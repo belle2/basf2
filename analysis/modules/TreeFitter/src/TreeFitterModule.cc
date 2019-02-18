@@ -26,6 +26,7 @@
 
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
 
+#include <framework/particledb/EvtGenDatabasePDG.h>
 using namespace Belle2;
 
 REG_MODULE(TreeFitter)
@@ -41,7 +42,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            "Upper limit for chi2 fluctuations to accept result. Larger value = less signal rejection but also less background rejection. Optimized for FOM on different topologies - don't touch unless you REALLY want this.",
            1.);
   addParam("massConstraintList", m_massConstraintList,
-           "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).");
+           "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
+  addParam("massConstraintListParticlename", m_massConstraintListParticlename,
+           "Type::[string]. List of particles to mass constrain with string = particle name.", {});
   addParam("customOriginVertex", m_customOriginVertex,
            "Type::[double]. List of vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
@@ -79,6 +82,17 @@ void TreeFitterModule::initialize()
   particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
+
+  if ((m_massConstraintList.size()) == 0 && (m_massConstraintListParticlename.size()) > 0) {
+    for (auto& containedParticle : m_massConstraintListParticlename) {
+      TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
+      m_massConstraintList.push_back(particletemp->PdgCode());
+    }
+    TreeFitter::massConstraintListPDG = m_massConstraintList;
+  } else {
+    TreeFitter::massConstraintListPDG = m_massConstraintList;
+  }
+
 }
 
 void TreeFitterModule::beginRun()
@@ -146,7 +160,7 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     )
   );
   /** TODO this is a bit of a hack. Make a config struct or so. */
-  TreeFitter::massConstraintListPDG = m_massConstraintList;
+  //  TreeFitter::massConstraintListPDG = m_massConstraintList;
   TreeFitter::massConstraintType = m_massConstraintType;
   TreeFitter::removeConstraintList = m_removeConstraintList;
 
@@ -167,7 +181,7 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[40;97m          ___       __ |  y     , ..,     \033[97;40mThank you for using TreeFitter.       \033[0m");
   B2INFO("\033[40;97m         /)'\\    ''''| u  \\ %W%W%%;                                             \033[0m");
   B2INFO("\033[40;97m     ___)/   \"---\\_ \\   |____”            \033[97;40mCite:                                 \033[0m");
-  B2INFO("\033[40;97m   ;&&%%;           (|__.|)./  ,..,           \033[97;40m(paper here)                      \033[0m");
+  B2INFO("\033[40;97m   ;&&%%;           (|__.|)./  ,..,           \033[97;40mhttps://arxiv.org/abs/1901.11198  \033[0m");
   B2INFO("\033[40;97m             ,.., ___\\    |/     &&\"                                            \033[0m");
   B2INFO("\033[40;97m           &&%%&    (| Uo /        '\"     \033[97;40mEmail:                                \033[0m");
   B2INFO("\033[40;97m            ''''     \\ 7 \\                   \033[97;40mfrancesco.tenchini@desy.de         \033[0m");

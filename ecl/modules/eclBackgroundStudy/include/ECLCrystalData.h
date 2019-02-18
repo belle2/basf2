@@ -8,14 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-// ECLCrystalData.h : Class
-// for obtaining crystal details for a given crystal cell
-// An evolved look-up table.
 #pragma once
 
 namespace Belle2 {
 
+  /**
+   * Class for obtaining crystal details for a given crystal cell
+   * An evolved look-up table.
+   */
   class ECLCrystalData {
   private :
 

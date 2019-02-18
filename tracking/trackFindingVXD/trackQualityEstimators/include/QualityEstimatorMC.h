@@ -31,7 +31,7 @@ namespace Belle2 {
      * @param mva_target : Boolean whether to perform quality estimation for MVA QE training.
      *                     This overwrites the strictQualityIndicator option!
      */
-    QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
+    QualityEstimatorMC(const std::string& mcRecoTracksStoreArrayName = "MCRecoTracks",
                        bool strictQualityIndicator = true, bool mva_target = false):
       QualityEstimatorBase(), m_strictQualityIndicator(strictQualityIndicator), m_mva_target(mva_target),
       m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
@@ -52,7 +52,7 @@ namespace Belle2 {
      * @param svdClustersName : SVD cluster StoreArray name
      * @param pxdClustersName : PXD cluster StoreArray name
      */
-    void setClustersNames(std::string svdClustersName, std::string pxdClustersName)
+    void setClustersNames(const std::string& svdClustersName, const std::string& pxdClustersName)
     { m_svdClustersName = svdClustersName; m_pxdClustersName = pxdClustersName; };
 
   protected:

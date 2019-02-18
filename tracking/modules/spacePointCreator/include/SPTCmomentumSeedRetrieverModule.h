@@ -79,10 +79,10 @@ namespace Belle2 {
     double m_bFieldZ = 0.;
 
     /** knows current event number. */
-    unsigned int m_eventCounter;
+    unsigned int m_eventCounter = 0;
 
     /** total number of TCs found in SpacePointTrackCand-container. */
-    unsigned int m_nTCsTotal;
+    unsigned int m_nTCsTotal = 0;
 
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;

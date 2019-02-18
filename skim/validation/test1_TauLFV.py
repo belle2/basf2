@@ -18,20 +18,37 @@ import os.path
 from basf2 import *
 from modularAnalysis import *
 from skimExpertFunctions import *
+from stdCharged import *
+from stdPhotons import *
+from stdPi0s import *
+from stdV0s import *
+from skim.standardlists.lightmesons import *
+
+taulfvskim = Path()
 
 fileList = ['../TauLFV.dst.root']
+inputMdstList('MC9', fileList, path=taulfvskim)
 
-inputMdstList('MC9', fileList)
+stdPi('loose', path=taulfvskim)
+stdK('loose', path=taulfvskim)
+stdPr('loose', path=taulfvskim)
+stdE('loose', path=taulfvskim)
+stdMu('loose', path=taulfvskim)
+stdPhotons('loose', path=taulfvskim)
+stdPi0s('loose', path=taulfvskim)
+loadStdSkimPi0(path=taulfvskim)
+stdKshorts(path=taulfvskim)
+loadStdLightMesons(path=taulfvskim)
 
-# Hadronic B0 skim
+# TauLFV skim
 from skim.taupair import *
-tauList = TauLFVList(1)
-skimOutputUdst('../TauLFV.udst.root', tauList)
-summaryOfLists(tauList)
+tauList = TauLFVList(1, path=taulfvskim)
+skimOutputUdst('../TauLFV.udst.root', tauList, path=taulfvskim)
+summaryOfLists(tauList, path=taulfvskim)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=taulfvskim)
+process(taulfvskim)
 
 # print out the summary
 print(statistics)

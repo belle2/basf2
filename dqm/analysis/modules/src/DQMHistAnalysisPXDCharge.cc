@@ -34,16 +34,16 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
-  addParam("HistoDir", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
-  B2DEBUG(1, "DQMHistAnalysisPXDCharge: Constructor done.");
+  B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 
 void DQMHistAnalysisPXDChargeModule::initialize()
 {
-  B2DEBUG(1, "DQMHistAnalysisPXDCharge: initialized.");
+  B2DEBUG(99, "DQMHistAnalysisPXDCharge: initialized.");
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -112,7 +112,7 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 
 void DQMHistAnalysisPXDChargeModule::beginRun()
 {
-  B2DEBUG(1, "DQMHistAnalysisPXDCharge: beginRun called.");
+  B2DEBUG(99, "DQMHistAnalysisPXDCharge: beginRun called.");
 
   m_cCharge->Clear();
 }
@@ -134,7 +134,7 @@ void DQMHistAnalysisPXDChargeModule::event()
       hh1 = findHist(m_histogramDirectoryName, name);
     }
     if (hh1) {
-      B2INFO("Histo " << name << " found in mem");
+//       B2INFO("Histo " << name << " found in mem");
       /// FIXME Replace by a nice fit
       m_fLandau->SetParameter(0, 1000);
       m_fLandau->SetParameter(1, 50);
@@ -183,7 +183,7 @@ void DQMHistAnalysisPXDChargeModule::event()
     data = m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
     m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
-    B2INFO("Mean: " << data << " Max Diff: " << diff);
+//     B2INFO("Mean: " << data << " Max Diff: " << diff);
 
 #ifdef _BELLE2_EPICS
     SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
@@ -198,7 +198,7 @@ void DQMHistAnalysisPXDChargeModule::event()
 
 void DQMHistAnalysisPXDChargeModule::endRun()
 {
-  B2DEBUG(1, "DQMHistAnalysisPXDCharge : endRun called");
+  B2DEBUG(99, "DQMHistAnalysisPXDCharge : endRun called");
 }
 
 
@@ -211,6 +211,6 @@ void DQMHistAnalysisPXDChargeModule::terminate()
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   ca_context_destroy();
 #endif
-  B2DEBUG(1, "DQMHistAnalysisPXDCharge: terminate called");
+  B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");
 }
 

@@ -20,7 +20,7 @@ set_log_level(LogLevel.DEBUG)
 
 main = create_path()
 
-if argc == 2 and argvs[1][-6:0] == ".sroot":
+if argc == 2 and argvs[1][-6:] == ".sroot":
     f_in_root = argvs[1]
     input = register_module('SeqRootInput')
     matchobj = re.search(r"([^\/]+)\.sroot", f_in_root)
@@ -41,7 +41,7 @@ else:
 
 main.add_module(input)
 histo = register_module('HistoManager')
-histo.param("histoFileName", "dqm.%s.root" % basename)
+histo.param("histoFileName", "dqm.%s.superlayer0.root" % basename)
 
 # Unpacker
 trgcdctsfUnpacker = register_module("TRGCDCTSFUnpacker")

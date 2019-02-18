@@ -250,7 +250,7 @@ bool PXDReadRawONSENModule::unpack_dhc_frame(void* data)
       uint32_t tt = ((time_tag_mid & 0x7FFF) << 12) | (time_tag_lo_and_type >> 4);
       // we cannot recover full time tag from DHH header, but we do as much as possible to
       // allow for check against a second PXD packet. Again: The time recovered here is WRONG, as we only have the lowest 17 bit of the second since epoch
-      m_eventMetaDataPtr->setTime((unsigned long long int)((time_tag_hi << 1) + (time_tag_mid & 0x8000 ? 1 : 0)) * 1000000000 +
+      m_eventMetaDataPtr->setTime((unsigned long long int)((time_tag_hi << 1) + ((time_tag_mid & 0x8000) ? 1 : 0)) * 1000000000 +
                                   (int)std::round(tt / 0.127216));
       return true;// assumes that DHC start is behind ONSEN_TRG
     }

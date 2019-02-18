@@ -3,6 +3,7 @@
 
 #include <framework/core/HistoModule.h>
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
+#include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
 #include <trg/ecl/TrgEclCluster.h>
@@ -40,10 +41,6 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   private:
-    /** Object of TC Clustering */
-    TrgEclCluster* _TCCluster;
-    //! TCId histogram
-    //TH2* h_TC2d;
     //! TCId histogram
     TH1* h_TCId;
     //! TCthetaId histogram
@@ -86,6 +83,7 @@ namespace Belle2 {
 
     //!
     StoreArray<TRGECLUnpackerStore> trgeclHitArray;
+    StoreArray<TRGECLUnpackerEvtStore> trgeclEvtArray;
     StoreArray<TRGECLCluster> trgeclCluster;
   };
 

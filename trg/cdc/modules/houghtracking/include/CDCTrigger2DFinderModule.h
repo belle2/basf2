@@ -134,7 +134,7 @@ namespace Belle2 {
 
     /** Combine Hough candidates to tracks by a fixed pattern algorithm.
      *  The Hough plane is first divided in 2 x 2 squares, then squares are combined. */
-    void patternClustering();
+    void patternClustering(const cdcMap& inputMap);
     /** Check for left/right connection of patterns in 2 x 2 squares */
     bool connectedLR(unsigned patternL, unsigned patternR);
     /** Check for up/down connection of patterns in 2 x 2 squares */
@@ -158,10 +158,11 @@ namespace Belle2 {
      *  @ return   index of corner within pattern */
     unsigned bottomLeftCorner(unsigned pattern);
 
-    /** Find all hits whose Hough curve crosses the rectangle
+    /** Find all hits in inputMap whose Hough curve crosses the rectangle
      *  with corners (x1, y1) and (x2, y2) and add the hit indices to list. */
     void findAllCrossingHits(std::vector<unsigned>& list,
-                             double x1, double x2, double y1, double y2);
+                             double x1, double x2, double y1, double y2,
+                             const cdcMap& inputMap);
     /** Select one hit per super layer.
      *  @param list        input list of hit Ids
      *  @param selected    selected hit Ids are added to selected
@@ -218,6 +219,9 @@ namespace Belle2 {
     bool m_usePriority;
     /** switch to check separately for a hit in the innermost super layer */
     bool m_requireSL0;
+
+    /** switch to send only the first found track and suppress the subsequent clones */
+    bool m_suppressClone;
 
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */

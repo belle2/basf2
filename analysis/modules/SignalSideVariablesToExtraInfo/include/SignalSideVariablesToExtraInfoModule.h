@@ -32,15 +32,11 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /** constructor */
     SignalSideVariablesToExtraInfoModule();
-
     /** Register input and output data */
     virtual void initialize() override;
-
-    /**  */
+    /** process event */
     virtual void event() override;
 
 
@@ -56,8 +52,10 @@ namespace Belle2 {
      */
     std::map<std::string, std::string> m_variableToExtraInfo;
 
-    Variable::Manager::FunctionPtr m_function; /**< Function pointer corresponding to given variable. */
-    std::string m_extraInfoName; /**< extra info name to be added */
+    /** Vector of function pointers corresponding to given variables. */
+    std::vector<Variable::Manager::FunctionPtr> m_functions;
+    /** Vector of extra info names */
+    std::vector<std::string> m_extraInfoNames;
   };
 }
 

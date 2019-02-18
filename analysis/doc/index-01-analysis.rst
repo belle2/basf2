@@ -1,6 +1,6 @@
-=========
+========
 Analysis
-=========
+========
 
 The analysis package collects modules and tools for high-level analysis of Belle II data.
 With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
@@ -60,17 +60,16 @@ Here is a list of variables known to ``basf2`` that can be used in cut strings o
 Output for offline analysis
 ===========================
 
-For historical reasons, there are two ways to save information from analysis jobs (e.g. for offline analysis using python tools such as `pandas`_)
-The recommended method is to get output directly from the VariableManger.
-New users are encouraged to start with this.
+You can save information from analysis jobs directly from the `VariableManager` (e.g. for offline analysis using python tools such as `pandas`_) 
 
 .. _pandas: https://pandas.pydata.org/
 
 .. toctree:: VariableManagerOutput
 
-We also support :doc:`NtupleMaker` tools which were developed first.
-However we expect to deprecate this method in the next release, and eventually remove.
-The documentation is included here for backward compatibility.
+.. warning::
+        The alternative `NtupleMaker` tools are now deprecated, please update your scripts.
+        We expect to remove this functionality in the next major release.
+        The documentation is included here for completeness. 
 
 .. toctree:: NtupleMaker
 
@@ -84,15 +83,12 @@ Truth-matching
 
 .. toctree:: MCMatching
 
-How to Veto
-===========
-
-.. toctree:: HowToVeto
-
 Advanced Topics
 ===============
 
 .. toctree:: RestOfEvent
+
+.. toctree:: HowToVeto
 
 .. toctree:: FlavorTagger
 

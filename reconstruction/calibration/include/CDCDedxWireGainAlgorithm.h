@@ -14,7 +14,7 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dataobjects/WireID.h>
 #include <framework/database/DBObjPtr.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TLine.h>
 #include <TCanvas.h>
 #include <iostream>

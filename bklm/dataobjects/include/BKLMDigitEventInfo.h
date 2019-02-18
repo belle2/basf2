@@ -10,14 +10,14 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
 
 namespace Belle2 {
 
   /**
    * Class to store debugging informations from the unpacker (event based).
    */
-  class BKLMDigitEventInfo : public RelationsObject {
+  class BKLMDigitEventInfo : public KLMDigitEventInfo {
 
   public:
 
@@ -25,12 +25,13 @@ namespace Belle2 {
      * Default constructor
      */
     BKLMDigitEventInfo():
+      KLMDigitEventInfo(),
       m_nOutOfRangeHits(0),
       m_nRPCHits(0),
       m_nSciHits(0),
-      m_triggerCTime(0),
       m_triggerUTime(0),
-      m_windowStart(0)
+      m_windowStart(0),
+      m_triggerCTimeOfPreviousEvent(0)
     {}
 
     /**
@@ -62,11 +63,6 @@ namespace Belle2 {
      * Increase by 'hits' the number of scintillator hits in the event
      */
     void increaseSciHits(int hits) { m_nSciHits += hits; }
-
-    /**
-     * Set trigger CTime
-     */
-    void setTriggerCTime(unsigned int triggerCTime) { m_triggerCTime = triggerCTime; }
 
     /**
      * Set trigger UTime
@@ -102,16 +98,10 @@ namespace Belle2 {
     int getSciHits() const { return m_nSciHits; }
 
     /**
-     * Returns trigger CTime
-     * @return trigger CTime
-     */
-    unsigned int getTriggerCTime() const { return m_triggerCTime; }
-
-    /**
      * Returns trigger CTime as int
      * @return trigger CTime
      */
-    int getIntTriggerCTime() const { return (int)m_triggerCTime; }
+    int getIntTriggerCTime() const { return (int)m_TriggerCTime; }
 
     /**
      * Returns trigger UTime
@@ -129,13 +119,13 @@ namespace Belle2 {
      * Returns trigger interval (triggerCTime - triggerCTimeOfPreviousEvent)
      * @return trigger interval
      */
-    long int getTriggerInterval() const { return (long int)m_triggerCTime - (long int)m_triggerCTimeOfPreviousEvent; }
+    long int getTriggerInterval() const { return (long int)m_TriggerCTime - (long int)m_triggerCTimeOfPreviousEvent; }
 
     /**
      * Returns trigger interval (triggerCTime - triggerCTimeOfPreviousEvent) in us
      * @return trigger interval in us
      */
-    double getTriggerIntervalInUs() const { return ((long int)m_triggerCTime - (long int)m_triggerCTimeOfPreviousEvent) * 8.0 / 1000.0; }
+    double getTriggerIntervalInUs() const { return ((long int)m_TriggerCTime - (long int)m_triggerCTimeOfPreviousEvent) * 8.0 / 1000.0; }
 
   private:
     int m_nOutOfRangeHits; /**< outOfRange-flagged hits (skipped hits with layer > 14) */
@@ -144,15 +134,13 @@ namespace Belle2 {
 
     int m_nSciHits; /**< scintillator hits in the event */
 
-    unsigned int m_triggerCTime; /**< trigger CTime */
-
     unsigned int m_triggerUTime; /**< trigger UTime */
 
     unsigned int m_windowStart; /**< window start */
 
     unsigned int m_triggerCTimeOfPreviousEvent; /**< trigger CTime of previous event */
 
-    ClassDef(BKLMDigitEventInfo, 1); /**< ClassDef */
+    ClassDef(BKLMDigitEventInfo, 3); /**< ClassDef */
 
   };
 

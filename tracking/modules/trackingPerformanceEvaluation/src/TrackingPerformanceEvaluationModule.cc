@@ -557,12 +557,11 @@ void TrackingPerformanceEvaluationModule::event()
   StoreArray<SVDCluster> svdClusters;
   StoreArray<CDCHit> cdcHit;
 
-  bool hasRecoTrack = false;
 
   BOOST_FOREACH(RecoTrack & mcRecoTrack, mcRecoTracks) {
 
     int nRecoTrack = 0;
-    hasRecoTrack = false;
+    bool hasRecoTrack = false;
 
     //3.a retrieve the RecoTrack
     RelationVector<RecoTrack> RecoTracks_fromMCRecoTrack = DataStore::getRelationsWithObj<RecoTrack>(&mcRecoTrack);
@@ -581,46 +580,9 @@ void TrackingPerformanceEvaluationModule::event()
 
       B2DEBUG(99, "~~~~~ " << RecoTracks_fromMCParticle.size() << " RecoTracks related to this MCParticle");
       for (int tc = 0; tc < (int)RecoTracks_fromMCParticle.size(); tc++)
-
         if (!hasRecoTrack) {
-
           hasRecoTrack = true;
           nRecoTrack++;
-
-          /*
-                genfit::TrackCandHit* thehitMCRT = 0;
-                for (int hitMCRT = 0; hitMCRT < (int)mcTrackCand.getNHits(); hitMCRT++) {
-
-                  thehitMCRT = mcTrackCand.getHit(hitMCRT);
-                  if (!thehitMCRT)
-                    continue;
-
-                  int hitId = thehitMCRT->getHitId();
-                  int detId = thehitMCRT->getDetId();
-                  if (detId == 1)
-                    m_h1_HitsMCRecoTrack->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
-                  if (detId == 2)
-                    m_h1_HitsMCRecoTrack->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
-                  //      if(thehitMCRT->getDetId() == 3)
-                  //        m_h1_HitsMCRecoTrack->Fill( cdcHit[hitId]->getLayer() );
-
-                  genfit::TrackCandHit* thehitTC = 0;
-                  for (int hitTC = 0; hitTC < (int)TrackCands_fromMCParticle[tc]->getNHits(); hitTC++) {
-
-                    thehitTC = TrackCands_fromMCParticle[tc]->getHit(hitTC);
-                    if (!thehitTC)
-                      continue;
-
-                    if ((*thehitTC) == (*thehitMCRT)) {
-                      if (detId == Const::PXD)
-                        m_h1_HitsRecoTrackPerMCRecoTrack->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
-                      if (detId == Const::SVD)
-                        m_h1_HitsRecoTrackPerMCRecoTrack->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
-                      continue;
-                    }
-                  }
-            }
-          */
         }
 
     }
@@ -858,6 +820,8 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
   double p = momentum.Mag();
   double mass = fitResult->getParticleType().getMass();
   double beta = p / sqrt(p * p + mass * mass);
+  // the following line gives a false positive for cpp-check
+  // cppcheck-suppress unreadVariable
   double sinTheta = TMath::Sin(momentum.Theta());
 
   m_h2_d0errphi0err_xy->Fill(d0_err / phi_err * px / pt,

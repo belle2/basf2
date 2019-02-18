@@ -110,11 +110,23 @@ void ECLFinalizerModule::event()
       // create an mdst cluster for each ecl shower
       const auto eclCluster = m_eclClusters.appendNew();
 
-      // set all variables
-      eclCluster->setStatus(eclShower.getStatus());
+      // status between showers and clusters may be different:
+      if (eclShower.hasPulseShapeDiscrimination()) {
+        eclCluster->addStatus(ECLCluster::EStatusBit::c_PulseShapeDiscrimination);
+      }
+
+
       eclCluster->setConnectedRegionId(eclShower.getConnectedRegionId());
-      eclCluster->setHypothesisId(eclShower.getHypothesisId());
       eclCluster->setClusterId(eclShower.getShowerId());
+
+      if (eclShower.getHypothesisId() == ECLShower::c_nPhotons) {
+        eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      } else if (eclShower.getHypothesisId() == ECLShower::c_neutralHadron) {
+        eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      } else {
+        B2ERROR("ECLShower hypothesis " << eclShower.getHypothesisId()  << " is not supported.");
+        eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_none);
+      }
 
       eclCluster->setEnergy(eclShower.getEnergy());
       eclCluster->setEnergyRaw(eclShower.getEnergyRaw());
@@ -143,6 +155,7 @@ void ECLFinalizerModule::event()
       eclCluster->setTheta(eclShower.getTheta());
       eclCluster->setPhi(eclShower.getPhi());
       eclCluster->setR(eclShower.getR());
+      eclCluster->setPulseShapeDiscriminationMVA(eclShower.getPulseShapeDiscriminationMVA());
       eclCluster->setClusterHadronIntensity(eclShower.getShowerHadronIntensity());
       eclCluster->setNumberOfHadronDigits(eclShower.getNumberOfHadronDigits());
 
@@ -161,7 +174,7 @@ void ECLFinalizerModule::event()
     } else { // Count number of c_nPhotons showers that aren't converted into clusters for monitoring
 
       // Get detector region
-      if (eclShower.getHypothesisId() == Belle2::ECLCluster::c_nPhotons) {
+      if (eclShower.getHypothesisId() == Belle2::ECLShower::c_nPhotons) {
 
         const auto detectorRegion = eclShower.getDetectorRegion();
 

@@ -29,7 +29,7 @@
 # Example steering file - 2012 Belle II Collaboration
 ########################################################
 
-from basf2 import *
+from basf2 import set_log_level, LogLevel, register_module, create_path, process, statistics
 
 # Set the global log level
 set_log_level(LogLevel.ERROR)

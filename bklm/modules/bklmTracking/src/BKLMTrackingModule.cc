@@ -27,7 +27,9 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
   m_passYX(nullptr),
   m_totalYX(nullptr),
   m_passYZ(nullptr),
-  m_totalYZ(nullptr)
+  m_totalYZ(nullptr),
+  m_runTotalEvents(0),
+  m_runTotalEventsWithTracks(0)
 {
   for (int i = 0; i < 8; ++i) {
     m_total[0][i] = nullptr;
@@ -67,32 +69,30 @@ void BKLMTrackingModule::initialize()
     B2INFO("BKLMTrackingModule:: this module is running in efficiency study mode!");
 
   m_file =     new TFile(m_outPath.c_str(), "recreate");
-  char hname[100];
+  TString hname;
+  std::string labelFB[2] = {"BB", "BF"};
   int Nbin = 16;
   float gmin = -350;
   float gmax = 350;
   int gNbin = 150;
-  //int Nbin2=100;
 
-  m_totalYX  = new TH2F("m_totalYX", " denominator Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
-  m_passYX  = new TH2F("m_passYX", " numerator Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
-  m_totalYZ  = new TH2F("m_totalYZ", " denominator Y vs. Z", gNbin, gmin, gmax, gNbin, gmin, gmax);
-  m_passYZ  = new TH2F("m_passYZ", " numerator Y vs. Z", gNbin, gmin, gmax, gNbin, gmin, gmax);
-  m_effiYX  = new TH2F("m_effiYX", " effi. Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
-  m_effiYZ  = new TH2F("m_effiYZ", " effi. Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_totalYX  = new TH2F("totalYX", " denominator Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_passYX  = new TH2F("passYX", " numerator Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_totalYZ  = new TH2F("totalYZ", " denominator Y vs. Z", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_passYZ  = new TH2F("passYZ", " numerator Y vs. Z", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_effiYX  = new TH2F("effiYX", " effi. Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_effiYZ  = new TH2F("effiYZ", " effi. Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
   m_effiYX->GetXaxis()->SetTitle("x (cm)");
   m_effiYX->GetYaxis()->SetTitle("y (cm)");
   m_effiYZ->GetXaxis()->SetTitle("z (cm)");
   m_effiYZ->GetYaxis()->SetTitle("y (cm)");
-  //m_effiYX  = new TEfficiency("m_effiYX", "effi Y vs. X", 150, -350, 350, 150, -350, 350);
-  //m_effiYZ  = new TEfficiency("m_effiYZ", "effi Y vs. Z", 150, -350, 350, 150, -350, 350);
   for (int iF = 0; iF < 2; iF++) {
     for (int iS = 0; iS < 8; iS++) {
-      sprintf(hname, "effi_isForward%i_Sector%i", iF, iS + 1);
+      hname.Form("effi_%s%i", labelFB[iF].c_str(), iS);
       m_effiVsLayer[iF][iS]  = new TEfficiency(hname, hname, Nbin, 0, 16);
-      sprintf(hname, "total_isForward%i_Sector%i", iF, iS + 1);
+      hname.Form("total_%s%i", labelFB[iF].c_str(), iS);
       m_total[iF][iS] = new TH1F(hname, hname, Nbin, 0, 16);
-      sprintf(hname, "pass_isForward%i_Sector%i", iF, iS + 1);
+      hname.Form("pass_%s%i", labelFB[iF].c_str(), iS);
       m_pass[iF][iS] = new TH1F(hname, hname, Nbin, 0, 16);
     }
   }
@@ -109,14 +109,6 @@ void BKLMTrackingModule::beginRun()
 
 void BKLMTrackingModule::event()
 {
-
-  StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
-  //unsigned long eventNumber = eventMetaData->getEvent();
-  //unsigned long runNumber = eventMetaData->getRun();
-  //unsigned long expNumber = eventMetaData->getExperiment();
-
-  //StoreArray<BKLMHit2d> hits2D;
-  //StoreArray<BKLMTrack> m_storeTracks;
   m_storeTracks.clear();
   bool thereIsATrack = false;
 
@@ -127,7 +119,6 @@ void BKLMTrackingModule::event()
   } else if (m_studyEffi) {
     for (int iForward = 0; iForward < 2; iForward++) {
       for (int iSector = 0; iSector < 8; iSector++) {
-        //if(iSector!=2&&iSector!=6) continue;
         for (int iLayer = 0; iLayer < 15; iLayer++) {
           runTracking(1, iForward, iSector , iLayer);
           if (m_storeTracks.getEntries() > 0)
@@ -151,7 +142,6 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
   //std::list<BKLMTrack*> tracks;
   //tracks.clear();
 
-  //cout<<" mode "<<mode<<", iForward "<<iForward<<", "<<iSector<<" , "<<iLayer<<endl;
   BKLMTrackFitter* m_fitter = new BKLMTrackFitter();
   BKLMTrackFinder*  m_finder = new BKLMTrackFinder();
   m_finder->setGlobalFit(m_globalFit);
@@ -164,7 +154,6 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
       hits2D[j]->isOnStaTrack(false);
     }
   }
-  //cout<<" num. of 2D hits "<<hits2D.getEntries()<<endl;
 
   for (int hi = 0; hi < hits2D.getEntries() - 1; ++hi) {
 
@@ -206,7 +195,6 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
 
       std::list<BKLMHit2d*> m_hits;
       if (m_finder->filter(seed, sectorHitList, m_hits)) {
-        //B2INFO("BKLMTrackingModule::stand-alone BKLMTrack fitted success.");
         BKLMTrack* m_track = m_storeTracks.appendNew();
         m_track->setTrackParam(m_fitter->getTrackParam());
         m_track->setTrackParamErr(m_fitter->getTrackParamErr());
@@ -230,7 +218,6 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
           RecoTrack* closestTrack = nullptr;
           if (m_MatchToRecoTrack) {
             if (findClosestRecoTrack(m_track, closestTrack)) {
-              //B2INFO("BKLMTrackingModule::matched RecoTrack found.");
               m_track->addRelationTo(closestTrack);
               for (j = m_hits.begin(); j != m_hits.end(); ++j) {
                 unsigned int sortingParameter = closestTrack->getNumberOfTotalHits();
@@ -262,23 +249,11 @@ void BKLMTrackingModule::terminate()
   }
 
   m_file->cd();
-  char name[100];
   for (int iF = 0; iF < 2; iF++) {
     for (int iS = 0; iS < 8; iS++) {
-      sprintf(name, "isForward%i_Sector%i_check", iF, iS + 1);
-      //m_effiVsLayer_check[iF][iS]  = new TEfficiency(*m_pass[iF][iS], *m_total[iF][iS]);
-      //m_effiVsLayer_check[iF][iS]->SetName(name);
       m_effiVsLayer[iF][iS]->Write();
       m_total[iF][iS]->Write();
       m_pass[iF][iS]->Write();
-      //m_theta[iF][iS]->Write();
-      //m_phi[iF][iS]->Write();
-      //m_effiVsLayer_check[iF][iS]->Write();
-      /*for(int iL = 0; iL<15; iL++)
-      {
-      m_effiVsPhi[iF][iS][iL]->Write();
-      }
-      */
     }
   }
 

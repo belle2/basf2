@@ -83,7 +83,7 @@ ECL Cluster
 
 Here is a list of variables related to ECL cluster.
 All ECLCluster-based variables return NaN if no ECLCluster is found.
-There is further detailed documentation available `here<https://confluence.desy.de/x/I3I0Aw>`_.
+There is further detailed documentation available `here <https://confluence.desy.de/x/I3I0Aw>`_.
 
 .. b2-variables::
    :group: ECL Cluster related
@@ -131,13 +131,33 @@ Here is a list of variables that returns extra info of a given particle:
 .. b2-variables::
    :group: MetaFunctions   
 
-MC Matching
-~~~~~~~~~~~
+MC matching and MC truth
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of truth-matching variables:
+Here is a list of MC truth-related variables.
+For some variables, you will need to run truth matching in order to get sensible results.
+
+.. code-block:: python
+
+    from modularAnalysis import matchMCTruth
+    matchMCTruth("B0:myCandidates")  # for example
+
+
+Variables will also work on generator-level particles:
+
+.. code-block:: python
+
+    from modularAnalysis import fillParticleListFromMC
+    fillParticleListFromMC("B0:generator", "") # the generator-level B particles
+
 
 .. b2-variables::
-   :group: MC Matching
+   :group: MC matching and MC truth
+
+
+.. b2-variables::
+   :group: MC particle seen in subdetectors
+
 
 Daughter info
 ~~~~~~~~~~~~~
@@ -148,7 +168,7 @@ Here is a list of variables getting info from particle's daughters:
    :group: DirectDaughterInfo
 
 KLM Cluster and :math:`K_{L}^0` Identification
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 
@@ -171,6 +191,8 @@ Flavor Tagger
 .. b2-variables::
    :group: Flavor Tagger MetaFunctions
 
+.. _restOfEventVariables:
+
 Rest of Event
 ~~~~~~~~~~~~~
 
@@ -183,13 +205,30 @@ Continuum Suppression
 .. b2-variables::
     :group: Continuum Suppression
 
-Miscellaneous
-~~~~~~~~~~~~~
 
-Other variable that can be handy in development:
+.. _eventShapeVariables:
+
+Event Shape
+~~~~~~~~~~~
+
+These variables are available after adding the event shape builder modules.
+This can be done with the function `modularAnalysis.buildEventShape`.
 
 .. b2-variables::
-   :group: Miscellaneous
+    :group: EventShape
+
+.. _eventKinematicsVariables:
+
+Event Kinematics
+~~~~~~~~~~~~~~~~
+
+These variables are available after adding the event kinematics modules.
+This can be done with the function `modularAnalysis.buildEventKinematics`.
+
+.. b2-variables::
+    :group: EventKinematics
+         
+.. _flight_information:
 
 Flight Information
 ~~~~~~~~~~~~~~~~~~
@@ -199,6 +238,8 @@ Here is a list of flight time and distance variables of a (grand)daughter partic
 .. b2-variables::
    :group: Flight Information   
 
+.. _vertex_information:
+
 Vertex Information
 ~~~~~~~~~~~~~~~~~~
 
@@ -207,6 +248,15 @@ Here is a list of production and decay vertex variables:
 .. b2-variables::
    :group: Vertex Information   
 
+
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+Other variable that can be handy in development:
+
+.. b2-variables::
+   :group: Miscellaneous
 
 Calibration
 ~~~~~~~~~~~
@@ -262,26 +312,27 @@ There are several predefined lists of variables and for each predefined list it 
 Operations with variable lists
 ==============================
 
-It is possible to create new variable lists using meta-variables. 
-For example, one can define list of kinematical variables in LAB frame and create another lists of kinematic variabels 
-in CMS using ``useCMSFrame(variable)`` meta-variable:
+It is possible to create new variable lists using meta-variables.  For example,
+one can define list of kinematic variables in LAB frame and create another
+lists of kinematic variables in CMS using ``useCMSFrame(variable)`` meta-variable:
 
 .. code:: python
 
+  from variables.utils import create_aliases
   # Replacement to Kinematics tool
-  kinematics = ['px',
-                'py',
-                'pz',
-                'pt',
-                'p',
-                'E']
+  kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
   # Kinematic variables in CMS
-  ckm_kinematics = wrap_list(kinematics,
-                             "useCMSFrame(variable)",
-                             "CMS")
+  cms_kinematics = create_aliases(kinematics, "useCMSFrame({variable})", "CMS")
 
-Functions for list operations are stored below.
+Now we can use the list of aliases ``cms_kinematics`` and add them to the
+output in one go or modify them further. The following functions are provided
+to help to easily create aliases.
 
-.. automodule:: variables.utils
-   :members:
+.. we don't document all of the stuff on this module and we choose the order
+   because the remaining functions will not be helpful for users and this is a
+   user manual after all.
 
+.. autofunction:: variables.utils.create_aliases
+.. autofunction:: variables.utils.create_aliases_for_selected
+.. autofunction:: variables.utils.create_daughter_aliases
+.. autofunction:: variables.utils.create_mctruth_aliases

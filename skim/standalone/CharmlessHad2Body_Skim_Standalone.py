@@ -20,7 +20,7 @@ from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
-gb2_setuprel = "release-02-00-00"
+gb2_setuprel = "release-03-00-00"
 
 # Create skim path
 charmless2skimpath = Path()
@@ -50,7 +50,7 @@ Had2BodyList = CharmlessHad2BodyB0List(path=charmless2skimpath) + CharmlessHad2B
 skimOutputUdst(skimCode, Had2BodyList, path=charmless2skimpath)
 summaryOfLists(Had2BodyList, path=charmless2skimpath)
 
-setSkimLogging(skim_path=charmless2skimpath)
+setSkimLogging(path=charmless2skimpath)
 process(charmless2skimpath)
 
 # Print summary statistics

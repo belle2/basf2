@@ -719,7 +719,7 @@ namespace Belle2 {
             const auto& ecl = roe->getECLClusters();
             for (auto& x : ecl) {
               if (x == nullptr) continue;
-              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x);
+              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x, ECLCluster::EHypothesisBit::c_nPhotons);
               if (iMomECLCluster == iMomECLCluster) {
                 if (x->isNeutral()) momXNeutralClusters += iMomECLCluster;
               }
@@ -748,20 +748,22 @@ namespace Belle2 {
               float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
               for (auto& x : ecl) {
                 if (x == nullptr) continue;
-                float iEnergy = x -> getEnergy();
+                float iEnergy = x -> getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
                 if (x->isNeutral() && iEnergy == iEnergy) {
-                  if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(x)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                  if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(x,
+                                                                      ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
               }
               for (auto& track : tracks) {
                 if (track != particle->getTrack()) {
                   for (const ECLCluster& chargedCluster : track->getRelationsWith<ECLCluster>()) {
                     // ignore everything except the nPhotons hypothesis
-                    if (chargedCluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+                    if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
                       continue;
-                    float iEnergy = chargedCluster.getEnergy();
+                    float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
                     if (iEnergy == iEnergy) {
-                      if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(&chargedCluster)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                      if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(&chargedCluster,
+                                                                          ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                     }
                   }
                 }
@@ -1390,7 +1392,7 @@ namespace Belle2 {
           // if KaonPion
           if (index == 9)
           {
-            const MCParticle* mcSlowPionMother;
+            const MCParticle* mcSlowPionMother = nullptr;
             StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
             Particle* targetSlowPion = nullptr;
             if (SlowPionList.isValid()) {

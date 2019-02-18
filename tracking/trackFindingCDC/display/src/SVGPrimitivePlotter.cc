@@ -57,13 +57,9 @@ void SVGPrimitivePlotter::drawLine(float startX,
   PrimitivePlotter::drawLine(startX, startY, endX, endY, attributeMap);
 
   AttributeMap geometryAttributeMap {
-    // cppcheck-suppress ignoredReturnValue
     {"x1", std::to_string(startX)},
-    // cppcheck-suppress ignoredReturnValue
     {"x2", std::to_string(endX)},
-    // cppcheck-suppress ignoredReturnValue
     {"y1", std::to_string(startY)},
-    // cppcheck-suppress ignoredReturnValue
     {"y2", std::to_string(endY)}
   };
 
@@ -81,13 +77,9 @@ void SVGPrimitivePlotter::drawArrow(float startX,
   PrimitivePlotter::drawArrow(startX, startY, endX, endY, attributeMap);
 
   AttributeMap geometryAttributeMap {
-    // cppcheck-suppress ignoredReturnValue
     {"x1", std::to_string(startX)},
-    // cppcheck-suppress ignoredReturnValue
     {"x2", std::to_string(endX)},
-    // cppcheck-suppress ignoredReturnValue
     {"y1", std::to_string(startY)},
-    // cppcheck-suppress ignoredReturnValue
     {"y2", std::to_string(endY)},
     {"marker-end" , "url(#endArrow)"}
   };
@@ -104,11 +96,8 @@ void SVGPrimitivePlotter::drawCircle(float centerX,
   PrimitivePlotter::drawCircle(centerX, centerY, radius, attributeMap);
 
   AttributeMap geometryAttributeMap {
-    // cppcheck-suppress ignoredReturnValue
     {"cx", std::to_string(centerX)},
-    // cppcheck-suppress ignoredReturnValue
     {"cy", std::to_string(centerY)},
-    // cppcheck-suppress ignoredReturnValue
     {"r", std::to_string(std::fabs(radius))}
   };
 
@@ -284,9 +273,7 @@ const std::string SVGPrimitivePlotter::save(const std::string& fileName)
   viewBoxStringStream << getBoundingBox().getHeight();
 
   AttributeMap variableAttributeMap{
-    // cppcheck-suppress ignoredReturnValue
     {"height", std::to_string(getCanvasHeight())},
-    // cppcheck-suppress ignoredReturnValue
     {"width", std::to_string(getCanvasWidth())},
     {"viewBox", viewBoxStringStream.str()},
   };

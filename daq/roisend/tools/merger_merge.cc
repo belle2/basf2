@@ -101,7 +101,8 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
     return -1;
   }
 
-  ret = b2_timed_blocking_io(sd, 0);
+  ret = b2_timed_blocking_io(sd,
+                             1);// This means, if the socket blocks longer than Xs, it will return a EAGAIN or EWOULDBLOCK (immediately)
   if (ret == -1) {
     ERROR(b2_timed_blocking_io);
     return -1;
@@ -433,7 +434,13 @@ main(int argc, char* argv[])
           unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
 
           n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
-          ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
+          while (1) {
+            ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
+            if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+              ERR_FPRINTF(stderr, "[WARNING] merger_merge: socket buffer full, retry\n");
+              sleep(1);// Bad hack, wait a second
+            } else break;
+          }
 
           if (ret == -1) {
             ERROR(b2_send);
@@ -456,7 +463,7 @@ main(int argc, char* argv[])
 
           flstat->log(n_bytes_to_onsen);
 
-          if (event_count < 40 || event_count % 10000 == 0) {
+          if (event_count < 10 /*|| event_count % 10000 == 0*/) {
             LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] sent event to ONSEN\n", event_count);
             dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
           }

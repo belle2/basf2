@@ -14,7 +14,7 @@ from modularAnalysis import *
 from stdPhotons import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 set_log_level(LogLevel.INFO)
 
 import os
@@ -53,7 +53,7 @@ skimOutputUdst(skimCode, ISRpipicc, path=ISRskimpath)
 summaryOfLists(ISRpipicc, path=ISRskimpath)
 
 # output skim log information
-setSkimLogging(skim_path=ISRskimpath)
+setSkimLogging(path=ISRskimpath)
 
 # process the path
 process(ISRskimpath)

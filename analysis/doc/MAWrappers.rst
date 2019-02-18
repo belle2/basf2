@@ -1,4 +1,4 @@
-.. _maweappers:
+.. _mawrappers:
 
 ModularAnalysis
 ===============
@@ -20,7 +20,7 @@ ModularAnalysis
       
          from basf2 import *
          from stdCharged import stdPi
-         from modularAnalysis import doSomething
+         from modularAnalysis import *
          stdPi()
          doSomething()
          process(analysis_main)

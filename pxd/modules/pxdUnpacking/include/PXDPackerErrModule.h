@@ -59,25 +59,25 @@ namespace Belle2 {
       std::map <int, std::vector <int>> m_dhc_mapto_dhe;
 
       /** Event counter */
-      unsigned int m_packed_events;
+      unsigned int m_packed_events{0};
       /** Real Trigger Nr */
-      unsigned int m_real_trigger_nr;
+      unsigned int m_real_trigger_nr{0};
       /** Trigger Nr */
-      unsigned int m_trigger_nr;
+      unsigned int m_trigger_nr{0};
       /** Run+Subrun Nr */
-      unsigned short m_run_nr_word1;
+      unsigned short m_run_nr_word1{0};
       /** Exp+Run Nr */
-      unsigned short m_run_nr_word2;
+      unsigned short m_run_nr_word2{0};
       /** Time(Tag) from MetaInfo */
-      unsigned long long int m_meta_time;
+      unsigned long long int m_meta_time{0};
 
       /** DHP Readout Frame Nr for DHP and DHE headers */
-      unsigned int m_trigger_dhp_framenr;
+      unsigned int m_trigger_dhp_framenr{0};
       /** DHE Trigger Gate for DHE headers */
-      unsigned int m_trigger_dhe_gate;
+      unsigned int m_trigger_dhe_gate{0};
 
       /** flag if we found one test failing */
-      bool m_found_fatal;
+      bool m_found_fatal {false};
 
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
@@ -112,13 +112,8 @@ namespace Belle2 {
 
       /** Pack one DHP RAW to buffer.
        */
+      /* cppcheck-suppress unusedPrivateFunction */
       void pack_dhp_raw(int dhp_id, int dhe_id);
-
-      /** Swap endianes inside all shorts of this frame besides CRC.
-       * @param data pointer to frame
-       * @param len length of frame
-       */
-      void endian_swap_frame(unsigned short* data, int len);
 
       void start_frame(void);//! Start with a new Frame
       void append_int8(unsigned char w);//! cat 8bit value to frame
@@ -135,10 +130,10 @@ namespace Belle2 {
       std::map <VxdID , int> startOfVxdID;
 
       /** temporary hitmap buffer for pixel to raw data conversion */
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] = {0};
 
-      unsigned int dhe_byte_count; /**< Byte count in current DHE package */
-      unsigned int dhc_byte_count; /**< Byte count in current DHC package */
+      unsigned int dhe_byte_count{0}; /**< Byte count in current DHE package */
+      unsigned int dhc_byte_count{0}; /**< Byte count in current DHC package */
 
       bool CheckErrorMaskInEvent(unsigned int eventnr, PXDError::PXDErrorFlags mask);
 

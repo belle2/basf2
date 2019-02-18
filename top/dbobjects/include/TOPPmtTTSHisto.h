@@ -68,7 +68,8 @@ namespace Belle2 {
       }
       pmtPixel--;
       if (pmtPixel >= c_NumPmtPixels) {
-        B2ERROR("TOPPmtTTSHisto::setHistogram: invalid PMT pixel " << pmtPixel + 1);
+        B2ERROR("TOPPmtTTSHisto::setHistogram: invalid PMT pixel "
+                << LogVar("PMT pixel", pmtPixel + 1));
         return;
       }
       m_histo[pmtPixel] = *histo;

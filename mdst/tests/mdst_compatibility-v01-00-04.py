@@ -11,6 +11,7 @@ CHANGES since release-01-00-04:
 - Track:
   + getQualityIndicator
 - ECLCluster:
+  + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity
   + getNumberOfHadronDigits
   + hasPulseShapeDiscrimination

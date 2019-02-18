@@ -10,16 +10,32 @@
 
 #include <bklm/modules/bklmDigitAnalyzer/BKLMDigitAnalyzerModule.h>
 
-// #include <framework/core/ModuleParam.templateDetails.h>
-
 using namespace Belle2;
 
 
 REG_MODULE(BKLMDigitAnalyzer)
 
 
-BKLMDigitAnalyzerModule::BKLMDigitAnalyzerModule() : Module()
+BKLMDigitAnalyzerModule::BKLMDigitAnalyzerModule() : Module(),
+  m_runNumber(0),
+  m_outputRootFile(nullptr),
+  m_histoList(nullptr)
 {
+  for (int i = 0; i < 2; ++i) {
+    m_histoLayerVsSector[i] = nullptr;
+    m_histoLayerVsSectorPerPlane[i][0] = nullptr;
+    m_histoLayerVsSectorPerPlane[i][1] = nullptr;
+    for (int s = 0; s < 8; ++s) {
+      m_histoLayer[i][s] = nullptr;
+      for (int p = 0; p < 2; ++p) {
+        m_histoChannel[i][s][p] = nullptr;
+        m_histoStrip[i][s][p] = nullptr;
+        m_histoTdc[i][s][p] = nullptr;
+        m_histoCTimeDiff[i][s][p] = nullptr;
+      }
+    }
+  }
+
   // Set module properties
   setDescription("Module useful to quickly analyze BKLM unpacked data.");
 
@@ -42,6 +58,10 @@ void BKLMDigitAnalyzerModule::initialize()
 
 void BKLMDigitAnalyzerModule::beginRun()
 {
+  time_t rawTime;
+  time(&rawTime);
+  struct tm* tm = gmtime(&rawTime);
+
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
   m_runNumber = eventMetaData->getRun();
 
@@ -54,6 +74,33 @@ void BKLMDigitAnalyzerModule::beginRun()
 
   m_outputRootFile = new TFile(outputRootNameTString, "RECREATE");
   B2INFO("BKLMDigitAnalyzer:: the output file '" << outputRootNameTString.Data() << "' will be created for run " << m_runNumber);
+
+  int exp = -1;
+  int run = -1;
+  int year = -1;
+  int month = -1;
+  int day = -1;
+  int hour = -1;
+  int min = -1;
+  int sec = -1;
+  m_extraInfo = new TTree("extraInfo", "Extra informations");
+  m_extraInfo->Branch("exp", &exp, "exp/I");
+  m_extraInfo->Branch("run", &run, "run/I");
+  m_extraInfo->Branch("year", &year, "year/I");
+  m_extraInfo->Branch("month", &month, "month/I");
+  m_extraInfo->Branch("day", &day, "day/I");
+  m_extraInfo->Branch("hour", &hour, "hour/I");
+  m_extraInfo->Branch("min", &min, "min/I");
+  m_extraInfo->Branch("sec", &sec, "sec/I");
+  exp = eventMetaData->getExperiment();
+  run = m_runNumber;
+  year = tm->tm_year + 1900;
+  month = tm->tm_mon + 1;
+  day = tm->tm_mday;
+  hour = tm->tm_hour;
+  min = tm->tm_min;
+  sec = tm->tm_sec;
+  m_extraInfo->Fill();
 
   m_histoList = new TList;
 
@@ -78,13 +125,20 @@ void BKLMDigitAnalyzerModule::beginRun()
         TString iSectorTString(toString(iSector).c_str());
         TString nameSector = label[fb] + iSectorTString;
 
-        m_histoLayer[fb][iSector] = createTH1("Layer" + nameSector, nameSector + " Layer -- run" + runNumberTString, 31, -0.5, 15.,
-                                              "Layer (0-based)", "Counts", 1, m_histoList);
-
         if (isRPCorPhi == 0) {
 
-          m_histoChannel[fb][iSector][isRPCorPhi] = createTH2("PlaneZ" + nameSector, nameSector + " Plane z -- run" + runNumberTString, 31,
+          // Create the histogram belowo only one time
+          m_histoLayer[fb][iSector] = createTH1("Layer" + nameSector, nameSector + " Layer -- run" + runNumberTString, 31, -0.5, 15.,
+                                                "Layer (0-based)", "Counts", 1, m_histoList);
+
+          m_histoChannel[fb][iSector][isRPCorPhi] = createTH2("PlaneZ" + nameSector,
+                                                              nameSector + " Plane z, electronic channels -- run" + runNumberTString, 31,
                                                               -0.5, 15., "Layer (0-based)", 130, -0.5, 64.5, "Channel", 1, m_histoList);
+
+          m_histoStrip[fb][iSector][isRPCorPhi] = createTH2("PlaneZStrip" + nameSector,
+                                                            nameSector + " Plane z, strips -- run" + runNumberTString,
+                                                            31, -0.5, 15., "Layer (0-based)", 130, -0.5, 64.5, "Strip", 1, m_histoList);
+
           m_histoTdc[fb][iSector][isRPCorPhi] = createTH1("SciTdc" + nameSector,
                                                           nameSector + " TDC (Scintillators) -- run" + runNumberTString, 60, 0, 30, "TDC", "Counts", 1, m_histoList);
 
@@ -94,8 +148,13 @@ void BKLMDigitAnalyzerModule::beginRun()
 
         } else {
 
-          m_histoChannel[fb][iSector][isRPCorPhi] = createTH2("PlanePhi" + nameSector, nameSector + " Plane phi -- run" + runNumberTString,
+          m_histoChannel[fb][iSector][isRPCorPhi] = createTH2("PlanePhi" + nameSector,
+                                                              nameSector + " Plane phi, electronic channels -- run" + runNumberTString,
                                                               31, -0.5, 15., "Layer (0-based)", 130, -0.5, 64.5, "Channel", 1, m_histoList);
+
+          m_histoStrip[fb][iSector][isRPCorPhi] = createTH2("PlanePhiStrip" + nameSector,
+                                                            nameSector + " Plane phi, strips -- run" + runNumberTString,
+                                                            31, -0.5, 15., "Layer (0-based)", 130, -0.5, 64.5, "Strip", 1, m_histoList);
 
           m_histoTdc[fb][iSector][isRPCorPhi] = createTH1("RPCTdc" + nameSector, nameSector + " TDC (RPCs) -- run" + runNumberTString, 230,
                                                           -100, 2200, "TDC", "Counts", 1, m_histoList);
@@ -134,6 +193,9 @@ void BKLMDigitAnalyzerModule::event()
       m_histoChannel[1 - digit.isForward()][digit.getSector() - 1][digit.isPhiReadout()]->Fill(digit.getLayer() - 1,
           digitRaw->getChannel() - 1);
 
+      m_histoStrip[1 - digit.isForward()][digit.getSector() - 1][digit.isPhiReadout()]->Fill(digit.getLayer() - 1,
+          digit.getStrip() - 1);
+
       // getTime() retruns the TDC
       m_histoTdc[1 - digit.isForward()][digit.getSector() - 1][digit.inRPC()]->Fill(digit.getTime());
 
@@ -146,9 +208,13 @@ void BKLMDigitAnalyzerModule::event()
 
 void BKLMDigitAnalyzerModule::endRun()
 {
+  StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
+
   // Save the .root file
   if (m_outputRootFile != NULL) {
     m_outputRootFile->cd();
+
+    m_extraInfo->Write();
 
     TIter nextHisto(m_histoList);
     TObject* obj;
@@ -156,25 +222,6 @@ void BKLMDigitAnalyzerModule::endRun()
       obj->Write("", TObject::kWriteDelete);
   }
   m_outputRootFile->Close();
-
-  // Save the .pdf file
-  /*TString runNumberTString(toString(0).c_str());
-
-  TString outputPdfNameTString(m_outputPdfName);
-  outputPdfNameTString += "_run" + runNumberTString + ".pdf";
-
-  TCanvas* canvas = new TCanvas("canvas", "canvas", 1000, 800);
-  canvas->SetBatch();
-  canvas->cd();
-  m_histoLayerPerSector[0]->Draw("colz");
-  canvas->SaveAs(outputPdfNameTString + "(");
-  m_histoLayerPerSector[1]->Draw("colz");
-  canvas->SaveAs(outputPdfNameTString);
-
-  TCanvas* empty = new TCanvas("empty", "empty", 1000, 800);
-  empty->SetBatch();
-  empty->cd();
-  empty->SaveAs(outputPdfNameTString + ")");*/
 }
 
 void BKLMDigitAnalyzerModule::terminate()

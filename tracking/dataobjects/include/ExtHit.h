@@ -59,6 +59,9 @@ namespace Belle2 {
     //! Copy constructor
     ExtHit(const ExtHit&);
 
+    //! Assignment operator
+    ExtHit& operator=(const ExtHit&);
+
     //! Destructor
     virtual ~ExtHit() {}
 

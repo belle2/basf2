@@ -67,7 +67,7 @@ vx.vertexTree(list_name='B0:all',
               ipConstraint=True,
               # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
               updateAllDaughters=True,  # update momenta off ALL particles
-              massConstraint=[111],  # mass constrain ALL pi0
+              massConstraint=['pi0'],  # mass constrain ALL pi0
               path=my_path
               )
 

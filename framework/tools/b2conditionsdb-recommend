@@ -9,7 +9,7 @@ import basf2
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
-import basf2_version
+import basf2.version
 import argparse
 import os
 import subprocess
@@ -54,7 +54,7 @@ def get_global_tags(release, input_file, analysis):
 if __name__ == "__main__":
     args = create_argumentparser().parse_args()
 
-    tags = get_global_tags(basf2_version.version, args.input, args.analysis)
+    tags = get_global_tags(basf2.version.version, args.input, args.analysis)
 
     if tags:
         print(' '.join(tags))

@@ -35,7 +35,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
 
     # all photons (reconstructed using the N1 clustering)
     if listtype == 'all':
-        fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path)
+        fillParticleList('gamma:all', 'clusterHasNPhotons', True, path)
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
     elif listtype == 'cdc':
@@ -149,5 +149,5 @@ def loadStdGoodBellePhoton(path=analysis_main):
     Parameters:
         path (basf2.Path): the path to load the modules
     """
-    loadStdAllPhoton(path)
+    stdPhotons('all', path)
     cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)

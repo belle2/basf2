@@ -46,11 +46,13 @@ namespace Belle2 {
     //! Hist memory
     DqmMemFile* m_memory = nullptr;
     std::string m_mempath;
+    std::string m_memname;
     int m_memsize;
     int m_interval;
     bool m_autocanvas;
     bool m_remove_empty;
     std::vector<std::string> m_acfolders;
+    TCanvas* m_c_info = nullptr;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     std::map<std::string, TCanvas*> m_cs;

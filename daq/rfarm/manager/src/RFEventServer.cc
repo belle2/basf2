@@ -184,7 +184,7 @@ int RFEventServer::Start(NSMmsg*, NSMcontext*)
 
 int RFEventServer::Stop(NSMmsg*, NSMcontext*)
 {
-  //  m_rbufin->clear();
+  m_rbufin->clear();
   return 0;
 }
 
@@ -257,5 +257,22 @@ void RFEventServer::server()
   }
 }
 
-
+void RFEventServer::cleanup()
+{
+  printf("RFEventServer : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  /*
+  kill ( m_pid_recv, SIGINT );
+  int status;
+  waitpid ( m_pid_recv, &status, 0 );
+  printf ( "RFEventServer : receiver terminated.\n" );
+  for ( int i=0; i<m_nnodes; i++ ) {
+    kill ( m_pid_sender[i], SIGINT );
+    waitpid ( m_pid_sender[i], &status, 0 );
+    printf ( "RFEventServer : sender [%d] terminated.\n", i );
+  }
+  */
+  printf("RFEventServer: Done. Exitting\n");
+  exit(-1);
+}
 

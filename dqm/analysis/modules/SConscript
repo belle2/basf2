@@ -4,7 +4,7 @@ Import('env')
 
 #env['LIBS'] = ['framework', 'daq', "RHTTP", "ca", "RooFit", "RooFitCore"]
 #env['LIBS'] = ['framework', 'daq', "RHTTP", "RooFit", "RooFitCore"]
-env['LIBS'] = ['framework', 'daq', 'dqm', 'RooFit', 'RooFitCore', 'vxd']
+env['LIBS'] = ['framework', 'daq', 'dqm', 'RooFit', 'RooFitCore', 'vxd', 'boost_regex']
 
 option = os.environ['BELLE2_OPTION']
 # disable EPICS if clang compiled
@@ -12,7 +12,7 @@ if option != 'clang':
     env['EPICS_BASE']=os.environ['EPICS_BASE']
     env['EPICS_HOST_ARCH']=os.environ['EPICS_HOST_ARCH']
 
-    env.Append(CPPDEFINES=['_BELLE2_EPICS'])
+    env.Append( CPPDEFINES=['_BELLE2_EPICS'])
     env.Append( CPPPATH=['$EPICS_BASE/include'] )
     env.Append( CPPPATH=['$EPICS_BASE/include/os/Linux'] )
 

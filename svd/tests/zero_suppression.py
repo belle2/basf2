@@ -45,9 +45,9 @@ if __name__ == "__main__":
         # We create data separately, so that we can use them in other tests.
 
         create_simhits = basf2.create_path()
-        create_simhits.add_module('EventInfoSetter', expList=[0], runList=[0], evtNumList=[1000])
+        create_simhits.add_module('EventInfoSetter', evtNumList=[50])
         create_simhits.add_module('Gearbox')
-        create_simhits.add_module('Geometry', components=['MagneticField', 'SVD'])
+        create_simhits.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         create_simhits.add_module('ParticleGun')
         create_simhits.add_module('FullSim')
         create_simhits.add_module('RootOutput', outputFileName='SimulationForThresholdTest.root',
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         # Read generated Simhits and Truehits
         test_threshold.add_module('RootInput', inputFileName='SimulationForThresholdTest.root')
         test_threshold.add_module('Gearbox')
-        test_threshold.add_module('Geometry', components=['MagneticField', 'SVD'])
+        test_threshold.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         # Set the threshold.
         test_threshold.add_module('SVDDigitizer', ZeroSuppressionCut=threshold)
         threshold_checker = CheckZS(threshold)

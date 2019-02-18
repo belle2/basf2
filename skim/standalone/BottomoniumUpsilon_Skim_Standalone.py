@@ -14,7 +14,7 @@ from stdPi0s import *
 from stdPhotons import *
 from stdCharged import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 import sys
 import os
 import glob
@@ -45,7 +45,7 @@ skimOutputUdst(skimCode, YList, path=BottomoniumUpsilonskimpath)
 summaryOfLists(YList, path=BottomoniumUpsilonskimpath)
 
 
-setSkimLogging(skim_path=BottomoniumUpsilonskimpath)
+setSkimLogging(path=BottomoniumUpsilonskimpath)
 process(BottomoniumUpsilonskimpath)
 
 # print out the summary

@@ -159,6 +159,26 @@ namespace Belle2 {
                             DataStore::EDurability durability = DataStore::c_Event,
                             std::string const& namedRelation = "") const;
 
+    /** Check for the existence of a relation to the provided toArray (from this Pystorearray)
+     *
+     * @param toArray       Array the relation should point to (from this StoreArray)
+     * @param durability    Durability of the relation.
+     * @param namedRelation Additional name for the relation, or "" for the default naming
+     */
+    bool hasRelationTo(const PyStoreArray& toArray,
+                       DataStore::EDurability durability = DataStore::c_Event,
+                       const std::string& namedRelation = "") const;
+
+    /** Check for the existence of a relation from the provided toArray (to this Pystorearray)
+     *
+     * @param fromArray     Array the relation should point to (from this StoreArray)
+     * @param durability    Durability of the relation.
+     * @param namedRelation Additional name for the relation, or "" for the default naming
+     */
+    bool hasRelationFrom(const PyStoreArray& fromArray,
+                         DataStore::EDurability durability = DataStore::c_Event,
+                         const std::string& namedRelation = "") const;
+
     /** Return name under which the object is saved in the DataStore. */
     std::string getName() const { return m_storeAccessor.getName(); }
 

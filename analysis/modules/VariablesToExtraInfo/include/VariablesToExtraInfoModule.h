@@ -33,7 +33,7 @@ namespace Belle2 {
    *  Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.");
    *
    * The module can also write any variable as an extra-info filed to any of the daughter particles specified via the DecayString.
-   * This is usefull for example when calculating various vetos (pi0, J/psi, ...). Note that in general it is not advised
+   * This is useful for example when calculating various vetos (pi0, J/psi, ...). Note that in general it is not advised
    * to write anything to daughter particle, since the daughter particle is not unique, it can be daughter of some other particle
    * in an event as well.
    */
@@ -69,7 +69,7 @@ namespace Belle2 {
     DecayDescriptor m_pDDescriptor;
     /** if true the extraInfo is written to daughter specified by the decay string*/
     bool m_writeToDaughter = false;
-    /** -1/0/1: Overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name already exists */
+    /** -1/0/1/2: Overwrite if lower / don't overwrite / overwrite if higher / always overwrite, in case if extra info with given name already exists */
     int m_overwrite = 0;
 
     /**

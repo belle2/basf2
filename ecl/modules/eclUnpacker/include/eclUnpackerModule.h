@@ -20,9 +20,12 @@ namespace Belle2 {
   class ECLTrig;
   class ECLDsp;
 
+  /** the ECL unpacker module */
   class ECLUnpackerModule : public Module {
   public:
+    /** constructor */
     ECLUnpackerModule();
+    /** destructor */
     virtual ~ECLUnpackerModule();
 
     /** initialize */

@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>oliver.frost@desy.de</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>CosmicsSimNoBkg.root</input>
   <output>CosmicsTrackingValidation.root</output>
   <description>This module validates that track finding is capable of reconstructing tracks in cosmics run.</description>
@@ -11,7 +11,7 @@
 """
 
 VALIDATION_OUTPUT_FILE = 'CosmicsTrackingValidation.root'
-CONTACT = 'oliver.frost@desy.de'
+CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 10000
 ACTIVE = True
 

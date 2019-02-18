@@ -3,7 +3,8 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Alon Hershenhorn, Torben Ferber                          *
+ * Contributors: Torben Ferber                                            *
+ *               Alon Hershenhorn                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,10 +18,9 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * return hadron scintillation component intensity of cluster computed from digits with offline waveforms saved.
-     * Variable is used to separate hadronic showers from electromagnetic showers
+     * return digit level MVA that uses pulse shape discrimination to identify hadronic vs electromagnetic showers.
      */
-    double eclClusterHadronIntensity(const Particle* particle);
+    double eclPulseShapeDiscriminationMVA(const Particle* particle);
 
     /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
@@ -181,19 +181,28 @@ namespace Belle2 {
     double eclClusterConnectedRegionId(const Particle* particle);
 
     /**
-    * return the unique Cluster ID of this cluster
-    */
-    double eclClusterUniqueId(const Particle* particle);
-
-    /**
      * return the Cluster ID within the connected region of this cluster
      */
     double eclClusterId(const Particle* particle);
 
     /**
-     * return the Hypothesis ID of this cluster
+     * [deprecated] return the Hypothesis ID of this cluster
      */
     double eclClusterHypothesisId(const Particle* particle);
+
+    /**
+     * Returns 1.0 if the cluster has the 'N photons' hypothesis (historically
+     * called 'N1'), 0.0 if not, and NaN if no cluster is associated to the
+     * particle.
+     */
+    double eclClusterHasNPhotonsHypothesis(const Particle* particle);
+
+    /**
+     * Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis
+     * (historically called 'N2'), 0.0 if not, and NaN if no cluster is
+     * associated to the particle.
+     */
+    double eclClusterHasNeutralHadronHypothesis(const Particle* particle);
 
     /**
      * return 1 if cluster has pulse shape discrimination variables computed
@@ -241,12 +250,12 @@ namespace Belle2 {
     double eclEnergy3BWDEndcap(const Particle* particle);
 
     /**
-     * Returns the ECL weighted average time of the photon daughters of the provided particle
+     * Returns the ECL weighted average time of the daughters of the provided particle
      */
     double weightedAverageECLTime(const Particle* particle);
 
     /**
-     * Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time
+     * Returns the maximum weighted distance between the individual ECL time and the ECL average time of all daughters
      */
     double maxWeightedDistanceFromAverageECLTime(const Particle* particle);
 

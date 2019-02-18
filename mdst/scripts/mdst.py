@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
 from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 from ROOT.Belle2 import Const
 
@@ -25,9 +24,6 @@ def add_mdst_output(
         dataDescription (dict or None): Additional key->value pairs to be added as data description
            fields to the output FileMetaData
     """
-
-    output = register_module('RootOutput')
-    output.param('outputFileName', filename)
     branches = [
         'Tracks',
         'V0s',
@@ -50,17 +46,14 @@ def add_mdst_output(
                      'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
         persistentBranches += ['BackgroundInfo']
     branches += additionalBranches
-    output.param('branchNames', branches)
-    output.param('branchNamesPersistent', persistentBranches)
     # set dataDescription correctly
     if dataDescription is None:
         dataDescription = {}
     # set dataLevel to mdst if it's not already set to something else (which
     # might happen for udst output since that calls this function)
     dataDescription.setdefault("dataLevel", "mdst")
-    output.param("additionalDataDescription", dataDescription)
-    path.add_module(output)
-    return output
+    return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
+                           branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)
 
 
 def add_mdst_dump(path, print_untested=False):
@@ -111,17 +104,20 @@ def add_mdst_dump(path, print_untested=False):
             }),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
-            "getHypothesisId", "getClusterId", "getMinTrkDistance", "getDeltaL",
+            "getClusterId", "getMinTrkDistance", "getDeltaL",
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
             "getE9oE21", "getClusterHadronIntensity", "getNumberOfHadronDigits",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
-            "getDeltaTime99", "getPhi", "getTheta", "getR", "getEnergy",
+            "getDeltaTime99", "getPhi", "getTheta", "getR", "getHypotheses",
             "getEnergyRaw", "getEnergyHighestCrystal", "getUncertaintyEnergy",
             "getUncertaintyTheta", "getUncertaintyPhi", "getClusterPosition",
             "getCovarianceMatrix3x3", "getDetectorRegion", "getUniqueId",
             "isTriggerCluster", "hasTriggerClusterMatching", "hasPulseShapeDiscrimination",
+            "getPulseShapeDiscriminationMVA",
             ], {
-                             "getRelationsWith": ["KlIds", "MCParticles"],
+                "getEnergy": [16, 32],
+                "hasHypothesis": [16, 32],
+                "getRelationsWith": ["KlIds", "MCParticles"],
                              }),
         DataStorePrinter("EventLevelClusteringInfo", [
             "getNECLCalDigitsOutOfTimeFWD", "getNECLCalDigitsOutOfTimeBarrel",

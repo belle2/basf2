@@ -1,66 +1,57 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# This steering file tests the eclChargedPID/ECLChargedPIDModule.
-# It must run on DST files, or reduced DSTs containing
-# ECLShowers, Tracks and all relevant relational containers:
-#
-# 'Tracks',
-# 'TrackFitResults',
-# 'ECLClusters',
-# 'ECLShowers',
-# 'TracksToECLClusters',
-# 'TracksToECLShowers',
-# 'ECLClustersToECLShowers',
-# 'ECLConnectedRegions',
-# 'ECLPidLikelihoods',
-# 'PIDLikelihoods',
-# 'TracksToECLPidLikelihoods',
-# 'TracksToPIDLikelihoods',
-#
-# Author: Marco Milesi (marco.milesi@unimelb.edu.au)
-# Year: 2018
-#
-# Usage:
-#
-# basf2 ecl/examples/EclChargedPIDModuleTest.py /path/to/input/DST/file.root -n N
-#
-########################################################
+"""
 
-from basf2 import *
-from ROOT import Belle2
-from modularAnalysis import *
-import os
-import sys
+This steering file tests the ECLChargedPIDModule.
 
-# Choose the DB
-use_local_database("localdb/database.txt")
+It must run on DST files, or reduced DSTs containing
+ECLShowers, Tracks and all relevant relational containers:
+
+'Tracks',
+'TrackFitResults',
+'ECLClusters',
+'ECLShowers',
+'TracksToECLClusters',
+'TracksToECLShowers',
+'ECLClustersToECLShowers',
+'ECLConnectedRegions',
+'ECLPidLikelihoods',
+'PIDLikelihoods',
+'TracksToECLPidLikelihoods',
+'TracksToPIDLikelihoods',
+
+Author: Marco Milesi (marco.milesi@unimelb.edu.au)
+Year: 2018
+
+Usage:
+
+basf2 -n N -i /path/to/input/DST/file.root EclChargedPidModuleTest.py
+
+"""
+
+import basf2
 
 # Register necessary modules to this path.
-main_path = create_path()
-
-if len(sys.argv) != 2:
-    os.sys.exit("ERROR: input file not given. Specify it as an argument")
+main_path = basf2.create_path()
 
 # Add module to read input *DST file.
-inputfile = sys.argv[1]
-simpleinput = register_module('RootInput')
-simpleinput.param('inputFileNames', inputfile)
+simpleinput = basf2.register_module('RootInput')
 main_path.add_module(simpleinput)
 
-# Add eclChargedPID/ECLChargedPIDModule.
-eclid = register_module('ECLChargedPID')
+# Add the module to the path.
+eclid = basf2.register_module('ECLChargedPID')
 main_path.add_module(eclid)
-eclid.logging.log_level = LogLevel.DEBUG
-eclid.logging.debug_level = 10
+# Set debug options for this module.
+eclid.logging.log_level = basf2.LogLevel.DEBUG
+eclid.logging.debug_level = 20
 
-# Print the datamodel objects in the store.
-printcolls = register_module('PrintCollections')
+# Print the data model objects in the store.
+printcolls = basf2.register_module('PrintCollections')
 main_path.add_module(printcolls)
 
-# This line allows to study events one-by-one, interactively
-# main_path.add_module('Interactive')
+# Start processing events.
+basf2.process(main_path)
 
-process(main_path)
-print(statistics)
+# Get some statistics about the booked modules.
+print(basf2.statistics)

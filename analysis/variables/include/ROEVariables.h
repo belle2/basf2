@@ -30,14 +30,6 @@ namespace Belle2 {
     double isInRestOfEvent(const Particle* particle);
 
     /**
-    * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.
-    * It can happen that for example a cluster is in the rest of event,
-    * which is CR - matched to a nearby track which is not in the ROE
-    * Hence this variable checks if all MdstObjects are in the ROE
-    */
-    double isCompletelyInRestOfEvent(const Particle* particle);
-
-    /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
      */
     double nRemainingTracksInROE(const Particle* particle, std::string maskName = "");
@@ -116,6 +108,21 @@ namespace Belle2 {
      * Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria
      */
     Manager::FunctionPtr nROE_NeutralECLClusters(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns number of charged particles in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROE_ChargedParticles(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns number of photons in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROE_Photons(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns number of neutral hadrons in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments);
 
     /**
      * Returns the number of particles in ROE from the given particle list.
@@ -329,6 +336,10 @@ namespace Belle2 {
      * temp
      */
     Manager::FunctionPtr bssMassDifference(const std::vector<std::string>& arguments);
+    /**
+     * returns related nested or host ROE
+     */
+    const RestOfEvent* getRelatedROEObject(const Particle* particle, bool returnHostOnly = false);
   }
 } // Belle2 namespace
 

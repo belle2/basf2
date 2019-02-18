@@ -61,8 +61,7 @@ ma.matchMCTruth(list_name='B0:all',
 
 
 # Select variables that we want to store to ntuple
-B0_vars = vc.event_meta_data + \
-    vc.inv_mass + \
+B0_vars = vc.inv_mass + \
     vc.mc_truth + \
     vu.create_aliases_for_selected(
         list_of_variables=vc.inv_mass + vc.mc_truth,
@@ -73,16 +72,10 @@ B0_vars = vc.event_meta_data + \
 
 pi0_vars = vc.mc_truth + \
     vc.kinematics + \
-    << << << < HEAD
-vc.mass_before_fit + \
-    vc.event_meta_data + \
-    == == == =
->>>>>> > 008de079c1... Delete misleading variable collection and remove wrong examples.
-['extraInfo(BDT)', 'decayAngle(0)'] + \
+    ['extraInfo(BDT)', 'decayAngle(0)'] + \
     vu.create_aliases_for_selected(
-    list_of_variables=vc.cluster + vc.kinematics,
-    decay_string='pi0 -> ^gamma ^gamma')
-
+        list_of_variables=vc.cluster + vc.kinematics,
+        decay_string='pi0 -> ^gamma ^gamma')
 
 # Saving variables to ntuple
 output_file = 'B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root'

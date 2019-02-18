@@ -120,13 +120,6 @@ namespace TreeFitter {
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
   {
     ParticleBase* rc = 0;
-    const int pdgcode = particle->getPDGCode();
-
-    bool validfit  = false; // ? SC
-
-    if (Belle2::Const::ParticleType(pdgcode) == Belle2::Const::pi0 && validfit) {
-      B2ERROR("ParticleBase::createParticle: found pi0 with valid fit. This is likely a configuration error.");
-    }
 
     if (!mother) { // 'head of tree' particles
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
@@ -162,7 +155,7 @@ namespace TreeFitter {
 
     } else { // 'internal' particles
 
-      if (validfit) {   // fitted composites
+      if (false) {   // fitted composites //JFK::eventually implement prefitting mechanic to prefit composites with other fitters
         if (isAResonance(particle)) {
 
           rc = new RecoResonance(particle, mother);

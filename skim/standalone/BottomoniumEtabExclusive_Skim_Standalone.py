@@ -11,7 +11,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 import sys
 import os
 import glob
@@ -38,7 +38,7 @@ skimOutputUdst(skimCode, EtabList, path=BottomoniumEtabskimpath)
 summaryOfLists(EtabList, path=BottomoniumEtabskimpath)
 
 
-setSkimLogging(skim_path=BottomoniumEtabskimpath)
+setSkimLogging(path=BottomoniumEtabskimpath)
 process(BottomoniumEtabskimpath)
 
 # print out the summary

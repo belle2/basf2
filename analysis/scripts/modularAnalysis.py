@@ -552,8 +552,8 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
                       path=analysis_main,
                       enforceFitHypothesis=False):
     """
-    Creates Particles of the desired types from the corresponding `mdst` dataobjects,
-    loads them to the StoreArray<Particle> and fills the ParticleLists.
+    Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
+    loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
     via list tuples (decayString, cut), for example
@@ -568,16 +568,16 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the `mdst` dataobject that is used as an input is determined from the type of
+    The type of the ``mdst`` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    * charged final state particles (input `mdst` type = Tracks)
+    * charged final state particles (input ``mdst`` type = Tracks)
         - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
     * neutral final state particles
-        - "gamma"           (input `mdst` type = ECLCluster)
-        - "K_S0", "Lambda0" (input `mdst` type = V0)
-        - "K_L0"            (input `mdst` type = KLMCluster)
+        - "gamma"           (input ``mdst`` type = ECLCluster)
+        - "K_S0", "Lambda0" (input ``mdst`` type = V0)
+        - "K_L0"            (input ``mdst`` type = KLMCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -624,23 +624,23 @@ def fillParticleList(
     enforceFitHypothesis=False
 ):
     """
-    Creates Particles of the desired type from the corresponding `mdst` dataobjects,
+    Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
     See also:
         the :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the `mdst` dataobject that is used as an input is determined from the type of
+    The type of the ``mdst`` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    * charged final state particles (input `mdst` type = Tracks)
+    * charged final state particles (input ``mdst`` type = Tracks)
         - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
     * neutral final state particles
-        - "gamma"           (input `mdst` type = ECLCluster)
-        - "K_S0", "Lambda0" (input `mdst` type = V0)
-        - "K_L0"            (input `mdst` type = KLMCluster)
+        - "gamma"           (input ``mdst`` type = ECLCluster)
+        - "K_S0", "Lambda0" (input ``mdst`` type = V0)
+        - "K_L0"            (input ``mdst`` type = KLMCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -1206,7 +1206,7 @@ def ntupleTree(
     Parameters:
         tree_name (str): the output nutple (TTree) name
         list_name (str): input ParticleList name
-        tools (list of str): list of Ntuple tools to be included, tool-decaystring pairs.
+        tools (list(str)): list of Ntuple tools to be included, tool-decaystring pairs.
     """
 
     message = (
@@ -1238,7 +1238,7 @@ def variablesToNtuple(
 
     Parameters:
         decayString (str): specifies type of Particles and determines the name of the ParticleList
-        variables (list of str): the list of variables (which must be registered in the VariableManager)
+        variables (list(str)): the list of variables (which must be registered in the VariableManager)
         treename (str): name of the ntuple tree
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
@@ -1265,8 +1265,8 @@ def variablesToHistogram(
 
     Parameters:
         decayString (str): specifies type of Particles and determines the name of the ParticleList
-        variables (list of tuple): variables + binning which must be registered in the VariableManager
-        variables_2d (list of tuple): pair of variables + binning for each which must be registered in the VariableManager
+        variables (list(tuple))): variables + binning which must be registered in the VariableManager
+        variables_2d (list(tuple)): pair of variables + binning for each which must be registered in the VariableManager
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
     """
@@ -1287,11 +1287,12 @@ def variablesToExtraInfo(
     path=analysis_main,
 ):
     """
-    For each particle in the input list the selected variables are saved in an extra-info field witht he given name.
+    For each particle in the input list the selected variables are saved in an extra-info field with the given name.
     Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
 
-    It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given
-    name already exists (-1/0/1).
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
 
     @param particleList  The input ParticleList
     @param variables     Dictionary of Variables and extraInfo names.
@@ -1318,11 +1319,12 @@ def variablesToDaughterExtraInfo(
     are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
     to specified daughter particle.
 
-    It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name
-    already exists (-1/0/1)
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
 
     @param particleList  The input ParticleList
-    @param decayString   Decay string that specifiec to which daughter the extra infor should be appended
+    @param decayString   Decay string that specifies to which daughter the extra info should be appended
     @param variables     Dictionary of Variables and extraInfo names.
     @param option        Various options for overwriting
     @param path          modules are added to this path
@@ -1343,12 +1345,12 @@ def variableToSignalSideExtraInfo(
     path,
 ):
     """
-    Write the value of specified variable estimated For the single particle in the input list (has to contain exactly 1
+    Write the value of specified variables estimated for the single particle in the input list (has to contain exactly 1
     particle) as an extra info to the particle related to current ROE.
     Should be used only in the for_each roe path.
 
     @param particleList  The input ParticleList
-    @param varToExtraInfo Dictionary of Variable and extraInfo name.
+    @param varToExtraInfo Dictionary of Variables and extraInfo names.
     @param path          modules are added to this path
     """
     mod = register_module('SignalSideVariablesToExtraInfo')
@@ -1522,6 +1524,18 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('particleListsInput', inputParticlelists)
+    path.add_module(roeBuilder)
+
+
+def buildNestedRestOfEvent(target_list_name, maskName='', path=analysis_main):
+    """
+    Creates for each Particle in the given ParticleList a RestOfEvent
+    """
+    roeBuilder = register_module('RestOfEventBuilder')
+    roeBuilder.set_name('NestedROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('nestedROEMask', maskName)
+    roeBuilder.param('createNestedROE', True)
     path.add_module(roeBuilder)
 
 
@@ -1956,7 +1970,7 @@ def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
         copyLists(outList, [firstList, secondList], False, path)
         vertexKFit(outList, 0.0, '', '', path)
         markDuplicate(outList, prioritiseV0, path)
-        applyCuts(outList, 'extraInfo(highQualityVertex)')
+        applyCuts(outList, 'extraInfo(highQualityVertex)', path)
     else:
         B2ERROR("Lists to be merged contain different particles")
 

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Alexei Sibidanov                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef BelleCrystal_HH
 #define BelleCrystal_HH
 
@@ -20,27 +30,30 @@ namespace Belle2 {
       double x, y;
     };
 
+    /** a Belle crystal in Geant4 */
     class BelleCrystal : public G4CSGSolid {
-    public:  // with description
+    public:
+      /** Constructor for "nominal" BelleCrystal */
       explicit BelleCrystal(const G4String& pName);
-      // Constructor for "nominal" BelleCrystal
-
+      /** Constructor */
       BelleCrystal(const G4String& pName, int, const G4ThreeVector*);
 
+      /** Destructor */
       virtual ~BelleCrystal() ;
-      // Destructor
 
       Plane_t GetSidePlane(G4int n) const {return fPlanes[n];}
 
       // Methods for solid
 
-      G4double GetCubicVolume();
-      G4double GetSurfaceArea();
+      G4double GetCubicVolume(); /**< get the Cubic volume */
+      G4double GetSurfaceArea(); /**< get the surface area */
 
+      /** compute the dimensions */
       void ComputeDimensions(G4VPVParameterisation* p,
                              const G4int n,
                              const G4VPhysicalVolume* pRep);
 
+      /** calculate the extent of the volume */
       G4bool CalculateExtent(const EAxis pAxis,
                              const G4VoxelLimits& pVoxelLimit,
                              const G4AffineTransform& pTransform,
@@ -75,14 +88,17 @@ namespace Belle2 {
 
     public:  // without description
 
+      /**
+       * Fake default constructor for usage restricted to direct object
+       * persistency for clients requiring preallocation of memory for
+       * persistifiable objects.
+       */
       explicit BelleCrystal(__void__&);
-      // Fake default constructor for usage restricted to direct object
-      // persistency for clients requiring preallocation of memory for
-      // persistifiable objects.
 
+      /** copy constructor */
       BelleCrystal(const BelleCrystal& rhs);
+      /** assignment operator */
       BelleCrystal& operator=(const BelleCrystal& rhs);
-      // Copy constructor and assignment operator.
 
       G4ThreeVector vertex(unsigned int i) const;
     protected:  // with description
@@ -94,13 +110,12 @@ namespace Belle2 {
                        Plane_t& plane) const;
 
     private:
-      G4ThreeVector GetPointOnTriangle(int) const;
-      // Returns a random point on the surface of one of the faces
-      double area(int, double&) const; // triangle area
+      G4ThreeVector GetPointOnTriangle(int) const; /**< Returns a random point on the surface of one of the faces */
+      double area(int, double&) const; /**< triangle area */
       double getvolarea() const;
-      const unsigned int* ivertx(unsigned int i) const;
+      const unsigned int* ivertx(unsigned int i) const; /**< get the ith vertex */
     private:
-      unsigned int nsides;
+      unsigned int nsides; /**< the number of sides */
       double fDz;
       std::vector<Plane_t> fPlanes;
       std::vector<Point_t> fx;
@@ -108,13 +123,13 @@ namespace Belle2 {
       mutable std::vector<double> fareas;
     };
 
+    /** Belle crystal in polyhedron */
     class PolyhedronBelleCrystal: public G4Polyhedron {
     public:
-      PolyhedronBelleCrystal(int, const G4ThreeVector*);
-      virtual ~PolyhedronBelleCrystal();
+      PolyhedronBelleCrystal(int, const G4ThreeVector*); /**< constructor */
+      virtual ~PolyhedronBelleCrystal();                 /**< destructor */
     };
 
   }
 }
 #endif
-

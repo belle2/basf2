@@ -88,7 +88,8 @@ namespace Belle2 {
       setTrackLength(m_extHit->getTOF(), chargedStable);
       const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
       if (!fitResult) {
-        B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
+        B2ERROR("No TrackFitResult available."
+                << LogVar("PDG code", chargedStable.getPDGCode()));
         return;
       }
       m_charge = fitResult->getChargeSign();
@@ -138,7 +139,8 @@ namespace Belle2 {
       setTrackLength(m_extHit->getTOF(), chargedStable);
       const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
       if (!fitResult) {
-        B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
+        B2ERROR("No TrackFitResult available."
+                << LogVar("PDG code", chargedStable.getPDGCode()));
         return;
       }
       m_charge = fitResult->getChargeSign();

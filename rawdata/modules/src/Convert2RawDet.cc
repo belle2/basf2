@@ -75,26 +75,88 @@ void Convert2RawDetModule::event()
 {
   //  B2INFO("Event " << m_nevt);
 
+  vector<unsigned int> cpr_id;
+
+  //
+  // Check if COPPER ID is duplicated.
+  //
+  StoreArray<RawSVD> raw_svdarray;
+  for (int i = 0; i < raw_svdarray.getEntries(); i++) {
+    for (int j = 0; j < raw_svdarray[ i ]->GetNumEntries(); j++) {
+      cpr_id.push_back(raw_svdarray[ i ]->GetNodeID(j));
+    }
+  }
+
+  StoreArray<RawCDC> raw_cdcarray;
+  for (int i = 0; i < raw_cdcarray.getEntries(); i++) {
+    for (int j = 0; j < raw_cdcarray[ i ]->GetNumEntries(); j++) {
+      cpr_id.push_back(raw_cdcarray[ i ]->GetNodeID(j));
+    }
+  }
+
+  StoreArray<RawTOP> raw_toparray;
+  for (int i = 0; i < raw_toparray.getEntries(); i++) {
+    for (int j = 0; j < raw_toparray[ i ]->GetNumEntries(); j++) {
+      cpr_id.push_back(raw_toparray[ i ]->GetNodeID(j));
+    }
+  }
+
+  StoreArray<RawARICH> raw_aricharray;
+  for (int i = 0; i < raw_aricharray.getEntries(); i++) {
+    for (int j = 0; j < raw_aricharray[ i ]->GetNumEntries(); j++) {
+      cpr_id.push_back(raw_aricharray[ i ]->GetNodeID(j));
+    }
+  }
+
+  StoreArray<RawECL> raw_eclarray;
+  for (int i = 0; i < raw_eclarray.getEntries(); i++) {
+    for (int j = 0; j < raw_eclarray[ i ]->GetNumEntries(); j++) {
+      cpr_id.push_back(raw_eclarray[ i ]->GetNodeID(j));
+    }
+  }
+
+  StoreArray<RawKLM> raw_klmarray;
+  for (int i = 0; i < raw_klmarray.getEntries(); i++) {
+    for (int j = 0; j < raw_klmarray[ i ]->GetNumEntries(); j++) {
+      cpr_id.push_back(raw_klmarray[ i ]->GetNodeID(j));
+    }
+  }
+
+  StoreArray<RawTRG> raw_trgarray;
+  for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+    for (int j = 0; j < raw_trgarray[ i ]->GetNumEntries(); j++) {
+      cpr_id.push_back(raw_trgarray[ i ]->GetNodeID(j));
+    }
+  }
+
+
   StoreArray<RawDataBlock> raw_datablkarray;
   for (int i = 0; i < raw_datablkarray.getEntries(); i++) {
-
-    convertDataObject(raw_datablkarray[ i ]);
+    convertDataObject(raw_datablkarray[ i ], cpr_id);
   }
   raw_datablkarray.clear();
 
-
   StoreArray<RawCOPPER> raw_cprarray;
   for (int i = 0; i < raw_cprarray.getEntries(); i++) {
-    //    (raw_cprarray[ i ]->GetBuffer(0))[ 6 ] |= 0x02000000;
-    convertDataObject((RawDataBlock*)(raw_cprarray[ i ]));
+    convertDataObject((RawDataBlock*)(raw_cprarray[ i ]), cpr_id);
   }
   raw_cprarray.clear();
 
+
+  for (unsigned int i = 0; i < cpr_id.size(); i++) {
+    for (unsigned int j = i + 1; j < cpr_id.size(); j++) {
+      //      printf("[DEBUG] eve %d i %d 0x%.8x j %d 0x%.8x\n", m_nevt, i, cpr_id[i], j, cpr_id[j] );
+      if (cpr_id[ i ] == cpr_id[ j ]) {
+        B2FATAL("Duplicated COPPER object is found. ID=0x" << hex << cpr_id[ i ] << " Exiting...");
+      }
+    }
+  }
   m_nevt++;
+
 }
 
 
-void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
+void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk, std::vector<unsigned int>& cpr_id)
 {
   //
   // Convert RawDataBlock to Raw***
@@ -138,7 +200,8 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
       tempcpr.SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
       int subsys_id = tempcpr.GetNodeID(0);
 
-
+      // store COPPER ID for check
+      cpr_id.push_back((unsigned int)subsys_id);
 
       delete_flag = 1; // this buffer will be deleted in Raw*** destructor.
 

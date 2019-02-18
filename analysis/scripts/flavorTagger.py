@@ -485,7 +485,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
         targetVariable = 'isRightCategory(' + category + ')'
         extraInfoName = targetVariable
@@ -509,7 +509,8 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
             if mode == 'Sampler':
                 if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
-                    methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
+                    methodPrefixEventLevelKaonPion = "FlavorTagger_" + belleOrBelle2Flag + \
+                        "_" + weightFiles + 'EventLevelKaonPionFBDT'
                     identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
                     if not os.path.isfile(identifierEventLevelKaonPion):
                         # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
@@ -562,14 +563,14 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
         targetVariable = 'isRightCategory(' + category + ')'
 
         if not os.path.isfile(identifierEventLevel) and mode == 'Sampler':
 
             if category == 'KaonPion':
-                methodPrefixEventLevelSlowPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
+                methodPrefixEventLevelSlowPion = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
                 identifierEventLevelSlowPion = filesDirectory + '/' + methodPrefixEventLevelSlowPion + '_1.root'
                 if not os.path.isfile(identifierEventLevelSlowPion):
                     B2INFO("Flavor Tagger: event level weight file for the Slow Pion category is absent." +
@@ -620,7 +621,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixEventLevel + "_1.root"
 
@@ -671,7 +672,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
 
-    methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     if mode == 'Sampler':
@@ -791,7 +792,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     B2INFO('COMBINER LEVEL TEACHER')
 
-    methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     sampledFilesList = glob.glob(filesDirectory + '/' + methodPrefixCombinerLevel + 'sampled*.root')
@@ -866,7 +867,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 def flavorTagger(
     particleLists=[],
     mode='Expert',
-    weightFiles='B2JpsiKs_muBGx1',
+    weightFiles='B2nunubarBGx1',
     workingDirectory='.',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
     categories=[
@@ -904,11 +905,14 @@ def flavorTagger(
                                                trained, for this step you do not reconstruct any particle or do any analysis,
                                                you just run the flavorTagger alone.
       @param weightFiles                       Weight files name. Default=
-                                               ``B2JpsiKs_muBGx1``. Use ``B2JpsiKs_muBGx0`` with BGx0 MC. If the user self
+                                               ``B2nunubarBGx1``. For Belle MC/data use  ``B2JpsiKs_muBGx1``. If the user self
                                                wants to train the FlavorTagger, the weightfiles name should correspond to the
                                                analysed CP channel in order to avoid confusions. The default name
-                                               ``B2JpsiKs_mu`` corresponds to Breco
-                                               :math:`\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
+                                               ``B2nunubarBGx1`` corresponds to
+                                               :math:`B^0_{\\rm sig}\\to \\nu \\overline{\\nu}`.
+                                               and ``B2JpsiKs_muBGx1`` to
+                                               :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
+                                               BGx1 stays for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
       @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.

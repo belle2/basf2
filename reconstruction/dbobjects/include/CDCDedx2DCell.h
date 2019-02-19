@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett                                             *
+ * Contributors: Jake Bennett, Jitendra                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -51,7 +51,8 @@ namespace Belle2 {
       }
       for (unsigned int layer = 0; layer < getSize(); ++layer) {
         const TH2F* newhist = rhs.getHist(layer);
-        m_twodgains[layer].Multiply(newhist);
+        if (newhist->GetEntries() > 0)m_twodgains[layer].Multiply(newhist);
+        else B2ERROR("ERROR! constant histograms is empty");
       }
       return *this;
     }
@@ -70,11 +71,24 @@ namespace Belle2 {
     {
       if (m_twodgains.size() == 0) {
         B2ERROR("ERROR!");
+        return NULL;
       }
-      if (layer < 8 && m_twodgains.size() <= 2) return &m_twodgains[0];
-      else if (m_twodgains.size() == 2) return &m_twodgains[1];
-      else return &m_twodgains[layer];
-    };
+
+      if (m_twodgains.size() == 2) {
+        if (layer == 0) return &m_twodgains[0];
+        else if (layer == 1) return &m_twodgains[1];
+        else {
+          B2ERROR("ERROR! const histograms NOT found");
+          return NULL;
+        }
+      } else if (m_twodgains.size() == 56) {
+        return &m_twodgains[layer];
+      } else {
+        B2ERROR("ERROR! Something is wrong # of const histograms");
+        return NULL;
+      }
+      return NULL;
+    }
 
     /** Return dE/dx mean value for the given bin
      * @param layer number
@@ -137,6 +151,6 @@ namespace Belle2 {
     short m_version; /**< version number for 2D correction */
     std::vector<TH2F> m_twodgains; /**< 2D histograms of doca/enta gains, layer dependent */
 
-    ClassDef(CDCDedx2DCell, 3); /**< ClassDef */
+    ClassDef(CDCDedx2DCell, 4); /**< ClassDef */
   };
 } // end namespace Belle2

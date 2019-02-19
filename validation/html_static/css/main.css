@@ -342,6 +342,11 @@ textarea {
     border-bottom-right-radius: 4px;
 }
 
+#button-revision-load-container {
+    display: block;
+    padding-top: 7px;
+}
+
 #systeminfo {
     /* Need the important, else we'll be overwritten by #menu>div */
     border-bottom: 1px solid gray !important;

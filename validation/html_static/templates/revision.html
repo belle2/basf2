@@ -14,4 +14,9 @@
 	{{/if}}
 </div>
 {{/revisions}}
-<button on-click='loadSelectedRevisions'>Load selected</button>
+<!-- actually this should be a div, but then this will be formatted by the
+div: last-child rule, so just make it a span and give it the corresponding
+CSS properties -->
+<span id="button-revision-load-container">
+	<button id="button-revision-load" on-click='loadSelectedRevisions'>Load selected</button>
+</span>

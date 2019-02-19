@@ -291,7 +291,7 @@ namespace Belle2 {
     //! Get Event Timing
     double getEventTiming() { return m_eventtiming; }
     //! Get bits for GDL
-    int getECLtoGDL(int i) { return m_bitECLtoGDL[i]; }
+    int getECLtoGDL(int i) { if (i < 4) { return m_bitECLtoGDL[i]; } else { return 0; }}
 
 
 

@@ -650,10 +650,10 @@ void TRGGRLProjectsModule::event()
   bool nclst1_2 = (N_clst1 & (1 << 2)) != 0;
   bool nclst1_3 = (N_clst1 & (1 << 3)) != 0;
 
-  bool nclst2_0 = (N_clst1 & (2 << 0)) != 0;
-  bool nclst2_1 = (N_clst1 & (2 << 1)) != 0;
-  bool nclst2_2 = (N_clst1 & (2 << 2)) != 0;
-  bool nclst2_3 = (N_clst1 & (2 << 3)) != 0;
+  bool nclst2_0 = (N_clst2 & (1 << 0)) != 0;
+  bool nclst2_1 = (N_clst2 & (1 << 1)) != 0;
+  bool nclst2_2 = (N_clst2 & (1 << 2)) != 0;
+  bool nclst2_3 = (N_clst2 & (1 << 3)) != 0;
 
   //---------------------------------------------------------------------
   //..Filling InputBits

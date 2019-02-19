@@ -146,7 +146,7 @@ void SVDUnpackerDQMModule::beginRun()
 void SVDUnpackerDQMModule::event()
 {
   if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) if (!shutUpNoData) {
-      B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD monitoring disabled");
+      B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
       shutUpNoData = true;
     }
 

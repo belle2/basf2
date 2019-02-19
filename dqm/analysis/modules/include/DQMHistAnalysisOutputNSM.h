@@ -8,12 +8,12 @@
 
 #pragma once
 
+#include <daq/slc/nsm/NSMCommunicator.h>
+#include <daq/slc/nsm/NSMNodeDaemon.h>
+
 #include <dqm/analysis/modules/DQMHistAnalysisOutput.h>
 
 namespace Belle2 {
-
-  /** Class declaration for output NSMCallback */
-  class NSMCallback;
 
   /**
    * The module to output values to NSM network.

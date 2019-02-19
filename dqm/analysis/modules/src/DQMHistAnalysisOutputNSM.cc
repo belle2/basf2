@@ -8,9 +8,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutputNSM.h>
 
-#include <daq/slc/nsm/NSMCommunicator.h>
-#include <daq/slc/nsm/NSMNodeDaemon.h>
-
 #include <daq/slc/runcontrol/RCNode.h>
 
 #include <daq/slc/system/PThread.h>

@@ -238,7 +238,7 @@ CatCode='CatCode00010203040506070809101112'
 
 identifier="B2"${trainDecayChannel}
 
-if [ ${trainDecayChannel} = "JpsiKs" ] 
+if [ ${trainDecayChannel} = "JPsiKs" ] 
    then
    identifier="B2JpsiKs_mu"
    fi
@@ -258,11 +258,11 @@ for iCategory in "${categories[@]}"
       mkdir -p ${workingDirectoryForCatVal}'/EventLevel'${iCategory}
       
       nohup ${currentpath}/ft_mva_evaluate.py \
-        -id "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}EventLevel${iCategory}FBDT_1.root" \
-        -train "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}EventLevel${iCategory}FBDTsampled*.root" \
-        -data  "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}EventLevel${iCategory}FBDTsampled*.root" \
-        -tree ${BelleOrBelle2}'_'${identifier}${MCType}'EventLevel'${iCategory}'FBDT_tree' \
-        -out  ${BelleOrBelle2}'_'${identifier}${MCType}'EventLevel'${iCategory}'FBDT.pdf'  \
+        -id    "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}EventLevel${iCategory}FBDT_1.root" \
+        -train "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}EventLevel${iCategory}FBDTsampled*.root" \
+        -data  "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}EventLevel${iCategory}FBDTsampled*.root" \
+        -tree "FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}EventLevel${iCategory}FBDT_tree" \
+        -out  "FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}EventLevel${iCategory}FBDT.pdf"  \
         -w ${workingDirectoryForCatVal}'/EventLevel'${iCategory} -b2Orb ${BelleOrBelle2} \
         >& ${workingDirectoryForCatVal}'/EventLevel'${iCategory}'/mva_evaluate.out' & 
         
@@ -270,21 +270,21 @@ for iCategory in "${categories[@]}"
 
 mkdir -p ${workingDirectoryForCatVal}'/CombinerFBDT'    
 nohup ${currentpath}/ft_mva_evaluate.py \
-        -id "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}FBDT_1.root" \
-        -train "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}sampled*.root" \
-        -data  "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}sampled*.root" \
-        -tree ${BelleOrBelle2}'_'${identifier}${MCType}'Combiner'${CatCode}'FBDT_tree' \
-        -out ${BelleOrBelle2}'_'${identifier}${MCType}'Combiner'${CatCode}'FBDT.pdf' \
+        -id    "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}FBDT_1.root" \
+        -train "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}sampled*.root" \
+        -data  "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}sampled*.root" \
+        -tree "FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}FBDT_tree" \
+        -out  "FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}FBDT.pdf" \
         -w ${workingDirectoryForCatVal}'/CombinerFBDT' -b2Orb ${BelleOrBelle2} \
         >& ${workingDirectoryForCatVal}'/CombinerFBDT/mva_evaluate.out' & 
 
 mkdir -p ${workingDirectoryForCatVal}'/CombinerFANN'    
 nohup ${currentpath}/ft_mva_evaluate.py \
-        -id "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}FANN_1.root" \
-        -train "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}sampled*.root" \
-        -data  "${workingDirectory}/FlavorTagging/TrainedMethods/${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}sampled*.root" \
-        -tree ${BelleOrBelle2}'_'${identifier}${MCType}'Combiner'${CatCode}'FBDT_tree' \
-        -out ${BelleOrBelle2}'_'${identifier}${MCType}'Combiner'${CatCode}'FANN.pdf' \
+        -id    "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}FANN_1.root" \
+        -train "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}sampled*.root" \
+        -data  "${workingDirectory}/FlavorTagging/TrainedMethods/FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}sampled*.root" \
+        -tree "FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}FBDT_tree" \
+        -out  "FlavorTagger_${BelleOrBelle2}_${identifier}${MCType}Combiner${CatCode}FANN.pdf" \
         -w ${workingDirectoryForCatVal}'/CombinerFANN' -b2Orb ${BelleOrBelle2} \
         >& ${workingDirectoryForCatVal}'/CombinerFANN/mva_evaluate.out' & 
 

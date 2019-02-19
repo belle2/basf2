@@ -52,7 +52,7 @@ b2.use_central_database("analysis_tools_release-03")
 # Flavor Tagger, Vertex of Signal Side and TagV
 ft.flavorTagger(
     particleLists=['B0:jpsiks'],
-    weightFiles='B2JpsiKs_muBGx1',
+    weightFiles='B2nunubarBGx1',
     path=cp_val_path)
 
 vx.vertexRave(list_name='B0:jpsiks', conf_level=0.0,

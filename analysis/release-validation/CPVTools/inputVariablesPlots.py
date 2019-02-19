@@ -180,7 +180,7 @@ def plotInputVariablesOfFlavorTagger():
         if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
             identifiersExtraInfosDict[particleList] = []
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         treeName = methodPrefixEventLevel + "_tree"
         targetVariable = 'isRightCategory(' + category + ')'
 

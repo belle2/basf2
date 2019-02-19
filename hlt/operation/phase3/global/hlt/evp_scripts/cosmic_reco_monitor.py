@@ -11,7 +11,7 @@ path = create_hlt_path(args)
 
 # add software reconstruction and trigger for cosmics
 add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitoring",
-                   data_taking_period="phase3")
+                   data_taking_period="early_phase3")
 
 finalize_hlt_path(path, args)
 basf2.print_path(path)

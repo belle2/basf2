@@ -12,7 +12,7 @@ path = create_expressreco_path(args)
 
 # add expressreco
 add_expressreco_processing(path, run_type="cosmics", do_reconstruction=True,
-                           data_taking_period="phase3")
+                           data_taking_period="early_phase3")
 
 finalize_expressreco_path(path, args, show_progress_bar=True)
 basf2.print_path(path)

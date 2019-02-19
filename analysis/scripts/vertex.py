@@ -777,6 +777,24 @@ def fitPseudo(
     list_name,
     path=analysis_main,
 ):
+    """
+    Add a pseudo \"vertex fit\" which adds a covariance matrix from the combination of the four-vectors of the daughters.
+    This is similar to BaBar's "Add4" function.
+    It is commonly used for :math:`\\pi^0\\to\\gamma\\gamma` reconstruction where a vertex fit is not possible.
+
+    Here is the basic usage:
+
+    .. code-block::python
+        from modularAnalysis import fitPseudo
+        from stdPi0s import stdPi0s
+        stdPi0s("loose", path=mypath)
+        fitPseudo("pi0:loose", path=mypath)
+
+    Parameters:
+        list_name (str): the name of the list to add the covariance matrix to
+        path (basf2.Path): modules are added to this path
+    """
+
     pseudofit = register_module('PseudoVertexFitter')
     pseudofit.set_name('PseudoVertexFitter_' + list_name)
     pseudofit.param('listName', list_name)

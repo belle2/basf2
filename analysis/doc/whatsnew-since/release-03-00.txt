@@ -13,6 +13,7 @@ Modules
 +++++++
 
 * Removal of the unsupported ECLClusterInfoModule.
+* Added `modularAnalysis.fitPseudo` function and a pseudo vertex fitting module to add a covariance matrix when a vertex fit is not possible. E.g. for :math:`\pi^0` decays.
 
 
 Standard Particle Lists

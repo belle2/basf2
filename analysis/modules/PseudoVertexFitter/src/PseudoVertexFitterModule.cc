@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Klemens Lautenbach                         *
@@ -10,7 +10,6 @@
 
 #include <analysis/modules/PseudoVertexFitter/PseudoVertexFitterModule.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <TMath.h>
 
 using namespace std;
@@ -40,11 +39,11 @@ namespace Belle2 {
 
   void PseudoVertexFitterModule::initialize()
   {
+    if (m_listName == "") {
+      B2ERROR("No list name specified! Please enter the list name of the particle you want to add a covariance matrix to.");
+      return;
+    }
     B2INFO("PseudoVertexFitter: adding covariance matrix to " << m_listName);
-  }
-
-  void PseudoVertexFitterModule::beginRun()
-  {
 
   }
 

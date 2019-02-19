@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Klemens Lautenbach                             *
+ * Contributors: Klemens Lautenbach                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +12,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 namespace Belle2 {
 
@@ -34,11 +35,6 @@ namespace Belle2 {
      * This method is called at the beginning of data processing.
      */
     virtual void initialize() override;
-
-    /**
-     * Called when entering a new run.
-     */
-    virtual void beginRun() override;
 
     /**
      * Event processor.

@@ -73,7 +73,6 @@ namespace Belle2 {
   {
 
     //m_beamParams.required("", DataStore::c_Persistent);
-
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 

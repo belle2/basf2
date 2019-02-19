@@ -473,7 +473,7 @@ void SVDLocalCalibrationsCheckModule::printFirstPage()
   // PEDESTAL
   sprintf(cuts, "  Pedestal: an APV is problematic if 1. or 2. or 3.");
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.1f ADC",  m_cutPedestal_ave);
+  sprintf(cuts, "         1. abs(ref_ave - check_ave) > %1.1f ADC",  m_cutPedestal_ave);
   pt_cuts->AddText(cuts);
   sprintf(cuts, "         2. more than %d strips with a value %1.1f ADC higher than the value of the ref calibration",  m_cutN_out,
           m_cutPedestal_out);
@@ -555,6 +555,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     checkV = m_h2NoiseCHECK->getHistogram(theVxdID, 0);
     minY = refU->GetYaxis()->GetXmin();
     maxY = refU->GetYaxis()->GetXmax();
+    minY = 0;
+    maxY = 6;
     leftLine = -m_cutNoise_out;
     rightLine = m_cutNoise_out;
     topLine = 5;

@@ -27,7 +27,7 @@
 					  </tr>
 					</table>
 				</div>
-				<div class='revisions menuhead'>
+				<div class='revisions menuhead' title="A tag, also called revision, is one version of the software. In this submenu you can select the versions that should be compared.">
 					<img src="images/list.png" alt="Tags">&nbsp; Tags
 				</div>
 				<div id='revisions' class='submenu underlineditems'
@@ -35,7 +35,7 @@
 				Loading ...
 				</div>
 				
-				<div class='menuhead'>
+				<div class='menuhead' title="Links with additional information. Suggestions welcome.">
 					<img src="images/link.png" alt="JIRA issue">&nbsp; Useful links
 
 				</div>
@@ -48,53 +48,53 @@
 						<div><a target="_blank" href="https://agira.desy.de/secure/CreateIssue!default.jspa">Report Bug</a></div>
 				</div>
 
-				<div class='packages menuhead'>
+				<div class='packages menuhead'  title="Software package selection submenu. Packages only show up if at least one of their scripts have run.">
 					<img src="images/cubes.png" alt="Packages">&nbsp; Packages
 				</div>
 				<div id='packages' class='packages_submenu'>
 				Loading ...
 				</div>
-				<div class="menuhead" >
+				<div class="menuhead" title="The color scheme governing the border of the plots">
 					<img src="images/list.png" alt="Palette">
 					&nbsp;Palette
 				</div>
 				<div class="trivial-submenu " id="palette">
-					<div class="swatch-line-header">Non-expert plot</div>
-					<div>
+					<div class="swatch-line-header" title="Border color of plots that are not marked as expert plots.">Non-expert plot</div>
+					<div title="The chi2 comparison of the reference and newest revision returned a p value below the error level: The two distributions do not match.">
 						<span class="swatch" id="swatch-fail-nonexpert">x</span>
 						<span class="swatch-text">Comparison Fail</span>
 					</div>
-					<div class="swatch-line">
+					<div class="swatch-line"  title="The chi2 comparison of the reference and newest revision returned a p value below the warning level: The two distributions seem to differ somewhat.">
 						<span class="swatch" id="swatch-warn-nonexpert">!</span>
 						<span class="swatch-text">Comparison Warn</span>
 					</div>
-					<div class="swatch-line">
+					<div class="swatch-line"  title="The chi2 comparison of the reference and newest revision returned a p value above the warning level: The two distributions seem to match.">
 						<span class="swatch" id="swatch-pass-nonexpert">o</span>
 						<span class="swatch-text">Comparison Pass</span>
 					</div>
-					<div class="swatch-line">
+					<div class="swatch-line" title="No chi2 comparison was performed. Perhaps there is no reference, the ROOT object doesn't support comparison or the comparison was manually deactivated.">
 						<span class="swatch" id="swatch-nocomp-nonexpert">?</span>
 						<span class="swatch-text">No comparison</span>
 					</div>
-					<div class="swatch-line-header">Expert plot</div>
-					<div class="swatch-line">
+					<div class="swatch-line-header" title="Border color of plots that are marked as expert plots.">Expert plot</div>
+					<div class="swatch-line"  title="The chi2 comparison of the reference and newest revision returned a p value below the warning level: The two distributions seem to differ somewhat.">
 						<span class="swatch" id="swatch-fail">x</span>
 						<span class="swatch-text">Comparison Fail</span>
 					</div>
-					<div class="swatch-line">
+					<div class="swatch-line" title="The chi2 comparison of the reference and newest revision returned a p value above the warning level: The two distributions seem to match.">
 						<span class="swatch" id="swatch-warn">!</span>
 						<span class="swatch-text">Comparison Warn</span>
 					</div>
-					<div class="swatch-line">
+					<div class="swatch-line" title="The chi2 comparison of the reference and newest revision returned a p value above the warning level: The two distributions seem to match.">
 						<span class="swatch" id="swatch-pass">o</span>
 						<span class="swatch-text">Comparison Pass</span>
 					</div>
-					<div class="swatch-line">
+					<div class="swatch-line" title="No chi2 comparison was performed. Perhaps there is no reference, the ROOT object doesn't support comparison or the comparison was manually deactivated.">
 						<span class="swatch" id="swatch-nocomp">?</span>
 						<span class="swatch-text">No comparison</span>
 					</div>
 				</div>
-				<div class="menuhead">
+				<div class="menuhead" title="Information about the server running this site.">
 					<img src="images/link.png" alt="systeminfo">&nbsp; System Info
 				</div>
 				<div class="system-submenu" id="systeminfo">

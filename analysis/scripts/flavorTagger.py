@@ -11,7 +11,8 @@
 from basf2 import *
 from modularAnalysis import *
 import basf2_mva
-from variables import variables as flavorTaggerVariables
+from variables import utils
+from variables.collections import flavor_tagging
 from ROOT import Belle2
 import os
 import glob
@@ -45,6 +46,32 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotfound=True, uploadToData
     downloadFlag = downloadFromDatabaseIfNotfound
     uploadFlag = uploadToDatabaseAfterTraining
 
+
+def add_default_FlavorTagger_aliases():
+    """
+    This function creates the default aliases for flavor tagging variables and adds them to the
+    predefined collection of variables called flavor_tagging.
+    """
+
+    utils._variablemanager.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
+    utils._variablemanager.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
+    utils._variablemanager.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
+    flavor_tagging.append('FBDT_qrCombined')
+    flavor_tagging.append('FANN_qrCombined')
+    flavor_tagging.append('qrMC')
+
+    for iCategory in AvailableCategories:
+        aliasForQp = 'qp' + iCategory
+        aliasForTrueTarget = 'hasTrueTarget' + iCategory
+        aliasForIsRightCategory = 'isRightCategory' + iCategory
+        utils._variablemanager.addAlias(aliasForQp, 'qpCategory(' + iCategory + ')')
+        utils._variablemanager.addAlias(aliasForTrueTarget, 'hasTrueTargets(' + iCategory + ')')
+        utils._variablemanager.addAlias(aliasForIsRightCategory, 'isTrueFTCategory(' + iCategory + ')')
+        flavor_tagging.append(aliasForQp)
+        flavor_tagging.append(aliasForTrueTarget)
+        flavor_tagging.append(aliasForIsRightCategory)
+
+    utils.add_collection(flavor_tagging, 'flavor_tagging')
 
 # Options for Track and Event Levels
 fastBDTCategories = basf2_mva.FastBDTOptions()
@@ -232,24 +259,24 @@ KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 
-flavorTaggerVariables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
+utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+utils._variablemanager.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
+utils._variablemanager.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
+utils._variablemanager.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
 
-flavorTaggerVariables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
+utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+utils._variablemanager.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
+utils._variablemanager.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
+utils._variablemanager.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
 
-flavorTaggerVariables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
-flavorTaggerVariables.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+utils._variablemanager.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
+utils._variablemanager.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
+utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
 
-flavorTaggerVariables.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+utils._variablemanager.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
+utils._variablemanager.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
+utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
 
 
 def setVariables():
@@ -1013,6 +1040,7 @@ def flavorTagger(
                     flavorTaggerInfoFiller.param('targetProb', False)
                     flavorTaggerInfoFiller.param('trackPointers', False)
                     roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
+                    add_default_FlavorTagger_aliases()
 
     # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
     particleListsToRemoveExtraInfo = []

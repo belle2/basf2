@@ -1,9 +1,25 @@
+<!---------------------------------------------------------------------------->
+<!-- TOOLBOX ON TOP -->
+<!---------------------------------------------------------------------------->
+
 <div id="topmost_viewselection">
   <input id="check_show_overview" type="checkbox" checked='{{show_overview}}'>
   <label for="check_show_overview">Compact View</label>
   <input id="check_show_expert_plots" type="checkbox" checked='{{show_expert_plots}}'>
   <label for="check_show_expert_plots">Expert Plots</label>
 </div>
+
+<!-- temporary announcements -->
+  <div class="infobox">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+    <b>Recent changes:</b> $\LaTeX$ and HTML support now working!
+    <a href="https://confluence.desy.de/display/BI/News">More news</a>
+  </div>
+
+<!---------------------------------------------------------------------------->
+<!-- PLOTS LOADING OVERLAY -->
+<!-- This will be hidden, unless we're currently reloading plots... -->
+<!---------------------------------------------------------------------------->
 
 <div id="outer">
   <div id="table-container">
@@ -16,25 +32,29 @@
   </div>
 </div>
 
+<!---------------------------------------------------------------------------->
+<!-- MAIN CONTENT -->
+<!---------------------------------------------------------------------------->
+
 {{#packages}}
 <div intro="fade">
-  <!-- this is the overview -->
-
-  <!-- temporary announcements -->
-  <div class="infobox">
-    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-    <b>Recent changes:</b> $\LaTeX$ and HTML support now working!
-    <a href="https://confluence.desy.de/display/BI/News">More news</a>
-  </div>
+  <!-- Overview over package -->
+  <!-------------------------------------------------------------------------->
 
   <h1>Package: {{ name }}</h1>
 
   <h2>Script Files</h2>
   {{>scriptfiles_accordion}}
   <br>
+
+  <!-- Looping over all plotfiles -->
+  <!-------------------------------------------------------------------------->
+
   {{#plotfiles}}
   <a name="{{package}}-{{rootfile}}"></a>
   <div class="wrap_rootfile">
+    <!-- Header -->
+    <!------------>
     <h2>Result File: {{rootfile}} <a href="../results/{{newest_revision}}/{{package}}/{{rootfile}}.root">download {{newest_revision}}</a>
       {{#if !has_reference}}
       <div class="no_reference">NO REFERENCE FILE</div>
@@ -42,6 +62,8 @@
     </h2>
     <br>
 
+    <!-- If we have html content: -->
+    <!------------------------------>
     {{#html_content}}
     <div class="wrap_boxes">
       <h2 class="persistent-header">HTML Content: {{title}}</h2>
@@ -51,6 +73,8 @@
     </div>
     {{/html_content}}
 
+    <!-- If we show ntuples: -->
+    <!------------------------->
     {{#ntuples}}
     <div class="wrap_boxes">
       <h2 class="persistent-header">NTuple: {{title}}</h2>
@@ -62,6 +86,8 @@
     </div>
     {{/ntuples}}
 
+    <!-- If we show plots: -->
+    <!----------------------->
     {{#if !show_overview}}
     {{>plot_full_view}}
     {{else}}
@@ -71,6 +97,15 @@
   {{/plotfiles}}
 </div>
 {{/packages}}
+
+<!---------------------------------------------------------------------------->
+<!-- THINGS TO BE INCLUDED ABOVE -->
+<!-- (cf. ractive 'partial' keyword) -->
+<!---------------------------------------------------------------------------->
+
+<!---------------------------------------------------------------------------->
+<!-- Scriptfiles accordions -->
+<!---------------------------------------------------------------------------->
 
 {{#partial scriptfiles_accordion}}
 <div id="accordion_script_files">
@@ -104,6 +139,10 @@
 </div>
 {{/partial}}
 
+<!---------------------------------------------------------------------------->
+<!-- Plot matrix -->
+<!---------------------------------------------------------------------------->
+
 {{#partial plot_matrix}}
 <section intro="fade" class="persistent-area">
   <div class="plot_matrix">
@@ -127,6 +166,9 @@
 </section>
 {{/partial}}
 
+<!---------------------------------------------------------------------------->
+<!-- Plot full view -->
+<!---------------------------------------------------------------------------->
 
 {{#partial plot_full_view}}
 <section intro="fade" class="persistent-area">
@@ -148,6 +190,10 @@
 </section>
 {{/partial}}
 
+<!---------------------------------------------------------------------------->
+<!-- Plot description -->
+<!---------------------------------------------------------------------------->
+
 {{#partial plot_description}}
 <div class="wrap_boxes_descriptions">
   <span><strong>Package: </strong>{{ package }}</span><br>
@@ -163,6 +209,10 @@
   <!-- todo: share this plot -->
 </div>
 {{/partial}}
+
+<!---------------------------------------------------------------------------->
+<!-- NTuple description -->
+<!---------------------------------------------------------------------------->
 
 {{#partial ntuple_description}}
 <div class="wrap_boxes_descriptions">

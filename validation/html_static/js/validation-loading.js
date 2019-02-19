@@ -461,19 +461,34 @@ function fillNtupleTable(domId, jsonLoadingPath) {
  * The package that is opened, when the validation page is opened.
  *  Currently that's just picking the page first in alphabetic order
  *  (i.e. analysis) or false if no packages are available.
- * @param packageList
+ * @param packageList A list of package objects (data["packages"])
  * @return {*}
  */
 function getDefaultPackageName(packageList) {
+
     if (packageList.length === 0) {
         console.debug("getDefaultPackageName: No packages available.");
         return false;
     }
 
-    let last_package = localStorage.getItem(getStorageId("packageList"));
-    if (last_package !== null){
-        console.debug(`Opening package '${last_package}' because it was opened last`);
-        return last_package
+    let lastPackage = localStorage.getItem(getStorageId("packageList"));
+    if (lastPackage !== null){
+        // check if lastPackage is still available
+        let found = false;
+        for(let i in packageList){
+            if (packageList[i].name === lastPackage) {
+                found = true;
+            }
+        }
+        // If it is still available, return the name, otherwise proceed
+        if (found){
+            console.debug(`Opening package '${lastPackage}' because it was opened last`);
+            return lastPackage
+        }
+        else{
+            console.debug(`Last package '${lastPackage}' is not available anymore.`);
+        }
+
     }
 
     let firstPackageName = packageList[0].name;

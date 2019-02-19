@@ -412,6 +412,37 @@ namespace Belle2 {
                                  m_fineSearch);
     m_success++;
 
+    // store T0 of single tracks relative to bunchTime
+
+    for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
+      const auto& trk = topTracks[itrk];
+      auto& finder = finders[itrk];
+      const auto& t0trk = finder.getMinimum();
+      auto* timeZero = m_timeZeros.appendNew(trk.getModuleID(),
+                                             t0trk.position - bunchTime,
+                                             t0trk.error, numPhotons[itrk]);
+      timeZero->setAssumedMass(masses[itrk]);
+      if (not t0trk.valid) timeZero->setInvalid();
+      timeZero->addRelationTo(trk.getExtHit());
+
+      if (m_saveHistograms) {
+        std::string num = std::to_string(itrk);
+        auto chi2 = finder.getHistogram("chi2_" + num,
+                                        "precise T0 single track; t_{0} [ns]; -2 log L");
+        auto pdf = top1Dpdfs[itrk].getHistogram("pdf1D_" + num,
+                                                "PDF projected to time axis; time [ns]");
+        TH1F hits(("hits_" + num).c_str(),
+                  "time distribution of hits (t0-subtracted); time [ns]",
+                  pdf.GetNbinsX(), pdf.GetXaxis()->GetXmin(), pdf.GetXaxis()->GetXmax());
+        for (const auto& digit : m_topDigits) {
+          if (digit.getModuleID() != trk.getModuleID()) continue;
+          if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+          hits.Fill(digit.getTime() - t0trk.position);
+        }
+        timeZero->setHistograms(chi2, pdf, hits);
+      }
+    }
+
     // correct time in TOPDigits
 
     if (m_correctDigits) {
@@ -426,18 +457,6 @@ namespace Belle2 {
       }
     }
 
-    // store T0 of single tracks (bunchTime is subtracted)
-
-    for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
-      const auto& trk = topTracks[itrk];
-      auto& finder = finders[itrk];
-      const auto& t0trk = finder.getMinimum();
-      auto* timeZero = m_timeZeros.appendNew(trk.getModuleID(), t0trk.position - bunchTime,
-                                             t0trk.error, numPhotons[itrk]);
-      timeZero->setAssumedMass(masses[itrk]);
-      if (not t0trk.valid) timeZero->setInvalid();
-      timeZero->addRelationTo(trk.getExtHit());
-    }
 
   }
 

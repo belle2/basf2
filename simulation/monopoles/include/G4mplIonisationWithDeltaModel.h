@@ -212,6 +212,7 @@ namespace Belle2 {
       G4double chargeSquare; /**< Square of magnetic charge*/
       G4double dedxlim; /**< dedx limit in asymptotic formula, not used*/
       G4double pi_hbarc2_over_mc2; /**< Mass with constants combination*/
+      G4double nmpl; /**< Magn. charge in units of Dirac charge g_D, nmpl=1 -> g = g_D*/
 
       static std::vector<G4double>* dedx0; /**<Base dedx for each couple in current material*/
     };

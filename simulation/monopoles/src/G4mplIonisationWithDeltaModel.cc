@@ -13,6 +13,8 @@
 //     S.P. Ahlen, Rev. Mod. Phys 52(1980), p121
 // [2] K.A. Milton arXiv:hep-ex/0602040
 // [3] S.P. Ahlen and K. Kinoshita, Phys. Rev. D26 (1982) 2347
+// [4] Y. Kazama et al., Phys. Rev. D15 (1977) 2287-2299
+// [5] S.P. Ahlen, Phys. Rev. D17 (1978) 229-233
 
 // modified from GEANT4 exoticphysics/monopole/*
 // works only for low magnetic charge, higher charge corrections are not used
@@ -28,6 +30,7 @@
 #include <G4ProductionCutsTable.hh>
 #include <G4MaterialCutsCouple.hh>
 #include <G4Log.hh>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
@@ -46,13 +49,15 @@ G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
     bg2lim(beta2lim * (1.0 + beta2lim))
 {
   pi_hbarc2_over_mc2 = pi * hbarc * hbarc / electron_mass_c2;
+  nmpl = magCharge * 2 * fine_structure_const;
   chargeSquare = magCharge * magCharge * 4 * fine_structure_const *
                  fine_structure_const; //Formulas below assume Dirac charge units for magnetic charge, g_D = 68.5e
   dedxlim = 45. * chargeSquare * GeV * cm2 / g;
   fParticleChange = nullptr;
   theElectron = G4Electron::Electron();
-  G4cout << "### Monopole ionisation model with d-electron production, Gmag= "
-         << magCharge / eplus << G4endl;//TODO print it with B2INFO
+  B2INFO("### Monopole ionisation model with d-electron production, Gmag= "  << magCharge / eplus);
+  if (nmpl >= 6)
+    B2WARNING("Monopole charge Gmag= " << magCharge / eplus << "e not reasonable. Please choose a value smaller than 411e.");
   monopole = nullptr;
   mass = 0.0;
 }
@@ -157,6 +162,16 @@ G4mplIonisationWithDeltaModel::ComputeDEDXAhlen(const G4Material* material,
 //   G4double dedx =
 //     1.0 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)));//Fryberger magneticon double ionisation
 
+
+  G4double k = 0;   // Cross-section correction
+  if (nmpl >= 0.5) { k = 0.406; }
+  if (nmpl >= 1) { k = 0.346; }
+  if (nmpl >= 1.5) { k = 0.3; }
+  const G4double B[7] = { 0.0, 0.248, 0.672, 1.022, 1.243, 1.464, 1.685};   // Bloch correction
+  if (nmpl < 6)
+    dedx += 0.5 * k - B[int(floor(nmpl + 0.5))];
+
+
   // density effect correction
   G4double x = G4Log(bg2) / twoln10;
   dedx -= material->GetIonisation()->DensityCorrection(x);
@@ -181,7 +196,7 @@ G4mplIonisationWithDeltaModel::ComputeCrossSectionPerElectron(
   G4double maxEnergy = std::min(tmax, maxKinEnergy);
   G4double cutEnergy = std::max(LowEnergyLimit(), cut);
   if (cutEnergy < maxEnergy) {
-    cross = (0.5 / cutEnergy - 0.5 / maxEnergy) * pi_hbarc2_over_mc2 * chargeSquare;
+    cross = (1.0 / cutEnergy - 1.0 / maxEnergy) * twopi_mc2_rcl2 * chargeSquare;
   }
   return cross;
 }

@@ -73,7 +73,7 @@ void PXDDQMEfficiencyNtupleModule::terminate()
 void PXDDQMEfficiencyNtupleModule::initialize()
 {
   m_file = new TFile("test.root", "recreate");
-  m_tuple = new TNtuple("effcontrol", "effcontrol", "vxdid:u:v:p:pt:distu:distv:sigu:sigv:found");
+  m_tuple = new TNtuple("effcontrol", "effcontrol", "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched");
 
   //register the required arrays
   //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them

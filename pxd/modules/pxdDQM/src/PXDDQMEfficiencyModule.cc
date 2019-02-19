@@ -58,13 +58,16 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 
-  addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
+  addParam("momCut", m_momCut, "Set a cut on the track momentum, 0 disables", double(0));
 
-  addParam("pTCut", m_pTCut, "Set a cut on the track pT", double(0));
+  addParam("pTCut", m_pTCut, "Set a cut on the track pT, 0 disables", double(0));
 
   addParam("cutBorders", m_cutBorders, "Do not use tracks near the borders of the sensor", bool(true));
 
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
+
+  addParam("trackUFactorDistCut", m_uFactor, "Set a cut on u error of track (factor*err<dist), 0 disables", double(2.0));
+  addParam("trackVFactorDistCut", m_vFactor, "Set a cut on v error of track (factor*err<dist), 0 disables", double(2.0));
 }
 
 
@@ -134,8 +137,8 @@ void PXDDQMEfficiencyModule::event()
         m_h_pt[aVxdID]->Fill(trackstate.getMom().Pt());
         m_h_su[aVxdID]->Fill(sigu);
         m_h_sv[aVxdID]->Fill(sigv);
-        if (2.0 * sigu > m_distcut) continue; // Error 2*SigmaU > cut
-        if (2.0 * sigv > m_distcut) continue; // Error 2*SigmaV > cut
+        if (m_uFactor * sigu > m_distcut) continue; // Error ufak*SigmaU > cut
+        if (m_vFactor * sigv > m_distcut) continue; // Error vfak*SigmaV > cut
 
         double u_fit = intersec_buff.X();
         double v_fit = intersec_buff.Y();

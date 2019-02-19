@@ -23,9 +23,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 
-//root stuff
-#include "TTree.h"
-#include "TString.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TVector3.h"
@@ -108,12 +105,14 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_tracks;
     StoreArray<ROIid> m_ROIs;
 
-    double m_distcut; //distance cut in cm!
-    double m_pcut; //pValue-Cut for tracks
-    double m_momCut; //Cut on fitted track momentum
-    double m_pTCut; //Cut on fitted track pT
-    unsigned int m_minSVDHits; //Required hits in SVD strips for tracks
-    int m_maskedDistance; //Distance inside which no dead pixel or module border is allowed
+    double m_distcut; // distance cut in cm!
+    double m_uFactor; // factor for track-error on distcut comparison
+    double m_vFactor; // factor for track-error on distcut comparison
+    double m_pcut; // pValue-Cut for tracks
+    double m_momCut; // Cut on fitted track momentum
+    double m_pTCut; // Cut on fitted track pT
+    unsigned int m_minSVDHits; // Required hits in SVD strips for tracks
+    int m_maskedDistance; // Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency
     std::map<VxdID, TH2D*> m_h_track_hits;
@@ -126,5 +125,6 @@ namespace Belle2 {
     std::map<VxdID, TH1D*> m_h_pt2;
     std::map<VxdID, TH1D*> m_h_su2;
     std::map<VxdID, TH1D*> m_h_sv2;
+
   };
 }

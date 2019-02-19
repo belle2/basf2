@@ -7,47 +7,28 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #include <alignment/GblMultipleScatteringController.h>
-#include <framework/logging/Logger.h>
-#include <TGeoManager.h>
+#include <genfit/GblFitter.h>
+
+//#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 
-void GblMultipleScatteringController::controlTrackSegment(TVector3 entry, TVector3 exit, genfit::GblFitter* fitter)
+void GblMultipleScatteringController::controlTrackSegment(TVector3, TVector3, double scatTheta, genfit::GblFitter* fitter)
 {
-  (void)entry;
-  (void)exit;
-  (void)fitter;
-  /*int midPointInCDC = false;
-  TVector3 midPoint = (exit + entry) * 0.5;
-  if (!gGeoManager) {
-    B2ERROR("Could not access geometry manager.");
-    fitter->setMSOptions(true, true);
-    return;
-  }
+  bool enableScattering = true;
+  //TVector3 pos = 0.5 * (entry + exit);
+  //B2INFO("scatTheta = " << scatTheta << " [rad] @ [x,y,z] = [ " << pos[0] << ", " << pos[1] << ", " << pos[2] << "] [cm]");
 
-  TGeoNode* node    = gGeoManager->FindNode(midPoint[0], midPoint[1], midPoint[2]);
+  if (scatTheta < 0.0001) enableScattering = false;
 
-  if (!node) {
-    B2ERROR("Could not find geometry node between entry and exit point in the track segment. Follows: entry, exit");
-    entry.Print();
-    exit.Print();
-    // As fall-back, use thick scatterers
-    fitter->setMSOptions(true, true);
-    return;
-  }
-
-  const string cdcVolumePrefix("logicalSD_CDCLayer");
-  string name = node->GetName();
-
-  if (name.compare(0, cdcVolumePrefix.length(), cdcVolumePrefix) == 0)
-    midPointInCDC = true;
-
-  if (midPointInCDC)
+  if (!enableScattering)
     // No scattering
     fitter->setMSOptions(false, false);
   else
     // Thick scatterers
-    fitter->setMSOptions(true, true);*/
+    fitter->setMSOptions(true, true);
 }
+

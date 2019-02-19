@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GblMultipleScatteringController_h
-#define GblMultipleScatteringController_h
+#pragma once
 
 #include <genfit/GblTrackSegmentController.h>
-#include <genfit/GblFitter.h>
+
+class GblFitter;
 
 namespace Belle2 {
 
@@ -22,13 +22,12 @@ namespace Belle2 {
    * Its main purpose is to switch off GBL scatterers inside CDC.
    * This has no measurable effects except for much improved performance
    * of the fitter.
-   *
    */
   class GblMultipleScatteringController : public genfit::GblTrackSegmentController {
 
   public:
 
-    /// @brief Cosntructor
+    /// @brief Constructor
     GblMultipleScatteringController() : GblTrackSegmentController() {;}
     /// @brief Destructor
     virtual ~GblMultipleScatteringController() {;}
@@ -40,20 +39,13 @@ namespace Belle2 {
      *
      * @param entry First point in track segment position in global coords
      * @param exit Second point in track segment position in global coords
+     * @param scatTheta Total MS variance accumulated in segment
      * @param fitter Pointer to the fitter
      * @return void
      */
-    virtual void controlTrackSegment(TVector3 entry, TVector3 exit, genfit::GblFitter* fitter);
-
-  protected:
-
-  public:
-
-    //ClassDef(GblMultipleScatteringController, 1) /** GBL multiple scattering controller for Belle 2 */
+    virtual void controlTrackSegment(TVector3, TVector3, double scatTheta, genfit::GblFitter* fitter);
 
   };
 
 } /* End of namespace Belle2 */
-/** @} */
 
-#endif // GblMultipleScatteringController_h

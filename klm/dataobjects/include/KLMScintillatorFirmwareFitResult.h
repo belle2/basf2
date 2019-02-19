@@ -15,14 +15,19 @@
 
 namespace Belle2 {
 
-  namespace EKLM {
+  namespace KLM {
 
     /**
-     * FPGA fit status.
+     * Scintillator firmware fit status.
      */
-    enum FPGAFitStatus {
-      c_FPGASuccessfulFit, /**< Successful fit. */
-      c_FPGANoSignal,      /**< Signal is too small to do any fitting. */
+    enum ScintillatorFirmwareFitStatus {
+
+      /** Successful fit. */
+      c_ScintillatorFirmwareSuccessfulFit,
+
+      /** Signal is too small to do any fitting. */
+      c_ScintillatorFirmwareNoSignal,
+
     };
 
   }
@@ -30,19 +35,19 @@ namespace Belle2 {
   /**
    * FPGA fit simulation data.
    */
-  class EKLMFPGAFit : public RelationsObject {
+  class KLMScintillatorFirmwareFitResult : public RelationsObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMFPGAFit();
+    KLMScintillatorFirmwareFitResult();
 
     /**
      * Destructor.
      */
-    ~EKLMFPGAFit();
+    ~KLMScintillatorFirmwareFitResult();
 
     /**
      * Get signal start time (in TDC counts).
@@ -102,7 +107,7 @@ namespace Belle2 {
     int m_MinimalAmplitude;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMFPGAFit, 2);
+    ClassDef(Belle2::KLMScintillatorFirmwareFitResult, 1);
 
   };
 

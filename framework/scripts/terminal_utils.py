@@ -12,6 +12,9 @@ import sys
 import subprocess
 import os
 import io
+import shutil
+import tempfile
+import shlex
 
 
 class Pager(object):
@@ -143,9 +146,102 @@ class Pager(object):
         self._pager_process.communicate()
 
 
-if __name__ == '__main__':
-    import time
-    with Pager():
-        for i in range(30):
-            print("This is an example on how to use the pager.")
-            time.sleep(0.1)
+class InputEditor():
+    """
+    Class to get user input via opening a temporary file in a text editor.
+
+    It is an alternative to the python commands ``input()`` or ``sys.stdin.readlines`` and is
+    similar to the behaviour of ``git commit`` for editing commit messages.  By using an editor
+    instead of the command line, the user is motivated to give expressive multi-line input,
+    leveraging the full text editing capabilities of his editor.  This function cannot be used for
+    example in interactive terminal scripts, whenever detailed user input is required.
+
+    Heavily inspired by the code in this blog post:
+    https://chase-seibert.github.io/blog/2012/10/31/python-fork-exec-vim-raw-input.html
+
+    :param editor_command: Editor to open for user input.  If ``None``, get default editor from
+        environment variables.  It should be the name of a shell executable and can contain command
+        line arguments.
+    :param initial_content: Initial string to insert into the temporary file that is opened for user
+        input.  Can be used for default input or to insert comment lines with instructions.
+    :param commentlines_start_with: Optionally define string with which comment lines start
+    """
+    def __init__(self,
+                 editor_command: str = None,
+                 initial_content: str = None,
+                 commentlines_start_with: str = "#"):
+        """
+        Constructor
+        """
+        # Use provided editor command or editor command from environment variables
+        editor_command_string = editor_command or self._default_environment_editor()
+        # split editor_command to seperate executable name command line arguments
+        self.editor_command_list = shlex.split(editor_command_string, posix=True)
+        # check if editor executable exists and if not, prompt for new editor command
+        if shutil.which(self.editor_command_list[0]) is None:
+            self._prompt_for_editor()
+
+        self.initial_content = initial_content
+        self.comment_string = commentlines_start_with
+
+    def input(self):
+        """
+        Get user input via editing a temporary file in an editor. If opening the editor fails, fall
+        back to command line input
+        """
+        try:
+            with tempfile.NamedTemporaryFile(mode='r+') as tmpfile:
+                if self.initial_content:
+                    tmpfile.write(self.initial_content)
+                    tmpfile.flush()
+                subprocess.check_call(self.editor_command_list + [tmpfile.name])
+                tmpfile.seek(0)
+                input_string = tmpfile.read().strip()
+            input_string = self._remove_comment_lines(input_string)
+
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+                # If editor not found or other problem with subprocess call, fall back to terminal input
+                print("Could not open {}.".format(self.get_editor_command()))
+                print("Try to set your $VISUAL or $EDITOR environment variables properly.\n")
+                sys.exit(1)
+
+        return input_string
+
+    def get_editor_command(self):
+        "Get editor shell command string used for user input."
+        # Construct string from list which holds the executable and args
+        return " ".join(self.editor_command_list)
+
+    def _remove_comment_lines(self, a_string):
+        """
+        Remove lines from string that start with a comment character and return modified version.
+        """
+        if self.comment_string is not None:
+            a_string = "\n".join(
+                [line for line in a_string.splitlines()
+                 if not line.startswith(self.comment_string)]).strip()
+        return a_string
+
+    def _default_environment_editor(self):
+        """
+        Return editor from environment variables. If not existing, return vi(m) as default.
+        """
+        editor_command = (os.environ.get('VISUAL') or os.environ.get('EDITOR') or
+                          'vim' or 'vi')
+        return editor_command
+
+    def _prompt_for_editor(self):
+        """
+        Ask user to provide editor command
+        """
+        # Prompt user for editor command until one is found which exists in PATH
+        while True:
+            new_editor_command_string = input("Use editor: ")
+            new_editor_command_list = shlex.split(new_editor_command_string, posix=True)
+
+            if shutil.which(new_editor_command_list[0]) is not None:
+                self.editor_command_list = new_editor_command_list
+                return self.editor_command_list
+
+            else:
+                print(f"Editor '{self.editor_command_list[0]}' not found in $PATH.")

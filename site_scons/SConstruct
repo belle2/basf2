@@ -74,6 +74,13 @@ global_env = Environment(
     BINDIR=os.path.join('#bin', subdir),
     MODDIR=os.path.join('#modules', subdir),
     DATADIR='#data',
+    # get list of directories (aka packages or subfolders thereof) for which to
+    # disable compiler warnings when compiling. For example if
+    # BELLE2_DISABLE_COMPILER_WARNINGS="daq framework/utilities" there will be no
+    # compiler warnings for any targets defined in daq or any of its subfolders
+    # as well as framework/utilities or any of its subfolders. There is are no
+    # checks or warnings if the given directories don't exist.
+    DISABLE_COMPILER_WARNINGS=os.environ.get("BELLE2_DISABLE_COMPILER_WARNINGS", "").split(),
     EXTDIR=os.environ['BELLE2_EXTERNALS_DIR'],
     EXTINCDIR=os.path.join('$EXTDIR', 'include'),
     EXTLIBDIR=os.path.join('$EXTDIR', 'lib', extsubdir),
@@ -113,11 +120,14 @@ global_env = Environment(
     ],
 )
 
-# recalculate MD5 sums only if the time stamp differs
-global_env.Decider('MD5-timestamp')
+# recalculate MD5 sums only if the file changed in the last 10 minutes
+SetOption("max_drift", 600)
 
 # cache implicit dependencies (#includes)
 SetOption('implicit_cache', 1)
+
+# disable source code checks
+global_env.SourceCode(".", None)
 
 # include extra library paths and compiler flags
 if GetOption('extralibpath'):
@@ -131,8 +141,16 @@ if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')
 elif option == 'opt':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
     global_env.Append(FORTRANFLAGS='-O3')
+    # Parallel LTO avoids sequential bottlenecks when large libraries are
+    # linked, but causes oversubscription when linking libraries concurrently.
+    # Performance and RAM usage measurements suggest that between these two
+    # evils, oversubscription is the better choice.
+    global_env.Append(LINKFLAGS='-flto=' + str(GetOption('num_jobs')))
+    # LTO requires some binutils wrappers that preserve the GCC IR
+    global_env['AR'] = 'gcc-ar'
+    global_env['RANLIB'] = 'gcc-ranlib'
 elif option == 'intel':
     intel_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):

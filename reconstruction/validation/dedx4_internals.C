@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jkumar@andrew.cmu.edu</contact>
   <description>Check some internals of the module</description>
 </header>
 */
@@ -50,7 +50,7 @@ void plot(const TString &input_filename)
   hist->SetTitle("layer ID for each dE/dx measurement");
   hist->GetListOfFunctions()->Add(new TNamed("Description", "layer ID for each dE/dx measurement (negative values for PXD/SVD)"));
   hist->GetListOfFunctions()->Add(new TNamed("Check", "Smooth distribution for values > 0, VXD measurements (< 0) at around the same level (in particular, should not be twice as high). Gap at -1, -2 indicates PXD is not being used (=default)."));
-  hist->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  hist->GetListOfFunctions()->Add(new TNamed("Contact","jkumar@andrew.cmu.edu"));
   hist->Write();
 
   output_file->Close();

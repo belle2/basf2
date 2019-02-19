@@ -30,6 +30,7 @@ gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

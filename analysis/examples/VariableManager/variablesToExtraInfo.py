@@ -1,39 +1,60 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# The VariablesToNtuple module saves variables from the VariableManager to a candidate-based TNtuple
-
-from basf2 import *
-from modularAnalysis import *
+# The VariablesToExtraInfo module saves variables at some stage in the
+# processing chain for recovery later. In this example it saves the invariant
+# mass of D0 candidates, before- and after- running a vertex fit. You could
+# also use this to save electron energy (or dielectron q2) before- and after-
+# running Bremsstrahlung correction or similar.
+#
+# Thomas Keck and Sam Cunliffe
+#
+# For full documentation please refer to https://software.belle2.org
+# Anything unclear? Ask questions at https://questions.belle2.org
 
 import os
+import basf2
+import modularAnalysis as ma  # a shorthand for the analysis tools namespace
+from vertex import vertexKFit
+
 if os.path.isfile('mdst.root'):
     filename = 'mdst.root'
-elif os.path.isfile('/storage/jbod/tkeck/MC7/evtgen-charged/sub00/mdst_000240_prod00000788_task00000685.root'):
-    filename = '/storage/jbod/tkeck/MC7/evtgen-charged/sub00/mdst_000240_prod00000788_task00000685.root'
-elif os.path.isfile('/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000788/s00/e0000/4S/r00000/'
-                    'charged/sub00/mdst_000240_prod00000788_task00000685.root'):
-    filename = '/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000788/s00/e0000/4S/r00000/'\
-               'charged/sub00/mdst_000240_prod00000788_task00000685.root'
 else:
-    raise RuntimeError("Please copy an mdst file from KEKCC into this directory named mdst.root")
+    raise RuntimeError("Please copy an mdst file into this directory named mdst.root")
 
-inputMdstList('MC7', [filename])
+mypath = basf2.Path()  # create a new path
 
-fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')])
-reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95')
-matchMCTruth('D0')
+# add input data and ParticleLoader modules to the path
+ma.inputMdstList('default', [filename], path=mypath)
+ma.fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')], path=mypath)
+ma.reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95', path=mypath)
+ma.matchMCTruth('D0', path=mypath)
 
-# This will write out one row per candidate in the D0 list
-analysis_main.add_module('VariablesToExtraInfo',
-                         particleList='D0',
-                         variables={'M': 'M_before_vertex_fit'})
+# this saves the "pre-vertx fit" mass in the extraInfo() of the D0 particle
+mypath.add_module('VariablesToExtraInfo',
+                  particleList='D0',
+                  variables={'M': 'M_before_vertex_fit'})
 
-fitVertex('D0', -2.0)
+# now we do a verted fit (this can change the mass)
+vertexKFit('D0', -2.0, path=mypath, silence_warning=True)
 
-analysis_main.add_module('VariablesToNtuple',
-                         particleList='D0',
-                         variables=['M', 'extraInfo(M_before_vertex_fit)'])
+# now save the pre- and post- fit mass using VariablesToNtuple
+mypath.add_module('VariablesToNtuple',
+                  particleList='D0',
+                  variables=['M', 'extraInfo(M_before_vertex_fit)'])
 
-process(analysis_main)
-print(statistics)
+# It is important to undertand that modules are loaded onto a basf2.Path by
+# the modularAnalysis convenience functions (or by hand by you) and the order
+# matters so you need to put VariablesToExtraInfo in the path *before* your
+# processing which may alter variables.
+#
+# Here is an example of how to check this:
+basf2.B2RESULT("Printing modules on the path")
+for i, module in enumerate(mypath.modules()):
+    basf2.B2RESULT(i, "   ", module.name())
+# We use B2RESULT because it stands out in amongst the basf2 information.
+# I could use python's native print()
+
+# process the data
+basf2.process(mypath)
+print(basf2.statistics)

@@ -288,7 +288,6 @@ void ECLLocalRunCalibratorModule::writeObjToDB(
       B2FATAL("ECLLocalRunCalibratorModule: bad "
               << key << " reference object");
     }
-    float normMeanVal;
     for (int cry = 0; cry < c_nCrystals; ++cry) {
       // Get mean values and
       // standard deviations
@@ -296,10 +295,10 @@ void ECLLocalRunCalibratorModule::writeObjToDB(
       float refMean = refArray->getCalibVector()[cry];
       // Calculate normalized
       // mean value.
-      normMeanVal = normalizeMean(
-                      key,
-                      m_data.at(key)[cry].getMean(),
-                      refMean);
+      float normMeanVal = normalizeMean(
+                            key,
+                            m_data.at(key)[cry].getMean(),
+                            refMean);
       // Enable offset flag
       if (key == c_timeKey &&
           normMeanVal > m_maxTimeOffset) {

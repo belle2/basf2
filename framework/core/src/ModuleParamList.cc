@@ -137,20 +137,18 @@ ModuleParamPtr ModuleParamList::getParameterPtr(const std::string& name) const
   } else throw (ModuleParameterNotFoundError() << name);
 }
 
-std::string ModuleParamList::getParamTypeString(const std::string& name) const
-{
-  //Check if a parameter with the given name exists
-  std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
-  mapIter = m_paramMap.find(name);
-
-  if (mapIter != m_paramMap.end()) {
-    return mapIter->second.get()->getTypeInfo();
-  } else {
-    B2FATAL("Module parameter '" + name + "' does not exist!");
-  }
-  return std::string();
-}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
+//==================================================================================
+//                          Explicit template instantiations
+//==================================================================================
+
+template void ModuleParamList::addParameter(const std::string&, bool&, const std::string&, const bool&);
+template void ModuleParamList::addParameter(const std::string&, double&, const std::string&, const double&);
+template void ModuleParamList::addParameter(const std::string&, float&, const std::string&, const float&);
+template void ModuleParamList::addParameter(const std::string&, int&, const std::string&, const int&);
+template void ModuleParamList::addParameter(const std::string&, std::string&, const std::string&, const std::string&);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

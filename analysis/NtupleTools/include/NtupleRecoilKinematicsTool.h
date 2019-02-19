@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLERECOILKINEMATICSTOOL_H
-#define NTUPLERECOILKINEMATICSTOOL_H
+#pragma once
 
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 
@@ -48,4 +47,3 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLERECOILKINEMATICSTOOL_H

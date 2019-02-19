@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>Thomas.Hauth@kit.edu</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>MuonGenSimNoBkg.root</input>
   <output>MuonTrackingValidation.root</output>
   <description>This script validates the full track finding chain in easy 1 muon events.</description>

@@ -34,8 +34,11 @@
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
+
+#include <svd/calibration/SVDDetectorConfiguration.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <vxd/dataobjects/VxdID.h>
@@ -60,6 +63,78 @@ using namespace std;
 using namespace Belle2;
 using boost::property_tree::ptree;
 
+void SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fileName)
+{
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
+  const std::string filename = FileSystem::findFile(fileName); //phase 3 xmlMapping
+  B2INFO("Importing the svd online -> offline map " << fileName << "\n");
+  //  const std::string filename = FileSystem::findFile("testbeam/vxd/data/2017_svd_mapping.xml");
+  const std::string payloadname = "SVDChannelMapping.xml";
+  if (Database::Instance().addPayload(payloadname, filename, iov))
+    B2INFO("Success!");
+  else
+    B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
+}
+
+void SVDLocalCalibrationsImporter::importSVDGlobalXMLFile(const std::string& fileName)
+{
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
+  const std::string filename = FileSystem::findFile(fileName);
+  B2INFO("Importing the global run configuration xml file " << fileName << "\n");
+
+  const std::string payloadname = "SVDGlobalXMLFile.xml";
+  if (Database::Instance().addPayload(payloadname, filename, iov))
+    B2INFO("Success!");
+  else
+    B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
+}
+
+
+void importSVDGlobalConfigParametersFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  // This is the property tree
+  ptree pt;
+
+  // Load the XML file into the property tree. If reading fails
+  // (cannot open file, parse error), an exception is thrown.
+  read_xml(xmlFileName, pt);
+
+
+  for (ptree::value_type const& cfgDocumentChild :
+       pt.get_child("cfg_document")) {
+
+    if (cfgDocumentChild.first == "noise_run") {
+      std::cout << "Masking bitmap is an attribute of the node <noise_run>!" << endl;
+      int  maskFilter = cfgDocumentChild.second.get<int>("<xmlattr>.mask") ;
+      std::cout << " masking bitmap    = " << maskFilter << endl;
+
+    }
+    if (cfgDocumentChild.first == "hardware_run") {
+      std::cout << "Zero suppression is an attribute of the node <hardware_run>!" << endl;
+      float  zeroSuppression = cfgDocumentChild.second.get<int>("<xmlattr>.zs_cut") ;
+      std::cout << " zero suppression cut    = " << zeroSuppression << endl;
+
+    }
+
+    if (cfgDocumentChild.first == "i2c") {
+      std::cout << "Latency is an attribute of the node <i2c>!" << endl;
+      float  latency = cfgDocumentChild.second.get<int>("<xmlattr>.lat") ;
+      std::cout << " latency  = " << latency << endl;
+
+    }
+  }
+
+
+}
+
+void importSVDLocalConfigParametersFromXML(const std::string& xmlfileName, bool errorTollerant)
+{
+
+
+}
+
 
 void SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
@@ -82,10 +157,17 @@ void SVDLocalCalibrationsImporter::importSVDPedestalCalibrationsFromXML(const st
       -1.0, errorTollerant);
 }
 
+void SVDLocalCalibrationsImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
+      xmlFileName, "hot_strips",
+      false, errorTollerant);
+}
+
 void SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDFADCMaskedStrips::t_payload  >(SVDFADCMaskedStrips::name,
-      xmlFileName, "FADCMasked_strips",
+      xmlFileName, "masks",
       -1.0, errorTollerant);
 }
 

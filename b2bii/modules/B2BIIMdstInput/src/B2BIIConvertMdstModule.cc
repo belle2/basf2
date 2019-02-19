@@ -157,6 +157,9 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module()
 
   addParam("use6x6CovarianceMatrix4Tracks", m_use6x6CovarianceMatrix4Tracks,
            "Use 6x6 (position, momentum) covariance matrix for charged tracks instead of 5x5 (helix parameters) covariance matrix", false);
+  addParam("mcMatchingMode", m_mcMatchingModeString,
+           "MC matching mode: 'Direct', or 'GeneratorLevel'",
+           std::string("Direct"));
 
   m_realData = false;
 
@@ -172,7 +175,12 @@ void B2BIIConvertMdstModule::initialize()
 {
   // Initialize Belle II DataStore
   initializeDataStore();
-
+  if (m_mcMatchingModeString == "Direct")
+    m_mcMatchingMode = c_Direct;
+  else if (m_mcMatchingModeString == "GeneratorLevel")
+    m_mcMatchingMode = c_GeneratorLevel;
+  else
+    B2FATAL("Unknown MC matching mode: " << m_mcMatchingModeString);
   B2INFO("B2BIIConvertMdst: initialized.");
 }
 
@@ -181,23 +189,12 @@ void B2BIIConvertMdstModule::initializeDataStore()
   B2DEBUG(99, "[B2BIIConvertMdstModule::initializeDataStore] initialization of DataStore started");
 
   // list here all converted Belle2 objects
-  StoreArray<ECLCluster> eclClusters;
-  eclClusters.registerInDataStore();
-
-  StoreArray<KLMCluster> klmClusters;
-  klmClusters.registerInDataStore();
-
-  StoreArray<Track> tracks;
-  tracks.registerInDataStore();
-
-  StoreArray<TrackFitResult> trackFitResults;
-  trackFitResults.registerInDataStore();
-
-  StoreArray<V0> v0s;
-  v0s.registerInDataStore();
-
-  StoreArray<Particle> particles;
-  particles.registerInDataStore();
+  m_eclClusters.registerInDataStore();
+  m_klmClusters.registerInDataStore();
+  m_tracks.registerInDataStore();
+  m_trackFitResults.registerInDataStore();
+  m_v0s.registerInDataStore();
+  m_particles.registerInDataStore();
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
@@ -220,19 +217,17 @@ void B2BIIConvertMdstModule::initializeDataStore()
   m_pidLikelihoods.registerInDataStore();
 
   // needs to be registered, even if running over data, since this information is available only at the begin_run function
-  // TODO: Change to module parameter and check if consistent?
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.registerInDataStore();
+  m_mcParticles.registerInDataStore();
 
   //list here all Relations between Belle2 objects
-  tracks.registerRelationTo(mcParticles);
-  tracks.registerRelationTo(m_pidLikelihoods);
-  eclClusters.registerRelationTo(mcParticles);
-  eclClusters.registerRelationTo(tracks);
-  klmClusters.registerRelationTo(tracks);
-  klmClusters.registerRelationTo(eclClusters);
-  particles.registerRelationTo(mcParticles);
-  particles.registerRelationTo(m_pidLikelihoods);
+  m_tracks.registerRelationTo(m_mcParticles);
+  m_tracks.registerRelationTo(m_pidLikelihoods);
+  m_eclClusters.registerRelationTo(m_mcParticles);
+  m_eclClusters.registerRelationTo(m_tracks);
+  m_klmClusters.registerRelationTo(m_tracks);
+  m_klmClusters.registerRelationTo(m_eclClusters);
+  m_particles.registerRelationTo(m_mcParticles);
+  m_particles.registerRelationTo(m_pidLikelihoods);
 
   B2DEBUG(99, "[B2BIIConvertMdstModule::initializeDataStore] initialization of DataStore ended");
 }
@@ -396,22 +391,15 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
 
 void B2BIIConvertMdstModule::convertMdstChargedTable()
 {
-  // at this point MCParticles StoreArray should already exist
-  StoreArray<MCParticle> mcParticles;
-
-  // StoreArrays
-  StoreArray<Track> tracks;
-  StoreArray<TrackFitResult> trackFitResults;
-
   // Relations
-  RelationArray tracksToMCParticles(tracks, mcParticles);
+  RelationArray tracksToMCParticles(m_tracks, m_mcParticles);
 
   // Loop over all Belle charged tracks
   Belle::Mdst_charged_Manager& m = Belle::Mdst_charged_Manager::get_manager();
   for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); chargedIterator++) {
     Belle::Mdst_charged belleTrack = *chargedIterator;
 
-    auto track = tracks.appendNew();
+    auto track = m_tracks.appendNew();
 
     // convert MDST_Charged -> Track
     convertMdstChargedObject(belleTrack, track);
@@ -423,41 +411,35 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
 
     // create Track -> MCParticle relation
     // step 1: MDSTCharged -> Gen_hepevt
-    const Belle::Gen_hepevt& hep(gen_level(get_hepevt(belleTrack)));
-    if (hep) {
-      // step 2: Gen_hepevt -> MCParticle
-      if (genHepevtToMCParticle.count(hep.get_ID()) > 0) {
-        int matchedMCParticle = genHepevtToMCParticle[hep.get_ID()];
+    const Belle::Gen_hepevt& hep0 = get_hepevt(belleTrack);
+    if (hep0 == 0)
+      continue;
+    const Belle::Gen_hepevt* hep = nullptr;
+    switch (m_mcMatchingMode) {
+      case c_Direct:
+        hep = &hep0;
+        break;
+      case c_GeneratorLevel:
+        hep = &gen_level(hep0);
+        break;
+    }
+    // step 2: Gen_hepevt -> MCParticle
+    if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
+      int matchedMCParticle = genHepevtToMCParticle[hep->get_ID()];
 
-        // step 3: set the relation
-        tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
+      // step 3: set the relation
+      tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
 
-        testMCRelation(hep, mcParticles[matchedMCParticle], "Track");
-      } else {
-        B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
-        B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
-      }
+      testMCRelation(*hep, m_mcParticles[matchedMCParticle], "Track");
+    } else {
+      B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
+      B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
     }
   }
 }
 
 void B2BIIConvertMdstModule::convertMdstVee2Table()
 {
-  //B2INFO("*** convertMdstVee2Table ***");
-  // at this point MCParticles StoreArray should already exist
-  StoreArray<MCParticle> mcParticles;
-
-  // Tracks and TrackFitResults StoreArrays should exist as well
-  StoreArray<Track> tracks;
-  StoreArray<PIDLikelihood> pidLikelihoods;
-  StoreArray<TrackFitResult> trackFitResults;
-
-  // create V0 StoreArray
-  StoreArray<V0> v0s;
-
-  // Particle StoreArray exists as well
-  StoreArray<Particle> particles;
-
   // Create and initialize K_S0 particle list
   StoreObjPtr<ParticleList> ksPList("K_S0:mdst");
   ksPList.create();
@@ -561,7 +543,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         belleVeeDaughterHelix(belleV0, 1, helixParam, helixError);
 
-        auto trackFitP = trackFitResults.appendNew(helixParam, helixError, pTypeP, 0.5, -1, -1);
+        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, 0.5, -1, -1);
         trackFitPIndex = trackFitP->getArrayIndex();
 
         belleVeeDaughterToCartesian(belleV0, 1, pTypeP, momentumP, positionP, error7x7P);
@@ -592,7 +574,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           continue;
         }
 
-        auto trackFitP = trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1);
+        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1);
 
         trackFitPIndex = trackFitP->getArrayIndex();
 
@@ -617,7 +599,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         belleVeeDaughterHelix(belleV0, -1, helixParam, helixError);
 
-        auto trackFitM = trackFitResults.appendNew(helixParam, helixError, pTypeM, 0.5, -1, -1);
+        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, 0.5, -1, -1);
         trackFitMIndex = trackFitM->getArrayIndex();
 
         belleVeeDaughterToCartesian(belleV0, -1, pTypeM, momentumM, positionM, error7x7M);
@@ -647,7 +629,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           continue;
         }
 
-        auto trackFitM = trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1);
+        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1);
 
         trackFitMIndex = trackFitM->getArrayIndex();
 
@@ -667,13 +649,13 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       }
     }
 
-    Track* trackP = tracks[trackID[0] - 1];
-    Track* trackM = tracks[trackID[1] - 1];
+    Track* trackP = m_tracks[trackID[0] - 1];
+    Track* trackM = m_tracks[trackID[1] - 1];
 
-    TrackFitResult* trackFitP = trackFitResults[trackFitPIndex];
-    TrackFitResult* trackFitM = trackFitResults[trackFitMIndex];
+    TrackFitResult* trackFitP = m_trackFitResults[trackFitPIndex];
+    TrackFitResult* trackFitM = m_trackFitResults[trackFitMIndex];
 
-    v0s.appendNew(std::make_pair(trackP, trackFitP), std::make_pair(trackM, trackFitM));
+    m_v0s.appendNew(std::make_pair(trackP, trackFitP), std::make_pair(trackM, trackFitM));
 
     // create Ks Particle and add it to the 'K_S0:mdst' ParticleList
     const PIDLikelihood* pidP = trackP->getRelated<PIDLikelihood>();
@@ -681,12 +663,12 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     const MCParticle* mcParticleP = trackP->getRelated<MCParticle>();
     const MCParticle* mcParticleM = trackM->getRelated<MCParticle>();
 
-    Particle* newDaugP = particles.appendNew(daughterP);
+    Particle* newDaugP = m_particles.appendNew(daughterP);
     if (pidP)
       newDaugP->addRelationTo(pidP);
     if (mcParticleP)
       newDaugP->addRelationTo(mcParticleP);
-    Particle* newDaugM = particles.appendNew(daughterM);
+    Particle* newDaugM = m_particles.appendNew(daughterM);
     if (pidM)
       newDaugM->addRelationTo(pidM);
     if (mcParticleM)
@@ -695,27 +677,19 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TLorentzVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
     TVector3 v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
 
+    Particle* newV0 = nullptr;
     if (belleV0.kind() == 1) { // K0s -> pi+ pi-
       Particle KS(v0Momentum, 310);
       KS.appendDaughter(newDaugP);
       KS.appendDaughter(newDaugM);
       KS.setVertex(v0Vertex);
-      Particle* newKS = particles.appendNew(KS);
-      ksPList->addParticle(newKS);
+      newV0 = m_particles.appendNew(KS);
+      ksPList->addParticle(newV0);
 
       // append extra info: goodKs flag
       Belle::FindKs belleKSFinder;
       belleKSFinder.candidates(belleV0, Belle::IpProfile::position(1));
-      newKS->addExtraInfo("goodKs", belleKSFinder.goodKs());
-
-      // append extra info: nisKsFinder quality indicators
-      Belle::nisKsFinder ksnb;
-      double protIDP = atcPID(pidP, 2, 4);
-      double protIDM = atcPID(pidM, 2, 4);
-      ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
-      newKS->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
-      newKS->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
-      newKS->addExtraInfo("ksnbStandard", ksnb.standard());
+      newV0->addExtraInfo("goodKs", belleKSFinder.goodKs());
 
       /*
       std::cout << " ---- B1 Ks ---- " << std::endl;
@@ -756,22 +730,35 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.appendDaughter(newDaugP);
       Lambda0.appendDaughter(newDaugM);
       Lambda0.setVertex(v0Vertex);
-      Particle* newLambda0 = particles.appendNew(Lambda0);
-      lambda0PList->addParticle(newLambda0);
+      newV0 = m_particles.appendNew(Lambda0);
+      lambda0PList->addParticle(newV0);
     } else if (belleV0.kind() == 3) { // anti-Lambda -> pi+ anti-p
       Particle antiLambda0(v0Momentum, -3122);
       antiLambda0.appendDaughter(newDaugM);
       antiLambda0.appendDaughter(newDaugP);
       antiLambda0.setVertex(v0Vertex);
-      Particle* newAntiLambda0 = particles.appendNew(antiLambda0);
-      antiLambda0PList->addParticle(newAntiLambda0);
+      newV0 = m_particles.appendNew(antiLambda0);
+      antiLambda0PList->addParticle(newV0);
     } else if (belleV0.kind() == 4) { // gamma -> e+ e-
       Particle gamma(v0Momentum, 22);
       gamma.appendDaughter(newDaugP);
       gamma.appendDaughter(newDaugM);
       gamma.setVertex(v0Vertex);
-      Particle* newGamma = particles.appendNew(gamma);
-      convGammaPList->addParticle(newGamma);
+      newV0 = m_particles.appendNew(gamma);
+      convGammaPList->addParticle(newV0);
+    }
+    // append extra info: nisKsFinder quality indicators
+    if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
+      Belle::nisKsFinder ksnb;
+      double protIDP = atcPID(pidP, 2, 4);
+      double protIDM = atcPID(pidM, 2, 4);
+      ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
+      // K_S0 and Lambda (inverse cut on ksnbNoLam for Lambda selection).
+      newV0->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
+      newV0->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
+      // K_S0 only
+      if (belleV0.kind() == 1)
+        newV0->addExtraInfo("ksnbStandard", ksnb.standard());
     }
   }
 
@@ -779,9 +766,6 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
 void B2BIIConvertMdstModule::convertGenHepEvtTable()
 {
-  // create MCParticle StoreArray
-  StoreArray<MCParticle> mcParticles;
-
   if (m_realData)
     return;
 
@@ -888,14 +872,8 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
 
 void B2BIIConvertMdstModule::convertMdstECLTable()
 {
-  // At this point MCParticles StoreArray should already exist
-  StoreArray<MCParticle> mcParticles;
-
-  // Create ECLCluster StoreArray
-  StoreArray<ECLCluster> eclClusters;
-
   // Relations
-  RelationArray eclClustersToMCParticles(eclClusters, mcParticles);
+  RelationArray eclClustersToMCParticles(m_eclClusters, m_mcParticles);
 
   // Clear the mdstEcl <-> ECLCluster map
   mdstEclToECLCluster.clear();
@@ -911,7 +889,7 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
     Belle::Mdst_ecl_aux mdstEclAux(ecl_aux_manager(mdstEcl.get_ID()));
 
     // Create Belle II ECLCluster
-    auto B2EclCluster = eclClusters.appendNew();
+    auto B2EclCluster = m_eclClusters.appendNew();
 
     // Convert Mdst_ecl -> ECLCluster and create map of indices
     convertMdstECLObject(mdstEcl, mdstEclAux, B2EclCluster);
@@ -927,17 +905,28 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
     // Create ECLCluster -> MCParticle relation
     // Step 1: MDST_ECL -> Gen_hepevt
-    const Belle::Gen_hepevt hep(gen_level(get_hepevt(mdstEcl)));
-    if (hep && hep.idhep() != 911) {
+    const Belle::Gen_hepevt& hep0 = get_hepevt(mdstEcl);
+    if (hep0 == 0)
+      continue;
+    const Belle::Gen_hepevt* hep = nullptr;
+    switch (m_mcMatchingMode) {
+      case c_Direct:
+        hep = &hep0;
+        break;
+      case c_GeneratorLevel:
+        hep = &gen_level(hep0);
+        break;
+    }
+    if (hep->idhep() != 911) {
       // Step 2: Gen_hepevt -> MCParticle
-      if (genHepevtToMCParticle.count(hep.get_ID()) > 0) {
-        int matchedMCParticleID = genHepevtToMCParticle[hep.get_ID()];
+      if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
+        int matchedMCParticleID = genHepevtToMCParticle[hep->get_ID()];
         // Step 3: set the relation
         eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticleID);
-        testMCRelation(hep, mcParticles[matchedMCParticleID], "ECLCluster");
+        testMCRelation(*hep, m_mcParticles[matchedMCParticleID], "ECLCluster");
       } else {
-        B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
-        B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
+        B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
+        B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
       }
     }
   }
@@ -946,12 +935,6 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
 void B2BIIConvertMdstModule::convertMdstKLMTable()
 {
-  // At this point MCParticles StoreArray should already exist
-  StoreArray<MCParticle> mcParticles;
-
-  // Create ECLCluster StoreArray
-  StoreArray<KLMCluster> klmClusters;
-
   // There was no MC matching in Belle for KLM Clusters
 
   // Clear the mdstKlm <-> KLMCluster map
@@ -967,7 +950,7 @@ void B2BIIConvertMdstModule::convertMdstKLMTable()
     Belle::Mdst_klm_cluster mdstKlm_cluster = *klmC_Ite;
 
     // Create Belle II ECLCluster
-    auto B2KlmCluster = klmClusters.appendNew();
+    auto B2KlmCluster = m_klmClusters.appendNew();
 
     // Convert Mdst_klm_cluster -> KLMCluster and create map of indices
     convertMdstKLMObject(mdstKlm_cluster, B2KlmCluster);
@@ -979,15 +962,8 @@ void B2BIIConvertMdstModule::convertMdstKLMTable()
 
 void B2BIIConvertMdstModule::convertMdstGammaTable()
 {
-  // At this point ECLClusters and MCParticles StoreArray should already exist
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<MCParticle> mcParticles;
-
-  // Create Particles StoreArray
-  StoreArray<Particle> particles;
-
   // Relations
-  RelationArray particlesToMCParticles(particles, mcParticles);
+  RelationArray particlesToMCParticles(m_particles, m_mcParticles);
 
   // Clear the mdstGamma <-> Particle map
   mdstGammaToParticle.clear();
@@ -1010,12 +986,12 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
       continue;
 
     // Get ECLCluster from map
-    ECLCluster* B2EclCluster = eclClusters[mdstEclToECLCluster[mdstEcl.get_ID()]];
+    ECLCluster* B2EclCluster = m_eclClusters[mdstEclToECLCluster[mdstEcl.get_ID()]];
     if (!B2EclCluster)
       continue;
 
     // Create Particle from ECLCluster, add to StoreArray, create gamma map entry
-    Particle* B2Gamma = particles.appendNew(Particle(B2EclCluster));
+    Particle* B2Gamma = m_particles.appendNew(B2EclCluster);
     mdstGammaToParticle[mdstGamma.get_ID()] = B2Gamma->getArrayIndex();
 
     // Add particle to particle list
@@ -1034,10 +1010,6 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
 
 void B2BIIConvertMdstModule::convertMdstPi0Table()
 {
-  // At this point ECLClusters and Particles StoreArray should already exist
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<Particle> particles;
-
   // Create and initialize particle list
   StoreObjPtr<ParticleList> plist("pi0:mdst");
   plist.create();
@@ -1057,11 +1029,11 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
     TLorentzVector p4(mdstPi0.px(), mdstPi0.py(), mdstPi0.pz(), mdstPi0.energy());
 
     // Create Particle from TLorentzVector and PDG code, add to StoreArray
-    Particle* B2Pi0 = particles.appendNew(Particle(p4, 111));
+    Particle* B2Pi0 = m_particles.appendNew(p4, 111);
 
     // Get Belle II photons from map
-    Particle* B2Gamma1 = particles[mdstGammaToParticle[mdstGamma1.get_ID()]];
-    Particle* B2Gamma2 = particles[mdstGammaToParticle[mdstGamma2.get_ID()]];
+    Particle* B2Gamma1 = m_particles[mdstGammaToParticle[mdstGamma1.get_ID()]];
+    Particle* B2Gamma2 = m_particles[mdstGammaToParticle[mdstGamma2.get_ID()]];
     if (!B2Gamma1 || !B2Gamma2)
       continue;
 
@@ -1076,18 +1048,8 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
 
 void B2BIIConvertMdstModule::convertMdstKLongTable()
 {
-
-  // panter tables: extrernals/include/belle_legacy/tables
-
-  // At this point KLMClusters and Particles StoreArray should already exist
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<Particle> particles;
-
-  // At this point MCParticles StoreArray should already exist
-  StoreArray<MCParticle> mcParticles;
-
   // Relations
-  RelationArray particlesToMCParticles(particles, mcParticles);
+  RelationArray particlesToMCParticles(m_particles, m_mcParticles);
 
 
   // Create and initialize particle list
@@ -1107,7 +1069,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
 
 
     // Get KLMCluster from map
-    KLMCluster* B2KlmCluster = klmClusters[mdstKlmToKLMCluster[mdstKlm.get_ID()]];
+    KLMCluster* B2KlmCluster = m_klmClusters[mdstKlmToKLMCluster[mdstKlm.get_ID()]];
     if (!B2KlmCluster)
       continue;
 
@@ -1115,7 +1077,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
     B2KlmCluster->setClusterPosition(mdstKlong.cos_x(), mdstKlong.cos_y(), mdstKlong.cos_z());
 
     // Create Particle from KLMCluster, add to StoreArray, create Klong map entry
-    Particle* B2Klong = particles.appendNew(Particle(B2KlmCluster));
+    Particle* B2Klong = m_particles.appendNew(B2KlmCluster);
     mdstKlongToParticle[mdstKlong.get_ID()] = B2Klong->getArrayIndex();
 
     // Add particle to particle list
@@ -1162,7 +1124,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
         if (sum > 0.0) {
           int matchedMCParticleID = genHepevtToMCParticle[(*klong_hep_it).get_ID()];
           particlesToMCParticles.add(bestRecKlongID, matchedMCParticleID);
-          testMCRelation((*klong_hep_it), mcParticles[matchedMCParticleID], "particles");
+          testMCRelation((*klong_hep_it), m_mcParticles[matchedMCParticleID], "m_particles");
         }
       }
     }
@@ -1516,8 +1478,6 @@ void B2BIIConvertMdstModule::convertHelix(Belle::Helix& helix, std::vector<float
 
 void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track)
 {
-  StoreArray<TrackFitResult> trackFitResults;
-
   Belle::Mdst_trk& trk = belleTrack.trk();
 
   for (int mhyp = 0 ; mhyp < c_nHyp; ++mhyp) {
@@ -1623,7 +1583,8 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
           helixError[counter++] = helixCovariance(i, j);
     }
 
-    auto trackFit = trackFitResults.appendNew(helixParam, helixError, pType, pValue, patternCdc.getInteger(), patternVxd.getInteger());
+    auto trackFit = m_trackFitResults.appendNew(helixParam, helixError, pType, pValue, patternCdc.getInteger(),
+                                                patternVxd.getInteger());
     track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
     /*
       B2INFO("--- B1 Track: ");
@@ -1728,11 +1689,8 @@ void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster&
 //-----------------------------------------------------------------------------
 void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
 {
-  StoreArray<Track> tracks;
-  StoreArray<ECLCluster> eclClusters;
-
   // Relations
-  RelationArray eclClustersToTracks(eclClusters, tracks);
+  RelationArray eclClustersToTracks(m_eclClusters, m_tracks);
 
   Belle::Mdst_ecl_trk_Manager& m = Belle::Mdst_ecl_trk_Manager::get_manager();
   Belle::Mdst_charged_Manager& chgMg = Belle::Mdst_charged_Manager::get_manager();
@@ -1774,13 +1732,9 @@ void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
 
 void B2BIIConvertMdstModule::setKLMClustersRelations()
 {
-  StoreArray<Track> tracks;
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KLMCluster> klmClusters;
-
   // Relations
-  RelationArray klmClustersToTracks(klmClusters, tracks);
-  RelationArray klmClustersToEclClusters(klmClusters, eclClusters);
+  RelationArray klmClustersToTracks(m_klmClusters, m_tracks);
+  RelationArray klmClustersToEclClusters(m_klmClusters, m_eclClusters);
 
   Belle::Mdst_klm_cluster_Manager& klm_cluster_manager = Belle::Mdst_klm_cluster_Manager::get_manager();
 

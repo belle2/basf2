@@ -37,6 +37,7 @@
 #pragma link C++ class Belle2::CDCADCDeltaPedestals+;
 #pragma link C++ class Belle2::CDCFEElectronics+;
 #pragma link C++ class Belle2::CDCEDepToADCConversions+;
+#pragma link C++ class Belle2::CDCFudgeFactorsForSigma+;
 
 #pragma link C++ class std::map <unsigned short, float>+;
 #pragma link C++ class std::vector<float>+;

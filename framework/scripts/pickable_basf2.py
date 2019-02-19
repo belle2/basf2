@@ -41,7 +41,7 @@ def process(path, max_event=0):
     sys.modules['basf2'] = original_basf2
     original_basf2.process(path, max_event)
     state = list(map(tuple, manager.mock_calls))
-    pickle_path = original_basf2.fw.get_pickle_path()
+    pickle_path = original_basf2.get_pickle_path()
     print("Path", path)
     print("State", state)
     if pickle_path != '' and path is not None:

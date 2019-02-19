@@ -44,6 +44,14 @@ DQMHistAnalysisPXDFitsModule::DQMHistAnalysisPXDFitsModule()
     j++;
     if (j == NUM_MODULES) break;
   }
+  for (auto i = 0; i < NUM_MODULES; i++) {
+    m_hSignal[i] = nullptr;
+    m_hCommon[i] = nullptr;
+    m_hCounts[i] = nullptr;
+    m_cSignal[i] = nullptr;
+    m_cCommon[i] = nullptr;
+    m_cCounts[i] = nullptr;
+  }
   B2DEBUG(1, "DQMHistAnalysisPXDFits: Constructor done.");
 }
 
@@ -177,11 +185,11 @@ void DQMHistAnalysisPXDFitsModule::event()
 
     for (auto j = 0; j < 6; j++) {
       for (auto k = 0; k < 4; k++) {
-        TH1* hh1 = NULL;
+        //TH1* hh1 = NULL;
         string s2 = str(format("_%d.%d.%d_%d_%d") % layer % ladder % sensor % j % k);
 
         std::string name = "hrawPxdHitsCharge" + s2;
-        hh1 = findHist(name);
+        TH1* hh1 = findHist(name);
         if (hh1 == NULL) {
           hh1 = findHist(m_histogramDirectoryName, name);
         }

@@ -20,42 +20,36 @@
 # (location: analysis/scripts/stdV0s.py)
 #
 # Contributors: B. Scavino (August 2018)
+#               I. Komarov (September 2018)
 #
 ################################################################################
 
-from basf2 import *
-from modularAnalysis import inputMdst
-from modularAnalysis import printDataStore
-from modularAnalysis import printList
-from modularAnalysis import fillParticleList
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
-from modularAnalysis import analysis_main
+import basf2 as b2
+import modularAnalysis as ma
+import variables.collections as vc
+import variables.utils as vu
+import stdV0s as stdv
 
-from stdV0s import *
-# check if the required input file exists (from B2A101 example)
-import os.path
-import sys
-if not os.path.isfile('B2A101-Y4SEventGeneration-gsim-BKGx0.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-gsim-BKGx0.root) does not exist. '
-             'Please run B2A101-Y4SEventGeneration.py and B2A103-SimulateAndReconstruct-withoutBeamBkg.py '
-             'tutorial scripts first.')
+# create path
+my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx0.root')
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+             path=my_path)
 
 # print contents of the DataStore before loading Particles
-printDataStore()
+ma.printDataStore(path=my_path)
 
 # create and fill Ks/Lambda0 ParticleLists, using V0s as source
 # second argument are the selection criteria: '' means no cut, take all
 # the decay chain has to be specified (i.e. the two daughters, as well)
 # A vertex fit should also be performed
 # In this example a cut on the candidates mass is applied
-fillParticleList('K_S0:V0 -> pi+ pi-', '0.3 < M < 0.7')
-vertexKFit('K_S0:V0', 0.0)
-fillParticleList('Lambda0:V0 -> p+ pi-', '0.9 < M < 1.3')
-vertexKFit('Lambda0:V0', 0.0)
+ma.fillParticleList(decayString='K_S0:V0 -> pi+ pi-', cut='0.3 < M < 0.7', path=my_path)
+ma.vertexKFit(list_name='K_S0:V0', conf_level=0.0, path=my_path)
+ma.fillParticleList(decayString='Lambda0:V0 -> p+ pi-', cut='0.9 < M < 1.3', path=my_path)
+ma.vertexKFit(list_name='Lambda0:V0', conf_level=0.0, path=my_path)
 
 # alternatively, we can create a list of particles combined
 # using the analysis ParticleCombiner module
@@ -64,70 +58,98 @@ vertexKFit('Lambda0:V0', 0.0)
 # created, too)
 # A vertex fit should also be performed
 # In this example a cut on the candidates mass is applied
-fillParticleList('pi-:all', '')
-fillParticleList('p+:all', '')
+ma.fillParticleList(decayString='pi-:all', cut='', path=my_path)
+ma.fillParticleList(decayString='p+:all', cut='', path=my_path)
 
-reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7')
-vertexKFit('K_S0:RD', 0.0)
-reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3')
-vertexKFit('Lambda0:RD', 0.0)
+ma.reconstructDecay(decayString='K_S0:RD -> pi+:all pi-:all', cut='0.3 < M < 0.7', path=my_path)
+ma.vertexKFit(list_name='K_S0:RD', conf_level=0.0, path=my_path)
+ma.reconstructDecay(decayString='Lambda0:RD -> p+:all pi-:all', cut='0.9 < M < 1.3', path=my_path)
+ma.vertexKFit(list_name='Lambda0:RD', conf_level=0.0, path=my_path)
 
 # another possibility is to use default functions
 # for V0s they are defined in analysis/scripts/stdV0s.py
 # e.g. stdKshorts():
 # - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
 #   a cut on the candidates mass is applied, too
-stdKshorts()
-stdLambdas()
+stdv.stdKshorts(path=my_path)
+stdv.stdLambdas(path=my_path)
 
 # print contents of the DataStore after loading Particles
-printDataStore()
+ma.printDataStore(path=my_path)
 
 # print out the contents of each ParticleList
-printList('K_S0:V0', False)
-printList('Lambda0:V0', False)
+ma.printList(list_name='K_S0:V0', full=False, path=my_path)
+ma.printList(list_name='Lambda0:V0', full=False, path=my_path)
 
-printList('K_S0:RD', False)
-printList('Lambda0:RD', False)
+ma.printList(list_name='K_S0:RD', full=False, path=my_path)
+ma.printList(list_name='Lambda0:RD', full=False, path=my_path)
 
-printList('K_S0:all', False)
-printList('Lambda0:all', False)
+ma.printList(list_name='K_S0:all', full=False, path=my_path)
+ma.printList(list_name='Lambda0:all', full=False, path=my_path)
 
-# define Ntuple tools for V0s:
-toolsK0 = ['EventMetaData', '^K_S0']
-toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['InvMass', '^K_S0']
-toolsK0 += ['Vertex', '^K_S0']
-toolsK0 += ['MCVertex', '^K_S0']
-toolsK0 += ['PID', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['TrackHits', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['MCTruth', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['CustomFloats[dr:dz:isSignal:chiProb]', '^K_S0']
-toolsK0 += ['MCHierarchy[Intermediate]', '^K_S0']
+# define variables
+pi0_vars = vc.kinematics + \
+    vc.pid +  \
+    vc.track + \
+    vc.track_hits + \
+    vc.mc_truth
 
-toolsLambda0 = ['EventMetaData', '^Lambda0']
-toolsLambda0 += ['Kinematics', '^Lambda0 -> ^p+ ^pi-']
-toolsLambda0 += ['InvMass', '^Lambda0']
-toolsLambda0 += ['Vertex', '^Lambda0']
-toolsLambda0 += ['MCVertex', '^Lambda0']
-toolsLambda0 += ['PID', 'Lambda0 -> ^p+ ^pi-']
-toolsLambda0 += ['Track', 'Lambda0 -> ^p+ ^pi-']
-toolsLambda0 += ['TrackHits', 'Lambda0 -> ^p+ ^pi-']
-toolsLambda0 += ['MCTruth', '^Lambda0 -> ^p+ ^pi-']
-toolsLambda0 += ['CustomFloats[dr:dz:isSignal:chiProb]', '^Lambda0']
-toolsLambda0 += ['MCHierarchy[Intermediate]', '^Lambda0']
+v0_vars = vc.kinematics + \
+    vc.inv_mass + \
+    vc.vertex +\
+    vc.mc_truth + \
+    ['chiProb'] +\
+    vu.create_daughter_aliases(pi0_vars, 0) +\
+    vu.create_daughter_aliases(pi0_vars, 1)
 
-ntupleFile('B2A203-LoadV0s.root')
-ntupleTree('kshort_v0', 'K_S0:V0', toolsK0)  # K_S0 from V0s
-ntupleTree('kshort_rd', 'K_S0:RD', toolsK0)  # K_S0 from reconstructDecay
-ntupleTree('kshort_std', 'K_S0:all', toolsK0)  # K_S0 from standard list (=V0s, see stdV0s.py)
 
-ntupleTree('lambda_v0', 'Lambda0:V0', toolsLambda0)  # Lambda0 from V0s
-ntupleTree('lambda_rd', 'Lambda0:RD', toolsLambda0)  # Lambda0 from reconstructDecay
-ntupleTree('lambda_std', 'Lambda0:all', toolsLambda0)  # Lambda0 from standard list (=V0s, see stdV0s.py)
-# Process the events
-process(analysis_main)
+# saving variables to ntuple
+rootOutputFile = 'B2A203-LoadV0s.root'
+
+# K_S0 from V0s
+ma.variablesToNtuple(treename='kshort_v0',
+                     decayString='K_S0:V0',
+                     variables=v0_vars,
+                     filename=rootOutputFile,
+                     path=my_path)
+
+# K_S0 from reconstructDecay
+ma.variablesToNtuple(treename='kshort_rd',
+                     decayString='K_S0:RD',
+                     variables=v0_vars,
+                     filename=rootOutputFile,
+                     path=my_path)
+
+# K_S0 from standard list (=V0s, see stdV0s.py)
+ma.variablesToNtuple(treename='kshort_std',
+                     decayString='K_S0:all',
+                     variables=v0_vars,
+                     filename=rootOutputFile,
+                     path=my_path)
+
+# Lambda0 from V0s
+ma.variablesToNtuple(treename='lambda_v0',
+                     decayString='Lambda0:V0',
+                     variables=v0_vars,
+                     filename=rootOutputFile,
+                     path=my_path)
+
+# Lambda0 from reconstructDecay
+ma.variablesToNtuple(treename='lambda_rd',
+                     decayString='Lambda0:RD',
+                     variables=v0_vars,
+                     filename=rootOutputFile,
+                     path=my_path)
+
+# Lambda0 from standard list (=V0s, see stdV0s.py)
+ma.variablesToNtuple(treename='lambda_std',
+                     decayString='Lambda0:all',
+                     variables=v0_vars,
+                     filename=rootOutputFile,
+                     path=my_path)
+
+
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

@@ -81,20 +81,20 @@ def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5', max
     reconstructDecay('K_S0:pipi -> pi+:highPID pi-:highPID', '.25 <= M <= .75', path=main)
     # fit K_S0 Vertex
 
-    fitVertex('K_S0:pipi', 0., '', 'rave', 'vertex', '', False, path=main)
+    vertexRave('K_S0:pipi', 0., path=main, silence_warning=True)
 
     # reconstruct J/psi -> mu+ mu- decay and fit vertex
     reconstructDecay('J/psi:mumu -> mu+:highPID mu-:highPID', '3.0 <= M <= 3.2 ', path=main)
 
     # applyCuts('J/psi:mumu', '3.07 < M < 3.11', path=main)
     applyCuts('J/psi:mumu', '', path=main)
-    massVertexRave('J/psi:mumu', 0., '', path=main)
+    massVertexRave('J/psi:mumu', 0., '', path=main, silence_warning=True)
 
     # reconstruct B0 -> J/psi Ks decay
     reconstructDecay('B0:jpsiks -> J/psi:mumu K_S0:pipi', '5.2 <= M <= 5.4', path=main)
 
     # Fit the B0 Vertex
-    vertexRave('B0:jpsiks', 0., 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', '', path=main)
+    vertexRave('B0:jpsiks', 0., 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', '', path=main, silence_warning=True)
 
     # perform MC matching (MC truth asociation). Always before TagV
     matchMCTruth('B0:jpsiks', path=main)

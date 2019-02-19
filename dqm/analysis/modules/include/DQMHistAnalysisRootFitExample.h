@@ -48,15 +48,22 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data member
-    RooWorkspace* w;
-    RooRealVar* x;
-    RooDataHist* data;
-    RooPlot* plot;
-    RooFitResult* r;
-    RooAbsPdf* model;
+    /** The RooFit work space. */
+    RooWorkspace* w = nullptr;
+    /** The fitting variable. */
+    RooRealVar* x = nullptr;
+    /** The data of histogram for fitting. */
+    RooDataHist* data = nullptr;
+    /** The plot of the fitting result. */
+    RooPlot* plot = nullptr;
+    /** The fitting result. */
+    RooFitResult* r = nullptr;
+    /** The PDF for fitting. */
+    RooAbsPdf* model = nullptr;
 
 
-    TCanvas* m_c0;
+    /** The drawing canvas for plotting the fitting result. */
+    TCanvas* m_c0 = nullptr;
 
 #ifdef _BELLE2_EPICS
     chid  mychid;

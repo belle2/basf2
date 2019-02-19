@@ -7,6 +7,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
 
 namespace Belle2 {
 
@@ -28,13 +29,15 @@ namespace Belle2 {
     /** Initialize the module.
      * Load the network weights and register datastore objects.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called once for each event.
      * Run the network for all CDCTriggerTracks and store output z-vertex
      * in the same CDCTriggerTrack.
      */
-    virtual void event();
+    virtual void event() override;
+    /** shuffle the input ids in the input vector to match the hardware*/
+    float hwInputIdShuffle(float tsid, int sl);
 
   protected:
     /** Name of file where network weights etc. are stored. */
@@ -62,6 +65,12 @@ namespace Belle2 {
      *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
+    /** Switch for writing out the input vector for each track (off by default). */
+    bool m_writeMLPinput;
+    /** Switch for always using the shortest priority time of the TS as t0. */
+    bool m_alwaysTrackT0;
+    /** Switch to mimic an apparent bug in the hardware preprocessing. */
+    bool m_hardwareCompatibilityMode;
 
     /** list of input 2D tracks */
     StoreArray<CDCTriggerTrack> m_tracks2D;
@@ -69,6 +78,8 @@ namespace Belle2 {
     StoreArray<CDCTriggerTrack> m_tracksNN;
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** list of input vectors for each NN track */
+    StoreArray<CDCTriggerMLPInput> m_mlpInput;
   };
 }
 #endif

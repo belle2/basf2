@@ -91,6 +91,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_MinPt(0.0), // initialized later
   m_MinKE(0.0), // initialized later
   m_TracksColName(NULL), // initialized later
+  m_RecoTracksColName(NULL), // initialized later
   m_ExtHitsColName(NULL), // initialized later
   m_MuidsColName(NULL), // initialized later
   m_MuidHitsColName(NULL), // initialized later
@@ -110,6 +111,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_TargetMuid(NULL), // initialized later
   m_MinRadiusSq(0.0), // initialized later
   m_OffsetZ(0.0), // initialized later
+  m_BarrelNSector(0), // initialized later
   m_BarrelMaxR(0.0), // initialized later
   m_BarrelMinR(0.0), // initialized later
   m_BarrelHalfLength(0.0), // initialized later
@@ -123,6 +125,8 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
   m_ExpNo(0), // modified later
+  m_bklmBadChannelsValid(false), // initialized later
+  m_eklmChannelsValid(false), // initialized later
   m_eklmTransformData(NULL), // initialized later
   m_MuonPlusPar(NULL), // modified later
   m_MuonMinusPar(NULL), // modified later
@@ -1122,7 +1126,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
     g4eState.SetParameters(posG4e, momG4e); // compute private-state parameters from momG4e
     g4eState.SetError(covG4e);
-  } catch (genfit::Exception) {
+  } catch (const genfit::Exception&) {
     B2WARNING("genfit::MeasuredStateOnPlane() exception: skipping extrapolation for this track. initial momentum = ("
               << firstMomentum.X() << "," << firstMomentum.Y() << "," << firstMomentum.Z() << ")");
     extState.pdgCode = 0; // prevent start of extrapolation in swim()

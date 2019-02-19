@@ -20,6 +20,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -335,9 +336,43 @@ namespace Belle2 {
       return (pInitial - pDaughters).M();
     }
 
+    double mcParticleSecondaryPhysicsProcess(const Particle* p)
+    {
+      const MCParticle* mcp = p->getMCParticle();
+      if (mcp) {
+        return mcp->getSecondaryPhysicsProcess();
+      } else {
+        return -1;
+      }
+    }
+
+    double mcParticleStatus(const Particle* p)
+    {
+      const MCParticle* mcp = p->getMCParticle();
+      if (mcp) {
+        return mcp->getStatus();
+      } else {
+        return -1;
+      }
+    }
+
+    double particleMCPrimaryParticle(const Particle* p)
+    {
+      const MCParticle* mcp = p->getMCParticle();
+      if (mcp) {
+        unsigned int bitmask = MCParticle::c_PrimaryParticle;
+        if (mcp->hasStatus(bitmask))
+          return 1;
+        else
+          return 0;
+      } else {
+        return -1;
+      }
+    }
+
     double particleMCVirtualParticle(const Particle* p)
     {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_IsVirtual;
         if (mcp->hasStatus(bitmask))
@@ -351,7 +386,7 @@ namespace Belle2 {
 
     double particleMCInitialParticle(const Particle* p)
     {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_Initial;
         if (mcp->hasStatus(bitmask))
@@ -365,7 +400,7 @@ namespace Belle2 {
 
     double particleMCISRParticle(const Particle* p)
     {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_IsISRPhoton;
         if (mcp->hasStatus(bitmask))
@@ -379,7 +414,7 @@ namespace Belle2 {
 
     double particleMCFSRParticle(const Particle* p)
     {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_IsFSRPhoton;
         if (mcp->hasStatus(bitmask))
@@ -393,7 +428,7 @@ namespace Belle2 {
 
     double particleMCPhotosParticle(const Particle* p)
     {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_IsPHOTOSPhoton;
         if (mcp->hasStatus(bitmask))
@@ -403,6 +438,14 @@ namespace Belle2 {
       } else {
         return -1;
       }
+    }
+
+    double generatorEventWeight(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      if (!evtMetaData)
+        return std::numeric_limits<double>::quiet_NaN();
+      return evtMetaData->getGeneratedWeight();
     }
 
     int tauPlusMcMode(const Particle*)
@@ -514,7 +557,7 @@ namespace Belle2 {
       return (double)mcp->hasSeenInDetector(Const::KLM);
     }
 
-    VARIABLE_GROUP("MC Matching");
+    VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
@@ -577,6 +620,15 @@ namespace Belle2 {
                       "The theta of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
+
+
+    REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,
+                      "Returns the secondary physics process flag.");
+    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
+                      "Returns status bits of related MCParticle or - 1 if MCParticle relation is not set.");
+    REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
+                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle,"
+                      "-1 if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
                       "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non - virtual MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
@@ -592,10 +644,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("generatorEventWeight", generatorEventWeight,
+                      "[Eventbased] Returns the event weight produced by the event generator")
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
                       "Decay ID for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
                       "Decay ID for the negative tau lepton in a tau pair generated event.")
+
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,

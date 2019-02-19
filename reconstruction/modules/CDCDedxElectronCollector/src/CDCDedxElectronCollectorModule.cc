@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: jvbennett                                                *
+ * Contributors: jikumar, jvbennett                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -127,8 +127,8 @@ void CDCDedxElectronCollectorModule::collect()
 
     ////NEW
     const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
-    if (eclCluster) {
-      double TrkEoverP = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+    if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+      double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
       if (abs(TrkEoverP - 1) >= fSetEoverP)continue;
       //printf("TrkEoverP = %0.03f\n", TrkEoverP);
     }
@@ -149,9 +149,9 @@ void CDCDedxElectronCollectorModule::collect()
 
         double TrkEoverPOther = -2.0;
         const ECLCluster* eclClusterOther = Othertrack->getRelated<ECLCluster>();
-        if (!eclClusterOther)continue;
+        if (!eclClusterOther or !eclClusterOther->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))continue;
 
-        TrkEoverPOther = (eclClusterOther->getEnergy()) / (mOtherTrack->getMomentum().Mag());
+        TrkEoverPOther = (eclClusterOther->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (mOtherTrack->getMomentum().Mag());
 
         //cutting on EoverP of other track
         if (abs(TrkEoverPOther - 1.0) >= fSetEoverP) {
@@ -159,7 +159,7 @@ void CDCDedxElectronCollectorModule::collect()
           continue;
         }
         //cutting on dedx of other track
-        if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) >= 0.2) {
+        if (dedxOtherTrack->getDedxNoSat() <= 0.85 || dedxOtherTrack->getDedxNoSat() >= 1.25) {
           //printf("Cut2: TrkdEdxOther = %0.03f\n", dedxOtherTrack->getDedxNoSat());
           continue;
         }
@@ -192,7 +192,7 @@ void CDCDedxElectronCollectorModule::collect()
     for (int i = 0; i < m_nhits; ++i) {
 
       if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue; //Jake added
-      if (dedxTrack->getPath(i) <= 0.5)continue; //JK
+      //if (dedxTrack->getPath(i) <= 0.5)continue; //JK
       if (Iswire)m_wire.push_back(dedxTrack->getWire(i));
       if (Islayer) m_layer.push_back(dedxTrack->getHitLayer(i));
       if (Isdoca)m_doca.push_back(dedxTrack->getDoca(i));

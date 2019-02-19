@@ -60,12 +60,12 @@ namespace Belle2 {
 
     // Dumps debug information.
     void dump(const std::string& message = std::string(""),
-              const std::string& prefix = std::string("")) const;
+              const std::string& prefix = std::string("")) const override;
 
   public:// Modifiers
 
     /// Clears all entries and regions.
-    void clear(void);
+    void clear(void) override;
 
     /// Clears only specified layer ID.
     void clear(unsigned layerId);
@@ -74,7 +74,7 @@ namespace Belle2 {
     void clearCells(void);
 
     /// Voting.
-    // using TRGCDCHoughPlaneBase::vote; // to be checked
+    using TRGCDCHoughPlaneBase::vote; // to be checked
     void vote(float rx,
               float ry,
               int charge,
@@ -93,7 +93,7 @@ namespace Belle2 {
               int weight = 1);
 
     /// Sets entry.
-    // using TRGCDCHoughPlane::setEntry; // to be checked
+    using TRGCDCHoughPlane::setEntry; // to be checked
     unsigned setEntry(unsigned serialId, unsigned layerId, unsigned n);
 
     /// Merge layers into one.
@@ -106,7 +106,7 @@ namespace Belle2 {
     void preparePatterns(unsigned layerId, unsigned nPatterns);
 
     /// registers a pattern..
-    // using TRGCDCHoughPlane::registerPattern; // to be checked
+    using TRGCDCHoughPlane::registerPattern; // to be checked
     void registerPattern(unsigned layerId, unsigned id);
 
     /// finalize patterns.

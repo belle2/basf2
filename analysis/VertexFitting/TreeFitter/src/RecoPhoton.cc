@@ -94,8 +94,9 @@ namespace TreeFitter {
   ErrCode RecoPhoton::initParams()
   {
     const Belle2::ECLCluster* cluster = particle()->getECLCluster();
+    const Belle2::ECLCluster::EHypothesisBit clusterhypo = particle()->getECLClusterEHypothesisBit();
     const TVector3 centroid = cluster->getClusterPosition();
-    const double energy = cluster->getEnergy();
+    const double energy = cluster->getEnergy(clusterhypo);
 
     m_init = true;
     m_covariance =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);

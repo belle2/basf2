@@ -23,105 +23,11 @@
 	<value energy="3.66">0.23</value>
 	<value energy="4.1">0.31</value>
 	<value energy="5.8">0.14</value>
+	<value energy="7.5">0.0</value>
       </Property>
     </Properties>
     <Type>dielectric_metal</Type>
     <Finish>polished</Finish>
     <Model>glisur</Model>
   </Surface>
-  
-  
-
-  <Alignment>
-    <Plate id="1">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="2">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="3">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="4">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="5">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="6">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="7">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="8">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="9">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="10">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="11">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="12">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="13">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="14">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="15">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="16">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="17">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-    <Plate id="18">
-      <dr unit="mm" >0.00000000e+00</dr> 
-      <dphi unit="deg" >0.00000000e+00</dphi> 
-      <dtheta unit="deg" >0.00000000e+00</dtheta> 
-    </Plate>
-  </Alignment>
 </Mirrors>

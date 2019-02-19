@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
+import basf2.core as _basf2
 from ROOT import Belle2
 
 from hep_ipython_tools.entities import StoreContentList, StoreContent
 
 
-class PrintCollections(basf2.Module):
+class PrintCollections(_basf2.Module):
 
     """
     A small module to catch the content of the store array for some events and store them in the queue.
@@ -17,9 +17,9 @@ class PrintCollections(basf2.Module):
         """
         Create the module with the given queue.
         """
+        super().__init__()
         #: The queue to handle
         self.queue = queue
-        basf2.Module.__init__(self)
         #: The contents of the store arrays for some events
         self.store_content_list = []
         #: The current event number
@@ -75,7 +75,7 @@ class PrintCollections(basf2.Module):
         self.queue.put("ipython.store_content", self.store_content_list)
 
 
-class ProgressPython(basf2.Module):
+class ProgressPython(_basf2.Module):
 
     """
     A small module that prints every now and then the event number to the given connection.
@@ -84,7 +84,7 @@ class ProgressPython(basf2.Module):
 
     def __init__(self, queue):
         """ Init the module """
-        basf2.Module.__init__(self)
+        super().__init__()
         #: The queue to handle
         self.queue = queue
         #: The current event number

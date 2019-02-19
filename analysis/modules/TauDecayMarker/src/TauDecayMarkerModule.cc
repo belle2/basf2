@@ -33,10 +33,14 @@ REG_MODULE(TauDecayMarker)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TauDecayMarkerModule::TauDecayMarkerModule() : Module()
+TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tau_pair(false), no_of_tau_plus(0), no_of_tau_minus(0), id_of_tau_plus(-1),
+  id_of_tau_minus(-1), m_pmode(-2), m_mmode(-2)
 {
   // Set module properties
-  setDescription("Module to identify and label generated tau decays channels, using MCParticle information..");
+  setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
+                 "is numbered following the order in the default KKMC decay table. Using this module, "
+                 "the channel number will be stored in the variables `tauPlusMcMode`, and `tauMinusMcMode`. "
+                 "Further details and usage can be found at https://confluence.desy.de/display/BI/Tau+Physics+Analysis+Tools. ");
 }
 
 void TauDecayMarkerModule::initialize()

@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEEVENTMETADATATOOL_H
-#define NTUPLEEVENTMETADATATOOL_H
+#pragma once
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -34,4 +33,3 @@ namespace Belle2 {
   };
 } // namepspace Belle2
 
-#endif // NTUPLEEVENTMETADATATOOL_H

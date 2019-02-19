@@ -152,7 +152,10 @@ void BKLMRawPackerModule::event()
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
     buf[1] |= ((bword3 << 16));
-    if (copperId < 1 || copperId > 4) { B2WARNING("BKLMRawPacker:: abnormal copper index: " << copperId); continue; }
+    if (copperId < 1 || copperId > 4) {
+      B2WARNING("BKLMRawPacker::event() out-of-range (1..4):" << LogVar("COPPER ID", copperId));
+      continue;
+    }
     data_words[copperId - 1][finesse].push_back(buf[0]);
     data_words[copperId - 1][finesse].push_back(buf[1]);
 
@@ -249,7 +252,6 @@ void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, 
                                      unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
 {
 
-  charge = m_scintADCOffset - charge;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMRAWPACKER_H
-#define EKLMRAWPACKER_H
+#pragma once
 
 /* C++ headers. */
 #include <cstdint>
@@ -107,6 +106,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

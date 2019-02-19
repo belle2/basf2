@@ -54,7 +54,9 @@ namespace Belle2 {
         int moduleID = topModule.getInt("moduleID");
         if (moduleID == 0) continue; // module is not installed into barrel
         if (moduleID < 0 or moduleID > c_numModules) {
-          B2ERROR(topModule.getPath() << " moduleID=" << moduleID << " ***invalid ID");
+          B2ERROR("TOP::FrontEndMapper: invalid moduleID in xml file"
+                  << LogVar("moduleID", moduleID)
+                  << LogVar("path", topModule.getPath()));
           return;
         }
 
@@ -63,21 +65,27 @@ namespace Belle2 {
 
           int col = boardstack.getInt("@col");
           if (col < 0 or col >= c_numColumns) {
-            B2ERROR(boardstack.getPath() << " col=" << col << " ***invalid number");
+            B2ERROR("TOP::FrontEndMapper: invalid boardstack number in xml file"
+                    << LogVar("moduleID", moduleID)
+                    << LogVar("boardstack", col)
+                    << LogVar("path", boardstack.getPath()));
             return;
           }
           if (!modules.insert(moduleID * c_numColumns + col).second) {
-            B2ERROR(boardstack.getPath()
-                    << " moduleID=" << moduleID
-                    << " col=" << col
-                    << " ***already mapped");
+            B2ERROR("TOP::FrontEndMapper: this boardstack is already mapped."
+                    << LogVar("moduleID", moduleID)
+                    << LogVar("boardstack", col)
+                    << LogVar("path", boardstack.getPath()));
             return;
           }
 
           unsigned short scrodID = (unsigned short) boardstack.getInt("SCRODid");
           if (!scrodIDs.insert(scrodID).second) {
-            B2ERROR(boardstack.getPath() << "/SCRODid " << scrodID <<
-                    " ***already used");
+            B2ERROR("TOP::FrontEndMapper: this SCROD ID is already used."
+                    << LogVar("moduleID", moduleID)
+                    << LogVar("boardstack", col)
+                    << LogVar("scrod", scrodID)
+                    << LogVar("path", boardstack.getPath() + "/SCRODid"));
             return;
           }
 
@@ -88,8 +96,9 @@ namespace Belle2 {
           else if (finesseSlot == "C") {finesse = 2;}
           else if (finesseSlot == "D") {finesse = 3;}
           else {
-            B2ERROR(boardstack.getPath() << "/FinesseSlot " << finesseSlot <<
-                    " ***invalid slot (valid are A, B, C, D)");
+            B2ERROR("TOP::FrontEndMapper: invalid slot (valid are A, B, C, D)."
+                    << LogVar("FinesseSlot", finesseSlot)
+                    << LogVar("path", boardstack.getPath() + "/FinesseSlot"));
             return;
           }
 
@@ -97,8 +106,11 @@ namespace Belle2 {
           m_copperIDs.insert(copperID);
           string copper = boardstack.getString("COPPERid") + " " + finesseSlot;
           if (!coppers.insert(copper).second) {
-            B2ERROR(boardstack.getPath() << "/COPPERid " << copper <<
-                    " ***input already used");
+            B2ERROR("TOP::FrontEndMapper: this COPPER ID is already used."
+                    << LogVar("moduleID", moduleID)
+                    << LogVar("boardstack", col)
+                    << LogVar("copperID", copper)
+                    << LogVar("path", boardstack.getPath() + "/COPPERid"));
             return;
           }
 

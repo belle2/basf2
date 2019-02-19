@@ -65,24 +65,9 @@ def goodBelleKshort(path=analysis_main):
     applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path)
 
 
-def loadStdKS(path=analysis_main):
-    """
-     Warining:
-        This function is deprecated. Please use :func:`stdKshorts` directly
-
-    Loads the standard :math:`K_{S}^{0}` list.
-    Kept for backward compatibility.
-
-    Parameters:
-        path (basf2.Path): modules are added to this path
-
-    """
-    stdKshorts(path)
-
-
 def stdLambdas(path=analysis_main):
     """
-    Load :math:`Lambda^{0}` from the mdst V0 objects (created when the
+    Load :math:`\Lambda^{0}`s from the mdst V0 objects (created when the
     tracking was run). The ParticleList is named "Lambda0:all". A vertex fit is
     performed and only candidates with an invariant mass in the range
     :math:`1.10 < M < 1.13~GeV`, and for which the vertex fit did not fail, are
@@ -110,8 +95,8 @@ def mergedLambdas(prioritiseV0=True, path=analysis_main):
 
     ::
 
-        from stdV0s import stdKshorts
-        help(stdKshorts)
+        from stdV0s import stdLambdas
+        help(stdLambdas)
 
     Parameters:
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?
@@ -120,7 +105,7 @@ def mergedLambdas(prioritiseV0=True, path=analysis_main):
     fillParticleList('Lambda0:V0 -> p+ pi-', '0.9 < M < 1.3', True, path=path)
     stdPi('all', path=path)  # no quality cuts
     stdPr('all', path=path)  # no quality cuts
-    reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.3 < M < 0.7', 1, True, path)
-    V0ListMerger('Lambda0:V0', 'Lambda0:RD', prioritiseV0, path)  # outputs Lambda0:merged
-    vertexKFit('Lambda0:merged', 0.0, '', '', path)
-    applyCuts('Lambda0:merged', '1.10 < M < 1.13', path)
+    reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, True, path=path)
+    V0ListMerger('Lambda0:V0', 'Lambda0:RD', prioritiseV0, path=path)  # outputs Lambda0:merged
+    vertexKFit('Lambda0:merged', 0.0, '', '', path=path)
+    applyCuts('Lambda0:merged', '1.10 < M < 1.13', path=path)

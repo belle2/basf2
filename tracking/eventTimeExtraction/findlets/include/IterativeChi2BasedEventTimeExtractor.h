@@ -26,7 +26,6 @@ namespace Belle2 {
     {
       Super::exposeParameters(moduleParamList, prefix);
 
-      moduleParamList->getParameter<unsigned int>(TrackFindingCDC::prefixed(prefix, "iterations")).setDefaultValue(5);
       moduleParamList->getParameter<bool>(TrackFindingCDC::prefixed(prefix, "useLastEventT0")).setDefaultValue(false);
     }
   };

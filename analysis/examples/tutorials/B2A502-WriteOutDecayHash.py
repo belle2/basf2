@@ -18,31 +18,38 @@
 #  1) No guarantee for collisions!
 #
 # Contributors: Moritz Gelb (June 2017)
+#               I. Komarov (September 2018)
 #
-######################################################
+################################################################################
 
-from basf2 import *
-from modularAnalysis import *
-from decayHash import DecayHashMap
-from beamparameters import add_beamparameters
+import basf2 as b2
+import modularAnalysis as ma
+import variables.collections as vc
+import variables.utils as vu
 
-# set the log level
-set_log_level(LogLevel.WARNING)
-beamparameters = add_beamparameters(analysis_main, "Y4S")
+# create path
+my_path = b2.create_path()
 
-# Bd_JpsiKL_ee Signal MC file
-# Generated for release-01-00-00
-inputFile = "/group/belle2/tutorial/release_01-00-00/1111540100.dst.root"
-inputMdstList('MC9', inputFile)
-
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('JPsi2ee_e2egamma.root', 'examples', False),
+             path=my_path)
 
 # reconstruct the decay
-fillParticleList('e+', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4', False)
-fillParticleList('gamma', '', False)
-reconstructDecay('J/psi -> e+ e-', '')
+ma.fillParticleList(decayString='e+',
+                    cut='electronID > 0.2 and d0 < 2 and abs(z0) < 4',
+                    writeOut=False,
+                    path=my_path)
+ma.fillParticleList(decayString='gamma',
+                    cut='',
+                    writeOut=False,
+                    path=my_path)
+ma.reconstructDecay(decayString='J/psi -> e+ e-',
+                    cut='',
+                    path=my_path)
 
 # generate the decay string
-analysis_main.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi.root')
+my_path.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi_from_B2A502.root')
 
 
 # write out ntuples
@@ -54,10 +61,13 @@ var = ['M',
        'extraInfo(DecayHashExtended)',
        ]
 
-variablesToNtuple('J/psi', var, filename='Jpsi.root')
+ma.variablesToNtuple(decayString='J/psi',
+                     variables=var,
+                     filename='Jpsi_from_B2A502.root',
+                     path=my_path)
 
 # process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

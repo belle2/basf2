@@ -24,7 +24,6 @@ namespace Belle2 {
    * of the inverse covariant matrix to perform waveform fit and
    * the parameters defining the waveform shape.
    */
-
   class ECLWaveformData : public TObject {
   public:
 
@@ -47,12 +46,11 @@ namespace Belle2 {
       if (i < j) std::swap(i, j);
       return m_matrixElement[ i * (i + 1) / 2 + j];
     }
-    /** Getter method for all matrix as one dimentional array */
 
+    /** Getter method for all matrix as one dimentional array */
     void getArray(float WF[136]) const  {for (int i = 0; i < 136; i++) { WF[i] = (float) m_matrixElement[i];}   }
 
-    /** Getter method for all matrix as two dimentional array */
-
+    /** Getter method for all matrix as two dimentional array (floats) */
     void getMatrix(float M[16][16]) const
     {
       const float* A = m_matrixElement;
@@ -62,6 +60,7 @@ namespace Belle2 {
       }
     }
 
+    /** Getter method for all matrix as two dimentional array (doubles) */
     void getMatrix(double M[16][16]) const
     {
       const float* A = m_matrixElement;
@@ -71,7 +70,7 @@ namespace Belle2 {
       }
     }
 
-//    void storeMatrix(const float M[16][16])
+    /** Setter for matrix from std::array of floats */
     void storeMatrix(const std::array<std::array<float, 16>, 16>& M) // using std::array for intel compiler (TF)
     {
       float* A = m_matrixElement;
@@ -81,7 +80,7 @@ namespace Belle2 {
       }
     }
 
-//    void storeMatrix(const double M[16][16])
+    /** Setter for matrix from std::array of doubles */
     void storeMatrix(const std::array<std::array<double, 16>, 16>& M) // using std::array for intel compiler (TF)
     {
       float* A = m_matrixElement;
@@ -92,7 +91,6 @@ namespace Belle2 {
     }
 
     /** Setter method for waveform shape parameter */
-
     void setWaveformPar(size_t i, float value)
     {
       assert(i < c_nParams);
@@ -107,33 +105,32 @@ namespace Belle2 {
       return m_waveformPar[i];
     }
 
-    /** Getter method for waveform shape parameters as one dimentional array */
+    /** Getter method for waveform shape parameters as one dimentional array of
+     * floats */
     void getWaveformParArray(float P[10]) const
     {
       for (int i = 0; i < 10; i++)
         P[i] = (float) m_waveformPar[i];
     }
 
-
+    /** Getter method for waveform shape parameters as one dimentional array of
+     * doubles */
     void getWaveformParArray(double P[10]) const
     {
       for (int i = 0; i < 10; i++)
         P[i] = m_waveformPar[i];
     }
 
-
     /** print-out function for debugging purpose*/
-
     void print() const;
 
-
-    static const size_t c_nElements = 136; /** number of independent matrix elements*/
-    static const size_t c_nParams = 10; /** number of parameters defining the waveform shape*/
+    static const size_t c_nElements = 136; /**< number of independent matrix elements*/
+    static const size_t c_nParams = 10; /**< number of parameters defining the waveform shape*/
   private:
-    Float_t m_matrixElement[c_nElements];
-    Float_t m_waveformPar[c_nParams];
+    Float_t m_matrixElement[c_nElements]; /**< the matrix elements */
+    Float_t m_waveformPar[c_nParams]; /**< the waveform parameters */
 
-    ClassDef(ECLWaveformData, 1);
+    ClassDef(ECLWaveformData, 1); /**< ClassDef */
   };
 
   /** Container for constant parameters used in waveform fits */
@@ -141,28 +138,28 @@ namespace Belle2 {
   class ECLWFAlgoParams : public TObject {
   public:
 
-    Int_t ka;               /** multipliers power of 2 for fg31,fg41 */
-    Int_t kb;               /** multipliers power of 2 for fg32 */
-    Int_t kc;               /** multipliers power of 2 for fg33,fg43 */
-    Int_t y0Startr;         /** start point for pedestal calculation */
-    Int_t chiThresh;        /** chi2 threshold for quality bit */
-    Int_t k1Chi;            /** multipliers power of 2 for f */
-    Int_t k2Chi;            /** multipliers power of 2 for chi2 calculation */
-    Int_t hitThresh;        /** hardware threshold(to start digitization) */
-    Int_t lowAmpThresh;     /** threshold to calculate time */
-    Int_t skipThresh;       /** threshold to send data to collector */
-    int getka() const {return (int) ka;}
-    int getkb() const {return (int) kb;}
-    int getkc() const {return (int) kc;}
-    int gety0s()  const {return (int) y0Startr;}
-    int getcT() const {return (int) chiThresh;}
-    int getk1() const {return (int) k1Chi;}
-    int getk2() const {return (int) k2Chi;}
-    int gethT() const {return (int) hitThresh;}
-    int getlAT() const {return (int) lowAmpThresh;}
-    int getsT()  const {return (int) skipThresh;}
+    Int_t ka;               /**< multipliers power of 2 for fg31,fg41 */
+    Int_t kb;               /**< multipliers power of 2 for fg32 */
+    Int_t kc;               /**< multipliers power of 2 for fg33,fg43 */
+    Int_t y0Startr;         /**< start point for pedestal calculation */
+    Int_t chiThresh;        /**< chi2 threshold for quality bit */
+    Int_t k1Chi;            /**< multipliers power of 2 for f */
+    Int_t k2Chi;            /**< multipliers power of 2 for chi2 calculation */
+    Int_t hitThresh;        /**< hardware threshold(to start digitization) */
+    Int_t lowAmpThresh;     /**< threshold to calculate time */
+    Int_t skipThresh;       /**< threshold to send data to collector */
+    int getka() const {return (int) ka;}            /**< getter for multipliers power of 2 for fg31 fg41 */
+    int getkb() const {return (int) kb;}            /**< getter for multipliers power of 2 for fg32 */
+    int getkc() const {return (int) kc;}            /**< getter for multipliers power of 2 for fg33,fg43 */
+    int gety0s()  const {return (int) y0Startr;}    /**< getter for the start point for pedestal calculation */
+    int getcT() const {return (int) chiThresh;}     /**< getter for the chi2 threshold for quality bit */
+    int getk1() const {return (int) k1Chi;}         /**< getter for the multipliers power of 2 for f */
+    int getk2() const {return (int) k2Chi;}         /**< getter for multipliers power of 2 for chi2 calculation */
+    int gethT() const {return (int) hitThresh;}     /**< getter for the hardware threshold */
+    int getlAT() const {return (int) lowAmpThresh;} /**< getter for the threshold to calculate time */
+    int getsT()  const {return (int) skipThresh;}   /**< getter for the threshold to send data to collector */
 
-    ClassDef(ECLWFAlgoParams, 1)
+    ClassDef(ECLWFAlgoParams, 1) /**< ClassDef */
   };
 
   /** Container for constant matrix used to generate electronic noise */
@@ -182,11 +179,9 @@ namespace Belle2 {
     }
 
     /** Getter method for matrix as one dimentional array */
-
     void getArray(float NoiseData[496]) const  {for (int i = 0; i < 496; i++) { NoiseData[i] = (float) m_matrixElement[i];}   }
 
     /** Getter method for matrix as two dimentional array */
-
     void getMatrix(float M[31][31]) const
     {
       const float* A = m_matrixElement;
@@ -201,7 +196,7 @@ namespace Belle2 {
       }
     }
 
-    // sampling a random vector x from the 31-dimensional multivariate normal distribution with covariance matrix C
+    /** sampling a random vector x from the 31-dimensional multivariate normal distribution with covariance matrix C */
     void generateCorrelatedNoise(const float z[31], float x[31]) const
     {
       // z = (z0, ..., z30) is a inpute vector whose components are 31 independent standard normal variates
@@ -215,26 +210,30 @@ namespace Belle2 {
       }
     }
 
-    static const size_t c_nElements = 496; /** number of independent elements */
+    static const size_t c_nElements = 496; /**< number of independent elements */
 
-    Float_t m_matrixElement[c_nElements]; /** electronic noise matrix */
+    Float_t m_matrixElement[c_nElements]; /**< electronic noise matrix */
 
-    ClassDef(ECLNoiseData, 1)
+    ClassDef(ECLNoiseData, 1) /**< ClassDef */
   };
 
 
+  /** Class for a lookup table */
   class ECLLookupTable : public TObject {
   public:
+    /** Constructor */
     ECLLookupTable() : m_content(8736, 0) {}
 
+    /** Array-like access operator */
     unsigned int operator[](unsigned int key) const
     { return m_content[ key - 1 ]; }
+    /** Array-like access operator */
     unsigned int& operator[](unsigned int key)
     { return m_content[ key - 1 ]; }
 
   private:
-    std::vector<unsigned int> m_content; /** index to index lookup table */
-    ClassDef(ECLLookupTable, 1);
+    std::vector<unsigned int> m_content; /**< index to index lookup table */
+    ClassDef(ECLLookupTable, 1); /**< ClassDef */
   };
 
 }

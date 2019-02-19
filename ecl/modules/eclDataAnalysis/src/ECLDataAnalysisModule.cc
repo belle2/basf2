@@ -1479,7 +1479,13 @@ void ECLDataAnalysisModule::event()
   for (unsigned int iclusters = 0; iclusters < (unsigned int)m_eclClusters.getEntries() ; iclusters++) {
     ECLCluster* aECLClusters = m_eclClusters[iclusters];
     m_eclClusterIdx->push_back(iclusters);
-    m_eclClusterEnergy->push_back(aECLClusters->getEnergy());
+
+    double clusterE = 0.0;
+    if (aECLClusters->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) clusterE = aECLClusters->getEnergy(
+            ECLCluster::EHypothesisBit::c_nPhotons);
+    else clusterE = aECLClusters->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
+    m_eclClusterEnergy->push_back(clusterE);
+
     m_eclClusterEnergyError->push_back(aECLClusters->getUncertaintyEnergy());
     m_eclClusterTheta->push_back(aECLClusters->getTheta());
     m_eclClusterThetaError->push_back(aECLClusters->getUncertaintyTheta());
@@ -1506,7 +1512,7 @@ void ECLDataAnalysisModule::event()
     m_eclClusterLAT->push_back(aECLClusters->getLAT());
     m_eclClusterDeltaTime99->push_back(aECLClusters->getDeltaTime99());
     m_eclClusterDetectorRegion->push_back(aECLClusters->getDetectorRegion());
-    m_eclClusterHypothesisId->push_back(aECLClusters->getHypothesisId());
+    m_eclClusterHypothesisId->push_back(aECLClusters->getHypotheses());
 
     if (aECLClusters->getRelated<ECLShower>() != (nullptr)) {
       const ECLShower* shower_cluster = aECLClusters->getRelated<ECLShower>();
@@ -1557,7 +1563,7 @@ void ECLDataAnalysisModule::event()
       y++;
     }
 
-    m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
+    m_eclClusterToBkgWeight->push_back(clusterE - sumHit);
     m_eclClusterSimHitSum->push_back(sumHit);
     if (idx[0] > -1) {
       m_eclClusterToMCWeight1->push_back(wi[0]);
@@ -1784,7 +1790,13 @@ void ECLDataAnalysisModule::event()
     for (unsigned int iclusters = 0; iclusters < (unsigned int)m_eclPureClusters.getEntries() ; iclusters++) {
       ECLCluster* aECLClusters = m_eclPureClusters[iclusters];
       m_eclPureClusterIdx->push_back(iclusters);
-      m_eclPureClusterEnergy->push_back(aECLClusters->getEnergy());
+
+      double clusterE = 0.0;
+      if (aECLClusters->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) clusterE = aECLClusters->getEnergy(
+              ECLCluster::EHypothesisBit::c_nPhotons);
+      else clusterE = aECLClusters->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
+      m_eclPureClusterEnergy->push_back(clusterE);
+
       m_eclPureClusterEnergyError->push_back(aECLClusters->getUncertaintyEnergy());
       m_eclPureClusterTheta->push_back(aECLClusters->getTheta());
       m_eclPureClusterThetaError->push_back(aECLClusters->getUncertaintyTheta());
@@ -1812,7 +1824,7 @@ void ECLDataAnalysisModule::event()
       m_eclPureClusterE1oE9->push_back(aECLClusters->getE1oE9());
       m_eclPureClusterDeltaTime99->push_back(aECLClusters->getDeltaTime99());
       m_eclPureClusterDetectorRegion->push_back(aECLClusters->getDetectorRegion());
-      m_eclPureClusterHypothesisId->push_back(aECLClusters->getHypothesisId());
+      m_eclPureClusterHypothesisId->push_back(aECLClusters->getHypotheses());
 
       //Dump MC Info - Multiple Matching
       double sumHit = 0;
@@ -1857,7 +1869,7 @@ void ECLDataAnalysisModule::event()
         y++;
       }
 
-      m_eclPureClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
+      m_eclPureClusterToBkgWeight->push_back(clusterE - sumHit);
       if (idx[0] > -1) {
         m_eclPureClusterToMCWeight1->push_back(wi[0]);
         m_eclPureClusterToMC1->push_back(idx[0]);

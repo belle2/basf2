@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr, Thomas Hauth                  *
+ * Contributors: Andreas Moll, Thomas Kuhr, Thomas Hauth, Martin Ritter   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -117,6 +117,11 @@ namespace Belle2 {
      */
     std::ostream& print(std::ostream& out) const;
 
+    /** Return a json string for the log message.
+     * The returned string will be a json object containing the full log message on one line
+     * @param complete if true include all fields independent of the logInfo settings
+     */
+    std::string toJSON(bool complete) const;
 
   private:
 

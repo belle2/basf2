@@ -2,18 +2,20 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 from abc import ABC, abstractmethod
-import subprocess
-import multiprocessing as mp
-from collections import defaultdict
-import shutil
-from itertools import repeat
-import glob
-from .utils import method_dispatch
 import pickle
 import configparser
-from .utils import decode_json_string
 import pathlib
+import glob
+from collections import defaultdict
+import shutil
+import subprocess
+import multiprocessing as mp
+
+from .utils import method_dispatch
+from .utils import decode_json_string
+from .utils import grouper
 
 import ROOT
 
@@ -555,16 +557,6 @@ class Local(Backend):
                 B2INFO("No valid input file paths found for job {0}".format(job.name))
 
             if job.max_files_per_subjob > 0 and existing_input_files:
-                import itertools
-
-                def grouper(n, iterable):
-                    it = iter(iterable)
-                    while True:
-                        chunk = tuple(itertools.islice(it, n))
-                        if not chunk:
-                            return
-                        yield chunk
-
                 for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
                     subjob = job.create_subjob(i)
                     subjob.input_files = subjob_input_files
@@ -735,16 +727,6 @@ class Batch(Backend):
                 B2INFO("No valid input file paths found for job {0}".format(job.name))
 
             if job.max_files_per_subjob > 0 and existing_input_files:
-                import itertools
-
-                def grouper(n, iterable):
-                    it = iter(iterable)
-                    while True:
-                        chunk = tuple(itertools.islice(it, n))
-                        if not chunk:
-                            return
-                        yield chunk
-
                 for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
                     subjob = job.create_subjob(i)
                     subjob.input_files = subjob_input_files
@@ -855,7 +837,7 @@ class PBS(Batch):
         print("# --- Start PBS ---", file=batch_file)
         print(" ".join([PBS.cmd_queue, batch_queue]), file=batch_file)
         print(" ".join([PBS.cmd_name, job.name]), file=batch_file)
-        print(" ".join([PBS.cmd_wkdir, job.working_dir]), file=batch_file)
+        print(" ".join([PBS.cmd_wkdir, str(job.working_dir)]), file=batch_file)
         print(" ".join([PBS.cmd_stdout, os.path.join(job.working_dir, "stdout")]), file=batch_file)
         print(" ".join([PBS.cmd_stderr, os.path.join(job.working_dir, "stderr")]), file=batch_file)
         print("# --- End PBS ---", file=batch_file)
@@ -979,7 +961,7 @@ class LSF(Batch):
         print("# --- Start LSF ---", file=batch_file)
         print(" ".join([LSF.cmd_queue, batch_queue]), file=batch_file)
         print(" ".join([LSF.cmd_name, job.name]), file=batch_file)
-        print(" ".join([LSF.cmd_wkdir, job.working_dir]), file=batch_file)
+        print(" ".join([LSF.cmd_wkdir, str(job.working_dir)]), file=batch_file)
         print(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")]), file=batch_file)
         print(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")]), file=batch_file)
         print("# --- End LSF ---", file=batch_file)

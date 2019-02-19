@@ -100,7 +100,7 @@ namespace Belle2 {
      * and create timing and charge distribution as projection histograms for the x- and y-axis, respectively.
      * Timing cut is also applied for charge distributiion
      */
-    void LoadHistograms(std::string histotype);//histotype {Height_gain,Height_efficiency,Integral_gain:}
+    void LoadHistograms(const std::string& histotype);//histotype {Height_gain,Height_efficiency,Integral_gain:}
 
     /**
      * Fit charge (or integrated charged) distribution to calculate gain and efficiency for each channel
@@ -115,7 +115,7 @@ namespace Belle2 {
     /**
      * Draw results of gain/efficiency calculation for each channel to a given output file
      */
-    void DrawResult(std::string histotype, EHistogramType LoadHisto);
+    void DrawResult(const std::string& histotype, EHistogramType LoadHisto);
 
     /**
      * Fit function of pulse charge (or charnge) distribution for channel(pixel)-by-channel gain extraction, given by

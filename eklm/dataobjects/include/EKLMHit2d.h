@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMHIT2D_H
-#define EKLMHIT2D_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -62,12 +61,9 @@ namespace Belle2 {
     /** Chi^2 of the hit. */
     float m_ChiSq;
 
-    /** Needed to make Belle2::EKLMHit2d storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMHit2d, 4);
 
   };
 
 }
-
-#endif
-

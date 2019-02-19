@@ -86,12 +86,14 @@ int RFDqmServer::UnConfigure(NSMmsg* nsmm, NSMcontext* nsmc)
   if (badlist == NULL)
     badlist = blank;
 
+  /* Should be done at STOP
   char outfile[1024];
   //  sprintf(outfile, "dqm_e%4.4dr%6.6d.root", msg->pars[0], msg->pars[1]);
   sprintf(outfile, "dqm_e%4.4dr%6.6d.root", m_expno, m_runno);
   int pid_dqmmerge = m_proc->Execute(merger, outfile, nodebase, topdir, nnodes, startnode, badlist);
   int status;
   pid_t done = waitpid(pid_dqmmerge, &status, 0);
+  */
 
   // Kill DQM hrelay and hserver
   //  system("killall hrelay hserver");
@@ -190,3 +192,10 @@ void RFDqmServer::server()
   }
 }
 
+void RFDqmServer::cleanup()
+{
+  printf("RFDqmServer : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFDqmServer: Done. Exitting\n");
+  exit(-1);
+}

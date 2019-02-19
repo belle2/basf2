@@ -31,11 +31,10 @@ namespace {
   class OverlapHandler: public G4VExceptionHandler {
   public:
     /** Constructor which just takes a callback function pointer to be called in case of exceptions */
-    OverlapHandler(std::function<void(const std::string&)> callback): m_callback(callback) {}
+    explicit OverlapHandler(std::function<void(const std::string&)> callback): m_callback(callback) {}
     /** Called when an exception is raised. Calls the callback and does nothing else */
     virtual bool Notify(const char*, const char*, G4ExceptionSeverity, const char* description)
     {
-      std::string message{description};
       m_callback(description);
       return false;
     }

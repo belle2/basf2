@@ -1,10 +1,6 @@
-#include "daq/roisend/RoiSenderCallback.h"
 
-#include <daq/slc/base/StringUtil.h>
+#include <daq/roisend/RoiSenderCallback.h>
 
-#include <unistd.h>
-
-#include <sys/stat.h>
 
 using namespace Belle2;
 using namespace std;
@@ -16,7 +12,7 @@ static RoiSenderCallback* s_roisender = NULL;
 //-----------------------------------------------------------------
 void* RunRoiSenderLogger(void*)
 {
-  s_roisender->RoiSenderLogger();
+  s_roisender->server();
   return NULL;
 }
 
@@ -31,10 +27,6 @@ RoiSenderCallback::RoiSenderCallback()
   s_roisender = this;
 }
 
-RoiSenderCallback::~RoiSenderCallback()
-{
-
-}
 
 void RoiSenderCallback::load(const DBObject&, const std::string&)
 {
@@ -49,102 +41,131 @@ void RoiSenderCallback::load(const DBObject&, const std::string&)
   mkdir(execdir.c_str(), 0755);
   chdir(execdir.c_str());
 
-  // 2. Initialize process manager
-  m_proc = new RFProcessManager(nodename);
+  // 2. Initialize process manager if not existing
+  if (!m_proc) m_proc = new RFProcessManager(nodename);
 
-  // 3. Initialize log manager
-  m_log = new RFLogManager(nodename);
+  // 3. Initialize log manager if not existing
+  if (!m_log) m_log = new RFLogManager(nodename, nodename);
 
-  // 4. Initialize local shared memory
-  m_shm = new RFSharedMem(nodename);
+  // 4. Initialize local shared memory if not existing, this seems to be used by flow monitoring in mergemerge?
+  if (!m_shm) m_shm = new RFSharedMem(nodename);
 
 
   // 5. Run MergerMerge
   char* merger = m_conf->getconf("roisender", "merger");
   char* mergerport = m_conf->getconf("roisender", "mergerport");
-  char* mergerhost = m_conf->getconf("roisender", "mergerhost");
+//   char* mergerhost = m_conf->getconf("roisender", "mergerhost");
   char* onsenhost = m_conf->getconf("roisender", "onsenhost");
   char* onsenport = m_conf->getconf("roisender", "onsenport");
 
   string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
                    string(m_conf->getconf("roisender", "nodename"));
 
-  char idbuf[3];
+  char idbuf[11]; // maximum length by cppcheck
   sprintf(idbuf, "%2.2d", 0);
   m_pid_merger = m_proc->Execute(merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
-  sleep(2);
+  sleep(2); // WHY a sleep? if it is a race condition find & destroy!
 
-  // 6. Start Logger
-  pthread_attr_t thread_attr;
-  pthread_attr_init(&thread_attr);
-  //  pthread_attr_setschedpolicy(&thread_attr , SCHED_FIFO);
-  //  pthread_attr_setdetachstate(&thread_attr , PTHREAD_CREATE_DETACHED);
-  //  pthread_t thr_input;
-  pthread_create(&m_logthread, NULL, RunRoiSenderLogger, NULL);
-
+  // 6. Start Logger -- only on first load
+  if (!m_logthread) {
+    pthread_attr_t thread_attr;
+    pthread_attr_init(&thread_attr);
+    //  pthread_attr_setschedpolicy(&thread_attr , SCHED_FIFO);
+    //  pthread_attr_setdetachstate(&thread_attr , PTHREAD_CREATE_DETACHED);
+    //  pthread_t thr_input;
+    pthread_create(&m_logthread, NULL, RunRoiSenderLogger, NULL);
+  }
 }
 
 void RoiSenderCallback::start()
 {
+  // do nothing
 }
 
 void RoiSenderCallback::stop()
 {
+  // do nothing
 }
 
 void RoiSenderCallback::abort()
 {
   // Kill processes
-  int status;
   if (m_pid_merger != 0) {
-    kill(m_pid_merger, SIGINT);
-    waitpid(m_pid_merger, &status, 0);
-    LogFile::info("killd merger (pid=%d)", m_pid_merger);
+    int pid = m_pid_merger;
+    kill(pid, SIGINT);
+    LogFile::info("kill merger (pid=%d)", pid);// attention, race condition!
   }
-
-  pthread_cancel(m_logthread);
-
+  // wait until
+  for (int i = 0; m_pid_merger; i++) {
+    sleep(1);
+    int pid = m_pid_merger;
+    if (i == 5) {
+      kill(pid, SIGKILL); // force!
+      LogFile::warning("kill merger (pid=%d) with SIGKILL", pid);
+    }
+    if (i == 10) {
+      LogFile::error("killing merger (pid=%d) did not work", pid);
+      m_pid_merger = 0;
+      break;
+    }
+  }
 }
 
 void RoiSenderCallback::recover(const DBObject&, const std::string&)
 {
   // Kill processes
-  int status;
-  if (m_pid_merger != 0) {
-    kill(m_pid_merger, SIGINT);
-    waitpid(m_pid_merger, &status, 0);
-    LogFile::info("killd merger (pid=%d)", m_pid_merger);
-  }
+  abort();
+
+  sleep(2); // WHY a sleep? if it is a race condition find & destroy!
 
   // 1. Run merger first
   char* merger = m_conf->getconf("roisender", "merger");
   char* mergerport = m_conf->getconf("roisender", "mergerport");
-  char* mergerhost = m_conf->getconf("roisender", "mergerhost");
+//   char* mergerhost = m_conf->getconf("roisender", "mergerhost");
   char* onsenhost = m_conf->getconf("roisender", "onsenhost");
   char* onsenport = m_conf->getconf("roisender", "onsenport");
 
   string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
                    string(m_conf->getconf("roisender", "nodename"));
 
-  char idbuf[3];
-  sprintf(idbuf, "%2.2d", 0);
+  char idbuf[11];// maxlength by cppcheck
+  sprintf(idbuf, "%2.2d", 0);// why this?
   m_pid_merger = m_proc->Execute(merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
-  sleep(2);
-
+  sleep(2); // WHY a sleep? if it is a race condition find & destroy!
 }
 
-void RoiSenderCallback::RoiSenderLogger()
+void RoiSenderCallback::server()
 {
   while (true) {
+    pid_t pid = m_proc->CheckProcess();
+    // pid==0 -> nothing to report
+    // pid <0 -> some system error ... ignore ?
+    // pide>0 -> some pid has died (in one way or the other)
+    if (pid > 0) {
+      if (pid == m_pid_merger) {
+        if (getNode().getState() == RCState::LOADING_TS
+            || getNode().getState() == RCState::STARTING_TS || getNode().getState() == RCState::STOPPING_TS
+            || getNode().getState() == RCState::READY_S || getNode().getState() == RCState::RUNNING_S) {
+          // surpress Fatal and Error if we are in Abort? race condition on m_pid_merger
+          m_log->Fatal("RoiSenderCallback : merger2merge dead. pid = %d\n", pid);
+          setState(RCState::ERROR_ES);
+        } else {
+          m_log->Info("RoiSenderCallback : merger2merge dead. pid = %d\n", pid);
+        }
+        m_pid_merger = 0; // race condition for recover!!!
+        // if you have many childs, do a continue here to avoid having to await timout of CheckOutput (1s)
+      }
+    } else if (pid < 0) {
+      perror("RoiSenderCallback::server");
+    }
     int st = m_proc->CheckOutput();
+    // st==0 -> timeout of select
+    // st <0 -> system error ... ?
+    // st >0 some file descriptor has action
     if (st < 0) {
-      perror("RoiSenderLogger::server");
-      //      exit ( -1 );
+      perror("RoiSenderCallback::server");// we will never see that in the logging
     } else if (st > 0) {
       m_log->ProcessLog(m_proc->GetFd());
     }
   }
 }
-
-
-

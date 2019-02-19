@@ -15,6 +15,7 @@
 #include <string>
 #include <analysis/VariableManager/Manager.h>
 
+
 namespace Belle2 {
   class Particle;
 
@@ -46,6 +47,11 @@ namespace Belle2 {
     double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit);
 
     /**
+     * returns true L1 time type
+     */
+    double getTimType(const Particle*);
+
+    /**
      * returns 1 if the event passes a given software trigger identifier
      */
     Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args);
@@ -59,5 +65,6 @@ namespace Belle2 {
      * returns 1 if the event passes the fast reco trigger
      */
     double passesAnyFastRecoTrigger(const Particle*);
+
   }
 }

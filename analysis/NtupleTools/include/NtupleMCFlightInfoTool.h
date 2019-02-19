@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEMCFLIGHTINFOTOOL_H
-#define NTUPLEMCFLIGHTINFOTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -45,4 +44,3 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLEMCFLIGHTINFOTOOL_H

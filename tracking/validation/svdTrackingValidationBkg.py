@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSim.root</input>
   <output>SVDTrackingValidationBkg.root</output>
   <description>

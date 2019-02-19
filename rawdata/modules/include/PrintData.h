@@ -72,10 +72,10 @@ namespace Belle2 {
     virtual ~PrintDataModule();
 
     //! initialization
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void event();
+    virtual void event() override;
 
     //! print the contents of a RawCOPPER event
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i, int array_index);
@@ -89,7 +89,7 @@ namespace Belle2 {
     //! print a PXD event
     virtual void printPXDEvent(RawPXD* raw_pxd);
 
-    virtual void endRun();
+    virtual void endRun() override;
 
   protected :
     //!Compression parameter

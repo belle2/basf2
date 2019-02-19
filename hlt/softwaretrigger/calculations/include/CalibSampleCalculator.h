@@ -11,6 +11,7 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
+#include <hlt/softwaretrigger/calculations/HLTCalculator.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -29,10 +30,11 @@ namespace Belle2 {
     class CalibSampleCalculator : public SoftwareTriggerCalculation {
     public:
       /// Set the default names for the store object particle lists.
-      CalibSampleCalculator(): m_particlelist(), m_extrainfoname() {};
+      CalibSampleCalculator() {}
 
       /// Set the default names for the store object particle lists.
-      CalibSampleCalculator(const std::vector<std::string>& prt, const std::vector<std::string>& ext) { m_particlelist = prt; m_extrainfoname = ext;};
+      CalibSampleCalculator(const std::vector<std::string>& prt, const std::vector<std::string>& ext) :
+        m_particlelist(prt), m_extrainfoname(ext) {}
 
       /// Require the particle list. We do not need more here.
       void requireStoreArrays() override;
@@ -53,6 +55,12 @@ namespace Belle2 {
 
       /** the name of extra info */
       std::vector<std::string> m_extrainfoname;
+
+      /**
+       * Also include the variables of the HLT calculator. This is just a temporary fix
+       * until both the HLT and calibration menu is actually fixed.
+       * */
+      HLTCalculator m_hltCalculator;
     };
   }
 }

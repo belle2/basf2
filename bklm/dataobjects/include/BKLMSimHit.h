@@ -124,7 +124,7 @@ namespace Belle2 {
     float m_PropagationTime;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMSimHit, 5);
+    ClassDefOverride(BKLMSimHit, 5);
 
   };
 

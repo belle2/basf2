@@ -41,19 +41,24 @@ namespace Belle2 {
 
     // Data members
   private:
-    //! Hist memory
-    DqmMemFile* m_memory;
+    /** Hist memory */
+    DqmMemFile* m_memory = nullptr;
+    /** Path to input hist memory. */
     std::string m_mempath;
+    /** Size of the input hist memory. */
     int m_memsize;
+    /** The refresh interval in ms. */
     int m_interval;
-    //  THttpServer* m_serv;
 
+    /** The metadata for each event. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    //! Exp number, Run number
-    unsigned int m_expno;
-    unsigned int m_runno;
-    unsigned int m_count;
+    /** Exp number */
+    unsigned int m_expno = 0;
+    /** Run number */
+    unsigned int m_runno = 0;
+    /** Event number */
+    unsigned int m_count = 0;
   };
 } // end namespace Belle2
 

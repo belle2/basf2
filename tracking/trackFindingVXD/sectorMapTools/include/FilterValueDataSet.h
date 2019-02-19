@@ -143,7 +143,7 @@ namespace Belle2 {
 /////////////////////////////////////////////////////////////////////////// member functions:
 
     /** constructor, expects to get a vector of names for filters. */
-    FilterValueDataSet(std::vector<std::string> filterNames) :
+    explicit FilterValueDataSet(std::vector<std::string> filterNames) :
       expNo(std::numeric_limits<unsigned>::max()),
       runNo(std::numeric_limits<unsigned>::max()),
       evtNo(std::numeric_limits<unsigned>::max()),

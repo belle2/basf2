@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDATABASEIMPORTER_H
-#define EKLMDATABASEIMPORTER_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
@@ -115,11 +114,6 @@ namespace Belle2 {
      */
     void importElectronicsMap();
 
-    /**
-     * Import time conversion parameters.
-     */
-    void importTimeConversion();
-
   private:
 
     /** Displacement. */
@@ -143,6 +137,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

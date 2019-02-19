@@ -8,21 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGITIZERMODULE_H
-#define EKLMDIGITIZERMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
-#include <eklm/dbobjects/EKLMDigitizationParameters.h>
-#include <eklm/dbobjects/EKLMTimeConversion.h>
-#include <eklm/simulation/FPGAFitter.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
 
@@ -83,20 +81,15 @@ namespace Belle2 {
     void readAndSortSimHits();
 
     /**
-     * Create EKLMSim2Hits from EKLMSimHits using boost:graph mechanism.
-     */
-    void makeSim2Hits();
-
-    /**
      * Merge hits from the same strip. Create EKLMDigits.
      */
     void mergeSimHitsToStripHits();
 
     /** Digitization parameters. */
-    DBObjPtr<EKLMDigitizationParameters> m_DigPar;
+    DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
 
     /** Time conversion. */
-    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+    DBObjPtr<KLMTimeConversion> m_TimeConversion;
 
     /** Channel data. */
     DBObjPtr<EKLMChannels> m_Channels;
@@ -113,36 +106,27 @@ namespace Belle2 {
     /** Initial digitization time. */
     double m_DigitizationInitialTime;
 
-    /** Save FPGA fit data (EKLMFPGAFit). */
+    /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;
 
-    /** Use debug mode in EKLM::FiberAndElectronics or not. */
+    /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
-
-    /** Create EKLMSim2Hits? */
-    bool m_CreateSim2Hits;
 
     /** Map for EKLMSimHit sorting according sensitive volumes. */
     std::multimap<int, EKLMSimHit*> m_SimHitVolumeMap;
 
     /** FPGA fitter. */
-    EKLM::FPGAFitter* m_Fitter;
+    KLM::ScintillatorFirmware* m_Fitter;
 
     /** Simulation hits. */
     StoreArray<EKLMSimHit> m_SimHits;
-
-    /** Partly merged simulation hits (not created by default). */
-    StoreArray<EKLMSim2Hit> m_Sim2Hits;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
 
     /** FPGA fits. */
-    StoreArray<EKLMFPGAFit> m_FPGAFits;
+    StoreArray<KLMScintillatorFirmwareFitResult> m_FPGAFits;
 
   };
 
 }
-
-#endif
-

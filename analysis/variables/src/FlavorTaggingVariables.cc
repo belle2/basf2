@@ -255,11 +255,9 @@ namespace Belle2 {
       int flag = 0;
       StoreObjPtr<ParticleList> KShortList("K_S0:inRoe");
       if (KShortList.isValid()) {
-        if (KShortList.isValid()) {
-          for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
-            if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
-            flag++;
-          }
+        for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
+          if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
+          flag++;
         }
       } else B2FATAL("NumberOfKShortsInRoe cannot be calculated because the required particleList K_S0:inRoe could not be found or is not valid");
       return flag;
@@ -719,7 +717,7 @@ namespace Belle2 {
             ClusterUtils C;
             for (auto& x : ecl) {
               if (x == nullptr) continue;
-              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x);
+              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x, ECLCluster::EHypothesisBit::c_nPhotons);
               if (iMomECLCluster == iMomECLCluster) {
                 if (x->isNeutral()) momXneutralclusters += iMomECLCluster;
                 else if (!(x->isNeutral())) {
@@ -751,10 +749,11 @@ namespace Belle2 {
               float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
               for (auto& x : ecl) {
                 if (x == nullptr) continue;
-                float iEnergy = x -> getEnergy();
+                float iEnergy = x -> getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
                 if (iEnergy == iEnergy) {
                   ClusterUtils cluster_util;
-                  if ((T.rotateLabToCms() * cluster_util.Get4MomentumFromCluster(x)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                  if ((T.rotateLabToCms() * cluster_util.Get4MomentumFromCluster(x,
+                       ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
                 //       for (auto & i : klm) {
                 //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
@@ -1375,11 +1374,11 @@ namespace Belle2 {
           }
 
           // ----------------------------  For KaonPion Category ------------------------------------
-          const MCParticle* mcSlowPionMother;
           bool haveKaonPionSameMother = false;
           // if KaonPion
           if (index == 9)
           {
+            const MCParticle* mcSlowPionMother = nullptr;
             StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
             Particle* targetSlowPion = nullptr;
             if (SlowPionList.isValid()) {
@@ -1792,10 +1791,10 @@ namespace Belle2 {
 
           Variable::Manager& manager = Variable::Manager::Instance();
 
-          bool particlesHaveMCAssociated = false;
 
           if (ListOfParticles.isValid())
           {
+            bool particlesHaveMCAssociated = false;
             int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* iParticle = ListOfParticles->getParticle(i);

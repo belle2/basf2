@@ -13,6 +13,7 @@
 #include <framework/gearbox/Const.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <pxd/reconstruction/PXDClusterPositionEstimator.h>
+#include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -76,7 +77,10 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float 
   rawHitCov_(1, 0) = covUV;
   rawHitCov_(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
-  m_energyDep = hit->getCharge() * Const::ehEnergy;
+  const PXD::SensorInfo& SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  auto ADUToEnergy = PXD::PXDGainCalibrator::getInstance().getADUToEnergy(m_sensorID, SensorInfo.getUCellID(hit->getU()),
+                     SensorInfo.getVCellID(hit->getV()));
+  m_energyDep = hit->getCharge() * ADUToEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();
@@ -98,7 +102,10 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit*):
   rawHitCov_(1, 0) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
   rawHitCov_(1, 1) = hit->getVSigma() * hit->getVSigma();
   // Set physical parameters
-  m_energyDep = hit->getCharge() * Const::ehEnergy;
+  const PXD::SensorInfo& SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  auto ADUToEnergy = PXD::PXDGainCalibrator::getInstance().getADUToEnergy(m_sensorID, SensorInfo.getUCellID(hit->getU()),
+                     SensorInfo.getVCellID(hit->getV()));
+  m_energyDep = hit->getCharge() * ADUToEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();
@@ -141,6 +148,49 @@ float PXDRecoHit::getShapeLikelyhood(const genfit::StateOnPlane& state) const
   return 0;
 }
 
+TVectorD PXDRecoHit::applyPlanarDeformation(TVectorD hitCoords, std::vector<double> planarParameters,
+                                            const genfit::StateOnPlane& state) const
+{
+  // Legendre parametrization of deformation
+  auto L1 = [](double x) {return x;};
+  auto L2 = [](double x) {return (3 * x * x - 1) / 2;};
+  auto L3 = [](double x) {return (5 * x * x * x - 3 * x) / 2;};
+  auto L4 = [](double x) {return (35 * x * x * x * x - 30 * x * x + 3) / 8;};
+
+  const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+
+  double u = hitCoords[0];
+  double v = hitCoords[1];
+  double width = geometry.getWidth(v);              // Width of sensor (U side)
+  double length = geometry.getLength();             // Length of sensor (V side)
+  u = u * 2 / width;                                // Legendre parametrization required U in (-1, 1)
+  v = v * 2 / length;                               // Legendre parametrization required V in (-1, 1)
+
+  /* Planar deformation using Legendre parametrization
+     w(u, v) = L_{31} * L2(u) + L_{32} * L1(u) * L1(v) + L_{33} * L2(v) +
+               L_{41} * L3(u) + L_{42} * L2(u) * L1(v) + L_{43} * L1(u) * L2(v) + L_{44} * L3(v) +
+               L_{51} * L4(u) + L_{52} * L3(u) * L1(v) + L_{53} * L2(u) * L2(v) + L_{54} * L1(u) * L3(v) + L_{55} * L4(v); */
+  double dw =
+    planarParameters[0] * L2(u) + planarParameters[1] * L1(u) * L1(v) + planarParameters[2] * L2(v) +
+    planarParameters[3] * L3(u) + planarParameters[4] * L2(u) * L1(v) + planarParameters[5] * L1(u) * L2(v) + planarParameters[6] * L3(
+      v) +
+    planarParameters[7] * L4(u) + planarParameters[8] * L3(u) * L1(v) + planarParameters[9] * L2(u) * L2(v) + planarParameters[10] * L1(
+      u) * L3(v) + planarParameters[11] * L4(v);
+
+  double du_dw = state.getState()[1]; // slope in U direction
+  double dv_dw = state.getState()[2]; // slope in V direction
+
+  u = u * width / 2;  // from Legendre to Local parametrization
+  v = v * length / 2; // from Legendre to Local parametrization
+
+  TVectorD pos(2);
+
+  pos[0] = u + dw * du_dw;
+  pos[1] = v + dw * dv_dw;
+
+  return pos;
+}
+
 std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   // Track-based update only takes place when the RecoHit has an associated cluster
@@ -164,15 +214,22 @@ std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlan
       hitCov(0, 1) = offset->getUVCovariance();
       hitCov(1, 0) = offset->getUVCovariance();
       hitCov(1, 1) = offset->getVSigma2();
+
+      // Apply planar deformation
+      TVectorD pos = applyPlanarDeformation(hitCoords, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
+
       return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(
-                                                        hitCoords, hitCov, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
+                                                        pos, hitCov, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
                                                       ));
     }
   }
 
+  // Apply planar deformation
+  TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
+
   // If we reach here, we can do no better than what we have
   return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(
-                                                    rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
+                                                    pos, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
                                                   ));
 }
 

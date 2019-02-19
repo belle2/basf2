@@ -83,10 +83,12 @@ namespace Belle2 {
           B2WARNING("addData: no space available in /TOP_DATA/");
           return status;
         case -1:
-          B2ERROR("addData: invalid module ID " << moduleID + 1);
+          B2ERROR("addData: invalid module ID."
+                  << LogVar("moduleID", moduleID + 1));
           return status;
         case -2:
-          B2ERROR("addData: invalid pixel ID " << pixelID + 1);
+          B2ERROR("addData: invalid pixel ID."
+                  << LogVar("pixelID", pixelID + 1));
           return status;
         case -3:
           B2ERROR("addData: digit should already be masked-out (different masks used?)");

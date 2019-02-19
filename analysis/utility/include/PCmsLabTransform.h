@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PCMSLABTRANSFORM_H
-#define PCMSLABTRANSFORM_H
+#pragma once
 
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/database/DBObjPtr.h>
@@ -88,7 +87,6 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif
 
 
 

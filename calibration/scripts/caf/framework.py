@@ -35,12 +35,144 @@ from .utils import temporary_workdir
 from .utils import IoV
 from .utils import IoV_Result
 from .utils import find_int_dirs
+from .utils import LocalDatabase
+from .utils import CentralDatabase
 
 from caf import strategies
 from caf import runners
 import caf.backends
 from .state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
 from caf.database import CAFDB
+
+
+class Collection():
+    """
+    Keyword Arguments:
+        collector (str, basf2.Module): The collector module  or module name for this `Collection`.
+        input_files (list[str]): The input files to be used for only this `Collection`.
+        pre_collection_path (basf2.Path): The reconstruction `basf2.Path` to be run prior to the Collector module.
+        database_chain (list[CentralDatabase, LocalDatabase]): The database chain to be used initially for this `Collection`.
+        output_patterns (list[str]): Output patterns of files produced by collector which will be used to pass to the
+            `Algorithm.data_input` function. Setting this here, replaces the default completely.
+        max_files_for_collector_job (int): Maximum number of input files sent to each collector subjob for this `Collection`.
+        backend_args (dict): The args for the backend submission of this `Collection`.
+    """
+
+    def __init__(self,
+                 collector=None,
+                 input_files=None,
+                 pre_collector_path=None,
+                 database_chain=None,
+                 output_patterns=None,
+                 max_files_per_collector_job=-1,
+                 backend_args=None
+                 ):
+        #: Collector module of this collection
+        self.collector = collector
+        #: Internal input_files stored for this calibration
+        self.input_files = []
+        if input_files:
+            self.input_files = input_files
+        #: File -> Iov dictionary, should be
+        #:
+        #: >>> {absolute_file_path:iov}
+        #:
+        #: Where iov is a :py:class:`IoV <caf.utils.IoV>` object. Will be filled during `CAF.run()` if empty.
+        #: To improve performance you can fill this yourself before calling `CAF.run()`
+        self.files_to_iovs = {}
+        #: Since many collectors require some different setup, if you set this attribute to a `basf2.Path` it will be run before
+        #: the collector and after the default RootInput module + HistoManager setup.
+        #: If this path contains RootInput then it's params are used in the RootInput module instead, except for the input_files
+        #: parameter which is set to whichever files are passed to the collector subjob.
+        self.pre_collector_path = None
+        if pre_collector_path:
+            self.pre_collector_path = pre_collector_path
+        #: Output patterns of files produced by collector which will be used to pass to the `Algorithm.data_input` function.
+        #: You can set these to anything understood by `glob.glob`, but if you want to specify this you should also specify
+        #: the `Algorithm.data_input` function to handle the different types of files and call the
+        #: CalibrationAlgorithm.setInputFiles() with the correct ones.
+        self.output_patterns = ['CollectorOutput.root']
+        #: Maximum number of input files per subjob during the collector step (passed to a `caf.backends.Job` object).
+        #: -1 is the default meaning that all input files are run in one big collector job.
+        self.max_files_per_collector_job = max_files_per_collector_job
+        #: Dictionary passed to the collector Job object to configure how the `caf.backends.Backend` instance should treat
+        #: the collector job. Currently only useful for setting the 'queue' of the batch system backends that the collector
+        #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
+        self.backend_args = {}
+
+        if database_chain:
+            #: The database chain used for this Collection. NOT necessarily the same database chain used for the algorithm
+            #: step! Since the algorithm will merge the collected data into one process it has to use a single DB chain set from
+            #: the overall Calibration.
+            self.database_chain = database_chain
+        else:
+            self.database_chain = []
+            self.use_central_database(get_default_global_tags())
+
+    def reset_database(self):
+        """
+        Remove everything in the database_chain of this Calibration, including the default central database
+        tag automatically included from `basf2.get_default_global_tags`
+        """
+        self.database_chain = []
+
+    def use_central_database(self, global_tag):
+        """
+        Parameters:
+            global_tag (str): The central database global tag to use for this calibration.
+
+        Using this allows you to append a central database to the database chain for this collection.
+        The default database chain is just the central one from `basf2.get_default_global_tags`.
+        To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
+        and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
+
+        Alternatively you could set an empty list as the input database_chain when adding the Collection to the Calibration.
+        """
+        central_db = CentralDatabase(global_tag)
+        self.database_chain.append(central_db)
+
+    def use_local_database(self, filename, directory=""):
+        """
+        Parameters:
+            filename (str): The path to the database.txt of the local database
+
+        Keyword Argumemts:
+            directory (str): The path to the payloads directory for this local database.
+
+        Append a local database to the chain for this collection.
+        You can call this function multiple times and each database will be added to the chain IN ORDER.
+        The databases are applied to this collection ONLY.
+        """
+        local_db = LocalDatabase(filename, directory)
+        self.database_chain.append(local_db)
+
+    @property
+    def collector(self):
+        """
+        """
+        return self._collector
+
+    @collector.setter
+    def collector(self, collector):
+        """
+        """
+        # check if collector is already a module or if we need to create one
+        # from the name
+        if collector:
+            from basf2 import Module
+            if isinstance(collector, str):
+                from basf2 import register_module
+                collector = register_module(collector)
+            if not isinstance(collector, Module):
+                B2ERROR("Collector needs to be either a Module or the name of such a module")
+        #: Internal storage of collector attribute
+        self._collector = collector
+
+    def is_valid(self):
+        if (not self.collector or not self.input_files):
+            return False
+        else:
+            return True
 
 
 class CalibrationBase(ABC, Thread):
@@ -166,26 +298,29 @@ class CalibrationBase(ABC, Thread):
 
 class Calibration(CalibrationBase):
     """
-    Every Calibration object must have a collector and at least one algorithm.
-    You have the option to add in your collector/algorithm by argument here, or
+    Every Calibration object must have at least one collector at least one algorithm.
+    You have the option to add in your collector/algorithm by argument here, or add them
     later by changing the properties.
+
+    If you plan to use multiple `Collection` objects I recommend that you only set the name here and add the Collections
+    separately via `add_collection()`.
 
     Parameters:
         name (str): Name of this calibration. It should be unique for use in the `CAF`
     Keyword Arguments:
-        collector: Should be set to a CalibrationCollectorModule() or a string with the module name.
-        algorithms: Should be set to a CalibrationAlgorithm() or a `list` of them.
+        collector (str or `basf2.Module`): Should be set to a CalibrationCollectorModule() or a string with the module name.
+        algorithms (list or ROOT.Belle2.CalibrationAlgorithm): The algorithm(s) to use for this `Calibration`.
         input_files (str or list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
 
     A Calibration won't be valid in the `CAF` until it has all of these four attributes set. For example:
 
     >>> cal = Calibration('TestCalibration1')
     >>> col1 = register_module('CaTest')
-    >>> cal.collector = col1
+    >>> cal.add_collection('TestColl', col1)
 
     or equivalently
 
-    >>> cal.collector = 'CaTest'
+    >>> cal = Calibration('TestCalibration1', 'CaTest')
 
     If you want to run a basf2 :py:class:`path <basf2.Path>` before your collector module when running over data
 
@@ -193,7 +328,18 @@ class Calibration(CalibrationBase):
 
     You don't have to put a RootInput module in this pre-collection path, but you can if
     you need some special parameters.
-    The inputFileNames parameter will be set by the `CAF` automatically for you.
+    The inputFileNames parameter of RootInput will be set by the CAF automatically for you.
+
+    You can use optional arguments to pass in some/all during initialisation of the `Calibration` class
+
+    >>> cal = Calibration( 'TestCalibration1', 'CaTest', [alg1,alg2], ['/path/to/file.root'])
+
+    you can change the input file list later on, before running with `CAF`
+
+    >>> cal.input_files = ['path/to/*.root', 'other/path/to/file2.root']
+
+    If you have multiple collections from calling `add_collection()` then you should instead set the pre_collector_path,
+    input_files, database chain etc from there. See `Collection`.
 
     Adding the CalibrationAlgorithm(s) is easy
 
@@ -209,8 +355,8 @@ class Calibration(CalibrationBase):
     >>> alg2 = TestAlgo()
     >>> cal.algorithms = [alg1, alg2]
 
-    Note that when you set the algorithms, they are automatically wrapped and stored as
-    `Algorithm` instances. To access the algorithm underneath directly do:
+    Note that when you set the algorithms, they are automatically wrapped and stored as a Python class
+    `Algorithm`. To access the C++ algorithm clas underneath directly do:
 
     >>> cal.algorithms[i].algorithm
 
@@ -222,14 +368,6 @@ class Calibration(CalibrationBase):
     as your algorithm list.
 
     >>> cal.pre_algorithms = [my_function1, my_function2, ...]
-
-    You can use optional arguments to pass in some/all during initialisation of the `Calibration` class
-
-    >>> cal = Calibration( 'TestCalibration1', 'CaTest', [alg1,alg2], ['/path/to/file.root'])
-
-    you can change the input file list later on, before running with `CAF`
-
-    >>> cal.input_files = ['path/to/*.root', 'other/path/to/file2.root']
 
     You can also specify the dependencies of the calibration on others
 
@@ -244,61 +382,68 @@ class Calibration(CalibrationBase):
     alg_output_dir = "algorithm_output"
     #: Checkpoint states which we are allowed to restart from.
     checkpoint_states = ["init", "collector_completed", "completed"]
+    #: Default collection name
+    default_collection_name = "default"
 
     def __init__(self,
                  name,
                  collector=None,
                  algorithms=None,
-                 input_files=None):
+                 input_files=None,
+                 pre_collector_path=None,
+                 database_chain=None,
+                 output_patterns=None,
+                 max_files_per_collector_job=-1,
+                 backend_args=None
+                 ):
         """
         """
-        super().__init__(name, input_files)
-        #: Internal calibration collector/algorithms/input_files stored for this calibration
-        self._collector = None
+        #: Collections stored for this calibration.
+        self.collections = {}
         #: Internal calibration algorithms stored for this calibration
         self._algorithms = []
-        #: Internal input_files stored for this calibration
-        self._input_files = []
 
-        if collector:
-            #: Collector property, you can assign either a CollectorModule directly, or a string with the CollectorModule
-            #: name. It will run `basf2.register_module` for you and assign it to this property.
-            self.collector = collector
+        # Default collection added, will have None type and requires setting later via `self.collector`, or will take the
+        # CollectorModule/module name directly.
+        self.add_collection(self.default_collection_name,
+                            Collection(collector,
+                                       input_files,
+                                       pre_collector_path,
+                                       database_chain,
+                                       output_patterns,
+                                       max_files_per_collector_job,
+                                       backend_args
+                                       ))
+
+        super().__init__(name, input_files)
         if algorithms:
             #: `Algorithm` classes that wil be run by this `Calibration`. You should set this attribute to either a single
             #: CalibrationAlgorithm C++ class, or a `list` of them if you want to run multiple CalibrationAlgorithms using one
             #: CalibrationCollectorModule.
             self.algorithms = algorithms
-        #: Since many collectors require some different setup, if you set this attribute to a `basf2.Path` it will be run before
-        #: the collector and after the default RootInput module + HistoManager setup.
-        #: If this path contains RootInput then it's params are used in the RootInput module instead, except for the input_files
-        #: parameter.
-        self.pre_collector_path = None
         #: Output results of algorithms for each iteration
         self.results = {}
-        #: Output patterns of files produced by collector which will be passed to the `Algorithm.data_input` function.
-        #: You can set these to anythuing understood by `glob.glob`, but if you want to specify this you should also specify
-        #: the `Algorithm.data_input` function to handle the different types of files and call the
-        #: CalibrationAlgorithm.setInputFiles() with hte correct ones.
-        self.output_patterns = ['CollectorOutput.root']
         #: Variable to define the maximum number of iterations for this calibration specifically.
         #: It overrides tha CAF calibration_defaults value if set.
         self.max_iterations = None
-        #: Maximum number of input files per subjob during the collector step (passed to a `caf.backends.Job` object).
-        #: -1 is the default meaning that all input files are run in one big collector job.
-        self.max_files_per_collector_job = -1
-        #: Dictionary passed to the collector Job object to configure how the `caf.backends.Backend` instance should treat
-        #: the collector job. Currently only useful for setting the 'queue' of the batch system backends that the collector
-        #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
-        self.backend_args = {}
+        #: List of ExpRun that will be ignored by this Calibration. This runs will not have Collector jobs run on
+        #: them (if possible). And the algorithm execution will exclude them from a ExpRun list. However, the
+        #: algorithm execution may merge IoVs of final payloads to cover the 'gaps' caused by these runs.
+        #: You should pay attention to what the AlgorithmStrategy you choose will do in these cases.
+        self.ignored_runs = None
         if self.algorithms:
             #: The strategy that the algorithm(s) will be run against. Assign a list of strategies the same length as the number of
             #: algorithms, or assign a single strategy to apply it to all algorithms in this `Calibration`. You can see the choices
             #: in :py:mod:`caf.strategies`.
             self.strategies = strategies.SingleIOV
-
-        self._local_database_chain = []
-        self.use_central_database(get_default_global_tags())
+        if database_chain:
+            #: The database chain that is applied to the algorithms.
+            #: This is often updated at the same time as the database chain for the default `Collection`.
+            self.database_chain = database_chain
+        else:
+            self.database_chain = []
+            # This database is already applied to the `Collection` automatically, so don't do it again
+            self.use_central_database(get_default_global_tags(), apply_to_default_collection=False)
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
         #: Plugin your own runner class to change how your calibration will run the list of algorithms.
@@ -317,66 +462,183 @@ class Calibration(CalibrationBase):
         #: Location of a SQLite database that will save the state of the calibration so that it can be restarted from failure.
         self._db_path = None
 
-    def is_valid(self):
-        """A full calibration consists of a collector AND an associated algorithm AND input_files.
-        This returns False if any are missing or if the collector and algorithm are mismatched.
-
-        We also check that the strategies of the algorithms match the collector granularity.
+    def add_collection(self, name, collection):
         """
-        if (not self.collector or not self.algorithms or not self.input_files):
-            B2WARNING("Empty collector, algorithm, or input_files for {}.".format(self.name))
+        Parameters:
+            name (str): Unique name of this `Collection` in the Calibration.
+            collection (`Collection`): `Collection` object to use.
+
+        Adds a new `Collection` object to the `Calibration`. Any valid Collection will be used in the Calibration.
+        A default Collection is automatically added but isn't valid and won't run unless you have assigned a collector
+        + input files.
+        You can ignore the default one and only add your own custom Collections. You can configure the default from the
+        Calibration(...) arguments or after creating the Calibration object via directly setting the cal.collector, cal.input_files
+        attributes.
+        """
+        if name not in self.collections:
+            self.collections[name] = collection
+        else:
+            B2WARNING(("A Collection with the name '{}' already exists in this Calibration. It has not been added."
+                       "Please use another name.").format(name))
+
+    def is_valid(self):
+        """
+        A full calibration consists of a collector AND an associated algorithm AND input_files.
+
+        Returns False if:
+            1) We are missing any of the above.
+            2) There are multiple Collections and the Collectors have mis-matched granularities.
+            3) Any of our Collectors have granularities that don't match what our Strategy can use.
+        """
+        if not self.algorithms:
+            B2WARNING("Empty algorithm list for {}.".format(self.name))
             return False
-        collector_params = self.collector.available_params()
-        for param in collector_params:
-            if param.name == "granularity":
-                granularity = param.values
+
+        if not any([collection.is_valid() for collection in self.collections.values()]):
+            B2WARNING("No valid Collections for {}.".format(self.name))
+            return False
+
+        granularities = []
+        for collection in self.collections.values():
+            if collection.is_valid():
+                collector_params = collection.collector.available_params()
+                for param in collector_params:
+                    if param.name == "granularity":
+                        granularities.append(param.values)
+        if len(set(granularities)) > 1:
+            B2WARNING("Multiple different granularities set for the Collections in this Calibration.")
+            return False
+
         for alg in self.algorithms:
             alg_type = type(alg.algorithm).__name__
-            if self.collector.name() != alg.algorithm.getCollectorName():
-                B2WARNING(("Algorithm '%s' requested collector '%s' but got '%s'"
-                           % (alg_type, alg.algorithm.getCollectorName(), self.collector.name())))
-                return False
-            if granularity not in alg.strategy.allowed_granularities:
-                B2WARNING("Selected strategy for {} does not allow collector "
-                          "granularity to be '{}'.".format(alg_type,
-                                                           granularity))
+            incorrect_gran = [granularity not in alg.strategy.allowed_granularities for granularity in granularities]
+            if any(incorrect_gran):
+                B2WARNING("Selected strategy for {} does not match a collector's "
+                          "granularity.".format(alg_type))
                 return False
         return True
 
-    def use_central_database(self, global_tag):
+    def reset_database(self, apply_to_default_collection=True):
+        """
+        Keyword Arguments:
+            apply_to_default_collection (bool): Should we also reset the default collection?
+
+        Remove everything in the database_chain of this Calibration, including the default central database
+        tag automatically included from `basf2.get_default_global_tags`. This will NOT affect the database chain of any
+        `Collection` other than the default one. You can prevent the default Collection from having its chain reset by setting
+        'apply_to_default_collection' to False.
+        """
+        self.database_chain = []
+        if self.default_collection_name in self.collections and apply_to_default_collection:
+            self.collections[self.default_collection_name].reset_database()
+
+    def use_central_database(self, global_tag, apply_to_default_collection=True):
         """
         Parameters:
             global_tag (str): The central database global tag to use for this calibration.
 
-        Using this allows you to set the central database for this calibration.
-        If you don't call this, the default is set from `basf2.get_default_global_tags`.
-        If this is set manually it will override the default.
-        To turn off central database completely you should set this global tag to an empty string.
-        """
-        self._global_tag = global_tag
+        Keyword Arguments:
+            apply_to_default_collection (bool): Should we also call use_central_database on the default collection (if it exists)
 
-    def use_local_database(self, filename, directory=""):
+        Using this allows you to append a central database to the database chain for this calibration.
+        The default database chain is just the central one from `basf2.get_default_global_tags`.
+        To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
+        and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
+
+        Note that the database chain attached to the `Calibration` will only affect the default `Collection` (if it exists),
+        and the algorithm processes. So calling:
+
+        >> cal.use_central_database("global_tag")
+
+        will modify the database chain used by all the algorithms assigned to this `Calibration`, and modifies the database chain
+        assigned to
+
+        >> cal.collections['default'].database_chain
+
+        But calling
+
+        >> cal.use_central_database(file_path, payload_dir, False)
+
+        will add the database to the Algorithm processes, but leave the default Collection database chain untouched.
+        So if you have multiple Collections in this Calibration *their database chains are separate*.
+        To specify an additional `CentralDatabase` for a different collection, you will have to call:
+
+        >> cal.collections['OtherCollection'].use_central_database("global_tag")
+        """
+        central_db = CentralDatabase(global_tag)
+        self.database_chain.append(central_db)
+        if self.default_collection_name in self.collections and apply_to_default_collection:
+            self.collections[self.default_collection_name].use_central_database(global_tag)
+
+    def use_local_database(self, filename, directory="", apply_to_default_collection=True):
         """
         Parameters:
             filename (str): The path to the database.txt of the local database
 
         Keyword Argumemts:
             directory (str): The path to the payloads directory for this local database.
+            apply_to_default_collection (bool): Should we also call use_local_database on the default collection (if it exists)
 
         Append a local database to the chain for this calibration.
         You can call this function multiple times and each database will be added to the chain IN ORDER.
         The databases are applied to this calibration ONLY.
-        They are applied to the collector job and algorithm step as a database chain of the form:
+        The Local and Central databases applied via these functions are applied to the algorithm processes and optionally
+        the default `Collection` job as a database chain.
+        There are other databases applied to the processes later, checked by basf2 in this order:
 
-        central DB Global tag (if used) -> these local databases -> CAF created local database constants
+        1) Local Database from previous iteration of this Calibration.
+        2) Local Database chain from output of previous dependent Calibrations.
+        3) This chain of Local and Central databases where the last added is checked first.
+
+        Note that this function on the `Calibration` object will only affect the default `Collection` if it exists and if
+        'apply_to_default_collection' remains True. So calling:
+
+        >> cal.use_local_database(file_path, payload_dir)
+
+        will modify the database chain used by all the algorithms assigned to this `Calibration`, and modifies the database chain
+        assigned to
+
+        >> cal.collections['default'].database_chain
+
+        But calling
+
+        >> cal.use_local_database(file_path, payload_dir, False)
+
+        will add the database to the Algorithm processes, but leave the default Collection database chain untouched.
+
+        If you have multiple Collections in this Calibration *their database chains are separate*.
+        To specify an additional `LocalDatabase` for a different collection, you will have to call:
+
+        >> cal.collections['OtherCollection'].use_local_database(file_path, payload_dir)
+
         """
-        self._local_database_chain.append((filename, directory))
+        local_db = LocalDatabase(filename, directory)
+        self.database_chain.append(local_db)
+        if self.default_collection_name in self.collections and apply_to_default_collection:
+            self.collections[self.default_collection_name].use_local_database(filename, directory)
+
+    def _get_default_collection_attribute(self, attr):
+        if self.default_collection_name in self.collections:
+            return getattr(self.collections[self.default_collection_name], attr)
+        else:
+            B2WARNING(("You tried to get the attribute '{}' from the Calibration '{}', but the default collection doesn't exist."
+                       "You should use the cal.collections['CollectionName'].{} to access a custom "
+                       "collection's attributes directly.".format(attr, self.name, attr)))
+            return None
+
+    def _set_default_collection_attribute(self, attr, value):
+        if self.default_collection_name in self.collections:
+            setattr(self.collections[self.default_collection_name], attr, value)
+        else:
+            B2WARNING(("You tried to set the attribute '{}' from the Calibration '{}', but the default collection doesn't exist."
+                       "You should use the cal.collections['CollectionName'].{} to access a custom "
+                       "collection's attributes directly.".format(attr, self.name, attr)))
 
     @property
     def collector(self):
         """
         """
-        return self._collector
+        return self._get_default_collection_attribute("collector")
 
     @collector.setter
     def collector(self, collector):
@@ -384,15 +646,86 @@ class Calibration(CalibrationBase):
         """
         # check if collector is already a module or if we need to create one
         # from the name
-        if collector:
-            from basf2 import Module
-            if isinstance(collector, str):
-                from basf2 import register_module
-                collector = register_module(collector)
-            if not isinstance(collector, Module):
-                B2ERROR("Collector needs to be either a Module or the name of such a module")
-        #: Internal storage of collector attribute
-        self._collector = collector
+        from basf2 import Module
+        if isinstance(collector, str):
+            from basf2 import register_module
+            collector = register_module(collector)
+        if not isinstance(collector, Module):
+            B2ERROR("Collector needs to be either a Module or the name of such a module")
+
+        self._set_default_collection_attribute("collector", collector)
+
+    @property
+    def input_files(self):
+        """
+        """
+        return self._get_default_collection_attribute("input_files")
+
+    @input_files.setter
+    def input_files(self, files):
+        """
+        """
+        self._set_default_collection_attribute("input_files", files)
+
+    @property
+    def files_to_iovs(self):
+        """
+        """
+        return self._get_default_collection_attribute("files_to_iovs")
+
+    @files_to_iovs.setter
+    def files_to_iovs(self, file_map):
+        """
+        """
+        self._set_default_collection_attribute("files_to_iovs", file_map)
+
+    @property
+    def pre_collector_path(self):
+        """
+        """
+        return self._get_default_collection_attribute("pre_collector_path")
+
+    @pre_collector_path.setter
+    def pre_collector_path(self, path):
+        """
+        """
+        self._set_default_collection_attribute("pre_collector_path", path)
+
+    @property
+    def output_patterns(self):
+        """
+        """
+        return self._get_default_collection_attribute("output_patterns")
+
+    @output_patterns.setter
+    def output_patterns(self, patterns):
+        """
+        """
+        self._set_default_collection_attribute("output_patterns", patterns)
+
+    @property
+    def max_files_per_collector_job(self):
+        """
+        """
+        return self._get_default_collection_attribute("max_files_per_collector_job")
+
+    @max_files_per_collector_job.setter
+    def max_files_per_collector_job(self, max_files):
+        """
+        """
+        self._set_default_collection_attribute("max_files_per_collector_job", max_files)
+
+    @property
+    def backend_args(self):
+        """
+        """
+        return self._get_default_collection_attribute("backend_args")
+
+    @backend_args.setter
+    def backend_args(self, args):
+        """
+        """
+        self._set_default_collection_attribute("backend_args", args)
 
     @property
     def algorithms(self):
@@ -504,7 +837,7 @@ class Calibration(CalibrationBase):
         Main logic of the Calibration object.
         Will be run in a new Thread by calling the start() method.
         """
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path, read_only=True) as db:
             initial_state = db.get_calibration_value(self.name, "checkpoint")
             initial_iteration = db.get_calibration_value(self.name, "iteration")
         B2INFO("Initial status of {} found to be state={}, iteration={}".format(self.name,
@@ -590,7 +923,7 @@ class Calibration(CalibrationBase):
         """
         The current major state of the calibration in the database file. The machine may have a different state.
         """
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path, read_only=True) as db:
             return db.get_calibration_value(self.name, "state")
 
     @state.setter
@@ -612,7 +945,7 @@ class Calibration(CalibrationBase):
         Returns:
             int: The current iteration number
         """
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path, read_only=True) as db:
             return db.get_calibration_value(self.name, "iteration")
 
     @iteration.setter
@@ -653,7 +986,7 @@ class Algorithm():
         #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
         self.algorithm = algorithm
         #: The name of the algorithm, default is the Algorithm class name
-        self.name = algorithm.__cppname__.replace('Belle2::', '')
+        self.name = algorithm.__cppname__[algorithm.__cppname__.rfind('::') + 2:]
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
         #: The list of files matching the `Calibration.output_patterns` from the collector output
         #: directories will be passed to it
@@ -706,6 +1039,10 @@ class CAF():
     `CalibrationBase` instances.
     """
 
+    #: Default attributes and their config file Key, that will be used to assign values to Calibrations
+    #: if they weren't set directly on the Calibration
+    _calibration_default_setup = {"max_iterations": "MaxIterations", "ignored_runs": "IgnoredRuns"}
+
     #: The name of the SQLite DB that gets created
     _db_name = "caf_state.db"
 
@@ -740,8 +1077,9 @@ class CAF():
 
         if not calibration_defaults:
             calibration_defaults = {}
-        if "max_iterations" not in calibration_defaults:
-            calibration_defaults["max_iterations"] = decode_json_string(self.config["CAF_DEFAULTS"]["MaxIterations"])
+        for attribute_name, config_key in self._calibration_default_setup.items():
+            if attribute_name not in calibration_defaults:
+                calibration_defaults[attribute_name] = decode_json_string(self.config["CAF_DEFAULTS"][config_key])
         #: Default options applied to each calibration known to the `CAF`, if the `Calibration` has these defined by the user
         #: then the defaults aren't applied. A simple way to define the same configuration to all calibrations in the `CAF`.
         self.calibration_defaults = calibration_defaults
@@ -840,6 +1178,20 @@ class CAF():
         else:
             self._algorithm_backend = caf.backends.Local()
 
+    def _prune_invalid_collections(self):
+        """
+        Checks all current calibrations and removes any invalid Collections from their collections list.
+        """
+        B2INFO("Checking for any invalid Collections in Calibrations.")
+        for calibration in self.calibrations.values():
+            valid_collections = {}
+            for name, collection in calibration.collections.items():
+                if collection.is_valid():
+                    valid_collections[name] = collection
+                else:
+                    B2WARNING("Removing invalid Collection '{}' from Calibration '{}'".format(name, calibration.name))
+            calibration.collections = valid_collections
+
     def run(self, iov=None):
         """
         Keyword Arguments:
@@ -862,6 +1214,8 @@ class CAF():
 
         # Check that a backend has been set and use default Local() one if not
         self._check_backend()
+
+        self._prune_invalid_collections()
 
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()

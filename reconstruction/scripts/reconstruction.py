@@ -82,7 +82,7 @@ def add_cosmics_reconstruction(
         addClusterExpertModules=True,
         merge_tracks=True,
         top_in_counter=False,
-        data_taking_period='phase2',
+        data_taking_period='early_phase3',
         use_second_cdc_hits=False,
         add_muid_hits=False):
     """

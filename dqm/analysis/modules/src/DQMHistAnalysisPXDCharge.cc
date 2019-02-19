@@ -183,7 +183,7 @@ void DQMHistAnalysisPXDChargeModule::event()
     data = m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
     m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
-//     B2INFO("Mean: " << data << " Max Diff: " << diff);
+    if (0) B2INFO("Mean: " << data << " Max Diff: " << diff);
 
 #ifdef _BELLE2_EPICS
     SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");

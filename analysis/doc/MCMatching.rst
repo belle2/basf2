@@ -275,23 +275,21 @@ or (recommended) via an alias:
 
 The analyst can then compare the hashes in the nTupleFile with the hashes in the root file produced by the ParticleMCDecayString module to retrieve the decay strings.
 
-----------------
-Tau decay McMode
-----------------
+------------------
+Tau decay MC modes
+------------------
 
-An special case is the tau decay McModes. They were designed to study generated tau pair events.
-Consist of two variables ``tauPlusMcMode``, and ``tauMinusMcMode``. To use them, is required to call first ``labelTauDecays`` in the steering file.
+A special case is the decay of generated tau lepton pairs. For their study, it is useful to call the function ``labelTauPairMC`` in the steering file.
 
 .. code-block:: python
 
-        from modularAnalysis import labelTauDecays
-        labelTauDecays()
+        from modularAnalysis import labelTauPairMC
+        labelTauPairMC()
 
 .. b2-variables::
         :variables: tauPlusMcMode,tauMinusMcMode
 
-        
-The variables store an integer MC mode, which corresponds to one decay channel of the tau lepton (one for the positive and the other for the negative).
+Using MC information, ``labelTauPairMC`` identifies if the generated event is a tau pair decay. The channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode`` (one for the positive and the other for the negative) according to the following table:
 
 ============  ==============================  ============  ==============================
 MC mode       Decay channel                   MC mode       Decay channel

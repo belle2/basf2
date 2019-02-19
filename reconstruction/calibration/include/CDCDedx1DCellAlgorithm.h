@@ -18,6 +18,7 @@
 #include <TLine.h>
 #include <TMath.h>
 #include <TH1F.h>
+#include <TBox.h>
 #include <TString.h>
 #include <TCanvas.h>
 
@@ -60,6 +61,10 @@ namespace Belle2 {
     */
     void setMonitoringPlots(bool value) {IsMakePlots = value;}
 
+    /**
+    * adding suffix to filenae for uniqueness in each iter
+    */
+    void setOutFilePrefix(std::string value) {fSetPrefix = value;}
 
     /**
     * funtion to set rotation symmetry
@@ -147,6 +152,7 @@ namespace Belle2 {
     Double_t feaUE; /**< Upper edge of enta angle */
     Double_t feaBS; /**< Binwidth edge of enta angle */
 
+    std::string fSetPrefix; /**< suffix to filename */
     std::vector<int> fEntaBinNums;  /**< Vector for enta asym bin values */
     std::vector<double> fEntaBinValues;  /**< Vector for doca asym bin values */
 

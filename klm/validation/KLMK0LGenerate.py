@@ -26,7 +26,6 @@ main = create_path()
 # Event data
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
-eventinfosetter.param('runList', [1])
 
 # Evtgen and beam parameters.
 evtgen = register_module('EvtGenInput')

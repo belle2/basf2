@@ -60,12 +60,9 @@ namespace Belle2 {
       virtual void setupAlignmentHierarchy(GlobalDerivativesHierarchy&) {}
     };
 
-    /// CDC interface: Fills wire alignment in CDCAlignment based on computed alignment of layers
+    /// CDC interface
     class CDCGlobalParamInterface : public IGlobalParamInterface {
     public:
-      /// Fills wire alignment in CDCAlignment based on computed alignment of layers
-      virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result,
-                                  GlobalParamVector& thisGlobalParamVector) override final;
 
     };
 

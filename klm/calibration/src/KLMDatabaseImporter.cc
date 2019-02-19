@@ -16,9 +16,11 @@
 #include <TTree.h>
 
 /* Belle2 headers. */
-#include <klm/calibration/KLMDatabaseImporter.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/gearbox/GearDir.h>
+#include <klm/calibration/KLMDatabaseImporter.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 
 using namespace Belle2;
 
@@ -41,6 +43,16 @@ void KLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunLow = runLow;
   m_ExperimentHigh = experimentHigh;
   m_RunHigh = runHigh;
+}
+
+void KLMDatabaseImporter::importScintillatorDigitizationParameters(
+  const KLMScintillatorDigitizationParameters* digitizationParameters)
+{
+  DBImportObjPtr<KLMScintillatorDigitizationParameters> digPar;
+  digPar.construct(*digitizationParameters);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  digPar.import(iov);
 }
 
 void KLMDatabaseImporter::importTimeConversion(

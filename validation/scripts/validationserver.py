@@ -3,16 +3,18 @@ from glob import glob
 import json
 import json_objects
 import os.path
-import time
 import argparse
 import logging
 import sys
 import queue
 import webbrowser
+import datetime
 from multiprocessing import Process, Queue
 from validationplots import create_plots
+import validationfunctions
 import validationpath
 import functools
+import time
 
 g_plottingProcesses = {}
 
@@ -66,7 +68,7 @@ def deliver_json(file_name):
     return data
 
 
-def create_revsion_key(revision_names):
+def create_revision_key(revision_names):
     """
     Create a string key out of a revision list, which is handed to tho browser
     in form of a progress key
@@ -105,7 +107,7 @@ def start_plotting_request(revision_names, results_folder):
     Start a new comparison between the supplied revisions
     """
 
-    rev_key = create_revsion_key(revision_names)
+    rev_key = create_revision_key(revision_names)
 
     # still running a plotting for this combination ?
     if rev_key in g_plottingProcesses:
@@ -158,6 +160,14 @@ class ValidationRoot(object):
 
         #: folder where the comparison plots and json result files are located
         self.comparison_folder = comparison_folder
+
+        #: Date when this object was instantiated
+        self.last_restart = datetime.datetime.now()
+
+        #: Git version
+        self.version = validationfunctions.get_compact_git_hash(
+            os.environ["BELLE2_LOCAL_DIR"]
+        )
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -293,6 +303,25 @@ class ValidationRoot(object):
             )
 
         return deliver_json(full_path)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def system_info(self):
+        """
+        Returns:
+            JSON file containing git versions and time of last restart
+        """
+        # note: for some reason %Z doesn't work like this, so we use
+        # time.tzname for the time zone.
+        return {
+            "last_restart":
+                self.last_restart.strftime("%-d %b %H:%M ") + time.tzname[1],
+            "version_restart": self.version,
+            "version_current":
+                validationfunctions.get_compact_git_hash(
+                    os.environ["BELLE2_LOCAL_DIR"]
+                )
+        }
 
 
 def setup_gzip_compression(path, cherry_config):

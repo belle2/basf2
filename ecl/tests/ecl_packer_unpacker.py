@@ -152,7 +152,7 @@ class ECLPackerUnpackerTestModule(Module):
 main = create_path()
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 # to run the framework the used modules need to be registered
@@ -163,6 +163,7 @@ main.add_module(particlegun)
 
 # add simulation for ECL only
 simulation.add_simulation(main, components=['ECL'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["ECL"])
 
 # Add ECLDigits with wide range of amp, time, quality, chi2
 main.add_module(addECLDigitsModule())

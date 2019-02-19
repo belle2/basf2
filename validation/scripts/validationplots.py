@@ -102,7 +102,7 @@ def find_root_object(root_objects, **kwargs):
         return []
 
 
-def serve_existing_plots():
+def serve_existing_plots(revisions):
     """
     Goes to the folder where
     the plots for the given selection are stored, and replaces the current
@@ -110,7 +110,8 @@ def serve_existing_plots():
     :return: No return value
     """
 
-    print("File exists already and will be served from archive!")
+    print("Plots for the revision(s) {} have already been created before "
+          "and will be served from the archive.".format(", ".join(revisions)))
 
 
 def get_plot_files(revisions, work_folder):
@@ -239,6 +240,10 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         ROOT.kWarning. If set to None, global level will be left unchanged.
     @return: No return value
     """
+
+    print(validationfunctions.terminal_title_line(
+        "Creating plots for the revision(s) " + ", ".join(revisions) + "."
+    ))
 
     # Since we are going to plot, we need to initialize ROOT
     ROOT.gROOT.SetBatch()
@@ -478,7 +483,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         if index is not None:
             style = get_style(index)
             line_color = ROOT.gROOT.GetColor(style.GetLineColor()).AsHexString()
-        print("For {} index {} color {}".format(r, index, line_color))
+        # print("For {} index {} color {}".format(r, index, line_color))
 
         # todo the creation date and git_hash of the original revision should be transferred here
         comparison_revs.append(json_objects.ComparisonRevision(
@@ -559,8 +564,9 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         print()
 
     if chi2_verbosity:
-        print()
-        print("Chi2 comparisons:")
+        if not warning_verbosity:
+            print()
+        print("Chi2 comparisons")
         for result, perpetrators in plotuples_by_comparison_result.items():
             print("* '{}' was the result of {} comparisons".format(
                 result, len(perpetrators)
@@ -976,19 +982,17 @@ def create_plots(revisions=None, force=False, process_queue=None,
     if not revisions:
         revisions = []
 
-    # Retrieve the desired revisions from the command line arguments and store
-    # them in 'revisions'
-    if revisions:
-        # Loop over all revisions given on the command line
-        for revision in revisions:
-            # If it is a valid (i.e. available) revision, append it to the list
-            # of revisions that we will include in our plots
-            # 'reference' needs to be treated
-            # separately, because it is always a viable option, but will never
-            # be listed in 'available_revisions()'
-            if revision in available_revisions(work_folder) \
-                    or revision == 'reference':
-                revisions.append(revision)
+    # Loop over all revisions given on the command line
+    for revision in revisions:
+        # If it is a valid (i.e. available) revision, append it to the list
+        # of revisions that we will include in our plots
+        # 'reference' needs to be treated
+        # separately, because it is always a viable option, but will never
+        # be listed in 'available_revisions()'
+        if revision not in available_revisions(work_folder) \
+                and not revision == 'reference':
+            print("Warning: Removing invalid revision '{}'.".format(revision))
+            revisions.pop(revision)
 
     # In case no valid revisions were given, fall back to default and use all
     # available revisions and reference. The order should now be [reference,
@@ -1008,7 +1012,7 @@ def create_plots(revisions=None, force=False, process_queue=None,
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
-        serve_existing_plots()
+        serve_existing_plots(revisions)
     # Otherwise: Create the requested plots
     else:
         generate_new_plots(revisions, work_folder, process_queue)

@@ -16,7 +16,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/dataobjects/BKLMHit1d.h>
-#include <eklm/simulation/FPGAFitter.h>
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH1I.h"

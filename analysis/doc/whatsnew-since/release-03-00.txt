@@ -8,21 +8,8 @@ Variables
   Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
 
 * Removed ClusterHadronIntensity and clusterUniqueID.
-
-Modules
-+++++++
-
-* Removal of the unsupported ECLClusterInfoModule.
-
-
-Standard Particle Lists
-+++++++++++++++++++++++
-
-* Updated charged standard PID cut values to reflect the correct efficiencies.
-  This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
-
-Variables
-+++++++++
+* Added helix extrapolation from charged tracks
+* Added clusterMdstIndex variable to get ECLCluster MDST index for particles that do not originate from ECLCluster
 
 * The function to create variable aliases for particles selected from a decay
   string has been fixed and extended to allow better
@@ -30,6 +17,14 @@ Variables
 
   .. seealso::
      `variables.utils.create_aliases_for_selected()`
+
+Standard Particle Lists
++++++++++++++++++++++++
+
+* Updated charged standard PID cut values to reflect the correct efficiencies.
+  This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
+
+* Fix the `stdKlongs.stdKlongs` lists.
 
 * The variables for the fast reco HLT trigger stage have been removed,
   as we are currently not planning to have it in the early data taking.
@@ -51,3 +46,8 @@ FEI
 
 * Removed the backward compatibility layer (``pid_renaming_oktober_2017``). 
   Only FEI trainings from release-02 are supported. Please update to ``FEIv4_2018_MC9_release_02_00_01`` or newer.
+
+Tutorials
++++++++++
+
+* Fix B2A202 to load Klongs as advertised.

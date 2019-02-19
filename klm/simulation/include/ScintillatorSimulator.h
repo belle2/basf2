@@ -11,20 +11,21 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dbobjects/EKLMChannelData.h>
-#include <eklm/dbobjects/EKLMDigitizationParameters.h>
-#include <eklm/simulation/FPGAFitter.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
 
-  namespace EKLM {
+  namespace KLM {
 
     /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.
      */
-    class FiberAndElectronics : public EKLMHitMCTime {
+    class ScintillatorSimulator : public EKLMHitMCTime {
 
     public:
 
@@ -42,40 +43,52 @@ namespace Belle2 {
        * @param[in] fitter                  Fitter.
        * @param[in] debug                   Use debug mode.
        */
-      FiberAndElectronics(const EKLMDigitizationParameters* digPar,
-                          FPGAFitter* fitter, double digitizationInitialTime,
-                          bool debug);
+      ScintillatorSimulator(const KLMScintillatorDigitizationParameters* digPar,
+                            ScintillatorFirmware* fitter,
+                            double digitizationInitialTime,
+                            bool debug);
 
       /**
        * Copy constructor (disabled).
        */
-      FiberAndElectronics(const FiberAndElectronics&) = delete;
+      ScintillatorSimulator(const ScintillatorSimulator&) = delete;
 
       /**
        * Operator = (disabled).
        */
-      FiberAndElectronics& operator=(const FiberAndElectronics&) = delete;
+      ScintillatorSimulator& operator=(const ScintillatorSimulator&) = delete;
 
       /**
        * Destructor.
        */
-      ~FiberAndElectronics();
+      ~ScintillatorSimulator();
 
       /**
-       * Process.
+       * Simulate BKLM strip.
+       * @param[in] firstHit First hit in this strip.
+       * @param[in] end      End of hit range.
        */
-      void processEntry();
+      void simulate(std::multimap<int, BKLMSimHit*>::iterator& firstHit,
+                    std::multimap<int, BKLMSimHit*>::iterator& end);
+
+      /**
+       * Simulate EKLM strip.
+       * @param[in] firstHit First hit in this strip.
+       * @param[in] end      End of hit range.
+       */
+      void simulate(std::multimap<int, EKLMSimHit*>::iterator& firstHit,
+                    std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
        * Get fit data.
        */
-      EKLMFPGAFit* getFPGAFit();
+      KLMScintillatorFirmwareFitResult* getFPGAFit();
 
       /**
        * Get fit status.
        * @return Status of the fit.
        */
-      enum FPGAFitStatus getFitStatus() const;
+      enum ScintillatorFirmwareFitStatus getFitStatus() const;
 
       /**
        * Get number of photoelectrons (fit result).
@@ -88,12 +101,9 @@ namespace Belle2 {
       int getGeneratedNPE();
 
       /**
-       * Set hit range.
-       * @param[in] it  First hit in this strip.
-       * @param[in] end End of hit range.
+       * Get total energy deposited in the strip (sum over ssimulation hits).
        */
-      void setHitRange(std::multimap<int, EKLMSimHit*>::iterator& it,
-                       std::multimap<int, EKLMSimHit*>::iterator& end);
+      double getEnergy();
 
       /**
        * Set channel data.
@@ -123,10 +133,10 @@ namespace Belle2 {
     private:
 
       /** Parameters. */
-      const EKLMDigitizationParameters* m_DigPar;
+      const KLMScintillatorDigitizationParameters* m_DigPar;
 
       /** Fitter. */
-      FPGAFitter* m_fitter;
+      ScintillatorFirmware* m_fitter;
 
       /** Initial digitization time. */
       double m_DigitizationInitialTime;
@@ -168,19 +178,16 @@ namespace Belle2 {
       int m_PhotoelectronBufferSize;
 
       /** FPGA fit status. */
-      enum FPGAFitStatus m_FPGAStat;
+      enum ScintillatorFirmwareFitStatus m_FPGAStat;
 
       /** FPGA fit data. */
-      EKLMFPGAFit m_FPGAFit;
+      KLMScintillatorFirmwareFitResult m_FPGAFit;
 
       /** Number of photoelectrons (generated). */
       int m_npe;
 
-      /** First hit. */
-      std::multimap<int, EKLMSimHit*>::iterator m_hit;
-
-      /** End of hits. */
-      std::multimap<int, EKLMSimHit*>::iterator m_hitEnd;
+      /** Total energy deposited in the strip. */
+      double m_Energy;
 
       /** Name of the strip. */
       std::string m_stripName;
@@ -199,6 +206,16 @@ namespace Belle2 {
        * @param[in] size New size of buffers.
        */
       void reallocPhotoElectronBuffers(int size);
+
+      /**
+       * Prepare simulation.
+       */
+      void prepareSimulation();
+
+      /**
+       *  Perform common simulation stage.
+       */
+      void performSimulation();
 
       /**
        * Sort photoelectrons.

@@ -22,7 +22,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-
+#include <simulation/monopoles/G4Monopole.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
@@ -179,8 +179,6 @@ namespace Belle2 {
       //      std::cout <<"setignore=true for track= "<< t.GetTrackID() << std::endl;
     }
 
-    const G4double charge = t.GetDefinition()->GetPDGCharge();
-
     //    const G4double tof = t.GetGlobalTime(); //tof at post step point
     //    if (isnan(tof)) {
     //      B2ERROR("SensitiveDetector: global time is nan");
@@ -188,6 +186,10 @@ namespace Belle2 {
     //    }
 
     const G4int pid = t.GetDefinition()->GetPDGEncoding();
+    const G4double charge = t.GetDefinition()->GetPDGCharge();
+    const G4double magCharge = abs(pid) == 99666 ? \
+                               static_cast<Monopoles::G4Monopole*>(t.GetDefinition())->MagneticCharge() : 0; //G4Monopole inherits from G4ParticleDefinition
+    // NOTE This surprisingly works without pid check and tertiary operator, but is supposed to be undefined behaviour.
     const G4int trackID = t.GetTrackID();
     //    std::cout << "pid,stepl,trackID,trackl,weight= " << pid <<" "<< stepLength <<" "<< trackID <<" "<< t.GetTrackLength() <<" "<< hitWeight << std::endl;
 

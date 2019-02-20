@@ -33,7 +33,6 @@ namespace Belle2 {
 
     private:
       /// Singleton: Default ctor only available to getInstance method
-      /// TODO: Manage singleton by MCManager? Then, ctor needs to be public.
       CDCMCCloneLookUp() = default;
 
       /// Helper function which returns a map of MCTrackIDs to vectors of CDTrack pointers.
@@ -50,13 +49,13 @@ namespace Belle2 {
       std::map<const CDCTrack*, bool> m_cdcTrackIsCloneMap;
     };
 
-    // Compare Functor which which decides from two tracks to declare non-clone
-    struct CompareCurlerTracks {
-      /// marker function for the isFunctor test
+    /// Functor which which decides which of two tracks to declare as best match
+    struct CompareCDCTracks {
+      // marker function for the isFunctor test
       operator FunctorTag();
 
-      CompareCurlerTracks(const CDCMCTrackLookUp& cdcMCTrackLookUp,
-                          const CDCMCHitLookUp& cdcMCHitLookUp)
+      CompareCDCTracks(const CDCMCTrackLookUp& cdcMCTrackLookUp,
+                       const CDCMCHitLookUp& cdcMCHitLookUp)
         : m_CDCMCTrackLookUp(cdcMCTrackLookUp)
         , m_CDCMCHitLookUp(cdcMCHitLookUp) {};
 
@@ -67,11 +66,10 @@ namespace Belle2 {
 
     private:
       /// Get number of hits in track that are correctly matched
-      /// TODO: maybe implement this method in HitCollectionLookUp?
       unsigned int getNumberOfCorrectHits(const CDCTrack* ptrCDCTrack) const;
 
       const CDCMCTrackLookUp& m_CDCMCTrackLookUp;
       const CDCMCHitLookUp& m_CDCMCHitLookUp;
     };
-  }
-}
+  } // namespace TrackFindingCDC
+} // namespace Belle2

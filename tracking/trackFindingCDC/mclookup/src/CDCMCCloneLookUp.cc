@@ -20,8 +20,7 @@ std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCloneLookUp::getMatchedC
 {
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
 
-  /// Map of MCTrackIds to vectors of matching CDCTrack pointers
-  /// TODO: is purity threshold for "matched" definition okay?
+  // Map of MCTrackIds to vectors of matching CDCTrack pointers
   std::map<const ITrackType, std::vector<CDCTrack*>> mapMCTrackIDToCDCTracks;
 
   for (CDCTrack& cdcTrack : cdcTracks) {
@@ -29,7 +28,7 @@ std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCloneLookUp::getMatchedC
 
     ITrackType mcTrackID = cdcMCTrackLookUp.getMCTrackId(ptrCDCTrack);
 
-    /// only if matching MCTrack with 50% minimal purity was found
+    // only if matching MCTrack with 50% minimal purity was found
     if (mcTrackID != INVALID_ITRACK) {
       if (mapMCTrackIDToCDCTracks.find(mcTrackID) == mapMCTrackIDToCDCTracks.end()) {
         // mcTrackID not yet in map, so add element
@@ -42,7 +41,7 @@ std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCloneLookUp::getMatchedC
   return mapMCTrackIDToCDCTracks;
 }
 
-unsigned int CompareCurlerTracks::getNumberOfCorrectHits(const CDCTrack* ptrCDCTrack) const
+unsigned int CompareCDCTracks::getNumberOfCorrectHits(const CDCTrack* ptrCDCTrack) const
 {
   ITrackType mcTrackID = m_CDCMCTrackLookUp.getMCTrackId(ptrCDCTrack);
   auto hitIsCorrect = [this, &mcTrackID](const CDCRecoHit3D & recoHit) {
@@ -52,27 +51,23 @@ unsigned int CompareCurlerTracks::getNumberOfCorrectHits(const CDCTrack* ptrCDCT
 }
 
 /// Functor definition of comparison function for findBestMatchedTrack
-bool CompareCurlerTracks::operator()(const CDCTrack* ptrCDCTrack1,
-                                     const CDCTrack* ptrCDCTrack2) const
+bool CompareCDCTracks::operator()(const CDCTrack* ptrCDCTrack1, const CDCTrack* ptrCDCTrack2) const
 {
-  // // Maybe add reference of instance in functor ctor?
-  // const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
-
   Index firstNLoopsTrack1 = m_CDCMCTrackLookUp.getFirstNLoops(ptrCDCTrack1);
   Index firstNLoopsTrack2 = m_CDCMCTrackLookUp.getFirstNLoops(ptrCDCTrack2);
 
   // Look for track with smallest NLoops of first hit.
   // If it is equal, use track with the larger number of correct hits.
-  bool isTrack1Better;
+  bool firstTrackBetter;
   if (firstNLoopsTrack1 == firstNLoopsTrack2) {
     const unsigned int nCorrectHitsTrack1 = getNumberOfCorrectHits(ptrCDCTrack1);
     const unsigned int nCorrectHitsTrack2 = getNumberOfCorrectHits(ptrCDCTrack2);
 
-    isTrack1Better = nCorrectHitsTrack1 > nCorrectHitsTrack2;
+    firstTrackBetter = nCorrectHitsTrack1 > nCorrectHitsTrack2;
   } else {
-    isTrack1Better = (firstNLoopsTrack1 < firstNLoopsTrack2);
+    firstTrackBetter = (firstNLoopsTrack1 < firstNLoopsTrack2);
   }
-  return isTrack1Better;
+  return firstTrackBetter;
 }
 
 CDCTrack* CDCMCCloneLookUp::findBestMatchedTrack(std::vector<CDCTrack*> matchedTrackPtrs)
@@ -80,7 +75,7 @@ CDCTrack* CDCMCCloneLookUp::findBestMatchedTrack(std::vector<CDCTrack*> matchedT
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
   const CDCMCHitLookUp& cdcMCHitLookUp = CDCMCHitLookUp::getInstance();
 
-  const CompareCurlerTracks compareCurlerTracks(cdcMCTrackLookUp, cdcMCHitLookUp);
+  const CompareCDCTracks compareCurlerTracks(cdcMCTrackLookUp, cdcMCHitLookUp);
   CDCTrack* ptrNonCloneTrack =
     *(std::min_element(begin(matchedTrackPtrs), end(matchedTrackPtrs), compareCurlerTracks));
 

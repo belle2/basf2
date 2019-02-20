@@ -37,6 +37,8 @@ function loadRevisions() {
 
         function setupRevisionLoader(ractive) {
 
+            setDefaultPrebuildOption();
+
             loadPrebuildRevisions();
             let revs = getDefaultRevisions();
             setRevisions(revs);
@@ -112,10 +114,20 @@ function loadSelectedRevisions(data) {
     setupRactiveFromRevision(data, revList);
 }
 
+function setDefaultPrebuildOption(){
+    let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
+    console.debug(`RECOVERED ${mode}`);
+    if (mode == null){
+        mode = "rbn";
+    }
+    $("#prebuilt-select").val(mode);
+}
+
 function loadPrebuildRevisions(data){
     console.warn("LOADPREUIL");
     let selector = $("#prebuilt-select")[0];
     let mode = selector.options[selector.selectedIndex].value;
+    localStorage.setItem(getStorageId("prebuildRevisionDefault"), mode);
     console.debug(`mode is ${mode}`);
     let revisions = getDefaultRevisions(mode);
     console.debug(`revisions are ${revisions.toString()}`);

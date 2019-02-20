@@ -30,31 +30,22 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
   // Set module properties
   setDescription("Create basic histograms for PXD efficiency");
 
-  // What exactly is needed for this to be true? rausgenommen wegen Nuple
-  // setPropertyFlags(c_ParallelProcessingCertified);
-  // setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);// for ntuple
+  // setPropertyFlags(c_ParallelProcessingCertified);// for ntuple not certified!!!
 
   // Parameter definitions
   addParam("pxdClustersName", m_pxdClustersName, "name of StoreArray with PXD cluster", std::string(""));
   addParam("tracksName", m_tracksName, "name of StoreArray with RecoTracks", std::string(""));
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
 
+  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", true);
+
   addParam("pCut", m_pcut, "Set a cut on the p-value ", double(0));
-
-  addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(true));
-
-  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
-
-  addParam("maskDeadPixels", m_maskDeadPixels, "Do not consider tracks going through known dead or hot pixels for the efficiency",
-           bool(false));
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 
   addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
 
   addParam("pTCut", m_pTCut, "Set a cut on the track pT", double(0));
-
-  addParam("cutBorders", m_cutBorders, "Do not use tracks near the borders of the sensor", bool(true));
 
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
 }
@@ -93,11 +84,6 @@ void PXDDQMEfficiencyNtupleModule::event()
     B2INFO("RecoTrack array is missing, no efficiencies");
     return;
   }
-  if (!m_ROIs.isValid() && m_requireROIs) {
-    B2INFO("ROI array is missing but required hits in ROIs, aborting");
-    return;
-  }
-
 
   for (auto& a_track : m_tracks) {
 
@@ -140,17 +126,17 @@ void PXDDQMEfficiencyNtupleModule::event()
         int vcell_fit = info.getVCellID(intersec_buff.Y());
 
         bool closeToBoarder = false;
-        if (m_cutBorders && isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
+        if (isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
           closeToBoarder = true;
         }
 
         bool closeToDead = false;
-        if (m_maskDeadPixels && isDeadPixelClose(ucell_fit, vcell_fit, m_maskedDistance, aVxdID)) {
+        if (isDeadPixelClose(ucell_fit, vcell_fit, m_maskedDistance, aVxdID)) {
           closeToDead = true;
         }
 
         bool fitInsideROI = false;
-        if (m_requireROIs) {
+        if (m_ROIs.isValid()) {
           //Check if the intersection is inside a ROI
           //If not, even if measured the cluster was thrown away->Not PXD's fault
           for (auto& roit : m_ROIs) {

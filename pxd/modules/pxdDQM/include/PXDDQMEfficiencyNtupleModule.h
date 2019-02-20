@@ -81,15 +81,8 @@ namespace Belle2 {
 
     bool isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID);
 
-    //Require tracks going through ROIs
-    bool m_requireROIs;
-
     //if true alignment will be used!
     bool m_useAlignment;
-
-    bool m_maskDeadPixels;
-
-    bool m_cutBorders;
 
     //the geometry
     VXD::GeoCache& m_vxdGeometry;

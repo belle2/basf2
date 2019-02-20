@@ -469,7 +469,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks",
                             filterParameters={"cut": 0.1})
 
     if with_clone_rejection:
-        path.add_module("TFCDC_TrackQualityRejecter",
+        path.add_module("TFCDC_TrackQualityEstimator",
                         filter=clone_rejection_filter,
                         filterParameters=clone_rejection_filter_parameters,
                         markAsBackground=mark_clones_as_background,

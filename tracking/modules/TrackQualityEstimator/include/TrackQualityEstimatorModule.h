@@ -3,30 +3,30 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost, Nils Braun                                 *
+ * Contributors: Michael Eliachevitch                                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/combined/TrackQualityRejecter.h>
+#include <tracking/trackFindingCDC/findlets/combined/TrackQualityEstimator.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-     * Module implementation using the MCTrackTrackQualityRejecter findlet
+     * Module implementation using the MCTrackTrackQualityEstimator findlet
      */
-    class TFCDC_TrackQualityRejecterModule : public FindletModule<TrackQualityRejecter> {
+    class TFCDC_TrackQualityEstimatorModule : public FindletModule<TrackQualityEstimator> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<TrackQualityRejecter>;
+      using Super = FindletModule<TrackQualityEstimator>;
 
     public:
       /// Constructor setting the default store vector names
-      TFCDC_TrackQualityRejecterModule();
+      TFCDC_TrackQualityEstimatorModule();
     };
   }
 }

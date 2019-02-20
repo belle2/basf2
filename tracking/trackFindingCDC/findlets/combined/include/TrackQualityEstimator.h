@@ -23,7 +23,7 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Deletes fake tracks that have been rejected by a filter
-    class TrackQualityRejecter : public Findlet<CDCTrack&> {
+    class TrackQualityEstimator : public Findlet<CDCTrack&> {
 
     private:
       /// Type of the base class
@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      TrackQualityRejecter(const std::string& defaultFilterName = "recording");
+      TrackQualityEstimator(const std::string& defaultFilterName = "recording");
 
       /// Short description of the findlet
       std::string getDescription() final;

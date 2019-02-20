@@ -7,15 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/TrackQualityRejecter/TrackQualityRejecterModule.h>
+#include <tracking/modules/TrackQualityEstimator/TrackQualityEstimatorModule.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(TFCDC_TrackQualityRejecter);
+REG_MODULE(TFCDC_TrackQualityEstimator);
 
-TFCDC_TrackQualityRejecterModule::TFCDC_TrackQualityRejecterModule()
+TFCDC_TrackQualityEstimatorModule::TFCDC_TrackQualityEstimatorModule()
   : Super( {"CDCTrackVector"})
 {
 }

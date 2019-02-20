@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/combined/TrackQualityRejecter.h>
+#include <tracking/trackFindingCDC/findlets/combined/TrackQualityEstimator.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -23,19 +23,19 @@ using namespace TrackFindingCDC;
 
 template class TrackFindingCDC::ChooseableFilter<TrackQualityFilterFactory>;
 
-TrackQualityRejecter::TrackQualityRejecter(const std::string& defaultFilterName)
+TrackQualityEstimator::TrackQualityEstimator(const std::string& defaultFilterName)
   : m_trackQualityFilter(defaultFilterName)
 {
   this->addProcessingSignalListener(&m_mcCloneLookUpFiller);
   this->addProcessingSignalListener(&m_trackQualityFilter);
 }
 
-std::string TrackQualityRejecter::getDescription()
+std::string TrackQualityEstimator::getDescription()
 {
   return "Set the quality indicator for CDC tracks and, if desired, delete tracks with a too low quality value.";
 }
 
-void TrackQualityRejecter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void TrackQualityEstimator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_trackQualityFilter.exposeParameters(moduleParamList, prefix);
   m_mcCloneLookUpFiller.exposeParameters(moduleParamList, prefix);
@@ -46,7 +46,7 @@ void TrackQualityRejecter::exposeParameters(ModuleParamList* moduleParamList, co
                                 m_param_deleteTracks);
 }
 
-void TrackQualityRejecter::apply(std::vector<CDCTrack>& tracks)
+void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
 {
   m_mcCloneLookUpFiller.apply(tracks);
 

@@ -403,7 +403,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     else:
         qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
 
-    path.add_module("TFCDC_TrackQualityRejecter",
+    path.add_module("TFCDC_TrackQualityEstimator",
                     inputTracks=output_tracks,
                     filter='mva',
                     filterParameters={'cut': cdc_quality_indicator_cut, 'identifier': qi_weightfile})

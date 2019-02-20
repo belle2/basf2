@@ -122,12 +122,12 @@ namespace Belle2 {
 
       if (int(std::lround(vars[0])) < 0)  B2FATAL("Index cannot be negative.");
 
-      const unsigned int IndexIn = int(std::lround(vars[0]));
+      const unsigned int indexIn = int(std::lround(vars[0]));
 
       const int varid = int(std::lround(vars[1]));
 
-      //OnlineEnergyToSort vector is used for sorting digits by online digit energy
-      std::vector<std::tuple<double, unsigned int>> OnlineEnergyToSort;
+      //EnergyToSort vector is used for sorting digits by digit energy measured by FPGAs
+      std::vector<std::tuple<double, unsigned int>> energyToSort;
 
       const ECLCluster* cluster = particle->getECLCluster();
 
@@ -135,13 +135,13 @@ namespace Belle2 {
 
         auto relatedDigits = cluster->getRelationsTo<ECLCalDigit>();
 
-        if (IndexIn < relatedDigits.size()) {
+        if (indexIn < relatedDigits.size()) {
 
           for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
             const auto caldigit = relatedDigits.object(iRel);
 
-            OnlineEnergyToSort.emplace_back(caldigit->getEnergy(), iRel);
+            energyToSort.emplace_back(caldigit->getEnergy(), iRel);
 
           }
 
@@ -149,9 +149,9 @@ namespace Belle2 {
           return std::numeric_limits<double>::quiet_NaN();
         }
 
-        std::sort(OnlineEnergyToSort.begin(), OnlineEnergyToSort.end(), std::greater<>());
+        std::sort(energyToSort.begin(), energyToSort.end(), std::greater<>());
 
-        const auto [digitEnergy, caldigitIndex] = OnlineEnergyToSort[IndexIn];
+        const auto [digitEnergy, caldigitIndex] = energyToSort[indexIn];
 
         const auto caldigitSelected = relatedDigits.object(caldigitIndex);
 

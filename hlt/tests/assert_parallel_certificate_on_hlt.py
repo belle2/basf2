@@ -6,12 +6,11 @@
 #
 #
 # Author: Nils Braun
-
 import basf2
 import reconstruction
-from softwaretrigger.path_functions import add_hlt_processing, add_expressreco_processing
+from softwaretrigger.processing import add_hlt_processing, add_expressreco_processing
 
-from softwaretrigger.constants import SoftwareTriggerModes
+from softwaretrigger.constants import SoftwareTriggerModes, RunTypes
 
 
 def test_path(path):
@@ -20,8 +19,8 @@ def test_path(path):
     for m in modules:
         if m.name() == "HistoManager":
             continue
-        assert m.has_properties(
-            basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)
+        assert m.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), \
+            f'{m} is missing c_ParallelProcessingCertified flag!'
 
         for sub_path in m.get_all_condition_paths():
             test_path(sub_path)
@@ -38,24 +37,25 @@ if __name__ == "__main__":
     for trigger in SoftwareTriggerModes:
         path = basf2.create_path()
         path.add_module("HistoManager")
-        add_hlt_processing(path, run_type="collision", softwaretrigger_mode=trigger)
+        add_hlt_processing(path, run_type=RunTypes.beam, softwaretrigger_mode=trigger)
         test_path(path)
 
-    for trigger in SoftwareTriggerModes:
-        path = basf2.create_path()
-        path.add_module("HistoManager")
-        add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode=trigger, data_taking_period="phase3")
-        test_path(path)
+    path = basf2.create_path()
+    path.add_module("HistoManager")
+    add_hlt_processing(path, run_type=RunTypes.cosmic, softwaretrigger_mode=SoftwareTriggerModes.monitor,
+                       data_taking_period="phase3")
+    test_path(path)
 
     # Add various modes of express reco
     for do_reconstruction in [True, False]:
         path = basf2.create_path()
         path.add_module("HistoManager")
-        add_expressreco_processing(path, run_type="collision", do_reconstruction=do_reconstruction)
+        add_expressreco_processing(path, run_type=RunTypes.beam, do_reconstruction=do_reconstruction)
         test_path(path)
 
     for do_reconstruction in [True, False]:
         path = basf2.create_path()
         path.add_module("HistoManager")
-        add_expressreco_processing(path, run_type="cosmics", do_reconstruction=do_reconstruction, data_taking_period="phase3")
+        add_expressreco_processing(path, run_type=RunTypes.cosmic, do_reconstruction=do_reconstruction,
+                                   data_taking_period="phase3")
         test_path(path)

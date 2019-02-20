@@ -301,7 +301,7 @@ namespace Belle2 {
 
         const HepPoint3D  x(pos[0] / CLHEP::cm, pos[1] / CLHEP::cm, pos[2] / CLHEP::cm);
         const HepVector3D p(momIn.x() / CLHEP::GeV, momIn.y() / CLHEP::GeV, momIn.z() / CLHEP::GeV);
-        Helix tmp(x, p, charge + 0.001);
+        Helix tmp(x, p, charge);
         tmp.bFieldZ(B_kG[2]);
         tmp.ignoreErrorMatrix();
 

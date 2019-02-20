@@ -165,7 +165,7 @@ function getDefaultRevisions(mode="rbn") {
 
     for (let i in allRevisions){
         let rev = allRevisions[i];
-        if (rev.startsWith("release")) {
+        if (rev.startsWith("release") || rev.startsWith("prerelease")) {
             releaseRevisions.push(rev);
         }
         if (rev.startsWith("build")) {

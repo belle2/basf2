@@ -215,7 +215,7 @@ class Mails:
                 mail_log[contact] = failed_scripts[contact]
             # if user already is in mail_log, add the failed scripts
             else:
-                for script in contact:
+                for script in failed_scripts[contact]:
                     mail_log[contact][script] = failed_scripts[contact][script]
 
         return mail_log
@@ -248,9 +248,9 @@ class Mails:
             body_plot += "<b>Description:</b> {description}<br>"
             body_plot += "<b>Comparison:</b> {comparison_text}<br>"
             body_plot += "<b>Error type:</b> {errormsg}<br>"
-            # fixme: sometimes 'rootfile' is just '--'.
-            body_plot += '<a href="{url}#{package}-{rootfile}">' \
-                         'Click me for details</a>'
+            if plots[plot]["rootfile"] != "--":
+                body_plot += '<a href="{url}#{package}-{rootfile}">' \
+                             'Click me for details</a>'
             body_plot += "\n\n"
 
             # Fill in fields

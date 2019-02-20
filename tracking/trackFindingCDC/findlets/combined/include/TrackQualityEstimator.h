@@ -46,8 +46,8 @@ namespace Belle2 {
       // Findlet to fill CDCTracks into lookup table (singleton) with clone information
       CDCMCCloneLookUpFiller m_mcCloneLookUpFiller;
 
-      /// Parameter : Switch on to delete the clones, otherwise just mark them as background.
-      bool m_param_deleteTracks = true;
+      /// Parameter : Delete tracks below threshold instead of just assigning quality indicator
+      bool m_param_deleteTracks = false;
 
       /// Reference to the filter to be used to filter
       ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;

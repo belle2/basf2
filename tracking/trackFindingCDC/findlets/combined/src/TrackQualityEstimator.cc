@@ -42,7 +42,7 @@ void TrackQualityEstimator::exposeParameters(ModuleParamList* moduleParamList, c
 
   moduleParamList->addParameter(prefixed(prefix, "deleteTracks"),
                                 m_param_deleteTracks,
-                                "Delete the tracks instead of marking them as background.",
+                                "Delete tracks below cut instead of just assigning quality indicator.",
                                 m_param_deleteTracks);
 }
 

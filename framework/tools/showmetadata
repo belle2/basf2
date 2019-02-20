@@ -1,2 +1,0 @@
-#!/bin/bash
-b2file-metadata-show "$@"

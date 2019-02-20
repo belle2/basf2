@@ -240,9 +240,8 @@ void DataWriterModule::event()
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     TrackClusterSeparation* trackSep;
     float best_dist = 100000000;
-    float dist;
     for (auto trackSeperation :  trackSeperations) {
-      dist = trackSeperation.getDistance();
+      float dist = trackSeperation.getDistance();
       if (dist < best_dist) {
         best_dist = dist;
         trackSep = &trackSeperation;

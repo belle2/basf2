@@ -1,6 +1,4 @@
 /**************************************************************************
- *
- *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *

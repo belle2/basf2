@@ -161,9 +161,8 @@ void KLMExpertModule::event()
 
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     float best_dist = 1e10;
-    float dist;
     for (auto trackSeperation :  trackSeperations) {
-      dist = trackSeperation.getDistance();
+      float dist = trackSeperation.getDistance();
       if (dist < best_dist) {
         best_dist = dist;
         m_KLMTrackSepDist         = trackSeperation.getDistance();

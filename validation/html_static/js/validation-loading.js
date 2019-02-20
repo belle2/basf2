@@ -37,6 +37,7 @@ function loadRevisions() {
 
         function setupRevisionLoader(ractive) {
 
+            loadPrebuildRevisions();
             let revs = getDefaultRevisions();
             setRevisions(revs);
 
@@ -45,6 +46,10 @@ function loadRevisions() {
             // be ready to load any other revision configuration if user desires
             ractive.on('loadSelectedRevisions', function () {
                 loadSelectedRevisions(data);
+            });
+
+            ractive.on('loadPrebuildRevisions', function () {
+                loadPrebuildRevisions(data);
             });
         }
 
@@ -107,6 +112,17 @@ function loadSelectedRevisions(data) {
     setupRactiveFromRevision(data, revList);
 }
 
+function loadPrebuildRevisions(data){
+    console.warn("LOADPREUIL");
+    let selector = $("#prebuilt-select")[0];
+    let mode = selector.options[selector.selectedIndex].value;
+    console.debug(`mode is ${mode}`);
+    let revisions = getDefaultRevisions(mode);
+    console.debug(`revisions are ${revisions.toString()}`);
+    setRevisions(revisions);
+    loadSelectedRevisions(data);
+}
+
 /**
  * Sets the state of the revision checkboxes
  * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
@@ -114,7 +130,7 @@ function loadSelectedRevisions(data) {
  *  (default, last build, nightly and revision).
  */
 function getDefaultRevisions(mode="rbn") {
-    let allRevisions = getSelectedRevsList();
+    let allRevisions = getAllRevsList();
 
     let referenceRevision = "reference";
     let releaseRevisions = [];
@@ -135,7 +151,7 @@ function getDefaultRevisions(mode="rbn") {
     }
 
     if (mode === "all"){
-        return allRevisions
+        return allRevisions;
     }
     else if (mode === "r"){
         if (releaseRevisions.length >= 1){
@@ -180,17 +196,7 @@ function getDefaultRevisions(mode="rbn") {
 
 function setRevisions(revisionList) {
     $('.reference-checkbox').each(function (i, obj) {
-        console.log(`looking at ${i}/${obj.value}`);
-        console.log(`checked: ${obj.checked}`);
-        console.log(`wanted: ${revisionList.includes(obj.value)}`);
-        if (revisionList.includes(obj.value)) {
-            console.log(`enabled: ${i}/${obj.value}`);
-            obj.checked = true;
-        }
-        else {
-            console.log(`disabled: ${i}/${obj.value}`);
-            obj.checked = false;
-        }
+        obj.checked = revisionList.includes(obj.value);
     });
 }
 
@@ -610,6 +616,15 @@ function getSelectedRevsList() {
     });
     selectedRev.sort();
     return selectedRev;
+}
+
+function getAllRevsList() {
+    let revs = [];
+    $('.reference-checkbox').each(function (i, obj) {
+        revs.push(obj.value)
+    });
+    revs.sort();
+    return revs;
 }
 
 /**

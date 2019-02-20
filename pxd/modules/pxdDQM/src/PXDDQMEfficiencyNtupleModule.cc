@@ -53,18 +53,25 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
 
 void PXDDQMEfficiencyNtupleModule::terminate()
 {
-  if (m_tuple) m_tuple->Write();
+  auto dir = gDirectory;
+  if (m_tuple) {
+    m_file->cd();
+    m_tuple->Write();
+    delete m_tuple;
+  }
   if (m_file) {
     m_file->Write();
     m_file->Close();
+    delete m_file;
   }
+  dir->cd();
 }
 
 
 void PXDDQMEfficiencyNtupleModule::initialize()
 {
-  m_file = new TFile("test.root", "recreate");
   m_tuple = new TNtuple("effcontrol", "effcontrol", "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched");
+  m_file = new TFile("test.root", "recreate");
 
   //register the required arrays
   //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them

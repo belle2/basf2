@@ -325,8 +325,7 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
                     recoTracksStoreArrayName=output_reco_tracks)
 
 
-def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False,
-                          cdc_quality_indicator_cut=0.0):
+def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -398,15 +397,11 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
-        qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithCA.weights.xml"
-
-    else:
-        qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
-
+    cdc_quality_estimator_weightfile_id = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
     path.add_module("TFCDC_TrackQualityEstimator",
                     inputTracks=output_tracks,
-                    filter='mva',
-                    filterParameters={'cut': cdc_quality_indicator_cut, 'identifier': qi_weightfile})
+                    filter='mva', deleteTracks=False,
+                    filterParameters={"identifier": cdc_quality_estimator_weightfile_id})
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",

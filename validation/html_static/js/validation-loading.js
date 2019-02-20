@@ -578,10 +578,12 @@ function getNewestRevision(rev_data) {
  * whenever your actions might make any DOM that contains LaTeX appear on the
  * page!
  * @param force do not check latexRenderingInProgress
+ * @param irepeat how often did we recursively call this function to render
+ *  left over latex elements
  * @returns {*}
  */
-function renderLatex(force=false) {
-    if (!force && latexRenderingInProgress){
+function renderLatex(force=false, irepeat=0) {
+    if (irepeat === 0 && !force && latexRenderingInProgress){
         console.debug("Superfluous level 0 call to renderLatex()");
         return false;
     }
@@ -602,12 +604,13 @@ function renderLatex(force=false) {
     // perhaps because we're missing some calls to renderLatex. So we always
     // check if the last _renderLatex call typeset new elements, and if it does
     // we wait for 1s and try again.
-    if (newElements){
-        return setTimeout(() => renderLatex(force=true), 1000)
+    if (newElements && irepeat < 15){
+        return setTimeout(() => renderLatex(force=true, irepeat=irepeat+1), 1000)
     }
 
     console.debug("renderLatex thinks LaTeX DOMs have stopped from " +
-        "appearing on the page and will therefore stop.");
+        "appearing on the page and will therefore stop (or it has tried " +
+        "too often and gives up).");
     latexRenderingInProgress = false;
 }
 
@@ -630,6 +633,6 @@ function _renderLatex(log=true) {
     }
     // This is the current hack for finding out whether we did any additional
     // typesetting....
-    // todo: find the proper way to find out if we typeset any new elemtn
+    // todo: find the proper way to find out if we typeset any new element
     return (t1 - t0) > 5;
 }

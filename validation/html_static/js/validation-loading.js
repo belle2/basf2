@@ -1,5 +1,19 @@
 /** This file contains all the main functions */
 
+"use strict";
+
+// ============================================================================
+// Global variables
+// ============================================================================
+
+/**
+ * Is the JS that allows us to render LaTeX already loaded?
+ * @type {boolean}
+ */
+var latexRenderingLoaded = false;
+
+var latexRenderingInProgress = false;
+
 // ============================================================================
 // "Top level" functions, i.e. functions that are called directly from the
 // HTML or triggered from there.
@@ -552,4 +566,70 @@ function getNewestRevision(rev_data) {
     }
 
     return newest
+}
+
+/**
+ * Render any latex formula on the current page and keep on recursively calling
+ * this function until it looks like no new elements appear.
+ * Note: We wait until we have latex support (via the latexRenderingLoaded
+ * global variable) and (via latexRenderingInProgress) also make sure that
+ * only one kind of this function is active (including its recursive calls)
+ * That means that calling this function is super cheap, so please call it
+ * whenever your actions might make any DOM that contains LaTeX appear on the
+ * page!
+ * @param force do not check latexRenderingInProgress
+ * @returns {*}
+ */
+function renderLatex(force=false) {
+    if (!force && latexRenderingInProgress){
+        console.debug("Superfluous level 0 call to renderLatex()");
+        return false;
+    }
+
+    // Make sure only one instance of this function is running.
+    latexRenderingInProgress = true;
+
+    if (!latexRenderingLoaded){
+        // Latex rendering is not yet loaded, so let's just call this very
+        // function again in 300 ms
+        console.debug("Latex rendering requested, but not yet available. Waiting.");
+        return setTimeout(() => renderLatex(force=true), 300);
+    }
+
+    // Now Latex is available!
+    let newElements =_renderLatex();
+    // Currently this still doesn't necessarily catch all of the elements,
+    // perhaps because we're missing some calls to renderLatex. So we always
+    // check if the last _renderLatex call typeset new elements, and if it does
+    // we wait for 1s and try again.
+    if (newElements){
+        return setTimeout(() => renderLatex(force=true), 1000)
+    }
+
+    console.debug("renderLatex thinks LaTeX DOMs have stopped from " +
+        "appearing on the page and will therefore stop.");
+    latexRenderingInProgress = false;
+}
+
+/**
+ * Render latex content. You probably want to call renderLatex instead.
+ * @param log display log message
+ * @returns {boolean} did we (probably) typeset new mathematics?
+ * @private
+ */
+function _renderLatex(log=true) {
+    // Reload MathJax, because we might have new LaTeX code in Ractive
+    // elements. Because MathJax replaces the DOMs with pictures, it will
+    // not regenerate things twice.
+
+    let t0 = performance.now();
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    const t1 = performance.now();
+    if (log){
+        console.log(`Re-typeset latex in ${(t1 - t0).toFixed(1)}ms`);
+    }
+    // This is the current hack for finding out whether we did any additional
+    // typesetting....
+    // todo: find the proper way to find out if we typeset any new elemtn
+    return (t1 - t0) > 5;
 }

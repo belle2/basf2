@@ -2,6 +2,8 @@
 Support functions for using Ractive on the validation website
 */
 
+"use strict";
+
 // ============================================================================
 // Saving ractive values to local or session storage
 // ============================================================================
@@ -187,15 +189,7 @@ function setupRactive(templateName,
                 onRactiveCreated(ractive);
             }
 
-            // Reload MathJax, because we might have new LaTeX code in Ractive
-            // elements. It might be a slight overkill to do this every time,
-            // but it's not costly performance wise anyhow, so let's just do it.
-            // In fact, because MathJax replaces the DOMs with pictures, it will
-            // not regenerate things twice.
-            var t0 = performance.now();
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-            var t1 = performance.now();
-            console.log("Re-Typeset all using MathJax. This took " + (t1 - t0) + "ms.")
+            renderLatex();
 
             console.log("Ractive setup with " + templateName + " complete");
         }).fail(

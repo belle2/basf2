@@ -40,25 +40,25 @@ TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
   setDescription(desc);
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
-           string("CDCTriggerSegmentHits"));
+           string("CDCTriggerSegmentHits0"));
   addParam("addTSToDatastore", m_addTSToDatastore,
            "If true, adds TS to datastore",
            true);
   addParam("EventTimeName", m_EventTimeName,
            "Name of the event time object.",
-           string("BinnedEventT0"));
+           string("BinnedEventT00"));
   addParam("addEventTimeToDatastore", m_addEventTimeToDatastore,
            "If true, adds event time to datastore",
            true);
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the input tracks from the 2D finder.",
-           string("TRGCDC2DFinderTracks"));
+           string("TRGCDC2DFinderTracks0"));
   addParam("add2DFinderToDatastore", m_add2DFinderToDatastore,
            "If true, adds 2D Finder results to datastore",
            true);
   addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the 3D output tracks.",
-           string("TRGCDC3DFitterTracks"));
+           string("TRGCDC3DFitterTracks0"));
   addParam("add3DToDatastore", m_add3DToDatastore,
            "If true, adds 3D results to datastore",
            true);
@@ -67,7 +67,7 @@ TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
            unsigned(0));
   addParam("firmwareResultCollectionName", m_firmwareResultCollectionName,
            "Name of the StoreArray holding the firmware results.",
-           string("TRGCDCT3DUnpackerStores"));
+           string("TRGCDCT3DUnpackerStores0"));
   addParam("isVerbose", m_isVerbose,
            "If not zero, prints detail information.",
            unsigned(0));

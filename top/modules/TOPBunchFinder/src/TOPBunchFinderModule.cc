@@ -218,6 +218,8 @@ namespace Belle2 {
     std::vector<TOPtrack> topTracks;
     std::vector<double> masses;
     std::vector<TOP1Dpdf> top1Dpdfs;
+    std::vector<int> numPhotons;
+    std::vector<Chi2MinimumFinder1D> finders;
 
     // loop over reconstructed tracks, make a selection and push to containers
 
@@ -269,7 +271,7 @@ namespace Belle2 {
       topTracks.push_back(trk);
       masses.push_back(mass);
       top1Dpdfs.push_back(pdf1d);
-
+      numPhotons.push_back(reco.getNumOfPhotons());
     }
     m_recBunch->setNumTracks(numTrk, topTracks.size(), m_nodEdxCount);
     if (topTracks.empty()) return;
@@ -288,14 +290,20 @@ namespace Belle2 {
 
     // find rough T0
 
-    Chi2MinimumFinder1D roughFinder(numBins, minT0, maxT0);
     for (const auto& pdf : top1Dpdfs) {
-      const auto& bins = roughFinder.getBinCenters();
+      finders.push_back(Chi2MinimumFinder1D(numBins, minT0, maxT0));
+      auto& finder = finders.back();
+      const auto& bins = finder.getBinCenters();
       for (unsigned i = 0; i < bins.size(); i++) {
         double t0 = bins[i];
-        roughFinder.add(i, -2 * pdf.getLogL(t0));
+        finder.add(i, -2 * pdf.getLogL(t0));
       }
     }
+    auto roughFinder = finders[0];
+    for (size_t i = 1; i < finders.size(); i++) {
+      roughFinder.add(finders[i]);
+    }
+
     const auto& t0Rough = roughFinder.getMinimum();
     if (m_saveHistograms) {
       m_recBunch->addHistogram(roughFinder.getHistogram("chi2_rough_",
@@ -310,9 +318,9 @@ namespace Belle2 {
 
     // find precise T0
 
-    std::vector<Chi2MinimumFinder1D> finders;
-    std::vector<int> numPhotons;
     if (m_fineSearch) {
+      finders.clear();
+      numPhotons.clear();
 
       const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
       double timeMin = tdc.getTimeMin() + t0Rough.position;

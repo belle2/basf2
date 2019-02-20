@@ -2,6 +2,10 @@
 
 "use strict";
 
+// todo: generally: Maybe it would be better to make data a global variable instead of
+// passing it from function to function, potentially having to reload it from the
+// server if that chain breaks
+
 // ============================================================================
 // Global variables
 // ============================================================================
@@ -21,16 +25,10 @@ var latexRenderingInProgress = false;
 
 /**
  * This function gets called from the main page validation.html at the
- * beginning and sets up the * page with the initial selection of revisions.
- * @param revList
+ * beginning and sets up the revisions sub-menu and then loads the
+ * corresponding plots to the default selection of the revisions
  */
-function loadRevisions(revList) {
-    if (!Array.isArray(revList) || !revList.length) {
-        revList = [];
-    }
-
-    let revString = selectedRevsListToString(revList);
-
+function loadRevisions() {
     console.log("Loading revisions from server");
     let revLoadPath = "../revisions";
 
@@ -39,17 +37,13 @@ function loadRevisions(revList) {
 
         function setupRevisionLoader(ractive) {
 
-            // load the defaults for the first time
-            if (revString === "") {
-                loadSelectedRevisions(data);
-            } else {
-                // otherwise, load a specific selection
-                setupRactiveFromRevision(data, revList);
-            }
+            let revs = getDefaultRevisions();
+            setRevisions(revs);
+
+            loadSelectedRevisions(data);
 
             // be ready to load any other revision configuration if user desires
             ractive.on('loadSelectedRevisions', function () {
-
                 loadSelectedRevisions(data);
             });
         }
@@ -111,6 +105,93 @@ function loadSelectedRevisions(data) {
     console.log(`Loading rev via string '${revString}'.`);
 
     setupRactiveFromRevision(data, revList);
+}
+
+/**
+ * Sets the state of the revision checkboxes
+ * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
+ *  nightly only), "b" (last build only), "nnn" (all nightlies), "rbn"
+ *  (default, last build, nightly and revision).
+ */
+function getDefaultRevisions(mode="rbn") {
+    let allRevisions = getSelectedRevsList();
+
+    let referenceRevision = "reference";
+    let releaseRevisions = [];
+    let buildRevisions = [];
+    let nightlyRevisions = [];
+
+    for (let i in allRevisions){
+        let rev = allRevisions[i];
+        if (rev.startsWith("release")) {
+            releaseRevisions.push(rev);
+        }
+        if (rev.startsWith("build")) {
+            buildRevisions.push(rev);
+        }
+        if (rev.startsWith("nightly")) {
+            nightlyRevisions.push(rev);
+        }
+    }
+
+    if (mode === "all"){
+        return allRevisions
+    }
+    else if (mode === "r"){
+        if (releaseRevisions.length >= 1){
+            return [referenceRevision, releaseRevisions[0]];
+        }
+    }
+    else if (mode === "b"){
+        if (buildRevisions.length >= 1){
+            return [referenceRevision, buildRevisions[0]];
+        }
+    }
+    else if (mode === "n"){
+        if (nightlyRevisions.length >= 1){
+            return [referenceRevision, nightlyRevisions[0]];
+        }
+    }
+    else if (mode === "nnn"){
+        if (nightlyRevisions.length >= 1){
+            return [referenceRevision].concat(nightlyRevisions);
+        }
+    }
+    else if (mode === "rbn"){
+        // default anyway
+    }
+    else {
+        console.error(`Unknown getDefaultRevisions mode '${mode}'!`);
+    }
+
+    let rbnRevisions = [referenceRevision];
+    if (releaseRevisions.length >= 1){
+        rbnRevisions.push(releaseRevisions[0])
+    }
+    if (buildRevisions.length >= 1){
+        rbnRevisions.push(buildRevisions[0])
+    }
+    if (nightlyRevisions.length >= 1){
+        rbnRevisions.push(nightlyRevisions[0])
+    }
+
+    return rbnRevisions
+}
+
+function setRevisions(revisionList) {
+    $('.reference-checkbox').each(function (i, obj) {
+        console.log(`looking at ${i}/${obj.value}`);
+        console.log(`checked: ${obj.checked}`);
+        console.log(`wanted: ${revisionList.includes(obj.value)}`);
+        if (revisionList.includes(obj.value)) {
+            console.log(`enabled: ${i}/${obj.value}`);
+            obj.checked = true;
+        }
+        else {
+            console.log(`disabled: ${i}/${obj.value}`);
+            obj.checked = false;
+        }
+    });
 }
 
 // ============================================================================

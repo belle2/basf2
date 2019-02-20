@@ -9,9 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/track/TrackQualityFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
 #include <tracking/trackFindingCDC/filters/track/BestMatchedTruthVarSet.h>
-#include <tracking/trackFindingCDC/filters/track/TrackQualityVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
@@ -28,46 +27,21 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+// these types are the only difference to TrackFilterFactory, since here BestMatchedTruthVarSet is
+// used whereas the base class uses TruthTrackVarSet
 namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
   using NoneTrackFilter = NoneFilter<BaseTrackFilter>;
   using MCTrackFilter = TruthVarFilter<BestMatchedTruthVarSet>;
-  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<BestMatchedTruthVarSet, TrackQualityVarSet>>;
-  using MVATrackFilter = MVAFilter<TrackQualityVarSet>;
-}
+  using RecordingTrackFilter =
+    RecordingFilter<VariadicUnionVarSet<BestMatchedTruthVarSet, BasicTrackVarSet>>;
+  using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
+} // namespace
 
 template class TrackFindingCDC::FilterFactory<BaseTrackFilter>;
 
-TrackQualityFilterFactory::TrackQualityFilterFactory(const std::string& defaultFilterName)
-  : Super(defaultFilterName)
-{
-}
-
-std::string TrackQualityFilterFactory::getIdentifier() const
-{
-  return "Track";
-}
-
-std::string TrackQualityFilterFactory::getFilterPurpose() const
-{
-  return "Track filter to reject fakes";
-}
-
-std::map<std::string, std::string>
-TrackQualityFilterFactory::getValidFilterNamesAndDescriptions() const
-{
-  return {
-    {"none", "no track is valid"},
-    {"all", "set all tracks as good"},
-    {"truth", "monte carlo truth"},
-    {"recording", "record variables to a TTree"},
-    {"eval", "record truth and the mva response for insitu comparision"},
-    {"mva", "test with a mva method"}
-  };
-}
-
-std::unique_ptr<BaseTrackFilter>
-TrackQualityFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BaseTrackFilter> TrackQualityFilterFactory::create(
+  const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<NoneTrackFilter>();
@@ -82,9 +56,11 @@ TrackQualityFilterFactory::create(const std::string& filterName) const
     using TrackFilterVarSet = FilterVarSet<BaseTrackFilter>;
     recordedVarSets->push_back(std::make_unique<TrackFilterVarSet>("mva", create("mva")));
     recordedVarSets->push_back(std::make_unique<TrackFilterVarSet>("truth", create("truth")));
-    return std::make_unique<Recording<BaseTrackFilter>>(std::move(recordedVarSets), "TrackQualityFilter_eval.root");
+    return std::make_unique<Recording<BaseTrackFilter>>(std::move(recordedVarSets),
+                                                        "TrackQualityFilter_eval.root");
   } else if (filterName == "mva") {
-    return std::make_unique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackQualityFilter.xml", 0.10);
+    return std::make_unique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackQualityFilter.xml",
+                                            0.10);
   } else {
     return Super::create(filterName);
   }

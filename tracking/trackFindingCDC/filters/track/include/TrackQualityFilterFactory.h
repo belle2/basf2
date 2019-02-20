@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
-
+#include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
@@ -18,26 +18,16 @@ namespace Belle2 {
     // Guard to prevent repeated instantiations
     extern template class FilterFactory<BaseTrackFilter>;
 
-    /// Factory that can create appropriate track filters from associated names.
-    class TrackQualityFilterFactory : public FilterFactory<BaseTrackFilter> {
-
+    /** Derived class of TrackFilterFactory with a truth target that also discards clones
+     * Probably this whole class could be removed if TrackFilterFactory would be templated with the
+     * type of the TruthVarSet as a template argument
+     */
+    class TrackQualityFilterFactory : public TrackFilterFactory {
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseTrackFilter>;
+      using Super = TrackFilterFactory;
 
     public:
-      /// Constructor forwarding the default filter name
-      TrackQualityFilterFactory(const std::string& defaultFilterName = "recording");
-
-      /// Getter for a short identifier for the factory
-      std::string getIdentifier() const override;
-
-      /// Getter for a descriptive purpose of the constructed filters
-      std::string getFilterPurpose() const override;
-
-      /// Getter for valid filter names and a description for each
-      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
-
       /// Create a filter with the given name.
       std::unique_ptr<BaseTrackFilter> create(const std::string& filterName) const override;
     };

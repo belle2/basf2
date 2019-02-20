@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * This function installs a timer with wait_time ( in ms ) which
  * will check for the plot creation progress on the server

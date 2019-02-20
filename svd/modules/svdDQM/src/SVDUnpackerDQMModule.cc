@@ -122,6 +122,7 @@ void SVDUnpackerDQMModule::beginRun()
 {
 
   if (DQMUnpackerHisto != NULL) DQMUnpackerHisto->Reset();
+  shutUpNoData = false;
 
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
 
@@ -144,11 +145,10 @@ void SVDUnpackerDQMModule::beginRun()
 
 void SVDUnpackerDQMModule::event()
 {
-  if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) {
-    B2ERROR("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD monitoring disabled");
-  }
-
-  if (m_eventMetaDataPtr->getEvent() % 1000 == 0) B2INFO("event number: " << m_eventMetaDataPtr->getEvent());
+  if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) if (!shutUpNoData) {
+      B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
+      shutUpNoData = true;
+    }
 
   unsigned int nDiagnostics = m_svdDAQDiagnostics.getEntries();
 

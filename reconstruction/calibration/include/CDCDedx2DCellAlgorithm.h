@@ -15,6 +15,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <TF1.h>
 #include <TLine.h>
+#include <TBox.h>
 #include <TMath.h>
 #include <TH1D.h>
 #include <TH2D.h>
@@ -60,6 +61,11 @@ namespace Belle2 {
     *Set asym bins flag to on or off
     */
     void setRotationSymmetry(bool value) {IsRS = value;}
+
+    /**
+    * adding prefix to filenae for uniqueness in each iter
+    */
+    void setOutFilePrefix(std::string value) {fSetPrefix = value;}
 
     /**
     funtion to set flag active for plotting
@@ -157,6 +163,7 @@ namespace Belle2 {
     Double_t fdocaUE; /**< Upper edge of doca */
     Double_t fdocaBS; /**< Binwidth edge of doca */
 
+    std::string fSetPrefix; /**< prefix to filename */
     std::vector<int> fDocaBinNums; /**< Vector for enta asym bin # */
     std::vector<double> fDocaBinValues;  /**< Vector for doca asym bin # */
 

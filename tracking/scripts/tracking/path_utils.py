@@ -77,7 +77,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
 
 
 def add_cr_track_fit_and_track_creator(path, components=None,
-                                       data_taking_period='gcr2017', top_in_counter=False,
+                                       data_taking_period='early_phase3', top_in_counter=False,
                                        prune_tracks=False, event_timing_extraction=True,
                                        reco_tracks="RecoTracks", tracks=""):
     """

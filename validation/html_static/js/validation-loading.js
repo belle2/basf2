@@ -114,6 +114,12 @@ function loadSelectedRevisions(data) {
     setupRactiveFromRevision(data, revList);
 }
 
+/**
+ * Set the dropdown menu that specifies the favorite prebuilt combination of
+ * revisions to the value which was last selected by the user or to 'rbn' if
+ * no such setting exists.
+ * @returns the mode which was set
+ */
 function setDefaultPrebuildOption(){
     let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
     console.debug(`RECOVERED ${mode}`);
@@ -121,16 +127,24 @@ function setDefaultPrebuildOption(){
         mode = "rbn";
     }
     $("#prebuilt-select").val(mode);
+    return mode;
 }
 
+/**
+ * This will get the selected prebuilt combination from the drop down menu,
+ * get the corresponding revisions and show the corresponding plots.
+ * It will also save the value of the drop down menu in localStorage.
+ * This function should be bound to the user changing the value in the drop
+ * down menu.
+ * @param data
+ */
 function loadPrebuildRevisions(data){
-    console.warn("LOADPREUIL");
     let selector = $("#prebuilt-select")[0];
     let mode = selector.options[selector.selectedIndex].value;
     localStorage.setItem(getStorageId("prebuildRevisionDefault"), mode);
-    console.debug(`mode is ${mode}`);
+    console.debug(`Loading prebuild reivision with mode '${mode}'`);
     let revisions = getDefaultRevisions(mode);
-    console.debug(`revisions are ${revisions.toString()}`);
+    console.debug(`Revisions to load are ${revisions.toString()}`);
     setRevisions(revisions);
     loadSelectedRevisions(data);
 }
@@ -165,25 +179,17 @@ function getDefaultRevisions(mode="rbn") {
     if (mode === "all"){
         return allRevisions;
     }
-    else if (mode === "r"){
-        if (releaseRevisions.length >= 1){
-            return [referenceRevision, releaseRevisions[0]];
-        }
+    else if (mode === "r" && releaseRevisions.length >= 1){
+        return [referenceRevision, releaseRevisions[0]];
     }
-    else if (mode === "b"){
-        if (buildRevisions.length >= 1){
-            return [referenceRevision, buildRevisions[0]];
-        }
+    else if (mode === "b" && buildRevisions.length >= 1){
+        return [referenceRevision, buildRevisions[0]];
     }
-    else if (mode === "n"){
-        if (nightlyRevisions.length >= 1){
-            return [referenceRevision, nightlyRevisions[0]];
-        }
+    else if (mode === "n" && nightlyRevisions.length >= 1){
+        return [referenceRevision, nightlyRevisions[0]];
     }
-    else if (mode === "nnn"){
-        if (nightlyRevisions.length >= 1){
-            return [referenceRevision].concat(nightlyRevisions);
-        }
+    else if (mode === "nnn" && nightlyRevisions.length >= 1){
+        return [referenceRevision].concat(nightlyRevisions);
     }
     else if (mode === "rbn"){
         // default anyway
@@ -206,6 +212,12 @@ function getDefaultRevisions(mode="rbn") {
     return rbnRevisions
 }
 
+/**
+ * Set the state of the revision checkboxes in the revision submenu.
+ * @param revisionList any revision in this list will be checked, all others
+ *  will be unchecked. Any revision in this list which does not have a
+ *  corresponding checkbox will be ignored.
+ */
 function setRevisions(revisionList) {
     $('.reference-checkbox').each(function (i, obj) {
         obj.checked = revisionList.includes(obj.value);

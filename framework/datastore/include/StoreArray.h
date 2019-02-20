@@ -115,57 +115,6 @@ namespace Belle2 {
     /** STL-like const_iterator over the T objects (not T* ). */
     typedef ObjArrayIterator<const TClonesArray, const T> const_iterator;
 
-    /** Register an array, that should be written to the output by default, in the data store.
-     *  This must be called in the initialization phase.
-     *
-     *  @warning Use discouraged, use registerInDataStore() instead.
-     *  @param name        Name under which the TClonesArray is stored.
-     *  @param durability  Specifies lifetime of array in question.
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    [[deprecated("Please use registerInDataStore() on an instance and consider making the StoreArray a member of your class")]]
-    static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                   bool errorIfExisting = false)
-    {
-      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true,
-                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : DataStore::c_WriteOut);
-
-    }
-
-    /** Check whether an array was registered before.
-     *  It will cause an error if the array does not exist.
-     *  This must be called in the initialization phase.
-     *
-     *  @warning Use discouraged, use isRequired() instead.
-     *  @param name        Name under which the TClonesArray is stored.
-     *  @param durability  Specifies lifetime of array in question.
-     *  @return            True if the array exists.
-     */
-    [[deprecated("Please use isRequired() on an instance and consider making the StoreArray a member of your class")]]
-    static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
-    {
-      std::string arrayName = DataStore::arrayName<T>(name);
-      return DataStore::Instance().requireInput(StoreAccessorBase(arrayName, durability, T::Class(), true));
-    }
-
-    /** Tell the data store about an optional input.
-     *
-     *  Mainly useful for creating diagrams of module inputs and outputs.
-     *
-     *
-     *  @warning Use discouraged, use isOptional() instead.
-     *  @param name        Name under which the TClonesArray is stored.
-     *  @param durability  Specifies lifetime of array in question.
-     *  @return            True if the array exists.
-     */
-    [[deprecated("Please use isOptional() on an instance and consider making the StoreArray a member of your class")]]
-    static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
-    {
-      std::string arrayName = DataStore::arrayName<T>(name);
-      return DataStore::Instance().optionalInput(StoreAccessorBase(arrayName, durability, T::Class(), true));
-    }
-
     /** Constructor to access an array in the DataStore.
      *
      *  @param name       Name under which the array is stored in the DataStore.

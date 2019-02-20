@@ -44,13 +44,13 @@ import json
 skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
 skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
 skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic   '
-skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
+skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 Charm3BodyHadronic'
 skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  '
-skims += 'CharmRare BtoXll BtoXgamma  TauLFV CharmRare Charm2BodyNeutrals2'
+skims += 'CharmRare BtoXll BtoXgamma  TauLFV  Charm2BodyNeutrals2 CharmlessHad2Body CharmlessHad3Body'
 skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1 Charm3BodyHadronic3   Charm2BodyNeutrals Charm2BodyNeutralsD0'
-
-bkgs = 'MC9_mixedBGx1  MC9_chargedBGx1 MC9_ccbarBGx1 MC9_ssbarBGx1 MC9_uubarBGx0  MC9_ddbarBGx1  MC9_taupairBGx1'
-bkgs += ' MC9_mixedBGx0 MC9_chargedBGx0 MC9_ccbarBGx0 MC9_ssbarBGx0 MC9_uubarBGx0 MC9_ddbarBGx0 MC9_taupairBGx0'
+skims += 'Charm2BodyHadronic Charm2BodyHadronicD0'
+bkgs = 'MC11_mixedBGx1  MC11_chargedBGx1 MC11_ccbarBGx1 MC11_ssbarBGx1 MC11_uubarBGx0  MC11_ddbarBGx1  MC11_taupairBGx1'
+bkgs += ' MC11_mixedBGx0 MC11_chargedBGx0 MC11_ccbarBGx0 MC11_ssbarBGx0 MC11_uubarBGx0 MC11_ddbarBGx0 MC11_taupairBGx0'
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
 jsonEvtSizeInput = open('JsonEvtSizeInput.txt', 'w')

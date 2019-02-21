@@ -47,7 +47,7 @@ ma.matchMCTruth(list_name='B0:jpsiks', path=cp_val_path)
 ma.buildRestOfEvent(target_list_name='B0:jpsiks', path=cp_val_path)
 
 # Get Special GT for the flavor tagger weight files
-b2.use_central_database("analysis_tools_release-03")
+b2.use_central_database("analysis_tools_release-03-01-00")
 
 # Flavor Tagger, Vertex of Signal Side and TagV
 ft.flavorTagger(

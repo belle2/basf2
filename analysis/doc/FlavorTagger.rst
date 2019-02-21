@@ -202,7 +202,7 @@ steering file right before calling the flavor tagger:
 +===========================+===========================================+
 | release-01-02-04          | analysis_AAT-parameters_release-01-02-03  |
 +---------------------------+-------------------------------------------+
-| release-03-01-00 or later | analysis_tools_release-03                 |
+| release-03-01-00 or later | analysis_tools_release-03-01-00           |
 +---------------------------+-------------------------------------------+
 
 Saving to nTuples

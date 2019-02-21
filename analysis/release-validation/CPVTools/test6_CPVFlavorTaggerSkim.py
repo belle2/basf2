@@ -79,7 +79,7 @@ ma.buildRestOfEvent(target_list_name='B0:sig', path=cp_val_path)
 ma.applyCuts(list_name='B0:sig', cut='abs(isRelatedRestOfEventB0Flavor) == 1', path=cp_val_path)
 
 # # Get Special GT for the flavor tagger weight files
-# b2.use_central_database("analysis_AAT-parameters_release-01-02-03")
+# b2.use_central_database("analysis_tools_release-03-01-00")
 #
 # # Flavor Tagger, Vertex of Signal Side and TagV
 # ft.flavorTagger(

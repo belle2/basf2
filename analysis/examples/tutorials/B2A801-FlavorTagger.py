@@ -109,7 +109,7 @@ ma.buildRestOfEvent(target_list_name='B0:sig',
 # https://b2-master.belle2.org/software/development/sphinx/analysis/doc/FlavorTagger.html
 # E.g. for release-03-01-00 and later versions
 
-b2.use_central_database("analysis_tools_release-03")
+b2.use_central_database("analysis_tools_release-03-01-00")
 
 # The default working directory is '.'
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.

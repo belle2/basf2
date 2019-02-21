@@ -71,4 +71,4 @@ discriminating variable.
 categories. It performs a ranking of variables. This script performs also tests to evaluate if the multivariate methods
 on which the flavorTagger depends are overtrained. 
 
-
+To understand the evaluation of the flavor tagger performance you can reed further in BELLE2-PTHESIS-2018-003.

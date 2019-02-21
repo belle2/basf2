@@ -64,6 +64,41 @@ namespace Belle2 {
       return counter;
     }
 
+    double MCGenPDG(const Particle*, const std::vector<double>& indexes)
+    {
+      int i = indexes[0];
+      StoreArray<MCParticle> mcParticles;
+      if (i < mcParticles.getEntries()) {
+        if (mcParticles[i]->getStatus(MCParticle::c_PrimaryParticle) && (!mcParticles[i]->getStatus(MCParticle::c_IsVirtual))
+            && (!mcParticles[i]->getStatus(MCParticle::c_Initial))) {
+          return mcParticles[i]->getPDG();
+        } else {
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double MCGenMothIndex(const Particle*, const std::vector<double>& indexes)
+    {
+      int i = indexes[0];
+      StoreArray<MCParticle> mcParticles;
+      MCParticle* mother;
+      if (i < mcParticles.getEntries()) {
+        if (mcParticles[i]->getStatus(MCParticle::c_PrimaryParticle) && (!mcParticles[i]->getStatus(MCParticle::c_IsVirtual))
+            && (!mcParticles[i]->getStatus(MCParticle::c_Initial))) {
+          mother = mcParticles[i]->getMother();
+          if (mother) return mother->getArrayIndex();
+          else return -1;
+        } else {
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
     double isAncestorOf(const Particle* part, const std::vector<double>& daughterIDs)
     {
       if (part == nullptr)
@@ -511,12 +546,25 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("ParameterFunctions");
-    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdgcode)", NumberOfMCParticlesInEvent , R"DOC(
+    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdgcode)", NumberOfMCParticlesInEvent, R"DOC(
                       Returns number of MC Particles (including anti-particles) with the given pdgcode in the event.
 
                       Used in the FEI to determine to calculate reconstruction efficiencies.
 
                       The variable is event-based and does not need a valid particle pointer as input.)DOC");
+    REGISTER_VARIABLE("MCGenPDG(index)", MCGenPDG, R"DOC(
+                      Returns PDG code of the MC generated particle with the given index in the event.
+
+                      In case the index is out of range, NaN will be returned.
+
+                      In cases the particle is initial, virtual or not primary, NaN will be returned as well.)DOC");
+    REGISTER_VARIABLE("MCGenMothIndex(index)", MCGenMothIndex, R"DOC(
+                      Returns mother index of the MC generated particle with the given index in the event.
+                      In case the index is out of range, NaN will be returned.
+
+                      In case the particle is initial, virtual or not primary, NaN will be returned as well.
+
+                      In case the mother of the particle is not found, -1 will be returned.)DOC");
     REGISTER_VARIABLE("isAncestorOf(i, j, ...)", isAncestorOf, R"DOC(
                       Returns a positive integer if daughter at position particle->daughter(i)->daughter(j)... is an ancestor of the related MC particle, 0 otherwise.
 

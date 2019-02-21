@@ -1323,6 +1323,14 @@ namespace Belle2 {
       /** Output datastore for unpacker **/
       StoreArray<TRGCDCT3DUnpackerStore> m_store;
 
+      //address of copper module
+      unsigned int m_copper_address;
+      unsigned int m_copper_ab;
+
+      //TSF module number
+      int m_T3DMOD;
+
+
     };
   }
 } // end namespace Belle2

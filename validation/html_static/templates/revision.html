@@ -1,17 +1,25 @@
 {{#revisions}}
 <div>
-	<!-- color will be update by the java script method loadValidationPlots -->
-	<div>
-	<input  class="reference-checkbox" name="revisions" 
-			id="reference-checkbox-{{label}}" 
-			value="{{label}}" checked="" 
-			type="checkbox">&nbsp;<label for="reference-checkbox-{{label}}" class="revision-label"
-		style="color: black;">{{ label }}</label>
-	</div>
-	<!-- show some extra information, but not for the reference plots -->
-	{{#if label != "reference" }}
-		<div class="revision-details">{{creation_date}} {{creation_timezone}} | <a class="revision-details-repo-link" href="https://stash.desy.de/projects/B2/repos/software/commits/{{git_hash}}">{{git_hash}}</a></div>
-	{{/if}}
+  <!-- color will be update by the java script method loadValidationPlots -->
+  <div>
+    <input  class="reference-checkbox" name="revisions"
+            id="reference-checkbox-{{label}}"
+            value="{{label}}" checked=""
+            type="checkbox">
+    &nbsp;
+    <label for="reference-checkbox-{{label}}" class="revision-label"
+           style="color: black;">{{ label }}
+    </label>
+  </div>
+  <!-- show some extra information, but not for the reference plots -->
+  {{#if label != "reference" }}
+  <div class="revision-details">{{creation_date}} {{creation_timezone}} | <a target="_blank" class="revision-details-repo-link" href="https://stash.desy.de/projects/B2/repos/software/commits/{{git_hash}}">{{git_hash}}</a></div>
+  {{/if}}
 </div>
 {{/revisions}}
-<button on-click='loadSelectedRevisions'>Load selected</button>
+<!-- actually this should be a div, but then this will be formatted by the
+div: last-child rule, so just make it a span and give it the corresponding
+CSS properties -->
+<span id="button-revision-load-container">
+	<button id="button-revision-load" on-click='loadSelectedRevisions'>Load selected</button>
+</span>

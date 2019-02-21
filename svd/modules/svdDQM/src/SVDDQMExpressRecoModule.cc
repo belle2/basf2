@@ -153,6 +153,8 @@ void SVDDQMExpressRecoModule::defineHisto()
 
   m_clusterChargeU = new TH1F*[nSVDSensors];
   m_clusterChargeV = new TH1F*[nSVDSensors];
+  m_clusterSNRU = new TH1F*[nSVDSensors];
+  m_clusterSNRV = new TH1F*[nSVDSensors];
   m_stripSignalU = new TH1F*[nSVDSensors];
   m_stripSignalV = new TH1F*[nSVDSensors];
   m_stripCountU = new TH1F*[nSVDSensors];
@@ -164,6 +166,8 @@ void SVDDQMExpressRecoModule::defineHisto()
 
   int ChargeBins = 80;
   float ChargeMax = 80;
+  int SNRBins = 50;
+  float SNRMax = 100;
   int TimeBins = 50;
   float TimeMin = -100;
   float TimeMax = 100;
@@ -180,6 +184,20 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_clusterChargeVAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
   m_clusterChargeVAll->GetXaxis()->SetTitle("charge of v clusters [ke-]");
   m_clusterChargeVAll->GetYaxis()->SetTitle("count");
+
+  //----------------------------------------------------------------
+  // Charge SNR of clusters for all sensors
+  //----------------------------------------------------------------
+  name = str(format("DQMER_SVD_ClusterSNRUAll"));
+  title = str(format("DQM ER SVD Cluster SNR in U for all sensors"));
+  m_clusterSNRUAll = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);  // max = ~ 60
+  m_clusterSNRUAll->GetXaxis()->SetTitle("cluster SNR in u");
+  m_clusterSNRUAll->GetYaxis()->SetTitle("count");
+  name = str(format("DQMER_SVD_ClusterSNRVAll"));
+  title = str(format("DQM ER SVD Cluster SNR in V for all sensors"));
+  m_clusterSNRVAll = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRVAll->GetXaxis()->SetTitle("cluster SNR in v");
+  m_clusterSNRVAll->GetYaxis()->SetTitle("count");
 
   //----------------------------------------------------------------
   // Cluster time distribution for all sensors
@@ -242,6 +260,19 @@ void SVDDQMExpressRecoModule::defineHisto()
     m_clusterChargeV[i] = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
     m_clusterChargeV[i]->GetXaxis()->SetTitle("charge of v clusters [ke-]");
     m_clusterChargeV[i]->GetYaxis()->SetTitle("count");
+    //----------------------------------------------------------------
+    // SNR of clusters
+    //----------------------------------------------------------------
+    name = str(format("DQMER_SVD_%1%_ClusterSNRU") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Cluster SNR in U") % sensorDescr);
+    m_clusterSNRU[i] = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+    m_clusterSNRU[i]->GetXaxis()->SetTitle("cluster SNR in u");
+    m_clusterSNRU[i]->GetYaxis()->SetTitle("count");
+    name = str(format("DQMER_SVD_%1%_ClusterSNRV") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Cluster SNR in V") % sensorDescr);
+    m_clusterSNRV[i] = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+    m_clusterSNRV[i]->GetXaxis()->SetTitle("cluster SNR in v");
+    m_clusterSNRV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Charge of strips
     //----------------------------------------------------------------
@@ -440,6 +471,8 @@ void SVDDQMExpressRecoModule::beginRun()
   */
   if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Reset();
   if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Reset();
+  if (m_clusterSNRUAll != NULL) m_clusterSNRUAll->Reset();
+  if (m_clusterSNRVAll != NULL) m_clusterSNRVAll->Reset();
   if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Reset();
   if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Reset();
   for (int i = 0; i < gTools->getNumberOfSVDSensors(); i++) {
@@ -449,6 +482,8 @@ void SVDDQMExpressRecoModule::beginRun()
     if (m_clustersV[i] != NULL) m_clustersV[i]->Reset();
     if (m_clusterChargeU[i] != NULL) m_clusterChargeU[i]->Reset();
     if (m_clusterChargeV[i] != NULL) m_clusterChargeV[i]->Reset();
+    if (m_clusterSNRU[i] != NULL) m_clusterSNRU[i]->Reset();
+    if (m_clusterSNRV[i] != NULL) m_clusterSNRV[i]->Reset();
     if (m_stripSignalU[i] != NULL) m_stripSignalU[i]->Reset();
     if (m_stripSignalV[i] != NULL) m_stripSignalV[i]->Reset();
     if (m_stripCountU[i] != NULL) m_stripCountU[i]->Reset();
@@ -606,7 +641,9 @@ void SVDDQMExpressRecoModule::event()
       if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Fill(index);
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterSNRU[index] != NULL) m_clusterSNRU[index]->Fill(cluster.getSNR());
       if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterSNRUAll != NULL) m_clusterSNRUAll->Fill(cluster.getSNR());
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
       if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
       if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Fill(cluster.getClsTime());
@@ -622,7 +659,9 @@ void SVDDQMExpressRecoModule::event()
       if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Fill(index);
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterSNRV[index] != NULL) m_clusterSNRV[index]->Fill(cluster.getSNR());
       if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterSNRVAll != NULL) m_clusterSNRVAll->Fill(cluster.getSNR());
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
       if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(cluster.getClsTime());
       if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Fill(cluster.getClsTime());

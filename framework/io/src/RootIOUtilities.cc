@@ -13,10 +13,6 @@
 
 #include <wordexp.h>
 
-#include <algorithm>
-
-
-using namespace std;
 using namespace Belle2;
 
 const std::string RootIOUtilities::c_treeNames[] = { "tree", "persistent" };
@@ -25,24 +21,25 @@ const std::string RootIOUtilities::c_SteerExcludeBranchNames[] = { "excludeBranc
 const std::string RootIOUtilities::c_SteerAdditionalBranchNames[] = { "additionalBranchNames", "additionalBranchNamesPersistent" };
 
 std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string>& branchesToFilter,
-                                                      const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability)
+                                                      const std::vector<std::string>& branches,
+                                                      const std::vector<std::string>& excludeBranches, int durability, bool quiet)
 {
-  set<string> branchSet, excludeBranchSet;
-  for (string b : branches) {
-    if (branchesToFilter.count(b) == 0)
+  std::set<std::string> branchSet, excludeBranchSet;
+  for (std::string b : branches) {
+    if (branchesToFilter.count(b) == 0 and not quiet)
       B2WARNING("The branch " << b << " given in " << c_SteerBranchNames[durability] << " does not exist.");
-    if (!branchSet.insert(b).second)
+    if (!branchSet.insert(b).second and not quiet)
       B2WARNING(c_SteerBranchNames[durability] << " has duplicate entry " << b);
   }
-  for (string b : excludeBranches) {
-    if (branchesToFilter.count(b) == 0)
+  for (std::string b : excludeBranches) {
+    if (branchesToFilter.count(b) == 0 and not quiet)
       B2INFO("The branch " << b << " given in " << c_SteerExcludeBranchNames[durability] << " does not exist.");
-    if (!excludeBranchSet.insert(b).second)
+    if (!excludeBranchSet.insert(b).second and not quiet)
       B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);
   }
 
-  set<string> out, relations, excluderelations;
-  for (string branch : branchesToFilter) {
+  std::set<std::string> out, relations, excluderelations;
+  for (std::string branch : branchesToFilter) {
     if (excludeBranchSet.count(branch))
       continue;
     if (branchSet.empty() or branchSet.count(branch))
@@ -50,9 +47,9 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
   }
   if (!excludeBranchSet.empty()) {
     //remove relations for excluded things
-    for (string from : branchesToFilter) {
-      for (string to : branchesToFilter) {
-        string branch = DataStore::relationName(from, to);
+    for (std::string from : branchesToFilter) {
+      for (std::string to : branchesToFilter) {
+        std::string branch = DataStore::relationName(from, to);
         if (out.count(branch) == 0)
           continue; //not selected
         if (excludeBranchSet.count(from) == 0 and excludeBranchSet.count(to) == 0)
@@ -62,14 +59,14 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
         excluderelations.insert(branch);
       }
     }
-    for (string rel : excluderelations) {
+    for (std::string rel : excluderelations) {
       out.erase(rel);
     }
   }
   //add relations between accepted branches
-  for (string from : out) {
-    for (string to : out) {
-      string branch = DataStore::relationName(from, to);
+  for (std::string from : out) {
+    for (std::string to : out) {
+      std::string branch = DataStore::relationName(from, to);
       if (branchesToFilter.count(branch) == 0)
         continue; //not in input
       if (excludeBranchSet.count(branch))
@@ -83,10 +80,10 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
 
 std::vector<std::string> RootIOUtilities::expandWordExpansions(const std::vector<std::string>& filenames)
 {
-  vector<string> out;
+  std::vector<std::string> out;
   wordexp_t expansions;
   wordexp("", &expansions, 0);
-  for (const string& pattern : filenames) {
+  for (const std::string& pattern : filenames) {
     if (wordexp(pattern.c_str(), &expansions, WRDE_APPEND | WRDE_NOCMD | WRDE_UNDEF) != 0) {
       B2ERROR("Failed to expand pattern '" << pattern << "'!");
     }
@@ -155,7 +152,7 @@ void RootIOUtilities::setCreationData(FileMetaData& metadata)
 {
   std::string site;
   char date[100];
-  auto now = time(0);
+  auto now = time(nullptr);
   strftime(date, 100, "%Y-%m-%d %H:%M:%S", gmtime(&now));
   const char* belle2_site = getenv("BELLE2_SITE");
   if (belle2_site) {

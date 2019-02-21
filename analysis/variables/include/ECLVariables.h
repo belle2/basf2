@@ -385,5 +385,10 @@ namespace Belle2 {
      */
     double eclTCIsMaximumForCluster(const Particle* particle);
 
+    /**
+     * Returns cluster mdst array index
+     */
+    double eclClusterMdstIndex(const Particle* particle);
+
   }
 } // Belle2 namespace

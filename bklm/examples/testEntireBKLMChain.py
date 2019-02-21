@@ -71,7 +71,8 @@ main.add_module(reco)
 
 # Add the self-tracking
 main.add_module('BKLMTracking',
-                StudyEffiMode=0)
+                StudyEffiMode=True,
+                outputName='bklmEfficiency_test.root')
 
 # Save the dataobjects in a .root output
 main.add_module('RootOutput',

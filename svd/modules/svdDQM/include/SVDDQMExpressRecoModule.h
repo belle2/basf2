@@ -103,6 +103,14 @@ namespace Belle2 {
     TH1F* m_clusterChargeUAll = nullptr;
     /** v charge of clusters for all sensors */
     TH1F* m_clusterChargeVAll = nullptr;
+    /** u SNR of clusters per sensor */
+    TH1F** m_clusterSNRU = nullptr;
+    /** v SNR of clusters per sensor */
+    TH1F** m_clusterSNRV = nullptr;
+    /** u SNR of clusters for all sensors */
+    TH1F* m_clusterSNRUAll = nullptr;
+    /** v SNR of clusters for all sensors */
+    TH1F* m_clusterSNRVAll = nullptr;
     /** u charge of strips */
     TH1F** m_stripSignalU = nullptr;
     /** v charge of strips */

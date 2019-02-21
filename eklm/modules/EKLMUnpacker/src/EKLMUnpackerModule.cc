@@ -234,9 +234,9 @@ void EKLMUnpackerModule::event()
             if (channelData == nullptr)
               B2FATAL("Incomplete EKLM channel data.");
             if (charge < channelData->getThreshold())
-              eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+              eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
             else
-              eklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
+              eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
           }
         }
       }

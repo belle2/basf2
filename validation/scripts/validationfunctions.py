@@ -11,6 +11,7 @@ import argparse
 import glob
 import os
 import subprocess
+import sys
 import time
 
 # 3rd party
@@ -216,6 +217,7 @@ def get_argument_parser(modes=None):
              "actually executing thesteering files (for debugging purposes).",
         action='store_true'
     )
+    # todo: use the options keyword here?
     parser.add_argument(
         "-m",
         "--mode",
@@ -509,12 +511,29 @@ def congratulator(success=None, failure=None, total=None, just_comment=False,
         Comment on your success rate (str).
     """
 
-    if not total:
-        total = success + failure
-    if not failure:
-        failure = total - success
-    if not success:
-        success = total - failure
+    n_nones = [success, failure, total].count(None)
+
+    if n_nones == 0 and total != success + failure:
+        print(
+            "ERROR (congratulator): Specify 2 of the arguments 'success',"
+            "'failure', 'total'.",
+            file=sys.stderr
+        )
+        return ""
+    elif n_nones >= 2:
+        print(
+            "ERROR (congratulator): Specify 2 of the arguments 'success',"
+            "'failure', 'total'.",
+            file=sys.stderr
+        )
+        return ""
+    else:
+        if total is None:
+            total = success + failure
+        if failure is None:
+            failure = total - success
+        if success is None:
+            success = total - failure
 
     # Beware of zero division errors.
     if total == 0:

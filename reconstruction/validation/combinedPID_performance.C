@@ -1,7 +1,7 @@
 /*
 <header>
   <input>CombinedPIDPerformance.root</input>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jvbennet@olemiss.edu</contact>
   <description>Check PID performance</description>
   <interval>release</interval>
 </header>
@@ -56,43 +56,43 @@ void combinedPID_performance(){
   // write out efficiencies
   epi->GetListOfFunctions()->Add(new TNamed("Description", epi->GetTitle()));
   epi->GetListOfFunctions()->Add(new TNamed("Check", "Should be as high as possible"));
-  epi->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  epi->GetListOfFunctions()->Add(new TNamed("Contact","jvbennet@olemiss.edu"));
   epi->Write();
 
   ek->GetListOfFunctions()->Add(new TNamed("Description", epi->GetTitle()));
   ek->GetListOfFunctions()->Add(new TNamed("Check", "Should be as high as possible"));
-  ek->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  ek->GetListOfFunctions()->Add(new TNamed("Contact","jvbennet@olemiss.edu"));
   ek->Write();
 
   ep->GetListOfFunctions()->Add(new TNamed("Description", epi->GetTitle()));
   ep->GetListOfFunctions()->Add(new TNamed("Check", "Should be as high as possible"));
-  ep->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  ep->GetListOfFunctions()->Add(new TNamed("Contact","jvbennet@olemiss.edu"));
   ep->Write();
 
   epk->GetListOfFunctions()->Add(new TNamed("Description", epi->GetTitle()));
   epk->GetListOfFunctions()->Add(new TNamed("Check", "Should be as high as possible"));
-  epk->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  epk->GetListOfFunctions()->Add(new TNamed("Contact","jvbennet@olemiss.edu"));
   epk->Write();
 
   // write out fake rates
   fpi->GetListOfFunctions()->Add(new TNamed("Description", epi->GetTitle()));
   fpi->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible"));
-  fpi->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  fpi->GetListOfFunctions()->Add(new TNamed("Contact","jvbennet@olemiss.edu"));
   fpi->Write();
 
   fk->GetListOfFunctions()->Add(new TNamed("Description", epi->GetTitle()));
   fk->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible"));
-  fk->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  fk->GetListOfFunctions()->Add(new TNamed("Contact","jvbennet@olemiss.edu"));
   fk->Write();
 
   fp->GetListOfFunctions()->Add(new TNamed("Description", epi->GetTitle()));
   fp->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible"));
-  fp->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  fp->GetListOfFunctions()->Add(new TNamed("Contact","jvbennet@olemiss.edu"));
   fp->Write();
 
   fpk->GetListOfFunctions()->Add(new TNamed("Description", epi->GetTitle()));
   fpk->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible"));
-  fpk->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  fpk->GetListOfFunctions()->Add(new TNamed("Contact","jvbennet@olemiss.edu"));
   fpk->Write();
 
   outfile->Close();

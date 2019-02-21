@@ -39,7 +39,7 @@ stdK('all', path=myAna_Main)
 stdE('all', path=myAna_Main)
 
 
-m skim.charm import DstToD0PiD0ToHpJm
+from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(myAna_Main)
 
 skimOutputUdst('WG6_DstToD0ToKpi', DstToD0PiD0ToHpJmList, path=myAna_Main)

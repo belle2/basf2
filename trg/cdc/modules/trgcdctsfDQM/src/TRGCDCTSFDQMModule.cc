@@ -58,14 +58,16 @@ void TRGCDCTSFDQMModule::defineHisto()
 {
   oldDir = gDirectory;
   dirDQM = NULL;
-  dirDQM = oldDir->mkdir("TRGCDCTSF");
+  //dirDQM = oldDir->mkdir("TRGCDCTSF");
+  if (!oldDir->Get("TRGCDCTSF"))dirDQM = oldDir->mkdir("TRGCDCTSF");
+  else dirDQM = (TDirectory*)oldDir->Get("TRGCDCTSF");
   dirDQM->cd();
   //Total number of TSF hits per event in each superlayer
-  h_nhit = new TH1I("hCDCTSF_nhit", "nhit", 10, 0, 10);
+  h_nhit = new TH1I(Form("hCDCTSF_nhit_mod%d", m_TSFMOD), Form("nhit_mod%d", m_TSFMOD), 10, 0, 10);
   h_nhit->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
   h_nhit->GetXaxis()->SetTitle("Total number of TSF hits/event");
   //Total number of hits in each TSF
-  h_nhit_tsf = new TH1I("hCDCTSF_nhit_tsf", "nhit_tsf", 200, 0, 200);
+  h_nhit_tsf = new TH1I(Form("hCDCTSF_nhit_tsf_mod%d", m_TSFMOD), Form("nhit_tsf_mod%d", m_TSFMOD), 200, 0, 200);
   h_nhit_tsf->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
   h_nhit_tsf->GetXaxis()->SetTitle("TSF ID");
   h_nhit_tsf->GetYaxis()->SetTitle("Total number of hits");
@@ -91,6 +93,11 @@ void TRGCDCTSFDQMModule::initialize()
   _run = bevt->getRun();
   REG_HISTOGRAM
   defineHisto();
+
+  char c_name[100];
+  sprintf(c_name, "TRGCDCTSFUnpackerStore%d", m_TSFMOD);
+  entAry.isRequired(c_name);
+  if (!entAry || !entAry.getEntries()) return;
 
 }
 
@@ -125,8 +132,6 @@ void TRGCDCTSFDQMModule::event()
 
   dirDQM->cd();
 
-  StoreArray<TRGCDCTSFUnpackerStore> entAry;
-  if (!entAry || !entAry.getEntries()) return;
 
   //Fill
   int nhit = 0;

@@ -391,7 +391,7 @@ def pretty_print_module(module, module_name, replacements={}):
             occurence of any key in the function signature will be replaced by
             its value
     """
-    from pager import Pager
+    from terminal_utils import Pager
     desc_list = []
 
     # allow mod to be just the name of the module

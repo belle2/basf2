@@ -181,7 +181,7 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[40;97m          ___       __ |  y     , ..,     \033[97;40mThank you for using TreeFitter.       \033[0m");
   B2INFO("\033[40;97m         /)'\\    ''''| u  \\ %W%W%%;                                             \033[0m");
   B2INFO("\033[40;97m     ___)/   \"---\\_ \\   |____”            \033[97;40mCite:                                 \033[0m");
-  B2INFO("\033[40;97m   ;&&%%;           (|__.|)./  ,..,           \033[97;40m(paper here)                      \033[0m");
+  B2INFO("\033[40;97m   ;&&%%;           (|__.|)./  ,..,           \033[97;40mhttps://arxiv.org/abs/1901.11198  \033[0m");
   B2INFO("\033[40;97m             ,.., ___\\    |/     &&\"                                            \033[0m");
   B2INFO("\033[40;97m           &&%%&    (| Uo /        '\"     \033[97;40mEmail:                                \033[0m");
   B2INFO("\033[40;97m            ''''     \\ 7 \\                   \033[97;40mfrancesco.tenchini@desy.de         \033[0m");

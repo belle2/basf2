@@ -119,7 +119,7 @@ namespace Belle2 {
 
     /** set the hit collection and event time to required
      * and store the hit collection name */
-    void initializeCollections(std::string hitCollectionName, std::string eventTimeName);
+    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, bool alwaysTrackT0 = false);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -162,7 +162,7 @@ namespace Belle2 {
      * If there is no valid event time, it can be determined
      * from the shortest priority time of all hit candidates,
      * if the option is enabled for the given sector. */
-    void getEventTime(unsigned isector, const CDCTriggerTrack& track);
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track, bool alwaysTrackT0 = false);
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input

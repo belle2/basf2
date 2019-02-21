@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from softwaretrigger.hltdqm import standard_hltdqm
 from analysisDQM import add_analysis_dqm
 
 
@@ -47,7 +46,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
 
     if dqm_environment == "hlt":
         # HLT
-        standard_hltdqm(path)
+        path.add_module("SoftwareTriggerHLTDQM")
+        path.add_module("StatisticsTimingHLTDQM")
+
         # SVD DATA FORMAT
         if components is None or 'SVD' in components:
             svdunpackerdqm = register_module('SVDUnpackerDQM')

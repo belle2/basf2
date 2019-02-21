@@ -9,7 +9,8 @@ import generators
 from simulation import add_simulation
 from rawdata import add_packers
 from L1trigger import add_tsim
-from softwaretrigger.path_functions import DEFAULT_EXPRESSRECO_COMPONENTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
+from softwaretrigger import constants
+from softwaretrigger.constants import DEFAULT_EXPRESSRECO_COMPONENTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 from ROOT import Belle2
 find_file = Belle2.FileSystem.findFile
 
@@ -49,9 +50,9 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     path = basf2.Path()
     path.add_module('EventInfoSetter', evtNumList=[1], expList=[exp_number])
 
-    if run_type == "beam":
+    if run_type == constants.RunTypes.beam:
         generators.add_continuum_generator(path, finalstate="uubar")
-    elif run_type == "cosmic":
+    elif run_type == constants.RunTypes.cosmic:
         # add something which looks a tiny bit like a cosmic generator. We
         # cannot use the normal cosmic generator as that needs a bigger
         # simulation top volume than the default geometry from the database.
@@ -60,9 +61,9 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     add_simulation(path, usePXDDataReduction=(location == "expressreco"))
     add_tsim(path)
 
-    if location == "hlt":
+    if location == constants.Location.hlt:
         components = DEFAULT_HLT_COMPONENTS
-    elif location == "expressreco":
+    elif location == constants.Location.expressreco:
         components = DEFAULT_EXPRESSRECO_COMPONENTS
     else:
         basf2.B2FATAL("Location {} for test is not supported".format(location))
@@ -73,7 +74,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
 
     # remove everything but HLT input raw objects
     branch_names = RAWDATA_OBJECTS + ["EventMetaData", "TRGSummary"]
-    if location == "hlt":
+    if location == constants.Location.hlt:
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")
 

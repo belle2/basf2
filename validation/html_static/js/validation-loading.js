@@ -126,6 +126,7 @@ function setDefaultPrebuildOption(){
     if (mode == null){
         mode = "rbn";
     }
+    // todo: check if this is an allowed mode, else discard!
     $("#prebuilt-select").val(mode);
     return mode;
 }
@@ -668,14 +669,14 @@ function selectedRevsListToString(selectedRevs) {
 
 /**
  * Return the newest revision that is included in the dataset.
- * @param rev_data
+ * @param revData
  * @return {*}
  */
-function getNewestRevision(rev_data) {
+function getNewestRevision(revData) {
     let newest = null;
     // deliberately super early date
     let newestData = "2000-00-00 00:00:00";
-    let revList = rev_data["revisions"];
+    let revList = revData["revisions"];
 
     for (let i in revList) {
         if (revList[i]["label"] !== "reference") {
@@ -725,7 +726,8 @@ function renderLatex(force=false, irepeat=0) {
     // perhaps because we're missing some calls to renderLatex. So we always
     // check if the last _renderLatex call typeset new elements, and if it does
     // we wait for 1s and try again.
-    if (newElements && irepeat < 15){
+    // In either way we try at least 3 times.
+    if (irepeat < 3 || (newElements && irepeat < 15)){
         return setTimeout(() => renderLatex(force=true, irepeat=irepeat+1), 1000)
     }
 

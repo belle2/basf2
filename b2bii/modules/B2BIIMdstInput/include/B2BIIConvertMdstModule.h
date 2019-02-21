@@ -127,7 +127,7 @@ namespace Belle2 {
 
     //! flag that tells which form of covariance matrix should be used in the conversion of charged tracks
     // true = use 6x6 (position, momentum) covariance matrix
-    // false = use 5x5 (helix parameters) covaraince matrix
+    // false = use 5x5 (helix parameters) covariance matrix
     bool m_use6x6CovarianceMatrix4Tracks;
 
     //! MC matching mode.
@@ -135,6 +135,10 @@ namespace Belle2 {
 
     //! C matching mode.
     MCMatchingMode m_mcMatchingMode;
+
+    bool m_convertECLCrystalEnergies; /**< Flag to switch on conversion of Datecl_mc_ehits objects into ECLHits */
+
+    bool m_convertExtHits; /**< Flag to switch on conversion of Mdst_ecl_trk into ExtHits */
 
     //! variable to tell us which IPProfile bin was active last time we looked
     int m_lastIPProfileBin{ -1};
@@ -305,7 +309,7 @@ namespace Belle2 {
     /** maps Belle hypotheses to Const::ChargedStable (from http://belle.kek.jp/secured/wiki/doku.php?id=software:atc_pid). */
     const static Const::ChargedStable c_belleHyp_to_chargedStable[c_nHyp];
 
-    /** Add given Belle likelihoods (not log-likelihoods, in Belle hypothethis order) for given detector to pid. */
+    /** Add given Belle likelihoods (not log-likelihoods, in Belle hypothesis order) for given detector to pid. */
     void setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp], bool discard_allzero = false);
 
 #ifdef HAVE_KID_ACC
@@ -315,7 +319,7 @@ namespace Belle2 {
     double cdc_pid(const Belle::Mdst_charged& chg, int idp);
 #endif
 
-    /* calcualtes atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
+    /* calculates atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
     double atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp);
 
     //-----------------------------------------------------------------------------
@@ -378,7 +382,7 @@ namespace Belle2 {
     /** V0-particles. */
     StoreArray<V0> m_v0s;
 
-    /** Partciles. */
+    /** Particles. */
     StoreArray<Particle> m_particles;
 
     /** output PIDLikelihood array. */

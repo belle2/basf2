@@ -160,6 +160,9 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module()
   addParam("mcMatchingMode", m_mcMatchingModeString,
            "MC matching mode: 'Direct', or 'GeneratorLevel'",
            std::string("Direct"));
+  addParam("convertECLCrystalEnergies", m_convertECLCrystalEnergies, "Flag to switch on conversion of Datecl_mc_ehits into ECLHits",
+           false);
+  addParam("convertExtHits", m_convertExtHits, "Flag to switch on conversion of Mdst_ecl_trk into ExtHits", false);
 
   m_realData = false;
 
@@ -195,8 +198,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
   m_trackFitResults.registerInDataStore();
   m_v0s.registerInDataStore();
   m_particles.registerInDataStore();
-  m_eclHits.registerInDataStore();
-  m_extHits.registerInDataStore();
+  if (m_convertECLCrystalEnergies) m_eclHits.registerInDataStore();
+  if (m_convertExtHits) m_extHits.registerInDataStore();
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
@@ -224,7 +227,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   //list here all Relations between Belle2 objects
   m_tracks.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_pidLikelihoods);
-  m_tracks.registerRelationTo(m_extHits);
+  if (m_convertExtHits) m_tracks.registerRelationTo(m_extHits);
   m_eclClusters.registerRelationTo(m_mcParticles);
   m_eclClusters.registerRelationTo(m_tracks);
   m_klmClusters.registerRelationTo(m_tracks);
@@ -329,10 +332,10 @@ void B2BIIConvertMdstModule::event()
   convertMdstKLongTable();
 
   // 11. Convert ECL crystal energy
-  convertECLHitTable();
+  if (m_convertECLCrystalEnergies) convertECLHitTable();
 
   // 12. Convert ExtHit information and set Track -> ExtHit relations
-  convertExtHitTable();
+  if (m_convertExtHits) convertExtHitTable();
 }
 
 

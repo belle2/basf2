@@ -196,6 +196,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   m_v0s.registerInDataStore();
   m_particles.registerInDataStore();
   m_eclHits.registerInDataStore();
+  m_extHits.registerInDataStore();
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
@@ -223,6 +224,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   //list here all Relations between Belle2 objects
   m_tracks.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_pidLikelihoods);
+  m_tracks.registerRelationTo(m_extHits);
   m_eclClusters.registerRelationTo(m_mcParticles);
   m_eclClusters.registerRelationTo(m_tracks);
   m_klmClusters.registerRelationTo(m_tracks);
@@ -328,6 +330,9 @@ void B2BIIConvertMdstModule::event()
 
   // 11. Convert ECL crystal energy
   convertECLHitTable();
+
+  // 12. Convert ExtHit information and set Track -> ExtHit relations
+  convertExtHitTable();
 }
 
 
@@ -765,7 +770,6 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         newV0->addExtraInfo("ksnbStandard", ksnb.standard());
     }
   }
-
 }
 
 void B2BIIConvertMdstModule::convertGenHepEvtTable()
@@ -936,7 +940,6 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
   }
 }
 
-
 void B2BIIConvertMdstModule::convertMdstKLMTable()
 {
   // There was no MC matching in Belle for KLM Clusters
@@ -962,7 +965,6 @@ void B2BIIConvertMdstModule::convertMdstKLMTable()
 
   }
 }
-
 
 void B2BIIConvertMdstModule::convertMdstGammaTable()
 {
@@ -1010,7 +1012,6 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
       B2Gamma->addRelationTo(matchedMCParticle);
   }
 }
-
 
 void B2BIIConvertMdstModule::convertMdstPi0Table()
 {
@@ -1133,7 +1134,6 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
       }
     }
   }
-
 }
 
 void B2BIIConvertMdstModule::convertECLHitTable()
@@ -1158,6 +1158,51 @@ void B2BIIConvertMdstModule::convertECLHitTable()
 
     // Convert Datecl_mc_ehit -> ECLHit
     convertECLHitObject(datECLMCEHit, B2EclHit);
+  }
+}
+
+void B2BIIConvertMdstModule::convertExtHitTable()
+{
+  Belle::Mdst_ecl_trk_Manager& eclTrkMgr = Belle::Mdst_ecl_trk_Manager::get_manager();
+  // check if the Mdst_ecl_trk table has any entries
+  if (eclTrkMgr.count() == 0) {
+    return;
+  }
+
+  Belle::Mdst_charged_Manager& chgMg = Belle::Mdst_charged_Manager::get_manager();
+
+  // Relations
+  RelationArray tracksToExtHits(m_tracks, m_extHits);
+
+  // Loop over all Belle Mdst_ecl_trk
+  for (Belle::Mdst_ecl_trk_Manager::iterator ecltrkIterator = eclTrkMgr.begin(); ecltrkIterator != eclTrkMgr.end();
+       ++ecltrkIterator) {
+
+    // Pull Mdst_ecl_trk from manager
+    Belle::Mdst_ecl_trk mdstECLTrk = *ecltrkIterator;
+
+    // Create Belle II ExtHit
+    auto B2ExtHit = m_extHits.appendNew();
+
+    // Convert Mdst_ecl_trk -> ExtHit
+    convertExtHitObject(mdstECLTrk, B2ExtHit);
+
+    // Set relation between track and ExtHit
+    Belle::Mdst_trk mTRK = mdstECLTrk.trk();
+
+    // the numbering in mdst_charged is
+    // not necessarily the same as in mdst_trk
+    // therefore we have to find the corresponding mdst_charged
+    for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); chgIterator++) {
+      Belle::Mdst_charged mChar = *chgIterator;
+      Belle::Mdst_trk mTRK_in_charged = mChar.trk();
+
+      if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
+        // found the correct  mdst_charged
+        tracksToExtHits.add(mChar.get_ID() - 1, m_extHits.getEntries() - 1, 1.0);
+        break;
+      }
+    }
   }
 }
 
@@ -1222,7 +1267,6 @@ void B2BIIConvertMdstModule::setLikelihoods(PIDLikelihood* pid, Const::EDetector
   //copy proton likelihood to deuterons
   pid->setLogLikelihood(det, Const::deuteron, pid->getLogL(Const::proton, det));
 }
-
 
 void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track)
 {
@@ -1462,7 +1506,6 @@ void B2BIIConvertMdstModule::convertHelix(const Belle::Mdst_trk_fit& trk_fit,
   for (unsigned int i = 0; i < size; i++)
     for (unsigned int j = i; j < size; j++)
       helixError[counter++] = error5x5[i][j];
-
 }
 
 void B2BIIConvertMdstModule::convertHelix(Belle::Helix& helix, std::vector<float>& helixParams, CLHEP::HepSymMatrix& error5x5)
@@ -1561,7 +1604,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     unsigned short uHits;
     unsigned short vHits;
     unsigned short svdLayers;
-// taken from: http://belle.kek.jp/group/indirectcp/cpfit/cpfit-festa/2004/talks/Apr.14/CPfesta-2005-Higuchi(3).pdf
+    // taken from: http://belle.kek.jp/group/indirectcp/cpfit/cpfit-festa/2004/talks/Apr.14/CPfesta-2005-Higuchi(3).pdf
     StoreObjPtr<EventMetaData> event;
     // mask for the rphi hits, first 6 (8) bits/ 2 bits per layer
     std::bitset<32> svdUMask(static_cast<std::string>("00000000000000000000000000000011"));
@@ -1704,13 +1747,11 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   eclCluster->setNumberOfCrystals(eclAux.nhits());
 }
 
-
 void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster& klm_cluster, KLMCluster* klmCluster)
 {
   // note: Belle quality flag is not saved (no free int variable in Belle2 KLMCluster)
   klmCluster->setLayers(klm_cluster.layers());
   klmCluster->setInnermostLayer(klm_cluster.first_layer());
-
 }
 
 void B2BIIConvertMdstModule::convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit)
@@ -1719,6 +1760,22 @@ void B2BIIConvertMdstModule::convertECLHitObject(const Belle::Datecl_mc_ehits& e
   eclHit->setCellId(ecl_mc_ehit.cId());
   eclHit->setEnergyDep(ecl_mc_ehit.energy());
 }
+
+void B2BIIConvertMdstModule::convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_trk_hit, ExtHit* extHit)
+{
+  extHit->setPDGCode(Const::pion.getPDGCode()); // always set Pion
+  extHit->setDetectorID(Const::EDetector::ECL);
+  extHit->setCopyID(ecl_trk_hit.cId());
+  extHit->setStatus(EXT_ENTER);
+  extHit->setPosition(TVector3(ecl_trk_hit.x(0), ecl_trk_hit.x(1), ecl_trk_hit.x(2)));
+  extHit->setMomentum(TVector3(ecl_trk_hit.p(0), ecl_trk_hit.p(1), ecl_trk_hit.p(2)));
+  double covarianceMatrix[21];
+  for (int i = 0; i < 21; ++i) {
+    covarianceMatrix[i] = ecl_trk_hit.error(i);
+  }
+  extHit->setCovariance(covarianceMatrix);
+}
+
 
 //-----------------------------------------------------------------------------
 // RELATIONS

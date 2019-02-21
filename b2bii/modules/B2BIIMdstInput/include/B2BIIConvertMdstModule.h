@@ -34,13 +34,13 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <framework/dbobjects/BeamParameters.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Const.h>
-
-#include <ecl/dataobjects/ECLHit.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/LorentzVector.h"
@@ -189,6 +189,11 @@ namespace Belle2 {
      */
     void convertECLHitTable();
 
+    /**
+     * Reads and converts all entries of Mdst_ecl_trk Panther table to ExtHit dataobjects and adds them to StoreArray<ExtHit>.
+     */
+    void convertExtHitTable();
+
     /** Stores beam parameters (energy, angles) in BeamParameters (currently in the DataStore). */
     void convertBeamEnergy();
 
@@ -226,6 +231,11 @@ namespace Belle2 {
      * Converts Datecl_mc_ehits record to ECLHit object.
      */
     void convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit);
+
+    /**
+     * Converts Mdst_ecl_trk record to ExtHit object.
+     */
+    void convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_trk_hit, ExtHit* extHit);
 
     /**
      * Creates TrackFitResult and fills it.
@@ -317,7 +327,6 @@ namespace Belle2 {
      */
     void setECLClustersToTracksRelations();
 
-
     /**
      * Sets KLMCluster -> Track and ECLCluster relations
      */
@@ -377,6 +386,9 @@ namespace Belle2 {
 
     /** ECL hits */
     StoreArray<ECLHit> m_eclHits;
+
+    /** Ext hits */
+    StoreArray<ExtHit> m_extHits;
 
     /** BeamParameters */
     DBObjPtr<BeamParameters> m_beamParamsDB;

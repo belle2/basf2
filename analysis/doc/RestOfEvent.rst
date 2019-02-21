@@ -117,6 +117,20 @@ a cut ``isInRestOfEvent == 1``. One can proceeed to fill other types ROE particl
 like pions, kaons etc, in the same way. 
 It is possible to execute other modules in the ROE loop, like :func:`modularAnalysis.reconstructDecay` for example,
 however, it is **important** to use a proper ROE path when calling any basf2 functionality in the ROE loop.
+One can also move information calculated in the ROE to the signal side.
+The most common use-case is probably a veto as described in detail in :ref:`HowToVeto` which uses
+
+.. code-block:: python
+
+    variableToSignalSideExtraInfo('pi0:veto', {'M': 'pi0veto'}, path=roe_path)
+
+to add an ExtraInfo to the signal particle that defines the ROE. Via the
+module SignalSideVariablesToDaughterExtraInfoModule this functionality is
+extended to any particle on the signal side, for example:
+
+.. code-block:: python
+
+  roe_path.add_module('SignalSideVariablesToDaughterExtraInfo', particleListName='D0:all', variablesToExtraInfo={'x' : 'VtxX'})
 
 ROE masks
 ---------

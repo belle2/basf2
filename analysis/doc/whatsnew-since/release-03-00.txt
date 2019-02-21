@@ -41,6 +41,11 @@ Modules
 
 * Removal of the unsupported ECLClusterInfoModule.
 
+* Added the new module SignalSideVariablesToDaughterExtraInfoModule. It adds
+  ExtraInfo to a specified particle (typically a daughter on the signal side).
+  The corresponding information is calculated in the RestOfEvent so it is
+  supposed to be executed only in for_each ROE paths.
+
 FEI
 +++
 

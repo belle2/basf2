@@ -63,7 +63,7 @@ void TRGCDCTSFDQMModule::defineHisto()
   else dirDQM = (TDirectory*)oldDir->Get("TRGCDCTSF");
   dirDQM->cd();
   //Total number of TSF hits per event in each superlayer
-  h_nhit = new TH1I(Form("hCDCTSF_nhit_mod%d", m_TSFMOD), Form("nhit_mod%d", m_TSFMOD), 10, 0, 10);
+  h_nhit = new TH1I(Form("hCDCTSF_nhit_mod%d", m_TSFMOD), Form("nhit_mod%d", m_TSFMOD), 16, 0, 16);
   h_nhit->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
   h_nhit->GetXaxis()->SetTitle("Total number of TSF hits/event");
   //Total number of hits in each TSF
@@ -71,6 +71,16 @@ void TRGCDCTSFDQMModule::defineHisto()
   h_nhit_tsf->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
   h_nhit_tsf->GetXaxis()->SetTitle("TSF ID");
   h_nhit_tsf->GetYaxis()->SetTitle("Total number of hits");
+  //Validity of hits in each super layer
+  h_valid = new TH1I(Form("hCDCTSF_valid_mod%d", m_TSFMOD), Form("valid__mod%d", m_TSFMOD), 10, 0, 10);
+  h_valid->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
+  h_valid->GetXaxis()->SetTitle("Validity");
+  h_valid->GetYaxis()->SetTitle("#of tsf hits");
+  //Timing of hits in each super layer
+  h_timing = new TH1I(Form("hCDCTSF_timing_mod%d", m_TSFMOD), Form("timing__mod%d", m_TSFMOD), 520, -5, 515);
+  h_timing->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
+  h_timing->GetXaxis()->SetTitle("Timing");
+  h_timing->GetYaxis()->SetTitle("#of tsf hits");
   oldDir->cd();
 }
 
@@ -142,37 +152,88 @@ void TRGCDCTSFDQMModule::event()
 
   int id = 0;
   int v  = 0;
+  int rt = 0;
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
     id = entAry[ii]->m_trackerhit0id;
     v  = entAry[ii]->m_trackerhit0v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit0rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit1id;
     v  = entAry[ii]->m_trackerhit1v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit1rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit2id;
     v  = entAry[ii]->m_trackerhit2v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit2rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit3id;
     v  = entAry[ii]->m_trackerhit3v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit3rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit4id;
     v  = entAry[ii]->m_trackerhit4v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit4rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit5id;
     v  = entAry[ii]->m_trackerhit5v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit5rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit6id;
     v  = entAry[ii]->m_trackerhit6v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit6rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit7id;
     v  = entAry[ii]->m_trackerhit7v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit7rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit8id;
     v  = entAry[ii]->m_trackerhit8v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit8rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit9id;
     v  = entAry[ii]->m_trackerhit9v;
-    if (v != 0)h_nhit_tsf->Fill(id);
+    rt = entAry[ii]->m_trackerhit9rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
   }
 
   oldDir->cd();

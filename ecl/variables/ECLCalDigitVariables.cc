@@ -271,6 +271,16 @@ namespace Belle2 {
             return eclCalDigits[storearraypos]->getTwoComponentTotalEnergy();
           } else if (varid == varType::twoComponentHadronEnergy) {
             return eclCalDigits[storearraypos]->getTwoComponentHadronEnergy();
+          } else if (varid == varType::twoComponentSavedChi2_PhotonHadron) {
+            return eclCalDigits[storearraypos]->getTwoComponentSavedChi2(ECLDsp::photonHadron);
+          } else if (varid == varType::twoComponentSavedChi2_PileUpPhoton) {
+            return eclCalDigits[storearraypos]->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton);
+          } else if (varid == varType::twoComponentSavedChi2_PhotonDiode) {
+            return eclCalDigits[storearraypos]->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing);
+          } else if (varid == varType::twoComponentDiodeEnergy) {
+            return eclCalDigits[storearraypos]->getTwoComponentDiodeEnergy();
+          } else if (varid == varType::twoComponentFitType) {
+            return int(eclCalDigits[storearraypos]->getTwoComponentFitType());
           }
         } else {
           return std::numeric_limits<double>::quiet_NaN();
@@ -365,7 +375,7 @@ namespace Belle2 {
     }
 
     //! @returns the eclcaldigit two component chi2 for photon+hadron fit type by digit energy rank
-    double getTwoComponentChi2Saved_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
+    double getTwoComponentChi2SavedByEnergyRank_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
     {
       if (vars.size() != 1) {
         B2FATAL("Need exactly one parameters (energy index).");
@@ -375,7 +385,7 @@ namespace Belle2 {
     }
 
     //! @returns the eclcaldigit two component chi2 for photon+hadron + pile-up photon fit type by digit energy rank
-    double getTwoComponentChi2Saved_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
+    double getTwoComponentChi2SavedByEnergyRank_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
     {
       if (vars.size() != 1) {
         B2FATAL("Need exactly one parameters (energy index).");
@@ -385,7 +395,7 @@ namespace Belle2 {
     }
 
     //! @returns the eclcaldigit two component chi2 for photon+diode fit type by digit energy rank
-    double getTwoComponentChi2Saved_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
+    double getTwoComponentChi2SavedByEnergyRank_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
     {
       if (vars.size() != 1) {
         B2FATAL("Need exactly one parameters (energy index).");
@@ -534,6 +544,116 @@ namespace Belle2 {
       }
 
       std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentHadronEnergy, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component Diode energy
+    double getECLCalDigitTwoComponentDiodeEnergy(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentDiodeEnergy, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component Diode energy from ext
+    double getExtECLCalDigitTwoComponentDiodeEnergy(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentDiodeEnergy, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component Fit Type
+    double getECLCalDigitTwoComponentFitType(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentFitType, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component Fit Type from ext
+    double getExtECLCalDigitTwoComponentFitType(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentFitType, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PhotonHadron fit
+    double getECLCalDigitTwoComponentChi2Saved_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonHadron, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PhotonHadron fit from ext
+    double getExtECLCalDigitTwoComponentChi2Saved_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonHadron, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PileUpPhoton fit
+    double getECLCalDigitTwoComponentChi2Saved_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PileUpPhoton, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PileUpPhoton fit from ext
+    double getExtECLCalDigitTwoComponentChi2Saved_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PileUpPhoton, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PhotonDiode fit
+    double getECLCalDigitTwoComponentChi2Saved_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonDiode, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PhotonDiode fit from ext
+    double getExtECLCalDigitTwoComponentChi2Saved_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonDiode, ECLCalDigitVariable::centerType::extCell};
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
@@ -858,6 +978,28 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclcaldigitExtCenterCellIndex(i)", getExtCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours) for an ext track");
 
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentFitType(i, j)", getExtECLCalDigitTwoComponentFitType,
+                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentDiodeEnergy(i, j)", getExtECLCalDigitTwoComponentDiodeEnergy,
+                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PhotonHadron(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PhotonHadron,
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PileUpPhoton(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PileUpPhoton,
+                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PhotonDiode(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PhotonDiode,
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentFitType(i, j)", getECLCalDigitTwoComponentFitType,
+                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergy(i, j)", getECLCalDigitTwoComponentDiodeEnergy,
+                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PhotonHadron(i, j)", getECLCalDigitTwoComponentChi2Saved_PhotonHadron,
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PileUpPhoton(i, j)", getECLCalDigitTwoComponentChi2Saved_PileUpPhoton,
+                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PhotonDiode(i, j)", getECLCalDigitTwoComponentChi2Saved_PhotonDiode,
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+
     REGISTER_VARIABLE("eclcaldigitEnergyByEnergyRank(i)", getECLCalDigitEnergyByEnergyRank,
                       "[calibration] Returns the caldigit energy of the i-th highest energy caldigit in the cluster (i>=0)");
 
@@ -879,13 +1021,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergyByEnergyRank(i)", getTwoComponentDiodeEnergyByEnergyRank,
                       "[calibration] Returns the two component fit Diode Energy of the i-th highest energy caldigit in the cluster (i>=0)");
 
-    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonHadron(i)", getTwoComponentChi2Saved_PhotonHadron,
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonHadron(i)", getTwoComponentChi2SavedByEnergyRank_PhotonHadron,
                       "[calibration] Returns the chi2 for the photo+hadron fit type of the i-th highest energy caldigit in the cluster (i>=0)");
 
-    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PileUpPhoton(i)", getTwoComponentChi2Saved_PileUpPhoton,
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PileUpPhoton(i)", getTwoComponentChi2SavedByEnergyRank_PileUpPhoton,
                       "[calibration] Returns the chi2 for the photo+hadron+pile-up photon fit type of the i-th highest energy caldigit in the cluster (i>=0)");
 
-    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonDiode(i)", getTwoComponentChi2Saved_PhotonDiode,
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonDiode(i)", getTwoComponentChi2SavedByEnergyRank_PhotonDiode,
                       "[calibration] Returns the chi2 for the photo+diode fit type of the i-th highest energy caldigit in the cluster (i>=0)");
 
     REGISTER_VARIABLE("eclcaldigitWeightByEnergyRank(i)", getWeightByEnergyRank,

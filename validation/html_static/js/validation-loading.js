@@ -156,7 +156,7 @@ function loadPrebuildRevisions(data){
  *  (default, last build, nightly and revision).
  */
 function getDefaultRevisions(mode="rbn") {
-    let allRevisions = getAllRevsList();
+    let allRevisions = getAllRevsList().sort().reverse();
 
     let referenceRevision = "reference";
     let releaseRevisions = [];
@@ -165,6 +165,7 @@ function getDefaultRevisions(mode="rbn") {
 
     for (let i in allRevisions){
         let rev = allRevisions[i];
+        // fixme: This will have problems with sorting. Probably we rather want to have prerelease as a new category!
         if (rev.startsWith("release") || rev.startsWith("prerelease")) {
             releaseRevisions.push(rev);
         }

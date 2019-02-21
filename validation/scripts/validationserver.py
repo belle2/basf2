@@ -455,7 +455,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cherry_config["/static"] = {
         'tools.staticdir.on': True,
         # only serve js, css, html and png files
-        'tools.staticdir.match': "^.*\.(js|css|html|png)$",
+        'tools.staticdir.match': "^.*\.(js|css|html|png|js.map)$",
         'tools.staticdir.dir': static_folder
     }
     setup_gzip_compression("/static", cherry_config)

@@ -584,7 +584,9 @@ class Distribution(Plotter):
         self.first_binning = None
         #: x axis label
         self.x_axis_label = ''
+        #: Sets if the plots are drawn in logScale or not
         self.logScale = False
+        #: Sets the bin width of the plots
         self.binWidth = 0.02
 
     def add(self, data, column, mask=None, weight_column=None, label=None, bins=50):
@@ -823,6 +825,8 @@ class normalizedResiduals(Plotter):
     """
     Plots the difference between two histograms
     """
+    #: @var xmin
+    #: Minimum x value
     #: @var xmax
     #: Maximum x value
     #: @var ymax

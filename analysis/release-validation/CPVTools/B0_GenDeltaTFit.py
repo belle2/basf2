@@ -12,6 +12,9 @@
 # B0 -> J/psi Ks
 # B0 -> nu_tau anti_nu_tau
 #
+# If you want to use this script for other decay channels
+# you need to modify lines 379-381.
+#
 # Contributor: F. Abudinen (December 2018)
 #
 ######################################################
@@ -67,6 +70,9 @@ def plotWithAsymmetry(
         textFitRes,
         asymmVarName,
         removeArtifacts):
+    """
+    Produces a plot with an asymmetry (y_A -y_B)/(y_A + y_B) below, where y_A and y_B are the y values of curves A and B.
+    """
 
     # plot for Thesis
     rooFitFrame.Print()
@@ -247,16 +253,85 @@ def plotWithAsymmetry(
 
 
 class fitDeltaT(b2.Module):
+    """
+    This class makes plots to validate the generated CP asymmetry. It saves the decay time information of the simulation
+    for both B mesons by running as a basf2 module.  It fills the information in RooDataSets and at the end it fits the
+    known quantum mechanical pdfs to the delta T distribution and the individual decay time distributions of
+    the signal and the tag-side B mesons to check if the S and the A parameters in the simulation are correct.
+    """
+    #: @var nentries
+    #: Total number of analyzed events.
+    #: @var DT
+    #: Time difference between the decays of the two generated B mesons.
+    #: @var Tsig
+    #: Decay time of the signal B mesons. Attention! This script recognizes only B0-> JPsiKs as signal B meson.
+    #: @var Ttag
+    #: Decay time of the tag-side B meson.
+    #: @var DT0
+    #: Production time of the B mesons.
+    #: @var Tau
+    #: B0-meson lifetime.
+    #: @var A
+    #: Direct CP-violation parameter (CP violation in decay).
+    #: @var S
+    #: Mixing-induced CP-violation parameter (CP violation caused by the overlap between mixing and decay phases)
+    #: @var DM
+    #: Mass difference between the two B0-mass eigenstates.
+    #: @var Norm
+    #: Normalization factor of the quantum mechanical pdfs.
+    #: @var BetaGamma
+    #: Lorentz boost of the B mesons.
+    #: @var q
+    #: Flavor of the tag-side B0 meson at the time of its decay.
+    #: @var qsig
+    #: Flavor of the signal-side B0 meson at the time of its decay.
+    #: @var fitData
+    #: RooDataSet containing DT and q for each event.
+    #: @var fitDataTag
+    #: RooDataSet containing Ttag and q for each event.
+    #: @var fitDataTagDeltaTPos
+    #: RooDataSet containing Ttag and q for positive DT
+    #: @var fitDataTagDeltaTNeg
+    #: RooDataSet containing Ttag and q for negative DT
+    #: @var fitDataSig
+    #: RooDataSet containing Tsig and q for each event.
+    #: @var fitDataSigDeltaTPos
+    #: RooDataSet containing Tsig and q for positive DT
+    #: @var fitDataSigDeltaTNeg
+    #: RooDataSet containing Tsig and q for negative DT
+    #: @var B0sInTagSide
+    #: Number of tag-side B0s (positive flavor).
+    #: @var B0barsInTagSide
+    #: Number of tag-side anti-B0s (negative flavor).
+    #: @var B0sInSignalSide
+    #: Number of B0s in the signal side (positive flavor).
+    #: @var B0barsInSignalSide
+    #: Number of anti-B0s in the signal side (negative flavor).
+    #: @var fractionB0barInSignalSide
+    #: Fraction of anti-B0s in the signal side.
+    #: @var fractionB0InSignalSide
+    #: Fraction of B0s in the signal side
+    #: @var DeltaZsigUpsilon
+    #: Difference between the production and the decay vertices of the signal-side B0 meson in z direction.
+    #: @var DeltaZtagUpsilon
+    #: Difference between the production and the decay vertices of the tag-side B0 meson in z direction.
+    #: @var fitDataDeltaZsigUpsilon
+    #: RooDataSet containing DeltaZsigUpsilon and q.
+    #: @var fitDataDeltaZtagUpsilon
+    #: RooDataSet containing DeltaZtagUpsilon and q.
+    #: @var TsigPosNeg
+    #: Empty variable just to define the limits of the frames in the plots for Tsig.
+    #: @var TtagPosNeg
+    #: Empty variable just to define the limits of the frames in the plots for Ttag.
 
     def __init__(self):
+        """
+        Here the module initializes by declaring the variables corresponding to the interesting physical parameters and
+        decay times. The RooDataSets where the information will be saved are also declared.
+        """
         super(fitDeltaT, self).__init__()
         self.nentries = 0
-        self.PATH = "/home/iwsatlas1/abudinen/releases/software/analysis/examples/tutorials/B0Experiments"
 
-        self.B0_mcTagPDG = ROOT.RooRealVar("B0_mcTagPDG", "B0_mcTagPDG", 0., -1000., 1000.)
-        self.B0_DeltaT = ROOT.RooRealVar("B0_DeltaT", "B0_DeltaT", 0., -10., 10.)
-        self.B0_TruthDeltaT = ROOT.RooRealVar("B0_TruthDeltaT", "B0_TruthDeltaT", 0., -7., 7.)
-        self.evt_no = ROOT.RooRealVar("evt_no", "evt_no", 0., -10., 10000000.)
         self.DT = ROOT.RooRealVar("DT", "#Delta#it{t}", 0., -11., 11., "ps")
         self.Tsig = ROOT.RooRealVar("Tsig", "#it{t}_{sig}^{gen}", 0., 0., 11., "ps")
         self.Ttag = ROOT.RooRealVar("Ttag", "#it{t}_{tag}^{gen}", 0., 0., 11., "ps")
@@ -267,7 +342,6 @@ class fitDeltaT(b2.Module):
         self.DM = ROOT.RooRealVar("DM", "DM", 0.507)
         self.Norm = ROOT.RooRealVar("Norm", "Norm", 2, 1, 8)
         self.BetaGamma = ROOT.RooRealVar("BetaGamma", "BetaGamma", 0.5, 0.1, 1)
-        self.B0_mcPDG = ROOT.RooRealVar("B0_mcPDG", "B0_mcPDG", 0., -1000., 1000.)
 
         self.q = ROOT.RooCategory("q", "q")
         self.q.defineType("1")
@@ -322,6 +396,9 @@ class fitDeltaT(b2.Module):
         self.TtagPosNeg = ROOT.RooRealVar("Ttag", "#it{t}_{tag}^{gen}", 0., 0., 7., "ps")
 
     def event(self):
+        """
+        Here the information is collected event by event.
+        """
 
         plist = Belle2.PyStoreObj('B0:all')
         plistUpsilon = Belle2.PyStoreObj('Upsilon(4S):all')
@@ -419,7 +496,10 @@ class fitDeltaT(b2.Module):
                 self.fitDataDeltaZsigUpsilon.add(ROOT.RooArgSet(self.DeltaZsigUpsilon, self.q))
 
     def terminate(self):
-
+        """
+        Here the known quantum mechanical pdfs are defined and fitted to the generated MC distributions.
+        Afterwards, the plots are saved.
+        """
         # S
 
         # Delta t Fit

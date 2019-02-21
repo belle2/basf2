@@ -65,6 +65,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   useBelleDBServer=None,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
+                                  convertECLCrystalEnergies=False,
+                                  convertExtHits=False,
                                   path=analysis_main, entrySequences=None):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
@@ -111,6 +113,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
     convert = register_module('B2BIIConvertMdst')
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
+    convert.param("convertECLCrystalEnergies", convertECLCrystalEnergies)
+    convert.param("convertExtHits", convertExtHits)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

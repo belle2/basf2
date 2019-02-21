@@ -585,9 +585,24 @@ just use spans /klieret */
  /* The alert message box */
 .infobox {
     padding: 20px;
-    background-color: #46a7f5; /* Red */
     color: white;
     margin-bottom: 15px;
+}
+
+.info {
+    background-color: #46a7f5;
+}
+
+.warn {
+    background-color: #ffa92a;
+}
+
+.success {
+    background-color: #6abc6d;
+}
+
+.fail {
+    background-color: #f56257;
 }
 
 .infobox a {

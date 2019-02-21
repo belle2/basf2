@@ -1,6 +1,6 @@
 
 
-# Script for validation of CP-violation analysis tools
+# Scripts for validation of CP-violation analysis tools
 
 The scripts contained in this folder serve for validating the tools used for CP-violation analyses once 
 a new basf2 release comes out. We train and test the flavor tagger and perform vertex reconstruction 

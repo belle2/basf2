@@ -143,6 +143,9 @@ FlavorTagInfo data object, all flavor tagger extraInfos are then deleted. The
 user can decide which information is saved in the Ntuples. If specified, also
 the inputs of the combiner are saved.
 
+For more information see 
+`BELLE2-PTHESIS-2018-003 <https://docs.belle2.org/record/1215/files/BELLE2-PTHESIS-2018-003.pdf>`_.
+
 Using the FlavorTagger
 ----------------------
 
@@ -318,7 +321,7 @@ An example tutorial for normal use can be found under:
 Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
 (Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
 There are also some slides for the tutorial accessible from 
-`Link this confluence page <https://confluence.desy.de/display/BI/Physics+AnalysisSoftware>`_ .
+`this confluence page <https://confluence.desy.de/display/BI/Physics+AnalysisSoftware>`_ .
 
 As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.You find them under:
 

@@ -147,7 +147,10 @@ function loadPrebuildRevisions(data){
     let revisions = getDefaultRevisions(mode);
     console.debug(`Revisions to load are ${revisions.toString()}`);
     setRevisions(revisions);
-    loadSelectedRevisions(data);
+    // todo: loadPrebuildRevisions can be either called from loadRevisions where we do not want to load anything yet, or from the trigger of the selection menu. Maybe make this into 2 functions?
+    if (typeof data !== 'undefined'){
+        loadSelectedRevisions(data);
+    }
 }
 
 /**

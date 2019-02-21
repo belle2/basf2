@@ -347,6 +347,12 @@ textarea {
     padding-top: 7px;
 }
 
+#prebuilt-select-container {
+    display: block;
+    padding-top: 7px;
+    font-size: 11px;
+}
+
 #systeminfo {
     /* Need the important, else we'll be overwritten by #menu>div */
     border-bottom: 1px solid gray !important;

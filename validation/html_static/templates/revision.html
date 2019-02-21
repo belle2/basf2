@@ -23,3 +23,15 @@ CSS properties -->
 <span id="button-revision-load-container">
 	<button id="button-revision-load" on-click='loadSelectedRevisions'>Load selected</button>
 </span>
+<span id="prebuilt-select-container" title="Any of the following combinations of revisions is already prebuilt (i.e. no new plots will have to be created). Furthermore, the last selected setting here will be remembered and restored when the validation page is opened.">
+  <span>Popular/prebuilt/default</span>:
+  <label for="prebuilt-select"></label>
+  <select id="prebuilt-select" on-change="loadPrebuildRevisions">
+    <option value="rbn" title="Reference and the latest (pre)release, latest build and latest nightly">Ref + latest rel/build/night</option>
+    <option value="r" title="Reference and the latest (pre)release">Ref + latest release</option>
+    <option value="b" title="Reference and the latest build">Ref + latest build</option>
+    <option value="n" title="Reference and the latest nightly">Ref + latest nightly</option>
+    <option value="nnn" title="Reference and all nightly revisions">Ref + all nightlies</option>
+    <option value="all">Ref + all revisions</option>
+  </select>
+</span>

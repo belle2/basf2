@@ -2,6 +2,10 @@
 
 "use strict";
 
+// todo: generally: Maybe it would be better to make data a global variable instead of
+// passing it from function to function, potentially having to reload it from the
+// server if that chain breaks
+
 // ============================================================================
 // Global variables
 // ============================================================================
@@ -21,16 +25,10 @@ var latexRenderingInProgress = false;
 
 /**
  * This function gets called from the main page validation.html at the
- * beginning and sets up the * page with the initial selection of revisions.
- * @param revList
+ * beginning and sets up the revisions sub-menu and then loads the
+ * corresponding plots to the default selection of the revisions
  */
-function loadRevisions(revList) {
-    if (!Array.isArray(revList) || !revList.length) {
-        revList = [];
-    }
-
-    let revString = selectedRevsListToString(revList);
-
+function loadRevisions() {
     console.log("Loading revisions from server");
     let revLoadPath = "../revisions";
 
@@ -39,18 +37,21 @@ function loadRevisions(revList) {
 
         function setupRevisionLoader(ractive) {
 
-            // load the defaults for the first time
-            if (revString === "") {
-                loadSelectedRevisions(data);
-            } else {
-                // otherwise, load a specific selection
-                setupRactiveFromRevision(data, revList);
-            }
+            setDefaultPrebuildOption();
+
+            loadPrebuildRevisions();
+            let revs = getDefaultRevisions();
+            setRevisions(revs);
+
+            loadSelectedRevisions(data);
 
             // be ready to load any other revision configuration if user desires
             ractive.on('loadSelectedRevisions', function () {
-
                 loadSelectedRevisions(data);
+            });
+
+            ractive.on('loadPrebuildRevisions', function () {
+                loadPrebuildRevisions(data);
             });
         }
 
@@ -111,6 +112,116 @@ function loadSelectedRevisions(data) {
     console.log(`Loading rev via string '${revString}'.`);
 
     setupRactiveFromRevision(data, revList);
+}
+
+/**
+ * Set the dropdown menu that specifies the favorite prebuilt combination of
+ * revisions to the value which was last selected by the user or to 'rbn' if
+ * no such setting exists.
+ * @returns the mode which was set
+ */
+function setDefaultPrebuildOption(){
+    let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
+    console.debug(`RECOVERED ${mode}`);
+    if (mode == null){
+        mode = "rbn";
+    }
+    $("#prebuilt-select").val(mode);
+    return mode;
+}
+
+/**
+ * This will get the selected prebuilt combination from the drop down menu,
+ * get the corresponding revisions and show the corresponding plots.
+ * It will also save the value of the drop down menu in localStorage.
+ * This function should be bound to the user changing the value in the drop
+ * down menu.
+ * @param data
+ */
+function loadPrebuildRevisions(data){
+    let selector = $("#prebuilt-select")[0];
+    let mode = selector.options[selector.selectedIndex].value;
+    localStorage.setItem(getStorageId("prebuildRevisionDefault"), mode);
+    console.debug(`Loading prebuild reivision with mode '${mode}'`);
+    let revisions = getDefaultRevisions(mode);
+    console.debug(`Revisions to load are ${revisions.toString()}`);
+    setRevisions(revisions);
+    loadSelectedRevisions(data);
+}
+
+/**
+ * Sets the state of the revision checkboxes
+ * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
+ *  nightly only), "b" (last build only), "nnn" (all nightlies), "rbn"
+ *  (default, last build, nightly and revision).
+ */
+function getDefaultRevisions(mode="rbn") {
+    let allRevisions = getAllRevsList();
+
+    let referenceRevision = "reference";
+    let releaseRevisions = [];
+    let buildRevisions = [];
+    let nightlyRevisions = [];
+
+    for (let i in allRevisions){
+        let rev = allRevisions[i];
+        if (rev.startsWith("release") || rev.startsWith("prerelease")) {
+            releaseRevisions.push(rev);
+        }
+        if (rev.startsWith("build")) {
+            buildRevisions.push(rev);
+        }
+        if (rev.startsWith("nightly")) {
+            nightlyRevisions.push(rev);
+        }
+    }
+
+    if (mode === "all"){
+        return allRevisions;
+    }
+    else if (mode === "r" && releaseRevisions.length >= 1){
+        return [referenceRevision, releaseRevisions[0]];
+    }
+    else if (mode === "b" && buildRevisions.length >= 1){
+        return [referenceRevision, buildRevisions[0]];
+    }
+    else if (mode === "n" && nightlyRevisions.length >= 1){
+        return [referenceRevision, nightlyRevisions[0]];
+    }
+    else if (mode === "nnn" && nightlyRevisions.length >= 1){
+        return [referenceRevision].concat(nightlyRevisions);
+    }
+    else if (mode === "rbn"){
+        // default anyway
+    }
+    else {
+        console.error(`Unknown getDefaultRevisions mode '${mode}'!`);
+    }
+
+    let rbnRevisions = [referenceRevision];
+    if (releaseRevisions.length >= 1){
+        rbnRevisions.push(releaseRevisions[0])
+    }
+    if (buildRevisions.length >= 1){
+        rbnRevisions.push(buildRevisions[0])
+    }
+    if (nightlyRevisions.length >= 1){
+        rbnRevisions.push(nightlyRevisions[0])
+    }
+
+    return rbnRevisions
+}
+
+/**
+ * Set the state of the revision checkboxes in the revision submenu.
+ * @param revisionList any revision in this list will be checked, all others
+ *  will be unchecked. Any revision in this list which does not have a
+ *  corresponding checkbox will be ignored.
+ */
+function setRevisions(revisionList) {
+    $('.reference-checkbox').each(function (i, obj) {
+        obj.checked = revisionList.includes(obj.value);
+    });
 }
 
 // ============================================================================
@@ -529,6 +640,15 @@ function getSelectedRevsList() {
     });
     selectedRev.sort();
     return selectedRev;
+}
+
+function getAllRevsList() {
+    let revs = [];
+    $('.reference-checkbox').each(function (i, obj) {
+        revs.push(obj.value)
+    });
+    revs.sort();
+    return revs;
 }
 
 /**

@@ -19,6 +19,8 @@
 #include <TStreamerElement.h>
 #include <TROOT.h>
 
+#include <string>
+
 using namespace Belle2;
 
 TString HtmlClassInspector::getMemberData(const TObject* obj)
@@ -166,7 +168,9 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
           }
         }
         if (isPrintable) {
-          strncpy(line + kvalue, *ppointer, i);
+          //strncpy(line + kvalue, *ppointer, i);
+          std::string out(*ppointer);
+          out.copy(line + kvalue, i);
           line[kvalue + i] = 0;
         } else {
           line[kvalue] = 0;
@@ -187,7 +191,10 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
         }
       }
       if (isPrintable) {
-        strncpy(line + kvalue, *ppointer, i); //
+        std::string out(*ppointer);
+        out.copy(line + kvalue, i);
+        //strncpy(line + kvalue, *ppointer, i); //
+
         line[kvalue + i] = 0;
       } else {
         line[kvalue] = 0;

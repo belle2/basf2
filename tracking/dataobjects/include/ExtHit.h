@@ -81,7 +81,7 @@ namespace Belle2 {
     void setTOF(double tof) { m_TOF = tof; }
 
     //! Set position of this extrapolation hit
-    void setPosition(TVector3 position)
+    void setPosition(const TVector3& position)
     {
       m_Position[0] = position.x();
       m_Position[1] = position.y();
@@ -89,7 +89,7 @@ namespace Belle2 {
     }
 
     //! Set momentum at this extrapolation hit
-    void setMomentum(TVector3 momentum)
+    void setMomentum(const TVector3& momentum)
     {
       m_Momentum[0] = momentum.x();
       m_Momentum[1] = momentum.y();

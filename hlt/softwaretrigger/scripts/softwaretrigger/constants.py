@@ -46,4 +46,4 @@ DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM", "
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 # Location of the database in the online system
-DEFAULT_DB_FILE_LOCATION = "/dev/shm/LocalDB.rel0101/database.txt"
+DEFAULT_DB_FILE_LOCATION = "/dev/shm/localdb/database.txt"

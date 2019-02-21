@@ -21,6 +21,8 @@
 #include <framework/logging/Logger.h>
 // DataStore classes
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPBarHit.h>
@@ -49,6 +51,16 @@ namespace Belle2 {
     {
 
       if (!track) return;
+
+      const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
+      if (!fitResult) {
+        B2ERROR("No TrackFitResult available."
+                << LogVar("PDG code", chargedStable.getPDGCode()));
+        return;
+      }
+
+      // require hits in CDC
+      if (fitResult->getHitPatternCDC().getNHits() == 0) return;
 
       // set pointers first
 
@@ -86,12 +98,6 @@ namespace Belle2 {
       m_position = m_extHit->getPosition();
       m_momentum = m_extHit->getMomentum();
       setTrackLength(m_extHit->getTOF(), chargedStable);
-      const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
-      if (!fitResult) {
-        B2ERROR("No TrackFitResult available."
-                << LogVar("PDG code", chargedStable.getPDGCode()));
-        return;
-      }
       m_charge = fitResult->getChargeSign();
       if (m_mcParticle) m_pdg = m_mcParticle->getPDG();
       m_moduleID = m_extHit->getCopyID();

@@ -17,8 +17,10 @@
 #include <top/reconstruction/TOP1Dpdf.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
 
-// Hit classes
+// Dataobject classes
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -75,6 +77,11 @@ namespace Belle2 {
              "minimal ratio of detected-to-expected photons to accept track", 0.4);
     addParam("maxDERatio", m_maxDERatio,
              "maximal ratio of detected-to-expected photons to accept track", 2.5);
+    addParam("minPt", m_minPt, "minimal p_T of the track", 0.3);
+    addParam("maxPt", m_maxPt, "maximal p_T of the track", 6.0);
+    addParam("maxD0", m_maxD0, "maximal absolute value of helix perigee distance", 2.0);
+    addParam("maxZ0", m_maxZ0, "maximal absolute value of helix perigee z coordinate", 4.0);
+    addParam("minNHitsCDC", m_minNHitsCDC, "minimal number of hits in CDC", 20);
     addParam("useMCTruth", m_useMCTruth,
              "if true, use MC truth for particle mass instead of the most probable from dEdx",
              false);
@@ -131,6 +138,8 @@ namespace Belle2 {
     // output
 
     m_recBunch.registerInDataStore();
+    m_timeZeros.registerInDataStore();
+    m_timeZeros.registerRelationTo(extHits);
 
     // Configure TOP detector for reconstruction
 
@@ -170,6 +179,7 @@ namespace Belle2 {
     } else {
       m_recBunch->clearReconstructed();
     }
+    m_timeZeros.clear();
 
     // set MC truth if available
 
@@ -208,12 +218,26 @@ namespace Belle2 {
     std::vector<TOPtrack> topTracks;
     std::vector<double> masses;
     std::vector<TOP1Dpdf> top1Dpdfs;
+    std::vector<int> numPhotons;
+    std::vector<Chi2MinimumFinder1D> finders;
 
     // loop over reconstructed tracks, make a selection and push to containers
 
     for (const auto& track : m_tracks) {
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
+
+      // track selection
+      const auto* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
+      if (not fitResult) {
+        B2ERROR("No TrackFitResult available. Must be a bug somewhere.");
+        continue;
+      }
+      if (fitResult->getHitPatternCDC().getNHits() < m_minNHitsCDC) continue;
+      if (fabs(fitResult->getD0()) > m_maxD0) continue;
+      if (fabs(fitResult->getZ0()) > m_maxZ0) continue;
+      auto pt = fitResult->getTransverseMomentum();
+      if (pt < m_minPt or pt > m_maxPt) continue;
 
       // determine most probable particle mass
       double mass = 0;
@@ -247,7 +271,7 @@ namespace Belle2 {
       topTracks.push_back(trk);
       masses.push_back(mass);
       top1Dpdfs.push_back(pdf1d);
-
+      numPhotons.push_back(reco.getNumOfPhotons());
     }
     m_recBunch->setNumTracks(numTrk, topTracks.size(), m_nodEdxCount);
     if (topTracks.empty()) return;
@@ -266,14 +290,20 @@ namespace Belle2 {
 
     // find rough T0
 
-    Chi2MinimumFinder1D roughFinder(numBins, minT0, maxT0);
     for (const auto& pdf : top1Dpdfs) {
-      const auto& bins = roughFinder.getBinCenters();
+      finders.push_back(Chi2MinimumFinder1D(numBins, minT0, maxT0));
+      auto& finder = finders.back();
+      const auto& bins = finder.getBinCenters();
       for (unsigned i = 0; i < bins.size(); i++) {
         double t0 = bins[i];
-        roughFinder.add(i, -2 * pdf.getLogL(t0));
+        finder.add(i, -2 * pdf.getLogL(t0));
       }
     }
+    auto roughFinder = finders[0];
+    for (size_t i = 1; i < finders.size(); i++) {
+      roughFinder.add(finders[i]);
+    }
+
     const auto& t0Rough = roughFinder.getMinimum();
     if (m_saveHistograms) {
       m_recBunch->addHistogram(roughFinder.getHistogram("chi2_rough_",
@@ -289,29 +319,40 @@ namespace Belle2 {
     // find precise T0
 
     if (m_fineSearch) {
+      finders.clear();
+      numPhotons.clear();
 
       const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
       double timeMin = tdc.getTimeMin() + t0Rough.position;
       double timeMax = tdc.getTimeMax() + t0Rough.position;
       double t0min = t0Rough.position - m_timeRange / 2;
       double t0max = t0Rough.position + m_timeRange / 2;
-      Chi2MinimumFinder1D finder(m_numBins, t0min, t0max);
 
       for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
+        finders.push_back(Chi2MinimumFinder1D(m_numBins, t0min, t0max));
         auto& trk = topTracks[itrk];
         auto mass = masses[itrk];
         reco.setMass(mass);
         reco.reconstruct(trk);
+        numPhotons.push_back(reco.getNumOfPhotons());
         if (reco.getFlag() != 1) {
           B2ERROR("TOPBunchFinder: track is not in the acceptance -> must be a bug");
           continue;
         }
+        auto& finder = finders.back();
         const auto& binCenters = finder.getBinCenters();
         for (unsigned i = 0; i < binCenters.size(); i++) {
           double t0 = binCenters[i];
           finder.add(i, -2 * reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear));
         }
       }
+
+      if (finders.size() == 0) return; // just in case
+      auto finder = finders[0];
+      for (size_t i = 1; i < finders.size(); i++) {
+        finder.add(finders[i]);
+      }
+
       const auto& t0Fine = finder.getMinimum();
       if (m_saveHistograms) {
         m_recBunch->addHistogram(finder.getHistogram("chi2_fine_",
@@ -379,6 +420,39 @@ namespace Belle2 {
                                  m_fineSearch);
     m_success++;
 
+    // store T0 of single tracks relative to bunchTime
+
+    if (finders.size() == topTracks.size()) {
+      for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
+        const auto& trk = topTracks[itrk];
+        auto& finder = finders[itrk];
+        const auto& t0trk = finder.getMinimum();
+        auto* timeZero = m_timeZeros.appendNew(trk.getModuleID(),
+                                               t0trk.position - bunchTime,
+                                               t0trk.error, numPhotons[itrk]);
+        timeZero->setAssumedMass(masses[itrk]);
+        if (not t0trk.valid) timeZero->setInvalid();
+        timeZero->addRelationTo(trk.getExtHit());
+
+        if (m_saveHistograms) {
+          std::string num = std::to_string(itrk);
+          auto chi2 = finder.getHistogram("chi2_" + num,
+                                          "precise T0 single track; t_{0} [ns]; -2 log L");
+          auto pdf = top1Dpdfs[itrk].getHistogram("pdf1D_" + num,
+                                                  "PDF projected to time axis; time [ns]");
+          TH1F hits(("hits_" + num).c_str(),
+                    "time distribution of hits (t0-subtracted); time [ns]",
+                    pdf.GetNbinsX(), pdf.GetXaxis()->GetXmin(), pdf.GetXaxis()->GetXmax());
+          for (const auto& digit : m_topDigits) {
+            if (digit.getModuleID() != trk.getModuleID()) continue;
+            if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+            hits.Fill(digit.getTime() - t0trk.position);
+          }
+          timeZero->setHistograms(chi2, pdf, hits);
+        }
+      }
+    }
+
     // correct time in TOPDigits
 
     if (m_correctDigits) {
@@ -392,6 +466,7 @@ namespace Belle2 {
         }
       }
     }
+
 
   }
 

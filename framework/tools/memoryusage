@@ -1,6 +1,6 @@
 #!/bin/bash
-OLD=print-tree
-NEW=b2file-size
+OLD=memoryusage
+NEW=b2code-memoryusage
 echo -e "\033[0;31mAttention:\033[0m ${OLD} has been renamed to ${NEW}.
 
 Some time ago the software group has decided that we should enforce a more

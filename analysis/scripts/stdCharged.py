@@ -53,7 +53,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
     """
 
     # basic quality cut strings
-    trackQuality = 'thetaInCDCAcceptance and chiProb > 0.001'
+    trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
     ipCut = 'd0 < 0.5 and abs(z0) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 

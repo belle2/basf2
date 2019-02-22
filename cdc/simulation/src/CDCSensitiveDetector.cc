@@ -284,7 +284,9 @@ namespace Belle2 {
       const HepPoint3D fwd(tfw3v.x(), tfw3v.y(), tfw3v.z());
       const HepPoint3D bck(tbw3v.x(), tbw3v.y(), tbw3v.z());
 
-      if (m_magneticField) {
+      if (m_magneticField && (abs(pid) != 99666)) {
+        // For monopoles a line segment approximation in the step volume is done,
+        // which is more reasonable, but should be done with a proper catenary FIXME
         // Cal. distance assuming helix track (still approximation)
         m_nonUniformField = 1;
         if (Bfield[0] == 0. && Bfield[1] == 0. &&

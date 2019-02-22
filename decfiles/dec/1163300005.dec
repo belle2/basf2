@@ -19,7 +19,7 @@ Alias myD- D-
 ChargeConj myD- myD+
 
 Decay Upsilon(4S)
-1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+1.0 B0sig anti-B0sig B0tag anti-B0tag	VSS_BMIX dm;
 Enddecay
 #
 

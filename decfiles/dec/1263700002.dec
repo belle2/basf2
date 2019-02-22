@@ -16,8 +16,8 @@ Alias  anti-D0tag anti-D0
 ChargeConj D0tag  anti-D0tag
 
 Decay Upsilon(4S)
-0.5 B+sig B- VSS;
-0.5 B-sig B+ VSS;
+0.5 B+sig B-tag VSS;
+0.5 B-sig B+tag VSS;
 Enddecay
 
 

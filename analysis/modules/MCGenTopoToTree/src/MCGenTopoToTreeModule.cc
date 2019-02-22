@@ -164,10 +164,6 @@ void MCGenTopoToTreeModule::event()
       m_tree->get().Fill();
     }
   }
-
-  delete MCGenPDG;
-  delete MCGenMothIndex;
-  delete MCGenIndex;
 }
 
 void MCGenTopoToTreeModule::terminate()

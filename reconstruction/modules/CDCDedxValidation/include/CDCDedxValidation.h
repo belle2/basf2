@@ -1,9 +1,10 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                   *
+ * BASF2 (Belle Analysis Framework 2)                   *                 *
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jitendra Kumar
+ * Contributors: Jitendra Kumar                                           *
+ * Module for validationg CDC dE/dx GT or data processing validation      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -34,87 +35,138 @@
 
 namespace Belle2 {
 
-  /** Extracts dE/dx information for calibration testing. Writes a ROOT file. */
+  /**
+   * First version commited on Feb 21 2019
+   * Extracts dE/dx information for validation and writes a ROOT file.
+   * Input to this module is bhabha or radbhabha or hadron skimmed files only.
+   * See reconstruction/examples/ExtractCDCdEdxValidation.C to extract output file and make nice plots.
+   * See reconstruction/examples/runCDCdEdxValidation.py to run this module.
+   */
   class CDCDedxValidationModule : public HistoModule {
 
   public:
 
-    /** Default constructor */
+    /**
+     * Default constructor
+     * contain list of members with initial values
+     */
     CDCDedxValidationModule();
 
-    /** Destructor */
+    /**
+     * Default destructor
+     */
     virtual ~CDCDedxValidationModule() {}
 
-    /** Initialize the module */
+    /**
+     * Initialize
+     * This is inherited from base class
+     */
     virtual void initialize() override;
 
-    /** This method is called for each run */
+    /**
+     * Fuction to execute each run
+     * This is inherited from base class
+     */
     virtual void beginRun() override;
 
-    /** This method is called for each event. All processing of the event takes place in this method. */
+    /**
+     * fuction to execute event (event by event)
+     * This is inherited from base class
+     */
     virtual void event() override;
 
-    /** This method is called at the end of each run */
+    /**
+     * fuction is called after each event
+     * This is inherited from base class
+     */
     virtual void endRun() override;
 
-    /** End of the event processing. */
+    /**
+     * Terminate after all data processed
+     * This is inherited from base class
+     */
     virtual void terminate() override;
 
 
-    /** Definition of relavant list of histograms */
+    /**
+     * Defination of histograms
+     * This contain a list of histogram for validation
+     */
     void DefineHistograms(TString level, Int_t iR);
 
-    /** Fill defined histograms*/
+    /**
+     * Filling histograms
+     * This will fill histogram defined histograms in above function
+     */
     void FillHistograms(CDCDedxTrack* dedxTrack, const TrackFitResult* mTrack);
 
-    /** Extra higher level histograms such as trends*/
+    /**
+     * Extrating histogram and some calucation
+     * Higher level histograms are filled after each run or full processing
+     */
     void ExtractHistograms(TString level);
 
-    /** Apply standard selection of tracks*/
+    /**
+     * Track selection
+     * A clean way to impliment selections on tracks (so far few only)
+     */
     Bool_t IsSelectedTrack(const TrackFitResult* mTrack);
 
-    /** Set D0 cut window on tracks*/
+    /**
+     * d0 Selection
+     * set/change d0 while executing this module from external script
+     */
     void setD0Cut(Double_t value) {fD0Window = value;}
 
-    /** Set Z0 cut window on tracks*/
+    /**
+     * z0 Selection
+     * set/change z0 while executing this module from external script
+     */
     void setZ0Cut(Double_t value) {fZ0Window = value;}
 
 
   private:
 
+    /**
+     * Data members for objects, cuts and others
+     * @param outputFileName    Name of output file (default is CDCdEdxValidation.root)
+     * @param SampleType        Select type of skim files (bhabha or radbhabha or hadron)
+     * @param fnRuns            an Upper bound to total runs as an input
+     */
+
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    Double_t fD0Window; //*D0 window cut*/
-    Double_t fZ0Window; //*Z0 window cut*/
-    Int_t fnRunCounter; //*Total runs used*/
-    Int_t fiRun; //*Current run counter*/
+    Double_t fD0Window; /**< d0 window cut */
+    Double_t fZ0Window; /**< z0 window cut */
+    Int_t fnRunCounter; /**< Total runs used counter */
+    Int_t fiRun; /**< Current run number */
 
-    Int_t    fnBinsdedx; //nbin of dedx range
-    Double_t fnBinsdedxLE; //lowedge of dedx
-    Double_t fnBinsdedxUE; //upedge of dedx
+    Int_t    fnBinsdedx; /**< nbin of dedx range */
+    Double_t fnBinsdedxLE; /**< low edge of dedx */
+    Double_t fnBinsdedxUE; /**< up edge of dedx */
 
-    Int_t fnRuns; //*Number of runs ref*/
-    Int_t fCurrentRunNum; //*current run number*/
-    Double_t fcRunGain; //* existing run gain*/
-    Double_t fTrkEoverP; //* E/p ratio for cut*/
+    Int_t fnRuns; /**< Number of runs ref */
+    Int_t fCurrentRunNum; /**< current run number */
+    Double_t fcRunGain; /**< existing run gain */
+    Double_t fTrkEoverP; /**< E/p ratio for cut */
 
-    TFile* fFileOutput = nullptr;     //! Write final objects to file for RG
-    TList* fBasic = nullptr;   //! List of basic histos
-    TList* fPRdEdx = nullptr;   //! List of per run dedx histos
-    TList* fPRdEdxinP = nullptr; //!list per run dedx in P histos
+    TFile* fFileOutput = nullptr;     /**< Write final objects to file for RG */
+    TList* fBasic = nullptr;   /**< List of basic histos */
+    TList* fPRdEdx = nullptr;   /**< List of per run dedx histos */
+    TList* fPRdEdxinP = nullptr;/**< list per run dedx in P histos */
 
-    std::string fOutFileName; //name of output ROOT file
-    std::string fCollType; //collision type
+    std::string fOutFileName; /**< name of output ROOT file */
+    std::string fCollType; /**< collision type */
 
-    std::vector<Double_t> TotMean;   //Mean of dedx by Fit
-    std::vector<Double_t> TotMeanE;  //Mean Error of dedx by Fit
-    std::vector<Double_t> TotSigma;  //Sigma of dedx by Fit
-    std::vector<Double_t> TotSigmaE; //Sigma Error of dedx by Fit
-    std::vector<Int_t> TotRunN;    //veector array of runs processed
+    std::vector<Double_t> TotMean;   /**< Mean of dedx by Fit */
+    std::vector<Double_t> TotMeanE;  /**< Mean Error of dedx by Fit */
+    std::vector<Double_t> TotSigma;  /**< Sigma of dedx by Fit */
+    std::vector<Double_t> TotSigmaE; /**< Sigma Error of dedx by Fit */
+    std::vector<Int_t> TotRunN;    /**< veector array of runs processed */
 
     std::vector<TH1D*> hdEdx_PR; /**< histogram array per run */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
 
   };
 
-} // Belle2 namespace
+}

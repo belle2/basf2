@@ -29,7 +29,7 @@ CDCDedxValidationModule::CDCDedxValidationModule():
   fnBinsdedxUE(1.6)
 {
   setDescription("Make data quality monitoring plots for CDC dE/dx");
-  addParam("outputFileName", fOutFileName, "Name for output file", std::string("LevelMonitoring.root"));
+  addParam("outputFileName", fOutFileName, "Name for output file", std::string("CDCdEdxValidation.root"));
   addParam("SampleType", fCollType, "Switch to hadron (false) vs bhabha files", std::string("temp"));
   addParam("fnRuns", fnRuns, "Number of input runs");
 

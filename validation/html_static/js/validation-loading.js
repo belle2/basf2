@@ -353,7 +353,6 @@ function setupRactiveFromRevision(revData, revList) {
             function (ractive) {
 
                 if ("packages" in data) {
-                    // todo: load the package which was last time viewn by the users
                     let firstPackageName = getDefaultPackageName(data["packages"]);
                     if (firstPackageName !== false) {
                         loadValidationPlots(firstPackageName, data);
@@ -748,6 +747,7 @@ function renderLatex(force=false, irepeat=0) {
             }
             if (irepeat >= 3) {
                 console.debug("Stopping " + msg);
+                latexRenderingInProgress = false;
             }
             else {
                 console.debug("Scheduling " + msg);

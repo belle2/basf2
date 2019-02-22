@@ -456,8 +456,8 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
     }
 
-    // ignore neutrals (unless requested)
-    if (!m_neutrals && aMcParticlePtr->getCharge() == 0) {
+    // ignore neutrals (unless requested) (and unless monopoles)
+    if (!m_neutrals && (aMcParticlePtr->getCharge() == 0 && abs(aMcParticlePtr->getPDG()) != 99666)) {
       B2DEBUG(100, "particle does not have the right charge. MC particle will be skipped");
       continue; //goto next mcParticle, do not make track candidate
     }

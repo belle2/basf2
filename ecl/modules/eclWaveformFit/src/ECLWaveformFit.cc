@@ -193,7 +193,8 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.03);
-  addParam("Chi2Threshold", m_chi2Threshold, "chi2 threshold to classify offline fit as good fit.", 60.0);
+  addParam("Chi2Threshold25dof", m_chi2Threshold25dof, "chi2 threshold (25 dof) to classify offline fit as good fit.", 49.0);
+  addParam("Chi2Threshold27dof", m_chi2Threshold27dof, "chi2 threshold (27 dof) to classify offline fit as good fit.", 60.0);
   addParam("CovarianceMatrix", m_CovarianceMatrix,
            "Option to use crystal dependent covariance matrices (false uses identity matrix).", true);
 }
@@ -382,7 +383,7 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadron, p2_chi2);
 
     //if hadron fit failed try hadron + background photon (fit type = 1)
-    if (p2_chi2 >= m_chi2Threshold) {
+    if (p2_chi2 >= m_chi2Threshold27dof) {
 
       fitType = ECLDsp::photonHadronBackgroundPhoton;
       p2_chi2 = -1;
@@ -390,18 +391,17 @@ void ECLWaveformFitModule::event()
       aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, p2_chi2);
 
       //hadron + background photon fit failed try diode fit (fit type = 2)
-      if (p2_chi2 >= m_chi2Threshold) {
+      if (p2_chi2 >= m_chi2Threshold25dof) {
         g_sih = &m_si[0][2];//set second component to diode
         fitType = ECLDsp::photonDiodeCrossing;
         p2_chi2 = -1;
         Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
         aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, p2_chi2);
+
+        if (p2_chi2 >= m_chi2Threshold27dof) fitType = ECLDsp::poorChi2;  //indicates all fits tried had bad chi2
       }
 
     }
-
-    //indicates all fits tried had bad chi2
-    if (p2_chi2 >= m_chi2Threshold) fitType = ECLDsp::poorChi2;
 
     //storing fit results
     aECLDsp.setTwoComponentTotalAmp(p2_a + p2_a1);

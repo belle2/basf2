@@ -262,7 +262,7 @@ if not skipSecond:
     second = create_path()
 
     eventinfosetter = register_module('EventInfoSetter')
-    eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+    eventinfosetter.param('evtNumList', [1])
     second.add_module(eventinfosetter)
 
     # HistoManager

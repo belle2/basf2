@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 
 # gb2_setuprel = 'build-2014-10-22'
 
@@ -9,10 +10,6 @@ from basf2 import *
 # Simulation of laser calibration system with cal pulse
 # ---------------------------------------------------------------
 
-# local database with TBC constants
-reset_database()
-pathTo = '/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855/'  # on KEKCC
-use_local_database(pathTo + "localDB/localDB.txt", pathTo + "localDB")
 
 # Create path
 main = create_path()
@@ -41,7 +38,7 @@ def fiber(x, angle, barID=1, path=main):
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param('evtNumList', [100])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)

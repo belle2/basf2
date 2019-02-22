@@ -16,7 +16,18 @@
  */
 var latexRenderingLoaded = false;
 
+/**
+ * Is the function renderLatex already recursively running?
+ * @type {boolean}
+ */
 var latexRenderingInProgress = false;
+
+/**
+ * The number of LaTeX formulas that are on the page.
+ * @type {number}
+ */
+var latexEqnCount = 0;
+
 
 // ============================================================================
 // "Top level" functions, i.e. functions that are called directly from the
@@ -703,8 +714,8 @@ function getNewestRevision(revData) {
  * whenever your actions might make any DOM that contains LaTeX appear on the
  * page!
  * @param force do not check latexRenderingInProgress
- * @param irepeat how often did we recursively call this function to render
- *  left over latex elements
+ * @param irepeat how often did we recursively call this function to check
+ *  for left over latex elements (will be reset whenever new LaTeX is rendered)
  * @returns {*}
  */
 function renderLatex(force=false, irepeat=0) {
@@ -723,42 +734,33 @@ function renderLatex(force=false, irepeat=0) {
         return setTimeout(() => renderLatex(force=true), 300);
     }
 
-    // Now Latex is available!
-    let newElements =_renderLatex();
-    // Currently this still doesn't necessarily catch all of the elements,
-    // perhaps because we're missing some calls to renderLatex. So we always
-    // check if the last _renderLatex call typeset new elements, and if it does
-    // we wait for 1s and try again.
-    // In either way we try at least 3 times.
-    if (irepeat < 3 || (newElements && irepeat < 15)){
-        return setTimeout(() => renderLatex(force=true, irepeat=irepeat+1), 1000)
+    if ( irepeat === 0 ){
+        console.debug("Rendering LaTeX.");
     }
 
-    console.debug("renderLatex thinks LaTeX DOMs have stopped from " +
-        "appearing on the page and will therefore stop (or it has tried " +
-        "too often and gives up).");
-    latexRenderingInProgress = false;
-}
-
-/**
- * Render latex content. You probably want to call renderLatex instead.
- * @param log display log message
- * @returns {boolean} did we (probably) typeset new mathematics?
- * @private
- */
-function _renderLatex(log=true) {
-    // Reload MathJax, because we might have new LaTeX code in Ractive
-    // elements. Because MathJax replaces the DOMs with pictures, it will
-    // not regenerate things twice.
-
-    let t0 = performance.now();
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-    const t1 = performance.now();
-    if (log){
-        console.log(`Re-typeset latex in ${(t1 - t0).toFixed(1)}ms`);
-    }
-    // This is the current hack for finding out whether we did any additional
-    // typesetting....
-    // todo: find the proper way to find out if we typeset any new element
-    return (t1 - t0) > 5;
+    // In order to see whether there is still new LaTeX code appearing on the
+    // page, we count the number of equations. If new LaTeX code appears, we
+    // reload it 3 more times (waiting 1s in between). We also reload it at
+    // least 3 times in general.
+    MathJax.Hub.Queue(
+        function () {
+            latexEqnCount = MathJax.Hub.getAllJax().length;
+        },
+        ["Typeset", MathJax.Hub],
+        function () {
+            let neqn = MathJax.Hub.getAllJax().length;
+            let msg = `LaTeX re-rendering: neqn=${neqn}, irepeat=${irepeat}. `;
+            if (latexEqnCount !== neqn) {
+                // New LaTeX appeared, restart counting.
+                irepeat = 0;
+            }
+            if (irepeat >= 3) {
+                console.debug("Stopping " + msg);
+            }
+            else {
+                console.debug("Scheduling " + msg);
+                return setTimeout(() => renderLatex(force=true, irepeat=irepeat+1), 1000);
+            }
+        }
+    );
 }

@@ -49,12 +49,7 @@ function loadRevisions() {
         function setupRevisionLoader(ractive) {
 
             setDefaultPrebuildOption();
-
-            loadPrebuildRevisions();
-            let revs = getDefaultRevisions();
-            setRevisions(revs);
-
-            loadSelectedRevisions(data);
+            loadPrebuildRevisions(data);
 
             // be ready to load any other revision configuration if user desires
             ractive.on('loadSelectedRevisions', function () {
@@ -154,14 +149,11 @@ function loadPrebuildRevisions(data){
     let selector = $("#prebuilt-select")[0];
     let mode = selector.options[selector.selectedIndex].value;
     localStorage.setItem(getStorageId("prebuildRevisionDefault"), mode);
-    console.debug(`Loading prebuild reivision with mode '${mode}'`);
+    console.debug(`Loading prebuild revision with mode '${mode}'`);
     let revisions = getDefaultRevisions(mode);
     console.debug(`Revisions to load are ${revisions.toString()}`);
     setRevisions(revisions);
-    // todo: loadPrebuildRevisions can be either called from loadRevisions where we do not want to load anything yet, or from the trigger of the selection menu. Maybe make this into 2 functions?
-    if (typeof data !== 'undefined'){
-        loadSelectedRevisions(data);
-    }
+    loadSelectedRevisions(data);
 }
 
 /**
@@ -266,7 +258,7 @@ function setupRactiveFromRevision(revData, revList) {
     let comparisonLoadPath = `../comparisons/${revString}`;
     let createComparisonUrl = "../create_comparison";
 
-    console.log(`Loading Comparison 'comparisonLoadPath'`);
+    console.log(`Loading Comparison from '${comparisonLoadPath}'`);
 
     // todo: This SCREAMS to be refactored in some way....
     $.get(comparisonLoadPath).done(function (data) {
@@ -327,7 +319,7 @@ function setupRactiveFromRevision(revData, revList) {
                     //     package list of the comparison object).
                     console.debug(
                         `Package '${newestRev["packages"][irev]["name"]}` +
-                        "' was found in the revision file, but not in the" +
+                        "' was found in the revision file, but not in the " +
                         "comparison file. Probably this package did not " +
                         "create a single output file."
                     );

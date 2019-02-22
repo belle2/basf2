@@ -121,7 +121,7 @@ def test_script(script_location, input_file_name, temp_dir):
     test_path.add_module("RootInput", inputFileName=output_file_name)
     test_path.add_module(CheckForCorrectHLTResults())
 
-    if "beam_reco" in script_location:
+    if "expressreco" not in script_location and "beam_reco" in script_location:
         basf2.process(test_path)
 
 

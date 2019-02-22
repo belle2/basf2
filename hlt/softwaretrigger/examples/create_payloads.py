@@ -358,5 +358,7 @@ def upload_cuts(cuts, accept_mode=True):
 
 
 if __name__ == '__main__':
-    upload_cuts(filter_cuts)
+    # Accept Mode = False means, the default is to reject the event (not to accept it)
+    upload_cuts(filter_cuts, accept_mode=False)
+    # For skim cuts we do not care what the default is (there will be no selection anyways)
     upload_cuts(skim_cuts)

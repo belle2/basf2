@@ -16,10 +16,8 @@
 ################################################################################
 
 
-import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 from basf2 import B2INFO, B2FATAL
+import ROOT
 import numpy as np
 import pylab
 import sys

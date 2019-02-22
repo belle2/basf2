@@ -11,8 +11,6 @@
 # ***********************************************
 
 import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 from array import array
 import numpy as np
 

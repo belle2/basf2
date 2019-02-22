@@ -19,7 +19,6 @@
 # ******************************************************************************************
 
 import ROOT
-ROOT.gROOT.ProcessLine(".include/cvmfs/belle.cern.ch/sl6/externals/v01-04-01/include/python3.5")
 import numpy as np
 import matplotlib as mpl
 mpl.use('Agg')

@@ -17,8 +17,6 @@
 ######################################################
 
 import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 from ROOT import Belle2
 import sys
 import flavorTagger as ft

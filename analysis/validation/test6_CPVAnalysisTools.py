@@ -11,15 +11,13 @@
 </header>
 """
 
-import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 import basf2 as b2
 import modularAnalysis as ma
 import flavorTagger as ft
 import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
+import ROOT
 import sys
 import os
 

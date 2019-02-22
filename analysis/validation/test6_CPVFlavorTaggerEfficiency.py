@@ -13,9 +13,6 @@
 
 
 import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
-from ROOT import Belle2
 from basf2 import B2INFO, B2FATAL
 import flavorTagger as ft
 from array import array

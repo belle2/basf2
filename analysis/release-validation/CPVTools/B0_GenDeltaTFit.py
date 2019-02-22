@@ -20,8 +20,6 @@
 ######################################################
 
 import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 import basf2 as b2
 from ROOT import Belle2
 import modularAnalysis as ma

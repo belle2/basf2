@@ -69,19 +69,17 @@ signatures belonging to the different categories.
   Underlying decay modes of the flavor tagging categories.
 
 
-Notes:
-^^^^^^
-
-Decays with intermediate resonances that provide flavor information are
-correctly considered as signal. E.g., :math:`\bar{B_0} \to D_1^+ \to D^{*+} \to D^+ \to K_{10} \to K^{0*} \to K^-`.
-
-The Kaon and the Intermediate Lepton categories consider mesonic and baryonic
-decays via :math:`b \to c \to s` transitions. E.g., 
-:math:`b \to \Sigma_{\bar{c}} \to \Lambda_{\bar{c}}^+ \to K^- p \pi^+ (\Lambda \ell^+ p \nu_{\ell})`.
-
-The FastHadron category considers also intermediate resonances and single tau
-daughters (kinematically similar). E.g., 
-:math:`b \to \tau^- (\to \rho^-) \to \pi^-, b \to \tau^- (\to K^{*-}) \to K^-`.
+.. note::
+   Decays with intermediate resonances that provide flavor information are
+   correctly considered as signal. E.g., :math:`\bar{B_0} \to D_1^+ \to D^{*+} \to D^+ \to K_{10} \to K^{0*} \to K^-`.
+   
+   The Kaon and the Intermediate Lepton categories consider mesonic and baryonic
+   decays via :math:`b \to c \to s` transitions. E.g., 
+   :math:`b \to \Sigma_{\bar{c}} \to \Lambda_{\bar{c}}^+ \to K^- p \pi^+ (\Lambda \ell^+ p \nu_{\ell})`.
+   
+   The FastHadron category considers also intermediate resonances and single tau
+   daughters (kinematically similar). E.g., 
+   :math:`b \to \tau^- (\to \rho^-) \to \pi^-, b \to \tau^- (\to K^{*-}) \to K^-`.
 
 Flavor Tagger Algorithm
 -----------------------

@@ -13,8 +13,6 @@
 # ***********************************************
 
 import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 from basf2 import B2INFO
 import flavorTagger as ft
 from defaultEvaluationParameters import categories, Quiet, r_subsample, r_size

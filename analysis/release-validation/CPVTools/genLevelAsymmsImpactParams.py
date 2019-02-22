@@ -16,8 +16,6 @@
 
 
 import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 from ROOT import Belle2
 import basf2_mva
 

@@ -21,9 +21,6 @@
 # Contributor: F. Abudinen (Dec 2018)
 #
 ######################################################
-import ROOT
-import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 import basf2 as b2
 import modularAnalysis as ma
 import flavorTagger as ft

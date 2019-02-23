@@ -272,8 +272,9 @@ namespace Belle2 {
       bool isPi0 = false;
 
       if (m_hasCovMatrix == false) {
-        if (child->getPDGCode() == 111 && child->getNDaughters() == 2) {
-          if (child->getDaughter(0)->getPDGCode() == 22 && child->getDaughter(1)->getPDGCode() == 22) {
+        if (child->getPDGCode() == Const::pi0.getPDGCode() && child->getNDaughters() == 2) {
+          if (child->getDaughter(0)->getPDGCode() == Const::photon.getPDGCode()
+              && child->getDaughter(1)->getPDGCode() == Const::photon.getPDGCode()) {
             isPi0 = true;
           }
         }

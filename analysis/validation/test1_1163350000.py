@@ -95,8 +95,6 @@ variables.addAlias('pzDiffNoLep2', 'formula(pzDiffNoLep*pzDiffNoLep)')
 
 variables.addAlias('Q2', 'formula(energyDiffNoLep2-[pxDiffNoLep2+pyDiffNoLep2+pzDiffNoLep2])')
 
-pzDiffNoLep2outputRootFile = '../1163350000.ntup.root'
-
 fileList = ['../1163350000.dst.root']
 
 ma.inputMdstList('default', fileList, path=my_path)

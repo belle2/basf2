@@ -273,11 +273,11 @@ void plotDplus( TTree* ptree, TFile *outputFile){
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
 
-  const char *title = "D reconstruction forB#rightarrow D^{*}#tau#nu (Hadronic tag)";
+  const char *title = "D+ reconstruction forB#rightarrow D^{*+}#tau#nu";
   TH1F* h_DmassNoCut_Mode1 = new TH1F("h_DmassNoCut_Mode1",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode1", "InvM","dmID==1");
   h_DmassNoCut_Mode1->GetXaxis()->SetTitle("m_{D+} (GeV/c^{2})");
-  h_DmassNoCut_Mode1->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K^{-}#p^{+}#p^{-} from D* decay"));
+  h_DmassNoCut_Mode1->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D+ to K^{-}#p^{+}#p^{-} from D* decay"));
   h_DmassNoCut_Mode1->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
   h_DmassNoCut_Mode1->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode1->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -285,7 +285,7 @@ void plotDplus( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode2 = new TH1F("h_DmassNoCut_Mode2",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode2", "InvM","dmID==2");
   h_DmassNoCut_Mode2->GetXaxis()->SetTitle("m_{D+} (GeV/c^{2})");
-  h_DmassNoCut_Mode2->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K^{-}#p^{+}#p^{-}#p^{0} from D* decay"));  
+  h_DmassNoCut_Mode2->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D+ to K^{-}#p^{+}#p^{-}#p^{0} from D* decay"));  
   h_DmassNoCut_Mode2->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
   h_DmassNoCut_Mode2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode2->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -293,7 +293,7 @@ void plotDplus( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode3 = new TH1F("h_DmassNoCut_Mode3",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode3", "InvM","dmID==3");
   h_DmassNoCut_Mode3->GetXaxis()->SetTitle("m_{D+} (GeV/c^{2})");
-  h_DmassNoCut_Mode3->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{+} from D* decay"));   
+  h_DmassNoCut_Mode3->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D+ to K_{s}^{0}#p^{+} from D* decay"));   
   h_DmassNoCut_Mode3->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode3->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode3->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -301,7 +301,7 @@ void plotDplus( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode4 = new TH1F("h_DmassNoCut_Mode4",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode4", "InvM","dmID==4");
   h_DmassNoCut_Mode4->GetXaxis()->SetTitle("m_{D+} (GeV/c^{2})");
-  h_DmassNoCut_Mode4->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{+}#p^{-}#p^{+} from D* decay")); 
+  h_DmassNoCut_Mode4->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D+ to K_{s}^{0}#p^{+}#p^{-}#p^{+} from D* decay")); 
   h_DmassNoCut_Mode4->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode4->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode4->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -309,7 +309,7 @@ void plotDplus( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode5 = new TH1F("h_DmassNoCut_Mode5",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode5", "InvM","dmID==5");
   h_DmassNoCut_Mode5->GetXaxis()->SetTitle("m_{D+} (GeV/c^{2})");
-  h_DmassNoCut_Mode5->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{+}#p^{0} from D* decay"));   
+  h_DmassNoCut_Mode5->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D+ to K_{s}^{0}#p^{+}#p^{0} from D* decay"));   
   h_DmassNoCut_Mode5->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode5->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode5->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -317,7 +317,7 @@ void plotDplus( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode6 = new TH1F("h_DmassNoCut_Mode6",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode6", "InvM","dmID==6");
   h_DmassNoCut_Mode6->GetXaxis()->SetTitle("m_{D+} (GeV/c^{2})");
-  h_DmassNoCut_Mode6->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#K^{+} from D* decay"));   
+  h_DmassNoCut_Mode6->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D+ to K_{s}^{0}#K^{+} from D* decay"));   
   h_DmassNoCut_Mode6->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode6->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode6->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -336,12 +336,12 @@ void plotDzero( TTree* ptree, TFile *outputFile){
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
 
-  const char *title = "D reconstruction forB#rightarrow D^{*}#tau#nu (Hadronic tag)";
+  const char *title = "D0 reconstruction for B0#rightarrow D^{*+}#tau#nu";
 
   TH1F* h_DmassNoCut_Mode7 = new TH1F("h_DmassNoCut_Mode7",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode7", "InvM","dmID==7");
   h_DmassNoCut_Mode7->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
-  h_DmassNoCut_Mode7->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K^{-}#p^{+} from D* decay"));   
+  h_DmassNoCut_Mode7->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D0 to K^{-}#p^{+} from D* decay"));   
   h_DmassNoCut_Mode7->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode7->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode7->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -349,7 +349,7 @@ void plotDzero( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode8 = new TH1F("h_DmassNoCut_Mode8",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode8", "InvM","dmID==8");
   h_DmassNoCut_Mode8->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
-  h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K^{-}#p^{+}#p^{0} from D* decay"));   
+  h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D0 to K^{-}#p^{+}#p^{0} from D* decay"));   
   h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -357,7 +357,7 @@ void plotDzero( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode9 = new TH1F("h_DmassNoCut_Mode9",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode9", "InvM","dmID==9");
   h_DmassNoCut_Mode9->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
-  h_DmassNoCut_Mode9->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{0} from D* decay"));   
+  h_DmassNoCut_Mode9->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D0 to K_{s}^{0}#p^{0} from D* decay"));   
   h_DmassNoCut_Mode9->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode9->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode9->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -365,7 +365,7 @@ void plotDzero( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode10 = new TH1F("h_DmassNoCut_Mode10",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode10", "InvM","dmID==10");
   h_DmassNoCut_Mode10->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
-  h_DmassNoCut_Mode10->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K^{-}#p^{+}#p^{+}#p^{-} from D* decay"));   
+  h_DmassNoCut_Mode10->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D0 to K^{-}#p^{+}#p^{+}#p^{-} from D* decay"));   
   h_DmassNoCut_Mode10->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode10->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode10->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -373,7 +373,7 @@ void plotDzero( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode11 = new TH1F("h_DmassNoCut_Mode11",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode11", "InvM","dmID==11");
   h_DmassNoCut_Mode11->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
-  h_DmassNoCut_Mode11->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{+}#p^{-} from D* decay"));   
+  h_DmassNoCut_Mode11->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D0 to K_{s}^{0}#p^{+}#p^{-} from D* decay"));   
   h_DmassNoCut_Mode11->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode11->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode11->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -381,7 +381,7 @@ void plotDzero( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode12 = new TH1F("h_DmassNoCut_Mode12",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode12", "InvM","dmID==12");
   h_DmassNoCut_Mode12->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
-  h_DmassNoCut_Mode12->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{+}#p^{-}#pi^{0} from D* decay"));   
+  h_DmassNoCut_Mode12->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D0 to K_{s}^{0}#p^{+}#p^{-}#pi^{0} from D* decay"));   
   h_DmassNoCut_Mode12->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode12->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode12->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -404,12 +404,12 @@ void plotDSTsig( TTree* ptree, TFile *outputFile){
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
 
+  const char *title = "D*+ reconstruction for B0#rightarrow D^{*+}#tau#nu";
 
-  const char *title = "D*+ reconstruction forB#rightarrow D^{0}#pi";
   TH1F* h_DmassNoCut_Mode13 = new TH1F("h_DmassNoCut_Mode13",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode13", "InvM","dmID==13");
   h_DmassNoCut_Mode13->GetXaxis()->SetTitle("m_{D*+} (GeV/c^{2})");
-  h_DmassNoCut_Mode13->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D* to D^{0}#pi^{+} "));
+  h_DmassNoCut_Mode13->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D*+ to D^{0}#pi^{+} "));
   h_DmassNoCut_Mode13->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
   h_DmassNoCut_Mode13->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode13->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -417,7 +417,7 @@ void plotDSTsig( TTree* ptree, TFile *outputFile){
   TH1F* h_DmassNoCut_Mode14 = new TH1F("h_DmassNoCut_Mode14",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode14", "InvM","dmID==14");
   h_DmassNoCut_Mode14->GetXaxis()->SetTitle("m_{D*+} (GeV/c^{2})");
-  h_DmassNoCut_Mode14->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D* to D^{+}#pi^{0}"));
+  h_DmassNoCut_Mode14->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D*+ to D^{+}#pi^{0}"));
   h_DmassNoCut_Mode14->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
   h_DmassNoCut_Mode14->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode14->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
@@ -425,6 +425,35 @@ void plotDSTsig( TTree* ptree, TFile *outputFile){
   outputFile->cd();
   h_DmassNoCut_Mode13->Write();
   h_DmassNoCut_Mode14->Write();
+}
+
+
+
+void plotBtag( TTree* ptree, TFile *outputFile){
+  gStyle->SetOptStat(0);
+  gStyle->SetHistMinimumZero();
+
+  const char *title = "Btag properties for B0#rightarrow D^{*+}#tau#nu";
+  TH1F* h_BtagdeltaE = new TH1F("h_BtagdeltaE",title,60,-0.3,0.3);
+  ptree->Project("h_BtagdeltaE", "deltaE","");
+  h_BtagdeltaE->GetXaxis()->SetTitle("deltaE");
+  h_BtagdeltaE->GetListOfFunctions()->Add(new TNamed("Description", "Btag deltaE"));
+  h_BtagdeltaE->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
+  h_BtagdeltaE->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  h_BtagdeltaE->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+
+  TH1F* h_BtagMbc = new TH1F("h_BtagMbc",title,100,5.2,5.3);
+  ptree->Project("h_BtagMbc", "Mbc","");
+  h_BtagMbc->GetXaxis()->SetTitle("Mbc");
+  h_BtagMbc->GetListOfFunctions()->Add(new TNamed("Description", "Btag Mbc"));
+  h_BtagMbc->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
+  h_BtagMbc->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  h_BtagMbc->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+
+
+  outputFile->cd();
+  h_BtagdeltaE->Write();
+  h_BtagMbc->Write();
 } 
 ////////////////////
 void test2_1163350000(){
@@ -436,6 +465,7 @@ void test2_1163350000(){
   TTree * treeD0 =(TTree*)sample->Get("D0all");
   TTree * treeDplus=(TTree*)sample->Get("Dpall");
   TTree * treeDSTsig=(TTree*)sample->Get("DSTsig");
+  TTree * treeBtag=(TTree*)sample->Get("Btag");
 
   TFile* outputFile = new TFile("1163350000_Validation.root","RECREATE");
   
@@ -444,6 +474,7 @@ void test2_1163350000(){
   plotDzero(treeD0,outputFile);
   plotDplus(treeDplus,outputFile); 
   plotDSTsig(treeDSTsig,outputFile);
+  plotBtag(treeBtag,outputFile);
   outputFile->Close();
 
 }

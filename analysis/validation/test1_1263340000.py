@@ -200,14 +200,14 @@ Y4S_BpDstarVars_4 = vu.create_aliases_for_selected(list_of_variables=['cosTBTO']
 V_Y4S_BpDstar = Y4S_BpDstarVars_1 + Y4S_BpDstarVars_2 + Y4S_BpDstarVars_3 + Y4S_BpDstarVars_4
 
 V_D0Dstar = ['InvM', 'dmID']
-
+V_tag = ['deltaE', 'Mbc']
 # ma.variablesToNtuple('Upsilon(4S)', V_Y4S_BpDstar,
 # filename='../1263340000.ntup.root', treename='Y4S',
 # path=my_path)#commented out by Sourav Dey for the time being. Please do
 # not remove the line.
 ma.variablesToNtuple('D*0:sigDstar', V_D0Dstar, filename='../1263340000.ntup.root', treename='DSTsig', path=my_path)
 ma.variablesToNtuple('D0:sigD', V_D0Dstar, filename='../1263340000.ntup.root', treename='D0all', path=my_path)
-
+ma.variablesToNtuple('B-:tag', V_tag, filename='../1263340000.ntup.root', treename='Btag', path=my_path)
 # Process the events
 b2.process(my_path)
 

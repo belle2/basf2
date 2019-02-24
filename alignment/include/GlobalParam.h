@@ -208,7 +208,6 @@ namespace Belle2 {
         // Make new unique ptr to a copy of the other internal object
         if (other.m_object)
           m_object.reset(new DBObjType(*(static_cast<DBObjType*>(other.m_object.get()))));
-        return *this;
       }
 
       /// Assignment operator

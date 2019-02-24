@@ -193,7 +193,7 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.03);
-  addParam("Chi2Threshold25dof", m_chi2Threshold25dof, "chi2 threshold (25 dof) to classify offline fit as good fit.", 49.0);
+  addParam("Chi2Threshold25dof", m_chi2Threshold25dof, "chi2 threshold (25 dof) to classify offline fit as good fit.", 57.1);
   addParam("Chi2Threshold27dof", m_chi2Threshold27dof, "chi2 threshold (27 dof) to classify offline fit as good fit.", 60.0);
   addParam("CovarianceMatrix", m_CovarianceMatrix,
            "Option to use crystal dependent covariance matrices (false uses identity matrix).", true);

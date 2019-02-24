@@ -128,11 +128,11 @@ void SoftwareTriggerModule::initializeDebugOutput()
   if (m_param_storeDebugOutputToROOTFile) {
     m_debugOutputFile.reset(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
     if (not m_debugOutputFile) {
-      B2ERROR("Could not open debug output file. Aborting.");
+      B2FATAL("Could not open debug output file. Aborting.");
     }
     m_debugTTree.reset(new TTree("software_trigger_results", "software_trigger_results"));
     if (not m_debugTTree) {
-      B2ERROR("Could not create debug output tree. Aborting.");
+      B2FATAL("Could not create debug output tree. Aborting.");
     }
   }
 
@@ -162,6 +162,11 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
   // Return the trigger decision up to here
   bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer, true);
   const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalResultName();
+  if (totalResult) {
+    m_resultStoreObjectPointer->addResult(totalResultIdentifier, SoftwareTriggerCutResult::c_accept);
+  } else {
+    m_resultStoreObjectPointer->addResult(totalResultIdentifier, SoftwareTriggerCutResult::c_reject);
+  }
   setReturnValue(totalResult);
 }
 

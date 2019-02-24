@@ -311,7 +311,7 @@ namespace Belle2 {
       /// Constructor
       /// @param components vector of string with DB objects default names in the global vector
       /// If empty, any component is included by default.
-      explicit GlobalParamVector(std::vector<std::string> components = {});
+      explicit GlobalParamVector(const std::vector<std::string>& components = {});
 
       /// Destructor
       ~GlobalParamVector() {}

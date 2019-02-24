@@ -49,6 +49,8 @@ namespace Belle2 {
     /// All methods to override have default implementaion which does nothing
     class IGlobalParamInterface {
     public:
+      /// Destructor
+      virtual ~IGlobalParamInterface() {}
       /// Implement this to be called after Millepede finishes and all global parameters are filled
       /// in DB objects (which allow this) in GlobalParam
       /// @param std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& tuple with result <unique id, element, param, value>
@@ -199,6 +201,15 @@ namespace Belle2 {
         return m_object.get();
       }
 
+      /// Copy constructor
+      GlobalParamSet<DBObjType>(const GlobalParamSet<DBObjType>& other)
+      {
+        m_hasBeenChangedInDB = other.m_hasBeenChangedInDB;
+        // Make new unique ptr to a copy of the other internal object
+        if (other.m_object)
+          m_object.reset(new DBObjType(*(static_cast<DBObjType*>(other.m_object.get()))));
+      }
+
       /// Assignment operator
       GlobalParamSet<DBObjType>& operator=(const GlobalParamSet<DBObjType>& other)
       {
@@ -299,7 +310,7 @@ namespace Belle2 {
       /// Constructor
       /// @param components vector of string with DB objects default names in the global vector
       /// If empty, any component is included by default.
-      explicit GlobalParamVector(std::vector<std::string> components = {});
+      explicit GlobalParamVector(const std::vector<std::string>& components = {});
 
       /// Destructor
       ~GlobalParamVector() {}

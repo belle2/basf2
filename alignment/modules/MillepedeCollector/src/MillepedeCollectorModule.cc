@@ -1140,8 +1140,6 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyE
   double phi = atan2(avgMom[1], avgMom[0]);
   if (phi < 0.) phi += 2. * TMath::Pi();
 
-  std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
-
   double alpha = M / 2. / m;
   double c1 = m * sqrt(alpha * alpha - 1.);
   double c2 = 0.5 * sqrt((alpha * alpha - 1.) / alpha / alpha * (p * p + M * M));
@@ -1237,7 +1235,7 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyE
   return {result[0], result[1]};
 }
 
-TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop)
+TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop)
 {
   auto state = msop;
   const TVector3& U(state.getPlane()->getU());
@@ -1309,7 +1307,7 @@ TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(genfit::MeasuredSta
   return J_Mp_6x5.T();
 }
 
-TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(genfit::MeasuredStateOnPlane msop)
+TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop)
 {
   auto state = msop;
   // get vectors and aux variables

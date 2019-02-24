@@ -73,7 +73,7 @@ namespace Belle2 {
     }
 
 
-    GlobalParamVector::GlobalParamVector(std::vector< std::string > components) : m_components(components) {}
+    GlobalParamVector::GlobalParamVector(const std::vector< std::string >& components) : m_components(components) {}
 
     void GlobalParamVector::updateGlobalParam(double difference, short unsigned int uniqueID, short unsigned int element,
                                               short unsigned int param)

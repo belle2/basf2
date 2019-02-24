@@ -25,7 +25,7 @@ REG_MODULE(SoftwareTriggerResultPrinter)
 
 
 SoftwareTriggerResultPrinterModule::SoftwareTriggerResultPrinterModule()
-  : Module(), m_resultStoreObjectPointer("", DataStore::c_Event)
+  : Module()
 {
   setDescription("Print (and optionally write out) the software trigger "
                  "results in an easily accessible summary table.");
@@ -43,6 +43,7 @@ SoftwareTriggerResultPrinterModule::SoftwareTriggerResultPrinterModule()
 void SoftwareTriggerResultPrinterModule::initialize()
 {
   m_resultStoreObjectPointer.isRequired();
+  m_l1Result.isRequired();
 }
 
 void SoftwareTriggerResultPrinterModule::terminate()
@@ -121,4 +122,13 @@ void SoftwareTriggerResultPrinterModule::event()
   } else {
     m_passedEventsPerTrigger["final_decision"][SoftwareTriggerCutResult::c_reject]++;
   }
+
+  const bool l1Accepted = m_l1Result->test();
+  if (l1Accepted) {
+    m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_accept]++;
+  } else {
+    m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_reject]++;
+  }
+
+
 }

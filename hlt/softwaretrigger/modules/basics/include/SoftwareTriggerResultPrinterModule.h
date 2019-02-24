@@ -12,6 +12,7 @@
 #include <framework/core/Module.h>
 
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
@@ -51,6 +52,8 @@ namespace Belle2 {
 
       /// Store Object for reading the trigger decision.
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+      /// Store Object for reading the l1 result
+      StoreObjPtr<TRGSummary> m_l1Result;
       /// TFile to store the debug TTree (or a nullptr if we do not save the debug output).
       std::unique_ptr<TFile> m_debugOutputFile;
       /// TTree to store the debug output (or a nullptr if we do not save the debug output).

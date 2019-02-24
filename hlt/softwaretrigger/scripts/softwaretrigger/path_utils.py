@@ -30,7 +30,7 @@ def add_hlt_dqm(path, run_type, components=constants.DEFAULT_HLT_COMPONENTS, sta
         add_geometry_if_not_present(path)
         add_unpackers(path, components=components)
 
-    add_online_dqm(path, run_type=run_type, dqm_environment=str(constants.Location.hlt), components=components)
+    add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.hlt.name, components=components)
 
 
 def add_expressreco_dqm(path, run_type, components=constants.DEFAULT_EXPRESSRECO_COMPONENTS, standalone=False):
@@ -41,7 +41,7 @@ def add_expressreco_dqm(path, run_type, components=constants.DEFAULT_EXPRESSRECO
         add_geometry_if_not_present(path)
         add_unpackers(path, components=components)
 
-    add_online_dqm(path, run_type=run_type, dqm_environment=str(constants.Location.expressreco), components=components)
+    add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components)
 
 
 def add_geometry_if_not_present(path):

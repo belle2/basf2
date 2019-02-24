@@ -201,6 +201,16 @@ namespace Belle2 {
         return m_object.get();
       }
 
+      /// Copy constructor
+      GlobalParamSet<DBObjType>(const GlobalParamSet<DBObjType>& other)
+      {
+        m_hasBeenChangedInDB = other.m_hasBeenChangedInDB;
+        // Make new unique ptr to a copy of the other internal object
+        if (other.m_object)
+          m_object.reset(new DBObjType(*(static_cast<DBObjType*>(other.m_object.get()))));
+        return *this;
+      }
+
       /// Assignment operator
       GlobalParamSet<DBObjType>& operator=(const GlobalParamSet<DBObjType>& other)
       {

@@ -156,11 +156,12 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
   const SoftwareTriggerCutResult& moduleResult =
     FinalTriggerDecisionCalculator::getModuleResult(*m_resultStoreObjectPointer, m_param_baseIdentifier,
                                                     m_dbHandler->getAcceptOverridesReject());
-  const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(m_param_baseIdentifier);
-  m_resultStoreObjectPointer->addResult(totalResultIdentifier, moduleResult);
+  const std::string& moduleResultIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(m_param_baseIdentifier);
+  m_resultStoreObjectPointer->addResult(moduleResultIdentifier, moduleResult);
 
   // Return the trigger decision up to here
-  bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+  bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer, true);
+  const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalResultName();
   setReturnValue(totalResult);
 }
 

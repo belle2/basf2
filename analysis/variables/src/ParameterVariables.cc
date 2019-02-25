@@ -84,12 +84,10 @@ namespace Belle2 {
     {
       int i = indexes[0];
       StoreArray<MCParticle> mcParticles;
-      MCParticle* mother;
       if (i < mcParticles.getEntries()) {
         if (mcParticles[i]->getStatus(MCParticle::c_PrimaryParticle) && (!mcParticles[i]->getStatus(MCParticle::c_IsVirtual))
             && (!mcParticles[i]->getStatus(MCParticle::c_Initial))) {
-          mother = mcParticles[i]->getMother();
-          if (mother) return mother->getArrayIndex();
+          if (mcParticles[i]->getMother()) return mcParticles[i]->getMother()->getArrayIndex();
           else return -1;
         } else {
           return std::numeric_limits<float>::quiet_NaN();
@@ -553,13 +551,13 @@ namespace Belle2 {
 
                       The variable is event-based and does not need a valid particle pointer as input.)DOC");
     REGISTER_VARIABLE("MCGenPDG(index)", MCGenPDG, R"DOC(
-                      Returns PDG code of the MC generated particle with the given index in the event.
+                      [Eventbased] Returns PDG code of the MC generated particle with the given index in the event.
 
                       In case the index is out of range, NaN will be returned.
 
                       In cases the particle is initial, virtual or not primary, NaN will be returned as well.)DOC");
     REGISTER_VARIABLE("MCGenMothIndex(index)", MCGenMothIndex, R"DOC(
-                      Returns mother index of the MC generated particle with the given index in the event.
+                      [Eventbased] Returns mother index of the MC generated particle with the given index in the event.
                       In case the index is out of range, NaN will be returned.
 
                       In case the particle is initial, virtual or not primary, NaN will be returned as well.

@@ -5,7 +5,7 @@ from variables import variables
 from variables.utils import add_collection
 
 
-def MCGenTopo(n=200):
+def mc_gen_topo(n=200):
     """
     Gets the list of variables containing the raw topology information of MC generated events.
 
@@ -43,14 +43,14 @@ def MCGenTopo(n=200):
     return list_of_variables
 
 
-# The following statement adds a collection of variables, MCGenTopo, which
-# corresponds to the list of variables returned by MCGenTopo().
-add_collection(MCGenTopo(), 'MCGenTopo')
+# The following statement adds a collection of variables, mc_gen_topo, which
+# corresponds to the list of variables returned by mc_gen_topo().
+add_collection(mc_gen_topo(), 'mc_gen_topo')
 
 # The following statements add a group of collections of variables,
-# MCGenTopo_n with n=0, 1, ... 498, 499, which correspond to the group of
-# lists of variables returned by MCGenTopo(n) with n=0, 1, ... 498, 499.
+# mc_gen_topo_n with n=0, 1, ... 498, 499, which correspond to the group of
+# lists of variables returned by mc_gen_topo(n) with n=0, 1, ... 498, 499.
 for n in range(500):
-    list_of_variables = MCGenTopo(n)
-    collection_of_variables = 'MCGenTopo_' + str(n)
+    list_of_variables = mc_gen_topo(n)
+    collection_of_variables = 'mc_gen_topo_' + str(n)
     add_collection(list_of_variables, collection_of_variables)

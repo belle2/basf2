@@ -65,9 +65,9 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   useBelleDBServer=None,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
+                                  path=analysis_main, entrySequences=None,
                                   convertECLCrystalEnergies=False,
-                                  convertExtHits=False,
-                                  path=analysis_main, entrySequences=None):
+                                  convertExtHits=False):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.

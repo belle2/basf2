@@ -180,6 +180,9 @@ print("start process...")
 
 
 if not skipFirst:
+    # Define a global tag
+    use_central_database('data_reprocessing_proc8')
+
     # Create path
     first = create_path()
 
@@ -203,8 +206,6 @@ if not skipFirst:
 
     # Geometry (only TOP needed)
     geometry = register_module('Geometry')
-    geometry.param('useDB', False)
-    geometry.param('components', ['TOP'])
     first.add_module(geometry)
 
     # Unpacking

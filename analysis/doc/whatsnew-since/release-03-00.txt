@@ -16,6 +16,8 @@ Variables
   .. seealso::
      `variables.utils.create_aliases_for_selected()`
 
+* The collection flavor_tagging contains all flavor tagging variables for users.
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
@@ -36,13 +38,30 @@ Modules
 
 * Removal of the unsupported ECLClusterInfoModule.
 
+* The module buildRestOfEvent in modularAnalysis.py uses now the default lists: 
+  'pi+:mdst', 'gamma:mdst' and 'K_L0:mdst'.
+
+* The module VertexFitUpdateDaughtersModule updates now the daughters always. 
+
 FEI
 +++
 
 * Removed the backward compatibility layer (``pid_renaming_oktober_2017``). 
   Only FEI trainings from release-02 are supported. Please update to ``FEIv4_2018_MC9_release_02_00_01`` or newer.
 
+Flavor Tagger
++++++++++++++
+
+* BtagToWBosonVariables adapted to work with the new ROE.
+* New default global tag for weight files is analysis_tools_release-03-01-00.
+* All release validation and performance evaluation scripts added to analysis/release-validation/CPVTools/.
+* The flavor tagger creates and adds default aliases into the collection list flavor_tagging.
+* Nightly validation files updated test6_CPVAnalysisTools.py.
+* All example scripts use now variablesToNtuples and follow the current syntax and path rules.
+* Sphinx documentation is uptodate.
+
 Tutorials
 +++++++++
 
 * Fix B2A202 to load Klongs as advertised.
+* Fix B2A801 to use JPsiKs as signal channel and to show how to run on Belle data/MC. Central database global tag updated.

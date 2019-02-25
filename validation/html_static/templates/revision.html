@@ -2,11 +2,21 @@
 <div>
   <!-- color will be update by the java script method loadValidationPlots -->
   <div>
+    <input
+        class="reference-radio"
+        id="reference-radio-{{label}}"
+        type="radio"
+        name="reference-selection-radio"
+        value="{{label}}"
+        title="Use this revision as a reference, i.e. compare the newest selected revision to this revision."
+        onclick="onReferenceSelectionChanged()"
+    >
     <input  class="reference-checkbox" name="revisions"
             id="reference-checkbox-{{label}}"
             value="{{label}}" checked=""
-            type="checkbox">
-    &nbsp;
+            type="checkbox"
+            title="Show this revision in the plots."
+    >
     <label for="reference-checkbox-{{label}}" class="revision-label"
            style="color: black;">{{ label }}
     </label>

@@ -109,6 +109,25 @@ function triggerPopup(itemId) {
 function loadSelectedRevisions(data) {
 
     let revList = getSelectedRevsList();
+
+    // Now we need to put the revision that serves as comparison reference first!
+    let reference = getReferenceSelection();
+    if (reference !== undefined){
+        let referenceIndex = revList.indexOf(reference);
+        if (referenceIndex > -1){
+            revList.splice(referenceIndex, 1);
+        }
+        else {
+            console.warn("Selected reference not in revisions.")
+        }
+        revList.unshift(reference);
+    }
+    else {
+        console.warn("No reference selected.")
+    }
+
+    console.log(revList);
+
     let revString = selectedRevsListToString(revList);
 
     if (revString === "") {
@@ -127,6 +146,8 @@ function loadSelectedRevisions(data) {
  * @returns the mode which was set
  */
 function setDefaultPrebuildOption(){
+    setReferenceSelection("reference");
+
     let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
     console.debug(`RECOVERED ${mode}`);
     if (mode == null){
@@ -156,6 +177,44 @@ function loadPrebuildRevisions(data){
     loadSelectedRevisions(data);
 }
 
+function getReferenceSelection(){
+    var myRadio = $("input[name=reference-selection-radio]");
+    var checkedValue = myRadio.filter(":checked").val();
+    console.log(`checkedValue=${checkedValue}`);
+    return checkedValue
+}
+
+function setReferenceSelection(revision){
+    $(`#reference-radio-${revision}`).each(
+        function (i, obj) {
+            obj.checked = true;
+        }
+    );
+    onReferenceSelectionChanged();
+}
+
+function onReferenceSelectionChanged(){
+    $('.reference-checkbox').each(function (i, obj) {
+        obj.disabled = false;
+    });
+
+    let selectedReference = getReferenceSelection();
+    if ( selectedReference !== "reference"){
+        $("#reference-checkbox-reference").each(
+            function (i, obj) {
+                obj.checked = false;
+                obj.disabled = true;
+            }
+        );
+    }
+    $(`#reference-checkbox-${selectedReference}`).each(
+        function (i, obj) {
+            obj.checked = true;
+            obj.disabled = true;
+        }
+    );
+}
+
 /**
  * Sets the state of the revision checkboxes
  * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
@@ -163,6 +222,7 @@ function loadPrebuildRevisions(data){
  *  (default, last build, nightly and revision).
  */
 function getDefaultRevisions(mode="rbn") {
+
     let allRevisions = getAllRevsList().sort().reverse();
 
     let referenceRevision = "reference";

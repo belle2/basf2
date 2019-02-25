@@ -492,7 +492,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         if index is not None:
             style = get_style(index)
             line_color = ROOT.gROOT.GetColor(style.GetLineColor()).AsHexString()
-        # print("For {} index {} color {}".format(r, index, line_color))
+        print("For {} index {} color {}".format(r, index, line_color))
 
         # todo the creation date and git_hash of the original revision should be transferred here
         comparison_revs.append(json_objects.ComparisonRevision(

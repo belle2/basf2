@@ -186,7 +186,7 @@ function getReferenceSelection(){
 
 function setReferenceSelection(revision){
     $(`#reference-radio-${revision}`).each(
-        function (i, obj) {
+        (i, obj) => {
             obj.checked = true;
         }
     );
@@ -198,7 +198,7 @@ function onReferenceSelectionChanged(){
         obj.disabled = false;
     });
     $(`.revision-label`).each(
-        function (i, obj) {
+        (i, obj) => {
             obj.style.fontWeight = "normal";
         }
     );
@@ -206,20 +206,20 @@ function onReferenceSelectionChanged(){
     let selectedReference = getReferenceSelection();
     if ( selectedReference !== "reference"){
         $("#reference-checkbox-reference").each(
-            function (i, obj) {
+            (i, obj) => {
                 obj.checked = false;
                 obj.disabled = true;
             }
         );
     }
     $(`#reference-checkbox-${selectedReference}`).each(
-        function (i, obj) {
+        (i, obj) => {
             obj.checked = true;
             obj.disabled = true;
         }
     );
     $(`#revision-label-${selectedReference}`).each(
-        function (i, obj) {
+        (i, obj) => {
             obj.style.fontWeight = "bold";
         }
     );
@@ -502,15 +502,23 @@ function loadValidationPlots(packageLoadName, data) {
     console.log(`loadValidationPlots: Comparison data for package '${packageLoadName}' loaded`);
 
     let selected_list = getSelectedRevsList();
-    // update the already displayed revision labels with the correct colors
-    $(".revision-label").each(function () {
+    let reference = getReferenceSelection();
 
+    // update the already displayed revision labels with the correct colors
+    $(".revision-label").each( function () {
+
+        // todo: this is overly complicated: Just loop over selected list and set colors and set everything to standard before
+        // todo: also use arguments to this function, rather then $(this)
         let label = $(this).text();
         // find the revision with the same label
         for (let i in data["revisions"]) {
             if (data["revisions"][i].label === label) {
                 $(this).css("color", data["revisions"][i].color);
             }
+        }
+
+        if (reference === label){
+            $(this).css("color", "black")
         }
 
         if (selected_list.indexOf(label) < 0) {

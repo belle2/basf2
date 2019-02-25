@@ -17,8 +17,12 @@
             type="checkbox"
             title="Show this revision in the plots."
     >
-    <label for="reference-checkbox-{{label}}" class="revision-label"
-           style="color: black;">{{ label }}
+    <label
+        for="reference-checkbox-{{label}}"
+        class="revision-label"
+        id="revision-label-{{label}}"
+        style="color: black;">
+      {{ label }}
     </label>
   </div>
   <!-- show some extra information, but not for the reference plots -->

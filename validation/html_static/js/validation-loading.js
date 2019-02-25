@@ -197,6 +197,11 @@ function onReferenceSelectionChanged(){
     $('.reference-checkbox').each(function (i, obj) {
         obj.disabled = false;
     });
+    $(`.revision-label`).each(
+        function (i, obj) {
+            obj.style.fontWeight = "normal";
+        }
+    );
 
     let selectedReference = getReferenceSelection();
     if ( selectedReference !== "reference"){
@@ -213,6 +218,15 @@ function onReferenceSelectionChanged(){
             obj.disabled = true;
         }
     );
+    $(`#revision-label-${selectedReference}`).each(
+        function (i, obj) {
+            obj.style.fontWeight = "bold";
+        }
+    );
+
+    // todo: also style newest revision in bold. Problem: we don't have the
+    // argument for that yet.
+    // let newestRevision = getNewestRevision()
 }
 
 /**

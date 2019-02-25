@@ -655,12 +655,8 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
 
     # Retrieve the Revision and the Package from the path. The Package can
     # directly be returned (c.f. return at the bottom of this function)
-    if is_reference:
-        revision = 'reference'
-        package = root_file.split('/')[-3]
-    else:
-        revision = root_file.split('/')[-3]
-        package = root_file.split('/')[-2]
+    revision = root_file.split('/')[-3]
+    package = root_file.split('/')[-2]
 
     # Get the 'last modified' timestamp of the revision that contains our
     # current root_file

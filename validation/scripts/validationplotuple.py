@@ -79,6 +79,8 @@ class Plotuple:
         # All elements of the Plotuple that are not the reference-object
         # Get the elements, i.e. all RootObjects except for the
         # reference object. May be either histograms or n-tuples.
+        # todo: this might give confusing results in comparison with sorting by
+        # name and we also have a nonlinear history, so this doesn't make sense...
         self.elements = sorted(
             [_ for _ in root_objects if _ is not self.reference],
             key=lambda _: _.date,
@@ -287,8 +289,9 @@ class Plotuple:
                 self.comparison_result = "equal"
 
             self.chi2test_result = \
-                r'Performed $\chi^2$-Test between reference and {} ' \
+                r'Performed $\chi^2$-Test between {} and {} ' \
                 r'($\chi^2$ = {:.4f}; NDF = {}; $\chi^2/\text{{NDF}}$ = {:.4f})'.format(
+                    self.reference.revision,
                     self.newest.revision,
                     chi2,
                     ndf,

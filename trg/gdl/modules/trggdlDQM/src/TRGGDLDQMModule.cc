@@ -297,7 +297,6 @@ void TRGGDLDQMModule::initialize()
   }
 
   n_inbit = m_dbinput->getninbit();
-  std::cout << "kogatest "  << n_inbit << std::endl;
   n_outbit = m_dbftdl ->getnoutbit();
   for (int i = 0; i < 320; i++) {
     strcpy(inbitname[i], m_dbinput->getinbitname(i));
@@ -402,24 +401,23 @@ void TRGGDLDQMModule::event()
 
   StoreArray<TRGGDLUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) {
-    //std::cout << "no trg unpacker" << std::endl;
     return;
   }
 
-  StoreArray<SoftwareTriggerResult> entAry_soft;
-  if (!entAry_soft || !entAry_soft.getEntries()) {
+  //Get skim type from SoftwareTriggerResult
+  StoreObjPtr<SoftwareTriggerResult> result_soft;
+  if (!result_soft.isValid()) {
     skim.push_back(0);
   } else {
     skim.push_back(0);
-    std::map<std::string, int> skim_map = entAry_soft[0]->getResults();
+    const std::map<std::string, int>& skim_map = result_soft->getResults();
     for (int iskim = 1; iskim < nskim_gdldqm; iskim++) {
-      auto itr = skim_map.find(skim_smap[iskim]);
-      if (itr != skim_map.end()) {
-        if (skim_map[skim_smap[iskim]] == 1) skim.push_back(iskim);
+      if (skim_map.find(skim_menu[iskim]) != skim_map.end()) {
+        const bool accepted = (result_soft->getResult(skim_menu[iskim]) == SoftwareTriggerCutResult::c_accept);
+        if (accepted) skim.push_back(iskim);
       }
     }
   }
-
 
 
   //prepare entAry adress

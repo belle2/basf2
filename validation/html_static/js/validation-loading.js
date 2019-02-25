@@ -177,13 +177,19 @@ function loadPrebuildRevisions(data){
     loadSelectedRevisions(data);
 }
 
+/**
+ * Return the revision selected as refrence
+ * @returns {*|jQuery|*|*}
+ */
 function getReferenceSelection(){
     var myRadio = $("input[name=reference-selection-radio]");
-    var checkedValue = myRadio.filter(":checked").val();
-    console.log(`checkedValue=${checkedValue}`);
-    return checkedValue
+    return myRadio.filter(":checked").val();
 }
 
+/**
+ * Set a custom revision as reference
+ * @param revision the revision to be reference
+ */
 function setReferenceSelection(revision){
     $(`#reference-radio-${revision}`).each(
         (i, obj) => {
@@ -193,6 +199,13 @@ function setReferenceSelection(revision){
     onReferenceSelectionChanged();
 }
 
+/**
+ * This function gets called whenever the selection of the reference radio
+ * buttons changes. 1. If anything else than the standard revision is selected,
+ * the standard revision is disabled (untick and disable checkbox).
+ * 2. The reference revision will also be shown in the plots (tick checkbox)
+ * 3. The reference revision is shown in bold.
+ */
 function onReferenceSelectionChanged(){
     $('.reference-checkbox').each(function (i, obj) {
         obj.disabled = false;
@@ -731,6 +744,10 @@ function getSelectedRevsList() {
     return selectedRev;
 }
 
+/**
+ * Returns an array with all revisions shown in the submenu.
+ * @returns {Array}
+ */
 function getAllRevsList() {
     let revs = [];
     $('.reference-checkbox').each(function (i, obj) {

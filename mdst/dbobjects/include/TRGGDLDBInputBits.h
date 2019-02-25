@@ -64,6 +64,14 @@ namespace Belle2 {
     {
       return m_ninbit;
     }
+    /** get name of i-th input trigger bit**/
+    int getinbitnum(const char* c) const
+    {
+      for (int i = 0; i < 320; i++) {
+        if (strcmp(c, m_inbitname[i]) == 0)return i;
+      }
+      return -1;
+    }
 
   private:
 

@@ -8,6 +8,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <stdlib.h>
 #include <iostream>
 #include <string>
@@ -16,6 +18,7 @@
 #include <TH1I.h>
 
 namespace Belle2 {
+
 
   class TRGGDLDQMModule : public HistoModule {
 
@@ -40,56 +43,59 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   protected:
+    //number of skims
+    static const int nskim_gdldqm = 7;
+
     //! timestamp diff from gdlL1 to comL1 in LSB8nsec
-    TH1I* h_c8_gdlL1TocomL1;
+    TH1I* h_c8_gdlL1TocomL1[nskim_gdldqm];
     //! timestamp diff from t0(top) to gdlL1 in LSB8nsec
-    TH1I* h_c8_topTogdlL1;
+    TH1I* h_c8_topTogdlL1[nskim_gdldqm];
     //! timestamp diff from t0(ecl) to gdlL1 in LSB8nsec
-    TH1I* h_c8_eclTogdlL1;
+    TH1I* h_c8_eclTogdlL1[nskim_gdldqm];
     //! timestamp diff from t0(cdc) to gdlL1 in LSB8nsec
-    TH1I* h_c8_cdcTogdlL1;
+    TH1I* h_c8_cdcTogdlL1[nskim_gdldqm];
     //! timestamp diff from fit on fam to GDL in LSB8nsec
-    TH1I* h_c8_ecl8mToGDL;
+    TH1I* h_c8_ecl8mToGDL[nskim_gdldqm];
     //! timestamp diff from t0(top) to GDL in LSB8nsec
-    TH1I* h_c8_topToGDL;
+    TH1I* h_c8_topToGDL[nskim_gdldqm];
     //! timestamp diff from t0(ecl) to GDL in LSB8nsec
-    TH1I* h_c8_eclToGDL;
+    TH1I* h_c8_eclToGDL[nskim_gdldqm];
     //! timestamp diff from t0(cdc) to GDL in LSB8nsec
-    TH1I* h_c8_cdcToGDL;
+    TH1I* h_c8_cdcToGDL[nskim_gdldqm];
     //! timestamp diff from cdc_timing to comL1 in LSB2nsec
-    TH1I* h_c2_cdcTocomL1;
+    TH1I* h_c2_cdcTocomL1[nskim_gdldqm];
     //! timestamp diff from cdc_timing to comL1 in nsec
-    TH1D* h_ns_cdcTocomL1;
+    TH1D* h_ns_cdcTocomL1[nskim_gdldqm];
     //! timestamp diff from cdc_timing to gdlL1 in nsec
-    TH1D* h_ns_cdcTogdlL1;
+    TH1D* h_ns_cdcTogdlL1[nskim_gdldqm];
     //! timestamp diff from top_timing to ecl_timing in nsec
-    TH1D* h_ns_topToecl;
+    TH1D* h_ns_topToecl[nskim_gdldqm];
     //! timestamp diff from top_timing to cdc_timing in nsec
-    TH1D* h_ns_topTocdc;
+    TH1D* h_ns_topTocdc[nskim_gdldqm];
     //! timestamp from cdc_timing to ecl_timing to L1 in LSB2nsec
-    TH1I* h_c2_cdcToecl;
+    TH1I* h_c2_cdcToecl[nskim_gdldqm];
     //! timestamp diff from cdc_timing to ecl_timing in nsec
-    TH1D* h_ns_cdcToecl;
+    TH1D* h_ns_cdcToecl[nskim_gdldqm];
 
     //! input bits
     // TH1I* h_inp;
-    // TH1I* h_inp_rise[N_BITS_RESERVED];
-    // TH1I* h_inp_fall[N_BITS_RESERVED];
+    // TH1I* h_inp_rise[N_BITS_RESERVED][nskim_gdldqm];
+    // TH1I* h_inp_fall[N_BITS_RESERVED][nskim_gdldqm];
     //! itd bits
-    TH1I* h_itd;
-    TH1I* h_itd_rise[N_BITS_RESERVED];
-    TH1I* h_itd_fall[N_BITS_RESERVED];
+    TH1I* h_itd[nskim_gdldqm];
+    TH1I* h_itd_rise[N_BITS_RESERVED][nskim_gdldqm];
+    TH1I* h_itd_fall[N_BITS_RESERVED][nskim_gdldqm];
     //! ftd bits
-    TH1I* h_ftd;
-    TH1I* h_ftd_rise[N_BITS_RESERVED];
-    TH1I* h_ftd_fall[N_BITS_RESERVED];
+    TH1I* h_ftd[nskim_gdldqm];
+    TH1I* h_ftd_rise[N_BITS_RESERVED][nskim_gdldqm];
+    TH1I* h_ftd_fall[N_BITS_RESERVED][nskim_gdldqm];
     //! psn bits
-    TH1I* h_psn;
-    TH1I* h_psn_rise[N_BITS_RESERVED];
-    TH1I* h_psn_fall[N_BITS_RESERVED];
-    TH1I* h_psn_extra;
+    TH1I* h_psn[nskim_gdldqm];
+    TH1I* h_psn_rise[N_BITS_RESERVED][nskim_gdldqm];
+    TH1I* h_psn_fall[N_BITS_RESERVED][nskim_gdldqm];
+    TH1I* h_psn_extra[nskim_gdldqm];
     //! timtype
-    TH1I* h_timtype;
+    TH1I* h_timtype[nskim_gdldqm];
     //! event by event psnm timing distribution
     TH2I* h_p;
     //! event by event ftdl timing distribution
@@ -118,13 +124,14 @@ namespace Belle2 {
     unsigned evtno;
     unsigned _exp;
     unsigned _run;
+    std::vector<int> skim;
     //private:
     //StoreArray<TRGGDLUnpackerStore> store;
 
     static const int n_output_extra;
     static const char* output_extra[4];
 
-    //condition database for unpacer
+    //condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     int LeafBitMap[320];
     char LeafNames[320][100];
@@ -141,6 +148,26 @@ namespace Belle2 {
     int ee_ftd[10];
     int ee_itd[10];
 
+    //condition database for input bits
+    DBObjPtr<TRGGDLDBInputBits>m_dbinput;
+    unsigned  n_inbit;
+    char inbitname[320][100];
+
+    //condition database for output bits
+    DBObjPtr<TRGGDLDBFTDLBits> m_dbftdl;
+    unsigned  n_outbit;
+    char outbitname[320][100];
+
+    //name of skim from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
+    std::string skim_smap[nskim_gdldqm] = {
+      "all",
+      "accept_hadron",
+      "accept_tau_tau",
+      "accept_mumu_1trk",
+      "accept_mumu_2trk",
+      "accept_gamma_gamma",
+      "accept_bhabha"
+    };
 
   };
 

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# This example demonstrates the detailed usage of the parameter lists returned by mc_gen_topo(n)
-# and the collections of variables named like mc_gen_topo_n.
+# This example demonstrates the detailed usage of the parameter lists of variables returned by mc_gen_topo(n)
+# and the parameter collections of variables named like mc_gen_topo_n. For details on mc_gen_topo(n) and
+# mc_gen_topo_n, please refer to their definitions in analysis/scripts/variables/parameterCollections.py.
+# Xing-Yu Zhou
 
 import basf2
 from modularAnalysis import inputMdst

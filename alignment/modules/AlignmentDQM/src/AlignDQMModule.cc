@@ -103,59 +103,34 @@ void AlignDQMModule::defineHisto()
 
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
-  TDirectory* DirAlign = NULL;
-  DirAlign = oldDir->mkdir("AlignmentDQM");
-  TDirectory* DirAlignSensors = NULL;
-  DirAlignSensors = oldDir->mkdir("AlignmentDQMSensors");
-  TDirectory* DirAlignSensResids = NULL;
-  DirAlignSensResids = DirAlignSensors->mkdir("Residuals2D");
-  TDirectory* DirAlignSensResids1D = NULL;
-  DirAlignSensResids1D = DirAlignSensors->mkdir("Residuals1D");
+  TDirectory* DirAlign = oldDir->mkdir("AlignmentDQM");
+  TDirectory* DirAlignSensors = oldDir->mkdir("AlignmentDQMSensors");
+  TDirectory* DirAlignSensResids = DirAlignSensors->mkdir("Residuals2D");
+  TDirectory* DirAlignSensResids1D = DirAlignSensors->mkdir("Residuals1D");
 
-  TDirectory* DirAlignSensResMeanUPosUV = NULL;
-  DirAlignSensResMeanUPosUV = DirAlignSensors->mkdir("ResidMeanUPositUV");
-  TDirectory* DirAlignSensResMeanVPosUV = NULL;
-  DirAlignSensResMeanVPosUV = DirAlignSensors->mkdir("ResidMeanVPositUV");
-  TDirectory* DirAlignSensResMeanUPosU = NULL;
-  DirAlignSensResMeanUPosU = DirAlignSensors->mkdir("ResidMeanUPositU");
-  TDirectory* DirAlignSensResMeanVPosU = NULL;
-  DirAlignSensResMeanVPosU = DirAlignSensors->mkdir("ResidMeanVPositU");
-  TDirectory* DirAlignSensResMeanUPosV = NULL;
-  DirAlignSensResMeanUPosV = DirAlignSensors->mkdir("ResidMeanUPositV");
-  TDirectory* DirAlignSensResMeanVPosV = NULL;
-  DirAlignSensResMeanVPosV = DirAlignSensors->mkdir("ResidMeanVPositV");
-  TDirectory* DirAlignSensResUPosU = NULL;
-  DirAlignSensResUPosU = DirAlignSensors->mkdir("ResidUPositU");
-  TDirectory* DirAlignSensResVPosU = NULL;
-  DirAlignSensResVPosU = DirAlignSensors->mkdir("ResidVPositU");
-  TDirectory* DirAlignSensResUPosV = NULL;
-  DirAlignSensResUPosV = DirAlignSensors->mkdir("ResidUPositV");
-  TDirectory* DirAlignSensResVPosV = NULL;
-  DirAlignSensResVPosV = DirAlignSensors->mkdir("ResidVPositV");
+  TDirectory* DirAlignSensResMeanUPosUV = DirAlignSensors->mkdir("ResidMeanUPositUV");
+  TDirectory* DirAlignSensResMeanVPosUV = DirAlignSensors->mkdir("ResidMeanVPositUV");
+  TDirectory* DirAlignSensResMeanUPosU = DirAlignSensors->mkdir("ResidMeanUPositU");
+  TDirectory* DirAlignSensResMeanVPosU = DirAlignSensors->mkdir("ResidMeanVPositU");
+  TDirectory* DirAlignSensResMeanUPosV = DirAlignSensors->mkdir("ResidMeanUPositV");
+  TDirectory* DirAlignSensResMeanVPosV = DirAlignSensors->mkdir("ResidMeanVPositV");
+  TDirectory* DirAlignSensResUPosU = DirAlignSensors->mkdir("ResidUPositU");
+  TDirectory* DirAlignSensResVPosU = DirAlignSensors->mkdir("ResidVPositU");
+  TDirectory* DirAlignSensResUPosV = DirAlignSensors->mkdir("ResidUPositV");
+  TDirectory* DirAlignSensResVPosV = DirAlignSensors->mkdir("ResidVPositV");
 
-  TDirectory* DirAlignLayers = NULL;
-  DirAlignLayers = oldDir->mkdir("AlignmentDQMLayers");
+  TDirectory* DirAlignLayers = oldDir->mkdir("AlignmentDQMLayers");
 
-  TDirectory* DirAlignLayerResMeanUPosUV = NULL;
-  DirAlignLayerResMeanUPosUV = DirAlignLayers->mkdir("ResidLayerMeanUPositPhiTheta");
-  TDirectory* DirAlignLayerResMeanVPosUV = NULL;
-  DirAlignLayerResMeanVPosUV = DirAlignLayers->mkdir("ResidLayerMeanVPositPhiTheta");
-  TDirectory* DirAlignLayerResMeanUPosU = NULL;
-  DirAlignLayerResMeanUPosU = DirAlignLayers->mkdir("ResidLayerMeanUPositPhi");
-  TDirectory* DirAlignLayerResMeanVPosU = NULL;
-  DirAlignLayerResMeanVPosU = DirAlignLayers->mkdir("ResidLayerMeanVPositPhi");
-  TDirectory* DirAlignLayerResMeanUPosV = NULL;
-  DirAlignLayerResMeanUPosV = DirAlignLayers->mkdir("ResidLayerMeanUPositTheta");
-  TDirectory* DirAlignLayerResMeanVPosV = NULL;
-  DirAlignLayerResMeanVPosV = DirAlignLayers->mkdir("ResidLayerMeanVPositTheta");
-  TDirectory* DirAlignLayerResUPosU = NULL;
-  DirAlignLayerResUPosU = DirAlignLayers->mkdir("ResidLayerUPositPhi");
-  TDirectory* DirAlignLayerResVPosU = NULL;
-  DirAlignLayerResVPosU = DirAlignLayers->mkdir("ResidLayerVPositPhi");
-  TDirectory* DirAlignLayerResUPosV = NULL;
-  DirAlignLayerResUPosV = DirAlignLayers->mkdir("ResidLayerUPositTheta");
-  TDirectory* DirAlignLayerResVPosV = NULL;
-  DirAlignLayerResVPosV = DirAlignLayers->mkdir("ResidLayerVPositTheta");
+  TDirectory* DirAlignLayerResMeanUPosUV = DirAlignLayers->mkdir("ResidLayerMeanUPositPhiTheta");
+  TDirectory* DirAlignLayerResMeanVPosUV = DirAlignLayers->mkdir("ResidLayerMeanVPositPhiTheta");
+  TDirectory* DirAlignLayerResMeanUPosU = DirAlignLayers->mkdir("ResidLayerMeanUPositPhi");
+  TDirectory* DirAlignLayerResMeanVPosU = DirAlignLayers->mkdir("ResidLayerMeanVPositPhi");
+  TDirectory* DirAlignLayerResMeanUPosV = DirAlignLayers->mkdir("ResidLayerMeanUPositTheta");
+  TDirectory* DirAlignLayerResMeanVPosV = DirAlignLayers->mkdir("ResidLayerMeanVPositTheta");
+  TDirectory* DirAlignLayerResUPosU = DirAlignLayers->mkdir("ResidLayerUPositPhi");
+  TDirectory* DirAlignLayerResVPosU = DirAlignLayers->mkdir("ResidLayerVPositPhi");
+  TDirectory* DirAlignLayerResUPosV = DirAlignLayers->mkdir("ResidLayerUPositTheta");
+  TDirectory* DirAlignLayerResVPosV = DirAlignLayers->mkdir("ResidLayerVPositTheta");
 
   DirAlign->cd();
   // Momentum Phi
@@ -798,12 +773,12 @@ void AlignDQMModule::beginRun()
 void AlignDQMModule::event()
 {
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
-  int iTrack = 0;
-  int iTrackVXD = 0;
-  int iTrackCDC = 0;
-  int iTrackVXDCDC = 0;
 
   try {
+    int iTrack = 0;
+    int iTrackVXD = 0;
+    int iTrackCDC = 0;
+    int iTrackVXDCDC = 0;
     StoreArray<Track> tracks(m_param_TracksStoreArrayName);
     if (!tracks || !tracks.getEntries()) return;
     for (const Track& track : tracks) {  // over tracks
@@ -852,23 +827,20 @@ void AlignDQMModule::event()
       m_MomTheta->Fill(Theta);
       m_MomCosTheta->Fill(cos(Theta - 90.0));
 
-      float Chi2NDF = 0;
-      float NDF = 0;
-      float pValue = 0;
       if (theRC[0]->wasFitSuccessful()) {
         if (!theRC[0]->getTrackFitStatus())
           continue;
         // add NDF:
-        NDF = theRC[0]->getTrackFitStatus()->getNdf();
+        float NDF = theRC[0]->getTrackFitStatus()->getNdf();
         m_NDF->Fill(NDF);
         // add Chi2/NDF:
         m_Chi2->Fill(theRC[0]->getTrackFitStatus()->getChi2());
         if (NDF) {
-          Chi2NDF = theRC[0]->getTrackFitStatus()->getChi2() / NDF;
+          float Chi2NDF = theRC[0]->getTrackFitStatus()->getChi2() / NDF;
           m_Chi2NDF->Fill(Chi2NDF);
         }
         // add p-value:
-        pValue = theRC[0]->getTrackFitStatus()->getPVal();
+        float pValue = theRC[0]->getTrackFitStatus()->getPVal();
         m_PValue->Fill(pValue);
         // add residuals:
         int iHit = 0;

@@ -26,6 +26,7 @@
 #include <chrono>
 #include <string>
 #include <regex>
+#include <fstream>
 
 namespace Belle2 {
   namespace MVA {
@@ -222,6 +223,11 @@ namespace Belle2 {
     void save_custom_weightfile(const GeneralOptions& general_options, const SpecificOptions& specific_options,
                                 const std::string& custom_weightfile, const std::string& output_identifier)
     {
+      std::ifstream ifile(custom_weightfile);
+      if (!(bool)ifile) {
+        B2FATAL("Input weight file: " << custom_weightfile << " does not exist!");
+      }
+
       Weightfile weightfile;
       weightfile.addOptions(general_options);
       weightfile.addOptions(specific_options);

@@ -19,7 +19,7 @@ using namespace Belle2;
 
 CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
                unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status, signed short otherHitIndex,
-               unsigned short leadingEdgeCharge)
+               unsigned short leadingEdgeCharge, unsigned short tot)
 {
   setTDCCount(tdcCount);
   setADCCount(charge);
@@ -27,6 +27,7 @@ CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
   setStatus(status);
   setOtherHitIndex(otherHitIndex);
   setADCCountAtLeadingEdge(leadingEdgeCharge);
+  setTOT(tot);
 }
 
 

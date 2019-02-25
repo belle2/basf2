@@ -41,9 +41,9 @@ namespace Belle2 {
   public:
     /** Empty constructor for ROOT IO. */
     CDCHit() :
-      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_status(0), m_otherHitIndex(-1), m_adcCountAtLeadingEdge(0)
+      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_status(0), m_otherHitIndex(-1), m_adcCountAtLeadingEdge(0), m_tot(0)
     {
-      B2DEBUG(250, "Empty CDCHit Constructor called.");
+      B2DEBUG(29, "Empty CDCHit Constructor called.");
     }
 
     /** Constructor to set all internal variables.
@@ -59,14 +59,17 @@ namespace Belle2 {
      *  @param status         Status of the hit.
      *  @param otherHitIndex  Index to the other hit.
      *  @param leadingEdgeADC ADCcount for a narrow gate at the leading edge.
+     *  @param tot            Time over threshold.
      */
     CDCHit(unsigned short tdcCount, unsigned short adcCount,
            unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status = 0, signed short otherHitIndex = -1,
-           unsigned short leadingEdgeADC = 0);
+           unsigned short leadingEdgeADC = 0,
+           unsigned short tot = 0);
 
     /** Constructor using the WireID object. */
     CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID, unsigned short status = 0,
-           signed short otherHitIndex = -1, unsigned short leadingEdgeADC = 0)
+           signed short otherHitIndex = -1, unsigned short leadingEdgeADC = 0,
+           unsigned short tot = 0)
     {
       setTDCCount(tdcCount);
       setADCCount(adcCount);
@@ -74,6 +77,7 @@ namespace Belle2 {
       setStatus(status);
       setOtherHitIndex(otherHitIndex);
       setADCCountAtLeadingEdge(leadingEdgeADC);
+      setTOT(tot);
     }
 
     /** Setter for Wire ID.
@@ -87,7 +91,7 @@ namespace Belle2 {
      */
     void setWireID(unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire)
     {
-      B2DEBUG(250, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
+      B2DEBUG(29, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
       m_eWire = WireID(iSuperLayer, iLayer, iWire).getEWire();
     }
 
@@ -104,7 +108,7 @@ namespace Belle2 {
      */
     void setStatus(unsigned short status)
     {
-      B2DEBUG(250, "setStatus called with " << status);
+      B2DEBUG(29, "setStatus called with " << status);
       m_status = status;
     }
 
@@ -126,7 +130,7 @@ namespace Belle2 {
      */
     void setTDCCount(short tdcCount)
     {
-      B2DEBUG(250, "setTDCCount called with " << tdcCount);
+      B2DEBUG(29, "setTDCCount called with " << tdcCount);
       m_tdcCount = tdcCount;
     }
 
@@ -153,6 +157,12 @@ namespace Belle2 {
     void setADCCountAtLeadingEdge(unsigned short adcCount)
     {
       m_adcCountAtLeadingEdge = adcCount;
+    }
+
+    /** Setter for TOT. */
+    void setTOT(unsigned short tot)
+    {
+      m_tot = tot;
     }
 
     /** Getter for iWire. */
@@ -237,6 +247,12 @@ namespace Belle2 {
       return m_adcCountAtLeadingEdge;
     }
 
+    /** Getter for TOT. */
+    unsigned short getTOT() const
+    {
+      return m_tot;
+    }
+
     /**
      * Implementation of the base class function.
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
@@ -277,10 +293,13 @@ namespace Belle2 {
     /** ADC count at leading edge. */
     unsigned short  m_adcCountAtLeadingEdge;
 
+    /** Time over threshod. */
+    unsigned short  m_tot;
+
 
   private:
     /** ROOT Macro.*/
-    ClassDefOverride(CDCHit, 7);
+    ClassDefOverride(CDCHit, 8);
   };
 } // end namespace Belle2
 

@@ -70,6 +70,13 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
              example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="3")[1:],
     }
 
+    #: Map a list of known global tag names to their global tag state
+    globaltags = {
+        "localtest": "PUBLISHED",
+        "newgt": "NEW",
+        "invalidgt": "INVALID",
+    }
+
     def reply(self, xml):
         """Return a given xml string"""
         self.send_response(200)
@@ -89,6 +96,14 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         params = parse_qs(url.query)
         # return mock payload info
+        if url.path.startswith("/v2/globalTag"):
+            # gt info
+            gtname = url.path.split("/")[-1]
+            if gtname in self.globaltags:
+                return self.reply('{ "name": "%s", "globalTagStatus": { "name": "%s" } }' % (gtname, self.globaltags[gtname]))
+            else:
+                return self.send_error(404)
+
         if url.path.endswith("/iovPayloads/"):
             exp = params["expNumber"][0]
             run = params["runNumber"][0]
@@ -172,14 +187,14 @@ def run_redirect(pipe, redir_port):
     httpd.serve_forever()
 
 
-def dbprocess(host, path, lastChangeCallback=lambda: None):
+def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localtest"):
     """Process a given path in a child process so that FATAL will not abort this
     script but just the child and configure to use a central database at the given host"""
     # reset the database so that there is no chain
     basf2.reset_database()
     # now run the path in a child process inside of a clean working directory
     with clean_working_directory():
-        basf2.use_central_database("localtest", host, host, "", basf2.LogLevel.WARNING)
+        basf2.use_central_database(globaltag, host, host, "", basf2.LogLevel.WARNING)
         lastChangeCallback()
         safe_process(path)
 
@@ -233,6 +248,13 @@ for exp in range(len(SimpleConditionsDB.payloads) + 1):
     dbprocess(mock_host, main)
     # and again using redirection
     dbprocess(redir_host, main)
+
+# check that a invalid global tag or a misspelled global tag actually throw
+# errors
+evtinfo.param({"expList": [3], "runList": [0], "evtNumList": [1]})
+for gt in ["newgt", "invalidgt", "horriblymisspelled",
+           "h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ"]:
+    dbprocess(mock_host, main, globaltag=gt)
 
 # check 503 retry
 evtinfo.param({"expList": [503], "runList": [0], "evtNumList": [1]})

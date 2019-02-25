@@ -14,6 +14,11 @@ Variables
 * The function to create variable aliases for particles selected from a decay
   string has been fixed and extended to allow better
   customization (:issue:`BII-4437`)
+Modules
++++++++
+
+* Removal of the unsupported ECLClusterInfoModule.
+* Added `modularAnalysis.fitPseudo` function and a pseudo vertex fitting module to add a covariance matrix when a vertex fit is not possible. E.g. for :math:`\pi^0` decays.
 
   .. seealso::
      `variables.utils.create_aliases_for_selected()`

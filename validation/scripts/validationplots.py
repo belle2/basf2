@@ -132,6 +132,10 @@ def get_plot_files(revisions, work_folder):
     # in their package folders
     for revision in revisions:
 
+        if revision == "reference":
+            results.extend(get_tracked_reference_files())
+            continue
+
         rev_result_folder = os.path.join(results_foldername, revision)
         if not os.path.isdir(rev_result_folder):
             continue
@@ -143,12 +147,12 @@ def get_plot_files(revisions, work_folder):
             # find all root files within this package
             root_files = glob.glob(package_folder + "/*.root")
             # append with absolute path
-            results = results + [os.path.abspath(rf) for rf in root_files]
+            results.extend([os.path.abspath(rf) for rf in root_files])
 
     return results
 
 
-def get_reference_files():
+def get_tracked_reference_files():
     """
     This function loops over the local and central release dir and collects
     the .root-files from the validation-subfolders of the packages. These are
@@ -261,13 +265,18 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     # are stored on a different location than the regular plot ROOT files.
 
     # Collect all plot files, i.e. plot ROOT files from the requested revisions
-    plot_files = get_plot_files(revisions, work_folder)
-
-    # If we also want a reference plot, collect the reference ROOT files
-    if 'reference' in revisions:
-        reference_files = get_reference_files()
-    else:
+    if len(revisions) == 0:
+        print("No revisions selected for plotting. Returning without "
+              "doing anything.", file=sys.stderr)
+        return
+    elif len(revisions) == 1:
+        # Only one revision, so there's no point in making comparisons
+        # ==> no reference files
+        plot_files = get_plot_files(revisions, work_folder)
         reference_files = []
+    else:
+        plot_files = get_plot_files(revisions[1:], work_folder)
+        reference_files = get_plot_files(revisions[:1], work_folder)
 
     # Now create the ROOT objects for the plot and the reference objects,
     # and get the lists of keys and packages

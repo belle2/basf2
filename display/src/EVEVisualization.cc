@@ -1309,34 +1309,39 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
 
 void EVEVisualization::addECLCluster(const ECLCluster* cluster)
 {
-  const float phi = cluster->getPhi();
-  float dPhi = cluster->getUncertaintyPhi();
-  float dTheta = cluster->getUncertaintyTheta();
-  if (dPhi >= M_PI / 4 or dTheta >= M_PI / 4 or cluster->getUncertaintyEnergy() == 1.0) {
-    B2WARNING("Found ECL cluster with broken errors (unit matrix or too large). Using 0.05 as error in phi/theta. The 3x3 error matrix previously was:");
-    cluster->getCovarianceMatrix3x3().Print();
-    dPhi = dTheta = 0.05;
-  }
 
-  if (!std::isfinite(dPhi) or !std::isfinite(dTheta)) {
-    B2ERROR("ECLCluster phi or theta error is NaN or infinite, skipping cluster!");
-    return;
-  }
+  // only display c_nPhotons hypothesis clusters
+  if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
 
-  //convert theta +- dTheta into eta +- dEta
-  TVector3 thetaLow;
-  thetaLow.SetPtThetaPhi(1.0, cluster->getTheta() - dTheta, phi);
-  TVector3 thetaHigh;
-  thetaHigh.SetPtThetaPhi(1.0, cluster->getTheta() + dTheta, phi);
-  float etaLow = thetaLow.Eta();
-  float etaHigh = thetaHigh.Eta();
-  if (etaLow > etaHigh) {
-    std::swap(etaLow, etaHigh);
-  }
+    const float phi = cluster->getPhi();
+    float dPhi = cluster->getUncertaintyPhi();
+    float dTheta = cluster->getUncertaintyTheta();
+    if (dPhi >= M_PI / 4 or dTheta >= M_PI / 4 or cluster->getUncertaintyEnergy() == 1.0) {
+      B2WARNING("Found ECL cluster with broken errors (unit matrix or too large). Using 0.05 as error in phi/theta. The 3x3 error matrix previously was:");
+      cluster->getCovarianceMatrix3x3().Print();
+      dPhi = dTheta = 0.05;
+    }
 
-  int id = m_eclData->AddTower(etaLow, etaHigh, phi - dPhi, phi + dPhi);
-  m_eclData->FillSlice(0, cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
-  VisualRepMap::getInstance()->addCluster(cluster, m_eclData, id);
+    if (!std::isfinite(dPhi) or !std::isfinite(dTheta)) {
+      B2ERROR("ECLCluster phi or theta error is NaN or infinite, skipping cluster!");
+      return;
+    }
+
+    //convert theta +- dTheta into eta +- dEta
+    TVector3 thetaLow;
+    thetaLow.SetPtThetaPhi(1.0, cluster->getTheta() - dTheta, phi);
+    TVector3 thetaHigh;
+    thetaHigh.SetPtThetaPhi(1.0, cluster->getTheta() + dTheta, phi);
+    float etaLow = thetaLow.Eta();
+    float etaHigh = thetaHigh.Eta();
+    if (etaLow > etaHigh) {
+      std::swap(etaLow, etaHigh);
+    }
+
+    int id = m_eclData->AddTower(etaLow, etaHigh, phi - dPhi, phi + dPhi);
+    m_eclData->FillSlice(0, cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
+    VisualRepMap::getInstance()->addCluster(cluster, m_eclData, id);
+  }
 }
 
 void EVEVisualization::addKLMCluster(const KLMCluster* cluster)

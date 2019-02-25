@@ -756,6 +756,7 @@ function selectedRevsListToString(selectedRevs) {
 
 /**
  * Return the newest revision that is included in the dataset.
+ * Also highlights it by displaying it bold.
  * @param revData
  * @return {*}
  */
@@ -773,6 +774,17 @@ function getNewestRevision(revData) {
             }
         }
     }
+
+    // todo: I wish we could move this somewhere else...
+    if ( newest !== null ){
+        // console.warn(newest.label);
+        $(`#revision-label-${newest.label}`).each(
+            (i, obj) => {
+                obj.style.fontWeight = "bold";
+            }
+        );
+    }
+
 
     return newest
 }

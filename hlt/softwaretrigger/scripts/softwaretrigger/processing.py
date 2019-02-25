@@ -40,9 +40,8 @@ def setup_basf2_and_db():
     parser.add_argument('--histo-output-file', type=str,
                         help="Filename for histogram output",
                         default=None)
-    parser.add_argument('--central-db-tag', type=str,
-                        help="Use the central db with a specific tag",
-                        default=None)
+    parser.add_argument('--central-db-tag', type=str, nargs="*",
+                        help="Use the central db with a specific tag (can be applied multiple times, order is relevant)")
     parser.add_argument('--no-output',
                         help="Don't write any output files",
                         action="store_true", default=False)
@@ -51,8 +50,10 @@ def setup_basf2_and_db():
 
     # Local DB specification
     basf2.reset_database()
+    basf2.use_database_chain()
     if args.central_db_tag:
-        basf2.use_central_database(args.central_db_tag)
+        for central_tag in args.central_db_tag:
+            basf2.use_central_database(central_tag)
     else:
         basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
 

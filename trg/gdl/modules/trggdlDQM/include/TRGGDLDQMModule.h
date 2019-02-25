@@ -172,12 +172,12 @@ namespace Belle2 {
     //name of histgrams
     std::string skim_smap[nskim_gdldqm] = {
       "all",
-      "software_trigger_cut&skim&accept_hadron",
-      "software_trigger_cut&skim&accept_tau_tau",
-      "software_trigger_cut&skim&accept_mumu_1trk",
-      "software_trigger_cut&skim&accept_mumu_2trk",
-      "software_trigger_cut&skim&accept_gamma_gamma",
-      "software_trigger_cut&skim&accept_bhabha"
+      "hadron",
+      "tautau",
+      "mumu1trk",
+      "mumu2trk",
+      "gammagamma",
+      "bhabha"
     };
 
   };

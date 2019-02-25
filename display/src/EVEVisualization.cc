@@ -352,6 +352,11 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
       representation = representations.front();
     }
 
+    if (!track->hasTrackFitStatus(representation)) {
+      B2ERROR("RecoTrack without FitStatus: will be skipped!");
+      return;
+    }
+
     const genfit::FitStatus* fitStatus = track->getTrackFitStatus(representation);
 
     isPruned = fitStatus->isTrackPruned();

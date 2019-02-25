@@ -57,12 +57,9 @@
 #include <alignment/Hierarchy.h>
 #include <alignment/GlobalParam.h>
 #include <alignment/GlobalDerivatives.h>
-
-#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/GblMultipleScatteringController.h>
 
 #include <genfit/KalmanFitterInfo.h>
-
-//#include <alignment/reconstruction/GblMultipleScatteringController.h>
 
 using namespace std;
 using namespace Belle2;
@@ -903,7 +900,7 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
   //gbl->setOptions(m_internalIterations, true, true, m_externalIterations, m_recalcJacobians);
   gbl->setOptions("", true, true, 0, 0);
-  //gbl->setTrackSegmentController(new GblMultipleScatteringController);
+  gbl->setTrackSegmentController(new GblMultipleScatteringController);
 
   MeasurementAdder factory("", "", "", "", "");
 

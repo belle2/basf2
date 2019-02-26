@@ -493,7 +493,7 @@ namespace Belle2 {
 
         // if hit is more than 15cm from the track position on the detector plane, skip it.
         // (not reconstructing hits with irrelevantly large Cherenkov angle)
-        if ((track_at_detector - virthitpos).Mag() > 15.0) continue;
+        if ((track_at_detector - virthitpos).Mag() > 25.0) continue;
 
         double sigExpArr[c_noOfHypotheses] = {0.0}; // esigi for given mirror hypothesis only
         double th_cer_all[c_noOfAerogels] = {0.0};

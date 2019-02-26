@@ -143,6 +143,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["nTrkLoose"] += 1;
 
       const short charge = trackFitResult->getChargeSign();
+      if (charge == 0) {
+        continue;
+      }
       calculationResult["netChargeLoose"] += charge;
 
       const TLorentzVector& momentumLab = trackFitResult->get4Momentum();

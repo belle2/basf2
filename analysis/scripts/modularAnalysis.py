@@ -2217,7 +2217,7 @@ def tagCurlTracks(particleLists,
                   belle=False,
                   mcTruth=False,
                   responseCut=0.303,
-                  selectorType='cut',
+                  selectorType='mva',
                   ptCut=0.6,
                   train=False,
                   path=analysis_main):

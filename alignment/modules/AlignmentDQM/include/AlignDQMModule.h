@@ -170,6 +170,39 @@ namespace Belle2 {
     /** Number of all finding tracks */
     TH1F* m_Tracks = nullptr;
 
+    /** helix parameters and their corellations: */
+
+    /** d0 - the signed distance to the IP in the r-phi plane */
+    TH1F* m_D0 = nullptr;
+    /** z0 - the z0 coordinate of the perigee (beam spot position) */
+    TH1F* m_Z0 = nullptr;
+    /** Omega - the curvature of the track. It's sign is defined by the charge of the particle */
+    TH1F* m_Omega = nullptr;
+    /** TanLambda - the slope of the track in the r-z plane */
+    TH1F* m_TanLambda = nullptr;
+
+    /** d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z) */
+    TH2F* m_D0Z0 = nullptr;
+    /** d0 - signed distance to the IP in r-phi vs. Track momentum Pt */
+    TH2F* m_D0MomPt = nullptr;
+    /** d0 - signed distance to the IP in r-phi vs. Omega - the curvature of the track */
+    TH2F* m_D0Omega = nullptr;
+    /** d0 - signed distance to the IP in r-phi vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_D0TanLambda = nullptr;
+    /** z0 - the z0 coordinate of the perigee vs. Track momentum Pt */
+    TH2F* m_Z0MomPt = nullptr;
+    /** z0 - the z0 coordinate of the perigee vs. Omega - the curvature of the track */
+    TH2F* m_Z0Omega = nullptr;
+    /** z0 - the z0 coordinate of the perigee vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_Z0TanLambda = nullptr;
+    /** Track momentum Pt vs. Omega - the curvature of the track */
+    TH2F* m_MomPtOmega = nullptr;
+    /** Track momentum Pt vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_MomPtTanLambda = nullptr;
+    /** Omega - the curvature of the track vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_OmegaTanLambda = nullptr;
+
+
     /// StoreArray name where the merged Tracks are written.
     std::string m_param_TracksStoreArrayName = "";
 

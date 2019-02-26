@@ -86,7 +86,7 @@ void DQMHistAnalysisARICHModule::beginRun()
 
 void DQMHistAnalysisARICHModule::event()
 {
-
+  //Draw lines on mergerHits histogram for shifters to divide sectors
   m_h_mergerHit = findHist("ARICH/mergerHit");
   if (m_h_mergerHit != NULL) {
     m_c_mergerHit->Clear();

@@ -11,7 +11,7 @@
 #ifndef ARICHDQMANALYSISMODULE_H
 #define ARICHDQMANALYSISMODULE_H
 
-//#pragma once
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -111,8 +111,9 @@ namespace Belle2 {
     TH1* m_h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
     TH1* m_h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/
 
+    //TObjects for DQM analysis
     TLine* m_LineForMB[5] = {}; /**Lines to divide the sectors on mergerHit histogram*/
-    TCanvas* m_c_mergerHit = NULL;
+    TCanvas* m_c_mergerHit = NULL; /**Canvas for modified mergerHit histogram*/
 
   };
 

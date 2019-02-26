@@ -13,8 +13,6 @@ import os
 import sys
 import glob
 
-# define a local database (will be created automatically, if doesn't exist)
-use_local_database("localDB/localDB.txt", "localDB", False)
 
 # Create path
 main = create_path()
@@ -28,14 +26,14 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
-# Geometry (TOP is needed only)
-geometry = register_module('Geometry')
-geometry.param('components', ['TOP'])
-geometry.param('useDB', False)
-main.add_module(geometry)
+# Initialize TOP geometry parameters from gearbox
+main.add_module('TOPGeometryParInitializer', useDB=False)
 
 # process single event
 process(main)
+
+# define a local database (will be created automatically, if doesn't exist)
+use_local_database("localDB/localDB.txt", "localDB", False)
 
 # and then run the importer
 dbImporter = TOPDatabaseImporter()
@@ -43,8 +41,8 @@ dbImporter = TOPDatabaseImporter()
 # import constants
 
 # root file names are supposed to be 'commonT0_r*.root', where * is a run number
-pathToFiles = './'  # set the correct path to root files!
-allFileNames = sorted(glob.glob('pathToFiles/commonT0_r*.root'))
+pathToFiles = '.'  # set the correct path to root files!
+allFileNames = sorted(glob.glob(pathToFiles + '/commonT0_r*.root'))
 fileNames = []
 for fileName in allFileNames:
     file = TFile.Open(fileName)
@@ -63,7 +61,7 @@ for fileName in allFileNames:
     file.Close()
 
 numFiles = len(fileNames)
-if numFiles is 0:
+if numFiles == 0:
     print('No files found')
     sys.exit()
 

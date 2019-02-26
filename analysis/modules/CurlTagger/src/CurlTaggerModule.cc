@@ -64,7 +64,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
            false);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
 
-  addParam("responseCut", m_ResponseCut, "minimum allowed selector response for a match.", 0.303);
+  addParam("responseCut", m_ResponseCut, "minimum allowed selector response for a match.", 0.324);
 }
 
 CurlTaggerModule::~CurlTaggerModule()

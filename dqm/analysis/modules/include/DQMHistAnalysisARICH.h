@@ -83,37 +83,9 @@ namespace Belle2 {
   protected:
     bool m_debug;/**<debug*/
 
-    //Histograms to show status by 1/0
-    TH1* m_h_chStat = NULL;/**<Status of each channels*/
-    TH1* m_h_aeroStat = NULL;/**<Status of each aerogel tiles*/
-
-    //Hitograms from DQM module
-    TH1* m_h_chDigit   = NULL;/**<The number of raw digits in each channel*/
-    TH1* m_h_chipDigit = NULL;/**<The number of raw digits in each ASIC chip*/
-    TH1* m_h_hapdDigit = NULL;/**<The number of raw digits in each HAPD*/
-    TH1* m_h_chHit = NULL;/**<The number of hits in each channel*/
-    TH1* m_h_chipHit = NULL;/**<The number of hits in each ASIC chip*/
-    TH1* m_h_hapdHit = NULL;/**<The number of hits in each HAPD*/
-    TH1* m_h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
-    TH1* m_h_secHapdHit[6] = {};/**<The number of hits in each HAPDs of each sector*/
-    TH2* m_h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
-    TH1* m_h_aerogelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
-    TH1* m_h_bits = NULL;/**<Timing bits*/
-    TH2* m_h_hitsPerTrack2D = NULL;/**<Sum of 2D hit/track map on each position of track*/
-    TH2* m_h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
-    TH3* m_h_aerogelHits3D = NULL; /**< 3D histogram of */
-    TH3* m_h_mirrorThetaPhi = NULL; /**< cherenkov theta vs phi for mirror reflected photons (for each mirror plate)*/
-    TH2* m_h_thetaPhi = NULL;  /**< cherenkov theta vs phi for non-mirror-reflected photons*/
-    TH1* m_h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
-    TH1* m_h_theta = NULL;/**<Reconstructed Cherenkov angles*/
-    TH1* m_h_hitsPerTrack = NULL;/**<Average hits/track calculated from h_hits2D and h_track2D*/
-
-    TH1* m_h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
-    TH1* m_h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/
-
     //TObjects for DQM analysis
-    TLine* m_LineForMB[5] = {}; /**Lines to divide the sectors on mergerHit histogram*/
-    TCanvas* m_c_mergerHit = NULL; /**Canvas for modified mergerHit histogram*/
+    TLine* m_LineForMB[5] = {}; /**<Lines to divide the sectors on mergerHit histogram*/
+    TCanvas* m_c_mergerHit = NULL; /**<Canvas for modified mergerHit histogram*/
 
   };
 

@@ -21,9 +21,14 @@ parser.add_option('-e', '--exp', dest='experiment',
                   default=-1, help='experiment')
 parser.add_option('-r', '--run', dest='run',
                   default=-1, help='run')
+parser.add_option('-o', '--object', dest='object',
+                  default="", help='object to be printed')
+
 
 (options, args) = parser.parse_args()
 
+if options.object == '':
+    print("use option -o to specify the object to be printed (ARICHReconstructionPar, etc)")
 
 # set database tag
 if options.tag == 'local':
@@ -47,24 +52,32 @@ run = int(options.run)
 if exp > 0 and run > 0:
     dbImporter.setExperimentAndRun(exp, run)
 
-# uncomment/comment the desired function
-
-# dbImporter.printModulesInfo()
-# dbImporter.printSimulationPar()
-# dbImporter.printChannelMask() # use dbImporter.printChannelMask(True) to make 2d map of active channels
-# dbImporter.printChannelMapping()
-# dbImporter.printFEMappings()
-# dbImporter.printGlobalAlignment()
-# dbImporter.printMirrorAlignment()
-
-# creates root file with full detector plane QE map (all HAPDs) as stored in the database
-
-# dbImporter.dumpQEMap()
-
-# creates root file with numbering of HAPD module slots (position on detector plane -> module number)
-
-# dbImporter.dumpModuleNumbering()
-
-# print geometry parameters of ARICH detector from the database
-
-# dbImporter.printGeometryConfig()
+if options.object == 'ARICHModulesInfo':
+    dbImporter.printModulesInfo()
+elif options.object == 'ARICHSimulationPar':
+    dbImporter.printSimulationPar()
+elif options.object == 'ARICHChannelMask':
+    dbImporter.printChannelMask()  # use dbImporter.printChannelMask(True) to make 2d map of active channels
+elif options.object == 'ARICHChannelMapping':
+    dbImporter.printChannelMapping()
+elif options.object == 'ARICHMergerMapping':
+    dbImporter.printMergerMapping()
+elif options.object == 'ARICHCopperMapping':
+    dbImporter.printCopperMapping()
+elif options.object == 'ARICHReconstructionPar':
+    dbImporter.printReconstructionPar()
+elif options.object == 'ARICHGlobalAlignment':
+    dbImporter.printGlobalAlignment()
+elif options.object == 'ARICHMirrorAlignment':
+    dbImporter.printMirrorAlignment()
+elif options.object == 'ARICHGeometryConfig':
+    # print geometry parameters of ARICH detector from the database
+    dbImporter.printGeometryConfig()
+elif options.object == 'moduleNumbering':
+    # creates file with numbering of HAPD module slots (position on detector plane -> module number)
+    dbImporter.dumpModuleNumbering()
+elif options.object == 'QEMap':
+    # creates root file with full detector plane QE map (all HAPDs) as stored in the database
+    dbImporter.dumpQEMap()
+else:
+    print('Non-valid arich DB object!')

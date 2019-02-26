@@ -35,6 +35,7 @@ namespace Belle2 {
     double L1Trigger(const Particle*)
     {
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       return trg->test();
     }
 
@@ -44,6 +45,7 @@ namespace Belle2 {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
+          if (!trg) return std::numeric_limits<float>::quiet_NaN();
           return trg->testPsnm(name);
         };
         return func;
@@ -58,6 +60,7 @@ namespace Belle2 {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
+          if (!trg) return std::numeric_limits<float>::quiet_NaN();
           return trg->testFtdl(name);
         };
         return func;
@@ -72,6 +75,7 @@ namespace Belle2 {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
+          if (!trg) return std::numeric_limits<float>::quiet_NaN();
           return trg->testInput(name);
         };
         return func;
@@ -117,6 +121,7 @@ namespace Belle2 {
 
       // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       const unsigned int trgWord = trg->getPsnmBits(ntrgWord);
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
       isL1Trigger = (trgWord >> bitInWord) & 1;
@@ -143,6 +148,7 @@ namespace Belle2 {
       // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
 
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       const unsigned int trgWord = trg->getFtdlBits(ntrgWord);
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
       isL1Trigger = (trgWord >> bitInWord) & 1;
@@ -167,6 +173,7 @@ namespace Belle2 {
 
       // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       const unsigned int trgWord = trg->getInputBits(ntrgWord);
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
       isL1Trigger = (trgWord >> bitInWord) & 1;
@@ -191,9 +198,17 @@ namespace Belle2 {
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
 
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       prescale = trg->getPreScale(ntrgWord, bitInWord);
 
       return prescale;
+    }
+
+    double getTimType(const Particle*)
+    {
+      StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
+      return trg->getTimType();
     }
 
     Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args)
@@ -240,21 +255,10 @@ namespace Belle2 {
       // for HLT, a c_accept is a pass and all other cases are fail
       // see mdst/dataobjects/include/SoftwareTriggerResult.h
       std::vector<std::string> hardcodedname
-        = { "software_trigger_cut&hlt&total_result" };
+        = { "software_trigger_cut&filter&total_result" };
       double swtcr = softwareTriggerResult(hardcodedname)(p);
       if (swtcr > 0.5) return 1.0; // 1
       else             return 0.0; // 0 or -1
-    }
-
-    double passesAnyFastRecoTrigger(const Particle* p)
-    {
-      // for fast reco, a c_accept and c_noResult is a pass, c_reject is a fail
-      // see mdst/dataobjects/include/SoftwareTriggerResult.h
-      std::vector<std::string> hardcodedname
-        = { "software_trigger_cut&fast_reco&total_result" };
-      double swtcr = softwareTriggerResult(hardcodedname)(p);
-      if (swtcr < -0.5) return 0.0; // -1
-      else              return 1.0; // 1 or 0
     }
 
     //-------------------------------------------------------------------------
@@ -277,17 +281,17 @@ namespace Belle2 {
                       "Returns the input bit status of the i-th input trigger bit.");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
                       "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
+    REGISTER_VARIABLE("L1TimType", getTimType ,
+                      "Returns ETimingType time type.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
     REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult,
                       "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
                       "defined as reject (-1), accept (1), or noResult (0). Note "
-                      "that the meanings of these change depending if using FastReco "
-                      "or the HLT, hence expert.");
+                      "that the meanings of these change depending if using trigger "
+                      "or the skim stage, hence expert.");
     REGISTER_VARIABLE("HighLevelTrigger", passesAnyHighLevelTrigger,
                       "[Eventbased] 1.0 if event passes the HLT trigger, 0.0 if not");
-    REGISTER_VARIABLE("FastRecoTrigger", passesAnyFastRecoTrigger,
-                      "[Eventbased] 1.0 if event passes the fastreco trigger, 0.0 if not");
     //-------------------------------------------------------------------------
   }
 }

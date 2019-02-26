@@ -400,6 +400,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       return false;
     };
 
+    // cppcheck-suppress ignoredReturnValue
     std::adjacent_find(simHitsForMcParticle.begin(),
                        simHitsForMcParticle.end(),
                        drawConnectSimHits);

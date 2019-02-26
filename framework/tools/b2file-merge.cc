@@ -1,6 +1,7 @@
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/io/RootIOUtilities.h>
+#include <framework/io/RootFileInfo.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FileCatalog.h>
@@ -9,7 +10,6 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
 
 #include <TSystem.h>
 #include <TFile.h>
@@ -41,7 +41,8 @@ int main(int argc, char* argv[])
   ("output,o", po::value<std::string>(&outputfilename), "output file name")
   ("file", po::value<std::vector<std::string>>(&inputfilenames), "filename to merge")
   ("force,f", "overwrite existing file")
-  ("no-catalog", "don't register output file in file catalog")
+  ("no-catalog", "don't register output file in file catalog, This is now the default")
+  ("add-to-catalog", "register the output file in the file catalog")
   ("quiet,q", "if given don't print infos, just warnings and errors");
   po::positional_options_description positional;
   positional.add("output", 1);
@@ -78,7 +79,7 @@ The following restrictions apply:
       logConfig->setLogLevel(LogConfig::c_Warning);
   }
 
-  B2INFO("Merging files into " << boost::io::quoted(outputfilename));
+  B2INFO("Merging files into " << std::quoted(outputfilename));
   // check output file
   if (fs::exists(outputfilename) && variables.count("force")==0) {
     B2ERROR("Output file exists, use -f to force overwriting it");
@@ -98,8 +99,7 @@ The following restrictions apply:
   // set of all users
   std::set<std::string> allUsers;
   // EventInfo for the high/low event numbers of the final FileMetaData
-  auto lowEvt = boost::make_optional(false, EventInfo{0,0,0});
-  auto highEvt = boost::make_optional(false, EventInfo{0,0,0});
+  std::optional<EventInfo> lowEvt, highEvt;
   // set of all branch names in the event tree to compare against to make sure
   // that they're the same in all files
   std::set<std::string> allEventBranches;
@@ -111,171 +111,138 @@ The following restrictions apply:
   // there. The idea is that merging the persistent stuff is fast so we catch
   // errors more quickly when we do this as a first step and events later on.
   for (const auto& input : inputfilenames) {
-    if (!fs::exists(input)) {
-      B2ERROR("Input file " << boost::io::quoted(input) << " does not exist");
-      continue;
-    }
-    // it exists but can we open it?
-    TFile tfile(input.c_str());
-    if (tfile.IsZombie()) {
-      B2ERROR("Could not open " << boost::io::quoted(input));
-      continue;
-    }
-    // get the persistent tree in the file
-    TTree* persistent = dynamic_cast<TTree*>(tfile.Get("persistent"));
-    if (!persistent) {
-      B2ERROR("No persistent tree found in " <<  boost::io::quoted(input));
-      continue;
-    }
-    // if some used hadd or did something else strange we might have more or
-    // less then one entry in the persistent tree
-    if (persistent->GetEntriesFast() != 1) {
-      B2ERROR("Found " << persistent->GetEntriesFast() << "!=1 entries in the persistent tree in "
-              << boost::io::quoted(input));
-      continue;
-    }
-    // Ok, load the FileMetaData from the tree
-    FileMetaData* fileMetaData{nullptr};
-    persistent->SetBranchAddress("FileMetaData", &fileMetaData);
-    if (persistent->GetEntry(0) <= 0) {
-      B2ERROR("Problem loading FileMetaData from " << input);
-      continue;
-    }
-    // File looks usable, start checking metadata ...
-    B2INFO("adding file " << boost::io::quoted(input));
-    if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) fileMetaData->Print("all");
+    try {
+      RootIOUtilities::RootFileInfo fileInfo(input);
+      // Ok, load the FileMetaData from the tree
+      const auto &fileMetaData = fileInfo.getFileMetaData();
+      // File looks usable, start checking metadata ...
+      B2INFO("adding file " << std::quoted(input));
+      if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) fileMetaData.Print("all");
 
-    // ok now we now that FileMetaData is there, check the branches of the file
-    // and make sure they are all equal
-    TTree* tree = dynamic_cast<TTree*>(tfile.Get("tree"));
-    if(!tree){
-      B2ERROR("No event tree found in " << boost::io::quoted(input));
-      continue;
-    }
-    std::set<std::string> branches;
-    for(TObject* br: *tree->GetListOfBranches()){
-      branches.insert(br->GetName());
-    }
-    if(branches.empty()) {
-      B2ERROR("No branches found in event tree in " << boost::io::quoted(input));
-      continue;
-    }
-    if(allEventBranches.empty()) {
-      std::swap(allEventBranches,branches);
-    }else{
-      if(branches!=allEventBranches){
-        B2ERROR("Branches in " << boost::io::quoted(input) << " differ from "
-                << boost::io::quoted(inputfilenames.front()));
+      auto branches = fileInfo.getBranchNames();
+      if(branches.empty()) {
+        throw std::runtime_error("Could not find any branches in event tree");
       }
-    }
-
-    // File looks good so far, now fix the persistent stuff, i.e. merge all
-    // objects in persistent tree
-    for(TObject* brObj: *persistent->GetListOfBranches()){
-      TBranchElement* br = dynamic_cast<TBranchElement*>(brObj);
-      // FileMetaData is handled separately
-      if(br && br->GetTargetClass() == FileMetaData::Class() && std::string(br->GetName()) == "FileMetaData")
-        continue;
-      // Make sure the branch is mergeable
-      if(!br || !br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
-        B2ERROR("Branch " << boost::io::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
-        continue;
-      }
-      // Ok, it's an object we now how to handle so get it from the tree
-      Mergeable* object{nullptr};
-      br->SetAddress(&object);
-      if(br->GetEntry(0)<=0) {
-        B2ERROR("Could not read branch " << boost::io::quoted(br->GetName()) << " of entry 0 from persistent tree in "
-                << boost::io::quoted(input));
-        continue;
-      }
-      // and either insert it into the map of mergeables or merge with the existing one
-      auto it = persistentMergeables.insert(std::make_pair(br->GetName(), std::make_pair(object, 1)));
-      if(!it.second) {
-        try {
-          it.first->second.first->merge(object);
-        }catch(std::exception &e){
-          B2FATAL("Cannot merge " << boost::io::quoted(br->GetName()) << " in " << boost::io::quoted(input) << ": " << e.what());
-        }
-        it.first->second.second++;
-        // ok, merged, get rid of it.
-        delete object;
+      if(allEventBranches.empty()) {
+        std::swap(allEventBranches,branches);
       }else{
-        B2INFO("Found mergeable object " << boost::io::quoted(br->GetName()) << " in persistent tree");
+        if(branches!=allEventBranches){
+          B2ERROR("Branches in " << std::quoted(input) << " differ from "
+              << std::quoted(inputfilenames.front()));
+        }
       }
-    }
 
-    std::string release = fileMetaData->getRelease();
-    if(release == "") {
-        B2ERROR("Cannot determine release used to create " <<  boost::io::quoted(input));
+      // File looks good so far, now fix the persistent stuff, i.e. merge all
+      // objects in persistent tree
+      for(TObject* brObj: *fileInfo.getPersistentTree().GetListOfBranches()){
+        TBranchElement* br = dynamic_cast<TBranchElement*>(brObj);
+        // FileMetaData is handled separately
+        if(br && br->GetTargetClass() == FileMetaData::Class() && std::string(br->GetName()) == "FileMetaData")
+          continue;
+        // Make sure the branch is mergeable
+        if(!br || !br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
+          B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
+          continue;
+        }
+        // Ok, it's an object we now how to handle so get it from the tree
+        Mergeable* object{nullptr};
+        br->SetAddress(&object);
+        if(br->GetEntry(0)<=0) {
+          B2ERROR("Could not read branch " << std::quoted(br->GetName()) << " of entry 0 from persistent tree in "
+              << std::quoted(input));
+          continue;
+        }
+        // and either insert it into the map of mergeables or merge with the existing one
+        auto it = persistentMergeables.insert(std::make_pair(br->GetName(), std::make_pair(object, 1)));
+        if(!it.second) {
+          try {
+            it.first->second.first->merge(object);
+          }catch(std::exception &e){
+            B2FATAL("Cannot merge " << std::quoted(br->GetName()) << " in " << std::quoted(input) << ": " << e.what());
+          }
+          it.first->second.second++;
+          // ok, merged, get rid of it.
+          delete object;
+        }else{
+          B2INFO("Found mergeable object " << std::quoted(br->GetName()) << " in persistent tree");
+        }
+      }
+
+      std::string release = fileMetaData.getRelease();
+      if(release == "") {
+        B2ERROR("Cannot determine release used to create " <<  std::quoted(input));
         continue;
-    }else if(boost::algorithm::ends_with(fileMetaData->getRelease(), "-modified")){
-        B2WARNING("File " << boost::io::quoted(input) << " created with modified software " <<  fileMetaData->getRelease()
+      }else if(boost::algorithm::ends_with(fileMetaData.getRelease(), "-modified")){
+        B2WARNING("File " << std::quoted(input) << " created with modified software "
+                  <<  fileMetaData.getRelease()
                   << ": cannot verify that files are compatible");
         release = release.substr(0, release.size() - std::string("-modified").size());
-    }
+      }
 
-    // so, event tree looks good too. Now we merge the FileMetaData
-    if (!outputMetaData) {
-      // first input file, just take the event metadata
-      outputMetaData = new FileMetaData(*fileMetaData);
-      outputRelease = release;
-    } else {
-      // check meta data for consistency, we could move this into FileMetaData...
-      if(release != outputRelease) {
-        B2ERROR("Release in " << boost::io::quoted(input) << " differs from previous files: " <<
-                fileMetaData->getRelease() << " != " << outputMetaData->getRelease());
-      }
-      if(fileMetaData->getSteering() != outputMetaData->getSteering()){
-        // printing both steering files is not useful for anyone so just throw an error
-        B2ERROR("Steering file for " << boost::io::quoted(input) << " differs from previous files.");
-      }
-      if(fileMetaData->getDatabaseGlobalTag() != outputMetaData->getDatabaseGlobalTag()){
-        B2ERROR("Database globalTag in " << boost::io::quoted(input) << " differs from previous files: " <<
-                fileMetaData->getDatabaseGlobalTag() << " != " << outputMetaData->getDatabaseGlobalTag());
-      }
-      if(fileMetaData->getDataDescription() != outputMetaData->getDataDescription()){
-        KeyValuePrinter cur(true);
-        for (auto descrPair : outputMetaData->getDataDescription())
-          cur.put(descrPair.first, descrPair.second);
-        KeyValuePrinter prev(true);
-        for (auto descrPair : fileMetaData->getDataDescription())
-          prev.put(descrPair.first, descrPair.second);
+      // so, event tree looks good too. Now we merge the FileMetaData
+      if (!outputMetaData) {
+        // first input file, just take the event metadata
+        outputMetaData = new FileMetaData(fileMetaData);
+        outputRelease = release;
+      } else {
+        // check meta data for consistency, we could move this into FileMetaData...
+        if(release != outputRelease) {
+          B2ERROR("Release in " << std::quoted(input) << " differs from previous files: " <<
+                  fileMetaData.getRelease() << " != " << outputMetaData->getRelease());
+        }
+        if(fileMetaData.getSteering() != outputMetaData->getSteering()){
+          // printing both steering files is not useful for anyone so just throw an error
+          B2ERROR("Steering file for " << std::quoted(input) << " differs from previous files.");
+        }
+        if(fileMetaData.getDatabaseGlobalTag() != outputMetaData->getDatabaseGlobalTag()){
+          B2ERROR("Database globalTag in " << std::quoted(input) << " differs from previous files: " <<
+                  fileMetaData.getDatabaseGlobalTag() << " != " << outputMetaData->getDatabaseGlobalTag());
+        }
+        if(fileMetaData.getDataDescription() != outputMetaData->getDataDescription()){
+          KeyValuePrinter cur(true);
+          for (auto descrPair : outputMetaData->getDataDescription())
+            cur.put(descrPair.first, descrPair.second);
+          KeyValuePrinter prev(true);
+          for (auto descrPair : fileMetaData.getDataDescription())
+            prev.put(descrPair.first, descrPair.second);
 
-        B2ERROR("dataDescription in " << boost::io::quoted(input) << " differs from previous files:\n" << cur.string() << " vs.\n" << prev.string());
+          B2ERROR("dataDescription in " << std::quoted(input) << " differs from previous files:\n" << cur.string() << " vs.\n" << prev.string());
+        }
+        if(fileMetaData.isMC() != outputMetaData->isMC()){
+          B2ERROR("Type (real/MC) for " << std::quoted(input) << " differs from previous files.");
+        }
+        // update event numbers ...
+        outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData.getMcEvents());
+        outputMetaData->setNEvents(outputMetaData->getNEvents() + fileMetaData.getNEvents());
       }
-      if(fileMetaData->isMC() != outputMetaData->isMC()){
-        B2ERROR("Type (real/MC) for " << boost::io::quoted(input) << " differs from previous files.");
+      if(fileMetaData.getNEvents() < 1) {
+        B2WARNING("File " << std::quoted(input) << " is empty.");
+      } else {
+        // make sure we have the correct low/high event numbers
+        EventInfo curLowEvt = EventInfo{fileMetaData.getExperimentLow(), fileMetaData.getRunLow(), fileMetaData.getEventLow()};
+        EventInfo curHighEvt = EventInfo{fileMetaData.getExperimentHigh(), fileMetaData.getRunHigh(), fileMetaData.getEventHigh()};
+        if(!lowEvt or curLowEvt < *lowEvt) lowEvt = curLowEvt;
+        if(!highEvt or curHighEvt > *highEvt) highEvt = curHighEvt;
       }
-      // update event numbers ...
-      outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData->getMcEvents());
-      outputMetaData->setNEvents(outputMetaData->getNEvents() + fileMetaData->getNEvents());
-    }
-    if(fileMetaData->getNEvents() < 1) {
-      B2WARNING("File " << boost::io::quoted(input) << " is empty.");
-    } else {
-      // make sure we have the correct low/high event numbers
-      EventInfo curLowEvt = EventInfo{fileMetaData->getExperimentLow(), fileMetaData->getRunLow(), fileMetaData->getEventLow()};
-      EventInfo curHighEvt = EventInfo{fileMetaData->getExperimentHigh(), fileMetaData->getRunHigh(), fileMetaData->getEventHigh()};
-      if(!lowEvt or curLowEvt < *lowEvt) lowEvt = curLowEvt;
-      if(!highEvt or curHighEvt > *highEvt) highEvt = curHighEvt;
-    }
-    // check if we have seen this random seed already in one of the previous files
-    auto it = allSeeds.insert(fileMetaData->getRandomSeed());
-    if(!it.second) {
-      B2WARNING("Duplicate Random Seed: " << boost::io::quoted(fileMetaData->getRandomSeed()) << " present in more then one file");
-    }
-    allUsers.insert(fileMetaData->getUser());
-    // remember all parent files we encounter
-    for (int i = 0; i < fileMetaData->getNParents(); ++i) {
-      allParents.insert(fileMetaData->getParent(i));
+      // check if we have seen this random seed already in one of the previous files
+      auto it = allSeeds.insert(fileMetaData.getRandomSeed());
+      if(!it.second) {
+        B2WARNING("Duplicate Random Seed: " << std::quoted(fileMetaData.getRandomSeed()) << " present in more then one file");
+      }
+      allUsers.insert(fileMetaData.getUser());
+      // remember all parent files we encounter
+      for (int i = 0; i < fileMetaData.getNParents(); ++i) {
+        allParents.insert(fileMetaData.getParent(i));
+      }
+    }catch(std::exception &e) {
+      B2ERROR("input file " << std::quoted(input) << ": " << e.what());
     }
   }
 
   //Check if the same mergeables were found in all files
   for(const auto &val: persistentMergeables){
     if(val.second.second != inputfilenames.size()){
-      B2ERROR("Mergeable " << boost::io::quoted(val.first) << " only present in " << val.second.second << " out of "
+      B2ERROR("Mergeable " << std::quoted(val.first) << " only present in " << val.second.second << " out of "
               << inputfilenames.size() << " files");
     }
   }
@@ -318,13 +285,13 @@ The following restrictions apply:
   // the conversion of the event trees and create the output file.
   TFile output(outputfilename.c_str(), "RECREATE");
   if (output.IsZombie()) {
-    B2ERROR("Could not create output file " << boost::io::quoted(outputfilename));
+    B2ERROR("Could not create output file " << std::quoted(outputfilename));
     return 1;
   }
 
   TTree* outputEventTree{nullptr};
   for (const auto& input : inputfilenames) {
-    B2INFO("processing events from " << boost::io::quoted(input));
+    B2INFO("processing events from " << std::quoted(input));
     TFile tfile(input.c_str());
     TTree* tree = dynamic_cast<TTree*>(tfile.Get("tree"));
     if(!outputEventTree){
@@ -353,9 +320,10 @@ The following restrictions apply:
   outputEventTree->Write();
   B2INFO("Done processing events");
 
-  // add it to the file catalog. This also modifies the LFN in the FileMetaData
-  // so we do it before writing the persistent tree
-  if(variables.count("no-catalog")==0) {
+  // we need to set the LFN to the absolute path name
+  outputMetaData->setLfn(fs::absolute(outputfilename, fs::initial_path()).string());
+  // and maybe register it in the file catalog
+  if(variables.count("add-to-catalog")>0) {
     FileCatalog::Instance().registerFile(outputfilename, *outputMetaData);
   }
   B2INFO("Writing FileMetaData");

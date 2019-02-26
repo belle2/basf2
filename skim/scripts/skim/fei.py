@@ -11,7 +11,8 @@ __authors__ = [
     "Hannah Wakeling"
 ]
 
-from basf2 import *
+import basf2
+import fei
 from modularAnalysis import *
 
 from variables import *
@@ -233,11 +234,8 @@ def runFEIforB0Hadronic(path):
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    from fei import backward_compatibility_layer
-    backward_compatibility_layer.pid_renaming_oktober_2017()
-    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+    basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
-    import fei
     particles = fei.get_default_channels(neutralB=True, chargedB=False, hadronic=True, semileptonic=False, KLong=False)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
@@ -313,11 +311,8 @@ def runFEIforBplusHadronic(path):
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    from fei import backward_compatibility_layer
-    backward_compatibility_layer.pid_renaming_oktober_2017()
-    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+    basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
-    import fei
     particles = fei.get_default_channels(neutralB=False, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
@@ -358,11 +353,8 @@ def runFEIforHadronicCombined(path):
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    from fei import backward_compatibility_layer
-    backward_compatibility_layer.pid_renaming_oktober_2017()
-    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+    basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
-    import fei
     particles = fei.get_default_channels(neutralB=True, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
@@ -576,11 +568,8 @@ def runFEIforB0SLWithOneLep(path):
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    from fei import backward_compatibility_layer
-    backward_compatibility_layer.pid_renaming_oktober_2017()
-    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+    basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
-    import fei
     particles = fei.get_default_channels(
         neutralB=True,
         chargedB=False,
@@ -650,11 +639,8 @@ def runFEIforBplusSLWithOneLep(path):
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    from fei import backward_compatibility_layer
-    backward_compatibility_layer.pid_renaming_oktober_2017()
-    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+    basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
-    import fei
     particles = fei.get_default_channels(
         neutralB=False,
         chargedB=True,
@@ -696,11 +682,8 @@ def runFEIforSLWithOneLepCombined(path):
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    from fei import backward_compatibility_layer
-    backward_compatibility_layer.pid_renaming_oktober_2017()
-    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+    basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
-    import fei
     particles = fei.get_default_channels(
         neutralB=True,
         chargedB=True,
@@ -749,11 +732,8 @@ def runFEIforSkimCombined(path):
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    from fei import backward_compatibility_layer
-    backward_compatibility_layer.pid_renaming_oktober_2017()
-    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+    basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
-    import fei
     particles = fei.get_default_channels(
         neutralB=True,
         chargedB=True,

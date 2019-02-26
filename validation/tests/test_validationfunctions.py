@@ -21,9 +21,11 @@ class ValidationFunctionstTest(unittest.TestCase):
         functions returns the expected result
         """
 
-        # test disabled for now, until a way to run this properly on the build bot
-        # can be found
+        # fixme: disabled for now
+        # test disabled for now, until a way to run this properly on the
+        # build bot can be found
         return
+        # noinspection PyUnreachableCode
 
         cwd = os.getcwd()
 

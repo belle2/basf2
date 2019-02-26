@@ -53,16 +53,13 @@ assert metadata.getSteering().strip().endswith('dummystring')
 assert 10 == metadata.getMcEvents()
 
 
-# Check the file meta data (via file)
-assert 0 == os.system('showmetadata ' + testFile.name)
-
 os.system('touch Belle2FileCatalog.xml')
-assert 0 == os.system('addmetadata --lfn /logical/file/name ' + testFile.name)
+assert 0 == os.system('b2file-metadata-add --lfn /logical/file/name ' + testFile.name)
 
-assert 0 == os.system('showmetadata ' + testFile.name)
+assert 0 == os.system('b2file-metadata-show ' + testFile.name)
 
 # Check JSON output (contains steering file, so we cannotuse .out)
-metadata_output = subprocess.check_output(['showmetadata', '--json', testFile.name])
+metadata_output = subprocess.check_output(['b2file-metadata-show', '--json', testFile.name])
 m = json.loads(metadata_output.decode('utf-8'))
 assert 7 == m['experimentLow']
 assert 1 == m['runLow']

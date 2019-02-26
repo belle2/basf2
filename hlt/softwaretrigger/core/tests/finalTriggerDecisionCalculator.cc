@@ -112,35 +112,30 @@ namespace Belle2 {
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
       // No total results should not change anything.
-      result.addResult(SoftwareTriggerDBHandler::makeFullCutName("fast_reco", "some_cut"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeFullCutName("filter", "some_cut"), SoftwareTriggerCutResult::c_reject);
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
-      // fast reco has accepted -> accept
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_accept);
-      EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
-
-      // fast reco has rejected -> reject
+      // filter has rejected -> reject
       result.clear();
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("filter"), SoftwareTriggerCutResult::c_reject);
       EXPECT_EQ(false, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
-      // fast reco has accepted and hlt also -> accept
+      // filter has accepted and skim also -> accept
       result.clear();
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_accept);
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("hlt"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("filter"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("skim"), SoftwareTriggerCutResult::c_accept);
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
-      // fast reco has rejected and hlt should not change anything -> reject
+      // filter has rejected and skim should not change anything -> reject
       result.clear();
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_reject);
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("hlt"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("filter"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("skim"), SoftwareTriggerCutResult::c_accept);
       EXPECT_EQ(false, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
-      // fast reco and hlt have accepted, calib does not matter -> accept
+      // filter has accepted, skim does not matter -> accept
       result.clear();
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_accept);
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("hlt"), SoftwareTriggerCutResult::c_accept);
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("calib"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("filter"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("skim"), SoftwareTriggerCutResult::c_reject);
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
     }
   }

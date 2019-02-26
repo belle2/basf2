@@ -209,15 +209,17 @@ namespace KlId {
 
     Belle2::ECLCluster* closestECL = nullptr ;
     double closestECLAngleDist = 1e10;
-    double angularDist = 1e10;
     Belle2::StoreArray<Belle2::ECLCluster> eclClusters;
 
     if (eclClusters.getEntries() > 0) {
       unsigned int index = 0;
       unsigned int indexOfClosestCluster = 0;
       for (Belle2::ECLCluster& eclcluster : eclClusters) {
+
+        if (!eclcluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)) continue;
+
         const TVector3& eclclusterPos = eclcluster.getClusterPosition();
-        angularDist = eclclusterPos.Angle(klmClusterPosition);
+        double angularDist = eclclusterPos.Angle(klmClusterPosition);
         if (angularDist < closestECLAngleDist) {
           closestECLAngleDist = angularDist;
           // the problem here is one can not just use a refenrence to klmCluster because the next cluster will be written in the same address
@@ -241,7 +243,6 @@ namespace KlId {
     const Belle2::KLMCluster* closestKLM = nullptr;
     double closestKLMDist = 1e10;
     double avInterClusterDist = 0;
-    double nextClusterDist = 1e10;
     double nKLMCluster = klmClusters.getEntries();
 
     if (nKLMCluster > 1) {
@@ -253,7 +254,7 @@ namespace KlId {
         const TVector3& nextClusterPos = nextCluster.getClusterPosition();
         const TVector3& clustDistanceVec = nextClusterPos - klmClusterPosition;
 
-        nextClusterDist = clustDistanceVec.Mag2();
+        double nextClusterDist = clustDistanceVec.Mag2();
         avInterClusterDist = avInterClusterDist + nextClusterDist;
 
         if ((nextClusterDist < closestKLMDist) and not(nextClusterDist == 0)) {

@@ -145,7 +145,8 @@ namespace Belle2 {
     StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
 
     double m_EnergyThreshold{0.03};  /**< energy threshold to fit pulse offline*/
-    double m_chi2Threshold{60.0};  /**< chi2 threshold to classify offline fit as good fit*/
+    double m_chi2Threshold25dof{57.1};  /**< chi2 threshold (25 dof) to classify offline fit as good fit.*/
+    double m_chi2Threshold27dof{60.0};  /**< chi2 threshold (27 dof) to classify offline fit as good fit.*/
     bool m_TemplatesLoaded{false};  /**< Flag to indicate if waveform templates are loaded from database.*/
     void loadTemplateParameterArray();  /**< loads waveform templates from database.*/
     std::vector<double> m_ADCtoEnergy;  /**< calibration vector form adc to energy*/

@@ -66,7 +66,7 @@ namespace Belle2 {
     *  @param sensorID           VxdID of sensor the DATCONSVDSpacePoint shall be on.
     *  @param detID              SensorType detector-type (PXD, SVD, ...) to be used.
     */
-    DATCONSVDSpacePoint(B2Vector3<double> pos, std::pair<double, double> normalizedLocal,
+    DATCONSVDSpacePoint(B2Vector3<double>& pos, const std::pair<double, double>& normalizedLocal,
                         std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID) :
       m_position(pos),
       m_normalizedLocal(normalizedLocal),
@@ -74,8 +74,6 @@ namespace Belle2 {
       m_vxdID(sensorID), m_sensorType(detID)
     {}
 
-    /** Default Destructor. */
-    virtual ~DATCONSVDSpacePoint() {}
     //-----------------------------------------------------------------------------------------------------------------
 
     /** overloaded '<<' stream operator. Print secID to stream by converting it to string */

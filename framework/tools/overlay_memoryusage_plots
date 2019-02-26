@@ -1,2 +1,0 @@
-#!/bin/bash
-memoryusage_overlay_plots "$@"

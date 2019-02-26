@@ -152,6 +152,14 @@ def check_error_free(tool, toolname, package, filter=lambda x: False):
     In case there is some output left, then prints the error message and exits
     (failing the test).
 
+    The test is only executed for a full local checkout: If the ``BELLE2_RELEASE_DIR``
+    environment variable is set or if ``BELLE2_LOCAL_DIR`` is unset the test is
+    skipped: The program exits with an appropriate message.
+
+    Warnings:
+        If the test is skipped or the test contains errors this function does
+        not return but will directly end the program.
+
     Arguments:
         tool(str): executable to call
         toolname(str): human readable name of the tool
@@ -159,6 +167,12 @@ def check_error_free(tool, toolname, package, filter=lambda x: False):
         filter(lambda): function which gets called for each line of output and
            if it returns True the line will be ignored.
     """
+
+    if "BELLE2_RELEASE_DIR" in os.environ:
+        skip_test("Central release is setup")
+    if "BELLE2_LOCAL_DIR" not in os.environ:
+        skip_test("No local release is setup")
+
     with local_software_directory():
         try:
             output = subprocess.check_output([tool, package], encoding="utf8")

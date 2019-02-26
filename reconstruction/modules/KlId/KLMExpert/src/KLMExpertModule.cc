@@ -125,7 +125,7 @@ void KLMExpertModule::event()
 
     // get variables of the closest ECL cluster might be removed in future
     if (!(closestECLCluster == nullptr)) {
-      m_KLMECLE                = closestECLCluster -> getEnergy();
+      m_KLMECLE                = closestECLCluster -> getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       m_KLMECLE9oE25           = closestECLCluster -> getE9oE21();
       m_KLMECLTerror           = closestECLCluster -> getDeltaTime99();
       m_KLMECLTiming           = closestECLCluster -> getTime();
@@ -161,9 +161,8 @@ void KLMExpertModule::event()
 
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     float best_dist = 1e10;
-    float dist;
     for (auto trackSeperation :  trackSeperations) {
-      dist = trackSeperation.getDistance();
+      float dist = trackSeperation.getDistance();
       if (dist < best_dist) {
         best_dist = dist;
         m_KLMTrackSepDist         = trackSeperation.getDistance();

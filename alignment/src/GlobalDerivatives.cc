@@ -12,13 +12,13 @@
 
 namespace Belle2 {
   namespace alignment {
-    GlobalDerivatives::GlobalDerivatives(std::pair< std::vector< int >, TMatrixD > globals)
+    GlobalDerivatives::GlobalDerivatives(const std::pair< std::vector< int >, TMatrixD >& globals)
     {
       m_globals.second.ResizeTo(globals.second);
       m_globals.first = globals.first;
       m_globals.second = globals.second;
     }
-    GlobalDerivatives::GlobalDerivatives(std::vector< int > labels, TMatrixD derivs)
+    GlobalDerivatives::GlobalDerivatives(const std::vector< int >& labels, const TMatrixD& derivs)
     {
       m_globals.second.ResizeTo(derivs);
       m_globals.first = labels;

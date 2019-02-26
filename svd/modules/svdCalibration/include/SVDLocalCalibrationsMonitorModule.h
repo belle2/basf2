@@ -75,9 +75,12 @@ namespace Belle2 {
     TBranch* b_noiseEl = nullptr; /**< strip noise (e-)*/
     TBranch* b_noiseAVE = nullptr; /**< sensor noise average (ADC)*/
     TBranch* b_noiseRMS = nullptr; /**< sensor noise rms (ADC)*/
-    TBranch* b_peakTime = nullptr; /**< strip peakTime*/
-    TBranch* b_peakTimeAVE = nullptr; /**< sensor peakTime average*/
-    TBranch* b_peakTimeRMS = nullptr; /**< sensor peakTime arm*/
+    TBranch* b_calPeakADC = nullptr; /**< strip calPeakADC*/
+    TBranch* b_calPeakADCAVE = nullptr; /**< sensor calPeakADC average*/
+    TBranch* b_calPeakADCRMS = nullptr; /**< sensor calPeakADC arm*/
+    TBranch* b_calPeakTime = nullptr; /**< strip calPeakTime*/
+    TBranch* b_calPeakTimeAVE = nullptr; /**< sensor calPeakTime average*/
+    TBranch* b_calPeakTimeRMS = nullptr; /**< sensor calPeakTime arm*/
     TBranch* b_pulseWidth = nullptr; /**< strip pulse width*/
     TBranch* b_pulseWidthAVE = nullptr; /**< sensor pulse width average*/
     TBranch* b_pulseWidthRMS = nullptr; /**< sensor pulse width rms*/
@@ -101,9 +104,12 @@ namespace Belle2 {
     float m_gain = -1; /**< strip gain*/
     float m_gainAVE = -1; /**< sensor gain average*/
     float m_gainRMS = -1; /**< sensor gain rms*/
-    float m_peakTime = -1; /**< strip peak time*/
-    float m_peakTimeAVE = -1; /**< sensor peak time average */
-    float m_peakTimeRMS = -1; /**< sensor peak time rms*/
+    float m_calPeakADC = -1; /**< strip peak time*/
+    float m_calPeakADCAVE = -1; /**< sensor peak time average */
+    float m_calPeakADCRMS = -1; /**< sensor peak time rms*/
+    float m_calPeakTime = -1; /**< strip peak time*/
+    float m_calPeakTimeAVE = -1; /**< sensor peak time average */
+    float m_calPeakTimeRMS = -1; /**< sensor peak time rms*/
     float m_pulseWidth = -1; /**< strip pulse width */
     float m_pulseWidthAVE = -1; /**< sensor pulse width average*/
     float m_pulseWidthRMS = -1; /**< sensor pulse width rms*/
@@ -139,12 +145,16 @@ namespace Belle2 {
     SVDHistograms<TH2F>* m_h2Gain = nullptr; /**< gain (e-/ADC) VS strip 2D histo */
 
     //PEAKTIME
-    SVDHistograms<TH1F>* m_hPeakTime = nullptr; /**< peakTime (ns) histo */
-    SVDHistograms<TH2F>* m_h2PeakTime = nullptr; /**< peakTime (ns) VS strip 2D histo */
+    SVDHistograms<TH1F>* m_hCalPeakTime = nullptr; /**< calPeakTime (ns) histo */
+    SVDHistograms<TH2F>* m_h2CalPeakTime = nullptr; /**< calPeakTime (ns) VS strip 2D histo */
+
+    //PEAKADC
+    SVDHistograms<TH1F>* m_hCalPeakADC = nullptr; /**< calPeakADC (ns) histo */
+    SVDHistograms<TH2F>* m_h2CalPeakADC = nullptr; /**< calPeakADC (ns) VS strip 2D histo */
 
     //PULSEWIDTH
-    SVDHistograms<TH1F>* m_hPulseWidth = nullptr; /**< peakTime (ns) histo */
-    SVDHistograms<TH2F>* m_h2PulseWidth = nullptr; /**< peakTime (ns) VS strip 2D histo */
+    SVDHistograms<TH1F>* m_hPulseWidth = nullptr; /**< calPeakTime (ns) histo */
+    SVDHistograms<TH2F>* m_h2PulseWidth = nullptr; /**< calPeakTime (ns) VS strip 2D histo */
 
   };
 }

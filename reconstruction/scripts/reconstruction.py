@@ -15,16 +15,15 @@ from tracking import (
     add_prune_tracks,
 )
 
-from softwaretrigger import (
-    add_fast_reco_software_trigger,
-    add_hlt_software_trigger,
-    add_calibration_software_trigger,
+from softwaretrigger.path_utils import (
+    add_filter_software_trigger,
+    add_skim_software_trigger
 )
 
 import mdst
 
 
-def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
+def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False):
     """
@@ -35,17 +34,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
-    :param trigger_mode: Trigger mode to emulate. Possible values are: "all", "hlt", "fast_reco".
-
-        * "all": Normal mode. Do add all the modules in the standard reconstruction. This is the mode for the typical
-          user.
-        * "fast_reco": Only add those modules that are needed for classifying an event as background or not in the
-          fast reco part of the software trigger.
-        * "hlt": Only add those modules thar are needed for classifying an event as background or not in the
-          hlt part of the software trigger. Please note that the fast reco part is also needed for this to work.
-
-        The trigger_mode does just steer, which modules in the standard reconstruction are added to the path. It does
-        not make any trigger decisions itself.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
@@ -56,6 +44,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         execution time.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
+    :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
     """
 
     # Add tracking reconstruction modules
@@ -63,7 +52,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 components=components,
                                 pruneTracks=False,
                                 mcTrackFinding=False,
-                                trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding,
                                 trackFitHypotheses=trackFitHypotheses,
                                 use_second_cdc_hits=use_second_cdc_hits)
@@ -76,15 +64,13 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                     components=components,
                                     pruneTracks=pruneTracks,
                                     add_muid_hits=add_muid_hits,
-                                    addClusterExpertModules=addClusterExpertModules,
-                                    trigger_mode=trigger_mode)
+                                    addClusterExpertModules=addClusterExpertModules)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
-    if trigger_mode == "all" and (not components or (
+    if add_trigger_calculation and (not components or (
             "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
-        add_fast_reco_software_trigger(path)
-        add_hlt_software_trigger(path)
-        add_calibration_software_trigger(path)
+        add_filter_software_trigger(path)
+        add_skim_software_trigger(path)
 
 
 def add_cosmics_reconstruction(
@@ -96,7 +82,7 @@ def add_cosmics_reconstruction(
         addClusterExpertModules=True,
         merge_tracks=True,
         top_in_counter=False,
-        data_taking_period='phase2',
+        data_taking_period='early_phase3',
         use_second_cdc_hits=False,
         add_muid_hits=False):
     """
@@ -147,7 +133,6 @@ def add_cosmics_reconstruction(
                                     components=components,
                                     pruneTracks=pruneTracks,
                                     addClusterExpertModules=addClusterExpertModules,
-                                    trigger_mode="all",
                                     add_muid_hits=add_muid_hits,
                                     cosmics=True)
 
@@ -181,8 +166,7 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                                    add_muid_hits=False,
-                                    trigger_mode="all", cosmics=False):
+                                    add_muid_hits=False, cosmics=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -190,53 +174,46 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param path: The path to add the modules to.
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last after the post-tracking modules.
-    :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param cosmics: if True, steer TOP for cosmic reconstruction
     """
 
-    if trigger_mode in ["hlt", "all"]:
-        add_dedx_modules(path, components)
-        add_ext_module(path, components)
-        add_top_modules(path, components, trigger_mode=trigger_mode, cosmics=cosmics)
-        add_arich_modules(path, components)
+    add_dedx_modules(path, components)
+    add_ext_module(path, components)
+    add_top_modules(path, components, cosmics=cosmics)
+    add_arich_modules(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_PID')
 
-    if trigger_mode in ["fast_reco", "all"]:
-        add_ecl_modules(path, components)
+    add_ecl_modules(path, components)
 
-    if trigger_mode in ["hlt", "all"]:
-        path.add_module("EventT0Combiner")
+    path.add_module("EventT0Combiner")
 
-    if trigger_mode in ["fast_reco", "all"]:
-        add_ecl_finalizer_module(path, components)
+    add_ecl_finalizer_module(path, components)
 
-    if trigger_mode in ["hlt", "all"]:
-        add_ecl_mc_matcher_module(path, components)
+    add_ecl_mc_matcher_module(path, components)
 
-        add_klm_modules(path, components)
+    add_klm_modules(path, components)
 
-        add_klm_mc_matcher_module(path, components)
+    add_klm_mc_matcher_module(path, components)
 
-        add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
-        add_ecl_track_cluster_modules(path, components)
-        add_ecl_cluster_properties_modules(path, components)
-        add_ecl_eip_module(path, components)
-        add_pid_module(path, components)
+    add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
+    add_ecl_track_cluster_modules(path, components)
+    add_ecl_cluster_properties_modules(path, components)
+    add_ecl_eip_module(path, components)
+    add_pid_module(path, components)
 
-    if trigger_mode in ["all"] and addClusterExpertModules:
+    if addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
 
-    if trigger_mode in ["hlt", "all"]:
-        add_ecl_track_brem_finder(path, components)
+    add_ecl_track_brem_finder(path, components)
 
-        # Prune tracks as soon as the post-tracking steps are complete
-        if pruneTracks:
-            add_prune_tracks(path, components)
+    # Prune tracks as soon as the post-tracking steps are complete
+    if pruneTracks:
+        add_prune_tracks(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
@@ -308,7 +285,12 @@ def add_cdst_output(
         'TracksToMuids',
         'ARICHDigits',
         'ARICHInfo',
-        'ARICHTracks'
+        'ARICHTracks',
+        'SoftwareTriggerVariables',
+        'BKLMDigits',
+        'BKLMHit1ds',
+        'BKLMHit2dsToBKLMHit1ds',
+        'BKLMHit1dsToBKLMDigits'
     ]
     if dataDescription is None:
         dataDescription = {}
@@ -332,13 +314,12 @@ def add_arich_modules(path, components=None):
         path.add_module(arich_rec)
 
 
-def add_top_modules(path, components=None, trigger_mode="all", cosmics=False):
+def add_top_modules(path, components=None, cosmics=False):
     """
     Add the TOP reconstruction to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
-    :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     :param cosmics: if True, steer TOP for cosmic reconstruction
     """
     # TOP reconstruction
@@ -351,8 +332,7 @@ def add_top_modules(path, components=None, trigger_mode="all", cosmics=False):
         else:
             top_finder = register_module('TOPBunchFinder')
             path.add_module(top_finder)
-            if trigger_mode in ["hlt"]:
-                top_finder.param('addOffset', True)
+            top_finder.param('addOffset', True)
         top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 

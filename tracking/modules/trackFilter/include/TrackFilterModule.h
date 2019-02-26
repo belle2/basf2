@@ -56,7 +56,7 @@ namespace Belle2 {
 
     static bool m_saveControlNtuples; /**< if true produces a rootfile with control ntupled*/
     std::string m_rootFileName;   /**< root file name */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing ntuples */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing ntuples */
 
   private:
 

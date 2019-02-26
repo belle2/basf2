@@ -16,6 +16,20 @@ be adapted when changing to the new release.
 Changes since release-03-00
 ===========================
 
+.. rubric:: Restrict usage of ``useDB=False`` for Geometry creation
+
+Creating the geometry from XML files instead of the configuration in the
+Database may lead to wrong results. So while the option ``useDB=False`` is
+still necessary to debug changes to the geometry definitions it is now
+restricted to only be used for ``exp, run = 0, 0`` to protect users from
+mistakes.
+
+This also changes the behavior of `add_simulation()
+<simulation.add_simulation>` and `add_reconstruction()
+<reconstruction.add_reconstruction>`: If a list of components is provided this
+will now only change the digitization or reconstruction setup but will always
+use the full geometry from the database.
+
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see
 
@@ -26,6 +40,7 @@ Changes since release-03-00
 
 .. include:: framework/doc/whatsnew-since/release-03-00.txt
 
+.. include:: ecl/doc/whatsnew-since/release-03-00.txt
 
 
 Changes since release-02-01

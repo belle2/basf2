@@ -729,6 +729,12 @@ namespace {
     evtData.registerRelationTo(profileInfo);
     DataStore::Instance().setInitializeActive(false);
 
+    EXPECT_TRUE(DataStore::Instance().hasRelation(evtData, profileInfo, DataStore::c_Event, ""));
+    EXPECT_FALSE(DataStore::Instance().hasRelation(profileInfo, evtData, DataStore::c_Event, ""));
+    EXPECT_FALSE(DataStore::Instance().hasRelation(evtData, profileInfo, DataStore::c_Event, "SOMENONSENSE"));
+    EXPECT_FALSE(DataStore::Instance().hasRelation(evtData, profileInfo, DataStore::c_Persistent, ""));
+    EXPECT_FALSE(DataStore::Instance().hasRelation(profileInfo, evtData, DataStore::c_Persistent, ""));
+
     EXPECT_EQ(1, DataStore::Instance().getListOfRelatedArrays(evtData).size());
     EXPECT_EQ(1, DataStore::Instance().getListOfRelatedArrays(profileInfo).size());
 

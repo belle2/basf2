@@ -111,7 +111,7 @@ for i in range(500):
 add_properties(
     gaus_changing,
     {
-        'Description': "xlog ylog with stats",
+        'Description': "xlog ylog with stats. I can haz $\LaTeX$?",
         'Check': "Gaus Changing Histogram Check",
         'Contact': "Gaus Changing Histogram Contact",
         'MetaOptions': "logx, logy"

@@ -88,11 +88,9 @@ void PXDDAQDQMModule::defineHisto()
     hDAQCM2[avxdid] = new TH1F("PXDDAQCM2_" + bufful, "Common Mode on DHE " + buff + "; Common Mode", 64, 0, 64);
   }
   for (int i = 0; i < 16; i++) {
-    //cppcheck-suppress zerodiv
     hDAQDHCReduction[i] = new TH1F(("PXDDAQDHCDataReduction_" + str(format("%d") % i)).c_str(),
                                    ("Data Reduction DHC " + str(format(" %d") % i) + "; Raw/Red; Counts").c_str(), 200, 0,
                                    40); // If max changed, check overflow copy below
-    //cppcheck-suppress zerodiv
   }
 //   hDAQErrorEvent->LabelsDeflate("X");
 //   hDAQErrorEvent->LabelsOption("v");

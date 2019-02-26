@@ -15,9 +15,9 @@ import requests
 import re
 import subprocess
 import getpass
-import requests
-import json
 from versioning import upload_global_tag, jira_global_tag
+import readline  # wraps `input()` to have gnu readline functionality
+import terminal_utils
 
 
 def get_argument_parser():
@@ -105,7 +105,8 @@ Required release : %s
 Type of request : %s
 """ % (data[task], data['reason'], data['release'], data['request'])
     if task == 'master':
-        issue["description"] += 'Branch              : %s\nPhase               : %s\n' % (data['master_branch'], data['master_phases'])
+        issue["description"] += 'Branch              : %s\nPhase               : %s\n' % (
+            data['master_branch'], data['master_phases'])
     elif task == 'online':
         issue["description"] += 'Software update     : %s\n' % data['online_update']
     if 'details' in data.keys():
@@ -148,15 +149,17 @@ if __name__ == "__main__":
     data['content'] = content
     data['user'] = os.environ['BELLE2_USER']
     username = input('\nConfirm your DESY user name by pressing enter or type the correct one [%s]: ' % data['user'])
-    if username  != '':
+    if username != '':
         data['user'] = username
     data['reason'] = input('\nPlease describe the reason for the request: ')
     data['release'] = input('\nThe new payloads require at least the following software release: ')
 
     print("""\nOf which type is the request?
     - [A]ddition: New payloads are added. No changes of other payloads are required.
-    - [U]pdate: Payloads with the given names already exist and have the same type as the new ones, only the values are different. Superseded existing payloads will be removed.
-    - [C]hange: Payloads with the given names already exist, but have a different type than the new ones. All existing payloads will be removed.""")
+    - [U]pdate: Payloads with the given names already exist and have the same type as the new ones, only the values are different.
+                Superseded existing payloads will be removed.
+    - [C]hange: Payloads with the given names already exist, but have a different type than the new ones.
+                All existing payloads will be removed.""")
     while True:
         request = input('a/u/c: ').lower()
         if request in ['a', 'u', 'c']:
@@ -167,7 +170,8 @@ if __name__ == "__main__":
     print('\nWhich global tags are affected?')
     if input('- master for software development (y/n) [n]? ').lower() == 'y':
         data['master'] = upload_global_tag('master')
-        data['master_branch'] = input('  -> The code changes, that must be synchronized with the payload update, are in the branch: ')
+        data['master_branch'] = input(
+            '  -> The code changes, that must be synchronized with the payload update, are in the branch: ')
         data['master_phases'] = '2+3'
         if (input('  -> Are the payloads for phase 2 and 3 (y/n) [y]? ').lower() == 'n'):
             if (input('  -> Are the payloads for phase 3 (y/n) [y]? ').lower() == 'n'):
@@ -176,7 +180,8 @@ if __name__ == "__main__":
                 data['master_phases'] = '3'
     if input('- online for HLT and express reco (y/n) [n]? ').lower() == 'y':
         data['online'] = upload_global_tag('online')
-        data['online_update'] = input('  -> The update of the payload must be synchronized with an update of the software (y/n) [y]? ').lower() in ['y', '']
+        data['online_update'] = input(
+            '  -> The update of the payload must be synchronized with an update of the software (y/n) [y]? ').lower() in ['y', '']
     if input('- data for data (re)processing and MC production (y/n) [n]? ').lower() == 'y':
         data['data'] = upload_global_tag('data')
     elif input('- mc for payloads that differ from those in the data GT (y/n) [n]? ').lower() == 'y':
@@ -185,12 +190,33 @@ if __name__ == "__main__":
         data['analysis'] = upload_global_tag('analysis')
     elif 'master' not in data.keys() and 'online' not in data.keys():
         print('\nNo global tag selected -> Exiting')
-        print('\nIf you want to add already uploaded payloads to a new global tag, send the request including the list of payload names, the source, and the destination global tag to mgt-global-tag@belle2.org.')
+        print('\nIf you want to add already uploaded payloads to a new global tag, send the request including the list',
+              'of payload names, the source, and the destination global tag to mgt-global-tag@belle2.org.')
         sys.exit(1)
 
     if len(set(data.keys()) & set(['data', 'mc', 'analysis'])) > 0:
-        print('\nEnter detailed instructions about targeted global tags/releases and the update procedure and then hit CTRL-D:')
-        data['details'] = sys.stdin.readlines()
+        # Ask user to enter detailed instructions. For this multiline input, offer option to use temporary editor
+        prompt_string = 'Enter detailed instructions about targeted global tags/releases and the update procedure'
+        print(prompt_string)
+        if input(f"Use editor (e) or command line (c) [e] for multiline input? ").lower() != "c":
+            input_editor = terminal_utils.InputEditor(commentlines_start_with="#")
+            # define initial comment for the temporary input file to guide the user
+            editor_help_comment = (
+                f"\n# {prompt_string}\n"
+                "# Lines starting with `#` will be ignored.\n"
+                f"# Currently in editor: {input_editor.get_editor_command()}.\n"
+                "# When finished, save and quit."
+            )
+            if input_editor.editor_command_list[0] in ['vi', 'vim']:
+                editor_help_comment += "#\nIf in vim: Use :wq to save and quit or :q! to discard changes."
+            input_editor.initial_content = editor_help_comment
+
+            details_input_string = input_editor.input()
+        else:
+            print("Input detailed instructions in command line and hit CTRL-D to finish")
+            details_input_string = sys.stdin.readlines()
+
+        data['details'] = details_input_string
 
     # summarize request and ask for confirmation
     time = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
@@ -213,7 +239,7 @@ Affected global tags: """ % (localdb, data['reason'], data['release'], data['req
         print(''.join(data['details']))
     print('')
     if input('- Is the above information correct (y/n) [n]? ').lower() != 'y':
-       sys.exit(0)
+        sys.exit(0)
 
     while True:
         password = getpass.getpass("\nPlease give your DESY password to authenticate the request: ")
@@ -239,8 +265,8 @@ Affected global tags: """ % (localdb, data['reason'], data['release'], data['req
             upload_payloads(localdb, task, data, time, iovs)
 
     # send information to web service
-    user = re.search('user=\S*', os.environ['BELLE2_DOWNLOAD']).group(0).split('=')[1]
-    password = re.search('password=\S*', os.environ['BELLE2_DOWNLOAD']).group(0).split('=')[1]
+    user = re.search(r'user=\S*', os.environ['BELLE2_DOWNLOAD']).group(0).split('=')[1]
+    password = re.search(r'password=\S*', os.environ['BELLE2_DOWNLOAD']).group(0).split('=')[1]
     response = requests.post('https://b2-master.belle2.org/cgi-bin/global_tag_request.py', auth=(user, password), data=data)
     if response.status_code == 200:
         print('\nRequest successfully submitted.')

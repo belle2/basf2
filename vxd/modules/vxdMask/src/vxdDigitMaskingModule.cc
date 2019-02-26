@@ -51,7 +51,7 @@ vxdDigitMaskingModule::vxdDigitMaskingModule() : HistoModule()
   setDescription("vxdDigitMasking of pixels and strips in PXD and SVD base on their fireing");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("maskVXD"));
   m_nEventsProcess = -1;
   addParam("nEventsProcess", m_nEventsProcess, "Number of events to process", m_nEventsProcess);

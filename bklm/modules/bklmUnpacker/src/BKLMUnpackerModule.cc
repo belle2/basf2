@@ -273,7 +273,7 @@ void BKLMUnpackerModule::event()
             bklmDigitEventInfo->increaseOutOfRangeHits();
 
             // store the digit in the appropriate dataobject
-            BKLMDigitOutOfRange* bklmDigitOutOfRange = m_bklmDigitOutOfRanges.appendNew(moduleId, ctime, tdc, m_scintADCOffset - charge);
+            BKLMDigitOutOfRange* bklmDigitOutOfRange = m_bklmDigitOutOfRanges.appendNew(moduleId, ctime, tdc, charge);
             bklmDigitOutOfRange->addRelationTo(bklmDigitRaw);
             bklmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
 
@@ -294,8 +294,10 @@ void BKLMUnpackerModule::event()
           // moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
           moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
-          BKLMDigit* bklmDigit = m_bklmDigits.appendNew(moduleId, ctime, tdc, m_scintADCOffset - charge);
-          if (layer < 2 && ((m_scintADCOffset - charge) > m_scintThreshold))
+          BKLMDigit* bklmDigit = m_bklmDigits.appendNew(moduleId, ctime, tdc, charge);
+          bklmDigit->setTime(
+            m_TimeConversion->getTime(ctime, tdc, triggerCTime, layer <= 1));
+          if (layer < 2 && (charge < m_scintThreshold))
             bklmDigit->isAboveThreshold(true);
 
           B2DEBUG(29, "BKLMUnpackerModule:: digit after Unpacker: sector: " << bklmDigit->getSector() << " isForward: " <<

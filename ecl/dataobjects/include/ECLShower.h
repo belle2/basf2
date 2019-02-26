@@ -28,8 +28,24 @@ namespace Belle2 {
   class ECLShower : public RelationsObject {
   public:
 
+    /** The hypothesis ID for  ECLShowers. Unlike ECLClusters, ECLShowers have one and only one hypothesis ID. */
+    enum Hypothesis : unsigned int {
+      /** CR is split into a muon and n photons (T1) */
+      c_muonNPhotons = 1,
+      /** CR is reconstructed as a charged hadron (T2) */
+      c_chargedHadron = 2,
+      /** CR is split into an electron and n photons (T3) */
+      c_electronNPhotons = 3,
+      /** CR is split into n photons (N1) */
+      c_nPhotons = 5,
+      /** CR is reconstructed as a neutral hadron (N2) */
+      c_neutralHadron = 6,
+      /** CR is reconstructed as merged pi0 (N3) */
+      c_mergedPi0 = 7
+    };
+
     /** The status information for the ECLShowers. */
-    enum StatusBit {
+    enum StatusBit : unsigned int  {
       /** bit 0:  Dead crystal within nominal shower neighbour region.  */
       c_hasDeadCrystal = 1 << 0,
 
@@ -498,7 +514,8 @@ namespace Belle2 {
     // 10: added getUniqueId()
     // 11: added m_ShowerHadronIntensity and m_NumberOfHadronDigits variables (SL)
     // 12: added m_PulseShapeDiscriminationMVA.  Noted m_ShowerHadronIntensity will be removed in release-04 (SL)
-    ClassDef(ECLShower, 12);/**< ClassDef */
+    // 13: made enums strongly typed
+    ClassDef(ECLShower, 13);/**< ClassDef */
 
   };
 

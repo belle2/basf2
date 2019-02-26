@@ -60,9 +60,7 @@ void PXDRawDQMChipsModule::defineHisto()
     if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(layer, ladder, sensor))) {
       for (auto j = 0; j < eNumSwitcher; j++) {
         for (auto k = 0; k < eNumDCD; k++) {
-          //cppcheck-suppress zerodiv
           string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh) Switcher %d DCD %d") % layer % ladder % sensor % i % j % k);
-          //cppcheck-suppress zerodiv
           string s2 = str(format("_%d.%d.%d_%d_%d") % layer % ladder % sensor % j % k);
 
           hrawPxdHitsCount[i][j][k] = new TH1F(("hrawPxdCount" + s2).c_str(), ("Pxd Raw Count " + s + ";Nr per Event").c_str(), 8192, 0,

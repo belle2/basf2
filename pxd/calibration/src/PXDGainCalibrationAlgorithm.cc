@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Benjamin Schwenker                                       *
+ * Contributors: Benjamin Schwenker, Jonas Roetter                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,7 +26,8 @@
 
 //ROOT
 #include <TRandom.h>
-#include <TH1I.h>
+#include <TH1.h>
+#include <TF1.h>
 
 using namespace std;
 using boost::format;
@@ -101,7 +102,8 @@ namespace {
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDClusterChargeCollector"),
-  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false)
+
+  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false), strategy(0)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
@@ -187,7 +189,8 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
   // Post processing of gain map. It is possible that the gain
   // computation failed on some parts. Here, we replace default
-  // values by local averages of neighboring sensor parts.
+  // values (1.0) by local averages of neighboring sensor parts.
+
   for (const auto& sensorID : pxdSensors) {
     for (unsigned short vBin = 0; vBin < nBinsV; ++vBin) {
       float meanGain = 0;
@@ -238,7 +241,6 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
   const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
-
   // Vector with cluster signals from collected mc
   vector<double> mc_signals;
 
@@ -255,15 +257,28 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   }
 
   double dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
-  double mcMedian = CalculateMedian(mc_signals);
-
-  double gain =  dataMedian / mcMedian;
-  if (gain <= 0) {
+  double mcMedian;
+  // check if dataMedian makes sense
+  if (dataMedian <= 0.0) {
     B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
               ". Set gain to default value (=1.0) as well.");
-    gain = 1.0;
+    return 1.0;
+  }
+  if (strategy == 0) mcMedian = CalculateMedian(mc_signals);
+  else if (strategy == 1) mcMedian = FitLandau(mc_signals);
+  else {
+    B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
   }
 
+  // check if mcMedian makes sense
+  if (mcMedian <= 0.0) {
+    B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
+              ". Set gain to default value (=1.0) as well.");
+    return 1.0;
+  }
+
+
+  double gain =  dataMedian / mcMedian;
   double gainFromDB = GetCurrentGainFromDB(sensorID, uBin, vBin);
   B2DEBUG(10, "Gain from db used in PXDDigitizer is " << gainFromDB);
   B2DEBUG(10, "New gain correction derived is " << gain);
@@ -340,7 +355,7 @@ double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
   auto size = signals.size();
 
   if (size == 0) {
-    return 0;  // Undefined, really.
+    return 0.0;  // Undefined, really.
   } else {
     sort(signals.begin(), signals.end());
     if (size % 2 == 0) {
@@ -351,3 +366,38 @@ double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
   }
 }
 
+double PXDGainCalibrationAlgorithm::FitLandau(vector<double>& signals)
+{
+  auto size = signals.size();
+  if (size == 0) return 0.0; // Undefined, really.
+
+  // get max and min values of signal vector
+  int max = *max_element(signals.begin(), signals.end());
+  int min = *min_element(signals.begin(), signals.end());
+
+  // create histogram to hold signals and fill it
+  TH1D* hist_signals = new TH1D("", "", max - min, min, max);
+  for (auto it = signals.begin(); it != signals.end(); ++it) {
+    hist_signals->Fill(*it);
+  }
+
+  // create fit function
+  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
+  landau->SetParNames("MPV", "sigma", "scale");
+  landau->SetParameters(100, 1, 1000);
+
+  // do fit and get results
+  Int_t status = hist_signals->Fit("landau", "Lq", "", 0, 350);
+  double MPV = landau->GetParameter("MPV");
+
+  // clean up
+  delete hist_signals;
+  delete landau;
+
+  // check fit status
+  if (status == 0) return MPV;
+  else {
+    B2WARNING("Fit failed!. using default value.");
+    return 0.0;
+  }
+}

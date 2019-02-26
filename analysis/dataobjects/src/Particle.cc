@@ -13,7 +13,6 @@
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -179,7 +178,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
   const TVector3 clustervertex = C.GetIPPosition();
   setVertex(clustervertex);
 
-  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex);
+  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit());
   m_px = clustermom.Px();
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();
@@ -195,7 +194,8 @@ Particle::Particle(const ECLCluster* eclCluster) :
   const TMatrixDSym clustervertexcovmat = C.GetIPPositionCovarianceMatrix();
 
   // Set error matrix.
-  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat);
+  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat,
+                              getECLClusterEHypothesisBit());
   storeErrorMatrix(clustercovmat);
 }
 
@@ -539,6 +539,7 @@ const PIDLikelihood* Particle::getPIDLikelihood() const
     return nullptr;
 }
 
+
 const ECLCluster* Particle::getECLCluster() const
 {
   if (m_particleType == c_ECLCluster) {
@@ -553,11 +554,11 @@ const ECLCluster* Particle::getECLCluster() const
     // loop over all clusters matched to this track
     for (const ECLCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<ECLCluster>()) {
       // ignore everything except the nPhotons hypothesis
-      if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
         continue;
       // check if we're most energetic thus far
-      if (cluster.getEnergy() > highestEnergy) {
-        highestEnergy = cluster.getEnergy();
+      if (cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > highestEnergy) {
+        highestEnergy = cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
         bestTrackMatchedCluster = &cluster;
       }
     }
@@ -565,6 +566,12 @@ const ECLCluster* Particle::getECLCluster() const
   } else {
     return nullptr;
   }
+}
+
+double Particle::getECLClusterEnergy() const
+{
+  const ECLCluster* cluster = this->getECLCluster();
+  return cluster->getEnergy(this->getECLClusterEHypothesisBit());
 }
 
 const KLMCluster* Particle::getKLMCluster() const

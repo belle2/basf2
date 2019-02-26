@@ -57,12 +57,9 @@
 #include <alignment/Hierarchy.h>
 #include <alignment/GlobalParam.h>
 #include <alignment/GlobalDerivatives.h>
-
-#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/GblMultipleScatteringController.h>
 
 #include <genfit/KalmanFitterInfo.h>
-
-//#include <alignment/reconstruction/GblMultipleScatteringController.h>
 
 using namespace std;
 using namespace Belle2;
@@ -903,7 +900,7 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
   //gbl->setOptions(m_internalIterations, true, true, m_externalIterations, m_recalcJacobians);
   gbl->setOptions("", true, true, 0, 0);
-  //gbl->setTrackSegmentController(new GblMultipleScatteringController);
+  gbl->setTrackSegmentController(new GblMultipleScatteringController);
 
   MeasurementAdder factory("", "", "", "", "");
 
@@ -1140,8 +1137,6 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyE
   double phi = atan2(avgMom[1], avgMom[0]);
   if (phi < 0.) phi += 2. * TMath::Pi();
 
-  std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
-
   double alpha = M / 2. / m;
   double c1 = m * sqrt(alpha * alpha - 1.);
   double c2 = 0.5 * sqrt((alpha * alpha - 1.) / alpha / alpha * (p * p + M * M));
@@ -1237,7 +1232,7 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyE
   return {result[0], result[1]};
 }
 
-TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop)
+TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop)
 {
   auto state = msop;
   const TVector3& U(state.getPlane()->getU());
@@ -1309,7 +1304,7 @@ TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(genfit::MeasuredSta
   return J_Mp_6x5.T();
 }
 
-TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(genfit::MeasuredStateOnPlane msop)
+TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop)
 {
   auto state = msop;
   // get vectors and aux variables

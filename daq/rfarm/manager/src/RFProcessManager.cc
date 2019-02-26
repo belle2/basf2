@@ -191,7 +191,6 @@ int RFProcessManager::CheckOutput()
       }
       if (nfd == 0) break; // was a timeout -> return to do other stuff
     }
-    // sleep(1); As we use a select with 1s timeout, why add another wait here??
   }
   // Return nfd
   //  time_t now = time ( NULL );

@@ -3,6 +3,7 @@
 
 from basf2 import *
 from optparse import OptionParser
+import os
 
 # --------------------------------------------------------------------
 # Example script for ARICH stand alone simulation and reconstruction

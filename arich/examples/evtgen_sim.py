@@ -7,7 +7,7 @@ from tracking import add_tracking_reconstruction
 from modularAnalysis import analysis_main
 from modularAnalysis import inputMdst
 from tracking import add_tracking_reconstruction
-
+import os
 # --------------------------------------------------------------------
 # Performs Geant4 simulation of events generated with evtgen_gen.py
 # PXD, SVD, CDC and ARICH detectors are used. Reconstruction of tracks

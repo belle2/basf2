@@ -138,8 +138,10 @@ void AlignDQMModule::defineHisto()
 
   float fMomRange = 3.0;
   int iMomRange = 60;
-  float fZ0Range = 10.0;  // Half range in cm
-  float fD0Range = 1.0;   // Half range in cm
+  float fZ0Range = 10.0;     // Half range in cm
+  float fD0Range = 1.0;      // Half range in cm
+  int iPhiRange = 180;
+  float fPhiRange = 180.0;   // Half range in deg
 
   DirAlignHelixParameters->cd();
 
@@ -153,6 +155,11 @@ void AlignDQMModule::defineHisto()
   m_D0 = new TH1F(name.c_str(), title.c_str(), 100, -fD0Range, fD0Range);
   m_D0->GetXaxis()->SetTitle("d0 [cm]");
   m_D0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_Phi"));
+  title = str(format("Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention"));
+  m_Phi = new TH1F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange);
+  m_Phi->GetXaxis()->SetTitle("#phi [deg]");
+  m_Phi->GetYaxis()->SetTitle("Arb. Units");
   name = str(format("Alig_Omega"));
   title = str(format("Omega - the curvature of the track. It's sign is defined by the charge of the particle"));
   m_Omega = new TH1F(name.c_str(), title.c_str(), 100, -0.1, 0.1);
@@ -166,6 +173,43 @@ void AlignDQMModule::defineHisto()
 
   DirAlignHelixCorrelations->cd();
 
+  name = str(format("Alig_PhiD0"));
+  title = str(
+            format("Phi - angle of the transverse momentum in the r-phi plane vs. d0 - signed distance to the IP in r-phi "));
+  m_PhiD0 = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 100, -fD0Range, fD0Range);
+  m_PhiD0->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiD0->GetYaxis()->SetTitle("d0 [cm]");
+  m_PhiD0->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_PhiZ0"));
+  title = str(
+            format("Phi - angle of the transverse momentum in the r-phi plane vs. "
+                   "z0 of the perigee (to see primary vertex shifts along R or z)"));
+  m_PhiZ0 = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 100, -fZ0Range, fZ0Range);
+  m_PhiZ0->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiZ0->GetYaxis()->SetTitle("z0 [cm]");
+  m_PhiZ0->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_PhiMomPt"));
+  title = str(
+            format("Phi - angle of the transverse momentum in the r-phi plane vs. Track momentum Pt"));
+  m_PhiMomPt = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 2 * iMomRange, 0.0, fMomRange);
+  m_PhiMomPt->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiMomPt->GetYaxis()->SetTitle("Momentum");
+  m_PhiMomPt->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_PhiOmega"));
+  title = str(
+            format("Phi - angle of the transverse momentum in the r-phi plane vs. Omega - the curvature of the track"));
+  m_PhiOmega = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 100, -0.1, 0.1);
+  m_PhiOmega->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiOmega->GetYaxis()->SetTitle("Omega");
+  m_PhiOmega->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_PhiTanLambda"));
+  title = str(
+            format("dPhi - angle of the transverse momentum in the r-phi plane vs. "
+                   "TanLambda - the slope of the track in the r-z plane"));
+  m_PhiTanLambda = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 100, -4.0, 4.0);
+  m_PhiTanLambda->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiTanLambda->GetYaxis()->SetTitle("Tan Lambda");
+  m_PhiTanLambda->GetZaxis()->SetTitle("Arb. Units");
   name = str(format("Alig_D0Z0"));
   title = str(
             format("d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z)"));
@@ -836,9 +880,16 @@ void AlignDQMModule::beginRun()
 
   if (m_D0 != NULL) m_D0->Reset();
   if (m_Z0 != NULL) m_Z0->Reset();
+  if (m_Phi != NULL) m_Phi->Reset();
   if (m_MomPt != NULL) m_MomPt->Reset();
   if (m_Omega != NULL) m_Omega->Reset();
   if (m_TanLambda != NULL) m_TanLambda->Reset();
+
+  if (m_PhiD0 != NULL) m_PhiD0->Reset();
+  if (m_PhiZ0 != NULL) m_PhiZ0->Reset();
+  if (m_PhiMomPt != NULL) m_PhiMomPt->Reset();
+  if (m_PhiOmega != NULL) m_PhiOmega->Reset();
+  if (m_PhiTanLambda != NULL) m_PhiTanLambda->Reset();
 
   if (m_D0Z0 != NULL) m_D0Z0->Reset();
   if (m_D0MomPt != NULL) m_D0MomPt->Reset();
@@ -1143,8 +1194,16 @@ void AlignDQMModule::event()
 
       if (m_D0 != NULL) m_D0->Fill(tfr->getD0());
       if (m_Z0 != NULL) m_Z0->Fill(tfr->getZ0());
+      if (m_Phi != NULL) m_Phi->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"));
       if (m_Omega != NULL) m_Omega->Fill(tfr->getOmega());
       if (m_TanLambda != NULL) m_TanLambda->Fill(tfr->getTanLambda());
+
+      if (m_PhiD0 != NULL) m_PhiD0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
+      if (m_PhiZ0 != NULL) m_PhiZ0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getZ0());
+      if (m_PhiMomPt != NULL) m_PhiMomPt->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getMomentum().Pt());
+      if (m_PhiOmega != NULL) m_PhiOmega->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getOmega());
+      if (m_PhiTanLambda != NULL)
+        m_PhiTanLambda->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getTanLambda());
 
       if (m_D0Z0 != NULL) m_D0Z0->Fill(tfr->getD0(), tfr->getZ0());
       if (m_D0MomPt != NULL) m_D0MomPt->Fill(tfr->getD0(), tfr->getMomentum().Pt());

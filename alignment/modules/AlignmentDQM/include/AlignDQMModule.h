@@ -172,6 +172,8 @@ namespace Belle2 {
 
     /** helix parameters and their corellations: */
 
+    /** Phi - the angle of the transverse momentum in the r-phi plane, with CDF naming convention */
+    TH1F* m_Phi = nullptr;
     /** d0 - the signed distance to the IP in the r-phi plane */
     TH1F* m_D0 = nullptr;
     /** z0 - the z0 coordinate of the perigee (beam spot position) */
@@ -181,6 +183,16 @@ namespace Belle2 {
     /** TanLambda - the slope of the track in the r-z plane */
     TH1F* m_TanLambda = nullptr;
 
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. d0 - signed distance to the IP in r-phi */
+    TH2F* m_PhiD0 = nullptr;
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. z0 of the perigee (to see primary vertex shifts along R or z) */
+    TH2F* m_PhiZ0 = nullptr;
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. Track momentum Pt */
+    TH2F* m_PhiMomPt = nullptr;
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. Omega - the curvature of the track */
+    TH2F* m_PhiOmega = nullptr;
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_PhiTanLambda = nullptr;
     /** d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z) */
     TH2F* m_D0Z0 = nullptr;
     /** d0 - signed distance to the IP in r-phi vs. Track momentum Pt */

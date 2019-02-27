@@ -828,16 +828,13 @@ void DisplayUI::exit()
 
 void DisplayUI::showUserData(const DisplayData& displayData)
 {
-  static TGFileBrowser* fileBrowser = NULL;
   static std::map<std::string, BrowsableWrapper*> wrapperMap;
   for (auto& entry : wrapperMap) {
-    //doesn't do anything
-    //fileBrowser->RecursiveRemove(wrappers[i]);
-
     entry.second = NULL;
   }
 
   if (!displayData.m_histograms.empty()) {
+    static TGFileBrowser* fileBrowser = NULL;
     if (!fileBrowser) {
       gEve->GetBrowser()->StartEmbedding(0);
       fileBrowser = gEve->GetBrowser()->MakeFileBrowser();

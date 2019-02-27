@@ -36,7 +36,7 @@ namespace Belle2 {
      * @param numPhotons number of photon hits used to find minimum
      */
     TOPTimeZero(int moduleID, double t0, double err, int numPhotons):
-      m_moduleID(moduleID), m_t0(t0), m_err(err), m_numPhotons(numPhotons)
+      m_moduleID(moduleID), m_t0(t0), m_err(err), m_numPhotons(numPhotons), m_valid(true)
     {}
 
     /**
@@ -51,6 +51,17 @@ namespace Belle2 {
       m_pdf = pdf;
       m_hits = hits;
     }
+
+    /**
+     * Sets particle mass used in reconstruction
+     * @param mass particle mass
+     */
+    void setAssumedMass(double mass) {m_assumedMass = mass;}
+
+    /**
+     * Sets time zero to invalid. Usefull when time zero not successfully determined.
+     */
+    void setInvalid() {m_valid = false;}
 
     /**
      * Returns slot number used to determine t0
@@ -94,6 +105,18 @@ namespace Belle2 {
      */
     const TH1F& getHits() const {return m_hits;}
 
+    /**
+     * Returns particle mass used in time zero reconstruction
+     * @return particle mass
+     */
+    double getAssumedMass() const {return m_assumedMass;}
+
+    /**
+     * Returns the status of time zero reconstruction
+     * @return true if successfully determined
+     */
+    bool isValid() const {return m_valid;}
+
   private:
 
     int m_moduleID = 0; /**< slot number (1-based) */
@@ -103,8 +126,10 @@ namespace Belle2 {
     TH1F m_chi2;  /**< chi^2 versus t0 used to find minimum */
     TH1F m_pdf;  /**< PDF projected to time */
     TH1F m_hits;  /**< time distribution of hits */
+    float m_assumedMass = 0; /**< particle mass used in reconstruction */
+    bool m_valid = false; /**< status: true if time zero is successfully determined */
 
-    ClassDef(TOPTimeZero, 2); /**< ClassDef */
+    ClassDef(TOPTimeZero, 3); /**< ClassDef */
 
   };
 

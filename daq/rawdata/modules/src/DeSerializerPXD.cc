@@ -61,7 +61,7 @@ void DeSerializerPXDModule::initialize()
   m_eventMetaDataPtr.registerInDataStore();
 
   // Initialize Array of RawCOPPER
-  StoreArray<RawPXD>::registerPersistent();
+  rawpxdary.registerInDataStore();
 
   B2DEBUG(0, "DeSerializerPXDModule: initialized.");
 }

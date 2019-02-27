@@ -31,9 +31,10 @@ namespace Belle2 {
      * @param branches if not empty, the list of branches to be accepted
      * @param excludeBranches branches that should never end up in output (takes precedence over everything else)
      * @param durability Durability being filtered (used for messages only)
+     * @param quiet If true don't warn about branches which are missing/extra/duplicate in the lists
      */
     std::set<std::string> filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches,
-                                         const std::vector<std::string>& excludeBranches, int durability);
+                                         const std::vector<std::string>& excludeBranches, int durability, bool quiet = false);
 
     /** Performs wildcard expansion using wordexp(), returns matches. */
     std::vector<std::string> expandWordExpansions(const std::vector<std::string>& filenames);

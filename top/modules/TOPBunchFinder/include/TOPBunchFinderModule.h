@@ -20,6 +20,7 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <top/dataobjects/TOPTimeZero.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
 namespace Belle2 {
@@ -72,6 +73,11 @@ namespace Belle2 {
     double m_minSBRatio;  /**< minimal signal-to-background ratio */
     double m_minDERatio;  /**< minimal ratio of detected over expected photons */
     double m_maxDERatio;  /**< maximal ratio of detected over expected photons */
+    double m_minPt; /**< minimal p_T of track */
+    double m_maxPt; /**< maximal p_T of track */
+    double m_maxD0; /**< maximal absolute value of helix perigee distance */
+    double m_maxZ0; /**< maximal absolute value of helix perigee z coordnate */
+    int m_minNHitsCDC; /**< minimal number of hits in CDC */
     bool m_useMCTruth;    /**< use MC truth for mass instead of dEdx most probable */
     bool m_saveHistograms; /**< flag to save histograms */
     double m_tau; /**< first order filter time constant [events] */
@@ -98,6 +104,7 @@ namespace Belle2 {
     StoreArray<Track> m_tracks; /**< collection of tracks */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreObjPtr<MCInitialParticles> m_initialParticles; /**< simulated beam particles */
+    StoreArray<TOPTimeZero> m_timeZeros; /**< collection of T0 of individual tracks */
 
   };
 

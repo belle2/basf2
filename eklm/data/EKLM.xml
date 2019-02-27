@@ -4,8 +4,7 @@
 	<Version>0</Version>
 	<Creator library="eklm">EKLMCreator</Creator>
 	<Content>
-		<!-- Simulation, digitization. -->
-		<xi:include href="DigitizationParams.xml"/>
+		<!-- Simulation. -->
 		<SensitiveDetector>
 			<HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>
 		</SensitiveDetector>

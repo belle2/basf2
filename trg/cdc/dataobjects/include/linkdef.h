@@ -15,6 +15,7 @@
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+;
 #pragma link C++ class Belle2::CDCTriggerFinderClone+;
 #pragma link C++ class Belle2::TRGCDCTSFUnpackerStore+;
+#pragma link C++ class Belle2::TRGCDCETFUnpackerStore+;
 
 #pragma link C++ class Belle2::TRGCDCT3DUnpackerStore+;
 #pragma link C++ class Belle2::Bitstream<array<bitset<MERGER_WIDTH>, NUM_MERGER> >+;

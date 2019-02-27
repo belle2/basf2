@@ -8,12 +8,20 @@ Variables
   Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
 
 * Removed ClusterHadronIntensity and clusterUniqueID.
+* Added helix extrapolation from charged tracks
+* Added clusterMdstIndex variable to get ECLCluster MDST index for particles that do not originate from ECLCluster
 
+* The function to create variable aliases for particles selected from a decay
+  string has been fixed and extended to allow better
+  customization (:issue:`BII-4437`)
 Modules
 +++++++
 
 * Removal of the unsupported ECLClusterInfoModule.
+* Added `modularAnalysis.fitPseudo` function and a pseudo vertex fitting module to add a covariance matrix when a vertex fit is not possible. E.g. for :math:`\pi^0` decays.
 
+  .. seealso::
+     `variables.utils.create_aliases_for_selected()`
 
 Standard Particle Lists
 +++++++++++++++++++++++
@@ -21,15 +29,10 @@ Standard Particle Lists
 * Updated charged standard PID cut values to reflect the correct efficiencies.
   This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
 
-Variables
-+++++++++
+* Fix the `stdKlongs.stdKlongs` lists.
 
-* The function to create variable aliases for particles selected from a decay
-  string has been fixed and extended to allow better
-  customization (:issue:`BII-4437`)
-
-  .. seealso::
-     `variables.utils.create_aliases_for_selected()`
+* The variables for the fast reco HLT trigger stage have been removed,
+  as we are currently not planning to have it in the early data taking.
 
 Modules
 +++++++
@@ -43,8 +46,18 @@ Modules
 
 * Removal of the unsupported ECLClusterInfoModule.
 
+* Added the new module SignalSideVariablesToDaughterExtraInfoModule. It adds
+  ExtraInfo to a specified particle (typically a daughter on the signal side).
+  The corresponding information is calculated in the RestOfEvent so it is
+  supposed to be executed only in for_each ROE paths.
+
 FEI
 +++
 
 * Removed the backward compatibility layer (``pid_renaming_oktober_2017``). 
   Only FEI trainings from release-02 are supported. Please update to ``FEIv4_2018_MC9_release_02_00_01`` or newer.
+
+Tutorials
++++++++++
+
+* Fix B2A202 to load Klongs as advertised.

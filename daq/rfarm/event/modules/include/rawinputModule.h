@@ -84,6 +84,17 @@ namespace Belle2 {
     //! Total nr. of events in the file
     int m_nevt;
 
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< EventMetaData. */
+    StoreArray<RawDataBlock> m_rawDataBlock; /**< RawDataBlock. */
+    StoreArray<RawCOPPER> m_rawCOPPER; /**< RawCOPPER. */
+    StoreArray<RawCDC> m_rawCDC; /**< RawCDC. */
+    StoreArray<RawSVD> m_rawSVD; /**< RawSVD. */
+    StoreArray<RawTOP> m_rawTOP; /**< RawTOP. */
+    StoreArray<RawECL> m_rawECL; /**< RawECL. */
+    StoreArray<RawARICH> m_rawARICH; /**< RawARICH. */
+    StoreArray<RawKLM> m_rawKLM; /**< RawKLM. */
+    StoreArray<RawTRG> m_rawTRG; /**< RawTRG. */
+    StoreArray<RawFTSW> m_rawFTSW; /**< RawFTSW. */
   };
 } // end namespace Belle2
 

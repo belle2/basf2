@@ -3,16 +3,18 @@ from glob import glob
 import json
 import json_objects
 import os.path
-import time
 import argparse
 import logging
 import sys
 import queue
 import webbrowser
+import datetime
 from multiprocessing import Process, Queue
 from validationplots import create_plots
+import validationfunctions
 import validationpath
 import functools
+import time
 
 g_plottingProcesses = {}
 
@@ -66,7 +68,7 @@ def deliver_json(file_name):
     return data
 
 
-def create_revsion_key(revision_names):
+def create_revision_key(revision_names):
     """
     Create a string key out of a revision list, which is handed to tho browser
     in form of a progress key
@@ -105,7 +107,7 @@ def start_plotting_request(revision_names, results_folder):
     Start a new comparison between the supplied revisions
     """
 
-    rev_key = create_revsion_key(revision_names)
+    rev_key = create_revision_key(revision_names)
 
     # still running a plotting for this combination ?
     if rev_key in g_plottingProcesses:
@@ -158,6 +160,14 @@ class ValidationRoot(object):
 
         #: folder where the comparison plots and json result files are located
         self.comparison_folder = comparison_folder
+
+        #: Date when this object was instantiated
+        self.last_restart = datetime.datetime.now()
+
+        #: Git version
+        self.version = validationfunctions.get_compact_git_hash(
+            os.environ["BELLE2_LOCAL_DIR"]
+        )
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -229,8 +239,46 @@ class ValidationRoot(object):
             j["label"] = lbl_folder
             combined_list.append(j)
 
-        # sort by name
-        combined_list.sort(key=lambda rev: rev["creation_date"], reverse=True)
+        # Sorting
+
+        # Order by categories (nightly, build, etc.) first, then by date
+        # A pure chronological order doesn't make sense, because we do not
+        # have a linear history ((pre)releases branch off) and for the builds
+        # the date corresponds to the build date, not to the date of the
+        # actual commit.
+        def sort_key(label: str):
+            if "-" not in label:
+                logging.warning(
+                    "Misformatted label encountered: '{}' "
+                    "(doesn't seem to include date?)".format(label)
+                )
+                return label
+            category, datetag = label.split("-", maxsplit=1)
+            print(category, datetag)
+            # Will later reverse order to bring items in the same category
+            # in reverse chronological order, so the following list will have
+            # the items in reverse order as well:
+            order = [
+                "release",
+                "prerelease",
+                "build",
+                "nightly"
+            ]
+            try:
+                index = order.index(category)
+            except ValueError:
+                logging.warning(
+                    "Misformatted label encountered: '{}' "
+                    "(doesn't seem to belong to any known "
+                    "category?)".format(label)
+                )
+                index = 9
+            return "{}-{}".format(index, datetag)
+
+        combined_list.sort(
+            key=lambda rev: sort_key(rev["label"]),
+            reverse=True
+        )
 
         # reference always on top
         combined_list = [reference_revision] + combined_list
@@ -293,6 +341,25 @@ class ValidationRoot(object):
             )
 
         return deliver_json(full_path)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def system_info(self):
+        """
+        Returns:
+            JSON file containing git versions and time of last restart
+        """
+        # note: for some reason %Z doesn't work like this, so we use
+        # time.tzname for the time zone.
+        return {
+            "last_restart":
+                self.last_restart.strftime("%-d %b %H:%M ") + time.tzname[1],
+            "version_restart": self.version,
+            "version_current":
+                validationfunctions.get_compact_git_hash(
+                    os.environ["BELLE2_LOCAL_DIR"]
+                )
+        }
 
 
 def setup_gzip_compression(path, cherry_config):
@@ -426,7 +493,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cherry_config["/static"] = {
         'tools.staticdir.on': True,
         # only serve js, css, html and png files
-        'tools.staticdir.match': "^.*\.(js|css|html|png)$",
+        'tools.staticdir.match': "^.*\.(js|css|html|png|js.map)$",
         'tools.staticdir.dir': static_folder
     }
     setup_gzip_compression("/static", cherry_config)

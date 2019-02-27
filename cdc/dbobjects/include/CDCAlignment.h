@@ -48,6 +48,24 @@ namespace Belle2 {
     /// Wire tension w.r.t. nominal (=50. ?)
     static const baseType wireTension = 21;
 
+    // Alignment of layers ------------------------------------------------
+    //Numbering taken from Claus ... no need to change, good idea :-)
+    //(1: X(bwd), 2: Y(bwd), 6: Phi(bwd), 11: X(fwd-bwd), 12: Y(fwd-bwd), 16: Phi(fwd-bwd)
+
+    /// Layer shift in global X at backward endplate
+    static const baseType layerX = 1;
+    /// Layer shift in global Y at backward endplate
+    static const baseType layerY = 2;
+    /// Layer rotation in global X-Y plane (gamma) at backward endplate
+    static const baseType layerPhi = 6;
+
+    /// Layer shift in global X  dX = foward - backward endplate
+    static const baseType layerDx = 11;
+    /// Layer shift in global Y  dY = foward - backward endplate
+    static const baseType layerDy = 12;
+    /// Layer rotation in global X-Y plane (gamma)  dPhi = foward - backward endplate
+    static const baseType layerDPhi = 16;
+
     /// Constructor
     CDCAlignment() : DBObjCalibrationConstMapBase() {}
 
@@ -93,19 +111,17 @@ namespace Belle2 {
     ~CDCAlignment() {}
 
     // ------------- Interface to global Millepede calibration ----------------
-    //TODO: enable the wire alignment
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 27;}
-    /// Get global parameter FIXME does nothing because CDC is not ready
-    double getGlobalParam(unsigned short, unsigned short) const
+    /// Get global parameter
+    double getGlobalParam(unsigned short element, unsigned short param) const
     {
-      //return get(element, param);
-      return 0.;
+      return get(element, param);
     }
-    /// Set global parameter FIXME does nothing because CDC is not ready
-    void setGlobalParam(double, unsigned short, unsigned short)
+    /// Set global parameter
+    void setGlobalParam(double value, unsigned short element, unsigned short param)
     {
-      //set(element, param, value);
+      set(element, param, value);
     }
     /// list stored global parameters TODO FIXME CDC not ready
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
@@ -116,7 +132,7 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(CDCAlignment, 1); /**< Storage for CDC alignment constants (mainly now for Millepede) */
+    ClassDef(CDCAlignment, 2); /**< Storage for CDC alignment constants (mainly now for Millepede) */
 
   };
 

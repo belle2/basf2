@@ -42,6 +42,6 @@ namespace Belle2 {
     /// Minimal PXD cluster size for used PXD hits in cosmic track
     unsigned int m_minimumClusterSize = 0;
     /// Magnitude of cosmic tracks if magnetic field is not used.
-    double m_magnitudeOfMomentumWithoutMagneticField;
+    double m_magnitudeOfMomentumWithoutMagneticField = 10.;
   };
 }

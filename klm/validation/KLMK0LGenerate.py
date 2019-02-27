@@ -18,7 +18,7 @@ from beamparameters import add_beamparameters
 set_log_level(LogLevel.WARNING)
 
 # Fixed random seed
-set_random_seed(12345)
+set_random_seed(123456)
 
 # Create main path
 main = create_path()
@@ -26,7 +26,6 @@ main = create_path()
 # Event data
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
-eventinfosetter.param('runList', [1])
 
 # Evtgen and beam parameters.
 evtgen = register_module('EvtGenInput')

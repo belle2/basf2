@@ -78,8 +78,8 @@ void PXDPackerModule::initialize()
 
   m_packed_events = 0;
 
-  B2DEBUG(20, "Clusterizer is " << m_Clusterize);
-  B2DEBUG(20, "InvertMapping is " << m_InvertMapping);
+  B2DEBUG(27, "Clusterizer is " << m_Clusterize);
+  B2DEBUG(27, "InvertMapping is " << m_InvertMapping);
 
   /// read in the mapping for ONSEN->DHC->DHE->DHP
   /// until now ONSEN->DHC is not needed yet (might be based on event numbers per event)
@@ -87,7 +87,7 @@ void PXDPackerModule::initialize()
   for (auto& it : m_dhe_to_dhc) {
     bool flag;
     int dhc_id;
-    B2DEBUG(20, "PXD Packer --> DHC/DHE");
+    B2DEBUG(27, "PXD Packer --> DHC/DHE");
     flag = false;
     if (it.size() != 6) {
       /// means [ 1 2 3 4 5 -1 ] DHC 1 has DHE 2,3,4,5 on port 0-3 and nothing on port 4
@@ -97,7 +97,7 @@ void PXDPackerModule::initialize()
       if (flag) {
         int v;
         v = it2;
-        B2DEBUG(20, "PXD Packer --> ... DHE " << it2);
+        B2DEBUG(27, "PXD Packer --> ... DHE " << it2);
         if (it2 < -1 || it2 >= 64) {
           if (it2 != -1) B2ERROR("PXD Packer --> DHC id " << it2 << " is out of range (0-64 or -1)! disable channel.");
           v = -1;
@@ -106,7 +106,7 @@ void PXDPackerModule::initialize()
         m_dhc_mapto_dhe[dhc_id].push_back(v);
       } else {
         dhc_id = it2;
-        B2DEBUG(20, "PXD Packer --> DHC .. " << it2);
+        B2DEBUG(27, "PXD Packer --> DHC .. " << it2);
         if (dhc_id < 0 || dhc_id >= 16) {
           B2ERROR("PXD Packer --> DHC id " << it2 << " is out of range (0-15)! skip");
           break;
@@ -115,17 +115,17 @@ void PXDPackerModule::initialize()
       flag = true;
     }
   }
-  B2DEBUG(20, "PXD Packer --> DHC/DHE done");
+  B2DEBUG(27, "PXD Packer --> DHC/DHE done");
 
 //   for (auto & it : m_dhe_mapto_dhc) {
-//     B2DEBUG(20, "PXD Packer --> DHE " << it.first << " connects to DHC " << it.second);
+//     B2DEBUG(27, "PXD Packer --> DHE " << it.first << " connects to DHC " << it.second);
 //   }
 
   for (auto& it : m_dhc_mapto_dhe) {
     int port = 0;
-    B2DEBUG(20, "PXD Packer --> DHC " << it.first);
+    B2DEBUG(27, "PXD Packer --> DHC " << it.first);
     for (auto& it2 : it.second) {
-      B2DEBUG(20, "PXD Packer --> .. connects to DHE " << it2 << " port " << port);
+      B2DEBUG(27, "PXD Packer --> .. connects to DHE " << it2 << " port " << port);
       port++;
     }
   }
@@ -153,7 +153,7 @@ void PXDPackerModule::event()
 
   int nDigis = m_storeDigits.getEntries();
 
-  B2DEBUG(20, "PXD Packer --> Nr of Digis: " << nDigis);
+  B2DEBUG(27, "PXD Packer --> Nr of Digis: " << nDigis);
 
   startOfVxdID.clear();
 
@@ -167,7 +167,7 @@ void PXDPackerModule::event()
     if (currentVxdId != lastVxdId) {
       // do something...
       lastVxdId = currentVxdId;
-      B2DEBUG(20, "VxdId: " << currentVxdId << " " << (int)currentVxdId);
+      B2DEBUG(27, "VxdId: " << currentVxdId << " " << (int)currentVxdId);
       {
         unsigned int layer, ladder, sensor, segment, dhe_id;
         layer = currentVxdId.getLayerNumber();/// 1 ... 2
@@ -175,13 +175,13 @@ void PXDPackerModule::event()
         sensor = currentVxdId.getSensorNumber();/// 1 ... 2
         segment = currentVxdId.getSegmentNumber();// Frame nr?
         dhe_id = ((layer - 1) << 5) | ((ladder) << 1) | (sensor - 1);
-        B2DEBUG(20, "Layer: " << layer << " Ladder " << ladder << " Sensor " << sensor << " Segment(Frame) " << segment << " =>DHEID: " <<
+        B2DEBUG(27, "Layer: " << layer << " Ladder " << ladder << " Sensor " << sensor << " Segment(Frame) " << segment << " =>DHEID: " <<
                 dhe_id);
       }
 
       if (startOfVxdID.count(currentVxdId) > 0) B2FATAL("PXD Digits are not sorted by VxdID!");
       startOfVxdID[currentVxdId] = std::distance(m_storeDigits.begin(), it);
-      B2DEBUG(20, "Offset : " << startOfVxdID[currentVxdId]);
+      B2DEBUG(27, "Offset : " << startOfVxdID[currentVxdId]);
     }
   }
 
@@ -198,7 +198,7 @@ void PXDPackerModule::event()
 void PXDPackerModule::pack_event(void)
 {
   int dhe_ids[5] = {0, 0, 0, 0, 0};
-  B2DEBUG(20, "PXD Packer --> pack_event");
+  B2DEBUG(27, "PXD Packer --> pack_event");
 
   // loop for each DHC in system
   // get active DHCs from a database?
@@ -276,7 +276,7 @@ void PXDPackerModule::start_frame(void)
 
 void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 {
-  B2DEBUG(20, "PXD Packer --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
+  B2DEBUG(27, "PXD Packer --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
 
   /// HLT frame ??? format still t.b.d. TODO
   start_frame();
@@ -332,7 +332,7 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 
 void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
 {
-  B2DEBUG(20, "PXD Packer --> pack_dhe ID " << dhe_id << " DHP act: " << dhp_active);
+  B2DEBUG(27, "PXD Packer --> pack_dhe ID " << dhe_id << " DHP act: " << dhp_active);
   // dhe_id is not dhe_id ...
   bool dhe_has_remapped = !m_InvertMapping; /// unless stated otherwise, DHH will not reformat coordinates
 
@@ -383,11 +383,11 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
     layer = ((dhe_id & 0x20) >> 5) + 1;
     currentVxdId = VxdID(layer, ladder, sensor);
 
-    B2DEBUG(20, "pack_dhe: VxdId: " << currentVxdId << " " << (int)currentVxdId);
+    B2DEBUG(27, "pack_dhe: VxdId: " << currentVxdId << " " << (int)currentVxdId);
 
     {
       auto it = m_storeDigits.begin();
-      B2DEBUG(20, "Advance: " << startOfVxdID[currentVxdId]);
+      B2DEBUG(27, "Advance: " << startOfVxdID[currentVxdId]);
       advance(it, startOfVxdID[currentVxdId]);
       for (; it != m_storeDigits.end(); ++it) {
         auto id = it->getSensorID();
@@ -402,7 +402,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
             B2ERROR("U/V out of range U: " << col << " V: " << row);
           } else {
             // fill ADC ... convert float to unsigned char, clamp to 0 - 255 , no scaling ... and how about common mode?
-            B2DEBUG(99, "Pixel: V: " << row << ", U: " << col << ", Ch " << it->getCharge());
+            B2DEBUG(26, "Pixel: V: " << row << ", U: " << col << ", Ch " << it->getCharge());
             if (!dhe_has_remapped) {
               do_the_reverse_mapping(row, col, layer, sensor);
             }
@@ -452,7 +452,7 @@ void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int
 void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id)
 {
   B2FATAL("This code needs to be checked agains new firmware");
-  B2DEBUG(20, "PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id);
+  B2DEBUG(27, "PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id);
   start_frame();
   /// DHP data Frame
   append_int32((EDHCFrameHeaderDataType::c_DHP_RAW << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
@@ -481,7 +481,7 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id)
 
 void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, int startrow)
 {
-  B2DEBUG(20, "PXD Packer --> pack_dhp Chip " << chip_id << " of DHE id: " << dhe_id);
+  B2DEBUG(27, "PXD Packer --> pack_dhp Chip " << chip_id << " of DHE id: " << dhe_id);
   // remark: chip_id != port most of the time ...
   bool empty = true;
   unsigned short last_rowstart = 0;
@@ -508,7 +508,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
     bool rowstart = true;
     for (int col = c1; col < c2; col++) {
       if (halfladder_pixmap[row][col] != 0) {
-        B2DEBUG(99, "Pixel: ROW: " << row << ", COL: " << col << ", Ch " << (int)halfladder_pixmap[row][col]);
+        B2DEBUG(26, "Pixel: ROW: " << row << ", COL: " << col << ", Ch " << (int)halfladder_pixmap[row][col]);
         if (rowstart) {
           last_rowstart = ((row & 0x3FE) << (6 - 1)) | 0; // plus common mode 6 bits ... set to 0
           append_int16(last_rowstart);
@@ -521,13 +521,13 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
     }
   }
   if (!empty && (m_current_frame.size() & 0x3)) {
-    B2DEBUG(20, "Repeat last rowstart to align to 32bit.");
+    B2DEBUG(27, "Repeat last rowstart to align to 32bit.");
     append_int16(last_rowstart);
   }
 
 
   if (empty) {
-    B2DEBUG(20, "Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
+    B2DEBUG(27, "Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
     // we DROP the frame, thus we have to correct DHE and DHC counters
     dhc_byte_count -= 8; // fixed size of Header
     dhe_byte_count -= 8; // fixed size of Header

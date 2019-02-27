@@ -132,10 +132,161 @@ void AlignDQMModule::defineHisto()
   TDirectory* DirAlignLayerResUPosV = DirAlignLayers->mkdir("ResidLayerUPositTheta");
   TDirectory* DirAlignLayerResVPosV = DirAlignLayers->mkdir("ResidLayerVPositTheta");
 
+  /** helix parameters and their corellations: */
+  TDirectory* DirAlignHelixParameters = DirAlign->mkdir("HelixPars");
+  TDirectory* DirAlignHelixCorrelations = DirAlign->mkdir("HelixCorrelations");
+
+  float fMomRange = 3.0;
+  int iMomRange = 60;
+  float fZ0Range = 10.0;     // Half range in cm
+  float fD0Range = 1.0;      // Half range in cm
+  int iPhiRange = 180;
+  float fPhiRange = 180.0;   // Half range in deg
+
+  DirAlignHelixParameters->cd();
+
+  string name = str(format("Alig_Z0"));
+  string title = str(format("z0 - the z coordinate of the perigee (beam spot position)"));
+  m_Z0 = new TH1F(name.c_str(), title.c_str(), 100, -fZ0Range, fZ0Range);
+  m_Z0->GetXaxis()->SetTitle("z0 [cm]");
+  m_Z0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_D0"));
+  title = str(format("d0 - the signed distance to the IP in the r-phi plane"));
+  m_D0 = new TH1F(name.c_str(), title.c_str(), 100, -fD0Range, fD0Range);
+  m_D0->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_Phi"));
+  title = str(format("Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention"));
+  m_Phi = new TH1F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange);
+  m_Phi->GetXaxis()->SetTitle("#phi [deg]");
+  m_Phi->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_Omega"));
+  title = str(format("Omega - the curvature of the track. It's sign is defined by the charge of the particle"));
+  m_Omega = new TH1F(name.c_str(), title.c_str(), 100, -0.1, 0.1);
+  m_Omega->GetXaxis()->SetTitle("Omega");
+  m_Omega->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_TanLambda"));
+  title = str(format("TanLambda - the slope of the track in the r-z plane"));
+  m_TanLambda = new TH1F(name.c_str(), title.c_str(), 100, -4.0, 4.0);
+  m_TanLambda->GetXaxis()->SetTitle("Tan Lambda");
+  m_TanLambda->GetYaxis()->SetTitle("Arb. Units");
+
+  DirAlignHelixCorrelations->cd();
+
+  name = str(format("Alig_PhiD0"));
+  title = str(
+            format("Phi - angle of the transverse momentum in the r-phi plane vs. d0 - signed distance to the IP in r-phi "));
+  m_PhiD0 = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 100, -fD0Range, fD0Range);
+  m_PhiD0->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiD0->GetYaxis()->SetTitle("d0 [cm]");
+  m_PhiD0->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_PhiZ0"));
+  title = str(
+            format("Phi - angle of the transverse momentum in the r-phi plane vs. "
+                   "z0 of the perigee (to see primary vertex shifts along R or z)"));
+  m_PhiZ0 = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 100, -fZ0Range, fZ0Range);
+  m_PhiZ0->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiZ0->GetYaxis()->SetTitle("z0 [cm]");
+  m_PhiZ0->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_PhiMomPt"));
+  title = str(
+            format("Phi - angle of the transverse momentum in the r-phi plane vs. Track momentum Pt"));
+  m_PhiMomPt = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 2 * iMomRange, 0.0, fMomRange);
+  m_PhiMomPt->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiMomPt->GetYaxis()->SetTitle("Momentum");
+  m_PhiMomPt->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_PhiOmega"));
+  title = str(
+            format("Phi - angle of the transverse momentum in the r-phi plane vs. Omega - the curvature of the track"));
+  m_PhiOmega = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 100, -0.1, 0.1);
+  m_PhiOmega->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiOmega->GetYaxis()->SetTitle("Omega");
+  m_PhiOmega->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_PhiTanLambda"));
+  title = str(
+            format("dPhi - angle of the transverse momentum in the r-phi plane vs. "
+                   "TanLambda - the slope of the track in the r-z plane"));
+  m_PhiTanLambda = new TH2F(name.c_str(), title.c_str(), iPhiRange, -fPhiRange, fPhiRange, 100, -4.0, 4.0);
+  m_PhiTanLambda->GetXaxis()->SetTitle("#phi [deg]");
+  m_PhiTanLambda->GetYaxis()->SetTitle("Tan Lambda");
+  m_PhiTanLambda->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_D0Z0"));
+  title = str(
+            format("d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z)"));
+  m_D0Z0 = new TH2F(name.c_str(), title.c_str(), 100, -fD0Range, fD0Range, 100, -fZ0Range, fZ0Range);
+  m_D0Z0->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0Z0->GetYaxis()->SetTitle("z0 [cm]");
+  m_D0Z0->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_D0MomPt"));
+  title = str(
+            format("d0 - signed distance to the IP in r-phi vs. Track momentum Pt"));
+  m_D0MomPt = new TH2F(name.c_str(), title.c_str(), 100, -fD0Range, fD0Range, 2 * iMomRange, 0.0, fMomRange);
+  m_D0MomPt->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0MomPt->GetYaxis()->SetTitle("Momentum");
+  m_D0MomPt->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_D0Omega"));
+  title = str(
+            format("d0 - signed distance to the IP in r-phi vs. Omega - the curvature of the track"));
+  m_D0Omega = new TH2F(name.c_str(), title.c_str(), 100, -fD0Range, fD0Range, 100, -0.1, 0.1);
+  m_D0Omega->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0Omega->GetYaxis()->SetTitle("Omega");
+  m_D0Omega->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_D0TanLambda"));
+  title = str(
+            format("d0 - signed distance to the IP in r-phi vs. TanLambda - the slope of the track in the r-z plane"));
+  m_D0TanLambda = new TH2F(name.c_str(), title.c_str(), 100, -fD0Range, fD0Range, 100, -4.0, 4.0);
+  m_D0TanLambda->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0TanLambda->GetYaxis()->SetTitle("Tan Lambda");
+  m_D0TanLambda->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_Z0MomPt"));
+  title = str(
+            format("z0 - the z0 coordinate of the perigee vs. Track momentum Pt"));
+  m_Z0MomPt = new TH2F(name.c_str(), title.c_str(), 100, -fZ0Range, fZ0Range, 2 * iMomRange, 0.0, fMomRange);
+  m_Z0MomPt->GetXaxis()->SetTitle("z0 [cm]");
+  m_Z0MomPt->GetYaxis()->SetTitle("Momentum");
+  m_Z0MomPt->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_Z0Omega"));
+  title = str(
+            format("z0 - the z0 coordinate of the perigee vs. Omega - the curvature of the track"));
+  m_Z0Omega = new TH2F(name.c_str(), title.c_str(), 100, -fZ0Range, fZ0Range, 100, -0.1, 0.1);
+  m_Z0Omega->GetXaxis()->SetTitle("z0 [cm]");
+  m_Z0Omega->GetYaxis()->SetTitle("Omega");
+  m_Z0Omega->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_Z0TanLambda"));
+  title = str(
+            format("z0 - the z0 coordinate of the perigee vs. TanLambda - the slope of the track in the r-z plane"));
+  m_Z0TanLambda = new TH2F(name.c_str(), title.c_str(), 100, -fZ0Range, fZ0Range, 100, -4.0, 4.0);
+  m_Z0TanLambda->GetXaxis()->SetTitle("z0 [cm]");
+  m_Z0TanLambda->GetYaxis()->SetTitle("Tan Lambda");
+  m_Z0TanLambda->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_MomPtOmega"));
+  title = str(
+            format("Track momentum Pt vs. Omega - the curvature of the track"));
+  m_MomPtOmega = new TH2F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange, 100, -0.1, 0.1);
+  m_MomPtOmega->GetXaxis()->SetTitle("Momentum");
+  m_MomPtOmega->GetYaxis()->SetTitle("Omega");
+  m_MomPtOmega->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_MomPtTanLambda"));
+  title = str(
+            format("Track momentum Pt vs. TanLambda - the slope of the track in the r-z plane"));
+  m_MomPtTanLambda = new TH2F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange, 100, -4.0, 4.0);
+  m_MomPtTanLambda->GetXaxis()->SetTitle("Momentum");
+  m_MomPtTanLambda->GetYaxis()->SetTitle("Tan Lambda");
+  m_MomPtTanLambda->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("Alig_OmegaTanLambda"));
+  title = str(
+            format("Omega - the curvature of the track vs. TanLambda - the slope of the track in the r-z plane"));
+  m_OmegaTanLambda = new TH2F(name.c_str(), title.c_str(), 100, -0.1, 0.1, 100, -4.0, 4.0);
+  m_OmegaTanLambda->GetXaxis()->SetTitle("Omega");
+  m_OmegaTanLambda->GetYaxis()->SetTitle("Tan Lambda");
+  m_OmegaTanLambda->GetZaxis()->SetTitle("Arb. Units");
+
+  iMomRange = 600;
+
   DirAlign->cd();
   // Momentum Phi
-  string name = str(format("Alig_MomPhi"));
-  string title = str(format("Momentum Phi of fit"));
+  name = str(format("Alig_MomPhi"));
+  title = str(format("Momentum Phi of fit"));
   m_MomPhi = new TH1F(name.c_str(), title.c_str(), 180, -180, 180);
   m_MomPhi->GetXaxis()->SetTitle("Mom Phi [deg]");
   m_MomPhi->GetYaxis()->SetTitle("counts");
@@ -279,8 +430,6 @@ void AlignDQMModule::defineHisto()
   int iHitsInCDC = 200;
   int iHits = 200;
   int iTracks = 30;
-  int iMomRange = 600;
-  float fMomRange = 3.0;
   name = str(format("Alig_TrackMomentumX"));
   title = str(format("Track Momentum X"));
   m_MomX = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, -fMomRange, fMomRange);
@@ -296,11 +445,15 @@ void AlignDQMModule::defineHisto()
   m_MomZ = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, -fMomRange, fMomRange);
   m_MomZ->GetXaxis()->SetTitle("Momentum");
   m_MomZ->GetYaxis()->SetTitle("counts");
+
+  DirAlignHelixParameters->cd();
   name = str(format("Alig_TrackMomentumPt"));
   title = str(format("Track Momentum pT"));
   m_MomPt = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange);
   m_MomPt->GetXaxis()->SetTitle("Momentum");
   m_MomPt->GetYaxis()->SetTitle("counts");
+
+  DirAlign->cd();
   name = str(format("Alig_TrackMomentumMag"));
   title = str(format("Track Momentum Magnitude"));
   m_Mom = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange);
@@ -725,6 +878,30 @@ void AlignDQMModule::beginRun()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
+  if (m_D0 != NULL) m_D0->Reset();
+  if (m_Z0 != NULL) m_Z0->Reset();
+  if (m_Phi != NULL) m_Phi->Reset();
+  if (m_MomPt != NULL) m_MomPt->Reset();
+  if (m_Omega != NULL) m_Omega->Reset();
+  if (m_TanLambda != NULL) m_TanLambda->Reset();
+
+  if (m_PhiD0 != NULL) m_PhiD0->Reset();
+  if (m_PhiZ0 != NULL) m_PhiZ0->Reset();
+  if (m_PhiMomPt != NULL) m_PhiMomPt->Reset();
+  if (m_PhiOmega != NULL) m_PhiOmega->Reset();
+  if (m_PhiTanLambda != NULL) m_PhiTanLambda->Reset();
+
+  if (m_D0Z0 != NULL) m_D0Z0->Reset();
+  if (m_D0MomPt != NULL) m_D0MomPt->Reset();
+  if (m_D0Omega != NULL) m_D0Omega->Reset();
+  if (m_D0TanLambda != NULL) m_D0TanLambda->Reset();
+  if (m_Z0MomPt != NULL) m_Z0MomPt->Reset();
+  if (m_Z0Omega != NULL) m_Z0Omega->Reset();
+  if (m_Z0TanLambda != NULL) m_Z0TanLambda->Reset();
+  if (m_MomPtOmega != NULL) m_MomPtOmega->Reset();
+  if (m_MomPtTanLambda != NULL) m_MomPtTanLambda->Reset();
+  if (m_OmegaTanLambda != NULL) m_OmegaTanLambda->Reset();
+
   if (m_MomPhi != NULL) m_MomPhi->Reset();
   if (m_MomTheta != NULL) m_MomTheta->Reset();
   if (m_MomCosTheta != NULL) m_MomCosTheta->Reset();
@@ -1014,6 +1191,32 @@ void AlignDQMModule::event()
       if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);
       if (m_HitsCDC != NULL) m_HitsCDC->Fill(nCDC);
       if (m_Hits != NULL) m_Hits->Fill(nPXD + nSVD + nCDC);
+
+      if (m_D0 != NULL) m_D0->Fill(tfr->getD0());
+      if (m_Z0 != NULL) m_Z0->Fill(tfr->getZ0());
+      if (m_Phi != NULL) m_Phi->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"));
+      if (m_Omega != NULL) m_Omega->Fill(tfr->getOmega());
+      if (m_TanLambda != NULL) m_TanLambda->Fill(tfr->getTanLambda());
+
+      if (m_PhiD0 != NULL) m_PhiD0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
+      if (m_PhiZ0 != NULL) m_PhiZ0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getZ0());
+      if (m_PhiMomPt != NULL) m_PhiMomPt->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getMomentum().Pt());
+      if (m_PhiOmega != NULL) m_PhiOmega->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getOmega());
+      if (m_PhiTanLambda != NULL)
+        m_PhiTanLambda->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getTanLambda());
+
+      if (m_D0Z0 != NULL) m_D0Z0->Fill(tfr->getD0(), tfr->getZ0());
+      if (m_D0MomPt != NULL) m_D0MomPt->Fill(tfr->getD0(), tfr->getMomentum().Pt());
+      if (m_D0Omega != NULL) m_D0Omega->Fill(tfr->getD0(), tfr->getOmega());
+      if (m_D0TanLambda != NULL) m_D0TanLambda->Fill(tfr->getD0(), tfr->getTanLambda());
+      if (m_Z0MomPt != NULL) m_Z0MomPt->Fill(tfr->getZ0(), tfr->getMomentum().Pt());
+      if (m_Z0Omega != NULL) m_Z0Omega->Fill(tfr->getZ0(), tfr->getOmega());
+      if (m_Z0TanLambda != NULL) m_Z0TanLambda->Fill(tfr->getZ0(), tfr->getTanLambda());
+      if (m_MomPtOmega != NULL) m_MomPtOmega->Fill(tfr->getMomentum().Pt(), tfr->getOmega());
+      if (m_MomPtTanLambda != NULL) m_MomPtTanLambda->Fill(tfr->getMomentum().Pt(), tfr->getTanLambda());
+      if (m_OmegaTanLambda != NULL) m_OmegaTanLambda->Fill(tfr->getOmega(), tfr->getTanLambda());
+
+
     }
     if (m_TracksVXD != NULL) m_TracksVXD->Fill(iTrackVXD);
     if (m_TracksCDC != NULL) m_TracksCDC->Fill(iTrackCDC);

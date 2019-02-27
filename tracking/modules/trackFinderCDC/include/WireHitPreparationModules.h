@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/HitReclaimer.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
@@ -64,6 +65,17 @@ namespace Belle2 {
     public:
       /// Constructor
       TFCDC_HitReclaimerModule();
+    };
+
+
+    class TFCDC_WireHitBackgroundDetectorModule : public FindletModule<WireHitBackgroundDetector> {
+
+      /// Type of the base class
+      using Super = FindletModule<WireHitBackgroundDetector>;
+
+    public:
+      /// Constructor
+      TFCDC_WireHitBackgroundDetectorModule();
     };
   }
 }

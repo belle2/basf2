@@ -69,15 +69,15 @@ bool BestMatchedTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
   }
 
   bool trackIsClone = cloneLookUp.isTrackClone(*ptrCDCTrack);
-
   bool matchedNotClone = (not trackIsClone) and (not trackIsFake);
+  // Truth: PR Track is not a fake and the best matched track (not a clone)
+  var<named("truth")>() = matchedNotClone;
 
-  var<named("weight")>() = 1.0; // trackHasMinimalMatchPurity;
+  // Other truth variables are mostly to be helpful during debugging.
   var<named("truth_track_is_fake")>() = trackIsFake;
   var<named("truth_track_is_matched")>() = not trackIsFake;
   var<named("truth_matched_hits")>() = numberOfCorrectHits;
   var<named("truth_track_is_clone")>() = trackIsClone;
-  var<named("truth")>() = matchedNotClone; //not trackIsClone;
   var<named("truth_first_nloops")>() = mcTrackLookUp.getFirstNLoops(ptrCDCTrack);
   var<named("truth_event_id")>() = m_eventMetaData->getEvent();
   var<named("truth_MCTrackID")>() = trackMCMatch;

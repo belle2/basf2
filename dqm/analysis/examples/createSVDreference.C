@@ -32,8 +32,8 @@ void createSVDreference(){
   // occ > occError  -> red bin
 
   float occEmpty = 0;
-  float occWarning = 3;
-  float occError = 5;
+  float occWarning = 1.5;
+  float occError = 2;
 
   //bin 1: occupancy level EMPTY
   ref_occ->SetBinContent(1,occEmpty);

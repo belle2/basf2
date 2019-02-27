@@ -61,10 +61,8 @@ namespace Belle2 {
     TH2F* m_hOccupancyV = nullptr; /**< occupancy V histo */
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
 
-    TPaveText boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color); /**< plot sensor-box in occupancy plot */
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
-    TPaveText* m_leg = nullptr; /**< occupancy plot legend */
     TPaveText* m_legProblem = nullptr; /**< occupancy plot legend, problem */
     TPaveText* m_legWarning = nullptr; /**< occupancy plot legend, warning */
     TPaveText* m_legNormal = nullptr; /**< occupancy plot legend, normal */
@@ -72,6 +70,11 @@ namespace Belle2 {
     TPaveText* m_legError = nullptr; /**< occupancy plot legend, error*/
     TText* m_yTitle = nullptr; /**< y axis title text*/
 
+    Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed befor throwing ERROR*/
+    Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+    Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+    Int_t m_onlineZSoccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+    Int_t m_onlineZSoccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
 
     //! IDs of all SXD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

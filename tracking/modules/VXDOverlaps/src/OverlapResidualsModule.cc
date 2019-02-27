@@ -216,7 +216,6 @@ void OverlapResidualsModule::defineHisto()
 void OverlapResidualsModule::event()
 {
 
-  gROOT->SetBatch();
   for (const auto& trk : recoTrack) {
     if (! trk.wasFitSuccessful()) {
       continue;

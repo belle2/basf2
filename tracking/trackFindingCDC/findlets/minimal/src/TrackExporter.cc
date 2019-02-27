@@ -19,7 +19,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <TMatrixDSym.h>
 
@@ -62,7 +61,7 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
 void TrackExporter::initialize()
 {
   // Output StoreArray
-  if (m_param_exportTracks and (not m_param_exportIntoExistingStoreArray)) {
+  if (m_param_exportTracks) {
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     storedRecoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
     RecoTrack::registerRequiredRelations(storedRecoTracks);
@@ -80,14 +79,14 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
   defaultCovSeed(4, 4) = 0.01e-3;
   defaultCovSeed(5, 5) = 0.04e-3;
 
-  OriginTrackFinder setFoundByTrackFinder =
-    static_cast<RecoHitInformation::OriginTrackFinder>(m_param_setFoundByTrackFinder);
-
   // Put code to generate gf track cands here if requested.
   if (m_param_exportTracks) {
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     for (const CDCTrack& track : tracks) {
       RecoTrack* newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
+      if (newRecoTrack) {
+        newRecoTrack->setQualityIndicator(track.getQualityIndicator());
+      }
       if (newRecoTrack and m_param_discardCovarianceMatrix) {
         newRecoTrack->setSeedCovariance(defaultCovSeed);
       }

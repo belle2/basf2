@@ -150,7 +150,8 @@ REG_MODULE(B2BIIConvertMdst)
 //                 Implementation
 //-----------------------------------------------------------------
 
-B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module()
+B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
+  m_mcMatchingMode(c_Direct)
 {
   //Set module properties
   setDescription("Converts Belle mDST objects (Panther tables and records) to Belle II mDST objects.");
@@ -408,7 +409,7 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
 
   // Loop over all Belle charged tracks
   Belle::Mdst_charged_Manager& m = Belle::Mdst_charged_Manager::get_manager();
-  for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); chargedIterator++) {
+  for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); ++chargedIterator) {
     Belle::Mdst_charged belleTrack = *chargedIterator;
 
     auto track = m_tracks.appendNew();
@@ -475,7 +476,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
   // Loop over all Belle Vee2 candidates
   Belle::Mdst_vee2_Manager& m = Belle::Mdst_vee2_Manager::get_manager();
-  for (Belle::Mdst_vee2_Manager::iterator vee2Iterator = m.begin(); vee2Iterator != m.end(); vee2Iterator++) {
+  for (Belle::Mdst_vee2_Manager::iterator vee2Iterator = m.begin(); vee2Iterator != m.end(); ++vee2Iterator) {
     Belle::Mdst_vee2 belleV0 = *vee2Iterator;
 
     // +ve track
@@ -792,11 +793,9 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
   m_particleGraph.clear();
 
   int position = m_particleGraph.size();
-  int nParticles = 0;
 
   // Start with the root (mother-of-all) particle (1st particle in gen_hepevt table)
   m_particleGraph.addParticle();
-  nParticles++;
   Belle::Gen_hepevt rootParticle = genMgr(Belle::Panther_ID(1));
   genHepevtToMCParticle[1] = position;
 
@@ -813,7 +812,7 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
       // Particle has no mother
       // put the particle in the graph:
       position = m_particleGraph.size();
-      m_particleGraph.addParticle(); nParticles++;
+      m_particleGraph.addParticle();
       genHepevtToMCParticle[hep.get_ID()] = position;
 
       MCParticleGraph::GraphParticle* graphParticle = &m_particleGraph[position];
@@ -853,7 +852,6 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     //putting the daughter in the graph:
     position = m_particleGraph.size();
     m_particleGraph.addParticle();
-    nParticles++;
     genHepevtToMCParticle[currDaughter.get_ID()] = position;
 
     MCParticleGraph::GraphParticle* graphDaughter = &m_particleGraph[position];
@@ -893,7 +891,7 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
   Belle::Mdst_ecl_Manager& ecl_manager = Belle::Mdst_ecl_Manager::get_manager();
   Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
 
-  for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); eclIterator++) {
+  for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); ++eclIterator) {
 
     // Pull Mdst_ecl from manager
     Belle::Mdst_ecl mdstEcl = *eclIterator;
@@ -954,7 +952,7 @@ void B2BIIConvertMdstModule::convertMdstKLMTable()
   Belle::Mdst_klm_cluster_Manager& klm_cluster_manager = Belle::Mdst_klm_cluster_Manager::get_manager();
 
   for (Belle::Mdst_klm_cluster_Manager::iterator klmC_Ite = klm_cluster_manager.begin(); klmC_Ite != klm_cluster_manager.end();
-       klmC_Ite++) {
+       ++klmC_Ite) {
 
     // Pull Mdst_ecl from manager
     Belle::Mdst_klm_cluster mdstKlm_cluster = *klmC_Ite;
@@ -986,7 +984,7 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
   Belle::Mdst_gamma_Manager& gamma_manager = Belle::Mdst_gamma_Manager::get_manager();
 
   for (Belle::Mdst_gamma_Manager::iterator gammaIterator = gamma_manager.begin(); gammaIterator != gamma_manager.end();
-       gammaIterator++) {
+       ++gammaIterator) {
 
     // Pull Mdst_gamma from manager and Mdst_ecl from pointer to Mdst_ecl
     Belle::Mdst_gamma mdstGamma = *gammaIterator;
@@ -1025,7 +1023,7 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
 
   // Loop over all Mdst_pi0
   Belle::Mdst_pi0_Manager& pi0_manager = Belle::Mdst_pi0_Manager::get_manager();
-  for (Belle::Mdst_pi0_Manager::iterator pi0Iterator = pi0_manager.begin(); pi0Iterator != pi0_manager.end(); pi0Iterator++) {
+  for (Belle::Mdst_pi0_Manager::iterator pi0Iterator = pi0_manager.begin(); pi0Iterator != pi0_manager.end(); ++pi0Iterator) {
 
     // Pull Mdst_pi0 from manager and Mdst_gammas from pointers to Mdst_gammas
     Belle::Mdst_pi0 mdstPi0 = *pi0Iterator;
@@ -1066,7 +1064,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
   plist->initialize(130, "K_L0:mdst");
 
   Belle::Mdst_klong_Manager& klong_manager = Belle::Mdst_klong_Manager::get_manager();
-  for (Belle::Mdst_klong_Manager::iterator klong_Ite = klong_manager.begin(); klong_Ite != klong_manager.end(); klong_Ite++) {
+  for (Belle::Mdst_klong_Manager::iterator klong_Ite = klong_manager.begin(); klong_Ite != klong_manager.end(); ++klong_Ite) {
 
     // Pull Mdst_klong from manager and Mdst_klm from pointer to Mdst_klm
     Belle::Mdst_klong mdstKlong = *klong_Ite;
@@ -1196,7 +1194,7 @@ void B2BIIConvertMdstModule::convertExtHitTable()
     // the numbering in mdst_charged is
     // not necessarily the same as in mdst_trk
     // therefore we have to find the corresponding mdst_charged
-    for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); chgIterator++) {
+    for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); ++chgIterator) {
       Belle::Mdst_charged mChar = *chgIterator;
       Belle::Mdst_trk mTRK_in_charged = mChar.trk();
 
@@ -1604,8 +1602,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     std::bitset<32> svdBitSet(svdHitPattern);
 
     HitPatternVXD patternVxd;
-    unsigned short uHits;
-    unsigned short vHits;
+
     unsigned short svdLayers;
     // taken from: http://belle.kek.jp/group/indirectcp/cpfit/cpfit-festa/2004/talks/Apr.14/CPfesta-2005-Higuchi(3).pdf
     StoreObjPtr<EventMetaData> event;
@@ -1625,8 +1622,8 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
 
     // loop over all svd layers (layer index is shifted + 3 for basf2)
     for (unsigned short layerId = 0; layerId < svdLayers; layerId++) {
-      uHits = (svdBitSet & svdUMask).count();
-      vHits = (svdBitSet & svdVMask).count();
+      unsigned short uHits = (svdBitSet & svdUMask).count();
+      unsigned short vHits = (svdBitSet & svdVMask).count();
       patternVxd.setSVDLayer(layerId + 3, uHits, vHits);
       // shift masks to the left
       svdUMask <<= 2;
@@ -1796,7 +1793,7 @@ void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
   // finally tracks which are geometrically matched (type == 0)
   std::vector<int> insert_order_types = {1, 2, 0};
   for (auto& insert_type : insert_order_types) {
-    for (Belle::Mdst_ecl_trk_Manager::iterator ecltrkIterator = m.begin(); ecltrkIterator != m.end(); ecltrkIterator++) {
+    for (Belle::Mdst_ecl_trk_Manager::iterator ecltrkIterator = m.begin(); ecltrkIterator != m.end(); ++ecltrkIterator) {
       Belle::Mdst_ecl_trk mECLTRK = *ecltrkIterator;
 
       if (mECLTRK.type() != insert_type)
@@ -1811,7 +1808,7 @@ void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
       // the numbering in mdst_charged
       // not necessarily the same as in mdst_trk
       // therfore have to find corresponding mdst_charged
-      for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); chgIterator++) {
+      for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); ++chgIterator) {
         Belle::Mdst_charged mChar = *chgIterator;
         Belle::Mdst_trk mTRK_in_charged = mChar.trk();
 
@@ -1836,7 +1833,7 @@ void B2BIIConvertMdstModule::setKLMClustersRelations()
 
 
   for (Belle::Mdst_klm_cluster_Manager::iterator klmC_Ite = klm_cluster_manager.begin(); klmC_Ite != klm_cluster_manager.end();
-       klmC_Ite++) {
+       ++klmC_Ite) {
 
     Belle::Mdst_klm_cluster mdstKlm_cluster = *klmC_Ite;
     Belle::Mdst_trk mTRK    = mdstKlm_cluster.trk();
@@ -1920,7 +1917,7 @@ int B2BIIConvertMdstModule::recoverMoreThan24bitIDHEP(int id)
   }
 }
 
-void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName)
+void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, const std::string& objectName)
 {
   int bellePDGCode   = belleMC.idhep();
   int belleIIPDGCode = mcP->getPDG();

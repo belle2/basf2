@@ -348,7 +348,7 @@ namespace Belle2 {
     /**
      * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle
      */
-    void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName);
+    void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, const std::string& objectName);
 
     //! MCParticle Graph to build Belle2 MC Particles
     Belle2::MCParticleGraph m_particleGraph;

@@ -39,7 +39,7 @@ namespace Belle2 {
     /** Compute the difference of coordinate residuals between two hits in overlapping sensors of a same VXD layer */
     void event() override;
 
-    /**                                                                                                                                                                                                         * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed                                                                                                                          * to be placed in this function.                                                                                                                                                                           */
+    /**  Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed to be placed in this function */
     void defineHisto() override;
 
   private:

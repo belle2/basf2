@@ -17,8 +17,18 @@ namespace Belle2 {
 
   /**
    * Class for initializing TOPGeometryPar.
-   * This class is by default initialized in GeoTOPCreator, when Geant geometry is created.
-   * Useful when Geant geometry is not needed to be created.
+   *
+   * The singleton class TOPGeometryPar is a central store for all the run-independent
+   * parameters that we need in the TOP software. It is used when creating G4 geometry
+   * (the volumes) of TOP counter, then in the packer/unpacker to convert scrodID and
+   * channel numbers to the corresponding slot and pixel ID's, then in the digitizer,
+   * and finally in the reconstruction.
+   *
+   * By default TOPGeometryPar is initialized in GeoTOPCreator called by Geometry module,
+   * either from conditions DB or using XML files. But since for the TOP the G4 geometry
+   * is used only in the simulation (in module FullSim), we don't need to create it
+   * when processing our own data. In these cases we can replace Geometry module with
+   * this one.
    */
   class TOPGeometryParInitializerModule : public Module {
 

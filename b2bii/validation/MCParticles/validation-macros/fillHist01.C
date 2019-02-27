@@ -8,9 +8,9 @@
    TCanvas* c2 ;
    TChain *belle_root, *belle2_root ;
 
-   void bookset(char* hbasename, char* basftype, char* htitle, Int_t bins, Float_t xl, Float_t xh);
+   void bookset(const char* hbasename, const char* basftype, const char* htitle, Int_t bins, Float_t xl, Float_t xh);
 
-   void fillset(char* hbasename, char* basftype, char* treevar, char* cuts);
+   void fillset(const char* hbasename, const char* basftype, const char* treevar, const char* cuts);
 
 //==============================================================================
 
@@ -191,7 +191,7 @@
     }
 
 //==============================================================================
-   void bookset(char* hbasename, char* basftype, char* htitle, Int_t bins, Float_t xl, Float_t xh) {
+   void bookset(const char* hbasename, const char* basftype, const char* htitle, Int_t bins, Float_t xl, Float_t xh) {
 
       cout << "\n  Booking plots with title: "
            << htitle << " for " << basftype << endl ;
@@ -209,7 +209,7 @@
 
 //------------------------------------------------------------------------------
 
-   void fillset(char* hbasename, char* basftype, char* treevar, char* cuts) {
+   void fillset(const char* hbasename, const char* basftype, const char* treevar, const char* cuts) {
 
       cout << " Filling " << hbasename << " plots of " << treevar << endl ;
       cout << " Cuts: " << cuts << endl ;

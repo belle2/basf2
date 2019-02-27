@@ -142,7 +142,7 @@ void CDCPackerModule::event()
     int iwire = (eWire % 512);
     short tdc = hit.getTDCCount();
     short adc = hit.getADCCount();
-
+    unsigned short tot = hit.getTOT();
     //
     // If not prepared the map element for this cell, exit.
     //
@@ -156,7 +156,7 @@ void CDCPackerModule::event()
     if (hit.is2ndHit() == false) { // first hit timing for one cell.
       // increase 8 bytes (4 bhytes).
       tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += ch_data_bytes;
-      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0xbbaa, adc, tdc);
+      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, tot, adc, tdc);
       chData.push_back(chd);
     } else { // second hit timing
       // Search ChData object for this cell.

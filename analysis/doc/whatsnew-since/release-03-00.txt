@@ -14,6 +14,11 @@ Variables
 * The function to create variable aliases for particles selected from a decay
   string has been fixed and extended to allow better
   customization (:issue:`BII-4437`)
+
+* Added M2 and InvM2, that return the invariant mass squared of a given Particle:
+  M2 returns the mass squared determined from the particle's 4-momentum vector;
+  InvM2 returns the mass squared determined from the particle's daughter 4-momentum vectors.
+
 Modules
 +++++++
 

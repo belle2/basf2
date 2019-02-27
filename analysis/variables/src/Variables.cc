@@ -665,14 +665,11 @@ namespace Belle2 {
 
     double particleInvariantMassSquared(const Particle* part)
     {
-      const std::vector<Particle*> daughters = part->getDaughters();
-      if (daughters.size() > 0) {
-        TLorentzVector sum;
-        for (unsigned i = 0; i < daughters.size(); i++)
-          sum += daughters[i]->get4Vector();
-        return sum.M2();
-      } else
-        return particleMassSquared(part);
+      double m = particleInvariantMass(part);
+      if (m < 0)
+        return -(m * m);
+      else
+        return m * m;
     }
 
     double b2bTheta(const Particle* part)

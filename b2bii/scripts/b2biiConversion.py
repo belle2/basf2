@@ -91,11 +91,12 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
     # input.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(input)
 
-    gearbox = register_module('Gearbox')
-    gearbox.param('fileName', 'b2bii/Belle.xml')
-    path.add_module(gearbox)
-
-    path.add_module('Geometry', ignoreIfPresent=False, useDB=False, components=['MagneticField'])
+    # we need magnetic field which is different than default.
+    # shamelessly copied from analysis/scripts/modularAnalysis.py:inputMdst
+    from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+    field = Belle2.MagneticField()
+    field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+    Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
 
     if (not generatorLevelReconstruction):
         # Fix MSDT Module

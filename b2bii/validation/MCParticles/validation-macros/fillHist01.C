@@ -221,11 +221,8 @@
 
       sprintf(modecuts,"%s",cuts) ;
 
-      TChain *basf_root(0) ;
-      TChain *basf2_root(0) ;
-
-      if ( basftype == "basf") {
-         basf_root = belle_root ;
+      if (strcmp(basftype, "basf") == 0) {
+         TChain *basf_root = belle_root ;
 
          sprintf(histname, "h%s_%s", hbasename,basftype) ;
          sprintf( arg1, "%s>>%s", treevar, histname ) ;
@@ -234,13 +231,13 @@
          c2->Update() ;
       }
 
-      if (basftype == "basf2") {
-         basf_root = belle2_root ;
+      if (strcmp(basftype, "basf2") == 0) {
+         TChain *basf2_root = belle2_root ;
 
          sprintf(histname, "h%s_%s", hbasename,basftype) ;
          sprintf( arg1, "%s>>%s", treevar, histname ) ;
          cout << "arg1: " << arg1 << "  modecuts: " << modecuts << endl ;
-         basf_root->Draw( arg1, modecuts ) ;
+         basf2_root->Draw( arg1, modecuts ) ;
          c2->Update() ;
       }
 

@@ -10,7 +10,7 @@
 # usage:
 #    basf2 generateSADBg.py bgType accRing equivTime_us num [sampleType phase outdir]
 # arguments:
-#    bgType         Coulomb or Touschek
+#    bgType         Coulomb, Touschek or Brems
 #    accRing        LER or HER
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
@@ -30,7 +30,7 @@ argvs = sys.argv
 argc = len(argvs)
 
 if argc == 5:
-    bgType = argvs[1]     # Coulomb, Touschek
+    bgType = argvs[1]     # Coulomb, Touschek or Brems
     accRing = argvs[2]    # LER or HER
     equivTime = argvs[3]  # equivalent SuperKEKB running time in micro-seconds
     num = argvs[4]        # output file number
@@ -64,7 +64,7 @@ elif argc == 8:
 else:
     print('usage:')
     print('basf2', argvs[0],
-          '(Touschek,Coulomb) (HER,LER) equivTime_us num [(study,usual,ECL,PXD) phase outdir]')
+          '(Touschek,Coulomb,Brems) (HER,LER) equivTime_us num [(study,usual,ECL,PXD) phase outdir]')
     sys.exit()
 
 # set parameters

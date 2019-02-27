@@ -49,6 +49,8 @@ namespace Belle2 {
                   bg_BHWideLargeAngle = 19, /**< Large angle radiative Bhabha */
                   bg_InjectionLER     = 21, /**< injection background LER */
                   bg_InjectionHER     = 22, /**< injection background HER */
+                  bg_Brems_LER        = 23, /**< bremsstrahlung LER */
+                  bg_Brems_HER        = 24, /**< bremsstrahlung HER */
                   bg_other            = 99  /**< Other type of background */
                 };
     /**

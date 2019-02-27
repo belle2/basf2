@@ -53,16 +53,6 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 "Name of the output StoreArray of RecoTracks.",
                                 m_param_exportTracksInto);
 
-  moduleParamList->addParameter(prefixed(prefix, "exportIntoExistingStoreArray"),
-                                m_param_exportIntoExistingStoreArray,
-                                "Switch to append exported RecoTracks to an existing Store Array instead of creating a new one.",
-                                m_param_exportIntoExistingStoreArray);
-
-  moduleParamList->addParameter(prefixed(prefix, "setFoundByTrackFinder"),
-                                m_param_setFoundByTrackFinder,
-                                "Set the `FoundByTrackFinder` flag to add to all exported hits.",
-                                m_param_setFoundByTrackFinder);
-
   moduleParamList->addParameter(prefixed(prefix, "discardCovarianceMatrix"),
                                 m_param_discardCovarianceMatrix,
                                 "Discard covariance matrix in favour of a hand written one.",
@@ -98,16 +88,8 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     for (const CDCTrack& track : tracks) {
       RecoTrack* newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
-      if (newRecoTrack) {
-        newRecoTrack->setQualityIndicator(track.getQualityIndicator());
-        if (m_param_discardCovarianceMatrix) {
-          newRecoTrack->setSeedCovariance(defaultCovSeed);
-        }
-        if (setFoundByTrackFinder != OriginTrackFinder::c_undefinedTrackFinder) {
-          for (const RecoHitInformation::UsedCDCHit* hit : newRecoTrack->getCDCHitList()) {
-            newRecoTrack->setFoundByTrackFinder(hit, setFoundByTrackFinder);
-          }
-        }
+      if (newRecoTrack and m_param_discardCovarianceMatrix) {
+        newRecoTrack->setSeedCovariance(defaultCovSeed);
       }
     }
   }

@@ -15,6 +15,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(TFCDC_WireHitPreparer);
 REG_MODULE(TFCDC_WireHitCreator);
 REG_MODULE(TFCDC_HitReclaimer);
+REG_MODULE(TFCDC_WireHitBackgroundDetector);
 
 TFCDC_WireHitPreparerModule::TFCDC_WireHitPreparerModule()
   : Super( {"CDCWireHitVector"})
@@ -27,6 +28,11 @@ TFCDC_WireHitCreatorModule::TFCDC_WireHitCreatorModule()
 }
 
 TFCDC_HitReclaimerModule::TFCDC_HitReclaimerModule()
+  : Super( {"CDCWireHitVector"})
+{
+}
+
+TFCDC_WireHitBackgroundDetectorModule::TFCDC_WireHitBackgroundDetectorModule()
   : Super( {"CDCWireHitVector"})
 {
 }

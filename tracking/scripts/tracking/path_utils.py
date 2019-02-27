@@ -397,7 +397,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
-    cdc_quality_estimator_weightfile_id = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
+    cdc_quality_estimator_weightfile_id = "tracking/data/trackfindingcdc_TrackQualityIndicator.weights.xml"
     path.add_module("TFCDC_TrackQualityEstimator",
                     inputTracks=output_tracks,
                     filter='mva', deleteTracks=False,

@@ -44,7 +44,33 @@ void createSVDreference(){
   //bin 3: occupancy level ERROR
   ref_occ->SetBinContent(3,occError);
 
+  TH1F* ref_onlineOcc = new TH1F("refOnlineOccupancy","OnlineOccupancy Levels Reference",3,0,3);
+
+  TString xOnlineLabels[3]={"onlineOccEmpty","onlineOccWarning","onlineOccError"};
+  for(int i = 0; i<3; i++)
+    ref_onlineOcc->GetXaxis()->SetBinLabel(i+1,xOnlineLabels[i]);
+
+  //infos:
+  // onlineOcc < onlineOccEmpty -> black bin
+  // onlineOccEmpty <= onlineOcc < onlineOccWarning  -> green bin
+  // onlineOccWarning <= onlineOcc < onlineOccError  -> orange bin
+  // onlineOcc > onlineOccError  -> red bin
+
+  float onlineOccEmpty = 0;
+  float onlineOccWarning = 5;
+  float onlineOccError = 10;
+
+  //bin 1: onlineOccupancy level EMPTY
+  ref_onlineOcc->SetBinContent(1,onlineOccEmpty);
+
+  //bin 2: onlineOccupancy level WARNING
+  ref_onlineOcc->SetBinContent(2,onlineOccWarning);
+
+  //bin 3: onlineOccupancy level ERROR
+  ref_onlineOcc->SetBinContent(3,onlineOccError);
+
   ref_occ->Write();
+  ref_onlineOcc->Write();
 
   f->Close();
 

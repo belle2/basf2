@@ -70,6 +70,12 @@ namespace Belle2 {
     TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */
     TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
 
+    const int nSensors = 172;
+    TH1F** m_hStripOccupancyU = nullptr; /**< u-side strip chart occupancy histos*/
+    TCanvas** m_cStripOccupancyU = nullptr; /**< u-side strip chart occupancy canvas*/
+    TH1F** m_hStripOccupancyV = nullptr; /**< u-side strip chart occupancy histos*/
+    TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
+
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
     TPaveText* m_legProblem = nullptr; /**< occupancy plot legend, problem */

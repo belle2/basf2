@@ -167,8 +167,8 @@ namespace Belle2 {
     TH1F** m_clusterSizeU = nullptr;
     /** v size */
     TH1F** m_clusterSizeV = nullptr;
-    /** u time */
 
+    /** u time */
     TH1F** m_clusterTimeU = nullptr;
     /** v time */
     TH1F** m_clusterTimeV = nullptr;

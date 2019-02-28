@@ -170,15 +170,15 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_yTitle->SetTextFont(42);
 
   gROOT->cd();
-  m_cUnpacker = new TCanvas("c_SVDDataFormat");
+  m_cUnpacker = new TCanvas("SVDAnalysis/c_SVDDataFormat");
   m_cUnpacker->SetGrid(1);
-  m_cOccupancyU = new TCanvas("c_SVDOccupancyU");
+  m_cOccupancyU = new TCanvas("SVDAnalysis/c_SVDOccupancyU");
   //  m_cOccupancyU->SetGrid(1);
-  m_cOccupancyV = new TCanvas("c_SVDOccupancyV");
+  m_cOccupancyV = new TCanvas("SVDAnalysis/c_SVDOccupancyV");
   //  m_cOccupancyV->SetGrid(1);
-  m_cOnlineOccupancyU = new TCanvas("c_SVDOnlineOccupancyU");
+  m_cOnlineOccupancyU = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyU");
   //  m_cOnlineOccupancyU->SetGrid(1);
-  m_cOnlineOccupancyV = new TCanvas("c_SVDOnlineOccupancyV");
+  m_cOnlineOccupancyV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV");
   //  m_cOnlineOccupancyV->SetGrid(1);
 
   //strip occupancy per sensor
@@ -351,7 +351,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       //      B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " status = " << m_occUstatus);
 
       //produce the occupancy plot
-      m_cStripOccupancyU[i] = new TCanvas(Form("c_StripOccupancyU_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
+      m_cStripOccupancyU[i] = new TCanvas(Form("SVDAnalysis/c_StripOccupancyU_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
       m_hStripOccupancyU[i] = new TH1F(*htmp);
       m_hStripOccupancyU[i]->Scale(1 / nEvents);
       m_hStripOccupancyU[i]->SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
@@ -393,7 +393,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
         }
       }
       //produce the occupancy plot
-      m_cStripOccupancyV[i] = new TCanvas(Form("c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
+      m_cStripOccupancyV[i] = new TCanvas(Form("SVDAnalysis/c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
       m_hStripOccupancyV[i] = new TH1F(*htmp);
       m_hStripOccupancyV[i]->Scale(1 / nEvents);
       m_hStripOccupancyV[i]->SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));

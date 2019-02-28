@@ -65,6 +65,9 @@ namespace Belle2 {
     TH2F* m_hOccupancyV = nullptr; /**< occupancy V histo */
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
 
+    TH1F* m_hOccupancyChartChip = nullptr; /**< occupancy chart histo */
+    TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
+
     TH2F* m_hOnlineOccupancyU = nullptr; /**< online occupancy U histo */
     TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
     TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */

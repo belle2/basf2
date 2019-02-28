@@ -217,11 +217,6 @@ namespace Belle2 {
     double particleMassSquared(const Particle* part);
 
     /**
-     * return mass squared (determined from particle's daughter 4-momentum vectors)
-     */
-    double particleInvariantMassSquared(const Particle* part);
-
-    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);

@@ -21,7 +21,7 @@ using namespace TrackFindingCDC;
 
 std::string CDCMCCloneLookUpFiller::getDescription()
 {
-  return "Fill CDCTracks into CDCMCCloneLookUp singleton, which stores lookup table if track is clone from curler loops";
+  return "Fill CDCTracks into CDCMCCloneLookUp singleton, which stores lookup table if track is clone";
 }
 
 /// Signal the beginning of a new event

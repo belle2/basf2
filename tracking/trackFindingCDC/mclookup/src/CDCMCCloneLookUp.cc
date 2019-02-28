@@ -75,9 +75,9 @@ CDCTrack* CDCMCCloneLookUp::findBestMatchedTrack(std::vector<CDCTrack*> matchedT
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
   const CDCMCHitLookUp& cdcMCHitLookUp = CDCMCHitLookUp::getInstance();
 
-  const CompareCDCTracks compareCurlerTracks(cdcMCTrackLookUp, cdcMCHitLookUp);
+  const CompareCDCTracks compareCDCTracks(cdcMCTrackLookUp, cdcMCHitLookUp);
   CDCTrack* ptrNonCloneTrack =
-    *(std::min_element(begin(matchedTrackPtrs), end(matchedTrackPtrs), compareCurlerTracks));
+    *(std::min_element(begin(matchedTrackPtrs), end(matchedTrackPtrs), compareCDCTracks));
 
   return ptrNonCloneTrack;
 }

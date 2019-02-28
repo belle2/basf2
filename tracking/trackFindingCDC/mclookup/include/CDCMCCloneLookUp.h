@@ -13,6 +13,15 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /** Class providing information whether a PR CDC track is the best match or a clone
+     *
+     * In contrast to all other MC lookup classes, it requires the information of all tracks in an
+     * event to decide which are clones. Therofore, it has to be filled once with a CDCTrack vector
+     * before being used.
+     *
+     * The definition of which track is a better match and thus which to classify * as a clone is
+     * encoded in the separate functor CompareCDCTracks.
+     */
     class CDCMCCloneLookUp {
 
     public:
@@ -51,17 +60,22 @@ namespace Belle2 {
 
     /// Functor which which decides which of two tracks to declare as best match
     struct CompareCDCTracks {
-      // marker function for the isFunctor test
+      /// marker function for the isFunctor test
       operator FunctorTag();
 
+      /// Constructor of the CDC track comparer to get the better match, taking references to MC
+      /// lookup singletons.
       CompareCDCTracks(const CDCMCTrackLookUp& cdcMCTrackLookUp,
                        const CDCMCHitLookUp& cdcMCHitLookUp)
         : m_CDCMCTrackLookUp(cdcMCTrackLookUp)
         , m_CDCMCHitLookUp(cdcMCHitLookUp) {};
 
-      // Return true if Track1 has a lower NLoops of first hit than Track1, in the reversed case
-      // return false
-      // If both tracks have the same firstNLoops, return true if Track1 has larger number hits.
+
+      /** Compare both CDC tracks to get the better matched one.
+       *
+       * Returns true if track1 has a lower loop number at the first hit than track1.
+       * If both tracks have the same loop number, return true if track1 has larger number of matched hits.
+       */
       bool operator()(const CDCTrack* ptrCDCTrack1, const CDCTrack* ptrCDCTrack2) const;
 
     private:

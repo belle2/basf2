@@ -195,13 +195,13 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
                         };
 
 
-  m_hOccupancyV =  new TH2F("hOccupancyV", "Average Sensor Occupancy (%), V side ", 16, 0.5, 16.5, 19, 0, 19);
+  m_hOccupancyV =  new TH2F("hOccupancyV", "Average ZS5 Sensor Occupancy (%), V side ", 16, 0.5, 16.5, 19, 0, 19);
   m_hOccupancyV->SetMarkerSize(1.1);
   m_hOccupancyV->GetXaxis()->SetTitle("ladder number");
   m_hOccupancyV->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOccupancyV->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-  m_hOccupancyU =  new TH2F("hOccupancyU", "Average Sensor Occupancy (%), U side ", 16, 0.5, 16.5, 19, 0, 19);
+  m_hOccupancyU =  new TH2F("hOccupancyU", "Average ZS5 Sensor Occupancy (%), U side ", 16, 0.5, 16.5, 19, 0, 19);
   m_hOccupancyU->SetMarkerSize(1.1);
   m_hOccupancyU->GetXaxis()->SetTitle("ladder number");
   m_hOccupancyU->GetXaxis()->SetLabelSize(0.04);
@@ -293,12 +293,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_hOccupancyU->SetTitle(m_hOccupancyU->GetTitle() + runID);
   m_hOccupancyU->SetStats(0);
   m_hOccupancyV->SetTitle(m_hOccupancyV->GetTitle() + runID);
-  m_hOccupancyU->SetStats(0);
+  m_hOccupancyV->SetStats(0);
 
   m_hOnlineOccupancyU->SetTitle(m_hOnlineOccupancyU->GetTitle() + runID);
   m_hOnlineOccupancyU->SetStats(0);
   m_hOnlineOccupancyV->SetTitle(m_hOnlineOccupancyV->GetTitle() + runID);
-  m_hOnlineOccupancyU->SetStats(0);
+  m_hOnlineOccupancyV->SetStats(0);
 
   //set dedicate gStyle
   const Int_t colNum = 4;
@@ -351,7 +351,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       //      B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " status = " << m_occUstatus);
 
       //produce the occupancy plot
-      m_cStripOccupancyU[i] = new TCanvas(Form("SVDAnalysis/c_StripOccupancyU_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
+      m_cStripOccupancyU[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyU_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
       m_hStripOccupancyU[i] = new TH1F(*htmp);
       m_hStripOccupancyU[i]->Scale(1 / nEvents);
       m_hStripOccupancyU[i]->SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
@@ -393,7 +393,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
         }
       }
       //produce the occupancy plot
-      m_cStripOccupancyV[i] = new TCanvas(Form("SVDAnalysis/c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
+      m_cStripOccupancyV[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
       m_hStripOccupancyV[i] = new TH1F(*htmp);
       m_hStripOccupancyV[i]->Scale(1 / nEvents);
       m_hStripOccupancyV[i]->SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));

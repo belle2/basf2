@@ -25,6 +25,7 @@ main.add_module('Geometry', components=['SVD'])
 
 svd = register_module('DQMHistAnalysisSVDGeneral')
 svd.param('printCanvas', True)
+svd.param('unpackerErrorLevel', 0.00001)
 svd.param('RefHistoFile', "SVDrefHisto.root")
 main.add_module(svd)
 

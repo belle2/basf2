@@ -52,8 +52,8 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("ShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name", std::string("SVDShaperDigits"));
-  addParam("noZSShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name",
+  addParam("offlineZSShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name", std::string("SVDShaperDigitsZS5"));
+  addParam("ShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name",
            std::string("SVDShaperDigits"));
 
   addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", m_ShowAllHistos);

@@ -162,14 +162,15 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    ThicknessDensityPar(int IRCDCB = 0, int IPhiCDCB = 0, int IRCDCF = 0, int IPhiCDCF = 0,
-                        int IRECLB = 0, int IPhiECLB = 0, int IRECLF = 0, int IPhiECLF = 0,
-                        int IRARICHF = 0, int IPhiARICHF = 0,  int IPhiTOPB = 0, int IPhiTOPF = 0,
+    ThicknessDensityPar(int IRCDCB = 0, int IPhiCDCB = 0, int IRCDCF = 0, int IPhiCDCF = 0, int IRECLB = 0,
+                        int IZECLB = 0, int IPhiECLB = 0, int IRECLF = 0, int IZECLF = 0, int IPhiECLF = 0,
+                        int IZARICHF = 0, int IPhiARICHF = 0, int IPhiTOPB = 0, int IPhiTOPF = 0,
                         const std::vector<double>& thicknesses = std::vector<double>(),
                         const std::vector<double>& density = std::vector<double>()):
       m_IRCDCB(IRCDCB), m_IPhiCDCB(IPhiCDCB), m_IRCDCF(IRCDCF), m_IPhiCDCF(IPhiCDCF), m_IRECLB(IRECLB),
-      m_IPhiECLB(IPhiECLB), m_IRECLF(IRECLF), m_IPhiECLF(IPhiECLF), m_IRARICHF(IRARICHF),
-      m_IPhiARICHF(IPhiARICHF), m_IPhiTOPB(IPhiTOPB), m_IPhiTOPF(IPhiTOPF), m_thick(thicknesses), m_density(density) {}
+      m_IZECLB(IZECLB), m_IPhiECLB(IPhiECLB), m_IRECLF(IRECLF), m_IZECLF(IZECLF), m_IPhiECLF(IPhiECLF),
+      m_IZARICHF(IZARICHF), m_IPhiARICHF(IPhiARICHF), m_IPhiTOPB(IPhiTOPB), m_IPhiTOPF(IPhiTOPF), m_thick(thicknesses),
+      m_density(density) {}
 
     /** Destructor */
     ~ThicknessDensityPar() {}
@@ -192,14 +193,18 @@ namespace Belle2 {
     int getIPhiCDCF() const { return m_IPhiCDCF;}
     /** Get the segmentation in R of ECL gap backward */
     int getIRECLB() const { return m_IRECLB;}
+    /** Get the segmentation in Z of ECL gap backward */
+    int getIZECLB() const { return m_IZECLB;}
     /** Get the segmentation in Phi of ECL gap backward */
     int getIPhiECLB() const { return m_IPhiECLB;}
     /** Get the segmentation in R of ECL gap forward */
     int getIRECLF() const { return m_IRECLF;}
+    /** Get the segmentation in Z of ECL gap forward */
+    int getIZECLF() const { return m_IZECLF;}
     /** Get the segmentation in Phi of ECL gap forward */
     int getIPhiECLF() const { return m_IPhiECLF;}
-    /** Get the segmentation in R of ARICH gap forward */
-    int getIRARICHF() const { return m_IRARICHF;}
+    /** Get the segmentation in Z of ARICH gap forward */
+    int getIZARICHF() const { return m_IZARICHF;}
     /** Get the segmentation in Phi of ARICH gap forward */
     int getIPhiARICHF() const { return m_IPhiARICHF;}
     /** Get the segmentation in Phi of TOP gap backward */
@@ -223,14 +228,18 @@ namespace Belle2 {
     int m_IPhiCDCF;
     /** segmentation in R of ECL backward     */
     int m_IRECLB;
+    /** segmentation in Z of ECL backward     */
+    int m_IZECLB;
     /** segmentation in Phi of ECL backward   */
     int m_IPhiECLB;
     /** segmentation in R of ECL forward      */
     int m_IRECLF;
+    /** segmentation in Z of ECL forward      */
+    int m_IZECLF;
     /** segmentation in Phi of ECL forward    */
     int m_IPhiECLF;
-    /** segmentation in R of ARICH forward    */
-    int m_IRARICHF;
+    /** segmentation in Z of ARICH forward    */
+    int m_IZARICHF;
     /** segmentation in Phi of ARICH forward  */
     int m_IPhiARICHF;
     /** segmentation in Phi of TOP backward    */

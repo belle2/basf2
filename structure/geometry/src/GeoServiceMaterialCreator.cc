@@ -114,10 +114,12 @@ namespace Belle2 {
         content5.getInt("IRCDCFor"),
         content5.getInt("IPhiCDCFor"),
         content5.getInt("IRECLBack"),
+        content5.getInt("IZECLBack"),
         content5.getInt("IPhiECLBack"),
         content5.getInt("IRECLFor"),
+        content5.getInt("IZECLFor"),
         content5.getInt("IPhiECLFor"),
-        content5.getInt("IRARICHFor"),
+        content5.getInt("IZARICHFor"),
         content5.getInt("IPhiARICHFor"),
         content5.getInt("IPhiTOPBack"),
         content5.getInt("IPhiTOPFor"),
@@ -173,11 +175,13 @@ namespace Belle2 {
       int IPhiCDCB =  Thick.getIPhiCDCB();
       int IRCDCF =  Thick.getIRCDCF();
       int IPhiCDCF =  Thick.getIPhiCDCF();
-      int IZECLB =  Thick.getIRECLB();
+      int IRECLB =  Thick.getIRECLB();
+      int IZECLB = Thick.getIZECLB();
       int IPhiECLB =  Thick.getIPhiECLB();
-      int IZECLF =  Thick.getIRECLF();
+      int IRECLF =  Thick.getIRECLF();
+      int IZECLF = Thick.getIZECLF();
       int IPhiECLF =  Thick.getIPhiECLF();
-      int IZARICHF =  Thick.getIRARICHF();
+      int IZARICHF =  Thick.getIZARICHF();
       int IPhiARICHF =  Thick.getIPhiARICHF();
       int IPhiTOPB =  Thick.getIPhiTOPB();
       int IPhiTOPF =  Thick.getIPhiTOPF();
@@ -222,15 +226,17 @@ namespace Belle2 {
         //      Create Materials from BEAST 2 in the gap between ARICH and TOP.
         if (materialID == 2) {
           int blockid = 0;
+          const double materialThick = fabs(materialForwardZ - materialBackwardZ) / IZARICHF;
           for (int iZ = 0; iZ < IZARICHF; iZ++) {
             const double rmin = materialInnerR;
-            const double rmax = materialOuterR;
-            const double materialThick = fabs(materialForwardZ - materialBackwardZ) / IZARICHF;
+            //const double rmax = materialOuterR;
             const double materialPosZ = materialBackwardZ + iZ * materialThick;
             for (int iPhi = 0; iPhi < IPhiARICHF; iPhi++) {
               const double SPhi = 360. / IPhiARICHF * iPhi;
               const double DPhi = 360. / IPhiARICHF;
-              double density = Density[blockid] * CLHEP::g / CLHEP::cm3;
+              const double materialRThick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF] / Unit::mm;
+              const double rmax = rmin + materialRThick;
+              double density = Density[iZ] * CLHEP::g / CLHEP::cm3;
               G4Material* ArichAir = geometry::Materials::get("Arich_TopGapfor");
               G4Material* medArichGap = new G4Material("ArichGap_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
               medArichGap->AddMaterial(ArichAir, 1.);
@@ -248,13 +254,13 @@ namespace Belle2 {
           else {IPhiTOP = IPhiTOPF;}
           const double rmin = materialInnerR;
           const double rmax = materialOuterR;
-          const double materialThick = materialForwardZ - materialBackwardZ;
           const double materialPosZ = materialBackwardZ;
           for (int iPhi = 0; iPhi < IPhiTOP; iPhi++) {
             const double SPhi = 360. / IPhiTOP * iPhi;
             const double DPhi = 360. / IPhiTOP;
             if (materialID == 3) {
-              double density = Density[blockid + IZARICHF * IPhiARICHF] * CLHEP::g / CLHEP::cm3;
+              const double materialThick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF] / Unit::mm;
+              double density = Density[IZARICHF] * CLHEP::g / CLHEP::cm3;
               G4Material* TopAir = geometry::Materials::get("Top_ECLGapback");
               G4Material* medTopGap = new G4Material("TopGapback_" + to_string(iPhi), density, 1);
               medTopGap->AddMaterial(TopAir, 1.);
@@ -262,7 +268,9 @@ namespace Belle2 {
               createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, medTopGap,  storageName, logical_gap_topback);
             }
             if (materialID == 4) {
-              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPB] * CLHEP::g / CLHEP::cm3;
+              const double materialThick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB] /
+                                           Unit::mm;
+              double density = Density[1 + IZARICHF] * CLHEP::g / CLHEP::cm3;
               G4Material* TopAir = geometry::Materials::get("Top_ECLGapfor");
               G4Material* medTopGap = new G4Material("TopGapfor_" + to_string(iPhi), density, 1);
               medTopGap->AddMaterial(TopAir, 1.);
@@ -276,45 +284,51 @@ namespace Belle2 {
       //      Create Materials from BEAST 2 in the gap between barrel and endcap of ECL.
       for (const ServiceGapsMaterialsEclPar& material : parameters.getServiceGapsEclMaterials()) {
         int blockid = 0;
-        int IZECL = 0, IPhiECL = 0;
+        int IRECL = 0, IZECL = 0, IPhiECL = 0;
         const int materialID = material.getIdentifier();
-        if (materialID < 1) {IZECL = IZECLB; IPhiECL = IPhiECLB;}
-        else {IZECL = IZECLF; IPhiECL = IPhiECLF;}
+        if (materialID < 1) {IRECL = IRECLB; IZECL = IZECLB; IPhiECL = IPhiECLB;}
+        else {IRECL = IRECLF; IZECL = IZECLF; IPhiECL = IPhiECLF;}
         const double materialInnerR1 = material.getInnerR1() / Unit::mm;
         const double materialOuterR1 = material.getOuterR1() / Unit::mm;
         const double materialInnerR2 = material.getInnerR2() / Unit::mm;
         const double materialOuterR2 = material.getOuterR2() / Unit::mm;
         const double materialBackwardZ = material.getBackwardZ() / Unit::mm;
         const double materialForwardZ = material.getForwardZ() / Unit::mm;
-        const double thick = materialForwardZ - materialBackwardZ ;
-        const double Hf1 = (materialOuterR1 - materialInnerR1) / IZECL;
-        const double Hf2 = (materialOuterR2 - materialInnerR2) / IZECL;
-        for (int iZ = 0; iZ < IZECL; iZ++) {
-          const double rmin1 = materialInnerR1 + Hf1 * iZ;
-          const double rmax1 = materialInnerR1 + Hf1 * (iZ + 1);
-          const double rmin2 = materialInnerR2 + Hf2 * iZ;
-          const double rmax2 = materialInnerR2 + Hf2 * (iZ + 1);
-          const double posZ = materialBackwardZ ;
-          for (int iPhi = 0; iPhi < IPhiECL; iPhi++) {
-            const double SPhi = (360. / IPhiECL) * iPhi;
-            const double DPhi = 360. / IPhiECL;
-            if (materialID == 0) {
-              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPF + IPhiTOPB] * CLHEP::g / CLHEP::cm3;
-              G4Material* ECLbackAir = geometry::Materials::get("ECLGapback");
-              G4Material* medECLback = new G4Material("ECLback_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
-              medECLback->AddMaterial(ECLbackAir, 1.);
-              const string storageName = "Service_ECLGAPS_Bwd_" + to_string(iZ) + "_" + to_string(iPhi);
-              createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLback, storageName, logical_gap_back);
+        const double interval = (materialForwardZ - materialBackwardZ) / IZECL ;
+        const double Hf1 = (materialOuterR1 - materialInnerR1) / IRECL;
+        const double Hf2 = (materialOuterR2 - materialInnerR2) / IRECL;
+        for (int iR = 0; iR < IRECL; iR++) {
+          const double rmin1 = materialInnerR1 + Hf1 * iR;
+          const double rmax1 = materialInnerR1 + Hf1 * (iR + 1);
+          const double rmin2 = materialInnerR2 + Hf2 * iR;
+          const double rmax2 = materialInnerR2 + Hf2 * (iR + 1);
+          for (int iZ = 0; iZ < IZECL; iZ++) {
+            const double posZ = materialBackwardZ + interval * iZ;
+            for (int iPhi = 0; iPhi < IPhiECL; iPhi++) {
+              const double SPhi = (360. / IPhiECL) * iPhi;
+              const double DPhi = 360. / IPhiECL;
+              if (materialID == 0) {
+                const double thick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB + IPhiTOPF] /
+                                     Unit::mm;
+                double density = Density[iZ + IZARICHF + 2 ] * CLHEP::g / CLHEP:: cm3;
+                G4Material* ECLbackAir = geometry::Materials::get("ECLGapback");
+                G4Material* medECLback = new G4Material("ECLback_" + to_string(iR) + "_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
+                medECLback->AddMaterial(ECLbackAir, 1.);
+                const string storageName = "Service_ECLGAPS_Bwd_" + to_string(iR) + "_" + to_string(iZ) + "_" + to_string(iPhi);
+                createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLback, storageName, logical_gap_back);
+              }
+              if (materialID == 1) {
+                const double thick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB + IPhiTOPF +
+                                               IZECLB * IRECLB * IPhiECLB] / Unit::mm;
+                double density = Density[iZ + IZARICHF + 2 + IZECLB] * CLHEP::g / CLHEP::cm3;
+                G4Material* ECLforAir = geometry::Materials::get("ECLGapfor");
+                G4Material* medECLfor = new G4Material("ECLfor_" + to_string(iR) + "_" + to_string(iZ) + "_" + to_string(iPhi), density,   1);
+                medECLfor->AddMaterial(ECLforAir, 1.);
+                const string storageName = "Service_ECLGAPS_Fwd_" + to_string(iR) + "_" + to_string(iZ) + "_" + to_string(iPhi);
+                createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLfor, storageName, logical_gap_for);
+              }
+              blockid++;
             }
-            if (materialID == 1) {
-              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPF + IPhiTOPB + IZECLB * IPhiECLB] * CLHEP::g / CLHEP::cm3;
-              G4Material* ECLforAir = geometry::Materials::get("ECLGapfor");
-              G4Material* medECLfor = new G4Material("ECLfor_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
-              medECLfor->AddMaterial(ECLforAir, 1.);
-              const string storageName = "Service_ECLGAPS_Fwd_" + to_string(iZ) + "_" + to_string(iPhi);
-              createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLfor, storageName, logical_gap_for);
-            }
-            blockid++;
           }
         }
       }

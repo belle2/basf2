@@ -302,10 +302,10 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (hChart != NULL) {
     m_hOccupancyChartChip = new TH1F(*hChart);
     m_hOccupancyChartChip->SetName("SVDOccupancyChart");
-    m_hOccupancyChartChip->SetTitle("SVD Occupancy of ZS5 Fired Strips per chip " + runID);
+    m_hOccupancyChartChip->SetTitle("SVD Occupancy of ZS5 Strips per chip " + runID);
     m_hOccupancyChartChip->Scale(1 / nEvents / 128);
     m_cOccupancyChartChip->cd();
-    //    m_cOccupancyChartChip->SetStats(0);
+    //    m_hOccupancyChartChip->SetStats(0);
     m_hOccupancyChartChip->DrawClone();
     delete m_hOccupancyChartChip;
   }
@@ -658,6 +658,7 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
 {
   B2INFO("DQMHistAnalysisSVDGeneral: terminate called");
 
+  delete m_refFile;
   delete m_legProblem;
   delete m_legWarning;
   delete m_legNormal;
@@ -688,6 +689,8 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
     //    delete m_hStripOccupancyV[module];
   }
 
+  delete m_cStripOccupancyU;
+  delete m_cStripOccupancyV;
 }
 
 

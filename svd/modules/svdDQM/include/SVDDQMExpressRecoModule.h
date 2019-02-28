@@ -138,17 +138,17 @@ namespace Belle2 {
     /** v SNR of clusters for layer 4,5,6 sensors */
     TH1F* m_clusterSNRV456 = nullptr;
 
-    /** u MaxBin of strips for all sensors (offline ZS)*/
+    /** u MaxBin of strips for all sensors (offline Zero Suppression)*/
     TH1F* m_stripMaxBinUAll = nullptr;
-    /** v MaxBin of strips for all sensors (offline ZS)*/
+    /** v MaxBin of strips for all sensors (offline Zero Suppression)*/
     TH1F* m_stripMaxBinVAll = nullptr;
-    /** u MaxBin of strips for layer 3 sensors (offline ZS)*/
+    /** u MaxBin of strips for layer 3 sensors (offline Zero Suppression)*/
     TH1F* m_stripMaxBinU3 = nullptr;
-    /** v MaxBin of strips for layer 3  sensors (offline ZS)*/
+    /** v MaxBin of strips for layer 3  sensors (offline Zero Suppression)*/
     TH1F* m_stripMaxBinV3 = nullptr;
-    /** u MaxBin of strips for layer 6 sensors (offline ZS)*/
+    /** u MaxBin of strips for layer 6 sensors (offline Zero Suppression)*/
     TH1F* m_stripMaxBinU6 = nullptr;
-    /** v MaxBin of strips for layer 6 sensors (offline ZS)*/
+    /** v MaxBin of strips for layer 6 sensors (offline Zero Suppression)*/
     TH1F* m_stripMaxBinV6 = nullptr;
 
     /** u charge of strips */
@@ -159,9 +159,9 @@ namespace Belle2 {
     TH1F** m_stripCountU = nullptr;
     /** v strip count */
     TH1F** m_stripCountV = nullptr;
-    /** u strip count (online ZS) */
+    /** u strip count (online Zero Suppression) */
     TH1F** m_onlineZSstripCountU = nullptr;
-    /** v strip count (online ZS */
+    /** v strip count (online Zero Suppression */
     TH1F** m_onlineZSstripCountV = nullptr;
     /** u size */
     TH1F** m_clusterSizeU = nullptr;

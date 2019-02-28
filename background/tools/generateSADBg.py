@@ -5,17 +5,17 @@
 # BG simulation using SAD input files
 #
 # make a link to the SAD files before running it (at KEKCC):
-#    ln -s /home/belle/staric/public/basf2/SADfiles input
+#  (ln -s /home/belle/staric/public/basf2/SADfiles input - sorry this files are outdated!)
 #
 # usage:
 #    basf2 generateSADBg.py bgType accRing equivTime_us num [sampleType phase outdir]
 # arguments:
-#    bgType         Coulomb or Touschek
+#    bgType         Coulomb, Touschek or Brems
 #    accRing        LER or HER
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
 #    sampleType     one of: study, usual, PXD, ECL
-#    phase          2 or 3
+#    phase          2, 31 (= early phase 3) or 3
 #    outdir         output directory path
 # -------------------------------------------------------------------------------------
 
@@ -30,12 +30,12 @@ argvs = sys.argv
 argc = len(argvs)
 
 if argc == 5:
-    bgType = argvs[1]     # Coulomb, Touschek
+    bgType = argvs[1]     # Coulomb, Touschek or Brems
     accRing = argvs[2]    # LER or HER
     equivTime = argvs[3]  # equivalent SuperKEKB running time in micro-seconds
     num = argvs[4]        # output file number
     sampleType = 'usual'  # study, usual, PXD, ECL
-    phase = 3             # 2 or 3
+    phase = 3             # phase number
     outdir = 'output'     # output directory path
 elif argc == 6:
     bgType = argvs[1]
@@ -64,13 +64,15 @@ elif argc == 8:
 else:
     print('usage:')
     print('basf2', argvs[0],
-          '(Touschek,Coulomb) (HER,LER) equivTime_us num [(study,usual,ECL,PXD) phase outdir]')
+          '(Touschek,Coulomb,Brems) (HER,LER) equivTime_us num [(study,usual,ECL,PXD) phase outdir]')
     sys.exit()
 
 # set parameters
 
 if phase == 3:
     subdir = 'phase3-15th/'
+elif phase == 31:
+    subdir = 'phase3-early/'
 elif phase == 2:
     subdir = 'phase2/'
 else:
@@ -114,6 +116,8 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
+elif phase == 31:
+    gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
 if sampleType == 'study':
     gearbox.param('override', [
         ("/DetectorComponent[@name='PXD']//ActiveChips", 'true', ''),
@@ -136,6 +140,7 @@ main.add_module(generator)
 
 # Geant geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 main.add_module(geometry)
 
 # Geant simulation
@@ -151,6 +156,9 @@ main.add_module(fullsim)
 progress = register_module('Progress')
 main.add_module(progress)
 
+# Output
+if phase == 31:
+    phase = 3
 add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile)
 
 # Process events

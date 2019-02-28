@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett                                             *
+ * Contributors: Jake Bennett, Jitendra                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -50,8 +50,12 @@ namespace Belle2 {
         return *this;
       }
       for (unsigned int layer = 0; layer < getSize(); ++layer) {
+        double tempLayer = -1; //out of bound layer
+        if (getSize() == 2)tempLayer = layer * 20; // 20 to make <8 and >=8 difference
+        else if (getSize() == 56)tempLayer = layer;
+        else B2ERROR("ERROR! Wrong # of constants vector array");
         for (unsigned int bin = 0; bin < getNBins(layer); ++bin) {
-          m_onedgains[layer][bin] *= rhs.getMean(layer, bin);
+          m_onedgains[layer][bin] *= rhs.getMean(tempLayer, bin);
         }
       }
       return *this;
@@ -71,10 +75,23 @@ namespace Belle2 {
     {
       if (m_onedgains.size() == 0) {
         B2ERROR("ERROR!");
+        return 0;
       }
-      if (layer < 8 && m_onedgains.size() <= 2) return m_onedgains[0].size();
-      else if (m_onedgains.size() == 2) return m_onedgains[1].size();
-      else return m_onedgains[layer].size();
+
+      if (m_onedgains.size() == 2) {
+        if (layer == 0) return m_onedgains[0].size();
+        else if (layer == 1) return m_onedgains[1].size();
+        else {
+          B2ERROR("ERROR! const vector not found");
+          return 0;
+        }
+      } else if (m_onedgains.size() == 56) {
+        return m_onedgains[layer].size();
+      } else {
+        B2ERROR("ERROR! Wrong # of constants vector array: getNBins()");
+        return 0;
+      }
+      return 0;
     };
 
     /** Return dE/dx mean value for the given bin
@@ -110,8 +127,8 @@ namespace Belle2 {
       if (enta < -3.1416 / 2.0) enta += 3.1416 / 2.0;
       if (enta > 3.1416 / 2.0) enta -= 3.1416 / 2.0;
 
-      double binsize = (m_onedgains[mylayer].size() != 0) ? 2.0 / m_onedgains[mylayer].size() : 0.0;
-      int bin = (binsize != 0.0) ? std::floor((std::sin(enta) + 1.0) / binsize) : -1;
+      double binsize = (m_onedgains[mylayer].size() != 0) ? 3.14159 / m_onedgains[mylayer].size() : 0.0;
+      int bin = (binsize != 0.0) ? std::floor((enta + 3.14159 / 2.0) / binsize) : -1;
       if (bin < 0 || (unsigned)bin >= m_onedgains[mylayer].size()) {
         B2WARNING("Problem with CDC dE/dx 1D binning!");
         return 1.0;
@@ -127,6 +144,6 @@ namespace Belle2 {
     short m_version; /**< version number for 1D cleanup correction */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
 
-    ClassDef(CDCDedx1DCell, 2); /**< ClassDef */
+    ClassDef(CDCDedx1DCell, 3); /**< ClassDef */
   };
 } // end namespace Belle2

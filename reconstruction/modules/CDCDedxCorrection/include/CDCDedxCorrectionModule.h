@@ -59,14 +59,14 @@ namespace Belle2 {
     /** Initialize the Module.
      * This method is called only once before the actual event processing
      * starts. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event. All processing of the event
      * has to take place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Perform a run gain correction */
     void RunGainCorrection(double& dedx) const;
@@ -140,15 +140,15 @@ namespace Belle2 {
     double m_removeHighest;
 
     /** saturation correction parameter: alpha */
-    double  m_alpha;
+    double  m_alpha{ -1.};
     /** saturation correction parameter: gamma */
-    double  m_gamma;
+    double  m_gamma{ -1.};
     /** saturation correction parameter: delta */
-    double  m_delta;
+    double  m_delta{ -1.};
     /** saturation correction parameter: power on cos(theta) */
-    double  m_power;
+    double  m_power{ -1.};
     /** saturation correction parameter: ratio */
-    double  m_ratio;
+    double  m_ratio{ -1.};
 
   };
 } // Belle2 namespace

@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <TMatrixFSym.h>
 
+#include <analysis/utility/ROOTToCLHEP.h>
 #include <analysis/KFit/KFitBase.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -55,6 +56,16 @@ KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymM
   }
 
   return this->addTrack(KFitTrack(p, x, e, q));
+}
+
+
+enum KFitError::ECode KFitBase::addParticle(const Particle* particle)
+{
+  return addTrack(
+           ROOTToCLHEP::getHepLorentzVector(particle->get4Vector()),
+           ROOTToCLHEP::getPoint3D(particle->getVertex()),
+           ROOTToCLHEP::getHepSymMatrix(particle->getMomentumVertexErrorMatrix()),
+           particle->getCharge());
 }
 
 
@@ -149,7 +160,6 @@ KFitBase::getTrackMomentum(const int id) const
   return m_Tracks[id].getMomentum();
 }
 
-
 const HepPoint3D
 KFitBase::getTrackPosition(const int id) const
 {
@@ -157,14 +167,12 @@ KFitBase::getTrackPosition(const int id) const
   return m_Tracks[id].getPosition();
 }
 
-
 const HepSymMatrix
 KFitBase::getTrackError(const int id) const
 {
   if (!isTrackIDInRange(id)) return HepSymMatrix(KFitConst::kNumber7, 0);
   return m_Tracks[id].getError();
 }
-
 
 const KFitTrack
 KFitBase::getTrack(const int id) const

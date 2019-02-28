@@ -65,6 +65,7 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
 
   m_nevt = -1;
   m_current_file_position = -1;
+  m_current_file_entry = -1;
 
   //Parameter definition
   addParam("inputFileName", m_inputFileName, "Belle MDST input file name. "
@@ -222,18 +223,17 @@ void B2BIIMdstInputModule::event()
 
   // Fill EventMetaData
   StoreObjPtr<EventMetaData> evtmetadata;
-  evtmetadata.create();
 
   // Read next event: We try to read the next event from the current file
   // if thist fails, open the next file and try again
   // if we cannot open the next file then stop processing
   while (!readNextEvent()) {
     if (!openNextFile()) {
-      evtmetadata->setEndOfData(); // stop event processing
       B2DEBUG(99, "[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << m_nevt << ". No more files");
       return;
     }
   }
+  evtmetadata.create();
 
   // Convert the Belle_event -> EventMetaData
   // Get Belle_event_Manager

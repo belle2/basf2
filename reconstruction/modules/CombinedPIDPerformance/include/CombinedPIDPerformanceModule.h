@@ -54,13 +54,13 @@ namespace Belle2 {
     virtual ~CombinedPIDPerformanceModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -71,7 +71,7 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcParticles; /**< Required array of input MCParticles */
 
     /** list to store TObjects */
-    TList* m_histoList;
+    TList* m_histoList{nullptr};
 
     /** method to create TEfficiencies */
     TEfficiency* createEfficiency(const char* name, const char* title,
@@ -109,7 +109,7 @@ namespace Belle2 {
     std::vector< TEfficiency* > m_epi_FakeRates;    /**< electron fake rates */
     std::vector< TEfficiency* > m_mpi_FakeRates;    /**< muon fake rates */
 
-    TH3F* h_ROC[5][10]; /**< ROC histograms */
+    TH3F* h_ROC[5][10] = {}; /**< ROC histograms */
 
     /** returns the likelihood ratio for given log likelihoods */
     double pidvalue(float pida, float pidb);

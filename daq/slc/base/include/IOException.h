@@ -8,10 +8,14 @@ namespace Belle2 {
   class IOException : public Exception {
 
   public:
-    IOException() throw() {}
-    IOException(const std::string& comment, ...) throw();
-    IOException(int err, const std::string& comment, ...) throw();
-    ~IOException() throw() {}
+    IOException() {}
+    IOException(const std::string& comment, ...);
+    IOException(int err, const std::string& comment, ...);
+#if __GNUC__ >= 7
+    virtual ~IOException() {}
+#else
+    virtual ~IOException() throw() {}
+#endif
 
   };
 

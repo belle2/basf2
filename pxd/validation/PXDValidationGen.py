@@ -91,7 +91,7 @@ particlegun.param({
     'zVertexParams': [0.0, 0.1],
     # all one track sharing the same vertex per event
     'independentVertices': False,
-    })
+})
 
 # ============================================================================
 # Print the parameters of the particle gun

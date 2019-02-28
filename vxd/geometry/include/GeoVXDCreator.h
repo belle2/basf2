@@ -93,7 +93,7 @@ namespace Belle2 {
        * @param  params Payload object
        * @return Transformation matrix for component
        */
-      G4Transform3D getAlignment(VXDAlignmentPar params);
+      G4Transform3D getAlignment(const VXDAlignmentPar& params);
 
       /**
        * Place a list of subcomponents into an component.
@@ -140,7 +140,7 @@ namespace Belle2 {
       /**
        * Return vector of VXDGeoPlacements with all the components defined inside a given path
        */
-      std::vector<VXDGeoPlacementPar> getSubComponents(GearDir path);
+      std::vector<VXDGeoPlacementPar> getSubComponents(const GearDir& path);
 
       /**
        * Read parameters for a ladder in layer with given ID from gearbox and layer
@@ -168,7 +168,8 @@ namespace Belle2 {
        * @param placements container holding names of all components to be cached
        * @param componentDir Path to Gearbox where parameters are to be found
        */
-      void readSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir, VXDGeometryPar& vxdGeometryPar);
+      void readSubComponents(const std::vector<VXDGeoPlacementPar>& placements, const GearDir& componentsDir,
+                             VXDGeometryPar& vxdGeometryPar);
 
     protected:
       /** Prefix to prepend to all volume names */

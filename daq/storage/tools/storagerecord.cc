@@ -82,36 +82,54 @@ public:
     m_runno = runno;
     m_fileid = fileid;
     bool available = false;
-    for (int i = 0; i < ndisks; i++) {
-      struct statvfs statfs;
-      char filename[1024];
-      sprintf(filename, "%s%02d", dir.c_str(), m_diskid);
+    char filename[1024];
+    struct statvfs statfs;
+    if (g_diskid > 0) {
+      sprintf(filename, "%s%02d", dir.c_str(), g_diskid);
       statvfs(filename, &statfs);
       float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
       if (usage < 0.9) {
+        m_diskid = g_diskid;
+        available = true;
+      }
+    } else {
+      for (int i = 0; i < ndisks; i++) {
+        sprintf(filename, "%s%02d", dir.c_str(), m_diskid);
+        statvfs(filename, &statfs);
+        float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
         sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
         std::ifstream fin(filename);
         int flag = 0;
         fin >> flag;
-        if (flag != 1) {
+        if (usage < 0.05) {
+          if (flag == 1) {
+            ::unlink(filename);
+            std::cout << "[DEBUG] disk : " << m_diskid << " is available again (full_flag removed)" << std::endl;
+          }
           available = true;
           std::cout << "[DEBUG] disk : " << m_diskid << " is available" << std::endl;
+          fin.close();
           break;
+        } else if (usage < 0.9) {
+          if (flag != 1) {
+            available = true;
+            std::cout << "[DEBUG] disk : " << m_diskid << " is available" << std::endl;
+            break;
+          }
+          fin.close();
+          std::cout << "[DEBUG] disk : " << m_diskid << " is with full_flag" << std::endl;
+        } else {
+          std::ofstream fout(filename);
+          fout << 1;
+          fout.close();
+          B2WARNING("disk-" << m_diskid << " is full " << usage);
         }
-        fin.close();
-        std::cout << "[DEBUG] disk : " << m_diskid << " is still full" << std::endl;
-      } else {
-        sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
-        std::ofstream fout(filename);
-        fout << 1;
-        fout.close();
-        B2WARNING("disk-" << m_diskid << " is full " << usage);
+        m_diskid++;
+        if (m_diskid > ndisks) m_diskid = 1;
       }
-      m_diskid++;
-      if (m_diskid > ndisks) m_diskid = 1;
     }
     if (!available) {
-      B2FATAL("No disk available for writing");
+      B2FATAL("No disk available for writing " << __FILE__ << ":" << __LINE__);
       exit(1);
     }
     std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",

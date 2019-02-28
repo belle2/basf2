@@ -79,10 +79,13 @@ runnumber = argvs[1]   # run number. Wildcards should work
 outfile = argvs[2]     # output name
 
 
-files = [f for f in glob.glob('/ghi/fs01/belle2/bdata/Data/sRaw/e0001/r0' + str(runnumber) + '/sub00/*.sroot')]
+files = glob.glob('/ghi/fs01/belle2/bdata/Data/sRaw/e0001/r0' + str(runnumber) + '/sub00/*.sroot')
 
 # Suppress messages and warnings during processing
 set_log_level(LogLevel.ERROR)
+
+# Define a global tag (note: the one given bellow will become out-dated!)
+use_central_database('data_reprocessing_proc8')
 
 # Create path
 main = create_path()
@@ -101,14 +104,8 @@ main.add_module(roinput)
 #    converter = register_module('Convert2RawDet')
 #    main.add_module(converter)
 
-# geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry (only TOP needed)
-geometry = register_module('Geometry')
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # Unpacking (format auto detection works now)
 unpack = register_module('TOPUnpacker')

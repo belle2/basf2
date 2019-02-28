@@ -3,13 +3,14 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Dmitrii Neverov                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/combined/StereoHitFinder.h>
+#include <tracking/trackFindingCDC/findlets/combined/MonopoleStereoHitFinder.h>
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
@@ -42,6 +43,26 @@ namespace Belle2 {
     public:
       /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
       TFCDC_StereoHitFinderModule();
+    };
+
+    /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.
+     *
+     * Same as above StereoHitFinder, but the s-z hypothesis is z(s) = (0) + (p + 4q)*x - q/25*s^2, where
+     *  p (in units of 100cm) is z coordinate of track at s=100cm, i.e. outer layers of CDC
+     *  q (in units of 100cm) is divergence of from a straight line at s=50cm, i.e. middle layers of CDC
+     *
+     * Non-zero q's indicate magnetic charge of the track
+     *
+     * TODO 3-dim hough tree to include z0 into consideration
+     *  */
+    class TFCDC_MonopoleStereoHitFinderModule : public FindletModule<MonopoleStereoHitFinder> {
+
+      /// The base class
+      using Super = FindletModule<MonopoleStereoHitFinder>;
+
+    public:
+      /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
+      TFCDC_MonopoleStereoHitFinderModule();
     };
   }
 }

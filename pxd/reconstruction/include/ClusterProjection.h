@@ -39,7 +39,8 @@ namespace Belle2 {
        */
       void add(unsigned int cell, float position, float charge);
       /** Finish calculation of center of gravity and set correct cluster size. Should only be used once */
-      void finalize() {
+      void finalize()
+      {
         m_pos /= m_charge;
         m_size = m_max - m_min + 1;
       }

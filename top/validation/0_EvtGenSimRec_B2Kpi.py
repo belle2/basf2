@@ -10,6 +10,7 @@
 """
 
 from basf2 import *
+import os
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from ROOT import Belle2
@@ -22,8 +23,6 @@ main = create_path()
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
-eventinfosetter.param('runList', [2])
-eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # generate events (B0 -> K+pi- + cc, other B0 generic)

@@ -10,8 +10,9 @@
 
 #pragma once
 
-#include <vector>
 #include <TObject.h>
+#include <framework/logging/Logger.h>
+#include <vector>
 #include <TH1F.h>
 
 namespace Belle2 {
@@ -29,18 +30,17 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    TOPPmtTTSHisto():
-      m_serialNumber(""), m_HV(0), m_histo()
+    TOPPmtTTSHisto()
     {}
 
     /**
      * Full constructor
-     * @param serialNumber serial number
-     * @param HV HV setting
+     * @param serialNumber PMT serial number
+     * @param HV high voltage used for the measurement
      */
     TOPPmtTTSHisto(const std::string& serialNumber,
                    float HV):
-      m_serialNumber(serialNumber), m_HV(HV), m_histo()
+      m_serialNumber(serialNumber), m_HV(HV)
     {}
 
     /**
@@ -50,20 +50,36 @@ namespace Belle2 {
     void setSerialNumber(const std::string& serNum) {m_serialNumber = serNum;}
 
     /**
-     * Set HV setting used for TTS measurement
-     * @param HV high voltage setting
+     * Set high voltage used for TTS measurement
+     * @param HV high voltage
      */
     void setHV(float HV) {m_HV = HV;}
 
     /**
-     * Append new element to the array
+     * Set histogram for a given pixel (make a copy)
      * @param pmtPixel pmtPixel number (1-based)
-     * @param histo vector of TH1F's for the TTS histograms
+     * @param histo TTS histogram
      */
-    void setHistogram(int pmtPixel, TH1F* histo)
+    void setHistogram(unsigned pmtPixel, const TH1F* histo)
     {
-      m_histo[pmtPixel - 1] = histo;
+      if (!histo) {
+        B2ERROR("TOPPmtTTSHisto::setHistogram: null pointer received");
+        return;
+      }
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) {
+        B2ERROR("TOPPmtTTSHisto::setHistogram: invalid PMT pixel "
+                << LogVar("PMT pixel", pmtPixel + 1));
+        return;
+      }
+      m_histo[pmtPixel] = *histo;
     }
+
+    /**
+     * Returns number of PMT pixels
+     * @return number of pixels
+     */
+    int getNumOfPixels() const {return c_NumPmtPixels;}
 
     /**
      * Returns PMT serial number
@@ -72,33 +88,31 @@ namespace Belle2 {
     const std::string& getSerialNumber() const {return m_serialNumber;}
 
     /**
-     * Returns HV setting used for TTS measurement
-     * @return HV
+     * Returns high voltage used for TTS measurement
+     * @return high voltage
      */
     float getHV() const {return m_HV;}
 
     /**
-     * Returns TTS histogram for a specified pmtPixel and HV setting
-     * @param pmtPixel pmtPixel number
-     * @return TTS histogram (TH1F*)
+     * Returns TTS histogram for a specified pmtPixel
+     * @param pmtPixel pmtPixel number (1-based)
+     * @return TTS histogram pointer or nullptr for invalid pmtPixel
      */
-    TH1F* getTTSHisto(int pmtPixel) const
+    const TH1F* getHistogram(unsigned pmtPixel) const
     {
-      if (pmtPixel > c_NumPmtPixels) pmtPixel = c_NumPmtPixels;
       pmtPixel--;
-      return m_histo[pmtPixel];
+      if (pmtPixel >= c_NumPmtPixels) return 0;
+      return &m_histo[pmtPixel];
     }
 
 
   private:
 
-    std::string m_serialNumber;      /**< serial number, e.g. JTxxxx */
-    float m_HV;                      /**< HV setting for which the set of histograms were taken */
-    TH1F* m_histo[c_NumPmtPixels];     /**< array of TTS histograms of measured TTS (one for each pmtPixel),
-              *   for the specific HV setting
-              */
+    std::string m_serialNumber;      /**< PMT serial number, e.g. JTxxxx */
+    float m_HV = 0;  /**< HV setting for which the set of histograms were taken */
+    TH1F m_histo[c_NumPmtPixels];  /**< histograms of measured TTS (one per pmtPixel) */
 
-    ClassDef(TOPPmtTTSHisto, 2); /**< ClassDef */
+    ClassDef(TOPPmtTTSHisto, 3); /**< ClassDef */
 
   };
 

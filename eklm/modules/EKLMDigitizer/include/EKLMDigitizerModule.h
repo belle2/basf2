@@ -8,21 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGITIZERMODULE_H
-#define EKLMDIGITIZERMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
-#include <eklm/dbobjects/EKLMDigitizationParameters.h>
-#include <eklm/dbobjects/EKLMTimeConversion.h>
-#include <eklm/simulation/FPGAFitter.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
 
@@ -48,29 +46,34 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
+
+    /**
+     * Check channel parameters for channel-specific simulation.
+     */
+    void checkChannelParameters();
 
     /**
      * Read hits from the store, sort sim hits and fill m_HitStripMap.
@@ -78,20 +81,15 @@ namespace Belle2 {
     void readAndSortSimHits();
 
     /**
-     * Create EKLMSim2Hits from EKLMSimHits using boost:graph mechanism.
-     */
-    void makeSim2Hits();
-
-    /**
      * Merge hits from the same strip. Create EKLMDigits.
      */
     void mergeSimHitsToStripHits();
 
     /** Digitization parameters. */
-    DBObjPtr<EKLMDigitizationParameters> m_DigPar;
+    DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
 
     /** Time conversion. */
-    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+    DBObjPtr<KLMTimeConversion> m_TimeConversion;
 
     /** Channel data. */
     DBObjPtr<EKLMChannels> m_Channels;
@@ -99,39 +97,36 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
+    /** Simulation mode. */
+    std::string m_SimulationMode;
+
+    /** Whether the simulation is channel-specific. */
+    bool m_ChannelSpecificSimulation;
+
     /** Initial digitization time. */
     double m_DigitizationInitialTime;
 
-    /** Save FPGA fit data (EKLMFPGAFit). */
+    /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;
 
-    /** Use debug mode in EKLM::FiberAndElectronics or not. */
+    /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
-
-    /** Create EKLMSim2Hits? */
-    bool m_CreateSim2Hits;
 
     /** Map for EKLMSimHit sorting according sensitive volumes. */
     std::multimap<int, EKLMSimHit*> m_SimHitVolumeMap;
 
     /** FPGA fitter. */
-    EKLM::FPGAFitter* m_Fitter;
+    KLM::ScintillatorFirmware* m_Fitter;
 
     /** Simulation hits. */
     StoreArray<EKLMSimHit> m_SimHits;
-
-    /** Partly merged simulation hits (not created by default). */
-    StoreArray<EKLMSim2Hit> m_Sim2Hits;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
 
     /** FPGA fits. */
-    StoreArray<EKLMFPGAFit> m_FPGAFits;
+    StoreArray<KLMScintillatorFirmwareFitResult> m_FPGAFits;
 
   };
 
 }
-
-#endif
-

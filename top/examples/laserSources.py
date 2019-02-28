@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 
 # ---------------------------------------------------------------
 # example of using OpticalGun to simulate laser light sources
@@ -13,7 +14,7 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param('evtNumList', [10])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
@@ -22,6 +23,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

@@ -4,10 +4,6 @@
 from basf2 import *
 from ROOT import Belle2
 from simulation import add_simulation
-from conditions_db import require_database_for_test
-
-# Make sure database is available for the test
-require_database_for_test()
 
 set_random_seed(321)
 set_log_level(LogLevel.INFO)
@@ -83,7 +79,7 @@ class PackerUnpackerTest(Module):
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [500], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [50]})
 main.add_module(eventinfosetter)
 
 particlegun = register_module('ParticleGun')
@@ -93,6 +89,7 @@ particlegun.param('momentumParams', [0.5, 4.0])
 main.add_module(particlegun)
 
 add_simulation(main, components=['BKLM'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["BKLM"])
 
 Packer = register_module('BKLMRawPacker')
 Packer.param("loadMapFromDB", 1)

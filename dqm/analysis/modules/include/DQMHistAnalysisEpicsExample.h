@@ -8,8 +8,10 @@
 
 #pragma once
 
+#ifdef _BELLE2_EPICS
 // EPICS
-//#include "cadef.h"
+#include "cadef.h"
+#endif
 
 #include <framework/core/Module.h>
 
@@ -32,26 +34,39 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisEpicsExampleModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     // Data members
   private:
+    /** The name of the histogram. */
     std::string m_histoname;
+    /** The definition of the fit function. */
     std::string m_function;
+    /** The fit function parameters for EPICS. */
     Int_t m_parameters;
-    std::string  m_pvname;
+    /** The prefix of PV. */
+    std::string  m_pvPrefix;
 
-    TF1* m_f1;
-    TCanvas* m_c1;
-    TLine* m_line, * m_line_lo, * m_line_hi;
+    /** The fit function. */
+    TF1* m_f1 = nullptr;
+    /** The drawing canvas. */
+    TCanvas* m_c1 = nullptr;
+    /** The line for the fitting result. */
+    TLine* m_line = nullptr;
+    /** The line for the lower bound. */
+    TLine* m_line_lo = nullptr;
+    /** The line for the higher bound. */
+    TLine* m_line_hi = nullptr;
 
-//    chid mychid[10];// hard limit max 10 parameters
+#ifdef _BELLE2_EPICS
+    chid mychid[10];// hard limit max 10 parameters
+#endif
   };
 } // end namespace Belle2
 

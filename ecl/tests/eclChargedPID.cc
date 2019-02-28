@@ -145,12 +145,10 @@ namespace Belle2 {
       eclPdfs.setPDFsMap(pdf.first);
     }
 
-    float pdfval(-1);
-    int abspdgId(0);
     for (const auto& pdf : pdfs) {
-      pdfval = eclPdfs.getPdf(pdf.first, p, theta)->Eval(eop);
+      float pdfval = eclPdfs.getPdf(pdf.first, p, theta)->Eval(eop);
       EXPECT_NEAR(pdf.second.Eval(eop), pdfval, 0.001);
-      abspdgId = abs(pdf.first);
+      int abspdgId = abs(pdf.first);
       if (pdf.first < 0) {
         likelihoods_minus[Const::chargedStableSet.find(abspdgId).getIndex()] = log(pdfval);
       } else {
@@ -164,9 +162,9 @@ namespace Belle2 {
     StoreArray<ECLPidLikelihood> ecl_likelihoods_plus;
     const auto* lk_plus = ecl_likelihoods_plus.appendNew(likelihoods_plus);
 
-    float logl(-700), logl_expect(-700);
     for (const auto& pdf : pdfs) {
-      logl_expect = log(pdf.second.Eval(eop));
+      float logl(-700);
+      float logl_expect = log(pdf.second.Eval(eop));
       if (pdf.first < 0) {
         logl = lk_minus->getLogLikelihood(Const::chargedStableSet.find(abs(pdf.first)));
       } else {

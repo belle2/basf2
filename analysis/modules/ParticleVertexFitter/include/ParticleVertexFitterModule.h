@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEVERTEXFITTERMODULE_H
-#define PARTICLEVERTEXFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -77,6 +76,7 @@ namespace Belle2 {
     std::string m_decayString;    /**< daughter particles selection */
     bool m_updateDaughters;       /**< flag for daughters update */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
+    bool m_hasCovMatrix = false;      /**< flag for mother covariance matrix (PseudoFitter)*/
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
@@ -160,55 +160,11 @@ namespace Belle2 {
                                      std::vector<Particle*>&  allparticles, const Particle* daughter);
 
     /**
-     * Adds given particle to the VertexFitKFit.
-     * @param kv reference to Kfitter VertexFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::VertexFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the MassVertexFitKFit.
-     * @param kv reference to Kfitter MassVertexFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::MassVertexFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the MassFitKFit.
-     * @param kv reference to Kfitter MassFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::MassFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the FourCFitKFit.
-     * @param kv reference to Kfitter FourCFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
-
-    /**
      * Adds given particle's child to the FourCFitKFit.
      * @param kv reference to Kfitter FourCFit object
      * @param particle pointer to particle
      */
     bool addChildofParticletoKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
-
-
-    /**
-     * Returns particle's 4-momentum as a HepLorentzVector
-     */
-    CLHEP::HepLorentzVector getCLHEPLorentzVector(const Particle* particle);
-
-    /**
-     * Returns particle's position as a HepPoint3D
-     */
-    HepPoint3D getCLHEPPoint3D(const Particle* particle);
-
-    /**
-     * Returns particle's 7x7 momentum-vertex-error matrix as a HepSymMatrix
-     */
-    CLHEP::HepSymMatrix getCLHEPSymMatrix(const Particle* particle);
 
     /**
      * Adds IPProfile constraint to the vertex fit using kfitter.
@@ -242,4 +198,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

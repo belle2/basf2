@@ -19,25 +19,12 @@ namespace Belle2 {
 
   DATCONSVDSimpleClusterCandidate::DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside)
     : m_vxdID(vxdID)
-    , m_isUside(isUside)
-    , m_maxClusterSize(6)
-    , m_charge(0)
-    , m_seedCharge(0)
-    , m_position(0)
-    , m_seedStrip(0)
-    , m_size(0)
-    , m_seedStripIndex(0) {};
+    , m_isUside(isUside) { m_maxClusterSize = 0; };
 
   DATCONSVDSimpleClusterCandidate::DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside, unsigned short maxClusterSize)
     : m_vxdID(vxdID)
     , m_isUside(isUside)
-    , m_maxClusterSize(maxClusterSize)
-    , m_charge(0)
-    , m_seedCharge(0)
-    , m_position(0)
-    , m_seedStrip(0)
-    , m_size(0)
-    , m_seedStripIndex(0) {};
+    , m_maxClusterSize(maxClusterSize) {};
 
   bool DATCONSVDSimpleClusterCandidate::add(VxdID vxdID, bool isUside, unsigned short index, unsigned short charge,
                                             unsigned short cellID)
@@ -99,7 +86,6 @@ namespace Belle2 {
 
     unsigned short clusterSize    = m_strips.size();
     unsigned short seedStripIndex = clusterSize / 2 + 1;
-//     unsigned short seedStrip      = (minStripCellID + clusterSize / 2);
     unsigned short seedStrip      = (minStripCellID + seedStripIndex - 1);
     double clusterPosition        = pitch * (seedStrip - numberofStrips / 2);
 

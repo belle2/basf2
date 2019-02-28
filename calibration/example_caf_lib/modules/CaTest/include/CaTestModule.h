@@ -23,11 +23,11 @@ namespace Belle2 {
     /// Constructor: Sets the description, the properties and the parameters of the module.
     CaTestModule();
 
-    virtual void prepare();
-    virtual void collect();
-    virtual void startRun();
-    virtual void closeRun();
-    virtual void finish();
+    virtual void prepare() override;
+    virtual void collect() override;
+    virtual void startRun() override;
+    virtual void closeRun() override;
+    virtual void finish() override;
   private:
 
     StoreObjPtr<EventMetaData> m_emd;
@@ -55,7 +55,7 @@ namespace Belle2 {
     /** Spread of gaussian (mean=42) filling test histogram (range=<0,100>) - probability of algo iterations depend on it */
     int m_spread;
     /// Runs during the defineHisto() function
-    virtual void inDefineHisto();
+    virtual void inDefineHisto() override;
     void describeProcess(std::string functionName);
   };
 }

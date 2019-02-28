@@ -118,16 +118,16 @@ namespace Belle2 {
       virtual int getVarBasis() const = 0;
 
       /// Returns the value of the constraint
-      virtual double getValue() const = 0;
+      virtual double getValue() const override = 0;
 
       /// Returns the error on the value of the constraint
-      virtual double getError() const;
+      virtual double getError() const override;
 
       /// Get first order derivatives.
       /// Call this with a predefined array "der" with the necessary number of entries!
       virtual void getDerivatives(int idim,      ///< First dimension of the array
                                   double der[]   ///< Array of derivatives, at least idim x idim
-                                 ) const = 0;
+                                 ) const override = 0;
 
       /// Accesses position of constraint in global constraint list
       virtual int  getGlobalNum() const

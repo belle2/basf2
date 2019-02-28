@@ -46,17 +46,6 @@ ModuleCondition::ModuleCondition(std::string expression, PathPtr conditionPath, 
   m_conditionValue = convertString<int>(expression.substr(iOperator, expression.length() - 1));
 }
 
-ModuleCondition::ModuleCondition(const ModuleCondition& other)
-{
-  if (other.m_conditionPath) {
-    std::shared_ptr<Path> p = std::static_pointer_cast<Path>(other.m_conditionPath->clone());
-    m_conditionPath = p;
-  }
-  m_conditionOperator = other.m_conditionOperator;
-  m_conditionValue = other.m_conditionValue;
-  m_afterConditionPath = other.m_afterConditionPath;
-}
-
 bool ModuleCondition::evaluate(int value) const
 {
   switch (m_conditionOperator) {

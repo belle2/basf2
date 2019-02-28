@@ -3,14 +3,12 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Matic Lubej                                              *
+ * Contributors: Matic Lubej, Sviatoslav Bilokin                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RESTOFEVENTINTERPRETERMODULE_H
-#define RESTOFEVENTINTERPRETERMODULE_H
-
+#pragma once
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -37,15 +35,18 @@ namespace Belle2 {
      */
     RestOfEventInterpreterModule();
 
-    /**  */
+    /** Overriden initialize method */
     virtual void initialize() override;
 
-    /** n */
+    /** Overriden event method */
     virtual void event() override;
 
 
   private:
 
+    std::string m_particleList;  /**< Name of the ParticleList */
+    std::vector<std::tuple<std::string, std::string, std::string, std::vector<double>>>
+    m_ROEMasksWithFractions; /**< Container for tuples with fractions */
     typedef std::map<std::string, std::shared_ptr<Variable::Cut>>
                                                                stringAndCutMap; /**< Type definition helper for a map of string and cuts */
     typedef std::map<std::string, std::vector<double>>
@@ -54,13 +55,10 @@ namespace Belle2 {
     typedef std::map<std::string, std::map<unsigned int, bool>>
                                                              stringAndMapOfIntAndBoolMap; /**< Type definition helper for a map of string and nested map of integer and boolean */
 
-    std::string m_particleList;  /**< Name of the ParticleList */
 
     std::vector<std::string> m_maskNames; /**< Container for added mask names of ROE interpretations */
 
     std::vector<std::tuple<std::string, std::string, std::string>> m_ROEMasks; /**< Container for tuples */
-    std::vector<std::tuple<std::string, std::string, std::string, std::vector<double>>>
-    m_ROEMasksWithFractions; /**< Container for tuples with fractions */
 
     stringAndCutMap m_trackCuts; /**< Cut object which performs the cuts on the remaining tracks for a single ROE interpretation */
     stringAndCutMap
@@ -73,4 +71,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* RESTOFEVENTINTERPRETERMODULE_H_H */

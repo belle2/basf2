@@ -54,6 +54,21 @@ namespace Belle2 {
     return row * m_numColumns * m_pmt.getNumColumns() + col + 1;
   }
 
+  int TOPGeoPMTArray::getPixelID(unsigned pmtID, unsigned pmtPixelID) const
+  {
+    pmtID--;
+    if (pmtID >= getSize()) return 0;
+
+    pmtPixelID--;
+    if (pmtPixelID >= m_pmt.getNumPixels()) return 0;
+
+    unsigned col = pmtPixelID % m_pmt.getNumColumns();
+    unsigned row = pmtPixelID / m_pmt.getNumColumns();
+
+    col += (pmtID % m_numColumns) * m_pmt.getNumColumns();
+    row += (pmtID / m_numColumns) * m_pmt.getNumRows();
+    return row * m_numColumns * m_pmt.getNumColumns() + col + 1;
+  }
 
   void TOPGeoPMTArray::generateDecoupledPMTs(double fraction)
   {
@@ -82,6 +97,10 @@ namespace Belle2 {
     if (m_dy <= 0) return false;
     if (m_material.empty()) return false;
     if (!m_pmt.isConsistent()) return false;
+    if (m_cookieThickness <= 0) return false;
+    if (m_cookieMaterial.empty()) return false;
+    if (m_filterThickness <= 0) return false;
+    if (m_filterMaterial.empty()) return false;
     return true;
   }
 
@@ -93,6 +112,12 @@ namespace Belle2 {
     cout << " " << s_unitName << endl;
     cout << " cell: " << getDx() << " X " << getDy() << " " << s_unitName << endl;
     cout << " material: " << getMaterial() << endl;
+    if (m_cookieThickness > 0) { // new version of payload
+      cout << " silicone cookies:  thickness = " << getCookieThickness() << " "
+           << s_unitName << ", material = " << getCookieMaterial() << endl;
+      cout << " wavelength filter: thickness = " << getFilterThickness() << " "
+           << s_unitName << ", material = " << getFilterMaterial() << endl;
+    }
     cout << " air gap (decoupled PMT's): " << getAirGap() << " " << s_unitName << endl;
     cout << " optically decoupled PMT's:";
     if (m_decoupledPMTs.empty()) {

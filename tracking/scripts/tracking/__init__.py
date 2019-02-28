@@ -6,7 +6,7 @@ from tracking.path_utils import *
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
-                                mcTrackFinding=False, trigger_mode="all", trackFitHypotheses=None,
+                                mcTrackFinding=False, trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False):
     """
@@ -23,7 +23,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param skipHitPreparerAdding: Advanced flag: do not add the hit preparation (esp. VXD cluster creation
         modules. This is useful if they have been added before already.
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
-    :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
@@ -36,39 +35,35 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         return
 
     if not skipGeometryAdding:
-        # Add the geometry in all trigger modes if not already in the path
         add_geometry_modules(path, components=components)
 
-    if not skipHitPreparerAdding and trigger_mode in ["all", "hlt"]:
+    if not skipHitPreparerAdding:
         add_hit_preparation_modules(path, components=components)
 
     # Material effects for all track extrapolations
-    if trigger_mode in ["all", "hlt"] and 'SetupGenfitExtrapolation' not in path:
+    if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
 
     if mcTrackFinding:
-        # Always add the MC finder in all trigger modes.
         add_mc_track_finding(path, components=components, reco_tracks=reco_tracks,
                              use_second_cdc_hits=use_second_cdc_hits)
     else:
-        add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
+        add_track_finding(path, components=components, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
-    if trigger_mode in ["hlt", "all"]:
-        add_time_extraction(path, components=components)
+    add_time_extraction(path, components=components)
 
-    if trigger_mode in ["hlt", "all"]:
-        add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
-                       use_second_cdc_hits=use_second_cdc_hits)
+    add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
+                   use_second_cdc_hits=use_second_cdc_hits)
 
-        if fit_tracks:
-            add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                            trackFitHypotheses=trackFitHypotheses,
-                                            reco_tracks=reco_tracks)
+    if fit_tracks:
+        add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
+                                        trackFitHypotheses=trackFitHypotheses,
+                                        reco_tracks=reco_tracks)
 
 
 def add_time_extraction(path, components=None):
@@ -82,7 +77,7 @@ def add_time_extraction(path, components=None):
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
-                                   data_taking_period="gcr2017", top_in_counter=False,
+                                   data_taking_period="early_phase3", top_in_counter=False,
                                    merge_tracks=False, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
@@ -110,7 +105,6 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
         return
 
     if not skip_geometry_adding:
-        # Add the geometry in all trigger modes if not already in the path
         add_geometry_modules(path, components)
 
     add_hit_preparation_modules(path, components=components)
@@ -156,7 +150,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
                                 use_second_cdc_hits=use_second_cdc_hits)
 
 
-def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="RecoTracks",
+def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
                       vxdtf2_mva_weight_file=None):
@@ -164,7 +158,6 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
     :param reco_tracks: The store array name where to output all tracks
-    :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     :param use_mc_truth: Use the truth information in the CKF modules
     :param svd_ckf_mode: how to apply the CKF (with VXDTF2 or without). Defaults to "VXDTF2_after".
     :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
@@ -192,15 +185,12 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
 
     latest_reco_tracks = None
 
-    if trigger_mode in ["fast_reco", "all"] and is_cdc_used(components):
+    if is_cdc_used(components):
         add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
-    if trigger_mode in ["hlt", "all"] and is_svd_used(components):
-        # in case the lastest_reco_tracks is not set and we are in hlt mode, a previous call to
-        # this method using trigger_mode = "fast_reco" was done and we have the CDC-only RecoTrack
-        # already
-        if trigger_mode == "hlt" and latest_reco_tracks is None:
+    if is_svd_used(components):
+        if latest_reco_tracks is None:
             latest_reco_tracks = cdc_reco_tracks
 
         add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
@@ -210,24 +200,24 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
                               vxdtf2_mva_weight_file=vxdtf2_mva_weight_file)
         latest_reco_tracks = svd_cdc_reco_tracks
 
-    if trigger_mode in ["all"] and is_pxd_used(components):
+    if is_pxd_used(components):
         add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                               use_mc_truth=use_mc_truth, output_reco_tracks=full_reco_tracks,
                               temporary_reco_tracks=pxd_reco_tracks,
                               add_both_directions=add_both_directions)
 
-    if trigger_mode in ["all"] and prune_temporary_tracks:
+    if prune_temporary_tracks:
         for temporary_reco_track_name in [pxd_reco_tracks, svd_reco_tracks, cdc_reco_tracks, svd_cdc_reco_tracks]:
             if temporary_reco_track_name != reco_tracks:
                 path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
 
 
-def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='gcr2017',
+def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='early_phase3',
                          merge_tracks=True, use_second_cdc_hits=False,
                          vxdtf2_mva_weight_file=None):
     import cdc.cr as cosmics_setup
 
-    if data_taking_period != "phase2":
+    if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)
 
         # track finding
@@ -261,7 +251,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
         if is_svd_used(components):
             add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                                   output_reco_tracks=svd_cdc_reco_tracks,
-                                  svd_ckf_mode="only_ckf", add_both_directions=True,
+                                  svd_ckf_mode="cosmics", add_both_directions=True,
                                   vxdtf2_mva_weight_file=vxdtf2_mva_weight_file)
             latest_reco_tracks = svd_cdc_reco_tracks
 

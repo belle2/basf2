@@ -74,27 +74,27 @@ namespace Belle2 {
     /** Sets vacuum polarization
      * @param vacPol Vacuum polarization option
      */
-    void setVacPol(std::string vacPol) { m_vacPol = vacPol; }
+    void setVacPol(const std::string& vacPol) { m_vacPol = vacPol; }
 
     /** Sets model: matched or ps
      * @param model matched or ps
      */
-    void setModel(std::string model) { m_model = model; }
+    void setModel(const std::string& model) { m_model = model; }
 
     /** Sets mode: weighted or unweighted
      * @param mode weighted or unweighted
      */
-    void setMode(std::string mode) { m_mode = mode; }
+    void setMode(const std::string& mode) { m_mode = mode; }
 
     /** Sets Order: born, alpha or exp
      * @param order born, alpha or exp
      */
-    void setOrder(std::string order) { m_order = order; }
+    void setOrder(const std::string& order) { m_order = order; }
 
     /** Sets final state minimum energy.
      * @param finalState Minimum energy for leptons/photons in the final state, in GeV
      */
-    void setFinalState(std::string finalState) { m_finalState = finalState; }
+    void setFinalState(const std::string& finalState) { m_finalState = finalState; }
 
     /** TEMPORARY SOLUTION! Approximate energy spread per beam (CMS)
      * @param spread energy spread per beam (CMS)
@@ -114,12 +114,12 @@ namespace Belle2 {
     /** Sets User mode similar to TEEGG: ETRON, EGAMMA, GAMMA or PRESCALE or NONE (default)
      * @param usermode ETRON, EGAMMA, GAMMA or NONE (default)
      */
-    void setUserMode(std::string usermode) { m_userMode = usermode; }
+    void setUserMode(const std::string& usermode) { m_userMode = usermode; }
 
     /** Sets NSK VP data file
      * @param NSKDataFile (default)
      */
-    void setNSKDataFile(std::string NSKDataFile) { m_NSKDataFile = NSKDataFile; }
+    void setNSKDataFile(const std::string& NSKDataFile) { m_NSKDataFile = NSKDataFile; }
 
     /** Sets the minimum CMS energy of the tagged e-/e+
      * @param eemin minimum CMS energy of the tagged e-/e+

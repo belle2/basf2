@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLECOMBINERMODULE_H
-#define PARTICLECOMBINERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -85,4 +84,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

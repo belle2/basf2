@@ -68,6 +68,12 @@ namespace Belle2 {
       /** The destructor of the GeoCryostatCreator class. */
       virtual ~GeoCryostatCreator();
 
+      /** Do not want a copy constructor */
+      GeoCryostatCreator(const GeoCryostatCreator&) = delete;
+
+      /** Do not want an assignment operator */
+      GeoCryostatCreator& operator =(const GeoCryostatCreator&) = delete;
+
       /**
       * Creates the ROOT Objects for the Cryostat geometry.
       * @param content A reference to the content part of the parameter

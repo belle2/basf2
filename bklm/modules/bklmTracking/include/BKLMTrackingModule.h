@@ -38,19 +38,19 @@ namespace Belle2 {
     virtual ~BKLMTrackingModule();
 
     //! Initialize at start of job
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! begin run stuff
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     //! Unpack one event and create digits
-    virtual void event();
+    virtual void event() override;
 
     //! end run stuff
-    virtual void endRun();
+    virtual void endRun() override;
 
     //! Terminate at the end of job
-    virtual void terminate();
+    virtual void terminate() override;
 
     //! Judge if two hits come from the same sector
     bool sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2);
@@ -143,6 +143,21 @@ namespace Belle2 {
     double distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
                          double& error,
                          double& sigma);
+
+    //! run number
+    std::vector<int> m_runNumber;
+
+    //! total number of processed events in the run
+    int m_runTotalEvents;
+
+    //! total number of processed events
+    std::vector<int> m_totalEvents;
+
+    //! total number of processed events in the run with at lease one BKLMTrack
+    int m_runTotalEventsWithTracks;
+
+    //! total number of processed events with at least one BKLMTrack
+    std::vector<int> m_totalEventsWithTracks;
   };
 } // end namespace Belle2
 #endif

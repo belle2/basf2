@@ -46,30 +46,22 @@ namespace Belle2 {
      */
     PXDDQMEfficiencyModule();
 
-    /**
-     * destructor
-     */
-    virtual ~PXDDQMEfficiencyModule();
+  private:
 
     /**
      * main function which fills trees and histograms
      */
-    virtual void event();
+    void event() override final;
 
     /**
      * initializes the need store arrays, trees and histograms
      */
-    virtual void initialize();
+    void initialize() override final;
 
     /**
      * actually defines the trees and histograms
      */
-    virtual void defineHisto();
-
-    /**
-     * Do the initialization here
-     */
-    virtual void beginRun();
+    void defineHisto() override final;
 
 
 
@@ -85,11 +77,19 @@ namespace Belle2 {
 
     int findClosestCluster(VxdID& vxdid, TVector3 intersection);
 
+    bool isCloseToBorder(int u, int v, int checkDistance);
+
+    bool isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID);
+
     //Require tracks going through ROIs
     bool m_requireROIs;
 
     //if true alignment will be used!
     bool m_useAlignment;
+
+    bool m_maskDeadPixels;
+
+    bool m_cutBorders;
 
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
@@ -110,7 +110,9 @@ namespace Belle2 {
 
     double m_distcut; //distance cut in cm!
     double m_pcut; //pValue-Cut for tracks
-    unsigned int m_minSVDHits;
+    double m_momCut; //Cut on fitted track momentum
+    unsigned int m_minSVDHits; //Required hits in SVD strips for tracks
+    int m_maskedDistance; //Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency
     std::map<VxdID, TH2D*> m_h_track_hits;

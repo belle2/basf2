@@ -22,14 +22,14 @@ namespace Belle2 {
 
   public:
     EventServerCallback();
-    virtual ~EventServerCallback() throw();
+    virtual ~EventServerCallback() noexcept;
 
   public:
-    virtual void load(const DBObject&) throw(RCHandlerException);
-    virtual void start() throw(RCHandlerException);
-    virtual void stop() throw(RCHandlerException);
-    virtual void recover(const DBObject&) throw(RCHandlerException);
-    virtual void abort() throw(RCHandlerException);
+    virtual void load(const DBObject&);
+    virtual void start();
+    virtual void stop();
+    virtual void recover(const DBObject&);
+    virtual void abort();
 
     void EventServerLogger();
 

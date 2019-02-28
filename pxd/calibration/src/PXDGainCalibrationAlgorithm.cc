@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Benjamin Schwenker                                       *
+ * Contributors: Benjamin Schwenker, Jonas Roetter                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,7 +26,8 @@
 
 //ROOT
 #include <TRandom.h>
-#include <TH1I.h>
+#include <TH1.h>
+#include <TF1.h>
 
 using namespace std;
 using boost::format;
@@ -38,15 +39,10 @@ namespace {
 
   /** Signal in ADU of collected clusters */
   int m_signal;
-
   /** Run number to be stored in dbtree */
   int m_run;
   /** Experiment number to be stored in dbtree */
   int m_exp;
-  /** ChargeMap to be stored in dbtree */
-  PXDClusterChargeMapPar m_chargeMap;
-  /** GainMap to be stored in dbtree */
-  PXDGainMapPar m_gainMap;
 
   /** Helper function to extract number of bins along u side and v side from counter histogram labels. */
   void getNumberOfBins(const std::shared_ptr<TH1I>& histo_ptr, unsigned short& nBinsU, unsigned short& nBinsV)
@@ -98,7 +94,6 @@ namespace {
       VxdID sensorID(token);
       sensorSet.insert(sensorID.getID());
     }
-
     return sensorSet.size();
   }
 
@@ -107,7 +102,8 @@ namespace {
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDClusterChargeCollector"),
-  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(true)
+
+  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false), strategy(0)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
@@ -153,6 +149,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
   // This is the PXD gain correction payload for conditions DB
   PXDGainMapPar* gainMapPar = new PXDGainMapPar(nBinsU, nBinsV);
+  set<VxdID> pxdSensors;
 
   // Loop over all bins of input histo
   for (auto histoBin = 1; histoBin <= cluster_counter->GetXaxis()->GetNbins(); histoBin++) {
@@ -185,8 +182,48 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     } else {
       B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfHits << " < " << minClusters <<
                 "). Use default gain.");
+      gainMapPar->setContent(sensorID.getID(), uBin, vBin, 1.0);
+    }
+    pxdSensors.insert(sensorID);
+  }
+
+  // Post processing of gain map. It is possible that the gain
+  // computation failed on some parts. Here, we replace default
+  // values (1.0) by local averages of neighboring sensor parts.
+
+  for (const auto& sensorID : pxdSensors) {
+    for (unsigned short vBin = 0; vBin < nBinsV; ++vBin) {
+      float meanGain = 0;
+      unsigned short nGood = 0;
+      unsigned short nBad = 0;
+      for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
+        auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
+        // Filter default gains
+        if (gain != 1.0) {
+          nGood += 1;
+          meanGain += gain;
+        } else {
+          nBad += 1;
+        }
+      }
+      B2RESULT("Gain calibration on sensor=" << sensorID << " and vBin=" << vBin << " was successful on " << nGood << "/" << nBinsU <<
+               " uBins.");
+
+      // Check if we can repair bad calibrations with a local avarage
+      if (nGood > 0 && nBad > 0) {
+        meanGain /= nGood;
+        for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
+          auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
+          if (gain == 1.0) {
+            gainMapPar->setContent(sensorID.getID(), uBin, vBin, meanGain);
+            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin << ": Replace default gain wih average "
+                     << meanGain);
+          }
+        }
+      }
     }
   }
+
 
   // Save the gain map to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
@@ -204,7 +241,6 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
   const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
-
   // Vector with cluster signals from collected mc
   vector<double> mc_signals;
 
@@ -220,29 +256,50 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
     mc_signals.push_back(m_signal + noise);
   }
 
-  auto dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
-  auto mcMedian = CalculateMedian(mc_signals);
-
-  double gain =  dataMedian / mcMedian;
-  if (gain <= 0) {
+  double dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
+  double mcMedian;
+  // check if dataMedian makes sense
+  if (dataMedian <= 0.0) {
     B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
               ". Set gain to default value (=1.0) as well.");
-    gain = 1.0;
+    return 1.0;
   }
-  return gain;
+  if (strategy == 0) mcMedian = CalculateMedian(mc_signals);
+  else if (strategy == 1) mcMedian = FitLandau(mc_signals);
+  else {
+    B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
+  }
+
+  // check if mcMedian makes sense
+  if (mcMedian <= 0.0) {
+    B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
+              ". Set gain to default value (=1.0) as well.");
+    return 1.0;
+  }
+
+
+  double gain =  dataMedian / mcMedian;
+  double gainFromDB = GetCurrentGainFromDB(sensorID, uBin, vBin);
+  B2DEBUG(10, "Gain from db used in PXDDigitizer is " << gainFromDB);
+  B2DEBUG(10, "New gain correction derived is " << gain);
+  B2DEBUG(10, "The total gain we should return is " << gain * gainFromDB);
+
+  return gain * gainFromDB;
 }
 
 double PXDGainCalibrationAlgorithm::GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin)
 {
   // Read back db payloads
-  PXDClusterChargeMapPar* chargeMapPtr = &m_chargeMap;
+  PXDClusterChargeMapPar* chargeMapPtr = 0;
+  PXDGainMapPar* gainMapPtr = 0;
 
   auto dbtree = getObjectPtr<TTree>("dbtree");
   dbtree->SetBranchAddress("run", &m_run);
   dbtree->SetBranchAddress("exp", &m_exp);
   dbtree->SetBranchAddress("chargeMap", &chargeMapPtr);
+  dbtree->SetBranchAddress("gainMap", &gainMapPtr);
 
-  // Compute running average of valiie d
+  // Compute running average of charge medians from db
   double sum = 0;
   int counter = 0;
 
@@ -250,18 +307,55 @@ double PXDGainCalibrationAlgorithm::GetChargeMedianFromDB(VxdID sensorID, unsign
   const auto nEntries = dbtree->GetEntries();
   for (int i = 0; i < nEntries; ++i) {
     dbtree->GetEntry(i);
-    sum += m_chargeMap.getContent(sensorID.getID(), uBin, vBin);
+    sum += chargeMapPtr->getContent(sensorID.getID(), uBin, vBin);
     counter += 1;
   }
+  delete chargeMapPtr;
+  chargeMapPtr = 0;
+  delete gainMapPtr;
+  gainMapPtr = 0;
+
   return sum / counter;
 }
+
+double PXDGainCalibrationAlgorithm::GetCurrentGainFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+{
+  // Read back db payloads
+  PXDClusterChargeMapPar* chargeMapPtr = 0;
+  PXDGainMapPar* gainMapPtr = 0;
+
+  auto dbtree = getObjectPtr<TTree>("dbtree");
+  dbtree->SetBranchAddress("run", &m_run);
+  dbtree->SetBranchAddress("exp", &m_exp);
+  dbtree->SetBranchAddress("chargeMap", &chargeMapPtr);
+  dbtree->SetBranchAddress("gainMap", &gainMapPtr);
+
+  // Compute running average of gains from db
+  double sum = 0;
+  int counter = 0;
+
+  // Loop over dbtree
+  const auto nEntries = dbtree->GetEntries();
+  for (int i = 0; i < nEntries; ++i) {
+    dbtree->GetEntry(i);
+    sum += gainMapPtr->getContent(sensorID.getID(), uBin, vBin);
+    counter += 1;
+  }
+  delete chargeMapPtr;
+  chargeMapPtr = 0;
+  delete gainMapPtr;
+  gainMapPtr = 0;
+
+  return sum / counter;
+}
+
 
 double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 {
   auto size = signals.size();
 
   if (size == 0) {
-    return 0;  // Undefined, really.
+    return 0.0;  // Undefined, really.
   } else {
     sort(signals.begin(), signals.end());
     if (size % 2 == 0) {
@@ -272,3 +366,38 @@ double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
   }
 }
 
+double PXDGainCalibrationAlgorithm::FitLandau(vector<double>& signals)
+{
+  auto size = signals.size();
+  if (size == 0) return 0.0; // Undefined, really.
+
+  // get max and min values of signal vector
+  int max = *max_element(signals.begin(), signals.end());
+  int min = *min_element(signals.begin(), signals.end());
+
+  // create histogram to hold signals and fill it
+  TH1D* hist_signals = new TH1D("", "", max - min, min, max);
+  for (auto it = signals.begin(); it != signals.end(); ++it) {
+    hist_signals->Fill(*it);
+  }
+
+  // create fit function
+  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
+  landau->SetParNames("MPV", "sigma", "scale");
+  landau->SetParameters(100, 1, 1000);
+
+  // do fit and get results
+  Int_t status = hist_signals->Fit("landau", "Lq", "", 0, 350);
+  double MPV = landau->GetParameter("MPV");
+
+  // clean up
+  delete hist_signals;
+  delete landau;
+
+  // check fit status
+  if (status == 0) return MPV;
+  else {
+    B2WARNING("Fit failed!. using default value.");
+    return 0.0;
+  }
+}

@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef TAUDECAYMARKERMODULE_H
-#define TAUDECAYMARKERMODULE_H
+#pragma once
 
 #include <TMath.h>
 #include <string>
@@ -28,9 +26,11 @@
 
 namespace Belle2 {
   /**
-   * Module to identify and label generated tau decays channels, using MCParticle information.
+   * Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel
+   * is numbered following the order in the default KKMC decay table. Using this module,
+   * the channel number will be stored in the variables `tauPlusMcMode`, and `tauMinusMcMode`.
+   * Further details and usage can be found at https://confluence.desy.de/display/BI/Tau+Physics+Analysis+Tools.
    *
-   *    *
    */
   class TauDecayMarkerModule : public Module {
 
@@ -42,10 +42,10 @@ namespace Belle2 {
     TauDecayMarkerModule();
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   private:
 
@@ -76,5 +76,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif // TAUDECAYMARKERMODULE_H

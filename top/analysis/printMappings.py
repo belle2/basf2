@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 import sys
 
 # ---------------------------------------------------------------------------
@@ -11,7 +12,7 @@ import sys
 # Usage:  basf2 top/analysis/printMappings.py
 #
 # The filename of the main xml file can be specified as an optional argument
-#   example: basf2 top/analysis/printMappings.py testbeam/top/LEPS2013-6/TOP.xml
+#   example: basf2 top/analysis/printMappings.py top/TOPSpareModule.xml
 #            (hint: omit 'data' from the path)
 # ---------------------------------------------------------------------------
 
@@ -26,7 +27,7 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
@@ -39,6 +40,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

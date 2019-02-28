@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc Yu Hu           *
+ * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc, Yu Hu           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,6 +26,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 // utilities
+#include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
@@ -72,7 +73,6 @@ namespace Belle2 {
   {
 
     //m_beamParams.required("", DataStore::c_Persistent);
-
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
@@ -126,12 +126,11 @@ namespace Belle2 {
                                        || m_withConstraint == "mother" || m_withConstraint == "iptubecut"))
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
-
     std::vector<unsigned int> toRemove;
     unsigned int n = plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
       Particle* particle = plist->getParticle(i);
-
+      m_hasCovMatrix = false;
       if (m_updateDaughters == true) {
         if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
         else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
@@ -142,7 +141,15 @@ namespace Belle2 {
         m_beamSpotCov = particle->getVertexErrorMatrix();
       }
 
-
+      TMatrixFSym mother_errMatrix(7);
+      mother_errMatrix = particle->getMomentumVertexErrorMatrix();
+      for (int k = 0; k < 7; k++) {
+        for (int j = 0; j < 7; j++) {
+          if (mother_errMatrix[k][j] > 0) {
+            m_hasCovMatrix = true;
+          }
+        }
+      }
       bool ok = doVertexFit(particle);
       if (!ok) particle->setPValue(-1);
       if (m_confidenceLevel == 0. && particle->getPValue() == 0.) {
@@ -232,7 +239,7 @@ namespace Belle2 {
     if (m_vertexFitter == "rave") {
       try {
         ok = doRaveFit(mother);
-      } catch (rave::CheckedFloatException) {
+      } catch (const rave::CheckedFloatException&) {
         B2ERROR("Invalid inputs (nan/inf)?");
         ok = false;
       }
@@ -263,10 +270,15 @@ namespace Belle2 {
         return false; // error matrix not valid
       }
       bool isPi0 = false;
-      if (child->getPDGCode() == 111 && child->getNDaughters() == 2)
-        if (child->getDaughter(0)->getPDGCode() == 22 && child->getDaughter(1)->getPDGCode() == 22)
-          isPi0 = true;
 
+      if (m_hasCovMatrix == false) {
+        if (child->getPDGCode() == Const::pi0.getPDGCode() && child->getNDaughters() == 2) {
+          if (child->getDaughter(0)->getPDGCode() == Const::photon.getPDGCode()
+              && child->getDaughter(1)->getPDGCode() == Const::photon.getPDGCode()) {
+            isPi0 = true;
+          }
+        }
+      }
       if (!isPi0)
         fitChildren.push_back(ichild);
       else
@@ -307,8 +319,8 @@ namespace Belle2 {
     analysis::MassFitKFit km;
     km.setMagneticField(m_Bfield);
 
-    addParticleToKfitter(km, &g1Temp);
-    addParticleToKfitter(km, &g2Temp);
+    km.addParticle(&g1Temp);
+    km.addParticle(&g2Temp);
 
     km.setVertex(kv.getVertex());
     km.setVertexError(kv.getVertexError());
@@ -353,7 +365,7 @@ namespace Belle2 {
     kv.setMagneticField(m_Bfield);
 
     for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-      addParticleToKfitter(kv, mother->getDaughter(fitChildren[iChild]));
+      kv.addParticle(mother->getDaughter(fitChildren[iChild]));
 
     if (ipProfileConstraint)
       addIPProfileToKFitter(kv);
@@ -390,9 +402,9 @@ namespace Belle2 {
             isPi0 = true;
 
         if (!isPi0)
-          addParticleToKfitter(kv2, child);
+          kv2.addParticle(child);
         else
-          addParticleToKfitter(kv2, &pi0Temp);
+          kv2.addParticle(&pi0Temp);
       }
 
       if (ipProfileConstraint)
@@ -415,7 +427,6 @@ namespace Belle2 {
 
     std::vector<unsigned> fitChildren;
     std::vector<unsigned> pi0Children;
-
     bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
 
     if (!validChildren)
@@ -437,7 +448,7 @@ namespace Belle2 {
       kmv.setMagneticField(m_Bfield);
 
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        addParticleToKfitter(kmv, mother->getDaughter(fitChildren[iChild]));
+        kmv.addParticle(mother->getDaughter(fitChildren[iChild]));
 
       kmv.setInvariantMass(mother->getPDGMass());
       int err = kmv.doFit();
@@ -455,7 +466,7 @@ namespace Belle2 {
       kv.setMagneticField(m_Bfield);
 
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        addParticleToKfitter(kv, mother->getDaughter(fitChildren[iChild]));
+        kv.addParticle(mother->getDaughter(fitChildren[iChild]));
 
       // Perform vertex fit using only the particles with valid error matrices
       int err = kv.doFit();
@@ -480,9 +491,9 @@ namespace Belle2 {
             isPi0 = true;
 
         if (!isPi0)
-          addParticleToKfitter(kmv2, child);
+          kmv2.addParticle(child);
         else
-          addParticleToKfitter(kmv2, &pi0Temp);
+          kmv2.addParticle(&pi0Temp);
       }
 
       kmv2.setInvariantMass(mother->getPDGMass());
@@ -510,7 +521,7 @@ namespace Belle2 {
 
       if (child->getPValue() < 0) return false; // error matrix not valid
 
-      addParticleToKfitter(km, child);
+      km.addParticle(child);
     }
 
     // apply mass constraint
@@ -541,7 +552,7 @@ namespace Belle2 {
       } else {
         if (child->getPValue() < 0) return false; // error matrix not valid
 
-        addParticleToKfitter(kf, child);
+        kf.addParticle(child);
       }
     }
 
@@ -561,54 +572,10 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
                                                      Particle* mother)
   {
-
-    analysis::MakeMotherKFit kmm;
-    kmm.setMagneticField(m_Bfield);
-
-    unsigned n = kv.getTrackCount();
-    for (unsigned i = 0; i < n; ++i) {
-      kmm.addTrack(kv.getTrackMomentum(i),
-                   kv.getTrackPosition(i),
-                   kv.getTrackError(i),
-                   kv.getTrack(i).getCharge());
-
-      kmm.setTrackVertexError(kv.getTrackVertexError(i));
-
-      for (unsigned j = i + 1; j < n; ++j) {
-        kmm.setCorrelation(kv.getCorrelation(i, j));
-      }
-    }
-
-    kmm.setVertex(kv.getVertex());
-    kmm.setVertexError(kv.getVertexError());
-
-    int err = kmm.doMake();
-    if (err != 0) return false;
-
-    TLorentzVector mom(kmm.getMotherMomentum().px(),
-                       kmm.getMotherMomentum().py(),
-                       kmm.getMotherMomentum().pz(),
-                       kmm.getMotherMomentum().e());
-
-    TVector3 pos(kmm.getMotherPosition().x(),
-                 kmm.getMotherPosition().y(),
-                 kmm.getMotherPosition().z());
-
-    CLHEP::HepSymMatrix covMatrix = kmm.getMotherError();
-
-    TMatrixFSym errMatrix(7);
-    for (int i = 0; i < 7; i++) {
-      for (int j = 0; j < 7; j++) {
-        errMatrix[i][j] = covMatrix[i][j];
-      }
-    }
-
-    double chi2 = kv.getCHIsq();
-    int ndf = kv.getNDF();
-    double prob = TMath::Prob(chi2, ndf);
-
-    mother->updateMomentum(mom, pos, errMatrix, prob);
-
+    enum analysis::KFitError::ECode fitError;
+    fitError = kv.updateMother(mother);
+    if (fitError != analysis::KFitError::kNoError)
+      return false;
     if (m_decayString.empty() && m_updateDaughters == true) {
       // update daughter momenta as well
       // the order of daughters in the *fitter is the same as in the mother Particle
@@ -620,27 +587,12 @@ namespace Belle2 {
         return false;
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
-        TLorentzVector childMom(kv.getTrackMomentum(iChild).px(),
-                                kv.getTrackMomentum(iChild).py(),
-                                kv.getTrackMomentum(iChild).pz(),
-                                kv.getTrackMomentum(iChild).e());
-
-        TVector3 childPos(kv.getTrackPosition(iChild).x(),
-                          kv.getTrackPosition(iChild).y(),
-                          kv.getTrackPosition(iChild).z());
-
-        CLHEP::HepSymMatrix childCovMatrix = kv.getTrackError(iChild);
-
-        TMatrixFSym childErrMatrix(7);
-        for (int i = 0; i < 7; i++) {
-          for (int j = 0; j < 7; j++) {
-            childErrMatrix[i][j] = childCovMatrix[i][j];
-          }
-        }
-
-        daughters[iChild]->set4Vector(childMom);
-        daughters[iChild]->setVertex(childPos);
-        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+        daughters[iChild]->set4Vector(
+          CLHEPToROOT::getTLorentzVector(kv.getTrackMomentum(iChild)));
+        daughters[iChild]->setVertex(
+          CLHEPToROOT::getTVector3(kv.getTrackPosition(iChild)));
+        daughters[iChild]->setMomentumVertexErrorMatrix(
+          CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
       }
     }
 
@@ -652,54 +604,10 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::makeKMassVertexMother(analysis::MassVertexFitKFit& kmv,
                                                          Particle* mother)
   {
-
-    analysis::MakeMotherKFit kmm;
-    kmm.setMagneticField(m_Bfield);
-
-    unsigned n = kmv.getTrackCount();
-    for (unsigned i = 0; i < n; ++i) {
-      kmm.addTrack(kmv.getTrackMomentum(i),
-                   kmv.getTrackPosition(i),
-                   kmv.getTrackError(i),
-                   kmv.getTrack(i).getCharge());
-
-      kmm.setTrackVertexError(kmv.getTrackVertexError(i));
-
-      for (unsigned j = i + 1; j < n; ++j) {
-        kmm.setCorrelation(kmv.getCorrelation(i, j));
-      }
-    }
-
-    kmm.setVertex(kmv.getVertex());
-    kmm.setVertexError(kmv.getVertexError());
-
-    int err = kmm.doMake();
-    if (err != 0) return false;
-
-    TLorentzVector mom(kmm.getMotherMomentum().px(),
-                       kmm.getMotherMomentum().py(),
-                       kmm.getMotherMomentum().pz(),
-                       kmm.getMotherMomentum().e());
-
-    TVector3 pos(kmm.getMotherPosition().x(),
-                 kmm.getMotherPosition().y(),
-                 kmm.getMotherPosition().z());
-
-    CLHEP::HepSymMatrix covMatrix = kmm.getMotherError();
-
-    TMatrixFSym errMatrix(7);
-    for (int i = 0; i < 7; i++) {
-      for (int j = 0; j < 7; j++) {
-        errMatrix[i][j] = covMatrix[i][j];
-      }
-    }
-
-    double chi2 = kmv.getCHIsq();
-    int ndf = kmv.getNDF();
-    double prob = TMath::Prob(chi2, ndf);
-
-    mother->updateMomentum(mom, pos, errMatrix, prob);
-
+    enum analysis::KFitError::ECode fitError;
+    fitError = kmv.updateMother(mother);
+    if (fitError != analysis::KFitError::kNoError)
+      return false;
     if (m_decayString.empty() && m_updateDaughters == true) {
       // update daughter moenta as well
       // the order of daughters in the *fitter is the same as in the mother Particle
@@ -711,27 +619,12 @@ namespace Belle2 {
         return false;
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
-        TLorentzVector childMom(kmv.getTrackMomentum(iChild).px(),
-                                kmv.getTrackMomentum(iChild).py(),
-                                kmv.getTrackMomentum(iChild).pz(),
-                                kmv.getTrackMomentum(iChild).e());
-
-        TVector3 childPos(kmv.getTrackPosition(iChild).x(),
-                          kmv.getTrackPosition(iChild).y(),
-                          kmv.getTrackPosition(iChild).z());
-
-        CLHEP::HepSymMatrix childCovMatrix = kmv.getTrackError(iChild);
-
-        TMatrixFSym childErrMatrix(7);
-        for (int i = 0; i < 7; i++) {
-          for (int j = 0; j < 7; j++) {
-            childErrMatrix[i][j] = childCovMatrix[i][j];
-          }
-        }
-
-        daughters[iChild]->set4Vector(childMom);
-        daughters[iChild]->setVertex(childPos);
-        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+        daughters[iChild]->set4Vector(
+          CLHEPToROOT::getTLorentzVector(kmv.getTrackMomentum(iChild)));
+        daughters[iChild]->setVertex(
+          CLHEPToROOT::getTVector3(kmv.getTrackPosition(iChild)));
+        daughters[iChild]->setMomentumVertexErrorMatrix(
+          CLHEPToROOT::getTMatrixFSym(kmv.getTrackError(iChild)));
       }
     }
 
@@ -742,55 +635,10 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::makeKMassMother(analysis::MassFitKFit& km,
                                                    Particle* mother)
   {
-
-    analysis::MakeMotherKFit kmm;
-    kmm.setMagneticField(m_Bfield);
-
-    unsigned n = km.getTrackCount();
-    for (unsigned i = 0; i < n; ++i) {
-      kmm.addTrack(km.getTrackMomentum(i),
-                   km.getTrackPosition(i),
-                   km.getTrackError(i),
-                   km.getTrack(i).getCharge());
-
-      if (km.getFlagFitWithVertex()) kmm.setTrackVertexError(km.getTrackVertexError(i));
-
-      for (unsigned j = i + 1; j < n; ++j) {
-        kmm.setCorrelation(km.getCorrelation(i, j));
-      }
-    }
-
-    kmm.setVertex(km.getVertex());
-    if (km.getFlagFitWithVertex())
-      kmm.setVertexError(km.getVertexError());
-
-    int err = kmm.doMake();
-    if (err != 0) return false;
-
-    TLorentzVector mom(kmm.getMotherMomentum().px(),
-                       kmm.getMotherMomentum().py(),
-                       kmm.getMotherMomentum().pz(),
-                       kmm.getMotherMomentum().e());
-
-    TVector3 pos(kmm.getMotherPosition().x(),
-                 kmm.getMotherPosition().y(),
-                 kmm.getMotherPosition().z());
-
-    CLHEP::HepSymMatrix covMatrix = kmm.getMotherError();
-
-    TMatrixFSym errMatrix(7);
-    for (int i = 0; i < 7; i++) {
-      for (int j = 0; j < 7; j++) {
-        errMatrix[i][j] = covMatrix[i][j];
-      }
-    }
-
-    double chi2 = km.getCHIsq();
-    int ndf = km.getNDF();
-    double prob = TMath::Prob(chi2, ndf);
-
-    mother->updateMomentum(mom, pos, errMatrix, prob);
-
+    enum analysis::KFitError::ECode fitError;
+    fitError = km.updateMother(mother);
+    if (fitError != analysis::KFitError::kNoError)
+      return false;
     if (m_decayString.empty() && m_updateDaughters == true) {
       // update daughter moenta as well
       // the order of daughters in the *fitter is the same as in the mother Particle
@@ -802,27 +650,12 @@ namespace Belle2 {
         return false;
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
-        TLorentzVector childMom(km.getTrackMomentum(iChild).px(),
-                                km.getTrackMomentum(iChild).py(),
-                                km.getTrackMomentum(iChild).pz(),
-                                km.getTrackMomentum(iChild).e());
-
-        TVector3 childPos(km.getTrackPosition(iChild).x(),
-                          km.getTrackPosition(iChild).y(),
-                          km.getTrackPosition(iChild).z());
-
-        CLHEP::HepSymMatrix childCovMatrix = km.getTrackError(iChild);
-
-        TMatrixFSym childErrMatrix(7);
-        for (int i = 0; i < 7; i++) {
-          for (int j = 0; j < 7; j++) {
-            childErrMatrix[i][j] = childCovMatrix[i][j];
-          }
-        }
-
-        daughters[iChild]->set4Vector(childMom);
-        daughters[iChild]->setVertex(childPos);
-        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+        daughters[iChild]->set4Vector(
+          CLHEPToROOT::getTLorentzVector(km.getTrackMomentum(iChild)));
+        daughters[iChild]->setVertex(
+          CLHEPToROOT::getTVector3(km.getTrackPosition(iChild)));
+        daughters[iChild]->setMomentumVertexErrorMatrix(
+          CLHEPToROOT::getTMatrixFSym(km.getTrackError(iChild)));
       }
     }
 
@@ -833,57 +666,12 @@ namespace Belle2 {
 
   bool ParticleVertexFitterModule::makeKFourCMother(analysis::FourCFitKFit& kf, Particle* mother)
   {
-
-    analysis::MakeMotherKFit kmm;
-    kmm.setMagneticField(m_Bfield);
-
-    unsigned n = kf.getTrackCount();
-    for (unsigned i = 0; i < n; ++i) {
-      kmm.addTrack(kf.getTrackMomentum(i),
-                   kf.getTrackPosition(i),
-                   kf.getTrackError(i),
-                   kf.getTrack(i).getCharge());
-
-      if (kf.getFlagFitWithVertex()) kmm.setTrackVertexError(kf.getTrackVertexError(i));
-
-      for (unsigned j = i + 1; j < n; ++j) {
-        kmm.setCorrelation(kf.getCorrelation(i, j));
-      }
-    }
-
-    kmm.setVertex(kf.getVertex());
-    if (kf.getFlagFitWithVertex())
-      kmm.setVertexError(kf.getVertexError());
-
-    int err = kmm.doMake();
-    if (err != 0) return false;
-
-    TLorentzVector mom(kmm.getMotherMomentum().px(),
-                       kmm.getMotherMomentum().py(),
-                       kmm.getMotherMomentum().pz(),
-                       kmm.getMotherMomentum().e());
-
-    TVector3 pos(kmm.getMotherPosition().x(),
-                 kmm.getMotherPosition().y(),
-                 kmm.getMotherPosition().z());
-
-    CLHEP::HepSymMatrix covMatrix = kmm.getMotherError();
-
-    TMatrixFSym errMatrix(7);
-    for (int i = 0; i < 7; i++) {
-      for (int j = 0; j < 7; j++) {
-        errMatrix[i][j] = covMatrix[i][j];
-      }
-    }
-
-    double chi2 = kf.getCHIsq();
-    int ndf = kf.getNDF();
-    double prob = TMath::Prob(chi2, ndf);
-    mother->addExtraInfo("FourCFitProb", prob);
-    mother->addExtraInfo("FourCFitChi2", chi2);
-
-    mother->updateMomentum(mom, pos, errMatrix, prob);
-
+    enum analysis::KFitError::ECode fitError;
+    fitError = kf.updateMother(mother);
+    if (fitError != analysis::KFitError::kNoError)
+      return false;
+    mother->addExtraInfo("FourCFitProb", kf.getCHIsq());
+    mother->addExtraInfo("FourCFitChi2", kf.getNDF());
     if (m_decayString.empty() && m_updateDaughters == true) {
       // update daughter moenta as well
       // the order of daughters in the *fitter is the same as in the mother Particle
@@ -918,25 +706,14 @@ namespace Belle2 {
         TVector3 childPoss;
         TMatrixFSym childErrMatrixs(7);
         for (unsigned iChild = 0; iChild < pars[iDaug].size(); iChild++) {
-          TLorentzVector childMom(kf.getTrackMomentum(pars[iDaug][iChild]).px(),
-                                  kf.getTrackMomentum(pars[iDaug][iChild]).py(),
-                                  kf.getTrackMomentum(pars[iDaug][iChild]).pz(),
-                                  kf.getTrackMomentum(pars[iDaug][iChild]).e());
-          childMoms = childMoms + childMom;
-
-          TVector3 childPos(kf.getTrackPosition(pars[iDaug][iChild]).x(),
-                            kf.getTrackPosition(pars[iDaug][iChild]).y(),
-                            kf.getTrackPosition(pars[iDaug][iChild]).z());
-          childPoss = childPoss + childPos;
-
-          CLHEP::HepSymMatrix childCovMatrix = kf.getTrackError(pars[iDaug][iChild]);
-
-          TMatrixFSym childErrMatrix(7);
-          for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
-              childErrMatrix[i][j] = childCovMatrix[i][j];
-            }
-          }
+          childMoms = childMoms +
+                      CLHEPToROOT::getTLorentzVector(
+                        kf.getTrackMomentum(pars[iDaug][iChild]));
+          childPoss = childPoss +
+                      CLHEPToROOT::getTVector3(
+                        kf.getTrackPosition(pars[iDaug][iChild]));
+          TMatrixFSym childErrMatrix =
+            CLHEPToROOT::getTMatrixFSym(kf.getTrackError(pars[iDaug][iChild]));
           childErrMatrixs = childErrMatrixs + childErrMatrix;
         }
         allparticles[iDaug]->set4Vector(childMoms);
@@ -1158,42 +935,6 @@ namespace Belle2 {
 
   }
 
-  void ParticleVertexFitterModule::addParticleToKfitter(analysis::VertexFitKFit& kv, const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
-    HepPoint3D              pos = getCLHEPPoint3D(particle);
-    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
-
-    kv.addTrack(mom, pos, err, particle->getCharge());
-  }
-
-  void ParticleVertexFitterModule::addParticleToKfitter(analysis::MassVertexFitKFit& kmv, const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
-    HepPoint3D              pos = getCLHEPPoint3D(particle);
-    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
-
-    kmv.addTrack(mom, pos, err, particle->getCharge());
-  }
-
-  void ParticleVertexFitterModule::addParticleToKfitter(analysis::MassFitKFit& km, const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
-    HepPoint3D              pos = getCLHEPPoint3D(particle);
-    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
-
-    km.addTrack(mom, pos, err, particle->getCharge());
-  }
-
-  void ParticleVertexFitterModule::addParticleToKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
-    HepPoint3D              pos = getCLHEPPoint3D(particle);
-    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
-
-    kf.addTrack(mom, pos, err, particle->getCharge());
-  }
-
   bool ParticleVertexFitterModule::addChildofParticletoKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
   {
     for (unsigned ichild = 0; ichild < particle->getNDaughters(); ichild++) {
@@ -1202,43 +943,12 @@ namespace Belle2 {
       else {
         if (child->getPValue() < 0) return false; // error matrix not valid
 
-        addParticleToKfitter(kf, child);
+        kf.addParticle(child);
       }
     }
     return true;
   }
 
-
-  CLHEP::HepLorentzVector ParticleVertexFitterModule::getCLHEPLorentzVector(const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom(particle->getPx(),
-                                particle->getPy(),
-                                particle->getPz(),
-                                particle->getEnergy());
-
-    return mom;
-  }
-
-  HepPoint3D ParticleVertexFitterModule::getCLHEPPoint3D(const Particle* particle)
-  {
-    HepPoint3D pos(particle->getX(), particle->getY(), particle->getZ());
-
-    return pos;
-  }
-
-  CLHEP::HepSymMatrix ParticleVertexFitterModule::getCLHEPSymMatrix(const Particle* particle)
-  {
-    CLHEP::HepSymMatrix covMatrix(7);
-    TMatrixFSym errMatrix = particle->getMomentumVertexErrorMatrix();
-
-    for (int i = 0; i < 7; i++) {
-      for (int j = i; j < 7; j++) {
-        covMatrix[i][j] = errMatrix[i][j];
-      }
-    }
-
-    return covMatrix;
-  }
 
   void ParticleVertexFitterModule::addIPProfileToKFitter(analysis::VertexFitKFit& kv)
   {

@@ -37,7 +37,7 @@ namespace Belle2 {
     SVDFADCMaskedStrips(): m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDFADCMaskedStrips: from now one we are using " <<
+        B2INFO("SVDFADCMaskedStrips: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
     }
 

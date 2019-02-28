@@ -122,10 +122,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
-        fitter.param('Correction_StripCalPeakTime', True)
-        fitter.param('Correction_TBTimeWindow', True)
-        fitter.param('Correction_ShiftMeanToZero', True)
-        fitter.param('Correction_ShiftMeanToZeroTBDep', False)
         fitter.param('RecoDigits', recoDigitsName)
         path.add_module(fitter)
 
@@ -134,6 +130,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         clusterizer.set_name(clusterizerName)
         clusterizer.param('RecoDigits', recoDigitsName)
         clusterizer.param('Clusters', clusterName)
+        clusterizer.param('useDB', True)
         path.add_module(clusterizer)
 
     # Add SVDSpacePointCreator
@@ -177,11 +174,9 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             path.add_module(clusterizer)
 
 
-def add_svd_simulation(path, createDigits=False):
+def add_svd_simulation(path):
 
     digitizer = register_module('SVDDigitizer')
-    if createDigits:
-        digitizer.param('GenerateDigits', True)
     path.add_module(digitizer)
 
 
@@ -213,7 +208,6 @@ def add_svd_SPcreation(path, isROIsimulation=False):
     if svdSPCreatorName not in [e.name() for e in path.modules()]:
         spCreatorSVD = register_module('SVDSpacePointCreator')
         spCreatorSVD.set_name(svdSPCreatorName)
-        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)

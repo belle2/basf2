@@ -98,7 +98,7 @@ namespace {
    * after process() is complete (RAII) */
   struct NumberEventsOverrideGuard {
     /** Remember the old value */
-    NumberEventsOverrideGuard(unsigned int newValue)
+    explicit NumberEventsOverrideGuard(unsigned int newValue)
     {
       m_maxEvent = Environment::Instance().getNumberEventsOverride();
       Environment::Instance().setNumberEventsOverride(newValue);
@@ -113,13 +113,19 @@ namespace {
   };
 }
 
-void EventProcessor::process(PathPtr startPath, long maxEvent)
+long EventProcessor::getMaximumEventNumber(long maxEvent) const
 {
   //Check whether the number of events was set via command line argument
   unsigned int numEventsArgument = Environment::Instance().getNumberEventsOverride();
   if ((numEventsArgument > 0) && ((maxEvent == 0) || (maxEvent > numEventsArgument))) {
-    maxEvent = numEventsArgument;
+    return numEventsArgument;
   }
+  return maxEvent;
+}
+
+void EventProcessor::process(PathPtr startPath, long maxEvent)
+{
+  maxEvent = getMaximumEventNumber(maxEvent);
   // Make sure the NumberEventsOverride reflects the actual number if
   // process(path, N) was used instead of -n and that it's reset to what it was
   // after we're done with processing()

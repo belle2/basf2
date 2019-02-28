@@ -74,14 +74,14 @@ void DeSerializerFILEModule::initialize()
   memset(time_array5, 0, sizeof(time_array5));
 
   // Initialize Array of RawCOPPER
-  StoreArray<RawDataBlock>::registerPersistent();
-  StoreArray<RawCOPPER>::registerPersistent();
-  StoreArray<RawSVD>::registerPersistent();
-  StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawTOP>::registerPersistent();
-  StoreArray<RawARICH>::registerPersistent();
-  StoreArray<RawECL>::registerPersistent();
-  StoreArray<RawKLM>::registerPersistent();
+  m_rawDataBlock.registerInDataStore();
+  m_rawCOPPER.registerInDataStore();
+  m_rawSVD.registerInDataStore();
+  m_rawCDC.registerInDataStore();
+  m_rawTOP.registerInDataStore();
+  m_rawARICH.registerInDataStore();
+  m_rawECL.registerInDataStore();
+  m_rawKLM.registerInDataStore();
 
   m_start_flag = 0;
 

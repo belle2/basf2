@@ -121,11 +121,6 @@ namespace Belle2 {
         if (!valid)
           B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString: " << decayString);
 
-        int nProducts = m_decaydescriptor.getNDaughters();
-        if (nProducts > 0)
-          B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
-                  << ". DecayString should not contain any daughters, only the mother particle.");
-
         // Mother particle
         const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
 
@@ -134,6 +129,28 @@ namespace Belle2 {
 
         if (not isValidPDGCode(pdgCode) and m_useMCParticles == false)
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
+
+        // if we're not loading MCParticles and we are loading K0S, Lambdas, or photons --> ee then this decaystring is a V0
+        bool mdstSourceIsV0 = false;
+        if (!m_useMCParticles &&
+            (abs(pdgCode) == abs(Const::Kshort.getPDGCode()) || abs(pdgCode) == abs(Const::Lambda.getPDGCode())
+             || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
+          mdstSourceIsV0 = true;
+
+        int nProducts = m_decaydescriptor.getNDaughters();
+        if (mdstSourceIsV0 == false) {
+          if (nProducts > 0)
+            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                    << ". DecayString should not contain any daughters, only the mother particle.");
+        } else {
+          if (nProducts != 2)
+            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                    << ". MDST source of the particle list is V0, DecayString should contain exactly two daughters, as well as the mother particle.");
+          else {
+            if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() * m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
+              B2ERROR("MDST source of the particle list is V0, the two daughters should have opposite charge");
+          }
+        }
 
         string antiListName = ParticleListName::antiParticleListName(listName);
         bool isSelfConjugatedParticle = (listName == antiListName);
@@ -173,13 +190,13 @@ namespace Belle2 {
               B2INFO("   -> MDST source: ECLClusters");
               m_ECLClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
             } else {
-              B2INFO("   -> MDST source: V0 (-> TFR(e) + TFR(e))");
+              B2INFO("   -> MDST source: V0");
               m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
             }
           }
 
           if (abs(pdgCode) == abs(Const::Kshort.getPDGCode())) {
-            B2INFO("   -> MDST source: V0 (-> TFR(pi) + TFR(pi))");
+            B2INFO("   -> MDST source: V0");
             m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
           }
 
@@ -189,7 +206,7 @@ namespace Belle2 {
           }
 
           if (abs(pdgCode) == abs(Const::Lambda.getPDGCode())) {
-            B2INFO("   -> MDST source: V0 (-> TFR(p) + TFR(pi))");
+            B2INFO("   -> MDST source: V0");
             m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
           }
         }
@@ -260,6 +277,12 @@ namespace Belle2 {
     StoreArray<V0> V0s;
     StoreArray<Particle> particles;
 
+    // check if the order of the daughters in the decay string (decided by the user) is the same of the v0 daughers order (fixed)
+    bool matchingDaughtersOrder = true;
+    if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() < 0
+        && m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
+      matchingDaughtersOrder = false;
+
     // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
     for (int i = 0; i < V0s.getEntries(); i++) {
       const V0* v0 = V0s[i];
@@ -290,6 +313,14 @@ namespace Belle2 {
           B2WARNING("Unknown V0 hypothesis!");
         }
 
+        // check if, given the initial user's decay descriptor, the current v0 is a particle or an anti-particle.
+        // in the V0 the order of the daughters is fixed, first the positive and then the negative; to be coherent with the decay desctiptor, when creating
+        // one particle list and one anti-particle, the v0 daughters' order has to be switched only in one case
+        bool correctOrder = matchingDaughtersOrder;
+        if (abs(v0Type.getPDGCode()) == abs(m_decaydescriptor.getMother()->getPDGCode())
+            && v0Type.getPDGCode() != m_decaydescriptor.getMother()->getPDGCode())
+          correctOrder = !correctOrder;
+
         std::pair<Track*, Track*> v0Tracks = v0->getTracks();
         std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
 
@@ -303,13 +334,22 @@ namespace Belle2 {
         const MCParticle* mcParticleM = (v0Tracks.second)->getRelated<MCParticle>();
 
         // add V0 daughters to the Particle StoreArray
-        Particle* newDaugP = particles.appendNew(daugP);
+        Particle* newDaugP;
+        Particle* newDaugM;
+
+        if (correctOrder) {
+          newDaugP = particles.appendNew(daugP);
+          newDaugM = particles.appendNew(daugM);
+        } else {
+          newDaugM = particles.appendNew(daugM);
+          newDaugP = particles.appendNew(daugP);
+        }
+
         if (pidP)
           newDaugP->addRelationTo(pidP);
         if (mcParticleP)
           newDaugP->addRelationTo(mcParticleP);
 
-        Particle* newDaugM = particles.appendNew(daugM);
         if (pidM)
           newDaugM->addRelationTo(pidM);
         if (mcParticleM)
@@ -318,8 +358,13 @@ namespace Belle2 {
         TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
 
         Particle v0P(v0Momentum, v0Type.getPDGCode());
-        v0P.appendDaughter(newDaugP);
-        v0P.appendDaughter(newDaugM);
+        if (correctOrder) {
+          v0P.appendDaughter(newDaugP);
+          v0P.appendDaughter(newDaugM);
+        } else {
+          v0P.appendDaughter(newDaugM);
+          v0P.appendDaughter(newDaugP);
+        }
 
         Particle* newPart = particles.appendNew(v0P);
 
@@ -454,8 +499,8 @@ namespace Belle2 {
       if (!cluster->isNeutral())
         continue;
 
-      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
-        continue;
+      // skip all ECLClusters that do not have the c_nPhotons hypothesis flag
+      if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles

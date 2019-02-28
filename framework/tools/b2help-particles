@@ -12,8 +12,8 @@ import argparse
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 import pdg
-import pager
-from basf2 import pretty_print_table
+from terminal_utils import Pager
+from basf2.utils import pretty_print_table
 
 
 def _align_dots(data, index, ensure_dot=False):
@@ -114,5 +114,5 @@ if __name__ == "__main__":
     outputlist.insert(0, ["PDG", "Name", "Mass", "Width", "Lifetime", "Charge", "Spin"])
 
     # Print list
-    with pager.Pager(prompt="Particle List", quit_if_one_screen=True):
+    with Pager(prompt="Particle List", quit_if_one_screen=True):
         pretty_print_table(outputlist, [0]*len(outputlist[0]))

@@ -1,7 +1,8 @@
 /*
 <header>
-  <input>../3470023000.dst.root</input>
-  <output>../3470023000.ntup.root</output>
+  <input>../3470023000.ntup.root</input>
+  <output>3470023000_Validation.root</output>
+  <contact>Maeda Yosuke (maeday@hepl.phys.nagoya-u.ac.jp)</contact>
 </header>
 */
 

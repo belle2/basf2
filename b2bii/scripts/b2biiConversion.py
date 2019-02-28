@@ -62,7 +62,12 @@ def setupB2BIIDatabase(isMC=False):
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
-                                  useBelleDBServer=None, path=analysis_main, entrySequences=None):
+                                  useBelleDBServer=None,
+                                  generatorLevelReconstruction=False,
+                                  generatorLevelMCMatching=False,
+                                  path=analysis_main, entrySequences=None,
+                                  convertECLCrystalEnergies=False,
+                                  convertExtHits=False):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -86,24 +91,31 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
     # input.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(input)
 
-    gearbox = register_module('Gearbox')
-    gearbox.param('fileName', 'b2bii/Belle.xml')
-    path.add_module(gearbox)
+    # we need magnetic field which is different than default.
+    # shamelessly copied from analysis/scripts/modularAnalysis.py:inputMdst
+    from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+    field = Belle2.MagneticField()
+    field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+    Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
 
-    path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticField'])
+    if (not generatorLevelReconstruction):
+        # Fix MSDT Module
+        fix = register_module('B2BIIFixMdst')
+        # fix.logging.set_log_level(LogLevel.DEBUG)
+        # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        path.add_module(fix)
 
-    # Fix MSDT Module
-    fix = register_module('B2BIIFixMdst')
-    # fix.logging.set_log_level(LogLevel.DEBUG)
-    # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-    path.add_module(fix)
-
-    if(applyHadronBJSkim):
-        emptypath = create_path()
-        fix.if_value('<=0', emptypath)  # discard 'bad events' marked by fixmdst
+        if(applyHadronBJSkim):
+            emptypath = create_path()
+            # discard 'bad events' marked by fixmdst
+            fix.if_value('<=0', emptypath)
 
     # Convert MDST Module
     convert = register_module('B2BIIConvertMdst')
+    if (generatorLevelMCMatching):
+        convert.param('mcMatchingMode', 'GeneratorLevel')
+    convert.param("convertECLCrystalEnergies", convertECLCrystalEnergies)
+    convert.param("convertExtHits", convertExtHits)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

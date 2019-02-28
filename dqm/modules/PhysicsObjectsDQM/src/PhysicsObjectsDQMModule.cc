@@ -7,11 +7,12 @@
 //-
 
 #include <dqm/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
-#include <analysis/VariableManager/ContinuumSuppressionVariables.h>
+#include <analysis/variables/ContinuumSuppressionVariables.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TLorentzVector.h>
 #include <TDirectory.h>
 #include <iostream>
+#include <map>
 
 using namespace Belle2;
 
@@ -32,7 +33,7 @@ PhysicsObjectsDQMModule::PhysicsObjectsDQMModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("TriggerIdentifier", m_triggerIdentifier,
-           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&hlt&accept_hadron"));
+           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_hadron"));
   addParam("PI0PListName", m_pi0PListName, "Name of the pi0 particle list", std::string("pi0:physDQM"));
   addParam("KS0PListName", m_ks0PListName, "Name of the KS0 particle list", std::string("K_S0:physDQM"));
 }
@@ -86,7 +87,14 @@ void PhysicsObjectsDQMModule::event()
 {
   StoreObjPtr<SoftwareTriggerResult> result;
   if (!result.isValid()) {
-    B2FATAL("SoftwareTriggerResult object not available but needed to select events for the histograms.");
+    B2ERROR("SoftwareTriggerResult object not available but needed to select events for the histograms.");
+    return;
+  }
+
+  const std::map<std::string, int>& results = result->getResults();
+  if (results.find(m_triggerIdentifier) == results.end()) {
+    B2ERROR("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifier);
+    return;
   }
 
   const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);

@@ -13,10 +13,14 @@
   using std::endl ;
 
   TCanvas* c3 ;
+  TPad *pad1;
+  TPad *pad2;
 
-  Int_t drawset(char* hbasename, char* xtitle, char* ytitle,
-               char* plottitle,
+  Int_t drawset(const char* hbasename, const char* xtitle, const char* ytitle,
+               const char* plottitle,
                Bool_t savePlots=kFALSE, Bool_t interactive=kTRUE) ;
+
+  void getBinContentDifference(TH1F* hfirst, TH1F* hsecond, TH1F* hdiff);
 
 //===============================================================================
 
@@ -34,8 +38,9 @@
           c3 = new TCanvas("c3","c3",750,600) ;
        }
 
-       TPad *pad1 = new TPad("pad1", "pad1", 0.01, 0.21, 0.99, 0.99) ;
-       TPad *pad2 = new TPad("pad2", "pad2", 0.01, 0.01, 0.99, 0.20) ;
+       pad1 = new TPad("pad1", "pad1", 0.01, 0.21, 0.99, 0.99) ;
+       pad2 = new TPad("pad2", "pad2", 0.01, 0.01, 0.99, 0.20) ;
+
        pad1->Draw() ;
        pad2->Draw() ;
 
@@ -123,8 +128,8 @@
   }
 //===============================================================================
 
-  Int_t drawset(char* hbasename, char* xtitle, char* ytitle,
-               char* plottitle, Bool_t savePlots, Bool_t interactive) {
+  Int_t drawset(const char* hbasename, const char* xtitle, const char* ytitle,
+               const char* plottitle, Bool_t savePlots, Bool_t interactive) {
 
        char histname[500] ;
        char histname1[500] ;
@@ -203,7 +208,8 @@
        int nbin = hfirst->GetSize()-2;  //2: underflow + overflow
        cout << "nbins " << nbin << endl ;
 
-       for (int i=0; i<nbin; i++) {
+       int i = 0;
+       for (i=0; i<nbin; i++) {
            double nfirst = hfirst->GetBinContent(i) ;
            double nsecond = hsecond->GetBinContent(i) ;
 

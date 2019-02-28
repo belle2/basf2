@@ -21,7 +21,6 @@ set_random_seed(12345)
 # Event data
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [500])
-eventinfosetter.param('runList', [1])
 
 # Particle gun
 particlegun = register_module('ParticleGun')
@@ -38,6 +37,7 @@ particlegun.param('phiParams', [0, 360])
 paramloader = register_module('Gearbox')
 geometry = register_module('Geometry')
 geometry.param('components', ['EKLM'])
+geometry.param('useDB', False)
 g4sim = register_module('FullSim')
 
 # EKLM Modules

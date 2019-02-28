@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# use to import parmeters from xml files to corresponding database classes
+# uncomment the desired function
+# optionaly IOV of created payload can be set as
+# basf2 arich/utility/scripts/ARICHImportPrametersToDB.py -- 3 0 3 -1
+# for example for all runs of experiment 3
+# arguments: 1 experimentLow, 2 runLow, 3 experimentHigh , 4 runHigh
+#
+# Author: luka.santelj@ijs.si
+
 from basf2 import *
 import ROOT
 from ROOT.Belle2 import ARICHDatabaseImporter
@@ -10,16 +19,16 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-# set local database folder
-use_local_database("localdb/database.txt",
-                   "localdb", 0, LogLevel.INFO)
+argvs = sys.argv
+argc = len(argvs)
 
+# set local database folder
+use_local_database("localdb/database.txt", "localdb")
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
 # get rid of an error message with gearbox
 eventinfo = register_module('EventInfoSetter')
 eventinfo.initialize()
-
 
 # load gearbox for reading parameters from xml files (by default in "arich/data")
 paramloader = register_module('Gearbox')
@@ -31,6 +40,10 @@ process(main)
 
 # and run the importer
 dbImporter = ARICHDatabaseImporter()
+
+# set IOV if desired (default IOV is 0,0,-1,-1)
+if argc == 5:
+    dbImporter.SetIOV(int(argvs[1]), int(argvs[2]), int(argvs[3]), int(argvs[4]))
 
 # uncomment/comment the desired function
 
@@ -92,23 +105,12 @@ dbImporter = ARICHDatabaseImporter()
 
 # dbImporter.importCosmicTestGeometry()
 
-# below few functions print the content of described classes from the database
+# Import global alignment parameters
+# Parameters are read from arich/data/ARICH-GlobalAlignment.xml
 
-# dbImporter.printModulesInfo()
-# dbImporter.printSimulationPar()
-# dbImporter.printChannelMask()
-# dbImporter.printChannelMapping()
-# dbImporter.printFEMappings()
+# dbImporter.importGlobalAlignment()
 
+# Import mirror alignment parameters
+# Parameters are read from arich/data/ARICH-MirrorAlignment.xml
 
-# creates root file with full detector plane QE map (all HAPDs) as stored in the database
-
-# dbImporter.dumpQEMap()
-
-# creates root file with numbering of HAPD module slots (position on detector plane -> module number)
-
-# dbImporter.dumpModuleNumbering()
-
-# print geometry parameters of ARICH detector from the database
-
-# dbImporter.printGeometryConfig()
+# dbImporter.importMirrorAlignment()

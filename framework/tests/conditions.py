@@ -18,8 +18,8 @@ getting the payload information and payloads and then we run through different s
 """
 
 import sys
-from basf2 import *
-from ROOT import Belle2
+import os
+import basf2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from b2test_utils import clean_working_directory, safe_process, skip_test
@@ -70,6 +70,13 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
              example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="3")[1:],
     }
 
+    #: Map a list of known global tag names to their global tag state
+    globaltags = {
+        "localtest": "PUBLISHED",
+        "newgt": "NEW",
+        "invalidgt": "INVALID",
+    }
+
     def reply(self, xml):
         """Return a given xml string"""
         self.send_response(200)
@@ -89,6 +96,14 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         params = parse_qs(url.query)
         # return mock payload info
+        if url.path.startswith("/v2/globalTag"):
+            # gt info
+            gtname = url.path.split("/")[-1]
+            if gtname in self.globaltags:
+                return self.reply('{ "name": "%s", "globalTagStatus": { "name": "%s" } }' % (gtname, self.globaltags[gtname]))
+            else:
+                return self.send_error(404)
+
         if url.path.endswith("/iovPayloads/"):
             exp = params["expNumber"][0]
             run = params["runNumber"][0]
@@ -104,11 +119,11 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
                 baseurl = "http://%s:%s" % self.server.socket.getsockname()
                 return self.reply(self.payloads[exp] % dict(exp=exp, run=run, baseurl=baseurl))
         else:
-            # check if a fallback payload file exists in the data/framework directory
+            # check if a fallback payload file exists in the conditions_testpayloads directory
             filename = os.path.basename(url.path)
             # replace rev_3 with rev_1
             filename = filename.replace("rev_3", "rev_1")
-            basedir = Belle2.FileSystem.findFile("data/framework")
+            basedir = basf2.find_file("framework/tests/conditions_testpayloads")
             path = os.path.join(basedir, filename)
             if os.path.isfile(path):
                 # ok, file exists. let's serve it
@@ -172,29 +187,29 @@ def run_redirect(pipe, redir_port):
     httpd.serve_forever()
 
 
-def dbprocess(host, path, lastChangeCallback=lambda: None):
+def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localtest"):
     """Process a given path in a child process so that FATAL will not abort this
     script but just the child and configure to use a central database at the given host"""
     # reset the database so that there is no chain
-    reset_database()
+    basf2.reset_database()
     # now run the path in a child process inside of a clean working directory
-    with clean_working_directory() as tempdir:
-        use_central_database("localtest", host, host, "", LogLevel.WARNING)
+    with clean_working_directory():
+        basf2.use_central_database(globaltag, host, host, "", basf2.LogLevel.WARNING)
         lastChangeCallback()
         safe_process(path)
 
 
 # keep timeouts short for testing
-set_central_database_networkparams(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
+basf2.set_central_database_networkparams(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
 
 # set the random seed to something fixed
-set_random_seed("something important")
+basf2.set_random_seed("something important")
 # simplify logging output to just the type and the message
-for level in LogLevel.values.values():
-    logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
+for level in basf2.LogLevel.values.values():
+    basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 # disable error summary, we don't need it for these short tests and it basically
 # doubles the output
-logging.enable_summary(False)
+basf2.logging.enable_summary(False)
 # and create a pipe so we can send the port we listen on from child to parent
 conn = multiprocessing.Pipe(False)
 # now start the mock conditions database as daemon so it gets killed at the end
@@ -222,7 +237,7 @@ redir_host = f"http://localhost:{redir_port}/"
 
 # create a simple processing path with just event info setter an a module which
 # prints the beamparameters from the database
-main = create_path()
+main = basf2.Path()
 evtinfo = main.add_module("EventInfoSetter")
 main.add_module("PrintBeamParameters")
 
@@ -234,11 +249,18 @@ for exp in range(len(SimpleConditionsDB.payloads) + 1):
     # and again using redirection
     dbprocess(redir_host, main)
 
+# check that a invalid global tag or a misspelled global tag actually throw
+# errors
+evtinfo.param({"expList": [3], "runList": [0], "evtNumList": [1]})
+for gt in ["newgt", "invalidgt", "horriblymisspelled",
+           "h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ"]:
+    dbprocess(mock_host, main, globaltag=gt)
+
 # check 503 retry
 evtinfo.param({"expList": [503], "runList": [0], "evtNumList": [1]})
 dbprocess(mock_host, main)
 # check again with different amount of retries
-set_central_database_networkparams(max_retries=0)
+basf2.set_central_database_networkparams(max_retries=0)
 dbprocess(mock_host, main)
 
 # the following ones fail, no need for 3 times
@@ -264,7 +286,7 @@ dbprocess("", main)
 # ok, try again with the steering file settings instead of environment variable
 del os.environ["BELLE2_CONDB_SERVERLIST"]
 del serverlist[1]
-dbprocess("", main, lastChangeCallback=lambda: set_central_serverlist(serverlist))
+dbprocess("", main, lastChangeCallback=lambda: basf2.set_central_serverlist(serverlist))
 
 if "ssl" in sys.argv:
     # ok, test SSL connectivity ... for now we just want to accept anything. This

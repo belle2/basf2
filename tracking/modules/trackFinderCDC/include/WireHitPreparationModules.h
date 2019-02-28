@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun, Oliver Frost                                 *
+ * Contributors: Nils Braun, Oliver Frost, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
+#include <tracking/trackFindingCDC/findlets/minimal/HitReclaimer.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
@@ -52,6 +53,17 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TFCDC_WireHitCreatorModule();
+    };
+
+
+    class TFCDC_HitReclaimerModule : public FindletModule<HitReclaimer> {
+
+      /// Type of the base class
+      using Super = FindletModule<HitReclaimer>;
+
+    public:
+      /// Constructor
+      TFCDC_HitReclaimerModule();
     };
   }
 }

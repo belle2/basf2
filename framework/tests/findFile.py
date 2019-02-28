@@ -10,6 +10,10 @@ rl = os.path.realpath
 
 # returns empty string if not found (plus B2ERROR if not silenced)
 assert '' == Belle2.FileSystem.findFile('framework/tests/ThisFileDoesntExist')
+
+# try to find TEST data file
+assert '' == Belle2.FileSystem.findFile('findFile.py', 'test')
+
 B2INFO("No more output from here...")
 assert '' == Belle2.FileSystem.findFile('framework/tests/ThisFileDoesntExist', True)
 
@@ -44,3 +48,7 @@ assert abspath == rl(Belle2.FileSystem.findFile('findFile.py'))
 os.chdir('/')
 assert abspath == rl(Belle2.FileSystem.findFile('framework/tests/findFile.py'))
 assert abspath == rl(Belle2.FileSystem.findFile('/framework/tests/findFile.py'))
+
+# set BELLe2_TEST_DATA_DIR and try to find data file
+os.environ['BELLE2_TEST_DATA_DIR'] = os.environ.get('BELLE2_RELEASE_DIR', os.environ.get('BELLE2_LOCAL_DIR'))
+assert abspath == rl(Belle2.FileSystem.findFile('framework/tests/findFile.py', 'test'))

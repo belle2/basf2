@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 from simulation import add_simulation
 import glob
 import sys
@@ -19,12 +20,15 @@ if len(argvs) > 1:
     elif argvs[1] == 'phase3':
         phase = 3
         compression = 4
+    elif argvs[1] == 'phase31':
+        phase = 31
+        compression = 4
     else:
-        B2ERROR('The argument can be either phase2 or phase3')
+        B2ERROR('The argument can be either phase2, phase3 or phase31')
         sys.exit()
 else:
     B2ERROR('No argument given specifying the running phase')
-    B2INFO('Usage: basf2 ' + argvs[0] + ' phase2/phase3' + ' [scaleFactor=1]')
+    B2INFO('Usage: basf2 ' + argvs[0] + ' phase2/phase3/phase31' + ' [scaleFactor=1]')
     sys.exit()
 
 scaleFactor = 1.0
@@ -40,6 +44,13 @@ if len(bg) == 0:
     B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
 
+if phase == 2:
+    for fileName in bg:
+        if 'phase2' not in fileName:
+            B2ERROR('BG mixing samples given in BELLE2_BACKGROUND_MIXING_DIR are not for phase 2')
+            B2INFO('Try:\n export BELLE2_BACKGROUND_MIXING_DIR=/group/belle2/BGFile/OfficialBKG/15thCampaign/phase2/set0/')
+            sys.exit()
+
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
        str(compression))
 B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
@@ -52,17 +63,20 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param('evtNumList', [100])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
 gearbox = register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
+elif phase == 31:
+    gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
 main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 main.add_module(geometry)
 
 # Beam background mixer

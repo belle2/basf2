@@ -59,8 +59,50 @@ namespace Belle2 {
     //! Copy constructor
     ExtHit(const ExtHit&);
 
+    //! Assignment operator
+    ExtHit& operator=(const ExtHit&);
+
     //! Destructor
     virtual ~ExtHit() {}
+
+    //! Set PDG code of this extrapolation's hypothesis
+    void setPDGCode(int pdgCode) { m_PdgCode = pdgCode; }
+
+    //! Set detector ID of this extrapolation hit
+    void setDetectorID(Const::EDetector detectorID) { m_DetectorID = detectorID; }
+
+    //! Set detector-element ID of sensitive element within detector
+    void setCopyID(int copyID) { m_CopyID = copyID; }
+
+    //! Set state of extrapolation at this hit
+    void setStatus(ExtHitStatus extHitStatus) { m_Status = extHitStatus; }
+
+    //! Set time of flight from the point of closest approach near the origin to this hit
+    void setTOF(double tof) { m_TOF = tof; }
+
+    //! Set position of this extrapolation hit
+    void setPosition(const TVector3& position)
+    {
+      m_Position[0] = position.x();
+      m_Position[1] = position.y();
+      m_Position[2] = position.z();
+    }
+
+    //! Set momentum at this extrapolation hit
+    void setMomentum(const TVector3& momentum)
+    {
+      m_Momentum[0] = momentum.x();
+      m_Momentum[1] = momentum.y();
+      m_Momentum[2] = momentum.z();
+    }
+
+    //! Set phase-space covariance at this extrapolation hit
+    void setCovariance(double covArray[21])
+    {
+      for (int k = 0; k < 21; ++k) {
+        m_Covariance[k] = covArray[k];
+      }
+    }
 
     //! Get PDG code of this extrapolation's hypothesis
     //! @return PDG code of this extrapolation's hypothesis

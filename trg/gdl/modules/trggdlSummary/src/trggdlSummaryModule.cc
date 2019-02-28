@@ -21,6 +21,7 @@
 #include <string.h>
 #include <unistd.h>
 
+
 using namespace Belle2;
 using namespace GDL;
 
@@ -39,70 +40,176 @@ void TRGGDLSummaryModule::initialize()
 {
 
   GDLResult.registerInDataStore();
+  for (int i = 0; i < 320; i++) {
+    LeafBitMap[i] = m_unpacker->getLeafMap(i);
+  }
+  for (int i = 0; i < 320; i++) {
+    strcpy(LeafNames[i], m_unpacker->getLeafnames(i));
+  }
+
+  _e_timtype = 0;
+  for (int i = 0; i < 10; i++) {
+    ee_psn[i] = 0;
+    ee_ftd[i] = 0;
+    ee_itd[i] = 0;
+  }
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(LeafNames[i], "timtype") == 0)_e_timtype = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn0") == 0)   ee_psn[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn1") == 0)   ee_psn[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn2") == 0)   ee_psn[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn3") == 0)   ee_psn[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn4") == 0)   ee_psn[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn5") == 0)   ee_psn[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn6") == 0)   ee_psn[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn7") == 0)   ee_psn[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn8") == 0)   ee_psn[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn9") == 0)   ee_psn[9] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd0") == 0)   ee_ftd[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd1") == 0)   ee_ftd[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd2") == 0)   ee_ftd[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd3") == 0)   ee_ftd[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd4") == 0)   ee_ftd[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd5") == 0)   ee_ftd[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd6") == 0)   ee_ftd[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd7") == 0)   ee_ftd[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd8") == 0)   ee_ftd[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd9") == 0)   ee_ftd[9] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd0") == 0)   ee_itd[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd1") == 0)   ee_itd[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd2") == 0)   ee_itd[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd3") == 0)   ee_itd[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd4") == 0)   ee_itd[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd5") == 0)   ee_itd[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd6") == 0)   ee_itd[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd7") == 0)   ee_itd[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd8") == 0)   ee_itd[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd9") == 0)   ee_itd[9] = LeafBitMap[i];
+  }
+
 
 }
 
 void TRGGDLSummaryModule::event()
 {
 
-  StoreArray<TRGGDLUnpackerStore> entAry;
 
-  std::vector<std::vector<int> > _data(GDL::nLeafs + GDL::nLeafsExtra);
-  for (int leaf = 0; leaf < GDL::nLeafs + GDL::nLeafsExtra; leaf++) {
-    std::vector<int> _v(GDL::nClks);
+  int n_leafs = 0;
+  n_leafs  = m_unpacker->getnLeafs();
+  int n_leafsExtra = 0;
+  n_leafsExtra = m_unpacker->getnLeafsExtra();
+  int n_clocks = m_unpacker->getnClks();
+  int nconf = m_unpacker->getconf();
+  int nword_input  = m_unpacker->get_nword_input();
+  int nword_output = m_unpacker->get_nword_output();
+
+
+
+
+  StoreArray<TRGGDLUnpackerStore> entAry;
+  if (!entAry || !entAry.getEntries()) return;
+
+  //prepare entAry adress
+  int clk_map = 0;
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) clk_map = i;
+  }
+
+  std::vector<std::vector<int> > _data(n_leafs + n_leafsExtra);
+  for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
+    std::vector<int> _v(n_clocks);
     _data[leaf] = _v;
   }
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[GDL::nLeafs + GDL::nLeafsExtra];
-    setLeafPointersArray(entAry[ii], Bits);
-    for (int leaf = 0; leaf < GDL::nLeafs + GDL::nLeafsExtra; leaf++) {
-      _data[leaf][entAry[ii]->m_clk] =  *Bits[leaf];
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
+    //set pointer
+    for (int i = 0; i < 320; i++) {
+      if (LeafBitMap[i] != -1) {
+        Bits[LeafBitMap[i]] = &(entAry[ii]->m_unpacker[i]);
+      }
+    }
+    for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
+      _data[leaf][entAry[ii]->m_unpacker[clk_map]] =  *Bits[leaf];
     }
   }
 
-
-  GDLResult.create();
+  GDLResult.create(true);
 
   unsigned ored = 0;
 
-  const unsigned itds[] = {GDL::e_itd0, GDL::e_itd1, GDL::e_itd2};
-  for (int j = 0; j < 3; j++) {
+  for (int j = 0; j < (int)nword_input; j++) {
     ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
-      ored |= _data[itds[j]][clk];
+    for (int clk = 0; clk < n_clocks; clk++) {
+      ored |= _data[ee_itd[j]][clk];
     }
     GDLResult->setInputBits(j, ored);
   }
 
-  const unsigned ftds[] = {GDL::e_ftd0, GDL::e_ftd1};
-  for (int j = 0; j < 2; j++) {
+  if (nconf == 0) {
     ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
-      ored |= _data[ftds[j]][clk];
+    for (int clk = 0; clk < n_clocks; clk++) {
+      ored |= _data[ee_ftd[0]][clk];
     }
-    GDLResult->setFtdlBits(j, ored);
+    GDLResult->setFtdlBits(0, ored);
+
+    ored = 0;
+    for (int clk = 0; clk < n_clocks; clk++) {
+      ored |= (_data[ee_ftd[2]][clk] << 16) + _data[ee_ftd[1]][clk];
+    }
+    GDLResult->setFtdlBits(1, ored);
+
+    ored = 0;
+    for (int clk = 0; clk < n_clocks; clk++) {
+      ored |= _data[ee_psn[0]][clk];
+    }
+    GDLResult->setPsnmBits(0, ored);
+
+    ored = 0;
+    for (int clk = 0; clk < n_clocks; clk++) {
+      ored |= (_data[ee_psn[2]][clk] << 16) + _data[ee_psn[1]][clk];
+    }
+    GDLResult->setPsnmBits(1, ored);
+  } else {
+    for (int j = 0; j < (int)nword_output; j++) {
+      ored = 0;
+      for (int clk = 0; clk < n_clocks; clk++) {
+        ored |= _data[ee_ftd[j]][clk];
+      }
+      GDLResult->setFtdlBits(j, ored);
+    }
+
+    for (int j = 0; j < (int)nword_output; j++) {
+      ored = 0;
+      for (int clk = 0; clk < n_clocks; clk++) {
+        ored |= _data[ee_psn[j]][clk];
+      }
+      GDLResult->setPsnmBits(j, ored);
+    }
   }
 
-  const unsigned psns[] = {GDL::e_psn0, GDL::e_psn1};
-  for (int j = 0; j < 2; j++) {
-    ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
-      ored |= _data[psns[j]][clk];
-    }
-    GDLResult->setPsnmBits(j, ored);
-  }
 
-  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[e_timtype][GDL::nClks - 1];
+  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
+
+  //get prescales
+  for (int i = 0; i < 320; i++) {
+    int bit1 = i / 32;
+    int bit2 = i % 32;
+    GDLResult->setPreScale(bit1, bit2, m_prescales->getprescales(i));
+  }
 
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
   } else if (gtt == GDL::e_tt_ecl) {
     tt = TRGSummary::TTYP_PID0;
+  } else if (gtt == GDL::e_tt_dphy) {
+    tt = TRGSummary::TTYP_DPHY;
   } else if (gtt == GDL::e_tt_rand) {
     tt = TRGSummary::TTYP_RAND;
+  } else {
+    tt = TRGSummary::TTYP_NONE;
   }
 
   GDLResult->setTimType(tt);

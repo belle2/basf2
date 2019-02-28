@@ -146,7 +146,7 @@ public :
   void SetOutputDir(const char* outpath); /**< Set output directory */
 
   /** Constructor */
-  eclChargedPidSelector(TTree* = 0) :
+  explicit eclChargedPidSelector(TTree* tree = 0) :
     fChain(0),
     eclShowerEnergy(0),
     eclShowerTheta(0),

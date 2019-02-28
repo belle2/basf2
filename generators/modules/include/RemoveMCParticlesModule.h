@@ -36,13 +36,13 @@ namespace Belle2 {
     virtual ~RemoveMCParticlesModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Terminates the module. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Apply cuts on a Particle and call for all daugthers recursively.
      * @param particle Particle to check

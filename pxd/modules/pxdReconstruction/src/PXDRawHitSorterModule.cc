@@ -20,6 +20,7 @@
 #include <pxd/reconstruction/PXDPixelMasker.h>
 
 #include <set>
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -43,8 +44,7 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("mergeDuplicates", m_mergeDuplicates,
-           "If true, add charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
-  addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
+           "If true, take maximum charge of multiple instances of the same fired pixel. Otherwise only keep the first.", true);
   addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", 0);
   addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
@@ -56,8 +56,10 @@ void PXDRawHitSorterModule::initialize()
 {
   //Register collections
   m_storeRawHits.isRequired(m_storeRawHitsName);
+  m_storeDaqStatus.isRequired();
   //m_storeDigits.registerInDataStore(m_storeDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
   m_storeDigits.registerInDataStore(m_storeDigitsName);
+
 }
 
 void PXDRawHitSorterModule::event()
@@ -69,13 +71,11 @@ void PXDRawHitSorterModule::event()
 
   //Mapping of Pixel information to sort according to VxdID, row, column
   std::map<VxdID, std::multiset<Pixel>> sensors;
+  // Get Map of (un)usable modules
+  auto usability = m_storeDaqStatus->getUsable();
 
   // Fill sensor information to get sorted Pixel indices
   const int nPixels = m_storeRawHits.getEntries();
-  unsigned short currentFrameNumber(0);
-  VxdID currentSensorID(0);
-  // TODO: It seems there is no need for the frameCounter any more ... should remove it as well.
-  unsigned short frameCounter(1); // to recode frame numbers to small integers
   for (int i = 0; i < nPixels; i++) {
     const PXDRawHit* const rawhit = m_storeRawHits[i];
     // If malformed object, drop it.
@@ -84,6 +84,7 @@ void PXDRawHitSorterModule::event()
       B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
       continue;
     }
+    if (!usability[sensorID]) continue;// masked as bad sensor data
     if (m_trimOutOfRange && !goodHit(rawhit))
       continue;
     // Zero-suppression cut
@@ -91,16 +92,6 @@ void PXDRawHitSorterModule::event()
     // FIXME: The index of the temporary Pixel object seems not needed here.
     // Set this index always to zero
     Pixel px(rawhit, 0);
-    if (sensorID != currentSensorID) {
-      currentSensorID = sensorID;
-      frameCounter = 1;
-      currentFrameNumber = rawhit->getFrameNr();
-    } else if (rawhit->getFrameNr() != currentFrameNumber) {
-      frameCounter++;
-      currentFrameNumber = rawhit->getFrameNr();
-    }
-    if (m_mergeFrames) frameCounter = 0;
-
     // We need some protection against crap data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
       if (PXDPixelMasker::getInstance().pixelOK(sensorID, px.getU(), px.getV())) {
@@ -124,9 +115,10 @@ void PXDRawHitSorterModule::event()
         //We already have a pixel at this address, see if we merge or drop the new one
         if (m_mergeDuplicates) {
           //Merge the two pixels. As the PXDDigit does not have setters we have to create a new object.
+          //The charge of the new PXDDigit is the maximum of the duplicates.
           const PXDDigit& old = *m_storeDigits[index - 1];
           *m_storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(),
-                                               old.getVCellID(), old.getCharge() + px.getCharge());
+                                               old.getVCellID(), std::max(old.getCharge(), static_cast<unsigned short>(px.getCharge())));
         } //Otherwise delete the second pixel by forgetting about it.
       }
       lastpx = &px;

@@ -24,14 +24,16 @@ home = os.environ['BELLE2_LOCAL_DIR']
 
 # reset_database()
 # use_central_database("development")
-use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
+use_database_chain()
+use_central_database("data_reprocessing_prod5", LogLevel.WARNING)
 
 # parameters
 parser = OptionParser()
 parser.add_option('-f', '--file', dest='filename', default='ARICHHits.root')
 parser.add_option('-s', '--display', dest='display', default=0)
 parser.add_option('-a', '--arichtrk', dest='arichtrk', default=0)
-parser.add_option('-r', '--recon', dest='recon', default=0)
+parser.add_option('-r', '--recon', dest='recon', default=1)
+parser.add_option('-o', '--output', dest='output', default='arich_recon_ntuple.root')
 (options, args) = parser.parse_args()
 
 # create paths
@@ -57,11 +59,15 @@ if int(options.display):
     main.add_module(geometry)
 
 if int(options.recon):
+    arichHits = register_module('ARICHFillHits')
+    arichHits.param('MagFieldCorrection', 1)
+    main.add_module(arichHits)
     arichreco = register_module('ARICHReconstructor')
     arichreco.param('storePhotons', 1)
+    arichreco.param('useAlignment', 1)
     main.add_module(arichreco)
     arichNtuple = register_module('ARICHNtuple')
-    arichNtuple.param('outputFile', 'arich_recon_ntuple.root')
+    arichNtuple.param('outputFile', options.output)
     main.add_module(arichNtuple)
 
 

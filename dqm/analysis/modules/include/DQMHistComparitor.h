@@ -21,22 +21,33 @@
 #include <TH1.h>
 #include <TCanvas.h>
 #include <TFile.h>
+#include <TString.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /** Class definition for the reference histogram display. */
 
   class DQMHistComparitorModule : public DQMHistAnalysisModule {
 
+    /**
+     * The struct for reference histogram comparison.
+     */
     typedef struct {
 #ifdef _BELLE2_EPICS
       chid    mychid;
 #endif
+      /** Whether to use EPICS. */
       bool epicsflag;
+      /** The name of the histogram to be compared. */
       TString histo1;
+      /** The name of the reference histogram. */
       TString histo2;
+      /** The canvas to display both original and reference histograms. */
       TCanvas* canvas;
+      /** The warning level for the histogram difference. */
       float warning;
+      /** The error level for the histogram difference. */
       float error;
+      /** The mininum entries for histogram comparison. */
       int min_entries;
     } CMPNODE;
 
@@ -47,14 +58,20 @@ namespace Belle2 {
     DQMHistComparitorModule();
     virtual ~DQMHistComparitorModule();
 
+    /**
+     * Find histogram corresponding to canvas.
+     * @param hname Name of the histogram
+     * @return The pointer to the histogram, or nullptr if not found.
+     */
+    TH1* find_histo_in_canvas(TString);
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     // Data members
   private:
@@ -65,8 +82,15 @@ namespace Belle2 {
     /** Reference Histogram Root file name */
     std::string m_refFileName;
     /** The pointer to the reference file */
-    TFile* m_refFile;
+    TFile* m_refFile = nullptr;
+    /** Whether to use the color code for warnings and errors. */
+    bool m_color = true;
 
+    /**
+     * Get histogram by its name.
+     * @param histoname The name of the histogram.
+     * @return The pointer to the histogram, or nullptr if not found.
+     */
     TH1* GetHisto(TString histoname);
 
   };

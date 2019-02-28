@@ -211,6 +211,8 @@ void DataWriterModule::endRun()
 
 void DataWriterModule::event()
 {
+  // Use the neutralHadron hypothesis for the ECL
+  const ECLCluster::EHypothesisBit eclHypothesis = ECLCluster::EHypothesisBit::c_neutralHadron;
 
   for (const KLMCluster& cluster : m_klmClusters) {
 
@@ -240,9 +242,8 @@ void DataWriterModule::event()
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     TrackClusterSeparation* trackSep;
     float best_dist = 100000000;
-    float dist;
     for (auto trackSeperation :  trackSeperations) {
-      dist = trackSeperation.getDistance();
+      float dist = trackSeperation.getDistance();
       if (dist < best_dist) {
         best_dist = dist;
         trackSep = &trackSeperation;
@@ -269,13 +270,13 @@ void DataWriterModule::event()
     if (isnan(m_KLMTrackRotationAngle))   { m_KLMTrackRotationAngle   = -999;}
     if (isnan(m_KLMTrackClusterSepAngle)) { m_KLMTrackClusterSepAngle = -999;}
 
-
-    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
+    // findClosestECLCluster with the c_neutralHadron hypothesis
+    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos, eclHypothesis);
     ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
     m_KLMECLDist = get<1>(closestECLAndDist);
 
     if (!(closestECLCluster == nullptr)) {
-      m_KLMECLE              = closestECLCluster->getEnergy();
+      m_KLMECLE              = closestECLCluster->getEnergy(eclHypothesis);
       m_KLMECLE9oE25         = closestECLCluster->getE9oE21();
       m_KLMECLEerror         = closestECLCluster->getUncertaintyEnergy();
       m_KLMECLTerror         = closestECLCluster->getDeltaTime99();
@@ -287,7 +288,7 @@ void DataWriterModule::event()
       m_KLMECLZ51            = closestECLCluster->getAbsZernike51();
       m_KLMECLUncertaintyPhi = closestECLCluster->getUncertaintyPhi();
       m_KLMECLUncertaintyTheta = closestECLCluster->getUncertaintyTheta();
-      m_KLMECLHypo = closestECLCluster->getHypothesisId();
+      m_KLMECLHypo = closestECLCluster->getHypotheses();
     } else {
       m_KLMECLdeltaL         = -999;
       m_KLMECLminTrackDist   = -999;
@@ -352,11 +353,11 @@ void DataWriterModule::event()
 // ---------------   ECL CLUSTERS
   for (const ECLCluster& cluster : m_eclClusters) {
 
-    if (!m_useECL) {continue;}
+    if (!m_useECL or !cluster.hasHypothesis(eclHypothesis)) {continue;}
 
     m_ECLminTrkDistance = cluster.getMinTrkDistance();
     m_ECLdeltaL         = cluster.getDeltaL();
-    m_ECLE              = cluster.getEnergy();
+    m_ECLE              = cluster.getEnergy(eclHypothesis);
     m_ECLE9oE25         = cluster.getE9oE21();
     m_ECLTiming         = cluster.getTime();
     m_ECLR              = cluster.getR();
@@ -398,7 +399,7 @@ void DataWriterModule::event()
     m_ECLZ                 = clusterPos.Z();
 
     ClusterUtils C;
-    m_ECLMom               = C.Get4MomentumFromCluster(&cluster).Vect().Mag2();
+    m_ECLMom               = C.Get4MomentumFromCluster(&cluster, eclHypothesis).Vect().Mag2();
     m_ECLDeltaTime         = cluster.getDeltaTime99();
 
     m_ECLUncertaintyEnergy = cluster.getUncertaintyEnergy();
@@ -435,8 +436,8 @@ void DataWriterModule::event()
 
     m_isSignal = isECLClusterSignal(cluster);
 
-    if (cluster.getHypothesisId() == 6) { m_treeECLhadron -> Fill();}
-    if (cluster.getHypothesisId() == 5) { m_treeECLgamma  -> Fill();}
+    if (cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) { m_treeECLhadron -> Fill();}
+    if (cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) { m_treeECLgamma  -> Fill();}
   }// for ecl cluster in clusters
 } // event
 

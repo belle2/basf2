@@ -256,8 +256,6 @@ void ECLLocalMaximumFinderModule::event()
           }
 
           if (m_isTrainingMode > 0) { // This requires MC matching before this stage!
-            int motherpdg   = -1;
-            int motherindex = -1;
             int pi0index    = -1;
             int maxtype     = 0;
             int maxpos      = 0;
@@ -268,8 +266,8 @@ void ECLLocalMaximumFinderModule::event()
               const auto particle = relatedParticlePairs.object(irel);
               const double weight = relatedParticlePairs.weight(irel);
 
-              motherpdg = -1;
-              motherindex = -1;
+              int motherpdg = -1;
+              int motherindex = -1;
               pi0index = -1;
               getEnteringMother(*particle, motherpdg, motherindex, pi0index);
               addToSignalEnergy(motherpdg, motherindex, pi0index, weight);

@@ -216,11 +216,6 @@ namespace Belle2 {
      */
     operator unsigned int() {return (unsigned int)label();}
 
-    /**
-     * @brief Assignment operator
-     */
-    GlobalLabel& operator=(const GlobalLabel& rhs) {gid = rhs.gid, eid = rhs.eid, pid = rhs.pid, tid = rhs.tid, tif = rhs.tif; return *this; };
-
     //! Get the VxdID (returns default if not VXD label)
     VxdID   getVxdID()       const;
 

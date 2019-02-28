@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMUNPACKERMODULE_H
-#define EKLMUNPACKERMODULE_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -19,10 +18,11 @@
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
-#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 #include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
@@ -47,27 +47,27 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -102,7 +102,7 @@ namespace Belle2 {
     DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
 
     /** Time conversion. */
-    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+    DBObjPtr<KLMTimeConversion> m_TimeConversion;
 
     /** Channels. */
     DBObjPtr<EKLMChannels> m_Channels;
@@ -110,12 +110,12 @@ namespace Belle2 {
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
 
+    /** Event information. */
+    StoreArray<KLMDigitEventInfo> m_DigitEventInfos;
+
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;
 
   };
 
 }
-
-#endif
-

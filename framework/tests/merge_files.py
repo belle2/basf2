@@ -28,7 +28,8 @@ def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[]
 
 
 def create_testfile_direct(name, metadata=None, release="test_release", user="test_user", seed=None,
-                           site="test_site", global_tag="test_globaltag", steering="test_steering"):
+                           site="test_site", global_tag="test_globaltag", steering="test_steering",
+                           is_mc=True):
     """similar to create_testfile but does it manually without running basf2 for
     full control over the FileMetaData"""
     if metadata is None:
@@ -38,9 +39,12 @@ def create_testfile_direct(name, metadata=None, release="test_release", user="te
 
     if seed is not None:
         metadata.setRandomSeed(seed)
+    metadata.setLfn(name)
     metadata.setCreationData("the most auspicious of days for testing", site, user, release)
     metadata.setDatabaseGlobalTag(global_tag)
     metadata.setSteering(steering)
+    if (not is_mc):
+        metadata.declareRealData()
     f = ROOT.TFile(name, "RECREATE")
     t = ROOT.TTree("persistent", "persistent")
     t.Branch("FileMetaData", metadata)
@@ -70,7 +74,7 @@ def merge_files(*args, output="output.root", filter_modified=False):
       filter_modified: if True omit warnings that the release is modified and
           consistency cannot be checked
     """
-    process = subprocess.run(["merge_basf2_files", "-q", output] + list(args), stdout=subprocess.PIPE)
+    process = subprocess.run(["b2file-merge", "-q", output] + list(args), stdout=subprocess.PIPE)
     # do we want to filter the modified release warning?
     if filter_modified:
         # if so replace them using regular expression
@@ -323,11 +327,11 @@ def check_19_lowhigh():
 
 
 def check_20_test_file():
-    """Check that a merged file passes the check_basf2_file program"""
+    """Check that a merged file passes the b2file-check program"""
     create_testfile("test1.root", events=1111)
     create_testfile("test2.root", events=123)
     merge_files("test1.root", "test2.root", filter_modified=True)
-    return subprocess.call(["check_basf2_file", "-n", "1234", "--mcevents", "1234",
+    return subprocess.call(["b2file-check", "-n", "1234", "--mcevents", "1234",
                             "output.root", "EventMetaData", "MCParticles"]) == 0
 
 
@@ -352,11 +356,18 @@ def check_21_eventmetadata():
     return max(eventcount.values()) == 0 and min(eventcount.values()) == 0
 
 
+def check_22_real_mc():
+    """Check that merging fails if real and MC data are mixed"""
+    create_testfile_direct("test1.root", is_mc=True)
+    create_testfile_direct("test2.root", is_mc=False)
+    return merge_files("test1.root", "test2.root") != 0
+
+
 def check_XX_filemetaversion():
     """Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
     affect merge_basf2_files and adapt the correct version number here."""
-    return FileMetaData.Class().GetClassVersion() == 9
+    return FileMetaData.Class().GetClassVersion() == 10
 
 
 if __name__ == "__main__":

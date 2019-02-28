@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import os
-import sys
+from basf2 import register_module
 import inspect
-from analysisPath import *
+from analysisPath import analysis_main
 
 
 def fitKinematic4C(
@@ -22,7 +20,7 @@ def fitKinematic4C(
     @param list_name    name of the input ParticleList
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
     @param path         modules are added to this path
     """
@@ -53,7 +51,7 @@ def UnmeasuredfitKinematic1C(
     @param list_name    name of the input ParticleList
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
     @param path         modules are added to this path
     """
@@ -80,18 +78,21 @@ def fitKinematic3C(
         path=analysis_main,
 ):
     """
-    Perform 3C momentum constraint kinematic fit with one unmeasured photon for particles in the given ParticleList.
+    Perform 3C momentum constraint kinematic fit with one photon with unmeasured energy for particles
+    in the given ParticleList, the first daughter should be the energy unmeasured Photon.
+
     @param list_name    name of the input ParticleList
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
+    @param add3CPhoton add one photon with unmeasured energy (costs 1C)
     @param path         modules are added to this path
     """
 
     orca = register_module('ParticleKinematicFitter')
     orca.set_name('ParticleKinematicFitter_' + list_name)
-    orca.param('debugFitter', True)
+    orca.param('debugFitter', False)
     orca.param('orcaTracer', 'None')
     orca.param('orcaFitterEngine', fitterEngine)
     orca.param('orcaConstraint', constraint)  # beam parameters automatically taken from database
@@ -118,7 +119,7 @@ def MassfitKinematic1CRecoil(
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
     @param recoilMass       RecoilMass (GeV)
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
     @param path         modules are added to this path
     """
@@ -152,7 +153,7 @@ def MassfitKinematic1C(
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass or Mass
     @param invMass       Inviriant  Mass (GeV)
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
     @param path         modules are added to this path
     """
@@ -171,10 +172,7 @@ def MassfitKinematic1C(
 
 
 if __name__ == '__main__':
-    desc_list = []
-    for function_name in sorted(list_functions(sys.modules[__name__])):
-        function = globals()[function_name]
-        signature = inspect.formatargspec(*inspect.getargspec(function))
-        signature = signature.replace(repr(analysis_main), 'analysis_main')
-        desc_list.append((function.__name__, signature + '\n' + function.__doc__))
-    pretty_print_description_list(desc_list)
+    from basf2.utils import pretty_print_module
+    pretty_print_module(__name__, "kinfit", {
+        repr(analysis_main): "analysis_main",
+    })

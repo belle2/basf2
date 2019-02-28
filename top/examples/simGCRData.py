@@ -13,17 +13,15 @@ from reconstruction import add_cosmics_reconstruction
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 
+# Define a global tag (note: the one given bellow will become out-dated!)
+use_central_database('data_reprocessing_proc8')
+
 # Create path
 main = create_path()
 
 # input
 roinput = register_module('RootInput')
 main.add_module(roinput)
-
-# geometry parameters
-gearbox = register_module('Gearbox')
-gearbox.param('fileName', 'geometry/Beast2_phase2.xml')  # phase 2 geometry
-main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')

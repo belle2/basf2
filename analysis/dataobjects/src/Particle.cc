@@ -13,7 +13,6 @@
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -179,7 +178,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
   const TVector3 clustervertex = C.GetIPPosition();
   setVertex(clustervertex);
 
-  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex);
+  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit());
   m_px = clustermom.Px();
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();
@@ -195,7 +194,8 @@ Particle::Particle(const ECLCluster* eclCluster) :
   const TMatrixDSym clustervertexcovmat = C.GetIPPositionCovarianceMatrix();
 
   // Set error matrix.
-  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat);
+  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat,
+                              getECLClusterEHypothesisBit());
   storeErrorMatrix(clustercovmat);
 }
 
@@ -539,6 +539,7 @@ const PIDLikelihood* Particle::getPIDLikelihood() const
     return nullptr;
 }
 
+
 const ECLCluster* Particle::getECLCluster() const
 {
   if (m_particleType == c_ECLCluster) {
@@ -553,11 +554,11 @@ const ECLCluster* Particle::getECLCluster() const
     // loop over all clusters matched to this track
     for (const ECLCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<ECLCluster>()) {
       // ignore everything except the nPhotons hypothesis
-      if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
         continue;
       // check if we're most energetic thus far
-      if (cluster.getEnergy() > highestEnergy) {
-        highestEnergy = cluster.getEnergy();
+      if (cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > highestEnergy) {
+        highestEnergy = cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
         bestTrackMatchedCluster = &cluster;
       }
     }
@@ -567,22 +568,49 @@ const ECLCluster* Particle::getECLCluster() const
   }
 }
 
+double Particle::getECLClusterEnergy() const
+{
+  const ECLCluster* cluster = this->getECLCluster();
+  return cluster->getEnergy(this->getECLClusterEHypothesisBit());
+}
+
 const KLMCluster* Particle::getKLMCluster() const
 {
   if (m_particleType == c_KLMCluster) {
     StoreArray<KLMCluster> klmClusters;
     return klmClusters[m_mdstIndex];
-  } else
+  } else if (m_particleType == c_Track) {
+    // a track may be matched to several clusters under different hypotheses
+    // take the cluster with largest number of layers as "the" cluster
+    StoreArray<Track> tracks;
+    const KLMCluster* longestTrackMatchedCluster = nullptr;
+    int numberOfLayers = -1;
+    // loop over all clusters matched to this track
+    for (const KLMCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<KLMCluster>()) {
+      // check if we're the longest cluster thus far
+      if (cluster.getLayers() > numberOfLayers) {
+        numberOfLayers = cluster.getLayers();
+        longestTrackMatchedCluster = &cluster;
+      }
+    }
+    return longestTrackMatchedCluster;
+  } else {
     return nullptr;
+  }
 }
+
 
 const MCParticle* Particle::getMCParticle() const
 {
   if (m_particleType == c_MCParticle) {
     StoreArray<MCParticle> mcParticles;
     return mcParticles[m_mdstIndex];
-  } else
-    return nullptr;
+  } else {
+    const MCParticle* related = this->getRelated<MCParticle>();
+    if (related)
+      return related;
+  }
+  return nullptr;
 }
 
 //--- private methods --------------------------------------------
@@ -730,6 +758,19 @@ void Particle::print() const
   B2INFO(getInfo());
 }
 
+std::vector<std::string> Particle::getExtraInfoNames() const
+{
+  std::vector<std::string> out;
+  if (!m_extraInfo.empty()) {
+    StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+    if (!extraInfoMap)
+      B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
+    const ParticleExtraInfoMap::IndexMap& map = extraInfoMap->getMap(m_extraInfo[0]);
+    for (auto const& ee : map) out.push_back(ee.first);
+  }
+  return out;
+}
+
 std::string Particle::getInfoHTML() const
 {
   std::stringstream stream;
@@ -844,6 +885,14 @@ float Particle::getExtraInfo(const std::string& name) const
 
 }
 
+void Particle::writeExtraInfo(const std::string& name, const float value)
+{
+  if (this->hasExtraInfo(name)) {
+    this->setExtraInfo(name, value);
+  } else {
+    this->addExtraInfo(name, value);
+  }
+}
 
 void Particle::setExtraInfo(const std::string& name, float value)
 {

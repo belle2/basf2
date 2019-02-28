@@ -36,13 +36,13 @@ namespace TreeFitter {
     initParams() ;
   }
 
-  ErrCode RecoPhoton::initParticleWithMother(FitParams* fitparams)
+  ErrCode RecoPhoton::initParticleWithMother(FitParams& fitparams)
   {
     const int posindexmother = mother()->posIndex();
 
     Eigen::Matrix<double, 1, 3> vertexToCluster = Eigen::Matrix<double, 1, 3>::Zero(1, 3);
     for (unsigned int i = 0; i < 3; ++i) {
-      vertexToCluster(i) = m_clusterPars(i) - fitparams->getStateVector()(posindexmother + i);
+      vertexToCluster(i) = m_clusterPars(i) - fitparams.getStateVector()(posindexmother + i);
     }
 
     const double distanceToMother = vertexToCluster.norm();
@@ -51,33 +51,30 @@ namespace TreeFitter {
 
     for (unsigned int i = 0; i < 3; ++i) {
       //px = E dx/|dx|
-      fitparams->getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
+      fitparams.getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
     }
-
-    fitparams->getStateVector()(momindex + 3) =  energy;
 
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoPhoton::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
+  ErrCode RecoPhoton::initMotherlessParticle([[gnu::unused]] FitParams& fitparams)
   {
     return ErrCode(ErrCode::Status::success);
   }
 
-  //FT: this is needed once Klongs become involved
   bool RecoPhoton::useEnergy(Belle2::Particle& particle)
   {
     bool rc = true ;
     const int pdg = particle.getPDGCode();
     if (pdg &&
-        Belle2::Const::ParticleType(pdg) != Belle2::Const::photon && //   pdg != 22 &&
-        Belle2::Const::ParticleType(pdg) != Belle2::Const::pi0) { //   pdg != 111){
+        Belle2::Const::ParticleType(pdg) != Belle2::Const::photon &&
+        Belle2::Const::ParticleType(pdg) != Belle2::Const::pi0) {
       rc = false ;
     }
     return rc ;
   }
 
-  ErrCode RecoPhoton::initCovariance(FitParams* fitparams) const
+  ErrCode RecoPhoton::initCovariance(FitParams& fitparams) const
   {
     const int momindex = momIndex();
     const int posindex  = mother()->posIndex();
@@ -85,10 +82,10 @@ namespace TreeFitter {
     const double factorE = 1000 * m_covariance(3, 3);
     const double factorX = 1000; // ~ 10cm error on initial vertex
 
-    fitparams->getCovariance().block<4, 4>(momindex, momindex) =
+    fitparams.getCovariance().block<4, 4>(momindex, momindex) =
       Eigen::Matrix<double, 4, 4>::Identity(4, 4) * factorE;
 
-    fitparams->getCovariance().block<3, 3>(posindex, posindex) =
+    fitparams.getCovariance().block<3, 3>(posindex, posindex) =
       Eigen::Matrix<double, 3, 3>::Identity(3, 3) * factorX;
 
     return ErrCode(ErrCode::Status::success);
@@ -97,8 +94,9 @@ namespace TreeFitter {
   ErrCode RecoPhoton::initParams()
   {
     const Belle2::ECLCluster* cluster = particle()->getECLCluster();
+    const Belle2::ECLCluster::EHypothesisBit clusterhypo = particle()->getECLClusterEHypothesisBit();
     const TVector3 centroid = cluster->getClusterPosition();
-    const double energy = cluster->getEnergy();
+    const double energy = cluster->getEnergy(clusterhypo);
 
     m_init = true;
     m_covariance =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);

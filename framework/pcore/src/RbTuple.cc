@@ -35,11 +35,9 @@ RbTupleManager::~RbTupleManager()
 {
 }
 
-RbTupleManager::RbTupleManager(int nproc, const char* file, const char* workdir)
+RbTupleManager::RbTupleManager(int nproc, const char* file, const char* workdir):
+  m_nproc(nproc), m_filename(file), m_workdir(workdir)
 {
-  m_filename = file;
-  m_nproc = nproc;
-  m_workdir = workdir;
 }
 
 // Access to Singleton

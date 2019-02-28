@@ -30,28 +30,28 @@ namespace Belle2 {
     HMatrixQP() {;}
 
     /** Return the underlying matrix. */
-    const TMatrixD& getMatrix() const;
+    const TMatrixD& getMatrix() const override;
 
     /** Calculate H * v = v_0. */
-    TVectorD Hv(const TVectorD& v) const;
+    TVectorD Hv(const TVectorD& v) const override;
 
     /** Calculate M * H^T = first column of M. */
-    TMatrixD MHt(const TMatrixDSym& M) const;
+    TMatrixD MHt(const TMatrixDSym& M) const override;
 
     /** Calculate M * H^T = first column of M. */
-    TMatrixD MHt(const TMatrixD& M) const;
+    TMatrixD MHt(const TMatrixD& M) const override;
 
     /** Calculate H * M * H^T = M_00. */
-    void HMHt(TMatrixDSym& M) const;
+    void HMHt(TMatrixDSym& M) const override;
 
     /** Clone the matrix. */
-    virtual HMatrixQP* clone() const {return new HMatrixQP(*this);}
+    virtual HMatrixQP* clone() const override {return new HMatrixQP(*this);}
 
     /** Check for equality. */
-    virtual bool isEqual(const genfit::AbsHMatrix& other) const {return (dynamic_cast<const HMatrixQP*>(&other) != nullptr);}
+    virtual bool isEqual(const genfit::AbsHMatrix& other) const override {return (dynamic_cast<const HMatrixQP*>(&other) != nullptr);}
 
     /** Print a symbol for the matrix for debugging. */
-    virtual void Print(const Option_t* = "") const;
+    virtual void Print(const Option_t* = "") const override;
   };
 
 }

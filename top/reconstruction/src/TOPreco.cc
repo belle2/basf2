@@ -54,8 +54,27 @@ namespace Belle2 {
           set_channel_mask_(&mdn, &ich, &flag);
         }
       }
+      B2INFO("TOPreco: new channel masks have been passed to reconstruction");
 
       if (printMask) print_channel_mask_();
+    }
+
+
+    void TOPreco::setChannelEffi()
+    {
+      const auto* topgp = TOPGeometryPar::Instance();
+      const auto* geo = topgp->getGeometry();
+      int numModules = geo->getNumModules();
+      for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
+        for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
+          int mdn = moduleID - 1; // 0-based used in fortran
+          int ich = pixelID - 1;  // 0-based used in fortran
+          float effi = topgp->getRelativePixelEfficiency(moduleID, pixelID);
+          set_channel_effi_(&mdn, &ich, &effi);
+        }
+      }
+      B2INFO("TOPreco: new relative pixel efficiencies have been passed to reconstruction");
     }
 
 
@@ -90,19 +109,22 @@ namespace Belle2 {
       if (status > 0) return status;
       switch (status) {
         case 0:
-          B2WARNING("addData: no space available in /TOP_DATA/");
+          B2WARNING("TOPReco::addData: no space available in /TOP_DATA/");
           return status;
         case -1:
-          B2ERROR("addData: invalid module ID " << moduleID + 1);
+          B2ERROR("TOPReco::addData: invalid module ID."
+                  << LogVar("moduleID", moduleID + 1));
           return status;
         case -2:
-          B2ERROR("addData: invalid pixel ID " << pixelID + 1);
+          B2ERROR("TOPReco::addData: invalid pixel ID."
+                  << LogVar("pixelID", pixelID + 1));
           return status;
         case -3:
-          B2ERROR("addData: digit should already be masked-out (different masks used?)");
+          B2ERROR("TOPReco::addData: digit should already be masked-out (different masks used?)");
           return status;
         default:
-          B2ERROR("addData: unknown return status " << status);
+          B2ERROR("TOPReco::addData: unknown return status."
+                  << LogVar("status", status));
           return status;
       }
     }

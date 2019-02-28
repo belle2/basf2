@@ -8,7 +8,7 @@
 
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFNSM.h"
-#include "daq/slc/nsm/NSMCommunicator.h"
+//#include "daq/slc/nsm/NSMCommunicator.h"
 #include <time.h>
 #include <stdio.h>
 
@@ -179,7 +179,12 @@ int RFProcessManager::CheckOutput()
       if (errno == EINTR) continue;
     } else {
       if (nsmc && FD_ISSET(nsmc->sock, &fdset)) {
-        NSMCommunicator(nsmc).callContext();
+        //        NSMCommunicator(nsmc).callContext();
+        char buf[NSM_TCPMSGSIZ];
+        if (nsmlib_recv(nsmc, (NSMtcphead*)buf, 1000) < 0)
+          printf("RFProcessManager: Failed to read NSM context\n");
+        else
+          nsmlib_call(nsmc, (NSMtcphead*)buf);
       }
       if (m_iopipe[0] > 0 &&
           FD_ISSET(m_iopipe[0], &fdset)) {
@@ -206,7 +211,8 @@ pid_t RFProcessManager::CheckProcess()
     pid_t pid = *it;
     int status;
     pid_t outpid = waitpid(pid, &status, WNOHANG);
-    if (outpid == -1) {
+    //    if (outpid == -1) {
+    if (outpid != 0 || outpid == pid) {
       m_pidlist.erase(it);
       return pid;
     }

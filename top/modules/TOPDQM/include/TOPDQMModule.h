@@ -16,6 +16,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TProfile.h"
+#include "TProfile2D.h"
 
 // dataobject classes
 #include <framework/datastore/StoreArray.h>
@@ -47,36 +48,36 @@ namespace Belle2 {
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -85,6 +86,7 @@ namespace Belle2 {
     double m_momentumCut; /**< momentum cut */
     double m_pValueCut;   /**< pValue cut */
     bool m_usePionID; /**< use pion ID in track selection */
+    int m_cutNphot;   /**< Number of photon cut */
 
     // histograms
     TH1F* m_recoTime = 0;           /**< time distribution */
@@ -114,6 +116,8 @@ namespace Belle2 {
     std::vector<TH1F*> m_badChannelHits; /**< Histograms for bad channel hits*/
     std::vector<TH1F*> m_goodHitsPerEvent; /**< Histograms for good hits per event*/
     std::vector<TH1F*> m_badHitsPerEvent; /**< Histograms for bad hits per event*/
+    std::vector<TProfile2D*> m_goodHitsXYTrack; /**< Histograms (2D) for good hits in x-y per module with track*/
+    std::vector<TProfile2D*> m_goodHitsXYTrackBkg; /**< Histograms (2D) for good hits in x-y per module with bkg track*/
 
     // other
     int m_numModules = 0; /**< number of TOP modules */

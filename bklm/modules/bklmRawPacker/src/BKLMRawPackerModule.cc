@@ -152,7 +152,10 @@ void BKLMRawPackerModule::event()
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
     buf[1] |= ((bword3 << 16));
-    if (copperId < 1 || copperId > 4) { B2WARNING("BKLMRawPacker:: abnormal copper index: " << copperId); continue; }
+    if (copperId < 1 || copperId > 4) {
+      B2WARNING("BKLMRawPacker::event() out-of-range (1..4):" << LogVar("COPPER ID", copperId));
+      continue;
+    }
     data_words[copperId - 1][finesse].push_back(buf[0]);
     data_words[copperId - 1][finesse].push_back(buf[1]);
 
@@ -249,7 +252,6 @@ void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, 
                                      unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
 {
 
-  charge = m_scintADCOffset - charge;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
@@ -368,8 +370,8 @@ int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int pl
   //we flip channel to match raw data
   int MaxiChannel = 0;
   if (!isForward && sector == 3 && plane == 0) {
-    if (plane == 0 && layer < 3) MaxiChannel = 38;
-    if (plane == 0 && layer > 2) MaxiChannel = 34;
+    if (layer < 3) MaxiChannel = 38;
+    if (layer > 2) MaxiChannel = 34;
   } else {
     if (layer == 1 && plane == 1) MaxiChannel = 37;
     if (layer == 2 && plane == 1) MaxiChannel = 42;

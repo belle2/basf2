@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett
+ * Contributors: Jitendra Kumar, Jake Bennett
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,22 +19,22 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
 
-#include "TH1F.h"
-#include "TH2F.h"
+#include "TH1D.h"
+#include "TH2D.h"
 #include "TString.h"
 #include "TDirectory.h"
-
-
-//import some useful namespace
-using std::cout;
-using std::endl;
 using std::vector;
 using std::string;
 
+
 namespace Belle2 {
 
-  /** Extracts dE/dx information for calibration testing. Writes a ROOT file.
+  /**
+   * This module to design collect CDC dEdx monitoring for DQM and only minimal information are
+   * stored. All higher level calculation like fit etc is done using DQM analysis module.
+   * Output of this module used as an input to DQM analysis.
    */
+
   class CDCDedxDQMModule : public HistoModule {
 
   public:
@@ -46,23 +46,23 @@ namespace Belle2 {
     virtual ~CDCDedxDQMModule();
 
     /** Defination of histograms */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each run */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** This method is called at the end of each run */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
 
@@ -75,8 +75,8 @@ namespace Belle2 {
     Bool_t isHadronfile; /**< Parameter-1 to switch binning */
     TString fCollType; /**< Parameter-2 to switch binning */
 
-    TH1F* temp1D; /**< Dedx histogram per run */
-    TH2F* temp2D; /**< Dedx vs P histogram per run */
+    TH1D* temp1D{nullptr}; /**< Dedx histogram per run */
+    TH2D* temp2D{nullptr}; /**< Dedx vs P histogram per run */
 
     Int_t    nBinsdedx; /**< nbin of dedx range */
     Double_t nBinsdedxLE; /**< Lowedge of dedx */

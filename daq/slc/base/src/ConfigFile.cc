@@ -14,6 +14,12 @@ const std::string ConfigFile::getFilePath(const std::string& filename_in)
 {
   std::string filename = filename_in;
   if (filename == "slowcontrol") {
+    /*
+    char* hostname = getenv("HOSTNAME");
+    if (hostname != NULL && std::string(hostname).find("hlt") != std::string::npos) {
+      filename = "slowcontrol.hlt";
+    }
+    */
     char* slcfile = getenv("BELLE2_SLC_FILE");
     if (slcfile != NULL && strlen(slcfile) > 0) {
       filename = slcfile;

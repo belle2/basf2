@@ -5,10 +5,13 @@
 # Called by the wrapper scripts runTBCpocket.sh and runTBClocal.sh, which
 # sets the proper directories for the output.
 #
+# Note: check the global tag!
+#
 # Contributors: Marko Staric, Umberto Tamponi
 #
 
 from basf2 import *
+import os
 import sys
 
 # read parameters
@@ -27,6 +30,9 @@ outdir = argvs[4]        # output directory path
 print('data type:', datatype, ' slot:', slot, ' calibration channel:', channel,
       ' output to:', outdir)
 
+# Define a global tag (note: the one given bellow can be out-dated!)
+use_central_database('data_reprocessing_proc8')
+
 # Suppress messages and warnings during processing
 set_log_level(LogLevel.ERROR)
 
@@ -43,14 +49,8 @@ if datatype == 'pocket':
     converter = register_module('Convert2RawDet')
     main.add_module(converter)
 
-# geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry (only TOP needed)
-geometry = register_module('Geometry')
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # Unpacking (format auto detection works now)
 unpack = register_module('TOPUnpacker')

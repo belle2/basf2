@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-
-gb2_setuprel = 'build-2014-10-22'
+import os
 
 # ---------------------------------------------------------------
 # example of using OpticalGun to simulate laser light sources
@@ -44,7 +43,7 @@ def fiber(
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param('evtNumList', [100])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
@@ -53,11 +52,11 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # Optical sources
-# for (pos,angle) in [(0.9,17), (5.7,15), (11.3,15), (16.9,15), (22.5,15), (28.1,15), (33.7,15), (39.3,15), (44.1,17)]:
 for barId in range(16):
     for pos in [
         0.9,

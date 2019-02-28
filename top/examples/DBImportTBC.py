@@ -16,14 +16,16 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-# define a local database (will be created automatically, if doesn't exist)
+# define a local database with write access
+# (will be created automatically, if doesn't exist)
 use_local_database("localDB/localDB.txt", "localDB", False)
 
+# create path
 main = create_path()
 
 # Event info setter - execute single event
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
@@ -31,6 +33,7 @@ gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""\
+This tool determines to recommended set of global tags.
+"""
+
+import basf2
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+import basf2.version
+import argparse
+import os
+import subprocess
+import json
+
+
+def create_argumentparser():
+    """Create an argument parser with all defined arguments"""
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--input", "-i", type=str,
+                        help="input file that should be processed, set to \"MC\" for generation of run-dependent Monte-Carlo")
+    parser.add_argument("--analysis", "-a", default=False, action="store_true",
+                        help="include global tag for analysis tools")
+    return parser
+
+
+def get_global_tags(release, input_file, analysis):
+    """Get the recommended set of global tags"""
+
+    from versioning import recommended_global_tags
+
+    # use default global tag for experiment independent MC
+    if input_file is None:
+        return [basf2.get_default_global_tags()]
+
+    # get recommended global tag for run-dependent MC generation
+    if input_file == 'MC':
+        return recommended_global_tags(release, True, analysis)
+
+    # get metadata from input file
+    if not os.path.isfile(input_file):
+        basf2.B2FATAL("No input file %s" % input_file)
+    process = subprocess.Popen(['b2file-metadata-show', '--json', input_file], stdout=subprocess.PIPE)
+    out = process.communicate()[0]
+    if process.returncode != 0:
+        basf2.B2FATAL("Could not get metadata from file %s" % input_file)
+    metadata = json.loads(out)
+
+    return recommended_global_tags(release, int(metadata['mcEvents']) != 0, analysis, metadata['globalTag'].split())
+
+
+if __name__ == "__main__":
+    args = create_argumentparser().parse_args()
+
+    tags = get_global_tags(basf2.version.version, args.input, args.analysis)
+
+    if tags:
+        print(' '.join(tags))
+    else:
+        basf2.B2ERROR("No recommended global tag found")

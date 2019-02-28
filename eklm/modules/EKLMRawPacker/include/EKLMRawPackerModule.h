@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMRAWPACKER_H
-#define EKLMRAWPACKER_H
+#pragma once
 
 /* C++ headers. */
 #include <cstdint>
@@ -46,27 +45,27 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -107,6 +106,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

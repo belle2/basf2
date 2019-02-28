@@ -46,7 +46,7 @@ namespace Belle2 {
 
 
   /// Insert of inner and outer TrackNodes of a Segment as SpacePoints into path of SpacePoints
-  inline void insertSpacePoints(std::vector<const SpacePoint*>& target, Segment<TrackNode> source)
+  inline void insertSpacePoints(std::vector<const SpacePoint*>& target, const Segment<TrackNode>& source)
   {
     if (target.empty()) {
       insertSpacePoint(target, *(source.getInnerHit()));

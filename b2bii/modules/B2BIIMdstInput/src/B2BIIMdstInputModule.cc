@@ -65,6 +65,7 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
 
   m_nevt = -1;
   m_current_file_position = -1;
+  m_current_file_entry = -1;
 
   //Parameter definition
   addParam("inputFileName", m_inputFileName, "Belle MDST input file name. "

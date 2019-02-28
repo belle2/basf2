@@ -10,9 +10,11 @@
 """
 
 from basf2 import *
+import os
 
 # ---------------------------------------------------------------------------------
 # Simulate, reconstruct and make a flat ntuple for validation of top reconstruction
+# Here we just want to test intrinsic TOP PID (no other material and ideal tracks)
 # ---------------------------------------------------------------------------------
 
 # Suppress messages and warnings during processing:
@@ -25,14 +27,14 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
+eventinfosetter.param('evtNumList', [10000])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
-# Geometry (only TOP and B-field)
+# Geometry (only TOP and B-field, since we are testing intrinsic TOP PID)
 geometry = register_module('Geometry')
 geometry.param('useDB', False)
 geometry.param('components', ['MagneticField', 'TOP'])

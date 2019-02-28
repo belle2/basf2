@@ -6,6 +6,7 @@ from ROOT import PyConfig
 PyConfig.StartGuiThread = False
 
 from basf2 import *
+import os
 import glob
 import sys
 
@@ -101,7 +102,7 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param('evtNumList', [1000])
 main.add_module(eventinfosetter)
 
 # generate BBbar events

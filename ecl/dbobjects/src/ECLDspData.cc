@@ -69,7 +69,7 @@ void ECLDspData::packCoefVector(const std::vector<short int>& src, std::vector<s
     dst.push_back(packed_size);
   }
 }
-void ECLDspData::unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst)
+void ECLDspData::unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst) const
 {
   const int N_CHANNELS = 16;
 
@@ -81,7 +81,7 @@ void ECLDspData::unpackCoefVector(const std::vector<short int>& src, std::vector
     dst.resize(dst_size);
   }
   if (packer_version >= 2) {
-    // Bits allocated for each value
+    // Number of bits allocated for each value
     const int value_bits = 4;
     const long value_max = 0xF;
     const int values_packed = sizeof(short) * 8 / value_bits;
@@ -90,20 +90,19 @@ void ECLDspData::unpackCoefVector(const std::vector<short int>& src, std::vector
     int packed_size = src[--size];
 
     int packed_start = size - packed_size;
-    int unpacked_index = 0;
     dst_size = packed_size * values_packed;
 
     dst.resize(dst_size);
-    int dst_index = 0;
-
-    int shift = -6;
 
     if (packed_size > 0) {
+      int unpacked_index = 0;
+      int dst_index = 0;
+      const int shift = -6;
+
       for (int i = packed_start; i < size; i++) {
         auto package = src[i];
-        short val;
         for (int k = 0; k < values_packed; k++) {
-          val = package & value_max;
+          short val = package & value_max;
           if (val != value_max) {
             dst[dst_index++] = val + shift;
           } else {

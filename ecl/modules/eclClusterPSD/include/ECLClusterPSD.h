@@ -71,7 +71,6 @@ namespace Belle2 {
     { return "ECLShowers" ; }
 
   private:
-    double m_Chi2Threshold;   /**< Two component fit chi square threshold .*/
     double m_CrystalHadronEnergyThreshold; /**< hadron component energy threshold to classify as hadron.*/
     double m_CrystalHadronIntensityThreshold; /**< hadron component intensity threshold to classify as hadron.*/
     StoreArray<ECLCalDigit> m_eclCalDigits;  /**< ECLCalDigit's */

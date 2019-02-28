@@ -78,7 +78,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   B2INFO(" OCCUPANCY WARNING " << m_occWarning << " < occ < " << m_occError);
   B2INFO(" OCCUPANCY EMPTY occ > " << m_occError);
 
-  m_legError = new TPaveText(1, 49.5, 5, 53.5);
+  m_legError = new TPaveText(1, 53.5, 5, 56.5);
   m_legError->AddText("ERROR!!");
   m_legError->SetFillColor(kRed);
   m_legError->SetTextColor(kWhite);
@@ -173,11 +173,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   //SETUP gSTYLE - all plots
   gStyle->SetOptStat(0);
+  gStyle->SetTitleY(.97);
 
   //check DATA FORMAT
   TH1* h = findHist("SVDUnpacker/DQMUnpackerHisto");
 
-  TBox b(-1, -4.6, 20, 54.5);
+  TBox b(-1.1, -4.5, 22.1, 58.5);
   b.SetLineWidth(12);
   b.SetFillStyle(0);
   Int_t color = kGreen;

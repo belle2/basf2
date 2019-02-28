@@ -1,5 +1,17 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <hlt/softwaretrigger/modules/basics/SoftwareTriggerModule.h>
 #include <hlt/softwaretrigger/core/utilities.h>
+#include <hlt/softwaretrigger/calculations/FilterCalculator.h>
+#include <hlt/softwaretrigger/calculations/SkimSampleCalculator.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <TFile.h>
 
@@ -53,12 +65,6 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "file, in which the results of the calculation are stored, if storeDebugOutput is "
            "turned on. Please note that already present files will be overridden. "
            "ATTENTION: This file debugging mode does not work in parallel processing.", m_param_debugOutputFileName);
-
-  addParam("calibParticleListName", m_particlename, "the name list of particle for the calibration and dqm",
-           std::vector<std::string>());
-
-  addParam("calibExtraInfoName", m_extrainfoname, "the variable name list that attached to the particles",
-           std::vector<std::string>());
 }
 
 void SoftwareTriggerModule::initialize()
@@ -106,14 +112,10 @@ void SoftwareTriggerModule::event()
 
 void SoftwareTriggerModule::initializeCalculation()
 {
-  if (m_param_baseIdentifier == "fast_reco") {
-    m_calculation.reset(new FastRecoCalculator());
-  } else if (m_param_baseIdentifier == "hlt") {
-    m_calculation.reset(new HLTCalculator());
-  } else if (m_param_baseIdentifier == "testbeam") {
-    m_calculation.reset(new TestbeamCalculator());
-  } else if (m_param_baseIdentifier == "calib") {
-    m_calculation.reset(new CalibSampleCalculator(m_particlename, m_extrainfoname));
+  if (m_param_baseIdentifier == "filter") {
+    m_calculation.reset(new FilterCalculator());
+  } else if (m_param_baseIdentifier == "skim") {
+    m_calculation.reset(new SkimSampleCalculator());
   } else {
     B2FATAL("You gave an invalid base identifier " << m_param_baseIdentifier << ".");
   }
@@ -126,11 +128,11 @@ void SoftwareTriggerModule::initializeDebugOutput()
   if (m_param_storeDebugOutputToROOTFile) {
     m_debugOutputFile.reset(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
     if (not m_debugOutputFile) {
-      B2ERROR("Could not open debug output file. Aborting.");
+      B2FATAL("Could not open debug output file. Aborting.");
     }
     m_debugTTree.reset(new TTree("software_trigger_results", "software_trigger_results"));
     if (not m_debugTTree) {
-      B2ERROR("Could not create debug output tree. Aborting.");
+      B2FATAL("Could not create debug output tree. Aborting.");
     }
   }
 
@@ -154,11 +156,17 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
   const SoftwareTriggerCutResult& moduleResult =
     FinalTriggerDecisionCalculator::getModuleResult(*m_resultStoreObjectPointer, m_param_baseIdentifier,
                                                     m_dbHandler->getAcceptOverridesReject());
-  const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(m_param_baseIdentifier);
-  m_resultStoreObjectPointer->addResult(totalResultIdentifier, moduleResult);
+  const std::string& moduleResultIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(m_param_baseIdentifier);
+  m_resultStoreObjectPointer->addResult(moduleResultIdentifier, moduleResult);
 
   // Return the trigger decision up to here
-  bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+  bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer, true);
+  const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalResultName();
+  if (totalResult) {
+    m_resultStoreObjectPointer->addResult(totalResultIdentifier, SoftwareTriggerCutResult::c_accept);
+  } else {
+    m_resultStoreObjectPointer->addResult(totalResultIdentifier, SoftwareTriggerCutResult::c_reject);
+  }
   setReturnValue(totalResult);
 }
 

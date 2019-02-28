@@ -236,4 +236,11 @@
   targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_22" \
   code="{m_sqrtcovmat_22 = onfile.m_Error[5];}"
 
+#pragma read sourceClass="Belle2::ECLCluster" version="[-12]" \
+  source="int m_hypothesisId" \
+  targetClass="Belle2::ECLCluster" target="m_hypotheses" \
+  code="{ if(onfile.m_hypothesisId == 5) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_nPhotons); \
+        else if(onfile.m_hypothesisId == 6) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron); \
+        else m_hypotheses = 0;}"
+
 #endif

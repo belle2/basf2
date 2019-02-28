@@ -627,7 +627,7 @@ namespace Belle2 {
         double extraE = 0.0;
 
         for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          extraE += roeClusters[iEcl]->getEnergy();
+          extraE += roeClusters[iEcl]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
         return extraE;
       };

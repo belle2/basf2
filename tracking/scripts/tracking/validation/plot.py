@@ -29,6 +29,7 @@ def get_logger():
     """
     return logging.getLogger(__name__)
 
+
 #: A map from quanity name symbols to their usual units in Belle II standard units.
 units_by_quantity_name = {
     'x': 'cm',
@@ -105,6 +106,42 @@ def compose_axis_label(quantity_name, unit=None):
     return axis_label
 
 
+def get1DBinningFromReference(name, refFileName):
+    """ returns nbins, lowerbound, upperbound for TH1 / TProfile with name "name" found in the file "refFileName"
+
+        @param name : name of the TH1 object to be looked for in the file
+        @param refFileName : name of the reference file where the object is searched for
+
+        @return int nbin, float xmin, float xmax  of the TH1
+    """
+
+    nbins = None
+    x_min = None
+    x_max = None
+
+    # store current directory to not confuse directories by opening a TFile
+    oldDirectory = ROOT.gROOT.CurrentDirectory()
+
+    tfile = ROOT.TFile(refFileName)
+    if tfile.IsOpen():
+        objptr = tfile.Get(name)
+        if objptr and objptr.InheritsFrom("TH1"):
+            nbins = objptr.GetNbinsX()
+            x_min = objptr.GetXaxis().GetXmin()
+            x_max = objptr.GetXaxis().GetXmax()
+        else:
+            basf2.B2WARNING('Requested object with name: ' + name + ' not found in file: ' + refFileName + " (or not a TH1)")
+    else:
+        basf2.B2WARNING('Requested file: ' + refFileName + ' could not be opened')
+
+    tfile.Close()
+
+    # set current directory back to original one
+    oldDirectory.cd()
+
+    return nbins, x_min, x_max
+
+
 #: A class for storing a named additional statistic to a histogram
 StatsEntry = ROOT.TParameter(float)
 
@@ -134,17 +171,25 @@ class ValidationPlot(object):
     very_sparse_dots_line_style_index = 28
     # This line style is defined in the set_tstyle method below.
 
-    def __init__(self, name):
+    def __init__(self, name, referenceFileName=None):
         """Constructor of the ValidationPlot
 
         Parameters
         ----------
         name : str
             A unique name to be used as the name of the ROOT object to be generated
+
+        referenceFileName : str
+            name of a reference file. If set the code will try to get the histogram or profile
+            from that file and determine the number of bins and upper and lower bound
+            (so far only implemented for 1D (TH1, TProfile), is ignored for 2D plots)
         """
 
         #: A unique name to be used as the name of the ROOT object to be generated
         self.name = root_save_name(name)
+
+        #: name of the reference file, if not None the binning will be read from there
+        self.referenceFileName = referenceFileName
 
         #: Description of the plot purpose for display on the validation page
         self._description = ''
@@ -196,6 +241,14 @@ class ValidationPlot(object):
              is_expert=True):
         """Fill the plot with a one dimensional histogram."""
 
+        # if referenceFileName was set the binning will taken from there
+        if self.referenceFileName is not None:
+            n, xmin, xmax = get1DBinningFromReference(self.name, self.referenceFileName)
+            if n is not None and xmin is not None and xmax is not None:
+                bins = n
+                upper_bound = xmax
+                lower_bound = xmin
+
         th1_factory = ROOT.TH1D
         self._is_expert = is_expert
 
@@ -233,6 +286,18 @@ class ValidationPlot(object):
                 gaus_z_score=None,
                 is_expert=True):
         """Fill the plot with a one dimensional profile of one variable over another."""
+
+        # if referenceFileName was set the binning will taken from there
+        if self.referenceFileName is not None:
+            n = None
+            xmin = None
+            xmax = None
+            n, xmin, xmax = get1DBinningFromReference(self.name, self.referenceFileName)
+            if n is not None and xmin is not None and xmax is not None:
+                bins = n
+                upper_bound = xmax
+                lower_bound = xmin
+
         th1_factory = ROOT.TProfile
         self._is_expert = is_expert
         if gaus_z_score is None:
@@ -2153,7 +2218,9 @@ class ValidationPlot(object):
         """Reassign the special attributes of the plot forwarding them to the ROOT plot."""
         # Forward the attributes to the plot by auto assignment
         self.check = self.check
+        #: contact information for this plot
         self.contact = self.contact
+        #: description of the plot
         self.description = self.description
 
         self.xlabel = self.xlabel

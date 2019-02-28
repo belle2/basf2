@@ -245,10 +245,11 @@ NeuroTrigger::setConstants()
 }
 
 void
-NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName)
+NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName, bool alwaysTrackT0)
 {
   m_segmentHits.isRequired(hitCollectionName);
-  m_eventTime.isRequired(eventTimeName);
+  if (!alwaysTrackT0)
+    m_eventTime.isRequired(eventTimeName);
   m_hitCollectionName = hitCollectionName;
 }
 
@@ -369,13 +370,17 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 }
 
 void
-NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track)
+NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, bool alwaysTrackT0)
 {
-  bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
-  if (hasT0) {
-    m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
-    m_hasT0 = true;
-  } else if (m_MLPs[isector].getT0fromHits()) {
+  if (!alwaysTrackT0) {
+    bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
+    if (hasT0) {
+      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_hasT0 = true;
+      return;
+    }
+  }
+  if (m_MLPs[isector].getT0fromHits() || alwaysTrackT0) {
     m_T0 = 9999;
     // find shortest time of related and relevant axial hits
     RelationVector<CDCTriggerSegmentHit> axialHits =

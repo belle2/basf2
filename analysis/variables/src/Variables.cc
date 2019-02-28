@@ -657,6 +657,21 @@ namespace Belle2 {
       return (invMass - nomMass) / massErr;
     }
 
+    double particleMassSquared(const Particle* part)
+    {
+      TLorentzVector p4 = part->get4Vector();
+      return p4.M2();
+    }
+
+    double particleInvariantMassSquared(const Particle* part)
+    {
+      double m = particleInvariantMass(part);
+      if (m < 0)
+        return -(m * m);
+      else
+        return m * m;
+    }
+
     double b2bTheta(const Particle* part)
     {
       PCmsLabTransform T;
@@ -679,11 +694,12 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
+      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
       if (!cluster) return std::numeric_limits<float>::quiet_NaN();
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
-      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
 
       // find the vector that balances this in the CMS
       PCmsLabTransform T;
@@ -697,11 +713,12 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
+      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
       if (!cluster) return std::numeric_limits<float>::quiet_NaN();
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
-      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
 
       // find the vector that balances this in the CMS
       PCmsLabTransform T;
@@ -1202,7 +1219,7 @@ namespace Belle2 {
 
 
     REGISTER_VARIABLE("M", particleMass,
-                      "invariant mass(determined from particle's 4-momentum vector)");
+                      "invariant mass (determined from particle's 4-momentum vector)");
     REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
     REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
     REGISTER_VARIABLE("dQ", particleDQ,
@@ -1211,9 +1228,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
 
     REGISTER_VARIABLE("InvM", particleInvariantMass,
-                      "invariant mass (determined from particle's daughter 4 - momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
-                      "invariant mass(determined from particle's daughter 4-momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
+
+    REGISTER_VARIABLE("M2", particleMassSquared,
+                      "invariant mass squared (determined from particle's 4-momentum vector)");
+    REGISTER_VARIABLE("InvM2", particleInvariantMassSquared,
+                      "invariant mass squared (determined from particle's daughter 4-momentum vectors)");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
                       "uncertainty of invariant mass (determined from particle's daughter 4 - momentum vectors)");

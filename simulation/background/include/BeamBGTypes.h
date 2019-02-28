@@ -51,6 +51,8 @@ namespace Belle2 {
         m_tags["BHWideLargeAngle"] = SimHitBase::bg_BHWideLargeAngle;
         m_tags["InjectionLER"] = SimHitBase::bg_InjectionLER;
         m_tags["InjectionHER"] = SimHitBase::bg_InjectionHER;
+        m_tags["Brems_LER"] = SimHitBase::bg_Brems_LER;
+        m_tags["Brems_HER"] = SimHitBase::bg_Brems_HER;
         m_tags["other"] = SimHitBase::bg_other;
       }
 

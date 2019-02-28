@@ -4,7 +4,7 @@
 """
 <header>
 <output>ECLClusterOutputBWD.root</output>
-<contact>Benjamin Oberhof, ecl2ml@bpost.kek.jp</contact>
+<contact>Elisa Manoni, elisa.manoni@pg.infn.it</contact>
 </header>
 """
 

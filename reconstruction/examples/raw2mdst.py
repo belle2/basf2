@@ -4,7 +4,8 @@
 from basf2 import *
 from rawdata import add_unpackers
 from reconstruction import add_reconstruction, add_mdst_output
-from softwaretrigger.path_functions import add_softwaretrigger_reconstruction
+from softwaretrigger.constants import SoftwareTriggerModes
+from softwaretrigger.softwaretrigger_reconstruction import add_softwaretrigger_reconstruction
 
 # create path
 main = create_path()
@@ -21,8 +22,8 @@ add_unpackers(main)
 
 # reconstruction
 # No filter is applied in monitoring mode. To enable filtering, use, for example,
-# softwaretrigger_mode="hlt_filter"
-add_softwaretrigger_reconstruction(main, softwaretrigger_mode="monitoring",
+# softwaretrigger_mode=SoftwareTriggerModes.filter
+add_softwaretrigger_reconstruction(main, softwaretrigger_mode=SoftwareTriggerModes.monitor,
                                    pruneDataStore=False, calcROIs=False)
 
 # mdst output

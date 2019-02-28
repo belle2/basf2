@@ -40,7 +40,8 @@ cluster = [
     'clusterErrorTheta',
     'clusterErrorTiming',
     'clusterHighestE',
-    'clusterHypothesis',
+    'clusterHasNPhotons',
+    'clusterHasNeutralHadron',
     'clusterLAT',
     'clusterNHits',
     'clusterPhi',
@@ -49,7 +50,6 @@ cluster = [
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'clusterUniqueID',
     'eclExtPhi',
     'eclExtPhiId',
     'eclExtTheta',
@@ -62,6 +62,28 @@ cluster = [
     'nRejectedECLShowersBWDEndcap',
     'nRejectedECLShowersBarrel',
     'nRejectedECLShowersFWDEndcap',
+]
+
+#: KLM cluster information
+klm_cluster = [
+    'klmClusterKlId',
+    'klmClusterTiming',
+    'klmClusterPositionX',
+    'klmClusterPositionY',
+    'klmClusterPositionZ',
+    'klmClusterInnermostLayer',
+    'klmClusterLayers',
+    'klmClusterEnergy',
+    'klmClusterMomentum',
+    'klmClusterIsBKLM',
+    'klmClusterIsEKLM',
+    'klmClusterIsForwardEKLM',
+    'klmClusterIsBackwardEKLM',
+    'klmClusterTheta',
+    'klmClusterPhi',
+    'maximumKLMAngleCMS',
+    'nKLMClusterTrackMatches',
+    'nMatchedKLMClusters',
 ]
 
 #: Dalitz masses for three body decays
@@ -211,7 +233,6 @@ momentum_uncertainty = [
 
 #: Replacement for RecoStats tool
 reco_stats = [
-    'nECLClusters',
     'nTracks',
 ]
 

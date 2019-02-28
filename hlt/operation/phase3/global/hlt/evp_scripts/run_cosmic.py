@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# This script can be chosen in the SC GUI. Its name is in the moment hardcoded into the GUI, so do not change it.
 
 import os
 import sys
@@ -32,8 +33,7 @@ histport = argvs[3]
 # ncore = argvs[4]
 ncore = "20"
 
-script = "cosmic_reco_monitor_novxd.py"
-# script = "cosmic_reco_monitor.py"
+script = "cosmic_reco_monitor.py"
 
 # run basf2
 proc = subprocess.Popen("basf2 --no-stats " + script + " " + inputrb + " " + outputrb +

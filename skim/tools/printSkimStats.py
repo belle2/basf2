@@ -41,15 +41,27 @@ import subprocess
 import json
 
 
-skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
+skims = '  ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
 skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
-skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic   '
-skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 Charm3BodyHadronic'
+skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0'  # CharmSemileptonic   '
+skims += ' feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 Charm3BodyHadronic'
 skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  '
-skims += 'CharmRare BtoXll BtoXgamma  TauLFV  Charm2BodyNeutrals2 CharmlessHad2Body CharmlessHad3Body'
+skims += ' CharmRare BtoXll BtoXgamma  TauLFV  Charm2BodyNeutrals2 CharmlessHad2Body CharmlessHad3Body'
 skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1 Charm3BodyHadronic3   Charm2BodyNeutrals Charm2BodyNeutralsD0'
-skims += 'Charm2BodyHadronic Charm2BodyHadronicD0'
-bkgs = 'MC11_mixedBGx1  MC11_chargedBGx1 MC11_ccbarBGx1 MC11_ssbarBGx1 MC11_uubarBGx0  MC11_ddbarBGx1  MC11_taupairBGx1'
+skims += ' Charm2BodyHadronic Charm2BodyHadronicD0'
+
+
+skims = 'ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon'
+skims = ' BtoDh_Kspipipi0 BtoDh_Kspi0 BtoDh_hh BtoDh_Kshh'
+skims = ' BtoPi0Pi0 BtoXll BtoXgamma Charm2BodyHadronic Charm2BodyHadronicD0'
+skims = ' Charm2BodyNeutrals Charm2BodyNeutralsD0 Charm3BodyHadronic Charm3BodyHadronic2'
+skims = ' Charm3BodyHadronic1 Charm3BodyHadronic3 CharmRare CharmSemileptonic'
+skims = ' CharmlessHad2Body CharmlessHad3Body ISRpipicc'
+skims = ' LFVZpInvisible LFVZpVisible LeptonicUntagged PRsemileptonicUntagged'
+skims = ' SLUntagged SinglePhotonDark SystematicsEELL SystematicsRadMuMu SystematicsRadEE'
+skims = ' SystematicsLambda Systematics SystematicsTracking TauLFV TCPV TauGeneric'
+skims = ' feiHadronicB0 feiHadronicBplus feiSLB0WithOneLep feiSLBplusWithOneLep'
+bkgs = 'MC11_mixedBGx1  MC11_chargedBGx1 MC11_ccbarBGx1 MC11_ccbarBGx1 MC11_uubarBGx0  MC11_ddbarBGx1  MC11_taupairBGx1'
 bkgs += ' MC11_mixedBGx0 MC11_chargedBGx0 MC11_ccbarBGx0 MC11_ssbarBGx0 MC11_uubarBGx0 MC11_ddbarBGx0 MC11_taupairBGx0'
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')

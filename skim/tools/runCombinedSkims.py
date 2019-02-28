@@ -2,7 +2,7 @@ import subprocess
 from skimExpertFunctions import *
 
 all_skims = [
-    "Dark", "Charm", "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "Tau", "MiscCombined", "feiHadronic", "ALP3Gamma",
+    "Dark", "Charm", "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "MiscCombined", "feiHadronic",
     "Semileptonic", "Quarkonium", "feiSLWithOneLepCombined"
 ]
 MC11types = {
@@ -21,7 +21,7 @@ MC11types = {
     "MC11_ssbarBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005682/s00/e0000/4S/r00000/ssbar/' +
     'mdst/sub00/mdst_000995_prod00005681_task00000996.root',
 
-    "MC11_taupairBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005684/s00/e0000/4S/r00000/ssbar/' +
+    "MC11_taupairBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005684/s00/e0000/4S/r00000/taupair/' +
     'mdst/sub00/mdst_000999_prod00005684_task00001002.root',
 
 
@@ -43,7 +43,7 @@ MC11types = {
     "MC11_ssbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005219/s00/e0000/4S/r00000/ssbar/' +
     'mdst/sub00/mdst_000988_prod00005219_task00000993.root',
 
-    "MC11_taupairBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005221/s00/e0000/4S/r00000/ssbar/' +
+    "MC11_taupairBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005221/s00/e0000/4S/r00000/taupair/' +
     'mdst/sub00/mdst_000985_prod00005221_task00000987.root',
 }
 

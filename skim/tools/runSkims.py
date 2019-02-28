@@ -31,19 +31,19 @@ MC11_types = {
     'mdst/sub00/mdst_000001_prod00005682_task00000001.root',
     "MC11_taupairBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005684/s00/e0000/4S/r00000/taupair/' +
     'mdst/sub00/mdst_000999_prod00005684_task00001002.root',
-    "MC11_mixedBGx0", '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006102/s00/e0000/4S/r00000/mixed/' +
+    "MC11_mixedBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006102/s00/e0000/4S/r00000/mixed/' +
     'mdst/sub00/mdst_000001_prod00006102_task00000001.root',
-    "MC11_chargedBGx0", '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006103/s00/e0000/4S/r00000/charged/' +
+    "MC11_chargedBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006103/s00/e0000/4S/r00000/charged/' +
     'mdst/sub00/mdst_000001_prod00006103_task00000001.root',
-    "MC11_ccbarBGx0", '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006107/s00/e0000/4S/r00000/ccbar/' +
+    "MC11_ccbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006107/s00/e0000/4S/r00000/ccbar/' +
     'mdst/sub00/mdst_000001_prod00006107_task00000001.root',
-    "MC11_uubarBGx0", '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006104/s00/e0000/4S/r00000/uubar/' +
+    "MC11_uubarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006104/s00/e0000/4S/r00000/uubar/' +
     'mdst/sub00/mdst_000001_prod00006104_task00000001.root',
-    "MC11_ddbarBGx0", '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006105/s00/e0000/4S/r00000/ddbar/' +
+    "MC11_ddbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006105/s00/e0000/4S/r00000/ddbar/' +
     'mdst/sub00/mdst_000001_prod00006105_task00000001.root',
-    "MC11_ssbarBGx0", '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006106/s00/e0000/4S/r00000/ssbar/' +
+    "MC11_ssbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006106/s00/e0000/4S/r00000/ssbar/' +
     'mdst/sub00/mdst_000001_prod00006107_task00000001.root',
-    "MC11_taupairBGx0", '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006108/s00/e0000/4S/r00000/taupair/' +
+    "MC11_taupairBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006108/s00/e0000/4S/r00000/taupair/' +
     'mdst/sub00/mdst_000001_prod00006108_task00000001.root',
 
 }
@@ -112,7 +112,7 @@ MC9_types = {
 }
 
 for skim in all_skims:
-    for dtype, input_file in MC11types.items():
+    for dtype, input_file in MC11_types.items():
         print(skim)
         print(dtype)
         script = f"../standalone/{skim}_Skim_Standalone.py"

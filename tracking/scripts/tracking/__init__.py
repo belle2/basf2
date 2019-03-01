@@ -210,7 +210,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                 path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
 
 
-def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='gcr2017',
+def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='early_phase3',
                          merge_tracks=True, use_second_cdc_hits=False):
     import cdc.cr as cosmics_setup
 

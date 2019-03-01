@@ -90,7 +90,7 @@ namespace Belle2 {
       double xraw = 0; /**< x at lost position [m] before matching G4 beam pipe inner surface */
       double yraw = 0; /**< y at lost position [m] before matching G4 beam pipe inner surface */
       double r = 0; /**< sqrt(x*x+y*y) [m] */
-      double rraw = 0; /**< sqrt(xraw*xraw+yraw*yraw) [m] */
+      double rr = 0; /**< sqrt(xraw*xraw+yraw*yraw) [m] */
       double dp_over_p0 = 0; /**< momentum deviation of the lost particle */
       double watt = 0; /**< loss wattage [W] */
     };
@@ -104,6 +104,8 @@ namespace Belle2 {
     TTree* m_tree = 0;  /**< root tree pointer */
     SADTree m_sad;      /**< TTree entry data */
     TRotation m_rotation; /**< rotation from SAD to Belle II frame */
+    int m_ring = 0 ; /**< ring number, 1-HER, 2-LER */
+    std::vector<int> m_sectionOrdering; /**< superKEKB section ordering */
 
     std::vector<double> m_rates; /**< cumulative rates of SAD particles [Hz] */
     int m_numEvents = 0 ; /**< number of events to generate */

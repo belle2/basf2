@@ -34,13 +34,14 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
 {
   //Parameter definition
   B2INFO("DQMHistAnalysisSVDGeneral: Constructor done.");
+
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
   addParam("unpackerErrorLevel", m_unpackError, "Maximum bin_content/ # events allowed before throwing ERROR", double(0.00001));
   addParam("occLevel_Error", m_occError, "Maximum Occupancy (%) allowed for safe operations (red)", float(5));
   addParam("occLevel_Warning", m_occWarning, "Occupancy (%) at WARNING level (orange)", float(3));
   addParam("occLevel_Empty", m_occEmpty, "Maximum Occupancy (%) for which the sensor is considered empty", float(0));
-  addParam("onlineOccLevel_Error", m_onlineOccError, "Maximum OnlineOccupancy (%) allowed for safe operations (red)", float(5));
-  addParam("onlineOccLevel_Warning", m_onlineOccWarning, "OnlineOccupancy (%) at WARNING level (orange)", float(3));
+  addParam("onlineOccLevel_Error", m_onlineOccError, "Maximum OnlineOccupancy (%) allowed for safe operations (red)", float(10));
+  addParam("onlineOccLevel_Warning", m_onlineOccWarning, "OnlineOccupancy (%) at WARNING level (orange)", float(5));
   addParam("onlineOccLevel_Empty", m_onlineOccEmpty, "Maximum OnlineOccupancy (%) for which the sensor is considered empty",
            float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
@@ -53,10 +54,10 @@ DQMHistAnalysisSVDGeneralModule::~DQMHistAnalysisSVDGeneralModule() { }
 void DQMHistAnalysisSVDGeneralModule::initialize()
 {
   B2INFO("DQMHistAnalysisSVDGeneral: initialized.");
-  B2INFO(" black = " << kBlack);
-  B2INFO(" green = " << kGreen);
-  B2INFO(" orange = " << kOrange);
-  B2INFO(" Red = " << kRed);
+  B2DEBUG(10, " black = " << kBlack);
+  B2DEBUG(10, " green = " << kGreen);
+  B2DEBUG(10, " orange = " << kOrange);
+  B2DEBUG(10, " Red = " << kRed);
 
   m_refFile = NULL;
   if (m_refFileName != "") {
@@ -87,15 +88,10 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   } else
     B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
 
-  B2INFO(" OCCUPANCY EMPTY occ < " << m_occEmpty);
-  B2INFO(" OCCUPANCY OK " << m_occEmpty << " < occ < " << m_occWarning);
-  B2INFO(" OCCUPANCY WARNING " << m_occWarning << " < occ < " << m_occError);
-  B2INFO(" OCCUPANCY EMPTY occ > " << m_occError);
-
-  B2INFO(" ONLINEOCCUPANCY EMPTY onlineOcc < " << m_onlineOccEmpty);
-  B2INFO(" ONLINEOCCUPANCY OK " << m_onlineOccEmpty << " < onlineOcc < " << m_onlineOccWarning);
-  B2INFO(" ONLINEOCCUPANCY WARNING " << m_onlineOccWarning << " < onlineOcc < " << m_onlineOccError);
-  B2INFO(" ONLINEOCCUPANCY EMPTY onlineOcc > " << m_onlineOccError);
+  B2INFO(" SVD occupancy thresholds:");
+  B2INFO("ONLINE OCCUPANCY: empty < " << m_onlineOccEmpty << " normal < " << m_onlineOccWarning << "warning < " << m_onlineOccError <<
+         " < error");
+  B2INFO("OFFLINE OCCUPANCY: empty < " << m_occEmpty << " normal < " << m_occWarning << "warning < " << m_occError << " < error");
 
   m_legError = new TPaveText(-1, 54, 3, 57.5);
   m_legError->AddText("ERROR!!");
@@ -116,6 +112,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
   //occupancy chart chip
   m_cOccupancyChartChip = new TCanvas("SVDOccupancy/c_OccupancyChartChip");
+  m_hOccupancyChartChip =  new TH1F();
 
   //strip occupancy per sensor
   m_cStripOccupancyU = new TCanvas*[nSensors];
@@ -128,7 +125,10 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
     int tmp_sensor = m_SVDModules[i].getSensorNumber();
     m_cStripOccupancyU[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyU_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
     m_cStripOccupancyV[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
+    m_hStripOccupancyU[i] = new TH1F();
+    m_hStripOccupancyV[i] = new TH1F();
   }
+
 
   //OFFLINE occupancy plots legend
   m_legProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
@@ -300,14 +300,13 @@ void DQMHistAnalysisSVDGeneralModule::event()
   TH1F* hChart = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsChip");
 
   if (hChart != NULL) {
-    m_hOccupancyChartChip = new TH1F(*hChart);
+    hChart->Copy(*m_hOccupancyChartChip);
     m_hOccupancyChartChip->SetName("SVDOccupancyChart");
     m_hOccupancyChartChip->SetTitle("SVD Occupancy of ZS5 Strips per chip " + runID);
     m_hOccupancyChartChip->Scale(1 / nEvents / 128);
     m_cOccupancyChartChip->cd();
     //    m_hOccupancyChartChip->SetStats(0);
-    m_hOccupancyChartChip->DrawClone();
-    delete m_hOccupancyChartChip;
+    m_hOccupancyChartChip->Draw();
   }
   m_cOccupancyChartChip->Modified();
   m_cOccupancyChartChip->Update();
@@ -381,7 +380,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       //      B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " status = " << m_occUstatus);
 
       //produce the occupancy plot
-      m_hStripOccupancyU[i] = new TH1F(*htmp);
+      htmp->Copy(*m_hStripOccupancyU[i]);
       m_hStripOccupancyU[i]->Scale(1 / nEvents);
       m_hStripOccupancyU[i]->SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
       m_hStripOccupancyU[i]->SetTitle(Form("SVD Sensor %d_%d_%d U-Strip ZS5 Occupancy vs Strip Number", tmp_layer, tmp_ladder,
@@ -422,7 +421,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
         }
       }
       //produce the occupancy plot
-      m_hStripOccupancyV[i] = new TH1F(*htmp);
+      htmp->Copy(*m_hStripOccupancyV[i]);
       m_hStripOccupancyV[i]->Scale(1 / nEvents);
       m_hStripOccupancyV[i]->SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));
       m_hStripOccupancyV[i]->SetTitle(Form("SVD Sensor %d_%d_%d V-Strip ZS5 Occupancy vs Strip Number", tmp_layer, tmp_ladder,
@@ -503,16 +502,14 @@ void DQMHistAnalysisSVDGeneralModule::event()
       //B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " V occ = " << occV << " status = " << m_occVstatus);
     }
 
-    //update sensor occupancy canvas U
+    //update sensor occupancy canvas U and V
     m_cStripOccupancyU[i]->cd();
-    m_hStripOccupancyU[i]->DrawClone("histo");
-    delete m_hStripOccupancyU[i];
+    m_hStripOccupancyU[i]->Draw("histo");
     m_cStripOccupancyV[i]->cd();
-    m_hStripOccupancyV[i]->DrawClone("histo");
-    delete m_hStripOccupancyV[i];
+    m_hStripOccupancyV[i]->Draw("histo");
   }
 
-  //update U canvas
+  //update summary offline occupancy U canvas
   m_cOccupancyU->cd();
   m_hOccupancyU->Draw("text");
   m_yTitle->Draw("same");
@@ -544,7 +541,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_cOccupancyU->Update();
 
 
-  //update V canvas
+  //update summary offline occupancy V canvas
   m_cOccupancyV->cd();
   m_hOccupancyV->Draw("text");
   m_yTitle->Draw("same");
@@ -576,7 +573,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_cOccupancyV->Modified();
   m_cOccupancyV->Update();
 
-  //update ONLINE U canvas
+  //update summary online occupancy U canvas
   m_cOnlineOccupancyU->cd();
   m_hOnlineOccupancyU->Draw("text");
   m_yTitle->Draw("same");
@@ -608,7 +605,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_cOnlineOccupancyU->Modified();
   m_cOnlineOccupancyU->Update();
 
-  //update ONLINE V canvas
+  //update summary online occupancy V canvas
   m_cOnlineOccupancyV->cd();
   m_hOnlineOccupancyV->Draw("text");
   m_yTitle->Draw("same");
@@ -672,21 +669,25 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_yTitle;
 
   delete m_cUnpacker;
+
   delete m_hOccupancyU;
   delete m_cOccupancyU;
   delete m_hOccupancyV;
   delete m_cOccupancyV;
+
   delete m_hOnlineOccupancyU;
   delete m_cOnlineOccupancyU;
   delete m_hOnlineOccupancyV;
   delete m_cOnlineOccupancyV;
+
   delete m_cOccupancyChartChip;
+  delete m_hOccupancyChartChip;
 
   for (int module = 0; module < nSensors; module++) {
     delete m_cStripOccupancyU[module];
-    //    delete m_hStripOccupancyU[module];
+    delete m_hStripOccupancyU[module];
     delete m_cStripOccupancyV[module];
-    //    delete m_hStripOccupancyV[module];
+    delete m_hStripOccupancyV[module];
   }
 
   delete m_cStripOccupancyU;

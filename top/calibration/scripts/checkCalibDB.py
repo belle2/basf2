@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 import sys
 from ROOT import Belle2
 

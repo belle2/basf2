@@ -43,6 +43,18 @@ namespace Belle2 {
     return items;
   }
 
+  std::vector<std::string> EnvironmentVariables::getOrCreateList(const std::string& name, const std::string& fallback,
+      const std::string& separators)
+  {
+    //almost the same as above but we don't need to check if its set, we just parse the value or fallback into a list
+    std::string value = get(name, fallback);
+    std::vector<std::string> items;
+    //Treat empty string as empty list
+    if (value.empty()) return items;
+    boost::split(items, value, boost::is_any_of(separators));
+    return items;
+  }
+
   std::string EnvironmentVariables::expand(const std::string& text)
   {
     // we could implement this ourselves ... but that seems like a waste of

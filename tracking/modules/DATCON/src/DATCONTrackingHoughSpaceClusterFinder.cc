@@ -17,16 +17,12 @@ void
 DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
 {
 
-  int vertSectors         =  1;
-  int angleSectors        =  1;
-  int* clusterCount = new int(1);
-  int* clusterSize  = new int(1);
-  int minimumClusterSize = 1;
-  int maximumClusterSize = 1000;
-  int actualPositionX     =   0;
-  int actualPositionY     =   0;
-  int* initialPositionX = new int(0);
-  int* initialPositionY = new int(0);
+  int vertSectors         = 1;
+  int angleSectors        = 1;
+  int minimumClusterSize  = 1;
+  int maximumClusterSize  = 1000;
+  int actualPositionX     = 0;
+  int actualPositionY     = 0;
   double unitX = 0., unitY = 0.;
   double angleRange = 0., vertRange = 0.;
   double left = 0., right = 0., up = 0., down = 0.;
@@ -35,16 +31,9 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
   vector<unsigned int> mergedList;
   TVector2 CandidateCoordinates;
 
-  TVector2* CenterOfGravity = new TVector2(0, 0);
-
-  vector<int> clusterSizes;
-  vector<TVector2> CoG;
-
   int** ArrayOfActiveHoughSpaceSectors;
 
   if (m_usePhase2Simulation) {
-    // ATTENTION TODO FIXME : This still has to be implemented!!!
-    // So far no phase 2 specific algorithms have been implemented and tested!
     B2WARNING("This mode is not yet implemented, nothing will happen! Return...");
     return;
   } else {
@@ -83,47 +72,37 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
   // 0       : non-active sector (will never be visited, only checked)
   // 1,2,3...: index of the clusters
 
+  m_clusterCount = 1;
+
   for (auto it = HoughSpaceClusterCandCopy.begin(); it != HoughSpaceClusterCandCopy.end(); it++) {
     idList = it->getIdList();
     mergedList = idList;
     CandidateCoordinates = it->getCoord();
-    int j = (int)CandidateCoordinates.X();
-    int i = (int)CandidateCoordinates.Y();
-    if (ArrayOfActiveHoughSpaceSectors[i][j] == -1) {
-      actualPositionX = j;
-      actualPositionY = i;
-      (*initialPositionX) = actualPositionX;
-      (*initialPositionY) = actualPositionY;
-      CenterOfGravity->Set((actualPositionX + 0.5), (actualPositionY + 0.5));
-      (*clusterSize) = 1;
-      DepthFirstSearch(uSide, ArrayOfActiveHoughSpaceSectors, angleSectors, vertSectors, initialPositionX, initialPositionY,
-                       actualPositionX, actualPositionY, clusterCount, clusterSize, CenterOfGravity, mergedList);
-      (*clusterCount)++;
-      if ((*clusterSize) >= minimumClusterSize && (*clusterSize) <= maximumClusterSize) {
-        double CoGX = left + unitX * CenterOfGravity->X() / (double)(*clusterSize);
-//         double CoGY = down + unitY * CenterOfGravity->Y() / (double)(*clusterSize);
-        double CoGY = up - unitY * CenterOfGravity->Y() / (double)(*clusterSize);
-        CenterOfGravity->Set(CoGX, CoGY);
+    actualPositionX = (int)CandidateCoordinates.X();
+    actualPositionY = (int)CandidateCoordinates.Y();
+    if (ArrayOfActiveHoughSpaceSectors[actualPositionY][actualPositionX] == -1) {
+      m_clusterInitialPosition.Set((double)actualPositionX, (double)actualPositionY);
+      m_clusterCenterOfGravity.Set((double)actualPositionX, (double)actualPositionY);
+      m_clusterSize = 1;
+      DepthFirstSearch(uSide, ArrayOfActiveHoughSpaceSectors, angleSectors, vertSectors,
+                       actualPositionX, actualPositionY, mergedList);
+      m_clusterCount++;
+      if (m_clusterSize >= minimumClusterSize && m_clusterSize <= maximumClusterSize) {
+        double CoGX = left + unitX * (((double)m_clusterCenterOfGravity.X() / (double)(m_clusterSize)) + 0.5);
+        double CoGY = up   - unitY * (((double)m_clusterCenterOfGravity.Y() / (double)(m_clusterSize)) + 0.5);
         if (uSide) {
-          uTrackCand.push_back(DATCONTrackCand(mergedList, (*CenterOfGravity)));
+          uTrackCand.push_back(DATCONTrackCand(mergedList, TVector2(CoGX, CoGY)));
         } else {
-          vTrackCand.push_back(DATCONTrackCand(mergedList, (*CenterOfGravity)));
+          vTrackCand.push_back(DATCONTrackCand(mergedList, TVector2(CoGX, CoGY)));
         }
       }
     }
   }
-
-  delete clusterCount;
-  delete clusterSize;
-  delete initialPositionX;
-  delete initialPositionY;
-
 }
 
 void
 DATCONTrackingModule::DepthFirstSearch(bool uSide, int** ArrayOfActiveHoughSpaceSectors, int angleSectors, int vertSectors,
-                                       int* initialPositionX, int* initialPositionY, int actualPositionX, int actualPositionY, int* clusterCount, int* clusterSize,
-                                       TVector2* CenterOfGravity, vector<unsigned int>& mergedList)
+                                       int actualPositionX, int actualPositionY, vector<unsigned int>& mergedList)
 {
   vector<unsigned int> mergeMeIDList;
   int maximumClusterSize;
@@ -144,7 +123,7 @@ DATCONTrackingModule::DepthFirstSearch(bool uSide, int** ArrayOfActiveHoughSpace
     maximumClusterSizeY = m_MaximumThetaHSClusterSizeY;
   }
 
-  ArrayOfActiveHoughSpaceSectors[actualPositionY][actualPositionX] = *clusterCount;
+  ArrayOfActiveHoughSpaceSectors[actualPositionY][actualPositionX] = m_clusterCount;
   for (int k = actualPositionY; k >= actualPositionY - 1; k--) {
     for (int l = actualPositionX; l <= actualPositionX + 1; l++) {
       if (k >= 0  && k < vertSectors && l >= 0 && l < angleSectors) {
@@ -160,15 +139,13 @@ DATCONTrackingModule::DepthFirstSearch(bool uSide, int** ArrayOfActiveHoughSpace
           }
           mergeIdList(mergedList, mergeMeIDList);
 
-          (*CenterOfGravity) += TVector2((l + 0.5), (k + 0.5));  // TODO: check whether k-0.5 would be better...
-          (*clusterSize)++;
-          if ((*clusterSize) >= maximumClusterSize || fabs((*initialPositionX) - actualPositionX) >= maximumClusterSizeX
-              || fabs((*initialPositionY) - actualPositionY) >= maximumClusterSizeY) {
+          m_clusterCenterOfGravity += TVector2(l, k);
+          m_clusterSize++;
+          if (m_clusterSize >= maximumClusterSize || abs((int)m_clusterInitialPosition.X() - actualPositionX) >= maximumClusterSizeX
+              || abs((int)m_clusterInitialPosition.Y() - actualPositionY) >= maximumClusterSizeY) {
             return;
           }
-          DepthFirstSearch(uSide, ArrayOfActiveHoughSpaceSectors, angleSectors, vertSectors, initialPositionX, initialPositionY, l, k,
-                           clusterCount, clusterSize, CenterOfGravity, mergedList);
-
+          DepthFirstSearch(uSide, ArrayOfActiveHoughSpaceSectors, angleSectors, vertSectors, l, k, mergedList);
         }
       }
     }

@@ -351,8 +351,57 @@ It is also includes updated optical properties of HAPD quartz window.
       <Element fraction="0.5326">O</Element> 
       <Element fraction="0.4674">Si</Element>
     </Components>  
+    <Property name="RINDEX" unit="eV">
+      <value energy="1.500">1.45287</value>
+      <value energy="1.675">1.45443</value>
+      <value energy="1.850">1.45601</value>
+      <value energy="2.025">1.45764</value>
+      <value energy="2.200">1.45936</value>
+      <value energy="2.375">1.46118</value>
+      <value energy="2.550">1.46312</value>
+      <value energy="2.725">1.46519</value>
+      <value energy="2.900">1.46741</value>
+      <value energy="3.075">1.46977</value>
+      <value energy="3.250">1.47229</value>
+      <value energy="3.425">1.47499</value>
+      <value energy="3.600">1.47786</value>
+      <value energy="3.775">1.48091</value>
+      <value energy="3.950">1.48417</value>
+      <value energy="4.125">1.48763</value>
+      <value energy="4.300">1.49132</value>
+      <value energy="4.475">1.49524</value>
+      <value energy="4.650">1.49941</value>
+      <value energy="4.825">1.50385</value>
+      <value energy="5.000">1.50857</value>
+      <value energy="5.175">1.5124</value>
+      <value energy="5.350">1.5171</value>
+      <value energy="5.525">1.5219</value>
+      <value energy="5.700">1.5269</value>
+      <value energy="5.875">1.5321</value>
+      <value energy="6.050">1.5374</value>
+      <value energy="6.225">1.5429</value>
+      <value energy="6.400">1.5486</value>
+      <value energy="6.575">1.5544</value>
+      <value energy="6.750">1.5604</value>
+      <value energy="6.925">1.5666</value>
+      <value energy="7.100">1.5730</value>
+      <value energy="7.275">1.5795</value>
+      <value energy="7.450">1.5862</value>
+    </Property>
+    <Property name="ABSLENGTH" unit="eV">
+      <value energy="1.5">1000</value>
+      <value energy="2.2">1000</value>
+      <value energy="2.9">1000</value>
+      <value energy="3.6">1000</value>
+      <value energy="4.3">1000</value>
+      <value energy="5.0">1000</value>
+      <value energy="5.7">1000</value>
+      <value energy="6.4">1000</value>
+      <value energy="7.1">1000</value>
+      <value energy="7.8">1000</value>
+    </Property>    
   </Material> 
-
+  
   <Material name="HAPD_pcb">
     <state>Solid</state>
     <density unit="g/cm3">4.2</density>

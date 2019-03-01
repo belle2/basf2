@@ -29,9 +29,9 @@ namespace Belle2 {
       /// Usually 2 (also for 1 dim measurement, u/v selected via precision matrix)
       explicit GlobalDerivatives(int dim = 2) {m_globals.second.ResizeTo(dim, 0);}
       /// Constructor from pair of the vector and the matrix
-      explicit GlobalDerivatives(std::pair<std::vector<int>, TMatrixD> globals);
+      explicit GlobalDerivatives(const std::pair<std::vector<int>, TMatrixD>& globals);
       /// constructor from label vector and derivative matrix
-      GlobalDerivatives(std::vector<int> labels, TMatrixD derivs);
+      GlobalDerivatives(const std::vector<int>& labels, const TMatrixD& derivs);
       /// Convenient operator to allow to pass the object directly from RecoHit to globalDerivatives()
       /// WARNING: causes zero labels to be removed
       operator std::pair<std::vector<int>, TMatrixD>() {return passGlobals(m_globals);}

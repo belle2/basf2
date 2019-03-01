@@ -58,7 +58,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
         # simulation top volume than the default geometry from the database.
         path.add_module("ParticleGun", pdgCodes=[-13, 13], momentumParams=[10, 200])
 
-    add_simulation(path, usePXDDataReduction=(location == "expressreco"))
+    add_simulation(path, usePXDDataReduction=(location == constants.Location.expressreco))
     add_tsim(path)
 
     if location == constants.Location.hlt:
@@ -66,7 +66,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     elif location == constants.Location.expressreco:
         components = DEFAULT_EXPRESSRECO_COMPONENTS
     else:
-        basf2.B2FATAL("Location {} for test is not supported".format(location))
+        basf2.B2FATAL("Location {} for test is not supported".format(location.name))
 
     components.append("TRG")
 
@@ -121,7 +121,7 @@ def test_script(script_location, input_file_name, temp_dir):
     test_path.add_module("RootInput", inputFileName=output_file_name)
     test_path.add_module(CheckForCorrectHLTResults())
 
-    if "beam_reco" in script_location:
+    if "expressreco" not in script_location and "beam_reco" in script_location:
         basf2.process(test_path)
 
 
@@ -143,10 +143,14 @@ def test_folder(location, run_type, exp_number, phase):
                      hlt/operation/{phase}/global/{location}/evp_scripts/)
     """
     temp_dir = tempfile.mkdtemp()
-    output_file_name = os.path.join(temp_dir, f"{location}_{run_type}.root")
+    output_file_name = os.path.join(temp_dir, f"{location.name}_{run_type.name}.root")
     generate_input_file(run_type=run_type, location=location,
                         output_file_name=output_file_name, exp_number=exp_number)
 
-    script_dir = find_file(f"hlt/operation/{phase}/global/{location}/evp_scripts/")
-    for script_location in glob(os.path.join(script_dir, f"{run_type}_*.py")):
+    script_dir = find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
+    run_at_least_one = False
+    for script_location in glob(os.path.join(script_dir, f"{run_type.name}_*.py")):
+        run_at_least_one = True
         test_script(script_location, input_file_name=output_file_name, temp_dir=temp_dir)
+
+    assert run_at_least_one

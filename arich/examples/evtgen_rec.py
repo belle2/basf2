@@ -4,7 +4,7 @@
 from basf2 import *
 from optparse import OptionParser
 from tracking import add_tracking_reconstruction
-
+import os
 # --------------------------------------------------------------------
 # Example of using ARICH reconstruction
 # needs reconstructed tracks (Tracks), extrapolated to ARICH (ExtHits)

@@ -56,7 +56,7 @@ namespace {
 
   class MockDetectorInterface : public IGlobalParamInterface {
   public:
-    MockDetectorInterface(int id) : m_id(id) {}
+    explicit MockDetectorInterface(int id) : m_id(id) {}
     int hasBeenCalled() { return m_called; }
     virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&,
                                 GlobalParamVector&) override final

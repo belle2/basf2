@@ -2,9 +2,6 @@ import basf2
 from softwaretrigger import constants
 import modularAnalysis
 
-from daqdqm.collisiondqm import add_collision_dqm
-from daqdqm.cosmicdqm import add_cosmic_dqm
-
 from rawdata import add_unpackers
 from tracking import add_cdc_monopole_track_finding
 
@@ -13,6 +10,11 @@ def add_online_dqm(path, run_type, dqm_environment, components):
     """
     Add DQM plots for a specific run type and dqm environment
     """
+
+    # Local imports, as the dqm package is not checked out by default
+    from daqdqm.collisiondqm import add_collision_dqm
+    from daqdqm.cosmicdqm import add_cosmic_dqm
+
     if run_type == constants.RunTypes.beam:
         add_collision_dqm(path, components=components, dqm_environment=dqm_environment)
     elif run_type == constants.RunTypes.cosmic:
@@ -30,7 +32,7 @@ def add_hlt_dqm(path, run_type, components=constants.DEFAULT_HLT_COMPONENTS, sta
         add_geometry_if_not_present(path)
         add_unpackers(path, components=components)
 
-    add_online_dqm(path, run_type=run_type, dqm_environment=str(constants.Location.hlt), components=components)
+    add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.hlt.name, components=components)
 
 
 def add_expressreco_dqm(path, run_type, components=constants.DEFAULT_EXPRESSRECO_COMPONENTS, standalone=False):
@@ -41,7 +43,7 @@ def add_expressreco_dqm(path, run_type, components=constants.DEFAULT_EXPRESSRECO
         add_geometry_if_not_present(path)
         add_unpackers(path, components=components)
 
-    add_online_dqm(path, run_type=run_type, dqm_environment=str(constants.Location.expressreco), components=components)
+    add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components)
 
 
 def add_geometry_if_not_present(path):

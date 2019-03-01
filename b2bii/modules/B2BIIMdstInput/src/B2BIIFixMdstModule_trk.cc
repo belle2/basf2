@@ -2718,7 +2718,7 @@ namespace Belle2 {
 
     // scale error matrices in mdst_trk_fit
     Belle::Mdst_trk_fit_Manager& fitmgr = Belle::Mdst_trk_fit_Manager::get_manager();
-    for (std::vector<Belle::Mdst_trk_fit>::iterator it = fitmgr.begin(); it != fitmgr.end(); it++) {
+    for (std::vector<Belle::Mdst_trk_fit>::iterator it = fitmgr.begin(); it != fitmgr.end(); ++it) {
       Belle::Mdst_trk_fit& fit = *it;
       if (fit.helix(2) == 0.) continue;
 
@@ -2747,7 +2747,7 @@ namespace Belle2 {
 
     // scale error matrices in mdst_daughters
     Belle::Mdst_vee_daughters_Manager& daumgr = Belle::Mdst_vee_daughters_Manager::get_manager();
-    for (std::vector<Belle::Mdst_vee_daughters>::iterator it = daumgr.begin(); it != daumgr.end(); it++) {
+    for (std::vector<Belle::Mdst_vee_daughters>::iterator it = daumgr.begin(); it != daumgr.end(); ++it) {
       Belle::Mdst_vee_daughters& dau = *it;
       if (dau.helix_p(2) == 0. || dau.helix_m(2) == 0.) continue;
 
@@ -3001,7 +3001,7 @@ namespace Belle2 {
     const int i_ch(chMgr.count() + 1);
     const int i_trk(tMgr.count() + 1);
     for (std::vector<Belle::Mdst_trk_extra>::const_iterator i = teMgr.begin();
-         i != teMgr.end(); i++) {
+         i != teMgr.end(); ++i) {
       Belle::Mdst_trk& trk(tMgr.add());
       trk.quality((*i).quality());
       for (int j = 0; j < 5; j++) trk.mhyp(j, (*i).mhyp(j));
@@ -3050,7 +3050,7 @@ namespace Belle2 {
     Belle::Mdst_sim_trk_Manager& stMgr(Belle::Mdst_sim_trk_Manager::get_manager());
     int ist(0);
     for (std::vector<Belle::Mdst_sim_trk_extra>::const_iterator i = steMgr.begin();
-         i != steMgr.end(); i++) {
+         i != steMgr.end(); ++i) {
       Belle::Mdst_sim_trk& strk(stMgr.add());
       int argn = tMgr.count() - teMgr.count() + ist;
       if (argn < tMgr.count()) {
@@ -3068,7 +3068,7 @@ namespace Belle2 {
     (Belle::Mdst_svd_hit_extra_Manager::get_manager());
     Belle::Mdst_svd_hit_Manager& shMgr(Belle::Mdst_svd_hit_Manager::get_manager());
     for (std::vector<Belle::Mdst_svd_hit_extra>::iterator it = sheMgr.begin();
-         it != sheMgr.end(); it++) {
+         it != sheMgr.end(); ++it) {
       Belle::Mdst_svd_hit_extra& she = *it;
       Belle::Mdst_svd_hit& sh(shMgr.add());
       sh.lsa(she.lsa());
@@ -3087,7 +3087,7 @@ namespace Belle2 {
     Belle::Mdst_vee2_extra_Manager& veMgr(Belle::Mdst_vee2_extra_Manager::get_manager());
     const int i_vee2(vMgr.count() + 1);
     for (std::vector<Belle::Mdst_vee2_extra>::const_iterator i = veMgr.begin();
-         i != veMgr.end(); i++) {
+         i != veMgr.end(); ++i) {
       Belle::Mdst_vee2& vee(vMgr.add());
       vee.kind((*i).kind());
 
@@ -3181,7 +3181,7 @@ namespace Belle2 {
       std::vector<int> extra_ID;
       if (teMgr.count()) teMgr.remove();
       for (std::vector<Belle::Mdst_trk>::iterator i = tMgr.begin();
-           i != tMgr.end(); i++) {
+           i != tMgr.end(); ++i) {
         if ((*i).get_ID() < i_trk) {
           extra_ID.push_back(0);
           continue;
@@ -3198,7 +3198,7 @@ namespace Belle2 {
       if (i_vee2) {
         if (veeeMgr.count()) veeeMgr.remove();
         for (std::vector<Belle::Mdst_vee2>::iterator i = veeMgr.begin();
-             i != veeMgr.end(); i++) {
+             i != veeMgr.end(); ++i) {
           if ((*i).get_ID() < i_vee2) continue;
           if (!((*i).chgd(0).trk().quality() & 16u) && !((*i).chgd(1).trk().quality() & 16u)) {
             B2ERROR("Warning from B2BIIFixMdst: inconsistency between Belle::Mdst_vee2 and Belle::Mdst_evet_add"
@@ -3293,7 +3293,7 @@ namespace Belle2 {
     double scale[5];
 
     Belle::Mdst_trk_fit_Manager& fitmgr = Belle::Mdst_trk_fit_Manager::get_manager();
-    for (std::vector<Belle::Mdst_trk_fit>::iterator it = fitmgr.begin(); it != fitmgr.end(); it++) {
+    for (std::vector<Belle::Mdst_trk_fit>::iterator it = fitmgr.begin(); it != fitmgr.end(); ++it) {
       Belle::Mdst_trk_fit& fit = *it;
       if (fit.helix(2) == 0.) continue;
 
@@ -3362,10 +3362,9 @@ namespace Belle2 {
     }
 
     double u[n][n];
-    double s;
     //int pozdef = 1;
     for (int j = 0; j < n; j++) {
-      s = a[j][j];
+      double s = a[j][j];
       for (int k2 = 0; k2 < j; k2++) s -= u[j][k2] * u[j][k2];
       if (s > 0) {
         u[j][j] = sqrt(s);
@@ -3398,7 +3397,7 @@ namespace Belle2 {
   {
 //====================
     Belle::Mdst_charged_Manager& chgmgr = Belle::Mdst_charged_Manager::get_manager();
-    for (std::vector<Belle::Mdst_charged>::iterator it = chgmgr.begin(); it != chgmgr.end(); it++) {
+    for (std::vector<Belle::Mdst_charged>::iterator it = chgmgr.begin(); it != chgmgr.end(); ++it) {
       Belle::Mdst_charged& c = *it;
       Belle::Mdst_trk_fit& t = c.trk().mhyp(2);
 

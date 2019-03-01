@@ -18,7 +18,7 @@ from beamparameters import add_beamparameters
 set_log_level(LogLevel.WARNING)
 
 # Fixed random seed
-set_random_seed(12345)
+set_random_seed(123456)
 
 # Create main path
 main = create_path()

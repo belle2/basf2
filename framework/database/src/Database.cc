@@ -198,11 +198,6 @@ bool Database::writePayload(const std::string& fileName, const std::string& name
 }
 
 namespace {
-  void Database_addExperimentName(int, const std::string&)
-  {
-    B2WARNING("set_experiment_name is deprecated: setting experiment names is no longer possible and will be ignored");
-  }
-
   /** Configure the network settings for the Conditions database downloads */
   boost::python::dict setConditionsNetworkSettings(boost::python::tuple args, boost::python::dict kwargs)
   {
@@ -306,12 +301,6 @@ void Database::exposePythonAPI()
   docstring_options options(true, true, false);
 
   def("get_default_global_tags", &Database::getDefaultGlobalTags, "Get the default global tags for the central database");
-  def("set_experiment_name", &Database_addExperimentName, args("experiment", "name"), R"DOCSTRING(
-Set a name for the given experiment number when looking up payloads in the
-central database.
-
-.. deprecated:: release-00-09-00
-   This function is deprecated and any calls to it are ignored.)DOCSTRING");
   def("reset_database", &Database::reset, "Reset the database setup to have no database sources");
   def("use_database_chain", &DatabaseChain::createInstance,
       (bp::arg("resetIoVs") = true, bp::arg("loglevel") = LogConfig::c_Warning, bp::arg("invertLogging") = false),

@@ -51,14 +51,14 @@ namespace Belle2 {
                                          const std::string& cutIdentifier);
 
       /**
-       * Handy function to create the cut name related to the total cut result of a specific
-       * trigger stage (either trigger or skim) in the stored results. It is in the form
+       * Handy function to create the name related to the total result of a specific
+       * trigger stage (either filter or skim) in the stored results or the total result. It is in the form
        *   <package_identifier>&<base_name>&total_result
        *
-       * @param baseIdentifier The baseIdentifier (either trigger or skim)
+       * @param baseIdentifier The baseIdentifier (either filter or skim or all)
        * @return then name.
        */
-      static std::string makeTotalCutName(const std::string& baseIdentifier);
+      static std::string makeTotalResultName(const std::string& baseIdentifier = "all");
 
       /**
        * Helper function to compile the full menu identifier from the base name.

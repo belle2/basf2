@@ -94,6 +94,7 @@ namespace Belle2 {
 
   void ARICHDigitizerModule::beginRun()
   {
+    if (m_simPar->getNBkgHits() > 0)  m_bkgLevel = m_simPar->getNBkgHits();
   }
 
   void ARICHDigitizerModule::event()

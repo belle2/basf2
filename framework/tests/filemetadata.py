@@ -59,7 +59,7 @@ assert 0 == os.system('b2file-metadata-add --lfn /logical/file/name ' + testFile
 assert 0 == os.system('b2file-metadata-show ' + testFile.name)
 
 # Check JSON output (contains steering file, so we cannotuse .out)
-metadata_output = subprocess.check_output(['showmetadata', '--json', testFile.name])
+metadata_output = subprocess.check_output(['b2file-metadata-show', '--json', testFile.name])
 m = json.loads(metadata_output.decode('utf-8'))
 assert 7 == m['experimentLow']
 assert 1 == m['runLow']

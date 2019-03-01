@@ -30,8 +30,6 @@ import flavorTagger as ft
 import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
-import stdCharged as stdc
-from stdPi0s import stdPi0s
 
 
 # create path
@@ -45,26 +43,25 @@ environmentType = "default"
 belleOrBelle2Flag = "Belle2"
 
 
-if belleOrBelle2Flag == "Belle":
-    from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
-    import os
+# For Belle data/MC use
+#  from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
+#  import os
+#
+#  isBelleMC = True  # False for Belle Data True for Belle MC
+#  setupB2BIIDatabase(isBelleMC)
+#  os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
+#  os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
+#
+#  environmentType = "Belle"
+#
+#  # You can use Belle MC/data as input calling this script as basf2 -i 'YourConvertedBelleData*.root' B2A801-FlavorTagger.p
+#  ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
 
-    isBelleMC = True  # False for Belle Data True for Belle MC
-    setupB2BIIDatabase(isBelleMC)
-    os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
-    os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
-    environmentType = "Belle"
-
-    # You use Belle MC/data as input calling this script as basf2 -i 'YourConvertedBelleData*.root' B2A801-FlavorTagger.p
-    ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
-
-if belleOrBelle2Flag == "Belle2":
-
-    # load input ROOT file
-    ma.inputMdst(environmentType='default',
-                 filename=b2.find_file('mdst11_BGx1_b2jpsiks.root', 'examples', False),
-                 path=cp_val_path)
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('mdst11_BGx1_b2jpsiks.root', 'examples', False),
+             path=cp_val_path)
 
 
 # Creates Muon particle list
@@ -74,26 +71,25 @@ ma.fillParticleList(decayString='mu+:all', cut='', path=cp_val_path)
 # keep only candidates with dM<0.11
 ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=cp_val_path)
 
-if belleOrBelle2Flag == "Belle":
 
-    # use the existent K_S0:mdst list
-    ma.matchMCTruth(list_name='K_S0:mdst', path=cp_val_path)
+# For Belle data/MC use
+#  # use the existent K_S0:mdst list
+#  ma.matchMCTruth(list_name='K_S0:mdst', path=cp_val_path)
+#
+#  # reconstruct B0 -> J/psi Ks decay
+#  ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
 
-    # reconstruct B0 -> J/psi Ks decay
-    ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
 
-if belleOrBelle2Flag == "Belle2":
+# reconstruct Ks from standard pi+ particle list
+ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
+ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
 
-    # reconstruct Ks from standard pi+ particle list
-    ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
-    ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
+# reconstruct Ks from standard pi+ particle list
+ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
+ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
 
-    # reconstruct Ks from standard pi+ particle list
-    ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
-    ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
-
-    # reconstruct B0 -> J/psi Ks decay
-    ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+# reconstruct B0 -> J/psi Ks decay
+ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
 
 # Does the matching between reconstructed and MC particles
 ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
@@ -121,9 +117,11 @@ b2.use_central_database("analysis_tools_release-03-01-00")
 # The official weight files are trained using B0-> nu_tau anti-nu_tau as signal channel (no CP violation)
 # to avoid that the flavor tagger learns asymmetries on the tag side. Belle is not sensitive to this effect
 # and therefore JpsiKs is ok.
+
 weightfiles = 'B2nunubarBGx1'
-if belleOrBelle2Flag == "Belle":
-    weightfiles = 'B2JpsiKs_muBGx1'
+
+# For converted Belle data/MC use
+# weightfiles = 'B2JpsiKs_muBGx1'
 
 # Flavor Tagging Function. Default Expert mode to use the official weight files.
 ft.flavorTagger(

@@ -21,25 +21,22 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 //ROOT
+#include <TClass.h>
+#include <TROOT.h>
+#include <TMath.h>
 #include <TCanvas.h>
-#include <TString.h>
 #include <TLine.h>
-#include <TPaveText.h>
-#include <TFile.h>
 #include <TLegend.h>
 #include <THStack.h>
 #include <TWbox.h>
-
-class TH1F;
-class TH2F;
-
+#include <TFrame.h>
+#include <TH1F.h>
 
 namespace Belle2 {
 
   /**
    * This module is for analysis of ECL DQM histograms.
    */
-
 
   class DQMHistAnalysisECLModule : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
 
@@ -64,8 +61,9 @@ namespace Belle2 {
 
   private:
 
-    /** TLines showing acceptable boundaries for 'trigtag2_trigid' histogram. */
+    /** TLine to show lower boundary for 'trigtag2_trigid' histogram. */
     TLine* m_line1 = nullptr;
+    /** TLine to show upper boundary for 'trigtag2_trigid' histogram. */
     TLine* m_line2 = nullptr;
 
     /** Statistics control flag for time crate histograms from current run. */
@@ -88,8 +86,9 @@ namespace Belle2 {
     /** TLegend for time offsets. */
     TLegend* m_leg = nullptr;
 
-    /**TWboxes for time offsets TLegend. */
+    /** TWbox to show large time offset in TLegend. */
     TWbox* box1 = nullptr;
+    /** TWbox to show low statistics case in TLegend. */
     TWbox* box2 = nullptr;
 
     /** Histogram showing signal times from ECL crates (Thr. = 1 GeV). */

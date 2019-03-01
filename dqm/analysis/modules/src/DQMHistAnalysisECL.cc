@@ -18,14 +18,6 @@
 //THIS MODULE
 #include <dqm/analysis/modules/DQMHistAnalysisECL.h>
 
-//ROOT
-#include <TClass.h>
-#include <TDirectory.h>
-#include <TROOT.h>
-#include <TStyle.h>
-#include <TMath.h>
-#include <TFrame.h>
-
 using namespace Belle2;
 
 REG_MODULE(DQMHistAnalysisECL)
@@ -111,6 +103,7 @@ void DQMHistAnalysisECLModule::timeCrate(TH1F* h, Int_t* st)
       if (hclone->GetEntries() < 100) st[i] = 1;
       h->SetBinContent(i + 1, hclone->GetMean());
       h->SetBinError(i + 1, hclone->GetMeanError());
+      delete hclone;
     } else {
       st[i] = 1;
       h->SetBinContent(i + 1, 0);

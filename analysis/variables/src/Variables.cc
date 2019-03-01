@@ -663,15 +663,6 @@ namespace Belle2 {
       return p4.M2();
     }
 
-    double particleInvariantMassSquared(const Particle* part)
-    {
-      double m = particleInvariantMass(part);
-      if (m < 0)
-        return -(m * m);
-      else
-        return m * m;
-    }
-
     double b2bTheta(const Particle* part)
     {
       PCmsLabTransform T;
@@ -1226,16 +1217,13 @@ namespace Belle2 {
                       "released energy in decay minus nominal one");
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
+    REGISTER_VARIABLE("M2", particleMassSquared,
+                      "invariant mass squared (determined from particle's 4-momentum vector)");
 
     REGISTER_VARIABLE("InvM", particleInvariantMass,
                       "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "invariant mass (determined from particle's daughter 4-momentum vectors)");
-
-    REGISTER_VARIABLE("M2", particleMassSquared,
-                      "invariant mass squared (determined from particle's 4-momentum vector)");
-    REGISTER_VARIABLE("InvM2", particleInvariantMassSquared,
-                      "invariant mass squared (determined from particle's daughter 4-momentum vectors)");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
                       "uncertainty of invariant mass (determined from particle's daughter 4 - momentum vectors)");

@@ -202,9 +202,9 @@ namespace Belle2 {
       /** Phi v. theta per TPC for He w/ edge cuts weighted */
       TH2F* h_twtvp_He_pure[8];
       /** recoil energy */
-      TH2F* h_mctpc_recoil;
+      TH3F* h_mctpc_recoil;
       /** weighted recoil energy */
-      TH2F* h_mctpc_recoilW;
+      TH3F* h_mctpc_recoilW;
       /** vector of interaction probability vs E graphs for all recoils*/
       std::vector<TGraph*> m_intProb;
       /** vector of maximal energy fraction transfered to recoil*/

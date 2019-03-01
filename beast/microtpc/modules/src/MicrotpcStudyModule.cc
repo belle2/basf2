@@ -80,8 +80,8 @@ void MicrotpcStudyModule::defineHisto()
     h_tpc_rate[i]  = new TH1F(TString::Format("h_tpc_rate_%d", i), "detector #", 8, 0., 8.);
   }
 
-  h_mctpc_recoil = new TH2F("h_mctpc_recoil", "Neutron recoil energy [MeV]", 8, -0.5, 7.5, 1000, 0., 10.);
-  h_mctpc_recoilW = new TH2F("h_mctpc_recoil_w", "Neutron recoil energy [MeV]", 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoil = new TH3F("h_mctpc_recoil", "Neutron recoil energy [MeV]", 3, -0.5, 2.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoilW = new TH3F("h_mctpc_recoil_w", "Neutron recoil energy [MeV]", 3, -0.5, 2.5, 8, -0.5, 7.5, 1000, 0., 10.);
   h_mctpc_recoil->Sumw2();
   h_mctpc_recoilW->Sumw2();
 
@@ -474,9 +474,9 @@ void MicrotpcStudyModule::event()
       int irecoil = 0;
       for (auto fract : m_maxEnFrac) { // loop over all recoils in beast/microtpc/data/MICROTPC-recoilProb.xml
         double recoil = gRandom->Uniform(fract) * kin * 1e3; // calculate recoil energy
-        double weight = m_intProb[irecoil]->Eval(kin * 1e3) * trlen; // wight - interaction probability * track lenght
-        h_mctpc_recoil->Fill(detNb, recoil); // fill recoil energy
-        h_mctpc_recoilW->Fill(detNb, recoil, weight); // fill weighted recoil energy
+        double weight = m_intProb[irecoil]->Eval(kin * 1e3) * trlen; // weight - interaction probability * track lenght
+        h_mctpc_recoil->Fill(irecoil, detNb, recoil); // fill recoil energy
+        h_mctpc_recoilW->Fill(irecoil, detNb, recoil, weight); // fill weighted recoil energy
         irecoil++;
       }
     }

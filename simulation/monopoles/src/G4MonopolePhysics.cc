@@ -15,6 +15,7 @@
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 #include <simulation/monopoles/G4Monopole.h>
 #include <simulation/monopoles/G4MonopoleTransportation.h>
+#include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
 
@@ -43,8 +44,14 @@ G4MonopolePhysics::G4MonopolePhysics(double magneticCharge)
   //No way to store magnetic charge in TDatabasePDG,
   //so part of the information (e, m, code, etc.) should be stored before generation
   //and other part (g) passed to the simulation setup
-  fElCharge  = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode)->Charge() / 3.0; //TParticlePDG returns in units of |e|/3
-  fMonopoleMass = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode)->Mass() * GeV;
+  const auto monopoleInPDG = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode);
+  const auto antiMonopoleInPDG = TDatabasePDG::Instance()->GetParticle(-c_monopolePDGCode);
+  if (!monopoleInPDG || !antiMonopoleInPDG) {
+    B2FATAL("Monopole physics was requested, but the monopole parameters"
+            "were not registered in local PDG database under PID code " << c_monopolePDGCode);
+  }
+  fElCharge  = monopoleInPDG->Charge() / 3.0; //TParticlePDG returns in units of |e|/3
+  fMonopoleMass = antiMonopoleInPDG->Mass() * GeV;
   SetPhysicsType(bUnknown);
 }
 

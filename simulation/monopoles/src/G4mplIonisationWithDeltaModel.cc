@@ -51,7 +51,8 @@ G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
   pi_hbarc2_over_mc2 = pi * hbarc * hbarc / electron_mass_c2;
   nmpl = magCharge * 2 * fine_structure_const;
   chargeSquare = magCharge * magCharge * 4 * fine_structure_const *
-                 fine_structure_const; //Formulas below assume Dirac charge units for magnetic charge, g_D = 68.5e
+                 fine_structure_const;
+  //NOTE Formulas below assume Dirac charge units for magnetic charge, g_D = 68.5e
   dedxlim = 45. * chargeSquare * GeV * cm2 / g;
   fParticleChange = nullptr;
   theElectron = G4Electron::Electron();

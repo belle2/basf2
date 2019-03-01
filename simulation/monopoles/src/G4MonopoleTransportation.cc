@@ -230,15 +230,15 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
                               fParticleDef->GetPDGSpin(),
                               0,   //  Magnetic moment:  pParticleDef->GetMagneticMoment(),
                               0,   //  Electric Dipole moment - not in Particle Definition
-                              particleMagneticCharge);    // in Mev/c
+                              particleMagneticCharge);    // in units of the positron charge
 
     G4EquationOfMotion* equationOfMotion =
       (fFieldPropagator->GetChordFinder()->GetIntegrationDriver()->GetStepper())
       ->GetEquationOfMotion();
 
     equationOfMotion
-    ->SetChargeMomentumMass(chargeState,        //  Was particleMagneticCharge - in Mev/c
-                            momentumMagnitude, //  Was particleElectricCharge
+    ->SetChargeMomentumMass(chargeState,
+                            momentumMagnitude,
                             restMass) ;
     // SetChargeMomentumMass now passes both the electric and magnetic charge - in chargeState
 

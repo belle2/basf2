@@ -37,13 +37,13 @@ using namespace Belle2::Monopoles;
 
 G4MonopolePhysics::G4MonopolePhysics(double magneticCharge)
   : G4VPhysicsConstructor("Monopole physics"),
+    fMagCharge(magneticCharge), //in units of the positron charge
     fMpl(0), fApl(0)
 {
   //No way to store magnetic charge in TDatabasePDG,
-  //so part of the information (e, m, pdg, etc.) should be stored before generation
+  //so part of the information (e, m, code, etc.) should be stored before generation
   //and other part (g) passed to the simulation setup
-  fMagCharge = magneticCharge;//TODO check untis, should be handled as (e+)
-  fElCharge  = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode)->Charge() / 3.0;
+  fElCharge  = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode)->Charge() / 3.0; //TParticlePDG returns in units of |e|/3
   fMonopoleMass = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode)->Mass() * GeV;
   SetPhysicsType(bUnknown);
 }

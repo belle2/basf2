@@ -15,19 +15,14 @@
 """
 
 import ROOT
-import numpy as np
-import pylab
-import sys
-import glob
 import math
-import random
 import array
 from operator import itemgetter
 
 
 PATH = "."
 
-workingFiles = glob.glob(str("../CPVToolsOutput.root"))
+workingFiles = ["../CPVToolsOutput.root"]
 
 limDeltaT = 5
 limDeltaTErr = 3.0
@@ -87,10 +82,10 @@ for VXDReq in VXDReqs:
     B0_Z = ROOT.RooRealVar("z", "z", 0., -100, 100, "cm")
     B0_TruthZ = ROOT.RooRealVar("mcZ", "mcZ", 0., -100, 100, "cm")
 
-    B0_Jpsi_mu0_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_0_d0_d0_nPXDHits", "Jpsi_mu_0_0_d0_d0_nPXDHits", 1., -10., 100.)
-    B0_Jpsi_mu1_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_1_d0_d1_nPXDHits", "Jpsi_mu_0_1_d0_d1_nPXDHits", 1., -10., 100.)
-    B0_Jpsi_mu0_nSVDHits = ROOT.RooRealVar("Jpsi_mu_0_0_d0_d0_nSVDHits", "Jpsi_mu_0_0_d0_d0_nSVDHits", 1., -10., 100.)
-    B0_Jpsi_mu1_nSVDHits = ROOT.RooRealVar("Jpsi_mu_0_1_d0_d1_nSVDHits", "Jpsi_mu_0_1_d0_d1_nSVDHits", 1., -10., 100.)
+    B0_Jpsi_mu0_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_nPXDHits", "Jpsi_mu_0_nPXDHits", 0., -10., 100.)
+    B0_Jpsi_mu1_nPXDHits = ROOT.RooRealVar("Jpsi_mu_1_nPXDHits", "Jpsi_mu_1_nPXDHits", 0., -10., 100.)
+    B0_Jpsi_mu0_nSVDHits = ROOT.RooRealVar("Jpsi_mu_0_nSVDHits", "Jpsi_mu_0_nSVDHits", 0., -10., 100.)
+    B0_Jpsi_mu1_nSVDHits = ROOT.RooRealVar("Jpsi_mu_1_nSVDHits", "Jpsi_mu_1_nSVDHits", 0., -10., 100.)
 
     # B0_Jpsi_mu0_firstSVDLayer = ROOT.RooRealVar("B0_Jpsi_mu0__firstSVDLayer", "B0_pi0_e1__firstSVDLayer", 1., -10., 100.)
     # B0_Jpsi_mu1_firstSVDLayer = ROOT.RooRealVar("B0_Jpsi_mu1__firstSVDLayer", "B0_pi0_e0__firstSVDLayer", 1., -10., 100.)
@@ -113,14 +108,14 @@ for VXDReq in VXDReqs:
     cut = "isSignal == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
 
     if VXDReq == 'PXD1':
-        cut = cut + "&& (Jpsi_mu_0_0_d0_d0_nPXDHits> 0 || Jpsi_mu_0_1_d0_d1_nPXDHits> 0) "
+        cut = cut + "&& (Jpsi_mu_0_nPXDHits> 0 || Jpsi_mu_1_nPXDHits> 0) "
     if VXDReq == 'PXD2':
-        cut = cut + "&& Jpsi_mu_0_0_d0_d0_nPXDHits> 0 && Jpsi_mu_0_1_d0_d1_nPXDHits> 0 "
+        cut = cut + "&& Jpsi_mu_0_nPXDHits> 0 && Jpsi_mu_1_nPXDHits> 0 "
 
     if VXDReq == 'SVD1':
-        cut = cut + "&& (Jpsi_mu_0_0_d0_d0_nSVDHits> 0 || Jpsi_mu_0_1_d0_d1_nSVDHits> 0) "
+        cut = cut + "&& (Jpsi_mu_0_SVDHits> 0 || Jpsi_mu_1_nSVDHits> 0) "
     if VXDReq == 'SVD2':
-        cut = cut + "&& Jpsi_mu_0_0_d0_d0_nSVDHits> 0 && Jpsi_mu_0_1_d0_d1_nSVDHits> 0 "
+        cut = cut + "&& Jpsi_mu_0_nSVDHits> 0 && Jpsi_mu_1_nSVDHits> 0 "
 
     tdat.Draw("DeltaT - MCDeltaT >> B0_DeltaT_" + VXDReq, cut)
     tdat.Draw("DeltaTErr >> B0_DeltaTErr_" + VXDReq, cut)

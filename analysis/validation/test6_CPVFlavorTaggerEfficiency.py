@@ -16,20 +16,13 @@ import ROOT
 from basf2 import B2INFO, B2FATAL
 import flavorTagger as ft
 from array import array
-import pickle
-import math
-import glob
-import sys
 import shutil
 
 ROOT.gROOT.SetBatch(True)
 
-workingFile = str("../CPVToolsOutput.root")
-workingFiles = glob.glob(str(workingFile))
+workingFiles = ["../CPVToolsOutput.root"]
 treeName = str("B0tree")
 
-if len(workingFiles) < 1:
-    sys.exit("No file name or file names " + str(workingFile) + " found.")
 
 workingDirectory = '.'
 

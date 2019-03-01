@@ -1,53 +1,53 @@
 //+
-// File : RawFTSWFormat_v0.cc
+// File : RawFTSWFormat_v1.cc
 // Description : Module to handle raw data from COPPER.
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
-#include <rawdata/dataobjects/RawFTSWFormat_v0.h>
+#include <rawdata/dataobjects/RawFTSWFormat_v1.h>
 
 
 using namespace std;
 using namespace Belle2;
 
-RawFTSWFormat_v0::RawFTSWFormat_v0()
+RawFTSWFormat_v1::RawFTSWFormat_v1()
 {
 }
 
-RawFTSWFormat_v0::~RawFTSWFormat_v0()
+RawFTSWFormat_v1::~RawFTSWFormat_v1()
 {
 }
 
 
-int RawFTSWFormat_v0::Get15bitTLUTag(int n)
+int RawFTSWFormat_v1::Get15bitTLUTag(int n)
 {
   return (int)((unsigned int)(m_buffer[ GetBufferPos(n) +  POS_FTSW_4 ]) & 0x00007FFF);
 }
 
-unsigned int RawFTSWFormat_v0::GetTTCtimeTRGType(int n)
+unsigned int RawFTSWFormat_v1::GetTTCtimeTRGType(int n)
 {
   return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_CTIME_TRGTYPE ]);
 }
 
 
 
-int RawFTSWFormat_v0::GetTTCtime(int n)
+int RawFTSWFormat_v1::GetTTCtime(int n)
 {
   return (int)((GetTTCtimeTRGType(n) & TTCTIME_MASK) >> TTCTIME_SHIFT);
 }
 
-int RawFTSWFormat_v0::GetTRGType(int n)
+int RawFTSWFormat_v1::GetTRGType(int n)
 {
   return (int)(GetTTCtimeTRGType(n) & TRGTYPE_MASK);
 }
 
-unsigned int RawFTSWFormat_v0::GetTTUtime(int n)
+unsigned int RawFTSWFormat_v1::GetTTUtime(int n)
 {
   return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_UTIME ]);
 }
 
-void RawFTSWFormat_v0::GetTTTimeVal(int n, struct timeval* tv)
+void RawFTSWFormat_v1::GetTTTimeVal(int n, struct timeval* tv)
 {
   tv->tv_sec = GetTTUtime(n);
   tv->tv_usec = (int)(((double)GetTTCtime(n)) / 127.216);
@@ -55,7 +55,7 @@ void RawFTSWFormat_v0::GetTTTimeVal(int n, struct timeval* tv)
   return ;
 }
 
-void RawFTSWFormat_v0::GetTTTimeSpec(int n, struct timespec* ts)
+void RawFTSWFormat_v1::GetTTTimeSpec(int n, struct timespec* ts)
 {
   ts->tv_sec = GetTTUtime(n);
   ts->tv_nsec = (long)(((double)GetTTCtime(n)) / 0.127216);
@@ -63,33 +63,33 @@ void RawFTSWFormat_v0::GetTTTimeSpec(int n, struct timespec* ts)
   return ;
 }
 
-unsigned long long int RawFTSWFormat_v0::GetTTTimeNs(int n)
+unsigned long long int RawFTSWFormat_v1::GetTTTimeNs(int n)
 {
   return (unsigned long long int)GetTTUtime(n) * 1e9 + (long)((double)GetTTCtime(n) / 0.127216);
 }
 
-int RawFTSWFormat_v0::GetNwordsHeader(int n)
+int RawFTSWFormat_v1::GetNwordsHeader(int n)
 {
   return  m_buffer[ GetBufferPos(n) +  POS_HDR_NWORDS ];
 }
 
 
-unsigned int RawFTSWFormat_v0::GetFTSWNodeID(int n)
+unsigned int RawFTSWFormat_v1::GetFTSWNodeID(int n)
 {
   return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_NODE_ID ]);
 }
 
-unsigned int RawFTSWFormat_v0::GetEveNo(int n)
+unsigned int RawFTSWFormat_v1::GetEveNo(int n)
 {
   return m_buffer[  GetBufferPos(n) + POS_EVE_NO ];
 }
 
-unsigned int RawFTSWFormat_v0::GetMagicTrailer(int n)
+unsigned int RawFTSWFormat_v1::GetMagicTrailer(int n)
 {
   return m_buffer[  GetBufferPos(n) + POS_MAGIC_1 ];
 }
 
-void RawFTSWFormat_v0::CheckData(int n,
+void RawFTSWFormat_v1::CheckData(int n,
                                  unsigned int prev_evenum, unsigned int* cur_evenum,
                                  unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {

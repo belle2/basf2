@@ -1,13 +1,13 @@
 //+
-// File : RawFTSWFormat_v0.h
+// File : RawFTSWFormat_v1.h
 // Description : Module to handle raw data from COPPER
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 7 - Mar - 2016
 //-
 
-#ifndef RAWFTSWFORMAT_V0_H
-#define RAWFTSWFORMAT_V0_H
+#ifndef RAWFTSWFORMAT_V1_H
+#define RAWFTSWFORMAT_V1_H
 #include <rawdata/dataobjects/RawFTSWFormat.h>
 
 namespace Belle2 {
@@ -17,77 +17,75 @@ namespace Belle2 {
    *
    * This class stores the RAW data containing FTSW data(event #, trg time ).
    */
-  class RawFTSWFormat_v0 : public RawFTSWFormat {
+  class RawFTSWFormat_v1 : public RawFTSWFormat {
   public:
 
     //! Default constructor
-    RawFTSWFormat_v0();
+    RawFTSWFormat_v1();
     //! Constructor using existing pointer to raw data buffer
-    //RawFTSWFormat_v0(int* bufin, int nwords);
+    //RawFTSWFormat_v1(int* bufin, int nwords);
     //! Destructor
-    virtual ~RawFTSWFormat_v0();
+    virtual ~RawFTSWFormat_v1();
 
     /*     //! Get # of words in this buffer */
     /*     int GetNwords(int n); */
 
     //! Get # of words of header
-    int GetNwordsHeader(int n);
+    int GetNwordsHeader(int n) override;
 
     //! Get Node # ( should be "TTD " )
-    unsigned int GetFTSWNodeID(int n);
+    unsigned int GetFTSWNodeID(int n) override;
 
     //! Get event #
-    unsigned int GetEveNo(int n);
+    unsigned int GetEveNo(int n) override;
 
     //! Get a word containing ctime and trigger type info
-    unsigned int GetTTCtimeTRGType(int n);
+    unsigned int GetTTCtimeTRGType(int n) override;
 
     //! get unixtime of the trigger
-    unsigned int GetTTUtime(int n);
+    unsigned int GetTTUtime(int n) override;
 
     //! Get ctime of the trigger
-    int GetTTCtime(int n);
+    int GetTTCtime(int n) override;
 
     //! Get trgtype
-    int GetTRGType(int n);
+    int GetTRGType(int n) override;
 
     //! Get timeval from ctime and utime
-    void GetTTTimeVal(int n, struct timeval* tv);
+    void GetTTTimeVal(int n, struct timeval* tv) override;
 
     //! Get timespec from ctime and utime
-    void GetTTTimeSpec(int n, struct timespec* ts);
+    void GetTTTimeSpec(int n, struct timespec* ts) override;
 
     //! Get time in ns since epoch from ctime and utime
-    unsigned long long int GetTTTimeNs(int n);
+    unsigned long long int GetTTTimeNs(int n) override;
 
     //! Get magic number for data corruption check
-    unsigned int GetMagicTrailer(int n);
-
-
+    unsigned int GetMagicTrailer(int n) override;
 
     //! check the data contents
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
-                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) override;
 
     //! Exp# (10bit) run# (14bit) restart # (8bit)
-    unsigned int GetExpRunSubrun(int n);
+    unsigned int GetExpRunSubrun(int n) override;
 
     //! Get run #
-    int GetRunNo(int n);
+    int GetRunNo(int n) override;
 
 
     //! Get subrun #
-    int GetSubRunNo(int n);
+    int GetSubRunNo(int n) override;
 
     //! get a word cotaining run # and subrun #
-    int GetRunNoSubRunNo(int n);
+    int GetRunNoSubRunNo(int n) override;
 
     //! Get Exp #
-    int GetExpNo(int n);
+    int GetExpNo(int n) override;
 
     //! DESY test only
-    int Get15bitTLUTag(int n);
+    int Get15bitTLUTag(int n) override;
 
     enum {
       POS_NWORDS = 0,
@@ -130,31 +128,31 @@ namespace Belle2 {
 
   };
 
-  inline unsigned int RawFTSWFormat_v0::GetExpRunSubrun(int n)
+  inline unsigned int RawFTSWFormat_v1::GetExpRunSubrun(int n)
   {
     return (unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]);
 
   }
 
 
-  inline int RawFTSWFormat_v0::GetRunNo(int n)
+  inline int RawFTSWFormat_v1::GetRunNo(int n)
   {
     return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & RUNNO_MASK)
             >> RUNNO_SHIFT);
   }
 
-  inline int RawFTSWFormat_v0::GetSubRunNo(int n)
+  inline int RawFTSWFormat_v1::GetSubRunNo(int n)
   {
     return (m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ] & SUBRUNNO_MASK);
   }
 
-  inline int RawFTSWFormat_v0::GetRunNoSubRunNo(int n)
+  inline int RawFTSWFormat_v1::GetRunNoSubRunNo(int n)
   {
     return ((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) &
             (RUNNO_MASK | SUBRUNNO_MASK));
   }
 
-  inline int RawFTSWFormat_v0::GetExpNo(int n)
+  inline int RawFTSWFormat_v1::GetExpNo(int n)
   {
     return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & EXP_MASK)
             >> EXP_SHIFT);

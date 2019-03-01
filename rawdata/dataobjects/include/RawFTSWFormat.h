@@ -31,134 +31,68 @@ namespace Belle2 {
     /*     int GetNwords(int n); */
 
     //! Get # of words of header
-    int GetNwordsHeader(int n);
+    virtual int GetNwordsHeader(int n) = 0;
 
     //! Get Node # ( should be "TTD " )
-    unsigned int GetFTSWNodeID(int n);
+    virtual unsigned int GetFTSWNodeID(int n) = 0;
 
     //! Get event #
-    unsigned int GetEveNo(int n);
+    virtual unsigned int GetEveNo(int n) = 0;
 
     //! Get a word containing ctime and trigger type info
-    unsigned int GetTTCtimeTRGType(int n);
+    virtual unsigned int GetTTCtimeTRGType(int n) = 0;
 
     //! get unixtime of the trigger
-    unsigned int GetTTUtime(int n);
+    virtual unsigned int GetTTUtime(int n) = 0;
 
     //! Get ctime of the trigger
-    int GetTTCtime(int n);
+    virtual int GetTTCtime(int n) = 0;
 
     //! Get trgtype
-    int GetTRGType(int n);
+    virtual int GetTRGType(int n) = 0;
 
     //! Get timeval from ctime and utime
-    void GetTTTimeVal(int n, struct timeval* tv);
+    virtual void GetTTTimeVal(int n, struct timeval* tv) = 0;
 
     //! Get timespec from ctime and utime
-    void GetTTTimeSpec(int n, struct timespec* ts);
+    virtual void GetTTTimeSpec(int n, struct timespec* ts) = 0;
 
     //! Get time in ns since epoch from ctime and utime
-    unsigned long long int GetTTTimeNs(int n);
+    virtual unsigned long long int GetTTTimeNs(int n) = 0;
 
     //! Get magic number for data corruption check
-    unsigned int GetMagicTrailer(int n);
+    virtual unsigned int GetMagicTrailer(int n) = 0;
 
 
 
     //! check the data contents
-    void CheckData(int n,
-                   unsigned int prev_evenum, unsigned int* cur_evenum,
-                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
+    virtual void CheckData(int n,
+                           unsigned int prev_evenum, unsigned int* cur_evenum,
+                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) = 0;
 
     //! Exp# (10bit) run# (14bit) restart # (8bit)
-    unsigned int GetExpRunSubrun(int n);
+    virtual unsigned int GetExpRunSubrun(int n) = 0;
 
     //! Get run #
-    int GetRunNo(int n);
+    virtual int GetRunNo(int n) = 0;
 
 
     //! Get subrun #
-    int GetSubRunNo(int n);
+    virtual int GetSubRunNo(int n) = 0;
 
     //! get a word cotaining run # and subrun #
-    int GetRunNoSubRunNo(int n);
+    virtual int GetRunNoSubRunNo(int n) = 0;
 
     //! Get Exp #
-    int GetExpNo(int n);
+    virtual int GetExpNo(int n) = 0;
 
     //! DESY test only
-    int Get15bitTLUTag(int n);
+    virtual int Get15bitTLUTag(int n) = 0;
 
-    enum {
-      POS_NWORDS = 0,
-      POS_HDR_NWORDS = 1,
-      POS_NUMEVE_NUMNODES = 2,
-      POS_EXP_RUN_NO = 3,
-      POS_EVE_NO = 4,
-      POS_NA_1 = 5,
-      POS_NODE_ID = 6,
-      POS_NA_2 = 7,
-      POS_TT_CTIME_TRGTYPE = 8,
-      POS_TT_UTIME = 9,
-      POS_FTSW_3 = 10,
-      POS_FTSW_4 = 11,
-      POS_RSVD_1 = 12,
-      POS_MAGIC_1 = 13
-    };
-
-    enum {
-      EXP_MASK = 0xFFC00000,
-      EXP_SHIFT = 22,
-      RUNNO_MASK = 0x003FFF00,
-      RUNNO_SHIFT = 8,
-      SUBRUNNO_MASK = 0x000000FF,
-      TTCTIME_MASK = 0x7FFFFFF0,
-      TTCTIME_SHIFT = 4,
-      TRGTYPE_MASK = 0xF
-    };
-
-    enum {
-      SIZE_FTSW_PACKET = 14
-    };
-    //#endif
-
-    enum {
-      FTSW_MAGIC_TRAILER = 0x7FFF0000
-    };
 
   protected :
 
   };
-
-  inline unsigned int RawFTSWFormat::GetExpRunSubrun(int n)
-  {
-    return (unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]);
-
-  }
-
-
-  inline int RawFTSWFormat::GetRunNo(int n)
-  {
-    return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & RUNNO_MASK)
-            >> RUNNO_SHIFT);
-  }
-
-  inline int RawFTSWFormat::GetSubRunNo(int n)
-  {
-    return (m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ] & SUBRUNNO_MASK);
-  }
-
-  inline int RawFTSWFormat::GetRunNoSubRunNo(int n)
-  {
-    return ((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) &
-            (RUNNO_MASK | SUBRUNNO_MASK));
-  }
-
-  inline int RawFTSWFormat::GetExpNo(int n)
-  {
-    return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & EXP_MASK)
-            >> EXP_SHIFT);
-  }
 
 }
 

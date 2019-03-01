@@ -31,61 +31,61 @@ namespace Belle2 {
     /*     int GetNwords(int n); */
 
     //! Get # of words of header
-    int GetNwordsHeader(int n) override;
+    int GetNwordsHeader(int n);
 
     //! Get Node # ( should be "TTD " )
-    unsigned int GetFTSWNodeID(int n) override;
+    unsigned int GetFTSWNodeID(int n);
 
     //! Get event #
-    unsigned int GetEveNo(int n) override;
+    unsigned int GetEveNo(int n);
 
     //! Get a word containing ctime and trigger type info
-    unsigned int GetTTCtimeTRGType(int n) override;
+    unsigned int GetTTCtimeTRGType(int n);
 
     //! get unixtime of the trigger
-    unsigned int GetTTUtime(int n) override;
+    unsigned int GetTTUtime(int n);
 
     //! Get ctime of the trigger
-    int GetTTCtime(int n) override;
+    int GetTTCtime(int n);
 
     //! Get trgtype
-    int GetTRGType(int n) override;
+    int GetTRGType(int n);
 
     //! Get timeval from ctime and utime
-    void GetTTTimeVal(int n, struct timeval* tv) override;
+    void GetTTTimeVal(int n, struct timeval* tv);
 
     //! Get timespec from ctime and utime
-    void GetTTTimeSpec(int n, struct timespec* ts) override;
+    void GetTTTimeSpec(int n, struct timespec* ts);
 
     //! Get time in ns since epoch from ctime and utime
-    unsigned long long int GetTTTimeNs(int n) override;
+    unsigned long long int GetTTTimeNs(int n);
 
     //! Get magic number for data corruption check
-    unsigned int GetMagicTrailer(int n) override;
+    unsigned int GetMagicTrailer(int n);
 
     //! check the data contents
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
-                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) override;
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
 
     //! Exp# (10bit) run# (14bit) restart # (8bit)
-    unsigned int GetExpRunSubrun(int n) override;
+    unsigned int GetExpRunSubrun(int n);
 
     //! Get run #
-    int GetRunNo(int n) override;
+    int GetRunNo(int n);
 
 
     //! Get subrun #
-    int GetSubRunNo(int n) override;
+    int GetSubRunNo(int n);
 
     //! get a word cotaining run # and subrun #
-    int GetRunNoSubRunNo(int n) override;
+    int GetRunNoSubRunNo(int n);
 
     //! Get Exp #
-    int GetExpNo(int n) override;
+    int GetExpNo(int n);
 
     //! DESY test only
-    int Get15bitTLUTag(int n) override;
+    int Get15bitTLUTag(int n);
 
     enum {
       POS_NWORDS = 0,

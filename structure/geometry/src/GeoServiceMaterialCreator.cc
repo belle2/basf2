@@ -298,19 +298,27 @@ namespace Belle2 {
         const double Hf1 = (materialOuterR1 - materialInnerR1) / IRECL;
         const double Hf2 = (materialOuterR2 - materialInnerR2) / IRECL;
         for (int iR = 0; iR < IRECL; iR++) {
-          const double rmin1 = materialInnerR1 + Hf1 * iR;
-          const double rmax1 = materialInnerR1 + Hf1 * (iR + 1);
-          const double rmin2 = materialInnerR2 + Hf2 * iR;
-          const double rmax2 = materialInnerR2 + Hf2 * (iR + 1);
+          const double Rmin1 = materialInnerR1 + Hf1 * iR;
+          const double Rmax1 = materialInnerR1 + Hf1 * (iR + 1);
+          const double Rmin2 = materialInnerR2 + Hf2 * iR;
+          const double Rmax2 = materialInnerR2 + Hf2 * (iR + 1);
+          const double Hrmax = (Rmax2 - Rmax1) / IZECL;
+          const double Hrmin = (Rmin2 - Rmin1) / IZECL;
           for (int iZ = 0; iZ < IZECL; iZ++) {
-            const double posZ = materialBackwardZ + interval * iZ;
+            const double BackwardposZ = materialBackwardZ + interval * iZ;
+            const double ForwardposZ = materialBackwardZ + interval * (iZ + 1);
             for (int iPhi = 0; iPhi < IPhiECL; iPhi++) {
               const double SPhi = (360. / IPhiECL) * iPhi;
               const double DPhi = 360. / IPhiECL;
               if (materialID == 0) {
                 const double thick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB + IPhiTOPF] /
                                      Unit::mm;
+                const double rmin2 = Rmin1 + Hrmin * (iZ + 1);
+                const double rmax2 = Rmax1 + Hrmax * (iZ + 1);
+                const double rmin1 = rmin2 - Hrmin * thick / interval ;
+                const double rmax1 = rmax2 - Hrmax * thick / interval ;
                 double density = Density[iZ + IZARICHF + 2 ] * CLHEP::g / CLHEP:: cm3;
+                const double posZ = ForwardposZ - thick;
                 G4Material* ECLbackAir = geometry::Materials::get("ECLGapback");
                 G4Material* medECLback = new G4Material("ECLback_" + to_string(iR) + "_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
                 medECLback->AddMaterial(ECLbackAir, 1.);
@@ -320,7 +328,12 @@ namespace Belle2 {
               if (materialID == 1) {
                 const double thick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB + IPhiTOPF +
                                                IZECLB * IRECLB * IPhiECLB] / Unit::mm;
+                const double rmin1 = Rmin1 + Hrmin * iZ;
+                const double rmax1 = Rmax1 + Hrmax * iZ;
+                const double rmin2 = rmin1 + Hrmin * thick / interval;
+                const double rmax2 = rmax1 + Hrmax * thick / interval;
                 double density = Density[iZ + IZARICHF + 2 + IZECLB] * CLHEP::g / CLHEP::cm3;
+                const double posZ = BackwardposZ;
                 G4Material* ECLforAir = geometry::Materials::get("ECLGapfor");
                 G4Material* medECLfor = new G4Material("ECLfor_" + to_string(iR) + "_" + to_string(iZ) + "_" + to_string(iPhi), density,   1);
                 medECLfor->AddMaterial(ECLforAir, 1.);

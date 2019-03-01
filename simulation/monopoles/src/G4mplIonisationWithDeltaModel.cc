@@ -55,7 +55,7 @@ G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
   dedxlim = 45. * chargeSquare * GeV * cm2 / g;
   fParticleChange = nullptr;
   theElectron = G4Electron::Electron();
-  B2INFO("### Monopole ionisation model with d-electron production, Gmag= "  << magCharge / eplus);
+  B2INFO("Monopole ionisation model with d-electron production, Gmag= "  << magCharge / eplus);
   if (nmpl >= 6)
     B2WARNING("Monopole charge Gmag= " << magCharge / eplus << "e not reasonable. Please choose a value smaller than 411e.");
   monopole = nullptr;
@@ -226,10 +226,6 @@ G4mplIonisationWithDeltaModel::SampleSecondaries(vector<G4DynamicParticle*>* vdp
 
   G4double maxKinEnergy = std::min(maxEnergy, tmax);
   if (minKinEnergy >= maxKinEnergy) { return; }
-
-  //G4cout << "G4mplIonisationWithDeltaModel::SampleSecondaries: E(GeV)= "
-  //   << kineticEnergy/GeV << " M(GeV)= " << mass/GeV
-  //   << " tmin(MeV)= " << minKinEnergy/MeV << G4endl;//TODO print with B2DEBUG or remove altogether
 
   G4double totEnergy     = kineticEnergy + mass;
   G4double etot2         = totEnergy * totEnergy;

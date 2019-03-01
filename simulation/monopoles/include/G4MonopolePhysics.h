@@ -73,9 +73,7 @@ namespace Belle2 {
 
       G4Monopole* fMpl; /**< Pointer to the monopole definition in GEANT4*/
       G4Monopole* fApl; /**< Pointer to the anti-monopole definition in GEANT4*/
-      //Anti-monopole and its processes has to be treated separetely for now.
-      //TODO fix physics process registration so that anti-monopole can be treated automatically
-      //as a an anti-particle of the monopole
+      //Both monopole and anti-monopole have own process managers and have to be treated separately
 
     };
 

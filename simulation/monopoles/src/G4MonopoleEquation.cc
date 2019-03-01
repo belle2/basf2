@@ -41,10 +41,6 @@ G4MonopoleEquation::SetChargeMomentumMass(G4ChargeState particleChargeState,
 
   fMagCharge =  eplus * particleMagneticCharge * c_light ;
 
-  // G4cout << " G4MonopoleEquation: ElectricCharge=" << particleElectricCharge
-  //           << "; MagneticCharge=" << particleMagneticCharge
-  //           << G4endl;//TODO print with B2DEBUG or remove altogether
-
   fMassCof = particleMass * particleMass ;
 }
 

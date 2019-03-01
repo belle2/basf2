@@ -79,6 +79,8 @@ namespace Belle2 {
 
     };
 
+    const int c_monopolePDGCode = 99666;
+
   } //end Monopoles namespace
 
 } //end Belle2 namespace

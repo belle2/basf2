@@ -43,8 +43,8 @@ G4MonopolePhysics::G4MonopolePhysics(double magneticCharge)
   //so part of the information (e, m, pdg, etc.) should be stored before generation
   //and other part (g) passed to the simulation setup
   fMagCharge = magneticCharge;//TODO check untis, should be handled as (e+)
-  fElCharge  = TDatabasePDG::Instance()->GetParticle(99666)->Charge() / 3.0;
-  fMonopoleMass = TDatabasePDG::Instance()->GetParticle(99666)->Mass() * GeV;
+  fElCharge  = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode)->Charge() / 3.0;
+  fMonopoleMass = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode)->Mass() * GeV;
   SetPhysicsType(bUnknown);
 }
 
@@ -54,9 +54,9 @@ G4MonopolePhysics::~G4MonopolePhysics()
 
 void G4MonopolePhysics::ConstructParticle()
 {
-  fMpl = new G4Monopole("monopole",      fMonopoleMass,  fMagCharge,  fElCharge,  99666);
+  fMpl = new G4Monopole("monopole",      fMonopoleMass,  fMagCharge,  fElCharge,  c_monopolePDGCode);
 //NOTE careful not to use same name or encoding, this will lead to G4exception
-  fApl = new G4Monopole("anti-monopole", fMonopoleMass, -fMagCharge, -fElCharge, -99666);
+  fApl = new G4Monopole("anti-monopole", fMonopoleMass, -fMagCharge, -fElCharge, -c_monopolePDGCode);
 }
 
 

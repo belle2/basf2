@@ -80,18 +80,18 @@ void MicrotpcStudyModule::defineHisto()
     h_tpc_rate[i]  = new TH1F(TString::Format("h_tpc_rate_%d", i), "detector #", 8, 0., 8.);
   }
 
-  h_mctpc_recoil[0] = new TH3F("h_mctpc_recoil_He", "Neutron recoil energy [MeV]", 12, 0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
-  h_mctpc_recoilW[0] = new TH3F("h_mctpc_recoil_w_He", "Neutron recoil energy [MeV]", 12, 0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoil[0] = new TH3F("h_mctpc_recoil_He", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoilW[0] = new TH3F("h_mctpc_recoil_w_He", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
   h_mctpc_recoil[0]->Sumw2();
   h_mctpc_recoilW[0]->Sumw2();
 
-  h_mctpc_recoil[1] = new TH3F("h_mctpc_recoil_O", "Neutron recoil energy [MeV]", 12, 0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
-  h_mctpc_recoilW[1] = new TH3F("h_mctpc_recoil_w_O", "Neutron recoil energy [MeV]", 12, 0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoil[1] = new TH3F("h_mctpc_recoil_O", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoilW[1] = new TH3F("h_mctpc_recoil_w_O", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
   h_mctpc_recoil[1]->Sumw2();
   h_mctpc_recoilW[1]->Sumw2();
 
-  h_mctpc_recoil[2] = new TH3F("h_mctpc_recoil_C", "Neutron recoil energy [MeV]", 12, 0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
-  h_mctpc_recoilW[2] = new TH3F("h_mctpc_recoil_w_C", "Neutron recoil energy [MeV]", 12, 0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoil[2] = new TH3F("h_mctpc_recoil_C", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoilW[2] = new TH3F("h_mctpc_recoil_w_C", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
   h_mctpc_recoil[2]->Sumw2();
   h_mctpc_recoilW[2]->Sumw2();
 

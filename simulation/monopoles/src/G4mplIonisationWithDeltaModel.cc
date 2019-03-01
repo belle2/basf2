@@ -17,7 +17,6 @@
 // [5] S.P. Ahlen, Phys. Rev. D17 (1978) 229-233
 
 // modified from GEANT4 exoticphysics/monopole/*
-// works only for low magnetic charge, higher charge corrections are not used
 
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 

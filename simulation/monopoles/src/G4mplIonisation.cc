@@ -11,7 +11,6 @@
 // modified from GEANT4 exoticphysics/monopole/*
 
 #include <simulation/monopoles/G4mplIonisation.h>
-#include <simulation/monopoles/G4mplIonisationModel.h>
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 
 
@@ -54,15 +53,11 @@ void G4mplIonisation::InitialiseEnergyLossProcess(const G4ParticleDefinition* p,
   SetBaseParticle(0);
 
   // monopole model is responsible both for energy loss and fluctuations
-/*
+
   G4mplIonisationWithDeltaModel* ion =
     new G4mplIonisationWithDeltaModel(magneticCharge, "PAI");
-*/
-
-  G4mplIonisationModel* ion = new G4mplIonisationModel(magneticCharge, "PAI");
 
   ion->SetParticle(p);
-
 
   // define size of dedx and range tables
   G4EmParameters* param = G4EmParameters::Instance();

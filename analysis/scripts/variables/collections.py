@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 from variables import utils
 
-#: Replacement for FlavorTagging nTupleTool.
-#: The flavor_tagging list is filled when the flavorTagger is used in Expert mode.
-flavor_tagging = list()
-
 #: Replacement for DeltaEMbc
 deltae_mbc = ["Mbc", "deltaE"]
 
@@ -293,8 +289,5 @@ event_shape = [
 # TODO: this is still not optimal but better than before. Should we not just
 # get rid of the collections in the manager?
 for name, value in list(globals().items()):
-    if name == "flavor_tagging":
-        # The flavorTagger adds the flavor_tagging collection when it is used in 'Expert' mode
-        continue
     if isinstance(value, list):
         utils.add_collection(value, name)

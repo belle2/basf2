@@ -12,7 +12,6 @@ from basf2 import *
 from modularAnalysis import *
 import basf2_mva
 from variables import utils
-from variables.collections import flavor_tagging
 from ROOT import Belle2
 import os
 import glob
@@ -47,6 +46,22 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotfound=True, uploadToData
     uploadFlag = uploadToDatabaseAfterTraining
 
 
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC',
+                  'qpElectron', 'hasTrueTargetElectron', 'isRightCategoryElectron',
+                  'qpIntermediateElectron', 'hasTrueTargetIntermediateElectron', 'isRightCategoryIntermediateElectron',
+                  'qpMuon', 'hasTrueTargetMuon', 'isRightCategoryMuon',
+                  'qpIntermediateMuon', 'hasTrueTargetIntermediateMuon', 'isRightCategoryIntermediateMuon',
+                  'qpKinLepton', 'hasTrueTargetKinLepton', 'isRightCategoryKinLepton',
+                  'qpIntermediateKinLepton', 'hasTrueTargetIntermediateKinLepton', 'isRightCategoryIntermediateKinLepton',
+                  'qpKaon', 'hasTrueTargetKaon', 'isRightCategoryKaon',
+                  'qpSlowPion', 'hasTrueTargetSlowPion', 'isRightCategorySlowPion',
+                  'qpFastHadron', 'hasTrueTargetFastHadron', 'isRightCategoryFastHadron',
+                  'qpLambda', 'hasTrueTargetLambda', 'isRightCategoryLambda',
+                  'qpFSC', 'hasTrueTargetFSC', 'isRightCategoryFSC',
+                  'qpMaximumPstar', 'hasTrueTargetMaximumPstar', 'isRightCategoryMaximumPstar',
+                  'qpKaonPion', 'hasTrueTargetKaonPion', 'isRightCategoryKaonPion']
+
+
 def add_default_FlavorTagger_aliases():
     """
     This function creates the default aliases for flavor tagging variables and adds them to the
@@ -56,9 +71,6 @@ def add_default_FlavorTagger_aliases():
     utils._variablemanager.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
     utils._variablemanager.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
     utils._variablemanager.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
-    flavor_tagging.append('FBDT_qrCombined')
-    flavor_tagging.append('FANN_qrCombined')
-    flavor_tagging.append('qrMC')
 
     for iCategory in AvailableCategories:
         aliasForQp = 'qp' + iCategory
@@ -67,11 +79,9 @@ def add_default_FlavorTagger_aliases():
         utils._variablemanager.addAlias(aliasForQp, 'qpCategory(' + iCategory + ')')
         utils._variablemanager.addAlias(aliasForTrueTarget, 'hasTrueTargets(' + iCategory + ')')
         utils._variablemanager.addAlias(aliasForIsRightCategory, 'isTrueFTCategory(' + iCategory + ')')
-        flavor_tagging.append(aliasForQp)
-        flavor_tagging.append(aliasForTrueTarget)
-        flavor_tagging.append(aliasForIsRightCategory)
 
     utils.add_collection(flavor_tagging, 'flavor_tagging')
+
 
 # Options for Track and Event Levels
 fastBDTCategories = basf2_mva.FastBDTOptions()

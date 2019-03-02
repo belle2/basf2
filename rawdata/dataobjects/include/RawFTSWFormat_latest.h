@@ -86,24 +86,33 @@ namespace Belle2 {
     //! Get Exp #
     int GetExpNo(int n);
 
-    //! DESY test only
-    int Get15bitTLUTag(int n);
-
+    //!header format
     enum {
-      POS_NWORDS = 0,
-      POS_HDR_NWORDS = 1,
-      POS_NUMEVE_NUMNODES = 2,
-      POS_EXP_RUN_NO = 3,
-      POS_EVE_NO = 4,
-      POS_NA_1 = 5,
-      POS_NODE_ID = 6,
-      POS_NA_2 = 7,
-      POS_TT_CTIME_TRGTYPE = 8,
-      POS_TT_UTIME = 9,
-      POS_FTSW_3 = 10,
-      POS_FTSW_4 = 11,
-      POS_RSVD_1 = 12,
-      POS_MAGIC_1 = 13
+      POS_NWORDS = 0, // same as v.1( late-DESY ver.)
+      POS_HDR_NWORDS = 1, // same as v.1
+      POS_NUMEVE_NUMNODES = 2, // same as v.1
+      POS_EXP_RUN_NO = 3, // same as v.1
+      POS_EVE_NO_1 = 4, // same as v.1
+      POS_NA_1 = 5, // same as v.1
+      POS_NODE_ID = 6, // same as v.1
+      POS_NA_2 = 7 // same as v.1
+    };
+
+    //!data format
+    enum {
+      POS_TT_CTIME_TRGTYPE = 8, // same as v.1
+      POS_TT_UTIME = 9, // same as v.1
+      POS_EVE_NO_2 = 10,
+      POS_FRAME_COUNT = 11,
+      POS_TIME_SINCE_PREV_TRG = 12,
+      POS_INJECTION_INFO = 13,
+      POS_BUNCH_NUM = 14
+    };
+
+    //!trailer format
+    enum {
+      POS_RSVD_1 = 20, // same as v.1 but position is shifted
+      POS_MAGIC_1 = 21 // same as v.1 but position is shifted
     };
 
     enum {

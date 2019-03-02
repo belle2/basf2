@@ -20,11 +20,6 @@ RawFTSWFormat_latest::~RawFTSWFormat_latest()
 }
 
 
-int RawFTSWFormat_latest::Get15bitTLUTag(int n)
-{
-  return (int)((unsigned int)(m_buffer[ GetBufferPos(n) +  POS_FTSW_4 ]) & 0x00007FFF);
-}
-
 unsigned int RawFTSWFormat_latest::GetTTCtimeTRGType(int n)
 {
   return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_TT_CTIME_TRGTYPE ]);
@@ -81,7 +76,7 @@ unsigned int RawFTSWFormat_latest::GetFTSWNodeID(int n)
 
 unsigned int RawFTSWFormat_latest::GetEveNo(int n)
 {
-  return m_buffer[  GetBufferPos(n) + POS_EVE_NO ];
+  return m_buffer[  GetBufferPos(n) + POS_EVE_NO_1 ];
 }
 
 unsigned int RawFTSWFormat_latest::GetMagicTrailer(int n)

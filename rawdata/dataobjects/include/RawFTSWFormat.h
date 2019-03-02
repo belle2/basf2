@@ -87,7 +87,7 @@ namespace Belle2 {
     virtual int GetExpNo(int n) = 0;
 
     //! DESY test only
-    virtual int Get15bitTLUTag(int n) = 0;
+    virtual int Get15bitTLUTag(int n);
 
 
   protected :

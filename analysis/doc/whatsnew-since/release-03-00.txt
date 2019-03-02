@@ -22,27 +22,23 @@ Variables
                 variables.addAlias("nPhotonsCDC", "nParticlesInList(gamma:cdc)")
                 variables.addAlias("totalPhotonEECL", "totalEnergyOfParticlesInList(gamma:all)")
 
-
 * Deprecated :b2:var:`clusterHypothesis` following changes to the ECLCluster storage on mdst. 
   Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
+
 * Removed ClusterHadronIntensity and clusterUniqueID.
+
 * Added helix extrapolation from charged tracks
+
 * Added clusterMdstIndex variable to get ECLCluster MDST index for particles that do not originate from ECLCluster
 
 * The function to create variable aliases for particles selected from a decay
   string has been fixed and extended to allow better
   customization (:issue:`BII-4437`)
 
-* Added M2, that returns the invariant mass squared of a given Particle (determined from the particle's 4-momentum vector).
-
-Modules
-+++++++
-
-* Removal of the unsupported ECLClusterInfoModule.
-* Added `modularAnalysis.fitPseudo` function and a pseudo vertex fitting module to add a covariance matrix when a vertex fit is not possible. E.g. for :math:`\pi^0` decays.
-
   .. seealso::
      `variables.utils.create_aliases_for_selected()`
+
+* Added M2, that returns the invariant mass squared of a given Particle (determined from the particle's 4-momentum vector).
 
 Standard Particle Lists
 +++++++++++++++++++++++
@@ -64,6 +60,9 @@ Modules
 
   This affects all users of `modularAnalysis.rankByLowest()` and
   `modularAnalysis.rankByHighest()` if they passed ``allowMultiRank=True``
+
+* Fixed a bug in the :b2:mod:`BestCandidateSelection` module: now the
+  ``numBest`` parameter works as expected. 
 
 * Removal of the unsupported ECLClusterInfoModule.
 

@@ -76,7 +76,6 @@ namespace Belle2 {
     //! Get run #
     virtual int GetRunNo(int n) = 0;
 
-
     //! Get subrun #
     virtual int GetSubRunNo(int n) = 0;
 
@@ -86,9 +85,23 @@ namespace Belle2 {
     //! Get Exp #
     virtual int GetExpNo(int n) = 0;
 
-    //! DESY test only
+    //! DESY test only (ver.1)
     virtual int Get15bitTLUTag(int n);
 
+    //! HER injection = 1 or LER injection = 0
+    virtual int GetIsHER(int n);
+
+    //! Get time since the last injection
+    virtual unsigned int GetTimeSinceLastInjection(int n);
+
+    //! Get time since the previous trigger
+    virtual unsigned int GetTimeSincePrevTrigger(int n);
+
+    //! Get a bunch number
+    virtual unsigned int GetBunchNumber(int n);
+
+    //! Get a frame count
+    virtual unsigned int GetFrameCount(int n);
 
   protected :
 

@@ -32,3 +32,69 @@ int RawFTSWFormat::Get15bitTLUTag(int n)
   return -1;
 }
 
+// This function is only available in RawFTSW ver.2
+int RawFTSWFormat::GetIsHER(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+}
+
+
+
+unsigned int RawFTSWFormat::GetTimeSinceLastInjection(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+
+}
+
+unsigned int RawFTSWFormat::GetTimeSincePrevTrigger(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+
+}
+
+unsigned int RawFTSWFormat::GetBunchNumber(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+
+}
+
+unsigned int RawFTSWFormat::GetFrameCount(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+
+}

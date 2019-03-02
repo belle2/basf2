@@ -84,6 +84,51 @@ unsigned int RawFTSWFormat_latest::GetMagicTrailer(int n)
   return m_buffer[  GetBufferPos(n) + POS_MAGIC_1 ];
 }
 
+int RawFTSWFormat_latest::GetIsHER(int n)
+{
+  int* buffer = GetBuffer(n);
+  int ret = (buffer[ POS_INJECTION_INFO ] & INJ_HER_LER_MASK) >> INJ_HER_LER_SHIFT;
+  if (ret != 0 && ret != 0) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "[FATAL] INJECTION INFO in data is unexpected value(=0x%.8x). n=%d : %s %s %d: Exiting...\n",
+            buffer[ POS_INJECTION_INFO ], n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s\n", err_buf); fflush(stdout);
+    string err_str = err_buf;
+    throw (err_str);
+  }
+  return ret; // 1 -> HER, 0 -> LER
+}
+
+
+unsigned int RawFTSWFormat_latest::GetTimeSinceLastInjection(int n)
+{
+  unsigned int ret = 0;
+  return ret;
+}
+
+unsigned int RawFTSWFormat_latest::GetTimeSincePrevTrigger(int n)
+{
+  unsigned int ret = 0;
+  return ret;
+
+}
+
+unsigned int RawFTSWFormat_latest::GetBunchNumber(int n)
+{
+  unsigned int ret = 0;
+  return ret;
+
+}
+
+unsigned int RawFTSWFormat_latest::GetFrameCount(int n)
+{
+  unsigned int ret = 0;
+  return ret;
+
+}
+
+
 void RawFTSWFormat_latest::CheckData(int n,
                                      unsigned int prev_evenum, unsigned int* cur_evenum,
                                      unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)

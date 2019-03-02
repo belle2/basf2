@@ -132,7 +132,7 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
                       'MC6': True,
                       'MC7': True,
                       'default': False,
-                      'Belle': True}
+                      'Belle': False}
 
     if environmentType in environToMagneticField:
         fieldType = environToMagneticField[environmentType]

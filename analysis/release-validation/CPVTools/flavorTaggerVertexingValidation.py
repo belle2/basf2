@@ -83,6 +83,10 @@ def setEnvironment(belleOrBelle2Flag="Belle2"):
 
     ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
 
+    if belleOrBelle2Flag == "Belle":
+        fixECL = b2.register_module('FixECLClusters')
+        cp_val_path.add_module(fixECL)
+
 
 def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
     """

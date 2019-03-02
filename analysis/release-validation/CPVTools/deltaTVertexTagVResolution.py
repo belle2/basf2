@@ -80,10 +80,13 @@ for VXDReq in VXDReqs:
     B0_Z = ROOT.RooRealVar("z", "z", 0., -100, 100, "cm")
     B0_TruthZ = ROOT.RooRealVar("mcZ", "mcZ", 0., -100, 100, "cm")
 
-    B0_Jpsi_mu0_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_0_d0_d0_nPXDHits", "Jpsi_mu_0_0_d0_d0_nPXDHits", 1., -10., 100.)
-    B0_Jpsi_mu1_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_1_d0_d1_nPXDHits", "Jpsi_mu_0_1_d0_d1_nPXDHits", 1., -10., 100.)
-    B0_Jpsi_mu0_nSVDHits = ROOT.RooRealVar("Jpsi_mu_0_0_d0_d0_nSVDHits", "Jpsi_mu_0_0_d0_d0_nSVDHits", 1., -10., 100.)
-    B0_Jpsi_mu1_nSVDHits = ROOT.RooRealVar("Jpsi_mu_0_1_d0_d1_nSVDHits", "Jpsi_mu_0_1_d0_d1_nSVDHits", 1., -10., 100.)
+    B0_Jpsi_mu0_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_nPXDHits", "Jpsi_mu_0_nPXDHits", 0., -10., 100.)
+    B0_Jpsi_mu1_nPXDHits = ROOT.RooRealVar("Jpsi_mu_1_nPXDHits", "Jpsi_mu_1_nPXDHits", 0., -10., 100.)
+    B0_Jpsi_mu0_nSVDHits = ROOT.RooRealVar("Jpsi_mu_0_nSVDHits", "Jpsi_mu_0_nSVDHits", 0., -10., 100.)
+    B0_Jpsi_mu1_nSVDHits = ROOT.RooRealVar("Jpsi_mu_1_nSVDHits", "Jpsi_mu_1_nSVDHits", 0., -10., 100.)
+
+    # B0_Jpsi_mu0_firstSVDLayer = ROOT.RooRealVar("B0_Jpsi_mu0__firstSVDLayer", "B0_pi0_e1__firstSVDLayer", 1., -10., 100.)
+    # B0_Jpsi_mu1_firstSVDLayer = ROOT.RooRealVar("B0_Jpsi_mu1__firstSVDLayer", "B0_pi0_e0__firstSVDLayer", 1., -10., 100.)
 
     DT = ROOT.RooRealVar("DT", "DT", 0., -limDeltaT, limDeltaT, "ps")
     DSigZ = ROOT.RooRealVar("DSigZ", "DSigZ", 0., -limZSig, limZSig, "cm")
@@ -91,17 +94,26 @@ for VXDReq in VXDReqs:
     DTagZ = ROOT.RooRealVar("DSigZ", "DSigZ", 0., -limZTag, limZTag, "cm")
     # DTagZ = ROOT.RooFormulaVar("DTagZ", "DTagZ", "@@0-@@1", ROOT.RooArgList(B0_TagVz, B0_TruthTagVz))
 
+    histo_DeltaT = ROOT.TH1F('B0_DeltaT_' + VXDReq, 'Residual of DeltaT',
+                             100, -limDeltaT, limDeltaT)
+    histo_DeltaTErr = ROOT.TH1F('B0_DeltaTErr_' + VXDReq, 'Residual of DeltaZsig',
+                                100, 0, 30)
+    histo_DeltaZSig = ROOT.TH1F('B0_DeltaZsig_' + VXDReq, 'Residual of DeltaZsig',
+                                100, -limZSig, limZSig)
+    histo_DeltaZTag = ROOT.TH1F('B0_DeltaZtag_' + VXDReq, 'Residual of DeltaZsig',
+                                100, -limZTag, limZTag)
+
     cut = "isSignal == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
 
     if VXDReq == 'PXD1':
-        cut = cut + "&& (Jpsi_mu_0_0_d0_d0_nPXDHits> 0 || Jpsi_mu_0_1_d0_d1_nPXDHits> 0) "
+        cut = cut + "&& (Jpsi_mu_0_nPXDHits> 0 || Jpsi_mu_1_nPXDHits> 0) "
     if VXDReq == 'PXD2':
-        cut = cut + "&& Jpsi_mu_0_0_d0_d0_nPXDHits> 0 && Jpsi_mu_0_1_d0_d1_nPXDHits> 0 "
+        cut = cut + "&& Jpsi_mu_0_nPXDHits> 0 && Jpsi_mu_1_nPXDHits> 0 "
 
     if VXDReq == 'SVD1':
-        cut = cut + "&& (Jpsi_mu_0_0_d0_d0_nSVDHits> 0 || Jpsi_mu_0_1_d0_d1_nSVDHits> 0) "
+        cut = cut + "&& (Jpsi_mu_0_SVDHits> 0 || Jpsi_mu_1_nSVDHits> 0) "
     if VXDReq == 'SVD2':
-        cut = cut + "&& Jpsi_mu_0_0_d0_d0_nSVDHits> 0 && Jpsi_mu_0_1_d0_d1_nSVDHits> 0 "
+        cut = cut + "&& Jpsi_mu_0_nSVDHits> 0 && Jpsi_mu_1_nSVDHits> 0 "
 
     argSet = ROOT.RooArgSet(
         B0_DeltaT,
@@ -591,7 +603,7 @@ print('*                                                             *')
 print('* WEIGHTED AVERAGES OF THE PARAMETERS                         *')
 print('* OF THE FITTED 3 GAUSSIAN                                    *')
 print('*                                                             *')
-print('**************** WITHOUT PXD HIT REQUIREMENT ******************')
+print('**************** WITHOUT VXD HIT REQUIREMENT ******************')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')

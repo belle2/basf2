@@ -182,7 +182,7 @@
 	    <Layer id="2">
 	      <Material desc="Material for bottom part of the FW ECL Shield">STR-HDPE</Material>
 	      <Phi unit="deg">0</Phi>
-	      <Dphi unit="deg">180.0</Dphi>
+	      <Dphi unit="deg">360.0</Dphi>
 	      <Plane id="1">
 		<posZ unit="cm">215.5</posZ>
 		<innerRadius unit="cm">36.7</innerRadius>

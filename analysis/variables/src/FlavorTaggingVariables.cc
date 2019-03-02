@@ -716,14 +716,9 @@ namespace Belle2 {
                 if (iTrackMom == iTrackMom) momXChargedTracks += iTrackMom;
               }
             }
-            const auto& ecl = roe->getECLClusters();
-            for (auto& x : ecl) {
-              if (x == nullptr) continue;
-              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x, ECLCluster::EHypothesisBit::c_nPhotons);
-              if (iMomECLCluster == iMomECLCluster) {
-                if (x->isNeutral()) momXNeutralClusters += iMomECLCluster;
-              }
-            }
+
+            momXNeutralClusters = roe->get4VectorNeutralECLClusters();
+
             const auto& klm = roe->getKLMClusters();
             for (auto& x : klm) {
               if (x == nullptr) continue;
@@ -739,13 +734,17 @@ namespace Belle2 {
             TLorentzVector momX = T.rotateLabToCms() * (momXChargedTracks +
                                                         momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
             TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
+
             if (requestedVariable == "recoilMass") output = momX.M();
             if (requestedVariable == "recoilMassSqrd") output = momX.M2();
             else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
             else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
             else if (requestedVariable == "EW90") {
+
               TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
               float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+
+              const auto& ecl = roe->getECLClusters();
               for (auto& x : ecl) {
                 if (x == nullptr) continue;
                 float iEnergy = x -> getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);

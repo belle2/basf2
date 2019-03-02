@@ -39,6 +39,9 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawFTSW();
 
+    //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) override;
+
     //! read data, detect and set the version number of the data format
     void SetVersion();
 

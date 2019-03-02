@@ -1,3 +1,4 @@
+
 /*
 <header>
 <input>SVDValidationTTree.root</input>
@@ -6,12 +7,11 @@
 <input>SVDValidationTTreeSimhit.root</input>
 <description>
     This ROOT macro is used for the SVD validation. It creates several
-    histograms, divided by variable,layer number, strip direction (U, V), 
+    histograms, divided by variable, layer number, strip direction (U/P, V/N), 
     type of sensor (barrel or slanted, Layer3 type is called barrel too for simplicity's sake)
     and saves them to a ROOT file.
 </description>
-<contact> G.Caria, gcaria@student.unimelb.edu.au
-Modifed by Renu Garg, renu92garg@gmail.com </contact>
+<contact> SVD Software Group, svd-software@belle2.org</contact>
 </header>
 */
 

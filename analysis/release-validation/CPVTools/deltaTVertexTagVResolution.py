@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-################################################################################
+###########################################################################################
 #
 # This validation script performs a fit of DeltaT, DeltaTErr, Dz for B0_sig and
 # Deltaz for B0_tag. The signal channel here is B0->JPsiKs.
@@ -9,11 +9,14 @@
 # DeltaTErr is fitted with a CBShape function and two Gaussians.
 #
 # Usage:
-#   basf2 B2JpsiKs_mu_DeltaTResValidation.py workingRootNtupleFiles treeName
+#   basf2 B2JpsiKs_mu_DeltaTResValidation.py workingRootNtupleFiles treeName VXDrequirement
+#
+# The VXD requirement has to be either PXD or SVD. The script will then evaluate the
+# vertexing performance if PXD (or SVD) hits are required and if not.
 #
 # Contributors: L. Li Gioi, F. Abudinen (June 2017)
 #
-################################################################################
+###########################################################################################
 
 
 from basf2 import B2INFO, B2FATAL

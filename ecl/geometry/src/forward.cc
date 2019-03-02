@@ -62,6 +62,11 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   vector<cplacement_t>::iterator fp = find_if(bp.begin(), bp.end(), [ECL_forward_part](const cplacement_t& p) {return p.nshape == ECL_forward_part;});
   // global transformation before placing the whole forward part in the top logical volume
   G4Transform3D gTrans = (fp == bp.end()) ? G4Translate3D(0, 0, 1960) : get_transform(*fp);
+  // since the calorimeter supporting structures attach to the yoke at
+  // the same place we need to modify supporting legs by milling
+  // necessary thickness of steel when moving forward part outward in
+  // z-direction
+  double milled_thickness = gTrans.dz() - 1960; // [mm]
   if (fp != bp.end()) bp.erase(fp); // now not needed
 
   const double th0 = 13.12, th1 = 32.98;
@@ -273,9 +278,9 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   if (b_support_leg) {
     const G4VisAttributes* batt = att("iron");
 
-    G4VSolid* s1 = new G4Box("fwd_leg_p1", 130. / 2, 170. / 2, 40. / 2);
+    G4VSolid* s1 = new G4Box("fwd_leg_p1", 130. / 2, 170. / 2, (40. - milled_thickness) / 2);
     G4LogicalVolume* l1 = new G4LogicalVolume(s1, Materials::get("SUS304"), "l1", 0, 0, 0);
-    G4Transform3D t1 = G4Translate3D(0, 170. / 2, 40. / 2);
+    G4Transform3D t1 = G4Translate3D(0, 170. / 2, (40. - milled_thickness) / 2 + milled_thickness);
     l1->SetVisAttributes(batt);
 
     G4VSolid* s2 = new G4Box("fwd_leg_p2", 60. / 2, 130. / 2, 137. / 2);
@@ -295,9 +300,9 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4Transform3D t3 = G4Translate3D(0, 265. / 2 + 35, 40. + 137. + 75. / 2) * G4RotateY3D(-M_PI / 2);
     l3->SetVisAttributes(batt);
 
-    G4VSolid* s4 = new G4Box("fwd_leg_p4", 130. / 2, 5. / 2, 5. / 2);
+    G4VSolid* s4 = new G4Box("fwd_leg_p4", 130. / 2, 5. / 2, (5. + milled_thickness) / 2);
     G4LogicalVolume* l4 = new G4LogicalVolume(s4, Materials::get("SUS304"), "l4", 0, 0, 0);
-    G4Transform3D t4 = G4Translate3D(0, 170. - 5. / 2, -5. / 2);
+    G4Transform3D t4 = G4Translate3D(0, 170. - 5. / 2, (milled_thickness - 5.) / 2);
     l4->SetVisAttributes(batt);
 
     G4VSolid* s5 = new G4Box("fwd_leg_p5", 140. / 2, 130. / 2, 80. / 2);
@@ -339,8 +344,8 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     support_leg->AddPlacedVolume(l6, t6);
 
     for (int i = 0; i < 8; i++) {
-      G4Transform3D tp = gTrans * G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4) *
-                         G4Translate3D(0, 1415 - 165 + 420. / 2, ZT + (97. + 160.) / 2) * G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
+      G4Transform3D tp =  G4Translate3D(0, 0, 1960) * G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4) *
+                          G4Translate3D(0, 1415 - 165 + 420. / 2, ZT + (97. + 160.) / 2) * G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
       support_leg->MakeImprint(top, tp, 0, overlap);
     }
 

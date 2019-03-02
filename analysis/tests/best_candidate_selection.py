@@ -115,14 +115,15 @@ numBest_value = 2
 
 
 class NumBestChecker(basf2.Module):
-    # Check if 'numBest' works correctly
+    """Check if 'numBest' works correctly"""
 
     def initialize(self):
-        # Create particle list 'e-:numbest' object
+        """Create particle list 'e-:numbest' object"""
+        #: ParticleList object
         self.plist = Belle2.PyStoreObj('e-:numBest')
 
     def event(self):
-        # And check that 'numBest' worked correctly
+        """Check if 'e-:numBest' has the expected size"""
         size = self.plist.getListSize()
         # The test fails if size > numBest_value
         # since we will set numBest = numBest_value

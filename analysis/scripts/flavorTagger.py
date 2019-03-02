@@ -46,6 +46,7 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotfound=True, uploadToData
     uploadFlag = uploadToDatabaseAfterTraining
 
 
+# Default list of aliases that should be used to save the flavor tagging information using VariablesToNtuple
 flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC',
                   'qpElectron', 'hasTrueTargetElectron', 'isRightCategoryElectron',
                   'qpIntermediateElectron', 'hasTrueTargetIntermediateElectron', 'isRightCategoryIntermediateElectron',
@@ -64,8 +65,8 @@ flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC',
 
 def add_default_FlavorTagger_aliases():
     """
-    This function creates the default aliases for flavor tagging variables and adds them to the
-    predefined collection of variables called flavor_tagging.
+    This function adds the default aliases for flavor tagging variables
+    and defines the collection of flavor tagging variables.
     """
 
     utils._variablemanager.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')

@@ -19,14 +19,11 @@ import variables.collections as vc
 import variables.utils as vu
 import ROOT
 import sys
-import os
 
 # create path
 cp_val_path = b2.Path()
 
-if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
-    sys.exit(0)
-inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst11_BGx1_b2jpsiks.root')
+inputFile = b2.find_file(filename='analysis/mdst11_BGx1_b2jpsiks.root', data_type='validation')
 ma.inputMdst(environmentType='default', filename=inputFile, path=cp_val_path)
 
 # ma.inputMdst(environmentType='default', filename='../mdst11_BGx1_b2jpsiks.root', path=cp_val_path)

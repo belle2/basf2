@@ -356,7 +356,7 @@ void MillepedeCollectorModule::collect()
       for (auto& track : getParticlesTracks(mother->getDaughters()))
         daughters.push_back({
         gbl->collectGblPoints(track, track->getCardinalRep()),
-        getGlobalToLocalTransform(track->getFittedState()).T().GetSub(0, 4, 0, 2)
+        getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4).T()
       });
 
       if (daughters.size() > 1) {
@@ -383,18 +383,18 @@ void MillepedeCollectorModule::collect()
       auto mother = list->getParticle(iParticle);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
-      TMatrixD extProjection(3, 5);
+      TMatrixD extProjection(5, 3);
 
       bool first(true);
       for (auto& track : getParticlesTracks(mother->getDaughters())) {
         if (first) {
           // For first trajectory only
-          extProjection = getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4);
+          extProjection = getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2);
           first = false;
         }
         daughters.push_back({
           gbl->collectGblPoints(track, track->getCardinalRep()),
-          getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
+          getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4).T()
         });
       }
 
@@ -457,7 +457,9 @@ void MillepedeCollectorModule::collect()
           if (!lab.empty())
             daughters[0].first[0].addGlobals(lab, extProjection * der);
 
-          gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, vertexPrec);
+          gbl::GblTrajectory combined(daughters);
+          combined.printTrajectory(100);
+          combined.printPoints(100);
 
           combined.fit(chi2, ndf, lostWeight);
           getObjectPtr<TH1I>("ndf")->Fill(ndf);

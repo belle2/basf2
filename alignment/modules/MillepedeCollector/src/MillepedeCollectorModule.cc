@@ -356,7 +356,7 @@ void MillepedeCollectorModule::collect()
       for (auto& track : getParticlesTracks(mother->getDaughters()))
         daughters.push_back({
         gbl->collectGblPoints(track, track->getCardinalRep()),
-        getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4).T()
+        getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
       });
 
       if (daughters.size() > 1) {
@@ -394,7 +394,7 @@ void MillepedeCollectorModule::collect()
         }
         daughters.push_back({
           gbl->collectGblPoints(track, track->getCardinalRep()),
-          getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4).T()
+          getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
         });
       }
 

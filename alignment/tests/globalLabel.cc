@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <alignment/dbobjects/VXDAlignment.h>
+#include <cdc/dbobjects/CDCAlignment.h>
 
 
 using namespace std;
@@ -28,26 +29,26 @@ namespace Belle2 {
   class GlobalLabelTest : public ::testing::Test {
   protected:
     /// Testing vxd id
-    VxdID vxdid;
+    short vxdSensor;
     /// Testing cdc id
-    WireID cdcid;
+    short cdcWire;
     /// Testng parameter id
     int paramid;
 
     /** init */
     virtual void SetUp()
     {
-      vxdid = VxdID(1, 2, 1);
-      cdcid = WireID(1, 4, 60);
+      vxdSensor = VxdID(1, 2, 1).getID();
+      cdcWire = WireID(1, 4, 60).getEWire();
       paramid = 9;
     }
 
     /// Register some parameters as time dependent
     void registerSomeTimeDepParams()
     {
-      GlobalLabel(vxdid, paramid).registerTimeDependent(1, 100); // timeid=1 for 1..100
-      GlobalLabel(cdcid, paramid).registerTimeDependent(1, 50); // timeid=1 for 1..50
-      GlobalLabel(cdcid, paramid).registerTimeDependent(51, 100); // timeid=51 for 51..100
+      GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid).registerTimeDependent(1, 100); // timeid=1 for 1..100
+      GlobalLabel::construct<CDCAlignment>(cdcWire, paramid).registerTimeDependent(1, 50); // timeid=1 for 1..50
+      GlobalLabel::construct<CDCAlignment>(cdcWire, paramid).registerTimeDependent(51, 100); // timeid=51 for 51..100
     }
 
     /// Set current time slice for time dependent params
@@ -71,7 +72,7 @@ namespace Belle2 {
     for (int ilayer = 1; ilayer < 6; ilayer++) {
       for (unsigned int subrun = 0; subrun <= GlobalLabel::maxTID; subrun++) {
         VxdID id(ilayer, 0, 0);
-        GlobalLabel lab(id, 1);
+        GlobalLabel lab = GlobalLabel::construct<VXDAlignment>(id.getID(), 1);
         lab.registerTimeDependent(subrun, subrun);
         lab.setParameterId(2);
         lab.registerTimeDependent(subrun, subrun);
@@ -83,9 +84,9 @@ namespace Belle2 {
     for (int ilayer = 1; ilayer < 6; ilayer++) {
       for (unsigned int i = 0; i <= GlobalLabel::maxTID; i++) {
         setTime(i);
-        GlobalLabel movingLayer(VxdID(ilayer, 0, 0), 2);
-        GlobalLabel movingLayerStaticParam(VxdID(ilayer, 0, 0), 4);
-        GlobalLabel staticLayer(VxdID(6, 0, 0), 2);
+        GlobalLabel movingLayer = GlobalLabel::construct<VXDAlignment>(VxdID(ilayer, 0, 0).getID(), 2);
+        GlobalLabel movingLayerStaticParam = GlobalLabel::construct<VXDAlignment>(VxdID(ilayer, 0, 0).getID(), 4);
+        GlobalLabel staticLayer = GlobalLabel::construct<VXDAlignment>(VxdID(6, 0, 0).getID(), 2);
 
         EXPECT_EQ(i, movingLayer.getTimeId());
         EXPECT_EQ(0, movingLayerStaticParam.getTimeId());
@@ -98,20 +99,20 @@ namespace Belle2 {
   /// Test that time dependence works
   TEST_F(GlobalLabelTest, TimeSettingWorkflow)
   {
-    GlobalLabel vxdlabel1(vxdid, paramid);
-    GlobalLabel Cvxdlabel1(vxdid, 2);
+    GlobalLabel vxdlabel1 = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    GlobalLabel Cvxdlabel1 = GlobalLabel::construct<VXDAlignment>(vxdSensor, 2);
     EXPECT_EQ(0, vxdlabel1.getTimeId());
     EXPECT_EQ(0, Cvxdlabel1.getTimeId());
 
     registerSomeTimeDepParams();
-    GlobalLabel vxdlabel2(vxdid, paramid);
-    GlobalLabel Cvxdlabel2(vxdid, 2);
+    GlobalLabel vxdlabel2 = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    GlobalLabel Cvxdlabel2 = GlobalLabel::construct<VXDAlignment>(vxdSensor, 2);
     EXPECT_EQ(0, vxdlabel2.getTimeId());
     EXPECT_EQ(0, Cvxdlabel2.getTimeId());
 
     setTime(80);
-    GlobalLabel vxdlabel3(vxdid, paramid);
-    GlobalLabel Cvxdlabel3(vxdid, 2);
+    GlobalLabel vxdlabel3 = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    GlobalLabel Cvxdlabel3 = GlobalLabel::construct<VXDAlignment>(vxdSensor, 2);
     EXPECT_EQ(1, vxdlabel3.getTimeId());
     EXPECT_EQ(0, Cvxdlabel3.getTimeId());
 
@@ -120,7 +121,7 @@ namespace Belle2 {
   /// Test getters/setters, operators
   TEST_F(GlobalLabelTest, GettersSettersOperators)
   {
-    GlobalLabel vxdlabel1(vxdid, paramid);
+    GlobalLabel vxdlabel1 = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
     GlobalLabel vxdlabel2(100873609);
 
     // getters
@@ -128,11 +129,8 @@ namespace Belle2 {
     EXPECT_EQ(paramid, vxdlabel1.getParameterId());
     EXPECT_EQ(0, vxdlabel1.getTimeFlag());
     EXPECT_EQ(0, vxdlabel1.getTimeId());
-    EXPECT_EQ(vxdid, vxdlabel1.getVxdID());
-    EXPECT_EQ(65535, vxdlabel1.getWireID());
-    // no detector mismatch
-    EXPECT_EQ(0, GlobalLabel(cdcid, paramid).getVxdID());
-    EXPECT_EQ(cdcid, GlobalLabel(cdcid, paramid).getWireID());
+    EXPECT_EQ(vxdSensor, vxdlabel1.getElementId());
+
     // cast operators
     EXPECT_EQ(100873609, (int)vxdlabel1);
     EXPECT_EQ(100873609, (unsigned int)vxdlabel1);
@@ -142,17 +140,15 @@ namespace Belle2 {
     EXPECT_EQ(paramid, vxdlabel2.getParameterId());
     EXPECT_EQ(0, vxdlabel2.getTimeFlag());
     EXPECT_EQ(0, vxdlabel2.getTimeId());
-    EXPECT_EQ(vxdid, vxdlabel2.getVxdID());
-    EXPECT_EQ(65535, vxdlabel2.getWireID());
+    EXPECT_EQ(vxdSensor, vxdlabel2.getElementId());
+
     // no detector mismatch (GlobalLabel from label)
-    EXPECT_EQ(0, GlobalLabel(cdcid, paramid).getVxdID());
-    EXPECT_EQ(cdcid, GlobalLabel(cdcid, paramid).getWireID());
     // cats operator (GlobalLabel from label)
     EXPECT_EQ(100873609, (int)vxdlabel2);
     EXPECT_EQ(100873609, (unsigned int)vxdlabel2);
 
     // Assignment
-    GlobalLabel other(cdcid, 20);
+    GlobalLabel other = GlobalLabel::construct<CDCAlignment>(cdcWire, 20);
     other = vxdlabel1;
     EXPECT_EQ(100873609, other.label());
   }
@@ -162,19 +158,15 @@ namespace Belle2 {
   {
 
     // Test time indep. detector constructors
-    GlobalLabel vxdlabel(vxdid, paramid);
-    GlobalLabel cdclabel(cdcid, paramid);
+    GlobalLabel vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    GlobalLabel cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(100873609, vxdlabel.label());
-    EXPECT_EQ(200620409, cdclabel.label());
-    EXPECT_EQ(vxdid.getLadderNumber(), vxdlabel.getVxdID().getLadderNumber());
-    EXPECT_EQ(cdcid.getICLayer(), cdclabel.getWireID().getICLayer());
+    EXPECT_EQ(270620409, cdclabel.label());
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());
     // Test time indep. label constructor
     vxdlabel = GlobalLabel(100873609);
-    cdclabel = GlobalLabel(200620409);
-    EXPECT_EQ(vxdid.getLadderNumber(), vxdlabel.getVxdID().getLadderNumber());
-    EXPECT_EQ(cdcid.getICLayer(), cdclabel.getWireID().getICLayer());
+    cdclabel = GlobalLabel(270620409);
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());
 
@@ -186,20 +178,16 @@ namespace Belle2 {
 
     // Test detector time dependent constructors
     setTime(10);
-    vxdlabel = GlobalLabel(vxdid, paramid);
-    cdclabel = GlobalLabel(cdcid, paramid);
+    vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(1, vxdlabel.getTimeId());
     EXPECT_EQ(1, cdclabel.getTimeId());
-    EXPECT_EQ(vxdid.getLadderNumber(), vxdlabel.getVxdID().getLadderNumber());
-    EXPECT_EQ(cdcid.getICLayer(), cdclabel.getWireID().getICLayer());
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());
 
     // Test time dependent label constructor
     vxdlabel = GlobalLabel(vxdlabel.label());
     cdclabel = GlobalLabel(cdclabel.label());
-    EXPECT_EQ(vxdid.getLadderNumber(), vxdlabel.getVxdID().getLadderNumber());
-    EXPECT_EQ(cdcid.getICLayer(), cdclabel.getWireID().getICLayer());
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());
     EXPECT_EQ(1, vxdlabel.getTimeId());
@@ -208,47 +196,47 @@ namespace Belle2 {
     // Test that time dependence works correctly
     // on several subruns
     setTime(0);
-    vxdlabel = GlobalLabel(vxdid, paramid);
-    cdclabel = GlobalLabel(cdcid, paramid);
+    vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(0, vxdlabel.getTimeId());
     EXPECT_EQ(0, cdclabel.getTimeId());
 
 
     setTime(1);
-    vxdlabel = GlobalLabel(vxdid, paramid);
-    cdclabel = GlobalLabel(cdcid, paramid);
+    vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(1, vxdlabel.getTimeId());
     EXPECT_EQ(1, cdclabel.getTimeId());
 
     setTime(51);
-    vxdlabel = GlobalLabel(vxdid, paramid);
-    cdclabel = GlobalLabel(cdcid, paramid);
+    vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(1, vxdlabel.getTimeId());
     EXPECT_EQ(51, cdclabel.getTimeId());
 
     setTime(80);
-    vxdlabel = GlobalLabel(vxdid, paramid);
-    cdclabel = GlobalLabel(cdcid, paramid);
+    vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(1, vxdlabel.getTimeId());
     EXPECT_EQ(51, cdclabel.getTimeId());
 
     setTime(100);
-    vxdlabel = GlobalLabel(vxdid, paramid);
-    cdclabel = GlobalLabel(cdcid, paramid);
+    vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(1, vxdlabel.getTimeId());
     EXPECT_EQ(51, cdclabel.getTimeId());
 
     setTime(101);
-    vxdlabel = GlobalLabel(vxdid, paramid);
-    cdclabel = GlobalLabel(cdcid, paramid);
+    vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(0, vxdlabel.getTimeId());
     EXPECT_EQ(0, cdclabel.getTimeId());
 
     // Reset time dependence
     GlobalLabel::clearTimeDependentParamaters();
     setTime(90);
-    vxdlabel = GlobalLabel(vxdid, paramid);
-    cdclabel = GlobalLabel(cdcid, paramid);
+    vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
+    cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
     EXPECT_EQ(0, vxdlabel.getTimeId());
     EXPECT_EQ(0, cdclabel.getTimeId());
 

@@ -409,10 +409,16 @@ void MillepedeCollectorModule::collect()
         extMeasurements[1] = vertexResidual[1];
         extMeasurements[2] = vertexResidual[2];
 
-        // Attach the external measurement to first point of first trajectory
-        daughters[0].first[0].addMeasurement(extProjection, extMeasurements, vertexPrec);
+        TMatrixD extDeriv(3, 6);
+        extDeriv.Zero();
+        // beam vertex constraint
+        extDeriv(0, 0) = 1.;
+        extDeriv(1, 1) = 1.;
+        extDeriv(2, 2) = 1.;
 
         if (m_calibrateVertex) {
+          // The bug is in this block now only
+
           TMatrixD derivatives(3, 3);
           derivatives.UnitMatrix();
           std::vector<int> labels;
@@ -429,19 +435,61 @@ void MillepedeCollectorModule::collect()
           // the derivatives to not pass those with zero labels (usefull to get rid of some params)
           std::vector<int> lab(globals); TMatrixD der(globals);
 
+
+          /*// I want: dlocal/dext = dlocal/dtwobody * dtwobody/dext = dfdextPlusMinus * extDeriv^(-1)
+          TMatrixD dTwoBody_dExt(9, 7);
+          dTwoBody_dExt.Zero();
+          // beam vertex constraint
+          dTwoBody_dExt(0, 0) = 1.;
+          dTwoBody_dExt(1, 1) = 1.;
+          dTwoBody_dExt(2, 2) = 1.;
+          // beam kinematics constraint
+          dTwoBody_dExt(3, 3) = 1.;
+          dTwoBody_dExt(4, 4) = 1.;
+          dTwoBody_dExt(5, 5) = 1.;
+          // beam inv. mass constraint
+          dTwoBody_dExt(8, 6) = 1.;
+
+          TMatrixD dLocal_dExt = dfdextPlusMinus.first * dTwoBody_dExt;
+          TMatrixD dLocal_dExt_T = dLocal_dExt; dLocal_dExt_T.T();
+          TVectorD locRes = dLocal_dExt * extMeasurements;
+          TMatrixD locPrec =  dLocal_dExt * extPrec * dLocal_dExt_T;
+
+          TMatrixDSym prec(5); prec.Zero();
+          for (int i = 0; i < 5; ++i)
+            for (int j = 0; j < 5; ++j)
+              prec(i, j) = locPrec(i, j);
+
+          daughters[0].first[0].addMeasurement(locRes, prec);
+
+          if (!lab.empty())
+            daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);  */
+
+          // Attach the external measurement to first point of first trajectory
+          daughters[0].first[0].addMeasurement(extProjection, extMeasurements, vertexPrec);
+
           if (!lab.empty())
             daughters[0].first[0].addGlobals(lab, der);
+
+
+          gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, vertexPrec);
+
+          combined.fit(chi2, ndf, lostWeight);
+          getObjectPtr<TH1I>("ndf")->Fill(ndf);
+          getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+          getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+
+          if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
+        } else {
+
+          gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, vertexPrec);
+
+          combined.fit(chi2, ndf, lostWeight);
+          getObjectPtr<TH1I>("ndf")->Fill(ndf);
+          getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+          getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
         }
-
-        gbl::GblTrajectory combined(daughters);
-
-        combined.fit(chi2, ndf, lostWeight);
-        getObjectPtr<TH1I>("ndf")->Fill(ndf);
-        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
-        getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-
-        if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
-
       }
     }
   }
@@ -731,24 +779,8 @@ void MillepedeCollectorModule::collect()
 
         daughters[0].first[0].addMeasurement(locRes, prec);
 
-        // particle 2
-        TMatrixD dLocal_dExt2 = dfdextPlusMinus.second * dTwoBody_dExt;
-        TMatrixD dLocal_dExt2_T = dLocal_dExt2; dLocal_dExt2_T.T();
-        TVectorD locRes2 = dLocal_dExt2 * extMeasurements;
-        TMatrixD locPrec2 =  dLocal_dExt2 * extPrec * dLocal_dExt2_T;
-
-        TMatrixDSym prec2(5); prec2.Zero();
-        for (int i = 0; i < 5; ++i)
-          for (int j = 0; j < 5; ++j)
-            prec2(i, j) = locPrec2(i, j);
-
-        //daughters[1].first[0].addMeasurement(locRes2, prec2);
-
         if (!lab.empty())
           daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);
-
-        //if (!lab.empty())
-        //  daughters[1].first[0].addGlobals(lab, dfdextPlusMinus.second * der);
 
         gbl::GblTrajectory combined(daughters);//, extDeriv, extMeasurements, extPrec);
         //combined.printTrajectory(1000);

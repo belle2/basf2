@@ -389,7 +389,7 @@ void MillepedeCollectorModule::collect()
       for (auto& track : getParticlesTracks(mother->getDaughters())) {
         if (first) {
           // For first trajectory only
-          extProjection = getLocalToGlobalTransform(track->getFittedState()).T().GetSub(0, 2, 0, 4);
+          extProjection = getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4);
           first = false;
         }
         daughters.push_back({
@@ -409,7 +409,7 @@ void MillepedeCollectorModule::collect()
         extMeasurements[1] = vertexResidual[1];
         extMeasurements[2] = vertexResidual[2];
 
-        TMatrixD extDeriv(3, 6);
+        TMatrixD extDeriv(3, 3);
         extDeriv.Zero();
         // beam vertex constraint
         extDeriv(0, 0) = 1.;
@@ -417,8 +417,6 @@ void MillepedeCollectorModule::collect()
         extDeriv(2, 2) = 1.;
 
         if (m_calibrateVertex) {
-          // The bug is in this block now only
-
           TMatrixD derivatives(3, 3);
           derivatives.UnitMatrix();
           std::vector<int> labels;
@@ -436,24 +434,18 @@ void MillepedeCollectorModule::collect()
           std::vector<int> lab(globals); TMatrixD der(globals);
 
 
-          /*// I want: dlocal/dext = dlocal/dtwobody * dtwobody/dext = dfdextPlusMinus * extDeriv^(-1)
-          TMatrixD dTwoBody_dExt(9, 7);
-          dTwoBody_dExt.Zero();
+          // I want: dlocal/dext = dlocal/dVertex * dVertex/dext = getLocalToGlobalTransform * extDeriv^(-1)
+          TMatrixD dVertex_dExt(3, 3);
+          dVertex_dExt.Zero();
           // beam vertex constraint
-          dTwoBody_dExt(0, 0) = 1.;
-          dTwoBody_dExt(1, 1) = 1.;
-          dTwoBody_dExt(2, 2) = 1.;
-          // beam kinematics constraint
-          dTwoBody_dExt(3, 3) = 1.;
-          dTwoBody_dExt(4, 4) = 1.;
-          dTwoBody_dExt(5, 5) = 1.;
-          // beam inv. mass constraint
-          dTwoBody_dExt(8, 6) = 1.;
+          dVertex_dExt(0, 0) = 1.;
+          dVertex_dExt(1, 1) = 1.;
+          dVertex_dExt(2, 2) = 1.;
 
-          TMatrixD dLocal_dExt = dfdextPlusMinus.first * dTwoBody_dExt;
+          TMatrixD dLocal_dExt = extProjection * dVertex_dExt;
           TMatrixD dLocal_dExt_T = dLocal_dExt; dLocal_dExt_T.T();
           TVectorD locRes = dLocal_dExt * extMeasurements;
-          TMatrixD locPrec =  dLocal_dExt * extPrec * dLocal_dExt_T;
+          TMatrixD locPrec =  dLocal_dExt * vertexPrec * dLocal_dExt_T;
 
           TMatrixDSym prec(5); prec.Zero();
           for (int i = 0; i < 5; ++i)
@@ -463,14 +455,7 @@ void MillepedeCollectorModule::collect()
           daughters[0].first[0].addMeasurement(locRes, prec);
 
           if (!lab.empty())
-            daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);  */
-
-          // Attach the external measurement to first point of first trajectory
-          daughters[0].first[0].addMeasurement(extProjection, extMeasurements, vertexPrec);
-
-          if (!lab.empty())
-            daughters[0].first[0].addGlobals(lab, der);
-
+            daughters[0].first[0].addGlobals(lab, extProjection * der);
 
           gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, vertexPrec);
 

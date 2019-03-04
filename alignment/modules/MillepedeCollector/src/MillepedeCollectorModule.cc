@@ -143,6 +143,13 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("minUsedCDCHitFraction", m_minUsedCDCHitFraction, "Minimum used CDC hit fraction to write out a trajectory",
            double(0.85));
 
+  addParam("hierarchyType", m_hierarchyType, "Type of (VXD only now) hierarchy: 0 = None, 1 = Flat, 2 = Full",
+           int(2));
+  addParam("enablePXDHierarchy", m_enablePXDHierarchy, "Enable PXD in hierarchy (flat or full)",
+           bool(true));
+  addParam("enableSVDHierarchy", m_enableSVDHierarchy, "Enable SVD in hierarchy (flat or full)",
+           bool(true));
+
 }
 
 void MillepedeCollectorModule::prepare()
@@ -204,70 +211,22 @@ void MillepedeCollectorModule::prepare()
 
   registerObject<TH1F>("cdc_hit_fraction", new TH1F("cdc_hit_fraction", "cdc_hit_fraction", 100, 0., 1.));
 
+  // Configure the (VXD) hierarchy before being built
+  if (m_hierarchyType == 0)
+    Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_None;
+  else if (m_hierarchyType == 1)
+    Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_Flat;
+  else if (m_hierarchyType == 2)
+    Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_Full;
+
+  Belle2::alignment::VXDGlobalParamInterface::s_enablePXD = m_enablePXDHierarchy;
+  Belle2::alignment::VXDGlobalParamInterface::s_enableSVD = m_enableSVDHierarchy;
+
+  // This will also build the hierarchy for the first time:
   Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   AlignableCDCRecoHit::s_enableEventT0LocalDerivative = m_fitEventT0;
-
-  /*
-  if (m_useVXDHierarchy) {
-    // Set-up hierarchy
-    DBObjPtr<VXDAlignment> vxdAlignments;
-
-    So the hierarchy is as follows:
-                Belle 2
-              / |     | \
-          Ying  Yang Pat  Mat ... other sub-detectors
-          / |   / |  |  \  | \
-        ......  ladders ......
-        / / |   / |  |  \  | \ \
-      ......... sensors ........
-
-
-    for (auto& halfShellPlacement : geo.getHalfShellPlacements()) {
-      TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
-      trafoHalfShell *= geo.getTGeoFromRigidBodyParams(
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
-                        );
-      hierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobaParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
-
-      for (auto& ladderPlacement : geo.getLadderPlacements(halfShellPlacement.first)) {
-        // Updated trafo
-        TGeoHMatrix trafoLadder = ladderPlacement.second;
-        trafoLadder *= geo.getTGeoFromRigidBodyParams(
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
-                       );
-        hierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
-
-        for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {
-          // Updated trafo
-          TGeoHMatrix trafoSensor = sensorPlacement.second;
-          trafoSensor *= geo.getTGeoFromRigidBodyParams(
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
-                         );
-          hierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensorPlacement.first, ladderPlacement.first, trafoSensor);
-
-
-        }
-      }
-    }
-  }
-  */
 }
 
 void MillepedeCollectorModule::collect()

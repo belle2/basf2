@@ -410,11 +410,11 @@ void CDCUnpackerModule::event()
                   tdcCountTrig = tdc1;
                 } else {
                   CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId,
-                                                       status, -1, 0, tot);
+                                                       0, -1, 0, tot);
                   if (length == 5) {
                     if (m_enable2ndHit == true) {
                       CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId,
-                                                            status, -1, 0, tot);
+                                                            0, -1, 0, tot);
                       secondHit->setOtherHitIndices(firstHit);
                       secondHit->set2ndHitFlag();
                     }

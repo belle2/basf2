@@ -299,7 +299,7 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
         cl_theta[3]      = (sum_info[j][4] >> 13) & 0x7f;
         cl_phi[3]        = (sum_info[j][4] >>  5) & 0xff;
         cl_time[3]       = ((sum_info[j][4] & 0x1f) << 3) + ((sum_info[j][5] >> 29) & 0x7);
-        cl_energy[3]     = (sum_info[j][4] >>  17) & 0xfff;
+        cl_energy[3]     = (sum_info[j][5] >>  17) & 0xfff;
 
         cl_theta[2]      = (sum_info[j][5] >> 10) & 0x7f;
         cl_phi[2]        = (sum_info[j][5] >>  2) & 0xff;

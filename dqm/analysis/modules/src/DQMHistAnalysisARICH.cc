@@ -86,12 +86,9 @@ void DQMHistAnalysisARICHModule::beginRun()
 
 void DQMHistAnalysisARICHModule::event()
 {
-  //Histogram from DQM module
-  TH1* m_h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
-
 
   //Draw lines on mergerHits histogram for shifters to divide sectors
-  m_h_mergerHit = findHist("ARICH/mergerHit");
+  TH1* m_h_mergerHit = findHist("ARICH/mergerHit");/**<The number of hits in each Merger Boards*/
   if (m_h_mergerHit != NULL) {
     m_c_mergerHit->Clear();
     m_c_mergerHit->cd();

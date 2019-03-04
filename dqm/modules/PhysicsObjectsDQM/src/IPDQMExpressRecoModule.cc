@@ -129,11 +129,7 @@ void IPDQMExpressRecoModule::endRun()
     m_h_y_risol->Fill(m_v_y.at(u) - m_median);
     m_h_pull->Fill((m_v_y.at(u) - m_median) / m_err_y.at(u));
   }
-}
 
-
-void IPDQMExpressRecoModule::terminate()
-{
   m_h_x->GetXaxis()->SetRangeUser(m_h_x->GetMean(1) - 5 * m_h_x->GetRMS(1), m_h_x->GetMean(1) + 5 * m_h_x->GetRMS(1));
   m_h_y->GetXaxis()->SetRangeUser(m_h_y->GetMean(1) - 5 * m_h_y->GetRMS(1), m_h_y->GetMean(1) + 5 * m_h_y->GetRMS(1));
   m_h_z->GetXaxis()->SetRangeUser(m_h_z->GetMean(1) - 5 * m_h_z->GetRMS(1), m_h_z->GetMean(1) + 5 * m_h_z->GetRMS(1));
@@ -160,6 +156,12 @@ void IPDQMExpressRecoModule::terminate()
                                         m_h_cov_y_z->GetMean(1) + 5 * m_h_cov_y_z->GetRMS(1));
 }
 
+
+
+
+void IPDQMExpressRecoModule::terminate()
+{
+}
 
 void IPDQMExpressRecoModule::event()
 {

@@ -264,7 +264,7 @@ void SVDValidation()
   const char *Side[] = {"U","V"};
   const char *Type[] = {"Slanted","Barrel"};
   // const char* contact_str = "G.Caria, gcaria@student.unimelb.edu.au";  
-  const char* contact_str="R. Garg, renu92garg@gmail.com";
+  const char* contact_str="SVD Software Group, svd-software@belle2.org";
   //-------------------------------------------------------------
   // open the files with simulated and reconstructed events data
   TFile* input = TFile::Open("../SVDValidationTTree.root");

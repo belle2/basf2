@@ -405,16 +405,6 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
-        qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithCA.weights.xml"
-
-    else:
-        qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
-
-    path.add_module("TFCDC_CurlerCloneRejecter",
-                    inputTracks=output_tracks,
-                    filter='mva',
-                    filterParameters={'cut': cdc_quality_indicator_cut, 'identifier': qi_weightfile})
-
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
                     inputTracks=output_tracks,

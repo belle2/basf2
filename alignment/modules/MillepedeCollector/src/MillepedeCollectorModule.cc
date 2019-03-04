@@ -122,13 +122,13 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            "For primary vertices / two body decays, beam spot kinematics calibration derivatives are added",
            bool(true));
 
-  // Configure GBL fit of individual tracks
-  //   addParam("externalIterations", m_externalIterations, "Number of external iterations of GBL fitter",
-  //            int(0));
-  //   addParam("internalIterations", m_internalIterations, "String defining internal GBL iterations for outlier down-weighting",
-  //            string(""));
-  //   addParam("recalcJacobians", m_recalcJacobians, "Up to which external iteration propagation Jacobians should be re-calculated",
-  //            int(0));
+  //Configure GBL fit of individual tracks
+  addParam("externalIterations", m_externalIterations, "Number of external iterations of GBL fitter",
+           int(0));
+  addParam("internalIterations", m_internalIterations, "String defining internal GBL iterations for outlier down-weighting",
+           string(""));
+  addParam("recalcJacobians", m_recalcJacobians, "Up to which external iteration propagation Jacobians should be re-calculated",
+           int(0));
 
   addParam("minPValue", m_minPValue, "Minimum p-value to write out a (combined) trajectory. Set <0 to write out all.",
            double(-1.));
@@ -433,8 +433,7 @@ void MillepedeCollectorModule::collect()
           // the derivatives to not pass those with zero labels (usefull to get rid of some params)
           std::vector<int> lab(globals); TMatrixD der(globals);
 
-
-          // I want: dlocal/dext = dlocal/dVertex * dVertex/dext = getLocalToGlobalTransform * extDeriv^(-1)
+          // I want: dlocal/dext = dlocal/dVertex * dVertex/dext = getGlobalToLocalTransform * extDeriv^(-1)
           TMatrixD dVertex_dExt(3, 3);
           dVertex_dExt.Zero();
           // beam vertex constraint
@@ -467,6 +466,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
 
           if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+          B2RESULT("Beam vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
+
 
         } else {
 
@@ -476,6 +477,10 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+          if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
+          B2RESULT("Beam vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
+
         }
       }
     }
@@ -917,8 +922,7 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   }
 
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
-  //gbl->setOptions(m_internalIterations, true, true, m_externalIterations, m_recalcJacobians);
-  gbl->setOptions("", true, true, 0, 0);
+  gbl->setOptions(m_internalIterations, true, true, m_externalIterations, m_recalcJacobians);
   gbl->setTrackSegmentController(new GblMultipleScatteringController);
 
   MeasurementAdder factory("", "", "", "", "");

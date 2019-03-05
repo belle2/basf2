@@ -133,7 +133,8 @@ class TrackingValidationModule(basf2.Module):
         #: directory (this will trigger the default behaviour) or set the environmental variable DO_NOT_READ_BINNING
         self.referenceFileName = None
         if "DO_NOT_READ_BINNING" not in os.environ:
-            self.referenceFileName = Belle2.FileSystem.findFile("tracking/validation/" + self.output_file_name)
+            # the validity of the file will be checked later
+            self.referenceFileName = Belle2.FileSystem.findFile("tracking/validation/" + self.output_file_name, True)
             basf2.B2INFO("Will read binning from: " + self.referenceFileName)
             basf2.B2INFO("If this is not wanted set the environment variable DO_NOT_READ_BINNING or remove reference files.")
         else:

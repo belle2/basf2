@@ -16,7 +16,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-     * Module implementation using the MCTrackTrackQualityEstimator findlet
+     * Module implementation using the TrackTrackQualityEstimator findlet
      */
     class TFCDC_TrackQualityEstimatorModule : public FindletModule<TrackQualityEstimator> {
 

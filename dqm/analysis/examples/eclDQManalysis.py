@@ -5,6 +5,12 @@ from basf2 import *
 import sys
 argv = sys.argv
 
+if len(argv) < 3:
+    print()
+    print('Usage: %s input_filename output_filename' % argv[0])
+    print()
+    exit(1)
+
 set_log_level(LogLevel.INFO)
 
 # Create main path

@@ -1,4 +1,13 @@
-/**************************************************************************                                                                                              * BASF2 (Belle Analysis Framework 2)                                     *                                                                                              * Copyright(C) 2017 - Belle II Collaboration                             *                                                                                              *                                                                        *                                                                                              * Author: The Belle II Collaboration                                     *                                                                                              * Contributors: Gaetano de Marino                                        *                                                                                              *                                                                        *                                                                                              *                                                                        *                                                                                              *                                                                        *                                                                                              * This software is provided "as is" without any warranty.                *                                                                                              **************************************************************************/
+/***************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                      *
+ * Copyright(C) 2017 - Belle II Collaboration                              *
+ *                                                                         *
+ * Author: The Belle II Collaboration                                      *
+ * Contributors: Gaetano de Marino                                         *
+ *                                                                         *
+ *                                                                         *
+ * This software is provided "as is" without any warranty.                 *
+ ***************************************************************************/
 #include <framework/core/HistoModule.h>
 
 #include <framework/datastore/DataStore.h>
@@ -11,7 +20,10 @@
 #include "TPaveStats.h"
 
 namespace Belle2 {
-
+  /*
+    This Module, made for ExpressReco, monitors the position
+    and the dimension of the beamspot using mu+mu- events
+   */
   class IPDQMExpressRecoModule : public HistoModule {
 
   public:

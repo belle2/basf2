@@ -18,7 +18,7 @@ def add_IP_dqm(path):
     mySelection += ' and abs(dz)<1.0 and dr<0.5'
     fillParticleList('mu+:DQM', mySelection, path=path)
     reconstructDecay('Upsilon(4S):IPDQM -> mu+:DQM mu-:DQM', '9.5<M<11.5', path=path)
-    vx.vertexKFit('Upsilon(4S):IPDQM', conf_level=0, path=path)
+    vx.vertexKFit('Upsilon(4S):IPDQM', conf_level=0, path=path, silence_warning=True)
 
     dqm = register_module('IPDQMExpressReco')
     dqm.set_log_level(LogLevel.INFO)

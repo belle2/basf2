@@ -580,6 +580,39 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr granDaughterDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          // cppcheck-suppress unreadVariable
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First two arguments of granDaughterDiffOf meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0));
+            return diff;}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function granDaughterDiffOf");
+      }
+    }
+
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
@@ -620,6 +653,49 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
+      }
+    }
+
+    Manager::FunctionPtr granDaughterDiffOfPhi(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          // cppcheck-suppress unreadVariable
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of granDaughterDiffOfPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function granDaughterDiffOfPhi");
       }
     }
 
@@ -669,6 +745,51 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr granDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          // cppcheck-suppress unreadVariable
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of granDaughterDiffOfClusterPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            if (std::isnan(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0))) or std::isnan(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0))))
+              return std::numeric_limits<float>::quiet_NaN();
+
+            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function granDaughterDiffOfClusterPhi");
+      }
+    }
 
     Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
     {
@@ -1780,17 +1901,31 @@ arguments. Operator precedence is taken into account. For example ::
                       "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns p_j - p_i)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
+    REGISTER_VARIABLE("granDaughterDiffOf(i, j, variable)", granDaughterDiffOf,
+                      "Returns the difference of a variable between the first daughters of the two given daughters.\n"
+                      "E.g. useRestFrame(granDaughterDiffOf(0, 1, p)) returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
+                      "(That means that it returns p_j - p_i)\n"
+                      "Nota Bene: for the particular case 'variable=phi' you should use the 'granDaughterDiffOfPhi' function.");
     REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
                       "Returns the difference in phi between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("granDaughterDiffOfPhi(i, j)", granDaughterDiffOfPhi,
+                      "Returns the difference in phi between the first daughters of the two given daughters.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n");
     REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
                       "Returns the difference in phi between the ECLClusters of two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
                       "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("granDaughterDiffOfClusterPhi(i, j)", granDaughterDiffOfClusterPhi,
+                      "Returns the difference in phi between the ECLClusters of the daughters of the two given daughters.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n");
     REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
                       "Returns the difference in phi between the two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"

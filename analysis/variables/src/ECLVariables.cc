@@ -599,6 +599,7 @@ namespace Belle2 {
           B2DEBUG(11, "denom[" << numberOfClusterDaughters << "] = " << denom);
         } else {
           const std::vector<Particle*> daughters = current->getDaughters();
+          nDaughters = int(current->getNDaughters());
           for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
             stacked.push(daughters[iDaughter]);
           }
@@ -653,6 +654,7 @@ namespace Belle2 {
           B2DEBUG(11, "maxTimeDiff[" << numberOfClusterDaughters << "] = " << maxTimeDiff);
         } else {
           const std::vector<Particle*> daughters = current->getDaughters();
+          nDaughters = int(current->getNDaughters());
           for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
             stacked.push(daughters[iDaughter]);
           }

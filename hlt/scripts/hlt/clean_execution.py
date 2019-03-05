@@ -1,3 +1,4 @@
+import atexit
 import signal
 import subprocess
 from time import sleep, time
@@ -128,6 +129,9 @@ class CleanBasf2Execution:
         """
         signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGTERM, self.signal_handler)
+        # Just for safety, also register an exit handler
+        atexit.unregister(self.signal_handler)
+        atexit.register(self.signal_handler, signal.SIGTERM, None)
 
     def has_process_ended(self):
         """

@@ -85,15 +85,18 @@ class CleanBasf2Execution:
             self._handled_process.poll()
 
             # Give the process some time to react
-            if not self.wait_for_process(timeout=2):
+            if not self.wait_for_process(timeout=10):
                 basf2.B2WARNING("Process did not react in time. Sending a SIGKILL.")
         finally:
             # In any case: kill the process
             try:
                 os.killpg(self._pgid, signal.SIGKILL)
-                if not self.wait_for_process(timeout=1):
+                if not self.wait_for_process(timeout=10):
+                    backtrace = subprocess.check_output(["gdb", "-q",  "-batch", "-ex", "backtrace",  "basf2",
+                                                         str(self._pgid)]).decode()
                     basf2.B2ERROR("Could not end the process event with a KILL signal. This can happen because it is "
-                                  "in the uninterruptable sleep state. I can not do anything about this!")
+                                  "in the uninterruptable sleep state. I can not do anything about this!",
+                                  backtrace=backtrace)
             except ProcessLookupError:
                 # The process is already gone! Nice
                 pass

@@ -12,8 +12,11 @@
 
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dbobjects/TOPCalChannelMask.h>
 #include <TTree.h>
+#include <TH1F.h>
 
 
 namespace Belle2 {
@@ -30,9 +33,9 @@ namespace Belle2 {
        * tree structure
        */
       struct TreeStruct {
-        float slotRates[16] = {0}; /**< hit rates of the modules (slots) */
-        float totalRate = 0; /**< total detector hit rate */
-        bool valid = false;  /**< status: true = rates valid, false on clear() */
+        float slotRates[16] = {0}; /**< hit rates of the modules (slots) [MHz/PMT]*/
+        float totalRate = 0; /**< total detector hit rate [MHz/PMT]*/
+        bool valid = false;  /**< status: true = rates valid, set to false on clear() */
 
         /**
          * clear variables
@@ -48,8 +51,11 @@ namespace Belle2 {
 
       /**
        * Constructor
+       * @param timeOffset time offset to be subtracted from hit times [ns]
+       * @param timeWindow time window (full size) in which to count hits [ns]
        */
-      TOPHitRateCounter()
+      TOPHitRateCounter(double timeOffset, double timeWindow):
+        m_timeOffset(timeOffset), m_timeWindow(timeWindow)
       {}
 
       /**
@@ -75,7 +81,14 @@ namespace Belle2 {
 
     private:
 
+      /**
+       * Sets fractions of active channels
+       */
+      void setActiveFractions();
+
       // class parameters: to be set via constructor or setters
+      double m_timeOffset = 0; /**< time offset of hits [ns] */
+      double m_timeWindow = 0; /**< time window in which to count hits [ns] */
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */
@@ -84,8 +97,15 @@ namespace Belle2 {
       StoreArray<TOPDigit> m_digits;  /**< collection of digits */
 
       // DB payloads
+      DBObjPtr<TOPCalChannelMask> m_channelMask; /**< channel mask */
+
+      // control histograms: to check if time offset and window size are correctly set
+      TH1F* m_hits = 0; /**< time distribution of hits in wide range */
+      TH1F* m_hitsInWindow = 0; /**< time distribution of hits inside timeWindow */
 
       // other
+      double m_activeFractions[16] = {0}; /**< fractions of active channels in slots */
+      double m_activeTotal = 0; /**< total fraction of active channels */
 
     };
 

@@ -26,7 +26,7 @@
 namespace Belle2 {
 
   /**
-   * A module to monitor detector hit rates of beam background in certain time stamps
+   * A module to monitor detector hit rates of beam background
    * Output is to a flat ntuple
    */
   class BeamBkgHitRateMonitorModule : public Module {
@@ -72,6 +72,8 @@ namespace Belle2 {
     std::string m_outputFileName; /**< output file name */
     std::string m_treeName;       /**< output tree name */
     std::vector<int> m_trgTypes;  /**< trigger types to be selected */
+    double m_topTimeOffset; /**< TOP: time offset of hits [ns] */
+    double m_topTimeWindow; /**< TOP: time window in which to count hits [ns] */
 
     // collections
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data object */
@@ -100,7 +102,6 @@ namespace Belle2 {
     unsigned m_utimeFirst = 0; /**< unix time of the first event in the input stream */
     unsigned m_utimeMin = 0; /**< minimal unix time of the events */
     unsigned m_utimeMax = 0; /**< maximal unix time of the events */
-
 
   };
 

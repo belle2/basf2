@@ -59,7 +59,10 @@ namespace Belle2 {
     addParam("trgTypes", m_trgTypes,
              "trigger types for event selection (see TRGSummary.h for definitions)",
              m_trgTypes);
-
+    addParam("topTimeOffset", m_topTimeOffset,
+             "TOP: time offset of hits (to be subtracted) [ns]", 350.0);
+    addParam("topTimeWindow", m_topTimeWindow,
+             "TOP: time window in which to count hits [ns]", 100.0);
 
   }
 
@@ -85,7 +88,7 @@ namespace Belle2 {
     m_monitors.push_back(svd);
     auto* cdc = new Background::CDCHitRateCounter();
     m_monitors.push_back(cdc);
-    auto* top = new Background::TOPHitRateCounter();
+    auto* top = new Background::TOPHitRateCounter(m_topTimeOffset, m_topTimeWindow);
     m_monitors.push_back(top);
     auto* arich = new Background::ARICHHitRateCounter();
     m_monitors.push_back(arich);
@@ -167,7 +170,7 @@ namespace Belle2 {
   void BeamBkgHitRateMonitorModule::terminate()
   {
     m_file->cd();
-    m_tree->Write();
+    m_file->Write();
     m_file->Close();
 
     // print a summary

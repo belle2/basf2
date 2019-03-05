@@ -228,14 +228,14 @@ namespace Belle2 {
           int blockid = 0;
           const double materialThick = fabs(materialForwardZ - materialBackwardZ) / IZARICHF;
           for (int iZ = 0; iZ < IZARICHF; iZ++) {
-            const double rmin = materialInnerR;
-            //const double rmax = materialOuterR;
+            //const double rmin = materialInnerR;
+            const double rmax = materialOuterR;
             const double materialPosZ = materialBackwardZ + iZ * materialThick;
             for (int iPhi = 0; iPhi < IPhiARICHF; iPhi++) {
               const double SPhi = 360. / IPhiARICHF * iPhi;
               const double DPhi = 360. / IPhiARICHF;
               const double materialRThick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF] / Unit::mm;
-              const double rmax = rmin + materialRThick;
+              const double rmin = rmax - materialRThick;
               double density = Density[iZ] * CLHEP::g / CLHEP::cm3;
               G4Material* ArichAir = geometry::Materials::get("Arich_TopGapfor");
               G4Material* medArichGap = new G4Material("ArichGap_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);

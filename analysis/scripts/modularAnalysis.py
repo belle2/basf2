@@ -889,7 +889,7 @@ def combineAllParticles(
     """
     Creates a new Particle as the combination of all Particles from all
     provided inputParticleLists. However, each particle is used only once
-    (even if duplicates are provided and the combination has to pass the
+    (even if duplicates are provided) and the combination has to pass the
     specified selection criteria to be saved in the newly created (mother)
     ParticleList.
 

@@ -30,9 +30,9 @@ MC11_types = {
     "MC11_uubarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006104/s00/e0000/4S/r00000/uubar/' +
     'mdst/sub00/mdst_000001_prod00006104_task00000001.root',
     "MC11_ddbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006105/s00/e0000/4S/r00000/ddbar/' +
-    'mdst/sub00/mdst_000001_prod00006105_task00000001.root',
+    'mdst/sub00/mdst_000486_prod00006105_task00000491.root',
     "MC11_ssbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006106/s00/e0000/4S/r00000/ssbar/' +
-    'mdst/sub00/mdst_000001_prod00006107_task00000001.root',
+    'mdst/sub00/mdst_000001_prod00006106_task00000001.root',
     "MC11_taupairBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006108/s00/e0000/4S/r00000/taupair/' +
     'mdst/sub00/mdst_000001_prod00006108_task00000001.root',
     "MC11_mixedBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005215/s00/e0000/4S/r00000/mixed/' +

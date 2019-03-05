@@ -15,4 +15,4 @@ if __name__ == '__main__':
     try:
         execution.run()
     finally:
-        subprocess.check_call("clear_basf2_ipc")
+        subprocess.run("framework-pcore-clear_ipcs")

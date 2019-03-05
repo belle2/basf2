@@ -14,6 +14,9 @@
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
+//ARICH
+#include <arich/utility/ARICHChannelHist.h>
+
 // framework
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -77,6 +80,8 @@ void DQMHistAnalysisARICHModule::initialize()
   }
   m_c_mergerHit = new TCanvas("ARICH/c_mergerHitModified");
 
+  m_c_channelHist = new TCanvas("ARICHExpert/c_channelHist");
+
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }
 
@@ -100,6 +105,22 @@ void DQMHistAnalysisARICHModule::event()
     m_c_mergerHit->Modified();
   } else {
     B2INFO("Histogram named mergerHit is not found.");
+  }
+
+  //Draw 2D hit map of channels
+  TH1* m_h_chHit = findHist("ARICH/chHit");/**<The number of hits in each channels*/
+  if (m_h_chHit != NULL) {
+    for (int i = 1; i < 421; i++) {
+      for (int j = 0; j < 144; j++) {
+        int ch = (i - 1) * 144 + j;
+        channelHist->setBinContent(i, j, m_h_chHit->GetBinContent(ch + 1));
+      }
+    }
+    m_c_channelHist->Clear();
+    m_c_channelHist->cd();
+    channelHist->Draw();
+  } else {
+    B2INFO("Histogram named chHit is not found.");
   }
 
 }

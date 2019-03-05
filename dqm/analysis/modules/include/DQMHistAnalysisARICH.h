@@ -92,7 +92,7 @@ namespace Belle2 {
 
     Belle2::ARICHChannelHist* channelHist = new Belle2::ARICHChannelHist("ARICHExpert/chHits",
         "# of hits/channel"); /**<ARICH TObject to draw hit map for each channel*/
-    TCanvas* m_c_channelHist = NULL; /**<Canvas for modified mergerHit histogram*/
+    TCanvas* m_c_channelHist = NULL; /**<Canvas for 2D hit map of channels*/
 
   };
 

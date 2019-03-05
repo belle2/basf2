@@ -115,3 +115,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         path.add_module('ARICHDQM')
     # PhysicsObjectsDQM
     add_analysis_dqm(path)
+    # DAQ Monitor
+    path.add_module('DAQMonitor')

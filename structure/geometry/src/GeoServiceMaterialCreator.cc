@@ -254,12 +254,12 @@ namespace Belle2 {
           else {IPhiTOP = IPhiTOPF;}
           const double rmin = materialInnerR;
           const double rmax = materialOuterR;
-          const double materialPosZ = materialBackwardZ;
           for (int iPhi = 0; iPhi < IPhiTOP; iPhi++) {
             const double SPhi = 360. / IPhiTOP * iPhi;
             const double DPhi = 360. / IPhiTOP;
             if (materialID == 3) {
               const double materialThick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF] / Unit::mm;
+              const double materialPosZ = materialForwardZ - materialThick;
               double density = Density[IZARICHF] * CLHEP::g / CLHEP::cm3;
               G4Material* TopAir = geometry::Materials::get("Top_ECLGapback");
               G4Material* medTopGap = new G4Material("TopGapback_" + to_string(iPhi), density, 1);
@@ -270,6 +270,7 @@ namespace Belle2 {
             if (materialID == 4) {
               const double materialThick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB] /
                                            Unit::mm;
+              const double materialPosZ = materialBackwardZ;
               double density = Density[1 + IZARICHF] * CLHEP::g / CLHEP::cm3;
               G4Material* TopAir = geometry::Materials::get("Top_ECLGapfor");
               G4Material* medTopGap = new G4Material("TopGapfor_" + to_string(iPhi), density, 1);

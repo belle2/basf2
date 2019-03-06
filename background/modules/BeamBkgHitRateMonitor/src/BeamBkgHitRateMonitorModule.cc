@@ -186,6 +186,7 @@ namespace Belle2 {
              << LogVar("stop utime        ", m_utimeMax)
              << LogVar("duration [seconds]", m_utimeMax - m_utimeMin)
             );
+    B2RESULT("Output file: " << m_outputFileName);
   }
 
   bool BeamBkgHitRateMonitorModule::isEventSelected()

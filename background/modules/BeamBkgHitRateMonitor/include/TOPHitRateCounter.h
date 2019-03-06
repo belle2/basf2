@@ -33,8 +33,8 @@ namespace Belle2 {
        * tree structure
        */
       struct TreeStruct {
-        float slotRates[16] = {0}; /**< hit rates of the modules (slots) [MHz/PMT]*/
-        float totalRate = 0; /**< total detector hit rate [MHz/PMT]*/
+        float slotRates[16] = {0}; /**< hit rates per PMT of the modules (slots) [MHz] */
+        float totalRate = 0; /**< average hit rate per PMT [MHz] */
         bool valid = false;  /**< status: true = rates valid, set to false on clear() */
 
         /**

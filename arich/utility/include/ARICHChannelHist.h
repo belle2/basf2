@@ -18,7 +18,10 @@
 namespace Belle2 {
 
   /**
-   * Base class for geometry parameters.
+   * ARICH histogram with HAPD plane
+   * 3 options for bin segmentation are available
+   * type 0 - one bin per HAPD, type 1 - one bin per channel, type 2 - one bin per APD chip
+   * HAPD numbering is 1-420 (software numbering), channel is ASIC channel, APD is ASIC channel / 36
    */
   class ARICHChannelHist: public TH2Poly {
 
@@ -71,7 +74,7 @@ namespace Belle2 {
 
   protected:
 
-    int m_type = 0;
+    int m_type = 0; /**< histogram type */
     std::vector<unsigned> m_hapd2binMap; /**< map of bins*/
     ClassDef(ARICHChannelHist, 1); /**< ClassDef */
 

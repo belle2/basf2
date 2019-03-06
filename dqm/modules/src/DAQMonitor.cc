@@ -42,7 +42,8 @@ DAQMonitorModule::~DAQMonitorModule()
 void DAQMonitorModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("DAQ")->cd();
+  oldDir->mkdir("DAQ");
+  oldDir->cd("DAQ");
 
   h_nevt = new TH1F("Nevent", "Number of Events", 10, 0.0, 10.0);
 

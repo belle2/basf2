@@ -14,9 +14,6 @@
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-//ARICH
-#include <arich/utility/ARICHChannelHist.h>
-
 // framework
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -80,7 +77,9 @@ void DQMHistAnalysisARICHModule::initialize()
   }
   m_c_mergerHit = new TCanvas("ARICH/c_mergerHitModified");
 
-  m_c_channelHist = new TCanvas("ARICHExpert/c_channelHist");
+  channelHist = new Belle2::ARICHChannelHist("ARICHExpert/chHist",
+                                             "# of hits/channel"); /**<ARICH TObject to draw hit map for each channel*/
+  m_c_channelHist = new TCanvas("expert/c_channelHist");
 
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }

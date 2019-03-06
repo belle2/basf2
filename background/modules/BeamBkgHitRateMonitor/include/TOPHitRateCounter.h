@@ -23,7 +23,10 @@ namespace Belle2 {
   namespace Background {
 
     /**
-     * Class for monitoring beam background hit rates of TOP
+     * Class for monitoring beam background hit rates of TOP.
+     *
+     * Hit rates are given in MHz per PMT and are already corrected for different pixel
+     * efficiencies and masked-out pixels.
      */
     class TOPHitRateCounter: public HitRateBase {
 

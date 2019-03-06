@@ -28,13 +28,16 @@ std::string WireHitBackgroundDetector::getDescription()
 void WireHitBackgroundDetector::exposeParameters(ModuleParamList* moduleParamList,
                                                  const std::string& prefix)
 {
-  //m_wireHitFilter.exposeParameters(moduleParamList, prefix);
+  // TODO: m_wireHitFilter.exposeParameters(moduleParamList, prefix);
+}
 
-  moduleParamList->addParameter(prefixed(prefix, "Threshold"),
-                                m_wireHitFilter,
-                                "Threshold energy below which the hit is considered "
-                                "to be electronic noise",
-                                m_wireHitFilter);
+void WireHitBackgroundDetector::beginRun()
+{
+  Super::beginRun();
+  if (!(m_CDCWireHitRequirementsFromDB.isValid())) {
+    B2ERROR("CDC WireHitBackgroundDetector: DBObjPtr<CDCWireHitRequirements> not valid for current run.");
+    exit(1);
+  }
 }
 
 void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
@@ -42,7 +45,8 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
   for (CDCWireHit& wireHit : wireHits) {
     bool markAsBackground = false;
 
-    if (wireHit.getRefChargeDeposit() < m_wireHitFilter) {
+    if (wireHit.getRefChargeDeposit() < m_CDCWireHitRequirementsFromDB->getChargeCut()) {
+      B2INFO("CUT:   " << m_CDCWireHitRequirementsFromDB->getChargeCut());
       markAsBackground = true;
     }
 

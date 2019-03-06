@@ -42,6 +42,7 @@
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <cdc/dbobjects/CDCWireHitRequirements.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -889,6 +890,43 @@ void CDCDatabaseImporter::printADCDeltaPedestal()
   DBObjPtr<CDCADCDeltaPedestals> dbPed;
   dbPed->dump();
 }
+
+void CDCDatabaseImporter::importCDCWireHitRequirements(std::string fileName)
+{
+
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream.is_open()) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCWireHitRequirements> dbWireHitReq;
+  dbWireHitReq.construct();
+
+  double chargeCut = 0.0;
+
+  if (stream >> chargeCut) {
+    dbWireHitReq->setChargeCut(chargeCut);
+  }
+
+  stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbWireHitReq.import(iov);
+
+  B2RESULT("CDCWireHit requirements imported to database.");
+}
+
+void CDCDatabaseImporter::printCDCWireHitRequirements()
+{
+
+  DBObjPtr<CDCWireHitRequirements> dbWireHitReq;
+  dbWireHitReq->dump();
+}
+
 
 //Note; the following function is no longer needed
 #if 0

@@ -5,7 +5,7 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
-#include <daq/dqm/modules/DAQMonitor.h>
+#include <dqm/modules/DAQMonitor.h>
 
 
 using namespace std;

@@ -1201,7 +1201,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         daqpktstat.dhc_back().setErrorMask(m_errorMaskDHC);
         //B2DEBUG(98,"** DHC "<<currentDHCID<<" Raw"<<dhc.data_dhc_end_frame->get_words() * 4 <<" Red"<<countedBytesInDHC);
         daqpktstat.dhc_back().setCounters(dhc.data_dhc_end_frame->get_words() * 4, countedBytesInDHC);
-        daqpktstat.dhc_back().setEndErrorInfo(dhc.data_dhc_end_frame->getErorInfo());
+        daqpktstat.dhc_back().setEndErrorInfo(dhc.data_dhc_end_frame->getErrorInfo());
       }
       m_errorMaskDHC = 0;
       currentDHEID = 0xFFFFFFFF;
@@ -1268,7 +1268,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
           daqpktstat.dhc_back().dhe_back().setErrorMask(m_errorMaskDHE);
           // B2DEBUG(98,"** DHC "<<currentDHEID<<" Raw "<<dhc.data_dhe_end_frame->get_words() * 2 <<" Red"<<countedBytesInDHE);
           daqpktstat.dhc_back().dhe_back().setCounters(dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
-          daqpktstat.dhc_back().dhe_back().setEndErrorInfo(dhc.data_dhe_end_frame->getErorInfo());
+          daqpktstat.dhc_back().dhe_back().setEndErrorInfo(dhc.data_dhe_end_frame->getErrorInfo());
         }
       }
       m_errorMaskDHE = 0;

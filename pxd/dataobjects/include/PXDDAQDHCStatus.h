@@ -89,7 +89,7 @@ namespace Belle2 {
     /** Set Reduced Data counter for reduction calculation */
     uint32_t getRedCnt(void) const { return m_redCount;};
 
-    void setEndErrorInfo(uint32_t e) const { m_errorinfo = e;};
+    void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};
     uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
 
 

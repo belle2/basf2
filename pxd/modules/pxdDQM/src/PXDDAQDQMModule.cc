@@ -129,6 +129,11 @@ void PXDDAQDQMModule::event()
         PXDErrorFlags mask = (1ull << i);
         if ((dhc_emask & mask) == mask) hDAQErrorDHC->Fill(dhc.getDHCID(), i);
       }
+      unsigned int cmask = dhc.getEndErrorInfo();
+      for (int i = 0; i < 32; i++) {
+        unsigned int mask = (1 << i);
+        if ((cmask & mask) == mask) hDAQEndErrorDHC->Fill(dhc.getDHCID(), i);
+      }
       if (hDAQDHCReduction[dhc.getDHCID()]) {
         float red = dhc.getRedCnt() ? float(dhc.getRawCnt()) / dhc.getRedCnt() : 0.;
         B2DEBUG(98, "==DHC " << dhc.getDHCID() << "(Raw)" << dhc.getRawCnt() << " / (Red)" << dhc.getRedCnt() << " = " << red);
@@ -142,6 +147,11 @@ void PXDDAQDQMModule::event()
         for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
           PXDErrorFlags mask = (1ull << i);
           if ((dhe_emask & mask) == mask) hDAQErrorDHE->Fill(dhe.getDHEID(), i);
+        }
+        unsigned int emask = dhe.getEndErrorInfo();
+        for (int i = 0; i < 32; i++) {
+          unsigned int mask = (1 << i);
+          if ((emask & mask) == mask) hDAQEndErrorDHC->Fill(dhe.getDHEID(), i);
         }
 
         if (hDAQDHETriggerGate[dhe.getSensorID()]) hDAQDHETriggerGate[dhe.getSensorID()]->Fill(dhe.getTriggerGate());

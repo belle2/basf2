@@ -1,5 +1,3 @@
-#ifndef DAQMONITOR_H
-#define DAQMONITOR_H
 //+
 // File : DAQMonitor.h
 // Description : Module to monitor raw data accumulating histos
@@ -7,6 +5,8 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date :  5 - Sep - 2013
 //-
+
+#pragma once
 
 #include <stdlib.h>
 #include <string>
@@ -25,10 +25,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-
-#include <daq/rawdata/modules/DAQConsts.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
 
 #include <rawdata/dataobjects/RawPXD.h>
 #include <rawdata/dataobjects/RawSVD.h>
@@ -73,26 +69,33 @@ namespace Belle2 {
 
   private:
 
-    //! No. of sent events
+    /** No. of sent events */
     int m_nevt;
-    int* m_buffer;
 
-    //! Histograms
+    /** Histogram for PXD data size */
     TH1F* h_pxdsize;
+    /** Histogram for SVD data size */
     TH1F* h_svdsize;
+    /** Histogram for CDC data size */
     TH1F* h_cdcsize;
+    /** Histogram for TOP data size */
     TH1F* h_topsize;
+    /** Histogram for ARICH data size */
     TH1F* h_arichsize;
+    /** Histogram for ECL data size */
     TH1F* h_eclsize;
+    /** Histogram for KLM data size */
     TH1F* h_klmsize;
+    /** Histogram for TRG data size */
     TH1F* h_trgsize;
 
+    /** Histogram for total number of events */
     TH1F* h_nevt;
+    /** Histogram for total data size */
     TH1F* h_size;
+    /** Histogram for HLT data size */
     TH1F* h_hltsize;
 
   };
 
 } // end namespace Belle2
-
-#endif // MODULEHELLO_H

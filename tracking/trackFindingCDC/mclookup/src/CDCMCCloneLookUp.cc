@@ -30,12 +30,7 @@ std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCloneLookUp::getMatchedC
 
     // only if matching MCTrack with 50% minimal purity was found
     if (mcTrackID != INVALID_ITRACK) {
-      if (mapMCTrackIDToCDCTracks.find(mcTrackID) == mapMCTrackIDToCDCTracks.end()) {
-        // mcTrackID not yet in map, so add element
-        mapMCTrackIDToCDCTracks.emplace(mcTrackID, std::vector<CDCTrack*> {ptrCDCTrack});
-      } else { // mcTrackID already in map, so add Track to vector of tracks
-        mapMCTrackIDToCDCTracks[mcTrackID].push_back(ptrCDCTrack);
-      }
+      mapMCTrackIDToCDCTracks[mcTrackID].push_back(ptrCDCTrack);
     }
   }
   return mapMCTrackIDToCDCTracks;
@@ -58,15 +53,14 @@ bool CompareCDCTracks::operator()(const CDCTrack* ptrCDCTrack1, const CDCTrack* 
 
   // Look for track with smallest NLoops of first hit.
   // If it is equal, use track with the larger number of correct hits.
-  bool firstTrackBetter;
   if (firstNLoopsTrack1 == firstNLoopsTrack2) {
     const unsigned int nCorrectHitsTrack1 = getNumberOfCorrectHits(ptrCDCTrack1);
     const unsigned int nCorrectHitsTrack2 = getNumberOfCorrectHits(ptrCDCTrack2);
 
-    firstTrackBetter = nCorrectHitsTrack1 > nCorrectHitsTrack2;
-  } else {
-    firstTrackBetter = (firstNLoopsTrack1 < firstNLoopsTrack2);
+    const bool firstTrackBetter = nCorrectHitsTrack1 > nCorrectHitsTrack2;
+    return firstTrackBetter;
   }
+  const bool firstTrackBetter = (firstNLoopsTrack1 < firstNLoopsTrack2);
   return firstTrackBetter;
 }
 

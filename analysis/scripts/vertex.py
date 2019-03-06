@@ -749,9 +749,11 @@ def TagV(
     save the MC Btag in case of signal MC
 
     @param list_name name of the input Breco ParticleList
-    @param confidenceLevel minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
     @param MCassociation: use standard MC association or the internal one
-    @param useConstraint: choose constraint for the tag vertes fit
+    @param confidenceLevel: minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
+    @param useFitAlgorithm: choose the fit algorithm: boost, breco, standard, standard_pxd, singleTrack,
+           singleTrack_pxd, noConstraint
+    @param askMCInfo: True when requesting MC Information from the tracks performing the vertex fit
     @param reqPXDHits: minimum N PXD hits for a track
     @param maskName: get particles from a specified ROE mask
     @param path      modules are added to this path

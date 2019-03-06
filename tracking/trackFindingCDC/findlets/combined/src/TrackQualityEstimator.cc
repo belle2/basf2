@@ -51,21 +51,20 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
   m_mcCloneLookUpFiller.apply(tracks);
 
   auto reject = [this](CDCTrack & track) {
-    double filterWeight = m_trackQualityFilter(track);
-    track->setCellWeight(filterWeight);
-    if (std::isnan(filterWeight)) {
+    double qualityIndicator = m_trackQualityFilter(track);
+    if (std::isnan(qualityIndicator)) {
       track->setBackgroundFlag();
       track->setTakenFlag();
       return true;
     } else {
-      track.setQualityIndicator(filterWeight);
       return false;
     }
   };
+  if (m_param_deleteTracks) { erase_remove_if(tracks, reject); }
 
-  if (m_param_deleteTracks) {
-    erase_remove_if(tracks, reject);
-  } else {
-    std::for_each(begin(tracks), end(tracks), reject);
-  }
+  auto setQualityIndicator = [this](CDCTrack & track) {
+    double qualityIndicator = m_trackQualityFilter(track);
+    track.setQualityIndicator(qualityIndicator);
+  };
+  std::for_each(begin(tracks), end(tracks), setQualityIndicator);
 }

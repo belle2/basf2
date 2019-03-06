@@ -52,6 +52,7 @@ class CleanBasf2Execution:
         """
         Add the execution and terminate gracefully/hard if requested via signal.
         """
+        basf2.B2RESULT("Starting ", command)
         process = subprocess.Popen(command, start_new_session=True)
         pgid = os.getpgid(process.pid)
         if pgid != process.pid:

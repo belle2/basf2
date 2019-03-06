@@ -3,4 +3,4 @@
 from hlt.hlt_execution import main
 
 if __name__ == '__main__':
-    main("cosmic_reco_monitor.py")
+    exit(main("cosmic_reco_monitor.py"))

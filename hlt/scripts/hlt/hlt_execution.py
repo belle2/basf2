@@ -9,6 +9,7 @@ def main(script_name):
     """Shortcut method to do the basf2 execution on expressreco and hlt"""
     execution = CleanBasf2Execution(["basf2", "--no-stats", script_name, "--"] + sys.argv)
     try:
-        execution.run()
+        return_code = execution.run()
     finally:
         subprocess.run("framework-pcore-clear_ipcs")
+    return return_code

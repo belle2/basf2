@@ -3,4 +3,4 @@
 from hlt.hlt_execution import main
 
 if __name__ == '__main__':
-    main("roitest.py")
+    exit(main("roitest.py"))

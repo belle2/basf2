@@ -26,10 +26,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/rawdata/modules/DAQConsts.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
-
 #include <rawdata/dataobjects/RawPXD.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawCDC.h>

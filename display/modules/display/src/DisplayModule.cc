@@ -271,14 +271,16 @@ void DisplayModule::event()
 
     StoreArray<ECLCluster> clusters;
     for (const ECLCluster& cluster : clusters) {
-      if (m_showMCInfo) {
-        //make sure we add particles producing these
-        const MCParticle* mcpart = cluster.getRelated<MCParticle>();
-        if (mcpart)
-          m_visualizer->addMCParticle(mcpart);
-      }
+      if (cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        if (m_showMCInfo) {
+          //make sure we add particles producing these
+          const MCParticle* mcpart = cluster.getRelated<MCParticle>();
+          if (mcpart)
+            m_visualizer->addMCParticle(mcpart);
+        }
 
-      m_visualizer->addECLCluster(&cluster);
+        m_visualizer->addECLCluster(&cluster);
+      }
     }
 
     StoreArray<KLMCluster> klmclusters;

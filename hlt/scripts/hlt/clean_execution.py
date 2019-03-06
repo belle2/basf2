@@ -110,10 +110,6 @@ class CleanBasf2Execution:
         Wait maximum "timeout" for the process to stop.
         If it did not end in this period, returns False.
         """
-        # I would rather use self._handled_process.wait()
-        # which does exactly the same.
-        # However: the main process is also waiting for the return code
-        # so the threading.lock in the .wait() function will never aquire a lock :-(
         endtime = time() + timeout
         while True:
             if self.has_process_ended():
@@ -140,6 +136,11 @@ class CleanBasf2Execution:
         """
         Check if the handled process has ended already.
         This functions does not wait.
+
+        I would rather use self._handled_process.wait() or poll()
+        which does exactly the same.
+        However: the main process is also waiting for the return code
+        so the threading.lock in the .wait() function will never aquire a lock :-(
         """
         pid, sts = self._handled_process._try_wait(os.WNOHANG)
         assert pid == self._pgid or pid == 0

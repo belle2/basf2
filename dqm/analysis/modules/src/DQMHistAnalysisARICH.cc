@@ -79,7 +79,7 @@ void DQMHistAnalysisARICHModule::initialize()
 
   channelHist = new Belle2::ARICHChannelHist("ARICHExpert/chHist",
                                              "# of hits/channel"); /**<ARICH TObject to draw hit map for each channel*/
-  m_c_channelHist = new TCanvas("expert/c_channelHist");
+  m_c_channelHist = new TCanvas("ARICHExpert/c_channelHist");
 
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }

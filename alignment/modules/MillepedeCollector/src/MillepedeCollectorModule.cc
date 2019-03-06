@@ -36,6 +36,7 @@
 #include <TMath.h>
 #include <TH1F.h>
 #include <TTree.h>
+#include <TDecompSVD.h>
 
 #include <genfit/FullMeasurement.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
@@ -119,7 +120,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            "For primary vertices / two body decays, beam spot vertex calibration derivatives are added",
            bool(true));
   addParam("calibrateKinematics", m_calibrateKinematics,
-           "For primary vertices / two body decays, beam spot kinematics calibration derivatives are added",
+           "For primary two body decays, beam spot kinematics calibration derivatives are added",
            bool(true));
 
   //Configure GBL fit of individual tracks
@@ -373,7 +374,6 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-
   for (auto listName : m_primaryVertices) {
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
@@ -384,12 +384,14 @@ void MillepedeCollectorModule::collect()
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       TMatrixD extProjection(5, 3);
+      TMatrixD locProjection(3, 5);
 
       bool first(true);
       for (auto& track : getParticlesTracks(mother->getDaughters())) {
         if (first) {
           // For first trajectory only
           extProjection = getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2);
+          locProjection = getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4);
           first = false;
         }
         daughters.push_back({
@@ -401,6 +403,7 @@ void MillepedeCollectorModule::collect()
       if (daughters.size() > 1) {
         DBObjPtr<BeamParameters> beam;
 
+        TMatrixDSym vertexCov(beam->getCovVertex());
         TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
         TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
 
@@ -418,7 +421,11 @@ void MillepedeCollectorModule::collect()
 
         if (m_calibrateVertex) {
           TMatrixD derivatives(3, 3);
-          derivatives.UnitMatrix();
+          derivatives.Zero();
+          derivatives(0, 0) = 1.;
+          derivatives(1, 1) = 1.;
+          derivatives(2, 2) = 1.;
+
           std::vector<int> labels;
           GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
           labels.push_back(label.setParameterId(1));
@@ -427,38 +434,64 @@ void MillepedeCollectorModule::collect()
 
           // Allow to disable BeamParameters externally
           alignment::GlobalDerivatives globals(labels, derivatives);
-
           // Add derivatives for vertex calibration to first point of first trajectory
           // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
           // the derivatives to not pass those with zero labels (usefull to get rid of some params)
           std::vector<int> lab(globals); TMatrixD der(globals);
 
-          // I want: dlocal/dext = dlocal/dVertex * dVertex/dext = getGlobalToLocalTransform * extDeriv^(-1)
-          TMatrixD dVertex_dExt(3, 3);
-          dVertex_dExt.Zero();
-          // beam vertex constraint
-          dVertex_dExt(0, 0) = 1.;
-          dVertex_dExt(1, 1) = 1.;
-          dVertex_dExt(2, 2) = 1.;
+          // Transformation from local system at (vertex) point to global (vx,vy,vz)
+          // of the (decay) vertex
+          //
+          // d(q/p,u',v',u,v)/d(vy,vy,vz) = dLocal_dExt
+          //
+          //
+          // Note its transpose is its "inverse" in the sense that
+          //
+          // dloc/dext * (dloc/dext)^T = diag(0, 0, 0, 0, 1, 1)
+          //
+          //
+          // N.B. typical dLocal_dExt matrix (5x3):
+          //
+          //      |      0    |      1    |      2    |
+          // --------------------------------------------
+          //    0 |          0           0           0
+          //    1 |          0           0           0
+          //    2 |          0           0           0
+          //    3 |   -0.02614     -0.9997           0
+          //    4 |          0           0           1
+          //
+          // Therefore one can simplify things by only taking the last two rows/columns in vectors/matrices
+          // and vertex measurement can be expressed as standard 2D measurement in GBL.
+          //
+          TMatrixD dLocal_dExt = extProjection;
+          TMatrixD dExt_dLocal = locProjection;
 
-          TMatrixD dLocal_dExt = extProjection * dVertex_dExt;
-          TMatrixD dLocal_dExt_T = dLocal_dExt; dLocal_dExt_T.T();
           TVectorD locRes = dLocal_dExt * extMeasurements;
-          TMatrixD locPrec =  dLocal_dExt * vertexPrec * dLocal_dExt_T;
+          // Do not use inverted covariance - seems to have issues with numeric precision
+          TMatrixD locCov = dLocal_dExt * vertexCov * dExt_dLocal;
+          // Invert here only the 2D sub-matrix (rest is zero due to the foŕm of dLocal_dExt)
+          TMatrixD locPrec = locCov.GetSub(3, 4, 3, 4).Invert();
+          TMatrixDSym locPrec2D(2); locPrec2D.Zero();
+          for (int i = 0; i < 2; ++i)
+            for (int j = 0; j < 2; ++j)
+              locPrec2D(i, j) = locPrec(i, j);
 
-          TMatrixDSym prec(5); prec.Zero();
-          for (int i = 0; i < 5; ++i)
-            for (int j = 0; j < 5; ++j)
-              prec(i, j) = locPrec(i, j);
+          // Take the 2 last components also for residuals and global derivatives
+          // (in local system of vertex point - defined during fitRecoTrack(..., particle) and using
+          // the (hopefully) updated momentum and position seed after vertex fit by modularAnalysis
+          TVectorD locRes2D = locRes.GetSub(3, 4);
+          TMatrixD locDerivs2D = (extProjection * der).GetSub(3, 4, 0, 2);
 
-          daughters[0].first[0].addMeasurement(locRes, prec);
-
-          if (!lab.empty())
-            daughters[0].first[0].addGlobals(lab, extProjection * der);
+          // Attach the primary beamspot vertex position as a measurement at 1st point
+          // of first trajectory (and optionaly also the global derivatives for beamspot alignment
+          daughters[0].first[0].addMeasurement(locRes2D, locPrec2D);
+          if (!lab.empty()) {
+            daughters[0].first[0].addGlobals(lab, locDerivs2D);
+          }
 
           gbl::GblTrajectory combined(daughters);
-          combined.printTrajectory(100);
-          combined.printPoints(100);
+          //combined.printTrajectory(100);
+          //combined.printPoints(100);
 
           combined.fit(chi2, ndf, lostWeight);
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
@@ -562,7 +595,7 @@ void MillepedeCollectorModule::collect()
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
-      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / (beam->getCovHER() + beam->getCovHER())(0, 0);
+      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / 0.05 / 0.05;
       TVectorD massResidual(1); massResidual = - (mother->getMass() - beam->getMass());
 
       TVectorD extMeasurements(1);
@@ -610,7 +643,7 @@ void MillepedeCollectorModule::collect()
       TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
       TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
 
-      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / (beam->getCovHER() + beam->getCovHER())(0, 0);
+      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / (beam->getCovHER() + beam->getCovLER())(0, 0);
       TVectorD massResidual(1); massResidual = - (mother->getMass() - beam->getMass());
 
       TMatrixDSym extPrec(4); extPrec.Zero();
@@ -645,6 +678,7 @@ void MillepedeCollectorModule::collect()
   }
 
   for (auto listName : m_primaryTwoBodyDecays) {
+
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
       continue;
@@ -667,16 +701,18 @@ void MillepedeCollectorModule::collect()
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
-      TMatrixDSym extPrec(7); extPrec.Zero();
-      extPrec.SetSub(0, 0, beam->getCovVertex().Invert());
+      TMatrixDSym extCov(7); extCov.Zero();
+      extCov.SetSub(0, 0, beam->getCovVertex());
       //TODO:
       //I cannot get all 3 entries non-zero using Y4S setting for add_beamparameters
       //extPrec.SetSub(3, 3, (beam->getCovLER() + beam->getCovHER()).Invert());
-      extPrec(3, 3) = 1. / (beam->getCovLER() + beam->getCovHER())(0, 0);
-      extPrec(4, 4) = 1. / (beam->getCovLER() + beam->getCovHER())(0, 0);
-      extPrec(5, 5) = 1. / (beam->getCovLER() + beam->getCovHER())(0, 0);
+      extCov(3, 3) = (beam->getCovLER() + beam->getCovHER())(0, 0);
+      extCov(4, 4) = (beam->getCovLER() + beam->getCovHER())(0, 0);
+      extCov(5, 5) = (beam->getCovLER() + beam->getCovHER())(0, 0);
       //
-      extPrec(6, 6) = 1. / (beam->getCovLER()(0, 0) + beam->getCovHER()(0, 0));
+      extCov(6, 6) = (beam->getCovLER()(0, 0) + beam->getCovHER()(0, 0));
+
+      auto extPrec = extCov; extPrec.Invert();
 
       TVectorD extMeasurements(7);
       extMeasurements[0] = - (mother->getVertex() - beam->getVertex())[0];
@@ -704,8 +740,8 @@ void MillepedeCollectorModule::collect()
 
       if (m_calibrateVertex || m_calibrateKinematics) {
         B2WARNING("Primary vertex+kinematics calibration not (yet?) fully implemented!");
-
-        TMatrixD derivatives(9, 6); // up to d(x,y,z,px,py,pz,theta,phi,M)/d(vx,vy,vz,theta_x,theta_y,E)
+        // up to d(x,y,z,px,py,pz,theta,phi,M)/d(vx,vy,vz,theta_x,theta_y,E)
+        TMatrixD derivatives(9, 6);
         std::vector<int> labels;
         derivatives.Zero();
         if (m_calibrateVertex) {
@@ -745,7 +781,7 @@ void MillepedeCollectorModule::collect()
         // the derivatives to not pass those with zero labels (usefull to get rid of some params)
         std::vector<int> lab(globals); TMatrixD der(globals);
 
-        // I want: dlocal/dext = dlocal/dtwobody * dtwobody/dext = dfdextPlusMinus * extDeriv^(-1)
+        // I want: dlocal/dext = dlocal/dtwobody * dtwobody/dext = dfdextPlusMinus * dtwobody/dext
         TMatrixD dTwoBody_dExt(9, 7);
         dTwoBody_dExt.Zero();
         // beam vertex constraint
@@ -759,22 +795,48 @@ void MillepedeCollectorModule::collect()
         // beam inv. mass constraint
         dTwoBody_dExt(8, 6) = 1.;
 
-        TMatrixD dLocal_dExt = dfdextPlusMinus.first * dTwoBody_dExt;
+        const TMatrixD dLocal_dExt = dfdextPlusMinus.first * dTwoBody_dExt;
         TMatrixD dLocal_dExt_T = dLocal_dExt; dLocal_dExt_T.T();
-        TVectorD locRes = dLocal_dExt * extMeasurements;
-        TMatrixD locPrec =  dLocal_dExt * extPrec * dLocal_dExt_T;
 
-        TMatrixDSym prec(5); prec.Zero();
+        // The 5x7 transformation matrix d(q/p,u',v',u,v)/d(vx,vy,vz,px,py,pz,M) needs to be "inverted"
+        // to transform the covariance of the beamspot and boost vector of SuperKEKB into the local system
+        // of one GBL point - such that Millepede can align the beamspot (or even beam kinematics) if requested.
+        //
+        // I tested also other methods, but only the Singular Value Decomposition gives nice-enough results,
+        // with almost no code:
+        //
+        TDecompSVD svd(dLocal_dExt_T);
+        const TMatrixD dExt_dLocal  = svd.Invert().T();
+        //
+        // (dLocal_dExt * dExt_dLocal).Print();
+        //
+        // 5x5 matrix is as follows
+        //
+        //      |      0    |      1    |      2    |      3    |      4    |
+        // ----------------------------------------------------------------------
+        //    0 |          1   -2.58e-17   6.939e-18   1.571e-17  -1.649e-19
+        //    1 |  1.787e-14           1   5.135e-16  -3.689e-16  -2.316e-18
+        //    2 | -1.776e-15  -7.806e-17           1   5.636e-17   6.193e-18
+        //    3 | -2.453e-15    7.26e-18   2.009e-16           1   -1.14e-16
+        //    4 | -1.689e-14  -9.593e-17  -2.317e-15  -3.396e-17           1
+        //
+        // It took me like half a day to find to out how to do this by 2 lines of code. Source:
+        // ROOT macro example ... actually found at:
+        // <https://root.cern.ch/root/html/tutorials/matrix/solveLinear.C.html>
+
+        const TVectorD locRes = dLocal_dExt * extMeasurements;
+        const TMatrixD locPrec =  dLocal_dExt * extPrec * dExt_dLocal;
+
+        TMatrixDSym locPrecSym(5); locPrecSym.Zero();
         for (int i = 0; i < 5; ++i)
           for (int j = 0; j < 5; ++j)
-            prec(i, j) = locPrec(i, j);
+            locPrecSym(i, j) = locPrec(i, j);
 
-        daughters[0].first[0].addMeasurement(locRes, prec);
-
+        daughters[0].first[0].addMeasurement(locRes, locPrecSym);
         if (!lab.empty())
           daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);
 
-        gbl::GblTrajectory combined(daughters);//, extDeriv, extMeasurements, extPrec);
+        gbl::GblTrajectory combined(daughters);
         //combined.printTrajectory(1000);
         //combined.printPoints(1000);
 
@@ -1066,7 +1128,6 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   return true;
 }
 
-
 std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles, bool addVertexPoint)
 {
   std::vector< genfit::Track* > tracks;
@@ -1114,7 +1175,6 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
 
   return tracks;
 }
-
 
 std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyExtParametersTransform(Particle& mother,
     double motherMass)

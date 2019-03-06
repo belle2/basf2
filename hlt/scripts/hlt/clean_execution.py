@@ -31,45 +31,62 @@ class CleanBasf2Execution:
         from hlt.clean_execution import CleanBasf2Execution
 
         if __name__ == "__main__":
-            execution = CleanBasf2Execution(["basf2", "run.py"])
+            execution = CleanBasf2Execution()
             try:
-                execution.run()
+                execution.start(["basf2", "run.py"])
+                execution.wait()
             finally:
                 # Make sure to always do the cleanup, also in case of errors
                 print("Do cleanup")
 
     """
 
-    def __init__(self, basf2_commands):
+    def __init__(self):
         """
         Create a new execution with the given parameters (list of arguments)
         """
-        self._basf2_commands = basf2_commands
+        self._handled_processes = []
+        self._handled_commands = []
 
-        self._handled_process = None
-        self._pgid = None
-
-    def run(self):
+    def start(self, command):
         """
-        Start the execution and terminate gracefully/hard if requested via signal.
+        Add the execution and terminate gracefully/hard if requested via signal.
         """
-        self._handled_process = subprocess.Popen(self._basf2_commands, start_new_session=True)
-        self._pgid = os.getpgid(self._handled_process.pid)
-        if self._pgid != self._handled_process.pid:
+        process = subprocess.Popen(command, start_new_session=True)
+        pgid = os.getpgid(process.pid)
+        if pgid != process.pid:
             basf2.B2WARNING("Subprocess is not session leader. Weird")
 
         self.install_signal_handler()
+        self._handled_processes.append(process)
+        self._handled_commands.append(command)
 
-        self._handled_process.wait()
-        return self._handled_process.returncode
+    def wait(self):
+        """
+        Wait until all handled calculations have finished.
+        """
+        while True:
+            for command, process in zip(self._handled_commands, self._handled_processes):
+                if self.has_process_ended(process):
+                    basf2.B2RESULT("The process ", command, " died with ", process.returncode,
+                                   ". Killing the remaining ones.")
+                    self.kill()
+                    return process.returncode
+            sleep(1)
 
     def signal_handler(self, signal_number, signal_frame):
         """
         The signal handler called on SIGINT and SIGTERM.
+        """
+        self.kill()
+
+    def kill(self):
+        """
+        Clean or hard shutdown of all processes.
         It tries to kill the process gracefully but if it does not react after a certain time,
         it kills it with a SIGKILL.
         """
-        if not self._handled_process:
+        if not self._handled_processes:
             basf2.B2WARNING("Signal handler called without started process. This normally means, something is wrong!")
             return
 
@@ -81,38 +98,49 @@ class CleanBasf2Execution:
 
         try:
             # Send a graceful stop signal to the process and give it some time to react
-            self._handled_process.send_signal(signal.SIGINT)
-            self._handled_process.poll()
+            for process in self._handled_processes:
+                try:
+                    process.send_signal(signal.SIGINT)
+                    process.poll()
+                except ProcessLookupError:
+                    # The process is already gone! Nice
+                    pass
 
             # Give the process some time to react
             if not self.wait_for_process(timeout=10):
                 basf2.B2WARNING("Process did not react in time. Sending a SIGKILL.")
         finally:
             # In any case: kill the process
-            try:
-                os.killpg(self._pgid, signal.SIGKILL)
-                if not self.wait_for_process(timeout=10):
-                    backtrace = subprocess.check_output(["gdb", "-q",  "-batch", "-ex", "backtrace",  "basf2",
-                                                         str(self._pgid)]).decode()
-                    basf2.B2ERROR("Could not end the process event with a KILL signal. This can happen because it is "
-                                  "in the uninterruptable sleep state. I can not do anything about this!",
-                                  backtrace=backtrace)
-            except ProcessLookupError:
-                # The process is already gone! Nice
-                pass
-            basf2.B2RESULT("...Process stopped")
+            for process in self._handled_processes:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                    if not self.wait_for_process(timeout=10, process_list=[process]):
+                        backtrace = subprocess.check_output(["gdb", "-q",  "-batch", "-ex", "backtrace",  "basf2",
+                                                             str(process.pid)]).decode()
+                        basf2.B2ERROR("Could not end the process event with a KILL signal. "
+                                      "This can happen because it is in the uninterruptable sleep state. "
+                                      "I can not do anything about this!",
+                                      backtrace=backtrace)
+                except ProcessLookupError:
+                    # The process is already gone! Nice
+                    pass
+                basf2.B2RESULT("...Process stopped")
 
             # And reinstall the signal handlers
             self.install_signal_handler()
 
-    def wait_for_process(self, timeout, minimum_delay=0.0005):
+    def wait_for_process(self, process_list=None, timeout=10, minimum_delay=0.0005):
         """
         Wait maximum "timeout" for the process to stop.
         If it did not end in this period, returns False.
         """
+        if process_list is None:
+            process_list = self._handled_processes
+
         endtime = time() + timeout
         while True:
-            if self.has_process_ended():
+            all_finished = all(self.has_process_ended(process) for process in process_list)
+            if all_finished:
                 return True
 
             remaining = endtime - time()
@@ -132,7 +160,8 @@ class CleanBasf2Execution:
         atexit.unregister(self.signal_handler)
         atexit.register(self.signal_handler, signal.SIGTERM, None)
 
-    def has_process_ended(self):
+    @staticmethod
+    def has_process_ended(process):
         """
         Check if the handled process has ended already.
         This functions does not wait.
@@ -142,10 +171,10 @@ class CleanBasf2Execution:
         However: the main process is also waiting for the return code
         so the threading.lock in the .wait() function will never aquire a lock :-(
         """
-        pid, sts = self._handled_process._try_wait(os.WNOHANG)
-        assert pid == self._pgid or pid == 0
+        pid, sts = process._try_wait(os.WNOHANG)
+        assert pid == process.pid or pid == 0
 
-        if pid == self._pgid:
+        if pid == process.pid:
             return True
 
         return False

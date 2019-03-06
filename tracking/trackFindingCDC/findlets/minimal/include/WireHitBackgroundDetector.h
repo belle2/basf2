@@ -13,6 +13,8 @@
 
 #include <vector>
 #include <string>
+#include <framework/database/DBObjPtr.h>
+#include <cdc/dbobjects/CDCWireHitRequirements.h>
 
 namespace Belle2 {
 
@@ -27,19 +29,29 @@ namespace Belle2 {
       using Super = Findlet<CDCWireHit&>;
 
     public:
+      /// Default constructor
+      WireHitBackgroundDetector(): m_CDCWireHitRequirementsFromDB("CDCWireHitRequirements")
+      {
+      }
+
       /// Short description of the findlet
       std::string getDescription() final;
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
+      /// Begin run action
+      void beginRun() final;
+
       /// Main algorithm marking hit as background
       void apply(std::vector<CDCWireHit>& wireHits) final;
 
     private:
 
-      /// Chooseable WireHit filter to be used to filter background
-      double  m_wireHitFilter = 0;
+      /// TODO: Chooseable WireHit filter to be used to filter background
+
+      /// Cut values from the Data Base
+      DBObjPtr<CDCWireHitRequirements> m_CDCWireHitRequirementsFromDB;
     };
   }
 }

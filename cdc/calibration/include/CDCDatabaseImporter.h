@@ -191,6 +191,16 @@ namespace Belle2 {
      */
     void printWirPosMisalign();
 
+    /**
+     * Import CDCWireHits cut values to the database.
+     */
+    void importCDCWireHitRequirements(std::string fileName);
+    /**
+     * Get CDCWireHits cut values from the database and
+     * print them.
+     */
+    void printCDCWireHitRequirements();
+
   private:
 
     /**

@@ -325,7 +325,9 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
                     recoTracksStoreArrayName=output_reco_tracks)
 
 
-def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False):
+def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
+                          use_second_hits=False, use_cdc_quality_estimator=False,
+                          cdc_quality_estimator_weightfile=None):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -336,6 +338,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
+    :param use_cdc_quality_estimator: Add the TFCDC_TrackQualityEstimator to set the CDC quality
+           indicator for the ``output_reco_tracks``
+    :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
     """
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
     path.add_module("TFCDC_WireHitPreparer",
@@ -397,11 +402,17 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
-    cdc_quality_estimator_weightfile_id = "tracking/data/trackfindingcdc_TrackQualityIndicator.weights.xml"
-    path.add_module("TFCDC_TrackQualityEstimator",
-                    inputTracks=output_tracks,
-                    filter='mva', deleteTracks=False,
-                    filterParameters={"identifier": cdc_quality_estimator_weightfile_id})
+    if use_cdc_quality_estimator:
+        if cdc_quality_estimator_weightfile is not None:
+            filterParameters = {"identifier": cdc_quality_estimator_weightfile}
+        else:
+            filterParameters = None
+
+        path.add_module("TFCDC_TrackQualityEstimator",
+                        inputTracks=output_tracks,
+                        filter='mva',
+                        deleteTracks=False,
+                        filterParameters=filterParameters)
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",

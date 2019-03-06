@@ -59,8 +59,7 @@ std::unique_ptr<BaseTrackFilter> TrackQualityFilterFactory::create(
     return std::make_unique<Recording<BaseTrackFilter>>(std::move(recordedVarSets),
                                                         "TrackQualityFilter_eval.root");
   } else if (filterName == "mva") {
-    return std::make_unique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackQualityFilter.xml",
-                                            0.10);
+    return std::make_unique<MVATrackFilter>("trackfindingcdc_TrackQualityIndicator", 0.10);
   } else {
     return Super::create(filterName);
   }

@@ -3,7 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Vipin Gaur                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,10 +25,7 @@ KLMDQMModule::KLMDQMModule() :
   m_TimeScintillatorEKLM(nullptr),
   h_layerHits(nullptr),
   h_ctime(nullptr),
-  h_simtime(nullptr),
-  h_simEDep(nullptr),
   h_eDep(nullptr),
-  h_simNPixel(nullptr),
   h_nPixel(nullptr),
   h_moduleID(nullptr),
   h_zStrips(nullptr),
@@ -110,19 +107,10 @@ void KLMDQMModule::defineHistoBKLM()
   h_ctime = new TH1F("ctime", "Lowest 16 bits of the B2TT CTime signal",
                      100, -2, 2);
   h_ctime->GetXaxis()->SetTitle("ctime");
-  h_simtime = new TH1F("simtime", "MC simulation event hit time",
-                       100, 0, 1000);
-  h_simtime->GetXaxis()->SetTitle("time [ns]");
-  h_simEDep = new TH1F("simEDep", "MC simulation pulse height",
-                       25, 0, 25);
-  h_simEDep->GetXaxis()->SetTitle("pulse height [MeV]");
   h_eDep = new TH1F("eDep", "Reconstructed pulse height",
                     25, 0, 25);
   h_eDep->GetXaxis()->SetTitle("pulse height [MeV]");
   h_eDep->SetOption("LIVE");
-  h_simNPixel = new TH1F("simNPixel", "Simulated number of MPPC pixels",
-                         500, 0, 500);
-  h_simNPixel->GetXaxis()->SetTitle("Simulated number of MPPC pixels");
   h_nPixel = new TH1F("nPixel", "Reconstructed number of MPPC pixels",
                       500, 0, 500);
   h_nPixel->GetXaxis()->SetTitle("Reconstructed number of MPPC pixels");
@@ -130,7 +118,7 @@ void KLMDQMModule::defineHistoBKLM()
                         40, 0, 200000000);
   h_moduleID->GetXaxis()->SetTitle("detector-module identifier");
   h_zStrips = new TH1F("zStrips", "z-measuring strip numbers of the 2D hit",
-                       100, 0, 500);
+                       100, 0, 54);
   h_zStrips->GetXaxis()->SetTitle("z-measuring strip numbers of the 2D hit");
   h_zStrips->SetOption("LIVE");
   h_phiStrip = new TH1F("phiStrip", "Phi strip number of muon hit",
@@ -222,10 +210,7 @@ void KLMDQMModule::beginRun()
   /* BKLN. */
   h_layerHits->Reset();
   h_ctime->Reset();
-  h_simtime->Reset();
-  h_simEDep->Reset();
   h_eDep->Reset();
-  h_simNPixel->Reset();
   h_nPixel->Reset();
   h_moduleID->Reset();
   h_zStrips->Reset();
@@ -274,14 +259,11 @@ void KLMDQMModule::event()
     BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
     h_layerHits->Fill(digit->getModuleID());
     h_ctime->Fill(digit->getCTime());
-    h_simtime->Fill(digit->getSimTime());
     if (digit->inRPC())
       m_TimeRPC->Fill(digit->getTime());
     else
       m_TimeScintillatorBKLM->Fill(digit->getTime());
-    h_simEDep->Fill(digit->getSimEDep());
     h_eDep->Fill(digit->getEDep());
-    h_simNPixel->Fill(digit->getSimNPixel());
     h_nPixel->Fill(digit->getNPixel());
   }
   StoreArray<BKLMHit2d> hits(m_outputHitsName);

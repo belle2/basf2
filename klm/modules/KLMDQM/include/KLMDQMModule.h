@@ -3,7 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Vipin Gaur                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -125,17 +125,8 @@ namespace Belle2 {
     /** Histogram: Lowest 16 bits of the B2TT CTIME signal. */
     TH1F* h_ctime;
 
-    /** Histogram: MC simulation event hit time. */
-    TH1F* h_simtime;
-
-    /** Histogram: MC simulation pulse height. */
-    TH1F* h_simEDep;
-
     /** Histogram: Reconstructed pulse height. */
     TH1F* h_eDep;
-
-    /** Histogram: Simulated number of MPPC pixels. */
-    TH1F* h_simNPixel;
 
     /** Histogram: Reconstructed number MPPC pixels. */
     TH1F* h_nPixel;

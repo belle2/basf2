@@ -21,12 +21,13 @@ namespace Belle2 {
 
     /// Names of the variables to be generated
     constexpr static char const* const bestMatchedTruthVarNames[] = {
-      "weight", // if CDCTrack has minimalMatchPurity (50%)
-      "truth_track_is_fake", // less than 80% purity in CDC
-      "truth_track_is_matched", // not fake
+      // Truth: PR Track is not a fake and the best matched track (not a clone)
+      "truth",
+      // Other truth variables are mostly to be helpful during debugging.
+      "truth_track_is_fake",
+      "truth_track_is_matched",
       "truth_matched_hits",
-      "truth_track_is_clone", // track is clone
-      "truth", // CDC track is not clone
+      "truth_track_is_clone",
       "truth_first_nloops",
       "truth_event_id",
       "truth_MCTrackID",

@@ -89,6 +89,9 @@ namespace Belle2 {
     /** Set Reduced Data counter for reduction calculation */
     uint32_t getRedCnt(void) const { return m_redCount;};
 
+    void setEndErrorInfo(uint32_t e) const { m_errorinfo = e;};
+    uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
+
 
     /** Add DHE information
      * @param daqdhe DHE Status Object
@@ -127,11 +130,12 @@ namespace Belle2 {
     unsigned short m_dhcID;/**< DHC ID as delivered by DAQ.*/
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
+    uint32_t m_errorinfo; /* erroinfo from the DHC END */
 
     /** Vector of DHE informations belonging to this event */
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
-    ClassDef(PXDDAQDHCStatus, 2);
+    ClassDef(PXDDAQDHCStatus, 3);
 
   }; // class PXDDAQDHCStatus
 

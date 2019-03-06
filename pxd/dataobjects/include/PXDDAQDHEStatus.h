@@ -111,6 +111,10 @@ namespace Belle2 {
     /** get Readout Frame number */
     unsigned short getFrameNr(void) const { return  m_frameNr;};
 
+
+    void setEndErrorInfo(uint32_t e) const { m_errorinfo = e;};
+    uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
+
     /** Add DHP information
      * @param daqdhp DHP Status Object
      */
@@ -160,6 +164,7 @@ namespace Belle2 {
     unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
+    uint32_t m_errorinfo; /* erroinfo from the DHE END */
 
     /** Vector of DHP informations belonging to this event */
     std::vector< PXDDAQDHPStatus> m_pxdDHP;
@@ -167,7 +172,7 @@ namespace Belle2 {
     /** Vector of Common Mode informations belonging to this event */
     std::vector < PXDDAQDHPComMode> m_commode;
 
-    ClassDef(PXDDAQDHEStatus, 4);
+    ClassDef(PXDDAQDHEStatus, 6);
 
   }; // class PXDDAQDHEStatus
 

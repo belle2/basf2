@@ -21,6 +21,11 @@ def main(script_name):
     output_ring_buffer_list = [f"{args.output_ring_buffer}{i + 1}" for i in range(0, args.number_of_collectors)]
     message_queue_list = [f"/roi{i}" for i in range(0, args.number_of_collectors)]
 
+    for input_rb in input_ring_buffer_list:
+        subprocess.run(["removerb", input_rb])
+    for output_rb in output_ring_buffer_list:
+        subprocess.run(["removerb", output_rb])
+
     execution = CleanBasf2Execution()
     try:
         execution.start(["rb2mrb", args.input_ring_buffer] + input_ring_buffer_list)
@@ -32,7 +37,6 @@ def main(script_name):
     finally:
         execution.kill()
         subprocess.run(["framework-pcore-clear_ipcs"])
-        # TODO: actually needed?
         for input_rb in input_ring_buffer_list:
             subprocess.run(["removerb", input_rb])
         for output_rb in output_ring_buffer_list:

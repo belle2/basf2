@@ -92,6 +92,10 @@ namespace Belle2 {
 
     Belle2::ARICHChannelHist* channelHist = NULL; /**<ARICH TObject to draw hit map for each channel*/
     TCanvas* m_c_channelHist = NULL; /**<Canvas for 2D hit map of channels*/
+    Belle2::ARICHChannelHist* apdHist = NULL; /**<ARICH TObject to draw hit map for each APD*/
+    TCanvas* m_c_apdHist = NULL; /**<Canvas for 2D hit map of APDs*/
+    Belle2::ARICHChannelHist* hapdHist = NULL; /**<ARICH TObject to draw hit map for each HAPD*/
+    TCanvas* m_c_hapdHist = NULL; /**<Canvas for 2D hit map of HAPDs*/
 
   };
 

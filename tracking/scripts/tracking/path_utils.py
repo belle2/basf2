@@ -537,9 +537,20 @@ def add_cdc_monopole_track_finding(path, output_reco_tracks="RecoTracksMpl"):
                     RecoTracksStoreArrayName=output_reco_tracks)
 
 
-def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 useTwoStepSelection=True, PXDminSVDSPs=3, sectormap_file=None, custom_setup_name=None,
-                                 min_SPTC_quality=0., filter_overlapping=True, use_mva_qe=False):
+def add_vxd_track_finding_vxdtf2(
+    path,
+    svd_clusters="",
+    reco_tracks="RecoTracks",
+    components=None,
+    suffix="",
+    useTwoStepSelection=True,
+    PXDminSVDSPs=3,
+    sectormap_file=None,
+    custom_setup_name=None,
+    min_SPTC_quality=0.0,
+    filter_overlapping=True,
+    use_vxdtf2_quality_estimator=False,
+):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -571,7 +582,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     phase2_QEMVA_weight = None
     phase3_QEMVA_weight = 'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
 
-    if not use_mva_qe:
+    if not use_vxdtf2_quality_estimator:
         phase2_QEMVA_weight = None
         phase3_QEMVA_weight = None
 

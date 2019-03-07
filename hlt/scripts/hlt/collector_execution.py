@@ -13,7 +13,7 @@ def main(script_name):
     parser = ArgumentParser()
     parser.add_argument("input_ring_buffer", help="Name of the input ring buffer")
     parser.add_argument("output_ring_buffer", help="Name of the output ring buffer")
-    parser.add_argument("--number-of-collectors", help="Number of collectors to start", default=3)
+    parser.add_argument("--number-of-collectors", help="Number of collectors to start", default=3, type=int)
 
     args = parser.parse_args()
 

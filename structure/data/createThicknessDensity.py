@@ -14,31 +14,44 @@ thickness_TOPfor = (np.ones(144) * 1.0e-5).ravel()
 thickness_ECLback = (np.ones((3, 5, 144)) * 1.0e-5).ravel()
 thickness_ECLfor = (np.ones((3, 5, 144)) * 1.0e-5).ravel()
 
-# Input the density of the matirial in the forward gap between  ARICH and TOP
-# density_ARICH = (np.loadtxt(open("density_ARICH.csv", "rb"), delimiter=",")).ravel()
-
-# Input the density of the matirial in the forward gap between  TOP and ECL
-# density_TOP_back = (np.loadtxt(open("density_TOP_back.csv", "rb"), delimiter=",")).ravel()
-
-# Input the density of the matirial in the forward gap between  TOP and ECL
-# density_TOP_for = (np.loadtxt(open("density_TOP_for.csv", "rb"), delimiter=",")).ravel()
-
 # Input the thickness of the matirial in the backward gap between  CDC and ECL
 # thickness_CDCback = (np.loadtxt(open("thickness_CDCback.csv", "rb"), delimiter=",")).ravel()
+# thickness_CDCback[thickness_CDCback < 1.0e-5] = 1.0e-5
 
 # You can change the thickness of backward cell(i,j) by:
 # thickness_CDCback[i,j] = thickness
 
 # Input the thickness of the matirial in the forward gap between  CDC and ARICH
 # thickness_CDCfor = (np.loadtxt(open("thickness_CDCfor.csv", "rb"), delimiter=",")).ravel()
+# thickness_CDCfor[thickness_CDCfor < 1.0e-5] = 1.0e-5
 
-thickness_CDClist = list(map(str, thickness_CDCback.tolist() +
-                             thickness_CDCfor.tolist() +
-                             thickness_ARICH.tolist() +
-                             thickness_TOPback.tolist() +
-                             thickness_TOPfor.tolist() +
-                             thickness_ECLback.tolist() +
-                             thickness_ECLfor.tolist()))
+# Input the thickness of the matirial in the forward gap between  TOP and ECL
+# thickness_TOPback = (np.loadtxt(open("thickness_TOP_back.csv", "rb"), delimiter=",")).ravel()
+# thickness_TOPback[thickness_TOPback < 1.0e-5] = 1.0e-5
+
+# Input the thickness of the matirial in the forward gap between  TOP and ECL
+# thickness_TOPfor = (np.loadtxt(open("thickness_TOP_for.csv", "rb"), delimiter=",")).ravel()
+# thickness_TOPfor[thickness_TOPfor < 1.0e-5] = 1.0e-5
+
+# Input the thickness of the matirial in the forward gap between  ARICH and TOP
+# thickness_ARICH = (np.loadtxt(open("thickness_ARICH.csv", "rb"), delimiter=",")).ravel()
+# thickness_ARICH[thickness_ARICH < 1.0e-5] = 1.0e-5
+
+# Input the thickness of the matirial in the backward gap between barrel and endcap of ECL
+# thickness_ECLback = (np.loadtxt(open("thickness_ECLback.csv", "rb"), delimiter=",")).ravel()
+# thickness_ECLback[thickness_ECLback < 1.0e-5] = 1.0e-5
+
+# Input the thickness of the matirial in the forward gap between barrel and endcap of ECL
+# thickness_ECLfor = (np.loadtxt(open("thickness_ECLfor.csv", "rb"), delimiter=",")).ravel()
+# thickness_ECLfor[thickness_ECLfor < 1.0e-5] = 1.0e-5
+
+thickness_list = list(map(str, thickness_CDCback.tolist() +
+                          thickness_CDCfor.tolist() +
+                          thickness_ARICH.tolist() +
+                          thickness_TOPback.tolist() +
+                          thickness_TOPfor.tolist() +
+                          thickness_ECLback.tolist() +
+                          thickness_ECLfor.tolist()))
 
 
 density_ARICH = (np.ones(3) * 1.29e-10).ravel()  # 1.29e-10
@@ -47,12 +60,6 @@ density_TOPfor = (np.ones(1) * 1.29e-10).ravel()
 density_ECLback = (np.ones(5) * 1.29e-10).ravel()
 density_ECLfor = (np.ones(5) * 1.29e-10).ravel()
 
-
-# Input the density of the matirial in the backward gap between barrel and endcap of ECL
-# density_ECLback = (np.loadtxt(open("density_ECLback.csv", "rb"), delimiter=",")).ravel()
-
-# Input the density of the matirial in the forward gap between barrel and endcap of ECL
-# density_ECLfor = (np.loadtxt(open("density_ECLfor.csv", "rb"), delimiter=",")).ravel()
 
 density_list = list(map(str, density_ARICH.tolist() + density_TOPback.tolist() +
                         density_TOPfor.tolist() + density_ECLback.tolist() + density_ECLfor.tolist()))
@@ -81,7 +88,7 @@ value = {
     'IPhiCDCBack': 144,
     'IRCDCFor': 16,
     'IPhiCDCFor': 144,
-    'thicknesses': thickness_CDClist,
+    'thicknesses': thickness_list,
     'IZARICHFor': 3,
     'IPhiARICHFor': 144,
     'IPhiTOPBack': 144,

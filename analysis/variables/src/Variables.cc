@@ -589,15 +589,15 @@ namespace Belle2 {
       return result;
     }
 
-    double particleInvariantMassCoreCluster(const Particle* part) // AAA!!! NEW!!!
+    double particleInvariantMassCoreCluster(const Particle* part)
     {
       int nDaughters = int(part->getNDaughters());
-      int numOfClusDau = 0;
       TLorentzVector sum;
 
       if (nDaughters < 1) {
         return part->getMass();
       } else {
+        int nClusterDaughters = 0;
         std::stack<const Particle*> stacked;
         stacked.push(part);
         while (!stacked.empty()) {
@@ -607,24 +607,24 @@ namespace Belle2 {
           const ECLCluster* cluster = current->getECLCluster();
           if (cluster) {
             const ECLCluster::EHypothesisBit clusterBit = current->getECLClusterEHypothesisBit();
-            numOfClusDau ++;
+            nClusterDaughters ++;
             ClusterUtils clutls;
             TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterBit);
             sum += p4Cluster;
           } else {
             const std::vector<Particle*> daughters = current->getDaughters();
-            nDaughters = int(current->getNDaughters()); // ABSENT IN THE ORIGINAL, MISTAKE IN weightedAverageECLTime in ECLVariables?
+            nDaughters = int(current->getNDaughters());
             for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
               stacked.push(daughters[iDaughter]);
             }
           }
         }
 
-        if (numOfClusDau < 1) {
+        if (nClusterDaughters < 1) {
           B2WARNING("There are no clusters amongst the daughters of the provided particle!");
-          return -999.;
+          return std::numeric_limits<double>::quiet_NaN();
         }
-        B2DEBUG(10, "Number of daughters with cluster associated = " << numOfClusDau);
+        B2DEBUG(10, "Number of daughters with cluster associated = " << nClusterDaughters);
         return sum.M();
       }
     }
@@ -1265,7 +1265,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("clusterCoreInvM", particleInvariantMassCoreCluster,
-                      "invariant mass (determined from particle's final photons daughters 4-momentum vectors)");
+                      "invariant mass (determined from particle's final clusters daughters 4-momentum vectors)");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
                       "uncertainty of invariant mass (determined from particle's daughter 4 - momentum vectors)");

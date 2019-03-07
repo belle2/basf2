@@ -197,7 +197,7 @@ namespace Belle2 {
     double particleInvariantMassLambda(const Particle* part);
 
     /**
-     * return mass (determined from particle's final photons daughters 4-momentum vectors)
+     * return mass (determined from particle's final clusters daughters 4-momentum vectors)
      */
     double particleInvariantMassCoreCluster(const Particle* part);
 

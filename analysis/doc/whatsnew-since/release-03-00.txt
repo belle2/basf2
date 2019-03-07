@@ -40,6 +40,11 @@ Variables
 
 * Added M2, that returns the invariant mass squared of a given Particle (determined from the particle's 4-momentum vector).
 
+* Added clusterCoreInvM, that returns the invariant mass of the particles, computed with cluster information
+
+* Added grandDaughterDiffOf, grandDaughterDiffOfPhi, and grandDaughterDiffOfClusterPhi
+  They behave like daughterDiffOf-, but use granddaughters' info rather than daughters'
+
 Standard Particle Lists
 +++++++++++++++++++++++
 

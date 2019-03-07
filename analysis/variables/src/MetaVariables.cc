@@ -567,9 +567,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else {
             double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
             return diff;}
@@ -580,7 +580,7 @@ endloop:
       }
     }
 
-    Manager::FunctionPtr granDaughterDiffOf(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
         // have to tell cppcheck that these lines are fine, because it doesn't
@@ -594,22 +594,22 @@ endloop:
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First two arguments of granDaughterDiffOf meta function must be integers!");
+          B2WARNING("First two arguments of grandDaughterDiffOf meta function must be integers!");
           return nullptr;
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else {
             double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0));
             return diff;}
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function granDaughterDiffOf");
+        B2FATAL("Wrong number of arguments for meta function grandDaughterDiffOf");
       }
     }
 
@@ -633,9 +633,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else
           {
             double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
@@ -656,7 +656,7 @@ endloop:
       }
     }
 
-    Manager::FunctionPtr granDaughterDiffOfPhi(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
         // have to tell cppcheck that these lines are fine, because it doesn't
@@ -670,15 +670,15 @@ endloop:
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of granDaughterDiffOfPhi meta function must be integers!");
+          B2WARNING("The two arguments of grandDaughterDiffOfPhi meta function must be integers!");
           return nullptr;
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else
           {
             double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0));
@@ -695,7 +695,7 @@ endloop:
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function granDaughterDiffOfPhi");
+        B2FATAL("Wrong number of arguments for meta function grandDaughterDiffOfPhi");
       }
     }
 
@@ -719,9 +719,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else
           {
             if (std::isnan(var->function(particle->getDaughter(iDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
@@ -745,7 +745,7 @@ endloop:
       }
     }
 
-    Manager::FunctionPtr granDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
         // have to tell cppcheck that these lines are fine, because it doesn't
@@ -759,15 +759,15 @@ endloop:
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of granDaughterDiffOfClusterPhi meta function must be integers!");
+          B2WARNING("The two arguments of grandDaughterDiffOfClusterPhi meta function must be integers!");
           return nullptr;
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else
           {
             if (std::isnan(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0))) or std::isnan(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0))))
@@ -787,7 +787,7 @@ endloop:
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function granDaughterDiffOfClusterPhi");
+        B2FATAL("Wrong number of arguments for meta function grandDaughterDiffOfClusterPhi");
       }
     }
 
@@ -811,9 +811,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(phi)");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else
           {
             double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
@@ -854,9 +854,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(clusterPhi)");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else
           {
             if (std::isnan(var->function(particle->getDaughter(iDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
@@ -900,9 +900,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else {
             double iValue = var->function(particle->getDaughter(iDaughterNumber));
             double jValue = var->function(particle->getDaughter(jDaughterNumber));
@@ -927,9 +927,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else {
             double diff = var->function(particle) - var->function(particle->getDaughter(daughterNumber));
             return diff;}
@@ -953,9 +953,9 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           else {
             double daughterValue = var->function(particle->getDaughter(daughterNumber));
             double motherValue = var->function(particle);
@@ -979,11 +979,11 @@ endloop:
         }
         auto func = [daughterIndices](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (daughterIndices.size() == 2)
           {
             if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
-              return -999;
+              return std::numeric_limits<double>::quiet_NaN();
             else {
               const auto& frame = ReferenceFrame::GetCurrent();
               TVector3 pi = frame.getMomentum(particle->getDaughter(daughterIndices[0])).Vect();
@@ -1001,7 +1001,7 @@ endloop:
               TVector3 pk = frame.getMomentum(particle->getDaughter(daughterIndices[2])).Vect();
               return pk.Angle(pi + pj);
             }
-          } else return -999;
+          } else return std::numeric_limits<double>::quiet_NaN();
 
         };
         return func;
@@ -1022,11 +1022,11 @@ endloop:
         }
         auto func = [daughterIndices](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<double>::quiet_NaN();
           if (daughterIndices.size() == 2)
           {
             if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
-              return -998;
+              return std::numeric_limits<double>::quiet_NaN();
             else {
               const auto& frame = ReferenceFrame::GetCurrent();
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
@@ -1044,7 +1044,7 @@ endloop:
           } else if (daughterIndices.size() == 3)
           {
             if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
-                || daughterIndices[2] >= int(particle->getNDaughters())) return -997;
+                || daughterIndices[2] >= int(particle->getNDaughters())) return std::numeric_limits<double>::quiet_NaN();
             else {
               const auto& frame = ReferenceFrame::GetCurrent();
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
@@ -1063,7 +1063,7 @@ endloop:
               }
               return std::numeric_limits<float>::quiet_NaN();
             }
-          } else return -996;
+          } else return std::numeric_limits<double>::quiet_NaN();
 
         };
         return func;
@@ -1901,17 +1901,17 @@ arguments. Operator precedence is taken into account. For example ::
                       "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns p_j - p_i)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
-    REGISTER_VARIABLE("granDaughterDiffOf(i, j, variable)", granDaughterDiffOf,
+    REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
-                      "E.g. useRestFrame(granDaughterDiffOf(0, 1, p)) returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
+                      "E.g. useRestFrame(grandDaughterDiffOf(0, 1, p)) returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns p_j - p_i)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the 'granDaughterDiffOfPhi' function.");
+                      "Nota Bene: for the particular case 'variable=phi' you should use the 'grandDaughterDiffOfPhi' function.");
     REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
                       "Returns the difference in phi between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "For a generic variable difference, see daughterDiffOf.");
-    REGISTER_VARIABLE("granDaughterDiffOfPhi(i, j)", granDaughterDiffOfPhi,
+    REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
                       "Returns the difference in phi between the first daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n");
@@ -1921,7 +1921,7 @@ arguments. Operator precedence is taken into account. For example ::
                       "The function returns phi_j - phi_i.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
                       "For a generic variable difference, see daughterDiffOf.");
-    REGISTER_VARIABLE("granDaughterDiffOfClusterPhi(i, j)", granDaughterDiffOfClusterPhi,
+    REGISTER_VARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
                       "Returns the difference in phi between the ECLClusters of the daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"

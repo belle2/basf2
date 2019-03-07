@@ -212,12 +212,15 @@ V_Y4S_B0Dstar = Y4S_B0DstarVars_1 + Y4S_B0DstarVars_2 + Y4S_B0DstarVars_3 + Y4S_
 
 V_D = ['InvM', 'dmID']
 V_tag = ['deltaE', 'Mbc']
+
 # ma.variablesToNtuple('Upsilon(4S)', V_Y4S_B0Dstar,
 # filename='../1163350000.ntup.root', treename='Y4S',
 # path=my_path)#commented out by Sourav Dey for the time being. Please do not remove the line. SD
 ma.variablesToNtuple('e+:95effCleanTracks', vc.kinematics, filename='../1163350000.ntup.root', treename='Electron', path=my_path)
 ma.variablesToNtuple('mu+:95effCleanTracks', vc.kinematics, filename='../1163350000.ntup.root', treename='Muon', path=my_path)
 ma.variablesToNtuple('D0:sigD', V_D, filename='../1163350000.ntup.root', treename='D0all', path=my_path)
+ma.variablesToNtuple('D*+:sigDstar1', ['massDifference(0)'], filename='../1163350000.ntup.root', treename='DSTsig1', path=my_path)
+ma.variablesToNtuple('D*+:sigDstar2', ['massDifference(0)'], filename='../1163350000.ntup.root', treename='DSTsig2', path=my_path)
 ma.variablesToNtuple('D*+:sigDstar', V_D, filename='../1163350000.ntup.root', treename='DSTsig', path=my_path)
 ma.variablesToNtuple('D+:sigD', V_D, filename='../1163350000.ntup.root', treename='Dpall', path=my_path)
 ma.variablesToNtuple('B0:tag', V_tag, filename='../1163350000.ntup.root', treename='Btag', path=my_path)

@@ -312,21 +312,46 @@ void plotDSTsig(TTree* ptree, TFile *outputFile){
   h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
 
-  TH1F* h_massdiff = new TH1F(*h_DmassNoCut_Mode8);
-  h_massdiff->Add(h_DmassNoCut_Mode7, -1.0);
-  h_massdiff->SetNameTitle("h_massdiff", title);
-  h_massdiff->GetXaxis()->SetTitle("massdiff in (GeV/c^{2})");
-  h_massdiff->GetListOfFunctions()->Add(new TNamed("Description", "difference in invariant mass of D^{*0} to D^{0}#gamma and D^{*0} to D^{0}#pi^{0}"));
-  h_massdiff->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
-  h_massdiff->GetListOfFunctions()->Add(new TNamed("Contact", contact));
-  h_massdiff->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
-
-  outputFile->cd();
+   outputFile->cd();
   //  h_DmassNoCut_Mode7->Write();
   //h_DmassNoCut_Mode8->Write();
-  h_massdiff->Write();
+ 
+}
+void plotDSTsigmassdiff1( TTree* ptree, TFile *outputFile){
+
+  gStyle->SetOptStat(0);
+  gStyle->SetHistMinimumZero();
+
+  const char *title = "mass difference between D* and D for D^{*0} to D^{0}#pi^{0}";
+  TH1F* h_massdiff1 = new TH1F("h_massdiff1",title,60,0.135,0.165);
+  ptree->Project("h_massdiff1", "massDifference__bo0__bc","");
+  h_massdiff1->GetXaxis()->SetTitle("massdiff in (GeV/c^{2})");
+  h_massdiff1->GetListOfFunctions()->Add(new TNamed("Description", "mass difference between D* and D for D^{*0} to D^{0}#pi^{0}"));
+  h_massdiff1->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
+  h_massdiff1->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  h_massdiff1->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+
+  outputFile->cd();
+  h_massdiff1->Write();
 }
 
+void plotDSTsigmassdiff2( TTree* ptree, TFile *outputFile){
+
+  gStyle->SetOptStat(0);
+  gStyle->SetHistMinimumZero();
+
+  const char *title = "mass difference between D* and D for D^{*0} to D^{0}#gamma";
+  TH1F* h_massdiff2 = new TH1F("h_massdiff2",title,60,0.135,0.165);
+  ptree->Project("h_massdiff2", "massDifference__bo0__bc","");
+  h_massdiff2->GetXaxis()->SetTitle("massdiff in (GeV/c^{2})");
+  h_massdiff2->GetListOfFunctions()->Add(new TNamed("Description", "mass difference between D* and D for D^{*0} to D^{0}#gamma"));
+  h_massdiff2->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
+  h_massdiff2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  h_massdiff2->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+
+  outputFile->cd();
+  h_massdiff2->Write();
+}
 void plotBtag( TTree* ptree, TFile *outputFile){
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
@@ -359,7 +384,7 @@ void plotE( TTree* ptree, TFile *outputFile){
   gStyle->SetHistMinimumZero();
 
   const char *title = "Electron properties";
-  TH1F* h_pE = new TH1F("h_pE",title,100,0.0,10.0);
+  TH1F* h_pE = new TH1F("h_pE",title,50,0.0,5.0);
   ptree->Project("h_pE", "p","");
   h_pE->GetXaxis()->SetTitle("momentum");
   h_pE->GetListOfFunctions()->Add(new TNamed("Description", "Electron Momentum"));
@@ -399,6 +424,8 @@ void test2_1263340000(){
   TTree * treeBtag=(TTree*)sample->Get("Btag");
   TTree * treeE=(TTree*)sample->Get("Electron");
   TTree * treeMu=(TTree*)sample->Get("Muon");
+  TTree * treeDSTsig1=(TTree*)sample->Get("DSTsig1");
+  TTree * treeDSTsig2=(TTree*)sample->Get("DSTsig2");
 
   TFile* outputFile = new TFile("1263340000_Validation.root","RECREATE");
   
@@ -406,6 +433,8 @@ void test2_1263340000(){
   //  plotUpsHad(treeUpsHad, outputFile );
   plotDzero(treeD0,outputFile);
   plotDSTsig(treeDSTsig,outputFile);
+  plotDSTsigmassdiff1(treeDSTsig1,outputFile);
+  plotDSTsigmassdiff2(treeDSTsig2,outputFile);
   plotBtag(treeBtag,outputFile);
   plotE(treeE,outputFile);
   plotMu(treeMu,outputFile);

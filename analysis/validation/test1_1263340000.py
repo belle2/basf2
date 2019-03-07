@@ -208,6 +208,8 @@ V_tag = ['deltaE', 'Mbc']
 ma.variablesToNtuple('e+:95effCleanTracks', vc.kinematics, filename='../1263340000.ntup.root', treename='Electron', path=my_path)
 ma.variablesToNtuple('mu+:95effCleanTracks', vc.kinematics, filename='../1263340000.ntup.root', treename='Muon', path=my_path)
 ma.variablesToNtuple('D*0:sigDstar', V_D0Dstar, filename='../1263340000.ntup.root', treename='DSTsig', path=my_path)
+ma.variablesToNtuple('D*0:sigDstar1', ['massDifference(0)'], filename='../1263340000.ntup.root', treename='DSTsig1', path=my_path)
+ma.variablesToNtuple('D*0:sigDstar2', ['massDifference(0)'], filename='../1263340000.ntup.root', treename='DSTsig2', path=my_path)
 ma.variablesToNtuple('D0:sigD', V_D0Dstar, filename='../1263340000.ntup.root', treename='D0all', path=my_path)
 ma.variablesToNtuple('B-:tag', V_tag, filename='../1263340000.ntup.root', treename='Btag', path=my_path)
 # Process the events

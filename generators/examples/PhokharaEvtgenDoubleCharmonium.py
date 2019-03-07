@@ -11,6 +11,7 @@
 ########################################################
 
 import basf2
+import beamparameters
 
 # Set the global log level
 basf2.set_log_level(basf2.LogLevel.INFO)
@@ -18,6 +19,9 @@ basf2.set_log_level(basf2.LogLevel.INFO)
 main = basf2.create_path()
 
 main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
+
+# Beam parameters.
+beamparameters.add_beamparameters(main, "Y4S")
 
 # PHOKHARA
 phokhara = basf2.register_module('PhokharaInput')
@@ -33,6 +37,9 @@ phokhara.set_log_level(basf2.LogLevel.INFO)
 # K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)
 phokhara.param('FinalState', 0)
 phokhara.param('ReplaceMuonsByVirtualPhoton', True)
+
+# Simulate beam-energy spread.
+phokhara.param('BeamEnergySpread', True)
 
 # soft photon cutoff, final result is indepedent of the cut off as long as its small (<1e-3)
 # photon multiplicity (and exclusive cross sections depent on that parameter)

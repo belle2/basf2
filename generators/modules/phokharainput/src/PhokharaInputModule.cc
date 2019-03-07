@@ -80,6 +80,9 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
 
   addParam("ParameterFile", m_ParameterFile, "File that contain particle properties",
            FileSystem::findFile("/data/generators/phokhara/const_and_model_paramall9.1.dat"));
+  addParam("BeamEnergySpread", m_BeamEnergySpread,
+           "Simulate beam-energy spread (initializes PHOKHARA for every "
+           "event - very slow).", false);
 //   addParam("InputFile", m_InputFile, "File that contain input configuration", FileSystem::findFile("/data/generators/phokhara/input_9.1.dat"));
 
 }
@@ -120,6 +123,10 @@ void PhokharaInputModule::initialize()
     }
   }
   //Beam Parameters, initial particle - PHOKHARA cannot handle beam energy spread
+  if (m_BeamEnergySpread) {
+    m_initial.setAllowedFlags(BeamParameters::c_smearVertex |
+                              BeamParameters::c_smearBeam);
+  }
   m_initial.initialize();
 
 }
@@ -149,6 +156,12 @@ void PhokharaInputModule::event()
   TVector3 vertex = initial.getVertex();
 
   m_mcGraph.clear();
+  if (m_BeamEnergySpread) {
+    // PHOKHARA does not support beam-energy spread. To simulate it,
+    // the generator is initialized with the new energy for every event.
+    m_generator.setCMSEnergy(initial.getMass());
+    m_generator.init(m_ParameterFile);
+  }
   m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 

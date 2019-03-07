@@ -332,8 +332,7 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
                     recoTracksStoreArrayName=output_reco_tracks)
 
 
-def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False,
-                          cdc_quality_indicator_cut=0.0):
+def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.

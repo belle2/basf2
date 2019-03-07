@@ -287,8 +287,8 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
 
 def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters'):
     """
-    This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data reduction
-    to a path.
+    This function adds the standard reconstruction modules for tracking to be used for theq simulation of PXD data
+    reduction to a path.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components, always exclude the PXD.
@@ -370,7 +370,7 @@ def add_vxd_standalone_cosmics_finder(
 def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_reco_tracks="SVDCDCRecoTracks",
                                      cdc_reco_tracks="CDCRecoTracks", svd_reco_tracks="SVDRecoTracks",
                                      pxd_reco_tracks="PXDRecoTracks",
-                                     file='tracking/data/TrackQE_weight_files/FullTrackQE-Default.xml',
+                                     weightfile_id='tracking/data/TrackQE_weight_files/FullTrackQE-Default.xml',
                                      do_training=False):
     if(not do_training):
         trackQualityEstimatorMVA = register_module('TrackQualityEstimatorMVA', recoTracksStoreArrayName=reco_tracks,
@@ -378,7 +378,7 @@ def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_rec
                                                    CDCRecoTracksStoreArrayName=cdc_reco_tracks,
                                                    SVDRecoTracksStoreArrayName=svd_reco_tracks,
                                                    PXDRecoTracksStoreArrayName=pxd_reco_tracks)
-        trackQualityEstimatorMVA.param('WeightFileIdentifier', file)
+        trackQualityEstimatorMVA.param('WeightFileIdentifier', weightfile_id)
         path.add_module(trackQualityEstimatorMVA)
     else:
         trackQETrainingDataCollector = register_module('TrackQETrainingDataCollector', recoTracksStoreArrayName=reco_tracks,
@@ -386,5 +386,5 @@ def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_rec
                                                        CDCRecoTracksStoreArrayName=cdc_reco_tracks,
                                                        SVDRecoTracksStoreArrayName=svd_reco_tracks,
                                                        PXDRecoTracksStoreArrayName=pxd_reco_tracks)
-        trackQETrainingDataCollector.param('TrainingDataOutputName', file)
+        trackQETrainingDataCollector.param('TrainingDataOutputName', weightfile_id)
         path.add_module(trackQETrainingDataCollector)

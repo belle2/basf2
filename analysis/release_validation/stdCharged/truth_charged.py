@@ -5,21 +5,27 @@
 # Save all good charged tracks #
 ################################
 import basf2
-import modularAnalysis
+import sys
+import statistics
+from modularAnalysis import inputMdst, fillParticleList, matchMCTruth, variablesToNtuple
 from variables import variables
 
 charged_path = basf2.Path()
-
-# silence low level outputs
-logging.log_level = LogLevel.WARNING
 
 variables.addAlias('kBinaryID', 'pidPairProbabilityExpert(321,211,ALL)')
 variables.addAlias('eBinaryID', 'pidPairProbabilityExpert(11,211,ALL)')
 variables.addAlias('muBinaryID', 'pidPairProbabilityExpert(13,211,ALL)')
 variables.addAlias('pBinaryID', 'pidPairProbabilityExpert(2212,211,ALL)')
 
-inFile = '/group/belle2/users/jbennett/prerelease-03-00-00b/ph3/BGx1/ccbar_*.root'
-outFile = './prel03b_charged.root'
+if len(sys.argv) not in [2, 3]:
+    sys.exit('Must provide an input file and (optionally) an output file')
+
+inFile = sys.argv[1]
+if len(sys.argv) is 3:
+    outFile = sys.argv[2]
+else:
+    outFile = './truth_charged.root'
+
 inputMdst('default', inFile, path=charged_path)
 
 # --------------------------------------------------

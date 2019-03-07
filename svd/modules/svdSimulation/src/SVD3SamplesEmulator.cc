@@ -25,7 +25,7 @@ SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
 {
   B2DEBUG(1, "Constructor");
   // Set module properties
-  setDescription(" ");
+  setDescription("This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits.");
 
   // Parameter definitions
   addParam("SVDShaperDigits", m_shaperDigitInput, "StoreArray with the input shaperdigits", std::string("SVDShaperDigits"));

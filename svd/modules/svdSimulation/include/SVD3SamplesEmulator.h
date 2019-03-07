@@ -15,16 +15,13 @@
 #include <framework/datastore/StoreArray.h>
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/calibration/SVDPulseShapeCalibrations.h>
-#include <svd/calibration/SVDNoiseCalibrations.h>
-#include <svd/calibration/SVDCoGTimeCalibrations.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <string>
 
 namespace Belle2 {
-  /**
+  /**This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits.
    */
   class SVD3SamplesEmulatorModule : public Module {
 

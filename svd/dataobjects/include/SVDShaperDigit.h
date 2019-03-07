@@ -131,12 +131,50 @@ namespace Belle2 {
       return returnSamples;
     }
 
-    /** Get digit FADCTime estimate
+
+    /**
+     * Get the max bin.
+     * @return int time bin corresponding to the higher sample amplitude
+     */
+    int getMaxTimeBin() const
+    {
+      float amplitude = 0;
+      int maxbin = 0;
+      APVFloatSamples samples =  this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++) {
+        //      for (int k = 0; k < 6; k ++) {
+        if (samples[k] > amplitude) {
+          amplitude = samples[k];
+          maxbin = k;
+        }
+      }
+      return maxbin;
+    }
+
+    /**
+     * Get the ADC counts corresponding to the higher sample amplitude
+     * @return int of the ADC counts corresponding to the higher sample amplitude
+     */
+    int getMaxADCCounts() const
+    {
+      float amplitude = 0;
+      APVFloatSamples samples =  this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++) {
+        if (samples[k] > amplitude)
+          amplitude = samples[k];
+      }
+      return amplitude;
+    }
+
+
+    /**
+     * Get digit FADCTime estimate
      * @return digit time estimate from FADC
      */
     float getFADCTime() const { return static_cast<float>(m_FADCTime); }
 
-    /** Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.
+    /**
+     * Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.
      * @return the SVDModeByte object of the digit
      */
     SVDModeByte getModeByte() const
@@ -168,7 +206,10 @@ namespace Belle2 {
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
                 std::ostream_iterator<unsigned int>(os, " "));
-      os << "FADC time: " << (unsigned int)m_FADCTime << " " << thisMode << std::endl;
+      os << "FADC time: " << (unsigned int)m_FADCTime << " Triggerbin:" << (unsigned int) thisMode.getTriggerBin() << std::endl;
+      os << "RunType: " << (unsigned int)thisMode.getRunType() << ", EventType: " << (unsigned int) thisMode.getEventType() <<
+         ", DAQMode:  " << (unsigned int) thisMode.getDAQMode() << std::endl;
+      os << " SVDModeByte: " << (unsigned int)thisMode << std::endl;
       return os.str();
     }
 
@@ -268,7 +309,7 @@ namespace Belle2 {
     /**< Mode byte, trigger FADCTime + DAQ mode */
 
 
-    ClassDefOverride(SVDShaperDigit, 3)
+    ClassDefOverride(SVDShaperDigit, 4)
 
   }; // class SVDShaperDigit
 

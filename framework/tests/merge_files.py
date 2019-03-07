@@ -327,11 +327,11 @@ def check_19_lowhigh():
 
 
 def check_20_test_file():
-    """Check that a merged file passes the check_basf2_file program"""
+    """Check that a merged file passes the b2file-check program"""
     create_testfile("test1.root", events=1111)
     create_testfile("test2.root", events=123)
     merge_files("test1.root", "test2.root", filter_modified=True)
-    return subprocess.call(["check_basf2_file", "-n", "1234", "--mcevents", "1234",
+    return subprocess.call(["b2file-check", "-n", "1234", "--mcevents", "1234",
                             "output.root", "EventMetaData", "MCParticles"]) == 0
 
 

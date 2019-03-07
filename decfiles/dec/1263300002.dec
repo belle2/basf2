@@ -1,0 +1,60 @@
+# EventType: 1263300002
+# Descriptor: [B+ -> D** tau nu ]cc
+# NickName: B+_D**taunu
+# Documentation: B+->D** tau nu process, tag B decays exclusively as B->(D->Kpi(pi))pi
+# Tested: No
+# PhysicsWG: SL
+# Responsible: Sourav Dey
+# Email: souravdey@tauex.tau.ac.il
+# Cuts: None
+# Date: 20190124
+#
+#
+
+Alias mytau+ tau+
+Alias mytau- tau-
+ChargeConj mytau+ mytau-
+
+Alias  D0tag D0
+Alias  anti-D0tag anti-D0
+ChargeConj D0tag  anti-D0tag
+
+Alias B-tag B-
+Alias B+tag B+
+ChargeConj B-tag B+tag
+
+Decay Upsilon(4S)
+0.5 B+sig B-tag VSS;
+0.5 B-sig B+tag VSS;
+Enddecay
+
+
+Decay B+sig
+
+0.0013    anti-D_10    mytau+ nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
+0.0013    anti-D_0*0   mytau+ nu_tau          LLSW 0.68 -0.2 0.3;
+0.0020    anti-D'_10   mytau+ nu_tau          LLSW 0.68 -0.2 0.3;
+0.0020    anti-D_2*0   mytau+ nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
+
+Enddecay
+CDecay B-sig
+
+Decay mytau-
+0.154002925 e-      anti-nu_e nu_tau                        PHOTOS TAULNUNU; 
+0.1700000 mu-     anti-nu_mu nu_tau                       PHOTOS  TAULNUNU; 
+Enddecay
+CDecay mytau+
+
+
+Decay B-tag
+1.00 D0tag  pi-   PHOTOS                 PHSP;
+Enddecay
+CDecay B+tag
+
+Decay D0tag
+1.00 K- pi+   PHOTOS   PHSP;
+Enddecay
+CDecay anti-D0tag 
+
+#
+End

@@ -120,7 +120,7 @@ void EvtGenInputModule::event()
   TLorentzVector pParentParticle;
 
   //Initialize the beam energy for each event separatly
-  if (m_parentId.getId() == 93) {
+  if (EvtPDL::getStdHep(m_parentId) == 10022) {
     //virtual photon (vpho), no mass window, we accept everything
     pParentParticle = createBeamParticle();
   } else {

@@ -20,7 +20,7 @@ def fitKinematic4C(
     @param list_name    name of the input ParticleList
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
     @param path         modules are added to this path
     """
@@ -51,7 +51,7 @@ def UnmeasuredfitKinematic1C(
     @param list_name    name of the input ParticleList
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
     @param path         modules are added to this path
     """
@@ -78,18 +78,21 @@ def fitKinematic3C(
         path=analysis_main,
 ):
     """
-    Perform 3C momentum constraint kinematic fit with one unmeasured photon for particles in the given ParticleList.
+    Perform 3C momentum constraint kinematic fit with one photon with unmeasured energy for particles
+    in the given ParticleList, the first daughter should be the energy unmeasured Photon.
+
     @param list_name    name of the input ParticleList
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
+    @param add3CPhoton add one photon with unmeasured energy (costs 1C)
     @param path         modules are added to this path
     """
 
     orca = register_module('ParticleKinematicFitter')
     orca.set_name('ParticleKinematicFitter_' + list_name)
-    orca.param('debugFitter', True)
+    orca.param('debugFitter', False)
     orca.param('orcaTracer', 'None')
     orca.param('orcaFitterEngine', fitterEngine)
     orca.param('orcaConstraint', constraint)  # beam parameters automatically taken from database
@@ -116,7 +119,7 @@ def MassfitKinematic1CRecoil(
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
     @param recoilMass       RecoilMass (GeV)
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
     @param path         modules are added to this path
     """
@@ -150,7 +153,7 @@ def MassfitKinematic1C(
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass or Mass
     @param invMass       Inviriant  Mass (GeV)
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
     @param path         modules are added to this path
     """

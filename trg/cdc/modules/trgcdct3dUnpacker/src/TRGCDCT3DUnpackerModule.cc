@@ -34,6 +34,9 @@ TRGCDCT3DUnpackerModule::TRGCDCT3DUnpackerModule()
   string desc = "TRGCDCT3DUnpackerModule(" + version() + ")";
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("T3DMOD", m_T3DMOD,
+           "T3D module number",
+           0);
   B2INFO("TRGCDCT3DUnpacker: Constructor done.");
 }
 
@@ -47,8 +50,30 @@ void TRGCDCT3DUnpackerModule::terminate()
 
 void TRGCDCT3DUnpackerModule::initialize()
 {
-  m_store.registerInDataStore();
+  char c_name[100];
+  sprintf(c_name, "TRGCDCT3DUnpackerStore%d", m_T3DMOD);
+  m_store.registerInDataStore(c_name);
   //StoreArray<TRGCDCT3DUnpackerStore>::registerPersistent();
+
+  //set copper address
+  if (m_T3DMOD == 0) {
+    m_copper_address = 0x11000003;
+    m_copper_ab = 0;
+  } else if (m_T3DMOD == 1) {
+    m_copper_address = 0x11000003;
+    m_copper_ab = 1;
+  } else if (m_T3DMOD == 2) {
+    m_copper_address = 0x11000004;
+    m_copper_ab = 0;
+  } else if (m_T3DMOD == 3) {
+    m_copper_address = 0x11000004;
+    m_copper_ab = 1;
+  } else {
+    B2ERROR("trgcdct3dunpacker:cooper address is not set");
+    m_copper_address = 0;
+    m_copper_ab = 0;
+  }
+
 }
 
 void TRGCDCT3DUnpackerModule::beginRun()
@@ -64,9 +89,9 @@ void TRGCDCT3DUnpackerModule::event()
   StoreArray<RawTRG> raw_trgarray;
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      if (raw_trgarray[i]->GetNodeID(j) == 0x11000003) {
-        if (raw_trgarray[i]->GetDetectorNwords(j, 1) > 0) {
-          fillTreeTRGCDCT3DUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, 1), raw_trgarray[j]->GetEveNo(j));
+      if (raw_trgarray[i]->GetNodeID(j) == m_copper_address) {
+        if (raw_trgarray[i]->GetDetectorNwords(j, m_copper_ab) > 0) {
+          fillTreeTRGCDCT3DUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[j]->GetEveNo(j));
         }
       }
     }

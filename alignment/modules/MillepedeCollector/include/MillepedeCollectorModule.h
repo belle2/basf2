@@ -68,10 +68,10 @@ namespace Belle2 {
     bool fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
-    TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);
+    TMatrixD getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop);
 
     /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex) */
-    TMatrixD getLocalToGlobalTransform(genfit::MeasuredStateOnPlane msop);
+    TMatrixD getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop);
 
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
@@ -127,6 +127,15 @@ namespace Belle2 {
     double m_minCDCHitWeight;
     /** Minimum CDC used hit fraction **/
     double m_minUsedCDCHitFraction;
+
+    /** Type of alignment hierarchy (for VXD only for now): 0 = None, 1 = Flat (only constraints,
+         no new global parameters/derivatives), 2 = Full **/
+    int m_hierarchyType;
+    /** enable PXD hierarchy **/
+    bool m_enablePXDHierarchy;
+    /** enable SVD hierarchy **/
+    bool m_enableSVDHierarchy;
+
 
   };
 }

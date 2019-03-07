@@ -54,8 +54,17 @@ namespace Belle2 {
     //! Lowmilti bit of this hit.
     int s_low_multi;
 
-    //! 3D Bhabha bit of this hit.
-    int s_b2bhabha;
+    //! 3D Bhabha for veto bit of this hit.
+    int s_b2bhabhav;
+
+    //! 3D Bhabha for selection bit of this hit.
+    int s_b2bhabhas;
+
+    //! mumu bit of this hit.
+    int s_mumu;
+
+    //! prescale bit of this hit.
+    int s_prescale;
 
     //! 2D Bhabha bit of this hit.
     int s_b1bhabha;
@@ -134,8 +143,17 @@ namespace Belle2 {
     //! The mothod to set Lowmilti bit
     void setLowMulti(int low_multi) {s_low_multi = low_multi;}
 
-    //! The mothod to set 3D Bhabha bit
-    void set3DBhabha(int b2bhabha) {s_b2bhabha = b2bhabha;}
+    //! The mothod to set 3D Bhabha veto bit
+    void set3DBhabhaV(int b2bhabhav) {s_b2bhabhav = b2bhabhav;}
+
+    //! The mothod to set 3D Bhabha selection bit
+    void set3DBhabhaS(int b2bhabhas) {s_b2bhabhas = b2bhabhas;}
+
+    //! The mothod to set mumu bit
+    void setMumu(int mumu) {s_mumu = mumu;}
+
+    //! The mothod to set prescale bit
+    void setPrescale(int prescale) {s_prescale = prescale;}
 
     //! The mothod to set 2D Bhabha bit
     void set2DBhabha(int b1bhabha) {s_b1bhabha = b1bhabha;}
@@ -194,8 +212,17 @@ namespace Belle2 {
     //! The mothod to get Lowmilti bit
     int getLowMulti() const {return s_low_multi;}
 
-    //! The mothod to get 3D Bhabha bit
-    int get3DBhabha() const {return s_b2bhabha;}
+    //! The mothod to get 3D Bhabha veto bit
+    int get3DBhabhaV() const {return s_b2bhabhav;}
+
+    //! The mothod to get 3D Bhabha selection bit
+    int get3DBhabhaS() const {return s_b2bhabhas;}
+
+    //! The mothod to get mumu bit
+    int getMumu() const {return s_mumu;}
+
+    //! The mothod to get prescale bit
+    int getPrescale() const {return s_prescale;}
 
     //! The mothod to get 2D Bhabha bit
     int get2DBhabha() const {return s_b1bhabha;}
@@ -232,7 +259,10 @@ namespace Belle2 {
       s_icn       = 0;
       s_icn_over  = 0;
       s_low_multi = 0;
-      s_b2bhabha  = 0;
+      s_b2bhabhav = 0;
+      s_b2bhabhas = 0;
+      s_mumu      = 0;
+      s_prescale  = 0;
       s_b1bhabha  = 0;
       s_b1_type   = 0;
       s_physics   = 0;
@@ -254,7 +284,10 @@ namespace Belle2 {
       int icn,
       int icn_over,
       int low_multi,
-      int b2bhabha,
+      int b2bhabhav,
+      int b2bhabhas,
+      int mumu,
+      int prescale,
       int b1bhabha,
       int b1_type,
       int physics,
@@ -276,7 +309,10 @@ namespace Belle2 {
       s_icn       = icn;
       s_icn_over  = icn_over;
       s_low_multi = low_multi;
-      s_b2bhabha  = b2bhabha;
+      s_b2bhabhav = b2bhabhav;
+      s_b2bhabhas = b2bhabhas;
+      s_mumu      = mumu;
+      s_prescale  = prescale;
       s_b1bhabha  = b1bhabha;
       s_b1_type   = b1_type;
       s_physics   = physics;
@@ -287,7 +323,7 @@ namespace Belle2 {
       s_time_type = time_type;
     }
     /** the class title */
-    ClassDef(TRGECLUnpackerSumStore, 1);
+    ClassDef(TRGECLUnpackerSumStore, 2);
   };
 
 } // end namespace Belle2

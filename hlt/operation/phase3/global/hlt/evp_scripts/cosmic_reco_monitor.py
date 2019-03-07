@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import basf2
-from softwaretrigger.path_functions import setup_basf2_and_db, create_hlt_path, add_hlt_processing, finalize_hlt_path
+from softwaretrigger import constants
+from softwaretrigger.processing import setup_basf2_and_db, start_path, finalize_path, add_hlt_processing
 
-# set basf2 settings and configure local DB access
-args = setup_basf2_and_db(dbfile="/dev/shm/LocalDB.rel0101/database.txt")
+args = setup_basf2_and_db()
 
-# create the HLT path and add the Ring Buffer input and DQM modules
-path = create_hlt_path(args)
+path = start_path(args, location=constants.Location.hlt)
+add_hlt_processing(path, run_type=constants.RunTypes.cosmic,
+                   softwaretrigger_mode=constants.SoftwareTriggerModes.monitor,
+                   data_taking_period="early_phase3")
+finalize_path(path, args, location=constants.Location.hlt)
 
-# add software reconstruction and trigger for cosmics
-add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitoring",
-                   data_taking_period="phase3")
-
-finalize_hlt_path(path, args)
 basf2.print_path(path)
 basf2.process(path)

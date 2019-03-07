@@ -239,8 +239,46 @@ class ValidationRoot(object):
             j["label"] = lbl_folder
             combined_list.append(j)
 
-        # sort by name
-        combined_list.sort(key=lambda rev: rev["creation_date"], reverse=True)
+        # Sorting
+
+        # Order by categories (nightly, build, etc.) first, then by date
+        # A pure chronological order doesn't make sense, because we do not
+        # have a linear history ((pre)releases branch off) and for the builds
+        # the date corresponds to the build date, not to the date of the
+        # actual commit.
+        def sort_key(label: str):
+            if "-" not in label:
+                logging.warning(
+                    "Misformatted label encountered: '{}' "
+                    "(doesn't seem to include date?)".format(label)
+                )
+                return label
+            category, datetag = label.split("-", maxsplit=1)
+            print(category, datetag)
+            # Will later reverse order to bring items in the same category
+            # in reverse chronological order, so the following list will have
+            # the items in reverse order as well:
+            order = [
+                "release",
+                "prerelease",
+                "build",
+                "nightly"
+            ]
+            try:
+                index = order.index(category)
+            except ValueError:
+                logging.warning(
+                    "Misformatted label encountered: '{}' "
+                    "(doesn't seem to belong to any known "
+                    "category?)".format(label)
+                )
+                index = 9
+            return "{}-{}".format(index, datetag)
+
+        combined_list.sort(
+            key=lambda rev: sort_key(rev["label"]),
+            reverse=True
+        )
 
         # reference always on top
         combined_list = [reference_revision] + combined_list
@@ -307,8 +345,12 @@ class ValidationRoot(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def system_info(self):
-        # note: for some reason %Z doesn't work like this, so we use time.tzname
-        # for the time zone.
+        """
+        Returns:
+            JSON file containing git versions and time of last restart
+        """
+        # note: for some reason %Z doesn't work like this, so we use
+        # time.tzname for the time zone.
         return {
             "last_restart":
                 self.last_restart.strftime("%-d %b %H:%M ") + time.tzname[1],
@@ -451,7 +493,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cherry_config["/static"] = {
         'tools.staticdir.on': True,
         # only serve js, css, html and png files
-        'tools.staticdir.match': "^.*\.(js|css|html|png)$",
+        'tools.staticdir.match': "^.*\.(js|css|html|png|js.map)$",
         'tools.staticdir.dir': static_folder
     }
     setup_gzip_compression("/static", cherry_config)

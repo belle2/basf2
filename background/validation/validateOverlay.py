@@ -11,6 +11,7 @@
 
 from basf2 import *
 from simulation import add_simulation
+import os
 import glob
 import sys
 import math

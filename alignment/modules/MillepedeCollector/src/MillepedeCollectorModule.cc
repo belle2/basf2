@@ -57,12 +57,9 @@
 #include <alignment/Hierarchy.h>
 #include <alignment/GlobalParam.h>
 #include <alignment/GlobalDerivatives.h>
-
-#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/GblMultipleScatteringController.h>
 
 #include <genfit/KalmanFitterInfo.h>
-
-//#include <alignment/reconstruction/GblMultipleScatteringController.h>
 
 using namespace std;
 using namespace Belle2;
@@ -146,6 +143,13 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("minUsedCDCHitFraction", m_minUsedCDCHitFraction, "Minimum used CDC hit fraction to write out a trajectory",
            double(0.85));
 
+  addParam("hierarchyType", m_hierarchyType, "Type of (VXD only now) hierarchy: 0 = None, 1 = Flat, 2 = Full",
+           int(2));
+  addParam("enablePXDHierarchy", m_enablePXDHierarchy, "Enable PXD in hierarchy (flat or full)",
+           bool(true));
+  addParam("enableSVDHierarchy", m_enableSVDHierarchy, "Enable SVD in hierarchy (flat or full)",
+           bool(true));
+
 }
 
 void MillepedeCollectorModule::prepare()
@@ -207,70 +211,22 @@ void MillepedeCollectorModule::prepare()
 
   registerObject<TH1F>("cdc_hit_fraction", new TH1F("cdc_hit_fraction", "cdc_hit_fraction", 100, 0., 1.));
 
+  // Configure the (VXD) hierarchy before being built
+  if (m_hierarchyType == 0)
+    Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_None;
+  else if (m_hierarchyType == 1)
+    Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_Flat;
+  else if (m_hierarchyType == 2)
+    Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_Full;
+
+  Belle2::alignment::VXDGlobalParamInterface::s_enablePXD = m_enablePXDHierarchy;
+  Belle2::alignment::VXDGlobalParamInterface::s_enableSVD = m_enableSVDHierarchy;
+
+  // This will also build the hierarchy for the first time:
   Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   AlignableCDCRecoHit::s_enableEventT0LocalDerivative = m_fitEventT0;
-
-  /*
-  if (m_useVXDHierarchy) {
-    // Set-up hierarchy
-    DBObjPtr<VXDAlignment> vxdAlignments;
-
-    So the hierarchy is as follows:
-                Belle 2
-              / |     | \
-          Ying  Yang Pat  Mat ... other sub-detectors
-          / |   / |  |  \  | \
-        ......  ladders ......
-        / / |   / |  |  \  | \ \
-      ......... sensors ........
-
-
-    for (auto& halfShellPlacement : geo.getHalfShellPlacements()) {
-      TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
-      trafoHalfShell *= geo.getTGeoFromRigidBodyParams(
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
-                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
-                        );
-      hierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobaParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
-
-      for (auto& ladderPlacement : geo.getLadderPlacements(halfShellPlacement.first)) {
-        // Updated trafo
-        TGeoHMatrix trafoLadder = ladderPlacement.second;
-        trafoLadder *= geo.getTGeoFromRigidBodyParams(
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
-                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
-                       );
-        hierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
-
-        for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {
-          // Updated trafo
-          TGeoHMatrix trafoSensor = sensorPlacement.second;
-          trafoSensor *= geo.getTGeoFromRigidBodyParams(
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
-                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
-                         );
-          hierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensorPlacement.first, ladderPlacement.first, trafoSensor);
-
-
-        }
-      }
-    }
-  }
-  */
 }
 
 void MillepedeCollectorModule::collect()
@@ -903,7 +859,7 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
   //gbl->setOptions(m_internalIterations, true, true, m_externalIterations, m_recalcJacobians);
   gbl->setOptions("", true, true, 0, 0);
-  //gbl->setTrackSegmentController(new GblMultipleScatteringController);
+  gbl->setTrackSegmentController(new GblMultipleScatteringController);
 
   MeasurementAdder factory("", "", "", "", "");
 
@@ -1140,8 +1096,6 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyE
   double phi = atan2(avgMom[1], avgMom[0]);
   if (phi < 0.) phi += 2. * TMath::Pi();
 
-  std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
-
   double alpha = M / 2. / m;
   double c1 = m * sqrt(alpha * alpha - 1.);
   double c2 = 0.5 * sqrt((alpha * alpha - 1.) / alpha / alpha * (p * p + M * M));
@@ -1237,7 +1191,7 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyE
   return {result[0], result[1]};
 }
 
-TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop)
+TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop)
 {
   auto state = msop;
   const TVector3& U(state.getPlane()->getU());
@@ -1309,7 +1263,7 @@ TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(genfit::MeasuredSta
   return J_Mp_6x5.T();
 }
 
-TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(genfit::MeasuredStateOnPlane msop)
+TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop)
 {
   auto state = msop;
   // get vectors and aux variables

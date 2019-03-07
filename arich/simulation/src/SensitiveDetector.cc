@@ -94,7 +94,7 @@ namespace Belle2 {
 
       // if photon is internally reflected and going backward, do nothing
       if (theStatus == 3 && dir < 0) return 0;
-      if (theStatus == 4 && dir < 0) { if (gRandom->Uniform() < 0.6) track.SetTrackStatus(fStopAndKill); return 0;}
+      if (theStatus == 4 && dir < 0) { if (gRandom->Uniform() < 0.5) track.SetTrackStatus(fStopAndKill); return 0; }
 
       // apply quantum efficiency if not yet done
       bool applyQE = true;

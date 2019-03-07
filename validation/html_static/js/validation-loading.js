@@ -1,44 +1,63 @@
 /** This file contains all the main functions */
 
+"use strict";
+
+// todo: generally: Maybe it would be better to make data a global variable instead of
+// passing it from function to function, potentially having to reload it from the
+// server if that chain breaks
+
+// ============================================================================
+// Global variables
+// ============================================================================
+
+/**
+ * Is the JS that allows us to render LaTeX already loaded?
+ * @type {boolean}
+ */
+var latexRenderingLoaded = false;
+
+/**
+ * Is the function renderLatex already recursively running?
+ * @type {boolean}
+ */
+var latexRenderingInProgress = false;
+
+/**
+ * The number of LaTeX formulas that are on the page.
+ * @type {number}
+ */
+var latexEqnCount = 0;
+
+
 // ============================================================================
 // "Top level" functions, i.e. functions that are called directly from the
 // HTML or triggered from there.
 // ============================================================================
 
-// todo: maybe have a normal landing page in the future and just use loadSelectedRevisions instead?
 /**
  * This function gets called from the main page validation.html at the
- * beginning and sets up the * page with the initial selection of revisions.
- * @param revString
- * @param revList
+ * beginning and sets up the revisions sub-menu and then loads the
+ * corresponding plots to the default selection of the revisions
  */
-function loadRevisions(revString, revList) {
-    if (typeof revString === 'undefined') {
-        // fixme: shouldn't that be an empty string?
-        revString = null;
-    }
-    // fixme: this was a workaround for default values. But shouldn't rev list then also have a default value? Also note that JS support default values!
-
+function loadRevisions() {
     console.log("Loading revisions from server");
-    let rev_load_path = "../revisions";
+    let revLoadPath = "../revisions";
 
-    $.get(rev_load_path).then(function (data) {
+    $.get(revLoadPath).then(function (data) {
         console.log("Loading done!");
 
         function setupRevisionLoader(ractive) {
 
-            // load the defaults for the first time
-            if (revString == null) {
-                loadSelectedRevisions(data);
-            } else {
-                // otherwise, load a specific selection
-                setupRactiveFromRevision(data, revString, revList);
-            }
+            setDefaultPrebuildOption();
+            loadPrebuildRevisions(data);
 
             // be ready to load any other revision configuration if user desires
             ractive.on('loadSelectedRevisions', function () {
-
                 loadSelectedRevisions(data);
+            });
+
+            ractive.on('loadPrebuildRevisions', function () {
+                loadPrebuildRevisions(data);
             });
         }
 
@@ -69,11 +88,11 @@ function setSystemInfo() {
  * is installed once Ractive is done creating the template the popups do not work
  * any more if the user clicked on the "Overview" checkbox because new DOM items
  * get created
- * @param item_id
+ * @param itemId
  */
-function triggerPopup(item_id) {
+function triggerPopup(itemId) {
 
-    $(`#${item_id}`).magnificPopup({
+    $(`#${itemId}`).magnificPopup({
         type: 'inline',
         // Allow opening popup on middle mouse click. Always set it to true if
         // you don't provide alternative source in href.
@@ -89,8 +108,8 @@ function triggerPopup(item_id) {
  */
 function loadSelectedRevisions(data) {
 
-    let revString = getSelectedRevsString();
     let revList = getSelectedRevsList();
+    let revString = selectedRevsListToString(revList);
 
     if (revString === "") {
         alert("Please select at least one tag!");
@@ -98,7 +117,119 @@ function loadSelectedRevisions(data) {
 
     console.log(`Loading rev via string '${revString}'.`);
 
-    setupRactiveFromRevision(data, revString, revList);
+    setupRactiveFromRevision(data, revList);
+}
+
+/**
+ * Set the dropdown menu that specifies the favorite prebuilt combination of
+ * revisions to the value which was last selected by the user or to 'rbn' if
+ * no such setting exists.
+ * @returns the mode which was set
+ */
+function setDefaultPrebuildOption(){
+    let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
+    console.debug(`RECOVERED ${mode}`);
+    if (mode == null){
+        mode = "rbn";
+    }
+    // todo: check if this is an allowed mode, else discard!
+    $("#prebuilt-select").val(mode);
+    return mode;
+}
+
+/**
+ * This will get the selected prebuilt combination from the drop down menu,
+ * get the corresponding revisions and show the corresponding plots.
+ * It will also save the value of the drop down menu in localStorage.
+ * This function should be bound to the user changing the value in the drop
+ * down menu.
+ * @param data
+ */
+function loadPrebuildRevisions(data){
+    let selector = $("#prebuilt-select")[0];
+    let mode = selector.options[selector.selectedIndex].value;
+    localStorage.setItem(getStorageId("prebuildRevisionDefault"), mode);
+    console.debug(`Loading prebuild revision with mode '${mode}'`);
+    let revisions = getDefaultRevisions(mode);
+    console.debug(`Revisions to load are ${revisions.toString()}`);
+    setRevisions(revisions);
+    loadSelectedRevisions(data);
+}
+
+/**
+ * Sets the state of the revision checkboxes
+ * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
+ *  nightly only), "b" (last build only), "nnn" (all nightlies), "rbn"
+ *  (default, last build, nightly and revision).
+ */
+function getDefaultRevisions(mode="rbn") {
+    let allRevisions = getAllRevsList().sort().reverse();
+
+    let referenceRevision = "reference";
+    let releaseRevisions = [];
+    let buildRevisions = [];
+    let nightlyRevisions = [];
+
+    for (let i in allRevisions){
+        let rev = allRevisions[i];
+        // fixme: This will have problems with sorting. Probably we rather want to have prerelease as a new category!
+        if (rev.startsWith("release") || rev.startsWith("prerelease")) {
+            releaseRevisions.push(rev);
+        }
+        if (rev.startsWith("build")) {
+            buildRevisions.push(rev);
+        }
+        if (rev.startsWith("nightly")) {
+            nightlyRevisions.push(rev);
+        }
+    }
+
+    if (mode === "all"){
+        return allRevisions;
+    }
+    else if (mode === "r" && releaseRevisions.length >= 1){
+        return [referenceRevision, releaseRevisions[0]];
+    }
+    else if (mode === "b" && buildRevisions.length >= 1){
+        return [referenceRevision, buildRevisions[0]];
+    }
+    else if (mode === "n" && nightlyRevisions.length >= 1){
+        return [referenceRevision, nightlyRevisions[0]];
+    }
+    else if (mode === "nnn" && nightlyRevisions.length >= 1){
+        return [referenceRevision].concat(nightlyRevisions);
+    }
+    else if (mode === "rbn"){
+        // default anyway
+    }
+    else {
+        console.error(`Unknown getDefaultRevisions mode '${mode}'!`);
+    }
+
+    let rbnRevisions = [referenceRevision];
+    if (releaseRevisions.length >= 1){
+        rbnRevisions.push(releaseRevisions[0])
+    }
+    if (buildRevisions.length >= 1){
+        rbnRevisions.push(buildRevisions[0])
+    }
+    if (nightlyRevisions.length >= 1){
+        rbnRevisions.push(nightlyRevisions[0])
+    }
+
+    return rbnRevisions
+}
+
+/**
+ * Set the state of the revision checkboxes in the revision submenu.
+ * @param revisionList any revision in this list will be checked, all others
+ *  will be unchecked. Any revision in this list which does not have a
+ *  corresponding checkbox will be ignored.
+ */
+function setRevisions(revisionList) {
+    $('.reference-checkbox').each(function (i, obj) {
+        obj.checked = revisionList.includes(obj.value);
+    });
 }
 
 // ============================================================================
@@ -113,20 +244,21 @@ function loadSelectedRevisions(data) {
  * current selection of revisions haven't yet been generated and we
  * request them.
  * @param revData
- * @param revString
  * @param revList
  */
-function setupRactiveFromRevision(revData, revString, revList) {
+function setupRactiveFromRevision(revData, revList) {
 
     // don't event attempt to show comparisons for empty revisions
-    if (revString === "")
+    if (!Array.isArray(revList) || !revList.length)
         return;
+
+    let revString = selectedRevsListToString(revList);
 
     // make dynamic
     let comparisonLoadPath = `../comparisons/${revString}`;
     let createComparisonUrl = "../create_comparison";
 
-    console.log(`Loading Comparison 'comparisonLoadPath'`);
+    console.log(`Loading Comparison from '${comparisonLoadPath}'`);
 
     // todo: This SCREAMS to be refactored in some way....
     $.get(comparisonLoadPath).done(function (data) {
@@ -187,11 +319,11 @@ function setupRactiveFromRevision(revData, revString, revList) {
                     //     package list of the comparison object).
                     console.debug(
                         `Package '${newestRev["packages"][irev]["name"]}` +
-                        "' was found in the revision file, but not in the" +
+                        "' was found in the revision file, but not in the " +
                         "comparison file. Probably this package did not " +
                         "create a single output file."
                     );
-                    if (newestRev["packages"][irev]["fail_count"] > 0) {
+                    if (newestRev["packages"][irev]["scriptfiles"].length > 0) {
                         console.debug(
                             "However it did have failing scripts, so we " +
                             "will make it visible on the validation page. "
@@ -204,8 +336,9 @@ function setupRactiveFromRevision(revData, revString, revList) {
                         pkgDict["scriptfiles"] = scriptfiles;
                         pkgDict["newest_revision"] = label;
                         // Also add keys that usually come from the
-                        // comparison file:
+                        // comparison file and are nescessary for things to work
                         pkgDict["visible"] = true;
+                        pkgDict["comparison_error"] = 0; // else problems in package template
                         data["packages"].push(pkgDict);
 
                     }
@@ -220,15 +353,16 @@ function setupRactiveFromRevision(revData, revString, revList) {
             function (ractive) {
 
                 if ("packages" in data) {
-                    // todo: load the package which was last time viewn by the users
                     let firstPackageName = getDefaultPackageName(data["packages"]);
                     if (firstPackageName !== false) {
                         loadValidationPlots(firstPackageName, data);
                     } else {
-                        console.warn("No package could be loaded.")
+                        console.warn("No package could be loaded.");
+                        $("content").text("No package could be loaded");
                     }
                 }
                 ractive.on({
+                    // todo: why does pycharm complain about this being unused? It's used in package.html
                     load_validation_plots: function (evt) {
                         // This gets called if the user clicks on a package in the
                         // package-selection side menu.
@@ -238,10 +372,12 @@ function setupRactiveFromRevision(revData, revString, revList) {
 
                         let pkgs = ractive.get('packages');
 
+                        let package_name = evt.context.name;
+
                         // Display sub-packages for this one.
                         if (pkgs != null) {
                             for (let ipkg in pkgs) {
-                                if (pkgs[ipkg].name === evt.context.name) {
+                                if (pkgs[ipkg].name === package_name) {
                                     // disaplay this one
                                     ractive.set(`packages.${ipkg}.display_setting`, 'block');
                                     break;
@@ -252,6 +388,9 @@ function setupRactiveFromRevision(revData, revString, revList) {
                             // used to create this template instance
                             loadValidationPlots(evt.context.name, data);
                         }
+
+                        // Remember that this package was open last
+                        localStorage.setItem(getStorageId("packageList"), package_name);
                     }
                 });
             });
@@ -269,7 +408,7 @@ function setupRactiveFromRevision(revData, revString, revList) {
             })
         }).done(function (data) {
             let key = data["progress_key"];
-            beginCreatePlotWait(revString, revList, key, revData);
+            beginCreatePlotWait(revList, revList, key, revData);
         });
     });
 }
@@ -455,13 +594,34 @@ function fillNtupleTable(domId, jsonLoadingPath) {
  * The package that is opened, when the validation page is opened.
  *  Currently that's just picking the page first in alphabetic order
  *  (i.e. analysis) or false if no packages are available.
- * @param packageList
+ * @param packageList A list of package objects (data["packages"])
  * @return {*}
  */
 function getDefaultPackageName(packageList) {
+
     if (packageList.length === 0) {
         console.debug("getDefaultPackageName: No packages available.");
         return false;
+    }
+
+    let lastPackage = localStorage.getItem(getStorageId("packageList"));
+    if (lastPackage !== null){
+        // check if lastPackage is still available
+        let found = false;
+        for(let i in packageList){
+            if (packageList[i].name === lastPackage) {
+                found = true;
+            }
+        }
+        // If it is still available, return the name, otherwise proceed
+        if (found){
+            console.debug(`Opening package '${lastPackage}' because it was opened last`);
+            return lastPackage
+        }
+        else{
+            console.debug(`Last package '${lastPackage}' is not available anymore.`);
+        }
+
     }
 
     let firstPackageName = packageList[0].name;
@@ -471,7 +631,6 @@ function getDefaultPackageName(packageList) {
         console.debug("getDefaultPackageName: Name of first package undefined.");
         return false;
     }
-
 }
 
 
@@ -490,32 +649,39 @@ function getSelectedRevsList() {
     return selectedRev;
 }
 
+function getAllRevsList() {
+    let revs = [];
+    $('.reference-checkbox').each(function (i, obj) {
+        revs.push(obj.value)
+    });
+    revs.sort();
+    return revs;
+}
+
 /**
  * Returns a string representation of the array of selected revisions.
  * We need that to create folder names & queries
- * @return {string}
  */
-function getSelectedRevsString() {
+function selectedRevsListToString(selectedRevs) {
     let revString = "";
-    let selectedRev = getSelectedRevsList();
-    for (let i in selectedRev) {
+    for (let i in selectedRevs) {
         if (i > 0)
             revString += "_";
-        revString += selectedRev[i];
+        revString += selectedRevs[i];
     }
     return revString;
 }
 
 /**
  * Return the newest revision that is included in the dataset.
- * @param rev_data
+ * @param revData
  * @return {*}
  */
-function getNewestRevision(rev_data) {
+function getNewestRevision(revData) {
     let newest = null;
     // deliberately super early date
     let newestData = "2000-00-00 00:00:00";
-    let revList = rev_data["revisions"];
+    let revList = revData["revisions"];
 
     for (let i in revList) {
         if (revList[i]["label"] !== "reference") {
@@ -527,4 +693,66 @@ function getNewestRevision(rev_data) {
     }
 
     return newest
+}
+
+/**
+ * Render any latex formula on the current page and keep on recursively calling
+ * this function until it looks like no new elements appear.
+ * Note: We wait until we have latex support (via the latexRenderingLoaded
+ * global variable) and (via latexRenderingInProgress) also make sure that
+ * only one kind of this function is active (including its recursive calls)
+ * That means that calling this function is super cheap, so please call it
+ * whenever your actions might make any DOM that contains LaTeX appear on the
+ * page!
+ * @param force do not check latexRenderingInProgress
+ * @param irepeat how often did we recursively call this function to check
+ *  for left over latex elements (will be reset whenever new LaTeX is rendered)
+ * @returns {*}
+ */
+function renderLatex(force=false, irepeat=0) {
+    if (irepeat === 0 && !force && latexRenderingInProgress){
+        console.debug("Superfluous level 0 call to renderLatex()");
+        return false;
+    }
+
+    // Make sure only one instance of this function is running.
+    latexRenderingInProgress = true;
+
+    if (!latexRenderingLoaded){
+        // Latex rendering is not yet loaded, so let's just call this very
+        // function again in 300 ms
+        console.debug("Latex rendering requested, but not yet available. Waiting.");
+        return setTimeout(() => renderLatex(force=true), 300);
+    }
+
+    if ( irepeat === 0 ){
+        console.debug("Rendering LaTeX.");
+    }
+
+    // In order to see whether there is still new LaTeX code appearing on the
+    // page, we count the number of equations. If new LaTeX code appears, we
+    // reload it 3 more times (waiting 1s in between). We also reload it at
+    // least 3 times in general.
+    MathJax.Hub.Queue(
+        function () {
+            latexEqnCount = MathJax.Hub.getAllJax().length;
+        },
+        ["Typeset", MathJax.Hub],
+        function () {
+            let neqn = MathJax.Hub.getAllJax().length;
+            let msg = `LaTeX re-rendering: neqn=${neqn}, irepeat=${irepeat}. `;
+            if (latexEqnCount !== neqn) {
+                // New LaTeX appeared, restart counting.
+                irepeat = 0;
+            }
+            if (irepeat >= 3) {
+                console.debug("Stopping " + msg);
+                latexRenderingInProgress = false;
+            }
+            else {
+                console.debug("Scheduling " + msg);
+                return setTimeout(() => renderLatex(force=true, irepeat=irepeat+1), 1000);
+            }
+        }
+    );
 }

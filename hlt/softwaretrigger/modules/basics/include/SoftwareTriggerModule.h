@@ -1,12 +1,18 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <framework/core/Module.h>
 
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
-#include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
-#include <hlt/softwaretrigger/calculations/HLTCalculator.h>
-#include <hlt/softwaretrigger/calculations/TestbeamCalculator.h>
-#include <hlt/softwaretrigger/calculations/CalibSampleCalculator.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
@@ -21,10 +27,10 @@ namespace Belle2 {
      *
      * The return value of this module is a bool, which is either true (accept the event) or false (reject it).
      *
-     * This return value is defined by all trigger decision up to now. It is true, if both the fast_reco and hlt
+     * This return value is defined by all trigger decision up to now. It is true, if the trigger stage
      * accepted the event and false in all other cases.
      *
-     * The result for fast_reco and hlt and calculated within each module (depending on the base name):
+     * The result for the triggers calculated within each module (depending on the base name):
      *
      * It is defined from the results of the cuts in the given trigger menu, which are all evaluated
      * and the trigger mode (accept mode or not).
@@ -70,7 +76,7 @@ namespace Belle2 {
     private:
       // Parameters
       /// Base identifier for all cuts downloaded from database.
-      std::string m_param_baseIdentifier = "hlt";
+      std::string m_param_baseIdentifier = "";
       /// Store Object Pointer name for storing the trigger decision.
       std::string m_param_resultStoreArrayName = "";
       /// Flag to also store the result of the calculations into a root file.
@@ -109,13 +115,6 @@ namespace Belle2 {
 
       /// Helper function to store the calculated variables from the calculation either in the TTree or in the data store.
       void makeDebugOutput();
-
-      /// the name list of particles for the calibration and dqm
-      std::vector<std::string> m_particlename;
-
-      /// the extra info name attached to the particles
-      std::vector<std::string> m_extrainfoname;
-
     };
   }
 }

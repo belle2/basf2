@@ -22,7 +22,7 @@
 #include "TGraph.h"
 
 void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
-  char const *contactForAllPlots = "S. Cunliffe (sam.cunliffe@desy.de), S. Sandilya (saurabhsandilya@gmail.com), M. Schram (malachi.schram@desy.de)";
+  char const *contactForAllPlots = "S. Sandilya (saurabhsandilya@gmail.com)";
   char const *title = "B^{0}#rightarrowK*^{0}#gamma";
 
   TH1F* h_mbc = new TH1F("h_mbc",title,180,5.2,5.29);
@@ -56,7 +56,8 @@ void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_egam->GetListOfFunctions()->Add(new TNamed("Description", "Lab frame photon energy distribution from the decay B0 -> K*0 gamma"));
   h_egam->GetListOfFunctions()->Add(new TNamed("Check", "Broad distribution bewteen 1.5 and 3 GeV."));
   h_egam->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
-  h_egam->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
+  h_egam->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0., pvalue-error=0., expert")); 
+  // pvalue comparison turned off 27.02.2019 to be turned on when KS test is implemented
 
   TH1F* h_eparentgam = new TH1F("h_eparentgam",title,100,1.5,4.0); ptree->Project("h_eparentgam", "B0_Egamma", "1==1");
   h_eparentgam->GetXaxis()->SetTitle("E(#gamma) (GeV)");

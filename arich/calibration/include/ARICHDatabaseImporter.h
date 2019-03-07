@@ -143,9 +143,19 @@ namespace Belle2 {
     void importFEMappings();
 
     /**
-     * Prints mappings of FE electronics from the database
+     * Prints merger to FEB mappings from the database
      */
-    void printFEMappings();
+    void printMergerMapping();
+
+    /**
+     * Prints Copper to merger mappings from the database
+     */
+    void printCopperMapping();
+
+    /**
+     * Prints reconstruction parameters
+     */
+    void printReconstructionPar();
 
     /**
      * Prints geometry configuration parameters from the database

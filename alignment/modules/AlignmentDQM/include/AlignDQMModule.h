@@ -39,10 +39,13 @@ namespace Belle2 {
     /* Destructor */
     ~AlignDQMModule();
 
-    /** Module functions */
+    /** Module function initialize */
     void initialize() override final;
+    /** Module function beginRun */
     void beginRun() override final;
+    /** Module function event */
     void event() override final;
+    /** Module function endRun */
     void endRun() override final;
 
     /**
@@ -54,118 +57,163 @@ namespace Belle2 {
   private:
     // Special Alignment related: Sensor level
     /** ResidaulMean vs U vs V counter for sensor*/
-    TH2F** m_ResMeanPosUVSensCounts;
+    TH2F** m_ResMeanPosUVSensCounts = nullptr;
     /** ResidaulMeanU vs U vs V for sensor*/
-    TH2F** m_ResMeanUPosUVSens;
+    TH2F** m_ResMeanUPosUVSens = nullptr;
     /** ResidaulMeanU vs U vs V for sensor*/
-    TH2F** m_ResMeanVPosUVSens;
+    TH2F** m_ResMeanVPosUVSens = nullptr;
     /** ResidaulU vs U for sensor*/
-    TH2F** m_ResUPosUSens;
+    TH2F** m_ResUPosUSens = nullptr;
     /** ResidaulU vs V for sensor*/
-    TH2F** m_ResUPosVSens;
+    TH2F** m_ResUPosVSens = nullptr;
     /** ResidaulV vs U for sensor*/
-    TH2F** m_ResVPosUSens;
+    TH2F** m_ResVPosUSens = nullptr;
     /** ResidaulV vs V for sensor*/
-    TH2F** m_ResVPosVSens;
+    TH2F** m_ResVPosVSens = nullptr;
     /** ResidaulMeanU vs U for sensor*/
-    TH1F** m_ResMeanUPosUSens;
+    TH1F** m_ResMeanUPosUSens = nullptr;
     /** ResidaulMeanU vs V for sensor*/
-    TH1F** m_ResMeanUPosVSens;
+    TH1F** m_ResMeanUPosVSens = nullptr;
     /** ResidaulMeanV vs U for sensor*/
-    TH1F** m_ResMeanVPosUSens;
+    TH1F** m_ResMeanVPosUSens = nullptr;
     /** ResidaulMeanV vs V for sensor*/
-    TH1F** m_ResMeanVPosVSens;
+    TH1F** m_ResMeanVPosVSens = nullptr;
 
     // Special Alignment related: Layer level
     /** ResidaulMean vs Phi vs Theta counter for Layer*/
-    TH2F** m_ResMeanPhiThetaLayerCounts;
+    TH2F** m_ResMeanPhiThetaLayerCounts = nullptr;
     /** ResidaulMeanU vs Phi vs Theta for Layer*/
-    TH2F** m_ResMeanUPhiThetaLayer;
+    TH2F** m_ResMeanUPhiThetaLayer = nullptr;
     /** ResidaulMeanU vs Phi vs Theta for Layer*/
-    TH2F** m_ResMeanVPhiThetaLayer;
+    TH2F** m_ResMeanVPhiThetaLayer = nullptr;
     /** ResidaulU vs Phi for Layer*/
-    TH2F** m_ResUPhiLayer;
+    TH2F** m_ResUPhiLayer = nullptr;
     /** ResidaulU vs Theta for Layer*/
-    TH2F** m_ResUThetaLayer;
+    TH2F** m_ResUThetaLayer = nullptr;
     /** ResidaulV vs Phi for Layer*/
-    TH2F** m_ResVPhiLayer;
+    TH2F** m_ResVPhiLayer = nullptr;
     /** ResidaulV vs Theta for Layer*/
-    TH2F** m_ResVThetaLayer;
+    TH2F** m_ResVThetaLayer = nullptr;
     /** ResidaulMeanU vs Phi for Layer*/
-    TH1F** m_ResMeanUPhiLayer;
+    TH1F** m_ResMeanUPhiLayer = nullptr;
     /** ResidaulMeanU vs Theta for Layer*/
-    TH1F** m_ResMeanUThetaLayer;
+    TH1F** m_ResMeanUThetaLayer = nullptr;
     /** ResidaulMeanV vs Phi for Layer*/
-    TH1F** m_ResMeanVPhiLayer;
+    TH1F** m_ResMeanVPhiLayer = nullptr;
     /** ResidaulMeanV vs Theta for Layer*/
-    TH1F** m_ResMeanVThetaLayer;
+    TH1F** m_ResMeanVThetaLayer = nullptr;
 
     /** p Value */
-    TH1F* m_PValue;
+    TH1F* m_PValue = nullptr;
     /** Chi2 */
-    TH1F* m_Chi2;
+    TH1F* m_Chi2 = nullptr;
     /** NDF */
-    TH1F* m_NDF;
+    TH1F* m_NDF = nullptr;
     /** Chi2 / NDF */
-    TH1F* m_Chi2NDF;
+    TH1F* m_Chi2NDF = nullptr;
     /** Unbiased residuals for PXD u vs v */
-    TH2F* m_UBResidualsPXD;
+    TH2F* m_UBResidualsPXD = nullptr;
     /** Unbiased residuals for SVD u vs v */
-    TH2F* m_UBResidualsSVD;
+    TH2F* m_UBResidualsSVD = nullptr;
     /** Unbiased residuals for PXD and SVD u vs v per sensor*/
-    TH2F** m_UBResidualsSensor;
+    TH2F** m_UBResidualsSensor = nullptr;
     /** Unbiased residuals for PXD u */
-    TH1F* m_UBResidualsPXDU;
+    TH1F* m_UBResidualsPXDU = nullptr;
     /** Unbiased residuals for SVD u */
-    TH1F* m_UBResidualsSVDU;
+    TH1F* m_UBResidualsSVDU = nullptr;
     /** Unbiased residuals for PXD and SVD u per sensor*/
-    TH1F** m_UBResidualsSensorU;
+    TH1F** m_UBResidualsSensorU = nullptr;
     /** Unbiased residuals for PXD v */
-    TH1F* m_UBResidualsPXDV;
+    TH1F* m_UBResidualsPXDV = nullptr;
     /** Unbiased residuals for SVD v */
-    TH1F* m_UBResidualsSVDV;
+    TH1F* m_UBResidualsSVDV = nullptr;
     /** Unbiased residuals for PXD and SVD v per sensor*/
-    TH1F** m_UBResidualsSensorV;
+    TH1F** m_UBResidualsSensorV = nullptr;
     /** Track related clusters - hitmap in IP angle range */
-    TH2F** m_TRClusterHitmap;
+    TH2F** m_TRClusterHitmap = nullptr;
     /** Track related clusters - neighbor corelations in Phi */
-    TH2F** m_TRClusterCorrelationsPhi;
+    TH2F** m_TRClusterCorrelationsPhi = nullptr;
     /** Track related clusters - neighbor corelations in Theta */
-    TH2F** m_TRClusterCorrelationsTheta;
+    TH2F** m_TRClusterCorrelationsTheta = nullptr;
 
 
     /** Track momentum Pt.Phi */
-    TH1F* m_MomPhi;
+    TH1F* m_MomPhi = nullptr;
     /** Track momentum Pt.Theta */
-    TH1F* m_MomTheta;
+    TH1F* m_MomTheta = nullptr;
     /** Track momentum Pt.CosTheta */
-    TH1F* m_MomCosTheta;
+    TH1F* m_MomCosTheta = nullptr;
     /** Track momentum Pt.X */
-    TH1F* m_MomX;
+    TH1F* m_MomX = nullptr;
     /** Track momentum Pt.Y */
-    TH1F* m_MomY;
+    TH1F* m_MomY = nullptr;
     /** Track momentum Pt.Z */
-    TH1F* m_MomZ;
+    TH1F* m_MomZ = nullptr;
     /** Track momentum Pt */
-    TH1F* m_MomPt;
+    TH1F* m_MomPt = nullptr;
     /** Track momentum Magnitude */
-    TH1F* m_Mom;
+    TH1F* m_Mom = nullptr;
     /** Number of hits on PXD */
-    TH1F* m_HitsPXD;
+    TH1F* m_HitsPXD = nullptr;
     /** Number of hits on VXD */
-    TH1F* m_HitsSVD;
+    TH1F* m_HitsSVD = nullptr;
     /** Number of hits on CDC */
-    TH1F* m_HitsCDC;
+    TH1F* m_HitsCDC = nullptr;
     /** Number of all hits in tracks */
-    TH1F* m_Hits;
+    TH1F* m_Hits = nullptr;
     /** Number of tracks only with VXD */
-    TH1F* m_TracksVXD;
+    TH1F* m_TracksVXD = nullptr;
     /** Number of tracks only with CDC */
-    TH1F* m_TracksCDC;
+    TH1F* m_TracksCDC = nullptr;
     /** Number of full tracks with VXD+CDC */
-    TH1F* m_TracksVXDCDC;
+    TH1F* m_TracksVXDCDC = nullptr;
     /** Number of all finding tracks */
-    TH1F* m_Tracks;
+    TH1F* m_Tracks = nullptr;
+
+    /** helix parameters and their corellations: */
+
+    /** Phi - the angle of the transverse momentum in the r-phi plane, with CDF naming convention */
+    TH1F* m_Phi = nullptr;
+    /** d0 - the signed distance to the IP in the r-phi plane */
+    TH1F* m_D0 = nullptr;
+    /** z0 - the z0 coordinate of the perigee (beam spot position) */
+    TH1F* m_Z0 = nullptr;
+    /** Omega - the curvature of the track. It's sign is defined by the charge of the particle */
+    TH1F* m_Omega = nullptr;
+    /** TanLambda - the slope of the track in the r-z plane */
+    TH1F* m_TanLambda = nullptr;
+
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. d0 - signed distance to the IP in r-phi */
+    TH2F* m_PhiD0 = nullptr;
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. z0 of the perigee (to see primary vertex shifts along R or z) */
+    TH2F* m_PhiZ0 = nullptr;
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. Track momentum Pt */
+    TH2F* m_PhiMomPt = nullptr;
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. Omega - the curvature of the track */
+    TH2F* m_PhiOmega = nullptr;
+    /** Phi - the angle of the transverse momentum in the r-phi plane vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_PhiTanLambda = nullptr;
+    /** d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z) */
+    TH2F* m_D0Z0 = nullptr;
+    /** d0 - signed distance to the IP in r-phi vs. Track momentum Pt */
+    TH2F* m_D0MomPt = nullptr;
+    /** d0 - signed distance to the IP in r-phi vs. Omega - the curvature of the track */
+    TH2F* m_D0Omega = nullptr;
+    /** d0 - signed distance to the IP in r-phi vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_D0TanLambda = nullptr;
+    /** z0 - the z0 coordinate of the perigee vs. Track momentum Pt */
+    TH2F* m_Z0MomPt = nullptr;
+    /** z0 - the z0 coordinate of the perigee vs. Omega - the curvature of the track */
+    TH2F* m_Z0Omega = nullptr;
+    /** z0 - the z0 coordinate of the perigee vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_Z0TanLambda = nullptr;
+    /** Track momentum Pt vs. Omega - the curvature of the track */
+    TH2F* m_MomPtOmega = nullptr;
+    /** Track momentum Pt vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_MomPtTanLambda = nullptr;
+    /** Omega - the curvature of the track vs. TanLambda - the slope of the track in the r-z plane */
+    TH2F* m_OmegaTanLambda = nullptr;
+
 
     /// StoreArray name where the merged Tracks are written.
     std::string m_param_TracksStoreArrayName = "";

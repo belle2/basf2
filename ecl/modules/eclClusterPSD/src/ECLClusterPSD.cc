@@ -51,7 +51,6 @@ ECLClusterPSDModule::ECLClusterPSDModule()
   // Set module properties
   setDescription("Module uses offline two component fit results to compute pulse shape discrimation variables for particle identification.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("Chi2Threshold", m_Chi2Threshold, "Chi2 Threshold", 60.);
   addParam("CrystalHadronEnergyThreshold", m_CrystalHadronEnergyThreshold,
            "Hadron component energy threshold to identify as hadron digit.(GeV)", 0.003);
   addParam("CrystalHadronIntensityThreshold", m_CrystalHadronIntensityThreshold,
@@ -142,9 +141,18 @@ double ECLClusterPSDModule::evaluateMVA(const ECLShower* cluster)
 
     const auto caldigit = relatedDigits.object(iRel);
 
+    //exclude digits without waveforms
     const double digitChi2 = caldigit->getTwoComponentChi2();
+    if (digitChi2 < 0)  continue;
 
-    if (digitChi2 < 0 || digitChi2 >= m_Chi2Threshold) continue;
+    ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
+
+    //exclude digits digits with poor chi2
+    if (digitFitType1 == ECLDsp::poorChi2) continue;
+
+    //exclude digits with diode-crossing fits
+    if (digitFitType1 == ECLDsp::photonDiodeCrossing) continue;
+
     EnergyToSort.emplace_back(caldigit->getTwoComponentTotalEnergy(), iRel);
 
   }
@@ -231,24 +239,29 @@ void ECLClusterPSDModule::event()
 
       if (digit2CChi2 < 0)  continue; //only digits with waveforms
 
-      if (digit2CChi2 < m_Chi2Threshold) { //must be a good fit
+      ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
 
-        const double digit2CTotalEnergy = caldigit->getTwoComponentTotalEnergy();
-        const double digit2CHadronComponentEnergy = caldigit->getTwoComponentHadronEnergy();
+      //exclude digits digits with poor chi2
+      if (digitFitType1 == ECLDsp::poorChi2) continue;
 
-        cluster2CTotalEnergy += digit2CTotalEnergy;
-        cluster2CHadronEnergy += digit2CHadronComponentEnergy;
+      //exclude digits with diode-crossing fits
+      if (digitFitType1 == ECLDsp::photonDiodeCrossing) continue;
 
-        if (digit2CTotalEnergy < 0.6) {
-          if (digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  numberofHadronDigits += weight;
-        } else {
-          const double digitHadronComponentIntensity = digit2CHadronComponentEnergy / digit2CTotalEnergy;
-          if (digitHadronComponentIntensity > m_CrystalHadronIntensityThreshold)  numberofHadronDigits += weight;
-        }
+      const double digit2CTotalEnergy = caldigit->getTwoComponentTotalEnergy();
+      const double digit2CHadronComponentEnergy = caldigit->getTwoComponentHadronEnergy();
 
-        nWaveforminCluster += weight;
+      cluster2CTotalEnergy += digit2CTotalEnergy;
+      cluster2CHadronEnergy += digit2CHadronComponentEnergy;
 
+      if (digit2CTotalEnergy < 0.6) {
+        if (digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  numberofHadronDigits += weight;
+      } else {
+        const double digitHadronComponentIntensity = digit2CHadronComponentEnergy / digit2CTotalEnergy;
+        if (digitHadronComponentIntensity > m_CrystalHadronIntensityThreshold)  numberofHadronDigits += weight;
       }
+
+      nWaveforminCluster += weight;
+
     }
 
     if (nWaveforminCluster > 0) {

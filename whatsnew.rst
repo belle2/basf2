@@ -16,6 +16,12 @@ be adapted when changing to the new release.
 Changes since release-03-00
 ===========================
 
+.. rubric:: Abort processing for invalid or missing global tags
+
+If users specify a global tag to be used which is either marked as invalid in
+the database or which cannot be found in the database the processing is now
+aborted.
+
 .. rubric:: Restrict usage of ``useDB=False`` for Geometry creation
 
 Creating the geometry from XML files instead of the configuration in the

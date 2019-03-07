@@ -61,15 +61,14 @@ namespace Belle2 {
     //!
     FILE* m_fp_in;
 
-    //    StoreArray<RawDataBlock> raw_dblkarray;
-    /*     StoreArray<RawCOPPER> rawcprarray; */
-    /*     StoreArray<RawCDC> raw_cdcarray; */
-    /*     StoreArray<RawSVD> raw_svdarray; */
-    /*     StoreArray<RawTOP> raw_bpidarray; */
-    /*     StoreArray<RawECL> raw_eclarray; */
-    /*     StoreArray<RawARICH> raw_epidarray; */
-    /*     StoreArray<RawKLM> raw_klmarray; */
-    /*     StoreArray<RawFTSW> raw_ftswarray; */
+    StoreArray<RawDataBlock> m_rawDataBlock; /**< RawDataBlock. */
+    StoreArray<RawCOPPER> m_rawCOPPER; /**< RawCOPPER. */
+    StoreArray<RawCDC> m_rawCDC; /**< RawCDC. */
+    StoreArray<RawSVD> m_rawSVD; /**< RawSVD. */
+    StoreArray<RawTOP> m_rawTOP; /**< RawTOP. */
+    StoreArray<RawECL> m_rawECL; /**< RawECL. */
+    StoreArray<RawARICH> m_rawARICH; /**< RawARICH. */
+    StoreArray<RawKLM> m_rawKLM; /**< RawKLM. */
 
     //!
     int* m_prev_buf;

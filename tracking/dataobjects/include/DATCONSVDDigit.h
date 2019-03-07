@@ -11,7 +11,6 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDModeByte.h>
 #include <framework/dataobjects/DigitBase.h>
 
 #include <cstdint>
@@ -30,8 +29,6 @@ namespace Belle2 {
   * It is used for the DATCON simulation, as DATCON has less information of the SVD hits
   * available compared to the usual SVDShaperDigits.
   * The DATCONSVDDigit holds a set of 6 raw APV25 signal samples taken on a strip.
-  * It also holds DAQ mode (3 or 6 samples) and trigger time information in an
-  * SVDModeByte structure, and time fit from FADC (when available).
   */
 
 //     class DATCONSVDDigit : public DigitBase {
@@ -57,18 +54,12 @@ namespace Belle2 {
     * @param isU True if u strip, false if v.
     * @param cellID Strip ID.
     * @param samples std::array of 6 APV raw samples.
-    * @param mode SVDModeByte structure, packed trigger time bin and DAQ
-    * mode.
     */
     template<typename T>
     DATCONSVDDigit(VxdID sensorID, bool isU, short cellID,
-                   T samples[c_nAPVSamples],
-                   SVDModeByte mode = SVDModeByte()):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_mode(mode.getID())
-      //m_totalCharge(0), m_maxSampleIndex(0)
+                   T samples[c_nAPVSamples]):
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
     {
-      m_totalCharge = 0;
-      m_maxSampleIndex = 0;
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
                      [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
                     );
@@ -79,17 +70,11 @@ namespace Belle2 {
     * @param isU True if u strip, false if v.
     * @param cellID Strip ID.
     * @param samples std::array of 6 APV raw samples.
-    * @param mode SVDModeByte structure, packed trigger time bin and DAQ
-    * mode.
     */
     template<typename T>
-    DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, T samples,
-                   SVDModeByte mode = SVDModeByte()) :
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID),
-      m_mode(mode.getID())//, m_totalCharge(0), m_maxSampleIndex(0)
+    DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, T samples) :
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
     {
-      m_totalCharge = 0;
-      m_maxSampleIndex = 0;
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
                      [](typename T::value_type x)->APVRawSampleType
       { return trimToSampleRange(x); }
@@ -100,7 +85,7 @@ namespace Belle2 {
     DATCONSVDDigit() : DATCONSVDDigit(
         0, true, 0, APVRawSamples( {{0, 0, 0, 0, 0, 0}})
     )
-    { }
+    {}
 
     /** Getter for the sensor ID. */
     VxdID getSensorID() const { return m_sensorID; }
@@ -172,10 +157,6 @@ namespace Belle2 {
       return m_maxSampleIndex;
     }
 
-
-    /** Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.  */
-    SVDModeByte getModeByte() const { return m_mode; }
-
     /**
     * Convert a value to sample range.
     * @param value to be converted
@@ -209,19 +190,15 @@ namespace Belle2 {
       [](APVFloatSampleType x) { return static_cast<APVRawSampleType>(x); });
     }
 
-    /** Setter for the SVDModeByte. */
-    void setSVDModeByte(SVDModeByte mode) { m_mode = mode; }
-
   private:
 
     VxdID::baseType m_sensorID;       /**< Compressed sensor identifier.*/
     bool m_isU;                       /**< True if U, false if V. */
     short m_cellID;                   /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples;          /**< 6 APV signals from the strip. */
-    SVDModeByte::baseType m_mode;     /**< Mode byte, trigger FADCTime + DAQ mode */
-    unsigned short m_maxSampleIndex;  /**< Index of charge of sample max */
-    unsigned short m_maxSampleCharge; /**< Charge of sample max */
     unsigned short m_totalCharge;     /**< Total charge of this DATCONSVDDigit */
+    unsigned short m_maxSampleCharge; /**< Charge of sample max */
+    unsigned short m_maxSampleIndex;  /**< Index of charge of sample max */
 
     ClassDef(DATCONSVDDigit, 1)
 

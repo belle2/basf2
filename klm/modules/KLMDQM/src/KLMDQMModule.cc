@@ -118,7 +118,7 @@ void KLMDQMModule::defineHistoBKLM()
                         40, 0, 200000000);
   h_moduleID->GetXaxis()->SetTitle("detector-module identifier");
   h_zStrips = new TH1F("zStrips", "z-measuring strip numbers of the 2D hit",
-                       100, 0, 54);
+                       54, 0, 54);
   h_zStrips->GetXaxis()->SetTitle("z-measuring strip numbers of the 2D hit");
   h_zStrips->SetOption("LIVE");
   h_phiStrip = new TH1F("phiStrip", "Phi strip number of muon hit",

@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
+#include <tracking/trackFindingCDC/filters/wireHit/ChooseableWireHitFilter.h>
 #include <vector>
 #include <string>
 #include <framework/database/DBObjPtr.h>
@@ -30,9 +30,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor
-      WireHitBackgroundDetector(): m_CDCWireHitRequirementsFromDB("CDCWireHitRequirements")
-      {
-      }
+      WireHitBackgroundDetector();
 
       /// Short description of the findlet
       std::string getDescription() final;
@@ -48,7 +46,8 @@ namespace Belle2 {
 
     private:
 
-      /// TODO: Chooseable WireHit filter to be used to filter background
+      /// Chooseable WireHit filter to be used to filter background
+      ChooseableWireHitFilter m_wireHitFilter;
 
       /// Cut values from the Data Base
       DBObjPtr<CDCWireHitRequirements> m_CDCWireHitRequirementsFromDB;

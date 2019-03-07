@@ -20,6 +20,12 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+WireHitBackgroundDetector::WireHitBackgroundDetector() : m_CDCWireHitRequirementsFromDB("CDCWireHitRequirements")
+{
+  // adding the filter as a subordinary processing signal listener.
+  this->addProcessingSignalListener(&m_wireHitFilter);
+}
+
 std::string WireHitBackgroundDetector::getDescription()
 {
   return "Marks hits as background based on the result of a filter.";
@@ -28,7 +34,7 @@ std::string WireHitBackgroundDetector::getDescription()
 void WireHitBackgroundDetector::exposeParameters(ModuleParamList* moduleParamList,
                                                  const std::string& prefix)
 {
-  // TODO: m_wireHitFilter.exposeParameters(moduleParamList, prefix);
+  m_wireHitFilter.exposeParameters(moduleParamList, prefix);
 }
 
 void WireHitBackgroundDetector::beginRun()
@@ -45,10 +51,15 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
   for (CDCWireHit& wireHit : wireHits) {
     bool markAsBackground = false;
 
-    if (wireHit.getRefChargeDeposit() < m_CDCWireHitRequirementsFromDB->getChargeCut()) {
-      B2INFO("CUT:   " << m_CDCWireHitRequirementsFromDB->getChargeCut());
+    Weight wireHitWeight = m_wireHitFilter(wireHit);
+    if (std::isnan(wireHitWeight)) {
       markAsBackground = true;
     }
+
+    //if (wireHit.getRefChargeDeposit() < m_CDCWireHitRequirementsFromDB->getChargeCut()) {
+    //  B2INFO("CUT:   " << m_CDCWireHitRequirementsFromDB->getChargeCut());
+    //  markAsBackground = true;
+    //}
 
     if (markAsBackground) {
       wireHit->setBackgroundFlag();

@@ -736,7 +736,7 @@ namespace Belle2 {
             TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
 
             if (requestedVariable == "recoilMass") output = momX.M();
-            if (requestedVariable == "recoilMassSqrd") output = momX.M2();
+            else if (requestedVariable == "recoilMassSqrd") output = momX.M2();
             else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
             else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
             else if (requestedVariable == "EW90") {

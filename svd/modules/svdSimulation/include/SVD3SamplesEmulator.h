@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDSHAPERDIGIT3SAMPLESMODULE_H
-#define SVDSHAPERDIGIT3SAMPLESMODULE_H
+#ifndef SVD3SAMPLESEMULATORMODULE_H
+#define SVD3SAMPLESEMULATORMODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -26,17 +26,17 @@
 namespace Belle2 {
   /**
    */
-  class SVDShaperDigit3SamplesModule : public Module {
+  class SVD3SamplesEmulatorModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    SVDShaperDigit3SamplesModule();
+    SVD3SamplesEmulatorModule();
 
     /** if required */
-    virtual ~SVDShaperDigit3SamplesModule();
+    virtual ~SVD3SamplesEmulatorModule();
 
     /** initializes the module */
     virtual void beginRun() override;
@@ -64,4 +64,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* SVDSHAPERDIGITSFROMTRACKSMODULE_H */
+#endif /* SVD3SAMPLESEMULATORMODULE_H */

@@ -8,20 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/simulation/SVDShaperDigit3Samples.h>
+#include <svd/modules/svdSimulation/SVD3SamplesEmulator.h>
 
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDShaperDigit3Samples)
+REG_MODULE(SVD3SamplesEmulator)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDShaperDigit3SamplesModule::SVDShaperDigit3SamplesModule() : Module()
+SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
 {
   B2DEBUG(1, "Constructor");
   // Set module properties
@@ -34,13 +34,13 @@ SVDShaperDigit3SamplesModule::SVDShaperDigit3SamplesModule() : Module()
            std::string("SVDShaperDigit3Samples"));
 }
 
-SVDShaperDigit3SamplesModule::~SVDShaperDigit3SamplesModule()
+SVD3SamplesEmulatorModule::~SVD3SamplesEmulatorModule()
 {
   B2DEBUG(20, "Destructor");
 }
 
 
-void SVDShaperDigit3SamplesModule::initialize()
+void SVD3SamplesEmulatorModule::initialize()
 {
   if (m_startingSample > 3 || m_startingSample < 0) {
     B2FATAL("The starting sample must be between 0 and 3, you set = " << m_startingSample);
@@ -59,12 +59,12 @@ void SVDShaperDigit3SamplesModule::initialize()
 }
 
 
-void SVDShaperDigit3SamplesModule::beginRun()
+void SVD3SamplesEmulatorModule::beginRun()
 {
 }
 
 
-void SVDShaperDigit3SamplesModule::event()
+void SVD3SamplesEmulatorModule::event()
 {
   StoreArray<SVDShaperDigit> ShaperDigit3Samples(m_outputArrayName);
   StoreArray<SVDShaperDigit> ShaperDigits(m_shaperDigitInput);
@@ -102,10 +102,10 @@ void SVDShaperDigit3SamplesModule::event()
   }
 }
 
-void SVDShaperDigit3SamplesModule::endRun()
+void SVD3SamplesEmulatorModule::endRun()
 {
 }
 
-void SVDShaperDigit3SamplesModule::terminate()
+void SVD3SamplesEmulatorModule::terminate()
 {
 }

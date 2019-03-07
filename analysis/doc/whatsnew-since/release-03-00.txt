@@ -59,6 +59,7 @@ Flavor Tagger
 * Nightly validation files updated test6_CPVAnalysisTools.py.
 * All example scripts use now variablesToNtuples and follow the current syntax and path rules.
 * Sphinx documentation is uptodate.
+* Added first set of unit tests
 
 Tutorials
 +++++++++

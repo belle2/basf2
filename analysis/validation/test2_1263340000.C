@@ -266,13 +266,27 @@ void plotDzero(TTree* ptree, TFile *outputFile){
   h_DmassNoCut_Mode6->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode6->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
 
+  TH1F* h_DzeromassNoCut_All = new TH1F("h_DzeromassNoCut_All",title,70,1,3);
+  h_DzeromassNoCut_All->Add(h_DmassNoCut_Mode6);
+  h_DzeromassNoCut_All->Add(h_DmassNoCut_Mode5);
+  h_DzeromassNoCut_All->Add(h_DmassNoCut_Mode4);
+  h_DzeromassNoCut_All->Add(h_DmassNoCut_Mode3);
+  h_DzeromassNoCut_All->Add(h_DmassNoCut_Mode2);
+  h_DzeromassNoCut_All->Add(h_DmassNoCut_Mode1);
+  h_DzeromassNoCut_All->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
+  h_DzeromassNoCut_All->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D0 for all modes  from D* decay"));
+  h_DzeromassNoCut_All->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
+  h_DzeromassNoCut_All->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  h_DzeromassNoCut_All->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+
   outputFile->cd();
-  h_DmassNoCut_Mode1->Write();
-  h_DmassNoCut_Mode2->Write();
-  h_DmassNoCut_Mode3->Write();
-  h_DmassNoCut_Mode4->Write();
-  h_DmassNoCut_Mode5->Write();
-  h_DmassNoCut_Mode6->Write();
+  //  h_DmassNoCut_Mode1->Write();
+  //h_DmassNoCut_Mode2->Write();
+  //h_DmassNoCut_Mode3->Write();
+  //h_DmassNoCut_Mode4->Write();
+  //h_DmassNoCut_Mode5->Write();
+  //h_DmassNoCut_Mode6->Write();
+  h_DzeromassNoCut_All->Write();
 }
 
 void plotDSTsig(TTree* ptree, TFile *outputFile){
@@ -298,9 +312,19 @@ void plotDSTsig(TTree* ptree, TFile *outputFile){
   h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   h_DmassNoCut_Mode8->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
 
+  TH1F* h_massdiff = new TH1F(*h_DmassNoCut_Mode8);
+  h_massdiff->Add(h_DmassNoCut_Mode7, -1.0);
+  h_massdiff->SetNameTitle("h_massdiff", title);
+  h_massdiff->GetXaxis()->SetTitle("massdiff in (GeV/c^{2})");
+  h_massdiff->GetListOfFunctions()->Add(new TNamed("Description", "difference in invariant mass of D^{*0} to D^{0}#gamma and D^{*0} to D^{0}#pi^{0}"));
+  h_massdiff->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
+  h_massdiff->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  h_massdiff->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+
   outputFile->cd();
-  h_DmassNoCut_Mode7->Write();
-  h_DmassNoCut_Mode8->Write();
+  //  h_DmassNoCut_Mode7->Write();
+  //h_DmassNoCut_Mode8->Write();
+  h_massdiff->Write();
 }
 
 void plotBtag( TTree* ptree, TFile *outputFile){
@@ -330,6 +354,40 @@ void plotBtag( TTree* ptree, TFile *outputFile){
   h_BtagMbc->Write();
 }
 
+void plotE( TTree* ptree, TFile *outputFile){
+  gStyle->SetOptStat(0);
+  gStyle->SetHistMinimumZero();
+
+  const char *title = "Electron properties";
+  TH1F* h_pE = new TH1F("h_pE",title,100,0.0,10.0);
+  ptree->Project("h_pE", "p","");
+  h_pE->GetXaxis()->SetTitle("momentum");
+  h_pE->GetListOfFunctions()->Add(new TNamed("Description", "Electron Momentum"));
+  h_pE->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
+  h_pE->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  h_pE->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+
+  outputFile->cd();
+  h_pE->Write();
+}
+
+
+void plotMu( TTree* ptree, TFile *outputFile){
+  gStyle->SetOptStat(0);
+  gStyle->SetHistMinimumZero();
+
+  const char *title = "Muon properties";
+  TH1F* h_pMu = new TH1F("h_pMu",title,50,0.0,5.0);
+  ptree->Project("h_pMu", "p","");
+  h_pMu->GetXaxis()->SetTitle("momentum");
+  h_pMu->GetListOfFunctions()->Add(new TNamed("Description", "Muon Momentum"));
+  h_pMu->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
+  h_pMu->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  h_pMu->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
+
+  outputFile->cd();
+  h_pMu->Write();
+}
 void test2_1263340000(){
 
   TString inputfile("../1263340000.ntup.root");
@@ -339,6 +397,8 @@ void test2_1263340000(){
   TTree * treeD0 =(TTree*)sample->Get("D0all");
   TTree * treeDSTsig=(TTree*)sample->Get("DSTsig");
   TTree * treeBtag=(TTree*)sample->Get("Btag");
+  TTree * treeE=(TTree*)sample->Get("Electron");
+  TTree * treeMu=(TTree*)sample->Get("Muon");
 
   TFile* outputFile = new TFile("1263340000_Validation.root","RECREATE");
   
@@ -347,6 +407,8 @@ void test2_1263340000(){
   plotDzero(treeD0,outputFile);
   plotDSTsig(treeDSTsig,outputFile);
   plotBtag(treeBtag,outputFile);
+  plotE(treeE,outputFile);
+  plotMu(treeMu,outputFile);
   outputFile->Close();
 
 }

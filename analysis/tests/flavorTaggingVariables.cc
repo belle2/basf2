@@ -74,9 +74,15 @@ namespace {
     }
   };
 
-  /** Test flavor tagging variables . */
+  /** Test flavor tagging variables running on each ROE. */
   TEST_F(FlavorTaggingVariablesTest, VariablesRunningForEachROE)
   {
+
+    /**In this function we test some of the variables used as input by the flavor tagger module.
+    *  Specifically, we test those variables that use information from the RestOfEvent dataobject.
+    *  In the flavor tagger module, these variables run within a loop for each ROE. */
+
+
     Gearbox& gearbox = Gearbox::getInstance();
     gearbox.setBackends({std::string("file:")});
     gearbox.close();
@@ -89,7 +95,7 @@ namespace {
     StoreArray<Particle> testsParticles;
 
 
-    /** Neutral particles to be added to the ROE */
+    /** Neutral particles to be added to the ROE:  we will add 5 photons. */
     vector<const Particle*> roeNeutralParticles;
 
     /** Vector containing the ConnectedRegionId and ClusterId for each neutral ROE ECLCluster */
@@ -120,7 +126,7 @@ namespace {
 
     }
 
-    /** Charged particles to be added to the ROE */
+    /** Charged particles to be added to the ROE: we will add 8 charged pions. */
     vector<const Particle*> roeChargedParticles;
     const float bField = 1.5;
     TMatrixDSym cov6(6);
@@ -173,7 +179,6 @@ namespace {
 
       /** Here we add charged ECL clusters for some tracks */
       if (i == 0 || i == 1 || i == 2 || i == 3) {
-        B2INFO("hi");
         ECLCluster ROEChargedECL;
         ROEChargedECL.setIsTrack(true);
         ROEChargedECL.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
@@ -234,17 +239,29 @@ namespace {
 
     /** Now we test the Flavor Tagger Input Variables */
     const Manager::Var* var = Manager::Instance().getVariable("BtagToWBosonVariables(recoilMass)");
+
+    /** In this kind of fatal assertion (see google tests docu), we check that the variable manager is
+    * not returning a null pointer instead of a pointer to the requested variable. */
     ASSERT_NE(var, nullptr);
 
+    /** This vector contains the expected output values of the variable "BtagToWBosonVariables(recoilMass)" for each
+     *  of the tracks in the ROE (reference values). */
     vector<double> refsBtagToWBosonRecoilMass{3.2093, 4.1099, 4.3019, 4.4436, 4.4924, 4.5995, 4.6493, 4.5963};
 
+    /** For all tracks in the ROE we want to check that the variable "BtagToWBosonVariables(recoilMass)"
+       returns the expected value.*/
     for (unsigned i = 0; i < roeChargedParticles.size(); i++) {
 
       double output = var -> function(roeChargedParticles[i]);
 
+      /** In this non-fatal assertion we compare the output of the variable "BtagToWBosonVariables(recoilMass)"
+      * with the reference value for the ith ROE track.
+      * The absolute difference should not exceed 0.0005.  */
       EXPECT_NEAR(output, refsBtagToWBosonRecoilMass[i], 0.0005);
 
     }
+
+    /** In the following, we repeat the procedure for the other flavor tagging variables that run for each ROE. */
 
     var = Manager::Instance().getVariable("BtagToWBosonVariables(recoilMassSqrd)");
     ASSERT_NE(var, nullptr);

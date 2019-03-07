@@ -287,7 +287,7 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
 
 def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters'):
     """
-    This function adds the standard reconstruction modules for tracking to be used for theq simulation of PXD data
+    This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data
     reduction to a path.
 
     :param path: The path to add the tracking reconstruction modules to

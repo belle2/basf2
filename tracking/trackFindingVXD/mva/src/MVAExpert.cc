@@ -20,8 +20,8 @@
 using namespace Belle2;
 
 MVAExpert::MVAExpert(const std::string& identifier,
-                     std::vector<Named<float*>>& namedVariables)
-  : m_namedVariables(namedVariables)
+                     std::vector<Named<float*>> namedVariables)
+  : m_allNamedVariables(std::move(namedVariables))
   , m_identifier(identifier)
 {
 }

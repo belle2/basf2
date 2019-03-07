@@ -28,6 +28,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
     root_input_file = 'ElecGenSimNoBkg.root'
+    # root_input_file = 'EvtGenSimNoBkg.root'
 
     @staticmethod
     def finder_module(path):
@@ -39,8 +40,11 @@ class toCDCfromEclCKF(TrackingValidationRun):
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksSVD")
 
         reconstruction.add_ecl_modules(path)
-        # path.add_module("EventT0Combiner")
-        # reconstruction.add_ecl_finalizer_module(path)
+
+        # needed for truth matching
+        tracking.add_mc_track_finding(path)
+        reconstruction.add_ecl_finalizer_module(path)
+        reconstruction.add_ecl_mc_matcher_module(path)
 
         path.add_module("TFCDC_WireHitPreparer",
                         wirePosition="aligned",
@@ -58,14 +62,18 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         #                relatedRecoTrackStoreArrayName="CKFCDCfromEclRecoTracks",
                         #                relationCheckForDirection="forward",
                         eclSeedRecoTrackStoreArrayName='EclSeedRecoTracks',
-                        outputRecoTrackStoreArrayName="CKFCDCfromEclRecoTracks",
+                        # outputRecoTrackStoreArrayName="CKFCDCfromEclRecoTracks",
+                        outputRecoTrackStoreArrayName="RecoTracks",
                         outputRelationRecoTrackStoreArrayName="EclSeedRecoTracks",
-                        writeOutDirection="backward",
-                        stateBasicFilterParameters={"maximalHitDistance": 0.75},
-                        stateExtrapolationFilterParameters={
-                            "extrapolationDirection": "backward", "maximalHitDistanceEclSeed": 30.0},
+                        writeOutDirection="forward",
+                        stateBasicFilterParameters={
+                            "maximalHitDistance": 0.75,
+                            "maximalHitDistanceEclSeed": 30.0,
+                            "returnWeight": 1.},
+                        stateExtrapolationFilterParameters={"extrapolationDirection": "backward"},
                         pathFilter="arc_length",
-                        inputECLshowersStoreArrayName="ECLShowers")
+                        inputECLshowersStoreArrayName="ECLShowers",
+                        )
 
         # path.add_module(cdcckf,
         #                inputWireHits="CDCWireHitVector",
@@ -78,15 +86,18 @@ class toCDCfromEclCKF(TrackingValidationRun):
         #                stateBasicFilterParameters={"maximalHitDistance": 0.75},
         #                pathFilter="arc_length")
 
-        path.add_module("RelatedTracksCombiner",
-                        #                CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
-                        CDCRecoTracksStoreArrayName="CKFCDCfromEclRecoTracks",
-                        VXDRecoTracksStoreArrayName="RecoTracksSVD",
-                        recoTracksStoreArrayName="RecoTracks")
+        # Do not combine tracks for testing
+        # path.add_module("RelatedTracksCombiner",
+        #                #                CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
+        #                CDCRecoTracksStoreArrayName="CKFCDCfromEclRecoTracks",
+        #                VXDRecoTracksStoreArrayName="RecoTracksSVD",
+        #                recoTracksStoreArrayName="RecoTracks")
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 
         path.add_module('TrackCreator', recoTrackColName='RecoTracks')
+
+        path.add_module("PrintCollections", printForEvent=-1)
 
     tracking_coverage = {
         'UsePXDHits': False,

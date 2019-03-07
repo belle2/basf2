@@ -59,7 +59,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     // TODO: TrackLoader checks if RecoTrack present in relatedRecoTrackStoreArrayName. Does this have to be done?
     // Also does something with relationCheckForDirection, is this necessary?
 
-    // choose photon hypothesis since electrons not used?! Talk to Torben.
     if (shower.getHypothesisId() != ECLShower::c_nPhotons) {
       continue;
     }
@@ -69,7 +68,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
       continue;
     }
 
-    // TODO: how is R defined? Is that actually what I want?
     const double thetaClus  = shower.getTheta();
     const double phiClus  = shower.getPhi();
     const double rClus  = shower.getR();
@@ -100,31 +98,36 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     // for now: neglect correlations
     double covArray[6];
     shower.getCovarianceMatrixAsArray(covArray);
+    // ECLShower: depth of 15cm assumed (use that is uncertainty of radius)
     double dx2 = rClus * cosTheta * cosPhi * rClus * cosTheta * cosPhi * covArray[5]
-                 + rClus * sinTheta * sinPhi * rClus * sinTheta * sinPhi * covArray[2];
-    // + what to do about R?
+                 + rClus * sinTheta * sinPhi * rClus * sinTheta * sinPhi * covArray[2]
+                 + 15 * sinTheta * cosPhi * 15 * sinTheta * cosPhi;
     double dy2 = rClus * cosTheta * sinPhi * rClus * cosTheta * sinPhi * covArray[5]
-                 + rClus * sinTheta * cosPhi * rClus * sinTheta * cosPhi * covArray[2];
-    // + what to do about R?
-    double dz2 = rClus * sinTheta * rClus * sinTheta * covArray[5];
-    // + what to do about R?
+                 + rClus * sinTheta * cosPhi * rClus * sinTheta * cosPhi * covArray[2]
+                 + 15 * sinTheta * cosPhi * 15 * sinTheta * cosPhi;
+    double dz2 = rClus * sinTheta * rClus * sinTheta * covArray[5]
+                 + 15 * sinTheta * cosPhi * 15 * sinTheta * cosPhi;
+
     // As no helix extrapolation is done this is only a very rough momentum estimate
     // Set cov matrix to high values!
+    // Otherwise, get uncertainty on energy as covArray[0]
     double dpx2 = 0.25 * mom.X() * mom.X();
     double dpy2 = 0.25 * mom.Y() * mom.Y();
     double dpz2 = 0.25 * mom.Z() * mom.Z();
-    cov(0, 0) = dx2 * 10;
-    cov(1, 1) = dy2 * 10;
-    cov(2, 2) = dz2 * 10;
-    cov(3, 3) = dpx2 * 10;
-    cov(4, 4) = dpy2 * 10;
-    cov(5, 5) = dpz2 * 10;
-    // TODO: this is a shared pointer, so do I need to create two instances for Neg/Pos hypothesis?
-    genfit::SharedPlanePtr plane(new genfit::DetPlane(pos, pos));
-    msopNeg.setPosMomCov(pos, mom, cov);
-    msopNeg.setPlane(plane);
+
+    cov(0, 0) = dx2;
+    cov(1, 1) = dy2;
+    cov(2, 2) = dz2;
+    cov(3, 3) = dpx2;
+    cov(4, 4) = dpy2;
+    cov(5, 5) = dpz2;
+
+    genfit::SharedPlanePtr planePos(new genfit::DetPlane(pos, pos));
+    genfit::SharedPlanePtr planeNeg(new genfit::DetPlane(pos, pos));
     msopPos.setPosMomCov(pos, mom, cov);
-    msopPos.setPlane(plane);
+    msopPos.setPlane(planePos);
+    msopNeg.setPosMomCov(pos, mom, cov);
+    msopNeg.setPlane(planeNeg);
 
     //B2INFO("Pos: " << pos.X() << " (" << sqrt(dx2) << "), " << pos.Y() << " (" << sqrt(dy2) << "), " << pos.Z() << " (" << sqrt(dz2) << ")");
     //B2INFO("Mom: " << mom.X() << " (" << sqrt(dpx2) << "), " << mom.Y() << " (" << sqrt(dpy2) << "), " << mom.Z() << " (" << sqrt(dpz2) << ")");

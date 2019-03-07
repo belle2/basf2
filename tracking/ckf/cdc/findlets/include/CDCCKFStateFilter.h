@@ -64,12 +64,9 @@ namespace Belle2 {
       TrackFindingCDC::Weight weight;
 
       for (CDCCKFState& nextState : nextStates) {
-        B2INFO("---> New path");
-
         weight = m_preFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2INFO("     PreFilter lost");
           continue;
         }
 
@@ -79,7 +76,6 @@ namespace Belle2 {
         weight = m_basicFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2INFO("     BasicFilter lost");
           continue;
         }
 
@@ -87,7 +83,6 @@ namespace Belle2 {
         weight = m_extrapolationFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2INFO("     ExtrapolationFilter lost");
           continue;
         }
 
@@ -98,11 +93,8 @@ namespace Belle2 {
         weight = m_finalSelection({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2INFO("     FinalFilter lost");
           continue;
         }
-
-        B2INFO(" ---> ACCEPTED!");
       }
 
       B2DEBUG(100, "Starting with " << nextStates.size() << " possible hits");

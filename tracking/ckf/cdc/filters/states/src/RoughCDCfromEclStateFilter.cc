@@ -25,7 +25,10 @@ TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStat
 
   const double& arcLength = state.getArcLength() - lastState.getArcLength();
 
-  B2INFO("arcLength: " << arcLength << " (" << state.getArcLength() << " - " << lastState.getArcLength() << ")");
+//  B2INFO("-> new path");
+//  B2INFO(" isSeed: " << lastState.isSeed());
+
+//  B2INFO(" arcLength: " << arcLength << " (" << state.getArcLength() << " - " << lastState.getArcLength() << ")");
 
   // TODO: magic number
   if (!lastState.isSeed() and (arcLength >= 0 or arcLength < -20)) {
@@ -37,7 +40,7 @@ TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStat
 
   const double& hitDistance = state.getHitDistance();
 
-  B2INFO("hitDistance: " << hitDistance);
+//  B2INFO(" hitDistance: " << hitDistance);
 
   if (!lastState.isSeed() and std::abs(hitDistance) > m_maximalHitDistance) {
     return NAN;
@@ -45,6 +48,8 @@ TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStat
   if (lastState.isSeed() and std::abs(hitDistance) > m_maximalHitDistanceSeed) {
     return NAN;
   }
+
+//  B2INFO(" -> accepted");
 
   return 1;
 }

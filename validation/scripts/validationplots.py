@@ -91,17 +91,19 @@ def find_root_object(root_objects, **kwargs):
         for rootobject in root_objects:
             for value in desired_values:
                 try:
+                    # todo: huh, this doesn't look like we need a regexp for this /klieret
                     __ = re.search("^" + value + "$", rootobject.data[sieve])
                     if __ is not None:
                         results.append(rootobject)
                 except IndexError:
                     continue
         return results
-    # If no filer is given there will be no output
+    # If no filter is given there will be no output
     else:
         return []
 
 
+# todo: no reason to have this as a function. Called exactly once. /klieret
 def serve_existing_plots(revisions):
     """
     Goes to the folder where
@@ -272,13 +274,13 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     # Now create the ROOT objects for the plot and the reference objects,
     # and get the lists of keys and packages
     plot_objects, plot_keys, plot_packages = \
-        create_tobjects_from_list(
+        tobjects_from_files(
             plot_files,
             False,
             work_folder
         )
     reference_objects, reference_keys, reference_packages = \
-        create_tobjects_from_list(
+        tobjects_from_files(
             reference_files,
             True,
             work_folder
@@ -338,8 +340,6 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         # Now we loop over all files that belong to the package to
         # group the plots correctly
         for rootfile in files_in_pkg:
-            # todo: remove, only for debugging
-            # time.sleep(2.5)
             file_name, file_ext = os.path.splitext(rootfile)
 
             # Some more information to be printed out while plots are
@@ -385,6 +385,9 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
             compare_ntuples = []
             compare_html_content = []
             has_reference = False
+            # todo: this is very questionable way of doing this: looping a over a list
+            # of keys and then doing searches instead of just using dictionaries in
+            # the first place
             for key in sorted(keys):
 
                 # Find all objects for the Plotuple that is defined by the
@@ -448,6 +451,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                         )
                     )
 
+            # todo: add description field here
             compare_file = json_objects.ComparisonPlotFile(
                 title=file_name,
                 package=package,
@@ -585,7 +589,7 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         print()
 
 
-def create_tobjects_from_list(root_files, is_reference, work_folder):
+def tobjects_from_files(root_files, is_reference, work_folder):
     """
     Takes a list of root files, loops over them and creates the RootObjects
     for it. It then returns the list of RootObjects, a list of all keys,
@@ -610,9 +614,9 @@ def create_tobjects_from_list(root_files, is_reference, work_folder):
         # Create the RootObjects from this file and store them, as well as the
         file_objects, \
             file_keys, \
-            file_package = create_tobjects_from_file(root_file,
-                                                     is_reference,
-                                                     work_folder)
+            file_package = tobjects_from_file(root_file,
+                                              is_reference,
+                                              work_folder)
 
         # Append results to the global results
         list_objects += file_objects
@@ -623,10 +627,11 @@ def create_tobjects_from_list(root_files, is_reference, work_folder):
     list_keys = sorted(list(set(list_keys)))
     list_packages = sorted(list(set(list_packages)))
 
+    # todo: this is a terrible signature, why don't we just give back {package: file_keys: file_objects}
     return list_objects, list_keys, list_packages
 
 
-def create_tobjects_from_file(root_file, is_reference, work_folder):
+def tobjects_from_file(root_file, is_reference, work_folder):
     """
     Takes a root file, loops over its contents and creates the RootObjects
     for it. It then returns the list of RootObjects, a list of all keys,
@@ -668,6 +673,9 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
         file_keys.append(name)
 
         metaoptions = []
+        description = "n/a"
+        check = "n/a"
+        contact = "n/a"
 
         # temporary workaround for dbstore files located (wrongly)
         # in the validation results folder
@@ -677,10 +685,13 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
         # Get the ROOT object that belongs to that Key. If there is no
         # object, continue
         root_object = tfile.Get(name)
-        if (not root_object) or (root_object is None):
+        if not root_object:
+            continue
+        if root_object is None:
             continue
 
         # Determine which type of object it is, i.e. TH1, TH2 or TNtuple
+
         if root_object.InheritsFrom('TNtuple'):
             root_object_type = 'TNtuple'
         # this will also match TProfile, as this root class derives from
@@ -712,11 +723,6 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
                 root_object.SetDirectory(0)
 
             # Read out meta information:
-            # DescriptionDescription, Check and Contact
-            # Initialize as None objects
-            description = None
-            check = None
-            contact = None
 
             # Now check if the data exists in the ROOT file and if so, read it
             if root_object.FindObject('Description'):
@@ -725,12 +731,6 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
                 check = root_object.FindObject('Check').GetTitle()
             if root_object.FindObject('Contact'):
                 contact = root_object.FindObject('Contact').GetTitle()
-
-            # Empty fields are filled with 'n/a'
-            for metadatum in [description, check, contact]:
-                # .GetTitle() returns 'None', if there is no title
-                if metadatum is None:
-                    metadatum = 'n/a'
 
             # Now check for meta-options (colz, log-scale, etc.)
             metaoptions = []
@@ -758,22 +758,23 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
                 ntuple_values[leaf.GetName()] = leaf.GetValue()
 
             # Get description, check and contact
-            description = root_object.GetAlias('Description')
-            check = root_object.GetAlias('Check')
-            contact = root_object.GetAlias('Contact')
+            _description = root_object.GetAlias('Description')
+            _check = root_object.GetAlias('Check')
+            _contact = root_object.GetAlias('Contact')
 
-            # Empty fields are filled with 'n/a'
-            for metadatum in [description, check, contact]:
-                # .GetAlias() returns '' (empty string), if there is no alias
-                if metadatum == '':
-                    metadatum = 'n/a'
+            if _description:
+                description = _description
+            if _check:
+                check = _check
+            if _contact:
+                contact = _contact
 
             # Now check for meta-options (colz, log-scale, etc.)
-            metaoptions = root_object.GetAlias('MetaOptions')
-            if metaoptions:
+            _metaoptions = root_object.GetAlias('MetaOptions')
+            if _metaoptions:
                 # If there are meta-options, split the string on commas and
                 # remove unnecessary whitespaces
-                metaoptions = [_.strip() for _ in metaoptions.split(',')]
+                metaoptions = [_.strip() for _ in _metaoptions.split(',')]
 
             # Overwrite 'root_object' with the dictionary that contains the
             # values, because the values are what we want to save, and we
@@ -781,17 +782,13 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
             # n-tuples :-)
             root_object = ntuple_values
         elif root_object_type == 'TNamed':
-            # TODO Set this to correct values
-            description = None
-            check = None
-            contact = None
+            # TODO Set description, check, contact somehow?
+            pass
         elif root_object_type == 'TASImage':
-            # TODO Set this to correct values
-            description = None
-            check = None
-            contact = None
-        # If it is neither an histogram nor an n-tuple, we skip it!
+            # TODO Set description, check, contact somehow?
+            pass
         else:
+            # Skip all others
             continue
 
         # Create the RootObject and append it to the results
@@ -815,6 +812,7 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
     # Close the ROOT file before we open the next one!
     tfile.Close()
 
+    # todo: this is a terrible signature, why don't we just give back {package: file_keys: file_objects}
     return file_objects, file_keys, package
 
 
@@ -884,8 +882,7 @@ class RootObject:
                 False for revision objects.
         """
 
-        # TO DO
-        # All of the following could be simplified, if one modified the
+        # todo: All of the following could be simplified, if one modified the
         # find_root_object() method to search through vars(Root-Object)
 
         # A dict with all information about the Root-object

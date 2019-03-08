@@ -902,16 +902,39 @@ void CDCDatabaseImporter::importCDCWireHitRequirements(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
 
-  DBImportObjPtr<CDCWireHitRequirements> dbWireHitReq;
-  dbWireHitReq.construct();
+  int minADC = 0.0;          // Cut value for ADC
+  int minTOT = 0.0;          // Cut value for TOT
+  int maxTOT = 100;          // Cut value for TOT
+  double minADCOverTOT = 0.0;      // Cut value for ADC/TOT
 
-  double chargeCut = 0.0;
+  if (stream >> minADC) {
+  } else {
+    B2ERROR("Cannot get int minADC from " << fileName);
+    return;
+  }
 
-  if (stream >> chargeCut) {
-    dbWireHitReq->setChargeCut(chargeCut);
+  if (stream >> minTOT) {
+  } else {
+    B2ERROR("Cannot get int minADC from " << fileName);
+    return;
+  }
+
+  if (stream >> maxTOT) {
+  } else {
+    B2ERROR("Cannot get int maxTOT from " << fileName);
+    return;
+  }
+
+  if (stream >> minADCOverTOT) {
+  } else {
+    B2ERROR("Cannot get double minADCOverTOT from " << fileName);
+    return;
   }
 
   stream.close();
+
+  DBImportObjPtr<CDCWireHitRequirements> dbWireHitReq;
+  dbWireHitReq.construct(minADC, minTOT, maxTOT, minADCOverTOT);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -924,7 +947,11 @@ void CDCDatabaseImporter::printCDCWireHitRequirements()
 {
 
   DBObjPtr<CDCWireHitRequirements> dbWireHitReq;
-  dbWireHitReq->dump();
+  if (dbWireHitReq.isValid()) {
+    dbWireHitReq->dump();
+  } else {
+    B2WARNING("DBObjPtr<CDCWireHitRequirements> not valid for the current run.");
+  }
 }
 
 

@@ -27,7 +27,8 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCWireHitRequirements(double chargeCut) : m_chargeCut(chargeCut)
+    CDCWireHitRequirements(int minADC, int minTOT, int maxTOT, double minADCOverTOT) :
+      m_minADC(minADC), m_minTOT(minTOT), m_maxTOT(maxTOT), m_minADCOverTOT(minADCOverTOT)
     {
     }
 
@@ -38,30 +39,49 @@ namespace Belle2 {
     {
     }
 
-    /** Getter for FADC threshold */
-    double getChargeCut() const
+    /** Getter for ADC min threshold */
+    int getMinADC() const
     {
-      return m_chargeCut;
+      return m_minADC;
     }
 
-    /** Setter for FADC threshold */
-    void setChargeCut(double chargeCut)
+    /** Getter for TOT min threshold */
+    int getMinTOT() const
     {
-      m_chargeCut = chargeCut;
+      return m_minTOT;
     }
+
+    /** Getter for TOT max threshold */
+    int getMaxTOT() const
+    {
+      return m_maxTOT;
+    }
+
+    /** Getter for ADC/TOT min threshold */
+    double getMinADCOverTOT() const
+    {
+      return m_minADCOverTOT;
+    }
+
 
     /** Print content */
     void dump() const
     {
       std::cout << " " << std::endl;
       std::cout << "CDCWireHit requirements" << std::endl;
-      std::cout << "Charge > " << getChargeCut() << std::endl;
+      std::cout << "ADC > " << getMinADC() << std::endl;
+      std::cout << "TOT > " << getMinTOT() << std::endl;
+      std::cout << "TOT < " << getMaxTOT() << std::endl;
+      std::cout << "ADC/TOT > " << getMinADCOverTOT() << std::endl;
     }
 
   private:
-    double m_chargeCut = 0.0;          /**< Cut value for FADC */
+    int m_minADC = 0.0;          // Cut value for ADC
+    int m_minTOT = 0.0;          // Cut value for TOT
+    int m_maxTOT = 100;          // Cut value for TOT
+    double m_minADCOverTOT = 0.0;      // Cut value for ADC/TOT
 
-    ClassDef(CDCWireHitRequirements, 2); /**< ClassDef */
+    ClassDef(CDCWireHitRequirements, 3); // ClassDef
   };
 
 } // end namespace Belle2

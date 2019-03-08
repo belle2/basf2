@@ -154,7 +154,7 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
 void ARICHChannelHist::fillBin(unsigned hapdID, unsigned chID)
 {
   unsigned chIndex = 0;
-  if (m_type == 1) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
+  if (m_type == 0) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
   if (m_type == 2) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 4 + chID + 1;
   SetBinContent(chIndex, GetBinContent(chIndex) + 1);
 }
@@ -162,7 +162,7 @@ void ARICHChannelHist::fillBin(unsigned hapdID, unsigned chID)
 void ARICHChannelHist::setBinContent(unsigned hapdID, unsigned chID, double value)
 {
   unsigned chIndex = 0;
-  if (m_type == 1) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
+  if (m_type == 0) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
   if (m_type == 2) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 4 + chID + 1;
   SetBinContent(chIndex, value);
 }

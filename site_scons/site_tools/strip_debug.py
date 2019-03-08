@@ -4,9 +4,8 @@
 from SCons.Action import Action
 
 strip_debug_action = Action(
-    'objcopy --only-keep-debug ${TARGET} ${TARGET.dir}/.debug/${TARGET.file}.debug && '
-    'strip --strip-debug --strip-unneeded ${TARGET} && '
-    'objcopy --add-gnu-debuglink=${TARGET.dir}/.debug/${TARGET.file}.debug ${TARGET}',
+    'objcopy --only-keep-debug --compress-debug-sections ${TARGET} ${TARGET.dir}/.debug/${TARGET.file}.debug && '
+    'objcopy --strip-debug --strip-unneeded --add-gnu-debuglink ${TARGET.dir}/.debug/${TARGET.file}.debug ${TARGET}',
     "${STRIPCOMSTR}", chdir=False)
 
 

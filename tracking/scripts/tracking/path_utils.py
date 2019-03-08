@@ -243,8 +243,7 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
 
 
 def add_svd_track_finding(path, components, input_reco_tracks, output_reco_tracks, svd_ckf_mode="VXDTF2_after",
-                          use_mc_truth=False, add_both_directions=True, temporary_reco_tracks="SVDRecoTracks",
-                          vxdtf2_mva_weight_file=None, **kwargs):
+                          use_mc_truth=False, add_both_directions=True, temporary_reco_tracks="SVDRecoTracks", **kwargs):
     """Add SVD track finding to the path"""
 
     if not is_svd_used(components):
@@ -306,7 +305,6 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
 
     elif svd_ckf_mode == "VXDTF2_alone":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
-
         path.add_module('VXDCDCTrackMerger',
                         CDCRecoTrackColName=input_reco_tracks,
                         VXDRecoTrackColName=temporary_reco_tracks)
@@ -573,7 +571,8 @@ def add_vxd_track_finding_vxdtf2(
     :param min_SPTC_quality: minimal qualityIndicator value to keeps SPTCs after the QualityEstimation.
                                  0 means no cut. Default: 0
     :param filter_overlapping: Whether to use SVDOverlapResolver, Default: True
-    :param use_mva_qe: Whether to use the MVA Quality Estimator, if weight file is available. Default: False.
+    :param use_vxdtf2_quality_estimator: Whether to use the MVA Quality Estimator, if weight file is
+    available.Default: False.
     """
     ##########################
     # some setting for VXDTF2

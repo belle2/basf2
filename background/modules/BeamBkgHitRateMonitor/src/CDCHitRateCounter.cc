@@ -44,7 +44,7 @@ namespace Belle2 {
 
       // accumulate hits
       /* either count all */
-      rates.averageRate = m_digits.getEntries();
+      rates.averageRate += m_digits.getEntries();
       /* or count selected ones only
       for(const auto& digit: m_digits) {
       // select digits to count (usualy only good ones)

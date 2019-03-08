@@ -99,16 +99,25 @@ void AllParticleCombinerModule::event()
 
     StoreObjPtr<ParticleList> plist(m_inputListNames[iList]);
     for (unsigned int i = 0; i < plist->getListSize(); ++i) {
+      bool addParticle = true;
       Particle* particle = plist->getParticle(i, true);
-      int particleArrayIndex = particle->getArrayIndex();
-      if (std::find(daughterIndices.begin(), daughterIndices.end(), particleArrayIndex) != daughterIndices.end()) {
-        continue;
+      for (auto* daughter : particle->getFinalStateDaughters()) {
+        int particleArrayIndex = daughter->getArrayIndex();
+        if (std::find(daughterIndices.begin(), daughterIndices.end(), particleArrayIndex) != daughterIndices.end()) {
+          addParticle = false;
+          break;
+        }
       }
-      daughterIndices.push_back(particleArrayIndex);
-      px += particle->getPx();
-      py += particle->getPy();
-      pz += particle->getPz();
-      E += particle->getEnergy();
+      if (addParticle) {
+        for (auto* daughter : particle->getFinalStateDaughters()) {
+          int particleArrayIndex = daughter->getArrayIndex();
+          daughterIndices.push_back(particleArrayIndex);
+        }
+        px += particle->getPx();
+        py += particle->getPy();
+        pz += particle->getPz();
+        E += particle->getEnergy();
+      }
     }
   }
 

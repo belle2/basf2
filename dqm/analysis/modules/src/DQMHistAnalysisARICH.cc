@@ -77,6 +77,15 @@ void DQMHistAnalysisARICHModule::initialize()
   }
   m_c_mergerHit = new TCanvas("ARICH/c_mergerHitModified");
 
+  channelHist = new Belle2::ARICHChannelHist("ARICHExpert/chHist",
+                                             "# of hits/channel"); /**<ARICH TObject to draw hit map for each channel*/
+  m_c_channelHist = new TCanvas("ARICHExpert/c_channelHist");
+  apdHist = new Belle2::ARICHChannelHist("ARICHExpert/apdHist", "# of hits/APD", 2); /**<ARICH TObject to draw hit map for each APD*/
+  m_c_apdHist = new TCanvas("ARICHExpert/c_apdHist");
+  hapdHist = new Belle2::ARICHChannelHist("ARICHExpert/hapdHist", "# of hits/HAPD",
+                                          1); /**<ARICH TObject to draw hit map for each HAPD*/
+  m_c_hapdHist = new TCanvas("ARICHExpert/c_hapdHist");
+
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }
 
@@ -100,6 +109,43 @@ void DQMHistAnalysisARICHModule::event()
     m_c_mergerHit->Modified();
   } else {
     B2INFO("Histogram named mergerHit is not found.");
+  }
+
+  //Draw 2D hit map of channels and APDs
+  TH1* m_h_chHit = findHist("ARICH/chHit");/**<The number of hits in each channels*/
+  if (m_h_chHit != NULL) {
+    for (int i = 1; i < 421; i++) {
+      int apdHit[4] = {};
+      for (int j = 0; j < 144; j++) {
+        int ch = (i - 1) * 144 + j;
+        channelHist->setBinContent(i, j, m_h_chHit->GetBinContent(ch + 1));
+        apdHit[j / 36] += m_h_chHit->GetBinContent(ch + 1);
+      }
+      for (int j = 0; j < 4; j++) {
+        apdHist->setBinContent(i, j, apdHit[j]);
+      }
+    }
+    m_c_channelHist->Clear();
+    m_c_channelHist->cd();
+    channelHist->Draw();
+    m_c_apdHist->Clear();
+    m_c_apdHist->cd();
+    apdHist->Draw();
+  } else {
+    B2INFO("Histogram named chHit is not found.");
+  }
+
+  //Draw 2D hit map of HAPDs
+  TH1* m_h_hapdHit = findHist("ARICH/hapdHit");/**<The number of hits in each HAPDs*/
+  if (m_h_hapdHit != NULL) {
+    for (int i = 1; i < 421; i++) {
+      hapdHist->setBinContent(i, m_h_hapdHit->GetBinContent(i));
+    }
+    m_c_hapdHist->Clear();
+    m_c_hapdHist->cd();
+    hapdHist->Draw();
+  } else {
+    B2INFO("Histogram named hapdHit is not found.");
   }
 
 }

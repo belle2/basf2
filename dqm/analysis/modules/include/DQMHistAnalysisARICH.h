@@ -18,6 +18,9 @@
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
+//ARICH
+#include <arich/utility/ARICHChannelHist.h>
+
 #include <TCanvas.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -86,6 +89,13 @@ namespace Belle2 {
     //TObjects for DQM analysis
     TLine* m_LineForMB[5] = {}; /**<Lines to divide the sectors on mergerHit histogram*/
     TCanvas* m_c_mergerHit = NULL; /**<Canvas for modified mergerHit histogram*/
+
+    Belle2::ARICHChannelHist* channelHist = NULL; /**<ARICH TObject to draw hit map for each channel*/
+    TCanvas* m_c_channelHist = NULL; /**<Canvas for 2D hit map of channels*/
+    Belle2::ARICHChannelHist* apdHist = NULL; /**<ARICH TObject to draw hit map for each APD*/
+    TCanvas* m_c_apdHist = NULL; /**<Canvas for 2D hit map of APDs*/
+    Belle2::ARICHChannelHist* hapdHist = NULL; /**<ARICH TObject to draw hit map for each HAPD*/
+    TCanvas* m_c_hapdHist = NULL; /**<Canvas for 2D hit map of HAPDs*/
 
   };
 

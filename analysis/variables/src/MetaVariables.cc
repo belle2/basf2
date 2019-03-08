@@ -582,29 +582,36 @@ endloop:
 
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 3) {
+      if (arguments.size() == 5) {
         // have to tell cppcheck that these lines are fine, because it doesn't
         // support the lambda function syntax and throws a (wrong) variableScope
 
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
+        int agrandDaughterNumber = 0;
+        int bgrandDaughterNumber = 0;
         try {
           // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+          agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
+          bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First two arguments of grandDaughterDiffOf meta function must be integers!");
+          B2WARNING("First four arguments of grandDaughterDiffOf meta function must be integers!");
           return nullptr;
         }
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
-        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[4]);
+        auto func = [var, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
+        bgrandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
+          if (agrandDaughterNumber >= int((particle->getDaughter(iDaughterNumber))->getNDaughters()) || bgrandDaughterNumber >= int((particle->getDaughter(jDaughterNumber))->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
           else {
-            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0));
+            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber));
             return diff;}
         };
         return func;
@@ -658,30 +665,37 @@ endloop:
 
     Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 2) {
+      if (arguments.size() == 4) {
         // have to tell cppcheck that these lines are fine, because it doesn't
         // support the lambda function syntax and throws a (wrong) variableScope
 
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
+        int agrandDaughterNumber = 0;
+        int bgrandDaughterNumber = 0;
         try {
           // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+          agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
+          bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of grandDaughterDiffOfPhi meta function must be integers!");
+          B2WARNING("The four arguments of grandDaughterDiffOfPhi meta function must be integers!");
           return nullptr;
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
-        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+        auto func = [var, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
+        bgrandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
+          if (agrandDaughterNumber >= int((particle->getDaughter(iDaughterNumber))->getNDaughters()) || bgrandDaughterNumber >= int((particle->getDaughter(jDaughterNumber))->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
           else
           {
-            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0));
+            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber));
             if (fabs(diff) > M_PI)
             {
               if (diff > M_PI) {
@@ -747,33 +761,40 @@ endloop:
 
     Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 2) {
+      if (arguments.size() == 4) {
         // have to tell cppcheck that these lines are fine, because it doesn't
         // support the lambda function syntax and throws a (wrong) variableScope
 
         // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
+        int agrandDaughterNumber = 0;
+        int bgrandDaughterNumber = 0;
         try {
           // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+          agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
+          bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of grandDaughterDiffOfClusterPhi meta function must be integers!");
+          B2WARNING("The four arguments of grandDaughterDiffOfClusterPhi meta function must be integers!");
           return nullptr;
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
-        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+        auto func = [var, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
+        bgrandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
+          if (agrandDaughterNumber >= int((particle->getDaughter(iDaughterNumber))->getNDaughters()) || bgrandDaughterNumber >= int((particle->getDaughter(jDaughterNumber))->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
           else
           {
-            if (std::isnan(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0))) or std::isnan(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0))))
+            if (std::isnan(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber))) or std::isnan(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber))))
               return std::numeric_limits<float>::quiet_NaN();
 
-            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(0)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(0));
+            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber));
             if (fabs(diff) > M_PI)
             {
               if (diff > M_PI) {

@@ -34,6 +34,8 @@
 //ROOT
 #include <TVector3.h>
 
+#include <boost/lexical_cast.hpp>
+
 #include <cmath>
 #include <stack>
 
@@ -1050,6 +1052,46 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterOnlyInvariantMass(const Particle* part)
+    {
+      int nDaughters = int(part->getNDaughters());
+      TLorentzVector sum;
+
+      if (nDaughters < 1) {
+        return part->getMass();
+      } else {
+        int nClusterDaughters = 0;
+        std::stack<const Particle*> stacked;
+        stacked.push(part);
+        while (!stacked.empty()) {
+          const Particle* current = stacked.top();
+          stacked.pop();
+
+          const ECLCluster* cluster = current->getECLCluster();
+          if (cluster) {
+            const ECLCluster::EHypothesisBit clusterBit = current->getECLClusterEHypothesisBit();
+            nClusterDaughters ++;
+            ClusterUtils clutls;
+            TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterBit);
+            sum += p4Cluster;
+          } else {
+            const std::vector<Particle*> daughters = current->getDaughters();
+            nDaughters = int(current->getNDaughters());
+            for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+              stacked.push(daughters[iDaughter]);
+            }
+          }
+        }
+
+        if (nClusterDaughters < 1) {
+          B2WARNING("There are no clusters amongst the daughters of the provided particle!");
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        B2DEBUG(10, "Number of daughters with cluster associated = " << nClusterDaughters);
+        return sum.M();
+      }
+    }
+
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, "uncorrelated E over P, a convenience alias for ( clusterE / p )");
@@ -1172,6 +1214,9 @@ Since release-04-00-00 it is possible for a cluster to have both hypotheses so i
                       "[Eventbased] return the number of showers in the ECL that do not become clusters, from the barrel");
     REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap,
                       "[Eventbased] return the number of showers in the ECL that do not become clusters, from the BWD endcap");
+    REGISTER_VARIABLE("eclClusterOnlyInvariantMass", eclClusterOnlyInvariantMass,
+		      "[Expert] The invariant mass calculated from all ECLCluster daughters (i.e. photons) and cluster-matched tracks using the CLUSTER 4-MOMENTA."
+		      "Used for ECL-based dark sector physics and debugging track-cluster matching.");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
     VARIABLE_GROUP("ECL calibration");

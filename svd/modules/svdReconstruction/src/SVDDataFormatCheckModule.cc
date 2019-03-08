@@ -28,9 +28,9 @@ SVDDataFormatCheckModule::SVDDataFormatCheckModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ShaperDigits", m_storeShaperDigitsName,
-           "ShaperDigits collection name", string(""));
+           "ShaperDigits collection name", string("SVDShaperDigits"));
   addParam("DAQDiagnostics", m_storeDAQName,
-           "DAQDiagnostics collection name", string(""));
+           "DAQDiagnostics collection name", string("SVDDAQDiagnostics"));
   addParam("maxProblematicEvents", m_maxProblematicEvts,
            "maximum number of problematic events to display WARNING", int(10));
   addParam("maxProblematicStripsEvent", m_maxProblematicStripsInEvts,

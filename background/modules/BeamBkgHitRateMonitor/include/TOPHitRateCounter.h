@@ -17,7 +17,7 @@
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <TTree.h>
 #include <TH1F.h>
-
+#include <map>
 
 namespace Belle2 {
   namespace Background {
@@ -37,17 +37,18 @@ namespace Belle2 {
        */
       struct TreeStruct {
         float slotRates[16] = {0}; /**< hit rates per PMT of the modules (slots) [MHz] */
-        float totalRate = 0; /**< average hit rate per PMT [MHz] */
-        bool valid = false;  /**< status: true = rates valid, set to false on clear() */
+        float averageRate = 0; /**< average hit rate per PMT [MHz] */
+        int numEvents = 0; /**< number of events accumulated */
+        bool valid = false;  /**< status: true = rates valid */
 
         /**
-         * clear variables
+         * normalize accumulated hits to single event
          */
-        void clear()
+        void normalize()
         {
-          for (auto& slotRate : slotRates) slotRate = 0;
-          totalRate = 0;
-          valid = false;
+          if (numEvents == 0) return;
+          for (auto& slotRate : slotRates) slotRate /= numEvents;
+          averageRate /= numEvents;
         }
 
       };
@@ -68,19 +69,16 @@ namespace Belle2 {
       virtual void initialize(TTree* tree) override;
 
       /**
-       * Clear the tree structure and other relevant variables to prepare for 'accumulate'
-       */
-      virtual void clear()  override;
-
-      /**
        * Accumulate hits
+       * @param timeStamp time stamp
        */
-      virtual void accumulate()  override;
+      virtual void accumulate(unsigned timeStamp) override;
 
       /**
-       * Normalize accumulated hits (e.g. transform to rates)
+       * Normalize accumulated hits (e.g. transform to rates) and prepare for TTree::Fill
+       * @param timeStamp time stamp
        */
-      virtual void normalize()  override;
+      virtual void normalize(unsigned timeStamp) override;
 
     private:
 
@@ -95,6 +93,9 @@ namespace Belle2 {
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */
+
+      // buffer
+      std::map<unsigned, TreeStruct> m_buffer; /**< average rates in time stamps */
 
       // collections
       StoreArray<TOPDigit> m_digits;  /**< collection of digits */

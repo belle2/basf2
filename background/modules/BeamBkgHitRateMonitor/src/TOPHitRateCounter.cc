@@ -28,7 +28,7 @@ namespace Belle2 {
       m_digits.isOptional();
 
       // set branch address
-      tree->Branch("top", &m_rates, "slotRates[16]/F:totalRate/F:valid/O");
+      tree->Branch("top", &m_rates, "slotRates[16]/F:averageRate/F:numEvents/I:valid/O");
 
       // create control histograms
       m_hits = new TH1F("top_hits", "time distribution of hits; digit.time [ns]",
@@ -45,15 +45,16 @@ namespace Belle2 {
       setActiveFractions();
     }
 
-    void TOPHitRateCounter::clear()
-    {
-      m_rates.clear();
-    }
-
-    void TOPHitRateCounter::accumulate()
+    void TOPHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available
       if (not m_digits.isValid()) return;
+
+      // get buffer element
+      auto& rates = m_buffer[timeStamp];
+
+      // increment event counter
+      rates.numEvents++;
 
       // accumulate hits (weighted by efficiency correction)
       const auto* topgp = TOP::TOPGeometryPar::Instance();
@@ -67,24 +68,30 @@ namespace Belle2 {
         auto effi = topgp->getRelativePixelEfficiency(digit.getModuleID(),
                                                       digit.getPixelID());
         float wt = std::min(1.0 / effi, 10.0);
-        m_rates.slotRates[digit.getModuleID() - 1] += wt;
-        m_rates.totalRate += wt;
+        rates.slotRates[digit.getModuleID() - 1] += wt;
+        rates.averageRate += wt;
       }
 
       // set flag to true to indicate the rates are valid
-      m_rates.valid = true;
+      rates.valid = true;
 
     }
 
-    void TOPHitRateCounter::normalize()
+    void TOPHitRateCounter::normalize(unsigned timeStamp)
     {
+      // copy buffer element
+      m_rates = m_buffer[timeStamp];
+
       if (not m_rates.valid) return;
+
+      // normalize
+      m_rates.normalize();
 
       // convert rates to [MHz/PMT]
       for (auto& slotRate : m_rates.slotRates) {
         slotRate /= m_timeWindow / Unit::us * 32; // 32 PMT's per slot
       }
-      m_rates.totalRate /= m_timeWindow / Unit::us * 32 * 16; // 16 slots
+      m_rates.averageRate /= m_timeWindow / Unit::us * 32 * 16; // 16 slots
 
       // check if DB object has changed and if so set fractions of active channels
       if (m_channelMask.hasChanged()) setActiveFractions();
@@ -98,7 +105,7 @@ namespace Belle2 {
           m_rates.slotRates[m] = 0;
         }
       }
-      m_rates.totalRate /= m_activeTotal; // we don't expect full TOP to be masked-out
+      m_rates.averageRate /= m_activeTotal; // we don't expect full TOP to be masked-out
 
     }
 

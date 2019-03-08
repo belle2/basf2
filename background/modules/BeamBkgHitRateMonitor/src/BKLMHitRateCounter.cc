@@ -27,37 +27,48 @@ namespace Belle2 {
       m_digits.isOptional();
 
       // set branch address
-      tree->Branch("bklm", &m_rates, "totalRate/F:valid/O");
+      tree->Branch("bklm", &m_rates, "averageRate/F:numEvents/I:valid/O");
 
     }
 
-    void BKLMHitRateCounter::clear()
-    {
-      m_rates.clear();
-    }
-
-    void BKLMHitRateCounter::accumulate()
+    void BKLMHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available
       if (not m_digits.isValid()) return;
 
+      // get buffer element
+      auto& rates = m_buffer[timeStamp];
+
+      // increment event counter
+      rates.numEvents++;
+
       // accumulate hits
       /* either count all */
-      m_rates.totalRate = m_digits.getEntries();
+      rates.averageRate = m_digits.getEntries();
       /* or count selected ones only
       for(const auto& digit: m_digits) {
-      // select digits to count here first, usualy count good ones only
-      m_rates.totalRate += 1;
+      // select digits to count (usualy only good ones)
+         rates.averageRate += 1;
       }
       */
 
       // set flag to true to indicate the rates are valid
-      m_rates.valid = true;
+      rates.valid = true;
 
     }
 
-    void BKLMHitRateCounter::normalize()
+    void BKLMHitRateCounter::normalize(unsigned timeStamp)
     {
+      // copy buffer element
+      m_rates = m_buffer[timeStamp];
+
+      if (not m_rates.valid) return;
+
+      // normalize
+      m_rates.normalize();
+
+      // optionally: convert to MHz, correct for the masked-out channels etc.
+
     }
 
 

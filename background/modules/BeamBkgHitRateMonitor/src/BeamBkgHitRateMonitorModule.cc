@@ -59,6 +59,8 @@ namespace Belle2 {
     addParam("trgTypes", m_trgTypes,
              "trigger types for event selection (see TRGSummary.h for definitions)",
              m_trgTypes);
+    addParam("writeEmptyTimeStamps", m_writeEmptyTimeStamps,
+             "if true, write to ntuple also empty time stamps", false);
     addParam("topTimeOffset", m_topTimeOffset,
              "TOP: time offset of hits (to be subtracted) [ns]", 350.0);
     addParam("topTimeWindow", m_topTimeWindow,
@@ -110,11 +112,8 @@ namespace Belle2 {
 
     // set tree branches
     m_tree->Branch("run", &m_run, "run/I");
-    m_tree->Branch("event", &m_event, "event/I");
-    m_tree->Branch("trgType", &m_trgType, "trgType/I");
-    m_tree->Branch("timeStamp", &m_timeStamp, "timeStamp/l");
-    m_tree->Branch("utime", &m_utime, "utime/i");
-    m_tree->Branch("ctime", &m_ctime, "ctime/i");
+    m_tree->Branch("numEvents", &m_numEvents, "numEvents/I");
+    m_tree->Branch("timeStamp", &m_timeStamp, "timeStamp/i");
     m_tree->Branch("time", &m_time, "time/I");
     for (auto& monitor : m_monitors) {
       monitor->initialize(m_tree);
@@ -138,37 +137,43 @@ namespace Belle2 {
     if (m_utimeFirst == 0) {
       m_utimeFirst = utime;
       m_utimeMin = utime;
-      m_utimeMax = utime;
+      m_utimeMax = utime + 1;
     }
     m_utimeMin = std::min(m_utimeMin, utime);
-    m_utimeMax = std::max(m_utimeMax, utime);
+    m_utimeMax = std::max(m_utimeMax, utime + 1);
 
     // event selection
     if (not isEventSelected()) return;
-    m_numEvents++;
+    m_numEventsSelected++;
 
-    // clear rate monitors
+    // accumulate
     for (auto& monitor : m_monitors) {
-      monitor->clear();
+      monitor->accumulate(utime);
     }
-
-    // fill ntuple
-    m_run = m_eventMetaData->getRun();
-    m_event = m_eventMetaData->getEvent();
-    m_timeStamp = m_eventMetaData->getTime();
-    m_utime = utime;
-    m_ctime = m_rawTRGs[0]->GetTTCtime(0);
-    m_time = m_utime - m_utimeFirst;
-    for (auto& monitor : m_monitors) {
-      monitor->accumulate();
-      monitor->normalize();
-    }
-    m_tree->Fill();
+    m_runNumbers[utime] = m_eventMetaData->getRun();
+    m_eventCounts[utime] += 1;
 
   }
 
   void BeamBkgHitRateMonitorModule::terminate()
   {
+
+    // fill ntuple
+    for (unsigned utime = m_utimeMin; utime < m_utimeMax; utime++) {
+      if (not m_writeEmptyTimeStamps) {
+        if (m_eventCounts.find(utime) == m_eventCounts.end()) continue;
+      }
+      m_run = m_runNumbers[utime];
+      m_numEvents = m_eventCounts[utime];
+      m_timeStamp = utime;
+      m_time = utime - m_utimeMin;
+      for (auto& monitor : m_monitors) {
+        monitor->normalize(utime);
+      }
+      m_tree->Fill();
+    }
+
+    // write to file
     m_file->cd();
     m_file->Write();
     m_file->Close();
@@ -179,7 +184,8 @@ namespace Belle2 {
       trigs += "        trigger type " + std::to_string(m_trgTypes[i]) + ": " +
                std::to_string(m_trgTypesCount[i]) + " events\n";
     }
-    B2RESULT(m_numEvents << " events selected for beam background hit rate monitoring.\n"
+    B2RESULT(m_numEventsSelected
+             << " events selected for beam background hit rate monitoring.\n"
              << trigs
              << LogVar("first event utime ", m_utimeMin)
              << LogVar("start utime       ", m_utimeMin)
@@ -191,10 +197,10 @@ namespace Belle2 {
 
   bool BeamBkgHitRateMonitorModule::isEventSelected()
   {
-    m_trgType = m_trgSummary->getTimType();
+    auto trgType = m_trgSummary->getTimType();
     unsigned i = 0;
-    for (auto trgType : m_trgTypes) {
-      if (m_trgType == trgType) {
+    for (auto type : m_trgTypes) {
+      if (trgType == type) {
         m_trgTypesCount[i]++;
         return true;
       }

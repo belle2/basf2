@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <TFile.h>
 #include <TTree.h>
 
@@ -72,6 +73,7 @@ namespace Belle2 {
     std::string m_outputFileName; /**< output file name */
     std::string m_treeName;       /**< output tree name */
     std::vector<int> m_trgTypes;  /**< trigger types to be selected */
+    bool m_writeEmptyTimeStamps;  /**< if true write to ntuple also empty time stamps */
     double m_topTimeOffset; /**< TOP: time offset of hits [ns] */
     double m_topTimeWindow; /**< TOP: time window in which to count hits [ns] */
 
@@ -85,19 +87,20 @@ namespace Belle2 {
     TTree* m_tree = 0; /**< root tree pointer */
 
     // tree variables
-    int m_run = 0;     /**< run number */
-    int m_event = 0;   /**< event number */
-    int m_trgType = 0; /**< trigger type (see TRGSummary.h for definition) */
-    unsigned long long int m_timeStamp = 0; /**< time stamp of event */
-    unsigned m_utime = 0; /**< unix time of event [seconds since 1.1.1970] */
-    unsigned m_ctime = 0; /**< clock time of event [RF/4 ticks, reset at each second] */
-    int m_time = 0; /**< time in seconds w.r.t the first event in the input stream */
+    int m_run = 0;  /**< run number */
+    int m_numEvents = 0;  /**< number of events in time stamp */
+    unsigned m_timeStamp = 0;  /**< time stamp (unix time) */
+    int m_time = 0;  /**< time in seconds w.r.t the first event */
 
-    // rate monitoring classes: these provide additional tree branches
+    // buffers
+    std::map<unsigned, int> m_runNumbers; /**< run numbers of time stamps */
+    std::map<unsigned, int> m_eventCounts; /**< number of events in time stamps */
+
+    // rate monitoring classes: these provide additional buffers and tree branches
     std::vector<Background::HitRateBase*> m_monitors; /**< rate monitors */
 
     // other
-    unsigned m_numEvents = 0;  /**< number of selected events */
+    unsigned m_numEventsSelected = 0;  /**< number of selected events */
     std::vector<unsigned> m_trgTypesCount; /**< trigger type counter */
     unsigned m_utimeFirst = 0; /**< unix time of the first event in the input stream */
     unsigned m_utimeMin = 0; /**< minimal unix time of the events */

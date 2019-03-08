@@ -36,19 +36,16 @@ namespace Belle2 {
       virtual void initialize(TTree* tree) = 0;
 
       /**
-       * Clear the tree structure and other relevant variables to prepare for 'accumulate'
-       */
-      virtual void clear() = 0;
-
-      /**
        * Accumulate hits
+       * @param timeStamp time stamp
        */
-      virtual void accumulate() = 0;
+      virtual void accumulate(unsigned timeStamp) = 0;
 
       /**
-       * Normalize accumulated hits (e.g. transform to rates)
+       * Normalize accumulated hits (e.g. transform to rates) and prepare for TTree::Fill
+       * @param timeStamp time stamp
        */
-      virtual void normalize() = 0;
+      virtual void normalize(unsigned timeStamp) = 0;
 
     };
 

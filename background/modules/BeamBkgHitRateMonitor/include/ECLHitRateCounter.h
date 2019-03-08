@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <TTree.h>
+#include <map>
 
 
 namespace Belle2 {
@@ -31,16 +32,17 @@ namespace Belle2 {
        */
       struct TreeStruct {
 
-        float totalRate = 0; /**< total detector hit rate */
-        bool valid = false;  /**< status: true = rates valid, false on clear() */
+        float averageRate = 0; /**< total detector average hit rate */
+        int numEvents = 0; /**< number of events accumulated */
+        bool valid = false;  /**< status: true = rates valid */
 
         /**
-         * clear variables
+         * normalize accumulated hits to single event
          */
-        void clear()
+        void normalize()
         {
-          totalRate = 0;
-          valid = false;
+          if (numEvents == 0) return;
+          averageRate /= numEvents;
         }
 
       };
@@ -58,19 +60,16 @@ namespace Belle2 {
       virtual void initialize(TTree* tree) override;
 
       /**
-       * Clear the tree structure and other relevant variables to prepare for 'accumulate'
-       */
-      virtual void clear()  override;
-
-      /**
        * Accumulate hits
+       * @param timeStamp time stamp
        */
-      virtual void accumulate()  override;
+      virtual void accumulate(unsigned timeStamp) override;
 
       /**
        * Normalize accumulated hits (e.g. transform to rates)
+       * @param timeStamp time stamp
        */
-      virtual void normalize()  override;
+      virtual void normalize(unsigned timeStamp) override;
 
     private:
 
@@ -78,6 +77,9 @@ namespace Belle2 {
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */
+
+      // buffer
+      std::map<unsigned, TreeStruct> m_buffer; /**< average rates in time stamps */
 
       // collections
       StoreArray<ECLDigit> m_digits;  /**< collection of digits */

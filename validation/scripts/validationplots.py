@@ -279,7 +279,6 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     all_plotuples = []
 
     # Only plot packages where we have at least one plot (not just references)
-    # todo: this was the previous standard, do we want to keep it that way?
     packages = list(sorted(plot_p2f2k2o.keys()))
 
     # for every package
@@ -290,11 +289,6 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
             'Creating plots for package: {0}'.format(package),
             level=1
         ))
-
-        # A list of all objects (including reference objects) that
-        # belong to the current package
-        # objects_in_pkg = list(plot_p2k2o[package].values()) + \
-        #     list(reference_p2k2o[package].values())
 
         compare_files = []
 
@@ -341,51 +335,17 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                     revisions,
                     work_folder
                 )
+                plotuple.create_plotuple()
                 plotuples.append(plotuple)
                 has_reference = plotuple.has_reference()
 
                 if plotuple.type == 'TNtuple':
-                    compare_ntuples.append(
-                        json_objects.ComparisonNTuple(
-                            title=plotuple.get_plot_title(),
-                            description=plotuple.description,
-                            contact=plotuple.contact,
-                            check=plotuple.check,
-                            is_expert=plotuple.is_expert(),
-                            json_file_path=plotuple.file
-                        )
-                    )
+                    compare_ntuples.append(plotuple.create_json_object())
                 elif plotuple.type == 'TNamed':
-                    compare_html_content.append(
-                        json_objects.ComparisonHtmlContent(
-                            title=plotuple.get_plot_title(),
-                            description=plotuple.description,
-                            contact=plotuple.contact,
-                            check=plotuple.check,
-                            is_expert=plotuple.is_expert(),
-                            html_content=plotuple.html_content
-                        )
-                    )
+                    # todo: this will give trouble with description field
+                    compare_html_content.append(plotuple.create_json_object())
                 else:
-                    compare_plots.append(
-                        json_objects.ComparisonPlot(
-                            title=plotuple.get_plot_title(),
-                            comparison_result=plotuple.comparison_result,
-                            comparison_text=plotuple.chi2test_result,
-                            comparison_pvalue=plotuple.pvalue,
-                            comparison_pvalue_warn=plotuple.pvalue_warn,
-                            comparison_pvalue_error=plotuple.pvalue_error,
-                            description=plotuple.description,
-                            contact=plotuple.contact,
-                            check=plotuple.check,
-                            height=plotuple.height,
-                            width=plotuple.width,
-                            is_expert=plotuple.is_expert(),
-                            plot_path=plotuple.get_plot_path(),
-                            png_filename=plotuple.get_png_filename(),
-                            pdf_filename=plotuple.get_pdf_filename()
-                        )
-                    )
+                    compare_plots.append(plotuple.create_json_object())
 
             # todo: add description field here
             compare_file = json_objects.ComparisonPlotFile(
@@ -539,8 +499,6 @@ def tobjects_from_files(root_files, is_reference, work_folder):
 
     # Return value: {package: {key: objects}}
     return_dict = collections.defaultdict(dict)
-
-    print("from_files", is_reference, root_files)
 
     # Now loop over all given
     for root_file in root_files:

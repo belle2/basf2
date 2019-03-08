@@ -143,7 +143,7 @@ function loadSelectedRevisions() {
 
     console.log(`Loading rev via string '${revString}'.`);
 
-    setupRactiveFromRevision(revisionsData, revList);
+    setupRactiveFromRevision(revList);
 }
 
 /**
@@ -344,10 +344,96 @@ function setRevisions(revisionList) {
 // Loading
 // ============================================================================
 
-
+/**
+ * Updates the comparisonData global variable (takes care of enriching
+ * comparisonData with some items of revisionsData)
+ * @param _comparisonData
+ */
 function updateComparisonData(_comparisonData) {
+    comparisonData = _comparisonData;
 
-};
+    // Get the newest revision within the selection
+    // to get information about failed scripts and the
+    // log files
+    let newestRev = getNewestRevision(revisionsData);
+
+    console.debug(`Newest revision is '${newestRev["label"]}'`);
+
+    // enrich the comparison data with the newest revision in this comparison
+    comparisonData["newest_revision"] = newestRev;
+
+    // We update comparisonData with some items from revisionsData.
+    if (newestRev != null) {
+        console.debug("Updating package information.");
+
+        // We now go through all of the packages in the revision object
+        // and add the corresponding information to the comparison object.
+        // object. For this we create a lookup table
+        //    'package name' -> 'index in list'
+        // for the comparison object.
+        let comparisonDataPkg2Index = {};
+        for (let index in comparisonData["packages"]) {
+            let name = comparisonData["packages"][index]["name"];
+            comparisonDataPkg2Index[name] = index;
+        }
+
+        for (let irev in newestRev["packages"]) {
+
+            // Information to be copied from the revision object:
+            let name = newestRev["packages"][irev]["name"];
+            let failCount = newestRev["packages"][irev]["fail_count"];
+            let scriptfiles = newestRev["packages"][irev]["scriptfiles"];
+            let label = newestRev["label"];
+
+            if (name in comparisonDataPkg2Index) {
+                // Found the package in the comparison object
+                // ==> Just add the information
+                let ipkg = comparisonDataPkg2Index [name];
+
+                comparisonData["packages"][ipkg]["fail_count"] = failCount;
+                comparisonData["packages"][ipkg]["scriptfiles"] = scriptfiles;
+                // Also store the label of the newest revision as this
+                // is needed to stich together the loading path of
+                // log files
+                comparisonData["packages"][ipkg]["newest_revision"] = label;
+            } else {
+                // Did not find the package in the comparison object
+                // ==> If there's a reason to display it on the homepage
+                //     (e.g. failed scripts whose logs we want to make
+                //     available, then we need to add a new item to the
+                //     package list of the comparison object).
+                console.debug(
+                    `Package '${newestRev["packages"][irev]["name"]}` +
+                    "' was found in the revision file, but not in the " +
+                    "comparison file. Probably this package did not " +
+                    "create a single output file."
+                );
+                if (newestRev["packages"][irev]["scriptfiles"].length > 0) {
+                    console.debug(
+                        "However it did have failing scripts, so we " +
+                        "will make it visible on the validation page. "
+                    );
+                    // Create a new empty entry with the same information
+                    // as above and add it to the data
+                    let pkgDict = {};
+                    pkgDict["name"] = name;
+                    pkgDict["fail_count"] = failCount;
+                    pkgDict["scriptfiles"] = scriptfiles;
+                    pkgDict["newest_revision"] = label;
+                    // Also add keys that usually come from the
+                    // comparison file and are nescessary for things to work
+                    pkgDict["visible"] = true;
+                    pkgDict["comparison_error"] = 0; // else problems in package template
+                    comparisonData["packages"].push(pkgDict);
+
+                }
+            }
+        }
+
+    } else {
+        console.debug("Newest rev is null.")
+    }
+}
 
 /**
  * Gets information about the comparisons and plots (generated when
@@ -356,10 +442,9 @@ function updateComparisonData(_comparisonData) {
  * If we cannot get the comparison/plot information, then the plots for the
  * current selection of revisions haven't yet been generated and we
  * request them.
- * @param revData
  * @param revList
  */
-function setupRactiveFromRevision(revData, revList) {
+function setupRactiveFromRevision(revList) {
 
     // don't event attempt to show comparisons for empty revisions
     if (!Array.isArray(revList) || !revList.length)
@@ -373,98 +458,9 @@ function setupRactiveFromRevision(revData, revList) {
 
     console.log(`Loading Comparison from '${comparisonLoadPath}'`);
 
-    // todo: This SCREAMS to be refactored in some way....
-    $.get(comparisonLoadPath).done(function (_comparison_data) {
+    $.get(comparisonLoadPath).done(function (_comparisonData) {
 
-        comparisonData = _comparison_data;
-
-        // Get the newest revision within the selection
-        // to get information about failed scripts and the
-        // log files
-        let newestRev = getNewestRevision(revData);
-
-        console.debug(`Newest revision is '${newestRev["label"]}'`);
-
-        // enrich the comparison data with the newest revision in this comparison
-        comparisonData["newest_revision"] = newestRev;
-
-        // We have two sources of information for scripts and plots:
-        // * The comparison object from comparisonLoadPath
-        // * The revision object
-        // We update the data from the comparison object with additional data
-        // from the revision object.
-        if (newestRev != null) {
-            console.debug("Updating package information.");
-
-            // We now go through all of the packages in the revision object
-            // and add the corresponding information to the comparison object.
-            // object. For this we create a lookup table
-            //    'package name' -> 'index in list'
-            // for the comparison object.
-            let comparisonDataPkg2Index = {};
-            for (let index in comparisonData["packages"]) {
-                let name = comparisonData["packages"][index]["name"];
-                comparisonDataPkg2Index[name] = index;
-            }
-
-            for (let irev in newestRev["packages"]) {
-
-                // Information to be copied from the revision object:
-                let name = newestRev["packages"][irev]["name"];
-                let failCount = newestRev["packages"][irev]["fail_count"];
-                let scriptfiles = newestRev["packages"][irev]["scriptfiles"];
-                let label = newestRev["label"];
-
-                if (name in comparisonDataPkg2Index) {
-                    // Found the package in the comparison object
-                    // ==> Just add the information
-                    let ipkg = comparisonDataPkg2Index [name];
-
-                    comparisonData["packages"][ipkg]["fail_count"] = failCount;
-                    comparisonData["packages"][ipkg]["scriptfiles"] = scriptfiles;
-                    // Also store the label of the newest revision as this
-                    // is needed to stich together the loading path of
-                    // log files
-                    comparisonData["packages"][ipkg]["newest_revision"] = label;
-                } else {
-                    // Did not find the package in the comparison object
-                    // ==> If there's a reason to display it on the homepage
-                    //     (e.g. failed scripts whose logs we want to make
-                    //     available, then we need to add a new item to the
-                    //     package list of the comparison object).
-                    console.debug(
-                        `Package '${newestRev["packages"][irev]["name"]}` +
-                        "' was found in the revision file, but not in the " +
-                        "comparison file. Probably this package did not " +
-                        "create a single output file."
-                    );
-                    if (newestRev["packages"][irev]["scriptfiles"].length > 0) {
-                        console.debug(
-                            "However it did have failing scripts, so we " +
-                            "will make it visible on the validation page. "
-                        );
-                        // Create a new empty entry with the same information
-                        // as above and add it to the data
-                        let pkgDict = {};
-                        pkgDict["name"] = name;
-                        pkgDict["fail_count"] = failCount;
-                        pkgDict["scriptfiles"] = scriptfiles;
-                        pkgDict["newest_revision"] = label;
-                        // Also add keys that usually come from the
-                        // comparison file and are nescessary for things to work
-                        pkgDict["visible"] = true;
-                        pkgDict["comparison_error"] = 0; // else problems in package template
-                        comparisonData["packages"].push(pkgDict);
-
-                    }
-                }
-            }
-
-            console.log("Data after updating");
-            console.log(comparisonData);
-        } else {
-            console.debug("Newest rev is null.")
-        }
+        updateComparisonData(_comparisonData);
 
         setupRactive("package", '#packages', comparisonData,
             // Wire the clicks on package names
@@ -473,7 +469,7 @@ function setupRactiveFromRevision(revData, revList) {
                 if ("packages" in comparisonData) {
                     let firstPackageName = getDefaultPackageName();
                     if (firstPackageName !== false) {
-                        loadValidationPlots(firstPackageName, comparisonData);
+                        loadValidationPlots(firstPackageName);
                     } else {
                         console.warn("No package could be loaded.");
                         $("content").text("No package could be loaded");
@@ -504,7 +500,7 @@ function setupRactiveFromRevision(revData, revList) {
 
                             // the context will contain the json object which was
                             // used to create this template instance
-                            loadValidationPlots(evt.context.name, comparisonData);
+                            loadValidationPlots(evt.context.name);
                         }
 
                         // Remember that this package was open last
@@ -527,7 +523,7 @@ function setupRactiveFromRevision(revData, revList) {
             })
         }).done(function (progress_data) {
             let key = progress_data["progress_key"];
-            beginCreatePlotWait(revList, revList, key, revData);
+            beginCreatePlotWait(revList, revList, key, revisionsData);
         });
     });
 }
@@ -806,14 +802,13 @@ function selectedRevsListToString(selectedRevs) {
 /**
  * Return the newest revision that is included in the dataset.
  * Also highlights it by displaying it bold.
- * @param revData
  * @return {*}
  */
-function getNewestRevision(revData) {
+function getNewestRevision() {
     let newest = null;
     // deliberately super early date
     let newestData = "2000-00-00 00:00:00";
-    let revList = revData["revisions"];
+    let revList = revisionsData["revisions"];
 
     for (let i in revList) {
         if (revList[i]["label"] !== "reference") {

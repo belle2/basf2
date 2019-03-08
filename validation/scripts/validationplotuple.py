@@ -104,6 +104,14 @@ class Plotuple:
         # The type of the elements in this Plotuple object
         self.type = self.newest.type
 
+        if self.type == "TNamed":
+            # Sometimes, we use TNamed to encode extra information about the
+            # ROOT file. In order to avoid that this will be plotted, we
+            # catch it here and assign it the type 'Meta'
+            meta_fields = ["description"]
+            if self.newest.object.GetName().lower().strip() in meta_fields:
+                self.type = "meta"
+
         # The description of the histogram/n-tuple which this Plotuple object
         # will yield
         self.description = self.newest.description
@@ -201,10 +209,11 @@ class Plotuple:
             self.create_image_plot()
         elif self.type == 'TNtuple':
             self.create_ntuple_table_json()
+        elif self.type == "meta":
+            pass
         else:
-            # fixme: shouldn't we rather throw an exception /klieret
-            sys.exit('Tried to create histogram/n-tuple, '
-                     'but received invalid type')
+            raise ValueError('Tried to create histogram/n-tuple, but received'
+                             'invalid type')
 
     def is_expert(self):
         """!
@@ -764,6 +773,12 @@ class Plotuple:
         # file
         self.file = None
 
+    def get_meta_information(self):
+        assert self.type == "meta"
+        key = self.newest.object.GetName().strip().lower()
+        value = self.newest.object.GetTitle()
+        return key, value
+
     def create_ntuple_table_json(self):
         """!
         If the Plotuple-object contains n-tuples, this will create the
@@ -865,6 +880,8 @@ class Plotuple:
                 is_expert=self.is_expert(),
                 html_content=self.html_content
             )
+        elif self.type == "meta":
+            return None
         else:
             return json_objects.ComparisonPlot(
                 title=self.get_plot_title(),

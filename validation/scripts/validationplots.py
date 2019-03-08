@@ -327,8 +327,10 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
             compare_ntuples = []
             compare_html_content = []
             has_reference = False
-            for key in all_p2f2k2o[package][rootfile].keys():
 
+            root_file_meta_data = collections.defaultdict(lambda: None)
+
+            for key in all_p2f2k2o[package][rootfile].keys():
                 # Otherwise we can generate Plotuple object
                 plotuple = Plotuple(
                     all_p2f2k2o[package][rootfile][key],
@@ -342,12 +344,14 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                 if plotuple.type == 'TNtuple':
                     compare_ntuples.append(plotuple.create_json_object())
                 elif plotuple.type == 'TNamed':
-                    # todo: this will give trouble with description field
                     compare_html_content.append(plotuple.create_json_object())
+                elif plotuple.type == "meta":
+                    meta_key, meta_value = plotuple.get_meta_information()
+                    print("{}: {}->{}".format(key, meta_key, meta_value))
+                    root_file_meta_data[meta_key] = meta_value
                 else:
                     compare_plots.append(plotuple.create_json_object())
 
-            # todo: add description field here
             compare_file = json_objects.ComparisonPlotFile(
                 title=file_name,
                 package=package,
@@ -356,7 +360,8 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                 plots=compare_plots,
                 has_reference=has_reference,
                 ntuples=compare_ntuples,
-                html_content=compare_html_content
+                html_content=compare_html_content,
+                description=root_file_meta_data["description"]
             )
             compare_files.append(compare_file)
 
@@ -767,9 +772,9 @@ class RootObject:
                 False for revision objects.
         """
 
-        # todo: All of the following could be simplified, if one modified the
-        # find_root_object() method to search through vars(Root-Object)
-
+        # todo: If this is what we want, why don't we just create a dictionary
+        #  in the first place? Or at least implement this by filtering through
+        #  self.__dict__
         # A dict with all information about the Root-object
         # Have all information as a dictionary so that we can search and
         # filter the objects by properties

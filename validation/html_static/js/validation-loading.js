@@ -191,9 +191,7 @@ function getReferenceSelection(){
     let selector = $("#reference-select")[0];
     let option = selector.options[selector.selectedIndex].value;
     if ( option === "auto"){
-        // second newest revision (by alphabetic sorting)
-        // todo: the newest revision, which is compared is taken by chronological
-        //   sorting ==> this is not quite consistent
+        console.log("Automatically assigning reference.");
         let selected_revs = getSelectedRevsList();
         selected_revs.sort();
         if (selected_revs.includes("reference")){
@@ -201,9 +199,9 @@ function getReferenceSelection(){
         }
         if (selected_revs.length <= 1){
             // impossible to do a comparison anyhow
-            return null;
+            return selected_revs[0];
         }
-        return selected_revs[-2];
+        return getNewestRevision(1);
     }
     else {
         return option;
@@ -215,8 +213,10 @@ function getReferenceSelection(){
  */
 function setReferenceSelectionOptions(){
     let selector = $("#reference-select")[0];
+    // Remove all options except for 'automatic':
     selector.options.length = 1;
     let selected_revs = getSelectedRevsList();
+    // Add all selected revisions as options for the reference:
     for (let i_rev in selected_revs){
         let rev = selected_revs[i_rev];
         selector.options[selector.options.length] = new Option(
@@ -243,7 +243,12 @@ function onRevisionSelectionChanged(){
  * 3. The reference revision is shown in bold.
  */
 function onReferenceSelectionChanged(){
-    console.warn("referenceSelectionChanged");
+    let selectedReference = getReferenceSelection();
+    let newestRevision = getNewestRevision();
+
+    console.log(`referenceSelectionChanged: Will compare '${newestRevision}' (newest selected revision) with '${selectedReference}' (reference).`);
+
+    // Upddate boldness
 
     $(`.revision-label`).each(
         (i, obj) => {
@@ -251,16 +256,20 @@ function onReferenceSelectionChanged(){
         }
     );
 
-    let selectedReference = getReferenceSelection();
     $(`#revision-label-${selectedReference}`).each(
         (i, obj) => {
             obj.style.fontWeight = "bold";
         }
     );
 
-    // todo: also style newest revision in bold. Problem: we don't have the
-    //   argument for that yet. 
-    // let newestRevision = getNewestRevision()
+
+    if ( newestRevision !== null ){
+        $(`#revision-label-${newestRevision}`).each(
+            (i, obj) => {
+                obj.style.fontWeight = "bold";
+            }
+        );
+    }
 }
 
 /**
@@ -355,7 +364,7 @@ function updateComparisonData(_comparisonData) {
     // Get the newest revision within the selection
     // to get information about failed scripts and the
     // log files
-    let newestRev = getNewestRevision(revisionsData);
+    let newestRev = findObjectWithKey(revisionsData["revisions"], "label", getNewestRevision());
 
     console.debug(`Newest revision is '${newestRev["label"]}'`);
 
@@ -772,6 +781,7 @@ function getSelectedRevsList() {
     return selectedRev;
 }
 
+// todo: rather get this directly from revisionsData
 /**
  * Returns an array with all revisions shown in the submenu.
  * @returns {Array}
@@ -799,38 +809,39 @@ function selectedRevsListToString(selectedRevs) {
     return revString;
 }
 
+// todo: once we properly have dictionaries instead of lists in revisionsData, this should only return the name of the newest revision...
 /**
- * Return the newest revision that is included in the dataset.
- * Also highlights it by displaying it bold.
+ * Return the newest revision that is selected.
+ * @param index: Get the i-th newest revision
  * @return {*}
  */
-function getNewestRevision() {
-    let newest = null;
-    // deliberately super early date
-    let newestData = "2000-00-00 00:00:00";
-    let revList = revisionsData["revisions"];
+function getNewestRevision(index=0) {
 
-    for (let i in revList) {
-        if (revList[i]["label"] !== "reference") {
-            if (revList[i]["creation_date"] > newestData) {
-                newestData = revList[i]["creation_date"];
-                newest = revList[i]
-            }
+    let selectedRevs = getSelectedRevsList();
+
+    let date2rev = {};
+    for (let i in revisionsData["revisions"]){
+        let label = revisionsData["revisions"][i]["label"];
+        if ( ! selectedRevs.includes(label)) continue;
+        if ( label === "reference" ) continue;
+        let date = revisionsData["revisions"][i]["creation_date"];
+        date2rev[date] = label;
+    }
+
+    let dates = Object.keys(date2rev);
+    let chosen_date = dates[index];
+    return date2rev[chosen_date]
+}
+
+/** Find an object in a list of objects by comparing a key with a certain value. */
+function findObjectWithKey(objects, key, value) {
+    for (let i in objects){
+        if (objects[i][key] === value) {
+            return objects[i]
         }
     }
-
-    // todo: I wish we could move this somewhere else...
-    if ( newest !== null ){
-        // console.warn(newest.label);
-        $(`#revision-label-${newest.label}`).each(
-            (i, obj) => {
-                obj.style.fontWeight = "bold";
-            }
-        );
-    }
-
-
-    return newest
+    console.warn(`Failed to find object with ${key}==${value}`);
+    return null;
 }
 
 

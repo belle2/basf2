@@ -30,6 +30,12 @@ namespace Belle2 {
     double isInRestOfEvent(const Particle* particle);
 
     /**
+     * Prints the indices of all particles in the ROE and the properties of all masks appended to the ROE.
+     * Intended for debugging purposes, always returns 0.
+     */
+    double printROE(const Particle* particle);
+
+    /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
      */
     double nRemainingTracksInROE(const Particle* particle, std::string maskName = "");

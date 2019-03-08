@@ -79,7 +79,6 @@ namespace Belle2 {
       return func;
     }
 
-
     Manager::FunctionPtr particleRelatedToCurrentROE(const std::vector<std::string>& arguments)
     {
       std::string listName;
@@ -102,7 +101,6 @@ namespace Belle2 {
       return func;
     }
 
-
     // only the helper function
     double nRemainingTracksInROE(const Particle* particle, std::string maskName)
     {
@@ -119,7 +117,6 @@ namespace Belle2 {
       }
       return n_roe_tracks - n_par_tracks;
     }
-
 
     Manager::FunctionPtr nROE_RemainingTracksWithMask(const std::vector<std::string>& arguments)
     {
@@ -233,6 +230,7 @@ namespace Belle2 {
 
       return frameMCRoe4Vector.Vect().Z();
     }
+
     double ROE_MC_Pt(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
@@ -248,6 +246,7 @@ namespace Belle2 {
 
       return frameMCRoe4Vector.Vect().Perp();
     }
+
     double ROE_MC_PTheta(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
@@ -263,8 +262,6 @@ namespace Belle2 {
 
       return frameMCRoe4Vector.Theta();
     }
-
-
 
     double ROE_MC_M(const Particle* particle)
     {
@@ -516,10 +513,6 @@ namespace Belle2 {
       };
       return func;
     }
-
-
-
-
 
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
@@ -804,7 +797,6 @@ namespace Belle2 {
       };
       return func;
     }
-
 
     Manager::FunctionPtr ROE_Pt(const std::vector<std::string>& arguments)
     {
@@ -1482,7 +1474,6 @@ namespace Belle2 {
       return q2;
     }
 
-
     Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments)
     {
       std::string maskName;
@@ -1689,6 +1680,16 @@ namespace Belle2 {
       return func;
     }
 
+    double printROE(const Particle* particle)
+    {
+      const RestOfEvent* roe = getRelatedROEObject(particle);
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+      } else roe->print();
+      return 0.0;
+    }
+
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
@@ -1860,6 +1861,7 @@ namespace Belle2 {
       }
       return roe->hasParticle(particle, maskName);
     }
+
     const RestOfEvent* getRelatedROEObject(const Particle* particle, bool returnHostOnly)
     {
       // Get related ROE object
@@ -2055,5 +2057,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
                       "Returns boolean value if track or eclCluster type particle passes a certain mask or not. Only to be used in for_each path");
+
+    REGISTER_VARIABLE("printROE", printROE,
+                      "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
   }
 }

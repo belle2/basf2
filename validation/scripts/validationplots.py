@@ -64,56 +64,39 @@ def date_from_revision(revision, work_folder):
     # Regular releases and builds however do have a reasonably well defined
     # 'last modified'-date!
     else:
-        # If the revision exists:
-        if revision in os.listdir(validationpath.get_results_folder(work_folder)):
-            return os.path.getmtime(validationpath.get_results_tag_folder(work_folder, revision))
+        revisions = os.listdir(validationpath.get_results_folder(work_folder))
+        if revision in revisions:
+            return os.path.getmtime(
+                validationpath.get_results_tag_folder(work_folder, revision)
+            )
         # Otherwise return a None object
         else:
             return None
 
 
-def find_root_object(root_objects, **kwargs):
-    """
-    Receives a list of RootObject objects and a filter KEYWORD=['accepted,
-    values'] and return the sublist that matches this filter
-    """
-    if kwargs is not None:
-        # Read in the filter and the values we are filtering for
-        sieve, desired_values = list(kwargs.items())[0]
-
-        # If we don't receive a list of desired values, make it a list!
-        if not isinstance(desired_values, list):
-            desired_values = [desired_values]
-
-        # Holds the lists of matches we have found
-        results = []
-
-        for rootobject in root_objects:
-            for value in desired_values:
-                try:
-                    # todo: huh, this doesn't look like we need a regexp for this /klieret
-                    __ = re.search("^" + value + "$", rootobject.data[sieve])
-                    if __ is not None:
-                        results.append(rootobject)
-                except IndexError:
-                    continue
-        return results
-    # If no filter is given there will be no output
-    else:
-        return []
-
-
-# todo: no reason to have this as a function. Called exactly once. /klieret
-def serve_existing_plots(revisions):
-    """
-    Goes to the folder where
-    the plots for the given selection are stored, and replaces the current
-    './content.html' with the one from the folder with the plots.
-    :return: No return value
+def merge_nested_list_dicts(a, b):
+    """ Given two nested dictionary with same depth that contain lists, return
+    'merged' dictionary that contains the joined lists.
+    :param a: Dict[Dict[...[Dict[List]]..]]
+    :param b: Dict[Dict[...[Dict[List]]..]] (same depth as a)
+    :return:
     """
 
-    print("Plots for the revision(s) {} have already been created before "
-          "and will be served from the archive.".format(", ".join(revisions)))
+    def _merge_nested_list_dicts(_a, _b):
+        """ Merge _b into _a, return _a. """
+        for key in _b:
+            if key in _a:
+                if isinstance(_a[key], dict) and isinstance(_b[key], dict):
+                    _merge_nested_list_dicts(_a[key], _b[key])
+                else:
+                    assert isinstance(_a[key], list)
+                    assert isinstance(_b[key], list)
+                    _a[key].extend(_b[key])
+            else:
+                _a[key] = _b[key]
+        return _a
+
+    return _merge_nested_list_dicts(a.copy(), b.copy())
 
 
 def get_plot_files(revisions, work_folder):
@@ -145,7 +128,7 @@ def get_plot_files(revisions, work_folder):
             # find all root files within this package
             root_files = glob.glob(package_folder + "/*.root")
             # append with absolute path
-            results = results + [os.path.abspath(rf) for rf in root_files]
+            results += [os.path.abspath(rf) for rf in root_files]
 
     return results
 
@@ -271,25 +254,10 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     else:
         reference_files = []
 
-    # Now create the ROOT objects for the plot and the reference objects,
-    # and get the lists of keys and packages
-    plot_objects, plot_keys, plot_packages = \
-        tobjects_from_files(
-            plot_files,
-            False,
-            work_folder
-        )
-    reference_objects, reference_keys, reference_packages = \
-        tobjects_from_files(
-            reference_files,
-            True,
-            work_folder
-        )
-
-    # Get the joint lists (and remove duplicates if applicable)
-    root_objects = plot_objects + reference_objects
-    keys = sorted(list(set(plot_keys)))
-    packages = sorted(list(set(plot_packages)))
+    # The dictionaries {package: {file: {key: [list of root objects]}}}
+    plot_p2f2k2o = tobjects_from_files(plot_files, False, work_folder)
+    reference_p2f2k2o = tobjects_from_files(reference_files, True, work_folder)
+    all_p2f2k2o = merge_nested_list_dicts(plot_p2f2k2o, reference_p2f2k2o)
 
     # Open the output file
     # First: Create destination directory if it does not yet exist
@@ -310,8 +278,12 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     # Collect all plotuples for all the files
     all_plotuples = []
 
+    # Only plot packages where we have at least one plot (not just references)
+    # todo: this was the previous standard, do we want to keep it that way?
+    packages = list(sorted(plot_p2f2k2o.keys()))
+
     # for every package
-    for i, package in enumerate(sorted(packages)):
+    for i, package in enumerate(packages):
 
         # Some information to be printed out while the plots are created
         print(terminal_title_line(
@@ -321,43 +293,19 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
         # A list of all objects (including reference objects) that
         # belong to the current package
-        objects_in_pkg = find_root_object(root_objects,
-                                          package=package)
-
-        # Find all ROOT files that were created in the scope of this
-        # package (also including reference files)
-        files_in_pkg = []
-        for plot_object in objects_in_pkg:
-            # For every object in the package, get the corresponding
-            # file name and append it to the list if its not in there
-            rootfile_name = os.path.basename(plot_object.rootfile)
-            if rootfile_name not in files_in_pkg:
-                files_in_pkg.append(rootfile_name)
-        files_in_pkg.sort()
+        # objects_in_pkg = list(plot_p2k2o[package].values()) + \
+        #     list(reference_p2k2o[package].values())
 
         compare_files = []
 
         # Now we loop over all files that belong to the package to
         # group the plots correctly
-        for rootfile in files_in_pkg:
+        for rootfile in sorted(all_p2f2k2o[package].keys()):
             file_name, file_ext = os.path.splitext(rootfile)
 
             # Some more information to be printed out while plots are
             # being created
             print('Creating plots for file: {0}'.format(rootfile))
-
-            # Get the list of all objects that belong to the current
-            # package and the current file. First the regular objects:
-            objects_in_pkg_and_file = find_root_object(
-                objects_in_pkg,
-                rootfile=".*/" + rootfile + ".*"
-            )
-
-            # And then the reference objects
-            objects_in_pkg_and_file += find_root_object(
-                reference_objects,
-                rootfile=".*/" + rootfile + ".*"
-            )
 
             # A list in which we keep all the plotuples for this file
             plotuples = []
@@ -385,23 +333,11 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
             compare_ntuples = []
             compare_html_content = []
             has_reference = False
-            # todo: this is very questionable way of doing this: looping a over a list
-            # of keys and then doing searches instead of just using dictionaries in
-            # the first place
-            for key in sorted(keys):
-
-                # Find all objects for the Plotuple that is defined by the
-                # package, the file and the key
-                root_objects_key = find_root_object(objects_in_pkg_and_file,
-                                                    key=key)
-
-                # If this list is empty, we can continue right away
-                if not root_objects_key:
-                    continue
+            for key in all_p2f2k2o[package][rootfile].keys():
 
                 # Otherwise we can generate Plotuple object
                 plotuple = Plotuple(
-                    root_objects_key,
+                    all_p2f2k2o[package][rootfile][key],
                     revisions,
                     work_folder
                 )
@@ -598,65 +534,58 @@ def tobjects_from_files(root_files, is_reference, work_folder):
         read in and for which the corresponding RootObjects shall be created
     :param is_reference: Boolean value indicating if the objects are
         reference objects or not.
-    :return: List RootObjects, List of Keys in said RootObjects, List of
-        Packages in said RootObjects
+    :return: {package: {file: {key: [list of root objects]}}}
     """
 
-    # Reserve some space for the results that will be returned by this
-    # function
-    list_objects = []
-    list_keys = []
-    list_packages = []
+    # Return value: {package: {key: objects}}
+    return_dict = collections.defaultdict(dict)
+
+    print("from_files", is_reference, root_files)
 
     # Now loop over all given
     for root_file in root_files:
 
         # Create the RootObjects from this file and store them, as well as the
-        file_objects, \
-            file_keys, \
-            file_package = tobjects_from_file(root_file,
-                                              is_reference,
-                                              work_folder)
+        package, key2object = tobjects_from_file(
+            root_file,
+            is_reference,
+            work_folder
+        )
 
-        # Append results to the global results
-        list_objects += file_objects
-        list_keys += file_keys
-        list_packages.append(file_package)
+        return_dict[package][os.path.basename(root_file)] = key2object
 
-    # Remove possible duplicates from the lists
-    list_keys = sorted(list(set(list_keys)))
-    list_packages = sorted(list(set(list_packages)))
-
-    # todo: this is a terrible signature, why don't we just give back {package: file_keys: file_objects}
-    return list_objects, list_keys, list_packages
+    return return_dict
 
 
 def tobjects_from_file(root_file, is_reference, work_folder):
     """
     Takes a root file, loops over its contents and creates the RootObjects
-    for it. It then returns the list of RootObjects, a list of all keys,
-    and a list of all packages for those objects.
+    for it.
     :param root_file: The *.root files which shall be read in and for which the
         corresponding RootObjects shall be created
     :param is_reference: Boolean value indicating if the object is a
         reference object or not.
-    :return: List RootObjects, List of Keys in said RootObjects, and the
-        Packages of said RootObjects
+    :return: package, {key: [list of root objects]}. Note: The list will
+        contain only one root object right now, because package + root file
+        basename key uniquely determine it, but later we will merge this list
+        with files from other revisions.
     """
-
-    # Reserve some space for the results that will be returned by this
-    # function
-    file_objects = []
-    file_keys = []
 
     # Retrieve the Revision and the Package from the path. The Package can
     # directly be returned (c.f. return at the bottom of this function)
     if is_reference:
         revision = 'reference'
         package = root_file.split('/')[-3]
+        if package == "validation" and \
+                root_file.split('/')[-2] == "validation-test":
+            package = "validation-test"
+
     else:
         revision = root_file.split('/')[-3]
         package = root_file.split('/')[-2]
+
+    # Return value: {key: root object}
+    key2object = collections.defaultdict(list)
 
     # Get the 'last modified' timestamp of the revision that contains our
     # current root_file
@@ -668,9 +597,8 @@ def tobjects_from_file(root_file, is_reference, work_folder):
     # Loop over all Keys in that ROOT-File
     for key in tfile.GetListOfKeys():
 
-        # Get the name of the Key and save it in file_keys
+        # Get the name of the Key
         name = key.GetName()
-        file_keys.append(name)
 
         metaoptions = []
         description = "n/a"
@@ -792,7 +720,7 @@ def tobjects_from_file(root_file, is_reference, work_folder):
             continue
 
         # Create the RootObject and append it to the results
-        file_objects.append(
+        key2object[name].append(
             RootObject(
                 revision,
                 package,
@@ -812,8 +740,7 @@ def tobjects_from_file(root_file, is_reference, work_folder):
     # Close the ROOT file before we open the next one!
     tfile.Close()
 
-    # todo: this is a terrible signature, why don't we just give back {package: file_keys: file_objects}
-    return file_objects, file_keys, package
+    return package, key2object
 
 
 ##############################################################################
@@ -1009,7 +936,11 @@ def create_plots(revisions=None, force=False, process_queue=None,
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
-        serve_existing_plots(revisions)
+        print(
+            "Plots for the revision(s) {} have already been created before "
+            "and will be served from the archive.".format(
+                ", ".join(revisions))
+        )
     # Otherwise: Create the requested plots
     else:
         generate_new_plots(revisions, work_folder, process_queue)

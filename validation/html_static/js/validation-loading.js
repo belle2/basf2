@@ -2,10 +2,6 @@
 
 "use strict";
 
-// todo: generally: Maybe it would be better to make data a global variable instead of
-// passing it from function to function, potentially having to reload it from the
-// server if that chain breaks
-
 // ============================================================================
 // Global variables
 // ============================================================================
@@ -14,20 +10,40 @@
  * Is the JS that allows us to render LaTeX already loaded?
  * @type {boolean}
  */
-var latexRenderingLoaded = false;
+let latexRenderingLoaded = false;
 
 /**
  * Is the function renderLatex already recursively running?
  * @type {boolean}
  */
-var latexRenderingInProgress = false;
+let latexRenderingInProgress = false;
 
 /**
  * The number of LaTeX formulas that are on the page.
  * @type {number}
  */
-var latexEqnCount = 0;
+let latexEqnCount = 0;
 
+/**
+ * This object holds information about the script execution of each revision,
+ * and is loaded from results/revisions.json, i.e. corresponds to the
+ * json_objects.Revisions object (basically a list of json_objects.Revision
+ * objects).
+ * This only needs to be initialized ones (namely by loadRevisions() function)
+ * @type {null}
+ */
+let revisionsData = null;
+
+/**
+ * This object holds information about the plots that correspond to
+ * one set of selected revisions and is loaded from
+ * html/plots/<string of revisions>/comparison.json.
+ * However, we also copy some information from revisions_data to it.
+ * This variable is set (and updated) by setupRactiveFromRevision.
+ * We need to update this, whenever the revision selection changes!
+ * @type {null}
+ */
+let comparisonData = null;
 
 // ============================================================================
 // "Top level" functions, i.e. functions that are called directly from the
@@ -36,32 +52,25 @@ var latexEqnCount = 0;
 
 /**
  * This function gets called from the main page validation.html at the
- * beginning and sets up the revisions sub-menu and then loads the
- * corresponding plots to the default selection of the revisions
+ * beginning, loads the revisions data and triggers the set up of the revisions
+ * sub-menu and the loading of the default selection of revisions
  */
 function loadRevisions() {
     console.log("Loading revisions from server");
     let revLoadPath = "../revisions";
 
-    $.get(revLoadPath).then(function (data) {
+    $.get(revLoadPath).then(function (_data) {
+        revisionsData = _data;
+
         console.log("Loading done!");
 
         function setupRevisionLoader(ractive) {
 
             setDefaultPrebuildOption();
-            loadPrebuildRevisions(data);
-
-            // be ready to load any other revision configuration if user desires
-            ractive.on('loadSelectedRevisions', function () {
-                loadSelectedRevisions(data);
-            });
-
-            ractive.on('loadPrebuildRevisions', function () {
-                loadPrebuildRevisions(data);
-            });
+            loadPrebuildRevisions();
         }
 
-        setupRactive("revision", '#revisions', data, null, setupRevisionLoader);
+        setupRactive("revision", '#revisions', revisionsData, null, setupRevisionLoader);
     });
 }
 
@@ -71,10 +80,9 @@ function loadRevisions() {
 function setSystemInfo() {
     console.log("Setting system info.");
     $.get("../system_info").done(
-        function(data) {
-            setupRactive("system_info", '#systeminfo', data);
+        function(system_info) {
+            setupRactive("system_info", '#systeminfo', system_info);
         }
-
     ).fail(
         function (){
             console.warn("Could not get system info.")
@@ -104,9 +112,8 @@ function triggerPopup(itemId) {
 /**
  * This function call is triggered by the button under the revisions list
  * "Load selected" and sets up the page with the new set of revisions.
- * @param data revision data
  */
-function loadSelectedRevisions(data) {
+function loadSelectedRevisions() {
 
     let revList = getSelectedRevsList();
 
@@ -136,7 +143,7 @@ function loadSelectedRevisions(data) {
 
     console.log(`Loading rev via string '${revString}'.`);
 
-    setupRactiveFromRevision(data, revList);
+    setupRactiveFromRevision(revisionsData, revList);
 }
 
 /**
@@ -153,7 +160,7 @@ function setDefaultPrebuildOption(){
     if (mode == null){
         mode = "rbn";
     }
-    // todo: check if this is an allowed mode, else discard!
+    // todo: check if this is an allowed mode (since it might since have vanished), else discard!
     $("#prebuilt-select").val(mode);
     return mode;
 }
@@ -164,9 +171,8 @@ function setDefaultPrebuildOption(){
  * It will also save the value of the drop down menu in localStorage.
  * This function should be bound to the user changing the value in the drop
  * down menu.
- * @param data
  */
-function loadPrebuildRevisions(data){
+function loadPrebuildRevisions(){
     let selector = $("#prebuilt-select")[0];
     let mode = selector.options[selector.selectedIndex].value;
     localStorage.setItem(getStorageId("prebuildRevisionDefault"), mode);
@@ -174,7 +180,7 @@ function loadPrebuildRevisions(data){
     let revisions = getDefaultRevisions(mode);
     console.debug(`Revisions to load are ${revisions.toString()}`);
     setRevisions(revisions);
-    loadSelectedRevisions(data);
+    loadSelectedRevisions();
 }
 
 /**
@@ -338,6 +344,11 @@ function setRevisions(revisionList) {
 // Loading
 // ============================================================================
 
+
+function updateComparisonData(_comparisonData) {
+
+};
+
 /**
  * Gets information about the comparisons and plots (generated when
  * we generate the plots), merges it with the information about the revisions
@@ -363,7 +374,9 @@ function setupRactiveFromRevision(revData, revList) {
     console.log(`Loading Comparison from '${comparisonLoadPath}'`);
 
     // todo: This SCREAMS to be refactored in some way....
-    $.get(comparisonLoadPath).done(function (data) {
+    $.get(comparisonLoadPath).done(function (_comparison_data) {
+
+        comparisonData = _comparison_data;
 
         // Get the newest revision within the selection
         // to get information about failed scripts and the
@@ -373,7 +386,7 @@ function setupRactiveFromRevision(revData, revList) {
         console.debug(`Newest revision is '${newestRev["label"]}'`);
 
         // enrich the comparison data with the newest revision in this comparison
-        data["newest_revision"] = newestRev;
+        comparisonData["newest_revision"] = newestRev;
 
         // We have two sources of information for scripts and plots:
         // * The comparison object from comparisonLoadPath
@@ -389,8 +402,8 @@ function setupRactiveFromRevision(revData, revList) {
             //    'package name' -> 'index in list'
             // for the comparison object.
             let comparisonDataPkg2Index = {};
-            for (let index in data["packages"]) {
-                let name = data["packages"][index]["name"];
+            for (let index in comparisonData["packages"]) {
+                let name = comparisonData["packages"][index]["name"];
                 comparisonDataPkg2Index[name] = index;
             }
 
@@ -407,12 +420,12 @@ function setupRactiveFromRevision(revData, revList) {
                     // ==> Just add the information
                     let ipkg = comparisonDataPkg2Index [name];
 
-                    data["packages"][ipkg]["fail_count"] = failCount;
-                    data["packages"][ipkg]["scriptfiles"] = scriptfiles;
+                    comparisonData["packages"][ipkg]["fail_count"] = failCount;
+                    comparisonData["packages"][ipkg]["scriptfiles"] = scriptfiles;
                     // Also store the label of the newest revision as this
                     // is needed to stich together the loading path of
                     // log files
-                    data["packages"][ipkg]["newest_revision"] = label;
+                    comparisonData["packages"][ipkg]["newest_revision"] = label;
                 } else {
                     // Did not find the package in the comparison object
                     // ==> If there's a reason to display it on the homepage
@@ -441,23 +454,26 @@ function setupRactiveFromRevision(revData, revList) {
                         // comparison file and are nescessary for things to work
                         pkgDict["visible"] = true;
                         pkgDict["comparison_error"] = 0; // else problems in package template
-                        data["packages"].push(pkgDict);
+                        comparisonData["packages"].push(pkgDict);
 
                     }
                 }
             }
+
+            console.log("Data after updating");
+            console.log(comparisonData);
         } else {
             console.debug("Newest rev is null.")
         }
 
-        setupRactive("package", '#packages', data,
+        setupRactive("package", '#packages', comparisonData,
             // Wire the clicks on package names
             function (ractive) {
 
-                if ("packages" in data) {
-                    let firstPackageName = getDefaultPackageName(data["packages"]);
+                if ("packages" in comparisonData) {
+                    let firstPackageName = getDefaultPackageName();
                     if (firstPackageName !== false) {
-                        loadValidationPlots(firstPackageName, data);
+                        loadValidationPlots(firstPackageName, comparisonData);
                     } else {
                         console.warn("No package could be loaded.");
                         $("content").text("No package could be loaded");
@@ -488,7 +504,7 @@ function setupRactiveFromRevision(revData, revList) {
 
                             // the context will contain the json object which was
                             // used to create this template instance
-                            loadValidationPlots(evt.context.name, data);
+                            loadValidationPlots(evt.context.name, comparisonData);
                         }
 
                         // Remember that this package was open last
@@ -496,6 +512,7 @@ function setupRactiveFromRevision(revData, revList) {
                     }
                 });
             });
+
     }).fail(function () {
 
         console.log(`Comparison '${revString}' does not exist yet, requesting it`);
@@ -508,8 +525,8 @@ function setupRactiveFromRevision(revData, revList) {
             data: JSON.stringify({
                 "revision_list": revList
             })
-        }).done(function (data) {
-            let key = data["progress_key"];
+        }).done(function (progress_data) {
+            let key = progress_data["progress_key"];
             beginCreatePlotWait(revList, revList, key, revData);
         });
     });
@@ -520,9 +537,8 @@ function setupRactiveFromRevision(revData, revList) {
  * Sets up the plot containers with the correct plots corresponding to the
  * selection of the revisions.
  * @param packageLoadName
- * @param data
  */
-function loadValidationPlots(packageLoadName, data) {
+function loadValidationPlots(packageLoadName) {
     console.log(`loadValidationPlots: Loading plots for package '${packageLoadName}'`);
 
     let loadedPackage = null;
@@ -539,9 +555,9 @@ function loadValidationPlots(packageLoadName, data) {
         // todo: also use arguments to this function, rather then $(this)
         let label = $(this).text();
         // find the revision with the same label
-        for (let i in data["revisions"]) {
-            if (data["revisions"][i].label === label) {
-                $(this).css("color", data["revisions"][i].color);
+        for (let i in comparisonData["revisions"]) {
+            if (comparisonData["revisions"][i].label === label) {
+                $(this).css("color", comparisonData["revisions"][i].color);
             }
         }
 
@@ -556,13 +572,13 @@ function loadValidationPlots(packageLoadName, data) {
     });
 
     if (packageLoadName === "") {
-        packageLoadName = getDefaultPackageName(data["packages"]);
+        packageLoadName = getDefaultPackageName(comparisonData["packages"]);
     }
 
     // Find data of the package by package name
-    for (let i in data["packages"]) {
-        if (data["packages"][i].name === packageLoadName) {
-            loadedPackage = data["packages"][i];
+    for (let i in comparisonData["packages"]) {
+        if (comparisonData["packages"][i].name === packageLoadName) {
+            loadedPackage = comparisonData["packages"][i];
             break;
         }
     }
@@ -646,7 +662,7 @@ function loadValidationPlots(packageLoadName, data) {
  */
 function fillNtupleTable(domId, jsonLoadingPath) {
     // move out of the static folder
-    $.getJSON(`../${jsonLoadingPath}`, function (data) {
+    $.getJSON(`../${jsonLoadingPath}`, function (ntuple_data) {
         let items = [];
 
         // add header
@@ -654,9 +670,9 @@ function fillNtupleTable(domId, jsonLoadingPath) {
         items.push("<th>tag</th>");
 
         // get the name of each value which is plotted
-        for (let rev in data) {
-            for (let fig in data[rev]) {
-                let val_pair = data[rev][fig];
+        for (let rev in ntuple_data) {
+            for (let fig in ntuple_data[rev]) {
+                let val_pair = ntuple_data[rev][fig];
                 items.push(`<th>${val_pair[0]}</th>`);
             }
             break;
@@ -665,13 +681,13 @@ function fillNtupleTable(domId, jsonLoadingPath) {
         items.push("</tr>");
 
         // reference first, if available
-        $.each(data, function (key) {
+        $.each(ntuple_data, function (key) {
 
             if (key === "reference") {
                 items.push("<tr>");
                 items.push(`<td>${key}</td>`);
-                for (let fig in data[key]) {
-                    let val_pair = data[key][fig];
+                for (let fig in ntuple_data[key]) {
+                    let val_pair = ntuple_data[key][fig];
                     items.push(`<td>${val_pair[1]}</td>`);
                 }
                 items.push("</tr>");
@@ -679,12 +695,12 @@ function fillNtupleTable(domId, jsonLoadingPath) {
         });
 
         // now the rest
-        $.each(data, function (key) {
+        $.each(ntuple_data, function (key) {
             if (key !== "reference") {
                 items.push("<tr>");
                 items.push(`<td>${key}</td>`);
-                for (let fig in data[key]) {
-                    let val_pair = data[key][fig];
+                for (let fig in ntuple_data[key]) {
+                    let val_pair = ntuple_data[key][fig];
                     items.push(`<td>${val_pair[1]}</td>`);
                 }
                 items.push("</tr>");
@@ -697,17 +713,18 @@ function fillNtupleTable(domId, jsonLoadingPath) {
 
 
 // ============================================================================
-// Small helper functions
+// Various getters
 // ============================================================================
 
 /**
  * The package that is opened, when the validation page is opened.
  *  Currently that's just picking the page first in alphabetic order
  *  (i.e. analysis) or false if no packages are available.
- * @param packageList A list of package objects (data["packages"])
  * @return {*}
  */
-function getDefaultPackageName(packageList) {
+function getDefaultPackageName() {
+
+    let packageList = comparisonData["packages"];
 
     if (packageList.length === 0) {
         console.debug("getDefaultPackageName: No packages available.");
@@ -820,6 +837,11 @@ function getNewestRevision(revData) {
 
     return newest
 }
+
+
+// ============================================================================
+// LaTeX
+// ============================================================================
 
 /**
  * Render any latex formula on the current page and keep on recursively calling

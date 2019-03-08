@@ -349,6 +349,11 @@ textarea {
 
 #prebuilt-select-container {
     display: block;
+    padding-bottom: 7px;
+}
+
+#reference-select-container{
+    display: block;
     padding-top: 7px;
     font-size: 11px;
 }

@@ -146,7 +146,7 @@ function loadSelectedRevisions(data) {
  * @returns the mode which was set
  */
 function setDefaultPrebuildOption(){
-    setReferenceSelection("reference");
+    setReferenceSelectionOptions();
 
     let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
     console.debug(`RECOVERED ${mode}`);
@@ -178,24 +178,54 @@ function loadPrebuildRevisions(data){
 }
 
 /**
- * Return the revision selected as refrence
- * @returns {*|jQuery|*|*}
+ * Return the revision selected as reference
+ * @returns
  */
 function getReferenceSelection(){
-    var myRadio = $("input[name=reference-selection-radio]");
-    return myRadio.filter(":checked").val();
+    let selector = $("#reference-select")[0];
+    let option = selector.options[selector.selectedIndex].value;
+    if ( option === "auto"){
+        // second newest revision (by alphabetic sorting)
+        // todo: the newest revision, which is compared is taken by chronological
+        //   sorting ==> this is not quite consistent
+        let selected_revs = getSelectedRevsList();
+        selected_revs.sort();
+        if (selected_revs.includes("reference")){
+            return "reference"
+        }
+        if (selected_revs.length <= 1){
+            // impossible to do a comparison anyhow
+            return null;
+        }
+        return selected_revs[-2];
+    }
+    else {
+        return option;
+    }
 }
 
 /**
- * Set a custom revision as reference
- * @param revision the revision to be reference
+ * Set the dropdown menu 'custom reference selection'
  */
-function setReferenceSelection(revision){
-    $(`#reference-radio-${revision}`).each(
-        (i, obj) => {
-            obj.checked = true;
-        }
-    );
+function setReferenceSelectionOptions(){
+    let selector = $("#reference-select")[0];
+    selector.options.length = 1;
+    let selected_revs = getSelectedRevsList();
+    for (let i_rev in selected_revs){
+        let rev = selected_revs[i_rev];
+        selector.options[selector.options.length] = new Option(
+            rev, rev
+        );
+    }
+    onReferenceSelectionChanged();
+}
+
+function onRevisionSelectionChanged(){
+    // Because we now have different revisions to pick from, we update the
+    // reference dropdown menu.
+    setReferenceSelectionOptions();
+    // Since this also reset to 'Automatic', this probably also changed our
+    // reference selection, so we call
     onReferenceSelectionChanged();
 }
 
@@ -207,9 +237,8 @@ function setReferenceSelection(revision){
  * 3. The reference revision is shown in bold.
  */
 function onReferenceSelectionChanged(){
-    $('.reference-checkbox').each(function (i, obj) {
-        obj.disabled = false;
-    });
+    console.warn("referenceSelectionChanged");
+
     $(`.revision-label`).each(
         (i, obj) => {
             obj.style.fontWeight = "normal";
@@ -217,20 +246,6 @@ function onReferenceSelectionChanged(){
     );
 
     let selectedReference = getReferenceSelection();
-    if ( selectedReference !== "reference"){
-        $("#reference-checkbox-reference").each(
-            (i, obj) => {
-                obj.checked = false;
-                obj.disabled = true;
-            }
-        );
-    }
-    $(`#reference-checkbox-${selectedReference}`).each(
-        (i, obj) => {
-            obj.checked = true;
-            obj.disabled = true;
-        }
-    );
     $(`#revision-label-${selectedReference}`).each(
         (i, obj) => {
             obj.style.fontWeight = "bold";
@@ -238,7 +253,7 @@ function onReferenceSelectionChanged(){
     );
 
     // todo: also style newest revision in bold. Problem: we don't have the
-    // argument for that yet.
+    //   argument for that yet. 
     // let newestRevision = getNewestRevision()
 }
 

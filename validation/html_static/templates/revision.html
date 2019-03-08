@@ -1,21 +1,25 @@
+<span id="prebuilt-select-container" title="Any of the following combinations of revisions is already prebuilt (i.e. no new plots will have to be created). Furthermore, the last selected setting here will be remembered and restored when the validation page is opened.">
+  <span>Popular/prebuilt/default</span>:
+  <label for="prebuilt-select"></label>
+  <select id="prebuilt-select" on-change="loadPrebuildRevisions">
+    <option value="rbn" title="Reference and the latest (pre)release, latest build and latest nightly">R+latest rel/build/night</option>
+    <option value="r" title="Reference and the latest (pre)release">R+latest release</option>
+    <option value="b" title="Reference and the latest build">R+latest build</option>
+    <option value="n" title="Reference and the latest nightly">R+latest nightly</option>
+    <option value="nnn" title="Reference and all nightly revisions">R+all nightlies</option>
+    <option value="all">R+all revisions</option>
+  </select>
+</span>
 {{#revisions}}
 <div>
   <!-- color will be update by the java script method loadValidationPlots -->
   <div>
-    <input
-        class="reference-radio"
-        id="reference-radio-{{label}}"
-        type="radio"
-        name="reference-selection-radio"
-        value="{{label}}"
-        title="Use this revision as a reference, i.e. compare the newest selected revision to this revision. The two compared revisions will be shown in bold face."
-        onclick="onReferenceSelectionChanged()"
-    >
     <input  class="reference-checkbox" name="revisions"
             id="reference-checkbox-{{label}}"
             value="{{label}}" checked=""
             type="checkbox"
             title="Show this revision in the plots."
+            onchange="onRevisionSelectionChanged()"
     >
     <label
         for="reference-checkbox-{{label}}"
@@ -34,18 +38,13 @@
 <!-- actually this should be a div, but then this will be formatted by the
 div: last-child rule, so just make it a span and give it the corresponding
 CSS properties -->
-<span id="button-revision-load-container">
-	<button id="button-revision-load" on-click='loadSelectedRevisions'>Load selected</button>
-</span>
-<span id="prebuilt-select-container" title="Any of the following combinations of revisions is already prebuilt (i.e. no new plots will have to be created). Furthermore, the last selected setting here will be remembered and restored when the validation page is opened.">
-  <span>Popular/prebuilt/default</span>:
-  <label for="prebuilt-select"></label>
-  <select id="prebuilt-select" on-change="loadPrebuildRevisions">
-    <option value="rbn" title="Reference and the latest (pre)release, latest build and latest nightly">Ref + latest rel/build/night</option>
-    <option value="r" title="Reference and the latest (pre)release">Ref + latest release</option>
-    <option value="b" title="Reference and the latest build">Ref + latest build</option>
-    <option value="n" title="Reference and the latest nightly">Ref + latest nightly</option>
-    <option value="nnn" title="Reference and all nightly revisions">Ref + all nightlies</option>
-    <option value="all">Ref + all revisions</option>
+<span id="reference-select-container" title="">
+  <span>Revision as custom reference:</span>
+  <label for="reference-select"></label>
+  <select id="reference-select" onchange="onReferenceSelectionChanged()">
+    <option value="auto" title="Reference (if drawn), else second newest revision">Automatic</option>
   </select>
+</span>
+<span id="button-revision-load-container">
+	<button id="button-revision-load" on-click='loadSelectedRevisions'>Load custom selection</button>
 </span>

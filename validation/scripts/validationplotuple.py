@@ -82,8 +82,8 @@ class Plotuple:
         # todo: this might give confusing results in comparison with sorting by
         # name and we also have a nonlinear history, so this doesn't make sense...
         self.elements = sorted(
-            [_ for _ in root_objects if _ is not self.reference],
-            key=lambda _: _.date,
+            [ro for ro in root_objects if not ro.is_reference],
+            key=lambda ro: ro.date,
             reverse=True
         )
 

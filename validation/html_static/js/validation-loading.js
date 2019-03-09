@@ -280,7 +280,7 @@ function onReferenceSelectionChanged(){
  */
 function getDefaultRevisions(mode="rbn") {
 
-    let allRevisions = getAllRevsList().sort().reverse();
+    let allRevisions = getRevs().sort().reverse();
 
     let referenceRevision = "reference";
     let releaseRevisions = [];
@@ -364,7 +364,7 @@ function updateComparisonData(_comparisonData) {
     // Get the newest revision within the selection
     // to get information about failed scripts and the
     // log files
-    let newestRev = findObjectWithKey(revisionsData["revisions"], "label", getNewestRevision());
+    let newestRev = getObjectWithKey(revisionsData["revisions"], "label", getNewestRevision());
 
     console.debug(`Newest revision is '${newestRev["label"]}'`);
 
@@ -541,82 +541,61 @@ function setupRactiveFromRevision(revList) {
 /**
  * Sets up the plot containers with the correct plots corresponding to the
  * selection of the revisions.
- * @param packageLoadName
+ * @param packageLoadName name of the package to be loaded (if unsupplied:
+ *  default package name)
  */
-function loadValidationPlots(packageLoadName) {
+function loadValidationPlots(packageLoadName="") {
     console.log(`loadValidationPlots: Loading plots for package '${packageLoadName}'`);
 
-    let loadedPackage = null;
-
-    console.log(`loadValidationPlots: Comparison data for package '${packageLoadName}' loaded`);
-
-    let selected_list = getSelectedRevsList();
     let reference = getReferenceSelection();
 
     // update the already displayed revision labels with the correct colors
     $(".revision-label").each( function () {
-
-        // todo: this is overly complicated: Just loop over selected list and set colors and set everything to standard before
-        // todo: also use arguments to this function, rather then $(this)
-        let label = $(this).text();
-        // find the revision with the same label
-        for (let i in comparisonData["revisions"]) {
-            if (comparisonData["revisions"][i].label === label) {
-                $(this).css("color", comparisonData["revisions"][i].color);
-            }
-        }
-
-        if (reference === label){
-            $(this).css("color", "black")
-        }
-
-        if (selected_list.indexOf(label) < 0) {
-            // the one which are not selected will be grayed out
-            $(this).css("color", "grey");
-        }
+        $(this).css("color", "grey");
     });
 
-    if (packageLoadName === "") {
-        packageLoadName = getDefaultPackageName(comparisonData["packages"]);
-    }
-
-    // Find data of the package by package name
-    for (let i in comparisonData["packages"]) {
-        if (comparisonData["packages"][i].name === packageLoadName) {
-            loadedPackage = comparisonData["packages"][i];
-            break;
+    for (let i in comparisonData["revisions"]){
+        let label = comparisonData["revisions"][i]["label"];
+        let color;
+        if (label === reference){
+            color = "black"
         }
+        else{
+            color = comparisonData["revisions"][i]["color"];
+        }
+        console.log(`label: ${label}, color: ${color}, #revision-label-${label}`);
+
+        $(`#revision-label-${label}`).each( function () {
+            $(this).css("color", color)
+        })
     }
 
-    // fixme: Shouldn't something happen here??
-    if (loadedPackage == null) {
+
+    if (packageLoadName === "") {
+        packageLoadName = getDefaultPackageName();
+    }
+    let loadedPackageData = getObjectWithKey(comparisonData["packages"], "name", packageLoadName);
+    if (loadedPackageData == null) {
+        // we requested a package which doesn't exist in our data
+        return;
     }
 
     // create unique ids for each plot, which can be used to create
     // links to individual plot images
     let uniq_plot_id = 1;
-    for (let i in loadedPackage["plotfiles"]) {
-        for (let ploti in loadedPackage["plotfiles"][i]["plots"]) {
-            loadedPackage["plotfiles"][i]["plots"][ploti]["unique_id"] = uniq_plot_id++;
+    for (let i in loadedPackageData["plotfiles"]) {
+        for (let ploti in loadedPackageData["plotfiles"][i]["plots"]) {
+            loadedPackageData["plotfiles"][i]["plots"][ploti]["unique_id"] = uniq_plot_id++;
         }
     }
 
-    let wrappedPackage = {packages: [loadedPackage]};
+    let wrappedPackage = {packages: [loadedPackageData]};
 
     setupRactive("plot_container", '#content', wrappedPackage, null,
         // on complete
         function (ractive) {
             ractiveValueRecoverSession(ractive, "show_overview");
             ractiveValueRecoverSession(ractive, "show_expert_plots");
-
-            // setup the jquery ui toggle buttons
-            // this can only be done here, otherwise the initial values of the toggle buttons
-            // will not be correct
-            /*
-            do not enable jquery ui buttons atm, because the toggle option
-            cannot be properly initialized with color
-            $("#check_show_overview").button();
-            $("#check_show_expert_plots").button();*/
 
             // make sure changes to the viewing settings are stored right away
             ractive.observe('show_overview', function () {
@@ -781,16 +760,15 @@ function getSelectedRevsList() {
     return selectedRev;
 }
 
-// todo: rather get this directly from revisionsData
 /**
- * Returns an array with all revisions shown in the submenu.
+ * Returns an array with all revision labels.
  * @returns {Array}
  */
-function getAllRevsList() {
+function getRevs() {
     let revs = [];
-    $('.reference-checkbox').each(function (i, obj) {
-        revs.push(obj.value)
-    });
+    for (let revision of revisionsData["revisions"]) {
+        revs.push(revision["label"]);
+    }
     revs.sort();
     return revs;
 }
@@ -802,8 +780,7 @@ function getAllRevsList() {
 function selectedRevsListToString(selectedRevs) {
     let revString = "";
     for (let i in selectedRevs) {
-        if (i > 0)
-            revString += "_";
+        if (i > 0) revString += "_";
         revString += selectedRevs[i];
     }
     return revString;
@@ -834,13 +811,15 @@ function getNewestRevision(index=0) {
 }
 
 /** Find an object in a list of objects by comparing a key with a certain value. */
-function findObjectWithKey(objects, key, value) {
-    for (let i in objects){
-        if (objects[i][key] === value) {
-            return objects[i]
+function getObjectWithKey(objects, key, value) {
+    for (let o of objects){
+        if (o[key] === value) {
+            return o;
         }
     }
-    console.warn(`Failed to find object with ${key}==${value}`);
+    console.warn(`Failed to find object with ${key}==${value}.`);
+    console.log("Objects to search in were:");
+    console.log(objects);
     return null;
 }
 

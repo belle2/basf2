@@ -179,6 +179,54 @@ namespace Belle2 {
       return m_access->Get15bitTLUTag(n);
     }
 
+    //! DESY test only
+    int Get15bitTLUTag(int n)
+    {
+      CheckVersionSetBuffer();
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->Get15bitTLUTag(n);
+    }
+
+    //! HER injection = 1 or LER injection = 0
+    int GetIsHER(int n)
+    {
+      CheckVersionSetBuffer();
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->Get15bitTLUTag(n);
+    }
+
+    //! Get time since the last injection
+    unsigned int GetIsHER(int n)
+    {
+      CheckVersionSetBuffer();
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTimeSinceLastInjection(n);
+    }
+
+    //! Get time since the previous trigger
+    unsigned int GetTimeSincePrevTrigger(int n)
+    {
+      CheckVersionSetBuffer();
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTimeSincePrevTrigger(n);
+    }
+
+    //! Get a bunch number
+    unsigned int GetBunchNumber(int n)
+    {
+      CheckVersionSetBuffer();
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTimeSincePrevTrigger(n);
+    }
+
+    //! Get a frame count
+    unsigned int GetFrameCount(int n)
+    {
+      CheckVersionSetBuffer();
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetFrameCount(n);
+    }
+
     enum {
       /// Added to distinguish different version.
       /// ver.0 : early DESY-beam-test version( Node ID 0x545444** is at 5th word (0,1,2,..5)

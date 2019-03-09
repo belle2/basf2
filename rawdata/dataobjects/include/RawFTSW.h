@@ -179,24 +179,16 @@ namespace Belle2 {
       return m_access->Get15bitTLUTag(n);
     }
 
-    //! DESY test only
-    int Get15bitTLUTag(int n)
-    {
-      CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
-      return m_access->Get15bitTLUTag(n);
-    }
-
     //! HER injection = 1 or LER injection = 0
     int GetIsHER(int n)
     {
       CheckVersionSetBuffer();
       m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
-      return m_access->Get15bitTLUTag(n);
+      return m_access->GetIsHER(n);
     }
 
     //! Get time since the last injection
-    unsigned int GetIsHER(int n)
+    unsigned int GetTimeSinceLastInjection(int n)
     {
       CheckVersionSetBuffer();
       m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
@@ -216,7 +208,7 @@ namespace Belle2 {
     {
       CheckVersionSetBuffer();
       m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
-      return m_access->GetTimeSincePrevTrigger(n);
+      return m_access->GetBunchNumber(n);
     }
 
     //! Get a frame count

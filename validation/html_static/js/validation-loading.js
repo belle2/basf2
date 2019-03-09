@@ -777,6 +777,15 @@ function selectedRevsListToString(selectedRevs) {
 function getNewestRevision(index=0) {
 
     let selectedRevs = getSelectedRevsList();
+    if (selectedRevs == null || selectedRevs.length === 0){
+        console.warn("no selected revisions found!");
+    }
+    console.log(selectedRevs);
+    if ( selectedRevs.length === 1 &&  selectedRevs[0] === "reference"){
+        // Need a special treatment in this case, because reference doesn't
+        // have a date set!
+        return "reference";
+    }
 
     let date2rev = {};
     for (let revision of revisionsData["revisions"]){
@@ -788,7 +797,15 @@ function getNewestRevision(index=0) {
     }
 
     let dates = Object.keys(date2rev);
-    let chosen_date = dates[index];
+
+    let chosen_date;
+    if (index >= dates.length){
+        console.log(`getNewestRevision(${index}): Too few revisions (${dates.length}); returning last one instead`);
+        chosen_date = dates[-1];
+    }
+    else {
+        chosen_date = dates[index];
+    }
     return date2rev[chosen_date]
 }
 

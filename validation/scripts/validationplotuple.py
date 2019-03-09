@@ -79,11 +79,12 @@ class Plotuple:
         # All elements of the Plotuple that are not the reference-object
         # Get the elements, i.e. all RootObjects except for the
         # reference object. May be either histograms or n-tuples.
-        # todo: this might give confusing results in comparison with sorting by
-        # name and we also have a nonlinear history, so this doesn't make sense...
-        self.elements = sorted(
-            [ro for ro in root_objects if not ro.is_reference],
-            key=lambda ro: ro.date,
+        # Note that the reference doesn't have a date set (and if we only plot
+        # the reference, then is_reference is probably not set), so we have
+        # to be careful of how to sort
+        self.elements = [ro for ro in root_objects if not ro.is_reference]
+        self.elements.sort(
+            key=lambda ro: ro.date if ro.date else 0,
             reverse=True
         )
 

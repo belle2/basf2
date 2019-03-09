@@ -52,7 +52,6 @@ namespace Belle2 {
     int GetNwordsHeader(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetNwordsHeader(n);
     }
 
@@ -60,7 +59,6 @@ namespace Belle2 {
     unsigned int GetFTSWNodeID(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetFTSWNodeID(n);
     }
 
@@ -68,7 +66,6 @@ namespace Belle2 {
     unsigned int GetEveNo(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetEveNo(n);
     }
 
@@ -76,7 +73,6 @@ namespace Belle2 {
     unsigned int GetTTCtimeTRGType(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetTTCtimeTRGType(n);
     }
 
@@ -84,7 +80,6 @@ namespace Belle2 {
     unsigned int GetTTUtime(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetTTUtime(n);
     }
 
@@ -92,7 +87,6 @@ namespace Belle2 {
     int GetTTCtime(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetTTCtime(n);
     }
 
@@ -100,7 +94,6 @@ namespace Belle2 {
     int GetTRGType(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetTRGType(n);
     }
 
@@ -108,7 +101,6 @@ namespace Belle2 {
     void GetTTTimeVal(int n, struct timeval* tv)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetTTTimeVal(n, tv);
     }
 
@@ -116,7 +108,6 @@ namespace Belle2 {
     unsigned int GetMagicTrailer(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetMagicTrailer(n);
     }
 
@@ -126,7 +117,6 @@ namespace Belle2 {
                    unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->CheckData(n, prev_evenum, cur_evenum, prev_exprunsubrun_no, cur_exprunsubrun_no);
     }
 
@@ -134,7 +124,6 @@ namespace Belle2 {
     unsigned int GetExpRunSubrun(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetExpRunSubrun(n);
     }
 
@@ -142,7 +131,6 @@ namespace Belle2 {
     int GetRunNo(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetRunNo(n);
     }
 
@@ -151,7 +139,6 @@ namespace Belle2 {
     int GetSubRunNo(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetSubRunNo(n);
     }
 
@@ -159,7 +146,6 @@ namespace Belle2 {
     int GetRunNoSubRunNo(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetRunNoSubRunNo(n);
     }
 
@@ -167,7 +153,6 @@ namespace Belle2 {
     int GetExpNo(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetExpNo(n);
     }
 
@@ -175,7 +160,6 @@ namespace Belle2 {
     int Get15bitTLUTag(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->Get15bitTLUTag(n);
     }
 
@@ -183,7 +167,6 @@ namespace Belle2 {
     int GetIsHER(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetIsHER(n);
     }
 
@@ -191,7 +174,6 @@ namespace Belle2 {
     unsigned int GetTimeSinceLastInjection(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetTimeSinceLastInjection(n);
     }
 
@@ -199,7 +181,6 @@ namespace Belle2 {
     unsigned int GetTimeSincePrevTrigger(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetTimeSincePrevTrigger(n);
     }
 
@@ -207,7 +188,6 @@ namespace Belle2 {
     unsigned int GetBunchNumber(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetBunchNumber(n);
     }
 
@@ -215,7 +195,6 @@ namespace Belle2 {
     unsigned int GetFrameCount(int n)
     {
       CheckVersionSetBuffer();
-      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
       return m_access->GetFrameCount(n);
     }
 
@@ -238,10 +217,10 @@ namespace Belle2 {
     };
 
     //! class to access
-    RawFTSWFormat* m_access; //! do not record
+    RawFTSWFormat* m_access{}; //! do not record
 
     /// Version of the format
-    int m_version; //! do not record
+    int m_version = 0; //! do not record
 
   protected :
     /// To derive from TObject

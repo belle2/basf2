@@ -119,6 +119,8 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
             masking.param('ShaperDigitsUnmasked', shaperDigitsName)
             path.add_module(masking)
 
+    path.add_module('SVDDataFormatCheck', ShaperDigits=shaperDigitsName)
+
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)

@@ -110,7 +110,7 @@ def get_popular_revision_combinations(work_folder):
 
     # Remove all Nones from the sublists
     ret = [
-        sorted(list(filter(None, comb))) for comb in ret
+        list(filter(None, comb)) for comb in ret
     ]
     # Remove all empty lists
     ret = list(filter(None, ret))

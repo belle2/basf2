@@ -120,9 +120,15 @@ function loadSelectedRevisions() {
 
     let revList = getSelectedRevsList();
 
+    console.log(`revList: ${revList}`);
+
     // Now we need to put the revision that serves as comparison reference first!
     let reference = getReferenceSelection();
+
+    console.log(`Bringing reference '${reference}' to front`);
+
     if (reference !== undefined){
+        // remove reference from the list of revisions
         let referenceIndex = revList.indexOf(reference);
         if (referenceIndex > -1){
             revList.splice(referenceIndex, 1);
@@ -130,13 +136,14 @@ function loadSelectedRevisions() {
         else {
             console.warn("Selected reference not in revisions.")
         }
+        // add reference to fron of revisions
         revList.unshift(reference);
     }
     else {
         console.warn("No reference selected.")
     }
 
-    console.log(revList);
+    console.log(`revList, after sorting: ${revList}`);
 
     let revString = selectedRevsListToString(revList);
 
@@ -144,7 +151,7 @@ function loadSelectedRevisions() {
         alert("Please select at least one tag!");
     }
 
-    console.log(`Loading rev via string '${revString}'.`);
+    console.log(`Loading revisions '${revList}' via string '${revString}'.`);
 
     setupRactiveFromRevision(revList);
 }
@@ -182,7 +189,7 @@ function loadPrebuildRevisions(){
     console.debug(`Loading prebuild revision with mode '${mode}'`);
     let revisions = getDefaultRevisions(mode);
     console.debug(`Revisions to load are ${revisions.toString()}`);
-    setRevisions(revisions);
+    setRevisionSelection(revisions);
     loadSelectedRevisions();
 }
 
@@ -321,7 +328,7 @@ function getDefaultRevisions(mode="rbn") {
         // default anyway
     }
     else {
-        console.error(`Unknown getDefaultRevisions mode '${mode}'!`);
+        console.error("Falling back to rbn mode!");
     }
 
     let rbnRevisions = [referenceRevision];
@@ -344,10 +351,11 @@ function getDefaultRevisions(mode="rbn") {
  *  will be unchecked. Any revision in this list which does not have a
  *  corresponding checkbox will be ignored.
  */
-function setRevisions(revisionList) {
+function setRevisionSelection(revisionList) {
     $('.reference-checkbox').each(function (i, obj) {
         obj.checked = revisionList.includes(obj.value);
     });
+    onRevisionSelectionChanged();
 }
 
 // ============================================================================
@@ -797,6 +805,7 @@ function getNewestRevision(index=0) {
     }
 
     let dates = Object.keys(date2rev);
+    dates.sort().reverse();
 
     let chosen_date;
     if (index >= dates.length){
@@ -806,7 +815,9 @@ function getNewestRevision(index=0) {
     else {
         chosen_date = dates[index];
     }
-    return date2rev[chosen_date]
+    let chosenRev = date2rev[chosen_date];
+    console.log(`Revision by newest at index ${index}: ${chosenRev}`);
+    return chosenRev
 }
 
 /** Find an object in a list of objects by comparing a key with a certain value. */

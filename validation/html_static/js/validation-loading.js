@@ -309,26 +309,30 @@ function getDefaultRevisions(mode="rbn") {
         }
     }
 
+    // NOTE THE DESIGN PATTERN BELOW:
+    // Don't use [referenceRevision, otherList[0]] or similar, because this
+    // gives problems if otherList is of length 0!
+
     if (mode === "all"){
         return allRevisions;
     }
-    else if (mode === "r" && releaseRevisions.length >= 1){
-        return [referenceRevision, releaseRevisions[0]];
+    else if (mode === "r"){
+        return [referenceRevision].concat(releaseRevisions.slice(0, 1));
     }
-    else if (mode === "b" && buildRevisions.length >= 1){
-        return [referenceRevision, buildRevisions[0]];
+    else if (mode === "b"){
+        return [referenceRevision].concat(buildRevisions.slice(0,1));
     }
-    else if (mode === "n" && nightlyRevisions.length >= 1){
-        return [referenceRevision, nightlyRevisions[0]];
+    else if (mode === "n"){
+        return [referenceRevision].concat(nightlyRevisions.slice(0, 1));
     }
-    else if (mode === "nnn" && nightlyRevisions.length >= 1){
+    else if (mode === "nnn"){
         return [referenceRevision].concat(nightlyRevisions);
     }
     else if (mode === "rbn"){
         // default anyway
     }
     else {
-        console.error("Falling back to rbn mode!");
+        console.error(`getDefaultRevisions: Unknown mode ${mode} ==> falling back to rbn!`);
     }
 
     let rbnRevisions = [referenceRevision];

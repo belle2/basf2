@@ -133,6 +133,10 @@ namespace Belle2 {
     enum {
       INJ_HER_LER_MASK = 0x80000000,
       INJ_HER_LER_SHIFT = 31,
+      INJ_TIME_MASK = 0x7FFFFFFF,
+      INJ_TIME_SHIFT = 0,
+      INJ_BUNCH_MASK = 0x000007FF,
+      INJ_BUNCH_SHIFT = 0,
       EXP_MASK = 0xFFC00000,
       EXP_SHIFT = 22,
       RUNNO_MASK = 0x003FFF00,

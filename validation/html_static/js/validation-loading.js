@@ -217,8 +217,7 @@ function setReferenceSelectionOptions(){
     selector.options.length = 1;
     let selected_revs = getSelectedRevsList();
     // Add all selected revisions as options for the reference:
-    for (let i_rev in selected_revs){
-        let rev = selected_revs[i_rev];
+    for (let rev of selected_revs){
         selector.options[selector.options.length] = new Option(
             rev, rev
         );
@@ -287,8 +286,7 @@ function getDefaultRevisions(mode="rbn") {
     let buildRevisions = [];
     let nightlyRevisions = [];
 
-    for (let i in allRevisions){
-        let rev = allRevisions[i];
+    for (let rev of allRevisions){
         // fixme: This will have problems with sorting. Probably we rather want to have prerelease as a new category!
         if (rev.startsWith("release") || rev.startsWith("prerelease")) {
             releaseRevisions.push(rev);
@@ -554,16 +552,9 @@ function loadValidationPlots(packageLoadName="") {
         $(this).css("color", "grey");
     });
 
-    for (let i in comparisonData["revisions"]){
-        let label = comparisonData["revisions"][i]["label"];
-        let color;
-        if (label === reference){
-            color = "black"
-        }
-        else{
-            color = comparisonData["revisions"][i]["color"];
-        }
-        console.log(`label: ${label}, color: ${color}, #revision-label-${label}`);
+    for (let revision of comparisonData["revisions"]){
+        let label = revision["label"];
+        let color = revision["color"];
 
         $(`#revision-label-${label}`).each( function () {
             $(this).css("color", color)
@@ -655,8 +646,7 @@ function fillNtupleTable(domId, jsonLoadingPath) {
 
         // get the name of each value which is plotted
         for (let rev in ntuple_data) {
-            for (let fig in ntuple_data[rev]) {
-                let val_pair = ntuple_data[rev][fig];
+            for (let val_pair of ntuple_data[rev]) {
                 items.push(`<th>${val_pair[0]}</th>`);
             }
             break;
@@ -666,12 +656,10 @@ function fillNtupleTable(domId, jsonLoadingPath) {
 
         // reference first, if available
         $.each(ntuple_data, function (key) {
-
             if (key === "reference") {
                 items.push("<tr>");
                 items.push(`<td>${key}</td>`);
-                for (let fig in ntuple_data[key]) {
-                    let val_pair = ntuple_data[key][fig];
+                for (let val_pair of ntuple_data[key]) {
                     items.push(`<td>${val_pair[1]}</td>`);
                 }
                 items.push("</tr>");
@@ -683,8 +671,7 @@ function fillNtupleTable(domId, jsonLoadingPath) {
             if (key !== "reference") {
                 items.push("<tr>");
                 items.push(`<td>${key}</td>`);
-                for (let fig in ntuple_data[key]) {
-                    let val_pair = ntuple_data[key][fig];
+                for (let val_pair of ntuple_data[key]) {
                     items.push(`<td>${val_pair[1]}</td>`);
                 }
                 items.push("</tr>");
@@ -718,12 +705,7 @@ function getDefaultPackageName() {
     let lastPackage = localStorage.getItem(getStorageId("packageList"));
     if (lastPackage !== null){
         // check if lastPackage is still available
-        let found = false;
-        for(let i in packageList){
-            if (packageList[i].name === lastPackage) {
-                found = true;
-            }
-        }
+        let found = getObjectWithKey(packageList, "name", lastPackage) !== null;
         // If it is still available, return the name, otherwise proceed
         if (found){
             console.debug(`Opening package '${lastPackage}' because it was opened last`);
@@ -732,7 +714,6 @@ function getDefaultPackageName() {
         else{
             console.debug(`Last package '${lastPackage}' is not available anymore.`);
         }
-
     }
 
     let firstPackageName = packageList[0].name;
@@ -797,11 +778,11 @@ function getNewestRevision(index=0) {
     let selectedRevs = getSelectedRevsList();
 
     let date2rev = {};
-    for (let i in revisionsData["revisions"]){
-        let label = revisionsData["revisions"][i]["label"];
+    for (let revision of revisionsData["revisions"]){
+        let label = revision["label"];
         if ( ! selectedRevs.includes(label)) continue;
         if ( label === "reference" ) continue;
-        let date = revisionsData["revisions"][i]["creation_date"];
+        let date = revision["creation_date"];
         date2rev[date] = label;
     }
 

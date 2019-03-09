@@ -51,7 +51,7 @@ namespace Belle2 {
       /** Input array for DAQ Status. */
 //       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
       StoreObjPtr<EventMetaData> m_evtPtr;
-      StoreArray<RawFTSW> m_rawTTD;
+      StoreArray<RawFTSWFormat_latest> m_rawTTD;
 
       //the geometry
       VXD::GeoCache& m_vxdGeometry;

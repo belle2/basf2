@@ -104,12 +104,11 @@ def get_plot_files(revisions, work_folder):
     Returns a list of all plot files as absolute paths. For this purpose,
     it loops over all revisions in 'revisions', finds the
     corresponding results folder and collects the plot ROOT files.
-    :rtype: list
-    :return: A list of all plot files, i.e. plot ROOT files from the
-             requested revisions
+    :return: plot files, i.e. plot ROOT files from the
+             requested revisions as dictionary {revision: {package: [root files]}}
     """
     # This is where we store the paths of plot ROOT files we've found
-    results = []
+    results = collections.defaultdict(lambda: collections.defaultdict(list))
 
     results_foldername = validationpath.get_results_folder(work_folder)
 
@@ -118,7 +117,7 @@ def get_plot_files(revisions, work_folder):
     for revision in revisions:
 
         if revision == "reference":
-            results.extend(get_tracked_reference_files())
+            results["reference"] = get_tracked_reference_files()
             continue
 
         rev_result_folder = os.path.join(results_foldername, revision)
@@ -132,7 +131,7 @@ def get_plot_files(revisions, work_folder):
             # find all root files within this package
             root_files = glob.glob(package_folder + "/*.root")
             # append with absolute path
-            results.extend([os.path.abspath(rf) for rf in root_files])
+            results[revision][p].extend([os.path.abspath(rf) for rf in root_files])
 
     return results
 
@@ -144,9 +143,9 @@ def get_tracked_reference_files():
     the files which we will use as references.
     From the central release directory, we collect the files from the release
     which is set up on the machine running this script.
-    :rtype : list
-    :return: A list of all reference files, i.e. ROOT files that are located
-             in the same folder as the steering files of the package
+    :return: ROOT files that are located
+             in the same folder as the steering files of the package as
+             {package: [list of root files]}
     """
 
     # The base paths to the local and central release directories
@@ -154,7 +153,7 @@ def get_tracked_reference_files():
                  'central': os.environ.get('BELLE2_RELEASE_DIR', None)}
 
     # This is where we store the paths of reference ROOT files we've found
-    results = {'local': [], 'central': []}
+    results = {'local': collections.defaultdict(list), 'central': collections.defaultdict(list)}
 
     # validation folder name used by the packages to keep the validation
     # reference plots
@@ -171,49 +170,63 @@ def get_tracked_reference_files():
 
         # list all available packages
         root = basepaths[location]
-        # searches for a validation folder in any top-most folder (package
-        # folders) and lists all root-files within
-        glob_search = os.path.join(root, "*", validation_folder_name, "*.root")
-        revision_root_files = [
-            os.path.abspath(f) for f in glob.glob(glob_search)
-            if os.path.isfile(f)
-        ]
-        # also look in the folder containing the validation tests
-        glob_search = os.path.join(
-            root,
-            "*",
-            validation_test_folder_name,
-            "*.root"
-        )
-        revision_root_files += [
-            os.path.abspath(f) for f in glob.glob(glob_search)
-            if os.path.isfile(f)
-        ]
 
-        # this looks very much like a root file, store
-        results[location] += revision_root_files
+        packages = os.listdir(root)
+
+        for package in packages:
+            # searches for a validation folder in any top-most folder (package
+            # folders) and lists all root-files within
+            glob_search = os.path.join(root, package, validation_folder_name, "*.root")
+            revision_root_files = [
+                os.path.abspath(f) for f in glob.glob(glob_search)
+                if os.path.isfile(f)
+            ]
+            # todo: shouldn't that only be fore the validation package?
+            # also look in the folder containing the validation tests
+            glob_search = os.path.join(
+                root,
+                package,
+                validation_test_folder_name,
+                "*.root"
+            )
+            revision_root_files += [
+                os.path.abspath(f) for f in glob.glob(glob_search)
+                if os.path.isfile(f)
+            ]
+
+            # this looks very much like a root file, store
+            results[location][package].extend(revision_root_files)
 
     # Now we need to get a rid of all the duplicates: Since local > central,
     # we will delete all central reference files that have a local counterpart.
     # First, loop over all local reference files
-    for local_file in results['local']:
-        # Remove the location, i.e. reduce the path to /[package]/[filename]
-        local_path = local_file.replace(basepaths['local'], '')
-        # Now loop over all central reference files
-        for central_file in results['central']:
-            # Remove the location, i.e.
-            # reduce the path to /[package]/[filename]
-            central_path = central_file.replace(basepaths['central'], '')
-            # If package and filename are the same, we remove the central
-            # file from our results list
-            if local_path == central_path:
-                results['central'].remove(central_file)
+    for package, local_files in results['local'].items():
+        for local_file in local_files:
+            # Remove the location, i.e. reduce the path to /[package]/[filename]
+            local_path = local_file.replace(basepaths['local'], '')
+            # Now loop over all central reference files
+            for central_file in results['central'][package]:
+                # Remove the location, i.e.
+                # reduce the path to /[package]/[filename]
+                central_path = central_file.replace(basepaths['central'], '')
+                # If package and filename are the same, we remove the central
+                # file from our results list
+                if local_path == central_path:
+                    results['central'][package].remove(central_file)
 
     # Return both local and central reference files. The return value does
     # not maintain the distinction between local and central files, because
     # we stored the absolute path to the reference files, and local and
     # central reference files are treated the same anyway.
-    return results['local'] + results['central']
+
+    ret = {
+        package:
+            results['central'][package] + results['local'][package]
+        for package in
+        list(results['central'].keys()) + list(results['central'].keys())
+    }
+
+    return ret
 
 
 def generate_new_plots(revisions, work_folder, process_queue=None,
@@ -254,14 +267,9 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         print("No revisions selected for plotting. Returning without "
               "doing anything.", file=sys.stderr)
         return
-    elif len(revisions) == 1:
-        # Only one revision, so there's no point in making comparisons
-        # ==> no reference files
-        plot_files = get_plot_files(revisions, work_folder)
-        reference_files = []
-    else:
-        plot_files = get_plot_files(revisions[1:], work_folder)
-        reference_files = get_plot_files(revisions[:1], work_folder)
+
+    plot_files = get_plot_files(revisions[1:], work_folder)
+    reference_files = get_plot_files(revisions[:1], work_folder)
 
     # The dictionaries {package: {file: {key: [list of root objects]}}}
     plot_p2f2k2o = tobjects_from_files(plot_files, False, work_folder)
@@ -289,6 +297,10 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
     # Only plot packages where we have at least one plot (not just references)
     packages = list(sorted(plot_p2f2k2o.keys()))
+    # A small edge case: If we only have references: Plot these, since the
+    # user obviously wants it
+    if not packages:
+        packages = list(sorted(reference_p2f2k2o))
 
     # for every package
     for i, package in enumerate(packages):
@@ -499,12 +511,12 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         print()
 
 
-def tobjects_from_files(root_files, is_reference, work_folder):
+def tobjects_from_files(root_files_dict, is_reference, work_folder):
     """
     Takes a list of root files, loops over them and creates the RootObjects
     for it. It then returns the list of RootObjects, a list of all keys,
     and a list of all packages for those objects.
-    :param root_files: The list of all *.root files which shall be
+    :param root_files_dict: The list of all *.root files which shall be
         read in and for which the corresponding RootObjects shall be created
     :param is_reference: Boolean value indicating if the objects are
         reference objects or not.
@@ -515,21 +527,23 @@ def tobjects_from_files(root_files, is_reference, work_folder):
     return_dict = collections.defaultdict(dict)
 
     # Now loop over all given
-    for root_file in root_files:
-
-        # Create the RootObjects from this file and store them, as well as the
-        package, key2object = tobjects_from_file(
-            root_file,
-            is_reference,
-            work_folder
-        )
-
-        return_dict[package][os.path.basename(root_file)] = key2object
+    for revision, package2root_files in root_files_dict.items():
+        for package, root_files in package2root_files.items():
+            for root_file in root_files:
+                # Create the RootObjects from this file and store them, as well as the
+                key2object = tobjects_from_file(
+                    root_file,
+                    package,
+                    revision,
+                    is_reference,
+                    work_folder
+                )
+                return_dict[package][os.path.basename(root_file)] = key2object
 
     return return_dict
 
 
-def tobjects_from_file(root_file, is_reference, work_folder):
+def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
     """
     Takes a root file, loops over its contents and creates the RootObjects
     for it.
@@ -542,19 +556,6 @@ def tobjects_from_file(root_file, is_reference, work_folder):
         basename key uniquely determine it, but later we will merge this list
         with files from other revisions.
     """
-
-    # Retrieve the Revision and the Package from the path. The Package can
-    # directly be returned (c.f. return at the bottom of this function)
-    if is_reference:
-        revision = 'reference'
-        package = root_file.split('/')[-3]
-        if package == "validation" and \
-                root_file.split('/')[-2] == "validation-test":
-            package = "validation-test"
-
-    else:
-        revision = root_file.split('/')[-3]
-        package = root_file.split('/')[-2]
 
     # Return value: {key: root object}
     key2object = collections.defaultdict(list)
@@ -712,7 +713,7 @@ def tobjects_from_file(root_file, is_reference, work_folder):
     # Close the ROOT file before we open the next one!
     tfile.Close()
 
-    return package, key2object
+    return key2object
 
 
 ##############################################################################

@@ -152,7 +152,7 @@ void BestCandidateSelectionModule::event()
 
     previous_val = candidate.first;
 
-    if (m_numBest != 0 and rank > m_numBest)
+    if (m_numBest != 0 and rank >= m_numBest)
       break;
   }
 }

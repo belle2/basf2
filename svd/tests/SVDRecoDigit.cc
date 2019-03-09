@@ -40,7 +40,7 @@ namespace Belle2 {
         EXPECT_EQ(SVDRecoDigit::OutputProbType(1.0), prob);
       EXPECT_EQ(100.0, digit.getChi2Ndf());
       EXPECT_EQ(SVDModeByte::c_DefaultID, digit.getModeByte().getID());
-      EXPECT_EQ("0-suppr/global/6 samples/0", std::string(digit.getModeByte()));
+      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
     }
 
     /**
@@ -51,7 +51,7 @@ namespace Belle2 {
       // Create an arbitrary recodigit
       VxdID sensorID(3, 4, 1);
       short int cellID = 132;
-      SVDModeByte digitModeByte(72);
+      SVDModeByte digitModeByte(151);
       float init_charge = 23456;
       float init_chargeErr = 1234;
       float init_time = -16;
@@ -77,7 +77,7 @@ namespace Belle2 {
       EXPECT_LE(fabs(1.0 - outputNorm), 1.0e-6);
       EXPECT_EQ(init_chi2, digit.getChi2Ndf());
       EXPECT_EQ(digitModeByte, digit.getModeByte());
-      EXPECT_EQ("0-suppr/global/6 samples/0", std::string(digit.getModeByte()));
+      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
     }
     /**
      * Check object creation and data getters using a stl container of probabilities.
@@ -87,7 +87,7 @@ namespace Belle2 {
       // Create an arbitrary recodigit
       VxdID sensorID(3, 4, 1);
       short int cellID = 132;
-      SVDModeByte digitModeByte(72);
+      SVDModeByte digitModeByte(151);
       float init_charge = 23456;
       float init_chargeErr = 1234;
       float init_time = -16;
@@ -99,7 +99,7 @@ namespace Belle2 {
                          init_timeErr, init_probs, init_chi2, digitModeByte);
       // Test getters
       std::string
-      digitString("VXDID : 25632 = 3.4.1 strip: V-132 Amplitude: 23456 +/- 1234 Time: -16 +/- 3.21\n probabilities: 0 655 6553 51772 3932 2621 Chi2/ndf: 2.34 0-suppr/global/6 samples/0\n");
+      digitString("VXDID : 25632 = 3.4.1 strip: V-132 Amplitude: 23456 +/- 1234 Time: -16 +/- 3.21\n probabilities: 0 655 6553 51772 3932 2621 Chi2/ndf: 2.34 0-suppr/global/6 samples/???\n");
       EXPECT_EQ(digitString, digit.toString());
     }
 

@@ -38,10 +38,10 @@ main.add_module(input)
 main.add_module(unpacker)
 
 input.param("inputFileName", f_in_root)
-output.param("outputFileName", "ecltrg_test.root")
+output.param("outputFileName", "ecltrg_unpacker.root")
 
 # main.add_module(output);
-main.add_module(output, branchNames=["TRGECLUnpackerStores"])
+main.add_module(output, branchNames=["TRGECLUnpackerStores", "TRGECLUnpackerEvtStores", "TRGECLUnpackerSumStores"])
 
 # Process all events
 process(main)

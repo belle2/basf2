@@ -29,7 +29,7 @@ namespace Belle2 {
     Belle::Mdst_pi0_Manager& pi0mgr = Belle::Mdst_pi0_Manager::get_manager();
 
     for (std::vector<Belle::Brecon>::iterator it = breconmgr.begin();
-         it != breconmgr.end(); it++) {
+         it != breconmgr.end(); ++it) {
 
       // select the table of pi0->gamma gamma
       if (std::abs((*it).pcode()) != 111) continue;
@@ -46,7 +46,7 @@ namespace Belle2 {
       const Belle::Panther_ID g1(gamma1.idmdst());
       const Belle::Panther_ID g2(gamma2.idmdst());
       for (std::vector<Belle::Mdst_pi0>::const_iterator it2 = pi0mgr.begin();
-           it2 != pi0mgr.end(); it2++) {
+           it2 != pi0mgr.end(); ++it2) {
         const Belle::Panther_ID da1((*it2).gamma_ID(0));
         const Belle::Panther_ID da2((*it2).gamma_ID(1));
         if ((g1 == da1 && g2 == da2) || (g1 == da2 && g2 == da1)) {

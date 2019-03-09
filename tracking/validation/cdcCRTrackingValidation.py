@@ -32,7 +32,10 @@ class CDCCR(TrackingValidationRun):
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
 
-    finder_module = staticmethod(tracking.add_cr_track_finding)
+    # data_taking_period has to be "gcr2017" (or one of the other cosmic runs) else the full cosmics finding (CDC+SVD)
+    # is added, or no cdc constants are defined
+    def finder_module(self, path):
+        tracking.add_cr_track_finding(path, data_taking_period="gcr2017")
 
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries

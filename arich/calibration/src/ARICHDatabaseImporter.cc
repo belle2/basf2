@@ -887,11 +887,15 @@ void ARICHDatabaseImporter::printChannelMapping()
   chMap->print();
 }
 
-void ARICHDatabaseImporter::printFEMappings()
+void ARICHDatabaseImporter::printMergerMapping()
 {
   DBObjPtr<ARICHMergerMapping> mrgMap;
-  DBObjPtr<ARICHCopperMapping> copMap;
   mrgMap->print();
+}
+
+void ARICHDatabaseImporter::printCopperMapping()
+{
+  DBObjPtr<ARICHCopperMapping> copMap;
   copMap->print();
 }
 
@@ -900,6 +904,13 @@ void ARICHDatabaseImporter::printModulesInfo()
   DBObjPtr<ARICHModulesInfo> modinfo;
   modinfo->print();
 }
+
+void ARICHDatabaseImporter::printReconstructionPar()
+{
+  DBObjPtr<ARICHReconstructionPar> recPar;
+  recPar->print();
+}
+
 
 void ARICHDatabaseImporter::printChannelMask(bool makeHist)
 {

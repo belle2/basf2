@@ -18,7 +18,7 @@ argc = len(argvs)  # of arg
 
 set_log_level(LogLevel.DEBUG)
 
-use_central_database("online")
+use_central_database("TRGGDL_201811")
 
 main = create_path()
 

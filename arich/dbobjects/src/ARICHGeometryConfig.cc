@@ -206,15 +206,25 @@ void ARICHGeometryConfig::read(const GearDir& content)
 
   // Aerogel tiles
   GearDir aerotilesDir(content, "AerogelTiles");
-  for (auto tileNode : aerotilesDir.getNodes("Tiles/Tile")) {
-    int ring = tileNode.getInt("ring");
-    int column = tileNode.getInt("column");
-    int layerN = tileNode.getInt("layer");
-    double n = tileNode.getDouble("n");
-    double transmL = tileNode.getDouble("transmL");
-    double thick = tileNode.getDouble("thick");
-    std::string materialName = tileNode.getString("material");
-    m_aerogelPlane.addTileParameters(ring, column, layerN, n, transmL, thick, materialName);
+  for (int il = 0; il < ilayer - 1; il++) {
+    int iring = 0;
+    for (auto ns_ring :  nAeroSlotsIndividualRing) {
+      iring++;
+      for (int islot = 1; islot < ns_ring + 1; islot++) {
+        for (auto tileNode : aerotilesDir.getNodes("Tiles/Tile")) {
+          int ring = tileNode.getInt("ring");
+          int column = tileNode.getInt("column");
+          int layerN = tileNode.getInt("layer");
+          if (iring == ring && column == islot && il == layerN) {
+            double n = tileNode.getDouble("n");
+            double transmL = tileNode.getDouble("transmL");
+            double thick = tileNode.getDouble("thick");
+            std::string materialName = tileNode.getString("material");
+            m_aerogelPlane.addTileParameters(ring, column, layerN, n, transmL, thick, materialName);
+          }
+        }
+      }
+    }
   }
 
   if (m_aerogelPlane.getFullAerogelMaterialDescriptionKey() == 0) {

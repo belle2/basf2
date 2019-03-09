@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="MICROTPC">
+<DetectorComponent name="MICROTPC"  xmlns:xi="http://www.w3.org/2001/XInclude">
 <Creator library="beast">MICROTPCCreator</Creator>
 <Content>
+<xi:include href="MICROTPC-recoilProb.xml"/>
 <!-- normally, parameters should be defined with a unit attribute. This
 enables automatic conversion to the default framework unit --> 
 <stepSize unit="um">200</stepSize>

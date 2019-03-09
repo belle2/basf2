@@ -7,9 +7,12 @@
 # the output root file (along with the arichHits).
 # Using option "-a 1" only the data from events that contain reconstruced track hit
 # in the is included into the output file.
-# ARICHDQM module is also included, it produces "histograms.root" with some basic
+# ARICHDQM module is also included, it produces "DQMhistograms.root" with some basic
 # dqm histograms (using all events). You can conveniently display some of them using
 # "root -l histograms.root arich/utility/scripts/plotDQM.C"
+#
+# NOTE: by default there is no output file made, only file with histograms from DQM
+#       use option "-o filename" to make output root file with hits...
 #
 # run as: "basf2 arich/examples/arich_process_raw.py -- -f path2datafile.root"
 # additional options:
@@ -17,6 +20,7 @@
 # "-t 1" include CDC track reconstruction (reconstructed tracks are stored into output )
 # "-a 1" store only data from events with track hit in arich
 # "-g 1" include GDL unpacker to have TRGSummary
+#
 #
 # Author: Luka Santelj
 
@@ -26,9 +30,12 @@ from optparse import OptionParser
 from reconstruction import add_cosmics_reconstruction
 home = os.environ['BELLE2_LOCAL_DIR']
 
-# set the tag for the global cosmic test (2018 Feb,Mar)
 reset_database()
-use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
+use_database_chain()
+
+# set DB tag with correct merger numbers, etc. (phase3 start)
+use_central_database('online')
+use_central_database('ARICH_phase3_test')
 
 # parameters
 parser = OptionParser()
@@ -37,7 +44,7 @@ parser.add_option(
     '--file',
     dest='filename',
     default='/ghi/fs01/belle2/bdata/users/tkonno/cosmic/cosmic.0002.00951.HLT3.f00000.root')
-parser.add_option('-o', '--output', dest='output', default='ARICHHits.root')
+parser.add_option('-o', '--output', dest='output', default='')
 parser.add_option('-d', '--debug', dest='debug', default=0)
 parser.add_option('-t', '--tracking', dest='tracking', default=0)
 parser.add_option('-a', '--arichtrk', dest='arichtrk', default=0)
@@ -49,7 +56,7 @@ main = create_path()
 store = create_path()
 
 # root input module
-input_module = register_module('RootInput')
+input_module = register_module('SeqRootInput')
 input_module.param('inputFileName', options.filename)
 # input_module.param('entrySequences',['5100:5300']) # process only range of events
 main.add_module(input_module)
@@ -96,18 +103,19 @@ arichHists = register_module('ARICHDQM')
 main.add_module(arichHists)
 
 # store the dataobjects
-output = register_module('RootOutput')
-output.param('outputFileName', options.output)
-branches = ['ARICHDigits', 'ARICHHits', 'ARICHInfo']
-if int(options.tracking):
-    branches.extend(['Tracks', 'TrackFitResults', 'RecoTracks', 'RecoHitInformations', 'ExtHits'])
-if int(options.gdl):
-    branches.append('TRGSummary')
-output.param('branchNames', branches)
-if int(options.arichtrk):
-    store.add_module(output)
-else:
-    main.add_module(output)
+if(options.output != ''):
+    output = register_module('RootOutput')
+    output.param('outputFileName', options.output)
+    branches = ['ARICHDigits', 'ARICHHits', 'ARICHInfo']
+    if int(options.tracking):
+        branches.extend(['Tracks', 'TrackFitResults', 'RecoTracks', 'RecoHitInformations', 'ExtHits'])
+    if int(options.gdl):
+        branches.append('TRGSummary')
+    output.param('branchNames', branches)
+    if int(options.arichtrk):
+        store.add_module(output)
+    else:
+        main.add_module(output)
 
 # show progress
 progress = register_module('Progress')

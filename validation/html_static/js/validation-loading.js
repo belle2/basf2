@@ -64,13 +64,16 @@ function loadRevisions() {
 
         console.log("Loading done!");
 
-        function setupRevisionLoader(ractive) {
-
-            setDefaultPrebuildOption();
-            loadPrebuildRevisions();
-        }
-
-        setupRactive("revision", '#revisions', revisionsData, null, setupRevisionLoader);
+        setupRactive(
+            "revision",
+            '#revisions',
+            revisionsData,
+            null,
+            function (ractive) {
+                setDefaultPrebuildOption();
+                loadPrebuildRevisions();
+            }
+        );
     });
 }
 
@@ -544,8 +547,6 @@ function setupRactiveFromRevision(revList) {
  */
 function loadValidationPlots(packageLoadName="") {
     console.log(`loadValidationPlots: Loading plots for package '${packageLoadName}'`);
-
-    let reference = getReferenceSelection();
 
     // update the already displayed revision labels with the correct colors
     $(".revision-label").each( function () {

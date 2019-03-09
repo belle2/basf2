@@ -222,7 +222,7 @@ textarea {
     /* use all viewport space */
     height:100vh;
     /* fixed width for now */
-    width:300px;
+    width:320px;
 }
 
 #content_scroll {
@@ -349,7 +349,7 @@ textarea {
 
 #prebuilt-select-container {
     display: block;
-    padding-bottom: 7px;
+    padding-bottom: 10px;
 }
 
 #reference-select-container{

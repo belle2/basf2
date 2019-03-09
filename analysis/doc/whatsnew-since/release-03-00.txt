@@ -4,9 +4,27 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* Removed ``nECLClusters`` (:issue:`BII-4476`).
+  The number of `ECLClusters` is not a good measure for anything except the age of the input mdst file.
+  Recent changes to the handling of ECLClusters and their hypotheses have changed this (already arbitrary) 
+  number to another (equally arbitrary buut different) number.
+
+  .. hint::
+	For most common use cases, the recommended alternative is the total number of photons
+        (unique photon hypothesis clusters) in the event:
+
+	.. code-block:: python
+
+		from variables import variables
+		from stdPhotons import stdPhotons
+		stdPhotons("cdc", path=mypath) # creates the all and cdc lists
+                variables.addAlias("nPhotonsAll", "nParticlesInList(gamma:all)")
+                variables.addAlias("nPhotonsCDC", "nParticlesInList(gamma:cdc)")
+                variables.addAlias("totalPhotonEECL", "totalEnergyOfParticlesInList(gamma:all)")
+
+
 * Deprecated :b2:var:`clusterHypothesis` following changes to the ECLCluster storage on mdst. 
   Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
-
 * Removed ClusterHadronIntensity and clusterUniqueID.
 * Added helix extrapolation from charged tracks
 * Added clusterMdstIndex variable to get ECLCluster MDST index for particles that do not originate from ECLCluster
@@ -14,6 +32,9 @@ Variables
 * The function to create variable aliases for particles selected from a decay
   string has been fixed and extended to allow better
   customization (:issue:`BII-4437`)
+
+* Added M2, that returns the invariant mass squared of a given Particle (determined from the particle's 4-momentum vector).
+
 Modules
 +++++++
 
@@ -45,6 +66,8 @@ Modules
   `modularAnalysis.rankByHighest()` if they passed ``allowMultiRank=True``
 
 * Removal of the unsupported ECLClusterInfoModule.
+
+* Added `modularAnalysis.fitPseudo` function and a pseudo vertex fitting module to add a covariance matrix when a vertex fit is not possible. E.g. for :math:`\pi^0` decays.
 
 * Added the new module SignalSideVariablesToDaughterExtraInfoModule. It adds
   ExtraInfo to a specified particle (typically a daughter on the signal side).

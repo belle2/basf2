@@ -42,6 +42,12 @@ namespace Belle2 {
     //Total number of hits in each TSF
     TH1I* h_nhit_tsf;
 
+    //Valid type of TSF hits in each superlayer
+    TH1I* h_valid;
+
+    //Timing of TSF hits in each superlayer
+    TH1I* h_timing;
+
     //TDirectories
     TDirectory* oldDir;
     TDirectory* dirDQM;

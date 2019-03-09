@@ -64,54 +64,39 @@ def date_from_revision(revision, work_folder):
     # Regular releases and builds however do have a reasonably well defined
     # 'last modified'-date!
     else:
-        # If the revision exists:
-        if revision in os.listdir(validationpath.get_results_folder(work_folder)):
-            return os.path.getmtime(validationpath.get_results_tag_folder(work_folder, revision))
+        revisions = os.listdir(validationpath.get_results_folder(work_folder))
+        if revision in revisions:
+            return os.path.getmtime(
+                validationpath.get_results_tag_folder(work_folder, revision)
+            )
         # Otherwise return a None object
         else:
             return None
 
 
-def find_root_object(root_objects, **kwargs):
-    """
-    Receives a list of RootObject objects and a filter KEYWORD=['accepted,
-    values'] and return the sublist that matches this filter
-    """
-    if kwargs is not None:
-        # Read in the filter and the values we are filtering for
-        sieve, desired_values = list(kwargs.items())[0]
-
-        # If we don't receive a list of desired values, make it a list!
-        if not isinstance(desired_values, list):
-            desired_values = [desired_values]
-
-        # Holds the lists of matches we have found
-        results = []
-
-        for rootobject in root_objects:
-            for value in desired_values:
-                try:
-                    __ = re.search("^" + value + "$", rootobject.data[sieve])
-                    if __ is not None:
-                        results.append(rootobject)
-                except IndexError:
-                    continue
-        return results
-    # If no filer is given there will be no output
-    else:
-        return []
-
-
-def serve_existing_plots(revisions):
-    """
-    Goes to the folder where
-    the plots for the given selection are stored, and replaces the current
-    './content.html' with the one from the folder with the plots.
-    :return: No return value
+def merge_nested_list_dicts(a, b):
+    """ Given two nested dictionary with same depth that contain lists, return
+    'merged' dictionary that contains the joined lists.
+    :param a: Dict[Dict[...[Dict[List]]..]]
+    :param b: Dict[Dict[...[Dict[List]]..]] (same depth as a)
+    :return:
     """
 
-    print("Plots for the revision(s) {} have already been created before "
-          "and will be served from the archive.".format(", ".join(revisions)))
+    def _merge_nested_list_dicts(_a, _b):
+        """ Merge _b into _a, return _a. """
+        for key in _b:
+            if key in _a:
+                if isinstance(_a[key], dict) and isinstance(_b[key], dict):
+                    _merge_nested_list_dicts(_a[key], _b[key])
+                else:
+                    assert isinstance(_a[key], list)
+                    assert isinstance(_b[key], list)
+                    _a[key].extend(_b[key])
+            else:
+                _a[key] = _b[key]
+        return _a
+
+    return _merge_nested_list_dicts(a.copy(), b.copy())
 
 
 def get_plot_files(revisions, work_folder):
@@ -278,25 +263,10 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         plot_files = get_plot_files(revisions[1:], work_folder)
         reference_files = get_plot_files(revisions[:1], work_folder)
 
-    # Now create the ROOT objects for the plot and the reference objects,
-    # and get the lists of keys and packages
-    plot_objects, plot_keys, plot_packages = \
-        create_tobjects_from_list(
-            plot_files,
-            False,
-            work_folder
-        )
-    reference_objects, reference_keys, reference_packages = \
-        create_tobjects_from_list(
-            reference_files,
-            True,
-            work_folder
-        )
-
-    # Get the joint lists (and remove duplicates if applicable)
-    root_objects = plot_objects + reference_objects
-    keys = sorted(list(set(plot_keys)))
-    packages = sorted(list(set(plot_packages)))
+    # The dictionaries {package: {file: {key: [list of root objects]}}}
+    plot_p2f2k2o = tobjects_from_files(plot_files, False, work_folder)
+    reference_p2f2k2o = tobjects_from_files(reference_files, True, work_folder)
+    all_p2f2k2o = merge_nested_list_dicts(plot_p2f2k2o, reference_p2f2k2o)
 
     # Open the output file
     # First: Create destination directory if it does not yet exist
@@ -317,8 +287,11 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     # Collect all plotuples for all the files
     all_plotuples = []
 
+    # Only plot packages where we have at least one plot (not just references)
+    packages = list(sorted(plot_p2f2k2o.keys()))
+
     # for every package
-    for i, package in enumerate(sorted(packages)):
+    for i, package in enumerate(packages):
 
         # Some information to be printed out while the plots are created
         print(terminal_title_line(
@@ -326,47 +299,16 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
             level=1
         ))
 
-        # A list of all objects (including reference objects) that
-        # belong to the current package
-        objects_in_pkg = find_root_object(root_objects,
-                                          package=package)
-
-        # Find all ROOT files that were created in the scope of this
-        # package (also including reference files)
-        files_in_pkg = []
-        for plot_object in objects_in_pkg:
-            # For every object in the package, get the corresponding
-            # file name and append it to the list if its not in there
-            rootfile_name = os.path.basename(plot_object.rootfile)
-            if rootfile_name not in files_in_pkg:
-                files_in_pkg.append(rootfile_name)
-        files_in_pkg.sort()
-
         compare_files = []
 
         # Now we loop over all files that belong to the package to
         # group the plots correctly
-        for rootfile in files_in_pkg:
-            # todo: remove, only for debugging
-            # time.sleep(2.5)
+        for rootfile in sorted(all_p2f2k2o[package].keys()):
             file_name, file_ext = os.path.splitext(rootfile)
 
             # Some more information to be printed out while plots are
             # being created
             print('Creating plots for file: {0}'.format(rootfile))
-
-            # Get the list of all objects that belong to the current
-            # package and the current file. First the regular objects:
-            objects_in_pkg_and_file = find_root_object(
-                objects_in_pkg,
-                rootfile=".*/" + rootfile + ".*"
-            )
-
-            # And then the reference objects
-            objects_in_pkg_and_file += find_root_object(
-                reference_objects,
-                rootfile=".*/" + rootfile + ".*"
-            )
 
             # A list in which we keep all the plotuples for this file
             plotuples = []
@@ -394,68 +336,30 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
             compare_ntuples = []
             compare_html_content = []
             has_reference = False
-            for key in sorted(keys):
 
-                # Find all objects for the Plotuple that is defined by the
-                # package, the file and the key
-                root_objects_key = find_root_object(objects_in_pkg_and_file,
-                                                    key=key)
+            root_file_meta_data = collections.defaultdict(lambda: None)
 
-                # If this list is empty, we can continue right away
-                if not root_objects_key:
-                    continue
-
+            for key in all_p2f2k2o[package][rootfile].keys():
                 # Otherwise we can generate Plotuple object
                 plotuple = Plotuple(
-                    root_objects_key,
+                    all_p2f2k2o[package][rootfile][key],
                     revisions,
                     work_folder
                 )
+                plotuple.create_plotuple()
                 plotuples.append(plotuple)
                 has_reference = plotuple.has_reference()
 
                 if plotuple.type == 'TNtuple':
-                    compare_ntuples.append(
-                        json_objects.ComparisonNTuple(
-                            title=plotuple.get_plot_title(),
-                            description=plotuple.description,
-                            contact=plotuple.contact,
-                            check=plotuple.check,
-                            is_expert=plotuple.is_expert(),
-                            json_file_path=plotuple.file
-                        )
-                    )
+                    compare_ntuples.append(plotuple.create_json_object())
                 elif plotuple.type == 'TNamed':
-                    compare_html_content.append(
-                        json_objects.ComparisonHtmlContent(
-                            title=plotuple.get_plot_title(),
-                            description=plotuple.description,
-                            contact=plotuple.contact,
-                            check=plotuple.check,
-                            is_expert=plotuple.is_expert(),
-                            html_content=plotuple.html_content
-                        )
-                    )
+                    compare_html_content.append(plotuple.create_json_object())
+                elif plotuple.type == "meta":
+                    meta_key, meta_value = plotuple.get_meta_information()
+                    print("{}: {}->{}".format(key, meta_key, meta_value))
+                    root_file_meta_data[meta_key] = meta_value
                 else:
-                    compare_plots.append(
-                        json_objects.ComparisonPlot(
-                            title=plotuple.get_plot_title(),
-                            comparison_result=plotuple.comparison_result,
-                            comparison_text=plotuple.chi2test_result,
-                            comparison_pvalue=plotuple.pvalue,
-                            comparison_pvalue_warn=plotuple.pvalue_warn,
-                            comparison_pvalue_error=plotuple.pvalue_error,
-                            description=plotuple.description,
-                            contact=plotuple.contact,
-                            check=plotuple.check,
-                            height=plotuple.height,
-                            width=plotuple.width,
-                            is_expert=plotuple.is_expert(),
-                            plot_path=plotuple.get_plot_path(),
-                            png_filename=plotuple.get_png_filename(),
-                            pdf_filename=plotuple.get_pdf_filename()
-                        )
-                    )
+                    compare_plots.append(plotuple.create_json_object())
 
             compare_file = json_objects.ComparisonPlotFile(
                 title=file_name,
@@ -465,7 +369,8 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                 plots=compare_plots,
                 has_reference=has_reference,
                 ntuples=compare_ntuples,
-                html_content=compare_html_content
+                html_content=compare_html_content,
+                description=root_file_meta_data["description"]
             )
             compare_files.append(compare_file)
 
@@ -594,7 +499,7 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         print()
 
 
-def create_tobjects_from_list(root_files, is_reference, work_folder):
+def tobjects_from_files(root_files, is_reference, work_folder):
     """
     Takes a list of root files, loops over them and creates the RootObjects
     for it. It then returns the list of RootObjects, a list of all keys,
@@ -603,60 +508,56 @@ def create_tobjects_from_list(root_files, is_reference, work_folder):
         read in and for which the corresponding RootObjects shall be created
     :param is_reference: Boolean value indicating if the objects are
         reference objects or not.
-    :return: List RootObjects, List of Keys in said RootObjects, List of
-        Packages in said RootObjects
+    :return: {package: {file: {key: [list of root objects]}}}
     """
 
-    # Reserve some space for the results that will be returned by this
-    # function
-    list_objects = []
-    list_keys = []
-    list_packages = []
+    # Return value: {package: {key: objects}}
+    return_dict = collections.defaultdict(dict)
 
     # Now loop over all given
     for root_file in root_files:
 
         # Create the RootObjects from this file and store them, as well as the
-        file_objects, \
-            file_keys, \
-            file_package = create_tobjects_from_file(root_file,
-                                                     is_reference,
-                                                     work_folder)
+        package, key2object = tobjects_from_file(
+            root_file,
+            is_reference,
+            work_folder
+        )
 
-        # Append results to the global results
-        list_objects += file_objects
-        list_keys += file_keys
-        list_packages.append(file_package)
+        return_dict[package][os.path.basename(root_file)] = key2object
 
-    # Remove possible duplicates from the lists
-    list_keys = sorted(list(set(list_keys)))
-    list_packages = sorted(list(set(list_packages)))
-
-    return list_objects, list_keys, list_packages
+    return return_dict
 
 
-def create_tobjects_from_file(root_file, is_reference, work_folder):
+def tobjects_from_file(root_file, is_reference, work_folder):
     """
     Takes a root file, loops over its contents and creates the RootObjects
-    for it. It then returns the list of RootObjects, a list of all keys,
-    and a list of all packages for those objects.
+    for it.
     :param root_file: The *.root files which shall be read in and for which the
         corresponding RootObjects shall be created
     :param is_reference: Boolean value indicating if the object is a
         reference object or not.
-    :return: List RootObjects, List of Keys in said RootObjects, and the
-        Packages of said RootObjects
+    :return: package, {key: [list of root objects]}. Note: The list will
+        contain only one root object right now, because package + root file
+        basename key uniquely determine it, but later we will merge this list
+        with files from other revisions.
     """
-
-    # Reserve some space for the results that will be returned by this
-    # function
-    file_objects = []
-    file_keys = []
 
     # Retrieve the Revision and the Package from the path. The Package can
     # directly be returned (c.f. return at the bottom of this function)
-    revision = root_file.split('/')[-3]
-    package = root_file.split('/')[-2]
+    if is_reference:
+        revision = 'reference'
+        package = root_file.split('/')[-3]
+        if package == "validation" and \
+                root_file.split('/')[-2] == "validation-test":
+            package = "validation-test"
+
+    else:
+        revision = root_file.split('/')[-3]
+        package = root_file.split('/')[-2]
+
+    # Return value: {key: root object}
+    key2object = collections.defaultdict(list)
 
     # Get the 'last modified' timestamp of the revision that contains our
     # current root_file
@@ -668,11 +569,13 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
     # Loop over all Keys in that ROOT-File
     for key in tfile.GetListOfKeys():
 
-        # Get the name of the Key and save it in file_keys
+        # Get the name of the Key
         name = key.GetName()
-        file_keys.append(name)
 
         metaoptions = []
+        description = "n/a"
+        check = "n/a"
+        contact = "n/a"
 
         # temporary workaround for dbstore files located (wrongly)
         # in the validation results folder
@@ -682,10 +585,13 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
         # Get the ROOT object that belongs to that Key. If there is no
         # object, continue
         root_object = tfile.Get(name)
-        if (not root_object) or (root_object is None):
+        if not root_object:
+            continue
+        if root_object is None:
             continue
 
         # Determine which type of object it is, i.e. TH1, TH2 or TNtuple
+
         if root_object.InheritsFrom('TNtuple'):
             root_object_type = 'TNtuple'
         # this will also match TProfile, as this root class derives from
@@ -717,11 +623,6 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
                 root_object.SetDirectory(0)
 
             # Read out meta information:
-            # DescriptionDescription, Check and Contact
-            # Initialize as None objects
-            description = None
-            check = None
-            contact = None
 
             # Now check if the data exists in the ROOT file and if so, read it
             if root_object.FindObject('Description'):
@@ -730,12 +631,6 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
                 check = root_object.FindObject('Check').GetTitle()
             if root_object.FindObject('Contact'):
                 contact = root_object.FindObject('Contact').GetTitle()
-
-            # Empty fields are filled with 'n/a'
-            for metadatum in [description, check, contact]:
-                # .GetTitle() returns 'None', if there is no title
-                if metadatum is None:
-                    metadatum = 'n/a'
 
             # Now check for meta-options (colz, log-scale, etc.)
             metaoptions = []
@@ -763,22 +658,23 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
                 ntuple_values[leaf.GetName()] = leaf.GetValue()
 
             # Get description, check and contact
-            description = root_object.GetAlias('Description')
-            check = root_object.GetAlias('Check')
-            contact = root_object.GetAlias('Contact')
+            _description = root_object.GetAlias('Description')
+            _check = root_object.GetAlias('Check')
+            _contact = root_object.GetAlias('Contact')
 
-            # Empty fields are filled with 'n/a'
-            for metadatum in [description, check, contact]:
-                # .GetAlias() returns '' (empty string), if there is no alias
-                if metadatum == '':
-                    metadatum = 'n/a'
+            if _description:
+                description = _description
+            if _check:
+                check = _check
+            if _contact:
+                contact = _contact
 
             # Now check for meta-options (colz, log-scale, etc.)
-            metaoptions = root_object.GetAlias('MetaOptions')
-            if metaoptions:
+            _metaoptions = root_object.GetAlias('MetaOptions')
+            if _metaoptions:
                 # If there are meta-options, split the string on commas and
                 # remove unnecessary whitespaces
-                metaoptions = [_.strip() for _ in metaoptions.split(',')]
+                metaoptions = [_.strip() for _ in _metaoptions.split(',')]
 
             # Overwrite 'root_object' with the dictionary that contains the
             # values, because the values are what we want to save, and we
@@ -786,21 +682,17 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
             # n-tuples :-)
             root_object = ntuple_values
         elif root_object_type == 'TNamed':
-            # TODO Set this to correct values
-            description = None
-            check = None
-            contact = None
+            # TODO Set description, check, contact somehow?
+            pass
         elif root_object_type == 'TASImage':
-            # TODO Set this to correct values
-            description = None
-            check = None
-            contact = None
-        # If it is neither an histogram nor an n-tuple, we skip it!
+            # TODO Set description, check, contact somehow?
+            pass
         else:
+            # Skip all others
             continue
 
         # Create the RootObject and append it to the results
-        file_objects.append(
+        key2object[name].append(
             RootObject(
                 revision,
                 package,
@@ -820,7 +712,7 @@ def create_tobjects_from_file(root_file, is_reference, work_folder):
     # Close the ROOT file before we open the next one!
     tfile.Close()
 
-    return file_objects, file_keys, package
+    return package, key2object
 
 
 ##############################################################################
@@ -889,10 +781,9 @@ class RootObject:
                 False for revision objects.
         """
 
-        # TO DO
-        # All of the following could be simplified, if one modified the
-        # find_root_object() method to search through vars(Root-Object)
-
+        # todo: If this is what we want, why don't we just create a dictionary
+        #  in the first place? Or at least implement this by filtering through
+        #  self.__dict__
         # A dict with all information about the Root-object
         # Have all information as a dictionary so that we can search and
         # filter the objects by properties
@@ -1017,7 +908,11 @@ def create_plots(revisions=None, force=False, process_queue=None,
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
-        serve_existing_plots(revisions)
+        print(
+            "Plots for the revision(s) {} have already been created before "
+            "and will be served from the archive.".format(
+                ", ".join(revisions))
+        )
     # Otherwise: Create the requested plots
     else:
         generate_new_plots(revisions, work_folder, process_queue)

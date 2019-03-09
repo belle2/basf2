@@ -204,7 +204,8 @@ namespace KlId {
 
 
   /** find closest ECL Cluster and its distance */
-  std::pair<Belle2::ECLCluster*, double> findClosestECLCluster(const TVector3& klmClusterPosition)
+  std::pair<Belle2::ECLCluster*, double> findClosestECLCluster(const TVector3& klmClusterPosition,
+      const Belle2::ECLCluster::EHypothesisBit eclhypothesis = Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)
   {
 
     Belle2::ECLCluster* closestECL = nullptr ;
@@ -216,7 +217,7 @@ namespace KlId {
       unsigned int indexOfClosestCluster = 0;
       for (Belle2::ECLCluster& eclcluster : eclClusters) {
 
-        if (!eclcluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)) continue;
+        if (!eclcluster.hasHypothesis(eclhypothesis)) continue;
 
         const TVector3& eclclusterPos = eclcluster.getClusterPosition();
         double angularDist = eclclusterPos.Angle(klmClusterPosition);

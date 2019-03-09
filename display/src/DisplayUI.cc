@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher                                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 //needs to be first
 #include <framework/core/ModuleParam.h>
 
@@ -553,10 +563,9 @@ void DisplayUI::makeGui()
   TGGroupFrame* visOptionsFrame = new TGGroupFrame(frmMain);
   visOptionsFrame->SetTitle("Visualisation Options");
   {
-    TGButton* b = 0;
     TGHorizontalFrame* hf = new TGHorizontalFrame(visOptionsFrame);
     {
-      b = new TGTextButton(hf, "Dark/light colors");
+      TGButton* b = new TGTextButton(hf, "Dark/light colors");
       b->SetToolTipText("Toggle background color");
       hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, margin, margin, margin, margin));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleColorScheme()");
@@ -819,16 +828,13 @@ void DisplayUI::exit()
 
 void DisplayUI::showUserData(const DisplayData& displayData)
 {
-  static TGFileBrowser* fileBrowser = NULL;
   static std::map<std::string, BrowsableWrapper*> wrapperMap;
   for (auto& entry : wrapperMap) {
-    //doesn't do anything
-    //fileBrowser->RecursiveRemove(wrappers[i]);
-
     entry.second = NULL;
   }
 
   if (!displayData.m_histograms.empty()) {
+    static TGFileBrowser* fileBrowser = NULL;
     if (!fileBrowser) {
       gEve->GetBrowser()->StartEmbedding(0);
       fileBrowser = gEve->GetBrowser()->MakeFileBrowser();

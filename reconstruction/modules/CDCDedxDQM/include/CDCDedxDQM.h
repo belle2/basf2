@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett
+ * Contributors: Jitendra Kumar, Jake Bennett
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,16 +19,22 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
 
-#include "TH1F.h"
-#include "TH2F.h"
+#include "TH1D.h"
+#include "TH2D.h"
 #include "TString.h"
 #include "TDirectory.h"
+using std::vector;
+using std::string;
 
 
 namespace Belle2 {
 
-  /** Extracts dE/dx information for calibration testing. Writes a ROOT file.
+  /**
+   * This module to design collect CDC dEdx monitoring for DQM and only minimal information are
+   * stored. All higher level calculation like fit etc is done using DQM analysis module.
+   * Output of this module used as an input to DQM analysis.
    */
+
   class CDCDedxDQMModule : public HistoModule {
 
   public:
@@ -69,8 +75,8 @@ namespace Belle2 {
     Bool_t isHadronfile; /**< Parameter-1 to switch binning */
     TString fCollType; /**< Parameter-2 to switch binning */
 
-    TH1F* temp1D{nullptr}; /**< Dedx histogram per run */
-    TH2F* temp2D{nullptr}; /**< Dedx vs P histogram per run */
+    TH1D* temp1D{nullptr}; /**< Dedx histogram per run */
+    TH2D* temp2D{nullptr}; /**< Dedx vs P histogram per run */
 
     Int_t    nBinsdedx; /**< nbin of dedx range */
     Double_t nBinsdedxLE; /**< Lowedge of dedx */

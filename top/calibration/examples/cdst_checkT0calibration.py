@@ -20,20 +20,13 @@ main = create_path()
 roinput = register_module('RootInput')
 main.add_module(roinput)
 
-# Geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry
-geometry = register_module('Geometry')
-geometry.param('components', ['MagneticField', 'TOP'])
-geometry.param('useDB', False)
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # Channel masking
 main.add_module('TOPChannelMasker')
 
-# Calibration checker
+# Calibration checker: for dimuon sample replace 'bhabha' with 'dimuon'
 calibrator = register_module('TOPChannelT0Calibrator')
 calibrator.param('sample', 'bhabha')
 calibrator.param('outputFileName', 'checkT0cal_r*.root')

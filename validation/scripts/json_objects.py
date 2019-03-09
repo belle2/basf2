@@ -108,7 +108,7 @@ class PlotFile(JsonBase):
     root files up to now
     """
 
-    def __init__(self, package, title, rootfile, plots):
+    def __init__(self, package, title, rootfile, plots, description=""):
         """
         Create a new PlotFile object and fill all members
         """
@@ -121,6 +121,8 @@ class PlotFile(JsonBase):
         self.rootfile = rootfile
         #: list of plots which are contained inside this plot file
         self.plots = plots
+        #: Description of plot file
+        self.description = description
 
 
 class Plot(JsonBase):
@@ -266,17 +268,18 @@ class ComparisonPlotFile(PlotFile):
     been performed for the content of this file
     """
 
-    # todo: do NOT use lists as default values /klieret
     def __init__(
-            self,
-            package,
-            title,
-            rootfile,
-            compared_revisions=None,
-            plots=None,
-            has_reference=False,
-            ntuples=None,
-            html_content=None):
+        self,
+        package,
+        title,
+        rootfile,
+        compared_revisions=None,
+        plots=None,
+        has_reference=False,
+        ntuples=None,
+        html_content=None,
+        description=None
+    ):
         """
         Create a new ComparisonPlotFile object and fill all members
         """
@@ -288,7 +291,8 @@ class ComparisonPlotFile(PlotFile):
         if not html_content:
             html_content = []
 
-        super().__init__(package, title, rootfile, plots)
+        super().__init__(package, title, rootfile, plots,
+                         description=description)
         #: label of the revision which were used in this comparison
         self.compared_revision = compared_revisions
         #: the ntuples which were compared

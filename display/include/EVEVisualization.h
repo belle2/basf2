@@ -107,6 +107,8 @@ namespace Belle2 {
 
     /** disabled. */
     EVEVisualization(const EVEVisualization&) = delete;
+    /** disabled assignment */
+    EVEVisualization& operator=(const EVEVisualization&) = delete;
     /** Destructor. */
     ~EVEVisualization();
 
@@ -321,7 +323,7 @@ namespace Belle2 {
     bool m_assignToPrimaries;
 
     /** If true, secondary MCParticles (and hits created by them) will not be shown. */
-    bool m_hideSecondaries;
+    bool m_hideSecondaries{false};
 
     /** map MCParticles to MCTrack (so hits can be added to the correct track). */
     std::map<const MCParticle*, MCTrack> m_mcparticleTracks;

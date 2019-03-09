@@ -15,7 +15,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  const SVDModeByte::baseType SVDModeByte::c_DefaultID = 72;
+  const SVDModeByte::baseType SVDModeByte::c_DefaultID = 151;
 
   SVDModeByte::operator string() const
   {
@@ -58,7 +58,11 @@ namespace Belle2 {
         os << "unknown";
     }
     os << "/";
-    os << static_cast<int>(m_id.parts.triggerBin);
+    if (m_id.parts.triggerBin <= MaxGoodTriggerBin) {
+      os << static_cast<int>(m_id.parts.triggerBin);
+    } else {
+      os << "???";
+    }
     return os.str();
   }
 

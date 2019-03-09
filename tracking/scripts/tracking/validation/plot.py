@@ -119,6 +119,9 @@ def get1DBinningFromReference(name, refFileName):
     x_min = None
     x_max = None
 
+    if refFileName is None or refFileName == "":
+        return nbins, x_min, x_max
+
     # store current directory to not confuse directories by opening a TFile
     oldDirectory = ROOT.gROOT.CurrentDirectory()
 

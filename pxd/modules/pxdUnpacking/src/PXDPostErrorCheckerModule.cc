@@ -151,13 +151,13 @@ void PXDPostErrorCheckerModule::event()
   unsigned short triggergate = 0;
   unsigned short dheframenr = 0;
   PXDErrorFlags mask = EPXDErrMask::c_NO_ERROR;
-  B2DEBUG(20, "Iterate PXD Packets for this Event");
+  B2DEBUG(25, "Iterate PXD Packets for this Event");
   for (auto& pkt : *m_storeDAQEvtStats) {
-    B2DEBUG(20, "Iterate DHC in Pkt " << pkt.getPktIndex());
+    B2DEBUG(25, "Iterate DHC in Pkt " << pkt.getPktIndex());
     for (auto& dhc : pkt) {
-      B2DEBUG(20, "Iterate DHE in DHC " << dhc.getDHCID());
+      B2DEBUG(25, "Iterate DHE in DHC " << dhc.getDHCID());
       for (auto& dhe : dhc) {
-        B2DEBUG(20, "Iterate DHP in DHE " << dhe.getDHEID() << " TrigGate " << dhe.getTriggerGate() << " FrameNr " << dhe.getFrameNr());
+        B2DEBUG(25, "Iterate DHP in DHE " << dhe.getDHEID() << " TrigGate " << dhe.getTriggerGate() << " FrameNr " << dhe.getFrameNr());
         if (had_dhe) {
           if (dhe.getTriggerGate() != triggergate) {
             if (!m_ignoreTriggerGate) B2ERROR("Trigger Gate of DHEs not identical" << LogVar("Triggergate 1",
@@ -175,7 +175,7 @@ void PXDPostErrorCheckerModule::event()
           had_dhe = true;
         }
         for (auto& dhp : dhe) {
-          B2DEBUG(20, "DHP " << dhp.getChipID() << " Framenr " << dhp.getFrameNr());
+          B2DEBUG(25, "DHP " << dhp.getChipID() << " Framenr " << dhp.getFrameNr());
           // TODO check against other DHP (full bits) and DHE (limited bits)
           // TODO We know that this will fail with current firmware and most likely will not be fixed...
         }

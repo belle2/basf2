@@ -16,7 +16,7 @@ from stdPi0s import *
 from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
-gb_setuprel = 'release-03-00-00'
+gb_setuprel = 'release-03-00-03'
 
 import sys
 import os
@@ -26,14 +26,10 @@ argvs = sys.argv
 argc = len(argvs)
 
 skimpath = Path()
-
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC11")
 
 
-inputMdstList('MC9', fileList, path=skimpath)
+inputMdstList('default', fileList, path=skimpath)
 stdPi('loose', path=skimpath)
 stdK('loose', path=skimpath)
 stdPi0s('loose', path=skimpath)

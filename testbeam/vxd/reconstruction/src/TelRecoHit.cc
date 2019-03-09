@@ -175,12 +175,12 @@ vector< int > TelRecoHit::labels()
   VxdID vxdid(getPlaneId());
   std::vector<int> labGlobal;
 
-  labGlobal.push_back(GlobalLabel(vxdid, 1)); // du
-  labGlobal.push_back(GlobalLabel(vxdid, 2)); // dv
-  labGlobal.push_back(GlobalLabel(vxdid, 3)); // dw
-  labGlobal.push_back(GlobalLabel(vxdid, 4)); // dalpha
-  labGlobal.push_back(GlobalLabel(vxdid, 5)); // dbeta
-  labGlobal.push_back(GlobalLabel(vxdid, 6)); // dgamma
+  labGlobal.push_back(GlobalLabel::construct<VXDAlignment>(vxdid.getID(), 1)); // du
+  labGlobal.push_back(GlobalLabel::construct<VXDAlignment>(vxdid.getID(), 2)); // dv
+  labGlobal.push_back(GlobalLabel::construct<VXDAlignment>(vxdid.getID(), 3)); // dw
+  labGlobal.push_back(GlobalLabel::construct<VXDAlignment>(vxdid.getID(), 4)); // dalpha
+  labGlobal.push_back(GlobalLabel::construct<VXDAlignment>(vxdid.getID(), 5)); // dbeta
+  labGlobal.push_back(GlobalLabel::construct<VXDAlignment>(vxdid.getID(), 6)); // dgamma
 
   return labGlobal;
 }

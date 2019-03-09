@@ -79,7 +79,7 @@ namespace Belle2 {
   void ARICHReconstructorModule::initialize()
   {
     // Initialize variables
-
+    if (m_ana) delete m_ana;
     m_ana = new ARICHReconstruction(m_storePhot);
     m_ana->setTrackPositionResolution(m_trackPositionResolution);
     m_ana->setTrackAngleResolution(m_trackAngleResolution);

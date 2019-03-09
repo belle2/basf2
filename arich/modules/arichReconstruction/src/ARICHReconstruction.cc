@@ -491,16 +491,18 @@ namespace Belle2 {
         // calculate fi_ch for a given track refl
         TVector3 virthitpos =  HitVirtualPosition(hitpos, mirrors[mirr]);
 
-        // if hit is more than 15cm from the track position on the detector plane, skip it.
+        // if hit is more than 25cm from the track position on the detector plane, skip it.
         // (not reconstructing hits with irrelevantly large Cherenkov angle)
-        if ((track_at_detector - virthitpos).Mag() > 15.0) continue;
+        if ((track_at_detector - virthitpos).Mag() > 25.0) continue;
 
         double sigExpArr[c_noOfHypotheses] = {0.0}; // esigi for given mirror hypothesis only
         double th_cer_all[c_noOfAerogels] = {0.0};
         double fi_cer_all[c_noOfAerogels] = {0.0};
+
         double weight[c_noOfHypotheses][c_noOfAerogels] = { {0.0} };
         double weight_sum[c_noOfHypotheses] = {0.0};
         int proc = 0;
+        double fi_cer_trk = 0.;
 
         // loop over all aerogel layers
         for (unsigned int iAerogel = 0; iAerogel < m_nAerogelLayers; iAerogel++) {
@@ -520,6 +522,7 @@ namespace Belle2 {
 
           th_cer_all[iAerogel] = th_cer;
           fi_cer_all[iAerogel] = fi_cer;
+          fi_cer_trk = dirch.XYvector().DeltaPhi(edirr.XYvector());
 
           // skip photons with irrelevantly large/small Cherenkov angle
           if (th_cer > 0.5 || th_cer < 0.1) continue;
@@ -609,6 +612,7 @@ namespace Belle2 {
           ARICHPhoton phot(iPhoton, th_cer_all[1], fi_cer_all[1], mirrors[mirr]); // th_cer of the first aerogel layer assumption is stored
           phot.setBkgExp(ebgri); // store expected number of background hits
           phot.setSigExp(sigExpArr); // store expected number of signal hits
+          phot.setPhiCerTrk(fi_cer_trk); // store phi angle in track coordinates
           phot.setNCosThetaCh(n_cos_theta_ch); // store n cos(theta_th) for all particle hypotheses
           phot.setPhiCh(phi_ch); // store phi_ch for all particle hypotheses
           phot.setXY(hitpos.X(), hitpos.Y()); // store x-y hit position

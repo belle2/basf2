@@ -4,7 +4,7 @@ Import('env')
 
 #env['LIBS'] = ['framework', 'daq', "RHTTP", "ca", "RooFit", "RooFitCore"]
 #env['LIBS'] = ['framework', 'daq', "RHTTP", "RooFit", "RooFitCore"]
-env['LIBS'] = ['framework', 'daq', 'dqm', 'RooFit', 'RooFitCore', 'vxd', 'boost_regex']
+env['LIBS'] = ['framework', 'daq', 'dqm', 'arich', 'RooFit', 'RooFitCore', 'vxd', 'boost_regex']
 
 option = os.environ['BELLE2_OPTION']
 # disable EPICS if clang compiled

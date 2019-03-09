@@ -13,24 +13,14 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
-
 set_log_level(LogLevel.INFO)
-
-gb2_setuprel = 'release-03-00-00'
-
-import os
-import sys
-import glob
+gb2_setuprel = 'release-03-00-03'
 skimCode = encodeSkimName('Charm2BodyHadronicD0')
 
 # create a new path for each WG
 c2bhdpath = Path()
-
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
-inputMdstList('MC9', fileList, path=c2bhdpath)
+fileList = get_test_file("mixedBGx1", "MC11")
+inputMdstList('default', fileList, path=c2bhdpath)
 
 stdPi('loose', path=c2bhdpath)
 stdK('loose', path=c2bhdpath)

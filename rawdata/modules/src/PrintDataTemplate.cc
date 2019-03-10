@@ -100,7 +100,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   int n = 0;
   rawftsw.GetTTTimeVal(n , &tv);
 
-  printf("nwords %d nodeID %.8x runsub %.8x run %d sub %d exp %d eve %u trl %.8x\n",
+  printf("HdrNwords %d nodeID %.8x runsub %.8x run %d sub %d exp %d eve %u trl %.8x\n",
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
          rawftsw.GetRunNoSubRunNo(n),

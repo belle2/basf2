@@ -82,6 +82,7 @@ void PrintDataTemplateModule::printBuffer(int* buf, int nwords)
 
 void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 {
+
   int* buf  = raw_datablock->GetBuffer(i);
   int nwords =  raw_datablock->GetBlockNwords(i);
   printf("*******FTSW data**********: nwords %d\n", nwords);
@@ -95,18 +96,39 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   int num_nodes = 1;
   rawftsw.SetBuffer(buf, nwords, delete_flag, num_event, num_nodes);
 
-
-
   timeval tv;
   int n = 0;
   rawftsw.GetTTTimeVal(n , &tv);
-  printf("eve %u TLU %d: %d %d %.8x: tv %d %d\n",
-         rawftsw.GetEveNo(n),
-         rawftsw.Get15bitTLUTag(n),
-         rawftsw.GetBlockNwords(n),
+
+  printf("nwords %d nodeID %.8x runsub %.8x run %d sub %d exp %d eve %u trl %.8x\n",
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
-         (int)(tv.tv_sec), (int)(tv.tv_usec)
+         rawftsw.GetRunNoSubRunNo(n),
+         rawftsw.GetRunNo(n),
+         rawftsw.GetSubRunNo(n),
+         rawftsw.GetExpNo(n),
+         rawftsw.GetEveNo(n),
+         rawftsw.GetMagicTrailer(n)
+        );
+
+  printf("ctimetrg %.8x utime %.8x ctime %d trg %d sec %d usec %d\n",
+         rawftsw.GetTTCtimeTRGType(n),
+         rawftsw.GetTTUtime(n),
+         rawftsw.GetTTCtime(n),
+         rawftsw.GetTRGType(n),
+         (int)(tv.tv_sec),
+         (int)(tv.tv_usec));
+  //  rawftsw.Get15bitTLUTag(n) );
+
+  //
+  // Show newly added variables for ver.2 format
+  //
+  printf("IsHER %d TimeLastInj %u TimePrevTrg %u BunchNum %d FrameCnt %d \n",
+         rawftsw.GetIsHER(n),
+         rawftsw.GetTimeSinceLastInjection(n),
+         rawftsw.GetTimeSincePrevTrigger(n),
+         rawftsw.GetBunchNumber(n),
+         rawftsw.GetFrameCount(n)
         );
 
   m_nftsw++;

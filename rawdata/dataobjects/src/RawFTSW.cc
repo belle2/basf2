@@ -42,8 +42,10 @@ void RawFTSW::SetVersion()
   //
   int temp_version = m_version;
   if (m_buffer[ POS_HEADER_SIZE ] == VER_2_HEADER_SIZE) {
+    m_access = new RawFTSWFormat_latest;
     m_version = 2; // as of 2019.3.2, the latest version is 2.
   } else if (m_buffer[ POS_HEADER_SIZE ] == VER_1_HEADER_SIZE) {
+    m_access = new RawFTSWFormat_v1;
     m_version = 1;
   } else if (m_buffer[ POS_HEADER_SIZE ] == VER_0_HEADER_SIZE) {
     char err_buf[500];

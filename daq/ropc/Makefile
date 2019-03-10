@@ -27,6 +27,9 @@ all: clean link ${TARGET1} ${TARGET2} cleanobj
 ropc: clean_ropc link ${TARGET1} cleanobj
 
 copper: clean_copper link ${TARGET2} cleanobj
+	@ echo "!!!!!!! Martin added overrides to reduce cppcheck warnings (https://stash.desy.de/projects/B2/repos/software/pull-requests/2825/overview), which leads to failure of compiling on COPPER. To compile on a COPPER, please run the following commands to remove override in rawdata classes"
+	@ echo "!!!!!!! cd rawdata/dataobjects/include; sed -i -e 's/ override;/;/g' *.h"
+
 
 ${TARGET1}: ${TARGET1}.cc ${OBJS}
 	$(CXX) $(CFLAGS) ${LIBFLAG} -L./ $^ -o $@ 

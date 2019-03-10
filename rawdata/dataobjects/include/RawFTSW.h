@@ -220,7 +220,7 @@ namespace Belle2 {
     RawFTSWFormat* m_access{}; //! do not record
 
     /// Version of the format
-    int m_version = 0; //! do not record
+    int m_version = -1; //! do not record
 
   protected :
     /// To derive from TObject

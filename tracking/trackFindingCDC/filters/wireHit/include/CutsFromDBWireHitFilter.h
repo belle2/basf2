@@ -10,17 +10,34 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
+#include <framework/database/DBObjPtr.h>
+#include <cdc/dbobjects/CDCWireHitRequirements.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWireHit;
 
-    /// Filter accepting all hits
-    class AllWireHitFilter : public BaseWireHitFilter {
+    /// Filter rejecting hits according to DB values.
+    class CutsFromDBWireHitFilter : public BaseWireHitFilter {
 
     public:
-      /// Basic filter method to override. All implementation accepts all hits.
+
+      /// Default constructor.
+      CutsFromDBWireHitFilter();
+
+      /// Called when a new run is started.
+      void beginRun() final;
+
+      /// Basic filter method to override.
       Weight operator()(const CDCWireHit& wireHit) final;
+
+    private:
+
+      /// Cut values from the Data Base.
+      DBObjPtr<CDCWireHitRequirements> m_CDCWireHitRequirementsFromDB;
+
+      /// Boolean asserting if DBObjPtr is valid for the current run.
+      bool m_DBPtrIsValidForCurrentRun;
     };
   }
 }

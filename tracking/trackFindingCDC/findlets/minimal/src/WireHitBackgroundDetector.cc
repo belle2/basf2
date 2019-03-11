@@ -20,7 +20,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-WireHitBackgroundDetector::WireHitBackgroundDetector() : m_CDCWireHitRequirementsFromDB("CDCWireHitRequirements")
+WireHitBackgroundDetector::WireHitBackgroundDetector()
 {
   // adding the filter as a subordinary processing signal listener.
   this->addProcessingSignalListener(&m_wireHitFilter);
@@ -37,15 +37,6 @@ void WireHitBackgroundDetector::exposeParameters(ModuleParamList* moduleParamLis
   m_wireHitFilter.exposeParameters(moduleParamList, prefix);
 }
 
-void WireHitBackgroundDetector::beginRun()
-{
-  Super::beginRun();
-  if (!(m_CDCWireHitRequirementsFromDB.isValid())) {
-    B2ERROR("CDC WireHitBackgroundDetector: DBObjPtr<CDCWireHitRequirements> not valid for current run.");
-    exit(1);
-  }
-}
-
 void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
 {
   for (CDCWireHit& wireHit : wireHits) {
@@ -55,11 +46,6 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
     if (std::isnan(wireHitWeight)) {
       markAsBackground = true;
     }
-
-    //if (wireHit.getRefChargeDeposit() < m_CDCWireHitRequirementsFromDB->getChargeCut()) {
-    //  B2INFO("CUT:   " << m_CDCWireHitRequirementsFromDB->getChargeCut());
-    //  markAsBackground = true;
-    //}
 
     if (markAsBackground) {
       wireHit->setBackgroundFlag();

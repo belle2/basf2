@@ -13,8 +13,6 @@
 #include <tracking/trackFindingCDC/filters/wireHit/ChooseableWireHitFilter.h>
 #include <vector>
 #include <string>
-#include <framework/database/DBObjPtr.h>
-#include <cdc/dbobjects/CDCWireHitRequirements.h>
 
 namespace Belle2 {
 
@@ -38,9 +36,6 @@ namespace Belle2 {
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-      /// Begin run action
-      void beginRun() final;
-
       /// Main algorithm marking hit as background
       void apply(std::vector<CDCWireHit>& wireHits) final;
 
@@ -49,8 +44,6 @@ namespace Belle2 {
       /// Chooseable WireHit filter to be used to filter background
       ChooseableWireHitFilter m_wireHitFilter;
 
-      /// Cut values from the Data Base
-      DBObjPtr<CDCWireHitRequirements> m_CDCWireHitRequirementsFromDB;
     };
   }
 }

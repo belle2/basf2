@@ -907,6 +907,8 @@ void CDCDatabaseImporter::importCDCWireHitRequirements(std::string fileName)
   int maxTOT = 100;          // Cut value for TOT
   double minADCOverTOT = 0.0;      // Cut value for ADC/TOT
 
+  // In the input file, the cuts are defined in that order:
+  // ADC>int TOT>int TOT<int ADC/TOT>double
   if (stream >> minADC) {
   } else {
     B2ERROR("Cannot get int minADC from " << fileName);

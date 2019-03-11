@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHit/AllWireHitFilter.h>
-
+#include <tracking/trackFindingCDC/filters/wireHit/CutsFromDBWireHitFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 
@@ -40,7 +40,8 @@ std::string WireHitFilterFactory::getFilterPurpose() const
 std::map<std::string, std::string> WireHitFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
-    {"all", "all wireHit are valid"}
+    {"all", "all wireHits are valid."},
+    {"cuts_from_DB", "wireHits filtered by cuts from DB."}
   };
 }
 
@@ -49,6 +50,8 @@ WireHitFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
     return std::make_unique<AllWireHitFilter>();
+  } else if (filterName == "cuts_from_DB") {
+    return std::make_unique<CutsFromDBWireHitFilter>();
   } else {
     return Super::create(filterName);
   }

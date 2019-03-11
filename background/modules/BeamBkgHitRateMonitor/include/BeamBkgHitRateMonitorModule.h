@@ -11,10 +11,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <rawdata/dataobjects/RawTRG.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
 
@@ -79,7 +77,6 @@ namespace Belle2 {
 
     // collections
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data object */
-    StoreArray<RawTRG> m_rawTRGs;  /**< collection of raw triggers */
     StoreObjPtr<TRGSummary> m_trgSummary;  /**< trigger summary */
 
     // output file and tree

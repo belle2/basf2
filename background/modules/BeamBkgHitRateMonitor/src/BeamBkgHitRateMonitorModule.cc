@@ -80,7 +80,6 @@ namespace Belle2 {
     // collections registration
 
     m_eventMetaData.isRequired();
-    m_rawTRGs.isRequired();
     m_trgSummary.isRequired();
 
     // create, set and append hit rate monitoring classes
@@ -126,14 +125,8 @@ namespace Belle2 {
 
   void BeamBkgHitRateMonitorModule::event()
   {
-    // check if we can get unix time of the event
-    if (m_rawTRGs.getEntries() == 0) {
-      B2ERROR("RawTRGs are empty: cannot get unix time of the event - event skipped");
-      return;
-    }
-
     // get unix time of the event
-    auto utime = m_rawTRGs[0]->GetTTUtime(0);
+    unsigned utime = m_eventMetaData->getTime() / 1000000000;
     if (m_utimeFirst == 0) {
       m_utimeFirst = utime;
       m_utimeMin = utime;

@@ -147,7 +147,7 @@ elif option == 'opt':
     # linked, but causes oversubscription when linking libraries concurrently.
     # Performance and RAM usage measurements suggest that between these two
     # evils, oversubscription is the better choice.
-    global_env.Append(LINKFLAGS='-flto=' + str(GetOption('num_jobs')))
+    global_env.Append(LINKFLAGS='-flto$(=%d$)' % GetOption('num_jobs'))
     # LTO requires some binutils wrappers that preserve the GCC IR
     global_env['AR'] = 'gcc-ar'
     global_env['RANLIB'] = 'gcc-ranlib'

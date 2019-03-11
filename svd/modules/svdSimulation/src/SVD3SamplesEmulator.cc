@@ -51,6 +51,9 @@ void SVD3SamplesEmulatorModule::initialize()
   B2DEBUG(10, "StartingSample: " << m_startingSample);
   B2DEBUG(10, "outputArrayName: " <<  m_outputArrayName);
 
+  B2INFO("The starting sample from which start to select the three samples:  " << m_startingSample);
+  B2INFO("The three samples selected are: " << m_startingSample << " " << m_startingSample + 1 << " " << m_startingSample + 2);
+
   StoreArray<SVDShaperDigit> ShaperDigits(m_shaperDigitInput);
   ShaperDigits.isRequired();
   StoreArray<SVDShaperDigit> ShaperDigit3Samples(m_outputArrayName);

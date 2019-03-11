@@ -51,12 +51,25 @@ void HepMCOutputModule::event()
   StoreArray<MCParticle> mcPartCollection;
 
   int nPart = mcPartCollection.getEntries();
+  int nVirtualPart = 0;
+  for (int iPart = 0; iPart < nPart; ++iPart) {
+    MCParticle& mcPart = *mcPartCollection[iPart];
+    if (mcPart.isVirtual()) nVirtualPart++;
+  }
+  nPart -= nVirtualPart;
 
+  HepMC::HEPEVT_Wrapper::zero_everything();
   HepMC::HEPEVT_Wrapper::set_event_number(eventMetaDataPtr->getEvent());
   HepMC::HEPEVT_Wrapper::set_number_entries(nPart);
 
-  for (int iPart = 0; iPart < nPart; ++iPart) {
-    MCParticle& mcPart = *mcPartCollection[iPart];
+  // Note: Particle numbering in HepMC starts at 1
+  for (int iPart = 1; iPart <= nPart; ++iPart) {
+    // but this is a normal array, starting at 0
+    MCParticle& mcPart = *mcPartCollection[iPart - 1];
+
+    if (mcPart.isVirtual()) {
+      continue;
+    }
 
     TVector3 mom = mcPart.getMomentum();
     TVector3 vert = mcPart.getVertex();
@@ -80,9 +93,6 @@ void HepMCOutputModule::event()
   HepMC::GenEvent* evt = m_hepevtio.read_next_event();
   *m_ascii_io << evt;
   delete evt;
-
-  // HepMC::HEPEVT_Wrapper::set_event_number(4);
-  B2INFO("Just read an event with" << evt->particles_size() << " particles");
 
 }
 

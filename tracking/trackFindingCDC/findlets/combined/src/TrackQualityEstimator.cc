@@ -50,21 +50,16 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
 {
   m_mcCloneLookUpFiller.apply(tracks);
 
-  auto reject = [this](CDCTrack & track) {
-    double qualityIndicator = m_trackQualityFilter(track);
-    if (std::isnan(qualityIndicator)) {
-      track->setBackgroundFlag();
-      track->setTakenFlag();
-      return true;
-    } else {
-      return false;
-    }
-  };
-  if (m_param_deleteTracks) { erase_remove_if(tracks, reject); }
-
-  auto setQualityIndicator = [this](CDCTrack & track) {
-    double qualityIndicator = m_trackQualityFilter(track);
+  for (CDCTrack& track : tracks) {
+    const double qualityIndicator = m_trackQualityFilter(track);
     track.setQualityIndicator(qualityIndicator);
-  };
-  std::for_each(begin(tracks), end(tracks), setQualityIndicator);
+  }
+
+  if (m_param_deleteTracks) { // delete track with QI below cut threshold
+    auto reject = [](const CDCTrack & track) {
+      const double qualityIndicator = track.getQualityIndicator();
+      return std::isnan(qualityIndicator);
+    };
+    erase_remove_if(tracks, reject);
+  }
 }

@@ -57,7 +57,8 @@ namespace Belle2 {
     m_trgTypes.push_back(TRGSummary::TTYP_DPHY);
     m_trgTypes.push_back(TRGSummary::TTYP_RAND);
     addParam("trgTypes", m_trgTypes,
-             "trigger types for event selection (see TRGSummary.h for definitions)",
+             "trigger types for event selection (see TRGSummary.h for definitions). "
+             "Empty list means all trigger types.",
              m_trgTypes);
     addParam("writeEmptyTimeStamps", m_writeEmptyTimeStamps,
              "if true, write to ntuple also empty time stamps", false);
@@ -117,9 +118,6 @@ namespace Belle2 {
     for (auto& monitor : m_monitors) {
       monitor->initialize(m_tree);
     }
-
-    // other
-    m_trgTypesCount.resize(m_trgTypes.size(), 0);
 
   }
 
@@ -183,9 +181,9 @@ namespace Belle2 {
 
     // print a summary for this run
     std::string trigs;
-    for (unsigned i = 0; i < m_trgTypes.size(); i++) {
-      trigs += "        trigger type " + std::to_string(m_trgTypes[i]) + ": " +
-               std::to_string(m_trgTypesCount[i]) + " events\n";
+    for (const auto& trgType : m_trgTypesCount) {
+      trigs += "        trigger type " + std::to_string(trgType.first) + ": " +
+               std::to_string(trgType.second) + " events\n";
     }
     B2RESULT("Run " << m_run << ": " << m_numEventsSelected
              << " events selected for beam background hit rate monitoring.\n"
@@ -211,13 +209,16 @@ namespace Belle2 {
   bool BeamBkgHitRateMonitorModule::isEventSelected()
   {
     auto trgType = m_trgSummary->getTimType();
-    unsigned i = 0;
+
+    if (m_trgTypes.empty()) {
+      m_trgTypesCount[trgType] += 1;
+      return true;
+    }
     for (auto type : m_trgTypes) {
       if (trgType == type) {
-        m_trgTypesCount[i]++;
+        m_trgTypesCount[trgType] += 1;
         return true;
       }
-      i++;
     }
     return false;
   }

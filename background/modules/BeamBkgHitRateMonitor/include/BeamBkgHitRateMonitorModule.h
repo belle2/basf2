@@ -95,9 +95,9 @@ namespace Belle2 {
 
     // tree variables
     int m_run = 0;  /**< run number */
-    int m_numEvents = 0;  /**< number of events in time stamp */
+    int m_numEvents = 0;  /**< number of events in the time stamp */
     unsigned m_timeStamp = 0;  /**< time stamp (unix time) */
-    int m_time = 0;  /**< time in seconds w.r.t the first event */
+    int m_time = 0;  /**< time in seconds w.r.t the first event of the run */
 
     // buffers
     std::map<unsigned, int> m_eventCounts; /**< number of events in time stamps */
@@ -107,10 +107,10 @@ namespace Belle2 {
 
     // other
     unsigned m_numEventsSelected = 0;  /**< number of selected events */
-    std::vector<unsigned> m_trgTypesCount; /**< trigger type counter */
-    unsigned m_utimeFirst = 0; /**< unix time of the first event in the input stream */
-    unsigned m_utimeMin = 0; /**< minimal unix time of the events */
-    unsigned m_utimeMax = 0; /**< maximal unix time of the events */
+    std::map<TRGSummary::ETimingType, unsigned> m_trgTypesCount; /**< trigger type counters */
+    unsigned m_utimeFirst = 0; /**< unix time of the first event in the run input stream */
+    unsigned m_utimeMin = 0; /**< minimal unix time of events in the run */
+    unsigned m_utimeMax = 0; /**< maximal unix time of events in the run */
 
   };
 

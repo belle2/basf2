@@ -63,9 +63,6 @@ namespace Belle2 {
 
   private:
 
-    // cppcheck-suppress unusedPrivateFunction
-    bool isV0(const MCParticle& the_mcParticle);
-
     bool isK_Short(const MCParticle& the_mcParticle);
 
     bool isLambda0(const MCParticle& the_mcParticle);

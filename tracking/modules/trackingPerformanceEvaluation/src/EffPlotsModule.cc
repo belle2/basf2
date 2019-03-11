@@ -1278,38 +1278,6 @@ void EffPlotsModule::terminate()
   }
 }
 
-bool EffPlotsModule::isV0(const MCParticle& the_mcParticle)
-{
-
-  bool isGamma = false;
-  if (abs(the_mcParticle.getPDG()) == 22)
-    isGamma = true;
-
-  bool isK_S0 = false;
-  if (abs(the_mcParticle.getPDG()) == 310)
-    isK_S0 = true;
-
-  bool isK_0 = false;
-  if (abs(the_mcParticle.getPDG()) == 311)
-    isK_0 = true;
-
-  bool isLambda = false;
-  if (abs(the_mcParticle.getPDG()) == 3122)
-    isLambda = true;
-
-  bool twoChargedProngs = false;
-
-  if (the_mcParticle.getDaughters().size() == 2)
-    twoChargedProngs = true;
-
-  if (twoChargedProngs)
-    if (the_mcParticle.getDaughters()[0]->getCharge() == 0)
-      twoChargedProngs = false;
-
-  return ((isGamma || isK_S0 || isK_0 || isLambda) && twoChargedProngs);
-
-}
-
 bool EffPlotsModule::isK_Short(const MCParticle& the_mcParticle)
 {
 

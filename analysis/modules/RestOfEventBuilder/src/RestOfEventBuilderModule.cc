@@ -173,22 +173,23 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
     for (int i = 0; i < m_part; i++) {
       Particle* storedParticle = plist->getParticle(i);
 
-      bool toAdd = true;
-      for (auto* daughter : fsdaughters) {
-        if (RestOfEvent::compareParticles(storedParticle, daughter)) {
-          B2DEBUG(10, "Ignoring Particle with PDG " << storedParticle->getPDGCode() << " index " << storedParticle->getMdstArrayIndex() <<
-                  " to "
-                  <<
-                  daughter->getMdstArrayIndex());
-          B2DEBUG(10, "Is copy " << storedParticle->isCopyOf(daughter));
-          toAdd = false;
-          nExcludedParticles++;
-          break;
+      std::vector<const Particle*> storedParticleDaughters = storedParticle->getFinalStateDaughters();
+      for (auto* storedParticleDaughter : storedParticleDaughters) {
+        bool toAdd = true;
+        for (auto* daughter : fsdaughters) {
+          if (RestOfEvent::compareParticles(storedParticleDaughter, daughter)) {
+            B2DEBUG(10, "Ignoring Particle with PDG " << storedParticleDaughter->getPDGCode() << " index " <<
+                    storedParticleDaughter->getMdstArrayIndex() << " to " << daughter->getMdstArrayIndex());
+            B2DEBUG(10, "Is copy " << storedParticleDaughter->isCopyOf(daughter));
+            toAdd = false;
+            nExcludedParticles++;
+            break;
+          }
         }
-      }
-      if (toAdd) {
-        //roe->addParticle(storedParticle);
-        particlesToAdd.push_back(storedParticle);
+        if (toAdd) {
+          //roe->addParticle(storedParticle);
+          particlesToAdd.push_back(storedParticleDaughter);
+        }
       }
     }
   }

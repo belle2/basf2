@@ -52,8 +52,6 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<SVDShaperDigit> m_storeShaper;
-    StoreArray<SVDShaperDigit> m_shaper;
     std::string m_shaperDigitInput;  /**< StoreArray with the input shaperdigits */
     Int_t m_startingSample;
     std::string m_outputArrayName;  /**< StoreArray with the selected output shaperdigits*/

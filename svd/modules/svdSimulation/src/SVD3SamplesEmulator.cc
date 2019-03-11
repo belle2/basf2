@@ -76,8 +76,6 @@ void SVD3SamplesEmulatorModule::event()
 
     SVDModeByte modeByte = shaper.getModeByte();
     //int DAQMode = modeByte.getDAQMode();
-    //B2INFO("DAQMODE: " << DAQMode);
-    //B2INFO("MODEBYTE: " << modeByte);
     modeByte.setDAQMode(1);
     Belle2::SVDShaperDigit::APVFloatSamples samples = shaper.getSamples();
     VxdID sensorID = shaper.getSensorID();
@@ -99,9 +97,6 @@ void SVD3SamplesEmulatorModule::event()
 
     //SVDModeByte threeModeByte = shaperThree->getModeByte();
     //int daq = threeModeByte.getDAQMode();
-    //B2INFO("MODEBYTE: " << threeModeByte);
-    //B2INFO("DAQMODE: " << daq);
-
   }
 }
 

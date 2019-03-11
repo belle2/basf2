@@ -7,10 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/cdc/filters/states/CDCStateTruthVarSet.h>
+#include <tracking/ckf/cdc/filters/states/CDCStateBasicVarSet.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
+
 
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -19,29 +20,29 @@
 using namespace std;
 using namespace Belle2;
 
-bool CDCStateTruthVarSet::extract(const BaseCDCStateFilter::Object* pair)
+bool CDCStateBasicVarSet::extract(const BaseCDCStateFilter::Object* pair)
 {
   const auto& path = pair->first;
   const auto& state = pair->second;
+  const auto& lastState = path->back();
 
   // check if hit belongs to same seed
   const auto& seed = path->front();
   const auto* seedRecoTrack = seed.getSeed();
-  const auto* seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
 
-  const auto* wireHit = state->getWireHit();
-  const auto* cdcHit = wireHit->getHit();
-  const auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
-  const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
-
-  // Bremsstrahlung etc (works for electron gun, check for other events later)
-  while (hitMCParticle->getMother()) {
-    hitMCParticle = hitMCParticle->getMother();
-  }
+  //const auto* wireHit = state->getWireHit();
+  //const auto* cdcHit = wireHit->getHit();
 
   // calculate the interesting quantities
-  var<named("match")>() = seedMCTrack == hitMCTrack ? true : false;
-  var<named("PDG")>() = hitMCParticle->getPDG();
+  var<named("firstHit")>() = lastState.isSeed();
+  var<named("arcLength")>() = state->getArcLength() - lastState.getArcLength();
+  var<named("hitDistance")>() = state->getHitDistance();
+  var<named("iCLayer")>() = state->getWireHit()->getWire().getICLayer();
+
+  TVector3 seedPos = seedRecoTrack->getPositionSeed();
+  var<named("seed_r")>() = seedPos.Perp();
+  var<named("seed_z")>() = seedPos.Z();
+  var<named("seed_charge")>() = seedRecoTrack->getChargeSeed();
 
   return true;
 }

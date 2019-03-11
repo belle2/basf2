@@ -25,16 +25,12 @@ TrackFindingCDC::Weight RoughCDCStateFilter::operator()(const BaseCDCStateFilter
 
   const double& arcLength = state.getArcLength() - lastState.getArcLength();
 
-  B2INFO("arcLength: " << arcLength << " (" << state.getArcLength() << " - " << lastState.getArcLength() << ")");
-
   // TODO: magic number
   if (arcLength <= 0 or arcLength > 20) {
     return NAN;
   }
 
   const double& hitDistance = state.getHitDistance();
-
-  B2INFO("hitDistance: " << hitDistance);
 
   if (std::abs(hitDistance) > m_maximalHitDistance) {
     return NAN;

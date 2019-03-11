@@ -17,23 +17,23 @@
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
-  static char const* const cdcStateTruthVarNames[] = {
+  static char const* const cdcfromEclStateTruthVarNames[] = {
     "match",
     "PDG"
   };
 
   /// Vehicle class to transport the variable names
-  class CDCStateTruthVarNames : public TrackFindingCDC::VarNames<BaseCDCStateFilter::Object> {
+  class CDCfromEclStateTruthVarNames : public TrackFindingCDC::VarNames<BaseCDCStateFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(cdcStateTruthVarNames);
+    static const size_t nVars = TrackFindingCDC::size(cdcfromEclStateTruthVarNames);
 
     /// Get the name of the column.
     constexpr
     static char const* getName(int iName)
     {
-      return cdcStateTruthVarNames[iName];
+      return cdcfromEclStateTruthVarNames[iName];
     }
   };
 
@@ -41,7 +41,7 @@ namespace Belle2 {
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  class CDCStateTruthVarSet : public TrackFindingCDC::VarSet<CDCStateTruthVarNames> {
+  class CDCfromEclStateTruthVarSet : public TrackFindingCDC::VarSet<CDCfromEclStateTruthVarNames> {
 
   public:
     /// Generate and assign the variables from the object.

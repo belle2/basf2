@@ -352,7 +352,6 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
             root_file_meta_data = collections.defaultdict(lambda: None)
 
             for key in all_p2f2k2o[package][rootfile].keys():
-                # Otherwise we can generate Plotuple object
                 plotuple = Plotuple(
                     all_p2f2k2o[package][rootfile][key],
                     revisions,
@@ -368,7 +367,6 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                     compare_html_content.append(plotuple.create_json_object())
                 elif plotuple.type == "meta":
                     meta_key, meta_value = plotuple.get_meta_information()
-                    print("{}: {}->{}".format(key, meta_key, meta_value))
                     root_file_meta_data[meta_key] = meta_value
                 else:
                     compare_plots.append(plotuple.create_json_object())
@@ -524,21 +522,25 @@ def tobjects_from_files(root_files_dict, is_reference, work_folder):
     """
 
     # Return value: {package: {key: objects}}
-    return_dict = collections.defaultdict(dict)
+    return_dict = collections.defaultdict(
+        lambda: collections.defaultdict(
+            lambda: collections.defaultdict(list)
+        )
+    )
 
     # Now loop over all given
     for revision, package2root_files in root_files_dict.items():
         for package, root_files in package2root_files.items():
             for root_file in root_files:
-                # Create the RootObjects from this file and store them, as well as the
-                key2object = tobjects_from_file(
+                key2objects = tobjects_from_file(
                     root_file,
                     package,
                     revision,
                     is_reference,
                     work_folder
                 )
-                return_dict[package][os.path.basename(root_file)] = key2object
+                for key, objects in key2objects.items():
+                    return_dict[package][os.path.basename(root_file)][key].extend(objects)
 
     return return_dict
 

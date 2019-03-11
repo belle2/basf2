@@ -56,9 +56,9 @@ namespace Belle2 {
 
     //Parameter
     std::string m_filename; /**< The output filename. */
+    bool m_storeVirtualParticles; /**< Flag which specifies if virtual particles are stored in the HEPEvt file. */
 
     //Variables
-    //std::ofstream m_fileStream;  /**< The text file stream. */
     HepMC::IO_HEPEVT m_hepevtio; /**< wrapper/buffer for hepevt conversion. */
     HepMC::IO_GenEvent* m_ascii_io; /**< The text file stream */
 

@@ -14,10 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-// #include <framework/gearbox/Unit.h>
-// #include <framework/core/Environment.h>
-// #include <boost/format.hpp>
-// #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -34,6 +30,7 @@ REG_MODULE(HepMCOutput)
 HepMCOutputModule::HepMCOutputModule() : Module()
 {
   addParam("OutputFilename", m_filename, "The filename of the output file");
+  addParam("StoreVirtualParticles", m_storeVirtualParticles, "Store also virtual particles in the HepMC file.", false);
 }
 
 
@@ -51,23 +48,29 @@ void HepMCOutputModule::event()
   StoreArray<MCParticle> mcPartCollection;
 
   int nPart = mcPartCollection.getEntries();
+
+  //Find number of virtual particles
   int nVirtualPart = 0;
-  for (int iPart = 0; iPart < nPart; ++iPart) {
-    MCParticle& mcPart = *mcPartCollection[iPart];
-    if (mcPart.isVirtual()) nVirtualPart++;
+  if (!m_storeVirtualParticles) {
+    for (int iPart = 0; iPart < nPart; ++iPart) {
+      MCParticle& mcPart = *mcPartCollection[iPart];
+      if (mcPart.isVirtual()) nVirtualPart++;
+    }
   }
-  nPart -= nVirtualPart;
+
+  // The following fills values into the HEPEVT_Wrapper buffers
+  // The procedure is similar to the code in HepevtOutputModule
 
   HepMC::HEPEVT_Wrapper::zero_everything();
   HepMC::HEPEVT_Wrapper::set_event_number(eventMetaDataPtr->getEvent());
-  HepMC::HEPEVT_Wrapper::set_number_entries(nPart);
+  HepMC::HEPEVT_Wrapper::set_number_entries(nPart - nVirtualPart);
 
   // Note: Particle numbering in HepMC starts at 1
   for (int iPart = 1; iPart <= nPart; ++iPart) {
     // but this is a normal array, starting at 0
     MCParticle& mcPart = *mcPartCollection[iPart - 1];
 
-    if (mcPart.isVirtual()) {
+    if (!m_storeVirtualParticles && mcPart.isVirtual()) {
       continue;
     }
 
@@ -90,6 +93,7 @@ void HepMCOutputModule::event()
     HepMC::HEPEVT_Wrapper::set_position(iPart, vert.X(), vert.Y(), vert.Z(), mcPart.getProductionTime());
   }
 
+  // read from buffers and write event to disk
   HepMC::GenEvent* evt = m_hepevtio.read_next_event();
   *m_ascii_io << evt;
   delete evt;
@@ -98,9 +102,7 @@ void HepMCOutputModule::event()
 
 void HepMCOutputModule::terminate()
 {
-  // here or better in destructor?
   if (m_ascii_io != 0) {
     delete m_ascii_io;
   }
 }
-

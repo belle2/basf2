@@ -31,6 +31,11 @@ namespace Belle2 {
 
     }
 
+    void PXDHitRateCounter::clear()
+    {
+      m_buffer.clear();
+    }
+
     void PXDHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available

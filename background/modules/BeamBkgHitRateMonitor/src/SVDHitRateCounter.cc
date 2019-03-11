@@ -31,6 +31,11 @@ namespace Belle2 {
 
     }
 
+    void SVDHitRateCounter::clear()
+    {
+      m_buffer.clear();
+    }
+
     void SVDHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available

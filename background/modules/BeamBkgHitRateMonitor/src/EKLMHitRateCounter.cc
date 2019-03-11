@@ -31,6 +31,11 @@ namespace Belle2 {
 
     }
 
+    void EKLMHitRateCounter::clear()
+    {
+      m_buffer.clear();
+    }
+
     void EKLMHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available

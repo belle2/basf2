@@ -45,6 +45,11 @@ namespace Belle2 {
       setActiveFractions();
     }
 
+    void TOPHitRateCounter::clear()
+    {
+      m_buffer.clear();
+    }
+
     void TOPHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available

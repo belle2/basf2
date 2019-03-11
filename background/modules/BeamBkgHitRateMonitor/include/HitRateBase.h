@@ -36,6 +36,11 @@ namespace Belle2 {
       virtual void initialize(TTree* tree) = 0;
 
       /**
+       * Clear time-stamp buffer to prepare for 'accumulate'
+       */
+      virtual void clear() = 0;
+
+      /**
        * Accumulate hits
        * @param timeStamp time stamp
        */

@@ -123,15 +123,33 @@ namespace Belle2 {
 
   }
 
+  void BeamBkgHitRateMonitorModule::beginRun()
+  {
+    // clear buffers
+    for (auto& monitor : m_monitors) {
+      monitor->clear();
+    }
+    m_eventCounts.clear();
+
+    // clear counters
+    m_numEventsSelected = 0;
+    m_trgTypesCount.clear();
+
+    // set run number
+    m_run = m_eventMetaData->getRun();
+
+    // set unix time of the first event in the run
+    unsigned utime = m_eventMetaData->getTime() / 1000000000;
+    m_utimeFirst = utime;
+    m_utimeMin = utime;
+    m_utimeMax = utime + 1;
+
+  }
+
   void BeamBkgHitRateMonitorModule::event()
   {
     // get unix time of the event
     unsigned utime = m_eventMetaData->getTime() / 1000000000;
-    if (m_utimeFirst == 0) {
-      m_utimeFirst = utime;
-      m_utimeMin = utime;
-      m_utimeMax = utime + 1;
-    }
     m_utimeMin = std::min(m_utimeMin, utime);
     m_utimeMax = std::max(m_utimeMax, utime + 1);
 
@@ -143,20 +161,17 @@ namespace Belle2 {
     for (auto& monitor : m_monitors) {
       monitor->accumulate(utime);
     }
-    m_runNumbers[utime] = m_eventMetaData->getRun();
     m_eventCounts[utime] += 1;
 
   }
 
-  void BeamBkgHitRateMonitorModule::terminate()
+  void BeamBkgHitRateMonitorModule::endRun()
   {
-
     // fill ntuple
     for (unsigned utime = m_utimeMin; utime < m_utimeMax; utime++) {
       if (not m_writeEmptyTimeStamps) {
         if (m_eventCounts.find(utime) == m_eventCounts.end()) continue;
       }
-      m_run = m_runNumbers[utime];
       m_numEvents = m_eventCounts[utime];
       m_timeStamp = utime;
       m_time = utime - m_utimeMin;
@@ -166,18 +181,13 @@ namespace Belle2 {
       m_tree->Fill();
     }
 
-    // write to file
-    m_file->cd();
-    m_file->Write();
-    m_file->Close();
-
-    // print a summary
+    // print a summary for this run
     std::string trigs;
     for (unsigned i = 0; i < m_trgTypes.size(); i++) {
       trigs += "        trigger type " + std::to_string(m_trgTypes[i]) + ": " +
                std::to_string(m_trgTypesCount[i]) + " events\n";
     }
-    B2RESULT(m_numEventsSelected
+    B2RESULT("Run " << m_run << ": " << m_numEventsSelected
              << " events selected for beam background hit rate monitoring.\n"
              << trigs
              << LogVar("first event utime ", m_utimeMin)
@@ -185,6 +195,16 @@ namespace Belle2 {
              << LogVar("stop utime        ", m_utimeMax)
              << LogVar("duration [seconds]", m_utimeMax - m_utimeMin)
             );
+  }
+
+  void BeamBkgHitRateMonitorModule::terminate()
+  {
+
+    // write to file and close
+    m_file->cd();
+    m_file->Write();
+    m_file->Close();
+
     B2RESULT("Output file: " << m_outputFileName);
   }
 

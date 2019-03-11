@@ -31,6 +31,11 @@ namespace Belle2 {
 
     }
 
+    void ARICHHitRateCounter::clear()
+    {
+      m_buffer.clear();
+    }
+
     void ARICHHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available

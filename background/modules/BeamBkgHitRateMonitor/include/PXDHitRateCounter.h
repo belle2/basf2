@@ -60,6 +60,11 @@ namespace Belle2 {
       virtual void initialize(TTree* tree) override;
 
       /**
+       * Clear time-stamp buffer to prepare for 'accumulate'
+       */
+      virtual void clear() override;
+
+      /**
        * Accumulate hits
        * @param timeStamp time stamp
        */

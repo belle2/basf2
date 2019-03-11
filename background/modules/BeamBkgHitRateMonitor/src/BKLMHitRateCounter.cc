@@ -31,6 +31,11 @@ namespace Belle2 {
 
     }
 
+    void BKLMHitRateCounter::clear()
+    {
+      m_buffer.clear();
+    }
+
     void BKLMHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available

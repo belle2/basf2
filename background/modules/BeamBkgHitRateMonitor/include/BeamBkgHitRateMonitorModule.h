@@ -49,9 +49,19 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
+     * Called when entering a new run.
+     */
+    virtual void beginRun() override;
+
+    /**
      * Event processor.
      */
     virtual void event() override;
+
+    /**
+     * End-of-run action.
+     */
+    virtual void endRun() override;
 
     /**
      * Termination action.
@@ -90,7 +100,6 @@ namespace Belle2 {
     int m_time = 0;  /**< time in seconds w.r.t the first event */
 
     // buffers
-    std::map<unsigned, int> m_runNumbers; /**< run numbers of time stamps */
     std::map<unsigned, int> m_eventCounts; /**< number of events in time stamps */
 
     // rate monitoring classes: these provide additional buffers and tree branches

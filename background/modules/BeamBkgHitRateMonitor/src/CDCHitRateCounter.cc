@@ -31,6 +31,11 @@ namespace Belle2 {
 
     }
 
+    void CDCHitRateCounter::clear()
+    {
+      m_buffer.clear();
+    }
+
     void CDCHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available

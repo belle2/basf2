@@ -903,7 +903,7 @@ def combineAllParticles(
 
     pmake = register_module('AllParticleCombiner')
     pmake.set_name('AllParticleCombiner_' + outputList)
-    pmake.param('inputParticleLists', inputListNames)
+    pmake.param('inputListNames', inputParticleLists)
     pmake.param('outputListName', outputList)
     pmake.param('cut', cut)
     pmake.param('writeOut', writeOut)

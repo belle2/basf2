@@ -39,7 +39,7 @@ copyLists('tau+:LFV', tauList, path=taulfvskim)
 # the variables that are printed out are: Mbc, deltaE
 from variables import variables
 variablesToHistogram(
-    filename='../TauLFV_Validation.root',
+    filename='TauLFV_Validation.root',
     decayString='tau+:LFV',
     variables=[('Mbc', 100, 1.50, 2.00), ('deltaE', 120, -1.1, 1.1)],
     variables_2d=[('Mbc', 50, 1.50, 2.00, 'deltaE', 60, -1.1, 1.1)],

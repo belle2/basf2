@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bjoern Spruck                                            *
@@ -19,7 +19,6 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
-// using namespace Belle2::PXD::PXDError;
 using namespace Belle2::VXD;
 using boost::format;
 
@@ -39,6 +38,7 @@ PXDInjectionDQMModule::PXDInjectionDQMModule() : HistoModule() , m_vxdGeometry(V
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDINJ"));
+  addParam("PXDRawHitsName", m_PXDRawHitsName, "Name of PXD raw hits", std::string(""));
   addParam("eachModule", m_eachModule, "creeate for each module", false);
 }
 
@@ -76,6 +76,7 @@ void PXDInjectionDQMModule::initialize()
   REG_HISTOGRAM
 //  m_storeDAQEvtStats.isRequired();
   m_rawTTD.isRequired();
+  m_storeRawHits.isRequired(m_PXDRawHitsName);
 }
 
 void PXDInjectionDQMModule::beginRun()
@@ -89,17 +90,14 @@ void PXDInjectionDQMModule::beginRun()
 
 void PXDInjectionDQMModule::event()
 {
-//   auto evt = *m_storeDAQEvtStats;
-  /*  if (not m_evtPtr.isValid()) {
-      B2FATAL("EventMeta missing in this event");
-      return;
-    }
+  unsigned long all = 0;
+  // count raw pixel hits per module
+  std::map <VxdID, int> freq;// count the number of RawHits per sensor
+  for (auto& p : m_storeRawHits) {
+    freq[p.getSensorID()]++;
+    all++;
+  }
 
-    if (m_evtPtr->getTime() == 0){
-      B2FATAL("EventMeta Time not set in this event");
-      return;
-    }
-   */
   for (auto& it : m_rawTTD) {
     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
@@ -112,8 +110,16 @@ void PXDInjectionDQMModule::event()
       // get PXD occupancy
       if (it.GetIsHER(0)) {
         // fill histograms ...
+        hOccAfterInjHER->Fill(all);
+        for (auto& a : hOccModAfterInjHER) {
+          a.second->Fill(freq[a.first]);
+        }
       } else {
         // fill histograms ...
+        hOccAfterInjLER->Fill(all);
+        for (auto& a : hOccModAfterInjLER) {
+          a.second->Fill(freq[a.first]);
+        }
       }
     }
 

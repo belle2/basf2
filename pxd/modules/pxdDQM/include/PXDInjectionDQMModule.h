@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bjoern Spruck                                            *
@@ -11,13 +11,13 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-// #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
+#include <pxd/dataobjects/PXDRawHit.h>
 #include <TH2.h>
 #include <TH1.h>
 #include <string>
@@ -46,12 +46,15 @@ namespace Belle2 {
 
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+      std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
+
       bool m_eachModule{false};// create a histo per module
 
       /** Input array for DAQ Status. */
-//       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
-      StoreObjPtr<EventMetaData> m_evtPtr;
       StoreArray<RawFTSW> m_rawTTD;
+
+      /** Input array for PXD Raw Hits. */
+      StoreArray<PXDRawHit> m_storeRawHits;
 
       //the geometry
       VXD::GeoCache& m_vxdGeometry;

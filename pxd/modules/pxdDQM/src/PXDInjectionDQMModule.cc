@@ -104,16 +104,19 @@ void PXDInjectionDQMModule::event()
     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+
+    // get last injection time
+    auto difference = it.GetTimeSinceLastInjection(0);
+    // overflow?
+    if (difference != 0x7FFFFFFF) {
+      // get PXD occupancy
+      if (it.GetIsHER(0)) {
+        // fill histograms ...
+      } else {
+        // fill histograms ...
+      }
+    }
+
     break;
   }
-
-  // get last injection time
-  // difference = ttd->getLastInjTime();
-  // overflow? if !difference==0x7FFFFFFF
-  // if(ttd->wasHER()){
-  // }else if(ttd->wasLER()){
-  // }
-  // fill histograms ...
-  // get PXD occupancy
-
 }

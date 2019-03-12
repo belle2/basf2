@@ -42,7 +42,7 @@ stdE('all', path=myAna_Main)
 from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(myAna_Main)
 
-skimOutputUdst('WG6_DstToD0ToKpi', DstToD0PiD0ToHpJmList, path=myAna_Main)
+skimOutputUdst('./WG6_DstToD0ToKpi.udst.root', DstToD0PiD0ToHpJmList, path=myAna_Main)
 summaryOfLists(DstToD0PiD0ToHpJmList, path=myAna_Main)
 
 

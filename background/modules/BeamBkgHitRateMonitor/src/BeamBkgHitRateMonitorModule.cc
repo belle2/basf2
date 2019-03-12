@@ -79,9 +79,12 @@ namespace Belle2 {
   void BeamBkgHitRateMonitorModule::initialize()
   {
     // collections registration
-
     m_eventMetaData.isRequired();
-    m_trgSummary.isRequired();
+    if (m_trgTypes.empty()) {
+      m_trgSummary.isOptional(); // enables to run the module when TRGSummary is absent
+    } else {
+      m_trgSummary.isRequired();
+    }
 
     // create, set and append hit rate monitoring classes
     auto* pxd = new Background::PXDHitRateCounter();
@@ -185,14 +188,14 @@ namespace Belle2 {
       trigs += "        trigger type " + std::to_string(trgType.first) + ": " +
                std::to_string(trgType.second) + " events\n";
     }
-    B2RESULT("Run " << m_run << ": " << m_numEventsSelected
-             << " events selected for beam background hit rate monitoring.\n"
-             << trigs
-             << LogVar("first event utime ", m_utimeMin)
-             << LogVar("start utime       ", m_utimeMin)
-             << LogVar("stop utime        ", m_utimeMax)
-             << LogVar("duration [seconds]", m_utimeMax - m_utimeMin)
-            );
+    B2INFO("Run " << m_run << ": " << m_numEventsSelected
+           << " events selected for beam background hit rate monitoring.\n"
+           << trigs
+           << LogVar("first event utime ", m_utimeMin)
+           << LogVar("start utime       ", m_utimeMin)
+           << LogVar("stop utime        ", m_utimeMax)
+           << LogVar("duration [seconds]", m_utimeMax - m_utimeMin)
+          );
   }
 
   void BeamBkgHitRateMonitorModule::terminate()
@@ -203,12 +206,13 @@ namespace Belle2 {
     m_file->Write();
     m_file->Close();
 
-    B2RESULT("Output file: " << m_outputFileName);
+    B2INFO("Output file: " << m_outputFileName);
   }
 
   bool BeamBkgHitRateMonitorModule::isEventSelected()
   {
-    auto trgType = m_trgSummary->getTimType();
+    auto trgType = TRGSummary::TTYP_NONE;
+    if (m_trgSummary.isValid()) trgType = m_trgSummary->getTimType();
 
     if (m_trgTypes.empty()) {
       m_trgTypesCount[trgType] += 1;

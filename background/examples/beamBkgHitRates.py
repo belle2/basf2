@@ -1,31 +1,26 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------------------------------------------
 # Example of a steering file for producing summary ntuple of beam background hit rates
 #
-# usage: basf2 beamBkgHitRates.py expNo runNo [globalTag]
+# usage: basf2 beamBkgHitRates.py expNo runNo globalTag
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
-import os
+import basf2
 import sys
 import glob
 from rawdata import add_unpackers
 
 # Argument parsing
 argvs = sys.argv
-if len(argvs) < 3:
-    print("usage: basf2", argvs[0], "expNo runNo [globalTag]")
+if len(argvs) < 4:
+    print("usage: basf2", argvs[0], "expNo runNo globalTag")
     sys.exit()
 
 expNo = 'e' + '{:0=4d}'.format(int(argvs[1]))
 runNo = 'r' + '{:0=5d}'.format(int(argvs[2]))
-global_tag = 'data_reprocessing_proc8'  # this one is good only for phase-2 (exp3) data
-if len(argvs) == 4:
-    global_tag = argvs[3]
-elif int(argvs[1]) > 3:
-    B2WARNING('Global tag ' + global_tag + ' may not be relevant for experiment ' + argvs[1])
+global_tag = argvs[3]
 
 indir = '/hsm/belle2/bdata/Data/Raw/' + expNo + '/' + runNo + '/sub00'
 files = sorted(glob.glob(indir + '/*.root'))
@@ -37,11 +32,11 @@ outdir = '.'
 outputFile = outdir + '/beamBkgHitRates-' + expNo + '-' + runNo + '.root'
 
 # Define global tag
-reset_database()
-use_central_database(global_tag)
+basf2.reset_database()
+basf2.use_central_database(global_tag)
 
 # Create path
-main = create_path()
+main = basf2.create_path()
 
 # Input (raw data)
 main.add_module('RootInput', inputFileNames=files)
@@ -67,11 +62,10 @@ main.add_module('TOPChannelMasker')
 main.add_module('BeamBkgHitRateMonitor', outputFileName=outputFile)
 
 # Show progress of processing
-progress = register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
-process(main)
+basf2.process(main)
 
 # Print call statistics
-print(statistics)
+print(basf2.statistics)

@@ -90,6 +90,8 @@ namespace Belle2 {
     bool fadcMatch;
     bool upsetAPV;
     bool badMapping;
+    bool badHeader;
+    bool badTrailer;
     unsigned short fadcNo;
     //unsigned short apvNo;
 

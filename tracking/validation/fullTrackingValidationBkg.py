@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>Thomas.Hauth@kit.edu</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSim.root</input>
   <output>FullTrackingValidationBkg.root</output>
   <description>This script validates the full track finding chain in Y(4S) runs with background.</description>

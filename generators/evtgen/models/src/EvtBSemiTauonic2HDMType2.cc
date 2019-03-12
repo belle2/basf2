@@ -28,6 +28,7 @@
 
 namespace Belle2 {
 
+  /** register the model in EvtGen */
   B2_EVTGEN_REGISTER_MODEL(EvtBSemiTauonic2HDMType2);
 
   EvtBSemiTauonic2HDMType2::EvtBSemiTauonic2HDMType2(): m_CalcHelAmp(0), m_CalcAmp(0) {}

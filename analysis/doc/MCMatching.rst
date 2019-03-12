@@ -141,7 +141,7 @@ Skipping of intermediate states in decay chain not supported yet, e.g. $B \to \p
 MC decay string
 ---------------
 
-See more at `confluence page <https://confluence.desy.de/display/BI/Physics+MCDecayString#PhysicsMCDecayString-Status>`
+See more at `confluence page <https://confluence.desy.de/display/BI/Physics+MCDecayString#PhysicsMCDecayString-Status>`_
 
 Analysis module to search for a generator-level decay string for given particle.
 

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Alexei Sibidanov                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef BelleLathe_HH
 #define BelleLathe_HH
 
@@ -25,8 +35,10 @@ namespace Belle2 {
       bool isconvex;
     };
 
+    /** struct for a three vector */
     struct vector_t {double x, y, z;};
 
+    /** struct for a triangle */
     struct triangle_t {int i0, i1, i2;};
 
     inline double dotxy(const vector_t& u, const vector_t& v)
@@ -36,22 +48,28 @@ namespace Belle2 {
 
     class BelleLathe : public G4CSGSolid {
     public:  // with description
+      /**
+       * Constructor for "nominal" BelleLathe whose parameters are to be set
+       * by a G4VPVParamaterisation later
+       */
       explicit BelleLathe(const G4String& pName);
-      // Constructor for "nominal" BelleLathe whose parameters are to be set
-      // by a G4VPVParamaterisation later
 
+      /** explicit constructor */
       BelleLathe(const G4String& pName, double phi0, double dphi, int n, double* z, double* rin, double* rout);
+      /** explicit constructor */
       BelleLathe(const G4String& pName, double, double, const std::vector<zr_t>&);
 
+      /** Destructor */
       virtual ~BelleLathe();
-      // Destructor
 
       // Methods for solid
 
+      /** compute the dimensions */
       void ComputeDimensions(G4VPVParameterisation* p,
                              const G4int n,
                              const G4VPhysicalVolume* pRep);
 
+      /** calculate the extent of the volume */
       G4bool CalculateExtent(const EAxis pAxis,
                              const G4VoxelLimits& pVoxelLimit,
                              const G4AffineTransform& pTransform,
@@ -90,14 +108,17 @@ namespace Belle2 {
 
     public:  // without description
 
+      /**
+       * Fake default constructor for usage restricted to direct object
+       * persistency for clients requiring preallocation of memory for
+       * persistifiable objects.
+       */
       explicit BelleLathe(__void__&);
-      // Fake default constructor for usage restricted to direct object
-      // persistency for clients requiring preallocation of memory for
-      // persistifiable objects.
 
+      /** copy constructor */
       BelleLathe(const BelleLathe& rhs);
+      /** assignment operator */
       BelleLathe& operator=(const BelleLathe& rhs);
-      // Copy constructor and assignment operator.
 
     protected:  // with description
       bool insector(double, double) const;
@@ -129,10 +150,11 @@ namespace Belle2 {
       mutable std::vector<G4ThreeVector> fsurf;
     };
 
+    /** Belle lathe polyhedron */
     class PolyhedronBelleLathe: public G4Polyhedron {
     public:
-      PolyhedronBelleLathe(const std::vector<zr_t>&, const std::vector<triangle_t>&, double, double);
-      virtual ~PolyhedronBelleLathe();
+      PolyhedronBelleLathe(const std::vector<zr_t>&, const std::vector<triangle_t>&, double, double); /**< constructor */
+      virtual ~PolyhedronBelleLathe(); /**< destructor */
     };
   }
 }

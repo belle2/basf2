@@ -41,33 +41,33 @@ SVDInterceptor::fillInterceptList(StoreArray<SVDIntercept>* interceptList, const
 
   for (int i = 0; i < trackList.getEntries(); ++i) { //loop over all tracks
 
-    B2DEBUG(1, " %%%%%  track candidate Nr. : " << i + 1);
+    B2DEBUG(20, " %%%%%  track candidate Nr. : " << i + 1);
 
     if (! trackList[i] ->wasFitSuccessful()) {
-      B2DEBUG(1, "%%%%% Fit not successful! discard this RecoTrack");
+      B2DEBUG(20, "%%%%% Fit not successful! discard this RecoTrack");
       continue;
     }
 
     // extrapolate track to cylinders (SVD layers)
     for (unsigned int svdLayer = 0; svdLayer < svdLayers.size(); svdLayer++) {
 
-      B2DEBUG(1, " .fill intercept List, Layer: " << svdLayer + 3);
+      B2DEBUG(20, " .fill intercept List, Layer: " << svdLayer + 3);
       // get current state of track
       genfit::MeasuredStateOnPlane gfTrackState = trackList[i]->getMeasuredStateOnPlaneFromFirstHit();
 
       try {
         gfTrackState.extrapolateToCylinder(m_svdLayerRadius[svdLayer]);
       }  catch (...) {
-        B2DEBUG(1, " .-extrapolation to cylinder failed");
+        B2DEBUG(20, " .-extrapolation to cylinder failed");
         continue;
       }
 
       std::list<ROIDetPlane> selectedPlanes;
-      B2DEBUG(1, " ..append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
+      B2DEBUG(20, " ..append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
               gfTrackState.getPos().Z());
       m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, gfTrackState.getPos(), svdLayer + 3);
 
-      B2DEBUG(1, " ...append intercepts for track " << i);
+      B2DEBUG(20, " ...append intercepts for track " << i);
       appendIntercepts(interceptList, selectedPlanes, trackList[i], i, recoTrackToSVDIntercepts);
     } //loop on layers
   } //loop on the track list
@@ -87,7 +87,7 @@ SVDInterceptor::appendIntercepts(StoreArray<SVDIntercept>* interceptList, std::l
 
   std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
 
-  B2DEBUG(1, " ...-appendIntercepts, checking " << planeList.size() << " planes");
+  B2DEBUG(20, " ...-appendIntercepts, checking " << planeList.size() << " planes");
 
   double lambda = 0;
 
@@ -103,7 +103,7 @@ SVDInterceptor::appendIntercepts(StoreArray<SVDIntercept>* interceptList, std::l
         state = gfTrack.getFittedState();
         lambda = state.extrapolateToPlane(itPlanes->getSharedPlanePtr());
       }  catch (...) {
-        B2DEBUG(1, " ...-extrapolation to plane failed");
+        B2DEBUG(20, " ...-extrapolation to plane failed");
         ++itPlanes;
         continue;
       }
@@ -118,21 +118,21 @@ SVDInterceptor::appendIntercepts(StoreArray<SVDIntercept>* interceptList, std::l
       tmpSVDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
       tmpSVDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
       tmpSVDIntercept.setLambda(lambda);
-      tmpSVDIntercept.setVxdID(itPlanes->getSensorInfo());
+      tmpSVDIntercept.setVxdID(itPlanes->getVxdID());
       tmpSVDIntercept.setUprime(predictedIntersect[1]);
       tmpSVDIntercept.setVprime(predictedIntersect[2]);
 
-      B2DEBUG(10, "coordinates with getPos = " << state.getPos().X()
+      B2DEBUG(20, "coordinates with getPos = " << state.getPos().X()
               << ", " << state.getPos().Y()
               << ", " << state.getPos().Z());
-      B2DEBUG(10, "coordinates with predInter = " << predictedIntersect[3]
+      B2DEBUG(20, "coordinates with predInter = " << predictedIntersect[3]
               << ", " << predictedIntersect[4]);
-      B2DEBUG(10, "momentum with getMom = " << state.getMom().X()
+      B2DEBUG(20, "momentum with getMom = " << state.getMom().X()
               << ", " << state.getMom().Y()
               << ", " << state.getMom().Z());
-      B2DEBUG(10, "U/V prime momentum with getMom = " << state.getMom().Z() / state.getMom().X()
+      B2DEBUG(20, "U/V prime momentum with getMom = " << state.getMom().Z() / state.getMom().X()
               << ", " << state.getMom().Z() / state.getMom().Y());
-      B2DEBUG(10, "U/V prime momentum with predInter = " << predictedIntersect[1]
+      B2DEBUG(20, "U/V prime momentum with predInter = " << predictedIntersect[1]
               << ", " << predictedIntersect[2]);
 
       interceptList->appendNew(tmpSVDIntercept);

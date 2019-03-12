@@ -11,6 +11,7 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFSharedMem.h"
@@ -41,6 +42,9 @@ namespace Belle2 {
 
     // Server function
     void server();
+
+    // Cleanup
+    void cleanup();
 
   private:
     RFConf*            m_conf;

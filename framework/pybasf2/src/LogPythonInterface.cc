@@ -177,6 +177,20 @@ void LogPythonInterface::exposePythonAPI()
   additional numeric indication of their priority called the ``debug_level`` to
   allow for different levels of verbosity.
 
+  The agreed values for ``debug_level`` are
+
+  * **0-9** for user code. These numbers are reserved for user analysis code and
+    may not be used by any part of basf2.
+  * **10-19** for analysis package code. The use case is that a user wants to debug
+    problems in analysis jobs with the help of experts.
+
+  * **20-29** for simulation/reconstruction code.
+  * **30-39** for core framework code.
+
+  .. note:: The default maximum debug level which will be shown when
+            running ``basf2 --debug`` without any argument for ``--debug`` is **10**
+
+
 .. attribute:: INFO
 
   Used for informational messages which are of use for the average user but not
@@ -351,6 +365,8 @@ Write log output to console, but format log messages as json objects for
 simplified parsing by other tools.  Each log message will be printed as a one
 line JSON object.
 
+.. versionadded:: release-03-00-00
+
 Parameters:
    complete_info (bool): If this is set to True the complete log information is printed regardless of the `LogInfo` setting.
 
@@ -373,7 +389,9 @@ Enable or disable logging via python. If this is set to true than log messages
 will be sent via `sys.stdout`. This is probably slightly slower but is useful
 when running in jupyter notebooks or when trying to redirect stdout in python
 to a buffer. This setting affects all log connections to the
-console.)DOCSTRING")
+console.
+
+.. versionadded:: release-03-00-00)DOCSTRING")
   ;
 
   //Expose Logging object
@@ -386,14 +404,16 @@ console.)DOCSTRING")
   //set docstring ...
 
   const std::string common_doc = R"DOCSTRING(
-All additional positional arguments are concatenated to the message and all
-keyword arguments are added to the function as log variables.)DOCSTRING";
+All additional positional arguments are converted to strings and concatenated
+to the log message. All keyword arguments are added to the function as
+:ref:`logging_logvariables`.)DOCSTRING";
 
   auto logDebug = raw_function(&LogPythonInterface::logDebug);
   def("B2DEBUG", logDebug);
   setattr(logDebug, "__doc__", "B2DEBUG(debugLevel, message, *args, **kwargs)\n\n"
           "Print a `DEBUG <basf2.LogLevel.DEBUG>` message. "
-          "The first argument is the debug Level. " + common_doc);
+          "The first argument is the `debug_level <basf2.LogLevel.DEBUG>`. " +
+          common_doc);
 
   auto logInfo = raw_function(&LogPythonInterface::logInfo);
   def("B2INFO", logInfo);
@@ -403,7 +423,8 @@ keyword arguments are added to the function as log variables.)DOCSTRING";
   auto logResult = raw_function(&LogPythonInterface::logResult);
   def("B2RESULT", logResult);
   setattr(logResult, "__doc__", "B2RESULT(message, *args, **kwargs)\n\n"
-          "Print a `RESULT <basf2.LogLevel.RESULT>` message. " + common_doc);
+          "Print a `RESULT <basf2.LogLevel.RESULT>` message. " + common_doc
+          + "\n\n.. deprecated:: release-01-00-00\n    use `B2INFO()` instead");
 
   auto logWarning = raw_function(&LogPythonInterface::logWarning);
   def("B2WARNING", logWarning);
@@ -418,8 +439,9 @@ keyword arguments are added to the function as log variables.)DOCSTRING";
   auto logFatal = raw_function(&LogPythonInterface::logFatal);
   def("B2FATAL", logFatal);
   setattr(logFatal, "__doc__", "B2FATAL(message, *args, **kwargs)\n\n"
-          "Print a `FATAL <basf2.LogLevel.FATAL>` message. "
-          "This also exits the programm with an error. " + common_doc);
+          "Print a `FATAL <basf2.LogLevel.FATAL>` message. " + common_doc +
+          "\n\n.. note:: This also exits the programm with an error and is "
+          "guaranteed to not return.");
 }
 
 namespace {

@@ -41,27 +41,17 @@ namespace Belle2 {
 
     virtual ~PerformanceEvaluationBaseClass();
 
-    /*    virtual void initialize();
+    TList* m_histoList = nullptr;
 
-    virtual void beginRun();
-
-    virtual void event();
-
-    virtual void endRun();
-
-    virtual void terminate();
-    */
-    TList* m_histoList;
-
-    TList* m_histoList_multiplicity;
-    TList* m_histoList_evtCharacterization;
-    TList* m_histoList_trkQuality;
-    TList* m_histoList_firstHit;
-    TList* m_histoList_pr;
-    TList* m_histoList_fit;
-    TList* m_histoList_efficiency;
-    TList* m_histoList_purity;
-    TList* m_histoList_others;
+    TList* m_histoList_multiplicity = nullptr;
+    TList* m_histoList_evtCharacterization = nullptr;
+    TList* m_histoList_trkQuality = nullptr;
+    TList* m_histoList_firstHit = nullptr;
+    TList* m_histoList_pr = nullptr;
+    TList* m_histoList_fit = nullptr;
+    TList* m_histoList_efficiency = nullptr;
+    TList* m_histoList_purity = nullptr;
+    TList* m_histoList_others = nullptr;
 
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,
@@ -135,7 +125,7 @@ namespace Belle2 {
     std::string m_rootFileName;   /**< root file name */
 
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
   };
 } // end of namespace

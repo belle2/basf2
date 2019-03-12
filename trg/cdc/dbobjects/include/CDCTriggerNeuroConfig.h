@@ -51,7 +51,7 @@ namespace Belle2 {
       m_B2Format.push_back(line);
     }
     /** function to add line to b2link format, overloaded  */
-    void addB2FormatLine(int start, int end, int offset, std::string name, std::string description)
+    void addB2FormatLine(int start, int end, int offset, const std::string& name, const std::string& description)
     {
       B2FormatLine b;
       b.start = start;

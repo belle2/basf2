@@ -11,8 +11,8 @@
     <peakQE desc="peak QE" unit="nm">0.50</peakQE>
     <LambdaFirst unit="nm">250</LambdaFirst>
     <LambdaStep unit="nm">10</LambdaStep>
-    <Qeffi component="point-0"> <qe>0.000</qe> </Qeffi>
-    <Qeffi component="point-1"> <qe>0.028</qe> </Qeffi> 
+    <Qeffi component="point-0"> <qe>0.40</qe> </Qeffi>
+    <Qeffi component="point-1"> <qe>0.40</qe> </Qeffi> 
     <Qeffi component="point-2"> <qe>0.563</qe> </Qeffi>
     <Qeffi component="point-3"> <qe>0.717</qe> </Qeffi>
     <Qeffi component="point-4"> <qe>0.828</qe> </Qeffi>

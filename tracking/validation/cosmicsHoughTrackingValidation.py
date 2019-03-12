@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>CosmicsSimNoBkg.root</input>
   <description>Validates the hough finder working on segments in cosmics events.</description>
 </header>

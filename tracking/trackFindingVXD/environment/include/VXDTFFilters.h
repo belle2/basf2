@@ -547,7 +547,7 @@ namespace Belle2 {
         }
 
         // add filter to the map
-        if (!addTwoHitFilter(outerFullSecID2sp, innerFullSecID2sp,
+        if (!addTwoHitFilter(outer_secid_2sp, inner_secid_2sp,
                              twoHitFilter))
           return false;
 
@@ -584,8 +584,8 @@ namespace Belle2 {
         }
 
         // add the filter to the map
-        if (!addThreeHitFilter(outerFullSecID3sp, centerFullSecID3sp,
-                               innerFullSecID3sp,
+        if (!addThreeHitFilter(outer_secid_3sp, center_secid_3sp,
+                               inner_secid_3sp,
                                threeHitFilter))
           return false;
 

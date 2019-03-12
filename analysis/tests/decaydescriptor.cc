@@ -211,6 +211,22 @@ namespace {
     EXPECT_EQ(dd5.getMother()->getLabel(), "");
   }
 
+  TEST(DecayDescriptorTest, UnicodeTest)
+  {
+    // use of unicode characters in labels
+    const std::string weird = "⨔π⁰=🖼🔰";
+    DecayDescriptor dd1;
+    bool initok = dd1.init("B0:" + weird + " -> K+:💩😜 pi-:💯🍆💦");
+    ASSERT_EQ(initok, true);
+    EXPECT_EQ(dd1.getMother()->getName(), "B0");
+    EXPECT_EQ(dd1.getMother()->getLabel(), weird);
+    ASSERT_EQ(dd1.getNDaughters(), 2);
+    EXPECT_EQ(dd1.getDaughter(0)->getMother()->getName(), "K+");
+    EXPECT_EQ(dd1.getDaughter(1)->getMother()->getName(), "pi-");
+    EXPECT_EQ(dd1.getDaughter(0)->getMother()->getLabel(), "💩😜");
+    EXPECT_EQ(dd1.getDaughter(1)->getMother()->getLabel(), "💯🍆💦");
+  }
+
   TEST(DecayDescriptorTest, BadGrammarTest)
   {
     DecayDescriptor dd1;

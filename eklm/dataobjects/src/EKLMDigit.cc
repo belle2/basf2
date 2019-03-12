@@ -11,6 +11,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <framework/logging/Logger.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
 
 using namespace Belle2;
 
@@ -22,7 +23,6 @@ EKLMDigit::EKLMDigit()
   m_Charge = 0;
   m_CTime = 0;
   m_TDC = 0;
-  m_TriggerCTime = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
@@ -37,7 +37,6 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
   m_Charge = 0;
   m_CTime = 0;
   m_TDC = 0;
-  m_TriggerCTime = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
@@ -62,10 +61,8 @@ DigitBase::EAppendStatus EKLMDigit::addBGDigit(const DigitBase* bg)
     this->setMCTime(bgDigit->getMCTime());
   }
   this->setEDep(this->getEDep() + bgDigit->getEDep());
-  if (this->getTime() > bgDigit->getTime()) {
+  if (this->getTime() > bgDigit->getTime())
     this->setTime(bgDigit->getTime());
-    this->setTriggerCTime(bgDigit->getTriggerCTime());
-  }
   this->setCharge(std::min(this->getCharge(), bgDigit->getCharge()));
   this->setGeneratedNPE(this->getGeneratedNPE() + bgDigit->getGeneratedNPE());
   return DigitBase::c_DontAppend;
@@ -99,23 +96,6 @@ uint16_t EKLMDigit::getTDC() const
 void EKLMDigit::setTDC(uint16_t tdc)
 {
   m_TDC = tdc;
-}
-
-uint16_t EKLMDigit::getTriggerCTime() const
-{
-  return m_TriggerCTime;
-}
-
-void EKLMDigit::setTriggerCTime(uint16_t ctime)
-{
-  m_TriggerCTime = ctime;
-}
-
-int EKLMDigit::getRelativeCTime() const
-{
-  if (m_CTime < m_TriggerCTime)
-    return m_CTime - m_TriggerCTime;
-  return (int)m_CTime - m_TriggerCTime - 0x10000;
 }
 
 /*

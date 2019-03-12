@@ -63,7 +63,7 @@ namespace Belle2 {
     bool isECLHit(const ExtHit& extHit) const;
 
     /** Calculate matching quality based on phi and theta consistencies */
-    double clusterQuality(double deltaPhi, double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const;
+    double showerQuality(double deltaPhi, double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const;
 
     /** Calculate phi consistency based on difference in azimuthal angle.
      *
@@ -123,6 +123,7 @@ namespace Belle2 {
      */
     bool m_angularDistanceMatching;
     bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */
+    bool m_skipZeroChargeTracks; /**< if true, tracks whose charge has been set to zero are excluded from track-cluster matching */
     double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */
     double m_matchingPTThreshold; /**< pt limit between angular-distance based and crystal-entering based matching algorithm */
     double m_brlEdgeTheta; /**< distance of polar angle from gaps where crystal-entering based matching is applied (in rad) */

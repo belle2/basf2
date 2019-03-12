@@ -368,16 +368,6 @@ void PXDPackerErrModule::event()
   }
 }
 
-void PXDPackerErrModule::endian_swap_frame(unsigned short* dataptr, int len)
-{
-  boost::spirit::endian::ubig16_t* p = (boost::spirit::endian::ubig16_t*)dataptr;
-
-  /// swap endianess of all shorts in frame BUT not the CRC (2 shorts)
-  for (int i = 0; i < len / 2 - 2; i++) {
-    p[i] = dataptr[i];// Endian Swap! (it doesnt matter if you swap from little to big or vice versa)
-  }
-}
-
 void PXDPackerErrModule::pack_event(void)
 {
   int dhe_ids[5] = {0, 0, 0, 0, 0};

@@ -22,7 +22,7 @@ namespace Belle2 {
   {
     ECLCluster myECLCluster;
 
-    EXPECT_EQ(exp(-5.), myECLCluster.getEnergy());
+    EXPECT_EQ(exp(-5.), myECLCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
     EXPECT_EQ(exp(-5.), myECLCluster.getEnergyRaw());
     EXPECT_EQ(exp(-5.), myECLCluster.getEnergyHighestCrystal());
     EXPECT_EQ(0, myECLCluster.getTheta());
@@ -83,7 +83,7 @@ namespace Belle2 {
     const double highestEnergy = 32.1;
     const double lat = 0.5;
     const double   nOfCrystals = 4;
-    const int   status = 1;
+    const ECLCluster::EStatusBit status = ECLCluster::EStatusBit::c_PulseShapeDiscrimination;
     // Energy->[0], Phi->[2], Theta->[5]
     double error[6] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
 
@@ -101,8 +101,9 @@ namespace Belle2 {
     myECLCluster.setLAT(lat);
     myECLCluster.setCovarianceMatrix(error);
     myECLCluster.setIsTrack(isTrack);
+    myECLCluster.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
 
-    EXPECT_FLOAT_EQ(energy, myECLCluster.getEnergy());
+    EXPECT_FLOAT_EQ(energy, myECLCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
     EXPECT_FLOAT_EQ(E9oE21, myECLCluster.getE9oE21());
     EXPECT_FLOAT_EQ(energyDepSum, myECLCluster.getEnergyRaw());
     EXPECT_FLOAT_EQ(theta, myECLCluster.getTheta());
@@ -111,7 +112,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(time, myECLCluster.getTime());
     EXPECT_FLOAT_EQ(deltaTime99, myECLCluster.getDeltaTime99());
     EXPECT_FLOAT_EQ(highestEnergy, myECLCluster.getEnergyHighestCrystal());
-    EXPECT_EQ(status, myECLCluster.getStatus());
+    EXPECT_TRUE(myECLCluster.hasStatus(status));
     EXPECT_FLOAT_EQ(nOfCrystals, myECLCluster.getNumberOfCrystals());
     EXPECT_FLOAT_EQ(lat, myECLCluster.getLAT());
 

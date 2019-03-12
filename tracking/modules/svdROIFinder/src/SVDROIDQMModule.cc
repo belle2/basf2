@@ -28,18 +28,18 @@ REG_MODULE(SVDROIDQM)
 
 SVDROIDQMModule::SVDROIDQMModule()
   : HistoModule()
-  , m_InterDir(NULL)
-  , m_ROIDir(NULL)
+  , m_InterDir(nullptr)
+  , m_ROIDir(nullptr)
   , hInterDictionary(172, [](const Belle2::VxdID & vxdid) {return (size_t)vxdid.getID(); })
 , hROIDictionary(172, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); })
 , hROIDictionaryEvt(172, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); })
 , m_numModules(0)
-, hnROIs(NULL)
-, hnInter(NULL)
-, harea(NULL)
-, hredFactor(NULL)
-, hCellU(NULL)
-, hCellV(NULL)
+, hnROIs(nullptr)
+, hnInter(nullptr)
+, harea(nullptr)
+, hredFactor(nullptr)
+, hCellU(nullptr)
+, hCellV(nullptr)
 , n_events(0)
 {
   //Set module properties
@@ -124,10 +124,6 @@ void SVDROIDQMModule::event()
 
   int ROIarea = 0;
   double redFactor = 0;
-  int minU;
-  int minV;
-  int maxU;
-  int maxV;
 
   for (auto& it : m_ROIs) {
 
@@ -137,10 +133,10 @@ void SVDROIDQMModule::event()
     const int nPixelsU = aSensorInfo.getUCells();
     const int nPixelsV = aSensorInfo.getVCells();
 
-    minU = it.getMinUid();
-    minV = it.getMinVid();
-    maxU = it.getMaxUid();
-    maxV = it.getMaxVid();
+    int minU = it.getMinUid();
+    int minV = it.getMinVid();
+    int maxU = it.getMaxUid();
+    int maxV = it.getMaxVid();
 
     int tmpROIarea = (maxU - minU) * (maxV - minV);
     ROIarea += tmpROIarea;
@@ -581,11 +577,11 @@ void SVDROIDQMModule::createHistosDictionaries()
 
         //--------------------------
 
-        itSvdSensors++;
+        ++itSvdSensors;
       }
-      itSvdLadders++;
+      ++itSvdLadders;
     }
-    itSvdLayers++;
+    ++itSvdLayers;
   }
 
 }

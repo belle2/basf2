@@ -54,9 +54,9 @@ namespace Belle2 {
     /** Destructor. */
     virtual ~FragmentationModule();
 
-    virtual void event() override;
-    virtual void initialize() override;
-    virtual void terminate() override;
+    virtual void event() override;      /**< Event method (process events) */
+    virtual void initialize() override; /**< Initialize the module */
+    virtual void terminate() override;  /**< terminate the module */
 
   protected:
 

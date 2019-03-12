@@ -6,7 +6,6 @@ import os
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
 import pprint
-pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 # Import XML Parser. Use C-Version, if available
 try:
@@ -16,6 +15,9 @@ except ImportError:
 
 from validationfunctions import find_creator
 import json_objects
+
+
+pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
 class ScriptStatus:
@@ -75,7 +77,8 @@ class Script:
         # Is this necessary?
         self._object = self
 
-        # stores the reference to the logging object used in this validation run
+        # stores the reference to the logging object used in this validation
+        # run
         self.log = log
 
         # The (absolute) path of the steering file
@@ -146,20 +149,27 @@ class Script:
         elif self.status == ScriptStatus.cached:
             string_status = "cached"
 
-        return json_objects.Script(self.name_not_sanitized, self.path, string_status,
-                                   log_url=os.path.join(self.package, self.name_not_sanitized) + ".log",
-                                   return_code=self.returncode)
+        return json_objects.Script(
+            self.name_not_sanitized,
+            self.path,
+            string_status,
+            log_url=os.path.join(self.package, self.name_not_sanitized) +
+            ".log",
+            return_code=self.returncode
+        )
 
-    def get_recursive_dependencies(self, list_of_scripts, level=0):
+    def get_recursive_dependencies(self, scripts, level=0):
         """!
         Loops over all dependencies of this script and recursively retrieves
         their sub-dependencies
         """
 
         if level > 50:
-            self.log.error('Recurisve dependency lookup reached level {0} and will quit now.'
-                           'Possibly circular dependcencies in the validation scripts ?'
-                           .format(level))
+            self.log.error(
+                'Recurisve dependency lookup reached level {0} and will quit '
+                'now. Possibly circular dependcencies in the validation '
+                'scripts ? '.format(level)
+            )
 
         all_deps = set()
         for dep in self.dependencies:
@@ -169,14 +179,16 @@ class Script:
             next_level = level + 1
 
             # find script object
-            dep_script = [x for x in list_of_scripts if x.name == dep.name]
+            dep_script = [x for x in scripts if x.name == dep.name]
             rec_deps = []
             if len(dep_script) == 1:
-                rec_deps = dep_script[0].get_recursive_dependencies(list_of_scripts, next_level)
+                rec_deps = dep_script[0].get_recursive_dependencies(
+                    scripts, next_level)
             else:
-                self.log.error('Depending script with the name {0} could not be found in the list of '
-                               'registered scripts.'
-                               .format(dep.name))
+                self.log.error(
+                    'Depending script with the name {0} could not be found '
+                    'in the list of registered scripts. '.format(dep.name)
+                )
 
             # only add, if not already in the dependencies list
             for rc in rec_deps:
@@ -191,7 +203,7 @@ class Script:
         """
         return "script_unique_name_{}_{}".format(self.package, self.name)
 
-    def compute_dependencies(self, list_of_scripts):
+    def compute_dependencies(self, scripts):
         """!
         Loops over the input files given in the header and tries to find the
         corresponding Script objects, which will then be stored in the
@@ -206,13 +218,18 @@ class Script:
 
                 # Find the script which is responsible for the creation of
                 # the input file (in the same package or in validation folder)
-                creator = find_creator(root_file, self.package, list_of_scripts, self.log)
+                creator = find_creator(
+                    root_file,
+                    self.package,
+                    scripts,
+                    self.log
+                )
 
                 # If no creator could be found, raise an error!
                 if creator is None:
-                    self.log.error('Unmatched dependency for {0}:'
-                                   '{1} has no creator!'
-                                   .format(self.path, root_file))
+                    self.log.error(
+                        'Unmatched dependency for {0}:{1} '
+                        'has no creator!'.format(self.path, root_file))
                     self.status = ScriptStatus.skipped
 
                 # If creator(s) could be found, add those scripts to the
@@ -229,7 +246,7 @@ class Script:
             # is presumed as a dependency
 
             # Get a list of all the script in the same directory
-            in_same_pkg = [script for script in list_of_scripts
+            in_same_pkg = [script for script in scripts
                            if script.package == self.package]
 
             # Divide that list into .py and .c files, because .py files are

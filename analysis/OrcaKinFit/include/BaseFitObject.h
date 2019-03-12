@@ -168,7 +168,7 @@ namespace Belle2 {
       //    virtual const char *getName () const { return name ? name : "???";}
       virtual const char* getName() const;  // { return name ? name : "???";}
       /// Set object's name
-      virtual void setName(const char* name_);
+      void setName(const char* name_);
       /// Get measured value of parameter ilocal
       virtual double getMParam(int ilocal      ///< Local parameter number
                               ) const;
@@ -234,7 +234,7 @@ namespace Belle2 {
 
 
       /// invalidate any cached quantities
-      virtual void invalidateCache() const {cachevalid = false;};
+      void invalidateCache() const {cachevalid = false;};
       virtual void updateCache() const = 0;
 
       // these are the mothods that fill the fitter's matrices/vectors

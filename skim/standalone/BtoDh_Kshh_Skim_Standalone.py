@@ -15,7 +15,7 @@ from stdV0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 mypath = Path()
 
@@ -45,4 +45,4 @@ setSkimLogging()
 process(mypath)
 
 # print out the summary
-print(statistics, path=mypath)
+print(statistics)

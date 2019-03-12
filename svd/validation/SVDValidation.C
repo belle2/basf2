@@ -25,23 +25,6 @@ Modifed by Renu Garg, renu92garg@gmail.com </contact>
 #include "TLine.h"
 
 // ======================================================================
-int layerToIndex(int layer){
-  int layermin = 3;
-  int layerIndex;
-  layerIndex = layer - layermin;	      
-  return layerIndex;
-}
-
-// ======================================================================
-/*TCanvas* makeNewCanvas(const char* cname, const char* ctitle)
-{
-      TCanvas* c = new TCanvas(cname, ctitle, 1028, 864);
-      c->Divide(2,2);
-      c->Draw();
-      return c;
-}
-*/ 
-// ======================================================================
 TH1F* create1DHisto(const char* name, const char* title,
                      Int_t n_bins, Double_t x_min, Double_t x_max,
                      const char* x_label)
@@ -86,8 +69,6 @@ void plotThis(const char *Type[], const char *Side[], const char* name, const ch
 {
    for (int layer=3; layer<=6; layer++) // loop on layers  
      {
-       int layerIndex = layerToIndex(layer);
-       //       TCanvas* c = makeNewCanvas(Form("%s-%d",name,layer),Form("%s, Layer %d",title, layer));
        int k = 0;
        for (int  m=1; m>=0; m--)  // loop over types
 	 for (int i=0; i<=1; i++)  // loop over sides
@@ -213,7 +194,6 @@ void plotThis2d(const char *Type[], const char *Side[], const char* name, const 
 {
    for (int layer=3; layer<=6; layer++) // loop on layers  
       {
-      int layerIndex = layerToIndex(layer);
       for (int  m=1; m>=0; m--)  // loop over types
         for (int i=0; i<=1; i++)  // loop over sides
           {{
@@ -243,8 +223,6 @@ void plotThisNoSideLoop(const char *Type[], const char* name, const char * title
 {
    for (int layer=3; layer<=6; layer++) // loop on layers  
       {
-      int layerIndex = layerToIndex(layer);
-      //      TCanvas* c = makeNewCanvas(Form("%s-%d",name,layer),Form("%s, Layer %d",title, layer));
       int k = 0;
       for (int  m=1; m>=0; m--)  // loop over types
           {

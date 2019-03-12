@@ -47,10 +47,8 @@ void ECLTrackClusterMatchingPerformanceModule::initialize()
   // MCParticles and Tracks needed for this module
   m_mcParticles.isRequired();
   m_tracks.isRequired();
-  m_recoTracks.isRequired();
   m_trackFitResults.isRequired();
   m_eclClusters.isRequired();
-  m_eclShowers.isRequired();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -83,10 +81,17 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       const double weight = relatedMCParticles.weight(index);
       // check that at least 50% of the generated energy of the particle is contained in this ECLCluster
       // and check that the total cluster energy is greater than 50% of the energy coming from the particle
-      if (eclCluster.getEnergy() >= 0.5 * relatedMCParticle->getEnergy()) {
+
+      ECLCluster::EHypothesisBit hypo = ECLCluster::EHypothesisBit::c_nPhotons;
+      if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)
+          and not eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        hypo = ECLCluster::EHypothesisBit::c_neutralHadron;
+      }
+
+      if (eclCluster.getEnergy(hypo) >= 0.5 * relatedMCParticle->getEnergy()) {
         if (isChargedStable(*relatedMCParticle) && weight >= 0.5 * relatedMCParticle->getEnergy()) {
           found_charged_stable = true;
-        } else if (relatedMCParticle->getPDG() == 22 && weight >= 0.5 * eclCluster.getEnergy() && !found_photon) {
+        } else if (relatedMCParticle->getPDG() == 22 && weight >= 0.5 * eclCluster.getEnergy(hypo) && !found_photon) {
           found_photon = true;
           m_photonEnergy = relatedMCParticle->getEnergy();
         }
@@ -100,8 +105,18 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       m_clusterIsChargedStable = int(found_charged_stable);
       m_clusterPhi = eclCluster.getPhi();
       m_clusterTheta = eclCluster.getTheta();
-      m_clusterHypothesis = eclCluster.getHypothesisId();
-      m_clusterEnergy = eclCluster.getEnergy();
+      if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
+          m_clusterHypothesis = 56;
+        } else {
+          m_clusterHypothesis = 5;
+        }
+        m_clusterEnergy = eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+      } else if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
+        m_clusterHypothesis = 6;
+        m_clusterEnergy = eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
+      }
+
       m_clusterErrorTiming = eclCluster.getDeltaTime99();
       m_clusterE1E9 = eclCluster.getE1oE9();
       m_clusterDetectorRegion = eclCluster.getDetectorRegion();
@@ -131,27 +146,21 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       m_trackProperties.y_gen = mcParticle.getVertex().Y();
       m_trackProperties.z_gen = mcParticle.getVertex().Z();
 
-      const RecoTrack* recoTrack = nullptr;
+      const Track* b2Track = nullptr;
       double maximumWeight = -2;
       // find highest rated Track
-      const auto& relatedRecoTracks = mcParticle.getRelationsWith<RecoTrack>();
-      for (unsigned int index = 0; index < relatedRecoTracks.size(); ++index) {
-        const RecoTrack* relatedRecoTrack = relatedRecoTracks.object(index);
-        const double weight = relatedRecoTracks.weight(index);
+      const auto& relatedTracks = mcParticle.getRelationsWith<Track>();
+      for (unsigned int index = 0; index < relatedTracks.size(); ++index) {
+        const Track* relatedTrack = relatedTracks.object(index);
+        const double weight = relatedTracks.weight(index);
 
-        const unsigned int numberOfRelatedTracks = relatedRecoTrack->getRelationsWith<Track>().size();
-        B2ASSERT("B2Track <-> RecoTrack is not a 1:1 relation as expected!", numberOfRelatedTracks <= 1);
-        // use only the fitted reco tracks
-        if (numberOfRelatedTracks == 1) {
-          if (weight > maximumWeight) {
-            maximumWeight = weight;
-            recoTrack = relatedRecoTrack;
-          }
+        if (weight > maximumWeight) {
+          maximumWeight = weight;
+          b2Track = relatedTrack;
         }
       }
 
-      if (recoTrack) {
-        const Track* b2Track = recoTrack->getRelated<Track>();
+      if (b2Track) {
         const TrackFitResult* fitResult = b2Track->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(pdgCode)));
         B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 
@@ -184,7 +193,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
         const ECLCluster* eclCluster_HadronHypothesis_track_related = nullptr;
         for (const auto& eclCluster : b2Track->getRelationsTo<ECLCluster>("", m_trackClusterRelationName)) {
           if (!(eclCluster.isTrack())) continue;
-          if (eclCluster.getHypothesisId() == ECLCluster::c_nPhotons) {
+          if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
             m_matchedToPhotonHypothesisECLCluster = 1;
             m_matchedPhotonHypothesisClusterDetectorRegion = eclCluster.getDetectorRegion();
             m_matchedPhotonHypothesisClusterTheta = eclCluster.getTheta();
@@ -192,7 +201,8 @@ void ECLTrackClusterMatchingPerformanceModule::event()
             m_matchedPhotonHypothesisClusterMinTrkDistance = eclCluster.getMinTrkDistance();
             m_matchedPhotonHypothesisClusterDeltaL = eclCluster.getDeltaL();
             eclCluster_PhotonHypothesis_track_related = &eclCluster;
-          } else if (eclCluster.getHypothesisId() == ECLCluster::c_neutralHadron) {
+          }
+          if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
             m_matchedToHadronHypothesisECLCluster = 1;
             m_matchedHadronHypothesisClusterDetectorRegion = eclCluster.getDetectorRegion();
             m_matchedHadronHypothesisClusterTheta = eclCluster.getTheta();
@@ -208,7 +218,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
         const auto& relatedECLClusters = mcParticle.getRelationsFrom<ECLCluster>();
         for (unsigned int index = 0; index < relatedECLClusters.size(); ++index) {
           const ECLCluster* relatedECLCluster = relatedECLClusters.object(index);
-          if (relatedECLCluster->getHypothesisId() != ECLCluster::c_nPhotons) continue;
+          if (!relatedECLCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
           const double weight = relatedECLClusters.weight(index);
           if (weight > maximumWeight) {
             eclCluster_matchedBestToMCParticle = relatedECLCluster;
@@ -222,9 +232,9 @@ void ECLTrackClusterMatchingPerformanceModule::event()
           m_mcparticle_cluster_phi = eclCluster_matchedBestToMCParticle->getPhi();
           m_mcparticle_cluster_detectorregion = eclCluster_matchedBestToMCParticle->getDetectorRegion();
           if ((eclCluster_PhotonHypothesis_track_related == eclCluster_matchedBestToMCParticle
-               && eclCluster_matchedBestToMCParticle->getHypothesisId() == ECLCluster::c_nPhotons)
+               && eclCluster_matchedBestToMCParticle->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
               || (eclCluster_HadronHypothesis_track_related == eclCluster_matchedBestToMCParticle
-                  && eclCluster_matchedBestToMCParticle->getHypothesisId() == ECLCluster::c_neutralHadron)) {
+                  && eclCluster_matchedBestToMCParticle->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))) {
             m_sameclusters = 1;
           }
         }

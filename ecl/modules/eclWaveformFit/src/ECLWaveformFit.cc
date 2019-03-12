@@ -24,6 +24,9 @@
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 #include <ecl/dbobjects/ECLAutoCovariance.h>
 
+//FRAMEWORK
+#include <framework/core/Environment.h>
+
 //ROOT
 #include <TMinuit.h>
 #include <TMatrixD.h>
@@ -201,12 +204,12 @@ ECLWaveformFitModule::~ECLWaveformFitModule()
 }
 
 //callback for loading templates from database
-void ECLWaveformFitModule::loadTemplateParameterArray(bool IsDataFlag)
+void ECLWaveformFitModule::loadTemplateParameterArray()
 {
 
   m_TemplatesLoaded = true;
 
-  if (IsDataFlag) {
+  if (m_IsMCFlag == 0) {
     //load data templates
     DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
     std::vector<double>  Ptemp(11), Htemp(11), Dtemp(11);
@@ -238,6 +241,7 @@ void ECLWaveformFitModule::loadTemplateParameterArray(bool IsDataFlag)
 void ECLWaveformFitModule::beginRun()
 {
 
+  m_IsMCFlag = Environment::Instance().isMC();
   m_TemplatesLoaded = false;
 
   DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
@@ -321,7 +325,7 @@ void ECLWaveformFitModule::event()
 
   if (!m_TemplatesLoaded) {
     //load templates once per run in first event that has saved waveforms.
-    if (m_eclDSPs.getEntries() > 0)  loadTemplateParameterArray(m_eclDSPs[0]->getIsData());
+    if (m_eclDSPs.getEntries() > 0)  loadTemplateParameterArray();
   }
 
   for (auto& aECLDsp : m_eclDSPs) {
@@ -357,7 +361,7 @@ void ECLWaveformFitModule::event()
     if (d->getAmp() * m_ADCtoEnergy[id] < m_EnergyThreshold)  continue;
 
     //loading template for waveform
-    if (aECLDsp.getIsData()) {
+    if (m_IsMCFlag == 0) {
       //data cell id dependent
       g_si = &m_si[id][0];
       g_sih = &m_si[id][1];

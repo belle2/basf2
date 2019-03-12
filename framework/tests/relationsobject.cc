@@ -214,6 +214,13 @@ namespace {
     relObjData.registerRelationTo(profileData, DataStore::c_Event, DataStore::c_WriteOut, relationName);
     DataStore::Instance().setInitializeActive(false);
 
+    //check the hasRelation finder works with and without names
+    EXPECT_TRUE(relObjData.hasRelationTo(profileData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(profileData.hasRelationTo(relObjData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(profileData.hasRelationTo(evtData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(relObjData.hasRelationTo(profileData));
+    EXPECT_FALSE(profileData.hasRelationTo(relObjData));
+
     (relObjData)[0]->addRelationTo((profileData)[0], -42.0, relationName);
 
     //getRelations

@@ -42,8 +42,8 @@ namespace Belle2 {
 
   private:
     /** Parameters to control the job */
-    double m_thetaLabMinDeg; /**< miniumum photon theta in lab (0 degrees) */
-    double m_thetaLabMaxDeg; /**< maximum photon theta in lab (180 degrees) */
+    double m_thetaLabMinDeg{0.}; /**< miniumum photon theta in lab (0 degrees) */
+    double m_thetaLabMaxDeg{180.}; /**< maximum photon theta in lab (180 degrees) */
     double m_minPairMass; /**< minimum invariant mass of the pair of photons (9 GeV/c^2) */
     double m_mindPhi; /**< minimum delta phi between clusters (179 deg) */
     double m_maxTime; /**< maximum photon (time - <t>)/dt99 (1) */
@@ -60,9 +60,9 @@ namespace Belle2 {
 
 
     /** Some other useful quantities */
-    double thetaLabMin;  /**< m_thetaLabMinDeg converted to radians */
-    double thetaLabMax;  /**< m_thetaLabMaxDeg converted to radians */
-    bool storeCalib = true;; /**< force the input calibration constants to be saved first event */
+    double thetaLabMin{ -1.0};  /**< m_thetaLabMinDeg converted to radians (conversion in Module::init) */
+    double thetaLabMax{ -1.0};  /**< m_thetaLabMaxDeg converted to radians (coneversion in Module::init) */
+    bool storeCalib = true; /**< force the input calibration constants to be saved first event */
     std::vector<float> EperCrys; /**< ECL digit energy for each crystal */
 
     double minTrkpt = 0.3; /**< (GeV/c) minimum pt of a good track */

@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Yinghui GUAN                                             *
+ * Contributors: Yinghui GUAN, VIPIN GAUR, Z. S. Stottler                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,13 @@
 #ifndef BKLMDATABASEIMPORTER_H
 #define BKLMDATABASEIMPORTER_H
 
+#include <stdio.h>
 #include <TObject.h>
+#include <string>
+#include <vector>
+#include <map>
+#include <fstream>
+#include <iostream>
 
 namespace Belle2 {
 
@@ -58,7 +64,8 @@ namespace Belle2 {
     void exportBklmSimulationPar();
 
     //! Import BKLM bad channels into the database
-    void importBklmBadChannels();
+    //void importBklmBadChannels();
+    void importBklmBadChannels(int expNoStart, int runStart, int expNoStop, int runStop, std::string fileName);
 
     //! Export BKLM bad channels from the database
     void exportBklmBadChannels();

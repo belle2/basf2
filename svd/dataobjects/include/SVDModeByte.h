@@ -63,7 +63,7 @@ namespace Belle2 {
    * Class to store SVD mode information
    *
    * - Mode : Zero suppressed 6- or 3- samples + unknown mode
-   * - Trigger time bin - 3 bits, correct values 0-3, other - error
+   * - Trigger time bin - 2 bits, correct values 0-3, other - error
    */
   class SVDModeByte {
   public:
@@ -71,7 +71,7 @@ namespace Belle2 {
     typedef uint8_t baseType;
     enum {
       /** Number of bits available to represent a triggerBin */
-      TriggerBinBits = 3,
+      TriggerBinBits = 2,
       /** Number of bits available to represent DAQ Mode */
       DAQModeBits = 2,
       /** Number of bits available to represent event type */
@@ -96,11 +96,11 @@ namespace Belle2 {
 
     };
 
-    /** Default / non-informative id 10010111 = 151
+    /** Default / non-informative id 1001000 = 72
      * Run type: zero-suppressed, 2
      * Event type: global run, 0
      * DAQ mode: 6-samples, 2
-     * Trigger invalid 111 = 7
+     * Trigger bin 0 - no "not set" or neutral option available
      */
     static const baseType c_DefaultID;
 

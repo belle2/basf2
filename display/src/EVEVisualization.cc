@@ -1335,7 +1335,7 @@ void EVEVisualization::addECLCluster(const ECLCluster* cluster)
   }
 
   int id = m_eclData->AddTower(etaLow, etaHigh, phi - dPhi, phi + dPhi);
-  m_eclData->FillSlice(0, cluster->getEnergy());
+  m_eclData->FillSlice(0, cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
   VisualRepMap::getInstance()->addCluster(cluster, m_eclData, id);
 }
 

@@ -11,11 +11,23 @@
 using namespace std;
 using namespace Belle2;
 
+static RFRoiSender* roi = NULL;
+
+extern "C" void sighandler(int sig)
+{
+  printf("SIGTERM handler here\n");
+  roi->cleanup();
+}
+
 int main(int argc, char** argv)
 {
   RFConf conf(argv[1]);
 
-  RFRoiSender* roi = new RFRoiSender(argv[1]);
+  //  RFRoiSender* roi = new RFRoiSender(argv[1]);
+  roi = new RFRoiSender(argv[1]);
+
+  signal(SIGINT, sighandler);
+  signal(SIGTERM, sighandler);
 
   RFNSM nsm(conf.getconf("roisender", "nodename"), roi);
   nsm.AllocMem(conf.getconf("system", "nsmdata"));

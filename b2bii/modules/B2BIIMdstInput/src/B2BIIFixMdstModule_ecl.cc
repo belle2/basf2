@@ -1320,12 +1320,13 @@ namespace Belle2 {
     // Correct energy and error matrix in Mdst_ecl.
     double factor;
     double factor13;
-    double shower_energy, shower_theta;
+
     for (std::vector<Belle::Mdst_ecl>::iterator itecl = eclmgr.begin();
          itecl != eclmgr.end(); ++itecl) {
       Belle::Mdst_ecl& shower = *itecl;
-      shower_energy = shower.energy();
-      shower_theta  = shower.theta();
+      // Shower energy and polar angle
+      double shower_energy = shower.energy();
+      double shower_theta  = shower.theta();
 
       // Fix wrong calib. for Exp. 45.
       //      if( Eno==45 )
@@ -1447,14 +1448,13 @@ namespace Belle2 {
     }
 
     // Correct energy in Belle::Mdst_gamma.
-    double gamma_energy, gamma_cos;
     for (std::vector<Belle::Mdst_gamma>::iterator itgam = gammamgr.begin();
          itgam != gammamgr.end(); ++itgam) {
       Belle::Mdst_gamma& gamma = *itgam;
       // Create the gamma's 3vector
       CLHEP::Hep3Vector gamma_3v(gamma.px(), gamma.py(), gamma.pz());
-      gamma_energy = gamma_3v.mag();
-      gamma_cos    = gamma_3v.cosTheta();
+      double gamma_energy = gamma_3v.mag();
+      double gamma_cos    = gamma_3v.cosTheta();
 
       // control sequence by option and expmc.
       switch (option) {

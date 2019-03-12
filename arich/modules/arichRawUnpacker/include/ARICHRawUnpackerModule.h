@@ -69,11 +69,11 @@ namespace Belle2 {
 
   protected:
     bool m_debug;
-    unsigned int m_ibyte;
-    TH1* h_rate_a_all;//yone
-    TH1* h_rate_b_all;//yone
-    TH1* h_rate_c_all;//yone
-    TH1* h_rate_d_all;//yone
+    unsigned int m_ibyte = 0;
+    TH1* h_rate_a_all = NULL;//yone
+    TH1* h_rate_b_all  = NULL;//yone
+    TH1* h_rate_c_all  = NULL;//yone
+    TH1* h_rate_d_all  = NULL;//yone
 
   };
 

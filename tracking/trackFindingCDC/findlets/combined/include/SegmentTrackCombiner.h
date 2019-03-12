@@ -22,6 +22,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
+#include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
@@ -34,6 +35,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCSegment2D;
+
+    // Guard to prevent repeated instantiations
+    extern template class TrackFindingCDC::Chooseable<BaseSegmentTrackFilter>;
+    extern template class TrackFindingCDC::ChooseableFilter<SegmentTrackFilterFactory>;
 
     /**
      * Findlet for the combination of tracks and segments.

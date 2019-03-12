@@ -19,19 +19,28 @@ REG_MODULE(PruneDataStore)
 PruneDataStoreModule::PruneDataStoreModule() :
   Module()
 {
-  setDescription(
-    "Clears the content of the DataStore while it keeps entries listed in the matchEntries option."
-    "The EventMetaData object will always be kept, as it is required by the framework to properly "
-    "work with the DataStore. Note: Also all Relations will be cleared if they are not matched by "
-    "one entry in the matchEntries list. You have to ensure the objects referenced by kept relations "
-    "are also matched by one entry in the keepEntries list so a relation does not point to nirvana."
-    "This logic can be inverted to remove only the entries matched by the regex in the matchEntries "
-    "parameter by setting the parameter to keepMatchedEntries to False.");
+  setDescription(R"DOC(
+    Clears the content of the DataStore while it keeps entries listed in the matchEntries option.
+    The EventMetaData object will always be kept, as it is required by the framework to properly
+    work with the DataStore.
+
+    This logic can be inverted to remove only the entries matched by the regex
+    in the matchEntries parameter by setting the parameter to
+    keepMatchedEntries to False.
+
+    Note:
+        Also all Relations will be cleared if they are not matched by one entry
+        in the matchEntries list. You have to ensure the objects referenced by
+        kept relations are also matched by one entry in the keepEntries list so
+        a relation does not point to nirvana.
+  )DOC");
   addParam("matchEntries", m_matchEntries,
-           "name of all DataStore entries (with regex syntax) to match. For example, you can use 'Raw.*' to match all Raw-Objects.",
+           "name of all DataStore entries (with regular expression syntax) to match. "
+           "For example, you can use 'Raw.*' to match all Raw-Objects.",
            m_matchEntries);
   addParam("keepMatchedEntries", m_keepMatchedEntries,
-           "If true, all entries matched by the RegEx expression are kept. If false, matched entries will be removed.",
+           "If true, all entries matched by the regular expression are kept. "
+           "If false, matched entries will be removed.",
            m_keepMatchedEntries);
   setPropertyFlags(c_ParallelProcessingCertified);
 

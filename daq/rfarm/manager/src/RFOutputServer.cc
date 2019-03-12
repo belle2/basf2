@@ -206,8 +206,8 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
 int RFOutputServer::Start(NSMmsg*, NSMcontext*)
 {
   // Clear RingBuffer
+  m_rbufout->forceClear();
   //  m_rbufin->forceClear();
-  //  m_rbufout->forceClear();
   return 0;
 }
 
@@ -276,6 +276,13 @@ void RFOutputServer::server()
     m_flow->fillProcessStatus(GetNodeInfo(), m_pid_receiver[recv_id], m_pid_sender,
                               m_pid_basf2);
   }
+}
+void RFOutputServer::cleanup()
+{
+  printf("RFOutputServer : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFOutputServer: Done. Exitting\n");
+  exit(-1);
 }
 
 

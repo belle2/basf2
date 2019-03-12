@@ -65,14 +65,20 @@ def get_html_plots_tag_comparison_folder(output_base_dir, tags):
     """!
     Return the absolute path to the results folder
     """
-    return os.path.join(get_html_plots_folder(output_base_dir), get_tag_comparison_folder(tags))
+    return os.path.join(
+        get_html_plots_folder(output_base_dir),
+        get_tag_comparison_folder(tags)
+    )
 
 
 def get_html_plots_tag_comparison_json(output_base_dir, tags):
     """!
     Return the absolute path json file with the comparison file
     """
-    return os.path.join(get_html_plots_tag_comparison_folder(output_base_dir, tags), file_name_comparison_json)
+    return os.path.join(
+        get_html_plots_tag_comparison_folder(output_base_dir, tags),
+        file_name_comparison_json
+    )
 
 
 def get_results_tag_folder(output_base_dir, tag):
@@ -84,17 +90,23 @@ def get_results_tag_folder(output_base_dir, tag):
 
 def get_results_tag_general_folder(output_base_dir, tag):
     """!
-    Return the absolute path to the results folder for one specific tag. In this
-    general folder, the common log files will be placed
+    Return the absolute path to the results folder for one specific
+    tag. In this general folder, the common log files will be placed
     """
-    return os.path.join(get_results_tag_folder(output_base_dir, tag), folder_name_general)
+    return os.path.join(
+        get_results_tag_folder(output_base_dir, tag),
+        folder_name_general
+    )
 
 
 def get_results_tag_revision_file(output_base_dir, tag):
     """!
     Return the absolute path to the revision.json file for one tag folder
     """
-    return os.path.join(get_results_tag_folder(output_base_dir, tag), file_name_results_json)
+    return os.path.join(
+        get_results_tag_folder(output_base_dir, tag),
+        file_name_results_json
+    )
 
 
 def get_results_tag_package_folder(output_base_dir, tag, package):

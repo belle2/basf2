@@ -14,4 +14,5 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::Chooseable<BaseClusterFilter>;
 template class TrackFindingCDC::ChooseableFilter<ClusterFilterFactory>;

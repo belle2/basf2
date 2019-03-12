@@ -679,11 +679,12 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
+      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
       if (!cluster) return std::numeric_limits<float>::quiet_NaN();
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
-      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
 
       // find the vector that balances this in the CMS
       PCmsLabTransform T;
@@ -697,11 +698,12 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
+      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
       if (!cluster) return std::numeric_limits<float>::quiet_NaN();
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
-      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
 
       // find the vector that balances this in the CMS
       PCmsLabTransform T;

@@ -11,11 +11,11 @@
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics, \
+    register_module
 from simulation import add_simulation
 from L1trigger import add_tsim
 from beamparameters import add_beamparameters
-import glob
 
 set_random_seed(12345)
 
@@ -56,8 +56,15 @@ process(main)
 print(statistics)
 
 from validation import *
-statistics_plots('EvtGenSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with generic EvtGen events', prefix='EvtGenSimNoBkg')
-event_timing_plot('../EvtGenSimNoBkg.root', 'EvtGenSimNoBkg_statistics.root',
-                  contact='tkuhr',
-                  jobDesc='a standard simulation job with generic EvtGen events', prefix='EvtGenSimNoBkg')
+statistics_plots(
+    'EvtGenSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with generic EvtGen events',
+    prefix='EvtGenSimNoBkg'
+)
+event_timing_plot(
+    '../EvtGenSimNoBkg.root', 'EvtGenSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with generic EvtGen events',
+    prefix='EvtGenSimNoBkg'
+)

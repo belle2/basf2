@@ -35,7 +35,7 @@ string TRGCDCT3DConverterModule::version() const
 TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
   : Module::Module()
 {
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   string desc = "TRGCDCT3DConverterModule(" + version() + ")";
   setDescription(desc);
   addParam("hitCollectionName", m_hitCollectionName,

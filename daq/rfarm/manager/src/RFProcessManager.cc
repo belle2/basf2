@@ -211,7 +211,8 @@ pid_t RFProcessManager::CheckProcess()
     pid_t pid = *it;
     int status;
     pid_t outpid = waitpid(pid, &status, WNOHANG);
-    if (outpid == -1) {
+    //    if (outpid == -1) {
+    if (outpid != 0 || outpid == pid) {
       m_pidlist.erase(it);
       return pid;
     }

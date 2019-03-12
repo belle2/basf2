@@ -23,6 +23,7 @@
 #include <bklm/dataobjects/BKLMDigitRaw.h>
 #include <bklm/dataobjects/BKLMDigitOutOfRange.h>
 #include <bklm/dataobjects/BKLMDigitEventInfo.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 
 #include <map>
 #include <string>
@@ -120,6 +121,9 @@ namespace Belle2 {
 
     //! ADC offset and threshold read from database
     DBObjPtr<BKLMADCThreshold> m_ADCParams;
+
+    //! Time conversion.
+    DBObjPtr<KLMTimeConversion> m_TimeConversion;
 
     //! rawKLM StoreArray
     StoreArray<RawKLM> m_rawKLMs;

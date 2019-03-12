@@ -53,6 +53,17 @@ namespace Belle2 {
       TVector3 getLocalMomentum(const Particle* particle);
 
       /**
+       * returns the time of flight from the origin to the TOP
+       */
+      double getTOF(const Particle* particle);
+
+      /**
+       * returns the time of flight from the origin to the TOP under a given hypothesis
+       */
+      double getTOFExpert(const Particle* particle, const std::vector<double>& vars);
+
+
+      /**
        * counts the number of photons in the TOP in a given time frame
        * if tmin < 0, count from the time of the first photon
        */
@@ -158,6 +169,36 @@ namespace Belle2 {
        */
       double countRawTOPHitsInInterval(const Particle* particle,
                                        const std::vector<double>& vars);
+
+      /**
+       * returns reconstruction flag
+       */
+      double getFlag(const Particle* particle);
+
+      /**
+       * returns electron log likelihood
+       */
+      double getElectronLogL(const Particle* particle);
+
+      /**
+       * returns muon log likelihood
+       */
+      double getMuonLogL(const Particle* particle);
+
+      /**
+       * returns pion log likelihood
+       */
+      double getPionLogL(const Particle* particle);
+
+      /**
+       * returns kaon log likelihood
+       */
+      double getKaonLogL(const Particle* particle);
+
+      /**
+       * returns proton log likelihood
+       */
+      double getProtonLogL(const Particle* particle);
 
       //---------------- TOPRecBunch related --------------------
 

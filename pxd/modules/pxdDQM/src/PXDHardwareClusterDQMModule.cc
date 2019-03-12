@@ -34,7 +34,7 @@ PXDHardwareClusterDQMModule::PXDHardwareClusterDQMModule() : HistoModule() , m_s
   //Set module properties
   setDescription("Monitor PXD hardware cluster");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxdhardcluster"));
 }
 

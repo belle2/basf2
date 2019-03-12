@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett
+ * Contributors: Jake Bennett, Jitendra Kumar
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -170,7 +170,9 @@ namespace Belle2 {
     double h_adcraw[kMaxHits]; /**< charge per hit */
     double h_doca[kMaxHits];   /**< distance of closest approach */
     double h_ndoca[kMaxHits];  /**< normalized distance of closest approach */
+    double h_docaRS[kMaxHits];  /**< normalized +RS distance of closest approach */
     double h_enta[kMaxHits];   /**< entrance angle */
+    double h_entaRS[kMaxHits];  /**< normalized + RS distance of entrance angle */
     double h_driftT[kMaxHits];   /**< drift time */
     double h_wireGain[kMaxHits];   /**< calibration hit gain */
     double h_twodCor[kMaxHits];   /**< calibration 2D correction */
@@ -183,5 +185,8 @@ namespace Belle2 {
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
+
+    bool IsHitLevel; /**< Flag to switch on/off hit level information */
+
   };
 } // Belle2 namespace

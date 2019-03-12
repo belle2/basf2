@@ -48,7 +48,7 @@ namespace Belle2 {
     TrueHitInfo() : m_Id(-1), m_wU(0.), m_wV(0.), m_U(false), m_V(false) { }
 
     /** ctor using Id-only */
-    TrueHitInfo(int Id) : m_Id(Id), m_wU(0.), m_wV(0.), m_U(false), m_V(false) { }
+    explicit TrueHitInfo(int Id) : m_Id(Id), m_wU(0.), m_wV(0.), m_U(false), m_V(false) { }
 
     // /** ctor with full information */
     // TrueHitInfo(int Id, double wU, double wV, bool U, bool V) :

@@ -21,9 +21,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
 
 using namespace Belle2;
 using namespace GDL;
@@ -126,7 +123,7 @@ void TRGGDLSummaryModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[n_leafs + n_leafsExtra];
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
     //set pointer
     for (int i = 0; i < 320; i++) {
       if (LeafBitMap[i] != -1) {
@@ -195,14 +192,18 @@ void TRGGDLSummaryModule::event()
 
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
 
-  /*
+  //get prescales
+  for (int i = 0; i < 320; i++) {
+    int bit1 = i / 32;
+    int bit2 = i % 32;
+    GDLResult->setPreScale(bit1, bit2, m_prescales->getprescales(i));
+  }
+
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
-  } else if (gtt == GDL::e_tt_top) {
-    tt = TRGSummary::TTYP_PID0;
   } else if (gtt == GDL::e_tt_ecl) {
-    tt = TRGSummary::TTYP_ECL;
+    tt = TRGSummary::TTYP_PID0;
   } else if (gtt == GDL::e_tt_dphy) {
     tt = TRGSummary::TTYP_DPHY;
   } else if (gtt == GDL::e_tt_rand) {
@@ -210,8 +211,7 @@ void TRGGDLSummaryModule::event()
   } else {
     tt = TRGSummary::TTYP_NONE;
   }
-  */
 
-  GDLResult->setTimType((TRGSummary::ETimingType)gtt);
+  GDLResult->setTimType(tt);
 
 }

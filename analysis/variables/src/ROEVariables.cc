@@ -45,46 +45,6 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double isCompletelyInRestOfEvent(const Particle* particle)
-    {
-      // It can happen that for example a cluster is in the rest of event,
-      // which is CR - matched to a nearby track which is not in the ROE
-      // Hence this variable checks if all MdstObjects are in the ROE
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (not roe.isValid())
-        return 0;
-
-      if (particle->getParticleType() == Particle::c_Composite) {
-        std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
-        for (unsigned int i = 0; i < fspDaug.size(); i++) {
-          if (isCompletelyInRestOfEvent(fspDaug[i]) == 0) {
-            return 0;
-          }
-        }
-        return 1.0;
-      } else {
-        // Check for Tracks
-        const auto& tracks = roe->getTracks();
-        if (particle->getTrack() and std::find(tracks.begin(), tracks.end(), particle->getTrack()) == tracks.end()) {
-          return 0.0;
-        }
-
-        // Check for KLMClusters
-        const auto& klm = roe->getKLMClusters();
-        if (particle->getKLMCluster() and std::find(klm.begin(), klm.end(), particle->getKLMCluster()) == klm.end()) {
-          return 0.0;
-        }
-
-        // Check for ECLClusters
-        const auto& ecl = roe->getECLClusters();
-        if (particle->getECLCluster() and std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) == ecl.end()) {
-          return 0.0;
-        }
-      }
-
-      return 1.0;
-    }
-
     double isInRestOfEvent(const Particle* particle)
     {
 
@@ -362,66 +322,16 @@ namespace Belle2 {
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
 
-        // Load ROE Tracks
-        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
-
-        // Add tracks in ROE V0 list, if they exist
-        //TODO: replace this!
-        /*std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
-        for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
-        {
-          roeTracks.push_back(particles[v0List[iV0]]->getDaughter(0)->getTrack());
-          roeTracks.push_back(particles[v0List[iV0]]->getDaughter(1)->getTrack());
-        }*/
-
-        // Load ROE ECLClusters
-        std::vector<const ECLCluster*> roeECL = roe->getECLClusters(maskName);
-
-        StoreArray<MCParticle> mcParticles;
         std::set<const MCParticle*> mcROEObjects;
 
-        // Fill Track MCParticles to std::set
-        for (unsigned i = 0; i < roeTracks.size(); i++)
-          if (roeTracks[i]->getRelated<MCParticle>())
-            mcROEObjects.insert(roeTracks[i]->getRelated<MCParticle>());
-
-        // Fill only photon MCParticles which have good relations, copied from ParticleLoader until a better solution is established
-        for (unsigned i = 0; i < roeECL.size(); i++)
+        auto roeParticles = roe->getParticles(maskName);
+        for (auto* roeParticle : roeParticles)
         {
-          if (roeECL[i]->isNeutral()) {
-            // ECLCluster can be matched to multiple MCParticles
-            // order the relations by weights and set Particle -> multiple MCParticle relation
-            // preserve the weight
-            RelationVector<MCParticle> mcRelations = roeECL[i]->getRelationsTo<MCParticle>();
-            // order relations by weights
-            std::vector<std::pair<int, double>> weightsAndIndices;
-            for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
-              const MCParticle* relMCParticle = mcRelations[iMCParticle];
-              double weight = mcRelations.weight(iMCParticle);
-              if (relMCParticle)
-                weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
-            }
-            // sort descending by weight
-            std::sort(weightsAndIndices.begin(), weightsAndIndices.end(), [](const std::pair<int, double>& left,
-            const std::pair<int, double>& right) {
-              return left.second > right.second;
-            });
-
-            // insert MCParticle based on relation strength
-            for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
-              const MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
-              double weight = weightsAndIndices[j].second;
-
-              // TODO: study this further and avoid hardcoded values
-              // set the relation only if the MCParticle's energy contribution
-              // to this cluster amounts to at least 25%
-              if (relMCParticle)
-                if (weight / roeECL[i]->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30 && relMCParticle->getPDG() == 22)
-                  mcROEObjects.insert(relMCParticle);
-            }
+          auto* mcroeParticle = roeParticle->getRelated<MCParticle>();
+          if (mcroeParticle != nullptr) {
+            mcROEObjects.insert(mcroeParticle);
           }
         }
-
         int flags = 0;
         checkMCParticleMissingFlags(mcROE, mcROEObjects, flags);
 
@@ -717,7 +627,7 @@ namespace Belle2 {
         double extraE = 0.0;
 
         for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          extraE += roeClusters[iEcl]->getEnergy();
+          extraE += roeClusters[iEcl]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
         return extraE;
       };
@@ -1875,44 +1785,46 @@ namespace Belle2 {
           int pdg = abs(daughters[i]->getPDG());
 
           // photon
-          if (pdg == 22 and (missingFlags & 1) == 0)
+          if (pdg == Const::photon.getPDGCode() and (missingFlags & 1) == 0)
             missingFlags += 1;
 
           // electrons
-          else if (pdg == 11 and (missingFlags & 2) == 0)
+          else if (pdg == Const::electron.getPDGCode() and (missingFlags & 2) == 0)
             missingFlags += 2;
 
           // muons
-          else if (pdg == 13 and (missingFlags & 4) == 0)
+          else if (pdg == Const::muon.getPDGCode() and (missingFlags & 4) == 0)
             missingFlags += 4;
 
           // pions
-          else if (pdg == 211 and (missingFlags & 8) == 0)
+          else if (pdg == Const::pion.getPDGCode() and (missingFlags & 8) == 0)
             missingFlags += 8;
 
           // kaons
-          else if (pdg == 321 and (missingFlags & 16) == 0)
+          else if (pdg == Const::kaon.getPDGCode() and (missingFlags & 16) == 0)
             missingFlags += 16;
 
           // protons
-          else if (pdg == 2212 and (missingFlags & 32) == 0)
+          else if (pdg == Const::proton.getPDGCode() and (missingFlags & 32) == 0)
             missingFlags += 32;
 
           // neutrons
-          else if (pdg == 1000010020 and (missingFlags & 64) == 0)
+          else if (pdg == Const::neutron.getPDGCode() and (missingFlags & 64) == 0)
             missingFlags += 64;
 
           // kshort
-          else if (pdg == 310 and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
+          else if (pdg == Const::Kshort.getPDGCode() and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
             std::vector<MCParticle*> ksDaug = daughters[i]->getDaughters();
             if (ksDaug.size() == 2) {
               // K_S0 -> pi+ pi-
-              if (abs(ksDaug[0]->getPDG()) == 211 and abs(ksDaug[1]->getPDG()) == 211 and (missingFlags & 128) == 0) {
+              if (abs(ksDaug[0]->getPDG()) == Const::pion.getPDGCode() and abs(ksDaug[1]->getPDG()) == Const::pion.getPDGCode()
+                  and (missingFlags & 128) == 0) {
                 if (mcROEObjects.find(ksDaug[0]) == mcROEObjects.end() or mcROEObjects.find(ksDaug[1]) == mcROEObjects.end())
                   missingFlags += 128;
               }
               // K_S0 -> pi0 pi0
-              else if (abs(ksDaug[0]->getPDG()) == 111 and abs(ksDaug[1]->getPDG()) == 111 and (missingFlags & 256) == 0) {
+              else if (abs(ksDaug[0]->getPDG()) == Const::pi0.getPDGCode() and abs(ksDaug[1]->getPDG()) == Const::pi0.getPDGCode()
+                       and (missingFlags & 256) == 0) {
                 std::vector<MCParticle*> pi0Daug0 = ksDaug[0]->getDaughters();
                 std::vector<MCParticle*> pi0Daug1 = ksDaug[1]->getDaughters();
                 if (mcROEObjects.find(pi0Daug0[0]) == mcROEObjects.end() or
@@ -1925,10 +1837,10 @@ namespace Belle2 {
           }
 
           // klong
-          else if (pdg == 130 and (missingFlags & 512) == 0)
+          else if (pdg == Const::Klong.getPDGCode() and (missingFlags & 512) == 0)
             missingFlags += 512;
 
-          // neutrino
+          // neutrinos, which are not in the Const::
           else if ((pdg == 12 or pdg == 14 or pdg == 16) and (missingFlags & 1024) == 0)
             missingFlags += 1024;
         }
@@ -1964,11 +1876,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
-
-    REGISTER_VARIABLE("isCompletelyInRestOfEvent", isCompletelyInRestOfEvent,
-                      "Similar to isInRestOfEvent, but checks if all Mdst objects of the particle are in the RestOfEvent"
-                      "One can use this to distinguish ECLClusters with a connected-region matched Track outside the ROE,"
-                      "from ordinary ECLClusters in the ROE mask for ECLClusters.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
                       "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."

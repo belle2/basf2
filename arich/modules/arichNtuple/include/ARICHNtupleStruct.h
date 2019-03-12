@@ -82,6 +82,7 @@ namespace Belle2 {
     struct ARICHTree {
       Int_t evt; /**< event number */
       Int_t run; /**< run number */
+      Int_t exp; /**< exp number */
 
       Short_t charge;    /**< charge */
       Float_t pValue; /**< p-value of Track fit */
@@ -124,7 +125,7 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      ARICHTree(): evt(0), run(0), charge(0), pValue(0), z0(0), d0(0), PDG(0), motherPDG(0),
+      ARICHTree(): evt(0), run(0), exp(0), charge(0), pValue(0), z0(0), d0(0), PDG(0), motherPDG(0),
 #ifdef ALIGNMENT_USING_BHABHA
         eop(0), e9e21(0), etot(0),
 #endif
@@ -141,6 +142,7 @@ namespace Belle2 {
       {
         evt = 0;
         run = 0;
+        exp = 0;
         trgtype = 0;
 
         pValue = 0;

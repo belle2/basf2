@@ -71,11 +71,11 @@ namespace Belle2 {
     { return "ECLShowers" ; }
 
   private:
-    double m_Chi2Threshold;   /** Two component fit chi square threshold .*/
-    double m_CrystalHadronEnergyThreshold; /** hadron component energy threshold to classify as hadron.*/
-    double m_CrystalHadronIntensityThreshold; /** hadron component intensity threshold to classify as hadron.*/
-    StoreArray<ECLCalDigit> m_eclCalDigits;  /** ECLCalDigit's */
-    StoreArray<ECLShower> m_eclShowers;  /** ECLShower's */
+    double m_Chi2Threshold;   /**< Two component fit chi square threshold .*/
+    double m_CrystalHadronEnergyThreshold; /**< hadron component energy threshold to classify as hadron.*/
+    double m_CrystalHadronIntensityThreshold; /**< hadron component intensity threshold to classify as hadron.*/
+    StoreArray<ECLCalDigit> m_eclCalDigits;  /**< ECLCalDigit's */
+    StoreArray<ECLShower> m_eclShowers;  /**< ECLShower's */
 
     const unsigned int maxdigits = 20; /**< Max number of digits mva can include.  Note input digits must have offline waveform. */
     const unsigned int m_numMVAvariables = 160; /**< number of variables expected in the MVA weightfile */
@@ -84,7 +84,8 @@ namespace Belle2 {
                                                                m_weightfile_representation; /**< Database pointer to the Database representation of the MVA weightfile */
     std::unique_ptr<MVA::Expert> m_expert; /**< Pointer to the current MVA Expert*/
     std::unique_ptr<MVA::SingleDataset>  m_dataset; /**< Pointer to the current dataset. */
-    /** initialize MVA weight file from DB
+    /**
+     * initialize MVA weight file from DB
      */
     void initializeMVAweightFile(const std::string& identifier,
                                  std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation);

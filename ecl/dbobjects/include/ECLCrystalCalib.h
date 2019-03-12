@@ -42,6 +42,6 @@ namespace Belle2 {
     std::vector<float> m_CalibConst; /**< Calibration constants */
     std::vector<float> m_CalibConstUnc; /**< Uncertainty on constants */
 
-    ClassDef(ECLCrystalCalib, 1);
+    ClassDef(ECLCrystalCalib, 1); /**< ClassDef */
   };
 }

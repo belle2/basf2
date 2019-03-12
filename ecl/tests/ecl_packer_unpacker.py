@@ -30,12 +30,14 @@ class addECLDigitsModule(Module):
     """
 
     def __init__(self):
+        """constructor"""
         super().__init__()
         amps = [0, 1, 100000, 262015]
         times = [-2048, -100, 0, 100, 2047]
         qualitys = [0, 1, 2, 3]
         chis = [0, 1, 254, 511]
         paramNames = ["amp", "time", "quality", "chi"]
+        #: ecl digit parameters
         self.digitParams = [dict(zip(paramNames, params)) for params in itertools.product(amps, times, qualitys, chis)]
 
     def event(self):

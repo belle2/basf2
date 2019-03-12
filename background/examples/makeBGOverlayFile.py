@@ -19,12 +19,15 @@ if len(argvs) > 1:
     elif argvs[1] == 'phase3':
         phase = 3
         compression = 4
+    elif argvs[1] == 'phase31':
+        phase = 31
+        compression = 4
     else:
-        B2ERROR('The argument can be either phase2 or phase3')
+        B2ERROR('The argument can be either phase2, phase3 or phase31')
         sys.exit()
 else:
     B2ERROR('No argument given specifying the running phase')
-    B2INFO('Usage: basf2 ' + argvs[0] + ' phase2/phase3' + ' [scaleFactor=1]')
+    B2INFO('Usage: basf2 ' + argvs[0] + ' phase2/phase3/phase31' + ' [scaleFactor=1]')
     sys.exit()
 
 scaleFactor = 1.0
@@ -66,6 +69,8 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
+elif phase == 31:
+    gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
 main.add_module(gearbox)
 
 # Geometry

@@ -13,7 +13,7 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 set_log_level(LogLevel.INFO)
 
 skimpath = Path()

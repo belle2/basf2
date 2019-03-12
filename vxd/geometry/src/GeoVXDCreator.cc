@@ -167,7 +167,7 @@ namespace Belle2 {
       return assembly;
     }
 
-    G4Transform3D GeoVXDCreator::getAlignment(VXDAlignmentPar params)
+    G4Transform3D GeoVXDCreator::getAlignment(const VXDAlignmentPar& params)
     {
       G4RotationMatrix rotation(params.getAlpha(), params.getBeta(), params.getBeta());
       G4ThreeVector translation(params.getDU() / Unit::mm, params.getDV() / Unit::mm, params.getDW() / Unit::mm);
@@ -495,7 +495,6 @@ namespace Belle2 {
           B2FATAL("Invalid SensorTypeID " << p.getSensorTypeID() << ", please check the definition of " << sensorID);
         }
         VXDGeoSensorPar& s = it->second;
-        string name = m_prefix + "." + (string)sensorID;
 
         //Now create all the other components and place the Sensor
         if (!vxdGeometryPar.getGlobalParams().getOnlyActiveMaterial()) readSubComponents(s.getComponents() , GearDir(content,
@@ -518,7 +517,7 @@ namespace Belle2 {
       return;
     }
 
-    void GeoVXDCreator::readSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir,
+    void GeoVXDCreator::readSubComponents(const std::vector<VXDGeoPlacementPar>& placements , const GearDir& componentsDir,
                                           VXDGeometryPar& vxdGeometryPar)
     {
       for (const VXDGeoPlacementPar& p : placements) {
@@ -600,7 +599,7 @@ namespace Belle2 {
       }
     }
 
-    std::vector<VXDGeoPlacementPar> GeoVXDCreator::getSubComponents(GearDir path)
+    std::vector<VXDGeoPlacementPar> GeoVXDCreator::getSubComponents(const GearDir& path)
     {
       vector<VXDGeoPlacementPar> result;
       for (const GearDir& component : path.getNodes("Component")) {

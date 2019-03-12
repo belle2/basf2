@@ -3,8 +3,8 @@
 
 """
 a test of the ParticleLoader using the small test file for running quickly
-there is a clone of this file which requires the presence of mdst7.root (a
-larger file) that is present on the buildbot server
+there is a clone of this file which requires the presence of mdst12.root (a
+larger file) that is present on the buildbot server but not bamboo
 """
 
 from ROOT import Belle2

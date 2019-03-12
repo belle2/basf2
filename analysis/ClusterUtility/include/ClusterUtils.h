@@ -42,39 +42,39 @@ namespace Belle2 {
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster);
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex);
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster);
+    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
      * @return const TMatrixDSym
      */
     const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                        const TMatrixDSym& covmatvertex);
+                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 7x7 covariance matrix (px, py, pz, E, x, y, z)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster);
+    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 7x7 covariance matrix (px, py, pz, E, x, y, z)
      * @return const TMatrixDSym
      */
     const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                        const TMatrixDSym& covmatvertex);
+                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns default IP position from beam parameters

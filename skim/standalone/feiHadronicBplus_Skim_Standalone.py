@@ -4,7 +4,7 @@
     FEI Hadronic B+ tag skim standalone for generic analysis in the
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180200
-    fei training: MC9 based, release-02-00-01 'FEIv4_2018_MC9_release_02_00_01'
+    fei training: MC9 based, release-03-00-00 'FEIv4_2018_MC9_release_02_00_01'
     """
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
@@ -16,7 +16,7 @@ from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 import sys
 import os

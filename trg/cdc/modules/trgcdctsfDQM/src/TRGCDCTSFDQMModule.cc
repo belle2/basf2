@@ -136,27 +136,38 @@ void TRGCDCTSFDQMModule::event()
   h_nhit->Fill(nhit);
 
   int id = 0;
+  int v  = 0;
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
     id = entAry[ii]->m_trackerhit0id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit0v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit1id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit1v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit2id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit2v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit3id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit3v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit4id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit4v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit5id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit5v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit6id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit6v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit7id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit7v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit8id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit8v;
+    if (v != 0)h_nhit_tsf->Fill(id);
     id = entAry[ii]->m_trackerhit9id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit9v;
+    if (v != 0)h_nhit_tsf->Fill(id);
   }
 
   oldDir->cd();

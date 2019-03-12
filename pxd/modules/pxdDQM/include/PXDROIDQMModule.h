@@ -51,31 +51,31 @@ namespace Belle2 {
       StoreArray<PXDRawROIs> m_storeROIs;
 
       /** Histogram 2d hitmap */
-      TH1F* hrawROIcount;     /** Histogram  */
-      TH1F* hrawROItype;     /** Histogram  */
+      TH1F* hrawROIcount = nullptr;     /** Histogram  */
+      TH1F* hrawROItype = nullptr;     /** Histogram  */
 
-      TH2F* hrawROIHLTmap;      /** Histogram  */
-      TH2F* hrawROIHLTsize;      /** Histogram  */
-      TH1F* hrawROIHLT_DHHID;     /** Histogram  */
-      TH1F* hrawROIHLTminU;     /** Histogram  */
-      TH1F* hrawROIHLTmaxU; /** Histogram  */
-      TH1F* hrawROIHLTminV; /** Histogram  */
-      TH1F* hrawROIHLTmaxV; /** Histogram  */
-      TH1F* hrawROIHLTsizeV; /** Histogram  */
-      TH1F* hrawROIHLTsizeU; /** Histogram  */
+      TH2F* hrawROIHLTmap = nullptr;      /** Histogram  */
+      TH2F* hrawROIHLTsize = nullptr;      /** Histogram  */
+      TH1F* hrawROIHLT_DHHID = nullptr;     /** Histogram  */
+      TH1F* hrawROIHLTminU = nullptr;     /** Histogram  */
+      TH1F* hrawROIHLTmaxU = nullptr; /** Histogram  */
+      TH1F* hrawROIHLTminV = nullptr; /** Histogram  */
+      TH1F* hrawROIHLTmaxV = nullptr; /** Histogram  */
+      TH1F* hrawROIHLTsizeV = nullptr; /** Histogram  */
+      TH1F* hrawROIHLTsizeU = nullptr; /** Histogram  */
 
-      TH2F* hrawROIDCmap;      /** Histogram  */
-      TH2F* hrawROIDCsize;      /** Histogram  */
-      TH1F* hrawROIDC_DHHID;     /** Histogram  */
-      TH1F* hrawROIDCminU;     /** Histogram  */
-      TH1F* hrawROIDCmaxU; /** Histogram  */
-      TH1F* hrawROIDCminV; /** Histogram  */
-      TH1F* hrawROIDCmaxV; /** Histogram  */
-      TH1F* hrawROIDCsizeV; /** Histogram  */
-      TH1F* hrawROIDCsizeU; /** Histogram  */
+      TH2F* hrawROIDCmap = nullptr;      /** Histogram  */
+      TH2F* hrawROIDCsize = nullptr;      /** Histogram  */
+      TH1F* hrawROIDC_DHHID = nullptr;     /** Histogram  */
+      TH1F* hrawROIDCminU = nullptr;     /** Histogram  */
+      TH1F* hrawROIDCmaxU = nullptr; /** Histogram  */
+      TH1F* hrawROIDCminV = nullptr; /** Histogram  */
+      TH1F* hrawROIDCmaxV = nullptr; /** Histogram  */
+      TH1F* hrawROIDCsizeV = nullptr; /** Histogram  */
+      TH1F* hrawROIDCsizeU = nullptr; /** Histogram  */
 
-      TH2F* hrawROINrDCvsNrHLT; /** Histogram  */
-      TH2F* hrawROIEVTsWithOneSource; /** Histogram  */
+      TH2F* hrawROINrDCvsNrHLT = nullptr; /** Histogram  */
+      TH2F* hrawROIEVTsWithOneSource = nullptr; /** Histogram  */
 
       //map<int,int> sensor_to_histindex;
 

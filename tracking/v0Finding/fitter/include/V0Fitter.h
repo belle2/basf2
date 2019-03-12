@@ -66,7 +66,7 @@ namespace Belle2 {
      * @param vertex Result of the fit is returned via reference.
      * @return
      */
-    bool fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
+    bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
 
     /// Extrapolate the fit results to the perigee to the vertex.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,

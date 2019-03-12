@@ -74,7 +74,7 @@ PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to ke
 DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID')
 DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
-DecayChannel.name.__doc__ = "Name of the channel e.g. D0:generic_0"
+DecayChannel.name.__doc__ = "str:Name of the channel e.g. D0:generic_0"
 DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weightfiles independent of decayModeID"
 DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
 DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channel e.g. [K+, pi-]"
@@ -89,11 +89,11 @@ MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'dQ': ('dQ', 100, -1.0, 1.0),
                              'abs(dM)': ('abs(dM)', 100, 0.0, 1.0),
                              'abs(dQ)': ('abs(dQ)', 100, 0.0, 1.0),
-                             'piid': ('piid', 100, 0.0, 1.0),
-                             'Kid': ('Kid', 100, 0.0, 1.0),
-                             'prid': ('prid', 100, 0.0, 1.0),
-                             'eid': ('eid', 100, 0.0, 1.0),
-                             'muid': ('muid', 100, 0.0, 1.0),
+                             'pionID': ('pionID', 100, 0.0, 1.0),
+                             'kaonID': ('kaonID', 100, 0.0, 1.0),
+                             'protonID': ('protonID', 100, 0.0, 1.0),
+                             'electronID': ('electronID', 100, 0.0, 1.0),
+                             'muonID': ('muonID', 100, 0.0, 1.0),
                              'isSignal': ('isSignal', 2, -0.5, 1.5),
                              'isSignalAcceptMissingNeutrino': ('isSignalAcceptMissingNeutrino', 2, -0.5, 1.5),
                              'isPrimarySignal': ('isPrimarySignal', 2, -0.5, 1.5),

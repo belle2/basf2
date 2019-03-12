@@ -231,11 +231,11 @@ namespace Belle2 {
         (dynamic_cast<NewFitterGSL*>(pfitter))->setDebug(debugfitter);
       } else {
         B2FATAL("ParticleKinematicFitterModule:  " << m_orcaFitterEngine << " is an invalid OrcaKinFit fitter engine!");
+        return false;
       }
 
       if (!pfitter) return false;
-
-      BaseFitter& fitter = *pfitter;
+      BaseFitter& fitter(*pfitter);
 
       // reset fitter
       resetFitter(fitter);
@@ -313,7 +313,7 @@ namespace Belle2 {
         }
       }
 
-      if (pfitter) delete pfitter;
+      delete pfitter;
       return true;
     }
 
@@ -370,7 +370,7 @@ namespace Belle2 {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 
-        double startingE = particle -> getECLCluster() -> getEnergy();
+        double startingE = particle -> getECLCluster() -> getEnergy(particle -> getECLClusterEHypothesisBit());
         double startingPhi = particle -> getECLCluster() -> getPhi();
         double startingTheta = particle -> getECLCluster() -> getTheta();
 

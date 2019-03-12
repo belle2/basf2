@@ -14,7 +14,7 @@ from stdCharged import stdPi, stdK
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 hhpath = Path()
 
@@ -45,4 +45,4 @@ setSkimLogging()
 process(hhpath)
 
 # print out the summary
-print(statistics, path=hhpath)
+print(statistics)

@@ -1,3 +1,5 @@
+.. _restOfEvent:
+
 Rest Of Event
 =============
 

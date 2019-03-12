@@ -371,6 +371,9 @@ def command_diff(args, db):
     limited to a set of payloads names using ``--filter`` or ``--exclude``. If
     the ``--regex`` option is supplied the searchterm will interpreted as a
     python regular expression where the case is ignored.
+
+    .. versionchanged:: release-03-00-00
+       modified output structure and added ``--human-readable``
     """
     iovfilter = ItemFilter(args)
     if db is None:
@@ -442,9 +445,9 @@ def command_diff(args, db):
             """Add a list of payloads to the table, filling the first column with opcode"""
             for p in payloads:
                 if args.human_readable:
-                    table.append([opcode, p.name, p.rev, p.readable_iov()])
+                    table.append([opcode, p.name, p.revision, p.readable_iov()])
                 else:
-                    table.append([opcode, p.name, p.rev] + list(p.iov))
+                    table.append([opcode, p.name, p.revision] + list(p.iov))
 
         for tag, i1, i2, j1, j2 in diff.get_opcodes():
             if tag == "equal":
@@ -493,6 +496,9 @@ def command_iov(args, db):
     limited to a given run and optionally searched using --filter or --exclude.
     If the --regex option is supplied the searchterm will interpreted as a
     python regular expression where the case is ignored.
+
+    .. versionchanged:: release-03-00-00
+       modified output structure and added ``--human-readable``
     """
 
     iovfilter = ItemFilter(args)
@@ -572,7 +578,7 @@ def command_iov(args, db):
             payloads.sort()
             if args.human_readable:
                 table = [["Name", "Rev", "IoV", "IovId", "PayloadId"]]
-                table += [[p.name, p.rev, p.readable_iov(), p.payload_id, p.iov_id] for p in payloads]
+                table += [[p.name, p.revision, p.readable_iov(), p.iov_id, p.payload_id] for p in payloads]
                 columns = ["+", -8, -32, 6, 9]
                 # strip repeated names, revision, payloadid, to make it more readable
                 last_name = None
@@ -588,7 +594,7 @@ def command_iov(args, db):
 
             else:
                 table = [["Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run", "IovId", "PayloadId"]]
-                table += [[p.name, p.rev] + list(p.iov) + [p.iov_id, p.payload_id] for p in payloads]
+                table += [[p.name, p.revision] + list(p.iov) + [p.iov_id, p.payload_id] for p in payloads]
                 columns = ["+", -8, 6, 6, 6, 6, 6, 9]
 
             pretty_print_table(table, columns)
@@ -597,6 +603,8 @@ def command_iov(args, db):
 def command_dump(args, db):
     """
     Dump the content of a given payload
+
+    .. versionadded:: release-03-00-00
 
     This command will dump the payload contents stored in a given payload. One
     can either specify the payloadId (from a previous output of
@@ -616,6 +624,12 @@ def command_dump(args, db):
     Or directly by payload id from a previous call to ``b2conditionsdb iov``::
 
         $ b2conditionsdb dump -i 59685
+
+    .. rubric:: Usage
+
+    Depending on whether you want to display a payload by its id in the
+    database, its name and revision in the database or from a local file
+    provide **one** of the arguments ``-i``, ``-r`` or ``-f``
     """
     if db is None:
         group = args.add_mutually_exclusive_group(required=True)

@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <output>VxdCdcValidationHarvested.root</output>
   <input>EvtGenSimNoBkg.root</input>
   <description>This module generates events for the V0 validation.</description>

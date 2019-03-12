@@ -29,17 +29,8 @@ from stdPi0s import *
 from stdV0s import *
 gb2_setuprel = "release-01-00-01"
 
-
-# from fei import backward_compatibility_layer
-# backward_compatibility_layer.pid_renaming_oktober_2017()
-
-# use_central_database('production', LogLevel.WARNING, 'fei_database')
-
-
 # their names in the ntuple are human readable
 from variables import variables
-
-
 variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')
 variables.addAlias('ROE_neextra', 'ROE_neextra(simple)')

@@ -211,6 +211,10 @@ def add_unpackers(path, components=None):
 
         trgeclunpacker = register_module('TRGECLUnpacker')
         path.add_module(trgeclunpacker)
+        trgcdctsfunpacker = register_module('TRGCDCTSFUnpacker')
+        path.add_module(trgcdctsfunpacker)
+        trgcdct3dunpacker = register_module('TRGCDCT3DUnpacker')
+        path.add_module(trgcdct3dunpacker)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):

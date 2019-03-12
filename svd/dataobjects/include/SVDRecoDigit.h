@@ -195,7 +195,7 @@ namespace Belle2 {
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU; /**< True if U, false if V. */
     short m_cellID; /**< Strip coordinate in pitch units. */
-    float m_stripNoise; /**< Noise of the strip, from calibration. */
+    //    float m_stripNoise; /**< Noise of the strip, from calibration. */
     float m_fittedAmplitude; /**< Fitted amplitude of the signal ("charge") */
     float m_fittedAmplitudeError; /** Error estimate of amplitude fit. */
     float m_fittedTime; /** Fitted arrival time of the signal. */
@@ -204,7 +204,7 @@ namespace Belle2 {
     float m_fitChi2Ndf; /** Standardized chi2 of the fit. */
     SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
 
-    ClassDef(SVDRecoDigit, 1)
+    ClassDef(SVDRecoDigit, 2)
 
   }; // class SVDRecoDigit
 

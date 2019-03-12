@@ -439,7 +439,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
             if (cellID > 0 || m_storeUnmapped) {
-              ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
+              ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
               // Add relation from ECLDigit to ECLDsp
               for (auto& newEclDigit : m_eclDigits) {
                 if (newEclDsp->getCellId() == newEclDigit.getCellId()) newEclDigit.addRelationTo(newEclDsp);

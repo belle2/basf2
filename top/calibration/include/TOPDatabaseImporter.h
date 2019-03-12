@@ -53,7 +53,7 @@ namespace Belle2 {
 
     /**
      * Import channel-by-channel T0 calibration constants to database
-     * The input is the root file produced by TOPLaserCalibrator
+     * The input is the root file with ntuple produced by TOPLaserCalibrator
      * @param fileNames file names separated by space (since vector doesn't work!)
      * @param firstExp first experiment number of IOV
      * @param firstRun first run number of IOV
@@ -63,6 +63,18 @@ namespace Belle2 {
     void importLocalT0Calibration(std::string fileNames,
                                   int firstExp = 0, int firstRun = 0,
                                   int lastExp = -1, int lastRun = -1);
+
+
+    /**
+     * Import channel T0 calibration constants
+     * The input is a root file with 1D histograms (one per slot, named "channelT0_slot*")
+     * @param fileName root file name
+     * @param expNo experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importChannelT0(std::string fileName,
+                         int expNo, int firstRun, int lastRun);
 
 
     /**
@@ -78,6 +90,16 @@ namespace Belle2 {
                                    int firstExp = 0, int firstRun = 0,
                                    int lastExp = -1, int lastRun = -1);
 
+    /**
+     * Import module T0 calibration constants
+     * The input is a root file with 1D histogram (name is "moduleT0")
+     * @param fileName root file name
+     * @param expNo experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importModuleT0(std::string fileName,
+                        int expNo, int firstRun, int lastRun);
 
     /**
      * Import common T0 calibration constants derived form the offline data reprocessing to database
@@ -93,6 +115,17 @@ namespace Belle2 {
                                           int firstExp = 0, int firstRun = 0,
                                           int lastExp = -1, int lastRun = -1);
 
+
+    /**
+     * Import common T0 calibration constants
+     * @param value central value of T0
+     * @param error uncertainty on T0
+     * @param expNo experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importCommonT0(double value, double error,
+                        int expNo, int firstRun, int lastRun);
 
     /**
      * Prints sample time calibration info about constants stored in database

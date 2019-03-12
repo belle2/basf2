@@ -33,6 +33,7 @@ TRGCDCT3DUnpackerModule::TRGCDCT3DUnpackerModule()
 
   string desc = "TRGCDCT3DUnpackerModule(" + version() + ")";
   setDescription(desc);
+  setPropertyFlags(c_ParallelProcessingCertified);
   B2INFO("TRGCDCT3DUnpacker: Constructor done.");
 }
 

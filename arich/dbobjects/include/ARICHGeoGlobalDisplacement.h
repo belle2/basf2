@@ -120,17 +120,6 @@ namespace Belle2 {
      */
     double getGamma() const {return m_gamma;}
 
-    /**
-     * Check for consistency of data members
-     * @return true if values consistent (valid)
-     */
-    bool isConsistent() const {return true;}
-
-    /**
-     * Print the content of the class
-     * @param title title to be printed
-     */
-    // void print(const std::string& title = "Module displacement parameters") const;
 
   private:
 

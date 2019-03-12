@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Sample scripts to compute hadron and diode templates                   *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Savino Longo (longos@uvuc.ca)                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include<iostream>
 #include<fstream>
 #include<stdlib.h>
@@ -12,9 +24,6 @@
 using namespace std;
 
 /*
-
-Sample scripts to compute hadron and diode templates by Savino Longo (longos@uvic.ca)
-
 Note photon shape calibrations are needed to compute hadron and diode templates.
 Photon calibrations should be placed in file named params_gamma_shape.dat in same directiory as this script.
 Format of params_gamma_shape.dat:
@@ -42,20 +51,17 @@ recompile with "scons ecl"
 6) execute eclComputePulseTemplates_Step0 1
 7) execute eclWriteWaveformParametersLocalDB
 Final step will create local db object.
-
-
-//
 */
-//
 
+/** a struct to hold relavent Crystal information */
 struct crystalInfo {
-  vector<double> PhotonWaveformPars;
-  vector<double> HadronWaveformPars;
-  vector<double> DiodeWaveformPars;
-  double MaxResHadron;
-  double MaxValHadron;
-  double MaxResDiode;
-  double MaxValDiode;
+  vector<double> PhotonWaveformPars; /**< photon waveform parameters */
+  vector<double> HadronWaveformPars; /**< hadron waveform parameters */
+  vector<double> DiodeWaveformPars;  /**< diode waveform parameters */
+  double MaxResHadron; /**< max. residuals hadron */
+  double MaxValHadron; /**< max. value hadron */
+  double MaxResDiode; /**< max. residuals diode */
+  double MaxValDiode; /**< max. value diode */
 };
 
 int main(int argc, char* argv[])

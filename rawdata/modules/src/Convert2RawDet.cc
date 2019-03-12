@@ -143,8 +143,8 @@ void Convert2RawDetModule::event()
   raw_cprarray.clear();
 
 
-  for (int i = 0; i < cpr_id.size(); i++) {
-    for (int j = i + 1; j < cpr_id.size(); j++) {
+  for (unsigned int i = 0; i < cpr_id.size(); i++) {
+    for (unsigned int j = i + 1; j < cpr_id.size(); j++) {
       //      printf("[DEBUG] eve %d i %d 0x%.8x j %d 0x%.8x\n", m_nevt, i, cpr_id[i], j, cpr_id[j] );
       if (cpr_id[ i ] == cpr_id[ j ]) {
         B2FATAL("Duplicated COPPER object is found. ID=0x" << hex << cpr_id[ i ] << " Exiting...");

@@ -9,6 +9,7 @@ from reconstruction import add_top_modules, add_cdst_output
 # Example of reprocessing cdst files with new TOP calibration constants
 #
 # Note: replace local database name/location before running or comment it out
+#       check the global tag: it must be the same as used in production of input file(s)
 # ---------------------------------------------------------------------------------------
 
 
@@ -27,21 +28,22 @@ class ReplaceTOPLikelihoods(Module):
 
         for track in Belle2.PyStoreArray('Tracks'):
             pid = track.getRelated('PIDLikelihoods')
+            # should unset TOP in PIDLikelihoods first, but such function is not available
             top = track.getRelated('TOPLikelihoods')
             if top and pid:
-                # for chargedStable in Belle2.Const.chargedStableSet: # not working!
-                for chargedStable in chargedStableSet:
-                    logL = top.getLogL(chargedStable)
-                    pid.setLogLikelihood(Belle2.Const.TOP, chargedStable, logL)
+                if top.getFlag() == 1:
+                    for chargedStable in chargedStableSet:
+                        logL = top.getLogL(chargedStable)
+                        pid.setLogLikelihood(Belle2.Const.TOP, chargedStable, logL)
 
 # Database:
 # - replace the name and location of the local DB before running!
+# - payloads are searched for in the reverse order of DB's given below;
+#   therefore the new calibration, if provided, is taken from the local DB.
 # - one can even use several local DB's
-# - payloads are searched for in the reverse order of DB's given below; therefore the new
-#   calibration, if provided, is taken from the local DB.
-use_central_database('development')  # some new stuff not in production tag
+use_central_database('development')  # some new stuff not in prod6 tag
 use_central_database('data_reprocessing_prod6')  # global tag used in production of cdst
-use_local_database('zzTBCdb/localDB/localDB.txt', 'zzTBCdb/localDB/')  # new calibration
+use_local_database('localDB/localDB.txt', 'localDB/')  # new calibration
 
 # Create path
 main = create_path()

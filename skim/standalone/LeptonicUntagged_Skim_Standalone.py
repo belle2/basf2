@@ -19,7 +19,7 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 skimCode = encodeSkimName('LeptonicUntagged')
 
 

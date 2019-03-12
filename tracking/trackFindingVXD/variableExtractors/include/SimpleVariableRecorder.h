@@ -69,7 +69,8 @@ namespace Belle2 {
      *  @param fileName   Name of ROOT file to which should be written.
      *  @param treeName       Name of the TTree in the ROOT file.
      */
-    SimpleVariableRecorder(std::vector<Named<float*>>& namedVariables, std::string fileName, std::string treeName) :
+    SimpleVariableRecorder(std::vector<Named<float*>>& namedVariables, const std::string& fileName,
+                           const std::string& treeName) :
       SimpleVariableRecorder([ & namedVariables](TTree & tree)
     {
       for (auto& variable : namedVariables) {

@@ -111,18 +111,20 @@ def add_mdst_dump(path, print_untested=False):
             }),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
-            "getHypothesisId", "getClusterId", "getMinTrkDistance", "getDeltaL",
+            "getClusterId", "getMinTrkDistance", "getDeltaL",
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
             "getE9oE21", "getClusterHadronIntensity", "getNumberOfHadronDigits",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
-            "getDeltaTime99", "getPhi", "getTheta", "getR", "getEnergy",
+            "getDeltaTime99", "getPhi", "getTheta", "getR", "getHypotheses",
             "getEnergyRaw", "getEnergyHighestCrystal", "getUncertaintyEnergy",
             "getUncertaintyTheta", "getUncertaintyPhi", "getClusterPosition",
             "getCovarianceMatrix3x3", "getDetectorRegion", "getUniqueId",
             "isTriggerCluster", "hasTriggerClusterMatching", "hasPulseShapeDiscrimination",
             "getPulseShapeDiscriminationMVA",
             ], {
-                             "getRelationsWith": ["KlIds", "MCParticles"],
+                "getEnergy": [16, 32],
+                "hasHypothesis": [16, 32],
+                "getRelationsWith": ["KlIds", "MCParticles"],
                              }),
         DataStorePrinter("EventLevelClusteringInfo", [
             "getNECLCalDigitsOutOfTimeFWD", "getNECLCalDigitsOutOfTimeBarrel",

@@ -106,6 +106,12 @@ class PayloadInformation:
     """Small container class to help compare payload information for efficient
     comparison between global tags"""
     def __init__(self, payload, iov):
+        """Set all internal members from the json information of the payload and the iov.
+
+        Arguments:
+            payload (dict): json information of the payload as returned by REST api
+            iov (dict): json information of the iov as returned by REST api
+        """
         #: name of the payload
         self.name = payload['basf2Module']['name']
         #: checksum of the payload
@@ -113,7 +119,7 @@ class PayloadInformation:
         #: interval of validity
         self.iov = iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]
         #: revision, not used for comparisons
-        self.rev = payload["revision"]
+        self.revision = payload["revision"]
         #: payload id in CDB, not used for comparisons
         self.payload_id = payload["payloadId"]
         #: iov id in CDB, not used for comparisons
@@ -129,7 +135,7 @@ class PayloadInformation:
 
     def __lt__(self, other):
         """Sort payloads by name, iov, revision"""
-        return (self.name.lower(), self.iov, self.rev) < (other.name.lower(), other.iov, other.rev)
+        return (self.name.lower(), self.iov, self.revision) < (other.name.lower(), other.iov, other.revision)
 
     def readable_iov(self):
         """return a human readable name for the IoV"""
@@ -147,7 +153,11 @@ class PayloadInformation:
             else:
                 return f"exp {e1}, runs {r1} - {r2}"
         else:
-            if r1 == 0 and r2 == -1:
+            if e2 == -1 and r1 == 0:
+                return f"exp {e1} - forever"
+            elif e2 == -1:
+                return f"exp {e1}, run {r1} - forever"
+            elif r1 == 0 and r2 == -1:
                 return f"exp {e1}-{e2}, all runs"
             elif r2 == -1:
                 return f"exp {e1}, run {r1} - exp {e2}, all runs"

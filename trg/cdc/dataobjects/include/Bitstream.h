@@ -1,7 +1,21 @@
 #pragma once
 #include <TObject.h>
+#include <bitset>
+
+#define MERGER_WIDTH 256
+#define NUM_MERGER 146
+#define TSF_TO_2D_HALF_WIDTH 219
+#define TSF_TO_2D_WIDTH 429
+#define NUM_2D 4
+#define NUM_TSF 5
+#define T2D_TO_3D_WIDTH 747
+#define NN_IN_WIDTH 982
+#define NN_OUT_WIDTH 570
+
 
 namespace Belle2 {
+
+  class CDCTriggerUnpackerModule;
 
   /**
    * Class to hold one clock cycle of raw bit content
@@ -26,6 +40,10 @@ namespace Belle2 {
    */
   template <typename SignalBus>
   class Bitstream : public TObject {
+    friend class CDCTriggerUnpackerModule;
+    friend class Merger;
+    friend class Tracker2D;
+    friend class Neuro;
   public:
     /** default constructor */
     Bitstream() {};
@@ -40,7 +58,7 @@ namespace Belle2 {
     ~Bitstream() { };
 
     // accessors
-    SignalBus signal()
+    const SignalBus& signal()
     {
       return m_signal;
     }
@@ -49,7 +67,7 @@ namespace Belle2 {
     SignalBus m_signal;
 
     //! Needed to make the ROOT object storable
-    ClassDef(Bitstream, 1);
+    ClassDef(Bitstream, 3);
   };
 
 }

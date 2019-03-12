@@ -23,7 +23,7 @@ from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 from skimExpertFunctions import setSkimLogging, encodeSkimName, add_skim
 fileList = [

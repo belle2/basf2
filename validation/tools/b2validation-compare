@@ -43,11 +43,21 @@ if __name__ == '__main__':
         In the end it will show the results of the validation in your browser.
     """)
 
-    parser.add_argument("revision", nargs="+", help="Which revisions to compare. Give the git hashes here.")
-    parser.add_argument("--compile-options", help="Options passed to scons when compiling",
-                        default="")
-    parser.add_argument("--validation-options", help="Options passed to b2validation when running",
-                        default="--use-cache")
+    parser.add_argument(
+        "revision",
+        nargs="+",
+        help="Which revisions to compare. Give the git hashes here."
+    )
+    parser.add_argument(
+        "--compile-options",
+        help="Options passed to scons when compiling",
+        default=""
+    )
+    parser.add_argument(
+        "--validation-options",
+        help="Options passed to b2validation when running",
+        default="--use-cache"
+    )
 
     args = parser.parse_args()
     revisions = args.revision

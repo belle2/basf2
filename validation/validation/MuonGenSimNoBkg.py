@@ -11,10 +11,11 @@
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics, \
+    register_module
 from simulation import add_simulation
 from beamparameters import add_beamparameters
-import glob
+from validation import statistics_plots, event_timing_plot
 
 set_random_seed(12345)
 
@@ -55,9 +56,16 @@ process(main)
 # Print call statistics
 print(statistics)
 
-from validation import *
-statistics_plots('MuonGenSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with generic MuonGenSimNoBkg events', prefix='MuonGenSimNoBkg')
-event_timing_plot('../MuonGenSimNoBkg.root', 'MuonGenSimNoBkg_statistics.root',
-                  contact='tkuhr',
-                  jobDesc='a standard simulation job with Muon events', prefix='MuonGenSimNoBkg')
+statistics_plots(
+    'MuonGenSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with generic MuonGenSimNoBkg events',
+    prefix='MuonGenSimNoBkg'
+)
+event_timing_plot(
+    '../MuonGenSimNoBkg.root',
+    'MuonGenSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with Muon events',
+    prefix='MuonGenSimNoBkg'
+)

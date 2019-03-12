@@ -76,7 +76,7 @@ using namespace Belle2;
 //
 //
 TrgEclMaster::TrgEclMaster():
-  TimeWindow(375.0), OverlapWindow(0.0), _Clustering(0), _Bhabha(0), _EventTiming(1), _NofTopTC(3), _ClusterLimit(6), _Lowmultibit(0)
+  TimeWindow(250.0), OverlapWindow(0.0), _Clustering(1), _Bhabha(0), _EventTiming(1), _NofTopTC(3), _ClusterLimit(6), _Lowmultibit(0)
 {
 
   TCEnergy.clear();
@@ -210,7 +210,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
   }
   //
   //
-  int nBin = 8000 / (TimeWindow / 3) ; //8000/125
+  int nBin = 8000 / (TimeWindow / 2) ; //8000/125
   double WindowStart = 0;
   double WindowEnd = 0;
   double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;

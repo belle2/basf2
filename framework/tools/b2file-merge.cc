@@ -41,7 +41,8 @@ int main(int argc, char* argv[])
   ("output,o", po::value<std::string>(&outputfilename), "output file name")
   ("file", po::value<std::vector<std::string>>(&inputfilenames), "filename to merge")
   ("force,f", "overwrite existing file")
-  ("no-catalog", "don't register output file in file catalog")
+  ("no-catalog", "don't register output file in file catalog, This is now the default")
+  ("add-to-catalog", "register the output file in the file catalog")
   ("quiet,q", "if given don't print infos, just warnings and errors");
   po::positional_options_description positional;
   positional.add("output", 1);
@@ -353,9 +354,10 @@ The following restrictions apply:
   outputEventTree->Write();
   B2INFO("Done processing events");
 
-  // add it to the file catalog. This also modifies the LFN in the FileMetaData
-  // so we do it before writing the persistent tree
-  if(variables.count("no-catalog")==0) {
+  // we need to set the LFN to the absolute path name
+  outputMetaData->setLfn(fs::absolute(outputfilename, fs::initial_path()).string());
+  // and maybe register it in the file catalog
+  if(variables.count("add-to-catalog")>0) {
     FileCatalog::Instance().registerFile(outputfilename, *outputMetaData);
   }
   B2INFO("Writing FileMetaData");

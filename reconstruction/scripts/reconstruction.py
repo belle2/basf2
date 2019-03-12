@@ -296,6 +296,7 @@ def add_cdst_output(
         'ECLCalDigits',
         'TRGECLClusters',
         'TRGECLUnpackerStores',
+        'TRGECLUnpackerEvtStores',
         'BKLMHit2ds',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
@@ -307,7 +308,12 @@ def add_cdst_output(
         'TracksToMuids',
         'ARICHDigits',
         'ARICHInfo',
-        'ARICHTracks'
+        'ARICHTracks',
+        'SoftwareTriggerVariables',
+        'BKLMDigits',
+        'BKLMHit1ds',
+        'BKLMHit2dsToBKLMHit1ds',
+        'BKLMHit1dsToBKLMDigits'
     ]
     if dataDescription is None:
         dataDescription = {}

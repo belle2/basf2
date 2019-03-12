@@ -81,6 +81,36 @@ namespace Belle2 {
         return module.momentumToLocal(momentum); // TVector3
       }
 
+      // helper function to compute the TOF for an arbitrary hypothesis
+      double computeTOF(const Particle* particle, int pdg)
+      {
+        const auto* extHit = getExtHit(particle);
+        if (not extHit) return 0;
+        auto extPDGCode = abs(extHit->getPdgCode());
+        double pmom = particle->getMomentumMagnitude();
+        double massExtHit = Const::ChargedStable(extPDGCode).getMass();
+        double betaExtHit = pmom / sqrt(pmom * pmom + massExtHit * massExtHit);
+        double mass = pdg == 0 ? particle->getMass() : Const::ChargedStable(abs(pdg)).getMass();
+        double beta = pmom / sqrt(pmom * pmom + mass * mass);
+        return extHit->getTOF() * betaExtHit / beta;
+      }
+
+      // returns the time of flight from the origin to the TOP
+      double getTOF(const Particle* particle)
+      {
+        return computeTOF(particle, 0);
+      }
+
+      // returns the time of flight from the origin to the TOP under a given hypothesis
+      double getTOFExpert(const Particle* particle, const vector<double>& vars)
+      {
+        if (vars.size() != 1) {
+          B2FATAL("Need exactly one parameter (pdg id).");
+        }
+        int pdg = static_cast<int>(vars[0]);
+        return computeTOF(particle, pdg);
+      }
+
       // counts the number of photons in the TOP in a given time frame
       // if tmin < 0, count from the time of the first photon
       int countHits(const Particle* particle, double tmin, double tmax, bool clean)
@@ -351,6 +381,49 @@ namespace Belle2 {
         }
         return TOPVariable::countRawHits(particle, vars[0], vars[1]);
       }
+
+      double getFlag(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getFlag();
+      }
+
+      double getElectronLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_e();
+      }
+
+      double getMuonLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_mu();
+      }
+
+      double getPionLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_pi();
+      }
+
+      double getKaonLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_K();
+      }
+
+      double getProtonLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_p();
+      }
+
       //---------------- TOPRecBunch related --------------------
 
       //! @returns whether the rec bunch is reconstructed
@@ -451,6 +524,10 @@ namespace Belle2 {
                       "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
     REGISTER_VARIABLE("topLocalTheta", TOPVariable::getTOPLocalTheta,
                       "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
+    REGISTER_VARIABLE("topTOF", TOPVariable::getTOF,
+                      "[calibration] The time of flight from the origin to the TOP");
+    REGISTER_VARIABLE("topTOFExpert(pdg)", TOPVariable::getTOFExpert,
+                      "[calibration] The time of flight from the origin to the TOP under the given hypothesis");
     REGISTER_VARIABLE("topSlotID", TOPVariable::getSlotID,
                       "[calibration] The ID of the TOP slot that was hit by the particle");
     REGISTER_VARIABLE("topExpectedPhotonCount(pdg)", TOPVariable::getExpectedTOPPhotonCount,
@@ -463,6 +540,18 @@ namespace Belle2 {
                       "[calibration] The number of photons in the first 20 ns after the first photon");
     REGISTER_VARIABLE("countRawTOPHitsInInterval(tmin, tmax)", TOPVariable::countRawTOPHitsInInterval,
                       "[calibration] The number of photons in the given interval");
+    REGISTER_VARIABLE("topFlag", TOPVariable::getFlag,
+                      "[calibration] reconstruction flag, log likelihoods are valid if flag==1");
+    REGISTER_VARIABLE("topElectronLogL", TOPVariable::getElectronLogL,
+                      "[calibration] electron log likelihood");
+    REGISTER_VARIABLE("topMuonLogL", TOPVariable::getMuonLogL,
+                      "[calibration] muon log likelihood");
+    REGISTER_VARIABLE("topPionLogL", TOPVariable::getPionLogL,
+                      "[calibration] pion log likelihood");
+    REGISTER_VARIABLE("topKaonLogL", TOPVariable::getKaonLogL,
+                      "[calibration] kaon log likelihood");
+    REGISTER_VARIABLE("topProtonLogL", TOPVariable::getProtonLogL,
+                      "[calibration] proton log likelihood");
     REGISTER_VARIABLE("topRecBunchUsedTrackCount", TOPVariable::TOPRecBunchUsedTrackCount,
                       "[calibration] The number of tracks used in the bunch reconstruction");
     REGISTER_VARIABLE("topRecBunchTrackCount", TOPVariable::TOPRecBunchTrackCount,

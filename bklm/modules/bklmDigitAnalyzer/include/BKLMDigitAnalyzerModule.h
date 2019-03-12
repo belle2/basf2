@@ -22,6 +22,7 @@
 #include <bklm/dataobjects/BKLMDigitEventInfo.h>
 
 #include "TFile.h"
+#include "TTree.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TList.h"
@@ -31,6 +32,7 @@
 
 #include <sstream>
 #include <string>
+#include <time.h>
 
 namespace Belle2 {
 
@@ -85,6 +87,9 @@ namespace Belle2 {
     //! Pointer to ROOT output file
     TFile* m_outputRootFile;
 
+    //! Pointer to ROOT tree with extra info
+    TTree* m_extraInfo;
+
     //! Pointer to ROOT list of histograms
     TList* m_histoList;
 
@@ -99,6 +104,9 @@ namespace Belle2 {
 
     //! Pointer to occupancy 2D histogram of each channel
     TH2F* m_histoChannel[2][8][2];
+
+    //! Pointer to occupancy 2D histogram of each strip
+    TH2F* m_histoStrip[2][8][2];
 
     //! Pointer to TDC 1D histogram of each channel for each sector and view
     TH1F* m_histoTdc[2][8][2];

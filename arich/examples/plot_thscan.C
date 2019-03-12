@@ -1,4 +1,4 @@
-/*
+TCanvas/*
  * Plots histograms from ARICHRateCal module
  * run as: "root -l histogram_file.root plot_thscan.C"
  * By: Tomoyuki Konno
@@ -22,9 +22,8 @@ void plot_thscan(){
   for (int i = 0; i< 100; i++) {
     TH1F* h = (TH1F*)_file0->Get(Form("h_rate2D_%d", i));
     if (h!=NULL && h->GetEntries() > 0) {
-      TCanvas* c = NULL;
       std::string cname = Form("c_rate2D_%d",i);
-      c = newTCanvas(cname.c_str(), 720, 560);
+      TCanvas* c = newTCanvas(cname.c_str(), 720, 560);
       //c->SetGrid();
       //c->SetGridx();
       //c->SetGridy();

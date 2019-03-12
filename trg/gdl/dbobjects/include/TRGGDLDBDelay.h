@@ -30,7 +30,7 @@ namespace Belle2 {
     /** Default constructor */
     TRGGDLDBDelay(): m_ninbit{0}, m_delay{0} {}
     /** copy constructor */
-    TRGGDLDBDelay(const TRGGDLDBDelay& b)
+    TRGGDLDBDelay(const TRGGDLDBDelay& b): TObject(b)
     {
       m_ninbit = b.m_ninbit;
       for (int i = 0; i < 320; i++) {

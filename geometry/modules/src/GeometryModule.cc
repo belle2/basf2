@@ -92,11 +92,6 @@ void GeometryModule::initialize()
     return;
   }
 
-  // Add a warning because we changed behavior. FIXME: To be removed after release-03-00-00
-  if (!getParam<bool>("useDB").isSetInSteering()) {
-    B2WARNING("Geometry is now loaded from the database by default. Please check your script to make sure this is what you want");
-  }
-
   if (m_useDB) {
     if (getParam<std::string>("geometryPath").isSetInSteering()) {
       B2WARNING("Loading Geometry from Database: parameter 'geometryPath' is ignored");

@@ -39,6 +39,7 @@ def create_testfile_direct(name, metadata=None, release="test_release", user="te
 
     if seed is not None:
         metadata.setRandomSeed(seed)
+    metadata.setLfn(name)
     metadata.setCreationData("the most auspicious of days for testing", site, user, release)
     metadata.setDatabaseGlobalTag(global_tag)
     metadata.setSteering(steering)
@@ -73,7 +74,7 @@ def merge_files(*args, output="output.root", filter_modified=False):
       filter_modified: if True omit warnings that the release is modified and
           consistency cannot be checked
     """
-    process = subprocess.run(["merge_basf2_files", "-q", output] + list(args), stdout=subprocess.PIPE)
+    process = subprocess.run(["b2file-merge", "-q", output] + list(args), stdout=subprocess.PIPE)
     # do we want to filter the modified release warning?
     if filter_modified:
         # if so replace them using regular expression

@@ -93,7 +93,6 @@ namespace Belle2 {
     }
     B2DEBUG(100, "TRGECLFAMModule ... created");
     Threshold.clear();
-    Threshold.resize(576, 0);
   }
 //
 //

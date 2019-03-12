@@ -15,12 +15,12 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/LogSystem.h>
-#include <trg/gdl/dbobjects/TRGGDLDBPrescales.h>
-#include <trg/gdl/dbobjects/TRGGDLDBFTDLBits.h>
-#include <trg/gdl/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBPrescales.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBBadrun.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
 #include <trg/gdl/dbobjects/TRGGDLDBDelay.h>
-#include <trg/gdl/dbobjects/TRGGDLDBBadrun.h>
 #include <iostream>
 #include <fstream>
 //#include <TFile.h>
@@ -33,9 +33,10 @@ void setprescale()
 {
 
   const int N_BITS_RESERVED = 320;
-  const int N_PSNM_ARRAY = 10;
+  const int N_PSNM_ARRAY = 11;
 
   const int run[N_PSNM_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
+    0, 0,   -1, -1,
     0, 0,    3, 107,
     3, 108,  3, 295,
     3, 296,  3, 1511,
@@ -45,15 +46,21 @@ void setprescale()
     3, 2001, 3, 2313,
     3, 2314, 3, 3503,
     3, 3504, 3, 5340,
-    3, 5341, 10, 0
+    3, 5341, 4, 0
   };
 
-  const int nbit[N_PSNM_ARRAY] = {18, 44, 63, 63, 63,
-                                  72, 75, 75, 75, 75
+  const int nbit[N_PSNM_ARRAY] = { 0, 18, 44, 63, 63,
+                                   63, 72, 75, 75, 75,
+                                   75
                                  };
 
   const unsigned
   psnmValues[N_PSNM_ARRAY][N_BITS_RESERVED] = {
+    // -1
+    {
+      0
+    },
+
     // 0
     // psn_0055 r59-
     {
@@ -174,6 +181,8 @@ void setprescale()
       1, 0, 20, 1, 1, 1, 1, 1, 1, 1,
       1, 1, 1, 1, 1
     }
+
+
   };
 
 
@@ -203,18 +212,21 @@ void setftdlbits()
 {
 
   const int N_BITS_RESERVED = 320;
-  const int N_OUTPUT_ARRAY = 5;
+  const int N_OUTPUT_ARRAY = 6;
 
   const int run[N_OUTPUT_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
-    0, 0,    3, 291,
+    0,    0, -1,  -1,
+    0, 0,    3,  291,
     3, 292,  3, 1314,
     3, 1315, 3, 1511,
     3, 1512, 3, 5313,
-    3, 5314, 10,    0
+    3, 5314, 10,   0
   };
 
-  const int nbit[N_OUTPUT_ARRAY]     = {62, 63, 67, 75, 88};
-  const int nbit_temp[N_OUTPUT_ARRAY] = {62, 63, 67, 75, 88 + 4};
+  const int nbit[N_OUTPUT_ARRAY]      = {62, 62, 63, 67, 75, 88,
+                                        };
+  const int nbit_temp[N_OUTPUT_ARRAY] = {62, 62, 63, 67, 75, 88 + 4,
+                                        };
 
   const char*
   outputBitNames[N_BITS_RESERVED] = {
@@ -232,6 +244,18 @@ void setftdlbits()
 
   const int
   outputMap[N_OUTPUT_ARRAY][N_BITS_RESERVED] = {
+
+    // -1
+    {
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+      60, 61
+    },
+
 
     // 0
     // 62 bit. gdl0065c
@@ -326,19 +350,22 @@ void setinputbits()
 {
 
   const int N_BITS_RESERVED = 320;
-  const int N_INPUT_ARRAY = 5;
+  const int N_INPUT_ARRAY = 6;
 
   const int run[N_INPUT_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
+    0, 0,    -1,  -1,
     0, 0,    3, 1314,
     3, 1315, 3, 1865,
     3, 1866, 3, 5313,
     3, 5314, 3, 5593,
-    3, 5594, 10,    0
+    3, 5594, 10,   0
   };
 
 
-  const int nbit[N_INPUT_ARRAY]     = {80, 87,  89, 109,  111};
-  const int nbit_temp[N_INPUT_ARRAY] = {80, 87 + 2, 89, 109 + 3, 111 + 3};
+  const int nbit[N_INPUT_ARRAY]      = { 80, 80, 87,  89, 109,  111,
+                                       };
+  const int nbit_temp[N_INPUT_ARRAY] = { 80, 80, 87 + 2, 89, 109 + 3, 111 + 3,
+                                       };
 
   const char*
   inputBitNames[N_BITS_RESERVED] = {
@@ -358,6 +385,19 @@ void setinputbits()
 
   const int
   inputMap[N_INPUT_ARRAY][N_BITS_RESERVED] = {
+    //-1
+    {
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+      20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+      30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+      40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+      50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+      60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+      70, 71, 72, 73, 74, 75, 76, 77, 78, 79
+    },
+
+    //0
     {
       0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
       10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -435,6 +475,8 @@ void setinputbits()
       103, 104, 105, 106
     },
 
+
+
   };
 
 
@@ -460,38 +502,46 @@ void setunpacker()
 {
 
   const int N_LEAF = 320;
-  const int N_UNPACKER_ARRAY = 7;
+  const int N_UNPACKER_ARRAY = 10;
 
   const int run[N_UNPACKER_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
+    0,    0, -1,  -1,
     0,    0, 3,  528,
     3,  529, 3,  676,
     3,  677, 3, 1314,
     3, 1315, 3, 1865,
     3, 1866, 3, 4790,
     3, 4791, 3, 5313,
-    3, 5314, 10,    0
+    3, 5314, 4, 6379,
+    4, 6380, 4, 7433,
+    4, 7434, 10,   0
   };
 
   /** num of leafs in data_b2l **/
   const int nLeafs[N_UNPACKER_ARRAY] = {
-    37, 27, 26, 26, 26, 31, 32
+    37, 37, 27, 26, 26,
+    26, 31, 32, 31, 32
   };
   /** num of leafs for others **/
   const int nLeafsExtra[N_UNPACKER_ARRAY] = {
-    8, 9, 11, 11, 11, 11, 11
+    8,   8,  9, 11, 11,
+    11, 11, 11, 11, 11
   };
   /** num of clk time window **/
   const int nClks[N_UNPACKER_ARRAY] = {
-    48, 48, 48, 48, 32, 32, 32
+    48, 48, 48, 48, 48,
+    32, 32, 32, 32, 32
   };
   /** num of bits **/
   const int nBits[N_UNPACKER_ARRAY] = {
-    640, 640, 640, 640, 640, 640, 640
+    640, 640, 640, 640, 640,
+    640, 640, 640, 640, 640
   };
 
   /** num of inputleafmap raw **/
   const int nrows[N_UNPACKER_ARRAY] = {
-    45, 51, 52, 52, 52, 57, 61
+    45, 45, 51, 52, 52,
+    52, 57, 61, 61, 61
   };
 
 
@@ -516,6 +566,19 @@ void setunpacker()
 
   const int
   inputleafMap[N_UNPACKER_ARRAY][N_LEAF] = {
+    {
+      //-1
+      0, 1, 2, 3, 4,
+      5, 6, 7, 8, 9,
+      10, 11, 12, 13, 14,
+      15, 16, 17, 18, 19,
+      20, 21, 22, 23, 24,
+      25, 26, 27, 28, 29,
+      30, 31, 32, 33, 34,
+      35, 36, 37, 38, 39,
+      40, 41, 42, 43, 44
+    },
+
     {
       //0
       0, 1, 2, 3, 4,
@@ -620,12 +683,89 @@ void setunpacker()
       22, 36, 3, 4, 5,
       6, 7, 16, 23, 27,
       28
+    },
+
+    {
+      //7
+      -1, -1,  1,  2, -1,
+      37, -1, -1,  9, -1,
+      12, 13, 14,  8, -1,
+      -1, -1, 15, 10,  0,
+      36, 25, 19, 20, -1,
+      -1, -1, 21, 26, 11,
+      27, 28, 29, 30, -1,
+      -1, -1, 31, 32, 33,
+      34, 38, 39, 40, 41,
+      -1, -1, -1, 22, 23,
+      -1, 35,  3,  4,  5,
+      6,   7, 18, 24, 16,
+      17
+    },
+
+    {
+      //8
+      -1, -1, 1, 2, -1,
+      38, -1, -1, 9, -1,
+      12, 13, 14, 8, -1,
+      -1, -1, 15, 10, 0,
+      37, 24, 17, 18, -1,
+      -1, -1, 19, 25, 11,
+      26, 29, 30, 31, -1,
+      -1, -1, 32, 33, 34,
+      35, 39, 40, 41, 42,
+      -1, -1, -1, 20, 21,
+      22, 36, 3, 4, 5,
+      6, 7, 16, 23, 27,
+      28
     }
 
   };
 
   /** bus bit map. (a downto a-b) **/
   const int BitMap[N_UNPACKER_ARRAY][N_LEAF][2] = {
+
+    {
+      //-1
+      639, 31, // etffmv
+      575, 10, // l1rvc
+      564, 2,  // timtype
+      561, 2,  // etyp
+      558, 0,  // final
+      557, 0,  // gdll1rvc
+      538, 12, // etfout
+      525, 0,  // etfvd
+      524, 14, // toprvc
+      480, 0,  // topvd
+      498, 17, // toptiming
+      479, 13, // ecltiming (lsb1ns)
+      465, 12, // cdctiming (lsb2ns)
+      447, 14, // rvcout
+      432,  0, // rvcout0
+      431, 11, // comrvc
+      419, 11, // etnrvc
+      407, 11, // nim0rvc
+      395, 11, // eclrvc
+      383, 11, // rvc
+      371, 11, // drvc
+      355, 15, // ftd2
+      339, 15, // psn2. Empty for 65c.
+      323, 15, // psn1.
+      307, 7,  // etfth2
+      299, 7,  // etfhdt
+      291, 3,  // etfth
+      287, 31, // psn0
+      255, 15, // ftd1
+      234, 10, // cdcrvc
+      223, 31, // ftd0
+      191, 31, // itd2
+      159, 31, // itd1
+      127, 31, // itd0
+      95,  31, // inp2
+      63,  31, // inp1
+      31,  31, // inp0
+    },
+
+
     {
       //0
       639, 31, // etffmv
@@ -857,24 +997,117 @@ void setunpacker()
       95, 31, // itd2
       63, 31, // itd1
       31, 31, // itd0
+    },
+
+    {
+      //7
+      623, 11, // rvc
+      611, 2,  // timtype
+      608, 2,  // etyp
+      603, 2,  // tttmdl
+      600, 1,  // tdsrcp
+      599, 1,  // tdtopp
+      598, 1,  // tdeclp
+      597, 1,  // tdcdcp
+      583, 14, // rvcout
+
+      557, 10, // toprvc
+      546, 10, // eclrvc
+      535, 10, // cdcrvc
+      524, 13, // toptiming
+      509, 13, // ecltiming
+      494, 13, // cdctiming
+      479, 10, // nim0rvc
+      468, 15, // itd4
+      452, 31, // itd3
+      415, 31, // psn3
+      383, 31, // psn2
+      351, 31, // psn1
+      319, 31, // psn0
+
+      287, 31, // topslot1
+      255, 31, // topslot0
+      223, 31, // ftd3
+      191, 31, // ftd2
+      159, 31, // ftd1
+      127, 31, // ftd0
+      95, 31, // itd2
+      63, 31, // itd1
+      31, 31, // itd0
+    },
+
+    {
+      //8
+      623, 11, // rvc
+      611, 2,  // timtype
+      608, 2,  // etyp
+      603, 2,  // tttmdl
+      600, 3,  // tdsrcp
+      596, 2,  // tdtopp
+      593, 2,  // tdeclp
+      590, 2,  // tdcdcp
+      583, 14, // rvcout
+      557, 10, // toprvc
+      546, 10, // eclrvc
+      535, 10, // cdcrvc
+      524, 13, // toptiming
+      509, 13, // ecltiming
+      494, 13, // cdctiming
+      479, 10, // nim0rvc
+      415, 31, // psn3
+      383, 31, // psn2
+      351, 31, // psn1
+      319, 31, // psn0
+      287, 31, // topslot1
+      255, 31, // topslot0
+      223,  4, // ntopslot
+      218, 26, // ftd3
+      191, 31, // ftd2
+      159, 31, // ftd1
+      127, 31, // ftd0
+      468, 15, // itd4
+      452, 31, // itd3
+      95, 31, // itd2
+      63, 31, // itd1
+      31, 31, // itd0
     }
+
+
   };
 
   int m_nword_header[N_UNPACKER_ARRAY] {
-    3, 4, 6, 6, 6, 6, 6
+    3, 3, 4, 6, 6,
+    6, 6, 6, 6, 6
   };
   int m_conf[N_UNPACKER_ARRAY] {
-    0, 1, 2, 3, 4, 5, 6
+    0, 0, 1, 2, 3,
+    4, 5, 6, 7, 6
   };
   int m_nword_input[N_UNPACKER_ARRAY] {
-    3, 3, 3, 3, 3, 3, 5
+    3, 3, 3, 3, 3,
+    3, 3, 5, 5, 5
   };
   int m_nword_output[N_UNPACKER_ARRAY] {
-    3, 3, 3, 3, 3, 3, 3
+    3, 3, 3, 3, 3,
+    3, 3, 3, 3, 3
   };
 
   const int BitMap_extra[N_UNPACKER_ARRAY][N_LEAF][3] = {
     {
+      //-1
+      -1, -1, -1, //evt
+      -1, -1, -1, //clk
+      0, -1, -1, //firmid
+      1, -1, -1, //firmver
+      2,  0, 12, //coml1rvc
+      2, 12,  9, //b2ldly
+      2, 21, 11, //maxrvc
+      -1, -1, -1  //conf
+    },
+
+
+    {
+      //0
       -1, -1, -1, //evt
       -1, -1, -1, //clk
       0, -1, -1, //firmid
@@ -886,6 +1119,7 @@ void setunpacker()
     },
 
     {
+      //1
       -1, -1, -1, //evt
       -1, -1, -1, //clk
       0, -1, -1, //firmid
@@ -898,6 +1132,7 @@ void setunpacker()
     },
 
     {
+      //2
       -1, -1, -1, //evt
       -1, -1, -1, //clk
       0, -1, -1, //firmid
@@ -912,6 +1147,7 @@ void setunpacker()
     },
 
     {
+      //3
       -1, -1, -1, //evt
       -1, -1, -1, //clk
       0, -1, -1, //firmid
@@ -926,6 +1162,7 @@ void setunpacker()
     },
 
     {
+      //4
       -1, -1, -1, //evt
       -1, -1, -1, //clk
       0, -1, -1, //firmid
@@ -940,6 +1177,7 @@ void setunpacker()
     },
 
     {
+      //5
       -1, -1, -1, //evt
       -1, -1, -1, //clk
       0, -1, -1, //firmid
@@ -954,6 +1192,37 @@ void setunpacker()
     },
 
     {
+      //6
+      -1, -1, -1, //evt
+      -1, -1, -1, //clk
+      0, -1, -1, //firmid
+      1, -1, -1, //firmver
+      3, 11, 11, //drvc
+      2,  0, 11, //finalrvc
+      3,  0, 11, //gdll1rvc
+      5,  0, 12, //coml1rvc
+      5, 12,  9, //b2ldly
+      5, 21, 11, //maxrvc
+      -1, -1, -1  //conf
+    },
+
+    {
+      //7
+      -1, -1, -1, //evt
+      -1, -1, -1, //clk
+      0, -1, -1, //firmid
+      1, -1, -1, //firmver
+      3, 11, 11, //drvc
+      2,  0, 11, //finalrvc
+      3,  0, 11, //gdll1rvc
+      5,  0, 12, //coml1rvc
+      5, 12,  9, //b2ldly
+      5, 21, 11, //maxrvc
+      -1, -1, -1  //conf
+    },
+
+    {
+      //8
       -1, -1, -1, //evt
       -1, -1, -1, //clk
       0, -1, -1, //firmid
@@ -1016,9 +1285,10 @@ void setunpacker()
 void setdelay()
 {
 
-  const int N_DELAY_ARRAY = 31;
+  const int N_DELAY_ARRAY = 32;
 
   const int run[N_DELAY_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
+    0,    0, -1,  -1,
     //0,    0, 3,   63,
     //0,  108, 3,  480,
     0,    0, 3,  480,
@@ -1051,10 +1321,11 @@ void setdelay()
     3, 5557, 3, 5592,
     3, 5594, 3, 5869,
     3, 5870, 3, 5959,
-    3, 5975, 10,    0
+    3, 5975, 4,   0
   };
 
   const int data_num[N_DELAY_ARRAY] = {
+    -1,
     //29,
     //30,
     30,
@@ -1118,9 +1389,10 @@ void setdelay()
 void setbadrun()
 {
 
-  const int N_BADRUN_ARRAY = 12;
+  const int N_BADRUN_ARRAY = 13;
 
   const int run[N_BADRUN_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
+    0, 0,   -1,   -1, // 0
     0, 0,    3, 3526, // 1
     3, 3527, 3, 3623, //-1
     3, 3624, 3, 3769, // 1
@@ -1132,13 +1404,13 @@ void setbadrun()
     3, 5247, 3, 5313, // 1
     3, 5314, 3, 5326, //-1
     3, 5327, 3, 6000, // 1
-    3, 6001, 10, 0    // 0
+    3, 6001, 10,   0  // 0
   };
 
   int flag[N_BADRUN_ARRAY] = {
-    1, -1, 1, -1, 1,
-    -1, 1, -1, 1, -1,
-    1, 0
+    0, 1, -1, 1, -1,
+    1, -1, 1, -1,  1,
+    -1, 1, 0
   };
 
   DBImportObjPtr<TRGGDLDBBadrun> badrun;

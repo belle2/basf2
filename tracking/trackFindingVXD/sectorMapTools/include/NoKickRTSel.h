@@ -76,7 +76,7 @@ namespace Belle2 {
     TTree* m_noKickTree; /**< TTree to which the information is written */
 
     /** Constructor with input file for use specific cuts file and allows validation */
-    NoKickRTSel(std::string fileName, bool outputHisto) :
+    NoKickRTSel(const std::string& fileName, bool outputHisto) :
       m_trackCuts(fileName)
     {
       m_outputFlag = false;

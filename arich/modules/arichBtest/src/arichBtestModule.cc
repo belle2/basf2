@@ -72,7 +72,7 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
 
-  arichBtestModule::arichBtestModule() : Module(), m_end(0), m_events(0), m_file(NULL), m_mwpc(NULL)
+  arichBtestModule::arichBtestModule() : Module(), m_end(0), m_events(0), m_file(NULL), m_timestart(0), m_mwpc(NULL)
   {
     //Set module properties
     setDescription("Module for the ARICH Beamtest data analysis. It creates track form the MWPC hits and reads the HAPD hits");
@@ -235,14 +235,14 @@ namespace Belle2 {
           if (print1290) printf("Global Trailer  0x%08x %u.data  STATUS=0x%03x nhits=%u\n", dbuf[i], i, (dbuf[i] >> 24) & 0x7, nhits);
 
           if (nhits != len) {
-            if (print1290) printf("V1290 nhits!=len %u %d\n", nhits, len);
+            if (print1290) printf("V1290 nhits!=len %u %u\n", nhits, len);
           };
           break;
         case 0x11:  // Global Trigger TimeTag
           if (print1290) printf("Global Trigger TimeTag  0x%08x %u.data\n", dbuf[i], i);
           break;
         case 0x1:   // TDC header
-          if (print1290) printf("TDC header  0x%08x %u.data evid=%d wc=%d\n", dbuf[i], i, (dbuf[i] >> 12) & 0xFFF, dbuf[i] & 0xFFF);
+          if (print1290) printf("TDC header  0x%08x %u.data evid=%d wc=%u\n", dbuf[i], i, (dbuf[i] >> 12) & 0xFFF, dbuf[i] & 0xFFF);
 
           break;
         case 0x3:   // TDC trailer
@@ -489,7 +489,7 @@ namespace Belle2 {
     BeginRec beginrec;
     BeginRec endrec;
     static char msg[1024];
-    int len, type;
+    int type;
 
     const int sint = sizeof(unsigned int);
     do {
@@ -515,13 +515,10 @@ namespace Belle2 {
     m_events++;
 
     type = hdr[0];
-    len  = hdr[1];
+    //   len  = hdr[1];
     int print = 0;
-    if (print) {
-      sprintf(msg, "type = %d, len = %d sint=%d", type, len , sint);
-      B2INFO(msg);
-    }
-    gzseek(m_fp, -2 * sizeof(unsigned int), SEEK_CUR);
+
+    gzseek(m_fp, 2 * sizeof(unsigned int), SEEK_CUR);
     switch (type) {
       case BEGIN_RECORD_TYPE: {
         gzread(m_fp, &beginrec, sizeof(beginrec));

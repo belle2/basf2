@@ -38,9 +38,6 @@ Modules
 
 * Removal of the unsupported ECLClusterInfoModule.
 
-* The module buildRestOfEvent in modularAnalysis.py uses now the default lists: 
-  'pi+:mdst', 'gamma:mdst' and 'K_L0:mdst'.
-
 * The module VertexFitUpdateDaughtersModule updates now the daughters always. 
 
 FEI

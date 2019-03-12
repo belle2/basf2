@@ -20,11 +20,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 
-#include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
-#include <string>
 #include <TH2.h>
 #include <TH1.h>
 #include <TH3.h>

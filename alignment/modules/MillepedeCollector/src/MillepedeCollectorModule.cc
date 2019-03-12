@@ -26,10 +26,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <mdst/dataobjects/Track.h>
-#include <genfit/Track.h>
 
 #include <alignment/GlobalLabel.h>
-#include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
@@ -40,9 +38,6 @@
 #include <genfit/FullMeasurement.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
-
-#include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
-#include <alignment/reconstruction/AlignableSVDRecoHit.h>
 
 #include <genfit/PlanarMeasurement.h>
 

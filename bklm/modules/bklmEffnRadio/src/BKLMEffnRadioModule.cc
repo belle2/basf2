@@ -27,11 +27,7 @@
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
-#include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Matrix/Matrix.h"
-
-#include <bklm/geometry/GeometryPar.h>
-#include <bklm/geometry/Module.h>
 
 #include "TMath.h"
 #include "TCanvas.h"

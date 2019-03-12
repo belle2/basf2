@@ -11,7 +11,6 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>

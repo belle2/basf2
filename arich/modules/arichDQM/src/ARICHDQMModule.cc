@@ -19,7 +19,6 @@
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>

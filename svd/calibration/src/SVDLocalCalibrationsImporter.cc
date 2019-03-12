@@ -52,8 +52,6 @@
 #include <TFile.h>
 #include <TVectorF.h>
 /*
-#include <fstream>
-
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>

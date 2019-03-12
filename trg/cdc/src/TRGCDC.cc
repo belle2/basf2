@@ -56,7 +56,6 @@
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/Link.h"
-#include "trg/cdc/Relation.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
 

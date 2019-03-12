@@ -3,7 +3,8 @@
 # This script is used to train and to test the flavor tagger while performing vertexing at kekcc.
 # It defines the whole procedure for release validation.
 # After the testing all the scripts validating the vertexing and the flavor tagging performance are used.
-# The script B0_GenDeltaTFit.py checks if the generated CP asymmetries are correct
+# The script B0_GenDeltaTFit.py checks if the generated CP asymmetries are correct.
+# Author: Fernando Abudinen.
 
 BelleOrBelle2=${1} # Belle (For converted B2BII MC)  or  Belle2
 trainDecayChannel=${2} # JPsiKs of nunubar

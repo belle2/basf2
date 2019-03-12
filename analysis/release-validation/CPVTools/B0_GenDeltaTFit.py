@@ -28,7 +28,6 @@ import matplotlib.pyplot as plt
 import pylab
 import sys
 import math
-import ROOT
 import random
 from variables import variables as mc_variables
 

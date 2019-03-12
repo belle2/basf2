@@ -36,7 +36,7 @@ def Store_LayerSensor_plots(filename):
     for i in range(1, 5):
         c_5 = TCanvas('c_5:' + str(i), 'Layer:Sensor = 5:' + str(i), 500, 700)
         c_5.Divide(4, 3)
-        l_Lyr5.append(c_6)
+        l_Lyr5.append(c_5)
         c_Fit_5 = TCanvas('c_Fit_5:' + str(i), 'Layer:Sensor = 5:' + str(i), 500, 700)
         c_Fit_5.Divide(4, 3)
         l_Fit_Lyr5.append(c_Fit_5)

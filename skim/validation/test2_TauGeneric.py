@@ -33,7 +33,7 @@ variables.addAlias('M2miss', 'missingMass2OfEvent')
 
 # the variables that are printed out are:
 variablesToHistogram(
-    filename='../TauGeneric_Validation.root',
+    filename='TauGeneric_Validation.root',
     decayString='',
     variables=[('nGoodTracks', 7, 1, 8),
                ('nGoodGammas', 15, 0, 15),

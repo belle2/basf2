@@ -1,3 +1,8 @@
+/****************************************************************
+ *   This file tests the variables used for flavor tagging.     *
+ *   Author: Fernando Abudinen.                                 *
+ ****************************************************************/
+
 #include <analysis/variables/FlavorTaggingVariables.h>
 
 #include <analysis/VariableManager/Manager.h>

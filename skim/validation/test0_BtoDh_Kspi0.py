@@ -40,7 +40,7 @@ add_reconstruction(main)
 
 
 # Finally add mdst output
-output_filename = "BtoDh_Kspi0.dst.root"
+output_filename = "../BtoDh_Kspi0.dst.root"
 add_mdst_output(main, filename=output_filename)
 
 # process events and print call statistics

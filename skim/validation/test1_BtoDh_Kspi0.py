@@ -25,7 +25,7 @@ kspi0 = Path()
 
 skimCode = encodeSkimName('BtoDh_Kspi0')
 
-fileList = ['BtoDh_Kspi0.dst.root']
+fileList = ['../BtoDh_Kspi0.dst.root']
 
 inputMdstList('default', fileList, path=kspi0)
 

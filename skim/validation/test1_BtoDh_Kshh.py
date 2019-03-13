@@ -25,7 +25,7 @@ kshh = Path()
 
 skimCode = encodeSkimName('BtoDh_Kshh')
 
-fileList = ['BtoDh_Kshh.dst.root']
+fileList = ['../BtoDh_Kshh.dst.root']
 
 inputMdstList('default', fileList, path=kshh)
 

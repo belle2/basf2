@@ -22,7 +22,7 @@ hh = Path()
 
 skimCode = encodeSkimName('BtoDh_hh')
 
-fileList = ['BtoDh_hh.dst.root']
+fileList = ['../BtoDh_hh.dst.root']
 
 inputMdstList('default', fileList, path=hh)
 

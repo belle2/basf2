@@ -283,10 +283,12 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   append_int32((EDHCFrameHeaderDataType::c_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
   append_int32(0xCAFE8000);// HLT HEADER, accepted flag set
   append_int32(m_trigger_nr); // HLT Trigger Nr
-  append_int32(m_run_nr_word1); // HLT Run NR etc
+  append_int16(m_run_nr_word2); // Exp NR 9-0 | Run Nr 13-8
+  append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
   append_int32(0xCAFE0000);// DATCON HEADER ...
   append_int32(m_trigger_nr); // DATCON Trigger Nr
-  append_int32(m_run_nr_word1); // DATCON Run NR etc
+  append_int16(m_run_nr_word2); // Exp NR 9-0 | Run Nr 13-8
+  append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
   add_frame_to_payload();
 
   /// DHC Start

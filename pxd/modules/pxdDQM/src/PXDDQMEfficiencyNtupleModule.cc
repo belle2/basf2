@@ -12,6 +12,8 @@
 #include <tracking/dataobjects/ROIid.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
+#include <mdst/dataobjects/Track.h>
+#include <framework/gearbox/Const.h>
 
 #include "TMatrixDSym.h"
 using namespace Belle2;
@@ -70,7 +72,8 @@ void PXDDQMEfficiencyNtupleModule::terminate()
 
 void PXDDQMEfficiencyNtupleModule::initialize()
 {
-  m_tuple = new TNtuple("effcontrol", "effcontrol", "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched");
+  m_tuple = new TNtuple("effcontrol", "effcontrol",
+                        "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched:z0:d0:svdhits:charge");
   m_file = new TFile("test.root", "recreate");
 
   //register the required arrays
@@ -106,6 +109,18 @@ void PXDDQMEfficiencyNtupleModule::event()
     trackstate = a_track.getMeasuredStateOnPlaneFromFirstHit();
     if (trackstate.getMom().Mag() < m_momCut) continue;
     if (trackstate.getMom().Pt() < m_pTCut) continue;
+
+    auto ptr = a_track.getRelated<Track>("Tracks");
+
+    if (!ptr) {
+      B2ERROR("expect a track for fitted recotracks");
+      continue;
+    }
+    auto ptr2 = ptr->getTrackFitResultWithClosestMass(Const::pion);
+    if (!ptr2) {
+      B2ERROR("expect a track fit result for mass");
+      continue;
+    }
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -166,6 +181,7 @@ void PXDDQMEfficiencyNtupleModule::event()
         double du_clus = 0;
         double dv_clus = 0;
         double d_clus = 0;
+        float charge = 0;
         bool matched = false;
         if (bestcluster >= 0) {
           double u_clus = m_pxdclusters[bestcluster]->getU();
@@ -176,11 +192,16 @@ void PXDDQMEfficiencyNtupleModule::event()
           du_clus = u_fit - u_clus;
           dv_clus = v_fit - v_clus;
           d_clus = dist_clus.Mag();
+          charge = m_pxdclusters[bestcluster]->getCharge();
           matched = true;
         }
-        m_tuple->Fill((int)aVxdID, u_fit, v_fit, trackstate.getMom().Mag(), trackstate.getMom().Pt(), du_clus, dv_clus, sigu, sigv,
-                      d_clus, fitInsideROI, closeToBoarder, closeToDead, matched);
-
+        float fill[20] = {float((int)aVxdID), float(u_fit), float(v_fit), float(trackstate.getMom().Mag()), float(trackstate.getMom().Pt()),
+                          float(du_clus), float(dv_clus), float(sigu), float(sigv), float(d_clus),
+                          float(fitInsideROI), float(closeToBoarder), float(closeToDead), float(matched),
+                          float(ptr2->getZ0()), float(ptr2->getD0()), float(a_track.getNumberOfSVDHits()),
+                          charge
+                         };
+        m_tuple->Fill(fill);
       }
     }
   }

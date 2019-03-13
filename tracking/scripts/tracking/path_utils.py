@@ -403,16 +403,15 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                         MinimalHitsBySuperLayerId={0: 15})
 
     if use_cdc_quality_estimator:
-        path.add_module("TFCDC_TrackQualityEstimator",
-                        inputTracks=output_tracks,
-                        filter='mva',
-                        deleteTracks=False)
-
+        # Add mva method to set a quality indicator for the CDC tracks
+        cdc_qe_module = path.add_module(
+            "TFCDC_TrackQualityEstimator",
+            inputTracks=output_tracks,
+            filter='mva',
+            deleteTracks=False,
+        )
         if cdc_quality_estimator_weightfile is not None:
-            # set a custom weight file identifier/path
-            cdc_qe_module = path.modules()[-1]
-            assert cdc_qe_module.name() == "TFCDC_TrackQualityEstimator", \
-                f"Last module in path ({cdc_qe_module.name()}) expected to be CDC track quality estimator"
+            # Set a custom weight file identifier/path instead of default
             cdc_qe_module.param("filterParameters", {"identifier": cdc_quality_estimator_weightfile})
 
     # Export CDCTracks to RecoTracks representation

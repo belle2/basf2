@@ -108,12 +108,6 @@ namespace Belle2 {
       return double(out);
     }
 
-    double nECLClusters(const Particle*)
-    {
-      StoreArray<ECLCluster> eclClusters;
-      return eclClusters.getEntries();
-    }
-
     double belleECLEnergy(const Particle*)
     {
       StoreArray<ECLCluster> eclClusters;
@@ -502,8 +496,6 @@ namespace Belle2 {
                       "removed from particle lists but a large number charge zero "
                       "fits them may indicate problems with whole event constraints "
                       "or abnominally high beam backgrounds and/or noisy events.")
-    REGISTER_VARIABLE("nECLClusters", nECLClusters,
-                      "[Eventbased] number of ECL in the event");
     REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy,
                       "[Eventbased] legacy total energy in ECL in the event as used in Belle 1 analyses. For Belle II "
                       "consider totalEnergyOfParticlesInList(gamma:all) instead");

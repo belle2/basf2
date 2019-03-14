@@ -165,10 +165,6 @@ namespace Belle2 {
         std::chrono::duration<double, std::milli> training_time = stop - start;
         B2INFO("Elapsed application time in ms " << training_time.count() << " for " << general_options.m_identifier);
         for (auto& r : results) {
-          // Suppress cppcheck false positive
-          // style: Variable 'result' is assigned a value that is never used.
-          // However, it is used, by branch->Fill() internally
-          // cppcheck-suppress *
           result = r;
           branch->Fill();
         }
@@ -180,10 +176,6 @@ namespace Belle2 {
           auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
           auto targets = data.getTargets();
           for (auto& t : targets) {
-            // Suppress cppcheck false positive
-            // style: Variable 'result' is assigned a value that is never used.
-            // However, it is used, by branch->Fill() internally
-            // cppcheck-suppress *
             target = t;
             target_branch->Fill();
           }

@@ -68,7 +68,7 @@ namespace Belle2 {
     void setMeanPar(int par, double value) {m_meanpars[par] = value; };
 
   private:
-    short m_version; /**< version number for mean parameterization */
+    short m_version{ -1}; /**< version number for mean parameterization */
     std::vector<double> m_meanpars; /**< dE/dx mean parameters */
 
     ClassDef(CDCDedxMeanPars, 1); /**< ClassDef */

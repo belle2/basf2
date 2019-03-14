@@ -32,7 +32,7 @@ charmless3neutralpath.add_module(eventinfosetter)
 
 # .dec file for B -> K+ K- pi0
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('../../decfiles/dec/1110021003.dec'))
+evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/1110021003.dec'))
 charmless3neutralpath.add_module(evtgeninput)
 
 # detector simulation

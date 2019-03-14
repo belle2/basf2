@@ -169,14 +169,13 @@ int RFProcessManager::CheckOutput()
 
     if ((nfd = select(highest + 1, &fdset, NULL, NULL, &tv)) < 0) {
       switch (errno) {
-        case EINTR: continue;
+        case EINTR: continue; // why? if we get a signal, we can return, too
         case EAGAIN: continue;
         default:
           //close(m_iopipe[0]);
           //m_iopipe[0] = -1;
           return 0;
       }
-      if (errno == EINTR) continue;
     } else {
       if (nsmc && FD_ISSET(nsmc->sock, &fdset)) {
         //        NSMCommunicator(nsmc).callContext();
@@ -190,8 +189,8 @@ int RFProcessManager::CheckOutput()
           FD_ISSET(m_iopipe[0], &fdset)) {
         break;
       }
+      if (nfd == 0) break; // was a timeout -> return to do other stuff
     }
-    sleep(1);
   }
   // Return nfd
   //  time_t now = time ( NULL );
@@ -219,6 +218,4 @@ pid_t RFProcessManager::CheckProcess()
   }
   return 0;
 }
-
-
 

@@ -38,12 +38,16 @@ namespace Belle2 {
 
     //! Parameters accesible from basf2 scripts
   protected:
+    /** The name of the histogram. */
     std::string m_histoname;
+    /** The definition of the fitting function. */
     std::string m_function;
 
     //! Data members
   private:
+    /** The fitting function. */
     TF1* m_f = nullptr;
+    /** The drawing canvas for the fitting result. */
     TCanvas* m_c = nullptr;
 
   };

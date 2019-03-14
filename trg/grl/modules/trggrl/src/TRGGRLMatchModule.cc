@@ -28,6 +28,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParamList.h>
 
 
 //utilities

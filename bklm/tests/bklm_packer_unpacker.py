@@ -79,7 +79,7 @@ class PackerUnpackerTest(Module):
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [500], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [50]})
 main.add_module(eventinfosetter)
 
 particlegun = register_module('ParticleGun')
@@ -89,6 +89,7 @@ particlegun.param('momentumParams', [0.5, 4.0])
 main.add_module(particlegun)
 
 add_simulation(main, components=['BKLM'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["BKLM"])
 
 Packer = register_module('BKLMRawPacker')
 Packer.param("loadMapFromDB", 1)

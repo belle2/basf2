@@ -5,7 +5,7 @@ import sys
 import pybasf2
 from basf2.utils import print_all_modules, print_params
 from basf2.core import set_log_level
-from pager import Pager
+from terminal_utils import Pager
 
 # Do not show INFO messages in module list (actually a problem of the module)
 set_log_level(pybasf2.LogLevel.WARNING)

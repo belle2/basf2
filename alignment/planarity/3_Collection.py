@@ -17,6 +17,7 @@ from ROOT import Belle2
 
 
 class MomentumSetup(Module):
+    """ Python module to set artificial momentum to RecoTracks (for cosmics @ B=0T) """
 
     def __init__(self):
         """ init """
@@ -40,6 +41,7 @@ class MomentumSetup(Module):
 
 
 class MomentumPrint(Module):
+    """ Python module to print momenta of RecoTracks """
 
     def __init__(self):
         """ init """

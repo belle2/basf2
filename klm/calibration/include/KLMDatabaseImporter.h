@@ -12,6 +12,7 @@
 
 /* Belle2 headers. */
 #include <framework/database/DBImportObjPtr.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 
 namespace Belle2 {
@@ -39,7 +40,14 @@ namespace Belle2 {
     void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
     /**
+     * Import scintillator simulation parameters.
+     */
+    void importScintillatorDigitizationParameters(
+      const KLMScintillatorDigitizationParameters* digitizationParameters);
+
+    /**
      * Import time conversion parameters.
+     * @param[in] timeConversion Time conversion parameters.
      */
     void importTimeConversion(const KLMTimeConversion* timeConversion);
 

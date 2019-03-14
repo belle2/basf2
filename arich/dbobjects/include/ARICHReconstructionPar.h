@@ -57,6 +57,15 @@ namespace Belle2 {
     }
 
     /**
+     * Set flat background per pad
+     * @param flatBkgPerPad value of flat background per pad
+     */
+    void setFlatBkgPerPad(const float flatBkgPerPad)
+    {
+      m_flatBkgPerPad = flatBkgPerPad;
+    }
+
+    /**
      * Set additional cherenkov angle PDF parameters
      * @param pars vector of parameters
      */
@@ -101,6 +110,15 @@ namespace Belle2 {
     double getAerogelFOM(unsigned iLayer) const
     {
       return m_aerogelFOM.at(iLayer);
+    }
+
+    /**
+     * Get flat background per pad
+     * @return flat background per pad
+     */
+    float getFlatBkgPerPad() const
+    {
+      return m_flatBkgPerPad;
     }
 
     /**

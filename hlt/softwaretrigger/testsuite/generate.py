@@ -8,7 +8,7 @@ import basf2
 import os
 
 import generators
-from softwaretrigger.path_functions import ALWAYS_SAVE_OBJECTS, DEFAULT_HLT_COMPONENTS, RAWDATA_OBJECTS
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, DEFAULT_HLT_COMPONENTS, RAWDATA_OBJECTS
 from background import get_background_files
 
 from rawdata import add_packers

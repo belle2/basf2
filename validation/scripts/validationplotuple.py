@@ -770,7 +770,7 @@ class Plotuple:
         """!
         If the Plotuple-object contains n-tuples, this will create the
         a JSON file, which is later converted to HTML by the javascript
-        function fill_ntuple_table.
+        function fillNtupleTable.
         """
 
         json_nutple = {}

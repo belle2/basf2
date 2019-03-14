@@ -100,6 +100,8 @@ void KLMExpertModule::init_mva(MVA::Weightfile& weightfile)
 
 void KLMExpertModule::event()
 {
+  // Use the neutralHadron hypothesis for the ECL
+  const ECLCluster::EHypothesisBit eclHypothesis = ECLCluster::EHypothesisBit::c_neutralHadron;
 
   //overwritten at the end of the cluster loop
   KlId* klid = nullptr;
@@ -119,13 +121,13 @@ void KLMExpertModule::event()
     m_KLMhitDepth        = cluster.getClusterPosition().Mag();
 
     // find nearest ecl cluster and calculate distance
-    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
+    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos, eclHypothesis);
     ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
     m_KLMECLDist = get<1>(closestECLAndDist);
 
     // get variables of the closest ECL cluster might be removed in future
     if (!(closestECLCluster == nullptr)) {
-      m_KLMECLE                = closestECLCluster -> getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+      m_KLMECLE                = closestECLCluster -> getEnergy(eclHypothesis);
       m_KLMECLE9oE25           = closestECLCluster -> getE9oE21();
       m_KLMECLTerror           = closestECLCluster -> getDeltaTime99();
       m_KLMECLTiming           = closestECLCluster -> getTime();
@@ -161,9 +163,8 @@ void KLMExpertModule::event()
 
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     float best_dist = 1e10;
-    float dist;
     for (auto trackSeperation :  trackSeperations) {
-      dist = trackSeperation.getDistance();
+      float dist = trackSeperation.getDistance();
       if (dist < best_dist) {
         best_dist = dist;
         m_KLMTrackSepDist         = trackSeperation.getDistance();

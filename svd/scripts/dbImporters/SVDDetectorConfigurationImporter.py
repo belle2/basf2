@@ -99,8 +99,7 @@ class configImporterToDBModule(Module):
         if args.calib is not None:
             # import SVDGlobalConfigParameters dbobject if NOT --isLocalXML: ZS, latency, mask, APV clock units
             configImporterToDB.importSVDGlobalConfigParametersFromXML(calibfile)
-            print(colored("V) Global Detector Configuration parameters", green))
-            print(colored("(ZS, latency, mask, APV clock time units) Imported", 'green'))
+            print(colored("V) Global Detector Configuration parameters: (ZS, latency, mask, APVClock units) Imported", 'green'))
             # import SVDLocalConfigParameters dbobject if NOT --isLocalXML:
             # injected charge, calibration time units, calibration date
             # configImporterToDB.importSVDLocalConfigParametersFromXML(calibfile)

@@ -28,6 +28,7 @@
 
 #include <cstdio>
 #include <unistd.h>
+#include <sys/wait.h>
 
 using namespace Belle2;
 using namespace Cosim;
@@ -181,7 +182,7 @@ void TSF::initialize()
 void TSF::terminate()
 {
   B2DEBUG(10, "Waiting for TSF firmware termination...");
-  wait();
+  wait(nullptr);
   for (unsigned i = 0; i < m_nSubModules; ++i) {
     close(inputFileDescriptor[i][1]);
     close(outputFileDescriptor[i][0]);

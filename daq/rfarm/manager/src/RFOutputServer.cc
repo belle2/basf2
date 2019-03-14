@@ -156,9 +156,6 @@ int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
       m_nnodes++;
     }
   }
-
-  m_rbufin->forceClear();
-  m_rbufout->forceClear();
   return 0;
 }
 
@@ -173,7 +170,7 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
   if (m_pid_sender != 0) {
     printf("killing sender %d\n", m_pid_sender);
     //    kill(m_pid_sender, SIGINT);
-    kill(m_pid_sender, SIGINT);
+    kill(m_pid_sender, SIGKILL);
     ws = waitpid(m_pid_sender, &status, 0);
     printf("wait return = %d, status = %d\n", ws, status);
   }

@@ -1,6 +1,0 @@
-#!/bin/bash
-CMD_STRING="--input-ring-buffer-name $1 "
-for rb in ${@:2}; do
-    CMD_STRING+="--output-ring-buffer-name ${rb} "
-done
-exec b2hlt_rb2rb ${CMD_STRING}

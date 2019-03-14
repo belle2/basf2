@@ -109,6 +109,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
   char* sender = m_conf->getconf("distributor", "sender", "script");
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
 
+
   char hostname[512], idname[3], shmid[3];
   for (int i = 0; i < maxnodes; i++) {
     sprintf(idname, "%2.2d", idbase + i);
@@ -144,9 +145,6 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
     char* nnodechr = m_conf->getconf("distributor", "nnodes");
     m_pid_recv = m_proc->Execute(filein, (char*)ringbuf.c_str(), file, nnodechr);
   }
-
-  m_rbufin->forceClear();
-
   // else none
   return 0;
 }
@@ -163,7 +161,7 @@ int RFEventServer::UnConfigure(NSMmsg*, NSMcontext*)
     if (m_pid_sender[i] != 0) {
       printf("RFEventServer:: killing sender pid=%d\n", m_pid_sender[i]);
       //      kill(m_pid_sender[i], SIGINT);
-      kill(m_pid_sender[i], SIGINT);
+      kill(m_pid_sender[i], SIGKILL);
       waitpid(m_pid_sender[i], &status, 0);
     }
   }

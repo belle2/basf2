@@ -116,7 +116,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of input PXDClusters", std::string(""));
 
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
-  B2DEBUG(1, "The default error mask is $" << std::hex << defaulterrormask);
+  B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
 
   addParam("IgnoreTriggerGate", m_ignoreTriggerGate, "Ignore different triggergate between DHEs", true);
   addParam("IgnoreDHPFrame", m_ignoreDHPFrame, "Ignore different dhp frame between DHEs", true);
@@ -134,7 +134,7 @@ void PXDPostErrorCheckerModule::initialize()
   m_storeROIs.isOptional(m_PXDRawROIsName);
   m_storeRawCluster.isOptional(m_RawClusterName);
 
-  B2DEBUG(1, "The set error mask is $" << std::hex << m_criticalErrorMask);
+  B2DEBUG(25, "The set error mask is $" << std::hex << m_criticalErrorMask);
 }
 
 void PXDPostErrorCheckerModule::event()

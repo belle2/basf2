@@ -58,7 +58,7 @@ void Rbuf2RbufModule::initialize()
   m_rbufout = new RingBuffer(m_name_rbufout.c_str());
 
   // Initialize EvtMetaData
-  m_eventMetaData.registerInDataStore();
+  StoreObjPtr<EventMetaData>::registerPersistent();
 
   // Calls event function for TTree
   event();

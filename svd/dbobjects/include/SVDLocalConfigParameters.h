@@ -59,6 +59,14 @@ namespace Belle2 {
     std::string getCalibDate(void) const { return m_calibDate; };
 
     /**
+      * Returns the units for expressing the calibration peak amplitude
+      * measured during local runs
+      * @param none
+      * @return string corresponding to the time stamp of the current calibration in the format yyyymmdd_hhmm.
+      */
+    std::string getCalPeakUnits(void) const { return m_calPeakUnits; };
+
+    /**
      * Set the injected charge
      * Input:
      * @param std::string [e]
@@ -67,6 +75,17 @@ namespace Belle2 {
     void setInjectedCharge(float injectedCharge)
     {
       m_injectedCharge = injectedCharge;
+    }
+
+    /**
+     * Set the calPeak units
+     * Input:
+     * @param std::string
+     *
+     */
+    void setCalPeakUnits(std::string calPeakUnits)
+    {
+      m_calPeakUnits = calPeakUnits;
     }
 
     /**
@@ -97,6 +116,10 @@ namespace Belle2 {
     /** charge in electrons injected in each strip to calibrate the pulse gain during the calibration run
      */
     float m_injectedCharge;
+
+    /** calibration peak units
+        */
+    std::string m_calPeakUnits;
 
     /** Time units of the measured pulse shape peak time expressed in accelerator RFC
      */

@@ -97,6 +97,8 @@ int main(int argc, char* argv[])
       size = socket.get_wordbuf(buffer, MAXEVTSIZE);
     } else {
       size = socket.get(reinterpret_cast<char*>(buffer), MAXEVTSIZE);
+      // We want to have it in words, not bytes
+      size = ((size - 1) / sizeof(int) + 1);
     }
     // Error checking socket
     if (size == 0) {

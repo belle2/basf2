@@ -10,9 +10,11 @@ from basf2 import *
 from svd import *
 import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import HotStripsCalibrations
-
+from ROOT.Belle2 import SVDHotStripsCalibrations
+import datetime
 import os
+
+now = datetime.datetime.now()
 
 
 class defaultHotStripsImporter(basf2.Module):
@@ -22,7 +24,7 @@ class defaultHotStripsImporter(basf2.Module):
         iov = Belle2.IntervalOfValidity.always()
         #      iov = IntervalOfValidity(0,0,-1,-1)
 
-        payload = Belle2.SVDHotStripsCalibrations.t_payload()
+        payload = Belle2.SVDHotStripsCalibrations.t_payload(0, "HotStrips_default_" + str(now.isoformat()) + "_INFO:_noHotstrips")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 

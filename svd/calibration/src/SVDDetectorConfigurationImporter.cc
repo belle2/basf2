@@ -108,7 +108,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   svdGlobalConfig->setZeroSuppression(zeroSuppression);
   svdGlobalConfig->setLatency(latency);
   svdGlobalConfig->setMaskFilter(maskFilter);
-  svdGlobalConfig->setAPVClockUnits(systemClock);
+  svdGlobalConfig->setAPVClockInRFCUnits(systemClock);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);

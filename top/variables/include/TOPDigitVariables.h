@@ -85,6 +85,13 @@ namespace Belle2 {
       double topDigitCount(const Particle* particle);
 
       /**
+       * extrapolates the track to TOP
+       */
+      double extrapTrackToTOPz(const Particle* particle);
+      double extrapTrackToTOPtheta(const Particle* particle);
+      double extrapTrackToTOPphi(const Particle* particle);
+
+      /**
        * returns the number of digits in all other module as the particle
        */
       double topBackgroundDigitCount(const Particle* particle);

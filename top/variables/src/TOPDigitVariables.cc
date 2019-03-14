@@ -24,6 +24,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
 #include <algorithm> // for sort
 using namespace std;
@@ -297,6 +298,47 @@ namespace Belle2 {
         return digitTimes.size() - maxGapIndex;
       }
 
+      //! @extrapolates the track to TOP
+      double extrapTrackToTOPz(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return -1.0;
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.z();
+      }
+
+      //! @extrapolates the track to TOP
+      double extrapTrackToTOPtheta(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return -1.0;
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.Theta();
+      }
+
+      //! @extrapolates the track to TOP
+      double extrapTrackToTOPphi(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return -1.0;
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.Phi();
+      }
 
       //! @returns the number of reflected digits in the same module as the particle
       double topReflectedDigitCount(const Particle* particle)
@@ -500,6 +542,12 @@ namespace Belle2 {
     } // TOPVariable
 
     VARIABLE_GROUP("TOP Calibration");
+    REGISTER_VARIABLE("extrapTrackToTOPz", TOPVariable::extrapTrackToTOPz,
+                      "[calibration] Extrapolates the track to TOP");
+    REGISTER_VARIABLE("extrapTrackToTOPtheta", TOPVariable::extrapTrackToTOPtheta,
+                      "[calibration] Extrapolates the track to TOP");
+    REGISTER_VARIABLE("extrapTrackToTOPphi", TOPVariable::extrapTrackToTOPphi,
+                      "[calibration] Extrapolates the track to TOP");
     REGISTER_VARIABLE("topDigitCount", TOPVariable::topDigitCount,
                       "[calibration] The number of TOPDigits in the module to which the track was extrapolated");
     REGISTER_VARIABLE("topBackgroundDigitCount", TOPVariable::topBackgroundDigitCount,

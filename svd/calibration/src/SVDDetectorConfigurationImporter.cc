@@ -142,7 +142,7 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
 
     if (apvChild.first == "cal_peaks") {
       calPeakUnits = apvChild.second.get<std::string>("<xmlattr>.units") ;
-      std::cout << " injected charge   = " << calPeakUnits << endl;
+      std::cout << " calPeak units   = " << calPeakUnits << endl;
 
     }
 
@@ -170,6 +170,9 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
   svdLocalConfig->setCalPeakUnits(calPeakUnits);
   svdLocalConfig->setCalibrationTimeInRFCUnits(calibTimeUnits);
   svdLocalConfig->setCalibDate(calibDate);
+  /* Injected charge set is HARDCODED here, by default 22500 electrons
+   */
+  svdLocalConfig->setInjectedCharge(22500);
 
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,

@@ -42,16 +42,14 @@ namespace Belle2 {
      * @param none
      * @return float corresponding to calibration time units [Accelerator RFC converted in ns]
      */
-    float getCalibrationTimeUnitsInNs(void) const
+    float getCalibrationTimeInRFCUnits(void) const
     {
-      float rfcToNs =
-        2; /** the conversion for accelerator radio frequency counst to ns is temporarly hardcoded. IT should be also read from the DB. */
       TString aux(m_calibrationTimeUnits);
       aux = aux.Remove(aux.First(" "), aux.Sizeof());
 
       std::string auxString(aux);
       int calibrationTimeCoeff = std::atoi(auxString.c_str());
-      return calibrationTimeCoeff * rfcToNs ;
+      return calibrationTimeCoeff;
     }
 
     /**
@@ -77,7 +75,7 @@ namespace Belle2 {
      * @param std::string coeff+ [RFC]
      *
      */
-    void setCalibrationTimeUnits(std::string calibrationTimeUnits)
+    void setCalibrationTimeInRFCUnits(std::string calibrationTimeUnits)
     {
       m_calibrationTimeUnits = calibrationTimeUnits;
     }

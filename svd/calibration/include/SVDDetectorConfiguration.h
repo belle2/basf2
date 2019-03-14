@@ -86,9 +86,9 @@ namespace Belle2 {
      *
      * Output: float corresponding to the time units [RFC]
      */
-    float getCalibrationTimeUnitsInNs()
+    float getCalibrationTimeInRFCUnits()
     {
-      return m_svdLocalConfig_aDBObjPtr->getCalibrationTimeUnitsInNs();
+      return m_svdLocalConfig_aDBObjPtr->getCalibrationTimeInRFCUnits();
     }
 
 
@@ -153,9 +153,9 @@ namespace Belle2 {
      *
      * Output: float corresponding to the APV Clock units [ns]
      */
-    float getAPVClockUnitsInNs()
+    float getAPVClockInRFCUnits()
     {
-      return m_svdGlobalConfig_aDBObjPtr->getAPVClockUnitsInNs();
+      return m_svdGlobalConfig_aDBObjPtr->getAPVClockInRFCUnits();
     }
 
 

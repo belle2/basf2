@@ -198,7 +198,7 @@ int RingBuffer::insq(const int* buf, int size)
   }
   if (m_bufinfo->numAttachedTx == 0) {
     //safe abort was requested
-    exit(0);
+    B2WARNING("Number of attached Tx is 0, in former times this aborted the execution, but I will go on.");
   }
   SemaphoreLocker locker(m_semid);
   if (m_bufinfo->nbuf == 0) {

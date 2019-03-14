@@ -41,7 +41,7 @@ namespace Belle2 {
   public:
     /** Empty constructor for ROOT IO. */
     CDCHit() :
-      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_status(0), m_otherHitIndex(-1), m_adcCountAtLeadingEdge(0), m_tot(0)
+      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_status(0), m_tot(0), m_otherHitIndex(-1), m_adcCountAtLeadingEdge(0)
     {
       B2DEBUG(29, "Empty CDCHit Constructor called.");
     }
@@ -57,27 +57,25 @@ namespace Belle2 {
      *  @param iLayer      Layer number inside the Super Layer.
      *  @param iWire       Wire number in the Layer.
      *  @param status         Status of the hit.
-     *  @param otherHitIndex  Index to the other hit.
-     *  @param leadingEdgeADC ADCcount for a narrow gate at the leading edge.
      *  @param tot            Time over threshold.
+     *  @param otherHitIndex  Index to the other hit.
+     *  @param leadingEdgeADC FADCcount at a sampling point near the leading edge.
      */
     CDCHit(unsigned short tdcCount, unsigned short adcCount,
-           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status = 0, signed short otherHitIndex = -1,
-           unsigned short leadingEdgeADC = 0,
-           unsigned short tot = 0);
+           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status = 0, unsigned short tot = 0,
+           signed short otherHitIndex = -1, unsigned short leadingEdgeADC = 0);
 
     /** Constructor using the WireID object. */
-    CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID, unsigned short status = 0,
-           signed short otherHitIndex = -1, unsigned short leadingEdgeADC = 0,
-           unsigned short tot = 0)
+    CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID, unsigned short status = 0, unsigned short tot = 0,
+           signed short otherHitIndex = -1, unsigned short leadingEdgeADC = 0)
     {
       setTDCCount(tdcCount);
       setADCCount(adcCount);
       setWireID(wireID);
       setStatus(status);
+      setTOT(tot);
       setOtherHitIndex(otherHitIndex);
       setADCCountAtLeadingEdge(leadingEdgeADC);
-      setTOT(tot);
     }
 
     /** Setter for Wire ID.
@@ -100,7 +98,6 @@ namespace Belle2 {
     {
       m_eWire = wireID.getEWire();
     }
-
 
     /** Setter for CDCHit status.
      *
@@ -287,15 +284,14 @@ namespace Belle2 {
     /** Status of CDCHit. */
     unsigned short  m_status;
 
+    /** Time over threshod. */
+    unsigned short  m_tot;
+
     /** Index to the other hit. */
     signed short  m_otherHitIndex;
 
     /** ADC count at leading edge. */
     unsigned short  m_adcCountAtLeadingEdge;
-
-    /** Time over threshod. */
-    unsigned short  m_tot;
-
 
   private:
     /** ROOT Macro.*/

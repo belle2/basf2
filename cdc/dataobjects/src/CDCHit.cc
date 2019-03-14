@@ -18,16 +18,16 @@ using namespace std;
 using namespace Belle2;
 
 CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
-               unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status, signed short otherHitIndex,
-               unsigned short leadingEdgeCharge, unsigned short tot)
+               unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status, unsigned short tot,
+               signed short otherHitIndex, unsigned short leadingEdgeCharge)
 {
   setTDCCount(tdcCount);
   setADCCount(charge);
   setWireID(iSuperLayer, iLayer, iWire);
   setStatus(status);
+  setTOT(tot);
   setOtherHitIndex(otherHitIndex);
   setADCCountAtLeadingEdge(leadingEdgeCharge);
-  setTOT(tot);
 }
 
 

@@ -21,7 +21,7 @@
 #include <string>
 
 namespace Belle2 {
-  /**This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits.
+  /**This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits. The three samples are stored in the first three positions of the APVSamples store array, and the last three are set to 0.
    */
   class SVD3SamplesEmulatorModule : public Module {
 
@@ -52,9 +52,9 @@ namespace Belle2 {
 
   private:
 
-    std::string m_shaperDigitInput;  /**< StoreArray with the input shaperdigits */
-    Int_t m_startingSample;
-    std::string m_outputArrayName;  /**< StoreArray with the selected output shaperdigits*/
+    std::string m_shaperDigitInput;  /**< StoreArray with the 6-samples input shaperdigits with DAQMode = 2*/
+    Int_t m_startingSample = 0;  /**< Starting sample from which select the three samples of the initial six*/
+    std::string m_outputArrayName;  /**< StoreArray with the 3-samples output shaperdigits, with DAQMode = 1*/
 
   };
 }

@@ -25,11 +25,11 @@ SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
 {
   B2DEBUG(1, "Constructor");
   // Set module properties
-  setDescription("This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits.");
+  setDescription("This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits. The three samples are stored in the first three positions of the APVSamples store array, and the last three are set to 0.");
 
   // Parameter definitions
   addParam("SVDShaperDigits", m_shaperDigitInput, "StoreArray with the input shaperdigits", std::string("SVDShaperDigits"));
-  addParam("StartingSample", m_startingSample, "Starting sample of the three samples (between 0 and 3, the default is 3)", 0);
+  addParam("StartingSample", m_startingSample, "Starting sample of the three samples (between 0 and 3, the default is 0)", int(0));
   addParam("outputArrayName", m_outputArrayName, "StoreArray with the output shaperdigits with 3 samples",
            std::string("SVDShaperDigit3Samples"));
 }
@@ -75,7 +75,13 @@ void SVD3SamplesEmulatorModule::event()
   for (const SVDShaperDigit& shaper : ShaperDigits) {
 
     SVDModeByte modeByte = shaper.getModeByte();
-    //int DAQMode = modeByte.getDAQMode();
+
+    int DAQMode = modeByte.getDAQMode();
+    if (DAQMode != 2) {
+      B2FATAL("The DAQMode is = " << DAQMode << " The number of samples of the input shaperdigits is NOT 6!");
+      return;
+    }
+
     modeByte.setDAQMode(1);
     Belle2::SVDShaperDigit::APVFloatSamples samples = shaper.getSamples();
     VxdID sensorID = shaper.getSensorID();
@@ -93,10 +99,16 @@ void SVD3SamplesEmulatorModule::event()
     threeSamples[5] = 0.;
 
     ShaperDigit3Samples.appendNew(sensorID, side, cellID, threeSamples, fadcT, modeByte);
-    //SVDShaperDigit* shaperThree = ShaperDigit3Samples.appendNew(sensorID, side, cellID, threeSamples, fadcT, modeByte);
+    // SVDShaperDigit* shaperThree = ShaperDigit3Samples.appendNew(sensorID, side, cellID, threeSamples, fadcT, modeByte);
+    // SVDModeByte threeModeByte = shaperThree->getModeByte();
+    // int daq = threeModeByte.getDAQMode();
+    //
+    // SVDModeByte modeByteAfterSettingNew = shaper.getModeByte();
+    // int DAQModeAfterSettingNew = modeByteAfterSettingNew.getDAQMode();
+    // B2INFO("ModeByte: " << modeByteAfterSettingNew);
+    // B2INFO("DAQMode After Setting New One: " << DAQModeAfterSettingNew);
+    // B2INFO("DAQMode Of the new ShaperDigit: " << daq);
 
-    //SVDModeByte threeModeByte = shaperThree->getModeByte();
-    //int daq = threeModeByte.getDAQMode();
   }
 }
 

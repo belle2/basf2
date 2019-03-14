@@ -17,7 +17,7 @@
 
 #define RBUFSIZE 100000000
 #define MAXEVTSIZE  400000000
-#define MAXEVT 1000
+#define MAXEVT 100000
 
 using namespace Belle2;
 using namespace std;
@@ -51,14 +51,19 @@ int main(int argc, char** argv)
   // Create event buffers
   for (int i = 0; i < nevt; i++) {
     evbuf[i] = new char[MAXEVTSIZE];
-    int is = file->read(evbuf[i], MAXEVTSIZE);
-    if (is <= 0) {
-      perror("read file");
-      exit(-1);
-    }
-    if (is > MAXEVTSIZE) {
-      printf("Event size too large : %d\n", is);
-      exit(-1);
+    int evsize = 0;
+    while (true) {
+      int is = file->read(evbuf[i], MAXEVTSIZE);
+      if (is <= 0) {
+        perror("read file");
+        exit(-1);
+      }
+      printf("eventsize = %d\n", is);
+      if (is > MAXEVTSIZE) {
+        printf("Event size too large : %d\n", is);
+        exit(-1);
+      }
+      if (is > 190000) break;
     }
   }
 

@@ -21,6 +21,7 @@
 """
 
 import glob
+import os
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction

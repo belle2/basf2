@@ -73,6 +73,15 @@ Modules
   The corresponding information is calculated in the RestOfEvent so it is
   supposed to be executed only in for_each ROE paths.
 
+* Fixed a bug and extended the functionality of the :b2:mod:`RestOfEventBuilder` module.
+  When providing a ParticleList of composite particles as an additional source
+  for building the ROE, the composite particles are now decomposed and their
+  final state daughters are added to the ROE (unless they are part of the
+  signal side or already present in the ROE). Previously, composite particles
+  were not decomposed and the first composite particle of the first
+  ParticleList of composite particles (and only this one) was always added to
+  the ROE.
+
 FEI
 +++
 

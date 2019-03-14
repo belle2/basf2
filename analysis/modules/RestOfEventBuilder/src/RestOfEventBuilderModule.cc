@@ -178,8 +178,8 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
         bool toAdd = true;
         for (auto* daughter : fsdaughters) {
           if (RestOfEvent::compareParticles(storedParticleDaughter, daughter)) {
-            B2DEBUG(10, "Ignoring Particle with PDG " << storedParticleDaughter->getPDGCode() << " index " <<
-                    storedParticleDaughter->getMdstArrayIndex() << " to " << daughter->getMdstArrayIndex());
+            B2DEBUG(10, "Ignoring Particle with PDG " << daughter->getPDGCode() << " index " <<
+                    storedParticleDaughter->getArrayIndex() << " to " << daughter->getArrayIndex());
             B2DEBUG(10, "Is copy " << storedParticleDaughter->isCopyOf(daughter));
             toAdd = false;
             nExcludedParticles++;

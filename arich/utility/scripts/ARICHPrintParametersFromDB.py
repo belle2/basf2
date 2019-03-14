@@ -15,7 +15,7 @@ from fnmatch import fnmatch
 from optparse import OptionParser
 
 parser = OptionParser()
-parser.add_option('-t', '--tag', dest='tag', default='Calibration_Offline_Development',
+parser.add_option('-t', '--tag', dest='tag', default='',
                   help='database tag from which to import/export data')
 parser.add_option('-e', '--exp', dest='experiment',
                   default=-1, help='experiment')
@@ -33,6 +33,8 @@ if options.object == '':
 # set database tag
 if options.tag == 'local':
     use_local_database("localdb/database.txt", "localdb")
+elif options.tag == '':
+    print("Using default tag")
 else:
     use_central_database(options.tag)
 

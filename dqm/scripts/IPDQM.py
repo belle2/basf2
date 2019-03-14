@@ -11,9 +11,8 @@ import vertex as vx
 
 
 def add_IP_dqm(path):
-    module_names = [m.name() for m in path.modules()]
 
-    applyEventCuts('nTracks==2', path)
+    # applyEventCuts('nTracks==2', path)
     mySelection = 'p>1.0'
     mySelection += ' and abs(dz)<1.0 and dr<0.5'
     fillParticleList('mu+:DQM', mySelection, path=path)

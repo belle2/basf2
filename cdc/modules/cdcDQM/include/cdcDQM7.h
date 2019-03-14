@@ -1,10 +1,16 @@
 /* Nanae Taniguchi 2017.07.12 */
 /* Nanae Taniguchi 2018.02.06 */
+/* Nanae Taniguchi 2019.02.17 */
 
 #ifndef CDCDQM7MODULE_H
 #define CDCDQM7MODULE_H
 
 #include <framework/core/HistoModule.h>
+// add
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+//
 
 #include <vector>
 #include "TH1F.h"
@@ -47,6 +53,9 @@ namespace Belle2 {
     TH1D* h_fast_tdc = nullptr;/**<fastest TDC in each event*/
 
     TH2D* bmap_2 = nullptr;/**<board status map 2D*/
+    // add
+    TH1D* h_occ = nullptr;/**<occupancy*/
+    TH1D* h_occ_L_px = nullptr;/**<occupancy*/
 
   };
 }

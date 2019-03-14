@@ -19,6 +19,8 @@ In the case of Belle data/MC, we compare the performance on data with the perfor
 Finally, we perform tests to understand the correlations between the input variables of the flavor tagger
 and we test if the MVA methods are overtrained.
 
+To understand the evaluation of the flavor tagger performance you can reed further in BELLE2-PTHESIS-2018-003.
+
 ## Procedure
 
 The whole procedure is defined in the script:

@@ -146,5 +146,4 @@ namespace Belle2 {
     ClassDef(SVDGlobalConfigParameters, 1);
 
   };
-
 }

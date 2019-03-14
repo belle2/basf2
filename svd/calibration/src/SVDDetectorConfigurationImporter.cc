@@ -84,14 +84,14 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
     }
     if (cfgDocumentChild.first == "hardware_run") {
       //      std::cout << "Zero suppression is an attribute of the node <hardware_run>!" << endl;
-      zeroSuppression = cfgDocumentChild.second.get<int>("<xmlattr>.zs_cut") ;
+      zeroSuppression = cfgDocumentChild.second.get<float>("<xmlattr>.zs_cut") ;
       std::cout << " zero suppression cut    = " << zeroSuppression << endl;
 
     }
 
     if (cfgDocumentChild.first == "i2c") {
       //std::cout << "Latency is an attribute of the node <i2c>!" << endl;
-      latency = cfgDocumentChild.second.get<int>("<xmlattr>.lat") ;
+      latency = cfgDocumentChild.second.get<float>("<xmlattr>.lat") ;
       std::cout << " latency  = " << latency << endl;
 
     }
@@ -124,6 +124,59 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
 void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(const std::string& xmlfileName, bool errorTollerant)
 {
 
+  // This is the property tree
+  ptree pt;
+
+  // Load the XML file into the property tree. If reading fails
+  // (cannot open file, parse error), an exception is thrown.
+  read_xml(xmlfileName, pt);
+
+  //auxilairy variables to store the XML file values
+  std::string calPeakUnits = "";
+  std::string calibTimeUnits = "";
+  std::string calibDate = "";
+
+  for (ptree::value_type const& apvChild :
+       pt.get_child("cfg_document.back_end_layout.fadc.adc.apv25")) {
+
+
+    if (apvChild.first == "cal_peaks") {
+      calPeakUnits = apvChild.second.get<std::string>("<xmlattr>.units") ;
+      std::cout << " injected charge   = " << calPeakUnits << endl;
+
+    }
+
+    if (apvChild.first == "cal_peak_time") {
+      calibTimeUnits = apvChild.second.get<std::string>("<xmlattr>.units") ;
+      std::cout << " calibration time units   = " << calibTimeUnits << endl;
+
+    }
+  }
+  for (ptree::value_type const& latestRunChild :
+       pt.get_child("cfg_document.latest_runs")) {
+
+    if (latestRunChild.first == "Noise") {
+      //      std::cout << "Masking bitmap is an attribute of the node <noise_run>!" << endl;
+      calibDate = latestRunChild.second.get<std::string>("<xmlattr>.end_of_run") ;
+      std::cout << " calibration date    = " << calibDate << endl;
+
+    }
+  }
+
+  DBImportObjPtr<SVDDetectorConfiguration::t_svdLocalConfig_payload> svdLocalConfig(SVDDetectorConfiguration::svdLocalConfig_name);
+
+  svdLocalConfig.construct();
+
+  svdLocalConfig->setCalPeakUnits(calPeakUnits);
+  svdLocalConfig->setCalibrationTimeInRFCUnits(calibTimeUnits);
+  svdLocalConfig->setCalibDate(calibDate);
+
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  svdLocalConfig.import(iov);
+  B2RESULT("SVDLocalConfigParameters imported to database.");
 
 }
 

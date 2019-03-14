@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Luka Santelj                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,11 +24,13 @@ namespace Belle2 {
     void ARICHHitRateCounter::initialize(TTree* tree)
     {
       // register collection(s) as optional, your detector might be excluded in DAQ
-      m_digits.isOptional();
+      m_hits.isOptional();
 
       // set branch address
-      tree->Branch("arich", &m_rates, "averageRate/F:numEvents/I:valid/O");
+      tree->Branch("arich", &m_rates, "hapdRates[420]/F:averageRate/F:numEvents/I:valid/O");
 
+      // set fractions of active channels
+      setActiveFractions();
     }
 
     void ARICHHitRateCounter::clear()
@@ -39,7 +41,7 @@ namespace Belle2 {
     void ARICHHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available
-      if (not m_digits.isValid()) return;
+      if (not m_hits.isValid()) return;
 
       // get buffer element
       auto& rates = m_buffer[timeStamp];
@@ -47,15 +49,13 @@ namespace Belle2 {
       // increment event counter
       rates.numEvents++;
 
-      // accumulate hits
-      /* either count all */
-      rates.averageRate += m_digits.getEntries();
-      /* or count selected ones only
-      for(const auto& digit: m_digits) {
-      // select digits to count (usualy only good ones)
-         rates.averageRate += 1;
+      // count and weight hits accoring to channel efficiecny
+      for (const auto& hit : m_hits) {
+        auto effi = m_modulesInfo->getChannelQE(hit.getModule(), hit.getChannel());
+        float wt = std::min(1.0 / effi, 100.);
+        rates.hapdRates[hit.getModule() - 1] += wt;
+        rates.averageRate += wt;
       }
-      */
 
       // set flag to true to indicate the rates are valid
       rates.valid = true;
@@ -72,10 +72,38 @@ namespace Belle2 {
       // normalize
       m_rates.normalize();
 
-      // optionally: convert to MHz, correct for the masked-out channels etc.
+      // correct rates for masked-out channels
+      if (m_channelMask.hasChanged()) setActiveFractions();
 
+      for (int imod = 0; imod < 420; imod++) {
+        double fraction = m_activeFractions[imod];
+        if (fraction > 0) m_rates.hapdRates[imod] /= fraction;
+        else m_rates.hapdRates[imod] = 0;
+      }
+      m_rates.averageRate /= m_activeTotal;
     }
 
+    void ARICHHitRateCounter::setActiveFractions()
+    {
+
+      if (not m_channelMask.isValid()) {
+        for (auto& fraction : m_activeFractions) fraction = 1;
+        m_activeTotal = 1;
+        B2WARNING("ARICHHitRateCounter: no valid channel mask - active fractions set to 1");
+        return;
+      }
+
+      int nactiveTotal = 0;
+      for (unsigned imod = 1; imod < 421; imod++) {
+        int nactive = 0;
+        for (unsigned ichn = 0; ichn < 144; ichn++) {
+          if (m_channelMask->isActive(imod, ichn)) nactive++;
+        }
+        nactiveTotal += nactive;
+        m_activeFractions[imod - 1] = (float)nactive / 144.;
+      }
+      m_activeTotal = (float)nactiveTotal / 144. / 420.;
+    }
 
   } // Background namespace
 } // Belle2 namespace

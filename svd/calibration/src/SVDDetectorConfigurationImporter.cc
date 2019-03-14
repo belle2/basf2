@@ -105,6 +105,9 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   }
 
   DBImportObjPtr<SVDDetectorConfiguration::t_svdGlobalConfig_payload> svdGlobalConfig(SVDDetectorConfiguration::svdGlobalConfig_name);
+
+  svdGlobalConfig.construct();
+
   svdGlobalConfig->setZeroSuppression(zeroSuppression);
   svdGlobalConfig->setLatency(latency);
   svdGlobalConfig->setMaskFilter(maskFilter);

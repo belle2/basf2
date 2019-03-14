@@ -73,4 +73,6 @@ discriminating variable.
 categories. It performs a ranking of variables. This script performs also tests to evaluate if the multivariate methods
 on which the flavorTagger depends are overtrained. 
 
-To understand the evaluation of the flavor tagger performance you can reed further in BELLE2-PTHESIS-2018-003.
+`ntupleUpsilon4SGenInfo.py` : saves MC variables for the generated Upsilon(4S). This is needed for studies of the generated MC information.
+This file is written for the case when the Upsilon(4S), has two daughters (i.e. BBbar) and four granddaughters (e.g. B0->Jpsi+K0S).
+The saved variables are mcPDG,M,nDaughters,mcDecayTime,mcLifeTime,mcDX,mcDY,mcDZ,mcE,mcPX,mcPY,mcPZ. 

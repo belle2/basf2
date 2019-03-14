@@ -68,10 +68,10 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   read_xml(xmlFileName, pt);
 
   //auxilairy variables to store the XML file values
-  int  maskFilter;
-  float  zeroSuppression;
-  float  latency;
-  std::string systemClock;
+  int  maskFilter = 0;
+  float  zeroSuppression = 0;
+  float  latency = 0;
+  std::string systemClock = "";
 
   for (ptree::value_type const& cfgDocumentChild :
        pt.get_child("cfg_document")) {
@@ -98,7 +98,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
 
     if (cfgDocumentChild.first == "fadc_ctrl") {
       //          std::cout << "Zero suppression is an attribute of the node <fadc_ctrl>!"<<endl;
-      std::string systemClock = cfgDocumentChild.second.get<std::string>("<xmlattr>.system_clock") ;
+      systemClock = cfgDocumentChild.second.get<std::string>("<xmlattr>.system_clock") ;
       std::cout << " APV clock units = " << systemClock << endl;
 
     }

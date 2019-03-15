@@ -27,7 +27,8 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDLocalConfigParameters()
+    SVDLocalConfigParameters(const TString& uniqueID = ""):
+      m_uniqueID(uniqueID)    // Add a string as unique identifier for a given local run configuration)
     {};
     /**
      * Returns the injected charge during the calibration run
@@ -109,8 +110,16 @@ namespace Belle2 {
     {
       m_calibDate = date;
     }
+
+
+    /**
+     * Get the unique ID  of the calibration
+     */
+    TString get_uniqueID() const {return m_uniqueID;}
+
   private:
 
+    TString m_uniqueID; //The unique identifier is a private member of SVDLocalConfigParameter, whose value is assigned in the constructor.
 
 
     /** charge in electrons injected in each strip to calibrate the pulse gain during the calibration run

@@ -23,10 +23,6 @@ parser = argparse.ArgumentParser(description="SVD Detector Configuration Importe
 parser.add_argument('--exp', metavar='experiment', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
 parser.add_argument('--run', metavar='run', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cfgXML', metavar='config xml', dest='calib', type=str, nargs=1, help='GlobalRun Calibration XML file')
-# parser.add_argument('--isLocalXML', dest='localXml', action='store_const', const=True, default=False,
-#                    help='Add this parameter if the XML is a Local run configuration instead of a Global Run Configuration')
-# parser.add_argument('--nomask', dest='mask', action='store_const', default=False, const=True,
-#                    help='Add this parameter if the XML does not contain the attribute <masks>')
 
 print('')
 
@@ -57,7 +53,7 @@ sys.stdout.write(RED)
 print('| ---> CHECK HERE: <---')
 print('|     experiment number = ' + str(experiment))
 print('|first valid run number = ' + str(run))
-print('|       calibration xml = ' + str(calibfile))
+print('|            global xml = ' + str(calibfile))
 print('| --->   THANKS!   <---')
 sys.stdout.write(RESET)
 

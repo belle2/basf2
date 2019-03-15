@@ -50,18 +50,15 @@ namespace Belle2 {
     SVDDetectorConfiguration()
       : m_svdLocalConfig_aDBObjPtr(svdLocalConfig_name)
       , m_svdGlobalConfig_aDBObjPtr(svdGlobalConfig_name)
-
-
     {
-      /*
+
       m_svdGlobalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDDetectorConfiguration, global run parameters: from now on we are using " <<
+        B2INFO("SVDDetectorConfiguration, GLOBAL run parameters: from now on we are using " <<
         this->m_svdGlobalConfig_aDBObjPtr -> get_uniqueID()); });
 
       m_svdLocalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDDetectorConfiguration, local run parameters: from now on we are using " <<
+        B2INFO("SVDDetectorConfiguration, LOCAL run parameters: from now on we are using " <<
         this->m_svdLocalConfig_aDBObjPtr -> get_uniqueID()); });
-      */
     }
   private:
     /** LOCAL CONFIGURATION PARAMETERS:

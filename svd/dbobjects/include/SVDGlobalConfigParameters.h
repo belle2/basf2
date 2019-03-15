@@ -27,7 +27,8 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDGlobalConfigParameters()
+    SVDGlobalConfigParameters(const TString& uniqueID = ""):
+      m_uniqueID(uniqueID)    // Add a string as unique identifier for a given local run configuration)
     {};
 
 
@@ -122,7 +123,14 @@ namespace Belle2 {
     }
 
 
+    /**
+     * Get the unique ID  of the calibration
+     */
+    TString get_uniqueID() const {return m_uniqueID;}
+
   private:
+
+    TString m_uniqueID; //The unique identifier is a private member of SVDLocalConfigParameter, whose value is assigned in the constructor.
 
     /** zero suppression value which defines the S/N threshold of data mode acquisition during global run in ZS mode
          */

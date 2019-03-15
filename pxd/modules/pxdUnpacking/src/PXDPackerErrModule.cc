@@ -203,14 +203,15 @@ std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
   /*
    * 76 Fake no Fake mix, replaced DHC Start
    * 77 ROI Frame without header/content, inside DHC Start/End
-   * 78 ROI Frame without header/content, outside DHC Start/End ... is this allowed?
+   * 78 ROI Frame without header/content, outside DHC Start/End ... this is not allowed (ONSEN)
    * 79 TODO ROI Frame with header & content
    * 80 TODO ROI Frame with header & content but errors
    */
   c_FAKE_NO_FAKE_DATA,
   c_ROI_PACKET_INV_SIZE,
-  c_ROI_PACKET_INV_SIZE,
+  c_ROI_PACKET_INV_SIZE,// no error flag for this?
   c_NO_ERROR,
+  c_NO_ERROR, // not error bit for this?
 };
 
 bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFlags mask)

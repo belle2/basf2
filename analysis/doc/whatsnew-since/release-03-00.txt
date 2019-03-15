@@ -16,8 +16,6 @@ Variables
   .. seealso::
      `variables.utils.create_aliases_for_selected()`
 
-* The collection flavor_tagging contains all flavor tagging variables for users.
-
 Standard Particle Lists
 +++++++++++++++++++++++
 

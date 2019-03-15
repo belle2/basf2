@@ -75,20 +75,6 @@ namespace Belle2 {
       return m_svdLocalConfig_aDBObjPtr->getInjectedCharge();
     }
 
-    /** LOCAL CONFIGURATION PARAMETERS:
-     * Return the units (in electrons) used to express the calibration
-     * peak amplitude
-     *
-     *
-     * Input:
-     * no input parameters are required since it is a detector based payload
-     *
-     * Output: float corresponding to the injected charge [e]
-     */
-    std::string getCalPeakUnits()
-    {
-      return m_svdLocalConfig_aDBObjPtr->getCalPeakUnits();
-    }
 
     /** LOCAL CONFIGURATION PARAMETERS:
      * Return the time units of the measured peak time of the pulse shape given in term of accelerator RFC

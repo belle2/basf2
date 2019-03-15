@@ -14,7 +14,7 @@
 
 // Map from the online world (FADC id, ADC id, APV ch id)
 // to the offline world (layer, ladder, sensor, view, cell)
-#include <svd/online/SVDOnlineToOfflineMap.h>
+//#include <svd/online/SVDOnlineToOfflineMap.h>
 
 // framework - Database
 #include <framework/database/Database.h>
@@ -32,7 +32,7 @@
 
 // wrapper objects
 #include <svd/calibration/SVDDetectorConfiguration.h>
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+//#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -44,21 +44,27 @@
 #include <sstream>
 #include <TFile.h>
 #include <TVectorF.h>
-/*
-#include <fstream>
-
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-*/
 
 using namespace std;
 using namespace Belle2;
 using boost::property_tree::ptree;
 
 
+void SVDDetectorConfigurationImporter::importSVDGlobalXMLFile(const std::string& fileName)
+{
 
-void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(const std::string& xmlFileName, bool errorTollerant)
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
+  const std::string filename = FileSystem::findFile(fileName);
+  B2INFO("Importing the global run configuration xml file " << fileName << "\n");
+
+  const std::string payloadname = "SVDGlobalXMLFile.xml";
+  if (Database::Instance().addPayload(payloadname, filename, iov))
+    B2INFO("Success!");
+  else
+    B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
+}
+
+void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(const std::string& xmlFileName)
 {
   // This is the property tree
   ptree pt;
@@ -106,7 +112,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
 
   DBImportObjPtr<SVDDetectorConfiguration::t_svdGlobalConfig_payload> svdGlobalConfig(SVDDetectorConfiguration::svdGlobalConfig_name);
 
-  svdGlobalConfig.construct();
+  svdGlobalConfig.construct(xmlFileName);
 
   svdGlobalConfig->setZeroSuppression(zeroSuppression);
   svdGlobalConfig->setLatency(latency);
@@ -121,7 +127,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
 
 }
 
-void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(const std::string& xmlfileName, bool errorTollerant)
+void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(const std::string& xmlFileName)
 {
 
   // This is the property tree
@@ -129,7 +135,7 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
 
   // Load the XML file into the property tree. If reading fails
   // (cannot open file, parse error), an exception is thrown.
-  read_xml(xmlfileName, pt);
+  read_xml(xmlFileName, pt);
 
   //auxilairy variables to store the XML file values
   std::string calPeakUnits = "";
@@ -165,7 +171,7 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
 
   DBImportObjPtr<SVDDetectorConfiguration::t_svdLocalConfig_payload> svdLocalConfig(SVDDetectorConfiguration::svdLocalConfig_name);
 
-  svdLocalConfig.construct();
+  svdLocalConfig.construct(xmlFileName);
 
   svdLocalConfig->setCalPeakUnits(calPeakUnits);
   svdLocalConfig->setCalibrationTimeInRFCUnits(calibTimeUnits);

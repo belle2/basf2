@@ -1,6 +1,11 @@
 /****************************************************************
+ *   BASF2 (Belle Analysis Framework 2)                         *
+ *   Copyright(C) 2013 - Belle II Collaboration                 *
+ *                                                              *
+ *   Author: The Belle II Collaboration                         *
+ *   Contributors: Fernando Abudinen.                           *
+ *                                                              *
  *   This file tests the variables used for flavor tagging.     *
- *   Author: Fernando Abudinen.                                 *
  ****************************************************************/
 
 #include <analysis/variables/FlavorTaggingVariables.h>

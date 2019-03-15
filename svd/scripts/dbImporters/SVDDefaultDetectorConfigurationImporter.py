@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-SVD Default Configuration importer.
-t_min = -80,
+SVD Default Detecotr Configuration importer.
 """
+
 import basf2
 from basf2 import *
 from svd import *
@@ -11,9 +11,10 @@ import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDLocalConfigParameters
 from ROOT.Belle2 import SVDGlobalConfigParameters
-
-
+import datetime
 import os
+
+now = datetime.datetime.now()
 
 # default values
 # local config
@@ -34,8 +35,15 @@ class defaultSVDConfigParametersImporter(basf2.Module):
 
         iov = Belle2.IntervalOfValidity.always()
 
-        local_payload = Belle2.SVDDetectorConfiguration.t_svdLocalConfig_payload()
-        global_payload = Belle2.SVDDetectorConfiguration.t_svdGlobalConfig_payload()
+        local_payload = Belle2.SVDDetectorConfiguration.t_svdLocalConfig_payload(
+            "LocalConfiguration_default_" + str(now.isoformat()) +
+            "_INFO:_injCharge=" + str(injCharge) + "_calTimeUnits=" + str(calibrationTimeUnits))
+
+        global_payload = Belle2.SVDDetectorConfiguration.t_svdGlobalConfig_payload(
+            "GlobalConfiguration_default_" + str(now.isoformat()) +
+            "_INFO:_latency=" + str(latency) +
+            "_maskFilter=" + str(maskFilter) + "_ZS=" + str(zeroSuppress) +
+            "_apvClkUnits=" + str(apvClockTimeUnits))
 
         local_payload.setCalibrationTimeInRFCUnits(calibrationTimeUnits)
         local_payload.setCalibDate(calibDate)
@@ -59,8 +67,8 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox")  # fileName="/geometry/Beast2_phase2.xml")
-main.add_module("Geometry", components=['SVD'])  # , useDB = False)
+main.add_module("Gearbox")
+main.add_module("Geometry", components=['SVD'])
 
 main.add_module(defaultSVDConfigParametersImporter())
 

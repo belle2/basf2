@@ -112,8 +112,11 @@ int main(int argc, char* argv[])
     }
     B2ASSERT("Size is negative! This should be handled above. Not good!", size > 0);
 
-    // Terminate messages make us terminate
     if (not raw) {
+      // We want to have it in words, not bytes
+      size = ((size - 1) / sizeof(int) + 1);
+
+      // Terminate messages make us terminate
       EvtMessage message(reinterpret_cast<char*>(buffer));
       if (message.type() == MSG_TERMINATE) {
         B2RESULT("Having received terminate message");
@@ -122,7 +125,7 @@ int main(int argc, char* argv[])
     }
 
     // Monitoring
-    flow.log(size * 4);
+    flow.log(size * sizeof(int));
 
     // Write to ring buffer
     const int returnValue = mainLoop.writeToRingBufferWaiting(ringBuffer, buffer, size);

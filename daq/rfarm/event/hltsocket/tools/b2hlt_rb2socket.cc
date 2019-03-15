@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     B2ASSERT("Size is negative! This should be handled above. Not good!", size > 0);
 
     // Monitoring
-    flow.log(size * 4);
+    flow.log(size * sizeof(int));
 
     if (raw) {
       returnValue = socket.put_wordbuf(buffer, size);

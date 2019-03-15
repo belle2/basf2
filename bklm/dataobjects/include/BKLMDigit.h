@@ -128,7 +128,7 @@ namespace Belle2 {
     int getCTime() const { return m_CTime; }
 
     //! Get the status of scint pulse-shape fit
-    //! @return status of scint pulse-shape fit (enum EKLM::FPGAFitStatus returned as int!)
+    //! @return status of scint pulse-shape fit (enum EKLM::ScintillatorFirmwareFitStatus returned as int!)
     int getFitStatus() { return m_FitStatus; }
 
     //! Determine whether two BKLMDigits refer to the same strip
@@ -158,7 +158,7 @@ namespace Belle2 {
     //! Set the charge value
     void setCharge(int charge) { m_Charge = charge; }
 
-    //! Set the status of the pulse-shape fit (enum EKLM::FPGAFitStatus --> int!)
+    //! Set the status of the pulse-shape fit (enum EKLM::ScintillatorFirmwareFitStatus --> int!)
     //! @param status completion status of the pulse-shape analysis
     void setFitStatus(int status) { m_FitStatus = status; }
 

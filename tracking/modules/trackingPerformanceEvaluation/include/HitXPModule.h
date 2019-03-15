@@ -70,34 +70,34 @@ namespace Belle2 {
     void terminate() override;
 
   private:
-    TTree* m_tree; /**< full output tree */
-    TFile* m_outputFile; /**< output file */
+    TTree* m_tree = nullptr; /**< full output tree */
+    TFile* m_outputFile = nullptr; /**< output file */
     std::vector<hitXP> m_hitXP; /**< vector of the hitXP, used to fill the output tree */
     std::set<hitXP, hitXP::timeCompare> m_hitXPSet; /**< set of the hitXP, used to order tn time he hit */
     bool c_addTree; /**<parameter to produce additional tree */
 
-    int m_trackNumber; /**< iterative number of the track in the run */
-    int m_eventNumber; /**< interative number of the event in the run */
-    int m_numberHitPerTrack; /**< counter of the number of the hit for each track */
-    int m_trackIterator; /**< iterator used to count track (m_trackNumber) */
-    int m_eventIterator; /**< iterator used to count event number (m_eventNumber) */
+    int m_trackNumber = 0; /**< iterative number of the track in the run */
+    int m_eventNumber = 0; /**< interative number of the event in the run */
+    int m_numberHitPerTrack = 0; /**< counter of the number of the hit for each track */
+    int m_trackIterator = 0; /**< iterator used to count track (m_trackNumber) */
+    int m_eventIterator = 0; /**< iterator used to count event number (m_eventNumber) */
 
-    TTree* m_treeSel; /**< selected output tree */
-    TFile* m_outputFileSel;/**<  selected output file */
+    TTree* m_treeSel = nullptr; /**< selected output tree */
+    TFile* m_outputFileSel = nullptr;/**<  selected output file */
     std::vector<hitXP> m_hitXPSel; /**< selected vector of hitXP */
-    int m_trackNumberSel; /**< selected iterative number of the track in the run */
-    int m_eventNumberSel; /**< selected interative number of the event in the run */
-    int m_numberHitPerTrackSel;/**< selected counter of the number of the hit for each track */
+    int m_trackNumberSel = 0; /**< selected iterative number of the track in the run */
+    int m_eventNumberSel = 0; /**< selected interative number of the event in the run */
+    int m_numberHitPerTrackSel = 0;/**< selected counter of the number of the hit for each track */
 
-    TTree* m_treeTiSel; /**< tight selected output tree */
-    TFile* m_outputFileTiSel; /**<  tight selected output file */
+    TTree* m_treeTiSel = nullptr; /**< tight selected output tree */
+    TFile* m_outputFileTiSel = nullptr; /**<  tight selected output file */
     std::vector<hitXP> m_hitXPTiSel; /**< tight selected vector of hitXP */
-    int m_trackNumberTiSel; /**< tight selected iterative number of the track in the run */
-    int m_eventNumberTiSel; /**< tight selected interative number of the event in the run */
-    int m_numberHitPerTrackTiSel; /**< tight selected counter of the number of the hit for each track */
+    int m_trackNumberTiSel = 0; /**< tight selected iterative number of the track in the run */
+    int m_eventNumberTiSel = 0; /**< tight selected interative number of the event in the run */
+    int m_numberHitPerTrackTiSel = 0; /**< tight selected counter of the number of the hit for each track */
 
-    TFile* m_outputFileExt; /**< external output file */
-    TTree* m_treeExt; /**< external output tree */
+    TFile* m_outputFileExt = nullptr; /**< external output file */
+    TTree* m_treeExt = nullptr; /**< external output tree */
     std::vector<double> m_EpositionEntryX; /**< exteral position at entry point, coordinate x */
     std::vector<double> m_EpositionEntryY; /**< exteral position at entry point, coordinate y */
     std::vector<double> m_EpositionEntryZ; /**< exteral position at entry point, coordinate z */
@@ -122,9 +122,9 @@ namespace Belle2 {
     std::vector<int> m_EclusterU; /**< external flag of u-cluster */
     std::vector<int> m_EclusterV; /**< external flag of v-cluster */
     std::vector<double> m_Echarge; /**< external charge */
-    int m_EtrackNumber; /**< external iterator of track in the run */
-    int m_EeventNumber; /**< external iterator of event in the run */
-    int m_EnumberHitPerTrack; /**< external numer of the hit for each track */
+    int m_EtrackNumber = 0; /**< external iterator of track in the run */
+    int m_EeventNumber = 0; /**< external iterator of event in the run */
+    int m_EnumberHitPerTrack = 0; /**< external numer of the hit for each track */
     std::vector<double> m_EomegaEntry; /**< external omega parameter at entry point */
     std::vector<double> m_Eomega0;  /**< external omega parameter at IP */
     std::vector<double> m_Ed0Entry; /**< external d0 parameter at entry point */
@@ -135,7 +135,7 @@ namespace Belle2 {
     std::vector<double> m_Ez00; /**< external z0 parameter at IP */
     std::vector<double> m_EtanlambdaEntry; /**< external tanlambda parameter at entry point */
     std::vector<double> m_Etanlambda0; /**< external tanlambda parameter at IP */
-    int m_Eprimary; /**< external flag for primary particles */
+    int m_Eprimary = 0; /**< external flag for primary particles */
 
   protected:
 

@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>oliver.frost@desy.de</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSimNoBkg.root</input>
   <output>CDCAutomatonTrackingValidation.root</output>
   <description>
@@ -14,7 +14,7 @@
 """
 
 VALIDATION_OUTPUT_FILE = 'CDCAutomatonTrackingValidation.root'
-CONTACT = 'oliver.frost@desy.de'
+CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 1000
 ACTIVE = True
 

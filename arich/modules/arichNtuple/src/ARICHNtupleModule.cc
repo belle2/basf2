@@ -72,6 +72,7 @@ namespace Belle2 {
   void ARICHNtupleModule::initialize()
   {
 
+    if (m_file) delete m_file;
     m_file = new TFile(m_outputFile.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
       B2FATAL("Couldn't open file '" << m_outputFile << "' for writing!");
@@ -82,6 +83,7 @@ namespace Belle2 {
 
     m_tree->Branch("evt", &m_arich.evt, "evt/I");
     m_tree->Branch("run", &m_arich.run, "run/I");
+    m_tree->Branch("exp", &m_arich.exp, "exp/I");
 
     m_tree->Branch("charge", &m_arich.charge, "charge/S");
     m_tree->Branch("pValue", &m_arich.pValue, "pValue/F");
@@ -171,6 +173,10 @@ namespace Belle2 {
 
       m_arich.clear();
 
+      m_arich.evt = evtMetaData->getEvent();
+      m_arich.run = evtMetaData->getRun();
+      m_arich.exp = evtMetaData->getExperiment();
+
       // set hapd window hit if available
       if (arichTrack.hitsWindow()) {
         TVector2 winHit = arichTrack.windowHitPosition();
@@ -257,7 +263,7 @@ namespace Belle2 {
 
       // get reconstructed photons associated with track
       const std::vector<ARICHPhoton>& photons = arichTrack.getPhotons();
-      m_arich.nRec = photons.size() < 200 ? photons.size() : 200 ;
+      m_arich.nRec = photons.size();
       int nphot = 0;
       for (auto it = photons.begin(); it != photons.end(); ++it) {
         ARICHPhoton iph = *it;
@@ -270,7 +276,6 @@ namespace Belle2 {
         }
         m_arich.photons.push_back(iph);
         nphot++;
-        if (nphot == 200) break;
       }
 
       TVector3 recPos = arichTrack.getPosition();

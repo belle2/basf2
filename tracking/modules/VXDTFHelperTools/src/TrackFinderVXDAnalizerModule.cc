@@ -47,7 +47,6 @@ REG_MODULE(TrackFinderVXDAnalizer)
 TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
 {
   B2INFO("TrackFinderVXDAnalizer-initialize");
-//   InitializeVariables();
 
   vector<string> rootFileNameVals;
   rootFileNameVals.push_back("TrackFinderVXDAnalizerResults");
@@ -135,15 +134,7 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
   addParam("minNDFThreshold", m_PARAMminNDFThreshold,
            " defines how many measurements (numbers of degrees of freedom) the TC must have to be accepted as reconstructed, standard is 5",
            unsigned(5));
-//   addParam("printExtentialAnalysisData", m_PARAMprintExtentialAnalysisData, "set true, if you want to cout special Info to the shell",
-  //            bool(false)); // TODO outdated, to be deleted...
 
-//   addParam("minTMomentumFilter", m_PARAMminTMomentumFilter,
-//            "to narrow down the relevant mcTracks, this minFilter can be set to filter tracks having lower transverse momentum in GeV/c than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges - WARNING for some cases, this is a typical source for strange results!",
-//            double(0.)); // TODO: shall they be re-implemented?
-//   addParam("maxTMomentumFilter", m_PARAMmaxTMomentumFilter,
-//            "to narrow down the relevant mcTracks, this maxFilter can be set to filter tracks having higher transverse momentum in GeV/c than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges - WARNING for some cases, this is a typical source for strange results!",
-  //            double(500.)); // TODO: shall they be re-implemented?
   addParam("writeToRoot", m_PARAMwriteToRoot,
            " if true, analysis data is stored to root file with file name chosen by 'rootFileName'", bool(true));
   addParam("rootFileName", m_PARAMrootFileName,

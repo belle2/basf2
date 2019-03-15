@@ -26,7 +26,7 @@ namespace Belle2 {
       return s_dbPackageIdentifier + "&" + baseCutIdentifier + "&" + cutIdentifier;
     }
 
-    std::string SoftwareTriggerDBHandler::makeTotalCutName(const std::string& baseIdentifier)
+    std::string SoftwareTriggerDBHandler::makeTotalResultName(const std::string& baseIdentifier)
     {
       return makeFullCutName(baseIdentifier, s_totalResultIdentifier);
     }

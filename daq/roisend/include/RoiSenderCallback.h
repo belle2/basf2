@@ -1,11 +1,4 @@
-#ifndef _Belle2_RoiSenderCallback_hh
-#define _Belle2_RoiSenderCallback_hh
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <unistd.h>
-#include <sys/types.h>
+#pragma once
 
 #include <daq/slc/runcontrol/RCCallback.h>
 
@@ -13,8 +6,7 @@
 #include <daq/rfarm/manager/RFProcessManager.h>
 #include <daq/rfarm/manager/RFSharedMem.h>
 #include <daq/rfarm/manager/RFLogManager.h>
-
-#include <framework/pcore/RingBuffer.h>
+#include <atomic>
 
 namespace Belle2 {
 
@@ -22,28 +14,26 @@ namespace Belle2 {
 
   public:
     RoiSenderCallback();
-    virtual ~RoiSenderCallback();
 
   public:
-    virtual void load(const DBObject&, const std::string&);
-    virtual void start();
-    virtual void stop();
-    virtual void recover(const DBObject&, const std::string&);
-    virtual void abort();
+    void load(const DBObject&, const std::string&);
+    void start();
+    void stop();
+    void recover(const DBObject&, const std::string&);
+    void abort();
 
-    void RoiSenderLogger();
+    void server();
 
   private:
-    RFConf* m_conf;
-    RFProcessManager* m_proc;
-    RFLogManager* m_log;
-    char* m_nodename;
-    RFSharedMem* m_shm;
-    int m_pid_merger;
-    pthread_t m_logthread;
+    RFConf* m_conf{};
+    RFProcessManager* m_proc{};
+    RFLogManager* m_log{};
+    char* m_nodename{};
+    RFSharedMem* m_shm{};
+    std::atomic_int m_pid_merger{};
+    pthread_t m_logthread{};
 
   };
 
 }
 
-#endif

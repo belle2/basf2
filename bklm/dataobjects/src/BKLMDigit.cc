@@ -51,20 +51,18 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
 
 BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
   DigitBase(),
+  m_CTime(ctime),
+  m_ModuleID(moduleID),
   m_SimTime(0.0),
+  m_Time(0.0),
   m_SimEDep(0.0),
   m_EDep(0.0),
   m_SimNPixel(0),
   m_NPixel(0.0),
+  m_Charge(charge),
   m_FitStatus(0)
 {
-  //this assaumes that the strip is already zero based...
-  m_ModuleID = moduleID;
-  m_CTime = ctime;
-  m_Time = tdc;
-  //m_NPixel = charge;
-  m_Charge = charge;
-
+  (void)tdc;
 }
 
 // Constructor with initial values for a scint simHit

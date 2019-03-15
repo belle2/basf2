@@ -502,8 +502,12 @@ class PostReconstruction(object):
                                      variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                      filename=config.removeJPsiSlash(filename), path=path)
 
-                variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                             'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                if 'B' in particle.identifier:
+                    variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                                 'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                else:
+                    variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 filename = 'Monitor_Final_{}.root'.format(particle.identifier)
                 variablesToNtuple(particle.identifier, variables, treename='variables',
                                   filename=config.removeJPsiSlash(filename), path=path)

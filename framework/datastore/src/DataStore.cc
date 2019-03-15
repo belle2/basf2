@@ -268,6 +268,28 @@ bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const Store
   return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, storeFlags);
 }
 
+bool DataStore::hasRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                            const std::string& namedRelation)
+{
+  // check that the input makes sense
+  if (!fromArray.isArray())
+    B2FATAL(fromArray.readableName() << " is not an array!");
+  if (!toArray.isArray())
+    B2FATAL(toArray.readableName() << " is not an array!");
+
+  // check the the namedRelation only contains regular characters
+  if (!std::regex_match(namedRelation, m_regexNamedRelationCheck))
+    B2FATAL("Named Relations can only contain alphabetic characters, given was: " << namedRelation);
+
+  // get the internal relation name from the name provided
+  const std::string& realname = relationName(fromArray.getName(), toArray.getName(), namedRelation);
+
+  // check whether the map entry exists
+  const auto& it = m_storeEntryMap[durability].find(realname);
+  if (it != m_storeEntryMap[durability].end()) return true;
+
+  return false;
+}
 
 DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
 {

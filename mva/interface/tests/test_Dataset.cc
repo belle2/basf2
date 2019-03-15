@@ -1,4 +1,5 @@
-/* BASF2 (Belle Analysis Framework 2)                                     *
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -402,7 +403,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -684,7 +685,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -965,7 +966,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -994,7 +995,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree2.Fill();
@@ -1337,7 +1338,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -1366,7 +1367,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree2.Fill();

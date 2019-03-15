@@ -832,7 +832,8 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
 
 
 def get_unittest_channels(specific=False):
-    chargedVariables = ['eid', 'extraInfo(preCut_rank)', 'Kid', 'prid', 'muid',
+    chargedVariables = ['electronID', 'extraInfo(preCut_rank)',
+                        'kaonID', 'protonID', 'muonID',
                         'p', 'pt', 'pz', 'dr', 'dz', 'chiProb']
 
     specific_cut = ''

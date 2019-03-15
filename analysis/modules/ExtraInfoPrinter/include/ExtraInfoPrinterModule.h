@@ -31,7 +31,7 @@ namespace Belle2 {
   public:
     /** Constructor */
     ExtraInfoPrinterModule();
-    /* Initialises module */
+    /** Initialises module */
     virtual void initialize() override;
     /** Called for each event */
     virtual void event() override;

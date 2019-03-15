@@ -88,7 +88,6 @@ namespace Belle2 {
     bool m_arichEvents; /**< process only events that have extrapolated hit in arich */
     int m_maxHits; /**< exclude events with very large number of hits in arich */
     int m_minHits; /**< exclude events with number of hits lower than this */
-    int m_hotThr; /**< Threshold scale of hits/channel to dicide hot channels */
 
     //Histograms to show status by 1/0
     TH1* h_chStat = NULL;/**<Status of each channels*/

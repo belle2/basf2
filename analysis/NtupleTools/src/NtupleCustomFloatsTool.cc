@@ -54,6 +54,7 @@ void NtupleCustomFloatsTool::setupTree()
       int iPos = iVar * nDecayProducts + iProduct;
       string varName;
 
+      // cppcheck-suppress stlIfStrFind
       if (m_strVarNames[iVar].find("{", 0) > 0) {
         varName = m_strVarNames[iVar].substr(m_strVarNames[iVar].find("{", 0) + 1, m_strVarNames[iVar].find("}",
                                              0) - m_strVarNames[iVar].find("{", 0) - 1);

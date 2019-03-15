@@ -113,7 +113,7 @@ void TrackFilterModule::event()
 
 void TrackFilterModule::terminate()
 {
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     m_selectedNtpl->Write();

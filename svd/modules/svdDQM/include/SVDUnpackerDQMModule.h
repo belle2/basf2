@@ -82,6 +82,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
     bool changeFADCaxis;
+    bool shutUpNoData;
 
     uint16_t ftbError;
     uint16_t ftbFlags;
@@ -90,6 +91,8 @@ namespace Belle2 {
     bool fadcMatch;
     bool upsetAPV;
     bool badMapping;
+    bool badHeader;
+    bool badTrailer;
     unsigned short fadcNo;
     //unsigned short apvNo;
 

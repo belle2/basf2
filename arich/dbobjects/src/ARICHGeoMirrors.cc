@@ -39,7 +39,6 @@ bool ARICHGeoMirrors::isConsistent() const
   if (m_plateThickness <= 0 || m_plateWidth <= 0 || m_plateLength <= 0) return false;
   if (m_plateWidth == 0) return false;
   if (m_radius == 0) return false;
-  if (m_radius == 0) return false;
   if (m_point.size() != m_nMirrors) return false;
   if (m_normVector.size() != m_nMirrors) return false;
   if (m_installed.size() != m_nMirrors) return false;

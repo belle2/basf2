@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Pulvermacher                                   *
@@ -24,17 +24,26 @@
 namespace Belle2 {
   class Particle;
 
-  /** Selects Particles with the highest values of 'variable' in the input list and removes all other particles from the list. Particles will receive an extra-info field '${variable}_rank' containing their rank as an integer starting at 1 (best). The ranking also takes antiparticles into account, so there will only be one B+- candidate with rank=1. Candidates with same value of 'variable' will have different ranks, with undefined order. The remaining list is sorted from best to worst candidate (each charge, e.g. B+/B-, separately).  */
+  /**
+   * Selects Particles with the highest values of 'variable' in the input list
+   * and removes all other particles from the list. Particles will receive an
+   * extra-info field '${variable}_rank' containing their rank as an integer
+   * starting at 1 (best). The ranking also takes antiparticles into account,
+   * so there will only be one B+- candidate with rank=1. Candidates with same
+   * value of 'variable' will have different ranks, with undefined order. The
+   * remaining list is sorted from best to worst candidate (each charge, e.g.
+   * B+/B-, separately).
+   */
   class BestCandidateSelectionModule : public Module {
   public:
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     BestCandidateSelectionModule();
+    /** Destructor */
     virtual ~BestCandidateSelectionModule() override;
-
+    /** Initialize the module (set up datastore) */
     virtual void initialize() override;
+    /** Process an event */
     virtual void event() override;
 
   private:

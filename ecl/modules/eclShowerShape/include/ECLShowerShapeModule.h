@@ -120,10 +120,10 @@ namespace Belle2 {
     m_dataset; /**< Pointer to the current dataset. It is assumed it holds 22 entries, 11 Zernike moments of N2 shower, followed by 11 Zernike moments of N1 shower. */
 
     /** Neighbour map 9 neighbours, for E9oE21 and E1oE9. */
-    ECL::ECLNeighbours* m_neighbourMap9{nullptr};
+    std::unique_ptr<ECL::ECLNeighbours> m_neighbourMap9;
 
     /** Neighbour map 21 neighbours, for E9oE21. */
-    ECL::ECLNeighbours* m_neighbourMap21{nullptr};
+    std::unique_ptr<ECL::ECLNeighbours> m_neighbourMap21;
 
     /** initialize MVA weight files from DB
      */

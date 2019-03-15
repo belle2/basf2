@@ -27,10 +27,10 @@ SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDB4CommissioningPlots_output.root"));
 
-  addParam("RecoDigitsName", m_RecoDigitName, "Name of RecoDigit Store Array.", std::string(""));
-  addParam("ClustersName", m_ClusterName, "Name of Cluster Store Array.", std::string(""));
-  addParam("TrackListName", m_TrackName, "Name of Track Store Array.", std::string(""));
-  addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string(""));
+  addParam("RecoDigitsName", m_RecoDigitName, "Name of RecoDigit Store Array.", std::string("SVDRecoDigits"));
+  addParam("ClustersName", m_ClusterName, "Name of Cluster Store Array.", std::string("SVDClusters"));
+  addParam("TrackListName", m_TrackName, "Name of Track Store Array.", std::string("Tracks"));
+  addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string("TrackFitResults"));
 }
 
 SVDB4CommissioningPlotsModule::~SVDB4CommissioningPlotsModule()
@@ -180,8 +180,7 @@ void SVDB4CommissioningPlotsModule::event()
   }
   BOOST_FOREACH(Track & track, m_Tracks) {
 
-    const TrackFitResult* tfr = NULL;
-    tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
       m_mom->Fill(tfr->getMomentum().Mag());

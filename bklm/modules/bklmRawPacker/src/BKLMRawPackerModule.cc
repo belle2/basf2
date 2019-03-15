@@ -252,7 +252,6 @@ void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, 
                                      unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
 {
 
-  charge = m_scintADCOffset - charge;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;

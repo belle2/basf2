@@ -9,7 +9,6 @@
 
 #include <tracking/modules/spacePointCreator/SpacePoint2TrueHitConnectorModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-// #include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/Environment.h> // getNumberProcesses
 
@@ -22,7 +21,6 @@
 #include <cmath>
 
 #include <algorithm>
-// #include <map>
 #include <unordered_map>
 #include <tracking/spacePointCreation/MapHelperFunctions.h> // map helper stuff
 
@@ -89,8 +87,8 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
 
   // initialize all counters
   initializeCounters();
-  m_rootFilePtr = NULL;
-  m_treePtr = NULL;
+  m_rootFilePtr = nullptr;
+  m_treePtr = nullptr;
 
   if (m_PARAMpositionAnalysis == true and Environment::Instance().getNumberProcesses() > 0) {
     B2WARNING(
@@ -240,12 +238,12 @@ void SpacePoint2TrueHitConnectorModule::event()
         registerAllRelations(spacePoint, trueHitMap, detType);
       } else { // find THE ONE TrueHit (to rule them all, one TrueHit to find them all ...)
         // COULDDO: wrap this up in a function
-        pair<VXDTrueHit*, double> trueHitwWeight = { NULL, 0.0 };
+        pair<VXDTrueHit*, double> trueHitwWeight = { nullptr, 0.0 };
 
         if (detType == c_PXD) trueHitwWeight = getTHwithWeight<baseMapT, PXDTrueHit>(trueHitMap, m_PXDTrueHits, spacePoint, c_PXD);
         else trueHitwWeight = getTHwithWeight<baseMapT, SVDTrueHit>(trueHitMap, m_SVDTrueHits, spacePoint, c_SVD);
 
-        if (trueHitwWeight.first != NULL) {
+        if (trueHitwWeight.first != nullptr) {
           registerOneRelation(spacePoint, trueHitwWeight, detType);
           thIndex = trueHitwWeight.first->getArrayIndex();
         } else {
@@ -581,7 +579,7 @@ void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spa
     double weightV = info.m_wV;
 
     MCParticle* mcParticle = trueHit->getRelatedFrom<MCParticle>("ALL");
-    if (mcParticle != NULL) {
+    if (mcParticle != nullptr) {
       if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle)) relationStatus.addStatus(c_primaryParticle);
     }
 
@@ -632,8 +630,8 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
                                                    Belle2::SpacePoint* spacePoint, e_detTypes detType)
 {
   vector<TrueHitInfo> trueHitInfos = getAllValues(aMap);
-  std::pair<TrueHitType*, double> THwithWeight(NULL, 0.0); // default return value
-  // return NULL pointer and zero weight if there is no TrueHit (safety measure that should not actually be needed!)
+  std::pair<TrueHitType*, double> THwithWeight(nullptr, 0.0); // default return value
+  // return nullptr pointer and zero weight if there is no TrueHit (safety measure that should not actually be needed!)
   if (trueHitInfos.empty()) return THwithWeight;
   std::sort(trueHitInfos.begin(), trueHitInfos.end()); // sort to have best candidates at beginning
 
@@ -666,7 +664,7 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
       int mcPartId = -1, pdgCode = 0;
       bool primary = false;
 
-      if (mcParticle != NULL) {
+      if (mcParticle != nullptr) {
         mcPartId = mcParticle->getArrayIndex();
         primary = mcParticle->hasStatus(MCParticle::c_PrimaryParticle);
         pdgCode = mcParticle->getPDG();
@@ -710,7 +708,7 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
   // check primary first
   MCParticle* mcPart = trueHit->template getRelatedFrom<MCParticle>("ALL");
   bool primaryPart = false; // assume secondary or background for safety
-  if (mcPart != NULL) primaryPart = mcPart->hasStatus(MCParticle::c_PrimaryParticle);
+  if (mcPart != nullptr) primaryPart = mcPart->hasStatus(MCParticle::c_PrimaryParticle);
   if (m_PARAMrequirePrimary && !primaryPart) {
     B2DEBUG(150, "TrueHit is not related to a primary particle but 'requirePrimary' is set to true!");
     m_rejectedNoPrimaryCtr++;
@@ -853,7 +851,7 @@ void SpacePoint2TrueHitConnectorModule::initializeRootFile()
 // ========================================================= CLOSE ROOT FILE ======================================================
 void SpacePoint2TrueHitConnectorModule::closeRootFile()
 {
-  if (m_treePtr != NULL && m_rootFilePtr != NULL) {
+  if (m_treePtr != nullptr && m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
 //     m_treePtr->Write(); // using TTree::Write() instead, which calls this any way
     m_rootFilePtr->Write();

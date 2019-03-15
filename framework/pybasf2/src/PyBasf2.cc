@@ -39,9 +39,9 @@ FileMetaData updateFileMetaData(const std::string& fileName, const std::string& 
   }
 
   // read the FileMetaData object or create a new one if it doesn't exist
-  FileMetaData* fileMetaData = 0;
-  TTree* tree = (TTree*) file->Get("persistent");
-  TTree* newTree = 0;
+  FileMetaData* fileMetaData = nullptr;
+  TTree* tree = dynamic_cast<TTree*>(file->Get("persistent"));
+  TTree* newTree = nullptr;
   if (!tree) {
     fileMetaData = dynamic_cast<FileMetaData*>(file->Get("FileMetaData"));
     if (!fileMetaData) {
@@ -58,6 +58,7 @@ FileMetaData updateFileMetaData(const std::string& fileName, const std::string& 
   }
 
   // update the IDs and write the updated FileMetaData to the file
+  const std::string oldLFN = fileMetaData->getLfn();
   fileMetaData->setLfn(lfn);
   if (newTree) {
     newTree->Fill();
@@ -66,10 +67,13 @@ FileMetaData updateFileMetaData(const std::string& fileName, const std::string& 
     fileMetaData->Write("FileMetaData");
   }
 
-  // update the local file catalog
-  FileMetaData localMetaData = *fileMetaData;
-  FileCatalog::Instance().registerFile(fileName, localMetaData);
-
+  // update the local file catalog but only *if* the file was already registered
+  std::string oldPFN = oldLFN;
+  FileMetaData localMetaData;
+  if (FileCatalog::Instance().getMetaData(oldPFN, localMetaData)) {
+    localMetaData  = *fileMetaData;
+    FileCatalog::Instance().registerFile(fileName, localMetaData, oldLFN);
+  }
   return *fileMetaData;
 }
 

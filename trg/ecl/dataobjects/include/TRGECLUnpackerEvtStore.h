@@ -48,8 +48,17 @@ namespace Belle2 {
     //! Total Energy in physics region of this event.
     int e_etot_p;
 
-    //! 3D Bhabha bit of this event.
-    int e_b2bhabha;
+    //! 3D Bhabha for veto bit of this hit.
+    int e_b2bhabhav;
+
+    //! 3D Bhabha for selection bit of this hit.
+    int e_b2bhabhas;
+
+    //! mumu bit of this hit.
+    int e_mumu;
+
+    //! prescale bit of this hit.
+    int e_prescale;
 
     //! 2D Bhabha bit of this event.
     int e_b1bhabha;
@@ -59,6 +68,9 @@ namespace Belle2 {
 
     //! checksum flag of this event.
     int e_checksum;
+
+    //! event check of this event.
+    int e_checkevt;
 
     //! The method to set event id
     void setEventId(int eventId) {e_eventId = eventId;}
@@ -87,8 +99,17 @@ namespace Belle2 {
     //! The mothod to set Total Energy in physics region
     void setEtotP(int etot_p) {e_etot_p = etot_p;}
 
-    //! The mothod to set 3D Bhabha bit
-    void set3DBhabha(int b2bhabha) {e_b2bhabha = b2bhabha;}
+    //! The mothod to set 3D Bhabha veto bit
+    void set3DBhabhaV(int b2bhabhav) {e_b2bhabhav = b2bhabhav;}
+
+    //! The mothod to set 3D Bhabha selection bit
+    void set3DBhabhaS(int b2bhabhas) {e_b2bhabhas = b2bhabhas;}
+
+    //! The mothod to set mumu bit
+    void setMumu(int mumu) {e_mumu = mumu;}
+
+    //! The mothod to set prescale bit
+    void setPrescale(int prescale) {e_prescale = prescale;}
 
     //! The mothod to set 2D Bhabha bit
     void set2DBhabha(int b1bhabha) {e_b1bhabha = b1bhabha;}
@@ -99,11 +120,14 @@ namespace Belle2 {
     //! The mothod to set checksum flag
     void setCheckSum(int checksum) {e_checksum = checksum;}
 
+    //! The mothod to set Evt Exist
+    void setEvtExist(int evtexist) {e_checkevt = evtexist;}
+
     //! The method to get event id
     int getEventId() const {return e_eventId;}
 
     //! The mothod to get the ETM version
-    int setETM() const {return e_etm;}
+    int getETM() const {return e_etm;}
 
     //! The mothod to get the L1 revoclk
     int getL1Revo() const {return e_l1_revo;}
@@ -126,8 +150,17 @@ namespace Belle2 {
     //! The mothod to get Total Energy in physics region
     int getEtotP() const {return e_etot_p;}
 
-    //! The mothod to get 3D Bhabha bit
-    int get3DBhabha() const {return e_b2bhabha;}
+    //! The mothod to get 3D Bhabha veto bit
+    int get3DBhabhaV() const {return e_b2bhabhav;}
+
+    //! The mothod to get 3D Bhabha selection bit
+    int get3DBhabhaS() const {return e_b2bhabhas;}
+
+    //! The mothod to get mumu bit
+    int getMumu() const {return e_mumu;}
+
+    //! The mothod to get prescale bit
+    int getPrescale() const {return e_prescale;}
 
     //! The mothod to get 2D Bhabha bit
     int get2DBhabha() const {return e_b1bhabha;}
@@ -137,6 +170,9 @@ namespace Belle2 {
 
     //! The mothod to get checksum flag
     int getCheckSum() const {return e_checksum;}
+
+    //! The mothod to get Evt Check
+    int getEvtExist() const {return e_checkevt;}
 
     TRGECLUnpackerEvtStore()
     {
@@ -150,10 +186,14 @@ namespace Belle2 {
       e_ntc       = 0;
       e_etot      = 0;
       e_etot_p    = 0;
-      e_b2bhabha  = 0;
+      e_b2bhabhav = 0;
+      e_b2bhabhas = 0;
+      e_mumu      = 0;
+      e_prescale  = 0;
       e_b1bhabha  = 0;
       e_physics   = 0;
       e_checksum  = 0;
+      e_checkevt  = 0;
     }
 
     //! Useful Constructor
@@ -167,10 +207,14 @@ namespace Belle2 {
       int ntc,
       int etot,
       int etot_p,
-      int b2bhabha,
+      int b2bhabhav,
+      int b2bhabhas,
+      int mumu,
+      int prescale,
       int b1bhabha,
       int physics,
-      int checksum
+      int checksum,
+      int evtexist
     )
     {
       e_eventId  = eventId;
@@ -182,13 +226,17 @@ namespace Belle2 {
       e_ntc      = ntc;
       e_etot     = etot;
       e_etot_p   = etot_p;
-      e_b2bhabha = b2bhabha;
+      e_b2bhabhav = b2bhabhav;
+      e_b2bhabhas = b2bhabhas;
+      e_mumu      = mumu;
+      e_prescale  = prescale;
       e_b1bhabha = b1bhabha;
       e_physics  = physics;
       e_checksum = checksum;
+      e_checkevt = evtexist;
     }
     /** the class title */
-    ClassDef(TRGECLUnpackerEvtStore, 1);
+    ClassDef(TRGECLUnpackerEvtStore, 2);
   };
 
 } // end namespace Belle2

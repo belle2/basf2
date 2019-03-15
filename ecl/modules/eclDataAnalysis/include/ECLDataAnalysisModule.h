@@ -305,7 +305,8 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterLAT; /**< Reconstructed LAT */
     std::vector<double>* m_eclClusterDeltaTime99; /**< DeltaTime99 */
     std::vector<int>* m_eclClusterDetectorRegion; /**< Cluster Detector Region */
-    std::vector<int>* m_eclClusterHypothesisId; /**< Cluster Detector Region */
+    std::vector<int>* m_eclClusterHasNPhotonHypothesis; /**< Cluster has n-photon hypothesis */
+    std::vector<int>* m_eclClusterHasNeutralHadronHypothesis; /**< Cluster has neutral hadron hypothesis */
 
     int m_eclPureDigitMultip; /**< Number of ECLDigits per event, PureCsI option */
     std::vector<int>* m_eclPureDigitIdx; /**< ECLDigit index, PureCsI option */
@@ -412,7 +413,8 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterE1oE9;  /**< Reconstructed E1oE9, PureCsI option */
     std::vector<double>* m_eclPureClusterDeltaTime99;  /**< Reconstructed DeltaT99, PureCsI option */
     std::vector<int>* m_eclPureClusterDetectorRegion; /**< Clusters detector region, PureCsI option */
-    std::vector<int>* m_eclPureClusterHypothesisId; /**< Cluster ID Hyp, PureCsI option */
+    std::vector<int>* m_eclPureClusterHasNPhotonHypothesis; /**< Cluster has n-photon hypothesis, PureCsI option */
+    std::vector<int>* m_eclPureClusterHasNeutralHadronHypothesis; /**< Cluster has neutral hadron hypothesis, PureCsI option */
 
     int m_eclShowerMultip; /**< Number of ECLShowers per event */
     std::vector<int>* m_eclShowerIdx; /**< Shower Index */

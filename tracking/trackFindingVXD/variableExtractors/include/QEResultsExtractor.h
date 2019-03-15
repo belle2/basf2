@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
 
     /// Define names of variables that get extracted
-    QEResultsExtractor(std::string method, std::vector<Named<float*>>& variableSet):
+    QEResultsExtractor(const std::string& method, std::vector<Named<float*>>& variableSet):
       VariableExtractor(), m_method(method)
     {
       addVariable(method + "_QI", variableSet);

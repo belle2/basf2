@@ -80,9 +80,26 @@ void MicrotpcStudyModule::defineHisto()
     h_tpc_rate[i]  = new TH1F(TString::Format("h_tpc_rate_%d", i), "detector #", 8, 0., 8.);
   }
 
+  h_mctpc_recoil[0] = new TH3F("h_mctpc_recoil_He", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoilW[0] = new TH3F("h_mctpc_recoil_w_He", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoil[0]->Sumw2();
+  h_mctpc_recoilW[0]->Sumw2();
+
+  h_mctpc_recoil[1] = new TH3F("h_mctpc_recoil_O", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoilW[1] = new TH3F("h_mctpc_recoil_w_O", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoil[1]->Sumw2();
+  h_mctpc_recoilW[1]->Sumw2();
+
+  h_mctpc_recoil[2] = new TH3F("h_mctpc_recoil_C", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoilW[2] = new TH3F("h_mctpc_recoil_w_C", "Neutron recoil energy [MeV]", 13, -0.5, 12.5, 8, -0.5, 7.5, 1000, 0., 10.);
+  h_mctpc_recoil[2]->Sumw2();
+  h_mctpc_recoilW[2]->Sumw2();
+
+
   for (int i = 0 ; i < 12 ; i++) {
-    h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [GeV]", 1000, 0., 10.);
-    h_mctpc_kinetic_zoom[i]  = new TH1F(TString::Format("h_mctpc_kinetic_zoom_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
+    h_mctpc_kinetic[i]  = new TH2F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [GeV]", 8, -0.5, 7.5, 1000, 0., 10.);
+    h_mctpc_kinetic_zoom[i]  = new TH2F(TString::Format("h_mctpc_kinetic_zoom_%d", i), "Neutron kin. energy [MeV]", 8, -0.5, 7.5, 1000,
+                                        0., 10.);
     h_mctpc_tvp[i] = new TH2F(TString::Format("h_mctpc_tvp_%d", i), "theta v phi", 180, 0., 180., 360, -180., 180.);
     h_mctpc_tvpW[i] = new TH2F(TString::Format("h_mctpc_tvpW_%d", i), "theta v phi weighted by kin", 180, 0., 180., 360, -180., 180.);
     h_mctpc_zr[i]  = new TH2F(TString::Format("h_mctpc_zr_%d", i), "r v z", 200, -400., 400., 200, 0., 400.);
@@ -254,9 +271,16 @@ void MicrotpcStudyModule::event()
   StoreArray<TPCG4TrackInfo> mcparts;
   StoreArray<SADMetaHit> sadMetaHits;
   double rate = 0;
+  int ring_section = 0;
+  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   for (const auto& sadMetaHit : sadMetaHits) {
     rate = sadMetaHit.getrate();
+    double ss = sadMetaHit.getss() / 100.;
+    if (ss < 0) ss += 3000.;
+    int section = (int)(ss / 250.);
+    if (section >= 0 && section < 12) ring_section = section_ordering[section];
   }
+
   /*
   StoreArray<MicrotpcDataHit> DataHits;
   int dentries = DataHits.getEntries();
@@ -437,6 +461,7 @@ void MicrotpcStudyModule::event()
     }
   }
   */
+  int trID = 0;
   for (const auto& mcpart : mcparts) { // start loop over all Tracks
     const double energy = mcpart.getEnergy();
     const double mass = mcpart.getMass();
@@ -449,6 +474,33 @@ void MicrotpcStudyModule::event()
     double z = vtx.Z();
     double r = sqrt(vtx.X() * vtx.X() + vtx.Y() * vtx.Y());
     int partID[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    if (trID == mcpart.getTrackID()) continue;
+    else trID = mcpart.getTrackID();
+    int detNb = -1;
+    int nhit = 0;
+    for (const auto& shit : SimHits) {
+      if (shit.gettkID() == trID) {
+        detNb = shit.getdetNb(); nhit++;
+        kin = shit.gettkKEnergy() / 1000;
+      }
+    }
+
+    // the only part that is actually used at the moment // Santelj 28.2.2019
+    if (PDG == 2112) {
+      double trlen = abs(2. / TMath::Sin(mom.Theta()));
+      if (trlen > 10) trlen = 10.;
+      int irecoil = 0;
+      for (auto fract : m_maxEnFrac) { // loop over all recoils in beast/microtpc/data/MICROTPC-recoilProb.xml
+        double recoil = gRandom->Uniform(fract) * kin * 1e3; // calculate recoil energy
+        double weight = m_intProb[irecoil]->Eval(kin * 1e3) * trlen; // weight - interaction probability * track lenght
+        if (weight < 0) weight = 0;
+        h_mctpc_recoil[irecoil]->Fill(ring_section, detNb, recoil); // fill recoil energy
+        h_mctpc_recoilW[irecoil]->Fill(ring_section, detNb, recoil, weight); // fill weighted recoil energy
+        //  std::cout << ring_section << " " << detNb << " " << recoil << " " << weight << std::endl;
+        irecoil++;
+      }
+    }
+    //------------------------------------------------------
 
     if (PDG == 11) partID[0] = 1; //positron
     else if (PDG == -11) partID[1] = 1; //electron
@@ -461,16 +513,17 @@ void MicrotpcStudyModule::event()
     else partID[8] = 1;
 
     if (PDG == 2112) {
+
       if (r < 10.0) {
-        h_mctpc_kinetic[9]->Fill(kin);
-        h_mctpc_kinetic_zoom[9]->Fill(kin * 1e3);
+        h_mctpc_kinetic[9]->Fill(detNb, kin);
+        h_mctpc_kinetic_zoom[9]->Fill(detNb, kin * 1e3);
         h_mctpc_tvp[9]->Fill(theta, phi);
         h_mctpc_tvpW[9]->Fill(theta, phi, kin);
         h_mctpc_zr[9]->Fill(z, r);
       }
       if (r > 70.0) {
-        h_mctpc_kinetic[10]->Fill(kin);
-        h_mctpc_kinetic_zoom[10]->Fill(kin * 1e3);
+        h_mctpc_kinetic[10]->Fill(detNb, kin);
+        h_mctpc_kinetic_zoom[10]->Fill(detNb, kin * 1e3);
         h_mctpc_tvp[10]->Fill(theta, phi);
         h_mctpc_tvpW[10]->Fill(theta, phi, kin);
         h_mctpc_zr[10]->Fill(z, r);
@@ -479,14 +532,15 @@ void MicrotpcStudyModule::event()
 
     for (int i = 0; i < 9; i++) {
       if (partID[i] == 1) {
-        h_mctpc_kinetic[i]->Fill(kin);
-        h_mctpc_kinetic_zoom[i]->Fill(kin * 1e3);
+        h_mctpc_kinetic[i]->Fill(detNb, kin);
+        h_mctpc_kinetic_zoom[i]->Fill(detNb, kin * 1e3);
         h_mctpc_tvp[i]->Fill(theta, phi);
         h_mctpc_tvpW[i]->Fill(theta, phi, kin);
         h_mctpc_zr[i]->Fill(z, r);
       }
     }
   }
+
   //number of Tracks
   //int nTracks = Tracks.getEntries();
 
@@ -623,6 +677,21 @@ void MicrotpcStudyModule::getXMLData()
   m_ChipColumnX = content.getDouble("ChipColumnX");
   m_ChipRowY = content.getDouble("ChipRowY");
   m_z_DG = content.getDouble("z_DG");
+
+  content = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/RecoilProbability");
+  for (const GearDir& recoil : content.getNodes("Recoil")) {
+    m_maxEnFrac.push_back(recoil.getDouble("Fraction"));
+    istringstream probstream;
+    double e, prob;
+    probstream.str(recoil.getString("Probability"));
+    TGraph* gr = new TGraph();
+    int i = 0;
+    while (probstream >> e >> prob) {
+      gr->SetPoint(i, e, prob);
+      i++;
+    }
+    m_intProb.push_back(gr);
+  }
 
   B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
   B2INFO("              from MICROTPC.xml. There are " << nTPC << " TPCs implemented");

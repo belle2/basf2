@@ -79,7 +79,7 @@ It is important to introduce intermediate cuts to reduce combinatorics in order 
 The FEI uses several cuts, which are applied for each particle in the following order:
 
 #.    **PreCut::userCut** is applied before all other cuts to introduce a-priori knowledge, e.g. final-state particle tracks (K shorts are handlet via V0 objects) should originate from the IP ``'[dr < 2] and [abs(dz) < 4]'``, the invariant mass of D mesons should be inside a certain mass window ``'1.7 < M < 1.95'``, hadronic B meson candidates require a reasonable beam-constrained mass and delta E ``'Mbc > 5.2 and abs(deltaE) < 0.5'``. This cut is also used to enforce constraints on the number of additional tracks in the event for a specific signal-side ``'nRemainingTracksInEvent == 1'``.
-#. **PreCut::bestCandidateCut** keeps for each decay-channel only a certain number of best-candidates. The variable which is used to rank all the candidates in an event is usually the PID for final-state particles e.g. eid piid muid; the distance to the nominal invariant mass abs(dM) for intermediate particles; the product of the daughter SignalProbabilities for intermediate particles in semileptonic or KLong channels ``daughterProductOf(extraInfo(SignalProbability))``. Between 10-20 candidates per channel (charge conjuagted candidates are counted separately) are typically kept at this stage. This reduces the combinatoric in each event to the same level.
+#. **PreCut::bestCandidateCut** keeps for each decay-channel only a certain number of best-candidates. The variable which is used to rank all the candidates in an event is usually the PID for final-state particles e.g. ``electronID``, ``pionID``, ``muonID```; the distance to the nominal invariant mass ``abs(dM)`` for intermediate particles; the product of the daughter SignalProbabilities for intermediate particles in semileptonic or KLong channels ``daughterProductOf(extraInfo(SignalProbability))``. Between 10-20 candidates per channel (charge conjuagted candidates are counted separately) are typically kept at this stage. This reduces the combinatoric in each event to the same level.
 #.    **PreCut::vertexCut** throws away candidates below a certain confidence level after the vertex fit. Default is throwing away only candidates with failed fits. Since the vertex fit is the most expensive part of the reconstruction it does not make sense to do a harder cut here, because the cuts on the network output afterwards will be more efficient without to much extra computing time
 #.    **PostCut::value** is a cut on the absolute value of the ``SignalProbability`` and should be chosen very loose, only candidates which are highly unlikely should be thrown away here
 #.    **PostCut::bestCandidateCut** keeps for each particle only a certain number of best-candidates. The candidates of all channels are ranked using their ``SignalProbability``. Usually Between 10-20 candidates are kept per particle. This cut is extremly importan because it limits the combinatoric in the next stage of reconstructions, and the algorithm can calculate the combinatoric at the next stage in advance.
@@ -310,8 +310,8 @@ Specific FEI Training
     path.add_module(skimfilter)
      
     # Signal side reconstruction
-    fillParticleList('mu+', 'muid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-    fillParticleList('e+', 'eid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
+    fillParticleList('mu+', 'muonID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
+    fillParticleList('e+', 'electronID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
     fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
     reconstructDecay('B+:sig_e -> gamma e+', '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6', dmID=1, writeOut=True, path=path)
     reconstructDecay('B+:sig_mu -> gamma mu+', '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6', dmID=2, writeOut=True, path=path)
@@ -497,8 +497,8 @@ Specific FEI
    path.add_module(skimfilter)
     
    # Signal side reconstruction
-   fillParticleList('mu+', 'muid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-   fillParticleList('e+', 'eid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
+   fillParticleList('mu+', 'muonID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
+   fillParticleList('e+', 'electronID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
    fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
    reconstructDecay('B+:sig_e -> gamma e+', '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6', dmID=1, writeOut=True, path=path)
    reconstructDecay('B+:sig_mu -> gamma mu+', '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6', dmID=2, writeOut=True, path=path)
@@ -672,44 +672,6 @@ The tag-side efficiencies are (on the events which survive the skim-cut)
 
 Troubleshooting
 ###############
-
-Bad variable name
-*****************
-
-If you encounter a bad variable name
-
-.. code-block:: c
-
-        [WARNING] Encountered bad variable name 'Kid'. Maybe you misspelled it?  { module: MVAExpert }
-
-and afterwards a segmentation fault
-
-.. code-block:: c
-
-	===========================================================
-	There was a crash.
-	This is the entire stack trace of all threads:
-	===========================================================
-	#0  0x00007f2c98a9b07a in waitpid () from /lib/x86_64-linux-gnu/libc.so.6
-	#1  0x00007f2c98a13fbb in ?? () from /lib/x86_64-linux-gnu/libc.so.6
-	#2  0x00007f2c98683762 in TUnixSystem::StackTrace() () from /local/scratch/ssd/tkeck/externals/v01-05-01/Linux_x86_64/opt/root/lib/libCore.so
-	#3  0x00007f2c98685c1c in TUnixSystem::DispatchSignals(ESignals) () from /local/scratch/ssd/tkeck/externals/v01-05-01/Linux_x86_64/opt/root/lib/libCore.so
-	#4  <signal handler called>
-	#5  0x00007f2c7df1dc18 in std::_Function_handler<double (Belle2::Particle const*), Belle2::Variable::daughter(std::vector<std::string, std::allocator<std::string> > const&)::{lambda(Belle2::Particle const*)#1}>::_M_invoke(std::_Any_data const&, Belle2::Particle const*&&) () from /local/scratch/ssd/tkeck/release/lib/Linux_x86_64/opt/libanalysis.so
-	#6  0x00007f2c7a9dd553 in Belle2::MVAExpertModule::analyse(Belle2::Particle*) () from /local/scratch/ssd/tkeck/release/modules/Linux_x86_64/opt/libMVAExpert.so
-
-::
-
-   from variables import variables as v
-   v.addAlias('Kid_belle', 'kIDBelle')
-
-Usually I provide a function in the backward_compatibility_layer of the FEI which adds those aliases. For instance to deal with the renaming of the PID variables in october 2017 you can add the following to your steering file:
-
-:: 
-
-   from fei import backward_compatibility_layer
-   backward_compatibility_layer.pid_renaming_oktober_2017()
-
 
 Crash in the Neurobayes Library
 *******************************

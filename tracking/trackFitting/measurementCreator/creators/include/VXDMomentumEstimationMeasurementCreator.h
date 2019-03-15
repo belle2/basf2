@@ -87,6 +87,7 @@ namespace Belle2 {
         return {};
       }
 
+      // cppcheck-suppress nullPointerRedundantCheck
       PlanarVXDMomentumMeasurement<HitType>* momentumMeasurement = new PlanarVXDMomentumMeasurement<HitType>(*planarMeasurement, hit,
           &recoTrack);
       momentumMeasurement->setCorrectionFitParameters(m_correctionFitParameters);

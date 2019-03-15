@@ -34,9 +34,9 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
-  addParam("HistoDir", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode"));
-  B2DEBUG(1, "DQMHistAnalysisPXDCM: Constructor done.");
+  B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
 void DQMHistAnalysisPXDCMModule::initialize()
@@ -87,12 +87,12 @@ void DQMHistAnalysisPXDCMModule::initialize()
   SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
-  B2DEBUG(1, "DQMHistAnalysisPXDCM: initialized.");
+  B2DEBUG(99, "DQMHistAnalysisPXDCM: initialized.");
 }
 
 void DQMHistAnalysisPXDCMModule::beginRun()
 {
-  B2DEBUG(1, "DQMHistAnalysisPXDCM: beginRun called.");
+  B2DEBUG(99, "DQMHistAnalysisPXDCM: beginRun called.");
 
   m_cCommonMode->Clear();
   m_cCommonMode->SetLogz();
@@ -113,7 +113,7 @@ void DQMHistAnalysisPXDCMModule::event()
       hh1 = findHist(m_histogramDirectoryName, name);
     }
     if (hh1) {
-      B2INFO("Histo " << name << " found in mem");
+//       B2INFO("Histo " << name << " found in mem");
       for (int bin = 1; bin <= 64; bin++) {
         float v;
         v = hh1->GetBinContent(bin);
@@ -133,7 +133,7 @@ void DQMHistAnalysisPXDCMModule::event()
   // not enough Entries
   // it->canvas->Pad()->SetFillColor(6);// Magenta
 //   B2INFO("data "<<data);
-  /// FIXME: absolute numbers or relative numbers and what is the laccpetable limit?
+  /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
   if (data > 100.) {
     m_cCommonMode->Pad()->SetFillColor(2);// Red
   } else if (data > 50.) {
@@ -159,7 +159,7 @@ void DQMHistAnalysisPXDCMModule::event()
 
 void DQMHistAnalysisPXDCMModule::terminate()
 {
-  B2DEBUG(1, "DQMHistAnalysisPXDCM: terminate called");
+  B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
   // m_cCommonMode->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
 }

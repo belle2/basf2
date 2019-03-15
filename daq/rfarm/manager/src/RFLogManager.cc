@@ -17,7 +17,7 @@ using namespace std;
 
 // Constructor/Destructor
 
-RFLogManager::RFLogManager(char* id, char* lognode, char* logdir)
+RFLogManager::RFLogManager(const char* id, const char* lognode, const char* logdir)
 {
   strcpy(m_id, id);
 
@@ -89,7 +89,7 @@ int RFLogManager::SwitchLogFile()
 }
 
 
-int RFLogManager::WriteLog(char* prefix, char* msg)
+int RFLogManager::WriteLog(const char* prefix, const char* msg)
 {
   SwitchLogFile();
   char wbuf[1024];
@@ -111,7 +111,7 @@ void RFLogManager::timestamp(char* buf)
   return;
 }
 
-char* RFLogManager::BuildMessage(char* fmt, ...)
+char* RFLogManager::BuildMessage(const char* fmt, ...)
 {
   va_list arg;
 
@@ -130,7 +130,7 @@ char* RFLogManager::BuildMessage(char* fmt, ...)
   */
 }
 
-void RFLogManager::Log(char* fmt, ...)
+void RFLogManager::Log(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
@@ -140,7 +140,7 @@ void RFLogManager::Log(char* fmt, ...)
   WriteLog("", msg);
 }
 
-void RFLogManager::Info(char* fmt, ...)
+void RFLogManager::Info(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
@@ -156,7 +156,7 @@ void RFLogManager::Info(char* fmt, ...)
   }
 }
 
-void RFLogManager::Warning(char* fmt, ...)
+void RFLogManager::Warning(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
@@ -172,7 +172,7 @@ void RFLogManager::Warning(char* fmt, ...)
   }
 }
 
-void RFLogManager::Error(char* fmt, ...)
+void RFLogManager::Error(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
@@ -188,7 +188,7 @@ void RFLogManager::Error(char* fmt, ...)
   }
 }
 
-void RFLogManager::Fatal(char* fmt, ...)
+void RFLogManager::Fatal(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
@@ -204,7 +204,7 @@ void RFLogManager::Fatal(char* fmt, ...)
   }
 }
 
-void RFLogManager::Abort(char* fmt, ...)
+void RFLogManager::Abort(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];

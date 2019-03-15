@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -83,6 +84,8 @@ void PXDDigitSorterModule::event()
   // If not digits, nothing to do
   if (!storeDigits || !storeDigits.getEntries()) return;
 
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
   RelationArray relDigitMCParticle(m_relDigitMCParticleName);
   RelationArray relDigitTrueHit(m_relDigitTrueHitName);
 
@@ -95,12 +98,16 @@ void PXDDigitSorterModule::event()
   const int nPixels = storeDigits.getEntries();
   for (int i = 0; i < nPixels; i++) {
     const PXDDigit* const storeDigit = storeDigits[i];
-    Pixel px(storeDigit, i);
     VxdID sensorID = storeDigit->getSensorID();
+    if (!geo.validSensorID(sensorID)) {
+      B2DEBUG(20, "Malformed PXDDigit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
+      continue;
+    }
 
     if (PXDPixelMasker::getInstance().pixelOK(storeDigit->getSensorID(), storeDigit->getUCellID(), storeDigit->getVCellID())) {
       // Trim digits
       if (!m_trimDigits || goodDigit(storeDigit)) {
+        Pixel px(storeDigit, i);
         sensors[sensorID].insert(px);
       } else {
         B2DEBUG(20, "Encountered a malformed digit in PXDDigit sorter: " << endl

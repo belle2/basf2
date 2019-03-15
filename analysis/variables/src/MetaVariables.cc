@@ -277,7 +277,7 @@ namespace Belle2 {
           for (const auto& cluster : clusters)
           {
             // look only at momentum of N1 (n photons) ECLClusters
-            if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+            if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
               continue;
 
             Particle particle(&cluster);
@@ -910,10 +910,12 @@ endloop:
               const auto& frame = ReferenceFrame::GetCurrent();
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
               const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+              const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
+              const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
               if (clusteri and clusterj) {
                 ClusterUtils clusutils;
-                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
-                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
                 return pi.Angle(pj);
               }
               return std::numeric_limits<float>::quiet_NaN();
@@ -927,11 +929,15 @@ endloop:
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
               const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
               const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
+              const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
+              const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
+              const ECLCluster::EHypothesisBit clusterkBit = (particle->getDaughter(daughterIndices[2]))->getECLClusterEHypothesisBit();
+
               if (clusteri and clusterj and clusterk) {
                 ClusterUtils clusutils;
-                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
-                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
-                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk)).Vect();
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
+                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
                 return pk.Angle(pi + pj);
               }
               return std::numeric_limits<float>::quiet_NaN();
@@ -1193,6 +1199,62 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function mcMother");
+      }
+    }
+
+    Manager::FunctionPtr genParticle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int particleNumber = 0;
+        try {
+          particleNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of genParticle meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+
+        auto func = [var, particleNumber](const Particle*) -> double {
+          StoreArray<MCParticle> mcParticles("MCParticles");
+          if (particleNumber >= mcParticles.getEntries())
+          {
+            return -999;
+          }
+
+          MCParticle* mcParticle = mcParticles[particleNumber];
+          Particle part = Particle(mcParticle);
+          return var->function(&part);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function genParticle");
+      }
+    }
+
+    Manager::FunctionPtr genUpsilon4S(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        auto func = [var](const Particle*) -> double {
+          StoreArray<MCParticle> mcParticles("MCParticles");
+          if (mcParticles.getEntries() == 0)
+          {
+            return -999;
+          }
+
+          MCParticle* mcUpsilon4S = mcParticles[0];
+          if (mcUpsilon4S->getPDG() != 300553)
+          {
+            return -999;
+          }
+
+          Particle upsilon4S = Particle(mcUpsilon4S);
+          return var->function(&upsilon4S);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function genUpsilon4S");
       }
     }
 
@@ -1565,8 +1627,9 @@ endloop:
           {
             const Particle* part = listOfParticles->getParticle(i);
             const ECLCluster* cluster = part->getECLCluster();
+            const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
             if (cluster != nullptr) {
-              totalEnergy += cluster->getEnergy();
+              totalEnergy += cluster->getEnergy(clusterHypothesis);
             }
           }
           return totalEnergy;
@@ -1617,10 +1680,14 @@ point numbers. Currently the only supported operations are addtion (``+``),
 subtraction (``-``), multiplication (``*``), division (``/``) and power (``^``
 or ``**``). Parenthesis can be in the form of square brackets ``[v1 * v2]``
 or normal brackets ``(v1 * v2)``. It will work also with variables taking
-arguments. Operator precedence is taken into account. For example::
+arguments. Operator precedence is taken into account. For example ::
 
     (daughter(0, E) + daughter(1, E))**2 - p**2 + 0.138
 
+.. versionchanged:: release-03-00-00
+   now both, ``[]`` and ``()`` can be used for grouping operations, ``**`` can
+   be used for exponent and float literals are possible directly in the
+   formula.
 )DOCSTRING");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
@@ -1677,6 +1744,25 @@ arguments. Operator precedence is taken into account. For example::
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
                       "The meta variable can also be nested: mcMother(mcMother(PDG)).")
+    REGISTER_VARIABLE("genParticle(i, variable)", genParticle,
+                      "[Eventbased] Returns function which returns the variable for the ith generator particle.\n"
+                      "The arguments of the function must be:\n"
+                      "    argument 1: Index of the particle in the MCParticle Array\n"
+                      "    argument 2: Valid basf2 variable name of the function that shall be evaluated.\n"
+                      "If the provided index goes beyond the length of the mcParticles array, -999 will be returned."
+                      "E.g. genParticle(0, p) returns the total momentum of the first MC Particle, which is "
+                      "the Upsilon(4S) in a generic decay.\n"
+                      "     genParticle(0, mcDaughter(1, p) returns the total momentum of the second daughter of "
+                      "the first MC Particle, which is the momentum of the second B meson in a generic decay.");
+    REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S,
+                      "[Eventbased] Returns function which returns the variable evaluated for the generator level"
+                      "Upsilon(4S).\n"
+                      "The argument of the function must be a valid basf2 variable name of the function "
+                      "that shall be evaluated.\n"
+                      "If no generator level Upsilon(4S) exists for the event, -999 will be returned.\n"
+                      "E.g. genUpsilon4S(p) returns the total momentum of the Upsilon(4S) in a generic decay.\n"
+                      "     genUpsilon4S(mcDaughter(1, p) returns the total momentum of the second daughter of "
+                      "the generator level Upsilon(4S), which is the momentum of the second B meson in a generic decay.");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
                       "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");

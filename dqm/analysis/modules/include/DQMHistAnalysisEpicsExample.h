@@ -44,14 +44,25 @@ namespace Belle2 {
 
     // Data members
   private:
+    /** The name of the histogram. */
     std::string m_histoname;
+    /** The definition of the fit function. */
     std::string m_function;
+    /** The fit function parameters for EPICS. */
     Int_t m_parameters;
+    /** The prefix of PV. */
     std::string  m_pvPrefix;
 
+    /** The fit function. */
     TF1* m_f1 = nullptr;
+    /** The drawing canvas. */
     TCanvas* m_c1 = nullptr;
-    TLine* m_line = nullptr, * m_line_lo = nullptr, * m_line_hi = nullptr;
+    /** The line for the fitting result. */
+    TLine* m_line = nullptr;
+    /** The line for the lower bound. */
+    TLine* m_line_lo = nullptr;
+    /** The line for the higher bound. */
+    TLine* m_line_hi = nullptr;
 
 #ifdef _BELLE2_EPICS
     chid mychid[10];// hard limit max 10 parameters

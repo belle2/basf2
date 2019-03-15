@@ -47,6 +47,9 @@ namespace Belle2 {
      */
     void initialize() override;
 
+    /**
+     * Event loop.
+     */
     void event() override;
 
     /**

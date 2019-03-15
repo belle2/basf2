@@ -404,6 +404,8 @@ Processes up to max_events events by starting with the first module in the speci
       2. in ``$VO_BELLE2_SW_DIR/validation-data``
       3. relative to the current working directory
 
+  .. versionadded:: release-03-00-00
+
   Arguments:
     filename (str): relative filename to look for, either in a central place or
         in the current working directory

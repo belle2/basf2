@@ -14,9 +14,10 @@
 //Root
 #include <TApplication.h>
 #include <TSystem.h>
+#include <TFile.h>
 
 //Framework
-#include <framework/utilities/FileSystem.h>
+#include <framework/utilities/EnvironmentVariables.h>
 
 //ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
@@ -42,6 +43,10 @@ EclDisplayModule::EclDisplayModule() : Module()
   setDescription("Event display module for ECL.");
 
   // Parameter definitions
+  addParam("showDisplay", m_showDisplay,
+           "Show GUI. Off by default because GUI crashes automatic tests.", false);
+  addParam("keepOpen", m_keepOpen,
+           "Keep window open after all events have been processed", false);
   addParam("displayEnergy", m_displayEnergy,
            "If true, energy distribution per channel (shaper, crate) is displayed. Otherwise, number of counts is displayed", false);
   addParam("displayMode", m_displayMode,
@@ -62,19 +67,39 @@ void EclDisplayModule::initialize()
 {
   m_eclarray.isRequired();
 
-  initFrame();
+  if (!m_showDisplay) {
+    m_frame_closed = true;
+  } else {
+    // Check if X display is available.
+    std::string display = EnvironmentVariables::get("DISPLAY", "");
+    if (display == "") {
+      B2WARNING("Environment variable DISPLAY is not set, event display won't be opened");
+      m_frame_closed = true;
+    }
+  }
+
+  if (!m_frame_closed)
+    initFrame();
 }
 
 void EclDisplayModule::initFrame()
 {
+  //== Init temporary file so TTree is not kept in memory.
+  m_tempname = "ecldisplay_tmp";
+
+  if (gSystem->TempFileName(m_tempname) == 0) {
+    throw std::runtime_error("ECLDisplay: failed to create temp file.");
+  } else {
+    m_tempfile = new TFile(m_tempname, "recreate");
+    gSystem->Unlink(m_tempname);
+  }
+
   SetMode(m_displayEnergy);
   m_app   = new TApplication("ECLDisplay App", 0, 0);
   m_data  = new EclData();
   m_frame = new EclFrame(m_displayMode, m_data, m_autoDisplay, &m_mapper);
 
   m_frame->Connect("CloseWindow()", "Belle2::EclDisplayModule", this, "handleClosedFrame()");
-
-  m_frame_closed = false;
 
   B2DEBUG(100, "EclDisplayModule::create ECLFrame");
 }
@@ -125,16 +150,19 @@ void EclDisplayModule::endRun()
 
 void EclDisplayModule::terminate()
 {
-  if (!m_frame_closed) {
-    m_data->update(false);
-    m_frame->loadNewData();
+  if (m_keepOpen) {
+    if (!m_frame_closed) {
+      m_data->update(false);
+      m_frame->loadNewData();
+    }
+
+    while (!m_frame_closed) {
+      gSystem->ProcessEvents();
+      gSystem->Sleep(0);
+    }
   }
 
-  while (!m_frame_closed) {
-    gSystem->ProcessEvents();
-    gSystem->Sleep(0);
-  }
-
-  delete m_frame;
-  delete m_data;
+  if (m_frame) delete m_frame;
+  if (m_data) delete m_data;
 }
+

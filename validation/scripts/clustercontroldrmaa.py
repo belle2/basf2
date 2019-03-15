@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import logging
-import os
-import subprocess
-import stat
-import shutil
 import sys
 
 from clustercontrolbase import ClusterBase
@@ -29,7 +24,8 @@ class Cluster(ClusterBase):
             import drmaa
             return True
         except ImportError:
-            print("drmaa library is not installed, please ues 'pip3 install drmaa'")
+            print("drmaa library is not installed, please ues 'pip3 install "
+                  "drmaa'")
             return False
         except RuntimeError as re:
             print("drmaa library not properly configured")
@@ -60,24 +56,28 @@ class Cluster(ClusterBase):
         """
 
         #: The command to submit a job. 'LOGFILE' will be replaced by the
-        # actual log file name
-        self.native_spec = ('-l h_vmem={requirement_vmem}G,h_fsize={requirement_storage}G '
+        #: actual log file name
+        self.native_spec = ('-l h_vmem={requirement_vmem}G,h_fsize={'
+                            'requirement_storage}G '
                             '-q {queuename} -V')
 
-        #: required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
-        # to memory consumption
+        #: required vmem by the job in GB, required on DESY NAF, otherwise
+        #: jobs get killed due to memory consumption
         self.requirement_vmem = 4
 
-        #: the storage IO in GB which can be performed by each job. By default, this is 3GB at
-        # DESY which is to small for some validation scripts
+        #: the storage IO in GB which can be performed by each job. By
+        #: default, this is 3GB at DESY which is to small for some validation
+        #:  scripts
         self.requirement_storage = 50
 
         #: Queue best suitable for execution at DESY NAF
         self.queuename = "short.q"
 
-        # call the base constructor, which will setup the batch cluster common stuff
+        # call the base constructor, which will setup the batch cluster
+        # common stuff
         super().__init__()
 
+    # noinspection PyMethodMayBeStatic
     def adjust_path(self, path):
         """!
         This method can be used if path names are different on submission
@@ -88,6 +88,7 @@ class Cluster(ClusterBase):
 
         return path
 
+    # noinspection PyMethodMayBeStatic
     def available(self):
         """!
         The cluster should always be available to accept new jobs.
@@ -121,11 +122,16 @@ class Cluster(ClusterBase):
 
             shell_script_name = self.prepareSubmission(job, options, tag)
 
-            # native specification with all the good settings for the batch server
-            native_spec_string = self.native_spec.format(requirement_storage=self.requirement_storage,
-                                                         requirement_vmem=self.requirement_vmem,
-                                                         queuename=self.queuename)
-            print('Creating job template for wrapper script {}'.format(shell_script_name))
+            # native specification with all the good settings for the batch
+            # server
+            native_spec_string = self.native_spec.format(
+                requirement_storage=self.requirement_storage,
+                requirement_vmem=self.requirement_vmem,
+                queuename=self.queuename
+            )
+            print('Creating job template for wrapper script {}'.format(
+                shell_script_name)
+            )
             jt = session.createJobTemplate()
             jt.remoteCommand = shell_script_name
             jt.joinFiles = True
@@ -133,7 +139,9 @@ class Cluster(ClusterBase):
 
             if not dry:
                 jobid = session.runJob(jt)
-                self.logger.debug("Script {} started with job id {}".format(job.name, jobid))
+                self.logger.debug("Script {} started with job id {}".format(
+                    job.name, jobid)
+                )
                 job.cluster_drmaa_jobid = jobid
 
             session.deleteJobTemplate(jt)
@@ -154,27 +162,31 @@ class Cluster(ClusterBase):
         import drmaa
 
         if not hasattr(job, 'cluster_drmaa_jobid'):
-            print("Job has not been started with cluster drmaaa because cluster_drmaa_jobid is missing")
+            print("Job has not been started with cluster drmaaa because "
+                  "cluster_drmaa_jobid is missing")
             sys.exit(0)
 
         with drmaa.Session() as session:
 
-            status = None
             # some batch server will forget completed jobs right away
             try:
                 status = session.jobStatus(job.cluster_drmaa_jobid)
             except drmaa.errors.InvalidJobException:
-                print("Job info for jobid {} cannot be retrieved, assuming job has terminated".format(job.cluster_drmaa_jobid))
+                print("Job info for jobid {} cannot be retrieved, assuming "
+                      "job has terminated".format(job.cluster_drmaa_jobid))
 
-                (donefile_exists, donefile_returncode) = self.checkDoneFile(job)
+                (donefile_exists, donefile_returncode) = \
+                    self.checkDoneFile(job)
 
-                # always return the job es complete even if there is no done file
-                # at this ponint tho job is also not longer running/queued on the cluster
+                # always return the job es complete even if there is no done
+                #  file at this ponint tho job is also not longer
+                # running/queued on the cluster
                 return [True, donefile_returncode]
 
             # Return that the job is finished + the return code for it
-            # depending when we look for the job this migh never be used, because
-            # the jobs disappear from qstat before we can query them ..
+            # depending when we look for the job this migh never be used,
+            # because the jobs disappear from qstat before we can query them
+            #  ..
             if status == drmaa.JobState.DONE:
                 # todo: return code
                 return [True, 0]

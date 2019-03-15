@@ -82,8 +82,7 @@ const SVDOnlineToOfflineMap::SensorInfo& SVDOnlineToOfflineMap::getSensorInfo(un
   auto sensorIter = m_sensors.find(id);
 
   if (sensorIter == m_sensors.end()) {
-    B2WARNING(" FADC #" <<  int(FADC) << " and " << "APV # " << int(APV25) <<
-              " : combination not found in the SVD On-line to Off-line map ");
+    B2WARNING("Combination not found in the SVD On-line to Off-line map:" << LogVar("FADC", int(FADC)) << LogVar("APV", int(APV25)));
     m_currentSensorInfo.m_sensorID = 0;
     m_currentSensorInfo.m_channel0 = 0;
     m_currentSensorInfo.m_channel127 = 0;
@@ -136,7 +135,7 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
 {
   // Issue a warning, we'll be sending out a null pointer.
   if (channel > 127) {
-    B2WARNING(" channel #" <<  int(channel) << " out of range (0-127).");
+    B2WARNING(" channel out of range (0-127):" << LogVar("channel", int(channel)));
     return NULL;
   }
   const SensorInfo& info = getSensorInfo(FADC, APV25);
@@ -154,7 +153,7 @@ SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
 {
   // Issue a warning, we'll be sending out a null pointer.
   if (channel > 127) {
-    B2WARNING(" channel #" <<  int(channel) << " out of range (0-127).");
+    B2WARNING(" channel out of range (0-127):" << LogVar("channel", int(channel)));
     return NULL;
   }
   const SensorInfo& info = getSensorInfo(FADC, APV25);

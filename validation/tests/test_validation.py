@@ -3,9 +3,6 @@
 
 import unittest
 import metaoptions
-import ROOT
-import random
-import math
 import tempfile
 import validationscript
 import validation
@@ -23,7 +20,7 @@ class ValidationTest(unittest.TestCase):
         """
         Test if the interval selection works
         """
-        intervalSel = validation.IntervalSelector(["release", " nightly"])
+        interval_sel = validation.IntervalSelector(["release", " nightly"])
 
         with tempfile.NamedTemporaryFile() as tf:
             tf.write(b'#!/usr/bin/env python3\n'
@@ -43,7 +40,7 @@ class ValidationTest(unittest.TestCase):
 
             script = validationscript.Script(tf.name, "package", None)
             script.load_header()
-            self.assertTrue(intervalSel.in_interval(script))
+            self.assertTrue(interval_sel.in_interval(script))
 
         with tempfile.NamedTemporaryFile() as tf:
             tf.write(b'#!/usr/bin/env python3\n'
@@ -63,7 +60,7 @@ class ValidationTest(unittest.TestCase):
 
             script = validationscript.Script(tf.name, "package", None)
             script.load_header()
-            self.assertTrue(intervalSel.in_interval(script))
+            self.assertTrue(interval_sel.in_interval(script))
 
     def test_interval_selection_default(self):
         """
@@ -88,8 +85,8 @@ class ValidationTest(unittest.TestCase):
             script = validationscript.Script(tf.name, "package", None)
             script.load_header()
 
-            intervalSel = validation.IntervalSelector(["release", " nightly"])
-            self.assertTrue(intervalSel.in_interval(script))
+            interval_sel = validation.IntervalSelector(["release", " nightly"])
+            self.assertTrue(interval_sel.in_interval(script))
 
     def test_apply_package_selection(self):
         """
@@ -102,7 +99,8 @@ class ValidationTest(unittest.TestCase):
         script1 = validation.Script("val1.py", "tracking", None)
         script2 = validation.Script("val2.py", "tracking", None)
         script3 = validation.Script("valOther.py", "other_package", None)
-        script4 = validation.Script("valOtherNotDepending.py", "other_package", None)
+        script4 = validation.Script("valOtherNotDepending.py", "other_package",
+                                    None)
         script2.dependencies = [script3]
 
         val.add_script(script1)
@@ -113,22 +111,40 @@ class ValidationTest(unittest.TestCase):
         # test with honoring dependencies
         val.apply_package_selection(["tracking"], False)
 
-        self.assertEqual(3, len(val.list_of_scripts))
-        self.assertTrue(len([s for s in val.list_of_scripts if s.unique_name() == script3.unique_name()]) == 1)
-        self.assertTrue(len([s for s in val.list_of_scripts if s.unique_name() == script4.unique_name()]) == 0)
+        self.assertEqual(3, len(val.scripts))
+        self.assertEqual(
+            1,
+            len([
+                s for s in val.scripts
+                if s.unique_name() == script3.unique_name()
+            ])
+        )
+        self.assertEqual(
+            0,
+            len([
+                s for s in val.scripts
+                if s.unique_name() == script4.unique_name()
+            ])
+        )
 
-        valNoDeps = validation.Validation()
+        val_no_deps = validation.Validation()
 
-        valNoDeps.add_script(script1)
-        valNoDeps.add_script(script2)
-        valNoDeps.add_script(script3)
-        valNoDeps.add_script(script4)
+        val_no_deps.add_script(script1)
+        val_no_deps.add_script(script2)
+        val_no_deps.add_script(script3)
+        val_no_deps.add_script(script4)
 
         # test with honoring dependencies
-        valNoDeps.apply_package_selection(["tracking"], True)
+        val_no_deps.apply_package_selection(["tracking"], True)
 
-        self.assertEqual(2, len(valNoDeps.list_of_scripts))
-        self.assertTrue(len([s for s in valNoDeps.list_of_scripts if s.unique_name() == script3.unique_name()]) == 0)
+        self.assertEqual(2, len(val_no_deps.scripts))
+        self.assertEqual(
+            0,
+            len([
+                s for s in val_no_deps.scripts
+                if s.unique_name() == script3.unique_name()
+            ])
+        )
 
     def test_parse_header(self):
         """
@@ -162,7 +178,9 @@ class ValidationTest(unittest.TestCase):
         """
         Test if the meta options parsers behaves nice
         """
-        p = metaoptions.MetaOptionParser(["expert", "pvalue-warn=0.9", "pvalue-error=0.4"])
+        p = metaoptions.MetaOptionParser(
+            ["expert", "pvalue-warn=0.9", "pvalue-error=0.4"]
+        )
 
         self.assertEqual(0.9, p.pvalue_warn())
         self.assertEqual(0.4, p.pvalue_error())
@@ -173,6 +191,7 @@ class ValidationTest(unittest.TestCase):
 
         self.assertEqual(None, p.pvalue_warn())
         self.assertEqual(None, p.pvalue_error())
+
 
 if __name__ == "__main__":
     unittest.main()

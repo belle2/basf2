@@ -48,18 +48,18 @@ class Cluster:
         """
 
         #: The command to submit a job. 'LOGFILE' will be replaced by the
-        # actual log file name
-        # self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
+        #: actual log file name
+        #: self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
         self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
 
         #: The path, where the help files are being created
-        # Maybe there should be a special subfolder for them?
+        #: Maybe there should be a special subfolder for them?
         self.path = os.getcwd()
 
         #: Contains a reference to the logger-object from validate_basf2
-        # Set up the logging functionality for the 'cluster execution'-Class,
-        # so we can log to validate_basf2.py's log what is going on in
-        # .execute and .is_finished
+        #: Set up the logging functionality for the 'cluster execution'-Class,
+        #: so we can log to validate_basf2.py's log what is going on in
+        #: .execute and .is_finished
         self.logger = logging.getLogger('validate_basf2')
 
         # We need to set up the same environment on the cluster like on the
@@ -79,7 +79,8 @@ class Cluster:
             self.b2setup = 'MY_BELLE2_DIR=' + \
                 self.adjust_path(belle2_local_dir) + ' ' + self.b2setup
         if os.environ.get('BELLE2_OPTION') != 'debug':
-            self.b2setup += '; b2code-option ' + os.environ.get('BELLE2_OPTION')
+            self.b2setup += '; b2code-option ' + \
+                            os.environ.get('BELLE2_OPTION')
 
         # Write to log which revision we are using
         self.logger.debug('Setting up the following release: {0}'
@@ -94,6 +95,7 @@ class Cluster:
         #: The file object to which all cluster messages will be written
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
+    # noinspection PyMethodMayBeStatic
     def adjust_path(self, path):
         """!
         This method can be used if path names are different on submission
@@ -104,6 +106,7 @@ class Cluster:
 
         return path
 
+    # noinspection PyMethodMayBeStatic
     def available(self):
         """!
         The cluster should always be available to accept new jobs.
@@ -230,8 +233,9 @@ class Cluster:
         else:
             return [False, 0]
 
+    # noinspection PyMethodMayBeStatic
     def terminate(self, job):
-        """!
-        Terminate a running job, not support with this backend so ignore the call
+        """! Terminate a running job, not support with this backend so
+        ignore the call
         """
         pass

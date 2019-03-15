@@ -73,7 +73,6 @@ namespace Belle2 {
   {
 
     //m_beamParams.required("", DataStore::c_Persistent);
-
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
@@ -127,12 +126,11 @@ namespace Belle2 {
                                        || m_withConstraint == "mother" || m_withConstraint == "iptubecut"))
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
-
     std::vector<unsigned int> toRemove;
     unsigned int n = plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
       Particle* particle = plist->getParticle(i);
-
+      m_hasCovMatrix = false;
       if (m_updateDaughters == true) {
         if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
         else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
@@ -143,7 +141,15 @@ namespace Belle2 {
         m_beamSpotCov = particle->getVertexErrorMatrix();
       }
 
-
+      TMatrixFSym mother_errMatrix(7);
+      mother_errMatrix = particle->getMomentumVertexErrorMatrix();
+      for (int k = 0; k < 7; k++) {
+        for (int j = 0; j < 7; j++) {
+          if (mother_errMatrix[k][j] > 0) {
+            m_hasCovMatrix = true;
+          }
+        }
+      }
       bool ok = doVertexFit(particle);
       if (!ok) particle->setPValue(-1);
       if (m_confidenceLevel == 0. && particle->getPValue() == 0.) {
@@ -264,10 +270,15 @@ namespace Belle2 {
         return false; // error matrix not valid
       }
       bool isPi0 = false;
-      if (child->getPDGCode() == 111 && child->getNDaughters() == 2)
-        if (child->getDaughter(0)->getPDGCode() == 22 && child->getDaughter(1)->getPDGCode() == 22)
-          isPi0 = true;
 
+      if (m_hasCovMatrix == false) {
+        if (child->getPDGCode() == Const::pi0.getPDGCode() && child->getNDaughters() == 2) {
+          if (child->getDaughter(0)->getPDGCode() == Const::photon.getPDGCode()
+              && child->getDaughter(1)->getPDGCode() == Const::photon.getPDGCode()) {
+            isPi0 = true;
+          }
+        }
+      }
       if (!isPi0)
         fitChildren.push_back(ichild);
       else
@@ -416,7 +427,6 @@ namespace Belle2 {
 
     std::vector<unsigned> fitChildren;
     std::vector<unsigned> pi0Children;
-
     bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
 
     if (!validChildren)

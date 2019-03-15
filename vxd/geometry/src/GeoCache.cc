@@ -259,6 +259,34 @@ namespace Belle2 {
         B2WARNING("No VXD alignment data. Defaults (0's) will be used!");
         return;
       }
+
+      // Loop over VXD sensors to read parameters for description of planar defomration
+      for (auto& sensorID : getListOfSensors()) {
+        std::vector<double> planarParameters = {
+          // Numbering of VXD alignment parameters:
+          //  -> 0-6:   Rigid body alignment
+          //  -> 31-33: First level of surface deformation
+          //  -> 41-44: Second level of surface deformation
+          //  -> 51-55: Third level of surface deformation
+          m_vxdAlignments->get(sensorID, 31),
+          m_vxdAlignments->get(sensorID, 32),
+          m_vxdAlignments->get(sensorID, 33),
+          m_vxdAlignments->get(sensorID, 41),
+          m_vxdAlignments->get(sensorID, 42),
+          m_vxdAlignments->get(sensorID, 43),
+          m_vxdAlignments->get(sensorID, 44),
+          m_vxdAlignments->get(sensorID, 51),
+          m_vxdAlignments->get(sensorID, 52),
+          m_vxdAlignments->get(sensorID, 53),
+          m_vxdAlignments->get(sensorID, 54),
+          m_vxdAlignments->get(sensorID, 55),
+        };
+
+        // Store parameters for planar deformation
+        VXD::SensorInfoBase& sensorInfo = const_cast<VXD::SensorInfoBase&>(getSensorInfo(sensorID));
+        sensorInfo.setSurfaceParameters(planarParameters);
+      }
+
       /**
       So the hierarchy is as follows:
                   Belle 2

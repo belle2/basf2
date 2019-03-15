@@ -16,6 +16,7 @@ main.add_module('ParticleGun', pdgCodes=[211, -211, 321, -321], nTracks=2)
 components = ['MagneticField', 'BeamPipe', 'CDC']
 add_simulation(main, components)
 add_reconstruction(main, components)
+set_module_parameters(main, type="Geometry", useDB=False, components=components)
 
 # output path
 main.add_module('RootOutput', outputFileName='streamer_test.root')

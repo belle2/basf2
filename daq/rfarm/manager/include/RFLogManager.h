@@ -28,28 +28,28 @@
 namespace Belle2 {
   class RFLogManager {
   public:
-    RFLogManager(char* prefix, char* lognode = NULL, char* logdir = NULL);
+    RFLogManager(const char* prefix, const char* lognode = NULL, const char* logdir = NULL);
     ~RFLogManager();
 
     // Read messages from fd and log them
     int ProcessLog(int fd);
 
     // Logger functions
-    void Log(char* fmt, ...);
-    void Info(char* fmt, ...);
-    void Warning(char* fmt, ...);
-    void Error(char* fmt, ...);
-    void Fatal(char* fmt, ...);
-    void Abort(char* fmt, ...);
+    void Log(const char* fmt, ...);
+    void Info(const char* fmt, ...);
+    void Warning(const char* fmt, ...);
+    void Error(const char* fmt, ...);
+    void Fatal(const char* fmt, ...);
+    void Abort(const char* fmt, ...);
 
     // Basic interface
-    void Write(char* msg);
-    char* BuildMessage(char* fmt, ...);
+    void Write(const char* msg);
+    char* BuildMessage(const char* fmt, ...);
 
   private:
     int today();
     void timestamp(char*);
-    int WriteLog(char* type, char* msg);
+    int WriteLog(const char* type, const char* msg);
     int OpenLogFile(int today);
     int SwitchLogFile();
 

@@ -3,16 +3,13 @@
 
 import logging
 import os
-import subprocess
 import stat
-import shutil
-import sys
 
 
 class ClusterBase:
     """
-    Base class which provides basic functionality to wrap basf2 into a shell script setting up the
-    environment and checking for completion of script
+    Base class which provides basic functionality to wrap basf2 into a shell
+    script setting up the environment and checking for completion of script
     """
 
     def __init__(self):

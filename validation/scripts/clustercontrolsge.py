@@ -50,33 +50,35 @@ class Cluster:
 
         #: The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
-        self.submit_command = ('qsub -cwd -l h_vmem={requirement_vmem}G,h_fsize={requirement_storage}G '
+        self.submit_command = ('qsub -cwd -l h_vmem={requirement_vmem}G,'
+                               'h_fsize={requirement_storage}G '
                                '-o {logfile} -e {logfile} -q {queuename} -V')
 
-        #: required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
-        # to memory consumption
+        #: required vmem by the job in GB, required on DESY NAF, otherwise
+        #: jobs get killed due to memory consumption
         self.requirement_vmem = 4
 
-        #: the storage IO in GB which can be performed by each job. By default, this is 3GB at
-        # DESY which is to small for some validation scripts
+        #: the storage IO in GB which can be performed by each job. By
+        #: default, this is 3GB at DESY which is to small for some validation
+        #:  scripts
         self.requirement_storage = 50
 
         #: Queue best suitable for execution at DESY NAF
         self.queuename = "short.q"
 
         #: The path, where the help files are being created
-        # Maybe there should be a special subfolder for them?
+        #: Maybe there should be a special subfolder for them?
         self.path = os.getcwd()
 
         #: Contains a reference to the logger-object from validate_basf2
-        # Set up the logging functionality for the 'cluster execution'-Class,
-        # so we can log to validate_basf2.py's log what is going on in
-        # .execute and .is_finished
+        #: Set up the logging functionality for the 'cluster execution'-Class,
+        #: so we can log to validate_basf2.py's log what is going on in
+        #: .execute and .is_finished
         self.logger = logging.getLogger('validate_basf2')
 
-        # We need to set up the same environment on the cluster like on the
-        # local machine. The information can be extracted from $BELLE2_TOOLS,
-        # $BELLE2_RELEASE_DIR and $BELLE2_LOCAL_DIR
+        #: We need to set up the same environment on the cluster like on the
+        #: local machine. The information can be extracted from $BELLE2_TOOLS,
+        #: $BELLE2_RELEASE_DIR and $BELLE2_LOCAL_DIR
 
         #: Path to the basf2 tools and central/local release
         self.tools = self.adjust_path(os.environ['BELLE2_TOOLS'])
@@ -91,7 +93,8 @@ class Cluster:
             self.b2setup = 'MY_BELLE2_DIR=' + \
                 self.adjust_path(belle2_local_dir) + ' ' + self.b2setup
         if os.environ.get('BELLE2_OPTION') != 'debug':
-            self.b2setup += '; b2code-option ' + os.environ.get('BELLE2_OPTION')
+            self.b2setup += '; b2code-option ' + \
+                            os.environ.get('BELLE2_OPTION')
 
         # Write to log which revision we are using
         self.logger.debug('Setting up the following release: {0}'
@@ -106,6 +109,7 @@ class Cluster:
         #: The file object to which all cluster messages will be written
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
+    # noinspection PyMethodMayBeStatic
     def adjust_path(self, path):
         """!
         This method can be used if path names are different on submission
@@ -116,6 +120,7 @@ class Cluster:
 
         return path
 
+    # noinspection PyMethodMayBeStatic
     def available(self):
         """!
         The cluster should always be available to accept new jobs.
@@ -162,7 +167,9 @@ class Cluster:
         else:
             # .py files are executed with basf2
             # 'options' contains an option-string for basf2, e.g. '-n 100'
-            params = validationfunctions.basf2_command_builder(job.path, options.split())
+            params = validationfunctions.basf2_command_builder(
+                job.path, options.split()
+            )
             command = subprocess.list2cmdline(params)
 
         # Create a helpfile-shellscript, which contains all the commands that
@@ -187,10 +194,12 @@ class Cluster:
         os.chmod(tmp_name, st.st_mode | stat.S_IEXEC)
 
         # Prepare the command line command for submission to the cluster
-        params = self.submit_command.format(queuename=self.queuename,
-                                            requirement_storage=self.requirement_storage,
-                                            requirement_vmem=self.requirement_vmem,
-                                            logfile=log_file).split() + [tmp_name]
+        params = self.submit_command.format(
+            queuename=self.queuename,
+            requirement_storage=self.requirement_storage,
+            requirement_vmem=self.requirement_vmem,
+            logfile=log_file
+        ).split() + [tmp_name]
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
@@ -245,8 +254,10 @@ class Cluster:
         else:
             return [False, 0]
 
+    # noinspection PyMethodMayBeStatic
     def terminate(self, job):
         """!
-        Terminate a running job, not support with this backend so ignore the call
+        Terminate a running job, not support with this backend so ignore the
+        call.
         """
         pass

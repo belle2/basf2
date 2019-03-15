@@ -1,6 +1,7 @@
 /.light
 /.externals
 /index.rst
+/whatsnew.rst
 /site_scons/
 /framework/
 /mdst/

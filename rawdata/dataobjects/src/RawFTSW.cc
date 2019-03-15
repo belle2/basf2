@@ -41,19 +41,27 @@ void RawFTSW::SetVersion()
   // I'm using the size of header which is stored the 1st word (0,1,..)
   //
   int temp_version = m_version;
-  if (m_buffer[ POS_HEADER_SIZE ] == VER_2_HEADER_SIZE) {
-    m_access = new RawFTSWFormat_latest;
-    m_version = 2; // as of 2019.3.2, the latest version is 2.
-  } else if (m_buffer[ POS_HEADER_SIZE ] == VER_1_HEADER_SIZE) {
-    m_access = new RawFTSWFormat_v1;
-    m_version = 1;
-  } else if (m_buffer[ POS_HEADER_SIZE ] == VER_0_HEADER_SIZE) {
+  if (m_buffer[ POS_HEADER_SIZE ] == VER_0_HEADER_SIZE) {
     char err_buf[500];
     sprintf(err_buf,
             "[FATAL] Ver.0 of RawFTSW( so-called early DESYtest format ) is detected but not supported. (header size = 0x%.8x ) Exiting...\n %s %s %d\n",
             m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf; throw (err_str);
+  } else if (m_buffer[ POS_NODE_FORMAT_ID ] == FORMAT_ID_VER_0TO2) {
+    if (m_buffer[ POS_HEADER_SIZE ] == VER_2_HEADER_SIZE) {
+      m_access = new RawFTSWFormat_latest;
+      m_version = 2; // as of 2019.3.2, the latest version is 2.
+    } else if (m_buffer[ POS_HEADER_SIZE ] == VER_1_HEADER_SIZE) {
+      m_access = new RawFTSWFormat_v1;
+      m_version = 1;
+    } else {
+      char err_buf[500];
+      sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",
+              m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("%s", err_buf); fflush(stdout);
+      string err_str = err_buf; throw (err_str);
+    }
   } else {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",

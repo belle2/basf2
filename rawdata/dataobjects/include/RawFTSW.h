@@ -208,6 +208,7 @@ namespace Belle2 {
       ///       : header size is 8 words
       ///       : Format is written by Nakao-san in ver.26(as of 2019.3.1 ) of https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=DAQ+TimingDistribution#DAQTimingDistribution-InformationsentfromTTDtodatastream
       POS_NODE_FORMAT_ID = 6, //! 0x545452?? up to ver.2 this number is more or less same. So, it cannot be used to distinguish different version numbers
+      FORMAT_ID_VER_0TO2 = 0x54544420,
       FTSW_FORMAT_MASK = 0x000000FF,
       POS_HEADER_SIZE = 1, //! The same number of this information must appear in RawFTSWFormat*.h. Information should be placed in one place but I need to put this number in RawFTSW.h because it is used to distinguish different version numbers.
       // header size is used to distinguish different version number for ver. 0, 1, and 2

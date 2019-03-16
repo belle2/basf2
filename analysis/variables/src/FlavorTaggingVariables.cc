@@ -10,6 +10,7 @@
 
 // Own include
 #include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/MCTruthVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -621,6 +622,32 @@ namespace Belle2 {
         return 0;
       } else return -2;//gRandom->Uniform(0, 1);
     }
+
+    double mcFlavorOfOtherB0(const Particle* particle)
+    {
+
+      if (std::abs(particle->getPDGCode()) != 511) {
+        B2ERROR("MCFlavorOfOtherB0: the given particle is not a neutral B mesons. This variable works only for B0 or B0bar particles. ");
+        return 0;
+      }
+
+      if (Variable::isSignal(particle) < 1.0) return 0;
+
+      const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcMother = mcParticle->getMother();
+
+      if (mcMother == nullptr) return 0;
+
+      for (auto& upsilon4SDaughter : mcMother -> getDaughters()) {
+        if (upsilon4SDaughter != mcParticle) {
+          if (upsilon4SDaughter -> getPDG() > 0) return 1.0;
+          else return -1.0;
+        }
+      }
+
+      return 1;
+
+    };
 
 //  ######################################### Meta Variables ##############################################
 
@@ -2101,7 +2128,9 @@ namespace Belle2 {
                       " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).");
-
+    REGISTER_VARIABLE("mcFlavorOfOtherB0", mcFlavorOfOtherB0,
+                      "Returns the MC flavor (+-1) of the accompaning tag-side neutral B meson if the given particle is a correctly MC matched neutral B. It returns 0 else. \n"
+                      "In other words, this variable checks the generated flavor of the other MC Upsilon(4S) daughter.");
 
     VARIABLE_GROUP("Flavor Tagger MetaFunctions")
 

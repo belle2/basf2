@@ -129,6 +129,11 @@ namespace Belle2 {
     double isRestOfEventMajorityB0Flavor(const Particle*);
 
     /**
+     * Returns the MC flavor (+-1) of the accompaning tag-side neutral B meson if the given particle is a correctly MC matched neutral B.
+     * It returns 0 else. */
+    double mcFlavorOfOtherB0(const Particle* particle);
+
+    /**
      * Returns function which returns a requested kinematical variable via argument[0] of the group of the semileptonic flavor tagging variables. The Possibilities are:
      * recoilMass: recoiling mass of the Btag system against the target particle in CMS
      * pMissCMS: CMS momentum magnitude missing in Btag using as target hypothesis the given particle

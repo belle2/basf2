@@ -120,9 +120,11 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
     if (obj->IsA()->InheritsFrom("TH1")) {
       TH1* h1 = (TH1*) obj;
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
-      msg->add(h1, h1->GetName());
-      nobjs++;
-      numobjs++;
+      if (h1->GetEntries() > 0) {    // Do not send empty histograms
+        msg->add(h1, h1->GetName());
+        nobjs++;
+        numobjs++;
+      }
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
       //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
       TDirectory* tdir = (TDirectory*) obj;

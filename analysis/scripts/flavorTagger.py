@@ -11,7 +11,7 @@
 from basf2 import *
 from modularAnalysis import *
 import basf2_mva
-from variables import variables as flavorTaggerVariables
+from variables import utils
 from ROOT import Belle2
 import os
 import glob
@@ -44,6 +44,68 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotfound=True, uploadToData
 
     downloadFlag = downloadFromDatabaseIfNotfound
     uploadFlag = uploadToDatabaseAfterTraining
+
+
+# Default list of aliases that should be used to save the flavor tagging information using VariablesToNtuple
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC',
+                  'qpElectron', 'hasTrueTargetElectron', 'isRightCategoryElectron',
+                  'qpIntermediateElectron', 'hasTrueTargetIntermediateElectron', 'isRightCategoryIntermediateElectron',
+                  'qpMuon', 'hasTrueTargetMuon', 'isRightCategoryMuon',
+                  'qpIntermediateMuon', 'hasTrueTargetIntermediateMuon', 'isRightCategoryIntermediateMuon',
+                  'qpKinLepton', 'hasTrueTargetKinLepton', 'isRightCategoryKinLepton',
+                  'qpIntermediateKinLepton', 'hasTrueTargetIntermediateKinLepton', 'isRightCategoryIntermediateKinLepton',
+                  'qpKaon', 'hasTrueTargetKaon', 'isRightCategoryKaon',
+                  'qpSlowPion', 'hasTrueTargetSlowPion', 'isRightCategorySlowPion',
+                  'qpFastHadron', 'hasTrueTargetFastHadron', 'isRightCategoryFastHadron',
+                  'qpLambda', 'hasTrueTargetLambda', 'isRightCategoryLambda',
+                  'qpFSC', 'hasTrueTargetFSC', 'isRightCategoryFSC',
+                  'qpMaximumPstar', 'hasTrueTargetMaximumPstar', 'isRightCategoryMaximumPstar',
+                  'qpKaonPion', 'hasTrueTargetKaonPion', 'isRightCategoryKaonPion']
+
+
+def add_default_FlavorTagger_aliases():
+    """
+    This function adds the default aliases for flavor tagging variables
+    and defines the collection of flavor tagging variables.
+    """
+
+    utils._variablemanager.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
+    utils._variablemanager.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
+    utils._variablemanager.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
+
+    for iCategory in AvailableCategories:
+        aliasForQp = 'qp' + iCategory
+        aliasForTrueTarget = 'hasTrueTarget' + iCategory
+        aliasForIsRightCategory = 'isRightCategory' + iCategory
+        utils._variablemanager.addAlias(aliasForQp, 'qpCategory(' + iCategory + ')')
+        utils._variablemanager.addAlias(aliasForTrueTarget, 'hasTrueTargets(' + iCategory + ')')
+        utils._variablemanager.addAlias(aliasForIsRightCategory, 'isTrueFTCategory(' + iCategory + ')')
+
+    utils.add_collection(flavor_tagging, 'flavor_tagging')
+
+
+def set_FlavorTagger_pid_aliases():
+    """
+    This function adds the pid aliases needed by the flavor tagger.
+    """
+    utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+    utils._variablemanager.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
+    utils._variablemanager.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
+    utils._variablemanager.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
+
+    utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+    utils._variablemanager.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
+    utils._variablemanager.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
+    utils._variablemanager.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
+
+    utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+    utils._variablemanager.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
+    utils._variablemanager.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
+    utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+
+    utils._variablemanager.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
+    utils._variablemanager.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
+    utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
 
 
 # Options for Track and Event Levels
@@ -83,7 +145,7 @@ mlpFANNCombiner.m_scale_target = False
 signalFraction = -2
 
 # Maximal number of events to train each method
-maxEventsNumber = 500000
+maxEventsNumber = 0  # 0 takes all the sampled events. The number in the past was 500000
 
 # Definition of all available categories, 'standard category name':
 # ['ParticleList', 'trackLevel category name', 'eventLevel category name',
@@ -231,25 +293,6 @@ variables = dict()
 KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
-
-flavorTaggerVariables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
-
-flavorTaggerVariables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
-
-flavorTaggerVariables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
-flavorTaggerVariables.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
-flavorTaggerVariables.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
-
-flavorTaggerVariables.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
-flavorTaggerVariables.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
-flavorTaggerVariables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
 
 
 def setVariables():
@@ -485,7 +528,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
         targetVariable = 'isRightCategory(' + category + ')'
         extraInfoName = targetVariable
@@ -509,7 +552,8 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
             if mode == 'Sampler':
                 if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
-                    methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
+                    methodPrefixEventLevelKaonPion = "FlavorTagger_" + belleOrBelle2Flag + \
+                        "_" + weightFiles + 'EventLevelKaonPionFBDT'
                     identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
                     if not os.path.isfile(identifierEventLevelKaonPion):
                         # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
@@ -562,14 +606,14 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
         targetVariable = 'isRightCategory(' + category + ')'
 
         if not os.path.isfile(identifierEventLevel) and mode == 'Sampler':
 
             if category == 'KaonPion':
-                methodPrefixEventLevelSlowPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
+                methodPrefixEventLevelSlowPion = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
                 identifierEventLevelSlowPion = filesDirectory + '/' + methodPrefixEventLevelSlowPion + '_1.root'
                 if not os.path.isfile(identifierEventLevelSlowPion):
                     B2INFO("Flavor Tagger: event level weight file for the Slow Pion category is absent." +
@@ -620,7 +664,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixEventLevel + "_1.root"
 
@@ -671,7 +715,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
 
-    methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     if mode == 'Sampler':
@@ -791,7 +835,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     B2INFO('COMBINER LEVEL TEACHER')
 
-    methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     sampledFilesList = glob.glob(filesDirectory + '/' + methodPrefixCombinerLevel + 'sampled*.root')
@@ -866,7 +910,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 def flavorTagger(
     particleLists=[],
     mode='Expert',
-    weightFiles='B2JpsiKs_muBGx1',
+    weightFiles='B2nunubarBGx1',
     workingDirectory='.',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
     categories=[
@@ -904,11 +948,14 @@ def flavorTagger(
                                                trained, for this step you do not reconstruct any particle or do any analysis,
                                                you just run the flavorTagger alone.
       @param weightFiles                       Weight files name. Default=
-                                               ``B2JpsiKs_muBGx1``. Use ``B2JpsiKs_muBGx0`` with BGx0 MC. If the user self
+                                               ``B2nunubarBGx1``. For Belle MC/data use  ``B2JpsiKs_muBGx1``. If the user self
                                                wants to train the FlavorTagger, the weightfiles name should correspond to the
                                                analysed CP channel in order to avoid confusions. The default name
-                                               ``B2JpsiKs_mu`` corresponds to Breco
-                                               :math:`\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
+                                               ``B2nunubarBGx1`` corresponds to
+                                               :math:`B^0_{\\rm sig}\\to \\nu \\overline{\\nu}`.
+                                               and ``B2JpsiKs_muBGx1`` to
+                                               :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
+                                               BGx1 stays for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
       @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
@@ -977,6 +1024,7 @@ def flavorTagger(
     setBelleOrBelle2(belleOrBelle2)
     setInteractionWithDatabase(downloadFromDatabaseIfNotfound, uploadToDatabaseAfterTraining)
     WhichCategories(categories)
+    set_FlavorTagger_pid_aliases()
     setVariables()
 
     roe_path = create_path()
@@ -1009,6 +1057,7 @@ def flavorTagger(
                     flavorTaggerInfoFiller.param('targetProb', False)
                     flavorTaggerInfoFiller.param('trackPointers', False)
                     roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
+                    add_default_FlavorTagger_aliases()
 
     # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
     particleListsToRemoveExtraInfo = []
@@ -1018,6 +1067,7 @@ def flavorTagger(
 
     if mode == 'Expert':
         removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
+
     elif mode == 'Sampler':
         removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
 

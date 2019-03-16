@@ -1,73 +1,74 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-<header>
-  <input>CPVToolsOutput.root</input>
-  <output>test6_CPVResolutionVertexTagV.root</output>
-  <contact>Fernando Abudinen; abudinen@mpp.mpg.de</contact>
-  <description>This validation script performs a fit of the values of DeltaT, DeltaTErr, Dz for B0_sig and Deltaz for B0_tag.
-  The DeltaT and DeltaZ distributions are fitted with 3 Gaussian functions.
-  DeltaTErr is fitted with a CBShape function and two Gaussians.
-  PXD requirement PXD0 means no hit is required.
-  PXD requirement PXD2 means both muon tracks from B->J/Psi Ks are required.</description>
-</header>
-"""
+###########################################################################################
+#
+# This validation script performs a fit of DeltaT, DeltaTErr, Dz for B0_sig and
+# Deltaz for B0_tag. The signal channel here is B0->JPsiKs.
+# The DeltaT and DeltaZ distributions are fitted with 3 Gaussian functions.
+# DeltaTErr is fitted with a CBShape function and two Gaussians.
+#
+# Usage:
+#   basf2 B2JpsiKs_mu_DeltaTResValidation.py workingRootNtupleFiles treeName VXDrequirement
+#
+# The VXD requirement has to be either PXD or SVD. The script will then evaluate the
+# vertexing performance if PXD (or SVD) hits are required and if not.
+#
+# Contributors: L. Li Gioi, F. Abudinen (June 2017)
+#
+###########################################################################################
 
+
+from basf2 import B2INFO, B2FATAL
 import ROOT
+import numpy as np
+import pylab
+import sys
+import glob
 import math
+import random
 import array
 from operator import itemgetter
 
+if len(sys.argv) != 4:
+    sys.exit(
+        "Must provide 3 arguments: [input_sim_file] or ['input_sim_file*'] wildcards, [treeName] " +
+        "and [VXD_requirement (PXD or SVD)]")
 
 PATH = "."
 
-workingFiles = ["../CPVToolsOutput.root"]
+workingFile = sys.argv[1]
+workingFiles = glob.glob(str(workingFile))
 
 limDeltaT = 5
 limDeltaTErr = 3.0
 limZSig = 0.03
 limZTag = 0.03
 
-treename = str("B0tree")
-
-# Output Validation file
-outputFile = ROOT.TFile("test6_CPVResolutionVertexTagV.root", "RECREATE")
-
-# Values to be watched
-outputNtuple = ROOT.TNtuple(
-    "Vertex_TagV_Resols",
-    "Weighted averages of the resolution params of Vertex and TagV Tools",
-    "mu_DT_PXD0:sigma_DT_PXD0:mu_DZsig_PXD0:sigma_DZsig_PXD0:mu_DZtag_PXD0:sigma_DZtag_PXD0:" +
-    "mu_DT_PXD2:sigma_DT_PXD2:mu_DZsig_PXD2:sigma_DZsig_PXD2:mu_DZtag_PXD2:sigma_DZtag_PXD2:PXD2_PXD0_Eff")
-
-outputNtuple.SetAlias('Description', "These are the weighted averages of the mean and the standard deviation " +
-                      "of the residuals for DeltaT, DeltaZsig and DeltaZtag. The fit is performed with 3 Gaussian functions." +
-                      "The units are ps for DeltaT and microns for DeltaZ.")
-outputNtuple.SetAlias(
-    'Check',
-    "These parameters should not change drastically. Since the nightly reconstruction validation runs" +
-    "on the same input file (which changes only from release to release), the values between builds should be the same.")
-outputNtuple.SetAlias('Contact', "abudinen@mpp.mpg.de, ligioi@mpp.mpg.de")
+treeName = str(sys.argv[2])
 
 # No PXD hit equired: PXD0. At least one PXD (SVD) hit for one of the muon tracks: PXD1 (SVD1).
 # Hit required for both muon tracks: PXD2 (SVD2)"
-VXDReqs = ["PXD0", "PXD2"]
+VXDReqs = []
+if str(sys.argv[3]) == "PXD":
+    VXDReqs = ["PXD0", "PXD2"]
+elif str(sys.argv[3]) == "SVD":
+    VXDReqs = ["SVD0", "SVD2"]
+else:
+    B2FATAL('Not available VXD requirement " + str(sys.argv[3]) + ". Available are "PXD" and "SVD".')
 
+ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 
 fitResults = []
-fitResultsForNtuple = []
 numberOfEntries = []
 
 for VXDReq in VXDReqs:
     iResult = []
 
-    tdat = ROOT.TChain(treename)
+    tdat = ROOT.TChain(treeName)
 
     for iFile in workingFiles:
         tdat.AddFile(iFile)
-
-    evt_no = ROOT.RooRealVar("evt_no", "evt_no", 0., -10., 10000000.)
 
     B0_DeltaT = ROOT.RooRealVar("DeltaT", "DeltaT", 0.)
     deltaTErr = ROOT.RooRealVar("DeltaTErr", "DeltaTErr", 0, limDeltaTErr, "ps")
@@ -117,85 +118,9 @@ for VXDReq in VXDReqs:
     if VXDReq == 'SVD2':
         cut = cut + "&& Jpsi_mu_0_nSVDHits> 0 && Jpsi_mu_1_nSVDHits> 0 "
 
-    tdat.Draw("DeltaT - MCDeltaT >> B0_DeltaT_" + VXDReq, cut)
-    tdat.Draw("DeltaTErr >> B0_DeltaTErr_" + VXDReq, cut)
-    tdat.Draw("z - mcZ >> B0_DeltaZsig_" + VXDReq, cut)
-    tdat.Draw("TagVz - mcTagVz >> B0_DeltaZtag_" + VXDReq, cut)
-
-    # Validation Plot 1
-    histo_DeltaT.GetXaxis().SetLabelSize(0.04)
-    histo_DeltaT.GetYaxis().SetLabelSize(0.04)
-    histo_DeltaT.GetYaxis().SetTitleOffset(0.7)
-    histo_DeltaT.GetXaxis().SetTitleOffset(0.7)
-    histo_DeltaT.GetXaxis().SetTitleSize(0.06)
-    histo_DeltaT.GetYaxis().SetTitleSize(0.07)
-    histo_DeltaT.SetTitle('DeltaT Residual for PXD requirement ' + VXDReq + '; #Deltat - Gen. #Deltat / ps ; Events')
-
-    histo_DeltaT.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'DeltaT Residual for PXD requirement ' + VXDReq +
-                    '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
-    histo_DeltaT.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
-    histo_DeltaT.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
-    histo_DeltaT.Write()
-
-    # Validation Plot 2
-    histo_DeltaTErr.GetXaxis().SetLabelSize(0.04)
-    histo_DeltaTErr.GetYaxis().SetLabelSize(0.04)
-    histo_DeltaTErr.GetYaxis().SetTitleOffset(0.7)
-    histo_DeltaTErr.GetXaxis().SetTitleOffset(0.7)
-    histo_DeltaTErr.GetXaxis().SetTitleSize(0.06)
-    histo_DeltaTErr.GetYaxis().SetTitleSize(0.07)
-    histo_DeltaTErr.SetTitle('DeltaT error for PXD requirement ' + VXDReq + ' ; #sigma_{#Deltat} / ps ; Events')
-
-    histo_DeltaTErr.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'logy'))
-    histo_DeltaTErr.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'DeltaT error for PXD requirement ' + VXDReq +
-                    '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
-    histo_DeltaTErr.GetListOfFunctions().Add(
-        ROOT.TNamed(
-            'Check',
-            'Std. Dev. and Mean should not change drastically. Peaks after 2.6 ps should not increase.'))
-    histo_DeltaTErr.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
-    histo_DeltaTErr.Write()
-
-    # Validation Plot 3
-    histo_DeltaZSig.GetXaxis().SetLabelSize(0.04)
-    histo_DeltaZSig.GetYaxis().SetLabelSize(0.04)
-    histo_DeltaZSig.GetYaxis().SetTitleOffset(0.7)
-    histo_DeltaZSig.GetXaxis().SetTitleOffset(0.7)
-    histo_DeltaZSig.GetXaxis().SetTitleSize(0.06)
-    histo_DeltaZSig.GetYaxis().SetTitleSize(0.07)
-    histo_DeltaZSig.SetTitle('DeltaZ Residual on signal side for requirement ' + VXDReq + '; B0_Z - Gen. B0_Z / cm ; Events')
-
-    histo_DeltaZSig.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'DeltaZ Residual on signal side for PXD requirement ' + VXDReq +
-                    '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
-    histo_DeltaZSig.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
-    histo_DeltaZSig.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
-    histo_DeltaZSig.Write()
-
-    # Validation Plot 4
-    histo_DeltaZTag.GetXaxis().SetLabelSize(0.04)
-    histo_DeltaZTag.GetYaxis().SetLabelSize(0.04)
-    histo_DeltaZTag.GetYaxis().SetTitleOffset(0.7)
-    histo_DeltaZTag.GetXaxis().SetTitleOffset(0.7)
-    histo_DeltaZTag.GetXaxis().SetTitleSize(0.06)
-    histo_DeltaZTag.GetYaxis().SetTitleSize(0.07)
-    histo_DeltaZTag.SetTitle('DeltaZ Residual on tag side for requirement ' + VXDReq + '; B0_TagVz - Gen. B0_TagVz / cm; Events')
-
-    histo_DeltaZTag.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'DeltaZ Residual on tag side for PXD requirement ' + VXDReq +
-                    '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
-    histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
-    histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
-    histo_DeltaZTag.Write()
-
     argSet = ROOT.RooArgSet(
-        # B0_mcTagPDG,
         B0_DeltaT,
         B0_TruthDeltaT,
-        # B0_mcErrors,
-        # evt_no,
         B0_TagVz,
         B0_TruthTagVz,
         B0_Z,
@@ -207,19 +132,6 @@ for VXDReq in VXDReqs:
     argSet.add(B0_Jpsi_mu1_nSVDHits)
 
     argSet.add(B0_isSignal)
-
-    # argSet.add(B0_X)
-    # argSet.add(B0_TruthX)
-    # argSet.add(B0_Y)
-    # argSet.add(B0_TruthY)
-
-    # argSet.add(B0_TagVx)
-    # argSet.add(B0_TruthTagVx)
-    # argSet.add(B0_TagVy)
-    # argSet.add(B0_TruthTagVy)
-
-    # argSet.add(deltaTErr)
-    # argSet.add(B0_qrMC)
 
     data = ROOT.RooDataSet(
         "data",
@@ -423,10 +335,8 @@ for VXDReq in VXDReqs:
     c1.SaveAs(nPlot)
     c1.Clear()
 
-    iResult.append(['mu = ' + '{: 4.2f}'.format(shift) + ' +- ' + '{:4.2f}'.format(shiftErr) + ' ps',
-                    'sigma =' + '{: 4.2f}'.format(resolution) + ' +- ' + '{:4.2f}'.format(resolutionErr) + ' ps'])
-    fitResultsForNtuple.append(shift)
-    fitResultsForNtuple.append(resolution)
+    iResult.append(['mu = ' + '{: 4.3f}'.format(shift) + ' +- ' + '{:4.3f}'.format(shiftErr) + ' ps',
+                    'sigma =' + '{: 4.3f}'.format(resolution) + ' +- ' + '{:4.3f}'.format(resolutionErr) + ' ps'])
 
     resFrameDtErr.SetTitle("")
     sXtitleLandau = "#sigma_{#Deltat} / ps"
@@ -518,7 +428,7 @@ for VXDReq in VXDReqs:
         ROOT.RooFit.LineWidth(4))
     resFrameSigZ.SetTitle("")
 
-    sXtitleSigZ = "B0_Z - Gen. B0_Z / cm"
+    sXtitleSigZ = "z - mcZ / cm"
 
     resFrameSigZ.GetXaxis().SetTitle(sXtitleSigZ)
     resFrameSigZ.GetXaxis().SetLimits(-limZSig, limZSig)
@@ -577,10 +487,8 @@ for VXDReq in VXDReqs:
     fitResSigZ.Clear()
     modelSigZ.Clear()
 
-    iResult.append(['mu = ' + '{:^5.1f}'.format(shiftSigZ) + ' +- ' + '{:^4.1f}'.format(shiftErrSigZ) + ' mum',
-                    'sigma = ' + '{:^4.1f}'.format(resolutionSigZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrSigZ) + ' mum'])
-    fitResultsForNtuple.append(shiftSigZ)
-    fitResultsForNtuple.append(resolutionSigZ)
+    iResult.append(['mu = ' + '{:^5.3f}'.format(shiftSigZ) + ' +- ' + '{:^4.3f}'.format(shiftErrSigZ) + ' mum',
+                    'sigma = ' + '{:^4.3f}'.format(resolutionSigZ) + ' +- ' + '{:^4.3f}'.format(resolutionErrSigZ) + ' mum'])
 
     # Fit of Delta z for B0_Tag
 
@@ -643,7 +551,7 @@ for VXDReq in VXDReqs:
         ROOT.RooFit.LineWidth(4))
     resFrameTagZ.SetTitle("")
 
-    sXtitleTagZ = "B0_TagVz - Gen. B0_TagVz / cm"
+    sXtitleTagZ = "TagVz - mcTagVz / cm"
 
     resFrameTagZ.GetXaxis().SetTitle(sXtitleTagZ)
     resFrameTagZ.GetXaxis().SetTitleSize(0.05)
@@ -687,54 +595,48 @@ for VXDReq in VXDReqs:
     cTag.SaveAs(nPlot)
     cTag.Clear()
 
-    iResult.append(['mu = ' + '{:^5.1f}'.format(shiftTagZ) + ' +- ' + '{:^4.1f}'.format(shiftErrTagZ) + ' mum',
-                    'sigma = ' + '{:^4.1f}'.format(resolutionTagZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrTagZ) + ' mum'])
-    fitResultsForNtuple.append(shiftTagZ)
-    fitResultsForNtuple.append(resolutionTagZ)
+    iResult.append(['mu = ' + '{:^5.3f}'.format(shiftTagZ) + ' +- ' + '{:^4.3f}'.format(shiftErrTagZ) + ' mum',
+                    'sigma = ' + '{:^4.3f}'.format(resolutionTagZ) + ' +- ' + '{:^4.3f}'.format(resolutionErrTagZ) + ' mum'])
 
     fitResults.append(iResult)
 
-fitResultsForNtuple.append(float((numberOfEntries[1] / numberOfEntries[0]) * 100))
-outputNtuple.Fill(array.array('f', fitResultsForNtuple))
-outputNtuple.Write()
-outputFile.Close()
 
 print('*********************** FIT RESULTS ***************************')
 print('*                                                             *')
 print('* WEIGHTED AVERAGES OF THE PARAMETERS                         *')
 print('* OF THE FITTED 3 GAUSSIAN                                    *')
 print('*                                                             *')
-print('**************** WITHOUT PXD HIT REQUIREMENT ******************')
+print('**************** WITHOUT VXD HIT REQUIREMENT ******************')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')
-print('*    ' + fitResults[0][0][0] + '         ' + fitResults[0][0][1] + '    *')
+print('*   ' + fitResults[0][0][0] + '         ' + fitResults[0][0][1] + ' *')
 print('*                                                             *')
 print('* SigZ - Gen. SigZ                                            *')
 print('*                                                             *')
-print('*    ' + fitResults[0][1][0] + '        ' + fitResults[0][1][1] + '   *')
+print('* ' + fitResults[0][1][0] + '        ' + fitResults[0][1][1] + ' *')
 print('*                                                             *')
 print('* TagZ - Gen. TagZ                                            *')
 print('*                                                             *')
-print('*    ' + fitResults[0][2][0] + '        ' + fitResults[0][2][1] + '   *')
+print('* ' + fitResults[0][2][0] + '        ' + fitResults[0][2][1] + ' *')
 print('*                                                             *')
-print('********REQUIRING BOTH MUON TRACKS TO HAVE A PXD HIT***********')
+print('********REQUIRING BOTH MUON TRACKS TO HAVE A ' + sys.argv[3] + ' HIT***********')
 print('*                                                             *')
 print('* Efficiency                                                  *')
 print('*                                                             *')
 print('* N_' + VXDReqs[1] + '/N_' + VXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
-      '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%             *')
+      '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%  *')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')
-print('*    ' + fitResults[1][0][0] + '         ' + fitResults[1][0][1] + '    *')
+print('*   ' + fitResults[1][0][0] + '         ' + fitResults[1][0][1] + ' *')
 print('*                                                             *')
 print('* SigZ - Gen. SigZ                                            *')
 print('*                                                             *')
-print('*    ' + fitResults[1][1][0] + '        ' + fitResults[1][1][1] + '   *')
+print('* ' + fitResults[1][1][0] + '        ' + fitResults[1][1][1] + ' *')
 print('*                                                             *')
 print('* TagZ - Gen. TagZ                                            *')
 print('*                                                             *')
-print('*    ' + fitResults[1][2][0] + '        ' + fitResults[1][2][1] + '   *')
+print('* ' + fitResults[1][2][0] + '        ' + fitResults[1][2][1] + ' *')
 print('*                                                             *')
 print('***************************************************************')

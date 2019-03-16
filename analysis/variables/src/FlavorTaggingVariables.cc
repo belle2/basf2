@@ -622,22 +622,6 @@ namespace Belle2 {
       } else return -2;//gRandom->Uniform(0, 1);
     }
 
-    double McFlavorOfTagSide(const Particle* part)
-    {
-      const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
-      if (roe != nullptr) {
-        for (auto& track : roe->getTracks()) {
-          const MCParticle* mcParticle = track->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) return 511;
-            else if (mcParticle->getPDG() == -511) return -511;
-            mcParticle = mcParticle->getMother();
-          }
-        }
-      }
-      return 0;
-    }
-
 //  ######################################### Meta Variables ##############################################
 
 //  Miscelaneous -------------------------------------------------------------------------------------------
@@ -2117,7 +2101,6 @@ namespace Belle2 {
                       " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).");
-    REGISTER_VARIABLE("McFlavorOfTagSide",  McFlavorOfTagSide, "Flavor of tag side from MC extracted from the RoE");
 
 
     VARIABLE_GROUP("Flavor Tagger MetaFunctions")

@@ -17,7 +17,6 @@
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
-#include <pxd/dataobjects/PXDRawCluster.h>
 
 namespace Belle2 {
 
@@ -43,7 +42,6 @@ namespace Belle2 {
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
-      std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
 
       /** Critical error mask which defines return value of task */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
@@ -61,8 +59,6 @@ namespace Belle2 {
       StoreArray<PXDRawROIs> m_storeROIs;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
-      /** Output array for Clusters. */
-      StoreArray<PXDRawCluster> m_storeRawCluster;
     };//end class declaration
 
 

@@ -113,7 +113,6 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("PXDRawHitsName", m_PXDRawHitsName, "The name of the StoreArray of input PXDRawHits", std::string(""));
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of input PXDRawAdcs", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of input PXDRawROIs", std::string(""));
-  addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of input PXDClusters", std::string(""));
 
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
   B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
@@ -132,7 +131,6 @@ void PXDPostErrorCheckerModule::initialize()
   m_storeRawHits.isOptional(m_PXDRawHitsName);
   m_storeRawAdc.isOptional(m_PXDRawAdcsName);
   m_storeROIs.isOptional(m_PXDRawROIsName);
-  m_storeRawCluster.isOptional(m_RawClusterName);
 
   B2DEBUG(25, "The set error mask is $" << std::hex << m_criticalErrorMask);
 }
@@ -193,7 +191,6 @@ void PXDPostErrorCheckerModule::event()
     m_storeRawHits.clear();
     m_storeROIs.clear();
     m_storeRawAdc.clear();
-    m_storeRawCluster.clear();
     setReturnValue(false); // allows special processing in case
   } else {
     // setReturnValue(true); // default, it is not needed

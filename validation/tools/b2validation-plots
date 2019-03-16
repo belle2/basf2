@@ -55,7 +55,7 @@ def get_popular_revision_combinations(work_folder):
     )
     available_releases = [
         revision for revision in available
-        if revision.startswith("release")
+        if revision.startswith("release") or revision.startswith("prerelease")
     ]
     available_builds = [
         revision for revision in available

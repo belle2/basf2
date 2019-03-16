@@ -19,18 +19,14 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-00-03'
 skimCode = encodeSkimName('LeptonicUntagged')
 
-
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC11")
 
 leppath = Path()
 
-inputMdstList('MC9', fileList, path=leppath)
+inputMdstList('default', fileList, path=leppath)
 
 loadStdSkimPi0(path=leppath)
 loadStdSkimPhoton(path=leppath)

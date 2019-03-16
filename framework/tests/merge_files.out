@@ -94,7 +94,7 @@ running check_19_lowhigh: Check that the low/high event numbers are merged corre
 [WARNING] File "test0.root" is empty.
 [WARNING] File "test0.root" is empty.
 check_19_lowhigh passed
-running check_20_test_file: Check that a merged file passes the check_basf2_file program
+running check_20_test_file: Check that a merged file passes the b2file-check program
 [INFO] Steering file: steering-test1.root.py
 [INFO] Steering file: steering-test2.root.py
 check_20_test_file passed

@@ -182,7 +182,7 @@ namespace Belle2 {
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
 
-    int m_nLayerWires[9]; /**< number of wires per layer: needed for wire gain calibration */
+    int m_nLayerWires[9] = {}; /**< number of wires per layer: needed for wire gain calibration */
 
     // parameters to determine the predicted means and resolutions and hadron correction
     DBObjPtr<CDCDedxMeanPars> m_DBMeanPars; /**< dE/dx mean parameters */

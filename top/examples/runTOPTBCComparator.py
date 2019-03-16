@@ -4,6 +4,7 @@
 # Usage: basf2 runTOPTBCComparator.py calSetList.txt
 #
 from basf2 import *
+import os
 import sys
 
 set_log_level(LogLevel.INFO)
@@ -13,7 +14,7 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)

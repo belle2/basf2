@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     for revision in revisions:
         # Step 1 Checkout git commit
-        helpers.checkout_git_revision(revision, repo)
+        helpers.checkout_git_revision(revision, repo=repo)
 
         # Step 2: compile
         helpers.compile_basf2(compile_options)

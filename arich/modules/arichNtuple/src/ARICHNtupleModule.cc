@@ -72,6 +72,7 @@ namespace Belle2 {
   void ARICHNtupleModule::initialize()
   {
 
+    if (m_file) delete m_file;
     m_file = new TFile(m_outputFile.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
       B2FATAL("Couldn't open file '" << m_outputFile << "' for writing!");

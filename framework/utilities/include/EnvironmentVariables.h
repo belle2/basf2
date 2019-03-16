@@ -29,9 +29,23 @@ namespace Belle2 {
      * By default the value of the environment variable is split by whitespace
      * (" \t\n\r") but a different list of characters can be supplied, for
      * example ":" for path lists or ", " for comma or space separated values
-     * */
+     */
     static std::vector<std::string> getList(const std::string& name, const std::vector<std::string>& fallback = {},
                                             const std::string& separators = " \t\n\r");
+
+    /** Get a list of values from an environment variable or the given fallback
+     * string if the variable is not set.
+     *
+     * By default the value of the environment variable is split by whitespace
+     * (" \t\n\r") but a different list of characters can be supplied, for
+     * example ":" for path lists or ", " for comma or space separated values
+     *
+     * In case the variable is not set this function will convert the fallback
+     * string to a list using the same rules as would apply for the envirnoment
+     * value itself.
+     */
+    static std::vector<std::string> getOrCreateList(const std::string& name, const std::string& fallback,
+                                                    const std::string& separators = " \t\n\r");
 
     /** Modify the given string and replace every occurence of $NAME or ${NAME}
      * with the value of the environment variable NAME. Variables which are not

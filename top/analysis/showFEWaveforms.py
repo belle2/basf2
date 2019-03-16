@@ -67,7 +67,7 @@ class WFDisplay(Module):
                 evtMetaData = Belle2.PyStoreObj('EventMetaData')
                 evtMetaData.obj().setEndOfData()
                 return True
-        except:
+        except BaseException:
             return False
 
     def draw(self, k, event, run):
@@ -205,6 +205,9 @@ class WFDisplay(Module):
 
 set_log_level(LogLevel.INFO)
 
+# Define a global tag (note: the one given bellow will become out-dated!)
+use_central_database('data_reprocessing_proc8')
+
 # Create path
 main = create_path()
 
@@ -217,15 +220,8 @@ main.add_module(roinput)
 rawconverter = register_module('Convert2RawDet')
 main.add_module(rawconverter)
 
-# geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry (only TOP needed)
-geometry = register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # Unpacking
 unpack = register_module('TOPUnpacker')

@@ -46,6 +46,8 @@ void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_egam->GetListOfFunctions()->Add(new TNamed("Description", "Lab frame photon energy distribution from B0 -> rho0 gamma"));
   h_egam->GetListOfFunctions()->Add(new TNamed("Check", "Broad distribution bewteen 1.5 and 3 GeV."));
   h_egam->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
+  h_egam->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0., pvalue-error=0., expert")); 
+  // pvalue comparison turned off 27.02.2019 to be turned on when KS test is implemented
   
   TH1F* h_eparentgam = new TH1F("h_eparentgam",title,100,1.5,4.0); 
   ptree->Project("h_eparentgam", "B0_Egamma", "1==1");

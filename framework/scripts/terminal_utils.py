@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-pager
------
+# @cond dont_want_no_doxygen_warnings_this_is_sphinxed
 
-Provides paginated output for Python code.
+"""
+terminal_utils - Helper functions for input from/output to a terminal
+---------------------------------------------------------------------
+
+This module contains modules useful to deal with output on the terminal:
+
+* `Pager`, a class to provide paginated output with less similar to other
+  popular tools like ``git diff``
+* `InputEditor`, a class to open an editor window when requesting longer inputs
+  from users, similar to ``git commit``
 """
 
 import sys
@@ -159,29 +166,32 @@ class InputEditor():
     Heavily inspired by the code in this blog post:
     https://chase-seibert.github.io/blog/2012/10/31/python-fork-exec-vim-raw-input.html
 
-    :param editor_command: Editor to open for user input.  If ``None``, get default editor from
-        environment variables.  It should be the name of a shell executable and can contain command
-        line arguments.
-    :param initial_content: Initial string to insert into the temporary file that is opened for user
-        input.  Can be used for default input or to insert comment lines with instructions.
-    :param commentlines_start_with: Optionally define string with which comment lines start
+    Parameters:
+        editor_command: Editor to open for user input.  If ``None``, get
+            default editor from environment variables.  It should be the name
+            of a shell executable and can contain command line arguments.
+        initial_content: Initial string to insert into the temporary file that
+            is opened for user input.  Can be used for default input or to
+            insert comment lines with instructions.
+        commentlines_start_with: Optionally define string with which comment
+            lines start
     """
     def __init__(self,
                  editor_command: str = None,
                  initial_content: str = None,
                  commentlines_start_with: str = "#"):
-        """
-        Constructor
-        """
+        """Constructor"""
         # Use provided editor command or editor command from environment variables
         editor_command_string = editor_command or self._default_environment_editor()
-        # split editor_command to seperate executable name command line arguments
+        #: command line for the editor, split to seperate executable name command line arguments
         self.editor_command_list = shlex.split(editor_command_string, posix=True)
         # check if editor executable exists and if not, prompt for new editor command
         if shutil.which(self.editor_command_list[0]) is None:
             self._prompt_for_editor()
 
+        #: initial content of the editor window
         self.initial_content = initial_content
+        #: string which starts comments in the file
         self.comment_string = commentlines_start_with
 
     def input(self):
@@ -208,7 +218,7 @@ class InputEditor():
         return input_string
 
     def get_editor_command(self):
-        "Get editor shell command string used for user input."
+        """Get editor shell command string used for user input."""
         # Construct string from list which holds the executable and args
         return " ".join(self.editor_command_list)
 
@@ -245,3 +255,5 @@ class InputEditor():
 
             else:
                 print(f"Editor '{self.editor_command_list[0]}' not found in $PATH.")
+
+# @endcond

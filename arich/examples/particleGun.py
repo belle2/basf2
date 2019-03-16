@@ -9,7 +9,7 @@ from svd import add_svd_reconstruction
 from svd import add_svd_reconstruction_CoG
 from pxd import add_pxd_reconstruction
 from simulation import add_simulation
-
+import os
 # --------------------------------------------------------------------
 # Example of using ARICH reconstruction
 # needs reconstructed tracks (Tracks), extrapolated to ARICH (ExtHits)

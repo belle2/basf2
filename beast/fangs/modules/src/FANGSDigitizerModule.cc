@@ -132,11 +132,13 @@ void FANGSDigitizerModule::event()
       m_dchip_trkID_map.clear();
     }
 
+    // There is some issue with these cuts! please check, remove for now!
     //check if ionization within sensitive volume
-    if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
+    /*if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
         (-m_ChipRowY < chipPosition.Y() && chipPosition.Y() <  m_ChipRowY) &&
         (0. < chipPosition.Z() && chipPosition.Z() <  m_sensor_width) &&
-        (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {
+        (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {*/
+    if (1) {
 
       if (edep <  m_Workfct) break;
       ////////////////////////////////

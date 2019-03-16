@@ -208,7 +208,9 @@ class KLMK0LPlotModule(Module):
         self.momentum_av = self.momentum_av * (1.0 / len(self.vertex))
         # x, y, z, e
         cov_mat = numpy.zeros((4, 4))
+        cov_mat_err = numpy.zeros((4, 4))
         corr_mat = numpy.zeros((4, 4))
+        corr_mat_err = numpy.zeros((4, 4))
         for i in range(len(self.vertex)):
             cov_mat[0][0] = cov_mat[0][0] + \
                 (self.vertex[i].x() - self.vertex_k_av.x()) * \
@@ -243,18 +245,61 @@ class KLMK0LPlotModule(Module):
         for i in range(0, 4):
             for j in range(i, 4):
                 cov_mat[i][j] = cov_mat[i][j] / (len(self.vertex) - 1)
+        for i in range(len(self.vertex)):
+            cov_mat_err[0][0] = cov_mat_err[0][0] + \
+                pow((self.vertex[i].x() - self.vertex_k_av.x()) *
+                    (self.vertex[i].x() - self.vertex_k_av.x()) - cov_mat[0][0], 2)
+            cov_mat_err[0][1] = cov_mat_err[0][1] + \
+                pow((self.vertex[i].x() - self.vertex_k_av.x()) *
+                    (self.vertex[i].y() - self.vertex_k_av.y()) - cov_mat[0][1], 2)
+            cov_mat_err[0][2] = cov_mat_err[0][2] + \
+                pow((self.vertex[i].x() - self.vertex_k_av.x()) *
+                    (self.vertex[i].z() - self.vertex_k_av.z()) - cov_mat[0][2], 2)
+            cov_mat_err[0][3] = cov_mat_err[0][3] + \
+                pow((self.vertex[i].x() - self.vertex_k_av.x()) *
+                    (self.momentum[i] - self.momentum_av) - cov_mat[0][3], 2)
+            cov_mat_err[1][1] = cov_mat_err[1][1] + \
+                pow((self.vertex[i].y() - self.vertex_k_av.y()) *
+                    (self.vertex[i].y() - self.vertex_k_av.y()) - cov_mat[1][1], 2)
+            cov_mat_err[1][2] = cov_mat_err[1][2] + \
+                pow((self.vertex[i].y() - self.vertex_k_av.y()) *
+                    (self.vertex[i].z() - self.vertex_k_av.z()) - cov_mat[1][2], 2)
+            cov_mat_err[1][3] = cov_mat_err[1][3] + \
+                pow((self.vertex[i].y() - self.vertex_k_av.y()) *
+                    (self.momentum[i] - self.momentum_av) - cov_mat[1][3], 2)
+            cov_mat_err[2][2] = cov_mat_err[2][2] + \
+                pow((self.vertex[i].z() - self.vertex_k_av.z()) *
+                    (self.vertex[i].z() - self.vertex_k_av.z()) - cov_mat[2][2], 2)
+            cov_mat_err[2][3] = cov_mat_err[2][3] + \
+                pow((self.vertex[i].z() - self.vertex_k_av.z()) *
+                    (self.momentum[i] - self.momentum_av) - cov_mat[2][3], 2)
+            cov_mat_err[3][3] = cov_mat_err[3][3] + \
+                pow((self.momentum[i] - self.momentum_av) *
+                    (self.momentum[i] - self.momentum_av) - cov_mat[3][3], 2)
+        for i in range(0, 4):
+            for j in range(i, 4):
+                cov_mat_err[i][j] = \
+                    math.sqrt(cov_mat_err[i][j] /
+                              ((len(self.vertex) - 2) * len(self.vertex)))
         self.hist_covmat.SetBinContent(1, cov_mat[0][0])
         self.hist_covmat.SetBinContent(2, cov_mat[0][1])
         self.hist_covmat.SetBinContent(3, cov_mat[0][2])
         self.hist_covmat.SetBinContent(4, cov_mat[1][1])
         self.hist_covmat.SetBinContent(5, cov_mat[1][2])
         self.hist_covmat.SetBinContent(6, cov_mat[2][2])
-        for i in range(1, 7):
-            self.hist_covmat.SetBinError(i, 300)
+        self.hist_covmat.SetBinError(1, cov_mat_err[0][0])
+        self.hist_covmat.SetBinError(2, cov_mat_err[0][1])
+        self.hist_covmat.SetBinError(3, cov_mat_err[0][2])
+        self.hist_covmat.SetBinError(4, cov_mat_err[1][1])
+        self.hist_covmat.SetBinError(5, cov_mat_err[1][2])
+        self.hist_covmat.SetBinError(6, cov_mat_err[2][2])
         for i in range(0, 4):
             for j in range(i, 4):
                 corr_mat[i][j] = cov_mat[i][j] / \
                     math.sqrt(cov_mat[i][i]) / math.sqrt(cov_mat[j][j])
+                # Normalization error is not taken into account.
+                corr_mat_err[i][j] = cov_mat_err[i][j] / cov_mat[i][j] * \
+                    corr_mat[i][j]
         self.hist_corrmat.SetBinContent(1, corr_mat[0][0])
         self.hist_corrmat.SetBinContent(2, corr_mat[0][1])
         self.hist_corrmat.SetBinContent(3, corr_mat[0][2])
@@ -265,8 +310,17 @@ class KLMK0LPlotModule(Module):
         self.hist_corrmat.SetBinContent(8, corr_mat[2][2])
         self.hist_corrmat.SetBinContent(9, corr_mat[2][3])
         self.hist_corrmat.SetBinContent(10, corr_mat[3][3])
-        for i in range(1, 11):
-            self.hist_corrmat.SetBinError(i, 0.05)
+        self.hist_corrmat.SetBinError(1, corr_mat_err[0][0])
+        self.hist_corrmat.SetBinError(2, corr_mat_err[0][1])
+        self.hist_corrmat.SetBinError(3, corr_mat_err[0][2])
+        self.hist_corrmat.SetBinError(4, corr_mat_err[0][3])
+        self.hist_corrmat.SetBinError(5, corr_mat_err[1][1])
+        self.hist_corrmat.SetBinError(6, corr_mat_err[1][2])
+        self.hist_corrmat.SetBinError(7, corr_mat_err[1][3])
+        self.hist_corrmat.SetBinError(8, corr_mat_err[2][2])
+        self.hist_corrmat.SetBinError(9, corr_mat_err[2][3])
+        self.hist_corrmat.SetBinError(10, corr_mat_err[3][3])
+        self.output_file.cd()
         self.output_file.cd()
         self.hist_nkl.Write()
         self.hist_xres.Write()

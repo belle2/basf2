@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * This function installs a timer with wait_time ( in ms ) which
  * will check for the plot creation progress on the server
@@ -44,7 +46,7 @@ function installPlottingProgress(revList, joinedRevisions, progressKey, waitTime
                         // is the plotting complete and the overlay can be hidden again ?
                         // load the newly generated plots
                         console.log("Plot creation for revisions " + revString + " complete");
-                        setupRactiveFromRevision(revData, revString, revList);
+                        setupRactiveFromRevision(revData, revList);
                         $("#outer").hide();
                     } else {
                         // detailed progress message

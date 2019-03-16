@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
@@ -26,8 +27,6 @@ main = create_path()
 # Number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
-eventinfosetter.param('runList', [0])
-eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # Event generator (B0 -> K+pi- + cc, other B0 generic)

@@ -73,7 +73,7 @@ namespace Belle2 {
     }
 
 
-    GlobalParamVector::GlobalParamVector(std::vector< std::string > components) : m_components(components) {}
+    GlobalParamVector::GlobalParamVector(const std::vector< std::string >& components) : m_components(components) {}
 
     void GlobalParamVector::updateGlobalParam(double difference, short unsigned int uniqueID, short unsigned int element,
                                               short unsigned int param)
@@ -158,6 +158,11 @@ namespace Belle2 {
       }
     }
 
+    VXDGlobalParamInterface::E_VXDHierarchyType VXDGlobalParamInterface::s_hierarchyType =
+      VXDGlobalParamInterface::E_VXDHierarchyType::c_Full;
+    bool VXDGlobalParamInterface::s_enablePXD = true;
+    bool VXDGlobalParamInterface::s_enableSVD = true;
+
     void VXDGlobalParamInterface::setupAlignmentHierarchy(GlobalDerivativesHierarchy& hierarchy)
     {
       try {
@@ -165,56 +170,82 @@ namespace Belle2 {
         auto& geo = VXD::GeoCache::getInstance();
         // Set-up hierarchy
         DBObjPtr<VXDAlignment> vxdAlignments;
-        /**
-        So the hierarchy is as follows:
-                    Belle 2
-                  / |     | \
-              Ying  Yang Pat  Mat ... other sub-detectors
-              / |   / |  |  \  | \
-            ......  ladders ......
-            / / |   / |  |  \  | \ \
-          ......... sensors ........
-        */
+        if (s_hierarchyType == c_None) {
+          // Nothing to be done
+          return;
 
-        for (auto& halfShellPlacement : geo.getHalfShellPlacements()) {
-          TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
-          trafoHalfShell *= geo.getTGeoFromRigidBodyParams(
-                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
-                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
-                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
-                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
-                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
-                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
-                            );
-          rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobalParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
+        } else if (s_hierarchyType == c_Flat) {
+          for (auto& sensor : geo.getListOfSensors()) {
+            //TODO: Don't we have better way to distinguish PXD and SVD?
+            // For PXD
+            if (sensor.getLayerNumber() <= 2 and !s_enablePXD)
+              continue;
+            // SVD layer > 2
+            if (sensor.getLayerNumber() > 2 and !s_enableSVD)
+              continue;
 
-          for (auto& ladderPlacement : geo.getLadderPlacements(halfShellPlacement.first)) {
-            // Updated trafo
-            TGeoHMatrix trafoLadder = ladderPlacement.second;
-            trafoLadder *= geo.getTGeoFromRigidBodyParams(
-                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
-                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
-                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
-                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
-                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
-                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
-                           );
-            rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
+            rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensor, VxdID(0, 0, 0, 1),
+                geo.get(sensor).getTransformation(true));
+          }
+        } else if (s_hierarchyType == c_Full) {
+          /**
+          So the hierarchy is as follows:
+                      Belle 2
+                    / |     | \
+                Ying  Yang Pat  Mat ... other sub-detectors
+                / |   / |  |  \  | \
+              ......  ladders ......
+              / / |   / |  |  \  | \ \
+            ......... sensors ........
+          */
 
-            for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {
+          for (auto& halfShellPlacement : geo.getHalfShellPlacements()) {
+            // For PXD
+            if (halfShellPlacement.first.getLayerNumber() <= 2 and !s_enablePXD)
+              continue;
+            // for SVD - layer > 2
+            if (halfShellPlacement.first.getLayerNumber() > 2 and !s_enableSVD)
+              continue;
+
+            TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
+            trafoHalfShell *= geo.getTGeoFromRigidBodyParams(
+                                vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
+                                vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
+                                vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
+                                vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
+                                vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
+                                vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
+                              );
+            rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobalParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
+
+            for (auto& ladderPlacement : geo.getLadderPlacements(halfShellPlacement.first)) {
               // Updated trafo
-              TGeoHMatrix trafoSensor = sensorPlacement.second;
-              trafoSensor *= geo.getTGeoFromRigidBodyParams(
-                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
-                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
-                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
-                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
-                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
-                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
+              TGeoHMatrix trafoLadder = ladderPlacement.second;
+              trafoLadder *= geo.getTGeoFromRigidBodyParams(
+                               vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
+                               vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
+                               vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
+                               vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
+                               vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
+                               vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
                              );
-              rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensorPlacement.first, ladderPlacement.first, trafoSensor);
+              rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
+
+              for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {
+                // Updated trafo
+                TGeoHMatrix trafoSensor = sensorPlacement.second;
+                trafoSensor *= geo.getTGeoFromRigidBodyParams(
+                                 vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
+                                 vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
+                                 vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
+                                 vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
+                                 vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
+                                 vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
+                               );
+                rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensorPlacement.first, ladderPlacement.first, trafoSensor);
 
 
+              }
             }
           }
         }

@@ -64,7 +64,7 @@ namespace Belle2 {
     /**
     * adding suffix to filenae for uniqueness in each iter
     */
-    void setOutFilePrefix(std::string value) {fSetPrefix = value;}
+    void setOutFilePrefix(const std::string& value) {fSetPrefix = value;}
 
     /**
     * funtion to set rotation symmetry

@@ -109,4 +109,32 @@ anal.rankByLowest("e-", "py", allowMultiRank=False, outputVariable="py_low_singl
 anal.rankByLowest("e-", "py", allowMultiRank=True, outputVariable="py_low_multi", path=path)
 # and also check sorting
 path.add_module(RankChecker())
+
+# we set numBest = 2: this is used also for the assert
+numBest_value = 2
+
+
+class NumBestChecker(basf2.Module):
+    """Check if 'numBest' works correctly"""
+
+    def initialize(self):
+        """Create particle list 'e-:numbest' object"""
+        #: ParticleList object
+        self.plist = Belle2.PyStoreObj('e-:numBest')
+
+    def event(self):
+        """Check if 'e-:numBest' has the expected size"""
+        size = self.plist.getListSize()
+        # The test fails if size > numBest_value
+        # since we will set numBest = numBest_value
+        assert size <= numBest_value, 'numBest test failed: there are too many Particles in the list!'
+
+
+# create a new list
+anal.fillParticleListFromMC('e-:numBest', '', path=path)
+# sort the list, using numBest
+anal.rankByHighest('e-:numBest', 'M', numBest=numBest_value, path=path)
+# and check that numBest worked as expected
+path.add_module(NumBestChecker())
+
 basf2.process(path)

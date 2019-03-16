@@ -29,7 +29,7 @@ namespace Belle2 {
        * - std::invalid_argument if the file cannot be opened at all
        * - std::runtime_error if any of the trees is missing or the number of entries in the persistent tree is !=1
        */
-      RootFileInfo(const std::string& filename);
+      explicit RootFileInfo(const std::string& filename);
       /** Close the file and delete all structures associated with it */
       ~RootFileInfo();
 

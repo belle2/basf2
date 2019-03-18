@@ -82,7 +82,7 @@ class Basf2ModuleIndex(Index):
             letter = modname[0].upper()
             content.setdefault(letter, [])
             content[letter].append([modname, 0, docname, target, "", "", ""])
-        return content.items(), False
+        return list(content.items()), False
 
 
 class Basf2VariableIndex(Index):
@@ -99,7 +99,7 @@ class Basf2VariableIndex(Index):
             letter = modname[0].upper()
             content.setdefault(letter, [])
             content[letter].append([modname, 0, docname, target, "", "", ""])
-        return content.items(), False
+        return list(content.items()), False
 
 
 class Basf2Domain(Domain):

@@ -197,12 +197,6 @@ namespace Belle2 {
     double particleInvariantMassLambda(const Particle* part);
 
     /**
-     * [Expert] The invariant mass calculated from all ECLCluster daughters (i.e. photons) and cluster-matched tracks using the CLUSTER 4-MOMENTA.
-     * Used for ECL-based dark sector physics and debugging track-cluster matching.
-     */
-    double eclClusterOnlyInvariantMass(const Particle* part);
-
-    /**
      * return uncertainty of the invariant mass (determined from particle's daughter 4-momentum vectors)
      */
     double particleInvariantMassError(const Particle* part);

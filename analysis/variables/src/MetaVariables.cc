@@ -587,14 +587,13 @@ endloop:
         // support the lambda function syntax and throws a (wrong) variableScope
 
         // cppcheck-suppress variableScope
-        int iDaughterNumber = 0;
-        int jDaughterNumber = 0;
-        int agrandDaughterNumber = 0;
-        int bgrandDaughterNumber = 0;
+        int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -670,14 +669,13 @@ endloop:
         // support the lambda function syntax and throws a (wrong) variableScope
 
         // cppcheck-suppress variableScope
-        int iDaughterNumber = 0;
-        int jDaughterNumber = 0;
-        int agrandDaughterNumber = 0;
-        int bgrandDaughterNumber = 0;
+        int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {
@@ -766,14 +764,13 @@ endloop:
         // support the lambda function syntax and throws a (wrong) variableScope
 
         // cppcheck-suppress variableScope
-        int iDaughterNumber = 0;
-        int jDaughterNumber = 0;
-        int agrandDaughterNumber = 0;
-        int bgrandDaughterNumber = 0;
+        int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          // cppcheck-suppress unreadVariable
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+          // cppcheck-suppress unreadVariable
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&) {

@@ -578,13 +578,6 @@ def add_vxd_track_finding_vxdtf2(
     # some setting for VXDTF2
     ##########################
 
-    phase2_QEMVA_weight = None
-    phase3_QEMVA_weight = 'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
-
-    if not use_vxdtf2_quality_estimator:
-        phase2_QEMVA_weight = None
-        phase3_QEMVA_weight = None
-
     # setting different for pxd and svd:
     if is_pxd_used(components):
         setup_name = "SVDPXDDefault"
@@ -670,42 +663,17 @@ def add_vxd_track_finding_vxdtf2(
         pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
         path.add_module(pxdSVDCut)
 
-    # Create phase2 path
-    #####################
-    phase2_path = create_path()
+    if use_vxdtf2_quality_estimator:
+        vxdtf_quality_estimator_weightfile = 'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
 
-    # Quality
-    qualityEstimator = register_module('QualityEstimatorMVA' if phase2_QEMVA_weight
-                                       else 'QualityEstimatorVXD')
-    qualityEstimator.param('EstimationMethod', 'tripletFit')
-    qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
-    if phase2_QEMVA_weight:
-        qualityEstimator.param('WeightFileIdentifier', phase2_QEMVA_weight)
-        qualityEstimator.param('UseTimingInfo', '-Timing' in phase2_QEMVA_weight)
-        qualityEstimator.param('ClusterInformation', 'Average')
-
-    phase2_path.add_module(qualityEstimator)
-
-    # Create phase3 path
-    #####################
-    phase3_path = create_path()
-
-    # Quality
-    qualityEstimator = register_module('QualityEstimatorMVA' if phase3_QEMVA_weight
-                                       else 'QualityEstimatorVXD')
-    qualityEstimator.param('EstimationMethod', 'tripletFit')
-    qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
-    if phase3_QEMVA_weight:
-        qualityEstimator.param('WeightFileIdentifier', phase3_QEMVA_weight)
-        qualityEstimator.param('UseTimingInfo', '-Timing' in phase3_QEMVA_weight)
-        qualityEstimator.param('ClusterInformation', 'Average')
-
-    phase3_path.add_module(qualityEstimator)
-
-    # Add IoVDependentCondition Module that selects phase2 or phase3 path
-    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)
-
-    #####################
+        path.add_module(
+            "QualityEstimatorMVA",
+            WeightFileIdentifier=vxdtf_quality_estimator_weightfile,
+            EstimationMethod="tripletFit",
+            SpacePointTrackCandsStoreArrayName=nameSPTCs,
+            UseTimingInfo=False,
+            ClusterInformation="Average",
+        )
 
     if min_SPTC_quality > 0.:
         qualityIndicatorCutter = register_module('VXDTrackCandidatesQualityIndicatorCutter')

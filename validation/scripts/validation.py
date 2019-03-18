@@ -552,7 +552,10 @@ class Validation:
         # Make sure dependent scripts of skipped scripts are skipped, too.
         for script_object in self.scripts:
             if script_object.status == ScriptStatus.skipped:
-                self.skip_script(script_object)
+                self.skip_script(
+                    script_object,
+                    reason="Depends on '{}'".format(script_object.path)
+                )
 
     def build_headers(self):
         """!
@@ -563,10 +566,12 @@ class Validation:
         for script_object in self.scripts:
             script_object.load_header()
 
-    def skip_script(self, script_object):
+    def skip_script(self, script_object, reason=""):
         """!
         This method sets the status of the given script and all dependent ones
         to 'skipped'.
+        @param script_object: Script object to be skipped.
+        @param reason: Reason for skipping object
         @return: None
         """
         # Print a warning if the status of the script is changed and then
@@ -574,12 +579,17 @@ class Validation:
         if script_object.status not in [ScriptStatus.skipped,
                                         ScriptStatus.failed]:
             self.log.warning('Skipping ' + script_object.path)
+            if reason:
+                self.log.debug("Reason for skipping: {}.".format(reason))
             script_object.status = ScriptStatus.skipped
 
         # Also skip all dependent scripts.
         for dependent_script in self.scripts:
             if script_object in dependent_script.dependencies:
-                self.skip_script(dependent_script)
+                self.skip_script(
+                    dependent_script,
+                    reason="Depends on '{}'".format(script_object.path)
+                )
 
     def create_log(self):
         """!
@@ -1108,7 +1118,12 @@ class Validation:
                 )
 
                 # Skip all dependent scripts
-                self.skip_script(script_obj)
+                self.skip_script(
+                    script_obj,
+                    reason="Script '{}' failed and we set it's status to "
+                           "skipped so that all dependencies are "
+                           "also skipped.".format(script_object.path)
+                )
 
             else:
                 # Remove this script from the dependencies of dependent
@@ -1160,7 +1175,13 @@ class Validation:
                 # kill the running process
                 script_obj.control.terminate(script_obj)
                 # Skip all dependent scripts
-                self.skip_script(script_obj)
+                self.skip_script(
+                    script_obj,
+                    reason="Script '{}' did not finish in time, so we're"
+                           "setting it to 'skipped' so that all dependent "
+                           "scripts will be skipped "
+                           "as well.".format(script_object.path)
+                )
 
         def handle_waiting_script(script_obj):
             # Determine the way of execution depending on whether

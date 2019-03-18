@@ -90,13 +90,6 @@ void PXDInjectionDQMModule::beginRun()
 
 void PXDInjectionDQMModule::event()
 {
-  unsigned long all = 0;
-  // count raw pixel hits per module
-  std::map <VxdID, int> freq;// count the number of RawHits per sensor
-  for (auto& p : m_storeRawHits) {
-    freq[p.getSensorID()]++;
-    all++;
-  }
 
   for (auto& it : m_rawTTD) {
     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
@@ -105,20 +98,25 @@ void PXDInjectionDQMModule::event()
 
     // get last injection time
     auto difference = it.GetTimeSinceLastInjection(0);
-    // overflow?
+    // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
-      // get PXD occupancy
+      // count raw pixel hits per module, only if necessary
+      unsigned int all = 0;
+      std::map <VxdID, int> freq;// count the number of RawHits per sensor
+      for (auto& p : m_storeRawHits) {
+        freq[p.getSensorID()]++;
+        all++;
+      }
+      // Should we use two histograms and normalize? Use maybe TEfficiency? Will this work with HistoModule?
       if (it.GetIsHER(0)) {
-        // fill histograms ...
-        hOccAfterInjHER->Fill(all);
+        hOccAfterInjHER->Fill(difference, all);
         for (auto& a : hOccModAfterInjHER) {
-          a.second->Fill(freq[a.first]);
+          a.second->Fill(difference, freq[a.first]);
         }
       } else {
-        // fill histograms ...
-        hOccAfterInjLER->Fill(all);
+        hOccAfterInjLER->Fill(difference, all);
         for (auto& a : hOccModAfterInjLER) {
-          a.second->Fill(freq[a.first]);
+          a.second->Fill(difference, freq[a.first]);
         }
       }
     }

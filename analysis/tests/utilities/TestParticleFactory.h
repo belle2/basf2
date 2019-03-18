@@ -51,6 +51,7 @@ namespace TestUtilities {
       bool isString = decaydescriptor->init(decayString);
       if (!isString) {
         B2INFO("Decay string is not defined: " << decayString);
+        delete decaydescriptor;
         return nullptr;
       }
       std::vector<std::string> strNames = decaydescriptor->getSelectionNames();

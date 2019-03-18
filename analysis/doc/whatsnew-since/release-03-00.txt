@@ -40,6 +40,11 @@ Variables
 
 * Added M2, that returns the invariant mass squared of a given Particle (determined from the particle's 4-momentum vector).
 
+* Added eclClusterOnlyInvariantMass, that returns the invariant mass of the particles, computed with cluster information
+
+* Added :b2:var:`grandDaughterDiffOf`,  :b2:var:`grandDaughterDiffOfPhi`, and  :b2:var:`grandDaughterDiffOfClusterPhi`.
+  They behave like :b2:var:`daughterDiffOf`, but use grandDaughters' information rather than daughters'.
+
 Standard Particle Lists
 +++++++++++++++++++++++
 

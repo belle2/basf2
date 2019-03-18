@@ -13,7 +13,7 @@
 VALIDATION_OUTPUT_FILE = 'CDCCRTrackingValidation.root'
 CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 10000
-ACTIVE = True
+ACTIVE = False
 
 import basf2
 basf2.set_random_seed(1337)

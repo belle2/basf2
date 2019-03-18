@@ -39,7 +39,7 @@
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 
 #include <svd/calibration/SVDDetectorConfiguration.h>
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+//#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -77,20 +77,7 @@ void SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fi
     B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
 }
 
-void SVDLocalCalibrationsImporter::importSVDGlobalXMLFile(const std::string& fileName)
-{
-
-  IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
-  const std::string filename = FileSystem::findFile(fileName);
-  B2INFO("Importing the global run configuration xml file " << fileName << "\n");
-
-  const std::string payloadname = "SVDGlobalXMLFile.xml";
-  if (Database::Instance().addPayload(payloadname, filename, iov))
-    B2INFO("Success!");
-  else
-    B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
-}
-
+/*
 
 void importSVDGlobalConfigParametersFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
@@ -135,7 +122,7 @@ void importSVDLocalConfigParametersFromXML(const std::string& xmlfileName, bool 
 
 }
 
-
+*/
 void SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   // We do initialize the noise to a negative value so that

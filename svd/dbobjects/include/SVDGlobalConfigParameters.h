@@ -27,7 +27,8 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDGlobalConfigParameters()
+    SVDGlobalConfigParameters(const TString& uniqueID = ""):
+      m_uniqueID(uniqueID)    // Add a string as unique identifier for a given local run configuration)
     {};
 
 
@@ -61,19 +62,17 @@ namespace Belle2 {
      * @param none
      * @return flaot corresponding to the APV clock units in [ns]
      */
-    float getAPVClockUnitsInNs(void) const
+    float getAPVClockInRFCUnits(void) const
     {
 
-      float rfcToNs =
-        2; /** the conversion for accelerator radio frequency counst to ns is temporarly hardcoded. IT should be also read from the DB. */
-      TString aux(m_APVClockUnits);
+      TString aux(m_APVClockInRFCUnits);
       aux = aux.Remove(aux.First(" "), aux.Sizeof());
       //    std::cout << "aux = " << aux <<endl;
       std::string auxString(aux);
       int APVClockUnitsCoeff = std::atoi(auxString.c_str());
       //    std::cout<<"time units coefficient = " << timeUnitsCoeff<<endl;
 
-      return APVClockUnitsCoeff * rfcToNs;
+      return APVClockUnitsCoeff;
     }
 
 
@@ -118,13 +117,20 @@ namespace Belle2 {
      * @param std::string coeff + units [RFC]
      *
      */
-    void setAPVClockUnits(std::string APVClockUnits)
+    void setAPVClockInRFCUnits(std::string APVClockUnits)
     {
-      m_APVClockUnits = APVClockUnits;
+      m_APVClockInRFCUnits = APVClockUnits;
     }
 
 
+    /**
+     * Get the unique ID  of the calibration
+     */
+    TString get_uniqueID() const {return m_uniqueID;}
+
   private:
+
+    TString m_uniqueID; //The unique identifier is a private member of SVDLocalConfigParameter, whose value is assigned in the constructor.
 
     /** zero suppression value which defines the S/N threshold of data mode acquisition during global run in ZS mode
          */
@@ -138,10 +144,9 @@ namespace Belle2 {
      */
     int m_maskFilter;
 
-    /** APVclock units
-     *
+    /** APVclock
      */
-    std::string m_APVClockUnits;
+    std::string m_APVClockInRFCUnits;
 
     ClassDef(SVDGlobalConfigParameters, 1);
 

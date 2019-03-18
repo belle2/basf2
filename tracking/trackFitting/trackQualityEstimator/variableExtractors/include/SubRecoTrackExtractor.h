@@ -44,38 +44,40 @@ namespace Belle2 {
     }
 
     /// extract the actual variables and write into a variable set
-    void extractVariables(RecoTrack const* CDCrecoTrack, RecoTrack const* SVDrecoTrack, RecoTrack const* PXDrecoTrack)
+    void extractVariables(RecoTrack const* CDCRecoTrack,
+                          RecoTrack const* SVDRecoTrack,
+                          RecoTrack const* PXDRecoTrack)
     {
-      if (PXDrecoTrack) {
-        float qi = PXDrecoTrack->getQualityIndicator();
-        m_variables.at("PXD_QI") = isnan(qi) ? 0. : qi;
+      if (PXDRecoTrack) {
+        const float pxdQI = PXDRecoTrack->getQualityIndicator();
+        m_variables.at("PXD_QI") = isnan(pxdQI) ? 0. : pxdQI;
       } else {
         m_variables.at("PXD_QI") = -1.;
       }
 
-      if (CDCrecoTrack) {
-        float qi = CDCrecoTrack->getQualityIndicator();
-        m_variables.at("CDC_QI") = isnan(qi) ? 0. : qi;
-        m_variables.at("CDC_FitSuccessful") = CDCrecoTrack->wasFitSuccessful();
+      if (CDCRecoTrack) {
+        float cdcQI = CDCRecoTrack->getQualityIndicator();
+        m_variables.at("CDC_QI") = isnan(cdcQI) ? 0. : cdcQI;
+        m_variables.at("CDC_FitSuccessful") = CDCRecoTrack->wasFitSuccessful();
       } else {
         m_variables.at("CDC_QI") = -1.;
         m_variables.at("CDC_FitSuccessful") = -1.;
       }
 
-      if (SVDrecoTrack) {
-        m_variables.at("SVD_QI") = SVDrecoTrack->getQualityIndicator();
-        m_variables.at("SVD_FitSuccessful") = SVDrecoTrack->wasFitSuccessful();
-        m_variables.at("SVD_has_SPTC") = bool(SVDrecoTrack->getRelatedTo<SpacePointTrackCand>("SPTrackCands"));
+      if (SVDRecoTrack) {
+        m_variables.at("SVD_QI") = SVDRecoTrack->getQualityIndicator();
+        m_variables.at("SVD_FitSuccessful") = SVDRecoTrack->wasFitSuccessful();
+        m_variables.at("SVD_has_SPTC") = bool(SVDRecoTrack->getRelatedTo<SpacePointTrackCand>("SPTrackCands"));
       } else {
         m_variables.at("SVD_QI") = -1.;
         m_variables.at("SVD_has_SPTC") = -1.;
         m_variables.at("SVD_FitSuccessful") = -1.;
       }
 
-      if (SVDrecoTrack and CDCrecoTrack and SVDrecoTrack->wasFitSuccessful() and CDCrecoTrack->wasFitSuccessful()) {
+      if (SVDRecoTrack and CDCRecoTrack and SVDRecoTrack->wasFitSuccessful() and CDCRecoTrack->wasFitSuccessful()) {
 
-        CDCwall_extrapolation(CDCrecoTrack, SVDrecoTrack);
-        POCA_extrapolation(CDCrecoTrack, SVDrecoTrack);
+        CDCwall_extrapolation(CDCRecoTrack, SVDRecoTrack);
+        POCA_extrapolation(CDCRecoTrack, SVDRecoTrack);
 
       } else {
         setDiffs("SVD_CDC_CDCwall_Pos", NULL, NULL);
@@ -122,7 +124,7 @@ namespace Belle2 {
 
     }
 
-    void CDCwall_extrapolation(RecoTrack const* CDCrecoTrack, RecoTrack const* SVDrecoTrack)
+    void CDCwall_extrapolation(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
     {
       // position and momentum used for extrapolations to the CDC Wall
       TVector3 center(0., 0., 0.);
@@ -131,13 +133,13 @@ namespace Belle2 {
       genfit::MeasuredStateOnPlane svd_sop; genfit::MeasuredStateOnPlane cdc_sop;
       try {
         // do extrapolation of SVD and CDC onto CDCwall
-        svd_sop = SVDrecoTrack->getMeasuredStateOnPlaneFromLastHit();
-        cdc_sop = CDCrecoTrack->getMeasuredStateOnPlaneFromFirstHit();
+        svd_sop = SVDRecoTrack->getMeasuredStateOnPlaneFromLastHit();
+        cdc_sop = CDCRecoTrack->getMeasuredStateOnPlaneFromFirstHit();
         cdc_sop.extrapolateToCylinder(m_CDC_wall_radius, center, direction);
         svd_sop.extrapolateToPlane(cdc_sop.getPlane());
       } catch (genfit::Exception const& e) {
         // extrapolation not possible, skip this track
-        B2WARNING("SubRecoTrackExtractor: SVDrecoTrack and/or CDCrecoTrack extrapolation to the CDCwall failed!\n"
+        B2WARNING("SubRecoTrackExtractor: SVDRecoTrack and/or CDCRecoTrack extrapolation to the CDCwall failed!\n"
                   << "-->" << e.what());
         setDiffs("SVD_CDC_CDCwall_Pos", NULL, NULL);
         setDiffs("SVD_CDC_CDCwall_Mom", NULL, NULL);
@@ -169,7 +171,7 @@ namespace Belle2 {
       }
     }
 
-    void POCA_extrapolation(RecoTrack const* CDCrecoTrack, RecoTrack const* SVDrecoTrack)
+    void POCA_extrapolation(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
     {
       // position and momentum used for extrapolations to the CDC Wall
       TVector3 linePoint(0., 0., 0.);
@@ -178,13 +180,13 @@ namespace Belle2 {
       genfit::MeasuredStateOnPlane svd_sop; genfit::MeasuredStateOnPlane cdc_sop;
       try {
         // do extrapolation of SVD and CDC onto CDCwall
-        svd_sop = SVDrecoTrack->getMeasuredStateOnPlaneFromFirstHit();
-        cdc_sop = CDCrecoTrack->getMeasuredStateOnPlaneFromFirstHit();
+        svd_sop = SVDRecoTrack->getMeasuredStateOnPlaneFromFirstHit();
+        cdc_sop = CDCRecoTrack->getMeasuredStateOnPlaneFromFirstHit();
         cdc_sop.extrapolateToLine(linePoint, lineDirection);
         svd_sop.extrapolateToLine(linePoint, lineDirection);
       } catch (genfit::Exception const& e) {
         // extrapolation not possible, skip this track
-        B2WARNING("SubRecoTrackExtractor: SVDrecoTrack and/or CDCrecoTrack extrapolation to POCA failed!\n"
+        B2WARNING("SubRecoTrackExtractor: SVDRecoTrack and/or CDCRecoTrack extrapolation to POCA failed!\n"
                   << "-->" << e.what());
         setDiffs("SVD_CDC_POCA_Pos", NULL, NULL);
         setDiffs("SVD_CDC_POCA_Mom", NULL, NULL);

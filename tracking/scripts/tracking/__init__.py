@@ -368,19 +368,23 @@ def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_rec
                                      pxd_reco_tracks="PXDRecoTracks",
                                      weightfile_id='tracking/data/TrackQE_weight_files/FullTrackQE-Default.xml',
                                      do_training=False):
-    if(not do_training):
-        trackQualityEstimatorMVA = register_module('TrackQualityEstimatorMVA', recoTracksStoreArrayName=reco_tracks,
-                                                   SVDCDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
-                                                   CDCRecoTracksStoreArrayName=cdc_reco_tracks,
-                                                   SVDRecoTracksStoreArrayName=svd_reco_tracks,
-                                                   PXDRecoTracksStoreArrayName=pxd_reco_tracks)
-        trackQualityEstimatorMVA.param('WeightFileIdentifier', weightfile_id)
-        path.add_module(trackQualityEstimatorMVA)
+    if not do_training:
+        path.add_module(
+            'TrackQualityEstimatorMVA',
+            recoTracksStoreArrayName=reco_tracks,
+            SVDCDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
+            CDCRecoTracksStoreArrayName=cdc_reco_tracks,
+            SVDRecoTracksStoreArrayName=svd_reco_tracks,
+            PXDRecoTracksStoreArrayName=pxd_reco_tracks,
+            WeightFileIdentifier=weightfile_id,
+        )
     else:
-        trackQETrainingDataCollector = register_module('TrackQETrainingDataCollector', recoTracksStoreArrayName=reco_tracks,
-                                                       SVDCDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
-                                                       CDCRecoTracksStoreArrayName=cdc_reco_tracks,
-                                                       SVDRecoTracksStoreArrayName=svd_reco_tracks,
-                                                       PXDRecoTracksStoreArrayName=pxd_reco_tracks)
-        trackQETrainingDataCollector.param('TrainingDataOutputName', weightfile_id)
-        path.add_module(trackQETrainingDataCollector)
+        path.add_module(
+            'TrackQETrainingDataCollector',
+            recoTracksStoreArrayName=reco_tracks,
+            SVDCDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
+            CDCRecoTracksStoreArrayName=cdc_reco_tracks,
+            SVDRecoTracksStoreArrayName=svd_reco_tracks,
+            PXDRecoTracksStoreArrayName=pxd_reco_tracks,
+            TrainingDataOutputName=weightfile_id,
+        )

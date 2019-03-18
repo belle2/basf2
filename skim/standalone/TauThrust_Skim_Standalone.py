@@ -3,7 +3,7 @@
 
 #######################################################
 #
-# Tau generic skims
+# Tau skim using thrust
 #
 ######################################################
 
@@ -16,29 +16,29 @@ from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-03-00-03'
 
-skimCode = encodeSkimName('TauGeneric')
+skimCode = encodeSkimName('TauThrust')
 import sys
 import os
 import glob
 
-taugenericskim = Path()
+tauthrustskim = Path()
 
 fileList = get_test_file("mixedBGx1", "MC11")
 
-inputMdstList('default', fileList, path=taugenericskim)
+inputMdstList('default', fileList, path=tauthrustskim)
 
-stdPi('all', path=taugenericskim)
-stdPhotons('all', path=taugenericskim)
+stdPi('all', path=tauthrustskim)
+stdPhotons('all', path=tauthrustskim)
 
 # Tau Skim
 from skim.taupair import *
-tauList = TauList(path=taugenericskim)
+tauList = TauThrustList(path=tauthrustskim)
 
-skimOutputUdst(skimCode, tauList, path=taugenericskim)
-summaryOfLists(tauList, path=taugenericskim)
+skimOutputUdst(skimCode, tauList, path=tauthrustskim)
+summaryOfLists(tauList, path=tauthrustskim)
 
-setSkimLogging(path=taugenericskim)
-process(taugenericskim)
+setSkimLogging(path=tauthrustskim)
+process(tauthrustskim)
 
 # print out the summary
 print(statistics)

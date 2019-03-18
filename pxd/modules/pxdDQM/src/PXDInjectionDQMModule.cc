@@ -50,6 +50,8 @@ void PXDInjectionDQMModule::defineHisto()
 
   hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;;Count/Time", 1000, -500, 4500);
   hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;;Count/Time", 1000, -500, 4500);
+  hEOccAfterInjLER  = new TEfficiency("PXDEOccInjLER", "PXDEOccInjLER/Time;;Count/Time", 1000, -500, 4500);
+  hEOccAfterInjHER  = new TEfficiency("PXDEOccInjHER", "PXDEOccInjHER/Time;;Count/Time", 1000, -500, 4500);
 
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -64,6 +66,10 @@ void PXDInjectionDQMModule::defineHisto()
 
       hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 1000, -500, 4500);
       hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 1000, -500, 4500);
+      hEOccModAfterInjLER[avxdid] = new TEfficiency("PXDEOccInjLER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 1000,
+                                                    -500, 4500);
+      hEOccModAfterInjHER[avxdid] = new TEfficiency("PXDEOccInjHER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 1000,
+                                                    -500, 4500);
 
     }
   }
@@ -110,12 +116,20 @@ void PXDInjectionDQMModule::event()
       // Should we use two histograms and normalize? Use maybe TEfficiency? Will this work with HistoModule?
       if (it.GetIsHER(0)) {
         hOccAfterInjHER->Fill(difference, all);
+        hEOccAfterInjHER->Fill(difference, all);
         for (auto& a : hOccModAfterInjHER) {
+          a.second->Fill(difference, freq[a.first]);
+        }
+        for (auto& a : hEOccModAfterInjHER) {
           a.second->Fill(difference, freq[a.first]);
         }
       } else {
         hOccAfterInjLER->Fill(difference, all);
+        hEOccAfterInjLER->Fill(difference, all);
         for (auto& a : hOccModAfterInjLER) {
+          a.second->Fill(difference, freq[a.first]);
+        }
+        for (auto& a : hEOccModAfterInjLER) {
           a.second->Fill(difference, freq[a.first]);
         }
       }

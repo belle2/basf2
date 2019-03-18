@@ -34,8 +34,6 @@
 //ROOT
 #include <TVector3.h>
 
-#include <boost/lexical_cast.hpp>
-
 #include <cmath>
 #include <stack>
 
@@ -567,7 +565,7 @@ namespace Belle2 {
 
     double weightedAverageECLTime(const Particle* particle)
     {
-      int nDaughters = int(particle->getNDaughters());
+      int nDaughters = particle->getNDaughters();
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
         return std::numeric_limits<float>::quiet_NaN();
@@ -601,7 +599,7 @@ namespace Belle2 {
           B2DEBUG(11, "denom[" << numberOfClusterDaughters << "] = " << denom);
         } else {
           const std::vector<Particle*> daughters = current->getDaughters();
-          nDaughters = int(current->getNDaughters());
+          nDaughters = current->getNDaughters();
           for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
             stacked.push(daughters[iDaughter]);
           }
@@ -623,7 +621,7 @@ namespace Belle2 {
 
     double maxWeightedDistanceFromAverageECLTime(const Particle* particle)
     {
-      int nDaughters = int(particle->getNDaughters());
+      int nDaughters = particle->getNDaughters();
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
         return std::numeric_limits<float>::quiet_NaN();
@@ -656,7 +654,7 @@ namespace Belle2 {
           B2DEBUG(11, "maxTimeDiff[" << numberOfClusterDaughters << "] = " << maxTimeDiff);
         } else {
           const std::vector<Particle*> daughters = current->getDaughters();
-          nDaughters = int(current->getNDaughters());
+          nDaughters = current->getNDaughters();
           for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
             stacked.push(daughters[iDaughter]);
           }
@@ -1054,7 +1052,7 @@ namespace Belle2 {
 
     double eclClusterOnlyInvariantMass(const Particle* part)
     {
-      int nDaughters = int(part->getNDaughters());
+      int nDaughters = part->getNDaughters();
       TLorentzVector sum;
 
       if (nDaughters < 1) {
@@ -1076,7 +1074,7 @@ namespace Belle2 {
             sum += p4Cluster;
           } else {
             const std::vector<Particle*> daughters = current->getDaughters();
-            nDaughters = int(current->getNDaughters());
+            nDaughters = current->getNDaughters();
             for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
               stacked.push(daughters[iDaughter]);
             }

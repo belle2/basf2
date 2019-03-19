@@ -184,9 +184,14 @@ namespace Belle2 {
                     << LogVar("Version", (dataFormat & 0xFF)));
         }
 
-        if (err != 0)
+        if (err != 0) {
+          stringstream copperName;
+          //nodeid format is described on page7 of: https://confluence.desy.de/display/BI/DAQ+WebHome?preview=%2F34029242%2F37487394%2FSetupPocketDAQ_4p1_RawCOPPERDataFormat.pdf
+          copperName << "cpr" << ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF)) << char('a' + finesse);
           B2ERROR("TOPUnpacker: extra or missing words in data buffer."
-                  << LogVar("Difference", err));
+                  << LogVar("Difference", err)
+                  << LogVar("copper", copperName.str()));
+        }
 
       } // finesse loop
     } // m_rawData loop
@@ -788,6 +793,19 @@ namespace Belle2 {
     unsigned int evtMagicHeader = (word >> 12) & 0xF;
     unsigned int evtScrodID = word & 0xFFF;
 
+    // determine slot number (moduleID) and boardstack
+    int moduleID = 0;
+    int boardstack = 0;
+    const auto* feemap = m_topgp->getFrontEndMapper().getMap(evtScrodID);
+    if (feemap) {
+      moduleID = feemap->getModuleID();
+      boardstack = feemap->getBoardstackNumber();
+    } else {
+      B2ERROR("TOPUnpacker: no front-end map available."
+              << LogVar("SCROD ID", evtScrodID));
+    }
+
+
     B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtType = " << evtType
@@ -1084,18 +1102,6 @@ namespace Belle2 {
     }
 
     B2DEBUG(200, "the rest:");
-
-    // determine slot number (moduleID) and boardstack
-    int moduleID = 0;
-    int boardstack = 0;
-    const auto* feemap = m_topgp->getFrontEndMapper().getMap(evtScrodID);
-    if (feemap) {
-      moduleID = feemap->getModuleID();
-      boardstack = feemap->getBoardstackNumber();
-    } else {
-      B2ERROR("TOPUnpacker: no front-end map available."
-              << LogVar("SCROD ID", evtScrodID));
-    }
 
     unsigned int numParsedWaveforms = 0;
     while (array.peekWord() != 0x6c617374 //next word is not wf footer word

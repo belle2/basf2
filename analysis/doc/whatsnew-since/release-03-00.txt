@@ -46,6 +46,16 @@ Variables
   They behave like :b2:var:`daughterDiffOf`, but use grandDaughters' information rather than daughters'.
 
 * Renamed ClusterHasPulseShapeDiscrimination to :b2:var:`clusterHasPulseShapeDiscrimination`, PulseShapeDiscriminationMVA to :b2:var:`clusterPulseShapeDiscriminationMVA`, and ClusterNumberOfHadronDigits to :b2:var`clusterNumberOfHadronDigits`.
+* Removed the misleading variable `McFlavorOfTagSide`. 
+
+* Added a variable `mcFlavorOfOtherB0` which returns the tag-side flavor by checking the other Upsilon4S
+  daughter without using the ROE. This variable is part of the default `flavor_tagging` list of variables. 
+
+* The name of the variable `MCTagBFlavor` changed to `internalTagVMCFlavor`. It should be used only by experts for debugging.
+
+* Avoided code duplication in flavor tagging variables. Many target variables use now `isSignal`. Therefore, a unit test for 
+  `isSignal` was added to the unit tests of the flavor tagging variables. 
+
 
 Standard Particle Lists
 +++++++++++++++++++++++

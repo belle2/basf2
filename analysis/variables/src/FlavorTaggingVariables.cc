@@ -536,7 +536,7 @@ namespace Belle2 {
     {
 
       if (std::abs(particle->getPDGCode()) != 511) {
-        B2ERROR("MCFlavorOfOtherB0: the given particle is not a neutral B mesons. This variable works only for B0 or B0bar particles. ");
+        B2ERROR("MCFlavorOfOtherB0: the given particle is not a neutral B meson. This variable works only for B0 or B0bar particles. ");
         return 0;
       }
 

@@ -303,7 +303,7 @@ Decay B0
 #                   b -> c semileptonic
 #
 0.05110    D*-     e+   nu_e               HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.02140    D-      e+   nu_e               BGL; #[Belle measurement: 1510.03657]
+0.02140    D-      e+   nu_e               BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00704    D_1-    e+   nu_e               LLSW 0.71 -1.6 -0.5 2.9;
 0.00362    D_0*-   e+   nu_e               LLSW 0.68 -0.2 0.3;
 0.00401    D'_1-   e+   nu_e               LLSW 0.68 -0.2 0.3;
@@ -327,7 +327,7 @@ Decay B0
 0.00217  D*- eta  e+   nu_e                PHSP;
 
 0.05110  D*-     mu+  nu_mu                HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.02140  D-      mu+  nu_mu                BGL; #[Belle measurement: 1510.03657]
+0.02140  D-      mu+  nu_mu                BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00704  D_1-    mu+  nu_mu                LLSW 0.71 -1.6 -0.5 2.9;
 0.00362  D_0*-   mu+  nu_mu                LLSW 0.68 -0.2 0.3;
 0.00401  D'_1-   mu+  nu_mu                LLSW 0.68 -0.2 0.3;
@@ -1622,7 +1622,7 @@ Decay anti-B0
 #                   b -> c semileptonic
 #
 0.05110    D*+     e-   anti-nu_e          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.02140    D+      e-   anti-nu_e          BGL; #[Belle measurement: 1510.03657]
+0.02140    D+      e-   anti-nu_e          BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00704    D_1+    e-   anti-nu_e          LLSW 0.71 -1.6 -0.5 2.9;
 0.00362    D_0*+   e-   anti-nu_e          LLSW 0.68 -0.2 0.3;
 0.00401    D'_1+   e-   anti-nu_e          LLSW 0.68 -0.2 0.3;
@@ -1646,7 +1646,7 @@ Decay anti-B0
 0.00217  D*+ eta  e-   anti-nu_e           PHSP;
 
 0.05110  D*+     mu-  anti-nu_mu           HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.02140  D+      mu-  anti-nu_mu           BGL; #[Belle measurement: 1510.03657]
+0.02140  D+      mu-  anti-nu_mu           BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00704  D_1+    mu-  anti-nu_mu           LLSW 0.71 -1.6 -0.5 2.9;
 0.00362  D_0*+   mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
 0.00401  D'_1+   mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
@@ -2956,7 +2956,7 @@ Decay B+
 #     Updated to PDG 2017: using the isospin average between B+ and B0
 #
 0.05490       anti-D*0     e+   nu_e        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.02310       anti-D0      e+   nu_e        BGL; #[Belle measurement: 1510.03657]
+0.02310       anti-D0      e+   nu_e        BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00757       anti-D_10    e+   nu_e        LLSW 0.71 -1.6 -0.5 2.9;
 0.00389       anti-D_0*0   e+   nu_e        LLSW 0.68 -0.2 0.3;
 0.00431       anti-D'_10   e+   nu_e        LLSW 0.68 -0.2 0.3;
@@ -2983,7 +2983,7 @@ Decay B+
 0.00201  anti-D*0 eta  e+   nu_e            PHSP;
 
 0.05490      anti-D*0     mu+  nu_mu        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.02310      anti-D0      mu+  nu_mu        BGL; #[Belle measurement: 1510.03657]
+0.02310      anti-D0      mu+  nu_mu        BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00757      anti-D_10    mu+  nu_mu        LLSW 0.71 -1.6 -0.5 2.9;
 0.00389      anti-D_0*0   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
 0.00431      anti-D'_10   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
@@ -3993,7 +3993,7 @@ Decay B-
 #     Updated to PDG 2017: using the isospin average between B+ and B0
 #
 0.05490    D*0     e-   anti-nu_e         HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.02310    D0      e-   anti-nu_e         BGL; #[Belle measurement: 1510.03657]
+0.02310    D0      e-   anti-nu_e         BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00757    D_10    e-   anti-nu_e         LLSW 0.71 -1.6 -0.5 2.9;
 0.00389    D_0*0   e-   anti-nu_e         LLSW 0.68 -0.2 0.3;;
 0.00431    D'_10   e-   anti-nu_e         LLSW 0.68 -0.2 0.3;;
@@ -4020,7 +4020,7 @@ Decay B-
 0.00201  D*0 eta  e-   anti-nu_e          PHSP;
 
 0.05490  D*0    mu-  anti-nu_mu           HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.02310  D0     mu-  anti-nu_mu           BGL; #[Belle measurement: 1510.03657]
+0.02310  D0     mu-  anti-nu_mu           BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00757  D_10   mu-  anti-nu_mu           LLSW 0.71 -1.6 -0.5 2.9;
 0.00389  D_0*0  mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
 0.00431  D'_10  mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;

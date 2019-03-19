@@ -47,60 +47,28 @@ namespace Belle2 {
      * @param channel hardware channel number (0-based)
      * @param status channel status (0: active 1: dead 2: noisy )
      */
-    void setStatus(int moduleID, unsigned channel, EStatus status)
-    {
-      int module = moduleID - 1;
-      if (!check(module, channel)) {
-        B2WARNING("Channel status not set");
-        return;
-      }
-      m_status[module][channel] = status;
-    }
+    void setStatus(int moduleID, unsigned channel, EStatus status);
 
     /**
      * Sets a specific channel as active
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      */
-    void setActive(int moduleID, unsigned channel)
-    {
-      int module = moduleID - 1;
-      if (!check(module, channel)) {
-        B2WARNING("Channel status 'active' not set");
-        return;
-      }
-      m_status[module][channel] = c_Active;
-    }
+    void setActive(int moduleID, unsigned channel);
 
     /**
      * Sets a specific channel as dead
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      */
-    void setDead(int moduleID, unsigned channel)
-    {
-      int module = moduleID - 1;
-      if (!check(module, channel)) {
-        B2WARNING("Channel status 'dead' not set");
-        return;
-      }
-      m_status[module][channel] = c_Dead;
-    }
+    void setDead(int moduleID, unsigned channel);
 
     /**
      * Sets a specific channel as noisy
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      */
-    void setNoisy(int moduleID, unsigned channel)
-    {
-      int module = moduleID - 1;
-      if (!check(module, channel)) {
-        B2WARNING("Channel status 'noisy' not set");
-        return;
-      }
-      m_status[module][channel] = c_Noisy;
-    }
+    void setNoisy(int moduleID, unsigned channel);
 
     /**
      * Returns the status of a single channel
@@ -108,15 +76,7 @@ namespace Belle2 {
      * @param channel hardware channel number (0-based)
      * @return status channel status (1: active 0: dead -1: noisy )
      */
-    EStatus getStatus(int moduleID, unsigned channel) const
-    {
-      int module = moduleID - 1;
-      if (!check(module, channel)) {
-        B2WARNING("Returning dead channel value");
-        return c_Dead;
-      }
-      return m_status[module][channel];
-    }
+    EStatus getStatus(int moduleID, unsigned channel) const;
 
     /**
      * Returns false if the channel is dead or noisy,
@@ -124,20 +84,17 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      */
-    bool isActive(int moduleID, unsigned channel) const
-    {
-      int module = moduleID - 1;
-      if (!check(module, channel)) {
-        B2WARNING("Returning false");
-        return false;
-      }
-      return (m_status[module][channel] == c_Active);
-    }
+    bool isActive(int moduleID, unsigned channel) const;
 
     /**
      * Returns number of all channels
      */
     int getNumOfChannels() const {return c_numChannels * c_numModules;}
+
+    /**
+     * Returns number of channels in a module
+     */
+    int getNumOfModuleChannels() const {return c_numChannels;}
 
     /**
      * Returns number of active channels
@@ -154,44 +111,59 @@ namespace Belle2 {
      */
     int getNumOfNoisyChannels() const {return getNumOf(c_Noisy);}
 
+    /**
+     * Returns fraction of active channels
+     */
+    double getActiveFraction() const
+    {
+      return static_cast<double>(getNumOfActiveChannels()) / c_numModules / c_numChannels;
+    }
+
+    /**
+     * Returns number of module active channels
+     */
+    int getNumOfActiveChannels(int moduleID) const {return getNumOf(c_Active, moduleID);}
+
+    /**
+     * Returns number of module dead channels
+     */
+    int getNumOfDeadChannels(int moduleID) const {return getNumOf(c_Dead, moduleID);}
+
+    /**
+     * Returns number of module noisy channels
+     */
+    int getNumOfNoisyChannels(int moduleID) const {return getNumOf(c_Noisy, moduleID);}
+
+    /**
+     * Returns fraction of module active channels
+     */
+    double getActiveFraction(int moduleID) const
+    {
+      return static_cast<double>(getNumOfActiveChannels(moduleID)) / c_numChannels;
+    }
+
 
   private:
 
     /**
      * Check input module and channel arguments are sane
      */
-    bool check(const int module, const unsigned channel) const
-    {
-      if (module >= c_numModules) {
-        B2ERROR("Invalid module number (" << ClassName() << ")");
-        return false;
-      }
-      if (module < 0) {
-        B2ERROR("Invalid module number (" << ClassName() << ")");
-        return false;
-      }
-      if (channel >= c_numChannels) {
-        B2ERROR("Invalid module number (" << ClassName() << ")");
-        return false;
-      }
-      return true;
-    }
+    bool check(const int module, const unsigned channel) const;
 
     /**
      * Counts and returns the number of channels having a given status
      * @param check status to be checked
      * @return number of channels of this status
      */
-    int getNumOf(EStatus check) const
-    {
-      int n = 0;
-      for (const auto& statuses : m_status) {
-        for (const auto status : statuses) {
-          if (status == check) n++;
-        }
-      }
-      return n;
-    }
+    int getNumOf(EStatus check) const;
+
+    /**
+     * Counts and returns the number of channels od a module having a given status
+     * @param check status to be checked
+     * @param moduleID module (slot) ID (1-based)
+     * @return number of channels of this status
+     */
+    int getNumOf(EStatus check, int moduleID) const;
 
     /**
      * Sizes
@@ -200,7 +172,7 @@ namespace Belle2 {
           c_numChannels = 512 /**< number of channels per module */
          };
 
-    EStatus m_status[c_numModules][c_numChannels] = {{ c_Active }};    /**< channel status. c_Active by default.*/
+    EStatus m_status[c_numModules][c_numChannels] = {{ c_Active }}; /**< channel status */
     // instantiating an array with too few entries fills with zeroes (==active)
 
     ClassDef(TOPCalChannelMask, 1); /**< ClassDef */

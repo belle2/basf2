@@ -45,7 +45,7 @@ skimOutputUdst('CharmlessHad2BodyNeutral.udst.root', Had2BodyList, path=charmles
 summaryOfLists(Had2BodyList, path=charmless2neutralpath)
 
 # Suppress noisy modules, and then process
-setSkimLogging(skim_path=charmless2neutralpath)
+setSkimLogging(path=charmless2neutralpath)
 process(charmless2neutralpath)
 
 # print out the summary

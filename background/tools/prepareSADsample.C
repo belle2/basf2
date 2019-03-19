@@ -19,6 +19,15 @@ struct SADTree {
   double py = 0; /**< py at lost position [GeV] */
   double E = 0;  /**< E at lost position [GeV] (in fact momentum magnitude!) */
   double rate = 0; /**< lost rate [Hz] */
+  double ss = 0; /**< scattered position (|s|<Ltot/2) [m] */
+  int nturn = 0; /**< number of turns from scattered to lost */
+  double sraw = 0; /**< s at lost position [m] before matching G4 beam pipe inner surface */
+  double xraw = 0; /**< x at lost position [m] before matching G4 beam pipe inner surface */
+  double yraw = 0; /**< y at lost position [m] before matching G4 beam pipe inner surface */
+  double r = 0; /**< sqrt(x*x+y*y) [m] */
+  double rr = 0; /**< sqrt(xraw*xraw+yraw*yraw) [m] */
+  double dp_over_p0 = 0; /**< momentum deviation of the lost particle */
+  double watt = 0; /**< loss wattage [W] */
 };
 
 SADTree m_sad; /**< TTree entry data */
@@ -51,7 +60,17 @@ void prepareSADsample(std::string inputFile, std::string outputFile)
   chain.SetBranchAddress("py", &m_sad.py);
   chain.SetBranchAddress("E", &m_sad.E);
   chain.SetBranchAddress("rate", &m_sad.rate);
-  
+  chain.SetBranchAddress("ss", &m_sad.ss);
+  chain.SetBranchAddress("sraw", &m_sad.sraw);
+  chain.SetBranchAddress("nturn", &m_sad.nturn);
+  chain.SetBranchAddress("xraw", &m_sad.xraw);
+  chain.SetBranchAddress("yraw", &m_sad.yraw);
+  chain.SetBranchAddress("r", &m_sad.r);
+  chain.SetBranchAddress("rr", &m_sad.rr);
+  chain.SetBranchAddress("dp_over_p0", &m_sad.dp_over_p0);
+  chain.SetBranchAddress("watt", &m_sad.watt);
+
+
   int numEntries = chain.GetEntries();
   if(numEntries <= 0) {
     cout << "tree 'tp' is empty";
@@ -67,6 +86,16 @@ void prepareSADsample(std::string inputFile, std::string outputFile)
   tree->Branch("py", &m_sad.py, "py/D");
   tree->Branch("E", &m_sad.E, "E/D");
   tree->Branch("rate", &m_sad.rate, "rate/D");
+  tree->BranchAddress("ss", &m_sad.ss, "ss/D");
+  tree->BranchAddress("sraw", &m_sad.sraw, "sraw/D");
+  tree->BranchAddress("nturn", &m_sad.nturn, "nturn/I");
+  tree->BranchAddress("xraw", &m_sad.xraw, "xraw/D");
+  tree->BranchAddress("yraw", &m_sad.yraw, "yraw/D");
+  tree->BranchAddress("r", &m_sad.r, "r/D");
+  tree->BranchAddress("rr", &m_sad.rr, "rr/D");
+  tree->BranchAddress("dp_over_p0", &m_sad.dp_over_p0, "dp_over_p0/D");
+  tree->BranchAddress("watt", &m_sad.watt, 'watt/D');
+
 
   double rate = 0;
   for(int i = 0; i < numEntries; i++) {

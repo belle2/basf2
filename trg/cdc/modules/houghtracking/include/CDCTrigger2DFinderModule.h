@@ -75,6 +75,7 @@ namespace Belle2 {
             a.getCoord().first.Y() == b.getCoord().first.Y());
   }
 
+
   class CDCTrigger2DFinderModule : public Module {
   public:
     /** Constructor.  */
@@ -248,6 +249,7 @@ namespace Belle2 {
     /** map of TS hits containing <iHit, <iSL, (x, y)>> with
      *  iHit: hit index in StoreArray
      *  iSL: super layer index
+
      *  (x, y): coordinates in conformal space */
     cdcMap hitMap;
     /** Hough Candidates */

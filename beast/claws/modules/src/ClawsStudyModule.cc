@@ -100,19 +100,19 @@ void ClawsStudyModule::defineHisto()
   h_clawss_rs_hitrate2W->Sumw2();
 
   for (int i = 0; i < 16; i++) {
-    h_clawss_rate1[i] = new TH1F(TString::Format("clawss_rate1_%d", i), "PE distributions", 500, 0., 5000.);
-    h_clawss_rate2[i] = new TH1F(TString::Format("clawss_rate2_%d", i), "PE distributions", 500, 0., 5000.);
-    h_clawss_rate1W[i] = new TH1F(TString::Format("clawss_rate1W_%d", i), "PE distributions", 500, 0., 5000.);
-    h_clawss_rate2W[i] = new TH1F(TString::Format("clawss_rate2W_%d", i), "PE distributions", 500, 0., 5000.);
-    h_clawss_pe1[i] = new TH2F(TString::Format("clawss_pe1_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_clawss_pe2[i] = new TH2F(TString::Format("clawss_pe2_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_clawss_pe1W[i] = new TH2F(TString::Format("clawss_pe1W_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_clawss_pe2W[i] = new TH2F(TString::Format("clawss_pe2W_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
+    h_clawss_rate1[i] = new TH1F(TString::Format("clawss_rate1_%d", i), "PE distributions", 500, 0., 500.);
+    h_clawss_rate2[i] = new TH1F(TString::Format("clawss_rate2_%d", i), "PE distributions", 500, 0., 500.);
+    h_clawss_rate1W[i] = new TH1F(TString::Format("clawss_rate1W_%d", i), "PE distributions", 500, 0., 500.);
+    h_clawss_rate2W[i] = new TH1F(TString::Format("clawss_rate2W_%d", i), "PE distributions", 500, 0., 500.);
+    h_clawss_pe1[i] = new TH2F(TString::Format("clawss_pe1_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_clawss_pe2[i] = new TH2F(TString::Format("clawss_pe2_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_clawss_pe1W[i] = new TH2F(TString::Format("clawss_pe1W_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_clawss_pe2W[i] = new TH2F(TString::Format("clawss_pe2W_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
 
-    h_clawss_rs_rate1[i] = new TH2F(TString::Format("clawss_rs_rate1_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_clawss_rs_rate2[i] = new TH2F(TString::Format("clawss_rs_rate2_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_clawss_rs_rate1W[i] = new TH2F(TString::Format("clawss_rs_rate1W_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_clawss_rs_rate2W[i] = new TH2F(TString::Format("clawss_rs_rate2W_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
+    h_clawss_rs_rate1[i] = new TH2F(TString::Format("clawss_rs_rate1_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_clawss_rs_rate2[i] = new TH2F(TString::Format("clawss_rs_rate2_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_clawss_rs_rate1W[i] = new TH2F(TString::Format("clawss_rs_rate1W_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_clawss_rs_rate2W[i] = new TH2F(TString::Format("clawss_rs_rate2W_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
 
     h_clawss_rate1[i]->Sumw2();
     h_clawss_rate2[i]->Sumw2();

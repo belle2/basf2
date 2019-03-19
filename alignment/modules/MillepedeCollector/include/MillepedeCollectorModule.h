@@ -128,6 +128,15 @@ namespace Belle2 {
     /** Minimum CDC used hit fraction **/
     double m_minUsedCDCHitFraction;
 
+    /** Type of alignment hierarchy (for VXD only for now): 0 = None, 1 = Flat (only constraints,
+         no new global parameters/derivatives), 2 = Full **/
+    int m_hierarchyType;
+    /** enable PXD hierarchy **/
+    bool m_enablePXDHierarchy;
+    /** enable SVD hierarchy **/
+    bool m_enableSVDHierarchy;
+
+
   };
 }
 

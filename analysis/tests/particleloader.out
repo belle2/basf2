@@ -1221,15 +1221,6 @@ Total Number of Particles created in the DataStore: 6118
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleList : K_S0 (0+0)
-[INFO] [ParticlePrinterModule] END   ------------------------------
-[INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleLists: Lambda0 (0+0) + anti-Lambda0 (0+0)
-[INFO] [ParticlePrinterModule] END   ------------------------------
-[INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleList : K_L0 (0+0)
-[INFO] [ParticlePrinterModule] END   ------------------------------
-[INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleList : gamma (0+4)
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0

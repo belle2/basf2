@@ -71,6 +71,15 @@ namespace Belle2 {
     /// Very tentative interface for VXD
     class VXDGlobalParamInterface : public IGlobalParamInterface {
     public:
+      enum E_VXDHierarchyType {
+        c_None = 0,
+        c_Flat = 1,
+        c_Full = 2
+      };
+      static E_VXDHierarchyType s_hierarchyType;
+      static bool s_enablePXD;
+      static bool s_enableSVD;
+
       /// Very tentaive function: not yet used
       virtual void setupAlignmentHierarchy(GlobalDerivativesHierarchy& hierarchy) override final;
     };

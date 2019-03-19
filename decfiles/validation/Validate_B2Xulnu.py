@@ -14,7 +14,7 @@ from modularAnalysis import *
 from ROOT import Belle2
 
 setupEventInfo(10000)
-add_evtgen_generator(analysis_main, 'signal', Belle2.FileSystem.findFile('decfiles/dec/Bu_Xulnu=cocktail.dec'))
+add_evtgen_generator(analysis_main, 'signal', Belle2.FileSystem.findFile('decfiles/dec/1290710002.dec'))
 loadGearbox()
 
 ntupleFile('../Validate_B2Xulnu.root')

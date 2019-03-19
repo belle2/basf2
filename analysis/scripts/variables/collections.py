@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 from variables import utils
 
-#: Placehoder for FT variables collection
-#: (not complete, see :issue:`BII-3853`)
-flavor_tagging = ["qrOutput(FBDT)"]
-
 #: Replacement for DeltaEMbc
 deltae_mbc = ["Mbc", "deltaE"]
 
@@ -14,9 +10,9 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
-    'PulseShapeDiscriminationMVA',
-    'ClusterHasPulseShapeDiscrimination',
-    'ClusterNumberOfHadronDigits',
+    'clusterPulseShapeDiscriminationMVA',
+    'clusterHasPulseShapeDiscrimination',
+    'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
     'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
@@ -195,8 +191,12 @@ mc_vertex = [
     'mcProdVertexZ'
 ]
 
-#: Tag-side related variables
+#: CPV and Tag-side related variables
 tag_vertex = [
+    'DeltaT',
+    'DeltaTErr',
+    'DeltaZ',
+    'DeltaBoost',
     'TagVLBoost',
     'TagVLBoostErr',
     'TagVOBoost',

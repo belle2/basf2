@@ -3,6 +3,7 @@
 
 from basf2 import *
 from analysisDQM import add_analysis_dqm
+from IPDQM import add_IP_dqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco"):
@@ -37,12 +38,13 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
             svddqm = register_module('SVDDQMExpressReco')
-            svddqm.param('ShaperDigits', 'SVDShaperDigitsZS5')
+            svddqm.param('offlineZSShaperDigits', 'SVDShaperDigitsZS5')
             path.add_module(svddqm)
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
             vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
+            add_IP_dqm(path)
 
     if dqm_environment == "hlt":
         # HLT
@@ -115,3 +117,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         path.add_module('ARICHDQM')
     # PhysicsObjectsDQM
     add_analysis_dqm(path)
+    # DAQ Monitor
+    path.add_module('DAQMonitor')

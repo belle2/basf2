@@ -243,7 +243,8 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
 
 
 def add_svd_track_finding(path, components, input_reco_tracks, output_reco_tracks, svd_ckf_mode="VXDTF2_after",
-                          use_mc_truth=False, add_both_directions=True, temporary_reco_tracks="SVDRecoTracks", **kwargs):
+                          use_mc_truth=False, add_both_directions=True, temporary_reco_tracks="SVDRecoTracks",
+                          use_vxdtf2_quality_estimator=False, **kwargs):
     """Add SVD track finding to the path"""
 
     if not is_svd_used(components):
@@ -251,7 +252,8 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
 
     if not input_reco_tracks:
         # We do not have an input track store array. So lets just add vxdtf track finding
-        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=output_reco_tracks)
+        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=output_reco_tracks,
+                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
         return
 
     if use_mc_truth:
@@ -262,7 +264,8 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
                         prRecoTracksStoreArrayName=input_reco_tracks)
 
     if svd_ckf_mode == "VXDTF2_before":
-        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
+        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks,
+                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                              use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
@@ -270,7 +273,8 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
                                  use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "VXDTF2_before_with_second_ckf":
-        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
+        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks,
+                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                              use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
@@ -296,7 +300,8 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                         use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
 
-        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
+        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks,
+                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                              use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
@@ -304,7 +309,8 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
                                  use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "VXDTF2_alone":
-        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
+        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks,
+                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
         path.add_module('VXDCDCTrackMerger',
                         CDCRecoTrackColName=input_reco_tracks,
                         VXDRecoTrackColName=temporary_reco_tracks)

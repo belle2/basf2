@@ -53,10 +53,10 @@
 #   https://stash.desy.de/projects/B2/repos/software/pull-requests/2147/overview
 #
 # March 2019, L. Cao (lu.cao@desy.de)
-#   Updated B -> D l nu form factor and parameters to latest Belle measurement (1510.03657)
-#   Updated B -> pi l nu form factor to BCL with paramters based on HFLAV 2016 (1612.07233) from M. Prim (markus.prim@kit.edu)
+#   Updated B -> D l nu form factor and parameters to the latest Belle measurement (1510.03657)
+#   Updated B -> pi l nu form factor to BCL with parameters based on HFLAV 2016 (1612.07233) from M. Prim (markus.prim@kit.edu)
 #   Updated B - > rho/omega l nu from factor to BCL with parameters from M. Prim
-#
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/3721/overview
 
 
 

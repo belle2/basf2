@@ -459,7 +459,6 @@ void MillepedeCollectorModule::collect()
           if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
           B2RESULT("Beam vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
-
         } else {
 
           gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, vertexPrec);

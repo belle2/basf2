@@ -53,8 +53,7 @@ namespace Belle2 {
                         const short** fine_cmc2 = NULL,
                         const short** fine_corradc = NULL)
       : m_sensorID(sensorID), m_isU(isU),
-        m_fadcID(fadcID), m_apvID(apvID), m_nSample(nSample),
-        m_cmc(0), m_fine_cmc(0),
+        m_fadcID(fadcID), m_apvID(apvID), m_nSample(nSample)
     {
       if (adc != NULL) {
         for (int channel = 0; channel < 128; channel++) {

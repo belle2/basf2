@@ -27,8 +27,11 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDGlobalConfigParameters(const TString& uniqueID = ""):
-      m_uniqueID(uniqueID)    // Add a string as unique identifier for a given local run configuration)
+    SVDGlobalConfigParameters(const TString& uniqueID = "")
+      : m_uniqueID(uniqueID),
+        m_latency(0),
+        m_maskFilter(7),
+        m_zeroSuppression(3)
     {};
 
 
@@ -130,7 +133,7 @@ namespace Belle2 {
 
   private:
 
-    TString m_uniqueID; //The unique identifier is a private member of SVDLocalConfigParameter, whose value is assigned in the constructor.
+    TString m_uniqueID;   /**< Add a string as unique identifier for a given local run configuration)*/
 
     /** zero suppression value which defines the S/N threshold of data mode acquisition during global run in ZS mode
          */
@@ -148,7 +151,7 @@ namespace Belle2 {
      */
     std::string m_APVClockInRFCUnits;
 
-    ClassDef(SVDGlobalConfigParameters, 1);
+    ClassDef(SVDGlobalConfigParameters, 1); /**< needed by root*/
 
   };
 

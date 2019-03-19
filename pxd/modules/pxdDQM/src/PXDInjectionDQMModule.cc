@@ -46,7 +46,7 @@ void PXDInjectionDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
-  oldDir->cd(m_histogramDirectoryName.c_str());
+  oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
 
   hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;;Count/Time", 1000, -500, 4500);
   hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;;Count/Time", 1000, -500, 4500);

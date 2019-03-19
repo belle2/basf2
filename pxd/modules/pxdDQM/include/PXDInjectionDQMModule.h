@@ -19,7 +19,6 @@
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <TH1.h>
-#include <TEfficiency.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -64,10 +63,10 @@ namespace Belle2 {
       std::map<VxdID, TH1F*> hOccModAfterInjLER;/** Occupancy after LER injection */
       std::map<VxdID, TH1F*> hOccModAfterInjHER;/** Occupancy after HER injection */
 
-      TEfficiency* hEOccAfterInjLER{};          /** Occupancy after LER injection */
-      TEfficiency* hEOccAfterInjHER{};          /** Occupancy after HER injection */
-      std::map<VxdID, TEfficiency*> hEOccModAfterInjLER;/** Occupancy after LER injection */
-      std::map<VxdID, TEfficiency*> hEOccModAfterInjHER;/** Occupancy after HER injection */
+      TH1F* hEOccAfterInjLER{};          /** Occupancy after LER injection */
+      TH1F* hEOccAfterInjHER{};          /** Occupancy after HER injection */
+      std::map<VxdID, TH1F*> hEOccModAfterInjLER;/** Occupancy after LER injection */
+      std::map<VxdID, TH1F*> hEOccModAfterInjHER;/** Occupancy after HER injection */
 
       void defineHisto() override final;
 

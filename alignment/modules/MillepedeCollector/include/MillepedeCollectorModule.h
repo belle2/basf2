@@ -73,12 +73,28 @@ namespace Belle2 {
     /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex) */
     TMatrixD getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop);
 
+    ///  Compute the transformation matrices d(q/p,u'v',u,v)/d(vx,vy,vz,px,py,pz,theta,phi,M) = dq/d(v,z) for
+    ///  both particles in pair. Only for decays of type V0(*)->f+f- (same mass for f)
+    ///  @param mother The mother Belle2::Particle with two daughters, its 4-momenta should already be updated by a previous vertex fit done
+    ///  by modularAnalysis.
+    ///  @param motherMass This function expect the assumed invariant mass of the pair. This is to allow to set artifical values
+    ///  (e.g. for e+e- -> mu+mu-)
+    ///  @return a pair of 5x9 matrices {dq+/d(v,z), dq-/d(v,z)}. One for each particle in list (in list order).
+    ///  NOTE: The signs DO NOT refer to charges of the particles! If you want to know: (+) particle is that one which goes *along* the mother
+    ///  momentum in CM system
+    ///
+    ///  The transformation is from local measurement system at 1st (GBL) point of each track in pair (virtual measurement
+    ///  (see fitRecoTrack(..., particle) and addVertexPoint parameter of getParticlesTracks(...)) to the common parameters which
+    ///  staticaly and kinematicaly describe the two-body decay:
+    ///
+    /// - Position of the common vertex (vy,vy,vz)
+    /// - Total momentum of the pair (particles are back-to-back in their CM) (px,py,pz) and the invariant mass (M) of the decay
+    /// - 2 angles describing the orientation of the decay particles in the system of the mother (CM)
+    ///
+    std::pair<TMatrixD, TMatrixD> getTwoBodyToLocalTransform(Particle& mother, double motherMass);
+
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
-
-    /** d(Px,Py,Pz)/d(vx,vy,vz,px,py,pz,theta,phi,M) **/
-    std::pair<TMatrixD, TMatrixD> getLocalToCommonTwoBodyExtParametersTransform(Particle& mother, double motherMass);
-
 
   private:
     /** Names of arrays with single RecoTracks fitted by GBL */
@@ -100,7 +116,6 @@ namespace Belle2 {
 
     /** Width (in GeV/c/c) to use for invariant mass constraint for 'stable' particles (like K short). Temporary until proper solution is found */
     double m_stableParticleWidth;
-
     /** Use double (instead of single/float) precision for binary files */
     bool m_doublePrecision;
     /** Add derivatives for beam spot vertex calibration for primary vertices */
@@ -115,17 +130,12 @@ namespace Belle2 {
     bool m_absFilePaths;
     /** Whether to use VXD alignment hierarchy*/
     std::vector<std::string> m_components{};
-
-    /** Current vector of GBL data from trajectory to be stored in a tree */
-    std::vector<gbl::GblData> m_currentGblData{};
-
     /** Number of external iterations of GBL fitter */
     int m_externalIterations;
     /** String defining internal GBL iterations for outlier down-weighting */
     std::string m_internalIterations;
     /** Up to which external iteration propagation Jacobians should be re-calculated */
     int m_recalcJacobians;
-
     /** Add local parameter for event T0 fit in GBL **/
     bool m_fitEventT0;
     /** Update L/R weights from previous DAF fit result? **/
@@ -134,7 +144,6 @@ namespace Belle2 {
     double m_minCDCHitWeight;
     /** Minimum CDC used hit fraction **/
     double m_minUsedCDCHitFraction;
-
     /** Type of alignment hierarchy (for VXD only for now): 0 = None, 1 = Flat (only constraints,
          no new global parameters/derivatives), 2 = Full **/
     int m_hierarchyType;
@@ -143,7 +152,8 @@ namespace Belle2 {
     /** enable SVD hierarchy **/
     bool m_enableSVDHierarchy;
 
-
+    /** Current vector of GBL data from trajectory to be stored in a tree */
+    std::vector<gbl::GblData> m_currentGblData{};
   };
 }
 

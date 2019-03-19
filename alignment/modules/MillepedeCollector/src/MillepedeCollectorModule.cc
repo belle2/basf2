@@ -243,7 +243,6 @@ void MillepedeCollectorModule::collect()
   }
 
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
-  //gbl->setTrackSegmentController(new GblMultipleScatteringController);
   double chi2 = -1.;
   double lostWeight = -1.;
   int ndf = -1;
@@ -492,7 +491,7 @@ void MillepedeCollectorModule::collect()
         continue;
       }
 
-      auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, mother->getPDGMass());
+      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, mother->getPDGMass());
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
@@ -548,7 +547,7 @@ void MillepedeCollectorModule::collect()
       }
 
       DBObjPtr<BeamParameters> beam;
-      auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, beam->getMass());
+      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, beam->getMass());
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
@@ -593,7 +592,7 @@ void MillepedeCollectorModule::collect()
       }
 
       DBObjPtr<BeamParameters> beam;
-      auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, beam->getMass());
+      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, beam->getMass());
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
@@ -637,6 +636,7 @@ void MillepedeCollectorModule::collect()
   }
 
   for (auto listName : m_primaryTwoBodyDecays) {
+    B2WARNING("This should NOT be used for production of calibration constants for the real detector (yet)!");
 
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
@@ -650,28 +650,40 @@ void MillepedeCollectorModule::collect()
 
       auto track12 = getParticlesTracks(mother->getDaughters());
       if (track12.size() != 2) {
-        B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
+        B2ERROR("Did not get exactly 2 fitted tracks. Skipping this mother in list " << listName);
         continue;
       }
 
-      auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, beam->getMass());
+      auto dfdextPlusMinus = getTwoBodyToLocalTransform(*mother, beam->getMass());
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
       TMatrixDSym extCov(7); extCov.Zero();
+      // 3x3 IP vertex covariance
       extCov.SetSub(0, 0, beam->getCovVertex());
+      //covariance of the "boost vector" -> see BeamParameters
+      // 3x3 matrix cov(E,theta_x,theta_y)
       //TODO:
       //I cannot get all 3 entries non-zero using Y4S setting for add_beamparameters
-      //extPrec.SetSub(3, 3, (beam->getCovLER() + beam->getCovHER()).Invert());
+      //extCov.SetSub(3, 3, (beam->getCovLER() + beam->getCovHER()));
       extCov(3, 3) = (beam->getCovLER() + beam->getCovHER())(0, 0);
-      extCov(4, 4) = (beam->getCovLER() + beam->getCovHER())(0, 0);
-      extCov(5, 5) = (beam->getCovLER() + beam->getCovHER())(0, 0);
-      //
+      //TODO: multiply by beam energy?
+      extCov(4, 4) = (beam->getCovLER() + beam->getCovHER())(1, 1);
+      //TODO: multiply by beam energy?
+      extCov(5, 5) = (beam->getCovLER() + beam->getCovHER())(2, 2);
+      //TODO Exactly zero if not set (experimental observation) ... temporary -> should NOT be zero
+      if (extCov(4, 4) == 0.)
+        extCov(4, 4) = extCov(0, 0);
+      //TODO Exactly zero if not set (experimental observation) ... temporary -> should NOT be zero
+      if (extCov(5, 5) == 0.)
+        extCov(5, 5) = extCov(0, 0);
+      // For the error of invariant mass of the beam I take that for its energy
       extCov(6, 6) = (beam->getCovLER()(0, 0) + beam->getCovHER()(0, 0));
 
       auto extPrec = extCov; extPrec.Invert();
+      beam->getCovLER().Print();
 
       TVectorD extMeasurements(7);
       extMeasurements[0] = - (mother->getVertex() - beam->getVertex())[0];
@@ -682,7 +694,9 @@ void MillepedeCollectorModule::collect()
       extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
       extMeasurements[6] = - (mother->getMass() - beam->getMass());
 
-      B2ERROR("mother mass = " << mother->getMass() << "  and beam mass = " << beam->getMass());
+      extMeasurements.Print();
+
+      B2INFO("mother mass = " << mother->getMass() << "  and beam mass = " << beam->getMass());
 
       TMatrixD extDeriv(7, 9);
       extDeriv.Zero();
@@ -699,10 +713,13 @@ void MillepedeCollectorModule::collect()
 
       if (m_calibrateVertex || m_calibrateKinematics) {
         B2WARNING("Primary vertex+kinematics calibration not (yet?) fully implemented!");
+        B2WARNING("This code is highly experimental and has (un)known issues!");
+
         // up to d(x,y,z,px,py,pz,theta,phi,M)/d(vx,vy,vz,theta_x,theta_y,E)
         TMatrixD derivatives(9, 6);
         std::vector<int> labels;
         derivatives.Zero();
+
         if (m_calibrateVertex) {
           derivatives(0, 0) = 1.;
           derivatives(1, 1) = 1.;
@@ -732,6 +749,7 @@ void MillepedeCollectorModule::collect()
           labels.push_back(0);
           labels.push_back(0);
         }
+
         // Allow to disable BeamParameters externally
         alignment::GlobalDerivatives globals(labels, derivatives);
 
@@ -757,6 +775,7 @@ void MillepedeCollectorModule::collect()
         const TMatrixD dLocal_dExt = dfdextPlusMinus.first * dTwoBody_dExt;
         TMatrixD dLocal_dExt_T = dLocal_dExt; dLocal_dExt_T.T();
 
+        dLocal_dExt.Print();
         // The 5x7 transformation matrix d(q/p,u',v',u,v)/d(vx,vy,vz,px,py,pz,M) needs to be "inverted"
         // to transform the covariance of the beamspot and boost vector of SuperKEKB into the local system
         // of one GBL point - such that Millepede can align the beamspot (or even beam kinematics) if requested.
@@ -765,9 +784,10 @@ void MillepedeCollectorModule::collect()
         // with almost no code:
         //
         TDecompSVD svd(dLocal_dExt_T);
-        const TMatrixD dExt_dLocal  = svd.Invert().T();
+        //TMatrixD dExt_dLocal  = svd.Invert().T();
+        TMatrixD dExt_dLocal = dLocal_dExt_T;
         //
-        // (dLocal_dExt * dExt_dLocal).Print();
+        // (dLocal_dExt * dExt_dLocal).Print(); // Check how close we are to unit matrix
         //
         // 5x5 matrix is as follows
         //
@@ -779,23 +799,38 @@ void MillepedeCollectorModule::collect()
         //    3 | -2.453e-15    7.26e-18   2.009e-16           1   -1.14e-16
         //    4 | -1.689e-14  -9.593e-17  -2.317e-15  -3.396e-17           1
         //
-        // It took me like half a day to find to out how to do this by 2 lines of code. Source:
-        // ROOT macro example ... actually found at:
+        // It took me half a day to find out how to do this with 2 lines of code (3 with the include).
+        // Source: ROOT macro example - actually found at:
         // <https://root.cern.ch/root/html/tutorials/matrix/solveLinear.C.html>
-
+        dExt_dLocal.Print();
+        for (int i = 0; i < 7; ++i) {
+          for (int j = 0; j < 5; ++j) {
+            if (fabs(dExt_dLocal(i, j)) < 1.e-6)
+              dExt_dLocal(i, j) = 0.;
+          }
+        }
         const TVectorD locRes = dLocal_dExt * extMeasurements;
         const TMatrixD locPrec =  dLocal_dExt * extPrec * dExt_dLocal;
 
         TMatrixDSym locPrecSym(5); locPrecSym.Zero();
-        for (int i = 0; i < 5; ++i)
-          for (int j = 0; j < 5; ++j)
-            locPrecSym(i, j) = locPrec(i, j);
+        for (int i = 0; i < 5; ++i) {
+          for (int j = i; j < 5; ++j) {
+            //locPrecSym(j, i) = locPrecSym(i, j) = locPrec(i, j);
+            locPrecSym(j, i) = locPrecSym(i, j) = (fabs(locPrec(i, j)) > 1.e-6) ? locPrec(i, j) : 0.;
+          }
+        }
 
         daughters[0].first[0].addMeasurement(locRes, locPrecSym);
         if (!lab.empty())
           daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);
 
-        gbl::GblTrajectory combined(daughters);
+        //TODO: Understand this: either find a bug somewhere or improve the parametrization or .... ?
+        // This should be enough, but the parametrization seems to fail for nearly horizontal pairs...
+        //gbl::GblTrajectory combined(daughters);
+        // This should not be needed, it actually seems to make worse Chi2/NDF, but GBL does not fail.
+        // The measurement added just to be able to add the global derivatives (done just above) is redundant
+        // to the external measurement added here:
+        gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, extPrec);
         //combined.printTrajectory(1000);
         //combined.printPoints(1000);
 
@@ -1013,6 +1048,14 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 
   genfit::AbsTrackRep* trackRep = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack, currentPdgCode);
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
+  auto state6D = gfTrack.getStateSeed();
+  TVector3 vPos(state6D[0], state6D[1], state6D[2]);
+  TVector3 vMom(state6D[3], state6D[4], state6D[5]);
+  vMom.Print();
+  vMom *= 1. / vMom.Mag() * 10.;
+  if (vMom[1] > 0.) vMom *= -1.;
+  gfTrack.setStateSeed(vPos, vMom);
+  vMom.Print();
 
   if (particle) {
     TVector3 vertexPos = particle->getVertex();
@@ -1079,6 +1122,9 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 
   try {
     gbl->processTrackWithRep(&gfTrack, gfTrack.getCardinalRep(), true);
+  } catch (genfit::Exception& e) {
+    B2ERROR(e.what());
+    return false;
   } catch (...) {
     B2ERROR("GBL fit failed.");
     return false;
@@ -1135,7 +1181,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
   return tracks;
 }
 
-std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyExtParametersTransform(Particle& mother,
+std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransform(Particle& mother,
     double motherMass)
 {
   std::vector<TMatrixD> result;
@@ -1156,7 +1202,7 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyE
   mother2lab(0, 0) = px * pz / pt / p; mother2lab(0, 1) = - py / pt; mother2lab(0, 2) = px / p;
   mother2lab(1, 0) = py * pz / pt / p; mother2lab(1, 1) =   px / pt; mother2lab(1, 2) = py / p;
   mother2lab(2, 0) = - pt / p;         mother2lab(2, 1) =   0;       mother2lab(2, 2) = pz / p;
-  auto lab2mother = mother2lab.Invert();
+  auto lab2mother = mother2lab; lab2mother.Invert();
 
   // Need to rotate and boost daughters' momenta to know which goes forward (+sign in decay model)
   // and to get the angles theta, phi of the decaying daughter system in mothers' reference frame

@@ -84,6 +84,9 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     for (const CDCTrack& track : tracks) {
       RecoTrack* newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
+      if (newRecoTrack) {
+        newRecoTrack->setQualityIndicator(track.getQualityIndicator());
+      }
       if (newRecoTrack and m_param_discardCovarianceMatrix) {
         newRecoTrack->setSeedCovariance(defaultCovSeed);
       }

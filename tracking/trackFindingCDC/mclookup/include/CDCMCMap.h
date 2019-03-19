@@ -26,8 +26,13 @@ namespace Belle2 {
     class CDCMCMap {
 
     public:
+
+      /// Default constructor, needs to be public for initialization in CDCMCManager
+      CDCMCMap() = default;
       /// Delete the assignement operator in order to avoid accidental copies.
       CDCMCMap& operator=(const CDCMCMap&) = delete;
+      /// For the same reason, also delete copy constructor
+      CDCMCMap(CDCMCMap&) = delete;
 
     public:
 

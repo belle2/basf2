@@ -1162,12 +1162,12 @@ namespace Belle2 {
                       "return zero. Returns NAN if there is no cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
-    REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
+    REGISTER_VARIABLE("clusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
                       "Status bit to indicate if cluster has digits with waveforms that passed energy and chi2 thresholds for computing PSD variables.");
-    REGISTER_VARIABLE("PulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA,
+    REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA,
                       "Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. \n"
                       "Value is 1.0 for electromagnetic showers and 0.0 for hadronic showers. \n");
-    REGISTER_VARIABLE("ClusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
+    REGISTER_VARIABLE("clusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
                       "Returns ECL cluster's Number of hadron digits in cluster (pulse shape discrimination variable). \n"
                       "Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. \n"
                       "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");

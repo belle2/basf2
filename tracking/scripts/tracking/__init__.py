@@ -152,8 +152,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
 
 def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
-                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
-                      vxdtf2_mva_weight_file=None):
+                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -196,8 +195,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                               output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
                               temporary_reco_tracks=svd_reco_tracks,
-                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
-                              vxdtf2_mva_weight_file=vxdtf2_mva_weight_file)
+                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions)
         latest_reco_tracks = svd_cdc_reco_tracks
 
     if is_pxd_used(components):
@@ -213,8 +211,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 
 
 def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='early_phase3',
-                         merge_tracks=True, use_second_cdc_hits=False,
-                         vxdtf2_mva_weight_file=None):
+                         merge_tracks=True, use_second_cdc_hits=False):
     import cdc.cr as cosmics_setup
 
     if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
@@ -251,8 +248,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
         if is_svd_used(components):
             add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                                   output_reco_tracks=svd_cdc_reco_tracks,
-                                  svd_ckf_mode="cosmics", add_both_directions=True,
-                                  vxdtf2_mva_weight_file=vxdtf2_mva_weight_file)
+                                  svd_ckf_mode="cosmics", add_both_directions=True)
             latest_reco_tracks = svd_cdc_reco_tracks
 
         if is_pxd_used(components):

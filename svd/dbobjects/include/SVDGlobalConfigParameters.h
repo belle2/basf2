@@ -29,9 +29,9 @@ namespace Belle2 {
     */
     SVDGlobalConfigParameters(const TString& uniqueID = "")
       : m_uniqueID(uniqueID),
+        m_zeroSuppression(3),
         m_latency(0),
-        m_maskFilter(7),
-        m_zeroSuppression(3)
+        m_maskFilter(7)
     {};
 
 

@@ -77,7 +77,7 @@ namespace Belle2 {
     std::string m_nameOfInstance =
       ""; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
 
-    bool m_onlySingleClusterSpacePoint =
+    bool m_onlySingleClusterSpacePoints =
       false; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
 
     std::string m_inputPDF = ""; /**< File path of root file containing pdf histograms */

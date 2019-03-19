@@ -3,80 +3,74 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Kirill Chilikin                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Own include
+/* Belle2 headers. */
 #include <background/modules/BeamBkgHitRateMonitor/EKLMHitRateCounter.h>
 
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
+using namespace Belle2::Background;
 
-using namespace std;
+void EKLMHitRateCounter::initialize(TTree* tree)
+{
+  // register collection(s) as optional, your detector might be excluded in DAQ
+  m_digits.isOptional();
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 
-namespace Belle2 {
-  namespace Background {
+  // set branch address
+  tree->Branch("eklm", &m_rates, "averageRate/F:numEvents/I:valid/O");
+}
 
-    void EKLMHitRateCounter::initialize(TTree* tree)
-    {
-      // register collection(s) as optional, your detector might be excluded in DAQ
-      m_digits.isOptional();
+void EKLMHitRateCounter::clear()
+{
+  m_buffer.clear();
+}
 
-      // set branch address
-      tree->Branch("eklm", &m_rates, "averageRate/F:numEvents/I:valid/O");
+void EKLMHitRateCounter::accumulate(unsigned timeStamp)
+{
+  // check if data are available
+  if (not m_digits.isValid())
+    return;
 
-    }
+  // get buffer element
+  auto& rates = m_buffer[timeStamp];
 
-    void EKLMHitRateCounter::clear()
-    {
-      m_buffer.clear();
-    }
+  // increment event counter
+  rates.numEvents++;
 
-    void EKLMHitRateCounter::accumulate(unsigned timeStamp)
-    {
-      // check if data are available
-      if (not m_digits.isValid()) return;
+  // accumulate hits
+  int n = m_digits.getEntries();
+  for (int i = 0; i < n; ++i) {
+    EKLMDigit* eklmDigit = m_digits[i];
+    if (!eklmDigit->isGood())
+      continue;
+    int sector = m_ElementNumbers->sectorNumber(
+                   eklmDigit->getEndcap(), eklmDigit->getLayer(),
+                   eklmDigit->getSector()) - 1;
+    rates.sectorRates[sector] += 1;
+    rates.averageRate += 1;
+  }
 
-      // get buffer element
-      auto& rates = m_buffer[timeStamp];
+  // set flag to true to indicate the rates are valid
+  rates.valid = true;
+}
 
-      // increment event counter
-      rates.numEvents++;
+void EKLMHitRateCounter::normalize(unsigned timeStamp)
+{
+  // copy buffer element
+  m_rates = m_buffer[timeStamp];
 
-      // accumulate hits
-      /* either count all */
-      rates.averageRate += m_digits.getEntries();
-      /* or count selected ones only
-      for(const auto& digit: m_digits) {
-      // select digits to count (usualy only good ones)
-         rates.averageRate += 1;
-      }
-      */
+  if (not m_rates.valid) return;
 
-      // set flag to true to indicate the rates are valid
-      rates.valid = true;
+  // normalize
+  m_rates.normalize();
 
-    }
-
-    void EKLMHitRateCounter::normalize(unsigned timeStamp)
-    {
-      // copy buffer element
-      m_rates = m_buffer[timeStamp];
-
-      if (not m_rates.valid) return;
-
-      // normalize
-      m_rates.normalize();
-
-      // optionally: convert to MHz, correct for the masked-out channels etc.
-
-    }
-
-
-  } // Background namespace
-} // Belle2 namespace
-
+  /* Normalize the hit rate per 1 strip. */
+  int n = m_ElementNumbers->getMaximalSectorGlobalNumber();
+  for (int i = 0; i < n; ++i) {
+    m_rates.sectorRates[i] /= (m_ElementNumbers->getMaximalStripNumber() *
+                               m_ElementNumbers->getMaximalPlaneNumber());
+  }
+}

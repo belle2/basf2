@@ -23,6 +23,7 @@ BottomoniumUpsilonskimpath = Path()
 skimCode = encodeSkimName('BottomoniumUpsilon')
 
 fileList = get_test_file("mixedBGx1", "MC11")
+inputMdstList('default', fileList, path=BottomoniumUpsilonskimpath)
 
 # use standard final state particle lists
 stdPi('loose', path=BottomoniumUpsilonskimpath)
@@ -30,8 +31,6 @@ stdE('loose', path=BottomoniumUpsilonskimpath)
 stdMu('loose', path=BottomoniumUpsilonskimpath)
 
 stdPhotons('loose', path=BottomoniumUpsilonskimpath)
-
-inputMdstList('default', fileList, path=BottomoniumUpsilonskimpath)
 
 # Bottomonium Skim
 from skim.quarkonium import *

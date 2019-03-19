@@ -535,7 +535,7 @@ namespace Belle2 {
                       "Returns the error of TagV in the direction orthogonal to the boost");
 
     REGISTER_VARIABLE("internalTagVMCFlavor", particleInternalTagVMCFlavor,
-                      "This variable is only for internal checks of the TagV module by developers. \n"
+                      "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"
                       "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
   }
 }

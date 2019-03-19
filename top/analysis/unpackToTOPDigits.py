@@ -9,7 +9,7 @@
 from basf2 import *
 
 # Define a global tag (note: the one given bellow will become out-dated!)
-use_central_database('data_reprocessing_proc8')
+use_central_database('data_reprocessing_prompt')
 
 # Create path
 main = create_path()

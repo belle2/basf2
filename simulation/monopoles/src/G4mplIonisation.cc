@@ -13,6 +13,7 @@
 #include <simulation/monopoles/G4mplIonisation.h>
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 
+
 #include <G4PhysicalConstants.hh>
 #include <G4SystemOfUnits.hh>
 #include <G4Electron.hh>
@@ -52,8 +53,10 @@ void G4mplIonisation::InitialiseEnergyLossProcess(const G4ParticleDefinition* p,
   SetBaseParticle(0);
 
   // monopole model is responsible both for energy loss and fluctuations
+
   G4mplIonisationWithDeltaModel* ion =
     new G4mplIonisationWithDeltaModel(magneticCharge, "PAI");
+
   ion->SetParticle(p);
 
   // define size of dedx and range tables

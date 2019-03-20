@@ -27,10 +27,22 @@ namespace Belle2 {
       m_hits.isOptional();
 
       // set branch address
-      tree->Branch("arich", &m_rates, "hapdRates[420]/F:averageRate/F:numEvents/I:valid/O");
+      tree->Branch("arich", &m_rates, "segmentRates[18]/F:averageRate/F:numEvents/I:valid/O");
+
+      // make map of modules to 18 segments
+      // (first hapd ring is 6 segments (by sector), for the rest, each segment merges 3 hapd rings (again by sector))
+      int nModInRing[7] = {0, 42, 90, 144, 204, 270, 342};
+      int iRing = 0;
+      for (int i = 0; i < 420; i++) {
+        if (i == nModInRing[iRing + 1]) iRing++;
+        int segment = (i - nModInRing[iRing]) / (7 + iRing);
+        if (iRing > 0) segment += 6;
+        if (iRing > 3) segment += 6;
+        m_segmentMap[i] = segment;
+      }
 
       // set fractions of active channels
-      setActiveFractions();
+      setActiveHapds();
     }
 
     void ARICHHitRateCounter::clear()
@@ -51,9 +63,10 @@ namespace Belle2 {
 
       // count and weight hits accoring to channel efficiecny
       for (const auto& hit : m_hits) {
+        if (hit.getModule() < 1 || hit.getModule() > 420) continue;
         auto effi = m_modulesInfo->getChannelQE(hit.getModule(), hit.getChannel());
         float wt = std::min(1.0 / effi, 100.);
-        rates.hapdRates[hit.getModule() - 1] += wt;
+        rates.segmentRates[m_segmentMap[hit.getModule() - 1]] += wt;
         rates.averageRate += wt;
       }
 
@@ -73,23 +86,24 @@ namespace Belle2 {
       m_rates.normalize();
 
       // correct rates for masked-out channels
-      if (m_channelMask.hasChanged()) setActiveFractions();
+      if (m_channelMask.hasChanged()) setActiveHapds();
 
-      for (int imod = 0; imod < 420; imod++) {
-        double fraction = m_activeFractions[imod];
-        if (fraction > 0) m_rates.hapdRates[imod] /= fraction;
-        else m_rates.hapdRates[imod] = 0;
+      for (int iSegment = 0; iSegment < 18; iSegment++) {
+        double nHapds = m_activeHapds[iSegment];
+        if (nHapds > 0) m_rates.segmentRates[iSegment] /= nHapds;
+        else m_rates.segmentRates[iSegment] = 0;
       }
       m_rates.averageRate /= m_activeTotal;
     }
 
-    void ARICHHitRateCounter::setActiveFractions()
+    void ARICHHitRateCounter::setActiveHapds()
     {
+      for (auto& nactive : m_activeHapds) nactive = 0;
 
       if (not m_channelMask.isValid()) {
-        for (auto& fraction : m_activeFractions) fraction = 1;
-        m_activeTotal = 1;
-        B2WARNING("ARICHHitRateCounter: no valid channel mask - active fractions set to 1");
+        for (unsigned imod = 1; imod < 421; imod++)  m_activeHapds[m_segmentMap[imod - 1]] += 1.;
+        m_activeTotal = 420;
+        B2WARNING("ARICHHitRateCounter: no valid channel mask - all HAPDs set to active");
         return;
       }
 
@@ -100,9 +114,9 @@ namespace Belle2 {
           if (m_channelMask->isActive(imod, ichn)) nactive++;
         }
         nactiveTotal += nactive;
-        m_activeFractions[imod - 1] = (float)nactive / 144.;
+        m_activeHapds[m_segmentMap[imod - 1]] += (float)nactive / 144.;
       }
-      m_activeTotal = (float)nactiveTotal / 144. / 420.;
+      m_activeTotal = (float)nactiveTotal / 144.;
     }
 
   } // Background namespace

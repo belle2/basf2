@@ -35,8 +35,8 @@ namespace Belle2 {
        */
       struct TreeStruct {
 
-        float hapdRates[420] = {0}; /**< hit rates per HAPD [Hz] */
-        float averageRate = 0; /**< total detector average hit rate */
+        float segmentRates[18] = {0}; /**< hit rates per HAPD [Hz] for 18 segments of arich */
+        float averageRate = 0; /**< total detector average hit rate per HAPD [Hz] */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
 
@@ -46,7 +46,7 @@ namespace Belle2 {
         void normalize()
         {
           if (numEvents == 0) return;
-          for (auto& hapdRate : hapdRates) hapdRate /= numEvents;
+          for (auto& segmentRate : segmentRates) segmentRate /= numEvents;
           averageRate /= numEvents;
         }
 
@@ -84,9 +84,9 @@ namespace Belle2 {
     private:
 
       /**
-       * Sets fractions of active channels
+       * Sets number of active hapds in each segment
        */
-      void setActiveFractions();
+      void setActiveHapds();
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */
@@ -102,8 +102,9 @@ namespace Belle2 {
       DBObjPtr<ARICHModulesInfo> m_modulesInfo; /**< HAPD modules info */
 
       // other
-      double m_activeFractions[420] = {0}; /**< fractions of active channels in HAPDs */
-      double m_activeTotal = 0; /**< total fraction of active channels */
+      double m_activeHapds[18] = {0}; /**< number of active HAPDS in each segment */
+      double m_activeTotal = 0; /**< total number of active HAPDS */
+      int  m_segmentMap[420] = {0}; /**< mapping from module ID to segments */
     };
 
   } // Background namespace

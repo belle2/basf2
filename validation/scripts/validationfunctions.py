@@ -96,13 +96,11 @@ def available_revisions(work_folder):
 
     # Get all folders in ./results/ sorted descending by the date they were
     # created (i.e. newest folder first)
-    revisions = sorted(
-        os.listdir(validationpath.get_results_folder(work_folder)),
-        key=lambda _: os.path.getmtime(
-            os.path.join(validationpath.get_results_folder(work_folder), _)),
-        reverse=True
-    )
-    # Return it
+    search_folder = validationpath.get_results_folder(work_folder)
+    subfolders = [p for p in os.scandir(search_folder) if p.is_dir()]
+    revisions = [
+        p.name for p in sorted(subfolders, key=lambda p: p.stat().st_mtime)
+    ]
     return revisions
 
 

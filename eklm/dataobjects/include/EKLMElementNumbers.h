@@ -305,9 +305,20 @@ namespace Belle2 {
     }
 
     /**
+     * Get number of strips in a sector.
+     */
+    static constexpr int getNStripsSector()
+    {
+      return m_MaximalPlaneNumber * m_MaximalStripNumber;
+    }
+
+    /**
      * Get number of strips in a segment.
      */
-    int getNStripsSegment() const;
+    static constexpr int getNStripsSegment()
+    {
+      return m_NStripsSegment;
+    }
 
   protected:
 

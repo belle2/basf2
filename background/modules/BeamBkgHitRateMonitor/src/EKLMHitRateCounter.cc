@@ -73,8 +73,6 @@ void EKLMHitRateCounter::normalize(unsigned timeStamp)
   m_rates.normalize();
 
   /* Normalize the hit rate per 1 strip. */
-  for (int i = 0; i < EKLMElementNumbers::getMaximalSectorGlobalNumber(); ++i) {
-    m_rates.sectorRates[i] /= (m_ElementNumbers->getMaximalStripNumber() *
-                               m_ElementNumbers->getMaximalPlaneNumber());
-  }
+  for (int i = 0; i < EKLMElementNumbers::getMaximalSectorGlobalNumber(); ++i)
+    m_rates.sectorRates[i] /= EKLMElementNumbers::getNStripsSector();
 }

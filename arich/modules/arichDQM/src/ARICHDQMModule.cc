@@ -313,15 +313,14 @@ namespace Belle2 {
     int mmid = 1;
     for (auto hh : hpd) { h_hapdHitPerEvent->Fill(mmid, hh); mmid++;}
 
-    for (const auto& arichLikelihood : arichLikelihoods) {
+    for (const auto& arichTrack : arichTracks) {
 
-      ARICHTrack* arichTrack = arichLikelihood.getRelated<ARICHTrack>();
 
       //Momentum limits are applied
-      if (arichTrack->getPhotons().size() == 0) continue;
-      if (arichTrack->getMomentum() < m_momDnLim || arichTrack->getMomentum() > m_momUpLim) continue;
+      if (arichTrack.getPhotons().size() == 0) continue;
+      if (arichTrack.getMomentum() < m_momDnLim || arichTrack.getMomentum() > m_momUpLim) continue;
 
-      TVector3 recPos = arichTrack->getPosition();
+      TVector3 recPos = arichTrack.getPosition();
       int trSector = 0;
       double dPhi = 0;
       if (recPos.Phi() >= 0) {
@@ -353,7 +352,7 @@ namespace Belle2 {
 
       h_tracks2D->Fill(recPos.X(), recPos.Y());
 
-      std::vector<ARICHPhoton> photons = arichTrack->getPhotons();
+      std::vector<ARICHPhoton> photons = arichTrack.getPhotons();
       int nPhoton = 0;
       for (auto& photon : photons) {
         if (photon.getMirror() == 0) {

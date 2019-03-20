@@ -355,7 +355,7 @@ class ComparisonPlot(Plot):
         self.comparison_text = comparison_text
 
         if isinstance(comparison_pvalue, float):
-            pvalue_str = "{:.6f}".format(comparison_pvalue)
+            pvalue_str = f"{comparison_pvalue:.6f}"
         else:
             pvalue_str = str(comparison_pvalue)
         #: the p-value computed during the comparison

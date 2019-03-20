@@ -169,7 +169,7 @@ def get_validation_folders(location, basepaths, log):
         return {}
 
     # Write to log what we are collecting
-    log.debug('Collecting {0} folders'.format(location))
+    log.debug(f'Collecting {location} folders')
 
     # Reserve some memory for our results
     results = {}
@@ -356,7 +356,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
     """
 
     # Write to log what we are collecting
-    log.debug('Collecting *{0} files from {1}'.format(ext, dirpath))
+    log.debug(f'Collecting *{ext} files from {dirpath}')
 
     # Some space where we store our results before returning them
     results = []

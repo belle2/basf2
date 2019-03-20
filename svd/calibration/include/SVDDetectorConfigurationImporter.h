@@ -85,7 +85,8 @@ namespace Belle2 {
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
-    ClassDef(SVDDetectorConfigurationImporter, 1);
+
+    ClassDef(SVDDetectorConfigurationImporter, 1); /**<needed by root */
   };
 
 } // Belle2 namespace

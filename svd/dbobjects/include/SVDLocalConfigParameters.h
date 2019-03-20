@@ -27,8 +27,9 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDLocalConfigParameters(const TString& uniqueID = ""):
-      m_uniqueID(uniqueID)    // Add a string as unique identifier for a given local run configuration)
+    SVDLocalConfigParameters(const TString& uniqueID = "")
+      : m_uniqueID(uniqueID),
+        m_injectedCharge(22500)
     {};
     /**
      * Returns the injected charge during the calibration run
@@ -117,7 +118,7 @@ namespace Belle2 {
      */
     std::string m_calibDate;
 
-    ClassDef(SVDLocalConfigParameters, 1);
+    ClassDef(SVDLocalConfigParameters, 1); /**<needed by root*/
 
   };
 

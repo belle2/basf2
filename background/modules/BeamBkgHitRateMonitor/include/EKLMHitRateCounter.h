@@ -39,7 +39,7 @@ namespace Belle2 {
       struct TreeStruct {
 
         /** Hit rates in each sector. */
-        float sectorRates[104] = {0};
+        float sectorRates[EKLMElementNumbers::getMaximalSectorGlobalNumber()] = {0};
 
         /** Total detector average hit rate. */
         float averageRate = 0;
@@ -57,7 +57,7 @@ namespace Belle2 {
         {
           if (numEvents == 0)
             return;
-          for (int i = 0; i < 104; ++i)
+          for (int i = 0; i < EKLMElementNumbers::getMaximalSectorGlobalNumber(); ++i)
             sectorRates[i] /= numEvents;
           averageRate /= numEvents;
         }

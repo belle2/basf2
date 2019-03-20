@@ -14,10 +14,7 @@
 
 using namespace Belle2;
 
-EKLMElementNumbers::EKLMElementNumbers() : m_MaximalEndcapNumber(2),
-  m_MaximalLayerNumber(14), m_MaximalDetectorLayerNumber{12, 14},
-  m_MaximalSectorNumber(4), m_MaximalPlaneNumber(2),
-  m_MaximalSegmentNumber(5), m_MaximalStripNumber(75), m_NStripsSegment(15)
+EKLMElementNumbers::EKLMElementNumbers()
 {
 }
 
@@ -281,43 +278,6 @@ int EKLMElementNumbers::getMaximalSegmentNumber() const
 int EKLMElementNumbers::getMaximalStripNumber() const
 {
   return m_MaximalStripNumber;
-}
-
-int EKLMElementNumbers::getMaximalLayerGlobalNumber() const
-{
-  return detectorLayerNumber(
-           m_MaximalEndcapNumber,
-           m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1]);
-}
-
-int EKLMElementNumbers::getMaximalSectorGlobalNumber() const
-{
-  return sectorNumber(m_MaximalEndcapNumber,
-                      m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],
-                      m_MaximalSectorNumber);
-}
-
-int EKLMElementNumbers::getMaximalPlaneGlobalNumber() const
-{
-  return planeNumber(m_MaximalEndcapNumber,
-                     m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],
-                     m_MaximalSectorNumber, m_MaximalPlaneNumber);
-}
-
-int EKLMElementNumbers::getMaximalSegmentGlobalNumber() const
-{
-  return segmentNumber(m_MaximalEndcapNumber,
-                       m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],
-                       m_MaximalSectorNumber, m_MaximalPlaneNumber,
-                       m_MaximalSegmentNumber);
-}
-
-int EKLMElementNumbers::getMaximalStripGlobalNumber() const
-{
-  return stripNumber(m_MaximalEndcapNumber,
-                     m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],
-                     m_MaximalSectorNumber, m_MaximalPlaneNumber,
-                     m_MaximalStripNumber);
 }
 
 int EKLMElementNumbers::getNStripsSegment() const

@@ -267,27 +267,42 @@ namespace Belle2 {
     /**
      * Get maximal detector layer global number.
      */
-    int getMaximalLayerGlobalNumber() const;
+    static constexpr int getMaximalLayerGlobalNumber()
+    {
+      return m_MaximalDetectorLayerNumber[0] + m_MaximalDetectorLayerNumber[1];
+    }
 
     /**
      * Get maximal sector global number.
      */
-    int getMaximalSectorGlobalNumber() const;
+    static constexpr int getMaximalSectorGlobalNumber()
+    {
+      return m_MaximalSectorNumber * getMaximalLayerGlobalNumber();
+    }
 
     /**
      * Get maximal plane global number.
      */
-    int getMaximalPlaneGlobalNumber() const;
+    static constexpr int getMaximalPlaneGlobalNumber()
+    {
+      return m_MaximalPlaneNumber * getMaximalSectorGlobalNumber();
+    }
 
     /**
      * Get maximal segment global number.
      */
-    int getMaximalSegmentGlobalNumber() const;
+    static constexpr int getMaximalSegmentGlobalNumber()
+    {
+      return m_MaximalSegmentNumber * getMaximalPlaneGlobalNumber();
+    }
 
     /**
      * Get maximal strip global number.
      */
-    int getMaximalStripGlobalNumber() const;
+    static constexpr int getMaximalStripGlobalNumber()
+    {
+      return m_MaximalStripNumber * getMaximalPlaneGlobalNumber();
+    }
 
     /**
      * Get number of strips in a segment.
@@ -297,33 +312,33 @@ namespace Belle2 {
   protected:
 
     /** Maximal endcap number. */
-    const int m_MaximalEndcapNumber;           //!
+    static constexpr int m_MaximalEndcapNumber = 2;
 
     /** Maximal layer number. */
-    const int m_MaximalLayerNumber;            //!
+    static constexpr int m_MaximalLayerNumber = 14;
 
     /** Maximal detector layer number. */
-    const int m_MaximalDetectorLayerNumber[2]; //!
+    static constexpr int m_MaximalDetectorLayerNumber[2] = {12, 14};
 
     /** Maximal sector number. */
-    const int m_MaximalSectorNumber;           //!
+    static constexpr int m_MaximalSectorNumber = 4;
 
     /** Maximal plane number. */
-    const int m_MaximalPlaneNumber;            //!
+    static constexpr int m_MaximalPlaneNumber = 2;
 
     /** Maximal segment number. */
-    const int m_MaximalSegmentNumber;          //!
+    static constexpr int m_MaximalSegmentNumber = 5;
 
     /** Maximal strip number. */
-    const int m_MaximalStripNumber;            //!
+    static constexpr int m_MaximalStripNumber = 75;
 
     /** Number of strips in a segment. */
-    const int m_NStripsSegment;                //!
+    static constexpr int m_NStripsSegment = 15;
 
   private:
 
     /** Class version. */
-    ClassDef(EKLMElementNumbers, 2);
+    ClassDef(EKLMElementNumbers, 3);
 
   };
 

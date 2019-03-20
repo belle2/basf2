@@ -20,8 +20,12 @@ void EKLMHitRateCounter::initialize(TTree* tree)
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 
   // set branch address
-  tree->Branch("eklm", &m_rates,
-               "sectorRates[104]/F:averageRate/F:numEvents/I:valid/O");
+  std::string branches;
+  branches =
+    "sectorRates[" +
+    std::to_string(EKLMElementNumbers::getMaximalSectorGlobalNumber()) +
+    "]/F:averageRate/F:numEvents/I:valid/O";
+  tree->Branch("eklm", &m_rates, branches.c_str());
 }
 
 void EKLMHitRateCounter::clear()
@@ -69,8 +73,7 @@ void EKLMHitRateCounter::normalize(unsigned timeStamp)
   m_rates.normalize();
 
   /* Normalize the hit rate per 1 strip. */
-  int n = m_ElementNumbers->getMaximalSectorGlobalNumber();
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < EKLMElementNumbers::getMaximalSectorGlobalNumber(); ++i) {
     m_rates.sectorRates[i] /= (m_ElementNumbers->getMaximalStripNumber() *
                                m_ElementNumbers->getMaximalPlaneNumber());
   }

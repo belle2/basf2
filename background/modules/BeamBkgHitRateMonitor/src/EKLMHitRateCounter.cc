@@ -20,7 +20,8 @@ void EKLMHitRateCounter::initialize(TTree* tree)
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 
   // set branch address
-  tree->Branch("eklm", &m_rates, "averageRate/F:numEvents/I:valid/O");
+  tree->Branch("eklm", &m_rates,
+               "sectorRates[104]/F:averageRate/F:numEvents/I:valid/O");
 }
 
 void EKLMHitRateCounter::clear()

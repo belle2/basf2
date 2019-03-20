@@ -182,10 +182,13 @@ void TSF::initialize()
 void TSF::terminate()
 {
   B2DEBUG(10, "Waiting for TSF firmware termination...");
-  wait(nullptr);
   for (unsigned i = 0; i < m_nSubModules; ++i) {
     close(inputFileDescriptor[i][1]);
     close(outputFileDescriptor[i][0]);
+  }
+  // wait for all processes to exit
+  for (unsigned i = 0; i < m_nSubModules; ++i) {
+    wait(nullptr);
   }
 }
 

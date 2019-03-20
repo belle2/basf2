@@ -174,8 +174,7 @@ def statistics_plots(
     if memory_profile:
         memory_profile.obj().GetListOfFunctions().Add(ROOT.TNamed(
             'Description',
-            'The virtual memory usage vs. the event number for {}.'.format(
-                job_desc))
+            f'The virtual memory usage vs. the event number for {job_desc}.')
         )
         memory_profile.obj().GetListOfFunctions().Add(ROOT.TNamed(
             'Check',
@@ -196,8 +195,7 @@ def statistics_plots(
     if memory_profile:
         memory_profile.obj().GetListOfFunctions().Add(ROOT.TNamed(
             'Description',
-            'The rss memory usage vs. the event number for {}.'.format(
-                job_desc))
+            f'The rss memory usage vs. the event number for {job_desc}.')
         )
         memory_profile.obj().GetListOfFunctions().Add(ROOT.TNamed(
             'Check',
@@ -226,8 +224,8 @@ def statistics_plots(
     h_module_memory.GetYaxis().SetTitle('memory increase/call [kB]')
     h_module_memory.GetListOfFunctions().Add(ROOT.TNamed(
         'Description',
-        'The (average) increase in virtual memory usage per call of the {} '
-        'method of modules for {}.'.format(method_name[method], job_desc))
+        f'The (average) increase in virtual memory usage per call of the '
+        f'{method_name[method]} method of modules for {job_desc}.')
     )
     h_module_memory.GetListOfFunctions().Add(ROOT.TNamed(
         'Check',
@@ -303,7 +301,7 @@ def event_timing_plot(
     h_timing.GetYaxis().SetTitle('events')
     h_timing.GetListOfFunctions().Add(ROOT.TNamed(
         'Description',
-        'The distribution of event execution times for {}.'.format(job_desc))
+        f'The distribution of event execution times for {job_desc}.')
     )
     h_timing.GetListOfFunctions().Add(ROOT.TNamed(
         'Check',
@@ -366,12 +364,12 @@ def draw_progress_bar(delete_lines, scripts, barlength=50):
             progressbar += '='
         else:
             progressbar += ' '
-    print('\x1b[0G[{0}] {1:6.1f}% ({2}/{3})'.format(progressbar, percent,
-                                                    finished_scripts,
-                                                    all_scripts))
+    print(
+        f'\x1b[0G[{progressbar}] {percent:6.1f}% '
+        f'({finished_scripts}/{all_scripts})')
 
     # Print the total runtime:
-    print('Runtime: {0}s'.format(runtime))
+    print(f'Runtime: {runtime}s')
 
     # Print the list of currently running scripts:
     running = [os.path.basename(__.path) for __ in scripts
@@ -381,7 +379,7 @@ def draw_progress_bar(delete_lines, scripts, barlength=50):
     if not running:
         running = ['-']
 
-    print('Running: {0}'.format(running[0]))
+    print(f'Running: {running[0]}')
     for __ in running[1:]:
         print('{0} {1}'.format(len('Running:') * " ", __))
 
@@ -718,9 +716,7 @@ class Validation:
             self.get_log_folder(),
             "list_of_failed_scripts.log"
         )
-        self.log.note("Writing list of failed scripts to {}.".format(
-            failed_log_path
-        ))
+        self.log.note(f"Writing list of failed scripts to {failed_log_path}.")
 
         # Select only failed scripts
         failed_scripts = [
@@ -743,9 +739,9 @@ class Validation:
             self.get_log_folder(),
             "list_of_skipped_scripts.log"
         )
-        self.log.note("Writing list of skipped scripts to {}.".format(
-            skipped_log_path
-        ))
+        self.log.note(
+            f"Writing list of skipped scripts to {skipped_log_path}."
+        )
 
         # Select only failed scripts
         skipped_scripts = [
@@ -777,7 +773,7 @@ class Validation:
         self.log.note(terminal_title_line(
             "Summary of script execution", level=0
         ))
-        self.log.note("Total number of scripts: {}".format(len(self.scripts)))
+        self.log.note(f"Total number of scripts: {len(self.scripts)}")
         self.log.note("")
         if skipped_scripts:
             self.log.note("{}/{} scripts were skipped".format(
@@ -793,7 +789,7 @@ class Validation:
             self.log.note("{}/{} scripts failed".format(
                 len(failed_scripts), len(self.scripts)))
             for s in failed_scripts:
-                self.log.note("* {}".format(s))
+                self.log.note(f"* {s}")
             self.log.note("")
         else:
             self.log.note("No scripts failed. Nice!")
@@ -897,9 +893,10 @@ class Validation:
             script_obj = self.get_script_by_name(script)
 
             if script_obj is None:
-                self.log.error("Script with name {0} cannot be found, "
-                               "skipping for selection"
-                               .format(script))
+                self.log.error(
+                    f"Script with name {script} cannot be found, skipping for "
+                    f"selection"
+                )
                 continue
 
             others = script_obj.get_recursive_dependencies(self.scripts)
@@ -909,14 +906,16 @@ class Validation:
         # enable all selections and dependencies
         for script_obj in self.scripts:
             if script_obj.name in scripts_to_enable:
-                self.log.warning("Enabling script {0} because it was selected "
-                                 "or a selected script depends on it."
-                                 .format(script_obj.name))
+                self.log.warning(
+                    f"Enabling script {script_obj.name} because it was "
+                    f"selected or a selected script depends on it."
+                )
                 script_obj.status = ScriptStatus.waiting
             else:
-                self.log.warning("Disabling script {0} because it was not "
-                                 "selected."
-                                 .format(script_obj.name))
+                self.log.warning(
+                    f"Disabling script {script_obj.name} because it was "
+                    f"not selected."
+                )
                 script_obj.status = ScriptStatus.skipped
 
         # Check if some of the selected_packages were not found.
@@ -1038,7 +1037,7 @@ class Validation:
         ]
 
         if not len(selected_controls) == 1:
-            print("Selected mode {} does not exist".format(self.mode))
+            print(f"Selected mode {self.mode} does not exist")
             sys.exit(1)
 
         selected_control = selected_controls[0]
@@ -1049,8 +1048,7 @@ class Validation:
         ))
 
         if not selected_control.is_supported():
-            print("Selected mode {} is not supported on your system".format(
-                self.mode))
+            print(f"Selected mode {self.mode} is not supported on your system")
             sys.exit(1)
 
         # instantiate the selected job control backend
@@ -1062,8 +1060,9 @@ class Validation:
         # read the git hash which is used to produce this validation
         src_basepath = self.get_useable_basepath()
         git_hash = validationfunctions.get_compact_git_hash(src_basepath)
-        self.log.debug("Git hash of repository located at {} is {}".format(
-            src_basepath, git_hash))
+        self.log.debug(
+            f"Git hash of repository located at {src_basepath} is {git_hash}"
+        )
 
         # todo: perhaps we want to have these files in the results folder, don't we? /klieret
         # If we do have runtime data, then read them
@@ -1112,9 +1111,7 @@ class Validation:
             if result[1] != 0:
                 script_obj.status = ScriptStatus.failed
                 self.log.warning(
-                    'exit_status was {0} for {1}'.format(
-                        result[1], script_obj.path
-                    )
+                    f'exit_status was {result[1]} for {script_obj.path}'
                 )
 
                 # Skip all dependent scripts
@@ -1167,10 +1164,8 @@ class Validation:
             if total_runtime_in_minutes > self.script_max_runtime_in_minutes:
                 script_obj.status = ScriptStatus.failed
                 self.log.warning(
-                    'Script {0} did not finish after {1} minutes, '
-                    'skipping '.format(
-                        script_obj.path,
-                        total_runtime_in_minutes)
+                    f'Script {script_obj.path} did not finish after '
+                    f'{total_runtime_in_minutes} minutes, skipping '
                 )
                 # kill the running process
                 script_obj.control.terminate(script_obj)
@@ -1201,7 +1196,7 @@ class Validation:
                 # Set script object variables accordingly
                 if script_obj.status == ScriptStatus.failed:
                     self.log.warning(
-                        'Starting of {0} failed'.format(script_obj.path)
+                        f'Starting of {script_obj.path} failed'
                     )
                 else:
                     script_obj.status = ScriptStatus.running
@@ -1300,11 +1295,9 @@ class Validation:
 
         if not os.path.exists(validationpath.folder_name_results):
             self.log.error(
-                "Folder {} not found in the current directory {}, please "
-                "run validate_basf2 first".format(
-                    validationpath.folder_name_results,
-                    save_dir
-                )
+                f"Folder {validationpath.folder_name_results} not found in "
+                f"the current directory {save_dir}, please run "
+                f"validate_basf2 first"
             )
 
         os.chdir(validationpath.folder_name_html)
@@ -1363,8 +1356,8 @@ def execute(tag=None, is_test=None):
 
         # Write to log that we have started the validation process
         validation.log.note('Starting validation...')
-        validation.log.note('Results will stored in a folder named "{0}"...'.
-                            format(validation.tag))
+        validation.log.note(
+            f'Results will stored in a folder named "{validation.tag}"...')
         validation.log.note('The (full) log file(s) can be found at {}'.format(
             ', '.join(get_log_file_paths(validation.log))
         ))
@@ -1376,8 +1369,7 @@ def execute(tag=None, is_test=None):
         if cmd_arguments.options:
             validation.basf2_options = ' '.join(cmd_arguments.options)
             validation.log.note(
-                'Received arguments for basf2: {0}'.format(
-                    validation.basf2_options)
+                f'Received arguments for basf2: {validation.basf2_options}'
             )
 
         # Check if we are using the cluster or local multiprocessing:

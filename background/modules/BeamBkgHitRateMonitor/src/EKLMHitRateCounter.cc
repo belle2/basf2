@@ -46,14 +46,12 @@ void EKLMHitRateCounter::accumulate(unsigned timeStamp)
   rates.numEvents++;
 
   // accumulate hits
-  int n = m_digits.getEntries();
-  for (int i = 0; i < n; ++i) {
-    EKLMDigit* eklmDigit = m_digits[i];
-    if (!eklmDigit->isGood())
+  for (const EKLMDigit& eklmDigit : m_digits) {
+    if (!eklmDigit.isGood())
       continue;
     int sector = m_ElementNumbers->sectorNumber(
-                   eklmDigit->getEndcap(), eklmDigit->getLayer(),
-                   eklmDigit->getSector()) - 1;
+                   eklmDigit.getEndcap(), eklmDigit.getLayer(),
+                   eklmDigit.getSector()) - 1;
     rates.sectorRates[sector] += 1;
     rates.averageRate += 1;
   }

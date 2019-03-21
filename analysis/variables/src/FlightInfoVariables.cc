@@ -118,7 +118,6 @@ namespace Belle2 {
       double fD      = lX * nX + lY * nY + lZ * nZ;
       //flight time
       double fT = daughter->getPDGMass() / Const::speedOfLight * fD / p;
-      //      B2WARNING("flight time calcolata = "<<fT);
 
       //covariance matrix of momentum and vertex for the Dz
       //ORDER = px,py,pz,E,x,y,z
@@ -397,11 +396,9 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              //        B2WARNING("siamo nel caso gran daughter, quindi no extra info");
               return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
             }
           } else {
-            //      B2WARNING("siamo nel caso daughter, quindi extra info");
             return getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
           };
           return -999;

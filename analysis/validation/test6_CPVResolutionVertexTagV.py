@@ -48,7 +48,7 @@ outputNtuple.SetAlias(
     'Check',
     "These parameters should not change drastically. Since the nightly reconstruction validation runs" +
     "on the same input file (which changes only from release to release), the values between builds should be the same.")
-outputNtuple.SetAlias('Contact', "abudinen@mpp.mpg.de, ligioi@mpp.mpg.de")
+outputNtuple.SetAlias('Contact', "Fernando.Abudinen@ts.infn.it")
 
 # No PXD hit equired: PXD0. At least one PXD (SVD) hit for one of the muon tracks: PXD1 (SVD1).
 # Hit required for both muon tracks: PXD2 (SVD2)"
@@ -135,7 +135,7 @@ for VXDReq in VXDReqs:
         ROOT.TNamed('Description', 'DeltaT Residual for PXD requirement ' + VXDReq +
                     '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
     histo_DeltaT.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
-    histo_DeltaT.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
+    histo_DeltaT.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'Fernando.Abudinen@ts.infn.it'))
     histo_DeltaT.Write()
 
     # Validation Plot 2
@@ -155,7 +155,7 @@ for VXDReq in VXDReqs:
         ROOT.TNamed(
             'Check',
             'Std. Dev. and Mean should not change drastically. Peaks after 2.6 ps should not increase.'))
-    histo_DeltaTErr.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
+    histo_DeltaTErr.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'Fernando.Abudinen@ts.infn.it'))
     histo_DeltaTErr.Write()
 
     # Validation Plot 3
@@ -171,7 +171,7 @@ for VXDReq in VXDReqs:
         ROOT.TNamed('Description', 'DeltaZ Residual on signal side for PXD requirement ' + VXDReq +
                     '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
     histo_DeltaZSig.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
-    histo_DeltaZSig.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
+    histo_DeltaZSig.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'Fernando.Abudinen@ts.infn.it'))
     histo_DeltaZSig.Write()
 
     # Validation Plot 4
@@ -187,7 +187,7 @@ for VXDReq in VXDReqs:
         ROOT.TNamed('Description', 'DeltaZ Residual on tag side for PXD requirement ' + VXDReq +
                     '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
     histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
-    histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
+    histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'Fernando.Abudinen@ts.infn.it'))
     histo_DeltaZTag.Write()
 
     argSet = ROOT.RooArgSet(

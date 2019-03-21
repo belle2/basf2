@@ -56,6 +56,7 @@ add_unpackers(path=main,
               components=['SVD', 'CDC', 'TOP', 'ARICH', 'ECL'])
 
 # additional modules if needed for hit processing
+main.add = module('ARICHFillHits')
 main.add_module('TOPChannelMasker')
 
 # Beam background rate monitor: output to flat ntuple

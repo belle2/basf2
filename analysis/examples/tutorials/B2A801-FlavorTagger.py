@@ -60,7 +60,7 @@ belleOrBelle2Flag = "Belle2"
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst11_BGx1_b2jpsiks.root', 'examples', False),
+             filename=b2.find_file('analysis/mdst11_BGx1_b2jpsiks.root', 'validation', False),
              path=cp_val_path)
 
 
@@ -199,11 +199,12 @@ bvars = vc.reco_stats + \
     vc.deltae_mbc + \
     vc.mc_truth + \
     vc.roe_multiplicities + \
-    # Attention: the collection of flavor tagging variables is defined in the flavorTagger
-ft.flavor_tagging + \
     vc.tag_vertex + \
     vc.mc_tag_vertex + \
     vertex_vars
+
+# Attention: the collection of flavor tagging variables is defined in the flavorTagger
+bvars += ft.flavor_tagging
 
 # Create aliases to save information for different particles
 bvars = bvars + \

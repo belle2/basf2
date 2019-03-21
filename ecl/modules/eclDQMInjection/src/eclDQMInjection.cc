@@ -81,14 +81,13 @@ void ECLDQMInjectionModule::event()
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
       unsigned int all = m_storeHits.getEntries();
-      difference /= 127;
-      // Should we use two histograms and normalize? Use maybe TH1F? Will this work with HistoModule?
+      float diff2 = difference / 127.; //  127MHz clock ticks to us
       if (it.GetIsHER(0)) {
-        hOccAfterInjHER->Fill(difference, all);
-        hEOccAfterInjHER->Fill(difference);
+        hOccAfterInjHER->Fill(diff2, all);
+        hEOccAfterInjHER->Fill(diff2);
       } else {
-        hOccAfterInjLER->Fill(difference, all);
-        hEOccAfterInjLER->Fill(difference);
+        hOccAfterInjLER->Fill(diff2, all);
+        hEOccAfterInjLER->Fill(diff2);
       }
     }
 

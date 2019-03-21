@@ -50,8 +50,9 @@ void PXDInjectionDQMModule::defineHisto()
 
   hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;;Count/Time", 1000, -500, 4500);
   hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;;Count/Time", 1000, -500, 4500);
-  hEOccAfterInjLER  = new TEfficiency("PXDEOccInjLER", "PXDEOccInjLER/Time;;Count/Time", 1000, -500, 4500);
-  hEOccAfterInjHER  = new TEfficiency("PXDEOccInjHER", "PXDEOccInjHER/Time;;Count/Time", 1000, -500, 4500);
+
+  hOccAfterInjLERGate  = new TH1F("PXDOccInjLERGate", "PXDOccInjLERGate;Time;Gate", 1000, 50, 150, 192, 0, 192);
+  hOccAfterInjHERGate  = new TH1F("PXDOccInjHERGate", "PXDOccInjHERGate;Time;Gate", 1000, 50, 150, 192, 0, 192);
 
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -66,11 +67,6 @@ void PXDInjectionDQMModule::defineHisto()
 
       hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 1000, -500, 4500);
       hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 1000, -500, 4500);
-      hEOccModAfterInjLER[avxdid] = new TEfficiency("PXDEOccInjLER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 1000,
-                                                    -500, 4500);
-      hEOccModAfterInjHER[avxdid] = new TEfficiency("PXDEOccInjHER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 1000,
-                                                    -500, 4500);
-
     }
   }
   // cd back to root directory
@@ -90,6 +86,8 @@ void PXDInjectionDQMModule::beginRun()
   // Assume that everthing is non-yero ;-)
   hOccAfterInjLER->Reset();
   hOccAfterInjHER->Reset();
+  hOccAfterInjLERGate->Reset();
+  hOccAfterInjHERGate->Reset();
   for (auto& a : hOccModAfterInjLER) a.second->Reset();
   for (auto& a : hOccModAfterInjHER) a.second->Reset();
 }
@@ -107,29 +105,28 @@ void PXDInjectionDQMModule::event()
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
       // count raw pixel hits per module, only if necessary
-      unsigned int all = 0;
       std::map <VxdID, int> freq;// count the number of RawHits per sensor
-      for (auto& p : m_storeRawHits) {
-        freq[p.getSensorID()]++;
-        all++;
-      }
+//       if(m_eachModule){
+//         for (auto& p : m_storeRawHits) {
+//             freq[p.getSensorID()]++;
+//         }
+//       }
+      unsigned int all = m_storeRawHits.size();
       // Should we use two histograms and normalize? Use maybe TEfficiency? Will this work with HistoModule?
       if (it.GetIsHER(0)) {
+        for (auto& p : m_storeRawHits) {
+          hOccAfterInjHER->Fill(difference, p.getRow / 4);
+        }
         hOccAfterInjHER->Fill(difference, all);
-        hEOccAfterInjHER->Fill(difference, all);
         for (auto& a : hOccModAfterInjHER) {
           a.second->Fill(difference, freq[a.first]);
         }
-        for (auto& a : hEOccModAfterInjHER) {
-          a.second->Fill(difference, freq[a.first]);
-        }
       } else {
-        hOccAfterInjLER->Fill(difference, all);
-        hEOccAfterInjLER->Fill(difference, all);
-        for (auto& a : hOccModAfterInjLER) {
-          a.second->Fill(difference, freq[a.first]);
+        for (auto& p : m_storeRawHits) {
+          hOccAfterInjLER->Fill(difference, p.getRow / 4);
         }
-        for (auto& a : hEOccModAfterInjLER) {
+        hOccAfterInjLER->Fill(difference, all);
+        for (auto& a : hOccModAfterInjLER) {
           a.second->Fill(difference, freq[a.first]);
         }
       }

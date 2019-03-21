@@ -61,13 +61,10 @@ namespace Belle2 {
 
       TH1F* hOccAfterInjLER{};          /** Occupancy after LER injection */
       TH1F* hOccAfterInjHER{};          /** Occupancy after HER injection */
+      TH1F* hOccAfterInjLERGate{};          /** Occupancy after LER injection */
+      TH1F* hOccAfterInjHERGate{};          /** Occupancy after HER injection */
       std::map<VxdID, TH1F*> hOccModAfterInjLER;/** Occupancy after LER injection */
       std::map<VxdID, TH1F*> hOccModAfterInjHER;/** Occupancy after HER injection */
-
-      TEfficiency* hEOccAfterInjLER{};          /** Occupancy after LER injection */
-      TEfficiency* hEOccAfterInjHER{};          /** Occupancy after HER injection */
-      std::map<VxdID, TEfficiency*> hEOccModAfterInjLER;/** Occupancy after LER injection */
-      std::map<VxdID, TEfficiency*> hEOccModAfterInjHER;/** Occupancy after HER injection */
 
       void defineHisto() override final;
 

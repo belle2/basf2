@@ -20,6 +20,9 @@ Standard Particle Lists
 
 * Updated V0 lists by making them explicitly call the appropriate vertex fit.
 
+* Switched the aforementioned fitter to Rave due to it displaying higher efficiency
+  (See Physics Performance Meeting, 21 March 2019).
+
 * Fixed a bug in the merged Lambda list, which used an incorrect mass window.
 
 * Updated charged standard PID cut values to reflect the correct efficiencies.

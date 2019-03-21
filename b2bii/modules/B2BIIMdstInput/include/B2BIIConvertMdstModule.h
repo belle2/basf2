@@ -140,6 +140,13 @@ namespace Belle2 {
 
     bool m_convertExtHits; /**< Flag to switch on conversion of Mdst_ecl_trk into ExtHits */
 
+    /**
+     * E9/E25 threshold value
+     * clusters with a value above this threshold are classified as neutral
+     * even if tracks are matched to their connected region (matchType == 2)
+     */
+    double m_matchType2E9oE25Threshold;
+
     //! variable to tell us which IPProfile bin was active last time we looked
     int m_lastIPProfileBin{ -1};
 

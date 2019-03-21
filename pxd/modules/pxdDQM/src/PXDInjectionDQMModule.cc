@@ -48,10 +48,10 @@ void PXDInjectionDQMModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
   oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
 
-  hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;;Count/Time", 1000, -500, 4500);
-  hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;;Count/Time", 1000, -500, 4500);
-  hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;;Count/Time", 1000, -500, 4500);
-  hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;;Count/Time", 1000, -500, 4500);
+  hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;;Count/Time", 4000, 0, 20000);
+  hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;;Count/Time", 4000, 0, 20000);
+  hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;;Count/Time", 4000, 0, 20000);
+  hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;;Count/Time", 4000, 0, 20000);
 
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -64,12 +64,12 @@ void PXDInjectionDQMModule::defineHisto()
       TString bufful = buff;
       buff.ReplaceAll(".", "_");
 
-      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 1000, -500, 4500);
-      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 1000, -500, 4500);
-      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 1000,
-                                             -500, 4500);
-      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 1000,
-                                             -500, 4500);
+      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 4000, 0, 20000);
+      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 4000, 0, 20000);
+      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 4000,
+                                             0, 20000);
+      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 4000,
+                                             0, 20000);
 
     }
   }

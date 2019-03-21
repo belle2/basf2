@@ -43,9 +43,9 @@ SVDLocalCalibrationsCheckModule::SVDLocalCalibrationsCheckModule() : Module()
   addParam("checkID", m_idFileNameCHECK, "ID of CHECK xml file.",
            std::string("checkID"));
   addParam("reference_root", m_rootFileNameREF, "Name of REFERENCE root file.",
-           std::string("/home/svd/calibrationQA/autoCalibrationCheck/tmp_files/SVDLocalCalibrationsMonitor_ref.root"));
+           std::string("SVDLocalCalibrationsMonitor_ref.root"));
   addParam("check_root", m_rootFileNameCHECK, "Name of CHECK root file.",
-           std::string("/home/svd/calibrationQA/autoCalibrationCheck/tmp_files/SVDLocalCalibrationsMonitor_check.root"));
+           std::string("SVDLocalCalibrationsMonitor_check.root"));
   addParam("plotGoodAPVs", m_plotGoodAPVs, "If true draw 1D plots also for good APVs", bool(false));
 
   addParam("cutN_outliers", m_cutN_out, "Max number of outliers allowed", int(5));

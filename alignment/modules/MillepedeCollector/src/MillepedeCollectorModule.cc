@@ -645,6 +645,8 @@ void MillepedeCollectorModule::collect()
 
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
+      B2WARNING("Two body decays with full kinematic constraint not yet correct - need to resolve strange covariance provided by BeamParameters!");
+
       auto mother = list->getParticle(iParticle);
 
       auto track12 = getParticlesTracks(mother->getDaughters());
@@ -662,6 +664,7 @@ void MillepedeCollectorModule::collect()
       TMatrixDSym extCov(7); extCov.Zero();
       // 3x3 IP vertex covariance
       extCov.SetSub(0, 0, beam->getCovVertex());
+      //TODO: FIXME: add transformation from (E,theta_x,theta_y) -> (px,py,pz)
       //covariance of the "boost vector" -> see BeamParameters
       // 3x3 matrix cov(E,theta_x,theta_y)
       //TODO:
@@ -682,7 +685,6 @@ void MillepedeCollectorModule::collect()
       extCov(6, 6) = (beam->getCovLER()(0, 0) + beam->getCovHER()(0, 0));
 
       auto extPrec = extCov; extPrec.Invert();
-      beam->getCovLER().Print();
 
       TVectorD extMeasurements(7);
       extMeasurements[0] = - (mother->getVertex() - beam->getVertex())[0];
@@ -692,8 +694,6 @@ void MillepedeCollectorModule::collect()
       extMeasurements[4] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[1];
       extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
       extMeasurements[6] = - (mother->getMass() - beam->getMass());
-
-      extMeasurements.Print();
 
       B2INFO("mother mass = " << mother->getMass() << "  and beam mass = " << beam->getMass());
 
@@ -774,7 +774,6 @@ void MillepedeCollectorModule::collect()
         const TMatrixD dLocal_dExt = dfdextPlusMinus.first * dTwoBody_dExt;
         TMatrixD dLocal_dExt_T = dLocal_dExt; dLocal_dExt_T.T();
 
-        dLocal_dExt.Print();
         // The 5x7 transformation matrix d(q/p,u',v',u,v)/d(vx,vy,vz,px,py,pz,M) needs to be "inverted"
         // to transform the covariance of the beamspot and boost vector of SuperKEKB into the local system
         // of one GBL point - such that Millepede can align the beamspot (or even beam kinematics) if requested.
@@ -783,8 +782,7 @@ void MillepedeCollectorModule::collect()
         // with almost no code:
         //
         TDecompSVD svd(dLocal_dExt_T);
-        //TMatrixD dExt_dLocal  = svd.Invert().T();
-        TMatrixD dExt_dLocal = dLocal_dExt_T;
+        TMatrixD dExt_dLocal  = svd.Invert().T();
         //
         // (dLocal_dExt * dExt_dLocal).Print(); // Check how close we are to unit matrix
         //
@@ -801,7 +799,6 @@ void MillepedeCollectorModule::collect()
         // It took me half a day to find out how to do this with 2 lines of code (3 with the include).
         // Source: ROOT macro example - actually found at:
         // <https://root.cern.ch/root/html/tutorials/matrix/solveLinear.C.html>
-        dExt_dLocal.Print();
         for (int i = 0; i < 7; ++i) {
           for (int j = 0; j < 5; ++j) {
             if (fabs(dExt_dLocal(i, j)) < 1.e-6)
@@ -1047,14 +1044,6 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 
   genfit::AbsTrackRep* trackRep = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack, currentPdgCode);
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
-  auto state6D = gfTrack.getStateSeed();
-  TVector3 vPos(state6D[0], state6D[1], state6D[2]);
-  TVector3 vMom(state6D[3], state6D[4], state6D[5]);
-  vMom.Print();
-  vMom *= 1. / vMom.Mag() * 10.;
-  if (vMom[1] > 0.) vMom *= -1.;
-  gfTrack.setStateSeed(vPos, vMom);
-  vMom.Print();
 
   if (particle) {
     TVector3 vertexPos = particle->getVertex();

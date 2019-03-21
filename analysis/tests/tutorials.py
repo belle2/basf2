@@ -29,6 +29,8 @@ class TutorialsTest(unittest.TestCase):
 
     @unittest.skipIf(not os.getenv('BELLE2_EXAMPLES_DATA_DIR'),
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")
+    @unittest.skipIf(not os.getenv('BELLE2_VALIDATION_DATA_DIR'),
+                     "$BELLE2_VALIDATION_DATA_DIR not found.")
     def test_tutorials(self):
         """
         Test supported tutorials.

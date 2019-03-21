@@ -71,6 +71,11 @@ void EKLMHitRateCounter::normalize(unsigned timeStamp)
   m_rates.normalize();
 
   /* Normalize the hit rate per 1 strip. */
-  for (int i = 0; i < EKLMElementNumbers::getMaximalSectorGlobalNumber(); ++i)
-    m_rates.sectorRates[i] /= EKLMElementNumbers::getNStripsSector();
+  for (int i = 0; i < EKLMElementNumbers::getMaximalSectorGlobalNumber(); ++i) {
+    int activeStrips = m_Channels->getActiveStripsSector(i + 1);
+    if (activeStrips == 0)
+      m_rates.sectorRates[i] = 0;
+    else
+      m_rates.sectorRates[i] /= activeStrips;
+  }
 }

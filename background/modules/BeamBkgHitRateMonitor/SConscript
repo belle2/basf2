@@ -8,7 +8,7 @@ env['LIBS'] = ['framework', 'rawdata_dataobjects', 'mdst_dataobjects',
                'arich_dataobjects',
                'ecl_dataobjects',
                'bklm_dataobjects',
-               'eklm_dataobjects',
+               'eklm_dataobjects', 'eklm_dbobjects',
                '$ROOT_LIBS']
 
 Return('env')

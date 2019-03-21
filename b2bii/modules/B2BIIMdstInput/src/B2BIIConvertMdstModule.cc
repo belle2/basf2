@@ -1725,8 +1725,10 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux,
                                                   ECLCluster* eclCluster)
 {
-  if (eclAux.e9oe25() < m_matchType2E9oE25Threshold) eclCluster->setIsTrack(ecl.match() > 0);
-  else eclCluster->setIsTrack(ecl.match() == 1);
+  if (eclAux.e9oe25() < m_matchType2E9oE25Threshold)
+    eclCluster->setIsTrack(ecl.match() > 0);
+  else
+    eclCluster->setIsTrack(ecl.match() == 1);
 
   eclCluster->setEnergy(ecl.energy()); //must happen before setCovarianceMatrix()!
   eclCluster->setPhi(ecl.phi());

@@ -31,8 +31,10 @@ namespace Belle2 {
        * tree structure
        */
       struct TreeStruct {
-
-        float averageRate = 0; /**< total detector average hit rate */
+        float layerAverageRates[4] = {0}; /**< layer average occupancy */
+        float layerLadderAverageRates[4][16] = {0}; /**< [#layer][#ladder] */
+        float layerSensorAverageRates[4][5] = {0}; /**< [#layer][#sensor] */
+        float averageRate = 0; /**< total SVD average occupancy */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
 
@@ -43,8 +45,18 @@ namespace Belle2 {
         {
           if (numEvents == 0) return;
           averageRate /= numEvents;
+          for (auto& rate : layerAverageRates) rate /= numEvents;
+          for (auto& row : layerLadderAverageRates) {
+            for (auto& rate : row) {
+              rate /= numEvents;
+            }
+          }
+          for (auto& row : layerSensorAverageRates) {
+            for (auto& rate : row) {
+              rate /= numEvents;
+            }
+          }
         }
-
       };
 
       /**
@@ -79,6 +91,11 @@ namespace Belle2 {
     private:
 
       // class parameters: to be set via constructor or setters
+      int m_nLadders[4] = {7, 10, 12, 16}; /**< number of ladders on each layer */
+      int m_nSensors[4] = {2, 3, 4, 5}; /**< number of sensors on a ladder on each layer */
+      int m_nAPVs[4] = {12, 10, 10, 10}; /**< number of APVs on both sides of a sensor on each layer */
+      int m_nTotalAPVs = 1748; /**< total number of APV over entire SVD */
+      int m_nAPVStrips = 128; /**< number of strips per APV */
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */

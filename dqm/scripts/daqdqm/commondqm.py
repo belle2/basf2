@@ -44,12 +44,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
             vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
 
-        if components is None or ('CDC' in components and 'SVD' in components):
-            add_IP_dqm(path)
-
-        if components is None or 'CDC' in components:
-            add_V0_dqm(path)
-
     if dqm_environment == "hlt":
         # HLT
         path.add_module("SoftwareTriggerHLTDQM")

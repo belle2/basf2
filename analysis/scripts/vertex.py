@@ -94,7 +94,7 @@ def vertexKFit(
     decay_string='',
     constraint='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -143,7 +143,7 @@ def vertexKFitDaughtersUpdate(
     conf_level,
     constraint='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the Daughters.
@@ -191,7 +191,7 @@ def massVertexKFit(
     conf_level,
     decay_string='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -239,7 +239,7 @@ def massVertexKFitDaughtersUpdate(
     conf_level,
     decay_string='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
@@ -287,7 +287,7 @@ def massKFit(
     conf_level,
     decay_string='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -335,7 +335,7 @@ def massKFitDaughtersUpdate(
     conf_level,
     decay_string='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
@@ -438,7 +438,7 @@ def vertexRave(
     decay_string='',
     constraint='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the RAVE for each Particle in the given ParticleList.
@@ -488,7 +488,7 @@ def vertexRaveDaughtersUpdate(
     decay_string='',
     constraint='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Performs a vertex fit using RAVE for each Particle in the given ParticleList and updating fully the
@@ -544,7 +544,7 @@ def massVertexRave(
     conf_level,
     decay_string='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList.
@@ -592,7 +592,7 @@ def massVertexRaveDaughtersUpdate(
     conf_level,
     decay_string='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList and update the daughters.
@@ -640,7 +640,7 @@ def massRave(
     conf_level,
     decay_string='',
     path=analysis_main,
-    silence_warning=False,
+    silence_warning=True,
 ):
     """
     Perform mass fit using the RAVE for each Particle in the given ParticleList.

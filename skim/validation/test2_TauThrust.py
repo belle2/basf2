@@ -10,7 +10,7 @@ from stdPhotons import *
 """
 <header>
   <input>../TauThrust.udst.root</input>
-  <output>../TauThrust_Validation.root</output>
+  <output>TauThrust_Validation.root</output>
   <contact>kenji@hepl.phys.nagoya-u.ac.jp</contact>
 </header>
 """
@@ -32,7 +32,7 @@ variablesToHistogram(
     decayString='',
     variables=[('nGoodTracks', 7, 1, 8),
                ('visibleEnergyOfEventCMS', 60, 0, 12),
-               ('thrust', 60, 0.7, 1)],
+               ('thrust', 50, 0.75, 1)],
     path=tauthrustskim
 )
 process(tauthrustskim)

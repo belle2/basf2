@@ -259,9 +259,9 @@ void cdcDQM7Module::event()
   int r_nent = cdcRawHits.getEntries();
 
   // new
-  double x = 0.;
-  double y = 0.;
-  int board = 0;
+  double x;
+  double y;
+  int board;
   for (int j = 0; j < r_nent; j++) {
     CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
 

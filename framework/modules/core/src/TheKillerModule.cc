@@ -11,7 +11,6 @@
 #include <framework/modules/core/TheKillerModule.h>
 #include <signal.h>
 #include <boost/algorithm/string.hpp>
-#include <TRandom.h>
 
 using namespace Belle2;
 
@@ -38,12 +37,13 @@ With this module you can kill basf2 in a variety of ways to test what happens if
 * uncaught exception
 * signal
 * segfault
+* bus error
 
 This error can occur in a selected event to test behavior during processing.)DOC");
 
   // Parameter definitions
   addParam("method", m_methodStr, "How to kill the event, one of (abort, terminate, "
-           "quick_exit, exit, exception, signal, segfault, random)", std::string("abort"));
+           "quick_exit, exit, exception, signal, segfault, buserror)", std::string("abort"));
   addParam("parameter", m_parameter, "Optional parameter for the kill method: for "
            "quick_exit and exit it is the return code, for signal it is the signal number", 0u);
   addParam("event", m_eventToKill, "In which event to kill the processing");
@@ -59,6 +59,7 @@ void TheKillerModule::initialize()
   else if (m_methodStr == "exception") m_method = EMethod::c_exception;
   else if (m_methodStr == "signal") m_method = EMethod::c_signal;
   else if (m_methodStr == "segfault") m_method = EMethod::c_segfault;
+  else if (m_methodStr == "buserror") m_method = EMethod::c_buserror;
   else B2ERROR("Unknown method , choose one of (abort, terminate, quick_exit, exit, "
                  "exception, signal, segfault)" << LogVar("method", m_methodStr));
 }
@@ -82,11 +83,28 @@ void TheKillerModule::event()
       break;
     case EMethod::c_segfault:
 #ifndef __clang_analyzer__
-      // this is an intentional nullptr dereference so lets hide it from clang analyzer
-      volatile int* foo {nullptr};
-      *foo = 5;
+      {
+        // this is an intentional nullptr dereference so lets hide it from clang analyzer
+        volatile int* foo {nullptr};
+        *foo = 5;
+      }
 #endif
-      B2FATAL("This should never be called ...");
       break;
+    case EMethod::c_buserror:
+#ifndef __clang_analyzer__
+      {
+#if defined(__GNUC__) && defined(__x86_64__)
+        __asm__("pushf\norl $0x40000,(%rsp)\npopf");
+#endif
+        char* cptr = (char*) malloc(sizeof(int) + 1);
+        int* iptr = (int*)(cptr + 1);
+        *iptr = 42;
+        free(cptr);
+      }
+#endif
+      break;
+    default:
+      B2FATAL("Illegal method");
   }
+  B2FATAL("This should never be called ...");
 }

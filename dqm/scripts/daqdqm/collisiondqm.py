@@ -22,5 +22,11 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco"):
     """
 
     add_common_dqm(path, components, dqm_environment)
-    add_IP_dqm(path)
-    add_V0_dqm(path)
+
+    # the following makes only sense in collisions
+    if dqm_environment == "expressreco":
+        if components is None or ('CDC' in components and 'SVD' in components):
+            add_IP_dqm(path)
+
+        if components is None or 'CDC' in components:
+            add_V0_dqm(path)

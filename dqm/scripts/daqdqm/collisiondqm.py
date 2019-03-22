@@ -4,6 +4,7 @@
 from basf2 import *
 
 from daqdqm.commondqm import add_common_dqm
+from IPDQM import add_IP_dqm
 
 
 def add_collision_dqm(path, components=None, dqm_environment="expressreco"):
@@ -20,3 +21,4 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco"):
     """
 
     add_common_dqm(path, components, dqm_environment)
+    add_IP_dqm(path)

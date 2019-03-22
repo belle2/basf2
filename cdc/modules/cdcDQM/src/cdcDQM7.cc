@@ -1,6 +1,6 @@
 /* Nanae Taniguchi 2017.07.12 */
 /* Nanae Taniguchi 2018.02.06 */
-/* occupancy 2019 */
+/* add occupancy plot 2019.03 */
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
 // add
@@ -287,7 +287,6 @@ void cdcDQM7Module::event()
   bmap_2->SetMaximum(h_ent / (300 * fac));
   bmap_2->SetMinimum(0.);
   //
-
 
 }
 

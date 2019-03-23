@@ -260,16 +260,13 @@ void cdcDQM7Module::event()
   int r_nent = cdcRawHits.getEntries();
 
   // new
-  double x;
-  double y;
-  int board;
   for (int j = 0; j < r_nent; j++) {
     CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
 
-    board = cdcrawhit->getBoardId();
+    int board = cdcrawhit->getBoardId();
 
-    x = board % 20;
-    y = (board - (board % 20)) / 20;
+    double x = board % 20;
+    double y = (board - (board % 20)) / 20;
 
     if (x != 5 || y != 5) {
       bmap_2->Fill(x, y);

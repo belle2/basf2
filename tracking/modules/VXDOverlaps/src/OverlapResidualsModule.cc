@@ -61,10 +61,8 @@ void OverlapResidualsModule::defineHisto()
 {
   //Create a separate histogram directories
   TDirectory* oldDir = gDirectory;
-  TDirectory* HMDir = NULL;
-  HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
-  TDirectory* ResDir = NULL;
-  ResDir = oldDir->mkdir("MonitoringResiduals_VXDOverlaps");
+  TDirectory* HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
+  TDirectory* ResDir = oldDir->mkdir("MonitoringResiduals_VXDOverlaps");
 
   //Define histograms of residuals
   ResDir->cd();

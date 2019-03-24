@@ -41,7 +41,7 @@ namespace Belle2 {
       Constant() = default;
 
       /// Constructor from the constant value
-      Constant(const T& t)
+      explicit Constant(const T& t)
         : m_t(t)
       {
       }

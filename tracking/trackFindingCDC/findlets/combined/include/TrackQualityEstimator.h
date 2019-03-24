@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      TrackQualityEstimator(const std::string& defaultFilterName = "recording");
+      explicit TrackQualityEstimator(const std::string& defaultFilterName = "recording");
 
       /// Short description of the findlet
       std::string getDescription() final;

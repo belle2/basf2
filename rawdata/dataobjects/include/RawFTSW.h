@@ -15,13 +15,6 @@
 #include <rawdata/dataobjects/RawFTSWFormat_v1.h>
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//
-// The latest DAQformat version number ( please ask Nakao-san for detail )
-#define LATEST_FTSW_FORMAT_VER 2 // From phase II ? 
-//
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 namespace Belle2 {
 
   /**
@@ -213,7 +206,7 @@ namespace Belle2 {
       POS_HEADER_SIZE = 1, //! The same number of this information must appear in RawFTSWFormat*.h. Information should be placed in one place but I need to put this number in RawFTSW.h because it is used to distinguish different version numbers.
       // header size is used to distinguish different version number for ver. 0, 1, and 2
       VER_0_HEADER_SIZE = 0, //! Unpacker for ver.0(early DESY version) is not available.
-      VER_1_HEADER_SIZE = 0,
+      VER_1_HEADER_SIZE = 0, // ! Unpacker for ver.1(late DESY version) is available but it is unlikely for a user to read this ver. Until there is a request to read ver.1, it is closed.
       VER_2_HEADER_SIZE = 8
     };
 

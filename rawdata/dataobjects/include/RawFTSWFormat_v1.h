@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   /**
-   * The Raw FTSW class ver.0 .
+   * The Raw FTSW class ver.1 .
    *
    * This class stores the RAW data containing FTSW data(event #, trg time ).
    */

@@ -166,7 +166,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("convertExtHits", m_convertExtHits, "Flag to switch on conversion of Mdst_ecl_trk into ExtHits", false);
   addParam("matchType2E9oE25Threshold", m_matchType2E9oE25Threshold,
            "clusters with a E9/E25 value above this threshold are classified as neutral even if tracks are matched to their connected region (matchType == 2)",
-           1.1);
+           -1.1);
 
   m_realData = false;
 

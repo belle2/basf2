@@ -53,7 +53,7 @@ void DQMHistOutputToEPICSModule::initialize()
     pmynode.push_back(n);
     int length = int(ca_element_count(n->mychid));
     if (length > 0) {
-      std::vector data = vector(length, 0.0);
+      std::vector data(length, 0.0);
       SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_set failure");
     }
 #endif

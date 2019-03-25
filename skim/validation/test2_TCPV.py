@@ -18,7 +18,7 @@ tcpvskimpath = Path()
 
 
 fileList = ['../TCPV.udst.root']
-inputMdstList('MC9', fileList, path=tcpvskimpath)
+inputMdstList('default', fileList, path=tcpvskimpath)
 
 
 from variables import variables

@@ -17,6 +17,5 @@ using namespace TrackFindingCDC;
 
 Weight AllWireHitFilter::operator()(const CDCWireHit& wireHit)
 {
-  // return wireHit.getRefChargeDeposit();
   return (*wireHit.getHit()).getADCCount();
 }

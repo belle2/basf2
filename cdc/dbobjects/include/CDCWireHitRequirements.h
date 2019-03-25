@@ -76,12 +76,17 @@ namespace Belle2 {
     }
 
   private:
-    int m_minADC = 0.0;          // Cut value for ADC
-    int m_minTOT = 0.0;          // Cut value for TOT
-    int m_maxTOT = 100;          // Cut value for TOT
-    double m_minADCOverTOT = 0.0;      // Cut value for ADC/TOT
+    /** Cut value for ADC (min ) */
+    int m_minADC = 0.0;
+    /** Cut value for TOT (min) */
+    int m_minTOT = 0.0;
+    /** Cut value for TOT (max) */
+    int m_maxTOT = 100;
+    /** Cut value for ADC/TOT (min) */
+    double m_minADCOverTOT = 0.0;
 
-    ClassDef(CDCWireHitRequirements, 3); // ClassDef
+    /** ROOT ClassDef */
+    ClassDef(CDCWireHitRequirements, 2);
   };
 
 } // end namespace Belle2

@@ -36,10 +36,13 @@ Weight CutsFromDBWireHitFilter::operator()(const CDCWireHit& wireHit)
   int ADC = (*wireHit.getHit()).getADCCount();
   if (m_DBPtrIsValidForCurrentRun) {
     if (m_DBPtrIsValidForCurrentRun and ADC > m_CDCWireHitRequirementsFromDB->getMinADC()) {
-      return ADC; // Hit accepted
+      /// Hit accepted
+      return ADC;
     } else {
-      return NAN; // Hit rejected
+      /// Hit rejected
+      return NAN;
     }
   }
-  return ADC; // Hit accepted (cf. B2WARNING above)
+  /// Hit accepted (cf. B2WARNING above)
+  return ADC;
 }

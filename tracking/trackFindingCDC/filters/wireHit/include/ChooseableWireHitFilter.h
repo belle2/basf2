@@ -16,7 +16,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    // Guard to prevent repeated instantiations
+    /// Guard to prevent repeated instantiations
     extern template class Chooseable<BaseWireHitFilter>;
     extern template class ChooseableFilter<WireHitFilterFactory>;
     using ChooseableWireHitFilter = ChooseableFilter<WireHitFilterFactory>;

@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWireHit;
 
-    // Guard to prevent repeated instantiations
+    /// Guard to prevent repeated instantiations
     extern template class Filter<CDCWireHit>;
 
     /// Base class for wire hit filters

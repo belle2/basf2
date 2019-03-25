@@ -15,7 +15,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    // Guard to prevent repeated instantiations
+    /// Guard to prevent repeated instantiations
     extern template class FilterFactory<BaseWireHitFilter>;
 
     /// Factory that can create appropriate wireHit filters from associated names.
@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      WireHitFilterFactory(const std::string& defaultFilterName = "cuts_from_DB");
+      explicit WireHitFilterFactory(const std::string& defaultFilterName = "cuts_from_DB");
 
       /// Default destructor
       ~WireHitFilterFactory();

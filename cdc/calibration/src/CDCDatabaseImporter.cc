@@ -902,13 +902,15 @@ void CDCDatabaseImporter::importCDCWireHitRequirements(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
 
-  int minADC = 0.0;          // Cut value for ADC
-  int minTOT = 0.0;          // Cut value for TOT
-  int maxTOT = 100;          // Cut value for TOT
-  double minADCOverTOT = 0.0;      // Cut value for ADC/TOT
+  int minADC = 0.0;          /**< Cut value for ADC (min) */
+  int minTOT = 0.0;          /**< Cut value for TOT (min) */
+  int maxTOT = 100;          /**< Cut value for TOT (max) */
+  double minADCOverTOT = 0.0;      /**< Cut value for ADC/TOT (min) */
 
-  // In the input file, the cuts are defined in that order:
-  // ADC>int TOT>int TOT<int ADC/TOT>double
+  /**
+   * In the input file, the cuts are defined in that order:
+   * ADC>int TOT>int TOT<int ADC/TOT>double
+   */
   if (stream >> minADC) {
   } else {
     B2ERROR("Cannot get int minADC from " << fileName);

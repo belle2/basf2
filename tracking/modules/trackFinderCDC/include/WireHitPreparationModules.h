@@ -38,7 +38,7 @@ namespace Belle2 {
       using Super = FindletModule<WireHitPreparer>;
 
     public:
-      // Constructor
+      /// Constructor
       TFCDC_WireHitPreparerModule();
     };
 
@@ -68,6 +68,11 @@ namespace Belle2 {
     };
 
 
+    /**
+     * Module counterpart to the WireHitBackgroundDetector findlet,
+     * which marks CDCWireHits as background based on the result of a filter.
+     * FindletModule is used as an adaptor findlet->module.
+     */
     class TFCDC_WireHitBackgroundDetectorModule : public FindletModule<WireHitBackgroundDetector> {
 
       /// Type of the base class

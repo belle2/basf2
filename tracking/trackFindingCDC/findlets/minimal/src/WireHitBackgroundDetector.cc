@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 
 WireHitBackgroundDetector::WireHitBackgroundDetector()
 {
-  // adding the filter as a subordinary processing signal listener.
+  /// adding the filter as a subordinary processing signal listener.
   this->addProcessingSignalListener(&m_wireHitFilter);
 }
 

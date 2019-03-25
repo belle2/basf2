@@ -57,6 +57,8 @@ Variables
   `isSignal` was added to the unit tests of the flavor tagging variables. 
 
 
+* Added MC flight information variables, :b2:var:`mcFlightDistance` and :b2:var:`mcFlightTime`
+
 Standard Particle Lists
 +++++++++++++++++++++++
 

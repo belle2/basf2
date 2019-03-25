@@ -19,7 +19,7 @@
 #include <G4SafetyHelper.hh>
 #include <G4FieldManagerStore.hh>
 #include <G4TransportationProcessType.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <framework/logging/Logger.h>
 
 class G4VSensitiveDetector;
@@ -27,6 +27,7 @@ class G4VSensitiveDetector;
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4MonopoleTransportation::G4MonopoleTransportation(const G4Monopole* mpl,
                                                    G4int verb)

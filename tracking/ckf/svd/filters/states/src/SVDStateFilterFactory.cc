@@ -30,6 +30,7 @@
 #include <tracking/ckf/svd/filters/states/SVDStateBasicVarSet.h>
 #include <tracking/ckf/svd/filters/states/SVDStateTruthVarSet.h>
 #include <tracking/ckf/svd/filters/states/SimpleSVDStateFilter.h>
+#include <tracking/ckf/svd/filters/states/ResidualSVDStateFilter.h>
 #include <tracking/ckf/svd/filters/states/AllSVDStateFilter.h>
 #include <tracking/ckf/svd/filters/states/NonIPCrossingSVDStateFilter.h>
 
@@ -95,6 +96,7 @@ std::map<std::string, std::string> SVDStateFilterFactory::getValidFilterNamesAnd
     {"ordering_truth", "monte carlo truth ordering"},
     {"sloppy_truth", "sloppy monte carlo truth"},
     {"simple", "simple filter to be used in svd"},
+    {"residual", "residual filter to be used in svd"},
     {"recording", "record variables to a TTree"},
     {"mva", "MVA filter"},
     {"sloppy_recording", "record variables to a TTree"},
@@ -116,6 +118,8 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<KalmanFilter<CKFToSVDState, SVDKalmanStepper>>();
   } else if (filterName == "simple") {
     return std::make_unique<SimpleSVDStateFilter>();
+  } else if (filterName == "residual") {
+    return std::make_unique<ResidualSVDStateFilter>();
   } else if (filterName == "truth") {
     return std::make_unique<MCSVDStateFilter>();
   } else if (filterName == "ordering_truth") {

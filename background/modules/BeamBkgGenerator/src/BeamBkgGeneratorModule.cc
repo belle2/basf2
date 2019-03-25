@@ -25,6 +25,7 @@
 // data objects
 #include <framework/dataobjects/EventMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
 
 // random generator
 #include <TRandom.h>
@@ -74,6 +75,10 @@ namespace Belle2 {
     StoreArray<MCParticle> mcParticles;
     mcParticles.registerInDataStore();
 
+    StoreArray<SADMetaHit> sadHits;
+    sadHits.registerInDataStore();
+
+
     // check steering parameters
 
     if (m_ringName != "LER" and m_ringName != "HER") {
@@ -104,6 +109,17 @@ namespace Belle2 {
     m_tree->SetBranchAddress("E", &m_sad.E);
     m_tree->SetBranchAddress("rate", &m_sad.rate);
 
+    // for SADMetaHit
+    m_tree->SetBranchAddress("ss", &m_sad.ss);
+    m_tree->SetBranchAddress("sraw", &m_sad.sraw);
+    m_tree->SetBranchAddress("nturn", &m_sad.nturn);
+    m_tree->SetBranchAddress("xraw", &m_sad.xraw);
+    m_tree->SetBranchAddress("yraw", &m_sad.yraw);
+    m_tree->SetBranchAddress("r", &m_sad.r);
+    m_tree->SetBranchAddress("rr", &m_sad.rr);
+    m_tree->SetBranchAddress("dp_over_p0", &m_sad.dp_over_p0);
+    m_tree->SetBranchAddress("watt", &m_sad.watt);
+
     int numEntries = m_tree->GetEntries();
     if (numEntries <= 0) {
       B2ERROR("SAD tree is empty");
@@ -126,10 +142,14 @@ namespace Belle2 {
     if (m_ringName == "LER") {
       GearDir ring("/Detector/SuperKEKB/LER/");
       m_rotation.RotateY(ring.getAngle("angle"));
+      m_ring = 2;
     } else {
       GearDir ring("/Detector/SuperKEKB/HER/");
       m_rotation.RotateY(ring.getAngle("angle"));
+      m_ring = 1;
     }
+
+    m_sectionOrdering.insert(m_sectionOrdering.end(), {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2});
 
     B2RESULT("BG rate: " << m_rates.back() / 1e6 << " MHz, events to generate: "
              << m_numEvents);
@@ -157,6 +177,21 @@ namespace Belle2 {
     int i = generateEntry();
     m_tree->GetEntry(i);
     m_counters[i]++;
+
+    // make SADMetaHit
+    int ring_section = -1;
+    double ssraw = m_sad.ss;
+    if (m_sad.ss < 0) ssraw += 3016.;
+    int section = (int)(ssraw * 12 / 3016.);
+    if ((unsigned)section < m_sectionOrdering.size()) ring_section = m_sectionOrdering[section];
+
+    StoreArray<SADMetaHit> SADMetaHits;
+    SADMetaHits.appendNew(SADMetaHit(m_sad.ss, m_sad.sraw, m_sad.ss, m_sad.s,
+                                     0., m_sad.nturn,
+                                     m_sad.x, m_sad.y, m_sad.px, m_sad.py, m_sad.xraw, m_sad.yraw,
+                                     m_sad.r, m_sad.rr, m_sad.dp_over_p0, m_sad.E, m_sad.rate,
+                                     m_sad.watt, m_ring, ring_section));
+
 
     // transform to Belle II (flip sign of y and s, rotate)
 

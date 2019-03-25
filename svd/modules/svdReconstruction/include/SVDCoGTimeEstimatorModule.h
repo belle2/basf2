@@ -47,6 +47,7 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDCoGTimeEstimatorModule();
 
+    /** default destructor*/
     virtual ~SVDCoGTimeEstimatorModule();
 
     /** Initialize the SVDCoGTimeEstimator.*/
@@ -68,11 +69,11 @@ namespace Belle2 {
   private:
 
     /** store arrays*/
-    StoreArray<SVDShaperDigit> m_storeShaper;
-    StoreArray<SVDRecoDigit> m_storeReco;
+    StoreArray<SVDShaperDigit> m_storeShaper; /**<SVDShaperDigits Store Array*/
+    StoreArray<SVDRecoDigit> m_storeReco; /**<SVDRecoDigits store array*/
 
-    StoreArray<SVDTrueHit> m_storeTrueHits;
-    StoreArray<MCParticle> m_storeMCParticles;
+    StoreArray<SVDTrueHit> m_storeTrueHits; /**<SVDTrueHits store array*/
+    StoreArray<MCParticle> m_storeMCParticles; /**<MCParticles Store array*/
 
     /** The peak time estimation */
     float m_weightedMeanTime;
@@ -169,11 +170,11 @@ namespace Belle2 {
     int fromModeToNumberOfSample(int modality);
 
     //calibration objects
-    SVDPulseShapeCalibrations m_PulseShapeCal;
-    SVDNoiseCalibrations m_NoiseCal;
-    SVDCoGTimeCalibrations m_TimeCal;
+    SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibrations db object*/
+    SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+    SVDCoGTimeCalibrations m_TimeCal; /**< SVD CoG Time calibrations db object*/
 
-    //number of samples
+    /** number of samples*/
     int m_NumberOfAPVSamples = 6;
 
   };

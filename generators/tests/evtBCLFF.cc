@@ -26,7 +26,7 @@ namespace Belle2 {
     /** sets up the test */
     static void SetUpTestCase()
     {
-      std::string decayFileName = FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC");
+      std::string decayFileName = FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC");
       s_evtgen = EvtGenInterface::createEvtGen(decayFileName);
     }
 

@@ -129,9 +129,9 @@ namespace Belle2 {
     double isRestOfEventMajorityB0Flavor(const Particle*);
 
     /**
-     * returns the PDG code of the correspondig B0/B0bar when found in RoE, 0 otherwise
-     */
-    double McFlavorOfTagSide(const Particle* part);
+     * Returns the MC flavor (+-1) of the accompaning tag-side neutral B meson if the given particle is a correctly MC matched neutral B.
+     * It returns 0 else. */
+    double mcFlavorOfOtherB0(const Particle* particle);
 
     /**
      * Returns function which returns a requested kinematical variable via argument[0] of the group of the semileptonic flavor tagging variables. The Possibilities are:

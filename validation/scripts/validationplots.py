@@ -102,7 +102,7 @@ def find_root_object(root_objects, **kwargs):
         return []
 
 
-def serve_existing_plots():
+def serve_existing_plots(revisions):
     """
     Goes to the folder where
     the plots for the given selection are stored, and replaces the current
@@ -110,7 +110,8 @@ def serve_existing_plots():
     :return: No return value
     """
 
-    print("File exists already and will be served from archive!")
+    print("Plots for the revision(s) {} have already been created before "
+          "and will be served from the archive.".format(", ".join(revisions)))
 
 
 def get_plot_files(revisions, work_folder):
@@ -240,6 +241,10 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     @return: No return value
     """
 
+    print(validationfunctions.terminal_title_line(
+        "Creating plots for the revision(s) " + ", ".join(revisions) + "."
+    ))
+
     # Since we are going to plot, we need to initialize ROOT
     ROOT.gROOT.SetBatch()
     ROOT.gStyle.SetOptStat(1110)
@@ -308,7 +313,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
         # Some information to be printed out while the plots are created
         print(terminal_title_line(
-            'Creating plots for package: {0}'.format(package),
+            f'Creating plots for package: {package}',
             level=1
         ))
 
@@ -339,7 +344,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
             # Some more information to be printed out while plots are
             # being created
-            print('Creating plots for file: {0}'.format(rootfile))
+            print(f'Creating plots for file: {rootfile}')
 
             # Get the list of all objects that belong to the current
             # package and the current file. First the regular objects:
@@ -465,7 +470,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         # Make the command line output more readable
         print()
 
-    print("Storing to {}".format(comparison_json_file))
+    print(f"Storing to {comparison_json_file}")
 
     # create objects for all revisions
     comparison_revs = []
@@ -478,7 +483,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         if index is not None:
             style = get_style(index)
             line_color = ROOT.gROOT.GetColor(style.GetLineColor()).AsHexString()
-        print("For {} index {} color {}".format(r, index, line_color))
+        # print("For {} index {} color {}".format(r, index, line_color))
 
         # todo the creation date and git_hash of the original revision should be transferred here
         comparison_revs.append(json_objects.ComparisonRevision(
@@ -524,7 +529,7 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         rf = os.path.basename(plotuple.rootfile)
         if len(rf) > 30:
             rf = rf[:30] + "..."
-        return "'{}' from '{}'".format(key, rf)
+        return f"'{key}' from '{rf}'"
 
     n_warnings = 0
     plotuple_no_warning = []
@@ -543,13 +548,13 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
     if warning_verbosity:
         print()
         if n_warnings:
-            print("A total of {} warnings were issued.".format(n_warnings))
+            print(f"A total of {n_warnings} warnings were issued.")
             for warning, perpetrators in plotuple_by_warning.items():
-                print("* '{}' was issued by "
-                      "{} plotuples".format(warning, len(perpetrators)))
+                print(f"* '{warning}' was issued by {len(perpetrators)} "
+                      f"plotuples")
                 if warning_verbosity >= 2:
                     for perpetrator in perpetrators:
-                        print("  - {}".format(perpetrator))
+                        print(f"  - {perpetrator}")
         else:
             print("No warnings were issued. ")
         print(validationfunctions.congratulator(
@@ -559,15 +564,15 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         print()
 
     if chi2_verbosity:
-        print()
-        print("Chi2 comparisons:")
+        if not warning_verbosity:
+            print()
+        print("Chi2 comparisons")
         for result, perpetrators in plotuples_by_comparison_result.items():
-            print("* '{}' was the result of {} comparisons".format(
-                result, len(perpetrators)
-            ))
+            print(f"* '{result}' was the result of {len(perpetrators)} "
+                  f"comparisons")
             if chi2_verbosity >= 2:
                 for perpetrator in perpetrators:
-                    print("  - {}".format(perpetrator))
+                    print(f"  - {perpetrator}")
         score = len(plotuples_by_comparison_result["equal"]) + \
             0.75 * len(plotuples_by_comparison_result["not_compared"]) + \
             0.5 * len(plotuples_by_comparison_result["warning"])
@@ -976,19 +981,17 @@ def create_plots(revisions=None, force=False, process_queue=None,
     if not revisions:
         revisions = []
 
-    # Retrieve the desired revisions from the command line arguments and store
-    # them in 'revisions'
-    if revisions:
-        # Loop over all revisions given on the command line
-        for revision in revisions:
-            # If it is a valid (i.e. available) revision, append it to the list
-            # of revisions that we will include in our plots
-            # 'reference' needs to be treated
-            # separately, because it is always a viable option, but will never
-            # be listed in 'available_revisions()'
-            if revision in available_revisions(work_folder) \
-                    or revision == 'reference':
-                revisions.append(revision)
+    # Loop over all revisions given on the command line
+    for revision in revisions:
+        # If it is a valid (i.e. available) revision, append it to the list
+        # of revisions that we will include in our plots
+        # 'reference' needs to be treated
+        # separately, because it is always a viable option, but will never
+        # be listed in 'available_revisions()'
+        if revision not in available_revisions(work_folder) \
+                and not revision == 'reference':
+            print(f"Warning: Removing invalid revision '{revision}'.")
+            revisions.pop(revision)
 
     # In case no valid revisions were given, fall back to default and use all
     # available revisions and reference. The order should now be [reference,
@@ -1008,7 +1011,7 @@ def create_plots(revisions=None, force=False, process_queue=None,
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
-        serve_existing_plots()
+        serve_existing_plots(revisions)
     # Otherwise: Create the requested plots
     else:
         generate_new_plots(revisions, work_folder, process_queue)

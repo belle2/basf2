@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck                   *
+ * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck, Torben Ferber    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,6 +15,8 @@
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/Helix.h>
+#include <framework/logging/Logger.h>
 
 // dataobjects from the MDST
 #include <mdst/dataobjects/Track.h>
@@ -256,6 +258,81 @@ namespace Belle2 {
       return double(count);
     }
 
+    // returns extrapolated theta position based on helix parameters
+    double trackHelixExtTheta(const Particle* part, const std::vector<double>& pars)
+    {
+      if (pars.size() != 3) {
+        B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      const double r = pars[0];
+      const double zfwd = pars[1];
+      const double zbwd = pars[2];
+
+      // get the track fit
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) return std::numeric_limits<double>::quiet_NaN();
+
+      // get helix and paremeters
+      const double z0 = trackFit->getZ0();
+      const double tanlambda = trackFit->getTanLambda();
+      const Helix h = trackFit->getHelix();
+
+      // extrapolate to radius
+      const double arcLength = h.getArcLength2DAtCylindricalR(r);
+      const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
+
+      // extrapolate to FWD z
+      const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
+
+      // extrapolate to BWD z
+      const double lBWD = (zbwd - z0) / tanlambda > 0 ? (zbwd - z0) / tanlambda : std::numeric_limits<double>::max();
+
+      // pick smalles arclength
+      const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
+
+      return atan2(h.getPositionAtArcLength2D(l).Perp(), h.getPositionAtArcLength2D(l).Z());
+    }
+
+    // returns extrapolated phi position based on helix parameters
+    double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars)
+    {
+      if (pars.size() != 3) {
+        B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      const double r = pars[0];
+      const double zfwd = pars[1];
+      const double zbwd = pars[2];
+
+      // get the track fit
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) return std::numeric_limits<double>::quiet_NaN();
+
+      // get helix and paremeters
+      const double z0 = trackFit->getZ0();
+      const double tanlambda = trackFit->getTanLambda();
+      const Helix h = trackFit->getHelix();
+
+      // extrapolate to radius
+      const double arcLength = h.getArcLength2DAtCylindricalR(r);
+      const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
+
+      // extrapolate to FWD z
+      const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
+
+      // extrapolate to BWD z
+      const double lBWD = (zbwd - z0) / tanlambda > 0 ? (zbwd - z0) / tanlambda : std::numeric_limits<double>::max();
+
+      // pick smalles arclength
+      const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
+
+      return atan2(h.getPositionAtArcLength2D(l).Y(), h.getPositionAtArcLength2D(l).X());
+    }
+
+
     /***************************************************
      * Event level tracking quantities
      */
@@ -264,7 +341,7 @@ namespace Belle2 {
     double nExtraCDCHits(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       return elti->getNCDCHitsNotAssigned();
     }
 
@@ -273,7 +350,7 @@ namespace Belle2 {
     double nExtraCDCHitsPostCleaning(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       return elti->getNCDCHitsNotAssignedPostCleaning();
     }
 
@@ -281,7 +358,7 @@ namespace Belle2 {
     double hasExtraCDCHitsInLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       int ilayer = int(std::lround(layer[0]));
       return elti->hasCDCLayer(ilayer);
     }
@@ -290,7 +367,7 @@ namespace Belle2 {
     double hasExtraCDCHitsInSuperLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       int ilayer = int(std::lround(layer[0]));
       return elti->hasCDCSLayer(ilayer);
     }
@@ -299,7 +376,7 @@ namespace Belle2 {
     double nExtraCDCSegments(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       return elti->getNCDCSegments();
     }
 
@@ -307,7 +384,7 @@ namespace Belle2 {
     double nExtraVXDHitsInLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       int ilayer = int(std::lround(layer[0]));
       return elti->getNVXDClustersInLayer(ilayer);
     }
@@ -316,7 +393,7 @@ namespace Belle2 {
     double nExtraVXDHits(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       double out = 0.0;
       for (uint16_t ilayer = 1; ilayer < 7; ilayer++)
         out += elti->getNVXDClustersInLayer(ilayer);
@@ -327,7 +404,7 @@ namespace Belle2 {
     double svdFirstSampleTime(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       return elti->getSVDFirstSampleTime();
     }
 
@@ -338,7 +415,7 @@ namespace Belle2 {
     double trackFindingFailureFlag(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      if (!elti) return std::numeric_limits<double>::quiet_NaN();
       return elti->hasAnErrorFlag();
     }
 
@@ -350,7 +427,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
     REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
     REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer, "Last CDC layer associated to the track");
-
     REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");
     REGISTER_VARIABLE("omega",     trackOmega,     "Curvature of the track");
@@ -364,6 +440,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probalility of the track fit");
     REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,
                       "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.");
+    REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta,
+                      "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
+    REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi,
+                      "Returns phi of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
 
     REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, "[Eventbased] The number of CDC hits in the event not assigned to any track");
     REGISTER_VARIABLE("nExtraCDCHitsPostCleaning", nExtraCDCHitsPostCleaning,

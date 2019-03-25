@@ -12,7 +12,7 @@ import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDClusterCuts
 from ROOT.Belle2 import SVDHitTimeSelectionFunction
-
+import datetime
 import os
 
 # default values
@@ -29,6 +29,7 @@ clsMinSNR = 0
 clsScaleErrSize1 = 1
 clsScaleErrSize2 = 1
 clsScaleErrSize3 = 1
+now = datetime.datetime.now()
 
 
 class defaultSVDClusterCalibrationImporter(basf2.Module):
@@ -36,9 +37,6 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
     def beginRun(self):
 
         iov = Belle2.IntervalOfValidity.always()
-
-        cls_payload = Belle2.SVDClusterCalibrations.t_payload()
-        time_payload = Belle2.SVDClusterCalibrations.t_time_payload()
 
         # SpacePoint time
         hitTimeSelection = SVDHitTimeSelectionFunction()
@@ -51,6 +49,9 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         # version 2: |t-t0|<nSgma*tErrTOT - NOT USED
         hitTimeSelection.setNsigma(clsTimeNSigma)
 
+        time_payload = Belle2.SVDClusterCalibrations.t_time_payload(
+            hitTimeSelection, "HitTimeSelection_default_" + str(now.isoformat()) + "_INFO:_tmin=-80")
+
         # cluster reconstruction & position error
         clsParam = SVDClusterCuts()
         clsParam.minSeedSNR = clsSeedSNR
@@ -59,6 +60,19 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         clsParam.scaleError_clSize1 = clsScaleErrSize1
         clsParam.scaleError_clSize2 = clsScaleErrSize2
         clsParam.scaleError_clSize3 = clsScaleErrSize3
+
+        cls_payload = Belle2.SVDClusterCalibrations.t_payload(
+            clsParam,
+            "ClusterCalibrations_default_" +
+            str(
+                now.isoformat()) +
+            "_INFO:_seed=" +
+            str(clsSeedSNR) +
+            "_adj=" +
+            str(clsAdjSNR) +
+            "_cls=" +
+            str(clsMinSNR) +
+            "_scaleFactors=fromSimulation")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -104,7 +118,6 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
                               str(clsParam.scaleError_clSize2) + ", size >2 = " + str(clsParam.scaleError_clSize3))
 
                         cls_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, clsParam)
-                        time_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, hitTimeSelection)
 
         Belle2.Database.Instance().storeData(Belle2.SVDClusterCalibrations.name, cls_payload, iov)
         Belle2.Database.Instance().storeData(Belle2.SVDClusterCalibrations.time_name, time_payload, iov)

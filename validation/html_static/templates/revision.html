@@ -1,17 +1,37 @@
 {{#revisions}}
 <div>
-	<!-- color will be update by the java script method loadValidationPlots -->
-	<div>
-	<input  class="reference-checkbox" name="revisions" 
-			id="reference-checkbox-{{label}}" 
-			value="{{label}}" checked="" 
-			type="checkbox">&nbsp;<label for="reference-checkbox-{{label}}" class="revision-label"
-		style="color: black;">{{ label }}</label>
-	</div>
-	<!-- show some extra information, but not for the reference plots -->
-	{{#if label != "reference" }}
-		<div class="revision-details">{{creation_date}} {{creation_timezone}} | <a class="revision-details-repo-link" href="https://stash.desy.de/projects/B2/repos/software/commits/{{git_hash}}">{{git_hash}}</a></div>
-	{{/if}}
+  <!-- color will be update by the java script method loadValidationPlots -->
+  <div>
+    <input  class="reference-checkbox" name="revisions"
+            id="reference-checkbox-{{label}}"
+            value="{{label}}" checked=""
+            type="checkbox">
+    &nbsp;
+    <label for="reference-checkbox-{{label}}" class="revision-label"
+           style="color: black;">{{ label }}
+    </label>
+  </div>
+  <!-- show some extra information, but not for the reference plots -->
+  {{#if label != "reference" }}
+  <div class="revision-details">{{creation_date}} {{creation_timezone}} | <a target="_blank" class="revision-details-repo-link" href="https://stash.desy.de/projects/B2/repos/software/commits/{{git_hash}}">{{git_hash}}</a></div>
+  {{/if}}
 </div>
 {{/revisions}}
-<button on-click='loadSelectedRevisions'>Load selected</button>
+<!-- actually this should be a div, but then this will be formatted by the
+div: last-child rule, so just make it a span and give it the corresponding
+CSS properties -->
+<span id="button-revision-load-container">
+	<button id="button-revision-load" on-click='loadSelectedRevisions'>Load selected</button>
+</span>
+<span id="prebuilt-select-container" title="Any of the following combinations of revisions is already prebuilt (i.e. no new plots will have to be created). Furthermore, the last selected setting here will be remembered and restored when the validation page is opened.">
+  <span>Popular/prebuilt/default</span>:
+  <label for="prebuilt-select"></label>
+  <select id="prebuilt-select" on-change="loadPrebuildRevisions">
+    <option value="rbn" title="Reference and the latest (pre)release, latest build and latest nightly">Ref + latest rel/build/night</option>
+    <option value="r" title="Reference and the latest (pre)release">Ref + latest release</option>
+    <option value="b" title="Reference and the latest build">Ref + latest build</option>
+    <option value="n" title="Reference and the latest nightly">Ref + latest nightly</option>
+    <option value="nnn" title="Reference and all nightly revisions">Ref + all nightlies</option>
+    <option value="all">Ref + all revisions</option>
+  </select>
+</span>

@@ -75,7 +75,6 @@ pi0_vars = vc.mc_truth + vc.kinematics + \
     vu.create_aliases_for_selected(
         vc.cluster + vc.kinematics, 'pi0 -> ^gamma ^gamma')
 
-
 # Saving variables to ntuple
 output_file = 'B2A401-KFit-MassFit.root'
 variablesToNtuple('B0:all', B0_vars,

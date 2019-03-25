@@ -45,7 +45,7 @@ TRGCDCT3DDQMModule::TRGCDCT3DDQMModule() : HistoModule()
            0);
   addParam("generatePostscript", m_generatePostscript,
            "Genarete postscript file or not",
-           true);
+           false);
   addParam("postScriptName", m_postScriptName,
            "postscript file name",
            string("cdct3ddqm.ps"));
@@ -57,31 +57,33 @@ void TRGCDCT3DDQMModule::defineHisto()
 {
   oldDir = gDirectory;
   dirDQM = NULL;
-  dirDQM = oldDir->mkdir("TRGCDCT3D");
+  //dirDQM = oldDir->mkdir("TRGCDCT3D");
+  if (!oldDir->Get("TRGCDCT3D"))dirDQM = oldDir->mkdir("TRGCDCT3D");
+  else dirDQM = (TDirectory*)oldDir->Get("TRGCDCT3D");
   dirDQM->cd();
   //dz distribution
-  h_dz = new TH1D("hdz", "ndz", 80, -40, 40);
+  h_dz = new TH1D(Form("hdz_mod%d", m_T3DMOD), Form("hdz_mod%d", m_T3DMOD), 80, -40, 40);
   h_dz->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_dz->GetXaxis()->SetTitle("dz");
   //phi distribution
-  h_phi = new TH1D("hphi", "nphi", 100, -6, 6);
+  h_phi = new TH1D(Form("hphi_mod%d", m_T3DMOD), Form("hphi_mod%d", m_T3DMOD), 100, -6, 6);
   h_phi->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_phi->GetXaxis()->SetTitle("phi");
   //tanlambda distribution
-  h_tanlambda = new TH1D("htanlambda", "ntanlambda", 100, -2.5, 2.5);
+  h_tanlambda = new TH1D(Form("htanlambda_mod%d", m_T3DMOD), Form("htanlambda_mod%d", m_T3DMOD), 100, -2.5, 2.5);
   h_tanlambda->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_tanlambda->GetXaxis()->SetTitle("tanlambda");
   //pt distribution
-  h_pt = new TH1D("hpt", "npt", 100, 0, 3);
+  h_pt = new TH1D(Form("hpt_mod%d", m_T3DMOD), Form("hpt_mod%d", m_T3DMOD), 100, 0, 3);
   h_pt->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_pt->GetXaxis()->SetTitle("pt");
 
   //2D phi distribution
-  h_phi_2D = new TH1D("hphi_2D", "nphi_2D", 100, -6, 6);
+  h_phi_2D = new TH1D(Form("hphi_2D_mod%d", m_T3DMOD), Form("hphi_2D_mod%d", m_T3DMOD), 100, -6, 6);
   h_phi_2D->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_phi_2D->GetXaxis()->SetTitle("phi_2D");
   //2D pt distribution
-  h_pt_2D = new TH1D("hpt_2D", "npt_2D", 100, 0, 3);
+  h_pt_2D = new TH1D(Form("hpt_2D_mod%d", m_T3DMOD), Form("hpt_2D_mod%d", m_T3DMOD), 100, 0, 3);
   h_pt_2D->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_pt_2D->GetXaxis()->SetTitle("pt_2D");
   oldDir->cd();
@@ -105,13 +107,20 @@ void TRGCDCT3DDQMModule::beginRun()
 void TRGCDCT3DDQMModule::initialize()
 {
 
-  entAry.isRequired("FirmTRGCDC3DFitterTracks");
-  entAry_2D.isRequired("FirmTRGCDC2DFinderTracks");
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
   REG_HISTOGRAM
   defineHisto();
+
+  char c_name_3D[100];
+  sprintf(c_name_3D, "FirmTRGCDC3DFitterTracks%d", m_T3DMOD);
+  char c_name_2D[100];
+  sprintf(c_name_2D, "FirmTRGCDC2DFinderTracks%d", m_T3DMOD);
+  entAry.isRequired(c_name_3D);
+  entAry_2D.isRequired(c_name_2D);
+  if (!entAry || !entAry.getEntries()) return;
+  if (!entAry_2D || !entAry_2D.getEntries()) return;
 
 }
 

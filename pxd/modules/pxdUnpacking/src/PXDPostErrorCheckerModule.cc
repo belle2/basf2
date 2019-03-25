@@ -41,7 +41,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DATA_OUTSIDE |
     //
     c_DHC_START_SECOND |
-    c_DHE_WRONG_ID_SEQ |
+//    c_DHE_WRONG_ID_SEQ | // until this is fixed in FW, we have to live with this
     c_FIX_SIZE |
     c_DHE_CRC |
     //
@@ -63,10 +63,10 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DHE_START_END_ID |
     c_DHE_START_ID |
     c_DHE_START_WO_END |
-    c_NO_PXD |
+//    c_NO_PXD | // THEN we anyway have no data
     //
 //         c_NO_DATCON |  // does not affect pixel data
-    c_FAKE_NO_DATA_TRIG |
+//         c_FAKE_NO_DATA_TRIG | // this will trigger always!!!!
     c_DHE_ACTIVE |
 //         c_DHP_ACTIVE | // GHOST problem ... bit always set
     //
@@ -98,7 +98,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_META_MM_DHC_ERS |
 //         c_META_MM_DHC_TT | // time tag is not set correctly in EvtMeta
     c_META_MM_ONS_HLT |
-    c_META_MM_ONS_DC |
+//         c_META_MM_ONS_DC | // problem with NO-DATCON
     //
 //         c_EVT_TRG_GATE_DIFFER | // still a bug in DHE FW
 //         c_EVT_TRG_FRM_NR_DIFFER | // still a bug in DHE FW
@@ -116,6 +116,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of input PXDClusters", std::string(""));
 
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
+  B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
 
   addParam("IgnoreTriggerGate", m_ignoreTriggerGate, "Ignore different triggergate between DHEs", true);
   addParam("IgnoreDHPFrame", m_ignoreDHPFrame, "Ignore different dhp frame between DHEs", true);
@@ -132,6 +133,8 @@ void PXDPostErrorCheckerModule::initialize()
   m_storeRawAdc.isOptional(m_PXDRawAdcsName);
   m_storeROIs.isOptional(m_PXDRawROIsName);
   m_storeRawCluster.isOptional(m_RawClusterName);
+
+  B2DEBUG(25, "The set error mask is $" << std::hex << m_criticalErrorMask);
 }
 
 void PXDPostErrorCheckerModule::event()
@@ -151,13 +154,13 @@ void PXDPostErrorCheckerModule::event()
   unsigned short triggergate = 0;
   unsigned short dheframenr = 0;
   PXDErrorFlags mask = EPXDErrMask::c_NO_ERROR;
-  B2DEBUG(20, "Iterate PXD Packets for this Event");
+  B2DEBUG(25, "Iterate PXD Packets for this Event");
   for (auto& pkt : *m_storeDAQEvtStats) {
-    B2DEBUG(20, "Iterate DHC in Pkt " << pkt.getPktIndex());
+    B2DEBUG(25, "Iterate DHC in Pkt " << pkt.getPktIndex());
     for (auto& dhc : pkt) {
-      B2DEBUG(20, "Iterate DHE in DHC " << dhc.getDHCID());
+      B2DEBUG(25, "Iterate DHE in DHC " << dhc.getDHCID());
       for (auto& dhe : dhc) {
-        B2DEBUG(20, "Iterate DHP in DHE " << dhe.getDHEID() << " TrigGate " << dhe.getTriggerGate() << " FrameNr " << dhe.getFrameNr());
+        B2DEBUG(25, "Iterate DHP in DHE " << dhe.getDHEID() << " TrigGate " << dhe.getTriggerGate() << " FrameNr " << dhe.getFrameNr());
         if (had_dhe) {
           if (dhe.getTriggerGate() != triggergate) {
             if (!m_ignoreTriggerGate) B2ERROR("Trigger Gate of DHEs not identical" << LogVar("Triggergate 1",
@@ -175,7 +178,7 @@ void PXDPostErrorCheckerModule::event()
           had_dhe = true;
         }
         for (auto& dhp : dhe) {
-          B2DEBUG(20, "DHP " << dhp.getChipID() << " Framenr " << dhp.getFrameNr());
+          B2DEBUG(25, "DHP " << dhp.getChipID() << " Framenr " << dhp.getFrameNr());
           // TODO check against other DHP (full bits) and DHE (limited bits)
           // TODO We know that this will fail with current firmware and most likely will not be fixed...
         }

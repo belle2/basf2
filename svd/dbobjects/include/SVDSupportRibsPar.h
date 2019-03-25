@@ -77,9 +77,9 @@ namespace Belle2 {
     double getR() const { return m_rpos; }
 
   private:
-    double m_theta;
-    double m_zpos;
-    double m_rpos;
+    double m_theta; /**< theta*/
+    double m_zpos; /**< z position*/
+    double m_rpos; /**< r position*/
 
     ClassDef(SVDSupportTabPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
@@ -115,12 +115,12 @@ namespace Belle2 {
 
   private:
 
-    std::string m_name;
-    double m_height;
-    double m_width;
-    double m_length;
-    double m_zpos;
-    double m_rpos;
+    std::string m_name; /**< name*/
+    double m_height; /**< height*/
+    double m_width; /**< width*/
+    double m_length; /**< length*/
+    double m_zpos; /**< z position*/
+    double m_rpos; /**< r position*/
 
     ClassDef(SVDEndmountPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
@@ -189,21 +189,21 @@ namespace Belle2 {
   private:
 
     // Get the common values for all layers
-    double m_spacing;
-    double m_height;
-    double m_innerWidth;
-    double m_outerWidth;
-    double m_tabLength;
+    double m_spacing; /**< spacing*/
+    double m_height; /**< height*/
+    double m_innerWidth; /**< inner width*/
+    double m_outerWidth; /**< outer width*/
+    double m_tabLength; /**< tab length*/
 
-    std::string m_outerMaterial;
-    std::string m_innerMaterial;
-    std::string m_outerColor;
-    std::string m_innerColor;
-    std::string m_endmountMaterial;
+    std::string m_outerMaterial; /**< outer material name*/
+    std::string m_innerMaterial; /**< inner material name*/
+    std::string m_outerColor; /**< outer material color*/
+    std::string m_innerColor; /**< inner material color*/
+    std::string m_endmountMaterial; /**< endmount material */
 
-    std::vector<SVDSupportTabPar> m_tabs;
-    std::vector<SVDSupportBoxPar> m_boxes;
-    std::vector<SVDEndmountPar> m_endmounts;
+    std::vector<SVDSupportTabPar> m_tabs; /**< vector of svd supper tabs*/
+    std::vector<SVDSupportBoxPar> m_boxes; /**< vector of svd support boxes*/
+    std::vector<SVDEndmountPar> m_endmounts; /**< vector of svd endmounts*/
 
     ClassDef(SVDSupportRibsPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

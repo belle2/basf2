@@ -15,6 +15,7 @@
 #include <G4ParticleTable.hh>
 #include <G4PhysicalConstants.hh>
 #include <G4SystemOfUnits.hh>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
@@ -38,10 +39,9 @@ G4Monopole::G4Monopole(const G4String& name,
 // stable     lifetime      decay_table
 {
   magCharge = eplus * mCharge;
-  G4cout << "Monopole is created: m(GeV)= " << mass / GeV
-         << " Qel= " << eCharge / eplus
-         << " Qmag= " << magCharge / eplus
-         << G4endl;//TODO print with B2INFO
+  B2INFO("Monopole is created: m(GeV)= " << mass / GeV
+         << " Qel(e+)= " << eCharge / eplus
+         << " Qmag(e+)= " << magCharge / eplus);
 }
 
 G4Monopole::~G4Monopole()

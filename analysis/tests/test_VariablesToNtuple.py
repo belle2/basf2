@@ -35,7 +35,7 @@ path.add_module('VariablesToNtuple',
 # Write out number of tracks and ecl-clusters in every event, except for events with 12 tracks where we take only every 100th events
 path.add_module('VariablesToNtuple',
                 particleList='',
-                variables=['nTracks', 'nECLClusters'],
+                variables=['nTracks', 'nKLMClusters'],
                 sampling=('nTracks', {12: 10}),
                 fileName='eventNtuple.root',
                 treeName='eventTree')
@@ -97,7 +97,7 @@ with b2test_utils.clean_working_directory():
     t = f.Get('eventTree')
     assert bool(t), "eventTree isn't contained in file"
     assert t.GetListOfBranches().Contains('nTracks'), "nTracks branch is missing"
-    assert t.GetListOfBranches().Contains('nECLClusters'), "nECLClusters branch is missing"
+    assert t.GetListOfBranches().Contains('nKLMClusters'), "nKLMClusters branch is missing"
     assert t.GetListOfBranches().Contains('__weight__'), "weight branch is missing"
     assert t.GetListOfBranches().Contains('__event__'), "event number branch is missing"
     assert t.GetListOfBranches().Contains('__run__'), "run number branch is missing"

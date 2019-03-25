@@ -21,9 +21,9 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
                                    const std::vector<unsigned>& moduleIDs) : TH2Poly()
 {
 
+  m_type = type;
   SetName(name);
   SetTitle(title);
-
   m_hapd2binMap.assign(420, 0);
 
   // positions of HAPDs and channel mapping (avoid using DB classes...)
@@ -33,8 +33,8 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
   double chns[12] = { -2.88, -2.37, -1.86, -1.35, -0.84, -0.33, 0.33, 0.84, 1.35, 1.86, 2.37, 2.88};
 
   float size = 0.5 / 2. - 0.01;
-  if (type == 1) size = 7.0 / 2. - 0.5;
-
+  if (m_type == 1) size = 7.0 / 2. - 0.5;
+  if (m_type == 2) size = 3.3 / 2.;
 
   float X[5], Y[5], globX[5], globY[5];
   X[0] = -size;  Y[0] = -size;
@@ -56,7 +56,7 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
   }
 
   // HAPD bins
-  if (type == 1) {
+  if (m_type == 1) {
     for (int hapdID = 1; hapdID < 421; hapdID++) {
       //for (unsigned hapdID : ids) {
       //m_hapd2binMap[hapdID - 1] = nhapd;
@@ -82,7 +82,7 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
       if (ihapd == nhapds[iring]) { iring++; ihapd = 0;}
     }
 
-  } else if (type == 0) {
+  } else if (m_type == 0) {
     for (int hapdID = 1; hapdID < 421; hapdID++) {
       //for (unsigned hapdID : ids) {
       //  m_hapd2binMap[hapdID - 1] = nhapd;
@@ -115,21 +115,55 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
       ihapd++;
       if (ihapd == nhapds[iring]) { iring++; ihapd = 0;}
     }
-  } else std::cout << "Invalid histogram type! use 0 for channel bins or 1 for HAPD bins" << std::endl;
-  SetOption("colz");
+  } else if (m_type == 2) {
+    size += 0.2;
+    for (int hapdID = 1; hapdID < 421; hapdID++) {
+      float dphi = 2.*M_PI / nhapds[iring];
+      float fi = dphi / 2. + ihapd * dphi;
+      float r = rs[iring];
+      TVector2 hapdPos(r * cos(fi), r * sin(fi));
+      for (int chipID = 0; chipID < 4; chipID++) {
+        TVector2 locPos(-size + (chipID / 2)*size * 2, size - (chipID % 2)*size * 2);
+        TVector2 centerPos = hapdPos + locPos.Rotate(fi);
 
+        for (int i = 0; i < 5; i++) {
+          float rotX = X[i] * cos(fi) - Y[i] * sin(fi);
+          float rotY = X[i] * sin(fi) + Y[i] * cos(fi);
+          globX[i] = rotX + centerPos.X();
+          globY[i] = rotY + centerPos.Y();
+        }
+
+        if (std::find(ids.begin(), ids.end(), hapdID) != ids.end()) {
+          m_hapd2binMap[hapdID - 1] = nhapd;
+          if (chipID == 3) nhapd++;
+          TGraph* mybox = new TGraph(5, globX, globY);
+          mybox->SetName((to_string(hapdID)).c_str());
+          AddBin(mybox);
+        }
+      }
+      ihapd++;
+      if (ihapd == nhapds[iring]) { iring++; ihapd = 0;}
+    }
+  } else  std::cout << "Invalid histogram type! use 0 for channel bins or 1 for HAPD bins" << std::endl;
+  SetOption("colz");
+  SetStats(0);
+  GetXaxis()->SetLimits(-115., 115.);
+  GetYaxis()->SetLimits(-115., 115.);
 }
 
 void ARICHChannelHist::fillBin(unsigned hapdID, unsigned chID)
 {
-  unsigned chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
+  unsigned chIndex = 0;
+  if (m_type == 0) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
+  if (m_type == 2) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 4 + chID + 1;
   SetBinContent(chIndex, GetBinContent(chIndex) + 1);
 }
 
 void ARICHChannelHist::setBinContent(unsigned hapdID, unsigned chID, double value)
 {
-
-  unsigned chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
+  unsigned chIndex = 0;
+  if (m_type == 0) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
+  if (m_type == 2) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 4 + chID + 1;
   SetBinContent(chIndex, value);
 }
 

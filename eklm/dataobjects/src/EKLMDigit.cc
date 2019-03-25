@@ -119,7 +119,7 @@ void EKLMDigit::setGeneratedNPE(int npe)
 
 bool EKLMDigit::isGood() const
 {
-  return m_fitStatus == EKLM::c_FPGASuccessfulFit;
+  return m_fitStatus == KLM::c_ScintillatorFirmwareSuccessfulFit;
 }
 
 int EKLMDigit::getPlane() const

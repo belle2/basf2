@@ -24,7 +24,7 @@ REG_MODULE(EKLMADC)
 static const char MemErr[] = "Memory allocation error.";
 
 EKLMADCModule::EKLMADCModule() : Module(),
-  m_fout(nullptr), m_DigPar(nullptr), m_hDir(nullptr), m_hRef(nullptr)
+  m_fout(nullptr), m_SciSimPar(nullptr), m_hDir(nullptr), m_hRef(nullptr)
 {
   setDescription("Standalone generation and studies of ADC output.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -42,15 +42,15 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
 {
   int j;
   double t, s;
-  EKLM::FiberAndElectronics fe(m_DigPar, nullptr, 0, false);
+  KLM::ScintillatorSimulator fe(m_SciSimPar, nullptr, 0, false);
   TH1F* h = nullptr;
-  t = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
+  t = m_SciSimPar->getNDigitizations() * m_SciSimPar->getADCSamplingTime();
   try {
-    h = new TH1F(name, "", m_DigPar->getNDigitizations(), 0, t);
+    h = new TH1F(name, "", m_SciSimPar->getNDigitizations(), 0, t);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (j = 0; j < m_DigPar->getNDigitizations(); j++) {
+  for (j = 0; j < m_SciSimPar->getNDigitizations(); j++) {
     m_hDir[j] = 0;
     m_hRef[j] = 0;
   }
@@ -59,9 +59,9 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
   fe.fillSiPMOutput(m_hDir, true, false);
   fe.fillSiPMOutput(m_hRef, false, true);
   s = 0;
-  for (j = 0; j < m_DigPar->getNDigitizations(); j++)
+  for (j = 0; j < m_SciSimPar->getNDigitizations(); j++)
     s = s + m_hDir[j] + m_hRef[j];
-  for (j = 1; j <= m_DigPar->getNDigitizations(); j++)
+  for (j = 1; j <= m_SciSimPar->getNDigitizations(); j++)
     h->SetBinContent(j, (m_hDir[j - 1] + m_hRef[j - 1]) / s);
   h->Write();
   delete h;
@@ -75,19 +75,19 @@ void EKLMADCModule::initialize()
   int i;
   /* cppcheck-suppress variableScope */
   double l;
-  if (!m_DigParDatabase.isValid())
+  if (!m_SciSimParDatabase.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
-  m_DigPar = new EKLMDigitizationParameters(*m_DigParDatabase);
+  m_SciSimPar = new KLMScintillatorDigitizationParameters(*m_SciSimParDatabase);
   const EKLM::GeometryData* geoDat = &EKLM::GeometryData::Instance();
   try {
     m_fout = new TFile(m_out.c_str(), "recreate");
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  m_hDir = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
+  m_hDir = (float*)malloc(m_SciSimPar->getNDigitizations() * sizeof(float));
   if (m_hDir == nullptr)
     B2FATAL(MemErr);
-  m_hRef = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
+  m_hRef = (float*)malloc(m_SciSimPar->getNDigitizations() * sizeof(float));
   if (m_hRef == nullptr)
     B2FATAL(MemErr);
   if (m_mode.compare("Strips") == 0) {
@@ -99,7 +99,7 @@ void EKLMADCModule::initialize()
       generateHistogram(str, l, l, 10000);
     }
   } else if (m_mode.compare("Shape") == 0) {
-    m_DigPar->setMirrorReflectiveIndex(0);
+    m_SciSimPar->setMirrorReflectiveIndex(0);
     generateHistogram("FitShape", 0, 0, 1000000);
   } else
     B2FATAL("Unknown operation mode.");
@@ -123,6 +123,6 @@ void EKLMADCModule::endRun()
 
 void EKLMADCModule::terminate()
 {
-  delete m_DigPar;
+  delete m_SciSimPar;
 }
 

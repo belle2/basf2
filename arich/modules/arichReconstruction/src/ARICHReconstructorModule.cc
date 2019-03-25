@@ -79,7 +79,7 @@ namespace Belle2 {
   void ARICHReconstructorModule::initialize()
   {
     // Initialize variables
-
+    if (m_ana) delete m_ana;
     m_ana = new ARICHReconstruction(m_storePhot);
     m_ana->setTrackPositionResolution(m_trackPositionResolution);
     m_ana->setTrackAngleResolution(m_trackAngleResolution);
@@ -106,15 +106,17 @@ namespace Belle2 {
     StoreArray<ARICHLikelihood> likelihoods;
     likelihoods.registerInDataStore();
 
-    likelihoods.registerRelationTo(extHits);
-    likelihoods.registerRelationTo(aeroHits);
-    tracks.registerRelationTo(likelihoods);
-
     StoreArray<ARICHTrack> arichTracks;
+    arichTracks.registerInDataStore();
+
+    if (m_inputTrackType) arichTracks.registerRelationTo(likelihoods);
+    else {
+      arichTracks.registerRelationTo(extHits);
+      tracks.registerRelationTo(likelihoods);
+    }
     //arichTracks.registerInDataStore(DataStore::c_DontWriteOut);
     //arichTracks.registerRelationTo(likelihoods, DataStore::c_Event, DataStore::c_DontWriteOut);
-    arichTracks.registerInDataStore();
-    arichTracks.registerRelationTo(likelihoods);
+    arichTracks.registerRelationTo(aeroHits);
     printModuleParams();
   }
 
@@ -195,9 +197,8 @@ namespace Belle2 {
         m_ana->likelihood2(*arichTrack, arichHits, *like);
         // make relations
         track->addRelationTo(like);
-        arichTrack->addRelationTo(like);
-        like->addRelationTo(arich2ndHit);
-        if (aeroHit) like->addRelationTo(aeroHit);
+        arichTrack->addRelationTo(arich2ndHit);
+        if (aeroHit) arichTrack->addRelationTo(aeroHit);
 
       } // Tracks loop
     } // input type if
@@ -225,7 +226,7 @@ namespace Belle2 {
         m_ana->likelihood2(*arichTrack, arichHits, *like);
         // make relation
         arichTrack->addRelationTo(like);
-        like->addRelationTo(aeroHit);
+        arichTrack->addRelationTo(aeroHit);
       } // for iTrack
 
     }

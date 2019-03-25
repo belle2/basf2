@@ -26,8 +26,8 @@ path.add_module('VariablesToHistogram',
 # Write out number of tracks and ecl-clusters in every event into histograms
 path.add_module('VariablesToHistogram',
                 particleList='',
-                variables=[('nTracks', 31, -0.5, 30.5), ('nECLClusters', 51, -0.5, 50.5)],
-                variables_2d=[('nTracks', 31, -0.5, 30.5, 'nECLClusters', 51, -0.5, 50.5)],
+                variables=[('nTracks', 31, -0.5, 30.5), ('nKLMClusters', 51, -0.5, 50.5)],
+                variables_2d=[('nTracks', 31, -0.5, 30.5, 'nKLMClusters', 51, -0.5, 50.5)],
                 fileName='eventNtuple.root')
 
 
@@ -72,11 +72,11 @@ with b2test_utils.clean_working_directory():
     assert t.GetBinContent(13) > t.GetBinContent(29), 'Expected more 12 track events than 29 track events'
     ntracks_12_1d = t.GetBinContent(13)
 
-    t = f.Get('nECLClusters')
-    assert bool(t), "nECLClusters histogram isn't contained in file"
+    t = f.Get('nKLMClusters')
+    assert bool(t), "nKLMClusters histogram isn't contained in file"
 
-    t = f.Get('nTracksnECLClusters')
-    assert bool(t), "nTracksnECLClusters 2d histogram isn't contained in file"
+    t = f.Get('nTracksnKLMClusters')
+    assert bool(t), "nTracksnKLMClusters 2d histogram isn't contained in file"
     ntracks_12_2d = []
     for i in range(53):
         ntracks_12_2d.append(t.GetBinContent(13, i))

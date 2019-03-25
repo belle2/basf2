@@ -7,7 +7,7 @@
   <contact>tkuhr</contact>
   <cacheable/>
   <description>
-    This steering file produces 10000 cosmic ray events without background.
+    This steering file produces 10000 cosmic ray events without background, for the early_phase3 geometry.
   </description>
 </header>
 """
@@ -21,7 +21,7 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10000], runList=[1], expList=[0])
+main.add_module('EventInfoSetter', evtNumList=[10000], runList=[1], expList=[1003])
 
 # generate BBbar events
 main.add_module('Cosmics')

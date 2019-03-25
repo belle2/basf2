@@ -30,10 +30,10 @@ namespace Belle2 {
    */
   namespace SVDRunType {
     constexpr uint8_t
-    raw = 0,
-    transparent = 1,
-    zero_suppressed = 2,
-    zero_suppressed_timefit = 3;
+    raw = 0, /**< 00. raw data*/
+    transparent = 1, /**< 01. transparent data*/
+    zero_suppressed = 2, /**< 10. zero suppressed*/
+    zero_suppressed_timefit = 3; /**< 11. zero suppressed + hit time finding*/
   }
 
   /** Event Type, 3 bits, separated into 1+2 bits:
@@ -43,8 +43,8 @@ namespace Belle2 {
    */
   namespace SVDEventType {
     constexpr uint8_t
-    global_run = 0,
-    local_run = 1;
+    global_run = 0, /**< global run */
+    local_run = 1; /**< local run - should never happen */
   }
 
   /** 2+3 bit:
@@ -54,16 +54,16 @@ namespace Belle2 {
    */
   namespace SVDDAQModeType {
     constexpr uint8_t
-    daq_1sample = 0,
-    daq_3samples = 1,
-    daq_6samples = 2;
+    daq_1sample = 0, /**< one sample per strip */
+    daq_3samples = 1, /**< three samples per strip */
+    daq_6samples = 2; /**< six samples per strip */
   }
 
   /**
    * Class to store SVD mode information
    *
    * - Mode : Zero suppressed 6- or 3- samples + unknown mode
-   * - Trigger time bin - 2 bits, correct values 0-3, other - error
+   * - Trigger time bin - 3 bits, correct values 0-3, other - error
    */
   class SVDModeByte {
   public:
@@ -71,7 +71,7 @@ namespace Belle2 {
     typedef uint8_t baseType;
     enum {
       /** Number of bits available to represent a triggerBin */
-      TriggerBinBits = 2,
+      TriggerBinBits = 3,
       /** Number of bits available to represent DAQ Mode */
       DAQModeBits = 2,
       /** Number of bits available to represent event type */
@@ -96,11 +96,11 @@ namespace Belle2 {
 
     };
 
-    /** Default / non-informative id 1001000 = 72
+    /** Default / non-informative id 10010111 = 151
      * Run type: zero-suppressed, 2
      * Event type: global run, 0
      * DAQ mode: 6-samples, 2
-     * Trigger bin 0 - no "not set" or neutral option available
+     * Trigger invalid 111 = 7
      */
     static const baseType c_DefaultID;
 

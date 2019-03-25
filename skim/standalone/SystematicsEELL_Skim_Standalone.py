@@ -16,7 +16,7 @@ from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-00-03'
 
 skimCode = encodeSkimName('SystematicsEELL')
 import sys
@@ -26,12 +26,8 @@ import glob
 skimpath = Path()
 
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
-
-inputMdstList('MC9', fileList, path=skimpath)
+fileList = get_test_file("mixedBGx1", "MC11")
+inputMdstList('default', fileList, path=skimpath)
 
 stdE('all', path=skimpath)
 stdMu('all', path=skimpath)

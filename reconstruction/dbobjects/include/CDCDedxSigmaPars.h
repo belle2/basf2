@@ -67,7 +67,7 @@ namespace Belle2 {
     void setSigmaPar(int par, double value) {m_sigmapars[par] = value; };
 
   private:
-    short m_version; /**< version number for sigma parameterization */
+    short m_version{ -1}; /**< version number for sigma parameterization */
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
     ClassDef(CDCDedxSigmaPars, 1); /**< ClassDef */

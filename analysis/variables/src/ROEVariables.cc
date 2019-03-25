@@ -63,13 +63,13 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe;
       if (not roe.isValid()) {
         B2WARNING("Please use isCloneOfSignalSide variable in for_each ROE loop!");
-        return 0;
+        return -999.;
       }
       auto* particleMC = particle->getRelatedTo<MCParticle>();
       if (!particleMC) {
         return 0.0;
       }
-      Particle* signal = roe->getRelatedFrom<Particle>();
+      auto* signal = roe->getRelatedFrom<Particle>();
       auto signalFSPs = signal->getFinalStateDaughters();
       for (auto* daughter : signalFSPs) {
         auto* daughterMC = daughter->getRelatedTo<MCParticle>();
@@ -84,7 +84,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe;
       if (!roe.isValid()) {
         B2WARNING("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
-        return 0;
+        return -999.;
       }
       auto* particleMC = particle->getRelatedTo<MCParticle>();
       if (!particleMC) {
@@ -1928,12 +1928,12 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("isCloneOfSignalSide", isCloneOfSignalSide,
                       "Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise. "
-                      "Requires generated information and truth-matching. "
+                      "Requires generator information and truth-matching. "
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("hasAncestorFromSignalSide", hasAncestorFromSignalSide,
                       "Returns 1 if a particle has ancestor from signal side, 0 otherwise. "
-                      "Requires generated information and truth-matching. "
+                      "Requires generator information and truth-matching. "
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,

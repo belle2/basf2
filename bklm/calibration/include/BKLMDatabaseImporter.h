@@ -19,6 +19,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <bklm/dbobjects/BKLMADCThreshold.h>
+
 namespace Belle2 {
 
 //! BKLM database importer.
@@ -95,7 +97,7 @@ namespace Belle2 {
     void exportBklmDigitizationParams();
 
     //! Import BKLM scintillator ADC parameters in database
-    void importBklmADCThreshold();
+    void importBklmADCThreshold(BKLMADCThreshold* threshold);
 
     //! Export BKLM scintillator ADC parameters from database
     void exportBklmADCThreshold();

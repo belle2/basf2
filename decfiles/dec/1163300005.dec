@@ -1,0 +1,60 @@
+# EventType: 1163300005
+# Descriptor: [B0 -> D** tau nu ]cc
+# NickName: B0_D**taunu
+# Documentation: B0->D** tau nu process, tag B decays exclusively as B->(D->Kpi(pi))pi
+# Tested: No
+# PhysicsWG: SL
+# Responsible: Sourav Dey
+# Email: souravdey@tauex.tau.ac.il 
+# Cuts: None
+# Date: 20190124
+#
+#
+Alias mytau+ tau+
+Alias mytau- tau-
+ChargeConj mytau- mytau+
+
+Alias myD+ D+
+Alias myD- D-
+ChargeConj myD- myD+
+
+Alias B0tag B0
+Alias anti-B0tag anti-B0
+ChargeConj B0tag anti-B0tag
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0tag anti-B0tag	VSS_BMIX dm;
+Enddecay
+#
+
+#central values from HFAG average
+
+Decay B0sig
+
+0.0013   D_1-    mytau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   D_0*-   mytau+ nu_tau                  LLSW 0.68 -0.2 0.3;
+0.0020   D'_1-   mytau+ nu_tau                  LLSW 0.68 -0.2 0.3;
+0.0020   D_2*-   mytau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
+
+Enddecay
+CDecay anti-B0sig
+#
+
+Decay mytau-
+0.154002925 e-      anti-nu_e nu_tau                        PHOTOS TAULNUNU; 
+0.17000000  mu-     anti-nu_mu nu_tau                       PHOTOS  TAULNUNU; 
+Enddecay
+CDecay mytau+
+
+
+Decay B0tag
+1.00 myD- pi+        PHOTOS            PHSP;
+Enddecay
+CDecay anti-B0tag
+
+Decay myD-
+1.00 K+ pi- pi-    PHOTOS       D_DALITZ;
+Enddecay
+CDecay myD+
+
+End

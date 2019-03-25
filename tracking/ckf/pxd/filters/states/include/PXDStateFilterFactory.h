@@ -25,7 +25,7 @@ namespace Belle2 {
 
   public:
     /// Constructor forwarding the default filter name
-    PXDStateFilterFactory(const std::string& defaultFilterName = "all");
+    explicit PXDStateFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
     ~PXDStateFilterFactory();

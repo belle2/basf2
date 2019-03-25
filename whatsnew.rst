@@ -26,6 +26,25 @@ This has several important consequences for the creation of particles and using 
 This is handled correctly by the ParticleLoader and ParticleCombiner (the corresponding convenience functions are `modularAnalysis.fillParticleList` and `modularAnalysis.reconstructDecay`).
 Essentially: it is forbidden from now onwards for any other analysis modules to create particles.
 
+.. rubric:: Abort processing for invalid or missing global tags
+
+If users specify a global tag to be used which is either marked as invalid in
+the database or which cannot be found in the database the processing is now
+aborted.
+
+.. rubric:: Restrict usage of ``useDB=False`` for Geometry creation
+
+Creating the geometry from XML files instead of the configuration in the
+Database may lead to wrong results. So while the option ``useDB=False`` is
+still necessary to debug changes to the geometry definitions it is now
+restricted to only be used for ``exp, run = 0, 0`` to protect users from
+mistakes.
+
+This also changes the behavior of `add_simulation()
+<simulation.add_simulation>` and `add_reconstruction()
+<reconstruction.add_reconstruction>`: If a list of components is provided this
+will now only change the digitization or reconstruction setup but will always
+use the full geometry from the database.
 
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see

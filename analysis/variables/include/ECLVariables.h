@@ -306,6 +306,12 @@ namespace Belle2 {
     double eclClusterEoP(const Particle* part);
 
     /**
+     * [Expert] The invariant mass calculated from all ECLCluster daughters (i.e. photons) and cluster-matched tracks using the CLUSTER 4-MOMENTA.
+     * Used for ECL-based dark sector physics and debugging track-cluster matching.
+     */
+    double eclClusterOnlyInvariantMass(const Particle* part);
+
+    /**
      * return the number of TCs above threshold
      */
     double getNumberOfTCs(const Particle*, const std::vector<double>& vars);
@@ -384,6 +390,11 @@ namespace Belle2 {
      * Returns true if cluster is related to maximum TC
      */
     double eclTCIsMaximumForCluster(const Particle* particle);
+
+    /**
+     * Returns cluster mdst array index
+     */
+    double eclClusterMdstIndex(const Particle* particle);
 
   }
 } // Belle2 namespace

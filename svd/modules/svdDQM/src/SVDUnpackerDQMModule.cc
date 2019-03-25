@@ -85,18 +85,19 @@ void SVDUnpackerDQMModule::defineHisto()
   const unsigned short Bins_FADCMatch = 1;
   const unsigned short Bins_UpsetAPV = 1;
   const unsigned short Bins_BadMapping = 1;
+  const unsigned short Bins_BadHeader = 1;
+  const unsigned short Bins_BadTrailer = 1;
 
   const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
-                               Bins_BadMapping;
+                               Bins_BadMapping + Bins_BadHeader + Bins_BadTrailer;
 
-  //  DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "Monitor SVD Histo", nBits, 1, nBits + 1, 48, 1, 49);
-  DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "Monitor SVD Histo", nBits, 1, nBits + 1, 52, 1, 53);
+  DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
 
   DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
 
 
-  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "badMapping"};
+  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "badHead", "badTrail", "badMapping"};
 
   //preparing X axis of the histogram
   for (unsigned short i = 0; i < nBits; i++) DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
@@ -119,7 +120,19 @@ void SVDUnpackerDQMModule::initialize()
 void SVDUnpackerDQMModule::beginRun()
 {
 
-  if (DQMUnpackerHisto != NULL) DQMUnpackerHisto->Reset();
+  StoreObjPtr<EventMetaData> evtMetaData;
+  int expNumber = evtMetaData->getExperiment();
+  int runNumber = evtMetaData->getRun();
+  TString histoTitle = TString::Format("SVD Data Format Monitor, Exp %d Run %d", expNumber, runNumber);
+
+
+
+  if (DQMUnpackerHisto != NULL) {
+    DQMUnpackerHisto->Reset();
+    DQMUnpackerHisto->SetTitle(histoTitle.Data());
+  }
+
+  shutUpNoData = false;
 
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
 
@@ -142,11 +155,11 @@ void SVDUnpackerDQMModule::beginRun()
 
 void SVDUnpackerDQMModule::event()
 {
-  if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) {
-    B2ERROR("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD monitoring disabled");
-  }
+  if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) if (!shutUpNoData) {
+      B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
+      shutUpNoData = true;
+    }
 
-  if (m_eventMetaDataPtr->getEvent() % 1000 == 0) B2INFO("event number: " << m_eventMetaDataPtr->getEvent());
 
   unsigned int nDiagnostics = m_svdDAQDiagnostics.getEntries();
 
@@ -162,6 +175,8 @@ void SVDUnpackerDQMModule::event()
     fadcMatch = m_svdDAQDiagnostics[i]->getFADCMatch();
     upsetAPV = m_svdDAQDiagnostics[i]->getUpsetAPV();
     badMapping = m_svdDAQDiagnostics[i]->getBadMapping();
+    badHeader = m_svdDAQDiagnostics[i]->getBadHeader();
+    badTrailer = m_svdDAQDiagnostics[i]->getBadTrailer();
 
     fadcNo = m_svdDAQDiagnostics[i]->getFADCNumber();
     //apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
@@ -171,7 +186,8 @@ void SVDUnpackerDQMModule::event()
       if (fadc_map.find(fadcNo) == fadc_map.end())   fadc_map.insert(make_pair(fadcNo, ++bin_no));
     }
 
-    if (ftbFlags != 0 or ftbError != 240 or apvError != 0 or !apvMatch or !fadcMatch or upsetAPV or badMapping) {
+    if (ftbFlags != 0 or ftbError != 240 or apvError != 0 or !apvMatch or !fadcMatch or upsetAPV or badMapping or badHeader
+        or badTrailer) {
       auto ybin = fadc_map.find(fadcNo);
 
       if (badMapping)  {
@@ -180,9 +196,12 @@ void SVDUnpackerDQMModule::event()
           fadc_map.clear();
           break;
         } else {
-          DQMUnpackerHisto->Fill(17, ybin->second);
+          DQMUnpackerHisto->Fill(19, ybin->second);
         }
       }
+
+      if (badHeader) DQMUnpackerHisto->Fill(17, ybin->second);
+      if (badTrailer) DQMUnpackerHisto->Fill(18, ybin->second);
 
       if (ftbFlags != 0) {
         if (ftbFlags & 16) DQMUnpackerHisto->Fill(5, ybin->second);

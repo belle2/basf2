@@ -41,8 +41,7 @@ class ReplaceTOPLikelihoods(Module):
 # - payloads are searched for in the reverse order of DB's given below;
 #   therefore the new calibration, if provided, is taken from the local DB.
 # - one can even use several local DB's
-use_central_database('development')  # some new stuff not in prod6 tag
-use_central_database('data_reprocessing_prod6')  # global tag used in production of cdst
+use_central_database('data_reprocessing_proc7')  # global tag used in production of cdst
 use_local_database('localDB/localDB.txt', 'localDB/')  # new calibration
 
 # Create path
@@ -52,15 +51,8 @@ main = create_path()
 roinput = register_module('RootInput')
 main.add_module(roinput)
 
-# geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry
-geometry = register_module('Geometry')
-geometry.param('components', ['MagneticField', 'TOP'])
-geometry.param('useDB', False)
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # Time Recalibrator
 recalibrator = register_module('TOPTimeRecalibrator')

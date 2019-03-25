@@ -131,6 +131,7 @@ main = create_path()
 setupEventInfo(100, main)
 add_evtgen_generator(main, 'charged')
 add_simulation(main, components=['SVD'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["SVD"])
 
 
 # if run on real data

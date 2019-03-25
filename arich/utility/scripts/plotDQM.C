@@ -8,20 +8,20 @@ void plotDQM(){
   
   gStyle->SetPalette(1);
   
-  TH1F* hBits = (TH1F*)_file0->Get("ARICHDQM/h_bits"); 
-  TH1F* hHits = (TH1F*)_file0->Get("ARICHDQM/h_hitsPerEvent"); 
-  TH1F* hHitsHapd = (TH1F*)_file0->Get("ARICHDQM/h_chHit"); 
-  TH1F* hHitsMerger = (TH1F*)_file0->Get("ARICHDQM/h_mergerHit");
-  TH1F* htheta = (TH1F*)_file0->Get("ARICHDQM/h_theta");
-  TH1F* hHitsPerTrack = (TH1F*)_file0->Get("ARICHDQM/h_hitsPerTrack"); 
-  TH2F* hHitsHAPDperEvent = (TH2F*)_file0->Get("ARICHDQM/h_hapdHitPerEvent"); 
+  TH1F* hBits = (TH1F*)_file0->Get("ARICH/bits"); 
+  TH1F* hHits = (TH1F*)_file0->Get("ARICH/hitsPerEvent"); 
+  TH1F* hHitsHapd = (TH1F*)_file0->Get("ARICH/chHit"); 
+  TH1F* hHitsMerger = (TH1F*)_file0->Get("ARICH/mergerHit");
+  TH1F* htheta = (TH1F*)_file0->Get("ARICH/theta");
+  TH1F* hHitsPerTrack = (TH1F*)_file0->Get("ARICH/hitsPerTrack"); 
+  TH2F* hHitsHAPDperEvent = (TH2F*)_file0->Get("ARICH/hapdHitPerEvent"); 
   
   // create 2D hit map using ARICHChannelHist
-  Belle2::ARICHChannelHist* chHits = new Belle2::ARICHChannelHist("chHits","# of hits/channel");
+  Belle2::ARICHChannelHist* chHits = new Belle2::ARICHChannelHist("chHits1","# of hits/channel");
   for(int i=1;i<421;i++){
     for(int j=0;j<144;j++){
       int ch = (i-1)*144 + j;
-      chHits->setBinContent(i,j,hHitsHapd->GetBinContent(ch+1));
+      chHits->setBinContent(i,j,double(hHitsHapd->GetBinContent(ch+1)));
     }
   }  
   

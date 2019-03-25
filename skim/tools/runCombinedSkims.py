@@ -2,11 +2,46 @@ import subprocess
 from skimExpertFunctions import *
 
 all_skims = [
-    "Dark", "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "Tau", "MiscCombined", "feiHadronic", "ALP3Gamma",
+    "Dark", "Charm", "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "MiscCombined", "feiHadronic",
     "Semileptonic", "Quarkonium", "feiSLWithOneLepCombined"
 ]
-all_data_types = {
+MC11_types = {
 
+    "MC11_mixedBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005678/s00/e0000/4S/r00000/mixed/' +
+    'mdst/sub00/mdst_000995_prod00005678_task00000995.root',
+    "MC11_chargedBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005679/s00/e0000/4S/r00000/charged/' +
+    'mdst/sub00/mdst_000990_prod00005679_task00000992.root',
+    "MC11_ccbarBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005683/s00/e0000/4S/r00000/ccbar/' +
+    'mdst/sub00/mdst_000994_prod00005683_task00001024.root',
+    "MC11_uubarBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005680/s00/e0000/4S/r00000/uubar/' +
+    'mdst/sub00/mdst_000962_prod00005680_task00000976.root',
+    "MC11_ddbarBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005681/s00/e0000/4S/r00000/ddbar/' +
+    'mdst/sub00/mdst_000995_prod00005681_task00000996.root',
+    "MC11_ssbarBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005682/s00/e0000/4S/r00000/ssbar/' +
+    'mdst/sub00/mdst_000995_prod00005681_task00000996.root',
+    "MC11_taupairBGx1": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005684/s00/e0000/4S/r00000/taupair/' +
+    'mdst/sub00/mdst_000999_prod00005684_task00001002.root',
+    "MC11_mixedBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006102/s00/e0000/4S/r00000/mixed/' +
+    'mdst/sub00/mdst_000001_prod00006102_task00000001.root',
+    "MC11_chargedBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006103/s00/e0000/4S/r00000/charged/' +
+    'mdst/sub00/mdst_000001_prod00006103_task00000001.root',
+    "MC11_ccbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006107/s00/e0000/4S/r00000/ccbar/' +
+    'mdst/sub00/mdst_000001_prod00006107_task00000001.root',
+    "MC11_uubarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006104/s00/e0000/4S/r00000/uubar/' +
+    'mdst/sub00/mdst_000001_prod00006104_task00000001.root',
+    "MC11_ddbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006105/s00/e0000/4S/r00000/ddbar/' +
+    'mdst/sub00/mdst_000486_prod00006105_task00000491.root',
+    "MC11_ssbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006106/s00/e0000/4S/r00000/ssbar/' +
+    'mdst/sub00/mdst_000001_prod00006106_task00000001.root',
+    "MC11_taupairBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00006108/s00/e0000/4S/r00000/taupair/' +
+    'mdst/sub00/mdst_000001_prod00006108_task00000001.root',
+    "MC11_mixedBGx0": '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005215/s00/e0000/4S/r00000/mixed/' +
+    'mdst/sub00/mdst_000985_prod00005215_task00000990.root',
+
+}
+
+
+MC10_types = {
     # MC10 generic samples
     "MC10_mixedBGx1": '/ghi/fs01/belle2/bdata/MC/release-01-00-03/DB00000294/MC10/prod00004770/s00/e0000/4S/r00000/mixed/' +
     'mdst/sub00/mdst_000001_prod00004770_task00000001.root',
@@ -36,7 +71,10 @@ all_data_types = {
     'mdst/sub00/mdst_000001_prod00004776_task00000001.root',
     "MC10_taupairBGx0": '/ghi/fs01/belle2/bdata/MC/release-01-00-03/DB00000294/MC10/prod00003603/s00/e0000/4S/r00000/taupair/' +
     'mdst/sub00/mdst_000001_prod00003603_task00000001.root',
+}
 
+
+MC9_types = {
     # MC9 generic samples
     "MC9_mixedBGx1": '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root',
@@ -69,13 +107,13 @@ all_data_types = {
 }
 
 for skim in all_skims:
-    for dtype, input_file in all_data_types.items():
+    for dtype, input_file in MC11_types.items():
         print(skim)
         print(dtype)
         script = f"../combined/{skim}_Skim_Standalone.py"
         log_file = f"{skim}_{dtype}.out"
         err_file = f"{skim}_{dtype}.err"
-        output_file = f"{skim}_{dtype}.udst.root"
+        output_file = f"combinedFiles/{skim}_{dtype}.udst.root"
 
         print(f"Running {script} on {input_file} to {output_file}")
         subprocess.run(["bsub", "-q", "l", "-oo", log_file, "-e", err_file, "basf2", script,

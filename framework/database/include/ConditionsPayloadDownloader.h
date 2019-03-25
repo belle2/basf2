@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <set>
 #include <framework/utilities/FileSystem.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/EConditionsDirectoryStructure.h>
@@ -93,7 +94,7 @@ namespace Belle2 {
     }
 
     /** Set the server list to try to connect to a central server
-     *  @param servList list of urls to try in turn to find a suitable server
+     *  @param serverList list of urls to try in turn to find a suitable server
      *    to connect to. The servers will be tried in order until one succeeds
      */
     void setServerList(const std::vector<std::string>& serverList)
@@ -214,6 +215,11 @@ namespace Belle2 {
      */
     std::string getTemporary(const std::string& key, const std::string& url, const std::string& digest);
 
+    /** Verify if the global tag can be used: It needs to exist and not have status INVALID.
+     * This function will not return in case of error but just raise a B2FATAL.
+     */
+    void verifyUsableGlobaltag(const std::string& globalTag);
+
     /** curl session handle */
     std::unique_ptr<ConditionsCurlSession> m_session;
     /** flag to indicate whether curl has been initialized already */
@@ -231,6 +237,9 @@ namespace Belle2 {
     std::map<std::string, std::unique_ptr<FileSystem::TemporaryFile>> m_tempfiles;
     /** Map of all existing payloads */
     std::map<std::string, PayloadInfo> m_payloads;
+
+    /** static set of global tags we checked for existence and usability */
+    static std::set<std::string> s_verifiedGlobalTags;
 
     /** Timeout to wait for connections in seconds */
     static unsigned int s_connectionTimeout;

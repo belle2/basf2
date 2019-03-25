@@ -24,7 +24,7 @@ namespace Belle2 {
 
   public:
     /// Constructor using a path.
-    CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& path);
+    explicit CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& path);
 
     /// Called in the exporter findlet for adding this to a already created reco track.
     void addToRecoTrack(RecoTrack& recoTrack) const;

@@ -5,7 +5,6 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Luka Santelj                                             *
  *                                                                        *
- *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -65,6 +64,12 @@ namespace Belle2 {
 
       /** The destructor of the GeoFarBeamLineCreator class. */
       virtual ~GeoFarBeamLineCreator();
+
+      /** Do not want a copy constructor */
+      GeoFarBeamLineCreator(const GeoFarBeamLineCreator&) = delete;
+
+      /** Do not want an assignment operator */
+      GeoFarBeamLineCreator& operator =(const GeoFarBeamLineCreator&) = delete;
 
       /**
       * Creates the ROOT Objects for the FarBeamLine geometry.

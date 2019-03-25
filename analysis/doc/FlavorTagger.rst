@@ -3,13 +3,11 @@ Flavor Tagger
 
 **Authors: F. Abudinen, M. Gelb, L. Li Gioi**
 
-The Flavor Tagger is a function based on multivariate methods to define the
-flavor of the not reconstructed (RestOfEvent) B-Meson in events with a neutral
-B-Meson pair.
+The Flavor Tagger is a module based on multivariate methods. It is designed to determine the
+flavor of the not reconstructed :math:`B^0` meson in events with a neutral
+:math:`B` meson pair. It can be used also in addition to continuum suppression in events
+with a charged :math:`B` meson pair.
 
-Note: 
-
-  This page is still under construction
 
 Flavor Tagging Principle
 ------------------------
@@ -27,9 +25,9 @@ Electron:
 IntermediateElectron:
       In the decay :math:`b \to X_c X \to X e^+ (b \to c \to s e^+ \nu)` the charge of the secondary electron (se) tags the B flavor. 
 Muon:
-      In the decay :math:`b \to X mu- (b \to c \mu^- \bar\nu)` the charge of the muon tags the flavor.
+      In the decay :math:`b \to X \mu- (b \to c \mu^- \bar\nu)` the charge of the muon tags the flavor.
 IntermediateMuon:
-      In the decay :math:`b \to X_c X \to X mu^+ (b \to c \to s\mu^+ \nu)` the charge of the secondary muon tags the flavor.
+      In the decay :math:`b \to X_c X \to X \mu^+ (b \to c \to s\mu^+ \nu)` the charge of the secondary muon tags the flavor.
 KinLepton:
       In the decay :math:`b \to X \ell^- (b \to \ell^- \bar\nu)` the charge of the lepton is
       the flavor signature. Here muon and electron PIDs are used.
@@ -41,16 +39,16 @@ Kaon:
 FastHadron:
       In the decay :math:`b \to X^+ \pi^- (K^-)`  the charge of the pion (Kaon) tags the flavor of the B Meson.  
 SlowPion:
-      In the decay :math:`b \to X D^{*+} \to X D_0 \pi^+ (b \to c )` the charge of the slow pion tags the flavor.
+      In the decay :math:`b \to X D^{*+} \to X D^0 \pi^+ (b \to c )` the charge of the slow pion tags the flavor.
 MaximumP*:
       Here the particle with the highest CMS momentum is assumed to be a
       primary daughter of the B. Therefore, its charge is considered as flavor
       signature.
 KaonPion:
-      In the decay :math:`b \to X D^{*+} \to X \pi^+ D_0 \to X K^- \pi^+ (b \to c \to s)` the
+      In the decay :math:`b \to X D^{*+} \to X \pi^+ D^0 \to X K^- \pi^+ (b \to c \to s)` the
       charges of the Kaon and the slow pion provide a combined flavour signature.
 FastSlowCorrelated (FSC):
-      Slow pions from :math:`D^{*\pm}` and high momentum primary particles, e.g. :math:`Bbar \to D^{*+} e^- \bar\nu \to X \pi^+ e^-` , 
+      Slow pions from :math:`D^{*\pm}` and high momentum primary particles, e.g. :math:`\overline{B^0} \to D^{*+} e^- \bar\nu \to X \pi^+ e^-` , 
       provide a combined flavour signature.
 Lambda:
       In the decay :math:`b \to \Lambda_c^* X \to \Lambda X \to X p \pi^- (b \to c \to s)` 
@@ -60,19 +58,28 @@ Lambda:
 In the following the particles providing the flavor tag information, i.e. the
 flavor signatures, are denoted as target.
 
-Notes:
-^^^^^^
+Below: Simple draft (no physical magnitudes) to illustrate the different decays providing the 
+signatures belonging to the different categories.
 
-Decays with intermediate resonances that provide flavor information are
-correctly considered as signal. E.g., :math:`\bar{B_0} \to D_1^+ \to D^{*+} \to D^+ \to K_{10} \to K^{*}_0 \to K^-`.
 
-The Kaon and the Intermediate Lepton categories consider mesonic and baryonic
-decays via :math:`b \to c \to s` transitions. E.g., 
-:math:`b \to \Sigma_{\bar{c}} \to \Lambda_{\bar{c}}^+ \to K^- p \pi^+ (\Lambda \ell^+ p \nu_{\ell})`.
+.. figure:: figs/newFlavorTaggerCategories.png
+  :width: 40em
+  :align: center
 
-The FastHadron category considers also intermediate resonances and single tau
-daughters (kinematically similar). E.g., 
-:math:`b \to \tau^- (\to \rho^-) \to \pi^-, b \to \tau^- (\to K^{*-}) \to K^-`.
+  Underlying decay modes of the flavor tagging categories.
+
+
+.. note::
+   Decays with intermediate resonances that provide flavor information are
+   correctly considered as signal. E.g., :math:`\bar{B_0} \to D_1^+ \to D^{*+} \to D^+ \to K_{10} \to K^{0*} \to K^-`.
+   
+   The Kaon and the Intermediate Lepton categories consider mesonic and baryonic
+   decays via :math:`b \to c \to s` transitions. E.g., 
+   :math:`b \to \Sigma_{\bar{c}} \to \Lambda_{\bar{c}}^+ \to K^- p \pi^+ (\Lambda \ell^+ p \nu_{\ell})`.
+   
+   The FastHadron category considers also intermediate resonances and single tau
+   daughters (kinematically similar). E.g., 
+   :math:`b \to \tau^- (\to \rho^-) \to \pi^-, b \to \tau^- (\to K^{*-}) \to K^-`.
 
 Flavor Tagger Algorithm
 -----------------------
@@ -81,6 +88,12 @@ developed by Belle and BaBar. It proceeds in 2 steps or levels: *EventLevel* and
 *CombinerLevel*. Each step relies on trained multivariate methods. Up to now, for
 the official Flavor Tagger, the multivariate method used is always a FastBDT
 which is embedded as Plugin in the `mva` TMVAInterface.
+
+.. figure:: figs/singleCategory.png
+  :width: 40em
+  :align: center
+
+  The process for an example category.
 
 At the starting point the available information consists only of ROE Tracks,
 ECL and KLM clusters.
@@ -113,9 +126,13 @@ q means flavor, and r is the so-called dilution factor. Currently, there are
 two combiner methods: one fast BDT and a multilayer-perceptron from the FANN
 library. In future, also new methods could be included.
 
+.. figure:: figs/allCategories.png
+  :width: 30em
+  :align: center
 
+  Flow of information in the flavor tagger.
 
-The *qr* value of the tagged B is saved temporary as extraInfo of the
+The ``qr`` value of the tagged B is saved temporary as extraInfo of the
 reconstructed B particle at the end of the FlavorTagger process.  All
 FlavorTagging informations (qr of the two multivariate methods and the
 RightCategory probabilities) saved previously as extraInfo are saved into a
@@ -124,126 +141,134 @@ FlavorTagInfo data object, all flavor tagger extraInfos are then deleted. The
 user can decide which information is saved in the Ntuples. If specified, also
 the inputs of the combiner are saved.
 
+For more information see 
+`BELLE2-PTHESIS-2018-003 <https://docs.belle2.org/record/1215/files/BELLE2-PTHESIS-2018-003.pdf>`_.
+
 Using the FlavorTagger
 ----------------------
 
-Adding the FlavorTagger to your analysis is very simple: an example can be found in this tutorial.
+Adding the FlavorTagger to your analysis is very simple: an example can be found in this tutorial:
 
-It is needed to import:
+analysis/examples/tutorials/B2A801-FlavorTagger.py
+
+At the beginning of your steering file you have to import:
 
 ::
   
-  from flavorTagger import *
+  import flavorTagger as ft
 
-The Flavor tagger script already imports modularAnalysis.py.
-
-Do not forget to buildRestOfEvent for your B0 recoParticle before calling the flavor tagger.
+Do not forget to buildRestOfEvent for your ``B0`` recoParticle before calling the flavor tagger.
 
 If you just want to use the flavor tagger as standard user you only need:
 
 :: 
 
-  flavorTagger( particleLists=['B0:jspiks'], weightFiles='B2JpsiKs_muBGx0')
+  ft.flavorTagger( particleLists=['B0:yourSignalBlist'], weightFiles='B2nunubarBGx1')
 
-and to add the nTuple tools as explained below. BGx0 stays for MC generated
-without machine Background. Please use B2JpsiKs_muBGx1 if you use MC generated
-with machine background. 
+and to add the nTuple tools as explained below. BGx1 stays for MC generated
+with machine Background. Only BGx1 files are provided centrally.
  
+If you use a release that is older tha release-03 or if you use converted Belle MC/data please use 
 
-The full interface of :func:`flavorTagger` function has 10 possible arguments and it is descibed below.
+::
+
+  weightFiles='B2JpsiKs_muBGx1'
+
+The reason for the different names of the weight files is that the flavor tagger for Belle II 
+is trained with MC samples for the signal channel :math:`B^0 \to \overline{\nu}\nu` which has
+no built in CP violation. This is needed to avoid that the flavorTagger learns CP asymmetries
+on the tag side. This effect was discovered first before release-03. Belle is not sensitive to
+this effect due to its wider beam spot and therefore training with :math:`B^0 \to J/\Psi K^0_{\rm S}` 
+is ok for Belle MC/data.
+
+The full interface of :func:`flavorTagger` function has 10 possible arguments and it is described below.
 
 How to get the weight files?
 ----------------------------
 
-If you are using release-00-08-00 or a newer software version the default
-weight files are downloaded automatically from the central database.
-Nevertheless, this functionality is still under developement and for releases
-08-00, 09-00 and 09-01 an additional manual step is required: a special central
-database tag has to be specified. E.g. for release-00-09-01 it is
-"GT_gen_prod_003.11_release-00-09-01-FEI-a". Therefore, one needs to add in the
+To download the weightfiles from the conditionsdb you have to append a special global tag 
+that depends on the release that you are using.
+Therefore, one needs to add in the
 steering file right before calling the flavor tagger:
 
 ::
  
-  use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
+  basf2.use_central_database("analysis_tools_release-03")
 
 +---------------------------+-------------------------------------------+
 | Release                   | Global DataBase Tag                       |
 +===========================+===========================================+
-| release-00-08-00          | GT_gen_prod_003.17_release-00-08-00-FEI-a |
+| release-01-02-04          | analysis_AAT-parameters_release-01-02-03  |
 +---------------------------+-------------------------------------------+
-| release-00-09-00          | GT_gen_prod_003.15_release-00-09-00-FEI-a |
-+---------------------------+-------------------------------------------+
-| release-00-09-01          | GT_gen_prod_003.11_release-00-09-01-FEI-a |
-+---------------------------+-------------------------------------------+
-| release-01-02-04 or later | analysis_AAT-parameters_release-01-02-03  |
+| release-03-01-00 or later | analysis_tools_release-03-01-00           |
 +---------------------------+-------------------------------------------+
 
 Saving to nTuples
 -----------------
 
-If you do not specify anything in the FlavorTagging ntuple only the qr Output
-of the TMVA method is saved (If used). Nevertheless, it could be very useful if
-you also save the FANN MLP Output and the individual outputs of each category.
-Please specify it as:
-
-::
-
-  toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
+The flavor tagger provides the output of the two combiners and the outputs 
+of the 13 categories. It provides also the MC information relevant for the categories. 
+To save this information you just have to add the predefined predefined list
+``ft.flavor_tagging``
+to the variables that you use as argument for the module :func:`variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be
-found in the ntupleTree of the output root file: 'B0_FBDT_qrCombined' or
-'B0_FANN_qrCombined'. FBDT is the output of a fast boosted decision tree and
+found in the ntupleTree of the output root file: ``FBDT_qrCombined`` or
+``FANN_qrCombined``. FBDT is the output of a fast boosted decision tree and
 FANN is the output of a multi-layer perceptron of the open source library fast
 artificial neural network . The default output -2 is saved for events without
 tracks in the ROE.
 
 The following variable is also saved by default,
 
-*qr_MC*:It is the ideal output of the flavor tagger (therefore the name) and is
-the target variable of the combiners. Scolastically speaking it should be
+``qr_MC``:It is the ideal output of the flavor tagger (therefore the name) and is
+the target variable of the combiners. Scholastically speaking it should be
 called q_MC and is just the MC flavor of the tag B. But it considers if
 isSignal on the signal side is 1. Therefore,  one can make several checks at
 one shot with this variable. qrMC is just the nTuple name. The variable which
 is saved is `isRelatedRestOfEventB0Flavor`.
 
-The goal of this variable is to return the value +1(-1) for a B0(B0bar) on the tag side checking the MC.
+The goal of this variable is to return the value +1(-1) for a :math:`B^0 (\overline{B}^0)` on the tag side checking the MC.
 But technically this is not trivial at all. The variable calculation performs the following steps:
 
-1. Check the MC matching of B0sig. It means MC B0sig corresponds to RECO B0sig. If correct then
+1. Check the MC matching of :math:`B^0_{\rm sig}`. It means MC :math:`B^0_{\rm sig}` corresponds to RECO :math:`B^0_{\rm sig}`. 
+   If correctly matched then:
 2. Loop over all tracks in the ROE and get for each one the related mc particle.
-3. Check the all mothers (grand-, grandgrandmother, and so on) of each one of
+3. Check all mothers (grand-, grandgrandmother, and so on) of each one of
    these MC particles and find out if at least one of them is a descendant of MC
-   B0 sig (these events are not good neither for training nor for evaluating). The
+   :math:`B^0_{\rm sig}` (these events are not good neither for training nor for evaluation). The
    loop is broken as soon as an MC particle related to a ROE track is found to be
-   a descendant of MC B0 sig. If not
-4. Find the MC flavor of the B0 particle on the tag side.
+   a descendant of MC :math:`B^0_{\rm sig}`. If not
+4. Find the MC flavor of the neutral :math:`B` particle on the tag side (:math:`B^0_{\rm tag}`).
 
 The variable has several output values. The meaning  are the following:
 
-  * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC B0 sig. -2 (+2) means MC B0 sig is a B0bar (B0)
+  * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`: 
+    *-2 (+2)* means MC :math:`B^0_{\rm sig}` is a :math:`B^0 (\overline{B}^0)`.
 
-  * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendent of MC B0 sig.
+  * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendent of MC :math:`B^0_{\rm sig}`:
+    *-1 (+1)* means that the MC neutral :math:`B` on the tag side is a :math:`B^0 (\overline{B}^0)`.
 
-  * -1 (+1) means that the MC B0 on the tag side is a B0bar (B0)
+  * *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side. 
+    It means, either there are no tracks in ROE, or among the MC particles
+    (and also their ancestors) that are related to the
+    ROE tracks no neutral :math:`B` particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
+    possible, e.g. for :math:`B\to` final state with only photons, :math:`B\to` invisible, :math:`B\to`
+    photons and few tracks but the tracks outside of the acceptance (or not
+    reconstructed), etc. Very rare things could also happen like there is no
+    related MC particle for the tracks in the ROE. This means that one should use
+    ``abs(B0_qrMC) == 1``, if one wants to filter out good events for evaluation. But
+    one should be very careful, e.g. for some signal channels the MC matching does
+    not work well at all and one could think for an instant that the flavor tagger
+    is under or overestimating the dilution.
 
-  * *0* Wrongly matched B0 sig or correctly matched but no B0 that could be
-    tagged was found on the tag side. 
+The flavor tagger also saves the variable ``mcFlavorOfOtherB0`` which returns the flavor of the 
+accompaning tag-side neutral :math:`B` meson if the given particle is a correctly MC matched 
+neutral :math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
+of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
-    * It means, either there are no tracks in ROE, or among the MC particles
-      (and also their ancestors) that are related to the
-      ROE tracks no B0 particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
-      possible, e.g. for :math:`B\to` final state with only photons, :math:`B\to` invisible, :math:`B\to`
-      photons and few tracks but the tracks outside of the acceptance (or not
-      reconstructed), etc. Very rare things could also happen like there is no
-      related MC particle for the tracks in the ROE. This means that one should use
-      ``abs(B0_qrMC) == 1``, , if one wants to filter out good events for evaluation. But
-      one should be very careful, e.g. for some signal channels the MC matching does
-      not work well at all and one could think for an instant that the flavor tagger
-      is under or overestimating the dilution.
-
-The additional informations about individual categories are saved if the option qpCategories is specified in the ntuples,
-``B0_qpCategory<Name>``, where ``<name>`` is the cathegory.
+The additional informations about individual categories are saved using the aliases
+``qpCategory<Name>``, where ``<name>`` is the cathegory.
 These are 13 values which correspond to the 13 inputs which are given to the
 combiners. They are actually not ``qr`` but ``qp`` where ``p`` is the output of the
 category level mva (FBDT) for the track with the highest target probability.
@@ -265,20 +290,21 @@ When the flavor tagger started to be developed, ``qr`` was used for each categor
 as input. But then it turned out that ``qp`` is more powerful. The names of the
 variables remained the same just for practical use.
 
-``B0_hasTrueTargetCategory<Name>``: These variables tell you if you have the target
-of a specific category for each event. For example, :math:`B_0\to e^+ \nu X^-` is the decay
+``hasTrueTargetCategory<Name>``: These variables tell you if you have the target
+of a specific category for each event. For example, :math:`B^0\to e^+ \nu X^-` is the decay
 corresponding to the electron category. This variable returns 1 if there is an
-:math:`e^+` which is a primary daughter of the B0 tag by checking the MC information. 0
+:math:`e^+` which is a primary daughter of the :math:`B^0_{\rm tag}` by checking the MC information. 0
 else. Similar for the other categories.
 
 The standard flavor tagger combines all 13 tags of all 13 categories for each
-event.  ``B0_hasTrueTargetCategory<Name>`` only tells you which categories were right
+event.  ``hasTrueTargetCategory<Name>`` only tells you which categories were right
 or not (with exceptions for kaons).
 
 Efficiency Calculation and Validation Plots
 -------------------------------------------
 
-If you want to calculate the efficiency of the FlavorTagger on your own File and produce qr plots, use the script analysis/examples/flavorTaggerEfficiency.py giving your file and the B0 tree name as arguments:
+If you want to calculate the efficiency of the FlavorTagger on your own File and produce qr plots, use the script 
+analysis/release-validation/CPVTools/flavorTaggerEfficiency.py giving your file and the ntuple tree name as arguments:
 
 ::
 
@@ -293,40 +319,33 @@ An example tutorial for normal use can be found under:
 
   analysis/examples/tutorials/B2A801-FlavorTagger.py
 
-If you want to use Belle MC or Belle Data, you have to follow a special order:
 
-:: 
+Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
+(Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
+There are also some slides for the tutorial accessible from 
+`this confluence page <https://confluence.desy.de/display/BI/Physics+AnalysisSoftware>`_ .
 
-  analysis/examples/tutorials/B2A802-FlavorTagger-BelleMC.py
-
-As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.You find them under:
+As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged. 
+You find them under:
 
 ::
 
-  /home/belle2/abudinen/public/release8ValidationScripts
+  analysis/release-validation/CPVTools/
 
-  /home/belle2/abudinen/public/release9-01ValidationScripts
-
-If you copy this folder and change the workingDirectory and savingDirectory in flavorTaggerValidatorInParalell.sh, you can train and test by yourself running:
+You can train and test the flavor tagger, and evaluate its performance by yourself running:
 
 ::
   
-  sh flavorTaggerValidatorInParalell.sh Belle2 BGx1`
+  sh CPVToolsValidatorInParalell.sh Belle2 nunubar nunubar BGx1 yourPathForWeightFiles yourPathForAnalyzedMdst
 
 Note:
-
-  you have to adjust the number of parallel processes nParal according to your machine.
 
 The convention is BGx0 for no machine background and BGx1 for MC with machine background. The process is defined in:
 
 ::
  
-  flavorTaggerValidation.py
+  flavorTaggerVertexingValidation.py
 
-Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
-(Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
-There are also some slides for the tutorial accessible from 
-`Link this confluence page <https://confluence.desy.de/display/BI/Physics+AnalysisSoftware>`_ .
 
 
 

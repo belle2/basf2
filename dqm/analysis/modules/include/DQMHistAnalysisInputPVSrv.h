@@ -61,9 +61,11 @@ namespace Belle2 {
 
     // Data members
   private:
-    //! Hist memory
+    /** The refresh interval in ms. */
     int m_interval;
+    /** Whether to use EPICS callback for changes. */
     bool m_callback;
+    /** Whether to start http server on port 8082. */
     bool m_server;
     //THttpServer* m_serv{0};
     //int m_nhist = 0;
@@ -75,11 +77,14 @@ namespace Belle2 {
     std::vector<MYNODE*> pmynode;
 #endif
 
+    /** The metadata for each event. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    //! Exp number, Run number
+    /** Exp number */
     unsigned int m_expno = 0;
+    /** Run number */
     unsigned int m_runno = 0;
+    /** Event number */
     unsigned int m_count = 0;
   };
 } // end namespace Belle2

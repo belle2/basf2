@@ -35,7 +35,7 @@ PXDRawDQMModule::PXDRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_s
   //Set module properties
   setDescription("Monitor raw PXD");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxdraw"));
 
   addParam("RawPXDsName", m_storeRawPxdrarrayName, "The name of the StoreArray of RawPXDs to be processed", string(""));

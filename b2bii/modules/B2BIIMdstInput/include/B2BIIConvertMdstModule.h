@@ -20,6 +20,7 @@
 // Belle objects (Panther tables)
 #include "belle_legacy/tables/belletdf.h"
 #include "belle_legacy/tables/mdst.h"
+#include "belle_legacy/tables/ecl.h"
 
 #include "belle_legacy/helix/Helix.h"
 
@@ -33,7 +34,9 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <framework/dbobjects/BeamParameters.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
@@ -124,7 +127,7 @@ namespace Belle2 {
 
     //! flag that tells which form of covariance matrix should be used in the conversion of charged tracks
     // true = use 6x6 (position, momentum) covariance matrix
-    // false = use 5x5 (helix parameters) covaraince matrix
+    // false = use 5x5 (helix parameters) covariance matrix
     bool m_use6x6CovarianceMatrix4Tracks;
 
     //! MC matching mode.
@@ -132,6 +135,10 @@ namespace Belle2 {
 
     //! C matching mode.
     MCMatchingMode m_mcMatchingMode;
+
+    bool m_convertECLCrystalEnergies; /**< Flag to switch on conversion of Datecl_mc_ehits objects into ECLHits */
+
+    bool m_convertExtHits; /**< Flag to switch on conversion of Mdst_ecl_trk into ExtHits */
 
     //! variable to tell us which IPProfile bin was active last time we looked
     int m_lastIPProfileBin{ -1};
@@ -181,6 +188,16 @@ namespace Belle2 {
      */
     void convertMdstVee2Table();
 
+    /**
+     * Reads and converts all entries of Datecl_mc_ehits Panther table to ECLHit dataobjects and adds them to StoreArray<ECLHit>.
+     */
+    void convertECLHitTable();
+
+    /**
+     * Reads and converts all entries of Mdst_ecl_trk Panther table to ExtHit dataobjects and adds them to StoreArray<ExtHit>.
+     */
+    void convertExtHitTable();
+
     /** Stores beam parameters (energy, angles) in BeamParameters (currently in the DataStore). */
     void convertBeamEnergy();
 
@@ -213,6 +230,16 @@ namespace Belle2 {
      * If running on MC, the Track -> MCParticle relation is set as well.
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
+
+    /**
+     * Converts Datecl_mc_ehits record to ECLHit object.
+     */
+    void convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit);
+
+    /**
+     * Converts Mdst_ecl_trk record to ExtHit object.
+     */
+    void convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_trk_hit, ExtHit* extHit);
 
     /**
      * Creates TrackFitResult and fills it.
@@ -282,7 +309,7 @@ namespace Belle2 {
     /** maps Belle hypotheses to Const::ChargedStable (from http://belle.kek.jp/secured/wiki/doku.php?id=software:atc_pid). */
     const static Const::ChargedStable c_belleHyp_to_chargedStable[c_nHyp];
 
-    /** Add given Belle likelihoods (not log-likelihoods, in Belle hypothethis order) for given detector to pid. */
+    /** Add given Belle likelihoods (not log-likelihoods, in Belle hypothesis order) for given detector to pid. */
     void setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp], bool discard_allzero = false);
 
 #ifdef HAVE_KID_ACC
@@ -292,7 +319,7 @@ namespace Belle2 {
     double cdc_pid(const Belle::Mdst_charged& chg, int idp);
 #endif
 
-    /* calcualtes atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
+    /* calculates atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
     double atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp);
 
     //-----------------------------------------------------------------------------
@@ -303,7 +330,6 @@ namespace Belle2 {
      * Sets ECLCluster -> Track relations
      */
     void setECLClustersToTracksRelations();
-
 
     /**
      * Sets KLMCluster -> Track and ECLCluster relations
@@ -322,7 +348,7 @@ namespace Belle2 {
     /**
      * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle
      */
-    void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName);
+    void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, const std::string& objectName);
 
     //! MCParticle Graph to build Belle2 MC Particles
     Belle2::MCParticleGraph m_particleGraph;
@@ -356,11 +382,17 @@ namespace Belle2 {
     /** V0-particles. */
     StoreArray<V0> m_v0s;
 
-    /** Partciles. */
+    /** Particles. */
     StoreArray<Particle> m_particles;
 
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
+
+    /** ECL hits */
+    StoreArray<ECLHit> m_eclHits;
+
+    /** Ext hits */
+    StoreArray<ExtHit> m_extHits;
 
     /** BeamParameters */
     DBObjPtr<BeamParameters> m_beamParamsDB;

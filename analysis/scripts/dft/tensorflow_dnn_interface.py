@@ -120,11 +120,16 @@ def apply(state, X):
     """
 
     binning.transform_ndarray(X, state.binning_parameters)
-    r = state.session.run(state.activation,
-                          feed_dict={state.x: X}).flatten()
-
+    chunk_size = 1000000
+    if len(X) > chunk_size:
+        results = list()
+        for i in range(0, len(X), chunk_size):
+            results.append(state.session.run(state.activation, feed_dict={state.x: X[i: i + chunk_size]}))
+        r = np.concatenate(results).flatten()
+    else:
+        r = state.session.run(state.activation, feed_dict={state.x: X}).flatten()
     if state.transform_to_probability:
-        binning.transform_array_to_sf(r, state.sig_back_tupe, signal_fraction=.5)
+        binning.transform_array_to_sf(r, state.sig_back_tuple, signal_fraction=.5)
 
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 

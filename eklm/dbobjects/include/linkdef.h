@@ -10,7 +10,6 @@
 #pragma link C++ class Belle2::EKLMChannelData+;
 #pragma link C++ class Belle2::EKLMChannels+;
 #pragma link C++ class Belle2::EKLMDataConcentratorLane+;
-#pragma link C++ class Belle2::EKLMDigitizationParameters+;
 #pragma link C++ class Belle2::EKLMElectronicsMap+;
 #pragma link C++ class Belle2::EKLMGeometry+;
 #pragma link C++ class Belle2::EKLMGeometry::EndcapStructureGeometry+;

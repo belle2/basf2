@@ -101,6 +101,10 @@ void PhokharaInputModule::initialize()
   mcparticle.registerInDataStore();
 
   if (m_replaceMuonsByVirtualPhoton) {
+    if (m_finalState != 0) {
+      B2FATAL("You requested to replace muons by a virtual photon, but the "
+              "final state is not mu+ mu-.");
+    }
     if (m_QED != 0) {
       B2FATAL("You requested to replace muons by a virtual photon. In this "
               "mode, PHOKHARA works as an ISR generator. The parameter QED "

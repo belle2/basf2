@@ -48,7 +48,7 @@ namespace Belle2 {
     }
   private:
 
-    ClassDef(SVDLocalRunBadStrips, 1);
+    ClassDef(SVDLocalRunBadStrips, 1); /**< needed by root*/
   };
 }
 

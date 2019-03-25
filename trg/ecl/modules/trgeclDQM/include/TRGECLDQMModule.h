@@ -41,10 +41,6 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   private:
-    /** Object of TC Clustering */
-    TrgEclCluster* _TCCluster;
-    //! TCId histogram
-    //TH2* h_TC2d;
     //! TCId histogram
     TH1* h_TCId;
     //! TCthetaId histogram

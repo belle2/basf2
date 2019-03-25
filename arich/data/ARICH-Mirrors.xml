@@ -23,6 +23,7 @@
 	<value energy="3.66">0.23</value>
 	<value energy="4.1">0.31</value>
 	<value energy="5.8">0.14</value>
+	<value energy="7.5">0.0</value>
       </Property>
     </Properties>
     <Type>dielectric_metal</Type>

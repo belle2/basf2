@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# This script can be chosen in the SC GUI. Its name is in the moment hardcoded into the GUI, so do not change it.
 
 import os
 import sys

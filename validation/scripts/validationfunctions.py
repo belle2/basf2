@@ -11,11 +11,11 @@ import argparse
 import glob
 import os
 import subprocess
+import sys
 import time
 
 # 3rd party
 import ROOT
-from basf2.utils import get_terminal_width
 
 # ours
 import validationpath
@@ -96,13 +96,11 @@ def available_revisions(work_folder):
 
     # Get all folders in ./results/ sorted descending by the date they were
     # created (i.e. newest folder first)
-    revisions = sorted(
-        os.listdir(validationpath.get_results_folder(work_folder)),
-        key=lambda _: os.path.getmtime(
-            os.path.join(validationpath.get_results_folder(work_folder), _)),
-        reverse=True
-    )
-    # Return it
+    search_folder = validationpath.get_results_folder(work_folder)
+    subfolders = [p for p in os.scandir(search_folder) if p.is_dir()]
+    revisions = [
+        p.name for p in sorted(subfolders, key=lambda p: p.stat().st_mtime)
+    ]
     return revisions
 
 
@@ -169,7 +167,7 @@ def get_validation_folders(location, basepaths, log):
         return {}
 
     # Write to log what we are collecting
-    log.debug('Collecting {0} folders'.format(location))
+    log.debug(f'Collecting {location} folders')
 
     # Reserve some memory for our results
     results = {}
@@ -217,6 +215,7 @@ def get_argument_parser(modes=None):
              "actually executing thesteering files (for debugging purposes).",
         action='store_true'
     )
+    # todo: use the options keyword here?
     parser.add_argument(
         "-m",
         "--mode",
@@ -355,7 +354,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
     """
 
     # Write to log what we are collecting
-    log.debug('Collecting *{0} files from {1}'.format(ext, dirpath))
+    log.debug(f'Collecting *{ext} files from {dirpath}')
 
     # Some space where we store our results before returning them
     results = []
@@ -481,6 +480,17 @@ def get_log_file_paths(logger):
     return ret
 
 
+def get_terminal_width():
+    """
+    Returns width of terminal in characters, or 80 if unknown.
+
+    Copied from basf2 utils. However, we only compile the validation package
+    on b2master, so copy this here.
+    """
+    from shutil import get_terminal_size
+    return get_terminal_size(fallback=(80, 24)).columns
+
+
 def congratulator(success=None, failure=None, total=None, just_comment=False,
                   rate_name="Success rate"):
     """ Keeping the morale up by commenting on success rates.
@@ -499,12 +509,29 @@ def congratulator(success=None, failure=None, total=None, just_comment=False,
         Comment on your success rate (str).
     """
 
-    if not total:
-        total = success + failure
-    if not failure:
-        failure = total - success
-    if not success:
-        success = total - failure
+    n_nones = [success, failure, total].count(None)
+
+    if n_nones == 0 and total != success + failure:
+        print(
+            "ERROR (congratulator): Specify 2 of the arguments 'success',"
+            "'failure', 'total'.",
+            file=sys.stderr
+        )
+        return ""
+    elif n_nones >= 2:
+        print(
+            "ERROR (congratulator): Specify 2 of the arguments 'success',"
+            "'failure', 'total'.",
+            file=sys.stderr
+        )
+        return ""
+    else:
+        if total is None:
+            total = success + failure
+        if failure is None:
+            failure = total - success
+        if success is None:
+            success = total - failure
 
     # Beware of zero division errors.
     if total == 0:

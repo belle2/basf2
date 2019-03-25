@@ -110,6 +110,38 @@ void GeometryModule::initialize()
     m_geometryConfig->addCallback([]() {B2FATAL("Geometry cannot change during processing, aborting");});
     geoManager.createGeometry(**m_geometryConfig);
   } else {
+    StoreObjPtr<EventMetaData> evtMeta;
+    if (!evtMeta.isValid() or not(evtMeta->getExperiment() == 0 and evtMeta->getRun() == 0)) {
+      B2FATAL(R"RAW(We no longer allow to disable the database when exp, run != 0, 0
+
+    If you want to create geometry configuration please create them from the
+    correct set of xml files and test them with exp,run == 0, 0 and then create
+    payloads for the correct iovs.
+
+    Otherwise just use the database configuration created by the experts.
+
+    This is for your own protection.)RAW");
+      return;
+    }
+    B2WARNING(R"RAW(You've decided to disable database for the Geometry.
+
+    Be aware, this is ONLY VALID for debugging purposes and validation of
+    geometry updates.
+
+    Do NOT USE THIS just to disable some parts in the geometry.
+
+    -> This is in any case very dangerous and will result in unrealistic
+       results. If you really want this and really know what you are doing you
+       will have no problems to create and use a custom geometry configuration
+       using the parameter `createPayloads=True`.
+
+    DEFINITELY don't use this just because it works without internet connection.
+
+    -> Please just use `b2conditionsdb` to download a snapshot of the global
+       tag you want to use ahead of time. Your results will not be correct if
+       you disable building the geometry from the database configuration
+
+    YOU HAVE BEEN WARNED!)RAW");
     geoManager.createGeometry(GearDir(m_geometryPath), geometry::FullGeometry);
   }
 }

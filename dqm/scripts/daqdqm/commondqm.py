@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from softwaretrigger.hltdqm import standard_hltdqm
 from analysisDQM import add_analysis_dqm
 
 
@@ -22,13 +21,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if dqm_environment == "expressreco":
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
-            path.add_module('PXDDAQDQM')
-            pxddqm = register_module('PXDDQMExpressReco')
-            path.add_module(pxddqm)
-            pxdeff = register_module('PXDDQMEfficiency')
-            path.add_module(pxdeff)
+            path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
+            path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
+            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
         # SVD
         if components is None or 'SVD' in components:
+            # SVD DATA FORMAT
+            svdunpackerdqm = register_module('SVDUnpackerDQM')
+            path.add_module(svdunpackerdqm)
             # ZeroSuppression Emulator
             path.add_module(
                 'SVDZeroSuppressionEmulator',
@@ -37,7 +37,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
             svddqm = register_module('SVDDQMExpressReco')
-            svddqm.param('ShaperDigits', 'SVDShaperDigitsZS5')
+            svddqm.param('offlineZSShaperDigits', 'SVDShaperDigitsZS5')
             path.add_module(svddqm)
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
@@ -46,7 +46,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
 
     if dqm_environment == "hlt":
         # HLT
-        standard_hltdqm(path)
+        path.add_module("SoftwareTriggerHLTDQM")
+        path.add_module("StatisticsTimingHLTDQM")
+
         # SVD DATA FORMAT
         if components is None or 'SVD' in components:
             svdunpackerdqm = register_module('SVDUnpackerDQM')
@@ -84,23 +86,26 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         trggdldqm = register_module('TRGGDLDQM')
         path.add_module(trggdldqm)
         # TRGCDCTSF
-        trgcdctsfdqm = register_module('TRGCDCTSFDQM')
-        path.add_module(trgcdctsfdqm)
+        nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
+        for mod_tsf in nmod_tsf:
+            path.add_module('TRGCDCTSFDQM', TSFMOD=mod_tsf)
         # TRGCDC3D
-        path.add_module('TRGCDCT3DConverter',
-                        hitCollectionName='FirmCDCTriggerSegmentHits',
-                        addTSToDatastore=True,
-                        EventTimeName='FirmBinnedEventT0',
-                        addEventTimeToDatastore=True,
-                        inputCollectionName='FirmTRGCDC2DFinderTracks',
-                        add2DFinderToDatastore=True,
-                        outputCollectionName='FirmTRGCDC3DFitterTracks',
-                        add3DToDatastore=True,
-                        fit3DWithTSIM=0,
-                        firmwareResultCollectionName='TRGCDCT3DUnpackerStores',
-                        isVerbose=0)
-        trgcdct3ddqm = register_module('TRGCDCT3DDQM')
-        path.add_module(trgcdct3ddqm, generatePostscript=False)
+        nmod_t3d = [0, 1, 2, 3]
+        for mod_t3d in nmod_t3d:
+            path.add_module('TRGCDCT3DConverter',
+                            hitCollectionName='FirmCDCTriggerSegmentHits' + str(mod_t3d),
+                            addTSToDatastore=True,
+                            EventTimeName='FirmBinnedEventT0' + str(mod_t3d),
+                            addEventTimeToDatastore=True,
+                            inputCollectionName='FirmTRGCDC2DFinderTracks' + str(mod_t3d),
+                            add2DFinderToDatastore=True,
+                            outputCollectionName='FirmTRGCDC3DFitterTracks' + str(mod_t3d),
+                            add3DToDatastore=True,
+                            fit3DWithTSIM=0,
+                            firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
+                            isVerbose=0)
+            path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
+
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if components is None or 'SVD' in components or 'PXD' in components:
         trackDqm = register_module('TrackDQM')
@@ -110,3 +115,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         path.add_module('ARICHDQM')
     # PhysicsObjectsDQM
     add_analysis_dqm(path)
+    # DAQ Monitor
+    path.add_module('DAQMonitor')

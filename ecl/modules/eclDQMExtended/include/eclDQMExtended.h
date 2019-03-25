@@ -163,11 +163,11 @@ namespace Belle2 {
     TH1F* h_qualityfail_shaperid{nullptr};
     /** Histogram: CrateIDs w/ failed amplitudes. */
     TH1F* h_ampfail_crateid{nullptr};
-    /** Histogram: CellIDs w/ failed times. */
+    /** Histogram: CrateIDs w/ failed times. */
     TH1F* h_timefail_crateid{nullptr};
-    /** Histogram: CellIDs w/ failed amplitudes and times. */
+    /** Histogram: CrateIDs w/ failed amplitudes and times. */
     TH1F* h_amptimefail_crateid{nullptr};
-    /** Histogram: CellIDs w/ failed qualities. */
+    /** Histogram: CrateIDs w/ failed qualities. */
     TH1F* h_qualityfail_crateid{nullptr};
 
     /** Histogram: Amplitude diff. (Emulator - Data) for amp. fails. */

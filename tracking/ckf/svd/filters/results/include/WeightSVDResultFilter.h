@@ -15,11 +15,11 @@
 
 namespace Belle2 {
   /// Base filter for CKF SVD results (on overlap check)
-  class WeightSVDResultFilter : public TrackFindingCDC::ChoosableFromVarSetFilter<SVDResultVarSet> {
+  class WeightSVDResultFilter : public BaseSVDResultFilter {
   public:
-    WeightSVDResultFilter() : TrackFindingCDC::ChoosableFromVarSetFilter<SVDResultVarSet>("weight_sum")
+    TrackFindingCDC::Weight operator()(const CKFToSVDResult& result) override
     {
-
+      return result.getWeightSum();
     }
   };
 }

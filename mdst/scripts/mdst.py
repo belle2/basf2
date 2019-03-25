@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
 from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 from ROOT.Belle2 import Const
 
@@ -25,9 +24,6 @@ def add_mdst_output(
         dataDescription (dict or None): Additional key->value pairs to be added as data description
            fields to the output FileMetaData
     """
-
-    output = register_module('RootOutput')
-    output.param('outputFileName', filename)
     branches = [
         'Tracks',
         'V0s',
@@ -50,17 +46,14 @@ def add_mdst_output(
                      'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
         persistentBranches += ['BackgroundInfo']
     branches += additionalBranches
-    output.param('branchNames', branches)
-    output.param('branchNamesPersistent', persistentBranches)
     # set dataDescription correctly
     if dataDescription is None:
         dataDescription = {}
     # set dataLevel to mdst if it's not already set to something else (which
     # might happen for udst output since that calls this function)
     dataDescription.setdefault("dataLevel", "mdst")
-    output.param("additionalDataDescription", dataDescription)
-    path.add_module(output)
-    return output
+    return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
+                           branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)
 
 
 def add_mdst_dump(path, print_untested=False):

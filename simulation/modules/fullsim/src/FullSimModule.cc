@@ -12,6 +12,7 @@
 #include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/DetectorConstruction.h>
 //- #include <simulation/kernel/PhysicsList.h>
+#include <simulation/physicslist/Belle2PhysicsList.h>
 #include <simulation/kernel/ExtPhysicsConstructor.h>
 #include <simulation/kernel/MagneticField.h>
 #include <simulation/kernel/PrimaryGeneratorAction.h>
@@ -94,7 +95,9 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("HadronProcessVerbosity", m_hadronProcessVerbosity, "Hadron Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("EmProcessVerbosity", m_emProcessVerbosity, "Em Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
+  addParam("StandardEM", m_standardEM, "If true, replaces fast EM physics with standard EM physics.", false);
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
+  addParam("UseHighPrecisionNeutrons", m_HPneutrons, "If true, high precision neutron models used below 20 MeV.", false);
   addParam("RegisterMonopoles", m_monopoles, "If set to true, G4MonopolePhysics is registered in Geant4 PhysicsList.", false);
   addParam("MonopoleMagCharge", m_monopoleMagneticCharge, "The value of monopole magnetic charge in units of e+.", 1.0);
   addParam("ProductionCut", m_productionCut,
@@ -188,30 +191,42 @@ void FullSimModule::initialize()
   //- physicsList->setProductionCutValue(m_productionCut);
   //- if (m_optics) physicsList->registerOpticalPhysicsList();
   //- runManager.SetUserInitialization(physicsList);
-  G4PhysListFactory physListFactory;
-  physListFactory.SetVerbose(m_runEventVerbosity);
-  G4VModularPhysicsList* physicsList = NULL;
-  if (physListFactory.IsReferencePhysList(m_physicsList)) physicsList = physListFactory.GetReferencePhysList(m_physicsList);
-  if (physicsList == NULL) B2FATAL("Could not load the physics list " << m_physicsList);
-  physicsList->RegisterPhysics(new ExtPhysicsConstructor);
-  if (m_optics) physicsList->RegisterPhysics(new G4OpticalPhysics);
-  if (m_monopoles) {
-    physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
-  }
-  physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
 
-  // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
-  // all the energy (as is done in G4ErrorPhysicsList)
-  G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
-  myParticleIterator->reset();
-  while ((*myParticleIterator)()) {
-    G4ParticleDefinition* particle = myParticleIterator->value();
-    if (particle->GetParticleName().compare(0, 4, "g4e_") == 0) {
-      physicsList->SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
+  if (m_physicsList == "Belle2") {
+    // Use Belle2PhysicsList
+    Belle2PhysicsList* physicsList = new Belle2PhysicsList(m_physicsList);
+    physicsList->SetVerbosity(m_runEventVerbosity);
+    physicsList->UseStandardEMPhysics(m_standardEM);
+    physicsList->UseOpticalPhysics(m_optics);
+    physicsList->UseHighPrecisionNeutrons(m_HPneutrons);
+    physicsList->SetProductionCutValue(m_productionCut);
+    runManager.SetUserInitialization(physicsList);
+
+  } else {
+    G4PhysListFactory physListFactory;
+    physListFactory.SetVerbose(m_runEventVerbosity);
+    G4VModularPhysicsList* physicsList = NULL;
+    if (physListFactory.IsReferencePhysList(m_physicsList)) physicsList = physListFactory.GetReferencePhysList(m_physicsList);
+    if (physicsList == NULL) B2FATAL("Could not load the physics list " << m_physicsList);
+    physicsList->RegisterPhysics(new ExtPhysicsConstructor);
+    if (m_optics) physicsList->RegisterPhysics(new G4OpticalPhysics);
+    if (m_monopoles) {
+      physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
     }
-  }
-  runManager.SetUserInitialization(physicsList);
+    physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
 
+    // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
+    // all the energy (as is done in G4ErrorPhysicsList)
+    G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
+    myParticleIterator->reset();
+    while ((*myParticleIterator)()) {
+      G4ParticleDefinition* particle = myParticleIterator->value();
+      if (particle->GetParticleName().compare(0, 4, "g4e_") == 0) {
+        physicsList->SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
+      }
+    }
+    runManager.SetUserInitialization(physicsList);
+  }
 
   //Create the magnetic field for the Geant4 simulation
   if (m_magneticFieldName != "none") {

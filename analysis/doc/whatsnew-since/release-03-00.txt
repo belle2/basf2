@@ -47,6 +47,8 @@ Variables
 
 * Renamed ClusterHasPulseShapeDiscrimination to :b2:var:`clusterHasPulseShapeDiscrimination`, PulseShapeDiscriminationMVA to :b2:var:`clusterPulseShapeDiscriminationMVA`, and ClusterNumberOfHadronDigits to :b2:var`clusterNumberOfHadronDigits`.
 
+* Added MC flight information variables, :b2:var:`mcFlightDistance` and :b2:var:`mcFlightTime`
+
 Standard Particle Lists
 +++++++++++++++++++++++
 

@@ -34,7 +34,7 @@ namespace Belle2 {
     /**
      * Constructor from weight file name.
      */
-    DatabaseRepresentationOfWeightfile(const std::string& data) : m_data(data) { }
+    explicit DatabaseRepresentationOfWeightfile(const std::string& data) : m_data(data) { }
 
     std::string m_data; /**< Serialized weightfile */
 

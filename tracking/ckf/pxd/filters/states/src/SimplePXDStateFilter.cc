@@ -65,7 +65,7 @@ Weight SimplePXDStateFilter::operator()(const BasePXDStateFilter::Object& pair)
   const Vector3D hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
   const bool sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
-  if (sameHemisphere == false) {
+  if (not sameHemisphere) {
     return NAN;
   }
 

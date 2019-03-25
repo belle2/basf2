@@ -73,7 +73,7 @@ def get_fom_from_file(script_name, file_names_and_fom, git_commit_hash,
     results = {}
 
     # Checkout git (stash or not stash)
-    print("Checking out git hash {hash}.".format(hash=git_commit_hash))
+    print(f"Checking out git hash {git_commit_hash}.")
 
     try:
         helpers.checkout_git_revision(git_commit_hash, repo=repo,
@@ -173,7 +173,7 @@ if __name__ == "__main__":
           f"{git_start_hash} to {git_end_hash}.")
     git_hashs = helpers.get_git_hashes_between(git_end_hash, git_start_hash)
 
-    print("There are {size} commits in this range.".format(size=len(git_hashs)))
+    print(f"There are {len(git_hashs)} commits in this range.")
 
     results = []
     for git_hash in git_hashs:

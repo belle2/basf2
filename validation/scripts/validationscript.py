@@ -166,9 +166,9 @@ class Script:
 
         if level > 50:
             self.log.error(
-                'Recurisve dependency lookup reached level {0} and will quit '
-                'now. Possibly circular dependcencies in the validation '
-                'scripts ? '.format(level)
+                f'Recurisve dependency lookup reached level {level} and will '
+                f'quit now. Possibly circular dependcencies in the validation '
+                f'scripts ? '
             )
 
         all_deps = set()
@@ -186,8 +186,8 @@ class Script:
                     scripts, next_level)
             else:
                 self.log.error(
-                    'Depending script with the name {0} could not be found '
-                    'in the list of registered scripts. '.format(dep.name)
+                    f'Depending script with the name {dep.name} could not be '
+                    f'found in the list of registered scripts. '
                 )
 
             # only add, if not already in the dependencies list
@@ -228,8 +228,8 @@ class Script:
                 # If no creator could be found, raise an error!
                 if creator is None:
                     self.log.error(
-                        'Unmatched dependency for {0}:{1} '
-                        'has no creator!'.format(self.path, root_file))
+                        f'Unmatched dependency for {self.path}:{root_file} '
+                        f'has no creator!')
                     self.status = ScriptStatus.skipped
 
                 # If creator(s) could be found, add those scripts to the

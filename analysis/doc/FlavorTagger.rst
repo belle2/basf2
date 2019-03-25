@@ -132,7 +132,7 @@ library. In future, also new methods could be included.
 
   Flow of information in the flavor tagger.
 
-The *qr* value of the tagged B is saved temporary as extraInfo of the
+The ``qr`` value of the tagged B is saved temporary as extraInfo of the
 reconstructed B particle at the end of the FlavorTagger process.  All
 FlavorTagging informations (qr of the two multivariate methods and the
 RightCategory probabilities) saved previously as extraInfo are saved into a
@@ -157,7 +157,7 @@ At the beginning of your steering file you have to import:
   
   import flavorTagger as ft
 
-Do not forget to buildRestOfEvent for your B0 recoParticle before calling the flavor tagger.
+Do not forget to buildRestOfEvent for your ``B0`` recoParticle before calling the flavor tagger.
 
 If you just want to use the flavor tagger as standard user you only need:
 
@@ -213,57 +213,61 @@ To save this information you just have to add the predefined predefined list
 to the variables that you use as argument for the module :func:`variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be
-found in the ntupleTree of the output root file: 'FBDT_qrCombined' or
-'FANN_qrCombined'. FBDT is the output of a fast boosted decision tree and
+found in the ntupleTree of the output root file: ``FBDT_qrCombined`` or
+``FANN_qrCombined``. FBDT is the output of a fast boosted decision tree and
 FANN is the output of a multi-layer perceptron of the open source library fast
 artificial neural network . The default output -2 is saved for events without
 tracks in the ROE.
 
 The following variable is also saved by default,
 
-*qr_MC*:It is the ideal output of the flavor tagger (therefore the name) and is
+``qr_MC``:It is the ideal output of the flavor tagger (therefore the name) and is
 the target variable of the combiners. Scholastically speaking it should be
 called q_MC and is just the MC flavor of the tag B. But it considers if
 isSignal on the signal side is 1. Therefore,  one can make several checks at
 one shot with this variable. qrMC is just the nTuple name. The variable which
 is saved is `isRelatedRestOfEventB0Flavor`.
 
-The goal of this variable is to return the value +1(-1) for a B0(B0bar) on the tag side checking the MC.
+The goal of this variable is to return the value +1(-1) for a :math:`B^0 (\overline{B}^0)` on the tag side checking the MC.
 But technically this is not trivial at all. The variable calculation performs the following steps:
 
-1. Check the MC matching of B0sig. It means MC B0sig corresponds to RECO B0sig. If correct then
+1. Check the MC matching of :math:`B^0_{\rm sig}`. It means MC :math:`B^0_{\rm sig}` corresponds to RECO :math:`B^0_{\rm sig}`. 
+   If correctly matched then:
 2. Loop over all tracks in the ROE and get for each one the related mc particle.
-3. Check the all mothers (grand-, grandgrandmother, and so on) of each one of
+3. Check all mothers (grand-, grandgrandmother, and so on) of each one of
    these MC particles and find out if at least one of them is a descendant of MC
-   B0 sig (these events are not good neither for training nor for evaluating). The
+   :math:`B^0_{\rm sig}` (these events are not good neither for training nor for evaluation). The
    loop is broken as soon as an MC particle related to a ROE track is found to be
-   a descendant of MC B0 sig. If not
-4. Find the MC flavor of the B0 particle on the tag side.
+   a descendant of MC :math:`B^0_{\rm sig}`. If not
+4. Find the MC flavor of the neutral :math:`B` particle on the tag side (:math:`B^0_{\rm tag}`).
 
 The variable has several output values. The meaning  are the following:
 
-  * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC B0 sig. -2 (+2) means MC B0 sig is a B0bar (B0)
+  * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`: 
+    *-2 (+2)* means MC :math:`B^0_{\rm sig}` is a :math:`B^0 (\overline{B}^0)`.
 
-  * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendent of MC B0 sig.
+  * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendent of MC :math:`B^0_{\rm sig}`:
+    *-1 (+1)* means that the MC neutral :math:`B` on the tag side is a :math:`B^0 (\overline{B}^0)`.
 
-  * -1 (+1) means that the MC B0 on the tag side is a B0bar (B0)
+  * *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side. 
+    It means, either there are no tracks in ROE, or among the MC particles
+    (and also their ancestors) that are related to the
+    ROE tracks no neutral :math:`B` particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
+    possible, e.g. for :math:`B\to` final state with only photons, :math:`B\to` invisible, :math:`B\to`
+    photons and few tracks but the tracks outside of the acceptance (or not
+    reconstructed), etc. Very rare things could also happen like there is no
+    related MC particle for the tracks in the ROE. This means that one should use
+    ``abs(B0_qrMC) == 1``, if one wants to filter out good events for evaluation. But
+    one should be very careful, e.g. for some signal channels the MC matching does
+    not work well at all and one could think for an instant that the flavor tagger
+    is under or overestimating the dilution.
 
-  * *0* Wrongly matched B0 sig or correctly matched but no B0 that could be
-    tagged was found on the tag side. 
+The flavor tagger also saves the variable ``mcFlavorOfOtherB0`` which returns the flavor of the 
+accompaning tag-side neutral :math:`B` meson if the given particle is a correctly MC matched 
+neutral :math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
+of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
-    * It means, either there are no tracks in ROE, or among the MC particles
-      (and also their ancestors) that are related to the
-      ROE tracks no B0 particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
-      possible, e.g. for :math:`B\to` final state with only photons, :math:`B\to` invisible, :math:`B\to`
-      photons and few tracks but the tracks outside of the acceptance (or not
-      reconstructed), etc. Very rare things could also happen like there is no
-      related MC particle for the tracks in the ROE. This means that one should use
-      ``abs(B0_qrMC) == 1``, , if one wants to filter out good events for evaluation. But
-      one should be very careful, e.g. for some signal channels the MC matching does
-      not work well at all and one could think for an instant that the flavor tagger
-      is under or overestimating the dilution.
-
-The additional informations about individual categories are saved if the option qpCategories is specified in the ntuples,
+The additional informations about individual categories are saved using the aliases
 ``qpCategory<Name>``, where ``<name>`` is the cathegory.
 These are 13 values which correspond to the 13 inputs which are given to the
 combiners. They are actually not ``qr`` but ``qp`` where ``p`` is the output of the
@@ -289,7 +293,7 @@ variables remained the same just for practical use.
 ``hasTrueTargetCategory<Name>``: These variables tell you if you have the target
 of a specific category for each event. For example, :math:`B^0\to e^+ \nu X^-` is the decay
 corresponding to the electron category. This variable returns 1 if there is an
-:math:`e^+` which is a primary daughter of the B0 tag by checking the MC information. 0
+:math:`e^+` which is a primary daughter of the :math:`B^0_{\rm tag}` by checking the MC information. 0
 else. Similar for the other categories.
 
 The standard flavor tagger combines all 13 tags of all 13 categories for each
@@ -321,21 +325,20 @@ Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy
 There are also some slides for the tutorial accessible from 
 `this confluence page <https://confluence.desy.de/display/BI/Physics+AnalysisSoftware>`_ .
 
-As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.You find them under:
+As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged. 
+You find them under:
 
 ::
 
   analysis/release-validation/CPVTools/
 
-If you copy this folder and change the workingDirectory and savingDirectory in CPVToolsValidatorInParalell.sh, you can train and test by yourself running:
+You can train and test the flavor tagger, and evaluate its performance by yourself running:
 
 ::
   
-  sh CPVToolsValidatorInParalell.sh Belle2 nunubar nunubar BGx1
+  sh CPVToolsValidatorInParalell.sh Belle2 nunubar nunubar BGx1 yourPathForWeightFiles yourPathForAnalyzedMdst
 
 Note:
-
-  you have to adjust the number of parallel processes nParal according to your machine.
 
 The convention is BGx0 for no machine background and BGx1 for MC with machine background. The process is defined in:
 

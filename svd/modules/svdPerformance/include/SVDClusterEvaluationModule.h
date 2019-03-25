@@ -71,7 +71,7 @@ namespace Belle2 {
 
   private:
 
-    double m_cmTomicron = 10000;
+    double m_cmTomicron = 10000; /**<factor cm -> micron*/
     int m_theLayer;  /**< layer under study */
     double m_interSigmaMax;  /**< max of the histo of the intercept stat error */
     double m_uFiducial;  /**< fiducial length u*/

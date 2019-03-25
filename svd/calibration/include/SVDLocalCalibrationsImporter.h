@@ -58,6 +58,12 @@ namespace Belle2 {
 
 
 
+    /**
+     * This method import to the database the strip
+     * noise from the pedestal local runs.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
     void importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
 
     /**
@@ -123,7 +129,8 @@ namespace Belle2 {
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
-    ClassDef(SVDLocalCalibrationsImporter, 1);
+
+    ClassDef(SVDLocalCalibrationsImporter, 1); /**< needed by root */
   };
 
 } // Belle2 namespace

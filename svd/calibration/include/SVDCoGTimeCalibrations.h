@@ -27,8 +27,9 @@ namespace Belle2 {
    */
   class SVDCoGTimeCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar< SVDCoGCalibrationFunction > > t_payload;
+    static std::string name; /**< name of the SVDCoGCalibrationFunction payload */
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar< SVDCoGCalibrationFunction > >
+    t_payload; /**< typedef for the SVDCoGCalibrationFunction payload of all SVD sensors*/
 
     /** Constructor, no input argument is required */
     SVDCoGTimeCalibrations() : m_aDBObjPtr(name)
@@ -75,7 +76,7 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDCoGCalibrationFunction payload */
   };
 }
 

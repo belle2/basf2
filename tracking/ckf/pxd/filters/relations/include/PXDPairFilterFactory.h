@@ -23,7 +23,7 @@ namespace Belle2 {
 
   public:
     /// Constructor forwarding the default filter name
-    PXDPairFilterFactory(const std::string& defaultFilterName = "sensor");
+    explicit PXDPairFilterFactory(const std::string& defaultFilterName = "sensor");
 
     /// Default destructor
     ~PXDPairFilterFactory();

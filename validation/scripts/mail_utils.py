@@ -75,11 +75,11 @@ def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="
     # Format the final goto link correctly if it is given
     if link is not None:
         if link_title is not None:
-            text += "\n\n[{}]({}){{:.goto}}".format(link_title, link)
-            data["plain_link"] = "\n\n{}: {}".format(link_title, link)
+            text += f"\n\n[{link_title}]({link}){{:.goto}}"
+            data["plain_link"] = f"\n\n{link_title}: {link}"
         else:
-            text += "\n\n<{}>{{:.goto}}".format(link)
-            data["plain_link"] = "\n\n{}".format(link)
+            text += f"\n\n<{link}>{{:.goto}}"
+            data["plain_link"] = f"\n\n{link}"
 
     # parse plain text to html
     data["body"] = markdown.markdown(text, output_format="xhtml1", extensions=["markdown.extensions.attr_list"])

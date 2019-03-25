@@ -154,6 +154,8 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
         double flightTimeEstimate = 0;
         flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
 
+        //TODO: for now this seems to be unused, (see following comment)
+        /*
         driftLength =
           tdcCountTranslator.getDriftLength(hit->getTDCCount(),
                                             wire.getWireID(),
@@ -161,6 +163,7 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
                                             rl,
                                             wire.getRefZ(),
                                             alpha);
+        */
 
         // As the legendre finder does not reestimate the drift length
         // We simply set it to the reference drift length for now.

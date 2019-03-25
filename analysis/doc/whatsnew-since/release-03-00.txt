@@ -46,14 +46,44 @@ Variables
   They behave like :b2:var:`daughterDiffOf`, but use grandDaughters' information rather than daughters'.
 
 * Renamed ClusterHasPulseShapeDiscrimination to :b2:var:`clusterHasPulseShapeDiscrimination`, PulseShapeDiscriminationMVA to :b2:var:`clusterPulseShapeDiscriminationMVA`, and ClusterNumberOfHadronDigits to :b2:var`clusterNumberOfHadronDigits`.
+* Removed the misleading variable `McFlavorOfTagSide`. 
+
+* Added a variable `mcFlavorOfOtherB0` which returns the tag-side flavor by checking the other Upsilon4S
+  daughter without using the ROE. This variable is part of the default `flavor_tagging` list of variables. 
+
+* The name of the variable `MCTagBFlavor` changed to `internalTagVMCFlavor`. It should be used only by experts for debugging.
+
+* Avoided code duplication in flavor tagging variables. Many target variables use now `isSignal`. Therefore, a unit test for 
+  `isSignal` was added to the unit tests of the flavor tagging variables. 
+
+
+* Added MC flight information variables, :b2:var:`mcFlightDistance` and :b2:var:`mcFlightTime`
 
 Standard Particle Lists
 +++++++++++++++++++++++
+
+* Updated V0 lists by making them explicitly call the appropriate vertex fit.
+
+* Switched the aforementioned fitter to Rave due to it displaying higher efficiency
+  (See Physics Performance Meeting, 21 March 2019).
+
+* Fixed a bug in the merged Lambda list, which used an incorrect mass window.
 
 * Updated charged standard PID cut values to reflect the correct efficiencies.
   This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
 
 * Fix the `stdKlongs.stdKlongs` lists.
+Unit Tests
+++++++++++
+
+* Added unit tests for the standard V0 lists.
+
+Variables
++++++++++
+
+* The function to create variable aliases for particles selected from a decay
+  string has been fixed and extended to allow better
+  customization (:issue:`BII-4437`)
 
 * The variables for the fast reco HLT trigger stage have been removed,
   as we are currently not planning to have it in the early data taking.

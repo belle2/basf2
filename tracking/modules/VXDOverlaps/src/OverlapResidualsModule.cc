@@ -61,10 +61,8 @@ void OverlapResidualsModule::defineHisto()
 {
   //Create a separate histogram directories
   TDirectory* oldDir = gDirectory;
-  TDirectory* HMDir = NULL;
-  HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
-  TDirectory* ResDir = NULL;
-  ResDir = oldDir->mkdir("MonitoringResiduals_VXDOverlaps");
+  TDirectory* HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
+  TDirectory* ResDir = oldDir->mkdir("MonitoringResiduals_VXDOverlaps");
 
   //Define histograms of residuals
   ResDir->cd();
@@ -224,7 +222,7 @@ void OverlapResidualsModule::event()
     const vector<SVDCluster* > svdClusters = trk.getSVDHitList();
     B2INFO("FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size());
     //LOOKING FOR 2 CONSECUTIVE PXD HITS IN OVERLAPPING MODULES OF A SAME LAYER
-    for (int i = 0; i < pxdClusters.size(); i++) {
+    for (unsigned int i = 0; i < pxdClusters.size(); i++) {
       const PXDCluster* pxd_1 = pxdClusters[i];
       const RecoHitInformation* infoPXD_1 = trk.getRecoHitInformation(pxd_1);
       if (!infoPXD_1) {
@@ -239,7 +237,7 @@ void OverlapResidualsModule::event()
       const unsigned short pxd_Layer_1 = pxd_id_1.getLayerNumber();
       const unsigned short pxd_Ladder_1 = pxd_id_1.getLadderNumber();
       const unsigned short pxd_Sensor_1 = pxd_id_1.getSensorNumber();
-      for (int l = i + 1; l < pxdClusters.size(); l++) {
+      for (unsigned int l = i + 1; l < pxdClusters.size(); l++) {
         const PXDCluster* pxd_2 = pxdClusters[l];
         const RecoHitInformation* infoPXD_2 = trk.getRecoHitInformation(pxd_2);
         if (!infoPXD_2) {
@@ -289,7 +287,7 @@ void OverlapResidualsModule::event()
     }
 
     //LOOKING FOR 2 CONSECUTIVE SVD HITS IN OVERLAPPING MODULES OF A SAME LAYER
-    for (int i = 0; i < svdClusters.size(); i++) {
+    for (unsigned int i = 0; i < svdClusters.size(); i++) {
       const SVDCluster* svd_1 = svdClusters[i];
       const RecoHitInformation* infoSVD_1 = trk.getRecoHitInformation(svd_1);
       if (!infoSVD_1) {
@@ -304,7 +302,7 @@ void OverlapResidualsModule::event()
       const unsigned short svd_Layer_1 = svd_id_1.getLayerNumber();
       const unsigned short svd_Ladder_1 = svd_id_1.getLadderNumber();
       const unsigned short svd_Sensor_1 = svd_id_1.getSensorNumber();
-      for (int l = i + 1; l < svdClusters.size(); l++) {
+      for (unsigned int l = i + 1; l < svdClusters.size(); l++) {
         const SVDCluster* svd_2 = svdClusters[l];
         const RecoHitInformation* infoSVD_2 = trk.getRecoHitInformation(svd_2);
         if (!infoSVD_2) {

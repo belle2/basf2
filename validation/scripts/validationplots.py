@@ -313,7 +313,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
         # Some information to be printed out while the plots are created
         print(terminal_title_line(
-            'Creating plots for package: {0}'.format(package),
+            f'Creating plots for package: {package}',
             level=1
         ))
 
@@ -344,7 +344,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
             # Some more information to be printed out while plots are
             # being created
-            print('Creating plots for file: {0}'.format(rootfile))
+            print(f'Creating plots for file: {rootfile}')
 
             # Get the list of all objects that belong to the current
             # package and the current file. First the regular objects:
@@ -470,7 +470,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         # Make the command line output more readable
         print()
 
-    print("Storing to {}".format(comparison_json_file))
+    print(f"Storing to {comparison_json_file}")
 
     # create objects for all revisions
     comparison_revs = []
@@ -529,7 +529,7 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         rf = os.path.basename(plotuple.rootfile)
         if len(rf) > 30:
             rf = rf[:30] + "..."
-        return "'{}' from '{}'".format(key, rf)
+        return f"'{key}' from '{rf}'"
 
     n_warnings = 0
     plotuple_no_warning = []
@@ -548,13 +548,13 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
     if warning_verbosity:
         print()
         if n_warnings:
-            print("A total of {} warnings were issued.".format(n_warnings))
+            print(f"A total of {n_warnings} warnings were issued.")
             for warning, perpetrators in plotuple_by_warning.items():
-                print("* '{}' was issued by "
-                      "{} plotuples".format(warning, len(perpetrators)))
+                print(f"* '{warning}' was issued by {len(perpetrators)} "
+                      f"plotuples")
                 if warning_verbosity >= 2:
                     for perpetrator in perpetrators:
-                        print("  - {}".format(perpetrator))
+                        print(f"  - {perpetrator}")
         else:
             print("No warnings were issued. ")
         print(validationfunctions.congratulator(
@@ -568,12 +568,11 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
             print()
         print("Chi2 comparisons")
         for result, perpetrators in plotuples_by_comparison_result.items():
-            print("* '{}' was the result of {} comparisons".format(
-                result, len(perpetrators)
-            ))
+            print(f"* '{result}' was the result of {len(perpetrators)} "
+                  f"comparisons")
             if chi2_verbosity >= 2:
                 for perpetrator in perpetrators:
-                    print("  - {}".format(perpetrator))
+                    print(f"  - {perpetrator}")
         score = len(plotuples_by_comparison_result["equal"]) + \
             0.75 * len(plotuples_by_comparison_result["not_compared"]) + \
             0.5 * len(plotuples_by_comparison_result["warning"])
@@ -991,7 +990,7 @@ def create_plots(revisions=None, force=False, process_queue=None,
         # be listed in 'available_revisions()'
         if revision not in available_revisions(work_folder) \
                 and not revision == 'reference':
-            print("Warning: Removing invalid revision '{}'.".format(revision))
+            print(f"Warning: Removing invalid revision '{revision}'.")
             revisions.pop(revision)
 
     # In case no valid revisions were given, fall back to default and use all

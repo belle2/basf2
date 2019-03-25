@@ -74,7 +74,6 @@ namespace Belle2 {
             daughter->hasExtraInfo("lifeTime") &&
             daughter->hasExtraInfo("lifeTimeErr")) {
           outErr = daughter -> getExtraInfo("lifeTimeErr");
-          //    B2WARNING("extra info lifetime = "<<daughter -> getExtraInfo("lifeTime"));
           return daughter -> getExtraInfo("lifeTime");
         }
       }
@@ -218,8 +217,13 @@ namespace Belle2 {
       if (mode == "time") {
         double lifetime = mcparticle->getLifetime();
         double mass = mcparticle->getMass();
-        double energy = mcparticle->getEnergy();
-        double time = lifetime / energy * mass;
+        double time = -99;
+        if (mass == 0)
+          B2WARNING("you are asking for the proper time of a massless particle which is not allowed, returning -99.");
+        else {
+          double energy = mcparticle->getEnergy();
+          time = lifetime / energy * mass;
+        }
 
         if (time < 0)
           B2WARNING("Negative true proper time, it's forbidden -> something went wrong.");

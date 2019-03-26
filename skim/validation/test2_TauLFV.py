@@ -12,7 +12,7 @@ from skim.standardlists.lightmesons import *
 """
 <header>
   <input>../TauLFV.udst.root</input>
-  <output>../TauLFV_Validation.root</output>
+  <output>TauLFV_Validation.root</output>
   <contact>kenji@hepl.phys.nagoya-u.ac.jp</contact>
 </header>
 """

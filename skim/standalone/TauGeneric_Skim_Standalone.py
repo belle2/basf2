@@ -17,9 +17,6 @@ set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-03-00-03'
 
 skimCode = encodeSkimName('TauGeneric')
-import sys
-import os
-import glob
 
 taugenericskim = Path()
 

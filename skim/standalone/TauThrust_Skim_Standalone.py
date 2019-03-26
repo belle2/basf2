@@ -17,9 +17,6 @@ set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-03-00-03'
 
 skimCode = encodeSkimName('TauThrust')
-import sys
-import os
-import glob
 
 tauthrustskim = Path()
 

@@ -27,7 +27,7 @@ def SetTauGenericSkimVariables(path=analysis_main):
     * nGoodTracks: number of good tracks in an event
     * netCharge: total net charge of good tracks
     * nTracksS1/nTracksS2: number of good tracks in each hemisphere S1/S2 divided by thrust axis
-    * MinvS1/MinvS2: invariant mass of particles in each hemisphere
+    * invMS1/invMS2: invariant mass of particles in each hemisphere
     * maxPt: maximum Pt amoung good tracks
     * E_ECLtrk: total ECL energy of good tracks
     """
@@ -57,8 +57,8 @@ def SetTauGenericSkimVariables(path=analysis_main):
     variables.addAlias('netCharge', 'formula(countInList(pi+:tauskim, charge == 1) - countInList(pi+:tauskim, charge == -1))')
     variables.addAlias('nTracksS1', 'nParticlesInList(pi+:S1)')
     variables.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
-    variables.addAlias('MinvS1', 'invMassInLists(pi+:S1, gamma:S1)')
-    variables.addAlias('MinvS2', 'invMassInLists(pi+:S2, gamma:S2)')
+    variables.addAlias('invMS1', 'invMassInLists(pi+:S1, gamma:S1)')
+    variables.addAlias('invMS2', 'invMassInLists(pi+:S2, gamma:S2)')
     # variables.addAlias('Evis', 'visibleEnergyOfEventCMS')
     variables.addAlias('maxPt', 'maxPtInList(pi+:tauskim)')
     variables.addAlias('E_ECLtrk', 'formula(totalECLEnergyOfParticlesInList(pi+:tauskim))')
@@ -97,11 +97,11 @@ def TauList(path=analysis_main):
     applyCuts('tau+:S1', '-2 < netCharge < 2', path=path)  # cut2
 
     # applyCuts('tau+:S1',
-    #          '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and MinvS1 < 1.8 ] or '
-    #          '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and MinvS2 < 1.8 ]', path=path)  # cut3+cut5
+    #          '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and invMS1 < 1.8 ] or '
+    #          '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 ]', path=path)  # cut3+cut5
     applyCuts('tau+:S1',
-              '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and MinvS1 < 1.8 and MinvS2 < 2.3 ] or '
-              '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and MinvS2 < 1.8 and MinvS1 < 2.3 ]', path=path)  # cut3+cut5+cut8
+              '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and invMS1 < 1.8 and invMS2 < 2.3 ] or '
+              '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 and invMS1 < 2.3 ]', path=path)  # cut3+cut5+cut8
 
     applyCuts('tau+:S1', 'visibleEnergyOfEventCMS < 10 and E_ECLtrk < 6', path=path)  # cut4
     applyCuts('tau+:S1', 'visibleEnergyOfEventCMS > 3 or maxPt > 1', path=path)  # cut6

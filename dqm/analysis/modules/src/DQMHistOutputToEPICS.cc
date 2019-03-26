@@ -51,16 +51,18 @@ void DQMHistOutputToEPICSModule::initialize()
     n->histoname = it.at(0);
     SEVCHK(ca_create_channel(it.at(1).c_str(), NULL, NULL, 10, &n->mychid), "ca_create_channel failure");
     pmynode.push_back(n);
-    int length = int(ca_element_count(n->mychid));
-    if (length > 0) {
-      std::vector <double> data(length, 0.0);
-      SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_set failure");
-    }
 #endif
   }
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  for (auto* n : pmynode) {
+    int length = int(ca_element_count(n->mychid));
+    if (length > 0) {
+      std::vector <double> data(length, 0.0);
+      SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_set failure");
+    }
+  }
 #endif
   B2DEBUG(99, "DQMHistOutputToEPICS: initialized.");
 }

@@ -65,10 +65,10 @@ void DQMHistOutputToEPICSModule::initialize()
     int length = int(ca_element_count(n->mychid));
     if (length > 0) {
       std::vector <double> data(length, 0.0);
-      SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_set failure");
+      SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_put failure");
       if (n->mychid_last) {
         if (length == int(ca_element_count(n->mychid_last))) {
-          SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_set failure");
+          SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_put failure");
         }
       }
     }
@@ -90,19 +90,16 @@ void DQMHistOutputToEPICSModule::event()
     if (hh1) {
       int length = int(ca_element_count(it->mychid));
       if (length > 0 && hh1->GetNcells() > 2) {
-        double* data = new double[length];
+        std::vector <double> data(length, 0.0);
         // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
         // We fill up the array with ZEROs otherwise
         for (int i = 0; i < length ; i++) {
           if (i < hh1->GetNcells() - 2) { // minus under/overflow bin
             data[i] = hh1->GetBinContent(i + 1);
-          } else {
-            data[i] = 0.0;
           }
         }
 
         SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)data), "ca_set failure");
-        delete []data;
       }
     }
   }
@@ -122,7 +119,7 @@ void DQMHistOutputToEPICSModule::terminate()
       if (length > 0 && length == int(ca_element_count(n->mychid_last))) {
         std::vector <double> data(length, 0.0);
         SEVCHK(ca_array_get(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_get failure");
-        SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_set failure");
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_put failure");
       }
     }
   }

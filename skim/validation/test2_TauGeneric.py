@@ -36,10 +36,10 @@ variablesToHistogram(
                ('visibleEnergyOfEventCMS', 60, 0, 12),
                ('E_ECLtrk', 70, 0, 7),
                ('maxPt', 60, 0, 6),
-               ('MinvS1', 60, 0, 3),
-               ('MinvS2', 60, 0, 3),
+               ('invMS1', 60, 0, 3),
+               ('invMS2', 60, 0, 3),
                ('Theta_miss', 60, 0, 180)],
-    variables_2d=[('MinvS1', 30, 0, 3, 'MinvS2', 30, 0, 3)],
+    variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3)],
     path=taugenericskim
 )
 process(taugenericskim)

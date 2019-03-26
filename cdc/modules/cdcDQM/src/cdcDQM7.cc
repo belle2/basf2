@@ -212,7 +212,11 @@ void cdcDQM7Module::event()
     int adcsum = cdchit->getADCCount();
     int vtdc = cdchit->getTDCCount();
 
+    if (sL > 8) continue; // error
+    if (iL > 8) continue; // error
+
     int num = sL * 6 + iL + 2;
+    if (num > 55) continue; // error
 
     if (adcsum > 25) {
       //    if (adcsum > -1) {
@@ -264,6 +268,7 @@ void cdcDQM7Module::event()
     CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
 
     int board = cdcrawhit->getBoardId();
+    if (board > 299) continue;
 
     double x = board % 20;
     double y = (board - (board % 20)) / 20;

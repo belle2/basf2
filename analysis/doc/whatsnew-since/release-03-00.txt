@@ -4,6 +4,9 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* Added ``isCloneOfSignalSide`` and ``hasAncestorFromSignalSide``  variables to monitor the clone particle
+  contamination in ROE. These variables use generator information.
+
 * Removed ``nECLClusters`` (:issue:`BII-4476`).
   The number of `ECLClusters` is not a good measure for anything except the age of the input mdst file.
   Recent changes to the handling of ECLClusters and their hypotheses have changed this (already arbitrary) 

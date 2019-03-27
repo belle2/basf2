@@ -38,8 +38,8 @@ void CKFToCDCFromEclFindlet::exposeParameters(ModuleParamList* moduleParamList, 
   m_resultFinalizer.exposeParameters(moduleParamList, prefix);
   m_resultStorer.exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->getParameter<std::string>("statePreFilter").setDefaultValue("all"); // mc_truth_eclSeed
-  moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("recording_eclSeed"); // rough_eclSeed
+  moduleParamList->getParameter<std::string>("statePreFilter").setDefaultValue("all");
+  moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough_eclSeed"); // rough_and_recording_eclSeed
   moduleParamList->getParameter<std::string>("stateExtrapolationFilter").setDefaultValue("extrapolate_and_update");
   moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance");
 }
@@ -56,6 +56,10 @@ void CKFToCDCFromEclFindlet::beginEvent()
 void CKFToCDCFromEclFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wireHits)
 {
   m_seedCreator.apply(m_seeds);
+
+  if (m_seeds.size() > 1) {
+    B2INFO(m_seeds.size() << " seeds created.");
+  }
 
   const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
 

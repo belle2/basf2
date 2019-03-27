@@ -12,44 +12,31 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
-
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/ckf/cdc/filters/paths/BaseCDCPathFilter.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
-  static char const* const cdcStateBasicVarNames[] = {
-    "eventNumber",
-    "firstHit",
-    "iCLayer",
-    "arcLength",
-    "hitDistance",
-    "seed_r",
-    "seed_z",
-    "seed_p",
-    "seed_pt",
-    "seed_pz",
-    "seed_charge",
-    "track_p",
-    "track_pt",
-    "track_pz",
-    "track_charge"
+  static char const* const cdcfromEclPathTruthVarNames[] = {
+    "matched",
+    "PDG",
+    "seed_p_truth",
+    "seed_pt_truth",
+    "seed_pz_truth"
   };
 
   /// Vehicle class to transport the variable names
-  class CDCStateBasicVarNames : public TrackFindingCDC::VarNames<BaseCDCStateFilter::Object> {
+  class CDCfromEclPathTruthVarNames : public TrackFindingCDC::VarNames<BaseCDCPathFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(cdcStateBasicVarNames);
+    static const size_t nVars = TrackFindingCDC::size(cdcfromEclPathTruthVarNames);
 
     /// Get the name of the column.
     constexpr
     static char const* getName(int iName)
     {
-      return cdcStateBasicVarNames[iName];
+      return cdcfromEclPathTruthVarNames[iName];
     }
   };
 
@@ -57,13 +44,10 @@ namespace Belle2 {
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  class CDCStateBasicVarSet : public TrackFindingCDC::VarSet<CDCStateBasicVarNames> {
+  class CDCfromEclPathTruthVarSet : public TrackFindingCDC::VarSet<CDCfromEclPathTruthVarNames> {
 
   public:
     /// Generate and assign the variables from the object.
-    virtual bool extract(const BaseCDCStateFilter::Object* result) override;
-
-  private:
-    StoreObjPtr<EventMetaData> m_eventMetaData;
+    virtual bool extract(const BaseCDCPathFilter::Object* path) override;
   };
 }

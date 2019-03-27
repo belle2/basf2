@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
+#include <tracking/ckf/cdc/filters/paths/BaseCDCPathFilter.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -20,12 +20,9 @@
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
-  static char const* const cdcStateBasicVarNames[] = {
+  static char const* const cdcPathBasicVarNames[] = {
     "eventNumber",
-    "firstHit",
-    "iCLayer",
-    "arcLength",
-    "hitDistance",
+    "totalHits",
     "seed_r",
     "seed_z",
     "seed_p",
@@ -35,21 +32,42 @@ namespace Belle2 {
     "track_p",
     "track_pt",
     "track_pz",
-    "track_charge"
+    "track_charge",
+    "chargeFlip",
+    "arcLength0",
+    "arcLength1",
+    "arcLength2",
+    "arcLength3",
+    "arcLength4",
+    "arcLength5",
+    "arcLength6",
+    "arcLength7",
+    "arcLength8",
+    "arcLength9",
+    "hitDistance0",
+    "hitDistance1",
+    "hitDistance2",
+    "hitDistance3",
+    "hitDistance4",
+    "hitDistance5",
+    "hitDistance6",
+    "hitDistance7",
+    "hitDistance8",
+    "hitDistance9"
   };
 
   /// Vehicle class to transport the variable names
-  class CDCStateBasicVarNames : public TrackFindingCDC::VarNames<BaseCDCStateFilter::Object> {
+  class CDCPathBasicVarNames : public TrackFindingCDC::VarNames<BaseCDCPathFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(cdcStateBasicVarNames);
+    static const size_t nVars = TrackFindingCDC::size(cdcPathBasicVarNames);
 
     /// Get the name of the column.
     constexpr
     static char const* getName(int iName)
     {
-      return cdcStateBasicVarNames[iName];
+      return cdcPathBasicVarNames[iName];
     }
   };
 
@@ -57,11 +75,11 @@ namespace Belle2 {
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  class CDCStateBasicVarSet : public TrackFindingCDC::VarSet<CDCStateBasicVarNames> {
+  class CDCPathBasicVarSet : public TrackFindingCDC::VarSet<CDCPathBasicVarNames> {
 
   public:
     /// Generate and assign the variables from the object.
-    virtual bool extract(const BaseCDCStateFilter::Object* result) override;
+    virtual bool extract(const BaseCDCPathFilter::Object* path) override;
 
   private:
     StoreObjPtr<EventMetaData> m_eventMetaData;

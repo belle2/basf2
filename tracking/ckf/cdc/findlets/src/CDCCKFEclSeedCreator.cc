@@ -94,7 +94,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 
     // set position, momentum, cov, sharedPlanePtr
     TMatrixDSym cov(6);
-    // TODO: check values of covariance matrix
     // for now: neglect correlations
     double covArray[6];
     shower.getCovarianceMatrixAsArray(covArray);
@@ -136,6 +135,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     CDCCKFState seedStateNeg(eclSeedNeg, msopNeg);
     seeds.push_back({seedStateNeg});
     CDCCKFState seedStatePos(eclSeedPos, msopPos);
-    seeds.push_back({seedStatePos});
+    //seeds.push_back({seedStatePos});
   }
 }

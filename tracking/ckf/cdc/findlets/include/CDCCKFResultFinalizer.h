@@ -61,15 +61,6 @@ namespace Belle2 {
       if (bestElement and not std::isnan(bestWeight)) {
         results.push_back(*bestElement);
       }
-
-      std::string str("Best path: ");
-      for (auto const& p : *bestElement) {
-        if (!p.isSeed()) {
-          str += std::to_string(p.getWireHit()->getWire().getICLayer());
-          str += "-";
-        }
-      }
-      B2INFO(str);
     }
 
   private:

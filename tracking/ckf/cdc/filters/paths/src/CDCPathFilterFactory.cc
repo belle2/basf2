@@ -13,15 +13,28 @@
 
 #include <tracking/ckf/cdc/filters/paths/SizeCDCPathFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
+#include <tracking/ckf/cdc/filters/paths/CDCPathBasicVarSet.h>
+#include <tracking/ckf/cdc/filters/paths/CDCPathTruthVarSet.h>
+#include <tracking/ckf/cdc/filters/paths/CDCfromEclPathTruthVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+namespace {
+  /// Recording filter
+  using RecordingCDCPathFilter = RecordingFilter<VariadicUnionVarSet<CDCPathBasicVarSet, CDCPathTruthVarSet>>;
+  /// Recording filter
+  using RecordingCDCfromEclPathFilter = RecordingFilter<VariadicUnionVarSet<CDCPathBasicVarSet, CDCfromEclPathTruthVarSet>>;
+  /// And filter for cdc paths
+  using AndCDCPathFilter = AndFilter<BaseCDCPathFilter>;
+}
 
 CDCPathFilterFactory::CDCPathFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -45,6 +58,8 @@ std::map<std::string, std::string> CDCPathFilterFactory::getValidFilterNamesAndD
   return {
     {"none", "no track combination is valid"},
     {"size", "very rough filtering"},
+    {"recording", "record variables to a TTree"},
+    {"size_and_recording", "record variables to a TTree"},
     //{"mc_truth", "Extrapolation and update"},
   };
 }
@@ -60,6 +75,20 @@ CDCPathFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SizeCDCPathFilter>();
     //} else if (filterName == "mc_truth") {
     //  return std::make_unique<MCTruthCDCPathFilter>();
+  } else if (filterName == "recording") {
+    return std::make_unique<RecordingCDCPathFilter>("CDCPathFilter.root");
+  } else if (filterName == "size_and_recording") {
+    return std::make_unique<AndCDCPathFilter>(
+             std::make_unique<RecordingCDCPathFilter>("CDCPathFilter.root"),
+             std::make_unique<SizeCDCPathFilter>()
+           );
+  } else if (filterName == "recording_fromEcl") {
+    return std::make_unique<RecordingCDCfromEclPathFilter>("CDCfromEclPathFilter.root");
+  } else if (filterName == "size_and_recording_fromEcl") {
+    return std::make_unique<AndCDCPathFilter>(
+             std::make_unique<RecordingCDCfromEclPathFilter>("CDCfromEclPathFilter.root"),
+             std::make_unique<SizeCDCPathFilter>()
+           );
   } else {
     return Super::create(filterName);
   }

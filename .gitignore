@@ -97,6 +97,7 @@ Belle2FileCatalog.xml
 *.swp
 .ipynb_checkpoints/
 -
+._*
 
 # Editor configuration #
 # #################### #

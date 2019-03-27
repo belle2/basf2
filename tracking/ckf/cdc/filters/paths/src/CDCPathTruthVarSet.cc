@@ -7,11 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/cdc/filters/states/CDCStateTruthVarSet.h>
+#include <tracking/ckf/cdc/filters/paths/CDCPathTruthVarSet.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
+#include <ecl/dataobjects/ECLShower.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -19,30 +20,42 @@
 using namespace std;
 using namespace Belle2;
 
-bool CDCStateTruthVarSet::extract(const BaseCDCStateFilter::Object* pair)
+bool CDCPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
 {
-  const auto& path = pair->first;
-  const auto& state = pair->second;
-
   // check if hit belongs to same seed
   const auto& seed = path->front();
   const auto* seedRecoTrack = seed.getSeed();
   const auto* seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
-  const auto* seedMCParticle = seedMCTrack->getRelated<MCParticle>();
+  // const auto* seedMCParticle = seedMCTrack->getRelated<MCParticle>();
 
-  const auto* wireHit = state->getWireHit();
-  const auto* cdcHit = wireHit->getHit();
-  const auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
-  //const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
+  // while (seedMCParticle->getMother()) {
+  //   seedMCParticle = seedMCParticle->getMother();
+  // }
 
-  // Bremsstrahlung etc (works for electron gun, check for other events later)
-  while (seedMCParticle->getMother()) {
-    seedMCParticle = seedMCParticle->getMother();
+  int matched = 0;
+
+  for (auto const& state : *path) {
+    if (state.isSeed()) {
+      continue;
+    }
+
+    const auto wireHit = state.getWireHit();
+    const auto cdcHit = wireHit->getHit();
+    // const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
+    const auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
+
+    if (seedMCTrack == hitMCTrack) {
+      matched += 1;
+    }
   }
 
-  // calculate the interesting quantities
-  var<named("match")>() = seedMCTrack == hitMCTrack ? true : false;
-  var<named("PDG")>() = seedMCParticle->getPDG();
+  var<named("matched")>() = matched;
+  /*  var<named("PDG")>() = seedMCParticle->getPDG();
 
+    auto seedMom = seedMCParticle->getMomentum();
+    var<named("seed_p_truth")>() = seedMom.Mag();
+    var<named("seed_pt_truth")>() = seedMom.Perp();
+    var<named("seed_pz_truth")>() = seedMom.Z();
+  */
   return true;
 }

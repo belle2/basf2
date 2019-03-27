@@ -293,7 +293,14 @@ namespace Belle2 {
       return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
     }
 
-
+    Manager::FunctionPtr chargedPidBDT(const std::string& pdgCodeHyp, const std::string& pdgCodeTest)
+    {
+      auto func = [pdgCodeHyp, pdgCodeTest](const Particle * part) -> double {
+        auto name = "chargedPidBDTScore_" + pdgCodeHyp + "_VS_" + pdgCodeTest;
+        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : -999.0;
+      };
+      return func;
+    }
 
     //*************
     // B2BII

@@ -27,39 +27,55 @@ import flavorTagger as ft
 import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
+import argparse
 import sys
 import os
 
-belleOrBelle2Flag = str(sys.argv[1])  # "Belle" or "Belle2"
-mode = str(sys.argv[2])  # "Sampler", "Teacher" or "Expert"
-decayChannelTrainedOn = str(sys.argv[3])  # Decay channel of the weight files "JPsiKs" or "nunubar"
-decayChannel = str(sys.argv[4])  # Decay channel that will be reconstructed "JPsiKs" or "nunubar"
-MCtype = str(sys.argv[5])  # BGx0 for background free MC otherwise BGx1, BelleDataConv for Converted Belle Data
-fileNumber = str(sys.argv[6])  # A file number (when sampling in parallel)
-workingDirectory = str(sys.argv[7])  # Place where the training samples and the weight files are saved
-savingDirectory = str(sys.argv[8])  # Place where the analyzed files are saved
-doVertex = str(sys.argv[9])  # Reconstruct B vertices True or False
 
-belleData = ''
-if len(sys.argv) > 10:
-    if sys.argv[10] != "BelleDataConv":
-        B2FATAL("argv[10] only for Belle Data in Expert mode")
-    elif sys.argv[10] == "BelleDataConv" and belleOrBelle2Flag != "Belle" and mode != "Expert":
-        B2FATAL("argv[10]=BelleDataConv only for Belle Data in Expert mode")
-    else:
-        belleData = sys.argv[10]
+def getCommandLineOptions():
+    """ Parses the command line options for the CPV validation and returns the corresponding arguments. """
 
-if belleOrBelle2Flag == "Belle":
-    from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
+    parser = argparse.ArgumentParser(description='Script for the validation of CPV tools:\
+                                     it defines the procedure to sample the training set, train and test the flavor tagger\
+                                     as well as to reconstruct the vertices of B0-> J/psi K_S0 and of the tag-side B0\
+                                     using the tagV module.\n\
+                                     Usage: basf2 -i inputMDST.root flavorTaggerVertexingValidation.py -- -m Sampler -dc JPsiKs')
 
+    parser.add_argument('-bob2', '--belleOrBelle2Flag', dest='belleOrBelle2Flag',
+                        type=str, default='Belle2', choices=['Belle', 'Belle2'],
+                        help='Choose Belle for converted Belle data or MC, otherwise choose Belle2.')
+    parser.add_argument('-m', '--mode', dest='mode', type=str, required=True,
+                        choices=['Sampler', 'Teacher', 'Expert'],
+                        help='Working mode of the flavor tagger. Choose Sampler, Teacher or Expert.')
+    parser.add_argument('-trc', '--decayChannelTrainedOn', dest='decayChannelTrainedOn',
+                        type=str, default='nunubar',
+                        help='Decay channel of the weight files. Official samples available are JPsiKs or nunubar.')
+    parser.add_argument('-dc', '--decayChannel', dest='decayChannel', type=str, required=True,
+                        choices=['JPsiKs', 'nunubar'], help='Decay channel that will be reconstructed. Choose JPsiKs or nunubar.')
+    parser.add_argument('-mct', '--mcType', dest='mcType', type=str, default='BGx1',
+                        choices=['BGx0', 'BGx1'], help='Type of files. Choose BGx0 for background free Belle II MC. \n' +
+                        'Otherwise choose BGx1 for BelleII MC with bkg. or for converted Belle data or MC.')
+    parser.add_argument('-fn', '--fileNumber', dest='fileNumber', type=str, default='',
+                        help='A file number (when sampling in parallel).')
+    parser.add_argument('-wd', '--workingDirectory', dest='workingDirectory', type=str, default='.',
+                        help='Path where the training samples and the weight files are saved.')
+    parser.add_argument('-sd', '--savingDirectory', dest='savingDirectory', type=str, default='.',
+                        help='Path where the analyzed output files are saved.')
+    parser.add_argument('-dv', '--doVertex', dest='doVertex', type=bool, default=False,
+                        help='Reconstruct B vertices True or False')
+    parser.add_argument('-bd', '--belleData', dest='belleData', type=str, default='',
+                        choices=['', 'BelleDataConv'], help='Choose BelleDataConv only for Belle Data in Expert mode.')
+    args = parser.parse_args()
 
-if decayChannelTrainedOn == 'JPsiKs':
-    decayChannelTrainedOn = 'JpsiKs_mu'
+    if args.belleData == "BelleDataConv":
+        if args.belleOrBelle2Flag != "Belle":
+            B2FATAL("BelleDataConv only for Belle Data.")
+        if args.mode != "Expert":
+            B2FATAL("BelleDataConv only in Expert mode.")
+        if args.mcType != "BGx1":
+            B2FATAL("When using BelleDataConv, mcType must be set to BGx1.")
 
-# workingDirectory = '.'
-
-# create path
-cp_val_path = b2.Path()
+    return args
 
 
 def setEnvironment(belleOrBelle2Flag="Belle2"):
@@ -72,6 +88,8 @@ def setEnvironment(belleOrBelle2Flag="Belle2"):
     environmentType = "default"
 
     if belleOrBelle2Flag == "Belle":
+        from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
+
         isBelleMC = True
         if belleData == "BelleDataConv":
             isBelleMC = False
@@ -82,10 +100,6 @@ def setEnvironment(belleOrBelle2Flag="Belle2"):
         environmentType = "Belle"
 
     ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
-
-    if belleOrBelle2Flag == "Belle":
-        fixECL = b2.register_module('FixECLClusters')
-        cp_val_path.add_module(fixECL)
 
 
 def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
@@ -126,6 +140,33 @@ def reconstructB2nunubar():
     ma.findMCDecay(list_name='B0:sig', decay='B0 -> nu_tau anti-nu_tau', writeOut=True, path=cp_val_path)
 
 
+def mcMatchAndBuildROE(belleOrBelle2Flag='Belle2'):
+    """
+    Runs the mc matching and creates the rest of event for the signal particle list.'
+
+    @param belleOrBelle2Flag Default is 'Belle2' but 'Belle' is possible.
+    """
+
+    # perform MC matching (MC truth asociation). Always before TagV
+    ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
+
+    # build the rest of the event associated to the B0
+    if belleOrBelle2Flag == "Belle":
+        target_list_name = 'B0:sig'
+        ma.fillParticleList('pi+:mdst', '', path=cp_val_path)
+        ma.fillParticleList('gamma:mdst', '', path=cp_val_path)
+        ma.fillParticleList('K_L0:mdst', '', path=cp_val_path)
+        inputParticlelists = ['pi+:mdst', 'gamma:mdst', 'K_L0:mdst']
+        roeBuilder = b2.register_module('RestOfEventBuilder')
+        roeBuilder.set_name('ROEBuilder_' + target_list_name)
+        roeBuilder.param('particleList', target_list_name)
+        roeBuilder.param('particleListsInput', inputParticlelists)
+        cp_val_path.add_module(roeBuilder)
+
+    if belleOrBelle2Flag == "Belle2":
+        ma.buildRestOfEvent(target_list_name='B0:sig', inputParticlelists=[], path=cp_val_path)
+
+
 def applyCPVTools(mode='Expert'):
     """
     Defines the procedure to use the flavor tagger and tagV on the signal 'B0:sig' list.
@@ -134,18 +175,12 @@ def applyCPVTools(mode='Expert'):
     @param mode Default is 'Expert' but also needed for 'Sampler' mode.
     """
 
-    # perform MC matching (MC truth asociation). Always before TagV
-    ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
-
-    # build the rest of the event associated to the B0
-    ma.buildRestOfEvent(target_list_name='B0:sig', inputParticlelists=[], path=cp_val_path)
-
     if mode == 'Sampler':
 
         ft.flavorTagger(
             particleLists=['B0:sig'],
             mode=mode,
-            weightFiles='B2' + decayChannelTrainedOn + MCtype,
+            weightFiles='B2' + decayChannelTrainedOn + mcType,
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
             belleOrBelle2=belleOrBelle2Flag,
             workingDirectory=workingDirectory,
@@ -157,78 +192,103 @@ def applyCPVTools(mode='Expert'):
         ft.flavorTagger(
             particleLists=['B0:sig'],
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-            weightFiles='B2' + decayChannelTrainedOn + MCtype,
+            weightFiles='B2' + decayChannelTrainedOn + mcType,
             belleOrBelle2=belleOrBelle2Flag,
             downloadFromDatabaseIfNotfound=True,
             workingDirectory=workingDirectory,
             samplerFileId=str(fileNumber),
             path=cp_val_path)
 
-    if doVertex == 'True' or mode == 'Expert':
+    if doVertex or mode == 'Expert':
 
-        if doVertex == 'True':
+        if doVertex:
             if decayChannel == "JPsiKs":
                 vx.vertexRave(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
                               constraint='', path=cp_val_path)
             vx.TagV(list_name='B0:sig', MCassociation='breco', path=cp_val_path)
             print("TagV will be used")
 
-    # Select variables that will be stored to ntuple
-    fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth
-    jpsiandk0s_vars = vc.mc_truth
-    vertex_vars = vc.vertex + vc.mc_vertex + vc.kinematics + vc.mc_kinematics
-    bvars = vc.reco_stats + \
-        vc.deltae_mbc + \
-        vc.mc_truth + \
-        vc.roe_multiplicities + \
-        ft.flavor_tagging + \
-        vc.tag_vertex + \
-        vc.mc_tag_vertex + \
-        vertex_vars
+        # Select variables that will be stored to ntuple
+        fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth
+        jpsiandk0s_vars = vc.mc_truth
+        vertex_vars = vc.vertex + vc.mc_vertex + vc.kinematics + vc.mc_kinematics
+        bvars = vc.reco_stats + \
+            vc.deltae_mbc + \
+            vc.mc_truth + \
+            vc.roe_multiplicities + \
+            vc.tag_vertex + \
+            vc.mc_tag_vertex + \
+            vertex_vars
 
-    if decayChannel == "JPsiKs":
-        bvars = bvars + \
-            vu.create_aliases_for_selected(list_of_variables=fs_vars,
-                                           decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
-            vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
-                                           decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]') + \
-            vu.create_aliases_for_selected(list_of_variables=vertex_vars,
-                                           decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
+        if decayChannel == "JPsiKs":
+            bvars = bvars + \
+                vu.create_aliases_for_selected(list_of_variables=fs_vars,
+                                               decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+                vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
+                                               decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]') + \
+                vu.create_aliases_for_selected(list_of_variables=vertex_vars,
+                                               decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
+        if mode == 'Expert':
+            bvars += ft.flavor_tagging
+        else:
+            vu._variablemanager.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
+            bvars += ['qrMC']
 
-    # Saving variables to ntuple
-    ma.variablesToNtuple(decayString='B0:sig',
-                         variables=bvars,
-                         filename=savingDirectory + '/' + 'B2A801-FlavorTagger' +
-                         mode + str(fileNumber) + belleOrBelle2Flag + MCtype + belleData + '.root',
-                         treename='B0tree',
-                         path=cp_val_path)
+        # Saving variables to ntuple
+        ma.variablesToNtuple(decayString='B0:sig',
+                             variables=bvars,
+                             filename=savingDirectory + '/' + 'B2A801-FlavorTagger' +
+                             mode + str(fileNumber) + belleOrBelle2Flag + mcType + belleData + '.root',
+                             treename='B0tree',
+                             path=cp_val_path)
 
     ma.summaryOfLists(particleLists=['B0:sig'], path=cp_val_path)
 
 
-if mode == "Sampler" or mode == "Expert":
+if __name__ == '__main__':
 
-    setEnvironment(belleOrBelle2Flag=belleOrBelle2Flag)
+    args = getCommandLineOptions()
 
-    if decayChannel == "nunubar":
-        reconstructB2nunubar()
+    belleOrBelle2Flag = args.belleOrBelle2Flag
+    mode = args.mode
+    decayChannelTrainedOn = args.decayChannelTrainedOn
+    decayChannel = args.decayChannel
+    mcType = args.mcType
+    fileNumber = args.fileNumber
+    workingDirectory = args.workingDirectory
+    savingDirectory = args.savingDirectory
+    doVertex = args.doVertex
+    belleData = args.belleData
 
-    elif decayChannel == "JPsiKs":
-        reconstructB2JpsiKs_mu(belleOrBelle2Flag=belleOrBelle2Flag)
+    if decayChannelTrainedOn == 'JPsiKs':
+        decayChannelTrainedOn = 'JpsiKs_mu'
 
-    applyCPVTools(mode=mode)
-    ma.process(cp_val_path)
-    print(b2.statistics)
+    cp_val_path = b2.Path()
 
-if mode == "Teacher":
+    if mode == "Sampler" or mode == "Expert":
 
-    ft.flavorTagger(
-        particleLists=[],
-        mode='Teacher',
-        weightFiles='B2' + decayChannelTrainedOn + MCtype,
-        combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-        belleOrBelle2=belleOrBelle2Flag,
-        downloadFromDatabaseIfNotfound=True,
-        uploadToDatabaseAfterTraining=True,
-        workingDirectory=workingDirectory,
-        path=cp_val_path)
+        setEnvironment(belleOrBelle2Flag=belleOrBelle2Flag)
+
+        if decayChannel == "nunubar":
+            reconstructB2nunubar()
+
+        elif decayChannel == "JPsiKs":
+            reconstructB2JpsiKs_mu(belleOrBelle2Flag=belleOrBelle2Flag)
+
+        mcMatchAndBuildROE(belleOrBelle2Flag=belleOrBelle2Flag)
+        applyCPVTools(mode=mode)
+        ma.process(cp_val_path)
+        print(b2.statistics)
+
+    if mode == "Teacher":
+
+        ft.flavorTagger(
+            particleLists=[],
+            mode='Teacher',
+            weightFiles='B2' + decayChannelTrainedOn + mcType,
+            combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
+            belleOrBelle2=belleOrBelle2Flag,
+            downloadFromDatabaseIfNotfound=True,
+            uploadToDatabaseAfterTraining=True,
+            workingDirectory=workingDirectory,
+            path=cp_val_path)

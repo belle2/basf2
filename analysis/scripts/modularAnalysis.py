@@ -1888,7 +1888,7 @@ def printROEInfo(
     @param full_print   print out mask values for each Track/ECLCLuster in mask
     @param path         modules are added to this path
     """
-    if not path:
+    if not isinstance(path, basf2.Path):
         B2FATAL("Error from printROEInfo, please add this to the for_each path")
 
     printMask = register_module('RestOfEventPrinter')

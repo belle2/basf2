@@ -1229,7 +1229,7 @@ Total Number of Particles created in the DataStore: 6718
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=12 arrayIndex=50 identifier=1001 daughterIndices:  (none)
  mass=0.4976
- momentum=(-0.01, -0.02, 0.09) p=0.09314
+ momentum=(nan, nan, nan) p=nan
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1248,7 +1248,7 @@ Total Number of Particles created in the DataStore: 6718
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=17 arrayIndex=51 identifier=6001 daughterIndices:  (none)
  mass=0.4976
- momentum=(-0.00, -0.02, 0.02) p=0.02535
+ momentum=(nan, nan, nan) p=nan
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1267,7 +1267,7 @@ Total Number of Particles created in the DataStore: 6718
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=19 arrayIndex=52 identifier=8001 daughterIndices:  (none)
  mass=0.4976
- momentum=(0.04, 0.09, 0.07) p=0.1225
+ momentum=(nan, nan, nan) p=nan
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1286,7 +1286,7 @@ Total Number of Particles created in the DataStore: 6718
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=23 arrayIndex=53 identifier=13001 daughterIndices:  (none)
  mass=0.4976
- momentum=(0.06, -0.12, -0.15) p=0.1977
+ momentum=(nan, nan, nan) p=nan
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):

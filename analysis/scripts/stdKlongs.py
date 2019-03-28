@@ -10,7 +10,7 @@
 #
 ########################################################
 
-from modularAnalysis import fillParticleList, cutAndCopyList
+from modularAnalysis import fillParticleList, cutAndCopyList, analysis_main
 
 
 def stdKlongs(listtype='all', path=analysis_main):

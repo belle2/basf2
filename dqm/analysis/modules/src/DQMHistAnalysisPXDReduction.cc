@@ -39,6 +39,13 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
+DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistAnalysisPXDReductionModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");
@@ -159,6 +166,5 @@ void DQMHistAnalysisPXDReductionModule::terminate()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
   // m_cReduction->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
-  // if (ca_current_context()) only the last module should destroy expics conext
 }
 

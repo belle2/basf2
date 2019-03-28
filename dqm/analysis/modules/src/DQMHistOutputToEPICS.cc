@@ -36,6 +36,13 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
   B2DEBUG(99, "DQMHistOutputToEPICS: Constructor done.");
 }
 
+DQMHistOutputToEPICSModule::~DQMHistOutputToEPICSModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistOutputToEPICSModule::initialize()
 {
 #ifdef _BELLE2_EPICS
@@ -124,7 +131,6 @@ void DQMHistOutputToEPICSModule::terminate()
     }
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-//  if( ca_current_context()) ca_context_destroy();// only the last module is allowd to destroy the context
 #endif
 }
 

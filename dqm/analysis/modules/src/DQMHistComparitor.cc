@@ -42,8 +42,12 @@ DQMHistComparitorModule::DQMHistComparitorModule()
   B2DEBUG(1, "DQMHistComparitor: Constructor done.");
 }
 
-
-DQMHistComparitorModule::~DQMHistComparitorModule() { }
+DQMHistComparitorModule::~DQMHistComparitorModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
 
 TH1* DQMHistComparitorModule::find_histo_in_canvas(TString histo_name)
 {
@@ -325,5 +329,4 @@ void DQMHistComparitorModule::terminate()
 {
   B2DEBUG(20, "DQMHistComparitor: terminate called");
   if (m_refFile) delete m_refFile;
-  // if (!ca_current_context()) only the last module should destroy context
 }

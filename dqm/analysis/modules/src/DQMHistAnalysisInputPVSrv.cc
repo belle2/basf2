@@ -91,7 +91,12 @@ DQMHistAnalysisInputPVSrvModule::DQMHistAnalysisInputPVSrvModule()
 }
 
 
-DQMHistAnalysisInputPVSrvModule::~DQMHistAnalysisInputPVSrvModule() { }
+DQMHistAnalysisInputPVSrvModule::~DQMHistAnalysisInputPVSrvModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
 
 void DQMHistAnalysisInputPVSrvModule::initialize()
 {
@@ -281,9 +286,6 @@ void DQMHistAnalysisInputPVSrvModule::endRun()
 void DQMHistAnalysisInputPVSrvModule::terminate()
 {
   B2DEBUG(20, "DQMHistAnalysisInputPVSrv: terminate called");
-#ifdef _BELLE2_EPICS
-// if (ca_current_context()) ca_context_destroy();// only the last module
-#endif
 }
 
 

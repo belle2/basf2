@@ -39,6 +39,13 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
+DQMHistAnalysisPXDCMModule::~DQMHistAnalysisPXDCMModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistAnalysisPXDCMModule::initialize()
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -162,6 +169,5 @@ void DQMHistAnalysisPXDCMModule::terminate()
   B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
   // m_cCommonMode->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
-  // if (ca_current_context()) only the laste module shoudl destory epics context
 }
 

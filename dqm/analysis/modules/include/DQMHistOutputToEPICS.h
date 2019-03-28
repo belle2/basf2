@@ -38,6 +38,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistOutputToEPICSModule();
+    //! Destructor
+    ~DQMHistOutputToEPICSModule();
 
   private:
 

@@ -43,6 +43,13 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
+DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistAnalysisPXDEffModule::initialize()
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -212,6 +219,5 @@ void DQMHistAnalysisPXDEffModule::event()
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
-  // if (ca_current_context()) //only the last module should destroy epics context
 }
 

@@ -41,6 +41,13 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 
+DQMHistAnalysisPXDChargeModule::~DQMHistAnalysisPXDChargeModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistAnalysisPXDChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: initialized.");
@@ -209,7 +216,6 @@ void DQMHistAnalysisPXDChargeModule::terminate()
   SEVCHK(ca_clear_channel(mychid[0]), "ca_clear_channel failure");
   SEVCHK(ca_clear_channel(mychid[1]), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-// if (ca_current_context())  ca_context_destroy();// only the last module
 #endif
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");
 }

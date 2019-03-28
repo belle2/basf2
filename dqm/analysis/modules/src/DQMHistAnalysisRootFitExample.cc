@@ -32,6 +32,12 @@ DQMHistAnalysisRooFitExampleModule::DQMHistAnalysisRooFitExampleModule()
   B2DEBUG(1, "DQMHistAnalysisRooFitExample: Constructor done.");
 }
 
+DQMHistAnalysisRooFitExampleModule::~DQMHistAnalysisRooFitExampleModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
 
 void DQMHistAnalysisRooFitExampleModule::initialize()
 {
@@ -132,7 +138,6 @@ void DQMHistAnalysisRooFitExampleModule::terminate()
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_clear_channel(mychid), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  // if (ca_current_context()) ca_context_destroy(); only the last module should destroy context
 #endif
   B2INFO("DQMHistAnalysisRooFitExample: terminate called");
 }

@@ -293,8 +293,16 @@ namespace Belle2 {
       return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
     }
 
-    Manager::FunctionPtr chargedPidBDT(const std::string& pdgCodeHyp, const std::string& pdgCodeTest)
+    Manager::FunctionPtr chargedPidBDT(const std::vector<std::string>& arguments)
     {
+      if (arguments.size() != 2) {
+        B2ERROR("Need exactly two arguments for chargedPidBDT: pdgCodeHyp, pdgCodeTest");
+        return nullptr;
+      }
+
+      auto pdgCodeHyp(arguments.at(0));
+      auto pdgCodeTest(arguments.at(1));
+
       auto func = [pdgCodeHyp, pdgCodeTest](const Particle * part) -> double {
         auto name = "chargedPidBDTScore_" + pdgCodeHyp + "_VS_" + pdgCodeTest;
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : -999.0;
@@ -434,6 +442,8 @@ namespace Belle2 {
                       "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("deuteronID", deuteronID,
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
+    REGISTER_VARIABLE("chargedPidBDT(pdgCodeHyp, pdgCodeTest)", chargedPidBDT,
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.");
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");

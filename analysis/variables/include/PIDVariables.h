@@ -106,13 +106,13 @@ namespace Belle2 {
 
     /**
      * @return the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.
-     * The signal hypothesis pdg and the test pdg are passed a strings.
+     * The signal hypothesis pdg and the test pdg are passed a vector of strings of size = 2.
      * Examples:
      * Response of BDT trained for "e vs pi" separation = chargedPidBDT(11, 211)
      *
      * If the BDT score for the given set of hypotheses is not available for the particle under test, return a dummy value of -999.
      */
-    Manager::FunctionPtr chargedPidBDT(const std::string& pdgCodeHyp, const std::string& pdgCodeTest);
+    Manager::FunctionPtr chargedPidBDT(const std::vector<std::string>& arguments);
 
     /**
      * Returns Belle's main PID variable to separate pions, kaons and protons:  atc_pid(3,1,5).prob()

@@ -72,7 +72,7 @@ void CDCDedxDQMModule::initialize()
     fCollType = "hadron skim";
   }
 
-  m_TrgResult.isRequired();
+  m_TrgResult.isOptional();
   m_cdcDedxTracks.isRequired();
   REG_HISTOGRAM
 
@@ -83,7 +83,6 @@ void CDCDedxDQMModule::initialize()
 //---------------------------------
 void CDCDedxDQMModule::beginRun()
 {
-
   if (!m_cdcDedxTracks.isOptional()) {
     B2WARNING("Missing CDCDedxTracks array, CDCDedxDQM is skipped.");
     return;
@@ -100,13 +99,13 @@ void CDCDedxDQMModule::event()
 {
 
   if (!m_TrgResult.isValid()) {
-    B2ERROR("SoftwareTriggerResult object not available but require to select bhabha events for this module");
+    B2WARNING("SoftwareTriggerResult object not available but require to select bhabha events for this module");
     return;
   }
 
   const std::map<std::string, int>& fresults = m_TrgResult->getResults();
   if (fresults.find(m_triggerIdentifier) == fresults.end()) {
-    B2ERROR("CDCDedxDQMModule: Can't find required trigger identifier: " << m_triggerIdentifier);
+    B2WARNING("CDCDedxDQMModule: Can't find required trigger identifier: " << m_triggerIdentifier);
     return;
   }
 

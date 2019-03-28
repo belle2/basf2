@@ -96,17 +96,7 @@ void ChargedPidMVAModule::terminate()
 void ChargedPidMVAModule::initializeMVA()
 {
 
-  if (!m_weightfiles_representation) { B2FATAL("No MVA weightfile representations payload found in database! Abort."); }
-
-  B2INFO("Loading weightfiles from the payload...");
-
-  // THis only if need to de-serialize xml from string
-  // std::vector<MVA::Weightfile> weightfiles;
-  // for (const auto& representation : *m_weightfiles_representation) {
-  //  // The actual weightfile is stored in the m_data field of the representation as a serialized string.
-  //  std::stringstream ss(representation.m_data);
-  //  weightfiles.push_back(MVA::Weightfile::loadFromStream(ss));
-  // }
+  if (!m_weightfiles_representation) { B2FATAL("No MVA weightfiles representation payload found in database! Abort..."); }
 
   B2INFO("Load supported MVA interfaces...");
 
@@ -117,23 +107,27 @@ void ChargedPidMVAModule::initializeMVA()
   // Iterate over standard charged particles.
   for (const auto& [pdg, name] : m_charged_particle_lists) {
 
-    B2INFO("\tParticle hypothesis: (" << pdg << "," << name << ")");
+    B2INFO("\tLoading weightfiles from the payload class for particle hypothesis: (" << pdg << "," << name << ")");
 
-    auto weightfiles = m_weightfiles_representation->getMVAWeights(pdg);
+    auto serialized_weightfiles = m_weightfiles_representation->getMVAWeights(pdg);
 
     B2INFO("\tConstruct the MVA experts and datasets from the weightfiles...");
 
     // Initialise list of experts/ds for this pdgId.
-    ExpertsList experts;
-    DatasetsList datasets;
+    ExpertsList experts(serialized_weightfiles->size());
+    DatasetsList datasets(serialized_weightfiles->size());
 
     // Initialise list of lists of variables/spectators for this pdgId.
     VariablesList variables, spectators;
 
-    for (unsigned int idx(0); idx < weightfiles.size(); idx++) {
+    for (unsigned int idx(0); idx < serialized_weightfiles->size(); idx++) {
+
+      // De-serialize the string into an MVA::Weightfile object.
+      std::stringstream ss(serialized_weightfiles->at(idx));
+      auto weightfile = MVA::Weightfile::loadFromStream(ss);
 
       MVA::GeneralOptions general_options;
-      weightfiles.at(idx).getOptions(general_options);
+      weightfile.getOptions(general_options);
 
       // Store the list of pointers to the relevant variables for this xml file.
       Variable::Manager& manager = Variable::Manager::Instance();
@@ -141,23 +135,20 @@ void ChargedPidMVAModule::initializeMVA()
       spectators.push_back(manager.getVariables(general_options.m_spectators));
 
       // Store an MVA::Expert object.
-      experts.push_back(supported_interfaces[general_options.m_method]->getExpert());
+      experts[idx] = supported_interfaces[general_options.m_method]->getExpert();
+      experts.at(idx)->load(weightfile);
 
       // Store an MVA::SingleDataset object, in which we will save our features later...
       std::vector<float> v(general_options.m_variables.size(), 0.0);
       std::vector<float> s(general_options.m_spectators.size(), 0.0);
-      //datasets.push_back( std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, v, 1.0, s)) );
-      datasets.push_back(std::make_unique<MVA::SingleDataset>(general_options, v, 1.0));
+      datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, v, 1.0);
 
-    }
-
-    // Load the weightfiles into the MVA::Expert objects.
-    for (unsigned int idx(0); idx < weightfiles.size(); idx++) {
-      experts.at(idx)->load(weightfiles.at(idx));
     }
 
     // Update maps w/ values for this pdgId.
-    m_experts.emplace(pdg, std::move(experts)); // https://stackoverflow.com/questions/28921250/c-nested-map-with-unique-ptr/32749132
+    m_experts.emplace(pdg, std::move(experts)); // Move semantics needed for unique_ptr:
+    // https://stackoverflow.com/questions/28921250/c-nested-map-with-unique-ptr/32749132
+    // https://stackoverflow.com/questions/6876751/differences-between-unique-ptr-and-shared-ptr
     m_datasets.emplace(pdg, std::move(datasets));
     m_variables.emplace(pdg, variables);
     m_spectators.emplace(pdg, spectators);

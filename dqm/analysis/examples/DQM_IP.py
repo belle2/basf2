@@ -30,7 +30,7 @@ main.add_module(inroot)
 ip_x = register_module('DQMHistAnalysisEpicsExample')
 ip_x.param("HistoName", "IPMonitoring/Y4S_Vertex.X")
 # ip_x.param("Function", "gaus(0)")
-ip_y.param('PVName', 'DQM:Beam:IP:X:')
+ip_x.param('PVName', 'DQM:Beam:IP:X:')
 main.add_module(ip_x)
 
 ip_y = register_module('DQMHistAnalysisEpicsExample')

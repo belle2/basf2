@@ -1822,16 +1822,15 @@ endloop:
 
           if (cluster)
           {
-            const Track* track = cluster->getRelated<Track>();
+            auto tracks = cluster->getRelationsFrom<Track>();
 
-            if (track) {
-              Particle trackParticle(track, Belle2::Const::pion);
+            for (const auto& track : tracks) {
+              Particle trackParticle(&track, Belle2::Const::pion);
 
               if (cut->check(&trackParticle))
                 return 1;
-              else
-                return 0;
             }
+            return 0;
           }
           return std::numeric_limits<double>::quiet_NaN();
         };
@@ -2091,6 +2090,6 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("maxPtInList(particleListName)", maxPtInList,
                       "Returns maximum transverse momentum Pt in the given particle List.");
     REGISTER_VARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
-                      "Returns if a Track that satisfies the given condition is related to the ECLCluster of the Particle.");
+                      "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.");
   }
 }

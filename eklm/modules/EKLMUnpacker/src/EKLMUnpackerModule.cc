@@ -173,7 +173,7 @@ void EKLMUnpackerModule::event()
             if (!(m_IgnoreWrongHits ||
                   (stripFirmware == 0 && m_IgnoreStrip0))) {
               B2ERROR("Incorrect strip number in raw data."
-                      << LogVar("Strip number", strip));
+                      << LogVar("Strip number", stripFirmware));
             }
             if (!m_WriteWrongHits)
               continue;

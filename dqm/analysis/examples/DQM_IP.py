@@ -27,32 +27,19 @@ main.add_module(inroot)
 # input.param('AutoCanvasFolders', [])
 # main.add_module(input)
 
-$  # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-from basf2 import *
-import sys
-argv = sys.argv
-
-# Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
-
-# Create main path
-main = create_path()
-
-ip_x = register_module('DQMHistAnalysisEpicsExampleModule')
+ip_x = register_module('DQMHistAnalysisEpicsExample')
 ip_x.param("HistoName", "IPMonitoring/Y4S_Vertex.X")
 # ip_x.param("Function", "gaus(0)")
 ip_y.param('PVName', 'DQM:Beam:IP:X:')
 main.add_module(ip_x)
 
-ip_y = register_module('DQMHistAnalysisEpicsExampleModule')
+ip_y = register_module('DQMHistAnalysisEpicsExample')
 ip_y.param("HistoName", "IPMonitoring/Y4S_Vertex.Y")
 # ip_y.param("Function", "gaus(0)")
 ip_y.param('PVName', 'DQM:Beam:IP:Y:')
 main.add_module(ip_y)
 
-ip_z = register_module('DQMHistAnalysisEpicsExampleModule')
+ip_z = register_module('DQMHistAnalysisEpicsExample')
 ip_z.param("HistoName", "IPMonitoring/Y4S_Vertex.Z")
 # ip_z.param("Function", "gaus(0)")
 ip_z.param('PVName', 'DQM:Beam:IP:Z:')

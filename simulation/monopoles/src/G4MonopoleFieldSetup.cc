@@ -32,11 +32,12 @@
 // #include "G4CashKarpRKF45.hh"
 // #include "G4RKG3_Stepper.hh"
 
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/SystemOfUnits.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4MonopoleFieldSetup* G4MonopoleFieldSetup::fMonopoleFieldSetup = 0;
 

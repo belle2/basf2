@@ -13,13 +13,14 @@
 #include <simulation/monopoles/G4MonopoleEquation.h>
 
 #include <globals.hh>
-#include <G4PhysicalConstants.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <iomanip>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4MonopoleEquation::G4MonopoleEquation(G4MagneticField* mField)
   : G4EquationOfMotion(mField)

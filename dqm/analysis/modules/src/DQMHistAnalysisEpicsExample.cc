@@ -2,8 +2,8 @@
 // File : DQMHistAnalysisEpicsExample.cc
 // Description :
 //
-// Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 25 - Dec - 2015
+// Author : Bjoern Spruck, Mainz Univerisity
+// Date : 2017-2019
 //-
 
 
@@ -230,7 +230,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
     for (auto i = 0; i < m_parameters; i++) {
       double data;
       data = m_f1->GetParameter(i);
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
+      if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
     }
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
@@ -248,10 +248,10 @@ void DQMHistAnalysisEpicsExampleModule::terminate()
 #ifdef _BELLE2_EPICS
   if (m_parameters > 0) {
     for (auto i = 0; i < m_parameters; i++) {
-      SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+      if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
     }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: terminate called");
 }

@@ -58,7 +58,7 @@ namespace Belle2 {
   class ParticleLoaderModule : public Module {
 
     /**
-     * tuple for collecting everything we know about the ParticleList to be created.
+     * tuple for collecting everything we know about the ParticlList to be created.
      * The elements are: PDGCode, name, anti-list name, isListSelfConjugated, and the cut sequence
      */
     typedef std::tuple<int, std::string, std::string, bool, std::shared_ptr<Variable::Cut>> PList;
@@ -158,9 +158,6 @@ namespace Belle2 {
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
 
     std::vector<int> m_chargeZeroTrackCounts; /**< internally used to count number of tracks with charge zero */
-
-    std::string
-    m_clusterTrackCut; /**< Charged clusters are not used to construct the list of photons if at least one of the related tracks satisfies these cut conditions */
   };
 
 } // Belle2 namespace

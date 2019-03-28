@@ -80,10 +80,6 @@ namespace Belle2 {
     addParam("enforceFitHypothesis", m_enforceFitHypothesis,
              "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
              m_enforceFitHypothesis);
-
-    addParam("clusterTrackCondition", m_clusterTrackCut,
-             "Charged clusters are not used to construct the list of photons if at least one of the related tracks satisfies the conditions given in this argument",
-             std::string(""));
   }
 
   void ParticleLoaderModule::initialize()
@@ -500,19 +496,7 @@ namespace Belle2 {
     for (int i = 0; i < ECLClusters.getEntries(); i++) {
       const ECLCluster* cluster      = ECLClusters[i];
 
-      auto tracks = cluster->getRelationsFrom<Track>();
-      std::shared_ptr<Variable::Cut> trackCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(m_clusterTrackCut));
-      bool found_relatedGoodTrack = false;
-      for (const auto& track : tracks) {
-        Particle trackParticle(&track, Belle2::Const::pion);
-
-        if (trackCut->check(&trackParticle)) {
-          found_relatedGoodTrack = true;
-          break;
-        }
-      }
-
-      if (found_relatedGoodTrack)
+      if (!cluster->isNeutral())
         continue;
 
       // skip all ECLClusters that do not have the c_nPhotons hypothesis flag

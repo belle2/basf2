@@ -85,7 +85,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
@@ -159,5 +159,6 @@ void DQMHistAnalysisPXDReductionModule::terminate()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
   // m_cReduction->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
+  // if (ca_current_context()) only the last module should destroy expics conext
 }
 

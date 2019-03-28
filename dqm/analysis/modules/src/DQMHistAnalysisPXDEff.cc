@@ -103,7 +103,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
@@ -212,5 +212,6 @@ void DQMHistAnalysisPXDEffModule::event()
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
+  // if (ca_current_context()) //only the last module should destroy epics context
 }
 

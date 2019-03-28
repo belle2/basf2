@@ -38,7 +38,7 @@ void DQMHistAnalysisRooFitExampleModule::initialize()
   B2INFO("DQMHistAnalysisRooFitExample: initialized.");
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_create_channel("fit_value", NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
@@ -132,7 +132,7 @@ void DQMHistAnalysisRooFitExampleModule::terminate()
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_clear_channel(mychid), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  ca_context_destroy();
+  // if (ca_current_context()) ca_context_destroy(); only the last module should destroy context
 #endif
   B2INFO("DQMHistAnalysisRooFitExample: terminate called");
 }

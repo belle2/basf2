@@ -188,7 +188,7 @@ void DQMHistComparitorModule::initialize()
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
 #endif
   for (auto& it : m_histlist) {
     if (it.size() != 7) {
@@ -325,4 +325,5 @@ void DQMHistComparitorModule::terminate()
 {
   B2DEBUG(20, "DQMHistComparitor: terminate called");
   if (m_refFile) delete m_refFile;
+  // if (!ca_current_context()) only the last module should destroy context
 }

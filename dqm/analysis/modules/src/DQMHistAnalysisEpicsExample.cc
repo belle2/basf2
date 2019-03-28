@@ -80,7 +80,7 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
   if (m_parameters > 0) {
     if (m_parameters > 10) m_parameters = 10; // hard limit
 #ifdef _BELLE2_EPICS
-    SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
 #endif
     for (auto i = 0; i < m_parameters; i++) {
       std::string aa;
@@ -247,7 +247,7 @@ void DQMHistAnalysisEpicsExampleModule::terminate()
     }
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  ca_context_destroy();
+//  if( ca_current_context()) ca_context_destroy();// only the last module is allowd to destroy the context
 #endif
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: terminate called");
 }

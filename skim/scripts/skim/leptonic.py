@@ -31,7 +31,7 @@ def LeptonicList(path):
     * lepton momentum in CMS Frame > 2 GeV
     * electronID > 0.5
     * muonID > 0.5
-    * nTracks > 4
+    * nTracks >= 3
     """
     __authors__ = [
         "Phillip Urquijo"

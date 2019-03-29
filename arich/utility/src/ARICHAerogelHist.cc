@@ -42,7 +42,6 @@
 #include <TString.h>
 #include <TFile.h>
 #include <TAxis.h>
-#include <TVector2.h>
 
 using namespace std;
 using namespace Belle2;

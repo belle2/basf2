@@ -17,7 +17,6 @@
 
 #include <framework/pcore/ZMQEventProcessor.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/GlobalProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
@@ -27,8 +26,6 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/LogSystem.h>
-
-#include <thread>
 
 #include <TROOT.h>
 

@@ -180,11 +180,6 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
 {
   // Simple implementation to stop all processes
   //  system("killall basf2 sock2rbr rb2sockr hrelay hserver");
-
-  // Emergency stop
-  system("killall -9 python");
-
-  // Normal abort
   int status;
   if (m_pid_sender != 0) {
     printf("RFEventProcessor : killing sender pid=%d\n", m_pid_sender);
@@ -193,7 +188,6 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   }
   if (m_pid_basf2 != 0) {
     printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);
-    //    kill(m_pid_basf2, SIGINT);
     kill(m_pid_basf2, SIGINT);
     waitpid(m_pid_basf2, &status, 0);
     m_pid_basf2 = 0;

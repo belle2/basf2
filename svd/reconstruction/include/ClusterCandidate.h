@@ -58,6 +58,7 @@ namespace Belle2 {
       /** get the reference to the map of sample counts per strip */
       const std::map<unsigned int, unsigned int>& getCounts() const { return m_counts; }
 
+      /** get quadratic fit charge*/
       float getQFCharge() const { return m_qfCharge; }
       /** get the seed charge of the cluster */
       float getQFSeedCharge() const { return m_qfSeedCharge; }
@@ -67,9 +68,10 @@ namespace Belle2 {
       const std::map<unsigned int, float>& getQFTimes() const { return m_qfTimes; }
 
     protected:
+      /** adjacent charge*/
       struct adjacentCharge {
-        float prev_charge;
-        float next_charge;
+        float prev_charge; /**< charge of the previous strip*/
+        float next_charge; /**< charge of the next strip*/
       };
 
       /** Charge of the cluster */

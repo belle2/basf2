@@ -417,8 +417,8 @@ def print_contents_and_errors(obj_a, obj_b):
     total_a = sum([obj_a.GetBinContent(ibin) for ibin in range(0, nbins + 2)])
     total_b = sum([obj_b.GetBinContent(ibin) for ibin in range(0, nbins + 2)])
 
-    print("Total events/summed weights in object 1: {:10.5f}".format(total_a))
-    print("Total events/summed weights in object 2: {:10.5f}".format(total_b))
+    print(f"Total events/summed weights in object 1: {total_a:10.5f}")
+    print(f"Total events/summed weights in object 2: {total_b:10.5f}")
 
     chi2_tot = 0
 
@@ -451,7 +451,7 @@ def print_contents_and_errors(obj_a, obj_b):
     cp.print_divider()
     print()
 
-    print("Total chi2: {:10.5f}".format(chi2_tot))
+    print(f"Total chi2: {chi2_tot:10.5f}")
 
 
 def debug_cli():
@@ -482,24 +482,24 @@ def debug_cli():
     # =================================
 
     if not os.path.exists(args.rootfile_a):
-        raise ValueError("Could not find '{}'.".format(args.rootfile_a))
+        raise ValueError(f"Could not find '{args.rootfile_a}'.")
 
     if not os.path.exists(args.rootfile_b):
-        raise ValueError("Could not find '{}'.".format(args.rootfile_b))
+        raise ValueError(f"Could not find '{args.rootfile_b}'.")
 
     rootfile_a = ROOT.TFile(args.rootfile_a)
     obj_a = rootfile_a.Get(args.name_a)
     if not obj_a:
-        raise ValueError("Could not find object '{}' in file '{}'.".format(
-            args.name_a, args.rootfile_a
-        ))
+        raise ValueError(
+            f"Could not find object '{args.name_a}' "
+            f"in file '{args.rootfile_a}'.")
 
     rootfile_b = ROOT.TFile(args.rootfile_b)
     obj_b = rootfile_b.Get(args.name_b)
     if not obj_b:
-        raise ValueError("Could not find object '{}' in file '{}'.".format(
-            args.name_b, args.rootfile_b
-        ))
+        raise ValueError(
+            f"Could not find object '{args.name_b}' "
+            f"in file '{args.rootfile_b}'.")
 
     # 3. Performe testing with debug option
     # =====================================

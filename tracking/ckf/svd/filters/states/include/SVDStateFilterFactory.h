@@ -25,7 +25,7 @@ namespace Belle2 {
 
   public:
     /// Constructor forwarding the default filter name
-    SVDStateFilterFactory(const std::string& defaultFilterName = "all");
+    explicit SVDStateFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
     ~SVDStateFilterFactory();

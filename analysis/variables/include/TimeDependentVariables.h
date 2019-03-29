@@ -219,6 +219,12 @@ namespace Belle2 {
      */
     double tagVErrOrthogonalBoostDirection(const Particle*);
 
+    /**
+     * Returns internal mc flavor used in the TagV module. Only to be used for internal checks by developers.
+     *
+     */
+    double particleInternalTagVMCFlavor(const Particle*);
+
   }
 }
 

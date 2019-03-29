@@ -63,7 +63,7 @@ namespace Belle2 {
     addParam("writeEmptyTimeStamps", m_writeEmptyTimeStamps,
              "if true, write to ntuple also empty time stamps", false);
     addParam("topTimeOffset", m_topTimeOffset,
-             "TOP: time offset of hits (to be subtracted) [ns]", 350.0);
+             "TOP: time offset of hits (to be subtracted) [ns]", 400.0);
     addParam("topTimeWindow", m_topTimeWindow,
              "TOP: time window in which to count hits [ns]", 100.0);
 
@@ -121,6 +121,12 @@ namespace Belle2 {
     for (auto& monitor : m_monitors) {
       monitor->initialize(m_tree);
     }
+
+    // control histograms
+    m_trgAll = new TH1F("trgAll", "trigger types of all events", 16, -0.5, 15.5);
+    m_trgAll->SetXTitle("type of trigger timing source");
+    m_trgSel = new TH1F("trgSel", "trigger types of selected events", 16, -0.5, 15.5);
+    m_trgSel->SetXTitle("type of trigger timing source");
 
   }
 
@@ -213,14 +219,17 @@ namespace Belle2 {
   {
     auto trgType = TRGSummary::TTYP_NONE;
     if (m_trgSummary.isValid()) trgType = m_trgSummary->getTimType();
+    m_trgAll->Fill(trgType);
 
     if (m_trgTypes.empty()) {
       m_trgTypesCount[trgType] += 1;
+      m_trgSel->Fill(trgType);
       return true;
     }
     for (auto type : m_trgTypes) {
       if (trgType == type) {
         m_trgTypesCount[trgType] += 1;
+        m_trgSel->Fill(trgType);
         return true;
       }
     }

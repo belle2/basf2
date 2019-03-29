@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
     }
 
     // Monitoring
-    flow.log(size * 4);
+    flow.log(size * sizeof(int));
 
     // Write to ring buffer
     const int returnValue = mainLoop.writeToRingBufferWaiting(ringBuffer, buffer, size);

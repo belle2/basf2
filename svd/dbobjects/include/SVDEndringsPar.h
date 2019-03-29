@@ -53,13 +53,13 @@ namespace Belle2 {
 
   private:
 
-    std::string m_name;
-    double m_z;
-    double m_baseRadius;
-    double m_innerRadius;
-    double m_outerRadius;
-    double m_horizontalBarWidth;
-    double m_verticalBarWidth;
+    std::string m_name; /**< name*/
+    double m_z; /**< z*/
+    double m_baseRadius; /**< base radius*/
+    double m_innerRadius; /**< inner radius*/
+    double m_outerRadius; /**< outer radius*/
+    double m_horizontalBarWidth; /**< horizontal bar width*/
+    double m_verticalBarWidth; /**< vertical bar width*/
 
     ClassDef(SVDEndringsTypePar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
@@ -95,12 +95,12 @@ namespace Belle2 {
 
   private:
 
-    std::string m_material;
-    double m_length;
-    double m_gapWidth;
-    double m_baseThickness;
+    std::string m_material; /**< material name */
+    double m_length; /**< length*/
+    double m_gapWidth; /**< gap width*/
+    double m_baseThickness; /**< base thickness*/
 
-    std::vector<SVDEndringsTypePar> m_types;
+    std::vector<SVDEndringsTypePar> m_types; /**< vector of types*/
 
     ClassDef(SVDEndringsPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

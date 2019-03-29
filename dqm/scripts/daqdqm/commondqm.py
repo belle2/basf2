@@ -3,7 +3,6 @@
 
 from basf2 import *
 from analysisDQM import add_analysis_dqm
-from IPDQM import add_IP_dqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco"):
@@ -44,7 +43,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         if components is None or 'PXD' in components or 'SVD' in components:
             vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
-            add_IP_dqm(path)
 
     if dqm_environment == "hlt":
         # HLT
@@ -61,9 +59,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         cdcdqm = register_module('cdcDQM7')
         path.add_module(cdcdqm)
 
-        cdcdedxdqm = register_module('CDCDedxDQM')
-        cdcdedxdqm.param("UsingHadronfiles", True)
-        path.add_module(cdcdedxdqm)
+        module_names = [m.name() for m in path.modules()]
+        if ('SoftwareTrigger' in module_names):
+            cdcdedxdqm = register_module('CDCDedxDQM')
+            path.add_module(cdcdedxdqm)
 
     # ECL
     if components is None or 'ECL' in components:

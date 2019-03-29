@@ -13,8 +13,10 @@ import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
-
+import datetime
 import os
+
+now = datetime.datetime.now()
 
 
 class defaultCoGTimeCalibrationImporter(basf2.Module):
@@ -22,32 +24,13 @@ class defaultCoGTimeCalibrationImporter(basf2.Module):
     def beginRun(self):
 
         iov = Belle2.IntervalOfValidity.always()
-        #      iov = IntervalOfValidity(0,0,-1,-1)
-
-        payload = Belle2.SVDCoGTimeCalibrations.t_payload()
 
         timeCal = SVDCoGCalibrationFunction()
         timeCal.set_bias(0., 0., 0., 0.)
         timeCal.set_scale(1., 1., 1., 1.)
 
-        geoCache = Belle2.VXD.GeoCache.getInstance()
-
-        for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
-            layerNumber = layer.getLayerNumber()
-            for ladder in geoCache.getLadders(layer):
-                ladderNumber = ladder.getLadderNumber()
-                for sensor in geoCache.getSensors(ladder):
-                    sensorNumber = sensor.getSensorNumber()
-                    for side in (0, 1):
-                        print(
-                            "setting CoG calibration for " +
-                            str(layerNumber) +
-                            "." +
-                            str(ladderNumber) +
-                            "." +
-                            str(sensorNumber) +
-                            " to alfa = 1, beta = 0")
-                        payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, timeCal)
+        payload = Belle2.SVDCoGTimeCalibrations.t_payload(
+            timeCal, "CoGTimeCalibrations_default_" + str(now.isoformat()) + "_INFO:_alpha=1_beta=0")
 
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 

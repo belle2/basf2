@@ -28,6 +28,15 @@ namespace Belle2 {
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      */
     double isInRestOfEvent(const Particle* particle);
+    /**
+     * Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise.
+     */
+    double isCloneOfSignalSide(const Particle* particle);
+
+    /**
+     * Returns 1 if a particle has ancestor signal side final state particles, 0 otherwise.
+     */
+    double hasAncestorFromSignalSide(const Particle* particle);
 
     /**
      * Prints the indices of all particles in the ROE and the properties of all masks appended to the ROE.

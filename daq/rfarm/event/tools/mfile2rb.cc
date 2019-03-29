@@ -51,7 +51,6 @@ int main(int argc, char** argv)
   // Create event buffers
   for (int i = 0; i < nevt; i++) {
     evbuf[i] = new char[MAXEVTSIZE];
-    int evsize = 0;
     while (true) {
       int is = file->read(evbuf[i], MAXEVTSIZE);
       if (is <= 0) {

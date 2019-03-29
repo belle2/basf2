@@ -13,12 +13,14 @@
 #include <simulation/monopoles/G4Monopole.h>
 
 #include <G4ParticleTable.hh>
-#include <G4PhysicalConstants.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4Monopole::G4Monopole(const G4String& name,
                        G4double  mass,
@@ -38,10 +40,9 @@ G4Monopole::G4Monopole(const G4String& name,
 // stable     lifetime      decay_table
 {
   magCharge = eplus * mCharge;
-  G4cout << "Monopole is created: m(GeV)= " << mass / GeV
-         << " Qel= " << eCharge / eplus
-         << " Qmag= " << magCharge / eplus
-         << G4endl;//TODO print with B2INFO
+  B2INFO("Monopole is created: m(GeV)= " << mass / GeV
+         << " Qel(e+)= " << eCharge / eplus
+         << " Qmag(e+)= " << magCharge / eplus);
 }
 
 G4Monopole::~G4Monopole()

@@ -12,6 +12,7 @@
 
 namespace Belle2 {
 
+  /** contains the calibration parameters of the clusterizer*/
   struct SVDClusterCuts {
 
     /** minimum value of SNR of the seed strip
@@ -52,7 +53,7 @@ namespace Belle2 {
     }
 
 
-    ClassDef(SVDClusterCuts, 1);
+    ClassDef(SVDClusterCuts, 1); /** needed by root*/
 
   };
 

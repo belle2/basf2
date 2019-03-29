@@ -41,7 +41,7 @@ def LeptonicList(path):
     cutAndCopyList('mu-:highP', 'mu-:all', 'useCMSFrame(p) > 2.0 and muonID > 0.5', True, path=path)
     reconstructDecay('B-:L0 -> e-:highP', '', 1, path=path)
     reconstructDecay('B-:L1 -> mu-:highP', '', 2, path=path)
-    applyCuts('B-:L0', 'nTracks>4', path=path)
-    applyCuts('B-:L1', 'nTracks>4', path=path)
+    applyCuts('B-:L0', 'nTracks>=3', path=path)
+    applyCuts('B-:L1', 'nTracks>=3', path=path)
     lepList = ['B-:L0', 'B-:L1']
     return lepList

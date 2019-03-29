@@ -259,7 +259,7 @@ namespace Belle2 {
 
     /**
      * Implementation of the base class function.
-     * Pile-up method.
+     * Overlay method.
      * @param bg BG digit
      * @return append status
      */

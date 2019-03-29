@@ -319,7 +319,7 @@ namespace Belle2 {
 
 
     /** ROOT Macro. */
-    ClassDef(CDCSimHit, 5);
+    ClassDefOverride(CDCSimHit, 5);
   };
 } // end namespace Belle2
 #endif

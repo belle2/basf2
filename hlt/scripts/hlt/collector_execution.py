@@ -13,6 +13,7 @@ def main(script_name):
     parser = ArgumentParser()
     parser.add_argument("input_ring_buffer", help="Name of the input ring buffer")
     parser.add_argument("output_ring_buffer", help="Name of the output ring buffer")
+    parser.add_argument("unused-histoport", help="Unused in the moment")
     parser.add_argument("--number-of-collectors", help="Number of collectors to start", default=3, type=int)
 
     args = parser.parse_args()
@@ -28,8 +29,8 @@ def main(script_name):
 
     execution = CleanBasf2Execution()
     try:
-        execution.start(["rb2mrb", args.input_ring_buffer] + input_ring_buffer_list)
-        execution.start(["mrb2rb"] + output_ring_buffer_list + [args.output_ring_buffer])
+        execution.start(["hlt_rb2mrb", args.input_ring_buffer] + input_ring_buffer_list)
+        execution.start(["hlt_mrb2rb"] + output_ring_buffer_list + [args.output_ring_buffer])
         for input_rb, output_rb, roi_message_queue in zip(input_ring_buffer_list, output_ring_buffer_list,
                                                           message_queue_list):
             execution.start(["basf2", "--no-stats", script_name, "--", input_rb, output_rb, roi_message_queue])

@@ -118,7 +118,7 @@ namespace Belle2 {
 
     double goodBelleGamma(const Particle* particle)
     {
-      double energy = particle->getEnergy();
+      double energy = eclClusterE(particle);
       int region = eclClusterDetectionRegion(particle);
 
       return (double) isGoodBelleGamma(region, energy);

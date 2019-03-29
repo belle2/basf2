@@ -52,7 +52,7 @@ class CleanBasf2Execution:
         """
         Add the execution and terminate gracefully/hard if requested via signal.
         """
-        basf2.B2RESULT("Starting ", command)
+        basf2.B2INFO("Starting ", command)
         process = subprocess.Popen(command, start_new_session=True)
         pgid = os.getpgid(process.pid)
         if pgid != process.pid:
@@ -69,8 +69,8 @@ class CleanBasf2Execution:
         while True:
             for command, process in zip(self._handled_commands, self._handled_processes):
                 if self.has_process_ended(process):
-                    basf2.B2RESULT("The process ", command, " died with ", process.returncode,
-                                   ". Killing the remaining ones.")
+                    basf2.B2INFO("The process ", command, " died with ", process.returncode,
+                                 ". Killing the remaining ones.")
                     self.kill()
                     return process.returncode
             sleep(1)
@@ -91,7 +91,7 @@ class CleanBasf2Execution:
             basf2.B2WARNING("Signal handler called without started process. This normally means, something is wrong!")
             return
 
-        basf2.B2RESULT("Termination requested...")
+        basf2.B2INFO("Termination requested...")
 
         # Make sure this signal handle is not called more than once
         signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -116,7 +116,7 @@ class CleanBasf2Execution:
                 try:
                     os.killpg(process.pid, signal.SIGKILL)
                     if not self.wait_for_process(timeout=10, process_list=[process]):
-                        backtrace = subprocess.check_output(["gdb", "-q",  "-batch", "-ex", "backtrace",  "basf2",
+                        backtrace = subprocess.check_output(["gdb", "-q", "-batch", "-ex", "backtrace", "basf2",
                                                              str(process.pid)]).decode()
                         basf2.B2ERROR("Could not end the process event with a KILL signal. "
                                       "This can happen because it is in the uninterruptable sleep state. "
@@ -125,7 +125,7 @@ class CleanBasf2Execution:
                 except ProcessLookupError:
                     # The process is already gone! Nice
                     pass
-                basf2.B2RESULT("...Process stopped")
+                basf2.B2INFO("...Process stopped")
 
             # And reinstall the signal handlers
             self.install_signal_handler()

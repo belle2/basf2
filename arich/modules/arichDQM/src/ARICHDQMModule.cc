@@ -375,25 +375,25 @@ namespace Belle2 {
       }
 
       //Get ARICHLikelihood related to the ARICHTrack
-      const ExtHit* extHit = arichTrack.getRelated<ExtHit>();
+      /*const ExtHit* extHit = arichTrack.getRelated<ExtHit>();
       const Track* mdstTrack = NULL;
       if (extHit) mdstTrack = extHit->getRelated<Track>();
       const ARICHAeroHit* aeroHit = arichTrack.getRelated<ARICHAeroHit>();
       const ARICHLikelihood* lkh = NULL;
       if (mdstTrack) lkh = mdstTrack->getRelated<ARICHLikelihood>();
-      else lkh = arichTrack.getRelated<ARICHLikelihood>();
+      else lkh = arichTrack.getRelated<ARICHLikelihood>();*/
 
-      if (lkh->getFlag()) { //Fill only when the number of expected photons is more than 0.
-        h_hitsPerTrack->Fill(nPhoton);
-        h_secHitsPerTrack[trSector]->Fill(nPhoton);
-        h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nPhoton);
+      //if(lkh->getFlag()){//Fill only when the number of expected photons is more than 0.
+      h_hitsPerTrack->Fill(nPhoton);
+      h_secHitsPerTrack[trSector]->Fill(nPhoton);
+      h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nPhoton);
 
-        int aeroID = arichGeoAero.getAerogelTileID(recPos.X(), recPos.Y());
-        h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
-                              (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20) ,
-                              nPhoton);
-        h_aerogelHit->Fill(aeroID, nPhoton);
-      }
+      int aeroID = arichGeoAero.getAerogelTileID(recPos.X(), recPos.Y());
+      h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                            (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20),
+                            nPhoton);
+      h_aerogelHit->Fill(aeroID, nPhoton);
+      //}
     }
 
   }

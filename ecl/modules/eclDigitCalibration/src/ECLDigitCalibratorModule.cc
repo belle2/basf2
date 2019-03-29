@@ -447,20 +447,16 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
 }
 
 
-double ECLDigitCalibratorModule::energyDependentTimeOffset(double amp)
+double ECLDigitCalibratorModule::energyDependentTimeOffset(const double amp)
 {
   double ampDiv10000 = amp / 10000.0
                        ;   // Scale down the size of the amplitude so that the size of the parameters are more natural, A = amplitude / 10000
 
-  // rename variables to make equation easier to read
   // t-t0 =  e^{ L_1 A } ( C_1 + L_2  A + Q_1 A^2  )  + C_2     ("Energy dependence equation")
-  double expLinear = m_energyDependenceTimeOffsetFitParam_expLinear ;
-  double polyConst = m_energyDependenceTimeOffsetFitParam_polyConst ;
-  double polyLinear = m_energyDependenceTimeOffsetFitParam_polyLinear ;
-  double polyQuad = m_energyDependenceTimeOffsetFitParam_polyQuadratic ;
-  //double overallConst = m_energyDependenceTimeOffsetFitParam_overallConst ;   // not used
-
   // Note that we do NOT apply C_2 because the overall constant is effectively set by the ts and tcrate values.  C_2 is incuded in the fit but should come out near zero.
-  return exp(expLinear * ampDiv10000) * (polyConst + polyLinear * ampDiv10000 + polyQuad * ampDiv10000 * ampDiv10000) ;
+  return exp(m_energyDependenceTimeOffsetFitParam_expLinear * ampDiv10000) *
+         (m_energyDependenceTimeOffsetFitParam_polyConst
+          + m_energyDependenceTimeOffsetFitParam_polyLinear * ampDiv10000
+          + m_energyDependenceTimeOffsetFitParam_polyQuadratic * ampDiv10000 * ampDiv10000) ;
 }
 

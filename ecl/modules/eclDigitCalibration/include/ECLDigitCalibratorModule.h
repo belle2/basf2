@@ -166,7 +166,8 @@ namespace Belle2 {
     // For the energy dependence correction to the time
     // t-t0 =  e^{ L_1 A } ( C_1 + L_2  A + Q_1 A^2  )  + C_2     ("Energy dependence equation")
     //    where  A = amplitude / 10000
-    double energyDependentTimeOffset(double amplitude) ;
+    double energyDependentTimeOffset(const double amplitude)
+    ;                  /**< Function to calculate "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_expLinear = -0.9952 ;     /**< L_1 in "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_polyConst = 10.4 ;        /**< C_1 in "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_polyLinear = 4.493 ;      /**< L_2 in "energy dependence equation" */

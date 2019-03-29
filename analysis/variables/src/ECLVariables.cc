@@ -331,7 +331,7 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        const Track* track = cluster->getRelated<Track>();
+        const Track* track = cluster->getRelatedFrom<Track>();
 
         if (track)
           return 1.0;

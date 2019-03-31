@@ -100,10 +100,10 @@ void EKLMUnpackerModule::event()
       uint16_t copperN = copperId - EKLM_ID;
       lane.setCopper(copperN);
       m_RawKLMs[i]->GetBuffer(j);
-      KLMDigitEventInfo* eklmDigitEventInfo = m_DigitEventInfos.appendNew();
-      int triggerCTime = m_RawKLMs[i]->GetTTCtime(j) & 0xFFFF;
-      eklmDigitEventInfo->setTriggerCTime(triggerCTime);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
+        KLMDigitEventInfo* eklmDigitEventInfo = m_DigitEventInfos.appendNew();
+        int triggerCTime = m_RawKLMs[i]->GetTTCtime(j) & 0xFFFF;
+        eklmDigitEventInfo->setTriggerCTime(triggerCTime);
         int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
@@ -156,6 +156,9 @@ void EKLMUnpackerModule::event()
             }
           }
         }
+        // in the last word there is the user word (from DCs)
+        int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+        eklmDigitEventInfo->setUserWord(userWord);
         for (int iHit = 0; iHit < numHits; iHit++) {
           dataWords[0] = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
           dataWords[1] =  buf_slot[iHit * hitLength + 0] & 0xFFFF;

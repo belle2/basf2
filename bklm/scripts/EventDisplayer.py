@@ -2,156 +2,116 @@
 # -*- coding: utf-8 -*-
 
 # Purpose:
-#   Analyze a DST file and write a PDF of "interesting" event displays.
-#   This script cannot analyze MDST files because they don't contain RawKLMs.
-#
-# Prerequisites (on kekcc):
-#   Before running this script, type
-#     source /cvmfs/belle.cern.ch/tools/b2setup release-02-01-00 <or higher release>
-#   then verify that the corresponding proper global tag is used near the end of this script.
-#   (Global tags are tabulated at https://confluence.desy.de/display/BI/Global+Tag+%28GT%29+page)
-#   The external python script bklmDB.py must be in the same folder as this script.
-#
-# Usage:
-#   basf2 bklm-eventdisplay.py -- -e # -r # -i infilename -c # -n # -m #
-#      You need the '--' before these options to tell basf2 that these are options to this script.
-#   Required arguments:
-#      either -i infilename or -e # -r #
-#      -i infilename  to specify the full pathname of the input ROOT DST file
-#      -e #   to specify the experiment number, e.g., -e 1 (default is 3)
-#      -r #   to specify the run number, e.g., -r 4794 (default is 4794)
-#   Optional arguments:
-#      -c #   to specify the maximum number of events to write to the PDF file (default = 100)
-#      -n #   to specify the minimum number of RPC hits in one sector (default = 4)
-#      -m #   to specify the minimum number of Muid hits in the event (default = 1)
-#
-# Input:
-#   ROOT DST file written by basf2 (may include multiple folios for one expt/run). For example,
-#   /ghi/fs01/belle2/bdata/Data/Raw/e0003/r04794/sub00/physics.0003.r04794.HLT2.f*.root
-#   /ghi/fs01/belle2/bdata/Data/Raw/e0004/r06380/sub00/cosmic.0004.r06380.HLT2.f00000.root
-#
-# Output:
-#   PDF file named bklmEvents-e#r#.pdf, using the experiment number and run number
+#   basf module to create BKLM event displays from BKLMHit2ds, ExtHits, and MuidHits.
 #
 
-from basf2 import *
+import basf2
 import bklmDB
-import simulation
-import reconstruction
-import tracking
-from tracking import add_tracking_reconstruction
 import rawdata
 import math
 import ctypes
 import ROOT
 from ROOT import Belle2, TH1F, TH2F, TCanvas, THistPainter, TPad
-from optparse import Option, OptionValueError, OptionParser
-import glob
 
 # =========================================================================
 #
-#   EventCountLimiter basf2 module (must be defined before use)
+#   EventDisplayer
 #
 # =========================================================================
 
 
-class EventCountLimiter(Module):
+class EventDisplayer(basf2.Module):
+    """Draw BKLM event displays from BKLMHit2ds, ExtHits, and MuidHits."""
 
-    def __init__(self):
-        """ init """
-        super(EventCountLimiter, self).__init__()
-
-    def initialize(self):
-        pass
-
-    def terminate(self):
-        pass
-
-    def beginRun(self):
-        pass
-
-    def endRun(self):
-        pass
-
-    def event(self):
-        global eventDisplayCounter
-        global eventCounterMax
-        super(EventCountLimiter, self).return_value(eventDisplayCounter < eventCounterMax)
-
-# =========================================================================
-#
-#   EventInspectorBKLM basf2 module (must be defined before use)
-#
-# =========================================================================
-
-
-class EventInspectorBKLM(Module):
-
+    #: COPPER base identifier for BKLM readout
     BKLM_ID = 0x07000000
+    #: COPPER base identifier for EKLM readout
     EKLM_ID = 0x08000000
-
+    #: bit position for strip-1 [0..47]
     BKLM_STRIP_BIT = 0
+    #: bit position for plane-1 [0..1]; 0 is inner-plane
     BKLM_PLANE_BIT = 6
+    #: bit position for layer-1 [0..14]; 0 is innermost
     BKLM_LAYER_BIT = 7
+    #: bit position for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_BIT = 11
+    #: bit position for detector end [0..1]; forward is 0
     BKLM_END_BIT = 14
+    #: bit position for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_BIT = 15
-    BKLM_OUTOFTIME_BIT = 24
-    BKLM_ONTRACK_BIT = 27
-    BKLM_ONSTATRACK_BIT = 29
-
+    #: bit mask for strip-1 [0..47]
     BKLM_STRIP_MASK = 0x3f
+    #: bit mask for plane-1 [0..1]; 0 is inner-plane
     BKLM_PLANE_MASK = (1 << BKLM_PLANE_BIT)
+    #: bit mask for layer-1 [0..15]; 0 is innermost and 14 is outermost
     BKLM_LAYER_MASK = (15 << BKLM_LAYER_BIT)
+    #: bit mask for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_MASK = (7 << BKLM_SECTOR_BIT)
+    #: bit mask for detector end [0..1]; forward is 0
     BKLM_END_MASK = (1 << BKLM_END_BIT)
+    #: bit mask for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_MASK = (63 << BKLM_MAXSTRIP_BIT)
-    BKLM_ONTRACK_MASK = (1 << BKLM_ONTRACK_BIT)
-    BKLM_ONSTATRACK_MASK = (1 << BKLM_ONSTATRACK_BIT)
+    #: bit mask for unique module identifier (end, sector, layer)
     BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
-    def __init__(self):
-        """ init """
-        super(EventInspectorBKLM, self).__init__()
+    def __init__(self, exp, run, eventPdfName, maxDisplays, minRPCHits, minMuidHits):
+        """Constructor
 
-    def makeGraph(self, x, y):
-        graph = ROOT.TGraph()
-        for i in range(0, len(x)):
-            graph.SetPoint(i, x[i], y[i])
-        graph.SetLineColor(2)
-        graph.SetLineWidth(1)
-        return graph
-
-    def makeText(self, x, y, s):
-        text = ROOT.TLatex(x, y, s)
-        text.SetTextSize(0.04)
-        text.SetTextColor(2)
-        text.SetTextAlign(22)
-        text.SetTextAngle(90)
-        return text
+        Arguments:
+            exp (str): formatted experiment number
+            run (str): formatter run number
+            eventPdfName (str): path name of the output event-display PDF file
+            maxDisplays (int): max # of events displays to write
+            minRPCHits (int): min # of RPC BKLMHit2ds in any sector for event display
+            minMuidHits (int): min # of MuidHits in the event for event display
+        """
+        super().__init__()
+        #: internal copy of experiment number
+        self.exp = exp
+        #: internal copy of run number
+        self.run = run
+        #: internal copy of the pathname of the output event-display PDF file
+        self.eventPdfName = eventPdfName
+        #: internal copy of the maximum number of event displays to write
+        self.maxDisplays = maxDisplays
+        #: internal copy of the minimum number of RPC BKLMHit2ds in any sector for event display
+        self.minRPCHits = minRPCHits
+        #: internal copy of the minimum number of MuidHits in the event for event display
+        self.minMuidHits = minMuidHits
+        #: event counter (needed for PDF table of contents' ordinal event#)
+        self.eventCounter = 0
+        #: event-display counter
+        self.eventDisplays = 0
+        #: title of the last-drawn event display (needed for PDF table of contents' last event)
+        self.lastTitle = ''
 
     def initialize(self):
+        """Handle job initialization: fill the mapping database, create histograms, open the event-display file"""
 
-        global exp
-        global run
-        global eventPdfName
-        global minRPCHitsPerSector
-        global minMuids
+        expRun = 'e{0:02d}r{1}: '.format(int(self.exp), int(self.run))
 
-        expRun = 'e{0:02d}r{1}: '.format(int(exp), int(run))
-        self.eventCanvas = ROOT.TCanvas("eventCanvas", eventPdfName, 3200, 1600)
-        title = '{0}['.format(eventPdfName)
+        # Open the output PDF file for event displays
+
+        self.eventCanvas = ROOT.TCanvas("eventCanvas", self.eventPdfName, 3200, 1600)
+        title = '{0}['.format(self.eventPdfName)
         self.eventCanvas.SaveAs(title)
         self.eventCanvas.Clear()
         self.eventCanvas.Divide(2, 1)
+
+        # Create the boilerplate for the end- and side-views of the event display
+
+        #: table of cosines for the BKLM-sector normals
         self.cosine = [0, 0, 0, 0, 0, 0, 0, 0]
+        #: table of sines for the BKLM-sector normals
         self.sine = [0, 0, 0, 0, 0, 0, 0, 0]
         for sector in range(0, 8):
             phi = math.pi * sector / 4
             self.cosine[sector] = math.cos(phi)
             self.sine[sector] = math.sin(phi)
+        #: blank scatterplot to define the bounds of the BKLM end view
         self.hist_XY = ROOT.TH2F('XY', ' ;x;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_XY.SetStats(False)
+        #: blank scatterplot to define the bounds of the BKLM side view
         self.hist_ZY = ROOT.TH2F('ZY', ' ;z;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_ZY.SetStats(False)
         # 300x300 cm^2 grid for each octant
@@ -160,6 +120,7 @@ class EventInspectorBKLM(Module):
         u3 = 100
         u4 = 400
         u5 = 150
+        # list of blank scatterplots to define the per-sector bounds of the BKLM end view
         self.hist_XYS = [0, 0, 0, 0, 0, 0, 0, 0]
         self.hist_XYS[0] = ROOT.TH2F('XYS0', ' ;x;y', 10, +u3, +u4, 10, -u5, +u5)
         self.hist_XYS[0].SetStats(False)
@@ -177,9 +138,11 @@ class EventInspectorBKLM(Module):
         self.hist_XYS[6].SetStats(False)
         self.hist_XYS[7] = ROOT.TH2F('XYS7', ' ;x;y', 10, +u1, +u2, 10, -u2, -u1)
         self.hist_XYS[7].SetStats(False)
+        # blank scatterplot to define the per-sector bounds of the rotated BKLM side view
         self.hist_ZYS = ROOT.TH2F('ZYS', ' ;z;y', 10, -150.0, 150.0, 10, 125.0, 425.0)
         self.hist_ZYS.SetStats(False)
         ROOT.gStyle.SetOptStat(10)
+        #: list of line-segment (x,y) points for the BKLM end view
         self.bklmXY = []
         r0 = 201.9 + 0.5 * 4.4  # cm
         dr = 9.1  # cm
@@ -228,6 +191,7 @@ class EventInspectorBKLM(Module):
                     g.SetLineStyle(3)
             g.SetLineWidth(1)
             self.bklmXY.append(g)
+        #: list of line-segment (z,y) points for the BKLM side view
         self.bklmZY = []
         rF = r0 + 14 * dr
         x0 = r0 * tan0
@@ -311,6 +275,7 @@ class EventInspectorBKLM(Module):
         g.SetLineColor(18)
         g.SetLineWidth(1)
         self.bklmZY.append(g)
+        #: list of line-segment (z,y) points for the BKLM sector's zoomed and rotated side view
         self.bklmZYL = []
         for layer in range(0, 15):
             r = r0 + layer * dr
@@ -322,52 +287,54 @@ class EventInspectorBKLM(Module):
             g.SetLineColor(19)
             g.SetLineWidth(1)
             self.bklmZYL.append(g)
-        # fill the readout <-> detector map from the information retrieved from the conditions database
+        #: readout <-> detector map (from the information retrieved from the conditions database)
         self.electIdToModuleId = bklmDB.fillDB()
-        # maps for sectorFB <-> data concentrator
+        #: map for sectorFB -> data concentrator
         self.sectorFBToDC = [11, 15, 2, 6, 10, 14, 3, 7, 9, 13, 0, 4, 8, 12, 1, 5]
+        #: map for data concentrator -> sectorFB
         self.dcToSectorFB = [10, 14, 2, 6, 11, 15, 3, 7, 12, 8, 4, 0, 13, 9, 5, 1]
-        # per-sector calibration adjustments (ns)
-        # old self.t0Cal = 312.62 # for rawKLMs
-        # old self.t0Cal2d = 293.2 # for BKLMHit2ds
-        # old self.ct0Cal = -1148.01
-        # old self.t0RPC = [7.85, -14.04, -5.58, -17.45, -6.34, 10.03, 13.29, 8.61, -3.3, -11.0, 0, -16.04, 4.97, 8.99, 9.64, 7.26]
-        # old self.ct0Scint = [0.70, -7.40, -11.54, -8.30, 0.50, 9.11, 11.12, 8.41, 0.69, -7.64, 0, -9.10, 0.82, 6.55, 10.57, 7.19]
-        self.t0Cal = 312.77  # for rawKLMs
-        self.t0Cal2d = 293.64  # for BKLMHit2ds
+        #: RPC-time calibration adjustment (ns) for rawKLMs
+        self.t0Cal = 312.77
+        #: RPC-time calibration adjustment (ns) for BKLMHit2ds
+        self.t0Cal2d = 293.64
+        #: scint-ctime calibration adjustment (ns) for rawKLMs
         self.ct0Cal = 905.61
+        #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
         self.ct0Cal2d = 905.61
+        #: per-sector variations in RPC-time calibration adjustment (ns) for rawKLMs
         self.t0RPC = [8.07, -13.98, -6.73, -17.52, -4.91, 9.24, 12.83, 8.92, -1.44, -10.46, 0, -15.57, 2.44, 7.68, 9.92, 8.23]
+        #: per-sector variations in scint-ctime calibration adjustment (ns) for rawKLMs
         self.ct0Scint = [0.67, -7.70, -12.70, -9.05, 0.14, 7.12, 10.14, 7.73, 0.17, -7.92, 0, -9.10, 0.19, 5.86, 10.67, 5.51]
 
     def terminate(self):
+        """Handle job termination: close event-display file"""
 
-        global eventPdfName
-
-        self.eventCanvas.Clear()
-        self.eventCanvas.SaveAs(eventPdfName)
-        title = '{0}]'.format(eventPdfName)
-        self.eventCanvas.SaveAs(title)
+        pdfNameLast = '{0}]'.format(self.eventPdfName)
+        self.eventCanvas.Print(pdfNameLast, self.lastTitle)
         print('Goodbye')
 
     def beginRun(self):
+        """Handle begin of run: print diagnostic message"""
         EventMetaData = Belle2.PyStoreObj('EventMetaData')
         print('beginRun', EventMetaData.getRun())
 
     def endRun(self):
+        """Handle end of run: print diagnostic message"""
         EventMetaData = Belle2.PyStoreObj('EventMetaData')
         print('endRun', EventMetaData.getRun())
 
     def event(self):
+        """Process one event: (optionally) draw event display"""
 
-        global minRPCHitsPerSector
-        global minMuids
-        global eventDisplayCounter
-        global eventPdfName
+        super().return_value(self.eventDisplays < self.maxDisplays)
 
+        if self.eventDisplays >= self.maxDisplays:
+            return
+
+        self.eventCounter += 1
         EventMetaData = Belle2.PyStoreObj('EventMetaData')
         event = EventMetaData.getEvent()
-        rawklms = Belle2.PyStoreArray('RawKLMs')
+        rawklms = Belle2.PyStoreArray('RawKLMs')  # to determine if BKLMHit2d is prompt
         hit2ds = Belle2.PyStoreArray('BKLMHit2ds')
         exthits = Belle2.PyStoreArray('ExtHits')
         muidhits = Belle2.PyStoreArray('MuidHits')
@@ -510,7 +477,7 @@ class EventInspectorBKLM(Module):
             muidZYSGraph[sector].SetMarkerStyle(20)
         j = -1
         for muidhit in muidhits:
-            j = j + 1
+            j += 1
             muidPosition = muidhit.getExtPosition()
             x = muidPosition[0]
             y = muidPosition[1]
@@ -522,7 +489,7 @@ class EventInspectorBKLM(Module):
             muidZYSGraph[sector].SetPoint(nPoint, z, abs(x * self.cosine[sector] + y * self.sine[sector]))
             if nMuids[sector] == 0:
                 zMuids[sector] = z
-            nMuids[sector] = nMuids[sector] + 1
+            nMuids[sector] += 1
 
         # Process the BKLMHit2ds for event display
 
@@ -567,7 +534,7 @@ class EventInspectorBKLM(Module):
             zStripMax = hit2d.getZStripMax() - 1
             sectorFB = sector if fb == 0 else sector + 8
             if layer >= 2:
-                rpcHitCount[sectorFB] = rpcHitCount[sectorFB] + 1
+                rpcHitCount[sectorFB] += 1
             dc = self.sectorFBToDC[sectorFB]
             copper = dc & 0x03
             finesse = dc >> 2
@@ -626,26 +593,26 @@ class EventInspectorBKLM(Module):
                 if abs(tCal - self.t0Cal2d) < 20:
                     isPromptHit = True
             if isPromptHit:
-                jPrompt = jPrompt + 1
+                jPrompt += 1
                 promptXYGraph.SetPoint(jPrompt, x, y)
                 promptZYGraph.SetPoint(jPrompt, z, y)
                 nPoint = promptZYSGraph[sector].GetN()
                 promptZYSGraph[sector].SetPoint(nPoint, z, abs(x * self.cosine[sector] + y * self.sine[sector]))
             else:
-                jBkgd = jBkgd + 1
+                jBkgd += 1
                 bkgdXYGraph.SetPoint(jBkgd, x, y)
                 bkgdZYGraph.SetPoint(jBkgd, z, y)
                 nPoint = bkgdZYSGraph[sector].GetN()
                 bkgdZYSGraph[sector].SetPoint(nPoint, z, abs(x * self.cosine[sector] + y * self.sine[sector]))
 
-        hasManyRPCHits = False
+        hasEnoughRPCHits = False
         for count in rpcHitCount:
-            if count > minRPCHitsPerSector:
-                hasManyRPCHits = True
+            if count > self.minRPCHits:
+                hasEnoughRPCHits = True
                 break
-        if hasManyRPCHits and (len(muidhits) > minMuids):
-            eventDisplayCounter = eventDisplayCounter + 1
-            title = 'e{0:02d}r{1}: event {2}'.format(int(exp), int(run), event)
+        if hasEnoughRPCHits and (len(muidhits) > self.minMuidHits):
+            self.eventDisplays += 1
+            title = 'e{0:02d}r{1}: event {2}'.format(int(self.exp), int(self.run), event)
             self.hist_XY.SetTitle(title)
             self.hist_ZY.SetTitle(title)
             self.eventCanvas.cd(1)
@@ -672,10 +639,11 @@ class EventInspectorBKLM(Module):
                 bkgdZYGraph.Draw("P")
             if promptZYGraph.GetN() > 0:
                 promptZYGraph.Draw("P")
-            self.eventCanvas.Print(eventPdfName, "Title:{0}".format(event))
+            self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
+            self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
             for sector in range(0, 8):
                 if nMuids[sector] > 0:
-                    title = 'e{0:02d}r{1}: event {2} sector {3}'.format(int(exp), int(run), event, sector)
+                    title = 'e{0:02d}r{1}: event {2} sector {3}'.format(int(self.exp), int(self.run), event, sector)
                     self.hist_XYS[sector].SetTitle(title)
                     self.eventCanvas.cd(1)
                     self.hist_XYS[sector].Draw()
@@ -706,116 +674,5 @@ class EventInspectorBKLM(Module):
                         bkgdZYSGraph[sector].Draw("P")
                     if promptZYSGraph[sector].GetN() > 0:
                         promptZYSGraph[sector].Draw("P")
-                    self.eventCanvas.Print(eventPdfName, "Title:{0}".format(event))
-
-# =========================================================================
-#
-#   Main routine; called by basf2
-#
-# =========================================================================
-
-
-parser = OptionParser()
-parser.add_option('-i', '--inputfile',
-                  dest='infilename', default='',
-                  help='Input ROOT filename [no default]')
-parser.add_option('-e', '--experiment',
-                  dest='eNumber', default='',
-                  help='Experiment number [no default]')
-parser.add_option('-r', '--run',
-                  dest='rNumber', default='',
-                  help='Run number [no default]')
-parser.add_option('-c', '--count',
-                  dest='counter', default='100',
-                  help='Maximum # of displayed events [default=100]')
-parser.add_option('-n', '--nrpchits',
-                  dest='minRPCHits', default='4',
-                  help='Minimum # of RPC hits in one sector [default=4]')
-parser.add_option('-m', '--muids',
-                  dest='minMuids', default='1',
-                  help='Minimum # of Muid hits in the event [default=1]')
-(options, args) = parser.parse_args()
-eventCounterMax = int(options.counter)
-if eventCounterMax <= 0:
-    print('Maximum number of events to display is', eventCounterMax, ' - nothing to do.')
-    sys.exit()
-eventDisplayCounter = 0
-minRPCHitsPerSector = int(options.minRPCHits)
-minMuids = int(options.minMuids)
-
-inputName = ''
-exp = ''
-run = ''
-if options.infilename != '':
-    inputName = options.infilename
-    fileList = glob.glob(inputName)
-    if len(fileList) == 0:
-        print('No file(s) match {0}'.format(inputName))
-        sys.exit()
-if options.eNumber != '':
-    if not options.eNumber.isdecimal():
-        print('Experiment number ({0}) is not valid'.format(options.eNumber))
-        sys.exit()
-    exp = '{0:04d}'.format(int(options.eNumber))
-else:
-    eStart = inputName.find('/e') + 2
-    if eStart < 0:
-        print('Input filename does not contain the required experiment number')
-        sys.exit()
-    eEnd = inputName.find('/', eStart)
-    exp = inputName[eStart:eEnd]
-    if not exp.isdecimal():
-        print('Input filename experiment number({0}) is not valid'.format(exp))
-        sys.exit()
-if options.rNumber != '':
-    if not options.rNumber.isdecimal():
-        print('Run number ({0}) is not valid'.format(options.rNumber))
-        sys.exit()
-    run = '{0:05d}'.format(int(options.rNumber))
-else:
-    rStart = inputName.find('/r') + 2
-    if rStart < 0:
-        print('Input filename does not contain the required run number')
-        sys.exit()
-    rEnd = inputName.find('/', rStart)
-    run = inputName[rStart:rEnd]
-    if not run.isdecimal():
-        print('Input filename run number({0}) is not valid'.format(run))
-        sys.exit()
-if len(inputName) == 0:
-    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT2.f00000.root'.format(exp, run))
-    if len(fileList) == 0:
-        print('No file(s) found for experiment <{0}> run <{1}>'.format(options.eNumber, options.rNumber))
-        sys.exit()
-    inputName = fileList[0].replace('f00000', 'f*')
-eventPdfName = 'bklmEvents-e{0}r{1}.pdf'.format(exp, run)
-
-print('bklm-eventDisplay: exp=', exp, 'run=', run, 'input=', inputName, '. Write at most', eventCounterMax,
-      ' events. Criteria: # RPC hits per sector >=', minRPCHitsPerSector, '  # Muids in event >=', minMuids)
-
-reset_database()
-use_database_chain()
-# use proper global tag for data - depends on the basf2 release
-use_central_database('data_reprocessing_prod6')  # for release-02-01-00
-# use_central_database('data_reprocessing_proc8')  # for release-03-01-00
-
-main = create_path()
-main.add_module('RootInput', inputFileName=inputName)
-main.add_module('ProgressBar')
-
-child = create_path()
-eventCountLimiter = EventCountLimiter()
-eventCountLimiter.if_true(child, AfterConditionPath.CONTINUE)
-main.add_module(eventCountLimiter)
-
-rawdata.add_unpackers(child)
-child.add_module('BKLMReconstructor')
-add_tracking_reconstruction(child)
-ext = child.add_module('Ext')
-ext.param('pdgCodes', [13])
-muid = child.add_module('Muid')
-# muid.param('MaxDistSigma', 10.0)
-child.add_module(EventInspectorBKLM())
-
-process(main)
-print(statistics)
+                    self.lastTitle = "Title:E{0} sector {1}".format(event, sector)
+                    self.eventCanvas.Print(self.eventPdfName, self.lastTitle)

@@ -2,116 +2,94 @@
 # -*- coding: utf-8 -*-
 
 # Purpose:
-#   Analyze a DST ROOT file and write resulting histograms/scatterplots to ROOT and PDF files.
-#   This script cannot analyze MDST files because they don't contain RawKLMs.
-#
-# Prerequisite (on kekcc):
-#   Before running this script, type
-#     source /cvmfs/belle.cern.ch/tools/b2setup release-02-01-00 <or higher release>
-#   then verify that the corresponding proper global tag is used near the end of this script.
-#   (Global tags are tabulated at https://confluence.desy.de/display/BI/Global+Tag+%28GT%29+page)
-#   The external python script bklmDB.py must be in the same folder as this script.
-#
-# Usage:
-#   basf2 bklm-dst.py -- -e # -r # -i infilename -c #
-#      You need the '--' before these options to tell basf2 that these are options to this script.
-#   Required arguments:
-#      either -i infilename or -e # -r #
-#      -i infilename  to specify the full pathname of the input ROOT DST file (no default)
-#      -e #   to specify the experiment number (default is 3)
-#      -r #   to specify the run number (default is 4794)
-# Optional arguments:
-#      -c #   to specify the maximum number of events to analyze (no default -> all events)
-#
-# Input:
-#   ROOT DST file written by basf2 (may include multiple folios for one expt/run). For example,
-#   /ghi/fs01/belle2/bdata/Data/Raw/e0003/r04794/sub00/physics.0003.r04794.HLT2.f*.root
-#   /ghi/fs01/belle2/bdata/Data/Raw/e0004/r06380/sub00/cosmic.0004.r06380.HLT2.f00000.root
-#
-# Output:
-#   ROOT histogram file named bklmHists-e#r#.root, using the experiment number and run number
-#   PDF file named bklmHists-e#r#.pdf, using the experiment number and run number
+#   basf module to histogram useful values in RawKLM, KLMDigit, BKLMHit1d, and BKLMHit2d
+#   data-objects in a DST ROOT file and to create BKLM event displays from these data-objects.
 #
 
-from basf2 import *
+import basf2
 import bklmDB
-import simulation
-import reconstruction
-import rawdata
 import math
 import ctypes
 import ROOT
 from ROOT import Belle2, TH1F, TH2F, TCanvas, THistPainter, TPad
-from optparse import Option, OptionValueError, OptionParser
-import glob
-
-# =========================================================================
-#
-#   EventCountLimiter basf2 module (must be defined before use)
-#
-# =========================================================================
 
 
-class EventCountLimiter(Module):
+class EventInspector(basf2.Module):
+    """Fill BKLM histograms of values from RawKLMs, KLMDigits, BKLMHit1ds, and BKLMHit2ds;
+    (optionally) draw event displays from these data-objects."""
 
-    def __init__(self):
-        """ init """
-        super(EventCountLimiter, self).__init__()
-
-    def initialize(self):
-        pass
-
-    def terminate(self):
-        pass
-
-    def beginRun(self):
-        pass
-
-    def endRun(self):
-        pass
-
-    def event(self):
-        global eventCounter
-        global eventCounterMax
-        super(EventCountLimiter, self).return_value(eventCounter < eventCounterMax)
-
-# =========================================================================
-#
-#   EventInspectorBKLM basf2 module (must be defined before use)
-#
-# =========================================================================
-
-
-class EventInspectorBKLM(Module):
-
+    #: COPPER base identifier for BKLM readout
     BKLM_ID = 0x07000000
+    #: COPPER base identifier for EKLM readout
     EKLM_ID = 0x08000000
-
+    #: bit position for strip-1 [0..47]
     BKLM_STRIP_BIT = 0
+    #: bit position for plane-1 [0..1]; 0 is inner-plane
     BKLM_PLANE_BIT = 6
+    #: bit position for layer-1 [0..14]; 0 is innermost
     BKLM_LAYER_BIT = 7
+    #: bit position for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_BIT = 11
+    #: bit position for detector end [0..1]; forward is 0
     BKLM_END_BIT = 14
+    #: bit position for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_BIT = 15
-    BKLM_OUTOFTIME_BIT = 24
-    BKLM_ONTRACK_BIT = 27
-    BKLM_ONSTATRACK_BIT = 29
-
+    #: bit mask for strip-1 [0..47]
     BKLM_STRIP_MASK = 0x3f
+    #: bit mask for plane-1 [0..1]; 0 is inner-plane
     BKLM_PLANE_MASK = (1 << BKLM_PLANE_BIT)
+    #: bit mask for layer-1 [0..15]; 0 is innermost and 14 is outermost
     BKLM_LAYER_MASK = (15 << BKLM_LAYER_BIT)
+    #: bit mask for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_MASK = (7 << BKLM_SECTOR_BIT)
+    #: bit mask for detector end [0..1]; forward is 0
     BKLM_END_MASK = (1 << BKLM_END_BIT)
+    #: bit mask for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_MASK = (63 << BKLM_MAXSTRIP_BIT)
-    BKLM_ONTRACK_MASK = (1 << BKLM_ONTRACK_BIT)
-    BKLM_ONSTATRACK_MASK = (1 << BKLM_ONSTATRACK_BIT)
+    #: bit mask for unique module identifier (end, sector, layer)
     BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
-    def __init__(self):
-        """ init """
-        super(EventInspectorBKLM, self).__init__()
+    def __init__(self, exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits):
+        """Constructor
+
+        Arguments:
+            exp (str): formatted experiment number
+            run (str): formatter run number
+            histName (str): path name of the output histogram ROOT file
+            pdfName (str): path name of the output histogram PDF file
+            eventPdfName (str): path name of the output event-display PDF file
+            maxDisplays (int): max # of events displays to write
+            minRPCHits (int): min # of RPC BKLMHit2ds in any sector for event display
+        """
+        super().__init__()
+        #: internal copy of experiment number
+        self.exp = exp
+        #: internal copy of run number
+        self.run = run
+        #: internal copy of the pathname of the output histogram ROOT file
+        self.histName = histName
+        #: internal copy of the pathname of the output histogram PDF file
+        self.pdfName = pdfName
+        #: internal copy of the pathname of the output event-display PDF file
+        self.eventPdfName = eventPdfName
+        #: internal copy of the maximum number of event displays to write
+        self.maxDisplays = maxDisplays
+        #: internal copy of the minimum number of RPC BKLMHit2ds in any sector for event display
+        self.minRPCHits = minRPCHits
+        #: event counter (needed for PDF table of contents' ordinal event#)
+        self.eventCounter = 0
+        #: event-display counter
+        self.eventDisplays = 0
+        #: title of the last-drawn event display (needed for PDF table of contents' last event)
+        self.lastTitle = ''
 
     def makeGraph(self, x, y):
+        """Create and return a ROOT TGraph
+
+        Arguments:
+          x[] (real): x coordinates
+          y[] (real): y coordinates
+        """
         graph = ROOT.TGraph()
         for i in range(0, len(x)):
             graph.SetPoint(i, x[i], y[i])
@@ -120,6 +98,14 @@ class EventInspectorBKLM(Module):
         return graph
 
     def makeText(self, x, y, s):
+        """Create and return a ROOT TLatex with the following properties:
+        size = 0.04, color = red, alignment = middle centre, angle = 90 degrees
+
+        Arguments:
+          x (real): x coordinate
+          y (real): y coordinate
+          s (str):  character string
+        """
         text = ROOT.TLatex(x, y, s)
         text.SetTextSize(0.04)
         text.SetTextColor(2)
@@ -128,248 +114,249 @@ class EventInspectorBKLM(Module):
         return text
 
     def initialize(self):
+        """Handle job initialization: fill the mapping database, create histograms, open the event-display file"""
 
-        global exp
-        global run
-        global histName
-
-        expRun = 'e{0:02d}r{1}: '.format(int(exp), int(run))
+        expRun = 'e{0:02d}r{1}: '.format(int(self.exp), int(self.run))
+        #: blank scatterplot to define the bounds of the BKLM end view
         self.hist_XY = ROOT.TH2F('XY', ' ;x;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_XY.SetStats(False)
+        #: blank scatterplot to define the bounds of the BKLM side view
         self.hist_ZY = ROOT.TH2F('ZY', ' ;z;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_ZY.SetStats(False)
+
+        # All histograms/scatterplots in the output file will show '# of events' only
         ROOT.gStyle.SetOptStat(10)
-        # fill the readout <-> detector map from the information retrieved from the conditions database
+        #: readout <-> detector map (from the information retrieved from the conditions database)
         self.electIdToModuleId = bklmDB.fillDB()
-        # maps for sectorFB <-> data concentrator
+        #: map for sectorFB -> data concentrator
         self.sectorFBToDC = [11, 15, 2, 6, 10, 14, 3, 7, 9, 13, 0, 4, 8, 12, 1, 5]
+        #: map for data concentrator -> sectorFB
         self.dcToSectorFB = [10, 14, 2, 6, 11, 15, 3, 7, 12, 8, 4, 0, 13, 9, 5, 1]
-        # per-sector calibration adjustments (ns)
-        # old self.t0Cal = 312.62 # for rawKLMs
-        # old self.t0Cal2d = 293.2 # for BKLMHit2ds
-        # old self.ct0Cal = -1148.01
-        # old self.t0RPC = [7.85, -14.04, -5.58, -17.45, -6.34, 10.03, 13.29, 8.61, -3.3, -11.0, 0, -16.04, 4.97, 8.99, 9.64, 7.26]
-        # old self.ct0Scint = [0.70, -7.40, -11.54, -8.30, 0.50, 9.11, 11.12, 8.41, 0.69, -7.64, 0, -9.10, 0.82, 6.55, 10.57, 7.19]
+        #: RPC-time calibration adjustment (ns) for rawKLMs
         self.t0Cal = 312.77  # for rawKLMs
+        #: RPC-time calibration adjustment (ns) for BKLMHit2ds
         self.t0Cal2d = 293.64  # for BKLMHit2ds
+        #: scint-ctime calibration adjustment (ns) for rawKLMs
         self.ct0Cal = 905.61
+        #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
         self.ct0Cal2d = 905.61
+        #: per-sector variations in RPC-time calibration adjustment (ns) for rawKLMs
         self.t0RPC = [8.07, -13.98, -6.73, -17.52, -4.91, 9.24, 12.83, 8.92, -1.44, -10.46, 0, -15.57, 2.44, 7.68, 9.92, 8.23]
+        #: per-sector variations in scint-ctime calibration adjustment (ns) for rawKLMs
         self.ct0Scint = [0.67, -7.70, -12.70, -9.05, 0.14, 7.12, 10.14, 7.73, 0.17, -7.92, 0, -9.10, 0.19, 5.86, 10.67, 5.51]
-        self.histogramFile = ROOT.TFile.Open(histName, "RECREATE")
+
+        #: Output ROOT TFile that will contain the histograms/scatterplots
+        self.histogramFile = ROOT.TFile.Open(self.histName, "RECREATE")
+        # All histograms/scatterplots in the output file will show '# of events' only
+        ROOT.gStyle.SetOptStat(10)
+
         # create the rawKLM histograms
+
+        #: histogram of the number of BKLMDigits in the event
         self.hist_nDigit = ROOT.TH1F('NDigit', expRun + '# of BKLMDigits', 500, -0.5, 499.5)
+        #: histogram of the number of RawKLMs in the event (should be 1)
         self.hist_nRawKLM = ROOT.TH1F('NRawKLM', expRun + '# of RawKLMs', 10, -0.5, 9.5)
+        #: histogram of the RawKLM's NumEvents (should be 1)
         self.hist_rawKLMnumEvents = ROOT.TH1F('RawKLMnumEvents', expRun + 'RawKLM NumEvents;(should be 1)', 10, -0.5, 9.5)
+        #: histogram of the RawKLM's NumNodes (should be 1)
         self.hist_rawKLMnumNodes = ROOT.TH1F('RawKLMnumNodes', expRun + 'RawKLM NumNodes;(should be 1)', 10, -0.5, 9.5)
+        #: scatterplot of the RawKLM's COPPER index vs NodeID relative to the base BKLM/EKLM values
         self.hist_rawKLMnodeID = ROOT.TH2F('RawKLMnodeID',
                                            expRun + 'RawKLM NodeID;' +
                                            'NodeID (bklm: 1..4, eklm:5..8);' +
                                            'Copper index',
                                            10, -0.5, 9.5, 10, -0.5, 9.5)
+        #: scatterplot of the RawKLM hit's lane vs flag (1=RPC, 2=Scint)
         self.hist_rawKLMlaneFlag = ROOT.TH2F('rawKLMlaneFlag',
                                              expRun + 'RawKLM lane vs flag;' +
                                              'Flag (1=RPC, 2=Scint);' +
                                              'Lane (scint: 1..7, RPC: 8..20)',
                                              4, -0.5, 3.5, 21, -0.5, 20.5)
+        #: scatterplot of the RawKLM RPC hit's extra bits vs sector in the third (time) word
         self.hist_rawKLMtExtraRPC = ROOT.TH2F('rawKLMtExtraRPC',
                                               expRun + 'RawKLM RPC tExtra bits;' +
                                               'Sector # (0-7 = backward, 8-15 = forward);' +
                                               'tExtra [should be 0]',
                                               16, -0.5, 15.5, 32, -0.5, 31.5)
+        #: scatterplot of the RawKLM RPC hit's extra bits vs sector in the fourth (charge) word
         self.hist_rawKLMqExtraRPC = ROOT.TH2F('rawKLMqExtraRPC',
                                               expRun + 'RawKLM RPC qExtra bits;' +
                                               'Sector # (0-7 = backward, 8-15 = forward);' +
                                               'qExtra [should be 0]',
                                               16, -0.5, 15.5, 16, -0.5, 15.5)
+        #: scatterplot of the RawKLM scint hit's extra bits vs sector in the third (time) word
         self.hist_rawKLMtExtraScint = ROOT.TH2F('rawKLMtExtraScint',
                                                 expRun + 'RawKLM Scint tExtra bits;' +
                                                 'Sector # (0-7 = backward, 8-15 = forward);' +
                                                 'tExtra [should be 0]',
                                                 16, -0.5, 15.5, 32, -0.5, 31.5)
+        #: scatterplot of the RawKLM scint hit's extra bits vs sector in the fourth (charge) word
         self.hist_rawKLMqExtraScint = ROOT.TH2F('rawKLMqExtraScint',
                                                 expRun + 'RawKLM Scint qExtra bits;' +
                                                 'Sector # (0-7 = backward, 8-15 = forward);' +
                                                 'qExtra [should be 0]',
                                                 16, -0.5, 15.5, 16, -0.5, 15.5)
+        #: histogram of number of hits, including multiple entries on one readout channel
         self.hist_rawKLMsizeMultihit = ROOT.TH1F('rawKLMsizeMultihit', expRun + 'RawKLM word count (N/channel)', 400, -0.5, 799.5)
+        #: histogram of number of hits, at most one entry per readout channel
         self.hist_rawKLMsize = ROOT.TH1F('rawKLMsize', expRun + 'RawKLM word count (1/channel)', 200, -0.5, 199.5)
+        #: histograms of number of hits, including multiple entries on one readout channel, indexed by sector#
         self.hist_rawKLMsizeByDCMultihit = []
+        #: histograms of number of hits, at most one entry per readout channel, indexed by sector#
         self.hist_rawKLMsizeByDC = []
-        for dc in range(0, 16):
+        for sectorFB in range(0, 16):
+            dc = self.sectorFBToDC[sectorFB]
             copper = dc & 0x03
             finesse = dc >> 2
-            label = 'rawKLM{0}{1}sizeMultihit'.format(copper, finesse)
-            title = '{0}rawKLM[{1}] finesse[{2}] word count (N/channel)'.format(expRun, copper, finesse)
+            label = 'rawKLM_S{0}_sizeMultihit'.format(sectorFB)
+            title = '{0}sector {1} [COPPER {2} finesse {3}] word count (N/channel)'.format(expRun, sectorFB, copper, finesse)
             self.hist_rawKLMsizeByDCMultihit.append(ROOT.TH1F(label, title, 100, -0.5, 99.5))
-            label = 'rawKLM{0}{1}size'.format(copper, finesse)
-            title = '{0}rawKLM[{1}] finesse[{2}] word count (1/channel)'.format(expRun, copper, finesse)
+            label = 'rawKLM_S{0}_size'.format(sectorFB)
+            title = '{0}sector {1} [COPPER {2} finesse {3}] word count (1/channel)'.format(expRun, sectorFB, copper, finesse)
             self.hist_rawKLMsizeByDC.append(ROOT.TH1F(label, title, 100, -0.5, 99.5))
+        #: scatterplots of multiplicity of entries in one readout channel vs lane/axis, indexed by sector#
         self.hist_rawKLMchannelMultiplicity = []
+        #: scatterplots of multiplicity of entries in one readout channel vs lane/axis/channel, indexed by sector#
         self.hist_rawKLMchannelMultiplicityFine = []
-        for dc in range(0, 16):
-            sectorFB = self.dcToSectorFB[dc]
+        for sectorFB in range(0, 16):
+            dc = self.sectorFBToDC[sectorFB]
             copper = dc & 0x03
             finesse = dc >> 2
-            label = 'rawKLM{0}{1}channelMultiplicity'.format(copper, finesse)
-            title = '{0}RawKLM[{1}] finesse[{2}] sector {3} per-channel multiplicity (N/channel > 1);'.format(
-                expRun, copper, finesse, sectorFB) + 'Per-channel multiplicity;(Lane #) * 2 + (Axis #)'
+            label = 'rawKLM_S{0:02d}_channelMultiplicity'.format(sectorFB)
+            title = '{0}sector {1} [COPPER {2} finesse {3}] per-channel multiplicity (N/channel > 1);'.format(
+                expRun, sectorFB, copper, finesse) + 'Per-channel multiplicity;(Lane #) * 2 + (Axis #)'
             self.hist_rawKLMchannelMultiplicity.append(ROOT.TH2F(label, title, 30, -0.5, 29.5, 42, -0.5, 41.5))
-            label = 'rawKLM{0}{1}channelMultiplicityFine'.format(copper, finesse)
-            title = '{0}RawKLM[{1}] finesse[{2}] sector {3} per-channel multiplicity (N/channel > 1);'.format(
-                expRun, copper, finesse.sectorFB) + 'Per-channel multiplicity;(Lane #) * 256 + (Axis #) * 128 + (Channel #)'
+            label = 'rawKLM_S{0:02d}_channelMultiplicityFine'.format(sectorFB)
+            title = '{0}sector {1} [COPPER {2} finesse {3}] per-channel multiplicity (N/channel > 1);'.format(
+                expRun, sectorFB, copper, finesse) + 'Per-channel multiplicity;(Lane #) * 256 + (Axis #) * 128 + (Channel #)'
             self.hist_rawKLMchannelMultiplicityFine.append(ROOT.TH2F(label, title, 30, -0.5, 29.5, 8192, -0.5, 8191.5))
+        #: histogram of number of mapped hits by sector, including multiple entries on one readout channel
         self.hist_mappedSectorOccupancyMultihit = ROOT.TH1F(
             'mappedSectorOccupancyMultihit',
             expRun + 'Sector occupancy of mapped channels (N/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward)',
             16, -0.5, 15.5)
+        #: histogram of number of unmapped hits by sector, including multiple entries on one readout channel
         self.hist_unmappedSectorOccupancyMultihit = ROOT.TH1F(
             'unmappedSectorOccupancyMultihit',
             expRun + 'Sector occupancy of unmapped channels (N/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward)',
             16, -0.5, 15.5)
+        #: histogram of number of mapped hits by sector, at most one entry per readout channel
         self.hist_mappedSectorOccupancy = ROOT.TH1F(
             'mappedSectorOccupancy',
             expRun + 'Sector occupancy of mapped channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward)',
             16, -0.5, 15.5)
+        #: histogram of number of unmapped hits by sector, at most one entry per readout channel
         self.hist_unmappedSectorOccupancy = ROOT.TH1F(
             'unmappedSectorOccupancy',
             expRun + 'Sector occupancy of unmapped channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward)',
             16, -0.5, 15.5)
+        #: histogram of number of mapped RPC hits by sector, at most one entry per readout channel
         self.hist_mappedRPCSectorOccupancy = ROOT.TH1F(
             'mappedRPCSectorOccupancy',
             expRun + 'Sector occupancy of mapped RPC channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward)',
             16, -0.5, 15.5)
+        #: scatterplot of number of mapped RPC hits by lane/axis vs sector, at most one entry per readout channel
         self.hist_mappedRPCLaneAxisOccupancy = ROOT.TH2F(
             'mappedRPCLaneAxisOccupancy',
             expRun + 'Lane/axis occupancy of mapped RPC channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward);' +
             '(Lane #) * 2 + (Axis #)',
             16, -0.5, 15.5, 42, -0.5, 41.5)
+        #: histogram of number of unmapped RPC hits by sector, at most one entry per readout channel
         self.hist_unmappedRPCSectorOccupancy = ROOT.TH1F(
             'unmappedRPCSectorOccupancy',
             expRun + 'Sector occupancy of unmapped RPC channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward)',
             16, -0.5, 15.5)
+        #: scatterplot of number of unmapped RPC hits by lane/axis vs sector, at most one entry per readout channel
         self.hist_unmappedRPCLaneAxisOccupancy = ROOT.TH2F(
             'unmappedRPCLaneAxisOccupancy',
             expRun + 'Lane/axis occupancy of unmapped RPC channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward);' +
             '(Lane #) * 2 + (Axis #)',
             16, -0.5, 15.5, 42, -0.5, 41.5)
+        #: scatterplot of number of mapped scint hits by lane/axis vs sector, at most one entry per readout channel
         self.hist_mappedScintSectorOccupancy = ROOT.TH1F(
             'mappedScintSectorOccupancy',
             expRun + 'Sector occupancy of mapped scint channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward)',
             16, -0.5, 15.5)
+        #: scatterplot of number of mapped scint hits by lane/axis vs sector, at most one entry per readout channel
         self.hist_mappedScintLaneAxisOccupancy = ROOT.TH2F(
             'mappedScintLaneAxisOccupancy',
             expRun + 'Lane/axis occupancy of mapped scint channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward);' +
             '(Lane #) * 2 + (Axis #)',
             16, -0.5, 15.5, 42, -0.5, 41.5)
+        #: histogram of number of unmapped scint hits by sector, at most one entry per readout channel
         self.hist_unmappedScintSectorOccupancy = ROOT.TH1F(
             'unmappedScintSectorOccupancy',
             expRun + 'Sector occupancy of unmapped scint channels (1/channel);' +
             'Sector # (0-7 = backward, 8-15 = forward)',
             16, -0.5, 15.5)
+        #: scatterplot of number of unmapped scint hits by lane/axis vs sector, at most one entry per readout channel
         self.hist_unmappedScintLaneAxisOccupancy = ROOT.TH2F(
             'unmappedScintLaneAxisOccupancy',
             expRun + 'Lane/axis occupancy of unmapped scint channels (1/channel);' +
                      'Sector # (0-7 = backward, 8-15 = forward);' +
                      '(Lane #) * 2 + (Axis #)',
             16, -0.5, 15.5, 42, -0.5, 41.5)
+        #: scatterplots of in-time mapped channel occupancy (1 hit per readout channel), indexed by sector#
         self.hist_mappedChannelOccupancyPrompt = [
-            [
-                0, 0], [
-                0, 0], [
-                0, 0], [
-                    0, 0], [
-                        0, 0], [
-                            0, 0], [
-                                0, 0], [
-                                    0, 0], [
-                                        0, 0], [
-                                            0, 0], [
-                                                0, 0], [
-                                                    0, 0], [
-                                                        0, 0], [
-                                                            0, 0], [
-                                                                0, 0], [
-                                                                    0, 0]]
+            [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+        #: scatterplots of out-of-time mapped channel occupancy (1 hit per readout channel), indexed by sector#
         self.hist_mappedChannelOccupancyBkgd = [
-            [
-                0, 0], [
-                0, 0], [
-                0, 0], [
-                    0, 0], [
-                        0, 0], [
-                            0, 0], [
-                                0, 0], [
-                                    0, 0], [
-                                        0, 0], [
-                                            0, 0], [
-                                                0, 0], [
-                                                    0, 0], [
-                                                        0, 0], [
-                                                            0, 0], [
-                                                                0, 0], [
-                                                                    0, 0]]
+            [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+        #: scatterplots of unmapped channel occupancy (1 hit per readout channel), indexed by sector#
         self.hist_unmappedChannelOccupancy = [
-            [
-                0, 0], [
-                0, 0], [
-                0, 0], [
-                    0, 0], [
-                        0, 0], [
-                            0, 0], [
-                                0, 0], [
-                                    0, 0], [
-                                        0, 0], [
-                                            0, 0], [
-                                                0, 0], [
-                                                    0, 0], [
-                                                        0, 0], [
-                                                            0, 0], [
-                                                                0, 0], [
-                                                                    0, 0]]
+            [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         for sectorFB in range(0, 16):
-            label = 'mappedChannelOccupancy_a0s{0}Prompt'.format(sectorFB)
+            label = 'mappedChannelOccupancy_A0S{0}Prompt'.format(sectorFB)
             title = '{0}In-time mapped channel occupancy for axis 0 sector {1};lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyPrompt[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'mappedChannelOccupancy_a0s{0}Bkgd'.format(sectorFB)
+            label = 'mappedChannelOccupancy_A0S{0}Bkgd'.format(sectorFB)
             title = '{0}Out-of-time mapped channel occupancy for axis 0 sector {1};lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyBkgd[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'unmappedChannelOccupancy_a0s{0}'.format(sectorFB)
+            label = 'unmappedChannelOccupancy_A0S{0}'.format(sectorFB)
             title = '{0}Unmapped channel occupancy for axis 0 sector {1};lane;channel'.format(expRun, sectorFB)
             self.hist_unmappedChannelOccupancy[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'mappedChannelOccupancy_a1s{0}Prompt'.format(sectorFB)
+            label = 'mappedChannelOccupancy_A1S{0}Prompt'.format(sectorFB)
             title = '{0}In-time mapped occupancy for axis 1 sector {1};lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyPrompt[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'mappedChannelOccupancy_a1s{0}Bkgd'.format(sectorFB)
+            label = 'mappedChannelOccupancy_A1S{0}Bkgd'.format(sectorFB)
             title = '{0}Out-of-time mapped occupancy for axis 1 sector {1};lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyBkgd[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'unmappedChannelOccupancy_a1s{0}'.format(sectorFB)
+            label = 'unmappedChannelOccupancy_A1S{0}'.format(sectorFB)
             title = '{0}Unmapped channel occupancy for axis 1 sector {1};lane;channel'.format(expRun, sectorFB)
             self.hist_unmappedChannelOccupancy[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
+        #: scatterplot of RPC TDC low-order bits vs sector (should be 0 since granularity is 4 ns)
         self.hist_RPCTimeLowBitsBySector = ROOT.TH2F('RPCTimeLowBitsBySector',
                                                      expRun + 'RPC TDC lowest-order bits;' +
                                                      'Sector # (0-7 = backward, 8-15 = forward);' +
                                                      'TDC % 4 (ns) [should be 0]',
                                                      16, -0.5, 15.5, 4, -0.5, 3.5)
+        #: histogram of RPC mapped-channel TDC value relative to event's trigger time
         self.hist_mappedRPCTime = ROOT.TH1F(
             'mappedRPCTime', expRun + 'RPC mapped-strip time distribution;t - ct(trigger) (ns)', 256, -0.5, 1023.5)
+        #: histogram of RPC mapped-channel TDC value relative to event's trigger time, corrected for inter-sector variation
         self.hist_mappedRPCTimeCal = ROOT.TH1F(
             'mappedRPCTimeCal', expRun + 'RPC mapped-strip time distribution;t - ct(trigger) - dt(sector) (ns)', 256, -0.5, 1023.5)
+        #: histogram of RPC mapped-channel TDC relative to trigger time, corrected for inter-sector varn and DC-processing delay
         self.hist_mappedRPCTimeCal2 = ROOT.TH1F('mappedRPCTimeCal2',
                                                 expRun + 'RPC mapped-strip time distribution;' +
                                                 't - ct(trigger) - dt(sector) - t(index) (ns)',
                                                 256, -0.5, 1023.5)
+        #: histograms of RPC mapped-channel TDC value relative to event's trigger time, indexed by sector
         self.hist_mappedRPCTimePerSector = []
+        #: histograms of RPC mapped-channel TDC value relative to event's trigger time, indexed by sector/layer
         self.hist_mappedRPCTimePerLayer = []
         for sectorFB in range(0, 16):
             label = 'mappedRPCTime_S{0:02d}'.format(sectorFB)
@@ -380,57 +367,71 @@ class EventInspectorBKLM(Module):
                 label = 'mappedRPCTime_S{0:02d}L{1:02d}'.format(sectorFB, layer)
                 title = '{0}RPC sector {1} layer {2} time distribution;t - ct(trigger) (ns)'.format(expRun, sectorFB, layer)
                 self.hist_mappedRPCTimePerLayer[sectorFB][layer] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
+        #: scatterplot of RPC mapped-channel TDC value relative to event's trigger time vs sector
         self.hist_mappedRPCTimeBySector = ROOT.TH2F('mappedRPCTimeBySector',
                                                     expRun + 'RPC mapped-strip time;' +
                                                     'Sector # (0-7 = backward, 8-15 = forward);' +
                                                     't - ct(trigger) (ns)',
                                                     16, -0.5, 15.5, 128, -0.5, 1023.5)
+        #: scatterplot of RPC mapped-channel TDC relative to trigger time, corrected for inter-sector variation, by sector
         self.hist_mappedRPCTimeCalBySector = ROOT.TH2F('mappedRPCTimeCalBySector',
                                                        expRun + 'RPC mapped-strip time;' +
                                                        'Sector # (0-7 = backward, 8-15 = forward);' +
                                                        't - ct(trigger) - dt(sector) (ns)',
                                                        16, -0.5, 15.5, 128, -0.5, 1023.5)
-        self.hist_mappedRPCCtimeRangeBySector = ROOT.TH2F('mappedRPCCtimeRangeBySector',
-                                                          expRun + 'RPC ctime-range in event;' +
-                                                          'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                          'ctimeMax - ctimeMin (ns)',
-                                                          16, -0.5, 15.5, 128, -0.5, 8191.5)
+        #: scatterplot of RPC mapped-channel REVO9 range in event vs sector
+        self.hist_mappedRPCRevotimeRangeBySector = ROOT.TH2F('mappedRPCRevotimeRangeBySector',
+                                                             expRun + 'RPC revotime-range in event;' +
+                                                             'Sector # (0-7 = backward, 8-15 = forward);' +
+                                                             'revotimeMax - revotimeMin (ns)',
+                                                             16, -0.5, 15.5, 128, -0.5, 8191.5)
+        #: histogram of RPC unmapped-channel TDC value relative to event's trigger time
         self.hist_unmappedRPCTime = ROOT.TH1F(
             'unmappedRPCTime', expRun + 'RPC unmapped-strip time distribution;t - ct(trigger) (ns)', 256, -0.5, 1023.5)
+        #: scatterplot of RPC unmapped-channel TDC value relative to event's trigger time, by sector
         self.hist_unmappedRPCTimeBySector = ROOT.TH2F('unmappedRPCTimeBySector',
                                                       expRun + 'RPC unmapped-strip time;' +
                                                       'Sector # (0-7 = backward, 8-15 = forward);' +
                                                       't - ct(trigger) (ns)',
                                                       16, -0.5, 15.5, 128, -0.5, 1023.5)
+        #: scatterplot of scint TDC low-order bits vs sector
         self.hist_ScintTimeLowBitsBySector = ROOT.TH2F('ScintTimeLowBitsbySector',
                                                        expRun + 'Scint TDC lowest-order bits;' +
                                                        'Sector # (0-7 = backward, 8-15 = forward);' +
                                                        'TDC % 4 (ns)',
                                                        16, -0.5, 15.5, 4, -0.5, 3.5)
+        #: histogram of scint mapped-channel CTIME value (NOT relative to event's trigger time)
         self.hist_mappedScintCtime0 = ROOT.TH1F(
             'mappedScintCtime0', expRun + 'Scint mapped-strip ctime distribution;ctime (ns)', 32, -0.5, 1023.5)
+        #: scatterplot of scint mapped-channel CTIME value (NOT relative to event's trigger time)
         self.hist_mappedScintCtime1 = ROOT.TH2F('mappedScintCtime1',
                                                 expRun + 'Scint mapped-strip ctime distribution;' +
                                                 'Sector # (0-7 = backward, 8-15 = forward);' +
                                                 'ctime (ns)',
                                                 16, -0.5, 15.5, 32, -0.5, 1023.5)
+        #: histogram of scint mapped-channel CTIME value relative to event's trigger time
         self.hist_mappedScintCtime = ROOT.TH1F(
             'mappedScintCtime', expRun + 'Scint mapped-strip ctime distribution;ctime - ct(trigger) (ns)', 32, -0.5, 1023.5)
+        #: scatterplot of scint mapped-channel CTIME value relative to event's trigger time vs sector
         self.hist_mappedScintCtimeBySector = ROOT.TH2F('mappedScintCtimeBySector',
                                                        expRun + 'Scint mapped-strip ctime;' +
                                                        'Sector # (0-7 = backward, 8-15 = forward);' +
                                                        'ctime - ct(trigger) (ns)',
                                                        16, -0.5, 15.5, 32, -0.5, 1023.5)
+        #: histogram of scint mapped-channel CTIME value relative to event's trigger time, corrected for inter-sector variation
         self.hist_mappedScintCtimeCal = ROOT.TH1F('mappedScintCtimeCal',
                                                   expRun + 'Scint mapped-strip ctime distribution;' +
                                                   'ctime - ct(trigger) - dt(sector) (ns)',
                                                   32, -0.5, 1023.5)
+        #: scatterplot of scint mapped-channel CTIME relative to trigger time, corrected for inter-sector variation, by sector
         self.hist_mappedScintCtimeCalBySector = ROOT.TH2F('mappedScintCtimeCalBySector',
                                                           expRun + 'Scint mapped-strip ctime;' +
                                                           'Sector # (0-7 = backward, 8-15 = forward);' +
                                                           'ctime - ct(trigger) - dt(sector) (ns)',
                                                           16, -0.5, 15.5, 32, -0.5, 1023.5)
+        #: histograms of scint mapped-channel CTIME value relative to event's trigger time, indexed by sector
         self.hist_mappedScintCtimePerSector = []
+        #: histograms of scint mapped-channel CTIME value relative to event's trigger time, indexed by sector/layer
         self.hist_mappedScintCtimePerLayer = []
         for sectorFB in range(0, 16):
             label = 'mappedScintCtime_S{0:02d}'.format(sectorFB)
@@ -441,160 +442,364 @@ class EventInspectorBKLM(Module):
                 label = 'mappedScintCtime_S{0:02d}L{1:02d}'.format(sectorFB, layer)
                 title = '{0}Scint sector {1} layer {2} ctime distribution;ctime - ct(trigger) (ns)'.format(expRun, sectorFB, layer)
                 self.hist_mappedScintCtimePerLayer[sectorFB][layer] = ROOT.TH1F(label, title, 32, -0.5, 1023.5)
+        #: scatterplot of scint mapped-channel CTIME range in event vs sector
         self.hist_mappedScintCtimeRangeBySector = ROOT.TH2F('mappedScintCtimeRangeBySector',
                                                             expRun + 'Scint ctime-range in event;' +
                                                             'Sector # (0-7 = backward, 8-15 = forward);' +
                                                             'ctimeMax - ctimeMin (ns)',
                                                             16, -0.5, 15.5, 128, -0.5, 8191.5)
+        #: histogram of scint unmapped-channel CTIME value relative to event's trigger time
         self.hist_unmappedScintCtime = ROOT.TH1F(
             'unmappedScintCtime', expRun + 'Scint unmapped-strip ctime distribution;ctime - ct(trigger) (ns)', 32, -0.5, 1023.5)
+        #: scatterplot of scint unmapped-channel CTIME value relative to event's trigger time, by sector
         self.hist_unmappedScintCtimeBySector = ROOT.TH2F('unmappedScintCtimeBySector',
                                                          expRun + 'Scint unmapped-strip ctime;' +
                                                          'Sector # (0-7 = backward, 8-15 = forward);' +
                                                          'ctime - ct(trigger) (ns)',
                                                          16, -0.5, 15.5, 32, -0.5, 1023.5)
+        #: histogram of scint mapped-channel TDC value (NOT relative to event's trigger time)
         self.hist_mappedScintTDC = ROOT.TH1F(
             'mappedScintTDC', expRun + 'Scint mapped-strip TDC distribution;t (ns)', 32, -0.5, 31.5)
+        #: histogram of scint mapped-channel TDC value relative to event's trigger time
         self.hist_mappedScintTime = ROOT.TH1F(
             'mappedScintTime', expRun + 'Scint mapped-strip time distribution;t - ct(trigger) (ns)', 32, -0.5, 31.5)
+        #: scatterplot of scint mapped-channel TDC value (NOT relative to event's trigger time) vs sector
         self.hist_mappedScintTDCBySector = ROOT.TH2F('mappedScintTDCBySector',
                                                      expRun + 'Scint mapped-strip TDC;' +
                                                      'Sector # (0-7 = backward, 8-15 = forward);' +
                                                      't (ns)',
                                                      16, -0.5, 15.5, 32, -0.5, 31.5)
+        #: scatterplot of scint mapped-channel TDC value relative to event's trigger time vs sector
         self.hist_mappedScintTimeBySector = ROOT.TH2F('mappedScintTimeBySector',
                                                       expRun + 'Scint mapped-strip time;' +
                                                       'Sector # (0-7 = backward, 8-15 = forward);' +
                                                       't - ct(trigger) (ns)',
                                                       16, -0.5, 15.5, 32, -0.5, 31.5)
+        #: histogram of scint unmapped-channel TDC value relative to event's trigger time
         self.hist_unmappedScintTime = ROOT.TH1F(
             'unmappedScintTime', expRun + 'Scint unmapped-strip time distribution;t - ct(trigger) (ns)', 32, -0.5, 31.5)
+        #: scatterplot of scint unmapped-channel TDC value relative to event's trigger time vs sector
         self.hist_unmappedScintTimeBySector = ROOT.TH2F('unmappedScintTimeBySector',
                                                         expRun + 'Scint unmapped-strip time;' +
                                                         'Sector # (0-7 = backward, 8-15 = forward);' +
                                                         't - ct(trigger) (ns)',
                                                         16, -0.5, 15.5, 32, -0.5, 31.5)
+
         # Create the BKLMHit1d-related histograms
+
+        #: histogram of the number of BKLMHit1ds
         self.hist_nHit1d = ROOT.TH1F('NHit1d', expRun + '# of BKLMHit1ds', 100, -0.5, 99.5)
+        #: histogram of the number of in-time RPC BKLMHit1ds
         self.hist_nHit1dRPCPrompt = ROOT.TH1F('NHit1dRPCPrompt', expRun + '# of prompt RPC BKLMHit1ds', 100, -0.5, 99.5)
+        #: histogram of the number of out-of-time RPC BKLMHit1ds
         self.hist_nHit1dRPCBkgd = ROOT.TH1F('NHit1dRPCBkgd', expRun + '# of background RPC BKLMHit1ds', 100, -0.5, 99.5)
+        #: histogram of the number of scint BKLMHit1ds
         self.hist_nHit1dScint = ROOT.TH1F('NHit1dScint', expRun + '# of scintillator BKLMHit1ds', 100, -0.5, 99.5)
+        #: histogram of the number of in-time scint BKLMHit1ds
         self.hist_nHit1dPrompt = ROOT.TH1F('NHit1dPrompt', expRun + '# of prompt BKLMHit1ds', 100, -0.5, 99.5)
+        #: histogram of the number of out-of-time scint BKLMHit1ds
         self.hist_nHit1dBkgd = ROOT.TH1F('NHit1dBkgd', expRun + '# of bkgd BKLMHit1ds', 100, -0.5, 99.5)
-        self.hist_n1dPhiZ = ROOT.TH2F('NHit1dPhiZ', expRun +
-                                      'Distribution of BKLMHit1ds;# of phi BKLMHit1ds;# of z BKLMHit1ds', 60, -
-                                      0.5, 59.5, 60, -
-                                      0.5, 59.5)
+        #: scatterplot of #Z BKLMHit1ds vs #Phi BKLMHit1ds
+        self.hist_n1dPhiZ = ROOT.TH2F('NHit1dPhiZ',
+                                      expRun + 'Distribution of BKLMHit1ds;# of phi BKLMHit1ds;# of z BKLMHit1ds',
+                                      60, -0.5, 59.5, 60, -0.5, 59.5)
+        #: scatterplot of #Phi BKLMHit1ds vs sector
         self.hist_multiplicityPhiBySector = ROOT.TH2F('Hit1dMultiplicityPhiBySector',
                                                       expRun + 'BKLMHit1d phi-strip multiplicity;' +
                                                       'sector # (0-7 = backward, 8-15 = forward);' +
                                                       '# of strips',
                                                       16, -0.5, 15.5, 8, -0.5, 7.5)
+        #: scatterplot of #Z BKLMHit1ds vs sector
         self.hist_multiplicityZBySector = ROOT.TH2F('Hit1dMultiplicityZBySector',
                                                     expRun + 'BKLMHit1d z-strip multiplicity;' +
                                                     'sector # (0-7 = backward, 8-15 = forward);' +
                                                     '# of strips',
                                                     16, -0.5, 15.5, 8, -0.5, 7.5)
+        #: histogram of RPC-phi BKLMHit1d time relative to event's trigger time, corrected for inter-sector variation
         self.hist_tphiRPCCal1d = ROOT.TH1F('tphiRPCCal1d',
                                            expRun + 'RPC BKLMHit1d phi-strip time distribution;' +
                                            't(phi) - ct(trigger) - dt(sector) (ns)',
                                            256, -0.5, 1023.5)
-        self.hist_tzRPCCal1d = ROOT.TH1F('tzRPCCal1d', expRun +
-                                         'RPC BKLMHit1d z-strip time distribution;t(z) - ct(trigger) - dt(sector) (ns)', 256, -
-                                         0.5, 1023.5)
+        #: histogram of RPC-z BKLMHit1d time relative to event's trigger time, corrected for inter-sector variation
+        self.hist_tzRPCCal1d = ROOT.TH1F('tzRPCCal1d',
+                                         expRun + 'RPC BKLMHit1d z-strip time distribution;t(z) - ct(trigger) - dt(sector) (ns)',
+                                         256, -0.5, 1023.5)
+        #: histogram of RPC-phi and -z BKLMHit1d avg time relative to event's trigger time, corrected for inter-sector variation
         self.hist_tRPCCal1d = ROOT.TH1F(
             'tRPCCal1d',
             expRun + 'RPC BKLMHit1d x 2 calibrated average-time distribution;0.5*[t(phi) + t(z)] - ct(trigger) - dt(sector) (ns)',
             256,
             -0.5,
             1023.5)
-        self.hist_dtRPC1d = ROOT.TH1F('dtRPC1d', expRun +
-                                      'RPC BKLMHit1d x 2 time-difference distribution;t(phi) - t(z) (ns)', 50, -
-                                      100.0, 100.0)
+        #: histogram of RPC-phi and -z BKLMHit1d time difference
+        self.hist_dtRPC1d = ROOT.TH1F('dtRPC1d',
+                                      expRun + 'RPC BKLMHit1d x 2 time-difference distribution;t(phi) - t(z) (ns)',
+                                      50, -100.0, 100.0)
+        #: histogram of scint-phi BKLMHit1d time relative to event's trigger time, corrected for inter-sector variation
         self.hist_tphiScintCal1d = ROOT.TH1F('tphiScintCal1d',
                                              expRun + 'Scintillator BKLMHit1d phi-strip ctime distribution;' +
                                              'ctime(phi) - ct(trigger) - dt(sector) (ns)',
                                              128, -0.5, 1023.5)
+        #: histogram of scint-z BKLMHit1d time relative to event's trigger time, corrected for inter-sector variation
         self.hist_tzScintCal1d = ROOT.TH1F('tzScintCal1d',
                                            expRun + 'Scintillator BKLMHit1d z-strip ctime distribution;' +
                                            'ctime(z) - ct(trigger) - dt(sector) (ns)',
                                            128, -0.5, 1023.5)
+        #: histogram of scint-phi and -z BKLMHit1d avg time relative to event's trigger time, corrected for inter-sector variation
         self.hist_tScintCal1d = ROOT.TH1F('tScintCal1d',
                                           expRun + 'Scintillator BKLMHit1d x 2 calibrated average-time distribution;' +
                                           '0.5*[ctime(phi) + ctime(z)] - ct(trigger) - dt(sector) (ns)',
                                           128, -0.5, 1023.5)
+        #: histogram of scint-phi and -z BKLMHit1d time difference
         self.hist_dtScint1d = ROOT.TH1F('dtScint1d', expRun +
                                         'Scintillator BKLMHit1d x 2 time-difference distribution;ctime(phi) - ctime(z) (ns)', 50, -
                                         100.0, 100.0)
+
         # Create the BKLMHit2d-related histograms
+
+        #: histogram of the number of BKLMHit2ds
         self.hist_nHit2d = ROOT.TH1F('NHit2d', expRun + '# of BKLMHit2ds', 50, -0.5, 49.5)
-        self.hist_hit2dOutOfTime = ROOT.TH1F('NHit2dOutOfTime', expRun + 'BKLMHit2d out-of-time flag', 2, -0.5, 1.5)
-        self.hist_hit2dOnTrack = ROOT.TH1F('NHit2dOnTrack', expRun + 'BKLMHit2d on-ext-track flag', 2, -0.5, 1.5)
-        self.hist_hit2dOnStaTrack = ROOT.TH1F('NHit2dOnStaTrack', expRun + 'BKLMHit2d on-standalone-track flag', 2, -0.5, 1.5)
+        #: scatterplot of end view of forward BKLM for in-time BKLMHit2ds
         self.hist_occupancyForwardXYPrompt = ROOT.TH2F('occupancyForwardXYPrompt',
-                                                       expRun + 'Forward xy RPC occupancy for in-time hits;' +
-                                                       'x(cm);y(cm)',
+                                                       expRun + 'Forward xy RPC occupancy for in-time hits;x(cm);y(cm)',
                                                        230, -345.0, 345.0, 230, -345.0, 345.0)
+        #: scatterplot of end view of backward BKLM for in-time BKLMHit2ds
         self.hist_occupancyBackwardXYPrompt = ROOT.TH2F('occupancyBackwardXYPrompt',
-                                                        expRun + 'Backward xy RPC occupancy for in-time hits;' +
-                                                        'x(cm);y(cm)',
+                                                        expRun + 'Backward xy RPC occupancy for in-time hits;x(cm);y(cm)',
                                                         230, -345.0, 345.0, 230, -345.0, 345.0)
-        self.hist_occupancyForwardXYBkgd = ROOT.TH2F('occupancyForwardXYBkgd', expRun +
-                                                     'Forward xy RPC occupancy for out-of-time hits;x(cm);y(cm)', 230, -
-                                                     345.0, 345.0, 230, -
-                                                     345.0, 345.0)
-        self.hist_occupancyBackwardXYBkgd = ROOT.TH2F('occupancyBackwardXYBkgd', expRun +
-                                                      'Backward xy RPC occupancy for out-of-time hits;x(cm);y(cm)', 230, -
-                                                      345.0, 345.0, 230, -
-                                                      345.0, 345.0)
-        self.hist_occupancyRZPrompt = ROOT.TH2F(
-            'occupancyRZPrompt', expRun + 'layer-z occupancy for in-time hits;z(cm);layer', 48, -190.0, 290.0, 16, -0.5, 15.5)
-        self.hist_occupancyZPrompt = ROOT.TH1F('occupancyZPrompt', expRun + 'z occupancy for in-time hits;z(cm)', 48, -190.0, 290.0)
-        self.hist_occupancyRPrompt = ROOT.TH1F(
-            'occupancyRPrompt', expRun + 'layer occupancy for in-time hits;layer', 16, -0.5, 15.5)
-        self.hist_occupancyRZBkgd = ROOT.TH2F('occupancyRZBkgd', expRun +
-                                              'layer-z occupancy for out-of-time hits;z(cm);layer', 48, -
-                                              190.0, 290.0, 16, -
-                                              0.5, 15.5)
-        self.hist_occupancyZBkgd = ROOT.TH1F('occupancyZBkgd', expRun + 'z occupancy for out-of-time hits;z(cm)', 48, -190.0, 290.0)
-        self.hist_occupancyRBkgd = ROOT.TH1F(
-            'occupancyRBkgd', expRun + 'layer occupancy for out-of-time hits;layer', 16, -0.5, 15.5)
-        self.hist_ctimeRPCtCal = ROOT.TH2F('ctimeRPCtCal',
-                                           expRun + 'RPC tCal vs ctime;' +
-                                           't - ct(trigger) - dt(sector) (ns);' +
-                                           'ctime - minCtime',
-                                           16, 281.5, 345.5, 16, -0.5, 255.5)
-        self.hist_ctimeRPCtCal2 = ROOT.TH2F('ctimeRPCtCal2',
-                                            expRun + 'RPC tCal vs ctime;' +
-                                            't - ct(trigger) - dt(sector) - dt(index) (ns);' +
-                                            'ctime - minCtime',
-                                            16, 281.5, 345.5, 16, -0.5, 255.5)
-        self.hist_jRPCtCal = ROOT.TH2F('jRPCtCal', expRun +
-                                       'RPC tCal vs hit index;t - ct(trigger) - dt(sector) (ns);Hit index', 16, 281.5, 345.5, 50, -
-                                       0.5, 49.5)
-        self.hist_jRPCtCal2 = ROOT.TH2F('jRPCtCal2',
-                                        expRun + 'RPC tCal vs hit index;' +
-                                        't - ct(trigger) - dt(sector) - dt(index) (ns);' +
-                                        'Hit index',
-                                        16, 281.5, 345.5, 50, -0.5, 49.5)
-        self.hist_tRPCCal2d = ROOT.TH1F(
-            'tRPCCal2d', expRun + 'RPC BKLMHit2d time distribution;t - ct(trigger) - dt(sector) (ns)', 256, -0.5, 1023.5)
+        #: scatterplot of end view of forward BKLM for out-of-time BKLMHit2ds
+        self.hist_occupancyForwardXYBkgd = ROOT.TH2F('occupancyForwardXYBkgd',
+                                                     expRun + 'Forward xy RPC occupancy for out-of-time hits;x(cm);y(cm)',
+                                                     230, -345.0, 345.0, 230, -345.0, 345.0)
+        #: scatterplot of end view of backward BKLM for out-of-time BKLMHit2ds
+        self.hist_occupancyBackwardXYBkgd = ROOT.TH2F('occupancyBackwardXYBkgd',
+                                                      expRun + 'Backward xy RPC occupancy for out-of-time hits;x(cm);y(cm)',
+                                                      230, -345.0, 345.0, 230, -345.0, 345.0)
+        #: scatterplot of side view of forward BKLM for in-time BKLMHit2ds
+        self.hist_occupancyRZPrompt = ROOT.TH2F('occupancyRZPrompt',
+                                                expRun + 'layer-z occupancy for in-time hits;z(cm);layer',
+                                                48, -190.0, 290.0, 16, -0.5, 15.5)
+        #: histogram of z coordinate for in-time BKLMHit2ds
+        self.hist_occupancyZPrompt = ROOT.TH1F('occupancyZPrompt',
+                                               expRun + 'z occupancy for in-time hits;z(cm)',
+                                               48, -190.0, 290.0)
+        #: histogram of layer# for in-time BKLMHit2ds
+        self.hist_occupancyRPrompt = ROOT.TH1F('occupancyRPrompt',
+                                               expRun + 'layer occupancy for in-time hits;layer',
+                                               16, -0.5, 15.5)
+        #: scatterplot of side view of forward BKLM for in-time BKLMHit2ds
+        self.hist_occupancyRZBkgd = ROOT.TH2F('occupancyRZBkgd',
+                                              expRun + 'layer-z occupancy for out-of-time hits;z(cm);layer',
+                                              48, -190.0, 290.0, 16, -0.5, 15.5)
+        #: histogram of z coordinate for out-of-time BKLMHit2ds
+        self.hist_occupancyZBkgd = ROOT.TH1F('occupancyZBkgd',
+                                             expRun + 'z occupancy for out-of-time hits;z(cm)',
+                                             48, -190.0, 290.0)
+        #: histogram of layer# for out-of-time BKLMHit2ds
+        self.hist_occupancyRBkgd = ROOT.TH1F('occupancyRBkgd',
+                                             expRun + 'layer occupancy for out-of-time hits;layer',
+                                             16, -0.5, 15.5)
+        #: histogram of RPC calibrated time in BKLMHit2ds
+        self.hist_tRPCCal2d = ROOT.TH1F('tRPCCal2d',
+                                        expRun + 'RPC BKLMHit2d time distribution;' +
+                                        't - ct(trigger) - dt(sector) (ns)',
+                                        256, -0.5, 1023.5)
+        #: scatterplot of RPC calibrated time in BKLMHit2ds vs sector
         self.hist_tRPCCal2dBySector = ROOT.TH2F('tRPCCal2dBySector',
                                                 expRun + 'RPC BKLMHit2d time distribution;' +
                                                 'sector # (0-7 = backward, 8-15 = forward);' +
                                                 't - ct(trigger) - dt(sector) (ns)',
                                                 16, -0.5, 15.5, 256, -0.5, 1023.5)
-        self.hist_ctScintCal2d = ROOT.TH1F(
-            'ctScintCal2d', expRun + 'Scint BKLMHit2d ctime distribution;ct - ct(trigger) - dt(sector) (ns)', 128, -0.5, 1023.5)
+        #: histogram of scint calibrated time in BKLMHit2ds
+        self.hist_ctScintCal2d = ROOT.TH1F('ctScintCal2d',
+                                           expRun + 'Scint BKLMHit2d ctime distribution;' +
+                                           'ct - ct(trigger) - dt(sector) (ns)',
+                                           128, -0.5, 1023.5)
+        #: scatterplot of scint calibrated time in BKLMHit2ds vs sector
         self.hist_ctScintCal2dBySector = ROOT.TH2F('ctScintCal2dBySector',
                                                    expRun + 'Scint BKLMHit2d ctime distribution;' +
                                                    'sector # (0-7 = backward, 8-15 = forward);' +
                                                    'ct - ct(trigger) - dt(sector) (ns)',
                                                    16, -0.5, 15.5, 128, -0.5, 1023.5)
 
-    def terminate(self):
+        # Create the time-calibration histograms
 
-        global pdfName
+        #: scatterplot of RPC calibrated time vs hit's CTIME relative to earliest-CTIME
+        self.hist_ctimeRPCtCal = ROOT.TH2F('ctimeRPCtCal',
+                                           expRun + 'RPC tCal vs ctime;' +
+                                           't - ct(trigger) - dt(sector) (ns);' +
+                                           'ctime - minCtime',
+                                           16, 281.5, 345.5, 16, -0.5, 255.5)
+        #: scatterplot of RPC calibrated time vs hit's CTIME relative to earliest-CTIME, corrected for DC-processing delay
+        self.hist_ctimeRPCtCal2 = ROOT.TH2F('ctimeRPCtCal2',
+                                            expRun + 'RPC tCal vs ctime;' +
+                                            't - ct(trigger) - dt(sector) - dt(index) (ns);' +
+                                            'ctime - minCtime',
+                                            16, 281.5, 345.5, 16, -0.5, 255.5)
+        #: scatterplot of RPC calibrated time vs hit's index
+        self.hist_jRPCtCal = ROOT.TH2F('jRPCtCal',
+                                       expRun + 'RPC tCal vs hit index;' +
+                                       't - ct(trigger) - dt(sector) (ns);' +
+                                       'Hit index',
+                                       16, 281.5, 345.5, 50, -0.5, 49.5)
+        #: scatterplot of RPC calibrated time vs hit's index, corrected for DC-processing delay
+        self.hist_jRPCtCal2 = ROOT.TH2F('jRPCtCal2',
+                                        expRun + 'RPC tCal vs hit index;' +
+                                        't - ct(trigger) - dt(sector) - dt(index) (ns);' +
+                                        'Hit index',
+                                        16, 281.5, 345.5, 50, -0.5, 49.5)
+
+        # Open the output PDF file for event displays
+
+        if self.maxDisplays > 0:
+            self.eventCanvas = ROOT.TCanvas("eventCanvas", self.eventPdfName, 3200, 1600)
+            title = '{0}['.format(self.eventPdfName)
+            self.eventCanvas.SaveAs(title)
+            self.eventCanvas.Clear()
+            self.eventCanvas.Divide(2, 1)
+
+        # Create the boilerplate for the end- and side-views of the event display
+
+        #: list of line-segment (x,y) points for the BKLM end view
+        self.bklmXY = []
+        r0 = 201.9 + 0.5 * 4.4  # cm
+        dr = 9.1  # cm
+        tan0 = math.tan(math.pi / 8.0)
+        g = ROOT.TGraph()
+        g.SetPoint(0, -200.0, 0.0)
+        g.SetPoint(1, +200.0, 0.0)
+        g.SetLineColor(19)
+        g.SetLineWidth(1)
+        g.SetLineStyle(3)
+        self.bklmXY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, 0.0, -200.0)
+        g.SetPoint(1, 0.0, +200.0)
+        g.SetLineColor(19)
+        g.SetLineWidth(1)
+        g.SetLineStyle(3)
+        self.bklmXY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, -5.0, 0.0)
+        g.SetPoint(1, +5.0, 0.0)
+        g.SetPoint(2, 0.0, 0.0)
+        g.SetPoint(3, 0.0, +5.0)
+        g.SetPoint(4, 0.0, -5.0)
+        g.SetLineColor(1)
+        g.SetLineWidth(1)
+        self.bklmXY.append(g)
+        for layer in range(0, 15):
+            r = r0 + layer * dr
+            x = r * tan0
+            g = ROOT.TGraph()
+            g.SetPoint(0, +r, -x)
+            g.SetPoint(1, +r, +x)
+            g.SetPoint(2, +x, +r)
+            g.SetPoint(3, -x, +r)
+            g.SetPoint(4, -r, +x)
+            g.SetPoint(5, -r, -x)
+            g.SetPoint(6, -x, -r)
+            g.SetPoint(7, +x, -r)
+            g.SetPoint(8, +r, -x)
+            if layer < 2:
+                g.SetLineColor(18)
+            else:
+                g.SetLineColor(17)
+                if (layer % 5) == 0:
+                    g.SetLineStyle(3)
+            g.SetLineWidth(1)
+            self.bklmXY.append(g)
+        #: list of line-segment (z,y) points for the BKLM side view
+        self.bklmZY = []
+        rF = r0 + 14 * dr
+        x0 = r0 * tan0
+        z0 = 47.0  # cm
+        zL = 220.0  # cm
+        g = ROOT.TGraph()
+        g.SetPoint(0, -zL + z0 - 140.0, 0.0)
+        g.SetPoint(1, +zL + z0 + 70.0, 0.0)
+        g.SetLineColor(19)
+        g.SetLineWidth(1)
+        g.SetLineStyle(3)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, 0.0, -315.0)
+        g.SetPoint(1, 0.0, +340.0)
+        g.SetLineColor(19)
+        g.SetLineWidth(1)
+        g.SetLineStyle(3)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, -5.0, 0.0)
+        g.SetPoint(1, +5.0, 0.0)
+        g.SetPoint(2, 0.0, 0.0)
+        g.SetPoint(3, 0.0, +5.0)
+        g.SetPoint(4, 0.0, -5.0)
+        g.SetLineColor(1)
+        g.SetLineWidth(1)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, -zL + z0, +x0)
+        g.SetPoint(1, -zL + z0, +r0)
+        g.SetLineColor(18)
+        g.SetLineWidth(1)
+        g.SetLineStyle(3)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, -zL + z0, -x0)
+        g.SetPoint(1, -zL + z0, -r0)
+        g.SetLineColor(18)
+        g.SetLineWidth(1)
+        g.SetLineStyle(3)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, +zL + z0, +x0)
+        g.SetPoint(1, +zL + z0, +r0)
+        g.SetLineColor(18)
+        g.SetLineWidth(1)
+        g.SetLineStyle(3)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, +zL + z0, -x0)
+        g.SetPoint(1, +zL + z0, -r0)
+        g.SetLineColor(18)
+        g.SetLineWidth(1)
+        g.SetLineStyle(3)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, -zL + z0, r0)
+        g.SetPoint(1, +zL + z0, r0)
+        g.SetPoint(2, +zL + z0, rF)
+        g.SetPoint(3, -zL + z0, rF)
+        g.SetPoint(4, -zL + z0, r0)
+        g.SetLineColor(18)
+        g.SetLineWidth(1)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, -zL + z0, -r0)
+        g.SetPoint(1, +zL + z0, -r0)
+        g.SetPoint(2, +zL + z0, -rF)
+        g.SetPoint(3, -zL + z0, -rF)
+        g.SetPoint(4, -zL + z0, -r0)
+        g.SetLineColor(18)
+        g.SetLineWidth(1)
+        self.bklmZY.append(g)
+        g = ROOT.TGraph()
+        g.SetPoint(0, -zL + z0, -x0)
+        g.SetPoint(1, +zL + z0, -x0)
+        g.SetPoint(2, +zL + z0, +x0)
+        g.SetPoint(3, -zL + z0, +x0)
+        g.SetPoint(4, -zL + z0, -x0)
+        g.SetLineColor(18)
+        g.SetLineWidth(1)
+        self.bklmZY.append(g)
+
+    def terminate(self):
+        """Handle job termination: draw histograms, close output files"""
+
+        if self.maxDisplays > 0:
+            pdfNameLast = '{0}]'.format(self.eventPdfName)
+            self.eventCanvas.Print(pdfNameLast, self.lastTitle)
 
         for sectorFB in range(0, 16):
             mappedScintSectorOccupancy = self.hist_mappedScintSectorOccupancy.GetBinContent(sectorFB + 1)
@@ -621,54 +826,54 @@ class EventInspectorBKLM(Module):
                     numerator = self.hist_unmappedRPCLaneAxisOccupancy.GetBinContent(sectorFB + 1, laneAxis + 1)
                     self.hist_unmappedRPCLaneAxisOccupancy.SetBinContent(
                         sectorFB + 1, laneAxis + 1, 100.0 * numerator / unmappedRPCSectorOccupancy)
-        canvas = ROOT.TCanvas("canvas", pdfName, 1600, 1600)
-        title = '{0}['.format(pdfName)
+        canvas = ROOT.TCanvas("canvas", self.pdfName, 1600, 1600)
+        title = '{0}['.format(self.pdfName)
         canvas.SaveAs(title)
         canvas.Clear()
         canvas.GetPad(0).SetGrid(1, 1)
         canvas.GetPad(0).Update()
         self.hist_nDigit.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nDigit.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nDigit.GetName()))
         self.hist_nRawKLM.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nRawKLM.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nRawKLM.GetName()))
         self.hist_rawKLMnumEvents.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMnumEvents.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnumEvents.GetName()))
         self.hist_rawKLMnumNodes.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMnumNodes.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnumNodes.GetName()))
         self.hist_rawKLMnodeID.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMnodeID.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnodeID.GetName()))
         self.hist_rawKLMlaneFlag.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMlaneFlag.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMlaneFlag.GetName()))
         self.hist_rawKLMtExtraRPC.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMtExtraRPC.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtExtraRPC.GetName()))
         self.hist_rawKLMqExtraRPC.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMqExtraRPC.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMqExtraRPC.GetName()))
         self.hist_rawKLMtExtraScint.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMtExtraScint.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtExtraScint.GetName()))
         self.hist_rawKLMqExtraScint.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMqExtraScint.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMqExtraScint.GetName()))
         self.hist_rawKLMsizeMultihit.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMsizeMultihit.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeMultihit.GetName()))
         self.hist_rawKLMsize.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMsize.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsize.GetName()))
         for dc in range(0, 16):
             self.hist_rawKLMsizeByDC[dc].Draw()
-            canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMsizeByDC[dc].GetName()))
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeByDC[dc].GetName()))
         for dc in range(0, 16):
             self.hist_rawKLMchannelMultiplicity[dc].Draw("box")
-            canvas.Print(pdfName, "Title:{0}".format(self.hist_rawKLMchannelMultiplicity[dc].GetName()))
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMchannelMultiplicity[dc].GetName()))
         self.hist_mappedSectorOccupancy.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedSectorOccupancy.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedSectorOccupancy.GetName()))
         self.hist_unmappedSectorOccupancy.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedSectorOccupancy.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedSectorOccupancy.GetName()))
         self.hist_mappedRPCSectorOccupancy.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCSectorOccupancy.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCSectorOccupancy.GetName()))
         self.hist_unmappedRPCSectorOccupancy.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedRPCSectorOccupancy.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCSectorOccupancy.GetName()))
         self.hist_mappedScintSectorOccupancy.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintSectorOccupancy.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintSectorOccupancy.GetName()))
         self.hist_unmappedScintSectorOccupancy.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedScintSectorOccupancy.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintSectorOccupancy.GetName()))
         canvas.Clear()
         canvas.Divide(2, 1)
         canvas.GetPad(0).SetGrid(1, 1)
@@ -732,7 +937,7 @@ class EventInspectorBKLM(Module):
                 graphScint1b.Draw("L")
             textRPC1.Draw()
             textScint1.Draw()
-            canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedChannelOccupancyPrompt[sectorFB][0].GetName()))
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedChannelOccupancyPrompt[sectorFB][0].GetName()))
         for sectorFB in range(0, 16):
             zmax = 1
             for lane in range(8, 21):
@@ -766,7 +971,7 @@ class EventInspectorBKLM(Module):
                 graphScint1b.Draw("L")
             textRPC1.Draw()
             textScint1.Draw()
-            canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedChannelOccupancyBkgd[sectorFB][0].GetName()))
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedChannelOccupancyBkgd[sectorFB][0].GetName()))
         for sectorFB in range(0, 16):
             canvas.cd(1)
             self.hist_unmappedChannelOccupancy[sectorFB][0].Draw("colz")
@@ -788,167 +993,166 @@ class EventInspectorBKLM(Module):
                 graphScint1b.Draw("L")
             textRPC1.Draw()
             textScint1.Draw()
-            canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedChannelOccupancy[sectorFB][0].GetName()))
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedChannelOccupancy[sectorFB][0].GetName()))
         canvas.Clear()
         canvas.Divide(1, 1)
         self.hist_RPCTimeLowBitsBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_RPCTimeLowBitsBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCTimeLowBitsBySector.GetName()))
         self.hist_mappedRPCTime.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCTime.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTime.GetName()))
         self.hist_mappedRPCTimeCal.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal.GetName()))
         self.hist_mappedRPCTimeCal2.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal2.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal2.GetName()))
         self.hist_mappedRPCTimeBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCTimeBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeBySector.GetName()))
         self.hist_mappedRPCTimeCalBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCalBySector.GetName()))
-        self.hist_mappedRPCCtimeRangeBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCCtimeRangeBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCalBySector.GetName()))
+        self.hist_mappedRPCRevotimeRangeBySector.Draw("box")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCRevotimeRangeBySector.GetName()))
         self.hist_unmappedRPCTime.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedRPCTime.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCTime.GetName()))
         self.hist_unmappedRPCTimeBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedRPCTimeBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCTimeBySector.GetName()))
         for sectorFB in range(0, 16):
             self.hist_mappedRPCTimePerSector[sectorFB].Draw()
-            canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCTimePerSector[sectorFB].GetName()))
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimePerSector[sectorFB].GetName()))
         for sectorFB in range(0, 16):
             for layer in range(0, 15):
                 self.hist_mappedRPCTimePerLayer[sectorFB][layer].Draw()
-                canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedRPCTimePerLayer[sectorFB][layer].GetName()))
+                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimePerLayer[sectorFB][layer].GetName()))
         self.hist_ScintTimeLowBitsBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_ScintTimeLowBitsBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintTimeLowBitsBySector.GetName()))
         self.hist_mappedScintTDC.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintTDC.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTDC.GetName()))
         self.hist_mappedScintTDCBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintTDCBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTDCBySector.GetName()))
         self.hist_mappedScintTime.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintTime.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTime.GetName()))
         self.hist_mappedScintTimeBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintTimeBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTimeBySector.GetName()))
         self.hist_mappedScintCtimeRangeBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtimeRangeBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeRangeBySector.GetName()))
         self.hist_unmappedScintTime.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedScintTime.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintTime.GetName()))
         self.hist_unmappedScintTimeBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedScintTimeBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintTimeBySector.GetName()))
         self.hist_mappedScintCtime0.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtime0.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime0.GetName()))
         self.hist_mappedScintCtime1.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtime1.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime1.GetName()))
         self.hist_mappedScintCtime.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtime.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime.GetName()))
         self.hist_mappedScintCtimeCal.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCal.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCal.GetName()))
         self.hist_mappedScintCtimeBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtimeBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeBySector.GetName()))
         self.hist_mappedScintCtimeCalBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCalBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCalBySector.GetName()))
         self.hist_unmappedScintCtime.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedScintCtime.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintCtime.GetName()))
         self.hist_unmappedScintCtimeBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_unmappedScintCtimeBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintCtimeBySector.GetName()))
         for sectorFB in range(0, 16):
             self.hist_mappedScintCtimePerSector[sectorFB].Draw()
-            canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtimePerSector[sectorFB].GetName()))
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimePerSector[sectorFB].GetName()))
         for sectorFB in range(0, 16):
             for layer in range(0, 2):
                 self.hist_mappedScintCtimePerLayer[sectorFB][layer].Draw()
-                canvas.Print(pdfName, "Title:{0}".format(self.hist_mappedScintCtimePerLayer[sectorFB][layer].GetName()))
+                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimePerLayer[sectorFB][layer].GetName()))
         self.hist_nHit1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nHit1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1d.GetName()))
         self.hist_nHit1dRPCPrompt.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nHit1dRPCPrompt.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1dRPCPrompt.GetName()))
         self.hist_nHit1dRPCBkgd.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nHit1dRPCBkgd.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1dRPCBkgd.GetName()))
         self.hist_nHit1dScint.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nHit1dScint.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1dScint.GetName()))
         self.hist_nHit1dPrompt.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nHit1dPrompt.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1dPrompt.GetName()))
         self.hist_nHit1dBkgd.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nHit1dBkgd.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1dBkgd.GetName()))
         self.hist_n1dPhiZ.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_n1dPhiZ.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_n1dPhiZ.GetName()))
         self.hist_multiplicityPhiBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_multiplicityPhiBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_multiplicityPhiBySector.GetName()))
         self.hist_multiplicityZBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_multiplicityZBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_multiplicityZBySector.GetName()))
         self.hist_tphiRPCCal1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_tphiRPCCal1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tphiRPCCal1d.GetName()))
         self.hist_tzRPCCal1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_tzRPCCal1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tzRPCCal1d.GetName()))
         self.hist_tRPCCal1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_tRPCCal1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal1d.GetName()))
         self.hist_dtRPC1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_dtRPC1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtRPC1d.GetName()))
         self.hist_tphiScintCal1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_tphiScintCal1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tphiScintCal1d.GetName()))
         self.hist_tzScintCal1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_tzScintCal1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tzScintCal1d.GetName()))
         self.hist_tScintCal1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_tScintCal1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tScintCal1d.GetName()))
         self.hist_dtScint1d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_dtScint1d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtScint1d.GetName()))
         self.hist_nHit2d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_nHit2d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit2d.GetName()))
         self.hist_occupancyForwardXYPrompt.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyForwardXYPrompt.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyForwardXYPrompt.GetName()))
         self.hist_occupancyBackwardXYPrompt.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyBackwardXYPrompt.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyBackwardXYPrompt.GetName()))
         self.hist_occupancyForwardXYBkgd.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyForwardXYBkgd.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyForwardXYBkgd.GetName()))
         self.hist_occupancyBackwardXYBkgd.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyBackwardXYBkgd.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyBackwardXYBkgd.GetName()))
         self.hist_occupancyRZPrompt.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyRZPrompt.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRZPrompt.GetName()))
         self.hist_occupancyZPrompt.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyZPrompt.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyZPrompt.GetName()))
         self.hist_occupancyRPrompt.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyRPrompt.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRPrompt.GetName()))
         self.hist_occupancyRZBkgd.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyRZBkgd.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRZBkgd.GetName()))
         self.hist_occupancyZBkgd.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyZBkgd.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyZBkgd.GetName()))
         self.hist_occupancyRBkgd.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_occupancyRBkgd.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRBkgd.GetName()))
         self.hist_ctimeRPCtCal.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal.GetName()))
         self.hist_ctimeRPCtCal2.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal2.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal2.GetName()))
         self.hist_jRPCtCal.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_jRPCtCal.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal.GetName()))
         self.hist_jRPCtCal2.Draw("colz")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_jRPCtCal2.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal2.GetName()))
         self.hist_tRPCCal2d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_tRPCCal2d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal2d.GetName()))
         self.hist_tRPCCal2dBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_tRPCCal2dBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal2dBySector.GetName()))
         self.hist_ctScintCal2d.Draw()
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_ctScintCal2d.GetName()))
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctScintCal2d.GetName()))
         self.hist_ctScintCal2dBySector.Draw("box")
-        canvas.Print(pdfName, "Title:{0}".format(self.hist_ctScintCal2dBySector.GetName()))
-        canvas.Clear()
-        canvas.Print(pdfName)
-        title = '{0}]'.format(pdfName)
-        canvas.SaveAs(title)
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctScintCal2dBySector.GetName()))
+        # the last page of the PDF file has to have "]" at the end of the PDF filename
+        pdfNameLast = '{0}]'.format(self.pdfName)
+        canvas.Print(pdfNameLast, "Title:{0}".format(self.hist_ctScintCal2dBySector.GetName()))
         self.histogramFile.Write()
         self.histogramFile.Close()
         print('Goodbye')
 
     def beginRun(self):
+        """Handle begin of run: print diagnostic message"""
         EventMetaData = Belle2.PyStoreObj('EventMetaData')
         print('beginRun', EventMetaData.getRun())
 
     def endRun(self):
+        """Handle end of run: print diagnostic message"""
         EventMetaData = Belle2.PyStoreObj('EventMetaData')
         print('endRun', EventMetaData.getRun())
 
     def event(self):
+        """Process one event: fill histograms, (optionally) draw event display"""
 
-        global eventCounter
-
-        eventCounter = eventCounter + 1
-
+        self.eventCounter += 1
         EventMetaData = Belle2.PyStoreObj('EventMetaData')
         event = EventMetaData.getEvent()
         rawklms = Belle2.PyStoreArray('RawKLMs')
@@ -1005,14 +1209,14 @@ class EventInspectorBKLM(Module):
                         print("##2 Event", event, 'copper', copper, 'finesse', finesse, 'n=', n, 'should be odd -- skipping')
                     else:
                         xxx = ((lastWord >> 16) << 3) & 0xffff  # DIVOT
-                        if int(exp) == 3:
+                        if int(self.exp) == 3:
                             xxx = trigCtime0 - 0x3b0
                         # DIVOT print("event {0} node {1} finesse {2}: trigCtime = {3:04x}
                         # trigTime = {4:04x} diff = {5:04x}".format(event, nodeID, finesse,
                         # (trigCtime0 & 0xffff), (xxx & 0xffff), ((trigCtime0 - xxx) & 0xffff)))
                         trigCtime = xxx
-                        countAll = countAll + 1
-                        count[dc] = count[dc] + 1
+                        countAll += 1
+                        count[dc] += 1
                         sectorFB = self.dcToSectorFB[dc]
                         n = n >> 1
                         channelMultiplicity = {}
@@ -1029,7 +1233,7 @@ class EventInspectorBKLM(Module):
                                 countAll = countAll + 2
                                 count[dc] = count[dc] + 2
                                 channelMultiplicity[laneAxisChannel] = 0
-                            channelMultiplicity[laneAxisChannel] = channelMultiplicity[laneAxisChannel] + 1
+                            channelMultiplicity[laneAxisChannel] += 1
                             ctime = word0 & 0xffff
                             channel = (word0 >> 16) & 0x7f
                             axis = (word0 >> 23) & 0x01
@@ -1040,7 +1244,7 @@ class EventInspectorBKLM(Module):
                             qExtra = (word1 >> 12) & 0x0f
                             isRPC = (flag == 1)
                             isScint = (flag == 2)
-                            if (int(exp) <= 3) and (lane <= 2):
+                            if (int(self.exp) <= 3) and (lane <= 2):
                                 trigCtx = trigCtime >> 3
                                 ctime = trigCtx - ((trigCtx - ctime) << 2)
                             if (ctime < minCtime) and (lane > 2):
@@ -1086,7 +1290,7 @@ class EventInspectorBKLM(Module):
                             rawCtime[dc].append(ctime)
                         if n > 1:
                             if maxRPCCtime > 0:
-                                self.hist_mappedRPCCtimeRangeBySector.Fill(sectorFB, (maxRPCCtime - minRPCCtime) << 3)
+                                self.hist_mappedRPCRevotimeRangeBySector.Fill(sectorFB, (maxRPCCtime - minRPCCtime) << 3)
                             if maxScintCtime > 0:
                                 self.hist_mappedScintCtimeRangeBySector.Fill(sectorFB, (maxScintCtime - minScintCtime) << 3)
                         for j in range(0, n):
@@ -1113,7 +1317,7 @@ class EventInspectorBKLM(Module):
                                 charge = word1 & 0x0fff
                                 tExtra = (word1 >> 27) & 0x1f
                                 qExtra = (word1 >> 12) & 0x0f
-                                if (int(exp) <= 3) and (lane <= 2):
+                                if (int(self.exp) <= 3) and (lane <= 2):
                                     trigCtx = trigCtime >> 3
                                     ctime = trigCtx - ((trigCtx - ctime) << 2)
                                 isRPC = (flag == 1)
@@ -1240,25 +1444,25 @@ class EventInspectorBKLM(Module):
                     tCal = ((int(hit1d.getTime()) - trigCtime) & 0x03ff) - self.t0RPC[sectorFB] - 0.75 * j
                     break
             if layer < 2:
-                nScint = nScint + 1
+                nScint += 1
             else:
                 if abs(tCal - self.t0Cal) < 25:
-                    nRPCPrompt = nRPCPrompt + 1
+                    nRPCPrompt += 1
                     if plane == 1:
                         self.hist_multiplicityPhiBySector.Fill(sectorFB, stripMax - stripMin + 1)
                     else:
                         self.hist_multiplicityZBySector.Fill(sectorFB, stripMax - stripMin + 1)
                 else:
-                    nRPCBkgd = nRPCBkgd + 1
+                    nRPCBkgd += 1
             if plane == 1:
-                nphihits = nphihits + 1
+                nphihits += 1
                 phiTimes[key] = tCal
                 if layer < 2:
                     self.hist_tphiScintCal1d.Fill(int(tCal) & 0x3ff)
                 else:
                     self.hist_tphiRPCCal1d.Fill(tCal)
             else:
-                nzhits = nzhits + 1
+                nzhits += 1
                 zTimes[key] = tCal
                 if layer < 2:
                     self.hist_tzScintCal1d.Fill(int(tCal) & 0x3ff)
@@ -1311,7 +1515,7 @@ class EventInspectorBKLM(Module):
             zStripMax = hit2d.getZStripMax() - 1
             sectorFB = sector if fb == 0 else sector + 8
             if layer >= 2:
-                rpcHits[sectorFB] = rpcHits[sectorFB] + 1
+                rpcHits[sectorFB] += 1
             dc = self.sectorFBToDC[sectorFB]
             copper = dc & 0x03
             finesse = dc >> 2
@@ -1363,9 +1567,6 @@ class EventInspectorBKLM(Module):
             y = hit2d.getGlobalPositionY()
             z = hit2d.getGlobalPositionZ()
             r = math.sqrt(x * x + y * y)
-            self.hist_hit2dOutOfTime.Fill(hit2d.isOutOfTime())
-            self.hist_hit2dOnTrack.Fill(hit2d.isOnTrack())
-            self.hist_hit2dOnStaTrack.Fill(hit2d.isOnStaTrack())
             isPromptHit = False
             promptColor = 3
             bkgdColor = 2
@@ -1406,113 +1607,55 @@ class EventInspectorBKLM(Module):
                     else:  # forward
                         self.hist_occupancyForwardXYBkgd.Fill(x, y)
 
-# =========================================================================
-#
-#   Main routine
-#
-# =========================================================================
+            # Add the hit to the event-display TGraph list (perhaps)
+            if self.eventDisplays < self.maxDisplays:
+                gXY = ROOT.TGraph()
+                gXY.SetPoint(0, x - 1.0, y - 1.0)
+                gXY.SetPoint(1, x - 1.0, y + 1.0)
+                gXY.SetPoint(2, x + 1.0, y + 1.0)
+                gXY.SetPoint(3, x + 1.0, y - 1.0)
+                gXY.SetPoint(4, x - 1.0, y - 1.0)
+                gXY.SetLineWidth(1)
+                gZY = ROOT.TGraph()
+                gZY.SetPoint(0, z - 1.0, y - 1.0)
+                gZY.SetPoint(1, z - 1.0, y + 1.0)
+                gZY.SetPoint(2, z + 1.0, y + 1.0)
+                gZY.SetPoint(3, z + 1.0, y - 1.0)
+                gZY.SetPoint(4, z - 1.0, y - 1.0)
+                gZY.SetLineWidth(1)
+                if isPromptHit:
+                    gXY.SetLineColor(promptColor)
+                    gZY.SetLineColor(promptColor)
+                else:
+                    gXY.SetLineColor(bkgdColor)
+                    gZY.SetLineColor(bkgdColor)
+                xyList.append(gXY)
+                zyList.append(gZY)
 
+        # After processing all of the hits in the event, draw the event display (perhaps)
 
-parser = OptionParser()
-parser.add_option('-i', '--inputfile',
-                  dest='infilename', default='',
-                  help='Input [S]ROOT filename [no default]')
-parser.add_option('-e', '--experiment',
-                  dest='eNumber', default='3',
-                  help='Experiment number [default=3]')
-parser.add_option('-r', '--run',
-                  dest='rNumber', default='4794',
-                  help='Run number [default=4794]')
-parser.add_option('-c', '--count',
-                  dest='counter', default='',
-                  help='Max # of analyzed events [no default]')
-(options, args) = parser.parse_args()
-eventCounterMax = -1
-if options.counter != '':
-    eventCounterMax = int(options.counter)
-    if eventCounterMax <= 0:
-        print("Maximum number of events to analyze is", eventCounterMax, " - nothing to do.")
-        sys.exit()
-eventCounter = 0
-
-inputName = ''
-exp = ''
-run = ''
-if options.infilename != '':
-    inputName = options.infilename
-    fileList = glob.glob(inputName)
-    if len(fileList) == 0:
-        print("No file(s) match {0}".format(inputName))
-        sys.exit()
-if options.eNumber != '':
-    if not options.eNumber.isdecimal():
-        print("Experiment number ({0}) is not valid".format(options.eNumber))
-        sys.exit()
-    exp = '{0:04d}'.format(int(options.eNumber))
-else:
-    eStart = inputName.find('/e') + 2
-    if eStart < 0:
-        print("Input filename does not contain the required experiment number")
-        sys.exit()
-    eEnd = inputName.find('/', eStart)
-    exp = inputName[eStart:eEnd]
-    if not exp.isdecimal():
-        print("Input filename's experiment number ({0}) is not valid".format(exp))
-        sys.exit()
-if options.rNumber != '':
-    if not options.rNumber.isdecimal():
-        print("Run number ({0}) is not valid".format(options.rNumber))
-        sys.exit()
-    run = '{0:05d}'.format(int(options.rNumber))
-else:
-    rStart = inputName.find('/r') + 2
-    if rStart < 0:
-        print("Input filename does not contain the required run number")
-        sys.exit()
-    rEnd = inputName.find('/', rStart)
-    run = inputName[rStart:rEnd]
-    if not run.isdecimal():
-        print("Input filename's run number ({0}) is not valid".format(run))
-        sys.exit()
-if len(inputName) == 0:
-    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT2.f00000.root'.format(exp, run))
-    if len(fileList) == 0:
-        print("No file(s) found for experiment <{0}> run <{1}>".format(options.eNumber, options.rNumber))
-        sys.exit()
-    inputName = fileList[0].replace("f00000", "f*")
-histName = 'bklmHists-e{0}r{1}.root'.format(exp, run)
-pdfName = 'bklmPlots-e{0}r{1}.pdf'.format(exp, run)
-
-if eventCounterMax >= 0:
-    print('bklm-dst: exp=', exp, 'run=', run, 'input=', inputName, '. Analyze at most', eventCounterMax, ' events.')
-else:
-    print('bklm-dst: exp=', exp, 'run=', run, 'input=', inputName, '. Analyze all events.')
-
-reset_database()
-use_database_chain()
-# use proper global tag for data
-use_central_database('data_reprocessing_prod6')  # for release-02-01-00
-# use_central_database('data_reprocessing_proc8')  # for release-03-01-00
-
-main = create_path()
-if inputName.find(".sroot") >= 0:
-    main.add_module('SeqRootInput', inputFileNames=inputName)
-else:
-    main.add_module('RootInput', inputFileName=inputName)
-main.add_module('ProgressBar')
-
-if eventCounterMax >= 0:
-    child = create_path()
-    eventCountLimiter = EventCountLimiter()
-    eventCountLimiter.if_true(child, AfterConditionPath.CONTINUE)
-    main.add_module(eventCountLimiter)
-    rawdata.add_unpackers(child, components=['BKLM'])
-    child.add_module('BKLMReconstructor')
-    child.add_module(EventInspectorBKLM())
-else:
-    rawdata.add_unpackers(main, components=['BKLM'])
-    main.add_module('BKLMReconstructor')
-    main.add_module(EventInspectorBKLM())
-
-process(main)
-print(statistics)
+        if self.eventDisplays < self.maxDisplays:
+            hasEnoughRPCHits = False
+            for count in rpcHits:
+                if count > self.minRPCHits:
+                    hasEnoughRPCHits = True
+                    break
+            if hasEnoughRPCHits:
+                self.eventDisplays += 1
+                title = 'e{0:02d}r{1}: event {2}'.format(int(self.exp), int(self.run), event)
+                self.hist_XY.SetTitle(title)
+                self.hist_ZY.SetTitle(title)
+                self.eventCanvas.cd(1)
+                self.hist_XY.Draw()
+                for g in self.bklmXY:
+                    g.Draw("L")
+                for g in xyList:
+                    g.Draw("L")
+                self.eventCanvas.cd(2)
+                self.hist_ZY.Draw()
+                for g in self.bklmZY:
+                    g.Draw("L")
+                for g in zyList:
+                    g.Draw("L")
+                self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
+                self.eventCanvas.Print(self.eventPdfName, self.lastTitle)

@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Benjamin Schwenker                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,8 +13,16 @@
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <pxd/geometry/SensorInfo.h>
+#include <vxd/geometry/GeoCache.h>
 #include <TTree.h>
+#include <TH1F.h>
 #include <map>
+
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 
 
 namespace Belle2 {
@@ -33,18 +41,14 @@ namespace Belle2 {
       struct TreeStruct {
 
         float averageRate = 0; /**< total detector average hit rate */
+        float meanOccupancies[40] = {0}; /**< mean hit occupancy from PXDDigits per sensor [Hits/Channel] */
+        float maxOccupancies[40] = {0}; /**< max hit occupancy from PXDDigits per sensor [Hits/Channel] */
+        float doseRates[40] = {0}; /**< mean dose rate from PXDDigits per sensor [Gy/s]  */
+        float softPhotonFluxes[40] = {0}; /**< mean soft photon flux per sensor (Single pixel cluster <10keV) [clusters/cm2/s]  */
+        float hardPhotonFluxes[40] = {0}; /**< mean hard photon flux per sensor (Single pixel cluster >10keV) [clusters/cm2/s]  */
+        float chargedFluxes[40] = {0}; /**< mean charged particle flux per sensor (Multi pixel cluster >10keV) [clusters/cm2/s]  */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
-
-        /**
-         * normalize accumulated hits to single event
-         */
-        void normalize()
-        {
-          if (numEvents == 0) return;
-          averageRate /= numEvents;
-        }
-
       };
 
       /**
@@ -78,7 +82,21 @@ namespace Belle2 {
 
     private:
 
+      /**
+       * Get PXD::SensorInfo
+       */
+      inline const PXD::SensorInfo& getInfo(VxdID sensorID) const;
+
+      /**
+       * Sets fractions of active channels
+       */
+      void setActiveFractions();
+
       // class parameters: to be set via constructor or setters
+      double m_integrationTime = 20 * Unit::us; ; /**< Integration time of PXD in ns */
+      bool m_maskDeadPixels = true; /**< Correct bg rates by taking into account masked pixels */
+
+      const double c_densitySi = 2.3290 * Unit::g_cm3; /**< Density of crystalline Silicon */
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */
@@ -88,12 +106,17 @@ namespace Belle2 {
 
       // collections
       StoreArray<PXDDigit> m_digits;  /**< collection of digits */
-
-      // DB payloads
+      StoreArray<PXDCluster> m_clusters;  /**< collection of clusters */
 
       // other
-
+      double m_activeFractions[40] = {0}; /**< fractions of active pixels in sensor */
+      double m_activeAreas[40] = {0}; /**< area of active pixels in sensor */
     };
+
+    inline const PXD::SensorInfo& PXDHitRateCounter::getInfo(VxdID sensorID) const
+    {
+      return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    }
 
   } // Background namespace
 } // Belle2 namespace

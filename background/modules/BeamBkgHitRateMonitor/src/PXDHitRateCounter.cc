@@ -3,17 +3,17 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Benjamin Schwenker                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 // Own include
 #include <background/modules/BeamBkgHitRateMonitor/PXDHitRateCounter.h>
+#include <pxd/reconstruction/PXDGainCalibrator.h>
+#include <pxd/reconstruction/PXDPixelMasker.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -26,9 +26,18 @@ namespace Belle2 {
       // register collection(s) as optional, your detector might be excluded in DAQ
       m_digits.isOptional();
 
-      // set branch address
-      tree->Branch("pxd", &m_rates, "averageRate/F:numEvents/I:valid/O");
+      // register collection(s) as optional, your detector might be excluded in DAQ
+      m_clusters.isOptional();
 
+      // set branch address
+      tree->Branch("pxd", &m_rates,
+                   "meanOccupancies[40]/F:maxOccupancies[40]/F:doseRates[40]/F:softPhotonFluxes[40]/F:hardPhotonFluxes[40]/F:chargedFluxes[40]/F:averageRate/F:numEvents/I:valid/O");
+
+      // check parameters
+      if (m_integrationTime <= 0) B2FATAL("invalid integration time window for PXD: " << m_integrationTime);
+
+      // set fractions of active channels
+      setActiveFractions();
     }
 
     void PXDHitRateCounter::clear()
@@ -39,7 +48,7 @@ namespace Belle2 {
     void PXDHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available
-      if (not m_digits.isValid()) return;
+      if ((not m_digits.isValid()) or (not m_clusters.isValid())) return;
 
       // get buffer element
       auto& rates = m_buffer[timeStamp];
@@ -48,18 +57,56 @@ namespace Belle2 {
       rates.numEvents++;
 
       // accumulate hits
-      /* either count all */
       rates.averageRate += m_digits.getEntries();
-      /* or count selected ones only
-      for(const auto& digit: m_digits) {
-      // select digits to count (usualy only good ones)
-         rates.averageRate += 1;
+
+      // Use the same indexing of sensors as for PXDDQM
+      auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+
+      // accumulate dose rate and event occupancy
+      float occupancies[40] = {0};
+      for (const PXDDigit& storeDigit : m_digits) {
+        VxdID sensorID = storeDigit.getSensorID();
+        int index = gTools->getPXDSensorIndex(storeDigit.getSensorID());
+        double ADUToEnergy =  PXD::PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, storeDigit.getUCellID(),
+                              storeDigit.getVCellID());
+        double hitEnergy = storeDigit.getCharge() * ADUToEnergy;
+        rates.doseRates[index] += (hitEnergy / Unit::J);
+
+        if (m_activeFractions[index] > 0) {
+          occupancies[index] += 1.0 / m_activeFractions[index];
+        }
       }
-      */
+
+      for (int index = 0; index < 40; index++) {
+        rates.meanOccupancies[index] += occupancies[index];
+        if (rates.maxOccupancies[index] < occupancies[index]) {
+          rates.maxOccupancies[index] = occupancies[index];
+        }
+      }
+
+      // accumulate fluxes
+      for (const PXDCluster& cluster : m_clusters) {
+        // Update if we have a new sensor
+        VxdID sensorID = cluster.getSensorID();
+        int index = gTools->getPXDSensorIndex(sensorID);
+        auto info = getInfo(sensorID);
+
+        auto cluster_uID = info.getUCellID(cluster.getU());
+        auto cluster_vID = info.getVCellID(cluster.getV());
+        double ADUToEnergy =  PXD::PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, cluster_uID, cluster_vID);
+        double clusterEnergy = cluster.getCharge() * ADUToEnergy;
+
+        if (cluster.getSize() == 1 && clusterEnergy < 10000 * Unit::eV && clusterEnergy > 6000 * Unit::eV) {
+          rates.softPhotonFluxes[index] += 1.0;
+        } else if (cluster.getSize() == 1 && clusterEnergy > 10000 * Unit::eV) {
+          rates.hardPhotonFluxes[index] += 1.0;
+        } else if (cluster.getSize() > 1 && clusterEnergy > 10000 * Unit::eV) {
+          rates.chargedFluxes[index] += 1.0;
+        }
+      }
 
       // set flag to true to indicate the rates are valid
       rates.valid = true;
-
     }
 
     void PXDHitRateCounter::normalize(unsigned timeStamp)
@@ -69,13 +116,65 @@ namespace Belle2 {
 
       if (not m_rates.valid) return;
 
-      // normalize
-      m_rates.normalize();
+      if (m_rates.numEvents == 0) return;
 
-      // optionally: convert to MHz, correct for the masked-out channels etc.
+      // Average number of PXDDigits per 1Hz
+      m_rates.averageRate /= m_rates.numEvents;
 
+      // Total integration time of PXD per 1Hz
+      double currentComponentTime = m_rates.numEvents * m_integrationTime;
+
+      //Pointer to GeoTools instance
+      auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+
+      // Compute sensor level averages per 1Hz
+      for (int index = 0; index < 40; index++) {
+        VxdID sensorID = gTools->getSensorIDFromPXDIndex(index);
+        auto info = getInfo(sensorID);
+        double currentSensorMass = m_activeAreas[index] * info.getThickness() * c_densitySi;
+        double currentSensorArea = m_activeAreas[index];
+
+        m_rates.meanOccupancies[index] /= m_rates.numEvents;
+        if (currentSensorArea > 0) {
+          m_rates.doseRates[index] *= (1.0 / (currentComponentTime / Unit::s)) * (1000 / currentSensorMass);
+          m_rates.softPhotonFluxes[index] *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+          m_rates.hardPhotonFluxes[index] *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+          m_rates.chargedFluxes[index] *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+        }
+      }
     }
 
+    void PXDHitRateCounter::setActiveFractions()
+    {
+      //Pointer to GeoTools instance
+      auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+      if (gTools->getNumberOfPXDLayers() == 0) {
+        B2FATAL("Missing geometry for PXD.");
+      }
+
+      // Initialize active areas and active fractions for all sensors
+      for (int index = 0; index < 40; index++) {
+        VxdID sensorID = gTools->getSensorIDFromPXDIndex(index);
+        auto info = getInfo(sensorID);
+
+        // Compute nominal number of pixel per sensor
+        m_activeFractions[index] = info.getUCells() * info.getVCells();
+        // Compute nominal area per sensor
+        m_activeAreas[index] = info.getWidth() * info.getLength();
+
+        if (m_maskDeadPixels) {
+          for (int ui = 0; ui < info.getUCells(); ++ui) {
+            for (int vi = 0; vi < info.getVCells(); ++vi) {
+              if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, ui, vi)
+                  || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, ui, vi)) {
+                m_activeFractions[index] -= 1;
+                m_activeAreas[index] -= info.getVPitch(info.getVCellPosition(vi)) * info.getUPitch();
+              }
+            }
+          }
+        }
+      }
+    }
 
   } // Background namespace
 } // Belle2 namespace

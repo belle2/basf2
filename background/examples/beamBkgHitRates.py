@@ -51,13 +51,15 @@ main.add_module('Geometry')
 # some detectors are temporary excluded
 # - EKLM because of missing payload in the above global tag
 # - BKLM because of making segmentation violation
-# - PXD because of too many warnings on exp 3 data
 add_unpackers(path=main,
-              components=['SVD', 'CDC', 'TOP', 'ARICH', 'ECL'])
+              components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'ECL'])
 
 # additional modules if needed for hit processing
 main.add = module('ARICHFillHits')
 main.add_module('TOPChannelMasker')
+main.add_module('ActivatePXDGainCalibrator')
+main.add_module('PXDClusterizer')
+
 
 # Beam background rate monitor: output to flat ntuple
 main.add_module('BeamBkgHitRateMonitor', outputFileName=outputFile)

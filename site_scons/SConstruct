@@ -17,8 +17,10 @@ if not analysis:
     AddOption('--local', dest='local', action='store_true', default=False,
               help='Enable faster build of local code. No code in the central release should depend on the local code!')
 AddOption('--no-symlink', dest='no-symlink', action='store_true', default=False, help='Use copies instead of symbolic links')
+AddOption('--no-debuginfo', dest='no-debuginfo', action='store_true', default=False, help='If given no debug information will be created')
 AddOption('--extra-libpath', dest='extralibpath', action='store', help='Additional library path')
 AddOption('--extra-ccflags', dest='extraccflags', action='store', help='Additional compiler flags')
+
 AddOption('--ignore-externals-version', dest='check_externals', action='store_false', default=True,
           help="if given the externals version will not checked for consistency between .externals and the environment")
 AddOption('--light', dest='light', action='store_true', default=False, help='Build a light release')
@@ -99,6 +101,7 @@ global_env = Environment(
     CPPPATH=['include'],
     LIBPATH=['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
     DATAOBJECT_LIBS=[],
+    SPLIT_DEBUGINFO=not GetOption('no-debuginfo'),
     TOOLS_LIBS={},
     TOOLS_LIBPATH={},
     TEST_LIBS=[],
@@ -142,7 +145,7 @@ if option == 'debug':
     global_env.Append(FORTRANFLAGS='-g')
 elif option == 'opt':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
-    global_env.Append(FORTRANFLAGS='-O3')
+    global_env.Append(FORTRANFLAGS=['-O3'])
     # Parallel LTO avoids sequential bottlenecks when large libraries are
     # linked, but causes oversubscription when linking libraries concurrently.
     # Performance and RAM usage measurements suggest that between these two
@@ -213,6 +216,9 @@ elif option == 'clang':
 else:
     print('Aborted because of unknown build option:', option)
     Exit(1)
+
+if(not GetOption('no-debuginfo')):
+    global_env.AppendUnique(CCFLAGS=['-g'], FORTRANFLAGS=['-g'])
 
 # allow overriding some things from command line (e.g. to enable scan-build)
 override_from_environment = ['CC', 'CXX', 'LD']

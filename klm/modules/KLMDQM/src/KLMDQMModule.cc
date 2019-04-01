@@ -164,14 +164,14 @@ void KLMDQMModule::defineHistoBKLM()
   h_yvszBKLMHit2ds->SetOption("LIVE");
 
   h_histoLayerVsSector[0]  = new TH2F("0LayerVSSector", "Sector VS Layer in barrel forward",
-                                      100, 0.0, 15.0, 240, -0.5, 7.5);
+                                      30, -0.25, 14.75, 16, -0.25, 7.75);
   h_histoLayerVsSector[0]->GetXaxis()->SetTitle("Layer");
   h_histoLayerVsSector[0]->GetYaxis()->SetTitle("Sector");
   h_histoLayerVsSector[0]->SetStats(0);
   h_histoLayerVsSector[0]->SetOption("colz");
 
   h_histoLayerVsSector[1]  = new TH2F("1LayerVSSector", "Sector VS Layer in barrel backward",
-                                      100, 0.0, 15.0, 240, -0.5, 7.5);
+                                      30, -0.25, 14.75, 16, -0.25, 7.75);
   h_histoLayerVsSector[1]->GetXaxis()->SetTitle("Layer");
   h_histoLayerVsSector[1]->GetYaxis()->SetTitle("Sector");
   h_histoLayerVsSector[1]->SetStats(0);

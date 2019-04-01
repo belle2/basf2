@@ -3,6 +3,9 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/DataStore.h>
 
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 
@@ -736,11 +739,21 @@ NeuroTrigger::save(const string& filename, const string& arrayname)
 bool
 NeuroTrigger::load(const string& filename, const string& arrayname)
 {
+  if (filename.size() < 1) {
+    //m_MLPs.clear();
+    //m_MLPs = m_cdctriggerneuroconfig->getMLPs();
+    std::cout << m_cdctriggerneuroconfig->getNNName() << std::endl;
+    //B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
+
+
+    //return true;
+  } //else {
   TFile datafile(filename.c_str(), "READ");
   if (!datafile.IsOpen()) {
     B2WARNING("Could not open file " << filename);
     return false;
   }
+
   TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
   if (!MLPs) {
     datafile.Close();
@@ -762,4 +775,5 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
   setConstants();
 
   return true;
+  //}
 }

@@ -1,5 +1,6 @@
 Import('env')
 
 env['LIBS'] = ['framework', 'mva', '$ROOT_LIBS']
+env['SUBLIB'] = True
 
 Return('env')

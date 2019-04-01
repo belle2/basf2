@@ -24,7 +24,22 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KLMDigitEventInfo() : m_TriggerCTime(0) {};
+    KLMDigitEventInfo():
+      m_TriggerCTime(0),
+      m_userWord(0)
+    {};
+
+    /**
+     * Set trigger CTime.
+     * @param[in] triggerCTime Trigger CTime.
+     */
+    void setTriggerCTime(unsigned int triggerCTime) { m_TriggerCTime = triggerCTime; }
+
+    /**
+     * Set user word (from DCs).
+     * @param[in] userWord User word (from DCs).
+     */
+    void setUserWord(unsigned int userWord) { m_userWord = userWord; }
 
     /**
      * Get trigger CTIME.
@@ -33,18 +48,21 @@ namespace Belle2 {
     unsigned int getTriggerCTime() const { return m_TriggerCTime; }
 
     /**
-     * Set trigger CTIME.
-     * @param[in] ctime Trigger CTime
+     * Get user word (from DCs).
+     * @return User word (from DCs).
      */
-    void setTriggerCTime(unsigned int triggerCTime) { m_TriggerCTime = triggerCTime; }
+    unsigned int getUserWord() const { return m_userWord; }
 
   protected:
 
     /** Trigger CTime */
     unsigned int m_TriggerCTime;
 
+    /** User word (from DCs) */
+    unsigned int m_userWord;
+
     /** Class version. */
-    ClassDef(KLMDigitEventInfo, 1);
+    ClassDef(KLMDigitEventInfo, 3);
 
   };
 

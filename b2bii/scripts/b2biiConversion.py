@@ -54,8 +54,8 @@ def setupB2BIIDatabase(isMC=False):
     # fallback to previously downloaded payloads if offline
     if not isMC:
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, True, LogLevel.ERROR)
-    # get payloads from central database
-    use_central_database(tagname, LogLevel.INFO if isMC else LogLevel.WARNING, payloaddir)
+        # get payloads from central database
+        use_central_database(tagname, LogLevel.WARNING, payloaddir)
     # unless they are already found locally
     if isMC:
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)

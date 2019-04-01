@@ -4,7 +4,7 @@
 # ---------------------------------------------------------------------------------------
 # Example of a steering file for producing summary ntuple of beam background hit rates
 #
-# usage: basf2 beamBkgHitRates.py expNo runNo globalTag
+# usage: basf2 beamBkgHitRates.py expNo runNo globalTag [outputFolder]
 # ---------------------------------------------------------------------------------------
 
 import basf2
@@ -15,7 +15,7 @@ from rawdata import add_unpackers
 # Argument parsing
 argvs = sys.argv
 if len(argvs) < 4:
-    print("usage: basf2", argvs[0], "expNo runNo globalTag")
+    print("usage: basf2", argvs[0], "expNo runNo globalTag [outputFolder]")
     sys.exit()
 
 expNo = 'e' + '{:0=4d}'.format(int(argvs[1]))
@@ -29,6 +29,8 @@ if len(files) == 0:
     sys.exit()
 
 outdir = '.'
+if len(argvs) > 4:
+    outdir = argvs[4]
 outputFile = outdir + '/beamBkgHitRates-' + expNo + '-' + runNo + '.root'
 
 # Define global tag
@@ -48,14 +50,10 @@ main.add_module('Gearbox')
 main.add_module('Geometry')
 
 # Unpacking
-# some detectors are temporary excluded
-# - EKLM because of missing payload in the above global tag
-# - BKLM because of making segmentation violation
-add_unpackers(path=main,
-              components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'ECL'])
+add_unpackers(path=main)
 
 # additional modules if needed for hit processing
-main.add = module('ARICHFillHits')
+main.add_module('ARICHFillHits')
 main.add_module('TOPChannelMasker')
 main.add_module('ActivatePXDGainCalibrator')
 main.add_module('PXDClusterizer')

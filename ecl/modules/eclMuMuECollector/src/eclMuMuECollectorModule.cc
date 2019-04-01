@@ -25,7 +25,6 @@
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dataobjects/ECLDigit.h>
 
 //MDST
 #include <mdst/dataobjects/Track.h>

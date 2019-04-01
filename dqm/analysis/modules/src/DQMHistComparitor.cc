@@ -42,8 +42,12 @@ DQMHistComparitorModule::DQMHistComparitorModule()
   B2DEBUG(1, "DQMHistComparitor: Constructor done.");
 }
 
-
-DQMHistComparitorModule::~DQMHistComparitorModule() { }
+DQMHistComparitorModule::~DQMHistComparitorModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
 
 TH1* DQMHistComparitorModule::find_histo_in_canvas(TString histo_name)
 {
@@ -188,7 +192,7 @@ void DQMHistComparitorModule::initialize()
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
 #endif
   for (auto& it : m_histlist) {
     if (it.size() != 7) {

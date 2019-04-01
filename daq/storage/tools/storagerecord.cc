@@ -3,7 +3,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/MsgHandler.h>
@@ -33,9 +32,7 @@
 #include <queue>
 
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
-#include <unistd.h>
 #include <signal.h>
 #include <sys/statvfs.h>
 #include <zlib.h>

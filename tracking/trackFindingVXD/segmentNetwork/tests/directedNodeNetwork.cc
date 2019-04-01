@@ -133,8 +133,6 @@ namespace DirectedNodeNetworkTests {
       vector<const SpacePoint*> sps4TC5 = { allSpacePoints.at(2), allSpacePoints.at(4)};
       SpacePointTrackCand* aSPTC5 = m_spacePointTrackCandData.appendNew((sps4TC5)); // shares a hit with tc2 and tc3
       aSPTC5->setQualityIndicator(0.65);
-      // false positive due to new with placement (cppcheck issue #7163)
-      // cppcheck-suppress memleak
     }
 
     /** TearDown environment - clear datastore */

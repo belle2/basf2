@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# @cond SUPPRESS_DOXYGEN
+
 # Thomas Keck 2015
 
 import copy
@@ -34,16 +36,6 @@ class Plotter(object):
     """
     Base class for all Plotters.
     """
-
-    # stupid workaround for doxygen refusing to document things
-
-    #: @fn set_errorbar_options(errorbar_kwargs)
-    #: Overrides default errorbar options for datapoint errorbars
-
-    #: @var xscale
-    #: limit scale
-    #: @var yscale
-    #: limit scale
 
     #: Plots added to the axis so far
     plots = None
@@ -1619,3 +1611,5 @@ if __name__ == '__main__':
     p.add(data, ['FastBDT', 'NeuroBayes', 'FastBDT2', 'NeuroBayes2', 'FastBDT3', 'NeuroBayes3'])
     p.finish()
     p.save('correlation_matrix.png')
+
+# @endcond

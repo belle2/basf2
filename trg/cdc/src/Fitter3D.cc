@@ -47,7 +47,6 @@
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/LUT.h"
-#include "trg/cdc/SegmentHit.h"
 #include "trg/trg/Constants.h"
 #include "trg/cdc/Helix.h"
 #include "trg/cdc/Fitter3DUtility.h"

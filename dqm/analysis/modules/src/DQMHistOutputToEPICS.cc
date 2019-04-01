@@ -2,7 +2,7 @@
 // File : DQMHistOutputToEPICS.cc
 // Description : Write Histogram Content to EPICS Arrays
 //
-// Author : Bjoern Spruck, Univerisity Mainz
+// Author : Bjoern Spruck, University Mainz
 // Date : 2019
 //-
 
@@ -36,13 +36,20 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
   B2DEBUG(99, "DQMHistOutputToEPICS: Constructor done.");
 }
 
+DQMHistOutputToEPICSModule::~DQMHistOutputToEPICSModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistOutputToEPICSModule::initialize()
 {
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
 #endif
   for (auto& it : m_histlist) {
-    if (it.size() != 2) {
+    if (it.size() < 2) {
       B2WARNING("Histolist with wrong nr of parameters " << it.size());
       continue;
     }
@@ -50,17 +57,29 @@ void DQMHistOutputToEPICSModule::initialize()
     auto n = new MYNODE;
     n->histoname = it.at(0);
     SEVCHK(ca_create_channel(it.at(1).c_str(), NULL, NULL, 10, &n->mychid), "ca_create_channel failure");
-    pmynode.push_back(n);
-    int length = int(ca_element_count(n->mychid));
-    if (length > 0) {
-      std::vector <double> data(length, 0.0);
-      SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_set failure");
+    if (it.size() >= 3) {
+      SEVCHK(ca_create_channel(it.at(2).c_str(), NULL, NULL, 10, &n->mychid_last), "ca_create_channel failure");
+    } else {
+      n->mychid_last = 0;
     }
+    pmynode.push_back(n);
 #endif
   }
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  for (auto* n : pmynode) {
+    int length = int(ca_element_count(n->mychid));
+    if (length > 0) {
+      std::vector <double> data(length, 0.0);
+      SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_put failure");
+      if (n->mychid_last) {
+        if (length == int(ca_element_count(n->mychid_last))) {
+          SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_put failure");
+        }
+      }
+    }
+  }
 #endif
   B2DEBUG(99, "DQMHistOutputToEPICS: initialized.");
 }
@@ -78,19 +97,16 @@ void DQMHistOutputToEPICSModule::event()
     if (hh1) {
       int length = int(ca_element_count(it->mychid));
       if (length > 0 && hh1->GetNcells() > 2) {
-        double* data = new double[length];
+        std::vector <double> data(length, 0.0);
         // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
         // We fill up the array with ZEROs otherwise
         for (int i = 0; i < length ; i++) {
           if (i < hh1->GetNcells() - 2) { // minus under/overflow bin
             data[i] = hh1->GetBinContent(i + 1);
-          } else {
-            data[i] = 0.0;
           }
         }
 
-        SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)data), "ca_set failure");
-        delete []data;
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)data.data()), "ca_set failure");
       }
     }
   }
@@ -101,5 +117,26 @@ void DQMHistOutputToEPICSModule::event()
 void DQMHistOutputToEPICSModule::terminate()
 {
   B2DEBUG(99, "DQMHistOutputToEPICS: terminate called");
+  /// TODO the following might be better suited in end_run, but its not clear if this is called before termination in current setup
+#ifdef _BELLE2_EPICS
+  for (auto* n : pmynode) {
+    if (n->mychid_last) {
+      // copy PVs to last-run-PV if existing
+      int length = int(ca_element_count(n->mychid));
+      if (length > 0 && length == int(ca_element_count(n->mychid_last))) {
+        std::vector <double> data(length, 0.0);
+        SEVCHK(ca_array_get(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_get failure");
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_put failure");
+      }
+    }
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  // the following belongs to terminate
+  for (auto* n : pmynode) {
+    if (n->mychid) SEVCHK(ca_clear_channel(n->mychid), "ca_clear_channel failure");
+    if (n->mychid_last) SEVCHK(ca_clear_channel(n->mychid_last), "ca_clear_channel failure");
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
 

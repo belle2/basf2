@@ -135,18 +135,18 @@ void SoftwareTriggerHLTDQMModule::event()
 
         if (cutEntry != m_triggerResult->getResults().end()) {
           const int cutResult = cutEntry->second;
-          m_cutResultHistograms[baseIdentifier]->Fill(cutName.c_str(), cutResult);
+          m_cutResultHistograms[baseIdentifier]->Fill(cutName.c_str(), cutResult > 0);
         }
       }
 
       const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
       const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
 
-      m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult);
+      m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
     }
 
     const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
-    m_cutResultHistograms["total_result"]->Fill("total_result", totalResult);
+    m_cutResultHistograms["total_result"]->Fill("total_result", totalResult > 0);
   }
 }
 

@@ -490,8 +490,8 @@ void TRGGDLDQMModule::event()
     begin_run = false;
   }
 
-  int psn[3] = {0};
-  int ftd[3] = {0};
+  int psn[5] = {0};
+  int ftd[5] = {0};
   int itd[5] = {0};
   int timtype  = 0;
 
@@ -500,8 +500,8 @@ void TRGGDLDQMModule::event()
 
   // fill event by event timing histogram and get time integrated bit info
   for (unsigned clk = 1; clk <= n_clocks; clk++) {
-    int psn_tmp[3] = {0};
-    int ftd_tmp[3] = {0};
+    int psn_tmp[5] = {0};
+    int ftd_tmp[5] = {0};
     int itd_tmp[5] = {0};
     for (unsigned j = 0; j < (unsigned)nword_input; j++) {
       itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);

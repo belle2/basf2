@@ -26,8 +26,6 @@
 #include "trg/ecl/modules/trgeclRawdataAnalysis/TRGECLRawdataAnalysisModule.h"
 
 #include <stdlib.h>
-
-#include <stdlib.h>
 #include <iostream>
 
 using namespace std;

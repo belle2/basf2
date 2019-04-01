@@ -21,7 +21,7 @@ from variables import variables
 myAna_Main = create_path()
 
 # load input ROOT file
-inputMdst('default', './WG6_DstToD0ToKpi.udst.root', path=myAna_Main)
+inputMdst('default', '../WG6_DstToD0ToKpi.udst.root', path=myAna_Main)
 
 # --------------------------------------------------
 # write out useful information to a ROOT file

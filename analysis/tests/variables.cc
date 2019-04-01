@@ -347,6 +347,13 @@ namespace {
 
     Particle* part = myParticles.appendNew(savedTrack, Const::ChargedStable(11));
 
+    const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
+    const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
+    const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+
+    EXPECT_TRUE(vIsFromTrack->function(part));
+    EXPECT_FALSE(vIsFromECL->function(part));
+    EXPECT_FALSE(vIsFromKLM->function(part));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
@@ -3028,11 +3035,30 @@ namespace {
     } // end loop over test list
   }
 
+  TEST_F(ECLVariableTest, IsFromECL)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+
+    const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
+    const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
+    const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+
+    for (int i = 0; i < eclclusters.getEntries(); ++i)
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        EXPECT_TRUE(vIsFromECL->function(p));
+        EXPECT_FALSE(vIsFromKLM->function(p));
+        EXPECT_FALSE(vIsFromTrack->function(p));
+      }
+  }
+
   TEST_F(ECLVariableTest, WholeEventClosure)
   {
     // we need the particles, tracks, and ECLClusters StoreArrays
     StoreArray<Particle> particles;
-    StoreArray<Track> tracks; StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+    StoreArray<ECLCluster> eclclusters;
 
     // create a photon (clusters) and pion (tracks) lists
     StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
@@ -3416,9 +3442,13 @@ namespace {
       // Insert MC particle logic here
       MCParticle mcKs;
       mcKs.setPDG(310);
+      mcKs.setProductionVertex(1.0, 1.0, 0.0);
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
+      mcKs.setProductionTime(0);
       mcKs.setMassFromPDG();
       mcKs.setMomentum(1.164, 1.55200, 0);
+      float decayTime = 5 * mcKs.getMass() / mcKs.getEnergy();
+      mcKs.setDecayTime(decayTime);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);
       MCParticle* newMCKs = mcParticles.appendNew(mcKs);
 
@@ -3611,9 +3641,10 @@ namespace {
     const Manager::Var* var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(1)");
     ASSERT_NE(var, nullptr);
     auto* Ks = newDp->getDaughter(1)->getRelatedTo<MCParticle>();
-    double p = sqrt(Ks->getMomentum().X() * Ks->getMomentum().X() + Ks->getMomentum().Y() *
-                    Ks->getMomentum().Y() + Ks->getMomentum().Z() * Ks->getMomentum().Z());
-    EXPECT_FLOAT_EQ(var->function(newDp), 5.0 / Const::speedOfLight * Ks->getMass() / p);
+    //    double p = Ks->getMomentum().Mag();
+    //    EXPECT_FLOAT_EQ(var->function(newDp), 5.0 / Const::speedOfLight * Ks->getMass() / p);
+
+    EXPECT_FLOAT_EQ(var->function(newDp), Ks->getLifetime() / Ks->getEnergy()*Ks->getMass());
 
     var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(3)");
     ASSERT_NE(var, nullptr);

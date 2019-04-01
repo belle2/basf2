@@ -113,15 +113,12 @@ b2.use_central_database("analysis_tools_release-03-01-00")
 #
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
-# BGx1 stays for MC generated with machine Background. Only this kind of weight files are supported since release-03
+# BGx1 stays for MC generated with machine Background.
 # The official weight files are trained using B0-> nu_tau anti-nu_tau as signal channel (no CP violation)
-# to avoid that the flavor tagger learns asymmetries on the tag side. Belle is not sensitive to this effect
-# and therefore JpsiKs is ok.
+# to avoid that the flavor tagger learns asymmetries on the tag side.
+# Only this kind of weight files are supported since release-03-01-00.
 
 weightfiles = 'B2nunubarBGx1'
-
-# For converted Belle data/MC use
-# weightfiles = 'B2JpsiKs_muBGx1'
 
 # Flavor Tagging Function. Default Expert mode to use the official weight files.
 ft.flavorTagger(

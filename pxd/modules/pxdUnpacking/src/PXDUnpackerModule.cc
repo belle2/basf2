@@ -43,8 +43,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   Module(),
   m_storeRawHits(),
   m_storeROIs(),
-  m_storeRawAdc(),
-  m_storeRawCluster()
+  m_storeRawAdc()
 {
   //Set module properties
   setDescription("Unpack Raw PXD Hits from ONSEN data stream");
@@ -56,7 +55,6 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of generated PXDRawAdcs", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
-  addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task", (uint64_t)0);
   addParam("SuppressErrorMask", m_suppressErrorMask, "Set mask for errors msgs which are not printed", (uint64_t)0);
   addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
@@ -89,7 +87,6 @@ void PXDUnpackerModule::initialize()
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeDAQEvtStats.registerInDataStore(m_PXDDAQEvtStatsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
-  m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   /// actually, later we do not want to store ROIs and raw ADC into output file ...  aside from debugging
 
   B2DEBUG(29, "ForceMapping: " << m_forceMapping);
@@ -372,35 +369,36 @@ void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, Vx
   B2WARNING("FCE (Cluster) Packet have not yet been tested with real HW clusters. Dont assume that this code is working!");
   return;
 
-  ubig16_t* cluster = (ubig16_t*)data;
-  int nr_words; //words in dhp frame
-  unsigned int words_in_cluster = 0; //counts 16bit words in cluster
-  nr_words = length / 2;
-  ubig16_t sor;
-  sor = 0x0000;
-
-  for (int i = 2 ; i < nr_words ; i++) {
-    if (i != 2) { //skip header
-      if ((((cluster[i] & 0x8000) == 0)
-           && ((cluster[i] & 0x4000) >> 14) == 1)) {  //searches for start of row frame with start of cluster flag = 1 => new cluster
-        if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster], words_in_cluster, vxd_id);
-        words_in_cluster = 0;
-      }
-    }
-    if ((cluster[i] & 0x8000) == 0) {
-      sor = cluster[i];
-    }
-    words_in_cluster++;
-
-    if ((cluster[nr_words - 1] & 0xFFFF) == (sor &
-                                             0xFFFF)) {//if frame is not 32bit aligned last word will be the last start of row word
-      cluster[nr_words - 1] = 0x0000;//overwrites the last redundant word with zero to make checking easier in PXDHardwareClusterUnpacker
-    }
-
-    if (i == nr_words - 1) {
-      if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster + 1], words_in_cluster, vxd_id);
-    }
-  }
+  // implement the unpacking here and not as a separate module ... when it is available in HW
+//   ubig16_t* cluster = (ubig16_t*)data;
+//   int nr_words; //words in dhp frame
+//   unsigned int words_in_cluster = 0; //counts 16bit words in cluster
+//   nr_words = length / 2;
+//   ubig16_t sor;
+//   sor = 0x0000;
+//
+//   for (int i = 2 ; i < nr_words ; i++) {
+//     if (i != 2) { //skip header
+//       if ((((cluster[i] & 0x8000) == 0)
+//            && ((cluster[i] & 0x4000) >> 14) == 1)) {  //searches for start of row frame with start of cluster flag = 1 => new cluster
+//         if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster], words_in_cluster, vxd_id);
+//         words_in_cluster = 0;
+//       }
+//     }
+//     if ((cluster[i] & 0x8000) == 0) {
+//       sor = cluster[i];
+//     }
+//     words_in_cluster++;
+//
+//     if ((cluster[nr_words - 1] & 0xFFFF) == (sor &
+//                                              0xFFFF)) {//if frame is not 32bit aligned last word will be the last start of row word
+//       cluster[nr_words - 1] = 0x0000;//overwrites the last redundant word with zero to make checking easier in PXDHardwareClusterUnpacker
+//     }
+//
+//     if (i == nr_words - 1) {
+//       if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster + 1], words_in_cluster, vxd_id);
+//     }
+//   }
 }
 
 void PXDUnpackerModule::dump_dhp(void* data, unsigned int frame_len)

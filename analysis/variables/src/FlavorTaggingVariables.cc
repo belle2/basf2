@@ -100,6 +100,8 @@ namespace Belle2 {
         // from analysis/ContinuumSuppression/src/ContinuumSuppression.cc
         // At some point this has to be updated!
 
+        // FIXME the following three loops reimplements the ParticleLoader and should be avoided -- SC
+
         // Charged tracks
         //
         const auto& roeTracks = roe->getTracks();
@@ -122,10 +124,10 @@ namespace Belle2 {
         }
 
         // ECLCluster -> Gamma
-        //
         const auto& roeECLClusters = roe->getECLClusters();
         for (auto& cluster : roeECLClusters) {
           if (cluster == nullptr) continue;
+          if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
           if (cluster->isNeutral()) {
             // Create particle from ECLCluster with gamma hypothesis
             Particle particle(cluster);
@@ -482,6 +484,7 @@ namespace Belle2 {
           }
         } else if (roe-> getNECLClusters() != 0) {
           for (auto& cluster : roe-> getECLClusters()) {
+            if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
             const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
             while (mcParticle != nullptr) {
               if (mcParticle->getPDG() == 511) {
@@ -794,7 +797,7 @@ namespace Belle2 {
               if (TargetFastParticle != nullptr) {
                 if (requestedVariable == "cosTPTOFast") output = Variable::Manager::Instance().getVariable("cosTPTO")->function(
                                                                      TargetFastParticle);
-                if (momSlowPion == momSlowPion) {
+                if (momSlowPion == momSlowPion) { // FIXME
                   if (requestedVariable == "cosSlowFast") output = TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
                   else if (requestedVariable == "SlowFastHaveOpositeCharges") {
                     if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {

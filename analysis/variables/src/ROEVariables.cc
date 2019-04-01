@@ -57,6 +57,53 @@ namespace Belle2 {
       return isInThisRestOfEvent(particle, roe);
     }
 
+    double isCloneOfSignalSide(const Particle* particle)
+    {
+
+      StoreObjPtr<RestOfEvent> roe;
+      if (not roe.isValid()) {
+        B2WARNING("Please use isCloneOfSignalSide variable in for_each ROE loop!");
+        return -999.;
+      }
+      auto* particleMC = particle->getRelatedTo<MCParticle>();
+      if (!particleMC) {
+        return 0.0;
+      }
+      auto* signal = roe->getRelatedFrom<Particle>();
+      auto signalFSPs = signal->getFinalStateDaughters();
+      for (auto* daughter : signalFSPs) {
+        auto* daughterMC = daughter->getRelatedTo<MCParticle>();
+        if (daughterMC == particleMC) {
+          return 1.0;
+        }
+      }
+      return 0.0;
+    }
+    double hasAncestorFromSignalSide(const Particle* particle)
+    {
+      StoreObjPtr<RestOfEvent> roe;
+      if (!roe.isValid()) {
+        B2WARNING("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
+        return -999.;
+      }
+      auto* particleMC = particle->getRelatedTo<MCParticle>();
+      if (!particleMC) {
+        return 0.0;
+      }
+      auto* signalReco = roe->getRelatedFrom<Particle>();
+      auto* signalMC = signalReco->getRelatedTo<MCParticle>();
+      MCParticle* ancestorMC = particleMC->getMother();
+      while (ancestorMC) {
+        if (ancestorMC == signalMC) {
+          return 1.0;
+        }
+        ancestorMC = ancestorMC->getMother();
+      }
+      return 0.0;
+    }
+
+
+
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
     {
       std::string listName;
@@ -1877,6 +1924,16 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+
+    REGISTER_VARIABLE("isCloneOfSignalSide", isCloneOfSignalSide,
+                      "Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise. "
+                      "Requires generator information and truth-matching. "
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+
+    REGISTER_VARIABLE("hasAncestorFromSignalSide", hasAncestorFromSignalSide,
+                      "Returns 1 if a particle has ancestor from signal side, 0 otherwise. "
+                      "Requires generator information and truth-matching. "
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,

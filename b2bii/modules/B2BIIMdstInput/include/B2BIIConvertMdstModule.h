@@ -327,9 +327,9 @@ namespace Belle2 {
     //-----------------------------------------------------------------------------
 
     /**
-     * Sets ECLCluster -> Track relations
+     * Sets Track -> ECLCluster relations
      */
-    void setECLClustersToTracksRelations();
+    void setTracksToECLClustersRelations();
 
     /**
      * Sets KLMCluster -> Track and ECLCluster relations

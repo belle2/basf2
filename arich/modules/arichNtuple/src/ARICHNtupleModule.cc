@@ -167,7 +167,17 @@ namespace Belle2 {
 
     for (const auto& arichTrack : m_arichTracks) {
 
-      const ARICHLikelihood* lkh = arichTrack.getRelated<ARICHLikelihood>();
+      const ExtHit* extHit = arichTrack.getRelated<ExtHit>();
+
+      const Track* mdstTrack = NULL;
+      if (extHit) mdstTrack = extHit->getRelated<Track>();
+
+      const ARICHAeroHit* aeroHit = arichTrack.getRelated<ARICHAeroHit>();
+
+      const ARICHLikelihood* lkh = NULL;
+      if (mdstTrack) lkh = mdstTrack->getRelated<ARICHLikelihood>();
+      else lkh = arichTrack.getRelated<ARICHLikelihood>();
+
       if (!lkh) continue;
       if (lkh->getFlag() != 1) continue;
 
@@ -213,7 +223,6 @@ namespace Belle2 {
 
       const MCParticle* particle = 0;
 
-      const Track* mdstTrack = lkh->getRelated<Track>();
       if (mdstTrack) {
         const TrackFitResult* fitResult = mdstTrack->getTrackFitResultWithClosestMass(Const::pion);
         if (fitResult) {
@@ -288,7 +297,6 @@ namespace Belle2 {
       m_arich.recHit.theta = recMom.Theta();
       m_arich.recHit.phi = recMom.Phi();
 
-      const ARICHAeroHit* aeroHit = lkh->getRelated<ARICHAeroHit>();
       if (aeroHit) {
         TVector3 truePos = aeroHit->getPosition();
         m_arich.mcHit.x = truePos.X();
@@ -327,7 +335,6 @@ namespace Belle2 {
           }
         }
       }
-
       m_tree->Fill();
     }
   }

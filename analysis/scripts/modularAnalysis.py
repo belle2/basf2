@@ -577,7 +577,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster)
+        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -587,7 +587,17 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     .. code-block:: python
 
         v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
-        fillParticleLists([kaons, pions, v0lambdas])
+        fillParticleLists([kaons, pions, v0lambdas], path=mypath)
+
+    Tip:
+        For "K_L0" it is now possible to load from ECLClusters, to revert to
+        the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
+
+    .. code-block:: python
+
+        klongs = ('K_L0', 'isFromKLM > 0')
+        fillParticleLists([kaons, pions, klongs], path=mypath)
+
 
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
@@ -640,7 +650,7 @@ def fillParticleList(
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster)
+        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -649,8 +659,15 @@ def fillParticleList(
 
     .. code-block:: python
 
-        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
-        fillParticleLists([kaons, pions, v0lambdas])
+        fillParticleList('Lambda0 -> p+ pi-', '0.9 < M < 1.3', path=mypath)
+
+    Tip:
+        For "K_L0" it is now possible to load from ECLClusters, to revert to
+        the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
+
+    .. code-block:: python
+
+        fillParticleList('K_L0', 'isFromKLM > 0', path=mypath)
 
     Parameters:
         decayString (str):           Type of Particle and determines the name of the ParticleList.
@@ -1854,7 +1871,7 @@ def printROEInfo(
     mask_names=[],
     which_mask='both',
     full_print=False,
-    path=analysis_main
+    path=None
 ):
     """
     This function prints out the information for the current ROE, so it should only be used in the for_each path.
@@ -1871,6 +1888,8 @@ def printROEInfo(
     @param full_print   print out mask values for each Track/ECLCLuster in mask
     @param path         modules are added to this path
     """
+    if not isinstance(path, basf2.Path):
+        B2FATAL("Error from printROEInfo, please add this to the for_each path")
 
     printMask = register_module('RestOfEventPrinter')
     printMask.set_name('RestOfEventPrinter')
@@ -2160,6 +2179,7 @@ def buildEventShape(inputListNames=[],
     @param harmonicMoments   Enables the calculation of the Harmonic moments.
     @param sphericity  Enables the calculation of the sphericity-related quantities.
     @param thrust  Enables the calculation of thust-related quantities.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them.
 
     """
     if not inputListNames:
@@ -2216,8 +2236,8 @@ def labelTauPairMC(path=analysis_main):
 def tagCurlTracks(particleLists,
                   belle=False,
                   mcTruth=False,
-                  responseCut=0.303,
-                  selectorType='cut',
+                  responseCut=0.324,
+                  selectorType='cUt',
                   ptCut=0.6,
                   train=False,
                   path=analysis_main):
@@ -2230,17 +2250,27 @@ def tagCurlTracks(particleLists,
 
       .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
-    @param particleLists: list of particle lists to check for curls
-    @param belle:         bool flag for belle or belle2 data/mc
-    @param mcTruth:       bool flag to output some truth based information
+
+    The module loops over all particles in a given list that meet the preselection **ptCut** and assigns them to
+    bundles based on the response of the chosen **selector** and the required minimum response set by the
+    **responseCut**. Once all particles are assigned they are ranked by 25dr^2+dz^2. All but the lowest are tagged
+    with extraInfo(isCurl=1) to allow for later removal  by cutting the list or removing these from ROE as
+    applicable.
+
+
+    @param particleLists: list of particle lists to check for curls.
+    @param belle:         bool flag for Belle or Belle II data/mc.
+    @param mcTruth:       bool flag to additionally assign particles with extraInfo(isTruthCurl) and
+                          extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
+                          genParticleIndex then ranked and tagged as normal.
     @param responseCut:   float min classifier response that considers two tracks to come from the same particle.
-                          Note 'cut' selector is binary 0/1
+                          Note 'cut' selector is binary 0/1.
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
     @param ptCut:         pre-selection cut on transverse momentum.
-    @param train:         flag to set training mode if selector has a training mode (mva)
-    @param path:          module is added to this path
+    @param train:         flag to set training mode if selector has a training mode (mva).
+    @param path:          module is added to this path.
     """
 
     if (not isinstance(particleLists, list)):

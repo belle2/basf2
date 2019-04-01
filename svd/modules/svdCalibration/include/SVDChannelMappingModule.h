@@ -35,9 +35,8 @@
 
 namespace Belle2 {
 
-  /** The HLT ROI DQM module.
+  /** The Channel Mapping Check Module
    *
-   * Creates basic DQM for ROI creation on HLT
    */
   class SVDChannelMappingModule : public Module {
 
@@ -46,8 +45,11 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDChannelMappingModule();
 
+    /**initialize*/
     void initialize() override;
+    /** event*/
     void event() override;
+    /** temrinate*/
     void terminate() override;
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/
@@ -57,14 +59,14 @@ namespace Belle2 {
     std::string m_rootFileName;   /**< root file name */
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
-    TList* m_histoList_digits;
-    TList* m_histoList_clusters;
+    TList* m_histoList_digits; /**< list of histograms for the strips*/
+    TList* m_histoList_clusters; /**< list of histograms for the clusters*/
 
   private:
 
-    StoreArray<SVDIntercept> m_Intercepts;
-    StoreArray<SVDCluster> m_clusters;
-    StoreArray<SVDShaperDigit> m_shapers;
+    StoreArray<SVDIntercept> m_Intercepts; /**< SVDintercept StoreArray*/
+    StoreArray<SVDCluster> m_clusters; /**< SVDClusters StoreArray*/
+    StoreArray<SVDShaperDigit> m_shapers; /**<SVDSHaperDigits StoreArray*/
 
     VXD::GeoCache& m_aGeometry = VXD::GeoCache::getInstance(); /**< the geometry */
 

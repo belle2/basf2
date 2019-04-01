@@ -21,6 +21,7 @@
 #include <map>
 #include <TFile.h>
 #include <TTree.h>
+#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -98,6 +99,10 @@ namespace Belle2 {
     int m_numEvents = 0;  /**< number of events in the time stamp */
     unsigned m_timeStamp = 0;  /**< time stamp (unix time) */
     int m_time = 0;  /**< time in seconds w.r.t the first event of the run */
+
+    // control histograms
+    TH1F* m_trgAll = 0; /**< trigger types of all events */
+    TH1F* m_trgSel = 0; /**< trigger types of selected events */
 
     // buffers
     std::map<unsigned, int> m_eventCounts; /**< number of events in time stamps */

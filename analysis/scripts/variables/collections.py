@@ -10,9 +10,9 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
-    'PulseShapeDiscriminationMVA',
-    'ClusterHasPulseShapeDiscrimination',
-    'ClusterNumberOfHadronDigits',
+    'clusterPulseShapeDiscriminationMVA',
+    'clusterHasPulseShapeDiscrimination',
+    'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
     'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
@@ -213,7 +213,6 @@ tag_vertex = [
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
     'MCDeltaT',
-    'MCTagBFlavor',
     'TagVmcLBoost',
     'TagVmcOBoost',
     'mcLBoost',

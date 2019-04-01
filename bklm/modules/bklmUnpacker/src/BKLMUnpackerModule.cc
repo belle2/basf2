@@ -112,21 +112,6 @@ void BKLMUnpackerModule::event()
 
     // getNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents
     for (int j = 0; j < m_rawKLMs[i]->GetNumEntries(); j++) {
-
-      BKLMDigitEventInfo* bklmDigitEventInfo = m_bklmDigitEventInfos.appendNew();
-
-      int triggerCTime = m_rawKLMs[i]->GetTTCtime(j) & 0xFFFF;
-      bklmDigitEventInfo->setTriggerCTime(triggerCTime);
-
-      int triggerUTime = m_rawKLMs[i]->GetTTUtime(j) & 0xFFFF;
-      bklmDigitEventInfo->setTriggerUTime(triggerUTime);
-
-      int windowStart = m_rawKLMs[i]->GetTrailerChksum(j);
-      bklmDigitEventInfo->setWindowStart(windowStart);
-
-      bklmDigitEventInfo->setPreviousEventTriggerCTime(m_triggerCTimeOfPreviousEvent);
-      m_triggerCTimeOfPreviousEvent = triggerCTime;
-
       // since the buffer has multiple events this gets each event/node... but how to disentangle events? Maybe only one event there?
 
       // are finesse and detector the same?
@@ -146,9 +131,24 @@ void BKLMUnpackerModule::event()
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         // addendum: there is always an additional word (count) at the end!
 
+        // we create one BKLMDigitEventInfo per COPPER link
+        BKLMDigitEventInfo* bklmDigitEventInfo = m_bklmDigitEventInfos.appendNew();
+        int triggerCTime = m_rawKLMs[i]->GetTTCtime(j) & 0xFFFF;
+        bklmDigitEventInfo->setTriggerCTime(triggerCTime);
+        int triggerUTime = m_rawKLMs[i]->GetTTUtime(j) & 0xFFFF;
+        bklmDigitEventInfo->setTriggerUTime(triggerUTime);
+        int windowStart = m_rawKLMs[i]->GetTrailerChksum(j);
+        bklmDigitEventInfo->setWindowStart(windowStart);
+        bklmDigitEventInfo->setPreviousEventTriggerCTime(m_triggerCTimeOfPreviousEvent);
+        m_triggerCTimeOfPreviousEvent = triggerCTime;
+
         int numDetNwords = m_rawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int numHits = numDetNwords / hitLength;
         int* buf_slot = m_rawKLMs[i]->GetDetectorBuffer(j, finesse_num);
+
+        // in the last word there is the user word (from DCs)
+        int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+        bklmDigitEventInfo->setUserWord(userWord);
 
         // cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,             finesse_num) << " words, " << numHits << " hits)" << endl;
         // if (numDetNwords > 0) {

@@ -13,13 +13,14 @@
 #include <simulation/monopoles/G4Monopole.h>
 
 #include <G4ParticleTable.hh>
-#include <G4PhysicalConstants.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4Monopole::G4Monopole(const G4String& name,
                        G4double  mass,

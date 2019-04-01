@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
-#include <Eigen/Eigenvalues>
 
 #include <string>
 #include <sstream>

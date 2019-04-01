@@ -17,7 +17,6 @@
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
-#include <pxd/dataobjects/PXDRawCluster.h>
 
 namespace Belle2 {
 
@@ -50,7 +49,6 @@ namespace Belle2 {
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be modified */
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be modified */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be modified */
-      std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be modified */
 
       /** Critical error mask which defines when data should be trashed, whole event only! */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
@@ -69,8 +67,6 @@ namespace Belle2 {
       StoreArray<PXDRawROIs> m_storeROIs;
       /** In/Output array for Raw Adcs. Only touched if data needs to be removed */
       StoreArray<PXDRawAdc> m_storeRawAdc;
-      /** In/Output array for Clusters. Only touched if data needs to be removed */
-      StoreArray<PXDRawCluster> m_storeRawCluster;
     };//end class declaration
 
 

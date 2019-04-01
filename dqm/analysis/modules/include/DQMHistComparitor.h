@@ -56,7 +56,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DQMHistComparitorModule();
-    virtual ~DQMHistComparitorModule();
+    ~DQMHistComparitorModule();
 
     /**
      * Find histogram corresponding to canvas.
@@ -65,13 +65,13 @@ namespace Belle2 {
      */
     TH1* find_histo_in_canvas(TString);
     //! Module functions to be called from main process
-    virtual void initialize() override;
+    void initialize() override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     // Data members
   private:

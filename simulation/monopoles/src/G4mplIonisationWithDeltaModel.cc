@@ -21,8 +21,8 @@
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 
 #include <Randomize.hh>
-#include <G4PhysicalConstants.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <G4ParticleChangeForLoss.hh>
 #include <G4Electron.hh>
 #include <G4DynamicParticle.hh>
@@ -34,6 +34,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 std::vector<G4double>* G4mplIonisationWithDeltaModel::dedx0 = nullptr;
 

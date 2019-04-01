@@ -38,22 +38,28 @@ KLMDQMModule::KLMDQMModule() :
   h_xvszBKLMHit2ds(nullptr),
   h_yvszBKLMHit2ds(nullptr)
 {
-  setDescription("KLM data quality monitor.");
-  setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("histogramDirectoryName", m_HistogramDirectoryName,
-           "Directory for KLM DQM histograms in ROOT file.",
-           std::string("KLM"));
-  addParam("histogramDirectoryNameEKLM", m_HistogramDirectoryNameEKLM,
-           "Directory for EKLM DQM histograms in ROOT file.",
-           std::string("EKLM"));
-  addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
-           "Directory for BKLM DQM histograms in ROOT file.",
-           std::string("BKLM"));
-  addParam("outputDigitsName", m_outputDigitsName,
-           "Name of BKLMDigit store array", std::string("BKLMDigits"));
-  m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
-  m_Sector = nullptr;
-  m_StripLayer = nullptr;
+  for (int i = 0; i < 2; ++i) {
+    h_histoLayerVsSector[i] = nullptr;
+  }
+
+  {
+    setDescription("KLM data quality monitor.");
+    setPropertyFlags(c_ParallelProcessingCertified);
+    addParam("histogramDirectoryName", m_HistogramDirectoryName,
+             "Directory for KLM DQM histograms in ROOT file.",
+             std::string("KLM"));
+    addParam("histogramDirectoryNameEKLM", m_HistogramDirectoryNameEKLM,
+             "Directory for EKLM DQM histograms in ROOT file.",
+             std::string("EKLM"));
+    addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
+             "Directory for BKLM DQM histograms in ROOT file.",
+             std::string("BKLM"));
+    addParam("outputDigitsName", m_outputDigitsName,
+             "Name of BKLMDigit store array", std::string("BKLMDigits"));
+    m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
+    m_Sector = nullptr;
+    m_StripLayer = nullptr;
+  }
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -157,6 +163,20 @@ void KLMDQMModule::defineHistoBKLM()
   h_yvszBKLMHit2ds->GetYaxis()->SetTitle("y(cm)");
   h_yvszBKLMHit2ds->SetOption("LIVE");
 
+  h_histoLayerVsSector[0]  = new TH2F("0LayerVSSector", "Sector VS Layer in barrel forward",
+                                      100, 0.0, 15.0, 240, -0.5, 7.5);
+  h_histoLayerVsSector[0]->GetXaxis()->SetTitle("Layer");
+  h_histoLayerVsSector[0]->GetYaxis()->SetTitle("Sector");
+  h_histoLayerVsSector[0]->SetStats(0);
+  h_histoLayerVsSector[0]->SetOption("colz");
+
+  h_histoLayerVsSector[1]  = new TH2F("1LayerVSSector", "Sector VS Layer in barrel backward",
+                                      100, 0.0, 15.0, 240, -0.5, 7.5);
+  h_histoLayerVsSector[1]->GetXaxis()->SetTitle("Layer");
+  h_histoLayerVsSector[1]->GetYaxis()->SetTitle("Sector");
+  h_histoLayerVsSector[1]->SetStats(0);
+  h_histoLayerVsSector[1]->SetOption("colz");
+
   oldDir->cd();
 }
 
@@ -222,6 +242,8 @@ void KLMDQMModule::beginRun()
   h_yvsxBKLMHit2ds->Reset();
   h_xvszBKLMHit2ds->Reset();
   h_yvszBKLMHit2ds->Reset();
+  h_histoLayerVsSector[0]->Reset();
+  h_histoLayerVsSector[1]->Reset();
 }
 
 void KLMDQMModule::event()
@@ -265,6 +287,7 @@ void KLMDQMModule::event()
       m_TimeScintillatorBKLM->Fill(digit->getTime());
     h_eDep->Fill(digit->getEDep());
     h_nPixel->Fill(digit->getNPixel());
+    h_histoLayerVsSector[1 - digit->isForward()]->Fill(digit->getLayer() - 1, digit->getSector() - 1);
   }
   StoreArray<BKLMHit2d> hits(m_outputHitsName);
   int nnent = hits.getEntries();

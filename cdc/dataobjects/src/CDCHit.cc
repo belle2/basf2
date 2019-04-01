@@ -18,13 +18,14 @@ using namespace std;
 using namespace Belle2;
 
 CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
-               unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status, signed short otherHitIndex,
-               unsigned short leadingEdgeCharge)
+               unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status, unsigned short tot,
+               signed short otherHitIndex, unsigned short leadingEdgeCharge)
 {
   setTDCCount(tdcCount);
   setADCCount(charge);
   setWireID(iSuperLayer, iLayer, iWire);
   setStatus(status);
+  setTOT(tot);
   setOtherHitIndex(otherHitIndex);
   setADCCountAtLeadingEdge(leadingEdgeCharge);
 }
@@ -33,7 +34,10 @@ CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
 DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
 {
   const auto* bgDigit = static_cast<const CDCHit*>(bg);
-  const unsigned short adc = m_adcCount;
+  const unsigned short adcSg = m_adcCount;
+  const unsigned short adcBg = bgDigit->getADCCount();
+  //  B2INFO(" ");
+  //  B2INFO("adcSg,adcBg= " << adcSg <<" "<< bgDigit->getADCCount());
   int diff  = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());
 
   // If the BG hit is faster than the true hit, the TDC count is replaced, and
@@ -50,8 +54,8 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
       relMCParticles.remove(i);
     }
   }
-  m_adcCount += adc;
-
+  m_adcCount = adcSg + adcBg;
+  //  B2INFO("diff, m_adcCount= " << diff <<" "<< m_adcCount);
 
   return DigitBase::c_DontAppend;
 

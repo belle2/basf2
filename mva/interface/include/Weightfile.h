@@ -17,6 +17,7 @@
 
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
+#include <framework/database/DBImportArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <boost/property_tree/ptree.hpp>
@@ -255,6 +256,15 @@ namespace Belle2 {
        */
       static void saveToDatabase(Weightfile& weightfile, const std::string& identifier,
                                  const Belle2::IntervalOfValidity& iov = Belle2::IntervalOfValidity(0, 0, -1, -1));
+
+      /**
+       * Static function which saves an array of Weightfile objects in the basf2 condition database
+       * @param weightfiles vector of weightfiles to save
+       * @param identifier in the database
+       * @param iov interval of validity of this weightfile
+       */
+      static void saveArrayToDatabase(std::vector<Weightfile>& weightfiles, const std::string& identifier,
+                                      const Belle2::IntervalOfValidity& iov = Belle2::IntervalOfValidity(0, 0, -1, -1));
 
       /**
        * Static function which loads a Weightfile from the basf2 condition database

@@ -83,7 +83,7 @@ void QETrainingDataCollectorModule::initialize()
 void QETrainingDataCollectorModule::beginRun()
 {
   // BField is required by all QualityEstimators
-  double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
+  const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
   m_estimatorMC->setMagneticFieldStrength(bFieldZ);
 }
@@ -97,19 +97,14 @@ void QETrainingDataCollectorModule::event()
     }
 
     std::vector<SpacePoint const*> const sortedHits = aTC.getSortedHits();
-
     if (m_ClusterInformation == "Average") {
       m_clusterInfoExtractor->extractVariables(sortedHits);
     }
-
     m_nSpacePoints = sortedHits.size();
-
-    double tmp = m_estimatorMC->estimateQuality(sortedHits);
-    m_truth = tmp > 0 ? 1 : 0;
-
+    const double mc_quality = m_estimatorMC->estimateQuality(sortedHits);
+    m_truth = float(mc_quality > 0);
     m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));
 
-    // record variables
     m_recorder->record();
   }
 }

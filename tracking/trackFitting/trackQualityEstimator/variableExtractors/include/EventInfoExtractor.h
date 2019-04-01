@@ -47,11 +47,17 @@ namespace Belle2 {
     {
       m_variables.at("N_RecoTracks") = recoTracks.getEntries();
 
-      int n_pxdRecoTracks = 0; int n_svdRecoTracks = 0; int n_cdcRecoTracks = 0;
-      float min_mom_diff_mag = std::numeric_limits<float>::max();   int min_mom_diff_mag_idx = -1;
-      float min_mom_diff_Pt = std::numeric_limits<float>::max();    int min_mom_diff_Pt_idx = -1;
-      float min_pos_diff_Theta = std::numeric_limits<float>::max(); int min_pos_diff_Theta_idx = -1;
-      float min_pos_diff_Phi = std::numeric_limits<float>::max();   int min_pos_diff_Phi_idx = -1;
+      int n_pxdRecoTracks = 0;
+      int n_svdRecoTracks = 0;
+      int n_cdcRecoTracks = 0;
+      float min_mom_diff_mag = std::numeric_limits<float>::max();
+      int min_mom_diff_mag_idx = -1;
+      float min_mom_diff_Pt = std::numeric_limits<float>::max();
+      int min_mom_diff_Pt_idx = -1;
+      float min_pos_diff_Theta = std::numeric_limits<float>::max();
+      int min_pos_diff_Theta_idx = -1;
+      float min_pos_diff_Phi = std::numeric_limits<float>::max();
+      int min_pos_diff_Phi_idx = -1;
 
       for (const RecoTrack& recoTrack : recoTracks) {
         if (recoTrack.hasPXDHits())
@@ -66,49 +72,39 @@ namespace Belle2 {
 
         float mom_diff_mag = fabs(recoTrack.getMomentumSeed().Mag() - thisRecoTrack.getMomentumSeed().Mag());
         if (mom_diff_mag < min_mom_diff_mag) {
-          min_mom_diff_mag     = mom_diff_mag;
+          min_mom_diff_mag = mom_diff_mag;
           min_mom_diff_mag_idx = recoTrack.getArrayIndex();
         }
-
         float mom_diff_Pt = fabs(recoTrack.getMomentumSeed().Pt() - thisRecoTrack.getMomentumSeed().Pt());
         if (mom_diff_Pt < min_mom_diff_Pt) {
-          min_mom_diff_Pt     = mom_diff_Pt;
+          min_mom_diff_Pt = mom_diff_Pt;
           min_mom_diff_Pt_idx = recoTrack.getArrayIndex();
         }
-
         float pos_diff_Theta = fabs(recoTrack.getPositionSeed().Theta() - thisRecoTrack.getPositionSeed().Theta());
         if (pos_diff_Theta < min_pos_diff_Theta) {
-          min_pos_diff_Theta     = pos_diff_Theta;
+          min_pos_diff_Theta = pos_diff_Theta;
           min_pos_diff_Theta_idx = recoTrack.getArrayIndex();
         }
-
         float pos_diff_Phi = fabs(recoTrack.getPositionSeed().Phi() - thisRecoTrack.getPositionSeed().Phi());
         if (pos_diff_Phi < min_pos_diff_Phi) {
-          min_pos_diff_Phi     = pos_diff_Phi;
+          min_pos_diff_Phi = pos_diff_Phi;
           min_pos_diff_Phi_idx = recoTrack.getArrayIndex();
         }
-
       }
 
       m_variables.at("N_PXDRecoTracks") = n_pxdRecoTracks;
       m_variables.at("N_SVDRecoTracks") = n_svdRecoTracks;
       m_variables.at("N_CDCRecoTracks") = n_cdcRecoTracks;
-
       m_variables.at("N_diff_PXD_SVD_RecoTracks") = n_svdRecoTracks - n_pxdRecoTracks;
       m_variables.at("N_diff_SVD_CDC_RecoTracks") = n_cdcRecoTracks - n_svdRecoTracks;
-
-      m_variables.at("RTs_Min_Mom_diff_Mag")     = min_mom_diff_mag;
+      m_variables.at("RTs_Min_Mom_diff_Mag") = min_mom_diff_mag;
       m_variables.at("RTs_Min_Mom_diff_Mag_idx") = min_mom_diff_mag_idx;
-
-      m_variables.at("RTs_Min_Mom_diff_Pt")     = min_mom_diff_Pt;
+      m_variables.at("RTs_Min_Mom_diff_Pt") = min_mom_diff_Pt;
       m_variables.at("RTs_Min_Mom_diff_Pt_idx") = min_mom_diff_Pt_idx;
-
-      m_variables.at("RTs_Min_Pos_diff_Theta")     = min_pos_diff_Theta;
+      m_variables.at("RTs_Min_Pos_diff_Theta") = min_pos_diff_Theta;
       m_variables.at("RTs_Min_Pos_diff_Theta_idx") = min_pos_diff_Theta_idx;
-
-      m_variables.at("RTs_Min_Pos_diff_Phi")     = min_pos_diff_Phi;
+      m_variables.at("RTs_Min_Pos_diff_Phi") = min_pos_diff_Phi;
       m_variables.at("RTs_Min_Pos_diff_Phi_idx") = min_pos_diff_Phi_idx;
-
     }
 
   private:

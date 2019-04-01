@@ -669,7 +669,7 @@ def add_vxd_track_finding_vxdtf2(
     trackFinder.param('xBestPerFamily', 30)
     path.add_module(trackFinder)
 
-    if(useTwoStepSelection):
+    if useTwoStepSelection:
         subSetModule = register_module('AddVXDTrackCandidateSubSets')
         subSetModule.param('NameSpacePointTrackCands', nameSPTCs)
         path.add_module(subSetModule)
@@ -680,14 +680,16 @@ def add_vxd_track_finding_vxdtf2(
     #################
 
     # When using PXD require at least PXDminSVDSPs SVD SPs for the SPTCs
-    if(use_pxd):
+    if use_pxd:
         pxdSVDCut = register_module('PXDSVDCut')
         pxdSVDCut.param('minSVDSPs', PXDminSVDSPs)
         pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
         path.add_module(pxdSVDCut)
 
     if use_vxdtf2_quality_estimator:
-        vxdtf_quality_estimator_weightfile = 'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
+        vxdtf_quality_estimator_weightfile = (
+            'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
+        )
 
         path.add_module(
             "QualityEstimatorMVA",

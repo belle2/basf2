@@ -44,7 +44,8 @@ namespace Belle2 {
       std::vector<const genfit::KalmanFitterInfo*> kalmanFitterInfos;
       kalmanFitterInfos.reserve(relatedRecoHitInformation.size());
 
-      int n_no_KalmanFitterInfo = 0; int n_no_trackPoint = 0;
+      int n_no_KalmanFitterInfo = 0;
+      int n_no_trackPoint = 0;
 
       for (const RecoHitInformation* recoHitInformation : relatedRecoHitInformation) {
         const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
@@ -112,9 +113,9 @@ namespace Belle2 {
     }
 
     /// calculated statistics and saves them in variable set
-    void setStats(std::string identifier, std::vector<float>& values)
+    void setStats
+    (std::string identifier, std::vector<float>& values)
     {
-
       int size = values.size();
       if (values.size() == 0) {
         m_variables.at(identifier + "_max") =  -1.;
@@ -133,28 +134,21 @@ namespace Belle2 {
       float sum = std::accumulate(values.begin(), values.end(), 0.0);
       float mean = sum / size;
       m_variables.at(identifier + "_mean") = mean;
-
-      float variance = 0.; int n_zeros = 0;
+      float variance = 0.;
+      int n_zeros = 0;
       for (float value : values) {
         variance += (value - mean) * (value - mean);
         if (value == 0)
           n_zeros++;
       }
-      // number of 0 values
       m_variables.at(identifier + "_n_zeros") = n_zeros;
-      // variance and standard deviation
       variance /= size - 1;
       float stddev = std::sqrt(variance);
       m_variables.at(identifier + "_std") = stddev;
-
-      //min and max
       m_variables.at(identifier + "_min") = values.front();
       m_variables.at(identifier + "_max") = values.back();
-
-      //median
       float median = size % 2 ? values[size / 2] : 0.5 * (values[size / 2] + values[size / 2 - 1]);
       m_variables.at(identifier + "_median") = median;
     }
-
   };
 }

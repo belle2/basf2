@@ -62,6 +62,13 @@ void ChargedPidMVAModule::event()
 
       Particle* particle = pList->getParticle(ipart);
 
+      // Check that the particle has a valid relation set between track and ECL cluster.
+      // Otherwise, assign a NaN score and skip to next.
+      if (!particle->getECLCluster()) {
+        particle->writeExtraInfo(m_score_varname, std::numeric_limits<float>::quiet_NaN());
+        continue;
+      }
+
       // Retrieve the index for the correct MVA expert and dataset, given (signal hypo, clusterTheta, p)
       auto theta   = particle->getECLCluster()->getTheta();
       auto p       = particle->getP();

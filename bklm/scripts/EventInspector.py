@@ -49,7 +49,7 @@ class EventInspector(basf2.Module):
     #: bit mask for unique module identifier (end, sector, layer)
     BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
-    def __init__(self, exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits):
+    def __init__(self, exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes):
         """Constructor
 
         Arguments:
@@ -82,6 +82,8 @@ class EventInspector(basf2.Module):
         self.eventDisplays = 0
         #: title of the last-drawn event display (needed for PDF table of contents' last event)
         self.lastTitle = ''
+        #: calculate prompt time for legacy BKLMHit1ds and BKLMHit2ds (True) or use stored time (False)
+        self.legacyTimes = legacyTimes
 
     def makeGraph(self, x, y):
         """Create and return a ROOT TGraph
@@ -133,17 +135,17 @@ class EventInspector(basf2.Module):
         #: map for data concentrator -> sectorFB
         self.dcToSectorFB = [10, 14, 2, 6, 11, 15, 3, 7, 12, 8, 4, 0, 13, 9, 5, 1]
         #: RPC-time calibration adjustment (ns) for rawKLMs
-        self.t0Cal = 312.77  # for rawKLMs
+        self.t0Cal = 236  # for rawKLMs
         #: RPC-time calibration adjustment (ns) for BKLMHit2ds
-        self.t0Cal2d = 293.64  # for BKLMHit2ds
+        self.t0Cal2d = 217  # for BKLMHit2ds
         #: scint-ctime calibration adjustment (ns) for rawKLMs
-        self.ct0Cal = 905.61
+        self.ct0Cal = 349
         #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
-        self.ct0Cal2d = 905.61
+        self.ct0Cal2d = 349
         #: per-sector variations in RPC-time calibration adjustment (ns) for rawKLMs
-        self.t0RPC = [8.07, -13.98, -6.73, -17.52, -4.91, 9.24, 12.83, 8.92, -1.44, -10.46, 0, -15.57, 2.44, 7.68, 9.92, 8.23]
+        self.t0RPC = [8, -14, -6, -14, -2, 10, 9, 13, 0, -10, -14, -20, 2, 6, 14, 11]
         #: per-sector variations in scint-ctime calibration adjustment (ns) for rawKLMs
-        self.ct0Scint = [0.67, -7.70, -12.70, -9.05, 0.14, 7.12, 10.14, 7.73, 0.17, -7.92, 0, -9.10, 0.19, 5.86, 10.67, 5.51]
+        self.ct0Scint = [-1, -33, -46, -33, -2, 32, 51, 32, 0, -32, -45, -33, -4, 34, 45, 27]
 
         #: Output ROOT TFile that will contain the histograms/scatterplots
         self.histogramFile = ROOT.TFile.Open(self.histName, "RECREATE")
@@ -1116,14 +1118,14 @@ class EventInspector(basf2.Module):
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyZBkgd.GetName()))
         self.hist_occupancyRBkgd.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRBkgd.GetName()))
-        self.hist_ctimeRPCtCal.Draw("colz")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal.GetName()))
-        self.hist_ctimeRPCtCal2.Draw("colz")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal2.GetName()))
-        self.hist_jRPCtCal.Draw("colz")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal.GetName()))
-        self.hist_jRPCtCal2.Draw("colz")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal2.GetName()))
+        # self.hist_ctimeRPCtCal.Draw("colz")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal.GetName()))
+        # self.hist_ctimeRPCtCal2.Draw("colz")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal2.GetName()))
+        # self.hist_jRPCtCal.Draw("colz")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal.GetName()))
+        # self.hist_jRPCtCal2.Draw("colz")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal2.GetName()))
         self.hist_tRPCCal2d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal2d.GetName()))
         self.hist_tRPCCal2dBySector.Draw("box")
@@ -1441,12 +1443,19 @@ class EventInspector(basf2.Module):
                         if ctDiffMax == 0:
                             break
                 else:  # it's an RPC layer
-                    tCal = ((int(hit1d.getTime()) - trigCtime) & 0x03ff) - self.t0RPC[sectorFB] - 0.75 * j
+                    tCal = tCal = hit1d.getTime() - trigCtime - self.t0RPC[sectorFB] - 0.75 * j
                     break
+            if not self.legacyTimes:
+                if layer < 2:
+                    tCal = hit1d.getTime() - self.ct0Scint[sectorFB]
+                else:
+                    tCal = hit1d.getTime() - self.t0RPC[sectorFB] - 0.75 * j
+            tCalTrunc = int(tCal) & 0x3ff
+
             if layer < 2:
                 nScint += 1
             else:
-                if abs(tCal - self.t0Cal) < 25:
+                if abs(tCalTrunc - self.t0Cal) < 25:
                     nRPCPrompt += 1
                     if plane == 1:
                         self.hist_multiplicityPhiBySector.Fill(sectorFB, stripMax - stripMin + 1)
@@ -1458,16 +1467,16 @@ class EventInspector(basf2.Module):
                 nphihits += 1
                 phiTimes[key] = tCal
                 if layer < 2:
-                    self.hist_tphiScintCal1d.Fill(int(tCal) & 0x3ff)
+                    self.hist_tphiScintCal1d.Fill(tCalTrunc)
                 else:
-                    self.hist_tphiRPCCal1d.Fill(tCal)
+                    self.hist_tphiRPCCal1d.Fill(tCalTrunc)
             else:
                 nzhits += 1
                 zTimes[key] = tCal
                 if layer < 2:
-                    self.hist_tzScintCal1d.Fill(int(tCal) & 0x3ff)
+                    self.hist_tzScintCal1d.Fill(tCalTrunc)
                 else:
-                    self.hist_tzRPCCal1d.Fill(tCal)
+                    self.hist_tzRPCCal1d.Fill(tCalTrunc)
         self.hist_nHit1dRPCPrompt.Fill(nRPCPrompt)
         self.hist_nHit1dRPCBkgd.Fill(nRPCBkgd)
         self.hist_nHit1dScint.Fill(nScint)
@@ -1488,16 +1497,17 @@ class EventInspector(basf2.Module):
                 if mphi == mz:
                     tz = zTimes[zKey]
                     dt = tphi - tz
-                    t = int((tphi + tz) * 0.5) & 0x3ff
+                    t = (tphi + tz) * 0.5
+                    tTrunc = int(t) & 0x3ff
                     if layer < 2:
                         self.hist_dtScint1d.Fill(dt)
                     else:
                         self.hist_dtRPC1d.Fill(dt)
                     if abs(dt) < 40:
                         if layer < 2:
-                            self.hist_tScintCal1d.Fill(t)
+                            self.hist_tScintCal1d.Fill(tTrunc)
                         else:
-                            self.hist_tRPCCal1d.Fill(t)
+                            self.hist_tRPCCal1d.Fill(tTrunc)
 
         # Process the BKLMHit2ds
 
@@ -1561,8 +1571,14 @@ class EventInspector(basf2.Module):
                             if ctDiffMax == 0:
                                 break
                     else:  # it's an RPC layer
-                        tCal = ((int(hit2d.getTime()) - trigCtime) & 0x03ff) - self.t0RPC[sectorFB] - 0.75 * jPhi - 0.75 * jZ
+                        tCal = hit2d.getTime() - trigCtime - self.t0RPC[sectorFB] - 0.75 * jPhi - 0.75 * jZ
                         break
+            if not self.legacyTimes:
+                if layer < 2:
+                    tCal = hit2d.getTime() - self.ct0Scint[sectorFB]  # - 0.75 * jPhi - 0.75 * jZ
+                else:
+                    tCal = hit2d.getTime() - self.t0RPC[sectorFB]  # - 0.75 * jPhi - 0.75 * jZ
+            tCalTrunc = int(tCal) & 0x3ff
             x = hit2d.getGlobalPositionX()
             y = hit2d.getGlobalPositionY()
             z = hit2d.getGlobalPositionZ()
@@ -1573,9 +1589,9 @@ class EventInspector(basf2.Module):
             if layer < 2:
                 promptColor = 7
                 bkgdColor = 4
-                self.hist_ctScintCal2d.Fill(tCal)
-                self.hist_ctScintCal2dBySector.Fill(sectorFB, tCal)
-                if abs(tCal - self.ct0Cal2d) < 20:
+                self.hist_ctScintCal2d.Fill(tCalTrunc)
+                self.hist_ctScintCal2dBySector.Fill(sectorFB, tCalTrunc)
+                if abs(tCalTrunc - self.ct0Cal2d) < 20:
                     isPromptHit = True
                     if fb == 0:  # backward
                         self.hist_occupancyBackwardXYPrompt.Fill(x, y)
@@ -1587,9 +1603,9 @@ class EventInspector(basf2.Module):
                     else:  # forward
                         self.hist_occupancyForwardXYBkgd.Fill(x, y)
             else:
-                self.hist_tRPCCal2d.Fill(tCal)
-                self.hist_tRPCCal2dBySector.Fill(sectorFB, tCal)
-                if abs(tCal - self.t0Cal2d) < 20:
+                self.hist_tRPCCal2d.Fill(tCalTrunc)
+                self.hist_tRPCCal2dBySector.Fill(sectorFB, tCalTrunc)
+                if abs(tCalTrunc - self.t0Cal2d) < 20:
                     isPromptHit = True
                     self.hist_occupancyRZPrompt.Fill(z, layer)
                     self.hist_occupancyZPrompt.Fill(z)
@@ -1598,7 +1614,7 @@ class EventInspector(basf2.Module):
                         self.hist_occupancyBackwardXYPrompt.Fill(x, y)
                     else:  # forward
                         self.hist_occupancyForwardXYPrompt.Fill(x, y)
-                elif abs(tCal - self.t0Cal2d) > 40:
+                elif abs(tCalTrunc - self.t0Cal2d) > 40:
                     self.hist_occupancyRZBkgd.Fill(z, layer)
                     self.hist_occupancyZBkgd.Fill(z)
                     self.hist_occupancyRBkgd.Fill(layer)

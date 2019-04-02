@@ -25,6 +25,7 @@
 #      -d #   to specify the maximum number of event displays (default is 100)
 #      -m #   to specify the minimum number of RPC BKLMHit2ds in any one sector (default is 4)
 #      -t tagName   to specify the name of conditions-database global tag (no default)
+#      -l #   to specify whether to use legacy time calculations (1) or not (0) (default is 0)
 #
 # Input:
 #   ROOT DST file written by basf2 (may include multiple folios for one expt/run). For example,
@@ -67,6 +68,9 @@ parser.add_option('-d', '--displays',
 parser.add_option('-m', '--minRPCHits',
                   dest='minRPCHits', default='4',
                   help='Min # of RPC hits in any one sector to display the event [4]')
+parser.add_option('-l', '--legacyTimes',
+                  dest='legacyTimes', default='0',
+                  help='Perform legacy time calculations (1) or not (0) for BKLMHit1ds,2ds [0]')
 parser.add_option('-t', '--tagName',
                   dest='tagName', default='data_reprocessing_prompt',
                   help='Conditions-database global-tag name [data_reprocessing_prompt]')
@@ -82,6 +86,8 @@ if options.nEvents != '':
 maxDisplays = int(options.displays)
 
 minRPCHits = int(options.minRPCHits)
+
+legacyTimes = int(options.legacyTimes)
 
 tagName = options.tagName
 
@@ -151,7 +157,7 @@ else:
     main.add_module('RootInput', inputFileName=inputName)
 main.add_module('ProgressBar')
 
-eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits)
+eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes)
 if maxCount >= 0:
     child = create_path()
     eventCountLimiter = EventCountLimiter(maxCount)

@@ -294,17 +294,17 @@ class EventDisplayer(basf2.Module):
         #: map for data concentrator -> sectorFB
         self.dcToSectorFB = [10, 14, 2, 6, 11, 15, 3, 7, 12, 8, 4, 0, 13, 9, 5, 1]
         #: RPC-time calibration adjustment (ns) for rawKLMs
-        self.t0Cal = 312.77
+        self.t0Cal = 236
         #: RPC-time calibration adjustment (ns) for BKLMHit2ds
-        self.t0Cal2d = 293.64
+        self.t0Cal2d = 217
         #: scint-ctime calibration adjustment (ns) for rawKLMs
-        self.ct0Cal = 905.61
+        self.ct0Cal = 368
         #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
-        self.ct0Cal2d = 905.61
+        self.ct0Cal2d = 349
         #: per-sector variations in RPC-time calibration adjustment (ns) for rawKLMs
-        self.t0RPC = [8.07, -13.98, -6.73, -17.52, -4.91, 9.24, 12.83, 8.92, -1.44, -10.46, 0, -15.57, 2.44, 7.68, 9.92, 8.23]
+        self.t0RPC = [8, -14, -6, -14, -2, 10, 9, 13, 0, -10, -14, -20, 2, 6, 14, 11]
         #: per-sector variations in scint-ctime calibration adjustment (ns) for rawKLMs
-        self.ct0Scint = [0.67, -7.70, -12.70, -9.05, 0.14, 7.12, 10.14, 7.73, 0.17, -7.92, 0, -9.10, 0.19, 5.86, 10.67, 5.51]
+        self.ct0Scint = [-1, -33, -46, -33, -2, 32, 51, 32, 0, -32, -45, -33, -4, 34, 45, 27]
 
     def terminate(self):
         """Handle job termination: close event-display file"""

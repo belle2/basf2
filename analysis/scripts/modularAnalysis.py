@@ -2289,6 +2289,22 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
+def applyChargedPidMVA(sigPdgId, bkgPdgId, path=analysis_main):
+    """
+    Apply charged particle identification MVA (binary separation S vs B),
+    decorating particles w/ MVA score variables.
+
+    @param sigPdgId the pdgId of the signal mass hypothesis.
+    @param bkgPdgId the pdgId of the background mass hypothesis.
+    """
+    chargedpid = register_module('ChargedPidMVA')
+
+    chargedpid.param('sigPdgId', sigPdgId)
+    chargedpid.param('bkgPdgId', bkgPdgId)
+
+    path.add_module(chargedpid)
+
+
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module
     pretty_print_module(__name__, "modularAnalysis", {

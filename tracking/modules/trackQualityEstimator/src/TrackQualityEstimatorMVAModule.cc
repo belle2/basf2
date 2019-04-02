@@ -57,25 +57,22 @@ void TrackQualityEstimatorMVAModule::beginRun()
 void TrackQualityEstimatorMVAModule::event()
 {
   for (RecoTrack& recoTrack : m_recoTracks) {
-    const std::shared_ptr<RecoTrack> pxdRecoTrack(
-      recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName));
-
-    std::shared_ptr<RecoTrack> svdcdcRecoTrack(
-      recoTrack.getRelatedTo<RecoTrack>(m_svdcdcRecoTracksStoreArrayName));
-
-    std::shared_ptr<RecoTrack> cdcRecoTrack;
-    std::shared_ptr<RecoTrack> svdRecoTrack;
+    const RecoTrack* pxdRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName);
+    const RecoTrack* svdcdcRecoTrack =
+      recoTrack.getRelatedTo<RecoTrack>(m_svdcdcRecoTracksStoreArrayName);
+    RecoTrack* cdcRecoTrack;
+    RecoTrack* svdRecoTrack;
     if (svdcdcRecoTrack) {
-      cdcRecoTrack = std::shared_ptr<RecoTrack>(svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_cdcRecoTracksStoreArrayName));
-      svdRecoTrack = std::shared_ptr<RecoTrack>(svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName));
+      cdcRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_cdcRecoTracksStoreArrayName);
+      svdRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);
     }
 
     m_eventInfoExtractor->extractVariables(m_recoTracks, recoTrack);
     m_recoTrackExtractor->extractVariables(recoTrack);
-    m_subRecoTrackExtractor->extractVariables(cdcRecoTrack.get(), svdRecoTrack.get(), pxdRecoTrack.get());
+    m_subRecoTrackExtractor->extractVariables(cdcRecoTrack, svdRecoTrack, pxdRecoTrack);
     m_hitInfoExtractor->extractVariables(recoTrack);
 
-    float qualityIndicator = m_mvaExpert->predict();
+    const float qualityIndicator = m_mvaExpert->predict();
     recoTrack.setQualityIndicator(qualityIndicator);
   }
 }

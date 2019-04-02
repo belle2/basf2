@@ -412,7 +412,9 @@ namespace Belle2 {
     {
 
       weightfile.getOptions(specific_options);
-      expert_signalFraction = weightfile.getSignalFraction();
+      if (specific_options.transform2probability) {
+        expert_signalFraction = weightfile.getSignalFraction();
+      }
 
       // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
       std::string custom_weightfile = weightfile.generateFileName(std::string("_") + specific_options.m_method + ".weights.xml");

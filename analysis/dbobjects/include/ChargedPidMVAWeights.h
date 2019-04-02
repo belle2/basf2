@@ -144,6 +144,11 @@ namespace Belle2 {
 
       const TH2F* grid = m_grids.at(part.getPDGCode());
 
+      if (!grid) {
+        B2FATAL("No (clusterTheta, p) TH2 bins grid was found in the DB payload for pdg: " << part.getPDGCode() <<
+                ". This should not happen! Abort...");
+      }
+
       int nbinsx = grid->GetXaxis()->GetNbins(); // nr. of theta (visible) bins, along X.
 
       int glob_bin_idx = findBin(grid, theta / m_ang_unit.GetVal(), p / m_energy_unit.GetVal());

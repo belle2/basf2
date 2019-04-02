@@ -245,7 +245,7 @@ void KLMDQMModule::event()
   int nent = digits.getEntries();
   for (i = 0; i < nent; i++) {
     BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
-    m_bklmLayerHits->Fill(digit->getModuleID());
+    m_bklmLayerHits->Fill(digit->getLayer());
     if (digit->inRPC())
       m_TimeRPC->Fill(digit->getTime());
     else

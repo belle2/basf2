@@ -82,11 +82,12 @@ void ChargedPidMVAModule::event()
       // Retrieve the index for the correct MVA expert and dataset, given (signal hypo, clusterTheta, p)
       auto theta   = particle->getECLCluster()->getTheta();
       auto p       = particle->getP();
-      auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p);
+      int jth, ip;
+      auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
 
       B2DEBUG(20, "\t\tclusterTheta = " << theta << " [rad]");
-      B2DEBUG(20, "\t\tP = " << p << " [GeV/c]");
-      B2DEBUG(20, "\t\tweightfile idx in payload = " << index);
+      B2DEBUG(20, "\t\tp = " << p << " [GeV/c]");
+      B2DEBUG(20, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
       auto nvars  = m_variables.at(abspdg).at(index).size();

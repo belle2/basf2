@@ -131,15 +131,19 @@ namespace Belle2 {
     }
 
     /**
-     * Get the index of the weightfile of interest, for a given particle mass hypothesis, clusterTheta, and p.
+     * Get the index of the weightfile of interest in the list of weightfiles, for a given particle mass hypothesis, clusterTheta, and p.
+     * The index is obtained by linearising the 2D histogram representing the (clusterTheta, p) bins grid.
      * The same index can be used to look up the correct MVA Expert and Dataset in the application module,
      * hence we believe it's more useful to return the index rather than a pointer to the weightfile itself.
+     * The function also retrieves the (clusterTheta, p) bin coordinates.
      * @param part the particle mass hypothesis.
      * @param theta the particle polar angle (from the ECL cluster) in [rad].
      * @param p the particle momentum (from the track) in [GeV/c].
+     * @param[out] jth the index of the (theta, p) bin along the theta (X) axis.
+     * @param[out] ip the index of the (theta, p) bin along the p (Y) axis.
      * @return the index of the weightfile of interest from the array of weightfiles.
     */
-    unsigned int getMVAWeightIdx(const Const::ChargedStable& part, const double& theta, const double& p) const
+    unsigned int getMVAWeightIdx(const Const::ChargedStable& part, const double& theta, const double& p, int& jth, int& ip) const
     {
 
       const TH2F* grid = m_grids.at(part.getPDGCode());
@@ -149,18 +153,26 @@ namespace Belle2 {
                 ". This should not happen! Abort...");
       }
 
-      int nbinsx = grid->GetXaxis()->GetNbins(); // nr. of theta (visible) bins, along X.
+      int nbins_th = grid->GetXaxis()->GetNbins(); // nr. of theta (visible) bins, along X.
 
       int glob_bin_idx = findBin(grid, theta / m_ang_unit.GetVal(), p / m_energy_unit.GetVal());
-      int j, i, k;
-      grid->GetBinXYZ(glob_bin_idx, j, i, k);
+      int k;
+      grid->GetBinXYZ(glob_bin_idx, jth, ip, k);
 
       // The index of the linearised 2D (theta,p) grid.
       // The unit offset is b/c ROOT sets global bin idx also for overflows and underflows.
-      return (j - 1) + nbinsx * (i - 1);
+      return (jth - 1) + nbins_th * (ip - 1);
 
     }
 
+    /**
+     * Overloaded method, to be used if not interested in knowing the 2D (clusterTheta, p) bin coordinates.
+     */
+    unsigned int getMVAWeightIdx(const Const::ChargedStable& part, const double& theta, const double& p) const
+    {
+      int jth, ip;
+      return getMVAWeightIdx(part, theta, p, jth, ip);
+    }
 
     /**
      * Read and dump the payload content from the internal 'matrioska' maps into an xml weightfile for the given set of inputs. Useful for debugging.
@@ -285,9 +297,10 @@ namespace Belle2 {
       { 1000010020, std::vector<std::string>() }
     };
 
-    ClassDef(ChargedPidMVAWeights, 2);
+    ClassDef(ChargedPidMVAWeights, 3);
     // 1: first class implementation.
     // 2: add energy/angular units.
+    // 3. add overloaded getMVAWeightIdx.
   };
 
 }

@@ -449,8 +449,8 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
 
 double ECLDigitCalibratorModule::energyDependentTimeOffset(const double amp)
 {
-  double ampDiv10000 = amp / 10000.0
-                       ;   // Scale down the size of the amplitude so that the size of the parameters are more natural, A = amplitude / 10000
+  // Scale down the size of the amplitude so that the size of the parameters are more natural, A = amplitude / 10000
+  double ampDiv10000 = amp / 10000.0 ;
 
   // t-t0 =  e^{ L_1 A } ( C_1 + L_2  A + Q_1 A^2  )  + C_2     ("Energy dependence equation")
   // Note that we do NOT apply C_2 because the overall constant is effectively set by the ts and tcrate values.  C_2 is incuded in the fit but should come out near zero.

@@ -122,9 +122,6 @@ namespace Belle2 {
     /** Number of hits per layer. */
     TH1F* m_bklmLayerHits;
 
-    /** Lowest 16 bits of the B2TT CTIME signal. */
-    TH1F* m_bklmCtime;
-
     /** Reconstructed pulse height. */
     TH1F* m_bklmEDep;
 

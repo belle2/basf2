@@ -26,7 +26,6 @@ KLMDQMModule::KLMDQMModule() :
   m_eklmSector(nullptr),
   m_eklmStripLayer(nullptr),
   m_bklmLayerHits(nullptr),
-  m_bklmCtime(nullptr),
   m_bklmEDep(nullptr),
   m_bklmNPixel(nullptr),
   m_bklmZStrips(nullptr),
@@ -101,9 +100,6 @@ void KLMDQMModule::defineHistoBKLM()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_HistogramDirectoryNameBKLM.c_str())->cd();
   m_bklmLayerHits = new TH1F("layer hits", "layer hits", 40, 0, 15);
-  m_bklmCtime = new TH1F("ctime", "Lowest 16 bits of the B2TT CTime signal",
-                         100, -2, 2);
-  m_bklmCtime->GetXaxis()->SetTitle("ctime");
   m_bklmEDep = new TH1F("eDep", "Reconstructed pulse height",
                         25, 0, 25);
   m_bklmEDep->GetXaxis()->SetTitle("pulse height [MeV]");
@@ -203,7 +199,6 @@ void KLMDQMModule::beginRun()
     m_eklmStripLayer[i]->Reset();
   /* BKLM. */
   m_bklmLayerHits->Reset();
-  m_bklmCtime->Reset();
   m_bklmEDep->Reset();
   m_bklmNPixel->Reset();
   m_bklmZStrips->Reset();
@@ -251,7 +246,6 @@ void KLMDQMModule::event()
   for (i = 0; i < nent; i++) {
     BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
     m_bklmLayerHits->Fill(digit->getModuleID());
-    m_bklmCtime->Fill(digit->getCTime());
     if (digit->inRPC())
       m_TimeRPC->Fill(digit->getTime());
     else

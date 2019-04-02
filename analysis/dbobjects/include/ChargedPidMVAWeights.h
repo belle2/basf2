@@ -25,6 +25,7 @@
 #include <TObject.h>
 #include <TH2F.h>
 #include <TParameter.h>
+#include <TFile.h>
 
 //BOOST
 #include <boost/algorithm/string/predicate.hpp>
@@ -32,6 +33,7 @@
 
 //C++
 #include <unordered_map>
+#include <fstream>
 
 
 namespace Belle2 {
@@ -153,6 +155,59 @@ namespace Belle2 {
       return (j - 1) + nbinsx * (i - 1);
 
     }
+
+
+    /**
+     * Read and dump the payload content from the internal 'matrioska' maps into an xml weightfile for the given set of inputs. Useful for debugging.
+     * @param theta the particle polar angle (from the ECL cluster) in [rad].
+     * @param p the particle momentum (from the track) in [GeV/c].
+     * @param pdg the particle mass hypothesis' pdgId.
+     */
+    void dumpPayload(const double& theta, const double& p, const int pdg = 0) const
+    {
+
+      B2INFO("Dumping payload content for...");
+      B2INFO("-) clusterTheta = " << theta << " [rad]");
+      B2INFO("-) p = " << p << " [GeV/c]");
+
+      for (const auto& [pdgId, grid] : m_grids) {
+
+        if (pdg && pdg != pdgId) continue;
+
+        B2INFO("-) pdgId = " << pdgId);
+
+        if (grid) {
+          std::string filename = "db_payload_chargedpidmva__theta_p_grid_pdg_" + std::to_string(pdgId) + ".root";
+          B2INFO("\tWriting ROOT file w/ (clusterTheta, p) bins grid: " << filename);
+          auto f = std::make_unique<TFile>(filename.c_str(), "RECREATE");
+          grid->Write();
+          f->Close();
+        } else {
+          B2WARNING("\tTH2 for pdg " << pdg << "is a nullptr!");
+        }
+      }
+
+      for (const auto& [pdgId, weights] : m_weightfiles) {
+
+        if (pdg && pdg != pdgId) continue;
+
+        auto idx = getMVAWeightIdx(Const::ChargedStable(pdg), theta, p);
+
+        auto serialized_weightfile = weights.at(idx);
+
+        std::string filename = "db_payload_chargedpidmva__weightfile_pdg_" + std::to_string(pdgId) + "_" + std::to_string(idx) + ".xml";
+
+        B2INFO("\tWriting weight file: " << filename);
+
+        std::ofstream weightfile;
+        weightfile.open(filename.c_str(), std::ios::out);
+        weightfile << serialized_weightfile << std::endl;
+        weightfile.close();
+
+      }
+
+    };
+
 
   private:
 

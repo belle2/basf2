@@ -152,8 +152,10 @@ namespace Belle2 {
         B2FATAL("Missing geometry for PXD.");
       }
 
+      int nPXDSensors = gTools->getNumberOfPXDSensors();
+
       // Initialize active areas and active fractions for all sensors
-      for (int index = 0; index < 40; index++) {
+      for (int index = 0; index < nPXDSensors; index++) {
         VxdID sensorID = gTools->getSensorIDFromPXDIndex(index);
         auto info = getInfo(sensorID);
 

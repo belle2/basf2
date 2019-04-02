@@ -120,43 +120,49 @@ namespace Belle2 {
     TH1F** m_StripLayer;
 
     /** Histogram: number of hits per layer. */
-    TH1F* m_layerHits;
+    TH1F* h_layerHits;
+
+    /** Histogram: Lowest 16 bits of the B2TT CTIME signal. */
+    TH1F* h_ctime;
 
     /** Histogram: Reconstructed pulse height. */
-    TH1F* m_eDep;
+    TH1F* h_eDep;
 
     /** Histogram: Reconstructed number MPPC pixels. */
-    TH1F* m_nPixel;
+    TH1F* h_nPixel;
+
+    /** Histogram: Detector-module identifier. */
+    TH1F* h_moduleID;
 
     /** Histogram: z-measuring strip numbers of the 2D hit. */
-    TH1F* m_zStrips;
+    TH1F* h_zStrips;
 
     /** Histogram: Phi strip number of muon hit. */
-    TH1F* m_phiStrip;
+    TH1F* h_phiStrip;
 
     /** Histogram: Sector number of muon hit. */
-    TH1F* m_sector;
+    TH1F* h_sector;
 
     /** Histogram: Layer number of muon hit. */
-    TH1F* m_layer;
+    TH1F* h_layer;
 
     /** Histogram: Distance from z axis in transverse plane of muon hit. */
-    TH1F* m_rBKLMHit2ds;
+    TH1F* h_rBKLMHit2ds;
 
     /** Histogram: Axial position of muon hit. */
-    TH1F* m_zBKLMHit2ds;
+    TH1F* h_zBKLMHit2ds;
 
     /** Histogram: Position projected into transverse plane of muon hit. */
-    TH2F* m_yvsxBKLMHit2ds;
+    TH2F* h_yvsxBKLMHit2ds;
 
     /** Histogram: Position projected into x-z plane of muon hit. */
-    TH2F* m_xvszBKLMHit2ds;
+    TH2F* h_xvszBKLMHit2ds;
 
     /** Histogram: Position projected into y-z plane of muon hit. */
-    TH2F* m_yvszBKLMHit2ds;
+    TH2F* h_yvszBKLMHit2ds;
 
     /** Layer VS Sector histogram for the BKLM forward and backward regions. */
-    TH2F* m_histoLayerVsSector[2];
+    TH2F* h_histoLayerVsSector[2];
 
   };
 

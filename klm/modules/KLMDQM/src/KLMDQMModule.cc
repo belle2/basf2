@@ -23,37 +23,42 @@ KLMDQMModule::KLMDQMModule() :
   m_TimeRPC(nullptr),
   m_TimeScintillatorBKLM(nullptr),
   m_TimeScintillatorEKLM(nullptr),
-  m_layerHits(nullptr),
-  m_eDep(nullptr),
-  m_nPixel(nullptr),
-  m_zStrips(nullptr),
-  m_phiStrip(nullptr),
-  m_sector(nullptr),
-  m_layer(nullptr),
-  m_rBKLMHit2ds(nullptr),
-  m_zBKLMHit2ds(nullptr),
-  m_yvsxBKLMHit2ds(nullptr),
-  m_xvszBKLMHit2ds(nullptr),
-  m_yvszBKLMHit2ds(nullptr)
+  h_layerHits(nullptr),
+  h_ctime(nullptr),
+  h_eDep(nullptr),
+  h_nPixel(nullptr),
+  h_moduleID(nullptr),
+  h_zStrips(nullptr),
+  h_phiStrip(nullptr),
+  h_sector(nullptr),
+  h_layer(nullptr),
+  h_rBKLMHit2ds(nullptr),
+  h_zBKLMHit2ds(nullptr),
+  h_yvsxBKLMHit2ds(nullptr),
+  h_xvszBKLMHit2ds(nullptr),
+  h_yvszBKLMHit2ds(nullptr)
 {
-  setDescription("KLM data quality monitor.");
-  setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("histogramDirectoryName", m_HistogramDirectoryName,
-           "Directory for KLM DQM histograms in ROOT file.",
-           std::string("KLM"));
-  addParam("histogramDirectoryNameEKLM", m_HistogramDirectoryNameEKLM,
-           "Directory for EKLM DQM histograms in ROOT file.",
-           std::string("EKLM"));
-  addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
-           "Directory for BKLM DQM histograms in ROOT file.",
-           std::string("BKLM"));
-  addParam("outputDigitsName", m_outputDigitsName,
-           "Name of BKLMDigit store array", std::string("BKLMDigits"));
-  m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
-  m_Sector = nullptr;
-  m_StripLayer = nullptr;
   for (int i = 0; i < 2; ++i) {
-    m_histoLayerVsSector[i] = nullptr;
+    h_histoLayerVsSector[i] = nullptr;
+  }
+
+  {
+    setDescription("KLM data quality monitor.");
+    setPropertyFlags(c_ParallelProcessingCertified);
+    addParam("histogramDirectoryName", m_HistogramDirectoryName,
+             "Directory for KLM DQM histograms in ROOT file.",
+             std::string("KLM"));
+    addParam("histogramDirectoryNameEKLM", m_HistogramDirectoryNameEKLM,
+             "Directory for EKLM DQM histograms in ROOT file.",
+             std::string("EKLM"));
+    addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
+             "Directory for BKLM DQM histograms in ROOT file.",
+             std::string("BKLM"));
+    addParam("outputDigitsName", m_outputDigitsName,
+             "Name of BKLMDigit store array", std::string("BKLMDigits"));
+    m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
+    m_Sector = nullptr;
+    m_StripLayer = nullptr;
   }
 }
 
@@ -103,68 +108,74 @@ void KLMDQMModule::defineHistoBKLM()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_HistogramDirectoryNameBKLM.c_str())->cd();
 
-  m_layerHits = new TH1F("layer hits", "layer hits",
+  h_layerHits = new TH1F("layer hits", "layer hits",
                          40, 0, 15);
-  m_eDep = new TH1F("eDep", "Reconstructed pulse height",
+  h_ctime = new TH1F("ctime", "Lowest 16 bits of the B2TT CTime signal",
+                     100, -2, 2);
+  h_ctime->GetXaxis()->SetTitle("ctime");
+  h_eDep = new TH1F("eDep", "Reconstructed pulse height",
                     25, 0, 25);
-  m_eDep->GetXaxis()->SetTitle("pulse height [MeV]");
-  m_eDep->SetOption("LIVE");
-  m_nPixel = new TH1F("nPixel", "Reconstructed number of MPPC pixels",
+  h_eDep->GetXaxis()->SetTitle("pulse height [MeV]");
+  h_eDep->SetOption("LIVE");
+  h_nPixel = new TH1F("nPixel", "Reconstructed number of MPPC pixels",
                       500, 0, 500);
-  m_nPixel->GetXaxis()->SetTitle("Reconstructed number of MPPC pixels");
-  m_zStrips = new TH1F("zStrips", "z-measuring strip numbers of the 2D hit",
+  h_nPixel->GetXaxis()->SetTitle("Reconstructed number of MPPC pixels");
+  h_moduleID = new TH1F("module ID", "detector-module identifier",
+                        40, 0, 200000000);
+  h_moduleID->GetXaxis()->SetTitle("detector-module identifier");
+  h_zStrips = new TH1F("zStrips", "z-measuring strip numbers of the 2D hit",
                        54, 0, 54);
-  m_zStrips->GetXaxis()->SetTitle("z-measuring strip numbers of the 2D hit");
-  m_zStrips->SetOption("LIVE");
-  m_phiStrip = new TH1F("phiStrip", "Phi strip number of muon hit",
+  h_zStrips->GetXaxis()->SetTitle("z-measuring strip numbers of the 2D hit");
+  h_zStrips->SetOption("LIVE");
+  h_phiStrip = new TH1F("phiStrip", "Phi strip number of muon hit",
                         50, -0.5, 49.5);
-  m_phiStrip->GetXaxis()->SetTitle("Phi strip number of muon hit");
-  m_phiStrip->SetOption("LIVE");
-  m_sector = new TH1F("sector", "Sector number of muon hit",
+  h_phiStrip->GetXaxis()->SetTitle("Phi strip number of muon hit");
+  h_phiStrip->SetOption("LIVE");
+  h_sector = new TH1F("sector", "Sector number of muon hit",
                       10, -0.5, 9.5);
-  m_sector->GetXaxis()->SetTitle("Sector number of muon hit");
-  m_sector->SetOption("LIVE");
-  m_layer = new TH1F("layer", "Layer number of muon hit",
+  h_sector->GetXaxis()->SetTitle("Sector number of muon hit");
+  h_sector->SetOption("LIVE");
+  h_layer = new TH1F("layer", "Layer number of muon hit",
                      16, -0.5, 15.5);
-  m_layer->GetXaxis()->SetTitle("Layer number of muon hit");
-  m_layer->SetOption("LIVE");
-  m_rBKLMHit2ds = new TH1F("rBKLMHit2ds", "Distance from z axis in transverse plane of muon hit",
+  h_layer->GetXaxis()->SetTitle("Layer number of muon hit");
+  h_layer->SetOption("LIVE");
+  h_rBKLMHit2ds = new TH1F("rBKLMHit2ds", "Distance from z axis in transverse plane of muon hit",
                            30, 200.0, 350.0);
-  m_rBKLMHit2ds->GetXaxis()->SetTitle("Distance from z axis in transverse plane of muon hit");
-  m_rBKLMHit2ds->SetOption("LIVE");
-  m_zBKLMHit2ds = new TH1F("zBKLMHit2ds", "Axial position of muon hit",
+  h_rBKLMHit2ds->GetXaxis()->SetTitle("Distance from z axis in transverse plane of muon hit");
+  h_rBKLMHit2ds->SetOption("LIVE");
+  h_zBKLMHit2ds = new TH1F("zBKLMHit2ds", "Axial position of muon hit",
                            100, -200.0, 300.0);
-  m_zBKLMHit2ds->GetXaxis()->SetTitle("Axial position of muon hit");
-  m_zBKLMHit2ds->SetOption("LIVE");
-  m_yvsxBKLMHit2ds = new TH2F("yvsx", "Position projected into y-x plane of muon hit",
+  h_zBKLMHit2ds->GetXaxis()->SetTitle("Axial position of muon hit");
+  h_zBKLMHit2ds->SetOption("LIVE");
+  h_yvsxBKLMHit2ds = new TH2F("yvsx", "Position projected into y-x plane of muon hit",
                               140, -350.0, 350.0, 140, -350.0, 350.0);
-  m_yvsxBKLMHit2ds->GetXaxis()->SetTitle("x(cm)");
-  m_yvsxBKLMHit2ds->GetYaxis()->SetTitle("y(cm)");
-  m_yvsxBKLMHit2ds->SetOption("LIVE");
-  m_xvszBKLMHit2ds = new TH2F("xvsz", "Position projected into x-z plane of muon hit",
+  h_yvsxBKLMHit2ds->GetXaxis()->SetTitle("x(cm)");
+  h_yvsxBKLMHit2ds->GetYaxis()->SetTitle("y(cm)");
+  h_yvsxBKLMHit2ds->SetOption("LIVE");
+  h_xvszBKLMHit2ds = new TH2F("xvsz", "Position projected into x-z plane of muon hit",
                               140, -300.0, 400.0, 140, -350.0, 350.0);
-  m_xvszBKLMHit2ds->GetXaxis()->SetTitle("z(cm)");
-  m_xvszBKLMHit2ds->GetYaxis()->SetTitle("x(cm)");
-  m_xvszBKLMHit2ds->SetOption("LIVE");
-  m_yvszBKLMHit2ds = new TH2F("yvsz", "Position projected into y-z plane of muon hit",
+  h_xvszBKLMHit2ds->GetXaxis()->SetTitle("z(cm)");
+  h_xvszBKLMHit2ds->GetYaxis()->SetTitle("x(cm)");
+  h_xvszBKLMHit2ds->SetOption("LIVE");
+  h_yvszBKLMHit2ds = new TH2F("yvsz", "Position projected into y-z plane of muon hit",
                               140, -300.0, 400.0, 140, -350.0, 350.0);
-  m_yvszBKLMHit2ds->GetXaxis()->SetTitle("z(cm)");
-  m_yvszBKLMHit2ds->GetYaxis()->SetTitle("y(cm)");
-  m_yvszBKLMHit2ds->SetOption("LIVE");
+  h_yvszBKLMHit2ds->GetXaxis()->SetTitle("z(cm)");
+  h_yvszBKLMHit2ds->GetYaxis()->SetTitle("y(cm)");
+  h_yvszBKLMHit2ds->SetOption("LIVE");
 
-  m_histoLayerVsSector[0]  = new TH2F("BackwardLayerVSSector", "Sector VS Layer in barrel forward",
+  h_histoLayerVsSector[0]  = new TH2F("0LayerVSSector", "Sector VS Layer in barrel forward",
                                       30, -0.25, 14.75, 16, -0.25, 7.75);
-  m_histoLayerVsSector[0]->GetXaxis()->SetTitle("Layer");
-  m_histoLayerVsSector[0]->GetYaxis()->SetTitle("Sector");
-  m_histoLayerVsSector[0]->SetStats(0);
-  m_histoLayerVsSector[0]->SetOption("colz");
+  h_histoLayerVsSector[0]->GetXaxis()->SetTitle("Layer");
+  h_histoLayerVsSector[0]->GetYaxis()->SetTitle("Sector");
+  h_histoLayerVsSector[0]->SetStats(0);
+  h_histoLayerVsSector[0]->SetOption("colz");
 
-  m_histoLayerVsSector[1]  = new TH2F("ForwardLayerVSSector", "Sector VS Layer in barrel backward",
+  h_histoLayerVsSector[1]  = new TH2F("1LayerVSSector", "Sector VS Layer in barrel backward",
                                       30, -0.25, 14.75, 16, -0.25, 7.75);
-  m_histoLayerVsSector[1]->GetXaxis()->SetTitle("Layer");
-  m_histoLayerVsSector[1]->GetYaxis()->SetTitle("Sector");
-  m_histoLayerVsSector[1]->SetStats(0);
-  m_histoLayerVsSector[1]->SetOption("colz");
+  h_histoLayerVsSector[1]->GetXaxis()->SetTitle("Layer");
+  h_histoLayerVsSector[1]->GetYaxis()->SetTitle("Sector");
+  h_histoLayerVsSector[1]->SetStats(0);
+  h_histoLayerVsSector[1]->SetOption("colz");
 
   oldDir->cd();
 }
@@ -217,20 +228,22 @@ void KLMDQMModule::beginRun()
   for (i = 0; i < n; i++)
     m_StripLayer[i]->Reset();
   /* BKLN. */
-  m_layerHits->Reset();
-  m_eDep->Reset();
-  m_nPixel->Reset();
-  m_zStrips->Reset();
-  m_phiStrip->Reset();
-  m_sector->Reset();
-  m_layer->Reset();
-  m_rBKLMHit2ds->Reset();
-  m_zBKLMHit2ds->Reset();
-  m_yvsxBKLMHit2ds->Reset();
-  m_xvszBKLMHit2ds->Reset();
-  m_yvszBKLMHit2ds->Reset();
-  m_histoLayerVsSector[0]->Reset();
-  m_histoLayerVsSector[1]->Reset();
+  h_layerHits->Reset();
+  h_ctime->Reset();
+  h_eDep->Reset();
+  h_nPixel->Reset();
+  h_moduleID->Reset();
+  h_zStrips->Reset();
+  h_phiStrip->Reset();
+  h_sector->Reset();
+  h_layer->Reset();
+  h_rBKLMHit2ds->Reset();
+  h_zBKLMHit2ds->Reset();
+  h_yvsxBKLMHit2ds->Reset();
+  h_xvszBKLMHit2ds->Reset();
+  h_yvszBKLMHit2ds->Reset();
+  h_histoLayerVsSector[0]->Reset();
+  h_histoLayerVsSector[1]->Reset();
 }
 
 void KLMDQMModule::event()
@@ -266,31 +279,30 @@ void KLMDQMModule::event()
   int nent = digits.getEntries();
   for (i = 0; i < nent; i++) {
     BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
-    m_layerHits->Fill(digit->getModuleID());
+    h_layerHits->Fill(digit->getModuleID());
+    h_ctime->Fill(digit->getCTime());
     if (digit->inRPC())
       m_TimeRPC->Fill(digit->getTime());
     else
       m_TimeScintillatorBKLM->Fill(digit->getTime());
-    m_eDep->Fill(digit->getEDep());
-    m_nPixel->Fill(digit->getNPixel());
-    if (digit->isForward())
-      m_histoLayerVsSector[0]->Fill(digit->getLayer() - 1, digit->getSector() - 1);
-    else
-      m_histoLayerVsSector[1]->Fill(digit->getLayer() - 1, digit->getSector() - 1);
+    h_eDep->Fill(digit->getEDep());
+    h_nPixel->Fill(digit->getNPixel());
+    h_histoLayerVsSector[1 - digit->isForward()]->Fill(digit->getLayer() - 1, digit->getSector() - 1);
   }
   StoreArray<BKLMHit2d> hits(m_outputHitsName);
   int nnent = hits.getEntries();
   for (i = 0; i < nnent; i++) {
     BKLMHit2d* hit = static_cast<BKLMHit2d*>(hits[i]);
-    m_zStrips->Fill(hit->getZStripAve());
-    m_phiStrip->Fill(hit->getPhiStripAve());
-    m_sector->Fill(hit->getSector());
-    m_layer->Fill(hit->getLayer());
-    m_rBKLMHit2ds->Fill(hit->getGlobalPosition().Perp());
-    m_zBKLMHit2ds->Fill(hit->getGlobalPosition().Z());
-    m_yvsxBKLMHit2ds->Fill(hit->getGlobalPosition().Y(), hit->getGlobalPosition().X());
-    m_xvszBKLMHit2ds->Fill(hit->getGlobalPosition().X(), hit->getGlobalPosition().Z());
-    m_yvszBKLMHit2ds->Fill(hit->getGlobalPosition().Y(), hit->getGlobalPosition().Z());
+    h_moduleID->Fill(hit->getModuleID());
+    h_zStrips->Fill(hit->getZStripAve());
+    h_phiStrip->Fill(hit->getPhiStripAve());
+    h_sector->Fill(hit->getSector());
+    h_layer->Fill(hit->getLayer());
+    h_rBKLMHit2ds->Fill(hit->getGlobalPosition().Perp());
+    h_zBKLMHit2ds->Fill(hit->getGlobalPosition().Z());
+    h_yvsxBKLMHit2ds->Fill(hit->getGlobalPosition().Y(), hit->getGlobalPosition().X());
+    h_xvszBKLMHit2ds->Fill(hit->getGlobalPosition().X(), hit->getGlobalPosition().Z());
+    h_yvszBKLMHit2ds->Fill(hit->getGlobalPosition().Y(), hit->getGlobalPosition().Z());
   }
 }
 

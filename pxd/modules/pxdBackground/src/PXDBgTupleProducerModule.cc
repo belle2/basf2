@@ -51,12 +51,12 @@ PXDBgTupleProducerModule::PXDBgTupleProducerModule() : Module()
   //Set module properties
   setDescription("PXD background tuple producer module");
   addParam("integrationTime", m_integrationTime, "PXD integration time in micro seconds", double(20));
+  addParam("timePeriod", m_timePeriod, "Period for background time series in seconds.", double(1));
   addParam("outputFileName", m_outputFileName, "Output file name", string("beast_tuple.root"));
   addParam("maskDeadPixels", m_maskDeadPixels, "Correct bg rates by known dead pixels", bool(true));
   addParam("nBinsU", m_nBinsU, "Number of regions per sensor along u side", int(1));
   addParam("nBinsV", m_nBinsV, "Number of regions per sensor along v side", int(6));
 }
-
 
 
 void PXDBgTupleProducerModule::initialize()
@@ -73,6 +73,9 @@ void PXDBgTupleProducerModule::initialize()
 
   // PXD integration time
   m_integrationTime *= Unit::us;
+
+  // Period for time series
+  m_timePeriod *= Unit::s;
 
   // So far, we did not see PXD data
   m_hasPXDData = false;
@@ -164,7 +167,7 @@ void PXDBgTupleProducerModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   // Compute the curent one second timestamp
-  unsigned long long int ts = eventMetaDataPtr->getTime() / 1000000000;
+  unsigned long long int ts = eventMetaDataPtr->getTime() / m_timePeriod;
 
   // If needed, add a new one second block to buffer
   auto iter = m_buffer.find(ts);

@@ -108,6 +108,7 @@ namespace Belle2 {
       std::string m_storeClustersName; /**< PXDClusters StoreArray name */
       std::string m_storeDigitsName; /**< PXDDigits StoreArray name */
       double m_integrationTime; /**< Integration time of PXD. */
+      double m_timePeriod; /**< Period for background time series. */
       bool m_maskDeadPixels; /**< Correct bg rates by taking into account masked pixels */
       int m_nBinsU; /**< Number of regions per sensor along u side */
       int m_nBinsV; /**< Number of regions per sensor along v side */

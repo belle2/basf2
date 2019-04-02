@@ -93,6 +93,12 @@ if __name__ == '__main__':
                        bkgPdgId=args.bkgPdgId,
                        path=path)
 
+    # Set debug level for this module
+    for m in path.modules():
+        if m.name() == "ChargedPidMVA":
+            m.logging.log_level = basf2.LogLevel.DEBUG
+            m.logging.debug_level = 20
+
     # ---------------
     # Make an NTuple.
     # ---------------

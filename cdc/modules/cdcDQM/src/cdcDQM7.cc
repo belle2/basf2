@@ -1,5 +1,6 @@
 /* Nanae Taniguchi 2017.07.12 */
 /* Nanae Taniguchi 2018.02.06 */
+/* add occupancy plot 2019.03 */
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
 // add
@@ -211,7 +212,11 @@ void cdcDQM7Module::event()
     int adcsum = cdchit->getADCCount();
     int vtdc = cdchit->getTDCCount();
 
+    if (sL > 8) continue; // error
+    if (iL > 8) continue; // error
+
     int num = sL * 6 + iL + 2;
+    if (num > 55) continue; // error
 
     if (adcsum > 25) {
       //    if (adcsum > -1) {
@@ -259,16 +264,14 @@ void cdcDQM7Module::event()
   int r_nent = cdcRawHits.getEntries();
 
   // new
-  double x = 0.;
-  double y = 0.;
-  int board = 0;
   for (int j = 0; j < r_nent; j++) {
     CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
 
-    board = cdcrawhit->getBoardId();
+    int board = cdcrawhit->getBoardId();
+    if (board > 299) continue;
 
-    x = board % 20;
-    y = (board - (board % 20)) / 20;
+    double x = board % 20;
+    double y = (board - (board % 20)) / 20;
 
     if (x != 5 || y != 5) {
       bmap_2->Fill(x, y);
@@ -286,7 +289,6 @@ void cdcDQM7Module::event()
   bmap_2->SetMaximum(h_ent / (300 * fac));
   bmap_2->SetMinimum(0.);
   //
-
 
 }
 

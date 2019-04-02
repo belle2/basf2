@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #pragma once
-#include <analysis/VariableManager/Utility.h>
 #include <framework/datastore/RelationsObject.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/gearbox/Const.h>
@@ -431,4 +431,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-

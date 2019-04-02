@@ -46,7 +46,7 @@ PXDReadRawBonnDAQModule::PXDReadRawBonnDAQModule() : Module()
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
 
-  B2DEBUG(0, "PXDReadRawBonnDAQModule: Constructor done.");
+  B2DEBUG(29, "PXDReadRawBonnDAQModule: Constructor done.");
 }
 
 
@@ -74,7 +74,7 @@ void PXDReadRawBonnDAQModule::initialize()
   // Register RawPXD
   m_rawPXD.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
 
-  B2DEBUG(0, "PXDReadRawBonnDAQModule: initialized.");
+  B2DEBUG(29, "PXDReadRawBonnDAQModule: initialized.");
 }
 
 int PXDReadRawBonnDAQModule::read_data(char* data, size_t len)
@@ -122,46 +122,46 @@ int PXDReadRawBonnDAQModule::readOneEvent()
     if (br <= 0) return br;
     unsigned int chunk_size = 0;
     if (evt->get_header8() == 0) {
-      B2DEBUG(1, "Group Header $" << std::hex << evt->get_header10() << " Chunk size " << std::dec << evt->get_size());
+      B2DEBUG(29, "Group Header $" << std::hex << evt->get_header10() << " Chunk size " << std::dec << evt->get_size());
       chunk_size = evt->get_size_group();
     } else {
-      B2DEBUG(1, "Header $" << std::hex << evt->get_header12() << " Chunk size " << std::dec << evt->get_size());
+      B2DEBUG(29, "Header $" << std::hex << evt->get_header12() << " Chunk size " << std::dec << evt->get_size());
       chunk_size = evt->get_size();
     }
     if (chunk_size <= 1) return 0;
     br = read_data(data + 4, chunk_size * 4 - 4);
     if (br <= 0) return br;
     if (evt->get_header12() == 0xe230) {
-      B2DEBUG(1, "File info " << std::hex << evt->get_header12() << " Events " << std::dec << data32[1]);
+      B2DEBUG(29, "File info " << std::hex << evt->get_header12() << " Events " << std::dec << data32[1]);
       continue;
     } else if (evt->get_header12() == 0xe100) {
-      B2DEBUG(1, "Info Event " << std::hex << evt->get_header12() << " RunNr $" << std::hex << data32[1]);
+      B2DEBUG(29, "Info Event " << std::hex << evt->get_header12() << " RunNr $" << std::hex << data32[1]);
       if (m_runNr == 0) m_runNr = data32[1]; // we assume it will not change within one file
       continue;
     } else if (evt->get_header10() == 0x0000) { // war 0x0020
-      B2DEBUG(1, "Run Event Group " << std::hex << evt->get_header10() << " Magic $" << std::hex << data32[1]);
+      B2DEBUG(29, "Run Event Group " << std::hex << evt->get_header10() << " Magic $" << std::hex << data32[1]);
       continue;
     } else if (evt->get_header12() == 0xbb00) {
-      B2DEBUG(1, "Run Event " << std::hex << evt->get_header12() << " Magic $" << std::hex << data32[1]);
+      B2DEBUG(29, "Run Event " << std::hex << evt->get_header12() << " Magic $" << std::hex << data32[1]);
       continue;
     } else if (evt->get_header10() == 0x0080) { // war 0x00A0
       int togo = chunk_size;
-      B2DEBUG(1, "Data Event Group " << std::hex << evt->get_header10() << " TriggerNr $" << std::hex << data32[1]);
+      B2DEBUG(29, "Data Event Group " << std::hex << evt->get_header10() << " TriggerNr $" << std::hex << data32[1]);
       triggernr = data32[1];
       togo -= 2;
       data32 += 2;
       data16 += 4;
       while (togo > 2) {
-        B2DEBUG(1, "TOGO: " << togo);
-        B2DEBUG(1, " ............... " << std::hex << data32[0] << " TriggerNr $" << std::hex << data32[1]);
+        B2DEBUG(29, "TOGO: " << togo);
+        B2DEBUG(29, " ............... " << std::hex << data32[0] << " TriggerNr $" << std::hex << data32[1]);
         if (triggernr != data32[1]) B2ERROR("Trigger Nr does not match!");
-        B2DEBUG(1, " ............... " << std::hex << data32[2]);
+        B2DEBUG(29, " ............... " << std::hex << data32[2]);
         togo -= 2;
         data32 += 2;
         data16 += 4;
         if ((data32[0] & 0xFFFF0000) == 0xCAFE0000) {
           int frames = (data32[0] & 0x3FF);
-          B2DEBUG(1, "Frames: " << frames);
+          B2DEBUG(29, "Frames: " << frames);
           int size = 0;
           bool nocrc = (data32[0] & 0x8000) != 0;
 
@@ -268,7 +268,6 @@ void PXDReadRawBonnDAQModule::event()
 
 void PXDReadRawBonnDAQModule::terminate()
 {
-  B2INFO("terminate called");
   if (fh) fclose(fh);
   fh = 0;
 }

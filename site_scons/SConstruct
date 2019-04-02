@@ -335,7 +335,7 @@ if len(global_env['TEST_FILES']) > 0:
 # build sphinx documentation if the --sphinx option is used
 AddOption("--sphinx", dest="sphinx", action="store_true", default=False, help="if given sphinx documentation will be generated")
 if global_env.GetOption("sphinx"):
-    sphinx_targets = ['html', 'latex']
+    sphinx_targets = ['html', 'latex', 'json']
     for sphinx_target in sphinx_targets:
         tools_doc = global_env.Command('build/tools_doc', [], 'ln -sf %s/doc $TARGET' % os.environ.get('BELLE2_TOOLS'))
         sphinx = global_env.Command('build/%s' % sphinx_target, 'index.rst', 'sphinx-build -b %s -c site_scons/sphinx -d build/doctrees . $TARGET' % sphinx_target)

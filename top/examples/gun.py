@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 from tracking import add_tracking_reconstruction
 from simulation import add_svd_simulation
 
@@ -20,7 +21,7 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param('evtNumList', [10])
 main.add_module(eventinfosetter)
 
 # Histogram manager immediately after master module

@@ -64,7 +64,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("TimeWindow", m_timeWindow, "Readout time window width in ns", 250.0);
-    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.2);
+    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.066);
     addParam("MagneticFieldDistorsion", m_bdistort, "Apply image distortion due to non-perp. magnetic field", 0);
   }
 
@@ -94,6 +94,7 @@ namespace Belle2 {
 
   void ARICHDigitizerModule::beginRun()
   {
+    if (m_simPar->getNBkgHits() > 0)  m_bkgLevel = m_simPar->getNBkgHits();
   }
 
   void ARICHDigitizerModule::event()

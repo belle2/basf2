@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 from variables import utils
 
-#: Placehoder for FT variables collection
-#: (not complete, see :issue:`BII-3853`)
-flavor_tagging = ["qrOutput(FBDT)"]
-
 #: Replacement for DeltaEMbc
 deltae_mbc = ["Mbc", "deltaE"]
 
@@ -14,9 +10,9 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
-    'PulseShapeDiscriminationMVA',
-    'ClusterHasPulseShapeDiscrimination',
-    'ClusterNumberOfHadronDigits',
+    'clusterPulseShapeDiscriminationMVA',
+    'clusterHasPulseShapeDiscrimination',
+    'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
     'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
@@ -40,7 +36,8 @@ cluster = [
     'clusterErrorTheta',
     'clusterErrorTiming',
     'clusterHighestE',
-    'clusterHypothesis',
+    'clusterHasNPhotons',
+    'clusterHasNeutralHadron',
     'clusterLAT',
     'clusterNHits',
     'clusterPhi',
@@ -49,7 +46,6 @@ cluster = [
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'clusterUniqueID',
     'eclExtPhi',
     'eclExtPhiId',
     'eclExtTheta',
@@ -62,6 +58,28 @@ cluster = [
     'nRejectedECLShowersBWDEndcap',
     'nRejectedECLShowersBarrel',
     'nRejectedECLShowersFWDEndcap',
+]
+
+#: KLM cluster information
+klm_cluster = [
+    'klmClusterKlId',
+    'klmClusterTiming',
+    'klmClusterPositionX',
+    'klmClusterPositionY',
+    'klmClusterPositionZ',
+    'klmClusterInnermostLayer',
+    'klmClusterLayers',
+    'klmClusterEnergy',
+    'klmClusterMomentum',
+    'klmClusterIsBKLM',
+    'klmClusterIsEKLM',
+    'klmClusterIsForwardEKLM',
+    'klmClusterIsBackwardEKLM',
+    'klmClusterTheta',
+    'klmClusterPhi',
+    'maximumKLMAngleCMS',
+    'nKLMClusterTrackMatches',
+    'nMatchedKLMClusters',
 ]
 
 #: Dalitz masses for three body decays
@@ -173,8 +191,12 @@ mc_vertex = [
     'mcProdVertexZ'
 ]
 
-#: Tag-side related variables
+#: CPV and Tag-side related variables
 tag_vertex = [
+    'DeltaT',
+    'DeltaTErr',
+    'DeltaZ',
+    'DeltaBoost',
     'TagVLBoost',
     'TagVLBoostErr',
     'TagVOBoost',
@@ -191,7 +213,6 @@ tag_vertex = [
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
     'MCDeltaT',
-    'MCTagBFlavor',
     'TagVmcLBoost',
     'TagVmcOBoost',
     'mcLBoost',
@@ -211,7 +232,6 @@ momentum_uncertainty = [
 
 #: Replacement for RecoStats tool
 reco_stats = [
-    'nECLClusters',
     'nTracks',
 ]
 

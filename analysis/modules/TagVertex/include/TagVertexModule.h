@@ -78,6 +78,7 @@ namespace Belle2 {
     std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
     std::string m_useFitAlgorithm;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
     int m_reqPXDHits;                /**< N of PXD hits for a track to be used */
+    std::string m_roeMaskName;      /**< ROE particles from this mask will be used for vertex fitting */
 
     double m_Bfield;              /**< magnetic field from data base */
     std::vector<const Track*> m_tagTracks;  /**< tracks of the rest of the event */

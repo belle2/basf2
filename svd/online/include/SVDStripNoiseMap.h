@@ -43,10 +43,24 @@ namespace Belle2 {
      * @param id VxdID of the required sensor, with segment number 0 for v, 1 for u
      * @param is_u true: u-side (p-side), false: v-side (n-side)
      * @param strip Strip number
-     * @return pedestal, noise, and threshold values
+     * @return pedestal value
      */
     float getPedestal(VxdID id, bool is_u, short strip);
+
+    /* Get pedestal, noise, and threshold values.
+     * @param id VxdID of the required sensor, with segment number 0 for v, 1 for u
+     * @param is_u true: u-side (p-side), false: v-side (n-side)
+     * @param strip Strip number
+     * @return noise value
+     */
     float getNoise(VxdID id, bool is_u, short strip);
+
+    /* Get pedestal, noise, and threshold values.
+     * @param id VxdID of the required sensor, with segment number 0 for v, 1 for u
+     * @param is_u true: u-side (p-side), false: v-side (n-side)
+     * @param strip Strip number
+     * @return threshold value
+     */
     float getThreshold(VxdID id, bool is_u, short strip);
 
     /* Check whether the strip is available or not.
@@ -68,10 +82,16 @@ namespace Belle2 {
      */
     SVDOnlineToOfflineMap* m_onl2offl_map_ptr;
 
-    /* Pedestal, noise, and threshold maps for all strips in ladders.
+    /* Pedestal map for all strips in ladders.
      */
     float m_pedestalMap [SVDPar::nSensorID][SVDPar::maxStrip];
+
+    /* noise map for all strips in ladders.
+     */
     float m_noiseMap    [SVDPar::nSensorID][SVDPar::maxStrip];
+
+    /* threshold map for all strips in ladders.
+     */
     float m_thresholdMap[SVDPar::nSensorID][SVDPar::maxStrip];
 
     /* Good strip map

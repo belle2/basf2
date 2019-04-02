@@ -157,15 +157,15 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timefail_quality->GetXaxis()->SetTitle("QualityData");
   h_timefail_quality->SetOption("LIVE");
 
-  h_ampfail_cellid = new TH1F("ampfail_cellid", "CellIDs w/ failed amps", 8736, 1, 8737);
+  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ failed amps", 8736, 1, 8737);
   h_ampfail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_ampfail_cellid->SetOption("LIVE");
 
-  h_timefail_cellid = new TH1F("timefail_cellid", "CellIDs w/ failed time", 8736, 1, 8737);
+  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ failed time", 8736, 1, 8737);
   h_timefail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_timefail_cellid->SetOption("LIVE");
 
-  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "CellIDs w/ failed times and amps", 8736, 1, 8737);
+  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ failed times and amps", 8736, 1, 8737);
   h_amptimefail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_amptimefail_cellid->SetOption("LIVE");
 
@@ -181,11 +181,11 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_amptimefail_shaperid->GetXaxis()->SetTitle("Shaper ID");
   h_amptimefail_shaperid->SetOption("LIVE");
 
-  h_ampfail_crateid = new TH1F("ampfail_crateid", "Shaper IDs w/ failed amps", 52, 1, 53);
+  h_ampfail_crateid = new TH1F("ampfail_crateid", "Crate IDs w/ failed amps", 52, 1, 53);
   h_ampfail_crateid->GetXaxis()->SetTitle("Crate ID");
   h_ampfail_crateid->SetOption("LIVE");
 
-  h_timefail_crateid = new TH1F("timefail_crateid", "Shaper IDs w/ failed time", 52, 1, 53);
+  h_timefail_crateid = new TH1F("timefail_crateid", "Crate IDs w/ failed time", 52, 1, 53);
   h_timefail_crateid->GetXaxis()->SetTitle("Crate ID");
   h_timefail_crateid->SetOption("LIVE");
 
@@ -193,9 +193,18 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID");
   h_amptimefail_crateid->SetOption("LIVE");
 
-  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "CellIDs w/ failed qualities", 8736, 1, 8737);
+  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ failed qualities", 8736, 1, 8737);
   h_qualityfail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_qualityfail_cellid->SetOption("LIVE");
+
+  h_qualityfail_shaperid = new TH1F("qualityfail_shaperid", "Shaper IDs w/ failed qualities", 624, 1, 625);
+  h_qualityfail_shaperid->GetXaxis()->SetTitle("Shaper ID");
+  h_qualityfail_shaperid->SetOption("LIVE");
+
+  h_qualityfail_crateid = new TH1F("qualityfail_crateid", "Crate IDs w/ failed qualities", 52, 1, 53);
+  h_qualityfail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_qualityfail_crateid->SetOption("LIVE");
+
 
   //2D histograms creation.
 
@@ -453,6 +462,8 @@ void ECLDQMEXTENDEDModule::beginRun()
   h_timefail_crateid->Reset();
   h_amptimefail_crateid->Reset();
   h_qualityfail_cellid->Reset();
+  h_qualityfail_shaperid->Reset();
+  h_qualityfail_crateid->Reset();
   h_ampdiff_cellid->Reset();
   h_timediff_cellid->Reset();
   h_ampdiff_quality->Reset();
@@ -523,6 +534,8 @@ void ECLDQMEXTENDEDModule::event()
         if (m_AmpFit != m_AmpData) iAmpflag_qualityfail = 1;
         if (m_TimeFit != m_TimeData) iTimeflag_qualityfail = 1;
         h_qualityfail_cellid->Fill(m_CellId);
+        h_qualityfail_shaperid->Fill(conversion(m_CellId));
+        h_qualityfail_crateid->Fill(mapper.getCrateID(m_CellId));
         h_ampflag_qualityfail->Fill(m_QualityData, iAmpflag_qualityfail);
         h_timeflag_qualityfail->Fill(m_QualityData, iTimeflag_qualityfail);
         h_quality_fit_data->Fill(m_QualityFit, m_QualityData);

@@ -21,7 +21,6 @@ set_random_seed(12345)
 # Event data
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [500])
-eventinfosetter.param('runList', [1])
 
 # Particle gun
 particlegun = register_module('ParticleGun')

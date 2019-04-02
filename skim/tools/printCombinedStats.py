@@ -41,10 +41,10 @@ import subprocess
 import json
 
 
-skims = 'feiHadronic Dark Semileptonic feiHadronic BtoCharm BtoCharmless Quarkonium  CombinedSystematics MiscCombined'
+skims = 'Dark Semileptonic BtoCharm BtoCharmless Quarkonium  CombinedSystematics MiscCombined'
 
-bkgs = 'MC10_chargedBGx1  MC10_chargedBGx1 MC10_ccbarBGx1 MC10_ssbarBGx1 MC10_uubarBGx0  MC10_ddbarBGx1  MC10_taupairBGx1'
-bkgs += ' MC10_mixedBGx0 MC10_chargedBGx0 MC10_ccbarBGx0 MC10_ssbarBGx0 MC10_uubarBGx0 MC10_ddbarBGx0 MC10_taupairBGx0'
+bkgs = 'MC11_chargedBGx1  MC11_chargedBGx1 MC11_ccbarBGx1 MC11_ssbarBGx1 MC11_uubarBGx0  MC11_ddbarBGx1  MC11_taupairBGx1'
+bkgs += ' MC11_mixedBGx0 MC11_chargedBGx0 MC11_ccbarBGx0 MC11_ssbarBGx0 MC11_uubarBGx0 MC11_ddbarBGx0 MC11_taupairBGx0'
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
 jsonEvtSizeInput = open('JsonEvtSizeInput.txt', 'w')
 jsonTimeInput = open('JsonTimeInput.txt', 'w')
@@ -99,13 +99,12 @@ for skim in skims.split():
     print(title)
     for bkg in bkgs.split():
         inputFileName = skim + '_' + bkg + '.out'
-        outputFileName = '../standalone/outputFiles/' + skim + '_' + bkg
         nSkimmedEvents = 0
         nPartSkimmedEvents = 0
         pos = bkg.find('_')
         skimCampaign = bkg[0:pos]
         sampleType = bkg[pos + 1:]
-        skimCampaign = 'MC9'
+        skimCampaign = 'MC11'
         fileList = get_test_file(sampleType, skimCampaign)
         nFullEvents = get_eventN(fileList)
         nFullFiles = get_total_infiles(sampleType, skimCampaign)
@@ -202,7 +201,7 @@ for skim in skims.split():
         if retention == 0:
             mdstSizePerEvent = 0
         for part in partSkim.split():
-            outputUdstName = '../standalone/outputFiles/' + part + '_' + bkg
+            outputUdstName = part + '_' + bkg
 
             nPartSkimmedEvents = get_eventN(outputUdstName + '.udst.root')
             statinfo_udst = os.stat(outputUdstName + '.udst.root')

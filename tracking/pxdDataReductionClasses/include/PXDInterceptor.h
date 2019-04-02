@@ -12,7 +12,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/pxdDataReductionClasses/ROIGeometry.h>

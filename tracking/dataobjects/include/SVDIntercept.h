@@ -31,8 +31,8 @@ namespace Belle2 {
 
   private:
 
-    double m_Uprime; /**< U direction tangent of the track extrapolated to the sensor */
-    double m_Vprime; /**< V direction tangent of the track extrapolated to the sensor */
+    double m_Uprime = 0; /**< U direction tangent of the track extrapolated to the sensor */
+    double m_Vprime = 0; /**< V direction tangent of the track extrapolated to the sensor */
 
     //! Needed to make the ROOT object storable
     ClassDef(SVDIntercept, 4);

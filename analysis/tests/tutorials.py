@@ -24,12 +24,13 @@ class TutorialsTest(unittest.TestCase):
     broken_tutorials = ['B2A701-ContinuumSuppression_Input.py',  # BII-4246
                         'B2A702-ContinuumSuppression_MVATrain.py',  # BII-4246
                         'B2A703-ContinuumSuppression_MVAExpert.py',  # BII-4246
-                        'B2A801-FlavorTagger.py',  # BII-4247
                         'B2A503-ReadDecayHash.py',  # BII-4254
                         ]
 
     @unittest.skipIf(not os.getenv('BELLE2_EXAMPLES_DATA_DIR'),
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")
+    @unittest.skipIf(not os.getenv('BELLE2_VALIDATION_DATA_DIR'),
+                     "$BELLE2_VALIDATION_DATA_DIR not found.")
     def test_tutorials(self):
         """
         Test supported tutorials.

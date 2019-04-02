@@ -32,6 +32,7 @@ CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() :
   fnEntaBinL(64),
   feaLE(-TMath::Pi() / 2),
   feaUE(+TMath::Pi() / 2),
+  fSetPrefix("_it0"),
   IsLocalBin(true),
   IsMakePlots(false),
   IsRS(true)
@@ -75,6 +76,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   //enta dedx distributions for inner and outer layer
   std::vector<TH1F*> hILdEdxhitInEntaBin(fnEntaBinL, 0);
   std::vector<TH1F*> hOLdEdxhitInEntaBin(fnEntaBinL, 0);
+
   Double_t ifeaLE = 0, ifeaUE = 0;
 
   for (int iea = 0; iea < fnEntaBinL; iea++) {
@@ -137,7 +139,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
       //Bin corresponds to enta
       ibinEA = (ieaHit - feaLE) / feaBS ; //from 0
-      if (ibinEA >= fnEntaBinL) continue; //bin stats from 0
+      if (ibinEA >= fnEntaBinG) continue; //bin stats from 0
 
       if (IsLocalBin) ibinEA = fEntaBinNums.at(ibinEA);
 
@@ -165,7 +167,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     } else {
       hOLEntaG->Draw(""); hILEntaG->Draw("same");
     }
-    ctmpde->SaveAs("hEntaDistributions.pdf");
+    ctmpde->SaveAs(Form("hEntaDistributions_%s.pdf", fSetPrefix.data()));
 
   }
 
@@ -200,13 +202,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     }
   }
 
-
-
   if (IsMakePlots) {
-
-    std::cout << "Used bins for truncation from 5 to 75 per #" << std::endl;
-    std::cout << "Inner Layes Bins = # from" << lBinInLayer << ", to " << hBinInLayer << std::endl;
-    std::cout << "Outer Layes Bins = # from" << lBinOutLayer << ", to " << hBinOutLayer << std::endl;
 
     TCanvas* ctem = new TCanvas("Layerhisto", "Inner and Outer Histo", 1200, 600);
     ctem->Divide(2, 1);
@@ -241,21 +237,21 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     tlOutL->SetX1(OutsumPer75); tlOutL->SetX2(OutsumPer75);
     tlOutL->SetY1(0); tlOutL->SetY2(hOLdEdx_all->GetMaximum());
     tlOutL->DrawClone("same");
-    ctem->SaveAs("Layerhistodedxhit_OneDCorr.pdf");
+    ctem->SaveAs(Form("Layerhistodedxhit_OneDCorr_%s.pdf", fSetPrefix.data()));
   }
-
-
 
   //short version = 0;
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 1200);
   ctmp->Divide(4, 4);
-  std::stringstream psname; psname << "dedx_1dcell.pdf[";
+  std::stringstream psname; psname << Form("dedx_1dcell_%s.pdf[", fSetPrefix.data());
   TLine* tl = new TLine();
   tl->SetLineColor(kRed);
 
+  TBox* tb = new TBox();
+
   if (IsMakePlots) {
     ctmp->Print(psname.str().c_str());
-    psname.str(""); psname << "dedx_1dcell.pdf";
+    psname.str(""); psname << Form("dedx_1dcell_%s.pdf", fSetPrefix.data());
   }
 
   TH1F* htemp = 0x0;
@@ -280,7 +276,6 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       startfrom = lBinOutLayer; endat = hBinOutLayer;
     } else continue;
 
-    //std::cout << "Layer I/O # = " << iIOLayer << std::endl;
     for (int iea = 1; iea <= fnEntaBinL; iea++) {
 
       Int_t ieaprime = iea; //rotation symmtery for 1<->3 and 4<->2
@@ -292,12 +287,12 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       else continue;
 
       double truncMean = 1.0;
-      if (htemp->Integral() < 100) truncMean  = 1.0; //low stats
+      if (htemp->Integral() < 250) truncMean  = 1.0; //low stats
       else {
         double binweights = 0.0;
         int sumofbc = 0;
         for (int ibin = startfrom; ibin <= endat; ibin++) {
-          //std::cout << " dedxhit bin = " << ibin << ", Entries =" << htemp->GetBinContent(ibin) << std::endl;
+
           if (htemp->GetBinContent(ibin) > 0) {
             binweights += (htemp->GetBinContent(ibin) * htemp->GetBinCenter(ibin));
             sumofbc += htemp->GetBinContent(ibin);
@@ -312,12 +307,25 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
       if (IsMakePlots) {
         ctmp->cd(((iea - 1) % 16) + 1);
-        htemp->SetFillColor(kYellow);
+        htemp->SetFillColorAlpha(kGreen, 0.30);
         htemp->SetTitle(Form("%s, #mean = %0.2f", htemp->GetTitle(), truncMean));
+        if (truncMean >= 1.02 || truncMean <= 0.98)htemp->SetFillColor(kYellow);
+        if (truncMean >= 1.05 || truncMean <= 0.95)htemp->SetFillColor(kOrange);
+        if (truncMean >= 1.10 || truncMean <= 0.90)htemp->SetFillColor(kRed);
         htemp->DrawClone("hist"); //clone is nessesory for pointer survival
+        tl->SetLineColor(kRed);
         tl->SetX1(truncMean); tl->SetX2(truncMean);
         tl->SetY1(0); tl->SetY2(htemp->GetMaximum());
         tl->DrawClone("same");
+
+        tb->SetLineColor(kPink);
+        tb->SetLineStyle(6);
+        tb->SetFillColorAlpha(kPink, 0.15);
+        tb->SetX1(htemp->GetBinLowEdge(startfrom));
+        tb->SetY1(0);
+        tb->SetX2(htemp->GetBinLowEdge(endat));
+        tb->SetY2(htemp->GetMaximum());
+        tb->DrawClone("same");
         if (iea % 16 == 0)ctmp->Print(psname.str().c_str());
       }
 
@@ -340,7 +348,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
 
   if (IsMakePlots) {
-    psname.str(""); psname << "dedx_1dcell.pdf]";
+    psname.str(""); psname << Form("dedx_1dcell_%s.pdf]", fSetPrefix.data());
     ctmp->Print(psname.str().c_str());
 
     // //Drawing final constants
@@ -348,7 +356,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     cconst->Divide(2, 1);
     cconst->cd(1); hILEntaConst->Draw();
     cconst->cd(2); hOLEntaConst->Draw();
-    cconst->SaveAs("FinalOneDConstantMap.pdf");
+    cconst->SaveAs(Form("FinalOneDConstantMap_%s.pdf", fSetPrefix.data()));
   }
 
   B2INFO("dE/dx Calibration done for 1D cleanup correction");
@@ -358,6 +366,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   delete htemp;
   delete ctmp;
   delete tl;
+  delete tb;
   return c_OK;
 
 }

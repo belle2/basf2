@@ -20,7 +20,7 @@ namespace Belle2 {
 
   public:
 
-
+    /** typedef of the return value of the calibration function*/
     typedef double (SVDCoGCalibrationFunction::*cogFunction)(double, int) const;
 
     /** returns the calibrated value of raw_time, depending on the trigger bin*/
@@ -63,7 +63,7 @@ namespace Belle2 {
 
     };
 
-
+    /** set the trigger bin dependent shift*/
     void set_bias(double tb0, double tb1, double tb2, double tb3)
     {
       m_bias[0] = tb0;
@@ -71,6 +71,7 @@ namespace Belle2 {
       m_bias[2] = tb2;
       m_bias[3] = tb3;
     }
+    /** set the trigger bin dependent scale*/
     void set_scale(double tb0, double tb1, double tb2, double tb3)
     {
       m_scale[0] = tb0;
@@ -79,6 +80,7 @@ namespace Belle2 {
       m_scale[3] = tb3;
     }
 
+    /** set the trigger bin dependent shift error*/
     void set_biasError(double tb0, double tb1, double tb2, double tb3)
     {
       m_biasError[0] = tb0;
@@ -86,6 +88,7 @@ namespace Belle2 {
       m_biasError[2] = tb2;
       m_biasError[3] = tb3;
     }
+    /** set the trigger bin dependent scale error*/
     void set_scaleError(double tb0, double tb1, double tb2, double tb3)
     {
       m_scaleError[0] = tb0;
@@ -93,6 +96,7 @@ namespace Belle2 {
       m_scaleError[2] = tb2;
       m_scaleError[3] = tb3;
     }
+    /** set the trigger bin dependent covariance between shift and scale*/
     void set_scaleBiasCovariance(double tb0, double tb1, double tb2, double tb3)
     {
       m_scaleBiasCovariance[0] = tb0;

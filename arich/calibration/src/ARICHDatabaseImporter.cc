@@ -774,6 +774,19 @@ void ARICHDatabaseImporter::printHvMappings()
   crateMap->print();
 }
 
+void ARICHDatabaseImporter::dumpHvMappings()
+{
+  DBObjPtr<ARICHHvCablesMapping> hvMap;
+
+  ARICHChannelHist* hist = new ARICHChannelHist("hvMapping", "module - HV cable mapping", 1);
+  for (int hapdID = 1; hapdID < 421; hapdID++) {
+    int val = hvMap->getCableID(hapdID) * 100 + hvMap->getInnerID(hapdID);
+    hist->setBinContent(hapdID, val);
+  }
+  hist->SetOption("TEXT");
+  hist->SaveAs("HVMapping.root");
+}
+
 void ARICHDatabaseImporter::printNominalBiasVoltages()
 {
   DBObjPtr<ARICHBiasVoltages> biasVolt;
@@ -887,11 +900,15 @@ void ARICHDatabaseImporter::printChannelMapping()
   chMap->print();
 }
 
-void ARICHDatabaseImporter::printFEMappings()
+void ARICHDatabaseImporter::printMergerMapping()
 {
   DBObjPtr<ARICHMergerMapping> mrgMap;
-  DBObjPtr<ARICHCopperMapping> copMap;
   mrgMap->print();
+}
+
+void ARICHDatabaseImporter::printCopperMapping()
+{
+  DBObjPtr<ARICHCopperMapping> copMap;
   copMap->print();
 }
 
@@ -900,6 +917,13 @@ void ARICHDatabaseImporter::printModulesInfo()
   DBObjPtr<ARICHModulesInfo> modinfo;
   modinfo->print();
 }
+
+void ARICHDatabaseImporter::printReconstructionPar()
+{
+  DBObjPtr<ARICHReconstructionPar> recPar;
+  recPar->print();
+}
+
 
 void ARICHDatabaseImporter::printChannelMask(bool makeHist)
 {
@@ -916,6 +940,57 @@ void ARICHDatabaseImporter::printChannelMask(bool makeHist)
     }
     hist->SaveAs("channelMask.root");
   }
+}
+
+void ARICHDatabaseImporter::dumpMergerMapping(bool sn)
+{
+  DBObjPtr<ARICHMergerMapping> mgrMap;
+  ARICHChannelHist* hist = new ARICHChannelHist("mergerNum", "module - merger mapping", 1);
+  for (int hapdID = 1; hapdID < 421; hapdID++) {
+    int val = mgrMap->getMergerID(hapdID);
+    if (sn) val = mgrMap->getMergerSN(val);
+    hist->setBinContent(hapdID, val);
+  }
+  hist->SetOption("TEXT");
+  hist->SaveAs("MergerMapping.root");
+
+}
+
+void ARICHDatabaseImporter::printFEMappings()
+{
+
+  DBObjPtr<ARICHMergerMapping> mgrMap;
+  DBObjPtr<ARICHCopperMapping> cprMap;
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+
+  cout << "{ \"hapdmap\": [" << endl;
+  for (int hapdID = 1; hapdID < 421; hapdID++) {
+    std::string hapdsn;
+    for (const GearDir& module : content.getNodes("Module")) {
+      hapdsn = module.getString("@hapdID");
+      unsigned sector = module.getInt("Sector");
+      unsigned ring = module.getInt("Ring");
+      unsigned azimuth = module.getInt("Azimuth");
+      unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+      if (moduleID == hapdID) break;
+    }
+
+    int val = mgrMap->getMergerID(hapdID);
+    cout << "{\n" << "\"ID\": \"" << hapdID << "\"," << endl;
+    cout << "\"sn\": \"" << hapdsn << "\"," << endl;
+    cout << "\"mrg\": \"" << val << "\"," << endl;
+    cout << "\"mrgSN\": \"" << mgrMap->getMergerSN(val) << "\"," << endl;
+    cout << "\"feb\": \"" << mgrMap->getFEBSlot(hapdID) - 1 << "\"," << endl;
+    cout << "\"cpr\": \"" << cprMap->getCopperID(val) << "\"," << endl;
+    cout << "\"hslb\": \"" << cprMap->getFinesse(val) << "\"" << endl;
+    if (hapdID < 420) cout << "}," << endl;
+    else  cout << "}" << endl;
+  }
+  cout << "]}" << endl;
+
+
 }
 
 void ARICHDatabaseImporter::dumpModuleNumbering()

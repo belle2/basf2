@@ -84,6 +84,19 @@ namespace Belle2 {
     int m_nevt;
 
     int m_red_factor;
+
+    StoreArray<RawDataBlock> m_rawDataBlock; /**< RawDataBlock. */
+    StoreArray<RawCOPPER> m_rawCOPPER; /**< RawCOPPER. */
+    StoreArray<RawCDC> m_rawCDC; /**< RawCDC. */
+    StoreArray<RawSVD> m_rawSVD; /**< RawSVD. */
+    StoreArray<RawTOP> m_rawTOP; /**< RawTOP. */
+    StoreArray<RawECL> m_rawECL; /**< RawECL. */
+    StoreArray<RawARICH> m_rawARICH; /**< RawARICH. */
+    StoreArray<RawKLM> m_rawKLM; /**< RawKLM. */
+    StoreArray<RawFTSW> m_rawFTSW; /**< RawFTSW. */
+#ifdef DESY
+    StoreArray<RawTLU> m_rawTLU; /**< RawTLU. */
+#endif
   };
 
 } // end namespace Belle2

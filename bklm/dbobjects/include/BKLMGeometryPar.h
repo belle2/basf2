@@ -11,7 +11,6 @@
 #ifndef BKLMGEOMETRYPAR_DB_H
 #define BKLMGEOMETRYPAR_DB_H
 
-#include <vector>
 #include <map>
 
 #include "CLHEP/Vector/ThreeVector.h"

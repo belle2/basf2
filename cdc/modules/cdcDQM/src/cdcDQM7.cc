@@ -1,11 +1,15 @@
 /* Nanae Taniguchi 2017.07.12 */
 /* Nanae Taniguchi 2018.02.06 */
+/* add occupancy plot 2019.03 */
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
-
-#include <framework/core/HistoModule.h>
+// add
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+//
+#include <framework/core/HistoModule.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
@@ -17,6 +21,8 @@
 
 #include <TDirectory.h>
 #include <TStyle.h>
+
+#include <TProfile.h>//
 
 using namespace std;
 using namespace Belle2;
@@ -54,6 +60,10 @@ TH1D* h_adc_sL[9] = {0}; // adc each super layer
 
 TH1D* h_fast_tdc; // fastest TDC in each event
 TH2D* bmap_2; // board status map 2D
+
+// add 20190205
+TH1D* h_occ; // occupancy
+TH1D* h_occ_L_px; // occupancy
 
 void cdcDQM7Module::defineHisto()
 {
@@ -104,6 +114,7 @@ void cdcDQM7Module::defineHisto()
     h_adc_L[b]->SetMinimum(0);
     h_adc_L[b]->SetFillColor(8);
 
+
   }
 
   for (int s = 0; s < 9; s++) {
@@ -119,8 +130,14 @@ void cdcDQM7Module::defineHisto()
   h_fast_tdc = new TH1D("fast_tdc", "fastest TDC", 50, 4800, 5000);
   h_fast_tdc->SetFillColor(6);
 
-  //
+  // 20190205
+  h_occ = new TH1D("occ", "occ. total", 100, 0, 1.);
+  h_occ->SetFillColor(95);
 
+  h_occ_L_px = new TH1D("occ_L_px", "occ. Layer dep.", 56, 0, 56);
+  h_occ_L_px->SetFillColor(75);
+
+  //
   bmap_2 = new TH2D("bmap_2", "", 20, 0, 20, 15, 0, 15);
 
   // LIVE
@@ -128,11 +145,14 @@ void cdcDQM7Module::defineHisto()
   h_tdc_sL[8]->SetOption("LIVE"); // outer most
   h_adc_sL[0]->SetOption("LIVE"); // small
   h_adc_sL[8]->SetOption("LIVE"); // outer most
-  h_fast_tdc->SetOption("LIVE"); // fastest TDC
+  //  h_fast_tdc->SetOption("LIVE"); // fastest TDC
   h_fast_tdc->SetStats(1);
+
   bmap_2->SetOption("LIVE"); //
   bmap_2->SetOption("zcol"); //
   bmap_2->SetStats(0);
+  h_occ_L_px->SetOption("LIVE"); //
+  h_occ_L_px->SetOption("hist"); //
 
   oldDir->cd();//
 
@@ -159,6 +179,10 @@ void cdcDQM7Module::beginRun()
 
   h_fast_tdc->Reset();
   bmap_2->Reset();
+
+  //
+  h_occ->Reset();
+  h_occ_L_px->Reset();
   //
 }
 
@@ -168,7 +192,16 @@ void cdcDQM7Module::event()
   StoreArray<CDCHit> cdcHits;
   int nent = cdcHits.getEntries();
   int ftdc = 0;
-  if (nent < 60 || nent > 200) return; //
+
+  // add
+  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
+  double n_L[56] = {};
+
+  // reset
+  h_occ_L_px->Reset(); //
+
+  // occ total
+  h_occ->Fill(nent / 14336.);
 
   for (int i = 0; i < nent; i++) {
     CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
@@ -179,9 +212,14 @@ void cdcDQM7Module::event()
     int adcsum = cdchit->getADCCount();
     int vtdc = cdchit->getTDCCount();
 
-    int num = sL * 6 + iL + 2;
+    if (sL > 8) continue; // error
+    if (iL > 8) continue; // error
 
-    if (adcsum > 10) {
+    int num = sL * 6 + iL + 2;
+    if (num > 55) continue; // error
+
+    if (adcsum > 25) {
+      //    if (adcsum > -1) {
 
       if (sL == 0) {
         h_nhits_L[iL]->Fill(wid);
@@ -189,12 +227,21 @@ void cdcDQM7Module::event()
         h_adc_L[iL]->Fill(adcsum);
         h_tdc_sL[sL]->Fill(vtdc);
         h_adc_sL[sL]->Fill(adcsum);
+
+        // add
+        n_L[iL] = n_L[iL] + (1. / ndiv[sL]);
+        //
+
       } else {
         h_nhits_L[num]->Fill(wid);
         h_tdc_L[num]->Fill(vtdc);
         h_adc_L[num]->Fill(adcsum);
         h_tdc_sL[sL]->Fill(vtdc);
         h_adc_sL[sL]->Fill(adcsum);
+
+        // add
+        n_L[num] = n_L[num] + (1. / ndiv[sL]);
+        //
       }
 
       if (vtdc > ftdc) {
@@ -207,26 +254,41 @@ void cdcDQM7Module::event()
 
   h_fast_tdc->Fill(ftdc);
 
+  // add
+  for (int q = 0; q < 56; q++) {
+    h_occ_L_px->Fill(q, n_L[q]);
+  }
+
   //
   StoreArray<CDCRawHit> cdcRawHits;
   int r_nent = cdcRawHits.getEntries();
 
   // new
-
   for (int j = 0; j < r_nent; j++) {
     CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
 
     int board = cdcrawhit->getBoardId();
+    if (board > 299) continue;
 
-    int x = board % 20;
-    int y = (board - (board % 20)) / 20;
-    bmap_2->Fill(x, y);
+    double x = board % 20;
+    double y = (board - (board % 20)) / 20;
+
+    if (x != 5 || y != 5) {
+      bmap_2->Fill(x, y);
+    }
+
+    if (x == 1. && y == 1.) {
+      bmap_2->Fill(0., 0.);
+    }
 
   }// cdcrawhits
 
   int h_ent = bmap_2->GetEntries();
-  double fac = 20.*0.5;
+  //  double fac = 20.*0.5;
+  double fac = 10.*0.5;
   bmap_2->SetMaximum(h_ent / (300 * fac));
+  bmap_2->SetMinimum(0.);
+  //
 
 }
 

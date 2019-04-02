@@ -6,13 +6,19 @@
 import timeit
 g_start_time = timeit.default_timer()
 
-import os
-import time
-import glob
+# std
 import argparse
-import ROOT
-import validationpath
+import glob
+import os
 import subprocess
+import sys
+import time
+
+# 3rd party
+import ROOT
+
+# ours
+import validationpath
 
 ###############################################################################
 #                           Function definitions                              #
@@ -90,13 +96,11 @@ def available_revisions(work_folder):
 
     # Get all folders in ./results/ sorted descending by the date they were
     # created (i.e. newest folder first)
-    revisions = sorted(
-        os.listdir(validationpath.get_results_folder(work_folder)),
-        key=lambda _: os.path.getmtime(
-            os.path.join(validationpath.get_results_folder(work_folder), _)),
-        reverse=True
-    )
-    # Return it
+    search_folder = validationpath.get_results_folder(work_folder)
+    subfolders = [p for p in os.scandir(search_folder) if p.is_dir()]
+    revisions = [
+        p.name for p in sorted(subfolders, key=lambda p: p.stat().st_mtime)
+    ]
     return revisions
 
 
@@ -163,7 +167,7 @@ def get_validation_folders(location, basepaths, log):
         return {}
 
     # Write to log what we are collecting
-    log.debug('Collecting {0} folders'.format(location))
+    log.debug(f'Collecting {location} folders')
 
     # Reserve some memory for our results
     results = {}
@@ -211,6 +215,7 @@ def get_argument_parser(modes=None):
              "actually executing thesteering files (for debugging purposes).",
         action='store_true'
     )
+    # todo: use the options keyword here?
     parser.add_argument(
         "-m",
         "--mode",
@@ -349,7 +354,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
     """
 
     # Write to log what we are collecting
-    log.debug('Collecting *{0} files from {1}'.format(ext, dirpath))
+    log.debug(f'Collecting *{ext} files from {dirpath}')
 
     # Some space where we store our results before returning them
     results = []
@@ -472,4 +477,136 @@ def get_log_file_paths(logger):
             ret.append(handler.baseFilename)
         except AttributeError:
             pass
+    return ret
+
+
+def get_terminal_width():
+    """
+    Returns width of terminal in characters, or 80 if unknown.
+
+    Copied from basf2 utils. However, we only compile the validation package
+    on b2master, so copy this here.
+    """
+    from shutil import get_terminal_size
+    return get_terminal_size(fallback=(80, 24)).columns
+
+
+def congratulator(success=None, failure=None, total=None, just_comment=False,
+                  rate_name="Success rate"):
+    """ Keeping the morale up by commenting on success rates.
+
+    Args:
+        success: Number of successes
+        failure: Number of failures
+        total: success + failures (out of success, failure and total, exactly
+            2 have to be spefified. If you want to use your own figure of
+            merit, just set total = 1. and set success to a number between 0.0
+            (infernal) to 1.0 (stellar))
+        just_comment: Do not add calculated percentage to return string.
+        rate_name: How to refer to the calculated success rate.
+
+    Returns:
+        Comment on your success rate (str).
+    """
+
+    n_nones = [success, failure, total].count(None)
+
+    if n_nones == 0 and total != success + failure:
+        print(
+            "ERROR (congratulator): Specify 2 of the arguments 'success',"
+            "'failure', 'total'.",
+            file=sys.stderr
+        )
+        return ""
+    elif n_nones >= 2:
+        print(
+            "ERROR (congratulator): Specify 2 of the arguments 'success',"
+            "'failure', 'total'.",
+            file=sys.stderr
+        )
+        return ""
+    else:
+        if total is None:
+            total = success + failure
+        if failure is None:
+            failure = total - success
+        if success is None:
+            success = total - failure
+
+    # Beware of zero division errors.
+    if total == 0:
+        return "That wasn't really exciting, was it?"
+
+    success_rate = 100 * success / total
+
+    comments = {
+        00.0: "You're grounded!",
+        10.0: "Infernal...",
+        20.0: "That's terrible!",
+        40.0: "You can do better than that.",
+        50.0: "That still requires some work.",
+        75.0: "Three quarters! Almost there!",
+        80.0: "Way to go ;)",
+        90.0: "Gold medal!",
+        95.0: "Legendary!",
+        99.0: "Nobel price!",
+        99.9: "Godlike!"
+    }
+
+    for value in sorted(comments.keys(), reverse=True):
+        if success_rate >= value:
+            comment = comments[value]
+            break
+    else:
+        # below minimum?
+        comment = comments[0]
+
+    if just_comment:
+        return comment
+    else:
+        return "{} {}%. {}".format(
+            rate_name,
+            int(success_rate),
+            comment
+        )
+
+
+def terminal_title_line(title="", subtitle="", level=0):
+    """ Print a title line in the terminal.
+
+    Args:
+        title (str): The title. If no title is given, only a separating line
+            is printed.
+        subtitle (str): Subtitle.
+        level (int): The lower, the more dominantly the line will be styled.
+    """
+    linewidth = get_terminal_width()
+
+    # using the markdown title underlining chars for lack of better
+    # alternatives
+    char_dict = {
+        0: "=",
+        1: "-",
+        2: "~"
+    }
+
+    for key in sorted(char_dict.keys(), reverse=True):
+        if level >= key:
+            char = char_dict[key]
+            break
+    else:
+        # below minimum, shouldn't happen but anyway
+        char = char_dict[0]
+
+    line = char * linewidth
+    if not title:
+        return line
+
+    # guess we could make a bit more effort with indenting/handling long titles
+    # capitalization etc., but for now:
+    ret = line + "\n"
+    ret += title.capitalize() + "\n"
+    if subtitle:
+        ret += subtitle + "\n"
+    ret += line
     return ret

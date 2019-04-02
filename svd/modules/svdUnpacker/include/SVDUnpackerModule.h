@@ -100,8 +100,8 @@ namespace Belle2 {
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
         unsigned int trgType   : 4;
-        unsigned int trgTiming : 3;
-        unsigned int onebit    : 1;
+        unsigned int trgTiming : 2;
+        unsigned int xTalk     : 2;
         unsigned int FADCnum   : 8;
         unsigned int evtType   : 1; // Event type(0): 0…TTD event, 1…standalone event
         unsigned int DAQMode   : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
@@ -112,9 +112,6 @@ namespace Belle2 {
       struct APVHeader {
         unsigned int CMC1      : 8; //LSB
         unsigned int CMC2      : 4;
-//         unsigned int fifoErr   : 1;
-//         unsigned int frameErr  : 1;
-//         unsigned int detectErr : 1;
         unsigned int apvErr    : 4;
         unsigned int pipelineAddr : 8;
         unsigned int APVnum : 6;
@@ -140,10 +137,8 @@ namespace Belle2 {
 
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
-        unsigned int emuPipeAddr: 8;
-//         unsigned int fifoErrOR   : 1;
-//         unsigned int frameErrOR  : 1;
-//         unsigned int detectErrOR : 1;
+        unsigned int dataSizeCut: 1;
+        unsigned int nullDigits: 7;
         unsigned int apvErrOR  : 4;
         unsigned int check : 4; //MSB
       };

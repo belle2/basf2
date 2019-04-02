@@ -31,7 +31,7 @@ PXDROIDQMModule::PXDROIDQMModule() : HistoModule() , m_storeROIs()
   //Set module properties
   setDescription("Monitor ROIs");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxdrawroi"));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of PXDRawROIs to be processed", std::string(""));
 }

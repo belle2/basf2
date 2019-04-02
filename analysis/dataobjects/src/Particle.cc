@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Marko Staric                                *
+ * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,7 +14,6 @@
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -162,15 +162,13 @@ Particle::Particle(const int trackArrayIndex,
   setMomentumPositionErrorMatrix(trackFit);
 }
 
-Particle::Particle(const ECLCluster* eclCluster) :
-  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
+  m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   if (!eclCluster) return;
 
-  // TODO: avoid hard coded values
-  m_pdgCode = 22;
   setFlavorType();
 
   // returns default vertex from clusterutils (from beam parameters if available)
@@ -179,7 +177,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
   const TVector3 clustervertex = C.GetIPPosition();
   setVertex(clustervertex);
 
-  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex);
+  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit(), m_mass);
   m_px = clustermom.Px();
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();
@@ -195,7 +193,8 @@ Particle::Particle(const ECLCluster* eclCluster) :
   const TMatrixDSym clustervertexcovmat = C.GetIPPositionCovarianceMatrix();
 
   // Set error matrix.
-  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat);
+  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat,
+                              getECLClusterEHypothesisBit());
   storeErrorMatrix(clustercovmat);
 }
 
@@ -539,6 +538,7 @@ const PIDLikelihood* Particle::getPIDLikelihood() const
     return nullptr;
 }
 
+
 const ECLCluster* Particle::getECLCluster() const
 {
   if (m_particleType == c_ECLCluster) {
@@ -553,11 +553,11 @@ const ECLCluster* Particle::getECLCluster() const
     // loop over all clusters matched to this track
     for (const ECLCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<ECLCluster>()) {
       // ignore everything except the nPhotons hypothesis
-      if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
         continue;
       // check if we're most energetic thus far
-      if (cluster.getEnergy() > highestEnergy) {
-        highestEnergy = cluster.getEnergy();
+      if (cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > highestEnergy) {
+        highestEnergy = cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
         bestTrackMatchedCluster = &cluster;
       }
     }
@@ -565,6 +565,12 @@ const ECLCluster* Particle::getECLCluster() const
   } else {
     return nullptr;
   }
+}
+
+double Particle::getECLClusterEnergy() const
+{
+  const ECLCluster* cluster = this->getECLCluster();
+  return cluster->getEnergy(this->getECLClusterEHypothesisBit());
 }
 
 const KLMCluster* Particle::getKLMCluster() const

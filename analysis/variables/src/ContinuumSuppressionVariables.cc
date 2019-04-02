@@ -66,12 +66,12 @@ namespace Belle2 {
 
       StoreArray<ECLCluster> eclClusters;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of N1 (n photons) ECLClusters
-        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        // sum only ECLClusters which have the N1 (n photons) hypothesis
+        if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
 
         ClusterUtils C;
-        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i]);
+        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i], ECLCluster::EHypothesisBit::c_nPhotons);
         if (momECLCluster == momECLCluster) {
           if (eclClusters[i]->isNeutral()) {
             Particle particle(eclClusters[i]);

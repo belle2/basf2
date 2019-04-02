@@ -44,19 +44,6 @@ namespace Belle2 {
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 
 
-    double particleMCTagBFlavor(const Particle* particle)
-    {
-      double result = 1000.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCTagBFlavor();
-
-      return result;
-    }
-
-
     // TagV x, y, z
 
     double particleTagVx(const Particle* particle)
@@ -483,13 +470,22 @@ namespace Belle2 {
     }
 
 
+    double particleInternalTagVMCFlavor(const Particle* particle)
+    {
+      double result = 1000.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getMCTagBFlavor();
+
+      return result;
+    }
 
 
 
 
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
-
-    REGISTER_VARIABLE("MCTagBFlavor", particleMCTagBFlavor, "Tag MC Tag B Flavor information");
 
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
     REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
@@ -538,6 +534,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVOBoostErr", tagVErrOrthogonalBoostDirection,
                       "Returns the error of TagV in the direction orthogonal to the boost");
 
+    REGISTER_VARIABLE("internalTagVMCFlavor", particleInternalTagVMCFlavor,
+                      "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"
+                      "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
   }
 }
 

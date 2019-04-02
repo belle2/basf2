@@ -30,7 +30,7 @@ namespace Belle2 {
     inline TLorentzVector getFourVector(const std::reference_wrapper<const ECLCluster>& cluster)
     {
       ClusterUtils C;
-      const TLorentzVector& v = C.Get4MomentumFromCluster(&(cluster.get()));
+      const TLorentzVector& v = C.Get4MomentumFromCluster(&(cluster.get()), ECLCluster::EHypothesisBit::c_nPhotons);
       return TLorentzVector(v.Px(), v.Py(), v.Pz(), v.E());
     }
 
@@ -117,7 +117,7 @@ namespace Belle2 {
       }
 
       ClusterUtils C;
-      return PCmsLabTransform::labToCms(C.Get4MomentumFromCluster(entity)).Rho();
+      return PCmsLabTransform::labToCms(C.Get4MomentumFromCluster(entity, ECLCluster::EHypothesisBit::c_nPhotons)).Rho();
     }
 
     /**

@@ -49,7 +49,18 @@ namespace Belle2 {
     /** Minimal distance between track and shower. */
     double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
 
-    /** Compute depth. */
+    /**
+     * Computation of depths / distances.
+     *
+     * A crucial point is defined which is the point where the (extrapolation
+     * of the) track and a certain vector are closest to each other. This
+     * vector originats from the cluster centre and points in the direction of
+     * the weighted average of the crystal orientations of the crystals that
+     * contribute to the cluster.
+     *
+     * lTrk is the distance between the point where the track enters the ECL and this point
+     * lShower is the distance between the cluster centre and this point
+     */
     void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
 
     // Required input

@@ -77,26 +77,56 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     drldrg(1, i) = vdir[i];
     drldrg(2, i) = ndir[i];
   }
-  // d local residual / global rigid body param
+  // d local residual / d global rigid body param
   auto drldg = drldrg * (drdm * dmdg);
 
-  // Alignment of layer X
+  // wire ends
+  const double zWireM = s_cdcGeometryTranslator->getWireBackwardPosition(getWireID(), CDCGeometryPar::c_Aligned)[2];
+  const double zWireP = s_cdcGeometryTranslator->getWireForwardPosition(getWireID(), CDCGeometryPar::c_Aligned)[2];
+  // relative Z position [0..1]
+  const double zRel = std::max(0., std::min(1., (pos[2] - zWireM) / (zWireP - zWireM)));
+
+  // Layer alignment
+  // wire 511 = no wire (0 is reserved for existing wires) - this has to be compatible with code in CDCGeometryPar::setWirPosAlignParams
+  auto layerID = WireID(getWireID().getICLayer(), 511);
+
+  // Alignment of layer X (bwd)
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerX),
+    GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerX),
     drldg(0, 0)
   );
 
-  // Alignment of layer Y
+  // Alignment of layer Y (bwd)
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerY),
+    GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerY),
     drldg(0, 1)
   );
 
-  // Alignment of layer rotation (gamma)
+  // Alignment of layer rotation (gamma) (bwd)
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerPhi),
+    GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerPhi),
     drldg(0, 5)
   );
+
+  // Difference between wire ends (end plates)
+  // Alignment of layer dX, dX = foward - backward endplate
+  globals.add(
+    GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerDx),
+    drldg(0, 0) * zRel
+  );
+
+  // Alignment of layer dY, dY = foward - backward endplate
+  globals.add(
+    GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerDy),
+    drldg(0, 1) * zRel
+  );
+
+  // Alignment of layer rotation difference d(gamma or phi), dPhi = foward - backward endplate
+  globals.add(
+    GlobalLabel::construct<CDCAlignment>(layerID, CDCAlignment::layerDPhi),
+    drldg(0, 5) * zRel
+  );
+
   //
   /**
   // Alignment of wires X in global coords

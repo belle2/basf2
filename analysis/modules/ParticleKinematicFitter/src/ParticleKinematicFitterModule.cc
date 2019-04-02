@@ -125,7 +125,7 @@ namespace Belle2 {
 
     void ParticleKinematicFitterModule::event()
     {
-      B2INFO("ParticleKinematicFitterModule::event");
+      B2DEBUG(17, "ParticleKinematicFitterModule::event");
 
       StoreObjPtr<ParticleList> plist(m_listName);
       if (!plist) {
@@ -155,7 +155,7 @@ namespace Belle2 {
     bool ParticleKinematicFitterModule::doKinematicFit(Particle* mother)
     {
 
-      B2INFO("ParticleKinematicFitterModule::doKinematicFit");
+      B2DEBUG(17, "ParticleKinematicFitterModule::doKinematicFit");
 
       bool ok = false;
 
@@ -363,14 +363,14 @@ namespace Belle2 {
 
     void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index)
     {
-      B2INFO("ParticleKinematicFitterModule: adding a particle to the fitter!");
+      B2DEBUG(17, "ParticleKinematicFitterModule: adding a particle to the fitter!");
 
       if (m_add3CPhoton && index == 0) {
         if (particle -> getPDGCode() != 22) {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 
-        double startingE = particle -> getECLCluster() -> getEnergy();
+        double startingE = particle -> getECLCluster() -> getEnergy(particle -> getECLClusterEHypothesisBit());
         double startingPhi = particle -> getECLCluster() -> getPhi();
         double startingTheta = particle -> getECLCluster() -> getTheta();
 
@@ -560,7 +560,7 @@ namespace Belle2 {
 
     void ParticleKinematicFitterModule::resetFitter(BaseFitter& fitter)
     {
-      B2INFO("ParticleKinematicFitterModule: Resetting the fitter");
+      B2DEBUG(17, "ParticleKinematicFitterModule: Resetting the fitter");
       fitter.reset();
     }
 

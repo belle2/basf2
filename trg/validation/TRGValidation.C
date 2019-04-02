@@ -7,6 +7,13 @@
 </header>
 */
 
+#include "TFile.h"
+#include "TCut.h"
+#include "TChain.h"
+#include "TH1.h"
+#include "TH1F.h"
+#include "TStyle.h"
+
 void TRGValidation()
 {
   TChain* tree = new TChain("tree");

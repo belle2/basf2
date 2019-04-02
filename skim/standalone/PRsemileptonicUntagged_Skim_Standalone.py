@@ -21,19 +21,15 @@ from skimExpertFunctions import *
 from skim.standardlists.charm import *
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-00-03'
 
 skimCode = encodeSkimName('PRsemileptonicUntagged')
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
-
+fileList = get_test_file("mixedBGx1", "MC11")
 # create a new path
 PRSLpath = Path()
 
-inputMdstList('MC9', fileList, path=PRSLpath)
+inputMdstList('default', fileList, path=PRSLpath)
 stdPi('all', path=PRSLpath)
 stdE('all', path=PRSLpath)
 stdMu('all', path=PRSLpath)

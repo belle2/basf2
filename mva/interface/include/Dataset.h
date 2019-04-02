@@ -45,6 +45,16 @@ namespace Belle2 {
       virtual ~Dataset() = default;
 
       /**
+       * Specify no copy constructor
+       */
+      Dataset(const Dataset&) = delete;
+
+      /**
+       * Specify no assignment operator
+       */
+      Dataset& operator=(const Dataset&) = delete;
+
+      /**
        * Returns the number of features in this dataset
        */
       virtual unsigned int getNumberOfFeatures() const = 0;

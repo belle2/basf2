@@ -43,6 +43,7 @@ class ResolutionAnalysis(object):
         plot_name_prefix='',  # depricated use plot_name instead
         plot_name_postfix='',  # depricated use plot_name instead
         plot_title_postfix='',  # depricated use plot_title instead
+        referenceFileName=None,  # if set binnings of histograms will be read from corresponding histogram in this file
     ):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
@@ -70,6 +71,8 @@ class ResolutionAnalysis(object):
 
         self._contact = contact
         self.plots = collections.OrderedDict()
+
+        self.referenceFileName = referenceFileName
 
     def analyse(
         self,
@@ -148,7 +151,7 @@ class ResolutionAnalysis(object):
 
                 residuals_hist_name = formatter.format(plot_name, subplot_name="residuals") + \
                     "{}_to_{}".format(lower_bin, upper_bin)
-                vplot = ValidationPlot(residuals_hist_name)
+                vplot = ValidationPlot(residuals_hist_name, self.referenceFileName)
                 vplot.hist(sel_residuals,
                            outlier_z_score=outlier_z_score,
                            is_expert=is_expert)
@@ -178,7 +181,7 @@ class ResolutionAnalysis(object):
                 resolution_values += [(lower_bin, upper_bin, bin_center, gaus_sigma, gaus_sigma_err)]
 
             resolution_graph_name = formatter.format(plot_name, subplot_name="resolution")
-            resolution_graph = ValidationPlot(resolution_graph_name)
+            resolution_graph = ValidationPlot(resolution_graph_name, self.referenceFileName)
 
             # compile all requried data going into the final TGraphErrors
             xs = []

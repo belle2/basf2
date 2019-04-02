@@ -133,12 +133,19 @@ namespace Belle2 {
      * The pdgIds and names of the standard charged particle lists.
      * This is not supposed to change at any time (?).
      */
-    const std::unordered_map<int, std::string> m_charged_particle_lists = { { 11, "e" },
-      { 13, "mu" },
-      { 211, "pi" },
-      { 321, "K" },
-      { 2212, "p" },
-      { 1000010020, "d" }
+    const std::unordered_map<int, std::string> m_charged_particle_lists = {
+      { 11, "e-:electrons" },
+      { -11, "e+:electrons" },
+      { 13, "mu-:muons" },
+      { -13, "mu+:muons" },
+      { 211, "pi+:pions" },
+      { -211, "pi-:pions" },
+      { 321, "K+:kaons" },
+      { -321, "K-:kaons" },
+      { 2212, "p+:protons" },
+      { -2212, "p-:protons" },
+      { 1000010020, "d+:deuterons" },
+      { -1000010020, "d-:deuterons" }
     };
 
     /**

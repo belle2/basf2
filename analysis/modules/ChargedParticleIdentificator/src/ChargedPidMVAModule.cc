@@ -49,23 +49,33 @@ void ChargedPidMVAModule::event()
   auto sigPart = Const::ChargedStable(m_sig_pdg);
   auto bkgPart = Const::ChargedStable(m_bkg_pdg);
 
+  B2DEBUG(20, "EVENT: " << m_event_metadata->getEvent());
+
   for (const auto& [pdg, name] : m_charged_particle_lists) {
 
     StoreObjPtr<ParticleList> pList(name);
 
+    // The ParticleLists are for particles and antiparticles, but for now we are charge-agnostic...
+    auto abspdg = abs(pdg);
+
     // Skip if this particle list does not match any of the input (S, B) hypotheses.
-    if (pdg != sigPart.getPDGCode() && pdg != bkgPart.getPDGCode()) {
+    if (abspdg != sigPart.getPDGCode() && abspdg != bkgPart.getPDGCode()) {
       continue;
     }
+
+    B2DEBUG(20, "Particle list: " << pList->getParticleListName() << " - nr. particles in list: " << pList->getListSize());
 
     for (unsigned int ipart(0); ipart < pList->getListSize(); ++ipart) {
 
       Particle* particle = pList->getParticle(ipart);
 
+      B2DEBUG(20, "\tParticle [" << ipart << "]");
+
       // Check that the particle has a valid relation set between track and ECL cluster.
       // Otherwise, assign a NaN score and skip to next.
       if (!particle->getECLCluster()) {
         particle->writeExtraInfo(m_score_varname, std::numeric_limits<float>::quiet_NaN());
+        B2DEBUG(20, "\t --> Invalid track-cluster relation, skip...");
         continue;
       }
 
@@ -74,12 +84,28 @@ void ChargedPidMVAModule::event()
       auto p       = particle->getP();
       auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p);
 
-      auto nvars = m_variables.at(pdg).at(index).size();
+      B2DEBUG(20, "\t\tclusterTheta = " << theta << " [rad]");
+      B2DEBUG(20, "\t\tP = " << p << " [GeV/c]");
+      B2DEBUG(20, "\t\tweightfile idx in payload = " << index);
+
+      // Fill the MVA::SingleDataset w/ variables and spectators.
+      auto nvars  = m_variables.at(abspdg).at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
-        m_datasets.at(pdg).at(index)->m_input[ivar] = m_variables.at(pdg).at(index).at(ivar)->function(particle);
+        auto varobj =  m_variables.at(abspdg).at(index).at(ivar);
+        B2DEBUG(20, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << varobj->function(particle));
+        m_datasets.at(abspdg).at(index)->m_input[ivar] = varobj->function(particle);
       }
+      auto nspecs  = m_spectators.at(abspdg).at(index).size();
+      for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
+        auto specobj =  m_spectators.at(abspdg).at(index).at(ispec);
+        B2DEBUG(20, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << specobj->function(particle));
+        m_datasets.at(abspdg).at(index)->m_spectators[ispec] = specobj->function(particle);
+      }
+
       // NB: the MVA::Expert used to calculate the score must be the one trained to discriminate THIS signal hypothesis!
-      float score = m_experts.at(sigPart.getPDGCode()).at(index)->apply(*m_datasets.at(pdg).at(index))[0];
+      float score = m_experts.at(sigPart.getPDGCode()).at(index)->apply(*m_datasets.at(abspdg).at(index))[0];
+
+      B2DEBUG(20, "\t\tscore = " << score);
 
       // Store the MVA score as a new particle object property.
       particle->writeExtraInfo(m_score_varname, score);
@@ -114,11 +140,14 @@ void ChargedPidMVAModule::initializeMVA()
   // Iterate over standard charged particles.
   for (const auto& [pdg, name] : m_charged_particle_lists) {
 
+    // Our MVA training is charge-agnostic atm, hence we skip negative pdgIds...
+    if (pdg < 0) { continue; }
+
     B2INFO("\tLoading weightfiles from the payload class for particle hypothesis: (" << pdg << "," << name << ")");
 
     auto serialized_weightfiles = m_weightfiles_representation->getMVAWeights(pdg);
 
-    B2INFO("\tConstruct the MVA experts and datasets from the weightfiles...");
+    B2INFO("\tConstruct the MVA experts and datasets from N = " << serialized_weightfiles->size() << " weightfiles...");
 
     // Initialise list of experts/ds for this pdgId.
     ExpertsList experts(serialized_weightfiles->size());
@@ -128,6 +157,8 @@ void ChargedPidMVAModule::initializeMVA()
     VariablesList variables, spectators;
 
     for (unsigned int idx(0); idx < serialized_weightfiles->size(); idx++) {
+
+      B2DEBUG(30, "\t\tweightfile[" << idx << "]");
 
       // De-serialize the string into an MVA::Weightfile object.
       std::stringstream ss(serialized_weightfiles->at(idx));
@@ -141,14 +172,21 @@ void ChargedPidMVAModule::initializeMVA()
       variables.push_back(manager.getVariables(general_options.m_variables));
       spectators.push_back(manager.getVariables(general_options.m_spectators));
 
+      B2DEBUG(30, "\t\tRetrieved N = " << general_options.m_variables.size() << " variables");
+      B2DEBUG(30, "\t\tRetrieved N = " << general_options.m_spectators.size() << " spectators");
+
       // Store an MVA::Expert object.
       experts[idx] = supported_interfaces[general_options.m_method]->getExpert();
       experts.at(idx)->load(weightfile);
 
+      B2DEBUG(30, "\t\tweightfile loaded successfully into expert[" << idx << "]!");
+
       // Store an MVA::SingleDataset object, in which we will save our features later...
       std::vector<float> v(general_options.m_variables.size(), 0.0);
       std::vector<float> s(general_options.m_spectators.size(), 0.0);
-      datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, v, 1.0);
+      datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, v, 1.0, s);
+
+      B2DEBUG(30, "\t\tdataset[" << idx << "] created successfully!");
 
     }
 

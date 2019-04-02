@@ -131,9 +131,6 @@ namespace Belle2 {
     /** Reconstructed number MPPC pixels. */
     TH1F* m_bklmNPixel;
 
-    /** Detector-module identifier. */
-    TH1F* m_bklmModuleID;
-
     /** z-measuring strip numbers of the 2D hit. */
     TH1F* m_bklmZStrips;
 

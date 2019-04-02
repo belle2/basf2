@@ -29,7 +29,6 @@ KLMDQMModule::KLMDQMModule() :
   m_bklmCtime(nullptr),
   m_bklmEDep(nullptr),
   m_bklmNPixel(nullptr),
-  m_bklmModuleID(nullptr),
   m_bklmZStrips(nullptr),
   m_bklmPhiStrip(nullptr),
   m_bklmSector(nullptr),
@@ -112,9 +111,6 @@ void KLMDQMModule::defineHistoBKLM()
   m_bklmNPixel = new TH1F("nPixel", "Reconstructed number of MPPC pixels",
                           500, 0, 500);
   m_bklmNPixel->GetXaxis()->SetTitle("Reconstructed number of MPPC pixels");
-  m_bklmModuleID = new TH1F("module ID", "detector-module identifier",
-                            40, 0, 200000000);
-  m_bklmModuleID->GetXaxis()->SetTitle("detector-module identifier");
   m_bklmZStrips = new TH1F("zStrips", "z-measuring strip numbers of the 2D hit",
                            54, 0, 54);
   m_bklmZStrips->GetXaxis()->SetTitle("z-measuring strip numbers of the 2D hit");
@@ -210,7 +206,6 @@ void KLMDQMModule::beginRun()
   m_bklmCtime->Reset();
   m_bklmEDep->Reset();
   m_bklmNPixel->Reset();
-  m_bklmModuleID->Reset();
   m_bklmZStrips->Reset();
   m_bklmPhiStrip->Reset();
   m_bklmSector->Reset();
@@ -268,7 +263,6 @@ void KLMDQMModule::event()
   int nnent = hits.getEntries();
   for (i = 0; i < nnent; i++) {
     BKLMHit2d* hit = static_cast<BKLMHit2d*>(hits[i]);
-    m_bklmModuleID->Fill(hit->getModuleID());
     m_bklmZStrips->Fill(hit->getZStripAve());
     m_bklmPhiStrip->Fill(hit->getPhiStripAve());
     m_bklmSector->Fill(hit->getSector());

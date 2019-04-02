@@ -24,6 +24,7 @@
 // ROOT
 #include <TObject.h>
 #include <TH2F.h>
+#include <TParameter.h>
 
 //BOOST
 #include <boost/algorithm/string/predicate.hpp>
@@ -48,12 +49,29 @@ namespace Belle2 {
     /**
      * Default constructor, necessary for ROOT to stream the object.
      */
-    ChargedPidMVAWeights() {}
+    ChargedPidMVAWeights() :
+      m_energy_unit("energyUnit", Unit::rad),
+      m_ang_unit("angularUnit", Unit::GeV)
+    {};
+
 
     /**
      * Destructor.
      */
     ~ChargedPidMVAWeights() {};
+
+
+    /**
+     * Set the energy unit to ensure consistency w/ the one used to define the bins grid.
+     */
+    void setEnergyUnit(const double& unit) { m_energy_unit.SetVal(unit); }
+
+
+    /**
+     * Set the angular unit to ensure consistency w/ the one used to define the bins grid.
+     */
+    void setAngularUnit(const double& unit) { m_ang_unit.SetVal(unit); }
+
 
     /**
      * Set the (cluster theta, p) grid of bins for this particle mass hypothesis' pdgId into the payload.
@@ -126,7 +144,7 @@ namespace Belle2 {
 
       int nbinsx = grid->GetXaxis()->GetNbins(); // nr. of theta (visible) bins, along X.
 
-      int glob_bin_idx = findBin(grid, theta, p);
+      int glob_bin_idx = findBin(grid, theta / m_ang_unit.GetVal(), p / m_energy_unit.GetVal());
       int j, i, k;
       grid->GetBinXYZ(glob_bin_idx, j, i, k);
 
@@ -178,6 +196,9 @@ namespace Belle2 {
 
   private:
 
+    TParameter<double> m_energy_unit; /**< The energy unit used for defining the bins grid. */
+    TParameter<double> m_ang_unit;    /**< The angular unit used for defining the bins grid. */
+
     /**
       * This map contains - for each charged particle mass hypothesis' pdgId - a 2D (clusterTheta, p) grid of bins as a TH2F.
       * It can be used to lookup the correct xml weightfile in the payload, given a pdgId, clusterTheta and p.
@@ -204,8 +225,9 @@ namespace Belle2 {
       { 1000010020, std::vector<std::string>() }
     };
 
-    ClassDef(ChargedPidMVAWeights, 1);
+    ClassDef(ChargedPidMVAWeights, 2);
     // 1: first class implementation.
+    // 2: add energy/angular units.
   };
 
 }

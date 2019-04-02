@@ -77,7 +77,6 @@ klm_cluster = [
     'klmClusterIsBackwardEKLM',
     'klmClusterTheta',
     'klmClusterPhi',
-    'maximumKLMAngleCMS',
     'nKLMClusterTrackMatches',
     'nMatchedKLMClusters',
 ]

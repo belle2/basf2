@@ -234,23 +234,42 @@ namespace Belle2 {
 
     double maximumKLMAngleCMS(const Particle* particle)
     {
+      // check there actually are KLM clusters in the event
       StoreArray<KLMCluster> clusters;
-      if (clusters.getEntries() == 0) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (clusters.getEntries() == 0) return std::numeric_limits<double>::quiet_NaN();
 
+      // get the input particle's vector momentum in the CMS frame
       PCmsLabTransform T;
       const TVector3 pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
 
+      // find the KLM cluster with the largest angle
       double maxAngle = 0.0;
-      for (int iKLM = 0; iKLM < clusters.getEntries(); iKLM++) {
-        const TVector3 clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
+      for (const auto cluster : clusters) {
+        const TVector3 clusterMomentumCms = (T.rotateLabToCms() * cluster.getMomentum()).Vect();
         double angle = pCms.Angle(clusterMomentumCms);
-        if (angle > maxAngle) {
-          maxAngle = angle;
-        }
+        if (angle > maxAngle) maxAngle = angle;
       }
       return maxAngle;
+    }
+
+    double minimumKLMAngleCMS(const Particle* particle)
+    {
+      // check there actually are KLM clusters in the event
+      StoreArray<KLMCluster> clusters;
+      if (clusters.getEntries() == 0) return std::numeric_limits<double>::quiet_NaN();
+
+      // get the input particle's vector momentum in the CMS frame
+      PCmsLabTransform T;
+      const TVector3 pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
+
+      // find the KLM cluster with the smallest angle
+      double minAngle = M_PI;
+      for (const auto cluster : clusters) {
+        const TVector3 clusterMomentumCms = (T.rotateLabToCms() * cluster.getMomentum()).Vect();
+        double angle = pCms.Angle(clusterMomentumCms);
+        if (angle < minAngle) minAngle = angle;
+      }
+      return minAngle;
     }
 
     double nKLMClusterTrackMatches(const Particle* particle)
@@ -294,6 +313,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("klmClusterPhi", klmClusterPhi, "Returns KLMCluster's phi.");
     REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
                       "Returns the maximum angle in the CMS between the Particle and all KLM clusters in the event.");
+    REGISTER_VARIABLE("minimumKLMAngleCMS", minimumKLMAngleCMS ,
+                      "Returns the minimum angle in the CMS between the Particle and all KLM clusters in the event.");
     REGISTER_VARIABLE("nKLMClusterTrackMatches", nKLMClusterTrackMatches,
                       "Returns the number of Tracks matched to the KLMCluster associated to this Particle (0 for K_L0, >0 for matched Tracks, NaN for not-matched Tracks).");
     REGISTER_VARIABLE("nMatchedKLMClusters", nMatchedKLMClusters,

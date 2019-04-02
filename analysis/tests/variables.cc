@@ -2946,6 +2946,91 @@ namespace {
                     b2bPhi->function(gammalist->getParticle(0)));
   }
 
+  TEST_F(ECLVariableTest, KLMCMSHelpersTest)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+
+    // connect gearbox for CMS boosting etc
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma:test");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // grab variables for testing
+    const Manager::Var* max = Manager::Instance().getVariable("maximumKLMAngleCMS");
+    const Manager::Var* min = Manager::Instance().getVariable("minimumKLMAngleCMS");
+
+    EXPECT_EQ(gammalist->getListSize(), 3);
+
+    {
+      // should all be NaN as there are no KLMClusters in the storearray yet
+      ASSERT_TRUE(std::isnan(max->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(min->function(gammalist->getParticle(0))));
+    }
+
+    // now add KLMClusters to the datastore
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<KLMCluster> klmclusters;
+    klmclusters.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+
+    KLMCluster* k1 = klmclusters.appendNew(KLMCluster());
+    k1->setClusterPosition(2, 2, 0.5); // somewhere in the ECL barrel - sameish as photon 1
+    k1->setMomentumMag(3);
+    EXPECT_EQ(klmclusters.getEntries(), 1);
+
+    {
+      // there is now one and only one KLMCluster, so the minimum should also be
+      // the maximum for all photons
+      EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(0)), min->function(gammalist->getParticle(0)));
+      EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(1)), min->function(gammalist->getParticle(1)));
+      EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(2)), min->function(gammalist->getParticle(2)));
+    }
+
+    KLMCluster* k2 = klmclusters.appendNew(KLMCluster());
+    k2->setClusterPosition(-1.9, -1.5, -0.15); // opposite! far from photon 1 (and a bit of boosting by eye)
+    k2->setMomentumMag(3);
+    EXPECT_EQ(klmclusters.getEntries(), 2);
+
+    {
+      // there are now two clusters, one close to photon 1
+      EXPECT_TRUE(min->function(gammalist->getParticle(1)) < min->function(gammalist->getParticle(0)));
+      EXPECT_TRUE(min->function(gammalist->getParticle(1)) < min->function(gammalist->getParticle(2)));
+
+      // and one far from photon 1
+      EXPECT_TRUE(max->function(gammalist->getParticle(1)) < max->function(gammalist->getParticle(0)));
+      EXPECT_TRUE(max->function(gammalist->getParticle(1)) < max->function(gammalist->getParticle(2)));
+
+      // not particularly intelligent, but also check the precise values are reproducable
+      EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(0)), 1.8632624);
+      EXPECT_FLOAT_EQ(min->function(gammalist->getParticle(0)), 1.7109571);
+      EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(1)), 1.8251470);
+      EXPECT_FLOAT_EQ(min->function(gammalist->getParticle(1)), 1.2793235);
+      EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(2)), 2.0248148);
+      EXPECT_FLOAT_EQ(min->function(gammalist->getParticle(2)), 1.5056936);
+    }
+  }
+
   TEST_F(ECLVariableTest, clusterKinematicsTest)
   {
     // we need the particles and ECLClusters arrays

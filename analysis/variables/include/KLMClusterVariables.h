@@ -110,6 +110,11 @@ namespace Belle2 {
     double maximumKLMAngleCMS(const Particle* particle);
 
     /**
+     * returns the minimum angle of a KLMCluster to this Particle in the CMS frame
+     */
+    double minimumKLMAngleCMS(const Particle* particle);
+
+    /**
      * returns the number of Tracks matched to the KLMCluster associated to this Particle
      * (0 for K_L0, >0 for matched Tracks, NaN for not-matched Tracks).
      */

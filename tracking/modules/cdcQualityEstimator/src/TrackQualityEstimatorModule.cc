@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/qualityEstimatorCDC/TrackQualityEstimatorModule.h>
+#include <tracking/modules/cdcQualityEstimator/TrackQualityEstimatorModule.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 using namespace Belle2;

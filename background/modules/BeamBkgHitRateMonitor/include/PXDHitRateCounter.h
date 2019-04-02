@@ -95,6 +95,7 @@ namespace Belle2 {
       // class parameters: to be set via constructor or setters
       double m_integrationTime = 20 * Unit::us; ; /**< Integration time of PXD in ns */
       bool m_maskDeadPixels = true; /**< Correct bg rates by taking into account masked pixels */
+      int m_nPXDSensors = 0;
 
       const double c_densitySi = 2.3290 * Unit::g_cm3; /**< Density of crystalline Silicon */
 

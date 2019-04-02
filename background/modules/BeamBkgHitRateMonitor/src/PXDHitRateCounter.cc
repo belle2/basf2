@@ -23,6 +23,14 @@ namespace Belle2 {
 
     void PXDHitRateCounter::initialize(TTree* tree)
     {
+      //Pointer to GeoTools instance
+      auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+      if (gTools->getNumberOfPXDLayers() == 0) {
+        B2FATAL("Missing geometry for PXD.");
+      }
+
+      m_nPXDSensors = gTools->getNumberOfPXDSensors();
+
       // register collection(s) as optional, your detector might be excluded in DAQ
       m_digits.isOptional();
 
@@ -128,7 +136,7 @@ namespace Belle2 {
       auto gTools = VXD::GeoCache::getInstance().getGeoTools();
 
       // Compute sensor level averages per 1Hz
-      for (int index = 0; index < 40; index++) {
+      for (int index = 0; index < m_nPXDSensors; index++) {
         VxdID sensorID = gTools->getSensorIDFromPXDIndex(index);
         auto info = getInfo(sensorID);
         double currentSensorMass = m_activeAreas[index] * info.getThickness() * c_densitySi;
@@ -148,14 +156,9 @@ namespace Belle2 {
     {
       //Pointer to GeoTools instance
       auto gTools = VXD::GeoCache::getInstance().getGeoTools();
-      if (gTools->getNumberOfPXDLayers() == 0) {
-        B2FATAL("Missing geometry for PXD.");
-      }
-
-      int nPXDSensors = gTools->getNumberOfPXDSensors();
 
       // Initialize active areas and active fractions for all sensors
-      for (int index = 0; index < nPXDSensors; index++) {
+      for (int index = 0; index < m_nPXDSensors; index++) {
         VxdID sensorID = gTools->getSensorIDFromPXDIndex(index);
         auto info = getInfo(sensorID);
 

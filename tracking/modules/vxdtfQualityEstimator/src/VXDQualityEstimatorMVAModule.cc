@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/vxdtfQualityEstimator/QualityEstimatorMVAModule.h>
+#include <tracking/modules/vxdtfQualityEstimator/VXDQualityEstimatorMVAModule.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
@@ -18,9 +18,9 @@
 using namespace Belle2;
 
 
-REG_MODULE(QualityEstimatorMVA)
+REG_MODULE(VXDQualityEstimatorMVA)
 
-QualityEstimatorMVAModule::QualityEstimatorMVAModule() : Module()
+VXDQualityEstimatorMVAModule::VXDQualityEstimatorMVAModule() : Module()
 {
   //Set module properties
   setDescription("The quality estimator module for SpacePointTrackCandidates.");
@@ -41,7 +41,7 @@ QualityEstimatorMVAModule::QualityEstimatorMVAModule() : Module()
   addParam("ClusterInformation", m_ClusterInformation, "How to compile information from clusters ['Average']", std::string(""));
 }
 
-void QualityEstimatorMVAModule::initialize()
+void VXDQualityEstimatorMVAModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
@@ -67,7 +67,7 @@ void QualityEstimatorMVAModule::initialize()
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }
 
-void QualityEstimatorMVAModule::beginRun()
+void VXDQualityEstimatorMVAModule::beginRun()
 {
   m_mvaExpert->beginRun();
   // BField is required by all QualityEstimators
@@ -75,7 +75,7 @@ void QualityEstimatorMVAModule::beginRun()
   m_estimator->setMagneticFieldStrength(bFieldZ);
 }
 
-void QualityEstimatorMVAModule::event()
+void VXDQualityEstimatorMVAModule::event()
 {
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {

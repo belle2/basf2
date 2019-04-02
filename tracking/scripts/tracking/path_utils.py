@@ -692,7 +692,7 @@ def add_vxd_track_finding_vxdtf2(
         )
 
         path.add_module(
-            "QualityEstimatorMVA",
+            "VXDQualityEstimatorMVA",
             WeightFileIdentifier=vxdtf_quality_estimator_weightfile,
             EstimationMethod="tripletFit",
             SpacePointTrackCandsStoreArrayName=nameSPTCs,

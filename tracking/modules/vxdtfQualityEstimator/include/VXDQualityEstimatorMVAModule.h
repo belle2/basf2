@@ -30,12 +30,12 @@ namespace Belle2 {
   * This module can support most estimation strategies that implement the interface QualityEstimatorBase
   * and use them together with cluster information to calculate a new QI using MVA.
   *  */
-  class QualityEstimatorMVAModule : public Module {
+  class VXDQualityEstimatorMVAModule : public Module {
 
   public:
 
     /** Constructor of the module. */
-    QualityEstimatorMVAModule();
+    VXDQualityEstimatorMVAModule();
 
     /** Initializes the Module. */
     void initialize() override;

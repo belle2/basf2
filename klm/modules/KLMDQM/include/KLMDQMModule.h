@@ -155,6 +155,9 @@ namespace Belle2 {
     /** Position projected into y-z plane of muon hit. */
     TH2F* m_bklmHit2dsYvsz;
 
+    /** Layer VS Sector histogram for the BKLM forward and backward regions. */
+    TH2F* m_bklmLayerVsSector[2];
+
   };
 
 }

@@ -36,7 +36,8 @@ KLMDQMModule::KLMDQMModule() :
   m_bklmHit2dsZ(nullptr),
   m_bklmHit2dsYvsx(nullptr),
   m_bklmHit2dsXvsz(nullptr),
-  m_bklmHit2dsYvsz(nullptr)
+  m_bklmHit2dsYvsz(nullptr),
+  m_bklmLayerVsSector{nullptr, nullptr}
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -146,7 +147,20 @@ void KLMDQMModule::defineHistoBKLM()
   m_bklmHit2dsYvsz->GetXaxis()->SetTitle("z, cm");
   m_bklmHit2dsYvsz->GetYaxis()->SetTitle("y, cm");
   m_bklmHit2dsYvsz->SetOption("LIVE");
-
+  m_bklmLayerVsSector[0] =
+    new TH2F("BackwardLayerVSSector", "Sector VS Layer in barrel forward",
+             30, -0.25, 14.75, 16, -0.25, 7.75);
+  m_bklmLayerVsSector[0]->GetXaxis()->SetTitle("Layer");
+  m_bklmLayerVsSector[0]->GetYaxis()->SetTitle("Sector");
+  m_bklmLayerVsSector[0]->SetStats(0);
+  m_bklmLayerVsSector[0]->SetOption("colz");
+  m_bklmLayerVsSector[1] =
+    new TH2F("ForwardLayerVSSector", "Sector VS Layer in barrel backward",
+             30, -0.25, 14.75, 16, -0.25, 7.75);
+  m_bklmLayerVsSector[1]->GetXaxis()->SetTitle("Layer");
+  m_bklmLayerVsSector[1]->GetYaxis()->SetTitle("Sector");
+  m_bklmLayerVsSector[1]->SetStats(0);
+  m_bklmLayerVsSector[1]->SetOption("colz");
   oldDir->cd();
 }
 
@@ -210,6 +224,8 @@ void KLMDQMModule::beginRun()
   m_bklmHit2dsYvsx->Reset();
   m_bklmHit2dsXvsz->Reset();
   m_bklmHit2dsYvsz->Reset();
+  m_bklmLayerVsSector[0]->Reset();
+  m_bklmLayerVsSector[1]->Reset();
 }
 
 void KLMDQMModule::event()
@@ -252,6 +268,8 @@ void KLMDQMModule::event()
       m_TimeScintillatorBKLM->Fill(digit->getTime());
     m_bklmEDep->Fill(digit->getEDep());
     m_bklmNPixel->Fill(digit->getNPixel());
+    m_bklmLayerVsSector[1 - digit->isForward()]->Fill(
+      digit->getLayer() - 1, digit->getSector() - 1);
   }
   StoreArray<BKLMHit2d> hits(m_outputHitsName);
   int nnent = hits.getEntries();

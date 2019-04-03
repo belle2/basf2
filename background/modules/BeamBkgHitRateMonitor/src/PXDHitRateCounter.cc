@@ -45,7 +45,7 @@ namespace Belle2 {
       if (m_integrationTime <= 0) B2FATAL("invalid integration time window for PXD: " << m_integrationTime);
 
       // set fractions of active channels
-      setActiveFractions();
+      setActivePixels();
     }
 
     void PXDHitRateCounter::clear()
@@ -80,8 +80,8 @@ namespace Belle2 {
         double hitEnergy = storeDigit.getCharge() * ADUToEnergy;
         rates.doseRates[index] += (hitEnergy / Unit::J);
 
-        if (m_activeFractions[index] > 0) {
-          occupancies[index] += 1.0 / m_activeFractions[index];
+        if (m_activePixels[index] > 0) {
+          occupancies[index] += 1.0 / m_activePixels[index];
         }
       }
 
@@ -152,7 +152,7 @@ namespace Belle2 {
       }
     }
 
-    void PXDHitRateCounter::setActiveFractions()
+    void PXDHitRateCounter::setActivePixels()
     {
       //Pointer to GeoTools instance
       auto gTools = VXD::GeoCache::getInstance().getGeoTools();
@@ -163,7 +163,7 @@ namespace Belle2 {
         auto info = getInfo(sensorID);
 
         // Compute nominal number of pixel per sensor
-        m_activeFractions[index] = info.getUCells() * info.getVCells();
+        m_activePixels[index] = info.getUCells() * info.getVCells();
         // Compute nominal area per sensor
         m_activeAreas[index] = info.getWidth() * info.getLength();
 
@@ -172,7 +172,7 @@ namespace Belle2 {
             for (int vi = 0; vi < info.getVCells(); ++vi) {
               if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, ui, vi)
                   || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, ui, vi)) {
-                m_activeFractions[index] -= 1;
+                m_activePixels[index] -= 1;
                 m_activeAreas[index] -= info.getVPitch(info.getVCellPosition(vi)) * info.getUPitch();
               }
             }

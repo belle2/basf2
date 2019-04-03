@@ -90,7 +90,7 @@ namespace Belle2 {
       /**
        * Sets fractions of active channels
        */
-      void setActiveFractions();
+      void setActivePixels();
 
       // class parameters: to be set via constructor or setters
       double m_integrationTime = 20 * Unit::us; ; /**< Integration time of PXD in ns */
@@ -110,7 +110,7 @@ namespace Belle2 {
       StoreArray<PXDCluster> m_clusters;  /**< collection of clusters */
 
       // other
-      double m_activeFractions[40] = {0}; /**< fractions of active pixels in sensor */
+      double m_activePixels[40] = {0}; /**< fractions of active pixels in sensor */
       double m_activeAreas[40] = {0}; /**< area of active pixels in sensor */
     };
 

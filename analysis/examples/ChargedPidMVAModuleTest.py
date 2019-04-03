@@ -107,7 +107,7 @@ if __name__ == '__main__':
     # Make an NTuple.
     # ---------------
 
-    filename = "chargedpid_ntuples.root"
+    filename = f"chargedpid_{args.sigPdgId}_vs_{args.bkgPdgId}_ntuples.root"
     for plist in plists:
         variablesToNtuple(decayString=plist[0],
                           variables=[f"chargedPidBDT({args.sigPdgId},{args.bkgPdgId})"],

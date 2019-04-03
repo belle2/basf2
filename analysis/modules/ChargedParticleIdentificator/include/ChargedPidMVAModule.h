@@ -32,9 +32,6 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
-//C++
-#include <unordered_map>
-
 
 namespace Belle2 {
 
@@ -42,8 +39,8 @@ namespace Belle2 {
    *
    * This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B.
    *
-   * It takes the Particle objects in a charged stable particle's ParticleList, calculates the MVA score
-   * using the appropriate xml weight file for a given input set of (S,B) mass hypotheses,
+   * For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists,
+   * calculates the MVA score using the appropriate xml weight file,
    * and adds it as ExtraInfo to the Particle objects.
    *
    */
@@ -51,11 +48,7 @@ namespace Belle2 {
 
     typedef std::vector<std::unique_ptr<MVA::Expert> > ExpertsList; /**< Typedef */
     typedef std::vector<std::unique_ptr<MVA::SingleDataset> > DatasetsList; /**< Typedef */
-    typedef std::vector< std::vector<const Variable::Manager::Var*> > VariablesList; /**< Typedef */
-
-    typedef std::unordered_map<int, ExpertsList > ExpertsByParticle; /**< Typedef */
-    typedef std::unordered_map<int, DatasetsList > DatasetsByParticle; /**< Typedef */
-    typedef std::unordered_map<int, VariablesList > VariablesListsByParticle; /**< Typedef */
+    typedef std::vector< std::vector<const Variable::Manager::Var*> > VariablesLists; /**< Typedef */
 
   public:
 
@@ -108,7 +101,7 @@ namespace Belle2 {
     /**
      * 1. Check if a payload is found in the database.
      * 2. Check the MVA weights for consistency every time they change in the database.
-     * 3. Load MVA weight files, and set MVA::Expert and MVA::SingleDataset objects for each file.
+     * 3. Load MVA weight files for the given signal hypothesis, and set MVA::Expert and MVA::SingleDataset objects for each file found.
     */
     void initializeMVA();
 
@@ -147,28 +140,28 @@ namespace Belle2 {
     DBObjPtr<ChargedPidMVAWeights> m_weightfiles_representation;
 
     /**
-     * This map contains - for each charged particle mass hypothesis' pdgId - a list of MVA::Expert objects.
-     * One Expert to be stored for each xml file found in the database.
+     * List of MVA::Expert objects.
+     * One Expert to be stored for each xml file found in the database for the given signal mass hypothesis.
      */
-    ExpertsByParticle m_experts;
+    ExpertsList m_experts;
 
     /**
-     * This map contains - for each charged particle mass hypothesis' pdgId - a list of MVA::SingleDataset objects.
-     * One DS to be stored for each xml file found in the database.
+     * List of MVA::SingleDataset objects.
+     * One DS to be stored for each xml file found in the database for the given signal mass hypothesis.
      */
-    DatasetsByParticle m_datasets;
+    DatasetsList m_datasets;
 
     /**
-     * This map contains - for each charged particle mass hypothesis' pdgId - a list of lists of feature variables.
-     * One list of lists to be stored for each xml file found in the database.
+     * List of lists of feature variables.
+     * One list of lists to be stored for each xml file found in the database for the given signal mass hypothesis.
      */
-    VariablesListsByParticle m_variables;
+    VariablesLists m_variables;
 
     /**
-     * This map contains - for each charged particle mass hypothesis' pdgId - a list of lists of spectator variables.
-     * One list of lists to be stored for each xml file found in the database.
+     * List of lists of spectator variables.
+     * One list of lists to be stored for each xml file found in the database for the given signal mass hypothesis.
      */
-    VariablesListsByParticle m_spectators;
+    VariablesLists m_spectators;
 
   };
 }

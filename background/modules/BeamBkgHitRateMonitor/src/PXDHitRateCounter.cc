@@ -79,13 +79,11 @@ namespace Belle2 {
                               storeDigit.getVCellID());
         double hitEnergy = storeDigit.getCharge() * ADUToEnergy;
         rates.doseRates[index] += (hitEnergy / Unit::J);
-
-        if (m_activePixels[index] > 0) {
-          occupancies[index] += 1.0 / m_activePixels[index];
-        }
+        occupancies[index] += 1.0;
       }
 
-      for (int index = 0; index < 40; index++) {
+      for (int index = 0; index < m_nPXDSensors; index++) {
+        occupancies[index] /= m_activePixels[index];
         rates.meanOccupancies[index] += occupancies[index];
         if (rates.maxOccupancies[index] < occupancies[index]) {
           rates.maxOccupancies[index] = occupancies[index];

@@ -179,6 +179,11 @@ namespace Belle2 {
     bool fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const;
 
     /**
+     * FIXME temporary workaround for monopoles, in order not to change Const::ChargedStable types.
+     */
+    bool fit(RecoTrack& recoTrack, const int pdgCode) const;
+
+    /**
      * Fit a reco track with the already present cardinal representation or with pion as default.
      *
      * If the cardinal particle hypothesis is already

@@ -103,9 +103,14 @@ void BaseRecoFitterModule::event()
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
     for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
-      Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
-      B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
-      const bool wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
+      bool wasFitSuccessful; //FIXME this is ugly, but atm changing framework/const.h seems even worse
+      if (pdgCodeToUseForFitting != 99666) {
+        Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
+        B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
+        wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
+      } else {
+        wasFitSuccessful = fitter.fit(recoTrack, pdgCodeToUseForFitting);
+      }
       const genfit::AbsTrackRep* trackRep = recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting);
 
       if (!trackRep) {

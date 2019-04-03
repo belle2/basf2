@@ -7,6 +7,7 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
 #include <genfit/RKTrackRep.h>
+#include <tracking/dataobjects/monopoles/MplTrackRep.h>
 
 #include <framework/dataobjects/Helix.h>
 
@@ -398,7 +399,11 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
 
   // not available? create one
   if (trackRepresentation == nullptr) {
-    trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    if (PDGcode == 99666) { //FIXME prototyping
+      trackRepresentation = new genfit::MplTrackRep(PDGcode, 1.0);
+    } else {
+      trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    }
     RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
   }
   return trackRepresentation;

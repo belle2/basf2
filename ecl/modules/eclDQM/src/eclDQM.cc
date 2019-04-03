@@ -54,7 +54,7 @@ ECLDQMModule::ECLDQMModule() : HistoModule()
            "histogram directory in ROOT file", std::string("ECL"));
   addParam("NHitsUpperThr1", m_NHitsUpperThr1, "Upper threshold of number of hits in event", 10000);
   addParam("NHitsUpperThr2", m_NHitsUpperThr2, "Upper threshold of number of hits in event (w/ Thr=10 MeV)", 1000);
-  addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 10.0 * Belle2::Unit::GeV);
+  addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 12.0 * Belle2::Unit::GeV);
   addParam("PedestalMeanUpperThr", m_PedestalMeanUpperThr, "Upper threshold of pedestal distribution", 15000);
   addParam("PedestalMeanLowerThr", m_PedestalMeanLowerThr, "Lower threshold of pedestal distribution", -15000);
   addParam("PedestalRmsUpperThr", m_PedestalRmsUpperThr, "Upper threshold of pedestal rms error distribution", 1000.);

@@ -26,7 +26,17 @@ template class TrackFindingCDC::ChooseableFilter<TrackQualityFilterFactory>;
 TrackQualityEstimator::TrackQualityEstimator(const std::string& defaultFilterName)
   : m_trackQualityFilter(defaultFilterName)
 {
-  this->addProcessingSignalListener(&m_mcCloneLookUpFiller);
+  const std::string filterName = m_trackQualityFilter.getFilterName();
+  const std::vector<std::string> filtersRequiringCloneTruth{"truth", "recording", "eval"};
+  // if filter name in list of filters requiring MC truth about clones, notify an
+  // CDCMCCloneLookUpFiller instance
+  if (std::find(std::begin(filtersRequiringCloneTruth),
+                std::end(filtersRequiringCloneTruth),
+                filterName)
+      != std::end(filtersRequiringCloneTruth)) {
+    this->addProcessingSignalListener(&m_mcCloneLookUpFiller);
+  }
+
   this->addProcessingSignalListener(&m_trackQualityFilter);
 }
 

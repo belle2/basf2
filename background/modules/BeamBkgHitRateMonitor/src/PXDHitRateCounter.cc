@@ -83,7 +83,9 @@ namespace Belle2 {
       }
 
       for (int index = 0; index < m_nPXDSensors; index++) {
-        occupancies[index] /= m_activePixels[index];
+        if (m_activePixels[index] > 0) {
+          occupancies[index] /= m_activePixels[index];
+        }
         rates.meanOccupancies[index] += occupancies[index];
         if (rates.maxOccupancies[index] < occupancies[index]) {
           rates.maxOccupancies[index] = occupancies[index];

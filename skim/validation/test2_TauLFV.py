@@ -19,7 +19,7 @@ from skim.standardlists.lightmesons import *
 
 taulfvskim = Path()
 
-inputMdst('MC9', '../TauLFV.udst.root', path=taulfvskim)
+inputMdst('default', '../TauLFV.udst.root', path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)
 stdK('loose', path=taulfvskim)

@@ -17,7 +17,7 @@ from stdPhotons import *
 
 tauthrustskim = Path()
 
-inputMdst('MC9', '../TauThrust.udst.root', path=tauthrustskim)
+inputMdst('default', '../TauThrust.udst.root', path=tauthrustskim)
 
 stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)

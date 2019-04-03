@@ -113,6 +113,8 @@ namespace Belle2 {
       int m_nBinsU; /**< Number of regions per sensor along u side */
       int m_nBinsV; /**< Number of regions per sensor along v side */
 
+      int m_nPXDSensors = 0;
+
       std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
       std::map<unsigned long long int,  std::map<VxdID, SensorData> > m_buffer; /**< Struct to hold sensor-wise background data. */
       std::map<VxdID, int> m_sensitivePixelMap; /**< Struct to hold sensor-wise number of sensitive pixels */

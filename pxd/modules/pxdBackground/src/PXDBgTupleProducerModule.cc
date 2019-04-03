@@ -85,10 +85,10 @@ void PXDBgTupleProducerModule::initialize()
   if (gTools->getNumberOfPXDLayers() == 0) {
     B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
   }
-  int nPXDSensors = gTools->getNumberOfPXDSensors();
+  m_nPXDSensors = gTools->getNumberOfPXDSensors();
 
   // Initialize m_sensorData with empty sensorData for all sensors
-  for (int i = 0; i < nPXDSensors; i++) {
+  for (int i = 0; i < m_nPXDSensors; i++) {
     VxdID sensorID = gTools->getSensorIDFromPXDIndex(i);
     m_sensorData[sensorID] = SensorData();
     // Start value for minOccupancy should be one not zero
@@ -177,6 +177,11 @@ void PXDBgTupleProducerModule::event()
 
   // Empty map for computing event wise occupancy
   std::map<VxdID, double> occupancyMap;
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  for (int i = 0; i < m_nPXDSensors; i++) {
+    VxdID sensorID = gTools->getSensorIDFromPXDIndex(i);
+    occupancyMap[sensorID] = 0.0;
+  }
 
   // Check if there is PXD data
   if (storeDigits.getEntries() > 0) {

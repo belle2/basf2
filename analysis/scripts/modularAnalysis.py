@@ -2289,18 +2289,57 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
-def applyChargedPidMVA(sigPdgId, bkgPdgId, path=analysis_main):
+def applyChargedPidMVA(sigPdgId, bkgPdgId, particleLists, path=analysis_main):
     """
-    Apply charged particle identification MVA (binary separation S vs B),
-    decorating particles w/ MVA score variables.
+    Apply particle identification for charged stable particles using an MVA.
+    The module decorates Particle objects in the input ParticleList(s) w/ variables
+    containing the appropriate MVA score, which can be used to select candidates.
+
+    Currently, particle identification works as 'binary' separation between
+    input S, B particle mass hypotheses according to the following scheme:
+
+    -) e (11) vs. pi (211)
+    -) mu (13) vs. pi (211)
+    -) pi (211) vs K (321)
+    -) K (321) vs pi (211)
+    -) p (2212) vs pi (211)
+    -) d : NOT AVAILABLE
+
+    The MVA algorithm used is a gradient boosted decision tree (TMVA 4.2.1, ROOT 6.14/06).
+
+    ***
+    NB:
+    The BDT is trained including only ECL-based inputs. Hence, it is mostly suited for electron (muon) ID.
+    This approach however could be expanded to include info from other subdetetctors in the future...
+
+    The MVA is charge-agnostic.
+    ***
 
     @param sigPdgId the pdgId of the signal mass hypothesis.
     @param bkgPdgId the pdgId of the background mass hypothesis.
+    @param particleLists list of names of ParticleList objects for charged stable particles.
+           The charge-conjugate ParticleLists will be also stored automatically.
     """
-    chargedpid = register_module('ChargedPidMVA')
 
+    # Enforce check on input S, B hypotheses compatibility.
+    binaryOpts = [(11, 211), (13, 211), (211, 321), (321, 211), (2212, 211)]
+
+    if (sigPdgId, bkgPdgId) not in binaryOpts:
+        B2FATAL("No charged pid MVA was trained to separate ", sigPdgId, " vs. ", bkgPdgId,
+                ". Please choose among the following pairs:\n",
+                "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
+
+    import pdg
+
+    plSet = set(particleLists)
+    for pList in particleLists:
+        name, label = pList.split(':')
+        plSet.add(f"{pdg.conjugate(name)}:{label}")
+
+    chargedpid = register_module('ChargedPidMVA')
     chargedpid.param('sigPdgId', sigPdgId)
     chargedpid.param('bkgPdgId', bkgPdgId)
+    chargedpid.param('particleLists', list(plSet))
 
     path.add_module(chargedpid)
 

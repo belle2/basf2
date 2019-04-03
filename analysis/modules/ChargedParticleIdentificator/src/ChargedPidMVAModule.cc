@@ -11,17 +11,22 @@ REG_MODULE(ChargedPidMVA)
 ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {
 
-  setDescription("This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B. It takes a set of Particle objects in a standard charged particle's ParticleList, calculates the MVA score using the appropriate xml weight file for a given input set of (S,B) mass hypotheses, and adds it as ExtraInfo to the Particle objects.");
+  setDescription("This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B. It takes the Particle objects in a charged stable particle's ParticleList, calculates the MVA score using the appropriate xml weight file for a given input set of (S,B) mass hypotheses, and adds it as ExtraInfo to the Particle objects.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("sigPdgId",
            m_sig_pdg,
-           "The pdgId of the signal mass hypothesis.");
+           "The input signal mass hypothesis' pdgId.",
+           int(0));
   addParam("bkgPdgId",
            m_bkg_pdg,
-           "The pdgId of the background mass hypothesis.");
-
+           "The input background mass hypothesis' pdgId.",
+           int(0));
+  addParam("particleLists",
+           m_particle_lists,
+           "The input list of ParticleList names.",
+           std::vector<std::string>());
 }
 
 
@@ -31,15 +36,26 @@ ChargedPidMVAModule::~ChargedPidMVAModule() {}
 void ChargedPidMVAModule::initialize()
 {
   m_event_metadata.isRequired();
-
-  m_score_varname = "chargedPidBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
 }
 
 
 void ChargedPidMVAModule::beginRun()
 {
+  // Retrieve the payload from the DB.
   m_weightfiles_representation.addCallback([this]() { initializeMVA(); });
   initializeMVA();
+
+  if (!m_weightfiles_representation->isValidPdg(m_sig_pdg)) {
+    B2FATAL("PDG: " << m_sig_pdg <<
+            " of the signal mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
+  }
+  if (!m_weightfiles_representation->isValidPdg(m_bkg_pdg)) {
+    B2FATAL("PDG: " << m_bkg_pdg <<
+            " of the background mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
+  }
+
+  m_score_varname = "chargedPidBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
+
 }
 
 
@@ -47,23 +63,29 @@ void ChargedPidMVAModule::event()
 {
 
   auto sigPart = Const::ChargedStable(m_sig_pdg);
-  auto bkgPart = Const::ChargedStable(m_bkg_pdg);
 
   B2DEBUG(20, "EVENT: " << m_event_metadata->getEvent());
 
-  for (const auto& [pdg, name] : m_charged_particle_lists) {
+  for (const auto& name : m_particle_lists) {
 
     StoreObjPtr<ParticleList> pList(name);
+    if (!pList) { B2FATAL("ParticleList: " << name << " could not be found. Aborting..."); }
 
-    // The ParticleLists are for particles and antiparticles, but for now we are charge-agnostic...
-    auto abspdg = abs(pdg);
+    // Need to get an absolute value in order to check if in Const::ChargedStable.
+    int pdg = abs(pList->getPDGCode());
 
-    // Skip if this particle list does not match any of the input (S, B) hypotheses.
-    if (abspdg != sigPart.getPDGCode() && abspdg != bkgPart.getPDGCode()) {
+    // Check if this ParticleList is made up of legit Const::ChargedStable particles.
+    if (!m_weightfiles_representation->isValidPdg(pdg)) {
+      B2FATAL("PDG: " << pList->getPDGCode() << " of ParticleList: " << pList->getParticleListName() <<
+              " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+    }
+
+    // Skip if this ParticleList does not match any of the input (S, B) hypotheses.
+    if (pdg != m_sig_pdg && pdg != m_bkg_pdg) {
       continue;
     }
 
-    B2DEBUG(20, "Particle list: " << pList->getParticleListName() << " - nr. particles in list: " << pList->getListSize());
+    B2DEBUG(20, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");
 
     for (unsigned int ipart(0); ipart < pList->getListSize(); ++ipart) {
 
@@ -90,21 +112,20 @@ void ChargedPidMVAModule::event()
       B2DEBUG(20, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
-      auto nvars  = m_variables.at(abspdg).at(index).size();
+      auto nvars  = m_variables.at(m_sig_pdg).at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
-        auto varobj =  m_variables.at(abspdg).at(index).at(ivar);
+        auto varobj =  m_variables.at(m_sig_pdg).at(index).at(ivar);
         B2DEBUG(20, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << varobj->function(particle));
-        m_datasets.at(abspdg).at(index)->m_input[ivar] = varobj->function(particle);
+        m_datasets.at(m_sig_pdg).at(index)->m_input[ivar] = varobj->function(particle);
       }
-      auto nspecs  = m_spectators.at(abspdg).at(index).size();
+      auto nspecs  = m_spectators.at(m_sig_pdg).at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
-        auto specobj =  m_spectators.at(abspdg).at(index).at(ispec);
+        auto specobj =  m_spectators.at(m_sig_pdg).at(index).at(ispec);
         B2DEBUG(20, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << specobj->function(particle));
-        m_datasets.at(abspdg).at(index)->m_spectators[ispec] = specobj->function(particle);
+        m_datasets.at(m_sig_pdg).at(index)->m_spectators[ispec] = specobj->function(particle);
       }
 
-      // NB: the MVA::Expert used to calculate the score must be the one trained to discriminate THIS signal hypothesis!
-      float score = m_experts.at(sigPart.getPDGCode()).at(index)->apply(*m_datasets.at(abspdg).at(index))[0];
+      float score = m_experts.at(m_sig_pdg).at(index)->apply(*m_datasets.at(m_sig_pdg).at(index))[0];
 
       B2DEBUG(20, "\t\tscore = " << score);
 
@@ -138,13 +159,21 @@ void ChargedPidMVAModule::initializeMVA()
   MVA::AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
 
-  // Iterate over standard charged particles.
-  for (const auto& [pdg, name] : m_charged_particle_lists) {
+  // Iterate over charged stable particle set.
+  for (const auto& hypo : Const::chargedStableSet) {
 
-    // Our MVA training is charge-agnostic atm, hence we skip negative pdgIds...
-    if (pdg < 0) { continue; }
+    auto pdg = hypo.getPDGCode();
 
-    B2INFO("\tLoading weightfiles from the payload class for particle hypothesis: (" << pdg << "," << name << ")");
+    // Ensure only the payload for signal hypothesis is retrieved.
+    if (pdg != m_sig_pdg) { continue; }
+
+    // Always skip deuteron for now...
+    if (pdg == 1000010020) {
+      B2WARNING("\tAt the moment, we don't have MVA trained to identify deuterons...");
+      continue;
+    }
+
+    B2INFO("\tLoading weightfiles from the payload class for SIGNAL particle hypothesis: " << pdg);
 
     auto serialized_weightfiles = m_weightfiles_representation->getMVAWeights(pdg);
 
@@ -192,9 +221,7 @@ void ChargedPidMVAModule::initializeMVA()
     }
 
     // Update maps w/ values for this pdgId.
-    m_experts.emplace(pdg, std::move(experts)); // Move semantics needed for unique_ptr:
-    // https://stackoverflow.com/questions/28921250/c-nested-map-with-unique-ptr/32749132
-    // https://stackoverflow.com/questions/6876751/differences-between-unique-ptr-and-shared-ptr
+    m_experts.emplace(pdg, std::move(experts));
     m_datasets.emplace(pdg, std::move(datasets));
     m_variables.emplace(pdg, variables);
     m_spectators.emplace(pdg, spectators);

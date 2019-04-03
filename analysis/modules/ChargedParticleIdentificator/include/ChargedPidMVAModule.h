@@ -42,7 +42,7 @@ namespace Belle2 {
    *
    * This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B.
    *
-   * It takes a set of Particle objects in a standard charged particle's ParticleList, calculates the MVA score
+   * It takes the Particle objects in a charged stable particle's ParticleList, calculates the MVA score
    * using the appropriate xml weight file for a given input set of (S,B) mass hypotheses,
    * and adds it as ExtraInfo to the Particle objects.
    *
@@ -115,38 +115,24 @@ namespace Belle2 {
   private:
 
     /**
-     * The signal mass hypothesis (unsigned) pdgId.
+     * The input signal mass hypothesis' pdgId.
      */
     int m_sig_pdg;
 
     /**
-     * The background mass hypothesis (unsigned) pdgId.
+     * The input background mass hypothesis' pdgId.
      */
     int m_bkg_pdg;
+
+    /**
+     * The input list of ParticleList names.
+     */
+    std::vector<std::string> m_particle_lists;
 
     /**
      * The lookup name of the MVA score variable, given the input S, B mass hypotheses for the algorithm.
      */
     std::string m_score_varname;
-
-    /**
-     * The pdgIds and names of the standard charged particle lists.
-     * This is not supposed to change at any time (?).
-     */
-    const std::unordered_map<int, std::string> m_charged_particle_lists = {
-      { 11, "e-:electrons" },
-      { -11, "e+:electrons" },
-      { 13, "mu-:muons" },
-      { -13, "mu+:muons" },
-      { 211, "pi+:pions" },
-      { -211, "pi-:pions" },
-      { 321, "K+:kaons" },
-      { -321, "K-:kaons" },
-      { 2212, "p+:protons" },
-      { -2212, "p-:protons" },
-      { 1000010020, "d+:deuterons" },
-      { -1000010020, "d-:deuterons" }
-    };
 
     /**
      * The event information. Used for debugging purposes.

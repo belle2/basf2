@@ -21,25 +21,27 @@ import argparse
 
 def argparser():
 
-    description = "This steering file fills an NTuple with the ChargedPidMVA score for a given pair of (S,B) mass hypotheses."
+    description = """This steering file fills an NTuple with the ChargedPidMVA score
+for a given pair of (S,B) mass hypotheses for charged stable particles."""
 
     parser = argparse.ArgumentParser(description=description, usage=__doc__)
-
-    sigPdgIds = [11, 13, 211, 321, 2212]
-    bkgPdgIds = [211, 321]
 
     parser.add_argument("--sigPdgId",
                         dest="sigPdgId",
                         required=True,
                         type=int,
-                        choices=sigPdgIds,
-                        help="The pdgId of the signal mass hypothesis.")
+                        help="The pdgId of the signal charged stable particle mass hypothesis.")
     parser.add_argument("--bkgPdgId",
                         dest="bkgPdgId",
                         required=True,
                         type=int,
-                        choices=bkgPdgIds,
-                        help="The pdgId of the background mass hypothesis.")
+                        help="The pdgId of the background charged stable particle mass hypothesis.")
+    parser.add_argument("-d", "--debug",
+                        dest="debug",
+                        action="store",
+                        default=0,
+                        type=int,
+                        help="Run the ChargedPidMVA module in debug mode. Pass the desired DEBUG level integer.")
 
     return parser
 
@@ -64,10 +66,10 @@ if __name__ == '__main__':
     rootinput = basf2.register_module('RootInput')
     path.add_module(rootinput)
 
-    # --------------------------------------
-    # Load standard charged particles,
+    # ---------------------------------------
+    # Load standard charged stable particles,
     # and fill corresponding particle lists.
-    # --------------------------------------
+    # ---------------------------------------
 
     electrons = ('e+:electrons', '')
     muons = ('mu+:muons', '')
@@ -79,7 +81,7 @@ if __name__ == '__main__':
 
     fillParticleLists(plists, path=path)
 
-    # TEMP: set aliases
+    # Set variable aliases if needed be.
     from variables import variables
     variables.addAlias("clusterEop", "clusterEoP")
     variables.addAlias("eclPulseShapeDiscriminationMVA", "clusterPulseShapeDiscriminationMVA")
@@ -91,13 +93,15 @@ if __name__ == '__main__':
 
     applyChargedPidMVA(sigPdgId=args.sigPdgId,
                        bkgPdgId=args.bkgPdgId,
+                       particleLists=[plist[0] for plist in plists],
                        path=path)
 
-    # Set debug level for this module
-    for m in path.modules():
-        if m.name() == "ChargedPidMVA":
-            m.logging.log_level = basf2.LogLevel.DEBUG
-            m.logging.debug_level = 20
+    if args.debug:
+        # Set debug level for this module
+        for m in path.modules():
+            if m.name() == "ChargedPidMVA":
+                m.logging.log_level = basf2.LogLevel.DEBUG
+                m.logging.debug_level = args.debug
 
     # ---------------
     # Make an NTuple.

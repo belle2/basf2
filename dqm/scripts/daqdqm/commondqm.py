@@ -52,12 +52,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                 "filter": [
                     "ge3_loose_tracks_inc_1_tight_not_ee2leg",
                     "selectmumu",
-                    "single_muon"],
+                    "single_muon\\10"],
                 "skim": [
                     "accept_hadron",
                     "accept_mumu_1trk",
                     "accept_mumu_2trk",
-                    "accept_bhabha",
+                    "accept_bhabha\\10",
                     "accept_gamma_gamma"]})
         path.add_module("StatisticsTimingHLTDQM")
 

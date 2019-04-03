@@ -40,13 +40,13 @@ namespace Belle2 {
        */
       struct TreeStruct {
 
-        float averageRate = 0; /**< total detector average hit rate */
         float meanOccupancies[40] = {0}; /**< mean hit occupancy from PXDDigits per sensor [Hits/Channel] */
         float maxOccupancies[40] = {0}; /**< max hit occupancy from PXDDigits per sensor [Hits/Channel] */
         float doseRates[40] = {0}; /**< mean dose rate from PXDDigits per sensor [Gy/s]  */
         float softPhotonFluxes[40] = {0}; /**< mean soft photon flux per sensor (Single pixel cluster <10keV) [clusters/cm2/s]  */
         float hardPhotonFluxes[40] = {0}; /**< mean hard photon flux per sensor (Single pixel cluster >10keV) [clusters/cm2/s]  */
         float chargedFluxes[40] = {0}; /**< mean charged particle flux per sensor (Multi pixel cluster >10keV) [clusters/cm2/s]  */
+        float averageRate = 0; /**< total detector average hit rate */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
       };

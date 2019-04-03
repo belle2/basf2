@@ -225,6 +225,13 @@ namespace Belle2 {
 
     };
 
+    /**
+     * Check if the input pdgId is that of a valid charged particle.
+     */
+    bool isValidPdg(const int pdg) const
+    {
+      return (Const::chargedStableSet.find(pdg) != Const::invalidParticle);
+    }
 
   private:
 
@@ -256,14 +263,6 @@ namespace Belle2 {
       int i = hist->GetYaxis()->FindBin(yy);
 
       return j + nbinsx * i;
-    }
-
-    /**
-     * Check if the input pdgId is that of a valid charged particle.
-     */
-    bool isValidPdg(const int pdg)
-    {
-      return (Const::chargedStableSet.find(pdg) != Const::invalidParticle);
     }
 
   private:

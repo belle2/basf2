@@ -239,6 +239,17 @@ namespace Belle2 {
     void getAsicChannel(int plane, int strip, int* asic, int* channel) const;
 
     /**
+     * Get HSLB name.
+     * @param[in] copper           Copper.
+     * @param[in[ dataConcentrator Data concentrator.
+     */
+    static std::string getHSLBName(int copper, int dataConcentrator)
+    {
+      char hslb = 'a' + dataConcentrator;
+      return "800" + std::to_string(copper) + hslb;
+    }
+
+    /**
      * Get maximal endcap number.
      */
     int getMaximalEndcapNumber() const;
@@ -265,7 +276,10 @@ namespace Belle2 {
     /**
      * Get maximal plane number.
      */
-    int getMaximalPlaneNumber() const;
+    static constexpr int getMaximalPlaneNumber()
+    {
+      return m_MaximalPlaneNumber;
+    }
 
     /**
      * Get maximal segment number.

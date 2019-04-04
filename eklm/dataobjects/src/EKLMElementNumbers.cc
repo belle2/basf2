@@ -269,11 +269,6 @@ int EKLMElementNumbers::getMaximalDetectorLayerNumber(int endcap) const
   return m_MaximalDetectorLayerNumber[endcap - 1];
 }
 
-int EKLMElementNumbers::getMaximalPlaneNumber() const
-{
-  return m_MaximalPlaneNumber;
-}
-
 int EKLMElementNumbers::getMaximalSegmentNumber() const
 {
   return m_MaximalSegmentNumber;

@@ -97,13 +97,14 @@ void DQMHistAnalysisKLMModule::analyseStripLayerHistogram(
     if (lane == nullptr)
       B2FATAL("Incomplete EKLM electronics map.");
     if ((nEvents > average * 10) && (nEvents > 50)) {
-      plane = ((i - 1) % EKLMElementNumbers::getNStripsSector()) / 2 + 1;
+      plane = ((i - 1) % EKLMElementNumbers::getNStripsSector()) /
+              EKLMElementNumbers::getMaximalStripNumber() + 1;
       strip = (i - 1) % EKLMElementNumbers::getMaximalStripNumber() + 1;
       int asic, channel;
       m_ElementNumbers->getAsicChannel(plane, strip, &asic, &channel);
-      str = "Hot channel: copper " + std::to_string(lane->getCopper()) +
-            ", data concentrator " +
-            std::to_string(lane->getDataConcentrator()) +
+      str = "Hot channel: HSLB " +
+            EKLMElementNumbers::getHSLBName(lane->getCopper(),
+                                            lane->getDataConcentrator()) +
             ", lane " + std::to_string(lane->getLane()) +
             ", asic " + std::to_string(asic) +
             ", channel " + std::to_string(channel);

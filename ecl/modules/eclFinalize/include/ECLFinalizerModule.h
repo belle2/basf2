@@ -52,7 +52,7 @@ namespace Belle2 {
   private:
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
     double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
-    double m_clusterLossyFraction; /** Maximum fractional difference between N1 and N2 number of crystals */
+    double m_clusterLossyFraction; /**< Maximum fractional difference between N1 and N2 number of crystals */
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigits */
     StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */

@@ -51,7 +51,7 @@ ECLFinalizerModule::ECLFinalizerModule() : Module()
   addParam("clusterTimeCutMaxEnergy", m_clusterTimeCutMaxEnergy, "All clusters above this energy are kept.",
            50.0 * Belle2::Unit::MeV);
   addParam("clusterLossyFraction", m_clusterLossyFraction,
-           "Keep N2 clusters only if #(crystals) is different from N1 by this fraction.",
+           "Keep neutral hadron hypothesis clusters only if the number of crystals is different from that of the n photons hypothesis cluster by this fraction: abs(n(neutral hadron)-n(photon))/n(photon)",
            1e-4);
 
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -150,21 +150,25 @@ void ECLFinalizerModule::event()
         else if (hypoShowerMap[std::make_pair(keypair.first, Belle2::ECLShower::c_nPhotons)].size() > 1) {
           hypoClusterMap[keypair].push_back(makeCluster(index, eventT0));
         } else {
-          // get the already existing N1 cluster index
-          const int n1idx = hypoClusterMap[std::make_pair(keypair.first, Belle2::ECLShower::c_nPhotons)][0];
-          double lossfraction = fabs(m_eclClusters[n1idx]->getNumberOfCrystals() - m_eclShowers[index]->getNumberOfCrystals());
+          // get the already existing nPhotons cluster index
+          const int indexOfCorrespondingNPhotonsCluster = hypoClusterMap[std::make_pair(keypair.first, Belle2::ECLShower::c_nPhotons)][0];
+          double lossfraction = fabs(m_eclClusters[indexOfCorrespondingNPhotonsCluster]->getNumberOfCrystals() -
+                                     m_eclShowers[index]->getNumberOfCrystals()) / m_eclClusters[indexOfCorrespondingNPhotonsCluster]->getNumberOfCrystals();
 
+          B2DEBUG(35, "ECLFinalizerModule::event n(photon shower) = " <<
+                  m_eclClusters[indexOfCorrespondingNPhotonsCluster]->getNumberOfCrystals() << ", n(hadron shower): " <<
+                  m_eclShowers[index]->getNumberOfCrystals());
           B2DEBUG(35, "ECLFinalizerModule::event lossfraction = " << lossfraction);
 
           if (lossfraction > m_clusterLossyFraction) {
             hypoClusterMap[keypair].push_back(makeCluster(index, eventT0));
           } else {
-            if (keypair.second == ECLShower::c_neutralHadron) m_eclClusters[n1idx]->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+            if (keypair.second == ECLShower::c_neutralHadron) m_eclClusters[indexOfCorrespondingNPhotonsCluster]->addHypothesis(
+                ECLCluster::EHypothesisBit::c_neutralHadron);
             else {
               B2ERROR("This ECLShower hypothesis is not supported yet: " << keypair.second);
             }
           }
-          // else add(!) flag
         }
       }
     }

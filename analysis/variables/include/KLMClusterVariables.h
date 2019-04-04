@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Torben Ferber, Giacomo De Pietro,           *
+ *               Sam Cunliffe                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +12,7 @@
 #pragma once
 
 #include <analysis/dataobjects/Particle.h>
-#include <framework/gearbox/Const.h>
+#include <analysis/VariableManager/Manager.h>
 
 namespace Belle2 {
 
@@ -113,6 +114,12 @@ namespace Belle2 {
      * returns the minimum angle of a KLMCluster to this Particle in the CMS frame
      */
     double minimumKLMAngleCMS(const Particle* particle);
+
+    /**
+     * returns a function which returns the value of a variable for the closest
+     * KLM cluster particle (in the CM system) to this particle
+     */
+    Manager::FunctionPtr closestKLMCMS(const std::vector<std::string>& arguments);
 
     /**
      * returns the number of Tracks matched to the KLMCluster associated to this Particle

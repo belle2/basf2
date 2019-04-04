@@ -2979,6 +2979,14 @@ namespace {
     // grab variables for testing
     const Manager::Var* max = Manager::Instance().getVariable("maximumKLMAngleCMS");
     const Manager::Var* min = Manager::Instance().getVariable("minimumKLMAngleCMS");
+    const Manager::Var* clx = Manager::Instance().getVariable("closestKLMCMS(klmClusterPositionX)");
+    const Manager::Var* cly = Manager::Instance().getVariable("closestKLMCMS(klmClusterPositionY)");
+    const Manager::Var* clz = Manager::Instance().getVariable("closestKLMCMS(klmClusterPositionZ)");
+    const Manager::Var* clE = Manager::Instance().getVariable("closestKLMCMS(klmClusterEnergy)");
+    const Manager::Var* frx = Manager::Instance().getVariable("farthestKLMCMS(klmClusterPositionX)");
+    const Manager::Var* fry = Manager::Instance().getVariable("farthestKLMCMS(klmClusterPositionY)");
+    const Manager::Var* frz = Manager::Instance().getVariable("farthestKLMCMS(klmClusterPositionZ)");
+    const Manager::Var* frE = Manager::Instance().getVariable("farthestKLMCMS(klmClusterEnergy)");
 
     EXPECT_EQ(gammalist->getListSize(), 3);
 
@@ -2986,6 +2994,14 @@ namespace {
       // should all be NaN as there are no KLMClusters in the storearray yet
       ASSERT_TRUE(std::isnan(max->function(gammalist->getParticle(0))));
       ASSERT_TRUE(std::isnan(min->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(clx->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(cly->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(clz->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(clE->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(frx->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(fry->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(frz->function(gammalist->getParticle(0))));
+      ASSERT_TRUE(std::isnan(frE->function(gammalist->getParticle(0))));
     }
 
     // now add KLMClusters to the datastore
@@ -3005,6 +3021,40 @@ namespace {
       EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(0)), min->function(gammalist->getParticle(0)));
       EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(1)), min->function(gammalist->getParticle(1)));
       EXPECT_FLOAT_EQ(max->function(gammalist->getParticle(2)), min->function(gammalist->getParticle(2)));
+
+      EXPECT_FLOAT_EQ(clx->function(gammalist->getParticle(0)), frx->function(gammalist->getParticle(0)));
+      EXPECT_FLOAT_EQ(clx->function(gammalist->getParticle(1)), frx->function(gammalist->getParticle(1)));
+      EXPECT_FLOAT_EQ(clx->function(gammalist->getParticle(2)), frx->function(gammalist->getParticle(2)));
+
+      EXPECT_FLOAT_EQ(cly->function(gammalist->getParticle(0)), fry->function(gammalist->getParticle(0)));
+      EXPECT_FLOAT_EQ(cly->function(gammalist->getParticle(1)), fry->function(gammalist->getParticle(1)));
+      EXPECT_FLOAT_EQ(cly->function(gammalist->getParticle(2)), fry->function(gammalist->getParticle(2)));
+
+      EXPECT_FLOAT_EQ(clz->function(gammalist->getParticle(0)), frz->function(gammalist->getParticle(0)));
+      EXPECT_FLOAT_EQ(clz->function(gammalist->getParticle(1)), frz->function(gammalist->getParticle(1)));
+      EXPECT_FLOAT_EQ(clz->function(gammalist->getParticle(2)), frz->function(gammalist->getParticle(2)));
+
+      EXPECT_FLOAT_EQ(clE->function(gammalist->getParticle(0)), frE->function(gammalist->getParticle(0)));
+      EXPECT_FLOAT_EQ(clE->function(gammalist->getParticle(1)), frE->function(gammalist->getParticle(1)));
+      EXPECT_FLOAT_EQ(clE->function(gammalist->getParticle(2)), frE->function(gammalist->getParticle(2)));
+
+      // we should be able to retrieve the cluster's position
+      EXPECT_FLOAT_EQ(clx->function(gammalist->getParticle(0)), 2);
+      EXPECT_FLOAT_EQ(clx->function(gammalist->getParticle(1)), 2);
+      EXPECT_FLOAT_EQ(clx->function(gammalist->getParticle(2)), 2);
+
+      EXPECT_FLOAT_EQ(cly->function(gammalist->getParticle(0)), 2);
+      EXPECT_FLOAT_EQ(cly->function(gammalist->getParticle(1)), 2);
+      EXPECT_FLOAT_EQ(cly->function(gammalist->getParticle(2)), 2);
+
+      EXPECT_FLOAT_EQ(clz->function(gammalist->getParticle(0)), 0.5);
+      EXPECT_FLOAT_EQ(clz->function(gammalist->getParticle(1)), 0.5);
+      EXPECT_FLOAT_EQ(clz->function(gammalist->getParticle(2)), 0.5);
+
+      // and the energy
+      EXPECT_FLOAT_EQ(clE->function(gammalist->getParticle(0)), 3.0409899);
+      EXPECT_FLOAT_EQ(clE->function(gammalist->getParticle(1)), 3.0409899);
+      EXPECT_FLOAT_EQ(clE->function(gammalist->getParticle(2)), 3.0409899);
     }
 
     KLMCluster* k2 = klmclusters.appendNew(KLMCluster());

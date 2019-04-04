@@ -12,6 +12,7 @@
 #include <background/modules/BeamBkgHitRateMonitor/PXDHitRateCounter.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>
+#include <string>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -38,8 +39,7 @@ namespace Belle2 {
       m_clusters.isOptional();
 
       string leaflist =
-        "meanOccupancies[40]/F:maxOccupancies[40]/F:doseRates[40]/F:softPhotonFluxes[40]/F:hardPhotonFluxes[40]/F:chargedFluxes[40]/F"
-        ":segmentDoseRates[240]/F:segmentSoftPhotonFluxes[240]/F:segmentHardPhotonFluxes[240]/F:segmentChargedFluxes[240]/F:averageRate/F:numEvents/I:valid/O";
+        "meanOccupancies[40]/F:maxOccupancies[40]/F:doseRates[40]/F:softPhotonFluxes[40]/F:hardPhotonFluxes[40]/F:chargedFluxes[40]/F:segmentDoseRates[240]/F:segmentSoftPhotonFluxes[240]/F:segmentHardPhotonFluxes[240]/F:segmentChargedFluxes[240]/F:averageRate/F:numEvents/I:valid/O";
 
       // set branch address
       tree->Branch("pxd", &m_rates, leaflist.c_str());

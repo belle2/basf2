@@ -127,9 +127,10 @@ void ECLFinalizerModule::event()
     }
   }
 
+  // map connected regions to different cluster hypothesis: key (CRId, HypothesisID) -> list arrayindex of cluster
   std::map<std::pair<int, int>, std::vector<int>> hypoClusterMap;
 
-  // now loop over all photon showers from the map and make clusters for those
+  // now loop over all photon showers from the map and make clusters for those and put them in the map
   for (const auto & [keypair, indexlist] : hypoShowerMap) {
     if (keypair.second == Belle2::ECLShower::c_nPhotons) {
       for (const auto& index : indexlist) {
@@ -140,7 +141,7 @@ void ECLFinalizerModule::event()
 
   // now loop over all other showers
   for (const auto & [keypair, indexlist] : hypoShowerMap) {
-    if (keypair.second != Belle2::ECLShower::c_nPhotons) { //  c_nPhotons
+    if (keypair.second != Belle2::ECLShower::c_nPhotons) {
       for (const auto& index : indexlist) {
         // no photon entry exists (maybe we did not run the splitter or selection cuts failed)
         if (hypoShowerMap.count(std::make_pair(keypair.first, Belle2::ECLShower::c_nPhotons)) < 1) {
@@ -210,9 +211,11 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   const int hyp = eclShower->getHypothesisId();
 
   // ECLClusters can have *multiple*, but not at the creation of an ECLCluster: use "set" and not "add"
-  if (hyp == ECLShower::c_nPhotons) eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
-  else if (hyp == ECLShower::c_neutralHadron) eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
-  else {
+  if (hyp == ECLShower::c_nPhotons) {
+    eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+  } else if (hyp == ECLShower::c_neutralHadron) {
+    eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+  } else {
     B2ERROR("This ECLShower hypothesis is not supported yet: " << hyp);
   }
 

@@ -37,9 +37,12 @@ namespace Belle2 {
       // register collection(s) as optional, your detector might be excluded in DAQ
       m_clusters.isOptional();
 
+      string leaflist =
+        "meanOccupancies[40]/F:maxOccupancies[40]/F:doseRates[40]/F:softPhotonFluxes[40]/F:hardPhotonFluxes[40]/F:chargedFluxes[40]/F"
+        ":segmentDoseRates[240]/F:segmentSoftPhotonFluxes[240]/F:segmentHardPhotonFluxes[240]/F:segmentChargedFluxes[240]/F:averageRate/F:numEvents/I:valid/O";
+
       // set branch address
-      tree->Branch("pxd", &m_rates,
-                   "meanOccupancies[40]/F:maxOccupancies[40]/F:doseRates[40]/F:softPhotonFluxes[40]/F:hardPhotonFluxes[40]/F:chargedFluxes[40]/F:averageRate/F:numEvents/I:valid/O");
+      tree->Branch("pxd", &m_rates, leaflist.c_str());
 
       // check parameters
       if (m_integrationTime <= 0) B2FATAL("invalid integration time window for PXD: " << m_integrationTime);
@@ -75,11 +78,13 @@ namespace Belle2 {
       for (const PXDDigit& storeDigit : m_digits) {
         VxdID sensorID = storeDigit.getSensorID();
         int index = gTools->getPXDSensorIndex(storeDigit.getSensorID());
+        int vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, storeDigit.getVCellID(), 6);
         double ADUToEnergy =  PXD::PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, storeDigit.getUCellID(),
                               storeDigit.getVCellID());
         double hitEnergy = storeDigit.getCharge() * ADUToEnergy;
         rates.doseRates[index] += (hitEnergy / Unit::J);
         occupancies[index] += 1.0;
+        rates.segmentDoseRates[vBin + index * 6] += (hitEnergy / Unit::J);
       }
 
       for (int index = 0; index < m_nPXDSensors; index++) {
@@ -101,15 +106,19 @@ namespace Belle2 {
 
         auto cluster_uID = info.getUCellID(cluster.getU());
         auto cluster_vID = info.getVCellID(cluster.getV());
+        int vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, cluster_vID, 6);
         double ADUToEnergy =  PXD::PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, cluster_uID, cluster_vID);
         double clusterEnergy = cluster.getCharge() * ADUToEnergy;
 
         if (cluster.getSize() == 1 && clusterEnergy < 10000 * Unit::eV && clusterEnergy > 6000 * Unit::eV) {
           rates.softPhotonFluxes[index] += 1.0;
+          rates.segmentSoftPhotonFluxes[vBin + index * 6] += 1.0;
         } else if (cluster.getSize() == 1 && clusterEnergy > 10000 * Unit::eV) {
           rates.hardPhotonFluxes[index] += 1.0;
+          rates.segmentHardPhotonFluxes[vBin + index * 6] += 1.0;
         } else if (cluster.getSize() > 1 && clusterEnergy > 10000 * Unit::eV) {
           rates.chargedFluxes[index] += 1.0;
+          rates.segmentChargedFluxes[vBin + index * 6] += 1.0;
         }
       }
 
@@ -148,6 +157,19 @@ namespace Belle2 {
           m_rates.softPhotonFluxes[index] *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
           m_rates.hardPhotonFluxes[index] *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
           m_rates.chargedFluxes[index] *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+
+          // Loop over v segements
+          for (int vBin = 0; vBin < 6; ++vBin)  {
+            double currentSegmentMass = m_segmentActiveAreas[vBin + index * 6] * info.getThickness() * c_densitySi;
+            double currentSegmentArea = m_segmentActiveAreas[vBin + index * 6];
+            if (currentSegmentArea > 0) {
+              m_rates.segmentDoseRates[vBin + index * 6] *= (1.0 / currentComponentTime) * (1000 / currentSegmentMass);
+              m_rates.segmentSoftPhotonFluxes[vBin + index * 6] *= (1.0 / currentSegmentArea) * (1.0 / (currentComponentTime / Unit::s));
+              m_rates.segmentHardPhotonFluxes[vBin + index * 6] *= (1.0 / currentSegmentArea) * (1.0 / (currentComponentTime / Unit::s));
+              m_rates.segmentChargedFluxes[vBin + index * 6] *= (1.0 / currentSegmentArea) * (1.0 /
+                                                                (currentComponentTime / Unit::s));
+            }
+          }
         }
       }
     }
@@ -164,8 +186,19 @@ namespace Belle2 {
 
         // Compute nominal number of pixel per sensor
         m_activePixels[index] = info.getUCells() * info.getVCells();
-        // Compute nominal area per sensor
+        // Compute nominal area of sensor
         m_activeAreas[index] = info.getWidth() * info.getLength();
+
+        // Loop over v segements
+        for (int vBin = 0; vBin < 6; ++vBin)  {
+          // Compute nominal number of pixel per segment
+          // Sgements have same number of rows, but due to pitch change a different length
+          m_segmentActivePixels[vBin + index * 6] = info.getUCells() * info.getVCells() / 6;
+          // Compute position of v segment
+          double v = info.getVCellPosition(vBin * info.getVCells() / 6);
+          // Compute nominal area of segment
+          m_segmentActiveAreas[vBin + index * 6] = info.getWidth() * info.getVPitch(v) * info.getVCells() / 6;
+        }
 
         if (m_maskDeadPixels) {
           for (int ui = 0; ui < info.getUCells(); ++ui) {
@@ -174,6 +207,9 @@ namespace Belle2 {
                   || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, ui, vi)) {
                 m_activePixels[index] -= 1;
                 m_activeAreas[index] -= info.getVPitch(info.getVCellPosition(vi)) * info.getUPitch();
+                int vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vi, 6);
+                m_segmentActivePixels[vBin + index * 6] -= 1;
+                m_segmentActiveAreas[vBin + index * 6] -= info.getVPitch(info.getVCellPosition(vi)) * info.getUPitch();
               }
             }
           }

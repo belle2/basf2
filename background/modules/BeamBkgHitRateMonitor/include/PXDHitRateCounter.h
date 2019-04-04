@@ -39,13 +39,16 @@ namespace Belle2 {
        * tree structure
        */
       struct TreeStruct {
-
         float meanOccupancies[40] = {0}; /**< mean hit occupancy from PXDDigits per sensor [Hits/Channel] */
         float maxOccupancies[40] = {0}; /**< max hit occupancy from PXDDigits per sensor [Hits/Channel] */
         float doseRates[40] = {0}; /**< mean dose rate from PXDDigits per sensor [Gy/s]  */
         float softPhotonFluxes[40] = {0}; /**< mean soft photon flux per sensor (Single pixel cluster <10keV) [clusters/cm2/s]  */
         float hardPhotonFluxes[40] = {0}; /**< mean hard photon flux per sensor (Single pixel cluster >10keV) [clusters/cm2/s]  */
         float chargedFluxes[40] = {0}; /**< mean charged particle flux per sensor (Multi pixel cluster >10keV) [clusters/cm2/s]  */
+        float segmentDoseRates[240] = {0};  /**< mean dose rate from PXDDigits per v segment of sensor [Gy/s]  */
+        float segmentSoftPhotonFluxes[240] = {0}; /**< mean soft photon flux per v segment of sensor (Single pixel cluster <10keV) [clusters/cm2/s]  */
+        float segmentHardPhotonFluxes[240] = {0}; /**< mean hard photon flux per v segment of sensor (Single pixel cluster >10keV) [clusters/cm2/s]  */
+        float segmentChargedFluxes[240] = {0}; /**< mean charged particle flux per v segment of sensor (Multi pixel cluster >10keV) [clusters/cm2/s]  */
         float averageRate = 0; /**< total detector average hit rate */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
@@ -110,8 +113,10 @@ namespace Belle2 {
       StoreArray<PXDCluster> m_clusters;  /**< collection of clusters */
 
       // other
-      double m_activePixels[40] = {0}; /**< fractions of active pixels in sensor */
+      double m_activePixels[40] = {0}; /**< number  of active pixels in sensor */
       double m_activeAreas[40] = {0}; /**< area of active pixels in sensor */
+      double m_segmentActivePixels[240] = {0}; /**< number of active pixels in v segements */
+      double m_segmentActiveAreas[240] = {0}; /**< area of active pixels in v segments */
     };
 
     inline const PXD::SensorInfo& PXDHitRateCounter::getInfo(VxdID sensorID) const

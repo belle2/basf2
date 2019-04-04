@@ -229,6 +229,16 @@ namespace Belle2 {
     int getStripFirmwareBySoftware(int stripSoftware) const;
 
     /**
+     * Get ASIC and channel numbers (both are 0-based)
+     * by plane and strip numbers.
+     * @param[in]  plane   Plane.
+     * @param[in]  strip   Strip,
+     * @param[out] asic    ASIC.
+     * @param[out] channel Channel.
+     */
+    void getAsicChannel(int plane, int strip, int* asic, int* channel) const;
+
+    /**
      * Get maximal endcap number.
      */
     int getMaximalEndcapNumber() const;

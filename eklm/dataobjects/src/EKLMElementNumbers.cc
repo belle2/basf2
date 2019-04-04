@@ -244,6 +244,15 @@ int EKLMElementNumbers::getStripFirmwareBySoftware(int stripSoftware) const
   return strip;
 }
 
+void EKLMElementNumbers::getAsicChannel(
+  int plane, int strip, int* asic, int* channel) const
+{
+  int stripFirmware = getStripFirmwareBySoftware(strip);
+  int asicMod5 = (stripFirmware - 1) / m_NStripsSegment;
+  *channel = (stripFirmware - 1) % m_NStripsSegment;
+  *asic = asicMod5 + m_MaximalSegmentNumber * (plane - 1);
+}
+
 int EKLMElementNumbers::getMaximalEndcapNumber() const
 {
   return m_MaximalEndcapNumber;

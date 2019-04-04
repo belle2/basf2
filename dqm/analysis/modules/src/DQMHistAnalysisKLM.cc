@@ -96,15 +96,17 @@ void DQMHistAnalysisKLMModule::analyseStripLayerHistogram(
     lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
     if (lane == nullptr)
       B2FATAL("Incomplete EKLM electronics map.");
-    if (nEvents > average * 10) {
+    if ((nEvents > average * 10) && (nEvents > 50)) {
       plane = ((i - 1) % EKLMElementNumbers::getNStripsSector()) / 2 + 1;
       strip = (i - 1) % EKLMElementNumbers::getMaximalStripNumber() + 1;
+      int asic, channel;
+      m_ElementNumbers->getAsicChannel(plane, strip, &asic, &channel);
       str = "Hot channel: copper " + std::to_string(lane->getCopper()) +
             ", data concentrator " +
             std::to_string(lane->getDataConcentrator()) +
             ", lane " + std::to_string(lane->getLane()) +
-            ", plane " + std::to_string(plane) +
-            ", strip " + std::to_string(strip);
+            ", asic " + std::to_string(asic) +
+            ", channel " + std::to_string(channel);
       latex.DrawLatexNDC(x, y, str.c_str());
       y -= 0.05;
     }

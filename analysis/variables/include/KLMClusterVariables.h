@@ -122,6 +122,12 @@ namespace Belle2 {
     Manager::FunctionPtr closestKLMCMS(const std::vector<std::string>& arguments);
 
     /**
+     * returns a function which returns the value of a variable for the furthest
+     * KLM cluster particle (in the CM system) to this particle
+     */
+    Manager::FunctionPtr furthestKLMCMS(const std::vector<std::string>& arguments);
+
+    /**
      * returns the number of Tracks matched to the KLMCluster associated to this Particle
      * (0 for K_L0, >0 for matched Tracks, NaN for not-matched Tracks).
      */

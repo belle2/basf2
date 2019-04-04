@@ -80,8 +80,9 @@ void DQMHistAnalysisKLMModule::analyseStripLayerHistogram(
     lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
     if (lane == nullptr)
       B2FATAL("Incomplete EKLM electronics map.");
-    str = "No data from copper " + std::to_string(lane->getCopper()) +
-          ", data concentrator " + std::to_string(lane->getDataConcentrator()) +
+    str = "No data from HSLB " +
+          EKLMElementNumbers::getHSLBName(lane->getCopper(),
+                                          lane->getDataConcentrator()) +
           ", lane " + std::to_string(lane->getLane());
     latex.DrawLatexNDC(x, y, str.c_str());
     y -= 0.05;

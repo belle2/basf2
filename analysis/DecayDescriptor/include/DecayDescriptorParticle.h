@@ -30,6 +30,8 @@ namespace Belle2 {
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
     int m_iPDGCode;
+    /** Is particle inclusive? */
+    bool m_isInclusive;
   public:
     /** Default ctor. */
     DecayDescriptorParticle();
@@ -73,6 +75,11 @@ namespace Belle2 {
     int getPDGCode() const
     {
       return m_iPDGCode;
+    }
+    /** Is the particle inclusive? */
+    int isInclusive() const
+    {
+      return m_isInclusive;
     }
   };
 }

@@ -142,6 +142,23 @@ namespace Belle2 {
              TClonesArray* arrayPointer = nullptr);
 
     /**
+     * Constructor for composite particles.
+     * All other private members are set to their default values (0).
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
+     * @param flavorType decay flavor type
+     * @param daughterIndices indices of daughters in StoreArray<Particle>
+     * @param isInclusive Is the particle inclusive?
+     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
+     */
+    Particle(const TLorentzVector& momentum,
+             const int pdgCode,
+             EFlavorType flavorType,
+             const std::vector<int>& daughterIndices,
+             bool isInclusive,
+             TClonesArray* arrayPointer = nullptr);
+
+    /**
      * Constructor from a reconstructed track (mdst object Track);
      * @param track pointer to Track object
      * @param chargedStable Type of charged particle
@@ -229,6 +246,15 @@ namespace Belle2 {
     void setPValue(float pValue)
     {
       m_pValue = pValue;
+    }
+
+    /**
+     * Sets m_isInclusive
+     * @param isInclusive Is the particle Inclusive?
+     */
+    void setInclusive(bool isInclusive)
+    {
+      m_isInclusive = isInclusive;
     }
 
     /**
@@ -461,6 +487,15 @@ namespace Belle2 {
     float getPValue() const
     {
       return m_pValue;
+    }
+
+    /**
+     * Returns true if the particle is Inclusive
+     * @return p-value of fit (nan means no fit done)
+     */
+    bool isInclusive() const
+    {
+      return m_isInclusive;
     }
 
     /**
@@ -827,6 +862,8 @@ namespace Belle2 {
     // v9: added m_pdgCodeUsedForFit
 
     friend class ParticleSubset;
+
+    bool m_isInclusive; /** Is the particle Inclusive? **/
   };
 
 } // end namespace Belle2

@@ -1037,5 +1037,57 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissPHOTOS | MCMatching::c_MissNeutrino, MCMatching::getMCErrors(d.m_particle)) << d.getString();
     }
   }
+
+
+  /** B0 -> Xsd (-> K+ pi- ) mu+ mu- */
+  TEST_F(MCMatchingTest, InclusiveReconstruction)
+  {
+    {
+      /** B0 -> Xsd (-> K+ pi- ) mu+ mu- */
+      Decay d(511, {{30343, {321, -211}}, -13, 13});
+      d.reconstruct({511, {{30343, {321, -211}}, -13, 13}});
+
+      Particle* Xsd = d.m_particle->getDaughters()[0];
+      ASSERT_TRUE(Xsd != nullptr);
+      EXPECT_EQ(Xsd->isInclusive(), false);
+      Xsd->setInclusive(true);
+      EXPECT_EQ(Xsd->isInclusive(), true);
+
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+    }
+    {
+      /** B0 -> K*0 (-> K+ pi- ) mu+ mu- */
+      Decay d(511, {{313, {321, -211}}, -13, 13});
+      d.reconstruct({511, {{30343, {321, -211}}, -13, 13}});
+
+      Particle* Xsd = d.m_particle->getDaughters()[0];
+      ASSERT_TRUE(Xsd != nullptr);
+      EXPECT_EQ(Xsd->isInclusive(), false);
+      Xsd->setInclusive(true);
+      EXPECT_EQ(Xsd->isInclusive(), true);
+
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+    }
+    {
+      /** B0 -> K*0 (-> K+ pi- ) J/psi (-> mu+ mu-) */
+      Decay d(511, { {313, {321, -211}}, {443, { -13, 13}}});
+      Decay* mup = &(d[1][0]);
+      Decay* mum = &(d[1][1]);
+      d.reconstruct({511, {{30343, {321, -211}}, { -13, {}, Decay::c_ReconstructFrom, mup}, {13, {}, Decay::c_ReconstructFrom, mum}}});
+
+      Particle* Xsd = d.m_particle->getDaughters()[0];
+      ASSERT_TRUE(Xsd != nullptr);
+      EXPECT_EQ(Xsd->isInclusive(), false);
+      Xsd->setInclusive(true);
+      EXPECT_EQ(Xsd->isInclusive(), true);
+
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+    }
+  }
+
+
 }  // namespace
 #endif

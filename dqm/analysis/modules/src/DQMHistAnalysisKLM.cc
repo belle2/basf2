@@ -16,8 +16,10 @@ using namespace Belle2;
 REG_MODULE(DQMHistAnalysisKLM)
 
 DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
-  : DQMHistAnalysisModule()
+  : DQMHistAnalysisModule(),
+    m_eklmStripLayer{nullptr}
 {
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 DQMHistAnalysisKLMModule::~DQMHistAnalysisKLMModule()
@@ -33,34 +35,78 @@ void DQMHistAnalysisKLMModule::initialize()
   }
 }
 
+void DQMHistAnalysisKLMModule::terminate()
+{
+  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerGlobalNumber(); ++i)
+    delete m_eklmStripLayer[i];
+}
 
 void DQMHistAnalysisKLMModule::beginRun()
 {
-}
-
-void DQMHistAnalysisKLMModule::event()
-{
-  std::string str;
-  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerGlobalNumber(); ++i) {
-    str = "EKLM/strip_layer_" + std::to_string(i + 1);
-    TH1* h = findHist(str);
-    if (h == NULL) {
-      B2ERROR("KLM DQM histogram " << str << " is not found.");
-      continue;
-    }
-    m_eklmStripLayer[i]->Clear();
-    m_eklmStripLayer[i]->cd();
-    h->Draw();
-    m_eklmStripLayer[i]->Modified();
-  }
+  if (!m_ElectronicsMap.isValid())
+    B2FATAL("No EKLM electronics map.");
 }
 
 void DQMHistAnalysisKLMModule::endRun()
 {
 }
 
-void DQMHistAnalysisKLMModule::terminate()
+void DQMHistAnalysisKLMModule::analyseStripLayerHistogram(
+  int layerGlobal, TH1* histogram, TLatex& latex)
 {
-  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerGlobalNumber(); ++i)
-    delete m_eklmStripLayer[i];
+  int i;
+  double x = 0.15;
+  double y = 0.85;
+  double nEvents, average;
+  int endcap, layer, sector, sectorGlobal, sectorsWithSignal;
+  double sectorEvents[EKLMElementNumbers::getMaximalSectorNumber()] = {0};
+  std::string str;
+  const EKLMDataConcentratorLane* lane;
+  average = 0;
+  m_ElementNumbers->layerNumberToElementNumbers(layerGlobal, &endcap, &layer);
+  for (i = 1; i <= EKLMElementNumbers::getNStripsLayer(); ++i) {
+    nEvents = histogram->GetBinContent(i);
+    average = average + nEvents;
+    sector = (i - 1) / EKLMElementNumbers::getNStripsSector();
+    sectorEvents[sector] += nEvents;
+  }
+  sectorsWithSignal = 0;
+  for (i = 0; i < EKLMElementNumbers::getMaximalSectorNumber(); ++i) {
+    if (sectorEvents[i] != 0) {
+      sectorsWithSignal++;
+      continue;
+    }
+    sectorGlobal = m_ElementNumbers->sectorNumber(endcap, layer, sector);
+    lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
+    if (lane == nullptr)
+      B2FATAL("Incomplete EKLM electronics map.");
+    str = "No data from copper " + std::to_string(lane->getCopper()) +
+          ", data concentrator " + std::to_string(lane->getDataConcentrator()) +
+          ", lane " + std::to_string(lane->getLane());
+    latex.DrawLatexNDC(x, y, str.c_str());
+    y -= 0.05;
+  }
+  if (sectorsWithSignal == 0)
+    return;
+}
+
+void DQMHistAnalysisKLMModule::event()
+{
+  std::string str;
+  TLatex latex;
+  latex.SetTextColor(kRed);
+  latex.SetTextAlign(11);
+  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerGlobalNumber(); ++i) {
+    str = "EKLM/strip_layer_" + std::to_string(i + 1);
+    TH1* h = findHist(str);
+    if (h == nullptr) {
+      B2ERROR("KLM DQM histogram " << str << " is not found.");
+      continue;
+    }
+    m_eklmStripLayer[i]->Clear();
+    m_eklmStripLayer[i]->cd();
+    h->Draw();
+    analyseStripLayerHistogram(i + 1, h, latex);
+    m_eklmStripLayer[i]->Modified();
+  }
 }

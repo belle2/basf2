@@ -247,7 +247,10 @@ namespace Belle2 {
     /**
      * Get maximal sector number.
      */
-    int getMaximalSectorNumber() const;
+    static constexpr int getMaximalSectorNumber()
+    {
+      return m_MaximalSectorNumber;
+    }
 
     /**
      * Get maximal plane number.
@@ -302,6 +305,14 @@ namespace Belle2 {
     static constexpr int getMaximalStripGlobalNumber()
     {
       return m_MaximalStripNumber * getMaximalPlaneGlobalNumber();
+    }
+
+    /**
+     * Get number of strips in a layer.
+     */
+    static constexpr int getNStripsLayer()
+    {
+      return getNStripsSector() * m_MaximalSectorNumber;
     }
 
     /**

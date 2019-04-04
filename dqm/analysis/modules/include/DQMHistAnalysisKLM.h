@@ -12,11 +12,14 @@
 
 /* External headers. */
 #include <TCanvas.h>
+#include <TLatex.h>
 
 /* Belle2 headers. */
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <eklm/dataobjects/EKLMElementNumbers.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
 
@@ -62,7 +65,22 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
-  private:
+  protected:
+
+    /**
+     * Analyse strip number histogram.
+     * @param[in]  layerGlobal Global layer number.
+     * @param[in]  histogram   Histogram.
+     * @param[out] latex       TLatex to draw messages.
+     */
+    void analyseStripLayerHistogram(int layerGlobal, TH1* histogram,
+                                    TLatex& latex);
+
+    /** Electronics map. */
+    DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** EKLM strip number within a layer. */
     TCanvas* m_eklmStripLayer[

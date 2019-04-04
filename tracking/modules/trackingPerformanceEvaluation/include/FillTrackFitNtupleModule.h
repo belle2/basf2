@@ -13,18 +13,21 @@
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
-#include <TTree.h>
 #include <TFile.h>
-#include <TList.h>
 #include <TNtuple.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <mdst/dataobjects/MCParticle.h>
-#include <tracking/dataobjects/MCParticleInfo.h>
 #include <mdst/dataobjects/Track.h>
+
+#include <tracking/dataobjects/MCParticleInfo.h>
 #include <tracking/dataobjects/RecoTrack.h>
+
 // forward declarations
 namespace Belle2 {
-  class Track;
   class TrackFitResult;
 
   template< class T >
@@ -41,16 +44,14 @@ namespace Belle2 {
 
     FillTrackFitNtupleModule();
 
-    virtual ~FillTrackFitNtupleModule();
-
     /// Require the store arrays and create the output root file
-    virtual void initialize() override;
+    void initialize() override;
 
     /// Loop over Track objects and fill ntuples with tracking parameters
-    virtual void event() override;
+    void event() override;
 
     /// Save output root file with ntuple
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 
@@ -59,7 +60,6 @@ namespace Belle2 {
     std::string m_TracksName; /**< Track StoreArray name */
     int m_ParticleHypothesis;  /**< Particle Hypothesis for the track fit (default: 211) */
 
-    //Ntuple for multi hypothesis particle
     TNtuple* m_n_MultiParticle = nullptr;  /**< Multi particle ntuple*/
 
     StoreArray<RecoTrack> m_RecoTracks; /**< RecoTrack StoreArray */

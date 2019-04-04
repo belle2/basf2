@@ -9,29 +9,13 @@
  **************************************************************************/
 
 #include <tracking/modules/trackingPerformanceEvaluation/FillTrackFitNtupleModule.h>
-#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-#include <framework/geometry/BFieldManager.h>
-
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-
 #include <genfit/KalmanFitterInfo.h>
 
-#include <root/TTree.h>
-#include <root/TObject.h>
-
 #include <boost/foreach.hpp>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 
@@ -51,11 +35,6 @@ FillTrackFitNtupleModule::FillTrackFitNtupleModule() :
   addParam("TracksName", m_TracksName, "Name of Track collection.", std::string(""));
   addParam("RecoTracksName", m_RecoTracksName, "Name of RecoTrack collection.", std::string("RecoTracks"));
   addParam("ParticleHypothesis", m_ParticleHypothesis, "Particle Hypothesis used in the track fit.", int(211));
-
-}
-
-FillTrackFitNtupleModule::~FillTrackFitNtupleModule()
-{
 
 }
 
@@ -91,16 +70,16 @@ void FillTrackFitNtupleModule::event()
     const RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
     if (recoTrack == nullptr) B2WARNING(" the RecoTrack associated to Track is nullptr!");
 
-    const TrackFitResult* fitResult_pi = track.getTrackFitResult(Const::ChargedStable(211));
-    const TrackFitResult* fitResult_k = track.getTrackFitResult(Const::ChargedStable(321));
-    const TrackFitResult* fitResult_p = track.getTrackFitResult(Const::ChargedStable(2212));
-    const TrackFitResult* fitResult_d = track.getTrackFitResult(Const::ChargedStable(1000010020));
+    const TrackFitResult* fitResult_pi = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* fitResult_k = track.getTrackFitResult(Const::kaon);
+    const TrackFitResult* fitResult_p = track.getTrackFitResult(Const::proton);
+    const TrackFitResult* fitResult_d = track.getTrackFitResult(Const::deuteron);
 
     Float_t flag_pi = kTRUE, flag_k = kTRUE, flag_p = kTRUE, flag_d = kTRUE;
-    if ((fitResult_pi == nullptr) || (fitResult_pi->getParticleType() != Const::ChargedStable(211))) flag_pi = kFALSE;
-    if ((fitResult_k == nullptr) || (fitResult_k->getParticleType() != Const::ChargedStable(321))) flag_k = kFALSE;
-    if ((fitResult_p == nullptr) || (fitResult_p->getParticleType() != Const::ChargedStable(2212))) flag_p = kFALSE;
-    if ((fitResult_d == nullptr) || (fitResult_d->getParticleType() != Const::ChargedStable(1000010020))) flag_d = kFALSE;
+    if ((fitResult_pi == nullptr) || (fitResult_pi->getParticleType() != Const::pion)) flag_pi = kFALSE;
+    if ((fitResult_k == nullptr) || (fitResult_k->getParticleType() != Const::kaon)) flag_k = kFALSE;
+    if ((fitResult_p == nullptr) || (fitResult_p->getParticleType() != Const::proton)) flag_p = kFALSE;
+    if ((fitResult_d == nullptr) || (fitResult_d->getParticleType() != Const::deuteron)) flag_d = kFALSE;
 
     Float_t trk_x_pi = 0, trk_y_pi = 0, trk_z_pi = 0, trk_px_pi = 0, trk_py_pi = 0, trk_pz_pi = 0, trk_p_pi = 0, trk_pt_pi = 0,
             trk_theta_pi = 0, trk_phi_pi = 0,

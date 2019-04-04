@@ -1,6 +1,7 @@
 /* Nanae Taniguchi 2017.07.12 */
 /* Nanae Taniguchi 2018.02.06 */
 /* add occupancy plot 2019.03 */
+/* add occupancy hist for PV 2019.04 */
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
 // add
@@ -63,7 +64,7 @@ TH2D* bmap_2; // board status map 2D
 
 // add 20190205
 TH1D* h_occ; // occupancy
-TH1D* h_occ_L_px; // occupancy
+TH1D* h_occ_L; // occupancy layer dependent
 
 void cdcDQM7Module::defineHisto()
 {
@@ -110,10 +111,10 @@ void cdcDQM7Module::defineHisto()
     h_tdc_L[b]->SetFillColor(6);
 
     // adc
-    h_adc_L[b] = new TH1D(Form("adc_L%d", b), Form("adc Layer %d", b), 75, 0, 150);
+    //    h_adc_L[b] = new TH1D(Form("adc_L%d", b), Form("adc Layer %d", b), 75, 0, 150);
+    h_adc_L[b] = new TH1D(Form("adc_L%d", b), Form("adc Layer %d", b), 100, 0, 500);
     h_adc_L[b]->SetMinimum(0);
     h_adc_L[b]->SetFillColor(8);
-
 
   }
 
@@ -122,7 +123,8 @@ void cdcDQM7Module::defineHisto()
     h_tdc_sL[s]->SetMinimum(0);
     h_tdc_sL[s]->SetFillColor(6);
 
-    h_adc_sL[s] = new TH1D(Form("adc_sL%d", s), Form("adc sLayer %d", s), 75, 0, 150);
+    //    h_adc_sL[s] = new TH1D(Form("adc_sL%d", s), Form("adc sLayer %d", s), 75, 0, 150);
+    h_adc_sL[s] = new TH1D(Form("adc_sL%d", s), Form("adc sLayer %d", s), 100, 0, 500);
     h_adc_sL[s]->SetMinimum(0);
     h_adc_sL[s]->SetFillColor(8);
   }
@@ -133,26 +135,30 @@ void cdcDQM7Module::defineHisto()
   // 20190205
   h_occ = new TH1D("occ", "occ. total", 100, 0, 1.);
   h_occ->SetFillColor(95);
-
-  h_occ_L_px = new TH1D("occ_L_px", "occ. Layer dep.", 56, 0, 56);
-  h_occ_L_px->SetFillColor(75);
+  //
+  h_occ_L = new TH1D("h_occ_L", "occ. each layer", 56, 0, 56.);
+  h_occ_L->SetFillColor(96);
+  h_occ_L->SetMinimum(0);
+  h_occ_L->SetStats(0);
+  h_occ_L->SetOption("hist");
 
   //
   bmap_2 = new TH2D("bmap_2", "", 20, 0, 20, 15, 0, 15);
 
   // LIVE
   h_tdc_sL[0]->SetOption("LIVE"); // small
+  h_tdc_sL[0]->SetOption("hist");
   h_tdc_sL[8]->SetOption("LIVE"); // outer most
+  h_tdc_sL[8]->SetOption("hist");
   h_adc_sL[0]->SetOption("LIVE"); // small
+  h_adc_sL[0]->SetOption("hist");
   h_adc_sL[8]->SetOption("LIVE"); // outer most
-  //  h_fast_tdc->SetOption("LIVE"); // fastest TDC
+  h_adc_sL[8]->SetOption("hist");
   h_fast_tdc->SetStats(1);
 
   bmap_2->SetOption("LIVE"); //
   bmap_2->SetOption("zcol"); //
   bmap_2->SetStats(0);
-  h_occ_L_px->SetOption("LIVE"); //
-  h_occ_L_px->SetOption("hist"); //
 
   oldDir->cd();//
 
@@ -179,11 +185,8 @@ void cdcDQM7Module::beginRun()
 
   h_fast_tdc->Reset();
   bmap_2->Reset();
-
-  //
   h_occ->Reset();
-  h_occ_L_px->Reset();
-  //
+  //  h_occ_L->Reset();
 }
 
 void cdcDQM7Module::event()
@@ -193,15 +196,13 @@ void cdcDQM7Module::event()
   int nent = cdcHits.getEntries();
   int ftdc = 0;
 
-  // add
-  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
-  double n_L[56] = {};
-
-  // reset
-  h_occ_L_px->Reset(); //
-
   // occ total
   h_occ->Fill(nent / 14336.);
+
+  // for layer dependent occupancy
+  int whits_L[56] = {}; // wire hits
+  double occ_L[56] = {}; // occupancy
+  h_occ_L->Reset();// reset
 
   for (int i = 0; i < nent; i++) {
     CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
@@ -218,8 +219,14 @@ void cdcDQM7Module::event()
     int num = sL * 6 + iL + 2;
     if (num > 55) continue; // error
 
-    if (adcsum > 25) {
-      //    if (adcsum > -1) {
+    // wire hits
+    if (sL == 0) {
+      whits_L[iL]++;
+    } else {
+      whits_L[num]++;
+    }
+
+    if (adcsum > 0) {
 
       if (sL == 0) {
         h_nhits_L[iL]->Fill(wid);
@@ -227,37 +234,54 @@ void cdcDQM7Module::event()
         h_adc_L[iL]->Fill(adcsum);
         h_tdc_sL[sL]->Fill(vtdc);
         h_adc_sL[sL]->Fill(adcsum);
-
-        // add
-        n_L[iL] = n_L[iL] + (1. / ndiv[sL]);
-        //
-
       } else {
         h_nhits_L[num]->Fill(wid);
         h_tdc_L[num]->Fill(vtdc);
         h_adc_L[num]->Fill(adcsum);
         h_tdc_sL[sL]->Fill(vtdc);
         h_adc_sL[sL]->Fill(adcsum);
-
-        // add
-        n_L[num] = n_L[num] + (1. / ndiv[sL]);
-        //
       }
 
       if (vtdc > ftdc) {
         ftdc = vtdc;
       }// fastest
 
-    }//adc
-
+    }// adc
   }// cdchit
 
   h_fast_tdc->Fill(ftdc);
 
-  // add
-  for (int q = 0; q < 56; q++) {
-    h_occ_L_px->Fill(q, n_L[q]);
+  // each layer
+  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
+  for (int b = 0; b < 56; b++) {
+    int n_wire;
+    if (b < 8) {
+      n_wire = ndiv[0];
+    } else if (b >= 8 && b < 14) {
+      n_wire = ndiv[1];
+    } else if (b >= 14 && b < 20) {
+      n_wire = ndiv[2];
+    } else if (b >= 20 && b < 26) {
+      n_wire = ndiv[3];
+    } else if (b >= 26 && b < 32) {
+      n_wire = ndiv[4];
+    } else if (b >= 32 && b < 38) {
+      n_wire = ndiv[5];
+    } else if (b >= 38 && b < 44) {
+      n_wire = ndiv[6];
+    } else if (b >= 44 && b < 50) {
+      n_wire = ndiv[7];
+    } else if (b >= 50 && b < 56) {
+      n_wire = ndiv[8];
+    }
+
+    // cal. occupancy
+    occ_L[b] = (double)whits_L[b] / n_wire;
+    h_occ_L->Fill(b, occ_L[b]);
+    //    printf("%d, %d:\n", b, whits_L[b]);
+    //    printf("%d, %f:\n", b, occ_L[b]);
   }
+
 
   //
   StoreArray<CDCRawHit> cdcRawHits;
@@ -268,14 +292,13 @@ void cdcDQM7Module::event()
     CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
 
     int board = cdcrawhit->getBoardId();
+    //    printf("%d, %d:\n", j, board);
     if (board > 299) continue;
 
     double x = board % 20;
-    double y = (board - (board % 20)) / 20;
-
-    if (x != 5 || y != 5) {
-      bmap_2->Fill(x, y);
-    }
+    double y = (board - (board % 20)) / 20.;
+    bmap_2->Fill(x, y);
+    //    printf("%f, %f:\n", x,y);
 
     if (x == 1. && y == 1.) {
       bmap_2->Fill(0., 0.);

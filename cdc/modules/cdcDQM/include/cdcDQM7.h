@@ -55,7 +55,7 @@ namespace Belle2 {
     TH2D* bmap_2 = nullptr;/**<board status map 2D*/
     // add
     TH1D* h_occ = nullptr;/**<occupancy*/
-    TH1D* h_occ_L_px = nullptr;/**<occupancy*/
+    TH1D* h_occ_L = nullptr;/**<occupancy-layer-dep.*/
 
   };
 }

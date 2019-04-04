@@ -2983,10 +2983,10 @@ namespace {
     const Manager::Var* cly = Manager::Instance().getVariable("closestKLMCMS(klmClusterPositionY)");
     const Manager::Var* clz = Manager::Instance().getVariable("closestKLMCMS(klmClusterPositionZ)");
     const Manager::Var* clE = Manager::Instance().getVariable("closestKLMCMS(klmClusterEnergy)");
-    const Manager::Var* frx = Manager::Instance().getVariable("farthestKLMCMS(klmClusterPositionX)");
-    const Manager::Var* fry = Manager::Instance().getVariable("farthestKLMCMS(klmClusterPositionY)");
-    const Manager::Var* frz = Manager::Instance().getVariable("farthestKLMCMS(klmClusterPositionZ)");
-    const Manager::Var* frE = Manager::Instance().getVariable("farthestKLMCMS(klmClusterEnergy)");
+    const Manager::Var* frx = Manager::Instance().getVariable("furthestKLMCMS(klmClusterPositionX)");
+    const Manager::Var* fry = Manager::Instance().getVariable("furthestKLMCMS(klmClusterPositionY)");
+    const Manager::Var* frz = Manager::Instance().getVariable("furthestKLMCMS(klmClusterPositionZ)");
+    const Manager::Var* frE = Manager::Instance().getVariable("furthestKLMCMS(klmClusterEnergy)");
 
     EXPECT_EQ(gammalist->getListSize(), 3);
 

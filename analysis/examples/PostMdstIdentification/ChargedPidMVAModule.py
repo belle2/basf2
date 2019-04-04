@@ -15,30 +15,31 @@ Example steering file - 2019 Belle II Collaboration.
 __author__ = "Marco Milesi"
 __email__ = "marco.milesi@unimelb.edu.au"
 
-
 import argparse
-
-import basf2
-from modularAnalysis import fillParticleLists, applyChargedPidMVA, variablesToNtuple
 
 
 def argparser():
 
     description = """This steering file fills an NTuple with the (currently ECL-only-based) ChargedPidMVA score
-for a given pair of (S,B) mass hypotheses for charged stable particles."""
+for a given pair of (S,B) mass hypotheses for charged stable particles. Multiple (S,B) pairs can be tested at the same time."""
 
     parser = argparse.ArgumentParser(description=description, usage=__doc__)
 
-    parser.add_argument("--sigHypoPDGCode",
-                        dest="sigHypoPDGCode",
+    def sb_pair(arg):
+        try:
+            s, b = map(int, arg.split(','))
+            return s, b
+        except BaseException:
+            raise argparse.ArgumentTypeError("Option string must be of the form \'S,B\'")
+
+    parser.add_argument("--testHyposPDGCodePair",
+                        dest="testHyposPDGCodePair",
                         required=True,
-                        type=int,
-                        help="The pdgId of the signal charged stable particle mass hypothesis.")
-    parser.add_argument("--bkgHypoPDGCode",
-                        dest="bkgHypoPDGCode",
-                        required=True,
-                        type=int,
-                        help="The pdgId of the background charged stable particle mass hypothesis.")
+                        type=sb_pair,
+                        nargs='+',
+                        help="""A list of pdgId pairs of the (signal,background) charged stable
+particle mass hypotheses to test. Pass a space-separated list of (>= 1) S,B pdgIds,
+e.g. \'--testHyposPDGCodePair 11,211 13,211\'""")
     parser.add_argument("-d", "--debug",
                         dest="debug",
                         action="store",
@@ -52,6 +53,9 @@ for a given pair of (S,B) mass hypotheses for charged stable particles."""
 if __name__ == '__main__':
 
     args = argparser().parse_args()
+
+    import basf2
+    from modularAnalysis import fillParticleLists, applyChargedPidMVA, variablesToNtuple
 
     # ------------
     # Create path.
@@ -91,15 +95,15 @@ if __name__ == '__main__':
     # Apply charged Pid MVA.
     # ----------------------
 
-    applyChargedPidMVA(sigHypoPDGCode=args.sigHypoPDGCode,
-                       bkgHypoPDGCode=args.bkgHypoPDGCode,
-                       particleLists=[plist[0] for plist in plists],
-                       path=path)
+    for s, b in args.testHyposPDGCodePair:
+        applyChargedPidMVA(sigHypoPDGCode=s,
+                           bkgHypoPDGCode=b,
+                           particleLists=[plist[0] for plist in plists],
+                           path=path)
 
     if args.debug:
-        # Set debug level for this module
         for m in path.modules():
-            if m.name() == "ChargedPidMVA":
+            if "ChargedPidMVA" in m.name():
                 m.logging.log_level = basf2.LogLevel.DEBUG
                 m.logging.debug_level = args.debug
 
@@ -107,10 +111,11 @@ if __name__ == '__main__':
     # Make an NTuple.
     # ---------------
 
-    filename = f"chargedpid_{args.sigHypoPDGCode}_vs_{args.bkgHypoPDGCode}_ntuples.root"
+    append = "__".join([f"{s}_vs_{b}" for s, b in args.testHyposPDGCodePair])
+    filename = f"chargedpid_ntuples__{append}.root"
     for plist in plists:
         variablesToNtuple(decayString=plist[0],
-                          variables=[f"chargedPidBDT({args.sigHypoPDGCode},{args.bkgHypoPDGCode})"],
+                          variables=[f"chargedPidBDT({s},{b})" for s, b in args.testHyposPDGCodePair],
                           treename=plist[0].split(':')[1],
                           filename=filename,
                           path=path)

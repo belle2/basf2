@@ -58,7 +58,7 @@ void DQMHistAnalysisKLMModule::analyseStripLayerHistogram(
   double x = 0.15;
   double y = 0.85;
   double nEvents, average;
-  int endcap, layer, sector, sectorGlobal, sectorsWithSignal;
+  int endcap, layer, sector, plane, strip, sectorGlobal, sectorsWithSignal;
   double sectorEvents[EKLMElementNumbers::getMaximalSectorNumber()] = {0};
   std::string str;
   const EKLMDataConcentratorLane* lane;
@@ -88,6 +88,27 @@ void DQMHistAnalysisKLMModule::analyseStripLayerHistogram(
   }
   if (sectorsWithSignal == 0)
     return;
+  average /= (sectorsWithSignal * EKLMElementNumbers::getNStripsSector());
+  for (i = 1; i <= EKLMElementNumbers::getNStripsLayer(); ++i) {
+    nEvents = histogram->GetBinContent(i);
+    sector = (i - 1) / EKLMElementNumbers::getNStripsSector() + 1;
+    sectorGlobal = m_ElementNumbers->sectorNumber(endcap, layer, sector);
+    lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
+    if (lane == nullptr)
+      B2FATAL("Incomplete EKLM electronics map.");
+    if (nEvents > average * 10) {
+      plane = ((i - 1) % EKLMElementNumbers::getNStripsSector()) / 2 + 1;
+      strip = (i - 1) % EKLMElementNumbers::getMaximalStripNumber() + 1;
+      str = "Hot channel: copper " + std::to_string(lane->getCopper()) +
+            ", data concentrator " +
+            std::to_string(lane->getDataConcentrator()) +
+            ", lane " + std::to_string(lane->getLane()) +
+            ", plane " + std::to_string(plane) +
+            ", strip " + std::to_string(strip);
+      latex.DrawLatexNDC(x, y, str.c_str());
+      y -= 0.05;
+    }
+  }
 }
 
 void DQMHistAnalysisKLMModule::event()

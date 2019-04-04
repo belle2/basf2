@@ -265,7 +265,10 @@ namespace Belle2 {
     /**
      * Get maximal strip number.
      */
-    int getMaximalStripNumber() const;
+    static constexpr int getMaximalStripNumber()
+    {
+      return m_MaximalStripNumber;
+    }
 
     /**
      * Get maximal detector layer global number.

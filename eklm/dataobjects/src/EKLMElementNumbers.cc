@@ -269,8 +269,3 @@ int EKLMElementNumbers::getMaximalSegmentNumber() const
 {
   return m_MaximalSegmentNumber;
 }
-
-int EKLMElementNumbers::getMaximalStripNumber() const
-{
-  return m_MaximalStripNumber;
-}

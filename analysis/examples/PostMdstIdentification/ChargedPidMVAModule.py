@@ -45,6 +45,7 @@ e.g. \'--testHyposPDGCodePair 11,211 13,211\'""")
                         action="store",
                         default=0,
                         type=int,
+                        choices=list(range(11, 20)),
                         help="Run the ChargedPidMVA module in debug mode. Pass the desired DEBUG level integer.")
 
     return parser
@@ -115,7 +116,7 @@ if __name__ == '__main__':
     filename = f"chargedpid_ntuples__{append}.root"
     for plist in plists:
         variablesToNtuple(decayString=plist[0],
-                          variables=[f"chargedPidBDT({s},{b})" for s, b in args.testHyposPDGCodePair],
+                          variables=[f"pidPairChargedBDTScore({s},{b})" for s, b in args.testHyposPDGCodePair],
                           treename=plist[0].split(':')[1],
                           filename=filename,
                           path=path)

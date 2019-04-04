@@ -53,7 +53,7 @@ void ChargedPidMVAModule::beginRun()
             " of the background mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
-  m_score_varname = "chargedPidBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
+  m_score_varname = "pidPairChargedBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
 
 }
 
@@ -93,9 +93,8 @@ void ChargedPidMVAModule::event()
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
       // Check that the particle has a valid relation set between track and ECL cluster.
-      // Otherwise, assign a NaN score and skip to next.
+      // Otherwise, skip to next.
       if (!particle->getECLCluster()) {
-        particle->writeExtraInfo(m_score_varname, std::numeric_limits<float>::quiet_NaN());
         B2DEBUG(11, "\t --> Invalid track-cluster relation, skip...");
         continue;
       }

@@ -2345,10 +2345,11 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path=analy
         name, label = pList.split(':')
         plSet.add(f"{pdg.conjugate(name)}:{label}")
 
-    chargedpid = register_module('ChargedPidMVA')
-    chargedpid.param('sigHypoPDGCode', sigHypoPDGCode)
-    chargedpid.param('bkgHypoPDGCode', bkgHypoPDGCode)
-    chargedpid.param('particleLists', list(plSet))
+    chargedpid = register_module("ChargedPidMVA")
+    chargedpid.set_name(f"ChargedPidMVA_{sigHypoPDGCode}_vs_{bkgHypoPDGCode}")
+    chargedpid.param("sigHypoPDGCode", sigHypoPDGCode)
+    chargedpid.param("bkgHypoPDGCode", bkgHypoPDGCode)
+    chargedpid.param("particleLists", list(plSet))
 
     path.add_module(chargedpid)
 

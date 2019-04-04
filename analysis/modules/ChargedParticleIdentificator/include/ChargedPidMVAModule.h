@@ -39,6 +39,8 @@ namespace Belle2 {
    *
    * This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B.
    *
+   * Currently, it uses only ECL-based inputs.
+   *
    * For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists,
    * calculates the MVA score using the appropriate xml weight file,
    * and adds it as ExtraInfo to the Particle objects.
@@ -83,18 +85,6 @@ namespace Belle2 {
      * This is most likely where your module will actually do anything.
      */
     virtual void event() override;
-
-    /**
-     * Called once when a run ends.
-     *
-     * Use this method to save run information, which you aggregated over the last run.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Clean up anything you created in initialize().
-     */
-    virtual void terminate() override;
 
   private:
 

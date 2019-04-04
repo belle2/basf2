@@ -106,6 +106,9 @@ namespace Belle2 {
 
     /**
      * @return the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.
+     *
+     * Currently uses ECL-only inputs.
+     *
      * The signal hypothesis pdg and the test pdg are passed a vector of strings of size = 2.
      * Examples:
      * Response of BDT trained for "e vs pi" separation = chargedPidBDT(11, 211)

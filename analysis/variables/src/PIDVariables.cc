@@ -443,7 +443,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("deuteronID", deuteronID,
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("chargedPidBDT(pdgCodeHyp, pdgCodeTest)", chargedPidBDT,
-                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.");
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. Currently uses only ECL inputs.");
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");

@@ -29,11 +29,6 @@
 
 //BOOST
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
-//C++
-#include <unordered_map>
-#include <fstream>
 
 
 namespace Belle2 {
@@ -275,12 +270,12 @@ namespace Belle2 {
       * It can be used to lookup the correct xml weightfile in the payload, given a pdgId, clusterTheta and p.
      */
     ClusterThetaPGridByParticle m_grids = {
-      { 11, nullptr },
-      { 13, nullptr },
-      { 211, nullptr },
-      { 321, nullptr },
-      { 2212, nullptr },
-      { 1000010020, nullptr }
+      { Const::electron.getPDGCode(), nullptr },
+      { Const::muon.getPDGCode(), nullptr },
+      { Const::pion.getPDGCode(), nullptr },
+      { Const::kaon.getPDGCode(), nullptr },
+      { Const::proton.getPDGCode(), nullptr },
+      { Const::deuteron.getPDGCode(), nullptr }
     };
 
     /**
@@ -288,12 +283,12 @@ namespace Belle2 {
      * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram conatined in the m_grids map.
      */
     WeightfilesByParticle m_weightfiles = {
-      { 11, std::vector<std::string>() },
-      { 13, std::vector<std::string>() },
-      { 211, std::vector<std::string>() },
-      { 321, std::vector<std::string>() },
-      { 2212, std::vector<std::string>() },
-      { 1000010020, std::vector<std::string>() }
+      { Const::electron.getPDGCode(), std::vector<std::string>() },
+      { Const::muon.getPDGCode(), std::vector<std::string>() },
+      { Const::pion.getPDGCode(), std::vector<std::string>() },
+      { Const::kaon.getPDGCode(), std::vector<std::string>() },
+      { Const::proton.getPDGCode(), std::vector<std::string>() },
+      { Const::deuteron.getPDGCode(), std::vector<std::string>() }
     };
 
     ClassDef(ChargedPidMVAWeights, 3);

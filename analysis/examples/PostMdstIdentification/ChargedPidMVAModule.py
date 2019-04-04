@@ -4,7 +4,7 @@
 """
 
 cd $BELLE2_LOCAL_DIR
-basf2 -i /PATH/TO/MDST/FILE.root analysis/examples/ChargedPidMVAModuleTest.py -- [OPTIONS]
+basf2 -i /PATH/TO/MDST/FILE.root analysis/examples/PostMdstIdentification/ChargedPidMVAModule.py -- [OPTIONS]
 
 Input: *_mdst_*.root
 Output: *_ntup_*.root
@@ -15,24 +15,27 @@ Example steering file - 2019 Belle II Collaboration.
 __author__ = "Marco Milesi"
 __email__ = "marco.milesi@unimelb.edu.au"
 
-import os
+
 import argparse
+
+import basf2
+from modularAnalysis import fillParticleLists, applyChargedPidMVA, variablesToNtuple
 
 
 def argparser():
 
-    description = """This steering file fills an NTuple with the ChargedPidMVA score
+    description = """This steering file fills an NTuple with the (currently ECL-only-based) ChargedPidMVA score
 for a given pair of (S,B) mass hypotheses for charged stable particles."""
 
     parser = argparse.ArgumentParser(description=description, usage=__doc__)
 
-    parser.add_argument("--sigPdgId",
-                        dest="sigPdgId",
+    parser.add_argument("--sigHypoPDGCode",
+                        dest="sigHypoPDGCode",
                         required=True,
                         type=int,
                         help="The pdgId of the signal charged stable particle mass hypothesis.")
-    parser.add_argument("--bkgPdgId",
-                        dest="bkgPdgId",
+    parser.add_argument("--bkgHypoPDGCode",
+                        dest="bkgHypoPDGCode",
                         required=True,
                         type=int,
                         help="The pdgId of the background charged stable particle mass hypothesis.")
@@ -49,9 +52,6 @@ for a given pair of (S,B) mass hypotheses for charged stable particles."""
 if __name__ == '__main__':
 
     args = argparser().parse_args()
-
-    import basf2
-    from modularAnalysis import fillParticleLists, applyChargedPidMVA, variablesToNtuple
 
     # ------------
     # Create path.
@@ -91,8 +91,8 @@ if __name__ == '__main__':
     # Apply charged Pid MVA.
     # ----------------------
 
-    applyChargedPidMVA(sigPdgId=args.sigPdgId,
-                       bkgPdgId=args.bkgPdgId,
+    applyChargedPidMVA(sigHypoPDGCode=args.sigHypoPDGCode,
+                       bkgHypoPDGCode=args.bkgHypoPDGCode,
                        particleLists=[plist[0] for plist in plists],
                        path=path)
 
@@ -107,10 +107,10 @@ if __name__ == '__main__':
     # Make an NTuple.
     # ---------------
 
-    filename = f"chargedpid_{args.sigPdgId}_vs_{args.bkgPdgId}_ntuples.root"
+    filename = f"chargedpid_{args.sigHypoPDGCode}_vs_{args.bkgHypoPDGCode}_ntuples.root"
     for plist in plists:
         variablesToNtuple(decayString=plist[0],
-                          variables=[f"chargedPidBDT({args.sigPdgId},{args.bkgPdgId})"],
+                          variables=[f"chargedPidBDT({args.sigHypoPDGCode},{args.bkgHypoPDGCode})"],
                           treename=plist[0].split(':')[1],
                           filename=filename,
                           path=path)

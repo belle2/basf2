@@ -10,15 +10,15 @@ REG_MODULE(ChargedPidMVA)
 
 ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {
-  setDescription("This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
+  setDescription("This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B. Currently, it uses only ECL-based inputs. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("sigPdgId",
+  addParam("sigHypoPDGCode",
            m_sig_pdg,
            "The input signal mass hypothesis' pdgId.",
            int(0));
-  addParam("bkgPdgId",
+  addParam("bkgHypoPDGCode",
            m_bkg_pdg,
            "The input background mass hypothesis' pdgId.",
            int(0));
@@ -63,7 +63,7 @@ void ChargedPidMVAModule::event()
 
   auto sigPart = Const::ChargedStable(m_sig_pdg);
 
-  B2DEBUG(20, "EVENT: " << m_event_metadata->getEvent());
+  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent());
 
   for (const auto& name : m_particle_lists) {
 
@@ -84,19 +84,19 @@ void ChargedPidMVAModule::event()
       continue;
     }
 
-    B2DEBUG(20, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");
+    B2DEBUG(11, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");
 
     for (unsigned int ipart(0); ipart < pList->getListSize(); ++ipart) {
 
       Particle* particle = pList->getParticle(ipart);
 
-      B2DEBUG(20, "\tParticle [" << ipart << "]");
+      B2DEBUG(11, "\tParticle [" << ipart << "]");
 
       // Check that the particle has a valid relation set between track and ECL cluster.
       // Otherwise, assign a NaN score and skip to next.
       if (!particle->getECLCluster()) {
         particle->writeExtraInfo(m_score_varname, std::numeric_limits<float>::quiet_NaN());
-        B2DEBUG(20, "\t --> Invalid track-cluster relation, skip...");
+        B2DEBUG(11, "\t --> Invalid track-cluster relation, skip...");
         continue;
       }
 
@@ -106,27 +106,27 @@ void ChargedPidMVAModule::event()
       int jth, ip;
       auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
 
-      B2DEBUG(20, "\t\tclusterTheta = " << theta << " [rad]");
-      B2DEBUG(20, "\t\tp = " << p << " [GeV/c]");
-      B2DEBUG(20, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
+      B2DEBUG(11, "\t\tclusterTheta = " << theta << " [rad]");
+      B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
+      B2DEBUG(11, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
       auto nvars  = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
         auto varobj =  m_variables.at(index).at(ivar);
-        B2DEBUG(20, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << varobj->function(particle));
+        B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << varobj->function(particle));
         m_datasets.at(index)->m_input[ivar] = varobj->function(particle);
       }
       auto nspecs  = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
         auto specobj =  m_spectators.at(index).at(ispec);
-        B2DEBUG(20, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << specobj->function(particle));
+        B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << specobj->function(particle));
         m_datasets.at(index)->m_spectators[ispec] = specobj->function(particle);
       }
 
       float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];
 
-      B2DEBUG(20, "\t\tscore = " << score);
+      B2DEBUG(11, "\t\tscore = " << score);
 
       // Store the MVA score as a new particle object property.
       particle->writeExtraInfo(m_score_varname, score);
@@ -137,22 +137,10 @@ void ChargedPidMVAModule::event()
 }
 
 
-void ChargedPidMVAModule::endRun()
-{
-}
-
-
-void ChargedPidMVAModule::terminate()
-{
-}
-
-
 void ChargedPidMVAModule::initializeMVA()
 {
 
-  if (!m_weightfiles_representation) { B2FATAL("No MVA weightfiles representation payload found in database! Abort..."); }
-
-  B2INFO("Load supported MVA interfaces...");
+  B2INFO("Load supported MVA interfaces for charged particle identification...");
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();
@@ -174,7 +162,7 @@ void ChargedPidMVAModule::initializeMVA()
 
   for (unsigned int idx(0); idx < nfiles; idx++) {
 
-    B2DEBUG(30, "\t\tweightfile[" << idx << "]");
+    B2DEBUG(12, "\t\tweightfile[" << idx << "]");
 
     // De-serialize the string into an MVA::Weightfile object.
     std::stringstream ss(serialized_weightfiles->at(idx));
@@ -188,7 +176,7 @@ void ChargedPidMVAModule::initializeMVA()
     m_variables[idx] = manager.getVariables(general_options.m_variables);
     m_spectators[idx] = manager.getVariables(general_options.m_spectators);
 
-    B2DEBUG(30, "\t\tRetrieved N = " << general_options.m_variables.size()
+    B2DEBUG(12, "\t\tRetrieved N = " << general_options.m_variables.size()
             << " variables, N = " << general_options.m_spectators.size()
             << " spectators");
 
@@ -196,14 +184,14 @@ void ChargedPidMVAModule::initializeMVA()
     m_experts[idx] = supported_interfaces[general_options.m_method]->getExpert();
     m_experts.at(idx)->load(weightfile);
 
-    B2DEBUG(30, "\t\tweightfile loaded successfully into expert[" << idx << "]!");
+    B2DEBUG(12, "\t\tweightfile loaded successfully into expert[" << idx << "]!");
 
     // Store an MVA::SingleDataset object, in which we will save our features later...
     std::vector<float> v(general_options.m_variables.size(), 0.0);
     std::vector<float> s(general_options.m_spectators.size(), 0.0);
     m_datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, v, 1.0, s);
 
-    B2DEBUG(30, "\t\tdataset[" << idx << "] created successfully!");
+    B2DEBUG(12, "\t\tdataset[" << idx << "] created successfully!");
 
   }
 

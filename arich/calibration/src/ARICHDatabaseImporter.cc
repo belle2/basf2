@@ -966,7 +966,7 @@ void ARICHDatabaseImporter::printFEMappings()
   GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
 
   cout << "{ \"hapdmap\": [" << endl;
-  for (int hapdID = 1; hapdID < 421; hapdID++) {
+  for (unsigned hapdID = 1; hapdID < 421; hapdID++) {
     std::string hapdsn;
     for (const GearDir& module : content.getNodes("Module")) {
       hapdsn = module.getString("@hapdID");

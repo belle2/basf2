@@ -14,6 +14,8 @@
 #include <string>
 #include <TH2Poly.h>
 #include <TGraph.h>
+#include <TLine.h>
+#include <TText.h>
 
 namespace Belle2 {
 
@@ -46,7 +48,7 @@ namespace Belle2 {
      * @param hapdID ID number of HAPD module
      * @param chID channel ID (asic channel) or APD ID
      */
-    void fillBin(unsigned hapdID, unsigned chID);
+    void fillBin(unsigned hapdID, unsigned chID, double weight = 1.);
 
     /**
      * Set content of bin corresponding to hapd hapdID and channel chID
@@ -60,7 +62,7 @@ namespace Belle2 {
      * Add entry to bin corresponding to hapd hapdID
      * @param hapdID ID number of HAPD module
      */
-    void fillBin(unsigned hapdID);
+    void fillBin(unsigned hapdID, double weight = 1.);
 
     /**
      * Set content of bin corresponding to hapd hapdID
@@ -69,14 +71,31 @@ namespace Belle2 {
      */
     void setBinContent(unsigned hapdID, double value);
 
+    /**
+     * Draw the histogram
+     * @param option root draw option
+     */
+    void Draw(Option_t* option = "") override;
 
+    /**
+     * Fill the channelHist from the histogram
+     * Type 0 channelHist has to be filled with 420*144bin TH1 (each channel)
+     * Type 1 channelHist can be filled with 420*144 (channels) or 420*4 (chips), or 420 (HAPDs) bin TH1
+     * Type 2 channelHist can be filled wit 420*144 or 420*4 bin TH1
+     * In case histogram has more bins than channelHist bin content is summed up
+     * Exampl: histogram with hits/channel can be used to make ChannelHist with hits/hapd
+     * @param hist historam
+     */
+    void fillFromTH1(TH1* hist);
 
 
   protected:
 
+    TLine lines[6];
+    TText labels[6];
     int m_type = 0; /**< histogram type */
     std::vector<unsigned> m_hapd2binMap; /**< map of bins*/
-    ClassDef(ARICHChannelHist, 1); /**< ClassDef */
+    ClassDefOverride(ARICHChannelHist, 2); /**< ClassDef */
 
   };
 

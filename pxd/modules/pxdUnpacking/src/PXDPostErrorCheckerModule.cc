@@ -180,6 +180,12 @@ void PXDPostErrorCheckerModule::event()
           // TODO check against other DHP (full bits) and DHE (limited bits)
           // TODO We know that this will fail with current firmware and most likely will not be fixed...
         }
+        for (auto it = dhe.cm_begin(); it < dhe.cm_end(); ++it)  {
+          if (*it.at(0) == 63) {
+            // TODO Check that we dont have CM=63 indicating fifo overflow, check and set bits
+            B2ERROR("DHP data loss (CM=63) in " << LogVar("DHE", dhe.getDHEID()) << LogVar("DHP", it[0]) << LogVar("Row", it[1]));
+          }
+        }
       }
     }
   }

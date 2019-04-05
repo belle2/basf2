@@ -580,6 +580,10 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
         pixelflag = false;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
+        if (dhp_cm == 63) { // fifo overflow
+          B2WARNING("DHP data loss (CM=63) in " << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
+          /// FIXME TODO set an error bit ... but define one first
+        }
         if (daqpktstat.dhc_size() > 0) {
           if (daqpktstat.dhc_back().dhe_size() > 0) {
             PXDDAQDHPComMode cm(dhp_dhp_id, dhp_row, dhp_cm);
@@ -830,6 +834,11 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_ID;
       }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
+      if ((found_mask_active_dhp & (1 << dhc.data_direct_readout_frame->getDHPPort())) != 0) {
+        B2ERROR("Second DHP data packet (MEMDUMP) for " << LogVar("DHE", currentDHEID) << LogVar("DHP",
+                dhc.data_direct_readout_frame->getDHPPort()));
+      }
+
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
       unpack_dhp_raw(data, len - 4,
@@ -866,6 +875,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_ID;
       }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
+      if ((found_mask_active_dhp & (1 << dhc.data_direct_readout_frame->getDHPPort())) != 0) {
+        B2ERROR("Second DHP data packet for " << LogVar("DHE", currentDHEID) << LogVar("DHP", dhc.data_direct_readout_frame->getDHPPort()));
+      }
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
       if (m_checkPaddingCRC) m_errorMask |= dhc.check_padding(); // isUnfiltered_event
 
@@ -911,6 +923,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_ID;
       }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
+      if ((found_mask_active_dhp & (1 << dhc.data_direct_readout_frame->getDHPPort())) != 0) {
+        B2ERROR("Second DHP data packet (FCE) for " << LogVar("DHE", currentDHEID) << LogVar("DHP",
+                dhc.data_direct_readout_frame->getDHPPort()));
+      }
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
       B2DEBUG(29, "UNPACK FCE FRAME with len $" << hex << len);
@@ -1133,6 +1149,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_ID;
       }
       /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
+      if ((found_mask_active_dhp & (1 << dhc.data_ghost_frame->getDHPPort())) != 0) {
+        B2ERROR("Second DHP data packet (GHOST) for " << LogVar("DHE", currentDHEID) << LogVar("DHP", dhc.data_ghost_frame->getDHPPort()));
+      }
       found_mask_active_dhp |= 1 << dhc.data_ghost_frame->getDHPPort();
 
       //found_mask_active_dhp = mask_active_dhp;/// TODO Workaround for DESY TB 2016 doesnt work

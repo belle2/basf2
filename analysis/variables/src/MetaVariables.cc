@@ -1805,6 +1805,40 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr eclClusterTrackMatchedWithCondition(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() <= 1) {
+
+        std::string cutString;
+        if (arguments.size() == 1)
+          cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle * particle) -> double {
+
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+
+          const ECLCluster* cluster = particle->getECLCluster();
+
+          if (cluster)
+          {
+            auto tracks = cluster->getRelationsFrom<Track>();
+
+            for (const auto& track : tracks) {
+              Particle trackParticle(&track, Belle2::Const::pion);
+
+              if (cut->check(&trackParticle))
+                return 1;
+            }
+            return 0;
+          }
+          return std::numeric_limits<double>::quiet_NaN();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function eclClusterSpecialTrackMatched");
+      }
+    }
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
@@ -1875,14 +1909,14 @@ arguments. Operator precedence is taken into account. For example ::
                       "or if the i-th MC daughter does not exist.\n"
                       "E.g. mcDaughter(0, PDG) will return the PDG code of the first MC daughter of the matched MC"
                       "particle of the reconstructed particle the function is applied to./n"
-                      "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).")
+                      "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).");
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
                       "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
-                      "The meta variable can also be nested: mcMother(mcMother(PDG)).")
+                      "The meta variable can also be nested: mcMother(mcMother(PDG)).");
     REGISTER_VARIABLE("genParticle(i, variable)", genParticle,
                       "[Eventbased] Returns function which returns the variable for the ith generator particle.\n"
                       "The arguments of the function must be:\n"
@@ -2038,7 +2072,6 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
                       "Returns if the absolute value of aPDGCode of a MCParticle related to a Particle matches a given PDGCode."
                       "Returns 0/0.5/1 if PDGCode does not match/is not available/ matches");
-
     REGISTER_VARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
@@ -2056,5 +2089,7 @@ arguments. Operator precedence is taken into account. For example ::
                       "Returns the total ECL energy of particles in the given particle List.");
     REGISTER_VARIABLE("maxPtInList(particleListName)", maxPtInList,
                       "Returns maximum transverse momentum Pt in the given particle List.");
+    REGISTER_VARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
+                      "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.");
   }
 }

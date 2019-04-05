@@ -55,6 +55,9 @@ add_unpackers(path=main)
 # additional modules if needed for hit processing
 main.add_module('ARICHFillHits')
 main.add_module('TOPChannelMasker')
+main.add_module('ActivatePXDGainCalibrator')
+main.add_module('PXDClusterizer')
+
 
 # Beam background rate monitor: output to flat ntuple
 main.add_module('BeamBkgHitRateMonitor', outputFileName=outputFile)

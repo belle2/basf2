@@ -2,7 +2,7 @@
 // File : DQMHistOutputToEPICS.cc
 // Description : Write Histogram Content to EPICS Arrays
 //
-// Author : Bjoern Spruck, Univerisity Mainz
+// Author : Bjoern Spruck, University Mainz
 // Date : 2019
 //-
 
@@ -36,10 +36,17 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
   B2DEBUG(99, "DQMHistOutputToEPICS: Constructor done.");
 }
 
+DQMHistOutputToEPICSModule::~DQMHistOutputToEPICSModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistOutputToEPICSModule::initialize()
 {
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
 #endif
   for (auto& it : m_histlist) {
     if (it.size() < 2) {
@@ -122,6 +129,12 @@ void DQMHistOutputToEPICSModule::terminate()
         SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_put failure");
       }
     }
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  // the following belongs to terminate
+  for (auto* n : pmynode) {
+    if (n->mychid) SEVCHK(ca_clear_channel(n->mychid), "ca_clear_channel failure");
+    if (n->mychid_last) SEVCHK(ca_clear_channel(n->mychid_last), "ca_clear_channel failure");
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif

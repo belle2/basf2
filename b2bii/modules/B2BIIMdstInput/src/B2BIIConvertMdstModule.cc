@@ -230,7 +230,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   m_tracks.registerRelationTo(m_pidLikelihoods);
   if (m_convertExtHits) m_tracks.registerRelationTo(m_extHits);
   m_eclClusters.registerRelationTo(m_mcParticles);
-  m_eclClusters.registerRelationTo(m_tracks);
+  m_tracks.registerRelationTo(m_eclClusters);
   m_klmClusters.registerRelationTo(m_tracks);
   m_klmClusters.registerRelationTo(m_eclClusters);
   m_particles.registerRelationTo(m_mcParticles);
@@ -314,8 +314,8 @@ void B2BIIConvertMdstModule::event()
   // 4. Convert Tracking information
   convertMdstChargedTable();
 
-  // 5. Set ECLCluster -> Track relations
-  setECLClustersToTracksRelations();
+  // 5. Set Track -> ECLCluster relations
+  setTracksToECLClustersRelations();
 
   // 6. Set KLMCluster -> Track, ECLCluster relations
   setKLMClustersRelations();
@@ -1780,10 +1780,10 @@ void B2BIIConvertMdstModule::convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_
 //-----------------------------------------------------------------------------
 // RELATIONS
 //-----------------------------------------------------------------------------
-void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
+void B2BIIConvertMdstModule::setTracksToECLClustersRelations()
 {
   // Relations
-  RelationArray eclClustersToTracks(m_eclClusters, m_tracks);
+  RelationArray tracksToECLClusters(m_tracks, m_eclClusters);
 
   Belle::Mdst_ecl_trk_Manager& m = Belle::Mdst_ecl_trk_Manager::get_manager();
   Belle::Mdst_charged_Manager& chgMg = Belle::Mdst_charged_Manager::get_manager();
@@ -1814,7 +1814,7 @@ void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
 
         if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
           // found the correct  mdst_charged
-          eclClustersToTracks.add(mdstEcl.get_ID() - 1, mChar.get_ID() - 1, 1.0);
+          tracksToECLClusters.add(mChar.get_ID() - 1, mdstEcl.get_ID() - 1, 1.0);
           break;
         }
       }

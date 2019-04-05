@@ -114,52 +114,49 @@ namespace Belle2 {
     TH1F* m_TimeScintillatorEKLM;
 
     /** Sector number. */
-    TH1F* m_Sector;
+    TH1F* m_eklmSector;
 
     /** Strip number within a layer. */
-    TH1F** m_StripLayer;
+    TH1F** m_eklmStripLayer;
 
-    /** Histogram: number of hits per layer. */
-    TH1F* h_layerHits;
+    /** Number of hits per layer. */
+    TH1F* m_bklmLayerHits;
 
-    /** Histogram: Lowest 16 bits of the B2TT CTIME signal. */
-    TH1F* h_ctime;
+    /** Reconstructed pulse height. */
+    TH1F* m_bklmEDep;
 
-    /** Histogram: Reconstructed pulse height. */
-    TH1F* h_eDep;
+    /** Reconstructed number MPPC pixels. */
+    TH1F* m_bklmNPixel;
 
-    /** Histogram: Reconstructed number MPPC pixels. */
-    TH1F* h_nPixel;
+    /** z-measuring strip numbers of the 2D hit. */
+    TH1F* m_bklmZStrips;
 
-    /** Histogram: Detector-module identifier. */
-    TH1F* h_moduleID;
+    /** Phi strip number of muon hit. */
+    TH1F* m_bklmPhiStrip;
 
-    /** Histogram: z-measuring strip numbers of the 2D hit. */
-    TH1F* h_zStrips;
+    /** Sector number of muon hit. */
+    TH1F* m_bklmSector;
 
-    /** Histogram: Phi strip number of muon hit. */
-    TH1F* h_phiStrip;
+    /** Layer number of muon hit. */
+    TH1F* m_bklmLayer;
 
-    /** Histogram: Sector number of muon hit. */
-    TH1F* h_sector;
+    /** Distance from z axis in transverse plane of muon hit. */
+    TH1F* m_bklmHit2dsR;
 
-    /** Histogram: Layer number of muon hit. */
-    TH1F* h_layer;
+    /** Axial position of muon hit. */
+    TH1F* m_bklmHit2dsZ;
 
-    /** Histogram: Distance from z axis in transverse plane of muon hit. */
-    TH1F* h_rBKLMHit2ds;
+    /** Position projected into transverse plane of muon hit. */
+    TH2F* m_bklmHit2dsYvsx;
 
-    /** Histogram: Axial position of muon hit. */
-    TH1F* h_zBKLMHit2ds;
+    /** Position projected into x-z plane of muon hit. */
+    TH2F* m_bklmHit2dsXvsz;
 
-    /** Histogram: Position projected into transverse plane of muon hit. */
-    TH2F* h_yvsxBKLMHit2ds;
+    /** Position projected into y-z plane of muon hit. */
+    TH2F* m_bklmHit2dsYvsz;
 
-    /** Histogram: Position projected into x-z plane of muon hit. */
-    TH2F* h_xvszBKLMHit2ds;
-
-    /** Histogram: Position projected into y-z plane of muon hit. */
-    TH2F* h_yvszBKLMHit2ds;
+    /** Layer VS Sector histogram for the BKLM forward and backward regions. */
+    TH2F* m_bklmLayerVsSector[2];
 
   };
 

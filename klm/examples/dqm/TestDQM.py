@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # KLM data quality monitor test.
+#
+# DQM analysis example (the next stage of DQM data processing) is
+# dqm/analysis/examples/DQMAnalysisKLM.py
 
 import basf2
 from daqdqm.commondqm import add_common_dqm

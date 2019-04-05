@@ -81,7 +81,7 @@ namespace Belle2 {
      * Fill the channelHist from the histogram
      * Type 0 channelHist has to be filled with 420*144bin TH1 (each channel)
      * Type 1 channelHist can be filled with 420*144 (channels) or 420*4 (chips), or 420 (HAPDs) bin TH1
-     * Type 2 channelHist can be filled wit 420*144 or 420*4 bin TH1
+     * Type 2 channelHist can be filled with 420*144 or 420*4 bin TH1
      * In case histogram has more bins than channelHist bin content is summed up
      * Exampl: histogram with hits/channel can be used to make ChannelHist with hits/hapd
      * @param hist historam

@@ -280,9 +280,10 @@ void ECLDigitCalibratorModule::event()
       bool m_IsMCFlag = Environment::Instance().isMC();
       B2DEBUG(35, "cellid = " << cellid << ", m_IsMCFlag = " << m_IsMCFlag) ;
       if (!m_IsMCFlag) {
-        double energyTimeShift = energyDependentTimeOffset(amplitude) ;
-        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", time before t(E) shift = " << calibratedTime <<
-                ", t(E) shift = " << energyTimeShift << " ns") ;
+        double energyTimeShift = energyDependentTimeOffset(amplitude * v_calibrationCrystalElectronics[cellid - 1]) ;
+        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude *
+                v_calibrationCrystalElectronics[cellid - 1] << ", time before t(E) shift = " << calibratedTime << ", t(E) shift = " <<
+                energyTimeShift << " ns") ;
         calibratedTime -= energyTimeShift ;
       }
 

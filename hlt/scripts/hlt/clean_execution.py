@@ -106,7 +106,7 @@ class CleanBasf2Execution:
             # Send a graceful stop signal to the process and give it some time to react
             for process in self._handled_processes:
                 try:
-                    process.send_signal(signal.SIGINT)
+                    os.killpg(process.pid, signal.SIGINT)
                     process.poll()
                 except ProcessLookupError:
                     # The process is already gone! Nice

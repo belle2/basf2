@@ -10,43 +10,41 @@
 </header>
 """
 
-from basf2 import *
-from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+import basf2 as b2
+import mdst as mdst
+import generators as ge
+import simulation as si
+import reconstruction as re
+import modularAnalysis as ma
 from ROOT import Belle2
 import glob
 
-set_random_seed(12345)
 
-# background (collision) files
-bg = glob.glob('./BG/[A-Z]*.root')
-
-# crea
-tcpvskimpath = Path()
+# Defining custom path
+tcpvskimpath = b2.Path()
 
 # specify number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [0])
-tcpvskimpath.add_module(eventinfosetter)
+ma.setupEventInfo(noEvents=100, path=tcpvskimpath)
 
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('skim/validation/TCPV.dec'))
-tcpvskimpath.add_module(evtgeninput)
+ge.add_evtgen_generator(path=tcpvskimpath,
+                        finalstate='signal',
+                        signaldecfile=b2.find_file(
+                            'dectcpv.dec'))
+
 
 # detector simulation
 # add_simulation(main, bkgfiles=bg)
-add_simulation(path=tcpvskimpath)
+si.add_simulation(path=tcpvskimpath)
 
 # reconstruction
-add_reconstruction(path=tcpvskimpath)
+re.add_reconstruction(path=tcpvskimpath)
 
 
 # Finally add mdst output
-output_filename = "../TCPV.dst.root"
-add_mdst_output(tcpvskimpath, filename=output_filename)
+output_filename = "TCPV.dst.root"
+mdst.add_mdst_output(path=tcpvskimpath, mc=True, filename=output_filename)
+
 
 # process events and print call statistics
-process(tcpvskimpath)
-print(statistics)
+b2.process(tcpvskimpath)
+print(b2.statistics)

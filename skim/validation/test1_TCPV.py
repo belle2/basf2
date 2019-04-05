@@ -11,29 +11,22 @@
 """
 
 
-import sys
-
-from basf2 import *
-from modularAnalysis import *
-from beamparameters import add_beamparameters
+import basf2
+import modularAnalysis as ma
 from skimExpertFunctions import *
 
-
-from basf2 import *
-from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
-from skim.standardlists.lightmesons import *
+from skim.standardlists.lightmesons import loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons
 
-from skimExpertFunctions import *
-
-
 tcpvskimpath = Path()
-fileList = ['../TCPV.dst.root']
-inputMdstList('MC9', fileList, path=tcpvskimpath)
+
+fileList = ['TCPV.dst.root']
+
+inputMdstList('default', fileList, path=tcpvskimpath)
 
 
 loadStdSkimPi0(path=tcpvskimpath)
@@ -54,10 +47,10 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
 # TCPV  B0 skim
 from skim.tcpv import TCPVList
 TCPVList = TCPVList(path=tcpvskimpath)
-skimOutputUdst('../TCPV.udst.root', TCPVList, path=tcpvskimpath)
-summaryOfLists(TCPVList, path=tcpvskimpath)
+ma.skimOutputUdst('TCPV.udst.root', TCPVList, path=tcpvskimpath)
+ma.summaryOfLists(TCPVList, path=tcpvskimpath)
 
-
+setSkimLogging(path=tcpvskimpath)
 process(tcpvskimpath)
 
 # print out the summary

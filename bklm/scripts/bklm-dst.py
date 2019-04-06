@@ -21,6 +21,7 @@
 #      -e #   to specify the experiment number (no default)
 #      -r #   to specify the run number (no default)
 # Optional arguments:
+#      -s #   to select events with all (0) or exactly one (1) or two or more (2) entries/channel (default is 0)
 #      -n #   to specify the maximum number of events to analyze (no default -> all events)
 #      -d #   to specify the maximum number of event displays (default is 100)
 #      -m #   to specify the minimum number of RPC BKLMHit2ds in any one sector (default is 4)
@@ -62,6 +63,9 @@ parser.add_option('-r', '--run',
 parser.add_option('-n', '--nEvents',
                   dest='nEvents', default='',
                   help='Max # of analyzed events [no default]')
+parser.add_option('-s', '--singleEntry',
+                  dest='singleEntry', default='0',
+                  help='Select events with any (0) or exactly one (1) or more than one (2) entries/channel [0]')
 parser.add_option('-d', '--displays',
                   dest='displays', default='100',
                   help='Max # of displayed events [100]')
@@ -75,6 +79,10 @@ parser.add_option('-t', '--tagName',
                   dest='tagName', default='data_reprocessing_prompt',
                   help='Conditions-database global-tag name [data_reprocessing_prompt]')
 (options, args) = parser.parse_args()
+
+singleEntry = int(options.singleEntry)
+if singleEntry < 0 or singleEntry > 2:
+    singleEntry = 0
 
 maxCount = -1
 if options.nEvents != '':
@@ -137,9 +145,10 @@ if len(inputName) == 0:
         sys.exit()
     inputName = fileList[0].replace("f00000", "f*")
 
-histName = 'bklmHists-e{0}r{1}.root'.format(exp, run)
-pdfName = 'bklmPlots-e{0}r{1}.pdf'.format(exp, run)
-eventPdfName = 'bklmEvents-e{0}r{1}.pdf'.format(exp, run)
+suffix = '' if singleEntry == 0 else '-singleEntry' if singleEntry == 1 else '-multipleEntries'
+histName = 'bklmHists-e{0}r{1}{2}.root'.format(exp, run, suffix)
+pdfName = 'bklmPlots-e{0}r{1}{2}.pdf'.format(exp, run, suffix)
+eventPdfName = 'bklmEvents-e{0}r{1}{2}.pdf'.format(exp, run, suffix)
 
 if maxCount >= 0:
     print('bklm-dst: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze', maxCount, 'events using ' + tagName)
@@ -157,7 +166,7 @@ else:
     main.add_module('RootInput', inputFileName=inputName)
 main.add_module('ProgressBar')
 
-eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes)
+eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes, singleEntry)
 if maxCount >= 0:
     child = create_path()
     eventCountLimiter = EventCountLimiter(maxCount)

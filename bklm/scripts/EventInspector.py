@@ -49,7 +49,7 @@ class EventInspector(basf2.Module):
     #: bit mask for unique module identifier (end, sector, layer)
     BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
-    def __init__(self, exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes):
+    def __init__(self, exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes, singleEntry):
         """Constructor
 
         Arguments:
@@ -60,6 +60,8 @@ class EventInspector(basf2.Module):
             eventPdfName (str): path name of the output event-display PDF file
             maxDisplays (int): max # of events displays to write
             minRPCHits (int): min # of RPC BKLMHit2ds in any sector for event display
+            legacyTimes (bool): true to correct BKLMHit{1,2}d times in legacy reconstruction, False otherwise
+            singleEntry (int): select events with any (0) or exactly one (1) or more than one (2) entries/channel
         """
         super().__init__()
         #: internal copy of experiment number
@@ -76,14 +78,16 @@ class EventInspector(basf2.Module):
         self.maxDisplays = maxDisplays
         #: internal copy of the minimum number of RPC BKLMHit2ds in any sector for event display
         self.minRPCHits = minRPCHits
+        #: calculate prompt time for legacy BKLMHit1ds and BKLMHit2ds (True) or use stored time (False)
+        self.legacyTimes = legacyTimes
+        #: select events with any (0) or exactly one (1) or more than one (2) entries/channel
+        self.singleEntry = singleEntry
         #: event counter (needed for PDF table of contents' ordinal event#)
         self.eventCounter = 0
         #: event-display counter
         self.eventDisplays = 0
         #: title of the last-drawn event display (needed for PDF table of contents' last event)
         self.lastTitle = ''
-        #: calculate prompt time for legacy BKLMHit1ds and BKLMHit2ds (True) or use stored time (False)
-        self.legacyTimes = legacyTimes
 
     def makeGraph(self, x, y):
         """Create and return a ROOT TGraph
@@ -139,7 +143,7 @@ class EventInspector(basf2.Module):
         #: RPC-time calibration adjustment (ns) for BKLMHit2ds
         self.t0Cal2d = 217  # for BKLMHit2ds
         #: scint-ctime calibration adjustment (ns) for rawKLMs
-        self.ct0Cal = 349
+        self.ct0Cal = 368
         #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
         self.ct0Cal2d = 349
         #: per-sector variations in RPC-time calibration adjustment (ns) for rawKLMs
@@ -175,29 +179,29 @@ class EventInspector(basf2.Module):
                                              'Lane (scint: 1..7, RPC: 8..20)',
                                              4, -0.5, 3.5, 21, -0.5, 20.5)
         #: scatterplot of the RawKLM RPC hit's extra bits vs sector in the third (time) word
-        self.hist_rawKLMtExtraRPC = ROOT.TH2F('rawKLMtExtraRPC',
-                                              expRun + 'RawKLM RPC tExtra bits;' +
-                                              'Sector # (0-7 = backward, 8-15 = forward);' +
-                                              'tExtra [should be 0]',
-                                              16, -0.5, 15.5, 32, -0.5, 31.5)
-        #: scatterplot of the RawKLM RPC hit's extra bits vs sector in the fourth (charge) word
-        self.hist_rawKLMqExtraRPC = ROOT.TH2F('rawKLMqExtraRPC',
-                                              expRun + 'RawKLM RPC qExtra bits;' +
-                                              'Sector # (0-7 = backward, 8-15 = forward);' +
-                                              'qExtra [should be 0]',
-                                              16, -0.5, 15.5, 16, -0.5, 15.5)
-        #: scatterplot of the RawKLM scint hit's extra bits vs sector in the third (time) word
-        self.hist_rawKLMtExtraScint = ROOT.TH2F('rawKLMtExtraScint',
-                                                expRun + 'RawKLM Scint tExtra bits;' +
+        self.hist_rawKLMtdcExtraRPC = ROOT.TH2F('rawKLMtdcExtraRPC',
+                                                expRun + 'RawKLM RPC tdcExtra bits;' +
                                                 'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                'tExtra [should be 0]',
+                                                'tdcExtra [should be 0]',
                                                 16, -0.5, 15.5, 32, -0.5, 31.5)
-        #: scatterplot of the RawKLM scint hit's extra bits vs sector in the fourth (charge) word
-        self.hist_rawKLMqExtraScint = ROOT.TH2F('rawKLMqExtraScint',
-                                                expRun + 'RawKLM Scint qExtra bits;' +
+        #: scatterplot of the RawKLM RPC hit's extra bits vs sector in the fourth (adc) word
+        self.hist_rawKLMadcExtraRPC = ROOT.TH2F('rawKLMadcExtraRPC',
+                                                expRun + 'RawKLM RPC adcExtra bits;' +
                                                 'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                'qExtra [should be 0]',
+                                                'adcExtra [should be 0]',
                                                 16, -0.5, 15.5, 16, -0.5, 15.5)
+        #: scatterplot of the RawKLM scint hit's extra bits vs sector in the third (time) word
+        self.hist_rawKLMtdcExtraScint = ROOT.TH2F('rawKLMtdcExtraScint',
+                                                  expRun + 'RawKLM Scint tdcExtra bits;' +
+                                                  'Sector # (0-7 = backward, 8-15 = forward);' +
+                                                  'tdcExtra',
+                                                  16, -0.5, 15.5, 32, -0.5, 31.5)
+        #: scatterplot of the RawKLM scint hit's extra bits vs sector in the fourth (adc) word
+        self.hist_rawKLMadcExtraScint = ROOT.TH2F('rawKLMadcExtraScint',
+                                                  expRun + 'RawKLM Scint adcExtra bits;' +
+                                                  'Sector # (0-7 = backward, 8-15 = forward);' +
+                                                  'adcExtra [should be 0]',
+                                                  16, -0.5, 15.5, 16, -0.5, 15.5)
         #: histogram of number of hits, including multiple entries on one readout channel
         self.hist_rawKLMsizeMultihit = ROOT.TH1F('rawKLMsizeMultihit', expRun + 'RawKLM word count (N/channel)', 400, -0.5, 799.5)
         #: histogram of number of hits, at most one entry per readout channel
@@ -347,14 +351,14 @@ class EventInspector(basf2.Module):
                                                      16, -0.5, 15.5, 4, -0.5, 3.5)
         #: histogram of RPC mapped-channel TDC value relative to event's trigger time
         self.hist_mappedRPCTime = ROOT.TH1F(
-            'mappedRPCTime', expRun + 'RPC mapped-strip time distribution;t - ct(trigger) (ns)', 256, -0.5, 1023.5)
+            'mappedRPCTime', expRun + 'RPC mapped-strip time distribution;t - t(trigger) (ns)', 256, -0.5, 1023.5)
         #: histogram of RPC mapped-channel TDC value relative to event's trigger time, corrected for inter-sector variation
         self.hist_mappedRPCTimeCal = ROOT.TH1F(
-            'mappedRPCTimeCal', expRun + 'RPC mapped-strip time distribution;t - ct(trigger) - dt(sector) (ns)', 256, -0.5, 1023.5)
-        #: histogram of RPC mapped-channel TDC relative to trigger time, corrected for inter-sector varn and DC-processing delay
+            'mappedRPCTimeCal', expRun + 'RPC mapped-strip time distribution;t - t(trigger) - dt(sector) (ns)', 256, -0.5, 1023.5)
+        #: histogram of RPC mapped-channel TDC relative to trigger time, corrected for inter-sector var'n and DC-processing delay
         self.hist_mappedRPCTimeCal2 = ROOT.TH1F('mappedRPCTimeCal2',
                                                 expRun + 'RPC mapped-strip time distribution;' +
-                                                't - ct(trigger) - dt(sector) - t(index) (ns)',
+                                                't - t(trigger) - dt(sector) - t(index) (ns)',
                                                 256, -0.5, 1023.5)
         #: histograms of RPC mapped-channel TDC value relative to event's trigger time, indexed by sector
         self.hist_mappedRPCTimePerSector = []
@@ -362,39 +366,41 @@ class EventInspector(basf2.Module):
         self.hist_mappedRPCTimePerLayer = []
         for sectorFB in range(0, 16):
             label = 'mappedRPCTime_S{0:02d}'.format(sectorFB)
-            title = '{0}RPC sector {1} time distribution;t - ct(trigger) (ns)'.format(expRun, sectorFB)
+            title = '{0}RPC sector {1} time distribution;t - t(trigger) (ns)'.format(expRun, sectorFB)
             self.hist_mappedRPCTimePerSector.append(ROOT.TH1F(label, title, 256, -0.5, 1023.5))
             self.hist_mappedRPCTimePerLayer.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             for layer in range(0, 15):
                 label = 'mappedRPCTime_S{0:02d}L{1:02d}'.format(sectorFB, layer)
-                title = '{0}RPC sector {1} layer {2} time distribution;t - ct(trigger) (ns)'.format(expRun, sectorFB, layer)
+                title = '{0}RPC sector {1} layer {2} time distribution;t - t(trigger) (ns)'.format(expRun, sectorFB, layer)
                 self.hist_mappedRPCTimePerLayer[sectorFB][layer] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
         #: scatterplot of RPC mapped-channel TDC value relative to event's trigger time vs sector
         self.hist_mappedRPCTimeBySector = ROOT.TH2F('mappedRPCTimeBySector',
                                                     expRun + 'RPC mapped-strip time;' +
                                                     'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                    't - ct(trigger) (ns)',
+                                                    't - t(trigger) (ns)',
                                                     16, -0.5, 15.5, 128, -0.5, 1023.5)
         #: scatterplot of RPC mapped-channel TDC relative to trigger time, corrected for inter-sector variation, by sector
         self.hist_mappedRPCTimeCalBySector = ROOT.TH2F('mappedRPCTimeCalBySector',
                                                        expRun + 'RPC mapped-strip time;' +
                                                        'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                       't - ct(trigger) - dt(sector) (ns)',
+                                                       't - t(trigger) - dt(sector) (ns)',
                                                        16, -0.5, 15.5, 128, -0.5, 1023.5)
         #: scatterplot of RPC mapped-channel REVO9 range in event vs sector
-        self.hist_mappedRPCRevotimeRangeBySector = ROOT.TH2F('mappedRPCRevotimeRangeBySector',
-                                                             expRun + 'RPC revotime-range in event;' +
-                                                             'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                             'revotimeMax - revotimeMin (ns)',
-                                                             16, -0.5, 15.5, 128, -0.5, 8191.5)
+        self.hist_mappedRPCCtimeRangeBySector = ROOT.TH2F('mappedRPCCtimeRangeBySector',
+                                                          expRun + 'RPC Ctime-range in event;' +
+                                                          'Sector # (0-7 = backward, 8-15 = forward);' +
+                                                          'CtimeMax - CtimeMin (ns)',
+                                                          16, -0.5, 15.5, 128, -0.5, 8191.5)
         #: histogram of RPC unmapped-channel TDC value relative to event's trigger time
-        self.hist_unmappedRPCTime = ROOT.TH1F(
-            'unmappedRPCTime', expRun + 'RPC unmapped-strip time distribution;t - ct(trigger) (ns)', 256, -0.5, 1023.5)
+        self.hist_unmappedRPCTime = ROOT.TH1F('unmappedRPCTime',
+                                              expRun + 'RPC unmapped-strip time distribution;' +
+                                              't - t(trigger) (ns)',
+                                              256, -0.5, 1023.5)
         #: scatterplot of RPC unmapped-channel TDC value relative to event's trigger time, by sector
         self.hist_unmappedRPCTimeBySector = ROOT.TH2F('unmappedRPCTimeBySector',
                                                       expRun + 'RPC unmapped-strip time;' +
                                                       'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                      't - ct(trigger) (ns)',
+                                                      't - t(trigger) (ns)',
                                                       16, -0.5, 15.5, 128, -0.5, 1023.5)
         #: scatterplot of scint TDC low-order bits vs sector
         self.hist_ScintTimeLowBitsBySector = ROOT.TH2F('ScintTimeLowBitsbySector',
@@ -402,38 +408,42 @@ class EventInspector(basf2.Module):
                                                        'Sector # (0-7 = backward, 8-15 = forward);' +
                                                        'TDC % 4 (ns)',
                                                        16, -0.5, 15.5, 4, -0.5, 3.5)
-        #: histogram of scint mapped-channel CTIME value (NOT relative to event's trigger time)
-        self.hist_mappedScintCtime0 = ROOT.TH1F(
-            'mappedScintCtime0', expRun + 'Scint mapped-strip ctime distribution;ctime (ns)', 32, -0.5, 1023.5)
-        #: scatterplot of scint mapped-channel CTIME value (NOT relative to event's trigger time)
+        #: histogram of scint mapped-channel CTIME value (NOT relative to event's trigger Ctime)
+        self.hist_mappedScintCtime0 = ROOT.TH1F('mappedScintCtime0',
+                                                expRun + 'Scint mapped-strip ctime distribution;' +
+                                                'ctime (ns)',
+                                                32, -0.5, 1023.5)
+        #: scatterplot of scint mapped-channel CTIME value (NOT relative to event's trigger Ctime)
         self.hist_mappedScintCtime1 = ROOT.TH2F('mappedScintCtime1',
                                                 expRun + 'Scint mapped-strip ctime distribution;' +
                                                 'Sector # (0-7 = backward, 8-15 = forward);' +
                                                 'ctime (ns)',
                                                 16, -0.5, 15.5, 32, -0.5, 1023.5)
-        #: histogram of scint mapped-channel CTIME value relative to event's trigger time
-        self.hist_mappedScintCtime = ROOT.TH1F(
-            'mappedScintCtime', expRun + 'Scint mapped-strip ctime distribution;ctime - ct(trigger) (ns)', 32, -0.5, 1023.5)
-        #: scatterplot of scint mapped-channel CTIME value relative to event's trigger time vs sector
+        #: histogram of scint mapped-channel CTIME value relative to event's trigger Ctime
+        self.hist_mappedScintCtime = ROOT.TH1F('mappedScintCtime',
+                                               expRun + 'Scint mapped-strip ctime distribution;' +
+                                               'ctime - ct(trigger) (ns)',
+                                               32, -0.5, 1023.5)
+        #: scatterplot of scint mapped-channel CTIME value relative to event's trigger Ctime vs sector
         self.hist_mappedScintCtimeBySector = ROOT.TH2F('mappedScintCtimeBySector',
                                                        expRun + 'Scint mapped-strip ctime;' +
                                                        'Sector # (0-7 = backward, 8-15 = forward);' +
                                                        'ctime - ct(trigger) (ns)',
                                                        16, -0.5, 15.5, 32, -0.5, 1023.5)
-        #: histogram of scint mapped-channel CTIME value relative to event's trigger time, corrected for inter-sector variation
+        #: histogram of scint mapped-channel CTIME value relative to event's trigger Ctime, corrected for inter-sector variation
         self.hist_mappedScintCtimeCal = ROOT.TH1F('mappedScintCtimeCal',
                                                   expRun + 'Scint mapped-strip ctime distribution;' +
                                                   'ctime - ct(trigger) - dt(sector) (ns)',
                                                   32, -0.5, 1023.5)
-        #: scatterplot of scint mapped-channel CTIME relative to trigger time, corrected for inter-sector variation, by sector
+        #: scatterplot of scint mapped-channel CTIME relative to trigger Ctime, corrected for inter-sector variation, by sector
         self.hist_mappedScintCtimeCalBySector = ROOT.TH2F('mappedScintCtimeCalBySector',
                                                           expRun + 'Scint mapped-strip ctime;' +
                                                           'Sector # (0-7 = backward, 8-15 = forward);' +
                                                           'ctime - ct(trigger) - dt(sector) (ns)',
                                                           16, -0.5, 15.5, 32, -0.5, 1023.5)
-        #: histograms of scint mapped-channel CTIME value relative to event's trigger time, indexed by sector
+        #: histograms of scint mapped-channel CTIME value relative to event's trigger Ctime, indexed by sector
         self.hist_mappedScintCtimePerSector = []
-        #: histograms of scint mapped-channel CTIME value relative to event's trigger time, indexed by sector/layer
+        #: histograms of scint mapped-channel CTIME value relative to event's trigger Ctime, indexed by sector/layer
         self.hist_mappedScintCtimePerLayer = []
         for sectorFB in range(0, 16):
             label = 'mappedScintCtime_S{0:02d}'.format(sectorFB)
@@ -450,42 +460,108 @@ class EventInspector(basf2.Module):
                                                             'Sector # (0-7 = backward, 8-15 = forward);' +
                                                             'ctimeMax - ctimeMin (ns)',
                                                             16, -0.5, 15.5, 128, -0.5, 8191.5)
-        #: histogram of scint unmapped-channel CTIME value relative to event's trigger time
-        self.hist_unmappedScintCtime = ROOT.TH1F(
-            'unmappedScintCtime', expRun + 'Scint unmapped-strip ctime distribution;ctime - ct(trigger) (ns)', 32, -0.5, 1023.5)
-        #: scatterplot of scint unmapped-channel CTIME value relative to event's trigger time, by sector
+        #: histogram of scint unmapped-channel CTIME value relative to event's trigger Ctime
+        self.hist_unmappedScintCtime = ROOT.TH1F('unmappedScintCtime',
+                                                 expRun + 'Scint unmapped-strip ctime distribution;' +
+                                                 'ctime - ct(trigger) (ns)',
+                                                 32, -0.5, 1023.5)
+        #: scatterplot of scint unmapped-channel CTIME value relative to event's trigger Ctime, by sector
         self.hist_unmappedScintCtimeBySector = ROOT.TH2F('unmappedScintCtimeBySector',
                                                          expRun + 'Scint unmapped-strip ctime;' +
                                                          'Sector # (0-7 = backward, 8-15 = forward);' +
                                                          'ctime - ct(trigger) (ns)',
                                                          16, -0.5, 15.5, 32, -0.5, 1023.5)
-        #: histogram of scint mapped-channel TDC value (NOT relative to event's trigger time)
-        self.hist_mappedScintTDC = ROOT.TH1F(
-            'mappedScintTDC', expRun + 'Scint mapped-strip TDC distribution;t (ns)', 32, -0.5, 31.5)
-        #: histogram of scint mapped-channel TDC value relative to event's trigger time
-        self.hist_mappedScintTime = ROOT.TH1F(
-            'mappedScintTime', expRun + 'Scint mapped-strip time distribution;t - ct(trigger) (ns)', 32, -0.5, 31.5)
-        #: scatterplot of scint mapped-channel TDC value (NOT relative to event's trigger time) vs sector
+        #: histogram of scint mapped-channel TDC value (NOT relative to event's trigger Ctime)
+        self.hist_mappedScintTDC = ROOT.TH1F('mappedScintTDC',
+                                             expRun + 'Scint mapped-strip TDC distribution;' +
+                                             't (ns)',
+                                             32, -0.5, 31.5)
+        #: histogram of scint mapped-channel TDC value relative to event's trigger Ctime
+        self.hist_mappedScintTime = ROOT.TH1F('mappedScintTime',
+                                              expRun + 'Scint mapped-strip time distribution;' +
+                                              't - t(trigger) (ns)', 32, -0.5, 31.5)
+        #: scatterplot of scint mapped-channel TDC value (NOT relative to event's trigger Ctime) vs sector
         self.hist_mappedScintTDCBySector = ROOT.TH2F('mappedScintTDCBySector',
                                                      expRun + 'Scint mapped-strip TDC;' +
                                                      'Sector # (0-7 = backward, 8-15 = forward);' +
                                                      't (ns)',
                                                      16, -0.5, 15.5, 32, -0.5, 31.5)
-        #: scatterplot of scint mapped-channel TDC value relative to event's trigger time vs sector
+        #: scatterplot of scint mapped-channel TDC value relative to event's trigger Ctime vs sector
         self.hist_mappedScintTimeBySector = ROOT.TH2F('mappedScintTimeBySector',
                                                       expRun + 'Scint mapped-strip time;' +
                                                       'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                      't - ct(trigger) (ns)',
+                                                      't - t(trigger) (ns)',
                                                       16, -0.5, 15.5, 32, -0.5, 31.5)
-        #: histogram of scint unmapped-channel TDC value relative to event's trigger time
-        self.hist_unmappedScintTime = ROOT.TH1F(
-            'unmappedScintTime', expRun + 'Scint unmapped-strip time distribution;t - ct(trigger) (ns)', 32, -0.5, 31.5)
-        #: scatterplot of scint unmapped-channel TDC value relative to event's trigger time vs sector
+        #: histogram of scint unmapped-channel TDC value relative to event's trigger Ctime
+        self.hist_unmappedScintTime = ROOT.TH1F('unmappedScintTime',
+                                                expRun + 'Scint unmapped-strip time distribution;' +
+                                                't - t(trigger) (ns)',
+                                                32, -0.5, 31.5)
+        #: scatterplot of scint unmapped-channel TDC value relative to event's trigger Ctime vs sector
         self.hist_unmappedScintTimeBySector = ROOT.TH2F('unmappedScintTimeBySector',
                                                         expRun + 'Scint unmapped-strip time;' +
                                                         'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                        't - ct(trigger) (ns)',
+                                                        't - t(trigger) (ns)',
                                                         16, -0.5, 15.5, 32, -0.5, 31.5)
+
+        # Create the RPC time-calibration/diagnostic histograms
+
+        #: scatterplot of RPC calibrated time vs hit's Ctime relative to earliest-Ctime
+        self.hist_ctimeRPCtCal = ROOT.TH2F('CtimeRPCtCal',
+                                           expRun + 'RPC tCal vs relative Ctime;' +
+                                           't - t(trigger) - dt(sector) (ns);' +
+                                           'Ctime - minCtime',
+                                           16, 281.5, 345.5, 16, -0.5, 255.5)
+        #: scatterplot of RPC calibrated time vs hit's Ctime relative to earliest-Ctime, corrected for DC-processing delay
+        self.hist_ctimeRPCtCalCorr = ROOT.TH2F('ctimeRPCtCalCorr',
+                                               expRun + 'RPC tCal vs relative Ctime;' +
+                                               't - t(trigger) - dt(sector) - dt(index) (ns);' +
+                                               'Ctime - minCtime',
+                                               16, 281.5, 345.5, 16, -0.5, 255.5)
+        #: scatterplot of RPC calibrated time vs hit's index
+        self.hist_jRPCtCal = ROOT.TH2F('jRPCtCal',
+                                       expRun + 'RPC tCal vs hit index;' +
+                                       't - t(trigger) - dt(sector) (ns);' +
+                                       'Hit index',
+                                       16, 281.5, 345.5, 50, -0.5, 49.5)
+        #: scatterplot of RPC calibrated time vs hit's index, corrected for DC-processing delay
+        self.hist_jRPCtCalCorr = ROOT.TH2F('jRPCtCalCorr',
+                                           expRun + 'RPC tCal vs hit index;' +
+                                           't - t(trigger) - dt(sector) - dt(index) (ns);' +
+                                           'Hit index',
+                                           16, 281.5, 345.5, 50, -0.5, 49.5)
+        #: histogram of RawKLM[] header's trigger CTIME relative to its final-data-word trigger REVO9 time
+        self.hist_trigCtime_trigRevo9time = ROOT.TH1F('trigCtime_trigRevo9time',
+                                                      expRun + 'trigCtime - trigRevo9time (ns)',
+                                                      256, -1024.5, 1023.5)
+        #: histogram of RPC TDC range
+        self.hist_dtTDC = ROOT.TH1F('dtTDC',
+                                    expRun + 'RPC TDC range;' +
+                                    'maxTDC - minTDC (ns)',
+                                    128, -0.5, 1023.5)
+        #: histogram of RPC Ctime range
+        self.hist_dtCtime = ROOT.TH1F('dtCtime',
+                                      expRun + 'RPC Ctime range;' +
+                                      'maxCtime - minCtime (ns)',
+                                      32, -0.5, 255.5)
+        #: scatterplot of RPC TDC range vs Ctime range
+        self.hist_dtTDCvsdtCtime = ROOT.TH2F('dtTDCvsdtCtime',
+                                             expRun + 'RPC Ctime range vs TDC range;' +
+                                             'maxTDC - minTDC (ns);' +
+                                             'maxCtime - minCtime (ns)',
+                                             128, -0.5, 1023.5, 128, -0.5, 1023.5)
+        #: scatterplot of RPC TDC range vs time
+        self.hist_dtTDCvsTime = ROOT.TH2F('dtTDCvsTime',
+                                          expRun + 'RPC TDC range vs time;' +
+                                          't - t(trigger) (ns);' +
+                                          'maxTDC - minTDC (ns)',
+                                          128, -0.5, 1023.5, 128, -0.5, 1023.5)
+        #: scatterplot of RPC Ctime range vs time
+        self.hist_dtCtimevsTime = ROOT.TH2F('dtCtimevsTime',
+                                            expRun + 'RPC Ctime range vs time;' +
+                                            't - t(trigger) (ns);' +
+                                            'maxCtime - minCtime (ns)',
+                                            128, -0.5, 1023.5, 32, -0.5, 255.5)
 
         # Create the BKLMHit1d-related histograms
 
@@ -520,42 +596,43 @@ class EventInspector(basf2.Module):
         #: histogram of RPC-phi BKLMHit1d time relative to event's trigger time, corrected for inter-sector variation
         self.hist_tphiRPCCal1d = ROOT.TH1F('tphiRPCCal1d',
                                            expRun + 'RPC BKLMHit1d phi-strip time distribution;' +
-                                           't(phi) - ct(trigger) - dt(sector) (ns)',
+                                           't(phi) - t(trigger) - dt(sector) (ns)',
                                            256, -0.5, 1023.5)
         #: histogram of RPC-z BKLMHit1d time relative to event's trigger time, corrected for inter-sector variation
         self.hist_tzRPCCal1d = ROOT.TH1F('tzRPCCal1d',
-                                         expRun + 'RPC BKLMHit1d z-strip time distribution;t(z) - ct(trigger) - dt(sector) (ns)',
+                                         expRun + 'RPC BKLMHit1d z-strip time distribution;' +
+                                         't(z) - t(trigger) - dt(sector) (ns)',
                                          256, -0.5, 1023.5)
         #: histogram of RPC-phi and -z BKLMHit1d avg time relative to event's trigger time, corrected for inter-sector variation
-        self.hist_tRPCCal1d = ROOT.TH1F(
-            'tRPCCal1d',
-            expRun + 'RPC BKLMHit1d x 2 calibrated average-time distribution;0.5*[t(phi) + t(z)] - ct(trigger) - dt(sector) (ns)',
-            256,
-            -0.5,
-            1023.5)
+        self.hist_tRPCCal1d = ROOT.TH1F('tRPCCal1d',
+                                        expRun + 'RPC BKLMHit1d x 2 calibrated average-time distribution;' +
+                                        '0.5*[t(phi) + t(z)] - t(trigger) - dt(sector) (ns)',
+                                        256, -0.5, 1023.5)
         #: histogram of RPC-phi and -z BKLMHit1d time difference
         self.hist_dtRPC1d = ROOT.TH1F('dtRPC1d',
-                                      expRun + 'RPC BKLMHit1d x 2 time-difference distribution;t(phi) - t(z) (ns)',
+                                      expRun + 'RPC BKLMHit1d x 2 time-difference distribution;' +
+                                      't(phi) - t(z) (ns)',
                                       50, -100.0, 100.0)
-        #: histogram of scint-phi BKLMHit1d time relative to event's trigger time, corrected for inter-sector variation
+        #: histogram of scint-phi BKLMHit1d time relative to event's trigger Ctime, corrected for inter-sector variation
         self.hist_tphiScintCal1d = ROOT.TH1F('tphiScintCal1d',
                                              expRun + 'Scintillator BKLMHit1d phi-strip ctime distribution;' +
                                              'ctime(phi) - ct(trigger) - dt(sector) (ns)',
                                              128, -0.5, 1023.5)
-        #: histogram of scint-z BKLMHit1d time relative to event's trigger time, corrected for inter-sector variation
+        #: histogram of scint-z BKLMHit1d time relative to event's trigger Ctime, corrected for inter-sector variation
         self.hist_tzScintCal1d = ROOT.TH1F('tzScintCal1d',
                                            expRun + 'Scintillator BKLMHit1d z-strip ctime distribution;' +
                                            'ctime(z) - ct(trigger) - dt(sector) (ns)',
                                            128, -0.5, 1023.5)
-        #: histogram of scint-phi and -z BKLMHit1d avg time relative to event's trigger time, corrected for inter-sector variation
+        #: histogram of scint-phi and -z BKLMHit1d avg time relative to event's trigger Ctime, corrected for inter-sector variation
         self.hist_tScintCal1d = ROOT.TH1F('tScintCal1d',
                                           expRun + 'Scintillator BKLMHit1d x 2 calibrated average-time distribution;' +
                                           '0.5*[ctime(phi) + ctime(z)] - ct(trigger) - dt(sector) (ns)',
                                           128, -0.5, 1023.5)
         #: histogram of scint-phi and -z BKLMHit1d time difference
-        self.hist_dtScint1d = ROOT.TH1F('dtScint1d', expRun +
-                                        'Scintillator BKLMHit1d x 2 time-difference distribution;ctime(phi) - ctime(z) (ns)', 50, -
-                                        100.0, 100.0)
+        self.hist_dtScint1d = ROOT.TH1F('dtScint1d',
+                                        expRun + 'Scintillator BKLMHit1d x 2 time-difference distribution;' +
+                                        'ctime(phi) - ctime(z) (ns)',
+                                        50, -100.0, 100.0)
 
         # Create the BKLMHit2d-related histograms
 
@@ -604,52 +681,25 @@ class EventInspector(basf2.Module):
         #: histogram of RPC calibrated time in BKLMHit2ds
         self.hist_tRPCCal2d = ROOT.TH1F('tRPCCal2d',
                                         expRun + 'RPC BKLMHit2d time distribution;' +
-                                        't - ct(trigger) - dt(sector) (ns)',
+                                        't - t(trigger) - dt(sector) (ns)',
                                         256, -0.5, 1023.5)
         #: scatterplot of RPC calibrated time in BKLMHit2ds vs sector
         self.hist_tRPCCal2dBySector = ROOT.TH2F('tRPCCal2dBySector',
                                                 expRun + 'RPC BKLMHit2d time distribution;' +
                                                 'sector # (0-7 = backward, 8-15 = forward);' +
-                                                't - ct(trigger) - dt(sector) (ns)',
+                                                't - t(trigger) - dt(sector) (ns)',
                                                 16, -0.5, 15.5, 256, -0.5, 1023.5)
         #: histogram of scint calibrated time in BKLMHit2ds
         self.hist_ctScintCal2d = ROOT.TH1F('ctScintCal2d',
                                            expRun + 'Scint BKLMHit2d ctime distribution;' +
-                                           'ct - ct(trigger) - dt(sector) (ns)',
+                                           'ct - t(trigger) - dt(sector) (ns)',
                                            128, -0.5, 1023.5)
         #: scatterplot of scint calibrated time in BKLMHit2ds vs sector
         self.hist_ctScintCal2dBySector = ROOT.TH2F('ctScintCal2dBySector',
                                                    expRun + 'Scint BKLMHit2d ctime distribution;' +
                                                    'sector # (0-7 = backward, 8-15 = forward);' +
-                                                   'ct - ct(trigger) - dt(sector) (ns)',
+                                                   'ct - t(trigger) - dt(sector) (ns)',
                                                    16, -0.5, 15.5, 128, -0.5, 1023.5)
-
-        # Create the time-calibration histograms
-
-        #: scatterplot of RPC calibrated time vs hit's CTIME relative to earliest-CTIME
-        self.hist_ctimeRPCtCal = ROOT.TH2F('ctimeRPCtCal',
-                                           expRun + 'RPC tCal vs ctime;' +
-                                           't - ct(trigger) - dt(sector) (ns);' +
-                                           'ctime - minCtime',
-                                           16, 281.5, 345.5, 16, -0.5, 255.5)
-        #: scatterplot of RPC calibrated time vs hit's CTIME relative to earliest-CTIME, corrected for DC-processing delay
-        self.hist_ctimeRPCtCal2 = ROOT.TH2F('ctimeRPCtCal2',
-                                            expRun + 'RPC tCal vs ctime;' +
-                                            't - ct(trigger) - dt(sector) - dt(index) (ns);' +
-                                            'ctime - minCtime',
-                                            16, 281.5, 345.5, 16, -0.5, 255.5)
-        #: scatterplot of RPC calibrated time vs hit's index
-        self.hist_jRPCtCal = ROOT.TH2F('jRPCtCal',
-                                       expRun + 'RPC tCal vs hit index;' +
-                                       't - ct(trigger) - dt(sector) (ns);' +
-                                       'Hit index',
-                                       16, 281.5, 345.5, 50, -0.5, 49.5)
-        #: scatterplot of RPC calibrated time vs hit's index, corrected for DC-processing delay
-        self.hist_jRPCtCal2 = ROOT.TH2F('jRPCtCal2',
-                                        expRun + 'RPC tCal vs hit index;' +
-                                        't - ct(trigger) - dt(sector) - dt(index) (ns);' +
-                                        'Hit index',
-                                        16, 281.5, 345.5, 50, -0.5, 49.5)
 
         # Open the output PDF file for event displays
 
@@ -846,14 +896,14 @@ class EventInspector(basf2.Module):
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnodeID.GetName()))
         self.hist_rawKLMlaneFlag.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMlaneFlag.GetName()))
-        self.hist_rawKLMtExtraRPC.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtExtraRPC.GetName()))
-        self.hist_rawKLMqExtraRPC.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMqExtraRPC.GetName()))
-        self.hist_rawKLMtExtraScint.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtExtraScint.GetName()))
-        self.hist_rawKLMqExtraScint.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMqExtraScint.GetName()))
+        self.hist_rawKLMtdcExtraRPC.Draw("box")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtdcExtraRPC.GetName()))
+        self.hist_rawKLMadcExtraRPC.Draw("box")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMadcExtraRPC.GetName()))
+        self.hist_rawKLMtdcExtraScint.Draw("box")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtdcExtraScint.GetName()))
+        self.hist_rawKLMadcExtraScint.Draw("box")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMadcExtraScint.GetName()))
         self.hist_rawKLMsizeMultihit.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeMultihit.GetName()))
         self.hist_rawKLMsize.Draw()
@@ -1010,8 +1060,8 @@ class EventInspector(basf2.Module):
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeBySector.GetName()))
         self.hist_mappedRPCTimeCalBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCalBySector.GetName()))
-        self.hist_mappedRPCRevotimeRangeBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCRevotimeRangeBySector.GetName()))
+        self.hist_mappedRPCCtimeRangeBySector.Draw("box")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCCtimeRangeBySector.GetName()))
         self.hist_unmappedRPCTime.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCTime.GetName()))
         self.hist_unmappedRPCTimeBySector.Draw("box")
@@ -1062,6 +1112,24 @@ class EventInspector(basf2.Module):
             for layer in range(0, 2):
                 self.hist_mappedScintCtimePerLayer[sectorFB][layer].Draw()
                 canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimePerLayer[sectorFB][layer].GetName()))
+        # self.hist_ctimeRPCtCal.Draw("colz")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal.GetName()))
+        # self.hist_ctimeRPCtCalCorr.Draw("colz")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCalCorr.GetName()))
+        # self.hist_jRPCtCal.Draw("colz")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal.GetName()))
+        # self.hist_jRPCtCalCorr.Draw("colz")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCalCorr.GetName()))
+        self.hist_dtTDC.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtTDC.GetName()))
+        self.hist_dtCtime.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtCtime.GetName()))
+        self.hist_dtTDCvsdtCtime.Draw("BOX")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtTDCvsdtCtime.GetName()))
+        self.hist_dtTDCvsTime.Draw("BOX")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtTDCvsTime.GetName()))
+        self.hist_dtCtimevsTime.Draw("BOX")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtCtimevsTime.GetName()))
         self.hist_nHit1d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1d.GetName()))
         self.hist_nHit1dRPCPrompt.Draw()
@@ -1118,14 +1186,6 @@ class EventInspector(basf2.Module):
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyZBkgd.GetName()))
         self.hist_occupancyRBkgd.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRBkgd.GetName()))
-        # self.hist_ctimeRPCtCal.Draw("colz")
-        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal.GetName()))
-        # self.hist_ctimeRPCtCal2.Draw("colz")
-        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRPCtCal2.GetName()))
-        # self.hist_jRPCtCal.Draw("colz")
-        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal.GetName()))
-        # self.hist_jRPCtCal2.Draw("colz")
-        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal2.GetName()))
         self.hist_tRPCCal2d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal2d.GetName()))
         self.hist_tRPCCal2dBySector.Draw("box")
@@ -1195,201 +1255,205 @@ class EventInspector(basf2.Module):
             self.hist_rawKLMnodeID.Fill(nodeID, copper)
             if (nodeID < 0) or (nodeID > 4):  # skip EKLM nodes
                 continue
-            trigCtime0 = (rawklm.GetTTCtime(0) & 0x7ffffff) << 3  # (ns)
-            x = (rawklm.GetTrailerChksum(0) & 0x0ffff) << 0  # (ns?)
+            trigCtime = (rawklm.GetTTCtime(0) & 0x7ffffff) << 3  # (ns)
+            revo9time = trigCtime - 0x3b0
             for finesse in range(0, 4):
                 dc = (finesse << 2) + copper
-                n = rawklm.GetDetectorNwords(0, finesse)
-                countAllMultihit = countAllMultihit + n
-                self.hist_rawKLMsizeByDCMultihit[dc].Fill(n)
+                nWords = rawklm.GetDetectorNwords(0, finesse)
+                self.hist_rawKLMsizeByDCMultihit[dc].Fill(nWords)
+                if nWords <= 0:
+                    continue
+                countAllMultihit = countAllMultihit + nWords
                 bufSlot = rawklm.GetDetectorBuffer(0, finesse)
-                if n > 0:
-                    lastWord = bufSlot[n - 1]
-                    if lastWord & 0xffff != 0:
-                        print("##1 Event", event, 'copper', copper, 'finesse', finesse, 'n=', n, 'lastWord=', hex(lastWord))
-                    if (n % 2) == 0:
-                        print("##2 Event", event, 'copper', copper, 'finesse', finesse, 'n=', n, 'should be odd -- skipping')
+                lastWord = bufSlot[nWords - 1]
+                if lastWord & 0xffff != 0:
+                    print("##1 Event", event, 'copper', copper, 'finesse', finesse, 'n=', nWords, 'lastWord=', hex(lastWord))
+                if (nWords % 2) == 0:
+                    print("##2 Event", event, 'copper', copper, 'finesse', finesse, 'n=', nWords, 'should be odd -- skipping')
+                    continue
+                if int(self.exp) != 3:  # revo9time was not stored in the last word of the data-packet list?
+                    revo9time = ((lastWord >> 16) << 3) & 0xffff
+                dt = (trigCtime & 0xffff) - (revo9time & 0xffff)
+                if dt > 0x7fff:
+                    dt -= 0x8000
+                self.hist_trigCtime_trigRevo9time.Fill(dt)
+                countAll += 1
+                count[dc] += 1
+                sectorFB = self.dcToSectorFB[dc]
+                n = nWords >> 1  # number of Data-Concentrator data packets
+                channelMultiplicity = {}
+                minRPCCtime = 99999
+                maxRPCCtime = 0
+                minRPCtdc = 99999
+                maxRPCtdc = 0
+                minScintCtime = 99999
+                maxScintCtime = 0
+                # first pass over this DC: determine per-channel multiplicities, event time ranges, and
+                # fill dictionaries for accessing RawKLM hit information from BLKMHit1ds and BKLMHit2ds
+                for j in range(0, n):
+                    word0 = bufSlot[j * 2]
+                    word1 = bufSlot[j * 2 + 1]
+                    ctime = word0 & 0xffff
+                    channel = (word0 >> 16) & 0x7f
+                    axis = (word0 >> 23) & 0x01
+                    lane = (word0 >> 24) & 0x1f  # 1..2 for scints, 8..20 for RPCs (=readout-board slot - 7)
+                    flag = (word0 >> 30) & 0x03  # identifies scintillator or RPC hit
+                    adc = word1 & 0x0fff
+                    tdc = (word1 >> 16) & 0x07ff
+                    isRPC = (flag == 1)
+                    isScint = (flag == 2)
+                    laneAxisChannel = (word0 >> 16) & 0x1fff
+                    if laneAxisChannel not in channelMultiplicity:
+                        countAll = countAll + 2
+                        count[dc] = count[dc] + 2
+                        channelMultiplicity[laneAxisChannel] = 0
+                    channelMultiplicity[laneAxisChannel] += 1
+                    if isRPC:
+                        if ctime < minRPCCtime:
+                            minRPCCtime = ctime
+                        if ctime > maxRPCCtime:
+                            maxRPCCtime = ctime
+                        if tdc < minRPCtdc:
+                            minRPCtdc = tdc
+                        if tdc > maxRPCtdc:
+                            maxRPCtdc = tdc
+                    elif isScint:
+                        if int(self.exp) <= 3:  # fix the ctime for old SCROD firmware
+                            trigCtx = trigCtime >> 3
+                            ctime = trigCtx - ((trigCtx - ctime) << 2)
+                        if ctime < minScintCtime:
+                            minScintCtime = ctime
+                        if ctime > maxScintCtime:
+                            maxScintCtime = ctime
+                    electId = (channel << 12) | (axis << 11) | (lane << 6) | (finesse << 4) | nodeID
+                    if electId in self.electIdToModuleId:
+                        moduleId = self.electIdToModuleId[electId]
+                        fb = (moduleId & self.BKLM_END_MASK) >> self.BKLM_END_BIT
+                        sector = (moduleId & self.BKLM_SECTOR_MASK) >> self.BKLM_SECTOR_BIT
+                        layer = (moduleId & self.BKLM_LAYER_MASK) >> self.BKLM_LAYER_BIT
+                        plane = (moduleId & self.BKLM_PLANE_MASK) >> self.BKLM_PLANE_BIT
+                        strip = (moduleId & self.BKLM_STRIP_MASK) >> self.BKLM_STRIP_BIT
+                        rawFb[dc].append(fb)
+                        rawSector[dc].append(sector)
+                        rawLayer[dc].append(layer)
+                        rawPlane[dc].append(plane)
+                        rawStrip[dc].append(strip)
+                        rawCtime[dc].append(ctime)
                     else:
-                        xxx = ((lastWord >> 16) << 3) & 0xffff  # DIVOT
-                        if int(self.exp) == 3:
-                            xxx = trigCtime0 - 0x3b0
-                        # DIVOT print("event {0} node {1} finesse {2}: trigCtime = {3:04x}
-                        # trigTime = {4:04x} diff = {5:04x}".format(event, nodeID, finesse,
-                        # (trigCtime0 & 0xffff), (xxx & 0xffff), ((trigCtime0 - xxx) & 0xffff)))
-                        trigCtime = xxx
-                        countAll += 1
-                        count[dc] += 1
-                        sectorFB = self.dcToSectorFB[dc]
-                        n = n >> 1
-                        channelMultiplicity = {}
-                        minCtime = 99999
-                        minRPCCtime = 99999
-                        maxRPCCtime = 0
-                        minScintCtime = 99999
-                        maxScintCtime = 0
-                        for j in range(0, n):
-                            word0 = bufSlot[j * 2]
-                            word1 = bufSlot[j * 2 + 1]
-                            laneAxisChannel = (word0 >> 16) & 0x1fff
-                            if laneAxisChannel not in channelMultiplicity:
-                                countAll = countAll + 2
-                                count[dc] = count[dc] + 2
-                                channelMultiplicity[laneAxisChannel] = 0
-                            channelMultiplicity[laneAxisChannel] += 1
-                            ctime = word0 & 0xffff
-                            channel = (word0 >> 16) & 0x7f
-                            axis = (word0 >> 23) & 0x01
-                            lane = (word0 >> 24) & 0x1f  # crate's slot number
-                            flag = (word0 >> 30) & 0x03
-                            charge = word1 & 0x0fff
-                            tExtra = (word1 >> 27) & 0x1f
-                            qExtra = (word1 >> 12) & 0x0f
-                            isRPC = (flag == 1)
-                            isScint = (flag == 2)
-                            if (int(self.exp) <= 3) and (lane <= 2):
-                                trigCtx = trigCtime >> 3
-                                ctime = trigCtx - ((trigCtx - ctime) << 2)
-                            if (ctime < minCtime) and (lane > 2):
-                                minCtime = ctime
-                            self.hist_rawKLMlaneFlag.Fill(flag, lane)
-                            if isRPC:
-                                self.hist_rawKLMtExtraRPC.Fill(sectorFB, tExtra)
-                                self.hist_rawKLMqExtraRPC.Fill(sectorFB, qExtra)
-                            elif isScint:
-                                self.hist_rawKLMtExtraScint.Fill(sectorFB, tExtra)
-                                self.hist_rawKLMqExtraScint.Fill(sectorFB, qExtra)
-                            fb = -1
-                            sector = -1
-                            layer = -1
-                            plane = -1
-                            strip = -1
-                            electId = (channel << 12) | (axis << 11) | (lane << 6) | (finesse << 4) | nodeID
-                            if electId in self.electIdToModuleId:
-                                if isRPC:
-                                    if ctime < minRPCCtime:
-                                        minRPCCtime = ctime
-                                    if ctime > maxRPCCtime:
-                                        maxRPCCtime = ctime
-                                elif isScint:
-                                    if ctime < minScintCtime:
-                                        minScintCtime = ctime
-                                    if ctime > maxScintCtime:
-                                        maxScintCtime = ctime
-                                self.hist_mappedSectorOccupancyMultihit.Fill(sectorFB)
-                                moduleId = self.electIdToModuleId[electId]
-                                fb = (moduleId & self.BKLM_END_MASK) >> self.BKLM_END_BIT
-                                sector = (moduleId & self.BKLM_SECTOR_MASK) >> self.BKLM_SECTOR_BIT
-                                layer = (moduleId & self.BKLM_LAYER_MASK) >> self.BKLM_LAYER_BIT
-                                plane = (moduleId & self.BKLM_PLANE_MASK) >> self.BKLM_PLANE_BIT
-                                strip = (moduleId & self.BKLM_STRIP_MASK) >> self.BKLM_STRIP_BIT
-                            else:
-                                self.hist_unmappedSectorOccupancyMultihit.Fill(sectorFB)
-                            rawFb[dc].append(fb)
-                            rawSector[dc].append(sector)
-                            rawLayer[dc].append(layer)
-                            rawPlane[dc].append(plane)
-                            rawStrip[dc].append(strip)
-                            rawCtime[dc].append(ctime)
-                        if n > 1:
-                            if maxRPCCtime > 0:
-                                self.hist_mappedRPCRevotimeRangeBySector.Fill(sectorFB, (maxRPCCtime - minRPCCtime) << 3)
-                            if maxScintCtime > 0:
-                                self.hist_mappedScintCtimeRangeBySector.Fill(sectorFB, (maxScintCtime - minScintCtime) << 3)
-                        for j in range(0, n):
-                            word0 = bufSlot[j * 2]
-                            word1 = bufSlot[j * 2 + 1]
-                            laneAxisChannel = (word0 >> 16) & 0x1fff
-                            if laneAxisChannel in channelMultiplicity:
-                                if channelMultiplicity[laneAxisChannel] > 1:
-                                    axis = (word0 >> 23) & 0x01
-                                    lane = (word0 >> 24) & 0x1f  # crate's slot number (1..7 for scints, 8..20 for RPCs)
-                                    laneAxis = axis if ((lane < 1) or (lane > 20)) else ((lane << 1) + axis)
-                                    self.hist_rawKLMchannelMultiplicity[dc].Fill(channelMultiplicity[laneAxisChannel], laneAxis)
-                                    self.hist_rawKLMchannelMultiplicityFine[dc].Fill(
-                                        channelMultiplicity[laneAxisChannel], laneAxisChannel)
-                                # DIVOT del channelMultiplicity[laneAxisChannel] # consider only first hit
-                                # in the channel/axis/lane of this dc
-                                ctime = word0 & 0xffff
-                                channel = (word0 >> 16) & 0x7f
-                                axis = (word0 >> 23) & 0x01
-                                lane = (word0 >> 24) & 0x1f  # crate's slot number (1..7 for scints, 8..20 for RPCs)
-                                flag = (word0 >> 30) & 0x03  # 1 for RPCs, 2 for scints
-                                electId = (channel << 12) | (axis << 11) | (lane << 6) | (finesse << 4) | nodeID
-                                tdc = (word1 >> 16) & 0x07ff
-                                charge = word1 & 0x0fff
-                                tExtra = (word1 >> 27) & 0x1f
-                                qExtra = (word1 >> 12) & 0x0f
-                                if (int(self.exp) <= 3) and (lane <= 2):
-                                    trigCtx = trigCtime >> 3
-                                    ctime = trigCtx - ((trigCtx - ctime) << 2)
-                                isRPC = (flag == 1)
-                                isScint = (flag == 2)
-                                laneAxis = axis if ((lane < 1) or (lane > 20)) else ((lane << 1) + axis)
-                                t = (tdc - trigCtime) & 0x03ff  # in ns, range is 0..1023
-                                t0j = 0.75 * j
-                                ct = (ctime << 3) - (trigCtime & 0x7fff8)  # in ns, range is only 8 bits in SCROD (??)
-                                ct = ct & 0x3ff
-                                if electId in self.electIdToModuleId:
-                                    self.hist_mappedSectorOccupancy.Fill(sectorFB)
-                                    if isRPC:
-                                        self.hist_RPCTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
-                                        tCal = t - self.t0RPC[sectorFB]
-                                        if abs(tCal - self.t0Cal) < 25:
-                                            if n > 60:
-                                                self.hist_ctimeRPCtCal.Fill(tCal, ctime - minCtime)
-                                                self.hist_ctimeRPCtCal2.Fill(tCal - t0j, ctime - minCtime)
-                                                self.hist_jRPCtCal.Fill(tCal, j)
-                                                self.hist_jRPCtCal2.Fill(tCal - t0j, j)
-                                            self.hist_mappedChannelOccupancyPrompt[sectorFB][axis].Fill(lane, channel)
-                                        elif abs(tCal - self.t0Cal) > 50:
-                                            self.hist_mappedChannelOccupancyBkgd[sectorFB][axis].Fill(lane, channel)
-                                        self.hist_mappedRPCSectorOccupancy.Fill(sectorFB)
-                                        self.hist_mappedRPCLaneAxisOccupancy.Fill(sectorFB, laneAxis)
-                                        self.hist_mappedRPCTime.Fill(t)
-                                        self.hist_mappedRPCTimeCal.Fill(tCal)
-                                        self.hist_mappedRPCTimeCal2.Fill(tCal - t0j)
-                                        self.hist_mappedRPCTimeBySector.Fill(sectorFB, t)
-                                        self.hist_mappedRPCTimeCalBySector.Fill(sectorFB, tCal - t0j)
-                                        self.hist_mappedRPCTimePerSector[sectorFB].Fill(t)
-                                        self.hist_mappedRPCTimePerLayer[sectorFB][lane - 6].Fill(t)
-                                    elif isScint:
-                                        self.hist_ScintTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
-                                        ctCal = ct - self.ct0Scint[sectorFB]
-                                        if abs(ctCal - self.ct0Cal) < 10:
-                                            self.hist_mappedChannelOccupancyPrompt[sectorFB][axis].Fill(lane, channel)
-                                        elif (abs(ctCal - self.ct0Cal) > 20):
-                                            self.hist_mappedChannelOccupancyBkgd[sectorFB][axis].Fill(lane, channel)
-                                        self.hist_mappedScintSectorOccupancy.Fill(sectorFB)
-                                        self.hist_mappedScintLaneAxisOccupancy.Fill(sectorFB, laneAxis)
-                                        self.hist_mappedScintTime.Fill(t & 0x1f)
-                                        self.hist_mappedScintTimeBySector.Fill(sectorFB, t & 0x1f)
-                                        self.hist_mappedScintTDC.Fill(tdc)
-                                        self.hist_mappedScintTDCBySector.Fill(sectorFB, tdc)
-                                        self.hist_mappedScintCtime0.Fill((ctime << 3) & 0x3ff)
-                                        self.hist_mappedScintCtime1.Fill(sectorFB, (ctime << 3) & 0x3ff)
-                                        self.hist_mappedScintCtime.Fill(ct)
-                                        self.hist_mappedScintCtimeBySector.Fill(sectorFB, ct)
-                                        self.hist_mappedScintCtimeCal.Fill(ctCal)
-                                        self.hist_mappedScintCtimeCalBySector.Fill(sectorFB, ctCal)
-                                        self.hist_mappedScintCtimePerSector[sectorFB].Fill(ct)
-                                        self.hist_mappedScintCtimePerLayer[sectorFB][lane - 1].Fill(ct)
-                                else:
-                                    self.hist_unmappedSectorOccupancy.Fill(sectorFB)
-                                    self.hist_unmappedChannelOccupancy[sectorFB][axis].Fill(lane, channel)
-                                    if isRPC:
-                                        self.hist_RPCTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
-                                        self.hist_unmappedRPCSectorOccupancy.Fill(sectorFB)
-                                        self.hist_unmappedRPCLaneAxisOccupancy.Fill(sectorFB, laneAxis)
-                                        self.hist_unmappedRPCTime.Fill(t)
-                                        self.hist_unmappedRPCTimeBySector.Fill(sectorFB, t)
-                                    elif isScint:
-                                        self.hist_ScintTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
-                                        self.hist_unmappedScintSectorOccupancy.Fill(sectorFB)
-                                        self.hist_unmappedScintLaneAxisOccupancy.Fill(sectorFB, laneAxis)
-                                        self.hist_unmappedScintTime.Fill(t & 0x1f)
-                                        self.hist_unmappedScintTimeBySector.Fill(sectorFB, t & 0x1f)
-                                        self.hist_unmappedScintCtime.Fill(ct)
-                                        self.hist_unmappedScintCtimeBySector.Fill(sectorFB, ct)
+                        rawFb[dc].append(-1)
+                        rawSector[dc].append(-1)
+                        rawLayer[dc].append(-1)
+                        rawPlane[dc].append(-1)
+                        rawStrip[dc].append(-1)
+                        rawCtime[dc].append(-1)
+                if n > 1:
+                    if maxRPCCtime > 0:
+                        self.hist_mappedRPCCtimeRangeBySector.Fill(sectorFB, (maxRPCCtime - minRPCCtime) << 3)
+                    if maxScintCtime > 0:
+                        self.hist_mappedScintCtimeRangeBySector.Fill(sectorFB, (maxScintCtime - minScintCtime) << 3)
+                # second pass over this DC's hits: histogram everything
+                for j in range(0, n):
+                    word0 = bufSlot[j * 2]
+                    word1 = bufSlot[j * 2 + 1]
+                    ctime = word0 & 0xffff
+                    channel = (word0 >> 16) & 0x7f
+                    axis = (word0 >> 23) & 0x01
+                    lane = (word0 >> 24) & 0x1f  # 1..2 for scints, 8..20 for RPCs (=readout-board slot - 7)
+                    flag = (word0 >> 30) & 0x03  # 1 for RPCs, 2 for scints
+                    electId = (channel << 12) | (axis << 11) | (lane << 6) | (finesse << 4) | nodeID
+                    adc = word1 & 0x0fff
+                    tdc = (word1 >> 16) & 0x07ff
+                    tdcExtra = (word1 >> 27) & 0x1f
+                    adcExtra = (word1 >> 12) & 0x0f
+                    isRPC = (flag == 1)
+                    isScint = (flag == 2)
+                    laneAxis = axis if ((lane < 1) or (lane > 20)) else ((lane << 1) + axis)
+                    laneAxisChannel = (word0 >> 16) & 0x1fff
+                    multiplicity = channelMultiplicity[laneAxisChannel]
+                    if multiplicity > 1:  # histogram only if 2+ entries in the same channel
+                        self.hist_rawKLMchannelMultiplicity[dc].Fill(multiplicity, laneAxis)
+                        self.hist_rawKLMchannelMultiplicityFine[dc].Fill(multiplicity, laneAxisChannel)
+                    if (self.singleEntry == 1 and multiplicity > 1) or (self.singleEntry == 2 and multiplicity == 1):
+                        continue
+                    self.hist_rawKLMlaneFlag.Fill(flag, lane)
+                    if isRPC:
+                        self.hist_rawKLMtdcExtraRPC.Fill(sectorFB, tdcExtra)
+                        self.hist_rawKLMadcExtraRPC.Fill(sectorFB, adcExtra)
+                    elif isScint:
+                        self.hist_rawKLMtdcExtraScint.Fill(sectorFB, tdcExtra)
+                        self.hist_rawKLMadcExtraScint.Fill(sectorFB, adcExtra)
+                        if int(self.exp) <= 3:  # fix the ctime for old SCROD firmware
+                            trigCtx = trigCtime >> 3
+                            ctime = trigCtx - ((trigCtx - ctime) << 2)
+                    t = (tdc - trigCtime) & 0x03ff  # in ns, range is 0..1023
+                    dtIndex = 0.75 * j
+                    ct = (ctime << 3) - (trigCtime & 0x7fff8)  # in ns, range is only 8 bits in SCROD (??)
+                    ct = ct & 0x3ff
+                    if electId in self.electIdToModuleId:  # mapped-channel histograms
+                        self.hist_mappedSectorOccupancyMultihit.Fill(sectorFB)
+                        if channelMultiplicity[laneAxisChannel] == 1:
+                            self.hist_mappedSectorOccupancy.Fill(sectorFB)
+                        if isRPC:
+                            self.hist_RPCTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
+                            tCal = t - self.t0RPC[sectorFB]
+                            if abs(tCal - self.t0Cal) < 25:
+                                if n > 20:
+                                    self.hist_ctimeRPCtCal.Fill(tCal, ctime - minRPCCtime)
+                                    self.hist_ctimeRPCtCalCorr.Fill(tCal - dtIndex, ctime - minRPCCtime)
+                                    self.hist_jRPCtCal.Fill(tCal, j)
+                                    self.hist_jRPCtCalCorr.Fill(tCal - dtIndex, j)
+                                self.hist_mappedChannelOccupancyPrompt[sectorFB][axis].Fill(lane, channel)
+                            elif abs(tCal - self.t0Cal) > 50:
+                                self.hist_mappedChannelOccupancyBkgd[sectorFB][axis].Fill(lane, channel)
+                            self.hist_mappedRPCSectorOccupancy.Fill(sectorFB)
+                            self.hist_mappedRPCLaneAxisOccupancy.Fill(sectorFB, laneAxis)
+                            self.hist_mappedRPCTime.Fill(t)
+                            self.hist_mappedRPCTimeCal.Fill(tCal)
+                            self.hist_mappedRPCTimeCal2.Fill(tCal - dtIndex)
+                            self.hist_mappedRPCTimeBySector.Fill(sectorFB, t)
+                            self.hist_mappedRPCTimeCalBySector.Fill(sectorFB, tCal - dtIndex)
+                            self.hist_mappedRPCTimePerSector[sectorFB].Fill(t)
+                            self.hist_mappedRPCTimePerLayer[sectorFB][lane - 6].Fill(t)
+                        elif isScint:
+                            self.hist_ScintTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
+                            ctCal = ct - self.ct0Scint[sectorFB]
+                            if abs(ctCal - self.ct0Cal) < 10:
+                                self.hist_mappedChannelOccupancyPrompt[sectorFB][axis].Fill(lane, channel)
+                            elif (abs(ctCal - self.ct0Cal) > 20):
+                                self.hist_mappedChannelOccupancyBkgd[sectorFB][axis].Fill(lane, channel)
+                            self.hist_mappedScintSectorOccupancy.Fill(sectorFB)
+                            self.hist_mappedScintLaneAxisOccupancy.Fill(sectorFB, laneAxis)
+                            self.hist_mappedScintTime.Fill(t & 0x1f)
+                            self.hist_mappedScintTimeBySector.Fill(sectorFB, t & 0x1f)
+                            self.hist_mappedScintTDC.Fill(tdc)
+                            self.hist_mappedScintTDCBySector.Fill(sectorFB, tdc)
+                            self.hist_mappedScintCtime0.Fill((ctime << 3) & 0x3ff)
+                            self.hist_mappedScintCtime1.Fill(sectorFB, (ctime << 3) & 0x3ff)
+                            self.hist_mappedScintCtime.Fill(ct)
+                            self.hist_mappedScintCtimeBySector.Fill(sectorFB, ct)
+                            self.hist_mappedScintCtimeCal.Fill(ctCal)
+                            self.hist_mappedScintCtimeCalBySector.Fill(sectorFB, ctCal)
+                            self.hist_mappedScintCtimePerSector[sectorFB].Fill(ct)
+                            self.hist_mappedScintCtimePerLayer[sectorFB][lane - 1].Fill(ct)
+                    else:  # unmapped-channel histograms
+                        self.hist_unmappedSectorOccupancyMultihit.Fill(sectorFB)
+                        if channelMultiplicity[laneAxisChannel] == 1:
+                            self.hist_unmappedSectorOccupancy.Fill(sectorFB)
+                        self.hist_unmappedChannelOccupancy[sectorFB][axis].Fill(lane, channel)
+                        if isRPC:
+                            self.hist_RPCTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
+                            self.hist_unmappedRPCSectorOccupancy.Fill(sectorFB)
+                            self.hist_unmappedRPCLaneAxisOccupancy.Fill(sectorFB, laneAxis)
+                            self.hist_unmappedRPCTime.Fill(t)
+                            self.hist_unmappedRPCTimeBySector.Fill(sectorFB, t)
+                        elif isScint:
+                            self.hist_ScintTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
+                            self.hist_unmappedScintSectorOccupancy.Fill(sectorFB)
+                            self.hist_unmappedScintLaneAxisOccupancy.Fill(sectorFB, laneAxis)
+                            self.hist_unmappedScintTime.Fill(t & 0x1f)
+                            self.hist_unmappedScintTimeBySector.Fill(sectorFB, t & 0x1f)
+                            self.hist_unmappedScintCtime.Fill(ct)
+                            self.hist_unmappedScintCtimeBySector.Fill(sectorFB, ct)
                 self.hist_rawKLMsizeByDC[dc].Fill(count[dc])
         self.hist_rawKLMsizeMultihit.Fill(countAllMultihit)
         self.hist_rawKLMsize.Fill(countAll)

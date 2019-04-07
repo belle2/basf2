@@ -23,8 +23,10 @@ class EventCountLimiter(basf2.Module):
             maxCount (int): number of events to be processed
         """
         super().__init__()
-        self.eventCounter = 0
+        #: internal copy of the event-counter upper limit
         self.maxCount = maxCount if (maxCount >= 0) else (1 << 31)
+        #: internal event counter
+        self.eventCounter = 0
 
     def initialize(self):
         """Handle job initialization (nothing to do here)"""

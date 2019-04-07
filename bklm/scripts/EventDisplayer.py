@@ -92,6 +92,7 @@ class EventDisplayer(basf2.Module):
 
         # Open the output PDF file for event displays
 
+        #: TCanvas on which event displays will be drawn
         self.eventCanvas = ROOT.TCanvas("eventCanvas", self.eventPdfName, 3200, 1600)
         title = '{0}['.format(self.eventPdfName)
         self.eventCanvas.SaveAs(title)
@@ -120,7 +121,7 @@ class EventDisplayer(basf2.Module):
         u3 = 100
         u4 = 400
         u5 = 150
-        # list of blank scatterplots to define the per-sector bounds of the BKLM end view
+        #: list of blank scatterplots to define the per-sector bounds of the BKLM end view
         self.hist_XYS = [0, 0, 0, 0, 0, 0, 0, 0]
         self.hist_XYS[0] = ROOT.TH2F('XYS0', ' ;x;y', 10, +u3, +u4, 10, -u5, +u5)
         self.hist_XYS[0].SetStats(False)
@@ -138,7 +139,7 @@ class EventDisplayer(basf2.Module):
         self.hist_XYS[6].SetStats(False)
         self.hist_XYS[7] = ROOT.TH2F('XYS7', ' ;x;y', 10, +u1, +u2, 10, -u2, -u1)
         self.hist_XYS[7].SetStats(False)
-        # blank scatterplot to define the per-sector bounds of the rotated BKLM side view
+        #: blank scatterplot to define the per-sector bounds of the rotated BKLM side view
         self.hist_ZYS = ROOT.TH2F('ZYS', ' ;z;y', 10, -150.0, 150.0, 10, 125.0, 425.0)
         self.hist_ZYS.SetStats(False)
         ROOT.gStyle.SetOptStat(10)

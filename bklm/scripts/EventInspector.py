@@ -704,6 +704,7 @@ class EventInspector(basf2.Module):
         # Open the output PDF file for event displays
 
         if self.maxDisplays > 0:
+            #: TCanvas on which event displays will be drawn
             self.eventCanvas = ROOT.TCanvas("eventCanvas", self.eventPdfName, 3200, 1600)
             title = '{0}['.format(self.eventPdfName)
             self.eventCanvas.SaveAs(title)

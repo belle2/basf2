@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <arich/utility/ARICHChannelHist.h>
+#include <framework/logging/Logger.h>
 #include <math.h>
 #include <iostream>
 #include <algorithm>
@@ -151,12 +152,34 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
   GetYaxis()->SetLimits(-115., 115.);
 }
 
-void ARICHChannelHist::fillBin(unsigned hapdID, unsigned chID)
+void ARICHChannelHist::Draw(Option_t* option)
+{
+  TH2Poly::Draw(option);
+  double rlin = 40;
+  double rlout = 113;
+  for (int isec = 0; isec < 6; isec++) {
+    double x1 = rlin * cos(M_PI / 3.*isec);
+    double x2 = rlout * cos(M_PI / 3.*isec);
+    double y1 = rlin * sin(M_PI / 3.*isec);
+    double y2 = rlout * sin(M_PI / 3.*isec);
+    lines[isec] = TLine(x1, y1, x2, y2);
+    lines[isec].Draw();
+    x1 = rlin * cos(M_PI / 3.*isec + M_PI / 6.);
+    y1 = rlin * sin(M_PI / 3.*isec + M_PI / 6.);
+    labels[isec] = TText(x1, y1, TString::Format("S-%d", isec + 1));
+    labels[isec].SetTextAlign(22);
+    labels[isec].SetTextSize(0.03);
+    labels[isec].Draw();
+  }
+}
+
+
+void ARICHChannelHist::fillBin(unsigned hapdID, unsigned chID, double weight)
 {
   unsigned chIndex = 0;
   if (m_type == 0) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
   if (m_type == 2) chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 4 + chID + 1;
-  SetBinContent(chIndex, GetBinContent(chIndex) + 1);
+  SetBinContent(chIndex, GetBinContent(chIndex) + weight);
 }
 
 void ARICHChannelHist::setBinContent(unsigned hapdID, unsigned chID, double value)
@@ -169,10 +192,43 @@ void ARICHChannelHist::setBinContent(unsigned hapdID, unsigned chID, double valu
 
 void ARICHChannelHist::setBinContent(unsigned hapdID, double value)
 {
-  SetBinContent(hapdID, value);
+  SetBinContent(m_hapd2binMap[hapdID], value);
 }
 
-void ARICHChannelHist::fillBin(unsigned hapdID)
+void ARICHChannelHist::fillBin(unsigned hapdID, double weight)
 {
-  SetBinContent(hapdID, GetBinContent(hapdID) + 1);
+  SetBinContent(m_hapd2binMap[hapdID], GetBinContent(hapdID) + weight);
+}
+
+void ARICHChannelHist::fillFromTH1(TH1* hist)
+{
+
+  int nbins = hist->GetNbinsX();
+  if (m_type == 1) {
+    if (nbins < 420) { B2ERROR("Number of bins in histogram small than number of ChannelHist bins!"); return;}
+    if (nbins == 420) for (int i = 0; i < nbins; i++) setBinContent(i + 1, hist->GetBinContent(i + 1));
+    if (nbins == 420 * 4) {
+      for (int i = 0; i < 420; i++) {
+        for (int j = 0; j < 4; j++) fillBin(i + 1, hist->GetBinContent(i * 4 + j + 1));
+      }
+    }
+    if (nbins == 420 * 144) {
+      for (int i = 0; i < 420; i++) {
+        for (int j = 0; j < 144; j++) fillBin(i + 1, hist->GetBinContent(i * 144 + j + 1));
+      }
+    }
+  } else if (m_type == 0) {
+    if (nbins < 420 * 144) { B2ERROR("Number of bins in histogram small than number of ChannelHist bins!"); return;}
+    for (int i = 0; i < 420; i++) {
+      for (int j = 0; j < 144; j++) setBinContent(i + 1, j, hist->GetBinContent(i * 144 + j + 1));
+    }
+  } else if (m_type == 2) {
+    if (nbins < 420 * 4) { B2ERROR("Number of bins in histogram small than number of ChannelHist bins!"); return;}
+    if (nbins == 420 * 4) for (int i = 0; i < nbins; i++) setBinContent(i / 4 + 1, i % 4, hist->GetBinContent(i + 1));
+    if (nbins == 420 * 144) {
+      for (int i = 0; i < 420; i++) {
+        for (int j = 0; j < 144; j++) fillBin(i + 1, j / 36, hist->GetBinContent(i * 144 + j + 1));
+      }
+    }
+  } else return;
 }

@@ -60,7 +60,7 @@ namespace Belle2 {
 
     //Variables
     HepMC::IO_HEPEVT m_hepevtio; /**< wrapper/buffer for hepevt conversion. */
-    HepMC::IO_GenEvent* m_ascii_io; /**< The text file stream */
+    std::unique_ptr<HepMC::IO_GenEvent> m_ascii_io; /**< The text file stream */
 
 
   };

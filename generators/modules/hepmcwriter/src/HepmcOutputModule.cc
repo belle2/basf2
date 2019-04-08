@@ -36,9 +36,7 @@ HepMCOutputModule::HepMCOutputModule() : Module()
 
 void HepMCOutputModule::initialize()
 {
-  // don't know how to do that on the stack ...
-  // (IO_GenEvent wants to be initialized with a filename)
-  m_ascii_io = new HepMC::IO_GenEvent(m_filename, std::ios::out);
+  m_ascii_io = std::make_unique<HepMC::IO_GenEvent>(m_filename, std::ios::out);
 }
 
 
@@ -102,7 +100,5 @@ void HepMCOutputModule::event()
 
 void HepMCOutputModule::terminate()
 {
-  if (m_ascii_io != 0) {
-    delete m_ascii_io;
-  }
+
 }

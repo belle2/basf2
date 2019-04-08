@@ -10,7 +10,9 @@
 
 #pragma once
 
+/* Belle2 headers. */
 #include <framework/datastore/RelationsObject.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
 
@@ -35,6 +37,23 @@ namespace Belle2 {
       m_UserWord(0)
     {
     };
+
+    /**
+     * Constructor.
+     * @param[in] rawKLM RawKLM.
+     * @param[in] entry  Entry (corresponds to the data form one copper).
+     */
+    KLMDigitEventInfo(RawKLM* rawKLM, int entry) :
+      m_TriggerCTime(rawKLM->GetTTCtime(entry)),
+      m_triggerCTimeOfPreviousEvent(0),
+      m_triggerUTime(rawKLM->GetTTUtime(entry)),
+      m_windowStart(rawKLM->GetTrailerChksum(entry)),
+      m_nRPCHits(0),
+      m_nSciHits(0),
+      m_nOutOfRangeHits(0),
+      m_UserWord(0)
+    {
+    }
 
     /**
      * Get trigger CTIME.

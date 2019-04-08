@@ -64,12 +64,12 @@ void BKLMUnpackerModule::initialize()
   m_bklmDigits.registerInDataStore(m_outputDigitsName);
   m_klmDigitRaws.registerInDataStore();
   m_bklmDigitOutOfRanges.registerInDataStore();
-  m_bklmDigitEventInfos.registerInDataStore();
+  m_klmDigitEventInfos.registerInDataStore();
 
   m_bklmDigits.registerRelationTo(m_klmDigitRaws);
   m_bklmDigitOutOfRanges.registerRelationTo(m_klmDigitRaws);
-  m_bklmDigitEventInfos.registerRelationTo(m_bklmDigits);
-  m_bklmDigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
+  m_klmDigitEventInfos.registerRelationTo(m_bklmDigits);
+  m_klmDigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
 
   if (m_loadMapFromDB)
     loadMapFromDB();
@@ -94,7 +94,7 @@ void BKLMUnpackerModule::event()
   m_bklmDigits.clear();
   m_klmDigitRaws.clear();
   m_bklmDigitOutOfRanges.clear();
-  m_bklmDigitEventInfos.clear();
+  m_klmDigitEventInfos.clear();
 
   B2DEBUG(29, "BKLMUnpackerModule:: there are " << m_rawKLMs.getEntries() << " RawKLM entries");
   for (int i = 0; i < m_rawKLMs.getEntries(); i++) {
@@ -131,15 +131,10 @@ void BKLMUnpackerModule::event()
         // addendum: there is always an additional word (count) at the end!
 
         // we create one KLMDigitEventInfo per COPPER link
-        KLMDigitEventInfo* bklmDigitEventInfo = m_bklmDigitEventInfos.appendNew();
-        int triggerCTime = m_rawKLMs[i]->GetTTCtime(j) & 0xFFFF;
-        bklmDigitEventInfo->setTriggerCTime(triggerCTime);
-        int triggerUTime = m_rawKLMs[i]->GetTTUtime(j) & 0xFFFF;
-        bklmDigitEventInfo->setTriggerUTime(triggerUTime);
-        int windowStart = m_rawKLMs[i]->GetTrailerChksum(j);
-        bklmDigitEventInfo->setWindowStart(windowStart);
-        bklmDigitEventInfo->setPreviousEventTriggerCTime(m_triggerCTimeOfPreviousEvent);
-        m_triggerCTimeOfPreviousEvent = triggerCTime;
+        KLMDigitEventInfo* klmDigitEventInfo =
+          m_klmDigitEventInfos.appendNew(m_rawKLMs[i], j);
+        klmDigitEventInfo->setPreviousEventTriggerCTime(m_triggerCTimeOfPreviousEvent);
+        m_triggerCTimeOfPreviousEvent = klmDigitEventInfo->getTriggerCTime();
 
         int numDetNwords = m_rawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int numHits = numDetNwords / hitLength;
@@ -147,7 +142,7 @@ void BKLMUnpackerModule::event()
 
         // in the last word there is the user word (from DCs)
         int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
-        bklmDigitEventInfo->setUserWord(userWord);
+        klmDigitEventInfo->setUserWord(userWord);
 
         // cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,             finesse_num) << " words, " << numHits << " hits)" << endl;
         // if (numDetNwords > 0) {
@@ -254,14 +249,14 @@ void BKLMUnpackerModule::event()
 
           if (outRange) {
             // increase by 1 the event-counter of outOfRange-flagged hits
-            bklmDigitEventInfo->increaseOutOfRangeHits();
+            klmDigitEventInfo->increaseOutOfRangeHits();
 
             // store the digit in the appropriate dataobject
             BKLMDigitOutOfRange* bklmDigitOutOfRange =
               m_bklmDigitOutOfRanges.appendNew(
                 moduleId, raw.ctime, raw.tdc, raw.charge);
             bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-            bklmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
+            klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
 
             std::string message = "channel number is out of range";
             m_rejected[message] += 1;
@@ -274,16 +269,17 @@ void BKLMUnpackerModule::event()
           // still have to add channel and axis to moduleId
           if (layer > 1) {
             moduleId |= BKLM_INRPC_MASK;
-            bklmDigitEventInfo->increaseRPCHits();
+            klmDigitEventInfo->increaseRPCHits();
           } else
-            bklmDigitEventInfo->increaseSciHits();
+            klmDigitEventInfo->increaseSciHits();
           // moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
           moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
           BKLMDigit* bklmDigit =
             m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
           bklmDigit->setTime(
-            m_TimeConversion->getTime(raw.ctime, raw.tdc, triggerCTime,
+            m_TimeConversion->getTime(raw.ctime, raw.tdc,
+                                      klmDigitEventInfo->getTriggerCTime(),
                                       layer <= 1));
           if (layer < 2 && (raw.charge < m_scintThreshold))
             bklmDigit->isAboveThreshold(true);
@@ -297,7 +293,7 @@ void BKLMUnpackerModule::event()
                   bklmDigit->getModuleID());
 
           bklmDigit->addRelationTo(klmDigitRaw);
-          bklmDigitEventInfo->addRelationTo(bklmDigit);
+          klmDigitEventInfo->addRelationTo(bklmDigit);
 
         } // iHit for cycle
 

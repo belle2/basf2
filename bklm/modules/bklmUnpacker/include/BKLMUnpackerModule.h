@@ -138,7 +138,7 @@ namespace Belle2 {
     StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;
 
     //! KLMDigitEventInfo StoreArray
-    StoreArray<KLMDigitEventInfo> m_bklmDigitEventInfos;
+    StoreArray<KLMDigitEventInfo> m_klmDigitEventInfos;
 
     //! trigger ctime of the previous event
     unsigned int m_triggerCTimeOfPreviousEvent;

@@ -12,6 +12,7 @@
 #include <cstdint>
 
 /* Belle2 headers. */
+#include <klm/rawdata/RawData.h>
 #include <eklm/modules/EKLMUnpacker/EKLMUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationArray.h>
@@ -160,41 +161,36 @@ void EKLMUnpackerModule::event()
         int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
         eklmDigitEventInfo->setUserWord(userWord);
         for (int iHit = 0; iHit < numHits; iHit++) {
-          dataWords[0] = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
-          dataWords[1] =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
-          dataWords[2] = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
-          dataWords[3] =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          uint16_t stripFirmware = dataWords[0] & 0x7F;
+          KLM::RawData raw;
+          KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw);
           /**
            * The possible values of the strip number in the raw data are
            * from 0 to 127, while the actual range of strip numbers is from
            * 1 to 75. A check is required. The unpacker continues to work
            * with B2ERROR because otherwise debugging is not possible.
            */
-          correctHit = m_ElementNumbers->checkStrip(stripFirmware, false);
+          correctHit = m_ElementNumbers->checkStrip(raw.channel, false);
           if (!correctHit) {
             if (!(m_IgnoreWrongHits ||
-                  (stripFirmware == 0 && m_IgnoreStrip0))) {
+                  (raw.channel == 0 && m_IgnoreStrip0))) {
               B2ERROR("Incorrect strip number in raw data."
-                      << LogVar("Strip number", stripFirmware));
+                      << LogVar("Strip number", raw.channel));
             }
             if (!m_WriteWrongHits)
               continue;
-            strip = stripFirmware;
+            strip = raw.channel;
           } else {
-            strip = m_ElementNumbers->getStripSoftwareByFirmware(stripFirmware);
+            strip = m_ElementNumbers->getStripSoftwareByFirmware(
+                      raw.channel);
           }
-          uint16_t plane = ((dataWords[0] >> 7) & 1) + 1;
+          uint16_t plane = raw.axis + 1;
           /*
            * The possible values of the plane number in the raw data are from
            * 1 to 2. The range is the same as in the detector geometry.
            * Consequently, a check of the plane number is useless: it is
            * always correct.
            */
-          lane.setLane((dataWords[0] >> 8) & 0x1F);
-          uint16_t ctime = dataWords[1] & 0xFFFF;
-          uint16_t tdc = dataWords[2] & 0x7FF;
-          uint16_t charge = dataWords[3] & 0xFFF;
+          lane.setLane(raw.lane);
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
           if (sectorGlobal == nullptr) {
             if (!m_IgnoreWrongHits) {
@@ -220,23 +216,24 @@ void EKLMUnpackerModule::event()
           }
           eklmDigit = m_Digits.appendNew();
           eklmDigit->addRelationTo(eklmDigitEventInfo);
-          eklmDigit->setCTime(ctime);
-          eklmDigit->setTDC(tdc);
+          eklmDigit->setCTime(raw.ctime);
+          eklmDigit->setTDC(raw.tdc);
           eklmDigit->setTime(
-            m_TimeConversion->getTime(ctime, tdc, triggerCTime, true));
+            m_TimeConversion->getTime(raw.ctime, raw.tdc,
+                                      triggerCTime, true));
           eklmDigit->setEndcap(endcap);
           eklmDigit->setLayer(layer);
           eklmDigit->setSector(sector);
           eklmDigit->setPlane(plane);
           eklmDigit->setStrip(strip);
-          eklmDigit->setCharge(charge);
+          eklmDigit->setCharge(raw.charge);
           if (correctHit) {
             stripGlobal = m_ElementNumbers->stripNumber(
                             endcap, layer, sector, plane, strip);
             channelData = m_Channels->getChannelData(stripGlobal);
             if (channelData == nullptr)
               B2FATAL("Incomplete EKLM channel data.");
-            if (charge < channelData->getThreshold())
+            if (raw.charge < channelData->getThreshold())
               eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
             else
               eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);

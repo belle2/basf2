@@ -11,18 +11,17 @@
 
 #include <bklm/modules/bklmUnpacker/BKLMUnpackerModule.h>
 
+#include <framework/database/DBArray.h>
 #include <framework/datastore/DataStore.h>
-//#include <framework/datastore/DataObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/crc.hpp>
-//#include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <bklm/dataobjects/BKLMStatus.h>
-#include <framework/database/DBArray.h>
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
+#include <klm/rawdata/RawData.h>
 
 #include <sstream>
 #include <iomanip>
@@ -209,31 +208,15 @@ void BKLMUnpackerModule::event()
 
           B2DEBUG(29, "BKLMUnpackerModule:: unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit *
                   hitLength + 1]);
-          // first word is the leftmost, not the rightmost
-          unsigned short bword2 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
-          unsigned short bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
-          unsigned short bword4 = buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          unsigned short bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
+          KLM::RawData raw;
+          KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw);
 
-          BKLMDigitRaw* bklmDigitRaw = m_bklmDigitRaws.appendNew(bword1, bword2, bword3, bword4);
-
-          B2DEBUG(29, "BKLMUnpackerModule:: unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4);
-
-          unsigned short channel = bword1 & 0x7F;
-          unsigned short axis = (bword1 >> 7) & 1;
-          // lane is the slot in the crate
-          unsigned short lane = (bword1 >> 8) & 0x1F;
-          // unsigned short flag = (bword1 >> 14);
-          unsigned short ctime = bword2 & 0xFFFF;
-          unsigned short tdc = bword3 & 0x7FF;
-          unsigned short charge = bword4 & 0xFFF;
-
-          B2DEBUG(29, "BKLMUnpackerModule:: unpacked info: channel: " << channel << ", axis: " << axis << " lane: " << lane << " ctime: " <<
-                  ctime << " tdc: " << tdc << " charge: " << charge);
+          //BKLMDigitRaw* bklmDigitRaw = m_bklmDigitRaws.appendNew(bword1, bword2, bword3, bword4);
 
           B2DEBUG(29, "BKLMUnpackerModule:: copper: " << copperId << " finesse: " << finesse_num);
 
-          int electId = electCooToInt(copperId - BKLM_ID, finesse_num , lane, axis, channel);
+          int electId = electCooToInt(copperId - BKLM_ID, finesse_num,
+                                      raw.lane, raw.axis, raw.channel);
           int moduleId = 0;
           bool outRange = false;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
@@ -241,11 +224,12 @@ void BKLMUnpackerModule::event()
               B2DEBUG(20, "BKLMUnpackerModule:: could not find in mapping"
                       << LogVar("Copper", copperId)
                       << LogVar("Finesse", finesse_num + 1)
-                      << LogVar("Lane", lane)
-                      << LogVar("Axis", axis));
+                      << LogVar("Lane", raw.lane)
+                      << LogVar("Axis", raw.axis));
               continue;
             } else {
-              moduleId = getDefaultModuleId(copperId, finesse_num, lane, axis, channel, outRange);
+              moduleId = getDefaultModuleId(copperId, finesse_num, raw.lane,
+                                            raw.axis, raw.channel, outRange);
             }
           } else {
             // found moduleId in the mapping
@@ -260,7 +244,7 @@ void BKLMUnpackerModule::event()
           // int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
           // int isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
           // int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
-          channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
+          int channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
 
           if (layer > 14) {
             B2DEBUG(20, "BKLMUnpackerModule:: strange that the layer number is larger than 14 "
@@ -273,8 +257,10 @@ void BKLMUnpackerModule::event()
             bklmDigitEventInfo->increaseOutOfRangeHits();
 
             // store the digit in the appropriate dataobject
-            BKLMDigitOutOfRange* bklmDigitOutOfRange = m_bklmDigitOutOfRanges.appendNew(moduleId, ctime, tdc, charge);
-            bklmDigitOutOfRange->addRelationTo(bklmDigitRaw);
+            BKLMDigitOutOfRange* bklmDigitOutOfRange =
+              m_bklmDigitOutOfRanges.appendNew(
+                moduleId, raw.ctime, raw.tdc, raw.charge);
+            //bklmDigitOutOfRange->addRelationTo(bklmDigitRaw);
             bklmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
 
             std::string message = "channel number is out of range";
@@ -294,10 +280,12 @@ void BKLMUnpackerModule::event()
           // moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
           moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
-          BKLMDigit* bklmDigit = m_bklmDigits.appendNew(moduleId, ctime, tdc, charge);
+          BKLMDigit* bklmDigit =
+            m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
           bklmDigit->setTime(
-            m_TimeConversion->getTime(ctime, tdc, triggerCTime, layer <= 1));
-          if (layer < 2 && (charge < m_scintThreshold))
+            m_TimeConversion->getTime(raw.ctime, raw.tdc, triggerCTime,
+                                      layer <= 1));
+          if (layer < 2 && (raw.charge < m_scintThreshold))
             bklmDigit->isAboveThreshold(true);
 
           B2DEBUG(29, "BKLMUnpackerModule:: digit after Unpacker: sector: " << bklmDigit->getSector() << " isForward: " <<
@@ -308,7 +296,7 @@ void BKLMUnpackerModule::event()
                   " isAboveThreshold " << bklmDigit->isAboveThreshold() << " isRPC " << bklmDigit->inRPC() << " moduleId " <<
                   bklmDigit->getModuleID());
 
-          bklmDigit->addRelationTo(bklmDigitRaw);
+          //bklmDigit->addRelationTo(bklmDigitRaw);
           bklmDigitEventInfo->addRelationTo(bklmDigit);
 
         } // iHit for cycle

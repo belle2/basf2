@@ -50,7 +50,8 @@ namespace Belle2 {
       bool m_param_deleteTracks = false;
 
       /// Reference to the filter to be used to filter
-      ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;
+      ChooseableFilter<TrackQualityFilterFactory>
+      m_trackQualityFilter;
     };
   }
 }

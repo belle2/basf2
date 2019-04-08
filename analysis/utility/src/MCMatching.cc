@@ -210,7 +210,8 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
                   << mother->getPDG() << " " << particle->getPDGCode() << " " << mcParticle->getPDG());
       }
       status |= MCErrorFlags::c_MissingResonance;
-    } else if (!particle->isInclusive()) {
+    } else if (!particle->isVirtual()) {
+      // Check if the particle is virtual. If so the flag of c_AddedWrongParticle will be ignored.
       status |= MCErrorFlags::c_AddedWrongParticle;
     }
   }

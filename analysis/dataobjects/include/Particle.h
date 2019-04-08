@@ -148,14 +148,14 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param isInclusive Is the particle inclusive?
+     * @param isVirtual Is the particle inclusive?
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
-             bool isInclusive,
+             bool isVirtual,
              TClonesArray* arrayPointer = nullptr);
 
     /**
@@ -249,12 +249,12 @@ namespace Belle2 {
     }
 
     /**
-     * Sets m_isInclusive
-     * @param isInclusive Is the particle Inclusive?
+     * Sets m_isVirtual
+     * @param isVirtual Is the particle Virtual?
      */
-    void setInclusive(bool isInclusive)
+    void setVirtual(bool isVirtual)
     {
-      m_isInclusive = isInclusive;
+      m_isVirtual = isVirtual;
     }
 
     /**
@@ -490,12 +490,12 @@ namespace Belle2 {
     }
 
     /**
-     * Returns true if the particle is Inclusive
+     * Returns true if the particle is Virtual
      * @return p-value of fit (nan means no fit done)
      */
-    bool isInclusive() const
+    bool isVirtual() const
     {
-      return m_isInclusive;
+      return m_isVirtual;
     }
 
     /**
@@ -863,7 +863,7 @@ namespace Belle2 {
 
     friend class ParticleSubset;
 
-    bool m_isInclusive; /** Is the particle Inclusive? **/
+    bool m_isVirtual; /** Is the particle Virtual? **/
   };
 
 } // end namespace Belle2

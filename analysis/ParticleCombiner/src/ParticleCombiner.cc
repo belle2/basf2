@@ -117,7 +117,7 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
-    m_isInclusive = mother->isInclusive();
+    m_isVirtual = mother->isVirtual();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
@@ -381,12 +381,12 @@ namespace Belle2 {
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_isInclusive,
+                                m_isVirtual,
                                 m_particleArray.getPtr());
       case 1: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_isInclusive,
+                                m_isVirtual,
                                 m_particleArray.getPtr());
-      case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices, m_isInclusive, m_particleArray.getPtr());
+      case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices, m_isVirtual, m_particleArray.getPtr());
       default: B2FATAL("You called getCurrentParticle although loadNext should have returned false!");
     }
 

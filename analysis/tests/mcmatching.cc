@@ -1049,9 +1049,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Xsd->isInclusive(), false);
-      Xsd->setInclusive(true);
-      EXPECT_EQ(Xsd->isInclusive(), true);
+      EXPECT_EQ(Xsd->isVirtual(), false);
+      Xsd->setVirtual(true);
+      EXPECT_EQ(Xsd->isVirtual(), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
@@ -1063,9 +1063,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Xsd->isInclusive(), false);
-      Xsd->setInclusive(true);
-      EXPECT_EQ(Xsd->isInclusive(), true);
+      EXPECT_EQ(Xsd->isVirtual(), false);
+      Xsd->setVirtual(true);
+      EXPECT_EQ(Xsd->isVirtual(), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
@@ -1079,9 +1079,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Xsd->isInclusive(), false);
-      Xsd->setInclusive(true);
-      EXPECT_EQ(Xsd->isInclusive(), true);
+      EXPECT_EQ(Xsd->isVirtual(), false);
+      Xsd->setVirtual(true);
+      EXPECT_EQ(Xsd->isVirtual(), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();

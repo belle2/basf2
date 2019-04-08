@@ -247,7 +247,7 @@ namespace Belle2 {
     int m_pdgCode; /**< PDG Code of the particle which is combined */
     bool m_isSelfConjugated; /**< True if the combined particle is self-conjugated */
     unsigned int m_iParticleType; /**< The type of particle which is currently generated */
-    bool m_isInclusive; /**< True if the particle is selected as inclusive by using "@" */
+    bool m_isVirtual; /**< True if the particle is selected as virtual by using "@" */
 
     unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */

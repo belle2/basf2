@@ -145,7 +145,7 @@ namespace {
     EXPECT_EQ(dd4.isIgnoreIntermediate(), false);
     EXPECT_EQ(dd4.isInclusive(), true);
 
-    // @ means inclusive (virtual) particle, for example @X -> K+ pi-
+    // @ means inclusive (virtual) particle, for example @Xsd -> K+ pi-
     DecayDescriptor dd5;
     initok = dd5.init("@Xsd:candidates -> K+:loose pi-:loose");
     EXPECT_EQ(initok, true);
@@ -155,7 +155,7 @@ namespace {
     EXPECT_EQ(dd5.isInclusive(), false);
 
     ASSERT_NE(dd5.getMother(), nullptr);
-    EXPECT_EQ(dd5.getMother()->isInclusive(), true);
+    EXPECT_EQ(dd5.getMother()->isVirtual(), true);
     EXPECT_EQ(dd5.getMother()->isSelected(), false);
 
   }

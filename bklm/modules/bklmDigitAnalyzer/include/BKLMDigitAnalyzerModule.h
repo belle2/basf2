@@ -17,9 +17,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMDigitRaw.h>
 #include <bklm/dataobjects/BKLMDigitOutOfRange.h>
 #include <bklm/dataobjects/BKLMDigitEventInfo.h>
+#include <klm/dataobjects/KLMDigitRaw.h>
 
 #include "TFile.h"
 #include "TTree.h"
@@ -73,7 +73,7 @@ namespace Belle2 {
     StoreArray<BKLMDigit> m_digit;
 
     //! Input raw BKLMDigits
-    StoreArray<BKLMDigitRaw> m_digitRaw;
+    StoreArray<KLMDigitRaw> m_digitRaw;
 
     //!  Input BKLMDigits whose time is out of range
     StoreArray<BKLMDigitOutOfRange> m_digitOutOfRange;

@@ -211,7 +211,7 @@ void BKLMUnpackerModule::event()
           KLM::RawData raw;
           KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw);
 
-          //BKLMDigitRaw* bklmDigitRaw = m_bklmDigitRaws.appendNew(bword1, bword2, bword3, bword4);
+          //KLMDigitRaw* bklmDigitRaw = m_bklmDigitRaws.appendNew(bword1, bword2, bword3, bword4);
 
           B2DEBUG(29, "BKLMUnpackerModule:: copper: " << copperId << " finesse: " << finesse_num);
 

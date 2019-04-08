@@ -182,7 +182,7 @@ void BKLMDigitAnalyzerModule::event()
 
     for (const BKLMDigit& digit : digitEventInfo->getRelationsTo<BKLMDigit>()) {
 
-      BKLMDigitRaw* digitRaw = digit.getRelatedTo<BKLMDigitRaw>();
+      KLMDigitRaw* digitRaw = digit.getRelatedTo<KLMDigitRaw>();
 
       m_histoLayerVsSector[1 - digit.isForward()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
 

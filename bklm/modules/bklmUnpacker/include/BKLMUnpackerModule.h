@@ -20,9 +20,9 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
-#include <bklm/dataobjects/BKLMDigitRaw.h>
 #include <bklm/dataobjects/BKLMDigitOutOfRange.h>
 #include <bklm/dataobjects/BKLMDigitEventInfo.h>
+#include <klm/dataobjects/KLMDigitRaw.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 
 #include <map>
@@ -132,7 +132,7 @@ namespace Belle2 {
     StoreArray<BKLMDigit> m_bklmDigits;
 
     //! BKLMDigitDebug StoreArray
-    StoreArray<BKLMDigitRaw> m_bklmDigitRaws;
+    StoreArray<KLMDigitRaw> m_bklmDigitRaws;
 
     //! BKLMDigitOutOfRange StoreArray
     StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;

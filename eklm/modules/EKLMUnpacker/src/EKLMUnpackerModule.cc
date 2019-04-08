@@ -162,7 +162,8 @@ void EKLMUnpackerModule::event()
         eklmDigitEventInfo->setUserWord(userWord);
         for (int iHit = 0; iHit < numHits; iHit++) {
           KLM::RawData raw;
-          KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw);
+          KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw,
+                             nullptr, nullptr, false);
           /**
            * The possible values of the strip number in the raw data are
            * from 0 to 127, while the actual range of strip numbers is from

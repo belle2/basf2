@@ -10,6 +10,10 @@
 
 #pragma once
 
+/* Belle2 headers. */
+#include <klm/dataobjects/KLMDigitRaw.h>
+#include <framework/datastore/StoreArray.h>
+
 namespace Belle2 {
 
   namespace KLM {
@@ -43,11 +47,16 @@ namespace Belle2 {
     };
 
     /**
-      Unpack KLM raw data.
-     * @param[in]  buffer Data buffer (to be unpacked).
-     * @param[out] data   Unpacked data.
+     * Unpack KLM raw data.
+     * @param[in]     buffer        Data buffer (to be unpacked).
+     * @param[out]    data          Unpacked data.
+     * @param[in,out] klmDigitRaws  KLMDigitRaw array.
+     * @param[out]    newDigitRaw   New KLMRawDigit.
+     * @param[in]     fillDigitRaws Whether to fill klmDigitRaws.
      */
-    void unpackRawData(const int* buffer, RawData* data);
+    void unpackRawData(
+      const int* buffer, RawData* data, StoreArray<KLMDigitRaw>* klmDigitRaws,
+      KLMDigitRaw** newDigitRaw, bool fillDigitRaws);
 
   }
 

@@ -132,7 +132,7 @@ namespace Belle2 {
     StoreArray<BKLMDigit> m_bklmDigits;
 
     //! BKLMDigitDebug StoreArray
-    StoreArray<KLMDigitRaw> m_bklmDigitRaws;
+    StoreArray<KLMDigitRaw> m_klmDigitRaws;
 
     //! BKLMDigitOutOfRange StoreArray
     StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;

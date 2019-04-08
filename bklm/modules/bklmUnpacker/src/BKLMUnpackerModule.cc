@@ -62,12 +62,12 @@ void BKLMUnpackerModule::initialize()
   m_rawKLMs.isRequired();
 
   m_bklmDigits.registerInDataStore(m_outputDigitsName);
-  m_bklmDigitRaws.registerInDataStore();
+  m_klmDigitRaws.registerInDataStore();
   m_bklmDigitOutOfRanges.registerInDataStore();
   m_bklmDigitEventInfos.registerInDataStore();
 
-  m_bklmDigits.registerRelationTo(m_bklmDigitRaws);
-  m_bklmDigitOutOfRanges.registerRelationTo(m_bklmDigitRaws);
+  m_bklmDigits.registerRelationTo(m_klmDigitRaws);
+  m_bklmDigitOutOfRanges.registerRelationTo(m_klmDigitRaws);
   m_bklmDigitEventInfos.registerRelationTo(m_bklmDigits);
   m_bklmDigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
 
@@ -92,7 +92,7 @@ void BKLMUnpackerModule::beginRun()
 void BKLMUnpackerModule::event()
 {
   m_bklmDigits.clear();
-  m_bklmDigitRaws.clear();
+  m_klmDigitRaws.clear();
   m_bklmDigitOutOfRanges.clear();
   m_bklmDigitEventInfos.clear();
 
@@ -209,9 +209,9 @@ void BKLMUnpackerModule::event()
           B2DEBUG(29, "BKLMUnpackerModule:: unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit *
                   hitLength + 1]);
           KLM::RawData raw;
-          KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw);
-
-          //KLMDigitRaw* bklmDigitRaw = m_bklmDigitRaws.appendNew(bword1, bword2, bword3, bword4);
+          KLMDigitRaw* klmDigitRaw;
+          KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw,
+                             &m_klmDigitRaws, &klmDigitRaw, true);
 
           B2DEBUG(29, "BKLMUnpackerModule:: copper: " << copperId << " finesse: " << finesse_num);
 
@@ -260,7 +260,7 @@ void BKLMUnpackerModule::event()
             BKLMDigitOutOfRange* bklmDigitOutOfRange =
               m_bklmDigitOutOfRanges.appendNew(
                 moduleId, raw.ctime, raw.tdc, raw.charge);
-            //bklmDigitOutOfRange->addRelationTo(bklmDigitRaw);
+            bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
             bklmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
 
             std::string message = "channel number is out of range";
@@ -296,7 +296,7 @@ void BKLMUnpackerModule::event()
                   " isAboveThreshold " << bklmDigit->isAboveThreshold() << " isRPC " << bklmDigit->inRPC() << " moduleId " <<
                   bklmDigit->getModuleID());
 
-          //bklmDigit->addRelationTo(bklmDigitRaw);
+          bklmDigit->addRelationTo(klmDigitRaw);
           bklmDigitEventInfo->addRelationTo(bklmDigit);
 
         } // iHit for cycle

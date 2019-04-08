@@ -56,6 +56,9 @@ namespace Belle2 {
      */
     std::vector<int> m_eclregbins = {1, 11, 2, 13, 3};
 
+    /**
+     * Base common name for all dummy weight files.
+     */
     std::string m_basename = "dummy_weightfile";
 
     /**

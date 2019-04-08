@@ -30,6 +30,13 @@ TrackQualityEstimator::TrackQualityEstimator(const std::string& defaultFilterNam
   this->addProcessingSignalListener(&m_trackQualityFilter);
 }
 
+void TrackQualityEstimator::initialize()
+{
+  Super::initialize();
+  // cache output of needsTruthInformation in member variable
+  m_needsTruthInformation = m_trackQualityFilter.needsTruthInformation();
+}
+
 std::string TrackQualityEstimator::getDescription()
 {
   return "Set the quality indicator for CDC tracks and, if desired, delete tracks with a too low quality value.";

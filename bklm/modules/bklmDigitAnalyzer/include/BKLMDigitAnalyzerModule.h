@@ -18,7 +18,7 @@
 
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dataobjects/BKLMDigitOutOfRange.h>
-#include <bklm/dataobjects/BKLMDigitEventInfo.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 
 #include "TFile.h"
@@ -79,7 +79,7 @@ namespace Belle2 {
     StoreArray<BKLMDigitOutOfRange> m_digitOutOfRange;
 
     //! Output data array of analyzed BKLMDigit information
-    StoreArray<BKLMDigitEventInfo> m_digitEventInfo;
+    StoreArray<KLMDigitEventInfo> m_digitEventInfo;
 
     //! Output filename
     std::string m_outputRootName;

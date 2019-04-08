@@ -26,43 +26,226 @@ namespace Belle2 {
      */
     KLMDigitEventInfo():
       m_TriggerCTime(0),
-      m_userWord(0)
-    {};
-
-    /**
-     * Set trigger CTime.
-     * @param[in] triggerCTime Trigger CTime.
-     */
-    void setTriggerCTime(unsigned int triggerCTime) { m_TriggerCTime = triggerCTime; }
-
-    /**
-     * Set user word (from DCs).
-     * @param[in] userWord User word (from DCs).
-     */
-    void setUserWord(unsigned int userWord) { m_userWord = userWord; }
+      m_triggerCTimeOfPreviousEvent(0),
+      m_triggerUTime(0),
+      m_windowStart(0),
+      m_nRPCHits(0),
+      m_nSciHits(0),
+      m_nOutOfRangeHits(0),
+      m_UserWord(0)
+    {
+    };
 
     /**
      * Get trigger CTIME.
      * @return Trigger CTIME.
      */
-    unsigned int getTriggerCTime() const { return m_TriggerCTime; }
+    unsigned int getTriggerCTime() const
+    {
+      return m_TriggerCTime;
+    }
 
     /**
-     * Get user word (from DCs).
-     * @return User word (from DCs).
+     * Returns trigger CTIME as int.
+     * @return Trigger CTIME.
      */
-    unsigned int getUserWord() const { return m_userWord; }
+    int getIntTriggerCTime() const
+    {
+      return (int)m_TriggerCTime;
+    }
+
+    /**
+     * Set trigger CTIME.
+     * @param[in] triggerCTime Trigger CTIME.
+     */
+    void setTriggerCTime(unsigned int triggerCTime)
+    {
+      m_TriggerCTime = triggerCTime;
+    }
+
+    /**
+     * Returns trigger interval (triggerCTime - triggerCTimeOfPreviousEvent)
+     * @return trigger interval
+     */
+    long int getTriggerInterval() const
+    {
+      return (long int)m_TriggerCTime - (long int)m_triggerCTimeOfPreviousEvent;
+    }
+
+    /**
+     * Returns trigger interval (triggerCTime - triggerCTimeOfPreviousEvent)
+     * in us.
+     * @return trigger interval in us
+     */
+    double getTriggerIntervalInUs() const
+    {
+      return ((long int)m_TriggerCTime -
+              (long int)m_triggerCTimeOfPreviousEvent) / 127.216;
+    }
+
+    /**
+     * Set trigger CTime of previous event
+     */
+    void setPreviousEventTriggerCTime(unsigned int triggerCTimeOfPreviousEvent)
+    {
+      m_triggerCTimeOfPreviousEvent = triggerCTimeOfPreviousEvent;
+    }
+
+    /**
+     * Get trigger UTIME.
+     * @return Trigger UTIME.
+     */
+    unsigned int getTriggerUTime() const
+    {
+      return m_triggerUTime;
+    }
+
+    /**
+     * Set trigger UTIME.
+     */
+    void setTriggerUTime(unsigned int triggerUTime)
+    {
+      m_triggerUTime = triggerUTime;
+    }
+
+    /**
+     * Get window start.
+     * @return Window start.
+     */
+    unsigned int getWindowStart() const
+    {
+      return m_windowStart;
+    }
+
+    /**
+     * Set window start.
+     */
+    void setWindowStart(unsigned int windowStart)
+    {
+      m_windowStart = windowStart;
+    }
+
+    /**
+     * Returns the number of RPC hits in the event.
+     * @return nRPCHits
+     */
+    int getRPCHits() const
+    {
+      return m_nRPCHits;
+    }
+
+    /**
+     * Increase by 1 the number of RPC hits in the event.
+     */
+    void increaseRPCHits()
+    {
+      m_nRPCHits++;
+    }
+
+    /**
+     * Increase by 'hits' the number of RPC hits in the event.
+     */
+    void increaseRPCHits(int hits)
+    {
+      m_nRPCHits += hits;
+    }
+
+    /**
+     * Returns the number of scintillator hits in the event.
+     * @return nSciHits
+     */
+    int getSciHits() const
+    {
+      return m_nSciHits;
+    }
+
+    /**
+     * Increase by 1 the number of scintillator hits in the event.
+     */
+    void increaseSciHits()
+    {
+      m_nSciHits++;
+    }
+
+    /**
+     * Increase by 'hits' the number of scintillator hits in the event.
+     */
+    void increaseSciHits(int hits)
+    {
+      m_nSciHits += hits;
+    }
+
+    /**
+     * Returns the number of OutOfRange-flagged hits in the event
+     * @return nOutOfRangeHits
+     */
+    int getOutOfRangeHits() const
+    {
+      return m_nOutOfRangeHits;
+    }
+
+    /**
+     * Increase by 1 the number of outOfRange-flagged hits in the event.
+     */
+    void increaseOutOfRangeHits()
+    {
+      m_nOutOfRangeHits++;
+    }
+
+    /**
+     * Increase by 'hits' the number of outOfRange-flagged hits in the event.
+     */
+    void increaseOutOfRangeHits(int hits)
+    {
+      m_nOutOfRangeHits += hits;
+    }
+
+    /**
+     * Get user word (from data concentrators).
+     * @return User word.
+     */
+    unsigned int getUserWord() const
+    {
+      return m_UserWord;
+    }
+
+    /**
+     * Set user word (from DCs).
+     * @param[in] userWord User word (from DCs).
+     */
+    void setUserWord(unsigned int userWord)
+    {
+      m_UserWord = userWord;
+    }
 
   protected:
 
     /** Trigger CTime */
     unsigned int m_TriggerCTime;
 
+    /** Trigger CTime of previous event. */
+    unsigned int m_triggerCTimeOfPreviousEvent;
+
+    /** Trigger UTime. */
+    unsigned int m_triggerUTime;
+
+    /** Window start. */
+    unsigned int m_windowStart;
+
+    /** RPC hits in the event. */
+    int m_nRPCHits;
+
+    /** Scintillator hits in the event. */
+    int m_nSciHits;
+
+    /** Out-of-range hits (skipped hits with layer > 14 for BKLM). */
+    int m_nOutOfRangeHits;
+
     /** User word (from DCs) */
-    unsigned int m_userWord;
+    unsigned int m_UserWord;
 
     /** Class version. */
-    ClassDef(KLMDigitEventInfo, 3);
+    ClassDef(KLMDigitEventInfo, 4);
 
   };
 

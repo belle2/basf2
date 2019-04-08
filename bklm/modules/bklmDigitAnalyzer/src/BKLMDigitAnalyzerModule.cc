@@ -173,7 +173,7 @@ void BKLMDigitAnalyzerModule::event()
 {
   for (int i = 0; i < m_digitEventInfo.getEntries(); i++) {
 
-    BKLMDigitEventInfo* digitEventInfo = m_digitEventInfo[i];
+    KLMDigitEventInfo* digitEventInfo = m_digitEventInfo[i];
     // Some warnings (they should never appear, but it's better to be sure)
     if ((digitEventInfo->getRPCHits() + digitEventInfo->getSciHits()) != (int)digitEventInfo->getRelationsTo<BKLMDigit>().size())
       B2WARNING("BKLMDigitAnalyzer:: the total number of BKLMDigit differs from the sum of RPC and scintillator hits stored in BKLMEventDigitDebug!");

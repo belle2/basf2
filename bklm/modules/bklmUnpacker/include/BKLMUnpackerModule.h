@@ -21,7 +21,7 @@
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
 #include <bklm/dataobjects/BKLMDigitOutOfRange.h>
-#include <bklm/dataobjects/BKLMDigitEventInfo.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 
@@ -137,8 +137,8 @@ namespace Belle2 {
     //! BKLMDigitOutOfRange StoreArray
     StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;
 
-    //! BKLMDigitEventInfo StoreArray
-    StoreArray<BKLMDigitEventInfo> m_bklmDigitEventInfos;
+    //! KLMDigitEventInfo StoreArray
+    StoreArray<KLMDigitEventInfo> m_bklmDigitEventInfos;
 
     //! trigger ctime of the previous event
     unsigned int m_triggerCTimeOfPreviousEvent;

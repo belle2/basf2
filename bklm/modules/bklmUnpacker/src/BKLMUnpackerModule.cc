@@ -130,8 +130,8 @@ void BKLMUnpackerModule::event()
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         // addendum: there is always an additional word (count) at the end!
 
-        // we create one BKLMDigitEventInfo per COPPER link
-        BKLMDigitEventInfo* bklmDigitEventInfo = m_bklmDigitEventInfos.appendNew();
+        // we create one KLMDigitEventInfo per COPPER link
+        KLMDigitEventInfo* bklmDigitEventInfo = m_bklmDigitEventInfos.appendNew();
         int triggerCTime = m_rawKLMs[i]->GetTTCtime(j) & 0xFFFF;
         bklmDigitEventInfo->setTriggerCTime(triggerCTime);
         int triggerUTime = m_rawKLMs[i]->GetTTUtime(j) & 0xFFFF;

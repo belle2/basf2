@@ -30,8 +30,6 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   addParam("outputDigitsName", m_outputDigitsName,
            "Name of EKLMDigit store array", string(""));
   addParam("PrintData", m_PrintData, "Print data.", false);
-  addParam("CheckCalibration", m_CheckCalibration,
-           "Check calibration-mode data.", false);
   addParam("WriteWrongHits", m_WriteWrongHits,
            "Record wrong hits (e.g. for debugging).", false);
   addParam("IgnoreWrongHits", m_IgnoreWrongHits,
@@ -114,49 +112,6 @@ void EKLMUnpackerModule::event()
           B2ERROR("Incorrect number of data words."
                   << LogVar("Number of data words", numDetNwords));
           continue;
-        }
-        if (m_CheckCalibration) {
-          std::map<int, int> blockLanes;
-          std::map<int, int>::iterator it;
-          /* cppcheck-suppress variableScope */
-          uint16_t blockData[15];
-          if (numHits % 75 != 0) {
-            B2ERROR("The number of hits in the calibration mode is not a "
-                    "multiple of 75." << LogVar("Number of hits", numHits));
-          } else {
-            nBlocks = numHits / 15;
-            for (i1 = 0; i1 < nBlocks; i1++) {
-              blockLanes.clear();
-              for (i2 = 0; i2 < 15; i2++) {
-                blockData[i2] = (buf_slot[(i1 * 15 + i2) * hitLength + 0]
-                                 >> 16) & 0xFFFF;
-                laneNumber = (blockData[i2] >> 8) & 0x1F;
-                it = blockLanes.find(laneNumber);
-                if (it == blockLanes.end())
-                  blockLanes.insert(std::pair<int, int>(laneNumber, 1));
-                else
-                  it->second++;
-              }
-              if (blockLanes.size() != 1) {
-                char buf[1024];
-                std::string errorMessage1, errorMessage2;
-                for (it = blockLanes.begin(); it != blockLanes.end(); ++it) {
-                  errorMessage1 += (std::string("Lane ") +
-                                    std::to_string(it->first) + ": " +
-                                    std::to_string(it->second) + " time(s).\n");
-                }
-                for (i2 = 0; i2 < 15; i2++) {
-                  snprintf(buf, 1024, "%04x", blockData[i2]);
-                  errorMessage2 += buf;
-                  if (i2 < 14)
-                    errorMessage2 += " ";
-                }
-                B2ERROR("Corrupted data block found."
-                        << LogVar("Lane numbers", errorMessage1)
-                        << LogVar("All first data words", errorMessage2));
-              }
-            }
-          }
         }
         // in the last word there is the user word (from DCs)
         int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;

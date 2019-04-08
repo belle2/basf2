@@ -77,9 +77,6 @@ namespace Belle2 {
     /** Print data. */
     bool m_PrintData;
 
-    /** Check calibration-mode data. */
-    bool m_CheckCalibration;
-
     /** Record wrong hits (e.g. for debugging). */
     bool m_WriteWrongHits;
 

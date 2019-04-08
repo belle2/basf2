@@ -29,6 +29,8 @@ REG_MODULE(HepMCOutput)
 
 HepMCOutputModule::HepMCOutputModule() : Module()
 {
+  setDescription("HepMC file output. This module loads an event record from the MCParticle collection and store the content back into the HepMC (2) format. HepMC format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
+
   addParam("OutputFilename", m_filename, "The filename of the output file");
   addParam("StoreVirtualParticles", m_storeVirtualParticles, "Store also virtual particles in the HepMC file.", false);
 }

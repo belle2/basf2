@@ -63,12 +63,12 @@ void BKLMUnpackerModule::initialize()
   m_bklmDigits.registerInDataStore(m_outputDigitsName);
   m_klmDigitRaws.registerInDataStore();
   m_bklmDigitOutOfRanges.registerInDataStore();
-  m_klmDigitEventInfos.registerInDataStore();
+  m_DigitEventInfos.registerInDataStore();
 
   m_bklmDigits.registerRelationTo(m_klmDigitRaws);
   m_bklmDigitOutOfRanges.registerRelationTo(m_klmDigitRaws);
-  m_klmDigitEventInfos.registerRelationTo(m_bklmDigits);
-  m_klmDigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
+  m_DigitEventInfos.registerRelationTo(m_bklmDigits);
+  m_DigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
 
   if (m_loadMapFromDB)
     loadMapFromDB();
@@ -212,7 +212,7 @@ void BKLMUnpackerModule::event()
 
         // we create one KLMDigitEventInfo per COPPER link
         KLMDigitEventInfo* klmDigitEventInfo =
-          m_klmDigitEventInfos.appendNew(m_RawKLMs[i], j);
+          m_DigitEventInfos.appendNew(m_RawKLMs[i], j);
         klmDigitEventInfo->setPreviousEventTriggerCTime(m_triggerCTimeOfPreviousEvent);
         m_triggerCTimeOfPreviousEvent = klmDigitEventInfo->getTriggerCTime();
 

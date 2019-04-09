@@ -68,12 +68,8 @@ void EKLMUnpackerModule::event()
    * detector buffer.
    */
   const int hitLength = 2;
-  int i1, i2;
   bool correctHit;
   int endcap, layer, sector, strip = 0, stripGlobal;
-  int laneNumber;
-  int nBlocks;
-  uint16_t dataWords[4];
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;

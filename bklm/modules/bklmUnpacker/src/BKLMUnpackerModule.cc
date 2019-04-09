@@ -58,7 +58,7 @@ BKLMUnpackerModule::~BKLMUnpackerModule()
 
 void BKLMUnpackerModule::initialize()
 {
-  m_rawKLMs.isRequired();
+  m_RawKLMs.isRequired();
 
   m_bklmDigits.registerInDataStore(m_outputDigitsName);
   m_klmDigitRaws.registerInDataStore();
@@ -176,49 +176,49 @@ void BKLMUnpackerModule::event()
    * detector buffer.
    */
   const int hitLength = 2;
-  B2DEBUG(29, "BKLMUnpackerModule:: there are " << m_rawKLMs.getEntries() << " RawKLM entries");
-  for (int i = 0; i < m_rawKLMs.getEntries(); i++) {
+  B2DEBUG(29, "BKLMUnpackerModule:: there are " << m_RawKLMs.getEntries() << " RawKLM entries");
+  for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
 
-    if (m_rawKLMs[i]->GetNumEvents() != 1) {
+    if (m_RawKLMs[i]->GetNumEvents() != 1) {
       B2DEBUG(20, "BKLMUnpackerModule:: RawKLM has more than one entry"
               << LogVar("RawKLM.Index", i)
-              << LogVar("RawKLM.Entries", m_rawKLMs[i]->GetNumEvents()));
+              << LogVar("RawKLM.Entries", m_RawKLMs[i]->GetNumEvents()));
       continue;
     }
 
-    B2DEBUG(29, "BKLMUnpackerModule:: events in buffer: " << m_rawKLMs[i]->GetNumEvents() << " ; number of nodes (copper boards): " <<
-            m_rawKLMs[i]->GetNumNodes());
+    B2DEBUG(29, "BKLMUnpackerModule:: events in buffer: " << m_RawKLMs[i]->GetNumEvents() << " ; number of nodes (copper boards): " <<
+            m_RawKLMs[i]->GetNumNodes());
 
     // getNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents
-    for (int j = 0; j < m_rawKLMs[i]->GetNumEntries(); j++) {
+    for (int j = 0; j < m_RawKLMs[i]->GetNumEntries(); j++) {
       // since the buffer has multiple events this gets each event/node... but how to disentangle events? Maybe only one event there?
 
       // are finesse and detector the same?
-      // int nWords = m_rawKLMs[i]->Get1stFINESSENwords(j);
+      // int nWords = m_RawKLMs[i]->Get1stFINESSENwords(j);
       // is this the same as get1stDetectorBuffer?
-      // int* data = m_rawKLMs[i]->Get1stFINESSEBuffer(j);
+      // int* data = m_RawKLMs[i]->Get1stFINESSEBuffer(j);
 
-      unsigned int copperId = m_rawKLMs[i]->GetNodeID(j);
+      unsigned int copperId = m_RawKLMs[i]->GetNodeID(j);
       //old 117440512 - 117440515 , new Data: 117440513 -- 117440516
 
       if (copperId < BKLM_ID  || copperId > BKLM_ID + 4)
         continue;
 
-      //short sCopperId = m_rawKLMs[i]->GetCOPPERNodeId(j);
-      m_rawKLMs[i]->GetBuffer(j);
+      //short sCopperId = m_RawKLMs[i]->GetCOPPERNodeId(j);
+      m_RawKLMs[i]->GetBuffer(j);
 
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         // addendum: there is always an additional word (count) at the end!
 
         // we create one KLMDigitEventInfo per COPPER link
         KLMDigitEventInfo* klmDigitEventInfo =
-          m_klmDigitEventInfos.appendNew(m_rawKLMs[i], j);
+          m_klmDigitEventInfos.appendNew(m_RawKLMs[i], j);
         klmDigitEventInfo->setPreviousEventTriggerCTime(m_triggerCTimeOfPreviousEvent);
         m_triggerCTimeOfPreviousEvent = klmDigitEventInfo->getTriggerCTime();
 
-        int numDetNwords = m_rawKLMs[i]->GetDetectorNwords(j, finesse_num);
+        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int numHits = numDetNwords / hitLength;
-        int* buf_slot = m_rawKLMs[i]->GetDetectorBuffer(j, finesse_num);
+        int* buf_slot = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
 
         // in the last word there is the user word (from DCs)
         int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;

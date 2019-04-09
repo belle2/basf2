@@ -126,8 +126,8 @@ namespace Belle2 {
     //! Time conversion.
     DBObjPtr<KLMTimeConversion> m_TimeConversion;
 
-    //! rawKLM StoreArray
-    StoreArray<RawKLM> m_rawKLMs;
+    /** Raw data. */
+    StoreArray<RawKLM> m_RawKLMs;
 
     //! BKLMDigit Array
     StoreArray<BKLMDigit> m_bklmDigits;

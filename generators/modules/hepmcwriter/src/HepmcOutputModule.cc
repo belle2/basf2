@@ -88,9 +88,9 @@ void HepMCOutputModule::event()
     HepMC::HEPEVT_Wrapper::set_id(iPart, mcPart.getPDG());
     HepMC::HEPEVT_Wrapper::set_parents(iPart, motherIndex, motherIndex);
     HepMC::HEPEVT_Wrapper::set_children(iPart, mcPart.getFirstDaughter(), mcPart.getLastDaughter());
-    HepMC::HEPEVT_Wrapper::set_momentum(iPart, mom.X(), mom.X(), mom.Z(), mcPart.getEnergy());
+    HepMC::HEPEVT_Wrapper::set_momentum(iPart, mom.X(), mom.Y(), mom.Z(), mcPart.getEnergy());
     HepMC::HEPEVT_Wrapper::set_mass(iPart, mcPart.getMass());
-    HepMC::HEPEVT_Wrapper::set_position(iPart, vert.X(), vert.Y(), vert.Z(), mcPart.getProductionTime());
+    HepMC::HEPEVT_Wrapper::set_position(iPart, vert.X(), vert.Y(), vert.Z(), mcPart.getProductionTime() * Const::speedOfLight);
   }
 
   // read from buffers and write event to disk

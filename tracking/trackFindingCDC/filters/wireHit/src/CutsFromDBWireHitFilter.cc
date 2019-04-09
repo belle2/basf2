@@ -24,8 +24,8 @@ CutsFromDBWireHitFilter::CutsFromDBWireHitFilter() :
 void CutsFromDBWireHitFilter::beginRun()
 {
   if (!(m_CDCWireHitRequirementsFromDB.isValid())) {
-    B2WARNING("DBObjPtr<CDCWireHitRequirements> not valid for current run.  { findlet: CutsFromDBWireHitFilter }");
-    B2WARNING("Cut not applied on CDCWireHit by CutsFromDBWireHitFilter.  { findlet: CutsFromDBWireHitFilter }") ;
+    B2WARNING("DBObjPtr<CDCWireHitRequirements> not valid for current run.  { findlet: CutsFromDBWireHitFilter }\n"
+              "Cut not applied on CDCWireHit by CutsFromDBWireHitFilter.  { findlet: CutsFromDBWireHitFilter }");
     m_DBPtrIsValidForCurrentRun = false;
   }
 

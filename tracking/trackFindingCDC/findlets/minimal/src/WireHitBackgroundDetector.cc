@@ -40,14 +40,10 @@ void WireHitBackgroundDetector::exposeParameters(ModuleParamList* moduleParamLis
 void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
 {
   for (CDCWireHit& wireHit : wireHits) {
-    bool markAsBackground = false;
 
     Weight wireHitWeight = m_wireHitFilter(wireHit);
-    if (std::isnan(wireHitWeight)) {
-      markAsBackground = true;
-    }
 
-    if (markAsBackground) {
+    if (std::isnan(wireHitWeight)) {
       wireHit->setBackgroundFlag();
       wireHit->setTakenFlag();
     }

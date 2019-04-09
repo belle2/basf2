@@ -11,6 +11,7 @@
 #pragma once
 #include <iostream>
 #include <TObject.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   /**
@@ -35,9 +36,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~CDCWireHitRequirements()
-    {
-    }
+    ~CDCWireHitRequirements() = default;
 
     /** Getter for ADC min threshold */
     int getMinADC() const
@@ -67,12 +66,12 @@ namespace Belle2 {
     /** Print content */
     void dump() const
     {
-      std::cout << " " << std::endl;
-      std::cout << "CDCWireHit requirements" << std::endl;
-      std::cout << "ADC > " << getMinADC() << std::endl;
-      std::cout << "TOT > " << getMinTOT() << std::endl;
-      std::cout << "TOT < " << getMaxTOT() << std::endl;
-      std::cout << "ADC/TOT > " << getMinADCOverTOT() << std::endl;
+      B2INFO(" " << std::endl
+             << "CDCWireHit requirements" << std::endl
+             << "ADC > " << getMinADC() << std::endl
+             << "TOT > " << getMinTOT() << std::endl
+             << "TOT < " << getMaxTOT() << std::endl
+             << "ADC/TOT > " << getMinADCOverTOT() << std::endl);
     }
 
   private:

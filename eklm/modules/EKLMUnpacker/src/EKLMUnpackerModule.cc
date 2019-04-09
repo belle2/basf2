@@ -46,9 +46,9 @@ EKLMUnpackerModule::~EKLMUnpackerModule()
 void EKLMUnpackerModule::initialize()
 {
   m_RawKLMs.isRequired();
-  m_Digits.registerInDataStore(m_outputDigitsName);
+  m_eklmDigits.registerInDataStore(m_outputDigitsName);
   m_DigitEventInfos.registerInDataStore();
-  m_Digits.registerRelationTo(m_DigitEventInfos);
+  m_eklmDigits.registerRelationTo(m_DigitEventInfos);
 }
 
 void EKLMUnpackerModule::beginRun()
@@ -114,7 +114,7 @@ void EKLMUnpackerModule::unpackEKLMDigit(
     m_ElementNumbers->sectorNumberToElementNumbers(
       *sectorGlobal, &endcap, &layer, &sector);
   }
-  EKLMDigit* eklmDigit = m_Digits.appendNew();
+  EKLMDigit* eklmDigit = m_eklmDigits.appendNew();
   eklmDigit->addRelationTo(klmDigitEventInfo);
   eklmDigit->setCTime(raw.ctime);
   eklmDigit->setTDC(raw.tdc);

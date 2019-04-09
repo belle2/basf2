@@ -129,7 +129,7 @@ namespace Belle2 {
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;
 
-    //! BKLMDigit Array
+    /** BKLM digits. */
     StoreArray<BKLMDigit> m_bklmDigits;
 
     //! BKLMDigitDebug StoreArray

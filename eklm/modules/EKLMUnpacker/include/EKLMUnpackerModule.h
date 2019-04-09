@@ -110,8 +110,8 @@ namespace Belle2 {
     /** Channels. */
     DBObjPtr<EKLMChannels> m_Channels;
 
-    /** Digits. */
-    StoreArray<EKLMDigit> m_Digits;
+    /** EKLM digits. */
+    StoreArray<EKLMDigit> m_eklmDigits;
 
     /** Event information. */
     StoreArray<KLMDigitEventInfo> m_DigitEventInfos;

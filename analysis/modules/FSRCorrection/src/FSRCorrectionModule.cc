@@ -19,7 +19,9 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
-
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -95,6 +97,13 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);
     antiParticleList.registerInDataStore(flags);
     m_maxAngle = cos(m_angleThres * M_PI / 180.0);
+
+    StoreArray<Particle> particles;
+    StoreArray<PIDLikelihood> pidlikelihoods;
+    StoreArray<Track> tracks;
+    particles.registerRelationTo(pidlikelihoods);
+    particles.registerRelationTo(tracks);
+
   }
 
 
@@ -198,6 +207,13 @@ namespace Belle2 {
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
+
+      const Track* track = lepton->getTrack();
+      const PIDLikelihood* pid = lepton->getPIDLikelihood();
+
+      if (track) { newLepton->addRelationTo(track); } else { std::cout << "NO TRACK FOUND"  << std::endl;}
+      if (pid) { newLepton->addRelationTo(pid); } else { std::cout << "NO PID FOUND"  << std::endl;}
+
       if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
       outputList->addParticle(newLepton);
 

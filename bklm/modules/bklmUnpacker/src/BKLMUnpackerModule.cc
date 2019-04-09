@@ -79,10 +79,8 @@ void BKLMUnpackerModule::beginRun()
   if (m_loadMapFromDB)
     loadMapFromDB();
 
-  if (m_loadThresholdFromDB) {
-    m_scintADCOffset = m_ADCParams->getADCOffset();
+  if (m_loadThresholdFromDB)
     m_scintThreshold = m_ADCParams->getADCThreshold();
-  }
 
   m_triggerCTimeOfPreviousEvent = 0;
 }

@@ -108,9 +108,6 @@ namespace Belle2 {
     //! load threshold from DataBase (true) or not (false)
     bool m_loadThresholdFromDB = true;
 
-    //! offset of the scintillator ADC
-    int m_scintADCOffset = 3400;
-
     //! threshold for the scintillator NPE
     double m_scintThreshold = 140;
 

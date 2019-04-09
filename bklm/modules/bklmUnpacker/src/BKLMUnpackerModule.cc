@@ -91,6 +91,11 @@ void BKLMUnpackerModule::beginRun()
 
 void BKLMUnpackerModule::event()
 {
+  /*
+   * Length of one hit in 4-byte words. This is needed to find the hits in the
+   * detector buffer.
+   */
+  const int hitLength = 2;
   B2DEBUG(29, "BKLMUnpackerModule:: there are " << m_rawKLMs.getEntries() << " RawKLM entries");
   for (int i = 0; i < m_rawKLMs.getEntries(); i++) {
 

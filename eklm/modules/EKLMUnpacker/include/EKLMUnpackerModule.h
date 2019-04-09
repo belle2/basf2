@@ -71,6 +71,15 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Unpack one EKLM digit.
+     * @param[in] rawData           Data to be unpacked.
+     * @param[in] lane              Lane.
+     * @param[in] klmDigitEventInfo KLMDigitEventInfo.
+     */
+    void unpackEKLMDigit(const int* rawData, EKLMDataConcentratorLane* lane,
+                         KLMDigitEventInfo* klmDigitEventInfo);
+
     /** Name of EKLMDigit store array. */
     std::string m_outputDigitsName;
 

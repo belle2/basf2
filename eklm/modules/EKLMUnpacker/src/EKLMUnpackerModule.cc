@@ -61,6 +61,86 @@ void EKLMUnpackerModule::beginRun()
     B2FATAL("EKLM channel data are not available.");
 }
 
+void EKLMUnpackerModule::unpackEKLMDigit(
+  const int* rawData, EKLMDataConcentratorLane* lane,
+  KLMDigitEventInfo* klmDigitEventInfo)
+{
+  int endcap, layer, sector, strip = 0, stripGlobal;
+  KLM::RawData raw;
+  KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
+  /**
+   * The possible values of the strip number in the raw data are
+   * from 0 to 127, while the actual range of strip numbers is from
+   * 1 to 75. A check is required. The unpacker continues to work
+   * with B2ERROR because otherwise debugging is not possible.
+   */
+  bool correctHit = m_ElementNumbers->checkStrip(raw.channel, false);
+  if (!correctHit) {
+    if (!(m_IgnoreWrongHits ||
+          (raw.channel == 0 && m_IgnoreStrip0))) {
+      B2ERROR("Incorrect strip number in raw data."
+              << LogVar("Strip number", raw.channel));
+    }
+    if (!m_WriteWrongHits)
+      return;
+    strip = raw.channel;
+  } else {
+    strip = m_ElementNumbers->getStripSoftwareByFirmware(
+              raw.channel);
+  }
+  uint16_t plane = raw.axis + 1;
+  /*
+   * The possible values of the plane number in the raw data are from
+   * 1 to 2. The range is the same as in the detector geometry.
+   * Consequently, a check of the plane number is useless: it is
+   * always correct.
+   */
+  lane->setLane(raw.lane);
+  const int* sectorGlobal = m_ElectronicsMap->getSectorByLane(lane);
+  if (sectorGlobal == nullptr) {
+    if (!m_IgnoreWrongHits) {
+      B2ERROR("Lane does not exist in the EKLM electronics map."
+              << LogVar("Copper", lane->getCopper())
+              << LogVar("Data concentrator", lane->getDataConcentrator())
+              << LogVar("Lane", lane->getLane()));
+    }
+    if (!m_WriteWrongHits)
+      return;
+    endcap = 0;
+    layer = 0;
+    sector = 0;
+    correctHit = false;
+  } else {
+    m_ElementNumbers->sectorNumberToElementNumbers(
+      *sectorGlobal, &endcap, &layer, &sector);
+  }
+  EKLMDigit* eklmDigit = m_Digits.appendNew();
+  eklmDigit->addRelationTo(klmDigitEventInfo);
+  eklmDigit->setCTime(raw.ctime);
+  eklmDigit->setTDC(raw.tdc);
+  eklmDigit->setTime(
+    m_TimeConversion->getTime(raw.ctime, raw.tdc,
+                              klmDigitEventInfo->getTriggerCTime(), true));
+  eklmDigit->setEndcap(endcap);
+  eklmDigit->setLayer(layer);
+  eklmDigit->setSector(sector);
+  eklmDigit->setPlane(plane);
+  eklmDigit->setStrip(strip);
+  eklmDigit->setCharge(raw.charge);
+  if (correctHit) {
+    stripGlobal = m_ElementNumbers->stripNumber(
+                    endcap, layer, sector, plane, strip);
+    const EKLMChannelData* channelData =
+      m_Channels->getChannelData(stripGlobal);
+    if (channelData == nullptr)
+      B2FATAL("Incomplete EKLM channel data.");
+    if (raw.charge < channelData->getThreshold())
+      eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+    else
+      eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
+  }
+}
+
 void EKLMUnpackerModule::event()
 {
   /*
@@ -68,12 +148,7 @@ void EKLMUnpackerModule::event()
    * detector buffer.
    */
   const int hitLength = 2;
-  bool correctHit;
-  int endcap, layer, sector, strip = 0, stripGlobal;
-  const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
-  EKLMDigit* eklmDigit;
-  const EKLMChannelData* channelData;
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
     if (m_RawKLMs[i]->GetNumEvents() != 1) {
       B2ERROR("RawKLM a wrong number of entries (should be 1)."
@@ -95,8 +170,6 @@ void EKLMUnpackerModule::event()
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         KLMDigitEventInfo* klmDigitEventInfo =
           m_DigitEventInfos.appendNew(m_RawKLMs[i], j);
-        int triggerCTime = m_RawKLMs[i]->GetTTCtime(j) & 0xFFFF;
-        klmDigitEventInfo->setTriggerCTime(triggerCTime);
         int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
@@ -110,79 +183,8 @@ void EKLMUnpackerModule::event()
         int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
         klmDigitEventInfo->setUserWord(userWord);
         for (int iHit = 0; iHit < numHits; iHit++) {
-          KLM::RawData raw;
-          KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw,
-                             nullptr, nullptr, false);
-          /**
-           * The possible values of the strip number in the raw data are
-           * from 0 to 127, while the actual range of strip numbers is from
-           * 1 to 75. A check is required. The unpacker continues to work
-           * with B2ERROR because otherwise debugging is not possible.
-           */
-          correctHit = m_ElementNumbers->checkStrip(raw.channel, false);
-          if (!correctHit) {
-            if (!(m_IgnoreWrongHits ||
-                  (raw.channel == 0 && m_IgnoreStrip0))) {
-              B2ERROR("Incorrect strip number in raw data."
-                      << LogVar("Strip number", raw.channel));
-            }
-            if (!m_WriteWrongHits)
-              continue;
-            strip = raw.channel;
-          } else {
-            strip = m_ElementNumbers->getStripSoftwareByFirmware(
-                      raw.channel);
-          }
-          uint16_t plane = raw.axis + 1;
-          /*
-           * The possible values of the plane number in the raw data are from
-           * 1 to 2. The range is the same as in the detector geometry.
-           * Consequently, a check of the plane number is useless: it is
-           * always correct.
-           */
-          lane.setLane(raw.lane);
-          sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
-          if (sectorGlobal == nullptr) {
-            if (!m_IgnoreWrongHits) {
-              B2ERROR("Lane does not exist in the EKLM electronics map."
-                      << LogVar("Copper", lane.getCopper())
-                      << LogVar("Data concentrator", lane.getDataConcentrator())
-                      << LogVar("Lane", lane.getLane()));
-            }
-            if (!m_WriteWrongHits)
-              continue;
-            endcap = 0;
-            layer = 0;
-            sector = 0;
-            correctHit = false;
-          } else {
-            m_ElementNumbers->sectorNumberToElementNumbers(
-              *sectorGlobal, &endcap, &layer, &sector);
-          }
-          eklmDigit = m_Digits.appendNew();
-          eklmDigit->addRelationTo(klmDigitEventInfo);
-          eklmDigit->setCTime(raw.ctime);
-          eklmDigit->setTDC(raw.tdc);
-          eklmDigit->setTime(
-            m_TimeConversion->getTime(raw.ctime, raw.tdc,
-                                      triggerCTime, true));
-          eklmDigit->setEndcap(endcap);
-          eklmDigit->setLayer(layer);
-          eklmDigit->setSector(sector);
-          eklmDigit->setPlane(plane);
-          eklmDigit->setStrip(strip);
-          eklmDigit->setCharge(raw.charge);
-          if (correctHit) {
-            stripGlobal = m_ElementNumbers->stripNumber(
-                            endcap, layer, sector, plane, strip);
-            channelData = m_Channels->getChannelData(stripGlobal);
-            if (channelData == nullptr)
-              B2FATAL("Incomplete EKLM channel data.");
-            if (raw.charge < channelData->getThreshold())
-              eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-            else
-              eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
-          }
+          unpackEKLMDigit(&buf_slot[iHit * hitLength], &lane,
+                          klmDigitEventInfo);
         }
       }
     }

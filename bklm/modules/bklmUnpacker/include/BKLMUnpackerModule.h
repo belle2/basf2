@@ -52,6 +52,16 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Unpack one BKLM digit.
+     * @param[in] rawData           Data to be unpacked.
+     * @param[in] copper            Copper identifier.
+     * @param[in] hslb              HSLB number.
+     * @param[in] klmDigitEventInfo KLMDigitEventInfo.
+     */
+    void unpackBKLMDigit(const int* rawData, int copper, int hslb,
+                         KLMDigitEventInfo* klmDigitEventInfo);
+
     //! fill m_electIdToModuleId from Data Base
     void loadMapFromDB();
 

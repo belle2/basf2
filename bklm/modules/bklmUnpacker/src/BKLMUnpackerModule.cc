@@ -88,6 +88,89 @@ void BKLMUnpackerModule::beginRun()
   m_triggerCTimeOfPreviousEvent = 0;
 }
 
+void BKLMUnpackerModule::unpackBKLMDigit(
+  const int* rawData, int copper, int hslb,
+  KLMDigitEventInfo* klmDigitEventInfo)
+{
+  KLM::RawData raw;
+  KLMDigitRaw* klmDigitRaw;
+  KLM::unpackRawData(rawData, &raw, &m_klmDigitRaws, &klmDigitRaw, true);
+  int electId = electCooToInt(copper - BKLM_ID, hslb,
+                              raw.lane, raw.axis, raw.channel);
+  int moduleId = 0;
+  bool outRange = false;
+  if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
+    if (!m_useDefaultModuleId) {
+      B2DEBUG(20, "BKLMUnpackerModule:: could not find in mapping"
+              << LogVar("Copper", copper)
+              << LogVar("Finesse", hslb + 1)
+              << LogVar("Lane", raw.lane)
+              << LogVar("Axis", raw.axis));
+      return;
+    } else {
+      moduleId = getDefaultModuleId(copper, hslb, raw.lane,
+                                    raw.axis, raw.channel, outRange);
+    }
+  } else {
+    // found moduleId in the mapping
+    moduleId = m_electIdToModuleId[electId];
+
+    // only channel and inRpc flag are not set yet
+  }
+
+  // moduleId counts are zero based
+  int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+  // int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
+  // int isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
+  // int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
+  int channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
+
+  if (layer > 14) {
+    B2DEBUG(20, "BKLMUnpackerModule:: strange that the layer number is larger than 14 "
+            << LogVar("Layer", layer));
+    return;
+  }
+
+  if (outRange) {
+    // increase by 1 the event-counter of outOfRange-flagged hits
+    klmDigitEventInfo->increaseOutOfRangeHits();
+
+    // store the digit in the appropriate dataobject
+    BKLMDigitOutOfRange* bklmDigitOutOfRange =
+      m_bklmDigitOutOfRanges.appendNew(
+        moduleId, raw.ctime, raw.tdc, raw.charge);
+    bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
+    klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
+
+    std::string message = "channel number is out of range";
+    m_rejected[message] += 1;
+    m_rejectedCount++;
+    B2DEBUG(21, "BKLMUnpackerModule:: channel number is out of range"
+            << LogVar("Channel", channel));
+    return;
+  }
+
+  // still have to add channel and axis to moduleId
+  if (layer > 1) {
+    moduleId |= BKLM_INRPC_MASK;
+    klmDigitEventInfo->increaseRPCHits();
+  } else
+    klmDigitEventInfo->increaseSciHits();
+  // moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
+  moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
+
+  BKLMDigit* bklmDigit =
+    m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
+  bklmDigit->setTime(
+    m_TimeConversion->getTime(raw.ctime, raw.tdc,
+                              klmDigitEventInfo->getTriggerCTime(),
+                              layer <= 1));
+  if (layer < 2 && (raw.charge < m_scintThreshold))
+    bklmDigit->isAboveThreshold(true);
+
+  bklmDigit->addRelationTo(klmDigitRaw);
+  klmDigitEventInfo->addRelationTo(bklmDigit);
+}
 
 void BKLMUnpackerModule::event()
 {
@@ -200,103 +283,9 @@ void BKLMUnpackerModule::event()
         // for (int iHit = 1; iHit < numHits; iHit++) {
         // changed start to 0 to test BKLMRawPacker. Nov.13 2015)
         for (int iHit = 0; iHit < numHits; iHit++) {
-
-          B2DEBUG(29, "BKLMUnpackerModule:: unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit *
-                  hitLength + 1]);
-          KLM::RawData raw;
-          KLMDigitRaw* klmDigitRaw;
-          KLM::unpackRawData(&buf_slot[iHit * hitLength], &raw,
-                             &m_klmDigitRaws, &klmDigitRaw, true);
-
-          B2DEBUG(29, "BKLMUnpackerModule:: copper: " << copperId << " finesse: " << finesse_num);
-
-          int electId = electCooToInt(copperId - BKLM_ID, finesse_num,
-                                      raw.lane, raw.axis, raw.channel);
-          int moduleId = 0;
-          bool outRange = false;
-          if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
-            if (!m_useDefaultModuleId) {
-              B2DEBUG(20, "BKLMUnpackerModule:: could not find in mapping"
-                      << LogVar("Copper", copperId)
-                      << LogVar("Finesse", finesse_num + 1)
-                      << LogVar("Lane", raw.lane)
-                      << LogVar("Axis", raw.axis));
-              continue;
-            } else {
-              moduleId = getDefaultModuleId(copperId, finesse_num, raw.lane,
-                                            raw.axis, raw.channel, outRange);
-            }
-          } else {
-            // found moduleId in the mapping
-            moduleId = m_electIdToModuleId[electId];
-            B2DEBUG(29, "BKLMUnpackerModule:: electId: " << electId << " module: " << moduleId);
-
-            // only channel and inRpc flag are not set yet
-          }
-
-          // moduleId counts are zero based
-          int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-          // int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
-          // int isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
-          // int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
-          int channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
-
-          if (layer > 14) {
-            B2DEBUG(20, "BKLMUnpackerModule:: strange that the layer number is larger than 14 "
-                    << LogVar("Layer", layer));
-            continue;
-          }
-
-          if (outRange) {
-            // increase by 1 the event-counter of outOfRange-flagged hits
-            klmDigitEventInfo->increaseOutOfRangeHits();
-
-            // store the digit in the appropriate dataobject
-            BKLMDigitOutOfRange* bklmDigitOutOfRange =
-              m_bklmDigitOutOfRanges.appendNew(
-                moduleId, raw.ctime, raw.tdc, raw.charge);
-            bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-            klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
-
-            std::string message = "channel number is out of range";
-            m_rejected[message] += 1;
-            m_rejectedCount++;
-            B2DEBUG(21, "BKLMUnpackerModule:: channel number is out of range"
-                    << LogVar("Channel", channel));
-            continue;
-          }
-
-          // still have to add channel and axis to moduleId
-          if (layer > 1) {
-            moduleId |= BKLM_INRPC_MASK;
-            klmDigitEventInfo->increaseRPCHits();
-          } else
-            klmDigitEventInfo->increaseSciHits();
-          // moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
-          moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
-
-          BKLMDigit* bklmDigit =
-            m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
-          bklmDigit->setTime(
-            m_TimeConversion->getTime(raw.ctime, raw.tdc,
-                                      klmDigitEventInfo->getTriggerCTime(),
-                                      layer <= 1));
-          if (layer < 2 && (raw.charge < m_scintThreshold))
-            bklmDigit->isAboveThreshold(true);
-
-          B2DEBUG(29, "BKLMUnpackerModule:: digit after Unpacker: sector: " << bklmDigit->getSector() << " isForward: " <<
-                  bklmDigit->isForward()
-                  << " layer: " << bklmDigit->getLayer() << " strip: " << bklmDigit->getStrip() << " isPhi: " << bklmDigit->isPhiReadout());
-          B2DEBUG(29, "BKLMUnpackerModule:: charge " << bklmDigit->getCharge() << " tdc" << bklmDigit->getTime() << " ctime " <<
-                  bklmDigit->getCTime() <<
-                  " isAboveThreshold " << bklmDigit->isAboveThreshold() << " isRPC " << bklmDigit->inRPC() << " moduleId " <<
-                  bklmDigit->getModuleID());
-
-          bklmDigit->addRelationTo(klmDigitRaw);
-          klmDigitEventInfo->addRelationTo(bklmDigit);
-
-        } // iHit for cycle
-
+          unpackBKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
+                          klmDigitEventInfo);
+        }
       } // finesse for cycle
 
     } // copper for cycle

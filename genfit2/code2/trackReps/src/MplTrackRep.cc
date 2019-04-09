@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/monopoles/MplTrackRep.h>
+#include "MplTrackRep.h"
 
 #include <framework/logging/Logger.h>
 

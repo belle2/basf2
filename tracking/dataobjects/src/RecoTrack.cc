@@ -7,7 +7,7 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
 #include <genfit/RKTrackRep.h>
-#include <tracking/dataobjects/monopoles/MplTrackRep.h>
+#include <genfit/MplTrackRep.h>
 
 #include <framework/dataobjects/Helix.h>
 

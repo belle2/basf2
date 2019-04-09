@@ -898,7 +898,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 9);
+    ClassDef(RecoTrack, 10);
   };
 
   /**

@@ -50,7 +50,7 @@ namespace Belle2 {
       CDCMCCloneLookUpFiller m_mcCloneLookUpFiller;
 
       /// Store output of needsTruthInformation from filter in member variable
-      bool m_needsTruthInformation;
+      bool m_needsTruthInformation = false;
 
       /// Parameter : Delete tracks below threshold instead of just assigning quality indicator
       bool m_param_deleteTracks = false;

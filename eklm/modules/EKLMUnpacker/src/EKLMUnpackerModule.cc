@@ -29,7 +29,6 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
            "Name of EKLMDigit store array", string(""));
-  addParam("PrintData", m_PrintData, "Print data.", false);
   addParam("WriteWrongHits", m_WriteWrongHits,
            "Record wrong hits (e.g. for debugging).", false);
   addParam("IgnoreWrongHits", m_IgnoreWrongHits,
@@ -79,8 +78,6 @@ void EKLMUnpackerModule::event()
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
   const EKLMChannelData* channelData;
-  if (m_PrintData)
-    printf("  w1   w2   w3   w4 e la s p st\n");
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
     if (m_RawKLMs[i]->GetNumEvents() != 1) {
       B2ERROR("RawKLM a wrong number of entries (should be 1)."
@@ -165,11 +162,6 @@ void EKLMUnpackerModule::event()
           } else {
             m_ElementNumbers->sectorNumberToElementNumbers(
               *sectorGlobal, &endcap, &layer, &sector);
-          }
-          if (m_PrintData) {
-            printf("%04x %04x %04x %04x %1d %2d %1d %1d %2d\n",
-                   dataWords[0], dataWords[1], dataWords[2], dataWords[3],
-                   endcap, layer, sector, plane, strip);
           }
           eklmDigit = m_Digits.appendNew();
           eklmDigit->addRelationTo(klmDigitEventInfo);

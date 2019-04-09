@@ -74,9 +74,6 @@ namespace Belle2 {
     /** Name of EKLMDigit store array. */
     std::string m_outputDigitsName;
 
-    /** Print data. */
-    bool m_PrintData;
-
     /** Record wrong hits (e.g. for debugging). */
     bool m_WriteWrongHits;
 

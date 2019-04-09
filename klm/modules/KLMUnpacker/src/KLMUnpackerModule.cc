@@ -12,8 +12,8 @@
 #include <cstdint>
 
 /* Belle2 headers. */
+#include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 #include <klm/rawdata/RawData.h>
-#include <eklm/modules/EKLMUnpacker/EKLMUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
@@ -21,9 +21,9 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(EKLMUnpacker)
+REG_MODULE(KLMUnpacker)
 
-EKLMUnpackerModule::EKLMUnpackerModule() : Module()
+KLMUnpackerModule::KLMUnpackerModule() : Module()
 {
   setDescription("EKLM unpacker (creates EKLMDigit from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -39,11 +39,11 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
-EKLMUnpackerModule::~EKLMUnpackerModule()
+KLMUnpackerModule::~KLMUnpackerModule()
 {
 }
 
-void EKLMUnpackerModule::initialize()
+void KLMUnpackerModule::initialize()
 {
   m_RawKLMs.isRequired();
   m_eklmDigits.registerInDataStore(m_outputDigitsName);
@@ -51,7 +51,7 @@ void EKLMUnpackerModule::initialize()
   m_eklmDigits.registerRelationTo(m_DigitEventInfos);
 }
 
-void EKLMUnpackerModule::beginRun()
+void KLMUnpackerModule::beginRun()
 {
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
@@ -61,7 +61,7 @@ void EKLMUnpackerModule::beginRun()
     B2FATAL("EKLM channel data are not available.");
 }
 
-void EKLMUnpackerModule::unpackEKLMDigit(
+void KLMUnpackerModule::unpackEKLMDigit(
   const int* rawData, EKLMDataConcentratorLane* lane,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
@@ -141,7 +141,7 @@ void EKLMUnpackerModule::unpackEKLMDigit(
   }
 }
 
-void EKLMUnpackerModule::event()
+void KLMUnpackerModule::event()
 {
   /*
    * Length of one hit in 4-byte words. This is needed to find the hits in the
@@ -191,11 +191,11 @@ void EKLMUnpackerModule::event()
   }
 }
 
-void EKLMUnpackerModule::endRun()
+void KLMUnpackerModule::endRun()
 {
 }
 
-void EKLMUnpackerModule::terminate()
+void KLMUnpackerModule::terminate()
 {
 }
 

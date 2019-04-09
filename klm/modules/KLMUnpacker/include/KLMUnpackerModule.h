@@ -28,21 +28,21 @@
 namespace Belle2 {
 
   /**
-   * EKLM unpacker.
+   * KLM unpacker.
    */
-  class EKLMUnpackerModule : public Module {
+  class KLMUnpackerModule : public Module {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMUnpackerModule();
+    KLMUnpackerModule();
 
     /**
      * Destructor.
      */
-    virtual ~EKLMUnpackerModule();
+    virtual ~KLMUnpackerModule();
 
     /**
      * Initializer.

@@ -91,11 +91,6 @@ void BKLMUnpackerModule::beginRun()
 
 void BKLMUnpackerModule::event()
 {
-  m_bklmDigits.clear();
-  m_klmDigitRaws.clear();
-  m_bklmDigitOutOfRanges.clear();
-  m_klmDigitEventInfos.clear();
-
   B2DEBUG(29, "BKLMUnpackerModule:: there are " << m_rawKLMs.getEntries() << " RawKLM entries");
   for (int i = 0; i < m_rawKLMs.getEntries(); i++) {
 

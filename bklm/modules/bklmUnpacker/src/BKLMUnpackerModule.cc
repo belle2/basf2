@@ -49,7 +49,6 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module(),
            double(140.0));
   addParam("loadThresholdFromDB", m_loadThresholdFromDB, "load threshold from DataBase (true) or not (false)", true);
   addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
-  addParam("rawdata", m_rawdata, "is this real rawdata (true) or MC data (false)", false);
 }
 
 

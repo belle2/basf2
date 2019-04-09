@@ -114,9 +114,6 @@ namespace Belle2 {
     //! threshold for the scintillator NPE
     double m_scintThreshold = 140;
 
-    //! is this real data (true) or MC data (false)
-    bool m_rawdata;
-
     //! name of BKLMDigit store array
     std::string m_outputDigitsName;
 

@@ -17,7 +17,7 @@ class PackerUnpackerTest(Module):
     module which checks if two collections of EKLMDigits are equal
     """
 
-    def sort_eklm_digits(self, unsortedPyStoreArray):
+    def sort_bklm_digits(self, unsortedPyStoreArray):
         """
         Use some digit information to sort the digits
         Returns a python-list containing the sorted digits
@@ -36,7 +36,7 @@ class PackerUnpackerTest(Module):
                 x.getStrip())
         )
 
-    def sort_bklm_digits(self, unsortedPyStoreArray):
+    def sort_eklm_digits(self, unsortedPyStoreArray):
         """
         Use some digit information to sort the digits
         Returns a python-list containing the sorted digits
@@ -65,14 +65,14 @@ class PackerUnpackerTest(Module):
         bklm_digits = Belle2.PyStoreArray("BKLMDigits")
         eklm_digits = Belle2.PyStoreArray("EKLMDigits")
         # processed by packer and unpacker
-        bklm_digits_unpacked = Belle2.PyStoreArray("EKLMDigitsUnpacked")
+        bklm_digits_unpacked = Belle2.PyStoreArray("BKLMDigitsUnpacked")
         eklm_digits_unpacked = Belle2.PyStoreArray("EKLMDigitsUnpacked")
 
         # sort digits
-        bklm_digits_sorted = self.sortDigits(bklm_digits)
-        bklm_digits_unpacked_sorted = self.sortDigits(bklm_digits_unpacked)
-        eklm_digits_sorted = self.sortDigits(eklm_digits)
-        eklm_digits_unpacked_sorted = self.sortDigits(eklm_digits_unpacked)
+        bklm_digits_sorted = self.sort_bklm_digits(bklm_digits)
+        bklm_digits_unpacked_sorted = self.sort_bklm_digits(bklm_digits_unpacked)
+        eklm_digits_sorted = self.sort_eklm_digits(eklm_digits)
+        eklm_digits_unpacked_sorted = self.sort_eklm_digits(eklm_digits_unpacked)
 
         # check the sizes
         if not len(bklm_digits_sorted) == len(bklm_digits_unpacked_sorted):
@@ -145,8 +145,8 @@ main.add_module(bklm_packer)
 main.add_module(eklm_packer)
 
 unpacker = register_module('KLMUnpacker')
-unpacker.param('outputDigitsName', 'BKLMDigitsUnpacked')
-unpacker.param('outputDigitsName', 'EKLMDigitsUnpacked')
+unpacker.param('outputBKLMDigitsName', 'BKLMDigitsUnpacked')
+unpacker.param('outputEKLMDigitsName', 'EKLMDigitsUnpacked')
 main.add_module(unpacker)
 
 main.add_module(PackerUnpackerTest())

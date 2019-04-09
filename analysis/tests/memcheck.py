@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""This script is used in the nightly build to check for memory issues with valgrind.
+It is run as a test to make sure the memcheck does not fail because of issues in the script."""
+
 from basf2 import set_random_seed, set_log_level, LogLevel, create_path, Module, find_file, process, statistics
 from simulation import add_simulation
 from L1trigger import add_tsim

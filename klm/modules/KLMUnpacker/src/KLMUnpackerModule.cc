@@ -27,7 +27,8 @@ REG_MODULE(KLMUnpacker)
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
   m_triggerCTimeOfPreviousEvent(0)
 {
-  setDescription("EKLM unpacker (creates EKLMDigit from RawKLM).");
+  setDescription("KLM unpacker (creates BKLMDigits and EKLMDigits "
+                 "from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputBKLMDigitsName", m_outputBKLMDigitsName,
            "Name of BKLMDigit store array.", string(""));
@@ -337,7 +338,7 @@ void KLMUnpackerModule::endRun()
 void KLMUnpackerModule::terminate()
 {
   for (const auto& message : m_rejected) {
-    B2DEBUG(20, "BKLMUnpackerModule:: " << message.first << " (occured " << message.second << " times)");
+    B2DEBUG(20, "KLMUnpackerModule:: " << message.first << " (occured " << message.second << " times)");
   }
 }
 

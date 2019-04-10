@@ -239,6 +239,21 @@ namespace Belle2 {
       return result;
     }
 
+    double particleDeltaZErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert) {
+        double zVariance = particle->getVertexErrorMatrix()(2, 2);
+        double TagVZVariance = vert->getTagVertexErrMatrix()(2, 2);
+        result = sqrt(zVariance + TagVZVariance);
+        if (std::isnan(result) or std::isinf(result)) result = -1111.0;
+      }
+      return result;
+    }
+
     double particleDeltaB(const Particle* particle)
     {
       double result = -1111.0;
@@ -251,6 +266,22 @@ namespace Belle2 {
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaT() * bg * c;
+      }
+      return result;
+    }
+
+    double particleDeltaBErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert) {
+        PCmsLabTransform T;
+        TVector3 boost = T.getBoostVector().BoostVector();
+        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+        double c = Const::speedOfLight / 1000.; // cm ps-1
+        result = vert->getDeltaTErr() * bg * c;
       }
       return result;
     }
@@ -506,7 +537,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
                       "Generated Delta T(Brec - Btag) in ps");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
+    REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr, "Error of the difference Z(Brec) - Z(Btag)");
     REGISTER_VARIABLE("DeltaBoost", particleDeltaB, "Boost direction: Brec - Btag");
+    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, "Error of the difference in Boost direction: Brec - Btag");
 
     REGISTER_VARIABLE("LBoost", vertexBoostDirection,
                       "Returns the vertex component in the boost direction");

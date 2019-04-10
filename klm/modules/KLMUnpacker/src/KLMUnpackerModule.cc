@@ -328,6 +328,9 @@ void KLMUnpackerModule::endRun()
 
 void KLMUnpackerModule::terminate()
 {
+  for (const auto& message : m_rejected) {
+    B2DEBUG(20, "BKLMUnpackerModule:: " << message.first << " (occured " << message.second << " times)");
+  }
 }
 
 void KLMUnpackerModule::loadMapFromDB()

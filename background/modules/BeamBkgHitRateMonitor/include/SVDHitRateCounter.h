@@ -13,6 +13,8 @@
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
 #include <framework/datastore/StoreArray.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
+#include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <TTree.h>
 #include <map>
 
@@ -88,14 +90,18 @@ namespace Belle2 {
        */
       virtual void normalize(unsigned timeStamp) override;
 
+      int nStripsOnLayerSide(int layer, bool isU)
+      {
+        if (!isU && layer > 0) return 512; // V side on Layer 4,5,6
+        else return 768;
+      }
+
     private:
 
       // class parameters: to be set via constructor or setters
+      int m_nLayers = 4;
       int m_nLadders[4] = {7, 10, 12, 16}; /**< number of ladders on each layer */
       int m_nSensors[4] = {2, 3, 4, 5}; /**< number of sensors on a ladder on each layer */
-      int m_nAPVs[4] = {12, 10, 10, 10}; /**< number of APVs on both sides of a sensor on each layer */
-      int m_nTotalAPVs = 1748; /**< total number of APV over entire SVD */
-      int m_nAPVStrips = 128; /**< number of strips per APV */
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */
@@ -107,8 +113,14 @@ namespace Belle2 {
       StoreArray<SVDShaperDigit> m_digits;  /**< collection of digits */
 
       // DB payloads
+      SVDHotStripsCalibrations m_HotStripsCalib;
+      SVDFADCMaskedStrips m_FADCMaskedStrips;
 
       // other
+      int m_activeStrips; /**< number of active strips */
+      int m_layerActiveStrips[4] = {0}; /**< number of active strips in each layer */
+      int m_layerLadderActiveStrips[4][16] = {0}; /**< number of active strips in each layer, ladder */
+      int m_layerSensorActiveStrips[4][5] = {0}; /**< number of active strips in each layer, sensor position */
 
     };
 

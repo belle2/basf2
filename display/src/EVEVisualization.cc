@@ -250,6 +250,11 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
   addObject(&recoTrack, track_lines);
 }
 
+void EVEVisualization::addTrackCandidateImproved(const std::string& collectionName,
+                                                 const RecoTrack& recoTrack)
+{
+}
+
 void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
                                           const CDCTriggerTrack& trgTrack)
 {

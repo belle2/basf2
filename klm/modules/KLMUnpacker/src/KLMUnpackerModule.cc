@@ -303,7 +303,8 @@ void KLMUnpackerModule::event()
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           B2ERROR("Incorrect number of data words."
                   << LogVar("Number of data words", numDetNwords));
-          continue;
+          if (!m_keepEvenPackages)
+            continue;
         }
         // in the last word there is the user word (from DCs)
         int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;

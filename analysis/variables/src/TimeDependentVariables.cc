@@ -126,7 +126,7 @@ namespace Belle2 {
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(0, 0);
+        result = sqrt(TagVErr(0, 0));
       }
 
       return result;
@@ -140,7 +140,7 @@ namespace Belle2 {
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(1, 1);
+        result = sqrt(TagVErr(1, 1));
       }
 
       return result;
@@ -154,7 +154,7 @@ namespace Belle2 {
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(2, 2);
+        result = sqrt(TagVErr(2, 2));
       }
 
       return result;

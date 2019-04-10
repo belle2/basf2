@@ -53,7 +53,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
   eventWeight = 1; // why is evt.weights() a std::vector?
   const int nparticles = evt.particles_size();
 
-  B2DEBUG(10, "Found eventID " << eventID << " with " << nparticles << " particles.");
+  B2DEBUG(20, "Found eventID " << eventID << " with " << nparticles << " particles.");
 
   if (nparticles <= 0) {
     throw (HepMCInvalidEventError());
@@ -72,7 +72,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     hash_index_map[hash] = i;
     ++tmp_particle;
   }
-  const double len_conv = HepMC::Units::conversion_factor(evt.length_unit(), HepMC::Units::MM); // from, to
+  const double len_conv = HepMC::Units::conversion_factor(evt.length_unit(), HepMC::Units::CM); // from, to
   const double mom_conv = HepMC::Units::conversion_factor(evt.momentum_unit(), HepMC::Units::GEV); // from, to
   auto read_particle = evt.particles_begin();
   //Read particles from file
@@ -91,7 +91,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     //whatever genius wrote this vector class did not implement an operator for multiplication with a scalar or even access via []
     const HepMC::FourVector momentum(mom_tmp.x()*mom_conv,  mom_tmp.y()*mom_conv, mom_tmp.z()*mom_conv, mom_tmp.t()*mom_conv);
 
-    B2DEBUG(10, "Read particle: status " << status << " isFinal " << isFinalstate << " isVirtual " << isVirtual << " pdg " << pdg_code
+    B2DEBUG(20, "Read particle: status " << status << " isFinal " << isFinalstate << " isVirtual " << isVirtual << " pdg " << pdg_code
             << " mass " << mass << " px " << momentum.x() << " py " << momentum.y() << " px " << momentum.z() << " E " << momentum.t());
     p.setPDG(pdg_code);
     p.setMomentum(TVector3(momentum.x(), momentum.y(), momentum.z()));
@@ -128,7 +128,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     ++read_particle;
   }
   eventID += 1;
-  B2DEBUG(10, "Returning event id " << eventID);
+  B2DEBUG(20, "Returning event id " << eventID);
   return eventID;
 }
 
@@ -139,10 +139,10 @@ void HepMCReader::readNextEvent(HepMC::GenEvent& evt)
     evt.read(m_input);
     if (evt.is_valid()) {
       const int nparticles = evt.particles_size();
-      B2DEBUG(10, "Found valid event.i N particles " << nparticles);
+      B2DEBUG(20, "Found valid event.i N particles " << nparticles);
       return; //
     } else {
-      B2DEBUG(10, "The next event was invalid. Will stop reading now.");
+      B2DEBUG(20, "The next event was invalid. Will stop reading now.");
     }
   }
   return;

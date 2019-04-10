@@ -306,9 +306,16 @@ void KLMUnpackerModule::event()
           if (!m_keepEvenPackages)
             continue;
         }
-        // in the last word there is the user word (from DCs)
-        int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
-        klmDigitEventInfo->setUserWord(userWord);
+        if (numDetNwords > 0) {
+          /*
+           * In the last word there is the user word
+           * (from data concentrators).
+           */
+          int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+          klmDigitEventInfo->setUserWord(userWord);
+        } else {
+          klmDigitEventInfo->setUserWord(0);
+        }
         for (int iHit = 0; iHit < numHits; iHit++) {
           if (eklmHit) {
             unpackEKLMDigit(&buf_slot[iHit * hitLength], &lane,

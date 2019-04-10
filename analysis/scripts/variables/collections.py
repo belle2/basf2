@@ -176,7 +176,7 @@ vertex = [
     'prodVertexXErr',
     'prodVertexYErr',
     'prodVertexZErr',
-    'pValue',
+    'chiProb',
 ]
 
 #: Replacement for MCVertex tuple tool

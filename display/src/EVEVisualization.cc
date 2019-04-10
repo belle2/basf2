@@ -253,6 +253,48 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
 void EVEVisualization::addTrackCandidateImproved(const std::string& collectionName,
                                                  const RecoTrack& recoTrack)
 {
+  const TString label = ObjectInfo::getIdentifier(&recoTrack);
+  // parse the option string ------------------------------------------------------------------------
+  bool drawHits = false;
+
+  if (m_options != "") {
+    for (size_t i = 0; i < m_options.length(); i++) {
+      if (m_options.at(i) == 'H') drawHits = true;
+    }
+  }
+  // finished parsing the option string -------------------------------------------------------------
+
+  TEveLine* track = new TEveLine(); // We are going to just add points with SetNextPoint
+  track->SetName(label); //popup label set at end of function
+  track->SetLineColor(c_recoTrackColor);
+  track->SetLineWidth(1);
+  track->SetTitle(ObjectInfo::getTitle(&recoTrack));
+
+  // add corresponding RecoHits ---------------------------------------------------------------------
+  TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
+  lines->SetMainColor(c_recoTrackColor);
+  lines->SetMarkerColor(c_recoTrackColor);
+  lines->SetMarkerStyle(6);
+  lines->SetMainTransparency(60);
+
+  if (drawHits) {
+    // Loop over all hits in the track (three different types)
+    for (const RecoHitInformation::UsedPXDHit* pxdHit : recoTrack.getPXDHitList()) {
+      addRecoHit(pxdHit, lines);
+    }
+
+    for (const RecoHitInformation::UsedSVDHit* svdHit : recoTrack.getSVDHitList()) {
+      addRecoHit(svdHit, lines);
+    }
+
+    for (const RecoHitInformation::UsedCDCHit* cdcHit : recoTrack.getCDCHitList()) {
+      addRecoHit(cdcHit, lines);
+    }
+  }
+
+  track->AddElement(lines);
+  addToGroup(collectionName, track);
+  addObject(&recoTrack, track);
 }
 
 void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,

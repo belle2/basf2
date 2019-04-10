@@ -16,7 +16,10 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <numeric>
+
 using namespace std;
+
 
 namespace Belle2 {
   namespace Background {
@@ -25,9 +28,25 @@ namespace Belle2 {
     {
       // register collection(s) as optional, your detector might be excluded in DAQ
       m_digits.isOptional();
+      m_dsps.isOptional();
 
       // set branch address
-      tree->Branch("ecl", &m_rates, "averageRate/F:numEvents/I:valid/O");
+      tree->Branch("ecl", &m_rates, "averageRate/F:numEvents/I:valid/O:averageDspBkgRate/F");
+
+
+      //ECL calibration
+
+      DBObjPtr<ECLCrystalCalib> m_ElectronicsCalib("ECLCrystalElectronics"), m_ECLECalib("ECLCrystalEnergy");
+
+      /*
+       if (m_ElectronicsCalib.hasChanged()) {electronicsCalib = m_ElectronicsCalib->getCalibVector();}
+       if (m_ECLECalib.hasChanged()) {energyCalib = m_ECLECalib->getCalibVector();}
+
+       // Write out a few for quality control
+       for (int ic = 1; ic < 9000; ic += 1000) {
+               B2INFO("DB constants for cellID=" << ic << " ElectronicsCalib = " << electronicsCalib[ic - 1] << " ECalib = " << energyCalib[ic - 1]);
+       }
+      */
 
     }
 
@@ -57,6 +76,37 @@ namespace Belle2 {
       }
       */
 
+
+      //calculate rates using waveforms
+      //The background rate for a crystal is calculated as
+      //rate = pedestal_squared / (average_photon_energy_squared * time_constant)
+      //where time_constant=2.53 us and average_photon_energy_squared = 1 MeV
+      for (auto& aECLDsp : m_dsps) {
+
+        int nadc = aECLDsp.getNADCPoints();
+        int cellid = aECLDsp.getCellId();
+        int crysID = cellid - 1;
+        std::vector<int> dspAv = aECLDsp.getDspA();
+
+        //finding the pedestal value
+        double sum31 = std::accumulate(dspAv.begin(), dspAv.begin() + nadc, 0.0);
+        double dspMean = sum31 / 31.0;
+
+        double wpsum = 0;
+        for (int v = 0; v < nadc; v++) {
+          wpsum += pow(dspAv[v] - dspMean, 2);
+        }
+
+        double dspRMS = sqrt(wpsum / nadc);
+        double dspEnergy = dspRMS ;//* abs(electronicsCalib[crysID] * energyCalib[crysID]);
+        //calculating the backgorund rate
+        double dspBkgRate = (pow(dspEnergy, 2)) / (2.53 * 1e-12);
+
+        //average rate over the whole ECL per given event, which is later normalized per 1Hz
+        rates.averageDspBkgRate += (dspBkgRate / m_dsps.getEntries());
+
+      }
+
       // set flag to true to indicate the rates are valid
       rates.valid = true;
 
@@ -79,4 +129,5 @@ namespace Belle2 {
 
   } // Background namespace
 } // Belle2 namespace
+
 

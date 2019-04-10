@@ -90,6 +90,10 @@ void KLMUnpackerModule::beginRun()
     B2FATAL("EKLM time conversion parameters are not available.");
   if (!m_Channels.isValid())
     B2FATAL("EKLM channel data are not available.");
+  if (m_loadMapFromDB)
+    loadMapFromDB();
+  if (m_loadThresholdFromDB)
+    m_scintThreshold = m_ADCParams->getADCThreshold();
   m_triggerCTimeOfPreviousEvent = 0;
 }
 

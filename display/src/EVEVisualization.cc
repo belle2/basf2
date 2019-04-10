@@ -264,13 +264,42 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
   }
   // finished parsing the option string -------------------------------------------------------------
 
+  // Create a track as a polyline through reconstructed points
+  // FIXME this is snatched from PrimitivePlotter, need to add extrapolation out of CDC
   TEveLine* track = new TEveLine(); // We are going to just add points with SetNextPoint
   track->SetName(label); //popup label set at end of function
   track->SetLineColor(c_recoTrackColor);
-  track->SetLineWidth(1);
+  track->SetLineWidth(3);
   track->SetTitle(ObjectInfo::getTitle(&recoTrack));
+  track->SetSmooth(true);
 
-  // add corresponding RecoHits ---------------------------------------------------------------------
+  for (auto recoHit : recoTrack.getRecoHitInformations()) {
+    // skip for reco hits which have not been used in the fit (and therefore have no fitted information on the plane
+    if (!recoHit->useInFit())
+      continue;
+
+    TVector3 pos;
+    TVector3 mom;
+    TMatrixDSym cov;
+
+    try {
+      const auto* trackPoint = recoTrack.getCreatedTrackPoint(recoHit);
+      const auto* fittedResult = trackPoint->getFitterInfo();
+      if (not fittedResult) {
+        B2WARNING("Skipping unfitted track point");
+        continue;
+      }
+      const genfit::MeasuredStateOnPlane& state = fittedResult->getFittedState();
+      state.getPosMomCov(pos, mom, cov);
+    } catch (const genfit::Exception&) {
+      B2WARNING("Skipping state with strange pos, mom or cov");
+      continue;
+    }
+
+    track->SetNextPoint(pos.X(), pos.Y(), pos.Z());
+  }
+
+  // add corresponding hits     ---------------------------------------------------------------------
   TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
   lines->SetMainColor(c_recoTrackColor);
   lines->SetMarkerColor(c_recoTrackColor);

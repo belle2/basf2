@@ -194,7 +194,7 @@ def applyCPVTools(mode='Expert'):
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
             weightFiles='B2' + decayChannelTrainedOn + mcType,
             belleOrBelle2=belleOrBelle2Flag,
-            downloadFromDatabaseIfNotfound=True,
+            downloadFromDatabaseIfNotfound=False,
             workingDirectory=workingDirectory,
             samplerFileId=str(fileNumber),
             path=cp_val_path)
@@ -288,7 +288,7 @@ if __name__ == '__main__':
             weightFiles='B2' + decayChannelTrainedOn + mcType,
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
             belleOrBelle2=belleOrBelle2Flag,
-            downloadFromDatabaseIfNotfound=True,
+            downloadFromDatabaseIfNotfound=False,
             uploadToDatabaseAfterTraining=True,
             workingDirectory=workingDirectory,
             path=cp_val_path)

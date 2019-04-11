@@ -981,16 +981,20 @@ def flavorTagger(
     if not Belle2.FileSystem.findFile(workingDirectory, True):
         B2FATAL('flavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
 
-    if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotfound):
+    global filesDirectory
+
+    filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
+
+    if mode == 'Sampler':
         if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging', True):
             os.mkdir(workingDirectory + '/FlavorTagging')
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
         elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods', True):
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
+        filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
-    global filesDirectory
-
-    filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
+    if mode == 'Expert' and downloadFromDatabaseIfNotfound:
+        filesDirectory = '.'
 
     if not (belleOrBelle2 == 'Belle2' or belleOrBelle2 == 'Belle'):
         B2FATAL('flavorTagger: Wrong argument for belleOrBelle2 given: The available modes are "Belle2" or "Belle"')

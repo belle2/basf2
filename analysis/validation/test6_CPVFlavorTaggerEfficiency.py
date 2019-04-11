@@ -14,10 +14,11 @@
 
 from basf2 import B2INFO, B2FATAL
 import flavorTagger as ft
-import os
 import ROOT
 from ROOT import Belle2
 from array import array
+import glob
+import os
 
 ROOT.gROOT.SetBatch(True)
 

@@ -129,12 +129,13 @@ class EventInspector(basf2.Module):
         #: blank scatterplot to define the bounds of the BKLM end view
         self.hist_XY = ROOT.TH2F('XY', ' ;x;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_XY.SetStats(False)
-        #: blank scatterplot to define the bounds of the BKLM side view
+        #: blank scatterplot to define the bounds of the BKLM side view for 1D hits
         self.hist_ZY1D = [0, 0]
         self.hist_ZY1D[0] = ROOT.TH2F('ZY0', ' ;z;y', 10, -200.0, 300.0, 10, -150.0, 350.0)
         self.hist_ZY1D[1] = ROOT.TH2F('ZY1', ' ;z;y', 10, -200.0, 300.0, 10, -150.0, 350.0)
         self.hist_ZY1D[0].SetStats(False)
         self.hist_ZY1D[0].SetStats(False)
+        #: blank scatterplot to define the bounds of the BKLM side view for 2D hits
         self.hist_ZY = ROOT.TH2F('ZY', ' ;z;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_ZY.SetStats(False)
 
@@ -1004,12 +1005,10 @@ class EventInspector(basf2.Module):
             self.hist_mappedChannelOccupancyPrompt[sectorFB][0].Draw("colz")  # z hits
             if sectorFB == 2:
                 graphRPC0Chimney.Draw("L")
-            else:
-                graphRPC0.Draw("L")
-            if sectorFB == 2:
                 graphScint1aChimney.Draw("L")
                 graphScint1bChimney.Draw("L")
             else:
+                graphRPC0.Draw("L")
                 graphScint1a.Draw("L")
                 graphScint1b.Draw("L")
             textRPC0.Draw()
@@ -1038,12 +1037,10 @@ class EventInspector(basf2.Module):
             self.hist_mappedChannelOccupancyBkgd[sectorFB][0].Draw("colz")  # z hits
             if sectorFB == 2:
                 graphRPC0Chimney.Draw("L")
-            else:
-                graphRPC0.Draw("L")
-            if sectorFB == 2:
                 graphScint1aChimney.Draw("L")
                 graphScint1bChimney.Draw("L")
             else:
+                graphRPC0.Draw("L")
                 graphScint1a.Draw("L")
                 graphScint1b.Draw("L")
             textRPC0.Draw()
@@ -1066,12 +1063,10 @@ class EventInspector(basf2.Module):
             self.hist_unmappedChannelOccupancy[sectorFB][0].Draw("colz")  # z hits
             if sectorFB == 2:
                 graphRPC0Chimney.Draw("L")
-            else:
-                graphRPC0.Draw("L")
-            if sectorFB == 2:
                 graphScint1aChimney.Draw("L")
                 graphScint1bChimney.Draw("L")
             else:
+                graphRPC0.Draw("L")
                 graphScint1a.Draw("L")
                 graphScint1b.Draw("L")
             textRPC0.Draw()

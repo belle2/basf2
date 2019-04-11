@@ -21,7 +21,6 @@
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/Hierarchy.h>
 
-
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -32,19 +31,34 @@ bool AlignableCDCRecoHit::s_enableEventT0LocalDerivative = true;
 std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
   GlobalDerivatives globals;
+  unsigned short LR = (int(m_leftRight) > 0.) ? 1 : 0;
+
+  const TVector3& mom = sop->getMom();
+  const TVector3& wirePositon = sop->getPlane()->getO();
+  const unsigned short layer = getWireID().getICLayer();
+
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const double alpha = cdcgeo.getAlpha(wirePositon, mom);
+  const double theta = cdcgeo.getTheta(mom);
+  const TVectorD& stateOnPlane = sop->getState();
+  const double driftLengthEstimate = std::abs(stateOnPlane(3));
+  const double driftTime = cdcgeo.getDriftTime(driftLengthEstimate, layer, LR, alpha, theta);
+  const double driftVelocity = cdcgeo.getDriftV(driftTime, layer, LR, alpha, theta);
 
   // CDC Calibration -------------------------------------------------
 
   // T0 calibration (per wire) TODO check sign!!!
-  globals.add(
-    GlobalLabel::construct<CDCTimeZeros>(getWireID(), 0),
-    -1. * double(int(m_leftRight))
-  );
+  if (driftTime > 20 && driftTime < 200 && fabs(driftVelocity) < 1.0e-2) {
+    globals.add(
+      GlobalLabel::construct<CDCTimeZeros>(getWireID(), 0),
+      driftVelocity * double(int(m_leftRight))
+    );
+  }
 
   // Time-walk calibration (per board) TODO checksign!!!
   globals.add(
     GlobalLabel::construct<CDCTimeWalks>(CDCGeometryPar::Instance().getBoardID(getWireID()), 0),
-    -1. * sqrt(m_adcCount) * double(int(m_leftRight))
+    driftVelocity * 1. / sqrt(m_adcCount) * double(int(m_leftRight))
   );
 
   // CDC Alignment ---------------------------------------------------
@@ -148,36 +162,40 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   );
   */
 
-  /**
-  // Gravitational wire sagging TODO highly experimental
-  double zWire; //TODO what is this and how to get?
-  double zWireM;//TODO what is this and how to get?
-  double zWireP;//TODO what is this and how to get?
-  double zRel = max(0., min(1., (zWire - zWireM) / (zWireP - zWireM)));
-
   globals.add(
     GlobalLabel::construct<CDCAlignment>(getWireID(), CDCAlignment::wireTension),
     drldg(0, 1) * 4.0 * zRel * (1.0 - zRel)
   );
-  */
+
 
   return globals;
 }
 
 
-TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane*)
+TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane* sop)
 {
   if (!s_enableEventT0LocalDerivative)
     return TMatrixD();
 
-  // CDC track time correction ----------------------------------------
-  //TODO change to derivative of the full Xt relation
-  double driftVelocity = CDCGeometryPar::Instance().getNominalDriftV();
+  unsigned short LR = (int(m_leftRight) > 0.) ? 1 : 0;
+
+  const TVector3& mom = sop->getMom();
+  const TVector3& wirePositon = sop->getPlane()->getO();
+  const unsigned short layer = getWireID().getICLayer();
+
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const double alpha = cdcgeo.getAlpha(wirePositon, mom);
+  const double theta = cdcgeo.getTheta(mom);
+  const TVectorD& stateOnPlane = sop->getState();
+  const double driftLengthEstimate = std::abs(stateOnPlane(3));
+  const double driftTime = cdcgeo.getDriftTime(driftLengthEstimate, layer, LR, alpha, theta);
+  const double driftVelocity = cdcgeo.getDriftV(driftTime, layer, LR, alpha, theta);
 
   TMatrixD locals(2, 1);
-  //TODO sign: plus or minus??
-  locals(0, 0) = - double(int(m_leftRight)) * driftVelocity;
-  locals(1, 0) = 0.; // insesitive coordinate along wire
+  if (driftTime > 20 && driftTime < 200 && fabs(driftVelocity) < 1.0e-2) {
+    locals(0, 0) = - double(int(m_leftRight)) * driftVelocity;
+    locals(1, 0) = 0.; // insesitive coordinate along wire
+  }
 
   return locals;
 }

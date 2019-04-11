@@ -948,7 +948,7 @@ def flavorTagger(
                                                trained, for this step you do not reconstruct any particle or do any analysis,
                                                you just run the flavorTagger alone.
       @param weightFiles                       Weight files name. Default=
-                                               ``B2nunubarBGx1``. For Belle MC/data use  ``B2JpsiKs_muBGx1``. If the user self
+                                               ``B2nunubarBGx1`` (official weight files). If the user self
                                                wants to train the FlavorTagger, the weightfiles name should correspond to the
                                                analysed CP channel in order to avoid confusions. The default name
                                                ``B2nunubarBGx1`` corresponds to

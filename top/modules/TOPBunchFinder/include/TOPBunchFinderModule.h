@@ -22,6 +22,7 @@
 #include <top/dataobjects/TOPRecBunch.h>
 #include <top/dataobjects/TOPTimeZero.h>
 #include <framework/dataobjects/MCInitialParticles.h>
+#include <framework/dataobjects/EventT0.h>
 
 namespace Belle2 {
 
@@ -105,6 +106,7 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreObjPtr<MCInitialParticles> m_initialParticles; /**< simulated beam particles */
     StoreArray<TOPTimeZero> m_timeZeros; /**< collection of T0 of individual tracks */
+    StoreObjPtr<EventT0> m_eventT0; /**< event T0 */
 
   };
 

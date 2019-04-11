@@ -176,7 +176,7 @@ vertex = [
     'prodVertexXErr',
     'prodVertexYErr',
     'prodVertexZErr',
-    'pValue',
+    'chiProb',
 ]
 
 #: Replacement for MCVertex tuple tool
@@ -196,7 +196,9 @@ tag_vertex = [
     'DeltaT',
     'DeltaTErr',
     'DeltaZ',
+    'DeltaZErr',
     'DeltaBoost',
+    'DeltaBoostErr',
     'TagVLBoost',
     'TagVLBoostErr',
     'TagVOBoost',

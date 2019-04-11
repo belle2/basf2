@@ -4,6 +4,8 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* Removed ``mcDX``, ``mcDY``, ``mcDZ`` variables as duplicates.
+
 * Added the meta variable :b2:var:`eclClusterSpecialTrackMatched` to check if
   any track related to an ECL cluster satisfies certain criteria. It can be used
   to apply an individual track-cluster matching.

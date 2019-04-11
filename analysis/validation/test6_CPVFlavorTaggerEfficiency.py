@@ -17,8 +17,6 @@ import flavorTagger as ft
 import ROOT
 from ROOT import Belle2
 from array import array
-import glob
-import os
 
 ROOT.gROOT.SetBatch(True)
 
@@ -866,10 +864,3 @@ outputFile.Close()
 
 print('*                                                                                                                 *')
 print('*******************************************************************************************************************')
-
-for iWeightFile in glob.glob('FlavorTagger_Belle*_1.root'):
-    if not Belle2.FileSystem.findFile(iWeightFile, True):
-        B2FATAL('flavorTaggerEfficiency: THE WEIGHT FILE ' + iWeightFile + ' COULD NOT BE FOUND IN THE CURRENT DIRECTORY.')
-    else:
-        os.remove(iWeightFile)
-B2INFO('flavorTaggerEfficiency: OLD WEIGHT FILES REMOVED. READY FOR THE COMING NIGHTLY VALIDATION.')

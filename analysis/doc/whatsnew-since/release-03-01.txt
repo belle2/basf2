@@ -11,3 +11,10 @@ Variables
 * Added missing error variable DeltaZErr and DeltaBoostErr. Fixed bug in TagV error functions.
 
 * Replaced pValue (tracking variable) with chiProb (vertexing variable) in the vertexing variable collection.
+
+Flavor Tagger
++++++++++++++
+
+* Default Expert (testing mode) does not create repositories and does not save weight files locally. 
+  It only loads the payloads directly from the database using the database payload names
+  as mva identifiers.

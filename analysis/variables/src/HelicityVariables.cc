@@ -159,15 +159,10 @@ namespace Belle2 {
 
     Manager::FunctionPtr cosHelicityAngleIfCMSIsTheDaughter(const std::vector<std::string>& arguments)
     {
-      // have to tell cppcheck that these lines are fine, because it doesn't
-      // support the lambda function syntax and throws a (wrong) variableScope
-
-      // cppcheck-suppress variableScope
       int iDau = 0;
       int iGrandDau = 0;
       if (arguments.size() == 2) {
         try {
-          // cppcheck-suppress unreadVariable
           iDau = Belle2::convertString<int>(arguments[0]);
           iGrandDau = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -206,15 +201,10 @@ namespace Belle2 {
 
     Manager::FunctionPtr cosAcoplanarityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
     {
-      // have to tell cppcheck that these lines are fine, because it doesn't
-      // support the lambda function syntax and throws a (wrong) variableScope
-
-      // cppcheck-suppress variableScope
       int iGrandDau1 = 0;
       int iGrandDau2 = 0;
       if (arguments.size() == 2) {
         try {
-          // cppcheck-suppress unreadVariable
           iGrandDau1 = Belle2::convertString<int>(arguments[0]);
           iGrandDau2 = Belle2::convertString<int>(arguments[1]);
 

@@ -8,6 +8,11 @@ Variables
   any track related to an ECL cluster satisfies certain criteria. It can be used
   to apply an individual track-cluster matching.
 
-* Added missing error variable DeltaZErr and DeltaBoostErr. Fixed bug in TagV error functions.
+* Added missing error variables :b2:var:`DeltaZErr` and :b2:var:`DeltaBoostErr`. 
+  Fixed bug in TagV error functions.
 
-* Replaced pValue (tracking variable) with chiProb (vertexing variable) in the vertexing variable collection.
+* Replaced :b2:var:`pValue` (tracking variable) with :b2:var:`chiProb` (vertexing variable) 
+  in the vertexing variable collection.
+
+* Organized all helicity variables into a dedicated file and added two new variables: 
+  :b2:var:`cosHelicityAngleIfCMSIsTheDaughter` and :b2:var:`cosAcoplanarityAngleIfCMSIsTheMother`. 

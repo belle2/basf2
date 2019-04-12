@@ -39,8 +39,9 @@ using namespace Belle2;
 REG_MODULE(StandardTrackingPerformance)
 
 StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL), m_pValue(-999), m_nGeneratedChargedStableMcParticles(-999),
-  m_nReconstructedChargedStableTracks(-999), m_nFittedChargedStabletracks(-999)
+  Module(), m_outputFile(NULL), m_dataTree(NULL), m_trackProperties(-999),  m_pValue(-999),
+  m_nGeneratedChargedStableMcParticles(-999), m_nReconstructedChargedStableTracks(-999),
+  m_nFittedChargedStabletracks(-999)
 {
   setDescription("Module to test the tracking efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);

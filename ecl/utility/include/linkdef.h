@@ -6,8 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::ECL::ECLChannelMapper;
-#pragma link C++ class Belle2::ECLDBTool;
-#pragma link C++ class Belle2::ECLLocalRunCalibLoader;
-#pragma link C++ class Belle2::ECLLocalRunCalibQuality;
-#pragma link C++ class Belle2::ECLLocalRunCalibQualityChecker;
+
+
 #endif

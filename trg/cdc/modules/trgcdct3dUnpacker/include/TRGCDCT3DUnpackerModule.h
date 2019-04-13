@@ -1326,6 +1326,7 @@ namespace Belle2 {
       //address of copper module
       unsigned int m_copper_address;
       unsigned int m_copper_ab;
+      int m_nword;
 
       //TSF module number
       int m_T3DMOD;

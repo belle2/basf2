@@ -293,8 +293,8 @@ namespace Belle2 {
 
     ClassDef(ChargedPidMVAWeights, 3);
     /**< 3. add overloaded getMVAWeightIdx. */
-    // 2: add energy/angular units.
-    // 1: first class implementation.
+    /**< 2: add energy/angular units. */
+    /**< 1: first class implementation. */
   };
 
 }

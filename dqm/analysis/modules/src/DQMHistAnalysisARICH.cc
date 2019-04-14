@@ -117,14 +117,15 @@ void DQMHistAnalysisARICHModule::event()
     if (htmp) nevt = htmp->GetEntries();
     m_apdHist->fillFromTH1(m_h_chHit);
     if (nevt) m_apdHist->Scale(1. / float(nevt));
+    m_apdPoly->SetMaximum(0.01);
     m_apdHist->setPoly(m_apdPoly);
+    m_apdPoly->SetMinimum(0.00001);
     m_c_apdHist->Clear();
     m_c_apdHist->cd();
-    m_apdPoly->SetMaximum(0.01);
-    m_apdPoly->SetMinimum(0.0);
     m_apdPoly->Draw("colz");
     m_apdPoly->GetXaxis()->SetTickLength(0);
     m_apdPoly->GetYaxis()->SetTickLength(0);
+    gPad->SetLogz();
     m_c_apdHist->Update();
   } else {
     B2INFO("Histogram named chipHit is not found.");

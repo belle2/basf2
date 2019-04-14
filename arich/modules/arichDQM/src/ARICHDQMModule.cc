@@ -167,6 +167,7 @@ namespace Belle2 {
     h_theta->SetOption("LIVE");
     h_hitsPerTrack->SetOption("LIVE");
     h_trackPerEvent->SetOption("LIVE");
+    h_flashPerAPD->SetOption("LivE");
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i]->SetOption("LIVE");
@@ -185,7 +186,7 @@ namespace Belle2 {
     h_bits->SetMinimum(0);
     h_hitsPerTrack2D->SetMinimum(0);
     h_tracks2D->SetMinimum(0);
-
+    h_flashPerAPD->SetMinumum(0);
     h_hitsPerEvent->SetMinimum(0);
     h_theta->SetMinimum(0);
     h_hitsPerTrack->SetMinimum(0);

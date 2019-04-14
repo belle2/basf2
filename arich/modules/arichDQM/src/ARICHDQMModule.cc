@@ -19,7 +19,6 @@
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
-
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <arich/dataobjects/ARICHDigit.h>
@@ -103,6 +102,8 @@ namespace Belle2 {
     h_hapdHit = new TH1D("hapdHit", "Number of hits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
     h_hapdHitPerEvent = new TH2D("hapdHitPerEvent", "Number of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5, 420 + 0.5,
                                  144, -0.5, 143.5);
+    h_trackPerEvent = new TH1D("trackPerEvent", "Number of tracks in ARICH per event; # of tracks;Events", 6, -0.5, 5.5);
+
     h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
     h_aerogelHit = new TH1D("aerogelHit", "Number track associated hits in each aerogel tile;Aerogel slot ID;Hits", 125, -0.5,
                             125 - 0.5);
@@ -139,6 +140,9 @@ namespace Belle2 {
                                 -M_PI, M_PI, 100, 0, 0.5);
     h_thetaPhi = new TH2D("thetaPhi", "Cherenkov theta vs phi;#phi [rad];#theta_{c} [rad]", 100, -M_PI, M_PI, 100, 0., 0.5);
 
+    h_flashPerAPD = new TH1D("flashPerAPD", "Number of flashes per APD; APD serial; number of flash", 420 * 4, -0.5, 420 * 4 - 0.5);
+
+
     dirARICHDQM->cd();
 
     //Select "LIVE" monitoring histograms
@@ -162,6 +166,7 @@ namespace Belle2 {
     h_hitsPerEvent->SetOption("LIVE");
     h_theta->SetOption("LIVE");
     h_hitsPerTrack->SetOption("LIVE");
+    h_trackPerEvent->SetOption("LIVE");
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i]->SetOption("LIVE");
@@ -218,7 +223,6 @@ namespace Belle2 {
 
     h_chStat->Reset();
     h_aeroStat->Reset();
-
     h_chDigit->Reset();
     h_chipDigit->Reset();
     h_hapdDigit->Reset();
@@ -237,7 +241,8 @@ namespace Belle2 {
     h_hitsPerEvent->Reset();
     h_theta->Reset();
     h_hitsPerTrack->Reset();
-
+    h_trackPerEvent->Reset();
+    h_flashPerAPD->Reset();
     h_mirrorThetaPhi->Reset();
     h_thetaPhi->Reset();
 
@@ -269,6 +274,7 @@ namespace Belle2 {
 
     if (!arichLikelihoods.getEntries() && m_arichEvents) { setReturnValue(0); return;}
 
+    std::vector<int> apds(420 * 4, 0);
     for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();
       for (int i = 0; i < 8; i++) {
@@ -279,9 +285,14 @@ namespace Belle2 {
       int moduleID  = digit.getModuleID();
       int channelID = digit.getChannelID();
       h_chDigit  ->Fill((moduleID - 1) * 144 + channelID);
-      h_chipDigit->Fill((moduleID - 1) * 4   + channelID / 36);
+      int chip = (moduleID - 1) * 4   + channelID / 36;
+      h_chipDigit->Fill(chip);
+      apds[chip] += 1;
       h_hapdDigit->Fill(moduleID);
     }
+
+    int iapd = 0;
+    for (auto apd : apds) { if (apd > 20) h_flashPerAPD->Fill(iapd); iapd++;}
 
     std::vector<int> hpd(420, 0);
     int nHit = 0;
@@ -313,11 +324,13 @@ namespace Belle2 {
     int mmid = 1;
     for (auto hh : hpd) { h_hapdHitPerEvent->Fill(mmid, hh); mmid++;}
 
+    int ntrk = 0;
     for (const auto& arichTrack : arichTracks) {
 
 
       //Momentum limits are applied
       //if (arichTrack.getPhotons().size() == 0) continue;
+      if (arichTrack.getMomentum() > 0.5) ntrk++; // count tracks with momentum larger than 0.5 GeV
       if (arichTrack.getMomentum() < m_momDnLim || arichTrack.getMomentum() > m_momUpLim) continue;
 
       TVector3 recPos = arichTrack.getPosition();
@@ -353,10 +366,9 @@ namespace Belle2 {
       h_tracks2D->Fill(recPos.X(), recPos.Y());
 
       std::vector<ARICHPhoton> photons = arichTrack.getPhotons();
-      int nPhoton = 0;
       for (auto& photon : photons) {
         if (photon.getMirror() == 0) {
-          if (trR < 95.) {
+          if (trR < 93.) {
             h_thetaPhi->Fill(photon.getPhiCer(), photon.getThetaCer());
             h_theta->Fill(photon.getThetaCer());
           }
@@ -368,38 +380,50 @@ namespace Belle2 {
             hitSector++;
           }
           h_secTheta[hitSector]->Fill(photon.getThetaCer());
-          nPhoton++;
         } else {
-          if (trR > 85.) h_mirrorThetaPhi->Fill(photon.getMirror(), photon.getPhiCer(), photon.getThetaCer());
+          if (trR > 95.) h_mirrorThetaPhi->Fill(photon.getMirror(), photon.getPhiCer(), photon.getThetaCer());
         }
       }
 
       //Get ARICHLikelihood related to the ARICHTrack
-      /*const ExtHit* extHit = arichTrack.getRelated<ExtHit>();
+      const ExtHit* extHit = arichTrack.getRelated<ExtHit>();
       const Track* mdstTrack = NULL;
       if (extHit) mdstTrack = extHit->getRelated<Track>();
-      const ARICHAeroHit* aeroHit = arichTrack.getRelated<ARICHAeroHit>();
       const ARICHLikelihood* lkh = NULL;
       if (mdstTrack) lkh = mdstTrack->getRelated<ARICHLikelihood>();
-      else lkh = arichTrack.getRelated<ARICHLikelihood>();*/
+      else lkh = arichTrack.getRelated<ARICHLikelihood>();
 
-      //if(lkh->getFlag()){//Fill only when the number of expected photons is more than 0.
-      h_hitsPerTrack->Fill(nPhoton);
-      h_secHitsPerTrack[trSector]->Fill(nPhoton);
-      h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nPhoton);
-
-      int aeroID = arichGeoAero.getAerogelTileID(recPos.X(), recPos.Y());
-      h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
-                            (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20),
-                            nPhoton);
-      h_aerogelHit->Fill(aeroID, nPhoton);
-      //}
+      if (lkh) {
+        if (!lkh->getFlag()) continue; //Fill only when the number of expected photons is more than 0.
+        double nphoton = lkh->getDetPhot();
+        h_hitsPerTrack->Fill(nphoton);
+        h_secHitsPerTrack[trSector]->Fill(nphoton);
+        h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nphoton);
+        int aeroID = arichGeoAero.getAerogelTileID(recPos.X(), recPos.Y());
+        h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                              (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20),
+                              nphoton);
+        h_aerogelHit->Fill(aeroID, nphoton);
+      }
     }
+
+    h_trackPerEvent->Fill(ntrk);
 
   }
 
   void ARICHDQMModule::endRun()
   {
+
+    if (h_theta->GetEntries() < 200) return;
+    TF1* f1 = new TF1("arichFitFunc", "gaus(0)+pol1(3)", 0.25, 0.4);
+    f1->SetParameters(0.8 * h_theta->GetMaximum(), 0.323, 0.016, 0, 0);
+    f1->SetParName(0, "C");
+    f1->SetParName(1, "mean");
+    f1->SetParName(2, "sigma");
+    f1->SetParName(3, "p0");
+    f1->SetParName(4, "p1");
+    h_theta->Fit(f1, "R");
+
   }
 
   void ARICHDQMModule::terminate()

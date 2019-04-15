@@ -181,7 +181,7 @@ class Plotuple:
 
         self.plot_folder = os.path.join(
             "plots",
-            "_".join(sorted(self.revisions)),
+            "_".join(self.revisions),
             self.package
         )
         if not os.path.isdir(self.plot_folder):

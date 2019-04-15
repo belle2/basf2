@@ -328,7 +328,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     all_plotuples = []
 
     # for every package
-    for i, package in enumerate(plot_packages):
+    for i, package in enumerate(sorted(list(plot_packages))):
 
         # Some information to be printed out while the plots are created
         print(terminal_title_line(

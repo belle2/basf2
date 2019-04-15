@@ -1,4 +1,6 @@
-<span id="prebuilt-select-container" title="Any of the following combinations of revisions is already prebuilt (i.e. no new plots will have to be created). Furthermore, the last selected setting here will be remembered and restored when the validation page is opened.">
+<span
+    id="prebuilt-select-container"
+    title="Any of the following combinations of revisions is already prebuilt (i.e. the plots have already been generated). Furthermore, the last selected setting here will be remembered and restored when the validation page is opened.">
   <span>Popular/prebuilt/default</span>:
   <label for="prebuilt-select"></label>
   <select id="prebuilt-select" onchange="loadPrebuildRevisions()">
@@ -38,13 +40,18 @@
 <!-- actually this should be a div, but then this will be formatted by the
 div: last-child rule, so just make it a span and give it the corresponding
 CSS properties -->
-<span id="reference-select-container" title="">
+<span id="reference-select-container" title="Manually choose which revision is compared with the newest selected revision. Only revisions that are checked in the list above can be selected.">
   <span>Revision as custom reference:</span>
   <label for="reference-select"></label>
   <select id="reference-select" onchange="onReferenceSelectionChanged()">
-    <option value="auto" title="Reference (if drawn), else second newest revision">Automatic</option>
+    <option value="auto" title="Reference (if drawn), else second newest revision.">Automatic</option>
   </select>
 </span>
 <span id="button-revision-load-container">
-	<button id="button-revision-load" onclick='loadSelectedRevisions()'>Load custom selection</button>
+	<button
+      id="button-revision-load"
+      onclick='loadSelectedRevisions()'
+      title="Load a combination of revisions selected above. This button turns red when you change a setting that requires a reload.">
+    Load custom selection
+  </button>
 </span>

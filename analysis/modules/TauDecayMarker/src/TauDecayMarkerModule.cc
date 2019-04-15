@@ -33,14 +33,16 @@ REG_MODULE(TauDecayMarker)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tau_pair(false), no_of_tau_plus(0), no_of_tau_minus(0), id_of_tau_plus(-1),
-  id_of_tau_minus(-1), m_pmode(-2), m_mmode(-2), m_pprong(0), m_mprong(0)
+TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tauPair(false), numOfTauPlus(0), numOfTauMinus(0), idOfTauPlus(-1),
+  idOfTauMinus(-1), m_pmode(-2), m_mmode(-2), m_pprong(0), m_mprong(0)
 {
   // Set module properties
   setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
                  "is numbered following the order in the default KKMC decay table. Using this module, "
                  "the channel number will be stored in the variables `tauPlusMcMode`, and `tauMinusMcMode`. "
                  "Further details and usage can be found at https://confluence.desy.de/display/BI/Tau+Physics+Analysis+Tools. ");
+  //Parameter definition
+  addParam("printDecayInfo", m_printDecayInfo, "Print information of the tau pair decay from MC.", false);
 }
 
 void TauDecayMarkerModule::initialize()
@@ -53,17 +55,22 @@ void TauDecayMarkerModule::initialize()
 void TauDecayMarkerModule::event()
 {
   StoreObjPtr<TauPairDecay> tauDecay;
+  StoreArray<MCParticle> MCParticles;
+
   if (!tauDecay) tauDecay.create();
 
   IdentifyTauPair();
-  if (tau_pair) {
+  if (tauPair) {
     m_pmode = getDecayChannelOfTau(+1) % 100;
     m_mmode = getDecayChannelOfTau(-1) % 100;
 
-    m_pprong = getProngOfTau(1);
-    m_mprong = getProngOfTau(-1);
+    m_pprong = getProngOfDecay(*MCParticles[idOfTauPlus - 1]);
+    m_mprong = getProngOfDecay(*MCParticles[idOfTauMinus - 1]);
 
-    B2INFO("Tau prong: " << m_pprong << "-" << m_mprong);
+    if (m_printDecayInfo) {
+      B2INFO("Decay ID: " << m_pmode << " (tau+), " << m_mmode << " (tau-)." <<
+             " Topology: " << m_pprong << "-" << m_mprong << " prong");
+    }
 
   } else {
     m_pmode = -1;
@@ -81,36 +88,36 @@ void TauDecayMarkerModule::event()
 void TauDecayMarkerModule::IdentifyTauPair()
 {
   StoreArray<MCParticle> MCParticles;
-  no_of_tau_plus = 0;
-  no_of_tau_minus = 0;
-  id_of_tau_plus = 0;
-  id_of_tau_minus = 0;
+  numOfTauPlus = 0;
+  numOfTauMinus = 0;
+  idOfTauPlus = 0;
+  idOfTauMinus = 0;
   TLorentzVector P4p, P4m;
   for (int i = 0; i < MCParticles.getEntries(); i++) {
     MCParticle& p = *MCParticles[i];
 
     if (p.getStatus() == 1 && p.getPDG() == 15) {
-      no_of_tau_minus++;
-      id_of_tau_minus = p.getIndex();
+      numOfTauMinus++;
+      idOfTauMinus = p.getIndex();
       P4m = p.get4Vector();
     }
     if (p.getStatus() == 1 && p.getPDG() == -15) {
-      no_of_tau_plus++;
-      id_of_tau_plus = p.getIndex();
+      numOfTauPlus++;
+      idOfTauPlus = p.getIndex();
       P4p = p.get4Vector();
     }
 
   }
-  if (no_of_tau_plus == 1 && no_of_tau_minus == 1) {
-    tau_pair = true;
-  } else tau_pair = false;
+  if (numOfTauPlus == 1 && numOfTauMinus == 1) {
+    tauPair = true;
+  } else tauPair = false;
 }
 
 int TauDecayMarkerModule::getNumDaughterOfTau(int s, int id, int sign)
 {
-  if (s == 0 || !tau_pair) return -1;
-  int tauid = id_of_tau_minus;
-  if (s > 0) tauid = id_of_tau_plus;
+  if (s == 0 || !tauPair) return -1;
+  int tauid = idOfTauMinus;
+  if (s > 0) tauid = idOfTauPlus;
   int ret = 0;
   StoreArray<MCParticle> MCParticles;
   MCParticle& p = *MCParticles[tauid - 1];
@@ -142,9 +149,9 @@ int TauDecayMarkerModule::getNumDaughterOfTau(int s, int id, int sign)
 
 int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign)
 {
-  if (s == 0 || !tau_pair) return -1;
-  int tauid = id_of_tau_minus;
-  if (s > 0) tauid = id_of_tau_plus;
+  if (s == 0 || !tauPair) return -1;
+  int tauid = idOfTauMinus;
+  if (s > 0) tauid = idOfTauPlus;
   int ret = 0;
   StoreArray<MCParticle> MCParticles;
   MCParticle& p = *MCParticles[tauid - 1];
@@ -179,7 +186,7 @@ int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign
 int TauDecayMarkerModule::getDecayChannelOfTau(int s)
 {
   int ret = 0;
-  if (tau_pair && s != 0) {
+  if (tauPair && s != 0) {
     if (
       getNumDaughterOfTauExceptGamma(s, -s * (-12), 1) == 1 &&
       getNumDaughterOfTauExceptGamma(s, -s * (11), 1) == 1 &&
@@ -570,31 +577,20 @@ int TauDecayMarkerModule::getDecayChannelOfTau(int s)
   return ret;
 }
 
-int TauDecayMarkerModule::getProngOfTau(int s)
-{
-  if (s == 0 || !tau_pair) return -1;
-  int tauid = id_of_tau_minus;
-  if (s > 0) tauid = id_of_tau_plus;
-  int ret = 0;
-  StoreArray<MCParticle> MCParticles;
-  MCParticle& p = *MCParticles[tauid - 1];
 
-  // TODO: Find a more elegant iteration between daughters.
-  for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-    MCParticle& d = *MCParticles[i - 1];
-    if (d.getFirstDaughter() != 0) {
-      for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
-        MCParticle& e = *MCParticles[j - 1];
-        if (e.getFirstDaughter() != 0) {
-          for (int k = e.getFirstDaughter(); k <= e.getLastDaughter(); ++k) {
-            MCParticle& f = *MCParticles[k - 1];
-            if (f.getStatus(MCParticle::c_StableInGenerator) != 0)
-              B2WARNING("Daughter mc particle not counted while getting the tau decay prong: " << f.getPDG());
-            else if (abs(f.getCharge()) != 0) ret++;
-          }
-        } else if (abs(e.getCharge()) != 0) ret++;
-      }
-    } else if (abs(d.getCharge()) != 0) ret++;
+int TauDecayMarkerModule::getProngOfDecay(const MCParticle& p)
+{
+  int ret = 0;
+  const vector<MCParticle*> daughters = p.getDaughters();
+  if (daughters.empty()) return ret;
+  for (MCParticle* d : daughters) {
+    if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+    // TODO: Improve how to identify a final state particle.
+    bool isChargedFinalState = find(begin(finalStatePDGs),
+                                    end(finalStatePDGs),
+                                    abs(d->getPDG())) != end(finalStatePDGs);
+    if (isChargedFinalState) ret++;
+    else ret += getProngOfDecay(*d);
   }
   return ret;
 }

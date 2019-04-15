@@ -13,6 +13,8 @@
 #include <TMath.h>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -50,15 +52,17 @@ namespace Belle2 {
   private:
 
     /** True if the generated event is a tau pair event. */
-    bool tau_pair;
+    bool tauPair;
     /** Number of positive tau leptons in the event */
-    int no_of_tau_plus;
+    int numOfTauPlus;
     /** Number of negative tau leptons in the event */
-    int no_of_tau_minus;
+    int numOfTauMinus;
     /** Index of the generated positive tau */
-    int id_of_tau_plus;
+    int idOfTauPlus;
     /** Index of the generated negative tau */
-    int id_of_tau_minus;
+    int idOfTauMinus;
+    /** PDG codes accepted as charged final state particles in generation: {e, mu, pi, K, p} */
+    const int finalStatePDGs[5] = { 11, 13, 211, 321, 2212 };
     /** ID of the decay channel of positive tau */
     Int_t m_pmode;
     /** ID of the decay channel of negative tau*/
@@ -77,7 +81,11 @@ namespace Belle2 {
     /** Count the number of daughers of the generated tau */
     int getNumDaughterOfTau(int s = 0, int id = 0, int sign = 0);
     /** Get the prong of the generated tau decay */
-    int getProngOfTau(int s = 0);
+    int getProngOfDecay(const MCParticle& mc);
+
+  protected:
+    /** If true, prints ID and prong of each tau lepton in the event.*/
+    bool m_printDecayInfo;
 
   };
 

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kiyoshi Hayasaka, Michel Villanueva                      *
@@ -34,7 +34,7 @@ REG_MODULE(TauDecayMarker)
 //-----------------------------------------------------------------
 
 TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tau_pair(false), no_of_tau_plus(0), no_of_tau_minus(0), id_of_tau_plus(-1),
-  id_of_tau_minus(-1), m_pmode(-2), m_mmode(-2)
+  id_of_tau_minus(-1), m_pmode(-2), m_mmode(-2), m_pprong(0), m_mprong(0)
 {
   // Set module properties
   setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
@@ -59,6 +59,12 @@ void TauDecayMarkerModule::event()
   if (tau_pair) {
     m_pmode = getDecayChannelOfTau(+1) % 100;
     m_mmode = getDecayChannelOfTau(-1) % 100;
+
+    m_pprong = getProngOfTau(1);
+    m_mprong = getProngOfTau(-1);
+
+    B2INFO("Tau prong: " << m_pprong << "-" << m_mprong);
+
   } else {
     m_pmode = -1;
     m_mmode = -1;
@@ -66,6 +72,9 @@ void TauDecayMarkerModule::event()
 
   tauDecay->addTauPlusIdMode(m_pmode);
   tauDecay->addTauMinusIdMode(m_mmode);
+
+  tauDecay->addTauPlusMcProng(m_pprong);
+  tauDecay->addTauMinusMcProng(m_mprong);
 
 }
 
@@ -560,3 +569,33 @@ int TauDecayMarkerModule::getDecayChannelOfTau(int s)
   }
   return ret;
 }
+
+int TauDecayMarkerModule::getProngOfTau(int s)
+{
+  if (s == 0 || !tau_pair) return -1;
+  int tauid = id_of_tau_minus;
+  if (s > 0) tauid = id_of_tau_plus;
+  int ret = 0;
+  StoreArray<MCParticle> MCParticles;
+  MCParticle& p = *MCParticles[tauid - 1];
+
+  // TODO: Find a more elegant iteration between daughters.
+  for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
+    MCParticle& d = *MCParticles[i - 1];
+    if (d.getFirstDaughter() != 0) {
+      for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
+        MCParticle& e = *MCParticles[j - 1];
+        if (e.getFirstDaughter() != 0) {
+          for (int k = e.getFirstDaughter(); k <= e.getLastDaughter(); ++k) {
+            MCParticle& f = *MCParticles[k - 1];
+            if (f.getStatus(MCParticle::c_StableInGenerator) != 0)
+              B2WARNING("Daughter mc particle not counted while getting the tau decay prong: " << f.getPDG());
+            else if (abs(f.getCharge()) != 0) ret++;
+          }
+        } else if (abs(e.getCharge()) != 0) ret++;
+      }
+    } else if (abs(d.getCharge()) != 0) ret++;
+  }
+  return ret;
+}
+

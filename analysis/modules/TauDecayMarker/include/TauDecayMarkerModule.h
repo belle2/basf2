@@ -63,6 +63,10 @@ namespace Belle2 {
     Int_t m_pmode;
     /** ID of the decay channel of negative tau*/
     Int_t m_mmode;
+    /** Prong of the decay channel of positive tau */
+    Int_t m_pprong;
+    /** Prong of the decay channel of negative tau*/
+    Int_t m_mprong;
 
     /** Identifies if the event is a generated tau pair */
     void IdentifyTauPair();
@@ -72,6 +76,8 @@ namespace Belle2 {
     int getNumDaughterOfTauExceptGamma(int s = 0, int id = 0, int sign = 0);
     /** Count the number of daughers of the generated tau */
     int getNumDaughterOfTau(int s = 0, int id = 0, int sign = 0);
+    /** Get the prong of the generated tau decay */
+    int getProngOfTau(int s = 0);
 
   };
 

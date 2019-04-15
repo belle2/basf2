@@ -424,20 +424,26 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     # create objects for all revisions
     comparison_revs = []
 
-    for r in revisions:
-        index = index_from_revision(r, work_folder)
-
-        # revision has black by default
-        line_color = "#000000"
+    for i_revision, revision in enumerate(revisions):
+        line_color = None
+        index = index_from_revision(revision, work_folder)
         if index is not None:
             style = get_style(index)
             line_color = ROOT.gROOT.GetColor(style.GetLineColor()).AsHexString()
-        print("For {} index {} color {}".format(r, index, line_color))
+        if i_revision == 0:
+            line_color = "#000000"
+        if line_color is None:
+            print(
+                f"ERROR: line_color for revision f{revision} could not be set!"
+                f" Choosing default color f{line_color}.",
+                file=sys.stderr
+            )
+        # print("For {} index {} color {}".format(revision, index, line_color))
 
         # todo the creation date and git_hash of the original revision should
         #  be transferred here
         comparison_revs.append(json_objects.ComparisonRevision(
-            label=r,
+            label=revision,
             color=line_color)
         )
 

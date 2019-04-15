@@ -520,7 +520,8 @@ class Plotuple:
         # If there is a reference object, and the list of plots is not empty,
         # perform a Chi^2-Test on the reference object and the first object in
         # the plot list:
-        if self.reference is not None and self.newest:
+        if self.reference is not None and self.newest \
+                and not self.reference == self.newest:
             self.chi2test()
 
         # A variable which holds whether we
@@ -680,7 +681,8 @@ class Plotuple:
         # If there is a reference object, and the list of plots is not empty,
         # perform a Chi^2-Test on the reference object and the first object in
         # the plot list:
-        if self.reference is not None and self.newest:
+        if self.reference is not None and self.newest \
+                and not self.reference == self.newest:
             self.chi2test()
 
         if 'nogrid' not in self.metaoptions:

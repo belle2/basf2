@@ -32,11 +32,6 @@
 #include "arich/geometry/ARICHGeometryPar.h"
 #include "arich/geometry/ARICHBtestGeometryPar.h"
 
-// framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-
-#include <arich/geometry/ARICHGeometryPar.h>
 #include "arich/modules/arichBtest/arichBtestData.h"
 
 #include <TH1F.h>

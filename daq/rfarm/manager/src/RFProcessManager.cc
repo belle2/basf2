@@ -11,6 +11,9 @@
 //#include "daq/slc/nsm/NSMCommunicator.h"
 #include <time.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 extern "C" {
 #include <nsm2/nsmlib2.h>
@@ -29,7 +32,7 @@ using namespace Belle2;
 RFProcessManager::RFProcessManager(char* nodename)
 {
   // Create IO pipe for output logging
-  if (pipe(m_iopipe) < 0) {
+  if (pipe2(m_iopipe, O_NONBLOCK) < 0) {
     perror("pipe");
     m_iopipe[0] = -1; m_iopipe[1] = -1;
   }

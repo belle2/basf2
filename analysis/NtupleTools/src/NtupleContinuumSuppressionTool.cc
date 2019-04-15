@@ -15,7 +15,6 @@
 #include <TLorentzVector.h>
 #include <TVector3.h>
 
-#include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>

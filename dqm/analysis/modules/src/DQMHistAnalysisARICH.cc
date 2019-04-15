@@ -77,6 +77,13 @@ void DQMHistAnalysisARICHModule::initialize()
   }
   m_c_mergerHit = new TCanvas("ARICH/c_mergerHitModified");
 
+  m_apdHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 2); /**<ARICH TObject to draw hit map for each APD*/
+  m_apdPoly = new TH2Poly();
+  m_apdPoly->SetName("ARICH/apdHitMap");
+  m_apdPoly->SetTitle("# of hits/APD/event");
+  m_apdPoly->SetOption("colz");
+  m_c_apdHist = new TCanvas("ARICH/c_apdHist");
+
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }
 
@@ -92,7 +99,7 @@ void DQMHistAnalysisARICHModule::event()
   if (m_h_mergerHit != NULL) {
     m_c_mergerHit->Clear();
     m_c_mergerHit->cd();
-    m_h_mergerHit->Draw();
+    m_h_mergerHit->Draw("hist");
     gPad->Update();
     for (int i = 0; i < 5; i++) {
       m_LineForMB[i]->DrawLine(12 * (i + 1) + 0.5, 0, 12 * (i + 1) + 0.5, gPad->GetUymax());
@@ -100,6 +107,28 @@ void DQMHistAnalysisARICHModule::event()
     m_c_mergerHit->Modified();
   } else {
     B2INFO("Histogram named mergerHit is not found.");
+  }
+
+  //Draw 2D hit map of channels and APDs
+  TH1* m_h_chHit = findHist("ARICH/chipHit");/**<The number of hits in each chip */
+  if (m_h_chHit != NULL) {
+    int nevt = 0;
+    TH1* htmp = findHist("ARICH/hitsPerEvent");
+    if (htmp) nevt = htmp->GetEntries();
+    m_apdHist->fillFromTH1(m_h_chHit);
+    if (nevt) m_apdHist->Scale(1. / float(nevt));
+    m_apdPoly->SetMaximum(0.1);
+    m_apdHist->setPoly(m_apdPoly);
+    m_apdPoly->SetMinimum(0.0001);
+    m_c_apdHist->Clear();
+    m_c_apdHist->cd();
+    m_apdPoly->Draw("colz");
+    m_apdPoly->GetXaxis()->SetTickLength(0);
+    m_apdPoly->GetYaxis()->SetTickLength(0);
+    gPad->SetLogz();
+    m_c_apdHist->Update();
+  } else {
+    B2INFO("Histogram named chipHit is not found.");
   }
 
 }

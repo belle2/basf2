@@ -11,7 +11,6 @@
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
 
 #include <alignment/Manager.h>
-#include <alignment/Hierarchy.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 
 #include <alignment/GlobalDerivatives.h>

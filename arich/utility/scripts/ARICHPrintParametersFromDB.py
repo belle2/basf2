@@ -15,7 +15,7 @@ from fnmatch import fnmatch
 from optparse import OptionParser
 
 parser = OptionParser()
-parser.add_option('-t', '--tag', dest='tag', default='Calibration_Offline_Development',
+parser.add_option('-t', '--tag', dest='tag', default='',
                   help='database tag from which to import/export data')
 parser.add_option('-e', '--exp', dest='experiment',
                   default=-1, help='experiment')
@@ -33,6 +33,8 @@ if options.object == '':
 # set database tag
 if options.tag == 'local':
     use_local_database("localdb/database.txt", "localdb")
+elif options.tag == '':
+    print("Using default tag")
 else:
     use_central_database(options.tag)
 
@@ -42,7 +44,13 @@ else:
 eventinfo = register_module('EventInfoSetter')
 eventinfo.initialize()
 main = create_path()
+
 main.add_module(eventinfo)
+
+# load gearbox for reading parameters from xml files (by default in "arich/data")
+paramloader = register_module('Gearbox')
+paramloader.initialize()
+
 process(main)
 
 # run the importer
@@ -79,5 +87,12 @@ elif options.object == 'moduleNumbering':
 elif options.object == 'QEMap':
     # creates root file with full detector plane QE map (all HAPDs) as stored in the database
     dbImporter.dumpQEMap()
+elif options.object == 'MergerMap':
+    # creates root file with numbering of HAPD modules to mergers (position on detector plane -> merger SN)
+    # use dbImporter.dumpMergerMapping(False) to print merger ID instead SN (ID = (sector-1)*12 + merger_sector_id (1-12))
+    dbImporter.dumpMergerMapping()
+elif options.object == 'FEMappings':
+    # prints FE mappings (module to merger to copper) in json suitable format
+    dbImporter.printFEMappings()
 else:
     print('Non-valid arich DB object!')

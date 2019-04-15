@@ -119,9 +119,9 @@ namespace Belle2 {
   void ARICHRateCalModule::event()
   {
     StoreObjPtr<EventMetaData> evtmetadata;
-    //int runno = evtmetadata->getRun();
+    int runno = evtmetadata->getRun();
     int raw_evtno = evtmetadata->getEvent();
-    int runno = raw_evtno / m_nevents;
+    //int runno = raw_evtno / m_nevents;
     ARICHThParam param(runno, m_dth, m_th0, m_nrun);
     StoreArray<ARICHRawDigit> rawdigits;
     for (auto& rawdigit : rawdigits) {

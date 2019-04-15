@@ -74,7 +74,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     const double upperX = numberOfBins;
     m_cutResultHistograms.emplace(baseIdentifier,
                                   new TH1F(baseIdentifier.c_str(), baseIdentifier.c_str(), numberOfBins, lowerX, upperX));
-    m_cutResultHistograms[baseIdentifier]->SetXTitle(("Cut Result for " + baseIdentifier).c_str());
+    m_cutResultHistograms[baseIdentifier]->SetXTitle(("Prescaled Cut Result for " + baseIdentifier).c_str());
     m_cutResultHistograms[baseIdentifier]->SetOption("bar");
     m_cutResultHistograms[baseIdentifier]->SetFillStyle(0);
     m_cutResultHistograms[baseIdentifier]->SetStats(false);
@@ -127,7 +127,8 @@ void SoftwareTriggerHLTDQMModule::event()
       const std::string& baseIdentifier = cutIdentifier.first;
       const auto& cuts = cutIdentifier.second;
 
-      for (const std::string& cutName : cuts) {
+      for (const std::string& cutTitle : cuts) {
+        const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
 
         // check if the cutResult is in the list, be graceful when not available
@@ -135,18 +136,18 @@ void SoftwareTriggerHLTDQMModule::event()
 
         if (cutEntry != m_triggerResult->getResults().end()) {
           const int cutResult = cutEntry->second;
-          m_cutResultHistograms[baseIdentifier]->Fill(cutName.c_str(), cutResult);
+          m_cutResultHistograms[baseIdentifier]->Fill(cutTitle.c_str(), cutResult > 0);
         }
       }
 
       const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
       const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
 
-      m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult);
+      m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
     }
 
     const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
-    m_cutResultHistograms["total_result"]->Fill("total_result", totalResult);
+    m_cutResultHistograms["total_result"]->Fill("total_result", totalResult > 0);
   }
 }
 

@@ -194,7 +194,7 @@ namespace Belle2 {
     /**
      * Import CDCWireHits cut values to the database.
      */
-    void importCDCWireHitRequirements(std::string fileName);
+    void importCDCWireHitRequirements(const std::string& fileName);
     /**
      * Get CDCWireHits cut values from the database and
      * print them.

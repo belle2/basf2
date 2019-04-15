@@ -263,7 +263,7 @@ class Chi2Test(ComparisonBase):
         nbins = local_object_a.GetNbinsX()
 
         if nbins < 2:
-            raise TooFewBins("{} bin(s) is to few to perform the Chi2 "
+            raise TooFewBins("{} bin(s) is too few to perform the Chi2 "
                              "test.".format(nbins))
 
         weighted_types = ["TProfile", "TH1D", "TH1F"]

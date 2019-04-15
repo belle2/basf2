@@ -6,9 +6,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/DataStore.h>
-
+#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-
+#include <string>
 #include <cmath>
 #include <TFile.h>
 
@@ -740,40 +740,38 @@ bool
 NeuroTrigger::load(const string& filename, const string& arrayname)
 {
   if (filename.size() < 1) {
-    //m_MLPs.clear();
-    //m_MLPs = m_cdctriggerneuroconfig->getMLPs();
-    std::cout << m_cdctriggerneuroconfig->getNNName() << std::endl;
-    //B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
+    m_MLPs.clear();
+    m_MLPs = m_cdctriggerneuroconfig->getMLPs();
+    B2INFO("Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
+    B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
+    return true;
+  } else {
+    TFile datafile(filename.c_str(), "READ");
+    if (!datafile.IsOpen()) {
+      B2WARNING("Could not open file " << filename);
+      return false;
+    }
 
-
-    //return true;
-  } //else {
-  TFile datafile(filename.c_str(), "READ");
-  if (!datafile.IsOpen()) {
-    B2WARNING("Could not open file " << filename);
-    return false;
-  }
-
-  TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
-  if (!MLPs) {
+    TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
+    if (!MLPs) {
+      datafile.Close();
+      B2WARNING("File " << filename << " does not contain key " << arrayname);
+      return false;
+    }
+    m_MLPs.clear();
+    for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {
+      CDCTriggerMLP* expert = dynamic_cast<CDCTriggerMLP*>(MLPs->At(isector));
+      if (expert) m_MLPs.push_back(*expert);
+      else B2WARNING("Wrong type " << MLPs->At(isector)->ClassName() << ", ignoring this entry.");
+    }
+    MLPs->Clear();
+    delete MLPs;
     datafile.Close();
-    B2WARNING("File " << filename << " does not contain key " << arrayname);
-    return false;
-  }
-  m_MLPs.clear();
-  for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {
-    CDCTriggerMLP* expert = dynamic_cast<CDCTriggerMLP*>(MLPs->At(isector));
-    if (expert) m_MLPs.push_back(*expert);
-    else B2WARNING("Wrong type " << MLPs->At(isector)->ClassName() << ", ignoring this entry.");
-  }
-  MLPs->Clear();
-  delete MLPs;
-  datafile.Close();
-  B2DEBUG(100, "loaded " << m_MLPs.size() << " networks");
+    B2DEBUG(100, "loaded " << m_MLPs.size() << " networks");
 
-  // load some values from the geometry that will be needed for the input
-  setConstants();
+    // load some values from the geometry that will be needed for the input
+    setConstants();
 
-  return true;
-  //}
+    return true;
+  }
 }

@@ -26,7 +26,7 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
   addParam("filename", m_filename,
            "Name of the files where the NeuroTrigger parameters are saved "
            "(compare NeuroTriggerTrainer).",
-           string("NeuroTrigger.root"));
+           string(""));
   addParam("arrayname", m_arrayname,
            "Name of the TObjArray holding the NeuroTrigger parameters "
            "(compare NeuroTriggerTrainer).",

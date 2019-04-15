@@ -6,7 +6,6 @@ import ROOT
 import os.path
 import validationcomparison
 import metaoptions
-import sys
 import math
 import json
 
@@ -297,14 +296,10 @@ class Plotuple:
                 self.comparison_result = "equal"
 
             self.chi2test_result = \
-                r'Performed $\chi^2$-Test between {} and {} ' \
-                r'($\chi^2$ = {:.4f}; NDF = {}; $\chi^2/\text{{NDF}}$ = {:.4f})'.format(
-                    self.reference.revision,
-                    self.newest.revision,
-                    chi2,
-                    ndf,
-                    chi2ndf
-                )
+                rf'Performed $\chi^2$-Test between {self.reference.revision} ' \
+                rf'and {self.newest.revision} ' \
+                rf'($\chi^2$ = {chi2:.4f}; NDF = {ndf}; ' \
+                rf'$\chi^2/\text{{NDF}}$ = {chi2ndf:.4f})'
             self.pvalue = pvalue
         else:
             self.pvalue = None

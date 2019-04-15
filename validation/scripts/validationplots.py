@@ -104,8 +104,11 @@ def get_plot_files(revisions, work_folder):
     Returns a list of all plot files as absolute paths. For this purpose,
     it loops over all revisions in 'revisions', finds the
     corresponding results folder and collects the plot ROOT files.
+    :param revisions: Name of the revisions.
+    :param work_folder: Folder that contains the results/ directory
     :return: plot files, i.e. plot ROOT files from the
-             requested revisions as dictionary {revision: {package: [root files]}}
+             requested revisions as dictionary
+             {revision: {package: [root files]}}
     """
     # This is where we store the paths of plot ROOT files we've found
     results = collections.defaultdict(lambda: collections.defaultdict(list))
@@ -117,7 +120,9 @@ def get_plot_files(revisions, work_folder):
     for revision in revisions:
 
         if revision == "reference":
-            results["reference"] = get_tracked_reference_files()
+            results["reference"] = collections.defaultdict(
+                list, get_tracked_reference_files()
+            )
             continue
 
         rev_result_folder = os.path.join(results_foldername, revision)
@@ -126,12 +131,14 @@ def get_plot_files(revisions, work_folder):
 
         packages = os.listdir(rev_result_folder)
 
-        for p in packages:
-            package_folder = os.path.join(rev_result_folder, p)
+        for package in packages:
+            package_folder = os.path.join(rev_result_folder, package)
             # find all root files within this package
             root_files = glob.glob(package_folder + "/*.root")
             # append with absolute path
-            results[revision][p].extend([os.path.abspath(rf) for rf in root_files])
+            results[revision][package].extend(
+                [os.path.abspath(rf) for rf in root_files]
+            )
 
     return results
 
@@ -153,7 +160,10 @@ def get_tracked_reference_files():
                  'central': os.environ.get('BELLE2_RELEASE_DIR', None)}
 
     # This is where we store the paths of reference ROOT files we've found
-    results = {'local': collections.defaultdict(list), 'central': collections.defaultdict(list)}
+    results = {
+        'local': collections.defaultdict(list),
+        'central': collections.defaultdict(list)
+    }
 
     # validation folder name used by the packages to keep the validation
     # reference plots
@@ -176,26 +186,26 @@ def get_tracked_reference_files():
         for package in packages:
             # searches for a validation folder in any top-most folder (package
             # folders) and lists all root-files within
-            glob_search = os.path.join(root, package, validation_folder_name, "*.root")
-            revision_root_files = [
-                os.path.abspath(f) for f in glob.glob(glob_search)
-                if os.path.isfile(f)
-            ]
-            # todo: shouldn't that only be fore the validation package?
-            # also look in the folder containing the validation tests
             glob_search = os.path.join(
-                root,
-                package,
-                validation_test_folder_name,
-                "*.root"
+                root, package, validation_folder_name, "*.root"
             )
-            revision_root_files += [
+            results[location][package].extend([
                 os.path.abspath(f) for f in glob.glob(glob_search)
                 if os.path.isfile(f)
-            ]
-
-            # this looks very much like a root file, store
-            results[location][package].extend(revision_root_files)
+            ])
+            # Special case: The validation-test folder in the validation package
+            # which is used as a quick test of this framework.
+            if package == "validation":
+                glob_search = os.path.join(
+                    root,
+                    package,
+                    validation_test_folder_name,
+                    "*.root"
+                )
+                results[location][validation_test_folder_name].extend([
+                    os.path.abspath(f) for f in glob.glob(glob_search)
+                    if os.path.isfile(f)
+                ])
 
     # Now we need to get a rid of all the duplicates: Since local > central,
     # we will delete all central reference files that have a local counterpart.
@@ -409,14 +419,15 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
             line_color = ROOT.gROOT.GetColor(style.GetLineColor()).AsHexString()
         print("For {} index {} color {}".format(r, index, line_color))
 
-        # todo the creation date and git_hash of the original revision should be transferred here
+        # todo the creation date and git_hash of the original revision should
+        #  be transferred here
         comparison_revs.append(json_objects.ComparisonRevision(
             label=r,
             color=line_color)
         )
 
-    # todo: refactor this information extracion -> json inside a specific class / method after the
-    # plots have been created
+    # todo: refactor this information extracion -> json inside a specific
+    #  class / method after the plots have been created
     json_objects.dump(
         comparison_json_file,
         json_objects.Comparison(comparison_revs, comparison_packages)

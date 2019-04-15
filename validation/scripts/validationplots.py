@@ -281,9 +281,31 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     plot_files = get_plot_files(revisions[1:], work_folder)
     reference_files = get_plot_files(revisions[:1], work_folder)
 
+    # We don't want to plot tracked references only, so we have to collect all
+    # packages that have at least one plot of a new revision in them.
+    # Only exception: If 'reference' is the only revision we have, we show it
+    # because this is clearly what the user wants
+    plot_packages = set()
+    only_tracked_reference = \
+        set(plot_files.keys()) | set(reference_files.keys()) == {"reference"}
+    for results in [plot_files, reference_files]:
+        for rev in results:
+            if rev == "reference" and not only_tracked_reference:
+                continue
+            for package in results[rev]:
+                if results[rev][package]:
+                    plot_packages.add(package)
+
     # The dictionaries {package: {file: {key: [list of root objects]}}}
     plot_p2f2k2o = tobjects_from_files(plot_files, False, work_folder)
     reference_p2f2k2o = tobjects_from_files(reference_files, True, work_folder)
+
+    # Delete all that doesn't belong to a package that we want to plot:
+    for package in set(plot_p2f2k2o.keys()) - plot_packages:
+        del plot_p2f2k2o[package]
+    for package in set(reference_p2f2k2o.keys()) - plot_packages:
+        del reference_p2f2k2o[package]
+
     all_p2f2k2o = merge_nested_list_dicts(plot_p2f2k2o, reference_p2f2k2o)
 
     # Open the output file
@@ -305,15 +327,8 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     # Collect all plotuples for all the files
     all_plotuples = []
 
-    # Only plot packages where we have at least one plot (not just references)
-    packages = list(sorted(plot_p2f2k2o.keys()))
-    # A small edge case: If we only have references: Plot these, since the
-    # user obviously wants it
-    if not packages:
-        packages = list(sorted(reference_p2f2k2o))
-
     # for every package
-    for i, package in enumerate(packages):
+    for i, package in enumerate(plot_packages):
 
         # Some information to be printed out while the plots are created
         print(terminal_title_line(
@@ -341,7 +356,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                     process_queue.put_nowait(
                         {
                             "current_package": i,
-                            "total_package": len(packages),
+                            "total_package": len(plot_packages),
                             "status": "running",
                             "package_name": package,
                             "file_name": file_name

@@ -154,6 +154,7 @@ function loadSelectedRevisions() {
     console.log(`Loading revisions '${revList}' via string '${revString}'.`);
 
     setupRactiveFromRevision(revList);
+    loadCustomSelectionRequired(false);
 }
 
 /**
@@ -248,11 +249,12 @@ function onRevisionSelectionChanged(){
     // Since this also reset to 'Automatic', this probably also changed our
     // reference selection, so we call
     onReferenceSelectionChanged();
+    loadCustomSelectionRequired(true);
 }
 
 /**
- * This function gets called whenever the selection of the reference radio
- * buttons changes. 1. If anything else than the standard revision is selected,
+ * This function gets called whenever the selection of the reference changes.
+ * 1. If anything else than the standard revision is selected,
  * the standard revision is disabled (untick and disable checkbox).
  * 2. The reference revision will also be shown in the plots (tick checkbox)
  * 3. The reference revision is shown in bold.
@@ -285,6 +287,7 @@ function onReferenceSelectionChanged(){
             }
         );
     }
+    loadCustomSelectionRequired(true);
 }
 
 /**
@@ -366,6 +369,20 @@ function setRevisionSelection(revisionList) {
         obj.checked = revisionList.includes(obj.value);
     });
     onRevisionSelectionChanged();
+}
+
+// ============================================================================
+// MISC styling
+// ============================================================================
+
+function loadCustomSelectionRequired(required){
+    let button = $("#button-revision-load")[0];
+    if (required === true){
+        button.style.color = "#FF0000"
+    }
+    else{
+        button.style.color = "#000000"
+    }
 }
 
 // ============================================================================

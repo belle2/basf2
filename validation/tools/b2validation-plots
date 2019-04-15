@@ -89,7 +89,7 @@ def get_popular_revision_combinations(work_folder):
     # Return value
     ret = [
         # All revisions
-        ["reference"] + available,
+        ["reference"] + sorted(available),
 
         # Latest X + reference
         ["reference", atindex_or_none(available_releases, 0)],
@@ -97,15 +97,14 @@ def get_popular_revision_combinations(work_folder):
         ["reference", atindex_or_none(available_nightlies, 0)],
 
         # All latest + reference
-        [
-            "reference",
+        ["reference"] + sorted([
             atindex_or_none(available_releases, 0),
             atindex_or_none(available_builds, 0),
             atindex_or_none(available_nightlies, 0)
-        ],
+        ]),
 
         # All nightlies + reference
-        ["reference"] + available_nightlies
+        ["reference"] + sorted(available_nightlies)
     ]
 
     # Remove all Nones from the sublists

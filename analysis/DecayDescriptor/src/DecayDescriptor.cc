@@ -43,7 +43,7 @@ bool DecayDescriptor::init(const std::string& str)
   DecayString s;
   std::string::const_iterator iter = str.begin();
   std::string::const_iterator end = str.end();
-  bool r = phrase_parse(iter, end, g, boost::spirit::ascii::space, s);
+  bool r = phrase_parse(iter, end, g, boost::spirit::unicode::space, s);
   if (!r || iter != end) return false;
   return init(s);
 }

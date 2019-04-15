@@ -34,7 +34,7 @@ myMain.add_module(eventinfosetter)
 # to run the framework the used modules need to be registered
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('ParentParticle', 'vpho')
-evtgeninput.param('userDECFile', './WG6_validation.dec')
+evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('skim/validation/WG6_validation.dec'))
 evtgeninput.param('InclusiveParticle', 'D*+')
 evtgeninput.param('InclusiveType', 2)
 myMain.add_module(evtgeninput)

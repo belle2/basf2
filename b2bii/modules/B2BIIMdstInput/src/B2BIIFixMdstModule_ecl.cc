@@ -1320,12 +1320,13 @@ namespace Belle2 {
     // Correct energy and error matrix in Mdst_ecl.
     double factor;
     double factor13;
-    double shower_energy, shower_theta;
+
     for (std::vector<Belle::Mdst_ecl>::iterator itecl = eclmgr.begin();
          itecl != eclmgr.end(); ++itecl) {
       Belle::Mdst_ecl& shower = *itecl;
-      shower_energy = shower.energy();
-      shower_theta  = shower.theta();
+      // Shower energy and polar angle
+      double shower_energy = shower.energy();
+      double shower_theta  = shower.theta();
 
       // Fix wrong calib. for Exp. 45.
       //      if( Eno==45 )
@@ -1443,18 +1444,17 @@ namespace Belle2 {
       shower.error(3, shower.error(3) / factor); // Energy-theta.
 
       // Incriment Belle::Mdst_ecl_aux pointer.
-      itaux++;
+      ++itaux;
     }
 
     // Correct energy in Belle::Mdst_gamma.
-    double gamma_energy, gamma_cos;
     for (std::vector<Belle::Mdst_gamma>::iterator itgam = gammamgr.begin();
          itgam != gammamgr.end(); ++itgam) {
       Belle::Mdst_gamma& gamma = *itgam;
       // Create the gamma's 3vector
       CLHEP::Hep3Vector gamma_3v(gamma.px(), gamma.py(), gamma.pz());
-      gamma_energy = gamma_3v.mag();
-      gamma_cos    = gamma_3v.cosTheta();
+      double gamma_energy = gamma_3v.mag();
+      double gamma_cos    = gamma_3v.cosTheta();
 
       // control sequence by option and expmc.
       switch (option) {
@@ -1716,8 +1716,8 @@ namespace Belle2 {
           CLHEP::HepMatrix Dy(6, 1, 0);
 
           int iter = 0;
-          double Df, f_old = DBL_MAX;
-          double Dchi2, chi2_old = DBL_MAX;
+          double f_old = DBL_MAX;
+          double chi2_old = DBL_MAX;
           double /*mass_gg,*/ chi2 = DBL_MAX;
           bool exit_flag = false;
 
@@ -1766,9 +1766,9 @@ namespace Belle2 {
             y = y0 + Dy;
             int ierr;
             chi2 = (Dy.T() * V.inverse(ierr) * Dy)[0][0];
-            Dchi2 = fabs(chi2 - chi2_old);
+            double Dchi2 = fabs(chi2 - chi2_old);
             chi2_old = chi2;
-            Df = fabs(f[0][0] - f_old);
+            double Df = fabs(f[0][0] - f_old);
             f_old = f[0][0];
 
             // When chi-sq. change is small enough and mass is
@@ -2264,7 +2264,7 @@ namespace Belle2 {
     Belle::Mdst_gamma_Manager& Gamma  = Belle::Mdst_gamma_Manager::get_manager();
 
     for (std::vector<Belle::Mdst_gamma>::iterator
-         it = Gamma.begin(); it != Gamma.end(); it++) {
+         it = Gamma.begin(); it != Gamma.end(); ++it) {
       double r(it->ecl().r());
       double theta(it->ecl().theta());
       double phi(it->ecl().phi());

@@ -174,10 +174,11 @@ void convert_npz_ASCII_to_root( TString fileName = "total_memory.dat"){
 }
 
 int readDataFile(TString fileName, vector<double> &t_v, vector<double> &v_v, vector<double> &r_v, vector<double> &p_v, vector<double> &s_v){
-  double t,v,r,p,s;
+
   ifstream myfile (fileName.Data());
   int nn = 0;
   if(myfile.is_open()){
+    double t,v,r,p,s;
     while(myfile>>t>>v>>r>>p>>s){
       t_v.push_back(t);
       v_v.push_back(v);

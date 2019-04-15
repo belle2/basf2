@@ -67,7 +67,7 @@ namespace Belle2 {
 
       enum {NPAR = 3}; // well, it's actually 1...Daniel should update
 
-      virtual double PgFromPz(double pz);
+      double PgFromPz(double pz);
 
       void updateCache() const override;
 

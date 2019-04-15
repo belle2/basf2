@@ -49,6 +49,8 @@ void EKLMUnpackerModule::initialize()
 {
   m_RawKLMs.isRequired();
   m_Digits.registerInDataStore(m_outputDigitsName);
+  m_DigitEventInfos.registerInDataStore();
+  m_Digits.registerRelationTo(m_DigitEventInfos);
 }
 
 void EKLMUnpackerModule::beginRun()
@@ -73,7 +75,7 @@ void EKLMUnpackerModule::event()
   int endcap, layer, sector, strip = 0, stripGlobal;
   int laneNumber;
   int nBlocks;
-  uint16_t dataWords[4], triggerCTime;
+  uint16_t dataWords[4];
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
@@ -98,8 +100,10 @@ void EKLMUnpackerModule::event()
       uint16_t copperN = copperId - EKLM_ID;
       lane.setCopper(copperN);
       m_RawKLMs[i]->GetBuffer(j);
-      triggerCTime = m_RawKLMs[i]->GetTTCtime(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
+        KLMDigitEventInfo* eklmDigitEventInfo = m_DigitEventInfos.appendNew();
+        int triggerCTime = m_RawKLMs[i]->GetTTCtime(j) & 0xFFFF;
+        eklmDigitEventInfo->setTriggerCTime(triggerCTime);
         int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
@@ -152,6 +156,9 @@ void EKLMUnpackerModule::event()
             }
           }
         }
+        // in the last word there is the user word (from DCs)
+        int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+        eklmDigitEventInfo->setUserWord(userWord);
         for (int iHit = 0; iHit < numHits; iHit++) {
           dataWords[0] = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
           dataWords[1] =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
@@ -169,7 +176,7 @@ void EKLMUnpackerModule::event()
             if (!(m_IgnoreWrongHits ||
                   (stripFirmware == 0 && m_IgnoreStrip0))) {
               B2ERROR("Incorrect strip number in raw data."
-                      << LogVar("Strip number", strip));
+                      << LogVar("Strip number", stripFirmware));
             }
             if (!m_WriteWrongHits)
               continue;
@@ -212,10 +219,11 @@ void EKLMUnpackerModule::event()
                    endcap, layer, sector, plane, strip);
           }
           eklmDigit = m_Digits.appendNew();
+          eklmDigit->addRelationTo(eklmDigitEventInfo);
           eklmDigit->setCTime(ctime);
-          eklmDigit->setTriggerCTime(triggerCTime);
           eklmDigit->setTDC(tdc);
-          eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
+          eklmDigit->setTime(
+            m_TimeConversion->getTime(ctime, tdc, triggerCTime, true));
           eklmDigit->setEndcap(endcap);
           eklmDigit->setLayer(layer);
           eklmDigit->setSector(sector);
@@ -229,9 +237,9 @@ void EKLMUnpackerModule::event()
             if (channelData == nullptr)
               B2FATAL("Incomplete EKLM channel data.");
             if (charge < channelData->getThreshold())
-              eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+              eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
             else
-              eklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
+              eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
           }
         }
       }

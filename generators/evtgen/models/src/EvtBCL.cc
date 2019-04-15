@@ -26,6 +26,7 @@
 
 namespace Belle2 {
 
+  /** register the model in EvtGen */
   B2_EVTGEN_REGISTER_MODEL(EvtBCL);
 
   EvtBCL::EvtBCL() : bclmodel(nullptr), calcamp(nullptr) {}

@@ -44,7 +44,7 @@ namespace Belle2 {
 
     double R2EventLevel(const Particle*)
     {
-      B2WARNING("Since the introduction of the EventShape framework along with the ContinuumSuppression one, this variable is deprecated. Please call the buildEventshape() function and use the foxWolframR2 variable instead.");
+      B2WARNING("The variable R2EventLevel is deprecated. Use `foxWolframR2` and ma.buildEventShape(inputListNames=[], default_cleanup=True, allMoments=False, cleoCones=True, collisionAxis=True, foxWolfram=True, harmonicMoments=True, jets=True, sphericity=True, thrust=True, checkForDuplicates=False, path=analysis_main)");
 
       std::vector<TVector3> p3_all;
 
@@ -66,12 +66,12 @@ namespace Belle2 {
 
       StoreArray<ECLCluster> eclClusters;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of N1 (n photons) ECLClusters
-        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        // sum only ECLClusters which have the N1 (n photons) hypothesis
+        if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
 
         ClusterUtils C;
-        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i]);
+        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i], ECLCluster::EHypothesisBit::c_nPhotons);
         if (momECLCluster == momECLCluster) {
           if (eclClusters[i]->isNeutral()) {
             Particle particle(eclClusters[i]);

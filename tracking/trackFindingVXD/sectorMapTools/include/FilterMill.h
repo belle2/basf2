@@ -57,7 +57,7 @@ namespace Belle2 {
 
 
     /** to be executed by functions which shall work with unchangeable set of filters. */
-    void checkLocked(std::string name) const
+    void checkLocked(const std::string& name) const
     {
       if (!m_locked) {
         B2WARNING("FilterMill-checkLocked: Function " << name <<

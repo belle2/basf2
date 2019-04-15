@@ -232,7 +232,9 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float charge = cluster.getCharge();
   float size = cluster.size();
   float SNR = cluster.getSNR();
+  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
   float position = cluster.getPosition();
+  position -= info.getLorentzShift(isU, position);
   float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
   float time = cluster.getTime();
   float timeError = cluster.getTimeError(); //not implemented yet

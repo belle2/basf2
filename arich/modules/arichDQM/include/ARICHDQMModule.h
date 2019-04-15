@@ -88,7 +88,6 @@ namespace Belle2 {
     bool m_arichEvents; /**< process only events that have extrapolated hit in arich */
     int m_maxHits; /**< exclude events with very large number of hits in arich */
     int m_minHits; /**< exclude events with number of hits lower than this */
-    int m_hotThr; /**< Threshold scale of hits/channel to dicide hot channels */
 
     //Histograms to show status by 1/0
     TH1* h_chStat = NULL;/**<Status of each channels*/
@@ -114,6 +113,8 @@ namespace Belle2 {
     TH1* h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
     TH1* h_theta = NULL;/**<Reconstructed Cherenkov angles*/
     TH1* h_hitsPerTrack = NULL;/**<Average hits/track calculated from h_hits2D and h_track2D*/
+    TH1* h_trackPerEvent = NULL;/**<Number of tracks in ARICH per event (with p>0.5 GeV)*/
+    TH1* h_flashPerAPD = NULL;/**<Number of flashes in each APD */
 
     TH1* h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
     TH1* h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/

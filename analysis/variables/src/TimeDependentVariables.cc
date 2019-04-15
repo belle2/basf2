@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,19 +42,6 @@ namespace Belle2 {
   namespace Variable {
 
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
-
-
-    double particleMCTagBFlavor(const Particle* particle)
-    {
-      double result = 1000.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCTagBFlavor();
-
-      return result;
-    }
 
 
     // TagV x, y, z
@@ -139,7 +126,7 @@ namespace Belle2 {
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(0, 0);
+        result = sqrt(TagVErr(0, 0));
       }
 
       return result;
@@ -153,7 +140,7 @@ namespace Belle2 {
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(1, 1);
+        result = sqrt(TagVErr(1, 1));
       }
 
       return result;
@@ -167,7 +154,7 @@ namespace Belle2 {
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(2, 2);
+        result = sqrt(TagVErr(2, 2));
       }
 
       return result;
@@ -252,6 +239,21 @@ namespace Belle2 {
       return result;
     }
 
+    double particleDeltaZErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert) {
+        double zVariance = particle->getVertexErrorMatrix()(2, 2);
+        double TagVZVariance = vert->getTagVertexErrMatrix()(2, 2);
+        result = sqrt(zVariance + TagVZVariance);
+        if (std::isnan(result) or std::isinf(result)) result = -1111.0;
+      }
+      return result;
+    }
+
     double particleDeltaB(const Particle* particle)
     {
       double result = -1111.0;
@@ -264,6 +266,22 @@ namespace Belle2 {
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaT() * bg * c;
+      }
+      return result;
+    }
+
+    double particleDeltaBErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert) {
+        PCmsLabTransform T;
+        TVector3 boost = T.getBoostVector().BoostVector();
+        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+        double c = Const::speedOfLight / 1000.; // cm ps-1
+        result = vert->getDeltaTErr() * bg * c;
       }
       return result;
     }
@@ -483,13 +501,22 @@ namespace Belle2 {
     }
 
 
+    double particleInternalTagVMCFlavor(const Particle* particle)
+    {
+      double result = 1000.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getMCTagBFlavor();
+
+      return result;
+    }
 
 
 
 
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
-
-    REGISTER_VARIABLE("MCTagBFlavor", particleMCTagBFlavor, "Tag MC Tag B Flavor information");
 
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
     REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
@@ -510,7 +537,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
                       "Generated Delta T(Brec - Btag) in ps");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
+    REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr, "Error of the difference Z(Brec) - Z(Btag)");
     REGISTER_VARIABLE("DeltaBoost", particleDeltaB, "Boost direction: Brec - Btag");
+    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, "Error of the difference in Boost direction: Brec - Btag");
 
     REGISTER_VARIABLE("LBoost", vertexBoostDirection,
                       "Returns the vertex component in the boost direction");
@@ -538,6 +567,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVOBoostErr", tagVErrOrthogonalBoostDirection,
                       "Returns the error of TagV in the direction orthogonal to the boost");
 
+    REGISTER_VARIABLE("internalTagVMCFlavor", particleInternalTagVMCFlavor,
+                      "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"
+                      "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
   }
 }
 

@@ -13,6 +13,8 @@
 
 #include <framework/datastore/RelationsObject.h>
 
+#include <string>
+
 namespace Belle2 {
 
   /**
@@ -81,6 +83,47 @@ namespace Belle2 {
                unsigned int psnmBits[10],
                ETimingType timType);
 
+    /** check whether any psnm bit is set
+     * @return True if triggered by L1
+     */
+    bool test() const;
+
+    /** check whether an input bit is set
+     * @param bit index of input bit.
+     * @return True if the bit is set
+     */
+    bool testInput(unsigned int bit) const;
+
+    /** check whether an input bit is set
+     * @param name name of input bit.
+     * @return True if the bit is set
+     */
+    bool testInput(const std::string& name) const {return testInput(getInputBitNumber(name));}
+
+    /** check whether a ftdl bit is set
+     * @param bit index of ftdl bit.
+     * @return True if the bit is set
+     */
+    bool testFtdl(unsigned int bit) const;
+
+    /** check whether a ftdl bit is set
+     * @param name name of ftdl bit.
+     * @return True if the bit is set
+     */
+    bool testFtdl(const std::string& name) const {return testFtdl(getOutputBitNumber(name));}
+
+    /** check whether a psnm bit is set
+     * @param bit index of psnm bit.
+     * @return True if the bit is set
+     */
+    bool testPsnm(unsigned int bit) const;
+
+    /** check whether a psnm bit is set
+     * @param name name of psnm bit.
+     * @return True if the bit is set
+     */
+    bool testPsnm(const std::string& name) const {return testPsnm(getOutputBitNumber(name));}
+
     /**set the Final Trigger Decision Logic bit*/
     void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
 
@@ -145,6 +188,18 @@ namespace Belle2 {
 
   private:
 
+    /** get number of an input trigger bit
+     * @param name input trigger bit name
+     * @return     input trigger bit number
+    */
+    unsigned int getInputBitNumber(const std::string& name) const;
+
+    /** get number of an output trigger bit
+     * @param name output trigger bit name
+     * @return     output trigger bit number
+    */
+    unsigned int getOutputBitNumber(const std::string& name) const;
+
     /** return the td part of an HTML table with green of the bit is > 0 */
     std::string outputBitWithColor(bool bit) const;
 
@@ -172,7 +227,6 @@ namespace Belle2 {
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
     ClassDefOverride(TRGSummary, 5);
-
   };
 
 

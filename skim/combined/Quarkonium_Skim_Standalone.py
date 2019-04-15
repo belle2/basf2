@@ -13,7 +13,7 @@ from modularAnalysis import *
 from stdPhotons import *
 from stdCharged import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 # create a new path
 skimpath = Path()

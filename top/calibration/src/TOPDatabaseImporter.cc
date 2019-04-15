@@ -282,6 +282,51 @@ namespace Belle2 {
   }
 
 
+  void TOPDatabaseImporter::importChannelT0(std::string fileName,
+                                            int expNo, int firstRun, int lastRun)
+  {
+    // declare db object to be imported -- and construct it
+    DBImportObjPtr<TOPCalChannelT0> channelT0;
+    channelT0.construct();
+
+    // open the root file
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // loop over slots and set channel T0
+    int nModules = TOPGeometryPar::Instance()->getGeometry()->getNumModules();
+    int count = 0;
+    for (int moduleID = 1; moduleID <= nModules; moduleID++) {
+      std::string name = "channelT0_slot";
+      if (moduleID < 10) name += "0";
+      name += std::to_string(moduleID);
+      auto* h = (TH1F*) file->Get(name.c_str());
+      if (!h) {
+        B2ERROR("Histogram with name '" + name + "' not found");
+        continue;
+      }
+      for (int channel = 0; channel < h->GetNbinsX(); channel++) {
+        double value = h->GetBinContent(channel + 1);
+        double error = h->GetBinError(channel + 1);
+        channelT0->setT0(moduleID, channel, value, error);
+        count++;
+      }
+    }
+    file->Close();
+
+    // import to database
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    channelT0.import(iov);
+
+    B2INFO("Channel T0 for exp " << expNo << " run " << firstRun << " to " << lastRun
+           << " imported. Calibrated channels: " << count << "/" << nModules * 512);
+
+  }
+
 
   void TOPDatabaseImporter::importOfflineCommonT0Calibration(string fileName,
                                                              int firstExp, int firstRun,
@@ -354,7 +399,18 @@ namespace Belle2 {
     B2INFO("   ");
   }
 
+  void TOPDatabaseImporter::importCommonT0(double value, double error,
+                                           int expNo, int firstRun, int lastRun)
+  {
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct(value, error);
 
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    commonT0.import(iov);
+
+    B2INFO("--> constants for exp = " << expNo
+           << " run = " << firstRun << " to " << lastRun << " imported");
+  }
 
   void TOPDatabaseImporter::importModuleT0Calibration(string fileName,
                                                       int firstExp, int firstRun,
@@ -403,6 +459,44 @@ namespace Belle2 {
       B2INFO("--> Time offset of Slot " << iSlot << " = " << moduleT0->getT0(iSlot));
     }
 
+
+  }
+
+
+  void TOPDatabaseImporter::importModuleT0(std::string fileName,
+                                           int expNo, int firstRun, int lastRun)
+  {
+
+    // construct DB import object
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+
+    // open the root file
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // get histogram and set the DB import object
+    auto* h = (TH1F*) file->Get("moduleT0");
+    if (not h) {
+      B2ERROR("no histogram 'moduleT0' found in the file, nothing imported");
+      return;
+    }
+    for (int slot = 1; slot <= h->GetNbinsX(); slot++) {
+      double value = h->GetBinContent(slot);
+      double error = h->GetBinError(slot);
+      moduleT0->setT0(slot, value, error);
+    }
+    file->Close();
+
+    // import the object
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    moduleT0.import(iov);
+
+    B2INFO("Module T0 constants imported to database");
 
   }
 

@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jkumar@andrew.cmu.edu</contact>
   <description>check log-likelihood difference pi vs. K</description>
 </header>
 */
@@ -67,7 +67,7 @@ void plot(const TString &input_filename)
       } else {
         hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible (esp. for low momenta), with almost no entries >0 "));
       }
-      hist->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+      hist->GetListOfFunctions()->Add(new TNamed("Contact","jkumar@andrew.cmu.edu"));
       hist->Write();
 
     }

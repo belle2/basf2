@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import argparse
+import basf2.utils as b2utils
+import ROOT
+from ROOT import Belle2
 """
 Makes analysis variables (which can be used in many of the functions defined
 in :mod:`modularAnalysis`) available to Python.
@@ -10,14 +14,7 @@ from ROOT import gSystem
 gSystem.Load('libanalysis.so')
 
 # import everything into current namespace.
-from ROOT import Belle2
 variables = Belle2.Variable.Manager.Instance()
-
-import ROOT
-
-import basf2.utils as b2utils
-import pager
-import argparse
 
 
 def std_vector(*args):
@@ -58,3 +55,15 @@ def printVars():
             rows.append([group])
         rows.append([name, description])
     b2utils.pretty_print_description_list(rows)
+
+
+def getAllTrgNames():
+    """
+    Return all PSNM trigger bit names
+    """
+
+    bits = Belle2.PyDBObj('TRGGDLDBFTDLBits')
+    evt = Belle2.EventMetaData()
+    Belle2.DBStore.Instance().update(evt)
+    size = Belle2.TRGSummary.c_ntrgWords * Belle2.TRGSummary.c_trgWordSize
+    return [bits.getoutbitname(i) for i in range(size) if bits.getoutbitname(i) != '']

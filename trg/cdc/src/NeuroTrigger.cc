@@ -246,10 +246,12 @@ NeuroTrigger::setConstants()
 }
 
 void
-NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName)
+NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName, std::string et_option)
 {
   m_segmentHits.isRequired(hitCollectionName);
-  m_eventTime.isRequired(eventTimeName);
+  if (!(et_option == "fastestpriority") || !(et_option == "zero")) {
+    m_eventTime.isRequired(eventTimeName);
+  }
   m_hitCollectionName = hitCollectionName;
 }
 

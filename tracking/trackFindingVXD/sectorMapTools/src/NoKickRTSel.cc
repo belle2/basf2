@@ -130,10 +130,9 @@ bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
 
 bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, NoKickCuts::EParameters par, bool is0)
 {
-  double deltaPar = 0;
-  //double selCutPXD =0;
   if (hit2.m_sensorLayer - hit1.m_sensorLayer > 1) return true;
   else {
+    double deltaPar = 0;
     switch (par) {
       case NoKickCuts::c_Omega:
         deltaPar = fabs(hit1.getOmegaEntry() - hit2.getOmegaEntry());
@@ -171,20 +170,16 @@ bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> se
       usedCut = fabs(selCut.at(0));
     } else usedCut = fabs(selCut.at(1));
 
-    // if (hit2.m_sensorLayer==1 || hit2.m_sensorLayer==2 || hit1.m_sensorLayer==1 || hit1.m_sensorLayer == 2){
-    //   usedCut = selCutPXD;
-    // }
-
     if (deltaPar > -usedCut && deltaPar < usedCut) return true;
     else {
-      B2DEBUG(75, "--------------------------");
-      B2DEBUG(75, "lay1=" << hit1.m_sensorLayer);
-      B2DEBUG(75, "lay2=" << hit2.m_sensorLayer);
-      B2DEBUG(75, "parameter=" << par);
-      B2DEBUG(75, "Min=" << selCut.at(0));
-      B2DEBUG(75, "Max=" << selCut.at(1));
-      B2DEBUG(75, "deltaPar=" << deltaPar);
-      B2DEBUG(75, "momentum=" << hit1.m_momentum0.Mag());
+      B2DEBUG(20, "--------------------------");
+      B2DEBUG(20, "lay1=" << hit1.m_sensorLayer);
+      B2DEBUG(20, "lay2=" << hit2.m_sensorLayer);
+      B2DEBUG(20, "parameter=" << par);
+      B2DEBUG(20, "Min=" << selCut.at(0));
+      B2DEBUG(20, "Max=" << selCut.at(1));
+      B2DEBUG(20, "deltaPar=" << deltaPar);
+      B2DEBUG(20, "momentum=" << hit1.m_momentum0.Mag());
       return false;
     }
   }
@@ -203,8 +198,7 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
     m_pt = sqrt(track.getMomentumSeed().X() * track.getMomentumSeed().X() + track.getMomentumSeed().Y() * track.getMomentumSeed().Y());
   }
 
-  bool good = true;
-  good = globalCut(m_8hitTrack);
+  bool good = globalCut(m_8hitTrack);
   if (good == false) {
     if (m_outputFlag) {
       m_numberOfCuts = -1; //it means "no specific cuts applied, but rejected for global cuts"
@@ -249,9 +243,6 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
         m_numberOfCuts++;
       }
       if (i == 0) { //beampipe crossing
-        std::vector<double> selCut0 = m_trackCuts.cutSelector(sinTheta, momentum, 0, m_8hitTrack.at(i).m_sensorLayer,
-                                                              (NoKickCuts::EParameters) j);
-
         bool goodSeg0 = segmentSelector(m_8hitTrack.at(i), m_8hitTrack.at(i), selCut, (NoKickCuts::EParameters) j, true);
         if (!goodSeg0) {
           good = false;

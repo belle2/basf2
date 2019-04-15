@@ -394,7 +394,9 @@ void RootInputModule::readTree()
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
     if (!m_recovery or fileMetaData)
-      B2INFO("Loading new input file with physical path:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
+      B2INFO("Loading new input file"
+             << LogVar("filename", m_tree->GetFile()->GetName())
+             << LogVar("metadata LFN", fileMetaData->getLfn()));
     if (m_processingAllEvents) {
       // add the MCEvents together so that the output contains the sum of generated events
       unsigned int mcEvents = fileMetaData->getMcEvents() + Environment::Instance().getNumberOfMCEvents();
@@ -511,7 +513,8 @@ bool RootInputModule::createParentStoreEntries()
     TFile* file = TFile::Open(parentPfn.c_str(), "READ");
     dir->cd();
     if (!file || !file->IsOpen()) {
-      B2ERROR("Couldn't open parent file " << parentLfn << " " << parentPfn);
+      B2ERROR("Couldn't open parent file. Maybe you need to create a file catalog using b2file-catalog-add?"
+              << LogVar("LFN", parentLfn) << LogVar("PFN", parentPfn));
       return false;
     }
 
@@ -560,7 +563,7 @@ bool RootInputModule::readParentTrees()
     TTree* tree = nullptr;
     if (m_parentTrees.find(parentLfn) == m_parentTrees.end()) {
       TDirectory* dir = gDirectory;
-      B2DEBUG(100, "Opening parent file: " << parentPfn);
+      B2DEBUG(100, "Opening parent file" << LogVar("PFN", parentPfn));
       TFile* file = TFile::Open(parentPfn.c_str(), "READ");
       dir->cd();
       if (!file || !file->IsOpen()) {

@@ -108,22 +108,16 @@ namespace Belle2 {
       return double(out);
     }
 
-    double nECLClusters(const Particle*)
-    {
-      StoreArray<ECLCluster> eclClusters;
-      return eclClusters.getEntries();
-    }
-
     double belleECLEnergy(const Particle*)
     {
       StoreArray<ECLCluster> eclClusters;
       double result = 0;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of N1 (n photons) ECLClusters
-        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        // sum only ECLClusters which have the N1 (n photons) hypothesis
+        if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
 
-        result += eclClusters[i]->getEnergy();
+        result += eclClusters[i]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       }
       return result;
     }
@@ -502,8 +496,6 @@ namespace Belle2 {
                       "removed from particle lists but a large number charge zero "
                       "fits them may indicate problems with whole event constraints "
                       "or abnominally high beam backgrounds and/or noisy events.")
-    REGISTER_VARIABLE("nECLClusters", nECLClusters,
-                      "[Eventbased] number of ECL in the event");
     REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy,
                       "[Eventbased] legacy total energy in ECL in the event as used in Belle 1 analyses. For Belle II "
                       "consider totalEnergyOfParticlesInList(gamma:all) instead");
@@ -534,6 +526,20 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
 
+    REGISTER_VARIABLE("date", eventYearMonthDay,
+                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
+                      " See also eventYear, provided for convenience."
+                      " For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+    REGISTER_VARIABLE("year", eventYear,
+                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
+                      "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+    REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
+                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
+    REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
+                      "[Eventbased] Remainder of the event time in fractions of a second.\n"
+                      "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
+
+    VARIABLE_GROUP("EventKinematics");
 
     REGISTER_VARIABLE("missingMomentumOfEvent", missingMomentumOfEvent,
                       "[Eventbased] The magnitude of the missing momentum in lab obtained with EventKinematics module")
@@ -563,18 +569,6 @@ namespace Belle2 {
                       "[Eventbased] The visible energy in CMS obtained with EventKinematics module")
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,
                       "[Eventbased] The energy in lab of all the photons obtained with EventKinematics module");
-    REGISTER_VARIABLE("date", eventYearMonthDay,
-                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
-                      " See also eventYear, provided for convenience."
-                      " For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
-    REGISTER_VARIABLE("year", eventYear,
-                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
-                      "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
-    REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
-                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
-    REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
-                      "[Eventbased] Remainder of the event time in fractions of a second.\n"
-                      "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0,

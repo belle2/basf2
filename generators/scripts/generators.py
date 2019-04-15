@@ -15,7 +15,7 @@ import os
 
 def get_default_decayfile():
     """Return the default DECAY.dec for Belle2"""
-    return Belle2.FileSystem.findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC")
+    return Belle2.FileSystem.findFile("decfiles/dec/DECAY_BELLE2.DEC")
 
 
 def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, subweights=[], maxsubweight=1, maxfinalweight=3.0):

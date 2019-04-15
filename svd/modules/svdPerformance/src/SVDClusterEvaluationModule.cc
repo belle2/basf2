@@ -58,13 +58,6 @@ void SVDClusterEvaluationModule::initialize()
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
-  m_width_LargeS_U = 5.772;
-  m_width_LargeS_V = 12.290;
-  m_width_SmallS_U = 3.855;
-  m_width_SmallS_V = m_width_LargeS_V;
-
-  m_safety_margin = 0.2;
-
   m_UbinWidth /= m_cmTomicron;
   m_VbinWidth /= m_cmTomicron;
 

@@ -40,27 +40,28 @@ namespace Belle2 {
 
       //Constructor
 
+      /** default constructor*/
       SVDPackerModule();
 
+      /**default destructor*/
       virtual ~SVDPackerModule();
 
-      virtual void initialize() override;
-      virtual void beginRun() override;
-      virtual void event() override;
-      virtual void endRun() override;
+      virtual void initialize() override; /**<initialize*/
+      virtual void beginRun() override; /**<begin run*/
+      virtual void event() override; /**<event*/
+      virtual void endRun() override; /**<end run*/
+      virtual void terminate() override; /**<terminate*/
 
-      virtual void terminate() override;
 
+      std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
+      std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
 
-      std::string m_rawSVDListName;
-      std::string m_svdShaperDigitListName;
-
-      bool m_simulate3sampleData;
+      bool m_simulate3sampleData; /**<if true, simulate 3-sample data taking*/
 
 
     private:
 
-
+      /** type def for the FADC map*/
       typedef std::unordered_map<unsigned short, unsigned short> FADCmap;
 
       /**how many FADCs we have */
@@ -69,32 +70,33 @@ namespace Belle2 {
       /** pointer to APVforFADCmap filled by mapping procedure */
       std::unordered_multimap<unsigned char, unsigned char>* APVmap;
 
-      int n_basf2evt; //event number
-      int m_nodeid; // Node ID
+      int n_basf2evt; /**<event number*/
+      int m_nodeid; /**< Node ID*/
 
-      static std::string m_xmlFileName;
-      DBObjPtr<PayloadFile> m_mapping;
+      static std::string m_xmlFileName /**< channel mapping xml filename*/;
+      DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
 
-      std::unique_ptr<SVDOnlineToOfflineMap> m_map;
-      //SVDStripNoiseMap* m_noiseMap;
+      std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<map*/
 
       /**maps containing assignment (0,1,2,3,4,..,nFADCboards-1) <-> FADC numbers  */
       FADCmap FADCnumberMap;
+      /**maps containing assignment (0,1,2,3,4,..,nFADCboards-1) <-> FADC numbers  */
       FADCmap FADCnumberMapRev;
 
-      std::vector<uint32_t> data_words;
+      std::vector<uint32_t> data_words; /**<data words*/
 
       //adds data32 to data vector and to crc16Input for further crc16 calculation
       void inline addData32(uint32_t adata32)
       {
         data_words.push_back(adata32);
       }
-
+      /** tool: print out N words*/
       void binPrintout(unsigned int nwords);
 
+      /** 6 samples and APV  channel struct*/
       struct DataInfo {
-        short data[6];
-        unsigned short channel;
+        short data[6]; /**6 samples*/
+        unsigned short channel; /**APV channel number*/
       } dataInfo;
 
 
@@ -107,8 +109,8 @@ namespace Belle2 {
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
         unsigned int trgType : 4;
-        unsigned int trgTiming : 3;
-        unsigned int onebit : 1;
+        unsigned int trgTiming : 2;
+        unsigned int xTalk : 2;
         unsigned int FADCnum : 8;
         unsigned int evtType : 1; // Event type(0): 0…TTD event, 1…standalone event
         unsigned int DAQMode : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
@@ -148,7 +150,8 @@ namespace Belle2 {
 
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
-        unsigned int emPipeAddr: 8;
+        unsigned int dataSizeCut: 1;
+        unsigned int nullDigits: 7;
         unsigned int fifoErrOR: 1;
         unsigned int frameErrOR: 1;
         unsigned int detectErrOR: 1;
@@ -177,7 +180,7 @@ namespace Belle2 {
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
       StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
       StoreArray<SVDShaperDigit> m_svdShaperDigit; /**< Required input for SVDShaperDigit */
-      int m_FADCTriggerNumberOffset;
+      int m_FADCTriggerNumberOffset; /**< FADC trigger numnber offset*/
 
     };
   } //SVD

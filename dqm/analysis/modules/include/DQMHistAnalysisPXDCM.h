@@ -32,6 +32,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDCMModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDCMModule();
   private:
 
     //! Module functions to be called from main process
@@ -55,8 +57,12 @@ namespace Belle2 {
     TH2F* m_hCommonMode = nullptr;
     //! Final Canvas
     TCanvas* m_cCommonMode = nullptr;
-    //! Lines in the Canvas to guide the eye
-    TLine* m_line1 = nullptr, *m_line2 = nullptr, *m_line3 = nullptr;
+    //! Line in the Canvas to guide the eye
+    TLine* m_line1 = nullptr;
+    //! Line in the Canvas to guide the eye
+    TLine* m_line2 = nullptr;
+    //! Line in the Canvas to guide the eye
+    TLine* m_line3 = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! one epics PV

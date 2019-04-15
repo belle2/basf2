@@ -198,6 +198,7 @@ namespace {
     EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("DOES_NOT_EXIST.root"), std::runtime_error);
 
     {
+      // cppcheck-suppress unreadVariable
       std::fstream file("INVALID.root");
     }
     EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("INVALID.root"), std::runtime_error);
@@ -309,6 +310,7 @@ namespace {
       weightfile2.setRemoveTemporaryDirectories(true);
       filename = weightfile2.generateFileName(".xml");
       {
+        // cppcheck-suppress unreadVariable
         std::ofstream a(filename);
       }
       EXPECT_TRUE(boost::filesystem::exists(filename));
@@ -320,6 +322,7 @@ namespace {
       weightfile2.setRemoveTemporaryDirectories(false);
       filename = weightfile2.generateFileName(".xml");
       {
+        // cppcheck-suppress unreadVariable
         std::ofstream a(filename);
       }
       EXPECT_TRUE(boost::filesystem::exists(filename));

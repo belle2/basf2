@@ -88,7 +88,7 @@ namespace Belle2 {
       /// Returns the name of the constraint
       virtual const char* getName() const;
       /// Set object's name
-      virtual void setName(const char* name_);
+      void setName(const char* name_);
 
       /// Get first order derivatives of the constraint function
       /// Call this with a predefined array "der" with the necessary number of entries!

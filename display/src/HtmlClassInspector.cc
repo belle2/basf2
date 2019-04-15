@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher                                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <display/HtmlClassInspector.h>
 
 #include <framework/utilities/HTML.h>
@@ -8,6 +18,8 @@
 #include <TStreamerInfo.h>
 #include <TStreamerElement.h>
 #include <TROOT.h>
+
+#include <string>
 
 using namespace Belle2;
 
@@ -156,7 +168,9 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
           }
         }
         if (isPrintable) {
-          strncpy(line + kvalue, *ppointer, i);
+          //strncpy(line + kvalue, *ppointer, i);
+          std::string out(*ppointer);
+          out.copy(line + kvalue, i);
           line[kvalue + i] = 0;
         } else {
           line[kvalue] = 0;
@@ -177,7 +191,10 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
         }
       }
       if (isPrintable) {
-        strncpy(line + kvalue, *ppointer, i);
+        std::string out(*ppointer);
+        out.copy(line + kvalue, i);
+        //strncpy(line + kvalue, *ppointer, i); //
+
         line[kvalue + i] = 0;
       } else {
         line[kvalue] = 0;

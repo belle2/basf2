@@ -32,9 +32,6 @@ namespace Belle2 {
     DATCONMostProbableHit(VxdID sensorID, TVector2 localCoordinate, double qualityOfHit):
       m_sensorID(sensorID), m_localCoordinate(localCoordinate), m_qualityOfHit(qualityOfHit) {}
 
-    /** Basic destructor */
-    ~DATCONMostProbableHit() {}
-
     /** Get sensor ID */
     VxdID getSensorID()           { return m_sensorID; }
     /** Get local coordinate */

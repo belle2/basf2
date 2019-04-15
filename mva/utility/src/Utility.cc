@@ -25,6 +25,8 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <regex>
+#include <fstream>
 
 namespace Belle2 {
   namespace MVA {
@@ -58,6 +60,27 @@ namespace Belle2 {
         weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
       }
       Belle2::MVA::Weightfile::saveToDatabase(weightfile, identifier, iov);
+    }
+
+    void upload_array(std::vector<std::string>& filenames, const std::string& identifier, int exp1, int run1, int exp2, int run2)
+    {
+      Belle2::IntervalOfValidity iov(exp1, run1, exp2, run2);
+
+      std::vector<Belle2::MVA::Weightfile> weightfiles;
+      for (const auto& filename : filenames) {
+
+        Belle2::MVA::Weightfile weightfile;
+        if (boost::ends_with(filename, ".root")) {
+          weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(filename);
+        } else  if (boost::ends_with(filename, ".xml")) {
+          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
+        } else {
+          std::cerr << "Unkown file extension, fallback to xml" << std::endl;
+          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
+        }
+        weightfiles.push_back(weightfile);
+      }
+      Belle2::MVA::Weightfile::saveArrayToDatabase(weightfiles, identifier, iov);
     }
 
     void extract(const std::string& filename, const std::string& directory)
@@ -165,10 +188,6 @@ namespace Belle2 {
         std::chrono::duration<double, std::milli> training_time = stop - start;
         B2INFO("Elapsed application time in ms " << training_time.count() << " for " << general_options.m_identifier);
         for (auto& r : results) {
-          // Suppress cppcheck false positive
-          // style: Variable 'result' is assigned a value that is never used.
-          // However, it is used, by branch->Fill() internally
-          // cppcheck-suppress *
           result = r;
           branch->Fill();
         }
@@ -180,10 +199,6 @@ namespace Belle2 {
           auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
           auto targets = data.getTargets();
           for (auto& t : targets) {
-            // Suppress cppcheck false positive
-            // style: Variable 'result' is assigned a value that is never used.
-            // However, it is used, by branch->Fill() internally
-            // cppcheck-suppress *
             target = t;
             target_branch->Fill();
           }
@@ -195,6 +210,27 @@ namespace Belle2 {
       tree.SetEntries();
       file.Write("variables");
 
+    }
+
+    void save_custom_weightfile(const GeneralOptions& general_options, const SpecificOptions& specific_options,
+                                const std::string& custom_weightfile, const std::string& output_identifier)
+    {
+      std::ifstream ifile(custom_weightfile);
+      if (!(bool)ifile) {
+        B2FATAL("Input weight file: " << custom_weightfile << " does not exist!");
+      }
+
+      Weightfile weightfile;
+      weightfile.addOptions(general_options);
+      weightfile.addOptions(specific_options);
+      weightfile.addFile(general_options.m_identifier + "_Weightfile", custom_weightfile);
+      std::string output_weightfile(custom_weightfile);
+      if (!output_identifier.empty()) {
+        std::regex to_replace("(\\.\\S+$)");
+        std::string replacement = "_" + output_identifier + "$0";
+        output_weightfile = std::regex_replace(output_weightfile, to_replace, replacement);
+      }
+      Weightfile::save(weightfile, output_weightfile);
     }
 
     void teacher(const GeneralOptions& general_options, const SpecificOptions& specific_options, const MetaOptions& meta_options)

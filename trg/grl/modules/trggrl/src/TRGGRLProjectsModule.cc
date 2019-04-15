@@ -350,16 +350,16 @@ void TRGGRLProjectsModule::event()
   int Trk_b2b_1to9 = 0;
   for (int itrk = 0; itrk < cdc2DTrkArray.getEntries(); itrk++) {
 
-    int phi_i_itrk = (cdc2DTrkArray[itrk]->getPhi0()) / 10;
+    int phi_i_itrk = (int)((cdc2DTrkArray[itrk]->getPhi0()) * (180 / M_PI) / 10);
 
     for (int jtrk = 0; jtrk < cdc2DTrkArray.getEntries(); jtrk++) {
       if (itrk <= jtrk) continue;
 
-      int phi_i_jtrk = cdc2DTrkArray[jtrk]->getPhi0() / 10;
-      if (abs(phi_i_itrk - phi_i_jtrk) <= 17 && abs(phi_i_itrk - phi_i_jtrk) >= 19) {Trk_b2b_1to3 = 1;}
-      if (abs(phi_i_itrk - phi_i_jtrk) <= 16 && abs(phi_i_itrk - phi_i_jtrk) >= 20) {Trk_b2b_1to5 = 1;}
-      if (abs(phi_i_itrk - phi_i_jtrk) <= 15 && abs(phi_i_itrk - phi_i_jtrk) >= 21) {Trk_b2b_1to7 = 1;}
-      if (abs(phi_i_itrk - phi_i_jtrk) <= 14 && abs(phi_i_itrk - phi_i_jtrk) >= 22) {Trk_b2b_1to9 = 1;}
+      int phi_i_jtrk = (int)((cdc2DTrkArray[jtrk]->getPhi0()) * (180 / M_PI) / 10);
+      if (abs(phi_i_itrk - phi_i_jtrk) >= 17 && abs(phi_i_itrk - phi_i_jtrk) <= 19) {Trk_b2b_1to3 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) >= 16 && abs(phi_i_itrk - phi_i_jtrk) <= 20) {Trk_b2b_1to5 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) >= 15 && abs(phi_i_itrk - phi_i_jtrk) <= 21) {Trk_b2b_1to7 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) >= 14 && abs(phi_i_itrk - phi_i_jtrk) <= 22) {Trk_b2b_1to9 = 1;}
     }
   }
   trgInfo->setTrk_b2b_1to3(Trk_b2b_1to3);
@@ -378,11 +378,11 @@ void TRGGRLProjectsModule::event()
     double x_iclu = eclTrgClusterArray[iclu]->getPositionX();
     double y_iclu = eclTrgClusterArray[iclu]->getPositionY();
 
-    int phi_iclu;
-    if (x_iclu >= 0 && y_iclu >= 0) {phi_iclu = atan(y_iclu / x_iclu) / 10;}
-    else if (x_iclu < 0 && y_iclu >= 0) {phi_iclu = (atan(y_iclu / x_iclu) + M_PI) / 10;}
-    else if (x_iclu < 0 && y_iclu < 0) {phi_iclu = (atan(y_iclu / x_iclu) + M_PI) / 10;}
-    else if (x_iclu >= 0 && y_iclu < 0) {phi_iclu = (atan(y_iclu / x_iclu) + 2 * M_PI) / 10;}
+    int phi_iclu = 0;
+    if (x_iclu >= 0 && y_iclu >= 0) {phi_iclu = (int)(atan(y_iclu / x_iclu) * (180.0 / M_PI) / 10);}
+    else if (x_iclu < 0 && y_iclu >= 0) {phi_iclu = (int)((atan(y_iclu / x_iclu) * (180.0 / M_PI) + 180.0) / 10);}
+    else if (x_iclu < 0 && y_iclu < 0) {phi_iclu = (int)((atan(y_iclu / x_iclu) * (180.0 / M_PI) + 180.0) / 10);}
+    else if (x_iclu >= 0 && y_iclu < 0) {phi_iclu = (int)((atan(y_iclu / x_iclu) * (180.0 / M_PI) + 360.0) / 10);}
 
     for (int jclu = 0; jclu < eclTrgClusterArray.getEntries(); jclu++) {
       if (iclu <= jclu) continue;
@@ -391,15 +391,15 @@ void TRGGRLProjectsModule::event()
       double y_jclu = eclTrgClusterArray[jclu]->getPositionY();
 
       int phi_jclu = 0;
-      if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = atan(y_jclu / x_jclu) / 10;}
-      else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
-      else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
-      else if (x_jclu >= 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + 2 * M_PI) / 10;}
+      if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = (int)(atan(y_jclu / x_jclu) * (180.0 / M_PI) / 10);}
+      else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (int)((atan(y_jclu / x_jclu) * (180.0 / M_PI) + 180.0) / 10);}
+      else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (int)((atan(y_jclu / x_jclu) * (180.0 / M_PI) + 180.0) / 10);}
+      else if (x_jclu >= 0 && y_jclu < 0) {phi_jclu = (int)((atan(y_jclu / x_jclu) * (180.0 / M_PI) + 360.0) / 10);}
 
-      if (abs(phi_iclu - phi_jclu) <= 17 && abs(phi_iclu - phi_jclu) >= 19) {cluster_b2b_1to3 = 1;}
-      if (abs(phi_iclu - phi_jclu) <= 16 && abs(phi_iclu - phi_jclu) >= 20) {cluster_b2b_1to5 = 1;}
-      if (abs(phi_iclu - phi_jclu) <= 15 && abs(phi_iclu - phi_jclu) >= 21) {cluster_b2b_1to7 = 1;}
-      if (abs(phi_iclu - phi_jclu) <= 14 && abs(phi_iclu - phi_jclu) >= 22) {cluster_b2b_1to9 = 1;}
+      if (abs(phi_iclu - phi_jclu) >= 17 && abs(phi_iclu - phi_jclu) <= 19) {cluster_b2b_1to3 = 1;}
+      if (abs(phi_iclu - phi_jclu) >= 16 && abs(phi_iclu - phi_jclu) <= 20) {cluster_b2b_1to5 = 1;}
+      if (abs(phi_iclu - phi_jclu) >= 15 && abs(phi_iclu - phi_jclu) <= 21) {cluster_b2b_1to7 = 1;}
+      if (abs(phi_iclu - phi_jclu) >= 14 && abs(phi_iclu - phi_jclu) <= 22) {cluster_b2b_1to9 = 1;}
     }
   }
   trgInfo->setcluster_b2b_1to3(cluster_b2b_1to3);
@@ -443,23 +443,23 @@ void TRGGRLProjectsModule::event()
 
     if (phi_CDC > 2 * M_PI) {phi_CDC = phi_CDC - 2 * M_PI;}
     else if (phi_CDC < 0) {phi_CDC = phi_CDC + 2 * M_PI;}
-    int phi_itrk = phi_CDC / 10;
+    int phi_itrk = (int)(phi_CDC * (180.0 / M_PI) / 10);
 
     for (int jclu = 0; jclu < eclTrgClusterArray.getEntries(); jclu++) {
 
       double x_jclu = eclTrgClusterArray[jclu]->getPositionX();
       double y_jclu = eclTrgClusterArray[jclu]->getPositionY();
 
-      int phi_jclu;
-      if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = atan(y_jclu / x_jclu) / 10;}
-      else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
-      else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
-      else {phi_jclu = (atan(y_jclu / x_jclu) + 2 * M_PI) / 10;}
+      int phi_jclu = 0;
+      if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = (int)(atan(y_jclu / x_jclu) * (180.0 / M_PI) / 10);}
+      else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (int)((atan(y_jclu / x_jclu) * (180.0 / M_PI) + 180.0) / 10);}
+      else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (int)((atan(y_jclu / x_jclu) * (180.0 / M_PI) + 180.0) / 10);}
+      else if (x_jclu >= 0 && y_jclu < 0) {phi_jclu = (int)((atan(y_jclu / x_jclu) * (180.0 / M_PI) + 360.0) / 10);}
 
-      if (abs(phi_itrk - phi_jclu) <= 17 && abs(phi_itrk - phi_jclu) >= 19) {Trkcluster_b2b_1to3 = 1;}
-      if (abs(phi_itrk - phi_jclu) <= 16 && abs(phi_itrk - phi_jclu) >= 20) {Trkcluster_b2b_1to5 = 1;}
-      if (abs(phi_itrk - phi_jclu) <= 15 && abs(phi_itrk - phi_jclu) >= 21) {Trkcluster_b2b_1to7 = 1;}
-      if (abs(phi_itrk - phi_jclu) <= 14 && abs(phi_itrk - phi_jclu) >= 22) {Trkcluster_b2b_1to9 = 1;}
+      if (abs(phi_itrk - phi_jclu) >= 17 && abs(phi_itrk - phi_jclu) <= 19) {Trkcluster_b2b_1to3 = 1;}
+      if (abs(phi_itrk - phi_jclu) >= 16 && abs(phi_itrk - phi_jclu) <= 20) {Trkcluster_b2b_1to5 = 1;}
+      if (abs(phi_itrk - phi_jclu) >= 15 && abs(phi_itrk - phi_jclu) <= 21) {Trkcluster_b2b_1to7 = 1;}
+      if (abs(phi_itrk - phi_jclu) >= 14 && abs(phi_itrk - phi_jclu) <= 22) {Trkcluster_b2b_1to9 = 1;}
     }
   }
 

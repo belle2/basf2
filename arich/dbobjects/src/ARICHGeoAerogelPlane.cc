@@ -224,13 +224,12 @@ double ARICHGeoAerogelPlane::getTotalTileThickness(int ring, int column) const
 
 double ARICHGeoAerogelPlane::getMaximumTotalTileThickness() const
 {
-  int iRi = 1;
   double maxThick = 0.0;
   double athick = 0.0;
   // ring ID   (range : [   1,     2,     3,     4])
   // column ID (range : [1;22] [1;28] [1;34] [1;40])
   for (unsigned iR = 0; iR < getNAeroSlotsIndividualRing().size(); iR++) {
-    iRi = iR;
+    int iRi = iR;
     for (int iS = 0; iS < getNAeroSlotsIndividualRing().at(iR); iS++) {
       athick = getTotalTileThickness(iRi + 1, iS + 1);
       if (maxThick < athick)

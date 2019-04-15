@@ -114,6 +114,26 @@ bool PyStoreArray::optionalRelationTo(const PyStoreArray& toArray,
                                                namedRelation);
 }
 
+bool PyStoreArray::hasRelationTo(const PyStoreArray& toArray,
+                                 DataStore::EDurability durability,
+                                 const std::string& namedRelation) const
+{
+  return DataStore::Instance().hasRelation(this->m_storeAccessor,
+                                           toArray.m_storeAccessor,
+                                           durability,
+                                           namedRelation);
+}
+
+bool PyStoreArray::hasRelationFrom(const PyStoreArray& fromArray,
+                                   DataStore::EDurability durability,
+                                   const std::string& namedRelation) const
+{
+  return DataStore::Instance().hasRelation(fromArray.m_storeAccessor,
+                                           this->m_storeAccessor,
+                                           durability,
+                                           namedRelation);
+}
+
 bool PyStoreArray::hasValidClass() const
 {
   const TClass* objClass = m_storeAccessor.getClass();

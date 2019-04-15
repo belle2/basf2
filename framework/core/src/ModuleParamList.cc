@@ -138,3 +138,17 @@ ModuleParamPtr ModuleParamList::getParameterPtr(const std::string& name) const
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+//==================================================================================
+//                          Explicit template instantiations
+//==================================================================================
+
+template void ModuleParamList::addParameter(const std::string&, bool&, const std::string&, const bool&);
+template void ModuleParamList::addParameter(const std::string&, double&, const std::string&, const double&);
+template void ModuleParamList::addParameter(const std::string&, float&, const std::string&, const float&);
+template void ModuleParamList::addParameter(const std::string&, int&, const std::string&, const int&);
+template void ModuleParamList::addParameter(const std::string&, std::string&, const std::string&, const std::string&);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

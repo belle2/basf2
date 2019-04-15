@@ -1,3 +1,14 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Alexei Sibidanov                                         *
+ *               Alex Bobrov                                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef SHAPERDSP_T_H
 #define SHAPERDSP_T_H
 
@@ -12,7 +23,7 @@ namespace Belle2 {
     class ShaperDSP_t {
     public:
 
-      /** Class include function that calculate electronic response from energy deposit   */
+      /** struct to encapsulate the electronic response from energy deposit   */
       struct sv123shift_t {
         /** time   */
         double t;
@@ -33,22 +44,24 @@ namespace Belle2 {
         /** second exponent factor for tail part of the signal. Time of the differential stage   */
         double ed;
 
-        sv123shift_t() {}
-        sv123shift_t(double _t, const ShaperDSP_t& _p) { init(_t, _p);}
-        void init(double, const ShaperDSP_t&) __attribute__((noinline));
-        sv123shift_t& operator +=(const sv123shift_t&);
-        sv123shift_t operator +(const sv123shift_t&) const;
-        bool validshift(const sv123shift_t& x) const {return t + x.t > 0;}
+        sv123shift_t() {} /**< default constructor */
+        sv123shift_t(double _t, const ShaperDSP_t& _p) { init(_t, _p);}  /**< constructor from a ShaperDSP class */
+        void init(double, const ShaperDSP_t&) __attribute__((noinline)); /**< initialise */
+        sv123shift_t& operator +=(const sv123shift_t&);      /**< increment operator */
+        sv123shift_t operator +(const sv123shift_t&) const;  /**< addition operator */
+        bool validshift(const sv123shift_t& x) const {return t + x.t > 0;} /**< check for a valid shift */
       };
 
+      /** struct for a shift of the shaper dsp */
       struct shaperdspshift_t: public sv123shift_t {
-        double et0, et1;
+        double et0; /**< . */
+        double et1; /**< . */
 
-        shaperdspshift_t() {}
-        shaperdspshift_t(double _t, const ShaperDSP_t& _p) { init(_t, _p);}
-        void init(double, const ShaperDSP_t&) __attribute__((noinline));
-        shaperdspshift_t& operator +=(const shaperdspshift_t&);
-        shaperdspshift_t operator +(const shaperdspshift_t&) const;
+        shaperdspshift_t() {} /**< default constructor */
+        shaperdspshift_t(double _t, const ShaperDSP_t& _p) { init(_t, _p);} /**< constructor from a ShaperDSP class */
+        void init(double, const ShaperDSP_t&) __attribute__((noinline)); /**< initialise */
+        shaperdspshift_t& operator +=(const shaperdspshift_t&); /**< increment operator */
+        shaperdspshift_t operator +(const shaperdspshift_t&) const; /**< addition operator */
       };
 
     private:

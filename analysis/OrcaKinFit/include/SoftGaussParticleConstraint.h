@@ -131,8 +131,7 @@ namespace Belle2 {
 
 
       /// Invalidates any cached values for the next event
-      virtual void invalidateCache() const
-      {}
+      void invalidateCache() const {}
 
       void test1stDerivatives();
       void test2ndDerivatives();

@@ -33,7 +33,7 @@ namespace Belle2 {
     /*!
       \param trgtype obtained from B2L data
     */
-    ARICHInfo(int trgtype)
+    explicit ARICHInfo(int trgtype)
     {
       m_trgtype = trgtype;
     }

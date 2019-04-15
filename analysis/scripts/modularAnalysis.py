@@ -15,6 +15,7 @@ from kinfit import *
 from analysisPath import analysis_main
 from variables import variables
 import basf2_mva
+import pdg
 
 
 def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
@@ -552,8 +553,8 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
                       path=analysis_main,
                       enforceFitHypothesis=False):
     """
-    Creates Particles of the desired types from the corresponding `mdst` dataobjects,
-    loads them to the StoreArray<Particle> and fills the ParticleLists.
+    Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
+    loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
     via list tuples (decayString, cut), for example
@@ -568,16 +569,16 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the `mdst` dataobject that is used as an input is determined from the type of
+    The type of the ``mdst`` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    * charged final state particles (input `mdst` type = Tracks)
+    * charged final state particles (input ``mdst`` type = Tracks)
         - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
     * neutral final state particles
-        - "gamma"           (input `mdst` type = ECLCluster)
-        - "K_S0", "Lambda0" (input `mdst` type = V0)
-        - "K_L0"            (input `mdst` type = KLMCluster)
+        - "gamma"           (input ``mdst`` type = ECLCluster)
+        - "K_S0", "Lambda0" (input ``mdst`` type = V0)
+        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -587,7 +588,17 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     .. code-block:: python
 
         v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
-        fillParticleLists([kaons, pions, v0lambdas])
+        fillParticleLists([kaons, pions, v0lambdas], path=mypath)
+
+    Tip:
+        For "K_L0" it is now possible to load from ECLClusters, to revert to
+        the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
+
+    .. code-block:: python
+
+        klongs = ('K_L0', 'isFromKLM > 0')
+        fillParticleLists([kaons, pions, klongs], path=mypath)
+
 
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
@@ -624,23 +635,23 @@ def fillParticleList(
     enforceFitHypothesis=False
 ):
     """
-    Creates Particles of the desired type from the corresponding `mdst` dataobjects,
+    Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
     See also:
         the :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the `mdst` dataobject that is used as an input is determined from the type of
+    The type of the ``mdst`` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    * charged final state particles (input `mdst` type = Tracks)
+    * charged final state particles (input ``mdst`` type = Tracks)
         - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
     * neutral final state particles
-        - "gamma"           (input `mdst` type = ECLCluster)
-        - "K_S0", "Lambda0" (input `mdst` type = V0)
-        - "K_L0"            (input `mdst` type = KLMCluster)
+        - "gamma"           (input ``mdst`` type = ECLCluster)
+        - "K_S0", "Lambda0" (input ``mdst`` type = V0)
+        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -649,8 +660,15 @@ def fillParticleList(
 
     .. code-block:: python
 
-        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
-        fillParticleLists([kaons, pions, v0lambdas])
+        fillParticleList('Lambda0 -> p+ pi-', '0.9 < M < 1.3', path=mypath)
+
+    Tip:
+        For "K_L0" it is now possible to load from ECLClusters, to revert to
+        the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
+
+    .. code-block:: python
+
+        fillParticleList('K_L0', 'isFromKLM > 0', path=mypath)
 
     Parameters:
         decayString (str):           Type of Particle and determines the name of the ParticleList.
@@ -1206,7 +1224,7 @@ def ntupleTree(
     Parameters:
         tree_name (str): the output nutple (TTree) name
         list_name (str): input ParticleList name
-        tools (list of str): list of Ntuple tools to be included, tool-decaystring pairs.
+        tools (list(str)): list of Ntuple tools to be included, tool-decaystring pairs.
     """
 
     message = (
@@ -1238,7 +1256,7 @@ def variablesToNtuple(
 
     Parameters:
         decayString (str): specifies type of Particles and determines the name of the ParticleList
-        variables (list of str): the list of variables (which must be registered in the VariableManager)
+        variables (list(str)): the list of variables (which must be registered in the VariableManager)
         treename (str): name of the ntuple tree
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
@@ -1265,8 +1283,8 @@ def variablesToHistogram(
 
     Parameters:
         decayString (str): specifies type of Particles and determines the name of the ParticleList
-        variables (list of tuple): variables + binning which must be registered in the VariableManager
-        variables_2d (list of tuple): pair of variables + binning for each which must be registered in the VariableManager
+        variables (list(tuple))): variables + binning which must be registered in the VariableManager
+        variables_2d (list(tuple)): pair of variables + binning for each which must be registered in the VariableManager
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
     """
@@ -1854,7 +1872,7 @@ def printROEInfo(
     mask_names=[],
     which_mask='both',
     full_print=False,
-    path=analysis_main
+    path=None
 ):
     """
     This function prints out the information for the current ROE, so it should only be used in the for_each path.
@@ -1871,6 +1889,8 @@ def printROEInfo(
     @param full_print   print out mask values for each Track/ECLCLuster in mask
     @param path         modules are added to this path
     """
+    if not isinstance(path, basf2.Path):
+        B2FATAL("Error from printROEInfo, please add this to the for_each path")
 
     printMask = register_module('RestOfEventPrinter')
     printMask.set_name('RestOfEventPrinter')
@@ -1970,7 +1990,7 @@ def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
         copyLists(outList, [firstList, secondList], False, path)
         vertexKFit(outList, 0.0, '', '', path)
         markDuplicate(outList, prioritiseV0, path)
-        applyCuts(outList, 'extraInfo(highQualityVertex)')
+        applyCuts(outList, 'extraInfo(highQualityVertex)', path)
     else:
         B2ERROR("Lists to be merged contain different particles")
 
@@ -2160,6 +2180,7 @@ def buildEventShape(inputListNames=[],
     @param harmonicMoments   Enables the calculation of the Harmonic moments.
     @param sphericity  Enables the calculation of the sphericity-related quantities.
     @param thrust  Enables the calculation of thust-related quantities.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them.
 
     """
     if not inputListNames:
@@ -2216,8 +2237,8 @@ def labelTauPairMC(path=analysis_main):
 def tagCurlTracks(particleLists,
                   belle=False,
                   mcTruth=False,
-                  responseCut=0.303,
-                  selectorType='cut',
+                  responseCut=0.324,
+                  selectorType='cUt',
                   ptCut=0.6,
                   train=False,
                   path=analysis_main):
@@ -2230,17 +2251,27 @@ def tagCurlTracks(particleLists,
 
       .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
-    @param particleLists: list of particle lists to check for curls
-    @param belle:         bool flag for belle or belle2 data/mc
-    @param mcTruth:       bool flag to output some truth based information
+
+    The module loops over all particles in a given list that meet the preselection **ptCut** and assigns them to
+    bundles based on the response of the chosen **selector** and the required minimum response set by the
+    **responseCut**. Once all particles are assigned they are ranked by 25dr^2+dz^2. All but the lowest are tagged
+    with extraInfo(isCurl=1) to allow for later removal  by cutting the list or removing these from ROE as
+    applicable.
+
+
+    @param particleLists: list of particle lists to check for curls.
+    @param belle:         bool flag for Belle or Belle II data/mc.
+    @param mcTruth:       bool flag to additionally assign particles with extraInfo(isTruthCurl) and
+                          extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
+                          genParticleIndex then ranked and tagged as normal.
     @param responseCut:   float min classifier response that considers two tracks to come from the same particle.
-                          Note 'cut' selector is binary 0/1
+                          Note 'cut' selector is binary 0/1.
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
     @param ptCut:         pre-selection cut on transverse momentum.
-    @param train:         flag to set training mode if selector has a training mode (mva)
-    @param path:          module is added to this path
+    @param train:         flag to set training mode if selector has a training mode (mva).
+    @param path:          module is added to this path.
     """
 
     if (not isinstance(particleLists, list)):
@@ -2257,6 +2288,70 @@ def tagCurlTracks(particleLists,
     curlTagger.param('train', train)
 
     path.add_module(curlTagger)
+
+
+def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path=analysis_main):
+    """
+    Apply an MVA (BDT) to perform particle identification for charged stable particles using `ChargedPidMVA` module.
+
+    Note:
+        Currently, the MVA is trained including only **ECL-based inputs**.
+        Hence, it is mostly suited for **electron (muon) identification**.
+        For the future, this approach could however be extended to include info from other subdetetctors,
+        as long as they are made available in the Mdst format...
+
+    The module decorates Particle objects in the input ParticleList(s) w/ variables
+    containing the appropriate MVA score, which can be used to select candidates.
+
+    Note:
+        Currently, particle identification works as 'binary' separation between
+        input S, B particle mass hypotheses according to the following scheme:
+
+        - e (11) vs. pi (211)
+
+        - mu (13) vs. pi (211)
+
+        - pi (211) vs K (321)
+
+        - K (321) vs pi (211)
+
+        - p (2212) vs pi (211)
+
+        - d : NOT AVAILABLE
+
+        The MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
+
+    The MVA algorithm used is a gradient boosted decision tree (`TMVA 4.2.1`, `ROOT 6.14/06`).
+
+    Parameters:
+        sigHypoPDGCode (int): the pdgId of the signal mass hypothesis.
+        bkgHypoPDGCode (int): the pdgId of the background mass hypothesis.
+        particleLists list(str): list of names of ParticleList objects for charged stable particles.
+                                 The charge-conjugate ParticleLists will be also stored automatically.
+        path (basf2.Path): the module is added to this path.
+
+    """
+
+    # Enforce check on input S, B hypotheses compatibility.
+    binaryOpts = [(11, 211), (13, 211), (211, 321), (321, 211), (2212, 211)]
+
+    if (sigHypoPDGCode, bkgHypoPDGCode) not in binaryOpts:
+        B2FATAL("No charged pid MVA was trained to separate ", sigHypoPDGCode, " vs. ", bkgHypoPDGCode,
+                ". Please choose among the following pairs:\n",
+                "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
+
+    plSet = set(particleLists)
+    for pList in particleLists:
+        name, label = pList.split(':')
+        plSet.add(f"{pdg.conjugate(name)}:{label}")
+
+    chargedpid = register_module("ChargedPidMVA")
+    chargedpid.set_name(f"ChargedPidMVA_{sigHypoPDGCode}_vs_{bkgHypoPDGCode}")
+    chargedpid.param("sigHypoPDGCode", sigHypoPDGCode)
+    chargedpid.param("bkgHypoPDGCode", bkgHypoPDGCode)
+    chargedpid.param("particleLists", list(plSet))
+
+    path.add_module(chargedpid)
 
 
 if __name__ == '__main__':

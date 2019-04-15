@@ -26,7 +26,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxDatabaseImporter(std::string inputFileName, std::string m_name);
+    CDCDedxDatabaseImporter(std::string inputFileName, const std::string& m_name);
 
     /**
      * Destructor

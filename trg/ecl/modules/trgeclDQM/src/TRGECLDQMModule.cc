@@ -30,7 +30,7 @@ REG_MODULE(TRGECLDQM);
 TRGECLDQMModule::TRGECLDQMModule() : HistoModule()
 {
 
-  _TCCluster = new TrgEclCluster();
+
   setDescription("DQM for ECL Trigger system");
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -46,7 +46,7 @@ TRGECLDQMModule::TRGECLDQMModule() : HistoModule()
 
 TRGECLDQMModule::~TRGECLDQMModule()
 {
-  delete _TCCluster;
+
 }
 
 
@@ -68,8 +68,8 @@ void TRGECLDQMModule::defineHisto()
   h_TCEnergy       = new TH1D("h_TCEnergy",      "TC Energy / event (ADC)",     100, 0, 3000);
   h_n_TChit_event  = new TH1D("h_n_TChit_event", "N(TC) / Event",                41, 0, 40);
   h_Cluster        = new TH1D("h_Cluster",       "N(Cluster) / event",           21, 0, 20);
-  h_TCTiming       = new TH1D("h_TCTiming",      "TC Timing / event (ns)",      100, 0, 50000);
-  h_TRGTiming      = new TH1D("h_TRGTiming",     "TRG Timing / event (ns)",     500, 0, 50000);
+  h_TCTiming       = new TH1D("h_TCTiming",      "TC Timing / event (ns)",      100, 0, 6000);
+  h_TRGTiming      = new TH1D("h_TRGTiming",     "TRG Timing / event (ns)",     500, 0, 6000);
 
 
   oldDir->cd();
@@ -113,13 +113,14 @@ void TRGECLDQMModule::event()
   double HitRevoFam = 0;
   double HitRevoTrg = 0;
   double HitFineTiming = 0;
+  double HitRevoEvtTiming = 0;
   for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
     TRGECLUnpackerStore* aTRGECLUnpackerStore = trgeclHitArray[ii];
     int TCID = (aTRGECLUnpackerStore->getTCId());
-    int hit_win =  aTRGECLUnpackerStore -> getHitWin();
+    //    int hit_win =  aTRGECLUnpackerStore -> getHitWin();
     HitEnergy =  aTRGECLUnpackerStore -> getTCEnergy();
     if (TCID < 1 || TCID > 576 || HitEnergy == 0) {continue;}
-    if (!(hit_win == 2 || hit_win == 3)) {continue;}
+    //    if (!(hit_win == 2 || hit_win == 3)) {continue;}
     HitTiming    = aTRGECLUnpackerStore ->getTCTime();
 
 
@@ -136,25 +137,23 @@ void TRGECLDQMModule::event()
 
     HitFineTiming = aTRGECLUnpackerEvtStore ->  getEvtTime();
     HitRevoTrg = aTRGECLUnpackerEvtStore -> getL1Revo();
-    HitRevoFam = aTRGECLUnpackerEvtStore -> getEvtRevo();
+    HitRevoEvtTiming = aTRGECLUnpackerEvtStore -> getEvtRevo();
 
     RevoTrg.push_back(HitRevoTrg);
-    FineTiming.push_back(HitFineTiming);
+
 
 
   }
-
+  if (HitRevoEvtTiming == -1) {return;}
   //----------------------
   //Clustering
   //----------------------
   //
 
-  _TCCluster = new TrgEclCluster();
-  _TCCluster -> setICN(TCId, TCEnergy, TCTiming);
-  int icnfwd = _TCCluster -> getICNSub(0);
-  int icnbr = _TCCluster -> getICNSub(1);
-  int icnbwd = _TCCluster -> getICNSub(2);
-  int c = icnfwd + icnbr + icnbwd;
+  TrgEclCluster  _TCCluster ;
+  _TCCluster.setICN(TCId, TCEnergy, TCTiming);
+
+  int c = _TCCluster.getNofCluster();
   h_Cluster->Fill(c);
 
   //
@@ -182,11 +181,13 @@ void TRGECLDQMModule::event()
     h_TCEnergy -> Fill(TCEnergy[ihit]);
     totalEnergy += TCEnergy[ihit];
     h_n_TChit_event -> Fill(NofTCHit);
-    timing = 8 * RevoTrg[ihit] - (128 * RevoFAM[ihit] + TCTiming[ihit]);
-    trgtiming = 8 * RevoTrg[ihit] - (128 * RevoFAM[ihit] + FineTiming[ihit]);
-
+    timing = 8 * HitRevoTrg - (128 * HitRevoEvtTiming + TCTiming[ihit]);
+    if (timing < 0) {timing = timing + 10240;}
     h_TCTiming->Fill(timing);
   }
+  trgtiming = 8 * HitRevoTrg - (128 *     HitRevoEvtTiming + HitFineTiming);
+
+  if (trgtiming < 0) {trgtiming = trgtiming + 10240;}
   h_TRGTiming -> Fill(trgtiming);
   h_TotalEnergy -> Fill(totalEnergy);
 

@@ -130,7 +130,7 @@ namespace Belle2 {
 
 
       /// Invalidates any cached values for the next event
-      virtual void invalidateCache() const;
+      void invalidateCache() const;
 
       /// Recalculates any cached values for the next event
       virtual void updateCache() const;

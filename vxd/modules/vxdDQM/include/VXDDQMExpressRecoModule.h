@@ -78,11 +78,11 @@ namespace Belle2 {
     float m_CutCorrelationTimeSVD = 70;
 
     /** Correlations and hit maps from space points */
-    TH2F** m_correlationsSP;
+    TH2F** m_correlationsSP{nullptr};
     /** Correlations and hit maps from space points - differencies in Phi*/
-    TH1F** m_correlationsSP1DPhi;
+    TH1F** m_correlationsSP1DPhi{nullptr};
     /** Correlations and hit maps from space points - differencies in Theta*/
-    TH1F** m_correlationsSP1DTheta;
+    TH1F** m_correlationsSP1DTheta{nullptr};
 
   };
 

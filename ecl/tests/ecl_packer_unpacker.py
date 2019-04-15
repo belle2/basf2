@@ -30,12 +30,14 @@ class addECLDigitsModule(Module):
     """
 
     def __init__(self):
+        """constructor"""
         super().__init__()
         amps = [0, 1, 100000, 262015]
         times = [-2048, -100, 0, 100, 2047]
         qualitys = [0, 1, 2, 3]
         chis = [0, 1, 254, 511]
         paramNames = ["amp", "time", "quality", "chi"]
+        #: ecl digit parameters
         self.digitParams = [dict(zip(paramNames, params)) for params in itertools.product(amps, times, qualitys, chis)]
 
     def event(self):
@@ -150,7 +152,7 @@ class ECLPackerUnpackerTestModule(Module):
 main = create_path()
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 # to run the framework the used modules need to be registered
@@ -161,6 +163,7 @@ main.add_module(particlegun)
 
 # add simulation for ECL only
 simulation.add_simulation(main, components=['ECL'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["ECL"])
 
 # Add ECLDigits with wide range of amp, time, quality, chi2
 main.add_module(addECLDigitsModule())

@@ -22,31 +22,6 @@
 
 namespace Belle2 {
 
-  /// Class to identify beam parameters
-  class BeamID {
-
-  public:
-
-    /// Primary vertex x-position
-    static const int vertexX = 1;
-
-    /// Primary vertex y-position
-    static const int vertexY = 2;
-
-    /// Primary vertex z-position
-    static const int vertexZ = 3;
-
-    /// Constructor
-    explicit BeamID() {}
-
-    /// convert to int, returns 0 as there are no elements of beam, only parameters
-    operator int() {return 0;}
-
-    /// convert to unsigned int, returns 0 as there are no elements of beam, only parameters
-    operator unsigned int() {return 0;}
-
-  };
-
   /**
    * @brief Class to convert to/from global labels
    * for Millepede II to/from detector & parameter
@@ -87,10 +62,6 @@ namespace Belle2 {
                                       maxTIF; /**< max internal id = 1.999.999.999 */
     static const gidTYPE maxLabel   =
       maxGID;  /**< Label and internal id ("gid") are the same numbers (label is signed but 0 and <0 values are invalid to give to Pede)*/
-    static const gidTYPE vxdOffset  = 1000000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
-    static const gidTYPE cdcOffset  = 2000000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
-    static const gidTYPE bklmOffset = 3000000;  /**< Offset of 300000 in element ids for BKLM */
-    static const gidTYPE eklmOffset = 4000000;  /**< Offset of 400000 in element ids for EKLM */
 
     /// Default constuctor. Members initialized in declaration
     GlobalLabel() {}
@@ -103,37 +74,6 @@ namespace Belle2 {
      * @param globalLabel The encoded label
      */
     explicit GlobalLabel(gidTYPE globalLabel);
-
-    /**
-     * @brief Constructor from VxdID (depends on time internally)
-     * @param vxdid VxdId of detector element (sensor, layer, ladder)
-     * @param paramId Numeric identificator of calibration/alignment parameter
-     *                type (U-shift, V-shift, alpha-Rotation, Lorentz-angle etc.).
-     */
-    GlobalLabel(VxdID vxdid, gidTYPE paramId);
-
-    /**
-     * @brief Constructor from WireID (depends on time internally)
-     * @param vxdid WireID of detector element (wire, layer?, superlayer?, endplate1?, endplate2?)
-     * @param paramId Numeric identificator of calibration/alignment parameter
-     *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
-     */
-    GlobalLabel(WireID cdcid, gidTYPE paramId);
-
-    /**
-     * @brief Constructor from BKLMid (depends on time internally)
-     * @param bklmid Unique of detector element (wire, layer?, superlayer?, endplate1?, endplate2?)
-     * @param paramId Numeric identificator of calibration/alignment parameter
-     *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
-     */
-    GlobalLabel(BKLMElementID bklmid, gidTYPE paramId);
-
-    /**
-     * Constructor from EKLMElementID.
-     * @param[in] eklmElement EKLM element identifier.
-     * @param[in] paramId     Numeric identifier of alignment parameter.
-     */
-    GlobalLabel(EKLMElementID eklmElement, gidTYPE paramId);
 
     /**
      * @brief Construct label for given DB object (template argument) and its element and parameter
@@ -215,43 +155,6 @@ namespace Belle2 {
      * @brief Cast to encoded Pede label
      */
     operator unsigned int() {return (unsigned int)label();}
-
-    /**
-     * @brief Assignment operator
-     */
-    GlobalLabel& operator=(const GlobalLabel& rhs) {gid = rhs.gid, eid = rhs.eid, pid = rhs.pid, tid = rhs.tid, tif = rhs.tif; return *this; };
-
-    //! Get the VxdID (returns default if not VXD label)
-    VxdID   getVxdID()       const;
-
-    //! Get the WireID (returns default if not CDC label)
-    WireID  getWireID()      const;
-
-    //! Get the BklmID (returns 0 if not BKLM label)
-    BKLMElementID getBklmID() const;
-
-    /**
-     * Get EKLM element identifier. It should be checked that this label is
-     * a EKLM label. If this is not the case, then the function fails with
-     * fatal error.
-     */
-    EKLMElementID getEklmID() const;
-
-    //! Is this VXD label?
-    bool    isVXD()          const {return (eid >= vxdOffset && eid < cdcOffset);}
-
-    //! Is this CDC label?
-    bool    isCDC()          const {return (eid >= cdcOffset && eid < bklmOffset);}
-
-    //! Is this BKLM label?
-    bool    isBKLM()         const {return (eid >= bklmOffset && eid < eklmOffset);}
-
-    //! Is this EKLM label?
-    bool    isEKLM()         const {return (eid >= eklmOffset && eid < maxEID);}
-
-    //! Is this Beam label?
-    bool    isBeam()         const {return (eid > 0 && eid < vxdOffset);}
-
 
     /**
      * @brief Returns the global id identifing DB object for constantwith this label

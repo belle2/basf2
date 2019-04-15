@@ -31,6 +31,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDReductionModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDReductionModule();
   private:
 
     //! Module functions to be called from main process

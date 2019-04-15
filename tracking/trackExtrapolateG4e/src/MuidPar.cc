@@ -26,6 +26,26 @@ namespace Belle2 {
 
   MuidPar::MuidPar() : m_ReducedChiSquaredDx(0.0)
   {
+    for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
+      for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
+        for (unsigned int layer = 0; layer < MUID_MaxBarrelLayer + MUID_MaxForwardEndcapLayer + 2; ++layer) {
+          m_LayerPDF[outcome][lastLayer][layer] = 0.0;
+        }
+      }
+    }
+    for (int detector = 0; detector <= MUID_MaxDetector; ++detector) {
+      for (int halfNdof = 0; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
+        m_ReducedChiSquaredThreshold[detector][halfNdof] = 0.0;
+        m_ReducedChiSquaredScaleY[detector][halfNdof] = 0.0;
+        m_ReducedChiSquaredScaleX[detector][halfNdof] = 0.0;
+        for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
+          m_ReducedChiSquaredPDF[detector][halfNdof][i] = 0.0;
+          m_ReducedChiSquaredD1[detector][halfNdof][i] = 0.0;
+          m_ReducedChiSquaredD2[detector][halfNdof][i] = 0.0;
+          m_ReducedChiSquaredD3[detector][halfNdof][i] = 0.0;
+        }
+      }
+    }
   }
 
   MuidPar::MuidPar(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
@@ -274,15 +294,7 @@ namespace Belle2 {
     double pdf = 0.0;
     if (halfNdof > MUID_MaxHalfNdof) { // extremely rare
       x *= m_ReducedChiSquaredScaleX[detector][MUID_MaxHalfNdof] * halfNdof;
-      if (halfNdof == 1) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::exp(-x);
-      } else if (halfNdof == 2) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * x * std::exp(-x);
-      } else if (halfNdof == 3) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * x * x * std::exp(-x);
-      } else {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::pow(x, halfNdof - 1.0) * std::exp(-x);
-      }
+      pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::pow(x, halfNdof - 1.0) * std::exp(-x);
     } else {
       if (x > m_ReducedChiSquaredThreshold[detector][halfNdof]) { // tail function for large x
         x *= m_ReducedChiSquaredScaleX[detector][halfNdof] * halfNdof;

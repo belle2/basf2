@@ -156,12 +156,23 @@ namespace Belle2 {
     const double c_pol2Var1 = 1684.0; /**< 2-order fit for p1 Var1 + Var2*bg + Var3*bg^2. */
     const double c_pol2Var2 = 3080.0; /**< 2-order fit for p1. */
     const double c_pol2Var3 = -613.9; /**< 2-order fit for p1. */
-    double m_pol2Max; /** < Maximum of p1 2-order fit to limit values */
+    double m_pol2Max; /**< Maximum of p1 2-order fit to limit values */
     const int c_nominalBG = 183; /**< Number of out of time digits at BGx1.0. */
-    double m_averageBG; /** < Average dose per crystal calculated from m_th1dBackground */
-    const double c_minT99 = 3.5;
+    double m_averageBG; /**< Average dose per crystal calculated from m_th1dBackground */
+    const double c_minT99 = 3.5; /**< The minimum t99 */
 
-    bool m_simulatePure = 0; /** < Flag to set pure CsI simulation option */
+    bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
+
+    // For the energy dependence correction to the time
+    // t-t0 =  e^{ L_1 A } ( C_1 + L_2  A + Q_1 A^2  )  + C_2     ("Energy dependence equation")
+    //    where  A = amplitude / 10000
+    double energyDependentTimeOffset(const double amplitude) ;            /**< Function to calculate "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_expLinear = -0.9952 ;     /**< L_1 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_polyConst = 10.4 ;        /**< C_1 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_polyLinear = 4.493 ;      /**< L_2 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_polyQuadratic = 3.916 ;   /**< Q_1 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_overallConst = -0.1403 ;  /**< C_2 in "energy dependence equation" */
+
   };
 
   /** Class derived from ECLDigitCalibratorModule, only difference are the names */

@@ -9,9 +9,9 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
-#include <eklm/simulation/FiberAndElectronics.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
+#include <klm/simulation/ScintillatorSimulator.h>
 
 using namespace Belle2;
 
@@ -47,7 +47,7 @@ void EKLMDigitizerModule::initialize()
     m_FPGAFits.registerInDataStore();
     m_Digits.registerRelationTo(m_FPGAFits);
   }
-  m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
+  m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
   if (m_SimulationMode == "Generic") {
     /* Nothing to do. */
   } else if (m_SimulationMode == "ChannelSpecific") {
@@ -128,22 +128,20 @@ void EKLMDigitizerModule::readAndSortSimHits()
 
 /*
  * Light propagation into the fiber, SiPM and electronics effects
- * are simulated in EKLM::FiberAndElectronics class.
+ * are simulated in KLM::ScintillatorSimulator class.
  */
 void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
   uint16_t tdc;
   int strip;
-  EKLM::FiberAndElectronics fes(&(*m_DigPar), m_Fitter,
-                                m_DigitizationInitialTime, m_Debug);
+  KLM::ScintillatorSimulator simulator(&(*m_DigPar), m_Fitter,
+                                       m_DigitizationInitialTime, m_Debug);
   const EKLMChannelData* channelData;
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
        it = m_SimHitVolumeMap.upper_bound(it->first)) {
     EKLMSimHit* simHit = it->second;
     ub = m_SimHitVolumeMap.upper_bound(it->first);
-    /* Set hits. */
-    fes.setHitRange(it, ub);
     if (m_ChannelSpecificSimulation) {
       strip = m_ElementNumbers->stripNumber(
                 simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
@@ -151,30 +149,33 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       channelData = m_Channels->getChannelData(strip);
       if (channelData == nullptr)
         B2FATAL("Incomplete EKLM channel data.");
-      fes.setChannelData(channelData);
+      simulator.setChannelData(channelData);
     }
     /* Simulation for a strip. */
-    fes.processEntry();
-    if (fes.getGeneratedNPE() == 0)
+    simulator.simulate(it, ub);
+    if (simulator.getGeneratedNPE() == 0)
       continue;
     EKLMDigit* eklmDigit = m_Digits.appendNew(simHit);
-    eklmDigit->setMCTime(simHit->getTime());
-    eklmDigit->setSiPMMCTime(fes.getMCTime());
-    eklmDigit->setPosition(simHit->getPosition());
-    eklmDigit->setGeneratedNPE(fes.getGeneratedNPE());
     eklmDigit->addRelationTo(simHit);
-    if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit) {
-      tdc = fes.getFPGAFit()->getStartTime();
-      eklmDigit->setCharge(fes.getFPGAFit()->getMinimalAmplitude());
+    eklmDigit->setMCTime(simHit->getTime());
+    eklmDigit->setSiPMMCTime(simulator.getMCTime());
+    eklmDigit->setPosition(simHit->getPosition());
+    eklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
+    eklmDigit->setEDep(simulator.getEnergy());
+    if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
+      tdc = simulator.getFPGAFit()->getStartTime();
+      eklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
     } else {
       tdc = 0;
-      eklmDigit->setCharge(0);
+      eklmDigit->setCharge(m_DigPar->getADCRange() - 1);
     }
     eklmDigit->setTDC(tdc);
-    eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
-    eklmDigit->setFitStatus(fes.getFitStatus());
-    if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
-      EKLMFPGAFit* fit = m_FPGAFits.appendNew(*fes.getFPGAFit());
+    eklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
+    eklmDigit->setFitStatus(simulator.getFitStatus());
+    if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit &&
+        m_SaveFPGAFit) {
+      KLMScintillatorFirmwareFitResult* fit =
+        m_FPGAFits.appendNew(*simulator.getFPGAFit());
       eklmDigit->addRelationTo(fit);
     }
   }

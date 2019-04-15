@@ -65,6 +65,7 @@ namespace Belle2 {
       index = 0;
       for (auto Usup : normalizedUsup)
         m_normalizedUsup.insert({Usup, index++});
+      // cppcheck-suppress unreadVariable
       m_normalizedUsup.insert({FLT_MAX, index++});
 
       m_fullSecIDs = fullSecIDs;
@@ -80,17 +81,17 @@ namespace Belle2 {
     {
 
       if (normalizedU < 0. or normalizedU > 1.)
-        return 0;
+        return FullSecID(0);
       if (normalizedV < 0. or normalizedV > 1.)
-        return 0;
+        return FullSecID(0);
 
       auto uKeyVal = m_normalizedUsup.upper_bound(normalizedU);
       if (uKeyVal == m_normalizedUsup.end())
-        return 0;
+        return FullSecID(0);
 
       auto vKeyVal = m_normalizedVsup.upper_bound(normalizedV);
       if (vKeyVal == m_normalizedVsup.end())
-        return 0;
+        return FullSecID(0);
 
 
       auto uIndex = uKeyVal->second;

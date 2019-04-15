@@ -41,6 +41,8 @@ namespace Belle2 {
     double m_minEfficiency;
     /** switch for creating relations for clones and merged tracks */
     bool m_relateClonesAndMerged;
+    /** switch for creating hit relations based on wire ID */
+    bool m_relateHitsByID;
 
     /** list of hits that are used for the matching */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;

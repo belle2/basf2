@@ -77,7 +77,9 @@ namespace Belle2 {
     const double m_fullBkgdCount = 183.0; /**< Nominal Background at BGx1.0 (MC12) */
 
     // For temporary BGx1
+    /** the leakage in BGx1 */
     TGraph2D m_leakage_bgx1[2]; // 0: phase2, 1: phase3
+    /** limits for the leakage in BGx1 */
     std::vector<double> m_leakage_bgx1_limits[2];
 
     // For BGx0 (complicated theta and phi dependency)

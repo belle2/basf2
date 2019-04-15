@@ -176,13 +176,9 @@ void HitXPModule::event()
 
 
   for (const MCParticle& particle : MCParticles) {
-    int hit_iterator = 0;
     m_Eprimary = particle.getStatus();
-    // for (const SVDCluster& cluster : particle.getRelationsFrom<SVDCluster>()) {
-    //   for (const SVDTrueHit& hit : cluster.getRelationsTo<SVDTrueHit>()) {
     for (const SVDTrueHit& hit : particle.getRelationsTo<SVDTrueHit>()) {
       if (hit.getRelationsFrom<SVDCluster>().size() > 0) {
-        hit_iterator++;
         VxdID trueHitSensorID = hit.getSensorID();
         const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
         const SVDCluster* cluster = hit.getRelationsFrom<SVDCluster>()[0];
@@ -203,8 +199,6 @@ void HitXPModule::event()
         m_hitXPSet.insert(entry);
       }
     }
-    //}
-    //}
     m_trackNumber = m_trackIterator;
     m_EtrackNumber = m_trackIterator; //----------------External Tree ----------------//
     m_trackIterator = m_trackIterator + 1;

@@ -13,6 +13,9 @@
 #include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 
+#include <boost/regex.hpp>
+#include <boost/algorithm/string/replace.hpp>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -30,6 +33,8 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   //Parameter definition
   addParam("InputRootFile", m_input_name, "Name of the input root file", std::string("input_histo.root"));
   addParam("SelectFolders", m_folders, "List of folders for which to process, empty for all", std::vector<std::string>());
+  addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
+           std::vector<std::string>());
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
@@ -39,6 +44,30 @@ void DQMHistAnalysisInputRootFileModule::initialize()
   m_file = new TFile(m_input_name.c_str());
   m_eventMetaDataPtr.registerInDataStore();
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");
+}
+
+bool DQMHistAnalysisInputRootFileModule::hname_pattern_match(std::string pattern, std::string text)
+{
+  boost::replace_all(pattern, "\\", "\\\\");
+  boost::replace_all(pattern, "^", "\\^");
+  boost::replace_all(pattern, ".", "\\.");
+  boost::replace_all(pattern, "$", "\\$");
+  boost::replace_all(pattern, "|", "\\|");
+  boost::replace_all(pattern, "(", "\\(");
+  boost::replace_all(pattern, ")", "\\)");
+  boost::replace_all(pattern, "[", "\\[");
+  boost::replace_all(pattern, "]", "\\]");
+  boost::replace_all(pattern, "*", "\\*");
+  boost::replace_all(pattern, "+", "\\+");
+  boost::replace_all(pattern, "?", "\\?");
+  boost::replace_all(pattern, "/", "\\/");
+
+  boost::replace_all(pattern, "\\?", ".");
+  boost::replace_all(pattern, "\\*", ".*");
+
+  boost::regex bpattern(pattern);
+
+  return regex_match(text, bpattern);
 }
 
 void DQMHistAnalysisInputRootFileModule::beginRun()
@@ -88,6 +117,19 @@ void DQMHistAnalysisInputRootFileModule::event()
       if (h->InheritsFrom("TH2")) h->SetOption("col");
       else h->SetOption("hist");
       std::string hname = h->GetName();
+
+      bool hpass = false;
+      if (m_histograms.size() == 0) {
+        hpass = true;
+      } else {
+        for (auto& hpattern : m_histograms) {
+          if (hname_pattern_match(hpattern, dirname + "/" + hname)) {
+            hpass = true;
+            break;
+          }
+        }
+      }
+      if (!hpass) continue;
 
       h->SetName((dirname + "/" + hname).c_str());
       hs.push_back(h);

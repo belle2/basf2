@@ -41,6 +41,7 @@ MilleData& MilleData::operator=(const MilleData& other)
   close();
   m_files = other.m_files;
   m_doublePrecision = other.m_doublePrecision;
+  m_absFilePaths = other.m_absFilePaths;
   m_numRecords = other.m_numRecords;
   return *this;
 }

@@ -92,57 +92,6 @@ namespace Belle2 {
    */
   template <class T> class StoreObjPtr : public StoreAccessorBase {
   public:
-    /** Register an object, that should be written to the output by default, in the data store.
-     *  This must be called in the initialization phase.
-     *
-     *  @warning Use discouraged, use registerInDataStore() instead.
-     *  @param name        Name under which the object is stored.
-     *  @param durability  Specifies lifetime of object in question.
-     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    [[deprecated("Please use registerInDataStore() on an instance and consider making the StoreObjPtr a member of your class")]]
-    static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                   bool errorIfExisting = true)
-    {
-      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false,
-                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : DataStore::c_WriteOut);
-    }
-
-    /** Check whether an object was registered before.
-     *
-     *  It will cause an error if the object does not exist.
-     *  This must be called in the initialization phase.
-     *
-     *  @warning Use discouraged, use isRequired() instead.
-     *  @param name        Name under which the object is stored.
-     *  @param durability  Specifies lifetime of object in question.
-     *  @return            True if the object exists.
-     */
-    [[deprecated("Please use isRequired() on an instance and consider making the StoreObjPtr a member of your class")]]
-    static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
-    {
-      std::string objName = DataStore::objectName<T>(name);
-      return DataStore::Instance().requireInput(StoreAccessorBase(objName, durability, T::Class(), false));
-    }
-
-    /** Tell the data store about an optional input.
-     *
-     *  Mainly useful for creating diagrams of module inputs and outputs.
-     *
-     *
-     *  @warning Use discouraged, use isOptional() instead.
-     *  @param name        Name under which the object is stored.
-     *  @param durability  Specifies lifetime of object in question.
-     *  @return            True if the object exists.
-     */
-    [[deprecated("Please use isOptional() on an instance and consider making the StoreObjPtr a member of your class")]]
-    static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
-    {
-      std::string objName = DataStore::objectName<T>(name);
-      return DataStore::Instance().optionalInput(StoreAccessorBase(objName, durability, T::Class(), false));
-    }
-
     /** Constructor to access an object in the DataStore.
      *
      *  @param name       Name under which the object is stored in the DataStore.

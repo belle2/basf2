@@ -163,21 +163,6 @@ namespace Belle2 {
     double particleMCMatchPT(const Particle* particle);
 
     /**
-     * return decay x-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDX(const Particle* particle);
-
-    /**
-     * return decay y-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDY(const Particle* particle);
-
-    /**
-     * return decay z-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDZ(const Particle* particle);
-
-    /**
      * return Energy of matched MCParticle (-999.0 if the particle is not matched)
      */
     double particleMCMatchE(const Particle* particle);

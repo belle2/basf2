@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>KShortGenSimNoBkg.root</input>
   <output>V0ValidationSample.root, V0ValidationHarvested.root</output>
   <description>This module generates events for the V0 validation.</description>

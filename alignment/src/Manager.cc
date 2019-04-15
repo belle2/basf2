@@ -21,7 +21,6 @@ namespace Belle2 {
       vector.addDBObj<BeamParameters>();
       vector.addDBObj<VXDAlignment>(vxdInterface);
       vector.addDBObj<CDCAlignment>(cdcInterface);
-      vector.addDBObj<CDCLayerAlignment>(cdcInterface);
       vector.addDBObj<CDCTimeZeros>(cdcInterface);
       vector.addDBObj<CDCTimeWalks>(cdcInterface);
       vector.addDBObj<CDCXtRelations>(cdcInterface);
@@ -120,6 +119,8 @@ namespace Belle2 {
       m_lorentzShift->buildConstraints(m_constraints);
       for (auto& name_elements : m_constraints) {
         auto name = name_elements.first;
+        if (!name) continue;
+
         txt << "Constraint 0. ! Constraint for global label: " << name << std::endl;
         auto& elements = name_elements.second;
         for (auto& label_coefficient : elements) {

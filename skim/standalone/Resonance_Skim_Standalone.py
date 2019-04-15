@@ -16,14 +16,12 @@ from skimExpertFunctions import *
 
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-03'
 
 syspath = Path()
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
-inputMdstList('MC9', fileList, path=syspath)
+fileList = get_test_file("mixedBGx1", "MC11")
+
+inputMdstList('default', fileList, path=syspath)
 
 argvs = sys.argv
 argc = len(argvs)
@@ -45,7 +43,8 @@ if 'Validation' in argvs and argc > 2:
     skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), ResonanceList, path=syspath)
 else:
     skimOutputUdst(skimCode, ResonanceList, path=syspath)
-summaryOfLists(ResonanceList)
+summaryOfLists(ResonanceList, path=syspath)
+
 if 'Validation' in argvs:
     if argc > 2:
         ntupleFile('Validation_%s_%s.root' % (skimCode, (argvs[argvs.index('Validation') + 1])))
@@ -114,4 +113,4 @@ if 'Validation' in argvs:
 setSkimLogging(path=syspath)
 process(syspath)
 
-print(statistics, path=syspath)
+print(statistics)

@@ -34,7 +34,7 @@ std::string Sector::printSector()
   if (m_useDistance4sort == true) useDistance = "yes";
 
   uint nFriends = m_myFriends.size();
-  FullSecID myID = m_sectorID;
+  FullSecID myID(m_sectorID);
 
   return (boost::format("Sector %1% got activated %2% and has %3% friends. Using distance for sorting: %4%, while having distance of %5%cm to origin.\n")
           % myID % isSectorActive % nFriends % useDistance % m_distance2Origin).str();

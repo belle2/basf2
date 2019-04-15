@@ -16,7 +16,8 @@
 #
 # Contributors: A. Zupanc (June 2014)
 #               Vishal (Oct2017) "Intermediate" option in MCHierarchy for Ks,pi0
-#               I.Komarov(Sep 2018)
+#               I.Komarov (Sep 2018)
+#               S Cunliffe (Feb 2019)
 #
 ######################################################
 
@@ -26,6 +27,7 @@ import variables.collections as vc
 import variables.utils as vu
 from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
+from stdKlongs import stdKlongs
 
 # create path
 my_path = b2.create_path()
@@ -63,6 +65,7 @@ ma.fillParticleList(decayString='p+:good', cut='protonID > 0.1', path=my_path)
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts(path=my_path)
 stdPi0s(listtype='looseFit', path=my_path)
+stdKlongs(listtype='all', path=my_path)  # only create the 'all' list with no cuts
 
 # print contents of the DataStore after loading Particles
 ma.printDataStore()
@@ -82,6 +85,7 @@ ma.printList('anti-p-:all', False, path=my_path)
 ma.printList('anti-p-:good', False, path=my_path)
 ma.printList('K_S0:all', False, path=my_path)
 ma.printList('pi0:looseFit', False, path=my_path)
+ma.printList('K_L0:all', False, path=my_path)
 
 
 # Select variables that we want to store to ntuple
@@ -112,6 +116,10 @@ pi0_variables = vc.mc_truth + \
     vc.kinematics + \
     ['extraInfo(BDT)', 'decayAngle(0)']
 
+K0l_variables = vc.kinematics + \
+    vc.mc_kinematics + \
+    vc.klm_cluster
+
 # Saving variables to ntuple
 output_file = 'B2A202-LoadReconstructedParticles.root'
 ma.variablesToNtuple(decayString='pi+:all',
@@ -137,6 +145,11 @@ ma.variablesToNtuple(decayString='mu+:all',
 ma.variablesToNtuple(decayString='gamma:all',
                      variables=gamma_variables,
                      treename='phot',
+                     filename=output_file,
+                     path=my_path)
+ma.variablesToNtuple(decayString='K_L0:all',
+                     variables=K0l_variables,
+                     treename='klong',
                      filename=output_file,
                      path=my_path)
 

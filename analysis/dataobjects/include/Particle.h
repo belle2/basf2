@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Marko Staric                                *
+ * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +13,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
@@ -24,7 +26,6 @@ class TClonesArray;
 namespace Belle2 {
 
   // forward declarations
-  class ECLCluster;
   class KLMCluster;
   class Track;
   class TrackFitResult;
@@ -166,8 +167,10 @@ namespace Belle2 {
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
      * @param eclCluster pointer to ECLCluster object
+     * @param type the kind of ParticleType we want (photon by default)
      */
-    explicit Particle(const ECLCluster* eclCluster);
+    explicit Particle(const ECLCluster* eclCluster,
+                      const Const::ParticleType& type = Const::photon);
 
     /**
      * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
@@ -588,11 +591,19 @@ namespace Belle2 {
     const PIDLikelihood* getPIDLikelihood() const;
 
     /**
-     * Returns the pointer to the ECLCluster object that was used to create this Particle (ParticleType == c_ECLCluster).
-     * NULL pointer is returned, if the Particle was not made from ECLCluster.
+     * Returns the pointer to the ECLCluster object that was used to create this Particle (if ParticleType == c_ECLCluster).
+     * Returns the pointer to the most energetic ECLCluster matched to the track (if ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle has no relation to an ECLCluster (either the particle is a different type or there was no track match).
      * @return const pointer to the ECLCluster
      */
     const ECLCluster* getECLCluster() const;
+
+    /**
+     * Returns the energy of the ECLCluster for the particle.
+     * The return value depends on the ECLCluster hypothesis.
+     * @return energy of the ECLCluster
+     */
+    double getECLClusterEnergy() const;
 
     /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
@@ -697,6 +708,27 @@ namespace Belle2 {
     bool wasExactFitHypothesisUsed() const
     {
       return std::abs(m_pdgCodeUsedForFit) == std::abs(m_pdgCode);
+    }
+
+    /**
+    * Returns the ECLCluster EHypothesisBit for this Particle.
+    */
+    ECLCluster::EHypothesisBit getECLClusterEHypothesisBit() const
+    {
+      const int pdg = abs(getPDGCode());
+      if ((pdg == Const::photon.getPDGCode())
+          or (pdg == Const::electron.getPDGCode())
+          or (pdg == Const::muon.getPDGCode())
+          or (pdg == Const::pion.getPDGCode())
+          or (pdg == Const::kaon.getPDGCode())
+          or (pdg == Const::proton.getPDGCode())
+          or (pdg == Const::deuteron.getPDGCode())) {
+        return ECLCluster::EHypothesisBit::c_nPhotons;
+      } else if (pdg == Const::Klong.getPDGCode()) {
+        return ECLCluster::EHypothesisBit::c_neutralHadron;
+      } else {
+        return ECLCluster::EHypothesisBit::c_none;
+      }
     }
 
   private:

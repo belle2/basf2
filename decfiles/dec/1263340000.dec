@@ -5,7 +5,7 @@
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Racha Cheaib
-# Email: rcheaib@olemiss.edu
+# Email: rachac@mail.ubc.ca
 # Cuts: None
 # Date: 20171204
 #
@@ -39,12 +39,12 @@ CDecay mytau+
 
 
 Decay B-
-1.00 D0tag  pi-                    PHSP;
+1.00 D0tag  pi-   PHOTOS                 PHSP;
 Enddecay
 CDecay B+
 
 Decay D0tag
-1.00 K- pi+    PHSP;
+1.00 K- pi+   PHOTOS   PHSP;
 Enddecay
 CDecay anti-D0tag 
 

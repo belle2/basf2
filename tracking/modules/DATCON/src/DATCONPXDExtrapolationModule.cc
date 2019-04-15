@@ -67,43 +67,36 @@ DATCONPXDExtrapolationModule::event()
   const double shiftY = (sensorMaxY + sensorMinY) / 2.0;
   const double layerRadius[2] = {1.42854, 2.21218};      // ATTENTION: hard coded values from pxd/data/PXD-Components.xml
   const double sensorLength[2] = {4.48, 6.144};
-  VxdID sensorID;
-
-  double shiftZ;
-  double angleDiff;
-
-  double x = 0., y = 0., z = 0.;
-  TVector2 mostProbableHitLocal(0, 0);
-  double a, b, cp; /**< helper variables */
-  double qualityOfHit;
-  double trackRadius, trackCurvsign, trackPhi, trackTheta;
-  double sensorPerpRadius;
-  double sensorPhi;
 
   for (auto& track : storeDATCONTracks) {
-    trackRadius   = track.getTrackRadius();
-    trackPhi      = track.getTrackPhi();
-    trackTheta    = track.getTrackTheta();
-    trackCurvsign = track.getTrackCurvature();
+    double trackPhi      = track.getTrackPhi();
+    double trackTheta    = track.getTrackTheta();
+    double trackCurvsign = track.getTrackCurvature();
 
-    trackRadius = trackCurvsign * fabs(trackRadius);
+    double trackRadius = trackCurvsign * fabs(track.getTrackRadius());
 
     /* Determine qualityOfHit */
-    qualityOfHit = 1.0 / fabs(trackRadius);
+    double qualityOfHit = 1.0 / fabs(trackRadius);
 
     /** Loop over both PXD layer */
     for (int layer = 1; layer <= 2; layer++) {
       /** Loop over all ladders of layer */
-      for (int ladder = 1; ladder <= 12; ladder++) {
+      for (int ladder = 1; ladder <= (layer == 1 ? 8 : 12); ladder++) {
         /** Loop over both modules of a ladder */
         for (int sensor = 1; sensor <= 2; sensor++) {
-          sensorID = VxdID(layer, ladder, sensor);
 
-          sensorPerpRadius = layerRadius[layer - 1];
+          double a, b, cp; /**< helper variables */
+          double shiftZ;
+          double sensorPhi;
+          TVector2 mostProbableHitLocal(0, 0);
 
-          x = std::numeric_limits<double>::max();
-          y = std::numeric_limits<double>::max();
-          z = std::numeric_limits<double>::max();
+          VxdID sensorID = VxdID(layer, ladder, sensor);
+
+          double sensorPerpRadius = layerRadius[layer - 1];
+
+          double x = std::numeric_limits<double>::max();
+          double y = std::numeric_limits<double>::max();
+          double z = std::numeric_limits<double>::max();
 
           if (layer == 1) {
             sensorPhi = M_PI / 4. * (ladder - 1);
@@ -113,7 +106,7 @@ DATCONPXDExtrapolationModule::event()
             shiftZ = centerZShiftLayer2[sensor - 1];
           }
 
-          angleDiff = trackPhi - sensorPhi;
+          double angleDiff = trackPhi - sensorPhi;
           if (angleDiff > M_PI) {
             angleDiff -= 2 * M_PI;
           }
@@ -167,11 +160,6 @@ DATCONPXDExtrapolationModule::event()
             continue;
           }
         }
-
-        if (layer == 1 && ladder == 8) {
-          ladder = 13; // don't loop over non-existing layer 1 ladders
-        }
-
       }
     }
   }

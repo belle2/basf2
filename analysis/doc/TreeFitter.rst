@@ -1,7 +1,7 @@
+.. _treeFitter:
+
 Tree Fitter
 ===========
-
-.. Documentation about the tree fitter is not yet migrated from our `confluence page <https://confluence.desy.de/display/BI/Physics+TreeFitter>`_. Please go there.  If you have time to do the migration, feel free to take `agira ticket <https://agira.desy.de/browse/BII-2980>`_. In this case you might need nice guid on Sphinx documentation: :ref:`doctools` .
 
 Tree Fitter is a tool to perform simultaneous vertex fitting of a single decay
 chain. The work is based on `arXiv:physics/0503191 <https://arxiv.org/abs/physics/0503191>`_.
@@ -23,13 +23,12 @@ Some notes to keep in mind:
 
 .. warning:: If you fit modes with neutrals: check your preselection efficiency!
 
-   E.g. a selection of :math:`0.130 < InvM < 0.14~GeV` already cuts away 60% of true :math:`\pi^0`  in :math:`B\to\pi^+\pi^-\pi^0`.
+For example, a selection of :math:`0.130 < \texttt{InvM} < 0.14~\rm{GeV}/c^2` already cuts away 60% of true :math:`\pi^0`  in :math:`B\to\pi^+\pi^-\pi^0`.
 
-   With :math:`E_{\gamma}>0.05~GeV` and :b2:var:`pionID`>0.5 and :b2:var:`chiProb`>0.001 Jo-Frederik Krohn got this efficiency (2017)
+.. figure:: figs/BtoPiPiPi0_masswindowEfficiency.png
+        :width: 600
 
-.. figure:: BtoPiPiPi0_masswindowEfficiency.pdf
-  :width: 40em
-  :align: center
+        The efficiency for :math:`B\to\pi^+\pi^-\pi^0`, with :math:`E_{\gamma}>0.05~\rm{GeV}`, :b2:var:`pionID`>0.5 and :b2:var:`chiProb`>0.001.
 
 
 .. autofunction:: vertex.vertexTree

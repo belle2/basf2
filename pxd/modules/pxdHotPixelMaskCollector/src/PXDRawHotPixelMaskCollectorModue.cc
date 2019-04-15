@@ -42,6 +42,7 @@ PXDRawHotPixelMaskCollectorModule::PXDRawHotPixelMaskCollectorModule() : Calibra
 void PXDRawHotPixelMaskCollectorModule::prepare() // Do your initialise() stuff here
 {
   m_pxdRawHit.isRequired();
+  m_storeDaqStatus.isRequired();
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
 
@@ -107,6 +108,8 @@ void PXDRawHotPixelMaskCollectorModule::collect() // Do your event() stuff here
   auto& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
 
+  // Get Map of (un)usable modules
+  auto usability = m_storeDaqStatus->getUsable();
   // Count hits per sensor
   TH1I* collector_pxdhitcounts = getObjectPtr<TH1I>("PXDHitCounts");
 
@@ -116,6 +119,7 @@ void PXDRawHotPixelMaskCollectorModule::collect() // Do your event() stuff here
       B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
       continue;
     }
+    if (!usability[sensorID]) continue;// masked as bad sensor data
 
     // We need some protection against crap data
     if (!goodHit(rawhit)) continue;

@@ -35,8 +35,6 @@
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 
-#include <alignment/GlobalParam.h>
-
 namespace Belle2 {
   class MillepedeAlgorithm;
   namespace alignment {

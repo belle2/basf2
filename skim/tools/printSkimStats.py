@@ -21,7 +21,7 @@
       (taking into account the total number of input mdst files available per sample.)
 
  To run printSkimStats.py, you need to have run your skim on a set of input mDST files
- (you can use skimRun.csh), and produce a set of uDST and log files with the following
+ (you can use runSkims.py), and produce a set of uDST and log files with the following
  name scheme:
   SkimName_SampleName.udst.root
   SkimName_SampleName.out
@@ -36,21 +36,33 @@ import os
 import itertools
 import sys
 import collections
-from skimExpertFunctions import getNEvents, getNumberOfInputMdstFilesPerSample, getTestFile, encodeSkimName
+from skimExpertFunctions import get_eventN, get_total_infiles, get_test_file, encodeSkimName
 import subprocess
 import json
 
 
-skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
+skims = '  ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
 skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
-skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic   '
-skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
+skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0'  # CharmSemileptonic   '
+skims += ' feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 Charm3BodyHadronic'
 skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  '
-skims += 'CharmRare BtoXll BtoXgamma  TauLFV '
-skims += ' Charm3BodyHadronic2  Charm3BodyHadronicD0   Charm2BodyNeutrals Charm2BodyNeutralsD0'
+skims += ' CharmRare BtoXll BtoXgamma  TauLFV  Charm2BodyNeutrals2 CharmlessHad2Body CharmlessHad3Body'
+skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1 Charm3BodyHadronic3   Charm2BodyNeutrals Charm2BodyNeutralsD0'
+skims += ' Charm2BodyHadronic Charm2BodyHadronicD0'
 
-bkgs = 'MC9_mixedBGx1  MC9_chargedBGx1 MC9_ccbarBGx1 MC9_ssbarBGx1 MC9_uubarBGx0  MC9_ddbarBGx1  MC9_taupairBGx1'
-bkgs += ' MC9_mixedBGx0 MC9_chargedBGx0 MC9_ccbarBGx0 MC9_ssbarBGx0 MC9_uubarBGx0 MC9_ddbarBGx0 MC9_taupairBGx0'
+
+skims = 'ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon'
+skims = ' BtoDh_Kspipipi0 BtoDh_Kspi0 BtoDh_hh BtoDh_Kshh'
+skims = ' BtoPi0Pi0 BtoXll BtoXgamma Charm2BodyHadronic Charm2BodyHadronicD0'
+skims = ' Charm2BodyNeutrals Charm2BodyNeutralsD0 Charm3BodyHadronic Charm3BodyHadronic2'
+skims = ' Charm3BodyHadronic1 Charm3BodyHadronic3 CharmRare CharmSemileptonic'
+skims = ' CharmlessHad2Body CharmlessHad3Body ISRpipicc'
+skims = ' LFVZpInvisible LFVZpVisible LeptonicUntagged PRsemileptonicUntagged'
+skims = ' SLUntagged SinglePhotonDark SystematicsEELL SystematicsRadMuMu SystematicsRadEE'
+skims = ' SystematicsLambda Systematics SystematicsTracking TauLFV TCPV TauGeneric'
+skims = ' feiHadronicB0 feiHadronicBplus feiSLB0WithOneLep feiSLBplusWithOneLep'
+bkgs = 'MC11_mixedBGx1  MC11_chargedBGx1 MC11_ccbarBGx1 MC11_ccbarBGx1 MC11_uubarBGx0  MC11_ddbarBGx1  MC11_taupairBGx1'
+bkgs += ' MC11_mixedBGx0 MC11_chargedBGx0 MC11_ccbarBGx0 MC11_ssbarBGx0 MC11_uubarBGx0 MC11_ddbarBGx0 MC11_taupairBGx0'
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
 jsonEvtSizeInput = open('JsonEvtSizeInput.txt', 'w')
@@ -79,10 +91,10 @@ for skim in skims.split():
         pos = bkg.find('_')
         skimCampaign = bkg[0:pos]
         sampleType = bkg[pos + 1:]
-        fileList = getTestFile(sampleType, skimCampaign)
-        nFullEvents = getNEvents(fileList)
-        nSkimmedEvents = getNEvents(outputUdstName + '.udst.root')
-        nFullFiles = getNumberOfInputMdstFilesPerSample(sampleType, skimCampaign)
+        fileList = get_test_file(sampleType, skimCampaign)
+        nFullEvents = get_eventN(fileList)
+        nSkimmedEvents = get_eventN(outputUdstName + '.udst.root')
+        nFullFiles = get_total_infiles(sampleType, skimCampaign)
         # These counters are included to determine the number  of lines with retention and candidate multiplicity information.
         lineCounter = 0
         l = 0

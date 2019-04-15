@@ -74,7 +74,7 @@ namespace Belle2 {
       void backward(G4LogicalVolume&);
       /** Place elements inside the forward endcap */
       void forward(G4LogicalVolume&);
-
+      /** Wrapped crystal */
       G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
 
       /** Define visual attributes */
@@ -92,9 +92,11 @@ namespace Belle2 {
 
       /** Sensitive detector */
       Simulation::SensitiveDetectorBase* m_sensitive;
+      /** Sensitive diode */
       Simulation::SensitiveDetectorBase* m_sensediode;
       /** Vector of background-Sensitive detectors */
       std::map<std::string, G4VisAttributes*> m_atts;
+      /** overlap */
       int m_overlap;
     };
 

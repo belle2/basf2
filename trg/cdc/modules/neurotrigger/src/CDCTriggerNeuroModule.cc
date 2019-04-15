@@ -54,6 +54,12 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "option on how to obtain the event time. Possibilities are: "
            "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero'.",
            string("etf_or_fastestpriority"));
+  addParam("writeMLPinput", m_writeMLPinput,
+           "if true, the MLP input vector will be written to the datastore (for DQM)",
+           false);
+  addParam("hardwareCompatibilityMode", m_hardwareCompatibilityMode,
+           "Switch to mimic an apparent bug in the hardware preprocessing",
+           false);
 }
 
 
@@ -69,13 +75,30 @@ CDCTriggerNeuroModule::initialize()
   m_tracksNN.registerInDataStore(m_outputCollectionName);
   m_tracks2D.isRequired(m_inputCollectionName);
   m_segmentHits.isRequired(m_hitCollectionName);
-  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName);
+  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName, m_et_option);
 
   m_tracks2D.registerRelationTo(m_tracksNN);
   m_tracks2D.requireRelationTo(m_segmentHits);
   m_tracksNN.registerRelationTo(m_segmentHits);
+  if (m_writeMLPinput) {
+    m_mlpInput.registerInDataStore(m_outputCollectionName + "Input",
+                                   DataStore::c_DontWriteOut);
+    m_tracksNN.registerRelationTo(m_mlpInput, DataStore::c_Event,
+                                  DataStore::c_DontWriteOut);
+  }
 }
 
+float CDCTriggerNeuroModule::hwInputIdShuffle(float tsid, int sl)
+{
+  switch (sl) {
+    case 8: return tsid + 0.12;
+    case 4: return tsid / 2;
+    case 3: return tsid - 0.12;
+    case 1: return (tsid + 0.12) / 2;
+    case 0: return tsid / 4;
+    default: return tsid;
+  }
+}
 
 void
 CDCTriggerNeuroModule::event()
@@ -104,6 +127,11 @@ CDCTriggerNeuroModule::event()
     // get the input for the MLP
     vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks2D[itrack]);
     vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds);
+    if (m_hardwareCompatibilityMode) {
+      for (unsigned isl = 0; isl < 9; isl++) {
+        MLPinput[3 * isl] = hwInputIdShuffle(MLPinput[3 * isl], isl);
+      }
+    }
     // run the MLP
     vector<float> target;
     if (m_fixedPoint) {
@@ -125,6 +153,16 @@ CDCTriggerNeuroModule::event()
     // relations to hits used in MLP
     for (unsigned i = 0; i < hitIds.size(); ++i) {
       NNtrack->addRelationTo(m_segmentHits[hitIds[i]]);
+    }
+    if (m_writeMLPinput) {
+      // for fixed point precision, round the inputs before saving
+      if (m_fixedPoint) {
+        for (unsigned ii = 0; ii < MLPinput.size(); ++ii) {
+          MLPinput[ii] = long(MLPinput[ii] * (1 << m_precision[3])) / float(1 << m_precision[3]);
+        }
+      }
+      auto* storeInput = m_mlpInput.appendNew(MLPinput, unsigned(isector));
+      NNtrack->addRelationTo(storeInput);
     }
   }
 }

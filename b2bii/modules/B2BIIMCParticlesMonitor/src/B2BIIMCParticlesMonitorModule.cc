@@ -46,24 +46,6 @@ B2BIIMCParticlesMonitorModule::~B2BIIMCParticlesMonitorModule()
 {
 }
 
-//------------------------------------------------------------------
-// Function to define histograms
-//-----------------------------------------------------------------
-
-TH1F* mcPDG; /** histogram PDG values of MC Particles */
-TH1F* mcM;   /** histogram mass */
-TH1F* mcPx;  /** histogram momentum_x */
-TH1F* mcPy;  /** histogram momentum_y */
-TH1F* mcPz;  /** histogram momentum_z */
-TH1F* mcE;   /** histogram energy */
-TH1F* mcVx;  /** histogram vertex_x */
-TH1F* mcVy;  /** histogram vertex_y */
-TH1F* mcVz;  /** histogram vertex_z */
-TH1F* mcPiPlusMother;  /** histogram PDG codes of mother particles of positive pions */
-TH1F* mcPiMinusMother; /** histogram PDG codes of mother particles of negative pions */
-TH1F* mcPi0Mother;  /** histogram PDG codes of mother particles of pi0's */
-TH1F* mcNDau;         /** histogram number of daughter particles of all particles */
-
 void B2BIIMCParticlesMonitorModule::defineHisto()
 {
   mcPDG = new TH1F("mcPDG", "PDG values of MCParticles", 100, -22500, 22500);

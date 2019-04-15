@@ -231,7 +231,7 @@ CDCTriggerNeuroTrainerModule::initialize()
       }
     }
   }
-  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName);
+  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName, m_parameters.et_option);
   // consistency check of training parameters
   if (m_NeuroTrigger.nSectors() != m_trainSets.size())
     B2ERROR("Number of training sets (" << m_trainSets.size() << ") should match " <<

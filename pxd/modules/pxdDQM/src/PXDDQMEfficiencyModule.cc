@@ -49,7 +49,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("pCut", m_pcut, "Set a cut on the p-value ", double(0));
 
-  addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(true));
+  addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(false));
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
 
@@ -66,10 +66,6 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 }
 
 
-PXDDQMEfficiencyModule::~PXDDQMEfficiencyModule()
-{
-}
-
 void PXDDQMEfficiencyModule::initialize()
 {
   //calls the define histogram function
@@ -81,13 +77,6 @@ void PXDDQMEfficiencyModule::initialize()
   m_tracks.isOptional(m_tracksName);
   m_ROIs.isOptional(m_ROIsName);
 }
-
-
-void PXDDQMEfficiencyModule::beginRun()
-{
-  //Not really anything to do here
-}
-
 
 
 void PXDDQMEfficiencyModule::event()
@@ -113,8 +102,7 @@ void PXDDQMEfficiencyModule::event()
 
     if (a_track.getNumberOfSVDHits() < m_minSVDHits) continue;
 
-    const genfit::FitStatus* fitstatus = NULL;
-    fitstatus = a_track.getTrackFitStatus();
+    const genfit::FitStatus* fitstatus = a_track.getTrackFitStatus();
     if (fitstatus->getPVal() < m_pcut) continue;
 
     genfit::MeasuredStateOnPlane trackstate;

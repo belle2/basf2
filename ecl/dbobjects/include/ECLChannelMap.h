@@ -94,7 +94,7 @@ namespace Belle2 {
     std::vector<int> m_MappingFWD; /**< Map entries for ECL forward endcap */
     std::vector<int> m_MappingBWD; /**< Map entries for ECL backward endcap */
 
-    ClassDef(ECLChannelMap, 1);
+    ClassDef(ECLChannelMap, 1); /**< ClassDef */
   };
 }
 

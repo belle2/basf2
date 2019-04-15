@@ -57,7 +57,6 @@ add_tracking_reconstruction(
     components=None,
     pruneTracks=False,
     mcTrackFinding=mcTrackFinding,
-    trigger_mode="all",
     skipGeometryAdding=False
 )
 

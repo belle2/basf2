@@ -134,9 +134,6 @@ add_skim('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpat
 from skim.charm import CharmRareList
 add_skim('CharmRare', CharmRareList(path=skimpath), path=skimpath)
 
-from skim.charm import CharmSemileptonicList
-add_skim('CharmSemileptonic', CharmSemileptonicList(path=skimpath), path=skimpath)
-
 
 # Systematics skim
 from skim.systematics import SystematicsList
@@ -207,10 +204,7 @@ add_skim('LeptonicUntagged', LeptonicList(path=skimpath), path=skimpath)
 from skim.semileptonic import PRList
 add_skim('PRsemileptonicUntagged', PRList(path=skimpath), path=skimpath)
 
-
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
-use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 # Weightfiles for FEIv4_2018_MC9_release_02_00_01 in this database
 
 import fei

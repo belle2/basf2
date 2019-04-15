@@ -15,7 +15,6 @@
 
 #include <iostream>
 #include <ostream>
-#include <iostream>
 
 namespace eudaq {
 

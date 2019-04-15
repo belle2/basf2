@@ -226,7 +226,13 @@ function setReferenceSelectionOptions(){
     // Remove all options except for 'automatic':
     selector.options.length = 1;
     let selected_revs = getSelectedRevsList();
-    // Add all selected revisions as options for the reference:
+    let newest_rev = getNewestRevision();
+    console.log("Newest_rev:", newest_rev);
+    // Do not allow to select the newest revision as reference (because it
+    // is the second comparison element anyhow)
+    selected_revs.splice(selected_revs.indexOf(newest_rev), 1);
+    console.log("Remaining revs:", selected_revs);
+    // Add all remaining revisions as options for the reference:
     for (let rev of selected_revs){
         selector.options[selector.options.length] = new Option(
             rev, rev

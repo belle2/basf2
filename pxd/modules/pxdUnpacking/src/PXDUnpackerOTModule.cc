@@ -1197,6 +1197,11 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
         }
       }
       /// TODO how to handle error flags set in in DHC_END?
+      if (dhc.data_dhc_end_frame->getErrorInfo() != 0) {
+        if (!(m_suppressErrorMask & c_DHH_END_ERRORBITS)) B2ERROR("DHC END Error Info set to $" << hex <<
+                                                                    dhc.data_dhc_end_frame->getErrorInfo());
+        m_errorMask |= c_DHH_END_ERRORBITS;
+      }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       m_errorMaskDHC |= m_errorMask; // do latest updates
 
@@ -1207,6 +1212,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
         daqpktstat.dhc_back().setErrorMask(m_errorMaskDHC);
         //B2DEBUG(98,"** DHC "<<currentDHCID<<" Raw"<<dhc.data_dhc_end_frame->get_words() * 4 <<" Red"<<countedBytesInDHC);
         daqpktstat.dhc_back().setCounters(dhc.data_dhc_end_frame->get_words() * 4, countedBytesInDHC);
+        daqpktstat.dhc_back().setEndErrorInfo(dhc.data_dhc_end_frame->getErrorInfo());
       }
       m_errorMaskDHC = 0;
       currentDHEID = 0xFFFFFFFF;
@@ -1225,6 +1231,11 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
         m_errorMask |= c_DHE_START_END_ID;
       }
       /// TODO how to handle error flags set in in DHE_END?
+      if (dhc.data_dhe_end_frame->getErrorInfo() != 0) {
+        if (!(m_suppressErrorMask & c_DHH_END_ERRORBITS)) B2ERROR("DHE END Error Info set to $" << hex <<
+                                                                    dhc.data_dhe_end_frame->getErrorInfo());
+        m_errorMask |= c_DHH_END_ERRORBITS;
+      }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       if (found_mask_active_dhp != mask_active_dhp) {
         if (!(m_suppressErrorMask & c_DHP_ACTIVE)) {
@@ -1268,6 +1279,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
           daqpktstat.dhc_back().dhe_back().setErrorMask(m_errorMaskDHE);
           // B2DEBUG(98,"** DHC "<<currentDHEID<<" Raw "<<dhc.data_dhe_end_frame->get_words() * 2 <<" Red"<<countedBytesInDHE);
           daqpktstat.dhc_back().dhe_back().setCounters(dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
+          daqpktstat.dhc_back().dhe_back().setEndErrorInfo(dhc.data_dhe_end_frame->getErrorInfo());
         }
       }
       m_errorMaskDHE = 0;

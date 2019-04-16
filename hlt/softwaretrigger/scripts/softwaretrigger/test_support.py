@@ -110,9 +110,9 @@ def test_script(script_location, input_file_name, temp_dir):
 
     cmd = [sys.executable, script_location,
            "--central-db-tag", central_database,
-           "--input-file", input_file_name,
-           "--histo-output-file", histos_file_name,
-           "--output-file", output_file_name,
+           "--input-file", os.path.abspath(input_file_name),
+           "--histo-output-file", os.path.abspath(histos_file_name),
+           "--output-file", os.path.abspath(output_file_name),
            "--number-processes", str(num_processes),
            input_buffer, output_buffer, str(histo_port)]
 

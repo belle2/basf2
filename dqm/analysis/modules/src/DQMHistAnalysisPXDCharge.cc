@@ -41,6 +41,13 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 
+DQMHistAnalysisPXDChargeModule::~DQMHistAnalysisPXDChargeModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistAnalysisPXDChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: initialized.");
@@ -102,7 +109,7 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
   SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
@@ -209,7 +216,6 @@ void DQMHistAnalysisPXDChargeModule::terminate()
   SEVCHK(ca_clear_channel(mychid[0]), "ca_clear_channel failure");
   SEVCHK(ca_clear_channel(mychid[1]), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  ca_context_destroy();
 #endif
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");
 }

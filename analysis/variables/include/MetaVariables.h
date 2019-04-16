@@ -329,5 +329,10 @@ namespace Belle2 {
     * Returns function which returns maximum transverse momentum Pt in the given particle Lists.
     */
     Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns if at least one track is related to the cluster of the particle and this track satisfies the given condition.
+    */
+    Manager::FunctionPtr eclClusterTrackMatchedWithCondition(const std::vector<std::string>& arguments);
   }
 }

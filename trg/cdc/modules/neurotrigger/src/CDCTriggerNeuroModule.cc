@@ -50,11 +50,12 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "fixed point precision in bit after radix point (for track phi, "
            "scaling factor, reference id, MLP nodes, MLP weights, "
            "MLP activation function)", {12, 8, 8, 12, 10, 10});
+  addParam("et_option", m_et_option,
+           "option on how to obtain the event time. Possibilities are: "
+           "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero'.",
+           string("etf_or_fastestpriority"));
   addParam("writeMLPinput", m_writeMLPinput,
            "if true, the MLP input vector will be written to the datastore (for DQM)",
-           false);
-  addParam("alwaysTrackT0", m_alwaysTrackT0,
-           "Switch for always using the shortest priority time of the TS as t0.",
            false);
   addParam("hardwareCompatibilityMode", m_hardwareCompatibilityMode,
            "Switch to mimic an apparent bug in the hardware preprocessing",
@@ -74,7 +75,7 @@ CDCTriggerNeuroModule::initialize()
   m_tracksNN.registerInDataStore(m_outputCollectionName);
   m_tracks2D.isRequired(m_inputCollectionName);
   m_segmentHits.isRequired(m_hitCollectionName);
-  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName, m_alwaysTrackT0);
+  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName, m_et_option);
 
   m_tracks2D.registerRelationTo(m_tracksNN);
   m_tracks2D.requireRelationTo(m_segmentHits);
@@ -116,7 +117,7 @@ CDCTriggerNeuroModule::event()
                                 atan2(1., m_tracks2D[itrack]->getCotTheta()));
     if (geoSectors.size() == 0) continue;
     // read out or determine event time
-    m_NeuroTrigger.getEventTime(geoSectors[0], *m_tracks2D[itrack], m_alwaysTrackT0);
+    m_NeuroTrigger.getEventTime(geoSectors[0], *m_tracks2D[itrack], m_et_option);
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
       m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack]);

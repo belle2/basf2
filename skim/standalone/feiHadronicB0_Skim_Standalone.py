@@ -5,7 +5,7 @@
     FEI Hadronic B0 tag skim standalone for generic analysis in the
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180100
-    fei training: default based, release-03-00-03 'FEIv4_2018_default_release_02_00_01'
+    fei training: MC11 based, release-03-00-03 'FEIv4_2018_MC11_release_03_00_00'
     """
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]

@@ -22,7 +22,6 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <vector>
 #include <cassert>
 #include <framework/utilities/FileSystem.h>
 #include <ecl/digitization/WrapArray2D.h>

@@ -12,11 +12,12 @@
 """
 
 
-import ROOT
 from basf2 import B2INFO, B2FATAL
 import flavorTagger as ft
-from array import array
 import shutil
+import ROOT
+from ROOT import Belle2
+from array import array
 
 ROOT.gROOT.SetBatch(True)
 

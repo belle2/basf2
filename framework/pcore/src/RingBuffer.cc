@@ -25,7 +25,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <cstdlib>
-#include <sys/ipc.h>
 #include <sys/sem.h>
 
 #include <fstream>

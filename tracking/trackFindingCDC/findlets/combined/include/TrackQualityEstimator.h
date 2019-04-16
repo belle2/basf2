@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      TrackQualityEstimator(const std::string& defaultFilterName = "recording");
+      explicit TrackQualityEstimator(const std::string& defaultFilterName = "recording");
 
       /// Short description of the findlet
       std::string getDescription() final;
@@ -39,12 +39,18 @@ namespace Belle2 {
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
+      /// Receive and dispatch signal before the start of the event processing
+      void initialize();
+
       /// Main algorithm
       void apply(std::vector<CDCTrack>& tracks) final;
 
     private:
       // Findlet to fill CDCTracks into lookup table (singleton) with clone information
       CDCMCCloneLookUpFiller m_mcCloneLookUpFiller;
+
+      /// Store output of needsTruthInformation from filter in member variable
+      bool m_needsTruthInformation = false;
 
       /// Parameter : Delete tracks below threshold instead of just assigning quality indicator
       bool m_param_deleteTracks = false;

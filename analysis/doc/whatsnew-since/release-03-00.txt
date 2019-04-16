@@ -4,6 +4,9 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* Added ``isCloneOfSignalSide`` and ``hasAncestorFromSignalSide``  variables to monitor the clone particle
+  contamination in ROE. These variables use generator information.
+
 * Removed ``nECLClusters`` (:issue:`BII-4476`).
   The number of `ECLClusters` is not a good measure for anything except the age of the input mdst file.
   Recent changes to the handling of ECLClusters and their hypotheses have changed this (already arbitrary) 
@@ -57,13 +60,33 @@ Variables
   `isSignal` was added to the unit tests of the flavor tagging variables. 
 
 
+* Added MC flight information variables, :b2:var:`mcFlightDistance` and :b2:var:`mcFlightTime`
+
 Standard Particle Lists
 +++++++++++++++++++++++
+
+* Updated V0 lists by making them explicitly call the appropriate vertex fit.
+
+* Switched the aforementioned fitter to Rave due to it displaying higher efficiency
+  (See Physics Performance Meeting, 21 March 2019).
+
+* Fixed a bug in the merged Lambda list, which used an incorrect mass window.
 
 * Updated charged standard PID cut values to reflect the correct efficiencies.
   This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
 
 * Fix the `stdKlongs.stdKlongs` lists.
+Unit Tests
+++++++++++
+
+* Added unit tests for the standard V0 lists.
+
+Variables
++++++++++
+
+* The function to create variable aliases for particles selected from a decay
+  string has been fixed and extended to allow better
+  customization (:issue:`BII-4437`)
 
 * The variables for the fast reco HLT trigger stage have been removed,
   as we are currently not planning to have it in the early data taking.

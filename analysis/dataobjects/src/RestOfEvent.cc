@@ -57,13 +57,29 @@ bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* 
       roeParticle->getTrack()->getArrayIndex() != toAddParticle->getTrack()->getArrayIndex()) {
     return false;
   }
-  if (roeParticle->getECLCluster() && toAddParticle->getECLCluster()
-      && roeParticle->getECLCluster()->getArrayIndex() != toAddParticle->getECLCluster()->getArrayIndex()) {
-    return false;
-  }
   if (roeParticle->getKLMCluster() && toAddParticle->getKLMCluster()
       && roeParticle->getKLMCluster()->getArrayIndex() != toAddParticle->getKLMCluster()->getArrayIndex()) {
     return false;
+  }
+
+  // It can be a bit more complicated for ECLClusters as we might also have to ensure they are connected-region unique
+  if (roeParticle->getECLCluster() && toAddParticle->getECLCluster()
+      && roeParticle->getECLCluster()->getArrayIndex() != toAddParticle->getECLCluster()->getArrayIndex()) {
+
+    // if either is a track then they must be different
+    if (roeParticle->getECLCluster()->isTrack() or toAddParticle->getECLCluster()->isTrack())
+      return false;
+
+    // we cannot combine two particles of different hypotheses from the same
+    // connected region (as their energies overlap)
+    if (roeParticle->getECLClusterEHypothesisBit() == toAddParticle->getECLClusterEHypothesisBit())
+      return false;
+
+    // in the rare case that both are neutral and the hypotheses are different,
+    // we must also check that they are from different connected regions
+    // otherwise they come from the "same" underlying ECLShower
+    if (roeParticle->getECLCluster()->getConnectedRegionId() != toAddParticle->getECLCluster()->getConnectedRegionId())
+      return false;
   }
   return true;
 }
@@ -498,11 +514,12 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& mask
   std::vector<const ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
   TLorentzVector roe4VectorECLClusters;
 
-  // Add all momenta from neutral ECLClusters
+  // Add all momenta from neutral ECLClusters which have the nPhotons hypothesis
   ClusterUtils C;
   for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
     if (roeClusters[iEcl]->isNeutral())
-      roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl], ECLCluster::EHypothesisBit::c_nPhotons);
+      if (roeClusters[iEcl]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+        roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl], ECLCluster::EHypothesisBit::c_nPhotons);
   }
 
   return roe4VectorECLClusters;

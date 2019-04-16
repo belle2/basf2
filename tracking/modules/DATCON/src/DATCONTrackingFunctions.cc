@@ -265,7 +265,6 @@ DATCONTrackingModule::trackMerger()
   std::vector<DATCONTrack> TracksCopy;
   std::vector<DATCONTrack> TracksMerged;
 
-  int count = 1;
   int trackID = 1;
 
   if (storeDATCONTracks.isValid()) {
@@ -289,7 +288,7 @@ DATCONTrackingModule::trackMerger()
     double ThetaAverage  = trackTheta;
     double ZzeroAverage  = TrackZzero;
 
-    count = 1;
+    int count = 1;
 
     bool cancelflag = false;
     while (true) {

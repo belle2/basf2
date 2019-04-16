@@ -4,6 +4,8 @@
 from basf2 import *
 
 from daqdqm.commondqm import add_common_dqm
+from IPDQM import add_IP_dqm
+from V0DQM import add_V0_dqm
 
 
 def add_collision_dqm(path, components=None, dqm_environment="expressreco"):
@@ -20,3 +22,11 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco"):
     """
 
     add_common_dqm(path, components, dqm_environment)
+
+    # the following makes only sense in collisions
+    if dqm_environment == "expressreco":
+        if components is None or ('CDC' in components and 'SVD' in components):
+            add_IP_dqm(path)
+
+        if components is None or 'CDC' in components:
+            add_V0_dqm(path)

@@ -16,7 +16,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/Helix.h>
-#include <framework/logging/Logger.h>
 
 // dataobjects from the MDST
 #include <mdst/dataobjects/Track.h>

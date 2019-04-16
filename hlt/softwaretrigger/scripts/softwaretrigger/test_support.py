@@ -1,3 +1,5 @@
+import random
+import shutil
 import subprocess
 import os
 import sys
@@ -102,18 +104,21 @@ def test_script(script_location, input_file_name, temp_dir):
     output_buffer = "UNUSED"  # unused
     histo_port = 6666         # unused
 
-    histos_file_name = os.path.join(temp_dir, "histos.root")
-    output_file_name = os.path.join(temp_dir, "output.root")
+    random_seed = "".join(random.choices("abcdef", k=4))
+
+    histos_file_name = os.path.join(temp_dir, f"{random_seed}_histos.root")
+    output_file_name = os.path.join(temp_dir, f"{random_seed}_output.root")
     # TODO: should we use the default global tag here?
     central_database = basf2.get_default_global_tags()
     num_processes = 1
 
     cmd = [sys.executable, script_location,
            "--central-db-tag", central_database,
-           "--input-file", input_file_name,
-           "--histo-output-file", histos_file_name,
-           "--output-file", output_file_name,
-           input_buffer, output_buffer, str(histo_port), str(num_processes)]
+           "--input-file", os.path.abspath(input_file_name),
+           "--histo-output-file", os.path.abspath(histos_file_name),
+           "--output-file", os.path.abspath(output_file_name),
+           "--number-processes", str(num_processes),
+           input_buffer, output_buffer, str(histo_port)]
 
     subprocess.check_call(cmd)
 
@@ -149,8 +154,10 @@ def test_folder(location, run_type, exp_number, phase):
 
     script_dir = find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False
-    for script_location in glob(os.path.join(script_dir, f"{run_type.name}_*.py")):
+    for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}_*.py")):
         run_at_least_one = True
         test_script(script_location, input_file_name=output_file_name, temp_dir=temp_dir)
 
     assert run_at_least_one
+
+    shutil.rmtree(temp_dir)

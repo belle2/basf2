@@ -220,8 +220,8 @@ void BKLMDigitAnalyzerModule::endRun()
     TObject* obj;
     while ((obj = nextHisto()))
       obj->Write("", TObject::kWriteDelete);
+    m_outputRootFile->Close();
   }
-  m_outputRootFile->Close();
 }
 
 void BKLMDigitAnalyzerModule::terminate()

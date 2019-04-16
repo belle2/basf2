@@ -32,11 +32,12 @@ namespace Belle2 {
    */
   class SVDOccupancyCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload;
+    static std::string name; /**< name of the ccupancy payload */
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload; /**< typedef of the Occupancy payload of all SVD strips*/
 
-    static std::string threshold_name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_threshold_payload;
+    // unused at the moment, but do not forget it!
+    //    static std::string threshold_name; /**< name of the threshold payload */
+    //    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_threshold_payload; /**< typedef of the threshold payload  of all SVD strips*/
 
     /** Constructor, no input argument is required */
     SVDOccupancyCalibrations()
@@ -73,7 +74,7 @@ namespace Belle2 {
     bool isValid() { return m_aDBObjPtr.isValid(); }
 
   private:
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr; /**< payload of the occupancy*/
 
 
   };

@@ -12,7 +12,7 @@
 <!-- temporary announcements -->
 <div class="infobox info">
   <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-  <b>Recent changes:</b> More combinations of revisions are prebuilt!
+  <b>Recent changes:</b> Compare different revisions to each other (alias "custom reference selection"); add description to ROOT files!
   <a target="_blank" href="https://confluence.desy.de/display/BI/News">Details &amp; more news</a>
 </div>
 
@@ -60,6 +60,10 @@
       <div class="no_reference">NO REFERENCE FILE</div>
       {{/if}}
     </h2>
+    {{#if description }}
+    <b>Description: </b>
+    {{ description }}
+    {{ /if }}
     <br>
 
     <!-- If we have html content: -->

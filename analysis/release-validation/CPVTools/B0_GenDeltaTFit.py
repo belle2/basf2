@@ -416,7 +416,7 @@ class fitDeltaT(b2.Module):
             Upsilon4Sparticle = plistUpsilon.obj().getParticle(index)
 
             if Upsilon4Sparticle.getPDGCode() == 300553:
-                zUpsilon = mc_variables.evaluate("mcDZ", Upsilon4Sparticle)
+                zUpsilon = mc_variables.evaluate("mcZ", Upsilon4Sparticle)
 
         for index in range(0, plist.obj().getListSize()):
             B0particle = plist.obj().getParticle(index)  # Pointer to the particle with highest prob
@@ -436,11 +436,11 @@ class fitDeltaT(b2.Module):
 
             if isB0sig:
                 tSig = mc_variables.evaluate("mcDecayTime", B0particle)
-                zSig = mc_variables.evaluate("mcDZ", B0particle)
+                zSig = mc_variables.evaluate("mcZ", B0particle)
                 sigPDG = B0particle.getPDGCode()
             else:
                 tTag = mc_variables.evaluate("mcDecayTime", B0particle)
-                zTag = mc_variables.evaluate("mcDZ", B0particle)
+                zTag = mc_variables.evaluate("mcZ", B0particle)
                 tagPDG = B0particle.getPDGCode()
 
             # print(tSig, " ", tTag)

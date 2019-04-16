@@ -447,7 +447,7 @@ namespace TreeFitter {
     jacobian(3, 2) = 1;
     jacobian(3, 3) = (pz * (px2 * x - py * (aq * r + py * x) + 2 * px * py * y)) / (pt2 * pt02);
     jacobian(3, 4) = (pz * (px * (aq * r + 2 * py * x) - px2 * y + py2 * y)) / (pt2 * pt02);
-    jacobian(3, 5) = std::atan2(-(aq * (px * x + py * y)), px2 + py * py0 - aq * px * y) / aq;
+    jacobian(3, 5) = std::atan2(-(aq * pt * (px * x + py * y)), pt * (px2 + py * py0 - aq * px * y)) / aq;
 
     // D tan lambda / Dx_i
     jacobian(4, 0) = 0;

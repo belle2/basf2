@@ -141,6 +141,12 @@ namespace TreeFitter {
 
     p.getResiduals().segment(0, 5) = m_params - helixpars;
 
+    //account for periodic boundary in phi residual
+    double phiResidual = p.getResiduals().segment(0, 5)(1);
+    if (phiResidual < -TMath::Pi()) phiResidual += 2 * TMath::Pi();
+    if (phiResidual >  TMath::Pi()) phiResidual -= 2 * TMath::Pi();
+    p.getResiduals().segment(0, 5)(1) = phiResidual;
+
     p.getV().triangularView<Eigen::Lower>() =  m_covariance.triangularView<Eigen::Lower>();
 
     p.getH().block<5, 3>(0, posindexmother) = -1.0 * jacobian.block<5, 3>(0, 0);

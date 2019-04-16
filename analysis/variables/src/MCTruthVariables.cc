@@ -642,9 +642,9 @@ namespace Belle2 {
                       "Decay ID for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
                       "Decay ID for the negative tau lepton in a tau pair generated event.")
-    REGISTER_VARIABLE("tauPlusMcProng", tauPlusMcProng,
+    REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng,
                       "Prong for the positive tau lepton in a tau pair generated event.")
-    REGISTER_VARIABLE("tauMinusMcProng", tauMinusMcProng,
+    REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "Prong for the negative tau lepton in a tau pair generated event.")
 
 

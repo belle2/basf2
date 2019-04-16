@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      explicit WireHitFilterFactory(const std::string& defaultFilterName = "cuts_from_DB");
+      explicit WireHitFilterFactory(const std::string& defaultFilterName = "all");
 
       /// Default destructor
       ~WireHitFilterFactory();

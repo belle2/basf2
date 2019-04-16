@@ -25,6 +25,12 @@ namespace Belle2 {
       /// Default constructor.
       CutsFromDBWireHitFilter();
 
+      /// Default destructor.
+      virtual ~CutsFromDBWireHitFilter();
+
+      /// Called at the beginning of the processing.
+      void initialize() final;
+
       /// Called when a new run is started.
       void beginRun() final;
 
@@ -33,8 +39,12 @@ namespace Belle2 {
 
     private:
 
+      /// Check if m_CDCWireHitRequirementsFromDB is valid
+      /// and set m_DBPtrIsValidForCurrentRun accordingly.
+      void checkIfDBObjPtrIsValid();
+
       /// Cut values from the Data Base.
-      DBObjPtr<CDCWireHitRequirements> m_CDCWireHitRequirementsFromDB;
+      DBObjPtr<CDCWireHitRequirements>* m_CDCWireHitRequirementsFromDB;
 
       /// Boolean asserting if DBObjPtr is valid for the current run.
       bool m_DBPtrIsValidForCurrentRun;

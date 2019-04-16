@@ -1,3 +1,4 @@
+import random
 import subprocess
 import os
 import sys
@@ -102,8 +103,10 @@ def test_script(script_location, input_file_name, temp_dir):
     output_buffer = "UNUSED"  # unused
     histo_port = 6666         # unused
 
-    histos_file_name = os.path.join(temp_dir, "histos.root")
-    output_file_name = os.path.join(temp_dir, "output.root")
+    random_seed = "".join(random.choices("abcdef", k=4))
+
+    histos_file_name = os.path.join(temp_dir, f"{random_seed}_histos.root")
+    output_file_name = os.path.join(temp_dir, f"{random_seed}_output.root")
     # TODO: should we use the default global tag here?
     central_database = basf2.get_default_global_tags()
     num_processes = 1

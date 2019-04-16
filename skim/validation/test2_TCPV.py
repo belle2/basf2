@@ -25,7 +25,7 @@ gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 tcpvskimpath = Path()
 
 
-fileList = ['TCPV.udst.root']
+fileList = ['../TCPV.udst.root']
 inputMdstList('default', fileList, path=tcpvskimpath)
 
 Kres = 'K_10'

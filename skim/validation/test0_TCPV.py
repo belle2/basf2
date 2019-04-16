@@ -24,12 +24,12 @@ import glob
 tcpvskimpath = b2.Path()
 
 # specify number of events to be generated
-ma.setupEventInfo(noEvents=100, path=tcpvskimpath)
+ma.setupEventInfo(noEvents=1000, path=tcpvskimpath)
 
 ge.add_evtgen_generator(path=tcpvskimpath,
                         finalstate='signal',
                         signaldecfile=b2.find_file(
-                            'dectcpv.dec'))
+                            'skim/validation/dectcpv.dec'))
 
 
 # detector simulation
@@ -41,7 +41,7 @@ re.add_reconstruction(path=tcpvskimpath)
 
 
 # Finally add mdst output
-output_filename = "TCPV.dst.root"
+output_filename = "../TCPV.dst.root"
 mdst.add_mdst_output(path=tcpvskimpath, mc=True, filename=output_filename)
 
 

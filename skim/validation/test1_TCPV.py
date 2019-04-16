@@ -24,7 +24,7 @@ from skim.standardlists.dileptons import loadStdDiLeptons
 
 tcpvskimpath = Path()
 
-fileList = ['TCPV.dst.root']
+fileList = ['../TCPV.dst.root']
 
 inputMdstList('default', fileList, path=tcpvskimpath)
 
@@ -47,7 +47,7 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
 # TCPV  B0 skim
 from skim.tcpv import TCPVList
 TCPVList = TCPVList(path=tcpvskimpath)
-ma.skimOutputUdst('TCPV.udst.root', TCPVList, path=tcpvskimpath)
+ma.skimOutputUdst('../TCPV.udst.root', TCPVList, path=tcpvskimpath)
 ma.summaryOfLists(TCPVList, path=tcpvskimpath)
 
 setSkimLogging(path=tcpvskimpath)

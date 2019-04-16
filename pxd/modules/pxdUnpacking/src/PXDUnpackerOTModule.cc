@@ -583,6 +583,7 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
         if (dhp_cm == 63) { // fifo overflow
           B2WARNING("DHP data loss (CM=63) in " << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
           /// FIXME TODO set an error bit ... but define one first
+          m_errorMask |= c_DHH_MISC_ERROR;
         }
         if (daqpktstat.dhc_size() > 0) {
           if (daqpktstat.dhc_back().dhe_size() > 0) {

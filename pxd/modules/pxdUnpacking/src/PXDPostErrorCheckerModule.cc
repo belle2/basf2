@@ -183,6 +183,7 @@ void PXDPostErrorCheckerModule::event()
         for (auto it = dhe.cm_begin(); it < dhe.cm_end(); ++it)  {
           if (std::get<2>(*it) == 63) {
             // TODO Check that we dont have CM=63 indicating fifo overflow, check and set bits
+            // mask |= c_DHH_MISC_ERROR; // unpacker should set this already, anyway we would want it set only on the DHP/DHE level...
             B2ERROR("DHP data loss (CM=63) in " << LogVar("DHE", dhe.getDHEID()) << LogVar("DHP", std::get<0>(*it)) << LogVar("Row",
                     std::get<1>(*it)));
           }

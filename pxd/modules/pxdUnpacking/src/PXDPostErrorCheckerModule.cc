@@ -58,7 +58,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DHP_SIZE |
     c_DHE_DHP_DHEID |
     c_DHE_DHP_PORT |
-    c_DHP_PIX_WO_ROW |
+//    c_DHP_PIX_WO_ROW | // FIXME this should not be needed
     //
     c_DHE_START_END_ID |
     c_DHE_START_ID |

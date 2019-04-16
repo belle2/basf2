@@ -143,8 +143,9 @@ namespace TreeFitter {
 
     //account for periodic boundary in phi residual
     double phiResidual = p.getResiduals().segment(0, 5)(1);
-    if (phiResidual < -TMath::Pi()) phiResidual += 2 * TMath::Pi();
-    if (phiResidual >  TMath::Pi()) phiResidual -= 2 * TMath::Pi();
+    phiResidual = std::fmod(phiResidual + TMath::Pi(), TMath::TwoPi());
+    if (phiResidual < 0) phiResidual += TMath::TwoPi();
+    phiResidual -= TMath::Pi();
     p.getResiduals().segment(0, 5)(1) = phiResidual;
 
     p.getV().triangularView<Eigen::Lower>() =  m_covariance.triangularView<Eigen::Lower>();

@@ -1,4 +1,5 @@
 import random
+import shutil
 import subprocess
 import os
 import sys
@@ -158,3 +159,5 @@ def test_folder(location, run_type, exp_number, phase):
         test_script(script_location, input_file_name=output_file_name, temp_dir=temp_dir)
 
     assert run_at_least_one
+
+    shutil.rmtree(temp_dir)

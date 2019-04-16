@@ -115,8 +115,8 @@ namespace Belle2 {
         //
         c_FAKE_NO_FAKE_DATA = 1ull << 60,
         c_UNUSABLE_DATA = 1ull << 61,
-        c_DHE_END_ERRORBITS  = 1ull << 62,
-        c_DHC_END_ERRORBITS  = 1ull << 63,
+        c_DHH_END_ERRORBITS  = 1ull << 62,
+        c_DHH_MISC_ERROR  = 1ull << 63,
         // all used up!
       };
 

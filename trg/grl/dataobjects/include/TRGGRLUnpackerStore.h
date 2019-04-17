@@ -191,6 +191,10 @@ namespace Belle2 {
     int m_TOP_trg;
     //** m_TSFL1_count leaf */
     int m_TSFL1_count;
+    //** m_slot64b_TOP_int_1 leaf */
+    int m_slot64b_TOP_int_1;
+    //** m_slot64b_TOP_int_0 leaf */
+    int m_slot64b_TOP_int_0;
     //** m_ECLL1_count leaf */
     int m_ECLL1_count;
     //** m_CDCL1_count leaf */

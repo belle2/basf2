@@ -32,7 +32,7 @@ namespace Belle2 {
   namespace TRGGRLUNPACKERSPACE {
 
     /** num of leafs in data_b2l **/
-    const int nLeafs = 121;
+    const int nLeafs = 123;
     /** num of leafs for others **/
     const int nLeafsExtra = 7;
     /** num of clk time window **/
@@ -146,6 +146,8 @@ namespace Belle2 {
       "N_g_1GeV_1",
       "N_g_2GeV_1",
       "TSFL1_count",
+      "slot64b_TOP_int_1",
+      "slot64b_TOP_int_0",
       "map_ST_int_1",
       "map_ST_int_0",
       "map_veto_int_1",
@@ -272,6 +274,8 @@ namespace Belle2 {
       e_N_g_1GeV_1,
       e_N_g_2GeV_1,
       e_TSFL1_count,
+      e_slot64b_TOP_int_1,
+      e_slot64b_TOP_int_0,
       e_map_ST_int_1,
       e_map_ST_int_0,
       e_map_veto_int_1,
@@ -414,6 +418,8 @@ namespace Belle2 {
       755, 2, // N_g_1GeV_1
       752, 2, // N_g_2GeV_1
       749, 9, // TSFL1_count
+      739, 31, // slot64b_TOP_int_1
+      708, 31, // slot64b_TOP_int_0
       351, 31, // map_ST_int_1 (63 downto 32)
       319, 31, // map_ST_int_0 (31 downto 0)
       287, 31, // map_veto_int_1 (63 downto 32)
@@ -542,6 +548,8 @@ namespace Belle2 {
       bitArray[e_N_g_1GeV_1    ] = &(store->m_N_g_1GeV[1]);
       bitArray[e_N_g_2GeV_1    ] = &(store->m_N_g_2GeV[1]);
       bitArray[e_TSFL1_count    ] = &(store->m_TSFL1_count);
+      bitArray[e_slot64b_TOP_int_1    ] = &(store->m_slot64b_TOP_int_1);
+      bitArray[e_slot64b_TOP_int_0    ] = &(store->m_slot64b_TOP_int_0);
       bitArray[e_map_ST_int_1    ] = &(store->m_map_ST_int[1]);
       bitArray[e_map_ST_int_0    ] = &(store->m_map_ST_int[0]);
       bitArray[e_map_veto_int_1    ] = &(store->m_map_veto_int[1]);

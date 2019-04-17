@@ -14,7 +14,6 @@
    - running on Belle 1 MC/data (convertedFromBelle = True)
    - running a specific FEI which is optimized for a signal selection and uses ROEs (specific = True)
    - run without semileptonic D channels (removeSLD = True )
-   - Bs/anti-Bs (upsilon5S = True )
 
  Another interesting configuration is given by get_fr_channels,
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
@@ -26,12 +25,12 @@ from basf2 import B2FATAL, B2INFO
 
 
 def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLong=False, chargedB=True, neutralB=True,
-                         convertedFromBelle=False, specific=False, removeSLD=False, upsilon5S=False):
+                         convertedFromBelle=False, specific=False, removeSLD=False):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
     adding a cut on nRemainingTracksInRestOfEvent is recommended.
-    @param B_extra_cut Additional user cut on rekombination of tag-B-mesons
+    @param B_extra_cut Additional user cut on recombination of tag-B-mesons
     @param hadronic whether to include hadronic B decays (default is True)
     @param semileptonic whether to include semileptonic B decays (default is True)
     @param KLong whether to include K_long decays into the training (default is False)
@@ -40,10 +39,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param removeSLD if True, removes semileptonic D modes from semileptonic B lists (default is False)
-    @param upsilon5S if True, reconstructs Bs mesons (default is False)
     """
-    if upsilon5S is True:
-        B2INFO('Running 5S FEI')
     if chargedB is False and neutralB is False:
         B2FATAL('No B-Mesons will be recombined, since chargedB==False and neutralB==False was selected!'
                 ' Please reconfigure the arguments of get_default_channels() accordingly')
@@ -231,7 +227,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                          'daughterInvariantMass({},{},{},{},{})', 'dQ', 'Q', 'dM', 'daughter({},extraInfo(decayModeID))']
 
     # TODO if specific:
-    # We can not do this in the generic case (because this would heavily influence our performance on the unkown signal events
+    # We can not do this in the generic case (because this would heavily influence our performance on the unknown signal events
     # but in the specific case this could work well
     #    intermediate_vars = ['nRemainingTracksInEvent']
 
@@ -534,10 +530,6 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     BP.addChannel(['J/psi', 'K+', 'pi0'])
     BP.addChannel(['J/psi', 'K_S0', 'pi+'])
 
-    mva_BPlusSemileptonic = MVAConfiguration(
-        variables=B_vars,
-        target='isSignalAcceptMissingNeutrino')
-
     semileptonic_user_cut = ''
     if B_extra_cut is not None:
         semileptonic_user_cut += B_extra_cut
@@ -783,77 +775,6 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         B0_KL.addChannel(['J/psi', 'K_L0'])
         B0_KL.addChannel(['J/psi', 'K_L0', 'pi+', 'pi-'])
 
-    """
-    BEGIN BS RECO:
-    """
-    BS = Particle('B_s0',
-                  MVAConfiguration(variables=B_vars,
-                                   target='isSignal'),
-                  PreCutConfiguration(userCut=hadronic_user_cut,
-                                      bestCandidateMode='highest',
-                                      bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-                                      bestCandidateCut=20),
-                  PostCutConfiguration(bestCandidateCut=20))
-    # FT
-    BS.addChannel(['D_s-', 'D_s+'])
-    BS.addChannel(['D_s*+', 'D_s-'])
-    # BS.addChannel(['D_s*-', 'D_s+'])      # Both ft and sw have this CP-conj included. Why?
-    BS.addChannel(['D_s*-', 'D_s*+'])
-    BS.addChannel(['D_s+', 'D-'])
-    BS.addChannel(['D*-', 'D_s+'])
-    BS.addChannel(['D_s*+', 'D-'])
-    BS.addChannel(['D_s*+', 'D*-'])
-    BS.addChannel(['D_s*-', 'K+'])
-    BS.addChannel(['D_s-', 'K+'])
-    BS.addChannel(['D_s*-', 'K*+'])
-    BS.addChannel(['D_s-', 'K*+'])
-    # BS.addChannel(['J/psi', 'eta'])
-    # BS.addChannel(['J/psi', 'etaprime'])
-    # BS.addChannel(['J/psi', 'phi'])       # K+K- NR added below
-    BS.addChannel(['D_s*-', 'pi+'])
-    BS.addChannel(['D_s-', 'pi+'])
-    # BS.addChannel(['D_s-', 'rho+'])       # pi+pi0 NR added below
-    # BS.addChannel(['D_s*-', 'rho+'])      # pi+pi0 NR added below
-    BS.addChannel(['anti-D*0', 'K_S0'])
-    BS.addChannel(['anti-D0', 'K_S0'])
-    BS.addChannel(['anti-D0', 'anti-K*0'])
-    BS.addChannel(['anti-D*0', 'anti-K*0'])
-
-    # SW - D_s
-    BS.addChannel(['D_s-', 'pi+', 'pi0'])           # rho+
-    BS.addChannel(['D_s-', 'pi+', 'pi+', 'pi-'])
-    BS.addChannel(['D_s-', 'D0', 'K+', 'pi0'])      # K*+
-    BS.addChannel(['D_s-', 'D0', 'K_S0', 'pi+'])    # K*+
-    BS.addChannel(['D_s-', 'D0', 'K+'])
-    BS.addChannel(['D_s-', 'D+', 'K+', 'pi-'])      # K*0
-    BS.addChannel(['D_s-', 'D+', 'K_S0', 'pi0'])    # K*0
-    BS.addChannel(['D_s-', 'D+', 'K_S0'])
-    # SW - D_s & D*
-    BS.addChannel(['D_s-', 'D*0', 'K+', 'pi0'])     # K*+
-    BS.addChannel(['D_s-', 'D*0', 'K_S0', 'pi+'])   # K*+
-    BS.addChannel(['D_s-', 'D*0', 'K+'])
-    BS.addChannel(['D_s-', 'D*+', 'K+', 'pi-'])     # K*0
-    BS.addChannel(['D_s-', 'D*+', 'K_S0', 'pi0'])   # K*0
-    BS.addChannel(['D_s-', 'D*+', 'K_S0'])
-    # SW - D_s*
-    BS.addChannel(['D_s*-', 'pi+', 'pi0'])          # rho+
-    BS.addChannel(['D_s*-', 'D0', 'K+', 'pi0'])     # K*+
-    BS.addChannel(['D_s*-', 'D0', 'K_S0', 'pi+'])   # K*+
-    BS.addChannel(['D_s*-', 'D0', 'K+'])
-    BS.addChannel(['D_s*-', 'D+', 'K+', 'pi-'])     # K*0
-    BS.addChannel(['D_s*-', 'D+', 'K_S0', 'pi0'])   # K*0
-    BS.addChannel(['D_s*-', 'D+', 'K_S0'])
-    BS.addChannel(['D_s*-', 'D*0', 'K+', 'pi0'])    # K*+
-    BS.addChannel(['D_s*-', 'D*0', 'K_S0', 'pi+'])  # K*+
-    BS.addChannel(['D_s*-', 'D*0', 'K+'])
-    BS.addChannel(['D_s*-', 'D*+', 'K+', 'pi-'])    # K*0
-    BS.addChannel(['D_s*-', 'D*+', 'K_S0', 'pi0'])  # K*0
-    BS.addChannel(['D_s*-', 'D*+', 'K_S0'])
-    BS.addChannel(['J/psi', 'K+', 'K-'])
-    """
-    END BS RECO:
-    """
-
     particles = []
     particles.append(pion)
     particles.append(kaon)
@@ -902,10 +823,6 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
             particles.append(B0_SL)
         if chargedB:
             particles.append(BP_SL)
-
-    if upsilon5S:
-        particles.append(BS)
-
     return particles
 
 

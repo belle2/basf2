@@ -24,7 +24,9 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   // parameters for saving / loading
   addParam("filename", m_filename,
-           "Name of the files where the NeuroTrigger parameters are saved "
+           "Name of the files where the NeuroTrigger parameters are saved. "
+           "When left blank, the parameters are loaded from the Conditions "
+           "Database."
            "(compare NeuroTriggerTrainer).",
            string(""));
   addParam("arrayname", m_arrayname,
@@ -41,7 +43,8 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "Name of the StoreArray holding the 2D input tracks.",
            string("TRGCDC2DFinderTracks"));
   addParam("outputCollectionName", m_outputCollectionName,
-           "Name of the StoreArray holding the output tracks with neural network estimates.",
+           "Name of the StoreArray holding the output tracks with neural "
+           "network estimates.",
            string("TRGCDCNeuroTracks"));
   addParam("fixedPoint", m_fixedPoint,
            "Switch to turn on fixed point arithmetic for FPGA simulation.",
@@ -51,11 +54,14 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "scaling factor, reference id, MLP nodes, MLP weights, "
            "MLP activation function)", {12, 8, 8, 12, 10, 10});
   addParam("et_option", m_et_option,
-           "option on how to obtain the event time. Possibilities are: "
-           "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero'.",
-           string("etf_or_fastestpriority"));
+           "option on how to obtain the event time. When left blank, the value "
+           "is loaded from the Conditions Database. Possibilities are: "
+           "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', "
+           "'etf_or_zero'.",
+           string(""));
   addParam("writeMLPinput", m_writeMLPinput,
-           "if true, the MLP input vector will be written to the datastore (for DQM)",
+           "if true, the MLP input vector will be written to the datastore "
+           "(for DQM)",
            false);
   addParam("hardwareCompatibilityMode", m_hardwareCompatibilityMode,
            "Switch to mimic an apparent bug in the hardware preprocessing",
@@ -66,6 +72,12 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
 void
 CDCTriggerNeuroModule::initialize()
 {
+  // Load Values from the conditions Database. The actual MLP-values are loaded
+  // in the Neurotrigger class itself to avoid bigger changes in the code.
+  if (m_et_option.size() < 1) {
+    m_et_option = m_cdctriggerneuroconfig->getUseETF() ? "etf_or_fastestpriority" : "fastestpriority";
+    B2INFO("The firmware version of the Neurotrigger boards is: " + m_cdctriggerneuroconfig->getNNTFirmwareVersionID());
+  }
   if (!m_NeuroTrigger.load(m_filename, m_arrayname))
     B2ERROR("NeuroTrigger could not be loaded correctly.");
   if (m_fixedPoint) {

@@ -339,7 +339,7 @@ skim_cuts = [
     dict(cut_string="[Bhabha2Trk == 1]",
          base_identifier="skim",
          cut_identifier="accept_bhabha",
-         prescale_factor=10,
+         prescale_factor=1,
          reject_cut=False),
 ]
 

@@ -172,7 +172,7 @@ if __name__ == '__main__':
         monitoring.MonitorDiagPlot(p, diag_plot_filename)
         o += b2latex.Graphics().add(diag_plot_filename + '.png', width=0.8).finish()
 
-        if p.particle.identifier in ['B+:generic', 'B0:generic']:
+        if p.particle.identifier in ['B+:generic', 'B0:generic', 'B_s0:generic']:
             money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Money')
             monitoring.MonitorMbcPlot(p, money_plot_filename)
             g = b2latex.Graphics()

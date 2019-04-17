@@ -28,9 +28,8 @@ namespace Belle2 {
       /// Default copy constructor
       CDCWireHitCluster(const CDCWireHitCluster& wireHitCluster) = default;
 
-      // TODO: cppcheck asks to make the input const reference but this would make the std::move not work as intended.
-      //   So I would suppress the check here?!?!
       /// Constructor from a bunch of wire hits
+      // cppcheck-suppress passedByValue
       explicit CDCWireHitCluster(std::vector<CDCWireHit*> wireHits)
         : Super(std::move(wireHits))
       {

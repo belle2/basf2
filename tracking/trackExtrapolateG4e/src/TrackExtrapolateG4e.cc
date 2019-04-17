@@ -512,9 +512,6 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
                                       const G4ErrorSymMatrix& covariance, // (6x6) using cm, GeV/c (genfit2 units)
                                       const std::string&) // DIVOT: NO LONGER USED - REMOVE THIS ARGUMENT
 {
-
-  //TODO: ask Leo Piilonen if we want to keep this variable as it causes cppcheck warnings (always false),
-  //   also what means DIVOT?
   bool isCosmic = false; // DIVOT
   if ((!m_ExtInitialized) && (!m_MuidInitialized)) {
     // No EXT nor MUID module in analysis path ==> mimic ext::initialize() with reasonable defaults.
@@ -548,6 +545,7 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
 
   G4ThreeVector positionG4e = position * CLHEP::cm; // convert from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // convert from genfit2 units (GeV/c) to geant4 units (MeV/c)
+  // cppcheck-suppress knownConditionTrueFalse
   if (isCosmic) momentumG4e = -momentumG4e;
   G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);

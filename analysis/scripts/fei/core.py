@@ -503,9 +503,12 @@ class PostReconstruction(object):
                                         variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                         filename=config.removeJPsiSlash(filename), path=path)
 
-                if 'B' in particle.identifier:
+                if 'B0' == particle.name or 'B+' == particle.name:
                     variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                                  'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                elif 'B_s0' == particle.name:
+                    variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 else:
                     variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                                  'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
@@ -624,13 +627,13 @@ class Teacher(object):
                     nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
                     if nSig < Teacher.MinimumNumberOfMVASamples:
                         B2WARNING(f"Training of MVC failed."
-                                  "Tree contains too few signal events {nSig}. Ignoring channel.")
+                                  "Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
                     if nBg < Teacher.MinimumNumberOfMVASamples:
                         B2WARNING(f"Training of MVC failed."
-                                  "Tree contains too few bckgrd events {nBg}. Ignoring channel.")
+                                  "Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
@@ -700,7 +703,7 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
         [p for p in particles if p.name in ['K_S0', 'Sigma+']],
         [p for p in particles if p.name in ['D+', 'D0', 'D_s+', 'Lambda_c+']],
         [p for p in particles if p.name in ['D*+', 'D*0', 'D_s*+']],
-        [p for p in particles if p.name in ['B0', 'B+']],
+        [p for p in particles if p.name in ['B0', 'B+', 'B_s0']],
         []
     ]
 

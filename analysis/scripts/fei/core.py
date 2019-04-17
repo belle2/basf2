@@ -87,7 +87,7 @@ class TrainingDataInformation(object):
     Basically we write out the number of MC particles in the whole dataset.
     This numbers we can use to calculate what fraction of candidates we have to write
     out as TrainingData to get a reasonable amount of candidates to train on
-    (too few candidates will lead to heavy overtraining, to many won't fit into memory).
+    (too few candidates will lead to heavy overtraining, too many won't fit into memory).
     Secondly we can use this information for the generation of the monitoring pdfs,
     where we calculate reconstruction efficiencies.
     """
@@ -337,7 +337,7 @@ class PreReconstruction(object):
                                   'preCut_rank',
                                   path=path)
                 else:
-                    raise RuntimeError("Unkown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
+                    raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
 
                 if self.config.monitor:
                     filename = 'Monitor_PreReconstruction_AfterRanking_{}.root'.format(channel.label)
@@ -502,9 +502,12 @@ class PostReconstruction(object):
                                      variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                      filename=config.removeJPsiSlash(filename), path=path)
 
-                if 'B' in particle.identifier:
+                if 'B0' == particle.name or 'B+' == particle.name:
                     variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                                  'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                elif 'B_s0' == particle.name:
+                    variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 else:
                     variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                                  'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
@@ -609,13 +612,15 @@ class Teacher(object):
                 if not basf2_mva.available(weightfile) and os.path.isfile(filename):
                     f = ROOT.TFile(filename)
                     if not f:
-                        B2WARNING("Training of MVC failed. Couldn't find ROOT file. Ignoring channel.")
+                        B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
+                                  "Ignoring channel {}.".format(channel.label))
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
                     l = [m for m in f.GetListOfKeys()]
                     if not l:
-                        B2WARNING("Training of MVC failed. ROOT file does not contain a tree. Ignoring channel.")
+                        B2WARNING("Training of MVC failed. ROOT file does not contain a tree. "
+                                  "Ignoring channel {}.".format(channel.label))
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
@@ -698,8 +703,8 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
     @param particles list of config.Particle objects
     """
     stages = [
-        [p for p in particles if p.name in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0', 'Lambda0']],
-        [p for p in particles if p.name in ['pi0', 'J/psi']],
+        [p for p in particles if p.name in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0']],
+        [p for p in particles if p.name in ['pi0', 'J/psi',  'phi']],
         [p for p in particles if p.name in ['K_S0']],
         [p for p in particles if p.name in ['D+', 'D0', 'D_s+']],
         [p for p in particles if p.name in ['D*+', 'D*0', 'D_s*+']],
@@ -757,7 +762,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     TRAINING
     For training this function is called multiple times, each time the FEI reconstructs one more stage in the hierarchical structure
     i.e. we start with FSP, pi0, KS_0, D, D*, and with B mesons. You have to set configuration.training to True for training mode.
-    All weightfiles created during the training will be strored in your local database.
+    All weight files created during the training will be stored in your local database.
     If you want to use the FEI training everywhere without copying this database by hand, you have to upload your local database
     to the central database first (see documentation for the Belle2 Condition Database).
 
@@ -772,7 +777,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
 
     LEGACY
     This function can also use old FEI trainings (version 3), just pass the Summary.pickle file of the old training,
-    and the weightfiles will be automatically converted to the new nameing scheme.
+    and the weight files will be automatically converted to the new naming scheme.
 
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
@@ -810,7 +815,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
 
     # There are in total 7 stages.
     # For training we start with -1 and go to 7 one stage at a time
-    # For application we can run tage 0 to 7 at once
+    # For application we can run stage 0 to 7 at once
     stages = get_stages_from_particles(particles)
 
     # If the user provided a Summary.pickle file of a FEIv3 training we
@@ -862,7 +867,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # we keep going, as soon as the user will call process on the produced path he will get an error message that the
     # weightfiles are missing.
     #
-    # Finally we keep track of the ParticleLists we use, so the user ca run the RemoveParticles module to reduce the size of the
+    # Finally we keep track of the ParticleLists we use, so the user can run the RemoveParticles module to reduce the size of the
     # intermediate output of RootOutput.
     used_lists = []
     for stage, stage_particles in enumerate(stages):
@@ -883,7 +888,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
             path.add_path(post_reconstruction.reconstruct())
         used_lists += [particle.identifier for particle in stage_particles]
 
-    # If we run in monitor mode we are insterested in the ModuleStatistics,
+    # If we run in monitor mode we are interested in the ModuleStatistics,
     # these statistics contain the runtime for each module which was run.
     if configuration.monitor:
         output = register_module('RootOutput')
@@ -893,7 +898,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
         output.param('ignoreCommandLineOverride', True)
         path.add_module(output)
 
-    # As metioned above the FEI keeps track of the stages which are already reconstructed during the training
+    # As mentioned above the FEI keeps track of the stages which are already reconstructed during the training
     # so we write out the Summary.pickle here, and increase the stage by one.
     if configuration.training or configuration.monitor:
         save_summary(particles, configuration, stage + 1)

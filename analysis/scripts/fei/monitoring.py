@@ -417,7 +417,7 @@ class MonitoringBranchingFractions(object):
     def __init__(self):
         """
         Create a new MonitoringBranchingFraction object.
-        The extracted branching fractions are cached, hence createing more than one object does not do anything.
+        The extracted branching fractions are cached, hence creating more than one object does not do anything.
         """
         if MonitoringBranchingFractions._shared is None:
             decay_file = get_default_decayfile()

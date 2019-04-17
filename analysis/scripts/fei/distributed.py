@@ -15,7 +15,7 @@
  Since a FEI training requires multiple runs over the same MC, it does so multiple times.
  The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput).
 
- In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI
+ In between it calls the do_trainings function of the FEI, to train the multivariate classifiers of the FEI
  at each stage.
 
  At the end it produces summary outputs using printReporting.py and latexReporting.py
@@ -29,7 +29,7 @@
 
  After the training the weightfiles will be stored in the localdb in the collection directory
  You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere.
- Alternatively you can just copy the localdb to somehwere and use it directly.
+ Alternatively you can just copy the localdb to somewhere and use it directly.
 
  Example:
  python3 ~/release/analysis/scripts/fei/distributed.py
@@ -44,7 +44,6 @@
 """
 
 
-import shutil
 import subprocess
 import sys
 import os
@@ -54,7 +53,6 @@ import time
 import stat
 import shutil
 import pickle
-
 import fei
 
 
@@ -146,7 +144,7 @@ def setup(args):
 def create_report(args):
     """
     Create all the reports for the FEI training and the individual mva trainings.
-    This will onyl work if
+    This will only work if
       1) Monitoring mode is used (see FeiConfiguration)
       2) Latex works on your system
       3) The system has enough memory to hold the training data for the mva classifiers
@@ -179,8 +177,7 @@ def submit_job(args, i):
     if args.site == 'kekcc':
         ret = subprocess.call("bsub -q l -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kekcc2':
-        # ret = subprocess.call("bsub -q b2_fei -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
-        ret = subprocess.call("bsub -q l -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
+        ret = subprocess.call("bsub -q b2_fei -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kitekp':
         ret = subprocess.call("qsub -cwd -q express,short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'local':
@@ -344,7 +341,7 @@ if __name__ == '__main__':
         elif args.skip == 'run':
             start = 0
         else:
-            raise RuntimeError('Unkown skip parameter {}'.format(args.skip))
+            raise RuntimeError('Unknown skip parameter {}'.format(args.skip))
 
         if start == 7:
             import sys
@@ -356,7 +353,7 @@ if __name__ == '__main__':
             print('Submitting jobs')
             for i in range(args.nJobs):
                 # The user wants to resubmit jobs, this means the training of some jobs failed
-                # We check which jobs contained an error flag, and where not successful
+                # We check which jobs contained an error flag, and were not successful
                 # These jobs are submitted again, other jobs are skipped (continue)
                 if start >= 6:
                     error_file = args.directory + '/jobs/{}/basf2_job_error'.format(i)
@@ -372,7 +369,7 @@ if __name__ == '__main__':
                 # Reset Summary file
                 shutil.copyfile(args.directory + '/collection/Summary.pickle', args.directory + '/jobs/{}/Summary.pickle'.format(i))
                 if not submit_job(args, i):
-                    raise RuntimeError('Error during submiting job')
+                    raise RuntimeError('Error during submitting job')
 
         if start >= 4:
             print('Wait for jobs to end')
@@ -396,14 +393,14 @@ if __name__ == '__main__':
         # So we have to setup the whole directory (this will override any existing training)
         setup(args)
 
-    # The main loop, which steers the whole FEI traiing on a batch system
+    # The main loop, which steers the whole FEI training on a batch system
     # 1. We check if the FEI still requires further steps
     # 2. We do all necessary trainings which we can perform at this point in time
-    # 3. We submit new jobs whihc will use the new trainings to reconstruct the hierarchy further
+    # 3. We submit new jobs which will use the new trainings to reconstruct the hierarchy further
     # 4. We wait until all jobs finished
     # 5. We merge the output of the jobs
     # 6. We update the inputs of the jobs (input of next stage is the output of the current stage)
-    # 7. We clean the job directories so they can be used during the enxt stage again.
+    # 7. We clean the job directories so they can be used during the next stage again.
     while is_still_training(args):
         print('Do available trainings')
         do_trainings(args)

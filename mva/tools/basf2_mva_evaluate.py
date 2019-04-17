@@ -189,17 +189,6 @@ if __name__ == '__main__':
         graphics.add('correlation_plot.pdf', width=1.0)
         o += graphics.finish()
 
-        if False:
-            graphics = b2latex.Graphics()
-            p = plotting.TSNE()
-            p.add(variables_data, variable_abbreviations.values(),
-                  test_target[first_identifier_abbr] == 1,
-                  test_target[first_identifier_abbr] == 0)
-            p.finish()
-            p.save('tsne_plot.pdf')
-            graphics.add('tsne_plot.pdf', width=1.0)
-            o += graphics.finish()
-
         for v in variables:
             variable_abbr = variable_abbreviations[v]
             o += b2latex.SubSection(format.string(v))
@@ -330,9 +319,10 @@ if __name__ == '__main__':
                 graphics.add('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)), width=1.0)
                 o += graphics.finish()
 
-        o.save('latex.tex', compile=True)
+        o.save('latex.tex', compile=False)
         os.chdir(old_cwd)
+
         if args.working_directory == '':
-            shutil.copy(tempdir + '/latex.pdf', args.outputfile)
+            shutil.copy(tempdir + '/latex.tex', args.outputfile)
         else:
-            shutil.copy(args.working_directory + '/latex.pdf', args.outputfile)
+            shutil.copy(args.working_directory + '/latex.tex', args.outputfile)

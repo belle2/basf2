@@ -22,9 +22,10 @@ import collections
 import copy
 import itertools
 import typing
+import basf2
 
 # Define classes at top level to make them pickable
-# Creates new classs via namedtuple, which are like a struct in C
+# Creates new class via namedtuple, which are like a struct in C
 
 FeiConfiguration = collections.namedtuple('FeiConfiguration', 'prefix, cache, b2bii, monitor, legacy, externTeacher, training')
 FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, False, True, None, 'basf2_mva_teacher', False)
@@ -40,6 +41,7 @@ FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI trainin
                                   "and the algorithm will be able to apply this training."
 FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, externClusterTeacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
+
 
 MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable')
 MVAConfiguration.__new__.__defaults__ = ('FastBDT',
@@ -59,7 +61,7 @@ PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, ve
 PreCutConfiguration.__new__.__defaults__ = ('', -2, None, 0, 'lowest')
 PreCutConfiguration.__doc__ = "PreCut configuration class. These cuts is employed before training the mva classifier."
 PreCutConfiguration.userCut.__doc__ = "The user cut is passed directly to the ParticleCombiner."\
-                                      "Particles which do not pass this cut are immediatly discarded."
+                                      "Particles which do not pass this cut are immediately discarded."
 PreCutConfiguration.vertexCut.__doc__ = "The vertex cut is passed as confidence level to the VertexFitter."
 PreCutConfiguration.bestCandidateVariable.__doc__ = "Variable from the VariableManager which is used to rank all candidates."
 PreCutConfiguration.bestCandidateMode.__doc__ = "Either lowest or highest."
@@ -217,9 +219,9 @@ class Particle(object):
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
         # At the moment all channels must have the same target variable. Why?
         if mvaConfig is not None and mvaConfig.target != self.mvaConfig.target:
-            B2FATAL(
+            basf2.B2FATAL(
                 'Particle %s has common target %s, while channel %s has %s. Each particle must have exactly one target!' %
-                (particle.identifier, self.mvaConfig.target, ' '.join(daughters), mvaConfig.target))
+                (self.identifier, self.mvaConfig.target, ' '.join(daughters), mvaConfig.target))
         # Replace generic-variables with ordinary variables.
         # All instances of {} are replaced with all combinations of daughter indices
         mvaVars = []

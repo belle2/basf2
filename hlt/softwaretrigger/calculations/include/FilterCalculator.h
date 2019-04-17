@@ -41,14 +41,22 @@ namespace Belle2 {
       void doCalculation(SoftwareTriggerObject& calculationResult) override;
 
     private:
+      /// Store Array of the tracks to be used
       StoreArray<Track> m_tracks;
+      /// Store Array of the ecl clusters to be used
       StoreArray<ECLCluster> m_eclClusters;
 
+      /// which Z0 defines a loose track
       double m_looseTrkZ0 = 10 * Unit::cm;
+      /// which Z0 defines a tight track
       double m_tightTrkZ0 = 2 * Unit::cm;
+      /// which CMS energy defines nElow
       double m_E2min = 0.2;
+      /// which CMS energy defines nEmedium
       double m_E0min = 0.3;
+      /// which CMS energy defines nEhigh
       double m_Ehigh = 2;
+      /// which CMS energy defines nEsingleClust
       double m_EsinglePhoton = 1;
     };
   }

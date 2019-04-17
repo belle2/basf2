@@ -513,6 +513,8 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
                                       const std::string&) // DIVOT: NO LONGER USED - REMOVE THIS ARGUMENT
 {
 
+  //TODO: ask Leo Piilonen if we want to keep this variable as it causes cppcheck warnings (always false),
+  //   also what means DIVOT?
   bool isCosmic = false; // DIVOT
   if ((!m_ExtInitialized) && (!m_MuidInitialized)) {
     // No EXT nor MUID module in analysis path ==> mimic ext::initialize() with reasonable defaults.

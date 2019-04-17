@@ -121,6 +121,8 @@ CDCTrajectory3D CDCAxialStereoFusion::fusePreliminary(const CDCSegment2D& fromSe
   CDCSegment3D stereoSegment3D = CDCSegment3D::reconstruct(stereoSegment2D, axialTrajectory2D);
 
   CDCTrajectorySZ trajectorySZ;
+
+  // TODO: ask Nils if the code below can be removed. (ccpcheck complains as mcTruthreference is alway false)
   const bool mcTruthReference = false;
   if (mcTruthReference) {
     const CDCMCSegment2DLookUp& theMCSegmentLookUp = CDCMCSegment2DLookUp::getInstance();

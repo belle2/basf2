@@ -49,6 +49,10 @@ namespace Belle2 {
     std::string m_param_outputRecoTrackStoreArrayName = "CKFRecoTracks";
     /// StoreArray name of the tracks, the output reco tracks should be related to.
     std::string m_param_outputRelationRecoTrackStoreArrayName = "RecoTracks";
+    /// Parameter for the direction of the CKF
+    std::string m_param_trackFindingDirectionAsString = "forward";
+    /// Direction parameter converted from the string parameters
+    TrackFindingCDC::EForwardBackward m_param_trackFindingDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
 
     // Store Arrays
     /// Output Reco Tracks Store Array

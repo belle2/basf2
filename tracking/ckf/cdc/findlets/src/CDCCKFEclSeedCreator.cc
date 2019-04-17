@@ -83,7 +83,7 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     // electron and positron hypothesis
     RecoTrack* eclSeedNeg = m_eclSeedRecoTracks.appendNew(pos, mom, -1);
     eclSeedNeg->addRelationTo(&shower);
-    RecoTrack* eclSeedPos = m_eclSeedRecoTracks.appendNew(pos, mom, +1);
+    RecoTrack* eclSeedPos = m_eclSeedRecoTracks.appendNew(pos, mom, 0);
     eclSeedPos->addRelationTo(&shower);
 
     // define MeasuredStateOnPlane
@@ -93,6 +93,7 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     genfit::MeasuredStateOnPlane msopPos(repPos);
 
     // set position, momentum, cov, sharedPlanePtr
+    // TODO: optimize these values!
     TMatrixDSym cov(6);
     // for now: neglect correlations
     double covArray[6];
@@ -114,12 +115,13 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     double dpy2 = 0.25 * mom.Y() * mom.Y();
     double dpz2 = 0.25 * mom.Z() * mom.Z();
 
-    cov(0, 0) = dx2;
-    cov(1, 1) = dy2;
-    cov(2, 2) = dz2;
-    cov(3, 3) = dpx2;
-    cov(4, 4) = dpy2;
-    cov(5, 5) = dpz2;
+    // TODO: check this. scaled cov seems to work better..
+    cov(0, 0) = dx2 * 0.01;
+    cov(1, 1) = dy2 * 0.01;
+    cov(2, 2) = dz2 * 0.01;
+    cov(3, 3) = dpx2 * 0.01;
+    cov(4, 4) = dpy2 * 0.01;
+    cov(5, 5) = dpz2 * 0.01;
 
     genfit::SharedPlanePtr planePos(new genfit::DetPlane(pos, pos));
     genfit::SharedPlanePtr planeNeg(new genfit::DetPlane(pos, pos));
@@ -133,8 +135,8 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 
     // create CDCCKF states
     CDCCKFState seedStateNeg(eclSeedNeg, msopNeg);
-    seeds.push_back({seedStateNeg});
+    //seeds.push_back({seedStateNeg});
     CDCCKFState seedStatePos(eclSeedPos, msopPos);
-    //seeds.push_back({seedStatePos});
+    seeds.push_back({seedStatePos});
   }
 }

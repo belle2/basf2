@@ -57,10 +57,6 @@ void CKFToCDCFromEclFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit
 {
   m_seedCreator.apply(m_seeds);
 
-  if (m_seeds.size() > 1) {
-    B2INFO(m_seeds.size() << " seeds created.");
-  }
-
   const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
 
   for (const auto& seed : m_seeds) {

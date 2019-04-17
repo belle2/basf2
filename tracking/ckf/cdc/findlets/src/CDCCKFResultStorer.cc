@@ -37,6 +37,11 @@ void CDCCKFResultStorer::exposeParameters(ModuleParamList* moduleParamList, cons
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeOutDirection"),
                                 m_param_writeOutDirectionAsString,
                                 "Write out the relations with the direction of the CDC part as weight");
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackFindingDirection"),
+                                m_param_trackFindingDirectionAsString,
+                                "Direction in which the track is reconstructed (SVD/ECL seed)",
+                                m_param_trackFindingDirectionAsString);
 }
 
 void CDCCKFResultStorer::initialize()
@@ -52,8 +57,11 @@ void CDCCKFResultStorer::initialize()
 
   StoreArray<RecoTrack> relationRecoTracks(m_param_outputRelationRecoTrackStoreArrayName);
   relationRecoTracks.registerRelationTo(m_outputRecoTracks);
+  m_outputRecoTracks.registerRelationTo(relationRecoTracks);
 
   m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
+
+  m_param_trackFindingDirection = fromString(m_param_trackFindingDirectionAsString);
 }
 
 void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
@@ -63,10 +71,18 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
       continue;
     }
 
-    const auto& trackState = result[1].getTrackState();
-    const TVector3& trackPosition = trackState.getPos();
-    const TVector3& trackMomentum = trackState.getMom();
-    const double trackCharge = trackState.getCharge();
+    genfit::MeasuredStateOnPlane const* trackState = 0;
+    if (m_param_trackFindingDirection == TrackFindingCDC::EForwardBackward::c_Forward) {
+      trackState = &result.at(1).getTrackState();
+    } else if (m_param_trackFindingDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
+      trackState = &result.back().getTrackState();
+    } else {
+      B2ERROR("CDCCKFResultStorer: No valid direction specified. Please use forward/backward.");
+    }
+
+    const TVector3& trackPosition = trackState->getPos();
+    const TVector3& trackMomentum = trackState->getMom();
+    const double trackCharge = trackState->getCharge();
 
     RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(trackPosition, trackMomentum, trackCharge);
 
@@ -75,7 +91,6 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
       if (state.isSeed()) {
         continue;
       }
-
 
       const TrackFindingCDC::CDCWireHit* wireHit = state.getWireHit();
 
@@ -94,5 +109,6 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
     }
 
     seed->addRelationTo(newRecoTrack, m_param_writeOutDirection);
+    newRecoTrack->addRelationTo(seed, m_param_writeOutDirection);
   }
 }

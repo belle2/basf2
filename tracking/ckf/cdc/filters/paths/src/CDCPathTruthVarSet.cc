@@ -24,38 +24,53 @@ bool CDCPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
 {
   // check if hit belongs to same seed
   const auto& seed = path->front();
-  const auto* seedRecoTrack = seed.getSeed();
-  const auto* seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
-  // const auto* seedMCParticle = seedMCTrack->getRelated<MCParticle>();
+  auto* seedRecoTrack = seed.getSeed();
+  auto* seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
 
-  // while (seedMCParticle->getMother()) {
-  //   seedMCParticle = seedMCParticle->getMother();
-  // }
-
-  int matched = 0;
-
-  for (auto const& state : *path) {
-    if (state.isSeed()) {
-      continue;
-    }
-
-    const auto wireHit = state.getWireHit();
-    const auto cdcHit = wireHit->getHit();
-    // const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
-    const auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
-
-    if (seedMCTrack == hitMCTrack) {
-      matched += 1;
-    }
+  MCParticle* seedMCParticle;
+  if (seedMCTrack) {
+    seedMCParticle = seedMCTrack->getRelated<MCParticle>();
+  }
+  // maybe used track from Ecl seeding?
+  else {
+    seedRecoTrack = seedRecoTrack->getRelated<RecoTrack>("EclSeedRecoTracks");
+    seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
+    const auto* seedEclShower = seedRecoTrack->getRelated<ECLShower>("ECLShowers");
+    seedMCParticle = seedEclShower->getRelated<MCParticle>();
   }
 
-  var<named("matched")>() = matched;
-  /*  var<named("PDG")>() = seedMCParticle->getPDG();
+  while (seedMCParticle->getMother()) {
+    seedMCParticle = seedMCParticle->getMother();
+  }
 
-    auto seedMom = seedMCParticle->getMomentum();
-    var<named("seed_p_truth")>() = seedMom.Mag();
-    var<named("seed_pt_truth")>() = seedMom.Perp();
-    var<named("seed_pz_truth")>() = seedMom.Z();
+  int matched = 0;
+  /*
+    for (auto const& state : *path) {
+      if (state.isSeed()) {
+        continue;
+      }
+
+      const auto wireHit = state.getWireHit();
+      const auto cdcHit = wireHit->getHit();
+      // const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
+      const auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
+
+      if (seedMCTrack == hitMCTrack) {
+        matched += 1;
+      }
+    }
   */
+
+  var<named("matched")>() = matched;
+  var<named("PDG")>() = seedMCParticle->getPDG();
+
+  auto seedMom = seedMCParticle->getMomentum();
+  var<named("seed_p_truth")>() = seedMom.Mag();
+  var<named("seed_theta_truth")>() = seedMom.Theta() * 180 / M_PI;
+  var<named("seed_pt_truth")>() = seedMom.Perp();
+  var<named("seed_pz_truth")>() = seedMom.Z();
+  var<named("seed_px_truth")>() = seedMom.X();
+  var<named("seed_py_truth")>() = seedMom.Y();
+
   return true;
 }

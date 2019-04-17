@@ -36,7 +36,8 @@ using namespace TrackFindingCDC;
 
 namespace {
   /// Recording filter for SVD seeding.
-  using RecordingCDCStateFilter = RecordingFilter<VariadicUnionVarSet<CDCStateBasicVarSet, CDCStateTruthVarSet>>;
+  using RecordingCDCStateFilter = RecordingFilter<VariadicUnionVarSet<CDCStateBasicVarSet>>;
+  //using RecordingCDCStateFilter = RecordingFilter<VariadicUnionVarSet<CDCStateBasicVarSet, CDCStateTruthVarSet>>;
   /// Recording filter for ECL seeding.
   using RecordingCDCfromEclStateFilter = RecordingFilter<VariadicUnionVarSet<CDCStateBasicVarSet, CDCfromEclStateTruthVarSet>>;
   /// And filter for cdc states

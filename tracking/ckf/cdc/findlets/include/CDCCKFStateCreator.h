@@ -18,6 +18,7 @@
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
@@ -84,12 +85,46 @@ namespace Belle2 {
       // Cache last-on-the-path state info too:
       const auto& lastState = path.back();
       double lastPhi = 0;
-      double lastICLayer = 0;
+      double lastICLayer = -1;
       if (lastState.isSeed()) {
-        if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
-          lastICLayer = 56;
-        } else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Unknown
-                   || m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Invalid) {
+        if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Forward) {
+          lastICLayer = 0;
+        } else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
+          const TrackFindingCDC::Vector3D seedPos(lastState.getSeed()->getPositionSeed());
+          const float seedPosZ = seedPos.z();
+
+          // get wires
+          const auto& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
+          const auto& wires = wireTopology.getWires();
+
+          // forward/backward wall of CDC
+          const float maxForwardZ = wires.back().getForwardZ();
+          const float maxBackwardZ = wires.back().getBackwardZ();
+
+          if (seedPosZ < maxForwardZ && seedPosZ > maxBackwardZ) {
+            lastICLayer = 56;
+          } else {
+            // do straight extrapolation of seed momentum to CDC outer walls
+            TrackFindingCDC::Vector3D seedMomZOne(lastState.getSeed()->getMomentumSeed());
+            seedMomZOne = seedMomZOne / seedMomZOne.z();
+            // const float maxZ = seedPosZ > 0 ? maxForwardZ : maxBackwardZ;
+            // const TrackFindingCDC::Vector3D extrapolatedPos = seedPos - seedMom / seedMom.norm() * (seedPosZ - maxZ);
+
+            // find closest iCLayer
+            float minDist = 99999;
+            for (const auto& wire : wires) {
+              const float maxZ = seedPosZ > 0 ? wire.getForwardZ() : wire.getBackwardZ();
+              const TrackFindingCDC::Vector3D extrapolatedPos = seedPos - seedMomZOne * (seedPosZ - maxZ);
+
+              const auto distance = wire.getDistance(extrapolatedPos);
+              if (distance < minDist) {
+                minDist = distance;
+                lastICLayer = wire.getICLayer();
+              }
+            }
+            B2DEBUG(100, lastICLayer << " (d=" << minDist << ")");
+          }
+        } else {
           B2WARNING("CDCCKFStateCreator: No valid direction specified. Please use foward/backward.");
         }
       } else {
@@ -108,7 +143,11 @@ namespace Belle2 {
 
       for (size_t i = 0; i < wireHits.size(); i++) {
         const auto iCLayer =  m_wireHitCache[i].icLayer; // wireHit->getWire().getICLayer();
-        if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {
+        if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward && lastState.isSeed()) {
+          if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump_eclSeed) {
+            continue;
+          }
+        } else if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {
           continue;
         }
 
@@ -133,6 +172,8 @@ namespace Belle2 {
   private:
     /// Maximum allowed step over layers
     int m_maximalLayerJump = 2;
+    /// Maximum allowed step over layers
+    int m_maximalLayerJump_eclSeed = 3;
     /// Maximal distance in phi between the path last hit/seed and the candidate hit
     double m_maximalDeltaPhi =  TMath::Pi() / 8;
     /// Parameter for the direction in which the tracks are built

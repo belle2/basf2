@@ -19,10 +19,25 @@ namespace Belle2 {
   constexpr
   static char const* const cdcfromEclPathTruthVarNames[] = {
     "matched",
+    "daughters",
     "PDG",
+    "mcTrackHits",
     "seed_p_truth",
+    "seed_theta_truth",
     "seed_pt_truth",
-    "seed_pz_truth"
+    "seed_pz_truth",
+    "seed_px_truth",
+    "seed_py_truth",
+    "mcTrackEnd_p",
+    "mcTrackEnd_pt",
+    "mcTrackEnd_pz",
+    "mcTrackEnd_px",
+    "mcTrackEnd_py",
+    "mcTrackEnd_z",
+    "mcTrackEnd_x",
+    "mcTrackEnd_y",
+    "mcTrackEnd_posTheta",
+    "mcTrackEnd_momTheta"
   };
 
   /// Vehicle class to transport the variable names

@@ -29,6 +29,19 @@ bool CDCfromEclPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
   const auto* seedMCParticle = seedEclShower->getRelated<MCParticle>();
   const auto* seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
 
+  int daughters = 0;
+  std::vector<MCParticle*> daughterMCParticles;
+  if (seedMCParticle->getNDaughters() > 0) {
+    daughterMCParticles = seedMCParticle->getDaughters();
+
+    while (daughterMCParticles.size() == 1) {
+      daughterMCParticles = daughterMCParticles.at(0)->getDaughters();
+    }
+    if (daughterMCParticles.size() > 1) {
+      daughters = daughterMCParticles.size();
+    }
+  }
+
   while (seedMCParticle->getMother()) {
     seedMCParticle = seedMCParticle->getMother();
   }
@@ -43,20 +56,50 @@ bool CDCfromEclPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
     const auto wireHit = state.getWireHit();
     const auto cdcHit = wireHit->getHit();
     // const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
-    const auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
+    auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
 
-    if (seedMCTrack == hitMCTrack) {
+    if (seedMCTrack != 0 && seedMCTrack == hitMCTrack) {
       matched += 1;
     }
   }
 
+
   var<named("matched")>() = matched;
+  var<named("daughters")>() = daughters;
   var<named("PDG")>() = seedMCParticle->getPDG();
 
   auto seedMom = seedMCParticle->getMomentum();
   var<named("seed_p_truth")>() = seedMom.Mag();
+  var<named("seed_theta_truth")>() = seedMom.Theta() * 180 / M_PI;
   var<named("seed_pt_truth")>() = seedMom.Perp();
   var<named("seed_pz_truth")>() = seedMom.Z();
+  var<named("seed_px_truth")>() = seedMom.X();
+  var<named("seed_py_truth")>() = seedMom.Y();
+
+
+  const auto* particleMCTrack = seedMCParticle->getRelated<RecoTrack>("RecoTracks");
+  int mcTrackHits = -1;
+  TVector3 trackPos(0, 0, 0);
+  TVector3 trackMom(0, 0, 0);
+  if (particleMCTrack) {
+    mcTrackHits = particleMCTrack->getNumberOfCDCHits();
+    auto msop = particleMCTrack->getMeasuredStateOnPlaneFromLastHit();
+    trackPos = msop.getPos();
+    trackMom = msop.getMom();
+  }
+  var<named("mcTrackHits")>() = mcTrackHits;
+
+  var<named("mcTrackEnd_p")>() = trackMom.Mag();
+  var<named("mcTrackEnd_momTheta")>() = trackMom.Theta() * 180 / M_PI;
+  var<named("mcTrackEnd_pt")>() = trackMom.Perp();
+  var<named("mcTrackEnd_pz")>() = trackMom.Z();
+  var<named("mcTrackEnd_px")>() = trackMom.X();
+  var<named("mcTrackEnd_py")>() = trackMom.Y();
+
+  var<named("mcTrackEnd_z")>() = trackPos.Z();
+  var<named("mcTrackEnd_x")>() = trackPos.X();
+  var<named("mcTrackEnd_y")>() = trackPos.Y();
+  var<named("mcTrackEnd_posTheta")>() = trackPos.Theta() * 180 / M_PI;
 
   return true;
 }

@@ -42,7 +42,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
         reconstruction.add_ecl_modules(path)
 
         # needed for truth matching
-        tracking.add_mc_track_finding(path)
+        tracking.add_mc_tracking_reconstruction(path)
         reconstruction.add_ecl_finalizer_module(path)
         reconstruction.add_ecl_mc_matcher_module(path)
 
@@ -72,8 +72,8 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         pathFilter="arc_length_fromEcl",
                         inputECLshowersStoreArrayName="ECLShowers",
                         trackFindingDirection="backward",
-                        # filter="size_and_recording_fromEcl",
-                        # filterParameters={"returnWeight": 1.}
+                        filter="size_and_recording_fromEcl",
+                        filterParameters={"returnWeight": 1.}
                         )
         cdcckf = basf2.register_module("ToCDCCKF")
         # cdcckf.logging.log_level = basf2.LogLevel.DEBUG
@@ -90,8 +90,8 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         stateBasicFilterParameters={"maximalHitDistance": 0.75},
                         # stateBasicFilterParameters={"maximalHitDistance": 0.75, "returnWeight": 1.},
                         pathFilter="arc_length",
-                        filter="size_and_recording",
-                        filterParameters={"returnWeight": 1.}
+                        # filter="size_and_recording",
+                        # filterParameters={"returnWeight": 1.}
                         )
 
         # Do not combine tracks for testing

@@ -328,7 +328,6 @@ if __name__ == '__main__':
 
         o.save(f'latex.{filetype}', compile=args.compile)
         os.chdir(old_cwd)
-
         if args.working_directory == '':
             shutil.copy(os.path.join(tempdir, f'latex.{filetype}'), args.outputfile)
         else:

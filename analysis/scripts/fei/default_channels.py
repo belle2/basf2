@@ -897,6 +897,10 @@ def get_default_channels(
         B0_KL.addChannel(['J/psi', 'K_L0'])
         B0_KL.addChannel(['J/psi', 'K_L0', 'pi+', 'pi-'])
 
+    """
+    BEGIN B_s0 RECO:
+    """
+
     # Use this instead of deltaE since Bs has three peaks in deltaE
     Bs_vars = ['formula(deltaE+Mbc-5.3669)' if x == 'deltaE' else x for x in B_vars]
 
@@ -912,6 +916,7 @@ def get_default_channels(
                                       bestCandidateCut=20),
                   PostCutConfiguration(bestCandidateCut=20))
 
+    # D_s & D*
     BS.addChannel(['D_s-', 'D_s+'])
     BS.addChannel(['D_s*+', 'D_s-'])
     BS.addChannel(['D_s*-', 'D_s*+'])
@@ -928,6 +933,17 @@ def get_default_channels(
     BS.addChannel(['anti-D*0', 'K_S0'])
     BS.addChannel(['anti-D0', 'K_S0'])
 
+    # D_s
+    BS.addChannel(['D_s-', 'K+'])
+    BS.addChannel(['D_s-', 'pi+'])
+
+    # D_s*
+    BS.addChannel(['D_s*-', 'K+'])
+    BS.addChannel(['D_s*-', 'pi+'])
+    BS.addChannel(['anti-D*0', 'K_S0'])
+    BS.addChannel(['anti-D0', 'K_S0'])
+
+    #  D_s
     BS.addChannel(['D_s-', 'pi+', 'pi+', 'pi-'])
     BS.addChannel(['D_s-', 'D0', 'K+'])
     BS.addChannel(['D_s-', 'D+', 'K_S0'])
@@ -936,6 +952,8 @@ def get_default_channels(
     BS.addChannel(['D_s-', 'D0', 'K_S0', 'pi+'])    # K*+
     BS.addChannel(['D_s-', 'D+', 'K+', 'pi-'])      # K*0
     BS.addChannel(['D_s-', 'D+', 'K_S0', 'pi0'])    # K*0
+
+    # D_s & D*
     BS.addChannel(['D_s-', 'D*0', 'K+'])
     BS.addChannel(['D_s-', 'D*+', 'K_S0'])
     BS.addChannel(['D_s-', 'D*0', 'K+', 'pi0'])     # K*+
@@ -943,12 +961,14 @@ def get_default_channels(
     BS.addChannel(['D_s-', 'D*+', 'K+', 'pi-'])     # K*0
     BS.addChannel(['D_s-', 'D*+', 'K_S0', 'pi0'])   # K*0
 
+    # D_s*
     BS.addChannel(['D_s*-', 'D0', 'K+'])
     BS.addChannel(['D_s*-', 'D+', 'K_S0'])
     BS.addChannel(['D_s*-', 'D*0', 'K+'])
     BS.addChannel(['D_s*-', 'D*+', 'K_S0'])
     BS.addChannel(['D_s*-', 'pi+', 'pi+', 'pi-'])
 
+    # These are from belle decfile
     BS.addChannel(['D_s*-', 'pi+', 'pi0'])          # rho+
     BS.addChannel(['D_s*-', 'D0', 'K+', 'pi0'])     # K*+
     BS.addChannel(['D_s*-', 'D0', 'K_S0', 'pi+'])   # K*+
@@ -960,12 +980,17 @@ def get_default_channels(
     BS.addChannel(['D_s*-', 'D*+', 'K_S0', 'pi0'])  # K*0
 
     BS.addChannel(['J/psi', 'K_S0'])
+    BS.addChannel(['J/psi', 'pi0'])
     BS.addChannel(['J/psi', 'pi+', 'pi-'])
     BS.addChannel(['J/psi', 'K+', 'K-']),
     BS.addChannel(['J/psi', 'K_S0', 'K-', 'pi+']),
     BS.addChannel(['J/psi', 'K-', 'K+', 'pi0']),
     BS.addChannel(['J/psi', 'pi-', 'pi+', 'pi0'])  # Eta
     BS.addChannel(['J/psi', 'pi+', 'pi-', 'pi-', 'pi+', 'pi0'])  # Etaprime
+
+    """
+    END B_s0 RECO:
+    """
 
     particles = []
     particles.append(pion)

@@ -12,7 +12,7 @@ Variables
   Fixed bug in TagV error functions.
 
 * Replaced :b2:var:`pValue` (tracking variable) with :b2:var:`chiProb` (vertexing variable) 
-  in the vertexing variable collection.
+  in the collection of vertexing variables.
 
-* Organized all helicity variables into a dedicated file and added two new variables: 
+* Added two new helicity variables: 
   :b2:var:`cosHelicityAngleIfCMSIsTheDaughter` and :b2:var:`cosAcoplanarityAngleIfCMSIsTheMother`. 

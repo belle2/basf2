@@ -157,7 +157,7 @@ namespace Belle2 {
     }
 
 
-    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheDaughter(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr cosHelicityAngleIfRefFrameIsTheDaughter(const std::vector<std::string>& arguments)
     {
       int iDau = 0;
       int iGrandDau = 0;
@@ -166,11 +166,11 @@ namespace Belle2 {
           iDau = Belle2::convertString<int>(arguments[0]);
           iGrandDau = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2FATAL("The two arguments of cosHelicityAngleIfCMSIsTheDaughter must be integers!");
+          B2FATAL("The two arguments of cosHelicityAngleIfRefFrameIsTheDaughter must be integers!");
           return nullptr;
         }
       } else {
-        B2FATAL("Wrong number of arguments for cosHelicityAngleIfCMSIsTheDaughter: two are needed.");
+        B2FATAL("Wrong number of arguments for cosHelicityAngleIfRefFrameIsTheDaughter: two are needed.");
       }
       auto func = [iDau, iGrandDau](const Particle * mother) -> double {
 
@@ -199,7 +199,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr cosAcoplanarityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr cosAcoplanarityAngleIfRefFrameIsTheMother(const std::vector<std::string>& arguments)
     {
       int iGrandDau1 = 0;
       int iGrandDau2 = 0;
@@ -209,16 +209,16 @@ namespace Belle2 {
           iGrandDau2 = Belle2::convertString<int>(arguments[1]);
 
         } catch (boost::bad_lexical_cast&) {
-          B2FATAL("The two arguments of cosAcoplanarityAngleIfCMSIsTheMother must be integers!");
+          B2FATAL("The two arguments of cosAcoplanarityAngleIfRefFrameIsTheMother must be integers!");
           return nullptr;
         }
       } else {
-        B2FATAL("Wrong number of arguments for cosAcoplanarityAngleIfCMSIsTheMother: two are needed.");
+        B2FATAL("Wrong number of arguments for cosAcoplanarityAngleIfRefFrameIsTheMother: two are needed.");
       }
       auto func = [iGrandDau1, iGrandDau2](const Particle * mother) -> double {
 
         if (mother->getNDaughters() != 2)
-          B2FATAL("cosAcoplanarityAngleIfCMSIsTheMother: this variable works only for two-body decays.");
+          B2FATAL("cosAcoplanarityAngleIfRefFrameIsTheMother: this variable works only for two-body decays.");
 
         const Particle* daughter1 = mother-> getDaughter(0);
         const Particle* daughter2 = mother-> getDaughter(1);
@@ -281,7 +281,7 @@ namespace Belle2 {
                       "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
                       "automatically loaded by the function, given the accelerators conditions.");
 
-    REGISTER_VARIABLE("cosHelicityAngleIfCMSIsTheDaughter", cosHelicityAngleIfCMSIsTheDaughter,
+    REGISTER_VARIABLE("cosHelicityAngleIfRefFrameIsTheDaughter", cosHelicityAngleIfRefFrameIsTheDaughter,
                       "Cosine of the helicity angle between the momentum of the provided particle and the momentum of the selected granddaughter\n"
                       "in the reference frame of the selected daughter (theta_1 and theta_2 in the PDG 2018, p. 722).\n"
                       "This variable needs two integer arguments: the first one is the index of the daughter and the second one is the index of the granddaughter.\n"
@@ -290,7 +290,7 @@ namespace Belle2 {
                       "both momenta in the rest frame of the J/psi.\n"
                       "This variable is needed for angular analyses of B meson decays into two vector particles.");
 
-    REGISTER_VARIABLE("cosAcoplanarityAngleIfCMSIsTheMother", cosAcoplanarityAngleIfCMSIsTheMother,
+    REGISTER_VARIABLE("cosAcoplanarityAngleIfRefFrameIsTheMother", cosAcoplanarityAngleIfRefFrameIsTheMother,
                       "Cosine of the acoplanarity angle (Phi in the PDG 2018, p. 722). Given a two-body decay, the acoplanarity angle is defined as\n"
                       "the angle between the two decay planes in the reference frame of the mother. We calculate the acoplanarity angle as the angle between the two\n"
                       "normal vectors of the decay planes. Each normal vector is the cross product of the momentum of one daughter (in the frame of the mother) and the\n"

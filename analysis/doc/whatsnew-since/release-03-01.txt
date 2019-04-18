@@ -15,4 +15,4 @@ Variables
   in the collection of vertexing variables.
 
 * Added two new helicity variables: 
-  :b2:var:`cosHelicityAngleIfCMSIsTheDaughter` and :b2:var:`cosAcoplanarityAngleIfCMSIsTheMother`. 
+  :b2:var:`cosHelicityAngleIfRefFrameIsTheDaughter` and :b2:var:`cosAcoplanarityAngleIfRefFrameIsTheMother`. 

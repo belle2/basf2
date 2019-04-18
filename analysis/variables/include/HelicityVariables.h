@@ -49,7 +49,7 @@ namespace Belle2 {
      * For example, in the Decay B0 -> [J/psi -> mu+ mu-] [K*0 -> K+ pi-], if the provided particle is B0 and the selected indices are (0, 0), the variable will return the
      * angle between the momentum of the B0 and the momentum of the mu+, both momenta in the rest frame of the J/psi.
      * This variable is needed for angular analyses of B meson decays into two vector particles.             */
-    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheDaughter(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr cosHelicityAngleIfRefFrameIsTheDaughter(const std::vector<std::string>& arguments);
 
     /**
      * Cosine of the acoplanarity angle (Phi in the PDG 2018, p. 722). Given a two-body decay, the acoplanarity angle is defined as
@@ -60,7 +60,7 @@ namespace Belle2 {
      * For example, in the Decay B0 -> [J/psi -> mu+ mu-] [K*0 -> K+ pi-], if the provided particle is B0 and the selected indices are (0, 0), the variable will return the
      * acoplanarity using the mu+ and the K+ granddaughters.
      * */
-    Manager::FunctionPtr cosAcoplanarityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr cosAcoplanarityAngleIfRefFrameIsTheMother(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

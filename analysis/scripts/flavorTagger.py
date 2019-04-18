@@ -34,7 +34,7 @@ def getBelleOrBelle2():
     return belleOrBelle2Flag
 
 
-def setInteractionWithDatabase(downloadFromDatabaseIfNotFound=True, uploadToDatabaseAfterTraining=False):
+def setInteractionWithDatabase(downloadFromDatabaseIfNotFound=False, uploadToDatabaseAfterTraining=False):
     """
     Sets the interaction with the database: download trained weight files or upload weight files after training.
     """

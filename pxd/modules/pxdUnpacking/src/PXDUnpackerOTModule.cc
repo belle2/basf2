@@ -11,7 +11,7 @@
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/unpacking/PXDRawDataStructs.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
-#include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
+#include <pxd/modules/pxdUnpacking/PXDUnpackerOTModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -29,7 +29,7 @@ using namespace boost::spirit::endian;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDUnpacker)
+REG_MODULE(PXDUnpackerOT)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -39,7 +39,7 @@ REG_MODULE(PXDUnpacker)
 ///*********************** Main unpacker code ***********************
 ///******************************************************************
 
-PXDUnpackerModule::PXDUnpackerModule() :
+PXDUnpackerOTModule::PXDUnpackerOTModule() :
   Module(),
   m_storeRawHits(),
   m_storeROIs(),
@@ -75,7 +75,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   m_errorSkipPacketMask = c_DHE_CRC | c_FIX_SIZE;
 }
 
-void PXDUnpackerModule::initialize()
+void PXDUnpackerOTModule::initialize()
 {
   // Required input
   m_eventMetaData.isRequired();
@@ -102,7 +102,7 @@ void PXDUnpackerModule::initialize()
 
 }
 
-void PXDUnpackerModule::terminate()
+void PXDUnpackerOTModule::terminate()
 {
   int flag = 0;
   string errstr = "Statistic ( ;";
@@ -122,7 +122,7 @@ void PXDUnpackerModule::terminate()
   B2RESULT("Statistic 2: !Accepted: " << m_notaccepted << " SendROIs: " << m_sendrois << " Unfiltered: " << m_sendunfiltered);
 }
 
-void PXDUnpackerModule::event()
+void PXDUnpackerOTModule::event()
 {
   m_storeDAQEvtStats.create(c_NO_ERROR);
 
@@ -172,7 +172,7 @@ void PXDUnpackerModule::event()
   setReturnValue(0 == (m_criticalErrorMask & m_errorMaskEvent));
 }
 
-void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
+void PXDUnpackerOTModule::unpack_rawpxd(RawPXD& px, int inx)
 {
   int Frames_in_event;
   int fullsize;
@@ -297,8 +297,8 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
   daqpktstat.setErrorMask(m_errorMaskPacket);
 }
 
-void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport,
-                                       VxdID vxd_id)
+void PXDUnpackerOTModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport,
+                                         VxdID vxd_id)
 {
 //   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
   ubig16_t* dhp_pix = (ubig16_t*)data;
@@ -313,8 +313,7 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   // Size: 64*768 + 8 bytes for a full frame readout
   if (frame_len != 0xC008) {
     if (!(m_suppressErrorMask & c_FIX_SIZE)) B2WARNING("Frame size unsupported for RAW ADC frame! $" <<
-                                                         LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str())
-                                                         << LogVar("DHE", dhe_ID) << LogVar("DHP", dhe_DHPport));
+                                                         LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str()));
     m_errorMask |= c_FIX_SIZE;
     return;
   }
@@ -358,7 +357,7 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   m_storeRawAdc.appendNew(vxd_id, data, frame_len);
 };
 
-void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
+void PXDUnpackerOTModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
 {
   //! *************************************************************
   //! Important Remark:
@@ -402,7 +401,7 @@ void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, Vx
 //   }
 }
 
-void PXDUnpackerModule::dump_dhp(void* data, unsigned int frame_len)
+void PXDUnpackerOTModule::dump_dhp(void* data, unsigned int frame_len)
 {
   // called only for debugging purpose, will never be called in normal running
   unsigned int w = frame_len / 2;
@@ -425,7 +424,7 @@ void PXDUnpackerModule::dump_dhp(void* data, unsigned int frame_len)
   B2WARNING("DHP CRC $" << hex << d[w] << ",$" << hex << d[w + 1]);
 }
 
-void PXDUnpackerModule::dump_roi(void* data, unsigned int frame_len)
+void PXDUnpackerOTModule::dump_roi(void* data, unsigned int frame_len)
 {
   // called only for debugging purpose, will never be called in normal running
   unsigned int w = frame_len / 4;
@@ -440,9 +439,9 @@ void PXDUnpackerModule::dump_roi(void* data, unsigned int frame_len)
   B2WARNING("ROI CRC $" << hex << d[w]);
 }
 
-void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhe_first_readout_frame_id_lo,
-                                   unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, VxdID vxd_id,
-                                   PXDDAQPacketStatus& daqpktstat)
+void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhe_first_readout_frame_id_lo,
+                                     unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, VxdID vxd_id,
+                                     PXDDAQPacketStatus& daqpktstat)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
   bool printflag = false;
@@ -455,7 +454,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int dhp_dhp_id       = 0;
 
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
-//  unsigned int dhp_offset = 0;
+//   unsigned int dhp_offset = 0;
   bool rowflag = false;
   bool pixelflag = true; // just for first row start
 
@@ -515,9 +514,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
   /* // TODO removed because data format error is not to be fixed soon
   if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
-    if (!m_suppressErrorMask & c_DHP_DHE_FRAME_DIFFER) B2WARNING("DHP Frame Nr differ from DHE Frame Nr by >1 DHE " <<
-          dhe_first_readout_frame_id_lo << " != DHP " << (dhp_readout_frame_lo & 0x3F) << " delta " << ((
-                dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F));
+    if(!m_suppressErrorMask&c_DHP_DHE_FRAME_DIFFER ) B2WARNING("DHP Frame Nr differ from DHE Frame Nr by >1 DHE " << dhe_first_readout_frame_id_lo << " != DHP " << (dhp_readout_frame_lo & 0x3F) << " delta "<< ((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) );
     m_errorMask |= c_DHP_DHE_FRAME_DIFFER;
   }
   */
@@ -670,7 +667,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   }
 };
 
-int PXDUnpackerModule::nr5bits(int i)
+int PXDUnpackerOTModule::nr5bits(int i)
 {
   /// too lazy to count the bits myself, thus using a small lookup table
   const int lut[32] = {
@@ -680,8 +677,8 @@ int PXDUnpackerModule::nr5bits(int i)
   return lut[i & 0x1F];
 }
 
-void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event,
-                                         PXDDAQPacketStatus& daqpktstat)
+void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event,
+                                           PXDDAQPacketStatus& daqpktstat)
 {
   /// The following STATIC variables are used to save some state or count some things
   /// while depacking the frames. they are in most cases (re)set on the first frame or ONSEN trg frame
@@ -838,6 +835,11 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_ID;
       }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
+      if ((found_mask_active_dhp & (1 << dhc.data_direct_readout_frame->getDHPPort())) != 0) {
+        B2ERROR("Second DHP data packet (MEMDUMP) for " << LogVar("DHE", currentDHEID) << LogVar("DHP",
+                dhc.data_direct_readout_frame->getDHPPort()));
+      }
+
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
       unpack_dhp_raw(data, len - 4,
@@ -874,6 +876,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_ID;
       }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
+      if ((found_mask_active_dhp & (1 << dhc.data_direct_readout_frame->getDHPPort())) != 0) {
+        B2ERROR("Second DHP data packet for " << LogVar("DHE", currentDHEID) << LogVar("DHP", dhc.data_direct_readout_frame->getDHPPort()));
+      }
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
       if (m_checkPaddingCRC) m_errorMask |= dhc.check_padding(); // isUnfiltered_event
 
@@ -919,6 +924,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_ID;
       }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
+      if ((found_mask_active_dhp & (1 << dhc.data_direct_readout_frame->getDHPPort())) != 0) {
+        B2ERROR("Second DHP data packet (FCE) for " << LogVar("DHE", currentDHEID) << LogVar("DHP",
+                dhc.data_direct_readout_frame->getDHPPort()));
+      }
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
       B2DEBUG(29, "UNPACK FCE FRAME with len $" << hex << len);
@@ -1141,6 +1150,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_ID;
       }
       /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
+      if ((found_mask_active_dhp & (1 << dhc.data_ghost_frame->getDHPPort())) != 0) {
+        B2ERROR("Second DHP data packet (GHOST) for " << LogVar("DHE", currentDHEID) << LogVar("DHP", dhc.data_ghost_frame->getDHPPort()));
+      }
       found_mask_active_dhp |= 1 << dhc.data_ghost_frame->getDHPPort();
 
       //found_mask_active_dhp = mask_active_dhp;/// TODO Workaround for DESY TB 2016 doesnt work

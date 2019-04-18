@@ -19,6 +19,8 @@
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <framework/geometry/BFieldManager.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
@@ -29,6 +31,10 @@ std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit2D::globalDerivatives(c
                    sop);
 
   auto globals = GlobalDerivatives(alignment);
+
+  auto lorentz = GlobalCalibrationManager::getInstance().getLorentzShiftHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
+                 sop, BFieldManager::getInstance().getField(sop->getPos()));
+  globals.add(lorentz);
 
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(getSensorID()));
 

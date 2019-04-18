@@ -194,6 +194,16 @@ namespace Belle2 {
     int tauMinusMcMode(const Particle*);
 
     /**
+     * return the prong of the generated decay of positive tau in a tau pair event.
+     */
+    int tauPlusMcProng(const Particle*);
+
+    /**
+     * return the prong of the generated decay of negative tau in a tau pair event.
+     */
+    int tauMinusMcProng(const Particle*);
+
+    /**
      * check that neutrals were seen in ECL, and charged were seen in SVD
      */
     double isReconstructible(const Particle*);

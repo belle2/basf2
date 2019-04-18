@@ -122,9 +122,9 @@ void DQMHistAnalysisPXDCMModule::event()
     if (hh1) {
 //       B2INFO("Histo " << name << " found in mem");
       for (int bin = 1; bin <= 64; bin++) {
-        float v;
+        double v;
         v = hh1->GetBinContent(bin);
-        m_hCommonMode->Fill(i, bin, v);
+        m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
       }
 
       /// FIXME: integration intervalls depend on CM default value

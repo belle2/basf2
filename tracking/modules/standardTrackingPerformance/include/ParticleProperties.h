@@ -20,7 +20,7 @@ namespace Belle2 {
     ParticleProperties() = default; /**< default constructor */
 
     /** constructor which sets all members to the given value */
-    ParticleProperties(double value)
+    explicit ParticleProperties(double value)
     {
       setAllTo(value);
     }

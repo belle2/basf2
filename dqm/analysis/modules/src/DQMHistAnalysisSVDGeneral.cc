@@ -205,13 +205,13 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
                         };
 
 
-  m_hOccupancyV =  new TH2F("hOccupancyV", "Average ZS5 Sensor Occupancy (%), V side ", 16, 0.5, 16.5, 19, 0, 19);
+  m_hOccupancyV =  new TH2F("hOccupancyV", "Average OFFLINE Sensor Occupancy (%), V side ", 16, 0.5, 16.5, 19, 0, 19);
   m_hOccupancyV->SetMarkerSize(1.1);
   m_hOccupancyV->GetXaxis()->SetTitle("ladder number");
   m_hOccupancyV->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOccupancyV->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-  m_hOccupancyU =  new TH2F("hOccupancyU", "Average ZS5 Sensor Occupancy (%), U side ", 16, 0.5, 16.5, 19, 0, 19);
+  m_hOccupancyU =  new TH2F("hOccupancyU", "Average OFFLINE Sensor Occupancy (%), U side ", 16, 0.5, 16.5, 19, 0, 19);
   m_hOccupancyU->SetMarkerSize(1.1);
   m_hOccupancyU->GetXaxis()->SetTitle("ladder number");
   m_hOccupancyU->GetXaxis()->SetLabelSize(0.04);
@@ -240,6 +240,10 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   m_cOnlineOccupancyU->Clear();
   m_cOnlineOccupancyV->Clear();
   m_cOccupancyChartChip->Clear();
+  for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
+    m_cStripOccupancyU[i]->Clear();
+    m_cStripOccupancyV[i]->Clear();
+  }
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
@@ -302,7 +306,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (hChart != NULL) {
     hChart->Copy(*m_hOccupancyChartChip);
     m_hOccupancyChartChip->SetName("SVDOccupancyChart");
-    m_hOccupancyChartChip->SetTitle("SVD Occupancy of ZS5 Strips per chip " + runID);
+    m_hOccupancyChartChip->SetTitle("SVD OFFLINE Occupancy per chip " + runID);
     m_hOccupancyChartChip->Scale(1 / nEvents / 128);
     m_cOccupancyChartChip->cd();
     //    m_hOccupancyChartChip->SetStats(0);
@@ -317,15 +321,21 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   //check MODULE OCCUPANCY online & offline
 
+  //reset canvas color
+  m_occUstatus = 0;
+  m_occVstatus = 0;
+  m_onlineOccUstatus = 0;
+  m_onlineOccVstatus = 0;
+
   //update titles with exp and run number
-  m_hOccupancyU->SetTitle(m_hOccupancyU->GetTitle() + runID);
+  m_hOccupancyU->SetTitle("Average OFFLINE Sensor Occupancy (%), U side " + runID);
   m_hOccupancyU->SetStats(0);
-  m_hOccupancyV->SetTitle(m_hOccupancyV->GetTitle() + runID);
+  m_hOccupancyV->SetTitle("Average OFFLINE Sensor Occupancy (%), V side " + runID);
   m_hOccupancyV->SetStats(0);
 
-  m_hOnlineOccupancyU->SetTitle(m_hOnlineOccupancyU->GetTitle() + runID);
+  m_hOnlineOccupancyU->SetTitle("Average ONLINE Sensor Occupancy (%), U side " + runID);
   m_hOnlineOccupancyU->SetStats(0);
-  m_hOnlineOccupancyV->SetTitle(m_hOnlineOccupancyV->GetTitle() + runID);
+  m_hOnlineOccupancyV->SetTitle("Average ONLINE Sensor Occupancy (%), V side " + runID);
   m_hOnlineOccupancyV->SetStats(0);
 
 
@@ -366,24 +376,23 @@ void DQMHistAnalysisSVDGeneralModule::event()
       }
       */
 
-      if (occU > m_occEmpty && occU < m_occWarning) {
-        if (m_occUstatus == 0) m_occUstatus = 0;
-      } else {
-        if (occU <= m_occEmpty) {
-          if (m_occUstatus < 1) m_occUstatus = 1;
-        } else if (occU <= m_occError) {
+      if (occU <= m_occEmpty) {
+        if (m_occUstatus < 1) m_occUstatus = 1;
+      } else if (occU > m_occWarning) {
+        if (occU < m_occError) {
           if (m_occUstatus < 2) m_occUstatus = 2;
-        } else if (occU > m_occError) {
+        } else if (occU >= m_occError) {
           if (m_occUstatus < 3) m_occUstatus = 3;
         }
       }
+
       //      B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " status = " << m_occUstatus);
 
       //produce the occupancy plot
       htmp->Copy(*m_hStripOccupancyU[i]);
       m_hStripOccupancyU[i]->Scale(1 / nEvents);
       m_hStripOccupancyU[i]->SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
-      m_hStripOccupancyU[i]->SetTitle(Form("SVD Sensor %d_%d_%d U-Strip ZS5 Occupancy vs Strip Number", tmp_layer, tmp_ladder,
+      m_hStripOccupancyU[i]->SetTitle(Form("SVD Sensor %d_%d_%d U-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
                                            tmp_sensor));
     }
     //look for V histogram - OFFLINE ZS
@@ -409,14 +418,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
       }
       */
 
-      if (occV > m_occEmpty && occV < m_occWarning) {
-        if (m_occVstatus == 0) m_occVstatus = 0;
-      } else {
-        if (occV <= m_occEmpty) {
-          if (m_occVstatus < 1) m_occVstatus = 1;
-        } else if (occV <= m_occError) {
+      if (occV <= m_occEmpty) {
+        if (m_occVstatus < 1) m_occVstatus = 1;
+      } else if (occV > m_occWarning) {
+        if (occV < m_occError) {
           if (m_occVstatus < 2) m_occVstatus = 2;
-        } else if (occV > m_occError) {
+        } else if (occV >= m_occError) {
           if (m_occVstatus < 3) m_occVstatus = 3;
         }
       }
@@ -424,7 +431,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       htmp->Copy(*m_hStripOccupancyV[i]);
       m_hStripOccupancyV[i]->Scale(1 / nEvents);
       m_hStripOccupancyV[i]->SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));
-      m_hStripOccupancyV[i]->SetTitle(Form("SVD Sensor %d_%d_%d V-Strip ZS5 Occupancy vs Strip Number", tmp_layer, tmp_ladder,
+      m_hStripOccupancyV[i]->SetTitle(Form("SVD Sensor %d_%d_%d V-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
                                            tmp_sensor));
 
     }
@@ -451,17 +458,16 @@ void DQMHistAnalysisSVDGeneralModule::event()
         }
       */
 
-      if (onlineOccV > m_onlineOccEmpty && onlineOccV < m_onlineOccWarning) {
-        if (m_onlineOccVstatus == 0) m_onlineOccVstatus = 0;
-      } else {
-        if (onlineOccV <= m_onlineOccEmpty) {
-          if (m_onlineOccVstatus < 1) m_onlineOccVstatus = 1;
-        } else if (onlineOccV <= m_onlineOccError) {
+      if (onlineOccV <= m_onlineOccEmpty) {
+        if (m_onlineOccVstatus < 1) m_onlineOccVstatus = 1;
+      } else if (onlineOccV > m_onlineOccWarning) {
+        if (onlineOccV < m_onlineOccError) {
           if (m_onlineOccVstatus < 2) m_onlineOccVstatus = 2;
-        } else if (onlineOccV > m_onlineOccError) {
+        } else if (onlineOccV >= m_onlineOccError) {
           if (m_onlineOccVstatus < 3) m_onlineOccVstatus = 3;
         }
       }
+
 
     }
     //look for U histogram - ONLINE ZS
@@ -487,14 +493,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
         }
       */
 
-      if (onlineOccU > m_onlineOccEmpty && onlineOccU < m_onlineOccWarning) {
-        if (m_onlineOccUstatus == 0) m_onlineOccUstatus = 0;
-      } else {
-        if (onlineOccU <= m_onlineOccEmpty) {
-          if (m_onlineOccUstatus < 1) m_onlineOccUstatus = 1;
-        } else if (onlineOccU <= m_onlineOccError) {
+      if (onlineOccU <= m_onlineOccEmpty) {
+        if (m_onlineOccUstatus < 1) m_onlineOccUstatus = 1;
+      } else if (onlineOccU > m_onlineOccWarning) {
+        if (onlineOccU < m_onlineOccError) {
           if (m_onlineOccUstatus < 2) m_onlineOccUstatus = 2;
-        } else if (onlineOccU > m_onlineOccError) {
+        } else if (onlineOccU >= m_onlineOccError) {
           if (m_onlineOccUstatus < 3) m_onlineOccUstatus = 3;
         }
       }

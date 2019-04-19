@@ -112,21 +112,16 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
   //occupancy chart chip
   m_cOccupancyChartChip = new TCanvas("SVDOccupancy/c_OccupancyChartChip");
-  m_hOccupancyChartChip =  new TH1F();
 
   //strip occupancy per sensor
   m_cStripOccupancyU = new TCanvas*[nSensors];
-  m_hStripOccupancyU = new TH1F*[nSensors];
   m_cStripOccupancyV = new TCanvas*[nSensors];
-  m_hStripOccupancyV = new TH1F*[nSensors];
   for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
     int tmp_layer = m_SVDModules[i].getLayerNumber();
     int tmp_ladder = m_SVDModules[i].getLadderNumber();
     int tmp_sensor = m_SVDModules[i].getSensorNumber();
     m_cStripOccupancyU[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyU_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
     m_cStripOccupancyV[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
-    m_hStripOccupancyU[i] = new TH1F();
-    m_hStripOccupancyV[i] = new TH1F();
   }
 
 
@@ -304,13 +299,14 @@ void DQMHistAnalysisSVDGeneralModule::event()
   TH1F* hChart = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsChip");
 
   if (hChart != NULL) {
-    hChart->Copy(*m_hOccupancyChartChip);
-    m_hOccupancyChartChip->SetName("SVDOccupancyChart");
-    m_hOccupancyChartChip->SetTitle("SVD OFFLINE Occupancy per chip " + runID);
-    m_hOccupancyChartChip->Scale(1 / nEvents / 128);
+    m_hOccupancyChartChip.Clear();
+    hChart->Copy(m_hOccupancyChartChip);
+    m_hOccupancyChartChip.SetName("SVDOccupancyChart");
+    m_hOccupancyChartChip.SetTitle("SVD OFFLINE Occupancy per chip " + runID);
+    m_hOccupancyChartChip.Scale(1 / nEvents / 128);
     m_cOccupancyChartChip->cd();
     //    m_hOccupancyChartChip->SetStats(0);
-    m_hOccupancyChartChip->Draw();
+    m_hOccupancyChartChip.Draw();
   }
   m_cOccupancyChartChip->Modified();
   m_cOccupancyChartChip->Update();
@@ -389,11 +385,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
       //      B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " status = " << m_occUstatus);
 
       //produce the occupancy plot
-      htmp->Copy(*m_hStripOccupancyU[i]);
-      m_hStripOccupancyU[i]->Scale(1 / nEvents);
-      m_hStripOccupancyU[i]->SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
-      m_hStripOccupancyU[i]->SetTitle(Form("SVD Sensor %d_%d_%d U-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
-                                           tmp_sensor));
+      m_hStripOccupancyU[i].Clear();
+      htmp->Copy(m_hStripOccupancyU[i]);
+      m_hStripOccupancyU[i].Scale(1 / nEvents);
+      m_hStripOccupancyU[i].SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
+      m_hStripOccupancyU[i].SetTitle(Form("SVD Sensor %d_%d_%d U-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
+                                          tmp_sensor));
     }
     //look for V histogram - OFFLINE ZS
     tmpname = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountV", tmp_layer, tmp_ladder, tmp_sensor);
@@ -428,11 +425,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
         }
       }
       //produce the occupancy plot
-      htmp->Copy(*m_hStripOccupancyV[i]);
-      m_hStripOccupancyV[i]->Scale(1 / nEvents);
-      m_hStripOccupancyV[i]->SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));
-      m_hStripOccupancyV[i]->SetTitle(Form("SVD Sensor %d_%d_%d V-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
-                                           tmp_sensor));
+      m_hStripOccupancyV[i].Clear();
+      htmp->Copy(m_hStripOccupancyV[i]);
+      m_hStripOccupancyV[i].Scale(1 / nEvents);
+      m_hStripOccupancyV[i].SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));
+      m_hStripOccupancyV[i].SetTitle(Form("SVD Sensor %d_%d_%d V-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
+                                          tmp_sensor));
 
     }
     //look for V histogram - ONLINE ZS
@@ -508,9 +506,9 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
     //update sensor occupancy canvas U and V
     m_cStripOccupancyU[i]->cd();
-    m_hStripOccupancyU[i]->Draw("histo");
+    m_hStripOccupancyU[i].Draw("histo");
     m_cStripOccupancyV[i]->cd();
-    m_hStripOccupancyV[i]->Draw("histo");
+    m_hStripOccupancyV[i].Draw("histo");
   }
 
   //update summary offline occupancy U canvas
@@ -685,13 +683,10 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_cOnlineOccupancyV;
 
   delete m_cOccupancyChartChip;
-  delete m_hOccupancyChartChip;
 
   for (int module = 0; module < nSensors; module++) {
     delete m_cStripOccupancyU[module];
-    delete m_hStripOccupancyU[module];
     delete m_cStripOccupancyV[module];
-    delete m_hStripOccupancyV[module];
   }
 
   delete m_cStripOccupancyU;

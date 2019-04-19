@@ -168,6 +168,16 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
+    double eclClusterCellId(const Particle* particle)
+    {
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->getMaxECellId();
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
     double eclClusterTiming(const Particle* particle)
     {
 
@@ -1132,6 +1142,8 @@ namespace Belle2 {
                       "Returns ECL cluster's timing uncertainty that contains 99% of true photons.");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE,
                       "Returns energy of the crystal with highest energy in the ECLCluster.");
+    REGISTER_VARIABLE("clusterCellID", eclClusterCellId,
+                      "Returns cellId of the crystal with highest energy in the ECLCluster.");
     REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9,
                       "Returns ratio of energies of the central crystal and 3x3 crystals around the central crystal.");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25,

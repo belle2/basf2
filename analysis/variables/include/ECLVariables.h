@@ -112,9 +112,14 @@ namespace Belle2 {
     double eclClusterErrorTiming(const Particle* particle);
 
     /**
-     * return the energy of the crystall with highest  energy
+     * return the energy of the crystal with highest energy
      */
     double eclClusterHighestE(const Particle* particle);
+
+    /**
+     * return the cellID of the crystal with highest energy
+     */
+    double eclClusterCellId(const Particle* particle);
 
     /**
      * return ratio of energies of the central crystal and 3x3 crystals around the central crystal

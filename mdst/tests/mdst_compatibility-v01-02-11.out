@@ -38,6 +38,7 @@ Untested method PIDLikelihood::setLogLikelihood
 Untested method ECLCluster::addHypothesis
 Untested method ECLCluster::addStatus
 Untested method ECLCluster::getHypothesisId
+Untested method ECLCluster::getMaxECellId
 Untested method ECLCluster::hasStatus
 Untested method ECLCluster::removeHypothesis
 Untested method ECLCluster::removeStatus
@@ -56,6 +57,7 @@ Untested method ECLCluster::setEnergyRaw
 Untested method ECLCluster::setHypothesis
 Untested method ECLCluster::setIsTrack
 Untested method ECLCluster::setLAT
+Untested method ECLCluster::setMaxECellId
 Untested method ECLCluster::setMinTrkDistance
 Untested method ECLCluster::setNumberOfCrystals
 Untested method ECLCluster::setNumberOfHadronDigits
@@ -25872,3 +25874,4 @@ MCParticle#63:
 [INFO]  (last message occurred 58 times in total)
 [INFO] ================================================================================
 
+[?1034h

@@ -73,7 +73,7 @@ namespace Belle2 {
     TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */
     TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
 
-    const int nSensors = 172;
+    const int nSensors = 172; /**< total number of sensors */
     TH1F m_hStripOccupancyU[172]; /**< u-side strip chart occupancy histos*/
     TCanvas** m_cStripOccupancyU = nullptr; /**< u-side strip chart occupancy canvas*/
     TH1F m_hStripOccupancyV[172]; /**< u-side strip chart occupancy histos*/

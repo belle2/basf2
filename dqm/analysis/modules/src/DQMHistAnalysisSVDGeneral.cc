@@ -140,14 +140,14 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_legNormal->AddText("OCCUPANCY WITHIN LIMITS");
   m_legNormal->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occEmpty, m_occWarning));
   m_legNormal->SetFillColor(kGreen);
-  m_legNormal->SetBorderSize(0.5);
+  m_legNormal->SetBorderSize(0.);
   m_legNormal->SetLineColor(kBlack);
   m_legEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
   m_legEmpty->AddText("NO DATA RECEIVED");
   m_legEmpty->AddText("from at least one sensor");
   m_legEmpty->SetFillColor(kBlack);
   m_legEmpty->SetTextColor(kWhite);
-  m_legEmpty->SetBorderSize(0.5);
+  m_legEmpty->SetBorderSize(0.);
   m_legEmpty->SetLineColor(kBlack);
 
   //ONLINE occupancy plots legend
@@ -165,7 +165,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_legOnNormal->AddText("OCCUPANCY WITHIN LIMITS");
   m_legOnNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
   m_legOnNormal->SetFillColor(kGreen);
-  m_legOnNormal->SetBorderSize(0.5);
+  m_legOnNormal->SetBorderSize(0.);
   m_legOnNormal->SetLineColor(kBlack);
   m_legOnEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
   m_legOnEmpty->AddText("NO DATA RECEIVED");
@@ -377,7 +377,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       } else if (occU > m_occWarning) {
         if (occU < m_occError) {
           if (m_occUstatus < 2) m_occUstatus = 2;
-        } else if (occU >= m_occError) {
+        } else {
           if (m_occUstatus < 3) m_occUstatus = 3;
         }
       }
@@ -420,7 +420,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       } else if (occV > m_occWarning) {
         if (occV < m_occError) {
           if (m_occVstatus < 2) m_occVstatus = 2;
-        } else if (occV >= m_occError) {
+        } else {
           if (m_occVstatus < 3) m_occVstatus = 3;
         }
       }
@@ -461,7 +461,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       } else if (onlineOccV > m_onlineOccWarning) {
         if (onlineOccV < m_onlineOccError) {
           if (m_onlineOccVstatus < 2) m_onlineOccVstatus = 2;
-        } else if (onlineOccV >= m_onlineOccError) {
+        } else {
           if (m_onlineOccVstatus < 3) m_onlineOccVstatus = 3;
         }
       }
@@ -496,7 +496,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       } else if (onlineOccU > m_onlineOccWarning) {
         if (onlineOccU < m_onlineOccError) {
           if (m_onlineOccUstatus < 2) m_onlineOccUstatus = 2;
-        } else if (onlineOccU >= m_onlineOccError) {
+        } else {
           if (m_onlineOccUstatus < 3) m_onlineOccUstatus = 3;
         }
       }

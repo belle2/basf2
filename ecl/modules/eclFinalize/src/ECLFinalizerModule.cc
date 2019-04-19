@@ -224,6 +224,7 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   eclCluster->setEnergy(eclShower->getEnergy());
   eclCluster->setEnergyRaw(eclShower->getEnergyRaw());
   eclCluster->setEnergyHighestCrystal(eclShower->getEnergyHighestCrystal());
+  eclCluster->setMaxECellId((short int)eclShower->getCentralCellId());
 
   double covmat[6] = {
     eclShower->getUncertaintyEnergy()* eclShower->getUncertaintyEnergy(),

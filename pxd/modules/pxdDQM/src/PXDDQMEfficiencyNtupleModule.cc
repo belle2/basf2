@@ -73,7 +73,7 @@ void PXDDQMEfficiencyNtupleModule::terminate()
 void PXDDQMEfficiencyNtupleModule::initialize()
 {
   m_tuple = new TNtuple("effcontrol", "effcontrol",
-                        "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched:z0:d0:svdhits:charge");
+                        "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched:z0:d0:svdhits:charge:phi:costheta");
   m_file = new TFile("test.root", "recreate");
 
   //register the required arrays
@@ -195,11 +195,11 @@ void PXDDQMEfficiencyNtupleModule::event()
           charge = m_pxdclusters[bestcluster]->getCharge();
           matched = true;
         }
-        float fill[20] = {float((int)aVxdID), float(u_fit), float(v_fit), float(trackstate.getMom().Mag()), float(trackstate.getMom().Pt()),
+        float fill[22] = {float((int)aVxdID), float(u_fit), float(v_fit), float(trackstate.getMom().Mag()), float(trackstate.getMom().Pt()),
                           float(du_clus), float(dv_clus), float(sigu), float(sigv), float(d_clus),
                           float(fitInsideROI), float(closeToBoarder), float(closeToDead), float(matched),
                           float(ptr2->getZ0()), float(ptr2->getD0()), float(a_track.getNumberOfSVDHits()),
-                          charge
+                          charge, trackstate.getMom().Phi(), trackstate.getMom().CosTheta()
                          };
         m_tuple->Fill(fill);
       }

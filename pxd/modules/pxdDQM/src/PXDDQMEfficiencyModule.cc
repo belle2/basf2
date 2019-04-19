@@ -12,6 +12,8 @@
 #include <tracking/dataobjects/ROIid.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
+#include <mdst/dataobjects/Track.h>
+#include <framework/gearbox/Const.h>
 
 #include "TDirectory.h"
 #include "TMatrixDSym.h"
@@ -114,6 +116,18 @@ void PXDDQMEfficiencyModule::event()
     trackstate = a_track.getMeasuredStateOnPlaneFromFirstHit();
     if (trackstate.getMom().Mag() < m_momCut) continue;
     if (trackstate.getMom().Pt() < m_pTCut) continue;
+
+    auto ptr = a_track.getRelated<Track>("Tracks");
+
+    if (!ptr) {
+      B2ERROR("expect a track for fitted recotracks");
+      continue;
+    }
+    auto ptr2 = ptr->getTrackFitResultWithClosestMass(Const::pion);
+    if (!ptr2) {
+      B2ERROR("expect a track fit result for mass");
+      continue;
+    }
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();

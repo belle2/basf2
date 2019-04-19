@@ -8,7 +8,6 @@ env['LIBS'] = ['framework',
                'trg_cdc_dbobjects',
                'trg_cdc',
                'trg_cdc_dataobjects',
-               'trg_cdc_dbobjects',
                'fann']
 
 Return('env')

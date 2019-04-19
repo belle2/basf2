@@ -63,7 +63,7 @@ namespace Belle2 {
       m_isTrack(false),
       m_status(0),
       m_hypotheses(static_cast<unsigned short>(EHypothesisBit::c_nPhotons)), // set to c_nPhotons for b2bii
-      m_maxECellId(-1),
+      m_maxECellId(0),
       m_connectedRegionId(0),
       m_clusterId(0),
       m_sqrtcovmat_00(0.),
@@ -130,7 +130,7 @@ namespace Belle2 {
     void removeHypothesis(EHypothesisBit bitmask) { m_hypotheses &= (~static_cast<short unsigned>(bitmask)); }
 
     /** Set cellID of maximum energy crystal */
-    void setMaxECellId(short int cellid) {m_maxECellId = cellid;}
+    void setMaxECellId(unsigned short cellid) {m_maxECellId = cellid;}
 
     /** Set connected region id. */
     void setConnectedRegionId(int crid) { m_connectedRegionId = crid; }
@@ -239,7 +239,7 @@ namespace Belle2 {
     unsigned short getHypotheses() const {return m_hypotheses;}
 
     //** Return cellID of maximum energy crystal */
-    short int getMaxECellId() const {return m_maxECellId;}
+    unsigned short getMaxECellId() const {return m_maxECellId;}
 
     /** Return connected region id. */
     int getConnectedRegionId() const {return m_connectedRegionId;}
@@ -377,7 +377,7 @@ namespace Belle2 {
     unsigned short m_hypotheses;
 
     /** CellID of maximum energy crystal */
-    short int m_maxECellId;
+    unsigned short m_maxECellId;
 
     /** Connected Region of this cluster. */
     int m_connectedRegionId;
@@ -472,7 +472,8 @@ namespace Belle2 {
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 13);
+    ClassDef(ECLCluster, 14);
+    // 14: Added m_maxECellId
     // 13: Added m_hypotheses
     // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.
     // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables

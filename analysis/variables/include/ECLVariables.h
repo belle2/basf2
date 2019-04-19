@@ -117,7 +117,7 @@ namespace Belle2 {
     double eclClusterHighestE(const Particle* particle);
 
     /**
-     * return the cellID of the crystal with highest energy
+     * return the cellID [1,8736] of the crystal with highest energy
      */
     double eclClusterCellId(const Particle* particle);
 

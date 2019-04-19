@@ -115,7 +115,6 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   CalibEntriesvsCrys.push_back(getObjectPtr<TH1F>("CalibEntriesvsCrysDifferentRing"));
 
   auto RawDigitAmpvsCrys = getObjectPtr<TH2F>("RawDigitAmpvsCrys");
-  auto RawDigitTimevsCrys = getObjectPtr<TH2F>("RawDigitTimevsCrys");
 
   /**-----------------------------------------------------------------------------------------------*/
   /**..Record the number of entries per crystal in each of the two normalized energy  histograms
@@ -181,7 +180,6 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
     AverageInitialCalib[idir]->Write();
   }
   RawDigitAmpvsCrys->Write();
-  RawDigitTimevsCrys->Write();
 
   /**-----------------------------------------------------------------------------------------------*/
   /**..If we have not been asked to do fits, we can quit now */

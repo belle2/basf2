@@ -20,6 +20,7 @@ import ROOT
 from ROOT import TVector3, TMatrixDSym, TFile, TH1F
 from ROOT import Belle2
 from ROOT.Belle2 import BeamSpot
+from array import array
 import argparse
 from termcolor import colored
 import sys
@@ -38,7 +39,7 @@ if(str(sys.argv[1]) == "help"):
 
 args = parser.parse_args()
 
-minVertices = 100
+minVertices = 10
 
 experiment = args.exp[0]
 run = args.run[0]
@@ -84,35 +85,43 @@ class beamSpotImporter(basf2.Module):
         hVertexY = dqmFile.Get("IPMonitoring/Y4S_Vertex.Y")
         hVertexZ = dqmFile.Get("IPMonitoring/Y4S_Vertex.Z")
 
-        vertexX = hVertexX.GetMean()
-        vertexY = hVertexY.GetMean()
-        vertexZ = hVertexZ.GetMean()
+        q = array('d', [0.5])
+        medianX = array('d', [0.])
+        medianY = array('d', [0.])
+        medianZ = array('d', [0.])
+
+        hVertexX.GetQuantiles(1, medianX, q)
+        hVertexY.GetQuantiles(1, medianY, q)
+        hVertexZ.GetQuantiles(1, medianZ, q)
 
         # vertex position
-        vertexPos = ROOT.TVector3(vertexX, vertexY, vertexZ)
+        # Computed as the medians of the vertex position histograms
+        vertexPos = ROOT.TVector3(medianX[0], medianY[0], medianZ[0])
         vertexPos.Print()
 
         # vertex position error
+        # Computed as the squared RMS of the vertex position histograms, divided by the number of entries
+        # Off-diagonal terms are set to zero, for the moment
+        vertexCov = ROOT.TMatrixDSym(3)
+        vertexCov[0][0] = hVertexX.GetRMS() * hVertexX.GetRMS() / entries
+        vertexCov[1][1] = hVertexY.GetRMS() * hVertexY.GetRMS() / entries
+        vertexCov[2][2] = hVertexZ.GetRMS() * hVertexZ.GetRMS() / entries
+        vertexCov[0][1] = 0
+        vertexCov[0][2] = 0
+        vertexCov[1][2] = 0
+        vertexCov[1][0] = 0
+        vertexCov[2][0] = 0
+        vertexCov[2][1] = 0
+        vertexCov.Print()
+
+        # beam spot size
+        vertexSize = ROOT.TMatrixDSym(3)
         hVarianceX = dqmFile.Get("IPMonitoring/Var.X")
         hVarianceY = dqmFile.Get("IPMonitoring/Var.Y")
         hVarianceZ = dqmFile.Get("IPMonitoring/Var.Z")
         hVarianceXY = dqmFile.Get("IPMonitoring/Covar.XY")
         hVarianceXZ = dqmFile.Get("IPMonitoring/Covar.XZ")
         hVarianceYZ = dqmFile.Get("IPMonitoring/Covar.YZ")
-        vertexCov = ROOT.TMatrixDSym(3)
-        vertexCov[0][0] = hVarianceX.GetMean()
-        vertexCov[1][1] = hVarianceY.GetMean()
-        vertexCov[2][2] = hVarianceZ.GetMean()
-        vertexCov[0][1] = hVarianceXY.GetMean()
-        vertexCov[0][2] = hVarianceXZ.GetMean()
-        vertexCov[1][2] = hVarianceYZ.GetMean()
-        vertexCov[1][0] = vertexCov[0][1]
-        vertexCov[2][0] = vertexCov[0][2]
-        vertexCov[2][1] = vertexCov[1][2]
-        vertexCov.Print()
-
-        # beam spot size
-        vertexSize = ROOT.TMatrixDSym(3)
         vertexSize[0][0] = 0.1
         vertexSize[1][1] = 0.2
         vertexSize[2][2] = 0.3

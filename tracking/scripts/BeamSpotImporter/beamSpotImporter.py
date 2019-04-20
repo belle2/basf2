@@ -71,6 +71,7 @@ class beamSpotImporter(basf2.Module):
             return
 
         hVertexX = dqmFile.Get("IPMonitoring/Y4S_Vertex.X")
+        hVertexX.GetXaxis().UnZoom()
 
         entries = hVertexX.GetEntries()
 
@@ -87,10 +88,18 @@ class beamSpotImporter(basf2.Module):
             return
 
         hVertexY = dqmFile.Get("IPMonitoring/Y4S_Vertex.Y")
+        hVertexY.GetXaxis().UnZoom()
         hVertexZ = dqmFile.Get("IPMonitoring/Y4S_Vertex.Z")
+        hVertexZ.GetXaxis().UnZoom()
+
         hVertexXY = dqmFile.Get("IPMonitoring/Y4S_Prod.XY")
+        hVertexXY.GetXaxis().UnZoom()
+
         hVertexYZ = dqmFile.Get("IPMonitoring/Y4S_Prod.YZ")
+        hVertexYZ.GetXaxis().UnZoom()
+
         hVertexXZ = dqmFile.Get("IPMonitoring/Y4S_Prod.XZ")
+        hVertexXZ.GetXaxis().UnZoom()
 
         q = array('d', [0.5])
         medianX = array('d', [0.])
@@ -115,9 +124,9 @@ class beamSpotImporter(basf2.Module):
         # Computed as the squared RMS of the vertex position histograms, divided by the number of entries
         # Off-diagonal terms are set to zero, for the moment
         vertexCov = ROOT.TMatrixDSym(3)
-        xRMS = hVertexX.GetRMS()
-        yRMS = hVertexY.GetRMS()
-        zRMS = hVertexZ.GetRMS()
+        xRMS = max(hVertexX.GetRMS(), hVertexX.GetBinWidth(1) / 2)
+        yRMS = max(hVertexY.GetRMS(), hVertexY.GetBinWidth(1) / 2)
+        zRMS = max(hVertexZ.GetRMS(), hVertexZ.GetBinWidth(1) / 2)
         xyRMS = hVertexXY.GetRMS()
         yzRMS = hVertexYZ.GetRMS()
         xzRMS = hVertexXZ.GetRMS()
@@ -164,7 +173,14 @@ class beamSpotImporter(basf2.Module):
             BLUE = "\033[0;34m"
             sys.stdout.write(bBLUE)
             print()
-            print('~~ BeamSpot for Experiment = ' + str(experiment) + ', Run = ' + str(run) + ' ~~')
+            print(
+                '~~ BeamSpot for Experiment = ' +
+                str(experiment) +
+                ', Run = ' +
+                str(run) +
+                ' , number of vertices = ' +
+                str(entries) +
+                ' ~~')
             print()
             sys.stdout.write(bBLUE)
             print('-> the vertex position (cm):')
@@ -183,37 +199,28 @@ class beamSpotImporter(basf2.Module):
             sys.stdout.write(BLUE)
             vertexCov.Print()
             print(
-                ' Error X = {} um VS bin width = {} um'.format(
+                ' Error X = {} um '.format(
                     round(
                         TMath.Sqrt(
                             vertexCov[0][0]) *
                         10000,
                         2),
-                    round(
-                        hVertexX.GetBinWidth(1) *
-                        10000),
                     1))
             print(
-                ' Error Y = {} um VS bin width = {} um'.format(
+                ' Error Y = {} um '.format(
                     round(
                         TMath.Sqrt(
                             vertexCov[1][1]) *
                         10000,
                         2),
-                    round(
-                        hVertexX.GetBinWidth(1) *
-                        10000),
                     1))
             print(
-                ' Error Z = {} um VS bin width = {} um'.format(
+                ' Error Z = {} um '.format(
                     round(
                         TMath.Sqrt(
                             vertexCov[2][2]) *
                         10000,
                         2),
-                    round(
-                        hVertexX.GetBinWidth(1) *
-                        10000),
                     1))
             print()
             sys.stdout.write(bBLUE)

@@ -7,7 +7,7 @@
 # from the DQM plots of the IPDQMExpressReco module
 #
 # usage:
-# > basf2 beamSpotImporter.py -- --exp [exp number] --run [run number] --dqm [DQM root file]
+# > basf2 beamSpotImporter.py -- --exp [exp number] --run [run number] --dqm [DQM root file] --verbose
 #
 # the DQM root file must contain the IPMonitoring folder
 #
@@ -42,6 +42,7 @@ if(str(sys.argv[1]) == "help"):
 args = parser.parse_args()
 
 minVertices = 10
+nSigmacut = 6
 
 experiment = args.exp[0]
 run = args.run[0]
@@ -87,15 +88,24 @@ class beamSpotImporter(basf2.Module):
 
         hVertexY = dqmFile.Get("IPMonitoring/Y4S_Vertex.Y")
         hVertexZ = dqmFile.Get("IPMonitoring/Y4S_Vertex.Z")
+        hVertexXY = dqmFile.Get("IPMonitoring/Y4S_Prod.XY")
+        hVertexYZ = dqmFile.Get("IPMonitoring/Y4S_Prod.YZ")
+        hVertexXZ = dqmFile.Get("IPMonitoring/Y4S_Prod.XZ")
 
         q = array('d', [0.5])
         medianX = array('d', [0.])
         medianY = array('d', [0.])
         medianZ = array('d', [0.])
+        medianXY = array('d', [0.])
+        medianYZ = array('d', [0.])
+        medianXZ = array('d', [0.])
 
         hVertexX.GetQuantiles(1, medianX, q)
         hVertexY.GetQuantiles(1, medianY, q)
         hVertexZ.GetQuantiles(1, medianZ, q)
+        hVertexXY.GetQuantiles(1, medianXY, q)
+        hVertexYZ.GetQuantiles(1, medianYZ, q)
+        hVertexXZ.GetQuantiles(1, medianXZ, q)
 
         # vertex position
         # Computed as the medians of the vertex position histograms
@@ -105,9 +115,16 @@ class beamSpotImporter(basf2.Module):
         # Computed as the squared RMS of the vertex position histograms, divided by the number of entries
         # Off-diagonal terms are set to zero, for the moment
         vertexCov = ROOT.TMatrixDSym(3)
-        vertexCov[0][0] = hVertexX.GetRMS() * hVertexX.GetRMS() / entries
-        vertexCov[1][1] = hVertexY.GetRMS() * hVertexY.GetRMS() / entries
-        vertexCov[2][2] = hVertexZ.GetRMS() * hVertexZ.GetRMS() / entries
+        xRMS = hVertexX.GetRMS()
+        yRMS = hVertexY.GetRMS()
+        zRMS = hVertexZ.GetRMS()
+        xyRMS = hVertexXY.GetRMS()
+        yzRMS = hVertexYZ.GetRMS()
+        xzRMS = hVertexXZ.GetRMS()
+
+        vertexCov[0][0] = xRMS * xRMS / entries
+        vertexCov[1][1] = yRMS * yRMS / entries
+        vertexCov[2][2] = zRMS * zRMS / entries
         vertexCov[0][1] = 0
         vertexCov[0][2] = 0
         vertexCov[1][2] = 0
@@ -117,15 +134,30 @@ class beamSpotImporter(basf2.Module):
 
         # beam spot size
         vertexSize = ROOT.TMatrixDSym(3)
-        hVarianceX = dqmFile.Get("IPMonitoring/Var.X")
-        hVarianceY = dqmFile.Get("IPMonitoring/Var.Y")
-        hVarianceZ = dqmFile.Get("IPMonitoring/Var.Z")
-        hVarianceXY = dqmFile.Get("IPMonitoring/Covar.XY")
-        hVarianceXZ = dqmFile.Get("IPMonitoring/Covar.XZ")
-        hVarianceYZ = dqmFile.Get("IPMonitoring/Covar.YZ")
-        vertexSize[0][0] = 0.1
-        vertexSize[1][1] = 0.2
-        vertexSize[2][2] = 0.3
+
+        hVertexX.SetAxisRange(medianX[0] - nSigmacut * xRMS, medianX[0] + nSigmacut * xRMS, "X")
+        hVertexY.SetAxisRange(medianY[0] - nSigmacut * yRMS, medianY[0] + nSigmacut * yRMS, "X")
+        hVertexZ.SetAxisRange(medianZ[0] - nSigmacut * zRMS, medianZ[0] + nSigmacut * zRMS, "X")
+        hVertexXY.SetAxisRange(medianXY[0] - nSigmacut * xyRMS, medianXY[0] + nSigmacut * xyRMS, "X")
+        hVertexYZ.SetAxisRange(medianYZ[0] - nSigmacut * yzRMS, medianYZ[0] + nSigmacut * yzRMS, "X")
+        hVertexXZ.SetAxisRange(medianXZ[0] - nSigmacut * xzRMS, medianYZ[0] + nSigmacut * xzRMS, "X")
+
+        xRMScut = hVertexX.GetRMS()
+        yRMScut = hVertexY.GetRMS()
+        zRMScut = hVertexZ.GetRMS()
+        xyRMScut = hVertexXY.GetRMS()
+        yzRMScut = hVertexYZ.GetRMS()
+        xzRMScut = hVertexXZ.GetRMS()
+
+        vertexSize[0][0] = xRMScut * xRMScut
+        vertexSize[1][1] = yRMScut * yRMScut
+        vertexSize[2][2] = zRMScut * zRMScut
+        vertexSize[0][1] = xyRMScut * xyRMScut
+        vertexSize[0][2] = xzRMScut * xzRMScut
+        vertexSize[1][2] = yzRMScut * yzRMScut
+        vertexSize[1][0] = xyRMScut * xyRMScut
+        vertexSize[2][0] = xzRMScut * xzRMScut
+        vertexSize[2][1] = yzRMScut * yzRMScut
 
         if args.verbose:
             bBLUE = "\033[1;34m"

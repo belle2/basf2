@@ -59,17 +59,17 @@ void TRGECLDQMModule::defineHisto()
   }
   dirDQM->cd();
 
-  h_TCId           = new TH1D("h_TCId",          "Hit TC ID",                   578, 0, 577);
-  h_TCthetaId      = new TH1D("h_TCthetaId",     "Hit TC #theta ID",             19, 0, 18);
-  h_TCphiId_FWD    = new TH1D("h_TCphiId_FWD",   "Hit TC #phi ID in FWD",        34, 0, 33);
-  h_TCphiId_BR     = new TH1D("h_TCphiId_BR",    "Hit TC #phi ID in BR",         38, 0, 37);
-  h_TCphiId_BWD    = new TH1D("h_TCphiId_BWD",   "Hit TC #phi ID in BWF",        34, 0, 33);
+  h_TCId           = new TH1D("h_TCId",          "Hit TC ID",                   578, 0, 578);
+  h_TCthetaId      = new TH1D("h_TCthetaId",     "Hit TC #theta ID",             19, 0, 19);
+  h_TCphiId_FWD    = new TH1D("h_TCphiId_FWD",   "Hit TC #phi ID in FWD",        34, 0, 34);
+  h_TCphiId_BR     = new TH1D("h_TCphiId_BR",    "Hit TC #phi ID in BR",         38, 0, 38);
+  h_TCphiId_BWD    = new TH1D("h_TCphiId_BWD",   "Hit TC #phi ID in BWD",        34, 0, 34);
   h_TotalEnergy    = new TH1D("h_TotalEnergy",   "Total TC Energy (ADC)",       100, 0, 3000);
   h_TCEnergy       = new TH1D("h_TCEnergy",      "TC Energy (ADC)",     100, 0, 1500);
   h_Narrow_TotalEnergy    = new TH1D("h_Narrow_TotalEnergy",   "Total TC Energy (ADC)",       100, 0, 500);
   h_Narrow_TCEnergy       = new TH1D("h_Narrow_TCEnergy",      "TC Energy (ADC)",     100, 0, 100);
-  h_n_TChit_event  = new TH1D("h_n_TChit_event", "N(TC) ",                41, 0, 40);
-  h_Cluster        = new TH1D("h_Cluster",       "N(Cluster) ",           21, 0, 20);
+  h_n_TChit_event  = new TH1D("h_n_TChit_event", "N(TC) ",                40, 0, 40);
+  h_Cluster        = new TH1D("h_Cluster",       "N(Cluster) ",           20, 0, 20);
   h_TCTiming       = new TH1D("h_TCTiming",      "TC Timing  (ns)",      100, 3010, 3210);
   h_TRGTiming      = new TH1D("h_TRGTiming",     "TRG Timing  (ns)",     100, 3010, 3210);
   h_Cal_TCTiming       = new TH1D("h_Cal_TCTiming",      "Cal TC Timing  (ns)",      100, -400, 400);

@@ -130,7 +130,7 @@ void DQMHistAnalysisPXDCMModule::event()
         v = hh1->GetBinContent(bin);
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         current += v;
-        dhp_fifo_overflow |= (bin == 64 && v); // DHP Fifo overflow ... might be critical/unrecoverable
+        dhp_fifo_overflow |= (bin == 64 && v > 0.0); // DHP Fifo overflow ... might be critical/unrecoverable
       }
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10

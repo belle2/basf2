@@ -145,18 +145,51 @@ namespace {
     EXPECT_EQ(dd4.isIgnoreIntermediate(), false);
     EXPECT_EQ(dd4.isInclusive(), true);
 
-    // @ means inclusive (virtual) particle, for example @Xsd -> K+ pi-
-    DecayDescriptor dd5;
-    initok = dd5.init("@Xsd:candidates -> K+:loose pi-:loose");
+  }
+
+  TEST(DecayDescriptorTest, VirtualParticleGrammar)
+  {
+    // @ means virtual (inclusive) particle, for example @Xsd -> K+ pi-
+    DecayDescriptor dd1;
+    bool initok = dd1.init("@Xsd:candidates -> K+:loose pi-:loose");
     EXPECT_EQ(initok, true);
 
-    EXPECT_EQ(dd5.isIgnorePhotons(), false);
-    EXPECT_EQ(dd5.isIgnoreIntermediate(), false);
-    EXPECT_EQ(dd5.isInclusive(), false);
+    ASSERT_NE(dd1.getMother(), nullptr);
+    EXPECT_EQ(dd1.getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd1.getMother()->isVirtual(), true);
+    EXPECT_EQ(dd1.getMother()->isSelected(), false);
 
-    ASSERT_NE(dd5.getMother(), nullptr);
-    EXPECT_EQ(dd5.getMother()->isVirtual(), true);
-    EXPECT_EQ(dd5.getMother()->isSelected(), false);
+    // Both selectors, @ and ^, cannot be used in same time
+    DecayDescriptor dd2;
+    initok = dd2.init("^@Xsd:candidates -> K+:loose pi-:loose");
+    EXPECT_EQ(initok, false);
+
+    DecayDescriptor dd3;
+    initok = dd3.init("@^Xsd:candidates -> K+:loose pi-:loose");
+    EXPECT_EQ(initok, false);
+
+
+    // @ can be attached to a daughter
+    DecayDescriptor dd4;
+    initok = dd4.init("B0:Xsdee -> @Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, true);
+
+    ASSERT_NE(dd4.getMother(), nullptr);
+    EXPECT_EQ(dd4.getMother()->isVirtual(), false);
+    EXPECT_EQ(dd4.getMother()->isSelected(), false);
+
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->isVirtual(), true);
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->isSelected(), false);
+
+    // Both selectors, @ and ^, cannot be used in same time
+    DecayDescriptor dd5;
+    initok = dd5.init("B0:Xsdee -> ^@Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, false);
+
+    DecayDescriptor dd6;
+    initok = dd6.init("B0:Xsdee -> @^Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, false);
 
   }
 

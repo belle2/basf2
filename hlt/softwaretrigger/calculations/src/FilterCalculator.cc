@@ -18,26 +18,43 @@
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
+/// Temporary data structure holding the track(s) with the maximum pT
 struct MaximumPtTrack {
+  /// the pT of the track
   double pT = NAN;
+  /// the track
   const Track* track = nullptr;
+  /// the sum of related cluster energies in CMS system
   double clusterEnergySumCMS = 0;
+  /// the sum of related cluster energies in lab system
   double clusterEnergySumLab = 0;
+  /// the momentum magnitude in CMS system
   double pCMS = NAN;
+  /// the momentum magnitude in lab system
   double pLab = NAN;
+  /// the 4 momentum in CMS system
   TLorentzVector p4CMS;
+  /// the 4 momentum in lab system
   TLorentzVector p4Lab;
 };
 
+/// Temporary data structure holding the ECL clusters used for this analysis
 struct SelectedECLCluster {
+  /// The ECL cluster
   const ECLCluster* cluster = nullptr;
+  /// the energy in CMS system
   double energyCMS = NAN;
+  /// the 4 momentum in CMS system
   TLorentzVector p4CMS;
+  /// the 4 momentum in lab system
   TLorentzVector p4Lab;
+  /// is this ECL cluster likely from a track (or a photon) = is it charged?
   bool isTrack = false;
+  /// the time of the cluster
   double clusterTime = NAN;
 };
 
+/// the boundaries for the eeFlatXX cuts
 const double flatBoundaries[10] = {0., 19., 22., 25., 30., 35., 45., 60., 90., 180.};
 
 void FilterCalculator::requireStoreArrays()

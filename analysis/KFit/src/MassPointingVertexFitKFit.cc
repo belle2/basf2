@@ -430,7 +430,12 @@ MassPointingVertexFitKFit::makeCoreMatrix(void) {
   - Sum_al_1[1][0] * Sum_al_1[1][0] - Sum_al_1[2][0] * Sum_al_1[2][0]
   - m_InvariantMass * m_InvariantMass;
 
-  m_d[2 * m_TrackCount + 1][0] = atan2(m_v_a[1][0] - m_ProductionVertex.y(), m_v_a[0][0] - m_ProductionVertex.x()) - atan2(Sum_al_1[1][0], Sum_al_1[0][0]);
+  double phiPointingConstraint = atan2(m_v_a[1][0] - m_ProductionVertex.y(), m_v_a[0][0] - m_ProductionVertex.x()) - atan2(Sum_al_1[1][0], Sum_al_1[0][0]);
+  phiPointingConstraint = std::fmod(phiPointingConstraint + TMath::Pi(), TMath::TwoPi());
+  if (phiPointingConstraint < 0) phiPointingConstraint += TMath::TwoPi();
+  phiPointingConstraint -= TMath::Pi();
+
+  m_d[2 * m_TrackCount + 1][0] = phiPointingConstraint;
   m_d[2 * m_TrackCount + 2][0] = acos((m_v_a[2][0] - m_ProductionVertex.z()) / vtx) - acos(Sum_al_1[2][0] / mom);
 
   double Sum_a = 0., Sum_tmpx = 0., Sum_tmpy = 0.;

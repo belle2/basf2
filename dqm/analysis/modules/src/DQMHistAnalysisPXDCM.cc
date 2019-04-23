@@ -135,7 +135,7 @@ void DQMHistAnalysisPXDCMModule::event()
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
       outside += hh1->Integral(16, 64);
-      outside += hh1->Integral(0, 5);
+      outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside;
       all += current;
       if (current > 1) {
@@ -149,17 +149,17 @@ void DQMHistAnalysisPXDCMModule::event()
 
   // not enough Entries
   if (all < 100.) {
-    m_cCommonMode->Pad()->SetFillColor(6);// Magenta or Gray
+    m_cCommonMode->Pad()->SetFillColor(kGray);// Magenta or Gray
   } else {
     /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
     if (all_outside / all > 1e-6 || dhp_fifo_overflow || error_flag) {
-      m_cCommonMode->Pad()->SetFillColor(2);// Red
+      m_cCommonMode->Pad()->SetFillColor(kRed);// Red
     } else if (all_outside / all > 1e-8 || warn_flag) {
-      m_cCommonMode->Pad()->SetFillColor(5);// Yellow
+      m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
     } else if (all_outside == 0.) {
-      m_cCommonMode->Pad()->SetFillColor(3);// Green
+      m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
     } else { // between 0 and 50 ...
-      m_cCommonMode->Pad()->SetFillColor(0);// White
+      m_cCommonMode->Pad()->SetFillColor(kWhite);// White
     }
   }
 

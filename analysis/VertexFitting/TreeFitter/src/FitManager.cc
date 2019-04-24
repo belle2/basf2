@@ -258,20 +258,22 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
-    if (posindex >= 0) {
-      const TVector3 pos(m_fitparams->getStateVector()(posindex),
-                         m_fitparams->getStateVector()(posindex + 1),
-                         m_fitparams->getStateVector()(posindex + 2));
-      cand.setVertex(pos);
-      if (&pb == m_decaychain->cand()) { // if head
-        const double fitparchi2 = m_fitparams->chiSquare();
-        cand.setPValue(TMath::Prob(fitparchi2, m_ndf));//if m_ndf<1, this is 0.
-        setExtraInfo(&cand, "chiSquared", fitparchi2);
-        setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
-        setExtraInfo(&cand, "ndf", m_ndf);
-      }
-    }
+
     if (m_updateDaugthers || isTreeHead) {
+      if (posindex >= 0) {
+        const TVector3 pos(m_fitparams->getStateVector()(posindex),
+                           m_fitparams->getStateVector()(posindex + 1),
+                           m_fitparams->getStateVector()(posindex + 2));
+        cand.setVertex(pos);
+        if (&pb == m_decaychain->cand()) { // if head
+          const double fitparchi2 = m_fitparams->chiSquare();
+          cand.setPValue(TMath::Prob(fitparchi2, m_ndf));//if m_ndf<1, this is 0.
+          setExtraInfo(&cand, "chiSquared", fitparchi2);
+          setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
+          setExtraInfo(&cand, "ndf", m_ndf);
+        }
+      }
+
       const int momindex = pb.momIndex();
       TLorentzVector p;
       p.SetPx(m_fitparams->getStateVector()(momindex));

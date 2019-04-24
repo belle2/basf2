@@ -34,11 +34,15 @@ CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
 DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
 {
   const auto* bgDigit = static_cast<const CDCHit*>(bg);
-  const unsigned short adcSg = m_adcCount;
-  const unsigned short adcBg = bgDigit->getADCCount();
-  //  B2INFO(" ");
-  //  B2INFO("adcSg,adcBg= " << adcSg <<" "<< bgDigit->getADCCount());
-  int diff  = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());
+  const unsigned short tdc4Sg = m_tdcCount;
+  const unsigned short adc4Sg = m_adcCount;
+  const unsigned short tot4Sg = m_tot;
+  const unsigned short tdc4Bg = bgDigit->getTDCCount();
+  const unsigned short adc4Bg = bgDigit->getADCCount();
+  const unsigned short tot4Bg = bgDigit->getTOT();
+  B2DEBUG(28, "Sg tdc,adc,tot= " << tdc4Sg << " " << adc4Sg << " " << tot4Sg);
+  B2DEBUG(28, "Bg tdc,adc,tot= " << tdc4Bg << " " << adc4Bg << " " << tot4Bg);
+  int diff = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());
 
   // If the BG hit is faster than the true hit, the TDC count is replaced, and
   // relation is removed.
@@ -54,9 +58,42 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
       relMCParticles.remove(i);
     }
   }
-  m_adcCount = adcSg + adcBg;
-  //  B2INFO("diff, m_adcCount= " << diff <<" "<< m_adcCount);
+
+  m_adcCount = adc4Sg + adc4Bg;
+
+  //Set TOT for signal+background case. It is assumed that the start timing
+  //of a pulse (input to ADC) is given by the TDC-count. This is an
+  //approximation becasue analog (for ADC) and digital (for TDC) parts are
+  //different in the front-end electronics.
+  unsigned short s1 = tdc4Sg; //start time of 1st pulse
+  unsigned short s2 = tdc4Bg; //start time of 2nd pulse
+  unsigned short w1 = 32 * tot4Sg; //its width
+  unsigned short w2 = 32 * tot4Bg; //its width
+  if (tdc4Sg < tdc4Bg) {
+    s1 = tdc4Bg;
+    w1 = 32 * tot4Bg;
+    s2 = tdc4Sg;
+    w2 = 32 * tot4Sg;
+  }
+  const unsigned short e1 = s1 - w1; //end time of 1st pulse
+  const unsigned short e2 = s2 - w2; //end time of 2nd pulse
+  B2DEBUG(28, "s1,e1,w1,s2,e2,w2= " << s1 << " " << e1 << " " << w1 << " " << s2 << " " << e2 << " " << w2);
+
+  int overLayType = 0;
+  double pulseW = w1 + w2;
+  if (e1 <= e2) {
+    overLayType = 1;
+    pulseW = w1;
+  } else if (e1 <= s2) {
+    overLayType = 2;
+    pulseW = s1 - e2;
+  }
+
+  m_tot = std::min(std::round(pulseW / 32.), 29.);
+  //  if (overLayType) {
+  B2DEBUG(28, "overLaytype= " << overLayType);
+  B2DEBUG(28, "adcCount,tot= " << m_adcCount << " " << m_tot);
+  //  }
 
   return DigitBase::c_DontAppend;
-
 }

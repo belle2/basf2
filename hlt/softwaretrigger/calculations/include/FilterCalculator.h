@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 #include <framework/gearbox/Unit.h>
 
@@ -44,6 +45,8 @@ namespace Belle2::SoftwareTrigger {
     StoreArray<Track> m_tracks;
     /// Store Array of the ecl clusters to be used
     StoreArray<ECLCluster> m_eclClusters;
+    /// Store Object with the trigger result
+    StoreObjPtr<TRGSummary> m_l1Trigger;
 
     /// which Z0 defines a loose track
     double m_looseTrkZ0 = 10 * Unit::cm;

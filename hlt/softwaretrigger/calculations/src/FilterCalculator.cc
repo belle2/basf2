@@ -119,6 +119,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["eeFlat6"] = 0;
   calculationResult["eeFlat7"] = 0;
   calculationResult["eeFlat8"] = 0;
+  // Passed on L1 information
+  calculationResult["l1_trigger_random"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND;
+  calculationResult["l1_trigger_delayed_bhabha"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
 
   calculationResult["true"] = 1;
   calculationResult["false"] = 0;

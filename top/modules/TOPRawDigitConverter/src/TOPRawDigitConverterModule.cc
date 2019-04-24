@@ -105,8 +105,10 @@ namespace Belle2 {
 
     // registration of objects in datastore
     m_rawDigits.isRequired(m_inputRawDigitsName);
+    m_eventDebugs.isOptional();
     m_digits.registerInDataStore(m_outputDigitsName);
     m_digits.registerRelationTo(m_rawDigits);
+    m_asicMask.registerInDataStore();
 
     // equidistant sample times in case calibration is not required
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -195,6 +197,32 @@ namespace Belle2 {
       }
     }
 
+    // set asic masks (asics and whole boardstacks masked in firmware for this event)
+
+    m_asicMask.create();
+    if (m_eventDebugs.getEntries() > 0) {
+      std::vector<unsigned short> masks(64, 0xFFFF);
+      for (const auto& eventDebug : m_eventDebugs) {
+        auto scrodID = eventDebug.getScrodID();
+        const auto* feemap = feMapper.getMap(scrodID);
+        if (!feemap) {
+          B2WARNING("TOPRawDigitConverter: No front-end map available."
+                    << LogVar("scrodID", scrodID));
+          continue;
+        }
+        auto moduleID = feemap->getModuleID();
+        auto boardstack = feemap->getBoardstackNumber();
+        unsigned bs = (moduleID - 1) * 4 + boardstack;
+        if (bs < 64) {
+          masks[bs] = eventDebug.getAsicMask();
+        } else {
+          B2ERROR("TOPRawDigitConverter: Invalid global boardstack number."
+                  << LogVar("bs", bs));
+        }
+      }
+      m_asicMask->set(masks);
+    }
+
     // convert to TOPDigits
 
     for (const auto& rawDigit : m_rawDigits) {
@@ -206,8 +234,8 @@ namespace Belle2 {
       auto scrodID = rawDigit.getScrodID();
       const auto* feemap = feMapper.getMap(scrodID);
       if (!feemap) {
-        B2ERROR("TOPRawDigitConverter: No front-end map available."
-                << LogVar("scrodID", scrodID));
+        B2WARNING("TOPRawDigitConverter: No front-end map available."
+                  << LogVar("scrodID", scrodID));
         continue;
       }
       auto moduleID = feemap->getModuleID();

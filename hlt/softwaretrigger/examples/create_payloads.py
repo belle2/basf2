@@ -263,6 +263,16 @@ FILTER_CUTS = [
          cut_identifier="ECLMuonPair",
          prescale_factor=10,
          reject_cut=False),
+    dict(cut_string="l1_trigger_random",
+         base_identifier="filter",
+         cut_identifier="passthrough_l1_trigger_random",
+         prescale_factor=1,
+         reject_cut=False),
+    dict(cut_string="l1_trigger_delayed_bhabha",
+         base_identifier="filter",
+         cut_identifier="passthrough_l1_trigger_delayed_bhabha",
+         prescale_factor=1,
+         reject_cut=False),
 ]
 
 # Definition of all skim cuts (copy from HLT before)

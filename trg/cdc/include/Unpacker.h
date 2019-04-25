@@ -400,8 +400,8 @@ namespace Belle2 {
       //  }
       //}
       if (!hit) {
-        hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime);
-        B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime);
+        hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime, iTracker);
+        B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime << " iTracker " << iTracker);
       }
       return hit;
     }
@@ -444,7 +444,7 @@ namespace Belle2 {
             B2DEBUG(15, "2DOut phi0:" << trk.phi0 << ", omega:" << trk.omega
                     << ", at clock " << foundTime << ", tracker " << iTracker);
             CDCTriggerTrack* track =
-              storeTracks->appendNew(trk.phi0, trk.omega, 0., foundTime);
+              storeTracks->appendNew(trk.phi0, trk.omega, 0., foundTime, iTracker);
             CDCTriggerFinderClone* clone =
               storeClones->appendNew(slv[clockCounterWidth + i] == one_val, iTracker);
             clone->addRelationTo(track);
@@ -465,7 +465,8 @@ namespace Belle2 {
                                     ts[2], // L/R
                                     ts[1], // priority time
                                     0, // fastest time (unknown)
-                                    foundTime); // found time (using the unpacked clock cycle)
+                                    foundTime, // found time (using the unpacked clock cycle)
+                                    iTracker); // quadrant
                 track->addRelationTo(hit);
               }
             }
@@ -516,7 +517,8 @@ namespace Belle2 {
                                      ts[2], // L/R
                                      ts[1], // priority time
                                      0, // fastest time (unknown)
-                                     foundTime + timeOffset[iTracker]); // found time
+                                     foundTime + timeOffset[iTracker], // found time
+                                     iTracker);  // quadrant
 
             // add if the TS hit of identical ID and foundTime is not already in the StoreArray
             // (from the 2D input of another quarter or the 2D track output)
@@ -603,7 +605,7 @@ namespace Belle2 {
         //}
         if (!track2D) {
           B2DEBUG(15, "make new 2D track with phi " << trk2D->phi0 << " omega " << trk2D->omega << " clock " << iclock);
-          track2D = store2DTracks->appendNew(trk2D->phi0, trk2D->omega, 0., iclock);
+          track2D = store2DTracks->appendNew(trk2D->phi0, trk2D->omega, 0., iclock, iTracker);
         }
         // add axial hits if not present already and create relations
         for (unsigned iAx = 0; iAx < nAxialTSF; ++iAx) {
@@ -660,7 +662,7 @@ namespace Belle2 {
       B2DEBUG(15, "make new NN track with , z:" << trkNN.z << ", theta:" << trkNN.theta <<
               ", sector:" << trkNN.sector << ", clock " << foundTime);
       CDCTriggerTrack* trackNN = storeNNTracks->appendNew(trk2D->phi0, trk2D->omega, 0.,
-                                                          trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., foundTime);
+                                                          trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., foundTime, iTracker);
       std::vector<float> inputVector(27, 0.);
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         inputVector[3 * iSL] = trkNN.inputID[iSL];

@@ -102,7 +102,7 @@ namespace Belle2 {
           //calculating the backgorund rate
           double dspBkgRate = (pow(dspEnergy, 2)) / (2.53 * 1e-12);
 
-          //average rate over the whole ECL per given event, which is later normalized per 1Hz
+          //hit rate for segment in ECL, which is later normalized per 1Hz
           rates.averageDspBkgRate[segment_number] += dspBkgRate;
 
         }

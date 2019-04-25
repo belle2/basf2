@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Andrea Fodor                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,12 +14,20 @@
 #include <framework/datastore/StoreArray.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 #include <framework/database/DBObjPtr.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/geometry/B2Vector3.h>
 #include <TTree.h>
 #include <map>
-
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <functional>
+#include <algorithm>
 
 namespace Belle2 {
   namespace Background {
@@ -39,17 +47,25 @@ namespace Belle2 {
         float averageRate = 0; /**< total detector average hit rate */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
-        float averageDspBkgRate = 0; /**<background rate calculated from ECL waveforms */
+        float averageDspBkgRate[16]; /**<background rate calculated from ECL waveforms */
+        int numEventsSegments[16]; /**< number of events per segment */
+        bool validDspRate = false; /**< status for rates calculated from waveforms, true if waveforms for all crystals are recorded */
 
         /**
          * normalize accumulated hits to single event
          */
-        void normalize()
+        void normalizeDigits()
         {
           if (numEvents == 0) return;
           averageRate /= numEvents;
-          averageDspBkgRate /= numEvents;
         }
+        void normalizeDsps()
+        {
+          if (numEventsSegments == 0) return;
+          std::transform(averageDspBkgRate, averageDspBkgRate + 16, numEventsSegments, averageDspBkgRate, std::divides<float>());
+
+        }
+
 
       };
 
@@ -96,17 +112,76 @@ namespace Belle2 {
       StoreArray<ECLDigit> m_digits;  /**< collection of digits */
       StoreArray<ECLDsp> m_dsps;
 
-      // DB payloads
-      // Enegy and electronics calibration for ECL
-      //DBObjPtr<ECLCrystalCalib> m_ElectronicsCalib("ECLCrystalElectronics"), m_ECLECalib("ECLCrystalEnergy");
-
       std::vector<float> electronicsCalib;
       std::vector<float> energyCalib;
 
       // other
+      std::ifstream ifss;
+      std::string segments;
+      Belle2::ECL::ECLGeometryPar* geom;
 
+      int findSegment(int cellid)
+      {
+        return segment_map.find(cellid)->second;
+      }
+
+      std::map<int, int> segment_map;
+
+      void segmentECL()
+      {
+        geom = Belle2::ECL::ECLGeometryPar::Instance();
+        for (int cid = 1; cid < 8737; cid++) {
+          geom->Mapping(cid);
+          const B2Vector3D position = geom->GetCrystalPos(cid - 1);
+          const double phi = position.Phi();
+          const double z = position.Z();
+
+          if (cid < 1297) {
+            if (phi > 0.7853 && phi < 2.356) {
+              segment_map.insert(std::pair<int, int>(cid, 0));
+            } else if (phi >= 2.356 || phi <= -2.356) {
+              segment_map.insert(std::pair<int, int>(cid, 1));
+            } else if (phi > -2.356 && phi < -0.7853) {
+              segment_map.insert(std::pair<int, int>(cid, 2));
+            } else {
+              segment_map.insert(std::pair<int, int>(cid, 3));
+            }
+          } else if (cid > 1296 && cid < 7777) {
+            if (z > 0) {
+              if (phi > 0.7853 && phi < 2.356) {
+                segment_map.insert(std::pair<int, int>(cid, 4));
+              } else if (phi >= 2.356 && phi <= -2.356) {
+                segment_map.insert(std::pair<int, int>(cid, 5));
+              } else if (phi > -2.356 && phi < -0.7853) {
+                segment_map.insert(std::pair<int, int>(cid, 6));
+              } else {
+                segment_map.insert(std::pair<int, int>(cid, 7));
+              }
+            } else {
+              if (phi > 0.7853 && phi < 2.356) {
+                segment_map.insert(std::pair<int, int>(cid, 8));
+              } else if (phi >= 2.356 && phi <= -2.356) {
+                segment_map.insert(std::pair<int, int>(cid, 9));
+              } else if (phi > -2.356 && phi < -0.7853) {
+                segment_map.insert(std::pair<int, int>(cid, 10));
+              } else {
+                segment_map.insert(std::pair<int, int>(cid, 11));
+              }
+            }
+          } else {
+            if (phi > 0.7853 && phi < 2.356) {
+              segment_map.insert(std::pair<int, int>(cid, 12));
+            } else if (phi >= 2.356 && phi <= -2.356) {
+              segment_map.insert(std::pair<int, int>(cid, 13));
+            } else if (phi > -2.356 && phi < -0.7853) {
+              segment_map.insert(std::pair<int, int>(cid, 14));
+            } else {
+              segment_map.insert(std::pair<int, int>(cid, 15));
+            }
+          }
+        }
+      }
     };
-
-  } // Background namespace
-} // Belle2 namespace
+  }
+}
 

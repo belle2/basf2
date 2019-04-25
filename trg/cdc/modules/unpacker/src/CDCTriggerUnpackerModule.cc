@@ -215,6 +215,12 @@ namespace Belle2 {
       while (counters.at(1).to_ulong() - counters.at(0).to_ulong() != 4) {
         std::rotate(counters.begin(), counters.begin() + 1, counters.end());
         ccShift++;
+        B2DEBUG(20, "rotating clock counters: counters at 1 - 0 = "
+                << counters.at(1).to_ulong() - counters.at(0).to_ulong()
+                << ", at(1) " << counters.at(1).to_ulong()
+                << ", at(0) " << counters.at(0).to_ulong()
+                << ", ccShift " << ccShift);
+
       }
       if (! std::is_sorted(counters.begin(), counters.end(),
       [](halfDataWord i, halfDataWord j) {

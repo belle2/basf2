@@ -130,6 +130,28 @@ namespace Belle2 {
         return 0;
       }
 
+      // need one more check, give a warning if the event has wrong data size
+
+      // event data block header:
+      // 0xdddd  --> correct event data (for 2D only?)
+      // 0xbbbb  --> dummy buffer supposed to be used for only suppressed events.
+      if (nWords[iFinesse] > headerSize) {
+        //dataHeader = CDCTriggerUnpacker::rawIntToAscii(data32tab.at(iFinesse)[headerSize]&0xFFFF0000 >> 16);
+        //bool dataHeader = ( (data32tab.at(iFinesse)[headerSize]&0xffff0000) == 0xdddd0000);
+        long dataHeader = (data32tab.at(iFinesse)[headerSize] & 0xffff0000);
+        if (dataHeader != 0xdddd0000) {
+          B2DEBUG(20, "The module " << name << " has an event data header " << std::hex << std::setfill('0') << std::setw(4) <<
+                  (dataHeader >> 16) <<
+                  " in this event. It will be ignore.");
+          return 0;
+        }
+        B2DEBUG(50, "subdet and head size " <<  std::setfill('0') << std::hex << std::setw(8) << iNode << ", " << std::dec <<  std::setw(
+                  0) << nWords[iFinesse] <<
+                " : " << std::hex << std::setw(8) << data32tab.at(iFinesse)[0] << " " << data32tab.at(iFinesse)[1] << " " << data32tab.at(
+                  iFinesse)[2] <<
+                " " << data32tab.at(iFinesse)[3] << " dataheader = " << dataHeader);
+      }
+
       /* get event header information
        * Ideally, these parameters should not change in the same run,
        * so it is more efficiency to do it in beginRun().

@@ -312,7 +312,7 @@ void KLMUnpackerModule::event()
            * In the last word there is the user word
            * (from data concentrators).
            */
-          int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+          unsigned int userWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
           klmDigitEventInfo->setUserWord(userWord);
         } else {
           klmDigitEventInfo->setUserWord(0);

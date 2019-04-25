@@ -1,4 +1,8 @@
 {
+    "__Preamble__" :
+    {
+        "Comment" : "By convention, a value of -1 for an upper limit stands for unbounded."
+    },
     "FirstSuperLayer" :
     {
         "ADC" :

@@ -24,6 +24,8 @@ AddOption('--extra-ccflags', dest='extraccflags', action='store', help='Addition
 AddOption('--ignore-externals-version', dest='check_externals', action='store_false', default=True,
           help="if given the externals version will not checked for consistency between .externals and the environment")
 AddOption('--light', dest='light', action='store_true', default=False, help='Build a light release')
+AddOption('--create-json', dest="create_json", action="store_true", default=False,
+          help="Create a compile_commands.json suitable for clang tools and many code completion libraries")
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
@@ -97,7 +99,7 @@ global_env = Environment(
     # disable warnings when compiling dictionaries, too much root problems
     # involved
     ROOTCLING_EXTRA_CCFLAGS=["-w"],
-    CPPDEFINES={'_PACKAGE_': '\\"$PACKAGE\\"'},
+    CPPDEFINES={'_PACKAGE_': '\'"$PACKAGE"\''},
     CPPPATH=['include'],
     LIBPATH=['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
     DATAOBJECT_LIBS=[],
@@ -122,6 +124,13 @@ global_env = Environment(
         "-Wl,--copy-dt-needed-entries"
     ],
 )
+
+# add this early because we want to be sure it's enabled before we create any
+# targets as it needs to modify the object/shared object builders
+if GetOption("create_json"):
+    tool = Tool('compilation_db', COMPILATIONDB_COMSTR="*** compilation database: $TARGET")
+    tool(global_env)
+    global_env.CompilationDatabase("#compile_commands.json")
 
 # recalculate MD5 sums only if the file changed in the last 10 minutes
 SetOption("max_drift", 600)

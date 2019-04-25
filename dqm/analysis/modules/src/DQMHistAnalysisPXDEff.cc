@@ -12,6 +12,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
 #include <TClass.h>
+#include <TLatex.h>
 #include <TGraphAsymmErrors.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -108,9 +109,11 @@ void DQMHistAnalysisPXDEffModule::initialize()
   if (gr) {
     auto ax = gr->GetXaxis();
     if (ax) {
+      ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
       for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
         TString ModuleName = (std::string)m_PXDModules[i];
         ax->SetBinLabel(i + 1, ModuleName);
+        B2RESULT(ModuleName);
       }
     }
   }
@@ -190,7 +193,7 @@ void DQMHistAnalysisPXDEffModule::event()
   double all = 0.0;
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    VxdID& aModule = m_PXDModules[i ];
+    VxdID& aModule = m_PXDModules[i];
     int j = i + 1;
 
     if (mapHits[aModule] == nullptr || mapMatches[aModule] == nullptr) {
@@ -212,21 +215,56 @@ void DQMHistAnalysisPXDEffModule::event()
   }
 
   m_cEffAll->cd();
-  if (all < 100.) {
-    m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
-  } else {
-    /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-    if (error_flag) {
-      m_cEffAll->Pad()->SetFillColor(kRed);// Red
-    } else if (warn_flag) {
-      m_cEffAll->Pad()->SetFillColor(kYellow);// Yellow
+  m_hEffAll->Paint("AP");
+
+  auto gr = m_hEffAll->GetPaintedGraph();
+  if (gr) {
+    gr->SetMinimum(0);
+    gr->SetMaximum(m_PXDModules.size());
+    auto ay = gr->GetYaxis();
+    if (ay) ay->SetRangeUser(0, 1.0);
+    auto ax = gr->GetXaxis();
+    if (ax) {
+      ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+        TString ModuleName = (std::string)m_PXDModules[i];
+        ax->SetBinLabel(i + 1, ModuleName);
+        B2RESULT(ModuleName);
+      }
+    }
+    for (int i = 0; i < gr->GetN(); i++) {
+      gr->SetPointEXhigh(i, 0.);
+      gr->SetPointEXlow(i, 0.);
+    }
+
+    gr->SetLineColor(4);
+    gr->SetLineWidth(2);
+    gr->SetMarkerStyle(8);
+
+    m_cEffAll->Clear();
+    gr->Draw("AP");
+    m_cEffAll->cd(0);
+
+    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken");
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+
+    if (all < 100.) {
+      m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
     } else {
-      m_cEffAll->Pad()->SetFillColor(kGreen);// Green
-//       m_cEffAll->Pad()->SetFillColor(kWhite);// White
+      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
+      if (error_flag) {
+        m_cEffAll->Pad()->SetFillColor(kRed);// Red
+      } else if (warn_flag) {
+        m_cEffAll->Pad()->SetFillColor(kYellow);// Yellow
+      } else {
+        m_cEffAll->Pad()->SetFillColor(kGreen);// Green
+        //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
+      }
     }
   }
 
-  m_hEffAll->Draw("AP");
   m_cEffAll->Modified();
   m_cEffAll->Update();
 

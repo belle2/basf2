@@ -112,7 +112,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
       maxCorrectionPullLabel = label.label();
     }
 
-    if (m_invertSign) correction = - correction;
+    if (m_invertSign) {
+      /* Sign should not be inverted for EKLM. */
+      if (!label.isEKLM())
+        correction = -correction;
+    }
 
     result.updateGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
     errors.setGlobalParam(error, label.getUniqueId(), label.getElementId(), label.getParameterId());

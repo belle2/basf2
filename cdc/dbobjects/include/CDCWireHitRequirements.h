@@ -70,7 +70,7 @@ namespace Belle2 {
 
       } catch (boost::property_tree::ptree_error& e) {
         // Any problem when parsing the tree?
-        B2ERROR("Cannot parse CDCWireHit requirement information: " << e.what());
+        B2FATAL("Cannot parse CDCWireHit requirement information: " << e.what());
       }
 
     }

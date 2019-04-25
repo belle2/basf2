@@ -907,7 +907,7 @@ void CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& jsonFi
     boost::property_tree::read_json(jsonFileName, tree);
 
   } catch (boost::property_tree::ptree_error& e) {
-    B2ERROR("Error when loading json file: " << e.what());
+    B2FATAL("Error when loading json file: " << e.what());
   }
 
   DBImportObjPtr<CDCWireHitRequirements> dbWireHitReq;

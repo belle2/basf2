@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
+#include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -169,6 +170,11 @@ void DQMHistAnalysisPXDCMModule::event()
     m_line2->Draw();
     m_line3->Draw();
   }
+
+  auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+  tt->SetTextAngle(90);// Rotated
+  tt->SetTextAlign(12);// Centered
+  tt->Draw();
 
   m_cCommonMode->Modified();
   m_cCommonMode->Update();

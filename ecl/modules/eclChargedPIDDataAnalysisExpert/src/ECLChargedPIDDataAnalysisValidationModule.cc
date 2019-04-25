@@ -208,17 +208,17 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency()
   h_eff_p->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of track momentum."));
   h_eff_p->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
   h_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_eff_p->GetListOfFunctions()->Add(new TNamed('MetaOptions', "pvalue-warn=0.5,pvalue-error=0.01"));
+  h_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
   h_eff_th->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of clusterTheta."));
   h_eff_th->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
   h_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_eff_th->GetListOfFunctions()->Add(new TNamed('MetaOptions', "pvalue-warn=0.5,pvalue-error=0.01"));
+  h_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
   h_eff_phi->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of clusterPhi."));
   h_eff_phi->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent and flat."));
   h_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_eff_phi->GetListOfFunctions()->Add(new TNamed('MetaOptions', "pvalue-warn=0.5,pvalue-error=0.01"));
+  h_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
   h_eff_p->Write();
   h_eff_th->Write();

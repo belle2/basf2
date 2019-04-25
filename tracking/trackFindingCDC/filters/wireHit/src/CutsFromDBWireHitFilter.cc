@@ -20,14 +20,9 @@ CutsFromDBWireHitFilter::CutsFromDBWireHitFilter() :
 {
 }
 
-CutsFromDBWireHitFilter::~CutsFromDBWireHitFilter()
-{
-  if (m_CDCWireHitRequirementsFromDB) delete m_CDCWireHitRequirementsFromDB;
-}
-
 void CutsFromDBWireHitFilter::initialize()
 {
-  m_CDCWireHitRequirementsFromDB = new DBObjPtr<CDCWireHitRequirements>;
+  m_CDCWireHitRequirementsFromDB = std::unique_ptr<DBObjPtr<CDCWireHitRequirements> >(new DBObjPtr<CDCWireHitRequirements>);
   checkIfDBObjPtrIsValid();
 }
 
@@ -38,12 +33,16 @@ void CutsFromDBWireHitFilter::beginRun()
 
 void CutsFromDBWireHitFilter::checkIfDBObjPtrIsValid()
 {
-  if (!((*m_CDCWireHitRequirementsFromDB).isValid())) {
-    B2WARNING("DBObjPtr<CDCWireHitRequirements> not valid for current run.  { findlet: CutsFromDBWireHitFilter }\n"
-              "Cut not applied on CDCWireHit by CutsFromDBWireHitFilter.  { findlet: CutsFromDBWireHitFilter }");
-    m_DBPtrIsValidForCurrentRun = false;
+  if (!m_CDCWireHitRequirementsFromDB) {
+    B2ERROR("std::unique_ptr<DBObjPtr<CDCWireHitRequirements> > m_CDCWireHitRequirementsFromDB not properly set.");
   } else {
-    m_DBPtrIsValidForCurrentRun = true;
+    if (!((*m_CDCWireHitRequirementsFromDB).isValid())) {
+      B2WARNING("DBObjPtr<CDCWireHitRequirements> not valid for current run.  { findlet: CutsFromDBWireHitFilter }\n"
+                "Cut not applied on CDCWireHit by CutsFromDBWireHitFilter.  { findlet: CutsFromDBWireHitFilter }");
+      m_DBPtrIsValidForCurrentRun = false;
+    } else {
+      m_DBPtrIsValidForCurrentRun = true;
+    }
   }
 }
 

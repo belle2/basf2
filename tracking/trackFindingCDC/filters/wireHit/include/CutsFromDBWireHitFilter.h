@@ -26,7 +26,7 @@ namespace Belle2 {
       CutsFromDBWireHitFilter();
 
       /// Default destructor.
-      virtual ~CutsFromDBWireHitFilter();
+      virtual ~CutsFromDBWireHitFilter() = default;
 
       /// Called at the beginning of the processing.
       void initialize() final;
@@ -49,7 +49,7 @@ namespace Belle2 {
       bool isInRange(const T& value, const std::pair<T, T>& range) const;
 
       /// Cut values from the Data Base.
-      DBObjPtr<CDCWireHitRequirements>* m_CDCWireHitRequirementsFromDB;
+      std::unique_ptr<DBObjPtr<CDCWireHitRequirements> > m_CDCWireHitRequirementsFromDB;
 
       /// Boolean asserting if DBObjPtr is valid for the current run.
       bool m_DBPtrIsValidForCurrentRun;

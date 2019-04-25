@@ -14,6 +14,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include "TDirectory.h"
+#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace std;
 using namespace Belle2;
@@ -54,6 +55,9 @@ CDCTriggerDQMModule::CDCTriggerDQMModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Name of the directory where histograms will be placed",
            string("cdctrigger"));
+  addParam("showRecoTracks", m_showRecoTracks,
+           "switch to turn on a comparison with the reconstruction",
+           string("no"));
 }
 
 
@@ -157,24 +161,33 @@ void CDCTriggerDQMModule::defineHisto()
                                       512, 0, 511);
   m_neuroSelTSPrioT_Layer8 = new TH1F("neuroSelTSPrioT_Layer8", "Priority time of track segments in layer 8",
                                       512, 0, 511);
-  m_neuroSelTSFoundT_Layer0 = new TH1F("neuroSelTSFoundT_Layer0", "Found time of track segments in layer 0",
-                                       48, 0, 48);
-  m_neuroSelTSFoundT_Layer1 = new TH1F("neuroSelTSFoundT_Layer1", "Found time of track segments in layer 1",
-                                       48, 0, 48);
-  m_neuroSelTSFoundT_Layer2 = new TH1F("neuroSelTSFoundT_Layer2", "Found time of track segments in layer 2",
-                                       48, 0, 48);
-  m_neuroSelTSFoundT_Layer3 = new TH1F("neuroSelTSFoundT_Layer3", "Found time of track segments in layer 3",
-                                       48, 0, 48);
-  m_neuroSelTSFoundT_Layer4 = new TH1F("neuroSelTSFoundT_Layer4", "Found time of track segments in layer 4",
-                                       48, 0, 48);
-  m_neuroSelTSFoundT_Layer5 = new TH1F("neuroSelTSFoundT_Layer5", "Found time of track segments in layer 5",
-                                       48, 0, 48);
-  m_neuroSelTSFoundT_Layer6 = new TH1F("neuroSelTSFoundT_Layer6", "Found time of track segments in layer 6",
-                                       48, 0, 48);
-  m_neuroSelTSFoundT_Layer7 = new TH1F("neuroSelTSFoundT_Layer7", "Found time of track segments in layer 7",
-                                       48, 0, 48);
-  m_neuroSelTSFoundT_Layer8 = new TH1F("neuroSelTSFoundT_Layer8", "Found time of track segments in layer 8",
-                                       48, 0, 48);
+  m_neuroSelTSFoundT_Layer0 = new TH1F("neuroSelTSFoundT_Layer0",
+                                       "First found time of selected TS - found time of Neuro Track in SL 0",
+                                       96, -47.99, 48.01);
+  m_neuroSelTSFoundT_Layer1 = new TH1F("neuroSelTSFoundT_Layer1",
+                                       "First found time of selected TS - found time of Neuro Track in SL 1",
+                                       96, -47.99, 48.01);
+  m_neuroSelTSFoundT_Layer2 = new TH1F("neuroSelTSFoundT_Layer2",
+                                       "First found time of selected TS - found time of Neuro Track in SL 2",
+                                       96, -47.99, 48.01);
+  m_neuroSelTSFoundT_Layer3 = new TH1F("neuroSelTSFoundT_Layer3",
+                                       "First found time of selected TS - found time of Neuro Track in SL 3",
+                                       96, -47.99, 48.01);
+  m_neuroSelTSFoundT_Layer4 = new TH1F("neuroSelTSFoundT_Layer4",
+                                       "First found time of selected TS - found time of Neuro Track in SL 4",
+                                       96, -47.99, 48.01);
+  m_neuroSelTSFoundT_Layer5 = new TH1F("neuroSelTSFoundT_Layer5",
+                                       "First found time of selected TS - found time of Neuro Track in SL 5",
+                                       96, -47.99, 48.01);
+  m_neuroSelTSFoundT_Layer6 = new TH1F("neuroSelTSFoundT_Layer6",
+                                       "First found time of selected TS - found time of Neuro Track in SL 6",
+                                       96, -47.99, 48.01);
+  m_neuroSelTSFoundT_Layer7 = new TH1F("neuroSelTSFoundT_Layer7",
+                                       "First found time of selected TS - found time of Neuro Track in SL 7",
+                                       96, -47.99, 48.01);
+  m_neuroSelTSFoundT_Layer8 = new TH1F("neuroSelTSFoundT_Layer8",
+                                       "First found time of selected TS - found time of Neuro Track in SL 8",
+                                       96, -47.99, 48.01);
   m_neuroInTSCount = new TH1F("neuroInTSCount", " number of TS per event",
                               200, 0, 200);
   m_neuroInPhi0 = new TH1F("neuroInPhi0", "Phi0 of incoming 2dtrack",
@@ -223,6 +236,71 @@ void CDCTriggerDQMModule::defineHisto()
   m_2DInTSCount = new TH1F("2DInTSCount", " number of 2D incoming TS per event",
                            200, 0, 200);
 
+  m_neuroOutQuad5Z = new TH1F("NeuroOutQuad5Z",
+                              "z distribution of neuro tracks;z [cm]",
+                              100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroOutQuad5CosTheta = new TH1F("NeuroOutQuad5CosTheta",
+                                     "cos theta distribution of neuro tracks;cos theta ",
+                                     100, -1, 1);
+  m_neuroOutQuad5Phi0 = new TH1F("NeuroOutQuad5Phi0",
+                                 "phi distribution from unpacker;phi [deg]",
+                                 161, -1.25, 361); // shift to reduce the binning error
+  m_neuroOutQuad5InvPt = new TH1F("NeuroOutQuad5InvPt",
+                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                  34, 0, 3.5);
+
+  m_neuroOutQuad0Z = new TH1F("NeuroOutQuad0Z",
+                              "z distribution of neuro tracks;z [cm]",
+                              100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroOutQuad0CosTheta = new TH1F("NeuroOutQuad0CosTheta",
+                                     "cos theta distribution of neuro tracks;cos theta ",
+                                     100, -1, 1);
+  m_neuroOutQuad0Phi0 = new TH1F("NeuroOutQuad0Phi0",
+                                 "phi distribution from unpacker;phi [deg]",
+                                 161, -1.25, 361); // shift to reduce the binning error
+  m_neuroOutQuad0InvPt = new TH1F("NeuroOutQuad0InvPt",
+                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                  34, 0, 3.5);
+
+  m_neuroOutQuad1Z = new TH1F("NeuroOutQuad1Z",
+                              "z distribution of neuro tracks;z [cm]",
+                              100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroOutQuad1CosTheta = new TH1F("NeuroOutQuad1CosTheta",
+                                     "cos theta distribution of neuro tracks;cos theta ",
+                                     100, -1, 1);
+  m_neuroOutQuad1Phi0 = new TH1F("NeuroOutQuad1Phi0",
+                                 "phi distribution from unpacker;phi [deg]",
+                                 161, -1.25, 361); // shift to reduce the binning error
+  m_neuroOutQuad1InvPt = new TH1F("NeuroOutQuad1InvPt",
+                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                  34, 0, 3.5);
+
+  m_neuroOutQuad2Z = new TH1F("NeuroOutQuad2Z",
+                              "z distribution of neuro tracks;z [cm]",
+                              100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroOutQuad2CosTheta = new TH1F("NeuroOutQuad2CosTheta",
+                                     "cos theta distribution of neuro tracks;cos theta ",
+                                     100, -1, 1);
+  m_neuroOutQuad2Phi0 = new TH1F("NeuroOutQuad2Phi0",
+                                 "phi distribution from unpacker;phi [deg]",
+                                 161, -1.25, 361); // shift to reduce the binning error
+  m_neuroOutQuad2InvPt = new TH1F("NeuroOutQuad2InvPt",
+                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                  34, 0, 3.5);
+
+  m_neuroOutQuad3Z = new TH1F("NeuroOutQuad3Z",
+                              "z distribution of neuro tracks;z [cm]",
+                              100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroOutQuad3CosTheta = new TH1F("NeuroOutQuad3CosTheta",
+                                     "cos theta distribution of neuro tracks;cos theta ",
+                                     100, -1, 1);
+  m_neuroOutQuad3Phi0 = new TH1F("NeuroOutQuad3Phi0",
+                                 "phi distribution from unpacker;phi [deg]",
+                                 161, -1.25, 361); // shift to reduce the binning error
+  m_neuroOutQuad3InvPt = new TH1F("NeuroOutQuad3InvPt",
+                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                  34, 0, 3.5);
+
   if (m_simNeuroTracksName != "") {
     m_neuroSector = new TH1F("NeuroSector",
                              "unpacked sector",
@@ -256,6 +334,76 @@ void CDCTriggerDQMModule::defineHisto()
                            20, 0, 20);
   }
 
+  if (m_showRecoTracks == "yes") {
+    //RecoTracks
+    m_RecoZ = new TH1F("RecoZ",
+                       "z distribution of reconstructed tracks;z [cm]",
+                       100, -150, 150); // 1cm bins from -50cm to 50cm
+    m_RecoCosTheta = new TH1F("RecoCosTheta",
+                              "cos theta distribution of reconstructed tracks;cos theta ",
+                              100, -1, 1);
+    m_RecoPhi = new TH1F("RecoPhi",
+                         "phi distribution of reconstructed tracks ;phi [deg]",
+                         161, -1.25, 361); // shift to reduce the binning error
+    m_RecoInvPt = new TH1F("RecoInvPt",
+                           "Inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
+                           34, 0, 3.5);
+
+    //RecoTracks matched to unpacked neuro tracks
+    m_RecoHWZ = new TH1F("RecoHWZ",
+                         "hw matched z distribution of reconstructed tracks;z [cm]",
+                         100, -150, 150); // 1cm bins from -50cm to 50cm
+    m_RecoHWCosTheta = new TH1F("RecoHWCosTheta",
+                                "hw matched cos theta distribution of reconstructed tracks;cos theta ",
+                                100, -1, 1);
+    m_RecoHWPhi = new TH1F("RecoHWPhi",
+                           "hw matched phi distribution of reconstructed tracks ;phi [deg]",
+                           161, -1.25, 361); // shift to reduce the binning error
+    m_RecoHWInvPt = new TH1F("RecoHWInvPt",
+                             "hw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
+                             34, 0, 3.5);
+
+    //RecoTracks matched to simulated neuro tracks
+    m_RecoSWZ = new TH1F("RecoSWZ",
+                         "sw matched z distribution of reconstructed tracks;z [cm]",
+                         100, -150, 150); // 1cm bins from -50cm to 50cm
+    m_RecoSWCosTheta = new TH1F("RecoSWCosTheta",
+                                "sw matched cos theta distribution of reconstructed tracks;cos theta ",
+                                100, -1, 1);
+    m_RecoSWPhi = new TH1F("RecoSWPhi",
+                           "sw matched phi distribution of reconstructed tracks ;phi [deg]",
+                           161, -1.25, 361); // shift to reduce the binning error
+    m_RecoSWInvPt = new TH1F("RecoSWInvPt",
+                             "sw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
+                             34, 0, 3.5);
+
+    m_DeltaRecoHWZ = new TH1F("DeltaRecoHWZ",
+                              "difference between reconstructed and unpacked neuro z;delta z [cm]",
+                              100, -100, 100);
+    m_DeltaRecoHWCosTheta = new TH1F("DeltaRecoHWCosTheta",
+                                     "difference between reconstructed and unpacked neuro cos(theta);delta cos(theta)",
+                                     100, -1, 1);
+    m_DeltaRecoHWInvPt = new TH1F("DeltaRecoHWInvPt",
+                                  "difference between reconstructed and unpacked neuro InvPt;delta InvPt [GeV^-1]",
+                                  100, -100, 100);
+    m_DeltaRecoHWPhi = new TH1F("DeltaRecoHWPhi",
+                                "difference between reconstructed and unpacked neuro phi;delta phi [deg]",
+                                100, -180, 180);
+
+    m_DeltaRecoSWZ = new TH1F("DeltaRecoSWZ",
+                              "difference between reconstructed and simulated neuro z;delta z [cm]",
+                              100, -100, 100);
+    m_DeltaRecoSWCosTheta = new TH1F("DeltaRecoSWCosTheta",
+                                     "difference between reconstructed and simulated neuro cos(theta);delta cos(theta)",
+                                     100, -1, 1);
+    m_DeltaRecoSWInvPt = new TH1F("DeltaRecoSWInvPt",
+                                  "difference between reconstructed and simulated neuro InvPt;delta InvPt [GeV^-1]",
+                                  100, -100, 100);
+    m_DeltaRecoSWPhi = new TH1F("DeltaRecoSWPhi",
+                                "difference between reconstructed and simulated neuro phi;delta phi [deg]",
+                                100, -180, 180);
+  }
+
   // cd back to root directory
   oldDir->cd();
 }
@@ -282,6 +430,13 @@ void CDCTriggerDQMModule::initialize()
     m_simNeuroInput.isRequired(m_simNeuroInputName);
     m_unpackedNeuroInput2DTracks.requireRelationTo(m_simNeuroTracks);
     m_simNeuroTracks.requireRelationTo(m_simNeuroInput);
+  }
+  if (m_showRecoTracks == "yes") {
+    m_RecoTracks.isRequired("RecoTracks");
+    m_RecoTracks.requireRelationTo(m_unpackedNeuroTracks);
+    if (m_simNeuroTracksName != "") {
+      m_RecoTracks.requireRelationTo(m_simNeuroTracks);
+    }
   }
 }
 
@@ -358,6 +513,31 @@ void CDCTriggerDQMModule::beginRun()
   m_2DInTSFoundT_Layer8->Reset();
   m_2DInTSCount->Reset();
 
+  m_neuroOutQuad5Z->Reset();
+  m_neuroOutQuad5CosTheta->Reset();
+  m_neuroOutQuad5Phi0->Reset();
+  m_neuroOutQuad5InvPt->Reset();
+
+  m_neuroOutQuad0Z->Reset();
+  m_neuroOutQuad0CosTheta->Reset();
+  m_neuroOutQuad0Phi0->Reset();
+  m_neuroOutQuad0InvPt->Reset();
+
+  m_neuroOutQuad1Z->Reset();
+  m_neuroOutQuad1CosTheta->Reset();
+  m_neuroOutQuad1Phi0->Reset();
+  m_neuroOutQuad1InvPt->Reset();
+
+  m_neuroOutQuad2Z->Reset();
+  m_neuroOutQuad2CosTheta->Reset();
+  m_neuroOutQuad2Phi0->Reset();
+  m_neuroOutQuad2InvPt->Reset();
+
+  m_neuroOutQuad3Z->Reset();
+  m_neuroOutQuad3CosTheta->Reset();
+  m_neuroOutQuad3Phi0->Reset();
+  m_neuroOutQuad3InvPt->Reset();
+
   if (m_simNeuroTracksName != "") {
     m_neuroSector->Reset();
     m_neuroDeltaZ->Reset();
@@ -370,11 +550,113 @@ void CDCTriggerDQMModule::beginRun()
     m_simSameTS->Reset();
     m_simDiffTS->Reset();
   }
+  if (m_showRecoTracks == "yes") {
+    m_RecoZ->Reset();
+    m_RecoCosTheta->Reset();
+    m_RecoInvPt->Reset();
+    m_RecoPhi->Reset();
+
+    m_RecoHWZ->Reset();
+    m_RecoHWCosTheta->Reset();
+    m_RecoHWInvPt->Reset();
+    m_RecoHWPhi->Reset();
+
+    m_RecoSWZ->Reset();
+    m_RecoSWCosTheta->Reset();
+    m_RecoSWInvPt->Reset();
+    m_RecoSWPhi->Reset();
+
+    m_DeltaRecoHWZ->Reset();
+    m_DeltaRecoHWCosTheta->Reset();
+    m_DeltaRecoHWInvPt->Reset();
+    m_DeltaRecoHWPhi->Reset();
+
+    m_DeltaRecoSWZ->Reset();
+    m_DeltaRecoSWCosTheta->Reset();
+    m_DeltaRecoSWInvPt->Reset();
+    m_DeltaRecoSWPhi->Reset();
+  }
 }
 
 
 void CDCTriggerDQMModule::event()
 {
+  if (m_showRecoTracks == "yes") {
+    // a RecoTrack has multiple representations for different particle hypothesis
+    // -> just take the first one that does not give errors.
+    bool foundValidRep = false;
+    for (RecoTrack& recoTrack : m_RecoTracks) {
+      float phi0Target = 0;
+      float invptTarget = 0;
+      float cosThetaTarget = 0;
+      float zTarget = 0;
+      for (genfit::AbsTrackRep* rep : recoTrack.getRepresentations()) {
+        if (!recoTrack.wasFitSuccessful(rep))
+          continue;
+        // get state (position, momentum etc.) from hit closest to IP and
+        // extrapolate to z-axis (may throw an exception -> continue to next representation)
+        try {
+          genfit::MeasuredStateOnPlane state =
+            recoTrack.getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), rep);
+          rep->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
+          // TODO check after matching
+          //  // flip tracks if necessary, such that trigger tracks and reco tracks
+          //  // point in the same direction
+          //  if (state.getMom().Dot(m_tracks[itrack]->getDirection()) < 0) {
+          //    state.setPosMom(state.getPos(), -state.getMom());
+          //    state.setChargeSign(-state.getCharge());
+          //  }
+          // get track parameters
+          phi0Target = state.getMom().Phi();
+          invptTarget = state.getCharge() / state.getMom().Pt();
+          cosThetaTarget = state.getMom().CosTheta();
+          zTarget = state.getPos().Z();
+        } catch (...) {
+          continue;
+        }
+        // break loop
+        foundValidRep = true;
+        break;
+      }
+      if (!foundValidRep) {
+        B2DEBUG(150, "No valid representation found for RecoTrack, skipping.");
+        continue;
+      } else {
+        m_RecoZ->Fill(zTarget);
+        m_RecoCosTheta->Fill(cosThetaTarget);
+        m_RecoPhi->Fill(phi0Target * 180 / M_PI);
+        m_RecoInvPt->Fill(invptTarget);
+        CDCTriggerTrack* neuroHWTrack = recoTrack.getRelatedTo<CDCTriggerTrack>(m_unpackedNeuroTracksName);
+        if (neuroHWTrack) {
+          m_RecoHWZ->Fill(zTarget);
+          m_RecoHWCosTheta->Fill(cosThetaTarget);
+          m_RecoHWPhi->Fill(phi0Target * 180 / M_PI);
+          m_RecoHWInvPt->Fill(invptTarget);
+
+          m_DeltaRecoHWZ->Fill(zTarget - neuroHWTrack->getZ0());
+          double cotTh = neuroHWTrack->getCotTheta();
+          double cosTh = copysign(1.0, cotTh) / sqrt(1. / (cotTh * cotTh) + 1);
+          m_DeltaRecoHWCosTheta->Fill(cosThetaTarget - cosTh);
+          m_DeltaRecoHWPhi->Fill((phi0Target - neuroHWTrack->getPhi0()) * 180 / M_PI);
+          m_DeltaRecoHWInvPt->Fill(invptTarget - 1. / neuroHWTrack->getPt());
+        }
+        CDCTriggerTrack* neuroSWTrack = recoTrack.getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);
+        if (neuroSWTrack) {
+          m_RecoSWZ->Fill(zTarget);
+          m_RecoSWCosTheta->Fill(cosThetaTarget);
+          m_RecoSWPhi->Fill(phi0Target * 180 / M_PI);
+          m_RecoSWInvPt->Fill(invptTarget);
+
+          m_DeltaRecoSWZ->Fill(zTarget - neuroSWTrack->getZ0());
+          double cotTh = neuroSWTrack->getCotTheta();
+          double cosTh = copysign(1.0, cotTh) / sqrt(1. / (cotTh * cotTh) + 1);
+          m_DeltaRecoSWCosTheta->Fill(cosThetaTarget - cosTh);
+          m_DeltaRecoSWPhi->Fill((phi0Target - neuroSWTrack->getPhi0()) * 180 / M_PI);
+          m_DeltaRecoSWInvPt->Fill(invptTarget - 1. / neuroSWTrack->getPt());
+        }
+      }
+    }
+  }
   // fill neurotrigger histograms
   int nofouttracks = 0;
   int nofintracks = 0;
@@ -386,12 +668,47 @@ void CDCTriggerDQMModule::event()
     nofouttracks ++;
     // fill raw distributions
     m_neuroOutZ->Fill(neuroTrack.getZ0());
-    double cot = neuroTrack.getCotTheta();
-    double cos = copysign(1.0, cot) / sqrt(1. / (cot * cot) + 1);
-    m_neuroOutCosTheta->Fill(cos);
+    double cotTh = neuroTrack.getCotTheta();
+    double cosTh = copysign(1.0, cotTh) / sqrt(1. / (cotTh * cotTh) + 1);
+    m_neuroOutCosTheta->Fill(cosTh);
     m_neuroOutPhi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
     m_neuroOutInvPt->Fill(1. / neuroTrack.getPt());
     m_neuroOutm_time->Fill(neuroTrack.getTime());
+
+    // fill hists per quadrant
+    switch (neuroTrack.getQuadrant()) {
+      case -1:
+        m_neuroOutQuad5Z->Fill(neuroTrack.getZ0());
+        m_neuroOutQuad5CosTheta->Fill(cosTh);
+        m_neuroOutQuad5Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroOutQuad5InvPt->Fill(1. / neuroTrack.getPt());
+        break;
+      case 0:
+        m_neuroOutQuad0Z->Fill(neuroTrack.getZ0());
+        m_neuroOutQuad0CosTheta->Fill(cosTh);
+        m_neuroOutQuad0Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroOutQuad0InvPt->Fill(1. / neuroTrack.getPt());
+        break;
+      case 1:
+        m_neuroOutQuad1Z->Fill(neuroTrack.getZ0());
+        m_neuroOutQuad1CosTheta->Fill(cosTh);
+        m_neuroOutQuad1Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroOutQuad1InvPt->Fill(1. / neuroTrack.getPt());
+        break;
+      case 2:
+        m_neuroOutQuad2Z->Fill(neuroTrack.getZ0());
+        m_neuroOutQuad2CosTheta->Fill(cosTh);
+        m_neuroOutQuad2Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroOutQuad2InvPt->Fill(1. / neuroTrack.getPt());
+        break;
+      case 3:
+        m_neuroOutQuad3Z->Fill(neuroTrack.getZ0());
+        m_neuroOutQuad3CosTheta->Fill(cosTh);
+        m_neuroOutQuad3Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroOutQuad3InvPt->Fill(1. / neuroTrack.getPt());
+        break;
+    }
+
     // get related stereo hits
     unsigned pattern = 0;
     for (const CDCTriggerSegmentHit& hit :
@@ -399,33 +716,49 @@ void CDCTriggerDQMModule::event()
       m_neuroSelTSID->Fill(hit.getSegmentID());
       unsigned int sl = hit.getISuperLayer();
       m_neuroSelTSCount->Fill(sl);
+      float neuroTime = neuroTrack.getTime();
+      // find first occurence of hit (used to debug the selcted TS field)
+      CDCTriggerSegmentHit firstHit = hit;
+
+      for (CDCTriggerSegmentHit compare : m_unpackedNeuroInputSegments) {
+        if (compare.getISuperLayer()       == hit.getISuperLayer()      &&
+            compare.getIWireCenter()       == hit.getIWireCenter()      &&
+            compare.getPriorityPosition()  == hit.getPriorityPosition() &&
+            compare.getLeftRight()         == hit.getLeftRight()        &&
+            compare.priorityTime()         == hit.priorityTime()        &&
+            compare.foundTime()            < firstHit.foundTime()) {
+          firstHit = compare;
+          //break; //TODO check: break is only possible if the TS list is sorted by foundTime
+        }
+      }
+
       switch (sl) {
         case 0: m_neuroSelTSPrioT_Layer0->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer0->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer0->Fill(firstHit.foundTime() - neuroTime);
           break;
         case 1: m_neuroSelTSPrioT_Layer1->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer1->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer1->Fill(firstHit.foundTime() - neuroTime);
           break;
         case 2: m_neuroSelTSPrioT_Layer2->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer2->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer2->Fill(firstHit.foundTime() - neuroTime);
           break;
         case 3: m_neuroSelTSPrioT_Layer3->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer3->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer3->Fill(firstHit.foundTime() - neuroTime);
           break;
         case 4: m_neuroSelTSPrioT_Layer4->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer4->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer4->Fill(firstHit.foundTime() - neuroTime);
           break;
         case 5: m_neuroSelTSPrioT_Layer5->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer5->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer5->Fill(firstHit.foundTime() - neuroTime);
           break;
         case 6: m_neuroSelTSPrioT_Layer6->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer6->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer6->Fill(firstHit.foundTime() - neuroTime);
           break;
         case 7: m_neuroSelTSPrioT_Layer7->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer7->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer7->Fill(firstHit.foundTime() - neuroTime);
           break;
         case 8: m_neuroSelTSPrioT_Layer8->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer8->Fill(hit.foundTime());
+          m_neuroSelTSFoundT_Layer8->Fill(firstHit.foundTime() - neuroTime);
           break;
       }
       if (sl % 2 == 1) pattern |= (1 << ((sl - 1) / 2));
@@ -470,7 +803,7 @@ void CDCTriggerDQMModule::event()
 
           StoreObjPtr<EventMetaData> eventMetaData;
 
-          if (abs(ndiffTS) >= 0 && nsameTS >= 8) {
+          if (nsameTS >= 8) {
             m_neuroDeltaZ->Fill(neuroTrack.getZ0() - neuroSimTrack->getZ0());
             m_neuroDeltaTheta->Fill(neuroTrack.getDirection().Theta() * 180. / M_PI -
                                     neuroSimTrack->getDirection().Theta() * 180. / M_PI);
@@ -502,32 +835,84 @@ void CDCTriggerDQMModule::event()
                  <<  setw(8) << neuroSimTrack->getZ0() << ")" << endl;
 
             const double BField = 1.5e-4;
-            cout << "quadrant values" << endl;
+            cout << "quadrant " << neuroTrack.getQuadrant() << endl;
 
-            double quadphi = neuroTrack.getPhi0();
-            if (quadphi > M_PI) quadphi -= M_PI;
-            double rawphi = (quadphi - M_PI / 4) * (2 * 80) / M_PI - 1;
+            double phiGlob = neuroTrack.getPhi0();
+            double phiQ = phiGlob - M_PI / 2 * neuroTrack.getQuadrant();
+            if (phiQ < 0)
+              phiQ += 2 * M_PI;
+            double phiR = (phiQ - M_PI / 4) * 2 * 80 / M_PI - 1;
             double omegaRaw = neuroTrack.getOmega() * 0.3 * 34 / (Const::speedOfLight * BField);
-            cout << "HW (phi quadrant, phi raw, omega raw) = (" << quadphi * 180. / M_PI << ", " << rawphi << ", " << omegaRaw << ")" << endl;
+            cout << "HW (phi quadrant, phi raw, omega raw) = (" << phiQ * 180. / M_PI << ", " << phiR << ", " << omegaRaw << ")" << endl;
 
-            quadphi = neuroSimTrack->getPhi0();
-            if (quadphi > M_PI) quadphi -= M_PI;
-            rawphi = (quadphi - M_PI / 4) * (2 * 80) / M_PI - 1;
+            double phiglobSW = neuroSimTrack->getPhi0() - M_PI / 4;
+            if (phiglobSW < 0)
+              phiglobSW += 2 * M_PI;
+            double quadphi = fmod(phiglobSW, M_PI / 2);
+            double rawphi = (quadphi) * (2 * 80) / M_PI - 1;
             omegaRaw = neuroSimTrack->getOmega() * 0.3 * 34 / (Const::speedOfLight * BField);
-            cout << "SW (phi quadrant, phi raw, omega raw) = (" << quadphi * 180. / M_PI << ", " << rawphi << ", " << omegaRaw << ")" << endl;
-
-
-            cout << "Selected TS (segment id, relative id in SL,  priority position, left right, priority time, raw Tracker ID)" << endl;
+            cout << "SW (phi quadrant, phi raw, omega raw) = (" << quadphi * 180. / M_PI + 45 << ", " << rawphi << ", " << omegaRaw << ")" <<
+                 endl;
 
             /* number of wires in a super layer*/
             static constexpr std::array<int, 9> nWiresInSuperLayer = {
               160, 160, 192, 224, 256, 288, 320, 352, 384
             };
+            cout << "priority: (0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left); left/right:  (0: no hit, 1: right, 2: left, 3: not determined)"
+                 << endl;
+            cout << "All TS 2D   (SL, quadrant, segment id, relative id in SL,  priority position, left right, priority time, found time, raw Tracker ID)"
+                 << endl;
+            for (const CDCTriggerSegmentHit& xhit : m_unpackedSegmentHits) {
+              cout << "(" << setw(5) << xhit.getISuperLayer() << ", " << setw(5) << xhit.getQuadrant() << ", "
+                   << setw(5) << xhit.getSegmentID() << ", " << setw(5) << xhit.getIWire() << ", "
+                   << setw(5) << xhit.getPriorityPosition() << ", " << setw(5) << xhit.getLeftRight() << ", "
+                   << setw(5) << xhit.priorityTime() << ", " << setw(5) << xhit.foundTime();
+              int iSL = xhit.getISuperLayer();
+              int iTS = xhit.getIWire();
+              int nwires = nWiresInSuperLayer[ iSL ];
+              if (iSL == 8) {
+                iTS += 16;
+                if (iTS > nwires) {
+                  iTS -= nwires;
+                }
+              }
+              int tsIDInTracker = iTS;
+              if (iTS > nwires / 2) {
+                tsIDInTracker -= (nwires / 2);
+              }
+              cout << ", " << setw(5) << tsIDInTracker << ")" << endl;
+            }
+            cout << "All TS NN   (SL, quadrant, segment id, relative id in SL,  priority position, left right, priority time, found time, raw Tracker ID)"
+                 << endl;
+            for (const CDCTriggerSegmentHit& xhit : m_unpackedNeuroInputSegments) {
+              cout << "(" << setw(5) << xhit.getISuperLayer() << ", " << setw(5) << xhit.getQuadrant() << ", "
+                   << setw(5) << xhit.getSegmentID() << ", " << setw(5) << xhit.getIWire() << ", "
+                   << setw(5) << xhit.getPriorityPosition() << ", " << setw(5) << xhit.getLeftRight() << ", "
+                   << setw(5) << xhit.priorityTime() << ", " << setw(5) << xhit.foundTime();
+              int iSL = xhit.getISuperLayer();
+              int iTS = xhit.getIWire();
+              int nwires = nWiresInSuperLayer[ iSL ];
+              if (iSL == 8) {
+                iTS += 16;
+                if (iTS > nwires) {
+                  iTS -= nwires;
+                }
+              }
+              int tsIDInTracker = iTS;
+              if (iTS > nwires / 2) {
+                tsIDInTracker -= (nwires / 2);
+              }
+              cout << ", " << setw(5) << tsIDInTracker << ")" << endl;
+            }
+            cout << "Selected TS (SL, quadrant, segment id, relative id in SL,  priority position, left right, priority time, found time, raw Tracker ID)"
+                 << endl;
+
             for (const CDCTriggerSegmentHit& xhit :
                  neuroSimTrack->getRelationsTo<CDCTriggerSegmentHit>(m_unpackedNeuroInputSegmentsName)) {
-              cout << "(" << setw(5) << xhit.getSegmentID() << ", " << setw(5) << xhit.getIWire() << ", " << setw(
-                     5) << xhit.getPriorityPosition() << ", " << setw(5) << xhit.getLeftRight() << ", " <<
-                   setw(5) << xhit.priorityTime();
+              cout << "(" << setw(5) << xhit.getISuperLayer() << ", " << setw(5) << xhit.getQuadrant() << ", "
+                   << setw(5) << xhit.getSegmentID() << ", " << setw(5) << xhit.getIWire() << ", "
+                   << setw(5) << xhit.getPriorityPosition() << ", " << setw(5) << xhit.getLeftRight() << ", "
+                   << setw(5) << xhit.priorityTime() << ", " << setw(5) << xhit.foundTime();
               int iSL = xhit.getISuperLayer();
               int iTS = xhit.getIWire();
               int nwires = nWiresInSuperLayer[ iSL ];

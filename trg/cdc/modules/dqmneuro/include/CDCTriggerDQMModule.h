@@ -16,6 +16,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include "TH1F.h"
 
@@ -68,6 +69,9 @@ namespace Belle2 {
     std::string m_simNeuroTracksName;
     /** StoreArray name for neuro input vector from TSIM */
     std::string m_simNeuroInputName;
+    /** switch to turn on a comparison with the reconstruction */
+    std::string m_showRecoTracks;
+
     // store arrays for direct access
     /** Storearray for TS hits from unpacker */
     StoreArray<CDCTriggerSegmentHit> m_unpackedSegmentHits;
@@ -85,6 +89,8 @@ namespace Belle2 {
     StoreArray<CDCTriggerTrack> m_simNeuroTracks;
     /** Storearray for neuro input vector from TSIM */
     StoreArray<CDCTriggerMLPInput> m_simNeuroInput;
+    /** Storearray for RecoTracks */
+    StoreArray<RecoTrack> m_RecoTracks;
 
 
     // histograms for neurotrigger
@@ -167,6 +173,52 @@ namespace Belle2 {
     TH1F* m_neuroDeltaSector;        /**< unpacked sector - TSIM sector */
     TH1F* m_simSameTS;               /**< number of TS selected in both, unpacked and TSIM tracks */
     TH1F* m_simDiffTS;               /**< number of TS selcted in TSIM but not in unpacked */
+    TH1F* m_RecoZ;                   /**< reconstructed z */
+    TH1F* m_RecoCosTheta;            /**< reconstructed cos(theta) */
+    TH1F* m_RecoInvPt;               /**< reconstructed inverse Pt */
+    TH1F* m_RecoPhi;                 /**< reconstructed phi */
+
+    TH1F* m_RecoHWZ;                 /**< matched to HW reconstructed z */
+    TH1F* m_RecoHWCosTheta;          /**< matched to HW reconstructed cos(theta) */
+    TH1F* m_RecoHWInvPt;             /**< matched to HW reconstructed inverse Pt */
+    TH1F* m_RecoHWPhi;               /**< matched to HW reconstructed phi */
+
+    TH1F* m_RecoSWZ;                 /**< matched to SW reconstructed z */
+    TH1F* m_RecoSWCosTheta;          /**< matched to SW reconstructed cos(theta) */
+    TH1F* m_RecoSWInvPt;             /**< matched to SW reconstructed inverse Pt */
+    TH1F* m_RecoSWPhi;               /**< matched to SW reconstructed phi */
+
+    TH1F* m_DeltaRecoHWZ;            /**< matched to HW reconstructed z */
+    TH1F* m_DeltaRecoHWCosTheta;     /**< matched to HW reconstructed cos(theta) */
+    TH1F* m_DeltaRecoHWInvPt;        /**< matched to HW reconstructed inverse Pt */
+    TH1F* m_DeltaRecoHWPhi;          /**< matched to HW reconstructed phi */
+
+    TH1F* m_DeltaRecoSWZ;            /**< matched to SW reconstructed z */
+    TH1F* m_DeltaRecoSWCosTheta;     /**< matched to SW reconstructed cos(theta) */
+    TH1F* m_DeltaRecoSWInvPt;        /**< matched to SW reconstructed inverse Pt */
+    TH1F* m_DeltaRecoSWPhi;          /**< matched to SW reconstructed phi */
+
+    TH1F* m_neuroOutQuad5Z;              /**< z distribution from unpacker */
+    TH1F* m_neuroOutQuad5CosTheta;       /**< cos theta distribution from unpacker */
+    TH1F* m_neuroOutQuad5Phi0;           /**< phi distribution from unpacker */
+    TH1F* m_neuroOutQuad5InvPt;          /**< Inverse Pt distribution from unpacker */
+
+    TH1F* m_neuroOutQuad0Z;              /**< z distribution from unpacker */
+    TH1F* m_neuroOutQuad0CosTheta;       /**< cos theta distribution from unpacker */
+    TH1F* m_neuroOutQuad0Phi0;           /**< phi distribution from unpacker */
+    TH1F* m_neuroOutQuad0InvPt;          /**< Inverse Pt distribution from unpacker */
+    TH1F* m_neuroOutQuad1Z;              /**< z distribution from unpacker */
+    TH1F* m_neuroOutQuad1CosTheta;       /**< cos theta distribution from unpacker */
+    TH1F* m_neuroOutQuad1Phi0;           /**< phi distribution from unpacker */
+    TH1F* m_neuroOutQuad1InvPt;          /**< Inverse Pt distribution from unpacker */
+    TH1F* m_neuroOutQuad2Z;              /**< z distribution from unpacker */
+    TH1F* m_neuroOutQuad2CosTheta;       /**< cos theta distribution from unpacker */
+    TH1F* m_neuroOutQuad2Phi0;           /**< phi distribution from unpacker */
+    TH1F* m_neuroOutQuad2InvPt;          /**< Inverse Pt distribution from unpacker */
+    TH1F* m_neuroOutQuad3Z;              /**< z distribution from unpacker */
+    TH1F* m_neuroOutQuad3CosTheta;       /**< cos theta distribution from unpacker */
+    TH1F* m_neuroOutQuad3Phi0;           /**< phi distribution from unpacker */
+    TH1F* m_neuroOutQuad3InvPt;          /**< Inverse Pt distribution from unpacker */
 
   };
 

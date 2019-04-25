@@ -245,7 +245,7 @@ void DQMHistAnalysisPXDEffModule::event()
     gr->Draw("AP");
     m_cEffAll->cd(0);
 
-    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken");
+    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();

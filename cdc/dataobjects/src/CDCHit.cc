@@ -40,8 +40,8 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
   const unsigned short tdc4Bg = bgDigit->getTDCCount();
   const unsigned short adc4Bg = bgDigit->getADCCount();
   const unsigned short tot4Bg = bgDigit->getTOT();
-  B2DEBUG(28, "Sg tdc,adc,tot= " << tdc4Sg << " " << adc4Sg << " " << tot4Sg);
-  B2DEBUG(28, "Bg tdc,adc,tot= " << tdc4Bg << " " << adc4Bg << " " << tot4Bg);
+  //  B2DEBUG(28, "Sg tdc,adc,tot= " << tdc4Sg << " " << adc4Sg << " " << tot4Sg);
+  //  B2DEBUG(28, "Bg tdc,adc,tot= " << tdc4Bg << " " << adc4Bg << " " << tot4Bg);
   int diff = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());
 
   // If the BG hit is faster than the true hit, the TDC count is replaced, and
@@ -77,7 +77,7 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
   }
   const unsigned short e1 = s1 - w1; //end time of 1st pulse
   const unsigned short e2 = s2 - w2; //end time of 2nd pulse
-  B2DEBUG(28, "s1,e1,w1,s2,e2,w2= " << s1 << " " << e1 << " " << w1 << " " << s2 << " " << e2 << " " << w2);
+  //  B2DEBUG(28, "s1,e1,w1,s2,e2,w2= " << s1 << " " << e1 << " " << w1 << " " << s2 << " " << e2 << " " << w2);
 
   int overLayType = 0;
   double pulseW = w1 + w2;
@@ -89,10 +89,11 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
     pulseW = s1 - e2;
   }
 
+  // maxtot=29 is hard-coded now
   m_tot = std::min(std::round(pulseW / 32.), 29.);
   //  if (overLayType) {
-  B2DEBUG(28, "overLaytype= " << overLayType);
-  B2DEBUG(28, "adcCount,tot= " << m_adcCount << " " << m_tot);
+  //  B2DEBUG(28, "overLaytype= " << overLayType);
+  //  B2DEBUG(28, "adcCount,tot= " << m_adcCount << " " << m_tot);
   //  }
 
   return DigitBase::c_DontAppend;

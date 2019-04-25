@@ -193,13 +193,17 @@ namespace Belle2 {
 
     /**
      * Import CDCWireHits cut values to the database.
+     * The cut values are read from a json file.
+     * An example of legal json file can be found at
+     * cdc/data/CDCWireHitRequirements_default.json
+     * In the json file, upper values of -1 stand for unbounded.
      */
-    void importCDCWireHitRequirements(const std::string& fileName);
+    void importCDCWireHitRequirements(const std::string& jsonFileName) const;
     /**
      * Get CDCWireHits cut values from the database and
      * print them.
      */
-    void printCDCWireHitRequirements();
+    void printCDCWireHitRequirements() const;
 
   private:
 

@@ -47,18 +47,64 @@ void CutsFromDBWireHitFilter::checkIfDBObjPtrIsValid()
   }
 }
 
+template <typename T>
+bool CutsFromDBWireHitFilter::isInRange(const T& value, const std::pair<T, T>& range) const
+{
+  if (range.second == -1) {
+    return (value >= range.first);
+  } else {
+    return (value >= range.first) && (value <= range.second);
+  }
+}
+
 Weight CutsFromDBWireHitFilter::operator()(const CDCWireHit& wireHit)
 {
-  int ADC = (*wireHit.getHit()).getADCCount();
+  const short ADC = (*wireHit.getHit()).getADCCount();
+  const short TOT = (*wireHit.getHit()).getTOT();
+  const float ADCOverTOT = (TOT != 0) ? static_cast<float>(ADC) / TOT : 0;
+
   if (m_DBPtrIsValidForCurrentRun) {
-    if (ADC > (*m_CDCWireHitRequirementsFromDB)->getMinADC()) {
-      // Hit accepted
-      return ADC;
+    if ((*wireHit.getHit()).getISuperLayer() == 0) {
+      // First super layer (0)
+      // Check if ADC, TOT and ADC/TOT are in the corresponding allowed ranges.
+      if (isInRange<short>(ADC, (*m_CDCWireHitRequirementsFromDB)->getADCRangeFirstSuperLayer()) &&
+          isInRange<short>(TOT, (*m_CDCWireHitRequirementsFromDB)->getTOTRangeFirstSuperLayer()) &&
+          isInRange<float>(ADCOverTOT, (*m_CDCWireHitRequirementsFromDB)->getADCOverTOTRangeFirstSuperLayer())) {
+        // Check if the conditions "if TOT==x, then ADC<=y" are not respected .
+        for (auto& v : (*m_CDCWireHitRequirementsFromDB)->getMaxADCGivenTOTFirstSuperLayer()) {
+          if (TOT == v.first and !(isInRange<short>(ADC, std::make_pair(0, v.second)))) {
+            // Hit rejected
+            return NAN;
+          }
+        }
+        // Hit accepted
+        return ADC;
+      } else {
+        // Hit rejected
+        return NAN;
+      }
+
     } else {
-      // Hit rejected
-      return NAN;
+      // Outer super layers (1-8)
+      // Check if ADC, TOT and ADC/TOT are in the corresponding allowed ranges.
+      if (isInRange<short>(ADC, (*m_CDCWireHitRequirementsFromDB)->getADCRangeOuterSuperLayers()) &&
+          isInRange<short>(TOT, (*m_CDCWireHitRequirementsFromDB)->getTOTRangeOuterSuperLayers()) &&
+          isInRange<float>(ADCOverTOT, (*m_CDCWireHitRequirementsFromDB)->getADCOverTOTRangeOuterSuperLayers())) {
+        // Check if the conditions "if TOT==x, then ADC<=y" are not respected.
+        for (auto& v : (*m_CDCWireHitRequirementsFromDB)->getMaxADCGivenTOTOuterSuperLayers()) {
+          if (TOT == v.first and !(isInRange<short>(ADC, std::make_pair(0, v.second)))) {
+            // Hit rejected
+            return NAN;
+          }
+        }
+        // Hit accepted
+        return ADC;
+      } else {
+        // Hit rejected
+        return NAN;
+      }
     }
   }
-  // Hit accepted (cf. B2WARNING above)
+  // If the DB pointer is not valid, the hit is accepted (cf. B2WARNING above)
   return ADC;
 }

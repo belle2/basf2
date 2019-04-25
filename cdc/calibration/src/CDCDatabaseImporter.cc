@@ -53,6 +53,9 @@
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 using namespace std;
 using namespace Belle2;
 
@@ -891,52 +894,24 @@ void CDCDatabaseImporter::printADCDeltaPedestal()
   dbPed->dump();
 }
 
-void CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& fileName)
+void CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& jsonFileName) const
 {
 
-  std::ifstream stream;
-  stream.open(fileName.c_str());
-  if (!stream.is_open()) {
-    B2ERROR("openFile: " << fileName << " *** failed to open");
-    return;
+  // Create a property tree
+  boost::property_tree::ptree tree;
+
+  try {
+
+    // Load the json file in this property tree.
+    B2INFO("Loading json file: " << jsonFileName);
+    boost::property_tree::read_json(jsonFileName, tree);
+
+  } catch (boost::property_tree::ptree_error& e) {
+    B2ERROR("Error when loading json file: " << e.what());
   }
-  B2INFO(fileName << ": open for reading");
-
-  int minADC = 0.0;          // Cut value for ADC (min)
-  int minTOT = 0.0;          // Cut value for TOT (min)
-  int maxTOT = 100;          // Cut value for TOT (max)
-  double minADCOverTOT = 0.0;      // Cut value for ADC/TOT (min)
-
-  // In the input file, the cuts are defined in that order:
-  // ADC>int TOT>int TOT<int ADC/TOT>double
-  if (stream >> minADC) {
-  } else {
-    B2ERROR("Cannot get int minADC from " << fileName);
-    return;
-  }
-
-  if (stream >> minTOT) {
-  } else {
-    B2ERROR("Cannot get int minADC from " << fileName);
-    return;
-  }
-
-  if (stream >> maxTOT) {
-  } else {
-    B2ERROR("Cannot get int maxTOT from " << fileName);
-    return;
-  }
-
-  if (stream >> minADCOverTOT) {
-  } else {
-    B2ERROR("Cannot get double minADCOverTOT from " << fileName);
-    return;
-  }
-
-  stream.close();
 
   DBImportObjPtr<CDCWireHitRequirements> dbWireHitReq;
-  dbWireHitReq.construct(minADC, minTOT, maxTOT, minADCOverTOT);
+  dbWireHitReq.construct(tree);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -945,7 +920,7 @@ void CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& fileNa
   B2RESULT("CDCWireHit requirements imported to database.");
 }
 
-void CDCDatabaseImporter::printCDCWireHitRequirements()
+void CDCDatabaseImporter::printCDCWireHitRequirements() const
 {
 
   DBObjPtr<CDCWireHitRequirements> dbWireHitReq;

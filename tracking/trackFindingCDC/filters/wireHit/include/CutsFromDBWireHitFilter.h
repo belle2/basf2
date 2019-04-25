@@ -43,6 +43,11 @@ namespace Belle2 {
       /// and set m_DBPtrIsValidForCurrentRun accordingly.
       void checkIfDBObjPtrIsValid();
 
+      /// Check if value >= range.first and value <= range.second
+      /// If range.second == -1, then check only if value >= range.first
+      template <typename T>
+      bool isInRange(const T& value, const std::pair<T, T>& range) const;
+
       /// Cut values from the Data Base.
       DBObjPtr<CDCWireHitRequirements>* m_CDCWireHitRequirementsFromDB;
 

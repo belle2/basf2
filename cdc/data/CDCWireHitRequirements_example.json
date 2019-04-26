@@ -1,6 +1,7 @@
 {
     "__Preamble__" :
     {
+        "Allowed values" : "ADC and TOT are read as short integers and ADCOverTOT as float.",
         "Comment" : "By convention, a value of -1 for an upper limit stands for unbounded."
     },
     "FirstSuperLayer" :

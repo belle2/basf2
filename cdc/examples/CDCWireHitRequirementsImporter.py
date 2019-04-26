@@ -13,7 +13,7 @@ from ROOT.Belle2 import CDCDatabaseImporter
 
 # Input json file containing the CDCWireHitRequirements
 # N.B. In the json file, -1 as upper limit means unbound.
-INPUT = FileSystem.findFile("cdc/data/CDCWireHitRequirements_default.json")
+INPUT = FileSystem.findFile("cdc/data/CDCWireHitRequirements_example.json")
 
 # Specify the exp and run where iov is valid.
 # N.B. -1 means unbound.

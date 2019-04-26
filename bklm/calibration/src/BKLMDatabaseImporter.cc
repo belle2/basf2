@@ -416,17 +416,18 @@ void BKLMDatabaseImporter::importBklmStripEfficiency(int expStart, int runStart,
       tree->SetBranchAddress("sector", &sector);
       int layer = 0;
       tree->SetBranchAddress("layer", &layer);
-      int isPhi = 0;
-      tree->SetBranchAddress("isPhi", &isPhi);
+      int plane = 0;
+      tree->SetBranchAddress("plane", &plane);
       int strip = 0;
       tree->SetBranchAddress("strip", &strip);
       float efficiency = 1.;
       tree->SetBranchAddress("efficiency", &efficiency);
       float efficiencyError = 0.;
       tree->SetBranchAddress("efficiencyError", &efficiencyError);
+
       for (int iStrip = 0; iStrip < tree->GetEntries(); iStrip++) {
         tree->GetEntry(iStrip);
-        stripEfficiency->setEfficiency(isForward, sector, layer, isPhi, strip, efficiency, efficiencyError);
+        stripEfficiency->setEfficiency(isForward, sector, layer, plane, strip, efficiency, efficiencyError);
       }
     }
     file->Close();

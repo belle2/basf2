@@ -12,12 +12,14 @@
 
 #include <framework/logging/Logger.h>
 #include <FieldManager.h>
+#include <TDatabasePDG.h>
 
 using namespace genfit;
 
 MplTrackRep::MplTrackRep(int pdgCode, float magCharge, char propDir) :
   RKTrackRep(pdgCode, propDir),
-  m_magCharge(magCharge)
+  m_magCharge(magCharge),
+  m_mass(TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass()) // We could ofc use AbsTrackRep::getMass(state) but we have no state here to call on
 {
   B2RESULT("Monopole representation is created");
 }

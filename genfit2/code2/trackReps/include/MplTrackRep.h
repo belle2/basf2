@@ -20,7 +20,7 @@ namespace genfit {
 
   public:
 
-    MplTrackRep() : m_magCharge(0) {};
+    MplTrackRep() : m_magCharge(0), m_mass(0) {};
     MplTrackRep(int pdgCode, float magCharge, char propDir = 0);
     ~MplTrackRep();
 
@@ -34,6 +34,7 @@ namespace genfit {
   private:
 
     const double m_magCharge;
+    const double m_mass;
 
   public:
 

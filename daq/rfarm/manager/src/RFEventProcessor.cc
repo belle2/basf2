@@ -180,6 +180,8 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
 {
   // Simple implementation to stop all processes
   //  system("killall basf2 sock2rbr rb2sockr hrelay hserver");
+
+  // Normal abort
   int status;
   if (m_pid_sender != 0) {
     printf("RFEventProcessor : killing sender pid=%d\n", m_pid_sender);
@@ -228,6 +230,10 @@ int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
                    string(m_conf->getconf("processor", "ringbufout"));
   char* hport = m_conf->getconf("processor", "historecv", "port");
 
+  // 0. Set run numbers
+  m_expno = nsmm->pars[0];
+  m_runno = nsmm->pars[1];
+
   // 1. Clear RingBuffers
   m_rbufout->forceClear();
   m_rbufin->forceClear();
@@ -243,8 +249,10 @@ int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
   return 0;
 }
 
-int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
+int RFEventProcessor::Stop(NSMmsg* msgm, NSMcontext* msgc)
 {
+  printf("RFEventProcessor : STOP processing started\n");
+  //  fflush ( stdout );
   /*
   char* hcollect = m_conf->getconf("processor", "dqm", "hcollect");
   char* filename = m_conf->getconf("processor", "dqm", "file");
@@ -254,6 +262,7 @@ int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
   waitpid(pid_hcollect, &status, 0);
   */
 
+  /*
   // Need to wait until all the events are processed and sent
   RfNodeInfo* nodeinfo = GetNodeInfo();
   int ncount = 0;
@@ -269,7 +278,10 @@ int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
     sleep(1);
     ncount ++;
   }
-
+  */
+  // Checking number of processed events using RfShm_Cell does not work as expected and is
+  // equivalent to wait for 30 sec. Just replaced with 5 sec waiting.
+  sleep(5);
 
   int status;
   if (m_pid_basf2 != 0) {
@@ -277,7 +289,14 @@ int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
     kill(m_pid_basf2, SIGINT);
     waitpid(m_pid_basf2, &status, 0);
     m_pid_basf2 = 0;
+    char outfile[1024];
+    sprintf(outfile, "dqm_e%4.4dr%6.6d.root", m_expno, m_runno);
+    std::rename("histofile.root", outfile);
+    printf("output file name = %s\n", outfile);
+    fflush(stdout);
+
   }
+  printf("RFEventProcessor : STOP processing done\n");
   return 0;
 }
 

@@ -35,13 +35,11 @@ namespace Belle2 {
       tree->Branch("ecl", &m_rates, "averageRate/F:numEvents/I:valid/O:averageDspBkgRate[16]/F:numEventsSegments[16]/I:validDspRate/O");
 
       //ECL calibration
-
-      DBObjPtr<ECLCrystalCalib> m_ElectronicsCalib("ECLCrystalElectronics"), m_ECLECalib("ECLCrystalEnergy");
       if (m_ElectronicsCalib.hasChanged()) {
-        electronicsCalib = m_ElectronicsCalib->getCalibVector();
+        m_electronicsCalib = m_ECLElectronicsCalib->getCalibVector();
       }
       if (m_ECLECalib.hasChanged()) {
-        energyCalib = m_ECLECalib->getCalibVector();
+        m_energyCalib = m_ECLECalib->getCalibVector();
       }
     }
 
@@ -82,28 +80,26 @@ namespace Belle2 {
         for (auto& aECLDsp : m_dsps) {
 
           int nadc = aECLDsp.getNADCPoints();
-          int cellid = aECLDsp.getCellId();
-          int segment_number = findSegment(cellid);
-          int crysID = cellid - 1;
+          int cellID = aECLDsp.getCellId();
+          int segmentNumber = findECLSegment(cellID);
+          int crysID = cellID - 1;
           std::vector<int> dspAv = aECLDsp.getDspA();
-          rates.numEventsSegments[segment_number]++;
+          rates.numEventsSegments[segmentNumber]++;
 
           //finding the pedestal value
-          double sum31 = std::accumulate(dspAv.begin(), dspAv.begin() + nadc, 0.0);
-          double dspMean = sum31 / nadc;
-
+          double dspMean = (std::accumulate(dspAv.begin(), dspAv.begin() + nadc, 0.0)) / nadc;
           double wpsum = 0;
           for (int v = 0; v < nadc; v++) {
             wpsum += pow(dspAv[v] - dspMean, 2);
           }
-
           double dspRMS = sqrt(wpsum / nadc);
-          double dspEnergy = dspRMS * abs(electronicsCalib[crysID] * energyCalib[crysID]);
+          double dspSigma = dspRMS * abs(m_electronicsCalib[crysID] * m_energyCalib[crysID]);
+
           //calculating the backgorund rate
-          double dspBkgRate = (pow(dspEnergy, 2)) / (2.53 * 1e-12);
+          double dspBkgRate = (pow(dspSigma, 2)) / (2.53 * 1e-12);
 
           //hit rate for segment in ECL, which is later normalized per 1Hz
-          rates.averageDspBkgRate[segment_number] += dspBkgRate;
+          rates.averageDspBkgRate[segmentNumber] += dspBkgRate;
 
         }
 
@@ -129,5 +125,62 @@ namespace Belle2 {
       // optionally: convert to MHz, correct for the masked-out channels etc.
 
     }
+
+
+    void ECLHitRateCounter::segmentECL()
+    {
+      m_geometry = Belle2::ECL::ECLGeometryPar::Instance();
+      for (int cid = 1; cid < 8737; cid++) {
+        m_geometry->Mapping(cid);
+        const B2Vector3D position = m_geometry->GetCrystalPos(cid - 1);
+        const double phi = position.Phi();
+        const double z = position.Z();
+
+        if (cid < 1297) {
+          if (phi > 0.7853 && phi < 2.356) {
+            m_segmentMap.insert(std::pair<int, int>(cid, 0));
+          } else if (phi >= 2.356 || phi <= -2.356) {
+            m_segmentMap.insert(std::pair<int, int>(cid, 1));
+          } else if (phi > -2.356 && phi < -0.7853) {
+            m_segmentMap.insert(std::pair<int, int>(cid, 2));
+          } else {
+            m_segmentMap.insert(std::pair<int, int>(cid, 3));
+          }
+        } else if (cid > 1296 && cid < 7777) {
+          if (z > 0) {
+            if (phi > 0.7853 && phi < 2.356) {
+              m_segmentMap.insert(std::pair<int, int>(cid, 4));
+            } else if (phi >= 2.356 && phi <= -2.356) {
+              m_segmentMap.insert(std::pair<int, int>(cid, 5));
+            } else if (phi > -2.356 && phi < -0.7853) {
+              m_segmentMap.insert(std::pair<int, int>(cid, 6));
+            } else {
+              m_segmentMap.insert(std::pair<int, int>(cid, 7));
+            }
+          } else {
+            if (phi > 0.7853 && phi < 2.356) {
+              m_segmentMap.insert(std::pair<int, int>(cid, 8));
+            } else if (phi >= 2.356 && phi <= -2.356) {
+              m_segmentMap.insert(std::pair<int, int>(cid, 9));
+            } else if (phi > -2.356 && phi < -0.7853) {
+              m_segmentMap.insert(std::pair<int, int>(cid, 10));
+            } else {
+              m_segmentMap.insert(std::pair<int, int>(cid, 11));
+            }
+          }
+        } else {
+          if (phi > 0.7853 && phi < 2.356) {
+            m_segmentMap.insert(std::pair<int, int>(cid, 12));
+          } else if (phi >= 2.356 && phi <= -2.356) {
+            m_segmentMap.insert(std::pair<int, int>(cid, 13));
+          } else if (phi > -2.356 && phi < -0.7853) {
+            m_segmentMap.insert(std::pair<int, int>(cid, 14));
+          } else {
+            m_segmentMap.insert(std::pair<int, int>(cid, 15));
+          }
+        }
+      }
+    }
+
   } // Background namespace
 } // Belle2 namespace

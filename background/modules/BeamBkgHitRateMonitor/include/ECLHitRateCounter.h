@@ -102,6 +102,15 @@ namespace Belle2 {
 
       // class parameters: to be set via constructor or setters
 
+      //functions
+      void segmentECL();
+
+      int findECLSegment(int cellid)
+      {
+        return m_segmentMap.find(cellid)->second;
+      }
+
+
       // tree structure
       TreeStruct m_rates; /**< tree variables */
 
@@ -112,75 +121,13 @@ namespace Belle2 {
       StoreArray<ECLDigit> m_digits;  /**< collection of digits */
       StoreArray<ECLDsp> m_dsps;
 
-      std::vector<float> electronicsCalib;
-      std::vector<float> energyCalib;
+      std::vector<float> m_electronicsCalib;
+      std::vector<float> m_energyCalib;
 
       // other
-      std::ifstream ifss;
-      std::string segments;
-      Belle2::ECL::ECLGeometryPar* geom;
-
-      int findSegment(int cellid)
-      {
-        return segment_map.find(cellid)->second;
-      }
-
-      std::map<int, int> segment_map;
-
-      void segmentECL()
-      {
-        geom = Belle2::ECL::ECLGeometryPar::Instance();
-        for (int cid = 1; cid < 8737; cid++) {
-          geom->Mapping(cid);
-          const B2Vector3D position = geom->GetCrystalPos(cid - 1);
-          const double phi = position.Phi();
-          const double z = position.Z();
-
-          if (cid < 1297) {
-            if (phi > 0.7853 && phi < 2.356) {
-              segment_map.insert(std::pair<int, int>(cid, 0));
-            } else if (phi >= 2.356 || phi <= -2.356) {
-              segment_map.insert(std::pair<int, int>(cid, 1));
-            } else if (phi > -2.356 && phi < -0.7853) {
-              segment_map.insert(std::pair<int, int>(cid, 2));
-            } else {
-              segment_map.insert(std::pair<int, int>(cid, 3));
-            }
-          } else if (cid > 1296 && cid < 7777) {
-            if (z > 0) {
-              if (phi > 0.7853 && phi < 2.356) {
-                segment_map.insert(std::pair<int, int>(cid, 4));
-              } else if (phi >= 2.356 && phi <= -2.356) {
-                segment_map.insert(std::pair<int, int>(cid, 5));
-              } else if (phi > -2.356 && phi < -0.7853) {
-                segment_map.insert(std::pair<int, int>(cid, 6));
-              } else {
-                segment_map.insert(std::pair<int, int>(cid, 7));
-              }
-            } else {
-              if (phi > 0.7853 && phi < 2.356) {
-                segment_map.insert(std::pair<int, int>(cid, 8));
-              } else if (phi >= 2.356 && phi <= -2.356) {
-                segment_map.insert(std::pair<int, int>(cid, 9));
-              } else if (phi > -2.356 && phi < -0.7853) {
-                segment_map.insert(std::pair<int, int>(cid, 10));
-              } else {
-                segment_map.insert(std::pair<int, int>(cid, 11));
-              }
-            }
-          } else {
-            if (phi > 0.7853 && phi < 2.356) {
-              segment_map.insert(std::pair<int, int>(cid, 12));
-            } else if (phi >= 2.356 && phi <= -2.356) {
-              segment_map.insert(std::pair<int, int>(cid, 13));
-            } else if (phi > -2.356 && phi < -0.7853) {
-              segment_map.insert(std::pair<int, int>(cid, 14));
-            } else {
-              segment_map.insert(std::pair<int, int>(cid, 15));
-            }
-          }
-        }
-      }
+      Belle2::ECL::ECLGeometryPar* m_geometry;
+      std::map<int, int> m_segmentMap;
+      DBObjPtr<ECLCrystalCalib> m_ECLElectronicsCalib("ECLCrystalElectronics"), m_ECLECalib("ECLCrystalEnergy");
     };
   }
 }

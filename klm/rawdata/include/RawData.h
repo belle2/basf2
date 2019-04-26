@@ -23,7 +23,7 @@ namespace Belle2 {
      */
     struct RawData {
 
-      /* Lane (5 bits, but only 3 are really necessary). */
+      /** Lane (5 bits, but only 3 are really necessary). */
       uint16_t lane;
 
       /** Axis (1 bit). */

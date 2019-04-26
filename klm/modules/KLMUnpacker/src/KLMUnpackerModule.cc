@@ -102,7 +102,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   const int* rawData, EKLMDataConcentratorLane* lane,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
-  int endcap, layer, sector, strip = 0, stripGlobal;
+  int endcap, layer, sector, strip = 0;
   KLM::RawData raw;
   KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
   /**
@@ -165,8 +165,8 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setStrip(strip);
   eklmDigit->setCharge(raw.charge);
   if (correctHit) {
-    stripGlobal = m_ElementNumbers->stripNumber(
-                    endcap, layer, sector, plane, strip);
+    int stripGlobal = m_ElementNumbers->stripNumber(
+                        endcap, layer, sector, plane, strip);
     const EKLMChannelData* channelData =
       m_Channels->getChannelData(stripGlobal);
     if (channelData == nullptr)

@@ -45,6 +45,8 @@ void ECLChargedPIDDataAnalysisValidationModule::initialize()
 
   m_tree = new TTree("ECLChargedPid", "ECLChargedPid");
   m_tree->Branch("p", &m_p, "p/F");
+  m_tree->Branch("trkTheta", &m_trkTheta, "trkTheta/F");
+  m_tree->Branch("trkPhi", &m_trkPhi, "trkPhi/F");
   m_tree->Branch("clusterTheta", &m_clusterTheta, "clusterTheta/F");
   m_tree->Branch("clusterPhi", &m_clusterPhi, "clusterPhi/F");
   m_tree->Branch("trackClusterMatch", &m_trackClusterMatch, "trackClusterMatch/B");
@@ -61,6 +63,8 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
 
   // Initialise branches to unphysical values.
   m_p = -1.0;
+  m_trkTheta = -1.0;
+  m_trkPhi = -4.0;
   m_clusterTheta = -1.0;
   m_clusterPhi = -4.0;
   m_trackClusterMatch = -1;
@@ -93,6 +97,11 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
     if (itrack_max < 0) continue; // Go to next particle if no track found.
 
     const auto track = particle.getRelationsFrom<Track>()[itrack_max];
+    const auto fitRes = track->getTrackFitResultWithClosestMass(Const::pion);
+
+    m_p = p_max;
+    m_trkTheta = fitRes->get4Momentum().Theta();
+    m_trkPhi = fitRes->get4Momentum().Phi();
 
     // Get the ECL cluster matching this track.
     int icluster_match(-1);
@@ -112,6 +121,10 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
 
     const auto eclCluster = eclClusters[icluster_match];
 
+    m_clusterTheta = eclCluster->getTheta();
+    m_clusterPhi = eclCluster->getPhi();
+    m_trackClusterMatch = 1;
+
     const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
 
     double lh_sig = eclLikelihood->getLikelihood(Const::chargedStableSet.find(std::abs(m_inputPdgId)));
@@ -121,14 +134,7 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       lh_all += eclLikelihood->getLikelihood(chargedStable);
     }
 
-    double pid = lh_sig / lh_all;
-
-    // Fill the tree branches.
-    m_p = p_max;
-    m_clusterTheta = eclCluster->getTheta();
-    m_clusterPhi = eclCluster->getPhi();
-    m_trackClusterMatch = 1;
-    m_pid = pid;
+    m_pid = lh_sig / lh_all;
 
   }
 
@@ -294,11 +300,11 @@ void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency()
   m_tree->Project("h_p_N", "p", match_cut_N.c_str());
   m_tree->Project("h_p_D", "p", match_cut_D.c_str());
 
-  m_tree->Project("h_th_N", "clusterTheta", match_cut_N.c_str());
-  m_tree->Project("h_th_D", "clusterTheta", match_cut_D.c_str());
+  m_tree->Project("h_th_N", "trkTheta", match_cut_N.c_str());
+  m_tree->Project("h_th_D", "trkTheta", match_cut_D.c_str());
 
-  m_tree->Project("h_phi_N", "clusterPhi", match_cut_N.c_str());
-  m_tree->Project("h_phi_D", "clusterPhi", match_cut_D.c_str());
+  m_tree->Project("h_phi_N", "trkPhi", match_cut_N.c_str());
+  m_tree->Project("h_phi_D", "trkPhi", match_cut_D.c_str());
 
   // Compute the efficiency.
 
@@ -321,19 +327,19 @@ void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency()
   h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Description",
                                                       "Efficiency of track-cluster matching as a function of track momentum."));
   h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
   h_match_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
   h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Description",
                                                        "Efficiency of track-cluster matching as a function of clusterTheta."));
   h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
   h_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
   h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Description",
                                                         "Efficiency of track-cluster matching as a function of clusterPhi."));
   h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent and flat."));
-  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
   h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
   h_match_eff_p->Write();

@@ -126,12 +126,22 @@ namespace Belle2 {
     float m_p;
 
     /**
-     * Cluster polar angle in [rad]
+     * Track polar angle in [rad].
+     */
+    float m_trkTheta;
+
+    /**
+     * Track azimuthal angle in [rad].
+     */
+    float m_trkPhi;
+
+    /**
+     * Cluster polar angle in [rad].
      */
     float m_clusterTheta;
 
     /**
-     * Cluster azimuthal angle in [rad]
+     * Cluster azimuthal angle in [rad].
      */
     float m_clusterPhi;
 

@@ -149,6 +149,18 @@ namespace Belle2 {
      */
     float m_pid;
 
+    /**
+     * Binning w/ variable bin size for track momentum (in [GeV/c]).
+     * It should match the binning used for parametrisation of the PID likelihood.
+     */
+    std::vector<float> m_p_binedges = {0.0, 0.5, 0.75, 1.0, 3.0, 5.0};
+
+    /**
+     * Binning w/ variable bin size for cluster polar angle (in [rad]).
+     * It should match the binning used for parametrisation of the PID likelihood.
+     */
+    std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057, 3.1415926};
+
   };
 }
 

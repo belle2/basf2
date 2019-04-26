@@ -144,6 +144,7 @@ void ECLChargedPIDDataAnalysisValidationModule::terminate()
 {
 
   computePIDEfficiency();
+  computeMatchingEfficiency();
 
   m_outputFile->cd();
   m_tree->Write();
@@ -156,14 +157,11 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency()
 
   m_outputFile->cd();
 
-  float p_binedges[] = {0.0, 0.5, 0.75, 1.0, 3.0, 5.0};
-  float th_binedges[] = {0.0, 0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057, 3.1415926};
+  TH1F* h_p_N = new TH1F("h_p_N", "h_p_N", m_p_binedges.size() - 1, m_p_binedges.data());
+  TH1F* h_p_D = new TH1F("h_p_D", "h_p_D", m_p_binedges.size() - 1, m_p_binedges.data());
 
-  TH1F* h_p_N = new TH1F("h_p_N", "h_p_N", sizeof(p_binedges) / sizeof(float) - 1, p_binedges);
-  TH1F* h_p_D = new TH1F("h_p_D", "h_p_D", sizeof(p_binedges) / sizeof(float) - 1, p_binedges);
-
-  TH1F* h_th_N = new TH1F("h_th_N", "h_th_N", sizeof(th_binedges) / sizeof(float) - 1, th_binedges);
-  TH1F* h_th_D = new TH1F("h_th_D", "h_th_D", sizeof(th_binedges) / sizeof(float) - 1, th_binedges);
+  TH1F* h_th_N = new TH1F("h_th_N", "h_th_N", m_th_binedges.size() - 1, m_th_binedges.data());
+  TH1F* h_th_D = new TH1F("h_th_D", "h_th_D", m_th_binedges.size() - 1, m_th_binedges.data());
 
   TH1F* h_phi_N = new TH1F("h_phi_N", "h_phi_N", 60, -3.14159, 3.14159);
   TH1F* h_phi_D = new TH1F("h_phi_D", "h_phi_D", 60, -3.14159, 3.14159);
@@ -176,94 +174,94 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency()
   h_phi_N = h_phi_N;
   h_phi_D = h_phi_D;
 
-  std::string cut = "pid > " + std::to_string(c_PID);
+  std::string pid_cut = "pid > " + std::to_string(c_PID);
 
-  m_tree->Project("h_p_N", "p", cut.c_str());
+  m_tree->Project("h_p_N", "p", pid_cut.c_str());
   m_tree->Project("h_p_D", "p");
 
-  m_tree->Project("h_th_N", "clusterTheta", cut.c_str());
+  m_tree->Project("h_th_N", "clusterTheta", pid_cut.c_str());
   m_tree->Project("h_th_D", "clusterTheta");
 
-  m_tree->Project("h_phi_N", "clusterPhi", cut.c_str());
+  m_tree->Project("h_phi_N", "clusterPhi", pid_cut.c_str());
   m_tree->Project("h_phi_D", "clusterPhi");
 
   // Compute the efficiency.
 
-  std::string eff_p_name = "eff_pid_" + m_inputPdgIdStr + "__VS_p";
-  std::string eff_th_name = "eff_pid_" + m_inputPdgIdStr + "__VS_th";
-  std::string eff_phi_name = "eff_pid_" + m_inputPdgIdStr + "__VS_phi";
+  std::string pid_eff_p_name = "pid_eff_" + m_inputPdgIdStr + "__VS_p";
+  std::string pid_eff_th_name = "pid_eff_" + m_inputPdgIdStr + "__VS_th";
+  std::string pid_eff_phi_name = "pid_eff_" + m_inputPdgIdStr + "__VS_phi";
 
   // Use TH1::Divide with binomial errors.
-  TH1F* h_eff_p = dynamic_cast<TH1F*>(h_p_N->Clone(eff_p_name.c_str()));
-  h_eff_p->Divide(h_p_N, h_p_D, 1.0, 1.0, "B");
+  TH1F* h_pid_eff_p = dynamic_cast<TH1F*>(h_p_N->Clone(pid_eff_p_name.c_str()));
+  h_pid_eff_p->Divide(h_p_N, h_p_D, 1.0, 1.0, "B");
 
-  TH1F* h_eff_th = dynamic_cast<TH1F*>(h_th_N->Clone(eff_th_name.c_str()));
-  h_eff_th->Divide(h_th_N, h_th_D, 1.0, 1.0, "B");
+  TH1F* h_pid_eff_th = dynamic_cast<TH1F*>(h_th_N->Clone(pid_eff_th_name.c_str()));
+  h_pid_eff_th->Divide(h_th_N, h_th_D, 1.0, 1.0, "B");
 
-  TH1F* h_eff_phi = dynamic_cast<TH1F*>(h_phi_N->Clone(eff_phi_name.c_str()));
-  h_eff_phi->Divide(h_phi_N, h_phi_D, 1.0, 1.0, "B");
+  TH1F* h_pid_eff_phi = dynamic_cast<TH1F*>(h_phi_N->Clone(pid_eff_phi_name.c_str()));
+  h_pid_eff_phi->Divide(h_phi_N, h_phi_D, 1.0, 1.0, "B");
 
-  // Add histogram info
+  // Add histogram info.
 
-  h_eff_p->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of track momentum."));
-  h_eff_p->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+  h_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of track momentum."));
+  h_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
+  h_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_pid_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
-  h_eff_th->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of clusterTheta."));
-  h_eff_th->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+  h_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of clusterTheta."));
+  h_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
+  h_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_pid_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
-  h_eff_phi->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of clusterPhi."));
-  h_eff_phi->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent and flat."));
-  h_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+  h_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of clusterPhi."));
+  h_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent and flat."));
+  h_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
-  h_eff_p->Write();
-  h_eff_th->Write();
-  h_eff_phi->Write();
+  h_pid_eff_p->Write();
+  h_pid_eff_th->Write();
+  h_pid_eff_phi->Write();
 
   // No chi-2 test available when using TEfficiency. Just kept for reference.
   if (TEfficiency::CheckConsistency(*h_p_N, *h_p_D)) {
 
-    TEfficiency* teff_p = new TEfficiency(*h_p_N, *h_p_D);
-    eff_p_name = "t_" + eff_p_name;
-    teff_p->SetName(eff_p_name.c_str());
+    TEfficiency* tpid_eff_p = new TEfficiency(*h_p_N, *h_p_D);
+    pid_eff_p_name = "t_" + pid_eff_p_name;
+    tpid_eff_p->SetName(pid_eff_p_name.c_str());
 
-    teff_p->SetConfidenceLevel(0.683);
-    teff_p->SetStatisticOption(TEfficiency::kBUniform);
-    teff_p->SetPosteriorMode();
+    tpid_eff_p->SetConfidenceLevel(0.683);
+    tpid_eff_p->SetStatisticOption(TEfficiency::kBUniform);
+    tpid_eff_p->SetPosteriorMode();
 
-    teff_p->Write();
+    tpid_eff_p->Write();
 
   }
   if (TEfficiency::CheckConsistency(*h_th_N, *h_th_D)) {
 
-    TEfficiency* teff_th = new TEfficiency(*h_th_N, *h_th_D);
-    eff_th_name = "t_" + eff_th_name;
-    teff_th->SetName(eff_th_name.c_str());
+    TEfficiency* tpid_eff_th = new TEfficiency(*h_th_N, *h_th_D);
+    pid_eff_th_name = "t_" + pid_eff_th_name;
+    tpid_eff_th->SetName(pid_eff_th_name.c_str());
 
-    teff_th->SetConfidenceLevel(0.683);
-    teff_th->SetStatisticOption(TEfficiency::kBUniform);
-    teff_th->SetPosteriorMode();
+    tpid_eff_th->SetConfidenceLevel(0.683);
+    tpid_eff_th->SetStatisticOption(TEfficiency::kBUniform);
+    tpid_eff_th->SetPosteriorMode();
 
     m_outputFile->cd();
-    teff_th->Write();
+    tpid_eff_th->Write();
 
   }
   if (TEfficiency::CheckConsistency(*h_phi_N, *h_phi_D)) {
 
-    TEfficiency* teff_phi = new TEfficiency(*h_phi_N, *h_phi_D);
-    eff_phi_name = "t_" + eff_phi_name;
-    teff_phi->SetName(eff_phi_name.c_str());
+    TEfficiency* tpid_eff_phi = new TEfficiency(*h_phi_N, *h_phi_D);
+    pid_eff_phi_name = "t_" + pid_eff_phi_name;
+    tpid_eff_phi->SetName(pid_eff_phi_name.c_str());
 
-    teff_phi->SetConfidenceLevel(0.683);
-    teff_phi->SetStatisticOption(TEfficiency::kBUniform);
-    teff_phi->SetPosteriorMode();
+    tpid_eff_phi->SetConfidenceLevel(0.683);
+    tpid_eff_phi->SetStatisticOption(TEfficiency::kBUniform);
+    tpid_eff_phi->SetPosteriorMode();
 
     m_outputFile->cd();
-    teff_phi->Write();
+    tpid_eff_phi->Write();
 
   }
 
@@ -271,4 +269,75 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency()
 
 void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency()
 {
+  m_outputFile->cd();
+
+  TH1F* h_p_N = new TH1F("h_p_N", "h_p_N", 50, 0.0, 5.0);
+  TH1F* h_p_D = new TH1F("h_p_D", "h_p_D", 50, 0.0, 5.0);
+
+  TH1F* h_th_N = new TH1F("h_th_N", "h_th_N", m_th_binedges.size() - 1, m_th_binedges.data());
+  TH1F* h_th_D = new TH1F("h_th_D", "h_th_D", m_th_binedges.size() - 1, m_th_binedges.data());
+
+  TH1F* h_phi_N = new TH1F("h_phi_N", "h_phi_N", 60, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F("h_phi_D", "h_phi_D", 60, -3.14159, 3.14159);
+
+  // Just to get rid of warnings.
+  h_p_N = h_p_N;
+  h_p_D = h_p_D;
+  h_th_N = h_th_N;
+  h_th_D = h_th_D;
+  h_phi_N = h_phi_N;
+  h_phi_D = h_phi_D;
+
+  std::string match_cut_N = "trackClusterMatch == 1";
+  std::string match_cut_D = "trackClusterMatch >= 0";
+
+  m_tree->Project("h_p_N", "p", match_cut_N.c_str());
+  m_tree->Project("h_p_D", "p", match_cut_D.c_str());
+
+  m_tree->Project("h_th_N", "clusterTheta", match_cut_N.c_str());
+  m_tree->Project("h_th_D", "clusterTheta", match_cut_D.c_str());
+
+  m_tree->Project("h_phi_N", "clusterPhi", match_cut_N.c_str());
+  m_tree->Project("h_phi_D", "clusterPhi", match_cut_D.c_str());
+
+  // Compute the efficiency.
+
+  std::string match_eff_p_name = "match_eff_" + m_inputPdgIdStr + "__VS_p";
+  std::string match_eff_th_name = "match_eff_" + m_inputPdgIdStr + "__VS_th";
+  std::string match_eff_phi_name = "match_eff_" + m_inputPdgIdStr + "__VS_phi";
+
+  // Use TH1::Divide with binomial errors.
+  TH1F* h_match_eff_p = dynamic_cast<TH1F*>(h_p_N->Clone(match_eff_p_name.c_str()));
+  h_match_eff_p->Divide(h_p_N, h_p_D, 1.0, 1.0, "B");
+
+  TH1F* h_match_eff_th = dynamic_cast<TH1F*>(h_th_N->Clone(match_eff_th_name.c_str()));
+  h_match_eff_th->Divide(h_th_N, h_th_D, 1.0, 1.0, "B");
+
+  TH1F* h_match_eff_phi = dynamic_cast<TH1F*>(h_phi_N->Clone(match_eff_phi_name.c_str()));
+  h_match_eff_phi->Divide(h_phi_N, h_phi_D, 1.0, 1.0, "B");
+
+  // Add histogram info.
+
+  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Description",
+                                                      "Efficiency of track-cluster matching as a function of track momentum."));
+  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
+  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+
+  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Description",
+                                                       "Efficiency of track-cluster matching as a function of clusterTheta."));
+  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
+  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+
+  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Description",
+                                                        "Efficiency of track-cluster matching as a function of clusterPhi."));
+  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent and flat."));
+  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+
+  h_match_eff_p->Write();
+  h_match_eff_th->Write();
+  h_match_eff_phi->Write();
+
 }

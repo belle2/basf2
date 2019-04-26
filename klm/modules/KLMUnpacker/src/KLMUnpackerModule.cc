@@ -12,6 +12,7 @@
 #include <cstdint>
 
 /* Belle2 headers. */
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
 #include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 #include <klm/rawdata/RawData.h>
@@ -367,11 +368,8 @@ void KLMUnpackerModule::loadMapFromDB()
     int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1 , laneId, axisId, channelId);
     int moduleId = 0;
 
-    moduleId = (isForward ? BKLM_END_MASK : 0)
-               | ((sector - 1) << BKLM_SECTOR_BIT)
-               | ((layer - 1) << BKLM_LAYER_BIT)
-               | ((plane) << BKLM_PLANE_BIT)
-               | ((stripId - 1) << BKLM_STRIP_BIT);
+    moduleId = BKLMElementNumbers::channelNumber(isForward, sector, layer,
+                                                 plane, stripId);
     m_electIdToModuleId[elecId] = moduleId;
 
     B2DEBUG(29, "KLMUnpackerModule:: electId: " << elecId << " moduleId: " << moduleId);

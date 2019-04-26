@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dbobjects/BKLMBadChannels.h>
 #include <iostream>
 
@@ -31,7 +32,8 @@ void BKLMBadChannels::appendDeadChannel(int channel)
 
 void BKLMBadChannels::appendDeadChannel(int isForward, int sector, int layer, int plane, int strip)
 {
-  int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
+  int channel = BKLMElementNumbers::channelNumber(isForward, sector, layer,
+                                                  plane, strip);
   appendDeadChannel(channel);
 }
 
@@ -45,7 +47,8 @@ void BKLMBadChannels::appendHotChannel(int channel)
 
 void BKLMBadChannels::appendHotChannel(int isForward, int sector, int layer, int plane, int strip)
 {
-  int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
+  int channel = BKLMElementNumbers::channelNumber(isForward, sector, layer,
+                                                  plane, strip);
   appendHotChannel(channel);
 }
 
@@ -60,7 +63,8 @@ bool BKLMBadChannels::isHotChannel(int channel) const
 
 bool BKLMBadChannels::isHotChannel(int isForward, int sector, int layer, int plane, int strip) const
 {
-  int channel =  geometryToChannelId(isForward, sector, layer, plane, strip);
+  int channel = BKLMElementNumbers::channelNumber(isForward, sector, layer,
+                                                  plane, strip);
   return isHotChannel(channel);
 }
 
@@ -75,20 +79,9 @@ bool BKLMBadChannels::isDeadChannel(int channel) const
 
 bool BKLMBadChannels::isDeadChannel(int isForward, int sector, int layer, int plane, int strip) const
 {
-  int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
+  int channel = BKLMElementNumbers::channelNumber(isForward, sector, layer,
+                                                  plane, strip);
   return isDeadChannel(channel);
-}
-
-int BKLMBadChannels::geometryToChannelId(int isForward, int sector, int layer, int plane, int strip) const
-{
-  int forOrBack = isForward ? 0 : 1;
-  int channel = (forOrBack << BKLM_END_BIT)
-                | ((sector - 1) << BKLM_SECTOR_BIT)
-                | ((layer - 1) << BKLM_LAYER_BIT)
-                | ((plane) << BKLM_PLANE_BIT)
-                | ((strip - 1) << BKLM_STRIP_BIT);
-
-  return channel;
 }
 
 void BKLMBadChannels::printHotChannels() const

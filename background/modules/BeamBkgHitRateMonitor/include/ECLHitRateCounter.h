@@ -121,13 +121,11 @@ namespace Belle2 {
       StoreArray<ECLDigit> m_digits;  /**< collection of digits */
       StoreArray<ECLDsp> m_dsps;
 
-      std::vector<float> m_electronicsCalib;
-      std::vector<float> m_energyCalib;
+      std::vector<float> m_ADCtoEnergy;
 
       // other
       Belle2::ECL::ECLGeometryPar* m_geometry;
       std::map<int, int> m_segmentMap;
-      DBObjPtr<ECLCrystalCalib> m_ECLElectronicsCalib("ECLCrystalElectronics"), m_ECLECalib("ECLCrystalEnergy");
     };
   }
 }

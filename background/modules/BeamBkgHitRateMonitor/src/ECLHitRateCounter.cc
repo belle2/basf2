@@ -35,12 +35,10 @@ namespace Belle2 {
       tree->Branch("ecl", &m_rates, "averageRate/F:numEvents/I:valid/O:averageDspBkgRate[16]/F:numEventsSegments[16]/I:validDspRate/O");
 
       //ECL calibration
-      if (m_ElectronicsCalib.hasChanged()) {
-        m_electronicsCalib = m_ECLElectronicsCalib->getCalibVector();
-      }
-      if (m_ECLECalib.hasChanged()) {
-        m_energyCalib = m_ECLECalib->getCalibVector();
-      }
+      DBObjPtr<ECLCrystalCalib> ECLElectronicsCalib("ECLCrystalElectronics"), ECLECalib("ECLCrystalEnergy");
+      m_ADCtoEnergy.resize(8736);
+      if (ECLElectronicsCalib) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = ECLElectronicsCalib->getCalibVector()[i];
+      if (ECLECalib) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= ECLECalib->getCalibVector()[i];
     }
 
     void ECLHitRateCounter::clear()
@@ -93,7 +91,7 @@ namespace Belle2 {
             wpsum += pow(dspAv[v] - dspMean, 2);
           }
           double dspRMS = sqrt(wpsum / nadc);
-          double dspSigma = dspRMS * abs(m_electronicsCalib[crysID] * m_energyCalib[crysID]);
+          double dspSigma = dspRMS * abs(m_ADCtoEnergy[crysID]);
 
           //calculating the backgorund rate
           double dspBkgRate = (pow(dspSigma, 2)) / (2.53 * 1e-12);

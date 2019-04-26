@@ -14,6 +14,8 @@
 #include <FieldManager.h>
 #include <TDatabasePDG.h>
 
+#include <math.h>
+
 using namespace genfit;
 
 MplTrackRep::MplTrackRep(int pdgCode, float magCharge, char propDir) :
@@ -50,7 +52,7 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   //   http://inspirehep.net/record/160548
 
   // important fixed numbers
-  static const double EC  ( 0.000149896229 );  // c/(2*10^12) resp. c/2Tera
+  static const double EC  ( 0.000149896229 );  // c/(2*10^12) resp. c/2Tera FIXME this 1/2 here is super sneaky
   static const double P3  ( 1./3. );           // 1/3
   static const double DLT ( .0002 );           // max. deviation for approximation-quality test
   // Aux parameters
@@ -63,21 +65,29 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   double   A0(0), A1(0), A2(0), A3(0), A4(0), A5(0), A6(0);
   double   B0(0), B1(0), B2(0), B3(0), B4(0), B5(0), B6(0);
   double   C0(0), C1(0), C2(0), C3(0), C4(0), C5(0), C6(0);
+  // Additional variables for momentum evolution FIXME these are all cryptic in accordance with the rest of the code around
+  double   D0(0), D1(0), D2(0), D3(0), D4(0);
+  double   F0(0), F1(0), F2(0), F3(0);
+  double   AH0(0), AH1(0), AH2(0), AH3(0);
 
   //
   // Runge Kutta Extrapolation
   //
   S3 = P3*S;
   S4 = 0.25*S;
-  PS2 = state7[6]*EC * S;
+  PS2 = m_magCharge * EC * S * (state7[6] > 0 ? 1 : -1);
 
-  // First point
+ // First point
   r[0] = R[0];           r[1] = R[1];           r[2]=R[2];
   FieldManager::getInstance()->getFieldVal(r[0], r[1], r[2], H0[0], H0[1], H0[2]);       // magnetic field in 10^-1 T = kGauss
   H0[0] *= PS2; H0[1] *= PS2; H0[2] *= PS2;     // H0 is PS2*(Hx, Hy, Hz) @ R0
-  A0 = A[1]*H0[2]-A[2]*H0[1]; B0 = A[2]*H0[0]-A[0]*H0[2]; C0 = A[0]*H0[1]-A[1]*H0[0]; // (ax, ay, az) x H0
-  A2 = A[0]+A0              ; B2 = A[1]+B0              ; C2 = A[2]+C0              ; // (A0, B0, C0) + (ax, ay, az)
-  A1 = A2+A[0]              ; B1 = B2+A[1]              ; C1 = C2+A[2]              ; // (A0, B0, C0) + 2*(ax, ay, az)
+  D0 = fabs(1.0/state7[6]); // p_n
+  F0 = std::sqrt(m_mass * m_mass + D0 * D0) / (D0 * D0); // E / p^2
+  AH0 = A[0]*H0[0] + A[1]*H0[1] + A[2]*H0[2]; // A dot H
+
+  A0 = F0 * (H0[0] - A[0] * AH0); B0 = F0 * (H0[1] - A[1] * AH0); C0 = F0 * (H0[2] - A[2] * AH0); // h/2 * k_1
+  A2 = A[0]+A0              ; B2 = A[1]+B0              ; C2 = A[2]+C0              ; // p_n + h/2 * k_1
+  A1 = A2+A[0]              ; B1 = B2+A[1]              ; C1 = C2+A[2]              ; // 2*p_n + h/2 * k_1
 
   // Second point
   if (varField) {
@@ -86,9 +96,20 @@ double MplTrackRep::RKPropagate(M1x7& state7,
     H1[0] *= PS2; H1[1] *= PS2; H1[2] *= PS2; // H1 is PS2*(Hx, Hy, Hz) @ (x, y, z) + 0.25*S * [(A0, B0, C0) + 2*(ax, ay, az)]
   }
   else { H1 = H0; };
-  A3 = B2*H1[2]-C2*H1[1]+A[0]; B3 = C2*H1[0]-A2*H1[2]+A[1]; C3 = A2*H1[1]-B2*H1[0]+A[2]; // (A2, B2, C2) x H1 + (ax, ay, az)
-  A4 = B3*H1[2]-C3*H1[1]+A[0]; B4 = C3*H1[0]-A3*H1[2]+A[1]; C4 = A3*H1[1]-B3*H1[0]+A[2]; // (A3, B3, C3) x H1 + (ax, ay, az)
-  A5 = A4-A[0]+A4            ; B5 = B4-A[1]+B4            ; C5 = C4-A[2]+C4            ; //    2*(A4, B4, C4) - (ax, ay, az)
+  D1 = D0 + F0 * D0 * AH0; // p_n + h/2 * l_1
+  F1 = std::sqrt(m_mass * m_mass + D1 * D1) / (D1 * D1); // E / p^2
+  AH1 = A2*H1[0] + B2*H1[1] + C2*H1[2]; // A dot H
+
+  A3 = A[0] + F1*(H1[0] - A2*AH1); B3 = A[1] + F1*(H1[1] - B2*AH1); C3 = A[2] + F1*(H1[2] - C2*AH1); // A_n + h/2 * k_2
+  D2 = D0 + F1 * D1 * AH1; // p_n + h/2 * l_2
+  F2 = std::sqrt(m_mass * m_mass + D2 * D2) / (D2 * D2); // E / p^2
+  AH2 = A3*H1[0] + B3*H1[1] + C3*H1[2]; // A dot H
+
+  A4 = A[0] + F2*(H1[0] - A3*AH2); B4 = A[1] + F2*(H1[1] - B3*AH2); C4 = A[2] + F2*(H1[2] - C3*AH2); // A_n + h/2 * k_3
+  A5 = A4-A[0]+A4            ; B5 = B4-A[1]+B4            ; C5 = C4-A[2]+C4            ; //    A_n + h * k_3
+  D3 = D0 + 2.0 * F2 * D2 * AH2; // p_n + h * l_3
+  F3 = std::sqrt(m_mass * m_mass + D3 * D3) / (D3 * D3); // E / p^2
+  AH3 = A4*H1[0] + B4*H1[1] + C4*H1[2]; // A dot H
 
   // Last point
   if (varField) {
@@ -97,8 +118,8 @@ double MplTrackRep::RKPropagate(M1x7& state7,
     H2[0] *= PS2; H2[1] *= PS2; H2[2] *= PS2; // H2 is PS2*(Hx, Hy, Hz) @ (x, y, z) + 0.25*S * (A4, B4, C4)
   }
   else { H2 = H0; };
-  A6 = B5*H2[2]-C5*H2[1]; B6 = C5*H2[0]-A5*H2[2]; C6 = A5*H2[1]-B5*H2[0]; // (A5, B5, C5) x H2
-
+  A6 = F3 * (H2[0] - A5*AH3); B6 = F3 * (H2[1] - B5*AH3); C6 = F3 * (H2[2] - C5*AH3); // h/2 * k_4
+  D4 = F3 * D3 * AH3 - D0; // h/2 * l_4 - p_n
 
   //
   // Derivatives of track parameters
@@ -210,6 +231,7 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   R[0] += (A2+A3+A4)*S3;   A[0] += (SA[0]=((A0+2.*A3)+(A5+A6))*P3-A[0]);  // R  = R0 + S3*[(A2, B2, C2) +   (A3, B3, C3) + (A4, B4, C4)]
   R[1] += (B2+B3+B4)*S3;   A[1] += (SA[1]=((B0+2.*B3)+(B5+B6))*P3-A[1]);  // A  =     1/3*[(A0, B0, C0) + 2*(A3, B3, C3) + (A5, B5, C5) + (A6, B6, C6)]
   R[2] += (C2+C3+C4)*S3;   A[2] += (SA[2]=((C0+2.*C3)+(C5+C6))*P3-A[2]);  // SA = A_new - A_old
+  state7[6] = m_magCharge * (state7[6] > 0 ? 1 : -1) / P3 / (D1 + 2*D2 + D3 + D4); // p_n+1 = 1/3 (D1 + 2*D2 +D3 + D4)
 
   // normalize A
   double CBA ( 1./sqrt(A[0]*A[0]+A[1]*A[1]+A[2]*A[2]) ); // 1/|A|

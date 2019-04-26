@@ -3,6 +3,7 @@
 
 from basf2 import *
 import glob
+import os
 
 # --------------------------------------------------------------------------
 # Example of using TOPTriggerDigitizer to make time stamps for trigger input
@@ -17,15 +18,12 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [100]})
 main.add_module(eventinfosetter)
 
-# Gearbox (set larger time window and offset for TOP)
+# Gearbox
 gearbox = register_module('Gearbox')
-gearbox.param('override', [("/DetectorComponent[@name='TOP']//numWindows", '12', ''),
-                           ("/DetectorComponent[@name='TOP']//offset", '150', 'ns')])
 main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('useDB', False)
 main.add_module(geometry)
 
 # generate BBbar events
@@ -50,10 +48,7 @@ simulation = register_module('FullSim')
 main.add_module(simulation)
 
 # TOP digitization
-topdigi = register_module('TOPDigitizer')
-topdigi.param('useWaveforms', True)
-topdigi.param('allChannels', True)
-main.add_module(topdigi)
+main.add_module('TOPDigitizer', allChannels=True, readoutWindows=12, offsetWindows=4)
 
 # TOP trigger digitization (time stamps)
 trigdigi = register_module('TOPTriggerDigitizer')

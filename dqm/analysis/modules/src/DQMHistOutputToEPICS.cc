@@ -101,12 +101,23 @@ void DQMHistOutputToEPICSModule::event()
         std::vector <double> data(length, 0.0);
         // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
         // We fill up the array with ZEROs otherwise
-        for (int i = 0; i < length ; i++) {
-          if (i < hh1->GetNcells() - 2) { // minus under/overflow bin
-            data[i] = hh1->GetBinContent(i + 1);
+        if (hh1->GetDimension() == 1) {
+          int i = 0;
+          int nx = hh1->GetNbinsX() - 1;
+          for (int x = 1; x < nx && i < length ; x++) {
+            data[i++] = hh1->GetBinContent(x);
+          }
+
+        } else if (hh1->GetDimension() == 2) {
+          int i = 0;
+          int nx = hh1->GetNbinsX() - 1;
+          int ny = hh1->GetNbinsY() - 1;
+          for (int y = 1; y < ny && i < length; y++) {
+            for (int x = 1; x < nx && i < length ; x++) {
+              data[i++] = hh1->GetBinContent(x, y);
+            }
           }
         }
-
         SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)data.data()), "ca_set failure");
       }
     }
@@ -118,7 +129,6 @@ void DQMHistOutputToEPICSModule::event()
 void DQMHistOutputToEPICSModule::copyToLast(void)
 {
   if (!m_dirty) return;
-  /// TODO the following might be better suited in end_run, but its not clear if this is called before termination in current setup
 #ifdef _BELLE2_EPICS
   for (auto* n : pmynode) {
     if (n->mychid_last) {

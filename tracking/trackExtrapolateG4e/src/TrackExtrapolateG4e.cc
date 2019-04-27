@@ -126,7 +126,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_EndcapScintVariance(0.0), // initialized later
   m_ExpNo(0), // modified later
   m_bklmBadChannelsValid(false), // initialized later
-  m_eklmChannelsValid(false), // initialized later
+  m_klmChannelStatusValid(false), // initialized later
   m_eklmTransformData(NULL), // initialized later
   m_MuonPlusPar(NULL), // modified later
   m_MuonMinusPar(NULL), // modified later
@@ -155,6 +155,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
     m_BarrelSectorPerp[s] = G4ThreeVector(0.0, 0.0, 0.0);
     m_BarrelSectorPhi[s] = G4ThreeVector(0.0, 0.0, 0.0);
   }
+  m_klmElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 TrackExtrapolateG4e::~TrackExtrapolateG4e()
@@ -395,8 +396,8 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
                 << expNo << " run " << evtMetaData->getRun());
     }
     m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
-    m_eklmChannelsValid = m_eklmChannels.isValid();
-    if (!m_eklmChannelsValid) {
+    m_klmChannelStatusValid = m_klmChannelStatus.isValid();
+    if (!m_klmChannelStatusValid) {
       B2WARNING("EKLM channel database requested but not available for experiment "
                 << expNo << " run " << evtMetaData->getRun());
     }
@@ -1402,12 +1403,17 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         result = m_eklmTransformData->getStripsByIntersection(
                    intersection.position, &strip1, &strip2);
         if (result == 0) {
-          const EKLMChannelData* channel1, *channel2;
-          channel1 = m_eklmChannels->getChannelData(strip1);
-          channel2 = m_eklmChannels->getChannelData(strip2);
-          if (channel1 == NULL || channel2 == NULL)
-            B2ERROR("Incomplete EKLM channel data.");
-          isDead = (!channel1->getActive()) || (!channel2->getActive());
+          uint16_t channel1, channel2;
+          channel1 = m_klmElementNumbers->channelNumberEKLM(strip1);
+          channel2 = m_klmElementNumbers->channelNumberEKLM(strip2);
+          enum KLMChannelStatus::ChannelStatus status1, status2;
+          status1 = m_klmChannelStatus->getChannelStatus(channel1);
+          status2 = m_klmChannelStatus->getChannelStatus(channel2);
+          if (status1 == KLMChannelStatus::c_Unknown ||
+              status2 == KLMChannelStatus::c_Unknown)
+            B2ERROR("Incomplete KLM channel status data.");
+          isDead = (status1 == KLMChannelStatus::c_Dead ||
+                    status2 == KLMChannelStatus::c_Dead);
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit

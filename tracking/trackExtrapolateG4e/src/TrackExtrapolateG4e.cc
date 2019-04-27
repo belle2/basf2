@@ -1356,12 +1356,12 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
               const CLHEP::Hep3Vector localPosition = m->globalToLocal(intersection.position); // uses and returns position in cm
               int zStrip = static_cast<int>(std::round(m->getZStrip(localPosition))); // uses position in cm
               int phiStrip = static_cast<int>(std::round(m->getPhiStrip(localPosition))); // ditto
-              int channel1, channel2;
+              uint16_t channel1, channel2;
               channel1 = m_klmElementNumbers->channelNumberBKLM(
                            fb, sector, layer, 0, zStrip);
               channel2 = m_klmElementNumbers->channelNumberBKLM(
                            fb, sector, layer, 1, phiStrip);
-              int status1, status2;
+              enum KLMChannelStatus::ChannelStatus status1, status2;
               status1 = m_klmChannelStatus->getChannelStatus(channel1);
               status2 = m_klmChannelStatus->getChannelStatus(channel2);
               if (status1 == KLMChannelStatus::c_Unknown ||

@@ -12,7 +12,7 @@
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
-int16_t Belle2::BKLMElementNumbers::channelNumber(
+uint16_t Belle2::BKLMElementNumbers::channelNumber(
   int forward, int sector, int layer, int plane, int strip)
 {
   return (forward ? BKLM_END_MASK : 0)

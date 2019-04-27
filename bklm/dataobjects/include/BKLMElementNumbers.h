@@ -25,8 +25,8 @@ namespace Belle2 {
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    int16_t channelNumber(int forward, int sector, int layer, int plane,
-                          int strip);
+    uint16_t channelNumber(int forward, int sector, int layer, int plane,
+                           int strip);
 
   }
 

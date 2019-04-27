@@ -87,6 +87,7 @@ void DQMHistOutputToEPICSModule::initialize()
 void DQMHistOutputToEPICSModule::beginRun()
 {
   B2DEBUG(99, "DQMHistOutputToEPICS: beginRun called.");
+  m_dirty = true;
 }
 
 void DQMHistOutputToEPICSModule::event()
@@ -114,9 +115,9 @@ void DQMHistOutputToEPICSModule::event()
 #endif
 }
 
-void DQMHistOutputToEPICSModule::terminate()
+void DQMHistOutputToEPICSModule::copyToLast(void)
 {
-  B2DEBUG(99, "DQMHistOutputToEPICS: terminate called");
+  if (!m_dirty) return;
   /// TODO the following might be better suited in end_run, but its not clear if this is called before termination in current setup
 #ifdef _BELLE2_EPICS
   for (auto* n : pmynode) {
@@ -131,7 +132,23 @@ void DQMHistOutputToEPICSModule::terminate()
     }
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
+
+  m_dirty = false;
+}
+
+void DQMHistOutputToEPICSModule::endRun()
+{
+  B2DEBUG(99, "DQMHistOutputToEPICS: endRun called");
+  copyToLast();
+}
+
+void DQMHistOutputToEPICSModule::terminate()
+{
+  B2DEBUG(99, "DQMHistOutputToEPICS: terminate called");
+  copyToLast();
   // the following belongs to terminate
+#ifdef _BELLE2_EPICS
   for (auto* n : pmynode) {
     if (n->mychid) SEVCHK(ca_clear_channel(n->mychid), "ca_clear_channel failure");
     if (n->mychid_last) SEVCHK(ca_clear_channel(n->mychid_last), "ca_clear_channel failure");

@@ -30,6 +30,7 @@ namespace Belle2 {
       chid    mychid;
       chid    mychid_last;
       std::string  histoname;
+      std::vector <double> data;
     } MYNODE;
 #endif
 

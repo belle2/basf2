@@ -75,15 +75,15 @@ void DQMHistOutputToEPICSModule::initialize()
 void DQMHistOutputToEPICSModule::cleanPVs(void)
 {
 #ifdef _BELLE2_EPICS
-  for (auto* n : pmynode) {
-    if (!n->mychid) continue;
-    int length = int(ca_element_count(n->mychid));
+  for (auto* it : pmynode) {
+    if (!it->mychid) continue;
+    int length = int(ca_element_count(it->mychid));
     if (length > 0) {
-      std::vector <double> data(length, 0.0);
-      SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_put failure");
-      if (n->mychid_last) {
-        if (length == int(ca_element_count(n->mychid_last))) {
-          SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_put failure");
+      it->data.resize(length, 0.0);
+      SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)(it->data.data())), "ca_put failure");
+      if (it->mychid_last) {
+        if (length == int(ca_element_count(it->mychid_last))) {
+          SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid_last, (void*)(it->data.data())), "ca_put failure");
         }
       }
     }
@@ -103,32 +103,30 @@ void DQMHistOutputToEPICSModule::event()
 #ifdef _BELLE2_EPICS
   for (auto& it : pmynode) {
     if (!it->mychid) continue;
+    int length = it->data.size();
     TH1* hh1 = findHist(it->histoname);
-    if (hh1) {
-      int length = int(ca_element_count(it->mychid));
-      if (length > 0 && hh1->GetNcells() > 2) {
-        std::vector <double> data(length, 0.0);
-        // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
-        // We fill up the array with ZEROs otherwise
-        if (hh1->GetDimension() == 1) {
-          int i = 0;
-          int nx = hh1->GetNbinsX() - 1;
-          for (int x = 1; x < nx && i < length ; x++) {
-            data[i++] = hh1->GetBinContent(x);
-          }
+    if (hh1 && hh1->GetNcells() > 2 && length > 0  && length == int(ca_element_count(it->mychid))) {
+      // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
+      // We fill up the array with ZEROs otherwise
+      if (hh1->GetDimension() == 1) {
+        int i = 0;
+        int nx = hh1->GetNbinsX() - 1;
+        for (int x = 1; x < nx && i < length ; x++) {
+          it->data[i++] = hh1->GetBinContent(x);
+        }
 
-        } else if (hh1->GetDimension() == 2) {
-          int i = 0;
-          int nx = hh1->GetNbinsX() - 1;
-          int ny = hh1->GetNbinsY() - 1;
-          for (int y = 1; y < ny && i < length; y++) {
-            for (int x = 1; x < nx && i < length ; x++) {
-              data[i++] = hh1->GetBinContent(x, y);
-            }
+      } else if (hh1->GetDimension() == 2) {
+        int i = 0;
+        int nx = hh1->GetNbinsX() - 1;
+        int ny = hh1->GetNbinsY() - 1;
+        for (int y = 1; y < ny && i < length; y++) {
+          for (int x = 1; x < nx && i < length ; x++) {
+            it->data[i++] = hh1->GetBinContent(x, y);
           }
         }
-        SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)data.data()), "ca_set failure");
       }
+
+      SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)it->data.data()), "ca_set failure");
     }
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
@@ -139,14 +137,12 @@ void DQMHistOutputToEPICSModule::copyToLast(void)
 {
   if (!m_dirty) return;
 #ifdef _BELLE2_EPICS
-  for (auto* n : pmynode) {
-    if (n->mychid && n->mychid_last) {
+  for (auto* it : pmynode) {
+    if (it->mychid && it->mychid_last) {
       // copy PVs to last-run-PV if existing
-      int length = int(ca_element_count(n->mychid));
-      if (length > 0 && length == int(ca_element_count(n->mychid_last))) {
-        std::vector <double> data(length, 0.0);
-        SEVCHK(ca_array_get(DBR_DOUBLE, length, n->mychid, (void*)data.data()), "ca_get failure");
-        SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)data.data()), "ca_put failure");
+      int length = it->data.size();
+      if (length > 0 && length == int(ca_element_count(it->mychid_last))) {
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid_last, (void*)it->data.data()), "ca_put failure");
       }
     }
   }
@@ -168,9 +164,9 @@ void DQMHistOutputToEPICSModule::terminate()
   copyToLast();
   // the following belongs to terminate
 #ifdef _BELLE2_EPICS
-  for (auto* n : pmynode) {
-    if (n->mychid) SEVCHK(ca_clear_channel(n->mychid), "ca_clear_channel failure");
-    if (n->mychid_last) SEVCHK(ca_clear_channel(n->mychid_last), "ca_clear_channel failure");
+  for (auto* it : pmynode) {
+    if (it->mychid) SEVCHK(ca_clear_channel(it->mychid), "ca_clear_channel failure");
+    if (it->mychid_last) SEVCHK(ca_clear_channel(it->mychid_last), "ca_clear_channel failure");
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif

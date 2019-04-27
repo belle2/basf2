@@ -145,8 +145,8 @@ void DQMHistOutputToEPICSModule::copyToLast(void)
       int length = int(ca_element_count(n->mychid));
       if (length > 0 && length == int(ca_element_count(n->mychid_last))) {
         std::vector <double> data(length, 0.0);
-        SEVCHK(ca_array_get(DBR_DOUBLE, length, n->mychid, (void*)(data.data())), "ca_get failure");
-        SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)(data.data())), "ca_put failure");
+        SEVCHK(ca_array_get(DBR_DOUBLE, length, n->mychid, (void*)data.data()), "ca_get failure");
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, n->mychid_last, (void*)data.data()), "ca_put failure");
       }
     }
   }

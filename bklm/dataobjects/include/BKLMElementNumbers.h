@@ -37,6 +37,17 @@ namespace Belle2 {
      */
     int getNStrips(int forward, int sector, int layer, int plane);
 
+    /**
+     * Check channel number.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     * @param[in] plane   Plane (0-based).
+     * @param[in] strip   Strip (1-based).
+     */
+    bool checkChannelNumber(int forward, int sector, int layer, int plane,
+                            int strip);
+
   }
 
 }

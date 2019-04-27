@@ -12,7 +12,9 @@
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
-uint16_t Belle2::BKLMElementNumbers::channelNumber(
+using namespace Belle2;
+
+uint16_t BKLMElementNumbers::channelNumber(
   int forward, int sector, int layer, int plane, int strip)
 {
   return (forward ? BKLM_END_MASK : 0)
@@ -22,7 +24,7 @@ uint16_t Belle2::BKLMElementNumbers::channelNumber(
          | ((strip - 1) << BKLM_STRIP_BIT);
 }
 
-int Belle2::BKLMElementNumbers::getNStrips(
+int BKLMElementNumbers::getNStrips(
   int forward, int sector, int layer, int plane)
 {
   int strips = 0;
@@ -50,4 +52,11 @@ int Belle2::BKLMElementNumbers::getNStrips(
       strips = 48;
   }
   return strips;
+}
+
+bool BKLMElementNumbers::checkChannelNumber(
+  int forward, int sector, int layer, int plane, int strip)
+{
+  return (strip >= 1) && (strip <= BKLMElementNumbers::getNStrips(
+                            forward, sector, layer, plane));
 }

@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
-#include <bklm/dbobjects/BKLMBadChannels.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <eklm/geometry/TransformDataGlobalAligned.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -476,12 +475,6 @@ namespace Belle2 {
 
     //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
     bool m_addHitsToRecoTrack = false;
-
-    //! Conditions-database object for BKLM dead-channel list (updated at start of each run)
-    DBObjPtr<BKLMBadChannels> m_bklmBadChannels;
-
-    //! Flag to indicate that the BKLM dead-channel list is valid for the given run
-    bool m_bklmBadChannelsValid;
 
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;

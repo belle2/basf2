@@ -12,7 +12,6 @@
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <bklm/dbobjects/BKLMSimulationPar.h>
-#include <bklm/dbobjects/BKLMBadChannels.h>
 #include <bklm/dbobjects/BKLMMisAlignment.h>
 #include <bklm/dbobjects/BKLMDisplacement.h>
 #include <bklm/dbobjects/BKLMTimeWindow.h>
@@ -194,43 +193,6 @@ void BKLMDatabaseImporter::exportBklmSimulationPar()
       B2INFO(ii << ", " << jj << ", :" << element->getPhiWeight(ii, jj) << endl);
     }
   }
-
-}
-
-void BKLMDatabaseImporter::importBklmBadChannels(int expNoStart, int runStart, int expNoStop, int runStop, std::string fileName)
-{
-  std::ifstream stream;
-  stream.open(fileName.c_str());
-  if (!stream) {
-    B2FATAL("openFile: " << fileName << " *** failed to open");
-    return;
-  }
-  B2INFO(fileName << ": open for reading");
-
-  BKLMBadChannels bklmBadChannels;
-
-  int isForward(0), sector(0), layer(0), plane(0), strip(0);
-
-  while (true) {
-    stream >> isForward >> sector >> layer >> plane >> strip;
-    if (stream.eof()) break;
-    B2INFO("Read in line" << isForward << ", " << sector << ", " << layer  << ", " << plane  << ", " << strip << ".");
-    bklmBadChannels.appendDeadChannel(isForward, sector, layer, plane, strip);
-  }
-  stream.close();
-  // define IOV and store data to the DB
-  IntervalOfValidity iov(expNoStart, runStart, expNoStop, runStop);
-  Database::Instance().storeData("BKLMBadChannels", &bklmBadChannels, iov);
-}
-
-void BKLMDatabaseImporter::exportBklmBadChannels()
-{
-  DBObjPtr<BKLMBadChannels> element("BKLMBadChannels");
-
-  element->printDeadChannels();
-
-  B2INFO("is (1,1,1,0,20) dead ? " << element->isDeadChannel(1, 1, 1, 0, 20) << "; is (1,1,1,0,21) hot ? " << element->isHotChannel(1,
-         1, 1, 0, 21));
 
 }
 

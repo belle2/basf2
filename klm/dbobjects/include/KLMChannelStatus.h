@@ -69,6 +69,12 @@ namespace Belle2 {
     void setChannelStatus(uint16_t channel, enum ChannelStatus status);
 
     /**
+     * Set staus for all channels.
+     * @param[in] status Status.
+     */
+    void setStatusAllChannels(enum ChannelStatus status);
+
+    /**
      * Get number of active strips in the specified EKLM sector.
      * @param[in] sectorGlobal Sector global number.
      */

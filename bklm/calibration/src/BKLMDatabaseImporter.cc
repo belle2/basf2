@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <bklm/calibration/BKLMDatabaseImporter.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <bklm/dbobjects/BKLMSimulationPar.h>
@@ -71,26 +72,14 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
             else if (plane == 1) axisId = 0;
           } else axisId = plane;
 
-          int MaxiChannel = 0;
-          if (isForward == 0 && sector == 3 && plane == 0) {
-            if (layer < 3) MaxiChannel = 38;
-            if (layer > 2) MaxiChannel = 34;
-          } else {
-            if (layer == 1 && plane == 1) MaxiChannel = 37;
-            if (layer == 2 && plane == 1) MaxiChannel = 42;
-            if (layer > 2 && layer < 7 && plane == 1) MaxiChannel = 36;
-            if (layer > 6 && plane == 1) MaxiChannel = 48;
-
-            if (layer == 1 && plane == 0) MaxiChannel = 54;
-            if (layer == 2 && plane == 0) MaxiChannel = 54;
-            if (layer > 2 && plane == 0) MaxiChannel = 48;
-          }
+          int MaxiChannel = BKLMElementNumbers::getNStrips(
+                              isForward, sector, layer, plane);
 
           bool dontFlip = false;
           if (isForward == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
           if (isForward == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
 
-          for (int iStrip = 1; iStrip < (MaxiChannel + 1);  iStrip++) {
+          for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
             int channelId = iStrip;
             if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
 

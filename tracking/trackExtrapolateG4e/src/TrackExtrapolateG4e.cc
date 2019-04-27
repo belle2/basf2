@@ -91,7 +91,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_MinPt(0.0), // initialized later
   m_MinKE(0.0), // initialized later
   m_TracksColName(NULL), // initialized later
-  m_RecoTracksColName(NULL), // initialized later
   m_ExtHitsColName(NULL), // initialized later
   m_MuidsColName(NULL), // initialized later
   m_MuidHitsColName(NULL), // initialized later
@@ -111,7 +110,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_TargetMuid(NULL), // initialized later
   m_MinRadiusSq(0.0), // initialized later
   m_OffsetZ(0.0), // initialized later
-  m_BarrelNSector(0), // initialized later
   m_BarrelMaxR(0.0), // initialized later
   m_BarrelMinR(0.0), // initialized later
   m_BarrelHalfLength(0.0), // initialized later
@@ -125,8 +123,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
   m_ExpNo(0), // modified later
-  m_bklmBadChannelsValid(false), // initialized later
-  m_eklmChannelsValid(false), // initialized later
   m_eklmTransformData(NULL), // initialized later
   m_MuonPlusPar(NULL), // modified later
   m_MuonMinusPar(NULL), // modified later
@@ -512,6 +508,7 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
                                       const G4ErrorSymMatrix& covariance, // (6x6) using cm, GeV/c (genfit2 units)
                                       const std::string&) // DIVOT: NO LONGER USED - REMOVE THIS ARGUMENT
 {
+
   bool isCosmic = false; // DIVOT
   if ((!m_ExtInitialized) && (!m_MuidInitialized)) {
     // No EXT nor MUID module in analysis path ==> mimic ext::initialize() with reasonable defaults.
@@ -545,7 +542,6 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
 
   G4ThreeVector positionG4e = position * CLHEP::cm; // convert from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // convert from genfit2 units (GeV/c) to geant4 units (MeV/c)
-  // cppcheck-suppress knownConditionTrueFalse
   if (isCosmic) momentumG4e = -momentumG4e;
   G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
@@ -1126,7 +1122,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
     g4eState.SetParameters(posG4e, momG4e); // compute private-state parameters from momG4e
     g4eState.SetError(covG4e);
-  } catch (const genfit::Exception&) {
+  } catch (genfit::Exception) {
     B2WARNING("genfit::MeasuredStateOnPlane() exception: skipping extrapolation for this track. initial momentum = ("
               << firstMomentum.X() << "," << firstMomentum.Y() << "," << firstMomentum.Z() << ")");
     extState.pdgCode = 0; // prevent start of extrapolation in swim()
@@ -1860,14 +1856,14 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool
     if ((abs(muid->getPDGCode()) == Const::muon.getPDGCode()) ||
         (abs(muid->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
     if (charge > 0) {
-      muon = m_MuonPlusPar->getPDF(muid, isForward);
+      muon = m_MuonPlusPar->getPDF_muon(muid, isForward);
       pion = m_PionPlusPar->getPDF(muid, isForward);
       kaon = m_KaonPlusPar->getPDF(muid, isForward);
       proton = m_ProtonPar->getPDF(muid, isForward);
       deuteron = m_DeuteronPar->getPDF(muid, isForward);
       electron = m_PositronPar->getPDF(muid, isForward);
     } else {
-      muon = m_MuonMinusPar->getPDF(muid, isForward);
+      muon = m_MuonMinusPar->getPDF_muon(muid, isForward);
       pion = m_PionMinusPar->getPDF(muid, isForward);
       kaon = m_KaonMinusPar->getPDF(muid, isForward);
       proton = m_AntiprotonPar->getPDF(muid, isForward);

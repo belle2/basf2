@@ -86,6 +86,9 @@ namespace Belle2 {
     //! Destructor
     ~MuidPar();
 
+    //! Get the PDF for a muon
+    double getPDF_muon(const Muid*, bool isForward) const;
+
     //! Get the PDF for a particular hypothesis
     double getPDF(const Muid*, bool isForward) const;
 
@@ -108,6 +111,9 @@ namespace Belle2 {
 
     //! Get the per-layer PDF for a particular hypothesis
     double getPDFLayer(const Muid*, bool) const;
+
+    //! Get the per-layer PDF for a muon
+    double getPDFLayer_muon(const Muid*, bool) const;
 
     //! Get the transverse-coordinate PDF for a particular hypothesis
     double getPDFRchisq(const Muid*) const;

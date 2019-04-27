@@ -23,6 +23,12 @@ KLMElementNumbers::~KLMElementNumbers()
 {
 }
 
+const KLMElementNumbers& KLMElementNumbers::Instance()
+{
+  static KLMElementNumbers klmElementNumbers;
+  return klmElementNumbers;
+}
+
 uint16_t KLMElementNumbers::channelNumberBKLM(
   int forward, int sector, int layer, int plane, int strip) const
 {

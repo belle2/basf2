@@ -23,14 +23,9 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor.
+     * Instantiation.
      */
-    KLMElementNumbers();
-
-    /**
-     * Destructor.
-     */
-    ~KLMElementNumbers();
+    static const KLMElementNumbers& Instance();
 
     /**
      * Get channel number for BKLM.
@@ -55,6 +50,16 @@ namespace Belle2 {
                                int strip) const;
 
   private:
+
+    /**
+     * Constructor.
+     */
+    KLMElementNumbers();
+
+    /**
+     * Destructor.
+     */
+    ~KLMElementNumbers();
 
     /** EKLM element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;

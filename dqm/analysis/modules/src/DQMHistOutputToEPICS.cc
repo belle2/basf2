@@ -68,7 +68,15 @@ void DQMHistOutputToEPICSModule::initialize()
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
+  B2DEBUG(99, "DQMHistOutputToEPICS: initialized.");
+}
+
+void DQMHistOutputToEPICSModule::cleanPVs(void)
+{
+#ifdef _BELLE2_EPICS
   for (auto* n : pmynode) {
+    if (!n->mychid) continue;
     int length = int(ca_element_count(n->mychid));
     if (length > 0) {
       std::vector <double> data(length, 0.0);
@@ -81,12 +89,12 @@ void DQMHistOutputToEPICSModule::initialize()
     }
   }
 #endif
-  B2DEBUG(99, "DQMHistOutputToEPICS: initialized.");
 }
 
 void DQMHistOutputToEPICSModule::beginRun()
 {
   B2DEBUG(99, "DQMHistOutputToEPICS: beginRun called.");
+  cleanPVs();
   m_dirty = true;
 }
 
@@ -94,6 +102,7 @@ void DQMHistOutputToEPICSModule::event()
 {
 #ifdef _BELLE2_EPICS
   for (auto& it : pmynode) {
+    if (!it->mychid) continue;
     TH1* hh1 = findHist(it->histoname);
     if (hh1) {
       int length = int(ca_element_count(it->mychid));
@@ -131,7 +140,7 @@ void DQMHistOutputToEPICSModule::copyToLast(void)
   if (!m_dirty) return;
 #ifdef _BELLE2_EPICS
   for (auto* n : pmynode) {
-    if (n->mychid_last) {
+    if (n->mychid && n->mychid_last) {
       // copy PVs to last-run-PV if existing
       int length = int(ca_element_count(n->mychid));
       if (length > 0 && length == int(ca_element_count(n->mychid_last))) {

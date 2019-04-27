@@ -10,6 +10,7 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <svd/dataobjects/SVDHistograms.h>
+#include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <string>
 #include <TTree.h>
@@ -98,11 +99,14 @@ namespace Belle2 {
 
     TList* m_histoList_occu;/**< occupancy for low charge clusters */
 
-    SVDHistograms<TH1F>* hm_occupancy = NULL;
-    SVDHistograms<TH1F>* hm_occupancy_after = NULL;
-    SVDHistograms<TH1F>* hm_dist = NULL;
-    SVDHistograms<TH1F>* hm_dist1 = NULL;
-    SVDHistograms<TH2F>* hm_dist12 = NULL;
+    SVDHistograms<TH1F>* hm_occupancy = nullptr; /**< strip occupancy per sensor*/
+    SVDHistograms<TH1F>* hm_hot_strips = nullptr; /**< hot strips per sensor*/
+    SVDHistograms<TH1F>* hm_occupancy_after = nullptr; /**< strip occupancy after removal of hot strips, per sensor*/
+    SVDHistograms<TH1F>* hm_dist = nullptr;
+    SVDHistograms<TH1F>* hm_dist1 = nullptr;
+    SVDHistograms<TH2F>* hm_dist12 = nullptr;
+
+    SVDSummaryPlots* m_hHotStripsSummary = nullptr; /**< hot strip summary  histo */
 
     TH1F*  h_tot_dqm;
     TH1F*  h_tot_dqm1;
@@ -115,12 +119,12 @@ namespace Belle2 {
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = NULL);  /**< thf */
+                            const char* xtitle, TList* histoList = nullptr);  /**< thf */
 
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            TList* histoList = NULL);  /**< thf */
+                            TList* histoList = nullptr);  /**< thf */
 
 
   protected:

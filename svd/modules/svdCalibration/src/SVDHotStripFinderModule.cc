@@ -55,6 +55,14 @@ void SVDHotStripFinderModule::beginRun()
   hOccupancy512.GetXaxis()->SetTitle("cellID");
   hm_occupancy = new SVDHistograms<TH1F>(hOccupancy768, hOccupancy768, hOccupancy768, hOccupancy512);
 
+  TH1F hHotStrips768("HotStrips768_L@layerL@ladderS@sensor@view", "DSSD HotStrips of @layer.@ladder.@sensor @view/@side side", 768, 0,
+                     768);
+  hHotStrips768.GetXaxis()->SetTitle("cellID");
+  TH1F hHotStrips512("HotStrips512_L@layerL@ladderS@sensor@view", "DSSD HotStrips of @layer.@ladder.@sensor @view/@side side", 512, 0,
+                     512);
+  hHotStrips512.GetXaxis()->SetTitle("cellID");
+  hm_hot_strips = new SVDHistograms<TH1F>(hHotStrips768, hHotStrips768, hHotStrips768, hHotStrips512);
+
   TH1F hOccupancy_after768("OccupancyAfter768_L@layerL@ladderS@sensor@view",
                            "DSSD Occupancy after HSF of @layer.@ladder.@sensor @view/@side side", 768, 0, 768);
   hOccupancy_after768.GetXaxis()->SetTitle("cellID");
@@ -79,6 +87,9 @@ void SVDHotStripFinderModule::beginRun()
   hDist12.GetYaxis()->SetTitle("occupancy");
   hm_dist12 = new SVDHistograms<TH2F>(hDist12);
 
+  //summary plot of the hot strips per sensor
+  m_hHotStripsSummary = new SVDSummaryPlots("hotStripsSummary@view", "Number of HotStrips on @view/@side Side");
+
 
   // DQM style historgram  number of hs vs sensor plane
   h_tot_dqm =  createHistogram1D("htodqm", "HS per sensor", 28, 0, 28.0, "HS per sensor", m_histoList_occu);
@@ -88,7 +99,7 @@ void SVDHotStripFinderModule::beginRun()
   h_tot_dist1 = createHistogram1D("htotdist1", "True occupancy distribution", 1000, 0, 0.05, "occupancy", m_histoList_occu);
   h_tot_dist12 = createHistogram2D("htotdist2d", "True vs sensor occupancy distribution", 1000, 0, 0.05, "sensor occupancy", 1000, 0,
                                    0.05, "occupancy", m_histoList_occu);
-  h_nevents = createHistogram1D("hnevets", "Number of events", 1000, 0, 0.05, "something", m_histoList_occu);
+  h_nevents = createHistogram1D("hnevents", "Number of events", 1, 0, 1, "", m_histoList_occu);
 
 }
 
@@ -261,14 +272,18 @@ void SVDHotStripFinderModule::terminate()
           /* for Laura .. HS flags, place interface for DB */
           for (int l = 0; l < 768; l++) {
             B2DEBUG(1, hsflag[l]);
-            if (flag[l])
+            if (flag[l] == 1) {
               hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l, hm_occupancy->getHistogram(*itSvdSensors,
                   k)->GetBinContent(l));
+            } else
+              hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l, 1);
           }
 
           if (m_rootFilePtr != NULL) {
             hm_occupancy->getHistogram(*itSvdSensors, k)->Write();
+            hm_hot_strips->getHistogram(*itSvdSensors, k)->Write();
             hm_occupancy_after->getHistogram(*itSvdSensors, k)->Write();
+            hm_dist12->getHistogram(*itSvdSensors, k)->Write();
           }
 
           B2DEBUG(1, " side " << i << " " << j << " " << m << " " << k);
@@ -280,6 +295,7 @@ void SVDHotStripFinderModule::terminate()
             h_tot_dqm1->Fill(float(itsensor));
           }
 
+          m_hHotStripsSummary->fill(*itSvdSensors, k, hm_hot_strips->getHistogram(*itSvdSensors, k)->GetEntries());
 
           itsensor++;
         }

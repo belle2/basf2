@@ -110,15 +110,15 @@ void DQMHistOutputToEPICSModule::event()
       // We fill up the array with ZEROs otherwise
       if (hh1->GetDimension() == 1) {
         int i = 0;
-        int nx = hh1->GetNbinsX() - 1;
+        int nx = hh1->GetNbinsX() + 1;
         for (int x = 1; x < nx && i < length ; x++) {
           it->data[i++] = hh1->GetBinContent(x);
         }
 
       } else if (hh1->GetDimension() == 2) {
         int i = 0;
-        int nx = hh1->GetNbinsX() - 1;
-        int ny = hh1->GetNbinsY() - 1;
+        int nx = hh1->GetNbinsX() + 1;
+        int ny = hh1->GetNbinsY() + 1;
         for (int y = 1; y < ny && i < length; y++) {
           for (int x = 1; x < nx && i < length ; x++) {
             it->data[i++] = hh1->GetBinContent(x, y);

@@ -1,8 +1,15 @@
-#ifndef SVDFHSMODULE_H
-#define SVDFHSMODULE_H
+#ifndef SVDHOTSTRIPFINDERMODULE_H
+#define SVDHOTSTRIPFINDERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <vxd/dataobjects/VxdID.h>
+
+#include <svd/dataobjects/SVDHistograms.h>
 
 #include <string>
 #include <TTree.h>
@@ -23,13 +30,13 @@ namespace Belle2 {
    *
    *  A detailed description of your module.
    */
-  class SVDfhsModule : public Module {
+  class SVDHotStripFinderModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */
-    SVDfhsModule();
+    SVDHotStripFinderModule();
 
     /** Use to clean up anything you created in the constructor. */
-    virtual ~SVDfhsModule();
+    virtual ~SVDHotStripFinderModule();
 
     /** Use this to initialize resources or memory your module needs.
      *
@@ -61,13 +68,10 @@ namespace Belle2 {
 
 
     /* user-defined parameters */
+    StoreArray<SVDShaperDigit> m_storeDigits; /**< shaper digits store array*/
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data store array*/
     std::string m_rootFileName;   /**< root file name */
-    std::string m_ShaperDigitName; /**< */
-    std::string m_RecoDigitName; /**< */
-    std::string m_ClusterName; /**< */
-    std::string m_TrackFitResultName; /**< */
-    std::string m_TrackName; /**< */
-    bool m_is2017TBanalysis; /**< true if we analyze 2017 TB data*/
+    std::string m_ShaperDigitName; /**< shaper digits name*/
     float m_thr; /**< Threshold cut for Hot strip finder*/
     int m_base;
 
@@ -94,41 +98,18 @@ namespace Belle2 {
 
     TList* m_histoList_occu;/**< occupancy for low charge clusters */
 
+    SVDHistograms<TH1F>* hm_occupancy = NULL;
+    SVDHistograms<TH1F>* hm_occupancy_after = NULL;
+    SVDHistograms<TH1F>* hm_dist = NULL;
+    SVDHistograms<TH1F>* hm_dist1 = NULL;
+    SVDHistograms<TH2F>* hm_dist12 = NULL;
 
-    //Hot strips search
-    TH1F*  h_occupancy[m_nLayers][m_nLadders][m_nSensors][m_nSides]; /** hot strips search**/
-    TH1F*  h_occupancy_after[m_nLayers][m_nLadders][m_nSensors][m_nSides]; /** hot strips search**/
-    TH1F*  h_dist[m_nLayers][m_nLadders][m_nSensors][m_nSides]; /** hot strips search**/
     TH1F*  h_tot_dqm;
     TH1F*  h_tot_dqm1;
     TH1F*  h_tot_dist;
-    TH1F*  h_dist1[m_nLayers][m_nLadders][m_nSensors][m_nSides]; /** hot strips search**/
     TH1F*  h_tot_dist1;
-    TH2F*  h_dist12[m_nLayers][m_nLadders][m_nSensors][m_nSides]; /** hot strips search**/
     TH2F*  h_tot_dist12;
     TH1F*  h_nevents;
-
-
-
-
-
-    int getSensor(int layer, int sensor, bool isTB)
-    {
-      int result = 0;
-      if (isTB) {
-        if (layer == 0)
-          result = sensor - 1;
-        else if (layer == 1 || layer == 2)
-          result = sensor - 2;
-        else if (layer == 3)
-          result = sensor - 3;
-      } else result = sensor - 1;
-      // test
-      result = sensor - 1;
-      //
-
-      return result;
-    }
 
 
     //list of functions to create histograms:
@@ -140,40 +121,6 @@ namespace Belle2 {
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             TList* histoList = NULL);  /**< thf */
-
-    TH3F* createHistogram3D(const char* name, const char* title,
-                            Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
-                            Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            Int_t nbinsZ, Double_t minZ, Double_t maxZ, const char* titleZ,
-                            TList* histoList = NULL);  /**< thf */
-
-
-    TH3F* createHistogram3D(const char* name, const char* title,
-                            Int_t nbinsX, Double_t* binsX, const char* titleX,
-                            Int_t nbinsY, Double_t* binsY, const char* titleY,
-                            Int_t nbinsZ, Double_t* binsZ, const char* titleZ,
-                            TList* histoList = NULL);  /**< thf */
-
-    TH1* duplicateHistogram(const char* newname, const char* newtitle,
-                            TH1* h, TList* histoList = NULL);  /**< thf */
-
-
-    TH1F* createHistogramsRatio(const char* name, const char* title,
-                                TH1* hNum, TH1* hDen, bool isEffPlot,
-                                int axisRef);  /**< thf */
-
-
-
-    void addEfficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);  /**< \
-                                  efficiency */
-    void addInefficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL,
-                              TH3F* h3_MCParticle = NULL);  /**< inefficiency */
-    void addPurityPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);  /**< puri\
-                              ty */
-
-
-
-
 
 
   protected:

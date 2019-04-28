@@ -392,7 +392,7 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
     m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
     m_klmChannelStatusValid = m_klmChannelStatus.isValid();
     if (!m_klmChannelStatusValid) {
-      B2WARNING("EKLM channel database requested but not available for experiment "
+      B2WARNING("KLM channel database requested but not available for experiment "
                 << expNo << " run " << evtMetaData->getRun());
     }
 

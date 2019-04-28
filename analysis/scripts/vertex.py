@@ -47,7 +47,7 @@ def fitVertex(
         fitter,
         fit_type,
         constraint,
-        daugthersUpdate,
+        daughtersUpdate,
         path,
     )
 

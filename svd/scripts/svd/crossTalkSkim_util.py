@@ -8,6 +8,8 @@
 ######
 # util to skim out cross talk event in the origami sensors
 #
+# requires svdCrossTalkFinderModule in the main path
+#
 # in order to use this function:
 # import it:
 #     from svd.crossTalkSkim_utils import skimCrossTalkEventsModule

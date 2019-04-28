@@ -29,13 +29,13 @@ SVDCrossTalkFinderModule::SVDCrossTalkFinderModule() : Module()
            "Path containing occupancy root file", std::string("/data/svd/occupancyMap.root"));
 
   addParam("uSideOccupancyFactor", m_uSideOccupancyFactor,
-           "Average occupancy multiple for high occupancy strip classification", 2);
+           "Multiple of the average occupancy for high occupancy strip classification", 2);
 
   addParam("vSideOccupancyFactor", m_vSideOccupancyFactor,
-           "Average occupancy multiple for high occupancy strip classification", 2);
+           "Multiple of the average occupancy for high occupancy strip classification", 2);
 
   addParam("nAPVFactor", m_nAPVFactor,
-           "Number of APV chips with high occupancy strips lit up in event required for cross talk condition", 30);
+           "Number of APV chips with at least one high occupancy strips in event required for cross talk flag", 30);
 
 }
 
@@ -79,7 +79,7 @@ void SVDCrossTalkFinderModule::event()
 
   for (auto& svdRecoDigit : m_svdRecoDigits) {
     std::string sensorName = svdRecoDigit.getSensorID();
-    //Remove L3 and +fw sensors from consideration
+    //Remove L3 and +fw sensors, not affected by cross-talk
     if (svdRecoDigit.getSensorID().getLayerNumber() == 3 or svdRecoDigit.getSensorID().getSensorNumber() == 1) {
       continue;
     }
@@ -121,7 +121,6 @@ void SVDCrossTalkFinderModule::event()
       }
       strips_vSide.push_back(stripID);
       if (!highOccChips_vSide.empty() && completeName == highOccChips_vSide.back() && adjacentStrip == 1) {
-//not used        clusterChips_vSide.push_back(completeName);
         if (clusterStrips_vSide.empty() || clusterStrips_vSide.back() != stripNum) {
           clusterStrips_vSide.push_back(highOccChipsStripNum_vSide.back());
         }
@@ -143,26 +142,14 @@ void SVDCrossTalkFinderModule::event()
     for (auto& svdRecoDigit : m_svdRecoDigits) {
       std::string sensorID = svdRecoDigit.getSensorID();
       std::string digitID = sensorID + "." + std::to_string(svdRecoDigit.isUStrip());
-//                cout<<digitID<<endl;
-//                if( std::find(highOccChips.begin(), highOccChips.end(), digitID)!= highOccChips.end() ){
-//                        std::string stripID = sensorID + "." + std::to_string(svdRecoDigit.getCellID());
       std::string stripID = digitID + "." + std::to_string(svdRecoDigit.getCellID());
       if (std::find(clusterStrips_uSide.begin(), clusterStrips_uSide.end(), stripID) != clusterStrips_uSide.end()) {
-//                        cout<<"flagged:"<<svdRecoDigit.getSensorID()<<endl;
         svdRecoDigit.setCrossTalkEventFlag(true);
-//                        cout<<"is digit flagged?"<<svdRecoDigit.isCrossTalkEvent()<<endl;
-//      }
       }
 
-///                if( std::find(highOccClusterChips_vSide.begin(), highOccClusterChips_vSide.end(), digitID)!= highOccClusterChips_vSide.end() ){
-///                        std::string stripID = sensorID + "." + std::to_string(svdRecoDigit.getCellID());
       if (std::find(clusterStrips_vSide.begin(), clusterStrips_vSide.end(), stripID) != clusterStrips_vSide.end()) {
-//                        cout<<"flagged:"<<svdRecoDigit.getSensorID()<<endl;
         svdRecoDigit.setCrossTalkEventFlag(true);
-//                        cout<<"is digit flagged?"<<svdRecoDigit.isCrossTalkEvent()<<endl;
       }
-///   }
-
 
     }//reco digit loop
   }
@@ -182,7 +169,7 @@ void SVDCrossTalkFinderModule::calculateAverage(TH1F* occupancyHist, double& mea
   double nBins = occupancyHist->GetXaxis()->GetNbins();
   double count = 0;
   for (int i = 0; i < nBins; i++) {
-    count = count + occupancyHist->GetBinContent(i);
+    count += occupancyHist->GetBinContent(i);
   }
-  mean = count / nBins;
+  mean /= nBins;
 }

@@ -14,7 +14,8 @@
 
 using namespace Belle2;
 
-int16_t BKLMElementNumbers::channelNumber(int forward, int sector, int layer, int plane, int strip)
+uint16_t BKLMElementNumbers::channelNumber(
+  int forward, int sector, int layer, int plane, int strip)
 {
   return (forward ? BKLM_END_MASK : 0)
          | ((sector - 1) << BKLM_SECTOR_BIT)
@@ -23,7 +24,8 @@ int16_t BKLMElementNumbers::channelNumber(int forward, int sector, int layer, in
          | ((strip - 1) << BKLM_STRIP_BIT);
 }
 
-bool BKLMElementNumbers::checkChannelNumber(int forward, int sector, int layer, int plane, int strip)
+bool BKLMElementNumbers::checkChannelNumber(
+  int forward, int sector, int layer, int plane, int strip)
 {
   bool flag = false;
   if (forward >= 0 and forward <= 1) {

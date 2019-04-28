@@ -142,6 +142,8 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
   evtinfo->m_clk_ECL.clear();
   evtinfo->m_theta_ECL.clear();
   evtinfo->m_phi_ECL.clear();
+  evtinfo->m_1GeV_ECL.clear();
+  evtinfo->m_2GeV_ECL.clear();
 
   for (int i = 0; i < rawstore->m_N_cluster; i++) {
     int index = index_ECL[i];
@@ -151,6 +153,9 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
     evtinfo->m_t_ECL.push_back(rawstore->m_t_ECL[index]);
     evtinfo->m_theta_ECL.push_back(rawstore->m_theta_ECL[index]);
     evtinfo->m_phi_ECL.push_back(rawstore->m_phi_ECL[index]);
+    evtinfo->m_E_ECL.push_back(rawstore->m_E_ECL[index]);
+    evtinfo->m_1GeV_ECL.push_back(rawstore->m_1GeV_ECL[index]);
+    evtinfo->m_2GeV_ECL.push_back(rawstore->m_2GeV_ECL[index]);
   }
 
 //----------
@@ -176,6 +181,7 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
 
   for (int i = 0; i < 32; i++) {
     evtinfo->m_map_ST[i] = ((rawstore->m_map_ST_int[0] & (1 << i)) != 0);
+    evtinfo->m_map_ST2[i] = ((rawstore->m_map_ST2_int[0] & (1 << i)) != 0);
     evtinfo->m_map_veto[i] = ((rawstore->m_map_veto_int[0] & (1 << i)) != 0);
     evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[0] & (1 << i)) != 0);
     evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[0] & (1 << i)) != 0);
@@ -183,6 +189,7 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
   }
   for (int i = 32; i < 64; i++) {
     evtinfo->m_map_ST[i] = ((rawstore->m_map_ST_int[1] & (1 << (i - 32))) != 0);
+    evtinfo->m_map_ST2[i] = ((rawstore->m_map_ST2_int[1] & (1 << (i - 32))) != 0);
     evtinfo->m_map_veto[i] = ((rawstore->m_map_veto_int[1] & (1 << (i - 32))) != 0);
     evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[1] & (1 << (i - 32))) != 0);
     evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[1] & (1 << (i - 32))) != 0);

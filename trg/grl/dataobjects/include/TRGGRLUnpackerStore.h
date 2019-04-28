@@ -45,6 +45,8 @@ namespace Belle2 {
     std::vector<bool> m_phi_i = std::vector<bool>(36, 0);
     //** m_N_track leaf */
     int m_N_track;
+    //** m_N_ST leaf */
+    int m_N_ST;
     //** m_b2b_1to3 leaf */
     int m_b2b_1to3;
     //** m_b2b_1to5 leaf */
@@ -139,6 +141,10 @@ namespace Belle2 {
     std::vector<int> m_E_ECL = std::vector<int>(30, 0);
     //** m_clk_ECL leaf */
     std::vector<int> m_clk_ECL = std::vector<int>(30, 0);
+    //** m_1GeV_flag_ECL leaf */
+    std::vector<int> m_1GeV_ECL = std::vector<int>(30, 0);
+    //** m_2GeV_flag_ECL leaf */
+    std::vector<int> m_2GeV_ECL = std::vector<int>(30, 0);
 
     //** m_map_TSF0 integer leaf */
     int m_map_TSF0_int[2];
@@ -150,6 +156,8 @@ namespace Belle2 {
     int m_map_veto_int[2];
     //** m_map_ST integer leaf */
     int m_map_ST_int[2];
+    //** m_map_ST2 integer leaf */
+    int m_map_ST2_int[2];
     //** m_map_TSF0 map leaf */
     std::vector<bool> m_map_TSF0 = std::vector<bool>(64, 0);
     //** m_map_TSF2 map leaf */
@@ -160,6 +168,8 @@ namespace Belle2 {
     std::vector<bool> m_map_veto = std::vector<bool>(64, 0);
     //** m_map_ST map leaf */
     std::vector<bool> m_map_ST = std::vector<bool>(64, 0);
+    //** m_map_ST2 map leaf */
+    std::vector<bool> m_map_ST2 = std::vector<bool>(64, 0);
 
     //** m_X leaf */
     int m_X;

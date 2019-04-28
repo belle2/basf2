@@ -32,7 +32,7 @@ namespace Belle2 {
   namespace TRGGRLUNPACKERSPACE {
 
     /** num of leafs in data_b2l **/
-    const int nLeafs = 123;
+    const int nLeafs = 123 + 3 + 32;
     /** num of leafs for others **/
     const int nLeafsExtra = 7;
     /** num of clk time window **/
@@ -41,6 +41,38 @@ namespace Belle2 {
     const int nBits = 2048;
     /** leaf names **/
     const char* LeafNames[nLeafs + nLeafsExtra] = {
+      "2GeV_15",
+      "2GeV_14",
+      "2GeV_13",
+      "2GeV_12",
+      "2GeV_11",
+      "2GeV_10",
+      "2GeV_9",
+      "2GeV_8",
+      "2GeV_7",
+      "2GeV_6",
+      "2GeV_5",
+      "2GeV_4",
+      "2GeV_3",
+      "2GeV_2",
+      "2GeV_1",
+      "2GeV_0",
+      "1GeV_15",
+      "1GeV_14",
+      "1GeV_13",
+      "1GeV_12",
+      "1GeV_11",
+      "1GeV_10",
+      "1GeV_9",
+      "1GeV_8",
+      "1GeV_7",
+      "1GeV_6",
+      "1GeV_5",
+      "1GeV_4",
+      "1GeV_3",
+      "1GeV_2",
+      "1GeV_1",
+      "1GeV_0",
       "theta_11",
       "phi_11",
       "t_11",
@@ -148,6 +180,9 @@ namespace Belle2 {
       "TSFL1_count",
       "slot64b_TOP_int_1",
       "slot64b_TOP_int_0",
+      "map_N_ST",
+      "map_ST2_int_1",
+      "map_ST2_int_0",
       "map_ST_int_1",
       "map_ST_int_0",
       "map_veto_int_1",
@@ -167,6 +202,38 @@ namespace Belle2 {
 
     /** enum of leafs **/
     enum EBits {
+      e_2GeV_15,
+      e_2GeV_14,
+      e_2GeV_13,
+      e_2GeV_12,
+      e_2GeV_11,
+      e_2GeV_10,
+      e_2GeV_9,
+      e_2GeV_8,
+      e_2GeV_7,
+      e_2GeV_6,
+      e_2GeV_5,
+      e_2GeV_4,
+      e_2GeV_3,
+      e_2GeV_2,
+      e_2GeV_1,
+      e_2GeV_0,
+      e_1GeV_15,
+      e_1GeV_14,
+      e_1GeV_13,
+      e_1GeV_12,
+      e_1GeV_11,
+      e_1GeV_10,
+      e_1GeV_9,
+      e_1GeV_8,
+      e_1GeV_7,
+      e_1GeV_6,
+      e_1GeV_5,
+      e_1GeV_4,
+      e_1GeV_3,
+      e_1GeV_2,
+      e_1GeV_1,
+      e_1GeV_0,
       e_theta_11,
       e_phi_11,
       e_t_11,
@@ -276,6 +343,9 @@ namespace Belle2 {
       e_TSFL1_count,
       e_slot64b_TOP_int_1,
       e_slot64b_TOP_int_0,
+      e_N_ST,
+      e_map_ST2_int_1,
+      e_map_ST2_int_0,
       e_map_ST_int_1,
       e_map_ST_int_0,
       e_map_veto_int_1,
@@ -295,6 +365,39 @@ namespace Belle2 {
 
     /** bus bit map. (a downto a-b) **/
     const int BitMap[nLeafs][2] = {
+
+      2023, 0, // 2GeV_15
+      2022, 0, // 2GeV_14
+      2021, 0, // 2GeV_13
+      2020, 0, // 2GeV_12
+      2019, 0, // 2GeV_11
+      2018, 0, // 2GeV_10
+      2017, 0, // 2GeV_9
+      2016, 0, // 2GeV_8
+      2015, 0, // 2GeV_7
+      2014, 0, // 2GeV_6
+      2013, 0, // 2GeV_5
+      2012, 0, // 2GeV_4
+      2011, 0, // 2GeV_3
+      2010, 0, // 2GeV_2
+      2009, 0, // 2GeV_1
+      2008, 0, // 2GeV_0
+      2007, 0, // 1GeV_15
+      2006, 0, // 1GeV_14
+      2005, 0, // 1GeV_13
+      2004, 0, // 1GeV_12
+      2003, 0, // 1GeV_11
+      2002, 0, // 1GeV_10
+      2001, 0, // 1GeV_9
+      2000, 0, // 1GeV_8
+      1999, 0, // 1GeV_7
+      1998, 0, // 1GeV_6
+      1997, 0, // 1GeV_5
+      1996, 0, // 1GeV_4
+      1995, 0, // 1GeV_3
+      1994, 0, // 1GeV_2
+      1993, 0, // 1GeV_1
+      1992, 0, // 1GeV_0
 
       1671 - 216, 6, // theta_11
       1664 - 216, 7, // phi_11
@@ -420,6 +523,9 @@ namespace Belle2 {
       749, 9, // TSFL1_count
       739, 31, // slot64b_TOP_int_1
       708, 31, // slot64b_TOP_int_0
+      418, 2, // N_ST
+      415, 31, // map_ST2_int_1 (63 downto 32)
+      383, 31, // map_ST2_int_0 (31 downto 0)
       351, 31, // map_ST_int_1 (63 downto 32)
       319, 31, // map_ST_int_0 (31 downto 0)
       287, 31, // map_veto_int_1 (63 downto 32)
@@ -441,6 +547,39 @@ namespace Belle2 {
     void
     setLeafPointersArray(TRGGRLUnpackerStore* store, int** bitArray)
     {
+      bitArray[e_2GeV_15    ] = &(store->m_2GeV_ECL[15]);
+      bitArray[e_2GeV_14    ] = &(store->m_2GeV_ECL[14]);
+      bitArray[e_2GeV_13    ] = &(store->m_2GeV_ECL[13]);
+      bitArray[e_2GeV_12    ] = &(store->m_2GeV_ECL[12]);
+      bitArray[e_2GeV_11    ] = &(store->m_2GeV_ECL[11]);
+      bitArray[e_2GeV_10    ] = &(store->m_2GeV_ECL[10]);
+      bitArray[e_2GeV_9    ] = &(store->m_2GeV_ECL[9]);
+      bitArray[e_2GeV_8    ] = &(store->m_2GeV_ECL[8]);
+      bitArray[e_2GeV_7    ] = &(store->m_2GeV_ECL[7]);
+      bitArray[e_2GeV_6    ] = &(store->m_2GeV_ECL[6]);
+      bitArray[e_2GeV_5    ] = &(store->m_2GeV_ECL[5]);
+      bitArray[e_2GeV_4    ] = &(store->m_2GeV_ECL[4]);
+      bitArray[e_2GeV_3    ] = &(store->m_2GeV_ECL[3]);
+      bitArray[e_2GeV_2    ] = &(store->m_2GeV_ECL[2]);
+      bitArray[e_2GeV_1    ] = &(store->m_2GeV_ECL[1]);
+      bitArray[e_2GeV_0    ] = &(store->m_2GeV_ECL[0]);
+      bitArray[e_1GeV_15    ] = &(store->m_1GeV_ECL[15]);
+      bitArray[e_1GeV_14    ] = &(store->m_1GeV_ECL[14]);
+      bitArray[e_1GeV_13    ] = &(store->m_1GeV_ECL[13]);
+      bitArray[e_1GeV_12    ] = &(store->m_1GeV_ECL[12]);
+      bitArray[e_1GeV_11    ] = &(store->m_1GeV_ECL[11]);
+      bitArray[e_1GeV_10    ] = &(store->m_1GeV_ECL[10]);
+      bitArray[e_1GeV_9    ] = &(store->m_1GeV_ECL[9]);
+      bitArray[e_1GeV_8    ] = &(store->m_1GeV_ECL[8]);
+      bitArray[e_1GeV_7    ] = &(store->m_1GeV_ECL[7]);
+      bitArray[e_1GeV_6    ] = &(store->m_1GeV_ECL[6]);
+      bitArray[e_1GeV_5    ] = &(store->m_1GeV_ECL[5]);
+      bitArray[e_1GeV_4    ] = &(store->m_1GeV_ECL[4]);
+      bitArray[e_1GeV_3    ] = &(store->m_1GeV_ECL[3]);
+      bitArray[e_1GeV_2    ] = &(store->m_1GeV_ECL[2]);
+      bitArray[e_1GeV_1    ] = &(store->m_1GeV_ECL[1]);
+      bitArray[e_1GeV_0    ] = &(store->m_1GeV_ECL[0]);
+
       bitArray[e_theta_11    ] = &(store->m_theta_ECL[11]);
       bitArray[e_phi_11    ] = &(store->m_phi_ECL[11]);
       bitArray[e_t_11    ] = &(store->m_t_ECL[11]);
@@ -550,6 +689,9 @@ namespace Belle2 {
       bitArray[e_TSFL1_count    ] = &(store->m_TSFL1_count);
       bitArray[e_slot64b_TOP_int_1    ] = &(store->m_slot64b_TOP_int_1);
       bitArray[e_slot64b_TOP_int_0    ] = &(store->m_slot64b_TOP_int_0);
+      bitArray[e_N_ST    ] = &(store->m_N_ST);
+      bitArray[e_map_ST2_int_1    ] = &(store->m_map_ST2_int[1]);
+      bitArray[e_map_ST2_int_0    ] = &(store->m_map_ST2_int[0]);
       bitArray[e_map_ST_int_1    ] = &(store->m_map_ST_int[1]);
       bitArray[e_map_ST_int_0    ] = &(store->m_map_ST_int[0]);
       bitArray[e_map_veto_int_1    ] = &(store->m_map_veto_int[1]);

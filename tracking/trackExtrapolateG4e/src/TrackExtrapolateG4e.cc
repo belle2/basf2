@@ -1865,15 +1865,15 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool
       muon = m_MuonPlusPar->getPDF(muid, isForward, "MuonPlus");
       pion = m_PionPlusPar->getPDF(muid, isForward, "PionPlus");
       kaon = m_KaonPlusPar->getPDF(muid, isForward, "KaonPlus");
-      proton = m_ProtonPar->getPDF(muid, isForward, "ProtonPlus");
-      deuteron = m_DeuteronPar->getPDF(muid, isForward, "DeuteronPlus");
-      electron = m_PositronPar->getPDF(muid, isForward, "ElectronPlus");
+      proton = m_ProtonPar->getPDF(muid, isForward, "Proton");
+      deuteron = m_DeuteronPar->getPDF(muid, isForward, "Deuteron");
+      electron = m_PositronPar->getPDF(muid, isForward, "Positron");
     } else {
       muon = m_MuonMinusPar->getPDF(muid, isForward, "MuonMinus");
       pion = m_PionMinusPar->getPDF(muid, isForward, "PionMinus");
       kaon = m_KaonMinusPar->getPDF(muid, isForward, "KaonMinus");
-      proton = m_AntiprotonPar->getPDF(muid, isForward, "ProtonMinus");
-      deuteron = m_AntideuteronPar->getPDF(muid, isForward, "DeuteronMinus");
+      proton = m_AntiprotonPar->getPDF(muid, isForward, "Antiproton");
+      deuteron = m_AntideuteronPar->getPDF(muid, isForward, "Antideuteron");
       electron = m_ElectronPar->getPDF(muid, isForward, "ElectronMinus");
     }
     if (muon > 0.0) logL_mu = log(muon);

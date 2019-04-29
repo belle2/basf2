@@ -47,7 +47,7 @@ namespace Belle2 {
         float averageRate = 0; /**< total detector average hit rate */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
-        float averageDspBkgRate[16]; /**<background rate calculated from ECL waveforms */
+        float averageDspBkgRate[16]; /**<background rate calculated from ECL waveforms [hits/second] */
         int numEventsSegments[16]; /**< number of events per segment */
         bool validDspRate = false; /**< status for rates calculated from waveforms, true if waveforms for all crystals are recorded */
 
@@ -59,6 +59,10 @@ namespace Belle2 {
           if (numEvents == 0) return;
           averageRate /= numEvents;
         }
+
+        /**
+         * normalize accumulated rates based on ECL waveforms
+         */
         void normalizeDsps()
         {
           if (numEventsSegments == 0) return;
@@ -103,8 +107,24 @@ namespace Belle2 {
       // class parameters: to be set via constructor or setters
 
       //functions
+      /**
+       * Performs ECL segmentation;
+       * Done once per run;
+       * Populates a map which connects each ECL crystal with a segment number (0-15);
+       * Segments 0-3 are in the forward endcap, 4-7 are in the barrel with z<0,
+       * 8-11 are in the barrel with z>0, 12-15 are in the backward endcap;
+       * Segment 0 contains crystals with 45deg < phi < 135deg,
+       * Segment 1 contains crystals with 135deg < phi < 225deg,
+       * Segment 2 contains crystals with 225deg < phi < 315deg,
+       * Segment 3 contains crystals with phi < 45deg or phi > 315deg,
+       * With the same angular patter continuing for barrel and BWD encap segments
+       */
       void segmentECL();
 
+      /**
+       * Find the correcsponding ECL segment based on the cellID
+       *@param cellid ECL crystal CellID
+       */
       int findECLSegment(int cellid)
       {
         return m_segmentMap.find(cellid)->second;
@@ -119,13 +139,13 @@ namespace Belle2 {
 
       // collections
       StoreArray<ECLDigit> m_digits;  /**< collection of digits */
-      StoreArray<ECLDsp> m_dsps;
+      StoreArray<ECLDsp> m_dsps; /**< collection of ECL waveforms */
 
-      std::vector<float> m_ADCtoEnergy;
+      std::vector<float> m_ADCtoEnergy; /**< vector used to store ECL calibration constants for each crystal */
 
       // other
-      Belle2::ECL::ECLGeometryPar* m_geometry;
-      std::map<int, int> m_segmentMap;
+      Belle2::ECL::ECLGeometryPar* m_geometry{nullptr}; /**< pointer to ECLGeometryPar */
+      std::map<int, int> m_segmentMap; /**< map with keys containing ECL CellID and values containing segment number */
     };
   }
 }

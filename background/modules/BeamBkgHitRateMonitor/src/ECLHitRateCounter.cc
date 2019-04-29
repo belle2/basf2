@@ -62,14 +62,6 @@ namespace Belle2 {
       rates.averageRate += m_digits.getEntries();
       rates.valid = true;
 
-      /* or count selected ones only
-      for(const auto& digit: m_digits) {
-      // select digits to count (usualy only good ones)
-         rates.averageRate += 1;
-      }
-      */
-
-
       //calculate rates using waveforms
       //The background rate for a crystal is calculated as
       //rate = pedestal_squared / (average_photon_energy_squared * time_constant)
@@ -144,11 +136,11 @@ namespace Belle2 {
           } else {
             m_segmentMap.insert(std::pair<int, int>(cid, 3));
           }
-        } else if (cid > 1296 && cid < 7777) {
+        } else if (cid > 1152 && cid < 7777) {
           if (z > 0) {
             if (phi > 0.7853 && phi < 2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 4));
-            } else if (phi >= 2.356 && phi <= -2.356) {
+            } else if (phi >= 2.356 || phi <= -2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 5));
             } else if (phi > -2.356 && phi < -0.7853) {
               m_segmentMap.insert(std::pair<int, int>(cid, 6));
@@ -158,7 +150,7 @@ namespace Belle2 {
           } else {
             if (phi > 0.7853 && phi < 2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 8));
-            } else if (phi >= 2.356 && phi <= -2.356) {
+            } else if (phi >= 2.356 || phi <= -2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 9));
             } else if (phi > -2.356 && phi < -0.7853) {
               m_segmentMap.insert(std::pair<int, int>(cid, 10));
@@ -169,7 +161,7 @@ namespace Belle2 {
         } else {
           if (phi > 0.7853 && phi < 2.356) {
             m_segmentMap.insert(std::pair<int, int>(cid, 12));
-          } else if (phi >= 2.356 && phi <= -2.356) {
+          } else if (phi >= 2.356 || phi <= -2.356) {
             m_segmentMap.insert(std::pair<int, int>(cid, 13));
           } else if (phi > -2.356 && phi < -0.7853) {
             m_segmentMap.insert(std::pair<int, int>(cid, 14));

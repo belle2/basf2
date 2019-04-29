@@ -26,11 +26,9 @@ namespace Belle2 {
   class DQMHistOutputToEPICSModule : public DQMHistAnalysisModule {
 
 #ifdef _BELLE2_EPICS
-// #define MAX_PV_NAME_LEN 40
-
     typedef struct {
-//     char    name[MAX_PV_NAME_LEN];
       chid    mychid;
+      chid    mychid_last;
       std::string  histoname;
     } MYNODE;
 #endif
@@ -40,6 +38,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistOutputToEPICSModule();
+    //! Destructor
+    ~DQMHistOutputToEPICSModule();
 
   private:
 

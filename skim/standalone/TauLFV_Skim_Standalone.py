@@ -17,40 +17,35 @@ from stdV0s import *
 from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-00-03'
 
 skimCode = encodeSkimName('TauLFV')
 
-import sys
-import os
-import glob
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+taulfvskim = Path()
 
-inputMdstList('MC9', fileList)
+fileList = get_test_file("mixedBGx1", "MC11")
+inputMdstList('default', fileList, path=taulfvskim)
 
-stdPi('loose')
-stdK('loose')
-stdPr('loose')
-stdE('loose')
-stdMu('loose')
-stdPhotons('loose')
-stdPi0s('loose')
-loadStdSkimPi0()
-stdKshorts()
-loadStdLightMesons()
+stdPi('loose', path=taulfvskim)
+stdK('loose', path=taulfvskim)
+stdPr('loose', path=taulfvskim)
+stdE('loose', path=taulfvskim)
+stdMu('loose', path=taulfvskim)
+stdPhotons('loose', path=taulfvskim)
+stdPi0s('loose', path=taulfvskim)
+loadStdSkimPi0(path=taulfvskim)
+stdKshorts(path=taulfvskim)
+loadStdLightMesons(path=taulfvskim)
 
 # Tau Skim
 from skim.taupair import *
-tauList = TauLFVList(1)
+tauList = TauLFVList(1, path=taulfvskim)
 
-skimOutputUdst(skimCode, tauList)
-summaryOfLists(tauList)
+skimOutputUdst(skimCode, tauList, path=taulfvskim)
+summaryOfLists(tauList, path=taulfvskim)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=taulfvskim)
+process(taulfvskim)
 
 # print out the summary
 print(statistics)

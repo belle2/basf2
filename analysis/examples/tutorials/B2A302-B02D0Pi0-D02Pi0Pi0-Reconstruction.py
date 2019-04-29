@@ -77,7 +77,6 @@ pi0_vars = vc.mc_truth + \
         list_of_variables=vc.cluster + vc.kinematics,
         decay_string='pi0 -> ^gamma ^gamma')
 
-
 # Saving variables to ntuple
 output_file = 'B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root'
 ma.variablesToNtuple('B0:all', B0_vars,

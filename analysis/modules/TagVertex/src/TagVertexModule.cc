@@ -67,7 +67,7 @@ namespace Belle2 {
     addParam("MCAssociation", m_useMCassociation,
              "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
     addParam("useFitAlgorithm", m_useFitAlgorithm,
-             "Choose the fit algorithm: boost,breco, standard, standard_pxd, singleTrack, singleTrack_pxd, no ", string("standard"));
+             "Choose the fit algorithm: boost, breco, standard, standard_pxd, singleTrack, singleTrack_pxd, noConstraint", string("standard"));
     addParam("maskName", m_roeMaskName,
              "Choose ROE mask to get particles from ", string(""));
     addParam("askMCInformation", m_MCInfo,
@@ -913,7 +913,7 @@ namespace Belle2 {
   {
     // apply constraint
     analysis::RaveSetup::getInstance()->unsetBeamSpot();
-    if (m_useFitAlgorithm != "no") analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_tube);
+    if (m_useFitAlgorithm != "noConstraint") analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_tube);
     analysis::RaveVertexFitter rFit;
 
     // Mpi &&  MKs

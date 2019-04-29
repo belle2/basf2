@@ -400,6 +400,10 @@ namespace Belle2 {
       for (unsigned int i = 0; i < general_options.m_variables.size(); ++i) {
         m_expert->AddVariable(Belle2::makeROOTCompatible(general_options.m_variables[i]), &m_input_cache[i]);
       }
+      m_spectators_cache.resize(general_options.m_spectators.size(), 0);
+      for (unsigned int i = 0; i < general_options.m_spectators.size(); ++i) {
+        m_expert->AddSpectator(Belle2::makeROOTCompatible(general_options.m_spectators[i]), &m_spectators_cache[i]);
+      }
 
       if (weightfile.containsElement("TMVA_Logfile")) {
         std::string custom_weightfile = weightfile.generateFileName("logfile");
@@ -412,7 +416,9 @@ namespace Belle2 {
     {
 
       weightfile.getOptions(specific_options);
-      expert_signalFraction = weightfile.getSignalFraction();
+      if (specific_options.transform2probability) {
+        expert_signalFraction = weightfile.getSignalFraction();
+      }
 
       // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
       std::string custom_weightfile = weightfile.generateFileName(std::string("_") + specific_options.m_method + ".weights.xml");
@@ -479,6 +485,8 @@ namespace Belle2 {
         test_data.loadEvent(iEvent);
         for (unsigned int i = 0; i < m_input_cache.size(); ++i)
           m_input_cache[i] = test_data.m_input[i];
+        for (unsigned int i = 0; i < m_spectators_cache.size(); ++i)
+          m_spectators_cache[i] = test_data.m_spectators[i];
         if (specific_options.transform2probability)
           probabilities[iEvent] = m_expert->GetProba(specific_options.m_method, expert_signalFraction);
         else

@@ -19,8 +19,6 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/Logger.h>
 
-#include <memory>
-
 #include <list>
 #include <string>
 #include <memory>

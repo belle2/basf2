@@ -17,8 +17,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>
 
-#include <TLorentzVector.h>
-
 #include <TDatabasePDG.h>
 #include <TLorentzVector.h>
 #include <TRandom3.h>

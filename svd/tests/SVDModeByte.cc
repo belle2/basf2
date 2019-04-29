@@ -14,17 +14,17 @@ namespace Belle2 {
     {
       // Default construct
       SVDModeByte s0;
-      SVDModeByte s_def(72);
+      SVDModeByte s_def(151);
       SVDModeByte s_en(SVDRunType::zero_suppressed, SVDEventType::global_run,
-                       SVDDAQModeType::daq_6samples, uint8_t(0));
-      SVDModeByte s_num(2, 0, 2, 0);
+                       SVDDAQModeType::daq_6samples, uint8_t(7));
+      SVDModeByte s_num(2, 0, 2, 7);
 
       EXPECT_EQ(s0, s_def);
       EXPECT_EQ(s_def, s_en);
       EXPECT_EQ(s_en, s_num);
       // Empty
-      EXPECT_EQ(uint8_t(72), s0.getID());
-      EXPECT_EQ((string)s0, "0-suppr/global/6 samples/0");
+      EXPECT_EQ(uint8_t(151), s0.getID());
+      EXPECT_EQ((string)s0, "0-suppr/global/6 samples/???");
       // Malformed
       s0.setTriggerBin(3);
       EXPECT_EQ((string)s0, "0-suppr/global/6 samples/3");
@@ -43,7 +43,7 @@ namespace Belle2 {
       EXPECT_EQ(s.getRunType(), SVDRunType::zero_suppressed_timefit);
       // Default
       SVDModeByte s0;
-      EXPECT_EQ(s0.getTriggerBin(), 0);
+      EXPECT_EQ(s0.getTriggerBin(), 7);
       EXPECT_EQ(s0.getDAQMode(), SVDDAQModeType::daq_6samples);
     }
   }

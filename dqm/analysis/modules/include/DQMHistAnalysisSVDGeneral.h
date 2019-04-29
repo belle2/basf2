@@ -44,6 +44,10 @@ namespace Belle2 {
     float m_occError; /**<error level of the occupancy */
     float m_occWarning; /**< warning level of the occupancy */
     float m_occEmpty; /**<empty level of the occupancy */
+
+    float m_onlineOccError; /**<error level of the onlineOccupancy */
+    float m_onlineOccWarning; /**< warning level of the onlineOccupancy */
+    float m_onlineOccEmpty; /**<empty level of the occupancy */
     //! Parameters accesible from basf2 scripts
     //  protected:
 
@@ -56,22 +60,44 @@ namespace Belle2 {
     TFile* m_refFile = nullptr;
 
     TCanvas* m_cUnpacker = nullptr; /**<unpacker plot canvas */
-    TH2F* m_hOccupancyU = nullptr; /**< occupnacy U histo */
-    TCanvas* m_cOccupancyU = nullptr; /**< occupacy U histo canvas */
+    TH2F* m_hOccupancyU = nullptr; /**< occupancy U histo */
+    TCanvas* m_cOccupancyU = nullptr; /**< occupancy U histo canvas */
     TH2F* m_hOccupancyV = nullptr; /**< occupancy V histo */
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
 
-    TPaveText boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color); /**< plot sensor-box in occupancy plot */
+    TH1F* m_hOccupancyChartChip = nullptr; /**< occupancy chart histo */
+    TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
+
+    TH2F* m_hOnlineOccupancyU = nullptr; /**< online occupancy U histo */
+    TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
+    TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */
+    TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
+
+    const int nSensors = 172;
+    TH1F** m_hStripOccupancyU = nullptr; /**< u-side strip chart occupancy histos*/
+    TCanvas** m_cStripOccupancyU = nullptr; /**< u-side strip chart occupancy canvas*/
+    TH1F** m_hStripOccupancyV = nullptr; /**< u-side strip chart occupancy histos*/
+    TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
+
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
-    TPaveText* m_leg = nullptr; /**< occupancy plot legend */
     TPaveText* m_legProblem = nullptr; /**< occupancy plot legend, problem */
     TPaveText* m_legWarning = nullptr; /**< occupancy plot legend, warning */
     TPaveText* m_legNormal = nullptr; /**< occupancy plot legend, normal */
     TPaveText* m_legEmpty = nullptr; /**< occupancy plot legend, empty */
     TPaveText* m_legError = nullptr; /**< occupancy plot legend, error*/
+    TPaveText* m_legOnProblem = nullptr; /**< onlineOccupancy plot legend, problem */
+    TPaveText* m_legOnWarning = nullptr; /**< onlineOccupancy plot legend, warning */
+    TPaveText* m_legOnNormal = nullptr; /**< onlineOccupancy plot legend, normal */
+    TPaveText* m_legOnEmpty = nullptr; /**< onlineOccupancy plot legend, empty */
+    TPaveText* m_legOnError = nullptr; /**< onlineOccupancy plot legend, error*/
     TText* m_yTitle = nullptr; /**< y axis title text*/
 
+    Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed befor throwing ERROR*/
+    Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+    Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+    Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+    Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
 
     //! IDs of all SXD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

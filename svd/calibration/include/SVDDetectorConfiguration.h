@@ -38,11 +38,11 @@ namespace Belle2 {
   class SVDDetectorConfiguration {
   public:
 
-    static std::string svdLocalConfig_name;
-    static std::string svdGlobalConfig_name;
+    static std::string svdLocalConfig_name; /**< name of the SVDLocalConfigParameters payload*/
+    static std::string svdGlobalConfig_name; /**< name of the SVDGlobalConfigParameters payload*/
 
-    typedef SVDLocalConfigParameters t_svdLocalConfig_payload;
-    typedef SVDGlobalConfigParameters t_svdGlobalConfig_payload;
+    typedef SVDLocalConfigParameters t_svdLocalConfig_payload; /**< typedef of the SVDLocalConfigParameters payload*/
+    typedef SVDGlobalConfigParameters t_svdGlobalConfig_payload; /**< typedef of the SVDGlobalConfigParameters payload*/
 
 
 
@@ -50,18 +50,15 @@ namespace Belle2 {
     SVDDetectorConfiguration()
       : m_svdLocalConfig_aDBObjPtr(svdLocalConfig_name)
       , m_svdGlobalConfig_aDBObjPtr(svdGlobalConfig_name)
-
-
     {
-      /*
+
       m_svdGlobalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDDetectorConfiguration, global run parameters: from now on we are using " <<
+        B2INFO("SVDDetectorConfiguration, GLOBAL run parameters: from now on we are using " <<
         this->m_svdGlobalConfig_aDBObjPtr -> get_uniqueID()); });
 
       m_svdLocalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDDetectorConfiguration, local run parameters: from now on we are using " <<
+        B2INFO("SVDDetectorConfiguration, LOCAL run parameters: from now on we are using " <<
         this->m_svdLocalConfig_aDBObjPtr -> get_uniqueID()); });
-      */
     }
   private:
     /** LOCAL CONFIGURATION PARAMETERS:
@@ -78,6 +75,7 @@ namespace Belle2 {
       return m_svdLocalConfig_aDBObjPtr->getInjectedCharge();
     }
 
+
     /** LOCAL CONFIGURATION PARAMETERS:
      * Return the time units of the measured peak time of the pulse shape given in term of accelerator RFC
      *
@@ -86,9 +84,9 @@ namespace Belle2 {
      *
      * Output: float corresponding to the time units [RFC]
      */
-    float getCalibrationTimeUnitsInNs()
+    float getCalibrationTimeInRFCUnits()
     {
-      return m_svdLocalConfig_aDBObjPtr->getCalibrationTimeUnitsInNs();
+      return m_svdLocalConfig_aDBObjPtr->getCalibrationTimeInRFCUnits();
     }
 
 
@@ -153,9 +151,9 @@ namespace Belle2 {
      *
      * Output: float corresponding to the APV Clock units [ns]
      */
-    float getAPVClockUnitsInNs()
+    float getAPVClockInRFCUnits()
     {
-      return m_svdGlobalConfig_aDBObjPtr->getAPVClockUnitsInNs();
+      return m_svdGlobalConfig_aDBObjPtr->getAPVClockInRFCUnits();
     }
 
 
@@ -171,8 +169,8 @@ namespace Belle2 {
 
 
   private:
-    DBObjPtr< t_svdLocalConfig_payload > m_svdLocalConfig_aDBObjPtr;
-    DBObjPtr< t_svdGlobalConfig_payload > m_svdGlobalConfig_aDBObjPtr;
+    DBObjPtr< t_svdLocalConfig_payload > m_svdLocalConfig_aDBObjPtr; /**< SVDLocalConfigParameters payload*/
+    DBObjPtr< t_svdGlobalConfig_payload > m_svdGlobalConfig_aDBObjPtr;  /**< SVDGlobalConfigParameters payload*/
 
 
   };

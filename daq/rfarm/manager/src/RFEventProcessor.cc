@@ -253,6 +253,24 @@ int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
   int status;
   waitpid(pid_hcollect, &status, 0);
   */
+
+  // Need to wait until all the events are processed and sent
+  RfNodeInfo* nodeinfo = GetNodeInfo();
+  int ncount = 0;
+  for (;;) {
+    RfShm_Cell& cellin = m_flow->getinfo(0);
+    RfShm_Cell& cellout = m_flow->getinfo(1);
+    if (cellin.nqueue == 0 && cellout.nqueue == 0) break;
+    printf("inqueue = %d : outqueue = %d\n", cellin.nqueue, cellout.nqueue);
+    if (ncount > 30) {
+      printf("RFEventProcessor : Timeout (30sec) in stopping\n");
+      break;
+    }
+    sleep(1);
+    ncount ++;
+  }
+
+
   int status;
   if (m_pid_basf2 != 0) {
     printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);

@@ -91,8 +91,7 @@ void SVDUnpackerDQMModule::defineHisto()
   const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
                                Bins_BadMapping + Bins_BadHeader + Bins_BadTrailer;
 
-  //  DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "Monitor SVD Histo", nBits, 1, nBits + 1, 48, 1, 49);
-  DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "Monitor SVD Histo", nBits, 1, nBits + 1, 52, 1, 53);
+  DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
 
   DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
@@ -121,7 +120,18 @@ void SVDUnpackerDQMModule::initialize()
 void SVDUnpackerDQMModule::beginRun()
 {
 
-  if (DQMUnpackerHisto != NULL) DQMUnpackerHisto->Reset();
+  StoreObjPtr<EventMetaData> evtMetaData;
+  int expNumber = evtMetaData->getExperiment();
+  int runNumber = evtMetaData->getRun();
+  TString histoTitle = TString::Format("SVD Data Format Monitor, Exp %d Run %d", expNumber, runNumber);
+
+
+
+  if (DQMUnpackerHisto != NULL) {
+    DQMUnpackerHisto->Reset();
+    DQMUnpackerHisto->SetTitle(histoTitle.Data());
+  }
+
   shutUpNoData = false;
 
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
@@ -149,6 +159,7 @@ void SVDUnpackerDQMModule::event()
       B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
       shutUpNoData = true;
     }
+
 
   unsigned int nDiagnostics = m_svdDAQDiagnostics.getEntries();
 

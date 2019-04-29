@@ -270,7 +270,9 @@ namespace Belle2 {
                 if (ch < 0) break;
               }
             } else if (type_feb == 0x01) { // Suppressed mode
-              if (length > 144 * 2 + 10) B2FATAL("error " << LogVar("length", length));
+              // The below line is commented since it sometimes causes problem during processing threshold scan data.
+              // No harm to comment this line since it is only utilized for threshold scan data.
+              //if (length > 144 * 2 + 10) B2FATAL("error " << LogVar("length", length));
               //B2INFO("suppreed mode");
               while (ibyte < length) {
                 int ch = calbyte(buf);

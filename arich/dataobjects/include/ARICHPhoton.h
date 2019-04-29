@@ -49,6 +49,14 @@ namespace Belle2 {
     }
 
     /**
+     * Set hit phi angle in track coordinates
+     */
+    void setPhiCerTrk(float phi)
+    {
+      m_phiCerTrk = phi;
+    }
+
+    /**
      * Set X-Y position of hit
      */
     void setXY(float x, float y)
@@ -199,6 +207,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get reconstructed phi cherenkov angle in track coordinate system
+     */
+    double getPhiCerTrk()
+    {
+      return (double)m_phiCerTrk;
+    }
+
+    /**
      * Get used mirror hypothesis (0 for no reflection)
      */
     int getMirror()
@@ -277,8 +293,9 @@ namespace Belle2 {
     float m_y = 0; /**< y of the hit position */
     int m_module = 0; /**< hit module */
     int m_channel = 0; /**< hit channel */
+    float m_phiCerTrk = 0.;  /**< reconstructed phi angle in track coordinate system */
 
-    ClassDef(ARICHPhoton, 4); /**< ClassDef */
+    ClassDef(ARICHPhoton, 5); /**< ClassDef */
 
   };
 } //Belle2 namespace

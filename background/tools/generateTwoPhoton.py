@@ -126,15 +126,15 @@ main.add_module(gearbox)
 # Generator (settings from Nakayama-san 15th campaign)
 aafh = register_module('AafhInput')
 aafh.param({
-        'mode': 5,
-        'rejection': 2,
-        'suppressionLimits': [1e100] * 4,
-        'minMass': 0.001,
-        'maxFinalWeight': 2.5,
-        'maxSubgeneratorWeight': 1.0,
-        'subgeneratorWeights': [1.000e+00, 2.216e+01, 3.301e+03, 6.606e+03, 1.000e+00,
-                                1.675e+00, 5.948e+00, 6.513e+00],
-        })
+    'mode': 5,
+    'rejection': 2,
+    'suppressionLimits': [1e100] * 4,
+    'minMass': 0.001,
+    'maxFinalWeight': 2.5,
+    'maxSubgeneratorWeight': 1.0,
+    'subgeneratorWeights': [1.000e+00, 2.216e+01, 3.301e+03, 6.606e+03, 1.000e+00,
+                            1.675e+00, 5.948e+00, 6.513e+00],
+})
 main.add_module(aafh)
 
 # Geant geometry

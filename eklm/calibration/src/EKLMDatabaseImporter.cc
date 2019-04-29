@@ -18,7 +18,6 @@
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMDatabaseImporter.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
 #include <eklm/geometry/AlignmentChecker.h>
@@ -151,21 +150,12 @@ void EKLMDatabaseImporter::importDisplacement()
   m_Displacement.import(iov);
 }
 
-void EKLMDatabaseImporter::loadDefaultElectronicsMap()
+void EKLMDatabaseImporter::importElectronicsMap(
+  const EKLMElectronicsMap* electronicsMap)
 {
-  m_ElectronicsMap.construct();
-}
-
-void EKLMDatabaseImporter::addSectorLane(
-  int endcap, int layer, int sector, int copper, int dataConcentrator, int lane)
-{
-  m_ElectronicsMap->addSectorLane(endcap, layer, sector,
-                                  copper, dataConcentrator, lane);
-}
-
-void EKLMDatabaseImporter::importElectronicsMap()
-{
+  DBImportObjPtr<EKLMElectronicsMap> electronicsMapImport;
+  electronicsMapImport.construct(*electronicsMap);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
-  m_ElectronicsMap.import(iov);
+  electronicsMapImport.import(iov);
 }

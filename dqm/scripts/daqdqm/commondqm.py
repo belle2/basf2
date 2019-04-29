@@ -37,7 +37,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
             svddqm = register_module('SVDDQMExpressReco')
-            svddqm.param('ShaperDigits', 'SVDShaperDigitsZS5')
+            svddqm.param('offlineZSShaperDigits', 'SVDShaperDigitsZS5')
             path.add_module(svddqm)
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
@@ -46,7 +46,19 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
 
     if dqm_environment == "hlt":
         # HLT
-        path.add_module("SoftwareTriggerHLTDQM")
+        path.add_module(
+            "SoftwareTriggerHLTDQM",
+            cutResultIdentifiers={
+                "filter": [
+                    "ge3_loose_tracks_inc_1_tight_not_ee2leg",
+                    "selectmumu",
+                    "single_muon\\10"],
+                "skim": [
+                    "accept_hadron",
+                    "accept_mumu_1trk",
+                    "accept_mumu_2trk",
+                    "accept_bhabha\\10",
+                    "accept_gamma_gamma"]})
         path.add_module("StatisticsTimingHLTDQM")
 
         # SVD DATA FORMAT
@@ -59,9 +71,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         cdcdqm = register_module('cdcDQM7')
         path.add_module(cdcdqm)
 
-        cdcdedxdqm = register_module('CDCDedxDQM')
-        cdcdedxdqm.param("UsingHadronfiles", True)
-        path.add_module(cdcdedxdqm)
+        module_names = [m.name() for m in path.modules()]
+        if ('SoftwareTrigger' in module_names):
+            cdcdedxdqm = register_module('CDCDedxDQM')
+            path.add_module(cdcdedxdqm)
 
     # ECL
     if components is None or 'ECL' in components:
@@ -115,3 +128,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         path.add_module('ARICHDQM')
     # PhysicsObjectsDQM
     add_analysis_dqm(path)
+    # DAQ Monitor
+    path.add_module('DAQMonitor')

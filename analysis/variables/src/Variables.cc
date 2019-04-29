@@ -657,6 +657,12 @@ namespace Belle2 {
       return (invMass - nomMass) / massErr;
     }
 
+    double particleMassSquared(const Particle* part)
+    {
+      TLorentzVector p4 = part->get4Vector();
+      return p4.M2();
+    }
+
     double b2bTheta(const Particle* part)
     {
       PCmsLabTransform T;
@@ -758,16 +764,6 @@ namespace Belle2 {
     }
 
 // other ------------------------------------------------------------
-
-    double particleMdstArrayIndex(const Particle* part)
-    {
-      return part->getMdstArrayIndex();
-    }
-
-    double particleMdstSource(const Particle* part)
-    {
-      return part->getMdstSource();
-    }
 
     double particlePvalue(const Particle* part)
     {
@@ -1204,18 +1200,20 @@ namespace Belle2 {
 
 
     REGISTER_VARIABLE("M", particleMass,
-                      "invariant mass(determined from particle's 4-momentum vector)");
+                      "invariant mass (determined from particle's 4-momentum vector)");
     REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
     REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
     REGISTER_VARIABLE("dQ", particleDQ,
                       "released energy in decay minus nominal one");
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
+    REGISTER_VARIABLE("M2", particleMassSquared,
+                      "invariant mass squared (determined from particle's 4-momentum vector)");
 
     REGISTER_VARIABLE("InvM", particleInvariantMass,
-                      "invariant mass (determined from particle's daughter 4 - momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
-                      "invariant mass(determined from particle's daughter 4-momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
                       "uncertainty of invariant mass (determined from particle's daughter 4 - momentum vectors)");
@@ -1268,10 +1266,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("trackMatchType", trackMatchType,
                       "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
                       "called connected - region(CR) track match");
-    REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
-                      "StoreArray index(0 - based) of the MDST object from which the Particle was created");
-    REGISTER_VARIABLE("mdstSource", particleMdstSource,
-                      "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"

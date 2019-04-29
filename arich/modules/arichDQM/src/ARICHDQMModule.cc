@@ -19,7 +19,6 @@
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
@@ -107,7 +106,8 @@ namespace Belle2 {
     h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
     h_aerogelHit = new TH1D("aerogelHit", "Number track associated hits in each aerogel tile;Aerogel slot ID;Hits", 125, -0.5,
                             125 - 0.5);
-    h_bits = new TH1D("bits", "Number of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5);
+    h_bits = new TH1D("bits", "Number of hits in each bit;Bit;Hits", 5, -1 - 0.5,
+                      4 - 0.5); //Bin at -1 is added to set minimum 0 without SetMinimum(0) due to bugs in jsroot on DQM server.
     h_hitsPerTrack2D = new TH2D("hitsPerTrack2D", "2D distribution of track associated hits;X[cm];Y[cm];Hits", 230, -115, 115, 230,
                                 -115, 115);
     h_tracks2D = new TH2D("tracks2D", "Distribution track positions;X[cm];Y[cm];Tracks", 230, -115, 115, 230, -115, 115);
@@ -313,15 +313,14 @@ namespace Belle2 {
     int mmid = 1;
     for (auto hh : hpd) { h_hapdHitPerEvent->Fill(mmid, hh); mmid++;}
 
-    for (const auto& arichLikelihood : arichLikelihoods) {
+    for (const auto& arichTrack : arichTracks) {
 
-      ARICHTrack* arichTrack = arichLikelihood.getRelated<ARICHTrack>();
 
       //Momentum limits are applied
-      if (arichTrack->getPhotons().size() == 0) continue;
-      if (arichTrack->getMomentum() < m_momDnLim || arichTrack->getMomentum() > m_momUpLim) continue;
+      //if (arichTrack.getPhotons().size() == 0) continue;
+      if (arichTrack.getMomentum() < m_momDnLim || arichTrack.getMomentum() > m_momUpLim) continue;
 
-      TVector3 recPos = arichTrack->getPosition();
+      TVector3 recPos = arichTrack.getPosition();
       int trSector = 0;
       double dPhi = 0;
       if (recPos.Phi() >= 0) {
@@ -353,7 +352,7 @@ namespace Belle2 {
 
       h_tracks2D->Fill(recPos.X(), recPos.Y());
 
-      std::vector<ARICHPhoton> photons = arichTrack->getPhotons();
+      std::vector<ARICHPhoton> photons = arichTrack.getPhotons();
       int nPhoton = 0;
       for (auto& photon : photons) {
         if (photon.getMirror() == 0) {
@@ -375,15 +374,26 @@ namespace Belle2 {
         }
       }
 
+      //Get ARICHLikelihood related to the ARICHTrack
+      /*const ExtHit* extHit = arichTrack.getRelated<ExtHit>();
+      const Track* mdstTrack = NULL;
+      if (extHit) mdstTrack = extHit->getRelated<Track>();
+      const ARICHAeroHit* aeroHit = arichTrack.getRelated<ARICHAeroHit>();
+      const ARICHLikelihood* lkh = NULL;
+      if (mdstTrack) lkh = mdstTrack->getRelated<ARICHLikelihood>();
+      else lkh = arichTrack.getRelated<ARICHLikelihood>();*/
+
+      //if(lkh->getFlag()){//Fill only when the number of expected photons is more than 0.
       h_hitsPerTrack->Fill(nPhoton);
       h_secHitsPerTrack[trSector]->Fill(nPhoton);
       h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nPhoton);
 
       int aeroID = arichGeoAero.getAerogelTileID(recPos.X(), recPos.Y());
       h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
-                            (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20) ,
+                            (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20),
                             nPhoton);
       h_aerogelHit->Fill(aeroID, nPhoton);
+      //}
     }
 
   }

@@ -42,7 +42,7 @@ PXDReadRawONSENModule::PXDReadRawONSENModule() : Module()
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
 
-  B2DEBUG(0, "PXDReadRawONSENModule: Constructor done.");
+  B2DEBUG(29, "PXDReadRawONSENModule: Constructor done.");
 }
 
 
@@ -72,7 +72,7 @@ void PXDReadRawONSENModule::initialize()
   StoreArray<RawPXD> storeRawPIDs;
   storeRawPIDs.registerInDataStore();
 
-  B2DEBUG(0, "PXDReadRawONSENModule: initialized.");
+  B2DEBUG(29, "PXDReadRawONSENModule: initialized.");
 }
 
 int PXDReadRawONSENModule::read_data(char* data, size_t len)
@@ -96,12 +96,12 @@ int PXDReadRawONSENModule::readOneEvent()
   int br = read_data(data, headerlen);
   if (br <= 0) return br;
   if (pxdheader[0] != 0xCAFEBABEu) {
-    printf("pxdheader wrong : Magic %X , Frames %X \n", (unsigned int) pxdheader[0], (unsigned int) pxdheader[1]);
+    B2FATAL(Form("pxdheader wrong : Magic %X , Frames %X \n", (unsigned int) pxdheader[0], (unsigned int) pxdheader[1]));
     exit(0);
   }
   framenr = pxdheader[1];
   if (framenr > MAX_PXD_FRAMES) {
-    printf("MAX_PXD_FRAMES too small : %d(%d) \n", framenr, MAX_PXD_FRAMES);
+    B2FATAL(Form("MAX_PXD_FRAMES too small : %d(%d) \n", framenr, MAX_PXD_FRAMES));
     exit(0);
   }
   tablelen = 4 * framenr;
@@ -112,7 +112,7 @@ int PXDReadRawONSENModule::readOneEvent()
   }
 
   if (datalen + headerlen + tablelen > len) {
-    printf("buffer too small : %d %d %d(%d) \n", headerlen, tablelen, datalen, len);
+    B2FATAL(Form("buffer too small : %d %d %d(%d) \n", headerlen, tablelen, datalen, len));
     exit(0);
   }
   int bcount = read_data(data + headerlen + tablelen, datalen);

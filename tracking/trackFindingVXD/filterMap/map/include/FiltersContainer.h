@@ -11,7 +11,6 @@
 #ifndef FILTERSCONTAINER_HH
 #define FILTERSCONTAINER_HH
 
-#include <string>
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include <unordered_map>
 #include <string>

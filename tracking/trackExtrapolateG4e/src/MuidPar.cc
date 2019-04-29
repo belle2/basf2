@@ -177,9 +177,11 @@ namespace Belle2 {
     if (hypothesis == -1) B2FATAL("MuidPar::fillPDFs(): hypothesisName " << hypothesisName << "is not expected. ");
 //hypothesis_values: 0: Positron, 1: Electron, 2:Deuteron, 3: Antideuteron: 4: Proton: 5: Antiproton 6: PionPlus 7: PionMinus 8: KaonPlus 9: KaonMinus 10: MuonPlus 11: MuonMinus
     if (hypothesisName == hypotheses[10]
-        || hypothesisName == hypotheses[11])   return getPDFLayer_muon(muid, isForward) * getPDFRchisq(muid);
-    if (hypothesisName != hypotheses[10]
-        && hypothesisName != hypotheses[11])   return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
+        || hypothesisName == hypotheses[11]) {
+      return getPDFLayer_muon(muid, isForward) * getPDFRchisq(muid);
+    } else {
+      return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
+    }
   }
 
 

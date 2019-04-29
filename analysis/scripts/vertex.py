@@ -28,7 +28,7 @@ def fitVertex(
     @param fitter       rave or kfitter
     @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
     @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube/mother)
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param path         modules are added to this path
     """
 
@@ -72,7 +72,7 @@ def _fitVertex(
     @param fitter       rave or kfitter
     @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
     @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube/mother)
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param path         modules are added to this path
     """
 

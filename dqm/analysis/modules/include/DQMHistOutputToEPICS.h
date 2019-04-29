@@ -30,6 +30,7 @@ namespace Belle2 {
       chid    mychid;
       chid    mychid_last;
       std::string  histoname;
+      std::vector <double> data;
     } MYNODE;
 #endif
 
@@ -54,6 +55,8 @@ namespace Belle2 {
 
     //! copy over to "last" PV
     void copyToLast(void);
+    //! set PVs to zero content (at run start)
+    void cleanPVs(void);
 
     // Data members
     /** Parameter list for histograms */

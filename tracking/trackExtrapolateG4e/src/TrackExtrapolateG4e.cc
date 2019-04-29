@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
+#include <tracking/dbobjects/MuidParameters.h>
 #include <tracking/trackExtrapolateG4e/MuidPar.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -1861,19 +1862,19 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool
     if ((abs(muid->getPDGCode()) == Const::muon.getPDGCode()) ||
         (abs(muid->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
     if (charge > 0) {
-      muon = m_MuonPlusPar->getPDF_muon(muid, isForward);
-      pion = m_PionPlusPar->getPDF(muid, isForward);
-      kaon = m_KaonPlusPar->getPDF(muid, isForward);
-      proton = m_ProtonPar->getPDF(muid, isForward);
-      deuteron = m_DeuteronPar->getPDF(muid, isForward);
-      electron = m_PositronPar->getPDF(muid, isForward);
+      muon = m_MuonPlusPar->getPDF(muid, isForward, "MuonPlus");
+      pion = m_PionPlusPar->getPDF(muid, isForward, "PionPlus");
+      kaon = m_KaonPlusPar->getPDF(muid, isForward, "KaonPlus");
+      proton = m_ProtonPar->getPDF(muid, isForward, "ProtonPlus");
+      deuteron = m_DeuteronPar->getPDF(muid, isForward, "DeuteronPlus");
+      electron = m_PositronPar->getPDF(muid, isForward, "ElectronPlus");
     } else {
-      muon = m_MuonMinusPar->getPDF_muon(muid, isForward);
-      pion = m_PionMinusPar->getPDF(muid, isForward);
-      kaon = m_KaonMinusPar->getPDF(muid, isForward);
-      proton = m_AntiprotonPar->getPDF(muid, isForward);
-      deuteron = m_AntideuteronPar->getPDF(muid, isForward);
-      electron = m_ElectronPar->getPDF(muid, isForward);
+      muon = m_MuonMinusPar->getPDF(muid, isForward, "MuonMinus");
+      pion = m_PionMinusPar->getPDF(muid, isForward, "PionMinus");
+      kaon = m_KaonMinusPar->getPDF(muid, isForward, "KaonMinus");
+      proton = m_AntiprotonPar->getPDF(muid, isForward, "ProtonMinus");
+      deuteron = m_AntideuteronPar->getPDF(muid, isForward, "DeuteronMinus");
+      electron = m_ElectronPar->getPDF(muid, isForward, "ElectronMinus");
     }
     if (muon > 0.0) logL_mu = log(muon);
     if (pion > 0.0) logL_pi = log(pion);

@@ -86,11 +86,8 @@ namespace Belle2 {
     //! Destructor
     ~MuidPar();
 
-    //! Get the PDF for a muon
-    double getPDF_muon(const Muid*, bool isForward) const;
-
     //! Get the PDF for a particular hypothesis
-    double getPDF(const Muid*, bool isForward) const;
+    double getPDF(const Muid*, bool isForward, const char*) const;
 
   private:
 

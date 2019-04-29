@@ -169,14 +169,17 @@ namespace Belle2 {
   }
 
 
-  double MuidPar::getPDF(const Muid* muid, bool isForward) const
+  double MuidPar::getPDF(const Muid* muid, bool isForward, const char hypothesisName[]) const
   {
-    return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
-  }
-
-  double MuidPar::getPDF_muon(const Muid* muid, bool isForward) const
-  {
-    return getPDFLayer_muon(muid, isForward) * getPDFRchisq(muid);
+    vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
+    int hypothesis = -1;
+    for (unsigned int ii = 0; ii < hypotheses.size(); ii++) { if (hypothesisName == hypotheses[ii]) {hypothesis = ii; break;}}
+    if (hypothesis == -1) B2FATAL("MuidPar::fillPDFs(): hypothesisName " << hypothesisName << "is not expected. ");
+//hypothesis_values: 0: Positron, 1: Electron, 2:Deuteron, 3: Antideuteron: 4: Proton: 5: Antiproton 6: PionPlus 7: PionMinus 8: KaonPlus 9: KaonMinus 10: MuonPlus 11: MuonMinus
+    if (hypothesisName == hypotheses[10]
+        || hypothesisName == hypotheses[11])   return getPDFLayer_muon(muid, isForward) * getPDFRchisq(muid);
+    if (hypothesisName != hypotheses[10]
+        && hypothesisName != hypotheses[11])   return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
   }
 
 

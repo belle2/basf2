@@ -47,11 +47,11 @@ void IPDQMExpressRecoModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("IPMonitoring")->cd();
 
-  m_h_x = new TH1F("Y4S_Vertex.X", "IP position - coord. X", 2000, -2, 2);
+  m_h_x = new TH1F("Y4S_Vertex.X", "IP position - coord. X", 1000, -1, 1);
   m_h_x->SetXTitle("IP_coord. X [cm]");
-  m_h_y = new TH1F("Y4S_Vertex.Y", "IP position - coord. Y", 2000, -2, 2);
+  m_h_y = new TH1F("Y4S_Vertex.Y", "IP position - coord. Y", 1000, -1, 1);
   m_h_y->SetXTitle("IP_coord. Y [cm]");
-  m_h_z = new TH1F("Y4S_Vertex.Z", "IP position - coord. Z", 2000, -2, 2);
+  m_h_z = new TH1F("Y4S_Vertex.Z", "IP position - coord. Z", 1000, -2, 2);
   m_h_z->SetXTitle("IP_coord. Z [cm]");
   m_h_px = new TH1F("Y4S_Vertex.pX", "Total momentum in lab. frame - coord. X", 100, -2, 2);
   m_h_px->SetXTitle("pX [GeV/c]");
@@ -131,6 +131,8 @@ void IPDQMExpressRecoModule::beginRun()
   m_h_E->Reset();
   m_v_y.clear();
   m_err_y.clear();
+  m_r = 0;
+  m_size_per_unit = m_size / m_no_units;
 }
 
 
@@ -180,7 +182,6 @@ void IPDQMExpressRecoModule::event()
       Particle* Y4S = Y4SParticles->getParticle(i);
       TVector3 IPVertex = frame.getVertex(Y4S);
       const auto& errMatrix = Y4S->getVertexErrorMatrix();
-
       m_h_x->Fill(IPVertex.X());
       m_h_y->Fill(IPVertex.Y());
       m_h_z->Fill(IPVertex.Z());
@@ -204,7 +205,7 @@ void IPDQMExpressRecoModule::event()
       m_err_y.push_back(std::sqrt(errMatrix(1, 1)));
       m_v_y.push_back(IPVertex.Y());
 
-      if (m_r == 199) {
+      if (m_r == m_size_per_unit) {
         m_h_temp->GetQuantiles(1, &m_median, &m_quantile);
         for (unsigned int u = 0; u < m_v_y.size(); u++) {
           m_h_y_risol->Fill(m_v_y.at(u) - m_median);

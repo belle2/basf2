@@ -93,7 +93,9 @@ namespace Belle2 {
     Double_t m_median = 0; /**<The median of y coord*/
     Double_t m_quantile = 0.5;/**<The 0.5 quantile for the median*/
     Int_t m_r = 0; /**<Counter for sampling*/
-
+    Int_t m_size = 199; /**<Size for sampling*/
+    Int_t m_no_units = 5; /**<Number of units*/
+    Int_t m_size_per_unit; /**<Size for sampling per each unit*/
     /** Name of the Y4S particle list */
     std::string m_Y4SPListName = "";
 

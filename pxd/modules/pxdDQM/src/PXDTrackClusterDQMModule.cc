@@ -64,7 +64,8 @@ void PXDTrackClusterDQMModule::defineHisto()
     TString buff = (std::string)avxdid;
     buff.ReplaceAll(".", "_");
 
-    m_trackClusterCharge[avxdid] = new TH1F("PXD_Cluster_Charge_" + buff, "PXD Cluster Charge " + buff + ";Charge/ADU;", 256, 0, 256);
+    m_trackClusterCharge[avxdid] = new TH1F("PXD_Track_Cluster_Charge_" + buff, "PXD Track Cluster Charge " + buff + ";Charge/ADU;",
+                                            256, 0, 256);
   }
 
   oldDir->cd();

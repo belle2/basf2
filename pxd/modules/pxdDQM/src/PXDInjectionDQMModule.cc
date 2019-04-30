@@ -51,8 +51,8 @@ void PXDInjectionDQMModule::defineHisto()
   hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;;Count/Time", 1000, -500, 4500);
   hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;;Count/Time", 1000, -500, 4500);
 
-  hOccAfterInjLERGate  = new TH1F("PXDOccInjLERGate", "PXDOccInjLERGate;Time;Gate", 1000, 50, 150, 192, 0, 192);
-  hOccAfterInjHERGate  = new TH1F("PXDOccInjHERGate", "PXDOccInjHERGate;Time;Gate", 1000, 50, 150, 192, 0, 192);
+  hOccAfterInjLERGate  = new TH2F("PXDOccInjLERGate", "PXDOccInjLERGate;Time;Gate", 1000, 50, 150, 192, 0, 192);
+  hOccAfterInjHERGate  = new TH2F("PXDOccInjHERGate", "PXDOccInjHERGate;Time;Gate", 1000, 50, 150, 192, 0, 192);
 
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();

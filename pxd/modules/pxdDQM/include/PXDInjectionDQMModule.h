@@ -61,8 +61,8 @@ namespace Belle2 {
 
       TH1F* hOccAfterInjLER{};          /** Occupancy after LER injection */
       TH1F* hOccAfterInjHER{};          /** Occupancy after HER injection */
-      TH1F* hOccAfterInjLERGate{};          /** Occupancy after LER injection */
-      TH1F* hOccAfterInjHERGate{};          /** Occupancy after HER injection */
+      TH2F* hOccAfterInjLERGate{};          /** Occupancy after LER injection */
+      TH2F* hOccAfterInjHERGate{};          /** Occupancy after HER injection */
       std::map<VxdID, TH1F*> hOccModAfterInjLER;/** Occupancy after LER injection */
       std::map<VxdID, TH1F*> hOccModAfterInjHER;/** Occupancy after HER injection */
 

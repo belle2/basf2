@@ -17,6 +17,7 @@
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/dataobjects/BKLMHit1d.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/core/HistoModule.h>
@@ -98,6 +99,8 @@ namespace Belle2 {
     /** Name of BKLMHit store array. */
     std::string m_outputHitsName;
 
+    std::string m_outputHitsName1d;
+
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
 
@@ -119,44 +122,17 @@ namespace Belle2 {
     /** Strip number within a layer. */
     TH1F** m_eklmStripLayer;
 
-    /** Number of hits per layer. */
-    TH1F* m_bklmLayerHits;
-
-    /** Reconstructed pulse height. */
-    TH1F* m_bklmEDep;
-
-    /** Reconstructed number MPPC pixels. */
-    TH1F* m_bklmNPixel;
-
-    /** z-measuring strip numbers of the 2D hit. */
-    TH1F* m_bklmZStrips;
-
-    /** Phi strip number of muon hit. */
-    TH1F* m_bklmPhiStrip;
-
-    /** Sector number of muon hit. */
-    TH1F* m_bklmSector;
-
-    /** Layer number of muon hit. */
-    TH1F* m_bklmLayer;
-
-    /** Distance from z axis in transverse plane of muon hit. */
-    TH1F* m_bklmHit2dsR;
-
     /** Axial position of muon hit. */
     TH1F* m_bklmHit2dsZ;
 
-    /** Position projected into transverse plane of muon hit. */
-    TH2F* m_bklmHit2dsYvsx;
+    /** Sector and layer number occupancy for phi-readout hits */
+    TH1F* m_bklmSectorLayerPhi;
 
-    /** Position projected into x-z plane of muon hit. */
-    TH2F* m_bklmHit2dsXvsz;
+    /** Sector and layer number occupancy for Z-readout hits */
+    TH1F* m_bklmSectorLayerZ;
 
-    /** Position projected into y-z plane of muon hit. */
-    TH2F* m_bklmHit2dsYvsz;
-
-    /** Layer VS Sector histogram for the BKLM forward and backward regions. */
-    TH2F* m_bklmLayerVsSector[2];
+    /** Number of BKLM Digits. */
+    TH1F* m_NBKLMDigits;
 
   };
 

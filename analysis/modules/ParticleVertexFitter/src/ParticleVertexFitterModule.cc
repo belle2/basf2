@@ -1045,9 +1045,13 @@ namespace Belle2 {
       }
     }
 
+    PCmsLabTransform T;
+    double rotationangle = T.getBeamParams().getHER().Vect().Angle(-1.0 * T.getBeamParams().getLER().Vect()) / 2.;
+
     TLorentzVector iptube_mom(0., 0., 1e10, 1e10);
     iptube_mom.RotateX(0.);
-    iptube_mom.RotateY(0.011);
+    iptube_mom.RotateY(rotationangle);
+    iptube_mom.RotateZ(0.);
 
     kv.setIpTubeProfile(
       ROOTToCLHEP::getHepLorentzVector(iptube_mom),

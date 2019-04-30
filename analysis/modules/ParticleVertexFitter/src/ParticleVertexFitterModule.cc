@@ -1047,7 +1047,7 @@ namespace Belle2 {
 
     TLorentzVector iptube_mom(0., 0., 1e10, 1e10);
     iptube_mom.RotateX(0.);
-    iptube_mom.RotateY(0.01);
+    iptube_mom.RotateY(0.011);
 
     kv.setIpTubeProfile(
       ROOTToCLHEP::getHepLorentzVector(iptube_mom),

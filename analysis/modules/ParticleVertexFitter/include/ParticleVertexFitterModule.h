@@ -186,6 +186,11 @@ namespace Belle2 {
     void addIPProfileToKFitter(analysis::VertexFitKFit& kv);
 
     /**
+     * Adds IPTube constraint to the vertex fit using kfitter.
+     */
+    void addIPTubeToKFitter(analysis::VertexFitKFit& kv);
+
+    /**
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
      * Pi0 particles are treated separately so they are filled to another vector.
      */

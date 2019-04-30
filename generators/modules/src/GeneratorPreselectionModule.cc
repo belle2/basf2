@@ -11,10 +11,7 @@
 // own include
 #include <generators/modules/GeneratorPreselectionModule.h>
 #include <framework/gearbox/Unit.h>
-#include <boost/format.hpp>
 #include <numeric>
-
-#include <TDatabasePDG.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,7 +28,7 @@ REG_MODULE(GeneratorPreselection)
 GeneratorPreselectionModule::GeneratorPreselectionModule() : Module()
 {
   // Set module properties
-  setDescription("Preselection based on generator truth information");
+  setDescription("Preselection based on generator truth information. Returns 0 if no cut have been passed, 1 if only the charged cut has been passed, 10 if only the photon cut has been passed, and 11 if both charged and photon cuts have been passed.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("nChargedMin", m_nChargedMin, "minimum number of charged particles", 0);
@@ -40,24 +37,18 @@ GeneratorPreselectionModule::GeneratorPreselectionModule() : Module()
   addParam("MinChargedPt", m_MinChargedPt, "minimum charged transverse momentum (pt) [GeV]", 0.1);
   addParam("MinChargedTheta", m_MinChargedTheta, "minimum polar angle of charged particle [deg]", 17.);
   addParam("MaxChargedTheta", m_MaxChargedTheta, "maximum polar angle of charged particle [deg]", 150.);
-  addParam("applyInCMS", m_applyInCMS, "if true apply the P,Pt,theta cuts in the center of mass frame", false);
+  addParam("applyInCMS", m_applyInCMS, "if true apply the P,Pt,theta, and energy cuts in the center of mass frame", false);
 
   addParam("nPhotonMin", m_nPhotonMin, "minimum number of photons", 0);
   addParam("nPhotonMax", m_nPhotonMax, "maximum number of photons", 999);
   addParam("MinPhotonEnergy", m_MinPhotonEnergy, "minimum photon energy [GeV]", -1.);
   addParam("MinPhotonTheta", m_MinPhotonTheta, "minimum polar angle of photon [deg]", 15.);
   addParam("MaxPhotonTheta", m_MaxPhotonTheta, "maximum polar angle of photon [deg]", 165.);
-
-  //initialize all member variables
-  m_onlyPrimaries = false;
-  m_maxLevel = -1;
-  m_nCharged = 0;
-  m_nPhoton = 0;
 }
 
 void GeneratorPreselectionModule::initialize()
 {
-  B2INFO("GeneratorPreselectionModule initialize");
+  B2DEBUG(29, "GeneratorPreselectionModule initialize");
 
   //convert limits to radian
   m_MinChargedTheta *= Unit::deg;
@@ -77,14 +68,9 @@ void GeneratorPreselectionModule::event()
   m_nCharged = 0;
   m_nPhoton  = 0.;
 
-  m_seen.clear();
-  m_seen.resize(m_mcparticles.getEntries() + 1, false);
-
-
   for (int i = 0; i < m_mcparticles.getEntries(); i++) {
     MCParticle& mc = *m_mcparticles[i];
-    if (mc.getMother() != NULL) continue;
-    checkParticle(mc, 0);
+    checkParticle(mc);
   }
 
   //check number of particles passing the cuts
@@ -111,26 +97,11 @@ void GeneratorPreselectionModule::event()
   }
 }
 
-void GeneratorPreselectionModule::checkParticle(const MCParticle& mc, int level)
+void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
 {
-  if (m_onlyPrimaries && !mc.hasStatus(MCParticle::c_PrimaryParticle)) return;
-  if (mc.hasStatus(MCParticle::c_Initial) || mc.hasStatus(MCParticle::c_IsVirtual)) return;
+  if (!mc.hasStatus(MCParticle::c_PrimaryParticle)) return;
+  if (mc.hasStatus(MCParticle::c_Initial) or mc.hasStatus(MCParticle::c_IsVirtual)) return;
 
-  //Only use up to max level
-  if (m_maxLevel >= 0 && level > m_maxLevel) return;
-  ++level;
-  string indent = "";
-
-  for (int i = 0; i < level; i++) indent += "  ";
-
-  TDatabasePDG* pdb = TDatabasePDG::Instance();
-  TParticlePDG* pdef = pdb->GetParticle(mc.getPDG());
-  string name = pdef ? (string(" (") + pdef->GetTitle() + ")") : "";
-
-  if (m_seen[mc.getIndex()]) {
-    B2INFO(boost::format("%4d %s%10d%s*") % mc.getIndex() % indent % mc.getPDG() % name);
-    return;
-  }
   const TVector3& p = mc.getMomentum();
   double energy     = mc.getEnergy();
   double mom        = p.Mag();
@@ -158,24 +129,18 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc, int level)
     }
   }
 
-  const vector<MCParticle*> daughters = mc.getDaughters();
-  for (MCParticle* daughter : daughters) {
-    checkParticle(*daughter, level);
-  }
-  m_seen[mc.getIndex()] = true;
-
 }
 
 void GeneratorPreselectionModule::terminate()
 {
-  B2RESULT("Final results of the preselection module:");
+  B2DEBUG(29, "Final results of the preselection module:");
   for (const auto& finalResult : m_resultCounter) {
-    B2RESULT("\tPreselection with result " << finalResult.first << ": " << finalResult.second << " times.");
+    B2DEBUG(29, "\tPreselection with result " << finalResult.first << ": " << finalResult.second << " times.");
   }
   const unsigned int sumCounters = std::accumulate(m_resultCounter.begin(), m_resultCounter.end(), 0, [](auto lhs, auto rhs) {
     return lhs + rhs.second;
   });
 
-  B2RESULT("Total number of tested events: " << sumCounters);
+  B2DEBUG(29, "Total number of tested events: " << sumCounters);
 }
 

@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisPXDCharge.h
-// Description : DAQM Analysis for PXD Common Modes
+// Description : DQM Analysis for PXD Cluster Charges
 //
 // Author : Bjoern Spruck, University Mainz
 // Date : 2018

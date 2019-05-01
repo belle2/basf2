@@ -211,8 +211,13 @@ namespace Belle2 {
       const Track* track = lepton->getTrack();
       const PIDLikelihood* pid = lepton->getPIDLikelihood();
 
-      if (track) { newLepton->addRelationTo(track); } else { std::cout << "NO TRACK FOUND"  << std::endl;}
-      if (pid) { newLepton->addRelationTo(pid); } else { std::cout << "NO PID FOUND"  << std::endl;}
+      if (track) {
+        // track relations are not managed via relations
+        newLepton->setTrack(track->getArrayIndex());
+      }
+      if (pid) {
+        newLepton->addRelationTo(pid);
+      }
 
       if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
       outputList->addParticle(newLepton);

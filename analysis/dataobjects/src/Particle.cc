@@ -530,6 +530,12 @@ const Track* Particle::getTrack() const
     return nullptr;
 }
 
+void Particle::setTrack(const int mdstIndex)
+{
+  m_mdstIndex = mdstIndex;
+  m_particleType = c_Track;
+}
+
 const PIDLikelihood* Particle::getPIDLikelihood() const
 {
   if (m_particleType == c_Track) {

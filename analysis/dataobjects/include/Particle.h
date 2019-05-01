@@ -578,6 +578,12 @@ namespace Belle2 {
     const Track* getTrack() const;
 
     /**
+     * set underlying track via index in the StoreArray `Tracks`
+     *
+     * */
+    void setTrack(const int mdstIndex);
+
+    /**
      * Returns the pointer to the PIDLikelihood object that is related to the Track, which
      * was used to create this Particle (ParticleType == c_Track).
      * NULL pointer is returned, if the Particle was not made from Track or if the Track has no

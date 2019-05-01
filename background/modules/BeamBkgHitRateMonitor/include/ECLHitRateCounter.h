@@ -22,10 +22,8 @@
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/geometry/B2Vector3.h>
 #include <TTree.h>
-#include <map>
-#include <iostream>
-#include <fstream>
-#include <string>
+#include <TFile.h>
+#include <TH1.h>
 #include <functional>
 #include <algorithm>
 
@@ -130,6 +128,11 @@ namespace Belle2 {
         return m_segmentMap.find(cellid)->second;
       }
 
+      /**
+       * Find the electronics noise correction for each cellID
+       * Reads a file with a histogram containing electronics noise level of each crystal
+       */
+      void findElectronicsNoise();
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */
@@ -146,6 +149,7 @@ namespace Belle2 {
       // other
       Belle2::ECL::ECLGeometryPar* m_geometry{nullptr}; /**< pointer to ECLGeometryPar */
       std::map<int, int> m_segmentMap; /**< map with keys containing ECL CellID and values containing segment number */
+      std::map<int, float> m_noiseMap; /**< map with keys containing ECL CellID and values containing electronics noise [GeV] */
     };
   }
 }

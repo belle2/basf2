@@ -27,6 +27,7 @@ namespace Belle2 {
     void ECLHitRateCounter::initialize(TTree* tree)
     {
       segmentECL();
+      findElectronicsNoise();
       // register collection(s) as optional, your detector might be excluded in DAQ
       m_digits.isOptional();
       m_dsps.isOptional();
@@ -64,7 +65,7 @@ namespace Belle2 {
 
       //calculate rates using waveforms
       //The background rate for a crystal is calculated as
-      //rate = pedestal_squared / (average_photon_energy_squared * time_constant)
+      //rate = rms_pedestal_squared / (average_photon_energy_squared * time_constant)
       //where time_constant=2.53 us and average_photon_energy_squared = 1 MeV
       if (m_dsps.getEntries() == 8736) {
         for (auto& aECLDsp : m_dsps) {
@@ -85,8 +86,11 @@ namespace Belle2 {
           double dspRMS = sqrt(wpsum / nadc);
           double dspSigma = dspRMS * abs(m_ADCtoEnergy[crysID]);
 
-          //calculating the backgorund rate
-          double dspBkgRate = (pow(dspSigma, 2)) / (2.53 * 1e-12);
+          //finding the corresponding electronics noise
+          float sigmaNoise = m_noiseMap.find(cellID)->second;
+
+          //calculating the background rate per second
+          double dspBkgRate = ((pow(dspSigma, 2)) - (pow(sigmaNoise, 2))) / (2.53 * 1e-12);
 
           //hit rate for segment in ECL, which is later normalized per 1Hz
           rates.averageDspBkgRate[segmentNumber] += dspBkgRate;
@@ -171,6 +175,19 @@ namespace Belle2 {
         }
       }
     }
+
+    void ECLHitRateCounter::findElectronicsNoise()
+    {
+      TFile noiseFile("ecl/data/sigmaMeanElectronics.root", "READ");
+      TH1F* h_Noise = dynamic_cast<TH1F*>(noiseFile.Get("sigma_noise"));
+
+      for (int i = 1; i < 8737; i++) {
+        m_noiseMap[i] = h_Noise->GetBinContent(i);
+      }
+
+      noiseFile.Close();
+    }
+
 
   } // Background namespace
 } // Belle2 namespace

@@ -21,7 +21,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -100,9 +99,7 @@ namespace Belle2 {
 
     StoreArray<Particle> particles;
     StoreArray<PIDLikelihood> pidlikelihoods;
-    StoreArray<Track> tracks;
     particles.registerRelationTo(pidlikelihoods);
-    particles.registerRelationTo(tracks);
 
   }
 

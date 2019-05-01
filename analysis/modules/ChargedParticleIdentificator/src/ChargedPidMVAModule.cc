@@ -1,6 +1,9 @@
 //THIS MODULE
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
 
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
 //C++
 #include <algorithm>
 
@@ -92,16 +95,29 @@ void ChargedPidMVAModule::event()
 
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
-      // Check that the particle has a valid relation set between track and ECL cluster.
+      // If the particle list was created by the FSRCorrection module,
+      // the info of the mdst objects associated to the particles cannot be retrieved
+      // directly from the particle.
+      // Instead, one has to get the 0-th daughter, i.e. the original particle before brem correction,
+      // as that will be the one that holds relations with the mdst objects associated to the particle.
+      //
+      // It is reasonably assumed that a charged stable particle won't have daughters in
+      // any other possible case (?)
+      bool isFSRProcessed = (particle->getNDaughters());
+      const Particle* daughter = (isFSRProcessed) ? particle->getDaughter(0) : nullptr;
+
+      // Check that the particle (or the 'daughter') has a valid relation set between track and ECL cluster.
       // Otherwise, skip to next.
-      if (!particle->getECLCluster()) {
+      const ECLCluster* eclCluster = (!isFSRProcessed) ? particle->getECLCluster() : daughter->getECLCluster();
+      if (!eclCluster) {
         B2DEBUG(11, "\t --> Invalid track-cluster relation, skip...");
         continue;
       }
 
       // Retrieve the index for the correct MVA expert and dataset, given (signal hypo, clusterTheta, p)
-      auto theta   = particle->getECLCluster()->getTheta();
-      auto p       = particle->getP();
+      auto theta   = eclCluster->getTheta();
+      auto p       = particle->getP(); // This is the momentum from the 4-vec after any possible correction,
+      // hence it must be the one of the actual particle.
       int jth, ip;
       auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
 
@@ -113,14 +129,16 @@ void ChargedPidMVAModule::event()
       auto nvars  = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
         auto varobj =  m_variables.at(index).at(ivar);
-        B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << varobj->function(particle));
-        m_datasets.at(index)->m_input[ivar] = varobj->function(particle);
+        auto var = varobj->function((!isFSRProcessed) ? particle : daughter);
+        B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
+        m_datasets.at(index)->m_input[ivar] = var;
       }
       auto nspecs  = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
         auto specobj =  m_spectators.at(index).at(ispec);
-        B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << specobj->function(particle));
-        m_datasets.at(index)->m_spectators[ispec] = specobj->function(particle);
+        auto spec = specobj->function((!isFSRProcessed) ? particle : daughter);
+        B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
+        m_datasets.at(index)->m_spectators[ispec] = spec;
       }
 
       float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];

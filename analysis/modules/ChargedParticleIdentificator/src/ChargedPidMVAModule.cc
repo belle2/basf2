@@ -129,7 +129,19 @@ void ChargedPidMVAModule::event()
       auto nvars  = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
         auto varobj =  m_variables.at(index).at(ivar);
-        auto var = varobj->function((!isFSRProcessed) ? particle : daughter);
+        // Set the variables from the daughter particle, if found.
+        // In that case, also ensure E/p is calculated *after* the 4-vec correction,
+        // i.e. using the actual particle's momentum.
+        auto var(-999.0);
+        if (varobj->name == "clusterEoP") {
+          if (isFSRProcessed) {
+            var = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / p;
+          } else {
+            var = varobj->function(particle);
+          }
+        } else {
+          var = varobj->function((!isFSRProcessed) ? particle : daughter);
+        }
         B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
         m_datasets.at(index)->m_input[ivar] = var;
       }

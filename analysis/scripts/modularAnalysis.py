@@ -329,8 +329,13 @@ def loadGearbox(path=analysis_main):
     """
     Loads Gearbox module to the path.
 
-    This is neccessary in a job with event generation only
-    (without reconstruction and reconstruction).
+    Warning:
+        Should be used in a job with event generation only
+
+    Needed for scripts which only generate events (without simulation
+    and reconstruction) in order to load the geometry.
+
+    See also: the tutorial ``B2A101-Y4SEventGeneration.py``.
 
     @param path modules are added to this path
     """

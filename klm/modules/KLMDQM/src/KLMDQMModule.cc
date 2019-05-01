@@ -3,8 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
- *               V. Gaur, Prof. L. Piilonen                               *
+ * Contributors: Kirill Chilikin, Vipin Gaur, Leo Piilonen                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -29,7 +28,7 @@ KLMDQMModule::KLMDQMModule() :
   m_bklmHit2dsZ(nullptr),
   m_bklmSectorLayerPhi(nullptr),
   m_bklmSectorLayerZ(nullptr),
-  m_NBKLMDigits(nullptr)
+  m_bklmDigitsN(nullptr)
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -42,7 +41,7 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
            "Directory for BKLM DQM histograms in ROOT file.",
            std::string("BKLM"));
-  addParam("outputDigitsName", m_outputDigitsName,
+  addParam("inputDigitsName", m_inputDigitsName,
            "Name of BKLMDigit store array", std::string("BKLMDigits"));
   m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
 }
@@ -106,10 +105,10 @@ void KLMDQMModule::defineHistoBKLM()
                            97, -172.22, 266.22);
   m_bklmHit2dsZ->GetXaxis()->SetTitle("Axial position of muon hit");
   m_bklmHit2dsZ->SetOption("LIVE");
-  m_NBKLMDigits = new TH1F("NBKLMDigits", "Number of BKLM Digits",
+  m_bklmDigitsN = new TH1F("bklmDigitsN", "Number of BKLM Digits",
                            250.0, 0.0, 250.0);
-  m_NBKLMDigits->GetXaxis()->SetTitle("Number of BKLM Digits");
-  m_NBKLMDigits->SetOption("LIVE");
+  m_bklmDigitsN->GetXaxis()->SetTitle("Number of BKLM Digits");
+  m_bklmDigitsN->SetOption("LIVE");
   oldDir->cd();
 }
 
@@ -144,7 +143,7 @@ void KLMDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_Digits.isRequired();
-  StoreArray<BKLMDigit> digits(m_outputDigitsName);
+  StoreArray<BKLMDigit> digits(m_inputDigitsName);
   digits.isRequired();
 }
 
@@ -164,7 +163,7 @@ void KLMDQMModule::beginRun()
   m_bklmHit2dsZ->Reset();
   m_bklmSectorLayerPhi->Reset();
   m_bklmSectorLayerZ->Reset();
-  m_NBKLMDigits->Reset();
+  m_bklmDigitsN->Reset();
 }
 
 void KLMDQMModule::event()
@@ -196,9 +195,9 @@ void KLMDQMModule::event()
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
   }
   /* BKLM. */
-  StoreArray<BKLMDigit> digits(m_outputDigitsName);
+  StoreArray<BKLMDigit> digits(m_inputDigitsName);
   int nent = digits.getEntries();
-  m_NBKLMDigits->Fill((double)digits.getEntries());
+  m_bklmDigitsN->Fill((double)digits.getEntries());
   for (i = 0; i < nent; i++) {
     BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
     if (digit->inRPC())
@@ -206,15 +205,14 @@ void KLMDQMModule::event()
     else
       m_TimeScintillatorBKLM->Fill(digit->getTime());
   }
-
-  StoreArray<BKLMHit2d> hits(m_outputHitsName);
+  StoreArray<BKLMHit2d> hits(m_inputHitsName2d);
   int nnent = hits.getEntries();
   for (i = 0; i < nnent; i++) {
     BKLMHit2d* hit = static_cast<BKLMHit2d*>(hits[i]);
     TVector3 hitPosition = hit->getGlobalPosition();
     m_bklmHit2dsZ->Fill(hitPosition.Z());
   }
-  StoreArray<BKLMHit1d> hits1d(m_outputHitsName1d);
+  StoreArray<BKLMHit1d> hits1d(m_inputHitsName1d);
   int nent1d = hits1d.getEntries();
   for (i = 0; i < nent1d; i++) {
     BKLMHit1d* hit1d = static_cast<BKLMHit1d*>(hits1d[i]);
@@ -223,9 +221,7 @@ void KLMDQMModule::event()
     } else {
       m_bklmSectorLayerZ->Fill((hit1d->isForward() ? 120 : 0) + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
     }
-  }//for loop ends
-
-
+  }
 }
 
 void KLMDQMModule::endRun()

@@ -3,7 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Vipin Gaur                              *
+ * Contributors: Kirill Chilikin, Vipin Gaur, Leo Piilonen                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -94,12 +94,13 @@ namespace Belle2 {
     std::string m_HistogramDirectoryNameBKLM;
 
     /** name of BKLMDigit store array. */
-    std::string m_outputDigitsName;
+    std::string m_inputDigitsName;
 
-    /** Name of BKLMHit store array. */
-    std::string m_outputHitsName;
+    /** Name of BKLMHit2d store array. */
+    std::string m_inputHitsName2d;
 
-    std::string m_outputHitsName1d;
+    /** Name of BKLMHit1d store array. */
+    std::string m_inputHitsName1d;
 
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
@@ -132,7 +133,7 @@ namespace Belle2 {
     TH1F* m_bklmSectorLayerZ;
 
     /** Number of BKLM Digits. */
-    TH1F* m_NBKLMDigits;
+    TH1F* m_bklmDigitsN;
 
   };
 

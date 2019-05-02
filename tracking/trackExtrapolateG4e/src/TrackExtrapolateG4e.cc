@@ -1862,19 +1862,19 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool
     if ((abs(muid->getPDGCode()) == Const::muon.getPDGCode()) ||
         (abs(muid->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
     if (charge > 0) {
-      muon = m_MuonPlusPar->getPDF(muid, isForward, "MuonPlus");
-      pion = m_PionPlusPar->getPDF(muid, isForward, "PionPlus");
-      kaon = m_KaonPlusPar->getPDF(muid, isForward, "KaonPlus");
-      proton = m_ProtonPar->getPDF(muid, isForward, "Proton");
-      deuteron = m_DeuteronPar->getPDF(muid, isForward, "Deuteron");
-      electron = m_PositronPar->getPDF(muid, isForward, "Positron");
+      muon = m_MuonPlusPar->getPDF(muid, isForward, true);
+      pion = m_PionPlusPar->getPDF(muid, isForward, false);
+      kaon = m_KaonPlusPar->getPDF(muid, isForward, false);
+      proton = m_ProtonPar->getPDF(muid, isForward, false);
+      deuteron = m_DeuteronPar->getPDF(muid, isForward, false);
+      electron = m_PositronPar->getPDF(muid, isForward, false);
     } else {
-      muon = m_MuonMinusPar->getPDF(muid, isForward, "MuonMinus");
-      pion = m_PionMinusPar->getPDF(muid, isForward, "PionMinus");
-      kaon = m_KaonMinusPar->getPDF(muid, isForward, "KaonMinus");
-      proton = m_AntiprotonPar->getPDF(muid, isForward, "Antiproton");
-      deuteron = m_AntideuteronPar->getPDF(muid, isForward, "Antideuteron");
-      electron = m_ElectronPar->getPDF(muid, isForward, "ElectronMinus");
+      muon = m_MuonMinusPar->getPDF(muid, isForward, true);
+      pion = m_PionMinusPar->getPDF(muid, isForward, false);
+      kaon = m_KaonMinusPar->getPDF(muid, isForward, false);
+      proton = m_AntiprotonPar->getPDF(muid, isForward, false);
+      deuteron = m_AntideuteronPar->getPDF(muid, isForward, false);
+      electron = m_ElectronPar->getPDF(muid, isForward, false);
     }
     if (muon > 0.0) logL_mu = log(muon);
     if (pion > 0.0) logL_pi = log(pion);

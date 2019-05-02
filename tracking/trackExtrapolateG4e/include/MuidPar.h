@@ -87,7 +87,7 @@ namespace Belle2 {
     ~MuidPar();
 
     //! Get the PDF for a particular hypothesis
-    double getPDF(const Muid*, bool isForward, const char*) const;
+    double getPDF(const Muid*, bool isForward, bool isMuon) const;
 
   private:
 

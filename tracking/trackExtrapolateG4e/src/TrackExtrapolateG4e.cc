@@ -1335,6 +1335,8 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       if (findMatchingBarrelHit(intersection, extState.track)) {
         (*bklmHitUsed)[intersection.hit].insert(std::pair<const Track*, double>(extState.track, intersection.chi2));
         extState.extLayerPattern |= (0x00000001 << intersection.layer);
+        //efficiency implementation
+        extState.extEfficiencyVector.push_back(1);
         if (extState.lastBarrelExtLayer < intersection.layer) {
           extState.lastBarrelExtLayer = intersection.layer;
         }
@@ -1369,6 +1371,15 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           }
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+            //efficiency storage
+            if (m_bklmStripEfficiency.isValid()) {
+              extState.extEfficiencyVector.push_back(m_bklmStripEfficiency->getEfficiency((intersection.isForward ? 1 : 0),
+                                                     intersection.sector + 1, intersection.layer + 1, 1, 1));
+            } else {
+              extState.extEfficiencyVector.push_back(0);
+            }
+          } else {
+            extState.extEfficiencyVector.push_back(0);
           }
           if (extState.lastBarrelExtLayer < intersection.layer) {
             extState.lastBarrelExtLayer = intersection.layer;
@@ -1385,6 +1396,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       fromG4eToPhasespace(g4eState, intersection.covariance);
       if (findMatchingEndcapHit(intersection, extState.track)) {
         extState.extLayerPattern |= (0x00008000 << intersection.layer);
+        extState.extEfficiencyVector.push_back(1);
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
         }
@@ -1413,6 +1425,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+          extState.extEfficiencyVector.push_back(1);
+        } else {
+          extState.extEfficiencyVector.push_back(0);
         }
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;

@@ -15,6 +15,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
 #include <bklm/dbobjects/BKLMBadChannels.h>
+#include <bklm/dbobjects/BKLMStripEfficiency.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/geometry/TransformDataGlobalAligned.h>
 #include <tracking/dataobjects/ExtHit.h>
@@ -107,6 +108,8 @@ namespace Belle2 {
     int hitLayerPattern;
     //! MUID: flag to indicate that the extrapolated track escaped from the KLM
     bool escaped;
+    //! MUID: vector of layer efficiencies
+    std::vector<float> extEfficiencyVector;
   };
 
   //! intersection of muid-extrapolated track with a KLM layer
@@ -481,6 +484,9 @@ namespace Belle2 {
 
     //! Flag to indicate that the BKLM dead-channel list is valid for the given run
     bool m_bklmBadChannelsValid;
+
+    //! Conditions-database object for BKLM strip efficiency
+    DBObjPtr<BKLMStripEfficiency> m_bklmStripEfficiency;
 
     //! Conditions-database object for EKLM dead-channel list (updated at start of each run)
     DBObjPtr<EKLMChannels> m_eklmChannels;

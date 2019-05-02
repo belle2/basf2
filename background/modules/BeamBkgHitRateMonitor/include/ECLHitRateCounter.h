@@ -45,8 +45,8 @@ namespace Belle2 {
         float averageRate = 0; /**< total detector average hit rate */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
-        float averageDspBkgRate[16]; /**<background rate calculated from ECL waveforms [hits/second] */
-        int numEventsSegments[16]; /**< number of events per segment */
+        float averageDspBkgRate[16] = {0}; /**<background rate calculated from ECL waveforms [hits/second] */
+        int numEventsSegments[16] = {0}; /**< number of events per segment */
         bool validDspRate = false; /**< status for rates calculated from waveforms, true if waveforms for all crystals are recorded */
 
         /**

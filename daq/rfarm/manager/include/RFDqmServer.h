@@ -12,6 +12,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFProcessManager.h"

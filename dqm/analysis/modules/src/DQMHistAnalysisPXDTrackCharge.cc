@@ -1,17 +1,16 @@
 //+
-// File : DQMHistAnalysisPXDCharge.cc
+// File : DQMHistAnalysisPXDTrackCharge.cc
 // Description : Analysis of PXD Cluster Charge
 //
 // Author : Bjoern Spruck, University Mainz
-// Date : 2018
+// Date : 2019
 //-
 
 
-#include <dqm/analysis/modules/DQMHistAnalysisPXDCharge.h>
+#include <dqm/analysis/modules/DQMHistAnalysisPXDTrackCharge.h>
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
-#include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -23,13 +22,13 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDCharge)
+REG_MODULE(DQMHistAnalysisPXDTrackCharge)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
+DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
@@ -38,20 +37,20 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
-  B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
+  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
+  B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
 
-DQMHistAnalysisPXDChargeModule::~DQMHistAnalysisPXDChargeModule()
+DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 {
 #ifdef _BELLE2_EPICS
   if (ca_current_context()) ca_context_destroy();
 #endif
 }
 
-void DQMHistAnalysisPXDChargeModule::initialize()
+void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
-  B2DEBUG(99, "DQMHistAnalysisPXDCharge: initialized.");
+  B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -68,8 +67,8 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cCharge = new TCanvas("c_Charge");
-  m_hCharge = new TH1F("Cluster Charge", "Cluster Charge; Module; Cluster Charge", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_cCharge = new TCanvas("c_TrackCharge");
+  m_hCharge = new TH1F("Track Cluster Charge", "Cluster Charge; Module; Cluster Charge", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hCharge->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCharge->SetStats(false);
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -118,14 +117,14 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 }
 
 
-void DQMHistAnalysisPXDChargeModule::beginRun()
+void DQMHistAnalysisPXDTrackChargeModule::beginRun()
 {
-  B2DEBUG(99, "DQMHistAnalysisPXDCharge: beginRun called.");
+  B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: beginRun called.");
 
   m_cCharge->Clear();
 }
 
-void DQMHistAnalysisPXDChargeModule::event()
+void DQMHistAnalysisPXDTrackChargeModule::event()
 {
 //   double data = 0.0;
   if (!m_cCharge) return;
@@ -134,7 +133,7 @@ void DQMHistAnalysisPXDChargeModule::event()
   bool enough = false;
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    std::string name = "DQMER_PXD_" + (std::string)m_PXDModules[i ] + "_ClusterCharge";;
+    std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i];
     std::replace(name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = findHist(name);
@@ -199,22 +198,17 @@ void DQMHistAnalysisPXDChargeModule::event()
 #endif
   }
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
-  tt->SetTextAngle(90);// Rotated
-  tt->SetTextAlign(12);// Centered
-  tt->Draw();
-
   m_cCharge->Modified();
   m_cCharge->Update();
 }
 
-void DQMHistAnalysisPXDChargeModule::endRun()
+void DQMHistAnalysisPXDTrackChargeModule::endRun()
 {
-  B2DEBUG(99, "DQMHistAnalysisPXDCharge : endRun called");
+  B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge : endRun called");
 }
 
 
-void DQMHistAnalysisPXDChargeModule::terminate()
+void DQMHistAnalysisPXDTrackChargeModule::terminate()
 {
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
@@ -222,6 +216,6 @@ void DQMHistAnalysisPXDChargeModule::terminate()
   SEVCHK(ca_clear_channel(mychid[1]), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
-  B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");
+  B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: terminate called");
 }
 

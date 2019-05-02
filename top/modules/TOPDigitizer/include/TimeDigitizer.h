@@ -54,13 +54,37 @@ namespace Belle2 {
        * Constructor
        * @param moduleID TOP module ID
        * @param pixelID pixel ID
-       * @param window storage window number (first window of waveform)
-       * @param storageDepth analog storage depth
+       * @param timeOffset time offset [ns]
+       * @param calErrorsSq calibration uncertainies squared
        * @param rmsNoise r.m.s of noise [ADC counts]
        * @param sampleTimes sample times
        */
-      TimeDigitizer(int moduleID, int pixelID, unsigned window, unsigned storageDepth,
+      TimeDigitizer(int moduleID, int pixelID, double timeOffset, double calErrorsSq,
                     double rmsNoise, const TOPSampleTimes& sampleTimes);
+
+      /**
+       * Sets storage depth
+       * @param storageDepth analog storage depth
+       */
+      static void setStorageDepth(unsigned storageDepth) {m_storageDepth = storageDepth;}
+
+      /**
+       * Sets the number of readout windows
+       * @param numWin number of readout windows
+       */
+      static void setReadoutWindows(unsigned numWin) {m_readoutWindows = numWin;}
+
+      /**
+       * Sets the number of windows before the first ASIC window
+       * @param offsetWin number of offset windows
+       */
+      static void setOffsetWindows(int offsetWin) {m_offsetWindows = offsetWin;}
+
+      /**
+       * Sets first ASIC window
+       * @param window storage window number
+       */
+      static void setFirstWindow(unsigned window) {m_window = window;}
 
       /**
        * Sets sample times
@@ -208,22 +232,28 @@ namespace Belle2 {
        * Generate waveform.
        * The size (number of ASIC windows) is given by the size of first argument.
        * The size of second argument must be the same as the first one.
+       * @param startSample starting sample w.r.t first window number
        * @param baselines possible baseline shifts of ASIC windows
        * @param rmsNoises noise levels (r.m.s) per ASIC window
        * @param pedestals average pedestals per ASIC window
        * @param ADCRange ADC range (2^NumBits)
        * @return generated waveform
        */
-      std::vector<short> generateWaveform(const std::vector<double>& baselines,
+      std::vector<short> generateWaveform(int startSample,
+                                          const std::vector<double>& baselines,
                                           const std::vector<double>& rmsNoises,
                                           const std::vector<double>& pedestals,
                                           int ADCRange) const;
 
+      static unsigned m_storageDepth;  /**< ASIC analog storage depth */
+      static unsigned m_readoutWindows;   /**< number of readout windows */
+      static int m_offsetWindows;    /**< number of windows before first window */
+      static unsigned m_window;      /**< first window number */
 
       int m_moduleID = 0;     /**< module ID (1-based) */
       int m_pixelID = 0;      /**< pixel (e.g. software channel) ID (1-based) */
-      unsigned m_window = 0;  /**< storage window number */
-      unsigned m_storageDepth = 0;  /**< ASIC analog storage depth */
+      double m_timeOffset = 0; /**< time offset [ns] */
+      double m_calErrorsSq = 0; /**< calibration uncertainties squared */
       double m_rmsNoise = 0;  /**< r.m.s of noise [ADC counts] */
       const TOPSampleTimes* m_sampleTimes = 0; /**< sample times */
 

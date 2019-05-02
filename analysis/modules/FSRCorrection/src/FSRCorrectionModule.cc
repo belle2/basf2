@@ -15,7 +15,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Const.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -171,7 +170,8 @@ namespace Belle2 {
         B2INFO("[FSRCorrectionModule] Found a radiative gamma and added its 4-vector to the lepton");
       }
 
-      Particle correctedLepton(new4Vec, lepton->getPDGCode(), 1, c_Track, lepton->getTrack()->getArrayIndex());
+      Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
+                               lepton->getTrack()->getArrayIndex());
 
       correctedLepton.appendDaughter(lepton);
       if (fsrGammaFound) {

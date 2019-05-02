@@ -15,6 +15,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/gearbox/Const.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -170,7 +171,8 @@ namespace Belle2 {
         B2INFO("[FSRCorrectionModule] Found a radiative gamma and added its 4-vector to the lepton");
       }
 
-      Particle correctedLepton(new4Vec, lepton->getPDGCode());
+      Particle correctedLepton(new4Vec, lepton->getPDGCode(), 1, c_Track, lepton->getTrack()->getArrayIndex());
+
       correctedLepton.appendDaughter(lepton);
       if (fsrGammaFound) {
         correctedLepton.appendDaughter(fsrGamma);
@@ -194,7 +196,6 @@ namespace Belle2 {
         correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
       }
 
-
       // add the info from original lepton to the new lepton
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
@@ -205,13 +206,8 @@ namespace Belle2 {
       Particle* newLepton = particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
 
-      const Track* track = lepton->getTrack();
       const PIDLikelihood* pid = lepton->getPIDLikelihood();
 
-      if (track) {
-        // track relations are not managed via relations
-        newLepton->setTrack(track->getArrayIndex());
-      }
       if (pid) {
         newLepton->addRelationTo(pid);
       }

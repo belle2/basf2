@@ -35,6 +35,7 @@ def add_generator_preselection(
         applyInCMS=False):
     """
         Adds generator preselection.
+        Should be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules
         It uses all particles from the event generator (i.e. primary, non-virtual, non-initial particles).
         It checks if the required conditions are fullfilled.
         If not, the events are given to the emptypath.
@@ -42,21 +43,21 @@ def add_generator_preselection(
         Note that you have to multiply the generated cross section by the retention fraction of the preselection.
 
         Parameters:
-        path (basf2.Path): path where the generator should be added
-        emptypath (basf2.Path): path where the skipped events are given to
-        nChargedMin (int): minimum number of charged particles"
-        nChargedMax (int): maximum number of charged particles"
-        MinChargedP (float): minimum charged momentum [GeV]"
-        MinChargedPt (float): minimum charged transverse momentum (pt) [GeV]"
-        MinChargedTheta (float): minimum polar angle of charged particle [deg]"
-        MaxChargedTheta (float): maximum polar angle of charged particle [deg]"
-        nPhotonMin (int): minimum number of photons"
-        nPhotonMax (int): maximum number of photons"
-        MinPhotonEnergy (float): minimum photon energy [GeV]"
-        MinPhotonTheta (float): minimum polar angle of photon [deg]"
-        MaxPhotonTheta (float): maximum polar angle of photon [deg]"
-        applyInCMS (bool): if true apply the P,Pt,theta, and energy cuts in the center of mass frame"
-        """
+            path (basf2.Path): path where the generator should be added
+            emptypath (basf2.Path): path where the skipped events are given to
+            nChargedMin (int): minimum number of charged particles
+            nChargedMax (int): maximum number of charged particles
+            MinChargedP (float): minimum charged momentum [GeV]
+            MinChargedPt (float): minimum charged transverse momentum (pt) [GeV]
+            MinChargedTheta (float): minimum polar angle of charged particle [deg]
+            MaxChargedTheta (float): maximum polar angle of charged particle [deg]
+            nPhotonMin (int): minimum number of photons
+            nPhotonMax (int): maximum number of photons
+            MinPhotonEnergy (float): minimum photon energy [GeV]
+            MinPhotonTheta (float): minimum polar angle of photon [deg]
+            MaxPhotonTheta (float): maximum polar angle of photon [deg]
+            applyInCMS (bool): if true apply the P,Pt,theta, and energy cuts in the center of mass frame
+    """
 
     generatorpreselection = path.add_module('GeneratorPreselection',
                                             nChargedMin=nChargedMin,

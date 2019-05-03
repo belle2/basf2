@@ -133,14 +133,14 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
 
 void GeneratorPreselectionModule::terminate()
 {
-  B2DEBUG(29, "Final results of the preselection module:");
+  B2RESULT("Final results of the preselection module:");
   for (const auto& finalResult : m_resultCounter) {
-    B2DEBUG(29, "\tPreselection with result " << finalResult.first << ": " << finalResult.second << " times.");
+    B2RESULT("\tPreselection with result " << finalResult.first << ": " << finalResult.second << " times.");
   }
   const unsigned int sumCounters = std::accumulate(m_resultCounter.begin(), m_resultCounter.end(), 0, [](auto lhs, auto rhs) {
     return lhs + rhs.second;
   });
 
-  B2DEBUG(29, "Total number of tested events: " << sumCounters);
+  B2RESULT("Total number of tested events: " << sumCounters);
 }
 

@@ -171,7 +171,7 @@ namespace Belle2 {
 
   double MuidPar::getPDF(const Muid* muid, bool isForward, bool isMuon) const
   {
-    if (isMuon == true) {
+    if (isMuon) {
       return getPDFLayer_muon(muid, isForward) * getPDFRchisq(muid);
     } else {
       return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
@@ -225,37 +225,8 @@ namespace Belle2 {
     //Pdf treatment used to avoid layer inefficiency problems
     double pdf = 1.0;
     unsigned int testBit = 1;
-    int sector = -1;
     float thresholdFraction = 0.33;
-    MuidHit* muidHits;
-
-    RelationVector<MuidHit> muidhit = muid->getRelationsTo<MuidHit>();
-    for (unsigned int muhit = 0; muhit < muidhit.size(); muhit++) {
-      muidHits =  muidhit[muhit];
-      sector = muidHits->getSector();
-      if (sector >= 0) break;
-    }
-
-    //BKLM EFFICIENCIES PHASE 2 for each sectors and each layers
-    double Eff_BF0[15] = {0.00266667, 0.313149, 0.303922, 0.426471, 0.356061, 0.835341, 0.741627, 0.82205, 0.891935, 0.570646, 0.789902, 0.849438, 0.824931, 0.716707, 0.334281};
-    double Eff_BF1[15] = {0.410815, 0.822917, 0.372642, 0.587234, 0.395349, 0.832392, 0.8528, 0.822755, 0.78553, 0.602975, 0.709347, 0.787199, 0, 0, 0.730331};
-    double Eff_BF2[15] = {0};
-    double Eff_BF3[15] = {0.293146, 0.803922, 0.666667, 0.745038, 0.73838, 0.849817, 0.877976, 0.869728, 0.873935, 0.553882, 0.83905, 0.621658, 0.722701, 0.73315, 0.683995};
-    double Eff_BF4[15] = {0.490405, 0.856354, 0.82, 0.845588, 0.733333, 0, 0.963907, 0.96401, 0.852459, 0.574007, 0.736585, 0.773529, 0, 0.773936, 0.771883};
-    double Eff_BF5[15] = {0, 0.283128, 0.909091, 0.875224, 0.0368034, 0.89071, 0.898216, 0.895127, 0.877193, 0.904465, 0.936652, 0.203077, 0.857868, 0.865826, 0.806624};
-    double Eff_BF6[15] = {0.574825, 0.605797, 0.231481, 0.415459, 0.218605, 0.753846, 0.811533, 0.852476, 0.857749, 0.539116, 0.615248, 0.896259, 0.781475, 0.806358, 0.811833};
-    double Eff_BF7[15] = {0, 0.137615, 0.372093, 0.37551, 0.518625, 0.805324, 0.822093, 0.70596, 0.572052, 0.525292, 0.672504, 0.838158, 0.82247, 0.767974, 0.762987};
-
-    double Eff_BB0[15] = {0.0173661, 0.511504, 0.775316, 0.855711, 0.907308, 0.00490998, 0.937226, 0.933579, 0.0379507, 0.850112, 0.74364, 0.89703, 0.0720109, 0.87108, 0.689127};
-    double Eff_BB1[15] = {0, 0.167857, 0.622222, 0.764423, 0.573864, 0.8437, 0.859036, 0.556748, 0.81104, 0.656328, 0.669749, 0.808803, 0.797143, 0.645641, 0.467733};
-    double Eff_BB2[15] = {0.26357, 0.129688, 0.758065, 0.547105, 0.662222, 0.758564, 0.860849, 0.80853, 0.670051, 0.636285, 0.922764, 0.202169, 0.779736, 0.589841, 0.172103};
-    double Eff_BB3[15] = {0.34612, 0.246792, 0.612676, 0.649916, 0.758359, 0.81388, 0.882759, 0.862028, 0.58209, 0.783617, 0.695918, 0.855087, 0.839012, 0.710262, 0.542714};
-    double Eff_BB4[15] = {0.383975, 0.405609, 0.511111, 0.370166, 0.378505, 0.829167, 0.871755, 0.885891, 0.855556, 0.603627, 0.695035, 0.866407, 0.806483, 0.607404, 0.68313};
-    double Eff_BB5[15] = {0.459225, 0.458082, 0.565359, 0.317967, 0.375375, 0.73494, 0.915799, 0.776042, 0.848387, 0.70607, 0.621698, 0.837285, 0.765024, 0.831115, 0.718705};
-    double Eff_BB6[15] = {0.133038, 0.0634518, 0.818505, 0.776632, 0.83959, 0.920382, 0.905817, 0.915014, 0.877493, 0.873563, 0.875776, 0.755906, 0.65625, 0.790476, 0.0493827};
-    double Eff_BB7[15] = {0.323093, 0.12311, 0.663677, 0.576842, 0.741093, 0.774687, 0.855208, 0.807381, 0.754821, 0.648686, 0.736682, 0.756126, 0.835646, 0.701065, 0.77396};
-
-    //----------------
+    std::vector<float> extEfficiencyVector = muid->getExtEfficiencyVector();
 
 
     for (int layer = 0; layer <= barrelExtLayer; ++layer) {
@@ -283,123 +254,17 @@ namespace Belle2 {
               } else {
                 //treatment of inefficient layers using BKLM efficiencies
                 if (isForward) { //select forward BKLM section
-                  switch (sector) {
-                    case (0):
-                      if (Eff_BF0[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BF0[layer]) / 6;
-                      } else if (Eff_BF0[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BF0[layer]);
-                      }
-                      break;
-                    case (1):
-                      if (Eff_BF1[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BF1[layer]) / 6;
-                      } else if (Eff_BF1[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BF1[layer]);
-                      }
-                      break;
-                    case (2):
-                      if (Eff_BF2[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BF2[layer]) / 6;
-                      } else if (Eff_BF2[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BF2[layer]);
-                      }
-                      break;
-                    case (3):
-                      if (Eff_BF3[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BF3[layer]) / 6;
-                      } else if (Eff_BF3[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BF3[layer]);
-                      }
-                      break;
-                    case (4):
-                      if (Eff_BF4[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BF4[layer]) / 6;
-                      } else if (Eff_BF4[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BF4[layer]);
-                      }
-                      break;
-                    case (5):
-                      if (Eff_BF5[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BF5[layer]) / 6;
-                      } else if (Eff_BF5[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BF5[layer]);
-                      }
-                      break;
-                    case (6):
-                      if (Eff_BF6[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BF6[layer]) / 6;
-                      } else if (Eff_BF6[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BF6[layer]);
-                      }
-                      break;
-                    case (7):
-                      if (Eff_BF7[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BF7[layer]) / 6;
-                      } else if (Eff_BF7[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BF7[layer]);
-                      }
-                      break;
+                  if (extEfficiencyVector.at(layer) < 0.5) {
+                    pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - extEfficiencyVector.at(layer)) / 6;
+                  } else if (extEfficiencyVector.at(layer) > 0.5) {
+                    pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * extEfficiencyVector.at(layer);
                   }
                 }
-                if (!isForward) { //select backward BKLM section
-                  switch (sector) {
-                    case (0):
-                      if (Eff_BB0[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BB0[layer]) / 6;
-                      } else if (Eff_BB0[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BB0[layer]);
-                      }
-                      break;
-                    case (1):
-                      if (Eff_BB1[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BB1[layer]) / 6;
-                      } else if (Eff_BB1[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BB1[layer]);
-                      }
-                      break;
-                    case (2):
-                      if (Eff_BB2[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BB2[layer]) / 6;
-                      } else if (Eff_BB2[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BB2[layer]);
-                      }
-                      break;
-                    case (3):
-                      if (Eff_BB3[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BB3[layer]) / 6;
-                      } else if (Eff_BB3[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BB3[layer]);
-                      }
-                      break;
-                    case (4):
-                      if (Eff_BB4[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BB4[layer]) / 6;
-                      } else if (Eff_BB4[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BB4[layer]);
-                      }
-                      break;
-                    case (5):
-                      if (Eff_BB5[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BB5[layer]) / 6;
-                      } else if (Eff_BB5[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BB5[layer]);
-                      }
-                      break;
-                    case (6):
-                      if (Eff_BB6[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BB6[layer]) / 6;
-                      } else if (Eff_BB6[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BB6[layer]);
-                      }
-                      break;
-                    case (7):
-                      if (Eff_BB7[layer] < 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - Eff_BB7[layer]) / 6;
-                      } else if (Eff_BB7[layer] >= 0.5) {
-                        pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (Eff_BB7[layer]);
-                      }
-                      break;
+                if (!isForward) { //select forward BKLM section
+                  if (extEfficiencyVector.at(layer) < 0.5) {
+                    pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - extEfficiencyVector.at(layer)) / 6;
+                  } else if (extEfficiencyVector.at(layer) > 0.5) {
+                    pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * extEfficiencyVector.at(layer);
                   }
                 }
               }
@@ -495,7 +360,6 @@ namespace Belle2 {
       testBit <<= 1; // move to next bit
     }
 
-    //    delete muidHits;
     return pdf;
 
   }
@@ -574,35 +438,8 @@ namespace Belle2 {
 
     double pdf = 1.0;
     unsigned int testBit = 1;
-    int sector = -1;
-    MuidHit* muidHits;
+    std::vector<float> extEfficiencyVector = muid->getExtEfficiencyVector();
 
-    RelationVector<MuidHit> muidhit = muid->getRelationsTo<MuidHit>();
-    for (unsigned int muhit = 0; muhit < muidhit.size(); muhit++) {
-      muidHits =  muidhit[muhit];
-      sector = muidHits->getSector();
-      if (sector >= 0) break;
-    }
-
-    //BKLM EFFICIENCIES PHASE 2 for each sectors and each layers
-    double Eff_BF0[15] = {0.00266667, 0.313149, 0.303922, 0.426471, 0.356061, 0.835341, 0.741627, 0.82205, 0.891935, 0.570646, 0.789902, 0.849438, 0.824931, 0.716707, 0.334281};
-    double Eff_BF1[15] = {0.410815, 0.822917, 0.372642, 0.587234, 0.395349, 0.832392, 0.8528, 0.822755, 0.78553, 0.602975, 0.709347, 0.787199, 0, 0, 0.730331};
-    double Eff_BF2[15] = {0};
-    double Eff_BF3[15] = {0.293146, 0.803922, 0.666667, 0.745038, 0.73838, 0.849817, 0.877976, 0.869728, 0.873935, 0.553882, 0.83905, 0.621658, 0.722701, 0.73315, 0.683995};
-    double Eff_BF4[15] = {0.490405, 0.856354, 0.82, 0.845588, 0.733333, 0, 0.963907, 0.96401, 0.852459, 0.574007, 0.736585, 0.773529, 0, 0.773936, 0.771883};
-    double Eff_BF5[15] = {0, 0.283128, 0.909091, 0.875224, 0.0368034, 0.89071, 0.898216, 0.895127, 0.877193, 0.904465, 0.936652, 0.203077, 0.857868, 0.865826, 0.806624};
-    double Eff_BF6[15] = {0.574825, 0.605797, 0.231481, 0.415459, 0.218605, 0.753846, 0.811533, 0.852476, 0.857749, 0.539116, 0.615248, 0.896259, 0.781475, 0.806358, 0.811833};
-    double Eff_BF7[15] = {0, 0.137615, 0.372093, 0.37551, 0.518625, 0.805324, 0.822093, 0.70596, 0.572052, 0.525292, 0.672504, 0.838158, 0.82247, 0.767974, 0.762987};
-
-    double Eff_BB0[15] = {0.0173661, 0.511504, 0.775316, 0.855711, 0.907308, 0.00490998, 0.937226, 0.933579, 0.0379507, 0.850112, 0.74364, 0.89703, 0.0720109, 0.87108, 0.689127};
-    double Eff_BB1[15] = {0, 0.167857, 0.622222, 0.764423, 0.573864, 0.8437, 0.859036, 0.556748, 0.81104, 0.656328, 0.669749, 0.808803, 0.797143, 0.645641, 0.467733};
-    double Eff_BB2[15] = {0.26357, 0.129688, 0.758065, 0.547105, 0.662222, 0.758564, 0.860849, 0.80853, 0.670051, 0.636285, 0.922764, 0.202169, 0.779736, 0.589841, 0.172103};
-    double Eff_BB3[15] = {0.34612, 0.246792, 0.612676, 0.649916, 0.758359, 0.81388, 0.882759, 0.862028, 0.58209, 0.783617, 0.695918, 0.855087, 0.839012, 0.710262, 0.542714};
-    double Eff_BB4[15] = {0.383975, 0.405609, 0.511111, 0.370166, 0.378505, 0.829167, 0.871755, 0.885891, 0.855556, 0.603627, 0.695035, 0.866407, 0.806483, 0.607404, 0.68313};
-    double Eff_BB5[15] = {0.459225, 0.458082, 0.565359, 0.317967, 0.375375, 0.73494, 0.915799, 0.776042, 0.848387, 0.70607, 0.621698, 0.837285, 0.765024, 0.831115, 0.718705};
-    double Eff_BB6[15] = {0.133038, 0.0634518, 0.818505, 0.776632, 0.83959, 0.920382, 0.905817, 0.915014, 0.877493, 0.873563, 0.875776, 0.755906, 0.65625, 0.790476, 0.0493827};
-    double Eff_BB7[15] = {0.323093, 0.12311, 0.663677, 0.576842, 0.741093, 0.774687, 0.855208, 0.807381, 0.754821, 0.648686, 0.736682, 0.756126, 0.835646, 0.701065, 0.77396};
-    //----------------
 
     for (int layer = 0; layer <= barrelExtLayer; ++layer) {
       if ((testBit & extLayerPattern) != 0) {
@@ -624,123 +461,17 @@ namespace Belle2 {
               } else {
                 //treatment of inefficient layers using BKLM efficiencies
                 if (isForward) { //select forward BKLM section
-                  switch (sector) {
-                    case (0):
-                      if (Eff_BF0[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF0[layer]) / 6;
-                      } else if (Eff_BF0[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF0[layer]);
-                      }
-                      break;
-                    case (1):
-                      if (Eff_BF1[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF1[layer]) / 6;
-                      } else if (Eff_BF1[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF1[layer]);
-                      }
-                      break;
-                    case (2):
-                      if (Eff_BF2[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF2[layer]) / 6;
-                      } else if (Eff_BF2[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF2[layer]);
-                      }
-                      break;
-                    case (3):
-                      if (Eff_BF3[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF3[layer]) / 6;
-                      } else if (Eff_BF3[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF3[layer]);
-                      }
-                      break;
-                    case (4):
-                      if (Eff_BF4[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF4[layer]) / 6;
-                      } else if (Eff_BF4[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF4[layer]);
-                      }
-                      break;
-                    case (5):
-                      if (Eff_BF5[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF5[layer]) / 6;
-                      } else if (Eff_BF5[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF5[layer]);
-                      }
-                      break;
-                    case (6):
-                      if (Eff_BF6[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF6[layer]) / 6;
-                      } else if (Eff_BF6[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF6[layer]);
-                      }
-                      break;
-                    case (7):
-                      if (Eff_BF7[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF7[layer]) / 6;
-                      } else if (Eff_BF7[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BF7[layer]);
-                      }
-                      break;
+                  if (extEfficiencyVector.at(layer) < 0.5) {
+                    pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - extEfficiencyVector.at(layer)) / 6;
+                  } else if (extEfficiencyVector.at(layer) > 0.5) {
+                    pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - extEfficiencyVector.at(layer));
                   }
                 }
-                if (!isForward) { //select backward BKLM section
-                  switch (sector) {
-                    case (0):
-                      if (Eff_BB0[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB0[layer]) / 6;
-                      } else if (Eff_BB0[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB0[layer]);
-                      }
-                      break;
-                    case (1):
-                      if (Eff_BB1[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB1[layer]) / 6;
-                      } else if (Eff_BB1[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB1[layer]);
-                      }
-                      break;
-                    case (2):
-                      if (Eff_BB2[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB2[layer]) / 6;
-                      } else if (Eff_BB2[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB2[layer]);
-                      }
-                      break;
-                    case (3):
-                      if (Eff_BB3[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB3[layer]) / 6;
-                      } else if (Eff_BB3[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB3[layer]);
-                      }
-                      break;
-                    case (4):
-                      if (Eff_BB4[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB4[layer]) / 6;
-                      } else if (Eff_BB4[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB4[layer]);
-                      }
-                      break;
-                    case (5):
-                      if (Eff_BB5[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB5[layer]) / 6;
-                      } else if (Eff_BB5[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB5[layer]);
-                      }
-                      break;
-                    case (6):
-                      if (Eff_BB6[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB6[layer]) / 6;
-                      } else if (Eff_BB6[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB6[layer]);
-                      }
-                      break;
-                    case (7):
-                      if (Eff_BB7[layer] < 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB7[layer]) / 6;
-                      } else if (Eff_BB7[layer] >= 0.5) {
-                        pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - Eff_BB7[layer]);
-                      }
-                      break;
+                if (!isForward) { //select forward BKLM section
+                  if (extEfficiencyVector.at(layer) < 0.5) {
+                    pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - extEfficiencyVector.at(layer)) / 6;
+                  } else if (extEfficiencyVector.at(layer) > 0.5) {
+                    pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - extEfficiencyVector.at(layer));
                   }
                 }
               }
@@ -831,9 +562,7 @@ namespace Belle2 {
       testBit <<= 1; // move to next bit
     }
 
-    //    delete muidHits;
     return pdf;
-
   }
 
   double MuidPar::getPDFRchisq(const Muid* muid) const
@@ -862,15 +591,7 @@ namespace Belle2 {
     double pdf = 0.0;
     if (halfNdof > MUID_MaxHalfNdof) { // extremely rare
       x *= m_ReducedChiSquaredScaleX[detector][MUID_MaxHalfNdof] * halfNdof;
-      if (halfNdof == 1) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::exp(-x);
-      } else if (halfNdof == 2) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * x * std::exp(-x);
-      } else if (halfNdof == 3) {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * x * x * std::exp(-x);
-      } else {
-        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::pow(x, halfNdof - 1.0) * std::exp(-x);
-      }
+      pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::pow(x, halfNdof - 1.0) * std::exp(-x);
     } else {
       if (x > m_ReducedChiSquaredThreshold[detector][halfNdof]) { // tail function for large x
         x *= m_ReducedChiSquaredScaleX[detector][halfNdof] * halfNdof;

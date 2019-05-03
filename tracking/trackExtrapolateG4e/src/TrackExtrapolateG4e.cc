@@ -553,8 +553,9 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
   G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
+  std::vector<float> empty; // used to initialize the vector
   ExtState extState = { NULL, pdgCode, isCosmic, tof, 0.0,                         // for EXT and MUID
-                        momentumG4e.unit(), 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false  // for MUID only
+                        momentumG4e.unit(), 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, empty, false  // for MUID only
                       };
   swim(extState, g4eState);
 }
@@ -611,8 +612,9 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
   G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
+  std::vector<float> empty; // used to initialize the vector
   ExtState extState = { NULL, pdgCode, isCosmic, tof, 0.0,                             // for EXT and MUID
-                        momentumG4e.unit(), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false  // for MUID only
+                        momentumG4e.unit(), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, empty, false  // for MUID only
                       };
   swim(extState, g4eState, NULL, NULL, NULL);
 }
@@ -1052,8 +1054,9 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
 
 ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G4ErrorFreeTrajState& g4eState)
 {
+  std::vector<float> empty; // used to initialize the vector
   ExtState extState = {&b2track, pdgCode, false, 0.0, 0.0,                               // for EXT and MUID
-                       G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false // for MUID only
+                       G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, empty, false // for MUID only
                       };
   RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
   if (recoTrack == NULL) {
@@ -1384,6 +1387,8 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           if (extState.lastBarrelExtLayer < intersection.layer) {
             extState.lastBarrelExtLayer = intersection.layer;
           }
+        } else {// extrapolation is crossing a not instrumented section: we need to push_back a value.
+          extState.extEfficiencyVector.push_back(0);
         }
       }
     }
@@ -1856,6 +1861,7 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool
   muid->setDegreesOfFreedom(extState.nPoint);
   muid->setExtLayerPattern(extState.extLayerPattern);
   muid->setHitLayerPattern(extState.hitLayerPattern);
+  muid->setExtEfficiencyVector(extState.extEfficiencyVector);
 
 // Do likelihood calculation
 

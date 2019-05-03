@@ -295,7 +295,8 @@ void SVDHotStripFinderModule::terminate()
             h_tot_dqm1->Fill(float(itsensor));
           }
 
-          m_hHotStripsSummary->fill(*itSvdSensors, k, hm_hot_strips->getHistogram(*itSvdSensors, k)->GetEntries());
+          for (int s = 0; s < hm_hot_strips->getHistogram(*itSvdSensors, k)->GetEntries(); s++)
+            m_hHotStripsSummary->fill(*itSvdSensors, k, 1);
 
           itsensor++;
         }
@@ -309,6 +310,9 @@ void SVDHotStripFinderModule::terminate()
 
   if (m_rootFilePtr != NULL) {
     oldDir->cd();
+
+    m_hHotStripsSummary->getHistogram(0)->Write();
+    m_hHotStripsSummary->getHistogram(1)->Write();
 
     TObject* obj;
     TIter nextH_occu(m_histoList_occu);

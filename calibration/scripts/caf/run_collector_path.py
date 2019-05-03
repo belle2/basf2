@@ -64,14 +64,18 @@ def run_collectors():
 
     # Now we need to create a path that definitely has RootInput as a module.
     main = create_path()
-    # Use this utility wrapper to check for RootInput and change params if necessary
+    # Use this utility wrapper to check for RootInput or SeqRootInput and change params if necessary
     from caf.utils import PathExtras
     pe = PathExtras(collector_path)
     if 'RootInput' in pe:
         root_input_mod = collector_path.modules()[pe.index('RootInput')]
         root_input_mod.param('inputFileNames', input_data)
     else:
-        main.add_module('RootInput', inputFileNames=input_data)
+        if 'SeqRootInput' in pe:
+            root_input_mod = collector_path.modules()[pe.index('SeqRootInput')]
+            root_input_mod.param('inputFileNames', input_data)
+        else:
+            main.add_module('RootInput', inputFileNames=input_data)
     if 'HistoManager' not in pe:
         main.add_module('HistoManager', histoFileName='CollectorOutput.root')
 

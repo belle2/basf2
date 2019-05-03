@@ -57,6 +57,8 @@ ECLDQMModule::ECLDQMModule() : HistoModule()
   addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 12.0 * Belle2::Unit::GeV);
   addParam("PedestalMeanUpperThr", m_PedestalMeanUpperThr, "Upper threshold of pedestal distribution", 15000);
   addParam("PedestalMeanLowerThr", m_PedestalMeanLowerThr, "Lower threshold of pedestal distribution", -15000);
+
+  addParam("PedestalRmsInclude", m_PedestalRmsInclude, "If true, save histogram with pedestal rms error values.", false);
   addParam("PedestalRmsUpperThr", m_PedestalRmsUpperThr, "Upper threshold of pedestal rms error distribution", 1000.);
 }
 
@@ -178,11 +180,13 @@ void ECLDQMModule::defineHisto()
   h_pedmean_cellid->GetYaxis()->SetTitle("Pedestal Average");
   h_pedmean_cellid->SetOption("LIVE");
 
-  h_pedrms_cellid = new TH2F("pedrms_cellid", "Pedestal rms error vs. Cell ID", 8736, 1, 8737, (int)m_PedestalRmsUpperThr, 0,
-                             m_PedestalRmsUpperThr);
-  h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_pedrms_cellid->GetYaxis()->SetTitle("Pedestal rms error");
-  h_pedrms_cellid->SetOption("LIVE");
+  if (m_PedestalRmsInclude) {
+    h_pedrms_cellid = new TH2F("pedrms_cellid", "Pedestal rms error vs. Cell ID",
+                               8736, 1, 8737, (int)m_PedestalRmsUpperThr, 0, m_PedestalRmsUpperThr);
+    h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
+    h_pedrms_cellid->GetYaxis()->SetTitle("Pedestal rms error");
+    h_pedrms_cellid->SetOption("LIVE");
+  }
 
   h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Crate ID", 52, 1, 53, 145, 0, 145);
   h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID");
@@ -226,7 +230,7 @@ void ECLDQMModule::beginRun()
   h_adc_hits->Reset();
   h_trigtag2_trigid->Reset();
   h_pedmean_cellid->Reset();
-  h_pedrms_cellid->Reset();
+  if (m_PedestalRmsInclude) h_pedrms_cellid->Reset();
   h_trigtime_trigid->Reset();
 }
 
@@ -307,9 +311,12 @@ void ECLDQMModule::event()
     for (int j = 0; j < 16; j++) m_PedestalMean[i] += m_DspArray[i][j];
     m_PedestalMean[i] /= 16;
     h_pedmean_cellid->Fill(aECLDsp.getCellId(), m_PedestalMean[i]); //Pedestal Avg histogram filling.
-    for (int j = 0; j < 16; j++) m_PedestalRms[i] += pow(m_DspArray[i][j] - m_PedestalMean[i], 2);
-    m_PedestalRms[i] = sqrt(m_PedestalRms[i] / 15.);
-    h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal Rms error histogram filling.
+
+    if (m_PedestalRmsInclude) {
+      for (int j = 0; j < 16; j++) m_PedestalRms[i] += pow(m_DspArray[i][j] - m_PedestalMean[i], 2);
+      m_PedestalRms[i] = sqrt(m_PedestalRms[i] / 15.);
+      h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal Rms error histogram filling.
+    }
   }
   h_adc_flag->Fill(0); //ADC flag histogram filling.
   if (m_ECLDsps.getEntries() == ECL_TOTAL_CHANNELS) h_adc_flag->Fill(1); //ADC flag histogram filling.

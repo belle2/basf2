@@ -96,19 +96,17 @@ void ChargedPidMVAModule::event()
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
       // If the particle list was created by the FSRCorrection module,
-      // the info of the mdst objects associated to the particles cannot be retrieved
-      // directly from the particle.
-      // Instead, one has to get the 0-th daughter, i.e. the original particle before brem correction,
-      // as that will be the one that holds relations with the mdst objects associated to the particle.
-      //
-      // It is reasonably assumed that a charged stable particle won't have daughters in
-      // any other possible case (?)
-      bool isFSRProcessed = (particle->getNDaughters());
-      const Particle* daughter = (isFSRProcessed) ? particle->getDaughter(0) : nullptr;
+      // the info in the mdst objects associated to the particles cannot be retrieved directly from the particle.
+      // Instead, one has to get the associated daughters, that hold relations with the mdst objects:
+      // -) the 0-th daughter, i.e. the original particle before brem correction,
+      // -) the 1-st daughter i.e. the brems photon particle (if found), needed to correct E/p.
+      auto nDaughters = particle->getNDaughters();
+      const Particle* daughterLep = (nDaughters) ? particle->getDaughter(0) : nullptr;
+      const Particle* daughterPh  = (nDaughters > 0) ? particle->getDaughter(1) : nullptr;
 
-      // Check that the particle (or the 'daughter') has a valid relation set between track and ECL cluster.
+      // Check that the particle (or the 'daughterLep') has a valid relation set between track and ECL cluster.
       // Otherwise, skip to next.
-      const ECLCluster* eclCluster = (!isFSRProcessed) ? particle->getECLCluster() : daughter->getECLCluster();
+      const ECLCluster* eclCluster = (!nDaughters) ? particle->getECLCluster() : daughterLep->getECLCluster();
       if (!eclCluster) {
         B2DEBUG(11, "\t --> Invalid track-cluster relation, skip...");
         continue;
@@ -123,6 +121,7 @@ void ChargedPidMVAModule::event()
 
       B2DEBUG(11, "\t\tclusterTheta = " << theta << " [rad]");
       B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
+      B2DEBUG(11, "\t\tFSRCorrected? " << static_cast<bool>(nDaughters));
       B2DEBUG(11, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
@@ -131,16 +130,18 @@ void ChargedPidMVAModule::event()
         auto varobj =  m_variables.at(index).at(ivar);
         // Set the variables from the daughter particle, if found.
         // In that case, also ensure E/p is calculated *after* the 4-vec correction,
-        // i.e. using the actual particle's momentum.
+        // i.e. using the actual particle's momentum, and the cluster energy includes the brems photon contribution.
         auto var(-999.0);
         if (varobj->name == "clusterEoP") {
-          if (isFSRProcessed) {
-            var = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / p;
+          if (nDaughters) {
+            auto energyLep = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+            auto energyPh = (daughterPh) ? daughterPh->getECLCluster()->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) : 0.0;
+            var = (energyLep + energyPh) / p;
           } else {
             var = varobj->function(particle);
           }
         } else {
-          var = varobj->function((!isFSRProcessed) ? particle : daughter);
+          var = varobj->function((!nDaughters) ? particle : daughterLep);
         }
         B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
         m_datasets.at(index)->m_input[ivar] = var;
@@ -148,7 +149,7 @@ void ChargedPidMVAModule::event()
       auto nspecs  = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
         auto specobj =  m_spectators.at(index).at(ispec);
-        auto spec = specobj->function((!isFSRProcessed) ? particle : daughter);
+        auto spec = specobj->function((!nDaughters) ? particle : daughterLep);
         B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
         m_datasets.at(index)->m_spectators[ispec] = spec;
       }

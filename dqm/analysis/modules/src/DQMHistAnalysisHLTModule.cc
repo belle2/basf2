@@ -111,8 +111,8 @@ void DQMHistAnalysisHLTModule::event()
 
   // TODO
   double instLuminosity = 0;
-  double totalNumberOfEvents = getValue("total_number", totalResultHistogram);
-  double numberOfBhabhaEvents = getValue("accept_bhabha", skimHistogram);
+  double totalNumberOfEvents = getValue("total_result", totalResultHistogram);
+  double numberOfBhabhaEvents = getValue("accept_bhabha/10", skimHistogram);
 
   unsigned int counter = 0;
   for (const auto& columnMapping : m_columnMapping) {

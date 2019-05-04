@@ -354,7 +354,7 @@ void TrackDQMModule::defineHisto()
 
   oldDir->cd();
   oldDir->mkdir("TracksDQMAlignment");// dont use returned ptr, it might be zero
-  oldDir->chdir("TracksDQMAlignment");
+  oldDir->cd("TracksDQMAlignment");
 
   for (int i = 0; i < nVXDSensors; i++) {
     VxdID id = gTools->getSensorIDFromIndex(i);

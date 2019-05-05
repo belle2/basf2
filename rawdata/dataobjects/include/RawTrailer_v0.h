@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <framework/logging/Logger.h>
 
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */
@@ -80,8 +81,7 @@ namespace Belle2 {
   inline void RawTrailer_v0::CheckBuffer()
   {
     if (m_buffer == NULL) {
-      perror("m_buffer is NULL. Exiting...");
-      exit(1);
+      B2FATAL("m_buffer is NULL. Exiting...");
     }
   }
 

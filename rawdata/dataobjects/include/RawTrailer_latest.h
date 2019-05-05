@@ -15,6 +15,7 @@
 
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */
+#include <framework/logging/Logger.h>
 
 //#define TRAILER_SIZE 16
 /* #define   POS_CHKSUM 0 */
@@ -83,8 +84,7 @@ namespace Belle2 {
   inline void RawTrailer_latest::CheckBuffer()
   {
     if (m_buffer == NULL) {
-      perror("m_buffer is NULL. Exiting...");
-      exit(1);
+      B2FATAL("m_buffer is NULL. Exiting...");
     }
   }
 

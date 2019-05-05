@@ -16,6 +16,7 @@
 
 #include <rawdata/RawCOPPERPackerInfo.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>
+#include "framework/logging/Logger.h"
 
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */
@@ -376,12 +377,12 @@ namespace Belle2 {
   {
     int pos_nwords = GetOffset1stFINESSE(n);
     if (pos_nwords >= m_nwords) {
-      printf("[DEBUG] Data size(0x%.8x) is smaller than data position info(0x%.8x). Exting...\n",  m_nwords, pos_nwords);
+      printf("[DEBUG] Data size(0x%.8x) is smaller than data position info(0x%.8x). Exiting...\n",  m_nwords, pos_nwords);
       for (int i = 0; i < m_nwords; i++) {
         printf("%.8x ", m_buffer[ i ]);
         if ((i % 10) == 9) printf("\n");
       }
-      exit(1);
+      B2FATAL("Data size is smaller than data position info. Exiting...");
     }
     return &(m_buffer[ pos_nwords]);
   }
@@ -390,12 +391,12 @@ namespace Belle2 {
   {
     int pos_nwords = GetOffset2ndFINESSE(n);
     if (pos_nwords >= m_nwords) {
-      printf("[DEBUG] Data size(0x%.8x) is smaller than data position info(0x%.8x). Exting...\n",  m_nwords, pos_nwords);
+      printf("[DEBUG] Data size(0x%.8x) is smaller than data position info(0x%.8x). Exiting...\n",  m_nwords, pos_nwords);
       for (int i = 0; i < m_nwords; i++) {
         printf("%.8x ", m_buffer[ i ]);
         if ((i % 10) == 9) printf("\n");
       }
-      exit(1);
+      B2FATAL("Data size is smaller than data position info. Exiting...");
     }
     return &(m_buffer[ pos_nwords]);
   }
@@ -404,12 +405,12 @@ namespace Belle2 {
   {
     int pos_nwords = GetOffset3rdFINESSE(n);
     if (pos_nwords >= m_nwords) {
-      printf("[DEBUG] Data size(0x%.8x) is smaller than data position info(0x%.8x). Exting...\n",  m_nwords, pos_nwords);
+      printf("[DEBUG] Data size(0x%.8x) is smaller than data position info(0x%.8x). Exiting...\n",  m_nwords, pos_nwords);
       for (int i = 0; i < m_nwords; i++) {
         printf("%.8x ", m_buffer[ i ]);
         if ((i % 10) == 9) printf("\n");
       }
-      exit(1);
+      B2FATAL("Data size is smaller than data position info. Exiting...");
     }
     return &(m_buffer[ pos_nwords]);
   }
@@ -418,12 +419,12 @@ namespace Belle2 {
   {
     int pos_nwords = GetOffset4thFINESSE(n);
     if (pos_nwords >= m_nwords) {
-      printf("[DEBUG] Data size(0x%.8x) is smaller than data position info(0x%.8x). Exting...\n",  m_nwords, pos_nwords);
+      printf("[DEBUG] Data size(0x%.8x) is smaller than data position info(0x%.8x). Exiting...\n",  m_nwords, pos_nwords);
       for (int i = 0; i < m_nwords; i++) {
         printf("%.8x ", m_buffer[ i ]);
         if ((i % 10) == 9) printf("\n");
       }
-      exit(1);
+      B2FATAL("Data size is smaller than data position info. Exiting...");
     }
     return &(m_buffer[ pos_nwords]);
   }

@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 //#include <TObject.h>
+#include <framework/logging/Logger.h>
 
 //#include <framework/datastore/DataStore.h>
 
@@ -227,28 +228,19 @@ namespace Belle2 {
   inline void RawHeader_v0::CheckSetBuffer()
   {
     if (m_buffer == NULL) {
-      perror("m_buffer is NULL. Exiting...");
-      exit(1);
+      B2FATAL("m_buffer is NULL. Exiting...");
     }
   }
 
   inline void RawHeader_v0::CheckGetBuffer()
   {
-
     if (m_buffer == NULL) {
-      printf("[DEBUG] m_buffer is NULL(%p). Data is corrupted or header info has not yet filled. Exiting...",
-             m_buffer);
-      exit(1);
+      B2FATAL("m_buffer is NULL. Data is corrupted or header info has not yet filled. Exiting...");
     } else if (m_buffer[ POS_TERM_HEADER ] != MAGIC_WORD_TERM_HEADER) {
-      printf("[DEBUG]  magic word is invalid(0x%x, %p pos %d). Data is corrupted or header info has not yet filled. Exiting...",
-             m_buffer[ POS_TERM_HEADER ], m_buffer, POS_TERM_HEADER);
-
-      exit(1);
-
+      B2FATAL("magic word is invalid(0x" << std::hex << m_buffer[ POS_TERM_HEADER ] << "," << m_buffer << " pos " << std::dec <<
+              POS_TERM_HEADER
+              << "). Data is corrupted or header info has not yet filled. Exiting...");
     }
-
-
-
   }
 
 

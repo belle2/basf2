@@ -17,6 +17,8 @@
 
 #include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
 #include <rawdata/CRCCalculator.h>
+#include <framework/logging/Logger.h>
+
 //#include <framework/datastore/DataStore.h>
 //#include <TObject.h>
 

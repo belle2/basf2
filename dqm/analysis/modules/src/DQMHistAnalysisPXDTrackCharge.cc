@@ -59,7 +59,6 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-    // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
 
@@ -200,13 +199,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
-      status = 3;
+      status = 4;
     } else if (fabs(data - 50) > 15. || diff > 10) {
       m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
-      status = 2;
+      status = 3;
     } else {
       m_cCharge->Pad()->SetFillColor(kGreen);// Green
-      status = 1;
+      status = 2;
     }
 
     // FIXME overwrite for now

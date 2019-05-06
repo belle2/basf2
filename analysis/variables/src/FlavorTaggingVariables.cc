@@ -29,7 +29,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
-#include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/TagVertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>

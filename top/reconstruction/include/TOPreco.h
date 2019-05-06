@@ -14,6 +14,7 @@
 #include <top/reconstruction/TOPtrack.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <framework/database/DBObjPtr.h>
+#include <top/dataobjects/TOPAsicMask.h>
 
 extern "C" {
   void set_beta_rq_(float*);
@@ -67,6 +68,7 @@ namespace Belle2 {
        * @param printMask if true, print masks to std output
        */
       static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
+                                 const TOPAsicMask& asicMask,
                                  bool printMask = false);
 
       /**

@@ -57,8 +57,6 @@ namespace Belle2 {
 
     /** Cluster Charge for PXD hits */
     std::map <VxdID, TH1F*> m_trackClusterCharge{};
-    /** Cluster Charge for PXD hits used in Fit */
-    std::map <VxdID, TH1F*> m_trackClusterChargeFitted{};
 
   };  //end class declaration
 

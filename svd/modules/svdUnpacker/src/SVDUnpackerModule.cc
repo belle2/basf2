@@ -71,6 +71,9 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
   addParam("killDigitsFromUpsetAPVs", m_killUpsetDigits, "Delete digits from upset APVs", bool(false));
   addParam("silentlyAppend", m_silentAppend, "Append digits to a pre-existing non-empty storeArray", bool(false));
   addParam("badMappingFatal", m_badMappingFatal, "Throw B2FATAL if there's a wrong payload in the database", bool(false));
+  addParam("switchErrors2Warnings", m_switchErrors2Warnings, "switching B2ERRORS to B2WARNINGS if running on HLT or ExpressReco",
+           bool(false));
+
 }
 
 SVDUnpackerModule::~SVDUnpackerModule()
@@ -102,6 +105,12 @@ void SVDUnpackerModule::beginRun()
   m_wrongFTBcrc = 0;
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
 
+  if (! m_map) { //give up
+    B2ERROR("SVD xml map not loaded." << std::endl <<
+            "No SVDDigit will be produced for this run!");
+    return;
+  }
+
   //number of FADC boards
   nFADCboards = m_map->getFADCboardsNumber();
 
@@ -124,16 +133,16 @@ void SVDUnpackerModule::event()
   StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
 
   if (!m_silentAppend && m_generateOldDigits && svdDigits && svdDigits.getEntries())
-    B2FATAL("Unpacking SVDDigits to a non-empty pre-existing StoreArray.\n"
-            << "This can lead to undesired behaviour. At least remember to\""
-            << "use SVDDigitSorter in your path and set the \n"
-            << "silentlyAppend parameter of SVDUnpacker to true.");
+    B2WARNING("Unpacking SVDDigits to a non-empty pre-existing StoreArray.\n"
+              << "This can lead to undesired behaviour. At least remember to\""
+              << "use SVDDigitSorter in your path and set the \n"
+              << "silentlyAppend parameter of SVDUnpacker to true.");
 
   if (!m_silentAppend && shaperDigits && shaperDigits.getEntries())
-    B2FATAL("Unpacking SVDShaperDigits to a non-empty pre-existing \n"
-            << "StoreArray. This can lead to undesired behaviour. At least\n"
-            << "remember to use SVDShaperDigitSorter in your path and \n"
-            << "set the silentlyAppend parameter of SVDUnpacker to true.");
+    B2WARNING("Unpacking SVDShaperDigits to a non-empty pre-existing \n"
+              << "StoreArray. This can lead to undesired behaviour. At least\n"
+              << "remember to use SVDShaperDigitSorter in your path and \n"
+              << "set the silentlyAppend parameter of SVDUnpacker to true.");
 
   SVDDAQDiagnostic* currentDAQDiagnostic;
   vector<SVDDAQDiagnostic*> vDiagnostic_ptr;
@@ -143,14 +152,11 @@ void SVDUnpackerModule::event()
   map<unsigned short, set<pair<unsigned short, unsigned short> > > apvsByPipeline;
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
-    B2ERROR("Missing valid EventMetaData." << std::endl <<
-            "No SVDDigit produced for this event");
-    return;
-  }
-
-  if (! m_map) { //give up
-    B2ERROR("SVD xml map not loaded." << std::endl <<
-            "No SVDDigit produced for this event");
+    if (!m_switchErrors2Warnings) {
+      B2ERROR("Missing valid EventMetaData." << std::endl << "No SVDDigit produced for this event!");
+    } else {
+      B2WARNING("Missing valid EventMetaData." << std::endl << "No SVDDigit produced for this event!");
+    }
     return;
   }
 
@@ -251,9 +257,13 @@ void SVDUnpackerModule::event()
               if (m_shutUpFTBError) { //
                 m_shutUpFTBError -= 1 ;
 
-                B2ERROR("Trigger number mismatch detected!" << LogVar("Expected trigger number & 0xFFFFFF",
-                                                                      (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) << LogVar("Trigger number in the FTB", m_FTBHeader.eventNumber));
-
+                if (!m_switchErrors2Warnings) {
+                  B2ERROR("Trigger number mismatch detected!" << LogVar("Expected trigger number & 0xFFFFFF",
+                                                                        (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) << LogVar("Trigger number in the FTB", m_FTBHeader.eventNumber));
+                } else {
+                  B2WARNING("Trigger number mismatch detected!" << LogVar("Expected trigger number & 0xFFFFFF",
+                                                                          (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) << LogVar("Trigger number in the FTB", m_FTBHeader.eventNumber));
+                }
               }
             }
 
@@ -281,9 +291,17 @@ void SVDUnpackerModule::event()
             if (
               m_MainHeader.trgNumber !=
               ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF)) {
-              B2ERROR(" Found a wrong FTB header of the SVD FADC " << LogVar("Event number", m_eventMetaDataPtr->getEvent()) << LogVar("FADC",
-                      fadc) << LogVar("Trigger number LSByte reported by the FADC", m_MainHeader.trgNumber) << LogVar("+ offset",
-                          m_FADCTriggerNumberOffset) << LogVar("expected", (m_eventMetaDataPtr->getEvent() & 0xFF)));
+
+              if (!m_switchErrors2Warnings) {
+                B2ERROR(" Found a wrong FTB header of the SVD FADC " << LogVar("Event number", m_eventMetaDataPtr->getEvent()) << LogVar("FADC",
+                        fadc) << LogVar("Trigger number LSByte reported by the FADC", m_MainHeader.trgNumber) << LogVar("+ offset",
+                            m_FADCTriggerNumberOffset) << LogVar("expected", (m_eventMetaDataPtr->getEvent() & 0xFF)));
+              } else {
+                B2WARNING(" Found a wrong FTB header of the SVD FADC " << LogVar("Event number", m_eventMetaDataPtr->getEvent()) << LogVar("FADC",
+                          fadc) << LogVar("Trigger number LSByte reported by the FADC", m_MainHeader.trgNumber) << LogVar("+ offset",
+                              m_FADCTriggerNumberOffset) << LogVar("expected", (m_eventMetaDataPtr->getEvent() & 0xFF)));
+              }
+
               badHeader = true;
               currentDAQDiagnostic = DAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, nFADCmatch, nAPVmatch, badHeader, fadc, 0);
               vDiagnostic_ptr.push_back(currentDAQDiagnostic);

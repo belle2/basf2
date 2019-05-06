@@ -39,8 +39,6 @@
 
 import basf2
 from basf2 import *
-import EventCountLimiter
-from EventCountLimiter import *
 import EventDisplayer
 from EventDisplayer import *
 import simulation
@@ -159,29 +157,14 @@ main.add_module('RootInput', inputFileName=inputName)
 main.add_module('ProgressBar')
 
 eventDisplayer = EventDisplayer(exp, run, eventPdfName, maxDisplays, minRPCHits, minMuidHits)
-if maxCount >= 0:
-    child = create_path()
-    eventCountLimiter = EventCountLimiter(maxCount)
-    eventCountLimiter.if_true(child, AfterConditionPath.CONTINUE)
-    main.add_module(eventCountLimiter)
-    rawdata.add_unpackers(child)
-    child.add_module('BKLMReconstructor')
-    add_tracking_reconstruction(child)
-    ext = child.add_module('Ext')
-    ext.param('pdgCodes', [13])
-    muid = child.add_module('Muid')
-    # muid.param('MaxDistSigma', 10.0)
-    child.add_module(eventDisplayer)
+rawdata.add_unpackers(main)
+main.add_module('BKLMReconstructor')
+add_tracking_reconstruction(main)
+ext = main.add_module('Ext')
+ext.param('pdgCodes', [13])
+muid = main.add_module('Muid')
+# muid.param('MaxDistSigma', 10.0)
+main.add_module(eventDisplayer)
 
-else:
-    rawdata.add_unpackers(main)
-    main.add_module('BKLMReconstructor')
-    add_tracking_reconstruction(main)
-    ext = main.add_module('Ext')
-    ext.param('pdgCodes', [13])
-    muid = main.add_module('Muid')
-    # muid.param('MaxDistSigma', 10.0)
-    main.add_module(eventDisplayer)
-
-process(main)
+process(main, max_event=maxCount)
 print(statistics)

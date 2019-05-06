@@ -767,17 +767,16 @@ namespace Belle2 {
         for (int sector = 1; sector <= m_NSector; ++sector) {
           for (int layer = 1; layer <= m_NLayer; ++layer) {
 
-            // BKLM_FORWARD =1, BKLM_BACKWARD=2.
-            BKLMElementID bklmid(fb - 1, sector - 1, layer - 1);
-
+            BKLMElementID bklmid(int(isForward), sector, layer);
+            int id = bklmid.getID();
             HepGeom::Transform3D alignment;
-            alignment = getTransformFromRigidBodyParams(bklmAlignments->get(bklmid, 1),
-                                                        bklmAlignments->get(bklmid, 2),
-                                                        bklmAlignments->get(bklmid, 3),
-                                                        bklmAlignments->get(bklmid, 4),
-                                                        bklmAlignments->get(bklmid, 5),
-                                                        bklmAlignments->get(bklmid, 6)
-                                                       );
+            alignment = getTransformFromRigidBodyParams(
+                          bklmAlignments->getGlobalParam(id, 1),
+                          bklmAlignments->getGlobalParam(id, 2),
+                          bklmAlignments->getGlobalParam(id, 3),
+                          bklmAlignments->getGlobalParam(id, 4),
+                          bklmAlignments->getGlobalParam(id, 5),
+                          bklmAlignments->getGlobalParam(id, 6));
 
             int moduleID = (isForward ? BKLM_END_MASK : 0)
                            | ((sector - 1) << BKLM_SECTOR_BIT)

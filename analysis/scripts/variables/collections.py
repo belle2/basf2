@@ -109,9 +109,9 @@ mc_variables = [
     'genMotherPDG',
     'genParticleID',
     'isCloneTrack',
-    'mcDX',
-    'mcDY',
-    'mcDZ',
+    'mcX',
+    'mcY',
+    'mcZ',
     'mcDecayTime',
     'mcE',
     'mcErrors',
@@ -176,7 +176,7 @@ vertex = [
     'prodVertexXErr',
     'prodVertexYErr',
     'prodVertexZErr',
-    'pValue',
+    'chiProb',
 ]
 
 #: Replacement for MCVertex tuple tool
@@ -196,7 +196,9 @@ tag_vertex = [
     'DeltaT',
     'DeltaTErr',
     'DeltaZ',
+    'DeltaZErr',
     'DeltaBoost',
+    'DeltaBoostErr',
     'TagVLBoost',
     'TagVLBoostErr',
     'TagVOBoost',

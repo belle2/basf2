@@ -269,6 +269,8 @@ def add_cdst_output(
         'ExtHits',
         'TOPLikelihoods',
         'TOPRecBunch',
+        'TOPTimeZeros',
+        'TOPAsicMask',
         'ECLDigits',
         'ECLCalDigits',
         'TRGECLClusters',

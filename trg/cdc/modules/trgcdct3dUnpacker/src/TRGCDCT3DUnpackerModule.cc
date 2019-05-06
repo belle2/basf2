@@ -59,19 +59,24 @@ void TRGCDCT3DUnpackerModule::initialize()
   if (m_T3DMOD == 0) {
     m_copper_address = 0x11000003;
     m_copper_ab = 0;
+    m_nword = 3075;
   } else if (m_T3DMOD == 1) {
     m_copper_address = 0x11000003;
     m_copper_ab = 1;
+    m_nword = 3075;
   } else if (m_T3DMOD == 2) {
     m_copper_address = 0x11000004;
     m_copper_ab = 0;
+    m_nword = 3075;
   } else if (m_T3DMOD == 3) {
     m_copper_address = 0x11000004;
     m_copper_ab = 1;
+    m_nword = 3075;
   } else {
     B2ERROR("trgcdct3dunpacker:cooper address is not set");
     m_copper_address = 0;
     m_copper_ab = 0;
+    m_nword = 3075;
   }
 
 }
@@ -90,7 +95,7 @@ void TRGCDCT3DUnpackerModule::event()
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
       if (raw_trgarray[i]->GetNodeID(j) == m_copper_address) {
-        if (raw_trgarray[i]->GetDetectorNwords(j, m_copper_ab) > 0) {
+        if (raw_trgarray[i]->GetDetectorNwords(j, m_copper_ab) == m_nword) {
           fillTreeTRGCDCT3DUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[j]->GetEveNo(j));
         }
       }

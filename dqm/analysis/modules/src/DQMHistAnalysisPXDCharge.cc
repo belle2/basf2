@@ -2,7 +2,7 @@
 // File : DQMHistAnalysisPXDCharge.cc
 // Description : Analysis of PXD Cluster Charge
 //
-// Author : Bjoern Spruck, Univerisity Mainz
+// Author : Bjoern Spruck, University Mainz
 // Date : 2018
 //-
 
@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
+#include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -156,7 +157,6 @@ void DQMHistAnalysisPXDChargeModule::event()
       m_cCharge->cd();
       hh1->Draw();
       m_fLandau->Draw("same");
-      m_cCharge->Print(str(format("cc_%d.pdf") % i).data());
 
       if (hh1->GetEntries() > 1000) enough = true;
     }
@@ -198,6 +198,11 @@ void DQMHistAnalysisPXDChargeModule::event()
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   }
+
+  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
+  tt->SetTextAngle(90);// Rotated
+  tt->SetTextAlign(12);// Centered
+  tt->Draw();
 
   m_cCharge->Modified();
   m_cCharge->Update();

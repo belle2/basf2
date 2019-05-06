@@ -100,7 +100,7 @@ namespace Belle2 {
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
-    if (mapSize == 0) B2WARNING("TOPUnpacker: No front-end mapping available for TOP");
+    if (mapSize == 0) B2ERROR("TOPUnpacker: No front-end mapping available for TOP");
 
   }
 

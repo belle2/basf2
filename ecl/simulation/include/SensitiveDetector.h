@@ -20,6 +20,8 @@
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dbobjects/ECLHadronComponentEmissionFunction.h>
 
+#include "G4EmCalculator.hh"
+
 #include "TGraph.h"
 #include "TFile.h"
 #include <string>
@@ -53,6 +55,7 @@ namespace Belle2 {
       // members of SensitiveDetector
       // G4double m_thresholdEnergyDeposit;// Energy Deposit  threshold
       // G4double m_thresholdKineticEnergy;// Kinetic Energy  threshold
+      G4EmCalculator m_emCal;  /**< Used to get dE/dx for pulse shape simulations */
 
       StoreArray<ECLSimHit> m_eclSimHits;   /**< ECLSimHit array */
       StoreArray<ECLHit> m_eclHits;         /**< ECLHit array */

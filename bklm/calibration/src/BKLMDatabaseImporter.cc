@@ -10,8 +10,6 @@
  **************************************************************************/
 
 #include <bklm/calibration/BKLMDatabaseImporter.h>
-#include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <bklm/dbobjects/BKLMElectronicMapping.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <bklm/dbobjects/BKLMSimulationPar.h>
 #include <bklm/dbobjects/BKLMMisAlignment.h>
@@ -29,7 +27,6 @@
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBImportArray.h>
 
 #include <string>
 #include <vector>
@@ -44,9 +41,8 @@ using namespace Belle2;
 BKLMDatabaseImporter::BKLMDatabaseImporter()
 {}
 
-void BKLMDatabaseImporter::importBklmElectronicMapping()
+void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
 {
-  DBImportArray<BKLMElectronicMapping> m_bklmMapping;
   int copperId = 0;
   int slotId = 0;
   int laneId = 0;
@@ -98,9 +94,25 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
       }//end of loop layers
     }//end of loop sectors
   }//end fb
+}
+
+void BKLMDatabaseImporter::setElectronicMappingLane(
+  int forward, int sector, int layer, int lane)
+{
+  int n = m_bklmMapping.getEntries();
+  for (int i = 0; i < n; i++) {
+    BKLMElectronicMapping* mapping = m_bklmMapping[i];
+    if ((mapping->getIsForward() == forward) &&
+        (mapping->getSector() == sector) &&
+        (mapping->getLayer() == layer))
+      mapping->setLane(lane);
+  }
+}
+
+void BKLMDatabaseImporter::importBklmElectronicMapping()
+{
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   m_bklmMapping.import(iov);
-
   return;
 }
 

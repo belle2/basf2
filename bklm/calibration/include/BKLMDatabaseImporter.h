@@ -23,6 +23,8 @@
 #include <iostream>
 
 #include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <bklm/dbobjects/BKLMElectronicMapping.h>
+#include <framework/database/DBImportArray.h>
 
 namespace Belle2 {
 
@@ -43,6 +45,21 @@ namespace Belle2 {
     * Destructor
     */
     virtual ~BKLMDatabaseImporter() {};
+
+    /**
+     * Load default electronics mapping.
+     */
+    void loadDefaultBklmElectronicMapping();
+
+    /**
+     * Set non-default lane.
+     * @param[in] forward Forward.
+     * @param[in] sector  Sector.
+     * @param[in] leyar   Layer.
+     * @param[in] lane    Lane.
+     */
+    void setElectronicMappingLane(
+      int forward, int sector, int layer, int lane);
 
     /**
      * Import BKLM electronics mapping in the database.
@@ -109,6 +126,9 @@ namespace Belle2 {
     void exportBklmStripEfficiency();
 
   private:
+
+    /** Electronics mapping. */
+    DBImportArray<BKLMElectronicMapping> m_bklmMapping;
 
     ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */
   };

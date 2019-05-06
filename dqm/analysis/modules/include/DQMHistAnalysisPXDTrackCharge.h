@@ -1,9 +1,9 @@
 //+
-// File : DQMHistAnalysisPXDCharge.h
-// Description : DQM Analysis for PXD Cluster Charges
+// File : DQMHistAnalysisPXDTrackCharge.h
+// Description : DQM Analysis for PXD Tracked Cluster Charges
 //
 // Author : Bjoern Spruck, University Mainz
-// Date : 2018
+// Date : 2019
 //-
 
 #pragma once
@@ -24,15 +24,15 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
 
-  class DQMHistAnalysisPXDChargeModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDTrackChargeModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
     //! Constructor
-    DQMHistAnalysisPXDChargeModule();
+    DQMHistAnalysisPXDTrackChargeModule();
     //! Destructor
-    ~DQMHistAnalysisPXDChargeModule();
+    ~DQMHistAnalysisPXDTrackChargeModule();
   private:
 
     //! Module functions to be called from main process

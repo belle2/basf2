@@ -24,24 +24,21 @@ std::ostream& operator<<(::std::ostream& output, const TVector3& tVector3)
          << tVector3.Z() << ")";
 }
 
-namespace Belle2 {
-  /** Predicate checking that all five components of the Helix are close by a maximal error of absError.*/
-  namespace TestHelpers {
+namespace Belle2::TestHelpers {
 
-    /** Overload method for ASSERT_ALL_NEAR / EXPECT_ALL_NEAR. */
-    template<>
-    bool allNear<Belle2::Helix>(const Belle2::Helix& expected,
-                                const Belle2::Helix& actual,
-                                double tolerance)
-    {
-      bool d0Near = fabs(expected.getD0() - actual.getD0()) < tolerance;
-      bool phi0Near = angleNear(expected.getPhi0(), actual.getPhi0(), tolerance);
-      bool omegaNear = fabs(expected.getOmega() - actual.getOmega()) < tolerance;
-      bool z0Near = fabs(expected.getZ0() - actual.getZ0()) < tolerance;
-      bool tanLambdaNear = fabs(expected.getTanLambda() - actual.getTanLambda()) < tolerance;
+  /** Overload method for ASSERT_ALL_NEAR / EXPECT_ALL_NEAR. */
+  template<>
+  bool allNear<Belle2::Helix>(const Belle2::Helix& expected,
+                              const Belle2::Helix& actual,
+                              double tolerance)
+  {
+    bool d0Near = fabs(expected.getD0() - actual.getD0()) < tolerance;
+    bool phi0Near = angleNear(expected.getPhi0(), actual.getPhi0(), tolerance);
+    bool omegaNear = fabs(expected.getOmega() - actual.getOmega()) < tolerance;
+    bool z0Near = fabs(expected.getZ0() - actual.getZ0()) < tolerance;
+    bool tanLambdaNear = fabs(expected.getTanLambda() - actual.getTanLambda()) < tolerance;
 
-      return d0Near and phi0Near and omegaNear and z0Near and tanLambdaNear;
-    }
+    return d0Near and phi0Near and omegaNear and z0Near and tanLambdaNear;
   }
 }
 

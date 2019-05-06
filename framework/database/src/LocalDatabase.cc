@@ -21,6 +21,7 @@
 #include <boost/range/adaptor/reversed.hpp>
 #include <fstream>
 #include <iomanip>
+#include <utility>
 #include <sys/file.h>
 
 using namespace std;
@@ -30,13 +31,15 @@ namespace fs = boost::filesystem;
 void LocalDatabase::createInstance(const std::string& fileName, const std::string& payloadDir, bool readOnly,
                                    LogConfig::ELogLevel logLevel, bool invertLogging)
 {
-  LocalDatabase* database = new LocalDatabase(fileName, payloadDir, readOnly);
+  auto* database = new LocalDatabase(fileName, payloadDir, readOnly);
   database->setLogLevel(logLevel, invertLogging);
   Database::setInstance(database);
 }
 
-LocalDatabase::LocalDatabase(const std::string& fileName, const std::string& payloadDir, bool readOnly):
-  m_fileName(fileName), m_absFileName(fs::absolute(m_fileName).string()), m_payloadDir(payloadDir), m_readOnly(readOnly)
+// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
+LocalDatabase::LocalDatabase(std::string  fileName, std::string  payloadDir, bool readOnly):
+  m_fileName(std::move(fileName)), m_absFileName(fs::absolute(m_fileName).string()), m_payloadDir(std::move(payloadDir)),
+  m_readOnly(readOnly)
 {
   if (m_payloadDir.empty()) {
     m_payloadDir = fs::path(m_absFileName).parent_path().string();
@@ -98,7 +101,7 @@ bool LocalDatabase::readDatabase()
         throw std::runtime_error("revision must be an integer");
       }
       // parse name
-      size_t pos = name.find("/");
+      size_t pos = name.find('/');
       if (pos == std::string::npos) {
         throw std::runtime_error("payload name must be of the form dbstore/<payloadname>");
       }

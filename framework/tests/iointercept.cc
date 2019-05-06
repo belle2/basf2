@@ -32,7 +32,7 @@ namespace {
   };
 
   /** params for testing */
-  typedef std::tuple<LogConfig::ELogLevel, std::string, std::string, bool, bool> logconvert_params_t;
+  using logconvert_params_t = std::tuple<LogConfig::ELogLevel, std::string, std::string, bool, bool>;
 
   /** Fixture class to intercept log messages which is needed for some tests */
   class IOInterceptTest: public ::testing::Test {
@@ -41,7 +41,7 @@ namespace {
     std::vector<LogMessage> m_messages;
 
     /** Add a log message interceptor */
-    void SetUp()
+    void SetUp() override
     {
       m_messages.clear();
       LogSystem::Instance().resetLogConnections();
@@ -49,14 +49,14 @@ namespace {
     }
 
     /** And try to reset logging system to default */
-    void TearDown()
+    void TearDown() override
     {
       LogSystem::Instance().resetLogging();
     }
   };
 
   /** Typedef to allow the death test sharing the fixture */
-  typedef IOInterceptTest IOInterceptDeathTest;
+  using IOInterceptDeathTest = IOInterceptTest;
 
   /** Derive a parametrized fixture to test conversion to log messages */
   class IOInterceptParamTest: public IOInterceptTest, public ::testing::WithParamInterface<logconvert_params_t> {};

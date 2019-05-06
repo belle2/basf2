@@ -60,16 +60,16 @@ EvtGenParticlePDG* EvtGenDatabasePDG::AddParticle(const char* name, const char* 
 
   if (old) {
     B2ERROR("EvtGenDatabasePDG::AddParticle: particle with PDGcode=" << PDGcode << " already defined");
-    return 0;
+    return nullptr;
   }
 
   if (std::strpbrk(name, " \t\n\v\f\r")) {
     B2ERROR("EvtGenDatabasePDG::AddParticle: invalid particle name '" << name << "'. Names may not contain Whitespace");
-    return 0;
+    return nullptr;
   }
 
-  EvtGenParticlePDG* p = new EvtGenParticlePDG(name, title, mass, stable, width, charge, ParticleClass,
-                                               PDGcode, Anti, TrackingCode, Lifetime, Spin, maxWidth, pythiaID);
+  auto* p = new EvtGenParticlePDG(name, title, mass, stable, width, charge, ParticleClass,
+                                  PDGcode, Anti, TrackingCode, Lifetime, Spin, maxWidth, pythiaID);
 
   fParticleList->Add(p);
   if (fPdgMap)
@@ -102,7 +102,7 @@ void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
   }
 
   // do we have lists already?
-  if (fParticleList == 0) {
+  if (fParticleList == nullptr) {
     //if not create them
     fParticleList  = new THashList;
     fListOfClasses = new TObjArray;
@@ -112,7 +112,7 @@ void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
     fListOfClasses->Delete();
     //and also reset the map from pdgcode to particle
     delete fPdgMap;
-    fPdgMap = 0;
+    fPdgMap = nullptr;
   }
   std::ifstream indec(filename);
 
@@ -154,7 +154,7 @@ void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
         indec >> mass >> pwidth >> pmaxwidth >> chg3 >> spin2 >> ctau >> lundkc;
 
         const double c_mm_per_s = Const::speedOfLight / (Unit::mm / Unit::s);
-        TParticlePDG* part = AddParticle(pname, pname, mass, 0, pwidth, chg3, "Unknown", stdhepid, 0, 0,
+        TParticlePDG* part = AddParticle(pname, pname, mass, false, pwidth, chg3, "Unknown", stdhepid, 0, 0,
                                          ctau / c_mm_per_s, spin2 / 2.0, pmaxwidth, lundkc);
         pdgToPartMap[stdhepid] = part;
         if (!part) {
@@ -185,7 +185,7 @@ void EvtGenDatabasePDG::WriteEvtGenTable(std::ostream& out)
   const double c_mm_per_s = Const::speedOfLight / (Unit::mm / Unit::s);
   if (fParticleList) {
     for (TObject* obj : *fParticleList) {
-      EvtGenParticlePDG* part = dynamic_cast<EvtGenParticlePDG*>(obj);
+      auto* part = dynamic_cast<EvtGenParticlePDG*>(obj);
       if (!part) {
         B2FATAL("EvtGenDatabasePDG::WriteEvtgenTable: Particle does not inherit from EventGenParticlePDG");
       }

@@ -197,7 +197,7 @@ ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
   s_pids = s_pidVector.data();
 
 }
-ProcHandler::~ProcHandler() { }
+ProcHandler::~ProcHandler() = default;
 
 
 void ProcHandler::startInputProcess()

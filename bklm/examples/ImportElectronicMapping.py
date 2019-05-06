@@ -29,7 +29,7 @@ process(main)
 dbImporter = BKLMDatabaseImporter()
 dbImporter.loadDefaultBklmElectronicMapping()
 
-# Switch lanes for real-data map
+# Switch lanes for real-data map.
 if (not mc):
     dbImporter.setElectronicMappingLane(0, 7, 1, 2)
     dbImporter.setElectronicMappingLane(0, 7, 2, 1)

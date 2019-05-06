@@ -51,6 +51,11 @@ namespace Belle2 {
     void event() override final;
 
     /**
+     * begin run function which resets histograms
+     */
+    void beginRun() override final;
+
+    /**
      * initializes the need store arrays, trees and histograms
      */
     void initialize() override final;
@@ -87,6 +92,8 @@ namespace Belle2 {
     bool m_maskDeadPixels;
 
     bool m_cutBorders;
+
+    bool m_verboseHistos; //! add some verbose istograms for cuts
 
     //the geometry
     VXD::GeoCache& m_vxdGeometry;

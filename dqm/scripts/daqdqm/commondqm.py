@@ -25,6 +25,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
             path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
             path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
+            path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
         # SVD
         if components is None or 'SVD' in components:
             # SVD DATA FORMAT

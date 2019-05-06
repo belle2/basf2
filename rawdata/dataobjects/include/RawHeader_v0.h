@@ -13,7 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 //#include <TObject.h>
-#include <framework/logging/Logger.h>
+#include <rawdata/loggerwrapper.h>
 
 //#include <framework/datastore/DataStore.h>
 

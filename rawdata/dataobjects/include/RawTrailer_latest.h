@@ -15,7 +15,7 @@
 
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */
-#include <framework/logging/Logger.h>
+#include <rawdata/loggerwrapper.h>
 
 //#define TRAILER_SIZE 16
 /* #define   POS_CHKSUM 0 */

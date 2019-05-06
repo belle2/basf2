@@ -16,7 +16,7 @@
 
 #include <rawdata/RawCOPPERPackerInfo.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>
-#include "framework/logging/Logger.h"
+#include "rawdata/loggerwrapper.h"
 
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */

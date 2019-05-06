@@ -1,4 +1,5 @@
 #include <rawdata/CRCCalculator.h>
+#include <rawdata/loggerwrapper.h>
 #include <string>
 using namespace std;
 
@@ -81,8 +82,7 @@ void copyData(int* buf_to, int* pos_nwords_to, const int* buf_from,
 {
 
   if (*pos_nwords_to + copy_nwords > nwords_buf_to) {
-    perror("Buffer overflow. Exiting...");
-    exit(1);
+    B2FATAL("Buffer overflow. Exiting...");
   }
 
   memcpy(buf_to + *pos_nwords_to, buf_from, copy_nwords * sizeof(int));

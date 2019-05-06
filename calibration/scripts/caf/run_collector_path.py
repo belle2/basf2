@@ -70,12 +70,12 @@ def run_collectors():
     if 'RootInput' in pe:
         root_input_mod = collector_path.modules()[pe.index('RootInput')]
         root_input_mod.param('inputFileNames', input_data)
+    elif 'SeqRootInput' in pe:
+        root_input_mod = collector_path.modules()[pe.index('SeqRootInput')]
+        root_input_mod.param('inputFileNames', input_data)
     else:
-        if 'SeqRootInput' in pe:
-            root_input_mod = collector_path.modules()[pe.index('SeqRootInput')]
-            root_input_mod.param('inputFileNames', input_data)
-        else:
-            main.add_module('RootInput', inputFileNames=input_data)
+        main.add_module('RootInput', inputFileNames=input_data)
+
     if 'HistoManager' not in pe:
         main.add_module('HistoManager', histoFileName='CollectorOutput.root')
 

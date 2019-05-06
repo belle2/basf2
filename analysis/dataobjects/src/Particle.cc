@@ -447,10 +447,12 @@ std::vector<int> Particle::getMdstArrayIndices(EParticleType type) const
 }
 
 
-void Particle::appendDaughter(const Particle* daughter)
+void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 {
-  // it's a composite particle
-  m_particleType = c_Composite;
+  if (updateType) {
+    // is it a composite particle or fsr corrected?
+    m_particleType = c_Composite;
+  }
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());

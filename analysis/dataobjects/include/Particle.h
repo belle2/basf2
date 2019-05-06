@@ -256,16 +256,18 @@ namespace Belle2 {
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      */
-    void appendDaughter(const Particle* daughter);
+    void appendDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
      * Appends index of daughter to daughters index array
      * @param particleIndex index of daughter in StoreArray<Particle>
      */
-    void appendDaughter(int particleIndex)
+    void appendDaughter(int particleIndex, const bool updateType = true)
     {
-      m_particleType = c_Composite;
-
+      if (updateType) {
+        // is it a composite particle or fsr corrected?
+        m_particleType = c_Composite;
+      }
       m_daughterIndices.push_back(particleIndex);
     }
 

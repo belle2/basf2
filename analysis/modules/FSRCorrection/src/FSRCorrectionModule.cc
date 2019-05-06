@@ -173,9 +173,9 @@ namespace Belle2 {
       Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
                                lepton->getTrack()->getArrayIndex());
 
-      correctedLepton.appendDaughter(lepton);
+      correctedLepton.appendDaughter(lepton, false);
       if (fsrGammaFound) {
-        correctedLepton.appendDaughter(fsrGamma);
+        correctedLepton.appendDaughter(fsrGamma, false);
         // update error matrix
         const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
         const TMatrixFSym& fsrErrorMatrix = fsrGamma->getMomentumVertexErrorMatrix();

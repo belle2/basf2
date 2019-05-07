@@ -49,7 +49,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("distCut", m_distcut, "max distance in [cm] for cluster to be counted to a track", double(0.0500));
 
-  addParam("pCut", m_pcut, "Set a cut on the p-value ", double(1e-20));
+  addParam("pCut", m_pcut, "Set a cut on the track p-value", double(1e-20));
 
   addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(false));
 
@@ -60,9 +60,9 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 
-  addParam("momCut", m_momCut, "Set a cut on the track momentum, 0 disables", double(0));
+  addParam("momCut", m_momCut, "Set a cut on the track momentum in GeV/c, 0 disables", double(0));
 
-  addParam("pTCut", m_pTCut, "Set a cut on the track pT, 0 disables", double(1));
+  addParam("pTCut", m_pTCut, "Set a cut on the track pT in GeV/c, 0 disables", double(1));
 
   addParam("cutBorders", m_cutBorders, "Do not use tracks near the borders of the sensor", bool(true));
 

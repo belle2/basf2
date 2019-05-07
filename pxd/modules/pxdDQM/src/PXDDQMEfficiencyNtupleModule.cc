@@ -41,13 +41,13 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", true);
 
-  addParam("pCut", m_pcut, "Set a cut on the p-value ", double(0));
+  addParam("pCut", m_pcut, "Set a cut on the track p-value", double(0));
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 
-  addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
+  addParam("momCut", m_momCut, "Set a cut on the track momentum in GeV/c, 0 disables", double(0));
 
-  addParam("pTCut", m_pTCut, "Set a cut on the track pT", double(0));
+  addParam("pTCut", m_pTCut, "Set a cut on the track pT in GeV/c, 0 disables", double(0));
 
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
 }

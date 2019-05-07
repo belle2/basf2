@@ -84,6 +84,9 @@ namespace Belle2 {
      * type is float to be consistend with m_variableSet (and TTree + MVA implementation) */
     float m_truth = NAN;
 
+    /// Parameter to enable event-wise features
+    bool m_param_useEventwiseFeatures = false;
+
 //    /** number of RecoTracks in an event*/
 //    float m_nRecoTracks = NAN;
 

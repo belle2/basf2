@@ -25,14 +25,14 @@
 
 namespace Belle2 {
 
-  /** Quality Estimator Data Collector Module to collect data for a MVA training using VXDQE_teacher.py.
+  /** VXD Quality Estimator Data Collector Module to collect data for a MVA training using VXDQE_teacher.py.
    *  Runs in addition to VXDTF2 and mc_matcher, see VXDQE_TrainingDataCollector.py for example.
    * */
-  class QETrainingDataCollectorModule : public Module {
+  class VXDQETrainingDataCollectorModule : public Module {
 
   public:
     /** Constructor of the module. */
-    QETrainingDataCollectorModule();
+    VXDQETrainingDataCollectorModule();
 
     /** Initializes the Module. */
     void initialize() override;

@@ -25,7 +25,7 @@
 namespace Belle2 {
 
   /** Class to write collected variables into a root file,
-   * Used by QETrainingDataCollectorModule
+   * Used by VXDQETrainingDataCollectorModule
    */
   class SimpleVariableRecorder {
 

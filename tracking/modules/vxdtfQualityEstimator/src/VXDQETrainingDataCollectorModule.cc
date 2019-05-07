@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/vxdtfQualityEstimator/QETrainingDataCollectorModule.h>
+#include <tracking/modules/vxdtfQualityEstimator/VXDQETrainingDataCollectorModule.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
@@ -19,12 +19,12 @@
 using namespace Belle2;
 
 
-REG_MODULE(QETrainingDataCollector)
+REG_MODULE(VXDQETrainingDataCollector)
 
-QETrainingDataCollectorModule::QETrainingDataCollectorModule() : Module()
+VXDQETrainingDataCollectorModule::VXDQETrainingDataCollectorModule() : Module()
 {
   //Set module properties
-  setDescription("Module to collect training data for a specified qualityEstimator and store it in a root file.");
+  setDescription("Module to collect training data for the VXDQualityEstimatorMVA and store it in a root file.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   addParam("EstimationMethod", m_EstimationMethod,
@@ -50,7 +50,7 @@ QETrainingDataCollectorModule::QETrainingDataCollectorModule() : Module()
   addParam("UseTimingInfo", m_UseTimingInfo, "Whether to collect timing information", bool(false));
 }
 
-void QETrainingDataCollectorModule::initialize()
+void VXDQETrainingDataCollectorModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
@@ -80,7 +80,7 @@ void QETrainingDataCollectorModule::initialize()
   B2ASSERT("QualityEstimatorMC could be initialized!", m_estimatorMC);
 }
 
-void QETrainingDataCollectorModule::beginRun()
+void VXDQETrainingDataCollectorModule::beginRun()
 {
   // BField is required by all QualityEstimators
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
@@ -88,7 +88,7 @@ void QETrainingDataCollectorModule::beginRun()
   m_estimatorMC->setMagneticFieldStrength(bFieldZ);
 }
 
-void QETrainingDataCollectorModule::event()
+void VXDQETrainingDataCollectorModule::event()
 {
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 
@@ -109,7 +109,7 @@ void QETrainingDataCollectorModule::event()
   }
 }
 
-void QETrainingDataCollectorModule::terminate()
+void VXDQETrainingDataCollectorModule::terminate()
 {
   m_recorder->write();
   m_recorder.reset();

@@ -44,6 +44,8 @@ namespace Belle2 {
     void event() override final;
     void defineHisto() override final;
 
+    std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
 

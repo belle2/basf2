@@ -100,12 +100,12 @@ float TagVertex::getTagVolErr()
 
 
 
-void TagVertex::setTagVertex(TVector3 TagVertex)
+void TagVertex::setTagVertex(const TVector3& TagVertex)
 {
   m_tagVertex = TagVertex;
 }
 
-void TagVertex::setTagVertexErrMatrix(TMatrixFSym TagVertexErrMatrix)
+void TagVertex::setTagVertexErrMatrix(const TMatrixFSym& TagVertexErrMatrix)
 {
   m_tagVertexErrMatrix = TagVertexErrMatrix;
 }
@@ -125,7 +125,7 @@ void TagVertex::setDeltaTErr(float DeltaTErr)
   m_deltaTErr = DeltaTErr;
 }
 
-void TagVertex::setMCTagVertex(TVector3 MCTagVertex)
+void TagVertex::setMCTagVertex(const TVector3& MCTagVertex)
 {
   m_MCtagV = MCTagVertex;
 }

@@ -17,41 +17,41 @@ using namespace Belle2;
 /************************SETTERS***********************/
 
 
-void FlavorTaggerInfoMap::setTargetTrackLevel(std::string category, const Track* track)
+void FlavorTaggerInfoMap::setTargetTrackLevel(const std::string& category, const Track* track)
 {
   m_targetTrackLevel.insert(std::pair<std::string, const Track*>(category, track));
 }
 
 
-void FlavorTaggerInfoMap::setProbTrackLevel(std::string category, float probability)
+void FlavorTaggerInfoMap::setProbTrackLevel(const std::string& category, float probability)
 {
   m_probTrackLevel.insert(std::pair<std::string, float>(category, probability));
 }
 
 
-void FlavorTaggerInfoMap::setTargetEventLevel(std::string category, const Belle2::Track* track)
+void FlavorTaggerInfoMap::setTargetEventLevel(const std::string& category, const Belle2::Track* track)
 {
   m_targetEventLevel.insert(std::pair<std::string, const Track*>(category, track));
 }
 
 
-void FlavorTaggerInfoMap::setProbEventLevel(std::string category, float probability)
+void FlavorTaggerInfoMap::setProbEventLevel(const std::string& category, float probability)
 {
   m_probEventLevel.insert(std::pair<std::string, float>(category, probability));
 }
 
 
-void FlavorTaggerInfoMap::setQpCategory(std::string category, float qp)
+void FlavorTaggerInfoMap::setQpCategory(const std::string& category, float qp)
 {
   m_qpCategory.insert(std::pair<std::string, float>(category, qp));
 }
 
-void FlavorTaggerInfoMap::setHasTrueTarget(std::string category, float isTrue)
+void FlavorTaggerInfoMap::setHasTrueTarget(const std::string& category, float isTrue)
 {
   m_hasTrueTarget.insert(std::pair<std::string, float>(category, isTrue));
 }
 
-void FlavorTaggerInfoMap::setIsTrueCategory(std::string category, float isTrue)
+void FlavorTaggerInfoMap::setIsTrueCategory(const std::string& category, float isTrue)
 {
   m_isTrueCategory.insert(std::pair<std::string, float>(category, isTrue));
 }

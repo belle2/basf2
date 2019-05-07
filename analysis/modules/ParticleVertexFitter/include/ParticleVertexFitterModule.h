@@ -204,7 +204,7 @@ namespace Belle2 {
     bool doRaveFit(Particle* mother);
 
     /**  check if all the Daughters (o grand-daughters) are selected for the vertex fit*/
-    bool allSelectedDaughters(const Particle* mother, std::vector<const Particle*> tracksVertex);
+    bool allSelectedDaughters(const Particle* mother, const std::vector<const Particle*>& tracksVertex);
 
     /**  calculate iptube constraint (quasi cylinder along boost direction) for RAVE fit*/
     void findConstraintBoost(double cut);

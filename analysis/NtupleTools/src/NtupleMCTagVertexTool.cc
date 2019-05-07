@@ -42,7 +42,7 @@ void NtupleMCTagVertexTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  TagVertex* Ver = selparticles[0]->getRelatedTo<TagVertex>();
+  auto* Ver = selparticles[0]->getRelatedTo<TagVertex>();
   if (Ver) {
     m_fMCTagVx = Ver->getMCTagVertex().X();
     m_fMCTagVy = Ver->getMCTagVertex().Y();

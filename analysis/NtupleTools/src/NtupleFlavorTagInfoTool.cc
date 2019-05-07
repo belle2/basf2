@@ -79,7 +79,7 @@ void NtupleFlavorTagInfoTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  FlavorTaggerInfo* flavTag = selparticles[0]->getRelatedTo<FlavorTaggerInfo>();
+  auto* flavTag = selparticles[0]->getRelatedTo<FlavorTaggerInfo>();
 
   if (flavTag) {
     for (unsigned i = 0; i < flavTag->getCategories().size(); i++) {

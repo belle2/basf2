@@ -38,7 +38,7 @@ using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(nullptr)
 {
   resetErrorMatrix();
@@ -46,7 +46,7 @@ Particle::Particle() :
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(nullptr)
 {
   setFlavorType();
@@ -79,7 +79,7 @@ Particle::Particle(const TLorentzVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
@@ -101,7 +101,7 @@ Particle::Particle(const TLorentzVector& momentum,
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(nullptr)
 {
   if (!track) return;
@@ -124,7 +124,7 @@ Particle::Particle(const Track* track,
   m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
 
   // set mass
-  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL)
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
     B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
   m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
 
@@ -137,7 +137,7 @@ Particle::Particle(const int trackArrayIndex,
                    const Const::ChargedStable& chargedStable,
                    const Const::ChargedStable& chargedStableUsedForFit) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(nullptr)
 {
   if (!trackFit) return;
@@ -154,7 +154,7 @@ Particle::Particle(const int trackArrayIndex,
   m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
 
   // set mass
-  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL)
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
     B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
   m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
 
@@ -164,7 +164,7 @@ Particle::Particle(const int trackArrayIndex,
 
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(nullptr)
 {
   if (!eclCluster) return;
@@ -200,7 +200,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
 
 Particle::Particle(const KLMCluster* klmCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(nullptr)
 {
   if (!klmCluster) return;
@@ -226,7 +226,7 @@ Particle::Particle(const KLMCluster* klmCluster) :
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(nullptr)
 {
   if (!mcParticle) return;
@@ -252,9 +252,7 @@ Particle::Particle(const MCParticle* mcParticle) :
 }
 
 
-Particle::~Particle()
-{
-}
+Particle::~Particle() = default;
 
 void Particle::setMdstArrayIndex(const int arrayIndex)
 {
@@ -385,23 +383,23 @@ float Particle::getMassError(void) const
 
 void Particle::updateMass(const int pdgCode)
 {
-  if (TDatabasePDG::Instance()->GetParticle(pdgCode) == NULL)
+  if (TDatabasePDG::Instance()->GetParticle(pdgCode) == nullptr)
     B2FATAL("PDG=" << pdgCode << " ***code unknown to TDatabasePDG");
   m_mass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
 }
 
-float Particle::getPDGMass(void) const
+float Particle::getPDGMass() const
 {
-  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL) {
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
     B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
     return 0.0;
   }
   return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass();
 }
 
-float Particle::getCharge(void) const
+float Particle::getCharge() const
 {
-  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL) {
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
     B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
     return 0.0;
   }
@@ -410,7 +408,7 @@ float Particle::getCharge(void) const
 
 const Particle* Particle::getDaughter(unsigned i) const
 {
-  if (i >= getNDaughters()) return NULL;
+  if (i >= getNDaughters()) return nullptr;
   return static_cast<Particle*>(getArrayPointer()->At(m_daughterIndices[i]));
 }
 
@@ -478,9 +476,9 @@ bool Particle::overlapsWith(const Particle* oParticle) const
   std::vector<const Particle*> otherFSPs = oParticle->getFinalStateDaughters();
 
   // check if they share any of the FSPs
-  for (unsigned tFSP = 0; tFSP < thisFSPs.size(); tFSP++)
-    for (unsigned oFSP = 0; oFSP < otherFSPs.size(); oFSP++)
-      if (thisFSPs[tFSP]->getMdstSource() == otherFSPs[oFSP]->getMdstSource())
+  for (auto& thisFSP : thisFSPs)
+    for (auto& otherFSP : otherFSPs)
+      if (thisFSP->getMdstSource() == otherFSP->getMdstSource())
         return true;
 
   return false;
@@ -661,21 +659,21 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
   unsigned compPos[] = {c_X,  c_Y,  c_Z};
 
   // covariances (p,E)
-  for (int i = 0; i < 3; i++) {
+  for (unsigned int i : compMom) {
     float Cov = 0;
     for (int k = 0; k < 3; k++) {
-      Cov += errMatrix(compMom[i], compMom[k]) * dEdp[k];
+      Cov += errMatrix(i, compMom[k]) * dEdp[k];
     }
-    errMatrix(compMom[i], c_E) = Cov;
+    errMatrix(i, c_E) = Cov;
   }
 
   // covariances (x,E)
-  for (int i = 0; i < 3; i++) {
+  for (unsigned int comp : compPos) {
     float Cov = 0;
     for (int k = 0; k < 3; k++) {
-      Cov += errMatrix(compPos[i], compMom[k]) * dEdp[k];
+      Cov += errMatrix(comp, compMom[k]) * dEdp[k];
     }
-    errMatrix(c_E, compPos[i]) = Cov;
+    errMatrix(c_E, comp) = Cov;
   }
 
   // variance (E,E)
@@ -694,8 +692,8 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 
 void Particle::resetErrorMatrix()
 {
-  for (int i = 0; i < c_SizeMatrix; i++)
-    m_errMatrix[i] = 0.0;
+  for (float& i : m_errMatrix)
+    i = 0.0;
 }
 
 void Particle::storeErrorMatrix(const TMatrixFSym& m)
@@ -789,8 +787,8 @@ std::string Particle::getInfoHTML() const
   stream << " <b>arrayIndex</b>=" << getArrayIndex();
   stream << " <b>identifier</b>=" << m_identifier;
   stream << " <b>daughterIndices</b>: ";
-  for (unsigned i = 0; i < m_daughterIndices.size(); i++) {
-    stream << m_daughterIndices[i] << ", ";
+  for (int daughterIndex : m_daughterIndices) {
+    stream << daughterIndex << ", ";
   }
   if (m_daughterIndices.empty()) stream << " (none)";
   stream << "<br>";
@@ -848,7 +846,7 @@ bool Particle::hasExtraInfo(const std::string& name) const
     return false;
 
   //get index for name
-  const unsigned int mapID = (unsigned int)m_extraInfo[0];
+  const auto mapID = (unsigned int)m_extraInfo[0];
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   if (!extraInfoMap) {
     B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
@@ -871,7 +869,7 @@ float Particle::getExtraInfo(const std::string& name) const
     throw std::runtime_error(std::string("getExtraInfo: Value '") + name + "' not found in Particle!");
 
   //get index for name
-  const unsigned int mapID = (unsigned int)m_extraInfo[0];
+  const auto mapID = (unsigned int)m_extraInfo[0];
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   if (!extraInfoMap) {
     B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
@@ -899,7 +897,7 @@ void Particle::setExtraInfo(const std::string& name, float value)
     throw std::runtime_error(std::string("setExtraInfo: Value '") + name + "' not found in Particle!");
 
   //get index for name
-  const unsigned int mapID = (unsigned int)m_extraInfo[0];
+  const auto mapID = (unsigned int)m_extraInfo[0];
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   if (!extraInfoMap) {
     B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
@@ -934,7 +932,7 @@ void Particle::addExtraInfo(const std::string& name, float value)
   }
 }
 
-bool Particle::forEachDaughter(std::function<bool(const Particle*)> function,
+bool Particle::forEachDaughter(const std::function<bool(const Particle*)>& function,
                                bool recursive, bool includeSelf) const
 {
   std::queue<const Particle*> qq;

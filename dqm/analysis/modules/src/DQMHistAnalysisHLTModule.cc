@@ -17,13 +17,13 @@ using namespace Belle2;
 namespace {
   bool hasValue(const std::string& name, TH1* histogram)
   {
-    return histogram->GetXaxis()->FindBin(name.c_str()) != -1;
+    return histogram->GetXaxis()->FindFixBin(name.c_str()) != -1;
   }
 
   double getValue(const std::string& name, TH1* histogram)
   {
     B2ASSERT("This histogram does not have this value!", hasValue(name, histogram));
-    auto binNumber = histogram->GetXaxis()->FindBin(name.c_str());
+    auto binNumber = histogram->GetXaxis()->FindFixBin(name.c_str());
     return histogram->GetBinContent(binNumber);
   }
 }
@@ -33,6 +33,7 @@ REG_MODULE(DQMHistAnalysisHLT)
 DQMHistAnalysisHLTModule::DQMHistAnalysisHLTModule()
 {
   addParam("pvPrefix", m_pvPrefix, "EPICS PV Name for the inst. luminosity", m_pvPrefix);
+  addParam("bhabhaName", m_bhabhaName, "Name of the bhabha trigger to do a ratio against", m_bhabhaName);
   addParam("columnMapping", m_columnMapping, "Which columns to use for calculating ratios and cross sections", m_columnMapping);
 }
 
@@ -57,6 +58,8 @@ void DQMHistAnalysisHLTModule::initialize()
   for (auto& canvasAndHisto : {m_hEfficiency, m_hCrossSection, m_hRatios}) {
     auto* histogram = canvasAndHisto.second;
     histogram->SetDirectory(0);
+    histogram->SetOption("bar");
+    histogram->SetFillStyle(0);
     histogram->SetStats(false);
 
     unsigned int counter = 0;
@@ -71,9 +74,11 @@ void DQMHistAnalysisHLTModule::initialize()
   }
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &m_epicschid), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (not m_pvPrefix.empty()) {
+    SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &m_epicschid), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -111,18 +116,17 @@ void DQMHistAnalysisHLTModule::event()
 
   double instLuminosity = 0;
   double totalNumberOfEvents = getValue("total_result", totalResultHistogram);
-  double numberOfBhabhaEvents = getValue("accept_bhabha/10", skimHistogram);
+  double numberOfBhabhaEvents = getValue(m_bhabhaName, skimHistogram);
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_get(DBR_DOUBLE, m_epicschid, (void*)&instLuminosity), "ca_get failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
-
-  if (instLuminosity == 0) {
-    B2WARNING("Instantaneous luminosity from epics is 0, will not continue");
-    return;
+  if (not m_pvPrefix.empty()) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_get(DBR_DOUBLE, m_epicschid, (void*)&instLuminosity), "ca_get failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  } else {
+    instLuminosity = NAN;
   }
+#endif
 
   unsigned int counter = 0;
   for (const auto& columnMapping : m_columnMapping) {
@@ -134,8 +138,14 @@ void DQMHistAnalysisHLTModule::event()
     } else if (hasValue(from, skimHistogram)) {
       value = getValue(from, skimHistogram);
     } else {
-      B2ERROR("Can not find value " << value << ". Will exit this module!");
-      return;
+      B2ERROR("Can not find value " << from << ". Will not use it!");
+
+      m_hEfficiency.second->Fill(counter, 0);
+      m_hCrossSection.second->Fill(counter, 0);
+      m_hRatios.second->Fill(counter, 0);
+
+      counter++;
+      continue;
     }
 
     m_hEfficiency.second->Fill(counter, value / totalNumberOfEvents);

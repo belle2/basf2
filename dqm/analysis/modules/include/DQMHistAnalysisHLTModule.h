@@ -33,6 +33,8 @@ namespace Belle2 {
   private:
     /// prefix for EPICS PVs
     std::string m_pvPrefix = "B2_nsm:get:ECL_LUM_MON:lum_det_run";
+    /// name of the bhabha trigger
+    std::string m_bhabhaName = "accept_bhabha";
     /// Which columns to use
     std::map<std::string, std::string> m_columnMapping;
     /// Histogram with final efficiencies

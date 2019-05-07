@@ -10,7 +10,7 @@
 
 #include <analysis/NtupleTools/NtupleDeltaTTool.h>
 #include <analysis/variables/Variables.h>
-#include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/TagVertex.h>
 #include <cmath>
 #include <TBranch.h>
 #include <TLorentzVector.h>
@@ -40,7 +40,7 @@ void NtupleDeltaTTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  Vertex* Ver = selparticles[0]->getRelatedTo<Vertex>();
+  TagVertex* Ver = selparticles[0]->getRelatedTo<TagVertex>();
 
   if (Ver) {
     m_fDeltaT = Ver->getDeltaT();

@@ -80,14 +80,14 @@ double MplTrackRep::RKPropagate(M1x7& state7,
  // First point
   r[0] = R[0];           r[1] = R[1];           r[2]=R[2];
   FieldManager::getInstance()->getFieldVal(r[0], r[1], r[2], H0[0], H0[1], H0[2]);       // magnetic field in 10^-1 T = kGauss
-  H0[0] *= PS2; H0[1] *= PS2; H0[2] *= PS2;     // H0 is PS2*(Hx, Hy, Hz) @ R0
+  H0[0] *= PS2; H0[1] *= PS2; H0[2] *= PS2;     // H0 is PS2*(Hx, Hy, Hz) @ R0; effectively this is h/2 * Force
   D0 = fabs(1.0/state7[6]); // p_n
   F0 = std::sqrt(m_mass * m_mass + D0 * D0) / (D0 * D0); // E / p^2
-  AH0 = A[0]*H0[0] + A[1]*H0[1] + A[2]*H0[2]; // A dot H
+  AH0 = A[0]*H0[0] + A[1]*H0[1] + A[2]*H0[2]; // A dot Force
 
   A0 = F0 * (H0[0] - A[0] * AH0); B0 = F0 * (H0[1] - A[1] * AH0); C0 = F0 * (H0[2] - A[2] * AH0); // h/2 * k_1
-  A2 = A[0]+A0              ; B2 = A[1]+B0              ; C2 = A[2]+C0              ; // p_n + h/2 * k_1
-  A1 = A2+A[0]              ; B1 = B2+A[1]              ; C1 = C2+A[2]              ; // 2*p_n + h/2 * k_1
+  A2 = A[0]+A0              ; B2 = A[1]+B0              ; C2 = A[2]+C0              ; // r'_n + h/2 * k_1
+  A1 = A2+A[0]              ; B1 = B2+A[1]              ; C1 = C2+A[2]              ; // 2*r'_n + h/2 * k_1
 
   // Second point
   if (varField) {
@@ -98,18 +98,18 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   else { H1 = H0; };
   D1 = D0 + F0 * D0 * AH0; // p_n + h/2 * l_1
   F1 = std::sqrt(m_mass * m_mass + D1 * D1) / (D1 * D1); // E / p^2
-  AH1 = A2*H1[0] + B2*H1[1] + C2*H1[2]; // A dot H
+  AH1 = A2*H1[0] + B2*H1[1] + C2*H1[2]; // A dot Force
 
-  A3 = A[0] + F1*(H1[0] - A2*AH1); B3 = A[1] + F1*(H1[1] - B2*AH1); C3 = A[2] + F1*(H1[2] - C2*AH1); // A_n + h/2 * k_2
+  A3 = A[0] + F1*(H1[0] - A2*AH1); B3 = A[1] + F1*(H1[1] - B2*AH1); C3 = A[2] + F1*(H1[2] - C2*AH1); // r'_n + h/2 * k_2
   D2 = D0 + F1 * D1 * AH1; // p_n + h/2 * l_2
   F2 = std::sqrt(m_mass * m_mass + D2 * D2) / (D2 * D2); // E / p^2
-  AH2 = A3*H1[0] + B3*H1[1] + C3*H1[2]; // A dot H
+  AH2 = A3*H1[0] + B3*H1[1] + C3*H1[2]; // A dot Force
 
-  A4 = A[0] + F2*(H1[0] - A3*AH2); B4 = A[1] + F2*(H1[1] - B3*AH2); C4 = A[2] + F2*(H1[2] - C3*AH2); // A_n + h/2 * k_3
-  A5 = A4-A[0]+A4            ; B5 = B4-A[1]+B4            ; C5 = C4-A[2]+C4            ; //    A_n + h * k_3
+  A4 = A[0] + F2*(H1[0] - A3*AH2); B4 = A[1] + F2*(H1[1] - B3*AH2); C4 = A[2] + F2*(H1[2] - C3*AH2); // r'_n + h/2 * k_3
+  A5 = A4-A[0]+A4            ; B5 = B4-A[1]+B4            ; C5 = C4-A[2]+C4            ; //    r'_n + h * k_3
   D3 = D0 + 2.0 * F2 * D2 * AH2; // p_n + h * l_3
   F3 = std::sqrt(m_mass * m_mass + D3 * D3) / (D3 * D3); // E / p^2
-  AH3 = A4*H1[0] + B4*H1[1] + C4*H1[2]; // A dot H
+  AH3 = A4*H1[0] + B4*H1[1] + C4*H1[2]; // A dot Force
 
   // Last point
   if (varField) {
@@ -231,7 +231,7 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   R[0] += (A2+A3+A4)*S3;   A[0] += (SA[0]=((A0+2.*A3)+(A5+A6))*P3-A[0]);  // R  = R0 + S3*[(A2, B2, C2) +   (A3, B3, C3) + (A4, B4, C4)]
   R[1] += (B2+B3+B4)*S3;   A[1] += (SA[1]=((B0+2.*B3)+(B5+B6))*P3-A[1]);  // A  =     1/3*[(A0, B0, C0) + 2*(A3, B3, C3) + (A5, B5, C5) + (A6, B6, C6)]
   R[2] += (C2+C3+C4)*S3;   A[2] += (SA[2]=((C0+2.*C3)+(C5+C6))*P3-A[2]);  // SA = A_new - A_old
-  state7[6] = m_magCharge * (state7[6] > 0 ? 1 : -1) / P3 / (D1 + 2*D2 + D3 + D4); // p_n+1 = 1/3 (D1 + 2*D2 +D3 + D4)
+  state7[6] = m_magCharge * (state7[6] > 0 ? 1 : -1) / P3 / (D1 + 2*D2 + D3 + D4); // g / p_n+1 = g / (1/3 (D1 + 2*D2 +D3 + D4))
 
   // normalize A
   double CBA ( 1./sqrt(A[0]*A[0]+A[1]*A[1]+A[2]*A[2]) ); // 1/|A|

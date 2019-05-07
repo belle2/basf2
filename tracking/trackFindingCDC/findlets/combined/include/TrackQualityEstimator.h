@@ -43,13 +43,12 @@ namespace Belle2 {
       void apply(std::vector<CDCTrack>& tracks) final;
 
     private:
-      // Findlet to fill CDCTracks into lookup table (singleton) with clone information
+      /// Findlet to fill CDCTracks into lookup table (singleton) with clone information
       CDCMCCloneLookUpFiller m_mcCloneLookUpFiller;
 
       /// Parameter : Delete tracks below threshold instead of just assigning quality indicator
       bool m_param_deleteTracks = false;
 
-      /// Reference to the filter to be used to filter
       ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;
     };
   }

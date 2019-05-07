@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/filters/track/TrackQualityFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/track/BestMatchedTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
@@ -32,9 +33,10 @@ using namespace TrackFindingCDC;
 namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
   using NoneTrackFilter = NoneFilter<BaseTrackFilter>;
-  using MCTrackFilter = TruthVarFilter<BestMatchedTruthVarSet>;
-  using RecordingTrackFilter =
-    RecordingFilter<VariadicUnionVarSet<BestMatchedTruthVarSet, BasicTrackVarSet>>;
+  using MCTrackFilter = TruthVarFilter<TruthTrackVarSet>;
+  using MCTrackFilterClonesAsBkg = TruthVarFilter<BestMatchedTruthVarSet>;
+  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using RecordingTrackFilterClonesAsBkg = RecordingFilter<VariadicUnionVarSet<BestMatchedTruthVarSet, BasicTrackVarSet>>;
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 } // namespace
 
@@ -46,6 +48,27 @@ std::string TrackQualityFilterFactory::getFilterPurpose() const
          "distinguish correct PR tracks from fake and if wanted also clone tracks. ";
 }
 
+std::map<std::string, std::string> TrackQualityFilterFactory::getValidFilterNamesAndDescriptions() const
+{
+  std::map<std::string, std::string> validFilterNamesAndDescriptions =
+    Super::getValidFilterNamesAndDescriptions();
+
+  validFilterNamesAndDescriptions.insert({
+    {
+      "truth_clones_as_bkg",
+      "Same as \"truth\", but only treat best matched tracks as truth and treat clone "
+      "tracks same as fakes as background"
+    },
+    {
+      "recording_clones_as_bkg",
+      "Same as \"recording\", but only treat best matched tracks as truth and treat clone "
+      "tracks same as fakes as background"
+    }
+  });
+
+  return validFilterNamesAndDescriptions;
+}
+
 std::unique_ptr<BaseTrackFilter> TrackQualityFilterFactory::create(
   const std::string& filterName) const
 {
@@ -55,8 +78,12 @@ std::unique_ptr<BaseTrackFilter> TrackQualityFilterFactory::create(
     return std::make_unique<AllTrackFilter>();
   } else if (filterName == "truth") {
     return std::make_unique<MCTrackFilter>();
+  } else if (filterName == "truth_clones_as_bkg") {
+    return std::make_unique<MCTrackFilterClonesAsBkg>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingTrackFilter>("TrackQualityFilter.root");
+  } else if (filterName == "recording_clones_as_bkg") {
+    return std::make_unique<RecordingTrackFilterClonesAsBkg>("TrackQualityFilter.root");
   } else if (filterName == "eval") {
     auto recordedVarSets = std::make_unique<UnionVarSet<CDCTrack>>();
     using TrackFilterVarSet = FilterVarSet<BaseTrackFilter>;

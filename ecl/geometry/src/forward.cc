@@ -58,8 +58,10 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
   //  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
   vector<cplacement_t> bp = load_placements(m_sap, ECLParts::forward);
-  const int ECL_forward_part = 1000;
-  vector<cplacement_t>::iterator fp = find_if(bp.begin(), bp.end(), [ECL_forward_part](const cplacement_t& p) {return p.nshape == ECL_forward_part;});
+  vector<cplacement_t>::iterator fp = find_if(bp.begin(), bp.end(), [](const cplacement_t& p) {
+    const int ECL_forward_part = 1000;
+    return p.nshape == ECL_forward_part;
+  });
   // global transformation before placing the whole forward part in the top logical volume
   G4Transform3D gTrans = (fp == bp.end()) ? G4Translate3D(0, 0, 1960) : get_transform(*fp);
   // since the calorimeter supporting structures attach to the yoke at

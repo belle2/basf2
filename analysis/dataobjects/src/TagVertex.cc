@@ -100,9 +100,9 @@ float TagVertex::getTagVolErr()
 
 
 
-void TagVertex::setTagVertex(const TVector3& TagVertex)
+void TagVertex::setTagVertex(const TVector3& tagVertex)
 {
-  m_tagVertex = TagVertex;
+  m_tagVertex = tagVertex;
 }
 
 void TagVertex::setTagVertexErrMatrix(const TMatrixFSym& TagVertexErrMatrix)

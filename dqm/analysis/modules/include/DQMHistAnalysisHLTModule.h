@@ -32,7 +32,7 @@ namespace Belle2 {
 
   private:
     /// prefix for EPICS PVs
-    std::string m_pvPrefix;
+    std::string m_pvPrefix = "B2_nsm:get:ECL_LUM_MON:lum_det_run";
     /// Which columns to use
     std::map<std::string, std::string> m_columnMapping;
     /// Histogram with final efficiencies
@@ -44,7 +44,7 @@ namespace Belle2 {
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV
-    chid  mychid;
+    chid  m_epicschid;
 #endif
   };
 }

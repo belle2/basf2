@@ -72,7 +72,7 @@ void DQMHistAnalysisHLTModule::initialize()
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &m_epicschid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
@@ -109,10 +109,20 @@ void DQMHistAnalysisHLTModule::event()
   m_hCrossSection.second->Reset();
   m_hRatios.second->Reset();
 
-  // TODO
   double instLuminosity = 0;
   double totalNumberOfEvents = getValue("total_result", totalResultHistogram);
   double numberOfBhabhaEvents = getValue("accept_bhabha/10", skimHistogram);
+
+#ifdef _BELLE2_EPICS
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_get(DBR_DOUBLE, m_epicschid, (void*)&instLuminosity), "ca_get failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
+
+  if (instLuminosity == 0) {
+    B2WARNING("Instantaneous luminosity from epics is 0, will not continue");
+    return;
+  }
 
   unsigned int counter = 0;
   for (const auto& columnMapping : m_columnMapping) {

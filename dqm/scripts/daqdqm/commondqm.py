@@ -61,7 +61,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                     "accept_mumu_1trk",
                     "accept_mumu_2trk",
                     "accept_bhabha",
-                    "accept_gamma_gamma"]})
+                    "accept_gamma_gamma"],
+            },
+            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"])
         path.add_module("StatisticsTimingHLTDQM")
 
         # SVD DATA FORMAT

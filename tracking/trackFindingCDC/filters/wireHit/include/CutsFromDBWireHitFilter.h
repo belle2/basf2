@@ -48,6 +48,11 @@ namespace Belle2 {
       template <typename T>
       bool isInRange(const T& value, const std::pair<T, T>& range) const;
 
+      /// Check if value <= upper_value
+      /// If upper_value == -1, then return true
+      template <typename T>
+      bool isLessThanOrEqualTo(const T& value, const T& upper_value) const;
+
       /// Cut values from the Data Base.
       std::unique_ptr<DBObjPtr<CDCWireHitRequirements> > m_CDCWireHitRequirementsFromDB;
 

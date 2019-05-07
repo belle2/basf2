@@ -17,7 +17,7 @@ CDCTriggerMLP::CDCTriggerMLP():
               -1., 11.,
               -1., 1.},
   T0fromHits(false),
-  et_option("etf_or_fastestpriority")
+  et_option("fastestpriority")
 {
   weights.assign(nWeightsCal(), 0.);
 }

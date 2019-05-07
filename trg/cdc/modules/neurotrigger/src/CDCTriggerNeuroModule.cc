@@ -53,7 +53,7 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
   addParam("et_option", m_et_option,
            "option on how to obtain the event time. Possibilities are: "
            "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero'.",
-           string("etf_or_fastestpriority"));
+           string(""));
   addParam("writeMLPinput", m_writeMLPinput,
            "if true, the MLP input vector will be written to the datastore (for DQM)",
            false);
@@ -71,7 +71,9 @@ CDCTriggerNeuroModule::initialize()
   if (m_fixedPoint) {
     m_NeuroTrigger.setPrecision(m_precision);
   }
-
+  if (m_et_option == "") {
+    m_et_option = m_NeuroTrigger.get_et_option();
+  }
   m_tracksNN.registerInDataStore(m_outputCollectionName);
   m_tracks2D.isRequired(m_inputCollectionName);
   m_segmentHits.isRequired(m_hitCollectionName);

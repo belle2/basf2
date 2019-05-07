@@ -42,7 +42,7 @@
   <output>MC5x1_K_S0_validation.root</output>
   <output>MC5x1_K_L0_validation.root</output>
   <output>MC5x1_pi0_validation.root</output>
-  <contact>Thomas Keck; thomas.keck2@kit.edu</contact>
+  <contact>william.sutcliffe@kit.edu</contact>
 </header>
 """
 

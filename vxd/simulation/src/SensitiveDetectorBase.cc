@@ -28,10 +28,10 @@ namespace Belle2 {
       const G4Track& track = *step->GetTrack();
       // Get particle PDG code
       const int pdgCode = track.GetDefinition()->GetPDGEncoding();
-      // Get particle charge (only keep charged tracks and photons)
+      // Get particle charge (only keep charged tracks, photons and magnetic monopoles)
       const bool isNeutral = track.GetDefinition()->GetPDGCharge() == 0;
-      const bool isAllowedNeutral = (pdgCode == 22) || (m_seeNeutrons && (abs(pdgCode) == 2112));
-      //Not interested in neutral particles except photons and maybe neutrons
+      const bool isAllowedNeutral = (pdgCode == 22) || (m_seeNeutrons && (abs(pdgCode) == 2112)) || (abs(pdgCode) == 99666);
+      //Not interested in neutral particles except photons, magnetic monopoles and maybe neutrons
       if (isNeutral && !isAllowedNeutral) return false;
 
       // Get track ID

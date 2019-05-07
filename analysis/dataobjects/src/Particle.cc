@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Marko Staric                                *
+ * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -161,15 +162,13 @@ Particle::Particle(const int trackArrayIndex,
   setMomentumPositionErrorMatrix(trackFit);
 }
 
-Particle::Particle(const ECLCluster* eclCluster) :
-  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
+  m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   if (!eclCluster) return;
 
-  // TODO: avoid hard coded values
-  m_pdgCode = 22;
   setFlavorType();
 
   // returns default vertex from clusterutils (from beam parameters if available)
@@ -178,7 +177,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
   const TVector3 clustervertex = C.GetIPPosition();
   setVertex(clustervertex);
 
-  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit());
+  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit(), m_mass);
   m_px = clustermom.Px();
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();

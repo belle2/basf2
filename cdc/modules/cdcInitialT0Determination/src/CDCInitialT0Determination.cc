@@ -1,6 +1,5 @@
 #include "cdc/modules/cdcInitialT0Determination/CDCInitialT0Determination.h"
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include "iostream"
 #include "TF1.h"

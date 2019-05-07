@@ -24,7 +24,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/TagVertex.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 
 // utilities
@@ -93,7 +93,7 @@ namespace Belle2 {
     StoreArray<Particle> particles;
     particles.isRequired();
     // output
-    StoreArray<Vertex> verArray;
+    StoreArray<TagVertex> verArray;
     verArray.registerInDataStore();
     particles.registerRelationTo(verArray);
   }
@@ -116,7 +116,7 @@ namespace Belle2 {
     StoreArray<Particle> Particles(plist->getParticleCollectionName());
 
     // output
-    StoreArray<Vertex> verArray;
+    StoreArray<TagVertex> verArray;
     analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
@@ -132,7 +132,7 @@ namespace Belle2 {
         toRemove.push_back(particle->getArrayIndex());
       } else {
         // save information in the Vertex StoreArray
-        Vertex* ver = verArray.appendNew();
+        TagVertex* ver = verArray.appendNew();
         // create relation: Particle <-> Vertex
         particle->addRelationTo(ver);
         // fill Vertex with content

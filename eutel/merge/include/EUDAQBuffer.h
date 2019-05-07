@@ -48,9 +48,6 @@
 #include <testbeam/vxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
 /** EUDAQBuffer: BUffer filled with EUDAQ Events.
  */
 

@@ -96,13 +96,11 @@ def available_revisions(work_folder):
 
     # Get all folders in ./results/ sorted descending by the date they were
     # created (i.e. newest folder first)
-    revisions = sorted(
-        os.listdir(validationpath.get_results_folder(work_folder)),
-        key=lambda _: os.path.getmtime(
-            os.path.join(validationpath.get_results_folder(work_folder), _)),
-        reverse=True
-    )
-    # Return it
+    search_folder = validationpath.get_results_folder(work_folder)
+    subfolders = [p for p in os.scandir(search_folder) if p.is_dir()]
+    revisions = [
+        p.name for p in sorted(subfolders, key=lambda p: p.stat().st_mtime)
+    ]
     return revisions
 
 
@@ -169,7 +167,7 @@ def get_validation_folders(location, basepaths, log):
         return {}
 
     # Write to log what we are collecting
-    log.debug('Collecting {0} folders'.format(location))
+    log.debug(f'Collecting {location} folders')
 
     # Reserve some memory for our results
     results = {}
@@ -356,7 +354,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
     """
 
     # Write to log what we are collecting
-    log.debug('Collecting *{0} files from {1}'.format(ext, dirpath))
+    log.debug(f'Collecting *{ext} files from {dirpath}')
 
     # Some space where we store our results before returning them
     results = []
@@ -457,14 +455,12 @@ def index_from_revision(revision, work_folder):
         be found for 'revision'
     """
 
-    # If the requested revision exists, return its index
-    if revision in available_revisions(work_folder):
-        index = available_revisions(work_folder).index(revision)
-    # Else return a None object
-    else:
-        index = None
+    revisions = available_revisions(work_folder) + ["reference"]
 
-    return index
+    if revision in revisions:
+        return revisions.index(revision)
+    else:
+        return None
 
 
 def get_log_file_paths(logger):

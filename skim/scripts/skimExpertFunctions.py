@@ -258,6 +258,7 @@ _skimNameMatching = [
     ('18520400', 'LFVZpInvisible'),
     ('18520500', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
+    ('18570700', 'TauThrust'),
 ]
 
 

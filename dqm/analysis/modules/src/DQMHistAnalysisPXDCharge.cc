@@ -2,7 +2,7 @@
 // File : DQMHistAnalysisPXDCharge.cc
 // Description : Analysis of PXD Cluster Charge
 //
-// Author : Bjoern Spruck, Univerisity Mainz
+// Author : Bjoern Spruck, University Mainz
 // Date : 2018
 //-
 
@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
+#include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -39,6 +40,13 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
+}
+
+DQMHistAnalysisPXDChargeModule::~DQMHistAnalysisPXDChargeModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
 }
 
 void DQMHistAnalysisPXDChargeModule::initialize()
@@ -102,7 +110,7 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
   SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
@@ -149,7 +157,6 @@ void DQMHistAnalysisPXDChargeModule::event()
       m_cCharge->cd();
       hh1->Draw();
       m_fLandau->Draw("same");
-      m_cCharge->Print(str(format("cc_%d.pdf") % i).data());
 
       if (hh1->GetEntries() > 1000) enough = true;
     }
@@ -192,6 +199,11 @@ void DQMHistAnalysisPXDChargeModule::event()
 #endif
   }
 
+  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
+  tt->SetTextAngle(90);// Rotated
+  tt->SetTextAlign(12);// Centered
+  tt->Draw();
+
   m_cCharge->Modified();
   m_cCharge->Update();
 }
@@ -209,7 +221,6 @@ void DQMHistAnalysisPXDChargeModule::terminate()
   SEVCHK(ca_clear_channel(mychid[0]), "ca_clear_channel failure");
   SEVCHK(ca_clear_channel(mychid[1]), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  ca_context_destroy();
 #endif
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");
 }

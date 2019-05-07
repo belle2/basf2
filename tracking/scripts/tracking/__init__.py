@@ -189,9 +189,6 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         latest_reco_tracks = cdc_reco_tracks
 
     if is_svd_used(components):
-        if latest_reco_tracks is None:
-            latest_reco_tracks = cdc_reco_tracks
-
         add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                               output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
                               temporary_reco_tracks=svd_reco_tracks,

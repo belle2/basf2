@@ -14,6 +14,7 @@
 #pragma once
 #include <TObject.h>
 #include <TVector3.h>
+#include <string>
 namespace Belle2 {
 
   class TRGGRLInfo : public TObject {
@@ -54,6 +55,7 @@ namespace Belle2 {
       m_Trk_b2b_1to5(-1),
       m_Trk_b2b_1to7(-1),
       m_Trk_b2b_1to9(-1),
+      m_Trk_open90(-1),
       m_cluster_b2b_1to3(-1),
       m_cluster_b2b_1to5(-1),
       m_cluster_b2b_1to7(-1),
@@ -137,6 +139,8 @@ namespace Belle2 {
     int getTrk_b2b_1to7() const {return m_Trk_b2b_1to7;}
     /**get Trk_b2b_1to9*/
     int getTrk_b2b_1to9() const {return m_Trk_b2b_1to9;}
+    /**get Trk_open90*/
+    int getTrk_open90() const {return m_Trk_open90;}
     /**get cluster_b2b_1to3*/
     int getcluster_b2b_1to3() const {return m_cluster_b2b_1to3;}
     /**get cluster_b2b_1to5*/
@@ -163,7 +167,8 @@ namespace Belle2 {
     int geteeb() const {return m_eeb;}
     /**get fep: one track & one matched & track-cluster b2b */
     int getfep() const {return m_fep;}
-
+    /**get GDL input bit */
+    bool getInputBits(int i) const {return m_InputBits[i];}
 
     /**set the number of 2D tracks*/
     void setN2Dfindertrk(int N2Dfindertrk)  {m_n_2dfinder_track = N2Dfindertrk;}
@@ -229,6 +234,8 @@ namespace Belle2 {
     void setTrk_b2b_1to7(int Trk_b2b_1to7) {m_Trk_b2b_1to7 = Trk_b2b_1to7;}
     /**set the value of Trk_b2b_1to9*/
     void setTrk_b2b_1to9(int Trk_b2b_1to9) {m_Trk_b2b_1to9 = Trk_b2b_1to9;}
+    /**set the value of Trk_open90*/
+    void setTrk_open90(int Trk_open90) {m_Trk_open90 = Trk_open90;}
     /**set the value of cluster_b2b_1to3*/
     void setcluster_b2b_1to3(int cluster_b2b_1to3) {m_cluster_b2b_1to3 = cluster_b2b_1to3;}
     /**set the value of cluster_b2b_1to5*/
@@ -255,6 +262,8 @@ namespace Belle2 {
     void seteeb(int eeb) {m_eeb = eeb;}
     /**set fep: one track & one matched & track-cluster b2b*/
     void setfep(int fep) {m_fep = fep;}
+    /**set GDL input bit*/
+    void setInputBits(int i, bool bit) {m_InputBits[i] = bit;}
 
 
   private:
@@ -330,6 +339,8 @@ namespace Belle2 {
     int m_Trk_b2b_1to7;
     /**Trk_b2b_1to9*/
     int m_Trk_b2b_1to9;
+    /**Trk_open90*/
+    int m_Trk_open90;
     /**cluster_b2b_1to3*/
     int m_cluster_b2b_1to3;
     /**cluster_b2b_1to5*/
@@ -356,6 +367,8 @@ namespace Belle2 {
     int m_eeb;
     /**fep: one track & one matched & track-cluster b2b*/
     int m_fep;
+    /**GDL input bits**/
+    std::vector<bool> m_InputBits = std::vector<bool>(320, false);
 
     /**! The Class title*/
     ClassDef(TRGGRLInfo, 2); /*< the class title */

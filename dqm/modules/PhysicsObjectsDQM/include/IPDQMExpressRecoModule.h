@@ -46,6 +46,14 @@ namespace Belle2 {
     TH1F* m_h_y = nullptr;
     /** z coord*/
     TH1F* m_h_z = nullptr;
+    /** x coord momentum in LAB frame*/
+    TH1F* m_h_px = nullptr;
+    /** y coord momentum in LAB frame*/
+    TH1F* m_h_py = nullptr;
+    /** z coord momentum  in LAB frame*/
+    TH1F* m_h_pz = nullptr;
+    /**Energy in LAB frame*/
+    TH1F* m_h_E = nullptr;
     /** y pull*/
     TH1F* m_h_pull = nullptr;
     /** y resolution */

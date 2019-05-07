@@ -11,10 +11,11 @@ from svd import *
 import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDNoiseCalibrations
-
+import datetime
 import os
 
-noise = -99
+now = datetime.datetime.now()
+
 '''
 # Phase 3 - scaled with 375
 noise_L3_U = 2.48
@@ -54,7 +55,8 @@ class defaultNoiseImporter(basf2.Module):
 
         iov = Belle2.IntervalOfValidity.always()
 
-        payload = Belle2.SVDNoiseCalibrations.t_payload()
+        payload = Belle2.SVDNoiseCalibrations.t_payload(-1, "NoiseCalibrations_default_" +
+                                                        str(now.isoformat()) + "_INFO:_fromPhase3calibrations")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 

@@ -12,6 +12,7 @@
 
 #include <top/modules/TOPChannelMasker/TOPChannelMaskerModule.h>
 #include <top/reconstruction/TOPreco.h>     // reconstruction wrapper
+#include <top/reconstruction/TOPconfigure.h>
 
 using namespace std;
 
@@ -35,13 +36,21 @@ namespace Belle2 {
 
     // Set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
+
+    // Add parameters
+    addParam("printMask", m_printMask,
+             "if true print channel mask as set in reconstruction", false);
+
   }
 
   void TOPChannelMaskerModule::initialize()
   {
     // register data objects
     m_digits.isRequired();
+    m_eventAsicMask.isOptional();
 
+    // Configure TOP detector in FORTRAN code
+    TOPconfigure config;
   }
 
   void TOPChannelMaskerModule::event()
@@ -63,10 +72,19 @@ namespace Belle2 {
       return;
     }
 
+    // have asic masks changed?
+    bool asicMasksChanged = false;
+    if (m_eventAsicMask.isValid()) {
+      if (m_eventAsicMask->get() != m_savedAsicMask.get()) {
+        m_savedAsicMask.set(m_eventAsicMask->get());
+        asicMasksChanged = true;
+      }
+    }
+
     // if channel masks have changed then pass the masking to the FORTRAN
     // reconstruction code to exclude from the pdf
-    if (m_channelMask.hasChanged()) {
-      TOPreco::setChannelMask(m_channelMask);
+    if (m_channelMask.hasChanged() or asicMasksChanged) {
+      TOPreco::setChannelMask(m_channelMask, m_savedAsicMask, m_printMask);
     }
 
     // now flag actual data Cherenkov hits as coming from bad channels

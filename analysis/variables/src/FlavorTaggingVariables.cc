@@ -10,6 +10,7 @@
 
 // Own include
 #include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/MCTruthVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -28,7 +29,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
-#include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -99,6 +99,8 @@ namespace Belle2 {
         // from analysis/ContinuumSuppression/src/ContinuumSuppression.cc
         // At some point this has to be updated!
 
+        // FIXME the following three loops reimplements the ParticleLoader and should be avoided -- SC
+
         // Charged tracks
         //
         const auto& roeTracks = roe->getTracks();
@@ -121,10 +123,10 @@ namespace Belle2 {
         }
 
         // ECLCluster -> Gamma
-        //
         const auto& roeECLClusters = roe->getECLClusters();
         for (auto& cluster : roeECLClusters) {
           if (cluster == nullptr) continue;
+          if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
           if (cluster->isNeutral()) {
             // Create particle from ECLCluster with gamma hypothesis
             Particle particle(cluster);
@@ -376,14 +378,7 @@ namespace Belle2 {
         const Particle* Bcp = roe->getRelated<Particle>();
         const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
 
-        int MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
-
-        MCMatchingError &= (~MCMatching::c_MissFSR);
-        MCMatchingError &= (~MCMatching::c_MissPHOTOS);
-        MCMatchingError &= (~MCMatching::c_MissingResonance);
-        MCMatchingError &= (~MCMatching::c_MissGamma);
-
-        if (MCMatchingError == MCMatching::c_Correct) {
+        if (Variable::isSignal(Bcp) > 0) {
           const MCParticle* Y4S = BcpMC->getMother();
           if (Y4S != nullptr) {
             for (auto& iTrack : roe->getTracks()) {
@@ -415,46 +410,11 @@ namespace Belle2 {
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
-      float BtagFlavor = 0;
-      float BcpFlavor = 0;
-
       if (roe.isValid()) {
         const Particle* Bcp = roe->getRelated<Particle>();
-        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+        return Variable::isRelatedRestOfEventB0Flavor(Bcp);
+      } else return 0;
 
-        int MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
-
-        MCMatchingError &= (~MCMatching::c_MissFSR);
-        MCMatchingError &= (~MCMatching::c_MissPHOTOS);
-        MCMatchingError &= (~MCMatching::c_MissingResonance);
-        MCMatchingError &= (~MCMatching::c_MissGamma);
-
-        if (MCMatchingError == MCMatching::c_Correct) {
-          const MCParticle* Y4S = BcpMC->getMother();
-          if (Y4S != nullptr) {
-            for (auto& iTrack : roe->getTracks()) {
-              const MCParticle* mcParticle = iTrack->getRelated<MCParticle>();
-              while (mcParticle != nullptr) {
-                if (mcParticle->getMother() == Y4S) {
-                  if (mcParticle == BcpMC) {
-                    if (mcParticle -> getPDG() > 0) BcpFlavor = 2;
-                    else BcpFlavor = -2;
-                  } else if (BtagFlavor == 0) {
-                    if (TMath::Abs(mcParticle -> getPDG()) == 511 || TMath::Abs(mcParticle -> getPDG()) == 521) {
-                      if (mcParticle -> getPDG() > 0) BtagFlavor = 1;
-                      else BtagFlavor = -1;
-                    } else BtagFlavor = 5;
-                  }
-                  break;
-                }
-                mcParticle = mcParticle->getMother();
-              }
-              if (BcpFlavor != 0 || BtagFlavor == 5) break;
-            }
-          }
-        }
-      }
-      return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
     }
 
     double ancestorHasWhichFlavor(const Particle* particle)
@@ -523,6 +483,7 @@ namespace Belle2 {
           }
         } else if (roe-> getNECLClusters() != 0) {
           for (auto& cluster : roe-> getECLClusters()) {
+            if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
             const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
             while (mcParticle != nullptr) {
               if (mcParticle->getPDG() == 511) {
@@ -566,77 +527,38 @@ namespace Belle2 {
     double isRestOfEventMajorityB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      float q_MC = 0; //Flavor of B
+
       if (roe.isValid()) {
-        if (roe-> getNTracks() != 0) {
-          for (auto& track : roe->getTracks()) {
-            const MCParticle* mcParticle = track->getRelated<MCParticle>();
-            while (mcParticle != nullptr) {
-              if (mcParticle->getPDG() == 511) {
-                q_MC++;
-                break;
-              }
-              if (mcParticle->getPDG() == -511) {
-                q_MC--;
-                break;
-              }
-              mcParticle = mcParticle->getMother();
-            }
-          }
-        } else if (roe-> getNECLClusters() != 0) {
-          for (auto& cluster : roe-> getECLClusters()) {
-            const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
-            while (mcParticle != nullptr) {
-              if (mcParticle->getPDG() == 511) {
-                q_MC++;
-                break;
-              }
-              if (mcParticle->getPDG() == -511) {
-                q_MC--;
-                break;
-              }
-              mcParticle = mcParticle->getMother();
-            }
-          }
-        } else if (roe-> getNKLMClusters() != 0) {
-          for (auto& klmcluster : roe-> getKLMClusters()) {
-            const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
-            while (mcParticle != nullptr) {
-              if (mcParticle->getPDG() == 511) {
-                q_MC++;
-                break;
-              }
-              if (mcParticle->getPDG() == -511) {
-                q_MC--;
-                break;
-              }
-              mcParticle = mcParticle->getMother();
-            }
-          }
-        }
-      }
-      if (q_MC > 0) {
-        return 1;
-      } else if (q_MC < 0) {
-        return 0;
+        const Particle* Bcp = roe->getRelated<Particle>();
+        return Variable::isRelatedRestOfEventMajorityB0Flavor(Bcp);
       } else return -2;//gRandom->Uniform(0, 1);
     }
 
-    double McFlavorOfTagSide(const Particle* part)
+    double mcFlavorOfOtherB0(const Particle* particle)
     {
-      const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
-      if (roe != nullptr) {
-        for (auto& track : roe->getTracks()) {
-          const MCParticle* mcParticle = track->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) return 511;
-            else if (mcParticle->getPDG() == -511) return -511;
-            mcParticle = mcParticle->getMother();
-          }
+
+      if (std::abs(particle->getPDGCode()) != 511) {
+        B2ERROR("MCFlavorOfOtherB0: the given particle is not a neutral B meson. This variable works only for B0 or B0bar particles. ");
+        return 0;
+      }
+
+      if (Variable::isSignal(particle) < 1.0) return 0;
+
+      const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcMother = mcParticle->getMother();
+
+      if (mcMother == nullptr) return 0;
+
+      for (auto& upsilon4SDaughter : mcMother -> getDaughters()) {
+        if (upsilon4SDaughter != mcParticle) {
+          if (upsilon4SDaughter -> getPDG() > 0) return 1.0;
+          else return -1.0;
         }
       }
+
       return 0;
-    }
+
+    };
 
 //  ######################################### Meta Variables ##############################################
 
@@ -694,9 +616,10 @@ namespace Belle2 {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
           PCmsLabTransform T;
-          TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
-          TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
-          TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+          ClusterUtils C;
+          TLorentzVector momXChargedTracks; //Momentum of charged X tracks in CMS-System
+          TLorentzVector momXChargedClusters; //Momentum of charged X clusters in CMS-System
+          TLorentzVector momXNeutralClusters; //Momentum of neutral X clusters in CMS-System
           TLorentzVector momTarget = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Mu in CMS-System
 
           double output = 0.0;
@@ -710,55 +633,67 @@ namespace Belle2 {
               const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
               const TrackFitResult* iTrack = track->getTrackFitResultWithClosestMass(charged);
               if (iTrack == nullptr) continue;
-              TLorentzVector momtrack(iTrack->getMomentum(), 0);
-              if (momtrack == momtrack) momXchargedtracks += momtrack;
-            }
-            const auto& ecl = roe->getECLClusters();
-            ClusterUtils C;
-            for (auto& x : ecl) {
-              if (x == nullptr) continue;
-              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x, ECLCluster::EHypothesisBit::c_nPhotons);
-              if (iMomECLCluster == iMomECLCluster) {
-                if (x->isNeutral()) momXneutralclusters += iMomECLCluster;
-                else if (!(x->isNeutral())) {
-                  if (x -> getRelated<Track>() != particle->getRelated<Track>()) momXchargedclusters += iMomECLCluster;
-                }
+              if (track != particle->getTrack()) {
+                TLorentzVector iTrackMom = iTrack->get4Momentum();
+                if (iTrackMom == iTrackMom) momXChargedTracks += iTrackMom;
               }
             }
+
+            momXNeutralClusters = roe->get4VectorNeutralECLClusters();
+
             const auto& klm = roe->getKLMClusters();
             for (auto& x : klm) {
               if (x == nullptr) continue;
               TLorentzVector iMomKLMCluster = x -> getMomentum();
               if (iMomKLMCluster == iMomKLMCluster) {
                 if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
-                  momXneutralclusters += iMomKLMCluster;
+                  momXNeutralClusters += iMomKLMCluster;
                 }
               }
             }
 
-            TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
-            TLorentzVector momX = T.rotateLabToCms() * (momXcharged + momXneutralclusters) -
-                                  momTarget; //Total Momentum of the recoiling X in CMS-System
+            // TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+            TLorentzVector momX = T.rotateLabToCms() * (momXChargedTracks +
+                                                        momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
             TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
+
             if (requestedVariable == "recoilMass") output = momX.M();
-            if (requestedVariable == "recoilMassSqrd") output = momX.M2();
+            else if (requestedVariable == "recoilMassSqrd") output = momX.M2();
             else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
             else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
             else if (requestedVariable == "EW90") {
+
               TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
               float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+
+              const auto& ecl = roe->getECLClusters();
               for (auto& x : ecl) {
                 if (x == nullptr) continue;
                 float iEnergy = x -> getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-                if (iEnergy == iEnergy) {
-                  ClusterUtils cluster_util;
-                  if ((T.rotateLabToCms() * cluster_util.Get4MomentumFromCluster(x,
-                       ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                if (x->isNeutral() && iEnergy == iEnergy) {
+                  if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(x,
+                                                                      ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
-                //       for (auto & i : klm) {
-                //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
-                //         }
               }
+              for (auto& track : tracks) {
+                if (track != particle->getTrack()) {
+                  for (const ECLCluster& chargedCluster : track->getRelationsWith<ECLCluster>()) {
+                    // ignore everything except the nPhotons hypothesis
+                    if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+                      continue;
+                    float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+                    if (iEnergy == iEnergy) {
+                      if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(&chargedCluster,
+                                                                          ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                    }
+                  }
+                }
+              }
+
+              //       for (auto & i : klm) {
+              //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
+              //         }
+
               output = E_W_90;
             } else {
               B2FATAL("Wrong variable  " << requestedVariable <<
@@ -861,7 +796,7 @@ namespace Belle2 {
               if (TargetFastParticle != nullptr) {
                 if (requestedVariable == "cosTPTOFast") output = Variable::Manager::Instance().getVariable("cosTPTO")->function(
                                                                      TargetFastParticle);
-                if (momSlowPion == momSlowPion) {
+                if (momSlowPion == momSlowPion) { // FIXME
                   if (requestedVariable == "cosSlowFast") output = TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
                   else if (requestedVariable == "SlowFastHaveOpositeCharges") {
                     if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
@@ -2104,8 +2039,9 @@ namespace Belle2 {
                       " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).");
-    REGISTER_VARIABLE("McFlavorOfTagSide",  McFlavorOfTagSide, "Flavor of tag side from MC extracted from the RoE");
-
+    REGISTER_VARIABLE("mcFlavorOfOtherB0", mcFlavorOfOtherB0,
+                      "Returns the MC flavor (+-1) of the accompaning tag-side neutral B meson if the given particle is a correctly MC matched neutral B. It returns 0 else. \n"
+                      "In other words, this variable checks the generated flavor of the other MC Upsilon(4S) daughter.");
 
     VARIABLE_GROUP("Flavor Tagger MetaFunctions")
 

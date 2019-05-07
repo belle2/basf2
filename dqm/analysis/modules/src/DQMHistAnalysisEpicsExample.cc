@@ -2,8 +2,8 @@
 // File : DQMHistAnalysisEpicsExample.cc
 // Description :
 //
-// Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 25 - Dec - 2015
+// Author : Bjoern Spruck, Mainz Univerisity
+// Date : 2017-2019
 //-
 
 
@@ -37,7 +37,12 @@ DQMHistAnalysisEpicsExampleModule::DQMHistAnalysisEpicsExampleModule()
 }
 
 
-DQMHistAnalysisEpicsExampleModule::~DQMHistAnalysisEpicsExampleModule() { }
+DQMHistAnalysisEpicsExampleModule::~DQMHistAnalysisEpicsExampleModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
 
 void DQMHistAnalysisEpicsExampleModule::initialize()
 {
@@ -80,7 +85,7 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
   if (m_parameters > 0) {
     if (m_parameters > 10) m_parameters = 10; // hard limit
 #ifdef _BELLE2_EPICS
-    SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
 #endif
     for (auto i = 0; i < m_parameters; i++) {
       std::string aa;
@@ -225,7 +230,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
     for (auto i = 0; i < m_parameters; i++) {
       double data;
       data = m_f1->GetParameter(i);
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
+      if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
     }
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
@@ -243,11 +248,10 @@ void DQMHistAnalysisEpicsExampleModule::terminate()
 #ifdef _BELLE2_EPICS
   if (m_parameters > 0) {
     for (auto i = 0; i < m_parameters; i++) {
-      SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+      if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
     }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  ca_context_destroy();
 #endif
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: terminate called");
 }

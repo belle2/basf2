@@ -253,33 +253,6 @@ namespace Belle2 {
       return mcparticle->getMomentum().Pt();
     }
 
-    double particleMCMatchDX(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getDecayVertex().Px();
-    }
-
-    double particleMCMatchDY(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getDecayVertex().Py();
-    }
-
-    double particleMCMatchDZ(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getDecayVertex().Pz();
-    }
-
     double particleMCMatchE(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -470,6 +443,29 @@ namespace Belle2 {
       return tauMinusId;
     }
 
+    int tauPlusMcProng(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      int tauPlusMcProng = tauDecay->getTauPlusMcProng();
+      return tauPlusMcProng;
+    }
+
+    int tauMinusMcProng(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      int tauMinusMcProng = tauDecay->getTauMinusMcProng();
+      return tauMinusMcProng;
+    }
+
+
 
     double isReconstructible(const Particle* p)
     {
@@ -585,7 +581,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isOrHasCloneTrack", isOrHasCloneTrack,
                       "Return 1 if the particle is a clone track or has a clone track as a daughter, 0 otherwise.");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,
-                      "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
@@ -593,31 +589,25 @@ namespace Belle2 {
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
                       "The number of relations of this Particle to MCParticle.");
     REGISTER_VARIABLE("mcDecayTime", particleMCMatchDecayTime,
-                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcLifeTime", particleMCMatchLifeTime,
-                      "The life time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The life time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPX", particleMCMatchPX,
-                      "The px of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The px of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPY", particleMCMatchPY,
-                      "The py of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The py of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPZ", particleMCMatchPZ,
-                      "The pz of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The pz of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPT", particleMCMatchPT,
-                      "The pt of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcDX", particleMCMatchDX,
-                      "The decay x-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcDY", particleMCMatchDY,
-                      "The decay y-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcDZ", particleMCMatchDZ,
-                      "The decay z-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The pt of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcE", particleMCMatchE,
-                      "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcP", particleMCMatchP,
-                      "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPhi", particleMCMatchPhi,
-                      "The phi of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The phi of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcTheta", particleMCMatchTheta,
-                      "The theta of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+                      "The theta of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
 
@@ -646,10 +636,16 @@ namespace Belle2 {
                       "-1 if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("generatorEventWeight", generatorEventWeight,
                       "[Eventbased] Returns the event weight produced by the event generator")
+
+    VARIABLE_GROUP("Generated tau decay information");
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
                       "Decay ID for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
                       "Decay ID for the negative tau lepton in a tau pair generated event.")
+    REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng,
+                      "Prong for the positive tau lepton in a tau pair generated event.")
+    REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
+                      "Prong for the negative tau lepton in a tau pair generated event.")
 
 
     VARIABLE_GROUP("MC particle seen in subdetectors");

@@ -77,14 +77,12 @@ void DQMHistAnalysisARICHModule::initialize()
   }
   m_c_mergerHit = new TCanvas("ARICH/c_mergerHitModified");
 
-  channelHist = new Belle2::ARICHChannelHist("ARICHExpert/chHist",
-                                             "# of hits/channel"); /**<ARICH TObject to draw hit map for each channel*/
-  m_c_channelHist = new TCanvas("ARICHExpert/c_channelHist");
-  apdHist = new Belle2::ARICHChannelHist("ARICHExpert/apdHist", "# of hits/APD", 2); /**<ARICH TObject to draw hit map for each APD*/
-  m_c_apdHist = new TCanvas("ARICHExpert/c_apdHist");
-  hapdHist = new Belle2::ARICHChannelHist("ARICHExpert/hapdHist", "# of hits/HAPD",
-                                          1); /**<ARICH TObject to draw hit map for each HAPD*/
-  m_c_hapdHist = new TCanvas("ARICHExpert/c_hapdHist");
+  m_apdHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 2); /**<ARICH TObject to draw hit map for each APD*/
+  m_apdPoly = new TH2Poly();
+  m_apdPoly->SetName("ARICH/apdHitMap");
+  m_apdPoly->SetTitle("# of hits/APD/event");
+  m_apdPoly->SetOption("colz");
+  m_c_apdHist = new TCanvas("ARICH/c_apdHist");
 
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }
@@ -101,7 +99,7 @@ void DQMHistAnalysisARICHModule::event()
   if (m_h_mergerHit != NULL) {
     m_c_mergerHit->Clear();
     m_c_mergerHit->cd();
-    m_h_mergerHit->Draw();
+    m_h_mergerHit->Draw("hist");
     gPad->Update();
     for (int i = 0; i < 5; i++) {
       m_LineForMB[i]->DrawLine(12 * (i + 1) + 0.5, 0, 12 * (i + 1) + 0.5, gPad->GetUymax());
@@ -112,40 +110,25 @@ void DQMHistAnalysisARICHModule::event()
   }
 
   //Draw 2D hit map of channels and APDs
-  TH1* m_h_chHit = findHist("ARICH/chHit");/**<The number of hits in each channels*/
+  TH1* m_h_chHit = findHist("ARICH/chipHit");/**<The number of hits in each chip */
   if (m_h_chHit != NULL) {
-    for (int i = 1; i < 421; i++) {
-      int apdHit[4] = {};
-      for (int j = 0; j < 144; j++) {
-        int ch = (i - 1) * 144 + j;
-        channelHist->setBinContent(i, j, m_h_chHit->GetBinContent(ch + 1));
-        apdHit[j / 36] += m_h_chHit->GetBinContent(ch + 1);
-      }
-      for (int j = 0; j < 4; j++) {
-        apdHist->setBinContent(i, j, apdHit[j]);
-      }
-    }
-    m_c_channelHist->Clear();
-    m_c_channelHist->cd();
-    channelHist->Draw();
+    int nevt = 0;
+    TH1* htmp = findHist("ARICH/hitsPerEvent");
+    if (htmp) nevt = htmp->GetEntries();
+    m_apdHist->fillFromTH1(m_h_chHit);
+    if (nevt) m_apdHist->Scale(1. / float(nevt));
+    m_apdPoly->SetMaximum(0.1);
+    m_apdHist->setPoly(m_apdPoly);
+    m_apdPoly->SetMinimum(0.0001);
     m_c_apdHist->Clear();
     m_c_apdHist->cd();
-    apdHist->Draw();
+    m_apdPoly->Draw("colz");
+    m_apdPoly->GetXaxis()->SetTickLength(0);
+    m_apdPoly->GetYaxis()->SetTickLength(0);
+    gPad->SetLogz();
+    m_c_apdHist->Update();
   } else {
-    B2INFO("Histogram named chHit is not found.");
-  }
-
-  //Draw 2D hit map of HAPDs
-  TH1* m_h_hapdHit = findHist("ARICH/hapdHit");/**<The number of hits in each HAPDs*/
-  if (m_h_hapdHit != NULL) {
-    for (int i = 1; i < 421; i++) {
-      hapdHist->setBinContent(i, m_h_hapdHit->GetBinContent(i));
-    }
-    m_c_hapdHist->Clear();
-    m_c_hapdHist->cd();
-    hapdHist->Draw();
-  } else {
-    B2INFO("Histogram named hapdHit is not found.");
+    B2INFO("Histogram named chipHit is not found.");
   }
 
 }

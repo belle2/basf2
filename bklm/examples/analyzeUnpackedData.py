@@ -6,7 +6,7 @@
 #  This steering file shows how to analyze the unpacked
 #  BKLM raw data in order to obtain the Hitmap.
 #  Note that the BKLMDigitAnalyzer module MUST go
-#  after the BKLMUnpacker module!
+#  after the KLMUnpacker module!
 #
 #  Usually we need to process only 10k events per run.
 #
@@ -30,12 +30,12 @@ main.add_module('SeqRootInput', inputFileNames=inputSRoot)
 main.add_module('Progress')
 
 # Add the unpacker
-main.add_module('BKLMUnpacker')
+main.add_module('KLMUnpacker')
 
 # Add the digit analyzer
 # Note that it must go after the unpacker
 # since it requires BKLMDigit and other dataobjects
-# created by the BKLMUnpacker
+# created by the KLMUnpacker
 main.add_module('BKLMDigitAnalyzer',
                 outputRootName='bklmHitmap')  # Note that .root is not needed!
 

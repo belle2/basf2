@@ -19,10 +19,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 
-
-
 namespace Belle2 {
-
 
   /**The module studies VXD hits from overlapping sensors of a same VXD layer.
    * In particular, it computes residuals differences sensitive to possible detector misalignments.
@@ -38,31 +35,70 @@ namespace Belle2 {
     void initialize() override;
     /** Compute the difference of coordinate residuals between two hits in overlapping sensors of a same VXD layer */
     void event() override;
-
     /**  Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed to be placed in this function */
     void defineHisto() override;
 
   private:
-    /** Array storing reconstructed tracks */
-    StoreArray<RecoTrack> recoTrack;
+    /** StoreArray name of the input and output RecoTracks */
+    std::string m_recoTracksStoreArrayName{"RecoTracks"};
     /** Array storing PXD clusters */
     StoreArray<PXDCluster> m_pxdcluster;
     /** Array storing SVD clusters */
     StoreArray<SVDCluster> m_svdcluster;
-    /** Histograms of VXD ( PXD + SVD ) residuals*/
-    TH1F* h_U_Res = nullptr;
-    TH1F* h_V_Res = nullptr;
-    /** Histograms of PXD residuals */
-    TH1F* h_U_Res_PXD = nullptr;
-    TH1F* h_V_Res_PXD = nullptr;
-    /** Histograms of SVD residuals */
-    TH1F* h_U_Res_SVD = nullptr;
-    TH1F* h_V_Res_SVD = nullptr;
+    /** Histograms of VXD ( PXD + SVD ) differences of residuals*/
+    TH1F* h_U_DeltaRes = nullptr;
+    TH1F* h_V_DeltaRes = nullptr;
+    /** Histograms of PXD differences of residuals */
+    TH1F* h_U_DeltaRes_PXD = nullptr;
+    TH1F* h_U_DeltaRes_PXD_Lyr1 = nullptr;
+    TH1F* h_U_DeltaRes_PXD_Lyr2 = nullptr;
+    TH1F* h_V_DeltaRes_PXD = nullptr;
+    TH1F* h_V_DeltaRes_PXD_Lyr1 = nullptr;
+    TH1F* h_V_DeltaRes_PXD_Lyr2 = nullptr;
+    /** Histograms of SVD differences of residuals */
+    TH1F* h_U_DeltaRes_SVD = nullptr;
+    TH1F* h_U_DeltaRes_SVD_Lyr3 = nullptr;
+    TH1F* h_U_DeltaRes_SVD_Lyr4 = nullptr;
+    TH1F* h_U_DeltaRes_SVD_Lyr5 = nullptr;
+    TH1F* h_U_DeltaRes_SVD_Lyr6 = nullptr;
+    TH1F* h_V_DeltaRes_SVD = nullptr;
+    TH1F* h_V_DeltaRes_SVD_Lyr3 = nullptr;
+    TH1F* h_V_DeltaRes_SVD_Lyr4 = nullptr;
+    TH1F* h_V_DeltaRes_SVD_Lyr5 = nullptr;
+    TH1F* h_V_DeltaRes_SVD_Lyr6 = nullptr;
+    /** 2D histograms: DeltaRes_u vs phi of VXD overlaps for each layer (1 to 6) */
+    TH2F* h_DeltaResUPhi_Lyr6 = nullptr;
+    TH2F* h_DeltaResUPhi_Lyr5 = nullptr;
+    TH2F* h_DeltaResUPhi_Lyr4 = nullptr;
+    TH2F* h_DeltaResUPhi_Lyr3 = nullptr;
+    TH2F* h_DeltaResUPhi_Lyr2 = nullptr;
+    TH2F* h_DeltaResUPhi_Lyr1 = nullptr;
+    /** 2D histograms: DeltaRes_u vs z of VXD overlaps for each layer (1 to 6) */
+    TH2F* h_DeltaResUz_Lyr6 = nullptr;
+    TH2F* h_DeltaResUz_Lyr5 = nullptr;
+    TH2F* h_DeltaResUz_Lyr4 = nullptr;
+    TH2F* h_DeltaResUz_Lyr3 = nullptr;
+    TH2F* h_DeltaResUz_Lyr2 = nullptr;
+    TH2F* h_DeltaResUz_Lyr1 = nullptr;
+    /** 2D histograms: DeltaRes_v vs z of VXD overlaps for each layer (1 to 6) */
+    TH2F* h_DeltaResVz_Lyr6 = nullptr;
+    TH2F* h_DeltaResVz_Lyr5 = nullptr;
+    TH2F* h_DeltaResVz_Lyr4 = nullptr;
+    TH2F* h_DeltaResVz_Lyr3 = nullptr;
+    TH2F* h_DeltaResVz_Lyr2 = nullptr;
+    TH2F* h_DeltaResVz_Lyr1 = nullptr;
+    /** 2D histograms: DeltaRes_v vs phi of VXD overlaps for each layer (1 to 6) */
+    TH2F* h_DeltaResVPhi_Lyr6 = nullptr;
+    TH2F* h_DeltaResVPhi_Lyr5 = nullptr;
+    TH2F* h_DeltaResVPhi_Lyr4 = nullptr;
+    TH2F* h_DeltaResVPhi_Lyr3 = nullptr;
+    TH2F* h_DeltaResVPhi_Lyr2 = nullptr;
+    TH2F* h_DeltaResVPhi_Lyr1 = nullptr;
     /** Histograms of SVD strips multiplicity */
     TH1F* h_SVDstrips_Mult = nullptr;
-    /** Histograms of SVD residuals grouped by clusters sizes */
-    TH1F* h_U_Cl1Cl2_Res[5] = {nullptr};
-    TH1F* h_V_Cl1Cl2_Res[5] = {nullptr};
+    /** Histograms of SVD differences of residuals grouped by clusters sizes */
+    TH1F* h_U_Cl1Cl2_DeltaRes[5] = {nullptr};
+    TH1F* h_V_Cl1Cl2_DeltaRes[5] = {nullptr};
     /** Sensor hit-maps from reconstructed u and v coordinates */
     TH2F* h_Lyr6[17][6] = {nullptr};
     TH2F* h_Lyr5[13][5] = {nullptr};

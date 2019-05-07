@@ -52,6 +52,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                 "filter": [
                     "ge3_loose_tracks_inc_1_tight_not_ee2leg",
                     "selectmumu",
+                    "ECLMuonPair",
+                    "ge3_loose_tracks_inc_1_tight_not_ee2leg",
+                    "2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx ",
                     "single_muon\\10"],
                 "skim": [
                     "accept_hadron",

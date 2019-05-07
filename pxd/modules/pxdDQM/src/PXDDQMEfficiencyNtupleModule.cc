@@ -199,7 +199,7 @@ void PXDDQMEfficiencyNtupleModule::event()
                           float(du_clus), float(dv_clus), float(sigu), float(sigv), float(d_clus),
                           float(fitInsideROI), float(closeToBoarder), float(closeToDead), float(matched),
                           float(ptr2->getZ0()), float(ptr2->getD0()), float(a_track.getNumberOfSVDHits()),
-                          charge, trackstate.getMom().Phi(), trackstate.getMom().CosTheta()
+                          charge, float(trackstate.getMom().Phi()), float(trackstate.getMom().CosTheta())
                          };
         m_tuple->Fill(fill);
       }

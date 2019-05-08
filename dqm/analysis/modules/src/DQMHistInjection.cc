@@ -52,13 +52,15 @@ void DQMHistInjectionModule::initialize()
   m_cInjectionHERPXDOcc = new TCanvas("PXDINJ/c_InjectionHERPXDOcc");
   m_cInjectionHERECL = new TCanvas("ECLINJ/c_InjectionHERECL");
 
-  m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "Mean Hits/event;Time in #mu s;", 4000, 0 , 20000);
-  m_hInjectionLERPXDOcc = new TH1F("HitInjectionPXDLEROcc", "Mean Occ in % per module;Time in #mu s;", 4000, 0 , 20000);
-  m_hInjectionLERECL = new TH1F("HitInjectionLERECL", "Mean Hits/event;Time in #mu s;", 4000, 0 , 20000);
+  m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionLERPXDOcc = new TH1F("HitInjectionPXDLEROcc", "PXD Occ after LER Injection;Time in #mus;Mean Occ in % per module", 4000,
+                                   0 , 20000);
+  m_hInjectionLERECL = new TH1F("HitInjectionLERECL", "ECL after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
 
-  m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "Mean Hits/event;Time in #mu s;", 4000, 0 , 20000);
-  m_hInjectionHERPXDOcc = new TH1F("HitInjectionPXDHEROcc", "Mean Occ in % per modul;Time in #mu s;", 4000, 0 , 20000);
-  m_hInjectionHERECL = new TH1F("HitInjectionHERECL", "Mean Hits/event;Time in #mu s;", 4000, 0 , 20000);
+  m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionHERPXDOcc = new TH1F("HitInjectionPXDHEROcc", "PXD Occ after HER Injection;Time in #mus;Mean Occ in % per modul", 4000,
+                                   0 , 20000);
+  m_hInjectionHERECL = new TH1F("HitInjectionHERECL", "ECL after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
 
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
@@ -87,14 +89,14 @@ void DQMHistInjectionModule::beginRun()
 {
   B2DEBUG(1, "DQMHistInjection: beginRun called.");
 
-  m_cInjectionLERPXD->Clear();
-  m_cInjectionLERPXDOcc->Clear();
-  m_cInjectionLERECL->Clear();
-  m_cInjectionHERPXD->Clear();
-  m_cInjectionHERPXDOcc->Clear();
-  m_cInjectionHERECL->Clear();
+//   m_cInjectionLERPXD->Clear(); // FIXME, unclear if this lets to crashes on new run?
+//   m_cInjectionLERPXDOcc->Clear();
+//   m_cInjectionLERECL->Clear();
+//   m_cInjectionHERPXD->Clear();
+//   m_cInjectionHERPXDOcc->Clear();
+//   m_cInjectionHERECL->Clear();
 
-  cleanPVs();
+//   cleanPVs();
 }
 
 
@@ -205,6 +207,11 @@ void DQMHistInjectionModule::event()
   for (auto& m : m_nodes) {
     if (!m.mychid) continue;
     int length = m.data.size();
+    if (length != int(ca_element_count(m.mychid)) && int(ca_element_count(m.mychid)) > 0) {
+      // FIXME, unclear why this is needed to prevent crashes on new run?
+      m.data.resize(int(ca_element_count(m.mychid)), 0.0);
+      length = m.data.size();
+    }
     if (m.histo && m.histo->GetNcells() > 2 && length > 0  && length == int(ca_element_count(m.mychid))) {
       // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
       // We fill up the array with ZEROs otherwise
@@ -227,7 +234,9 @@ void DQMHistInjectionModule::event()
       }
       SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
     } else {
-      B2ERROR("Inj " << ca_name(m.mychid) << " , " << m.histo << " , " << m.histo->GetNcells() << " , " << length << " , " <<
+      B2DEBUG(99, "Inj " << ca_name(m.mychid) << " , " << m.histo << " , " << (m.histo ? m.histo->GetNcells() : 0) << " , " << length <<
+              " , "
+              <<
               ca_element_count(m.mychid));
     }
   }
@@ -239,10 +248,16 @@ void DQMHistInjectionModule::cleanPVs(void)
 {
 #ifdef _BELLE2_EPICS
   for (auto m : m_nodes) {
-    int length = int(ca_element_count(m.mychid));
-    if (length > 0) {
-      m.data.resize(length, 0.0);
-      SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
+    if (m.mychid) {
+      int length = int(ca_element_count(m.mychid));
+      if (length > 0) {
+        m.data.resize(length, 0.0);
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
+      } else {
+        B2DEBUG(99, "clean: lenght " << ca_name(m.mychid));
+      }
+    } else {
+      B2DEBUG(99, "clean: chid " << ca_name(m.mychid));
     }
   }
 #endif

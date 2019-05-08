@@ -1,9 +1,8 @@
 //+
 // File : DQMHistInjection.cc
-// Description : DQM module, which gives histograms showing injecting occupancies
+// Description : DQM module, which gives histograms showing occupancies after injection
 //
-// Author : Uwe Gebauer
-// based on work from B. Spruck
+// Author : B. Spruck
 // Date : someday
 //-
 
@@ -11,9 +10,6 @@
 #include <dqm/analysis/modules/DQMHistInjection.h>
 #include <TROOT.h>
 #include <TClass.h>
-#include <TLatex.h>
-#include <TGraphAsymmErrors.h>
-#include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 using namespace Belle2;

@@ -68,7 +68,8 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_TrackCharge").data());
-  m_hCharge = new TH1F("Track Cluster Charge", "Cluster Charge; Module; Cluster Charge", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hCharge = new TH1F("Track Cluster Charge", "Track Cluster Charge; Module; Track Cluster Charge", m_PXDModules.size(), 0,
+                       m_PXDModules.size());
   m_hCharge->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCharge->SetStats(false);
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {

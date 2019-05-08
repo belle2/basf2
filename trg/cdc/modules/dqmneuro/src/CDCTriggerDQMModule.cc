@@ -311,6 +311,10 @@ void CDCTriggerDQMModule::defineHisto()
     m_neuroDeltaTheta = new TH1F("NeuroDeltaTheta",
                                  "difference between unpacked and simulated neuro theta;delta theta [deg]",
                                  100, -180, 180); // should be bit-precise, so look at very small range
+    m_neuroScatterZ = new TH2F("NeuroScatterZ",
+                               "unpacked z vs TSIM z [cm]",
+                               100, -150, 150, 100, -150, 150);
+
     m_neuroDeltaInputID = new TH1F("NeuroDeltaInputID",
                                    "difference between unpacked and simulated ID input;delta ID",
                                    100, -0.5, 0.5); // should be bit-precise, so look at very small range
@@ -561,6 +565,7 @@ void CDCTriggerDQMModule::beginRun()
     m_neuroSector->Reset();
     m_neuroDeltaZ->Reset();
     m_neuroDeltaTheta->Reset();
+    m_neuroScatterZ->Reset();
     m_neuroDeltaInputID->Reset();
     m_neuroDeltaInputT->Reset();
     m_neuroDeltaInputAlpha->Reset();
@@ -679,7 +684,7 @@ void CDCTriggerDQMModule::event()
           m_DeltaRecoSWCosTheta->Fill(cosThetaTarget - cosTh);
           m_DeltaRecoSWPhi->Fill((phi0Target - neuroSWTrack->getPhi0()) * 180 / M_PI);
           m_DeltaRecoSWInvPt->Fill(invptTarget - 1. / neuroSWTrack->getPt());
-          m_RecoHWZScatter->Fill(zTarget, neuroSWTrack->getZ0());
+          m_RecoSWZScatter->Fill(zTarget, neuroSWTrack->getZ0());
         }
       }
     }
@@ -842,6 +847,7 @@ void CDCTriggerDQMModule::event()
             m_neuroDeltaZ->Fill(neuroTrack.getZ0() - neuroSimTrack->getZ0());
             m_neuroDeltaTheta->Fill(neuroTrack.getDirection().Theta() * 180. / M_PI -
                                     neuroSimTrack->getDirection().Theta() * 180. / M_PI);
+            m_neuroScatterZ->Fill(neuroTrack.getZ0(), neuroSimTrack->getZ0());
             vector<float> unpackedInput =
               neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputName)->getInput();
             vector<float> simInput =

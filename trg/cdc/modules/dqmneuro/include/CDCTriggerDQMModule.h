@@ -167,6 +167,8 @@ namespace Belle2 {
     TH1F* m_neuroSector;             /**< unpacked sector */
     TH1F* m_neuroDeltaZ;             /**< unpacked z - TSIM z */
     TH1F* m_neuroDeltaTheta;         /**< unpacked theta - TSIM theta */
+    TH2F* m_neuroScatterZ;           /**< unpacked z vs TSIM z, scatter plot*/
+
     TH1F* m_neuroDeltaInputID;       /**< unpacked ID input - TSIM ID input */
     TH1F* m_neuroDeltaInputT;        /**< unpacked time input - TSIM time input */
     TH1F* m_neuroDeltaInputAlpha;    /**< unpacked alpha input - TSIM alpha input */

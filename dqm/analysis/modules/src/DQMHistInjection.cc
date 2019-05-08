@@ -121,7 +121,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
-  m_nodes[0].histo = Triggers;
+  //m_nodes[0].histo = Triggers;
   if (Hits && Triggers) {
     m_hInjectionLERPXD->Divide(Hits, Triggers);
     m_hInjectionLERPXDOcc->Divide(Hits, Triggers, 100, 768 * 250); // to percent
@@ -147,7 +147,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
-  m_nodes[3].histo = Triggers;
+  //m_nodes[3].histo = Triggers;
   if (Hits && Triggers) {
     m_hInjectionHERPXD->Divide(Hits, Triggers);
     m_hInjectionHERPXDOcc->Divide(Hits, Triggers, 100, 768 * 250); // to percent
@@ -175,7 +175,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
-  if (!m_nodes[0]) m_nodes[0].histo = Triggers;
+  m_nodes[0].histo = Triggers;
   if (Hits && Triggers) {
     m_hInjectionLERECL->Divide(Hits, Triggers);
   }
@@ -196,7 +196,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
-  if (!m_nodes[3]) m_nodes[3].histo = Triggers;
+  m_nodes[3].histo = Triggers;
   if (Hits && Triggers) {
     m_hInjectionHERECL->Divide(Hits, Triggers);
   }

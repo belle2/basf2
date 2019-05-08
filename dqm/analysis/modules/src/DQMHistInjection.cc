@@ -228,7 +228,7 @@ void DQMHistInjectionModule::event()
         }
       }
     }
-    SEVCHK(ca_put(DBR_DOUBLE, m.mychid, (void*)m.data.data()), "ca_set failure");
+    SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif

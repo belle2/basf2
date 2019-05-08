@@ -32,7 +32,7 @@ DQMHistInjectionModule::DQMHistInjectionModule() : DQMHistAnalysisModule()
   // This module CAN NOT be run in parallel!
 
 //   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed", std::string("PXDINJ"));
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:INJ"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:INJ:"));
   B2DEBUG(1, "DQMHistInjection: Constructor done.");
 }
 
@@ -67,17 +67,17 @@ void DQMHistInjectionModule::initialize()
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   m_nodes.resize(6);
-  SEVCHK(ca_create_channel((m_pvPrefix + ":LER:Triggers").data(), NULL, NULL, 10, &m_nodes[0].mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "LER:Triggers").data(), NULL, NULL, 10, &m_nodes[0].mychid), "ca_create_channel failure");
   m_nodes[0].histo = nullptr;
-  SEVCHK(ca_create_channel((m_pvPrefix + ":LE:PXD").data(), NULL, NULL, 10, &m_nodes[1].mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "LER:PXD").data(), NULL, NULL, 10, &m_nodes[1].mychid), "ca_create_channel failure");
   m_nodes[1].histo = m_hInjectionLERPXD;
-  SEVCHK(ca_create_channel((m_pvPrefix + ":LER:ECL").data(), NULL, NULL, 10, &m_nodes[2].mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "LER:ECL").data(), NULL, NULL, 10, &m_nodes[2].mychid), "ca_create_channel failure");
   m_nodes[2].histo = m_hInjectionLERECL;
-  SEVCHK(ca_create_channel((m_pvPrefix + ":HER:Triggers").data(), NULL, NULL, 10, &m_nodes[3].mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "HER:Triggers").data(), NULL, NULL, 10, &m_nodes[3].mychid), "ca_create_channel failure");
   m_nodes[3].histo = nullptr;
-  SEVCHK(ca_create_channel((m_pvPrefix + ":LE:PXD").data(), NULL, NULL, 10, &m_nodes[4].mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "HER:PXD").data(), NULL, NULL, 10, &m_nodes[4].mychid), "ca_create_channel failure");
   m_nodes[4].histo = m_hInjectionHERPXD;
-  SEVCHK(ca_create_channel((m_pvPrefix + ":HER:ECL").data(), NULL, NULL, 10, &m_nodes[5].mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "HER:ECL").data(), NULL, NULL, 10, &m_nodes[5].mychid), "ca_create_channel failure");
   m_nodes[5].histo = m_hInjectionHERECL;
 
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");

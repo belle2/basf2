@@ -19,6 +19,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include "TH1F.h"
+#include "TH2F.h"
 
 namespace Belle2 {
 
@@ -182,11 +183,13 @@ namespace Belle2 {
     TH1F* m_RecoHWCosTheta;          /**< matched to HW reconstructed cos(theta) */
     TH1F* m_RecoHWInvPt;             /**< matched to HW reconstructed inverse Pt */
     TH1F* m_RecoHWPhi;               /**< matched to HW reconstructed phi */
+    TH2F* m_RecoHWZScatter;          /**< matched to HW reconstructed z scatter plot*/
 
     TH1F* m_RecoSWZ;                 /**< matched to SW reconstructed z */
     TH1F* m_RecoSWCosTheta;          /**< matched to SW reconstructed cos(theta) */
     TH1F* m_RecoSWInvPt;             /**< matched to SW reconstructed inverse Pt */
     TH1F* m_RecoSWPhi;               /**< matched to SW reconstructed phi */
+    TH2F* m_RecoSWZScatter;          /**< matched to SW reconstructed z scatter plot*/
 
     TH1F* m_DeltaRecoHWZ;            /**< matched to HW reconstructed z */
     TH1F* m_DeltaRecoHWCosTheta;     /**< matched to HW reconstructed cos(theta) */
@@ -220,6 +223,10 @@ namespace Belle2 {
     TH1F* m_neuroOutQuad3Phi0;           /**< phi distribution from unpacker */
     TH1F* m_neuroOutQuad3InvPt;          /**< Inverse Pt distribution from unpacker */
 
+    TH1F* m_neuroOutSWZ;              /**< z distribution from simulation */
+    TH1F* m_neuroOutSWCosTheta;       /**< cos theta distribution from simulation */
+    TH1F* m_neuroOutSWPhi0;           /**< phi distribution from simulation */
+    TH1F* m_neuroOutSWInvPt;          /**< Inverse Pt distribution from simulation */
   };
 
 }

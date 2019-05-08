@@ -332,6 +332,19 @@ void CDCTriggerDQMModule::defineHisto()
     m_simDiffTS = new TH1F("NeuroSimDiffTS",
                            "number of TS selcted in TSIM but not in unpacker",
                            20, 0, 20);
+
+    m_neuroOutSWZ = new TH1F("NeuroOutSWZ",
+                             "sw z distribution of neuro tracks;z [cm]",
+                             100, -50, 50); // 1cm bins from -50cm to 50cm
+    m_neuroOutSWCosTheta = new TH1F("NeuroOutSWCosTheta",
+                                    "sw cos theta distribution of neuro tracks;cos theta ",
+                                    100, -1, 1);
+    m_neuroOutSWPhi0 = new TH1F("NeuroOutSWPhi0",
+                                "sw phi distribution from unpacker;phi [deg]",
+                                161, -1.25, 361); // shift to reduce the binning error
+    m_neuroOutSWInvPt = new TH1F("NeuroOutSWInvPt",
+                                 "sw Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                 34, 0, 3.5);
   }
 
   if (m_showRecoTracks == "yes") {
@@ -362,6 +375,9 @@ void CDCTriggerDQMModule::defineHisto()
     m_RecoHWInvPt = new TH1F("RecoHWInvPt",
                              "hw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
                              34, 0, 3.5);
+    m_RecoHWZScatter = new TH2F("RecoHWZScatter",
+                                "hw matched reconstruction; scatter z [cm]",
+                                100, -150, 150, 100, -150, 150);
 
     //RecoTracks matched to simulated neuro tracks
     m_RecoSWZ = new TH1F("RecoSWZ",
@@ -376,6 +392,9 @@ void CDCTriggerDQMModule::defineHisto()
     m_RecoSWInvPt = new TH1F("RecoSWInvPt",
                              "sw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
                              34, 0, 3.5);
+    m_RecoSWZScatter = new TH2F("RecoSWZScatter",
+                                "sw matched reconstruction; scatter z [cm]",
+                                100, -150, 150, 100, -150, 150);
 
     m_DeltaRecoHWZ = new TH1F("DeltaRecoHWZ",
                               "difference between reconstructed and unpacked neuro z;delta z [cm]",
@@ -549,6 +568,10 @@ void CDCTriggerDQMModule::beginRun()
     m_neuroDeltaSector->Reset();
     m_simSameTS->Reset();
     m_simDiffTS->Reset();
+    m_neuroOutSWZ->Reset();
+    m_neuroOutSWCosTheta->Reset();
+    m_neuroOutSWPhi0->Reset();
+    m_neuroOutSWInvPt->Reset();
   }
   if (m_showRecoTracks == "yes") {
     m_RecoZ->Reset();
@@ -560,11 +583,13 @@ void CDCTriggerDQMModule::beginRun()
     m_RecoHWCosTheta->Reset();
     m_RecoHWInvPt->Reset();
     m_RecoHWPhi->Reset();
+    m_RecoHWZScatter->Reset();
 
     m_RecoSWZ->Reset();
     m_RecoSWCosTheta->Reset();
     m_RecoSWInvPt->Reset();
     m_RecoSWPhi->Reset();
+    m_RecoSWZScatter->Reset();
 
     m_DeltaRecoHWZ->Reset();
     m_DeltaRecoHWCosTheta->Reset();
@@ -639,6 +664,7 @@ void CDCTriggerDQMModule::event()
           m_DeltaRecoHWCosTheta->Fill(cosThetaTarget - cosTh);
           m_DeltaRecoHWPhi->Fill((phi0Target - neuroHWTrack->getPhi0()) * 180 / M_PI);
           m_DeltaRecoHWInvPt->Fill(invptTarget - 1. / neuroHWTrack->getPt());
+          m_RecoHWZScatter->Fill(zTarget, neuroHWTrack->getZ0());
         }
         CDCTriggerTrack* neuroSWTrack = recoTrack.getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);
         if (neuroSWTrack) {
@@ -653,9 +679,18 @@ void CDCTriggerDQMModule::event()
           m_DeltaRecoSWCosTheta->Fill(cosThetaTarget - cosTh);
           m_DeltaRecoSWPhi->Fill((phi0Target - neuroSWTrack->getPhi0()) * 180 / M_PI);
           m_DeltaRecoSWInvPt->Fill(invptTarget - 1. / neuroSWTrack->getPt());
+          m_RecoHWZScatter->Fill(zTarget, neuroSWTrack->getZ0());
         }
       }
     }
+  }
+  for (CDCTriggerTrack& neuroswTrack : m_simNeuroTracks) {
+    m_neuroOutSWZ->Fill(neuroswTrack.getZ0());
+    double cotThSW = neuroswTrack.getCotTheta();
+    double cosThSW = copysign(1.0, cotThSW) / sqrt(1. / (cotThSW * cotThSW) + 1);
+    m_neuroOutSWCosTheta->Fill(cosThSW);
+    m_neuroOutSWPhi0->Fill(neuroswTrack.getPhi0() * 180 / M_PI);
+    m_neuroOutSWInvPt->Fill(1. / neuroswTrack.getPt());
   }
   // fill neurotrigger histograms
   int nofouttracks = 0;

@@ -89,14 +89,14 @@ void DQMHistAnalysisPXDEffModule::initialize()
     buff.ReplaceAll(".", "_");
     TString histTitle = "Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     if (m_singleHists) {
-      m_cEffModules[aPXDModule] = new TCanvas(m_histogramDirectoryName + "c_Eff_" + buff);
+      m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
     }
     m_hEffModules[aPXDModule] = new TEfficiency("HitEff_" + buff, histTitle,
                                                 m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
   //One bin for each module in the geometry, one histogram for each layer
-  m_cEffAll = new TCanvas(m_histogramDirectoryName + "c_EffAll");
+  m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
 
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());

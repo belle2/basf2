@@ -74,7 +74,7 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->SetOption("bar");
     histogram->SetFillStyle(0);
     histogram->SetStats(false);
-    histogram->Draw("");
+    histogram->Draw("hist");
   }
 
   for (auto& nameAndcanvasAndHisto : m_hl1Ratios) {
@@ -83,7 +83,7 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->SetOption("bar");
     histogram->SetFillStyle(0);
     histogram->SetStats(false);
-    histogram->Draw("");
+    histogram->Draw("hist");
   }
 
 #ifdef _BELLE2_EPICS

@@ -125,11 +125,11 @@ void DQMHistInjectionModule::event()
 
   m_cInjectionLERPXD->Clear();
   m_cInjectionLERPXD->cd(0);
-  m_hInjectionLERPXD->Draw();
+  m_hInjectionLERPXD->Draw("hist");
 
   m_cInjectionLERPXDOcc->Clear();
   m_cInjectionLERPXDOcc->cd(0);
-  m_hInjectionLERPXDOcc->Draw();
+  m_hInjectionLERPXDOcc->Draw("hist");
 
   locationHits = "PXDOccInjHER";
   if (m_histogramDirectoryName != "") {
@@ -151,11 +151,11 @@ void DQMHistInjectionModule::event()
 
   m_cInjectionHERPXD->Clear();
   m_cInjectionHERPXD->cd(0);
-  m_hInjectionHERPXD->Draw();
+  m_hInjectionHERPXD->Draw("hist");
 
   m_cInjectionHERPXDOcc->Clear();
   m_cInjectionHERPXDOcc->cd(0);
-  m_hInjectionHERPXDOcc->Draw();
+  m_hInjectionHERPXDOcc->Draw("hist");
 
   m_histogramDirectoryName = "ECLINJ";
 
@@ -178,7 +178,7 @@ void DQMHistInjectionModule::event()
 
   m_cInjectionLERECL->Clear();
   m_cInjectionLERECL->cd(0);
-  m_hInjectionLERECL->Draw();
+  m_hInjectionLERECL->Draw("hist");
 
   locationHits = "ECLOccInjHER";
   if (m_histogramDirectoryName != "") {
@@ -199,7 +199,7 @@ void DQMHistInjectionModule::event()
 
   m_cInjectionHERECL->Clear();
   m_cInjectionHERECL->cd(0);
-  m_hInjectionHERECL->Draw();
+  m_hInjectionHERECL->Draw("hist");
 
 #ifdef _BELLE2_EPICS
   for (auto& m : m_nodes) {
@@ -226,6 +226,9 @@ void DQMHistInjectionModule::event()
         }
       }
       SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
+    } else {
+      B2ERROR("Inj " << ca_name(m.mychid) << " , " << m.histo << " , " << m.histo->GetNcells() << " , " << length << " , " <<
+              ca_element_count(m.mychid));
     }
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");

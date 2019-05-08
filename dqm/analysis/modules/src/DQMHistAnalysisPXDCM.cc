@@ -64,7 +64,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cCommonMode = new TCanvas("c_CommonMode");
+  m_cCommonMode = new TCanvas(m_histogramDirectoryName + "c_CommonMode");
   m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 64, 0, 64);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);

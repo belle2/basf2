@@ -63,8 +63,7 @@ AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(),
            true);
 }
 
-AsyncWrapper::~AsyncWrapper()
-  = default;
+AsyncWrapper::~AsyncWrapper() = default;
 
 void AsyncWrapper::initialize()
 {

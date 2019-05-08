@@ -26,7 +26,10 @@ std::ostream& operator<<(::std::ostream& output, const TVector3& tVector3)
 
 namespace Belle2::TestHelpers {
 
-  /** Overload method for ASSERT_ALL_NEAR / EXPECT_ALL_NEAR. */
+  /** Predicate checking that all five components of the Helix are close by a
+   * maximal error of absError. Extends the EXPECT_ALL_NEAR/ASSERT_ALL_NEAR
+   * macro in the framework testhelpers to work for the helix class
+   */
   template<>
   bool allNear<Belle2::Helix>(const Belle2::Helix& expected,
                               const Belle2::Helix& actual,
@@ -68,9 +71,6 @@ namespace {
 
     return result;
   }
-}
-
-namespace {
 
   /** Set up a few arrays and objects in the datastore */
   class HelixTest : public ::testing::Test {

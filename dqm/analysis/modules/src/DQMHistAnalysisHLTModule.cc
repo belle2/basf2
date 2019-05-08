@@ -35,6 +35,7 @@ DQMHistAnalysisHLTModule::DQMHistAnalysisHLTModule()
   addParam("pvPrefix", m_pvPrefix, "EPICS PV Name for the inst. luminosity", m_pvPrefix);
   addParam("bhabhaName", m_bhabhaName, "Name of the bhabha trigger to do a ratio against", m_bhabhaName);
   addParam("columnMapping", m_columnMapping, "Which columns to use for calculating ratios and cross sections", m_columnMapping);
+  addParam("l1Histograms", m_l1Histograms, "Which l1 histograms to show", m_l1Histograms);
 }
 
 void DQMHistAnalysisHLTModule::initialize()
@@ -44,32 +45,44 @@ void DQMHistAnalysisHLTModule::initialize()
 
   m_hEfficiency = {
     new TCanvas("HLT/Ratio"),
-    new TH1F("Ratio", "Ratio to total triggered events", m_columnMapping.size(), 0, m_columnMapping.size())
+    new TH1F("Ratio", "Ratio of Tags to HLT triggered events", 1, 0, 0)
+  };
+  m_hEfficiencyTotal = {
+    new TCanvas("HLT/RatioTotal"),
+    new TH1F("Ratio", "Ratio of Tags to all events", 1, 0, 0)
   };
   m_hCrossSection = {
     new TCanvas("HLT/CrossSection"),
-    new TH1F("CrossSection", "Cross Section of triggered Events", m_columnMapping.size(), 0, m_columnMapping.size())
+    new TH1F("CrossSection", "Cross Section of triggered Events", 1, 0, 0)
   };
   m_hRatios = {
     new TCanvas("HLT/RatioToBahbha"),
-    new TH1F("RatioToBahbha", "Ratio to bhabha events", m_columnMapping.size(), 0, m_columnMapping.size())
+    new TH1F("RatioToBahbha", "Ratio to bhabha events", 1, 0, 0)
   };
 
-  for (auto& canvasAndHisto : {m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  for (const std::string& l1Name : m_l1Histograms) {
+    m_hl1Ratios.emplace(l1Name, std::make_pair(
+                          new TCanvas(("HLT/" + l1Name + "RatioToL1").c_str()),
+                          // + 1 for total result
+                          new TH1F((l1Name + "RatioToL1").c_str(), ("HLT Fractions for L1 " + l1Name).c_str(), 1, 0, 0)
+                        ));
+  }
+
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
     auto* histogram = canvasAndHisto.second;
     histogram->SetDirectory(0);
     histogram->SetOption("bar");
     histogram->SetFillStyle(0);
     histogram->SetStats(false);
+    histogram->Draw("");
+  }
 
-    unsigned int counter = 0;
-    for (const auto& columnMapping : m_columnMapping) {
-      const auto& to = columnMapping.second;
-
-      histogram->GetXaxis()->SetBinLabel(counter + 1, to.c_str());
-      counter++;
-    }
-
+  for (auto& nameAndcanvasAndHisto : m_hl1Ratios) {
+    auto* histogram = nameAndcanvasAndHisto.second.second;
+    histogram->SetDirectory(0);
+    histogram->SetOption("bar");
+    histogram->SetFillStyle(0);
+    histogram->SetStats(false);
     histogram->Draw("");
   }
 
@@ -85,8 +98,13 @@ void DQMHistAnalysisHLTModule::initialize()
 
 void DQMHistAnalysisHLTModule::beginRun()
 {
-  for (auto& canvasAndHisto : {m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
     auto* canvas = canvasAndHisto.first;
+    canvas->Clear();
+  }
+
+  for (auto& nameAndcanvasAndHisto : m_hl1Ratios) {
+    auto* canvas = nameAndcanvasAndHisto.second.first;
     canvas->Clear();
   }
 }
@@ -96,6 +114,7 @@ void DQMHistAnalysisHLTModule::event()
   auto* filterHistogram = findHist("softwaretrigger/filter");
   auto* skimHistogram = findHist("softwaretrigger/skim");
   auto* totalResultHistogram = findHist("softwaretrigger/total_result");
+  auto* eventNumberHistogram = findHist("softwaretrigger/event_number");
 
   if (not filterHistogram) {
     B2ERROR("Can not find the filter histogram!");
@@ -109,14 +128,20 @@ void DQMHistAnalysisHLTModule::event()
     B2ERROR("Can not find the total result histogram!");
     return;
   }
+  if (not eventNumberHistogram) {
+    B2ERROR("Can not find the event number histogram!");
+    return;
+  }
 
+  m_hEfficiencyTotal.second->Reset();
   m_hEfficiency.second->Reset();
   m_hCrossSection.second->Reset();
   m_hRatios.second->Reset();
 
   double instLuminosity = 0;
-  double totalNumberOfEvents = getValue("total_result", totalResultHistogram);
+  double numberOfAcceptedHLTEvents = getValue("total_result", totalResultHistogram);
   double numberOfBhabhaEvents = getValue(m_bhabhaName, skimHistogram);
+  double numberOfAllEvents = eventNumberHistogram->GetEntries();
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
@@ -124,13 +149,19 @@ void DQMHistAnalysisHLTModule::event()
     SEVCHK(ca_get(DBR_DOUBLE, m_epicschid, (void*)&instLuminosity), "ca_get failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   } else {
-    instLuminosity = NAN;
+    instLuminosity = 0;
   }
 #endif
 
-  unsigned int counter = 0;
+  m_hEfficiencyTotal.second->Fill("total_result", numberOfAcceptedHLTEvents / numberOfAllEvents);
+  if (instLuminosity != 0) {
+    m_hCrossSection.second->Fill("total_result", numberOfAcceptedHLTEvents / numberOfAllEvents * instLuminosity);
+  }
+  m_hRatios.second->Fill("total_result", numberOfAcceptedHLTEvents / numberOfBhabhaEvents);
+
   for (const auto& columnMapping : m_columnMapping) {
     const auto& from = columnMapping.first;
+    const auto& to = columnMapping.second;
 
     double value = 0;
     if (hasValue(from, filterHistogram)) {
@@ -139,25 +170,83 @@ void DQMHistAnalysisHLTModule::event()
       value = getValue(from, skimHistogram);
     } else {
       B2ERROR("Can not find value " << from << ". Will not use it!");
-
-      m_hEfficiency.second->Fill(counter, 0);
-      m_hCrossSection.second->Fill(counter, 0);
-      m_hRatios.second->Fill(counter, 0);
-
-      counter++;
       continue;
     }
 
-    m_hEfficiency.second->Fill(counter, value / totalNumberOfEvents);
-    m_hCrossSection.second->Fill(counter, value / totalNumberOfEvents * instLuminosity);
-    m_hRatios.second->Fill(counter, value / numberOfBhabhaEvents);
-
-    counter++;
+    m_hEfficiency.second->Fill(to.c_str(), value / numberOfAcceptedHLTEvents);
+    m_hEfficiencyTotal.second->Fill(to.c_str(), value / numberOfAllEvents);
+    if (instLuminosity != 0) {
+      m_hCrossSection.second->Fill(to.c_str(), value / numberOfAllEvents * instLuminosity);
+    }
+    m_hRatios.second->Fill(to.c_str(), value / numberOfBhabhaEvents);
   }
 
-  for (auto& canvasAndHisto : {m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  for (const std::string& l1Name : m_l1Histograms) {
+    auto* histogram = m_hl1Ratios.at(l1Name).second;
+    histogram->Reset();
+
+    auto* l1Histogram = findHist("softwaretrigger/" + l1Name);
+    auto* l1TotalResultHistogram = findHist("softwaretrigger/l1_total_result");
+
+    if (not l1Histogram or not l1TotalResultHistogram) {
+      B2ERROR("Can not find L1 histograms from softwaretrigger!");
+      continue;
+    }
+
+    for (const auto& columnMapping : m_columnMapping) {
+      const auto& from = columnMapping.first;
+      const auto& to = columnMapping.second;
+
+      if (not hasValue(from, l1Histogram)) {
+        B2ERROR("Can not find label " << from << " in l1 histogram " << l1Name);
+        continue;
+      }
+
+      if (not hasValue(l1Name, l1TotalResultHistogram)) {
+        B2ERROR("Can not find label " << l1Name << " in l1 total result histogram");
+        continue;
+      }
+
+      const double hltValueInL1Bin = getValue(from, l1Histogram);
+      const double l1TotalResult = getValue(l1Name, l1TotalResultHistogram);
+
+      histogram->Fill(to.c_str(), hltValueInL1Bin / l1TotalResult);
+    }
+
+    // and add a total result bin
+    const auto from = "hlt_result";
+    const auto to = "hlt_result";
+
+    if (not hasValue(from, l1Histogram)) {
+      B2ERROR("Can not find label " << from << " in l1 histogram " << l1Name);
+      continue;
+    }
+
+    if (not hasValue(l1Name, l1TotalResultHistogram)) {
+      B2ERROR("Can not find label " << l1Name << " in l1 total result histogram");
+      continue;
+    }
+
+    const double hltValueInL1Bin = getValue(from, l1Histogram);
+    const double l1TotalResult = getValue(l1Name, l1TotalResultHistogram);
+
+    histogram->Fill(to, hltValueInL1Bin / l1TotalResult);
+  }
+
+
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
     auto* canvas = canvasAndHisto.first;
     auto* histogram = canvasAndHisto.second;
+
+    canvas->cd();
+    histogram->Draw("");
+    canvas->Modified();
+    canvas->Update();
+  }
+
+  for (auto& nameAndCanvasAndHisto : m_hl1Ratios) {
+    auto* canvas = nameAndCanvasAndHisto.second.first;
+    auto* histogram = nameAndCanvasAndHisto.second.second;
 
     canvas->cd();
     histogram->Draw("");

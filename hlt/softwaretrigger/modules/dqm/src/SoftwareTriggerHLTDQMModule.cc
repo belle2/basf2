@@ -23,7 +23,6 @@ using namespace SoftwareTrigger;
 
 REG_MODULE(SoftwareTriggerHLTDQM)
 
-
 SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
 {
   setDescription("Monitor Physics Trigger");
@@ -69,37 +68,27 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_triggerVariablesHistograms[variable]->SetXTitle(("SoftwareTriggerVariable " + variable).c_str());
   }
 
-  unsigned int cutCounter = 0;
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
     const std::string& baseIdentifier = cutIdentifier.first;
-    const auto& cuts = cutIdentifier.second;
 
-    const unsigned int numberOfBins = cuts.size();
-    const double lowerX = 0;
-    const double upperX = numberOfBins;
     m_cutResultHistograms.emplace(baseIdentifier,
-                                  new TH1F(baseIdentifier.c_str(), baseIdentifier.c_str(), numberOfBins, lowerX, upperX));
+                                  new TH1F(baseIdentifier.c_str(), ("Events triggered in HLT baseIdentifier " + baseIdentifier).c_str(), 0, 0, 0));
     m_cutResultHistograms[baseIdentifier]->SetXTitle(("Prescaled Cut Result for " + baseIdentifier).c_str());
     m_cutResultHistograms[baseIdentifier]->SetOption("bar");
     m_cutResultHistograms[baseIdentifier]->SetFillStyle(0);
     m_cutResultHistograms[baseIdentifier]->SetStats(false);
-
-    cutCounter += numberOfBins;
   }
 
   // We add one for the total result
-  const unsigned int numberOfBins = m_param_cutResultIdentifiers.size() + 1;
-  const double lowerX = 0;
-  const double upperX = numberOfBins;
   m_cutResultHistograms.emplace("total_result",
-                                new TH1F("total_result", "Total Result", numberOfBins, lowerX, upperX));
+                                new TH1F("total_result", "Total Result of HLT (absolute numbers)", 0, 0, 0));
   m_cutResultHistograms["total_result"]->SetXTitle("Total Cut Result");
   m_cutResultHistograms["total_result"]->SetOption("bar");
   m_cutResultHistograms["total_result"]->SetFillStyle(0);
   m_cutResultHistograms["total_result"]->SetStats(false);
 
   for (const std::string& trigger : m_param_l1Identifiers) {
-    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), trigger.c_str(), cutCounter, 0, cutCounter));
+    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 0, 0, 0));
     m_l1Histograms[trigger]->SetXTitle(("HLT Result for L1: " + trigger).c_str());
     m_l1Histograms[trigger]->SetOption("bar");
     m_l1Histograms[trigger]->SetFillStyle(0);
@@ -108,7 +97,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
 
   // And also one for the total numbers
   m_l1Histograms.emplace("l1_total_result",
-                         new TH1F("l1_total_result", "L1 Total Results", m_param_l1Identifiers.size(), 0, m_param_l1Identifiers.size()));
+                         new TH1F("l1_total_result", "Events triggered in L1 (total results)", 0, 0, 0));
   m_l1Histograms["l1_total_result"]->SetXTitle("Total L1 Cut Result");
   m_l1Histograms["l1_total_result"]->SetOption("bar");
   m_l1Histograms["l1_total_result"]->SetFillStyle(0);
@@ -122,7 +111,6 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     oldDirectory->cd();
   }
 }
-
 
 void SoftwareTriggerHLTDQMModule::initialize()
 {
@@ -177,8 +165,7 @@ void SoftwareTriggerHLTDQMModule::event()
     m_cutResultHistograms["total_result"]->Fill("total_result", totalResult > 0);
   }
 
-
-  if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid()) {
+  if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid() and m_triggerResult.isValid()) {
     for (const std::string& l1Trigger : m_param_l1Identifiers) {
       const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
       if (triggerBit < 0) {
@@ -209,6 +196,9 @@ void SoftwareTriggerHLTDQMModule::event()
           }
         }
       }
+
+      const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
+      m_l1Histograms[l1Trigger]->Fill("hlt_result", totalResult > 0);
     }
   }
 
@@ -222,12 +212,11 @@ void SoftwareTriggerHLTDQMModule::event()
 void SoftwareTriggerHLTDQMModule::beginRun()
 {
   std::for_each(m_cutResultHistograms.begin(), m_cutResultHistograms.end(),
-  [](auto & it) {it.second->Reset();});
+  [](auto & it) { it.second->Reset(); });
   std::for_each(m_triggerVariablesHistograms.begin(), m_triggerVariablesHistograms.end(),
-  [](auto & it) {it.second->Reset();});
+  [](auto & it) { it.second->Reset(); });
   std::for_each(m_l1Histograms.begin(), m_l1Histograms.end(),
-  [](auto & it) {it.second->Reset();});
+  [](auto & it) { it.second->Reset(); });
   std::for_each(m_runInfoHistograms.begin(), m_runInfoHistograms.end(),
-  [](auto & it) {it.second->Reset();});
+  [](auto & it) { it.second->Reset(); });
 }
-

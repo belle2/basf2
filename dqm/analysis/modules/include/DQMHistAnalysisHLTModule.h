@@ -37,12 +37,18 @@ namespace Belle2 {
     std::string m_bhabhaName = "accept_bhabha";
     /// Which columns to use
     std::map<std::string, std::string> m_columnMapping;
-    /// Histogram with final efficiencies
+    /// Which l1 triggers to show
+    std::vector<std::string> m_l1Histograms;
+    /// Histogram with final efficiencies to HLT
     std::pair<TCanvas*, TH1F*> m_hEfficiency = {nullptr, nullptr};
+    /// Histogram with final efficiencies to all events
+    std::pair<TCanvas*, TH1F*> m_hEfficiencyTotal = {nullptr, nullptr};
     /// Histogram with final cross sections
     std::pair<TCanvas*, TH1F*> m_hCrossSection = {nullptr, nullptr};
     /// Histogram with final ratios to bhabha
     std::pair<TCanvas*, TH1F*> m_hRatios = {nullptr, nullptr};
+    /// Histogram with hlt&l1 ratios to l1 numbers
+    std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hl1Ratios;
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

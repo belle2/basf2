@@ -215,8 +215,8 @@ void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, std::vec
   mask->addParticles(toKeepinROE);
 }
 
-void RestOfEvent::updateMaskWithCuts(const std::string& maskName, std::shared_ptr<Variable::Cut> trackCut,
-                                     std::shared_ptr<Variable::Cut> eclCut, std::shared_ptr<Variable::Cut> klmCut, bool updateExisting)
+void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::shared_ptr<Variable::Cut>& trackCut,
+                                     const std::shared_ptr<Variable::Cut>& eclCut, const std::shared_ptr<Variable::Cut>& klmCut, bool updateExisting)
 {
   Mask* mask = findMask(maskName);
   if (!mask) {
@@ -432,11 +432,11 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
   //fillFractions(fractions, maskName);
 
   // Add momenta from other tracks
-  for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
+  for (auto& roeTrack : roeTracks) {
 
-    const Track* track = roeTracks[iTrack];
+    const Track* track = roeTrack;
     const PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
-    const MCParticle* mcp = roeTracks[iTrack]->getRelatedTo<MCParticle>();
+    const MCParticle* mcp = roeTrack->getRelatedTo<MCParticle>();
 
     if (!pid) {
       B2ERROR("Track with no PID information!");
@@ -493,8 +493,8 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
     else
       particlePDG = fracChoice;
 
-    Const::ChargedStable trackParticle = Const::ChargedStable(particlePDG);
-    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResultWithClosestMass(trackParticle);
+    auto trackParticle = Const::ChargedStable(particlePDG);
+    const TrackFitResult* tfr = roeTrack->getTrackFitResultWithClosestMass(trackParticle);
 
     // Set energy of track
     double tempMass = trackParticle.getMass();
@@ -516,10 +516,10 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& mask
 
   // Add all momenta from neutral ECLClusters which have the nPhotons hypothesis
   ClusterUtils C;
-  for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
-    if (roeClusters[iEcl]->isNeutral())
-      if (roeClusters[iEcl]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-        roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl], ECLCluster::EHypothesisBit::c_nPhotons);
+  for (auto& roeCluster : roeClusters) {
+    if (roeCluster->isNeutral())
+      if (roeCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+        roe4VectorECLClusters += C.Get4MomentumFromCluster(roeCluster, ECLCluster::EHypothesisBit::c_nPhotons);
   }
 
   return roe4VectorECLClusters;
@@ -558,7 +558,7 @@ void RestOfEvent::print() const
   }
 }
 
-void RestOfEvent::printIndices(std::set<int> indices) const
+void RestOfEvent::printIndices(const std::set<int>& indices) const
 {
   if (indices.empty())
     return;

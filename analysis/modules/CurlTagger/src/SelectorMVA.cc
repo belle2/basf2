@@ -35,9 +35,7 @@ SelectorMVA::SelectorMVA(bool belleFlag, bool trainFlag)
   }
 }
 
-SelectorMVA::~SelectorMVA()
-{
-}
+SelectorMVA::~SelectorMVA() = default;
 
 void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
 {

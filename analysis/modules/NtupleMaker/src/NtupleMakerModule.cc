@@ -25,12 +25,12 @@ using namespace boost::algorithm;
 // Register module in the framework
 REG_MODULE(NtupleMaker)
 
-TFile* NtupleMakerModule::m_file = NULL;
+TFile* NtupleMakerModule::m_file = nullptr;
 int NtupleMakerModule::m_nTrees = 0;
 
 NtupleMakerModule::NtupleMakerModule() : Module()
 {
-  m_tree = NULL;
+  m_tree = nullptr;
   m_nCands = 0;
   m_iCand = 0;
 
@@ -138,7 +138,7 @@ void NtupleMakerModule::event()
   // (useful if you want to save event information for every event)
   if (m_listName.empty()) {
     for (int iTool = 0; iTool < nTools; ++iTool)
-      m_tools[iTool].eval(NULL);
+      m_tools[iTool].eval(nullptr);
     m_tree->Fill();
     return;
   }
@@ -165,7 +165,7 @@ void NtupleMakerModule::terminate()
   if (m_nTrees == 0) {
     B2INFO("Close file " << m_fileName);
     m_file->Close();
-    m_file = NULL;
+    m_file = nullptr;
     return;
   }
 

@@ -306,12 +306,12 @@ namespace {
     std::vector<std::pair<int, std::string>> K_path;
     std::vector<std::pair<int, std::string>> pi0_path;
 
-    K_path.push_back(std::make_pair(0, std::string("B")));
-    K_path.push_back(std::make_pair(0, std::string("D")));
-    K_path.push_back(std::make_pair(0, std::string("K")));
+    K_path.emplace_back(0, std::string("B"));
+    K_path.emplace_back(0, std::string("D"));
+    K_path.emplace_back(0, std::string("K"));
 
-    pi0_path.push_back(std::make_pair(0, std::string("B")));
-    pi0_path.push_back(std::make_pair(1, std::string("pi0")));
+    pi0_path.emplace_back(0, std::string("B"));
+    pi0_path.emplace_back(1, std::string("pi0"));
 
     EXPECT_NE(expected_hierarchies, selected_hierarchies);
     expected_hierarchies.push_back(K_path);

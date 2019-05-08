@@ -13,6 +13,8 @@
 #include <framework/logging/Logger.h>
 #include <FieldManager.h>
 #include <TDatabasePDG.h>
+#include <MeasurementOnPlane.h>
+#include <Exception.h>
 
 #include <math.h>
 
@@ -28,6 +30,23 @@ MplTrackRep::MplTrackRep(int pdgCode, float magCharge, char propDir) :
 
 MplTrackRep::~MplTrackRep()
 {
+}
+
+double MplTrackRep::getCharge(const StateOnPlane& state) const {
+
+  if (dynamic_cast<const MeasurementOnPlane*>(&state) != nullptr) {
+    Exception exc("RKTrackRep::getCharge - cannot get charge from MeasurementOnPlane",__LINE__,__FILE__);
+    exc.setFatal();
+    throw exc;
+  }
+
+  double pdgCharge( m_magCharge * (this->getPDGCharge() > 0 ? 1.0 : -1.0));
+
+  // return pdgCharge with sign of q/p
+  if (state.getState()(0) * pdgCharge < 0)
+    return -pdgCharge;
+  else
+    return pdgCharge;
 }
 
 double MplTrackRep::RKPropagate(M1x7& state7,

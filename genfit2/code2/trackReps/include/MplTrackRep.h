@@ -31,6 +31,9 @@ namespace genfit {
                        double S,
                        bool varField = true,
                        bool calcOnlyLastRowOfJ = false) const override;
+
+    double getCharge(const StateOnPlane& state) const override; 
+
   private:
 
     const double m_magCharge;

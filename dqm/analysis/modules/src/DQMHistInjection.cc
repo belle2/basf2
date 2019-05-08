@@ -48,13 +48,13 @@ void DQMHistInjectionModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cInjectionLERPXD = new TCanvas("c_InjectionLERPXD");
-  m_cInjectionLERPXDOcc = new TCanvas("c_InjectionLERPXDOcc");
-  m_cInjectionLERECL = new TCanvas("c_InjectionLERECL");
+  m_cInjectionLERPXD = new TCanvas("PXDINJ/c_InjectionLERPXD");
+  m_cInjectionLERPXDOcc = new TCanvas("PXDINJ/c_InjectionLERPXDOcc");
+  m_cInjectionLERECL = new TCanvas("ECLINJ/c_InjectionLERECL");
 
-  m_cInjectionHERPXD = new TCanvas("c_InjectionHERPXD");
-  m_cInjectionHERPXDOcc = new TCanvas("c_InjectionHERPXDOcc");
-  m_cInjectionHERECL = new TCanvas("c_InjectionHERECL");
+  m_cInjectionHERPXD = new TCanvas("PXDINJ/c_InjectionHERPXD");
+  m_cInjectionHERPXDOcc = new TCanvas("PXDINJ/c_InjectionHERPXDOcc");
+  m_cInjectionHERECL = new TCanvas("ECLINJ/c_InjectionHERECL");
 
   m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "Mean Hits/event;Time in #mu s;", 4000, 0 , 20000);
   m_hInjectionLERPXDOcc = new TH1F("HitInjectionPXDLEROcc", "Mean Hits/event;Time in #mu s;", 4000, 0 , 20000);

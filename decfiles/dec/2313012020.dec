@@ -1,26 +1,5 @@
-#
-# JetSet generator parameters
-# obtained from http://belle.kek.jp/secured/generator/howto/charm.dec
-# do not change unless you know what you're doing
-#
-#JetSetPar PARJ(21)=0.28
-#JetSetPar PARJ(25)=0.27
-#JetSetPar PARJ(26)=0.12
-#JetSetPar PARJ(33)=0.3
-#JetSetPar PARJ(41)=0.32
-#JetSetPar PARJ(42)=0.62
-#JetSetPar PARJ(81)=0.38
-#JetSetPar PARJ(82)=0.76
-
-#JetSetPar PARP(2)=4.0
-#JetSetPar MSTP(141)=1
-#JetSetPar MSTP(171)=1
-#JetSetPar MSTP(172)=1
-#JetSetPar MSTJ(11)=4
-#JetSetPar PARJ(46)=1.0
-
-# Belle II start from here
-
+# EventType: 2313012020
+# Descriptor: [ccbar Ds*+[Ds+[rho+[pi+pi0]gamma]gamma]
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
@@ -57,18 +36,13 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-
-
-
-
 Alias MyDs+ D_s+
 Alias MyDs- D_s-
 ChargeConj MyDs+ MyDs-
 
 Alias Myrho+ rho+
 Alias Myrho- rho-
-Alias Mypi0 pi0
-
+ChargeConj Myrho+ Myrho-
 
 Decay vpho
 #          d u s c b t   e   mu  tau
@@ -87,23 +61,11 @@ Enddecay
 Decay MyDs+
 1.0 Myrho+ gamma PHOTOS PHSP;
 Enddecay
+CDecay MyDs-
 
 Decay Myrho+
-0.99955 pi+ Mypi0 PHOTOS VSS;
+1.0 pi+ pi0 PHOTOS VSS;
 Enddecay
-
-Decay MyDs-
-1.0 Myrho- gamma PHOTOS PHSP;
-Enddecay
-
-Decay Myrho-
-0.99955 pi- Mypi0 PHOTOS VSS;
-Enddecay
-
-
-Decay Mypi0
-0.98799 gamma gamma  PHSP;
-Enddecay
-
+CDecay Myrho- 
 
 End

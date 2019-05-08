@@ -1,27 +1,6 @@
-#
-# JetSet generator parameters
-# obtained from http://belle.kek.jp/secured/generator/howto/charm.dec
-# do not change unless you know what you're doing
-#
-#JetSetPar PARJ(21)=0.28
-#JetSetPar PARJ(25)=0.27
-#JetSetPar PARJ(26)=0.12
-#JetSetPar PARJ(33)=0.3
-#JetSetPar PARJ(41)=0.32
-#JetSetPar PARJ(42)=0.62
-#JetSetPar PARJ(81)=0.38
-#JetSetPar PARJ(82)=0.76
-
-#JetSetPar PARP(2)=4.0
-#JetSetPar MSTP(141)=1
-#JetSetPar MSTP(171)=1
-#JetSetPar MSTP(172)=1
-#JetSetPar MSTJ(11)=4
-#JetSetPar PARJ(46)=1.0
-
-# Belle II start from here
-
-
+# EventType: 2313012021 
+# Descriptor: [ccbar Ds*+[Ds+[K*+[K+pi0]gamma]gamma] 
+ 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
 #JetSetPar PARJ(25)=0.27 ---> corresponding to Pythia8 StringFlav:etaSup
@@ -57,7 +36,6 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-
 Alias MyDs+ D_s+
 Alias MyDs- D_s-
 ChargeConj MyDs+ MyDs-
@@ -65,11 +43,6 @@ ChargeConj MyDs+ MyDs-
 Alias MyK*+ K*+
 Alias MyK*- K*-
 ChargeConj MyK*+ MyK*-
-Alias MyK+ K+
-Alias MyK- K-
-ChargeConj MyK+ MyK-
-Alias Mypi0 pi0
-
 
 Decay vpho
 #          d u s c b t   e   mu  tau
@@ -88,23 +61,11 @@ Enddecay
 Decay MyDs+
 1.0 MyK*+ gamma PHOTOS PHSP;
 Enddecay
+CDecay MyDs-
 
 Decay MyK*+
-1.0 MyK+ Mypi0 PHOTOS VSS;
+1.0 K+ pi0 PHOTOS VSS;
 Enddecay
-
-Decay MyDs-
-1.0 MyK*- gamma PHOTOS PHSP;
-Enddecay
-
-Decay MyK*-
-1.0 MyK- Mypi0 PHOTOS VSS;
-Enddecay
-
-
-Decay Mypi0
-0.98799 gamma gamma  PHSP;
-Enddecay
-
+CDecay MyK*-
 
 End

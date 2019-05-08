@@ -175,6 +175,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
+  if (!m_nodes[0]) m_nodes[0].histo = Triggers;
   if (Hits && Triggers) {
     m_hInjectionLERECL->Divide(Hits, Triggers);
   }
@@ -195,6 +196,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
+  if (!m_nodes[3]) m_nodes[3].histo = Triggers;
   if (Hits && Triggers) {
     m_hInjectionHERECL->Divide(Hits, Triggers);
   }

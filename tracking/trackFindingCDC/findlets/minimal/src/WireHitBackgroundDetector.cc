@@ -46,6 +46,7 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
     if (std::isnan(wireHitWeight)) {
       wireHit->setBackgroundFlag();
       wireHit->setTakenFlag();
+      wireHit->setBadADCOrTOTFlag();
     }
   }
 }

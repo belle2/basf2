@@ -28,9 +28,6 @@ namespace Belle2 {
       using Super = TrackFilterFactory;
 
     public:
-      /// Getter for valid filter names and a description for each
-      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
-
       /// Getter for a descriptive purpose of the constructed filters
       std::string getFilterPurpose() const override;
 

@@ -626,8 +626,8 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
   m_pValue = trackFit->getPValue();
 
   // set error matrix
-  TMatrixF cov6(trackFit->getCovariance6());
-  unsigned order[] = {c_X, c_Y, c_Z, c_Px, c_Py, c_Pz};
+  const auto cov6 = trackFit->getCovariance6();
+  constexpr unsigned order[] = {c_X, c_Y, c_Z, c_Px, c_Py, c_Pz};
 
   TMatrixFSym errMatrix(c_DimMatrix);
   for (int i = 0; i < 6; i++) {
@@ -653,10 +653,10 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
      dE/dpx = px/E etc.
   */
 
-  float E = getEnergy();
-  float dEdp[] = {m_px / E, m_py / E, m_pz / E};
-  unsigned compMom[] = {c_Px, c_Py, c_Pz};
-  unsigned compPos[] = {c_X,  c_Y,  c_Z};
+  const float E = getEnergy();
+  const float dEdp[] = {m_px / E, m_py / E, m_pz / E};
+  constexpr unsigned compMom[] = {c_Px, c_Py, c_Pz};
+  constexpr unsigned compPos[] = {c_X,  c_Y,  c_Z};
 
   // covariances (p,E)
   for (unsigned int i : compMom) {

@@ -18,6 +18,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TTree.h>
 
 namespace Belle2 {
 
@@ -39,13 +40,15 @@ namespace Belle2 {
     void defineHisto() override;
 
   private:
+    /** Expert level switch */
+    bool m_ExpertLevel;
     /** StoreArray name of the input and output RecoTracks */
     std::string m_recoTracksStoreArrayName{"RecoTracks"};
     /** Array storing PXD clusters */
     StoreArray<PXDCluster> m_pxdcluster;
     /** Array storing SVD clusters */
     StoreArray<SVDCluster> m_svdcluster;
-    /** Histograms of VXD ( PXD + SVD ) differences of residuals*/
+    /** Histograms of VXD ( PXD + SVD ) differences of residuals */
     TH1F* h_U_DeltaRes = nullptr;
     TH1F* h_V_DeltaRes = nullptr;
     /** Histograms of PXD differences of residuals */
@@ -113,7 +116,24 @@ namespace Belle2 {
     TH2F* h_Fit_Lyr3[8][3] = {nullptr}; //[Ladder][sensor number]
     TH2F* h_Fit_Lyr2[13][3] = {nullptr}; //[Ladder][sensor number]
     TH2F* h_Fit_Lyr1[9][3] = {nullptr}; //[Ladder][sensor number]
-
+    /** Trees containing global information on VXD overlaps */
+    TTree* t_PXD = nullptr;
+    TTree* t_SVD_U = nullptr;
+    TTree* t_SVD_V = nullptr;
+    /** Branches of PXD tree */
+    float deltaResU_PXD = 0, intResU_PXD = 0, intResV_PXD = 0, intU_PXD = 0, intV_PXD = 0, intPhi_PXD = 0,
+          intZ_PXD = 0, extResU_PXD = 0, extResV_PXD = 0, extU_PXD = 0, extV_PXD = 0, extPhi_PXD = 0, extZ_PXD = 0;
+    unsigned int intLayer_PXD = 0, intLadder_PXD = 0, intSensor_PXD = 0, extLayer_PXD = 0, extLadder_PXD = 0, extSensor_PXD = 0;
+    /** Branches of SVD u-clusters tree */
+    float deltaRes_SVD_U = 0, intRes_SVD_U = 0, int_SVD_U = 0, intPhi_SVD_U = 0, intZ_SVD_U = 0, extRes_SVD_U = 0, ext_SVD_U = 0,
+          extPhi_SVD_U = 0, extZ_SVD_U = 0;
+    unsigned int intLayer_SVD_U = 0, intLadder_SVD_U = 0, intSensor_SVD_U = 0, extLayer_SVD_U = 0, extLadder_SVD_U = 0,
+                 extSensor_SVD_U = 0;
+    /** Branches of SVD v-clusters tree */
+    float deltaRes_SVD_V = 0, intRes_SVD_V = 0, int_SVD_V = 0, intPhi_SVD_V = 0, intZ_SVD_V = 0, extRes_SVD_V = 0, ext_SVD_V = 0,
+          extPhi_SVD_V = 0, extZ_SVD_V = 0;
+    unsigned int intLayer_SVD_V = 0, intLadder_SVD_V = 0, intSensor_SVD_V = 0, extLayer_SVD_V = 0, extLadder_SVD_V = 0,
+                 extSensor_SVD_V = 0;
   };
 }
 #endif /* OVERLAPRESIDUALS_H */

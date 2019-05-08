@@ -54,6 +54,9 @@ OverlapResidualsModule::OverlapResidualsModule() : HistoModule()
   //Parameter to take only specific RecoTracks as input
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "StoreArray name of the input and output RecoTracks.",
            m_recoTracksStoreArrayName);
+  //Parameter to produce TTrees storing global information on VXD overlaps
+  addParam("ExpertLevel", m_ExpertLevel,
+           "If set, enables the production of TTrees containing low level information on PXD and SVD overlaps", false);
 }
 
 void OverlapResidualsModule::initialize()
@@ -66,12 +69,74 @@ void OverlapResidualsModule::initialize()
 
 void OverlapResidualsModule::defineHisto()
 {
-  //Create  separate histogram directories
+  //Create separate histogram directories
   TDirectory* oldDir = gDirectory;
-  TDirectory* HMDir = NULL;
+  TDirectory* HMDir = nullptr;
   HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
-  TDirectory* ResDir = NULL;
+  TDirectory* ResDir = nullptr;
   ResDir = oldDir->mkdir("Monitoring_VXDOverlaps");
+
+//Special case of ExpertLevel option enabled
+  if (m_ExpertLevel) {
+    TDirectory* TreeDir = nullptr;
+    TreeDir = oldDir->mkdir("Trees_VXDOverlaps");
+    TreeDir->cd();
+    //Tree for PXD
+    t_PXD = new TTree("t_PXD", "Tree for PXD overlaps");
+    t_PXD->Branch("deltaResU_PXD", &deltaResU_PXD, "deltaResU_PXD/F");
+    t_PXD->Branch("intResU_PXD", &intResU_PXD, "intResU_PXD/F");
+    t_PXD->Branch("intResV_PXD", &intResV_PXD, "intResV_PXD/F");
+    t_PXD->Branch("intU_PXD", &intU_PXD, "intU_PXD/F");
+    t_PXD->Branch("intV_PXD", &intV_PXD, "intV_PXD/F");
+    t_PXD->Branch("intPhi_PXD", &intPhi_PXD, "intPhi_PXD/F");
+    t_PXD->Branch("intZ_PXD", &intZ_PXD, "intZ_PXD/F");
+    t_PXD->Branch("intLayer_PXD", &intLayer_PXD, "intLayer_PXD/i");
+    t_PXD->Branch("intLadder_PXD", &intLadder_PXD, "intLadder_PXD/i");
+    t_PXD->Branch("intSensor_PXD", &intSensor_PXD, "intSensor_PXD/i");
+    t_PXD->Branch("extResU_PXD", &extResU_PXD, "extResU_PXD/F");
+    t_PXD->Branch("extResV_PXD", &extResV_PXD, "extResV_PXD/F");
+    t_PXD->Branch("extU_PXD", &extU_PXD, "extU_PXD/F");
+    t_PXD->Branch("extV_PXD", &extV_PXD, "extV_PXD/F");
+    t_PXD->Branch("extPhi_PXD", &extPhi_PXD, "extPhi_PXD/F");
+    t_PXD->Branch("extZ_PXD", &extZ_PXD, "extZ_PXD/F");
+    t_PXD->Branch("extLayer_PXD", &extLayer_PXD, "extLayer_PXD/i");
+    t_PXD->Branch("extLadder_PXD", &extLadder_PXD, "extLadder_PXD/i");
+    t_PXD->Branch("extSensor_PXD", &extSensor_PXD, "extSensor_PXD/i");
+    //Tree for SVD u overlapping clusters
+    t_SVD_U = new TTree("t_SVD_U", "Tree for SVD u-overlaps");
+    t_SVD_U->Branch("deltaRes_SVD_U", &deltaRes_SVD_U, "deltaResU_SVD_U/F");
+    t_SVD_U->Branch("intRes_SVD_U", &intRes_SVD_U, "intRes_SVD_U/F");
+    t_SVD_U->Branch("int_SVD_U", &int_SVD_U, "int_SVD_U/F");
+    t_SVD_U->Branch("intPhi_SVD_U", &intPhi_SVD_U, "intPhi_SVD_U/F");
+    t_SVD_U->Branch("intZ_SVD_U", &intZ_SVD_U, "intZ_SVD_U/F");
+    t_SVD_U->Branch("intLayer_SVD_U", &intLayer_SVD_U, "intLayer_SVD_U/i");
+    t_SVD_U->Branch("intLadder_SVD_U", &intLadder_SVD_U, "intLadder_SVD_U/i");
+    t_SVD_U->Branch("intSensor_SVD_U", &intSensor_SVD_U, "intSensor_SVD_U/i");
+    t_SVD_U->Branch("extRes_SVD_U", &extRes_SVD_U, "extRes_SVD_U/F");
+    t_SVD_U->Branch("ext_SVD_U", &ext_SVD_U, "ext_SVD_U/F");
+    t_SVD_U->Branch("extPhi_SVD_U", &extPhi_SVD_U, "extPhi_SVD_U/F");
+    t_SVD_U->Branch("extZ_SVD_U", &extZ_SVD_U, "extZ_SVD_U/F");
+    t_SVD_U->Branch("extLayer_SVD_U", &extLayer_SVD_U, "extLayer_SVD_U/i");
+    t_SVD_U->Branch("extLadder_SVD_U", &extLadder_SVD_U, "extLadder_SVD_U/i");
+    t_SVD_U->Branch("extSensor_SVD_U", &extSensor_SVD_U, "extSensor_SVD_U/i");
+    //Tree for SVD v overlapping clusters
+    t_SVD_V = new TTree("t_SVD_V", "Tree for SVD v-overlaps");
+    t_SVD_V->Branch("deltaRes_SVD_V", &deltaRes_SVD_V, "deltaResU_SVD_V/F");
+    t_SVD_V->Branch("intRes_SVD_V", &intRes_SVD_V, "intRes_SVD_V/F");
+    t_SVD_V->Branch("int_SVD_V", &int_SVD_V, "int_SVD_V/F");
+    t_SVD_V->Branch("intPhi_SVD_V", &intPhi_SVD_V, "intPhi_SVD_V/F");
+    t_SVD_V->Branch("intZ_SVD_V", &intZ_SVD_V, "intZ_SVD_V/F");
+    t_SVD_V->Branch("intLayer_SVD_V", &intLayer_SVD_V, "intLayer_SVD_V/i");
+    t_SVD_V->Branch("intLadder_SVD_V", &intLadder_SVD_V, "intLadder_SVD_V/i");
+    t_SVD_V->Branch("intSensor_SVD_V", &intSensor_SVD_V, "intSensor_SVD_V/i");
+    t_SVD_V->Branch("extRes_SVD_V", &extRes_SVD_V, "extRes_SVD_V/F");
+    t_SVD_V->Branch("ext_SVD_V", &ext_SVD_V, "ext_SVD_V/F");
+    t_SVD_V->Branch("extPhi_SVD_V", &extPhi_SVD_V, "extPhi_SVD_V/F");
+    t_SVD_V->Branch("extZ_SVD_V", &extZ_SVD_V, "extZ_SVD_V/F");
+    t_SVD_V->Branch("extLayer_SVD_V", &extLayer_SVD_V, "extLayer_SVD_V/i");
+    t_SVD_V->Branch("extLadder_SVD_V", &extLadder_SVD_V, "extLadder_SVD_V/i");
+    t_SVD_V->Branch("extSensor_SVD_V", &extSensor_SVD_V, "extSensor_SVD_V/i");
+  }
 
   ResDir->cd();
   //Define histograms of residuals differences
@@ -433,6 +498,29 @@ void OverlapResidualsModule::event()
           double pxdZ_1 = pxdGlobal_1(2);
           double pxdZ_2 = pxdGlobal_2(2);
           B2INFO("PXD: difference of residuals " << over_U_PXD << "   " << over_V_PXD);
+          //Fill PXD tree for overlaps if required by the user
+          if (m_ExpertLevel) {
+            deltaResU_PXD = over_U_PXD;
+            intResU_PXD = res_U_1;
+            intResV_PXD = res_V_1;
+            intU_PXD = pxd_1->getU();
+            intV_PXD = pxd_1->getV();
+            intPhi_PXD = pxdPhi_1;
+            intZ_PXD = pxdZ_1;
+            intLayer_PXD = pxd_Layer_1;
+            intLadder_PXD = pxd_Ladder_1;
+            intSensor_PXD = pxd_Sensor_1;
+            extResU_PXD = res_U_2;
+            extResV_PXD = res_V_2;
+            extU_PXD = pxd_2->getU();
+            extV_PXD = pxd_2->getV();
+            extPhi_PXD = pxdPhi_2;
+            extZ_PXD = pxdZ_2;
+            extLayer_PXD = pxd_Layer_2;
+            extLadder_PXD = pxd_Ladder_2;
+            extSensor_PXD = pxd_Sensor_2;
+            t_PXD->Fill();
+          }
           //Fill histograms of residuals differences with PXD clusters
           h_U_DeltaRes->Fill(over_U_PXD);
           h_V_DeltaRes->Fill(over_V_PXD);
@@ -534,6 +622,25 @@ void OverlapResidualsModule::event()
             double svdZ_1 = svdGlobal_1(2);
             double svdZ_2 = svdGlobal_2(2);
             B2INFO("SVD: difference of u-residuals =========> " << over_U_SVD);
+            //Fill SVD tree for u-overlaps if required by the user
+            if (m_ExpertLevel) {
+              deltaRes_SVD_U = over_U_SVD;
+              intRes_SVD_U = res_U_1;
+              int_SVD_U = svd_1->getPosition();
+              intPhi_SVD_U = svdPhi_1;
+              intZ_SVD_U = svdZ_1;
+              intLayer_SVD_U = svd_Layer_1;
+              intLadder_SVD_U = svd_Ladder_1;
+              intSensor_SVD_U = svd_Sensor_1;
+              extRes_SVD_U = res_U_2;
+              ext_SVD_U = svd_2->getPosition();
+              extPhi_SVD_U = svdPhi_2;
+              extZ_SVD_U = svdZ_2;
+              extLayer_SVD_U = svd_Layer_2;
+              extLadder_SVD_U = svd_Ladder_2;
+              extSensor_SVD_U = svd_Sensor_2;
+              t_SVD_U->Fill();
+            }
             //Fill histograms of residuals differences with SVD u clusters
             h_U_DeltaRes->Fill(over_U_SVD);
             h_U_DeltaRes_SVD->Fill(over_U_SVD);
@@ -606,6 +713,25 @@ void OverlapResidualsModule::event()
             double svdZ_1 = svdGlobal_1(2);
             double svdZ_2 = svdGlobal_2(2);
             B2INFO("SVD: difference of v-residuals =========> " << over_V_SVD);
+            //Fill SVD tree for v-overlaps if required by the user
+            if (m_ExpertLevel) {
+              deltaRes_SVD_V = over_V_SVD;
+              intRes_SVD_V = res_V_1;
+              int_SVD_V = svd_1->getPosition();
+              intPhi_SVD_V = svdPhi_1;
+              intZ_SVD_V = svdZ_1;
+              intLayer_SVD_V = svd_Layer_1;
+              intLadder_SVD_V = svd_Ladder_1;
+              intSensor_SVD_V = svd_Sensor_1;
+              extRes_SVD_V = res_V_2;
+              ext_SVD_V = svd_2->getPosition();
+              extPhi_SVD_V = svdPhi_2;
+              extZ_SVD_V = svdZ_2;
+              extLayer_SVD_V = svd_Layer_2;
+              extLadder_SVD_V = svd_Ladder_2;
+              extSensor_SVD_V = svd_Sensor_2;
+              t_SVD_V->Fill();
+            }
             //Fill histograms of residuals differences with SVD v clusters
             h_V_DeltaRes->Fill(over_V_SVD);
             h_V_DeltaRes_SVD->Fill(over_V_SVD);

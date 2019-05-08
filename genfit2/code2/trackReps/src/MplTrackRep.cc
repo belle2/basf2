@@ -55,6 +55,7 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   static const double EC  ( 0.000149896229 );  // c/(2*10^12) resp. c/2Tera FIXME this 1/2 here is super sneaky
   static const double P3  ( 1./3. );           // 1/3
   static const double DLT ( .0002 );           // max. deviation for approximation-quality test
+  double sign = state7[6] > 0 ? 1.0 : -1.0;
   // Aux parameters
   M1x3&   R           = *((M1x3*) &state7[0]);       // Start coordinates  [cm]  (x,  y,  z)
   M1x3&   A           = *((M1x3*) &state7[3]);       // Start directions         (ax, ay, az);   ax^2+ay^2+az^2=1
@@ -66,7 +67,7 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   double   B0(0), B1(0), B2(0), B3(0), B4(0), B5(0), B6(0);
   double   C0(0), C1(0), C2(0), C3(0), C4(0), C5(0), C6(0);
   // Additional variables for momentum evolution FIXME these are all cryptic in accordance with the rest of the code around
-  double   D0(0), D1(0), D2(0), D3(0), D4(0);
+  double   D0(0), D1(0), D2(0), D3(0), D4(0), D5(0);
   double   F0(0), F1(0), F2(0), F3(0);
   double   AH0(0), AH1(0), AH2(0), AH3(0);
 
@@ -75,7 +76,7 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   //
   S3 = P3*S;
   S4 = 0.25*S;
-  PS2 = m_magCharge * EC * S * (state7[6] > 0 ? 1 : -1);
+  PS2 = m_magCharge * EC * S * sign;
 
  // First point
   r[0] = R[0];           r[1] = R[1];           r[2]=R[2];
@@ -126,7 +127,7 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   //
   if(jacobianT != nullptr){
 
-    // jacobianT
+    // jacobianT         //FIXME seems in magnetic case there are no shortcuts?
     // 1 0 0 0 0 0 0  x
     // 0 1 0 0 0 0 0  y
     // 0 0 1 0 0 0 0  z
@@ -139,99 +140,72 @@ double MplTrackRep::RKPropagate(M1x7& state7,
     double   dA0(0), dA2(0), dA3(0), dA4(0), dA5(0), dA6(0);
     double   dB0(0), dB2(0), dB3(0), dB4(0), dB5(0), dB6(0);
     double   dC0(0), dC2(0), dC3(0), dC4(0), dC5(0), dC6(0);
+    double   dD0(0), dD1(0), dD2(0), dD3(0), dD4(0); 
 
     int start(0);
 
-    if (!calcOnlyLastRowOfJ) {
+//     if (!calcOnlyLastRowOfJ) {
 
-      if (!varField) {
-        // d(x, y, z)/d(x, y, z) submatrix is unit matrix
-        J(0, 0) = 1;  J(1, 1) = 1;  J(2, 2) = 1;
-        // d(ax, ay, az)/d(ax, ay, az) submatrix is 0
-        // start with d(x, y, z)/d(ax, ay, az)
-        start = 3;
-      }
+//       if (!varField) { // FIXME let's be honest and calculate everything everytime
+//         // d(x, y, z)/d(x, y, z) submatrix is unit matrix
+//         J(0, 0) = 1;  J(1, 1) = 1;  J(2, 2) = 1;
+//         // d(ax, ay, az)/d(ax, ay, az) submatrix is 0
+//         // start with d(x, y, z)/d(ax, ay, az)
+//         start = 3;
+//       }
 
-      for(int i=start; i<6; ++i) {
+      for(int i=start; i<7; ++i) { 
 
         //first point
-        dA0 = H0[2]*J(i, 4)-H0[1]*J(i, 5);    // dA0/dp }
-        dB0 = H0[0]*J(i, 5)-H0[2]*J(i, 3);    // dB0/dp  } = dA x H0
-        dC0 = H0[1]*J(i, 3)-H0[0]*J(i, 4);    // dC0/dp }
+        dD0 = -D0*D0/sign*J(i,6);
+        dA0 = (1/(F0*F0*D0*D0*D0) - 2/D0)*A0*dD0 - (D1-D0)/D0*J(i,3) - F0*A[0]*(J(i,3)*H0[0] + J(i,4)*H0[1] + J(i,5)*H0[2]); // FIXME A true marvel of clarity
+        dB0 = (1/(F0*F0*D0*D0*D0) - 2/D0)*B0*dD0 - (D1-D0)/D0*J(i,4) - F0*A[1]*(J(i,3)*H0[0] + J(i,4)*H0[1] + J(i,5)*H0[2]);
+        dC0 = (1/(F0*F0*D0*D0*D0) - 2/D0)*C0*dD0 - (D1-D0)/D0*J(i,5) - F0*A[2]*(J(i,3)*H0[0] + J(i,4)*H0[1] + J(i,5)*H0[2]);
 
-        dA2 = dA0+J(i, 3);        // }
-        dB2 = dB0+J(i, 4);        //  } = (dA0, dB0, dC0) + dA
-        dC2 = dC0+J(i, 5);        // }
+        dD1 = dD0 + (1/(F0*F0*D0*D0*D0) - 1/D0)*(D1-D0)*dD0 + F0*D0*(J(i,3)*H0[0] + J(i,4)*H0[1] + J(i,5)*H0[2]);
+        dA2 = dA0+J(i, 3);
+        dB2 = dB0+J(i, 4);
+        dC2 = dC0+J(i, 5);
 
         //second point
-        dA3 = J(i, 3)+dB2*H1[2]-dC2*H1[1];    // dA3/dp }
-        dB3 = J(i, 4)+dC2*H1[0]-dA2*H1[2];    // dB3/dp  } = dA + (dA2, dB2, dC2) x H1
-        dC3 = J(i, 5)+dA2*H1[1]-dB2*H1[0];    // dC3/dp }
+        dD2 = dD0 + (1/(F1*F1*D1*D1*D1) - 1/D1)*(D2-D0)*dD1 + F1*D1*(dA2*H1[0] + dB2*H1[1] + dC2*H1[2]);
+        dA3 = J(i,3)+(1/(F1*F1*D1*D1*D1) - 2/D1)*(A2-A[0])*dD1 - (D2-D0)/D1*dA2 - F1*A2*(dA2*H1[0] + dB2*H1[1] + dC2*H1[2]); // FIXME it's only getting better
+        dB3 = J(i,4)+(1/(F1*F1*D1*D1*D1) - 2/D1)*(B2-A[1])*dD1 - (D2-D0)/D1*dB2 - F1*B2*(dA2*H1[0] + dB2*H1[1] + dC2*H1[2]);
+        dC3 = J(i,5)+(1/(F1*F1*D1*D1*D1) - 2/D1)*(C2-A[2])*dD1 - (D2-D0)/D1*dC2 - F1*C2*(dA2*H1[0] + dB2*H1[1] + dC2*H1[2]);
 
-        dA4 = J(i, 3)+dB3*H1[2]-dC3*H1[1];    // dA4/dp }
-        dB4 = J(i, 4)+dC3*H1[0]-dA3*H1[2];    // dB4/dp  } = dA + (dA3, dB3, dC3) x H1
-        dC4 = J(i, 5)+dA3*H1[1]-dB3*H1[0];    // dC4/dp }
+        dD3 = dD0 + 2*(1/(F2*F2*D2*D2*D2) - 1/D2)*(D3-D0)*dD2 + 2*F2*D2*(dA3*H1[0] + dB3*H1[1] + dC3*H1[2]);
+        dA4 = J(i, 3)+(1/(F2*F2*D2*D2*D2) - 2/D2)*(A3-A[0])*dD2 - (D3-D0)/D2*dA3 - F2*A3*(dA3*H1[0] + dB3*H1[1] + dC3*H1[2]);
+        dB4 = J(i, 4)+(1/(F2*F2*D2*D2*D2) - 2/D2)*(B3-A[1])*dD2 - (D3-D0)/D2*dB3 - F2*B3*(dA3*H1[0] + dB3*H1[1] + dC3*H1[2]);
+        dC4 = J(i, 5)+(1/(F2*F2*D2*D2*D2) - 2/D2)*(C3-A[2])*dD2 - (D3-D0)/D2*dC3 - F2*C3*(dA3*H1[0] + dB3*H1[1] + dC3*H1[2]);
 
         //last point
         dA5 = dA4+dA4-J(i, 3);      // }
         dB5 = dB4+dB4-J(i, 4);      //  } =  2*(dA4, dB4, dC4) - dA
         dC5 = dC4+dC4-J(i, 5);      // }
 
-        dA6 = dB5*H2[2]-dC5*H2[1];      // dA6/dp }
-        dB6 = dC5*H2[0]-dA5*H2[2];      // dB6/dp  } = (dA5, dB5, dC5) x H2
-        dC6 = dA5*H2[1]-dB5*H2[0];      // dC6/dp }
+        dD4 = -dD0+(1/(F3*F3*D3*D3*D3) - 1/D3)*(D4+D0)*dD3 + F3*D3*(dA5*H2[0] + dB5*H2[1] + dC5*H2[2]);
+        dA6 = (1/(F3*F3*D3*D3*D3) - 2/D3)*(A4-A[0])*dD3 - (D4+D0)/D3*dA5 - F3*A5*(dA5*H2[0] + dB5*H2[1] + dC5*H2[2]);
+        dB6 = (1/(F3*F3*D3*D3*D3) - 2/D3)*(B4-A[1])*dD3 - (D4+D0)/D3*dB5 - F3*B5*(dA5*H2[0] + dB5*H2[1] + dC5*H2[2]);
+        dC6 = (1/(F3*F3*D3*D3*D3) - 2/D3)*(C4-A[2])*dD3 - (D4+D0)/D3*dC5 - F3*C5*(dA5*H2[0] + dB5*H2[1] + dC5*H2[2]);
 
         // this gives the same results as multiplying the old with the new Jacobian
         J(i, 0) += (dA2+dA3+dA4)*S3;  J(i, 3) = ((dA0+2.*dA3)+(dA5+dA6))*P3; // dR := dR + S3*[(dA2, dB2, dC2) +   (dA3, dB3, dC3) + (dA4, dB4, dC4)]
         J(i, 1) += (dB2+dB3+dB4)*S3;  J(i, 4) = ((dB0+2.*dB3)+(dB5+dB6))*P3; // dA :=     1/3*[(dA0, dB0, dC0) + 2*(dA3, dB3, dC3) + (dA5, dB5, dC5) + (dA6, dB6, dC6)]
         J(i, 2) += (dC2+dC3+dC4)*S3;  J(i, 5) = ((dC0+2.*dC3)+(dC5+dC6))*P3;
+        D5 = P3*(D1 + 2*D2 + D3 + D4); //p_n+1
+        J(i,6) = -sign/D5/D5*P3*(dD1 + 2*dD2 + dD3 + dD4);
       }
 
-    } // end if (!calcOnlyLastRowOfJ)
-
-    J(6, 3) *= state7[6]; J(6, 4) *= state7[6]; J(6, 5) *= state7[6];
-
-    //first point
-    dA0 = H0[2]*J(6, 4)-H0[1]*J(6, 5) + A0;    // dA0/dp }
-    dB0 = H0[0]*J(6, 5)-H0[2]*J(6, 3) + B0;    // dB0/dp  } = dA x H0 + (A0, B0, C0)
-    dC0 = H0[1]*J(6, 3)-H0[0]*J(6, 4) + C0;    // dC0/dp }
-
-    dA2 = dA0+J(6, 3);        // }
-    dB2 = dB0+J(6, 4);        //  } = (dA0, dB0, dC0) + dA
-    dC2 = dC0+J(6, 5);        // }
-
-    //second point
-    dA3 = J(6, 3)+dB2*H1[2]-dC2*H1[1] + (A3-A[0]);    // dA3/dp }
-    dB3 = J(6, 4)+dC2*H1[0]-dA2*H1[2] + (B3-A[1]);    // dB3/dp  } = dA + (dA2, dB2, dC2) x H1
-    dC3 = J(6, 5)+dA2*H1[1]-dB2*H1[0] + (C3-A[2]);    // dC3/dp }
-
-    dA4 = J(6, 3)+dB3*H1[2]-dC3*H1[1] + (A4-A[0]);    // dA4/dp }
-    dB4 = J(6, 4)+dC3*H1[0]-dA3*H1[2] + (B4-A[1]);    // dB4/dp  } = dA + (dA3, dB3, dC3) x H1
-    dC4 = J(6, 5)+dA3*H1[1]-dB3*H1[0] + (C4-A[2]);    // dC4/dp }
-
-    //last point
-    dA5 = dA4+dA4-J(6, 3);      // }
-    dB5 = dB4+dB4-J(6, 4);      //  } =  2*(dA4, dB4, dC4) - dA
-    dC5 = dC4+dC4-J(6, 5);      // }
-
-    dA6 = dB5*H2[2]-dC5*H2[1] + A6;      // dA6/dp }
-    dB6 = dC5*H2[0]-dA5*H2[2] + B6;      // dB6/dp  } = (dA5, dB5, dC5) x H2 + (A6, B6, C6)
-    dC6 = dA5*H2[1]-dB5*H2[0] + C6;      // dC6/dp }
-
-    // this gives the same results as multiplying the old with the new Jacobian
-    J(6, 0) += (dA2+dA3+dA4)*S3/state7[6];  J(6, 3) = ((dA0+2.*dA3)+(dA5+dA6))*P3/state7[6]; // dR := dR + S3*[(dA2, dB2, dC2) +   (dA3, dB3, dC3) + (dA4, dB4, dC4)]
-    J(6, 1) += (dB2+dB3+dB4)*S3/state7[6];  J(6, 4) = ((dB0+2.*dB3)+(dB5+dB6))*P3/state7[6]; // dA :=     1/3*[(dA0, dB0, dC0) + 2*(dA3, dB3, dC3) + (dA5, dB5, dC5) + (dA6, dB6, dC6)]
-    J(6, 2) += (dC2+dC3+dC4)*S3/state7[6];  J(6, 5) = ((dC0+2.*dC3)+(dC5+dC6))*P3/state7[6];
+//     } // end if (!calcOnlyLastRowOfJ)
 
   }
-
   //
   // Track parameters in last point
   //
   R[0] += (A2+A3+A4)*S3;   A[0] += (SA[0]=((A0+2.*A3)+(A5+A6))*P3-A[0]);  // R  = R0 + S3*[(A2, B2, C2) +   (A3, B3, C3) + (A4, B4, C4)]
   R[1] += (B2+B3+B4)*S3;   A[1] += (SA[1]=((B0+2.*B3)+(B5+B6))*P3-A[1]);  // A  =     1/3*[(A0, B0, C0) + 2*(A3, B3, C3) + (A5, B5, C5) + (A6, B6, C6)]
   R[2] += (C2+C3+C4)*S3;   A[2] += (SA[2]=((C0+2.*C3)+(C5+C6))*P3-A[2]);  // SA = A_new - A_old
-  state7[6] = m_magCharge * (state7[6] > 0 ? 1 : -1) / P3 / (D1 + 2*D2 + D3 + D4); // g / p_n+1 = g / (1/3 (D1 + 2*D2 +D3 + D4))
+  state7[6] = m_magCharge * sign / D5; // g / p_n+1
 
   // normalize A
   double CBA ( 1./sqrt(A[0]*A[0]+A[1]*A[1]+A[2]*A[2]) ); // 1/|A|

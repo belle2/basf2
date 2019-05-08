@@ -36,7 +36,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 

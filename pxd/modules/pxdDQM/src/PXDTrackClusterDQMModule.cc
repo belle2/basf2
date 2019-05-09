@@ -92,8 +92,11 @@ void PXDTrackClusterDQMModule::event()
     if (!recoTrack.size()) continue;
     RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(recoTrack[0]);
 
+    const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
+    double correction = 1.0;
+    if (tfr) sin(tfr->getMomentum().Theta());
     for (auto& cluster : pxdClustersTrack) {
-      if (m_trackClusterCharge[cluster.getSensorID()]) m_trackClusterCharge[cluster.getSensorID()]->Fill(cluster.getCharge());
+      if (m_trackClusterCharge[cluster.getSensorID()]) m_trackClusterCharge[cluster.getSensorID()]->Fill(cluster.getCharge()*correction);
     }
   }
 }

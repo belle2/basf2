@@ -12,6 +12,7 @@
 
 /* Belle2 headers. */
 #include <framework/database/DBImportObjPtr.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
@@ -39,6 +40,11 @@ namespace Belle2 {
      * Set interval of validity.
      */
     void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
+
+    /**
+     * Import channel status.
+     */
+    void importChannelStatus(const KLMChannelStatus* channelStatus);
 
     /**
      * Import scintillator simulation parameters.

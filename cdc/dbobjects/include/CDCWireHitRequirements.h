@@ -284,9 +284,11 @@ namespace Belle2 {
     floatRange_t m_ADCOverTOTRangeOuterSuperLayers = {0.0, -1.0};
 
     /// Map of conditions of the type: if TOT==x, then ADC<=y (first super layer of CDC). An upper value of -1 stands for unbounded.
+    /// The first value is the given TOT, the second value is the maximum ADC.
     /// The upper bound is included in the allowed range.
     std::map<short, short> m_MaxADCGivenTOTFirstSuperLayer = {};
     /// Map of conditions of the type: if TOT==x, then ADC<=y (outer super layers of CDC). An upper value of -1 stands for unbounded.
+    /// The first value is the given TOT, the second value is the maximum ADC.
     /// The upper bound is included in the allowed range.
     std::map<short, short> m_MaxADCGivenTOTOuterSuperLayers = {};
 

@@ -33,6 +33,7 @@ PXDTrackClusterDQMModule::PXDTrackClusterDQMModule() : HistoModule(), m_vxdGeome
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDER"));
+  addParam("moreHistos", m_moreHistos, "Fill additional histograms (not for ereco)", false);
 }
 
 
@@ -69,10 +70,12 @@ void PXDTrackClusterDQMModule::defineHisto()
     buff.ReplaceAll(".", "_");
 
     m_trackClusterCharge[avxdid] = new TH1F("PXD_Track_Cluster_Charge_" + buff, "PXD Track Cluster Charge " + buff + ";Charge/ADU;",
-                                            256, 0, 256);
-    m_trackClusterChargeUC[avxdid] = new TH1F("PXD_Track_Cluster_Charge_UC_" + buff,
-                                              "PXD Track Cluster Charge (uncorrected)" + buff + ";Charge/ADU;",
-                                              256, 0, 256);
+                                            100, 0, 100);
+    if (m_moreHistos) {
+      m_trackClusterChargeUC[avxdid] = new TH1F("PXD_Track_Cluster_Charge_UC_" + buff,
+                                                "PXD Track Cluster Charge (uncorrected)" + buff + ";Charge/ADU;",
+                                                100, 0, 100);
+    }
   }
 
   oldDir->cd();

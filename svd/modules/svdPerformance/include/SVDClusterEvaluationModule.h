@@ -77,6 +77,7 @@ namespace Belle2 {
     double m_uFiducial;  /**< fiducial length u*/
     double m_vFiducial;  /**< fiducial length v*/
     float m_nSigma;  /**< number of sigmas for efficiency computation*/
+    float m_halfWidth;  /**< window half width for efficiency computation*/
     int m_groupNstrips; /**< number of strip in the group in 2D resid vs position*/
 
     VXD::GeoCache& m_geoCache = VXD::GeoCache::getInstance(); /**< the geo cache instance*/

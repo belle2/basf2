@@ -35,6 +35,7 @@ SVDClusterEvaluationModule::SVDClusterEvaluationModule(): Module()
            "length to be subtracted from the V-edge to consider intercepts inside the sensor. Positive values reduce the area; negative values increase the area",
            double(0));
   addParam("efficiency_nSigma", m_nSigma, " number of residual sigmas for the determination of the efficiency", float(5));
+  addParam("efficiency_halfWidth", m_halfWidth, " window half width for the determination of the efficiency", float(0.05));
   addParam("ClustersName", m_ClusterName, "Name of DUTs Cluster Store Array.", std::string(""));
   addParam("InterceptsName", m_InterceptName, "Name of Intercept Store Array.", std::string(""));
   addParam("TracksName", m_TrackName, "Name of Track Store Array.", std::string(""));
@@ -149,14 +150,16 @@ void SVDClusterEvaluationModule::event()
           continue;
 
         double interCoor = coorV;
+        double clPos = m_svdClusters[cls]->getPosition();
         //      double interSigma = sigmaV;
         if (m_svdClusters[cls]->isUCluster()) {
           interCoor = coorU;
           //interSigma = sigmaU;
+          clPos = m_svdClusters[cls]->getPosition(coorV);
         }
-        double resid = interCoor - m_svdClusters[cls]->getPosition();
+        double resid = interCoor - clPos;
         m_clsResid->fill(theVxdID, m_svdClusters[cls]->isUCluster(), resid);
-        m_clsResid2D->fill(theVxdID, m_svdClusters[cls]->isUCluster(), m_svdClusters[cls]->getPosition(), resid);
+        m_clsResid2D->fill(theVxdID, m_svdClusters[cls]->isUCluster(), clPos, resid);
 
         //looking for the minimal residual
         if (m_svdClusters[cls]->isUCluster()) {
@@ -269,12 +272,12 @@ void SVDClusterEvaluationModule::terminate()
     h_misV->GetYaxis()->SetTitle("V misalignment (#mum)");
 
 
-    TH1F* h_effU = new TH1F("hEffU", Form("U-Side Summary, %.1f#sigma", m_nSigma), 1, 0, 1);
+    TH1F* h_effU = new TH1F("hEffU", Form("U-Side Summary, %.1f#sigma or #pm%.1f mm", m_nSigma, m_halfWidth * 10), 1, 0, 1);
     h_effU->SetCanExtend(TH1::kAllAxes);
     h_effU->SetStats(0);
     h_effU->GetXaxis()->SetTitle("sensor");
     h_effU->GetYaxis()->SetTitle("U efficiency");
-    TH1F* h_effV = new TH1F("hEffV", Form("V-Side Summary, %.1f#sigma", m_nSigma), 1, 0, 1);
+    TH1F* h_effV = new TH1F("hEffV", Form("V-Side Summary, %.1f#sigma or #pm%.1f mm", m_nSigma, m_halfWidth * 10), 1, 0, 1);
     h_effV->SetCanExtend(TH1::kAllAxes);
     h_effV->SetStats(0);
     h_effV->GetXaxis()->SetTitle("sensor");
@@ -328,10 +331,14 @@ void SVDClusterEvaluationModule::terminate()
                 B2DEBUG(10, "U-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
                 residU[s] = func->GetParameter("sigma1");
                 misU[s] = func->GetParameter("mean1");
-                int binMin = res->FindBin(misU[s] - m_nSigma * residU[s]);
-                int binMax = res->FindBin(misU[s] + m_nSigma * residU[s]);
-                B2DEBUG(10, "from " << misU[s] - m_nSigma * residU[s] << " -> binMin = " << binMin);
-                B2DEBUG(10, "to " << misU[s] + m_nSigma * residU[s] << " -> binMax = " << binMax);
+                float halfWindow = m_nSigma * residU[s];
+                if (m_nSigma == 0)
+                  halfWindow = m_halfWidth;
+
+                int binMin = res->FindBin(misU[s] - halfWindow);
+                int binMax = res->FindBin(misU[s] + halfWindow);
+                B2DEBUG(10, "from " << misU[s] - halfWindow << " -> binMin = " << binMin);
+                B2DEBUG(10, "to " << misU[s] + halfWindow << " -> binMax = " << binMax);
                 int num = 0;
                 for (int bin = binMin; bin < binMax + 1; bin++)
                   num = num + res->GetBinContent(bin);
@@ -361,10 +368,15 @@ void SVDClusterEvaluationModule::terminate()
                 B2DEBUG(10, "V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
                 residV[s] = func->GetParameter("sigma1");
                 misV[s] = func->GetParameter("mean1");
-                int binMin = res->FindBin(misV[s] - m_nSigma * residV[s]);
-                int binMax = res->FindBin(misV[s] + m_nSigma * residV[s]);
-                B2DEBUG(10, "from " << misV[s] - m_nSigma * residV[s] << " -> binMin = " << binMin);
-                B2DEBUG(10, "to " << misV[s] + m_nSigma * residV[s] << " -> binMax = " << binMax);
+
+                float halfWindow = m_nSigma * residV[s];
+                if (m_nSigma == 0)
+                  halfWindow = m_halfWidth;
+
+                int binMin = res->FindBin(misV[s] - halfWindow);
+                int binMax = res->FindBin(misV[s] + halfWindow);
+                B2DEBUG(10, "from " << misV[s] - halfWindow << " -> binMin = " << binMin);
+                B2DEBUG(10, "to " << misV[s] + halfWindow << " -> binMax = " << binMax);
                 int num = 0;
                 for (int bin = binMin; bin < binMax + 1; bin++)
                   num = num + res->GetBinContent(bin);
@@ -406,10 +418,10 @@ void SVDClusterEvaluationModule::terminate()
 
     TGraphErrors* g_effU = new TGraphErrors(Nsensors, sensors, effU, sensorsErr, effUErr);
     g_effU->SetName("geffU");
-    g_effU->SetTitle(Form("U-Side Summary, %.1f#sigma", m_nSigma));
+    g_effU->SetTitle(Form("U-Side Summary, %.1f#sigma or #pm%.1f mm", m_nSigma, m_halfWidth * 10));
     TGraphErrors* g_effV = new TGraphErrors(Nsensors, sensors, effV, sensorsErr, effVErr);
     g_effV->SetName("geffV");
-    g_effV->SetTitle(Form("V-Side Summary, %.1f#sigma", m_nSigma));
+    g_effV->SetTitle(Form("V-Side Summary, %.1f#sigma or #pm%.1f mm", m_nSigma, m_halfWidth * 10));
 
     oldDir->cd();
     for (int bin = 0; bin < h_residU->GetNbinsX(); bin++)
@@ -519,6 +531,7 @@ bool SVDClusterEvaluationModule::fitResiduals(TH1F* res)
   function->SetParameter(0, 10);
   function->SetParLimits(0, 0, 1000000);
   function->SetParameter(1, 0);
+  function->SetParLimits(1, -0.02, 0.02);
   function->SetParameter(2, 0.01);
   function->SetParLimits(2, 0, 0.1);
   function->SetParameter(3, 1);

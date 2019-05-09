@@ -124,7 +124,6 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
                                      m_Channels->getChannelData(stripGlobal));
     if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
-    channelData->setActive(bool(active));
   }
   delete tree;
   delete file;
@@ -285,7 +284,6 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
                                      m_Channels->getChannelData(stripGlobal));
     if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
-    channelData->setActive(bool(active));
     channelData->setPedestal(pedestalMin);
     channelData->setThreshold(threshold);
     channelData->setAdjustmentVoltage(adjustmentVoltage);

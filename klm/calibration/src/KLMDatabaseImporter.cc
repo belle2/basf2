@@ -45,6 +45,16 @@ void KLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunHigh = runHigh;
 }
 
+void KLMDatabaseImporter::importChannelStatus(
+  const KLMChannelStatus* channelStatus)
+{
+  DBImportObjPtr<KLMChannelStatus> channelStatusImport;
+  channelStatusImport.construct(*channelStatus);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  channelStatusImport.import(iov);
+}
+
 void KLMDatabaseImporter::importScintillatorDigitizationParameters(
   const KLMScintillatorDigitizationParameters* digitizationParameters)
 {

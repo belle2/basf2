@@ -12,7 +12,6 @@
 #include <bklm/calibration/BKLMDatabaseImporter.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <bklm/dbobjects/BKLMSimulationPar.h>
-#include <bklm/dbobjects/BKLMBadChannels.h>
 #include <bklm/dbobjects/BKLMMisAlignment.h>
 #include <bklm/dbobjects/BKLMDisplacement.h>
 #include <bklm/dbobjects/BKLMTimeWindow.h>
@@ -71,26 +70,14 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
             else if (plane == 1) axisId = 0;
           } else axisId = plane;
 
-          int MaxiChannel = 0;
-          if (isForward == 0 && sector == 3 && plane == 0) {
-            if (layer < 3) MaxiChannel = 38;
-            if (layer > 2) MaxiChannel = 34;
-          } else {
-            if (layer == 1 && plane == 1) MaxiChannel = 37;
-            if (layer == 2 && plane == 1) MaxiChannel = 42;
-            if (layer > 2 && layer < 7 && plane == 1) MaxiChannel = 36;
-            if (layer > 6 && plane == 1) MaxiChannel = 48;
-
-            if (layer == 1 && plane == 0) MaxiChannel = 54;
-            if (layer == 2 && plane == 0) MaxiChannel = 54;
-            if (layer > 2 && plane == 0) MaxiChannel = 48;
-          }
+          int MaxiChannel = BKLMElementNumbers::getNStrips(
+                              isForward, sector, layer, plane);
 
           bool dontFlip = false;
           if (isForward == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
           if (isForward == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
 
-          for (int iStrip = 1; iStrip < (MaxiChannel + 1);  iStrip++) {
+          for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
             int channelId = iStrip;
             if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
 
@@ -209,43 +196,6 @@ void BKLMDatabaseImporter::exportBklmSimulationPar()
       B2INFO(ii << ", " << jj << ", :" << element->getPhiWeight(ii, jj) << endl);
     }
   }
-
-}
-
-void BKLMDatabaseImporter::importBklmBadChannels(int expNoStart, int runStart, int expNoStop, int runStop, std::string fileName)
-{
-  std::ifstream stream;
-  stream.open(fileName.c_str());
-  if (!stream) {
-    B2FATAL("openFile: " << fileName << " *** failed to open");
-    return;
-  }
-  B2INFO(fileName << ": open for reading");
-
-  BKLMBadChannels bklmBadChannels;
-
-  int isForward(0), sector(0), layer(0), plane(0), strip(0);
-
-  while (true) {
-    stream >> isForward >> sector >> layer >> plane >> strip;
-    if (stream.eof()) break;
-    B2INFO("Read in line" << isForward << ", " << sector << ", " << layer  << ", " << plane  << ", " << strip << ".");
-    bklmBadChannels.appendDeadChannel(isForward, sector, layer, plane, strip);
-  }
-  stream.close();
-  // define IOV and store data to the DB
-  IntervalOfValidity iov(expNoStart, runStart, expNoStop, runStop);
-  Database::Instance().storeData("BKLMBadChannels", &bklmBadChannels, iov);
-}
-
-void BKLMDatabaseImporter::exportBklmBadChannels()
-{
-  DBObjPtr<BKLMBadChannels> element("BKLMBadChannels");
-
-  element->printDeadChannels();
-
-  B2INFO("is (1,1,1,0,20) dead ? " << element->isDeadChannel(1, 1, 1, 0, 20) << "; is (1,1,1,0,21) hot ? " << element->isHotChannel(1,
-         1, 1, 0, 21));
 
 }
 

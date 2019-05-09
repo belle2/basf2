@@ -357,7 +357,8 @@ void PXDUnpackerOTModule::unpack_dhp_raw(void* data, unsigned int frame_len, uns
   m_storeRawAdc.appendNew(vxd_id, data, frame_len);
 };
 
-void PXDUnpackerOTModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
+void PXDUnpackerOTModule::unpack_fce([[maybe_unused]] unsigned short* data, [[maybe_unused]] unsigned int length,
+                                     [[maybe_unused]] VxdID vxd_id)
 {
   //! *************************************************************
   //! Important Remark:
@@ -1461,4 +1462,3 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
   }
   B2DEBUG(29, "DHC/DHE $" << hex << countedBytesInDHC << ", $" << hex << countedBytesInDHE);
 }
-

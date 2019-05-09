@@ -63,8 +63,6 @@ def linkdef_emitter(target, source, env):
 
         include_base = classname + '.h'
         header_file = os.path.join(source_dir, include_base)
-        if not os.path.isfile(header_file):
-            header_file = os.path.join(os.environ.get('BELLE2_RELEASE_DIR', ''), header_file)
 
         if not os.path.isfile(header_file):
             if not namespace:

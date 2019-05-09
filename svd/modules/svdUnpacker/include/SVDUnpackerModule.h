@@ -194,6 +194,11 @@ namespace Belle2 {
        */
       bool m_badMappingFatal = false;
 
+      /** Optionally we can switch all B2ERRORS to B2WARNINGS
+       *  if running on HLT or ExpressReco
+       */
+      bool m_switchErrors2Warnings = false;
+
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;
 

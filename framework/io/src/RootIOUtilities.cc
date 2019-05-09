@@ -25,13 +25,13 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
                                                       const std::vector<std::string>& excludeBranches, int durability, bool quiet)
 {
   std::set<std::string> branchSet, excludeBranchSet;
-  for (std::string b : branches) {
+  for (const std::string& b : branches) {
     if (branchesToFilter.count(b) == 0 and not quiet)
       B2WARNING("The branch " << b << " given in " << c_SteerBranchNames[durability] << " does not exist.");
     if (!branchSet.insert(b).second and not quiet)
       B2WARNING(c_SteerBranchNames[durability] << " has duplicate entry " << b);
   }
-  for (std::string b : excludeBranches) {
+  for (const std::string& b : excludeBranches) {
     if (branchesToFilter.count(b) == 0 and not quiet)
       B2INFO("The branch " << b << " given in " << c_SteerExcludeBranchNames[durability] << " does not exist.");
     if (!excludeBranchSet.insert(b).second and not quiet)
@@ -39,7 +39,7 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
   }
 
   std::set<std::string> out, relations, excluderelations;
-  for (std::string branch : branchesToFilter) {
+  for (const std::string& branch : branchesToFilter) {
     if (excludeBranchSet.count(branch))
       continue;
     if (branchSet.empty() or branchSet.count(branch))
@@ -47,8 +47,8 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
   }
   if (!excludeBranchSet.empty()) {
     //remove relations for excluded things
-    for (std::string from : branchesToFilter) {
-      for (std::string to : branchesToFilter) {
+    for (const std::string& from : branchesToFilter) {
+      for (const std::string& to : branchesToFilter) {
         std::string branch = DataStore::relationName(from, to);
         if (out.count(branch) == 0)
           continue; //not selected
@@ -59,13 +59,13 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
         excluderelations.insert(branch);
       }
     }
-    for (std::string rel : excluderelations) {
+    for (const std::string& rel : excluderelations) {
       out.erase(rel);
     }
   }
   //add relations between accepted branches
-  for (std::string from : out) {
-    for (std::string to : out) {
+  for (const std::string& from : out) {
+    for (const std::string& to : out) {
       std::string branch = DataStore::relationName(from, to);
       if (branchesToFilter.count(branch) == 0)
         continue; //not in input
@@ -130,7 +130,7 @@ bool RootIOUtilities::hasStreamer(const TClass* cl)
     // version number == 0 means no streamers for this class, check base classes
     TList* baseClasses = const_cast<TClass*>(cl)->GetListOfBases(); //method might update an internal cache, but is const otherwise
     TIter it(baseClasses);
-    while (TBaseClass* base = static_cast<TBaseClass*>(it())) {
+    while (auto* base = static_cast<TBaseClass*>(it())) {
       if (hasStreamer(base->GetClassPointer()))
         return true;
     }

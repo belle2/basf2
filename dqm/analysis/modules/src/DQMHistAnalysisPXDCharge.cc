@@ -2,7 +2,7 @@
 // File : DQMHistAnalysisPXDCharge.cc
 // Description : Analysis of PXD Cluster Charge
 //
-// Author : Bjoern Spruck, Univerisity Mainz
+// Author : Bjoern Spruck, University Mainz
 // Date : 2018
 //-
 
@@ -157,7 +157,6 @@ void DQMHistAnalysisPXDChargeModule::event()
       m_cCharge->cd();
       hh1->Draw();
       m_fLandau->Draw("same");
-      m_cCharge->Print(str(format("cc_%d.pdf") % i).data());
 
       if (hh1->GetEntries() > 1000) enough = true;
     }

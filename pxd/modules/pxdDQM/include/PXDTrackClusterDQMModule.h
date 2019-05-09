@@ -57,8 +57,10 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks;
     StoreArray<Track> m_tracks;
 
-    /** Cluster Charge for PXD hits */
+    /** Cluster Charge for PXD clusters */
     std::map <VxdID, TH1F*> m_trackClusterCharge{};
+    /** Cluster Charge for PXD clusters, uncorrected */
+    std::map <VxdID, TH1F*> m_trackClusterChargeUC{};
 
   };  //end class declaration
 

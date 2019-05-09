@@ -70,6 +70,9 @@ void PXDTrackClusterDQMModule::defineHisto()
 
     m_trackClusterCharge[avxdid] = new TH1F("PXD_Track_Cluster_Charge_" + buff, "PXD Track Cluster Charge " + buff + ";Charge/ADU;",
                                             256, 0, 256);
+    m_trackClusterChargeUC[avxdid] = new TH1F("PXD_Track_Cluster_Charge_UC_" + buff,
+                                              "PXD Track Cluster Charge (uncorrected)" + buff + ";Charge/ADU;",
+                                              256, 0, 256);
   }
 
   oldDir->cd();
@@ -79,6 +82,7 @@ void PXDTrackClusterDQMModule::defineHisto()
 void PXDTrackClusterDQMModule::beginRun()
 {
   for (auto& it : m_trackClusterCharge) it.second->Reset();
+  for (auto& it : m_trackClusterChargeUC) it.second->Reset();
 }
 
 
@@ -94,8 +98,9 @@ void PXDTrackClusterDQMModule::event()
 
     const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     double correction = 1.0;
-    if (tfr) sin(tfr->getMomentum().Theta());
+    if (tfr) correction = sin(tfr->getMomentum().Theta());
     for (auto& cluster : pxdClustersTrack) {
+      if (m_trackClusterChargeUC[cluster.getSensorID()]) m_trackClusterChargeUC[cluster.getSensorID()]->Fill(cluster.getCharge());
       if (m_trackClusterCharge[cluster.getSensorID()]) m_trackClusterCharge[cluster.getSensorID()]->Fill(cluster.getCharge()*correction);
     }
   }

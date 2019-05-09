@@ -338,7 +338,7 @@ namespace {
     TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
     Track mytrack;
@@ -366,7 +366,7 @@ namespace {
   class ROEVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
 
       StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
@@ -392,7 +392,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -455,7 +455,7 @@ namespace {
     TVector3 position(1.0, 0, 0);
     TVector3 momentum(0, 1.0, 0);
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     myTFRs.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
 
@@ -703,7 +703,7 @@ namespace {
   class EventVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle>().registerInDataStore();
@@ -713,7 +713,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -729,9 +729,9 @@ namespace {
     const Manager::Var* time = Manager::Instance().getVariable("eventTimeSeconds");
 
     // there is no EventMetaData so expect nan
-    EXPECT_FALSE(date->function(NULL) == date->function(NULL));
-    EXPECT_FALSE(year->function(NULL) == year->function(NULL));
-    EXPECT_FALSE(time->function(NULL) == time->function(NULL));
+    EXPECT_FALSE(date->function(nullptr) == date->function(nullptr));
+    EXPECT_FALSE(year->function(nullptr) == year->function(nullptr));
+    EXPECT_FALSE(time->function(nullptr) == time->function(nullptr));
 
     DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -862,7 +862,7 @@ namespace {
   class MetaVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
@@ -873,7 +873,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -2206,7 +2206,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2247,7 +2247,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2288,7 +2288,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2329,7 +2329,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2370,7 +2370,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2476,7 +2476,7 @@ namespace {
   class PIDVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap> peim;
@@ -2497,7 +2497,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -2524,7 +2524,7 @@ namespace {
     TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
@@ -2708,7 +2708,7 @@ namespace {
     TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
@@ -2775,7 +2775,7 @@ namespace {
   class ECLVariableTest : public ::testing::Test {
   protected:
     /** register Particle and ECLCluster arrays. */
-    virtual void SetUp()
+    void SetUp() override
     {
       // setup the DataStore
       DataStore::Instance().setInitializeActive(true);
@@ -2810,7 +2810,7 @@ namespace {
       // mock up some TrackFits for them (all pions)
       TRandom3 generator;
       TMatrixDSym cov6(6);
-      unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+      auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
       for (int i = 0; i < tracks.getEntries(); ++i) {
         int charge = (i % 2 == 0) ? +1 : -1;
@@ -2876,7 +2876,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -3194,7 +3194,7 @@ namespace {
   class KLMVariableTest : public ::testing::Test {
   protected:
     /** register Particle and KLMCluster arrays. */
-    virtual void SetUp()
+    void SetUp() override
     {
       // setup the DataStore
       DataStore::Instance().setInitializeActive(true);
@@ -3219,7 +3219,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -3264,7 +3264,7 @@ namespace {
     // mock up some TrackFits for them (all muons)
     TRandom3 generator;
     TMatrixDSym cov6(6);
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     for (int i = 0; i < tracks.getEntries(); ++i) {
       int charge = (i % 2 == 0) ? +1 : -1;
@@ -3376,7 +3376,7 @@ namespace {
     TVector3 position(1.0, 0, 0);
     TVector3 momentum(0, 1.0, 0);
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     trackFits.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
 
@@ -3427,7 +3427,7 @@ namespace {
   class FlightInfoTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle>().registerInDataStore();
@@ -3521,7 +3521,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -3730,7 +3730,7 @@ namespace {
   class VertexVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle>().registerInDataStore();
@@ -3771,7 +3771,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }

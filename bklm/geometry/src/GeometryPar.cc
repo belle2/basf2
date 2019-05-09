@@ -829,9 +829,9 @@ namespace Belle2 {
         double dGamma)
     {
 
-      CLHEP::HepRotation dx = CLHEP::HepRotationX(dGamma);
-      CLHEP::HepRotation dy = CLHEP::HepRotationY(dAlpha);
-      CLHEP::HepRotation dz = CLHEP::HepRotationZ(dBeta);
+      CLHEP::HepRotation dy = CLHEP::HepRotationY(-dAlpha);
+      CLHEP::HepRotation dz = CLHEP::HepRotationZ(-dBeta);
+      CLHEP::HepRotation dx = CLHEP::HepRotationX(-dGamma);
       CLHEP::Hep3Vector shift(dW, dU, dV);
 
       //we do dx-->dz-->dy ( local w-->v-->u), because angles are definded as intrinsic rotations u-->v'-->w''

@@ -27,7 +27,7 @@ namespace Belle2 {
     /** Create the NtupleTool specified by strName. The TTree* tree is
     the tree to which the NtupleTool will write. The DecayDescriptor d specifies
     which reconstructed particles the NtupleTool should act on. */
-    static NtupleFlatTool* create(std::string strName, TTree* tree, DecayDescriptor& d);
+    static NtupleFlatTool* create(const std::string& strName, TTree* tree, DecayDescriptor& d);
   };
 } // namespace Belle2
 

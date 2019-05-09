@@ -21,8 +21,8 @@ LogConfig::LogConfig(LogConfig::ELogLevel logLevel, int debugLevel) :
   m_debugLevel(debugLevel),
   m_abortLevel(LogConfig::c_Fatal)
 {
-  for (int level = 0; level < LogConfig::c_Default; level++) {
-    m_logInfo[level] = 0;
+  for (unsigned int& level : m_logInfo) {
+    level = 0;
   }
 }
 

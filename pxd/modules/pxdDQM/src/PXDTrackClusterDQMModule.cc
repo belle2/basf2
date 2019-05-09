@@ -31,6 +31,8 @@ PXDTrackClusterDQMModule::PXDTrackClusterDQMModule() : HistoModule(), m_vxdGeome
   setDescription("DQM for PXD Cluster matched to a Track");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("PXDER"));
 }
 
 
@@ -52,8 +54,10 @@ void PXDTrackClusterDQMModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("PXDER");
-  oldDir->cd("PXDER");
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not use return value with ->cd(), its ZERO if dir already exists
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
   for (VxdID& avxdid : sensors) {

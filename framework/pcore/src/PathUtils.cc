@@ -13,6 +13,7 @@
 #include <framework/pcore/ProcHandler.h>
 #include <framework/logging/LogMethod.h>
 #include <set>
+#include <utility>
 
 using namespace Belle2;
 
@@ -42,7 +43,7 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
 
       if (stage == 2) {
         bool path_is_useful = false;
-        for (auto parallelModule : mainPath->getModules()) {
+        for (const auto& parallelModule : mainPath->getModules()) {
           if (uselessParallelModules.count(parallelModule->getType()) == 0) {
             path_is_useful = true;
             break;
@@ -202,12 +203,12 @@ void PathUtils::prependModulesIfNotPresent(ModulePtrList* modules, const ModuleP
   }
 }
 
-void PathUtils::appendModule(PathPtr& path, ModulePtr module)
+void PathUtils::appendModule(PathPtr& path, const ModulePtr& module)
 {
   path->addModule(module);
 }
 
-void PathUtils::prependModule(PathPtr& path, ModulePtr module)
+void PathUtils::prependModule(PathPtr& path, const ModulePtr& module)
 {
   PathPtr newPath(new Path());
   newPath->addModule(module);

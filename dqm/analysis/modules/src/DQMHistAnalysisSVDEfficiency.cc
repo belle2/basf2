@@ -59,6 +59,30 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data(), "READ");
   }
+  //build the legend
+  m_legProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legProblem->AddText("ERROR!");
+  m_legProblem->AddText("at least one sensor with:");
+  m_legProblem->AddText(Form("efficiency < %1.0f%%", m_effError * 100));
+  m_legProblem->SetFillColor(kRed);
+  m_legWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legWarning->AddText("WARNING!");
+  m_legWarning->AddText("at least one sensor with:");
+  m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effWarning * 100, m_effError * 100));
+  m_legWarning->SetFillColor(kOrange);
+  m_legNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
+  m_legNormal->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effEmpty * 100, m_effWarning * 100));
+  m_legNormal->SetFillColor(kGreen);
+  m_legNormal->SetBorderSize(0.);
+  m_legNormal->SetLineColor(kBlack);
+  m_legEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
+  m_legEmpty->AddText("NO DATA RECEIVED");
+  m_legEmpty->AddText("from at least one sensor");
+  m_legEmpty->SetFillColor(kBlack);
+  m_legEmpty->SetTextColor(kWhite);
+  m_legEmpty->SetBorderSize(0.);
+  m_legEmpty->SetLineColor(kBlack);
 
   //search for reference
   if (m_refFile && m_refFile->IsOpen()) {
@@ -77,7 +101,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
 
   B2INFO(" SVD efficiency thresholds:");
-  B2INFO(" EFFICIENCY: empty < " << m_effEmpty << " normal < " << m_effWarning << "warning < " << m_effError << " < error");
+  B2INFO(" EFFICIENCY: empty < " << m_effEmpty << " < normal < " << m_effWarning << " < warning < " << m_effError << " < error");
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -126,31 +150,40 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_effVErrstatus = 0;
 
   //set dedicate gStyle
-  const Int_t colNum = 4;
-  Int_t palette[colNum] {kBlack,  kGreen, kOrange, kRed};
-  gStyle->SetPalette(colNum, palette);
+  //  const Int_t colNum = 4;
+  //  Int_t palette[colNum] {kBlack,  kGreen, kOrange, kRed};
+  //  gStyle->SetPalette(colNum, palette);
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.3f");
 
-  SVDSummaryPlots* found_tracksU = NULL;
-  SVDSummaryPlots* matched_clusU = NULL;
 
-  found_tracksU = (SVDSummaryPlots*)findHist("svdeff/TrackHits@view");
-  matched_clusU = (SVDSummaryPlots*)findHist("svdeff/MatchedHits@view");
+  //Efficiency for the U side
+  TH2F* found_tracksU = (TH2F*)findHist("svdeff/TrackHitsU");
+  TH2F* matched_clusU = (TH2F*)findHist("svdeff/MatchedHitsU");
 
   B2INFO("DQMHistAnalysisSVDEfficiency: before cycle.");
 
   if (matched_clusU == NULL || found_tracksU == NULL) {
-    B2INFO("Histograms not found");
+    B2INFO("Histograms needed for Efficiency computation are not found");
     m_cEfficiencyU->SetFillColor(kRed);
   } else {
+    B2INFO("U-side Before loop on sensors, size :" << m_SVDModules.size());
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
-      B2INFO("Before getValue, size :" << m_SVDModules.size());
-      effU = matched_clusU->getValue(m_SVDModules[i], 1) / found_tracksU->getValue(m_SVDModules[i], 1);
-      B2INFO("effU  :" << effU);
-      B2INFO("After getValue");
+      B2INFO("module " << i << "," << m_SVDModules[i]);
+      int bin = found_tracksU->FindBin(m_SVDModules[i].getLadderNumber(), findBinY(m_SVDModules[i].getLayerNumber(),
+                                       m_SVDModules[i].getSensorNumber()));
+      float numU = matched_clusU->GetBinContent(bin);
+      float denU = found_tracksU->GetBinContent(bin);
+      if (denU > 0)
+        effU = numU / denU;
+      else
+        effU = -1;
+      B2INFO("effU  = " << numU << "/" << denU << " = " << effU);
       m_hEfficiency->fill(m_SVDModules[i], 1, effU);
-      erreffU = std::sqrt(effU * (1 - effU));
+      if (effU == -1)
+        erreffU = -1;
+      else
+        erreffU = std::sqrt(effU * (1 - effU));
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU);
 
       if (effU <= m_effEmpty) {
@@ -166,20 +199,36 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
 
   B2INFO("DQMHistAnalysisSVDEfficiency: after cycle.");
-  SVDSummaryPlots* found_tracksV = NULL;
-  SVDSummaryPlots* matched_clusV = NULL;
 
-  found_tracksV = (SVDSummaryPlots*)findHist("svdeff/TrackHits@view");
-  matched_clusV = (SVDSummaryPlots*)findHist("svdeff/MatchedHits@view");
+  //Efficiency for the V side
+  TH2F* found_tracksV = (TH2F*)findHist("svdeff/TrackHitsV");
+  TH2F* matched_clusV = (TH2F*)findHist("svdeff/MatchedHitsV");
+
+  B2INFO("DQMHistAnalysisSVDEfficiency: before cycle.");
 
   if (matched_clusV == NULL || found_tracksV == NULL) {
-    B2INFO("Histograms not found");
+    B2INFO("Histograms needed for Efficiency computation are not found");
     m_cEfficiencyV->SetFillColor(kRed);
   } else {
+    B2INFO("V-side Before loop on sensors, size :" << m_SVDModules.size());
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
-      effV = matched_clusV->getValue(m_SVDModules[i], 0) / found_tracksV->getValue(m_SVDModules[i], 0);
+      B2INFO("module " << i << "," << m_SVDModules[i]);
+      int bin = found_tracksV->FindBin(m_SVDModules[i].getLadderNumber(), findBinY(m_SVDModules[i].getLayerNumber(),
+                                       m_SVDModules[i].getSensorNumber()));
+      float numV = matched_clusV->GetBinContent(bin);
+      float denV = found_tracksV->GetBinContent(bin);
+      if (denV > 0)
+        effV = numV / denV;
+      else
+        effV = -1;
+
+      B2INFO("effV  = " << numV << "/" << denV << " = " << effV);
       m_hEfficiency->fill(m_SVDModules[i], 0, effV);
-      erreffV = std::sqrt(effV * (1 - effV));
+      if (effV == -1)
+        erreffV = -1;
+      else
+        erreffV = std::sqrt(effV * (1 - effV));
+
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV);
 
       if (effV <= m_effEmpty) {
@@ -193,10 +242,18 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       }
     }
   }
+
+  B2INFO("DQMHistAnalysisSVDEfficiency: after cycle.");
+
+
   //update summary
   m_cEfficiencyU->cd();
-  m_hEfficiency->getHistogram(1)->Draw();
+  B2INFO("mah");
+  if (m_hEfficiency->getHistogram(1) == nullptr)
+    B2INFO("segmentation violation in arrivo");
 
+  m_hEfficiency->getHistogram(1)->Draw("boxtext");
+  B2INFO("mah2");
   if (m_effUstatus == 0) {
     m_cEfficiencyU->SetFillColor(kGreen);
     m_cEfficiencyU->SetFrameFillColor(10);
@@ -218,7 +275,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_legEmpty->Draw("same");
     }
   }
-  m_cEfficiencyU->Draw();
+  m_cEfficiencyU->Draw("text");
   m_cEfficiencyU->Update();
   m_cEfficiencyU->Modified();
   m_cEfficiencyU->Update();
@@ -226,7 +283,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   //update summary
   m_cEfficiencyV->cd();
-  m_hEfficiency->getHistogram(0)->Draw();
+  m_hEfficiency->getHistogram(0)->Draw("boxtext");
 
   if (m_effVstatus == 0) {
     m_cEfficiencyV->SetFillColor(kGreen);
@@ -249,6 +306,26 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_legEmpty->Draw("same");
     }
   }
+
+  m_cEfficiencyV->Draw();
+  m_cEfficiencyV->Update();
+  m_cEfficiencyV->Modified();
+  m_cEfficiencyV->Update();
+
+  m_cEfficiencyErrU->cd();
+  m_hEfficiencyErr->getHistogram(1)->Draw("colztext");
+  m_cEfficiencyErrU->Draw();
+  m_cEfficiencyErrU->Update();
+  m_cEfficiencyErrU->Modified();
+  m_cEfficiencyErrU->Update();
+
+  m_cEfficiencyErrV->cd();
+  m_hEfficiencyErr->getHistogram(0)->Draw("colztext");
+  m_cEfficiencyErrV->Draw();
+  m_cEfficiencyErrV->Update();
+  m_cEfficiencyErrV->Modified();
+  m_cEfficiencyErrV->Update();
+
 
 }
 
@@ -278,4 +355,19 @@ void DQMHistAnalysisSVDEfficiencyModule::terminate()
   delete m_hEfficiencyErr;
   delete m_cEfficiencyErrU;
   delete m_cEfficiencyErrV;
+}
+
+Int_t DQMHistAnalysisSVDEfficiencyModule::findBinY(Int_t layer, Int_t sensor)
+{
+
+  if (layer == 3)
+    return sensor; //2
+  if (layer == 4)
+    return 2 + 1 + sensor; //6
+  if (layer == 5)
+    return 6 + 1 + sensor; // 11
+  if (layer == 6)
+    return 11 + 1 + sensor; // 17
+  else
+    return -1;
 }

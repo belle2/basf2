@@ -122,8 +122,8 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_cEfficiencyErrV = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrV");
 
 
-  m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies for the @view/@side Side");
-  m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors for the @view/@side Side");
+  m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
+  m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -154,7 +154,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   //  Int_t palette[colNum] {kBlack,  kGreen, kOrange, kRed};
   //  gStyle->SetPalette(colNum, palette);
   gStyle->SetOptStat(0);
-  gStyle->SetPaintTextFormat("2.3f");
+  gStyle->SetPaintTextFormat("2.1f");
 
 
   //Efficiency for the U side
@@ -179,12 +179,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       else
         effU = -1;
       B2INFO("effU  = " << numU << "/" << denU << " = " << effU);
-      m_hEfficiency->fill(m_SVDModules[i], 1, effU);
+      m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       if (effU == -1)
         erreffU = -1;
       else
-        erreffU = std::sqrt(effU * (1 - effU));
-      m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU);
+        erreffU = std::sqrt(effU * (1 - effU) / denU);
+      m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
 
       if (effU <= m_effEmpty) {
         if (m_effUstatus < 1) m_effUstatus = 1;
@@ -223,13 +223,13 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         effV = -1;
 
       B2INFO("effV  = " << numV << "/" << denV << " = " << effV);
-      m_hEfficiency->fill(m_SVDModules[i], 0, effV);
+      m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       if (effV == -1)
         erreffV = -1;
       else
-        erreffV = std::sqrt(effV * (1 - effV));
+        erreffV = std::sqrt(effV * (1 - effV) / denV);
 
-      m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV);
+      m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
       if (effV <= m_effEmpty) {
         if (m_effVstatus < 1) m_effVstatus = 1;
@@ -252,7 +252,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   if (m_hEfficiency->getHistogram(1) == nullptr)
     B2INFO("segmentation violation in arrivo");
 
-  m_hEfficiency->getHistogram(1)->Draw("boxtext");
+  m_hEfficiency->getHistogram(1)->Draw("text");
   B2INFO("mah2");
   if (m_effUstatus == 0) {
     m_cEfficiencyU->SetFillColor(kGreen);
@@ -283,7 +283,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   //update summary
   m_cEfficiencyV->cd();
-  m_hEfficiency->getHistogram(0)->Draw("boxtext");
+  m_hEfficiency->getHistogram(0)->Draw("text");
 
   if (m_effVstatus == 0) {
     m_cEfficiencyV->SetFillColor(kGreen);

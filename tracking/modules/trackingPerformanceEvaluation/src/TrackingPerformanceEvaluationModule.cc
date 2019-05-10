@@ -918,20 +918,21 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           const PXDCluster* pxdcl = pxdHit->getCluster();
           RelationVector<PXDTrueHit> pxdth_fromcl = DataStore::getRelationsWithObj<PXDTrueHit>(pxdcl);
 
-          const PXDTrueHit* trueHit = pxdth_fromcl[0];
+          if ((int)pxdth_fromcl.size() != 0) {
+            const PXDTrueHit* trueHit = pxdth_fromcl[0];
 
-          if (trueHit) {
-            int trueHitIndex = trueHit->getArrayIndex();
-            RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&theTrack);
-            for (int mcp = 0; mcp < (int)MCParticles_fromTrack.size(); mcp++) {
-              RelationVector<PXDTrueHit> trueHit_fromMCParticles = DataStore::getRelationsWithObj<PXDTrueHit>(MCParticles_fromTrack[mcp]);
-              for (int th = 0; th < (int)trueHit_fromMCParticles.size(); th++) {
-                if (trueHit_fromMCParticles[th]->getArrayIndex() == trueHitIndex)
-                  isTrueHit = true;
+            if (trueHit) {
+              int trueHitIndex = trueHit->getArrayIndex();
+              RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&theTrack);
+              for (int mcp = 0; mcp < (int)MCParticles_fromTrack.size(); mcp++) {
+                RelationVector<PXDTrueHit> trueHit_fromMCParticles = DataStore::getRelationsWithObj<PXDTrueHit>(MCParticles_fromTrack[mcp]);
+                for (int th = 0; th < (int)trueHit_fromMCParticles.size(); th++) {
+                  if (trueHit_fromMCParticles[th]->getArrayIndex() == trueHitIndex)
+                    isTrueHit = true;
+                }
               }
             }
           }
-
 
         } else if (svdHit2D) {
 

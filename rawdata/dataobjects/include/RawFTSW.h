@@ -219,9 +219,11 @@ namespace Belle2 {
   protected :
     /// To derive from TObject
     /// ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
-    /// ver.3 Add m_access on Mar. 7 2016 but Classde stays 2 for some? reason
+    /// ver.3 Add m_access on Mar. 7 2016 but Classded stays 2 for some(?) reason
     /// ver.4 Add m_version on Feb. 18 2019 for the new format version defined by Nakao-san
-    ClassDef(RawFTSW, 4);
+    /// Reason to stay at *2* is that the persistent content did *not change*
+    /// If necessary: be aware that we have to change this in online and offline at the same time!
+    ClassDef(RawFTSW, 2);
   };
 
   inline void RawFTSW::CheckVersionSetBuffer()

@@ -107,8 +107,11 @@ namespace Belle2 {
     //! @return matching-hit bit pattern
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
 
-    //! @return efficiency vector
-    std::vector<float> getExtEfficiencyVector() const { return m_ExtEfficiencyVector; }
+    //! @return BKLM efficiency vector
+    std::vector<float> getExtBKLMEfficiencyVector() const { return m_ExtBKLMEfficiencyVector; }
+
+    //! @return EKLM efficiency vector
+    //    std::vector<float> getExtEKLMEfficiencyVector() const { return m_ExtEKLMEfficiencyVector; }
 
     //! assign muon PDF value for this extrapolation
     //! @param pdfValue muon PDF value (normalized) for this extrapolation
@@ -210,8 +213,12 @@ namespace Belle2 {
     //! @param pattern bit pattern of matching-hit layers during extrapolation
     void setHitLayerPattern(unsigned int pattern) { m_HitLayerPattern = pattern; }
 
-    //! assign efficiency vector
-    void setExtEfficiencyVector(std::vector<float> efficiencyVector) { m_ExtEfficiencyVector = efficiencyVector; }
+    //! assign BKLMefficiency vector
+    void setExtBKLMEfficiencyVector(const std::vector<float> efficiencyVector) { m_ExtBKLMEfficiencyVector = efficiencyVector; }
+
+    //! assign EKLM efficiency vector
+    //    void setExtEKLMEfficiencyVector(std::vector<float> efficiencyVector) { m_ExtEKLMEfficiencyVector = efficiencyVector; }
+
 
   private:
 
@@ -302,11 +309,15 @@ namespace Belle2 {
     //! bits 15..28 = endcap layers 1..14)
     unsigned int m_HitLayerPattern;
 
-    //! Vector of layer efficiencies
-    std::vector<float> m_ExtEfficiencyVector;
+    //! Vector of BKLM layer efficiencies
+    std::vector<float> m_ExtBKLMEfficiencyVector;
+
+    //! Vector of EKLM layer efficiencies
+    //    std::vector<float> m_ExtEKLMEfficiencyVector;
 
     //! Needed to make the ROOT object storable
     ClassDef(Muid, 6)
+    //    ClassDef(Muid, 7) With EKLM
 
   };
 }

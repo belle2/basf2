@@ -106,8 +106,10 @@ namespace Belle2 {
     int extLayerPattern;
     //! MUID: accumulated bit pattern of layers with matching hits
     int hitLayerPattern;
-    //! MUID: vector of layer efficiencies
-    std::vector<float> extEfficiencyVector;
+    //! MUID: vector of BKLM layer efficiencies
+    std::vector<float> extBKLMEfficiencyVector;
+    //! MUID: vector of EKLM layer efficiencies
+    //    std::vector<float> extEKLMEfficiencyVector;
     //! MUID: flag to indicate that the extrapolated track escaped from the KLM
     bool escaped;
   };

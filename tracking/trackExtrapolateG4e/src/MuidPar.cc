@@ -169,13 +169,9 @@ namespace Belle2 {
   }
 
 
-  double MuidPar::getPDF(const Muid* muid, bool isForward, bool isMuon) const
+  double MuidPar::getPDF(const Muid* muid, bool isForward) const
   {
-    if (isMuon) {
-      return getPDFLayer_muon(muid, isForward) * getPDFRchisq(muid);
-    } else {
-      return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
-    }
+    return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
   }
 
 
@@ -225,54 +221,22 @@ namespace Belle2 {
     //Pdf treatment used to avoid layer inefficiency problems
     double pdf = 1.0;
     unsigned int testBit = 1;
-    float thresholdFraction = 0.33;
-    std::vector<float> extEfficiencyVector = muid->getExtEfficiencyVector();
+    const std::vector<float> extBKLMEfficiencyVector = muid->getExtBKLMEfficiencyVector();
+    int BKLMEfficiencyVectorSize = extBKLMEfficiencyVector.size();
 
-
-    for (int layer = 0; layer <= barrelExtLayer; ++layer) {
-      if ((testBit & extLayerPattern) != 0) {
-        if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
-          //if there are less that a third of hits among the extrapolted path, the track is considered as not a muon
-          if (nBarrelHit <= thresholdFraction * nBarrelExt) {
-            pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]);
+    if (barrelExtLayer + 1 == BKLMEfficiencyVectorSize) { // check the size of the Efficiency Vector
+      for (int layer = 0; layer <= barrelExtLayer; ++layer) {
+        if ((testBit & extLayerPattern) != 0) {
+          if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
+            pdf *= m_LayerPDF[outcome][lastLayer][layer] * extBKLMEfficiencyVector.at(layer);
           } else {
-            pdf *= m_LayerPDF[outcome][lastLayer][layer];
-          }
-        } else {
-          if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
-            //if there are less that a third of hits among the extrapolted path, the track is considered as not a muon
-            if (nBarrelHit <= thresholdFraction * nBarrelExt) {
-              pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]);
-            } else {
-              unsigned int testBitPrev = testBit >> 1;
-              unsigned int testBitNext = testBit << 1;
-              unsigned int testBitNextNext = testBit << 2;
-              if (layer > 0 && ((((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0))
-                                || (((testBitNext & hitLayerPattern) != 0)
-                                    && ((testBitNextNext & hitLayerPattern) != 0)))) {
-                pdf *= m_LayerPDF[outcome][lastLayer][layer];
-              } else {
-                //treatment of inefficient layers using BKLM efficiencies
-                if (isForward) { //select forward BKLM section
-                  if (extEfficiencyVector.at(layer) < 0.5) {
-                    pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - extEfficiencyVector.at(layer)) / 6;
-                  } else if (extEfficiencyVector.at(layer) > 0.5) {
-                    pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * extEfficiencyVector.at(layer);
-                  }
-                }
-                if (!isForward) { //select forward BKLM section
-                  if (extEfficiencyVector.at(layer) < 0.5) {
-                    pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * (1 - extEfficiencyVector.at(layer)) / 6;
-                  } else if (extEfficiencyVector.at(layer) > 0.5) {
-                    pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * extEfficiencyVector.at(layer);
-                  }
-                }
-              }
+            if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
+              pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer] * extBKLMEfficiencyVector.at(layer));
             }
           }
         }
+        testBit <<= 1; // move to next bit
       }
-      testBit <<= 1; // move to next bit
     }
 
     int nEndcapExt = 0;
@@ -285,7 +249,7 @@ namespace Belle2 {
         nEndcapExt += 1; //counting the number of extrapolated EKLM layers
         if ((hitLayerPattern & bit) != 0) {
           outermostEndcapLayerWithHit = layer_new_EKLM;
-          nEndcapHit += ((hitLayerPattern & bit) != 0) ? 1 : 0;//counting the number of EKLM layers with hits in the pattern
+          nEndcapHit += 1;//counting the number of EKLM layers with hits in the pattern
         }
       }
     }
@@ -306,256 +270,10 @@ namespace Belle2 {
     for (int layer = 0; layer <= endcapExtLayer; ++layer) {
       if ((testBit & extLayerPattern) != 0) {
         if ((testBit & hitPattern_EKLM) != 0) {//checking the presence of a hit in the layer
-          //if there are less that a third of hits among the extrapolted path, the track is considered as not a muon
-          if (nBarrelHit + nEndcapHit <= thresholdFraction * (nEndcapExt + nBarrelExt)) {
-            pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
-          } else {
-            pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-          }
-        } else {
-          if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer)) {
-            //if there are less that a third of hits among the extrapolted path, the track is considered as not a muon
-            if (nBarrelHit + nEndcapHit <= thresholdFraction * (nEndcapExt + nBarrelExt)) {
-              pdf *= 1 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-            } else {
-              //treatment of inefficient very lasts EKLM layers
-              if (isForward) {
-                if (layer == 12) {
-                  if ((11 & hitPattern_EKLM) != 0) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-                  } else {
-                    pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
-                  }
-                } else if (layer == 13) {
-                  if (((12 & hitPattern_EKLM) != 0) || ((11 & hitPattern_EKLM) != 0)) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-                  } else {
-                    pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
-                  }
-                } else {
-                  pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
-                }
-              }
-              if (!isForward) {
-                if (layer == 10) {
-                  if ((9 & hitPattern_EKLM) != 0) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-                  } else {
-                    pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
-                  }
-                } else if (layer == 11) {
-                  if (((10 & hitPattern_EKLM) != 0) || ((9 & hitPattern_EKLM) != 0)) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-                  } else {
-                    pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
-                  }
-                } else {
-                  pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
-                }
-              }
-            }
-          }
-        }
-      }
-      testBit <<= 1; // move to next bit
-    }
-
-    return pdf;
-
-  }
-
-
-  double MuidPar::getPDFLayer_muon(const Muid* muid, bool isForward) const
-  {
-
-    // outcome:  0=Not in KLM, 1=Barrel Stop, 2=Endcap Stop, 3=Barrel Exit, 4=Endcap Exit
-
-    int outcome = muid->getOutcome();
-    if ((outcome <= 0) || (outcome > 4)) return 0.0;
-
-    int barrelExtLayer = muid->getBarrelExtLayer();
-    int endcapExtLayer = muid->getEndcapExtLayer();
-    if (barrelExtLayer > MUID_MaxBarrelLayer) return 0.0;
-    if (endcapExtLayer > MUID_MaxForwardEndcapLayer) return 0.0;
-    unsigned int extLayerPattern = muid->getExtLayerPattern();
-    unsigned int hitLayerPattern = muid->getHitLayerPattern();
-
-    // Use finer granularity for non-zero outcome:
-    //  1: stop in barrel
-    //  2: stop in forward endcap (without crossing barrel)
-    //  3: exit from barrel (without crossing endcap)
-    //  4: exit from forward endcap (without crossing barrel)
-    //  5: stop in forward endcap (after crossing barrel)
-    //  6: exit from forward endcap (after crossing barrel)
-    //  7-21: stop in forward endcap (after crossing barrel)
-    //  22-36: stop in backward endcap (after crossing barrel)
-    //  37-51: exit from forward endcap (after crossing barrel)
-    //  52-66: exit from backward endcap (after crossing barrel)
-
-    int lastLayer = barrelExtLayer;
-    if (outcome == 2) { // forward endcap stop (no barrel hits)
-      lastLayer = endcapExtLayer;
-      if (barrelExtLayer < 0) {
-        outcome = isForward ? 2 : 5; // forward or backward endcap stop (no barrel hits)
-      } else {
-        outcome = (isForward ? 7 : 22) + barrelExtLayer; // forward/backward endcap stop (B+E)
-      }
-    } else if (outcome == 4) { // forward endcap exit (no barrel hits)
-      lastLayer = endcapExtLayer;
-      if (barrelExtLayer < 0) {
-        outcome = isForward ? 4 : 6;  // forward or backward endcap exit (no barrel hits)
-      } else {
-        outcome = (isForward ? 37 : 52) + barrelExtLayer; // forward/backward endcap exit (B+E)
-      }
-    }
-
-
-    float thresholdFraction = 0.33;
-    int nBarrelExt = 0;
-    int nBarrelHit = 0;
-    int outermostBarrelLayerWithHit = -1;
-    unsigned int hitPattern_BKLM = 0;
-    for (int layer_new_BKLM = 0; layer_new_BKLM < 15; ++layer_new_BKLM) { // 15 barrel layers
-      unsigned int bit = (1 << layer_new_BKLM);
-      if ((extLayerPattern & bit) != 0) {
-        nBarrelExt += 1; //counting the number of BKLM extrapolated layers
-        if ((hitLayerPattern & bit) != 0) {
-          outermostBarrelLayerWithHit = layer_new_BKLM;
-          nBarrelHit += ((hitLayerPattern & bit) != 0) ? 1 : 0; //counting the number of BKLM layers with hits in the pattern
-        }
-      }
-      // re-write a hit pattern forcing the presence of a hit in each of the layer before the outermost one with a real hit
-      if (nBarrelHit >= thresholdFraction * nBarrelExt) {
-        for (int layer_new_BKLM_bitPattern = 0; layer_new_BKLM_bitPattern < outermostBarrelLayerWithHit; ++layer_new_BKLM_bitPattern) {
-          unsigned int bit_pattern = (1 << layer_new_BKLM_bitPattern);
-          if ((extLayerPattern & bit_pattern) != 0) {
-            hitPattern_BKLM |= bit_pattern;
-          }
-        }
-      }
-    }
-
-
-    double pdf = 1.0;
-    unsigned int testBit = 1;
-    std::vector<float> extEfficiencyVector = muid->getExtEfficiencyVector();
-
-
-    for (int layer = 0; layer <= barrelExtLayer; ++layer) {
-      if ((testBit & extLayerPattern) != 0) {
-        if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
-          pdf *= m_LayerPDF[outcome][lastLayer][layer];
-        } else {
-          if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
-            if (nBarrelHit >= 0.8 *
-                nBarrelExt) { //if there are more than 80% of hits among the extrapolted path, the track is considered as a muon
-              pdf *= m_LayerPDF[outcome][lastLayer][layer];
-            } else {
-              unsigned int testBitPrev = testBit >> 1;
-              unsigned int testBitNext = testBit << 1;
-              unsigned int testBitNextNext = testBit << 2;
-              if (layer > 0 && ((((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0))
-                                || (((testBitNext & hitLayerPattern) != 0)
-                                    && ((testBitNextNext & hitLayerPattern) != 0)))) {
-                pdf *= m_LayerPDF[outcome][lastLayer][layer];
-              } else {
-                //treatment of inefficient layers using BKLM efficiencies
-                if (isForward) { //select forward BKLM section
-                  if (extEfficiencyVector.at(layer) < 0.5) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - extEfficiencyVector.at(layer)) / 6;
-                  } else if (extEfficiencyVector.at(layer) > 0.5) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - extEfficiencyVector.at(layer));
-                  }
-                }
-                if (!isForward) { //select forward BKLM section
-                  if (extEfficiencyVector.at(layer) < 0.5) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - extEfficiencyVector.at(layer)) / 6;
-                  } else if (extEfficiencyVector.at(layer) > 0.5) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer] * (1 - extEfficiencyVector.at(layer));
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      testBit <<= 1; // move to next bit
-    }
-
-    int nEndcapExt = 0;
-    int nEndcapHit = 0;
-    int outermostEndcapLayerWithHit = -1;
-    unsigned int hitPattern_EKLM = 0;
-    for (int layer_new_EKLM = 0; layer_new_EKLM < 14; ++layer_new_EKLM) { // 14 endcap layers
-      unsigned int bit = (0x8000 << layer_new_EKLM);
-      if ((extLayerPattern & bit) != 0) {
-        nEndcapExt += 1;//counting the number of EKLM extrapolated layers
-        if ((hitLayerPattern & bit) != 0) {
-          outermostEndcapLayerWithHit = layer_new_EKLM;
-          nEndcapHit += ((hitLayerPattern & bit) != 0) ? 1 : 0;//counting the number of EKLM layers with hits in the pattern
-        }
-      }
-      // re-write a hit pattern forcing the presence of a hit in each of the layer before the outermost one with a real hit
-      if ((nBarrelHit + nEndcapHit) >= 1) {
-        for (int layer_new_EKLM_bitPattern = 0; layer_new_EKLM_bitPattern < outermostEndcapLayerWithHit;
-             ++layer_new_EKLM_bitPattern) { // 14 endcap layers
-          unsigned int bit_pattern_EKLM = (0x8000 << layer_new_EKLM_bitPattern);
-          if ((extLayerPattern & bit_pattern_EKLM) != 0) {
-            hitPattern_EKLM |= bit_pattern_EKLM;
-          }
-        }
-      }
-    }
-
-    int maxLayer = isForward ? MUID_MaxForwardEndcapLayer : MUID_MaxBackwardEndcapLayer;
-    testBit = 1 << (MUID_MaxBarrelLayer + 1);
-    for (int layer = 0; layer <= endcapExtLayer; ++layer) {
-      if ((testBit & extLayerPattern) != 0) {
-        if ((testBit & hitPattern_EKLM) != 0) {//checking the presence of a hit in the layer
           pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
         } else {
           if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer)) {
-            //if there are more than 80% of hits among the extrapolted path, the track is considered as a muon
-            if (nBarrelHit + nEndcapHit >= 0.8 * (nBarrelExt + nEndcapExt)) {
-              pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-            } else {
-              //treatment of inefficient very lasts EKLM layers
-              if (isForward) {
-                if (layer == 12) {
-                  if ((11 & hitPattern_EKLM) != 0) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-                  } else {
-                    pdf *= (1.0 - std::min(0.9, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]));
-                  }
-                } else if (layer == 13) {
-                  if (((12 & hitPattern_EKLM) != 0) || ((11 & hitPattern_EKLM) != 0)) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-                  } else {
-                    pdf *= (1.0 - std::min(0.9, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]));
-                  }
-                } else {
-                  pdf *= (1.0 - std::min(0.9, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]));
-                }
-              }
-              if (!isForward) {
-                if (layer == 10) {
-                  if ((9 & hitPattern_EKLM) != 0) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-                  } else {
-                    pdf *= (1.0 - std::min(0.9, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]));
-                  }
-                } else if (layer == 11) {
-                  if (((10 & hitPattern_EKLM) != 0) || ((9 & hitPattern_EKLM) != 0)) {
-                    pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
-                  } else {
-                    pdf *= (1.0 - std::min(0.9, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]));
-                  }
-                } else {
-                  pdf *= (1.0 - std::min(0.9, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]));
-                }
-              }
-
-            }
+            pdf *= (1.0 - std::min(0.9, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]));
           }
         }
       }
@@ -563,6 +281,7 @@ namespace Belle2 {
     }
 
     return pdf;
+
   }
 
   double MuidPar::getPDFRchisq(const Muid* muid) const

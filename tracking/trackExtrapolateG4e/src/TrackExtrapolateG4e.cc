@@ -1339,7 +1339,10 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         (*bklmHitUsed)[intersection.hit].insert(std::pair<const Track*, double>(extState.track, intersection.chi2));
         extState.extLayerPattern |= (0x00000001 << intersection.layer);
         //efficiency implementation
-        extState.extEfficiencyVector.push_back(1);
+        extState.extBKLMEfficiencyVector.push_back(1);
+        //  B2INFO("Efficienza layer con hit= "<< m_bklmStripEfficiency->getEfficiency((intersection.isForward ? 1 : 0),
+        //                       intersection.sector + 1, intersection.layer + 1, 1, 1));
+        //  B2INFO("Size vettore efficienze= "<< extState.extBKLMEfficiencyVector.size());
         if (extState.lastBarrelExtLayer < intersection.layer) {
           extState.lastBarrelExtLayer = intersection.layer;
         }
@@ -1376,19 +1379,22 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
             //efficiency storage
             if (m_bklmStripEfficiency.isValid()) {
-              extState.extEfficiencyVector.push_back(m_bklmStripEfficiency->getEfficiency((intersection.isForward ? 1 : 0),
-                                                     intersection.sector + 1, intersection.layer + 1, 1, 1));
+              extState.extBKLMEfficiencyVector.push_back(m_bklmStripEfficiency->getEfficiency((intersection.isForward ? 1 : 0),
+                                                         intersection.sector + 1, intersection.layer + 1, 1, 1));
+              //        B2INFO("Efficienza layer con hit= "<< m_bklmStripEfficiency->getEfficiency((intersection.isForward ? 1 : 0),
+              //                        intersection.sector + 1, intersection.layer + 1, 1, 1));
+              //        B2INFO("Size vettore efficienze= "<< extState.extBKLMEfficiencyVector.size());
             } else {
-              extState.extEfficiencyVector.push_back(0);
+              extState.extBKLMEfficiencyVector.push_back(0);
             }
           } else {
-            extState.extEfficiencyVector.push_back(0);
+            extState.extBKLMEfficiencyVector.push_back(0);
           }
           if (extState.lastBarrelExtLayer < intersection.layer) {
             extState.lastBarrelExtLayer = intersection.layer;
           }
         } else {// extrapolation is crossing a not instrumented section: we need to push_back a value.
-          extState.extEfficiencyVector.push_back(0);
+          extState.extBKLMEfficiencyVector.push_back(0);
         }
       }
     }
@@ -1401,7 +1407,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       fromG4eToPhasespace(g4eState, intersection.covariance);
       if (findMatchingEndcapHit(intersection, extState.track)) {
         extState.extLayerPattern |= (0x00008000 << intersection.layer);
-        extState.extEfficiencyVector.push_back(1);
+        //        extState.extEKLMEfficiencyVector.push_back(1); removed just for now
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
         }
@@ -1430,9 +1436,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-          extState.extEfficiencyVector.push_back(1);
+          //          extState.extEKLMEfficiencyVector.push_back(1); removed just for now
         } else {
-          extState.extEfficiencyVector.push_back(0);
+          //          extState.extEKLMEfficiencyVector.push_back(0); removed just for now
         }
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
@@ -1861,7 +1867,8 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool
   muid->setDegreesOfFreedom(extState.nPoint);
   muid->setExtLayerPattern(extState.extLayerPattern);
   muid->setHitLayerPattern(extState.hitLayerPattern);
-  muid->setExtEfficiencyVector(extState.extEfficiencyVector);
+  muid->setExtBKLMEfficiencyVector(extState.extBKLMEfficiencyVector);
+  //  muid->setExtEKLMEfficiencyVector(extState.extEKLMEfficiencyVector);
 
 // Do likelihood calculation
 
@@ -1883,19 +1890,19 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool
     if ((abs(muid->getPDGCode()) == Const::muon.getPDGCode()) ||
         (abs(muid->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
     if (charge > 0) {
-      muon = m_MuonPlusPar->getPDF(muid, isForward, true);
-      pion = m_PionPlusPar->getPDF(muid, isForward, false);
-      kaon = m_KaonPlusPar->getPDF(muid, isForward, false);
-      proton = m_ProtonPar->getPDF(muid, isForward, false);
-      deuteron = m_DeuteronPar->getPDF(muid, isForward, false);
-      electron = m_PositronPar->getPDF(muid, isForward, false);
+      muon = m_MuonPlusPar->getPDF(muid, isForward);
+      pion = m_PionPlusPar->getPDF(muid, isForward);
+      kaon = m_KaonPlusPar->getPDF(muid, isForward);
+      proton = m_ProtonPar->getPDF(muid, isForward);
+      deuteron = m_DeuteronPar->getPDF(muid, isForward);
+      electron = m_PositronPar->getPDF(muid, isForward);
     } else {
-      muon = m_MuonMinusPar->getPDF(muid, isForward, true);
-      pion = m_PionMinusPar->getPDF(muid, isForward, false);
-      kaon = m_KaonMinusPar->getPDF(muid, isForward, false);
-      proton = m_AntiprotonPar->getPDF(muid, isForward, false);
-      deuteron = m_AntideuteronPar->getPDF(muid, isForward, false);
-      electron = m_ElectronPar->getPDF(muid, isForward, false);
+      muon = m_MuonMinusPar->getPDF(muid, isForward);
+      pion = m_PionMinusPar->getPDF(muid, isForward);
+      kaon = m_KaonMinusPar->getPDF(muid, isForward);
+      proton = m_AntiprotonPar->getPDF(muid, isForward);
+      deuteron = m_AntideuteronPar->getPDF(muid, isForward);
+      electron = m_ElectronPar->getPDF(muid, isForward);
     }
     if (muon > 0.0) logL_mu = log(muon);
     if (pion > 0.0) logL_pi = log(pion);

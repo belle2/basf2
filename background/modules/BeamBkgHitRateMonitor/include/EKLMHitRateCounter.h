@@ -20,9 +20,9 @@
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMChannels.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 
 namespace Belle2 {
 
@@ -108,8 +108,8 @@ namespace Belle2 {
       /** EKLM element numbers. */
       const EKLM::ElementNumbersSingleton* m_ElementNumbers = nullptr;
 
-      /** EKLMChannels. */
-      DBObjPtr<EKLMChannels> m_Channels;
+      /** KLM channel status. */
+      DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
     };
 

@@ -19,8 +19,7 @@
 namespace Belle2 {
   namespace OrcaKinFit {
 
-    BaseSoftConstraint::~BaseSoftConstraint()
-    {}
+    BaseSoftConstraint::~BaseSoftConstraint() = default;
 
   }// end OrcaKinFit namespace
 } // end Belle2 namespace

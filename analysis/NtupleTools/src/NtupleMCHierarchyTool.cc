@@ -33,8 +33,8 @@ void NtupleMCHierarchyTool::setupTree()
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     if (m_InterMediate) {
-      newstrNames.push_back((strNames[iProduct] + "_Daughter0").c_str());
-      newstrNames.push_back((strNames[iProduct] + "_Daughter1").c_str());
+      newstrNames.emplace_back((strNames[iProduct] + "_Daughter0").c_str());
+      newstrNames.emplace_back((strNames[iProduct] + "_Daughter1").c_str());
     } else newstrNames.push_back(strNames[iProduct]);
   }
 

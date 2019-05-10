@@ -59,8 +59,8 @@ namespace TreeFitter {
 
 
   ParticleBase::ParticleBase(const std::string& name) :
-    m_particle(NULL),
-    m_mother(NULL),
+    m_particle(nullptr),
+    m_mother(nullptr),
     m_index(0),
     m_pdgMass(0),
     m_pdgWidth(0),
@@ -88,7 +88,7 @@ namespace TreeFitter {
 
   void ParticleBase::removeDaughter(const ParticleBase* pb)
   {
-    std::vector<ParticleBase*>::iterator iter = std::find(m_daughters.begin(), m_daughters.end(), pb);
+    auto iter = std::find(m_daughters.begin(), m_daughters.end(), pb);
     if (iter != m_daughters.end()) {
       delete *iter;
       m_daughters.erase(iter);
@@ -119,15 +119,15 @@ namespace TreeFitter {
 
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
   {
-    ParticleBase* rc = 0;
+    ParticleBase* rc = nullptr;
 
     if (!mother) { // 'head of tree' particles
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
-        rc = new InternalParticle(particle, 0, forceFitAll);
+        rc = new InternalParticle(particle, nullptr, forceFitAll);
 
       } else {
 
-        rc = new InternalParticle(particle, 0, forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
+        rc = new InternalParticle(particle, nullptr, forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
 
       }
 
@@ -282,7 +282,7 @@ namespace TreeFitter {
 
   const ParticleBase* ParticleBase::locate(Belle2::Particle* particle) const
   {
-    const ParticleBase* rc = (m_particle == particle) ? this : 0;
+    const ParticleBase* rc = (m_particle == particle) ? this : nullptr;
     if (!rc) {
       for (auto* daughter : m_daughters) {
         rc = daughter->locate(particle);

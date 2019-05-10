@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi, Stefano Lacaprara                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,10 +23,10 @@ namespace Belle2 {
 
 
   /**
-   * Vertex data object: contains Btag Vertex and DeltaT
+   * TagVertex data object: contains Btag Vertex and DeltaT
    */
 
-  class Vertex : public RelationsObject {
+  class TagVertex : public RelationsObject {
 
   public:
 
@@ -34,7 +34,7 @@ namespace Belle2 {
       * Default constructor.
       * All private members are set to 0 (all vectors are empty).
       */
-    Vertex()
+    TagVertex()
     {
       m_tagVertex(0) = 0; m_tagVertex(1) = 0; m_tagVertex(2) = 0;
       m_tagVertexPval = 0;
@@ -143,12 +143,12 @@ namespace Belle2 {
     /**
      * Set BTag Vertex
      */
-    void setTagVertex(TVector3 TagVertex);
+    void setTagVertex(const TVector3& TagVertex);
 
     /**
      *  Set BTag Vertex (3x3) error matrix
      */
-    void setTagVertexErrMatrix(TMatrixFSym TagVertexErrMatrix);
+    void setTagVertexErrMatrix(const TMatrixFSym& TagVertexErrMatrix);
 
     /**
      * Set BTag Vertex P value
@@ -168,7 +168,7 @@ namespace Belle2 {
     /**
      * Set generated BTag Vertex
      */
-    void setMCTagVertex(TVector3 MCTagVertex);
+    void setMCTagVertex(const TVector3& MCTagVertex);
 
     /**
      * Set generated Btag PDG code
@@ -240,20 +240,17 @@ namespace Belle2 {
     float m_truthTagVol;                /**< MC tagV component in the direction orthogonal to the boost */
     float m_tagVolErr;                  /**< Error of the tagV component in the direction orthogonal to the boost */
 
-
-
-
     /**
      * Resets 3x3 tag vertex error matrix
      * All elements are set to 0.0
      */
     void resetTagVertexErrorMatrix();
 
-
-    ClassDef(Vertex, 1) /**< class definition */
+    ClassDef(TagVertex, 2) /**<
+                             2. Name to contain "Tag"
+                             1. class definition
+                             */
 
   };
-
-
 
 } // end namespace Belle2

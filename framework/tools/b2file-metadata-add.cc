@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 
   // read the FileMetaData object or create a new one if it doesn't exist
   FileMetaData* fileMetaData = nullptr;
-  TTree* tree = dynamic_cast<TTree*>(file->Get("persistent"));
+  auto* tree = dynamic_cast<TTree*>(file->Get("persistent"));
   TTree* newTree = nullptr;
   if (!tree) {
     fileMetaData = dynamic_cast<FileMetaData*>(file->Get("FileMetaData"));
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
   if (varMap.count("lfn")) fileMetaData->setLfn(lfn);
   if (!dataDescriptions.empty()) {
     for (const auto& keyvalue : dataDescriptions) {
-      size_t pos = keyvalue.find("=");
+      size_t pos = keyvalue.find('=');
       if (pos == std::string::npos) {
         // no '=' in -d argument, assume deletion
         fileMetaData->removeDataDescription(keyvalue);

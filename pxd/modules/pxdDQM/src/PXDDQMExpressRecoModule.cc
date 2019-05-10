@@ -40,14 +40,14 @@ PXDDQMExpressRecoModule::PXDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
   setDescription("PXD DQM module for Express Reco "
-                 "Recommended Number of events for monito is 40 kEvents or more to fill all histograms "
+                 "Recommended Number of events for monitor is 40 kEvents or more to fill all histograms "
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("CutPXDCharge", m_CutPXDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 0.0 ", m_CutPXDCharge);
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
-           std::string("PXDExpReco"));
+           std::string("PXDER"));
 }
 
 

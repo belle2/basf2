@@ -3,7 +3,7 @@
  * Copyright(C) 2016  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Giacomo De Pietro                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,9 @@
 
 /* Belle2 headers. */
 #include <framework/database/DBImportObjPtr.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 
 namespace Belle2 {
@@ -40,6 +42,11 @@ namespace Belle2 {
     void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
     /**
+     * Import channel status.
+     */
+    void importChannelStatus(const KLMChannelStatus* channelStatus);
+
+    /**
      * Import scintillator simulation parameters.
      */
     void importScintillatorDigitizationParameters(
@@ -50,6 +57,12 @@ namespace Belle2 {
      * @param[in] timeConversion Time conversion parameters.
      */
     void importTimeConversion(const KLMTimeConversion* timeConversion);
+
+    /**
+     * Import strip efficiencies.
+     * @param[in] fileName Name of the ROOT file containing the efficiencies.
+     */
+    void importStripEfficiency(std::string fileName);
 
   private:
 

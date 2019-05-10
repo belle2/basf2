@@ -39,6 +39,12 @@ namespace Belle2 {
                                int strip) const;
 
     /**
+     * Get channel number for BKLM.
+     * @param[in] bklmChannel BKLM channel.
+     */
+    uint16_t channelNumberBKLM(int bklmChannel) const;
+
+    /**
      * Get channel number for EKLM.
      * @param[in] endcap Endcap number.
      * @param[in] layer  Layer number.
@@ -48,6 +54,12 @@ namespace Belle2 {
      */
     uint16_t channelNumberEKLM(int endcap, int layer, int sector, int plane,
                                int strip) const;
+
+    /**
+     * Get channel number for EKLM.
+     * @param[in] eklmStrip EKLM strip number.
+     */
+    uint16_t channelNumberEKLM(int eklmStrip) const;
 
   private:
 

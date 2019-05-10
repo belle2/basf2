@@ -178,39 +178,39 @@ namespace Belle2 {
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
         if (m_useMCParticles) {
           B2INFO("   -> MDST source: MCParticles");
-          m_MCParticles2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+          m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
         } else {
           bool chargedFSP = Const::chargedStableSet.contains(Const::ParticleType(abs(pdgCode)));
           if (chargedFSP) {
             B2INFO("   -> MDST source: Tracks");
-            m_Tracks2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_Tracks2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
           if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
             if (m_addDaughters == false) {
               B2INFO("   -> MDST source: ECLClusters");
-              m_ECLClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+              m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
             } else {
               B2INFO("   -> MDST source: V0");
-              m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+              m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
             }
           }
 
           if (abs(pdgCode) == abs(Const::Kshort.getPDGCode())) {
             B2INFO("   -> MDST source: V0");
-            m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode())) {
             B2INFO("   -> MDST source: KLMClusters");
-            m_KLMClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
             B2INFO("   -> MDST source: ECLClusters");
-            m_ECLClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
           if (abs(pdgCode) == abs(Const::Lambda.getPDGCode())) {
             B2INFO("   -> MDST source: V0");
-            m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
         }
         B2INFO("   -> With cuts  : " << cutParameter);
@@ -531,11 +531,11 @@ namespace Belle2 {
         const MCParticle* relMCParticle = mcRelations[iMCParticle];
         double weight = mcRelations.weight(iMCParticle);
         if (relMCParticle)
-          weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
+          weightsAndIndices.emplace_back(relMCParticle->getArrayIndex(), weight);
       }
       // sort descending by weight
-      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(), [](const std::pair<int, double>& left,
-      const std::pair<int, double>& right) {
+      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
+      [](const std::pair<int, double>& left, const std::pair<int, double>& right) {
         return left.second > right.second;
       });
 
@@ -567,9 +567,9 @@ namespace Belle2 {
         Particle* newPart = particles.appendNew(particle);
 
         // set relations to mcparticles
-        for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
-          const MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
-          double weight = weightsAndIndices[j].second;
+        for (auto& weightsAndIndex : weightsAndIndices) {
+          const MCParticle* relMCParticle = mcParticles[weightsAndIndex.first];
+          double weight = weightsAndIndex.second;
 
           // TODO: study this further and avoid hardcoded values
           // set the relation only if the MCParticle(reconstructed Particle)'s
@@ -731,24 +731,23 @@ namespace Belle2 {
   void ParticleLoaderModule::appendDaughtersRecursive(Particle* mother)
   {
     StoreArray<Particle> particles;
-    MCParticle* mcmother = mother->getRelated<MCParticle>();
+    auto* mcmother = mother->getRelated<MCParticle>();
 
     if (!mcmother)
       return;
 
     vector<MCParticle*> mcdaughters = mcmother->getDaughters();
 
-    for (unsigned int i = 0; i < mcdaughters.size(); i++) {
-      Particle particle(mcdaughters[i]);
+    for (auto& mcdaughter : mcdaughters) {
+      Particle particle(mcdaughter);
       Particle* daughter = particles.appendNew(particle);
-      daughter->addRelationTo(mcdaughters[i]);
+      daughter->addRelationTo(mcdaughter);
       mother->appendDaughter(daughter);
 
-      if (mcdaughters[i]->getNDaughters() > 0)
+      if (mcdaughter->getNDaughters() > 0)
         appendDaughtersRecursive(daughter);
     }
   }
 
 
 } // end Belle2 namespace
-

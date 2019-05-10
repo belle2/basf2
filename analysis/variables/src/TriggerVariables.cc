@@ -242,7 +242,7 @@ namespace Belle2 {
           err += "\" was not found. Maybe you misspelled it?\n";
           err += "Here are all possible trigger identifiers: \n";
           auto res = swtr->getResults();
-          for (auto it = res.begin(); it != res.end(); it++) err += it->first + "\n";
+          for (auto& re : res) err += re.first + "\n";
           B2FATAL(err);
         }
         return double(swtcr); // see mdst/dataobjects/include/SoftwareTriggerResult.h

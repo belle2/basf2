@@ -104,7 +104,7 @@ namespace Belle2 {
     return m_types;
   }
 
-  ParticleGenerator::ParticleGenerator(std::string decayString, std::string cutParameter) : m_iParticleType(0),
+  ParticleGenerator::ParticleGenerator(const std::string& decayString, const std::string& cutParameter) : m_iParticleType(0),
     m_listIndexGenerator(),
     m_particleIndexGenerator()
   {
@@ -147,7 +147,7 @@ namespace Belle2 {
 
         if (daughter_i->getLabel() != daughter_j->getLabel()) {
           m_inputListsCollide = true;
-          m_collidingLists.push_back(std::make_pair(i, j));
+          m_collidingLists.emplace_back(i, j);
         }
       }
     }
@@ -180,9 +180,9 @@ namespace Belle2 {
 
     int uniqueID = 1;
 
-    for (unsigned i = 0; i < m_collidingLists.size(); i++) {
-      StoreObjPtr<ParticleList> listA =  m_plists[m_collidingLists[i].first];
-      StoreObjPtr<ParticleList> listB =  m_plists[m_collidingLists[i].second];
+    for (auto& collidingList : m_collidingLists) {
+      StoreObjPtr<ParticleList> listA =  m_plists[collidingList.first];
+      StoreObjPtr<ParticleList> listB =  m_plists[collidingList.second];
 
       bool sameSign = (listA->getPDGCode() == listB->getPDGCode());
 
@@ -224,25 +224,25 @@ namespace Belle2 {
   {
     const Particle* A, *B;
     bool copies = false;
-    for (unsigned i = 0; i < listA.size(); i++) {
-      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(listA[i]) ? true : false;
+    for (int i : listA) {
+      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(i) ? true : false;
 
       if (not aIsAlreadyIn)
-        m_indicesToUniqueIDs[ listA[i] ] = uniqueID++;
+        m_indicesToUniqueIDs[ i ] = uniqueID++;
 
-      for (unsigned j = 0; j < listB.size(); j++) {
-        bool bIsAlreadyIn = m_indicesToUniqueIDs.count(listB[j]) ? true : false;
+      for (int j : listB) {
+        bool bIsAlreadyIn = m_indicesToUniqueIDs.count(j) ? true : false;
 
         if (bIsAlreadyIn)
           continue;
 
         // are these two particles copies
-        A = m_particleArray[ listA[i] ];
-        B = m_particleArray[ listB[j] ];
+        A = m_particleArray[ i ];
+        B = m_particleArray[ j ];
         copies = B->isCopyOf(A);
 
         if (copies)
-          m_indicesToUniqueIDs[ listB[j] ] = m_indicesToUniqueIDs[ listA[i] ];
+          m_indicesToUniqueIDs[ j ] = m_indicesToUniqueIDs[ i ];
       }
     }
   }
@@ -250,11 +250,11 @@ namespace Belle2 {
 
   void ParticleGenerator::fillIndicesToUniqueIDMap(const std::vector<int>& listA, int& uniqueID)
   {
-    for (unsigned i = 0; i < listA.size(); i++) {
-      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(listA[i]) ? true : false;
+    for (int i : listA) {
+      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(i) ? true : false;
 
       if (not aIsAlreadyIn)
-        m_indicesToUniqueIDs[ listA[i] ] = uniqueID++;
+        m_indicesToUniqueIDs[ i ] = uniqueID++;
     }
   }
 
@@ -409,12 +409,12 @@ namespace Belle2 {
 
       if (daughters.empty()) {
         int source = p->getMdstSource();
-        for (unsigned i = 0; i < sources.size(); i++) {
-          if (source == sources[i]) return false;
+        for (int i : sources) {
+          if (source == i) return false;
         }
         sources.push_back(source);
       } else {
-        for (unsigned i = 0; i < daughters.size(); i++) stack.push_back(m_particleArray[daughters[i]]);
+        for (int daughter : daughters) stack.push_back(m_particleArray[daughter]);
       }
     }
     return true;
@@ -436,8 +436,8 @@ namespace Belle2 {
 
   bool ParticleGenerator::inputListsCollide(const std::pair<unsigned, unsigned>& pair) const
   {
-    for (unsigned i = 0; i < m_collidingLists.size(); i++)
-      if (pair == m_collidingLists[i])
+    for (const auto& collidingList : m_collidingLists)
+      if (pair == collidingList)
         return true;
 
     return false;
@@ -478,7 +478,7 @@ namespace Belle2 {
           hypotheses.push_back(p->getECLClusterEHypothesisBit());
         }
       } else {
-        for (unsigned i = 0; i < daughters.size(); i++) stack.push_back(m_particleArray[daughters[i]]);
+        for (int daughter : daughters) stack.push_back(m_particleArray[daughter]);
       }
     }
 

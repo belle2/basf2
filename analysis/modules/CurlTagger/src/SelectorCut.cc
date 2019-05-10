@@ -34,9 +34,7 @@ SelectorCut::SelectorCut(bool belleFlag)
 
 }
 
-SelectorCut::~SelectorCut()
-{
-}
+SelectorCut::~SelectorCut() = default;
 
 std::vector<float> SelectorCut::getVariables(Particle* iPart, Particle* jPart)
 {

@@ -13,7 +13,7 @@
 #include <TVector3.h>
 
 #include <boost/math/special_functions/sign.hpp>
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace HelixParameterIndex;

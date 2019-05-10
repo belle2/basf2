@@ -136,7 +136,8 @@ void DQMHistAnalysisPXDCMModule::event()
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
       outside += hh1->Integral(16, 64);
-      outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
+      // FIXME currently we have to much noise below the line ... thsu excluding this to avoid false alarms
+      // outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside;
       all += current;
       if (current > 1) {

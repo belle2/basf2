@@ -70,9 +70,7 @@ output list. If ``allowMultiRank=True`` that means that there can be more than
 
 }
 
-BestCandidateSelectionModule::~BestCandidateSelectionModule()
-{
-}
+BestCandidateSelectionModule::~BestCandidateSelectionModule() = default;
 
 void BestCandidateSelectionModule::initialize()
 {

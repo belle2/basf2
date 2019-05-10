@@ -145,16 +145,13 @@ Environment::Environment() :
   setExternalsPath(envarExtDir);
 }
 
-
-Environment::~Environment()
-{
-}
+Environment::~Environment() = default;
 
 void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {
   const std::list<ModulePtr>& modules = path->buildModulePathList(true);
 
-  for (ModulePtr m : modules) {
+  for (const ModulePtr& m : modules) {
     if (m->hasProperties(Module::c_Input)) {
       std::vector<std::string> inputFiles = m->getFileNames(false);
       for (const string& file : inputFiles) {

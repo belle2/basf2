@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Lueck, Ulf Stolzenberg, Benjamin Schwenker, Uwe Gebauer        *
+ * Contributors: Gaetano De Marino, Giulia Casarosa       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -75,7 +75,7 @@ namespace Belle2 {
      */
     TVector3 getTrackInterSec(VXD::SensorInfoBase& svdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
 
-    int findClosestCluster(VxdID& vxdid, TVector3 intersection);
+    int findClosestCluster(VxdID& vxdid, TVector3 intersection, bool isU);
 
     bool isCloseToBorder(int u, int v, int checkDistance);
 
@@ -88,6 +88,7 @@ namespace Belle2 {
 
     bool m_cutBorders;
 
+    bool m_saveExpertHistos;
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
 
@@ -106,13 +107,16 @@ namespace Belle2 {
     double m_distcut; //distance cut in cm!
     double m_pcut; //pValue-Cut for tracks
     double m_momCut; //Cut on fitted track momentum
+    double m_ptCut; //Cut on fitted track pt
     unsigned int m_minSVDHits; //Required hits in SVD strips for tracks
     unsigned int m_minPXDHits; //Required hits in PXD for tracks
+    unsigned int m_minCDCHits; //Required hits in CDC for tracks
     int m_maskedDistance; //Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency
     std::map<VxdID, TH2D*> m_h_track_hits;
-    std::map<VxdID, TH2D*> m_h_matched_cluster;
+    std::map<VxdID, TH2D*> m_h_matched_clusterU;
+    std::map<VxdID, TH2D*> m_h_matched_clusterV;
     SVDSummaryPlots* m_TrackHits = nullptr;
     SVDSummaryPlots* m_MatchedHits = nullptr;
 

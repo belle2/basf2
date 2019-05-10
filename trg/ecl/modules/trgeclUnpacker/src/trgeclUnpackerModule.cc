@@ -13,6 +13,7 @@
 // 2.00 : 2018/02/17 : 8 window data (ETM Ver. 100)
 // 3.00 : 2018/07/31 : ETM version dependence included
 // 3.01 : 2019/02/25 : Trigger bit modify
+// 3.10 : 2019/05/10 : Update Trigger summary contaning Cluster information
 //---------------------------------------------------------------
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>

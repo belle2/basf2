@@ -150,7 +150,7 @@ namespace Belle2 {
 
     }
     //! The Class title
-    ClassDef(TRGECLCluster, 2); /*< the class title */
+    ClassDef(TRGECLCluster, 3); /*< the class title */
 
   };
 

@@ -30,6 +30,9 @@ namespace Belle2 {
     //! The cell id of this hit.
     int m_ClusterId;
 
+    //! Revolution clock
+    int m_evt_revo;
+
     //! The # of TC in Cluster.
     int m_NofTCinCluster;
 
@@ -58,14 +61,18 @@ namespace Belle2 {
     //! energy weighted position Z
     double m_Z;
 
+    //! Cluster Phi position
+    double m_Phi;
+    //! Cluster Theta position
+    double m_Theta;
 
     //! The method to set event id
     void setEventId(int eventId) { m_eventId = eventId; }
-
-    //! The method to set cell id
+    //! The method to set cluster id
     void setClusterId(int clusterId) { m_ClusterId = clusterId; }
-
-    //! The method to set maximum energy TC ID
+    //! Set FAM revoultion clock
+    void setEventRevo(int evt_revo) { m_evt_revo = evt_revo; }
+    //! The method to set maximum energy TC ID (Center TC ID)
     void setMaxTCId(int maxtcid) { m_MaxTCId  = maxtcid; }
     //! The method to set Theta Id of maximum TC in Cluster.
     void setMaxThetaId(int maxthetaid) { m_MaxThetaId  = maxthetaid; }
@@ -98,6 +105,9 @@ namespace Belle2 {
 
     //! The method to get cell id
     int getClusterId() const { return m_ClusterId; }
+    //! get FAM revoultion clock
+    int getEventRevo() { return m_evt_revo; }
+
     //! The method to get cell id
     int getNofTCinCluster() const { return m_NofTCinCluster; }
     //! The method to get the Maximum TC  id

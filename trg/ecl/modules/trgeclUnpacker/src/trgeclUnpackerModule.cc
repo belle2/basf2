@@ -35,7 +35,10 @@ TRGECLUnpackerModule::TRGECLUnpackerModule()
   string desc = "TRGECLUnpackerModule(" + version() + ")";
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
+
   B2INFO("trgeclunpacker: Constructor done.");
+
+
 }
 
 TRGECLUnpackerModule::~TRGECLUnpackerModule() {}
@@ -52,6 +55,7 @@ void TRGECLUnpackerModule::initialize()
   m_TRGECLSumArray.registerInDataStore();
   m_TRGECLTCArray.registerInDataStore();
   m_TRGECLEvtArray.registerInDataStore();
+  m_TRGECLClusterArray.registerInDataStore();
 }
 
 void TRGECLUnpackerModule::beginRun() {}
@@ -64,8 +68,9 @@ void TRGECLUnpackerModule::event()
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     iFiness = i;
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      nodeid = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
-      nwords = raw_trgarray[i]->GetDetectorNwords(j, 0);
+      nodeid   = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
+      nwords   = raw_trgarray[i]->GetDetectorNwords(j, 0);
+      trgtype  = raw_trgarray[i]->GetTRGType(j);
       if (nodeid == 0x13) {
         if (nwords < 9) {
           B2ERROR("Consistecy error in unpacker.");
@@ -74,6 +79,7 @@ void TRGECLUnpackerModule::event()
           continue;
         }
         readCOPPEREvent(raw_trgarray[i], j, nwords);
+
         n_basf2evt++;
       }
     }
@@ -93,18 +99,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
 
   int version_check = (rdat[0] >> 12) & 0xf;
   etm_version       = (rdat[0] >> 16) & 0xffff;
-  if (version_check == 15) {
-    if (etm_version >= 115) {
-      checkBuffer_115(rdat, nnn);
-    }
-  } else {
-    checkBuffer_114(rdat, nnn);
-  }
-
-}
-
-void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
-{
+  if (version_check != 15) return;
 
   // Checksum variable
   unsigned char check_sum = (rdat[nnn - 1] >> 24) & 0xFF;
@@ -139,26 +134,26 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
   bool summary_trg      = false;
 
   int data_win          = 0;
-  int evt_revo          = -9999;
 
   // TC
-  int ntc_win           = 0;
+  int ntc_win           =     0;
   bool tc_trg           = false;
   // TC info
-  int tc_id             = 0;
-  int tc_t              = 0;
-  int tc_e              = 0;
-  int conv_tc_t         = 0;
+  int tc_id             =     0;
+  int tc_t              =     0;
+  int tc_e              =     0;
+  int conv_tc_t         =     0;
+  int win3_revo         = -9999;
 
   vector<int> sum_data;
   vector<vector<int>> sum_info;
 
   vector<int> tc_data;
   vector<vector<int>> tc_info;
-
-  bool btrg    = false;
-  int trg_win  = -1;
-  int trg_revo = -1;
+  vector<vector<int>> tc_info_FE1;
+  vector<vector<int>> tc_info_FE2;
+  vector<vector<int>> tc_info_BE1;
+  vector<vector<int>> tc_info_BE2;
 
   // Unpacking ---->
   while (i < nnn - 2) {
@@ -172,6 +167,7 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
       tc_trg = true;
     }
     data_win    = window_num;
+    if (window_num == 3) win3_revo = summary_revo;
 
     if (summary_trg == true) { // Summary on
       sum_data.push_back(data_win);
@@ -182,12 +178,6 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
       sum_info.push_back(sum_data);
       sum_data.clear();
       i = i + 11;
-
-      if (btrg == false) {
-        trg_win  = data_win;
-        trg_revo = summary_revo;
-        btrg = true;
-      }
 
       if (tc_trg == true) { // summary on & TC on
         for (int j = 0; j < ntc_win; j++) {
@@ -201,7 +191,21 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
           tc_data.push_back(conv_tc_t);
           tc_data.push_back(tc_e);
           tc_data.push_back(data_win);
-          tc_info.push_back(tc_data);
+          if (tc_id < 81) {
+            if (tc_id > 75) {
+              tc_info_FE1.push_back(tc_data);
+            } else {
+              tc_info_FE2.push_back(tc_data);
+            }
+          } else if (tc_id > 512) {
+            if (tc_id > 572) {
+              tc_info_BE1.push_back(tc_data);
+            } else {
+              tc_info_BE2.push_back(tc_data);
+            }
+          } else {
+            tc_info.push_back(tc_data);
+          }
           tc_data.clear();
         }
         i = i + ntc_win - 1;
@@ -220,7 +224,21 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
           tc_data.push_back(conv_tc_t);
           tc_data.push_back(tc_e);
           tc_data.push_back(data_win);
-          tc_info.push_back(tc_data);
+          if (tc_id < 81) {
+            if (tc_id > 75) {
+              tc_info_FE1.push_back(tc_data);
+            } else {
+              tc_info_FE2.push_back(tc_data);
+            }
+          } else if (tc_id > 512) {
+            if (tc_id > 572) {
+              tc_info_BE1.push_back(tc_data);
+            } else {
+              tc_info_BE2.push_back(tc_data);
+            }
+          } else {
+            tc_info.push_back(tc_data);
+          }
           tc_data.clear();
         }
         i = i + ntc_win + 1;
@@ -231,53 +249,42 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
     window_num++;
   }
 
-  vector<int> vwin_revo;
-  vwin_revo.clear();
-  int win_revo = -1;
-  for (i = 0; i < 8; i++) {
-    if (btrg == true) {
-      win_revo = trg_revo + i - trg_win;
-      if (win_revo < 0) win_revo += 80;
-      vwin_revo.push_back(win_revo);
-    } else {
-      vwin_revo.push_back(-1);
-    }
-    if (i == 3) evt_revo = win_revo;
-  }
-
   // <---- Unpacking
 
   // Summary
-  int sum_num       = 0;
-  int sum_revo      = 0;
-  int cl_theta[6]   = {0};
-  int cl_phi[6]     = {0};
-  int cl_time[6]    = {0};
-  int cl_energy[6]  = {0};
-  int ncl           = 0;
-  int low_multi     = 0;
-  int b2bhabha_v    = 0;
-  int b2bhabha_s    = 0;
-  int mumu          = 0;
-  int prescale      = 0;
-  int icn_over      = 0;
-  int bg_veto       = 0;
-  int icn           = 0;
-  int etot_type     = 0;
-  int etot          = 0;
-  int b1_type       = 0;
-  int b1bhabha      = 0;
-  int physics       = 0;
-  int time_type     = 0;
-  int time          = 0;
+  int sum_num        = 0;
+  int sum_revo       = 0;
+  int cl_theta[6]    = {0};
+  int cl_phi[6]      = {0};
+  int cl_time[6]     = { -9999};
+  int cl_energy[6]   = {0};
+  int ncl            = 0;
+  int low_multi      = 0;
+  int b2bhabha_v     = 0;
+  int b2bhabha_s     = 0;
+  int mumu           = 0;
+  int prescale       = 0;
+  int icn_over       = 0;
+  int bg_veto        = 0;
+  int icn            = 0;
+  int etot_type      = 0;
+  int etot           = 0;
+  int b1_type        = 0;
+  int b1bhabha       = 0;
+  int physics        = 0;
+  int time_type      = 0;
+  int time           = 0;
 
-  int m_sumNum      = 0;
-  int evt_b1bha     = 0;
-  int evt_b2bha_v   = 0;
-  int evt_b2bha_s   = 0;
-  int evt_mumu      = 0;
-  int evt_prescale  = 0;
-  int evt_phy       = 0;
+  int m_sumNum       = 0;
+
+  TrgEclDataBase database;
+  TrgEclMapping mapping;
+
+  vector<int> cl_1d;
+  vector<vector<int>> cl_2d;
+
+  vector<int> evt_1d_vector;
+  vector<vector<int>> evt_2d_vector;
 
   // Store Summary
   int sum_size = sum_info.size();
@@ -384,6 +391,7 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
         mumu             = 0;
         prescale         = 0;
       }
+
       m_TRGECLSumArray.appendNew();
       m_sumNum = m_TRGECLSumArray.getEntries() - 1;
       m_TRGECLSumArray[m_sumNum]->setEventId(n_basf2evt);
@@ -410,18 +418,51 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
       m_TRGECLSumArray[m_sumNum]->setTime(time);
       m_TRGECLSumArray[m_sumNum]->setTimeType(time_type);
 
-      evt_b1bha    = evt_b1bha    || b1bhabha;
-      evt_b2bha_v  = evt_b2bha_v  || b2bhabha_v;
-      evt_b2bha_s  = evt_b2bha_s  || b2bhabha_s;
-      evt_mumu     = evt_mumu     || mumu;
-      evt_prescale = evt_prescale || prescale;
-      evt_phy      = evt_phy      || physics;
+      for (int k = 0; k < 6; k++) {
+        cl_1d.push_back(cl_theta[k]);
+        cl_1d.push_back(cl_phi[k]);
+        cl_1d.push_back(cl_time[k]);
+        cl_1d.push_back(cl_energy[k]);
+        cl_2d.push_back(cl_1d);
+        cl_1d.clear();
+      }
+      sort(cl_2d.begin(), cl_2d.end(),
+      [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[3] > aa2[3];});
+
+      evt_1d_vector.push_back(abs(sum_num - 3));
+      evt_1d_vector.push_back(sum_revo);
+      evt_1d_vector.push_back(sum_num);
+      evt_1d_vector.push_back(time);
+      for (int k = 0; k < 6; k++) {
+        evt_1d_vector.push_back(cl_2d[k][0]);
+        evt_1d_vector.push_back(cl_2d[k][1]);
+        evt_1d_vector.push_back(cl_2d[k][2]);
+        evt_1d_vector.push_back(cl_2d[k][3]);
+      }
+      evt_1d_vector.push_back(ncl);
+      evt_1d_vector.push_back(low_multi);
+      evt_1d_vector.push_back(b2bhabha_v);
+      evt_1d_vector.push_back(b2bhabha_s);
+      evt_1d_vector.push_back(mumu);
+      evt_1d_vector.push_back(prescale);
+      evt_1d_vector.push_back(icn);
+      evt_1d_vector.push_back(etot_type);
+      evt_1d_vector.push_back(etot);
+      evt_1d_vector.push_back(b1_type);
+      evt_1d_vector.push_back(b1bhabha);
+      evt_1d_vector.push_back(physics);
+      evt_1d_vector.push_back(time_type);
+      evt_2d_vector.push_back(evt_1d_vector);
+      evt_1d_vector.clear();
     }
   } else {
-    memset(cl_theta,    0, sizeof(cl_theta));
-    memset(cl_phi,      0, sizeof(cl_phi));
-    memset(cl_time, -9999, sizeof(cl_time));
-    memset(cl_energy,   0, sizeof(cl_energy));
+
+    for (int k = 0; k < 6; k++) {
+      cl_theta[k]   = 0;
+      cl_phi[k]     = 0;
+      cl_time[k]    = -9999;
+      cl_energy[k]  = 0;
+    }
     ncl        = 0;
     low_multi  = 0;
     b2bhabha_v = 0;
@@ -442,6 +483,7 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
     m_TRGECLSumArray.appendNew();
     m_sumNum = m_TRGECLSumArray.getEntries() - 1;
     m_TRGECLSumArray[m_sumNum]->setEventId(n_basf2evt);
+    m_TRGECLSumArray[m_sumNum]->setSumNum(0);
     m_TRGECLSumArray[m_sumNum]->setCLTheta(cl_theta);
     m_TRGECLSumArray[m_sumNum]->setCLPhi(cl_phi);
     m_TRGECLSumArray[m_sumNum]->setCLTime(cl_time);
@@ -465,14 +507,41 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
   }
 
   // TC & TRG
+  tc_info.insert(tc_info.end(), tc_info_FE1.begin(), tc_info_FE1.end());
+  tc_info.insert(tc_info.end(), tc_info_FE2.begin(), tc_info_FE2.end());
+  tc_info.insert(tc_info.end(), tc_info_BE1.begin(), tc_info_BE1.end());
+  tc_info.insert(tc_info.end(), tc_info_BE2.begin(), tc_info_BE2.end());
+
   int m_evtNum   = 0;
-  int evt_ntc    = tc_info.size();
-  int evt_timing = -9999;
-  int evt_win    = 0;
-  int evt_etot   = 0;
-  int evt_etot_p = 0;
+
+  int tot_ntc          = tc_info.size();
+  int evt_ntc          = 0;
+  int evt_revo         = -9999;
+  int evt_win          = 0;
+  int evt_timing       = -9999;
+  int evt_cl_theta[6]  = {0};
+  int evt_cl_phi[6]    = {0};
+  int evt_cl_time[6]   = { -9999};
+  int evt_cl_energy[6] = {0};
+  int evt_ncl          = 0;
+  int evt_low_multi    = 0;
+  int evt_b2bhabha_v   = 0;
+  int evt_b2bhabha_s   = 0;
+  int evt_mumu         = 0;
+  int evt_prescale     = 0;
+  int evt_icn          = 0;
+  int evt_etot_type    = 0;
+  int evt_etot         = 0;
+  int evt_b1_type      = 0;
+  int evt_b1bhabha     = 0;
+  int evt_physics      = 0;
+  int evt_time_type    = 0;
+  int cl_tcid = 0;
+  int cl_thetaid = 0;
+  int cl_phiid = 0;
 
   int m_tcNum    = 0;
+  int m_clNum    = 0;
   int m_tcid     = 0;
   int m_time     = -9999;
   int m_energy   = 0;
@@ -480,28 +549,75 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
   int m_revo     = 0;
   int m_caltime  = -9999;
 
-  if (evt_ntc != 0 && flag_checksum == 0 && nnn > 7) {
-    // Find most energetic TC timing
-    sort(tc_info.begin(), tc_info.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
-    evt_timing = tc_info[0][1];
-    evt_win    = tc_info[0][3];
+  int evt_v_size = evt_2d_vector.size();
+  if (evt_v_size != 0) {
+    // Sort window : 3 => 4 => 2 => 5 => 1 => 6 => 7
+    sort(evt_2d_vector.begin(), evt_2d_vector.end(),
+    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] <= aa2[0];});
+  }
+
+  if (tot_ntc != 0 && flag_checksum == 0 && nnn > 7) {
+    if (evt_v_size == 0) {
+      // Find most energetic TC timing
+      sort(tc_info.begin(), tc_info.end(),
+      [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
+      evt_revo         = win3_revo;
+      evt_win          = tc_info[0][3];
+      evt_timing       = tc_info[0][1];
+      for (int k = 0; k < 6; k++) {
+        evt_cl_theta[k]  = 0;
+        evt_cl_phi[k]    = 0;
+        evt_cl_time[k]   = 0;
+        evt_cl_energy[k] = 0;
+      }
+      evt_ncl          = 0;
+      evt_low_multi    = 0;
+      evt_b2bhabha_v   = 0;
+      evt_b2bhabha_s   = 0;
+      evt_mumu         = 0;
+      evt_prescale     = 0;
+      evt_icn          = 0;
+      evt_etot_type    = 0;
+      evt_etot         = 0;
+      evt_b1_type      = 0;
+      evt_b1bhabha     = 0;
+      evt_physics      = 0;
+      evt_time_type    = 0;
+    } else {
+      evt_revo   = evt_2d_vector[0][1];
+      evt_win    = evt_2d_vector[0][2];
+      evt_timing = evt_2d_vector[0][3];
+      for (int k = 0; k < 6; k++) {
+        evt_cl_theta[k]  = evt_2d_vector[0][4 + k * 4];
+        evt_cl_phi[k]    = evt_2d_vector[0][5 + k * 4];
+        evt_cl_time[k]   = evt_2d_vector[0][6 + k * 4];
+        evt_cl_energy[k] = evt_2d_vector[0][7 + k * 4];
+      }
+      evt_ncl          = evt_2d_vector[0][28];
+      evt_low_multi    = evt_2d_vector[0][29];
+      evt_b2bhabha_v   = evt_2d_vector[0][30];
+      evt_b2bhabha_s   = evt_2d_vector[0][31];
+      evt_mumu         = evt_2d_vector[0][32];
+      evt_prescale     = evt_2d_vector[0][33];
+      evt_icn          = evt_2d_vector[0][34];
+      evt_etot_type    = evt_2d_vector[0][35];
+      evt_etot         = evt_2d_vector[0][36];
+      evt_b1_type      = evt_2d_vector[0][37];
+      evt_b1bhabha     = evt_2d_vector[0][38];
+      evt_physics      = evt_2d_vector[0][39];
+      evt_time_type    = evt_2d_vector[0][40];
+    }
     // Sort by TC number
     sort(tc_info.begin(), tc_info.end(),
     [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] < aa2[0];});
 
-    for (int ii = 0; ii < evt_ntc; ii++) {
+    for (int ii = 0; ii < tot_ntc; ii++) {
       m_tcid    = tc_info[ii][0];
       m_time    = tc_info[ii][1];
       m_energy  = tc_info[ii][2];
       m_win     = tc_info[ii][3];
-      m_revo    = vwin_revo[3];
-      m_caltime = evt_timing - m_time;
-
-      evt_etot += m_energy;
-      if ((m_tcid < 81 && m_tcid % 5 != 1) || (m_tcid > 80 && m_tcid < 513)) {
-        evt_etot_p += m_energy;
-      }
+      m_revo    = win3_revo;
+      m_caltime = (evt_win - 3) * 128 + evt_timing - m_time;
       m_TRGECLTCArray.appendNew();
       m_tcNum = m_TRGECLTCArray.getEntries() - 1;
       m_TRGECLTCArray[m_tcNum]->setEventId(n_basf2evt);
@@ -512,27 +628,67 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
       m_TRGECLTCArray[m_tcNum]->setRevoFAM(m_revo);
       m_TRGECLTCArray[m_tcNum]->setTCEnergy(m_energy);
       m_TRGECLTCArray[m_tcNum]->setChecksum(flag_checksum);
-    }
 
+      if (m_win == evt_win || m_win == evt_win + 1) evt_ntc++;
+    }
+    for (int icluster = 0; icluster < 6; icluster++) {
+      if (evt_cl_energy[icluster] == 0 || evt_cl_theta[icluster] == 0 || evt_cl_phi[icluster] == 0) {continue;}
+      cl_tcid = mapping.getTCIdFromPosition(evt_cl_theta[icluster], evt_cl_phi[icluster]);
+      if (cl_tcid == 0) {continue;}
+      cl_thetaid = mapping.getTCThetaIdFromTCId(cl_tcid);
+      cl_phiid = mapping.getTCPhiIdFromTCId(cl_tcid);
+
+      m_TRGECLClusterArray.appendNew();
+      m_clNum    =  m_TRGECLClusterArray.getEntries() - 1;
+      m_TRGECLClusterArray[m_clNum] ->setEventId(n_basf2evt);
+      m_TRGECLClusterArray[m_clNum] ->setClusterId(icluster);
+      m_TRGECLClusterArray[m_clNum] ->setEventRevo(evt_revo);
+
+      m_TRGECLClusterArray[m_clNum] ->setMaxTCId(cl_tcid);  // center of Cluster
+      m_TRGECLClusterArray[m_clNum] ->setMaxThetaId(cl_thetaid);
+      m_TRGECLClusterArray[m_clNum] ->setMaxPhiId(cl_phiid);
+      m_TRGECLClusterArray[m_clNum] ->setClusterId(icluster);
+      m_TRGECLClusterArray[m_clNum] ->setEnergyDep((double)evt_cl_energy[icluster] * 5.25); // MeV
+      m_TRGECLClusterArray[m_clNum] ->setTimeAve((double)evt_cl_time[icluster]);
+      m_TRGECLClusterArray[m_clNum]->setPositionX(mapping.getTCPosition(cl_tcid).X());
+      m_TRGECLClusterArray[m_clNum]->setPositionY(mapping.getTCPosition(cl_tcid).Y());
+      m_TRGECLClusterArray[m_clNum]->setPositionZ(mapping.getTCPosition(cl_tcid).Z());
+
+
+
+
+
+
+    }
     m_TRGECLEvtArray.appendNew();
     m_evtNum = m_TRGECLEvtArray.getEntries() - 1;
     m_TRGECLEvtArray[m_evtNum]->setEventId(n_basf2evt);
     m_TRGECLEvtArray[m_evtNum]->setETM(etm_version);
     m_TRGECLEvtArray[m_evtNum]->setL1Revo(l1_revo);
-    m_TRGECLEvtArray[m_evtNum]->setEvtTime(evt_timing);
     m_TRGECLEvtArray[m_evtNum]->setEvtRevo(evt_revo);
     m_TRGECLEvtArray[m_evtNum]->setEvtWin(evt_win);
+    m_TRGECLEvtArray[m_evtNum]->setEvtTime(evt_timing);
     m_TRGECLEvtArray[m_evtNum]->setNTC(evt_ntc);
-    m_TRGECLEvtArray[m_evtNum]->setEtot(evt_etot);
-    m_TRGECLEvtArray[m_evtNum]->setEtotP(evt_etot_p);
-    m_TRGECLEvtArray[m_evtNum]->set3DBhabhaV(evt_b2bha_v);
-    m_TRGECLEvtArray[m_evtNum]->set3DBhabhaS(evt_b2bha_s);
+    m_TRGECLEvtArray[m_evtNum]->setCLTheta(evt_cl_theta);
+    m_TRGECLEvtArray[m_evtNum]->setCLPhi(evt_cl_phi);
+    m_TRGECLEvtArray[m_evtNum]->setCLTime(evt_cl_time);
+    m_TRGECLEvtArray[m_evtNum]->setCLEnergy(evt_cl_energy);
+    m_TRGECLEvtArray[m_evtNum]->setNCL(evt_ncl);
+    m_TRGECLEvtArray[m_evtNum]->setLowMulti(evt_low_multi);
+    m_TRGECLEvtArray[m_evtNum]->set3DBhabhaV(evt_b2bhabha_v);
+    m_TRGECLEvtArray[m_evtNum]->set3DBhabhaS(evt_b2bhabha_s);
     m_TRGECLEvtArray[m_evtNum]->setMumu(evt_mumu);
     m_TRGECLEvtArray[m_evtNum]->setPrescale(evt_prescale);
-    m_TRGECLEvtArray[m_evtNum]->set2DBhabha(evt_b1bha);
-    m_TRGECLEvtArray[m_evtNum]->setPhysics(evt_phy);
+    m_TRGECLEvtArray[m_evtNum]->setICN(evt_icn);
+    m_TRGECLEvtArray[m_evtNum]->setEtotType(evt_etot_type);
+    m_TRGECLEvtArray[m_evtNum]->setEtot(evt_etot);
+    m_TRGECLEvtArray[m_evtNum]->set2DBhabha(evt_b1bhabha);
+    m_TRGECLEvtArray[m_evtNum]->setBhabhaType(evt_b1_type);
+    m_TRGECLEvtArray[m_evtNum]->setPhysics(evt_physics);
+    m_TRGECLEvtArray[m_evtNum]->setTimeType(evt_time_type);
     m_TRGECLEvtArray[m_evtNum]->setCheckSum(flag_checksum);
     m_TRGECLEvtArray[m_evtNum]->setEvtExist(1);
+    m_TRGECLEvtArray[m_evtNum]->setTRGTYPE(trgtype);
   } else {
     m_TRGECLTCArray.appendNew();
     m_tcNum = m_TRGECLTCArray.getEntries() - 1;
@@ -554,200 +710,34 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
     m_TRGECLEvtArray[m_evtNum]->setEvtRevo(-9999);
     m_TRGECLEvtArray[m_evtNum]->setEvtWin(-9999);
     m_TRGECLEvtArray[m_evtNum]->setNTC(0);
-    m_TRGECLEvtArray[m_evtNum]->setEtot(0);
-    m_TRGECLEvtArray[m_evtNum]->setEtotP(0);
+    for (int k = 0; k < 6; k++) {
+      evt_cl_theta[k]  = 0;
+      evt_cl_phi[k]    = 0;
+      evt_cl_time[k]   = -9999;
+      evt_cl_energy[k] = 0;
+    }
+    m_TRGECLEvtArray[m_evtNum]->setCLTheta(evt_cl_theta);
+    m_TRGECLEvtArray[m_evtNum]->setCLPhi(evt_cl_phi);
+    m_TRGECLEvtArray[m_evtNum]->setCLTime(evt_cl_time);
+    m_TRGECLEvtArray[m_evtNum]->setCLEnergy(evt_cl_energy);
+    m_TRGECLEvtArray[m_evtNum]->setNCL(0);
+    m_TRGECLEvtArray[m_evtNum]->setLowMulti(0);
     m_TRGECLEvtArray[m_evtNum]->set3DBhabhaV(0);
     m_TRGECLEvtArray[m_evtNum]->set3DBhabhaS(0);
     m_TRGECLEvtArray[m_evtNum]->setMumu(0);
     m_TRGECLEvtArray[m_evtNum]->setPrescale(0);
+    m_TRGECLEvtArray[m_evtNum]->setICN(0);
+    m_TRGECLEvtArray[m_evtNum]->setEtotType(0);
+    m_TRGECLEvtArray[m_evtNum]->setEtot(0);
     m_TRGECLEvtArray[m_evtNum]->set2DBhabha(0);
+    m_TRGECLEvtArray[m_evtNum]->setBhabhaType(0);
     m_TRGECLEvtArray[m_evtNum]->setPhysics(0);
+    m_TRGECLEvtArray[m_evtNum]->setTimeType(0);
     m_TRGECLEvtArray[m_evtNum]->setCheckSum(flag_checksum);
     m_TRGECLEvtArray[m_evtNum]->setEvtExist(0);
+    m_TRGECLEvtArray[m_evtNum]->setTRGTYPE(trgtype);
   }
 
   return;
 }
 
-void TRGECLUnpackerModule::checkBuffer_114(int* rdat, int nnn)
-{
-
-  unsigned char check_sum = (rdat[nnn - 1] >> 8) & 0xFF;
-
-  unsigned char data_sum  = 0; // checksum
-  unsigned char summary_data[4] = {0};
-  vector<int> tc_info;
-  vector<vector<int>> evt_info;
-
-  int i      = 0;
-  int window = 0;
-  int w_ntc  = 0;
-  int w_revo = 0;
-  int tc_id  = 0;
-  int tc_t   = 0;
-  int tc_e   = 0;
-  int conv_tc_t = 0;
-  int flag_checksum = 0;
-  int ntc     = 0;
-  int l1_revo = 0;
-  int hit_win = 0;
-
-  tc_info.clear();
-  evt_info.clear();
-
-  l1_revo = (rdat[0] >> 16) & 0xffff;
-  data_sum = ((l1_revo >> 8) & 0xFF) + (l1_revo & 0xff);
-
-  while (i < nnn - 1) {
-    summary_data[0] = (rdat[i] >> 8) & 0xff;
-    summary_data[1] =  rdat[i] & 0xff;
-    summary_data[2] = (rdat[i + 1] >> 24) & 0xff;
-    summary_data[3] = (rdat[i + 1] >> 16) & 0xff;
-
-    for (int j = 0; j < 4; j++) {
-      data_sum = data_sum + summary_data[j];
-    }
-    w_ntc  = (summary_data[2] << 8) + summary_data[3];
-    ntc    = ntc + w_ntc;
-    if (window == 3) {
-      w_revo = summary_data[1];
-    }
-
-    if (w_ntc == 0) {
-      i++;
-      window++;
-    } else {
-      for (int j = 0; j < w_ntc; j++) {
-        tc_id     = (rdat[i + 1 + j] >> 3) & 0x3FF;
-        tc_t      = ((rdat[i + 1 + j] & 0x7) << 4) + ((rdat[i + 2 + j] >> 28) & 0xF);
-        conv_tc_t = (window - 3) * 128 + tc_t;
-        tc_e      = (rdat[i + 2 + j] >> 16) & 0xFFF;
-        hit_win   = window;
-        data_sum  = data_sum +
-                    ((rdat[i + 1 + j] >>  8) & 0xff) +
-                    ((rdat[i + 1 + j]) & 0xff) +
-                    ((rdat[i + 2 + j] >> 24) & 0xff) +
-                    ((rdat[i + 2 + j] >> 16) & 0xff);
-
-        tc_info.push_back(tc_id);
-        tc_info.push_back(conv_tc_t);
-        tc_info.push_back(tc_e);
-        tc_info.push_back(hit_win);
-        evt_info.push_back(tc_info);
-
-        tc_info.clear();
-      }
-      i = i + w_ntc + 1;
-      window++;
-    }
-  }
-
-
-  if (check_sum == data_sum) {
-    flag_checksum = 0;
-  } else {
-    flag_checksum = 1;
-  }
-
-  int evt_size   = evt_info.size();
-  int evt_timing = -9999;
-
-  int m_revo;
-  int m_gdl;
-  int m_ntc;
-  int m_tcid;
-  int m_time;
-  int m_caltime;
-  int m_evttime;
-  int m_energy;
-  int m_checksum;
-  int m_hitwin;
-  int m_hitNum;
-  int m_evtNum;
-
-  if (evt_size != 0 && flag_checksum == 0 && nnn > 7) {
-    // Find most energetic TC timing
-    sort(evt_info.begin(), evt_info.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
-    evt_timing = evt_info[0][1];
-
-    // Sort by TC number
-    sort(evt_info.begin(), evt_info.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] < aa2[0];});
-
-    m_gdl      = l1_revo;
-    m_revo     = w_revo;
-    m_ntc      = ntc;
-    m_evttime  = evt_timing;
-    m_checksum = flag_checksum;
-    for (int ii = 0; ii < evt_size; ii++) {
-      m_tcid    = evt_info[ii][0];
-      m_time    = evt_info[ii][1];
-      m_energy  = evt_info[ii][2];
-      m_hitwin  = evt_info[ii][3];
-      m_caltime = evt_timing - m_time;
-
-      m_TRGECLTCArray.appendNew();
-      m_hitNum = m_TRGECLTCArray.getEntries() - 1;
-      m_TRGECLTCArray[m_hitNum]->setEventId(n_basf2evt);
-      m_TRGECLTCArray[m_hitNum]->setTCId(m_tcid);
-      m_TRGECLTCArray[m_hitNum]->setTCTime(m_time);
-      m_TRGECLTCArray[m_hitNum]->setTCCALTime(m_caltime);
-      m_TRGECLTCArray[m_hitNum]->setHitWin(m_hitwin);
-      m_TRGECLTCArray[m_hitNum]->setRevoFAM(m_revo);
-      m_TRGECLTCArray[m_hitNum]->setTCEnergy(m_energy);
-      m_TRGECLTCArray[m_hitNum]->setChecksum(m_checksum);
-    }
-    m_TRGECLEvtArray.appendNew();
-    m_evtNum = m_TRGECLEvtArray.getEntries() - 1;
-    m_TRGECLEvtArray[m_evtNum]->setEventId(n_basf2evt);
-    m_TRGECLEvtArray[m_evtNum]->setNTC(m_ntc);
-    m_TRGECLEvtArray[m_evtNum]->setEvtTime(m_evttime);
-    m_TRGECLEvtArray[m_evtNum]->setL1Revo(m_gdl);
-    m_TRGECLEvtArray[m_evtNum]->setCheckSum(m_checksum);
-
-
-  } else {
-    m_tcid     = 0;
-    if (ntc == 0) {
-      m_ntc = 0;
-    } else {
-      m_ntc = -1;
-    }
-
-    m_energy   = 0;
-    m_hitwin   = -1;
-    m_time     = -9999;
-    m_caltime  = -9999;
-    m_evttime  = -9999;
-    m_revo     = w_revo;
-    m_gdl      = l1_revo;
-    if (flag_checksum == 1) {
-      m_checksum = 1;
-    } else {
-      m_checksum = 2;
-    }
-
-    m_TRGECLTCArray.appendNew();
-    m_hitNum = m_TRGECLTCArray.getEntries() - 1;
-    m_TRGECLTCArray[m_hitNum]->setEventId(n_basf2evt);
-    m_TRGECLTCArray[m_hitNum]->setTCId(m_tcid);
-    m_TRGECLTCArray[m_hitNum]->setTCTime(m_time);
-    m_TRGECLTCArray[m_hitNum]->setTCCALTime(m_caltime);
-    m_TRGECLTCArray[m_hitNum]->setHitWin(m_hitwin);
-    m_TRGECLTCArray[m_hitNum]->setRevoFAM(m_revo);
-    m_TRGECLTCArray[m_hitNum]->setTCEnergy(m_energy);
-    m_TRGECLTCArray[m_hitNum]->setChecksum(m_checksum);
-
-    m_TRGECLEvtArray.appendNew();
-    m_evtNum = m_TRGECLEvtArray.getEntries() - 1;
-    m_TRGECLEvtArray[m_evtNum]->setEventId(n_basf2evt);
-    m_TRGECLEvtArray[m_evtNum]->setNTC(0);
-    m_TRGECLEvtArray[m_evtNum]->setEvtTime(-9999);
-    m_TRGECLEvtArray[m_evtNum]->setL1Revo(m_gdl);
-    m_TRGECLEvtArray[m_evtNum]->setCheckSum(m_checksum);
-
-  }
-
-  return;
-}

@@ -71,6 +71,10 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("trackUFactorDistCut", m_uFactor, "Set a cut on u error of track (factor*err<dist), 0 disables", double(2.0));
   addParam("trackVFactorDistCut", m_vFactor, "Set a cut on v error of track (factor*err<dist), 0 disables", double(2.0));
 
+  addParam("z0minCut", m_z0minCut, "Set a cut z0 minimum in cm (large negativ value eg -9999 disables)", double(-1));
+  addParam("z0maxCut", m_z0maxCut, "Set a cut z0 maximum in cm (large positiv value eg 9999 disables)", double(1));
+  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (and negativ value eg -9999 disables)", double(0.5));
+
   addParam("verboseHistos", m_verboseHistos, "Add more verbose histograms for cuts (not for ereoc)", bool(false));
 }
 
@@ -143,6 +147,9 @@ void PXDDQMEfficiencyModule::event()
       B2ERROR("expect a track fit result for mass");
       continue;
     }
+
+    // Vertex cut
+    if (ptr2->getZ0() < m_z0minCut || ptr2->getZ0() > m_z0maxCut || fabs(ptr2->getD0()) > m_d0Cut) continue;
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();

@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Lueck, Ulf Stolzenberg, Benjamin Schwenker, Uwe Gebauer        *
+ * Contributors: Thomas Lueck, Ulf Stolzenberg, Benjamin Schwenker, Uwe Gebauer, Bjoern Spruck *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -119,6 +119,9 @@ namespace Belle2 {
     double m_momCut; // Cut on fitted track momentum
     double m_pTCut; // Cut on fitted track pT
     unsigned int m_minSVDHits; // Required hits in SVD strips for tracks
+    double m_z0minCut;/**> cut z0 minimum in cm (large negativ value eg -9999 disables)*/
+    double m_z0maxCut;/**> cut z0 maximum in cm (large positiv value eg 9999 disables)*/
+    double m_d0Cut;/**> cut abs(d0) in cm (and negativ value eg -9999 disables)*/
     int m_maskedDistance; // Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency

@@ -21,6 +21,7 @@
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
+#include <TGraphErrors.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
@@ -62,8 +63,8 @@ namespace Belle2 {
     TF1* m_fLandau = nullptr;
     //! Fit the Mean for all modules
     TF1* m_fMean = nullptr;
-    //! Histogram covering all modules
-    TH1F* m_hCharge = nullptr;
+    //! Graph covering all modules
+    TGraphErrors* m_gCharge = nullptr;
     //! Final Canvas
     TCanvas* m_cCharge = nullptr;
 

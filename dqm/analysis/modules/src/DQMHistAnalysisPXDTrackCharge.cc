@@ -36,8 +36,8 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
-  addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
-  addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
+  addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 10.);
+  addParam("RangeHigh", m_rangeHigh, "High border for fit", 100.);
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
@@ -68,16 +68,10 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_TrackCharge").data());
-  m_hCharge = new TH1F("Track Cluster Charge", "Track Cluster Charge; Module; Track Cluster Charge", m_PXDModules.size(), 0,
-                       m_PXDModules.size());
-  m_hCharge->SetDirectory(0);// dont mess with it, this is MY histogram
-  m_hCharge->SetStats(false);
-  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    TString ModuleName = (std::string)m_PXDModules[i];
-    m_hCharge->GetXaxis()->SetBinLabel(i + 1, ModuleName);
-  }
-  //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
-  m_hCharge->Draw("");
+
+  m_gCharge = new TGraphErrors();
+  m_gCharge->SetName("Track_Cluster_Charge");
+  m_gCharge->SetTitle("Track Cluster Charge");
 
   /// FIXME were to put the lines depends ...
 //   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
@@ -93,19 +87,17 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 //   m_line3->SetLineColor(1);
 //   m_line3->SetLineWidth(3);
 
-  /// FIXME : define the range, because its not a landau but now its hard to notice what happens outside!
-
-  m_fLandau = new TF1("f_Landau", "landau", m_rangeLow, m_rangeHigh);
+  m_fLandau = new TF1("f_Landau", "landau(0)", m_rangeLow, m_rangeHigh);
   m_fLandau->SetParameter(0, 1000);
   m_fLandau->SetParameter(1, 50);
   m_fLandau->SetParameter(2, 10);
-  m_fLandau->SetLineColor(4);
-  m_fLandau->SetNpx(60);
-  m_fLandau->SetNumberFitPoints(60);
+  m_fLandau->SetNpx(100);
+  m_fLandau->SetNumberFitPoints(100);
 
-  m_fMean = new TF1("f_Mean", "pol0", 0.5, m_PXDModules.size() - 0.5);
+  m_fMean = new TF1("f_Mean", "pol0", 0, m_PXDModules.size());
   m_fMean->SetParameter(0, 50);
   m_fMean->SetLineColor(5);
+  m_fMean->SetLineStyle(2);
   m_fMean->SetNpx(m_PXDModules.size());
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
@@ -130,9 +122,10 @@ void DQMHistAnalysisPXDTrackChargeModule::beginRun()
 void DQMHistAnalysisPXDTrackChargeModule::event()
 {
   if (!m_cCharge) return;
-  m_hCharge->Reset(); // dont sum up!!!
 
   bool enough = false;
+
+  m_gCharge->Set(0);
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i];
@@ -150,46 +143,70 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       m_fLandau->SetParLimits(1, 10, 80);
       m_fLandau->SetParameter(2, 10);
       m_fLandau->SetParLimits(2, 1, 50);
-      if (hh1->GetEntries() > 100) {
-        hh1->Fit(m_fLandau, "R");
-        m_hCharge->SetBinContent(i + 1, m_fLandau->GetParameter(1));
-        m_hCharge->SetBinError(i + 1, m_fLandau->GetParError(1));
-      } else {
-        m_hCharge->SetBinContent(i + 1, 50);
-        m_hCharge->SetBinError(i + 1, 100);
-      }
-      // m_hCharge->SetBinError(i + 1, m_fLandau->GetParameter(2) * 0.25); // arbitrary scaling
-      // cout << m_fLandau->GetParameter(0) << " " << m_fLandau->GetParameter(1) << " " << m_fLandau->GetParameter(2) << endl;
 
-      // m_hCharge->Fill(i, hh1->GetMean());
+      if (hh1->GetEntries() > 100) {
+        for (int f = 0; f < 5; f++) {
+          hh1->Fit(m_fLandau, "R");
+          m_fLandau->SetRange(m_fLandau->GetParameter(1) - 5, m_fLandau->GetParameter(1) + 50);
+        }
+
+        int p = m_gCharge->GetN();
+        m_gCharge->SetPoint(p, i + 0.5, m_fLandau->GetParameter(1));
+        m_gCharge->SetPointError(p, 0, m_fLandau->GetParError(1));
+      }
       m_cCharge->cd();
       hh1->Draw();
       if (hh1->GetEntries() > 100) m_fLandau->Draw("same");
 
+      m_cCharge->Modified();
+      m_cCharge->Print(TString(hh1->GetTitle()) + TString(".pdf"));
       if (hh1->GetEntries() > 1000) enough = true;
     }
   }
   m_cCharge->cd();
+  m_cCharge->Clear();
+  m_gCharge->SetMinimum(0);
+  m_gCharge->SetMaximum(70);
+  auto ax = m_gCharge->GetXaxis();
+  if (ax) {
+    ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+    for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+      TString ModuleName = (std::string)m_PXDModules[i];
+      ax->SetBinLabel(i + 1, ModuleName);
+    }
+  } else B2ERROR("no axis");
+//   m_cCharge->Clear();
+  m_gCharge->Draw("AP");
+  {
+    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+  }
+  m_cCharge->cd(0);
+  m_cCharge->Modified();
+  m_cCharge->Update();
+  m_cCharge->Print("gg2.pdf");
 
   double data = 0;
   double diff = 0;
-  if (m_hCharge) {
-    double currentMin, currentMax;
-    m_hCharge->Draw("");
+  if (m_gCharge) {
+//     double currentMin, currentMax;
 //     m_line1->Draw();
 //     m_line2->Draw();
 //     m_line3->Draw();
-    m_hCharge->Fit(m_fMean, "R");
-    data = m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
-    m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
-    diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
-    if (0) B2INFO("Mean: " << data << " Max Diff: " << diff);
+    m_gCharge->Fit(m_fMean, "R");
+    data = m_gCharge->GetMean(2); // m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
+    // m_gCharge->GetMinimumAndMaximum(currentMin, currentMax);
+    diff = m_gCharge->GetRMS(
+             2);// RMS of Y  // fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
 
 #ifdef _BELLE2_EPICS
     SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
 #endif
   }
+  m_cCharge->Print("gg3.pdf");
   int status = 0;
 
   if (!enough) {
@@ -198,10 +215,10 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     // status = 0; default
   } else {
     /// FIXME: what is the accpetable limit?
-    if (fabs(data - 50.) > 20. || diff > 30) {
+    if (fabs(data - 30.) > 20. || diff > 30) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
       status = 4;
-    } else if (fabs(data - 50) > 15. || diff > 10) {
+    } else if (fabs(data - 30) > 15. || diff > 10) {
       m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
       status = 3;
     } else {
@@ -210,21 +227,17 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     }
 
     // FIXME overwrite for now
-    m_cCharge->Pad()->SetFillColor(kGreen);// Green
+    // m_cCharge->Pad()->SetFillColor(kGreen);// Green
+
   }
+
+  m_cCharge->Print("gg4.pdf");
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
-  tt->SetTextAngle(90);// Rotated
-  tt->SetTextAlign(12);// Centered
-  tt->Draw();
-
-  m_cCharge->Modified();
-  m_cCharge->Update();
 }
 
 void DQMHistAnalysisPXDTrackChargeModule::endRun()

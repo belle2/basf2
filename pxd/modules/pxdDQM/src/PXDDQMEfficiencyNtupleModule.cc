@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas, Uwe                                              *
+ * Contributors: Bjoern Spruck                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -41,7 +41,7 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", true);
 
-  addParam("pCut", m_pcut, "Set a cut on the track p-value", double(0));
+  addParam("pCut", m_pcut, "Set a cut on the track fit p-value (0=no cut)", double(0));
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 
@@ -50,6 +50,7 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
   addParam("pTCut", m_pTCut, "Set a cut on the track pT in GeV/c, 0 disables", double(0));
 
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
+
 }
 
 

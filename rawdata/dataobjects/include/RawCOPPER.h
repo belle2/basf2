@@ -64,7 +64,7 @@ namespace Belle2 {
     //
 
     //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
-    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) override;
+    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) OVERRIDE_CPP17;
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // POINTER TO "DETECTOR BUFFER"
@@ -102,7 +102,7 @@ namespace Belle2 {
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
-    virtual int GetBufferPos(int n) override;
+    virtual int GetBufferPos(int n) OVERRIDE_CPP17;
 
     //! get buffer pointer of rawcopper header(Currently same as GetBufferPos)
     virtual int* GetRawHdrBufPtr(int n);

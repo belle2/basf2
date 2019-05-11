@@ -9,6 +9,7 @@
 #ifndef RAWFTSWFORMAT_LATEST_H
 #define RAWFTSWFORMAT_LATEST_H
 #include <rawdata/dataobjects/RawFTSWFormat.h>
+#include "rawdata/loggerwrapper.h"
 
 namespace Belle2 {
 
@@ -31,75 +32,75 @@ namespace Belle2 {
     /*     int GetNwords(int n); */
 
     //! Get # of words of header
-    int GetNwordsHeader(int n) override;
+    int GetNwordsHeader(int n) OVERRIDE_CPP17;
 
     //! Get Node # ( should be "TTD " )
-    unsigned int GetFTSWNodeID(int n) override;
+    unsigned int GetFTSWNodeID(int n) OVERRIDE_CPP17;
 
     //! Get event #
-    unsigned int GetEveNo(int n) override;
+    unsigned int GetEveNo(int n) OVERRIDE_CPP17;
 
     //! Get a word containing ctime and trigger type info
-    unsigned int GetTTCtimeTRGType(int n) override;
+    unsigned int GetTTCtimeTRGType(int n) OVERRIDE_CPP17;
 
     //! get unixtime of the trigger
-    unsigned int GetTTUtime(int n) override;
+    unsigned int GetTTUtime(int n) OVERRIDE_CPP17;
 
     //! Get ctime of the trigger
-    int GetTTCtime(int n) override;
+    int GetTTCtime(int n) OVERRIDE_CPP17;
 
     //! Get trgtype
-    int GetTRGType(int n) override;
+    int GetTRGType(int n) OVERRIDE_CPP17;
 
     //! Get timeval from ctime and utime
-    void GetTTTimeVal(int n, struct timeval* tv) override;
+    void GetTTTimeVal(int n, struct timeval* tv) OVERRIDE_CPP17;
 
     //! Get timespec from ctime and utime
-    void GetTTTimeSpec(int n, struct timespec* ts) override;
+    void GetTTTimeSpec(int n, struct timespec* ts) OVERRIDE_CPP17;
 
     //! Get time in ns since epoch from ctime and utime
-    unsigned long long int GetTTTimeNs(int n) override;
+    unsigned long long int GetTTTimeNs(int n) OVERRIDE_CPP17;
 
     //! Get magic number for data corruption check
-    unsigned int GetMagicTrailer(int n) override;
+    unsigned int GetMagicTrailer(int n) OVERRIDE_CPP17;
 
 
 
     //! check the data contents
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
-                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) override;
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) OVERRIDE_CPP17;
 
     //! Exp# (10bit) run# (14bit) restart # (8bit)
-    unsigned int GetExpRunSubrun(int n) override;
+    unsigned int GetExpRunSubrun(int n) OVERRIDE_CPP17;
 
     //! Get run #
-    int GetRunNo(int n) override;
+    int GetRunNo(int n) OVERRIDE_CPP17;
 
 
     //! Get subrun #
-    int GetSubRunNo(int n) override;
+    int GetSubRunNo(int n) OVERRIDE_CPP17;
 
     //! get a word cotaining run # and subrun #
-    int GetRunNoSubRunNo(int n) override;
+    int GetRunNoSubRunNo(int n) OVERRIDE_CPP17;
 
     //! Get Exp #
-    int GetExpNo(int n) override;
+    int GetExpNo(int n) OVERRIDE_CPP17;
 
     //! HER injection = 1 or LER injection = 0
-    int GetIsHER(int n) override;
+    int GetIsHER(int n) OVERRIDE_CPP17;
 
     //! Get time since the last injection
-    unsigned int GetTimeSinceLastInjection(int n) override;
+    unsigned int GetTimeSinceLastInjection(int n) OVERRIDE_CPP17;
 
     //! Get time since the previous trigger
-    unsigned int GetTimeSincePrevTrigger(int n) override;
+    unsigned int GetTimeSincePrevTrigger(int n) OVERRIDE_CPP17;
 
     //! Get a bunch number
-    unsigned int GetBunchNumber(int n) override;
+    unsigned int GetBunchNumber(int n) OVERRIDE_CPP17;
 
     //! Get a frame count
-    unsigned int GetFrameCount(int n) override;
+    unsigned int GetFrameCount(int n) OVERRIDE_CPP17;
 
     //!header format
     enum {

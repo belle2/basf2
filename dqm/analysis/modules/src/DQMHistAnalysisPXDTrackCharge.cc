@@ -230,10 +230,10 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     // status = 0; default
   } else {
     /// FIXME: what is the accpetable limit?
-    if (fabs(data - 30.) > 20. || diff > 10) {
+    if (fabs(data - 30.) > 20. || diff > 12) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
       status = 4;
-    } else if (fabs(data - 30) > 15. || diff > 5) {
+    } else if (fabs(data - 30) > 15. || diff > 8) {
       m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
       status = 3;
     } else {

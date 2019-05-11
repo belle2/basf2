@@ -55,7 +55,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
-  //collect the list of all PXD Modules in the geometry here
+  // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
@@ -140,7 +140,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       hh1 = findHist(m_histogramDirectoryName, name);
     }
     if (hh1) {
-//       B2INFO("Histo " << name << " found in mem");
+
       /// FIXME Replace by a nice fit
       m_fLandau->SetParameter(0, 1000);
       m_fLandau->SetParameter(1, 50);
@@ -179,7 +179,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       ax->SetBinLabel(i + 1, ModuleName);
     }
   } else B2ERROR("no axis");
-//   m_cCharge->Clear();
+
   m_gCharge->SetLineColor(4);
   m_gCharge->SetLineWidth(2);
   m_gCharge->SetMarkerStyle(8);
@@ -193,7 +193,6 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_cCharge->cd(0);
   m_cCharge->Modified();
   m_cCharge->Update();
-  m_cCharge->Print("gg2.pdf");
 
   double data = 0;
   double diff = 0;
@@ -222,7 +221,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
 #endif
   }
-  m_cCharge->Print("gg3.pdf");
+
   int status = 0;
 
   if (!enough) {
@@ -246,8 +245,6 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     // m_cCharge->Pad()->SetFillColor(kGreen);// Green
 
   }
-
-  m_cCharge->Print("gg4.pdf");
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");

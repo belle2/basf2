@@ -21,6 +21,7 @@
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
+#include <TLine.h>
 #include <TGraphErrors.h>
 
 namespace Belle2 {
@@ -68,6 +69,7 @@ namespace Belle2 {
     //! Final Canvas
     TCanvas* m_cCharge = nullptr;
 
+    TLine* m_line_up{}, *m_line_mean{}, *m_line_low{};
 #ifdef _BELLE2_EPICS
     //! Place for EPICS PVs, Mean and maximum deviation
     std::vector <chid> mychid;

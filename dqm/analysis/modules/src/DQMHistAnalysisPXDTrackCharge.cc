@@ -74,18 +74,21 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_gCharge->SetTitle("Track Cluster Charge");
 
   /// FIXME were to put the lines depends ...
-//   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
-//   m_line2 = new TLine(0, 16, m_PXDModules.size(), 16);
-//   m_line3 = new TLine(0, 3, m_PXDModules.size(), 3);
-//   m_line1->SetHorizontal(true);
-//   m_line1->SetLineColor(3);// Green
-//   m_line1->SetLineWidth(3);
-//   m_line2->SetHorizontal(true);
-//   m_line2->SetLineColor(1);// Black
-//   m_line2->SetLineWidth(3);
-//   m_line3->SetHorizontal(true);
-//   m_line3->SetLineColor(1);
-//   m_line3->SetLineWidth(3);
+  m_line_up = new TLine(0, 10, m_PXDModules.size(), 10);
+  m_line_mean = new TLine(0, 16, m_PXDModules.size(), 16);
+  m_line_low = new TLine(0, 3, m_PXDModules.size(), 3);
+  m_line_up->SetHorizontal(true);
+  m_line_up->SetLineColor(kMagenta);// Green
+  m_line_up->SetLineWidth(3);
+  m_line_up->SetLineStyle(7);
+  m_line_mean->SetHorizontal(true);
+  m_line_mean->SetLineColor(kGreen);// Black
+  m_line_mean->SetLineWidth(3);
+  m_line_mean->SetLineStyle(4);
+  m_line_low->SetHorizontal(true);
+  m_line_low->SetLineColor(kMagenta);
+  m_line_low->SetLineWidth(3);
+  m_line_low->SetLineStyle(7);
 
   m_fLandau = new TF1("f_Landau", "landau(0)", m_rangeLow, m_rangeHigh);
   m_fLandau->SetParameter(0, 1000);
@@ -96,8 +99,9 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   m_fMean = new TF1("f_Mean", "pol0", 0, m_PXDModules.size());
   m_fMean->SetParameter(0, 50);
-  m_fMean->SetLineColor(5);
-  m_fMean->SetLineStyle(2);
+  m_fMean->SetLineColor(kYellow);
+  m_fMean->SetLineWidth(3);
+  m_fMean->SetLineStyle(7);
   m_fMean->SetNpx(m_PXDModules.size());
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
@@ -152,7 +156,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
         int p = m_gCharge->GetN();
         m_gCharge->SetPoint(p, i + 0.5, m_fLandau->GetParameter(1));
-        m_gCharge->SetPointError(p, 0, m_fLandau->GetParError(1));
+        m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
       }
       m_cCharge->cd();
       hh1->Draw();
@@ -176,6 +180,9 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     }
   } else B2ERROR("no axis");
 //   m_cCharge->Clear();
+  m_gCharge->SetLineColor(4);
+  m_gCharge->SetLineWidth(2);
+  m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
   {
     auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
@@ -192,14 +199,23 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   double diff = 0;
   if (m_gCharge) {
 //     double currentMin, currentMax;
-//     m_line1->Draw();
-//     m_line2->Draw();
-//     m_line3->Draw();
     m_gCharge->Fit(m_fMean, "R");
-    data = m_gCharge->GetMean(2); // m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
+    double mean = m_gCharge->GetMean(2);
+    double maxi = mean + 15;
+    double mini = mean - 15;
+    m_line_up->SetY1(maxi);
+    m_line_up->SetY2(maxi);
+    m_line_mean->SetY1(mean);
+    m_line_mean->SetY2(mean);
+    m_line_low->SetY1(mini);
+    m_line_low->SetY2(mini);
+    data = mean; // m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
     // m_gCharge->GetMinimumAndMaximum(currentMin, currentMax);
-    diff = m_gCharge->GetRMS(
-             2);// RMS of Y  // fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
+    diff = m_gCharge->GetRMS(2);// RMS of Y
+    // better, max deviation as fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
+    m_line_up->Draw();
+    m_line_mean->Draw();
+    m_line_low->Draw();
 
 #ifdef _BELLE2_EPICS
     SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
@@ -215,10 +231,10 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     // status = 0; default
   } else {
     /// FIXME: what is the accpetable limit?
-    if (fabs(data - 30.) > 20. || diff > 30) {
+    if (fabs(data - 30.) > 20. || diff > 10) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
       status = 4;
-    } else if (fabs(data - 30) > 15. || diff > 10) {
+    } else if (fabs(data - 30) > 15. || diff > 5) {
       m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
       status = 3;
     } else {

@@ -16,7 +16,7 @@
 
 #include <rawdata/RawCOPPERPackerInfo.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>
-#include "rawdata/loggerwrapper.h"
+#include "rawdata/switch_basf2_standalone.h"
 
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */

@@ -15,7 +15,7 @@
 
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */
-#include <rawdata/loggerwrapper.h>
+#include <rawdata/switch_basf2_standalone.h>
 
 //#define TRAILER_SIZE 16
 /* #define   POS_CHKSUM 0 */

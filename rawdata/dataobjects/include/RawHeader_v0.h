@@ -13,7 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 //#include <TObject.h>
-#include <rawdata/loggerwrapper.h>
+#include <rawdata/switch_basf2_standalone.h>
 
 //#include <framework/datastore/DataStore.h>
 

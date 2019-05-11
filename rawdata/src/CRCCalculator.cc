@@ -1,5 +1,5 @@
 #include <rawdata/CRCCalculator.h>
-#include <rawdata/loggerwrapper.h>
+#include <rawdata/switch_basf2_standalone.h>
 #include <string>
 using namespace std;
 

@@ -9,7 +9,7 @@
 #ifndef RAWFTSWFORMAT_V1_H
 #define RAWFTSWFORMAT_V1_H
 #include <rawdata/dataobjects/RawFTSWFormat.h>
-#include "rawdata/loggerwrapper.h"
+#include "rawdata/switch_basf2_standalone.h"
 
 namespace Belle2 {
 

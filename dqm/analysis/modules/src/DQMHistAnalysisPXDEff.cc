@@ -90,9 +90,9 @@ void DQMHistAnalysisPXDEffModule::initialize()
     TString histTitle = "Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     if (m_singleHists) {
       m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
+      m_hEffModules[aPXDModule] = new TEfficiency("HitEff_" + buff, histTitle,
+                                                  m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     }
-    m_hEffModules[aPXDModule] = new TEfficiency("HitEff_" + buff, histTitle,
-                                                m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
   //One bin for each module in the geometry, one histogram for each layer
@@ -135,7 +135,7 @@ void DQMHistAnalysisPXDEffModule::beginRun()
   m_cEffAll->Clear();
 
   for (auto single_cmap : m_cEffModules) {
-    single_cmap.second->Clear();
+    if (single_cmap.second) single_cmap.second->Clear();
   }
 }
 
@@ -176,15 +176,17 @@ void DQMHistAnalysisPXDEffModule::event()
     } else {
       mapHits[aPXDModule] = Hits;
       mapMatches[aPXDModule] = Matches;
-      m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
-      m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
-    }
+      if (m_singleHists) {
+        if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
+          m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
+          m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
 
-    if (m_cEffModules[aPXDModule]) {
-      m_cEffModules[aPXDModule]->cd();
-      m_hEffModules[aPXDModule]->Draw("colz");
-      m_cEffModules[aPXDModule]->Modified();
-      m_cEffModules[aPXDModule]->Update();
+          m_cEffModules[aPXDModule]->cd();
+          m_hEffModules[aPXDModule]->Draw("colz");
+          m_cEffModules[aPXDModule]->Modified();
+          m_cEffModules[aPXDModule]->Update();
+        }
+      }
     }
   }//One-Module histos finished
 

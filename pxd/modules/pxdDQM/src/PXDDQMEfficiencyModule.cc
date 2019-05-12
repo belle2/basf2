@@ -49,7 +49,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("pCut", m_pcut, "Set a cut on the p-value ", double(0));
 
-  addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(true));
+  addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(false));
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
 

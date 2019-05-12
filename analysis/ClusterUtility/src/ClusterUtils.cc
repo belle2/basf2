@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,28 +14,30 @@
 using namespace Belle2;
 
 // -----------------------------------------------------------------------------
-ClusterUtils::ClusterUtils()
-{ }
+ClusterUtils::ClusterUtils() = default;
 
 // -----------------------------------------------------------------------------
-const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
+const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, double mass)
 {
 
   // Use the default vertex from the beam parameters if none is given.
-  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo);
+  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo, mass);
 }
 
 const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                           ECLCluster::EHypothesisBit hypo)
+                                                           ECLCluster::EHypothesisBit hypo, double mass)
 {
 
   // Get particle direction from vertex and reconstructed cluster position.
   TVector3 direction = cluster->getClusterPosition() - vertex;
 
   const double E  = cluster->getEnergy(hypo);
-  const double px = E * sin(direction.Theta()) * cos(direction.Phi());
-  const double py = E * sin(direction.Theta()) * sin(direction.Phi());
-  const double pz = E * cos(direction.Theta());
+  double p = sqrt(E * E - mass * mass);
+  if (std::isnan(p)) // then the cluster was less energetic than the mass provided
+    p = std::numeric_limits<double>::quiet_NaN();
+  const double px = p * sin(direction.Theta()) * cos(direction.Phi());
+  const double py = p * sin(direction.Theta()) * sin(direction.Phi());
+  const double pz = p * cos(direction.Theta());
 
   const TLorentzVector l(px, py, pz, E);
   return l;
@@ -75,9 +77,11 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
   const double energy = cluster->getEnergy(hypo);
   const double theta  = cluster->getTheta();
   const double phi    = cluster->getPhi();
+  // FIXME propagate possibly massive particles through the Jacobian
+  //const double p      = sqrt(energy * energy - mass * mass); // momentum
 
-  const double st    = sin(theta);
-  const double ct    = cos(theta);
+  const double st  = sin(theta);
+  const double ct  = cos(theta);
   const double sp  = sin(phi);
   const double cp  = cos(phi);
 

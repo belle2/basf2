@@ -29,7 +29,7 @@ Bundle::Bundle(bool isTruthBundle)
   }
 }
 
-Bundle::~Bundle() {}
+Bundle::~Bundle() = default;
 
 void Bundle::addParticle(Particle* particle)
 {

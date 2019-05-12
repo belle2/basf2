@@ -16,7 +16,7 @@ BottomoniumGammaUpsilonskimpath = Path()
 
 fileList = ['../BottomoniumGammaUpsilon.dst.root']
 
-inputMdstList('MC9', fileList, path=BottomoniumGammaUpsilonskimpath)
+inputMdstList('default', fileList, path=BottomoniumGammaUpsilonskimpath)
 
 # use standard final state particle lists
 stdPi('loose', path=BottomoniumGammaUpsilonskimpath)
@@ -24,8 +24,6 @@ stdE('loose', path=BottomoniumGammaUpsilonskimpath)
 stdMu('loose', path=BottomoniumGammaUpsilonskimpath)
 
 stdPhotons('loose', path=BottomoniumGammaUpsilonskimpath)
-
-inputMdstList('MC9', fileList, path=BottomoniumGammaUpsilonskimpath)
 
 # Bottomonium Skim
 from skim.quarkonium import *

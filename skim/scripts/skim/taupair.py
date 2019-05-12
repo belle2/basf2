@@ -27,17 +27,16 @@ def SetTauGenericSkimVariables(path=analysis_main):
     * nGoodTracks: number of good tracks in an event
     * netCharge: total net charge of good tracks
     * nTracksS1/nTracksS2: number of good tracks in each hemisphere S1/S2 divided by thrust axis
-    * MinvS1/MinvS2: invariant mass of particles in each hemisphere
-    * E_S1/E_S2: total energy of particles in each hemisphere in CMS
-    * Etot: visibleEnergyOfEventCMS + missingMomentumOfEventCMS (sum of energy of particles and missing momentum in CMS)
-    * E_ECL: total ECL energy of particles
-
+    * invMS1/invMS2: invariant mass of particles in each hemisphere
+    * maxPt: maximum Pt amoung good tracks
+    * E_ECLtrk: total ECL energy of good tracks
     """
     __author__ = "Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = 'pt > 0.1'
-    gammaCuts = 'E > 0.1'
+    trackCuts = 'pt > 0.1 and abs(d0) < 1 and abs(z0) < 5'
+    # trackCuts += ' and -0.8660 < cosTheta < 0.9563'
+    gammaCuts = 'E > 0.15'
     gammaCuts += ' and -0.8660 < cosTheta < 0.9563'
     cutAndCopyList('pi+:tauskim', 'pi+:all', trackCuts, path=path)
     cutAndCopyList('gamma:tauskim', 'gamma:all', gammaCuts, path=path)
@@ -58,17 +57,11 @@ def SetTauGenericSkimVariables(path=analysis_main):
     variables.addAlias('netCharge', 'formula(countInList(pi+:tauskim, charge == 1) - countInList(pi+:tauskim, charge == -1))')
     variables.addAlias('nTracksS1', 'nParticlesInList(pi+:S1)')
     variables.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
-    variables.addAlias('MinvS1', 'invMassInLists(pi+:S1, gamma:S1)')
-    variables.addAlias('MinvS2', 'invMassInLists(pi+:S2, gamma:S2)')
-    variables.addAlias(
-        'E_S1',
-        'formula(useCMSFrame(totalEnergyOfParticlesInList(pi+:S1)) + useCMSFrame(totalEnergyOfParticlesInList(gamma:S1)))')
-    variables.addAlias(
-        'E_S2',
-        'formula(useCMSFrame(totalEnergyOfParticlesInList(pi+:S2)) + useCMSFrame(totalEnergyOfParticlesInList(gamma:S2)))')
-    variables.addAlias('Etot', 'formula(visibleEnergyOfEventCMS + missingMomentumOfEventCMS)')
-    variables.addAlias('E_ECL',
-                       'formula(totalECLEnergyOfParticlesInList(pi+:tauskim)+totalECLEnergyOfParticlesInList(gamma:tauskim))')
+    variables.addAlias('invMS1', 'invMassInLists(pi+:S1, gamma:S1)')
+    variables.addAlias('invMS2', 'invMassInLists(pi+:S2, gamma:S2)')
+    # variables.addAlias('Evis', 'visibleEnergyOfEventCMS')
+    variables.addAlias('maxPt', 'maxPtInList(pi+:tauskim)')
+    variables.addAlias('E_ECLtrk', 'formula(totalECLEnergyOfParticlesInList(pi+:tauskim))')
 
 
 def TauList(path=analysis_main):
@@ -83,10 +76,11 @@ def TauList(path=analysis_main):
         1. :math:`1 <`  No. good tracks :math:`< 7`
         2. :math:`|` net charge :math:`| < 2`
         3. Event divided by thrust axis; No. good tracks in tag side = 1 or 3
-        4. :math:`P_{miss}>0.4` GeV, :math:`5<\\theta_{miss}<150` degree
-        5. :math:`M^2_{miss}<(8.5)^2` GeV, :math:`17<\\theta_{miss}`
-        6. :math:`M_{tag}<1.8` GeV, :math:`E_{tag}<5` GeV
-        7. :math:`E_{tot}<9` GeV or :math:`1<E_{ECL}<9` GeV
+        4. :math:`visibleEnergyOfEventCMS < 10` GeV and :math:`E_{ECLtrk} < 6` GeV
+        5. :math:`M_{tag} < 1.8` GeV
+        6. :math:`visibleEnergyOfEventCMS > 3` GeV or max `P_t > 1` GeV
+        7. :math:`\\theta_{miss}<150`
+        8. :math:`M_{sig} < 2.3` GeV
 
     Returns:
         list name of the TauGeneric skim candidates
@@ -95,23 +89,25 @@ def TauList(path=analysis_main):
 
     SetTauGenericSkimVariables(path=path)
 
-    # Selection criteria
-    applyEventCuts('1 < nGoodTracks < 7', path=path)  # cut1
-    applyEventCuts('-2 < netCharge < 2', path=path)  # cut2
-
-    applyEventCuts('missingMomentumOfEvent > 0.4 and 0.0873 < missingMomentumOfEvent_theta < 2.6180', path=path)  # cut4
-    applyEventCuts('missingMass2OfEvent < 72.25 or missingMomentumOfEvent_theta > 0.2967', path=path)  # cut5
-    applyEventCuts('Etot < 9.0 or 1 < E_ECL < 9', path=path)  # cut7
-
-    applyEventCuts('[[ nTracksS1 == 1 or nTracksS1 == 3 ] and MinvS1 < 1.8 and E_S1 < 5]'
-                   ' or [[ nTracksS2 == 1 or nTracksS2 == 3 ] and MinvS2 < 1.8 and E_S2 < 5]', path=path)  # cut3+cut6
-
-    # not use 'thrustOfEvent < 0.999'  (cut8) for now
-
-    # For skimming, the important thing is if the final particleList is empty or not.
     reconstructDecay('tau+:S1 -> pi+:S1', '', path=path)
     eventParticle = ['tau+:S1']
 
+    # Selection criteria
+    applyCuts('tau+:S1', '1 < nGoodTracks < 7', path=path)  # cut1
+    applyCuts('tau+:S1', '-2 < netCharge < 2', path=path)  # cut2
+
+    # applyCuts('tau+:S1',
+    #          '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and invMS1 < 1.8 ] or '
+    #          '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 ]', path=path)  # cut3+cut5
+    applyCuts('tau+:S1',
+              '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and invMS1 < 1.8 and invMS2 < 2.3 ] or '
+              '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 and invMS1 < 2.3 ]', path=path)  # cut3+cut5+cut8
+
+    applyCuts('tau+:S1', 'visibleEnergyOfEventCMS < 10 and E_ECLtrk < 6', path=path)  # cut4
+    applyCuts('tau+:S1', 'visibleEnergyOfEventCMS > 3 or maxPt > 1', path=path)  # cut6
+    applyCuts('tau+:S1', 'missingMomentumOfEvent_theta < 2.6180', path=path)  # cut7
+
+    # For skimming, the important thing is if the final particleList is empty or not.
     return eventParticle
 
 
@@ -240,3 +236,89 @@ def TauLFVList(flag=1, path=analysis_main):
 
     tau_lfv_lists = tau_lgamma_list + tau_lll_list + tau_lP0_list + tau_lS0_list + tau_lV0_list + tau_lhh_list + tau_bnv_list
     return tau_lfv_lists
+
+
+def SetTauThrustSkimVariables(path=analysis_main):
+    """
+    Set particle lists and variables for TauThrust skim
+
+    * inout particle lists: pi+:all, gamma:all
+
+    * output particle lists: pi+:good, gamma:good, pi+:S1/S2
+
+    * nGoodTracks: number of good tracks in an event
+    * netCharge: total net charge of good tracks
+    * nTracksS1/nTracksS2: number of good tracks in each hemisphere S1/S2 divided by thrust axis
+
+    """
+    __author__ = "Ami Rostomyan, Kenji Inami"
+
+    # Track and gamma cuts
+    trackCuts = '-5.0 < dz < 5.0 and dr < 1.0 and nCDCHits > 0'
+    cutAndCopyList('pi+:good', 'pi+:all', trackCuts, path=path)
+    gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
+    cutAndCopyList('gamma:good', 'gamma:all', gammaCuts, path=path)
+
+    # Get EventShape variables
+    buildEventShape(['pi+:good', 'gamma:good'],
+                    allMoments=False, foxWolfram=False, cleoCones=False,
+                    sphericity=False, jets=False, path=path)
+    buildEventKinematics(['pi+:good', 'gamma:good'], path=path)
+
+    # Split in signal and tag
+    cutAndCopyList('pi+:S1', 'pi+:good', 'cosToThrustOfEvent > 0', path=path)
+    cutAndCopyList('pi+:S2', 'pi+:good', 'cosToThrustOfEvent < 0', path=path)
+
+    variables.addAlias('nGoodTracks', 'nParticlesInList(pi+:good)')
+    variables.addAlias('netCharge', 'formula(countInList(pi+:good, charge == 1) - countInList(pi+:good, charge == -1))')
+    variables.addAlias('nTracksS1', 'nParticlesInList(pi+:S1)')
+    variables.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
+
+
+def TauThrustList(path=analysis_main):
+    """
+    Note:
+        * Skim for Tau decays using thrust
+        * Skim LFN code: 18570700
+        * Channel: :math:`e^+ e^- \\to \\tau^+ \\tau^-`
+        * Skim category: physics, tau
+
+    Criteria:
+        1. :math:`1 <`  No. good tracks :math:`< 7`
+        2. net charge :math:` == 0`
+        3. Event divided by thrust axis; select 1x1, 1x3, 1x5, 3x3 topology
+        4. :math:`0.8 < thrust`
+        5. :math:`visibleEnergyOfEventCMS < 10.4` GeV
+        6. For 1x1 topology, :math:`thrust < 0.99`
+
+    Returns:
+        list name of the TauThrust skim candidates
+    """
+    __author__ = "Ami Rostomyan, Kenji Inami"
+
+    SetTauThrustSkimVariables(path=path)
+
+    reconstructDecay('tau+:thrust -> pi+:S1', '', path=path)
+    eventParticle = ['tau+:thrust']
+
+    # Selection criteria
+    applyCuts('tau+:thrust', '1 < nGoodTracks < 7', path=path)  # cut1
+    applyCuts('tau+:thrust', 'netCharge == 0', path=path)  # cut2
+
+    topologyCuts = '[nTracksS1 == 1 and nTracksS2 == 1]'  # 1x1
+    topologyCuts += ' or [nTracksS1 == 1 and nTracksS2 == 3] or [nTracksS1 == 3 and nTracksS2 == 1]'  # 1x3, 3x1
+    topologyCuts += ' or [nTracksS1 == 1 and nTracksS2 == 5] or [nTracksS1 == 5 and nTracksS2 == 1]'  # 1x5, 5x1
+    topologyCuts += ' or [nTracksS1 == 3 and nTracksS2 == 3]'  # 3x3
+
+    applyCuts('tau+:thrust', topologyCuts, path=path)  # cut3
+
+    applyCuts('tau+:thrust', '0.8 < thrust', path=path)  # cut4
+    applyCuts('tau+:thrust', 'visibleEnergyOfEventCMS < 10.4', path=path)  # cut5
+
+    oneProngPath = create_path()
+    applyCuts('tau+:thrust', 'thrust < 0.99', path=oneProngPath)  # cut6 thrust upper cut for 1x1
+    sigThrustModule = path.add_module('VariableToReturnValue', variable='nGoodTracks')
+    sigThrustModule.if_value('== 2', oneProngPath, AfterConditionPath.CONTINUE)
+
+    # For skimming, the important thing is if the final particleList is empty or not.
+    return eventParticle

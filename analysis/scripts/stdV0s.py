@@ -14,15 +14,15 @@ def stdKshorts(path=analysis_main):
     :math:`0.450 < M < 0.550~GeV`, and for which the vertex fit did not fail, are kept
 
     Note:
-      when filling a particleList, for V0s the whole dacay chain has to be
+      when filling a particleList, for V0s the whole decay chain has to be
       specified (the two daughters as well)
 
     Parameters:
         path (basf2.Path): the path to load the modules
     """
     fillParticleList('K_S0:all -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-    vertexKFit('K_S0:all', 0.0, '', '', path)
-    applyCuts('K_S0:all', '0.450 < M < 0.550', path)
+    vertexRave('K_S0:all', conf_level=0.0, path=path, silence_warning=True)
+    applyCuts('K_S0:all', '0.450 < M < 0.550', path=path)
 
 
 def mergedKshorts(prioritiseV0=True, path=analysis_main):
@@ -42,12 +42,17 @@ def mergedKshorts(prioritiseV0=True, path=analysis_main):
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?
         path (basf2.Path): the path to load the modules
     """
+    # Fill one list from V0
     fillParticleList('K_S0:V0 -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
+    # Reconstruct a second list
     stdPi('all', path=path)  # no quality cuts
-    reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path)
-    V0ListMerger('K_S0:V0', 'K_S0:RD', prioritiseV0, path)  # outputs K_S0:merged
-    vertexKFit('K_S0:merged', 0.0, '', '', path)
-    applyCuts('K_S0:merged', '0.450 < M < 0.550', path)
+    reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
+    # Create merged list, vertex it and run duplicate marker
+    copyLists('K_S0:merged', ['K_S0:V0', 'K_S0:RD'], False, path=path)
+    vertexRave('K_S0:merged', conf_level=0.0, path=path, silence_warning=True)
+    markDuplicate('K_S0:merged', prioritiseV0, path=path)
+    # Select good duplicates with tighter mass window
+    applyCuts('K_S0:merged', 'extraInfo(highQualityVertex) and 0.450 < M < 0.550', path=path)
 
 
 def goodBelleKshort(path=analysis_main):
@@ -61,8 +66,8 @@ def goodBelleKshort(path=analysis_main):
         path (basf2.Path): the path to load the modules
     """
     fillParticleList('K_S0:legacyGoodKS -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-    vertexKFit('K_S0:legacyGoodKS', 0.0, '', '', path)
-    applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path)
+    vertexRave('K_S0:legacyGoodKS', conf_level=0.0, path=path, silence_warning=True)
+    applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path=path)
 
 
 def stdLambdas(path=analysis_main):
@@ -74,15 +79,15 @@ def stdLambdas(path=analysis_main):
     kept.
 
     Note:
-      when filling a particleList, for V0s the whole dacay chain has to be
+      when filling a particleList, for V0s the whole decay chain has to be
       specified (the two daughters as well)
 
     Parameters:
         path (basf2.Path): the path to load the modules
     """
     fillParticleList('Lambda0:all -> p+ pi-', '0.9 < M < 1.3', True, path=path)
-    vertexKFit('Lambda0:all', 0.0, '', '', path)
-    applyCuts('Lambda0:all', '1.10 < M < 1.13', path)
+    vertexRave('Lambda0:all', conf_level=0.0, path=path, silence_warning=True)
+    applyCuts('Lambda0:all', '1.10 < M < 1.13', path=path)
 
 
 def mergedLambdas(prioritiseV0=True, path=analysis_main):
@@ -102,10 +107,15 @@ def mergedLambdas(prioritiseV0=True, path=analysis_main):
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?
         path (basf2.Path): the path to load the modules
     """
+    # Fill one list from V0
     fillParticleList('Lambda0:V0 -> p+ pi-', '0.9 < M < 1.3', True, path=path)
+    # Reconstruct a second list
     stdPi('all', path=path)  # no quality cuts
     stdPr('all', path=path)  # no quality cuts
     reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, True, path=path)
-    V0ListMerger('Lambda0:V0', 'Lambda0:RD', prioritiseV0, path=path)  # outputs Lambda0:merged
-    vertexKFit('Lambda0:merged', 0.0, '', '', path=path)
-    applyCuts('Lambda0:merged', '1.10 < M < 1.13', path=path)
+    # Create merged list, vertex it and run duplicate marker
+    copyLists('Lambda0:merged', ['Lambda0:V0', 'Lambda0:RD'], False, path=path)
+    vertexRave('Lambda0:merged', conf_level=0.0, path=path, silence_warning=True)
+    markDuplicate('Lambda0:merged', prioritiseV0, path=path)
+    # Select good duplicates with tighter mass window
+    applyCuts('Lambda0:merged', 'extraInfo(highQualityVertex) and 1.10 < M < 1.13', path=path)

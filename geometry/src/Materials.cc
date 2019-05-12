@@ -66,8 +66,8 @@ namespace Belle2 {
 
     G4MaterialPropertiesTable* Materials::createProperties(const std::vector<GeoMaterialProperty>& props)
     {
-      if (!props.size()) return 0;
-      G4MaterialPropertiesTable* table = new G4MaterialPropertiesTable();
+      if (!props.size()) return nullptr;
+      auto* table = new G4MaterialPropertiesTable();
       m_PropTables.push_back(table);
       for (const GeoMaterialProperty& prop : props) {
         std::vector<double> energies = prop.getEnergies();
@@ -162,12 +162,12 @@ namespace Belle2 {
           if (component.getIselement()) {
             B2ERROR("createMaterial " << parameters.getName()
                     << ": Cannot calculate density when adding elements, please provde a density");
-            return 0;
+            return nullptr;
           }
           G4Material* mat = getMaterial(component.getName());
           if (!mat) {
             B2ERROR("createMaterial " << parameters.getName() << ": Material '" << component.getName() << "' not found");
-            return 0;
+            return nullptr;
           }
           density += mat->GetDensity() * component.getFraction();
         }
@@ -182,14 +182,14 @@ namespace Belle2 {
           G4Element* cmp = getElement(component.getName());
           if (!cmp) {
             B2ERROR("Cannot create material " << parameters.getName() << ": element " << component.getName() << " not found");
-            return 0;
+            return nullptr;
           }
           mat->AddElement(cmp, component.getFraction());
         } else {
           G4Material* cmp = getMaterial(component.getName());
           if (!cmp) {
             B2ERROR("Cannot create material " << parameters.getName() << ": material " << component.getName() << " not found");
-            return 0;
+            return nullptr;
           }
           mat->AddMaterial(cmp, component.getFraction());
         }
@@ -370,7 +370,7 @@ namespace Belle2 {
       for (G4Element* elm : elements) delete elm;
       elements.clear();
       B2DEBUG(50, "Cleaning G4Isotopes");
-      G4IsotopeTable& isotopes = const_cast<G4IsotopeTable&>(*G4Isotope::GetIsotopeTable());
+      auto& isotopes = const_cast<G4IsotopeTable&>(*G4Isotope::GetIsotopeTable());
       for (G4Isotope* iso : isotopes) delete iso;
       isotopes.clear();
       // delete material and element builder as they keep indices to materials they created :/

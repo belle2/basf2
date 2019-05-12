@@ -35,12 +35,11 @@ namespace Belle2 {
     ParticleFitObject::ParticleFitObject()
       : mass(0), fourMomentum(FourVector(0, 0, 0, 0))
     {
-      for (int i = 0; i < BaseDefs::MAXPAR; i++)
-        paramCycl[i] = -1;
+      for (double& i : paramCycl)
+        i = -1;
     }
 
-    ParticleFitObject::~ParticleFitObject()
-    {}
+    ParticleFitObject::~ParticleFitObject() = default;
 
     ParticleFitObject::ParticleFitObject(const ParticleFitObject& rhs)
       : BaseFitObject(rhs), mass(0), fourMomentum(FourVector(0, 0, 0, 0)), paramCycl{}
@@ -69,7 +68,7 @@ namespace Belle2 {
 
     ParticleFitObject& ParticleFitObject::assign(const BaseFitObject& source)
     {
-      if (const ParticleFitObject* psource = dynamic_cast<const ParticleFitObject*>(&source)) {
+      if (const auto* psource = dynamic_cast<const ParticleFitObject*>(&source)) {
         if (psource != this) {
           BaseFitObject::assign(source);
           mass = psource->mass;
@@ -200,8 +199,8 @@ namespace Belle2 {
     {
       B2INFO("ParticleFitObject::test2ndDerivatives, object " << getName() << "\n");
       const int idim = 100;
-      double* Mnum = new double[idim * idim];
-      double* Mcalc = new double[idim * idim];
+      auto* Mnum = new double[idim * idim];
+      auto* Mcalc = new double[idim * idim];
       for (int i = 0; i < idim * idim; ++i) Mnum[i] = Mcalc[i] = 0;
       addToGlobalChi2DerMatrix(Mcalc, idim);
       double eps = 0.0001;
@@ -309,5 +308,3 @@ namespace Belle2 {
 
   }// end OrcaKinFit namespace
 } // end Belle2 namespace
-
-

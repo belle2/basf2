@@ -193,13 +193,13 @@ public:
       return m_stringStream.str();
     }
 
-    std::stringstream s;
+    std::stringstream tmpBuffer;
     // put the string first
-    s <<  m_stringStream.str();
+    tmpBuffer <<  m_stringStream.str();
     for (auto const& v : m_variables) {
-      s << std::endl << "\t" << v.getName() << " = " << v.getValue();
+      tmpBuffer << std::endl << "\t" << v.getName() << " = " << v.getValue();
     }
-    return s.str();
+    return tmpBuffer.str();
   }
 
   /** Return the constant message part without the variables */

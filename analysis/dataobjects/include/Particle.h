@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Marko Staric                                *
+ * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -166,8 +167,10 @@ namespace Belle2 {
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
      * @param eclCluster pointer to ECLCluster object
+     * @param type the kind of ParticleType we want (photon by default)
      */
-    explicit Particle(const ECLCluster* eclCluster);
+    explicit Particle(const ECLCluster* eclCluster,
+                      const Const::ParticleType& type = Const::photon);
 
     /**
      * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
@@ -518,7 +521,7 @@ namespace Belle2 {
      * @return true if the function returned true for any of the particles it
      *    was applied to
      */
-    bool forEachDaughter(std::function<bool(const Particle*)> function,
+    bool forEachDaughter(const std::function<bool(const Particle*)>& function,
                          bool recursive = true, bool includeSelf = true) const;
 
     /**

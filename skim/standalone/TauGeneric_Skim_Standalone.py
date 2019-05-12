@@ -17,25 +17,25 @@ set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-03-00-03'
 
 skimCode = encodeSkimName('TauGeneric')
-import sys
-import os
-import glob
+
+taugenericskim = Path()
+
 fileList = get_test_file("mixedBGx1", "MC11")
 
-inputMdstList('default', fileList)
+inputMdstList('default', fileList, path=taugenericskim)
 
-stdPi('all')
-stdPhotons('all')
+stdPi('all', path=taugenericskim)
+stdPhotons('all', path=taugenericskim)
 
 # Tau Skim
 from skim.taupair import *
-tauList = TauList()
+tauList = TauList(path=taugenericskim)
 
-skimOutputUdst(skimCode, tauList)
-summaryOfLists(tauList)
+skimOutputUdst(skimCode, tauList, path=taugenericskim)
+summaryOfLists(tauList, path=taugenericskim)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=taugenericskim)
+process(taugenericskim)
 
 # print out the summary
 print(statistics)

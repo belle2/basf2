@@ -14,11 +14,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h> // data store framework
-#include <top/dataobjects/TOPDigit.h>       // data Cherenkov hits
-#include <framework/database/DBObjPtr.h>     // database objects framwork
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPAsicMask.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
-#include <top/dbobjects/TOPCalChannelMask.h> // Umberto's database object
+#include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPPmtInstallation.h>
 #include <top/dbobjects/TOPPmtQE.h>
 #include <top/dbobjects/TOPCalChannelRQE.h>
@@ -52,8 +54,11 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<TOPDigit> m_digits; /**< collection of digits */
+    bool m_printMask; /**< steering parameter: if true print channel mask as set in rec */
 
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
+    StoreObjPtr<TOPAsicMask> m_eventAsicMask; /**< masked asics in firmware */
+    TOPAsicMask m_savedAsicMask; /**< the default ones or a copy from data store */
     DBObjPtr<TOPCalChannelMask> m_channelMask; /**< list of dead/noisy channels */
 
     // those below are used only to check "hasChanged" status

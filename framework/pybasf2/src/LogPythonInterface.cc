@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
@@ -31,7 +32,7 @@ using namespace boost::python;
 
 void LogPythonInterface::setLogLevel(LogConfig::ELogLevel level)
 {
-  LogConfig::ELogLevel overrideLevel = (LogConfig::ELogLevel)Environment::Instance().getLogLevelOverride();
+  auto overrideLevel = (LogConfig::ELogLevel)Environment::Instance().getLogLevelOverride();
   if (overrideLevel != LogConfig::c_Default)
     level = overrideLevel;
 
@@ -134,7 +135,7 @@ dict LogPythonInterface::getLogStatistics()
   dict returnDict;
   LogSystem& logSys = LogSystem::Instance();
   for (int iLevel = 0; iLevel < LogConfig::c_Default; ++iLevel) {
-    LogConfig::ELogLevel logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
+    auto logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
     returnDict[logLevel] = logSys.getMessageCounter(logLevel);
   }
   return returnDict;
@@ -455,7 +456,7 @@ namespace {
    * objects to a std::map<string,string> by using the `str()` operator in
    * python.
    */
-  auto pythonDictToMap(dict d)
+  auto pythonDictToMap(const dict& d)
   {
     std::map<std::string, std::string> result;
     if (d.is_none()) return result;
@@ -474,7 +475,7 @@ namespace {
    * log stream variables. In case of debug messages the first argument is
    * treated as the debug level.
    */
-  void dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, boost::python::dict kwargs)
+  void dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, const boost::python::dict& kwargs)
   {
     int debugLevel = 0;
     const int firstArg = logLevel == LogConfig::c_Debug ? 1 : 0;
@@ -517,47 +518,47 @@ namespace {
   }
 }
 
-boost::python::object LogPythonInterface::logDebug(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logDebug(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2DEBUG
-  dispatchMessage(LogConfig::c_Debug, args, kwargs);
+  dispatchMessage(LogConfig::c_Debug, std::move(args), kwargs);
 #endif
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logInfo(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logInfo(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2INFO
-  dispatchMessage(LogConfig::c_Info, args, kwargs);
+  dispatchMessage(LogConfig::c_Info, std::move(args), kwargs);
 #endif
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logResult(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logResult(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2RESULT
-  dispatchMessage(LogConfig::c_Result, args, kwargs);
+  dispatchMessage(LogConfig::c_Result, std::move(args), kwargs);
 #endif
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logWarning(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logWarning(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2WARNING
-  dispatchMessage(LogConfig::c_Warning, args, kwargs);
+  dispatchMessage(LogConfig::c_Warning, std::move(args), kwargs);
 #endif
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logError(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logError(boost::python::tuple args, const boost::python::dict& kwargs)
 {
-  dispatchMessage(LogConfig::c_Error, args, kwargs);
+  dispatchMessage(LogConfig::c_Error, std::move(args), kwargs);
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logFatal(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logFatal(boost::python::tuple args, const boost::python::dict& kwargs)
 {
-  dispatchMessage(LogConfig::c_Fatal, args, kwargs);
+  dispatchMessage(LogConfig::c_Fatal, std::move(args), kwargs);
   std::exit(1);
   return boost::python::object();
 }

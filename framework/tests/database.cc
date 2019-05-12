@@ -42,7 +42,7 @@ namespace {
     TestHelpers::TempDirCreator m_tempDir; /**< ensure all tests are run inside a temporary directory. */
 
     /** Create a database with a TNamed object and an array of TObjects for experiment 1 to 5 each. */
-    virtual void SetUp()
+    void SetUp() override
     {
       StoreObjPtr<EventMetaData> evtPtr;
       DataStore::Instance().setInitializeActive(true);
@@ -100,7 +100,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
       Database::reset();
@@ -223,7 +223,7 @@ namespace {
     // check iteration on fresh object
     {
       int i = 0;
-      for (auto o : missing) {
+      for (const auto& o : missing) {
         (void)o;
         ++i;
       }
@@ -244,9 +244,8 @@ namespace {
     // check iteration on existing
     {
       int i = 0;
-      for (auto o : objects) {
-        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
-        ++i;
+      for (const auto& o : objects) {
+        EXPECT_EQ(o.GetUniqueID(), ++i);
       }
       EXPECT_EQ(i, 4);
     }
@@ -254,7 +253,7 @@ namespace {
     // check iteration on missing object
     {
       int i = 0;
-      for (auto o : missing) {
+      for (const auto& o : missing) {
         (void)o;
         ++i;
       }
@@ -266,9 +265,8 @@ namespace {
     // check iteration over missing but previously existing
     {
       int i = 0;
-      for (auto o : objects) {
-        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
-        ++i;
+      for (const auto& o : objects) {
+        EXPECT_EQ(o.GetUniqueID(), ++i);
       }
       EXPECT_EQ(i, 0);
     }
@@ -535,7 +533,7 @@ namespace {
     //found in the database during testing, just a override.
     EXPECT_B2FATAL(BFieldManager::getFieldInTesla({0, 0, 0}));
     //Unless we add a new one
-    Belle2::MagneticField* field = new Belle2::MagneticField();
+    auto* field = new Belle2::MagneticField();
     field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
     Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
     //So now it should work again
@@ -561,7 +559,7 @@ namespace {
     DataBaseNoDataStoreTest() : m_event(0, 0, 1) {};
 
     /** Create a database with a TNamed object and an array of TObjects for experiment 1 to 5 each. */
-    virtual void SetUp()
+    void SetUp() override
     {
       switch (m_dbType) {
         case c_local:
@@ -613,7 +611,7 @@ namespace {
     }
 
     /** Just reset the Database, hopefully no DataStore needs resetting */
-    virtual void TearDown()
+    void TearDown() override
     {
       if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
       Database::reset();
@@ -648,7 +646,7 @@ namespace {
     // check iteration on fresh object
     {
       int i = 0;
-      for (auto o : missing) {
+      for (const auto& o : missing) {
         (void)o;
         ++i;
       }
@@ -669,9 +667,8 @@ namespace {
     // check iteration on existing
     {
       int i = 0;
-      for (auto o : objects) {
-        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
-        ++i;
+      for (const auto& o : objects) {
+        EXPECT_EQ(o.GetUniqueID(), ++i);
       }
       EXPECT_EQ(i, 4);
     }
@@ -679,7 +676,7 @@ namespace {
     // check iteration on missing object
     {
       int i = 0;
-      for (auto o : missing) {
+      for (const auto& o : missing) {
         (void)o;
         ++i;
       }
@@ -691,9 +688,8 @@ namespace {
     // check iteration over missing but previously existing
     {
       int i = 0;
-      for (auto o : objects) {
-        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
-        ++i;
+      for (const auto& o : objects) {
+        EXPECT_EQ(o.GetUniqueID(), ++i);
       }
       EXPECT_EQ(i, 0);
     }

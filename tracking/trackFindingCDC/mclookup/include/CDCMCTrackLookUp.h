@@ -22,9 +22,13 @@ namespace Belle2 {
 
     public:
       /// Getter for the singletone instance
-      static
-      const CDCMCTrackLookUp&
-      getInstance();
+      static const CDCMCTrackLookUp& getInstance();
+
+      /// Default constructor, needs to be public for initialization in CDCMCManager
+      CDCMCTrackLookUp() = default;
+      /// Singleton: Delete copy constructor and assignment operator
+      CDCMCTrackLookUp(CDCMCTrackLookUp&) = delete;
+      CDCMCTrackLookUp& operator=(const CDCMCTrackLookUp&) = delete;
 
     };
 

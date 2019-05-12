@@ -34,7 +34,8 @@ namespace Belle2 {
     /// Copy by assignment (if some file on LHS is opened, it is closed during this operation; file pointers not transfered - new file to be opened)
     MilleData& operator=(const MilleData& other);
     /// Construct from other object (pointer to binary file is not transfered - new file has to be opened by new object)
-    MilleData(const MilleData& other) : MergeableNamed(other), m_doublePrecision(other.m_doublePrecision), m_files(other.m_files),
+    MilleData(const MilleData& other) : MergeableNamed(other), m_doublePrecision(other.m_doublePrecision),
+      m_absFilePaths(other.m_absFilePaths), m_files(other.m_files),
       m_binary(nullptr),
       m_numRecords(other.m_numRecords) {}
 

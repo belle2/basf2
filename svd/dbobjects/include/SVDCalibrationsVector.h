@@ -20,22 +20,29 @@ namespace Belle2 {
   class SVDCalibrationsVector {
 
   public:
-    typedef T calibrationType;
-    typedef std::vector< calibrationType > payloadContainerType;
+    typedef T calibrationType; /**< typedef of the calibration type class*/
+    typedef std::vector< calibrationType > payloadContainerType;  /**< typedef of the payload container, one per strip */
 
+    /** default constructor*/
     SVDCalibrationsVector() {};
+
+    /**default destructor*/
     ~SVDCalibrationsVector() {};
+
+    /** get the calibration of the strip*/
     static inline calibrationType get(const payloadContainerType& svdVector, unsigned int strip)
     {
       return svdVector.at(strip);
     }
 
+    /** set the calibration of the strip*/
     static inline void set(payloadContainerType& svdVector, unsigned int strip,
                            calibrationType value)
     {
       svdVector.at(strip) = value;
     }
 
+    /**initialize the calibration vector*/
     static void init(payloadContainerType& svdVector, unsigned int layer,
                      unsigned int /*ladder*/ , unsigned int /*sensor*/,
                      unsigned int side, const T& defaultT)

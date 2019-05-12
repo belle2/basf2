@@ -270,7 +270,9 @@ namespace Belle2 {
                 if (ch < 0) break;
               }
             } else if (type_feb == 0x01) { // Suppressed mode
-              if (length > 144 * 2 + 10) B2FATAL("error " << LogVar("length", length));
+              // The below line is commented since it sometimes causes problem during processing threshold scan data.
+              // No harm to comment this line since it is only utilized for threshold scan data.
+              //if (length > 144 * 2 + 10) B2FATAL("error " << LogVar("length", length));
               //B2INFO("suppreed mode");
               while (ibyte < length) {
                 int ch = calbyte(buf);
@@ -325,15 +327,23 @@ namespace Belle2 {
     head.FEBSlot = line1[0];
 
     // data length
-    char len[4];
+    unsigned char len[4];
     for (int i = 0; i < 4; i++) {
       shift = (3 - ibyte % 4) * 8;
       len[3 - i] = buffer[ibyte / 4] >> shift;
       ibyte++;
     }
 
+    unsigned seu = len[2];
+    // This line (16 bits) is actaully not used for data length.
+    len[2] = 0;
+    len[3] = 0;
     uint32_t* tmp = (uint32_t*)len;
     head.length = *tmp;
+
+    for (int i = 0; i < 6; i ++) {
+      head.SEU_FEB[i] = (seu & (1 << i)) != 0;
+    }
 
     // trigger number
     char trg[4];

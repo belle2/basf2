@@ -62,6 +62,8 @@ namespace Belle2 {
       // TH1F* hDAQErrorPacket{};         /** per packet (event builder input) errors  */
       TH2F* hDAQErrorDHC{};          /** individual DHC errors  */
       TH2F* hDAQErrorDHE{};          /** individual DHE errors  */
+      TH2F* hDAQEndErrorDHC{};  /** individual DHC END errors  */
+      TH2F* hDAQEndErrorDHE{}; /** individual DHE END errors  */
       std::map<VxdID, TH1F*> hDAQDHETriggerGate;/** DHE Trigger Gate ("start Row")  */
       std::map<VxdID, TH1F*> hDAQDHEReduction;/** DHE data reduction  */
       std::map<VxdID, TH2F*> hDAQCM;/** Common Mode per DHE to gate and DHP level */

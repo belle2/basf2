@@ -129,8 +129,8 @@ namespace Belle2 {
         int count = 0;
         if (tmin < 0) tmin = digitTimes[0];
         for (auto t : digitTimes) {
-          if (t >= tmin) ++count;
           if (t > tmax) break;
+          if (t >= tmin) ++count;
         }
         return count;
       }

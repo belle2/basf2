@@ -14,7 +14,7 @@ Set generate_reference = True to generate the reference files.
 """
 
 from validationtest import add_properties
-from ROOT import TFile, TH1F
+from ROOT import TFile, TH1F, TNamed
 import basf2
 
 
@@ -47,6 +47,12 @@ def generate_gaus(title, options, distort=0.):
 
 
 tfile = TFile("validationTestColorScheme.root", "RECREATE")
+
+TNamed(
+    "Description",
+    "These plots test the color scheme. Make sure to also check the 'expert' "
+    "plot checkbox to see the color scheme for expert plots."
+).Write()
 
 mop = {
     'Description': "Test color scheme",

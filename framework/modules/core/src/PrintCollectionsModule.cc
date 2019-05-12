@@ -39,10 +39,7 @@ PrintCollectionsModule::PrintCollectionsModule()
            m_printForEvent);
 }
 
-
-PrintCollectionsModule::~PrintCollectionsModule()
-{
-}
+PrintCollectionsModule::~PrintCollectionsModule() = default;
 
 void PrintCollectionsModule::initialize()
 {
@@ -97,12 +94,12 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //Print the object information
   //-----------------------------
   const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(durability);
-  for (DataStore::StoreEntryConstIter iter = map.begin(); iter != map.end(); ++iter) {
+  for (auto iter = map.begin(); iter != map.end(); ++iter) {
     if (iter->second.isArray)
       continue;
     const TObject* currCol = iter->second.ptr;
 
-    if (currCol != NULL) {
+    if (currCol != nullptr) {
       B2INFO(boost::format("%1% %|20t| %2%") % shorten(currCol->ClassName()) % iter->first);
     }
   }
@@ -111,13 +108,13 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //-----------------------------
   //Print the array information
   //-----------------------------
-  for (DataStore::StoreEntryConstIter iter = map.begin(); iter != map.end(); ++iter) {
+  for (auto iter = map.begin(); iter != map.end(); ++iter) {
     if (!iter->second.isArray)
       continue;
     const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second.ptr);
 
     long entries = 0;
-    if (currCol != NULL)
+    if (currCol != nullptr)
       entries = currCol->GetEntriesFast();
 
     std::string type = shorten(iter->second.objClass->GetName());

@@ -140,6 +140,7 @@ namespace Belle2 {
     m_recBunch.registerInDataStore();
     m_timeZeros.registerInDataStore();
     m_timeZeros.registerRelationTo(extHits);
+    m_eventT0.registerInDataStore(); // usually it is already registered in tracking
 
     // Configure TOP detector for reconstruction
 
@@ -180,6 +181,8 @@ namespace Belle2 {
       m_recBunch->clearReconstructed();
     }
     m_timeZeros.clear();
+
+    if (!m_eventT0.isValid()) m_eventT0.create();
 
     // set MC truth if available
 
@@ -418,6 +421,11 @@ namespace Belle2 {
 
     m_recBunch->setReconstructed(bunchNo, bunchTime, offset, error, m_offset, m_error,
                                  m_fineSearch);
+
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(bunchTime + offset,
+                                                             error,
+                                                             Const::TOP,
+                                                             "bunchFinder"));
     m_success++;
 
     // store T0 of single tracks relative to bunchTime

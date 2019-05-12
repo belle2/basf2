@@ -12,6 +12,8 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
 #include <TClass.h>
+#include <TLatex.h>
+#include <TGraphAsymmErrors.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -41,6 +43,13 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff"));
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
+}
+
+DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
 }
 
 void DQMHistAnalysisPXDEffModule::initialize()
@@ -82,28 +91,36 @@ void DQMHistAnalysisPXDEffModule::initialize()
     if (m_singleHists) {
       m_cEffModules[aPXDModule] = new TCanvas("c_Eff_" + buff);
     }
-    m_hEffModules[aPXDModule] = new TH2D("HitEff_" + buff, histTitle,
-                                         m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
-    m_hEffModules[aPXDModule]->SetStats(false);
+    m_hEffModules[aPXDModule] = new TEfficiency("HitEff_" + buff, histTitle,
+                                                m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
   //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll = new TCanvas("c_EffAll");
 
-  m_hEffAll = new TH1D("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
-                       m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
+                              m_PXDModules.size(), 0, m_PXDModules.size());
 
-  m_hEffAll->SetStats(false);
-  m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
+//   m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
+  m_hEffAll->Paint("AP");
 
-  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    TString ModuleName = (std::string)m_PXDModules[i];
-    m_hEffAll->GetXaxis()->SetBinLabel(i + 1, ModuleName);
+  auto gr = m_hEffAll->GetPaintedGraph();
+
+  if (gr) {
+    auto ax = gr->GetXaxis();
+    if (ax) {
+      ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+        TString ModuleName = (std::string)m_PXDModules[i];
+        ax->SetBinLabel(i + 1, ModuleName);
+        B2RESULT(ModuleName);
+      }
+    }
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
@@ -127,8 +144,8 @@ void DQMHistAnalysisPXDEffModule::event()
 {
 
   //Save the pointers to create the summary hists later
-  std::map<VxdID, TH2D*> mapHits;
-  std::map<VxdID, TH2D*> mapMatches;
+  std::map<VxdID, TH1*> mapHits;
+  std::map<VxdID, TH1*> mapMatches;
 
   //Count how many of each type of histogram there are for the averaging
   //std::map<std::string, int> typeCounter;
@@ -139,20 +156,17 @@ void DQMHistAnalysisPXDEffModule::event()
     TString buff = (std::string)aPXDModule;
     buff.ReplaceAll(".", "_");
 
-    //Summing up events is done in the module creating these
-    m_hEffModules[aPXDModule]->Reset();
-
-    TH2D* Hits, *Matches;
+    TH1* Hits, *Matches;
     TString locationHits = "track_hits_" + buff;
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH2D*)findHist(locationHits.Data());
+    Hits = (TH1*)findHist(locationHits.Data());
     TString locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    Matches = (TH2D*)findHist(locationMatches.Data());
+    Matches = (TH1*)findHist(locationMatches.Data());
 
     //Finding only one of them should only happen in very strange situations...
     if (Hits == nullptr || Matches == nullptr) {
@@ -162,7 +176,8 @@ void DQMHistAnalysisPXDEffModule::event()
     } else {
       mapHits[aPXDModule] = Hits;
       mapMatches[aPXDModule] = Matches;
-      m_hEffModules[aPXDModule]->Divide(Matches, Hits);
+      m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
+      m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
     }
 
     if (m_cEffModules[aPXDModule]) {
@@ -173,32 +188,83 @@ void DQMHistAnalysisPXDEffModule::event()
     }
   }//One-Module histos finished
 
-  //Fill both of the summary histograms
-  m_hEffAll->Reset();
+  bool error_flag = false;
+  bool warn_flag = false;
+  double all = 0.0;
+
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    VxdID& aModule = m_PXDModules[i ];
+    VxdID& aModule = m_PXDModules[i];
     int j = i + 1;
 
     if (mapHits[aModule] == nullptr || mapMatches[aModule] == nullptr) {
-      m_hEffAll->SetBinContent(j, 0);
+      m_hEffAll->SetTotalEvents(j, 0);
+      m_hEffAll->SetPassedEvents(j, 0);
     } else {
-      double moduleAverage = 0, moduleAverageErr = 0;
-      if (mapHits[aModule]->Integral() != 0) {
-        double i1, i2, di1, di2;
-        i1 = mapMatches[aModule]->Integral();
-        i2 = mapHits[aModule]->Integral();
-        di1 = TMath::Sqrt(i1);
-        di2 = TMath::Sqrt(i2);
-        moduleAverage = i1 / i2;
-        moduleAverageErr = (i2 * di1 + i1 * di2) / (i2 * i2);
-      }
-      m_hEffAll->SetBinContent(j, moduleAverage);
-      m_hEffAll->SetBinError(j, moduleAverageErr);
+      double imatch, ihit;
+      imatch = mapMatches[aModule]->Integral();
+      ihit = mapHits[aModule]->Integral();
+      all += ihit;
+      m_hEffAll->SetTotalEvents(j, ihit);
+      m_hEffAll->SetPassedEvents(j, imatch);
+
+      // get the errors and check for limits for each bin seperately ...
+      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
+      error_flag |= false; // (moduleAverageErr > 0.0 && moduleAverage < (0.50 + moduleAverageErr));
+      warn_flag |= false; // (moduleAverageErr > 0.0 && moduleAverage < (0.60 + moduleAverageErr));
     }
   }
 
   m_cEffAll->cd();
-  m_hEffAll->Draw("E");
+  m_hEffAll->Paint("AP");
+
+  auto gr = m_hEffAll->GetPaintedGraph();
+  if (gr) {
+    gr->SetMinimum(0);
+    gr->SetMaximum(m_PXDModules.size());
+    auto ay = gr->GetYaxis();
+    if (ay) ay->SetRangeUser(0, 1.0);
+    auto ax = gr->GetXaxis();
+    if (ax) {
+      ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+        TString ModuleName = (std::string)m_PXDModules[i];
+        ax->SetBinLabel(i + 1, ModuleName);
+        B2RESULT(ModuleName);
+      }
+    }
+    for (int i = 0; i < gr->GetN(); i++) {
+      gr->SetPointEXhigh(i, 0.);
+      gr->SetPointEXlow(i, 0.);
+    }
+
+    gr->SetLineColor(4);
+    gr->SetLineWidth(2);
+    gr->SetMarkerStyle(8);
+
+    m_cEffAll->Clear();
+    gr->Draw("AP");
+    m_cEffAll->cd(0);
+
+    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+
+    if (all < 100.) {
+      m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
+    } else {
+      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
+      if (error_flag) {
+        m_cEffAll->Pad()->SetFillColor(kRed);// Red
+      } else if (warn_flag) {
+        m_cEffAll->Pad()->SetFillColor(kYellow);// Yellow
+      } else {
+        m_cEffAll->Pad()->SetFillColor(kGreen);// Green
+        //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
+      }
+    }
+  }
+
   m_cEffAll->Modified();
   m_cEffAll->Update();
 

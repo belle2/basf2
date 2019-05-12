@@ -22,7 +22,7 @@
 namespace Belle2 {
   namespace MVA {
 
-    AbstractInterface::AbstractInterface(std::string name) : m_name(name)
+    AbstractInterface::AbstractInterface(const std::string& name) : m_name(name)
     {
       if (s_supported_interfaces.find(m_name) != s_supported_interfaces.end()) {
         B2WARNING("An interface with the name " << m_name << " already exists!");

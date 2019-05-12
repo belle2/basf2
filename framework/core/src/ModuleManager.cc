@@ -87,7 +87,7 @@ const map<string, string>& ModuleManager::getAvailableModules() const
 
 ModulePtr ModuleManager::registerModule(const string& moduleName, std::string sharedLibPath) noexcept(false)
 {
-  map<string, ModuleProxyBase*>::iterator moduleIter =  m_registeredProxyMap.find(moduleName);
+  auto moduleIter =  m_registeredProxyMap.find(moduleName);
 
   // Print an error message and then raise the exception ...
   auto error = [&moduleName](const std::string & text) -> void {
@@ -100,7 +100,7 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, std::string sh
   if (moduleIter == m_registeredProxyMap.end()) {
     // no library specified, try to find it from map of known modules
     if (sharedLibPath.empty()) {
-      map<string, string>::const_iterator libIter = m_moduleNameLibMap.find(moduleName);
+      auto libIter = m_moduleNameLibMap.find(moduleName);
       if (libIter != m_moduleNameLibMap.end()) {
         sharedLibPath = libIter->second;
       } else {
@@ -147,7 +147,7 @@ ModulePtrList ModuleManager::getModulesByProperties(const ModulePtrList& moduleP
 
 bool ModuleManager::allModulesHaveFlag(const ModulePtrList& list, unsigned int flag)
 {
-  for (auto m : list) {
+  for (const auto& m : list) {
     if (!m->hasProperties(flag))
       return false;
   }
@@ -200,18 +200,11 @@ void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& mod
   mapFile.close();
 }
 
-ModuleManager::ModuleManager()
-{
+ModuleManager::ModuleManager() = default;
 
-}
-
-
-ModuleManager::~ModuleManager()
-{
-}
+ModuleManager::~ModuleManager() = default;
 
 void ModuleManager::reset()
 {
   m_createdModulesList.clear();
 }
-

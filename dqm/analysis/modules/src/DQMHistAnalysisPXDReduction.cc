@@ -39,6 +39,13 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
+DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
+}
+
 void DQMHistAnalysisPXDReductionModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");
@@ -85,7 +92,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif

@@ -84,13 +84,13 @@ namespace Belle2 {
        * Return index of feature with the given name
        * @param feature name of the feature
        */
-      virtual unsigned int getFeatureIndex(std::string feature);
+      virtual unsigned int getFeatureIndex(const std::string& feature);
 
       /**
        * Return index of spectator with the given name
        * @param spectator name of the spectator
        */
-      virtual unsigned int getSpectatorIndex(std::string spectator);
+      virtual unsigned int getSpectatorIndex(const std::string& spectator);
 
       /**
        * Returns all values of one feature in a std::vector<float>

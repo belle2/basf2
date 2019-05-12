@@ -156,7 +156,7 @@ void DQMHistAnalysisECLModule::event()
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         if ((i == 0 && j == 3) || (i == 3 && j == 0)) break; //to exclude color alert for known problems
-        if (h_quality_fit_data->GetBinContent(h_quality_fit_data->GetBin(i + 1, j + 1) > 0)) {
+        if (h_quality_fit_data->GetBinContent(h_quality_fit_data->GetBin(i + 1, j + 1)) > 0) {
           c_quality_fit_data->Pad()->SetFillColor(kRed); //to initiate color alert for unknown errors!
           break;
         }
@@ -234,4 +234,3 @@ void DQMHistAnalysisECLModule::terminate()
 {
   B2DEBUG(20, "terminate called");
 }
-

@@ -1,4 +1,6 @@
 import argparse
+import multiprocessing
+import sys
 
 import basf2
 import ROOT
@@ -26,7 +28,7 @@ def setup_basf2_and_db():
                         help='Output Ring Buffer name')
     parser.add_argument('histo_port', type=int,
                         help='Port of the HistoManager to connect to')
-    parser.add_argument('number_processes', type=int, default=0,
+    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count(),
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local database.txt to use for the ConditionDB",

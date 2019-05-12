@@ -25,7 +25,6 @@
 
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
     MomentumConstraint::MomentumConstraint(double efact_, double pxfact_, double pyfact_,
@@ -40,8 +39,7 @@ namespace Belle2 {
     {}
 
 // destructor
-    MomentumConstraint::~MomentumConstraint()
-    {}
+    MomentumConstraint::~MomentumConstraint() = default;
 
 // calculate current value of constraint function
     double MomentumConstraint::getValue() const
@@ -50,9 +48,9 @@ namespace Belle2 {
       double totpy = 0;
       double totpz = 0;
       double totE = 0;
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
+      for (auto fitobject : fitobjects) {
 
-        const ParticleFitObject* foi =  dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+        const ParticleFitObject* foi =  dynamic_cast < ParticleFitObject* >(fitobject);
         assert(foi);
 
         if (pxfact != 0) totpx += foi->getPx();
@@ -70,13 +68,13 @@ namespace Belle2 {
 //                                      =  1 * d px(i) /d par(i, j)
     void MomentumConstraint::getDerivatives(int idim, double der[]) const
     {
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        for (int ilocal = 0; ilocal < fitobjects[i]->getNPar(); ilocal++) {
-          if (!fitobjects[i]->isParamFixed(ilocal)) {
-            int iglobal = fitobjects[i]->getGlobalParNum(ilocal);
+      for (auto fitobject : fitobjects) {
+        for (int ilocal = 0; ilocal < fitobject->getNPar(); ilocal++) {
+          if (!fitobject->isParamFixed(ilocal)) {
+            int iglobal = fitobject->getGlobalParNum(ilocal);
             assert(iglobal >= 0 && iglobal < idim);
             double d = 0;
-            const ParticleFitObject* foi =  dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+            const ParticleFitObject* foi =  dynamic_cast < ParticleFitObject* >(fitobject);
             assert(foi);
             if (pxfact != 0) d += pxfact * foi->getDPx(ilocal);
             if (pyfact != 0) d += pyfact * foi->getDPy(ilocal);
@@ -96,10 +94,10 @@ namespace Belle2 {
     void MomentumConstraint::updateCache() const
     {
       nparams = 0;
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        for (int ilocal = 0; ilocal < fitobjects[i]->getNPar(); ilocal++) {
-          int iglobal = fitobjects[i]->getGlobalParNum(ilocal);
-          if (!fitobjects[i]->isParamFixed(ilocal)) {
+      for (auto fitobject : fitobjects) {
+        for (int ilocal = 0; ilocal < fitobject->getNPar(); ilocal++) {
+          int iglobal = fitobject->getGlobalParNum(ilocal);
+          if (!fitobject->isParamFixed(ilocal)) {
             assert(iglobal >= 0);
             nparams++;
           }
@@ -134,4 +132,3 @@ namespace Belle2 {
   }// end OrcaKinFit namespace
 
 } // end Belle2 namespace
-

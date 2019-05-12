@@ -53,6 +53,14 @@ void IPDQMExpressRecoModule::defineHisto()
   m_h_y->SetXTitle("IP_coord. Y [cm]");
   m_h_z = new TH1F("Y4S_Vertex.Z", "IP position - coord. Z", 2000, -2, 2);
   m_h_z->SetXTitle("IP_coord. Z [cm]");
+  m_h_px = new TH1F("Y4S_Vertex.pX", "Total momentum in lab. frame - coord. X", 100, -2, 2);
+  m_h_px->SetXTitle("pX [GeV/c]");
+  m_h_py = new TH1F("Y4S_Vertex.pY", "Total momentum in lab. frame - coord. Y", 100, -2, 2);
+  m_h_py->SetXTitle("pY [GeV/c]");
+  m_h_pz = new TH1F("Y4S_Vertex.pZ", "Total momentum in lab. frame - coord. Z", 100, 1, 5);
+  m_h_pz->SetXTitle("pZ [GeV/c]");
+  m_h_E = new TH1F("Y4S_Vertex.E", "Energy in lab. frame", 100, 8, 13);
+  m_h_E->SetXTitle("E [GeV]");
   m_h_pull = new TH1F("Y4S_pull.Y", "Pull - coord. Y", 100, -10, 10);
   m_h_pull->SetXTitle("(y_{reco}- y_{med})/#sigma_{y}^{reco}");
   m_h_pull->GetXaxis()->SetTitleOffset(1.2);
@@ -117,6 +125,10 @@ void IPDQMExpressRecoModule::beginRun()
   m_h_xy->Reset();
   m_h_xz->Reset();
   m_h_yz->Reset();
+  m_h_px->Reset();
+  m_h_py->Reset();
+  m_h_pz->Reset();
+  m_h_E->Reset();
   m_v_y.clear();
   m_err_y.clear();
 }
@@ -124,12 +136,6 @@ void IPDQMExpressRecoModule::beginRun()
 
 void IPDQMExpressRecoModule::endRun()
 {
-  //to take care of the events after the last 200-event sample
-  for (unsigned int u = 0; u < m_v_y.size(); u++) {
-    m_h_y_risol->Fill(m_v_y.at(u) - m_median);
-    m_h_pull->Fill((m_v_y.at(u) - m_median) / m_err_y.at(u));
-  }
-
   m_h_x->GetXaxis()->SetRangeUser(m_h_x->GetMean(1) - 5 * m_h_x->GetRMS(1), m_h_x->GetMean(1) + 5 * m_h_x->GetRMS(1));
   m_h_y->GetXaxis()->SetRangeUser(m_h_y->GetMean(1) - 5 * m_h_y->GetRMS(1), m_h_y->GetMean(1) + 5 * m_h_y->GetRMS(1));
   m_h_z->GetXaxis()->SetRangeUser(m_h_z->GetMean(1) - 5 * m_h_z->GetRMS(1), m_h_z->GetMean(1) + 5 * m_h_z->GetRMS(1));
@@ -156,9 +162,6 @@ void IPDQMExpressRecoModule::endRun()
                                         m_h_cov_y_z->GetMean(1) + 5 * m_h_cov_y_z->GetRMS(1));
 }
 
-
-
-
 void IPDQMExpressRecoModule::terminate()
 {
 }
@@ -178,55 +181,38 @@ void IPDQMExpressRecoModule::event()
       TVector3 IPVertex = frame.getVertex(Y4S);
       const auto& errMatrix = Y4S->getVertexErrorMatrix();
 
-      if (m_r < 199) {
-        m_h_x->Fill(IPVertex.X());
-        m_h_y->Fill(IPVertex.Y());
-        m_h_z->Fill(IPVertex.Z());
-        m_h_xy->Fill(IPVertex.X()*IPVertex.Y());
-        m_h_xz->Fill(IPVertex.X()*IPVertex.Z());
-        m_h_yz->Fill(IPVertex.Y()*IPVertex.Z());
-        m_h_xx->Fill(IPVertex.X()*IPVertex.X());
-        m_h_yy->Fill(IPVertex.Y()*IPVertex.Y());
-        m_h_zz->Fill(IPVertex.Z()*IPVertex.Z());
-        m_h_temp->Fill(IPVertex.Y());
-        m_h_cov_x_x->Fill(errMatrix(0, 0));
-        m_h_cov_y_y->Fill(errMatrix(1, 1));
-        m_h_cov_z_z->Fill(errMatrix(2, 2));
-        m_h_cov_x_y->Fill(errMatrix(0, 1));
-        m_h_cov_x_z->Fill(errMatrix(0, 2));
-        m_h_cov_y_z->Fill(errMatrix(1, 2));
-        m_err_y.push_back(std::sqrt(errMatrix(1, 1)));
-        m_v_y.push_back(IPVertex.Y());
-      }
+      m_h_x->Fill(IPVertex.X());
+      m_h_y->Fill(IPVertex.Y());
+      m_h_z->Fill(IPVertex.Z());
+      m_h_xy->Fill(IPVertex.X()*IPVertex.Y());
+      m_h_xz->Fill(IPVertex.X()*IPVertex.Z());
+      m_h_yz->Fill(IPVertex.Y()*IPVertex.Z());
+      m_h_xx->Fill(IPVertex.X()*IPVertex.X());
+      m_h_yy->Fill(IPVertex.Y()*IPVertex.Y());
+      m_h_zz->Fill(IPVertex.Z()*IPVertex.Z());
+      m_h_temp->Fill(IPVertex.Y());
+      m_h_cov_x_x->Fill(errMatrix(0, 0));
+      m_h_cov_y_y->Fill(errMatrix(1, 1));
+      m_h_cov_z_z->Fill(errMatrix(2, 2));
+      m_h_cov_x_y->Fill(errMatrix(0, 1));
+      m_h_cov_x_z->Fill(errMatrix(0, 2));
+      m_h_cov_y_z->Fill(errMatrix(1, 2));
+      m_h_px->Fill(frame.getMomentum(Y4S).Px());
+      m_h_py->Fill(frame.getMomentum(Y4S).Py());
+      m_h_pz->Fill(frame.getMomentum(Y4S).Pz());
+      m_h_E->Fill(frame.getMomentum(Y4S).E());
+      m_err_y.push_back(std::sqrt(errMatrix(1, 1)));
+      m_v_y.push_back(IPVertex.Y());
 
-
-      else {
-        m_h_x->Fill(IPVertex.X());
-        m_h_y->Fill(IPVertex.Y());
-        m_h_z->Fill(IPVertex.Z());
-        m_h_xy->Fill(IPVertex.X()*IPVertex.Y());
-        m_h_xz->Fill(IPVertex.X()*IPVertex.Z());
-        m_h_yz->Fill(IPVertex.Y()*IPVertex.Z());
-        m_h_xx->Fill(IPVertex.X()*IPVertex.X());
-        m_h_yy->Fill(IPVertex.Y()*IPVertex.Y());
-        m_h_zz->Fill(IPVertex.Z()*IPVertex.Z());
-        m_h_temp->Fill(IPVertex.Y());
-        m_h_cov_x_x->Fill(errMatrix(0, 0));
-        m_h_cov_y_y->Fill(errMatrix(1, 1));
-        m_h_cov_z_z->Fill(errMatrix(2, 2));
-        m_h_cov_x_y->Fill(errMatrix(0, 1));
-        m_h_cov_x_z->Fill(errMatrix(0, 2));
-        m_h_cov_y_z->Fill(errMatrix(1, 2));
-
-        m_err_y.push_back(std::sqrt(errMatrix(1, 1)));
-        m_v_y.push_back(IPVertex.Y());
-        if (m_r == 199) {m_h_temp->GetQuantiles(1, &m_median, &m_quantile);}
-
+      if (m_r == 199) {
+        m_h_temp->GetQuantiles(1, &m_median, &m_quantile);
         for (unsigned int u = 0; u < m_v_y.size(); u++) {
           m_h_y_risol->Fill(m_v_y.at(u) - m_median);
           m_h_pull->Fill((m_v_y.at(u) - m_median) / m_err_y.at(u));
         }
-        m_r = -1; m_v_y.clear();
+        m_r = 0;
+        m_v_y.clear();
+        m_err_y.clear();
       }
       m_r += 1;
     }

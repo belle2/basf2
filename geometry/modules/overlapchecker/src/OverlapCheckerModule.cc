@@ -21,6 +21,7 @@
 #include "G4VSolid.hh"
 
 #include <regex>
+#include <utility>
 
 using namespace Belle2;
 
@@ -31,9 +32,9 @@ namespace {
   class OverlapHandler: public G4VExceptionHandler {
   public:
     /** Constructor which just takes a callback function pointer to be called in case of exceptions */
-    explicit OverlapHandler(std::function<void(const std::string&)> callback): m_callback(callback) {}
+    explicit OverlapHandler(std::function<void(const std::string&)> callback): m_callback(std::move(callback)) {}
     /** Called when an exception is raised. Calls the callback and does nothing else */
-    virtual bool Notify(const char*, const char*, G4ExceptionSeverity, const char* description)
+    bool Notify(const char*, const char*, G4ExceptionSeverity, const char* description) override
     {
       m_callback(description);
       return false;
@@ -87,8 +88,8 @@ void OverlapCheckerModule::event()
   G4StateManager::GetStateManager()->SetExceptionHandler(old);
 
   //Print the list of found overlaps
-  for (unsigned int iOverlap = 0; iOverlap < m_overlaps.size(); iOverlap++) {
-    B2ERROR("Overlaps detected for " << m_overlaps[iOverlap]);
+  for (const auto& m_overlap : m_overlaps) {
+    B2ERROR("Overlaps detected for " << m_overlap);
   }
 }
 
@@ -98,7 +99,7 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
   G4VPhysicalVolume* volume = m_nav.GetTopVolume();
   m_nav.BackLevel();
   B2ERROR(geant4Message);
-  std::regex r("(mother)?\\s*local point \\(([-+0-9eE.]+),([-+0-9eE.]+),([-+0-9eE.]+)\\)");
+  std::regex r(R"((mother)?\s*local point \(([-+0-9eE.]+),([-+0-9eE.]+),([-+0-9eE.]+)\))");
   std::smatch m;
   if (std::regex_search(geant4Message, m, r)) {
     G4ThreeVector posLocal(std::atof(m[2].str().c_str()), std::atof(m[3].str().c_str()), std::atof(m[4].str().c_str()));

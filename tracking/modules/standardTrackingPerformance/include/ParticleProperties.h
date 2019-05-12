@@ -17,6 +17,14 @@ namespace Belle2 {
    */
   struct ParticleProperties {
 
+    ParticleProperties() = default; /**< default constructor */
+
+    /** constructor which sets all members to the given value */
+    explicit ParticleProperties(double value)
+    {
+      setAllTo(value);
+    }
+
     static const int maxNweights = 160; /**< the maximum number of stored weights */
 
     double mass; /**< measured mass */

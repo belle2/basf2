@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
+#include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -145,17 +146,24 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       /// FIXME Replace by a nice fit
       m_fLandau->SetParameter(0, 1000);
       m_fLandau->SetParameter(1, 50);
+      m_fLandau->SetParLimits(1, 10, 80);
       m_fLandau->SetParameter(2, 10);
-      hh1->Fit(m_fLandau, "R");
-      m_hCharge->SetBinContent(i + 1, m_fLandau->GetParameter(1));
-      m_hCharge->SetBinError(i + 1, m_fLandau->GetParError(1));
+      m_fLandau->SetParLimits(2, 1, 50);
+      if (hh1->GetEntries() > 100) {
+        hh1->Fit(m_fLandau, "R");
+        m_hCharge->SetBinContent(i + 1, m_fLandau->GetParameter(1));
+        m_hCharge->SetBinError(i + 1, m_fLandau->GetParError(1));
+      } else {
+        m_hCharge->SetBinContent(i + 1, 50);
+        m_hCharge->SetBinError(i + 1, 100);
+      }
       // m_hCharge->SetBinError(i + 1, m_fLandau->GetParameter(2) * 0.25); // arbitrary scaling
       // cout << m_fLandau->GetParameter(0) << " " << m_fLandau->GetParameter(1) << " " << m_fLandau->GetParameter(2) << endl;
 
       // m_hCharge->Fill(i, hh1->GetMean());
       m_cCharge->cd();
       hh1->Draw();
-      m_fLandau->Draw("same");
+      if (hh1->GetEntries() > 100) m_fLandau->Draw("same");
 
       if (hh1->GetEntries() > 1000) enough = true;
     }
@@ -163,18 +171,18 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_cCharge->cd();
 
 
-  // not enough Entries
+// not enough Entries
   if (!enough) {
-    m_cCharge->Pad()->SetFillColor(6);// Magenta
+    m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
   } else {
 //   B2INFO("data "<<data);
     /// FIXME: absolute numbers or relative numbers and what is the laccpetable limit?
 //   if (data > 100.) {
-//     m_cCharge->Pad()->SetFillColor(2);// Red
+//     m_cCharge->Pad()->SetFillColor(kRed);// Red
 //   } else if (data > 50.) {
-//     m_cCharge->Pad()->SetFillColor(5);// Yellow
+//     m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
 //   } else {
-    m_cCharge->Pad()->SetFillColor(0);// White
+    m_cCharge->Pad()->SetFillColor(kGreen);// Green
   }
 
   if (m_hCharge) {
@@ -197,6 +205,11 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   }
+
+  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
+  tt->SetTextAngle(90);// Rotated
+  tt->SetTextAlign(12);// Centered
+  tt->Draw();
 
   m_cCharge->Modified();
   m_cCharge->Update();

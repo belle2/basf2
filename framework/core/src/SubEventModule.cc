@@ -17,6 +17,9 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <utility>
+#include <memory>
+
 using namespace Belle2;
 
 //REG_MODLUE needed for --execute-path functionality
@@ -45,15 +48,13 @@ SubEventModule::SubEventModule(): Module(), EventProcessor()
   addParam("loopCondition", m_loopConditionString, "Loop condition in case of do_while", m_loopConditionString);
 }
 
-SubEventModule::~SubEventModule()
-{
-}
+SubEventModule::~SubEventModule() = default;
 
 void SubEventModule::initSubEvent(const std::string& objectName, const std::string& loopOver, std::shared_ptr<Path> path)
 {
   m_objectName = objectName;
   m_loopOverName = loopOver;
-  m_path = path;
+  m_path = std::move(path);
   setName("for_each(" + objectName + " : " + loopOver + ")");
   setProperties();
 }
@@ -61,7 +62,7 @@ void SubEventModule::initSubEvent(const std::string& objectName, const std::stri
 void SubEventModule::initSubLoop(std::shared_ptr<Path> path, const std::string& condition, unsigned int maxIterations)
 {
   m_mode = c_DoWhile;
-  m_path = path;
+  m_path = std::move(path);
   m_maxIterations = maxIterations;
   m_loopConditionString = condition.empty() ? "<1" : condition;
   setDoWhileConditions();
@@ -75,7 +76,7 @@ void SubEventModule::setDoWhileConditions()
     B2FATAL("No Loop conditions specified");
   }
   if (!m_loopCondition) {
-    m_loopCondition.reset(new ModuleCondition(*m_loopConditionString, m_path, EAfterConditionPath::c_End));
+    m_loopCondition = std::make_unique<ModuleCondition>(*m_loopConditionString, m_path, EAfterConditionPath::c_End);
   }
   // We also need the last module to get its return value. If it's already set then fine.
   if (m_loopConditionModule) return;
@@ -134,7 +135,7 @@ void SubEventModule::setProperties()
 
 void restoreContents(const DataStore::StoreEntryMap& orig, DataStore::StoreEntryMap& dest)
 {
-  for (auto entry : orig) {
+  for (const auto& entry : orig) {
     auto& destEntry = dest[entry.first];
     auto& srcEntry = entry.second;
     if (srcEntry.ptr == nullptr)

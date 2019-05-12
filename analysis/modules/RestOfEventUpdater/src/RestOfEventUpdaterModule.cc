@@ -99,7 +99,8 @@ namespace Belle2 {
       updateMasksWithV0(roe, particlesToUpdate);
     }
   }
-  void RestOfEventUpdaterModule::updateMasksWithV0(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate)
+  void RestOfEventUpdaterModule::updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe,
+                                                   std::vector<const Particle*>& particlesToUpdate)
   {
     if (particlesToUpdate.size() == 0) {
       B2DEBUG(10, "No particles in list provided, nothing to do");
@@ -118,7 +119,7 @@ namespace Belle2 {
     }
 
   }
-  void RestOfEventUpdaterModule::updateMasksWithParticles(StoreObjPtr<RestOfEvent> roe,
+  void RestOfEventUpdaterModule::updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe,
                                                           std::vector<const Particle*>& particlesToUpdate, Particle::EParticleType listType)
   {
     for (auto& maskToUpdate : m_maskNamesForUpdating) {

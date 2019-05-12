@@ -51,10 +51,10 @@ namespace Belle2 {
     {
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test'><state>Gas</state><Components>"
-                         "<Material fraction='1.5'>Si</Material>"
-                         "<Material fraction='2.5612'>Au</Material>"
-                         "</Components></Material>");
+      backends.emplace_back("string:<Material name='Test'><state>Gas</state><Components>"
+                            "<Material fraction='1.5'>Si</Material>"
+                            "<Material fraction='2.5612'>Au</Material>"
+                            "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
       Materials& m = Materials::getInstance();
@@ -76,10 +76,10 @@ namespace Belle2 {
     {
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test1'><state>Solid</state><Components>"
-                         "<Material fraction='0.5'>Si</Material>"
-                         "<Element fraction='0.5'>Au</Element>"
-                         "</Components></Material>");
+      backends.emplace_back("string:<Material name='Test1'><state>Solid</state><Components>"
+                            "<Material fraction='0.5'>Si</Material>"
+                            "<Element fraction='0.5'>Au</Element>"
+                            "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
 
@@ -95,10 +95,10 @@ namespace Belle2 {
     {
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test2'><state>Liquid</state><density>1</density><Components>"
-                         "<Material>Si</Material>"
-                         "<Element>Au</Element>"
-                         "</Components></Material>");
+      backends.emplace_back("string:<Material name='Test2'><state>Liquid</state><density>1</density><Components>"
+                            "<Material>Si</Material>"
+                            "<Element>Au</Element>"
+                            "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
 
@@ -114,9 +114,9 @@ namespace Belle2 {
     {
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test3'><Components>"
-                         "<Material>Foo</Material>"
-                         "</Components></Material>");
+      backends.emplace_back("string:<Material name='Test3'><Components>"
+                            "<Material>Foo</Material>"
+                            "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
 
@@ -132,9 +132,9 @@ namespace Belle2 {
     {
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test4'><density>1</density><Components>"
-                         "<Element>Foo</Element>"
-                         "</Components></Material>");
+      backends.emplace_back("string:<Material name='Test4'><density>1</density><Components>"
+                            "<Element>Foo</Element>"
+                            "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
 
@@ -150,13 +150,13 @@ namespace Belle2 {
     {
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<test><Surface/>"
-                         "<Surface name='test'><Model>unified</Model><Finish>Ground</Finish>"
-                         "<Type>x_ray</Type><Value>2.0</Value></Surface>"
-                         "<Surface><Model>not existing</Model></Surface>"
-                         "<Surface><Finish>not existing</Finish></Surface>"
-                         "<Surface><Type>not existing</Type></Surface></test>"
-                        );
+      backends.emplace_back("string:<test><Surface/>"
+                            "<Surface name='test'><Model>unified</Model><Finish>Ground</Finish>"
+                            "<Type>x_ray</Type><Value>2.0</Value></Surface>"
+                            "<Surface><Model>not existing</Model></Surface>"
+                            "<Surface><Finish>not existing</Finish></Surface>"
+                            "<Surface><Type>not existing</Type></Surface></test>"
+                           );
       gb.setBackends(backends);
       gb.open();
 
@@ -189,15 +189,15 @@ namespace Belle2 {
     {
       Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='TestProperties'>"
-                         "<Components><Material>Si</Material></Components>"
-                         "<Property name='RINDEX' unit='eV'>"
-                         "<value energy='1.0'>1.40</value>"
-                         "<value energy='1.5'>1.41</value>"
-                         "<value energy='2.0'>1.42</value>"
-                         "<value energy='3.5'>1.43</value>"
-                         "</Property>"
-                         "</Material>");
+      backends.emplace_back("string:<Material name='TestProperties'>"
+                            "<Components><Material>Si</Material></Components>"
+                            "<Property name='RINDEX' unit='eV'>"
+                            "<value energy='1.0'>1.40</value>"
+                            "<value energy='1.5'>1.41</value>"
+                            "<value energy='2.0'>1.42</value>"
+                            "<value energy='3.5'>1.43</value>"
+                            "</Property>"
+                            "</Material>");
       gb.setBackends(backends);
       gb.open();
       Materials& m = Materials::getInstance();

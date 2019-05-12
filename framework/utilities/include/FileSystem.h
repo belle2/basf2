@@ -95,7 +95,7 @@ namespace Belle2 {
        * @param fileName  Name of the file to be locked (if it does not exist, it will be created)
        * @param readonly  create a read-only lock (multiple processes can hold one)
        */
-      explicit Lock(std::string fileName, bool readonly = false);
+      explicit Lock(const std::string& fileName, bool readonly = false);
 
       /**
        * Destructor. Releases the lock

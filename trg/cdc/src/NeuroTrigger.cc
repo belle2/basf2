@@ -249,7 +249,7 @@ void
 NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName, std::string et_option)
 {
   m_segmentHits.isRequired(hitCollectionName);
-  if (!(et_option == "fastestpriority") || !(et_option == "zero")) {
+  if (!((et_option == "fastestpriority") || (et_option == "zero"))) {
     m_eventTime.isRequired(eventTimeName);
   }
   m_hitCollectionName = hitCollectionName;
@@ -374,10 +374,11 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 void
 NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option)
 {
-  //if (et_option != m_MLPs[isector].get_et_option()) {
-  //    B2WARNING("Used event time option is different to the one set in the MLP"
-  //              << LogVar("et_option", et_option) << LogVar("isector", isector)
-  //              << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
+  if (et_option != m_MLPs[isector].get_et_option()) {
+    B2WARNING("Used event time option is different to the one set in the MLP"
+              << LogVar("et_option", et_option) << LogVar("isector", isector)
+              << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
+  }
   if (et_option == "etf_or_fastestpriority") {
     bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
     if (hasT0) {

@@ -21,17 +21,16 @@
 #include <iostream>
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
     BaseConstraint::BaseConstraint()
-      : name(0)
+      : name(nullptr)
     {
       setName("???");
     }
 
     BaseConstraint::BaseConstraint(const BaseConstraint& rhs)
-      : name(0)
+      : name(nullptr)
     {
       if (rhs.name) setName(rhs.name);
       else setName("???");
@@ -57,7 +56,7 @@ namespace Belle2 {
 
     void  BaseConstraint::setName(const char* name_)
     {
-      if (name_ == 0) return;
+      if (name_ == nullptr) return;
       size_t l = strlen(name_);
       if (name) delete[] name;
       name = new char[l + 1];

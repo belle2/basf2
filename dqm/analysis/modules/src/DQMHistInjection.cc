@@ -52,15 +52,15 @@ void DQMHistInjectionModule::initialize()
   m_cInjectionHERPXDOcc = new TCanvas("PXDINJ/c_InjectionHERPXDOcc");
   m_cInjectionHERECL = new TCanvas("ECLINJ/c_InjectionHERECL");
 
-  m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
   m_hInjectionLERPXDOcc = new TH1F("HitInjectionPXDLEROcc", "PXD Occ after LER Injection;Time in #mus;Mean Occ in % per module", 4000,
                                    0 , 20000);
-  m_hInjectionLERECL = new TH1F("HitInjectionLERECL", "ECL after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionLERECL = new TH1F("HitInjectionLERECL", "ECL Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
 
-  m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
   m_hInjectionHERPXDOcc = new TH1F("HitInjectionPXDHEROcc", "PXD Occ after HER Injection;Time in #mus;Mean Occ in % per modul", 4000,
                                    0 , 20000);
-  m_hInjectionHERECL = new TH1F("HitInjectionHERECL", "ECL after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionHERECL = new TH1F("HitInjectionHERECL", "ECL Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
 
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");

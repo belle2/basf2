@@ -104,7 +104,8 @@ void PXDTrackClusterDQMModule::event()
     if (tfr) correction = sin(tfr->getMomentum().Theta());
     for (auto& cluster : pxdClustersTrack) {
       if (m_trackClusterChargeUC[cluster.getSensorID()]) m_trackClusterChargeUC[cluster.getSensorID()]->Fill(cluster.getCharge());
-      if (m_trackClusterCharge[cluster.getSensorID()]) m_trackClusterCharge[cluster.getSensorID()]->Fill(cluster.getCharge()*correction);
+      if (tfr && m_trackClusterCharge[cluster.getSensorID()]) m_trackClusterCharge[cluster.getSensorID()]->Fill(
+          cluster.getCharge()*correction);
     }
   }
 }

@@ -56,13 +56,13 @@ Database& Database::Instance()
     const std::vector<std::string> fallbacks = EnvironmentVariables::getList("BELLE2_CONDB_FALLBACK", {"/cvmfs/belle.cern.ch/conditions"});
     const std::vector<std::string> globalTags = EnvironmentVariables::getList("BELLE2_CONDB_GLOBALTAG", {CURRENT_DEFAULT_TAG});
     B2DEBUG(38, "Conditions database fallback options:");
-    for (auto s : fallbacks) B2DEBUG(38, "  " << s);
+    for (const auto& s : fallbacks) B2DEBUG(38, "  " << s);
     B2DEBUG(38, "Conditions database global tags:");
-    for (auto s : globalTags) B2DEBUG(38, "  " << s);
+    for (const auto& s : globalTags) B2DEBUG(38, "  " << s);
     // OK, add fallback databases unless empty location is specified
     if (!fallbacks.empty()) {
       auto logLevel = LogConfig::c_Error;
-      for (auto localdb : fallbacks) {
+      for (const auto& localdb : fallbacks) {
         if (FileSystem::isFile(FileSystem::findFile(localdb, true))) {
           // If a file name is given use it as local DB
           B2DEBUG(30, "Adding fallback database " << FileSystem::findFile(localdb));
@@ -76,8 +76,8 @@ Database& Database::Instance()
             LocalDatabase::createInstance(fileName, "", true, logLevel);
           } else {
             // One local DB for each global tag
-            for (auto tag : globalTags) {
-              std::string fileName = localdb + "/" + tag + ".txt";
+            for (const auto& tag : globalTags) {
+              const auto fileName = std::string(localdb).append("/").append(tag).append(".txt");
               if (FileSystem::isFile(fileName)) {
                 B2DEBUG(30, "Adding fallback database " << fileName);
                 LocalDatabase::createInstance(fileName, "", true, logLevel);
@@ -92,7 +92,7 @@ Database& Database::Instance()
     // in which case we disable access to the database
     if (!globalTags.empty()) {
       // add all global tags which are separated by whitespace as conditions database
-      for (auto tag : globalTags) {
+      for (const auto& tag : globalTags) {
         B2DEBUG(30, "Adding central database for global tag " << tag);
         ConditionsDatabase::createDefaultInstance(tag, LogConfig::c_Warning);
       }
@@ -105,8 +105,8 @@ Database& Database::Instance()
 void Database::setInstance(Database* database)
 {
   if (s_instance) {
-    DatabaseChain* chain = dynamic_cast<DatabaseChain*>(s_instance.get());
-    DatabaseChain* replacement = dynamic_cast<DatabaseChain*>(database);
+    auto* chain = dynamic_cast<DatabaseChain*>(s_instance.get());
+    auto* replacement = dynamic_cast<DatabaseChain*>(database);
     if (replacement && chain) {
       B2DEBUG(39, "Replacing DatabaseChain with DatabaseChain: ignored");
       delete database;
@@ -133,8 +133,7 @@ void Database::reset()
   DBStore::Instance().reset(true);
 }
 
-
-Database::~Database() {}
+Database::~Database() = default;
 
 std::pair<TObject*, IntervalOfValidity> Database::getData(const EventMetaData& event, const std::string& name)
 {
@@ -199,7 +198,7 @@ bool Database::writePayload(const std::string& fileName, const std::string& name
 
 namespace {
   /** Configure the network settings for the Conditions database downloads */
-  boost::python::dict setConditionsNetworkSettings(boost::python::tuple args, boost::python::dict kwargs)
+  boost::python::dict setConditionsNetworkSettings(const boost::python::tuple& args, boost::python::dict kwargs)
   {
     using namespace boost::python;
     if (len(args) > 0) {
@@ -249,12 +248,12 @@ std::string Database::getGlobalTag()
 {
   std::vector<Database*> databases{&Database::Instance()};
   std::vector<std::string> tags;
-  DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
+  auto* chain = dynamic_cast<DatabaseChain*>(databases[0]);
   if (chain) {
     databases = chain->getDatabases();
   }
   for (Database* db : databases) {
-    ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
+    auto* cond = dynamic_cast<ConditionsDatabase*>(db);
     if (cond) {
       std::string tag = cond->getGlobalTag();
       if (std::find(tags.begin(), tags.end(), tag) == tags.end()) {
@@ -277,12 +276,12 @@ void Database_setCentralServerList(boost::python::list serverList)
   }
   // and now find all conditions db instances and set the list
   std::vector<Database*> databases{&Database::Instance()};
-  DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
+  auto* chain = dynamic_cast<DatabaseChain*>(databases[0]);
   if (chain) {
     databases = chain->getDatabases();
   }
   for (Database* db : databases) {
-    ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
+    auto* cond = dynamic_cast<ConditionsDatabase*>(db);
     if (cond) {
       cond->setServerList(cppServerList);
     }

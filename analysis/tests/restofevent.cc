@@ -26,7 +26,7 @@ namespace {
   class ROETest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
 
       DataStore::Instance().setInitializeActive(true);
@@ -92,7 +92,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }

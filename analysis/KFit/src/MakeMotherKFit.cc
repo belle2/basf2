@@ -17,7 +17,7 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
 
-MakeMotherKFit::MakeMotherKFit(void):
+MakeMotherKFit::MakeMotherKFit():
   m_Vertex(Hep3Vector()),
   m_VertexError(HepSymMatrix(3, 0))
 {
@@ -33,9 +33,7 @@ MakeMotherKFit::MakeMotherKFit(void):
 }
 
 
-MakeMotherKFit::~MakeMotherKFit(void)
-{
-}
+MakeMotherKFit::~MakeMotherKFit() = default;
 
 
 enum KFitError::ECode
@@ -110,7 +108,7 @@ MakeMotherKFit::setTrackVertexError(const HepMatrix& e) {
 
 
 enum KFitError::ECode
-MakeMotherKFit::setTrackZeroVertexError(void) {
+MakeMotherKFit::setTrackZeroVertexError() {
   HepMatrix zero(3, KFitConst::kNumber7, 0);
 
   return this->setTrackVertexError(zero);
@@ -134,7 +132,7 @@ MakeMotherKFit::setCorrelation(const HepMatrix& e) {
 
 
 enum KFitError::ECode
-MakeMotherKFit::setZeroCorrelation(void) {
+MakeMotherKFit::setZeroCorrelation() {
   HepMatrix zero(KFitConst::kNumber7, KFitConst::kNumber7, 0);
 
   return this->setCorrelation(zero);
@@ -158,40 +156,40 @@ MakeMotherKFit::setFlagBeforeAfter(const int flag) {
 
 
 enum KFitError::ECode
-MakeMotherKFit::getErrorCode(void) const {
+MakeMotherKFit::getErrorCode() const {
   return m_ErrorCode;
 }
 
 const KFitTrack
-MakeMotherKFit::getMother(void) const
+MakeMotherKFit::getMother() const
 {
   return m_Mother;
 }
 
 
 const HepLorentzVector
-MakeMotherKFit::getMotherMomentum(void) const
+MakeMotherKFit::getMotherMomentum() const
 {
   return m_Mother.getMomentum(KFitConst::kBeforeFit);
 }
 
 
 const HepPoint3D
-MakeMotherKFit::getMotherPosition(void) const
+MakeMotherKFit::getMotherPosition() const
 {
   return m_Mother.getPosition(KFitConst::kBeforeFit);
 }
 
 
 const HepSymMatrix
-MakeMotherKFit::getMotherError(void) const
+MakeMotherKFit::getMotherError() const
 {
   return m_Mother.getError(KFitConst::kBeforeFit);
 }
 
 
 enum KFitError::ECode
-MakeMotherKFit::doMake(void) {
+MakeMotherKFit::doMake() {
   // ...makes matrix.
   HepMatrix dMdC(KFitConst::kNumber7, KFitConst::kNumber7 * m_TrackCount + 3, 0);
   HepSymMatrix Ec(KFitConst::kNumber7 * m_TrackCount + 3, 0);
@@ -259,8 +257,8 @@ MakeMotherKFit::calculateError(HepSymMatrix* Ec) const
   // ...error matrix of tracks
   {
     int i = 0;
-    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it) {
-      (*Ec).sub(i * KFitConst::kNumber7 + 1, it->getError(m_FlagBeforeAfter));
+    for (const auto& track : m_Tracks) {
+      (*Ec).sub(i * KFitConst::kNumber7 + 1, track.getError(m_FlagBeforeAfter));
       i++;
     }
   }
@@ -269,9 +267,7 @@ MakeMotherKFit::calculateError(HepSymMatrix* Ec) const
   // ...error matrix between tracks
   if (m_FlagCorrelation) {
     int i = 0, j = 1;
-    for (vector<HepMatrix>::const_iterator it = m_Correlation.begin(), endIt = m_Correlation.end(); it != endIt; ++it) {
-      const HepMatrix& hm = *it;
-
+    for (const auto& hm : m_Correlation) {
       for (int k = 0; k < KFitConst::kNumber7; k++) for (int l = 0; l < KFitConst::kNumber7; l++) {
           (*Ec)[k + i * KFitConst::kNumber7][l + j * KFitConst::kNumber7] = hm[k][l];
         }
@@ -297,8 +293,7 @@ MakeMotherKFit::calculateError(HepSymMatrix* Ec) const
   // ...error matrix between vertex and tracks
   if (m_FlagTrackVertexError) {
     int i = 0;
-    for (vector<HepMatrix>::const_iterator it = m_TrackVertexError.begin(), endIt = m_TrackVertexError.end(); it != endIt; ++it) {
-      const HepMatrix& hm = *it;
+    for (const auto& hm : m_TrackVertexError) {
       for (int j = 0; j < 3; j++) for (int k = 0; k < KFitConst::kNumber7; k++) {
           (*Ec)[j + m_TrackCount * KFitConst::kNumber7][k + i * KFitConst::kNumber7] = hm[j][k];
         }
@@ -340,4 +335,3 @@ MakeMotherKFit::calculateDELMDELC(HepMatrix* dMdC) const
   (*dMdC)[0][1 + m_TrackCount * KFitConst::kNumber7] = - sum_a;
   (*dMdC)[1][0 + m_TrackCount * KFitConst::kNumber7] =   sum_a;
 }
-

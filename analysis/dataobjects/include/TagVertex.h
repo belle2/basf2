@@ -143,12 +143,12 @@ namespace Belle2 {
     /**
      * Set BTag Vertex
      */
-    void setTagVertex(TVector3 TagVertex);
+    void setTagVertex(const TVector3& TagVertex);
 
     /**
      *  Set BTag Vertex (3x3) error matrix
      */
-    void setTagVertexErrMatrix(TMatrixFSym TagVertexErrMatrix);
+    void setTagVertexErrMatrix(const TMatrixFSym& TagVertexErrMatrix);
 
     /**
      * Set BTag Vertex P value
@@ -168,7 +168,7 @@ namespace Belle2 {
     /**
      * Set generated BTag Vertex
      */
-    void setMCTagVertex(TVector3 MCTagVertex);
+    void setMCTagVertex(const TVector3& MCTagVertex);
 
     /**
      * Set generated Btag PDG code

@@ -29,7 +29,7 @@
 using namespace Belle2;
 
 bool AsyncWrapper::s_isAsync = false;
-RingBuffer* AsyncWrapper::s_currentRingBuffer = NULL;
+RingBuffer* AsyncWrapper::s_currentRingBuffer = nullptr;
 namespace {
   static std::vector<RingBuffer*> rbList;
   void cleanupIPC()
@@ -54,7 +54,7 @@ int AsyncWrapper::numAvailableEvents()
 
 AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(),
   m_wrappedModule(ModuleManager::Instance().registerModule(moduleType)),
-  m_ringBuffer(0), m_rx(0), m_tx(0)
+  m_ringBuffer(nullptr), m_rx(nullptr), m_tx(nullptr)
 {
   setParamList(m_wrappedModule->getParamList()); //inherit parameters from wrapped module
 
@@ -63,9 +63,7 @@ AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(),
            true);
 }
 
-AsyncWrapper::~AsyncWrapper()
-{
-}
+AsyncWrapper::~AsyncWrapper() = default;
 
 void AsyncWrapper::initialize()
 {
@@ -109,7 +107,7 @@ void AsyncWrapper::initialize()
 void AsyncWrapper::event()
 {
   if (!GlobalProcHandler::isWorkerProcess()) {
-    if (waitpid(-1, NULL, WNOHANG) != 0) {
+    if (waitpid(-1, nullptr, WNOHANG) != 0) {
       StoreObjPtr<EventMetaData> eventMetaData;
       eventMetaData->setEndOfData();
     }

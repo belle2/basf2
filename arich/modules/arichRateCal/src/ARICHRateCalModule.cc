@@ -122,7 +122,6 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtmetadata;
     int runno = m_internalmode ? m_run_count : evtmetadata->getRun();
     int raw_evtno = m_internalmode ? m_evt_count : evtmetadata->getEvent();
-    //int runno = raw_evtno / m_nevents;
     ARICHThParam param(runno, m_dth, m_th0, m_nrun);
     StoreArray<ARICHRawDigit> rawdigits;
     for (auto& rawdigit : rawdigits) {
@@ -162,4 +161,3 @@ namespace Belle2 {
 
 
 } // end Belle2 namespace
-

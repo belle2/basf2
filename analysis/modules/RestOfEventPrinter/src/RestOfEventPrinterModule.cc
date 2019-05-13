@@ -89,8 +89,7 @@ namespace Belle2 {
       B2INFO(" - " << "No. of ECLClusters in ROE: " << nAllECLClusters);
       B2INFO(" - " << "No. of KLMClusters in ROE: " << nAllKLMClusters);
 
-      for (std::vector<std::string>::iterator it = m_maskNames.begin() ; it != m_maskNames.end(); ++it) {
-        std::string maskName = *it;
+      for (const auto& maskName : m_maskNames) {
         unsigned int nTracks = roe->getNTracks(maskName);
         unsigned int nECLClusters = roe->getNECLClusters(maskName);
 

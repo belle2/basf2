@@ -33,7 +33,7 @@
 #include <thread>
 #include <sys/stat.h>
 
-#include <signal.h>
+#include <csignal>
 #include <fstream>
 
 using namespace std;
@@ -119,7 +119,7 @@ ZMQEventProcessor::~ZMQEventProcessor()
   g_eventProcessorForSignalHandling = nullptr;
 }
 
-void ZMQEventProcessor::process(PathPtr path, long maxEvent)
+void ZMQEventProcessor::process(const PathPtr& path, long maxEvent)
 {
   // Concerning signal handling:
   // * During the initialization, we just raise the signal without doing any cleanup etc.

@@ -29,10 +29,10 @@ using std::isfinite;
 #include <gsl/gsl_linalg.h>
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
-    BaseFitObject::BaseFitObject(): name(0), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{},  covinvvalid(false),
+    BaseFitObject::BaseFitObject(): name(nullptr), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{},  covinvvalid(
+        false),
       cachevalid(false)
     {
       setName("???");
@@ -48,7 +48,7 @@ namespace Belle2 {
     }
 
     BaseFitObject::BaseFitObject(const BaseFitObject& rhs)
-      : name(0), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{}, covinvvalid(false), cachevalid(false)
+      : name(nullptr), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{}, covinvvalid(false), cachevalid(false)
     {
       BaseFitObject::assign(rhs);
     }
@@ -64,7 +64,7 @@ namespace Belle2 {
     BaseFitObject& BaseFitObject::assign(const BaseFitObject& source)
     {
       if (&source != this) {
-        name = 0;
+        name = nullptr;
         setName(source.name);
         for (int i = 0; i < BaseDefs::MAXPAR; ++i) {
           par[i]          = source.par[i];
@@ -93,7 +93,7 @@ namespace Belle2 {
 
     void  BaseFitObject::setName(const char* name_)
     {
-      if (name_ == 0) return;
+      if (name_ == nullptr) return;
       size_t l = strlen(name_);
       if (name) delete[] name;
       name = new char[l + 1];

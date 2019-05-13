@@ -18,8 +18,9 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <memory>
 
 using namespace std;
 using namespace Belle2;
@@ -73,11 +74,11 @@ void VariablesToHistogramModule::initialize()
     std::tie(varStr, varNbins, low, high) = varTuple;
     std::string compatibleName = makeROOTCompatible(varStr);
 
-    auto ptr = std::unique_ptr<StoreObjPtr<RootMergeable<TH1D>>>(new StoreObjPtr<RootMergeable<TH1D>>("", DataStore::c_Persistent));
+    auto ptr = std::make_unique<StoreObjPtr<RootMergeable<TH1D>>>("", DataStore::c_Persistent);
     ptr->registerInDataStore(m_fileName + varStr, DataStore::c_DontWriteOut);
     ptr->construct(compatibleName.c_str(), compatibleName.c_str(), varNbins, low, high);
     // Create histogram in memory and do not associate them with a TFile
-    (*ptr)->get().SetDirectory(0);
+    (*ptr)->get().SetDirectory(nullptr);
     m_hists.push_back(std::move(ptr));
 
     //also collection function pointers
@@ -102,11 +103,11 @@ void VariablesToHistogramModule::initialize()
     std::string compatibleName1 = makeROOTCompatible(varStr1);
     std::string compatibleName2 = makeROOTCompatible(varStr2);
 
-    auto ptr2d = std::unique_ptr<StoreObjPtr<RootMergeable<TH2D>>>(new StoreObjPtr<RootMergeable<TH2D>>("", DataStore::c_Persistent));
+    auto ptr2d = std::make_unique<StoreObjPtr<RootMergeable<TH2D>>>("", DataStore::c_Persistent);
     ptr2d->registerInDataStore(m_fileName + varStr1 + varStr2, DataStore::c_DontWriteOut);
     ptr2d->construct((compatibleName1 + compatibleName2).c_str(), (compatibleName1 + compatibleName2).c_str(),
                      varNbins1, low1, high1, varNbins2, low2, high2);
-    (*ptr2d)->get().SetDirectory(0);
+    (*ptr2d)->get().SetDirectory(nullptr);
     m_2d_hists.push_back(std::move(ptr2d));
 
     //also collection function pointers

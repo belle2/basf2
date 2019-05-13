@@ -47,9 +47,7 @@ EventKinematicsModule::EventKinematicsModule() : Module()
 
 }
 
-EventKinematicsModule::~EventKinematicsModule()
-{
-}
+EventKinematicsModule::~EventKinematicsModule() = default;
 
 void EventKinematicsModule::initialize()
 {
@@ -181,5 +179,3 @@ float EventKinematicsModule::getTotalPhotonsEnergy()
   }
   return photonsEnergy;
 }
-
-

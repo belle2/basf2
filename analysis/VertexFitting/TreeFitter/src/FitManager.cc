@@ -37,14 +37,14 @@ namespace TreeFitter {
                          const bool useReferencing
                         ) :
     m_particle(particle),
-    m_decaychain(0),
+    m_decaychain(nullptr),
     m_status(VertexStatus::UnFitted),
     m_chiSquare(-1),
     m_niter(-1),
     m_prec(prec),
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
-    m_fitparams(0),
+    m_fitparams(nullptr),
     m_useReferencing(useReferencing)
   {
     m_decaychain =  new DecayChain(particle,
@@ -96,7 +96,7 @@ namespace TreeFitter {
         if (0 == m_niter) {
           m_errCode = m_decaychain->filter(*m_fitparams);
         } else if (m_niter > 0 && m_useReferencing) {
-          FitParams* tempState = new FitParams(*m_fitparams);
+          auto* tempState = new FitParams(*m_fitparams);
           m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
           delete tempState;
         }
@@ -248,7 +248,7 @@ namespace TreeFitter {
     } else {
       B2ERROR("Can't find candidate " << cand.getName() << "in tree " << m_particle->getName());
     }
-    return pb != 0;
+    return pb != nullptr;
   }
 
   void FitManager::updateCand(const ParticleBase& pb,
@@ -307,7 +307,7 @@ namespace TreeFitter {
     if (updateableMother) {
       const int ndaughters = cand.getNDaughters();
       for (int i = 0; i < ndaughters; i++) {
-        Belle2::Particle* daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
+        auto* daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
         updateTree(*daughter, false);
       }
     }

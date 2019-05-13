@@ -40,7 +40,7 @@ FileMetaData updateFileMetaData(const std::string& fileName, const std::string& 
 
   // read the FileMetaData object or create a new one if it doesn't exist
   FileMetaData* fileMetaData = nullptr;
-  TTree* tree = dynamic_cast<TTree*>(file->Get("persistent"));
+  auto* tree = dynamic_cast<TTree*>(file->Get("persistent"));
   TTree* newTree = nullptr;
   if (!tree) {
     fileMetaData = dynamic_cast<FileMetaData*>(file->Get("FileMetaData"));

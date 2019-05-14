@@ -11,9 +11,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 
@@ -22,8 +20,6 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranch.h>
-#include <TVector3.h>
-#include <TMatrixDSym.h>
 
 namespace Belle2 {
   /**

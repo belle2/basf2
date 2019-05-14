@@ -11,7 +11,7 @@ Then execute the script:
 > basf2 beamSpotMonitor.py
 """
 
-from basf2 import *
+import basf2
 import ROOT
 
 current_localDB = "put_here_the_path_to_your_localDB"
@@ -40,6 +40,5 @@ main.add_module(eventinfosetter)
 
 main.add_module('BeamSpotMonitor')
 
-# process single event
 print_path(main)
 process(main)

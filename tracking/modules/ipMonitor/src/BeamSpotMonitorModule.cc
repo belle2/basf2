@@ -9,6 +9,11 @@
  **************************************************************************/
 
 #include <tracking/modules/ipMonitor/BeamSpotMonitorModule.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
+#include <TVector3.h>
+#include <TMatrixDSym.h>
 
 using namespace Belle2;
 using namespace std;
@@ -54,14 +59,11 @@ void BeamSpotMonitorModule::initialize()
 
 void BeamSpotMonitorModule::beginRun()
 {
-
-  //  m_BeamSpotDB = unique_ptr<Belle2::DBObjPtr<Belle2::BeamSpot>>(new Belle2::DBObjPtr<Belle2::BeamSpot>());
-  //  m_BeamSpotDB = Belle2::DBObjPtr<Belle2::BeamSpot>;
-
-  if (! m_BeamSpotDB.isValid())
+  if (! m_BeamSpotDB.isValid()) {
     B2WARNING("No valid BeamSpot for the requested IoV");
-  else
+  } else {
     m_BeamSpot = *m_BeamSpotDB;
+  }
 
 }
 
@@ -71,7 +73,7 @@ void BeamSpotMonitorModule::event()
   StoreObjPtr<EventMetaData> meta;
   m_exp = meta->getExperiment();
   m_run = meta->getRun();
-  B2INFO("monitoring beam spot for experiment = " << m_exp << ", run = " << m_run);
+  B2DEBUG(80, "monitoring beam spot for experiment = " << m_exp << ", run = " << m_run);
 
   if (! m_BeamSpotDB.isValid())
     return;
@@ -99,15 +101,7 @@ void BeamSpotMonitorModule::event()
 
 void BeamSpotMonitorModule::terminate()
 {
-  //  B2RESULT("******************************************");
-  //  B2RESULT("** UNIQUE IDs of calibration DB objects **");
-  //  B2RESULT("");
-  //  if (m_BeamSpotDB.isValid())
-  //    B2RESULT("   - BeamSpot:" << m_BeamSpotDB.getUniqueID());
-  //  else
-  //    B2WARNING("No valid BeamSpot for the requested IoV");
-
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
 
     m_rootFilePtr->cd();
 

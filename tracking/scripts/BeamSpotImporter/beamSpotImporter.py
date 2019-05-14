@@ -15,7 +15,6 @@
 ##################################################################
 
 import basf2
-from basf2 import *
 import ROOT
 from ROOT import TVector3, TMatrixDSym, TFile, TH1F, TMath
 from ROOT import Belle2
@@ -27,9 +26,9 @@ import sys
 
 
 parser = argparse.ArgumentParser(description="BeamSpot Importer from DQM root file")
-parser.add_argument('--exp', metavar='experiment', dest='exp', type=int, nargs=1, help='Experiment Number')
-parser.add_argument('--run', metavar='run', dest='run', type=int, nargs=1, help='Run Number')
-parser.add_argument('--dqm', metavar='dqm', dest='dqm', type=str, nargs=1, help='DQM ROOT file')
+parser.add_argument('--exp', metavar='experiment', dest='exp', type=int,  help='Experiment Number')
+parser.add_argument('--run', metavar='run', dest='run', type=int,  help='Run Number')
+parser.add_argument('--dqm', metavar='dqm', dest='dqm', type=str, help='DQM ROOT file')
 parser.add_argument('--verbose', dest='verbose', action='store_const', const=True,
                     default=False, help='print BeamSpot to screen.')
 
@@ -44,9 +43,9 @@ args = parser.parse_args()
 minVertices = 10
 nSigmacut = 6
 
-experiment = args.exp[0]
-run = args.run[0]
-dqmRoot = args.dqm[0]
+experiment = args.exp
+run = args.run
+dqmRoot = args.dqm
 
 GREEN = "\033[1;32m"
 RESET = "\033[0;0m"

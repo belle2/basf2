@@ -36,14 +36,6 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDDAQDQMModule();
 
-      // virtual ~PXDDAQDQMModule();
-
-      virtual void initialize() override;
-
-      virtual void beginRun() override;
-
-      virtual void event() override;
-
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
@@ -57,6 +49,8 @@ namespace Belle2 {
       /// the very same DHE and DHC can show up in different packets (for different events)!
       /// but we will fill only one histogram
       TH1F* hDAQErrorEvent{};          /** per event errors */
+      TH1F* hDAQUseableModule{};          /** Count Useable/unuseable decision */
+      TH1F* hDAQNotUseableModule{};          /** Count Useable/unuseable decision */
       // TH1F* hDAQErrorPacket{};         /** per packet (event builder input) errors  */
       TH2F* hDAQErrorDHC{};          /** individual DHC errors  */
       TH2F* hDAQErrorDHE{};          /** individual DHE errors  */
@@ -68,7 +62,13 @@ namespace Belle2 {
       std::map<VxdID, TH1F*> hDAQCM2;/** Common Mode per DHE to gate and DHP level */
       std::map<int, TH1F*> hDAQDHCReduction;/** DHC data reduction  */
 
-      virtual void defineHisto() override;
+      void initialize() override final;
+
+      void beginRun() override final;
+
+      void event() override final;
+
+      void defineHisto() override final;
 
       std::vector<std::string> err;
 

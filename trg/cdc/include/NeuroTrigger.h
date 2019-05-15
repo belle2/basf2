@@ -195,6 +195,18 @@ namespace Belle2 {
      * if the option is enabled for the given sector. */
     void getEventTime(unsigned isector, const CDCTriggerTrack& track);
 
+    /** Return value of m_et_option */
+    std::string get_et_option()
+    {
+      std::string eto = m_MLPs[0].get_et_option();
+      for (unsigned int i = 0; i < m_MLPs.size(); ++i) {
+        if (m_MLPs[i].get_et_option() != eto) {
+          B2ERROR("Timing options in the expert networks in the CDC Neurotrigger differ!");
+        }
+      }
+      return eto;
+
+    }
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input

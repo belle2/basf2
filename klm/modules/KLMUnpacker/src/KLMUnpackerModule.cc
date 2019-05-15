@@ -183,20 +183,43 @@ void KLMUnpackerModule::unpackBKLMDigit(
   int electId = electCooToInt(copper - BKLM_ID, hslb,
                               raw.lane, raw.axis, raw.channel);
   int moduleId = 0;
-  bool outRange = false;
-  if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
+  std::map<int, int>::iterator it;
+  it = m_electIdToModuleId.find(electId);
+  if (it == m_electIdToModuleId.end()) {
     B2DEBUG(20, "KLMUnpackerModule:: could not find in mapping"
             << LogVar("Copper", copper)
             << LogVar("Finesse", hslb + 1)
             << LogVar("Lane", raw.lane)
             << LogVar("Axis", raw.axis));
-    return;
-  } else {
-    // found moduleId in the mapping
-    moduleId = m_electIdToModuleId[electId];
+    if (!m_WriteWrongHits)
+      return;
+    /* Try to find element with the same module ID. */
+    for (it = m_electIdToModuleId.begin(); it != m_electIdToModuleId.end();
+         ++it) {
+      /* Copper, finesse, and lane are 11 least-significant bits. */
+      if ((it->first & 0x3FF) == electId) {
+        // increase by 1 the event-counter of outOfRange-flagged hits
+        klmDigitEventInfo->increaseOutOfRangeHits();
 
-    // only channel and inRpc flag are not set yet
+        // store the digit in the appropriate dataobject
+        BKLMDigitOutOfRange* bklmDigitOutOfRange =
+          m_bklmDigitOutOfRanges.appendNew(
+            moduleId, raw.ctime, raw.tdc, raw.charge);
+        bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
+        klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
+
+        std::string message = "channel number is out of range";
+        m_rejected[message] += 1;
+        m_rejectedCount++;
+        B2DEBUG(21, "KLMUnpackerModule:: raw channel number is out of range"
+                << LogVar("Channel", raw.channel));
+
+        break;
+      }
+    }
+    return;
   }
+  moduleId = it->second;
 
   // moduleId counts are zero based
   int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
@@ -208,25 +231,6 @@ void KLMUnpackerModule::unpackBKLMDigit(
   if (layer > 14) {
     B2DEBUG(20, "KLMUnpackerModule:: strange that the layer number is larger than 14 "
             << LogVar("Layer", layer));
-    return;
-  }
-
-  if (outRange) {
-    // increase by 1 the event-counter of outOfRange-flagged hits
-    klmDigitEventInfo->increaseOutOfRangeHits();
-
-    // store the digit in the appropriate dataobject
-    BKLMDigitOutOfRange* bklmDigitOutOfRange =
-      m_bklmDigitOutOfRanges.appendNew(
-        moduleId, raw.ctime, raw.tdc, raw.charge);
-    bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-    klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
-
-    std::string message = "channel number is out of range";
-    m_rejected[message] += 1;
-    m_rejectedCount++;
-    B2DEBUG(21, "KLMUnpackerModule:: channel number is out of range"
-            << LogVar("Channel", channel));
     return;
   }
 

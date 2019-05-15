@@ -17,9 +17,12 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <vector>
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
+#include <TLine.h>
+#include <TGraphErrors.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
@@ -61,14 +64,15 @@ namespace Belle2 {
     TF1* m_fLandau = nullptr;
     //! Fit the Mean for all modules
     TF1* m_fMean = nullptr;
-    //! Histogram covering all modules
-    TH1F* m_hCharge = nullptr;
+    //! Graph covering all modules
+    TGraphErrors* m_gCharge = nullptr;
     //! Final Canvas
     TCanvas* m_cCharge = nullptr;
 
+    TLine* m_line_up{}, *m_line_mean{}, *m_line_low{};
 #ifdef _BELLE2_EPICS
-    //! Place for two EPICS PVs, Mean and maximum deviation
-    chid  mychid[2];
+    //! Place for EPICS PVs, Mean and maximum deviation
+    std::vector <chid> mychid;
 #endif
   };
 } // end namespace Belle2

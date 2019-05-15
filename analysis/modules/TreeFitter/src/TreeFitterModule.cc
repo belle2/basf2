@@ -40,7 +40,7 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            0.0);
   addParam("convergencePrecision", m_precision,
            "fractional upper limit for chi2 fluctuations to accept result. Larger value = less signal rejection but also less background rejection. Optimized for FOM on different topologies - don't touch unless you REALLY want this.",
-           1.);
+           0.01);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
   addParam("massConstraintListParticlename", m_massConstraintListParticlename,

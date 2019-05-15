@@ -173,7 +173,9 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
+#ifdef _BELLE2_EPICS
   m_nodes[0].histo = Triggers;
+#endif
   if (Hits && Triggers) {
     m_hInjectionLERECL->Divide(Hits, Triggers);
   }
@@ -194,7 +196,9 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
+#ifdef _BELLE2_EPICS
   m_nodes[3].histo = Triggers;
+#endif
   if (Hits && Triggers) {
     m_hInjectionHERECL->Divide(Hits, Triggers);
   }

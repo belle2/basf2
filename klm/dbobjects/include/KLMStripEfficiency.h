@@ -66,7 +66,7 @@ namespace Belle2 {
 
     /**
      * Set efficiency and relative error for a single EKLM strip using the geometrical infos
-     * @param endcap 1 for EF sectors, 0 for EB sectors
+     * @param endcap 2 for EF sectors, 1 for EB sectors
      * @param sector sector number
      * @param layer layer number
      * @param plane plane number
@@ -74,10 +74,10 @@ namespace Belle2 {
      * @param efficiency efficiency of the strip
      * @param efficiencyError error on the efficiency of the strip
      */
-    void setEndcapEfficiency(int isForward, int sector, int layer, int plane, int strip, float efficiency, float efficiencyError = 0.)
+    void setEndcapEfficiency(int endcap, int sector, int layer, int plane, int strip, float efficiency, float efficiencyError = 0.)
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberEKLM(isForward + 1, layer, sector, plane + 1, strip);
+      uint16_t stripId = elementNumbers->channelNumberEKLM(endcap, layer, sector, plane, strip);
       setEfficiency(stripId, efficiency, efficiencyError);
     }
 
@@ -110,16 +110,16 @@ namespace Belle2 {
 
     /**
      * Returns efficiency of a given EKLM strip using the geometrical infos
-     * @param endcap 1 for EF sectors, 0 for EB sectors
+     * @param endcap 2 for EF sectors, 1 for EB sectors
      * @param sector sector number
      * @param layer layer number
      * @param plane plane number
      * @param strip strip number
      */
-    float getEndcapEfficiency(int isForward, int sector, int layer, int plane, int strip) const
+    float getEndcapEfficiency(int endcap, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberEKLM(isForward + 1, layer, sector, plane + 1, strip);
+      uint16_t stripId = elementNumbers->channelNumberEKLM(endcap, layer, sector, plane, strip);
       return getEfficiency(stripId);
     }
 
@@ -152,16 +152,16 @@ namespace Belle2 {
 
     /**
      * Returns error on efficiency of a given EKLM strip using the geometrical infos
-     * @param endcap 1 for EF sectors, 0 for EB sectors
+     * @param endcap 2 for EF sectors, 1 for EB sectors
      * @param sector sector number
      * @param layer layer number
      * @param plane plane number
      * @param strip strip number
      */
-    float getEndcapEfficiencyError(int isForward, int sector, int layer, int plane, int strip) const
+    float getEndcapEfficiencyError(int endcap, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberEKLM(isForward + 1, layer, sector, plane + 1, strip);
+      uint16_t stripId = elementNumbers->channelNumberEKLM(endcap, layer, sector, plane, strip);
       return getEfficiencyError(stripId);
     }
 

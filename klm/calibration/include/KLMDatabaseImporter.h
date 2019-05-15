@@ -11,8 +11,6 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/logging/Logger.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>

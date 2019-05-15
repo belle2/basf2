@@ -20,8 +20,8 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/logging/Logger.h>
 #include <klm/calibration/KLMDatabaseImporter.h>
-#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 
 using namespace Belle2;
 

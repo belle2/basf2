@@ -39,7 +39,7 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            "Confidence level to accept fitted decay tree. Candidates with < confidenceLevel will be removed from the particle list! Typical Values: -1: keep all particle candidates, 0: remove all that fail the fit, 0.001: standard cut, 0.1: (too) tight cut. Optimise using a figure of merit (for example S/(sqrt{S+B}) ) for your analysis.",
            0.0);
   addParam("convergencePrecision", m_precision,
-           "Upper limit for chi2 fluctuations to accept result. Larger value = less signal rejection but also less background rejection. Optimized for FOM on different topologies - don't touch unless you REALLY want this.",
+           "fractional upper limit for chi2 fluctuations to accept result. Larger value = less signal rejection but also less background rejection. Optimized for FOM on different topologies - don't touch unless you REALLY want this.",
            1.);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});

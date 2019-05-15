@@ -239,7 +239,7 @@ void DQMHistAnalysisHLTModule::event()
     auto* histogram = canvasAndHisto.second;
 
     canvas->cd();
-    histogram->Draw("");
+    histogram->Draw("hist");
     canvas->Modified();
     canvas->Update();
   }
@@ -249,7 +249,7 @@ void DQMHistAnalysisHLTModule::event()
     auto* histogram = nameAndCanvasAndHisto.second.second;
 
     canvas->cd();
-    histogram->Draw("");
+    histogram->Draw("hist");
     canvas->Modified();
     canvas->Update();
   }

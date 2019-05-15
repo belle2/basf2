@@ -12,7 +12,6 @@
 
 // basf2 headers
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <framework/logging/Logger.h>
 
 /* C++ headers. */
 #include <cstdint>

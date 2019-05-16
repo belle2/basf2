@@ -19,7 +19,7 @@ namespace Belle2 {
     bool valid = decayDescriptor.init(listname);
     if (!valid)
       throw std::runtime_error("Invalid ParticleList name: '" + listname + "' Should be EVTPDLNAME[:LABEL], e.g. B+ or B+:mylist.");
-    ParticleListHelper::registerList(decayDescriptor);
+    ParticleListHelper::registerList(decayDescriptor, save);
   }
 
   void ParticleListHelper::registerList(const DecayDescriptor& decay, bool save)

@@ -90,6 +90,11 @@ namespace Belle2 {
        */
       virtual void normalize(unsigned timeStamp) override;
 
+      /**
+       * Return number of strips on a sensor.
+       * @param layer layer number of the sensor (starting from 0)
+       * @param isU true if the sensor is U side, false if V.
+       */
       int nStripsOnLayerSide(int layer, bool isU)
       {
         if (!isU && layer > 0) return 512; // V side on Layer 4,5,6
@@ -99,7 +104,7 @@ namespace Belle2 {
     private:
 
       // class parameters: to be set via constructor or setters
-      int m_nLayers = 4;
+      int m_nLayers = 4; /**< number of layers */
       int m_nLadders[4] = {7, 10, 12, 16}; /**< number of ladders on each layer */
       int m_nSensors[4] = {2, 3, 4, 5}; /**< number of sensors on a ladder on each layer */
 
@@ -113,8 +118,8 @@ namespace Belle2 {
       StoreArray<SVDShaperDigit> m_digits;  /**< collection of digits */
 
       // DB payloads
-      SVDHotStripsCalibrations m_HotStripsCalib;
-      SVDFADCMaskedStrips m_FADCMaskedStrips;
+      SVDHotStripsCalibrations m_HotStripsCalib; /**< payload for hot strips */
+      SVDFADCMaskedStrips m_FADCMaskedStrips; /**< payload for strips masked on FADC level */
 
       // other
       int m_activeStrips; /**< number of active strips */

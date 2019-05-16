@@ -15,6 +15,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <numeric>
 
@@ -91,6 +92,9 @@ namespace Belle2 {
 
           //calculating the background rate per second
           double dspBkgRate = ((pow(dspSigma, 2)) - (pow(sigmaNoise, 2))) / (2.53 * 1e-12);
+          if (dspBkgRate < 0) {
+            dspBkgRate = 0;
+          }
 
           //hit rate for segment in ECL, which is later normalized per 1Hz
           rates.averageDspBkgRate[segmentNumber] += dspBkgRate;
@@ -178,7 +182,15 @@ namespace Belle2 {
 
     void ECLHitRateCounter::findElectronicsNoise()
     {
-      TFile noiseFile("ecl/data/sigmaMeanElectronics.root", "READ");
+      std::string fileName = FileSystem::findFile("ecl/data/sigmaMeanElectronics.root");
+      if (fileName.empty()) {
+        B2WARNING("ECLHitRateCounter: file with electronics noise data not found");
+        for (int i = 1; i < 8737; i++) {
+          m_noiseMap[i] = 0;
+        }
+        return;
+      }
+      TFile noiseFile(fileName.c_str(), "READ");
       TH1F* h_Noise = dynamic_cast<TH1F*>(noiseFile.Get("sigma_noise"));
 
       for (int i = 1; i < 8737; i++) {

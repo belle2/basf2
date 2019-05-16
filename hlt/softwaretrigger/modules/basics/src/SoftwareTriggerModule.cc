@@ -106,6 +106,9 @@ void SoftwareTriggerModule::event()
   if (not m_resultStoreObjectPointer.isValid()) {
     m_resultStoreObjectPointer.construct();
   }
+  if (not m_additionalInformationStoreObjectPointer.isValid() and m_param_storeAdditionalInformation) {
+    m_additionalInformationStoreObjectPointer.construct();
+  }
 
   if (m_param_preScaleStoreDebugOutputToDataStore > 0 and not m_debugOutputStoreObject.isValid()) {
     m_debugOutputStoreObject.construct();

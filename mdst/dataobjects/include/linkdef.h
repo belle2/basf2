@@ -39,6 +39,7 @@
 
 #pragma link C++ class Belle2::TRGSummary+;
 #pragma link C++ class Belle2::SoftwareTriggerResult+;
+#pragma link C++ class Belle2::SoftwareTriggerInformation+;
 
 // Allow reading PIDLikelihood version <=2 (less particle types, different order)
 //

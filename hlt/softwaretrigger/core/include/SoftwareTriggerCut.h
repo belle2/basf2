@@ -111,6 +111,14 @@ namespace Belle2 {
        */
       SoftwareTriggerCutResult checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const;
 
+      /**
+       * Return both the non-prescaled and the prescaled result. This function should only be use experts, you basically always want to
+       * use the checkPreScaled function.
+       * Returns a pair [non-prescaled, prescaled]
+       */
+      std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> check(const SoftwareTriggerVariableManager::Object& prefilledObject)
+      const;
+
     private:
       /// Internal representation of the cut condition as a general cut.
       std::unique_ptr<GeneralCut<SoftwareTriggerVariableManager>> m_cut = nullptr;

@@ -14,6 +14,7 @@
 
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/SoftwareTriggerInformation.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
 #include <vector>
@@ -81,6 +82,8 @@ namespace Belle2 {
       std::string m_param_resultStoreArrayName = "";
       /// Flag to also store the result of the calculations into a root file.
       bool m_param_storeDebugOutputToROOTFile = false;
+      /// Flag to store additional information concerning the result to the data store
+      bool m_param_storeAdditionalInformation = true;
       /// Prescale with which to save the results of the calculations into the DataStore.
       unsigned int m_param_preScaleStoreDebugOutputToDataStore = 0;
       /// Output file name for the debug output. Is only used if debug is turned on.
@@ -91,6 +94,8 @@ namespace Belle2 {
       // Object pools
       /// Store Object for storing the trigger decision.
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+      /// Store Object for storing additional information (if requested)
+      StoreObjPtr<SoftwareTriggerInformation> m_additionalInformationStoreObjectPointer;
       /// Internal handler object for the DB interface.
       std::unique_ptr<SoftwareTriggerDBHandler> m_dbHandler;
       /// Internal handler for the Calculations (will be set in initialize to the correct one).

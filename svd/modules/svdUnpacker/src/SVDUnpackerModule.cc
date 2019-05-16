@@ -71,8 +71,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
   addParam("killDigitsFromUpsetAPVs", m_killUpsetDigits, "Delete digits from upset APVs", bool(false));
   addParam("silentlyAppend", m_silentAppend, "Append digits to a pre-existing non-empty storeArray", bool(false));
   addParam("badMappingFatal", m_badMappingFatal, "Throw B2FATAL if there's a wrong payload in the database", bool(false));
-  addParam("switchErrors2Warnings", m_switchErrors2Warnings, "switching B2ERRORS to B2WARNINGS if running on HLT or ExpressReco",
-           bool(false));
+  addParam("UnapckerErrorRate", m_errorRate, "How often the Unpackeer errors are displayed", int(1000));
 
 }
 
@@ -117,6 +116,8 @@ void SVDUnpackerModule::beginRun()
   //passing APV<->FADC mapping from SVDOnlineToOfflineMap object
   APVmap = &(m_map->APVforFADCmap);
 
+  NOofErrors1 = -1;
+  NOofErrors2 = -1;
 }
 
 #ifndef __clang__
@@ -152,11 +153,7 @@ void SVDUnpackerModule::event()
   map<unsigned short, set<pair<unsigned short, unsigned short> > > apvsByPipeline;
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
-    if (!m_switchErrors2Warnings) {
-      B2ERROR("Missing valid EventMetaData." << std::endl << "No SVDDigit produced for this event!");
-    } else {
-      B2WARNING("Missing valid EventMetaData." << std::endl << "No SVDDigit produced for this event!");
-    }
+    B2ERROR("Missing valid EventMetaData." << std::endl << "No SVDDigit produced for this event!");
     return;
   }
 
@@ -170,10 +167,11 @@ void SVDUnpackerModule::event()
   set<short> seenAPVHeaders = {};
 
   unsigned short nEntries_rawSVD = rawSVDList.getEntries();
+  auto eventNo = m_eventMetaDataPtr->getEvent();
 
   if (nEntries_rawSVD != nFADCboards) {
-    B2WARNING("Number of RawSVD data objects do not match the number of FADC boards" << LogVar("#RawSVD",
-              nEntries_rawSVD)  << LogVar("#FADCs", nFADCboards) << LogVar("Event number", m_eventMetaDataPtr->getEvent()));
+    B2ERROR("Number of RawSVD data objects do not match the number of FADC boards" << LogVar("#RawSVD",
+            nEntries_rawSVD)  << LogVar("#FADCs", nFADCboards) << LogVar("Event number", eventNo));
 
     nFADCmatch = false;
   }
@@ -236,34 +234,30 @@ void SVDUnpackerModule::event()
             if (ftbError != 240) {
               switch (ftbError - 240) {
                 case 3:
-                  B2WARNING("FADC Event Number is different from (FTB & TTD) Event Numbers");
+                  B2ERROR("FADC Event Number is different from (FTB & TTD) Event Numbers");
                   break;
                 case 5:
-                  B2WARNING("TTD Event Number is different from (FTB & FADC) Event Numbers");
+                  B2ERROR("TTD Event Number is different from (FTB & FADC) Event Numbers");
                   break;
                 case 6:
-                  B2WARNING("FTB Event Number is different from (TTD & FADC) Event Numbers");
+                  B2ERROR("FTB Event Number is different from (TTD & FADC) Event Numbers");
                   break;
                 case 7:
-                  B2WARNING("(FTB, TTD & FADC) Event Numbers are different from each other");
+                  B2ERROR("(FTB, TTD & FADC) Event Numbers are different from each other");
                   break;
                 default:
-                  B2WARNING("Problem with errorsField variable in FTB Header" << LogVar("abnormal value", ftbError));
+                  B2ERROR("Problem with errorsField variable in FTB Header" << LogVar("abnormal value", ftbError));
               }
             }
 
             if (m_FTBHeader.eventNumber !=
-                (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) {
-              if (m_shutUpFTBError) { //
-                m_shutUpFTBError -= 1 ;
-
-                if (!m_switchErrors2Warnings) {
-                  B2ERROR("Trigger number mismatch detected!" << LogVar("Expected trigger number & 0xFFFFFF",
-                                                                        (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) << LogVar("Trigger number in the FTB", m_FTBHeader.eventNumber));
-                } else {
-                  B2WARNING("Trigger number mismatch detected!" << LogVar("Expected trigger number & 0xFFFFFF",
-                                                                          (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) << LogVar("Trigger number in the FTB", m_FTBHeader.eventNumber));
-                }
+                (eventNo & 0xFFFFFF)) {
+              NOofErrors1++;
+              if (m_shutUpFTBError && !(NOofErrors1 % m_errorRate)) { //
+                m_shutUpFTBError -= 1;
+                B2ERROR("Event number mismatch detected! The event number given by EventMetaData object is different from the one in the FTB Header."
+                        << LogVar("Expected trigger number & 0xFFFFFF",
+                                  (eventNo & 0xFFFFFF)) << LogVar("Trigger number in the FTB", m_FTBHeader.eventNumber));
               }
             }
 
@@ -290,17 +284,13 @@ void SVDUnpackerModule::event()
 
             if (
               m_MainHeader.trgNumber !=
-              ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF)) {
+              ((eventNo - m_FADCTriggerNumberOffset) & 0xFF)) {
 
-              if (!m_switchErrors2Warnings) {
-                B2ERROR(" Found a wrong FTB header of the SVD FADC " << LogVar("Event number", m_eventMetaDataPtr->getEvent()) << LogVar("FADC",
-                        fadc) << LogVar("Trigger number LSByte reported by the FADC", m_MainHeader.trgNumber) << LogVar("+ offset",
-                            m_FADCTriggerNumberOffset) << LogVar("expected", (m_eventMetaDataPtr->getEvent() & 0xFF)));
-              } else {
-                B2WARNING(" Found a wrong FTB header of the SVD FADC " << LogVar("Event number", m_eventMetaDataPtr->getEvent()) << LogVar("FADC",
-                          fadc) << LogVar("Trigger number LSByte reported by the FADC", m_MainHeader.trgNumber) << LogVar("+ offset",
-                              m_FADCTriggerNumberOffset) << LogVar("expected", (m_eventMetaDataPtr->getEvent() & 0xFF)));
-              }
+              NOofErrors2++;
+              if (!(NOofErrors2 % m_errorRate))
+                B2ERROR("Event number mismatch detected! The event number given by EventMetaData object is different from the one in the FADC Header. "
+                        << LogVar("Event number", eventNo) << LogVar("FADC", fadc) << LogVar("Trigger number LSByte reported by the FADC",
+                            m_MainHeader.trgNumber) << LogVar("+ offset", m_FADCTriggerNumberOffset) << LogVar("expected", (eventNo & 0xFF)));
 
               badHeader = true;
               currentDAQDiagnostic = DAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, nFADCmatch, nAPVmatch, badHeader, fadc, 0);
@@ -322,8 +312,8 @@ void SVDUnpackerModule::event()
             apvErrors = m_APVHeader.apvErr;
             pipAddr = m_APVHeader.pipelineAddr;
 
-            if (apvErrors != 0) B2WARNING("APV error has been detected." << LogVar("FADC", fadc) << LogVar("APV", apv) << LogVar("Error value",
-                                            apvErrors));
+            if (apvErrors != 0) B2ERROR("APV error has been detected." << LogVar("FADC", fadc) << LogVar("APV", apv) << LogVar("Error value",
+                                          apvErrors));
 
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
             currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, nAPVmatch,
@@ -401,7 +391,6 @@ void SVDUnpackerModule::event()
                 if (fadcApv.first != fadc) continue;
                 if (seenAPVHeaders.find(fadcApv.second) == seenAPVHeaders.end()) {
                   // We have a missing APV. Look if it is a known one.
-                  auto eventNo = m_eventMetaDataPtr->getEvent();
                   auto missingRec = m_missingAPVs.find(make_pair(fadcApv.first, fadcApv.second));
                   if (missingRec != m_missingAPVs.end()) {
                     // This is known to be missing, so keep quiet and just update event counters
@@ -415,8 +404,8 @@ void SVDUnpackerModule::event()
                                            make_pair(fadcApv.first, fadcApv.second),
                                            make_pair(eventNo, eventNo)
                                          ));
-                    B2WARNING("missing APV header! " << LogVar("Event number", eventNo) << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
-                              int(fadcApv.first)));
+                    B2ERROR("missing APV header! " << LogVar("Event number", eventNo) << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
+                            int(fadcApv.first)));
                   }
                 }
               }
@@ -427,13 +416,13 @@ void SVDUnpackerModule::event()
             ftbFlags = m_FADCTrailer.FTBFlags;
             if ((ftbFlags >> 5) != 0) badTrailer = true;
             if (ftbFlags != 0) {
-              B2WARNING(" FTB Flags variable has an active error bit(s)" << LogVar("on FADC number", fadc));
+              B2ERROR(" FTB Flags variable has an active error bit(s)" << LogVar("on FADC number", fadc));
 
-              if (ftbFlags & 16) B2WARNING("----> CRC error has been detected. Data might be corrupted!");
-              if (ftbFlags & 8) B2WARNING("----> Bad Event indication has been detected. Data might be corrupted!");
-              if (ftbFlags & 4) B2WARNING("----> Double Header has been detected. Data might be corrupted!");
-              if (ftbFlags & 2) B2WARNING("----> Time Out has been detected. Data might be corrupted!");
-              if (ftbFlags & 1) B2WARNING("----> Event Too Long! Data might be corrupted!");
+              if (ftbFlags & 16) B2ERROR("----> CRC error has been detected. Data might be corrupted!");
+              if (ftbFlags & 8) B2ERROR("----> Bad Event indication has been detected. Data might be corrupted!");
+              if (ftbFlags & 4) B2ERROR("----> Double Header has been detected. Data might be corrupted!");
+              if (ftbFlags & 2) B2ERROR("----> Time Out has been detected. Data might be corrupted!");
+              if (ftbFlags & 1) B2ERROR("----> Event Too Long! Data might be corrupted!");
             }
 
             apvErrorsOR = m_FADCTrailer.apvErrOR;
@@ -497,7 +486,6 @@ void SVDUnpackerModule::event()
       if (p.first == major_apv->first) continue;
       for (const auto& fadcApv : p.second) {
         // We have an upset APV. Look if it is a known one.
-        auto eventNo = m_eventMetaDataPtr->getEvent();
         auto upsetRec = m_upsetAPVs.find(make_pair(fadcApv.first, fadcApv.second));
         if (upsetRec != m_upsetAPVs.end()) {
           // This is known to be upset, so keep quiet and update event counters
@@ -516,8 +504,8 @@ void SVDUnpackerModule::event()
             if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
               pp.setUpsetAPV(true);
           }
-          B2WARNING("Upset APV detected!!!" << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
-                    int(fadcApv.first)) << LogVar("Event number", eventNo));
+          B2ERROR("Upset APV detected!!!" << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
+                  int(fadcApv.first)) << LogVar("Event number", eventNo));
         }
       }
     }
@@ -527,7 +515,8 @@ void SVDUnpackerModule::event()
   for (auto& p : diagnosticMap) {
 
     if ((m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress()) || p.second->getFTBError() != 240
-        || p.second->getFTBFlags()) continue;
+        || p.second->getFTBFlags()     || p.second->getAPVError() || !(p.second->getAPVMatch()) || !(p.second->getFADCMatch())
+        ||  p.second->getBadMapping() || p.second->getUpsetAPV()) continue;
     shaperDigits.appendNew(p.first)->addRelationTo(p.second);
   }
 

@@ -82,7 +82,7 @@ const SVDOnlineToOfflineMap::SensorInfo& SVDOnlineToOfflineMap::getSensorInfo(un
   auto sensorIter = m_sensors.find(id);
 
   if (sensorIter == m_sensors.end()) {
-    B2WARNING("Combination not found in the SVD On-line to Off-line map:" << LogVar("FADC", int(FADC)) << LogVar("APV", int(APV25)));
+    B2ERROR("Combination not found in the SVD On-line to Off-line map:" << LogVar("FADC", int(FADC)) << LogVar("APV", int(APV25)));
     m_currentSensorInfo.m_sensorID = 0;
     m_currentSensorInfo.m_channel0 = 0;
     m_currentSensorInfo.m_channel127 = 0;

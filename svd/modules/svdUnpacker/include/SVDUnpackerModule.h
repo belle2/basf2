@@ -194,10 +194,16 @@ namespace Belle2 {
        */
       bool m_badMappingFatal = false;
 
-      /** Optionally we can switch all B2ERRORS to B2WARNINGS
-       *  if running on HLT or ExpressReco
+      /** The parameter that indicates what fraction of B2ERRORs messegases
+       * should be suppressed to not overload HLT while data taking
        */
-      bool m_switchErrors2Warnings = false;
+      int m_errorRate;
+
+      /** These are counters that count the number of "Trigger number mismatch"
+       * and "Event number mismatch" ERRORS.
+       */
+      int NOofErrors1;
+      int NOofErrors2;
 
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;

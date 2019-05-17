@@ -237,6 +237,9 @@ namespace Belle2 {
     bool m_unpackNeuro;  /**< flag to unpack neurotrigger data */
     bool m_decodeNeuro;  /**< flag to decode neurotrigger data */
 
+    int m_delayNNOutput; /**< delay of the NN output values clock cycle after the NN enable bit */
+    int m_delayNNSelect; /**< delay of the NN selected TS clock cycle after the NN enable bit */
+
     /** bitstream of TSF output to 2D tracker */
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;
 

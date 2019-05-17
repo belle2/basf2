@@ -361,7 +361,7 @@ void CDCTriggerDQMModule::defineHisto()
                               100, -1, 1);
     m_RecoPhi = new TH1F("RecoPhi",
                          "phi distribution of reconstructed tracks ;phi [deg]",
-                         161, -1.25, 361); // shift to reduce the binning error
+                         160, -180, 180);
     m_RecoInvPt = new TH1F("RecoInvPt",
                            "Inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
                            34, 0, 3.5);
@@ -375,7 +375,7 @@ void CDCTriggerDQMModule::defineHisto()
                                 100, -1, 1);
     m_RecoHWPhi = new TH1F("RecoHWPhi",
                            "hw matched phi distribution of reconstructed tracks ;phi [deg]",
-                           161, -1.25, 361); // shift to reduce the binning error
+                           160, -180, 180);
     m_RecoHWInvPt = new TH1F("RecoHWInvPt",
                              "hw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
                              34, 0, 3.5);
@@ -392,7 +392,7 @@ void CDCTriggerDQMModule::defineHisto()
                                 100, -1, 1);
     m_RecoSWPhi = new TH1F("RecoSWPhi",
                            "sw matched phi distribution of reconstructed tracks ;phi [deg]",
-                           161, -1.25, 361); // shift to reduce the binning error
+                           160, -180, 180);
     m_RecoSWInvPt = new TH1F("RecoSWInvPt",
                              "sw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
                              34, 0, 3.5);
@@ -411,7 +411,7 @@ void CDCTriggerDQMModule::defineHisto()
                                   100, -100, 100);
     m_DeltaRecoHWPhi = new TH1F("DeltaRecoHWPhi",
                                 "difference between reconstructed and unpacked neuro phi;delta phi [deg]",
-                                100, -180, 180);
+                                160, -180, 180);
 
     m_DeltaRecoSWZ = new TH1F("DeltaRecoSWZ",
                               "difference between reconstructed and simulated neuro z;delta z [cm]",
@@ -424,7 +424,7 @@ void CDCTriggerDQMModule::defineHisto()
                                   100, -100, 100);
     m_DeltaRecoSWPhi = new TH1F("DeltaRecoSWPhi",
                                 "difference between reconstructed and simulated neuro phi;delta phi [deg]",
-                                100, -180, 180);
+                                160, -180, 180);
   }
 
   // cd back to root directory
@@ -611,6 +611,8 @@ void CDCTriggerDQMModule::beginRun()
 
 void CDCTriggerDQMModule::event()
 {
+  if (m_unpackedNeuroInputSegments.getEntries() == 0)
+    return;
   if (m_showRecoTracks == "yes") {
     // a RecoTrack has multiple representations for different particle hypothesis
     // -> just take the first one that does not give errors.

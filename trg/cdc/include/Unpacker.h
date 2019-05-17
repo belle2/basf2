@@ -704,10 +704,10 @@ namespace Belle2 {
       StoreArray<CDCTriggerTrack>* store2DTracks,
       StoreArray<CDCTriggerTrack>* storeNNTracks,
       StoreArray<CDCTriggerSegmentHit>* tsHits,
-      StoreArray<CDCTriggerMLPInput>* storeNNInputs)
+      StoreArray<CDCTriggerMLPInput>* storeNNInputs,
+      int delayNNOutput,
+      int delayNNSelect)
     {
-      constexpr short delayNNOutput = 8;
-      constexpr short delayNNSelect = 3;
       for (short iclock = 0; iclock < bitsFromNN->getEntries(); ++iclock) {
         NNInputBitStream* bitsIn = (*bitsToNN)[iclock];
         NNOutputBitStream* bitsOutEnable = (*bitsFromNN)[iclock];
@@ -718,7 +718,7 @@ namespace Belle2 {
             TRG2DFinderTrack trk2D;
             bool has2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits, &trk2D);
             if (has2D) {
-              short foundTime = iclock + delayNNOutput;
+              int foundTime = iclock + delayNNOutput;
               if (foundTime  < bitsFromNN->getEntries()) {
                 NNOutputBitStream* bitsOut = (*bitsFromNN)[foundTime];
                 NNOutputBitStream* bitsSelectTS = (*bitsFromNN)[iclock + delayNNSelect];

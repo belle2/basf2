@@ -504,6 +504,10 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "number of words (number of bits / 32) of the B2L header", 3);
   addParam("alignFoundTime", m_alignFoundTime,
            "Whether to align out-of-sync Belle2Link data between different sub-modules", true);
+  addParam("delayNNOutput", m_delayNNOutput,
+           "delay of the NN output values clock cycle after the NN enable bit", 8);
+  addParam("delayNNSelect", m_delayNNSelect,
+           "delay of the NN selected TS clock cycle after the NN enable bit", 3);
 
 }
 
@@ -676,7 +680,8 @@ void CDCTriggerUnpackerModule::event()
     }
   }
   if (m_decodeNeuro) {
-    decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs);
+    decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs, m_delayNNOutput,
+               m_delayNNSelect);
   }
 }
 

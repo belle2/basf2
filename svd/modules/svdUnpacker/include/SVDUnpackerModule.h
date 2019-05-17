@@ -70,7 +70,6 @@ namespace Belle2 {
       int m_wrongFTBcrc;
 
 
-
     private:
 
       /**how many FADCs we have */
@@ -194,16 +193,17 @@ namespace Belle2 {
        */
       bool m_badMappingFatal = false;
 
-      /** The parameter that indicates what fraction of B2ERRORs messegases
+      /** The parameter that indicates what fraction of B2ERRORs messages
        * should be suppressed to not overload HLT while data taking
        */
       int m_errorRate;
 
-      /** These are counters that count the number of "Trigger number mismatch"
-       * and "Event number mismatch" ERRORS.
-       */
-      int NOofErrors1;
-      int NOofErrors2;
+      /** counters for specific ERRORS produced by the Unpacker */
+      int nTriggerMatchErrors;
+      int nEventMatchErrors;
+      int nUpsetAPVsErrors;
+      int nErrorFieldErrors;
+      int nMissingAPVsErrors;
 
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;

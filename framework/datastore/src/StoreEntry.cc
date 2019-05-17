@@ -5,15 +5,18 @@
 #include <TClass.h>
 #include <TClonesArray.h>
 
+#include <utility>
+
 using namespace Belle2;
 
-StoreEntry::StoreEntry(bool isArray_, TClass* cl, const std::string& name_, bool dontWriteOut_):
+// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
+StoreEntry::StoreEntry(bool isArray_, TClass* cl, std::string  name_, bool dontWriteOut_):
   isArray(isArray_),
   dontWriteOut(dontWriteOut_),
   objClass(cl),
   object(nullptr),
   ptr(nullptr),
-  name(name_)
+  name(std::move(name_))
 {
   recoverFromNullObject();
 }
@@ -36,7 +39,7 @@ void StoreEntry::recoverFromNullObject()
     // doesn't know about that. So to be on the safe side we have to manually
     // fix the pointer address using the BaseClassOffset from TClass. And since
     // pointer arithmetic on void* is forbidden we have to go to char* first.
-    char* rawPtr = reinterpret_cast<char*>(objClass->New());
+    auto* rawPtr = reinterpret_cast<char*>(objClass->New());
     int offset = objClass->GetBaseClassOffset(TObject::Class());
     if (offset < 0) B2FATAL("Class " << objClass->GetName() << " does not inherit from TObject");
     object = reinterpret_cast<TObject*>(rawPtr + offset);

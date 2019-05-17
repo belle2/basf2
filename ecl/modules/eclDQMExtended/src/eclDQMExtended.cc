@@ -87,6 +87,10 @@ ECLDQMEXTENDEDModule::ECLDQMEXTENDEDModule()
   addParam("RunName", m_RunName,
            "Name of run with DSP files", std::string("run0000/"));
 
+  addParam("SaveDetailedFitData", m_SaveDetailedFitData, "Save detailed data "
+           "(ampdiff_{cellid,shaper}, timediff_{cellid,shaper} histograms) for "
+           "failed fits.", false);
+
 }
 
 ECLDQMEXTENDEDModule::~ECLDQMEXTENDEDModule()
@@ -208,15 +212,33 @@ void ECLDQMEXTENDEDModule::defineHisto()
 
   //2D histograms creation.
 
-  h_ampdiff_cellid = new TH2F("ampdiff_cellid", "Amp. diff. (Emulator-Data) for amp. fails", 8736, 1, 8737, 239, -262143, 262143);
-  h_ampdiff_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_ampdiff_cellid->GetYaxis()->SetTitle("Amplitude difference");
-  h_ampdiff_cellid->SetOption("LIVE");
+  if (m_SaveDetailedFitData) {
+    h_ampdiff_cellid = new TH2F("ampdiff_cellid", "Amp. diff. (Emulator-Data) for amp. fails",
+                                8736, 1, 8737, 239, -262143, 262143);
+    h_ampdiff_cellid->GetXaxis()->SetTitle("Cell ID");
+    h_ampdiff_cellid->GetYaxis()->SetTitle("Amplitude difference");
+    h_ampdiff_cellid->SetOption("LIVE");
 
-  h_timediff_cellid = new TH2F("timediff_cellid", "Time diff.(Emulator-Data) for time fails", 8736, 1, 8737, 239, -4095, 4095);
-  h_timediff_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_timediff_cellid->GetYaxis()->SetTitle("Time difference");
-  h_timediff_cellid->SetOption("LIVE");
+    h_timediff_cellid = new TH2F("timediff_cellid", "Time diff.(Emulator-Data) for time fails",
+                                 8736, 1, 8737, 239, -4095, 4095);
+    h_timediff_cellid->GetXaxis()->SetTitle("Cell ID");
+    h_timediff_cellid->GetYaxis()->SetTitle("Time difference");
+    h_timediff_cellid->SetOption("LIVE");
+
+    h_ampdiff_shaperid = new TH2F("ampdiff_shaper", "Amp. diff. (Emulator-Data) "
+                                  "for amp. fails in bins of Shaper Id",
+                                  624, 1, 625, 239, -262143, 262143);
+    h_ampdiff_shaperid->GetXaxis()->SetTitle("Shaper Id");
+    h_ampdiff_shaperid->GetYaxis()->SetTitle("Amplitude difference");
+    h_ampdiff_shaperid->SetOption("LIVE");
+
+    h_timediff_shaperid = new TH2F("timediff_shaper", "Time diff. (Emulator-Data) "
+                                   "for time fails in bins of Shaper Id",
+                                   624, 1, 625, 239, -4095, 4095);
+    h_timediff_shaperid->GetXaxis()->SetTitle("Shaper Id");
+    h_timediff_shaperid->GetYaxis()->SetTitle("Time difference");
+    h_timediff_shaperid->SetOption("LIVE");
+  }
 
   h_ampdiff_quality = new TH2F("ampdiff_quality", "Amp. diff. (Emulator-Data) for amp. fails in bins of QualityData", 4, 0, 4, 239,
                                -262143, 262143);
@@ -229,19 +251,6 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timediff_quality->GetXaxis()->SetTitle("QualityData");
   h_timediff_quality->GetYaxis()->SetTitle("Time difference");
   h_timediff_quality->SetOption("LIVE");
-
-  h_ampdiff_shaperid = new TH2F("ampdiff_shaper", "Amp. diff. (Emulator-Data) for amp. fails in bins of Shaper Id", 624, 1, 625, 239,
-                                -262143, 262143);
-  h_ampdiff_shaperid->GetXaxis()->SetTitle("Shaper Id");
-  h_ampdiff_shaperid->GetYaxis()->SetTitle("Amplitude difference");
-  h_ampdiff_shaperid->SetOption("LIVE");
-
-  h_timediff_shaperid = new TH2F("timediff_shaper", "Time diff. (Emulator-Data) for time fails in bins of Shaper Id", 624, 1, 625,
-                                 239,
-                                 -4095, 4095);
-  h_timediff_shaperid->GetXaxis()->SetTitle("Shaper Id");
-  h_timediff_shaperid->GetYaxis()->SetTitle("Time difference");
-  h_timediff_shaperid->SetOption("LIVE");
 
   h_quality_fit_data = new TH2F("quality_fit_data", "QualityFit vs QualityData for quality fails", 4, 0, 4, 4, 0, 4);
   h_quality_fit_data->GetXaxis()->SetTitle("QualityFit");
@@ -464,12 +473,14 @@ void ECLDQMEXTENDEDModule::beginRun()
   h_qualityfail_cellid->Reset();
   h_qualityfail_shaperid->Reset();
   h_qualityfail_crateid->Reset();
-  h_ampdiff_cellid->Reset();
-  h_timediff_cellid->Reset();
+  if (m_SaveDetailedFitData) {
+    h_ampdiff_cellid->Reset();
+    h_timediff_cellid->Reset();
+    h_ampdiff_shaperid->Reset();
+    h_timediff_shaperid->Reset();
+  }
   h_ampdiff_quality->Reset();
   h_timediff_quality->Reset();
-  h_ampdiff_shaperid->Reset();
-  h_timediff_shaperid->Reset();
   h_quality_fit_data->Reset();
   h_ampflag_qualityfail->Reset();
   h_timeflag_qualityfail->Reset();
@@ -501,9 +512,11 @@ void ECLDQMEXTENDEDModule::event()
         h_ampfail_cellid->Fill(m_CellId);
         h_ampfail_shaperid->Fill(conversion(m_CellId));
         h_ampfail_crateid->Fill(mapper.getCrateID(m_CellId));
-        h_ampdiff_cellid->Fill(m_CellId, m_AmpFit - m_AmpData);
+        if (m_SaveDetailedFitData) {
+          h_ampdiff_cellid->Fill(m_CellId, m_AmpFit - m_AmpData);
+          h_ampdiff_shaperid->Fill(conversion(m_CellId), m_AmpFit - m_AmpData);
+        }
         h_ampdiff_quality->Fill(m_QualityData, m_AmpFit - m_AmpData);
-        h_ampdiff_shaperid->Fill(conversion(m_CellId), m_AmpFit - m_AmpData);
       }
       if (m_TimeFit != m_TimeData) {
         for (int i = 0; i < 4; i++) if (m_QualityData == i && m_AmpFit == m_AmpData) h_amp_timefail[i]->Fill(m_AmpData);
@@ -511,9 +524,11 @@ void ECLDQMEXTENDEDModule::event()
         h_timefail_cellid->Fill(m_CellId);
         h_timefail_shaperid->Fill(conversion(m_CellId));
         h_timefail_crateid->Fill(mapper.getCrateID(m_CellId));
-        h_timediff_cellid->Fill(m_CellId, m_TimeFit - m_TimeData);
+        if (m_SaveDetailedFitData) {
+          h_timediff_cellid->Fill(m_CellId, m_TimeFit - m_TimeData);
+          h_timediff_shaperid->Fill(conversion(m_CellId), m_TimeFit - m_TimeData);
+        }
         h_timediff_quality->Fill(m_QualityData, m_TimeFit - m_TimeData);
-        h_timediff_shaperid->Fill(conversion(m_CellId), m_TimeFit - m_TimeData);
       }
       if (m_AmpFit != m_AmpData && m_TimeFit != m_TimeData) {
         h_amptimefail_cellid->Fill(m_CellId);

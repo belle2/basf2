@@ -129,7 +129,7 @@ namespace TreeFitter {
                                                      charge()
                                                     );
     if (!m_cached) {
-      RecoTrack* nonconst =  const_cast<RecoTrack*>(this);
+      auto* nonconst =  const_cast<RecoTrack*>(this);
       if (m_flt == 0) { nonconst->updFltToMother(fitparams); }
       nonconst->updateParams(m_flt);
     }

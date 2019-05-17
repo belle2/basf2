@@ -1,6 +1,9 @@
 //THIS MODULE
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
 
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
 //C++
 #include <algorithm>
 
@@ -29,7 +32,7 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 }
 
 
-ChargedPidMVAModule::~ChargedPidMVAModule() {}
+ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 
 
 void ChargedPidMVAModule::initialize()
@@ -92,35 +95,63 @@ void ChargedPidMVAModule::event()
 
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
-      // Check that the particle has a valid relation set between track and ECL cluster.
+      // If the particle list was created by the FSRCorrection module,
+      // the info in the mdst objects associated to the particles cannot be retrieved directly from the particle.
+      // Instead, one has to get the associated daughters, that hold relations with the mdst objects:
+      // -) the 0-th daughter, i.e. the original particle before brem correction,
+      // -) the 1-st daughter i.e. the brems photon particle (if found), needed to correct E/p.
+      auto nDaughters = particle->getNDaughters();
+      const Particle* daughterLep = (nDaughters) ? particle->getDaughter(0) : nullptr;
+      const Particle* daughterPh  = (nDaughters > 0) ? particle->getDaughter(1) : nullptr;
+
+      // Check that the particle (or the 'daughterLep') has a valid relation set between track and ECL cluster.
       // Otherwise, skip to next.
-      if (!particle->getECLCluster()) {
+      const ECLCluster* eclCluster = (!nDaughters) ? particle->getECLCluster() : daughterLep->getECLCluster();
+      if (!eclCluster) {
         B2DEBUG(11, "\t --> Invalid track-cluster relation, skip...");
         continue;
       }
 
       // Retrieve the index for the correct MVA expert and dataset, given (signal hypo, clusterTheta, p)
-      auto theta   = particle->getECLCluster()->getTheta();
-      auto p       = particle->getP();
+      auto theta   = eclCluster->getTheta();
+      auto p       = particle->getP(); // This is the momentum from the 4-vec after any possible correction,
+      // hence it must be the one of the actual particle.
       int jth, ip;
       auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
 
       B2DEBUG(11, "\t\tclusterTheta = " << theta << " [rad]");
       B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
+      B2DEBUG(11, "\t\tFSRCorrected? " << static_cast<bool>(nDaughters));
       B2DEBUG(11, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
       auto nvars  = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
         auto varobj =  m_variables.at(index).at(ivar);
-        B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << varobj->function(particle));
-        m_datasets.at(index)->m_input[ivar] = varobj->function(particle);
+        // Set the variables from the daughter particle, if found.
+        // In that case, also ensure E/p is calculated *after* the 4-vec correction,
+        // i.e. using the actual particle's momentum, and the cluster energy includes the brems photon contribution.
+        auto var(-999.0);
+        if (varobj->name == "clusterEoP") {
+          if (nDaughters) {
+            auto energyLep = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+            auto energyPh = (daughterPh) ? daughterPh->getECLCluster()->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) : 0.0;
+            var = (energyLep + energyPh) / p;
+          } else {
+            var = varobj->function(particle);
+          }
+        } else {
+          var = varobj->function((!nDaughters) ? particle : daughterLep);
+        }
+        B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
+        m_datasets.at(index)->m_input[ivar] = var;
       }
       auto nspecs  = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
         auto specobj =  m_spectators.at(index).at(ispec);
-        B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << specobj->function(particle));
-        m_datasets.at(index)->m_spectators[ispec] = specobj->function(particle);
+        auto spec = specobj->function((!nDaughters) ? particle : daughterLep);
+        B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
+        m_datasets.at(index)->m_spectators[ispec] = spec;
       }
 
       float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];

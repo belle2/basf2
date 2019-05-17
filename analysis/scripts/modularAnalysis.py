@@ -2221,17 +2221,18 @@ def buildEventShape(inputListNames=[],
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(path=analysis_main):
+def labelTauPairMC(printDecayInfo=False, path=analysis_main):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
+    @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
     """
     tauDecayMarker = register_module('TauDecayMarker')
     tauDecayMarker.set_name('TauDecayMarker_')
 
-    path.add_module(tauDecayMarker)
+    path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
 
 
 def tagCurlTracks(particleLists,

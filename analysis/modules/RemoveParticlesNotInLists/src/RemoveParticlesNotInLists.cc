@@ -32,7 +32,7 @@ void RemoveParticlesNotInListsModule::initialize()
   particles.isRequired();
   m_subset.registerSubset(particles);
 
-  for (auto l : m_particleLists) {
+  for (const auto& l : m_particleLists) {
     StoreObjPtr<ParticleList>(l).isRequired();
   }
 }

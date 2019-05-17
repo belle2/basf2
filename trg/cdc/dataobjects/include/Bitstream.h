@@ -41,9 +41,9 @@ namespace Belle2 {
   template <typename SignalBus>
   class Bitstream : public TObject {
     friend class CDCTriggerUnpackerModule;
-    friend class Merger;
-    friend class Tracker2D;
-    friend class Neuro;
+    friend struct Merger;
+    friend struct Tracker2D;
+    friend struct Neuro;
   public:
     /** default constructor */
     Bitstream() {};

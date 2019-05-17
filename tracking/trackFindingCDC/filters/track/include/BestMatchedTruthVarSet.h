@@ -66,6 +66,7 @@ namespace Belle2 {
       /// Type of the base class
       using Super = VarSet<BestMatchedTruthVarNames>;
 
+      /// Pointer to the store array object with the EventMetaData
       StoreObjPtr<EventMetaData> m_eventMetaData;
     };
   }

@@ -3285,7 +3285,7 @@ namespace Belle2 {
     static bool start = true;
     if (start) {
       start = false;
-      B2ERROR("smear_trk: MC events -> track smearing is ON\n");
+      B2INFO("smear_trk: MC events -> track smearing is ON\n");
     }
 
     double scale_mc[5] = {1, 1, 1, 1, 1};

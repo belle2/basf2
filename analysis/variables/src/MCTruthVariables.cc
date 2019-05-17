@@ -298,8 +298,8 @@ namespace Belle2 {
       TLorentzVector pInitial = mcparticles[0]->get4Vector();
       TLorentzVector pDaughters;
       const std::vector<Particle*> daughters = part->getDaughters();
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        const MCParticle* mcD = daughters[i]->getRelatedTo<MCParticle>();
+      for (auto daughter : daughters) {
+        const MCParticle* mcD = daughter->getRelatedTo<MCParticle>();
         if (mcD == nullptr)
           return -999;
 
@@ -442,6 +442,29 @@ namespace Belle2 {
       int tauMinusId = tauDecay->getTauMinusIdMode();
       return tauMinusId;
     }
+
+    int tauPlusMcProng(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      int tauPlusMcProng = tauDecay->getTauPlusMcProng();
+      return tauPlusMcProng;
+    }
+
+    int tauMinusMcProng(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      int tauMinusMcProng = tauDecay->getTauMinusMcProng();
+      return tauMinusMcProng;
+    }
+
 
 
     double isReconstructible(const Particle* p)
@@ -613,10 +636,16 @@ namespace Belle2 {
                       "-1 if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("generatorEventWeight", generatorEventWeight,
                       "[Eventbased] Returns the event weight produced by the event generator")
+
+    VARIABLE_GROUP("Generated tau decay information");
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
                       "Decay ID for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
                       "Decay ID for the negative tau lepton in a tau pair generated event.")
+    REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng,
+                      "Prong for the positive tau lepton in a tau pair generated event.")
+    REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
+                      "Prong for the negative tau lepton in a tau pair generated event.")
 
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
@@ -639,5 +668,3 @@ namespace Belle2 {
 
   }
 }
-
-

@@ -16,7 +16,7 @@
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 
 #include <thread>
-#include <signal.h>
+#include <csignal>
 
 using namespace Belle2;
 

@@ -68,7 +68,7 @@ void GeometryModule::initialize()
   // filter out components which are not part of the load-able geometry
   vector<string> filteredComponents;
   copy_if(m_components.begin(), m_components.end(),
-  std::back_inserter(filteredComponents), [](std::string component) { return component != "TRG"; });
+  std::back_inserter(filteredComponents), [](const std::string & component) { return component != "TRG"; });
 
   geoManager.setDetectorComponents(filteredComponents);
   geoManager.setExcludedComponents(m_excluded);

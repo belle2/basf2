@@ -24,6 +24,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
             path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
             path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
+            path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
         # SVD
         if components is None or 'SVD' in components:
             # SVD DATA FORMAT
@@ -57,7 +58,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                     "accept_hadron",
                     "accept_mumu_1trk",
                     "accept_mumu_2trk",
-                    "accept_bhabha\\10",
+                    "accept_bhabha",
                     "accept_gamma_gamma"]})
         path.add_module("StatisticsTimingHLTDQM")
 

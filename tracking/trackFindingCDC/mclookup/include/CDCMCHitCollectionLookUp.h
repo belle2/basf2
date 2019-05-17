@@ -54,13 +54,13 @@ namespace Belle2 {
       }
 
     private:
-      // Id of the mc track
+      /// Id of the mc track
       ITrackType m_mcTrackId;
 
-      // Purity wrt mc track
+      /// Purity wrt mc track
       float m_purity;
 
-      // Number of correct rl information in the track
+      /// Number of correct rl information in the track
       int m_correctRLVote;
     };
 

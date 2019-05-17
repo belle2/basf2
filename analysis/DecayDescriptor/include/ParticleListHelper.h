@@ -99,11 +99,12 @@ namespace Belle2 {
     /** Non-templated convenience function to add a particle from simple four momentum
      * and an indicator whether it's particle or anti particle
      *
-     * \warning particle/anti particle is based on what name was given when creating the list.
+     * \warning particle/conjugates particle is based on what name was given when creating the list.
+     *      If you created the list as 'anti-B0' than supplying 'conjugated=true' will create a 'B0'
      */
-    Particle& addParticle(const TLorentzVector& momentum, bool antiparticle = false)
+    Particle& addParticle(const TLorentzVector& momentum, bool conjugated = false)
     {
-      return add(momentum, m_pdg * ((antiparticle and not isSelfConjugated()) ? -1 : 1));
+      return add(momentum, m_pdg * ((conjugated and not isSelfConjugated()) ? -1 : 1));
     }
 
   private:

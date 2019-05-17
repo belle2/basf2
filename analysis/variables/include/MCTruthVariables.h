@@ -57,6 +57,16 @@ namespace Belle2 {
     double isSignalAcceptMissingNeutrino(const Particle* part);
 
     /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including misssing massive), 0 otherwise
+     */
+    double isSignalAcceptMissingMassive(const Particle* part);
+
+    /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including misssing all particles), 0 otherwise
+     */
+    double isSignalAcceptMissing(const Particle* part);
+
+    /**
      * return 1 if the charge of the particle is wrong. 0 in
      * all other cases
      */

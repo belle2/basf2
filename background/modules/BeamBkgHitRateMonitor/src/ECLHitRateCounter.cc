@@ -191,7 +191,7 @@ namespace Belle2 {
         return;
       }
       TFile noiseFile(fileName.c_str(), "READ");
-      TH1F* h_Noise = dynamic_cast<TH1F*>(noiseFile.Get("sigma_noise"));
+      TH1F* h_Noise = dynamic_cast<TH1F*>(noiseFile.Get("sigma_mean"));
       if (not h_Noise) {
         B2WARNING("ECLHitRateCounter: histogram with electronics noise data not found");
         for (int i = 1; i < 8737; i++) {

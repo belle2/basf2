@@ -27,8 +27,7 @@ int RawFTSWFormat::Get15bitTLUTag(int n)
           "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
 }
 
@@ -40,8 +39,7 @@ int RawFTSWFormat::GetIsHER(int n)
           "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
 }
 
@@ -54,8 +52,7 @@ unsigned int RawFTSWFormat::GetTimeSinceLastInjection(int n)
           "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
 
 }
@@ -67,10 +64,8 @@ unsigned int RawFTSWFormat::GetTimeSincePrevTrigger(int n)
           "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
-
 }
 
 unsigned int RawFTSWFormat::GetBunchNumber(int n)
@@ -80,10 +75,8 @@ unsigned int RawFTSWFormat::GetBunchNumber(int n)
           "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
-
 }
 
 unsigned int RawFTSWFormat::GetFrameCount(int n)
@@ -93,8 +86,6 @@ unsigned int RawFTSWFormat::GetFrameCount(int n)
           "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
-  string err_str = err_buf;
-  throw (err_str);
+  B2FATAL(err_buf);
   return -1;
-
 }

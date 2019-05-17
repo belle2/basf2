@@ -43,8 +43,6 @@ unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  //  string err_str = err_buf; throw (err_str);
-
   return 0;
 }
 
@@ -84,7 +82,6 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("[DEBUG] %s\n", err_buf);
       B2FATAL(err_buf);
-      //      string err_str = err_buf; throw (err_str);
   }
 
   if (nwords < 0 || nwords > 1e6) {
@@ -95,7 +92,6 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s\n", err_buf);
     B2FATAL(err_buf);
-    //    string err_str = err_buf; throw (err_str);
   }
 
   return nwords;
@@ -115,7 +111,6 @@ unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  //  string err_str = err_buf; throw (err_str);
   return 0;
 }
 
@@ -182,7 +177,6 @@ bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  //  string err_str = err_buf; throw (err_str);
   return false;
 }
 
@@ -193,7 +187,6 @@ void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  //  string err_str = err_buf;  throw (err_str);
 }
 
 unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
@@ -207,8 +200,6 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
          m_node_id,  prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  //  string err_str = err_buf;  throw (err_str);
-
 }
 
 
@@ -220,8 +211,6 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
   printf("Print out variables to reduce unused-variables-warnings : %p %d\n", finesse_buf, finesse_nwords);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  //  string err_str = err_buf;  throw (err_str);
-
 }
 
 int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
@@ -240,7 +229,6 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
-    //    string err_str = err_buf;    throw (err_str);
   }
 
   int* copper_buf = GetBuffer(n);

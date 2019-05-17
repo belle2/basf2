@@ -105,8 +105,7 @@ int PreRawCOPPERFormat_v1::GetFINESSENwords(int n, int finesse_num)
             "[ERROR] COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
-    throw (err_str);
+    B2FATAL(err_buf);
   }
   int pos_nwords;
   switch (finesse_num) {
@@ -127,9 +126,7 @@ int PreRawCOPPERFormat_v1::GetFINESSENwords(int n, int finesse_num)
       sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
               finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf;
-      throw (err_str);
-
+      B2FATAL(err_buf);
   }
   return m_buffer[ pos_nwords ];
 
@@ -203,8 +200,8 @@ void PreRawCOPPERFormat_v1::CheckData(int n,
           n, prev_evenum, *cur_evenum_rawcprhdr, prev_copper_ctr, *cur_copper_ctr,
           prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 
 //   char err_buf[500];
 //   int err_flag = 0;
@@ -426,8 +423,8 @@ unsigned int PreRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id
           "This function for format ver.1 is not supported. (node %.8x preveve %u prevrun %u currun %u ) Exiting...\n %s %s %d\n",
           m_node_id, prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 
   return 0xffffffff;
 
@@ -895,7 +892,7 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
                 finesse_nwords, SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
-        string err_str = err_buf;     throw (err_str);
+        B2FATAL(err_buf);
       }
 
       copy_nwords =
@@ -1062,8 +1059,7 @@ int PreRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
             (unsigned short)(*buf & 0xFFFF), temp_crc16,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
-
+    B2FATAL(err_buf);
   }
   return 1;
 

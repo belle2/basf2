@@ -152,7 +152,7 @@ void RawFTSWFormat_latest::CheckData(int n,
   if (GetMagicTrailer(n) != FTSW_MAGIC_TRAILER) {
     sprintf(err_buf, "[FATAL] ERROR_EVENT : invalid magic word : block %d magic word 0x%x must be 0x%x : Exiting...\n %s %s %d\n",
             n, GetMagicTrailer(n), FTSW_MAGIC_TRAILER, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf);
+    printf("%s", err_buf); fflush(stdout);
     err_flag = 1;
   }
 
@@ -164,8 +164,7 @@ void RawFTSWFormat_latest::CheckData(int n,
       if (k % 10 == 9) printf("\n[DEBUG] ");
     }
     fflush(stderr);
-    string err_str = err_buf; throw (err_str);
-
+    B2FATAL(err_buf);
   }
 
   return;

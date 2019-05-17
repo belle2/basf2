@@ -566,16 +566,21 @@ namespace Belle2 {
 
       int nChildren = p->getNDaughters();
       if (arguments[0] >= nChildren) {
-        B2WARNING("No MCParticle is associated to the particle");
         return -999;
+      }
+
+      const Particle*   daugP   = p->getDaughter(arguments[0]);
+      const MCParticle* daugMCP = daugP->getRelated<MCParticle>();
+      if (!daugMCP) {
+        // This is a strange case.
+        // The particle, p, has the related MC particle, but i-th daughter does not have the related MC Particle.
+        B2WARNING("No MCParticle is associated to the i-th daughter");
+        return -1;
       }
 
       if (nChildren == 1) {
         return 1;
       } else {
-        const Particle*   daugP   = p->getDaughter(arguments[0]);
-        const MCParticle* daugMCP = daugP->getRelated<MCParticle>();
-
         int motherIndex = mcp->getIndex();
 
         std::vector<int> genMothers;
@@ -681,7 +686,7 @@ namespace Belle2 {
                       "Prong for the negative tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("genNStepsToDaughter(i)", genNStepsToDaughter,
                       "Returns number of steps to i-th daughter from the particle at generator level."
-                      "-1 if the no MCParticle is associated to the particle."
+                      "-1 if the no MCParticle is associated to the particle or i-th daughter."
                       "-999 if i-th daughter does not exist.");
 
 

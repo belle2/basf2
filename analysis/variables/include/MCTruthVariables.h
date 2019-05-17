@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace Belle2 {
   class Particle;
 
@@ -242,5 +244,12 @@ namespace Belle2 {
      * was theicle seen in the KLM
      */
     double seenInKLM(const Particle*);
+
+    /**
+     * return number of steps to i-th daughter from the particle at generator level.
+     * return -1, if no MCParticle is associated to the particle.
+     * return -999, if i-th daughter does not exist.
+     */
+    int genNStepsToDaughter(const Particle* particle, const std::vector<double>& arguments);
   }
 }

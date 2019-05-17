@@ -553,6 +553,39 @@ namespace Belle2 {
       return (double)mcp->hasSeenInDetector(Const::KLM);
     }
 
+    int genNStepsToDaughter(const Particle* p, const std::vector<double>& arguments)
+    {
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments for genNStepsToDaughter");
+
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (!mcp) {
+        B2WARNING("No MCParticle is associated to the particle");
+        return -1;
+      }
+
+      int nChildren = p->getNDaughters();
+      if (arguments[0] >= nChildren) {
+        B2WARNING("No MCParticle is associated to the particle");
+        return -999;
+      }
+
+      if (nChildren == 1) {
+        return 1;
+      } else {
+        const Particle*   daugP   = p->getDaughter(arguments[0]);
+        const MCParticle* daugMCP = daugP->getRelated<MCParticle>();
+
+        int motherIndex = mcp->getIndex();
+
+        std::vector<int> genMothers;
+        MCMatching::fillGenMothers(daugMCP, genMothers);
+        auto match = std::find(genMothers.begin(), genMothers.end(), motherIndex);
+
+        return match - genMothers.begin();
+      }
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -646,6 +679,10 @@ namespace Belle2 {
                       "Prong for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "Prong for the negative tau lepton in a tau pair generated event.")
+    REGISTER_VARIABLE("genNStepsToDaughter(i)", genNStepsToDaughter,
+                      "Returns number of steps to i-th daughter from the particle at generator level."
+                      "-1 if the no MCParticle is associated to the particle."
+                      "-999 if i-th daughter does not exist.");
 
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
@@ -665,6 +702,5 @@ namespace Belle2 {
                       "returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInKLM", seenInKLM,
                       "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
-
   }
 }

@@ -17,7 +17,6 @@
 
 #include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
 #include <rawdata/CRCCalculator.h>
-#include <rawdata/switch_basf2_standalone.h>
 
 //#include <framework/datastore/DataStore.h>
 //#include <TObject.h>

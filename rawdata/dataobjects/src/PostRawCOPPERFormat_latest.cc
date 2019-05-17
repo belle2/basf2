@@ -166,9 +166,6 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
     PrintData(GetBuffer(n), GetBlockNwords(n));
     printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
     B2FATAL(err_buf);
-    //    string err_str = err_buf; throw (err_str);
-    //     sleep(1234567);
-    //     exit(-1);
   }
 
   return;

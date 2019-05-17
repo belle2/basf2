@@ -41,7 +41,7 @@ namespace Belle2 {
 
     double particleIsInclusive(const Particle* part)
     {
-      return (double)part->isVirtual();
+      return (double)part->isInclusive();
     }
 
     VARIABLE_GROUP("Basic particle information");

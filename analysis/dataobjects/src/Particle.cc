@@ -39,7 +39,7 @@ using namespace Belle2;
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(nullptr), m_isVirtual(false)
+  m_arrayPointer(nullptr), m_isInclusive(false)
 {
   resetErrorMatrix();
 }
@@ -47,7 +47,7 @@ Particle::Particle() :
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(nullptr), m_isVirtual(false)
+  m_arrayPointer(nullptr), m_isInclusive(false)
 {
   setFlavorType();
   set4Vector(momentum);
@@ -61,7 +61,7 @@ Particle::Particle(const TLorentzVector& momentum,
                    const unsigned mdstIndex) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(flavorType), m_particleType(type),
-  m_arrayPointer(nullptr), m_isVirtual(false)
+  m_arrayPointer(nullptr), m_isInclusive(false)
 {
   if (flavorType == c_Unflavored and pdgCode < 0)
     m_pdgCode = -pdgCode;
@@ -80,7 +80,7 @@ Particle::Particle(const TLorentzVector& momentum,
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
   m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(arrayPointer), m_isVirtual(false)
+  m_arrayPointer(arrayPointer), m_isInclusive(false)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -101,7 +101,7 @@ Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const std::vector<int>& daughterIndices,
-                   bool isVirtual,
+                   bool isInclusive,
                    TClonesArray* arrayPointer) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
@@ -115,7 +115,7 @@ Particle::Particle(const TLorentzVector& momentum,
     m_pdgCode = -pdgCode;
   set4Vector(momentum);
   resetErrorMatrix();
-  m_isVirtual = isVirtual;
+  m_isInclusive = isInclusive;
 
   if (!daughterIndices.empty()) {
     m_particleType    = c_Composite;
@@ -130,7 +130,7 @@ Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(nullptr), m_isVirtual(false)
+  m_arrayPointer(nullptr), m_isInclusive(false)
 {
   if (!track) return;
 
@@ -166,7 +166,7 @@ Particle::Particle(const int trackArrayIndex,
                    const Const::ChargedStable& chargedStableUsedForFit) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(nullptr), m_isVirtual(false)
+  m_arrayPointer(nullptr), m_isInclusive(false)
 {
   if (!trackFit) return;
 
@@ -193,7 +193,7 @@ Particle::Particle(const int trackArrayIndex,
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(nullptr), m_isVirtual(false)
+  m_arrayPointer(nullptr), m_isInclusive(false)
 {
   if (!eclCluster) return;
 
@@ -229,7 +229,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
 Particle::Particle(const KLMCluster* klmCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(nullptr), m_isVirtual(false)
+  m_arrayPointer(nullptr), m_isInclusive(false)
 {
   if (!klmCluster) return;
 
@@ -255,7 +255,7 @@ Particle::Particle(const KLMCluster* klmCluster) :
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(nullptr), m_isVirtual(false)
+  m_arrayPointer(nullptr), m_isInclusive(false)
 {
   if (!mcParticle) return;
 

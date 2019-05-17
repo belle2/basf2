@@ -30,8 +30,8 @@ namespace Belle2 {
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
     int m_iPDGCode;
-    /** Is particle virtual? */
-    bool m_isVirtual;
+    /** Is particle inclusive? */
+    bool m_isInclusive;
   public:
     /** Default ctor. */
     DecayDescriptorParticle();
@@ -76,10 +76,10 @@ namespace Belle2 {
     {
       return m_iPDGCode;
     }
-    /** Is the particle virtual? */
-    int isVirtual() const
+    /** Is the particle inclusive? */
+    int isInclusive() const
     {
-      return m_isVirtual;
+      return m_isInclusive;
     }
   };
 }

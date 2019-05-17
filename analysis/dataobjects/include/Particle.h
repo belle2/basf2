@@ -148,14 +148,14 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param isVirtual Is the particle inclusive?
+     * @param isInclusive Is the particle inclusive?
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
-             bool isVirtual,
+             bool isInclusive,
              TClonesArray* arrayPointer = nullptr);
 
     /**
@@ -249,12 +249,12 @@ namespace Belle2 {
     }
 
     /**
-     * Sets m_isVirtual
-     * @param isVirtual Is the particle Virtual?
+     * Sets m_isInclusive
+     * @param isInclusive Is the particle Inclusive?
      */
-    void setVirtual(bool isVirtual)
+    void setInclusive(bool isInclusive)
     {
-      m_isVirtual = isVirtual;
+      m_isInclusive = isInclusive;
     }
 
     /**
@@ -490,12 +490,12 @@ namespace Belle2 {
     }
 
     /**
-     * Returns true if the particle is Virtual
+     * Returns true if the particle is Inclusive
      * @return p-value of fit (nan means no fit done)
      */
-    bool isVirtual() const
+    bool isInclusive() const
     {
-      return m_isVirtual;
+      return m_isInclusive;
     }
 
     /**
@@ -857,13 +857,14 @@ namespace Belle2 {
      */
     void setMdstArrayIndex(const int arrayIndex);
 
-    ClassDef(Particle, 9); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 10); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
+    // v10: added m_isInclusive
 
     friend class ParticleSubset;
 
-    bool m_isVirtual; /** Is the particle Virtual? **/
+    bool m_isInclusive; /** Is the particle Inclusive? **/
   };
 
 } // end namespace Belle2

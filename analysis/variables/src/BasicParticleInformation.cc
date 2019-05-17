@@ -39,6 +39,11 @@ namespace Belle2 {
       return part->getMdstSource();
     }
 
+    double particleIsInclusive(const Particle* part)
+    {
+      return (double)part->isVirtual();
+    }
+
     VARIABLE_GROUP("Basic particle information");
     REGISTER_VARIABLE("isFromECL", particleIsFromECL, "Returns 1.0 if this particle was created from an ECLCluster, 0 otherwise.");
     REGISTER_VARIABLE("isFromKLM", particleIsFromKLM, "Returns 1.0 if this particle was created from a KLMCluster, 0 otherwise.");
@@ -47,5 +52,7 @@ namespace Belle2 {
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
     REGISTER_VARIABLE("mdstSource", particleMdstSource,
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
+    REGISTER_VARIABLE("isInclusive", particleIsInclusive,
+                      "returns 1 if the particle is marked as an inclusive object (like B0 -> @Xsd e+ e-), 0 if not");
   }
 }

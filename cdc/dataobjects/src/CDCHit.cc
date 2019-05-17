@@ -79,22 +79,16 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
   const unsigned short e2 = s2 - w2; //end time of 2nd pulse
   //  B2DEBUG(28, "s1,e1,w1,s2,e2,w2= " << s1 << " " << e1 << " " << w1 << " " << s2 << " " << e2 << " " << w2);
 
-  int overLayType = 0;
   double pulseW = w1 + w2;
   if (e1 <= e2) {
-    overLayType = 1;
     pulseW = w1;
   } else if (e1 <= s2) {
-    overLayType = 2;
     pulseW = s1 - e2;
   }
 
   // maxtot=29 is hard-coded now
   m_tot = std::min(std::round(pulseW / 32.), 29.);
-  //  if (overLayType) {
-  //  B2DEBUG(28, "overLaytype= " << overLayType);
-  //  B2DEBUG(28, "adcCount,tot= " << m_adcCount << " " << m_tot);
-  //  }
+  // B2DEBUG(28, "adcCount,tot= " << m_adcCount << " " << m_tot);
 
   return DigitBase::c_DontAppend;
 }

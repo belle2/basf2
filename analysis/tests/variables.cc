@@ -368,6 +368,7 @@ namespace {
     virtual void SetUp()
     {
       // datastore things
+      DataStore::Instance().reset();
       DataStore::Instance().setInitializeActive(true);
 
       // needed to mock up

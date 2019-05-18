@@ -86,232 +86,232 @@ void CDCTriggerDQMModule::defineHisto()
   //----------------------------------------------------------------
 
   // define neurotrigger histograms
-  m_neuroOutZ = new TH1F("NeuroOutZ",
-                         "z distribution of neuro tracks;z [cm]",
-                         100, -50, 50); // 1cm bins from -50cm to 50cm
-  m_neuroOutCosTheta = new TH1F("NeuroOutCosTheta",
-                                "cos theta distribution of neuro tracks;cos theta ",
-                                100, -1, 1);
-  m_neuroOutHitPattern = new TH1F("NeuroUnpackedHitPattern",
-                                  "stereo hit pattern of neuro tracks;pattern",
-                                  16, 0, 16); // 4 stereo layers -> 2**4 possible patterns
-  m_neuroOutPhi0 = new TH1F("NeuroOutPhi0",
-                            "phi distribution from unpacker;phi [deg]",
-                            161, -1.25, 361); // shift to reduce the binning error
-  m_neuroOutInvPt = new TH1F("NeuroOutInvPt",
-                             "Inverse Pt distribution from unpacker; [GeV^{-1}]",
-                             34, 0, 3.5);
-  m_neuroOutm_time = new TH1F("neuroOutM_time", "m_time distribution from unpacker",
-                              48, 0, 48);
-  m_neuroOutTrackCount = new TH1F("neuroOutTrackCount",
-                                  "number of tracks per event",
-                                  20, 0, 20);
-  m_neuroOutVsInTrackCount = new TH1F("neuroOutVsInTrackCount",
-                                      "number of neuroOutTracks - number of 2dinTracks",
-                                      20, -10, 10);
-  m_neuroInTSID = new TH1F("neuroInTSID", "ID of incoming track segments",
-                           2336, 0, 2335);
-  m_neuroInTSPrioT_Layer0 = new TH1F("neuroInTSPrioT_Layer0", "Priority time of track segments in layer 0",
-                                     512, 0, 511);
-  m_neuroInTSPrioT_Layer1 = new TH1F("neuroInTSPrioT_Layer1", "Priority time of track segments in layer 1",
-                                     512, 0, 511);
-  m_neuroInTSPrioT_Layer2 = new TH1F("neuroInTSPrioT_Layer2", "Priority time of track segments in layer 2",
-                                     512, 0, 511);
-  m_neuroInTSPrioT_Layer3 = new TH1F("neuroInTSPrioT_Layer3", "Priority time of track segments in layer 3",
-                                     512, 0, 511);
-  m_neuroInTSPrioT_Layer4 = new TH1F("neuroInTSPrioT_Layer4", "Priority time of track segments in layer 4",
-                                     512, 0, 511);
-  m_neuroInTSPrioT_Layer5 = new TH1F("neuroInTSPrioT_Layer5", "Priority time of track segments in layer 5",
-                                     512, 0, 511);
-  m_neuroInTSPrioT_Layer6 = new TH1F("neuroInTSPrioT_Layer6", "Priority time of track segments in layer 6",
-                                     512, 0, 511);
-  m_neuroInTSPrioT_Layer7 = new TH1F("neuroInTSPrioT_Layer7", "Priority time of track segments in layer 7",
-                                     512, 0, 511);
-  m_neuroInTSPrioT_Layer8 = new TH1F("neuroInTSPrioT_Layer8", "Priority time of track segments in layer 8",
-                                     512, 0, 511);
-  m_neuroInTSFoundT_Layer0 = new TH1F("neuroInTSFoundT_Layer0", "Found time of track segments in layer 0",
-                                      48, 0, 48);
-  m_neuroInTSFoundT_Layer1 = new TH1F("neuroInTSFoundT_Layer1", "Found time of track segments in layer 1",
-                                      48, 0, 48);
-  m_neuroInTSFoundT_Layer2 = new TH1F("neuroInTSFoundT_Layer2", "Found time of track segments in layer 2",
-                                      48, 0, 48);
-  m_neuroInTSFoundT_Layer3 = new TH1F("neuroInTSFoundT_Layer3", "Found time of track segments in layer 3",
-                                      48, 0, 48);
-  m_neuroInTSFoundT_Layer4 = new TH1F("neuroInTSFoundT_Layer4", "Found time of track segments in layer 4",
-                                      48, 0, 48);
-  m_neuroInTSFoundT_Layer5 = new TH1F("neuroInTSFoundT_Layer5", "Found time of track segments in layer 5",
-                                      48, 0, 48);
-  m_neuroInTSFoundT_Layer6 = new TH1F("neuroInTSFoundT_Layer6", "Found time of track segments in layer 6",
-                                      48, 0, 48);
-  m_neuroInTSFoundT_Layer7 = new TH1F("neuroInTSFoundT_Layer7", "Found time of track segments in layer 7",
-                                      48, 0, 48);
-  m_neuroInTSFoundT_Layer8 = new TH1F("neuroInTSFoundT_Layer8", "Found time of track segments in layer 8",
-                                      48, 0, 48);
-  m_neuroSelTSID = new TH1F("neuroSelTSID", "ID of selected track segments",
-                            2336, 0, 2335);
-  m_neuroSelTSPrioT_Layer0 = new TH1F("neuroSelTSPrioT_Layer0", "Priority time of track segments in layer 0",
-                                      512, 0, 511);
-  m_neuroSelTSPrioT_Layer1 = new TH1F("neuroSelTSPrioT_Layer1", "Priority time of track segments in layer 1",
-                                      512, 0, 511);
-  m_neuroSelTSPrioT_Layer2 = new TH1F("neuroSelTSPrioT_Layer2", "Priority time of track segments in layer 2",
-                                      512, 0, 511);
-  m_neuroSelTSPrioT_Layer3 = new TH1F("neuroSelTSPrioT_Layer3", "Priority time of track segments in layer 3",
-                                      512, 0, 511);
-  m_neuroSelTSPrioT_Layer4 = new TH1F("neuroSelTSPrioT_Layer4", "Priority time of track segments in layer 4",
-                                      512, 0, 511);
-  m_neuroSelTSPrioT_Layer5 = new TH1F("neuroSelTSPrioT_Layer5", "Priority time of track segments in layer 5",
-                                      512, 0, 511);
-  m_neuroSelTSPrioT_Layer6 = new TH1F("neuroSelTSPrioT_Layer6", "Priority time of track segments in layer 6",
-                                      512, 0, 511);
-  m_neuroSelTSPrioT_Layer7 = new TH1F("neuroSelTSPrioT_Layer7", "Priority time of track segments in layer 7",
-                                      512, 0, 511);
-  m_neuroSelTSPrioT_Layer8 = new TH1F("neuroSelTSPrioT_Layer8", "Priority time of track segments in layer 8",
-                                      512, 0, 511);
-  m_neuroSelTSFoundT_Layer0 = new TH1F("neuroSelTSFoundT_Layer0",
-                                       "First found time of selected TS - found time of Neuro Track in SL 0",
-                                       96, -47.99, 48.01);
-  m_neuroSelTSFoundT_Layer1 = new TH1F("neuroSelTSFoundT_Layer1",
-                                       "First found time of selected TS - found time of Neuro Track in SL 1",
-                                       96, -47.99, 48.01);
-  m_neuroSelTSFoundT_Layer2 = new TH1F("neuroSelTSFoundT_Layer2",
-                                       "First found time of selected TS - found time of Neuro Track in SL 2",
-                                       96, -47.99, 48.01);
-  m_neuroSelTSFoundT_Layer3 = new TH1F("neuroSelTSFoundT_Layer3",
-                                       "First found time of selected TS - found time of Neuro Track in SL 3",
-                                       96, -47.99, 48.01);
-  m_neuroSelTSFoundT_Layer4 = new TH1F("neuroSelTSFoundT_Layer4",
-                                       "First found time of selected TS - found time of Neuro Track in SL 4",
-                                       96, -47.99, 48.01);
-  m_neuroSelTSFoundT_Layer5 = new TH1F("neuroSelTSFoundT_Layer5",
-                                       "First found time of selected TS - found time of Neuro Track in SL 5",
-                                       96, -47.99, 48.01);
-  m_neuroSelTSFoundT_Layer6 = new TH1F("neuroSelTSFoundT_Layer6",
-                                       "First found time of selected TS - found time of Neuro Track in SL 6",
-                                       96, -47.99, 48.01);
-  m_neuroSelTSFoundT_Layer7 = new TH1F("neuroSelTSFoundT_Layer7",
-                                       "First found time of selected TS - found time of Neuro Track in SL 7",
-                                       96, -47.99, 48.01);
-  m_neuroSelTSFoundT_Layer8 = new TH1F("neuroSelTSFoundT_Layer8",
-                                       "First found time of selected TS - found time of Neuro Track in SL 8",
-                                       96, -47.99, 48.01);
-  m_neuroInTSCount = new TH1F("neuroInTSCount", " number of TS per event",
-                              200, 0, 200);
-  m_neuroInPhi0 = new TH1F("neuroInPhi0", "Phi0 of incoming 2dtrack",
-                           161, -1.25, 361);
-  m_neuroInInvPt = new TH1F("NeuroInInvPt",
-                            "Inverse Pt distribution from incoming 2dtrack; [GeV^{-1}]",
-                            34, 0, 3.5);
-  m_neuroInm_time = new TH1F("neuroInM_time", "m_time distribution from incoming 2dtracks",
-                             48, 0, 48);
-  m_neuroInTrackCount = new TH1F("neuroInTrackCount", "number of neuro input 2dtracks per event",
-                                 20, 0, 20);
-  m_neuroInVs2DOutTrackCount = new TH1F("neuroInVs2DOutTrackCount", "Count of neuro input tracks vs. 2d output tracks",
+  m_neuroHWOutZ = new TH1F("NeuroHWOutZ",
+                           "z distribution of neuro tracks;z [cm]",
+                           100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroHWOutCosTheta = new TH1F("NeuroHWOutCosTheta",
+                                  "cos theta distribution of neuro tracks;cos theta ",
+                                  100, -1, 1);
+  m_neuroHWOutHitPattern = new TH1F("NeuroUnpackedHitPattern",
+                                    "stereo hit pattern of neuro tracks;pattern",
+                                    16, 0, 16); // 4 stereo layers -> 2**4 possible patterns
+  m_neuroHWOutPhi0 = new TH1F("NeuroHWOutPhi0",
+                              "phi distribution from unpacker;phi [deg]",
+                              161, -1.25, 361); // shift to reduce the binning error
+  m_neuroHWOutInvPt = new TH1F("NeuroHWOutInvPt",
+                               "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                               34, 0, 3.5);
+  m_neuroHWOutm_time = new TH1F("NeuroHWOutM_time", "m_time distribution from unpacker",
+                                48, 0, 48);
+  m_neuroHWOutTrackCount = new TH1F("NeuroHWOutTrackCount",
+                                    "number of tracks per event",
+                                    20, 0, 20);
+  m_neuroHWOutVsInTrackCount = new TH1F("NeuroHWOutVsInTrackCount",
+                                        "number of neuroHWOutTracks - number of 2dinTracks",
                                         20, -10, 10);
-  m_2DOutPhi0 = new TH1F("2DOutPhi0", "Phi0 of 2dtracks",
-                         161, -1.25, 361);
-  m_2DOutInvPt = new TH1F("2DOutInvPt",
-                          "Inverse Pt of 2dtracks; [GeV^{-1}]",
-                          34, 0, 3.5);
-  m_2DOutm_time = new TH1F("2DOutM_time", "m_time of 2dtracks",
-                           96, -48, 48);
-  m_2DOutTrackCount = new TH1F("2DOutTrackCount", "number of 2dtracks per event", 20, 0, 20);
-  m_neuroSelTSCount = new TH1F("neuroSelTSCount", "number of selected TS per SL", 9, 0, 8);
+  m_neuroHWInTSID = new TH1F("NeuroHWInTSID", "ID of incoming track segments",
+                             2336, 0, 2335);
+  m_neuroHWInTSPrioT_Layer0 = new TH1F("NeuroHWInTSPrioT_Layer0", "Priority time of track segments in layer 0",
+                                       512, 0, 511);
+  m_neuroHWInTSPrioT_Layer1 = new TH1F("NeuroHWInTSPrioT_Layer1", "Priority time of track segments in layer 1",
+                                       512, 0, 511);
+  m_neuroHWInTSPrioT_Layer2 = new TH1F("NeuroHWInTSPrioT_Layer2", "Priority time of track segments in layer 2",
+                                       512, 0, 511);
+  m_neuroHWInTSPrioT_Layer3 = new TH1F("NeuroHWInTSPrioT_Layer3", "Priority time of track segments in layer 3",
+                                       512, 0, 511);
+  m_neuroHWInTSPrioT_Layer4 = new TH1F("NeuroHWInTSPrioT_Layer4", "Priority time of track segments in layer 4",
+                                       512, 0, 511);
+  m_neuroHWInTSPrioT_Layer5 = new TH1F("NeuroHWInTSPrioT_Layer5", "Priority time of track segments in layer 5",
+                                       512, 0, 511);
+  m_neuroHWInTSPrioT_Layer6 = new TH1F("NeuroHWInTSPrioT_Layer6", "Priority time of track segments in layer 6",
+                                       512, 0, 511);
+  m_neuroHWInTSPrioT_Layer7 = new TH1F("NeuroHWInTSPrioT_Layer7", "Priority time of track segments in layer 7",
+                                       512, 0, 511);
+  m_neuroHWInTSPrioT_Layer8 = new TH1F("NeuroHWInTSPrioT_Layer8", "Priority time of track segments in layer 8",
+                                       512, 0, 511);
+  m_neuroHWInTSFoundT_Layer0 = new TH1F("NeuroHWInTSFoundT_Layer0", "Found time of track segments in layer 0",
+                                        48, 0, 48);
+  m_neuroHWInTSFoundT_Layer1 = new TH1F("NeuroHWInTSFoundT_Layer1", "Found time of track segments in layer 1",
+                                        48, 0, 48);
+  m_neuroHWInTSFoundT_Layer2 = new TH1F("NeuroHWInTSFoundT_Layer2", "Found time of track segments in layer 2",
+                                        48, 0, 48);
+  m_neuroHWInTSFoundT_Layer3 = new TH1F("NeuroHWInTSFoundT_Layer3", "Found time of track segments in layer 3",
+                                        48, 0, 48);
+  m_neuroHWInTSFoundT_Layer4 = new TH1F("NeuroHWInTSFoundT_Layer4", "Found time of track segments in layer 4",
+                                        48, 0, 48);
+  m_neuroHWInTSFoundT_Layer5 = new TH1F("NeuroHWInTSFoundT_Layer5", "Found time of track segments in layer 5",
+                                        48, 0, 48);
+  m_neuroHWInTSFoundT_Layer6 = new TH1F("NeuroHWInTSFoundT_Layer6", "Found time of track segments in layer 6",
+                                        48, 0, 48);
+  m_neuroHWInTSFoundT_Layer7 = new TH1F("NeuroHWInTSFoundT_Layer7", "Found time of track segments in layer 7",
+                                        48, 0, 48);
+  m_neuroHWInTSFoundT_Layer8 = new TH1F("NeuroHWInTSFoundT_Layer8", "Found time of track segments in layer 8",
+                                        48, 0, 48);
+  m_neuroHWSelTSID = new TH1F("NeuroHWSelTSID", "ID of selected track segments",
+                              2336, 0, 2335);
+  m_neuroHWSelTSPrioT_Layer0 = new TH1F("NeuroHWSelTSPrioT_Layer0", "Priority time of track segments in layer 0",
+                                        512, 0, 511);
+  m_neuroHWSelTSPrioT_Layer1 = new TH1F("NeuroHWSelTSPrioT_Layer1", "Priority time of track segments in layer 1",
+                                        512, 0, 511);
+  m_neuroHWSelTSPrioT_Layer2 = new TH1F("NeuroHWSelTSPrioT_Layer2", "Priority time of track segments in layer 2",
+                                        512, 0, 511);
+  m_neuroHWSelTSPrioT_Layer3 = new TH1F("NeuroHWSelTSPrioT_Layer3", "Priority time of track segments in layer 3",
+                                        512, 0, 511);
+  m_neuroHWSelTSPrioT_Layer4 = new TH1F("NeuroHWSelTSPrioT_Layer4", "Priority time of track segments in layer 4",
+                                        512, 0, 511);
+  m_neuroHWSelTSPrioT_Layer5 = new TH1F("NeuroHWSelTSPrioT_Layer5", "Priority time of track segments in layer 5",
+                                        512, 0, 511);
+  m_neuroHWSelTSPrioT_Layer6 = new TH1F("NeuroHWSelTSPrioT_Layer6", "Priority time of track segments in layer 6",
+                                        512, 0, 511);
+  m_neuroHWSelTSPrioT_Layer7 = new TH1F("NeuroHWSelTSPrioT_Layer7", "Priority time of track segments in layer 7",
+                                        512, 0, 511);
+  m_neuroHWSelTSPrioT_Layer8 = new TH1F("NeuroHWSelTSPrioT_Layer8", "Priority time of track segments in layer 8",
+                                        512, 0, 511);
+  m_neuroHWSelTSFoundT_Layer0 = new TH1F("NeuroHWSelTSFoundT_Layer0",
+                                         "First found time of selected TS - found time of Neuro Track in SL 0",
+                                         96, -47.99, 48.01);
+  m_neuroHWSelTSFoundT_Layer1 = new TH1F("NeuroHWSelTSFoundT_Layer1",
+                                         "First found time of selected TS - found time of Neuro Track in SL 1",
+                                         96, -47.99, 48.01);
+  m_neuroHWSelTSFoundT_Layer2 = new TH1F("NeuroHWSelTSFoundT_Layer2",
+                                         "First found time of selected TS - found time of Neuro Track in SL 2",
+                                         96, -47.99, 48.01);
+  m_neuroHWSelTSFoundT_Layer3 = new TH1F("NeuroHWSelTSFoundT_Layer3",
+                                         "First found time of selected TS - found time of Neuro Track in SL 3",
+                                         96, -47.99, 48.01);
+  m_neuroHWSelTSFoundT_Layer4 = new TH1F("NeuroHWSelTSFoundT_Layer4",
+                                         "First found time of selected TS - found time of Neuro Track in SL 4",
+                                         96, -47.99, 48.01);
+  m_neuroHWSelTSFoundT_Layer5 = new TH1F("NeuroHWSelTSFoundT_Layer5",
+                                         "First found time of selected TS - found time of Neuro Track in SL 5",
+                                         96, -47.99, 48.01);
+  m_neuroHWSelTSFoundT_Layer6 = new TH1F("NeuroHWSelTSFoundT_Layer6",
+                                         "First found time of selected TS - found time of Neuro Track in SL 6",
+                                         96, -47.99, 48.01);
+  m_neuroHWSelTSFoundT_Layer7 = new TH1F("NeuroHWSelTSFoundT_Layer7",
+                                         "First found time of selected TS - found time of Neuro Track in SL 7",
+                                         96, -47.99, 48.01);
+  m_neuroHWSelTSFoundT_Layer8 = new TH1F("NeuroHWSelTSFoundT_Layer8",
+                                         "First found time of selected TS - found time of Neuro Track in SL 8",
+                                         96, -47.99, 48.01);
+  m_neuroHWInTSCount = new TH1F("NeuroHWInTSCount", " number of TS per event",
+                                200, 0, 200);
+  m_neuroHWInPhi0 = new TH1F("NeuroHWInPhi0", "Phi0 of incoming 2dtrack",
+                             161, -1.25, 361);
+  m_neuroHWInInvPt = new TH1F("NeuroHWInInvPt",
+                              "Inverse Pt distribution from incoming 2dtrack; [GeV^{-1}]",
+                              34, 0, 3.5);
+  m_neuroHWInm_time = new TH1F("NeuroHWInM_time", "m_time distribution from incoming 2dtracks",
+                               48, 0, 48);
+  m_neuroHWInTrackCount = new TH1F("NeuroHWInTrackCount", "number of neuro input 2dtracks per event",
+                                   20, 0, 20);
+  m_neuroHWInVs2DOutTrackCount = new TH1F("NeuroHWInVs2DOutTrackCount", "Count of neuro input tracks vs. 2d output tracks",
+                                          20, -10, 10);
+  m_2DHWOutPhi0 = new TH1F("2DHWOutPhi0", "Phi0 of 2dtracks",
+                           161, -1.25, 361);
+  m_2DHWOutInvPt = new TH1F("2DHWOutInvPt",
+                            "Inverse Pt of 2dtracks; [GeV^{-1}]",
+                            34, 0, 3.5);
+  m_2DHWOutm_time = new TH1F("2DHWOutM_time", "m_time of 2dtracks",
+                             96, -48, 48);
+  m_2DHWOutTrackCount = new TH1F("2DHWOutTrackCount", "number of 2dtracks per event", 20, 0, 20);
+  m_neuroHWSelTSCount = new TH1F("NeuroHWSelTSCount", "number of selected TS per SL", 9, 0, 8);
 
-  m_2DInTSID = new TH1F("2DInTSID", "ID of 2D incoming axial track segments",
-                        2336, 0, 2335);
-  m_2DInTSPrioT_Layer0 = new TH1F("2DInTSPrioT_Layer0", "Priority time of track segments in layer 0",
-                                  512, 0, 511);
-  m_2DInTSPrioT_Layer2 = new TH1F("2DInTSPrioT_Layer2", "Priority time of track segments in layer 2",
-                                  512, 0, 511);
-  m_2DInTSPrioT_Layer4 = new TH1F("2DInTSPrioT_Layer4", "Priority time of track segments in layer 4",
-                                  512, 0, 511);
-  m_2DInTSPrioT_Layer6 = new TH1F("2DInTSPrioT_Layer6", "Priority time of track segments in layer 6",
-                                  512, 0, 511);
-  m_2DInTSPrioT_Layer8 = new TH1F("2DInTSPrioT_Layer8", "Priority time of track segments in layer 8",
-                                  512, 0, 511);
-  m_2DInTSFoundT_Layer0 = new TH1F("2DInTSFoundT_Layer0", "Found time of track segments in layer 0",
-                                   96, -48, 48);
-  m_2DInTSFoundT_Layer2 = new TH1F("2DInTSFoundT_Layer2", "Found time of track segments in layer 2",
-                                   96, -48, 48);
-  m_2DInTSFoundT_Layer4 = new TH1F("2DInTSFoundT_Layer4", "Found time of track segments in layer 4",
-                                   96, -48, 48);
-  m_2DInTSFoundT_Layer6 = new TH1F("2DInTSFoundT_Layer6", "Found time of track segments in layer 6",
-                                   96, -48, 48);
-  m_2DInTSFoundT_Layer8 = new TH1F("2DInTSFoundT_Layer8", "Found time of track segments in layer 8",
-                                   96, -48, 48);
-  m_2DInTSCount = new TH1F("2DInTSCount", " number of 2D incoming TS per event",
-                           200, 0, 200);
+  m_2DHWInTSID = new TH1F("2DHWInTSID", "ID of 2D incoming axial track segments",
+                          2336, 0, 2335);
+  m_2DHWInTSPrioT_Layer0 = new TH1F("2DHWInTSPrioT_Layer0", "Priority time of track segments in layer 0",
+                                    512, 0, 511);
+  m_2DHWInTSPrioT_Layer2 = new TH1F("2DHWInTSPrioT_Layer2", "Priority time of track segments in layer 2",
+                                    512, 0, 511);
+  m_2DHWInTSPrioT_Layer4 = new TH1F("2DHWInTSPrioT_Layer4", "Priority time of track segments in layer 4",
+                                    512, 0, 511);
+  m_2DHWInTSPrioT_Layer6 = new TH1F("2DHWInTSPrioT_Layer6", "Priority time of track segments in layer 6",
+                                    512, 0, 511);
+  m_2DHWInTSPrioT_Layer8 = new TH1F("2DHWInTSPrioT_Layer8", "Priority time of track segments in layer 8",
+                                    512, 0, 511);
+  m_2DHWInTSFoundT_Layer0 = new TH1F("2DHWInTSFoundT_Layer0", "Found time of track segments in layer 0",
+                                     96, -48, 48);
+  m_2DHWInTSFoundT_Layer2 = new TH1F("2DHWInTSFoundT_Layer2", "Found time of track segments in layer 2",
+                                     96, -48, 48);
+  m_2DHWInTSFoundT_Layer4 = new TH1F("2DHWInTSFoundT_Layer4", "Found time of track segments in layer 4",
+                                     96, -48, 48);
+  m_2DHWInTSFoundT_Layer6 = new TH1F("2DHWInTSFoundT_Layer6", "Found time of track segments in layer 6",
+                                     96, -48, 48);
+  m_2DHWInTSFoundT_Layer8 = new TH1F("2DHWInTSFoundT_Layer8", "Found time of track segments in layer 8",
+                                     96, -48, 48);
+  m_2DHWInTSCount = new TH1F("2DHWInTSCount", " number of 2D incoming TS per event",
+                             200, 0, 200);
 
-  m_neuroOutQuad5Z = new TH1F("NeuroOutQuad5Z",
-                              "z distribution of neuro tracks;z [cm]",
-                              100, -50, 50); // 1cm bins from -50cm to 50cm
-  m_neuroOutQuad5CosTheta = new TH1F("NeuroOutQuad5CosTheta",
-                                     "cos theta distribution of neuro tracks;cos theta ",
-                                     100, -1, 1);
-  m_neuroOutQuad5Phi0 = new TH1F("NeuroOutQuad5Phi0",
-                                 "phi distribution from unpacker;phi [deg]",
-                                 161, -1.25, 361); // shift to reduce the binning error
-  m_neuroOutQuad5InvPt = new TH1F("NeuroOutQuad5InvPt",
-                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
-                                  34, 0, 3.5);
+  m_neuroHWOutQuad5Z = new TH1F("NeuroHWOutQuad5Z",
+                                "z distribution of neuro tracks;z [cm]",
+                                100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroHWOutQuad5CosTheta = new TH1F("NeuroHWOutQuad5CosTheta",
+                                       "cos theta distribution of neuro tracks;cos theta ",
+                                       100, -1, 1);
+  m_neuroHWOutQuad5Phi0 = new TH1F("NeuroHWOutQuad5Phi0",
+                                   "phi distribution from unpacker;phi [deg]",
+                                   161, -1.25, 361); // shift to reduce the binning error
+  m_neuroHWOutQuad5InvPt = new TH1F("NeuroHWOutQuad5InvPt",
+                                    "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                    34, 0, 3.5);
 
-  m_neuroOutQuad0Z = new TH1F("NeuroOutQuad0Z",
-                              "z distribution of neuro tracks;z [cm]",
-                              100, -50, 50); // 1cm bins from -50cm to 50cm
-  m_neuroOutQuad0CosTheta = new TH1F("NeuroOutQuad0CosTheta",
-                                     "cos theta distribution of neuro tracks;cos theta ",
-                                     100, -1, 1);
-  m_neuroOutQuad0Phi0 = new TH1F("NeuroOutQuad0Phi0",
-                                 "phi distribution from unpacker;phi [deg]",
-                                 161, -1.25, 361); // shift to reduce the binning error
-  m_neuroOutQuad0InvPt = new TH1F("NeuroOutQuad0InvPt",
-                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
-                                  34, 0, 3.5);
+  m_neuroHWOutQuad0Z = new TH1F("NeuroHWOutQuad0Z",
+                                "z distribution of neuro tracks;z [cm]",
+                                100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroHWOutQuad0CosTheta = new TH1F("NeuroHWOutQuad0CosTheta",
+                                       "cos theta distribution of neuro tracks;cos theta ",
+                                       100, -1, 1);
+  m_neuroHWOutQuad0Phi0 = new TH1F("NeuroHWOutQuad0Phi0",
+                                   "phi distribution from unpacker;phi [deg]",
+                                   161, -1.25, 361); // shift to reduce the binning error
+  m_neuroHWOutQuad0InvPt = new TH1F("NeuroHWOutQuad0InvPt",
+                                    "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                    34, 0, 3.5);
 
-  m_neuroOutQuad1Z = new TH1F("NeuroOutQuad1Z",
-                              "z distribution of neuro tracks;z [cm]",
-                              100, -50, 50); // 1cm bins from -50cm to 50cm
-  m_neuroOutQuad1CosTheta = new TH1F("NeuroOutQuad1CosTheta",
-                                     "cos theta distribution of neuro tracks;cos theta ",
-                                     100, -1, 1);
-  m_neuroOutQuad1Phi0 = new TH1F("NeuroOutQuad1Phi0",
-                                 "phi distribution from unpacker;phi [deg]",
-                                 161, -1.25, 361); // shift to reduce the binning error
-  m_neuroOutQuad1InvPt = new TH1F("NeuroOutQuad1InvPt",
-                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
-                                  34, 0, 3.5);
+  m_neuroHWOutQuad1Z = new TH1F("NeuroHWOutQuad1Z",
+                                "z distribution of neuro tracks;z [cm]",
+                                100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroHWOutQuad1CosTheta = new TH1F("NeuroHWOutQuad1CosTheta",
+                                       "cos theta distribution of neuro tracks;cos theta ",
+                                       100, -1, 1);
+  m_neuroHWOutQuad1Phi0 = new TH1F("NeuroHWOutQuad1Phi0",
+                                   "phi distribution from unpacker;phi [deg]",
+                                   161, -1.25, 361); // shift to reduce the binning error
+  m_neuroHWOutQuad1InvPt = new TH1F("NeuroHWOutQuad1InvPt",
+                                    "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                    34, 0, 3.5);
 
-  m_neuroOutQuad2Z = new TH1F("NeuroOutQuad2Z",
-                              "z distribution of neuro tracks;z [cm]",
-                              100, -50, 50); // 1cm bins from -50cm to 50cm
-  m_neuroOutQuad2CosTheta = new TH1F("NeuroOutQuad2CosTheta",
-                                     "cos theta distribution of neuro tracks;cos theta ",
-                                     100, -1, 1);
-  m_neuroOutQuad2Phi0 = new TH1F("NeuroOutQuad2Phi0",
-                                 "phi distribution from unpacker;phi [deg]",
-                                 161, -1.25, 361); // shift to reduce the binning error
-  m_neuroOutQuad2InvPt = new TH1F("NeuroOutQuad2InvPt",
-                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
-                                  34, 0, 3.5);
+  m_neuroHWOutQuad2Z = new TH1F("NeuroHWOutQuad2Z",
+                                "z distribution of neuro tracks;z [cm]",
+                                100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroHWOutQuad2CosTheta = new TH1F("NeuroHWOutQuad2CosTheta",
+                                       "cos theta distribution of neuro tracks;cos theta ",
+                                       100, -1, 1);
+  m_neuroHWOutQuad2Phi0 = new TH1F("NeuroHWOutQuad2Phi0",
+                                   "phi distribution from unpacker;phi [deg]",
+                                   161, -1.25, 361); // shift to reduce the binning error
+  m_neuroHWOutQuad2InvPt = new TH1F("NeuroHWOutQuad2InvPt",
+                                    "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                    34, 0, 3.5);
 
-  m_neuroOutQuad3Z = new TH1F("NeuroOutQuad3Z",
-                              "z distribution of neuro tracks;z [cm]",
-                              100, -50, 50); // 1cm bins from -50cm to 50cm
-  m_neuroOutQuad3CosTheta = new TH1F("NeuroOutQuad3CosTheta",
-                                     "cos theta distribution of neuro tracks;cos theta ",
-                                     100, -1, 1);
-  m_neuroOutQuad3Phi0 = new TH1F("NeuroOutQuad3Phi0",
-                                 "phi distribution from unpacker;phi [deg]",
-                                 161, -1.25, 361); // shift to reduce the binning error
-  m_neuroOutQuad3InvPt = new TH1F("NeuroOutQuad3InvPt",
-                                  "Inverse Pt distribution from unpacker; [GeV^{-1}]",
-                                  34, 0, 3.5);
+  m_neuroHWOutQuad3Z = new TH1F("NeuroHWOutQuad3Z",
+                                "z distribution of neuro tracks;z [cm]",
+                                100, -50, 50); // 1cm bins from -50cm to 50cm
+  m_neuroHWOutQuad3CosTheta = new TH1F("NeuroHWOutQuad3CosTheta",
+                                       "cos theta distribution of neuro tracks;cos theta ",
+                                       100, -1, 1);
+  m_neuroHWOutQuad3Phi0 = new TH1F("NeuroHWOutQuad3Phi0",
+                                   "phi distribution from unpacker;phi [deg]",
+                                   161, -1.25, 361); // shift to reduce the binning error
+  m_neuroHWOutQuad3InvPt = new TH1F("NeuroHWOutQuad3InvPt",
+                                    "Inverse Pt distribution from unpacker; [GeV^{-1}]",
+                                    34, 0, 3.5);
 
   if (m_simNeuroTracksName != "") {
-    m_neuroSectorHW = new TH1F("NeuroSectorHW",
+    m_neuroHWSector = new TH1F("NeuroHWSector",
                                "unpacked sector",
                                10, 0, 10);
-    m_neuroSectorSW = new TH1F("NeuroSectorSW",
+    m_neuroSWSector = new TH1F("NeuroSWSector",
                                "sw sector",
                                10, 0, 10);
     m_neuroDeltaZ = new TH1F("NeuroDeltaZ",
@@ -346,34 +346,34 @@ void CDCTriggerDQMModule::defineHisto()
                            "number of TS selcted in TSIM but not in unpacker",
                            20, 0, 20);
 
-    m_neuroOutSWZ = new TH1F("NeuroOutSWZ",
+    m_neuroSWOutZ = new TH1F("NeuroSWOutZ",
                              "sw z distribution of neuro tracks;z [cm]",
                              100, -50, 50); // 1cm bins from -50cm to 50cm
-    m_neuroOutSWCosTheta = new TH1F("NeuroOutSWCosTheta",
+    m_neuroSWOutCosTheta = new TH1F("NeuroSWOutCosTheta",
                                     "sw cos theta distribution of neuro tracks;cos theta ",
                                     100, -1, 1);
-    m_neuroOutSWPhi0 = new TH1F("NeuroOutSWPhi0",
+    m_neuroSWOutPhi0 = new TH1F("NeuroSWOutPhi0",
                                 "sw phi distribution from unpacker;phi [deg]",
                                 161, -1.25, 361); // shift to reduce the binning error
-    m_neuroOutSWInvPt = new TH1F("NeuroOutSWInvPt",
+    m_neuroSWOutInvPt = new TH1F("NeuroSWOutInvPt",
                                  "sw Inverse Pt distribution from unpacker; [GeV^{-1}]",
                                  34, 0, 3.5);
   }
 
   if (m_simNeuroTracksSWTSSW2DName != "") {
-    m_neuroSectorSWTSSW2D = new TH1F("NeuroSectorSWTSSW2D",
+    m_neuroSWTSSW2DSector = new TH1F("NeuroSWTSSW2DSector",
                                      "swtssw2d sector",
                                      10, 0, 10);
-    m_neuroOutSWTSSW2DZ = new TH1F("NeuroOutSWTSSW2DZ",
+    m_neuroSWTSSW2DOutZ = new TH1F("NeuroSWTSSW2DOutZ",
                                    "sw z distribution of neuro tracks sw TS, sw 2D; z [cm]",
                                    100, -50, 50); // 1cm bins from -50cm to 50cm
-    m_neuroOutSWTSSW2DCosTheta = new TH1F("NeuroOutSWTSSW2DCosTheta",
+    m_neuroSWTSSW2DOutCosTheta = new TH1F("NeuroSWTSSW2DOutCosTheta",
                                           "sw cos theta distribution of neuro tracks sw TS, sw 2D; cos theta ",
                                           100, -1, 1);
-    m_neuroOutSWTSSW2DPhi0 = new TH1F("NeuroOutSWTSSW2DPhi0",
+    m_neuroSWTSSW2DOutPhi0 = new TH1F("NeuroSWTSSW2DOutPhi0",
                                       "sw phi distribution from unpacker sw TS, sw 2D; phi [deg]",
                                       161, -1.25, 361); // shift to reduce the binning error
-    m_neuroOutSWTSSW2DInvPt = new TH1F("NeuroOutSWTSSW2DInvPt",
+    m_neuroSWTSSW2DOutInvPt = new TH1F("NeuroSWTSSW2DOutInvPt",
                                        "sw Inverse Pt distribution from unpacker sw TS, sw 2D; [GeV^{-1}]",
                                        34, 0, 3.5);
   }
@@ -536,104 +536,104 @@ void CDCTriggerDQMModule::initialize()
 void CDCTriggerDQMModule::beginRun()
 {
   // Just to make sure, reset all the histograms.
-  m_neuroOutZ->Reset();
-  m_neuroOutCosTheta->Reset();
-  m_neuroOutHitPattern->Reset();
-  m_neuroOutPhi0->Reset();
-  m_neuroOutInvPt->Reset();
-  m_neuroOutm_time->Reset();
-  m_neuroOutTrackCount->Reset();
-  m_neuroOutVsInTrackCount->Reset();
-  m_neuroInTSID->Reset();
-  m_neuroInTSPrioT_Layer0->Reset();
-  m_neuroInTSPrioT_Layer1->Reset();
-  m_neuroInTSPrioT_Layer2->Reset();
-  m_neuroInTSPrioT_Layer3->Reset();
-  m_neuroInTSPrioT_Layer4->Reset();
-  m_neuroInTSPrioT_Layer5->Reset();
-  m_neuroInTSPrioT_Layer6->Reset();
-  m_neuroInTSPrioT_Layer7->Reset();
-  m_neuroInTSPrioT_Layer8->Reset();
-  m_neuroInTSFoundT_Layer0->Reset();
-  m_neuroInTSFoundT_Layer1->Reset();
-  m_neuroInTSFoundT_Layer2->Reset();
-  m_neuroInTSFoundT_Layer3->Reset();
-  m_neuroInTSFoundT_Layer4->Reset();
-  m_neuroInTSFoundT_Layer5->Reset();
-  m_neuroInTSFoundT_Layer6->Reset();
-  m_neuroInTSFoundT_Layer7->Reset();
-  m_neuroInTSFoundT_Layer8->Reset();
-  m_neuroSelTSPrioT_Layer0->Reset();
-  m_neuroSelTSPrioT_Layer1->Reset();
-  m_neuroSelTSPrioT_Layer2->Reset();
-  m_neuroSelTSPrioT_Layer3->Reset();
-  m_neuroSelTSPrioT_Layer4->Reset();
-  m_neuroSelTSPrioT_Layer5->Reset();
-  m_neuroSelTSPrioT_Layer6->Reset();
-  m_neuroSelTSPrioT_Layer7->Reset();
-  m_neuroSelTSPrioT_Layer8->Reset();
-  m_neuroSelTSFoundT_Layer0->Reset();
-  m_neuroSelTSFoundT_Layer1->Reset();
-  m_neuroSelTSFoundT_Layer2->Reset();
-  m_neuroSelTSFoundT_Layer3->Reset();
-  m_neuroSelTSFoundT_Layer4->Reset();
-  m_neuroSelTSFoundT_Layer5->Reset();
-  m_neuroSelTSFoundT_Layer6->Reset();
-  m_neuroSelTSFoundT_Layer7->Reset();
-  m_neuroSelTSFoundT_Layer8->Reset();
-  m_neuroInTSCount->Reset();
-  m_neuroInPhi0->Reset();
-  m_neuroInm_time->Reset();
-  m_neuroInInvPt->Reset();
-  m_neuroInTrackCount->Reset();
-  m_neuroInVs2DOutTrackCount->Reset();
-  m_2DOutPhi0->Reset();
-  m_2DOutm_time->Reset();
-  m_2DOutInvPt->Reset();
-  m_2DOutTrackCount->Reset();
-  m_neuroSelTSCount->Reset();
-  m_neuroSelTSID->Reset();
-  m_2DInTSID->Reset();
-  m_2DInTSPrioT_Layer0->Reset();
-  m_2DInTSPrioT_Layer2->Reset();
-  m_2DInTSPrioT_Layer4->Reset();
-  m_2DInTSPrioT_Layer6->Reset();
-  m_2DInTSPrioT_Layer8->Reset();
-  m_2DInTSFoundT_Layer0->Reset();
-  m_2DInTSFoundT_Layer2->Reset();
-  m_2DInTSFoundT_Layer4->Reset();
-  m_2DInTSFoundT_Layer6->Reset();
-  m_2DInTSFoundT_Layer8->Reset();
-  m_2DInTSCount->Reset();
+  m_neuroHWOutZ->Reset();
+  m_neuroHWOutCosTheta->Reset();
+  m_neuroHWOutHitPattern->Reset();
+  m_neuroHWOutPhi0->Reset();
+  m_neuroHWOutInvPt->Reset();
+  m_neuroHWOutm_time->Reset();
+  m_neuroHWOutTrackCount->Reset();
+  m_neuroHWOutVsInTrackCount->Reset();
+  m_neuroHWInTSID->Reset();
+  m_neuroHWInTSPrioT_Layer0->Reset();
+  m_neuroHWInTSPrioT_Layer1->Reset();
+  m_neuroHWInTSPrioT_Layer2->Reset();
+  m_neuroHWInTSPrioT_Layer3->Reset();
+  m_neuroHWInTSPrioT_Layer4->Reset();
+  m_neuroHWInTSPrioT_Layer5->Reset();
+  m_neuroHWInTSPrioT_Layer6->Reset();
+  m_neuroHWInTSPrioT_Layer7->Reset();
+  m_neuroHWInTSPrioT_Layer8->Reset();
+  m_neuroHWInTSFoundT_Layer0->Reset();
+  m_neuroHWInTSFoundT_Layer1->Reset();
+  m_neuroHWInTSFoundT_Layer2->Reset();
+  m_neuroHWInTSFoundT_Layer3->Reset();
+  m_neuroHWInTSFoundT_Layer4->Reset();
+  m_neuroHWInTSFoundT_Layer5->Reset();
+  m_neuroHWInTSFoundT_Layer6->Reset();
+  m_neuroHWInTSFoundT_Layer7->Reset();
+  m_neuroHWInTSFoundT_Layer8->Reset();
+  m_neuroHWSelTSPrioT_Layer0->Reset();
+  m_neuroHWSelTSPrioT_Layer1->Reset();
+  m_neuroHWSelTSPrioT_Layer2->Reset();
+  m_neuroHWSelTSPrioT_Layer3->Reset();
+  m_neuroHWSelTSPrioT_Layer4->Reset();
+  m_neuroHWSelTSPrioT_Layer5->Reset();
+  m_neuroHWSelTSPrioT_Layer6->Reset();
+  m_neuroHWSelTSPrioT_Layer7->Reset();
+  m_neuroHWSelTSPrioT_Layer8->Reset();
+  m_neuroHWSelTSFoundT_Layer0->Reset();
+  m_neuroHWSelTSFoundT_Layer1->Reset();
+  m_neuroHWSelTSFoundT_Layer2->Reset();
+  m_neuroHWSelTSFoundT_Layer3->Reset();
+  m_neuroHWSelTSFoundT_Layer4->Reset();
+  m_neuroHWSelTSFoundT_Layer5->Reset();
+  m_neuroHWSelTSFoundT_Layer6->Reset();
+  m_neuroHWSelTSFoundT_Layer7->Reset();
+  m_neuroHWSelTSFoundT_Layer8->Reset();
+  m_neuroHWInTSCount->Reset();
+  m_neuroHWInPhi0->Reset();
+  m_neuroHWInm_time->Reset();
+  m_neuroHWInInvPt->Reset();
+  m_neuroHWInTrackCount->Reset();
+  m_neuroHWInVs2DOutTrackCount->Reset();
+  m_2DHWOutPhi0->Reset();
+  m_2DHWOutm_time->Reset();
+  m_2DHWOutInvPt->Reset();
+  m_2DHWOutTrackCount->Reset();
+  m_neuroHWSelTSCount->Reset();
+  m_neuroHWSelTSID->Reset();
+  m_2DHWInTSID->Reset();
+  m_2DHWInTSPrioT_Layer0->Reset();
+  m_2DHWInTSPrioT_Layer2->Reset();
+  m_2DHWInTSPrioT_Layer4->Reset();
+  m_2DHWInTSPrioT_Layer6->Reset();
+  m_2DHWInTSPrioT_Layer8->Reset();
+  m_2DHWInTSFoundT_Layer0->Reset();
+  m_2DHWInTSFoundT_Layer2->Reset();
+  m_2DHWInTSFoundT_Layer4->Reset();
+  m_2DHWInTSFoundT_Layer6->Reset();
+  m_2DHWInTSFoundT_Layer8->Reset();
+  m_2DHWInTSCount->Reset();
 
-  m_neuroOutQuad5Z->Reset();
-  m_neuroOutQuad5CosTheta->Reset();
-  m_neuroOutQuad5Phi0->Reset();
-  m_neuroOutQuad5InvPt->Reset();
+  m_neuroHWOutQuad5Z->Reset();
+  m_neuroHWOutQuad5CosTheta->Reset();
+  m_neuroHWOutQuad5Phi0->Reset();
+  m_neuroHWOutQuad5InvPt->Reset();
 
-  m_neuroOutQuad0Z->Reset();
-  m_neuroOutQuad0CosTheta->Reset();
-  m_neuroOutQuad0Phi0->Reset();
-  m_neuroOutQuad0InvPt->Reset();
+  m_neuroHWOutQuad0Z->Reset();
+  m_neuroHWOutQuad0CosTheta->Reset();
+  m_neuroHWOutQuad0Phi0->Reset();
+  m_neuroHWOutQuad0InvPt->Reset();
 
-  m_neuroOutQuad1Z->Reset();
-  m_neuroOutQuad1CosTheta->Reset();
-  m_neuroOutQuad1Phi0->Reset();
-  m_neuroOutQuad1InvPt->Reset();
+  m_neuroHWOutQuad1Z->Reset();
+  m_neuroHWOutQuad1CosTheta->Reset();
+  m_neuroHWOutQuad1Phi0->Reset();
+  m_neuroHWOutQuad1InvPt->Reset();
 
-  m_neuroOutQuad2Z->Reset();
-  m_neuroOutQuad2CosTheta->Reset();
-  m_neuroOutQuad2Phi0->Reset();
-  m_neuroOutQuad2InvPt->Reset();
+  m_neuroHWOutQuad2Z->Reset();
+  m_neuroHWOutQuad2CosTheta->Reset();
+  m_neuroHWOutQuad2Phi0->Reset();
+  m_neuroHWOutQuad2InvPt->Reset();
 
-  m_neuroOutQuad3Z->Reset();
-  m_neuroOutQuad3CosTheta->Reset();
-  m_neuroOutQuad3Phi0->Reset();
-  m_neuroOutQuad3InvPt->Reset();
+  m_neuroHWOutQuad3Z->Reset();
+  m_neuroHWOutQuad3CosTheta->Reset();
+  m_neuroHWOutQuad3Phi0->Reset();
+  m_neuroHWOutQuad3InvPt->Reset();
 
   if (m_simNeuroTracksName != "") {
-    m_neuroSectorHW->Reset();
-    m_neuroSectorSW->Reset();
+    m_neuroHWSector->Reset();
+    m_neuroSWSector->Reset();
     m_neuroDeltaZ->Reset();
     m_neuroDeltaTheta->Reset();
     m_neuroScatterZ->Reset();
@@ -644,17 +644,17 @@ void CDCTriggerDQMModule::beginRun()
     m_neuroDeltaSector->Reset();
     m_simSameTS->Reset();
     m_simDiffTS->Reset();
-    m_neuroOutSWZ->Reset();
-    m_neuroOutSWCosTheta->Reset();
-    m_neuroOutSWPhi0->Reset();
-    m_neuroOutSWInvPt->Reset();
+    m_neuroSWOutZ->Reset();
+    m_neuroSWOutCosTheta->Reset();
+    m_neuroSWOutPhi0->Reset();
+    m_neuroSWOutInvPt->Reset();
   }
   if (m_simNeuroTracksSWTSSW2DName != "") {
-    m_neuroSectorSWTSSW2D->Reset();
-    m_neuroOutSWTSSW2DZ->Reset();
-    m_neuroOutSWTSSW2DCosTheta->Reset();
-    m_neuroOutSWTSSW2DPhi0->Reset();
-    m_neuroOutSWTSSW2DInvPt->Reset();
+    m_neuroSWTSSW2DSector->Reset();
+    m_neuroSWTSSW2DOutZ->Reset();
+    m_neuroSWTSSW2DOutCosTheta->Reset();
+    m_neuroSWTSSW2DOutPhi0->Reset();
+    m_neuroSWTSSW2DOutInvPt->Reset();
   }
   if (m_showRecoTracks == "yes") {
     m_RecoZ->Reset();
@@ -800,24 +800,24 @@ void CDCTriggerDQMModule::event()
   }
 
   for (CDCTriggerTrack& neuroswTrack : m_simNeuroTracksSWTSSW2D) {
-    m_neuroOutSWTSSW2DZ->Fill(neuroswTrack.getZ0());
+    m_neuroSWTSSW2DOutZ->Fill(neuroswTrack.getZ0());
     double cotThSW = neuroswTrack.getCotTheta();
     double cosThSW = copysign(1.0, cotThSW) / sqrt(1. / (cotThSW * cotThSW) + 1);
-    m_neuroOutSWTSSW2DCosTheta->Fill(cosThSW);
-    m_neuroOutSWTSSW2DPhi0->Fill(neuroswTrack.getPhi0() * 180 / M_PI);
-    m_neuroOutSWTSSW2DInvPt->Fill(1. / neuroswTrack.getPt());
-    unsigned simSectorSWTSSW2D =
+    m_neuroSWTSSW2DOutCosTheta->Fill(cosThSW);
+    m_neuroSWTSSW2DOutPhi0->Fill(neuroswTrack.getPhi0() * 180 / M_PI);
+    m_neuroSWTSSW2DOutInvPt->Fill(1. / neuroswTrack.getPt());
+    unsigned simSWTSSW2DSector =
       neuroswTrack.getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorSWTSSW2DName)->getSector();
-    m_neuroSectorSWTSSW2D->Fill(simSectorSWTSSW2D);
+    m_neuroSWTSSW2DSector->Fill(simSWTSSW2DSector);
 
   }
   for (CDCTriggerTrack& neuroswTrack : m_simNeuroTracks) {
-    m_neuroOutSWZ->Fill(neuroswTrack.getZ0());
+    m_neuroSWOutZ->Fill(neuroswTrack.getZ0());
     double cotThSW = neuroswTrack.getCotTheta();
     double cosThSW = copysign(1.0, cotThSW) / sqrt(1. / (cotThSW * cotThSW) + 1);
-    m_neuroOutSWCosTheta->Fill(cosThSW);
-    m_neuroOutSWPhi0->Fill(neuroswTrack.getPhi0() * 180 / M_PI);
-    m_neuroOutSWInvPt->Fill(1. / neuroswTrack.getPt());
+    m_neuroSWOutCosTheta->Fill(cosThSW);
+    m_neuroSWOutPhi0->Fill(neuroswTrack.getPhi0() * 180 / M_PI);
+    m_neuroSWOutInvPt->Fill(1. / neuroswTrack.getPt());
   }
   // fill neurotrigger histograms
   int nofouttracks = 0;
@@ -829,45 +829,45 @@ void CDCTriggerDQMModule::event()
     // count number of tracks
     nofouttracks ++;
     // fill raw distributions
-    m_neuroOutZ->Fill(neuroTrack.getZ0());
+    m_neuroHWOutZ->Fill(neuroTrack.getZ0());
     double cotTh = neuroTrack.getCotTheta();
     double cosTh = copysign(1.0, cotTh) / sqrt(1. / (cotTh * cotTh) + 1);
-    m_neuroOutCosTheta->Fill(cosTh);
-    m_neuroOutPhi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
-    m_neuroOutInvPt->Fill(1. / neuroTrack.getPt());
-    m_neuroOutm_time->Fill(neuroTrack.getTime());
+    m_neuroHWOutCosTheta->Fill(cosTh);
+    m_neuroHWOutPhi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+    m_neuroHWOutInvPt->Fill(1. / neuroTrack.getPt());
+    m_neuroHWOutm_time->Fill(neuroTrack.getTime());
 
     // fill hists per quadrant
     switch (neuroTrack.getQuadrant()) {
       case -1:
-        m_neuroOutQuad5Z->Fill(neuroTrack.getZ0());
-        m_neuroOutQuad5CosTheta->Fill(cosTh);
-        m_neuroOutQuad5Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
-        m_neuroOutQuad5InvPt->Fill(1. / neuroTrack.getPt());
+        m_neuroHWOutQuad5Z->Fill(neuroTrack.getZ0());
+        m_neuroHWOutQuad5CosTheta->Fill(cosTh);
+        m_neuroHWOutQuad5Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroHWOutQuad5InvPt->Fill(1. / neuroTrack.getPt());
         break;
       case 0:
-        m_neuroOutQuad0Z->Fill(neuroTrack.getZ0());
-        m_neuroOutQuad0CosTheta->Fill(cosTh);
-        m_neuroOutQuad0Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
-        m_neuroOutQuad0InvPt->Fill(1. / neuroTrack.getPt());
+        m_neuroHWOutQuad0Z->Fill(neuroTrack.getZ0());
+        m_neuroHWOutQuad0CosTheta->Fill(cosTh);
+        m_neuroHWOutQuad0Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroHWOutQuad0InvPt->Fill(1. / neuroTrack.getPt());
         break;
       case 1:
-        m_neuroOutQuad1Z->Fill(neuroTrack.getZ0());
-        m_neuroOutQuad1CosTheta->Fill(cosTh);
-        m_neuroOutQuad1Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
-        m_neuroOutQuad1InvPt->Fill(1. / neuroTrack.getPt());
+        m_neuroHWOutQuad1Z->Fill(neuroTrack.getZ0());
+        m_neuroHWOutQuad1CosTheta->Fill(cosTh);
+        m_neuroHWOutQuad1Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroHWOutQuad1InvPt->Fill(1. / neuroTrack.getPt());
         break;
       case 2:
-        m_neuroOutQuad2Z->Fill(neuroTrack.getZ0());
-        m_neuroOutQuad2CosTheta->Fill(cosTh);
-        m_neuroOutQuad2Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
-        m_neuroOutQuad2InvPt->Fill(1. / neuroTrack.getPt());
+        m_neuroHWOutQuad2Z->Fill(neuroTrack.getZ0());
+        m_neuroHWOutQuad2CosTheta->Fill(cosTh);
+        m_neuroHWOutQuad2Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroHWOutQuad2InvPt->Fill(1. / neuroTrack.getPt());
         break;
       case 3:
-        m_neuroOutQuad3Z->Fill(neuroTrack.getZ0());
-        m_neuroOutQuad3CosTheta->Fill(cosTh);
-        m_neuroOutQuad3Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
-        m_neuroOutQuad3InvPt->Fill(1. / neuroTrack.getPt());
+        m_neuroHWOutQuad3Z->Fill(neuroTrack.getZ0());
+        m_neuroHWOutQuad3CosTheta->Fill(cosTh);
+        m_neuroHWOutQuad3Phi0->Fill(neuroTrack.getPhi0() * 180 / M_PI);
+        m_neuroHWOutQuad3InvPt->Fill(1. / neuroTrack.getPt());
         break;
     }
 
@@ -875,9 +875,9 @@ void CDCTriggerDQMModule::event()
     unsigned pattern = 0;
     for (const CDCTriggerSegmentHit& hit :
          neuroTrack.getRelationsTo<CDCTriggerSegmentHit>(m_unpackedNeuroInputSegmentsName)) {
-      m_neuroSelTSID->Fill(hit.getSegmentID());
+      m_neuroHWSelTSID->Fill(hit.getSegmentID());
       unsigned int sl = hit.getISuperLayer();
-      m_neuroSelTSCount->Fill(sl);
+      m_neuroHWSelTSCount->Fill(sl);
       float neuroTime = neuroTrack.getTime();
       // find first occurence of hit (used to debug the selcted TS field)
       CDCTriggerSegmentHit firstHit = hit;
@@ -895,37 +895,37 @@ void CDCTriggerDQMModule::event()
       }
 
       switch (sl) {
-        case 0: m_neuroSelTSPrioT_Layer0->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer0->Fill(firstHit.foundTime() - neuroTime);
+        case 0: m_neuroHWSelTSPrioT_Layer0->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer0->Fill(firstHit.foundTime() - neuroTime);
           break;
-        case 1: m_neuroSelTSPrioT_Layer1->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer1->Fill(firstHit.foundTime() - neuroTime);
+        case 1: m_neuroHWSelTSPrioT_Layer1->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer1->Fill(firstHit.foundTime() - neuroTime);
           break;
-        case 2: m_neuroSelTSPrioT_Layer2->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer2->Fill(firstHit.foundTime() - neuroTime);
+        case 2: m_neuroHWSelTSPrioT_Layer2->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer2->Fill(firstHit.foundTime() - neuroTime);
           break;
-        case 3: m_neuroSelTSPrioT_Layer3->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer3->Fill(firstHit.foundTime() - neuroTime);
+        case 3: m_neuroHWSelTSPrioT_Layer3->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer3->Fill(firstHit.foundTime() - neuroTime);
           break;
-        case 4: m_neuroSelTSPrioT_Layer4->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer4->Fill(firstHit.foundTime() - neuroTime);
+        case 4: m_neuroHWSelTSPrioT_Layer4->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer4->Fill(firstHit.foundTime() - neuroTime);
           break;
-        case 5: m_neuroSelTSPrioT_Layer5->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer5->Fill(firstHit.foundTime() - neuroTime);
+        case 5: m_neuroHWSelTSPrioT_Layer5->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer5->Fill(firstHit.foundTime() - neuroTime);
           break;
-        case 6: m_neuroSelTSPrioT_Layer6->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer6->Fill(firstHit.foundTime() - neuroTime);
+        case 6: m_neuroHWSelTSPrioT_Layer6->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer6->Fill(firstHit.foundTime() - neuroTime);
           break;
-        case 7: m_neuroSelTSPrioT_Layer7->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer7->Fill(firstHit.foundTime() - neuroTime);
+        case 7: m_neuroHWSelTSPrioT_Layer7->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer7->Fill(firstHit.foundTime() - neuroTime);
           break;
-        case 8: m_neuroSelTSPrioT_Layer8->Fill(hit.priorityTime());
-          m_neuroSelTSFoundT_Layer8->Fill(firstHit.foundTime() - neuroTime);
+        case 8: m_neuroHWSelTSPrioT_Layer8->Fill(hit.priorityTime());
+          m_neuroHWSelTSFoundT_Layer8->Fill(firstHit.foundTime() - neuroTime);
           break;
       }
       if (sl % 2 == 1) pattern |= (1 << ((sl - 1) / 2));
     }
-    m_neuroOutHitPattern->Fill(pattern);
+    m_neuroHWOutHitPattern->Fill(pattern);
 
     if (m_simNeuroTracksName != "") {
       // get related track from TSIM (via 2D finder track)
@@ -978,8 +978,8 @@ void CDCTriggerDQMModule::event()
               neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getSector();
             unsigned simSector =
               neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorName)->getSector();
-            m_neuroSectorHW->Fill(unpackedSector);
-            m_neuroSectorSW->Fill(simSector);
+            m_neuroHWSector->Fill(unpackedSector);
+            m_neuroSWSector->Fill(simSector);
             m_neuroDeltaSector->Fill(unpackedSector - simSector);
 
             cout << endl;
@@ -1139,86 +1139,86 @@ void CDCTriggerDQMModule::event()
   }
   for (CDCTriggerTrack& neuroinput2dtrack : m_unpackedNeuroInput2DTracks) {
     nofintracks ++;
-    m_neuroInPhi0->Fill(neuroinput2dtrack.getPhi0() * 180 / M_PI);
-    m_neuroInm_time->Fill(neuroinput2dtrack.getTime());
-    m_neuroInInvPt->Fill(1. / neuroinput2dtrack.getPt());
+    m_neuroHWInPhi0->Fill(neuroinput2dtrack.getPhi0() * 180 / M_PI);
+    m_neuroHWInm_time->Fill(neuroinput2dtrack.getTime());
+    m_neuroHWInInvPt->Fill(1. / neuroinput2dtrack.getPt());
   }
   if (nofintracks > 0 || nofouttracks > 0) {
-    m_neuroInTrackCount->Fill(nofintracks);
-    m_neuroOutTrackCount->Fill(nofouttracks);
-    m_neuroOutVsInTrackCount->Fill((nofouttracks - nofintracks));
+    m_neuroHWInTrackCount->Fill(nofintracks);
+    m_neuroHWOutTrackCount->Fill(nofouttracks);
+    m_neuroHWOutVsInTrackCount->Fill((nofouttracks - nofintracks));
   }
   for (CDCTriggerSegmentHit& neuroinputsegment : m_unpackedNeuroInputSegments) {
     nofinsegments ++;
-    m_neuroInTSID->Fill(neuroinputsegment.getSegmentID());
+    m_neuroHWInTSID->Fill(neuroinputsegment.getSegmentID());
     unsigned int sl = neuroinputsegment.getISuperLayer();
     switch (sl) {
-      case 0: m_neuroInTSPrioT_Layer0->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer0->Fill(neuroinputsegment.foundTime());
+      case 0: m_neuroHWInTSPrioT_Layer0->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer0->Fill(neuroinputsegment.foundTime());
         break;
-      case 1: m_neuroInTSPrioT_Layer1->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer1->Fill(neuroinputsegment.foundTime());
+      case 1: m_neuroHWInTSPrioT_Layer1->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer1->Fill(neuroinputsegment.foundTime());
         break;
-      case 2: m_neuroInTSPrioT_Layer2->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer2->Fill(neuroinputsegment.foundTime());
+      case 2: m_neuroHWInTSPrioT_Layer2->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer2->Fill(neuroinputsegment.foundTime());
         break;
-      case 3: m_neuroInTSPrioT_Layer3->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer3->Fill(neuroinputsegment.foundTime());
+      case 3: m_neuroHWInTSPrioT_Layer3->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer3->Fill(neuroinputsegment.foundTime());
         break;
-      case 4: m_neuroInTSPrioT_Layer4->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer4->Fill(neuroinputsegment.foundTime());
+      case 4: m_neuroHWInTSPrioT_Layer4->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer4->Fill(neuroinputsegment.foundTime());
         break;
-      case 5: m_neuroInTSPrioT_Layer5->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer5->Fill(neuroinputsegment.foundTime());
+      case 5: m_neuroHWInTSPrioT_Layer5->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer5->Fill(neuroinputsegment.foundTime());
         break;
-      case 6: m_neuroInTSPrioT_Layer6->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer6->Fill(neuroinputsegment.foundTime());
+      case 6: m_neuroHWInTSPrioT_Layer6->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer6->Fill(neuroinputsegment.foundTime());
         break;
-      case 7: m_neuroInTSPrioT_Layer7->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer7->Fill(neuroinputsegment.foundTime());
+      case 7: m_neuroHWInTSPrioT_Layer7->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer7->Fill(neuroinputsegment.foundTime());
         break;
-      case 8: m_neuroInTSPrioT_Layer8->Fill(neuroinputsegment.priorityTime());
-        m_neuroInTSFoundT_Layer8->Fill(neuroinputsegment.foundTime());
+      case 8: m_neuroHWInTSPrioT_Layer8->Fill(neuroinputsegment.priorityTime());
+        m_neuroHWInTSFoundT_Layer8->Fill(neuroinputsegment.foundTime());
         break;
     }
   }
   if (nofinsegments > 0) {
-    m_neuroInTSCount->Fill(nofinsegments);
+    m_neuroHWInTSCount->Fill(nofinsegments);
   }
   for (CDCTriggerTrack& finder2dtrack : m_unpacked2DTracks) {
     nof2douttracks ++;
-    m_2DOutPhi0->Fill(finder2dtrack.getPhi0() * 180 / M_PI);
-    m_2DOutm_time->Fill(finder2dtrack.getTime());
-    m_2DOutInvPt->Fill(1. / finder2dtrack.getPt());
+    m_2DHWOutPhi0->Fill(finder2dtrack.getPhi0() * 180 / M_PI);
+    m_2DHWOutm_time->Fill(finder2dtrack.getTime());
+    m_2DHWOutInvPt->Fill(1. / finder2dtrack.getPt());
   }
   if (nof2douttracks > 0) {
-    m_neuroInVs2DOutTrackCount->Fill((nofintracks - nof2douttracks));
-    m_2DOutTrackCount->Fill(nof2douttracks);
+    m_neuroHWInVs2DOutTrackCount->Fill((nofintracks - nof2douttracks));
+    m_2DHWOutTrackCount->Fill(nof2douttracks);
   }
   for (CDCTriggerSegmentHit& hit : m_unpackedSegmentHits) {
     nof2dinsegments++;
-    m_2DInTSID->Fill(hit.getSegmentID());
+    m_2DHWInTSID->Fill(hit.getSegmentID());
     unsigned int sl = hit.getISuperLayer();
     switch (sl) {
-      case 0: m_2DInTSPrioT_Layer0->Fill(hit.priorityTime());
-        m_2DInTSFoundT_Layer0->Fill(hit.foundTime());
+      case 0: m_2DHWInTSPrioT_Layer0->Fill(hit.priorityTime());
+        m_2DHWInTSFoundT_Layer0->Fill(hit.foundTime());
         break;
-      case 2: m_2DInTSPrioT_Layer2->Fill(hit.priorityTime());
-        m_2DInTSFoundT_Layer2->Fill(hit.foundTime());
+      case 2: m_2DHWInTSPrioT_Layer2->Fill(hit.priorityTime());
+        m_2DHWInTSFoundT_Layer2->Fill(hit.foundTime());
         break;
-      case 4: m_2DInTSPrioT_Layer4->Fill(hit.priorityTime());
-        m_2DInTSFoundT_Layer4->Fill(hit.foundTime());
+      case 4: m_2DHWInTSPrioT_Layer4->Fill(hit.priorityTime());
+        m_2DHWInTSFoundT_Layer4->Fill(hit.foundTime());
         break;
-      case 6: m_2DInTSPrioT_Layer6->Fill(hit.priorityTime());
-        m_2DInTSFoundT_Layer6->Fill(hit.foundTime());
+      case 6: m_2DHWInTSPrioT_Layer6->Fill(hit.priorityTime());
+        m_2DHWInTSFoundT_Layer6->Fill(hit.foundTime());
         break;
-      case 8: m_2DInTSPrioT_Layer8->Fill(hit.priorityTime());
-        m_2DInTSFoundT_Layer8->Fill(hit.foundTime());
+      case 8: m_2DHWInTSPrioT_Layer8->Fill(hit.priorityTime());
+        m_2DHWInTSFoundT_Layer8->Fill(hit.foundTime());
         break;
     }
   }
   if (nof2dinsegments > 0)
-    m_2DInTSCount->Fill(nof2dinsegments);
+    m_2DHWInTSCount->Fill(nof2dinsegments);
 }
 
 

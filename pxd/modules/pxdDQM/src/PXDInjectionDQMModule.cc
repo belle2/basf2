@@ -9,12 +9,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDInjectionDQMModule.h>
-#include <vxd/geometry/GeoCache.h>
-//#include <vxd/geometry/SensorInfoBase.h>
-
 #include "TDirectory.h"
-#include <TAxis.h>
-#include <string>
 
 using namespace std;
 using namespace Belle2;
@@ -48,10 +43,10 @@ void PXDInjectionDQMModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
   oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
 
-  hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;;Count/Time", 4000, 0, 20000);
-  hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;;Count/Time", 4000, 0, 20000);
-  hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;;Count/Time", 4000, 0, 20000);
-  hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;;Count/Time", 4000, 0, 20000);
+  hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+  hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+  hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+  hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
 
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -64,11 +59,15 @@ void PXDInjectionDQMModule::defineHisto()
       TString bufful = buff;
       buff.ReplaceAll(".", "_");
 
-      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 4000, 0, 20000);
-      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful, "PXDOccModInjLER " + buff + "/Time;;Count/Time", 4000, 0, 20000);
-      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 4000,
+      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
+                                            "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful,
+                                            "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful,
+                                             "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000,
                                              0, 20000);
-      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful, "PXDEOccModInjLER " + buff + "/Time;;Count/Time", 4000,
+      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful,
+                                             "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000,
                                              0, 20000);
 
     }
@@ -80,7 +79,6 @@ void PXDInjectionDQMModule::defineHisto()
 void PXDInjectionDQMModule::initialize()
 {
   REG_HISTOGRAM
-//  m_storeDAQEvtStats.isRequired();
   m_rawTTD.isRequired();
   m_storeRawHits.isRequired(m_PXDRawHitsName);
 }
@@ -113,25 +111,24 @@ void PXDInjectionDQMModule::event()
         freq[p.getSensorID()]++;
         all++;
       }
-      difference /= 127;
-      // Should we use two histograms and normalize? Use maybe TH1F? Will this work with HistoModule?
+      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
-        hOccAfterInjHER->Fill(difference, all);
-        hEOccAfterInjHER->Fill(difference);
+        hOccAfterInjHER->Fill(diff2, all);
+        hEOccAfterInjHER->Fill(diff2);
         for (auto& a : hOccModAfterInjHER) {
-          a.second->Fill(difference, freq[a.first]);
+          if (a.second) a.second->Fill(difference, freq[a.first]);
         }
         for (auto& a : hEOccModAfterInjHER) {
-          a.second->Fill(difference);
+          if (a.second) a.second->Fill(difference);
         }
       } else {
-        hOccAfterInjLER->Fill(difference, all);
-        hEOccAfterInjLER->Fill(difference);
+        hOccAfterInjLER->Fill(diff2, all);
+        hEOccAfterInjLER->Fill(diff2);
         for (auto& a : hOccModAfterInjLER) {
-          a.second->Fill(difference, freq[a.first]);
+          if (a.second) a.second->Fill(difference, freq[a.first]);
         }
         for (auto& a : hEOccModAfterInjLER) {
-          a.second->Fill(difference);
+          if (a.second) a.second->Fill(difference);
         }
       }
     }

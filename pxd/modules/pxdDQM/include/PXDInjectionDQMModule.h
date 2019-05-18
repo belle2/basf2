@@ -14,21 +14,20 @@
 #include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <TH1.h>
 #include <string>
-#include <vector>
 #include <map>
 
 namespace Belle2 {
 
   namespace PXD {
-    /** The PXD Occ after Injection DQM module.
+    /** The PXD Occupancy after Injection DQM module.
      *
-     * Occ after Injection (taken from TTD packet)
+     * PXD Occupancy after Injection Histogramming with
+     * time (ticks) taken from TTD packet
+     *
      */
     class PXDInjectionDQMModule : public HistoModule {
 
@@ -36,12 +35,6 @@ namespace Belle2 {
 
       /** Constructor defining the parameters */
       PXDInjectionDQMModule();
-
-      void initialize() override final;
-
-      void beginRun() override final;
-
-      void event() override final;
 
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
@@ -55,20 +48,28 @@ namespace Belle2 {
       /** Input array for PXD Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
 
-      //the geometry
+      /** the VXD geometry */
       VXD::GeoCache& m_vxdGeometry;
 
-      TH1F* hOccAfterInjLER{};          /** Occupancy after LER injection */
-      TH1F* hOccAfterInjHER{};          /** Occupancy after HER injection */
-      std::map<VxdID, TH1F*> hOccModAfterInjLER;/** Occupancy after LER injection */
-      std::map<VxdID, TH1F*> hOccModAfterInjHER;/** Occupancy after HER injection */
+      TH1F* hOccAfterInjLER{};          /**< Histogram Occupancy after LER injection */
+      TH1F* hOccAfterInjHER{};          /**< Histogram Occupancy after HER injection */
 
-      TH1F* hEOccAfterInjLER{};          /** Occupancy after LER injection */
-      TH1F* hEOccAfterInjHER{};          /** Occupancy after HER injection */
-      std::map<VxdID, TH1F*> hEOccModAfterInjLER;/** Occupancy after LER injection */
-      std::map<VxdID, TH1F*> hEOccModAfterInjHER;/** Occupancy after HER injection */
+      std::map<VxdID, TH1F*> hOccModAfterInjLER; /**< Histogram Occupancy after LER injection */
+      std::map<VxdID, TH1F*> hOccModAfterInjHER; /**< Histogram Occupancy after HER injection */
 
-      void defineHisto() override final;
+      TH1F* hEOccAfterInjLER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+      TH1F* hEOccAfterInjHER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+
+      std::map<VxdID, TH1F*> hEOccModAfterInjLER; /**<  Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+      std::map<VxdID, TH1F*> hEOccModAfterInjHER; /**<  Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+
+      void initialize() override final; /**< initialize function */
+
+      void beginRun() override final;  /**< beginRun function */
+
+      void event() override final; /**< event function */
+
+      void defineHisto() override final; /**< defineHisto function */
 
     };//end class declaration
 

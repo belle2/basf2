@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDInjectionDQMModule.h>
-#include <vxd/geometry/GeoCache.h>
-//#include <vxd/geometry/SensorInfoBase.h>
-
 #include "TDirectory.h"
 #include <TAxis.h>
 #include <string>
@@ -76,7 +73,6 @@ void PXDInjectionDQMModule::defineHisto()
 void PXDInjectionDQMModule::initialize()
 {
   REG_HISTOGRAM
-//  m_storeDAQEvtStats.isRequired();
   m_rawTTD.isRequired();
   m_storeRawHits.isRequired(m_PXDRawHitsName);
 }
@@ -106,11 +102,12 @@ void PXDInjectionDQMModule::event()
     if (difference != 0x7FFFFFFF) {
       // count raw pixel hits per module, only if necessary
       std::map <VxdID, int> freq;// count the number of RawHits per sensor
-//       if(m_eachModule){
-//         for (auto& p : m_storeRawHits) {
-//             freq[p.getSensorID()]++;
-//         }
-//       }
+      if (m_eachModule) {
+        // that is slow code, sorry
+        for (auto& p : m_storeRawHits) {
+          freq[p.getSensorID()]++;
+        }
+      }
       unsigned int all = m_storeRawHits.size();
       // Should we use two histograms and normalize? Use maybe TEfficiency? Will this work with HistoModule?
       if (it.GetIsHER(0)) {
@@ -119,7 +116,7 @@ void PXDInjectionDQMModule::event()
         }
         hOccAfterInjHER->Fill(difference, all);
         for (auto& a : hOccModAfterInjHER) {
-          a.second->Fill(difference, freq[a.first]);
+          if (a.second) a.second->Fill(difference, freq[a.first]);
         }
       } else {
         for (auto& p : m_storeRawHits) {
@@ -127,7 +124,7 @@ void PXDInjectionDQMModule::event()
         }
         hOccAfterInjLER->Fill(difference, all);
         for (auto& a : hOccModAfterInjLER) {
-          a.second->Fill(difference, freq[a.first]);
+          if (a.second) a.second->Fill(difference, freq[a.first]);
         }
       }
     }

@@ -9,9 +9,7 @@
  **************************************************************************/
 
 #include <ecl/modules/eclDQMInjection/eclDQMInjection.h>
-
 #include "TDirectory.h"
-#include <string>
 
 using namespace std;
 using namespace Belle2;
@@ -43,10 +41,10 @@ void ECLDQMInjectionModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
   oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
 
-  hOccAfterInjLER  = new TH1F("ECLOccInjLER", "ECLOccInjLER/Time;;Count/Time", 4000, 0, 20000);
-  hOccAfterInjHER  = new TH1F("ECLOccInjHER", "ECLOccInjHER/Time;;Count/Time", 4000, 0, 20000);
-  hEOccAfterInjLER  = new TH1F("ECLEOccInjLER", "ECLEOccInjLER/Time;;Count/Time", 4000, 0, 20000);
-  hEOccAfterInjHER  = new TH1F("ECLEOccInjHER", "ECLEOccInjHER/Time;;Count/Time", 4000, 0, 20000);
+  hOccAfterInjLER  = new TH1F("ECLOccInjLER", "ECLOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+  hOccAfterInjHER  = new TH1F("ECLOccInjHER", "ECLOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+  hEOccAfterInjLER  = new TH1F("ECLEOccInjLER", "ECLEOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+  hEOccAfterInjHER  = new TH1F("ECLEOccInjHER", "ECLEOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
 
   // cd back to root directory
   oldDir->cd();
@@ -81,7 +79,7 @@ void ECLDQMInjectionModule::event()
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
       unsigned int all = m_storeHits.getEntries();
-      float diff2 = difference / 127.; //  127MHz clock ticks to us
+      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
         hOccAfterInjHER->Fill(diff2, all);
         hEOccAfterInjHER->Fill(diff2);

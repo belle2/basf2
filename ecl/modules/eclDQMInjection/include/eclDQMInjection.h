@@ -13,9 +13,7 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <TH1.h>
 #include <string>

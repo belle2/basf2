@@ -15,13 +15,6 @@
 #include <rawdata/dataobjects/RawFTSWFormat_v1.h>
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//
-// The latest DAQformat version number ( please ask Nakao-san for detail )
-#define LATEST_FTSW_FORMAT_VER 2 // From phase II ? 
-//
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 namespace Belle2 {
 
   /**
@@ -40,7 +33,7 @@ namespace Belle2 {
     virtual ~RawFTSW();
 
     //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
-    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) override;
+    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) OVERRIDE_CPP17;
 
     //! read data, detect and set the version number of the data format
     void SetVersion();
@@ -208,11 +201,12 @@ namespace Belle2 {
       ///       : header size is 8 words
       ///       : Format is written by Nakao-san in ver.26(as of 2019.3.1 ) of https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=DAQ+TimingDistribution#DAQTimingDistribution-InformationsentfromTTDtodatastream
       POS_NODE_FORMAT_ID = 6, //! 0x545452?? up to ver.2 this number is more or less same. So, it cannot be used to distinguish different version numbers
+      FORMAT_ID_VER_0TO2 = 0x54544420,
       FTSW_FORMAT_MASK = 0x000000FF,
       POS_HEADER_SIZE = 1, //! The same number of this information must appear in RawFTSWFormat*.h. Information should be placed in one place but I need to put this number in RawFTSW.h because it is used to distinguish different version numbers.
       // header size is used to distinguish different version number for ver. 0, 1, and 2
       VER_0_HEADER_SIZE = 0, //! Unpacker for ver.0(early DESY version) is not available.
-      VER_1_HEADER_SIZE = 0,
+      VER_1_HEADER_SIZE = 0, // ! Unpacker for ver.1(late DESY version) is available but it is unlikely for a user to read this ver. Until there is a request to read ver.1, it is closed.
       VER_2_HEADER_SIZE = 8
     };
 
@@ -220,14 +214,16 @@ namespace Belle2 {
     RawFTSWFormat* m_access{}; //! do not record
 
     /// Version of the format
-    int m_version = 0; //! do not record
+    int m_version = -1; //! do not record
 
   protected :
     /// To derive from TObject
     /// ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
-    /// ver.3 Add m_access on Mar. 7 2016 but Classde stays 2 for some? reason
+    /// ver.3 Add m_access on Mar. 7 2016 but Classded stays 2 for some(?) reason
     /// ver.4 Add m_version on Feb. 18 2019 for the new format version defined by Nakao-san
-    ClassDef(RawFTSW, 4);
+    /// Reason to stay at *2* is that the persistent content did *not change*
+    /// If necessary: be aware that we have to change this in online and offline at the same time!
+    ClassDef(RawFTSW, 2);
   };
 
   inline void RawFTSW::CheckVersionSetBuffer()

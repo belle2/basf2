@@ -132,7 +132,6 @@ void IPDQMExpressRecoModule::beginRun()
   m_v_y.clear();
   m_err_y.clear();
   m_r = 0;
-  m_size_per_unit = m_size / m_no_units;
 }
 
 

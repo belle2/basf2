@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Giulia Casarosa, Gaetano De Marino                       *
@@ -73,7 +73,7 @@ void BeamSpotMonitorModule::event()
   StoreObjPtr<EventMetaData> meta;
   m_exp = meta->getExperiment();
   m_run = meta->getRun();
-  B2DEBUG(80, "monitoring beam spot for experiment = " << m_exp << ", run = " << m_run);
+  B2DEBUG(25, "monitoring beam spot for experiment = " << m_exp << ", run = " << m_run);
 
   if (! m_BeamSpotDB.isValid())
     return;
@@ -109,7 +109,6 @@ void BeamSpotMonitorModule::terminate()
     m_tree->Write();
 
     m_rootFilePtr->Close();
-    //    B2RESULT("The rootfile containing the informations on the BeamSpot has been filled and closed.");
 
   }
 }

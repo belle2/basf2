@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-##################################################################
-#
-# DB Importer for the BeamSpot (position, position error, size)
-# from the DQM plots of the IPDQMExpressReco module
-#
-# usage:
-# > basf2 beamSpotImporter.py -- --exp [exp number] --run [run number] --dqm [DQM root file] --verbose
-#
-# the DQM root file must contain the IPMonitoring folder
-#
-# contributors (2019): G. De Marino, G. Casarosa
-##################################################################
+"""
+DB Importer for the BeamSpot (position, position error, size)
+from the DQM plots of the IPDQMExpressReco module
+
+usage:
+> basf2 beamSpotImporter.py -- --exp [exp number] --run [run number] --dqm [DQM root file] --verbose
+
+the DQM root file must contain the IPMonitoring folder
+
+contributors (2019): G. De Marino, G. Casarosa
+"""
 
 import basf2
 import ROOT
@@ -24,10 +23,9 @@ import argparse
 from termcolor import colored
 import sys
 
-
 parser = argparse.ArgumentParser(description="BeamSpot Importer from DQM root file")
-parser.add_argument('--exp', metavar='experiment', dest='exp', type=int,  help='Experiment Number')
-parser.add_argument('--run', metavar='run', dest='run', type=int,  help='Run Number')
+parser.add_argument('--exp', metavar='experiment', dest='exp', type=int, help='Experiment Number')
+parser.add_argument('--run', metavar='run', dest='run', type=int, help='Run Number')
 parser.add_argument('--dqm', metavar='dqm', dest='dqm', type=str, help='DQM ROOT file')
 parser.add_argument('--verbose', dest='verbose', action='store_const', const=True,
                     default=False, help='print BeamSpot to screen.')
@@ -58,9 +56,16 @@ print('')
 
 
 class beamSpotImporter(basf2.Module):
+    """
+    Fill the BeamSpot payload and generate a local database with the beam spot parameters (position, position error, size)
+    retrieving the histograms of IPMonitoring folder from DQM plots produced by the IPDQMExpressRecoModule
+    """
 
     def beginRun(self):
-
+        """
+        For a given input histogram the payload is revised only if the histogram
+        has a number of entries (aka number of reconstructed vertices) at least equal to minVertices
+        """
         iov = Belle2.IntervalOfValidity(experiment, run, -1, -1)
 
         dqmFile = TFile(str(dqmRoot), "read")
@@ -119,28 +124,28 @@ class beamSpotImporter(basf2.Module):
         # Computed as the medians of the vertex position histograms
         vertexPos = ROOT.TVector3(medianX[0], medianY[0], medianZ[0])
 
-        # vertex position error
+        # vertex position covariance matrix
         # Computed as the squared RMS of the vertex position histograms, divided by the number of entries
-        # Off-diagonal terms are set to zero, for the moment
         vertexCov = ROOT.TMatrixDSym(3)
         xRMS = max(hVertexX.GetRMS(), hVertexX.GetBinWidth(1) / 2)
         yRMS = max(hVertexY.GetRMS(), hVertexY.GetBinWidth(1) / 2)
         zRMS = max(hVertexZ.GetRMS(), hVertexZ.GetBinWidth(1) / 2)
-        xyRMS = hVertexXY.GetRMS()
-        yzRMS = hVertexYZ.GetRMS()
-        xzRMS = hVertexXZ.GetRMS()
+        xyRMS = hVertexXY.GetMean() - hVertexX.GetMean() * hVertexY.GetMean()
+        yzRMS = hVertexYZ.GetMean() - hVertexY.GetMean() * hVertexZ.GetMean()
+        xzRMS = hVertexXZ.GetMean() - hVertexX.GetMean() * hVertexZ.GetMean()
 
         vertexCov[0][0] = xRMS * xRMS / entries
         vertexCov[1][1] = yRMS * yRMS / entries
         vertexCov[2][2] = zRMS * zRMS / entries
-        vertexCov[0][1] = 0
-        vertexCov[0][2] = 0
-        vertexCov[1][2] = 0
-        vertexCov[1][0] = 0
-        vertexCov[2][0] = 0
-        vertexCov[2][1] = 0
+        vertexCov[0][1] = vertexCov[1][0] = xyRMS * xyRMS / entries
+        vertexCov[0][2] = vertexCov[2][0] = xzRMS * xzRMS / entries
+        vertexCov[1][2] = vertexCov[2][1] = yzRMS * yzRMS / entries
 
-        # beam spot size
+        # Beam spot size matrix
+        # Computed from the histograms of the coordinates and their products,
+        # centered on their medians and ranging of +/- nSigmacut sigmas from the medians
+        # N.B. Resolution subtraction should be included
+
         vertexSize = ROOT.TMatrixDSym(3)
 
         hVertexX.SetAxisRange(medianX[0] - nSigmacut * xRMS, medianX[0] + nSigmacut * xRMS, "X")
@@ -150,22 +155,12 @@ class beamSpotImporter(basf2.Module):
         hVertexYZ.SetAxisRange(medianYZ[0] - nSigmacut * yzRMS, medianYZ[0] + nSigmacut * yzRMS, "X")
         hVertexXZ.SetAxisRange(medianXZ[0] - nSigmacut * xzRMS, medianYZ[0] + nSigmacut * xzRMS, "X")
 
-        xRMScut = hVertexX.GetRMS()
-        yRMScut = hVertexY.GetRMS()
-        zRMScut = hVertexZ.GetRMS()
-        xyRMScut = hVertexXY.GetRMS()
-        yzRMScut = hVertexYZ.GetRMS()
-        xzRMScut = hVertexXZ.GetRMS()
-
-        vertexSize[0][0] = xRMScut * xRMScut
-        vertexSize[1][1] = yRMScut * yRMScut
-        vertexSize[2][2] = zRMScut * zRMScut
-        vertexSize[0][1] = xyRMScut * xyRMScut
-        vertexSize[0][2] = xzRMScut * xzRMScut
-        vertexSize[1][2] = yzRMScut * yzRMScut
-        vertexSize[1][0] = xyRMScut * xyRMScut
-        vertexSize[2][0] = xzRMScut * xzRMScut
-        vertexSize[2][1] = yzRMScut * yzRMScut
+        vertexSize[0][1] = vertexSize[1][0] = hVertexXY.GetMean() - hVertexX.GetMean() * hVertexY.GetMean()
+        vertexSize[0][2] = vertexSize[2][0] = hVertexXZ.GetMean() - hVertexX.GetMean() * hVertexZ.GetMean()
+        vertexSize[1][2] = vertexSize[2][1] = hVertexYZ.GetMean() - hVertexY.GetMean() * hVertexZ.GetMean()
+        vertexSize[0][0] = hVertexXX.GetMean() - hVertexX.GetMean() * hVertexX.GetMean()
+        vertexSize[1][1] = hVertexYY.GetMean() - hVertexY.GetMean() * hVertexY.GetMean()
+        vertexSize[2][2] = hVertexZZ.GetMean() - hVertexZ.GetMean() * hVertexZ.GetMean()
 
         if args.verbose:
             bBLUE = "\033[1;34m"

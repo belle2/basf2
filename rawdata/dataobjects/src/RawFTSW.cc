@@ -25,8 +25,10 @@ RawFTSW::~RawFTSW()
 void RawFTSW::SetVersion()
 {
   if (m_buffer == NULL) {
-    perror("m_buffer is NULL. Exiting...");
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "m_buffer is NULL. Exiting...");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   if (m_access != NULL) {
@@ -47,7 +49,7 @@ void RawFTSW::SetVersion()
             "[FATAL] Ver.0 of RawFTSW( so-called early DESYtest format ) is detected but not supported. (header size = 0x%.8x ) Exiting...\n %s %s %d\n",
             m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
+    B2FATAL(err_buf);
   } else if (m_buffer[ POS_NODE_FORMAT_ID ] == FORMAT_ID_VER_0TO2) {
     if (m_buffer[ POS_HEADER_SIZE ] == VER_2_HEADER_SIZE) {
       m_access = new RawFTSWFormat_latest;
@@ -60,14 +62,14 @@ void RawFTSW::SetVersion()
       sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",
               m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf; throw (err_str);
+      B2FATAL(err_buf);
     }
   } else {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",
             m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
+    B2FATAL(err_buf);
   }
 
   if (temp_version >= 0 && temp_version != m_version) {
@@ -76,7 +78,7 @@ void RawFTSW::SetVersion()
             "[FATAL] Already assigned RawFTSW format version (= %.8x) is different from the one (= %.8x) from the current event. Exiting...\n %s %s %d\n",
             temp_version, m_version, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
+    B2FATAL(err_buf);
   }
 
   m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
@@ -88,8 +90,10 @@ void RawFTSW::SetBuffer(int* bufin, int nwords, int delete_flag, int num_events,
 {
 
   if (bufin == NULL) {
-    printf("[FATAL] bufin is NULL. Exting...\n");
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "[FATAL] bufin is NULL. Exting...\n");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
   if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
 

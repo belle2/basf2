@@ -426,7 +426,9 @@ void PrintDataTemplateModule::event()
     for (int j = 0; j < raw_ftswarray[ i ]->GetNumEntries(); j++) {
       printf("\n===== DataBlock(RawFTSW): Block # %d ", i);
       printFTSWEvent(raw_ftswarray[ i ], j);
-      //checkFTSWver2(raw_ftswarray[ i ], j);
+      if (raw_ftswarray[ i ]->m_version == 2) {
+        checkFTSWver2(raw_ftswarray[ i ], j);
+      }
     }
   }
 

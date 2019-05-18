@@ -16,6 +16,7 @@
 #include <framework/utilities/EnvironmentVariables.h>
 #include <TRandom.h>
 #include <iomanip>
+#include <memory>
 #include <set>
 #include <chrono>
 #include <thread>
@@ -183,7 +184,7 @@ namespace Belle2 {
     try {
       // and load it into a boost property_tree
       boost::property_tree::read_json(gtinfo, pt);
-      std::string status = pt.get<std::string>("globalTagStatus.name");
+      auto status = pt.get<std::string>("globalTagStatus.name");
       if (status == "INVALID") {
         B2FATAL("The global tag " << std::quoted(escapedGlobalTag)
                 << " you're trying to use is marked as invalid");
@@ -211,7 +212,7 @@ namespace Belle2 {
       s_globalInit = true;
     }
     // create the curl session
-    m_session.reset(new ConditionsCurlSession);
+    m_session = std::make_unique<ConditionsCurlSession>();
     m_session->curl = curl_easy_init();
     if (!m_session->curl) {
       B2FATAL("Cannot intialize libcurl");
@@ -348,15 +349,15 @@ namespace Belle2 {
         PayloadInfo payloadInfo;
         auto payload = iov.second.get_child("payload");
         auto payloadIov = iov.second.get_child("payloadIov");
-        std::string name = payload.get<std::string>("basf2Module.name");
+        auto name = payload.get<std::string>("basf2Module.name");
         payloadInfo.digest = payload.get<std::string>("checksum");
         payloadInfo.payloadUrl = payload.get<std::string>("payloadUrl");
         payloadInfo.revision = payload.get<int>("revision", 0);
         payloadInfo.baseUrl = payload.get<std::string>("baseUrl");
-        int firstExp = payloadIov.get<int>("expStart");
-        int firstRun = payloadIov.get<int>("runStart");
-        int finalExp = payloadIov.get<int>("expEnd");
-        int finalRun = payloadIov.get<int>("runEnd");
+        auto firstExp = payloadIov.get<int>("expStart");
+        auto firstRun = payloadIov.get<int>("runStart");
+        auto finalExp = payloadIov.get<int>("expEnd");
+        auto finalRun = payloadIov.get<int>("runEnd");
         payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
 
         // make sure we have all fields filled

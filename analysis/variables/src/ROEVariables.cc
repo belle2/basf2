@@ -57,6 +57,53 @@ namespace Belle2 {
       return isInThisRestOfEvent(particle, roe);
     }
 
+    double isCloneOfSignalSide(const Particle* particle)
+    {
+
+      StoreObjPtr<RestOfEvent> roe;
+      if (not roe.isValid()) {
+        B2WARNING("Please use isCloneOfSignalSide variable in for_each ROE loop!");
+        return -999.;
+      }
+      auto* particleMC = particle->getRelatedTo<MCParticle>();
+      if (!particleMC) {
+        return 0.0;
+      }
+      auto* signal = roe->getRelatedFrom<Particle>();
+      auto signalFSPs = signal->getFinalStateDaughters();
+      for (auto* daughter : signalFSPs) {
+        auto* daughterMC = daughter->getRelatedTo<MCParticle>();
+        if (daughterMC == particleMC) {
+          return 1.0;
+        }
+      }
+      return 0.0;
+    }
+    double hasAncestorFromSignalSide(const Particle* particle)
+    {
+      StoreObjPtr<RestOfEvent> roe;
+      if (!roe.isValid()) {
+        B2WARNING("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
+        return -999.;
+      }
+      auto* particleMC = particle->getRelatedTo<MCParticle>();
+      if (!particleMC) {
+        return 0.0;
+      }
+      auto* signalReco = roe->getRelatedFrom<Particle>();
+      auto* signalMC = signalReco->getRelatedTo<MCParticle>();
+      MCParticle* ancestorMC = particleMC->getMother();
+      while (ancestorMC) {
+        if (ancestorMC == signalMC) {
+          return 1.0;
+        }
+        ancestorMC = ancestorMC->getMother();
+      }
+      return 0.0;
+    }
+
+
+
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
     {
       std::string listName;
@@ -72,13 +119,12 @@ namespace Belle2 {
         if (not roe.isValid())
           return 0;
 
-        Particle* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedTo<Particle>();
         return particleList->contains(particle) ? 1 : 0;
 
       };
       return func;
     }
-
 
     Manager::FunctionPtr particleRelatedToCurrentROE(const std::vector<std::string>& arguments)
     {
@@ -95,16 +141,15 @@ namespace Belle2 {
         if (not roe.isValid())
           return -999;
 
-        Particle* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedTo<Particle>();
         return var->function(particle);
 
       };
       return func;
     }
 
-
     // only the helper function
-    double nRemainingTracksInROE(const Particle* particle, std::string maskName)
+    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
@@ -119,7 +164,6 @@ namespace Belle2 {
       }
       return n_roe_tracks - n_par_tracks;
     }
-
 
     Manager::FunctionPtr nROE_RemainingTracksWithMask(const std::vector<std::string>& arguments)
     {
@@ -233,6 +277,7 @@ namespace Belle2 {
 
       return frameMCRoe4Vector.Vect().Z();
     }
+
     double ROE_MC_Pt(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
@@ -248,6 +293,7 @@ namespace Belle2 {
 
       return frameMCRoe4Vector.Vect().Perp();
     }
+
     double ROE_MC_PTheta(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
@@ -263,8 +309,6 @@ namespace Belle2 {
 
       return frameMCRoe4Vector.Theta();
     }
-
-
 
     double ROE_MC_M(const Particle* particle)
     {
@@ -421,8 +465,8 @@ namespace Belle2 {
         int nNeutrals = 0;
 
         // Select ECLClusters with no associated tracks
-        for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          if (roeClusters[iEcl]->isNeutral())
+        for (auto& roeCluster : roeClusters)
+          if (roeCluster->isNeutral())
             nNeutrals++;
 
         return nNeutrals;
@@ -516,10 +560,6 @@ namespace Belle2 {
       };
       return func;
     }
-
-
-
-
 
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
@@ -626,8 +666,8 @@ namespace Belle2 {
         std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         double extraE = 0.0;
 
-        for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          extraE += roeClusters[iEcl]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        for (auto& roeCluster : roeClusters)
+          extraE += roeCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
         return extraE;
       };
@@ -804,7 +844,6 @@ namespace Belle2 {
       };
       return func;
     }
-
 
     Manager::FunctionPtr ROE_Pt(const std::vector<std::string>& arguments)
     {
@@ -1338,10 +1377,10 @@ namespace Belle2 {
         std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
 
         // Loop the reconstructed side
-        for (unsigned int i = 0; i < recTrackParticles.size(); i++)
+        for (auto& recTrackParticle : recTrackParticles)
         {
-          pz += recTrackParticles[i]->getPz();
-          energy += recTrackParticles[i]->getEnergy();
+          pz += recTrackParticle->getPz();
+          energy += recTrackParticle->getEnergy();
         }
 
         // "Loop" the ROE side
@@ -1481,7 +1520,6 @@ namespace Belle2 {
 
       return q2;
     }
-
 
     Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments)
     {
@@ -1689,11 +1727,21 @@ namespace Belle2 {
       return func;
     }
 
+    double printROE(const Particle* particle)
+    {
+      const RestOfEvent* roe = getRelatedROEObject(particle);
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+      } else roe->print();
+      return 0.0;
+    }
+
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
 
-    TLorentzVector missing4Vector(const Particle* particle, std::string maskName, const std::string& opt)
+    TLorentzVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt)
     {
       // Get related ROE object
       const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -1775,14 +1823,14 @@ namespace Belle2 {
     void checkMCParticleMissingFlags(const MCParticle* mcp, std::set<const MCParticle*> mcROEObjects, int& missingFlags)
     {
       std::vector<MCParticle*> daughters = mcp->getDaughters();
-      for (unsigned i = 0; i < daughters.size(); i++) {
+      for (auto& daughter : daughters) {
 
-        if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+        if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
           continue;
 
-        if (mcROEObjects.find(daughters[i]) == mcROEObjects.end()) {
+        if (mcROEObjects.find(daughter) == mcROEObjects.end()) {
 
-          int pdg = abs(daughters[i]->getPDG());
+          int pdg = abs(daughter->getPDG());
 
           // photon
           if (pdg == Const::photon.getPDGCode() and (missingFlags & 1) == 0)
@@ -1814,7 +1862,7 @@ namespace Belle2 {
 
           // kshort
           else if (pdg == Const::Kshort.getPDGCode() and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
-            std::vector<MCParticle*> ksDaug = daughters[i]->getDaughters();
+            std::vector<MCParticle*> ksDaug = daughter->getDaughters();
             if (ksDaug.size() == 2) {
               // K_S0 -> pi+ pi-
               if (abs(ksDaug[0]->getPDG()) == Const::pion.getPDGCode() and abs(ksDaug[1]->getPDG()) == Const::pion.getPDGCode()
@@ -1844,22 +1892,23 @@ namespace Belle2 {
           else if ((pdg == 12 or pdg == 14 or pdg == 16) and (missingFlags & 1024) == 0)
             missingFlags += 1024;
         }
-        checkMCParticleMissingFlags(daughters[i], mcROEObjects, missingFlags);
+        checkMCParticleMissingFlags(daughter, mcROEObjects, missingFlags);
       }
     }
 
-    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, std::string maskName)
+    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
     {
       if (particle->getParticleType() == Particle::c_Composite) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
-        for (unsigned int i = 0; i < fspDaug.size(); i++) {
-          if (isInThisRestOfEvent(fspDaug[i], roe, maskName) == 0)
+        for (auto& i : fspDaug) {
+          if (isInThisRestOfEvent(i, roe, maskName) == 0)
             return 0;
         }
         return 1.0;
       }
       return roe->hasParticle(particle, maskName);
     }
+
     const RestOfEvent* getRelatedROEObject(const Particle* particle, bool returnHostOnly)
     {
       // Get related ROE object
@@ -1875,6 +1924,16 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+
+    REGISTER_VARIABLE("isCloneOfSignalSide", isCloneOfSignalSide,
+                      "Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise. "
+                      "Requires generator information and truth-matching. "
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+
+    REGISTER_VARIABLE("hasAncestorFromSignalSide", hasAncestorFromSignalSide,
+                      "Returns 1 if a particle has ancestor from signal side, 0 otherwise. "
+                      "Requires generator information and truth-matching. "
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
@@ -2055,5 +2114,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
                       "Returns boolean value if track or eclCluster type particle passes a certain mask or not. Only to be used in for_each path");
+
+    REGISTER_VARIABLE("printROE", printROE,
+                      "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
   }
 }

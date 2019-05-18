@@ -42,16 +42,16 @@ namespace Belle2 {
      */
     SVDLatencyCalibrationModule();
 
-    /**  */
+    /**  initialize */
     virtual void initialize() override;
 
-    /**  */
+    /**  begin run*/
     virtual void beginRun() override;
 
-    /**  */
+    /**  event*/
     virtual void event() override;
 
-    /**  */
+    /**  end run */
     virtual void endRun() override;
 
     /* user-defined parameters */
@@ -62,7 +62,7 @@ namespace Belle2 {
 
   private:
 
-    SVDHistograms<TH1F>* m_histo_maxAmplitude;
+    SVDHistograms<TH1F>* m_histo_maxAmplitude; /**vector of histograms containing the max bin distribution*/
 
     std::string m_shapersListName; /**< shapers list name */
     StoreArray<SVDShaperDigit> m_digits; /**< SVD digits*/

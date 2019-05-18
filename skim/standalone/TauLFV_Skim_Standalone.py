@@ -21,29 +21,31 @@ gb2_setuprel = 'release-03-00-03'
 
 skimCode = encodeSkimName('TauLFV')
 
-fileList = get_test_file("mixedBGx1", "MC11")
-inputMdstList('default', fileList)
+taulfvskim = Path()
 
-stdPi('loose')
-stdK('loose')
-stdPr('loose')
-stdE('loose')
-stdMu('loose')
-stdPhotons('loose')
-stdPi0s('loose')
-loadStdSkimPi0()
-stdKshorts()
-loadStdLightMesons()
+fileList = get_test_file("mixedBGx1", "MC11")
+inputMdstList('default', fileList, path=taulfvskim)
+
+stdPi('loose', path=taulfvskim)
+stdK('loose', path=taulfvskim)
+stdPr('loose', path=taulfvskim)
+stdE('loose', path=taulfvskim)
+stdMu('loose', path=taulfvskim)
+stdPhotons('loose', path=taulfvskim)
+stdPi0s('loose', path=taulfvskim)
+loadStdSkimPi0(path=taulfvskim)
+stdKshorts(path=taulfvskim)
+loadStdLightMesons(path=taulfvskim)
 
 # Tau Skim
 from skim.taupair import *
-tauList = TauLFVList(1)
+tauList = TauLFVList(1, path=taulfvskim)
 
-skimOutputUdst(skimCode, tauList)
-summaryOfLists(tauList)
+skimOutputUdst(skimCode, tauList, path=taulfvskim)
+summaryOfLists(tauList, path=taulfvskim)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=taulfvskim)
+process(taulfvskim)
 
 # print out the summary
 print(statistics)

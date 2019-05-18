@@ -12,6 +12,7 @@
 #include <boost/python/class.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <utility>
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
@@ -23,25 +24,16 @@
 using namespace Belle2;
 using namespace boost::python;
 
+Path::Path() = default;
 
-Path::Path()
-{
+Path::~Path() = default;
 
-}
-
-
-Path::~Path()
-{
-
-}
-
-
-void Path::addModule(ModulePtr module)
+void Path::addModule(const ModulePtr& module)
 {
   m_elements.push_back(module);
 }
 
-void Path::addPath(PathPtr path)
+void Path::addPath(const PathPtr& path)
 {
   if (path.get() == this) {
     B2FATAL("Attempting to add a path to itself!");
@@ -58,7 +50,7 @@ std::list<ModulePtr> Path::getModules() const
 {
   std::list<ModulePtr> modules;
   for (const std::shared_ptr<PathElement>& elem : m_elements) {
-    if (dynamic_cast<Module*>(elem.get()) != 0) {
+    if (dynamic_cast<Module*>(elem.get()) != nullptr) {
       //this path element is a Module, create a ModulePtr that shares ownership with 'elem'
       modules.push_back(std::static_pointer_cast<Module>(elem));
     } else {
@@ -99,21 +91,21 @@ void Path::putModules(const std::list<std::shared_ptr<Module> >& mlist)
 }
 
 
-void Path::forEach(std::string loopObjectName, std::string arrayName, PathPtr path)
+void Path::forEach(const std::string& loopObjectName, const std::string& arrayName, PathPtr path)
 {
   ModulePtr module = ModuleManager::Instance().registerModule("SubEvent");
-  static_cast<SubEventModule&>(*module).initSubEvent(loopObjectName, arrayName, path);
+  static_cast<SubEventModule&>(*module).initSubEvent(loopObjectName, arrayName, std::move(path));
   addModule(module);
 }
 
 void Path::doWhile(PathPtr path, const std::string& condition, unsigned int maxIterations)
 {
   ModulePtr module = ModuleManager::Instance().registerModule("SubEvent");
-  static_cast<SubEventModule&>(*module).initSubLoop(path, condition, maxIterations);
+  static_cast<SubEventModule&>(*module).initSubLoop(std::move(path), condition, maxIterations);
   addModule(module);
 }
 
-void Path::addIndependentPath(PathPtr independent_path, std::string ds_ID, boost::python::list merge_back)
+void Path::addIndependentPath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back)
 {
   if (ds_ID.empty()) {
     static int dscount = 1;
@@ -143,7 +135,7 @@ bool Path::contains(const std::string& moduleType) const
 {
   const std::list<ModulePtr>& modules = getModules();
 
-  auto sameTypeFunc = [moduleType](ModulePtr m) -> bool { return m->getType() == moduleType; };
+  auto sameTypeFunc = [moduleType](const ModulePtr & m) -> bool { return m->getType() == moduleType; };
   return std::find_if(modules.begin(), modules.end(), sameTypeFunc) != modules.end();
 }
 
@@ -151,7 +143,7 @@ std::shared_ptr<PathElement> Path::clone() const
 {
   PathPtr path(new Path);
   for (const auto& elem : m_elements) {
-    const Module* m = dynamic_cast<const Module*>(elem.get());
+    const auto* m = dynamic_cast<const Module*>(elem.get());
     if (m and m->getType() == "PyModule") {
       //B2WARNING("Python module " << m->getName() << " encountered, please make sure it correctly reinitialises itself to ensure multiple process() calls work.");
       path->addModule(std::static_pointer_cast<Module>(elem));
@@ -225,7 +217,7 @@ execute it once for each object in the given StoreArray ``arrayName``. It will
 create a StoreObject named ``loopObjectName``  of same type as array which will
 point to each element in turn for each execution.
 
-This has the effect of calling the ``event()`` methods of modules in ``path`` 
+This has the effect of calling the ``event()`` methods of modules in ``path``
 for each entry in ``arrayName``.
 
 The main use case is to use it after using the `RestOfEventBuilder` on a
@@ -243,8 +235,8 @@ executed twice and during the execution a StoreObjectPtr 'RestOfEvent' will be
 available, which will point to the first element in the first execution, and
 the second element in the second execution.
 
-.. seealso:: 
-    A worked example of this `for_each` RestOfEvent is to build a veto against 
+.. seealso::
+    A worked example of this `for_each` RestOfEvent is to build a veto against
     photons from :math:`\pi^0\to\gamma\gamma`. It is described in `HowToVeto`.
 
 .. note:: This feature is used by both the `FlavorTagger` and `FullEventInterpretation` algorithms.

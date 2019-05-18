@@ -44,7 +44,7 @@ namespace Belle2 {
 
     double R2EventLevel(const Particle*)
     {
-      B2WARNING("Since the introduction of the EventShape framework along with the ContinuumSuppression one, this variable is deprecated. Please call the buildEventshape() function and use the foxWolframR2 variable instead.");
+      B2WARNING("The variable R2EventLevel is deprecated. Use `foxWolframR2` and ma.buildEventShape(inputListNames=[], default_cleanup=True, allMoments=False, cleoCones=True, collisionAxis=True, foxWolfram=True, harmonicMoments=True, jets=True, sphericity=True, thrust=True, checkForDuplicates=False, path=analysis_main)");
 
       std::vector<TVector3> p3_all;
 

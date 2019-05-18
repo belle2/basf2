@@ -17,6 +17,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <vector>
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -32,6 +33,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDCMModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDCMModule();
   private:
 
     //! Module functions to be called from main process
@@ -63,8 +66,8 @@ namespace Belle2 {
     TLine* m_line3 = nullptr;
 
 #ifdef _BELLE2_EPICS
-    //! one epics PV
-    chid  mychid;
+    //! epics PVs
+    std::vector <chid> mychid;
 #endif
   };
 } // end namespace Belle2

@@ -20,6 +20,9 @@ namespace Belle2 {
     /// Set the cached B field
     void beginRun() final;
 
+    /// default constructor to silence the cppcheck warnings
+    SimplePXDStateFilter() = default;
+
     TrackFindingCDC::Weight operator()(const BasePXDStateFilter::Object& pair) final;
 
   private:

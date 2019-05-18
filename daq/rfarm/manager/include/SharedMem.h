@@ -22,9 +22,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #include <sys/wait.h>
-#include <stdlib.h>
 
 namespace Belle2 {
   class SharedMem {

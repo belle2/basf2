@@ -61,7 +61,7 @@ namespace Belle2 {
 
     // initializing the rest of private memebers
     m_pdgCode   = 0;
-    m_isSelfConjugatedParticle = 0;
+    m_isSelfConjugatedParticle = false;
   }
 
   void ParticleListManipulatorModule::initialize()
@@ -139,8 +139,8 @@ namespace Belle2 {
     }
 
     // copy all particles from input lists that pass selection criteria into plist
-    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      const StoreObjPtr<ParticleList> inPList(m_inputListNames[i]);
+    for (const auto& inputListName : m_inputListNames) {
+      const StoreObjPtr<ParticleList> inPList(inputListName);
 
       std::vector<int> fsParticles     = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,               false);
       const std::vector<int>& scParticles     = inPList->getList(ParticleList::EParticleType::c_SelfConjugatedParticle, false);
@@ -150,8 +150,8 @@ namespace Belle2 {
       fsParticles.insert(fsParticles.end(), scParticles.begin(), scParticles.end());
       fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());
 
-      for (unsigned j = 0; j < fsParticles.size(); j++) {
-        const Particle* part = particles[fsParticles[j]];
+      for (int fsParticle : fsParticles) {
+        const Particle* part = particles[fsParticle];
 
         std::vector<int> idSeq;
         fillUniqueIdentifier(part, idSeq);
@@ -181,9 +181,7 @@ namespace Belle2 {
 
   bool ParticleListManipulatorModule::isUnique(const std::vector<int>& idSeqOUT)
   {
-    for (unsigned i = 0; i < m_particlesInTheList.size(); i++) {
-      std::vector<int> idSeqIN = m_particlesInTheList[i];
-
+    for (const auto& idSeqIN : m_particlesInTheList) {
       bool sameSeq = (idSeqIN == idSeqOUT);
       if (sameSeq)
         return false;
@@ -192,4 +190,3 @@ namespace Belle2 {
     return true;
   }
 } // end Belle2 namespace
-

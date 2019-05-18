@@ -1,21 +1,22 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Yinghui GUAN, VIPIN GAUR, Z. S. Stottler                 *
+ * Contributors: Yinghui Guan, Vipin Gaur,                                *
+ *               Zachary S. Stottler, Giacomo De Pietro                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <bklm/calibration/BKLMDatabaseImporter.h>
-#include <bklm/dbobjects/BKLMElectronicMapping.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <bklm/dbobjects/BKLMSimulationPar.h>
 #include <bklm/dbobjects/BKLMBadChannels.h>
 #include <bklm/dbobjects/BKLMMisAlignment.h>
 #include <bklm/dbobjects/BKLMDisplacement.h>
 #include <bklm/dbobjects/BKLMTimeWindow.h>
+#include <bklm/dbobjects/BKLMStripEfficiency.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dataobjects/BKLMElementID.h>
 
@@ -27,7 +28,6 @@
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBImportArray.h>
 
 #include <string>
 #include <vector>
@@ -42,9 +42,8 @@ using namespace Belle2;
 BKLMDatabaseImporter::BKLMDatabaseImporter()
 {}
 
-void BKLMDatabaseImporter::importBklmElectronicMapping()
+void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
 {
-  DBImportArray<BKLMElectronicMapping> m_bklmMapping;
   int copperId = 0;
   int slotId = 0;
   int laneId = 0;
@@ -108,9 +107,25 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
       }//end of loop layers
     }//end of loop sectors
   }//end fb
+}
+
+void BKLMDatabaseImporter::setElectronicMappingLane(
+  int forward, int sector, int layer, int lane)
+{
+  int n = m_bklmMapping.getEntries();
+  for (int i = 0; i < n; i++) {
+    BKLMElectronicMapping* mapping = m_bklmMapping[i];
+    if ((mapping->getIsForward() == forward) &&
+        (mapping->getSector() == sector) &&
+        (mapping->getLayer() == layer))
+      mapping->setLane(lane);
+  }
+}
+
+void BKLMDatabaseImporter::importBklmElectronicMapping()
+{
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   m_bklmMapping.import(iov);
-
   return;
 }
 
@@ -390,6 +405,53 @@ void BKLMDatabaseImporter::exportBklmTimeWindow()
   B2INFO("z/phi coincidence window " << m_timing->getCoincidenceWindow());
   B2INFO(" timing cut reference " << m_timing->getPromptTime());
   B2INFO(" timing window " << m_timing->getPromptWindow());
+}
 
+void BKLMDatabaseImporter::importBklmStripEfficiency(int expStart, int runStart, int expStop, int runStop, std::string fileName)
+{
+  DBImportObjPtr<BKLMStripEfficiency> stripEfficiency;
+  stripEfficiency.construct();
 
+  TFile* file = TFile::Open(fileName.c_str(), "r");
+  if (!file) {
+    B2ERROR("Calibration file: " << fileName << " *** failed to open");
+  } else {
+    TTree* tree = (TTree*)file->Get("tree");
+    if (!tree) {
+      B2ERROR("Calibration file: " << fileName << " *** no tree named 'tree' found");
+      file->Close();
+    } else {
+      B2INFO("BKLMDatabaseImporter: file " << fileName << " opened for calibration");
+
+      int isForward = 0;
+      tree->SetBranchAddress("isForward", &isForward);
+      int sector = 0;
+      tree->SetBranchAddress("sector", &sector);
+      int layer = 0;
+      tree->SetBranchAddress("layer", &layer);
+      int plane = 0;
+      tree->SetBranchAddress("plane", &plane);
+      int strip = 0;
+      tree->SetBranchAddress("strip", &strip);
+      float efficiency = 1.;
+      tree->SetBranchAddress("efficiency", &efficiency);
+      float efficiencyError = 0.;
+      tree->SetBranchAddress("efficiencyError", &efficiencyError);
+
+      for (int iStrip = 0; iStrip < tree->GetEntries(); iStrip++) {
+        tree->GetEntry(iStrip);
+        stripEfficiency->setEfficiency(isForward, sector, layer, plane, strip, efficiency, efficiencyError);
+      }
+    }
+    file->Close();
+  }
+
+  IntervalOfValidity iov(expStart, runStart, expStop, runStop);
+  stripEfficiency.import(iov);
+
+  B2INFO("BKLMDatabaseImporter: strip efficiencies imported and file " << fileName << " closed");
+}
+
+void BKLMDatabaseImporter::exportBklmStripEfficiency()
+{
 }

@@ -6,7 +6,7 @@ current HLT trigger menu.
 from softwaretrigger.db_access import upload_cut_to_db, upload_trigger_menu_to_db
 
 # Definition of all filter cuts (by Chris Hearty)
-filter_cuts = [
+FILTER_CUTS = [
     dict(cut_string="nTrkLoose >= 3 and nTrkTight >= 1 and ee2leg == 0",
          base_identifier="filter",
          cut_identifier="ge3_loose_tracks_inc_1_tight_not_ee2leg",
@@ -263,10 +263,20 @@ filter_cuts = [
          cut_identifier="ECLMuonPair",
          prescale_factor=10,
          reject_cut=False),
+    dict(cut_string="l1_trigger_random",
+         base_identifier="filter",
+         cut_identifier="passthrough_l1_trigger_random",
+         prescale_factor=1,
+         reject_cut=False),
+    dict(cut_string="l1_trigger_delayed_bhabha",
+         base_identifier="filter",
+         cut_identifier="passthrough_l1_trigger_delayed_bhabha",
+         prescale_factor=1,
+         reject_cut=False),
 ]
 
 # Definition of all skim cuts (copy from HLT before)
-skim_cuts = [
+SKIM_CUTS = [
     dict(cut_string="[[nTracksLE >= 3] and [Bhabha2Trk == 0]]",
          base_identifier="skim",
          cut_identifier="accept_hadron",
@@ -339,7 +349,7 @@ skim_cuts = [
     dict(cut_string="[Bhabha2Trk == 1]",
          base_identifier="skim",
          cut_identifier="accept_bhabha",
-         prescale_factor=10,
+         prescale_factor=1,
          reject_cut=False),
 ]
 
@@ -359,6 +369,6 @@ def upload_cuts(cuts, accept_mode=True):
 
 if __name__ == '__main__':
     # Accept Mode = False means, the default is to reject the event (not to accept it)
-    upload_cuts(filter_cuts, accept_mode=False)
+    upload_cuts(FILTER_CUTS, accept_mode=False)
     # For skim cuts we do not care what the default is (there will be no selection anyways)
-    upload_cuts(skim_cuts)
+    upload_cuts(SKIM_CUTS)

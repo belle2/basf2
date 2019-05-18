@@ -94,7 +94,6 @@ void Raw2DsModule::initialize()
 
 void Raw2DsModule::beginRun()
 {
-  /*
   if (Environment::Instance().getNumberProcesses() != 0) {
     struct sigaction s;
     memset(&s, '\0', sizeof(s));
@@ -105,7 +104,6 @@ void Raw2DsModule::beginRun()
     }
     printf("Raw2Ds : Signal Handler installed.\n");
   }
-  */
   B2INFO("beginRun called.");
 }
 

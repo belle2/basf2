@@ -18,7 +18,7 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
 
-KFitBase::KFitBase(void)
+KFitBase::KFitBase()
 {
   m_ErrorCode = KFitError::kNoError;
   m_FlagFitted = false;
@@ -32,9 +32,7 @@ KFitBase::KFitBase(void)
 }
 
 
-KFitBase::~KFitBase(void)
-{
-}
+KFitBase::~KFitBase() = default;
 
 
 enum KFitError::ECode
@@ -85,7 +83,7 @@ KFitBase::setCorrelation(const HepMatrix& e) {
 
 
 enum KFitError::ECode
-KFitBase::setZeroCorrelation(void) {
+KFitBase::setZeroCorrelation() {
   HepMatrix zero(KFitConst::kNumber7, KFitConst::kNumber7, 0);
 
   return this->setCorrelation(zero);
@@ -101,34 +99,34 @@ KFitBase::setMagneticField(const double mf) {
 
 
 enum KFitError::ECode
-KFitBase::getErrorCode(void) const {
+KFitBase::getErrorCode() const {
   return m_ErrorCode;
 }
 
 
 int
-KFitBase::getTrackCount(void) const
+KFitBase::getTrackCount() const
 {
   return m_TrackCount;
 }
 
 
 int
-KFitBase::getNDF(void) const
+KFitBase::getNDF() const
 {
   return m_NDF;
 }
 
 
 double
-KFitBase::getCHIsq(void) const
+KFitBase::getCHIsq() const
 {
   return m_CHIsq;
 }
 
 
 double
-KFitBase::getMagneticField(void) const
+KFitBase::getMagneticField() const
 {
   return m_MagneticField;
 }
@@ -458,7 +456,7 @@ KFitBase::makeError4(const HepLorentzVector& p, const HepMatrix& e) const
 
 
 enum KFitError::ECode
-KFitBase::prepareCorrelation(void) {
+KFitBase::prepareCorrelation() {
   if (m_BeforeCorrelation.size() != (double)m_TrackCount * ((double)m_TrackCount - 1)*.5)
   {
     m_ErrorCode = KFitError::kBadCorrelationSize;
@@ -469,10 +467,8 @@ KFitBase::prepareCorrelation(void) {
   HepMatrix tmp_hm(KFitConst::kNumber6, KFitConst::kNumber6, 0);
   int row = 0, col = 0;
 
-  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; ++it)
+  for (auto& hm : m_BeforeCorrelation)
   {
-    const HepMatrix& hm = *it;
-
     row++;
     if (row == m_TrackCount) {
       col++;
@@ -503,7 +499,7 @@ KFitBase::prepareCorrelation(void) {
 
 
 enum KFitError::ECode
-KFitBase::doFit1(void) {
+KFitBase::doFit1() {
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
   if (m_TrackCount < m_NecessaryTrackCount)
@@ -579,7 +575,7 @@ KFitBase::doFit1(void) {
 
 
 enum KFitError::ECode
-KFitBase::doFit2(void) {
+KFitBase::doFit2() {
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
   if (m_TrackCount < m_NecessaryTrackCount)
@@ -730,7 +726,7 @@ KFitBase::doFit2(void) {
 
 
 bool
-KFitBase::isFitted(void) const
+KFitBase::isFitted() const
 {
   if (m_FlagFitted) return true;
 
@@ -760,4 +756,3 @@ KFitBase::isNonZeroEnergy(const HepLorentzVector& p) const
 
   return false;
 }
-

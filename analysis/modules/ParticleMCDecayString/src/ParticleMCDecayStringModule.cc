@@ -201,9 +201,9 @@ namespace Belle2 {
       case 130:   //K_L
       case 2112:  //n
       case 2212:  //p
-        return 1;
+        return true;
       default:
-        return 0;
+        return false;
     }
   }
 
@@ -315,24 +315,23 @@ namespace Belle2 {
     //Find positions of carets in original strings, store them, and then erase them.
     std::string mode("");
     std::vector<int> caretPositions;
-    for (std::vector<std::string>::iterator iter(decayStrings.begin()); iter != decayStrings.end(); ++iter) {
-      std::string thisString(*iter);
+    for (auto& decayString : decayStrings) {
+      std::string thisString(decayString);
       if ("" == mode) {
         mode = thisString;
         continue;
       }
 
-      int caretPosition(thisString.find("^")); // -1 if no match.
+      int caretPosition(thisString.find('^')); // -1 if no match.
       caretPositions.push_back(caretPosition);
       if (caretPosition > -1) {
-        iter->erase(caretPosition, 1);
+        decayString.erase(caretPosition, 1);
       }
     }
 
     //Check if all of the decay strings are the same (except for No matches):
     std::string theDecayString("");
-    for (std::vector<std::string>::iterator iter(decayStrings.begin()); iter != decayStrings.end(); ++iter) {
-      std::string thisString(*iter);
+    for (auto thisString : decayStrings) {
       if (thisString == mode) {continue;}
 
       //last decay string does not have a space at the end, don't want this to stop a match.

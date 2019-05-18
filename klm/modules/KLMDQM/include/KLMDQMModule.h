@@ -3,7 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Vipin Gaur                              *
+ * Contributors: Kirill Chilikin, Vipin Gaur, Leo Piilonen                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,6 +17,7 @@
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/dataobjects/BKLMHit1d.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/core/HistoModule.h>
@@ -93,10 +94,13 @@ namespace Belle2 {
     std::string m_HistogramDirectoryNameBKLM;
 
     /** name of BKLMDigit store array. */
-    std::string m_outputDigitsName;
+    std::string m_inputDigitsName;
 
-    /** Name of BKLMHit store array. */
-    std::string m_outputHitsName;
+    /** Name of BKLMHit2d store array. */
+    std::string m_inputHitsName2d;
+
+    /** Name of BKLMHit1d store array. */
+    std::string m_inputHitsName1d;
 
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
@@ -114,52 +118,22 @@ namespace Belle2 {
     TH1F* m_TimeScintillatorEKLM;
 
     /** Sector number. */
-    TH1F* m_Sector;
+    TH1F* m_eklmSector;
 
     /** Strip number within a layer. */
-    TH1F** m_StripLayer;
+    TH1F** m_eklmStripLayer;
 
-    /** Histogram: number of hits per layer. */
-    TH1F* h_layerHits;
+    /** Axial position of muon hit. */
+    TH1F* m_bklmHit2dsZ;
 
-    /** Histogram: Lowest 16 bits of the B2TT CTIME signal. */
-    TH1F* h_ctime;
+    /** Sector and layer number occupancy for phi-readout hits */
+    TH1F* m_bklmSectorLayerPhi;
 
-    /** Histogram: Reconstructed pulse height. */
-    TH1F* h_eDep;
+    /** Sector and layer number occupancy for Z-readout hits */
+    TH1F* m_bklmSectorLayerZ;
 
-    /** Histogram: Reconstructed number MPPC pixels. */
-    TH1F* h_nPixel;
-
-    /** Histogram: Detector-module identifier. */
-    TH1F* h_moduleID;
-
-    /** Histogram: z-measuring strip numbers of the 2D hit. */
-    TH1F* h_zStrips;
-
-    /** Histogram: Phi strip number of muon hit. */
-    TH1F* h_phiStrip;
-
-    /** Histogram: Sector number of muon hit. */
-    TH1F* h_sector;
-
-    /** Histogram: Layer number of muon hit. */
-    TH1F* h_layer;
-
-    /** Histogram: Distance from z axis in transverse plane of muon hit. */
-    TH1F* h_rBKLMHit2ds;
-
-    /** Histogram: Axial position of muon hit. */
-    TH1F* h_zBKLMHit2ds;
-
-    /** Histogram: Position projected into transverse plane of muon hit. */
-    TH2F* h_yvsxBKLMHit2ds;
-
-    /** Histogram: Position projected into x-z plane of muon hit. */
-    TH2F* h_xvszBKLMHit2ds;
-
-    /** Histogram: Position projected into y-z plane of muon hit. */
-    TH2F* h_yvszBKLMHit2ds;
+    /** Number of BKLM Digits. */
+    TH1F* m_bklmDigitsN;
 
   };
 

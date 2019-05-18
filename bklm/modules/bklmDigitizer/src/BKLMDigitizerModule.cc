@@ -33,6 +33,7 @@ BKLMDigitizerModule::BKLMDigitizerModule() : Module()
 {
   setDescription("Creates BKLMDigits from BKLMSimHits");
   setPropertyFlags(c_ParallelProcessingCertified);
+  m_Fitter = nullptr;
 }
 
 BKLMDigitizerModule::~BKLMDigitizerModule()

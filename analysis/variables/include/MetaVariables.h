@@ -87,10 +87,23 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the difference of the given variable between the first daughters of the two given daughters
+     * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     * Third argument the name of the variable.
+     */
+    Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the difference of the angular variable phi between the two given daughters
      * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      */
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable phi between the first daughters of the two given daughters
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters
@@ -98,6 +111,13 @@ namespace Belle2 {
      * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      */
     Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable clusterPhi between the first daughters of the two given daughters
+     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the difference of the angular variable phi between the two given daughters in the CMS frame
@@ -309,5 +329,10 @@ namespace Belle2 {
     * Returns function which returns maximum transverse momentum Pt in the given particle Lists.
     */
     Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns if at least one track is related to the cluster of the particle and this track satisfies the given condition.
+    */
+    Manager::FunctionPtr eclClusterTrackMatchedWithCondition(const std::vector<std::string>& arguments);
   }
 }

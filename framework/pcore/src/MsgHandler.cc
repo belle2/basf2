@@ -14,7 +14,7 @@
 #include <TMessage.h>
 #include <RZip.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace std;
 using namespace Belle2;
@@ -38,9 +38,7 @@ MsgHandler::MsgHandler(int complevel):
   m_msg->SetWriteMode();
 }
 
-MsgHandler::~MsgHandler()
-{
-}
+MsgHandler::~MsgHandler()  = default;
 
 void MsgHandler::clear()
 {
@@ -72,7 +70,7 @@ void MsgHandler::add(const TObject* obj, const string& name)
 EvtMessage* MsgHandler::encode_msg(ERecordType rectype)
 {
   if (rectype == MSG_TERMINATE) {
-    EvtMessage* eod = new EvtMessage(NULL, 0, rectype);
+    auto* eod = new EvtMessage(nullptr, 0, rectype);
     return eod;
   }
 
@@ -100,7 +98,7 @@ EvtMessage* MsgHandler::encode_msg(ERecordType rectype)
     }
   }
 
-  EvtMessage* evtmsg = new EvtMessage(buf->data(), buf->size(), rectype);
+  auto* evtmsg = new EvtMessage(buf->data(), buf->size(), rectype);
   evtmsg->setMsgFlags(flags);
   clear();
 
@@ -118,7 +116,7 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     m_compBuf.clear();
     int nzip{0}, nout{0};
     // ROOT wants unsigned char so make a new pointer to the data
-    unsigned char* zipptr = (unsigned char*) msgptr;
+    auto* zipptr = (unsigned char*) msgptr;
     // and uncompress everything
     while (zipptr < (unsigned char*)end) {
       // first get a header of the next block so we know how big the output will be

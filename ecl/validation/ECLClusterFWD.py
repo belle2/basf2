@@ -4,7 +4,7 @@
 """
 <header>
 <output>ECLClusterOutputFWD.root</output>
-<contact>Elisa Manoni, elisa.manoni@pg.infn.it<\contact>
+<contact>Elisa Manoni, elisa.manoni@pg.infn.it</contact>
 </header>
 """
 

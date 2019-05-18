@@ -25,8 +25,10 @@ RawFTSW::~RawFTSW()
 void RawFTSW::SetVersion()
 {
   if (m_buffer == NULL) {
-    perror("m_buffer is NULL. Exiting...");
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "m_buffer is NULL. Exiting...");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   if (m_access != NULL) {
@@ -34,29 +36,40 @@ void RawFTSW::SetVersion()
     m_access = nullptr;
   }
 
-
+  //
+  // Assign unpacker
   //
   // Special treatment is required because Nakao-san did not set verision number in ver.0,1, and 2 header.
   // I'm using the size of header which is stored the 1st word (0,1,..)
   //
   int temp_version = m_version;
-  if (m_buffer[ POS_HEADER_SIZE ] == VER_2_HEADER_SIZE) {
-    m_version = 2; // as of 2019.3.2, the latest version is 2.
-  } else if (m_buffer[ POS_HEADER_SIZE ] == VER_1_HEADER_SIZE) {
-    m_version = 1;
-  } else if (m_buffer[ POS_HEADER_SIZE ] == VER_0_HEADER_SIZE) {
+  if (m_buffer[ POS_HEADER_SIZE ] == VER_0_HEADER_SIZE) {
     char err_buf[500];
     sprintf(err_buf,
-            "[FATAL] Ver.0 of RawFTSW( so-called early DESYtest format is detected but not supported. (header size = 0x%.8x ) Exiting...\n %s %s %d\n",
+            "[FATAL] Ver.0 of RawFTSW( so-called early DESYtest format ) is detected but not supported. (header size = 0x%.8x ) Exiting...\n %s %s %d\n",
             m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
+    B2FATAL(err_buf);
+  } else if (m_buffer[ POS_NODE_FORMAT_ID ] == FORMAT_ID_VER_0TO2) {
+    if (m_buffer[ POS_HEADER_SIZE ] == VER_2_HEADER_SIZE) {
+      m_access = new RawFTSWFormat_latest;
+      m_version = 2; // as of 2019.3.2, the latest version is 2.
+    } else if (m_buffer[ POS_HEADER_SIZE ] == VER_1_HEADER_SIZE) {
+      m_access = new RawFTSWFormat_v1;
+      m_version = 1;
+    } else {
+      char err_buf[500];
+      sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",
+              m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("%s", err_buf); fflush(stdout);
+      B2FATAL(err_buf);
+    }
   } else {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid header size of FTSW data format(= 0x%.8x words). Exiting...\n %s %s %d\n",
             m_buffer[ POS_HEADER_SIZE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
+    B2FATAL(err_buf);
   }
 
   if (temp_version >= 0 && temp_version != m_version) {
@@ -65,29 +78,9 @@ void RawFTSW::SetVersion()
             "[FATAL] Already assigned RawFTSW format version (= %.8x) is different from the one (= %.8x) from the current event. Exiting...\n %s %s %d\n",
             temp_version, m_version, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
+    B2FATAL(err_buf);
   }
 
-  //
-  // Assign unpacker
-  //
-  switch (m_version) {
-    case LATEST_FTSW_FORMAT_VER :
-      m_access = new RawFTSWFormat_latest;
-      break;
-    case 1 : // it is 0x20 as of 2019/02/18
-      m_access = new RawFTSWFormat_v1;
-      break;
-    default : {
-      char err_buf[500];
-      sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : Invalid version of FTSW data format (= data says it is 0x%.8x now). Exiting...\n %s %s %d\n",
-              m_version, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf; throw (err_str);
-    }
-    exit(1);
-  }
   m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
 }
 
@@ -97,8 +90,10 @@ void RawFTSW::SetBuffer(int* bufin, int nwords, int delete_flag, int num_events,
 {
 
   if (bufin == NULL) {
-    printf("[FATAL] bufin is NULL. Exting...\n");
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "[FATAL] bufin is NULL. Exting...\n");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
   if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
 

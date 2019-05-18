@@ -26,9 +26,6 @@ PostRawCOPPERFormat_v1::~PostRawCOPPERFormat_v1()
 {
 }
 
-
-
-
 // int PostRawCOPPERFormat_v1::GetBufferPos(int n)
 // {
 //   if (m_buffer == NULL || m_nwords <= 0) {
@@ -81,7 +78,8 @@ unsigned int PostRawCOPPERFormat_v1::CalcDriverChkSum(int n)
   char err_buf[500];
   sprintf(err_buf, "This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
   return 0;
 }
 
@@ -119,14 +117,16 @@ int PostRawCOPPERFormat_v1::GetFINESSENwords(int n, int finesse_num)
       char err_buf[500];
       sprintf(err_buf, "Invalid finesse # : %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      string err_str = err_buf; throw (err_str);
+      printf("%s", err_buf); fflush(stdout);
+      B2FATAL(err_buf);
   }
 
   if (nwords < 0 || nwords > 1e6) {
     char err_buf[500];
     sprintf(err_buf, "# of words is strange. %d : %s %s %d\n", nwords,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf; throw (err_str);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   return nwords;
@@ -141,7 +141,8 @@ unsigned int PostRawCOPPERFormat_v1::GetB2LFEE32bitEventNumber(int n)
   char err_buf[500];
   sprintf(err_buf, "No event # in B2LFEE header. (block %d) Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
   return 0;
 }
 
@@ -159,8 +160,8 @@ void PostRawCOPPERFormat_v1::CheckData(int n,
           n, prev_evenum, *cur_evenum_rawcprhdr, prev_copper_ctr, *cur_copper_ctr,
           prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 
 //   char err_buf[500];
 //   int err_flag = 0;
@@ -218,7 +219,8 @@ bool PostRawCOPPERFormat_v1::CheckCOPPERMagic(int n)
   char err_buf[500];
   sprintf(err_buf, "No magic word # in COPPER header (block %d). Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
   return false;
 }
 
@@ -227,8 +229,8 @@ void PostRawCOPPERFormat_v1::CheckUtimeCtimeTRGType(int n)
   char err_buf[500];
   sprintf(err_buf, "This function is not supported (block %d). Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }
 
 
@@ -240,9 +242,8 @@ unsigned int PostRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_i
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u\n",
          m_node_id,  prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
-  string err_str = err_buf;
-  throw (err_str);
-
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }
 
 
@@ -252,9 +253,8 @@ int PostRawCOPPERFormat_v1::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %p %d\n", finesse_buf, finesse_nwords);
-  string err_str = err_buf;
-  throw (err_str);
-
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }
 
 int PostRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
@@ -269,8 +269,7 @@ int PostRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
     sprintf(err_buf, "The specified finesse(%d) seems to be empty(nwords = %d). Cannot calculate CRC16. Exiting...\n %s %s %d\n",
             finesse_num, finesse_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
-    throw (err_str);
+    B2FATAL(err_buf);
   }
   unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, &(m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ]), 1);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EVE_NO ]), 1);
@@ -307,7 +306,7 @@ int PostRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
     sprintf(err_buf,
             "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting...\n %s %s %d\n",
             (unsigned short)(*buf & 0xFFFF), temp_crc16, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf;     throw (err_str);
+    B2FATAL(err_buf);
   }
 
   return 1;

@@ -101,9 +101,7 @@ void RawTLUFormat::CheckData(int n,
       if (k % 10 == 9) printf("\n[DEBUG] ");
     }
     fflush(stderr);
-    string err_str = err_buf; throw (err_str);
-//     sleep(1234567);
-//     exit(-1);
+    B2FATAL(err_buf);
   }
 
   return;

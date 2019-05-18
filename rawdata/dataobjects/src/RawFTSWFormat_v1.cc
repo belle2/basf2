@@ -132,8 +132,7 @@ void RawFTSWFormat_v1::CheckData(int n,
       if (k % 10 == 9) printf("\n[DEBUG] ");
     }
     fflush(stderr);
-    string err_str = err_buf; throw (err_str);
-
+    B2FATAL(err_buf);
   }
 
   return;

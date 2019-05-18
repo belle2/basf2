@@ -79,7 +79,7 @@ void PXDInjectionDQMModule::defineHisto()
 void PXDInjectionDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional() /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
+  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
   m_storeRawHits.isRequired(m_PXDRawHitsName);
 }
 

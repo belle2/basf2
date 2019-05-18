@@ -120,7 +120,7 @@ Lambda0:frommc( 6)	|	  0.1330	  1.1244	  0.0967	  0.8175	  0.0363	  0.3069	  0.0
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 13155962
+Total Number of Particles created in the DataStore: 13129317
 =======================================================
 
 [INFO] ParticleStats Summary: 
@@ -149,13 +149,13 @@ Total Number of Particles created in the DataStore: 13155962
            mu+( 4)	|	 12.4571	 12.4571	  6.4894	  6.4894	  5.9677	  5.9677	  0.0000	  0.0000
           K_S0( 5)	|	  1.0219	  2.0793	  0.0000	  0.0000	  0.0000	  0.0000	  1.0219	  2.0793
        Lambda0( 6)	|	  2.3568	  4.2391	  1.1833	  2.1283	  1.1735	  2.1108	  0.0000	  0.0000
-          K_L0( 7)	|	 12.8209	 12.8260	  0.0000	  0.0000	  0.0000	  0.0000	 12.8209	 12.8260
+          K_L0( 7)	|	 12.5248	 12.5301	  0.0000	  0.0000	  0.0000	  0.0000	 12.5248	 12.5301
          gamma( 8)	|	 15.2537	 15.2551	  0.0000	  0.0000	  0.0000	  0.0000	 15.2537	 15.2551
 
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 13155962
+Total Number of Particles created in the DataStore: 13129317
 =======================================================
 
 [WARNING] There were 500 tracks skipped because of zero charge for mu+  { module: ParticleLoader }

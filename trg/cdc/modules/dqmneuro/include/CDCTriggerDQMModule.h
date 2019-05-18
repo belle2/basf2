@@ -59,7 +59,7 @@ namespace Belle2 {
     /** CDCTriggerTrack StoreArray name for neuro tracks from unpacker */
     std::string m_unpackedNeuroTracksName;
     /** StoreArray name for neuro input vector from unpacker */
-    std::string m_unpackedNeuroInputName;
+    std::string m_unpackedNeuroInputVectorName;
     /** StoreArray name for neuro input 2d finder tracks */
     std::string m_unpackedNeuroInput2DTracksName;
     /** StoreArray name for neuro input Track segments */
@@ -68,10 +68,19 @@ namespace Belle2 {
     /** CDCTriggerTrack StoreArray name for neuro tracks from TSIM
      *  (from CDCTriggerNeuro module with unpacked TS hits and 2D tracks as input) */
     std::string m_simNeuroTracksName;
-    /** StoreArray name for neuro input vector from TSIM */
-    std::string m_simNeuroInputName;
+    /** StoreArray name for simulated neuro input vector using HW TS, HW 2D*/
+    std::string m_simNeuroInputVectorName;
     /** switch to turn on a comparison with the reconstruction */
     std::string m_showRecoTracks;
+
+    /** StoreArray name for simulated TS hits */
+    std::string m_simSegmentHitsName;
+    /** StoreArray name for simulated 2D finder tracks using simulated TS */
+    std::string m_sim2DTracksSWTSName;
+    /** StoreArray name for neuro tracks using simulated TS and simulated 2D */
+    std::string m_simNeuroTracksSWTSSW2DName;
+    /** StoreArray name for neuro input vector using simulated TS and simulated 2D */
+    std::string m_simNeuroInputVectorSWTSSW2DName;
 
     // store arrays for direct access
     /** Storearray for TS hits from unpacker */
@@ -81,7 +90,7 @@ namespace Belle2 {
     /** Storearray for neuro tracks from unpacker */
     StoreArray<CDCTriggerTrack> m_unpackedNeuroTracks;
     /** Storearray for neuro input vector from unpacker */
-    StoreArray<CDCTriggerMLPInput> m_unpackedNeuroInput;
+    StoreArray<CDCTriggerMLPInput> m_unpackedNeuroInputVector;
     /** Store array for neuro input 2dfinder tracks */
     StoreArray<CDCTriggerTrack> m_unpackedNeuroInput2DTracks;
     /** StoreArray for neuro input Track segments */
@@ -89,10 +98,18 @@ namespace Belle2 {
     /** Storearray for neuro tracks from TSIM */
     StoreArray<CDCTriggerTrack> m_simNeuroTracks;
     /** Storearray for neuro input vector from TSIM */
-    StoreArray<CDCTriggerMLPInput> m_simNeuroInput;
+    StoreArray<CDCTriggerMLPInput> m_simNeuroInputVector;
     /** Storearray for RecoTracks */
     StoreArray<RecoTrack> m_RecoTracks;
 
+    /** Storearray for simulated TS hits */
+    StoreArray<CDCTriggerSegmentHit> m_simSegmentHits;
+    /** Storearray for simulated 2D finder tracks using simulated TS*/
+    StoreArray<CDCTriggerTrack> m_sim2DTracksSWTS;
+    /** Storearray for neuro input vector using simulated TS and simulated 2D */
+    StoreArray<CDCTriggerMLPInput> m_simNeuroInputVectorSWTSSW2D;
+    /** Storearray for neuro tracks using simulated TS and simulated 2D */
+    StoreArray<CDCTriggerTrack> m_simNeuroTracksSWTSSW2D;
 
     // histograms for neurotrigger
     TH1F* m_neuroOutZ;              /**< z distribution from unpacker */
@@ -103,6 +120,7 @@ namespace Belle2 {
     TH1F* m_neuroOutm_time;         /**< m_time distribution from unpacker */
     TH1F* m_neuroOutTrackCount;     /**< number of tracks per event */
     TH1F* m_neuroOutVsInTrackCount; /**< number of neuroOutTracks - number of 2dinTracks */
+
     TH1F* m_neuroInTSID;            /**< ID of incoming track segments */
     TH1F* m_neuroInTSPrioT_Layer0;  /**< Priority time of track segments in layer 0 */
     TH1F* m_neuroInTSPrioT_Layer1;  /**< Priority time of track segments in layer 1 */
@@ -142,6 +160,7 @@ namespace Belle2 {
     TH1F* m_neuroSelTSFoundT_Layer7; /**< Found time of selected track segments in layer 7 */
     TH1F* m_neuroSelTSFoundT_Layer8; /**< Found time of selected track segments in layer 8 */
     TH1F* m_neuroInTSCount;          /**< number of TS per track */
+
     TH1F* m_neuroInInvPt;            /**< Inverse Pt distribution from incoming 2dtrack */
     TH1F* m_neuroInPhi0;             /**< Phi0 of incoming 2dtrack */
     TH1F* m_neuroInm_time;           /**< m_time distribution from incoming 2dtracks */
@@ -150,8 +169,10 @@ namespace Belle2 {
     TH1F* m_2DOutPhi0;               /**< Phi0 of 2dtracks */
     TH1F* m_2DOutm_time;             /**< m_time 2dtracks */
     TH1F* m_2DOutTrackCount;         /**< number of 2dtracks per event */
+
     TH1F* m_neuroSelTSCount;         /**< number of selected TS per SL */
     TH1F* m_neuroSelTSID;            /**< ID of selected track segments */
+
     TH1F* m_2DInTSID;                /**< ID of 2D incoming axial track segments */
     TH1F* m_2DInTSPrioT_Layer0;      /**< Priority time of 2D track segments in layer 0 */
     TH1F* m_2DInTSPrioT_Layer2;      /**< Priority time of 2D track segments in layer 2 */
@@ -164,7 +185,10 @@ namespace Belle2 {
     TH1F* m_2DInTSFoundT_Layer6;     /**< Found time of 2D track segments in layer 6 */
     TH1F* m_2DInTSFoundT_Layer8;     /**< Found time of 2D track segments in layer 8 */
     TH1F* m_2DInTSCount;             /**< number of 2D incoming TS per SL */
-    TH1F* m_neuroSector;             /**< unpacked sector */
+
+    TH1F* m_neuroSectorHW;           /**< unpacked sector */
+    TH1F* m_neuroSectorSW;           /**< hw TS hw 2D sw NN sector */
+    TH1F* m_neuroSectorSWTSSW2D;     /**< sw TS sw 2D sw NN sector */
     TH1F* m_neuroDeltaZ;             /**< unpacked z - TSIM z */
     TH1F* m_neuroDeltaTheta;         /**< unpacked theta - TSIM theta */
     TH2F* m_neuroScatterZ;           /**< unpacked z vs TSIM z, scatter plot*/
@@ -176,6 +200,7 @@ namespace Belle2 {
     TH1F* m_neuroDeltaSector;        /**< unpacked sector - TSIM sector */
     TH1F* m_simSameTS;               /**< number of TS selected in both, unpacked and TSIM tracks */
     TH1F* m_simDiffTS;               /**< number of TS selcted in TSIM but not in unpacked */
+
     TH1F* m_RecoZ;                   /**< reconstructed z */
     TH1F* m_RecoCosTheta;            /**< reconstructed cos(theta) */
     TH1F* m_RecoInvPt;               /**< reconstructed inverse Pt */
@@ -229,6 +254,22 @@ namespace Belle2 {
     TH1F* m_neuroOutSWCosTheta;       /**< cos theta distribution from simulation */
     TH1F* m_neuroOutSWPhi0;           /**< phi distribution from simulation */
     TH1F* m_neuroOutSWInvPt;          /**< Inverse Pt distribution from simulation */
+
+    TH1F* m_neuroOutSWTSSW2DZ;              /**< z distribution from simulation using simulated TS and simulated 2D */
+    TH1F* m_neuroOutSWTSSW2DCosTheta;       /**< cos theta distribution from simulation using simulated TS and simulated 2D */
+    TH1F* m_neuroOutSWTSSW2DPhi0;           /**< phi distribution from simulation using simulated TS and simulated 2D */
+    TH1F* m_neuroOutSWTSSW2DInvPt;          /**< Inverse Pt distribution from simulation using simulated TS and simulated 2D */
+
+    TH1F* m_RecoSWTSSW2DZ;                 /**< matched to SWTSSW2DSWNN reconstructed z */
+    TH1F* m_RecoSWTSSW2DCosTheta;          /**< matched to SWTSSW2DSWNN reconstructed cos(theta) */
+    TH1F* m_RecoSWTSSW2DInvPt;             /**< matched to SWTSSW2DSWNN reconstructed inverse Pt */
+    TH1F* m_RecoSWTSSW2DPhi;               /**< matched to SWTSSW2DSWNN reconstructed phi */
+    TH2F* m_RecoSWTSSW2DZScatter;          /**< matched to SWTSSW2DSWNN reconstructed z scatter plot*/
+
+    TH1F* m_DeltaRecoSWTSSW2DZ;            /**< matched to SWTSSW2DSWNN reconstructed z */
+    TH1F* m_DeltaRecoSWTSSW2DCosTheta;     /**< matched to SWTSSW2DSWNN reconstructed cos(theta) */
+    TH1F* m_DeltaRecoSWTSSW2DInvPt;        /**< matched to SWTSSW2DSWNN reconstructed inverse Pt */
+    TH1F* m_DeltaRecoSWTSSW2DPhi;          /**< matched to SWTSSW2DSWNN reconstructed phi */
   };
 
 }

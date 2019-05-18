@@ -58,6 +58,12 @@ CDCTriggerDQMModule::CDCTriggerDQMModule() : HistoModule()
   addParam("showRecoTracks", m_showRecoTracks,
            "switch to turn on a comparison with the reconstruction",
            string("no"));
+  addParam("simSegmentHitsName", m_simSegmentHitsName,
+           "StoreArray name for simulated TS hits", string("CDCTriggerSegmentHitsSW"));
+  addParam("sim2DTracksSWTSName", m_sim2DTracksSWTSName,
+           "StoreArray name for simulated 2D finder tracks using simulated TS", string("TRGCDC2DFinderTracksSWTS"));
+  addParam("simNeuroTracksSWTSSW2DName", m_simNeuroTracksSWTSSW2DName,
+           "StoreArray name for neuro tracks using simulated TS and simulated 2D", string(""));
 }
 
 
@@ -302,9 +308,12 @@ void CDCTriggerDQMModule::defineHisto()
                                   34, 0, 3.5);
 
   if (m_simNeuroTracksName != "") {
-    m_neuroSector = new TH1F("NeuroSector",
-                             "unpacked sector",
-                             10, 0, 10);
+    m_neuroSectorHW = new TH1F("NeuroSectorHW",
+                               "unpacked sector",
+                               10, 0, 10);
+    m_neuroSectorSW = new TH1F("NeuroSectorSW",
+                               "sw sector",
+                               10, 0, 10);
     m_neuroDeltaZ = new TH1F("NeuroDeltaZ",
                              "difference between unpacked and simulated neuro z;delta z [cm]",
                              100, -100, 100); // should be bit-precise, so look at very small range
@@ -351,6 +360,24 @@ void CDCTriggerDQMModule::defineHisto()
                                  34, 0, 3.5);
   }
 
+  if (m_simNeuroTracksSWTSSW2DName != "") {
+    m_neuroSectorSWTSSW2D = new TH1F("NeuroSectorSWTSSW2D",
+                                     "swtssw2d sector",
+                                     10, 0, 10);
+    m_neuroOutSWTSSW2DZ = new TH1F("NeuroOutSWTSSW2DZ",
+                                   "sw z distribution of neuro tracks sw TS, sw 2D; z [cm]",
+                                   100, -50, 50); // 1cm bins from -50cm to 50cm
+    m_neuroOutSWTSSW2DCosTheta = new TH1F("NeuroOutSWTSSW2DCosTheta",
+                                          "sw cos theta distribution of neuro tracks sw TS, sw 2D; cos theta ",
+                                          100, -1, 1);
+    m_neuroOutSWTSSW2DPhi0 = new TH1F("NeuroOutSWTSSW2DPhi0",
+                                      "sw phi distribution from unpacker sw TS, sw 2D; phi [deg]",
+                                      161, -1.25, 361); // shift to reduce the binning error
+    m_neuroOutSWTSSW2DInvPt = new TH1F("NeuroOutSWTSSW2DInvPt",
+                                       "sw Inverse Pt distribution from unpacker sw TS, sw 2D; [GeV^{-1}]",
+                                       34, 0, 3.5);
+  }
+
   if (m_showRecoTracks == "yes") {
     //RecoTracks
     m_RecoZ = new TH1F("RecoZ",
@@ -383,23 +410,6 @@ void CDCTriggerDQMModule::defineHisto()
                                 "hw matched reconstruction; scatter z [cm]",
                                 100, -150, 150, 100, -150, 150);
 
-    //RecoTracks matched to simulated neuro tracks
-    m_RecoSWZ = new TH1F("RecoSWZ",
-                         "sw matched z distribution of reconstructed tracks;z [cm]",
-                         100, -150, 150); // 1cm bins from -50cm to 50cm
-    m_RecoSWCosTheta = new TH1F("RecoSWCosTheta",
-                                "sw matched cos theta distribution of reconstructed tracks;cos theta ",
-                                100, -1, 1);
-    m_RecoSWPhi = new TH1F("RecoSWPhi",
-                           "sw matched phi distribution of reconstructed tracks ;phi [deg]",
-                           160, -180, 180);
-    m_RecoSWInvPt = new TH1F("RecoSWInvPt",
-                             "sw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
-                             34, 0, 3.5);
-    m_RecoSWZScatter = new TH2F("RecoSWZScatter",
-                                "sw matched reconstruction; scatter z [cm]",
-                                100, -150, 150, 100, -150, 150);
-
     m_DeltaRecoHWZ = new TH1F("DeltaRecoHWZ",
                               "difference between reconstructed and unpacked neuro z;delta z [cm]",
                               100, -100, 100);
@@ -413,18 +423,69 @@ void CDCTriggerDQMModule::defineHisto()
                                 "difference between reconstructed and unpacked neuro phi;delta phi [deg]",
                                 160, -180, 180);
 
-    m_DeltaRecoSWZ = new TH1F("DeltaRecoSWZ",
-                              "difference between reconstructed and simulated neuro z;delta z [cm]",
-                              100, -100, 100);
-    m_DeltaRecoSWCosTheta = new TH1F("DeltaRecoSWCosTheta",
-                                     "difference between reconstructed and simulated neuro cos(theta);delta cos(theta)",
-                                     100, -1, 1);
-    m_DeltaRecoSWInvPt = new TH1F("DeltaRecoSWInvPt",
-                                  "difference between reconstructed and simulated neuro InvPt;delta InvPt [GeV^-1]",
-                                  100, -100, 100);
-    m_DeltaRecoSWPhi = new TH1F("DeltaRecoSWPhi",
-                                "difference between reconstructed and simulated neuro phi;delta phi [deg]",
-                                160, -180, 180);
+    if (m_simNeuroTracksName != "") {
+      //RecoTracks matched to simulated neuro tracks (hw TS hw 2D sw NN)
+      m_RecoSWZ = new TH1F("RecoSWZ",
+                           "sw matched z distribution of reconstructed tracks;z [cm]",
+                           100, -150, 150); // 1cm bins from -50cm to 50cm
+      m_RecoSWCosTheta = new TH1F("RecoSWCosTheta",
+                                  "sw matched cos theta distribution of reconstructed tracks;cos theta ",
+                                  100, -1, 1);
+      m_RecoSWPhi = new TH1F("RecoSWPhi",
+                             "sw matched phi distribution of reconstructed tracks ;phi [deg]",
+                             160, -180, 180);
+      m_RecoSWInvPt = new TH1F("RecoSWInvPt",
+                               "sw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
+                               34, 0, 3.5);
+      m_RecoSWZScatter = new TH2F("RecoSWZScatter",
+                                  "sw matched reconstruction; scatter z [cm]",
+                                  100, -150, 150, 100, -150, 150);
+
+      m_DeltaRecoSWZ = new TH1F("DeltaRecoSWZ",
+                                "difference between reconstructed and simulated neuro z;delta z [cm]",
+                                100, -100, 100);
+      m_DeltaRecoSWCosTheta = new TH1F("DeltaRecoSWCosTheta",
+                                       "difference between reconstructed and simulated neuro cos(theta);delta cos(theta)",
+                                       100, -1, 1);
+      m_DeltaRecoSWInvPt = new TH1F("DeltaRecoSWInvPt",
+                                    "difference between reconstructed and simulated neuro InvPt;delta InvPt [GeV^-1]",
+                                    100, -100, 100);
+      m_DeltaRecoSWPhi = new TH1F("DeltaRecoSWPhi",
+                                  "difference between reconstructed and simulated neuro phi;delta phi [deg]",
+                                  160, -180, 180);
+    }
+
+    if (m_simNeuroTracksSWTSSW2DName != "") {
+      //RecoTracks matched to simulated neuro tracks (sw TS sw 2D sw NN)
+      m_RecoSWTSSW2DZ = new TH1F("RecoSWTSSW2DZ",
+                                 "sw matched z distribution of reconstructed tracks;z [cm]",
+                                 100, -150, 150); // 1cm bins from -50cm to 50cm
+      m_RecoSWTSSW2DCosTheta = new TH1F("RecoSWTSSW2DCosTheta",
+                                        "sw matched cos theta distribution of reconstructed tracks;cos theta ",
+                                        100, -1, 1);
+      m_RecoSWTSSW2DPhi = new TH1F("RecoSWTSSW2DPhi",
+                                   "sw matched phi distribution of reconstructed tracks ;phi [deg]",
+                                   160, -180, 180);
+      m_RecoSWTSSW2DInvPt = new TH1F("RecoSWTSSW2DInvPt",
+                                     "sw matched inverse Pt distribution of reconstructed tracks; [GeV^{-1}]",
+                                     34, 0, 3.5);
+      m_RecoSWTSSW2DZScatter = new TH2F("RecoSWTSSW2DZScatter",
+                                        "sw matched reconstruction; scatter z [cm]",
+                                        100, -150, 150, 100, -150, 150);
+
+      m_DeltaRecoSWTSSW2DZ = new TH1F("DeltaRecoSWTSSW2DZ",
+                                      "difference between reconstructed and simulated neuro z;delta z [cm]",
+                                      100, -100, 100);
+      m_DeltaRecoSWTSSW2DCosTheta = new TH1F("DeltaRecoSWTSSW2DCosTheta",
+                                             "difference between reconstructed and simulated neuro cos(theta);delta cos(theta)",
+                                             100, -1, 1);
+      m_DeltaRecoSWTSSW2DInvPt = new TH1F("DeltaRecoSWTSSW2DInvPt",
+                                          "difference between reconstructed and simulated neuro InvPt;delta InvPt [GeV^-1]",
+                                          100, -100, 100);
+      m_DeltaRecoSWTSSW2DPhi = new TH1F("DeltaRecoSWTSSW2DPhi",
+                                        "difference between reconstructed and simulated neuro phi;delta phi [deg]",
+                                        160, -180, 180);
+    }
   }
 
   // cd back to root directory
@@ -445,20 +506,29 @@ void CDCTriggerDQMModule::initialize()
   m_unpackedNeuroTracks.requireRelationTo(m_unpackedNeuroInputSegments);
 
   if (m_simNeuroTracksName != "") {
-    m_unpackedNeuroInputName = m_unpackedNeuroTracksName + "Input";
-    m_unpackedNeuroInput.isRequired(m_unpackedNeuroInputName);
-    m_unpackedNeuroTracks.requireRelationTo(m_unpackedNeuroInput);
-    m_simNeuroInputName = m_simNeuroTracksName + "Input";
+    m_unpackedNeuroInputVectorName = m_unpackedNeuroTracksName + "Input";
+    m_unpackedNeuroInputVector.isRequired(m_unpackedNeuroInputVectorName);
+    m_unpackedNeuroTracks.requireRelationTo(m_unpackedNeuroInputVector);
+    m_simNeuroInputVectorName = m_simNeuroTracksName + "Input";
     m_simNeuroTracks.isRequired(m_simNeuroTracksName);
-    m_simNeuroInput.isRequired(m_simNeuroInputName);
+    m_simNeuroInputVector.isRequired(m_simNeuroInputVectorName);
     m_unpackedNeuroInput2DTracks.requireRelationTo(m_simNeuroTracks);
-    m_simNeuroTracks.requireRelationTo(m_simNeuroInput);
+    m_simNeuroTracks.requireRelationTo(m_simNeuroInputVector);
+  }
+  if (m_simNeuroTracksSWTSSW2DName != "") {
+    m_simNeuroInputVectorSWTSSW2DName = m_simNeuroTracksSWTSSW2DName + "Input";
+    m_simNeuroTracksSWTSSW2D.isRequired(m_simNeuroTracksSWTSSW2DName);
+    m_simNeuroInputVectorSWTSSW2D.isRequired(m_simNeuroInputVectorSWTSSW2DName);
+    m_simNeuroTracksSWTSSW2D.requireRelationTo(m_simNeuroInputVectorSWTSSW2D);
   }
   if (m_showRecoTracks == "yes") {
     m_RecoTracks.isRequired("RecoTracks");
     m_RecoTracks.requireRelationTo(m_unpackedNeuroTracks);
     if (m_simNeuroTracksName != "") {
       m_RecoTracks.requireRelationTo(m_simNeuroTracks);
+    }
+    if (m_simNeuroTracksSWTSSW2DName != "") {
+      m_RecoTracks.requireRelationTo(m_simNeuroTracksSWTSSW2D);
     }
   }
 }
@@ -562,7 +632,8 @@ void CDCTriggerDQMModule::beginRun()
   m_neuroOutQuad3InvPt->Reset();
 
   if (m_simNeuroTracksName != "") {
-    m_neuroSector->Reset();
+    m_neuroSectorHW->Reset();
+    m_neuroSectorSW->Reset();
     m_neuroDeltaZ->Reset();
     m_neuroDeltaTheta->Reset();
     m_neuroScatterZ->Reset();
@@ -578,6 +649,13 @@ void CDCTriggerDQMModule::beginRun()
     m_neuroOutSWPhi0->Reset();
     m_neuroOutSWInvPt->Reset();
   }
+  if (m_simNeuroTracksSWTSSW2DName != "") {
+    m_neuroSectorSWTSSW2D->Reset();
+    m_neuroOutSWTSSW2DZ->Reset();
+    m_neuroOutSWTSSW2DCosTheta->Reset();
+    m_neuroOutSWTSSW2DPhi0->Reset();
+    m_neuroOutSWTSSW2DInvPt->Reset();
+  }
   if (m_showRecoTracks == "yes") {
     m_RecoZ->Reset();
     m_RecoCosTheta->Reset();
@@ -590,21 +668,35 @@ void CDCTriggerDQMModule::beginRun()
     m_RecoHWPhi->Reset();
     m_RecoHWZScatter->Reset();
 
-    m_RecoSWZ->Reset();
-    m_RecoSWCosTheta->Reset();
-    m_RecoSWInvPt->Reset();
-    m_RecoSWPhi->Reset();
-    m_RecoSWZScatter->Reset();
-
     m_DeltaRecoHWZ->Reset();
     m_DeltaRecoHWCosTheta->Reset();
     m_DeltaRecoHWInvPt->Reset();
     m_DeltaRecoHWPhi->Reset();
 
-    m_DeltaRecoSWZ->Reset();
-    m_DeltaRecoSWCosTheta->Reset();
-    m_DeltaRecoSWInvPt->Reset();
-    m_DeltaRecoSWPhi->Reset();
+    if (m_simNeuroTracksName != "") {
+      m_RecoSWZ->Reset();
+      m_RecoSWCosTheta->Reset();
+      m_RecoSWInvPt->Reset();
+      m_RecoSWPhi->Reset();
+      m_RecoSWZScatter->Reset();
+
+      m_DeltaRecoSWZ->Reset();
+      m_DeltaRecoSWCosTheta->Reset();
+      m_DeltaRecoSWInvPt->Reset();
+      m_DeltaRecoSWPhi->Reset();
+    }
+    if (m_simNeuroTracksSWTSSW2DName != "") {
+      m_RecoSWTSSW2DZ->Reset();
+      m_RecoSWTSSW2DCosTheta->Reset();
+      m_RecoSWTSSW2DInvPt->Reset();
+      m_RecoSWTSSW2DPhi->Reset();
+      m_RecoSWTSSW2DZScatter->Reset();
+
+      m_DeltaRecoSWTSSW2DZ->Reset();
+      m_DeltaRecoSWTSSW2DCosTheta->Reset();
+      m_DeltaRecoSWTSSW2DInvPt->Reset();
+      m_DeltaRecoSWTSSW2DPhi->Reset();
+    }
   }
 }
 
@@ -688,8 +780,36 @@ void CDCTriggerDQMModule::event()
           m_DeltaRecoSWInvPt->Fill(invptTarget - 1. / neuroSWTrack->getPt());
           m_RecoSWZScatter->Fill(zTarget, neuroSWTrack->getZ0());
         }
+        CDCTriggerTrack* neuroSWTSSW2DTrack = recoTrack.getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksSWTSSW2DName);
+        if (neuroSWTSSW2DTrack) {
+          m_RecoSWTSSW2DZ->Fill(zTarget);
+          m_RecoSWTSSW2DCosTheta->Fill(cosThetaTarget);
+          m_RecoSWTSSW2DPhi->Fill(phi0Target * 180 / M_PI);
+          m_RecoSWTSSW2DInvPt->Fill(invptTarget);
+
+          m_DeltaRecoSWTSSW2DZ->Fill(zTarget - neuroSWTSSW2DTrack->getZ0());
+          double cotTh = neuroSWTSSW2DTrack->getCotTheta();
+          double cosTh = copysign(1.0, cotTh) / sqrt(1. / (cotTh * cotTh) + 1);
+          m_DeltaRecoSWTSSW2DCosTheta->Fill(cosThetaTarget - cosTh);
+          m_DeltaRecoSWTSSW2DPhi->Fill((phi0Target - neuroSWTSSW2DTrack->getPhi0()) * 180 / M_PI);
+          m_DeltaRecoSWTSSW2DInvPt->Fill(invptTarget - 1. / neuroSWTSSW2DTrack->getPt());
+          m_RecoSWTSSW2DZScatter->Fill(zTarget, neuroSWTSSW2DTrack->getZ0());
+        }
       }
     }
+  }
+
+  for (CDCTriggerTrack& neuroswTrack : m_simNeuroTracksSWTSSW2D) {
+    m_neuroOutSWTSSW2DZ->Fill(neuroswTrack.getZ0());
+    double cotThSW = neuroswTrack.getCotTheta();
+    double cosThSW = copysign(1.0, cotThSW) / sqrt(1. / (cotThSW * cotThSW) + 1);
+    m_neuroOutSWTSSW2DCosTheta->Fill(cosThSW);
+    m_neuroOutSWTSSW2DPhi0->Fill(neuroswTrack.getPhi0() * 180 / M_PI);
+    m_neuroOutSWTSSW2DInvPt->Fill(1. / neuroswTrack.getPt());
+    unsigned simSectorSWTSSW2D =
+      neuroswTrack.getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorSWTSSW2DName)->getSector();
+    m_neuroSectorSWTSSW2D->Fill(simSectorSWTSSW2D);
+
   }
   for (CDCTriggerTrack& neuroswTrack : m_simNeuroTracks) {
     m_neuroOutSWZ->Fill(neuroswTrack.getZ0());
@@ -851,14 +971,15 @@ void CDCTriggerDQMModule::event()
                                     neuroSimTrack->getDirection().Theta() * 180. / M_PI);
             m_neuroScatterZ->Fill(neuroTrack.getZ0(), neuroSimTrack->getZ0());
             vector<float> unpackedInput =
-              neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputName)->getInput();
+              neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getInput();
             vector<float> simInput =
-              neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputName)->getInput();
+              neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorName)->getInput();
             unsigned unpackedSector =
-              neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputName)->getSector();
+              neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getSector();
             unsigned simSector =
-              neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputName)->getSector();
-            m_neuroSector->Fill(unpackedSector);
+              neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorName)->getSector();
+            m_neuroSectorHW->Fill(unpackedSector);
+            m_neuroSectorSW->Fill(simSector);
             m_neuroDeltaSector->Fill(unpackedSector - simSector);
 
             cout << endl;

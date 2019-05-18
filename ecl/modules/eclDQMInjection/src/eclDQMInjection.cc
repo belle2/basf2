@@ -53,7 +53,7 @@ void ECLDQMInjectionModule::defineHisto()
 void ECLDQMInjectionModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isRequired();
+  m_rawTTD.isOptional() /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failin
   m_storeHits.isRequired(m_ECLDigitsName);
 }
 

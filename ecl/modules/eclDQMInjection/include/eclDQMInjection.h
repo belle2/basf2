@@ -34,17 +34,9 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       ECLDQMInjectionModule();
 
-      void initialize() override final;
-
-      void beginRun() override final;
-
-      void event() override final;
-
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
       std::string m_ECLDigitsName;  /**< The name of the StoreArray of ECLRawHits to be generated */
-
-      bool m_eachModule{false};// create a histo per module
 
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;
@@ -52,13 +44,19 @@ namespace Belle2 {
       /** Input array for ECL Raw Hits. */
       StoreArray<ECLDigit> m_storeHits;
 
-      TH1F* hOccAfterInjLER{};          /** Occupancy after LER injection */
-      TH1F* hOccAfterInjHER{};          /** Occupancy after HER injection */
+      TH1F* hOccAfterInjLER{};          /**< Histogram Occupancy after LER injection */
+      TH1F* hOccAfterInjHER{};          /**< Histogram Occupancy after HER injection */
 
-      TH1F* hEOccAfterInjLER{};          /** Occupancy after LER injection */
-      TH1F* hEOccAfterInjHER{};          /** Occupancy after HER injection */
+      TH1F* hEOccAfterInjLER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+      TH1F* hEOccAfterInjHER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
-      void defineHisto() override final;
+      void initialize() override final; /**< initialize function */
+
+      void beginRun() override final;  /**< beginRun function */
+
+      void event() override final; /**< event function */
+
+      void defineHisto() override final; /**< defineHisto function */
 
     };//end class declaration
 

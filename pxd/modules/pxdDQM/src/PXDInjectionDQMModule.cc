@@ -53,22 +53,17 @@ void PXDInjectionDQMModule::defineHisto()
     for (VxdID& avxdid : sensors) {
       VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
       if (info.getType() != VXD::SensorInfoBase::PXD) continue;
-      //Only interested in PXD sensors
+      // Only interested in PXD sensors
 
       TString buff = (std::string)avxdid;
-      TString bufful = buff;
-      buff.ReplaceAll(".", "_");
-
-      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
+      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + buff,
                                             "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful,
-                                            "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful,
-                                             "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000,
-                                             0, 20000);
-      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful,
-                                             "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000,
-                                             0, 20000);
+      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + buff,
+                                            "PXDOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + buff,
+                                             "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + buff,
+                                             "PXDEOccModInjHER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
 
     }
   }

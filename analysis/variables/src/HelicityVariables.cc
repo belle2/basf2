@@ -26,7 +26,7 @@
 namespace Belle2 {
   namespace Variable {
 
-    double cosHelicityAngle(const Particle* part)
+    double cosHelicityAngleMomentum(const Particle* part)
     {
 
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -91,7 +91,7 @@ namespace Belle2 {
 
     }
 
-    double cosHelicityAnglePi0Dalitz(const Particle* part)
+    double cosHelicityAngleMomentumPi0Dalitz(const Particle* part)
     {
 
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -117,7 +117,7 @@ namespace Belle2 {
     }
 
 
-    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr cosHelicityAngleBeamMomentum(const std::vector<std::string>& arguments)
     {
       int idau = 0;
       if (arguments.size() == 1) {
@@ -138,26 +138,22 @@ namespace Belle2 {
           return -999.0;
         }
 
-        TLorentzVector beam4Vector(getBeamPx(NULL), getBeamPy(NULL), getBeamPz(NULL), getBeamE(NULL));
+        TLorentzVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));
         TLorentzVector part4Vector = part->get4Vector();
         TLorentzVector mother4Vector = mother->get4Vector();
 
         TVector3 motherBoost = -(mother4Vector.BoostVector());
 
-        TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame;
-        beam4Vector_motherFrame = beam4Vector;
-        part4Vector_motherFrame = part4Vector;
+        beam4Vector.Boost(motherBoost);
+        part4Vector.Boost(motherBoost);
 
-        beam4Vector_motherFrame.Boost(motherBoost);
-        part4Vector_motherFrame.Boost(motherBoost);
-
-        return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
+        return - part4Vector.Vect().Dot(beam4Vector.Vect()) / part4Vector.Vect().Mag() / beam4Vector.Vect().Mag();
       };
       return func;
     }
 
 
-    Manager::FunctionPtr cosHelicityAngleIfRefFrameIsTheDaughter(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr cosHelicityAngle(const std::vector<std::string>& arguments)
     {
       int iDau = 0;
       int iGrandDau = 0;
@@ -199,7 +195,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr cosAcoplanarityAngleIfRefFrameIsTheMother(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr cosAcoplanarityAngle(const std::vector<std::string>& arguments)
     {
       int iGrandDau1 = 0;
       int iGrandDau2 = 0;
@@ -262,26 +258,26 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Helicity variables");
 
-    REGISTER_VARIABLE("cosHelicityAngle",
-                      cosHelicityAngle,
+    REGISTER_VARIABLE("cosHelicityAngleMomentum",
+                      cosHelicityAngleMomentum,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"
                       "and the momentum of the given particle in the lab frame\n"
                       "If the given particle has three daughters: cosine of the angle between the normal vector of the plane defined by the momenta of the three daughters in the frame of the given particle (mother)"
                       "and the momentum of the given particle in the lab frame.\n"
                       "Else: 0.");
 
-    REGISTER_VARIABLE("cosHelicityAnglePi0Dalitz",
-                      cosHelicityAnglePi0Dalitz,
+    REGISTER_VARIABLE("cosHelicityAngleMomentumPi0Dalitz",
+                      cosHelicityAngleMomentumPi0Dalitz,
                       "To be used for the decay pi0 -> e+ e- gamma: cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)"
                       "and the momentum of the given particle in the lab frame.\n"
                       "Else: 0.");
 
-    REGISTER_VARIABLE("cosHelicityAngleIfCMSIsTheMother", cosHelicityAngleIfCMSIsTheMother,
+    REGISTER_VARIABLE("cosHelicityAngleBeamMomentum", cosHelicityAngleBeamMomentum,
                       "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
                       "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
                       "automatically loaded by the function, given the accelerators conditions.");
 
-    REGISTER_VARIABLE("cosHelicityAngleIfRefFrameIsTheDaughter", cosHelicityAngleIfRefFrameIsTheDaughter,
+    REGISTER_VARIABLE("cosHelicityAngle", cosHelicityAngle,
                       "Cosine of the helicity angle between the momentum of the provided particle and the momentum of the selected granddaughter\n"
                       "in the reference frame of the selected daughter (theta_1 and theta_2 in the PDG 2018, p. 722).\n"
                       "This variable needs two integer arguments: the first one is the index of the daughter and the second one is the index of the granddaughter.\n"
@@ -290,7 +286,7 @@ namespace Belle2 {
                       "both momenta in the rest frame of the J/psi.\n"
                       "This variable is needed for angular analyses of B meson decays into two vector particles.");
 
-    REGISTER_VARIABLE("cosAcoplanarityAngleIfRefFrameIsTheMother", cosAcoplanarityAngleIfRefFrameIsTheMother,
+    REGISTER_VARIABLE("cosAcoplanarityAngle", cosAcoplanarityAngle,
                       "Cosine of the acoplanarity angle (Phi in the PDG 2018, p. 722). Given a two-body decay, the acoplanarity angle is defined as\n"
                       "the angle between the two decay planes in the reference frame of the mother. We calculate the acoplanarity angle as the angle between the two\n"
                       "normal vectors of the decay planes. Each normal vector is the cross product of the momentum of one daughter (in the frame of the mother) and the\n"

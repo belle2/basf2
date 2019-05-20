@@ -626,7 +626,10 @@ namespace Belle2 {
     for (int i = 0; i < KLMClusters.getEntries(); i++) {
       const KLMCluster* cluster      = KLMClusters[i];
 
-      if (cluster->getRelatedTo<KlId>()->getKlId() < 0.1)
+      if ((cluster->getRelatedTo<KlId>()) == NULL)
+        continue;
+
+      if ((cluster->getRelatedTo<KlId>()->getKlId() < 0) || (cluster->getRelatedTo<KlId>()->getKlId() > 1))
         continue;
 
       const MCParticle* mcParticle = cluster->getRelated<MCParticle>();

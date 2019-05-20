@@ -18,6 +18,8 @@
 #include <TMath.h>
 
 namespace TreeFitter {
+  constexpr double pi = TMath::Pi();
+  constexpr double twoPi = TMath::TwoPi();
 
   RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
     RecoParticle(particle, mother),
@@ -140,6 +142,13 @@ namespace TreeFitter {
     helixpars(4) = helix.getTanLambda();
 
     p.getResiduals().segment(0, 5) = m_params - helixpars;
+
+    //account for periodic boundary in phi residual
+    double phiResidual = p.getResiduals().segment(0, 5)(1);
+    phiResidual = std::fmod(phiResidual + pi, twoPi);
+    if (phiResidual < 0) phiResidual += twoPi;
+    phiResidual -= pi;
+    p.getResiduals().segment(0, 5)(1) = phiResidual;
 
     p.getV().triangularView<Eigen::Lower>() =  m_covariance.triangularView<Eigen::Lower>();
 

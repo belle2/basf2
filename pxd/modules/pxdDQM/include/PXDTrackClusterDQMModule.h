@@ -45,6 +45,7 @@ namespace Belle2 {
     void defineHisto() override final;
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+    bool m_moreHistos; /**< Fill aditional histograms */
 
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
@@ -54,11 +55,13 @@ namespace Belle2 {
     /** StoreArray name where RecoTracks are written. */
     std::string m_RecoTracksStoreArrayName;
 
-    StoreArray<RecoTrack> m_recoTracks;
-    StoreArray<Track> m_tracks;
+    StoreArray<RecoTrack> m_recoTracks; /**< reco track store array */
+    StoreArray<Track> m_tracks; /**< reco track store array */
 
-    /** Cluster Charge for PXD hits */
+    /** Cluster Charge for PXD clusters */
     std::map <VxdID, TH1F*> m_trackClusterCharge{};
+    /** Cluster Charge for PXD clusters, uncorrected */
+    std::map <VxdID, TH1F*> m_trackClusterChargeUC{};
 
   };  //end class declaration
 

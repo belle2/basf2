@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# Doxygen should skip this script
+# @cond
+
 """
 An example script to reconstruct inclusive particles and the use of MC
 matching tools for inclusive analyses.
@@ -47,3 +50,5 @@ variablesToNtuple("B0:inclusive", interesting_variables, path=mypath)
 
 basf2.process(mypath)
 print(basf2.statistics)
+
+# @endcond

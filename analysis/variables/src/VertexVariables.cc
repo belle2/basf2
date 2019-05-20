@@ -275,6 +275,13 @@ namespace Belle2 {
                       "Returns the y position of decay vertex of matched generated particle.");
     REGISTER_VARIABLE("mcZ", particleMCZ,
                       "Returns the z position of decay vertex of matched generated particle.");
+    REGISTER_VARIABLE("mcDX", particleMCX,
+                      "Returns the x position of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle."
+                      " Warning: mcDX, mcDY and mcDZ truth variables are duplicates of mcX, mcY and mcZ. They are going to be removed in the future releases. ");
+    REGISTER_VARIABLE("mcDY", particleMCY,
+                      "Returns the y position of decay vertex of matched generated particle.");
+    REGISTER_VARIABLE("mcDZ", particleMCZ,
+                      "Returns the z position of decay vertex of matched generated particle.");
     REGISTER_VARIABLE("mcDistance", particleMCDistance,
                       "Returns the distance to IP of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
     REGISTER_VARIABLE("mcRho", particleMCRho,

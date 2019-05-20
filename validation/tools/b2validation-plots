@@ -75,18 +75,21 @@ def get_popular_revision_combinations(work_folder):
 
     def remove_duplicates_lstlst(lstlst):
         """ Removes duplicate lists in a list of lists """
-        # The standard recipe for removing duplicates from a
-        # list $lst is list(set(lst)) (i.e. converting it to a set
-        # and then back to a list). However, lists, themselves are
-        # not hashable, so we cannot convert them to a set. Therefore we
-        # first convert all of the 'inner' lists to tuples, apply set and
-        # then convert back to list of lists.
-        return list(map(list, set(map(tuple, lstlst))))
+        # If we didn't care about the order:
+        # return list(map(list, set(map(tuple, lstlst))))
+        # would do the job. But we do care, or at least it is very
+        # relevant which revision is first (beceause it gets taken
+        # as reference)
+        ret = []
+        for lst in lstlst:
+            if lst not in ret:
+                ret.append(lst)
+        return ret
 
     # Return value
     ret = [
         # All revisions
-        ["reference"] + available,
+        ["reference"] + sorted(available),
 
         # Latest X + reference
         ["reference", atindex_or_none(available_releases, 0)],
@@ -94,20 +97,19 @@ def get_popular_revision_combinations(work_folder):
         ["reference", atindex_or_none(available_nightlies, 0)],
 
         # All latest + reference
-        [
-            "reference",
+        ["reference"] + sorted([
             atindex_or_none(available_releases, 0),
             atindex_or_none(available_builds, 0),
             atindex_or_none(available_nightlies, 0)
-        ],
+        ]),
 
         # All nightlies + reference
-        ["reference"] + available_nightlies
+        ["reference"] + sorted(available_nightlies)
     ]
 
     # Remove all Nones from the sublists
     ret = [
-        sorted(list(filter(None, comb))) for comb in ret
+        list(filter(None, comb)) for comb in ret
     ]
     # Remove all empty lists
     ret = list(filter(None, ret))

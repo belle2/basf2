@@ -139,7 +139,7 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
       }
     }
 
-    FlavorTaggerInfo* flavorTaggerInfo = selparticles[iProduct]->getRelatedTo<FlavorTaggerInfo>();
+    auto* flavorTaggerInfo = selparticles[iProduct]->getRelatedTo<FlavorTaggerInfo>();
 
     if (flavorTaggerInfo != nullptr) {
       if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") continue;

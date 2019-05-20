@@ -1121,6 +1121,10 @@ namespace Belle2 {
       //TSF module number
       int m_TSFMOD;
 
+      //exp number
+      unsigned _exp;
+      unsigned _run;
+
     };
   }
 } // end namespace Belle2

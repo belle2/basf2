@@ -455,14 +455,12 @@ def index_from_revision(revision, work_folder):
         be found for 'revision'
     """
 
-    # If the requested revision exists, return its index
-    if revision in available_revisions(work_folder):
-        index = available_revisions(work_folder).index(revision)
-    # Else return a None object
-    else:
-        index = None
+    revisions = available_revisions(work_folder) + ["reference"]
 
-    return index
+    if revision in revisions:
+        return revisions.index(revision)
+    else:
+        return None
 
 
 def get_log_file_paths(logger):

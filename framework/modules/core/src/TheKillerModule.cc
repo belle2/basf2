@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <framework/modules/core/TheKillerModule.h>
-#include <signal.h>
+#include <csignal>
 #include <boost/algorithm/string.hpp>
 
 using namespace Belle2;
@@ -96,8 +96,8 @@ void TheKillerModule::event()
 #if defined(__GNUC__) && defined(__x86_64__)
         __asm__("pushf\norl $0x40000,(%rsp)\npopf");
 #endif
-        char* cptr = (char*) malloc(sizeof(int) + 1);
-        int* iptr = (int*)(cptr + 1);
+        auto* cptr = (char*) malloc(sizeof(int) + 1);
+        auto* iptr = (int*)(cptr + 1);
         *iptr = 42;
         free(cptr);
       }

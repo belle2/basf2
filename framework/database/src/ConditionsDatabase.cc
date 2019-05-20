@@ -25,6 +25,8 @@
 #include <cstdio>
 #include <fstream>
 #include <iomanip>
+#include <utility>
+#include <memory>
 #include <sys/file.h>
 
 using namespace std;
@@ -34,7 +36,7 @@ namespace fs = boost::filesystem;
 void ConditionsDatabase::createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel,
                                                const std::string& payloadDir)
 {
-  ConditionsDatabase* database = new ConditionsDatabase(globalTag, payloadDir);
+  auto* database = new ConditionsDatabase(globalTag, payloadDir);
   database->setLogLevel(logLevel);
   database->addLocalDirectory("/cvmfs/belle.cern.ch/conditions", EConditionsDirectoryStructure::c_flatDirectory);
   Database::setInstance(database);
@@ -45,7 +47,7 @@ void ConditionsDatabase::createInstance(const std::string& globalTag, const std:
                                         const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel,
                                         bool invertLogging)
 {
-  ConditionsDatabase* database = new ConditionsDatabase(globalTag, fileBaseLocal);
+  auto* database = new ConditionsDatabase(globalTag, fileBaseLocal);
   database->setRESTBase(restBaseName);
   database->addLocalDirectory(fileBaseName, EConditionsDirectoryStructure::c_logicalSubdirectories);
   database->addLocalDirectory("/cvmfs/belle.cern.ch/conditions", EConditionsDirectoryStructure::c_flatDirectory);
@@ -53,8 +55,8 @@ void ConditionsDatabase::createInstance(const std::string& globalTag, const std:
   Database::setInstance(database);
 }
 
-
-ConditionsDatabase::ConditionsDatabase(const std::string& globalTag, const std::string& payloadDir): m_globalTag(globalTag),
+// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
+ConditionsDatabase::ConditionsDatabase(std::string  globalTag, const std::string& payloadDir): m_globalTag(std::move(globalTag)),
   m_currentExperiment(-1), m_currentRun(0)
 {
   if (payloadDir.empty()) {
@@ -62,11 +64,10 @@ ConditionsDatabase::ConditionsDatabase(const std::string& globalTag, const std::
   } else {
     m_payloadDir = fs::absolute(fs::path(payloadDir)).string();
   }
-  m_downloader.reset(new ConditionsPayloadDownloader(m_payloadDir));
+  m_downloader = std::make_unique<ConditionsPayloadDownloader>(m_payloadDir);
 }
 
-ConditionsDatabase::~ConditionsDatabase() {}
-
+ConditionsDatabase::~ConditionsDatabase() = default;
 
 bool ConditionsDatabase::getData(const EventMetaData& event, DBQuery& query)
 {

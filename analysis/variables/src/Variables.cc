@@ -31,7 +31,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
-#include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -447,8 +446,8 @@ namespace Belle2 {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() > 0) {
         TLorentzVector sum;
-        for (unsigned i = 0; i < daughters.size(); i++)
-          sum += daughters[i]->get4Vector();
+        for (auto daughter : daughters)
+          sum += daughter->get4Vector();
 
         result = sum.M();
       } else {
@@ -703,9 +702,7 @@ namespace Belle2 {
       // q = pB - pX
       TLorentzVector pX;
 
-      for (unsigned i = 0; i < mcDaug.size(); i++) {
-        const MCParticle* mcTemp = mcDaug[i];
-
+      for (auto mcTemp : mcDaug) {
         if (abs(mcTemp->getPDG()) <= 16)
           continue;
 
@@ -823,7 +820,7 @@ namespace Belle2 {
 
     double recoilMCDecayType(const Particle* particle)
     {
-      MCParticle* mcp = particle->getRelatedTo<MCParticle>();
+      auto* mcp = particle->getRelatedTo<MCParticle>();
 
       if (!mcp)
         return -1.0;
@@ -863,21 +860,21 @@ namespace Belle2 {
       std::vector<MCParticle*> daughters = mcp->getDaughters();
 
       // Are any of the daughters primary particles? How many of them are hadrons?
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+      for (auto& daughter : daughters) {
+        if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
           continue;
 
         nPrimaryParticleDaughters++;
-        if (abs(daughters[i]->getPDG()) > 22)
+        if (abs(daughter->getPDG()) > 22)
           nHadronicParticles++;
       }
 
       if (nPrimaryParticleDaughters > 1) {
-        for (unsigned i = 0; i < daughters.size(); i++) {
-          if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+        for (auto& daughter : daughters) {
+          if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
             continue;
 
-          if (abs(daughters[i]->getPDG()) == 12 or abs(daughters[i]->getPDG()) == 14 or abs(daughters[i]->getPDG()) == 16) {
+          if (abs(daughter->getPDG()) == 12 or abs(daughter->getPDG()) == 14 or abs(daughter->getPDG()) == 16) {
             if (!recursive) {
               if (nHadronicParticles == 0) {
                 decayType = 1.0;
@@ -893,7 +890,7 @@ namespace Belle2 {
           }
 
           else if (recursive)
-            checkMCParticleDecay(daughters[i], decayType, recursive);
+            checkMCParticleDecay(daughter, decayType, recursive);
         }
       }
     }

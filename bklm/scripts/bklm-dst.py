@@ -23,15 +23,16 @@
 # Optional arguments:
 #      -s #   to select events with all (0) or exactly one (1) or two or more (2) entries/channel (default is 0)
 #      -n #   to specify the maximum number of events to analyze (no default -> all events)
-#      -d #   to specify the maximum number of event displays (default is 100)
+#      -d #   to specify the maximum number of event displays (default is 0)
 #      -m #   to specify the minimum number of RPC BKLMHit2ds in any one sector (default is 4)
 #      -t tagName   to specify the name of conditions-database global tag (no default)
 #      -l #   to specify whether to use legacy time calculations (1) or not (0) (default is 0)
 #
 # Input:
 #   ROOT DST file written by basf2 (may include multiple folios for one expt/run). For example,
-#   /ghi/fs01/belle2/bdata/Data/Raw/e0003/r04794/sub00/physics.0003.r04794.HLT2.f*.root
-#   /ghi/fs01/belle2/bdata/Data/Raw/e0004/r06380/sub00/cosmic.0004.r06380.HLT2.f00000.root
+#   /ghi/fs01/belle2/bdata/Data/Raw/e0003/r04794/sub00/physics.0003.r04794.HLT1.f*.root
+#   /ghi/fs01/belle2/bdata/Data/Raw/e0004/r06380/sub00/cosmic.0004.r06380.HLT1.f00000.root
+#   /ghi/fs01/belle2/bdata/Data/Raw/e0007/r01650/sub00/cosmic.0007.r01650.HLT1.f*.root
 #
 # Output:
 #   ROOT histogram file named bklmHists-e#r#.root, using the experiment number and run number
@@ -40,8 +41,6 @@
 
 import basf2
 from basf2 import *
-import EventCountLimiter
-from EventCountLimiter import *
 import EventInspector
 from EventInspector import *
 import simulation
@@ -67,8 +66,11 @@ parser.add_option('-s', '--singleEntry',
                   dest='singleEntry', default='0',
                   help='Select events with any (0) or exactly one (1) or more than one (2) entries/channel [0]')
 parser.add_option('-d', '--displays',
-                  dest='displays', default='100',
-                  help='Max # of displayed events [100]')
+                  dest='displays', default='0',
+                  help='Max # of displayed events [0]')
+parser.add_option('-v', '--view',
+                  dest='view', default='2',
+                  help='View event displays using one-dimensional (1) or two-dimensional (2) hits [2]')
 parser.add_option('-m', '--minRPCHits',
                   dest='minRPCHits', default='4',
                   help='Min # of RPC hits in any one sector to display the event [4]')
@@ -91,6 +93,8 @@ if options.nEvents != '':
         print("Maximum number of events to analyze is", maxCount, " - nothing to do.")
         sys.exit()
 
+view = int(options.view)
+
 maxDisplays = int(options.displays)
 
 minRPCHits = int(options.minRPCHits)
@@ -108,6 +112,7 @@ if options.infilename != '':
     if len(fileList) == 0:
         print("No file(s) match {0}".format(inputName))
         sys.exit()
+    inputName = fileList[0].replace("f00000", "f*")
 if options.eNumber != '':
     if not options.eNumber.isdecimal():
         print("Experiment number ({0}) is not valid".format(options.eNumber))
@@ -139,7 +144,7 @@ else:
         print("Input filename's run number ({0}) is not valid".format(run))
         sys.exit()
 if len(inputName) == 0:
-    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT2.f00000.root'.format(exp, run))
+    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT1.f00000.root'.format(exp, run))
     if len(fileList) == 0:
         print("No file(s) found for experiment <{0}> run <{1}>".format(options.eNumber, options.rNumber))
         sys.exit()
@@ -148,7 +153,7 @@ if len(inputName) == 0:
 suffix = '' if singleEntry == 0 else '-singleEntry' if singleEntry == 1 else '-multipleEntries'
 histName = 'bklmHists-e{0}r{1}{2}.root'.format(exp, run, suffix)
 pdfName = 'bklmPlots-e{0}r{1}{2}.pdf'.format(exp, run, suffix)
-eventPdfName = 'bklmEvents-e{0}r{1}{2}.pdf'.format(exp, run, suffix)
+eventPdfName = 'bklmEvents{3}D-e{0}r{1}{2}.pdf'.format(exp, run, suffix, view)
 
 if maxCount >= 0:
     print('bklm-dst: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze', maxCount, 'events using ' + tagName)
@@ -166,19 +171,10 @@ else:
     main.add_module('RootInput', inputFileName=inputName)
 main.add_module('ProgressBar')
 
-eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes, singleEntry)
-if maxCount >= 0:
-    child = create_path()
-    eventCountLimiter = EventCountLimiter(maxCount)
-    eventCountLimiter.if_true(child, AfterConditionPath.CONTINUE)
-    main.add_module(eventCountLimiter)
-    rawdata.add_unpackers(child, components=['BKLM'])
-    child.add_module('BKLMReconstructor')
-    child.add_module(eventInspector)
-else:
-    rawdata.add_unpackers(main, components=['BKLM'])
-    main.add_module('BKLMReconstructor')
-    main.add_module(eventInspector)
+eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes, singleEntry, view)
+rawdata.add_unpackers(main, components=['BKLM'])
+main.add_module('BKLMReconstructor')
+main.add_module(eventInspector)
 
-process(main)
+process(main, max_event=maxCount)
 print(statistics)

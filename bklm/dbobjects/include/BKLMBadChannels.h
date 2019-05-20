@@ -100,9 +100,6 @@ namespace Belle2 {
     //! Set comment
     void setComment(const std::string& comment) {m_comment = comment;}
 
-    //! convert geometry position to a channel ID
-    int geometryToChannelId(int isForward, int sector, int layer, int plane, int strip) const;
-
     //! print hot channels
     void printHotChannels() const;
 

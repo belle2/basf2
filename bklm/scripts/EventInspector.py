@@ -49,7 +49,7 @@ class EventInspector(basf2.Module):
     #: bit mask for unique module identifier (end, sector, layer)
     BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
-    def __init__(self, exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes, singleEntry):
+    def __init__(self, exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes, singleEntry, view):
         """Constructor
 
         Arguments:
@@ -62,6 +62,7 @@ class EventInspector(basf2.Module):
             minRPCHits (int): min # of RPC BKLMHit2ds in any sector for event display
             legacyTimes (bool): true to correct BKLMHit{1,2}d times in legacy reconstruction, False otherwise
             singleEntry (int): select events with any (0) or exactly one (1) or more than one (2) entries/channel
+            view (int): view event displays using one-dimensional (1) or two-dimensional (2) BKLMHits
         """
         super().__init__()
         #: internal copy of experiment number
@@ -82,6 +83,8 @@ class EventInspector(basf2.Module):
         self.legacyTimes = legacyTimes
         #: select events with any (0) or exactly one (1) or more than one (2) entries/channel
         self.singleEntry = singleEntry
+        #: view event displays using one-dimensional (1) or two-dimensional (2) hits
+        self.view = view
         #: event counter (needed for PDF table of contents' ordinal event#)
         self.eventCounter = 0
         #: event-display counter
@@ -126,7 +129,13 @@ class EventInspector(basf2.Module):
         #: blank scatterplot to define the bounds of the BKLM end view
         self.hist_XY = ROOT.TH2F('XY', ' ;x;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_XY.SetStats(False)
-        #: blank scatterplot to define the bounds of the BKLM side view
+        #: blank scatterplot to define the bounds of the BKLM side view for 1D hits
+        self.hist_ZY1D = [0, 0]
+        self.hist_ZY1D[0] = ROOT.TH2F('ZY0', ' ;z;y', 10, -200.0, 300.0, 10, -150.0, 350.0)
+        self.hist_ZY1D[1] = ROOT.TH2F('ZY1', ' ;z;y', 10, -200.0, 300.0, 10, -150.0, 350.0)
+        self.hist_ZY1D[0].SetStats(False)
+        self.hist_ZY1D[0].SetStats(False)
+        #: blank scatterplot to define the bounds of the BKLM side view for 2D hits
         self.hist_ZY = ROOT.TH2F('ZY', ' ;z;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_ZY.SetStats(False)
 
@@ -138,14 +147,19 @@ class EventInspector(basf2.Module):
         self.sectorFBToDC = [11, 15, 2, 6, 10, 14, 3, 7, 9, 13, 0, 4, 8, 12, 1, 5]
         #: map for data concentrator -> sectorFB
         self.dcToSectorFB = [10, 14, 2, 6, 11, 15, 3, 7, 12, 8, 4, 0, 13, 9, 5, 1]
+        #: Time-calibration constants obtained from experiment 7 run 1505
         #: RPC-time calibration adjustment (ns) for rawKLMs
-        self.t0Cal = 236  # for rawKLMs
+        self.t0Cal = 312
+        #: RPC-time calibration adjustment (ns) for BKLMHit1ds
+        self.t0Cal1d = 325
         #: RPC-time calibration adjustment (ns) for BKLMHit2ds
-        self.t0Cal2d = 217  # for BKLMHit2ds
+        self.t0Cal2d = 308
         #: scint-ctime calibration adjustment (ns) for rawKLMs
-        self.ct0Cal = 368
+        self.ct0Cal = 455
+        #: scint-ctime calibration adjustment (ns) for BKLMHit1ds
+        self.ct0Cal1d = 533
         #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
-        self.ct0Cal2d = 349
+        self.ct0Cal2d = 520
         #: per-sector variations in RPC-time calibration adjustment (ns) for rawKLMs
         self.t0RPC = [8, -14, -6, -14, -2, 10, 9, 13, 0, -10, -14, -20, 2, 6, 14, 11]
         #: per-sector variations in scint-ctime calibration adjustment (ns) for rawKLMs
@@ -155,6 +169,7 @@ class EventInspector(basf2.Module):
         self.histogramFile = ROOT.TFile.Open(self.histName, "RECREATE")
         # All histograms/scatterplots in the output file will show '# of events' only
         ROOT.gStyle.SetOptStat(10)
+        ROOT.gStyle.SetOptFit(111)
 
         # create the rawKLM histograms
 
@@ -200,12 +215,12 @@ class EventInspector(basf2.Module):
         self.hist_rawKLMadcExtraScint = ROOT.TH2F('rawKLMadcExtraScint',
                                                   expRun + 'RawKLM Scint adcExtra bits;' +
                                                   'Sector # (0-7 = backward, 8-15 = forward);' +
-                                                  'adcExtra [should be 0]',
+                                                  'adcExtra',
                                                   16, -0.5, 15.5, 16, -0.5, 15.5)
         #: histogram of number of hits, including multiple entries on one readout channel
         self.hist_rawKLMsizeMultihit = ROOT.TH1F('rawKLMsizeMultihit', expRun + 'RawKLM word count (N/channel)', 400, -0.5, 799.5)
         #: histogram of number of hits, at most one entry per readout channel
-        self.hist_rawKLMsize = ROOT.TH1F('rawKLMsize', expRun + 'RawKLM word count (1/channel)', 200, -0.5, 199.5)
+        self.hist_rawKLMsize = ROOT.TH1F('rawKLMsize', expRun + 'RawKLM word count (1/channel)', 250, -0.5, 499.5)
         #: histograms of number of hits, including multiple entries on one readout channel, indexed by sector#
         self.hist_rawKLMsizeByDCMultihit = []
         #: histograms of number of hits, at most one entry per readout channel, indexed by sector#
@@ -214,12 +229,12 @@ class EventInspector(basf2.Module):
             dc = self.sectorFBToDC[sectorFB]
             copper = dc & 0x03
             finesse = dc >> 2
-            label = 'rawKLM_S{0}_sizeMultihit'.format(sectorFB)
+            label = 'rawKLM_S{0:02d}_sizeMultihit'.format(sectorFB)
             title = '{0}sector {1} [COPPER {2} finesse {3}] word count (N/channel)'.format(expRun, sectorFB, copper, finesse)
-            self.hist_rawKLMsizeByDCMultihit.append(ROOT.TH1F(label, title, 100, -0.5, 99.5))
-            label = 'rawKLM_S{0}_size'.format(sectorFB)
+            self.hist_rawKLMsizeByDCMultihit.append(ROOT.TH1F(label, title, 100, -0.5, 199.5))
+            label = 'rawKLM_S{0:02d}_size'.format(sectorFB)
             title = '{0}sector {1} [COPPER {2} finesse {3}] word count (1/channel)'.format(expRun, sectorFB, copper, finesse)
-            self.hist_rawKLMsizeByDC.append(ROOT.TH1F(label, title, 100, -0.5, 99.5))
+            self.hist_rawKLMsizeByDC.append(ROOT.TH1F(label, title, 100, -0.5, 199.5))
         #: scatterplots of multiplicity of entries in one readout channel vs lane/axis, indexed by sector#
         self.hist_rawKLMchannelMultiplicity = []
         #: scatterplots of multiplicity of entries in one readout channel vs lane/axis/channel, indexed by sector#
@@ -325,23 +340,23 @@ class EventInspector(basf2.Module):
             [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
             [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         for sectorFB in range(0, 16):
-            label = 'mappedChannelOccupancy_A0S{0}Prompt'.format(sectorFB)
-            title = '{0}In-time mapped channel occupancy for axis 0 sector {1};lane;channel'.format(expRun, sectorFB)
+            label = 'mappedChannelOccupancy_S{0:02d}ZPrompt'.format(sectorFB)
+            title = '{0}In-time mapped channel occupancy for sector {1} z hits;lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyPrompt[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'mappedChannelOccupancy_A0S{0}Bkgd'.format(sectorFB)
-            title = '{0}Out-of-time mapped channel occupancy for axis 0 sector {1};lane;channel'.format(expRun, sectorFB)
+            label = 'mappedChannelOccupancy_S{0:02d}ZBkgd'.format(sectorFB)
+            title = '{0}Out-of-time mapped channel occupancy for sector {1} z hits;lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyBkgd[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'unmappedChannelOccupancy_A0S{0}'.format(sectorFB)
-            title = '{0}Unmapped channel occupancy for axis 0 sector {1};lane;channel'.format(expRun, sectorFB)
+            label = 'unmappedChannelOccupancy_S{0:02d}Z'.format(sectorFB)
+            title = '{0}Unmapped channel occupancy for sector {1} z hits;lane;channel'.format(expRun, sectorFB)
             self.hist_unmappedChannelOccupancy[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'mappedChannelOccupancy_A1S{0}Prompt'.format(sectorFB)
-            title = '{0}In-time mapped occupancy for axis 1 sector {1};lane;channel'.format(expRun, sectorFB)
+            label = 'mappedChannelOccupancy_S{0:02d}PhiPrompt'.format(sectorFB)
+            title = '{0}In-time mapped occupancy for sector {1} phi hits;lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyPrompt[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'mappedChannelOccupancy_A1S{0}Bkgd'.format(sectorFB)
-            title = '{0}Out-of-time mapped occupancy for axis 1 sector {1};lane;channel'.format(expRun, sectorFB)
+            label = 'mappedChannelOccupancy_S{0:02d}PhiBkgd'.format(sectorFB)
+            title = '{0}Out-of-time mapped occupancy for sector {1} phi hits;lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyBkgd[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = 'unmappedChannelOccupancy_A1S{0}'.format(sectorFB)
-            title = '{0}Unmapped channel occupancy for axis 1 sector {1};lane;channel'.format(expRun, sectorFB)
+            label = 'unmappedChannelOccupancy_S{0:02d}Phi'.format(sectorFB)
+            title = '{0}Unmapped channel occupancy for sector {1} phi hits;lane;channel'.format(expRun, sectorFB)
             self.hist_unmappedChannelOccupancy[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
         #: scatterplot of RPC TDC low-order bits vs sector (should be 0 since granularity is 4 ns)
         self.hist_RPCTimeLowBitsBySector = ROOT.TH2F('RPCTimeLowBitsBySector',
@@ -385,6 +400,11 @@ class EventInspector(basf2.Module):
                                                        'Sector # (0-7 = backward, 8-15 = forward);' +
                                                        't - t(trigger) - dt(sector) (ns)',
                                                        16, -0.5, 15.5, 128, -0.5, 1023.5)
+        #: histogram of RPC mapped-channel REVO9 range in event
+        self.hist_mappedRPCCtimeRange = ROOT.TH1F('mappedRPCCtimeRange',
+                                                  expRun + 'RPC Ctime-range in event;' +
+                                                  'CtimeMax - CtimeMin (ns)',
+                                                  128, -0.5, 8191.5)
         #: scatterplot of RPC mapped-channel REVO9 range in event vs sector
         self.hist_mappedRPCCtimeRangeBySector = ROOT.TH2F('mappedRPCCtimeRangeBySector',
                                                           expRun + 'RPC Ctime-range in event;' +
@@ -403,7 +423,7 @@ class EventInspector(basf2.Module):
                                                       't - t(trigger) (ns)',
                                                       16, -0.5, 15.5, 128, -0.5, 1023.5)
         #: scatterplot of scint TDC low-order bits vs sector
-        self.hist_ScintTimeLowBitsBySector = ROOT.TH2F('ScintTimeLowBitsbySector',
+        self.hist_ScintTimeLowBitsBySector = ROOT.TH2F('ScintTimeLowBitsBySector',
                                                        expRun + 'Scint TDC lowest-order bits;' +
                                                        'Sector # (0-7 = backward, 8-15 = forward);' +
                                                        'TDC % 4 (ns)',
@@ -454,12 +474,17 @@ class EventInspector(basf2.Module):
                 label = 'mappedScintCtime_S{0:02d}L{1:02d}'.format(sectorFB, layer)
                 title = '{0}Scint sector {1} layer {2} ctime distribution;ctime - ct(trigger) (ns)'.format(expRun, sectorFB, layer)
                 self.hist_mappedScintCtimePerLayer[sectorFB][layer] = ROOT.TH1F(label, title, 32, -0.5, 1023.5)
+        #: histogram of scint mapped-channel CTIME range in event
+        self.hist_mappedScintCtimeRange = ROOT.TH1F('mappedScintCtimeRange',
+                                                    expRun + 'Scint ctime-range in event;' +
+                                                    'ctimeMax - ctimeMin (ns)',
+                                                    128, -0.5, 1023.5)
         #: scatterplot of scint mapped-channel CTIME range in event vs sector
         self.hist_mappedScintCtimeRangeBySector = ROOT.TH2F('mappedScintCtimeRangeBySector',
                                                             expRun + 'Scint ctime-range in event;' +
                                                             'Sector # (0-7 = backward, 8-15 = forward);' +
                                                             'ctimeMax - ctimeMin (ns)',
-                                                            16, -0.5, 15.5, 128, -0.5, 8191.5)
+                                                            16, -0.5, 15.5, 128, -0.5, 1023.5)
         #: histogram of scint unmapped-channel CTIME value relative to event's trigger Ctime
         self.hist_unmappedScintCtime = ROOT.TH1F('unmappedScintCtime',
                                                  expRun + 'Scint unmapped-strip ctime distribution;' +
@@ -531,37 +556,37 @@ class EventInspector(basf2.Module):
                                            'Hit index',
                                            16, 281.5, 345.5, 50, -0.5, 49.5)
         #: histogram of RawKLM[] header's trigger CTIME relative to its final-data-word trigger REVO9 time
-        self.hist_trigCtime_trigRevo9time = ROOT.TH1F('trigCtime_trigRevo9time',
-                                                      expRun + 'trigCtime - trigRevo9time (ns)',
-                                                      256, -1024.5, 1023.5)
+        self.hist_trigCtimeVsTrigRevo9time = ROOT.TH1F('trigCtimeVsTrigRevo9time',
+                                                       expRun + 'trigCtime - trigRevo9time (ns)',
+                                                       256, -1024.5, 1023.5)
         #: histogram of RPC TDC range
-        self.hist_dtTDC = ROOT.TH1F('dtTDC',
-                                    expRun + 'RPC TDC range;' +
-                                    'maxTDC - minTDC (ns)',
-                                    128, -0.5, 1023.5)
-        #: histogram of RPC Ctime range
-        self.hist_dtCtime = ROOT.TH1F('dtCtime',
-                                      expRun + 'RPC Ctime range;' +
-                                      'maxCtime - minCtime (ns)',
-                                      32, -0.5, 255.5)
-        #: scatterplot of RPC TDC range vs Ctime range
-        self.hist_dtTDCvsdtCtime = ROOT.TH2F('dtTDCvsdtCtime',
-                                             expRun + 'RPC Ctime range vs TDC range;' +
-                                             'maxTDC - minTDC (ns);' +
-                                             'maxCtime - minCtime (ns)',
-                                             128, -0.5, 1023.5, 128, -0.5, 1023.5)
-        #: scatterplot of RPC TDC range vs time
-        self.hist_dtTDCvsTime = ROOT.TH2F('dtTDCvsTime',
-                                          expRun + 'RPC TDC range vs time;' +
-                                          't - t(trigger) (ns);' +
+        self.hist_tdcRangeRPC = ROOT.TH1F('tdcRangeRPC',
+                                          expRun + 'RPC TDC range;' +
                                           'maxTDC - minTDC (ns)',
-                                          128, -0.5, 1023.5, 128, -0.5, 1023.5)
-        #: scatterplot of RPC Ctime range vs time
-        self.hist_dtCtimevsTime = ROOT.TH2F('dtCtimevsTime',
-                                            expRun + 'RPC Ctime range vs time;' +
-                                            't - t(trigger) (ns);' +
+                                          128, -0.5, 1023.5)
+        #: histogram of RPC Ctime range
+        self.hist_ctimeRangeRPC = ROOT.TH1F('ctimeRangeRPC',
+                                            expRun + 'RPC Ctime range;' +
                                             'maxCtime - minCtime (ns)',
-                                            128, -0.5, 1023.5, 32, -0.5, 255.5)
+                                            128, -0.5, 1023.5)
+        #: scatterplot of RPC TDC range vs Ctime range
+        self.hist_tdcRangeVsCtimeRangeRPC = ROOT.TH2F('tdcRangeVsCtimeRangeRPC',
+                                                      expRun + 'RPC Ctime range vs TDC range;' +
+                                                      'maxTDC - minTDC (ns);' +
+                                                      'maxCtime - minCtime (ns)',
+                                                      128, -0.5, 1023.5, 128, -0.5, 1023.5)
+        #: scatterplot of RPC TDC range vs time
+        self.hist_tdcRangeVsTimeRPC = ROOT.TH2F('tdcRangeVsTimeRPC',
+                                                expRun + 'RPC TDC range vs time;' +
+                                                't - t(trigger) (ns);' +
+                                                'maxTDC - minTDC (ns)',
+                                                128, -0.5, 1023.5, 128, -0.5, 1023.5)
+        #: scatterplot of RPC Ctime range vs time
+        self.hist_ctimeRangeVsTimeRPC = ROOT.TH2F('ctimeRangeVsTimeRPC',
+                                                  expRun + 'RPC Ctime range vs time;' +
+                                                  't - t(trigger) (ns);' +
+                                                  'maxCtime - minCtime (ns)',
+                                                  128, -0.5, 1023.5, 128, -0.5, 1023.5)
 
         # Create the BKLMHit1d-related histograms
 
@@ -614,20 +639,20 @@ class EventInspector(basf2.Module):
                                       't(phi) - t(z) (ns)',
                                       50, -100.0, 100.0)
         #: histogram of scint-phi BKLMHit1d time relative to event's trigger Ctime, corrected for inter-sector variation
-        self.hist_tphiScintCal1d = ROOT.TH1F('tphiScintCal1d',
-                                             expRun + 'Scintillator BKLMHit1d phi-strip ctime distribution;' +
-                                             'ctime(phi) - ct(trigger) - dt(sector) (ns)',
-                                             128, -0.5, 1023.5)
+        self.hist_ctphiScintCal1d = ROOT.TH1F('ctphiScintCal1d',
+                                              expRun + 'Scintillator BKLMHit1d phi-strip ctime distribution;' +
+                                              'ctime(phi) - ct(trigger) - dt(sector) (ns)',
+                                              128, -0.5, 1023.5)
         #: histogram of scint-z BKLMHit1d time relative to event's trigger Ctime, corrected for inter-sector variation
-        self.hist_tzScintCal1d = ROOT.TH1F('tzScintCal1d',
-                                           expRun + 'Scintillator BKLMHit1d z-strip ctime distribution;' +
-                                           'ctime(z) - ct(trigger) - dt(sector) (ns)',
-                                           128, -0.5, 1023.5)
+        self.hist_ctzScintCal1d = ROOT.TH1F('ctzScintCal1d',
+                                            expRun + 'Scintillator BKLMHit1d z-strip ctime distribution;' +
+                                            'ctime(z) - ct(trigger) - dt(sector) (ns)',
+                                            128, -0.5, 1023.5)
         #: histogram of scint-phi and -z BKLMHit1d avg time relative to event's trigger Ctime, corrected for inter-sector variation
-        self.hist_tScintCal1d = ROOT.TH1F('tScintCal1d',
-                                          expRun + 'Scintillator BKLMHit1d x 2 calibrated average-time distribution;' +
-                                          '0.5*[ctime(phi) + ctime(z)] - ct(trigger) - dt(sector) (ns)',
-                                          128, -0.5, 1023.5)
+        self.hist_ctScintCal1d = ROOT.TH1F('ctScintCal1d',
+                                           expRun + 'Scintillator BKLMHit1d x 2 calibrated average-time distribution;' +
+                                           '0.5*[ctime(phi) + ctime(z)] - ct(trigger) - dt(sector) (ns)',
+                                           128, -0.5, 1023.5)
         #: histogram of scint-phi and -z BKLMHit1d time difference
         self.hist_dtScint1d = ROOT.TH1F('dtScint1d',
                                         expRun + 'Scintillator BKLMHit1d x 2 time-difference distribution;' +
@@ -887,38 +912,41 @@ class EventInspector(basf2.Module):
         canvas.GetPad(0).Update()
         self.hist_nDigit.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nDigit.GetName()))
-        self.hist_nRawKLM.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nRawKLM.GetName()))
-        self.hist_rawKLMnumEvents.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnumEvents.GetName()))
-        self.hist_rawKLMnumNodes.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnumNodes.GetName()))
+        # self.hist_nRawKLM.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nRawKLM.GetName()))
+        # self.hist_rawKLMnumEvents.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnumEvents.GetName()))
+        # self.hist_rawKLMnumNodes.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnumNodes.GetName()))
         self.hist_rawKLMnodeID.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnodeID.GetName()))
         self.hist_rawKLMlaneFlag.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMlaneFlag.GetName()))
-        self.hist_rawKLMtdcExtraRPC.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtdcExtraRPC.GetName()))
-        self.hist_rawKLMadcExtraRPC.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMadcExtraRPC.GetName()))
-        self.hist_rawKLMtdcExtraScint.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtdcExtraScint.GetName()))
-        self.hist_rawKLMadcExtraScint.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMadcExtraScint.GetName()))
+        # self.hist_rawKLMtdcExtraRPC.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtdcExtraRPC.GetName()))
+        # self.hist_rawKLMadcExtraRPC.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMadcExtraRPC.GetName()))
+        # self.hist_rawKLMtdcExtraScint.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtdcExtraScint.GetName()))
+        # self.hist_rawKLMadcExtraScint.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMadcExtraScint.GetName()))
         self.hist_rawKLMsizeMultihit.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeMultihit.GetName()))
         self.hist_rawKLMsize.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsize.GetName()))
+        for dc in range(0, 16):
+            self.hist_rawKLMsizeByDCMultihit[dc].Draw()
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeByDCMultihit[dc].GetName()))
         for dc in range(0, 16):
             self.hist_rawKLMsizeByDC[dc].Draw()
             canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeByDC[dc].GetName()))
         for dc in range(0, 16):
             self.hist_rawKLMchannelMultiplicity[dc].Draw("box")
             canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMchannelMultiplicity[dc].GetName()))
-        self.hist_mappedSectorOccupancy.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedSectorOccupancy.GetName()))
-        self.hist_unmappedSectorOccupancy.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedSectorOccupancy.GetName()))
+        # self.hist_mappedSectorOccupancy.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedSectorOccupancy.GetName()))
+        # self.hist_unmappedSectorOccupancy.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedSectorOccupancy.GetName()))
         self.hist_mappedRPCSectorOccupancy.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCSectorOccupancy.GetName()))
         self.hist_unmappedRPCSectorOccupancy.Draw()
@@ -932,27 +960,36 @@ class EventInspector(basf2.Module):
         canvas.GetPad(0).SetGrid(1, 1)
         canvas.GetPad(1).SetGrid(1, 1)
         canvas.GetPad(2).SetGrid(1, 1)
+        # border of mapped z-readout channels for RPCs (axis=0)
         borderRPC0x = [7.5, 20.5, 20.5, 7.5, 7.5]
         borderRPC0y = [0.5, 0.5, 48.5, 48.5, 0.5]
         borderRPC0yChimney = [0.5, 0.5, 34.5, 34.5, 0.5]
+        # border of mapped phi-readout channels for scints (axis=0)
         borderScint0x = [0.5, 1.5, 1.5, 2.5, 2.5, 1.5, 1.5, 0.5, 0.5]
         borderScint0y = [4.5, 4.5, 2.5, 2.5, 44.5, 44.5, 41.5, 41.5, 4.5]
+        # border of mapped phi-readout channels for RPCs (axis=1)
         borderRPC1x = [7.5, 20.5, 20.5, 11.5, 11.5, 7.5, 7.5]
         borderRPC1y = [0.5, 0.5, 48.5, 48.5, 36.5, 36.5, 0.5]
+        # border of mapped z-readout channels for scints (axis=1)
         borderScint1x = [0.5, 2.5, 2.5, 0.5, 0.5]
         borderScint1ay = [0.5, 0.5, 9.5, 9.5, 0.5]
         borderScint1by = [15.5, 15.5, 60.5, 60.5, 15.5]
         borderScint1xChimney = [0.5, 1.5, 1.5, 2.5, 2.5, 1.5, 1.5, 0.5, 0.5]
         borderScint1ayChimney = [0.5, 0.5, 0.5, 0.5, 9.5, 9.5, 8.5, 8.5, 0.5]
         borderScint1byChimney = [15.5, 15.5, 16.5, 16.5, 45.5, 45.5, 45.5, 45.5, 15.5]
+        # graphs of z-readout-channel borders for RPCs (axis=0)
         graphRPC0 = self.makeGraph(borderRPC0x, borderRPC0y)
         graphRPC0Chimney = self.makeGraph(borderRPC0x, borderRPC0yChimney)
+        # graph of phi-readout-channel border for scints (axis=0)
         graphScint0 = self.makeGraph(borderScint0x, borderScint0y)
+        # graph of phi-readout-channel border for RPCs (axis=1)
         graphRPC1 = self.makeGraph(borderRPC1x, borderRPC1y)
+        # graphs of z-readout-channel borders for scints (axis=1)
         graphScint1a = self.makeGraph(borderScint1x, borderScint1ay)
         graphScint1b = self.makeGraph(borderScint1x, borderScint1by)
         graphScint1aChimney = self.makeGraph(borderScint1xChimney, borderScint1ayChimney)
         graphScint1bChimney = self.makeGraph(borderScint1xChimney, borderScint1byChimney)
+        # labels for the above borders
         textRPC0 = self.makeText(6.8, 25.0, "RPC z")
         textScint0 = self.makeText(3.2, 25.0, "Scint #phi")
         textRPC1 = self.makeText(6.8, 25.0, "RPC #phi")
@@ -965,14 +1002,17 @@ class EventInspector(basf2.Module):
                     zmax = z if z > zmax else zmax
             self.hist_mappedChannelOccupancyPrompt[sectorFB][0].SetMaximum(zmax)
             canvas.cd(1)
-            self.hist_mappedChannelOccupancyPrompt[sectorFB][0].Draw("colz")
+            self.hist_mappedChannelOccupancyPrompt[sectorFB][0].Draw("colz")  # z hits
             if sectorFB == 2:
                 graphRPC0Chimney.Draw("L")
+                graphScint1aChimney.Draw("L")
+                graphScint1bChimney.Draw("L")
             else:
                 graphRPC0.Draw("L")
-            graphScint0.Draw("L")
+                graphScint1a.Draw("L")
+                graphScint1b.Draw("L")
             textRPC0.Draw()
-            textScint0.Draw()
+            textScint1.Draw()
             zmax = 1
             for lane in range(8, 21):
                 for channel in range(0, 64):
@@ -980,16 +1020,11 @@ class EventInspector(basf2.Module):
                     zmax = z if z > zmax else zmax
             self.hist_mappedChannelOccupancyPrompt[sectorFB][1].SetMaximum(zmax)
             canvas.cd(2)
-            self.hist_mappedChannelOccupancyPrompt[sectorFB][1].Draw("colz")
+            self.hist_mappedChannelOccupancyPrompt[sectorFB][1].Draw("colz")  # phi hits
             graphRPC1.Draw("L")
-            if sectorFB == 2:
-                graphScint1aChimney.Draw("L")
-                graphScint1bChimney.Draw("L")
-            else:
-                graphScint1a.Draw("L")
-                graphScint1b.Draw("L")
+            graphScint0.Draw("L")
             textRPC1.Draw()
-            textScint1.Draw()
+            textScint0.Draw()
             canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedChannelOccupancyPrompt[sectorFB][0].GetName()))
         for sectorFB in range(0, 16):
             zmax = 1
@@ -999,14 +1034,17 @@ class EventInspector(basf2.Module):
                     zmax = z if z > zmax else zmax
             self.hist_mappedChannelOccupancyBkgd[sectorFB][0].SetMaximum(zmax)
             canvas.cd(1)
-            self.hist_mappedChannelOccupancyBkgd[sectorFB][0].Draw("colz")
+            self.hist_mappedChannelOccupancyBkgd[sectorFB][0].Draw("colz")  # z hits
             if sectorFB == 2:
                 graphRPC0Chimney.Draw("L")
+                graphScint1aChimney.Draw("L")
+                graphScint1bChimney.Draw("L")
             else:
                 graphRPC0.Draw("L")
-            graphScint0.Draw("L")
+                graphScint1a.Draw("L")
+                graphScint1b.Draw("L")
             textRPC0.Draw()
-            textScint0.Draw()
+            textScint1.Draw()
             zmax = 1
             for lane in range(8, 21):
                 for channel in range(0, 64):
@@ -1014,92 +1052,113 @@ class EventInspector(basf2.Module):
                     zmax = z if z > zmax else zmax
             self.hist_mappedChannelOccupancyBkgd[sectorFB][1].SetMaximum(zmax)
             canvas.cd(2)
-            self.hist_mappedChannelOccupancyBkgd[sectorFB][1].Draw("colz")
+            self.hist_mappedChannelOccupancyBkgd[sectorFB][1].Draw("colz")  # phi hits
             graphRPC1.Draw("L")
-            if sectorFB == 2:
-                graphScint1aChimney.Draw("L")
-                graphScint1bChimney.Draw("L")
-            else:
-                graphScint1a.Draw("L")
-                graphScint1b.Draw("L")
+            graphScint0.Draw("L")
             textRPC1.Draw()
-            textScint1.Draw()
+            textScint0.Draw()
             canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedChannelOccupancyBkgd[sectorFB][0].GetName()))
         for sectorFB in range(0, 16):
             canvas.cd(1)
-            self.hist_unmappedChannelOccupancy[sectorFB][0].Draw("colz")
+            self.hist_unmappedChannelOccupancy[sectorFB][0].Draw("colz")  # z hits
             if sectorFB == 2:
                 graphRPC0Chimney.Draw("L")
-            else:
-                graphRPC0.Draw("L")
-            graphScint0.Draw("L")
-            textRPC0.Draw()
-            textScint0.Draw()
-            canvas.cd(2)
-            self.hist_unmappedChannelOccupancy[sectorFB][1].Draw("colz")
-            graphRPC1.Draw("L")
-            if sectorFB == 2:
                 graphScint1aChimney.Draw("L")
                 graphScint1bChimney.Draw("L")
             else:
+                graphRPC0.Draw("L")
                 graphScint1a.Draw("L")
                 graphScint1b.Draw("L")
-            textRPC1.Draw()
+            textRPC0.Draw()
             textScint1.Draw()
+            canvas.cd(2)
+            self.hist_unmappedChannelOccupancy[sectorFB][1].Draw("colz")  # phi hits
+            graphRPC1.Draw("L")
+            graphScint0.Draw("L")
+            textRPC1.Draw()
+            textScint0.Draw()
             canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedChannelOccupancy[sectorFB][0].GetName()))
         canvas.Clear()
         canvas.Divide(1, 1)
-        self.hist_RPCTimeLowBitsBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCTimeLowBitsBySector.GetName()))
+        # self.hist_RPCTimeLowBitsBySector.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCTimeLowBitsBySector.GetName()))
+        timeFit = ROOT.TF1("timeFit", "gausn(0)+pol0(3)", 100.0, 500.0)
+        timeFit.SetParName(0, "Area")
+        timeFit.SetParameter(0, 1000.0)
+        timeFit.SetParName(1, "Mean")
+        timeFit.SetParameter(1, 300.0)
+        timeFit.SetParName(2, "Sigma")
+        timeFit.SetParameter(2, 20.0)
+        timeFit.SetParName(3, "Bkgd")
+        timeFit.SetParameter(3, 100.0)
+        timeFit.SetParameter(0, self.hist_mappedRPCTime.GetEntries())
+        self.hist_mappedRPCTime.Fit("timeFit", "QR")
         self.hist_mappedRPCTime.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTime.GetName()))
-        self.hist_mappedRPCTimeCal.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal.GetName()))
-        self.hist_mappedRPCTimeCal2.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal2.GetName()))
         self.hist_mappedRPCTimeBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeBySector.GetName()))
+        timeFit.SetParameter(0, self.hist_mappedRPCTimeCal.GetEntries())
+        self.hist_mappedRPCTimeCal.Fit("timeFit", "QR")
+        self.hist_mappedRPCTimeCal.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal.GetName()))
         self.hist_mappedRPCTimeCalBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCalBySector.GetName()))
-        self.hist_mappedRPCCtimeRangeBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCCtimeRangeBySector.GetName()))
+        # not useful anymore
+        # self.hist_mappedRPCTimeCal2.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal2.GetName()))
         self.hist_unmappedRPCTime.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCTime.GetName()))
         self.hist_unmappedRPCTimeBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCTimeBySector.GetName()))
         for sectorFB in range(0, 16):
+            timeFit.SetParameter(0, self.hist_mappedRPCTimePerSector[sectorFB].GetEntries())
+            self.hist_mappedRPCTimePerSector[sectorFB].Fit("timeFit", "QR")
             self.hist_mappedRPCTimePerSector[sectorFB].Draw()
             canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimePerSector[sectorFB].GetName()))
         for sectorFB in range(0, 16):
-            for layer in range(0, 15):
+            for layer in range(2, 15):
+                timeFit.SetParameter(0, self.hist_mappedRPCTimePerLayer[sectorFB][layer].GetEntries())
+                self.hist_mappedRPCTimePerLayer[sectorFB][layer].Fit("timeFit", "QR")
                 self.hist_mappedRPCTimePerLayer[sectorFB][layer].Draw()
                 canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimePerLayer[sectorFB][layer].GetName()))
-        self.hist_ScintTimeLowBitsBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintTimeLowBitsBySector.GetName()))
-        self.hist_mappedScintTDC.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTDC.GetName()))
-        self.hist_mappedScintTDCBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTDCBySector.GetName()))
-        self.hist_mappedScintTime.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTime.GetName()))
-        self.hist_mappedScintTimeBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTimeBySector.GetName()))
-        self.hist_mappedScintCtimeRangeBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeRangeBySector.GetName()))
-        self.hist_unmappedScintTime.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintTime.GetName()))
-        self.hist_unmappedScintTimeBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintTimeBySector.GetName()))
-        self.hist_mappedScintCtime0.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime0.GetName()))
-        self.hist_mappedScintCtime1.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime1.GetName()))
+        # self.hist_ScintTimeLowBitsBySector.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintTimeLowBitsBySector.GetName()))
+        # self.hist_mappedScintTDC.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTDC.GetName()))
+        # self.hist_mappedScintTDCBySector.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTDCBySector.GetName()))
+        # self.hist_mappedScintTime.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTime.GetName()))
+        # self.hist_mappedScintTimeBySector.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintTimeBySector.GetName()))
+        # self.hist_unmappedScintTime.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintTime.GetName()))
+        # self.hist_unmappedScintTimeBySector.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintTimeBySector.GetName()))
+        # self.hist_mappedScintCtime0.Draw()
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime0.GetName()))
+        # self.hist_mappedScintCtime1.Draw("box")
+        # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime1.GetName()))
+        ctimeFit = ROOT.TF1("ctimeFit", "gausn(0)+pol0(3)", 300.0, 700.0)
+        ctimeFit.SetParName(0, "Area")
+        ctimeFit.SetParameter(0, 1000.0)
+        ctimeFit.SetParName(1, "Mean")
+        ctimeFit.SetParameter(1, 450.0)
+        ctimeFit.SetParName(2, "Sigma")
+        ctimeFit.SetParameter(2, 40.0)
+        ctimeFit.SetParLimits(2, 15.0, 80.0)
+        ctimeFit.SetParName(3, "Bkgd")
+        ctimeFit.SetParameter(3, 10.0)
+        ctimeFit.SetParameter(0, self.hist_mappedScintCtime.GetEntries())
+        self.hist_mappedScintCtime.Fit("ctimeFit", "QR")
         self.hist_mappedScintCtime.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime.GetName()))
-        self.hist_mappedScintCtimeCal.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCal.GetName()))
         self.hist_mappedScintCtimeBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeBySector.GetName()))
+        ctimeFit.SetParameter(0, self.hist_mappedScintCtimeCal.GetEntries())
+        self.hist_mappedScintCtimeCal.Fit("ctimeFit", "QR")
+        self.hist_mappedScintCtimeCal.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCal.GetName()))
         self.hist_mappedScintCtimeCalBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCalBySector.GetName()))
         self.hist_unmappedScintCtime.Draw()
@@ -1107,10 +1166,14 @@ class EventInspector(basf2.Module):
         self.hist_unmappedScintCtimeBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintCtimeBySector.GetName()))
         for sectorFB in range(0, 16):
+            ctimeFit.SetParameter(0, self.hist_mappedScintCtimePerSector[sectorFB].GetEntries())
+            self.hist_mappedScintCtimePerSector[sectorFB].Fit("ctimeFit", "QR")
             self.hist_mappedScintCtimePerSector[sectorFB].Draw()
             canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimePerSector[sectorFB].GetName()))
         for sectorFB in range(0, 16):
             for layer in range(0, 2):
+                ctimeFit.SetParameter(0, self.hist_mappedScintCtimePerLayer[sectorFB][layer].GetEntries())
+                self.hist_mappedScintCtimePerLayer[sectorFB][layer].Fit("ctimeFit", "QR")
                 self.hist_mappedScintCtimePerLayer[sectorFB][layer].Draw()
                 canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimePerLayer[sectorFB][layer].GetName()))
         # self.hist_ctimeRPCtCal.Draw("colz")
@@ -1121,16 +1184,45 @@ class EventInspector(basf2.Module):
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCal.GetName()))
         # self.hist_jRPCtCalCorr.Draw("colz")
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtCalCorr.GetName()))
-        self.hist_dtTDC.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtTDC.GetName()))
-        self.hist_dtCtime.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtCtime.GetName()))
-        self.hist_dtTDCvsdtCtime.Draw("BOX")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtTDCvsdtCtime.GetName()))
-        self.hist_dtTDCvsTime.Draw("BOX")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtTDCvsTime.GetName()))
-        self.hist_dtCtimevsTime.Draw("BOX")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtCtimevsTime.GetName()))
+        self.hist_mappedRPCCtimeRangeBySector.Draw("box")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCCtimeRangeBySector.GetName()))
+        canvas.SetLogy(0)
+        self.hist_tdcRangeRPC.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeRPC.GetName()))
+        canvas.SetLogy(1)
+        self.hist_tdcRangeRPC.Draw("")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeRPC.GetName()))
+        canvas.SetLogy(0)
+        self.hist_ctimeRangeRPC.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRangeRPC.GetName()))
+        canvas.SetLogy(1)
+        self.hist_ctimeRangeRPC.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRangeRPC.GetName()))
+        canvas.SetLogy(0)
+        canvas.SetLogz(0)
+        self.hist_tdcRangeVsCtimeRangeRPC.Draw("BOX")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeVsCtimeRangeRPC.GetName()))
+        canvas.SetLogz(1)
+        self.hist_tdcRangeVsCtimeRangeRPC.Draw("COLZ")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeVsCtimeRangeRPC.GetName()))
+        canvas.SetLogz(0)
+        self.hist_tdcRangeVsTimeRPC.Draw("BOX")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeVsTimeRPC.GetName()))
+        canvas.SetLogz(1)
+        self.hist_tdcRangeVsTimeRPC.Draw("COLZ")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeVsTimeRPC.GetName()))
+        canvas.SetLogz(0)
+        self.hist_ctimeRangeVsTimeRPC.Draw("BOX")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRangeVsTimeRPC.GetName()))
+        canvas.SetLogz(1)
+        self.hist_ctimeRangeVsTimeRPC.Draw("COLZ")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRangeVsTimeRPC.GetName()))
+        canvas.SetLogz(0)
+        self.hist_mappedScintCtimeRange.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeRange.GetName()))
+        self.hist_mappedScintCtimeRangeBySector.Draw("box")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeRangeBySector.GetName()))
+
         self.hist_nHit1d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1d.GetName()))
         self.hist_nHit1dRPCPrompt.Draw()
@@ -1149,20 +1241,32 @@ class EventInspector(basf2.Module):
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_multiplicityPhiBySector.GetName()))
         self.hist_multiplicityZBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_multiplicityZBySector.GetName()))
+        timeFit.SetParameter(0, self.hist_tphiRPCCal1d.GetEntries())
+        self.hist_tphiRPCCal1d.Fit("timeFit", "QR")
         self.hist_tphiRPCCal1d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tphiRPCCal1d.GetName()))
+        timeFit.SetParameter(0, self.hist_tzRPCCal1d.GetEntries())
+        self.hist_tzRPCCal1d.Fit("timeFit", "QR")
         self.hist_tzRPCCal1d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tzRPCCal1d.GetName()))
+        timeFit.SetParameter(0, self.hist_tRPCCal1d.GetEntries())
+        self.hist_tRPCCal1d.Fit("timeFit", "QR")
         self.hist_tRPCCal1d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal1d.GetName()))
         self.hist_dtRPC1d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtRPC1d.GetName()))
-        self.hist_tphiScintCal1d.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tphiScintCal1d.GetName()))
-        self.hist_tzScintCal1d.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tzScintCal1d.GetName()))
-        self.hist_tScintCal1d.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tScintCal1d.GetName()))
+        ctimeFit.SetParameter(0, self.hist_ctphiScintCal1d.GetEntries())
+        self.hist_ctphiScintCal1d.Fit("ctimeFit", "QR")
+        self.hist_ctphiScintCal1d.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctphiScintCal1d.GetName()))
+        ctimeFit.SetParameter(0, self.hist_ctzScintCal1d.GetEntries())
+        self.hist_ctzScintCal1d.Fit("ctimeFit", "QR")
+        self.hist_ctzScintCal1d.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctzScintCal1d.GetName()))
+        ctimeFit.SetParameter(0, self.hist_ctScintCal1d.GetEntries())
+        self.hist_ctScintCal1d.Fit("ctimeFit", "QR")
+        self.hist_ctScintCal1d.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctScintCal1d.GetName()))
         self.hist_dtScint1d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtScint1d.GetName()))
         self.hist_nHit2d.Draw()
@@ -1187,10 +1291,14 @@ class EventInspector(basf2.Module):
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyZBkgd.GetName()))
         self.hist_occupancyRBkgd.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRBkgd.GetName()))
+        timeFit.SetParameter(0, self.hist_tRPCCal2d.GetEntries())
+        self.hist_tRPCCal2d.Fit("timeFit", "QR")
         self.hist_tRPCCal2d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal2d.GetName()))
         self.hist_tRPCCal2dBySector.Draw("box")
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal2dBySector.GetName()))
+        ctimeFit.SetParameter(0, self.hist_ctScintCal2d.GetEntries())
+        self.hist_ctScintCal2d.Fit("ctimeFit", "QR")
         self.hist_ctScintCal2d.Draw()
         canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctScintCal2d.GetName()))
         self.hist_ctScintCal2dBySector.Draw("box")
@@ -1274,10 +1382,10 @@ class EventInspector(basf2.Module):
                     continue
                 if int(self.exp) != 3:  # revo9time was not stored in the last word of the data-packet list?
                     revo9time = ((lastWord >> 16) << 3) & 0xffff
-                dt = (trigCtime & 0xffff) - (revo9time & 0xffff)
-                if dt > 0x7fff:
-                    dt -= 0x8000
-                self.hist_trigCtime_trigRevo9time.Fill(dt)
+                dt = (trigCtime - revo9time) & 0x3ff
+                if dt >= 0x200:
+                    dt -= 0x400
+                self.hist_trigCtimeVsTrigRevo9time.Fill(dt)
                 countAll += 1
                 count[dc] += 1
                 sectorFB = self.dcToSectorFB[dc]
@@ -1347,11 +1455,15 @@ class EventInspector(basf2.Module):
                         rawPlane[dc].append(-1)
                         rawStrip[dc].append(-1)
                         rawCtime[dc].append(-1)
+                tdcRangeRPC = maxRPCtdc - minRPCtdc  # (ns)
+                ctimeRangeRPC = (maxRPCCtime - minRPCCtime) << 3  # (ns)
+                ctimeRangeScint = (maxScintCtime - minScintCtime) << 3  # (ns)
                 if n > 1:
                     if maxRPCCtime > 0:
-                        self.hist_mappedRPCCtimeRangeBySector.Fill(sectorFB, (maxRPCCtime - minRPCCtime) << 3)
+                        self.hist_mappedRPCCtimeRangeBySector.Fill(sectorFB, ctimeRangeRPC)
                     if maxScintCtime > 0:
-                        self.hist_mappedScintCtimeRangeBySector.Fill(sectorFB, (maxScintCtime - minScintCtime) << 3)
+                        self.hist_mappedScintCtimeRange.Fill(ctimeRangeScint)
+                        self.hist_mappedScintCtimeRangeBySector.Fill(sectorFB, ctimeRangeScint)
                 # second pass over this DC's hits: histogram everything
                 for j in range(0, n):
                     word0 = bufSlot[j * 2]
@@ -1397,14 +1509,21 @@ class EventInspector(basf2.Module):
                         if isRPC:
                             self.hist_RPCTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
                             tCal = t - self.t0RPC[sectorFB]
-                            if abs(tCal - self.t0Cal) < 25:
+                            if j == 0:
+                                self.hist_tdcRangeRPC.Fill(tdcRangeRPC)
+                                self.hist_ctimeRangeRPC.Fill(ctimeRangeRPC)
+                                self.hist_tdcRangeVsCtimeRangeRPC.Fill(tdcRangeRPC, ctimeRangeRPC)
+                            self.hist_tdcRangeVsTimeRPC.Fill(tCal, tdcRangeRPC)
+                            self.hist_ctimeRangeVsTimeRPC.Fill(tCal, ctimeRangeRPC)
+                            if abs(tCal - self.t0Cal) < 50:
+                                self.hist_mappedChannelOccupancyPrompt[sectorFB][axis].Fill(lane, channel)
+                                # this code is probably not so useful after the 13x replication of the DC firmware
                                 if n > 20:
                                     self.hist_ctimeRPCtCal.Fill(tCal, ctime - minRPCCtime)
                                     self.hist_ctimeRPCtCalCorr.Fill(tCal - dtIndex, ctime - minRPCCtime)
                                     self.hist_jRPCtCal.Fill(tCal, j)
                                     self.hist_jRPCtCalCorr.Fill(tCal - dtIndex, j)
-                                self.hist_mappedChannelOccupancyPrompt[sectorFB][axis].Fill(lane, channel)
-                            elif abs(tCal - self.t0Cal) > 50:
+                            else:
                                 self.hist_mappedChannelOccupancyBkgd[sectorFB][axis].Fill(lane, channel)
                             self.hist_mappedRPCSectorOccupancy.Fill(sectorFB)
                             self.hist_mappedRPCLaneAxisOccupancy.Fill(sectorFB, laneAxis)
@@ -1418,10 +1537,10 @@ class EventInspector(basf2.Module):
                         elif isScint:
                             self.hist_ScintTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
                             ctCal = ct - self.ct0Scint[sectorFB]
-                            if abs(ctCal - self.ct0Cal) < 10:
-                                self.hist_mappedChannelOccupancyPrompt[sectorFB][axis].Fill(lane, channel)
-                            elif (abs(ctCal - self.ct0Cal) > 20):
-                                self.hist_mappedChannelOccupancyBkgd[sectorFB][axis].Fill(lane, channel)
+                            if abs(ctCal - self.ct0Cal) < 50:
+                                self.hist_mappedChannelOccupancyPrompt[sectorFB][1 - axis].Fill(lane, channel)
+                            else:
+                                self.hist_mappedChannelOccupancyBkgd[sectorFB][1 - axis].Fill(lane, channel)
                             self.hist_mappedScintSectorOccupancy.Fill(sectorFB)
                             self.hist_mappedScintLaneAxisOccupancy.Fill(sectorFB, laneAxis)
                             self.hist_mappedScintTime.Fill(t & 0x1f)
@@ -1440,14 +1559,15 @@ class EventInspector(basf2.Module):
                         self.hist_unmappedSectorOccupancyMultihit.Fill(sectorFB)
                         if channelMultiplicity[laneAxisChannel] == 1:
                             self.hist_unmappedSectorOccupancy.Fill(sectorFB)
-                        self.hist_unmappedChannelOccupancy[sectorFB][axis].Fill(lane, channel)
                         if isRPC:
+                            self.hist_unmappedChannelOccupancy[sectorFB][axis].Fill(lane, channel)
                             self.hist_RPCTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
                             self.hist_unmappedRPCSectorOccupancy.Fill(sectorFB)
                             self.hist_unmappedRPCLaneAxisOccupancy.Fill(sectorFB, laneAxis)
                             self.hist_unmappedRPCTime.Fill(t)
                             self.hist_unmappedRPCTimeBySector.Fill(sectorFB, t)
                         elif isScint:
+                            self.hist_unmappedChannelOccupancy[sectorFB][1 - axis].Fill(lane, channel)
                             self.hist_ScintTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
                             self.hist_unmappedScintSectorOccupancy.Fill(sectorFB)
                             self.hist_unmappedScintLaneAxisOccupancy.Fill(sectorFB, laneAxis)
@@ -1461,8 +1581,27 @@ class EventInspector(basf2.Module):
 
         # Process the BKLMHit1ds
 
+        cosine = [0, 0, 0, 0, 0, 0, 0, 0]
+        sine = [0, 0, 0, 0, 0, 0, 0, 0]
+        for sector in range(0, 8):
+            phi = math.pi * sector / 4
+            cosine[sector] = math.cos(phi)
+            sine[sector] = math.sin(phi)
+        zyList = [[], [], [], [], [], [], [], []]
+        xyList = [[], [], [], [], [], [], [], []]
+        r0 = 201.9 + 0.5 * 4.4  # cm
+        dr = 9.1  # cm
+        z0 = 47.0  # cm
+        dzScint = 4.0  # cm
+        dzRPC = 4.52  # cm
+        nPhiStrips = [37, 42, 36, 36, 36, 36, 48, 48, 48, 48, 48, 48, 48, 48, 48]
+        dPhiStrips = [4.0, 4.0, 4.9, 5.11, 5.32, 5.53, 4.3, 4.46, 4.62, 4.77, 4.93, 5.09, 5.25, 5.4, 5.56]
+        scintFlip = [[[-1, 1], [-1, 1], [1, 1], [1, -1], [1, -1], [1, -1], [-1, -1], [-1, 1]],
+                     [[1, -1], [1, -1], [1, 1], [-1, 1], [-1, 1], [-1, 1], [-1, -1], [1, -1]]]
+        promptColor = 3
+        bkgdColor = 2
         phiTimes = {}
-        zTimes = {}
+        zTimes = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
         nphihits = 0
         nzhits = 0
         nRPCPrompt = 0
@@ -1477,71 +1616,128 @@ class EventInspector(basf2.Module):
             stripMin = (key & self.BKLM_STRIP_MASK) >> self.BKLM_STRIP_BIT
             stripMax = (key & self.BKLM_MAXSTRIP_MASK) >> self.BKLM_MAXSTRIP_BIT
             sectorFB = sector if fb == 0 else sector + 8
-            dc = self.sectorFBToDC[sectorFB]
-            copper = dc & 0x03
-            finesse = dc >> 2
-            n = rawklms[copper].GetDetectorNwords(0, finesse) >> 1
-            trigCtime = (rawklms[copper].GetTTCtime(0) & 0x07ffffff) << 3
-            tCal = -1
-            ctDiffMax = 99999
-            for j in range(0, n):
-                if layer != rawLayer[dc][j]:
-                    continue
-                if sector != rawSector[dc][j]:
-                    continue
-                if fb != rawFb[dc][j]:
-                    continue
-                if plane != rawPlane[dc][j]:
-                    continue
-                strip = rawStrip[dc][j]
-                if strip < stripMin:
-                    continue
-                if strip > stripMax:
-                    continue
-                if layer < 2:  # it's a scint layer
-                    ctime = rawCtime[dc][j] << 3
-                    ct = ctime - trigCtime - self.ct0Scint[sectorFB]  # in ns, range is only 8 bits in SCROD (??)
-                    ctTrunc = int(ct) & 0x3ff
-                    if abs(ctTrunc - self.ct0Cal) < ctDiffMax:
-                        ctDiffMax = int(abs(ctTrunc - self.ct0Cal))
-                        tCal = ct
-                        if ctDiffMax == 0:
-                            break
-                else:  # it's an RPC layer
-                    tCal = tCal = hit1d.getTime() - trigCtime - self.t0RPC[sectorFB] - 0.75 * j
-                    break
-            if not self.legacyTimes:
+            if self.legacyTimes:
+                dc = self.sectorFBToDC[sectorFB]
+                copper = dc & 0x03
+                finesse = dc >> 2
+                n = rawklms[copper].GetDetectorNwords(0, finesse) >> 1
+                trigCtime = (rawklms[copper].GetTTCtime(0) & 0x07ffffff) << 3
+                tCal = -1
+                ctDiffMax = 99999
+                for j in range(0, n):
+                    if layer != rawLayer[dc][j]:
+                        continue
+                    if sector != rawSector[dc][j]:
+                        continue
+                    if fb != rawFb[dc][j]:
+                        continue
+                    if plane != rawPlane[dc][j]:
+                        continue
+                    strip = rawStrip[dc][j]
+                    if strip < stripMin:
+                        continue
+                    if strip > stripMax:
+                        continue
+                    if layer < 2:  # it's a scint layer
+                        ctime = rawCtime[dc][j] << 3
+                        ct = ctime - trigCtime - self.ct0Scint[sectorFB]  # in ns, range is only 8 bits in SCROD (??)
+                        ctTrunc = int(ct) & 0x3ff
+                        if abs(ctTrunc - self.ct0Cal) < ctDiffMax:
+                            ctDiffMax = int(abs(ctTrunc - self.ct0Cal))
+                            tCal = ct
+                            if ctDiffMax == 0:
+                                break
+                    else:  # it's an RPC layer
+                        tCal = tCal = hit1d.getTime() - trigCtime - self.t0RPC[sectorFB]
+                        break
+            else:
                 if layer < 2:
                     tCal = hit1d.getTime() - self.ct0Scint[sectorFB]
                 else:
-                    tCal = hit1d.getTime() - self.t0RPC[sectorFB] - 0.75 * j
+                    tCal = hit1d.getTime() - self.t0RPC[sectorFB]
             tCalTrunc = int(tCal) & 0x3ff
 
-            if layer < 2:
-                nScint += 1
-            else:
-                if abs(tCalTrunc - self.t0Cal) < 25:
-                    nRPCPrompt += 1
-                    if plane == 1:
-                        self.hist_multiplicityPhiBySector.Fill(sectorFB, stripMax - stripMin + 1)
+            if self.view == 1:
+                r = r0 + layer * dr
+                yA = r
+                zA = 500
+                xB = 500
+                yB = 500
+                stripAverage = (stripMin + stripMax) * 0.5
+                isPrompt = False
+                if layer < 2:
+                    nScint += 1
+                    isPrompt = (abs(tCalTrunc - self.ct0Cal1d) < 50)
+                    if plane == 0:
+                        if fb == 0:
+                            zA = z0 - stripAverage * dzScint
+                        else:
+                            zA = z0 + stripAverage * dzScint
                     else:
-                        self.hist_multiplicityZBySector.Fill(sectorFB, stripMax - stripMin + 1)
+                        h = ((stripAverage - 0.5 * nPhiStrips[layer]) * dPhiStrips[layer]) * scintFlip[fb][sector][layer]
+                        xB = r * cosine[sector] - h * sine[sector]
+                        yB = r * sine[sector] + h * cosine[sector]
                 else:
-                    nRPCBkgd += 1
+                    isPrompt = (abs(tCalTrunc - self.t0Cal1d) < 50)
+                    if plane == 0:
+                        if fb == 0:
+                            zA = z0 - stripAverage * dzRPC
+                        else:
+                            zA = z0 + stripAverage * dzRPC
+                    else:
+                        h = ((stripAverage - 0.5 * nPhiStrips[layer]) * dPhiStrips[layer])  # * rpcFlip[fb][sector]
+                        xB = r * cosine[sector] - h * sine[sector]
+                        yB = r * sine[sector] + h * cosine[sector]
+                    if abs(tCalTrunc - self.t0Cal) < 50:
+                        nRPCPrompt += 1
+                        if plane == 1:
+                            self.hist_multiplicityPhiBySector.Fill(sectorFB, stripMax - stripMin + 1)
+                        else:
+                            self.hist_multiplicityZBySector.Fill(sectorFB, stripMax - stripMin + 1)
+                    else:
+                        nRPCBkgd += 1
             if plane == 1:
                 nphihits += 1
                 phiTimes[key] = tCal
                 if layer < 2:
-                    self.hist_tphiScintCal1d.Fill(tCalTrunc)
+                    self.hist_ctphiScintCal1d.Fill(tCalTrunc)
                 else:
                     self.hist_tphiRPCCal1d.Fill(tCalTrunc)
             else:
                 nzhits += 1
-                zTimes[key] = tCal
+                zTimes[layer][key] = tCal
                 if layer < 2:
-                    self.hist_tzScintCal1d.Fill(tCalTrunc)
+                    self.hist_ctzScintCal1d.Fill(tCalTrunc)
                 else:
                     self.hist_tzRPCCal1d.Fill(tCalTrunc)
+            # Add the hit to the event-display TGraph list (perhaps)
+            if (self.view == 1) and (self.eventDisplays < self.maxDisplays):
+                if zA != 500:
+                    gZY = ROOT.TGraph()
+                    gZY.SetPoint(0, zA - 1.0, yA - 1.0)
+                    gZY.SetPoint(1, zA - 1.0, yA + 1.0)
+                    gZY.SetPoint(2, zA + 1.0, yA + 1.0)
+                    gZY.SetPoint(3, zA + 1.0, yA - 1.0)
+                    gZY.SetPoint(4, zA - 1.0, yA - 1.0)
+                    gZY.SetLineWidth(1)
+                    if isPrompt:
+                        gZY.SetLineColor(promptColor)
+                    else:
+                        gZY.SetLineColor(bkgdColor)
+                    zyList[sector].append(gZY)
+                if xB != 500:
+                    gXY = ROOT.TGraph()
+                    gXY.SetPoint(0, xB - 1.0, yB - 1.0)
+                    gXY.SetPoint(1, xB - 1.0, yB + 1.0)
+                    gXY.SetPoint(2, xB + 1.0, yB + 1.0)
+                    gXY.SetPoint(3, xB + 1.0, yB - 1.0)
+                    gXY.SetPoint(4, xB - 1.0, yB - 1.0)
+                    gXY.SetLineWidth(1)
+                    if isPrompt:
+                        gXY.SetLineColor(promptColor)
+                    else:
+                        gXY.SetLineColor(bkgdColor)
+                    xyList[sector].append(gXY)
         self.hist_nHit1dRPCPrompt.Fill(nRPCPrompt)
         self.hist_nHit1dRPCBkgd.Fill(nRPCBkgd)
         self.hist_nHit1dScint.Fill(nScint)
@@ -1557,22 +1753,76 @@ class EventInspector(basf2.Module):
             fb = (mphi & self.BKLM_END_MASK) >> self.BKLM_END_BIT
             sectorFB = sector if fb == 0 else sector + 8
             tphi = phiTimes[phiKey]
-            for zKey in zTimes:
+            tphiTrunc = int(tphi) & 0x3ff
+            for zKey in zTimes[layer]:
                 mz = zKey & self.BKLM_MODULEID_MASK
                 if mphi == mz:
-                    tz = zTimes[zKey]
-                    dt = tphi - tz
+                    tz = zTimes[layer][zKey]
+                    tzTrunc = int(tz) & 0x3ff
+                    dt = (tphiTrunc - tzTrunc) & 0x3ff
+                    if dt >= 0x200:
+                        dt -= 0x400
                     t = (tphi + tz) * 0.5
                     tTrunc = int(t) & 0x3ff
                     if layer < 2:
                         self.hist_dtScint1d.Fill(dt)
                     else:
                         self.hist_dtRPC1d.Fill(dt)
-                    if abs(dt) < 40:
+                    if abs(dt) < 4000:
                         if layer < 2:
-                            self.hist_tScintCal1d.Fill(tTrunc)
+                            self.hist_ctScintCal1d.Fill(tTrunc)
                         else:
                             self.hist_tRPCCal1d.Fill(tTrunc)
+
+        # After processing all of the BKLMHit1ds in the event, draw the event display (perhaps)
+
+        if (self.view == 1) and (self.eventDisplays < self.maxDisplays):
+            drawnSectors = 0
+            jCanvas = 1
+            for sector in range(0, 8):
+                if len(zyList[sector]) > self.minRPCHits:
+                    drawnSectors += 1
+                    self.eventCanvas.cd(jCanvas)
+                    title = 'e{0:02d}r{1}: event {2} z-readout hits in S{3}'.format(int(self.exp), int(self.run), event, sector)
+                    self.hist_ZY1D[jCanvas - 1].SetTitle(title)
+                    self.hist_ZY1D[jCanvas - 1].Draw()
+                    for g in self.bklmZY:
+                        g.Draw("L")
+                    for g in zyList[sector]:
+                        g.Draw("L")
+                    jCanvas += 1
+                    if jCanvas > 2:
+                        jCanvas = 1
+                        self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
+                        self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
+            enoughXYHits = False
+            for sector in range(0, 8):
+                if len(xyList[sector]) > self.minRPCHits:
+                    enoughXYHits = True
+                    break
+            if enoughXYHits:
+                drawnSectors += 1
+                self.eventCanvas.cd(jCanvas)
+                jCanvas += 1
+                title = 'e{0:02d}r{1}: event {2} phi-readout hits'.format(int(self.exp), int(self.run), event)
+                self.hist_XY.SetTitle(title)
+                self.hist_XY.Draw()
+                for g in self.bklmXY:
+                    g.Draw("L")
+                for sector in range(0, 8):
+                    for g in xyList[sector]:
+                        g.Draw("L")
+                if jCanvas > 2:
+                    jCanvas = 1
+                    self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
+                    self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
+            if jCanvas == 2:
+                self.eventCanvas.cd(jCanvas)
+                ROOT.gPad.Clear()
+                self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
+                self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
+            if drawnSectors > 0:
+                self.eventDisplays += 1
 
         # Process the BKLMHit2ds
 
@@ -1591,58 +1841,59 @@ class EventInspector(basf2.Module):
             sectorFB = sector if fb == 0 else sector + 8
             if layer >= 2:
                 rpcHits[sectorFB] += 1
-            dc = self.sectorFBToDC[sectorFB]
-            copper = dc & 0x03
-            finesse = dc >> 2
-            n = rawklms[copper].GetDetectorNwords(0, finesse) >> 1
-            trigCtime = (rawklms[copper].GetTTCtime(0) & 0x07ffffff) << 3
-            ctDiffMax = 99999
-            tCal = -1
-            jZ = -1
-            jPhi = -1
-            ctZ = 0
-            ctPhi = 0
-            for j in range(0, n):
-                if layer != rawLayer[dc][j]:
-                    continue
-                if sector != rawSector[dc][j]:
-                    continue
-                if fb != rawFb[dc][j]:
-                    continue
-                strip = rawStrip[dc][j]
-                plane = rawPlane[dc][j]
-                if plane == 0:  # it's a z strip
-                    if strip < zStripMin:
+            if self.legacyTimes:
+                dc = self.sectorFBToDC[sectorFB]
+                copper = dc & 0x03
+                finesse = dc >> 2
+                n = rawklms[copper].GetDetectorNwords(0, finesse) >> 1
+                trigCtime = (rawklms[copper].GetTTCtime(0) & 0x07ffffff) << 3
+                ctDiffMax = 99999
+                tCal = -1
+                jZ = -1
+                jPhi = -1
+                ctZ = 0
+                ctPhi = 0
+                for j in range(0, n):
+                    if layer != rawLayer[dc][j]:
                         continue
-                    if strip > zStripMax:
+                    if sector != rawSector[dc][j]:
                         continue
-                    ctZ = rawCtime[dc][j] << 3  # in ns, range is only 8 bits in SCROD (??)
-                    jZ = j
-                else:  # it's a phi strip
-                    if strip < phiStripMin:
+                    if fb != rawFb[dc][j]:
                         continue
-                    if strip > phiStripMax:
-                        continue
-                    ctPhi = rawCtime[dc][j] << 3  # in ns, range is only 8 bits in SCROD (??)
-                    jPhi = j
-                if (jZ >= 0) and (jPhi >= 0):
-                    if layer < 2:  # it's a scint layer
-                        if abs(ctZ - ctPhi) > 40:
+                    strip = rawStrip[dc][j]
+                    plane = rawPlane[dc][j]
+                    if plane == 0:  # it's a z strip
+                        if strip < zStripMin:
                             continue
-                        ct = int((ctZ + ctPhi) * 0.5 - trigCtime - self.ct0Scint[sectorFB]) & 0x3ff
-                        if abs(ct - self.ct0Cal) < ctDiffMax:
-                            ctDiffMax = int(abs(ct - self.ct0Cal))
-                            tCal = ct
-                            if ctDiffMax == 0:
-                                break
-                    else:  # it's an RPC layer
-                        tCal = hit2d.getTime() - trigCtime - self.t0RPC[sectorFB] - 0.75 * jPhi - 0.75 * jZ
-                        break
-            if not self.legacyTimes:
+                        if strip > zStripMax:
+                            continue
+                        ctZ = rawCtime[dc][j] << 3  # in ns, range is only 8 bits in SCROD (??)
+                        jZ = j
+                    else:  # it's a phi strip
+                        if strip < phiStripMin:
+                            continue
+                        if strip > phiStripMax:
+                            continue
+                        ctPhi = rawCtime[dc][j] << 3  # in ns, range is only 8 bits in SCROD (??)
+                        jPhi = j
+                    if (jZ >= 0) and (jPhi >= 0):
+                        if layer < 2:  # it's a scint layer
+                            if abs(ctZ - ctPhi) > 40:
+                                continue
+                            ct = int((ctZ + ctPhi) * 0.5 - trigCtime - self.ct0Scint[sectorFB]) & 0x3ff
+                            if abs(ct - self.ct0Cal) < ctDiffMax:
+                                ctDiffMax = int(abs(ct - self.ct0Cal))
+                                tCal = ct
+                                if ctDiffMax == 0:
+                                    break
+                        else:  # it's an RPC layer
+                            tCal = hit2d.getTime() - trigCtime - self.t0RPC[sectorFB]
+                            break
+            else:
                 if layer < 2:
-                    tCal = hit2d.getTime() - self.ct0Scint[sectorFB]  # - 0.75 * jPhi - 0.75 * jZ
+                    tCal = hit2d.getTime() - self.ct0Scint[sectorFB]
                 else:
-                    tCal = hit2d.getTime() - self.t0RPC[sectorFB]  # - 0.75 * jPhi - 0.75 * jZ
+                    tCal = hit2d.getTime() - self.t0RPC[sectorFB]
             tCalTrunc = int(tCal) & 0x3ff
             x = hit2d.getGlobalPositionX()
             y = hit2d.getGlobalPositionY()
@@ -1656,7 +1907,7 @@ class EventInspector(basf2.Module):
                 bkgdColor = 4
                 self.hist_ctScintCal2d.Fill(tCalTrunc)
                 self.hist_ctScintCal2dBySector.Fill(sectorFB, tCalTrunc)
-                if abs(tCalTrunc - self.ct0Cal2d) < 20:
+                if abs(tCalTrunc - self.ct0Cal2d) < 50:
                     isPromptHit = True
                     if fb == 0:  # backward
                         self.hist_occupancyBackwardXYPrompt.Fill(x, y)
@@ -1670,7 +1921,7 @@ class EventInspector(basf2.Module):
             else:
                 self.hist_tRPCCal2d.Fill(tCalTrunc)
                 self.hist_tRPCCal2dBySector.Fill(sectorFB, tCalTrunc)
-                if abs(tCalTrunc - self.t0Cal2d) < 20:
+                if abs(tCalTrunc - self.t0Cal2d) < 50:
                     isPromptHit = True
                     self.hist_occupancyRZPrompt.Fill(z, layer)
                     self.hist_occupancyZPrompt.Fill(z)
@@ -1679,7 +1930,7 @@ class EventInspector(basf2.Module):
                         self.hist_occupancyBackwardXYPrompt.Fill(x, y)
                     else:  # forward
                         self.hist_occupancyForwardXYPrompt.Fill(x, y)
-                elif abs(tCalTrunc - self.t0Cal2d) > 40:
+                elif abs(tCalTrunc - self.t0Cal2d) >= 50:
                     self.hist_occupancyRZBkgd.Fill(z, layer)
                     self.hist_occupancyZBkgd.Fill(z)
                     self.hist_occupancyRBkgd.Fill(layer)
@@ -1689,7 +1940,7 @@ class EventInspector(basf2.Module):
                         self.hist_occupancyForwardXYBkgd.Fill(x, y)
 
             # Add the hit to the event-display TGraph list (perhaps)
-            if self.eventDisplays < self.maxDisplays:
+            if (self.view == 2) and (self.eventDisplays < self.maxDisplays):
                 gXY = ROOT.TGraph()
                 gXY.SetPoint(0, x - 1.0, y - 1.0)
                 gXY.SetPoint(1, x - 1.0, y + 1.0)
@@ -1715,7 +1966,7 @@ class EventInspector(basf2.Module):
 
         # After processing all of the hits in the event, draw the event display (perhaps)
 
-        if self.eventDisplays < self.maxDisplays:
+        if (self.view == 2) and (self.eventDisplays < self.maxDisplays):
             hasEnoughRPCHits = False
             for count in rpcHits:
                 if count > self.minRPCHits:
@@ -1723,7 +1974,24 @@ class EventInspector(basf2.Module):
                     break
             if hasEnoughRPCHits:
                 self.eventDisplays += 1
-                title = 'e{0:02d}r{1}: event {2}'.format(int(self.exp), int(self.run), event)
+                title = 'e{0:02d}r{1}: event {2} z-readout hits'.format(int(self.exp), int(self.run), event)
+                self.hist_XY.SetTitle(title)
+                self.hist_ZY.SetTitle(title)
+                self.eventCanvas.cd(1)
+                self.hist_XY.Draw()
+                for g in self.bklmXY:
+                    g.Draw("L")
+                for g in xyList:
+                    g.Draw("L")
+                self.eventCanvas.cd(2)
+                self.hist_ZY.Draw()
+                for g in self.bklmZY:
+                    g.Draw("L")
+                for g in zyList:
+                    g.Draw("L")
+                self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
+                self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
+                title = 'e{0:02d}r{1}: event {2} phi-readout hits'.format(int(self.exp), int(self.run), event)
                 self.hist_XY.SetTitle(title)
                 self.hist_ZY.SetTitle(title)
                 self.eventCanvas.cd(1)

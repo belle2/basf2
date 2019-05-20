@@ -72,11 +72,27 @@ namespace Belle2 {
     }
 
     /** destructor deleting the rootFile. */
-    ~RawSecMapRootInterface() { /*delete m_file;*/ }
+    ~RawSecMapRootInterface() { if (m_file) delete m_file; }
 
 
     /** That class shall not be copied. */
-//     RawSecMapRootInterface(const RawSecMapRootInterface& rawSecMapInterFace)  = delete;
+    RawSecMapRootInterface(const RawSecMapRootInterface& rawSecMapInterFace) = delete;
+    /** but it may be moved */
+    RawSecMapRootInterface(RawSecMapRootInterface&& other) :
+      m_file(nullptr),
+      m_name(std::move(other.m_name)),
+      m_tree2Hit(std::move(other.m_tree2Hit)),
+      m_data2Hit(std::move(other.m_data2Hit)),
+      m_tree3Hit(std::move(other.m_tree3Hit)),
+      m_data3Hit(std::move(other.m_data3Hit))
+    {
+      // the new object takes ownership of the file
+      m_file = other.m_file;
+      other.m_file = nullptr;
+    }
+
+    /** That class shall not be copied. */
+    RawSecMapRootInterface& operator = (const RawSecMapRootInterface& rawSecMapInterFace) = delete;
 
 
     /** initialize the RawSecMapRootInterface for two-hit-combinations (to be called in Module::initialize(). */

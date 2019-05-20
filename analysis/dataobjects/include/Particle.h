@@ -521,7 +521,7 @@ namespace Belle2 {
      * @return true if the function returned true for any of the particles it
      *    was applied to
      */
-    bool forEachDaughter(std::function<bool(const Particle*)> function,
+    bool forEachDaughter(const std::function<bool(const Particle*)>& function,
                          bool recursive = true, bool includeSelf = true) const;
 
     /**

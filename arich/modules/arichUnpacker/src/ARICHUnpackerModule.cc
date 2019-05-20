@@ -327,15 +327,23 @@ namespace Belle2 {
     head.FEBSlot = line1[0];
 
     // data length
-    char len[4];
+    unsigned char len[4];
     for (int i = 0; i < 4; i++) {
       shift = (3 - ibyte % 4) * 8;
       len[3 - i] = buffer[ibyte / 4] >> shift;
       ibyte++;
     }
 
+    unsigned seu = len[2];
+    // This line (16 bits) is actaully not used for data length.
+    len[2] = 0;
+    len[3] = 0;
     uint32_t* tmp = (uint32_t*)len;
     head.length = *tmp;
+
+    for (int i = 0; i < 6; i ++) {
+      head.SEU_FEB[i] = (seu & (1 << i)) != 0;
+    }
 
     // trigger number
     char trg[4];

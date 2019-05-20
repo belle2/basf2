@@ -45,7 +45,9 @@ class CleanBasf2Execution:
         """
         Create a new execution with the given parameters (list of arguments)
         """
+        # The processes handled by this class
         self._handled_processes = []
+        # The commands related to the processes
         self._handled_commands = []
 
     def start(self, command):
@@ -69,10 +71,11 @@ class CleanBasf2Execution:
         while True:
             for command, process in zip(self._handled_commands, self._handled_processes):
                 if self.has_process_ended(process):
-                    basf2.B2INFO("The process ", command, " died with ", process.returncode,
+                    returncode = process.returncode
+                    basf2.B2INFO("The process ", command, " died with ", returncode,
                                  ". Killing the remaining ones.")
                     self.kill()
-                    return process.returncode
+                    return returncode
             sleep(1)
 
     def signal_handler(self, signal_number, signal_frame):
@@ -174,6 +177,8 @@ class CleanBasf2Execution:
         """
         pid, sts = process._try_wait(os.WNOHANG)
         assert pid == process.pid or pid == 0
+
+        process._handle_exitstatus(sts)
 
         if pid == process.pid:
             return True

@@ -28,6 +28,9 @@ namespace Belle2 {
     using FilterContainer = FiltersContainer<SpacePoint>;
 
   public:
+    /// default constructor to silence cppcheck warnings
+    SectorMapBasedSVDPairFilter() = default;
+
     /// Expose the parameters of the filter
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 

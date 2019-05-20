@@ -55,15 +55,24 @@ CDCTriggerDQMModule::CDCTriggerDQMModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Name of the directory where histograms will be placed",
            string("cdctrigger"));
-  addParam("showRecoTracks", m_showRecoTracks,
-           "switch to turn on a comparison with the reconstruction",
-           string("no"));
   addParam("simSegmentHitsName", m_simSegmentHitsName,
            "StoreArray name for simulated TS hits", string("CDCTriggerSegmentHitsSW"));
   addParam("sim2DTracksSWTSName", m_sim2DTracksSWTSName,
            "StoreArray name for simulated 2D finder tracks using simulated TS", string("TRGCDC2DFinderTracksSWTS"));
   addParam("simNeuroTracksSWTSSW2DName", m_simNeuroTracksSWTSSW2DName,
            "StoreArray name for neuro tracks using simulated TS and simulated 2D", string(""));
+  addParam("showRecoTracks", m_showRecoTracks,
+           "switch to turn on a comparison with the reconstruction",
+           false);
+  addParam("recoTrackMultiplicity", m_recoTrackMultiplicity,
+           "Select events with a specific RecoTrack track multiplicity. -1 for all events",
+           -1);
+  addParam("skipWithoutHWTS", m_skipWithoutHWTS,
+           "Switch to skip events without unpacked TS",
+           true);
+  addParam("maxRecoZDist", m_maxRecoZDist,
+           "Select only RecoTracks with a maximum z distance to the IP. -1.0 for all tracks",
+           (float)(- 1.0));
 }
 
 
@@ -1048,7 +1057,7 @@ void CDCTriggerDQMModule::defineHisto()
                                               100, -1, 1);
 
 
-  if (m_showRecoTracks == "yes") {
+  if (m_showRecoTracks) {
     //RecoTracks
     m_RecoZ = new TH1F("RecoZ",
                        "z distribution of reconstructed tracks;z [cm]",
@@ -1206,7 +1215,7 @@ void CDCTriggerDQMModule::initialize()
     m_simNeuroTracksSWTSSW2D.requireRelationTo(m_simSegmentHits);
     m_sim2DTracksSWTS.requireRelationTo(m_simNeuroTracksSWTSSW2D);
   }
-  if (m_showRecoTracks == "yes") {
+  if (m_showRecoTracks) {
     m_RecoTracks.isRequired("RecoTracks");
     m_RecoTracks.requireRelationTo(m_unpackedNeuroTracks);
     if (m_simNeuroTracksName != "") {
@@ -1612,7 +1621,7 @@ void CDCTriggerDQMModule::beginRun()
   m_neuroSWTSSW2DInputT_Layer8->Reset();
   m_neuroSWTSSW2DInputAlpha_Layer8->Reset();
 
-  if (m_showRecoTracks == "yes") {
+  if (m_showRecoTracks) {
     m_RecoZ->Reset();
     m_RecoCosTheta->Reset();
     m_RecoInvPt->Reset();
@@ -1659,9 +1668,15 @@ void CDCTriggerDQMModule::beginRun()
 
 void CDCTriggerDQMModule::event()
 {
-  if (m_unpackedNeuroInputSegments.getEntries() == 0)
+  if (m_skipWithoutHWTS and m_unpackedNeuroInputSegments.getEntries() == 0) {
+    B2DEBUG(150, "No unpacked TS found, skipping event.");
     return;
-  if (m_showRecoTracks == "yes") {
+  }
+  if (m_recoTrackMultiplicity != -1 and m_RecoTracks.getEntries() != m_recoTrackMultiplicity) {
+    B2DEBUG(150, "Wrong track multiplicity " << m_RecoTracks.getEntries() << ", skipping event.");
+    return;
+  }
+  if (m_showRecoTracks) {
     // a RecoTrack has multiple representations for different particle hypothesis
     // -> just take the first one that does not give errors.
     m_RecoTrackCount->Fill(m_RecoTracks.getEntries());
@@ -1703,6 +1718,10 @@ void CDCTriggerDQMModule::event()
         B2DEBUG(150, "No valid representation found for RecoTrack, skipping.");
         continue;
       } else {
+        if (m_maxRecoZDist != -1.0 and abs(zTarget) > m_maxRecoZDist) {
+          B2DEBUG(150, "RecoTrack not close to IP (maxRecoZDist), zReco = " << zTarget);
+          continue;
+        }
         m_RecoZ->Fill(zTarget);
         m_RecoCosTheta->Fill(cosThetaTarget);
         m_RecoPhi->Fill(phi0Target * 180 / M_PI);

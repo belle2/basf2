@@ -78,7 +78,13 @@ namespace Belle2 {
     /** Name for simulated neuro input vector using HW TS, HW 2D*/
     std::string m_simNeuroInputVectorName;
     /** Switch to turn on a comparison with the reconstruction */
-    std::string m_showRecoTracks;
+    bool m_showRecoTracks;
+    /** Select events with a specific RecoTrack track multiplicity. -1 for all events */
+    int m_recoTrackMultiplicity;
+    /** Switch to skip events without unpacked TS */
+    bool m_skipWithoutHWTS;
+    /** Select only RecoTracks with a maximum z distance to the IP. -1 for all tracks */
+    float m_maxRecoZDist;
 
     /** Name for simulated TS hits */
     std::string m_simSegmentHitsName;

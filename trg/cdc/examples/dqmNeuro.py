@@ -3,8 +3,6 @@ from ROOT import Belle2
 import sys
 import os
 
-print('begin')
-
 
 def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):
     unpacker = register_module('CDCTriggerUnpacker')
@@ -86,7 +84,6 @@ dstputfile = ''
 os.makedirs('dqmoutput/data', exist_ok=True)
 os.makedirs('dqmoutput/hist', exist_ok=True)
 os.makedirs('dqmoutput/log', exist_ok=True)
-print('somewhere', sys.argv[1])
 if '.sroot' in sys.argv[1]:
     outputfile = 'dqmoutput/hist/histo.' + sys.argv[1].split('/')[-1].split('.sroot')[0] + '.root'
     dstputfile = 'dqmoutput/data/dst.' + sys.argv[1].split('/')[-1].split('.sroot')[0] + '.root'
@@ -103,8 +100,8 @@ main.add_module('Progress', maxN=3)
 add_neuro_2d_unpackers(main, debug_level=2, debugout=False)
 add_neuro_simulation(main)
 add_neuro_simulation_swts(main)
-showRecoTracks = 'yes'
-if showRecoTracks == 'yes':
+showRecoTracks = True
+if showRecoTracks:
     main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='TSimNeuroTracks',
                     hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
     main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
@@ -120,8 +117,12 @@ main.add_module('HistoManager',
                 histoFileName=outputfile)
 main.add_module('CDCTriggerDQM',
                 simNeuroTracksName='TSimNeuroTracks',
+                simNeuroTracksSWTSSW2DName='TRGCDCNeuroTracksSWTSSW2D',
                 showRecoTracks=showRecoTracks,
-                simNeuroTracksSWTSSW2DName='TRGCDCNeuroTracksSWTSSW2D')
+                recoTrackMultiplicity=1,
+                skipWithoutHWTS=False,
+                maxRecoZDist=3.0
+                )
 main.add_module('RootOutput', outputFileName=dstputfile)
 
 process(main)

@@ -16,11 +16,6 @@ goodpath.add_module('EventInfoSetter', evtNumList=[10], runList=[0], expList=[0]
 with b2test_utils.clean_working_directory():
     b2test_utils.safe_process(goodpath)
 
-# call deprecated functions
-print("Checking ntupleTools and analysis_main are deprecated")
-ma.ntupleFile("hello.root")
-ma.ntupleTree(tree_name="", list_name="", tools=[])
-
 # process analysis_main, ensure deprecation warnings for ntupleTools
 # and analysis_main itself
 with b2test_utils.clean_working_directory():

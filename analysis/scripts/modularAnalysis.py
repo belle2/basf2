@@ -1180,68 +1180,6 @@ def printList(list_name, full, path=analysis_main):
     path.add_module(prlist)
 
 
-def ntupleFile(file_name, path=analysis_main):
-    """
-    Warning:
-        NtupleTools are going to be deprecated from release-03 and we aim to
-        remove them from release-04.  Please see
-        `modularAnalysis.variablesToNtuple` for the recommended alternative.
-
-    Creates new ROOT file to which the flat ntuples will be saved.
-
-    Parameters:
-        file_name (str): file name of the output root file
-        path (basf2.Path): modules are added to this path
-    """
-
-    message = (
-        "NtupleTools are going to be deprecated from release-03 and we"
-        " aim to remove them from release-04.\nPlease see "
-        "modularAnalysis.variablesToNtuple for the recommended alternative."
-    )
-    B2WARNING(message)
-
-    ntmaker = register_module('NtupleMaker')
-    ntmaker.set_name('NtupleMaker_ntupleFile_' + file_name)
-    ntmaker.param('fileName', file_name)
-    path.add_module(ntmaker)
-
-
-def ntupleTree(
-    tree_name,
-    list_name,
-    tools,
-    path=analysis_main,
-):
-    """
-    Warning:
-        NtupleTools are going to be deprecated from release-03 and we aim to
-        remove them from release-04.  Please see
-        `modularAnalysis.variablesToNtuple` for the recommended alternative.
-
-    Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
-
-    Parameters:
-        tree_name (str): the output nutple (TTree) name
-        list_name (str): input ParticleList name
-        tools (list(str)): list of Ntuple tools to be included, tool-decaystring pairs.
-    """
-
-    message = (
-        "NtupleTools are going to be deprecated from release-03 and we"
-        " aim to remove them from release-04.\nPlease see "
-        "modularAnalysis.variablesToNtuple for the recommended alternative."
-    )
-    B2WARNING(message)
-
-    ntmaker = register_module('NtupleMaker')
-    ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
-    ntmaker.param('treeName', tree_name)
-    ntmaker.param('listName', list_name)
-    ntmaker.param('tools', tools)
-    path.add_module(ntmaker)
-
-
 def variablesToNtuple(
     decayString,
     variables,

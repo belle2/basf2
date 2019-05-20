@@ -37,9 +37,9 @@ histo = register_module('HistoManager')
 cal = register_module('ARICHRateCal')
 cal.param("nrun", 100)
 cal.param("nevents", 1000)
-cal.param("dth", 0.01)
-cal.param("th0", -0.5)
-cal.param("internal", False)
+cal.param("dth", 0.01)  # can be ignored when internal = True
+cal.param("th0", -0.5)  # can be ignored when internal = True
+cal.param("internal", True)
 
 unpack = register_module('ARICHUnpacker')
 unpack.param('RawUnpackerMode', 1)

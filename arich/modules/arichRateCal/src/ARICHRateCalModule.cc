@@ -12,6 +12,7 @@
 #include <arich/modules/arichRateCal/ARICHRateCalModule.h>
 #include <arich/dataobjects/ARICHThParam.h>
 #include <arich/dataobjects/ARICHRawDigit.h>
+#include <arich/dataobjects/ARICHInfo.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -120,8 +121,14 @@ namespace Belle2 {
   void ARICHRateCalModule::event()
   {
     StoreObjPtr<EventMetaData> evtmetadata;
-    int runno = m_internalmode ? m_run_count : evtmetadata->getRun();
-    int raw_evtno = m_internalmode ? m_evt_count : evtmetadata->getEvent();
+    StoreObjPtr<ARICHInfo> arichinfo;
+    double vth_thscan = arichinfo->getvth_thscan();
+
+    //int runno = m_internalmode ? m_run_count : evtmetadata->getRun();
+    //int raw_evtno = m_internalmode ? m_evt_count : evtmetadata->getEvent();
+    int runno = evtmetadata->getRun();
+    int raw_evtno = evtmetadata->getEvent();
+
     ARICHThParam param(runno, m_dth, m_th0, m_nrun);
     StoreArray<ARICHRawDigit> rawdigits;
     for (auto& rawdigit : rawdigits) {
@@ -135,7 +142,8 @@ namespace Belle2 {
         for (auto& channel : channels) {
           if (channel.val > 0) {
             //B2INFO("MB="<<mrgid<<" ch="<< channel.chno);
-            h_rate2D[mrgid]->Fill(channel.chno + febno * 144, param.getVth() * 1000);
+            double vth = m_internalmode ? vth_thscan * 1000 : param.getVth() * 1000 ;
+            h_rate2D[mrgid]->Fill(channel.chno + febno * 144, vth);
           }
         }
       }

@@ -83,15 +83,13 @@ void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
 
   TFile* file = TFile::Open(fileName.c_str(), "r");
   if (!file) {
-    B2ERROR("Calibration file: " << fileName << " *** failed to open");
+    B2ERROR("KLMDatabaseImporter: calibration file " << fileName << " *** failed to open");
   } else {
     TTree* tree = (TTree*)file->Get("tree");
     if (!tree) {
-      B2ERROR("Calibration file: " << fileName << " *** no tree named 'tree' found");
+      B2ERROR("KLMDatabaseImporter: calibration file " << fileName << " *** no tree named 'tree' found");
       file->Close();
     } else {
-      B2INFO("BKLMDatabaseImporter: file " << fileName << " opened for calibration");
-
       int isBarrel = 0;
       tree->SetBranchAddress("isBarrel", &isBarrel);
       int isForward = 0;
@@ -124,6 +122,6 @@ void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
                          m_ExperimentHigh, m_RunHigh);
   stripEfficiency.import(iov);
 
-  B2INFO("KLMDatabaseImporter: strip efficiencies imported and file " << fileName << " closed");
+  B2INFO("KLMDatabaseImporter: strip efficiencies imported and calibration file " << fileName << " closed");
 }
 

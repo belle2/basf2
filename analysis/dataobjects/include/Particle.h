@@ -784,6 +784,7 @@ namespace Belle2 {
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
+    bool m_isInclusive; /** Is the particle Inclusive? **/
 
     /**
      * Identifier that can be used to identify whether the particle is unqiue
@@ -863,8 +864,6 @@ namespace Belle2 {
     // v10: added m_isInclusive
 
     friend class ParticleSubset;
-
-    bool m_isInclusive; /** Is the particle Inclusive? **/
   };
 
 } // end namespace Belle2

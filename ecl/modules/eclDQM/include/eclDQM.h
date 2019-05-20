@@ -95,8 +95,11 @@ namespace Belle2 {
     int m_PedestalMeanLowerThr;
     /** Upper threshold of pedestal distribution. */
     int m_PedestalMeanUpperThr;
+    /** If true, save histogram with pedestal rms error values. */
+    bool m_PedestalRmsInclude;
     /** Upper threshold of pedestal rms error distribution. */
     double m_PedestalRmsUpperThr;
+
     /** WF sampling points for digit array.   */
     int m_DspArray[8736][31] = {};
     /** Pedestal average values.   */

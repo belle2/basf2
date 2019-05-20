@@ -41,23 +41,23 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(nullptr)
   setDescription("BKLM reconstruction module of 1D and 2D hits");
   setPropertyFlags(c_ParallelProcessingCertified);
   // MC 1 GeV/c muons: 1-sigma width is 0.43 ns
-  addParam("Orthogonal-strip coincidence window (ns)", m_DtMax,
-           "Orthogonal strip hits whose time difference exceeds this value are independent",
+  addParam("DtMax", m_DtMax,
+           "Orthogonal-strip coincidence window. ns.",
            double(50.0));
   // MC 1 GeV/c muons: mean prompt time is 0.43 ns
-  addParam("Nominal prompt time (ns)", m_PromptTime,
-           "Nominal time of prompt hits",
+  addParam("PromptTime", m_PromptTime,
+           "Nominal time of prompt hits, ns.",
            double(0.0));
   // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
-  addParam("Prompt window (ns)", m_PromptWindow,
-           "Half-width of prompt window relative to PromptTime",
+  addParam("PromptWindow", m_PromptWindow,
+           "Half-width of prompt window relative to PromptTime, ns.",
            //double(50.0));
            double(2000.0));
-  addParam("Alignment correction flag", m_ifAlign,
-           "flag for alignment correction, do the correction (true) or not (false), default is false",
-           bool(false));
-  addParam("load time window from db", m_loadTimingFromDB,
-           "locad timing window from database (true) or not (false), default is true",
+  addParam("IfAlign", m_ifAlign,
+           "Perform alignment correction (true) or not (false).",
+           bool(true));
+  addParam("LoadTimingFromDB", m_loadTimingFromDB,
+           "Load timing window from database (true) or not (false).",
            bool(true));
 }
 

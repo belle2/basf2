@@ -180,15 +180,10 @@ def add_unpackers(path, components=None):
         arichunpacker = register_module('ARICHUnpacker')
         path.add_module(arichunpacker)
 
-    # BKLM
-    if components is None or 'BKLM' in components:
-        bklmunpacker = register_module('BKLMUnpacker')
-        path.add_module(bklmunpacker)
-
-    # EKLM
-    if components is None or 'EKLM' in components:
-        eklmunpacker = register_module('EKLMUnpacker')
-        path.add_module(eklmunpacker)
+    # KLM
+    if components is None or 'BKLM' in components or 'EKLM' in components:
+        klmunpacker = register_module('KLMUnpacker')
+        path.add_module(klmunpacker)
 
     # TRG
     if components is None or 'TRG' in components:

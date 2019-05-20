@@ -76,12 +76,12 @@ bkgCut = ROOT.TCut("(isSignal<1)")
 histOperationStrings = [
     "(E - mcE) / E_uncertainty>>B0_E_pull_s",
     "(p - mcP) / pErr>>B0_p_pull_s",
-    "(x - mcDX) / x_uncertainty>>B0_vertex_pullx_s",
-    "(y - mcDY) / y_uncertainty>>B0_vertex_pully_s",
-    "(z - mcDZ) / z_uncertainty>>B0_vertex_pullz_s",
-    "(x - mcDX)*10000>>B0_vertex_resolutionx_s",
-    "(y - mcDY)*10000>>B0_vertex_resolutiony_s",
-    "(z - mcDZ)*10000>>B0_vertex_resolutionz_s",
+    "(x - mcX) / x_uncertainty>>B0_vertex_pullx_s",
+    "(y - mcY) / y_uncertainty>>B0_vertex_pully_s",
+    "(z - mcZ) / z_uncertainty>>B0_vertex_pullz_s",
+    "(x - mcX)*10000>>B0_vertex_resolutionx_s",
+    "(y - mcY)*10000>>B0_vertex_resolutiony_s",
+    "(z - mcZ)*10000>>B0_vertex_resolutionz_s",
     "chiProb>>pVal_s",
     "chiProb>>pVal_b",
 ]

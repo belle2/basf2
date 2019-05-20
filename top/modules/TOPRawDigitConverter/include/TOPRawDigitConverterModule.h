@@ -15,8 +15,11 @@
 #include <vector>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPProductionEventDebug.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPAsicMask.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalTimebase.h>
@@ -108,7 +111,9 @@ namespace Belle2 {
 
     // collections
     StoreArray<TOPRawDigit> m_rawDigits; /**< collection of raw digits */
+    StoreArray<TOPProductionEventDebug> m_eventDebugs; /**< collection of debug data */
     StoreArray<TOPDigit> m_digits;       /**< collection of digits */
+    StoreObjPtr<TOPAsicMask> m_asicMask; /**< masked asics in firmware */
 
     // other
     std::vector<int> m_writeDepths;  /**< write depths of production debug format */

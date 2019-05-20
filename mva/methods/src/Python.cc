@@ -86,6 +86,11 @@ namespace Belle2 {
       */
       static PythonInitializerSingleton& GetInstance();
 
+      /**
+        Forbid copy constructor of PythonInitializerSingleton
+      */
+      PythonInitializerSingleton(const PythonInitializerSingleton&) = delete;
+
     private:
       /**
         Constructor of PythonInitializerSingleton
@@ -100,7 +105,7 @@ namespace Belle2 {
           m_initialized_python = true;
         }
 
-        if (PyArray_API == NULL) {
+        if (PyArray_API == nullptr) {
           init_numpy();
         }
       }
@@ -121,11 +126,6 @@ namespace Belle2 {
       }
 
       /**
-        Forbid copy constructor of PythonInitializerSingleton
-      */
-      PythonInitializerSingleton(const PythonInitializerSingleton&) = delete;
-
-      /**
         Helper funtion which initializes array system of numpy.
         Since import_array is a weird macro we need this wrapper function
         to protect us from the return statement in this macro
@@ -134,7 +134,7 @@ namespace Belle2 {
       {
         // Import array is a macro which returns NUMPY_IMPORT_ARRAY_RETVAL
         import_array();
-        return NULL;
+        return nullptr;
       }
 
       bool m_initialized_python = false; /**< Member which keeps indicate if this class initialized python */

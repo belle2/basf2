@@ -40,6 +40,7 @@ namespace Belle2 {
 
 
     void TOPreco::setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
+                                 const TOPAsicMask& asicMask,
                                  bool printMask)
     {
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -50,7 +51,7 @@ namespace Belle2 {
         for (unsigned channel = 0; channel < numPixels; channel++) {
           int mdn = moduleID - 1; // 0-based used in fortran
           int ich = mapper.getPixelID(channel) - 1; // 0-base used in fortran
-          int flag = mask->isActive(moduleID, channel);
+          int flag = mask->isActive(moduleID, channel) and asicMask.isActive(moduleID, channel);
           set_channel_mask_(&mdn, &ich, &flag);
         }
       }

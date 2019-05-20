@@ -44,7 +44,7 @@
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
 #include <unistd.h>
-#include <signal.h>
+#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
@@ -252,7 +252,8 @@ int main(int argc, char* argv[])
           "--callgrind-out-file=callgrind." + profileModule + ".%p",
         };
         //As execvp wants non-const char* pointers we have to copy the string contents.
-        for (auto arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
+        cmd.reserve(valgrind_argv.size());
+        for (const auto& arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
         //And now we add our own arguments, including the program name.
         for (int i = 0; i < argc; ++i)  { cmd.push_back(argv[i]); }
         //Finally, execvp wants a nullptr as last argument
@@ -304,13 +305,13 @@ int main(int argc, char* argv[])
 
     // -i
     if (varMap.count("input")) {
-      const vector<string>& names = varMap["input"].as<vector<string> >();
+      const auto& names = varMap["input"].as<vector<string>>();
       Environment::Instance().setInputFilesOverride(names);
     }
 
     // -S
     if (varMap.count("sequence")) {
-      const vector<string>& sequences = varMap["sequence"].as<vector<string> >();
+      const auto& sequences = varMap["sequence"].as<vector<string>>();
       Environment::Instance().setEntrySequencesOverride(sequences);
     }
 

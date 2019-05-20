@@ -82,8 +82,23 @@ namespace Belle2 {
       std::vector<unsigned long> SLpatternMask = {0};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 256;
-      /** If true, determine event time from relevant hits if it is missing. */
+      /** Determine, how the event time should be obtained. The options are:
+      *   "etf_only"                 :   only ETF info is used, otherwise an error
+      *                                  is thrown.
+      *   "fastestpriority"          :   event time is estimated by fastest priority
+      *                                  time in selected track segments. if something
+      *                                  fails, it is set to 0.
+      *   "zero"                     :   the event time is set to 0.
+      *   "etf_or_fastestpriority"   :   the event time is obtained by the ETF, if
+      *                                  not possible, the flag
+      *                                  "fastestppriority" is used.
+      *   "etf_or_zero"              :   the event time is obtained by the ETF, if
+      *                                  not possible, it es set to 0
+      */
+      std::string et_option = "etf_or_fastestpriority";
+      /** DEPRECATED!! If true, determine event time from relevant hits if it is missing. */
       bool T0fromHits = false;
+
     };
 
     /** Default constructor. */
@@ -119,7 +134,7 @@ namespace Belle2 {
 
     /** set the hit collection and event time to required
      * and store the hit collection name */
-    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, bool alwaysTrackT0 = false);
+    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, std::string et_option);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -157,12 +172,41 @@ namespace Belle2 {
     /** Calculate phi position of a hit relative to 2D track
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
-
     /** Read out the event time and store it.
+     * It can be given different options in the et_option ("EventTime option")
+     * parameter.
+     * The different options are:
+     *   "etf_only"                 :   only ETF info is used, otherwise an error
+     *                                  is thrown.
+     *   "fastestpriority"          :   event time is estimated by fastest priority
+     *                                  time in selected track segments. if something
+     *                                  fails, it is set to 0.
+     *   "zero"                     :   the event time is set to 0.
+     *   "etf_or_fastestpriority"   :   the event time is obtained by the ETF, if
+     *                                  not possible, the flag
+     *                                  "fastestppriority" is used.
+     *   "etf_or_zero"              :   the event time is obtained by the ETF, if
+     */
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option);
+
+    /** DEPRECATED!! Read out the event time and store it.
      * If there is no valid event time, it can be determined
      * from the shortest priority time of all hit candidates,
      * if the option is enabled for the given sector. */
-    void getEventTime(unsigned isector, const CDCTriggerTrack& track, bool alwaysTrackT0 = false);
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track);
+
+    /** Return value of m_et_option */
+    std::string get_et_option()
+    {
+      std::string eto = m_MLPs[0].get_et_option();
+      for (unsigned int i = 0; i < m_MLPs.size(); ++i) {
+        if (m_MLPs[i].get_et_option() != eto) {
+          B2ERROR("Timing options in the expert networks in the CDC Neurotrigger differ!");
+        }
+      }
+      return eto;
+
+    }
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input

@@ -20,6 +20,9 @@ namespace Belle2 {
     /// Set the cached B field
     void beginRun() final;
 
+    /// default constructor to silence cppcheck warnings
+    SimpleSVDStateFilter() = default;
+
     TrackFindingCDC::Weight operator()(const BaseSVDStateFilter::Object& pair) final;
 
   private:

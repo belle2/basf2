@@ -88,6 +88,10 @@ namespace Belle2 {
      */
     void fillFromTH1(TH1* hist);
 
+    /**
+     * Fill pure TH2Poly from ARICHChannelHist, makes bins and fills content
+     */
+    void setPoly(TH2Poly* poly);
 
   protected:
 

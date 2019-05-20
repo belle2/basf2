@@ -77,4 +77,4 @@ on which the flavorTagger depends are overtrained.
 
 `ntupleUpsilon4SGenInfo.py` : saves MC variables for the generated Upsilon(4S). This is needed for studies of the generated MC information.
 This file is written for the case when the Upsilon(4S), has two daughters (i.e. BBbar) and four granddaughters (e.g. B0->Jpsi+K0S).
-The saved variables are mcPDG,M,nDaughters,mcDecayTime,mcLifeTime,mcDX,mcDY,mcDZ,mcE,mcPX,mcPY,mcPZ. 
+The saved variables are mcPDG,M,nDaughters,mcDecayTime,mcLifeTime,mcX,mcY,mcZ,mcE,mcPX,mcPY,mcPZ. 

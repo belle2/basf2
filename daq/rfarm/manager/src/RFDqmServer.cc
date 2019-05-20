@@ -137,12 +137,22 @@ int RFDqmServer::Stop(NSMmsg* msg, NSMcontext*)
   if (badlist == NULL)
     badlist = blank;
 
-  char outfile[1024];
-  //  sprintf(outfile, "dqm_e%4.4dr%6.6d.root", msg->pars[0], msg->pars[1]);
-  sprintf(outfile, "dqm_e%4.4dr%6.6d.root", m_expno, m_runno);
-  int pid_dqmmerge = m_proc->Execute(merger, outfile, nodebase, topdir, nnodes, startnode, badlist);
+  int colpid = fork();
+  if (colpid == 0) {
+    char outfile[1024];
+    //  sprintf(outfile, "dqm_e%4.4dr%6.6d.root", msg->pars[0], msg->pars[1]);
+    sprintf(outfile, "dqm_e%4.4dr%6.6d.root", m_expno, m_runno);
+    // Double fork to avoid zombie
+    int dblpid = fork();
+    if (dblpid == 0) {
+      int pid_dqmmerge = m_proc->Execute(merger, outfile, nodebase, topdir, nnodes, startnode, badlist);
+      exit(0);
+    }
+    exit(0); // Exit mother of double fork
+  }
+  // Wait for the completion of mother
   int status;
-  pid_t done = waitpid(pid_dqmmerge, &status, 0);
+  pid_t done = waitpid(colpid, &status, 0);
 
   printf("DqmServer : Stopped.\n");
 

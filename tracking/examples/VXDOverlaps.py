@@ -318,36 +318,24 @@ def LayerSensorPlots(filename, lyr_num, lddr_num, snsr_num):
     # in all the ladders of a specific layer
     for i in range(1, snsr_num + 1):
         c_Meas = TCanvas('c_Meas_' + str(lyr_num) + ':' + str(i), 'Layer:Sensor = ' + str(lyr_num) + ':' + str(i), 500, 700)
-        c_Fit = TCanvas('c_Fit_' + str(lyr_num) + ':' + str(i), 'Layer:Sensor = ' + str(lyr_num) + ':' + str(i), 500, 700)
         if(lyr_num == 6):
             c_Meas.Divide(4, 4)
-            c_Fit.Divide(4, 4)
         elif(lyr_num == 5):
             c_Meas.Divide(4, 3)
-            c_Fit.Divide(4, 3)
         elif(lyr_num == 4):
             c_Meas.Divide(5, 2)
-            c_Fit.Divide(5, 2)
         elif(lyr_num == 3):
             c_Meas.Divide(7, 1)
-            c_Fit.Divide(7, 1)
         elif(lyr_num == 2):
             c_Meas.Divide(6, 2)
-            c_Fit.Divide(6, 2)
         elif(lyr_num == 1):
             c_Meas.Divide(4, 2)
-            c_Fit.Divide(4, 2)
         for k in range(1, lddr_num + 1):
             histo = hm.Get('h_' + str(lyr_num) + str(k) + str(i))
             c_Meas.cd(k)
             histo.Draw('COLZ')
-            histo_fit = hm.Get('h_Fit_' + str(lyr_num) + str(k) + str(i))
-            c_Fit.cd(k)
-            histo_fit.Draw('COLZ')
             c_Meas.SaveAs('HitMaps_plots_Overlaps/c_Layer:Sensor_' + str(lyr_num) + str(i) + '.root')
             c_Meas.SaveAs('HitMaps_plots_Overlaps/c_Layer:Sensor_' + str(lyr_num) + str(i) + '.pdf')
-            c_Fit.SaveAs('HitMaps_plots_Overlaps/c_Fit_Layer:Sensor_' + str(lyr_num) + str(i) + '.root')
-            c_Fit.SaveAs('HitMaps_plots_Overlaps/c_Fit_Layer:Sensor_' + str(lyr_num) + str(i) + '.pdf')
     return
 
 

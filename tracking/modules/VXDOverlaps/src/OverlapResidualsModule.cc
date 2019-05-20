@@ -69,75 +69,10 @@ void OverlapResidualsModule::initialize()
 
 void OverlapResidualsModule::defineHisto()
 {
-  //Create separate histogram directories
+  //Create directory to store monitoring histograms
   TDirectory* oldDir = gDirectory;
-  TDirectory* HMDir = nullptr;
-  HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
   TDirectory* ResDir = nullptr;
   ResDir = oldDir->mkdir("Monitoring_VXDOverlaps");
-
-//Special case of ExpertLevel option enabled
-  if (m_ExpertLevel) {
-    TDirectory* TreeDir = nullptr;
-    TreeDir = oldDir->mkdir("Trees_VXDOverlaps");
-    TreeDir->cd();
-    //Tree for PXD
-    t_PXD = new TTree("t_PXD", "Tree for PXD overlaps");
-    t_PXD->Branch("deltaResU_PXD", &deltaResU_PXD, "deltaResU_PXD/F");
-    t_PXD->Branch("intResU_PXD", &intResU_PXD, "intResU_PXD/F");
-    t_PXD->Branch("intResV_PXD", &intResV_PXD, "intResV_PXD/F");
-    t_PXD->Branch("intU_PXD", &intU_PXD, "intU_PXD/F");
-    t_PXD->Branch("intV_PXD", &intV_PXD, "intV_PXD/F");
-    t_PXD->Branch("intPhi_PXD", &intPhi_PXD, "intPhi_PXD/F");
-    t_PXD->Branch("intZ_PXD", &intZ_PXD, "intZ_PXD/F");
-    t_PXD->Branch("intLayer_PXD", &intLayer_PXD, "intLayer_PXD/i");
-    t_PXD->Branch("intLadder_PXD", &intLadder_PXD, "intLadder_PXD/i");
-    t_PXD->Branch("intSensor_PXD", &intSensor_PXD, "intSensor_PXD/i");
-    t_PXD->Branch("extResU_PXD", &extResU_PXD, "extResU_PXD/F");
-    t_PXD->Branch("extResV_PXD", &extResV_PXD, "extResV_PXD/F");
-    t_PXD->Branch("extU_PXD", &extU_PXD, "extU_PXD/F");
-    t_PXD->Branch("extV_PXD", &extV_PXD, "extV_PXD/F");
-    t_PXD->Branch("extPhi_PXD", &extPhi_PXD, "extPhi_PXD/F");
-    t_PXD->Branch("extZ_PXD", &extZ_PXD, "extZ_PXD/F");
-    t_PXD->Branch("extLayer_PXD", &extLayer_PXD, "extLayer_PXD/i");
-    t_PXD->Branch("extLadder_PXD", &extLadder_PXD, "extLadder_PXD/i");
-    t_PXD->Branch("extSensor_PXD", &extSensor_PXD, "extSensor_PXD/i");
-    //Tree for SVD u overlapping clusters
-    t_SVD_U = new TTree("t_SVD_U", "Tree for SVD u-overlaps");
-    t_SVD_U->Branch("deltaRes_SVD_U", &deltaRes_SVD_U, "deltaResU_SVD_U/F");
-    t_SVD_U->Branch("intRes_SVD_U", &intRes_SVD_U, "intRes_SVD_U/F");
-    t_SVD_U->Branch("int_SVD_U", &int_SVD_U, "int_SVD_U/F");
-    t_SVD_U->Branch("intPhi_SVD_U", &intPhi_SVD_U, "intPhi_SVD_U/F");
-    t_SVD_U->Branch("intZ_SVD_U", &intZ_SVD_U, "intZ_SVD_U/F");
-    t_SVD_U->Branch("intLayer_SVD_U", &intLayer_SVD_U, "intLayer_SVD_U/i");
-    t_SVD_U->Branch("intLadder_SVD_U", &intLadder_SVD_U, "intLadder_SVD_U/i");
-    t_SVD_U->Branch("intSensor_SVD_U", &intSensor_SVD_U, "intSensor_SVD_U/i");
-    t_SVD_U->Branch("extRes_SVD_U", &extRes_SVD_U, "extRes_SVD_U/F");
-    t_SVD_U->Branch("ext_SVD_U", &ext_SVD_U, "ext_SVD_U/F");
-    t_SVD_U->Branch("extPhi_SVD_U", &extPhi_SVD_U, "extPhi_SVD_U/F");
-    t_SVD_U->Branch("extZ_SVD_U", &extZ_SVD_U, "extZ_SVD_U/F");
-    t_SVD_U->Branch("extLayer_SVD_U", &extLayer_SVD_U, "extLayer_SVD_U/i");
-    t_SVD_U->Branch("extLadder_SVD_U", &extLadder_SVD_U, "extLadder_SVD_U/i");
-    t_SVD_U->Branch("extSensor_SVD_U", &extSensor_SVD_U, "extSensor_SVD_U/i");
-    //Tree for SVD v overlapping clusters
-    t_SVD_V = new TTree("t_SVD_V", "Tree for SVD v-overlaps");
-    t_SVD_V->Branch("deltaRes_SVD_V", &deltaRes_SVD_V, "deltaResU_SVD_V/F");
-    t_SVD_V->Branch("intRes_SVD_V", &intRes_SVD_V, "intRes_SVD_V/F");
-    t_SVD_V->Branch("int_SVD_V", &int_SVD_V, "int_SVD_V/F");
-    t_SVD_V->Branch("intPhi_SVD_V", &intPhi_SVD_V, "intPhi_SVD_V/F");
-    t_SVD_V->Branch("intZ_SVD_V", &intZ_SVD_V, "intZ_SVD_V/F");
-    t_SVD_V->Branch("intLayer_SVD_V", &intLayer_SVD_V, "intLayer_SVD_V/i");
-    t_SVD_V->Branch("intLadder_SVD_V", &intLadder_SVD_V, "intLadder_SVD_V/i");
-    t_SVD_V->Branch("intSensor_SVD_V", &intSensor_SVD_V, "intSensor_SVD_V/i");
-    t_SVD_V->Branch("extRes_SVD_V", &extRes_SVD_V, "extRes_SVD_V/F");
-    t_SVD_V->Branch("ext_SVD_V", &ext_SVD_V, "ext_SVD_V/F");
-    t_SVD_V->Branch("extPhi_SVD_V", &extPhi_SVD_V, "extPhi_SVD_V/F");
-    t_SVD_V->Branch("extZ_SVD_V", &extZ_SVD_V, "extZ_SVD_V/F");
-    t_SVD_V->Branch("extLayer_SVD_V", &extLayer_SVD_V, "extLayer_SVD_V/i");
-    t_SVD_V->Branch("extLadder_SVD_V", &extLadder_SVD_V, "extLadder_SVD_V/i");
-    t_SVD_V->Branch("extSensor_SVD_V", &extSensor_SVD_V, "extSensor_SVD_V/i");
-  }
-
   ResDir->cd();
   //Define histograms of residuals differences
   h_U_DeltaRes = new TH1F("h_U_DeltaRes", "Histrogram of residual difference #Delta res_{u} for overlapping hits", 100, -1000, 1000);
@@ -289,7 +224,7 @@ void OverlapResidualsModule::defineHisto()
   h_DeltaResVz_Lyr6 = new TH2F("h_DeltaResVz_Lyr6", "Layer 6: #Delta res_{v} vs z", 250, -30, 45, 100, -1000, 1000);
   h_DeltaResVz_Lyr6->GetXaxis()->SetTitle("z (cm)");
   h_DeltaResVz_Lyr6->GetYaxis()->SetTitle("#Delta res_{v} (#mum)");
-
+  //Restricting to SVD clusters sizes
   for (int i = 1; i < 5; i++) {
     //The name is the product of cluster sizes for 2 consecutive hits (maximum size considered is 2)
     TString h_name_U = "h_U_Cl1Cl2_" + std::to_string(i);
@@ -304,131 +239,128 @@ void OverlapResidualsModule::defineHisto()
     h_V_Cl1Cl2_DeltaRes[i]->GetYaxis()->SetTitle("counts");
   }
 
-  HMDir->cd();
-  //Create 2D sensor hit-maps for reconstructed hits
-  for (int i = 1; i <= 5; i++) {
-    for (int j = 1; j <= 16; j++) {
-      TString h_name = "h_6" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 6:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr6[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
-      h_Lyr6[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Lyr6[j][i]->GetYaxis()->SetTitle("v (cm)");
+  //Special case of ExpertLevel option enabled
+  if (m_ExpertLevel) {
+    //Create directory to store PXD and SVD hitmaps for overlapping hits
+    TDirectory* HMDir = nullptr;
+    HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
+    HMDir->cd();
+    //Define 2D sensor hit-maps for reconstructed hits
+    for (int i = 1; i <= 5; i++) {
+      for (int j = 1; j <= 16; j++) {
+        TString h_name = "h_6" + std::to_string(j) + std::to_string(i);
+        TString title = "Layer:Ladder:Sensor = 6:" + std::to_string(j) + ":" + std::to_string(i);
+        h_Lyr6[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
+        h_Lyr6[j][i]->GetXaxis()->SetTitle("u (cm)");
+        h_Lyr6[j][i]->GetYaxis()->SetTitle("v (cm)");
+      }
     }
-  }
-
-  for (int i = 1; i <= 4; i++) {
-    for (int j = 1; j <= 12; j++) {
-      TString h_name = "h_5" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 5:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr5[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
-      h_Lyr5[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Lyr5[j][i]->GetYaxis()->SetTitle("v (cm)");
+    for (int i = 1; i <= 4; i++) {
+      for (int j = 1; j <= 12; j++) {
+        TString h_name = "h_5" + std::to_string(j) + std::to_string(i);
+        TString title = "Layer:Ladder:Sensor = 5:" + std::to_string(j) + ":" + std::to_string(i);
+        h_Lyr5[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
+        h_Lyr5[j][i]->GetXaxis()->SetTitle("u (cm)");
+        h_Lyr5[j][i]->GetYaxis()->SetTitle("v (cm)");
+      }
     }
-  }
-
-  for (int i = 1; i <= 3; i++) {
-    for (int j = 1; j <= 10; j++) {
-      TString h_name = "h_4" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 4:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr4[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
-      h_Lyr4[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Lyr4[j][i]->GetYaxis()->SetTitle("v (cm)");
+    for (int i = 1; i <= 3; i++) {
+      for (int j = 1; j <= 10; j++) {
+        TString h_name = "h_4" + std::to_string(j) + std::to_string(i);
+        TString title = "Layer:Ladder:Sensor = 4:" + std::to_string(j) + ":" + std::to_string(i);
+        h_Lyr4[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
+        h_Lyr4[j][i]->GetXaxis()->SetTitle("u (cm)");
+        h_Lyr4[j][i]->GetYaxis()->SetTitle("v (cm)");
+      }
     }
-  }
-
-  for (int i = 1; i <= 2; i++) {
-    for (int j = 1; j <= 7; j++) {
-      TString h_name = "h_3" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 3:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr3[j][i] = new TH2F(h_name, title, 100, -1.92, 1.92, 100, -6.14, 6.14);
-      h_Lyr3[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Lyr3[j][i]->GetYaxis()->SetTitle("v (cm)");
+    for (int i = 1; i <= 2; i++) {
+      for (int j = 1; j <= 7; j++) {
+        TString h_name = "h_3" + std::to_string(j) + std::to_string(i);
+        TString title = "Layer:Ladder:Sensor = 3:" + std::to_string(j) + ":" + std::to_string(i);
+        h_Lyr3[j][i] = new TH2F(h_name, title, 100, -1.92, 1.92, 100, -6.14, 6.14);
+        h_Lyr3[j][i]->GetXaxis()->SetTitle("u (cm)");
+        h_Lyr3[j][i]->GetYaxis()->SetTitle("v (cm)");
+      }
     }
-  }
-
-  for (int i = 1; i <= 2; i++) {
-    for (int j = 1; j <= 12; j++) {
-      TString h_name = "h_2" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 2:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr2[j][i] = new TH2F(h_name, title, 100, -0.625, 0.625, 100, -3.072, 3.072);
-      h_Lyr2[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Lyr2[j][i]->GetYaxis()->SetTitle("v (cm)");
+    for (int i = 1; i <= 2; i++) {
+      for (int j = 1; j <= 12; j++) {
+        TString h_name = "h_2" + std::to_string(j) + std::to_string(i);
+        TString title = "Layer:Ladder:Sensor = 2:" + std::to_string(j) + ":" + std::to_string(i);
+        h_Lyr2[j][i] = new TH2F(h_name, title, 100, -0.625, 0.625, 100, -3.072, 3.072);
+        h_Lyr2[j][i]->GetXaxis()->SetTitle("u (cm)");
+        h_Lyr2[j][i]->GetYaxis()->SetTitle("v (cm)");
+      }
     }
-  }
-
-  for (int i = 1; i <= 2; i++) {
-    for (int j = 1; j <= 8; j++) {
-      TString h_name = "h_1" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 1:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr1[j][i] = new TH2F(h_name, title, 100, -0.625, 0.625, 100, -2.24, 2.24);
-      h_Lyr1[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Lyr1[j][i]->GetYaxis()->SetTitle("v (cm)");
+    for (int i = 1; i <= 2; i++) {
+      for (int j = 1; j <= 8; j++) {
+        TString h_name = "h_1" + std::to_string(j) + std::to_string(i);
+        TString title = "Layer:Ladder:Sensor = 1:" + std::to_string(j) + ":" + std::to_string(i);
+        h_Lyr1[j][i] = new TH2F(h_name, title, 100, -0.625, 0.625, 100, -2.24, 2.24);
+        h_Lyr1[j][i]->GetXaxis()->SetTitle("u (cm)");
+        h_Lyr1[j][i]->GetYaxis()->SetTitle("v (cm)");
+      }
     }
+    //Create directory to store PXD and SVD trees
+    TDirectory* TreeDir = nullptr;
+    TreeDir = oldDir->mkdir("Trees_VXDOverlaps");
+    TreeDir->cd();
+    //Tree for PXD
+    t_PXD = new TTree("t_PXD", "Tree for PXD overlaps");
+    t_PXD->Branch("deltaResU_PXD", &deltaResU_PXD, "deltaResU_PXD/F");
+    t_PXD->Branch("intResU_PXD", &intResU_PXD, "intResU_PXD/F");
+    t_PXD->Branch("intResV_PXD", &intResV_PXD, "intResV_PXD/F");
+    t_PXD->Branch("intU_PXD", &intU_PXD, "intU_PXD/F");
+    t_PXD->Branch("intV_PXD", &intV_PXD, "intV_PXD/F");
+    t_PXD->Branch("intPhi_PXD", &intPhi_PXD, "intPhi_PXD/F");
+    t_PXD->Branch("intZ_PXD", &intZ_PXD, "intZ_PXD/F");
+    t_PXD->Branch("intLayer_PXD", &intLayer_PXD, "intLayer_PXD/i");
+    t_PXD->Branch("intLadder_PXD", &intLadder_PXD, "intLadder_PXD/i");
+    t_PXD->Branch("intSensor_PXD", &intSensor_PXD, "intSensor_PXD/i");
+    t_PXD->Branch("extResU_PXD", &extResU_PXD, "extResU_PXD/F");
+    t_PXD->Branch("extResV_PXD", &extResV_PXD, "extResV_PXD/F");
+    t_PXD->Branch("extU_PXD", &extU_PXD, "extU_PXD/F");
+    t_PXD->Branch("extV_PXD", &extV_PXD, "extV_PXD/F");
+    t_PXD->Branch("extPhi_PXD", &extPhi_PXD, "extPhi_PXD/F");
+    t_PXD->Branch("extZ_PXD", &extZ_PXD, "extZ_PXD/F");
+    t_PXD->Branch("extLayer_PXD", &extLayer_PXD, "extLayer_PXD/i");
+    t_PXD->Branch("extLadder_PXD", &extLadder_PXD, "extLadder_PXD/i");
+    t_PXD->Branch("extSensor_PXD", &extSensor_PXD, "extSensor_PXD/i");
+    //Tree for SVD u overlapping clusters
+    t_SVD_U = new TTree("t_SVD_U", "Tree for SVD u-overlaps");
+    t_SVD_U->Branch("deltaRes_SVD_U", &deltaRes_SVD_U, "deltaResU_SVD_U/F");
+    t_SVD_U->Branch("intRes_SVD_U", &intRes_SVD_U, "intRes_SVD_U/F");
+    t_SVD_U->Branch("int_SVD_U", &int_SVD_U, "int_SVD_U/F");
+    t_SVD_U->Branch("intPhi_SVD_U", &intPhi_SVD_U, "intPhi_SVD_U/F");
+    t_SVD_U->Branch("intZ_SVD_U", &intZ_SVD_U, "intZ_SVD_U/F");
+    t_SVD_U->Branch("intLayer_SVD_U", &intLayer_SVD_U, "intLayer_SVD_U/i");
+    t_SVD_U->Branch("intLadder_SVD_U", &intLadder_SVD_U, "intLadder_SVD_U/i");
+    t_SVD_U->Branch("intSensor_SVD_U", &intSensor_SVD_U, "intSensor_SVD_U/i");
+    t_SVD_U->Branch("extRes_SVD_U", &extRes_SVD_U, "extRes_SVD_U/F");
+    t_SVD_U->Branch("ext_SVD_U", &ext_SVD_U, "ext_SVD_U/F");
+    t_SVD_U->Branch("extPhi_SVD_U", &extPhi_SVD_U, "extPhi_SVD_U/F");
+    t_SVD_U->Branch("extZ_SVD_U", &extZ_SVD_U, "extZ_SVD_U/F");
+    t_SVD_U->Branch("extLayer_SVD_U", &extLayer_SVD_U, "extLayer_SVD_U/i");
+    t_SVD_U->Branch("extLadder_SVD_U", &extLadder_SVD_U, "extLadder_SVD_U/i");
+    t_SVD_U->Branch("extSensor_SVD_U", &extSensor_SVD_U, "extSensor_SVD_U/i");
+    //Tree for SVD v overlapping clusters
+    t_SVD_V = new TTree("t_SVD_V", "Tree for SVD v-overlaps");
+    t_SVD_V->Branch("deltaRes_SVD_V", &deltaRes_SVD_V, "deltaResU_SVD_V/F");
+    t_SVD_V->Branch("intRes_SVD_V", &intRes_SVD_V, "intRes_SVD_V/F");
+    t_SVD_V->Branch("int_SVD_V", &int_SVD_V, "int_SVD_V/F");
+    t_SVD_V->Branch("intPhi_SVD_V", &intPhi_SVD_V, "intPhi_SVD_V/F");
+    t_SVD_V->Branch("intZ_SVD_V", &intZ_SVD_V, "intZ_SVD_V/F");
+    t_SVD_V->Branch("intLayer_SVD_V", &intLayer_SVD_V, "intLayer_SVD_V/i");
+    t_SVD_V->Branch("intLadder_SVD_V", &intLadder_SVD_V, "intLadder_SVD_V/i");
+    t_SVD_V->Branch("intSensor_SVD_V", &intSensor_SVD_V, "intSensor_SVD_V/i");
+    t_SVD_V->Branch("extRes_SVD_V", &extRes_SVD_V, "extRes_SVD_V/F");
+    t_SVD_V->Branch("ext_SVD_V", &ext_SVD_V, "ext_SVD_V/F");
+    t_SVD_V->Branch("extPhi_SVD_V", &extPhi_SVD_V, "extPhi_SVD_V/F");
+    t_SVD_V->Branch("extZ_SVD_V", &extZ_SVD_V, "extZ_SVD_V/F");
+    t_SVD_V->Branch("extLayer_SVD_V", &extLayer_SVD_V, "extLayer_SVD_V/i");
+    t_SVD_V->Branch("extLadder_SVD_V", &extLadder_SVD_V, "extLadder_SVD_V/i");
+    t_SVD_V->Branch("extSensor_SVD_V", &extSensor_SVD_V, "extSensor_SVD_V/i");
   }
-
-  //Create 2D sensor hit-maps for predicted (by track fit) hits
-  for (int i = 1; i <= 5; i++) {
-    for (int j = 1; j <= 16; j++) {
-      TString h_name = "h_Fit_6" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 6:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Fit_Lyr6[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
-      h_Fit_Lyr6[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Fit_Lyr6[j][i]->GetYaxis()->SetTitle("v (cm)");
-    }
-  }
-
-
-  for (int i = 1; i <= 4; i++) {
-    for (int j = 1; j <= 12; j++) {
-      TString h_name = "h_Fit_5" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 5:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Fit_Lyr5[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
-      h_Fit_Lyr5[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Fit_Lyr5[j][i]->GetYaxis()->SetTitle("v (cm)");
-    }
-  }
-
-  for (int i = 1; i <= 3; i++) {
-    for (int j = 1; j <= 10; j++) {
-      TString h_name = "h_Fit_4" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 4:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Fit_Lyr4[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
-      h_Fit_Lyr4[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Fit_Lyr4[j][i]->GetYaxis()->SetTitle("v (cm)");
-    }
-  }
-
-
-  for (int i = 1; i <= 2; i++) {
-    for (int j = 1; j <= 7; j++) {
-      TString h_name = "h_Fit_3" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 3:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Fit_Lyr3[j][i] = new TH2F(h_name, title, 100, -1.92, 1.92, 100, -6.14, 6.14);
-      h_Fit_Lyr3[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Fit_Lyr3[j][i]->GetYaxis()->SetTitle("v (cm)");
-    }
-  }
-
-  for (int i = 1; i <= 2; i++) {
-    for (int j = 1; j <= 12; j++) {
-      TString h_name = "h_Fit_2" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 2:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Fit_Lyr2[j][i] = new TH2F(h_name, title, 100, -0.625, 0.625, 100, -3.072, 3.072);
-      h_Fit_Lyr2[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Fit_Lyr2[j][i]->GetYaxis()->SetTitle("v (cm)");
-    }
-  }
-
-  for (int i = 1; i <= 2; i++) {
-    for (int j = 1; j <= 8; j++) {
-      TString h_name = "h_Fit_1" + std::to_string(j) + std::to_string(i);
-      TString title = "Layer:Ladder:Sensor = 1:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Fit_Lyr1[j][i] = new TH2F(h_name, title, 100, -0.625, 0.625, 100, -2.24, 2.24);
-      h_Fit_Lyr1[j][i]->GetXaxis()->SetTitle("u (cm)");
-      h_Fit_Lyr1[j][i]->GetYaxis()->SetTitle("v (cm)");
-    }
-  }
-
+  //Go back to the default output directory
   oldDir->cd();
 }
 
@@ -479,10 +411,8 @@ void OverlapResidualsModule::event()
           B2INFO(" ============= 2 hits in a PXD overlap ============= ");
           const TVectorD resUnBias_PXD_1 = fittedResult_1->getResidual(0, false).getState();
           const TVectorD resUnBias_PXD_2 = fittedResult_2->getResidual(0, false).getState();
-          const TVectorD& pxd_predIntersect_1 = trk.getMeasuredStateOnPlaneFromRecoHit(infoPXD_1).getState();
           const float res_U_1 = resUnBias_PXD_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
           const float res_V_1 = resUnBias_PXD_1.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
-          const TVectorD& pxd_predIntersect_2 = trk.getMeasuredStateOnPlaneFromRecoHit(infoPXD_2).getState();
           const double res_U_2 = resUnBias_PXD_2.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
           const double res_V_2 = resUnBias_PXD_2.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
           const float over_U_PXD = res_U_2 - res_U_1;
@@ -529,9 +459,7 @@ void OverlapResidualsModule::event()
           //Fill sensor hit-maps and 2D histograms with PXD clusters
           if (pxd_Layer_1 == 1 && pxd_Layer_2 == 1) {
             h_Lyr1[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
-            h_Fit_Lyr1[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_predIntersect_1[3], pxd_predIntersect_1[4]);
             h_Lyr1[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
-            h_Fit_Lyr1[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_predIntersect_2[3], pxd_predIntersect_2[4]);
             h_U_DeltaRes_PXD_Lyr1->Fill(over_U_PXD);
             h_V_DeltaRes_PXD_Lyr1->Fill(over_V_PXD);
             h_DeltaResUPhi_Lyr1->Fill(pxdPhi_1, over_U_PXD);
@@ -545,9 +473,7 @@ void OverlapResidualsModule::event()
           }
           if (pxd_Layer_1 == 2 && pxd_Layer_2 == 2) {
             h_Lyr2[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
-            h_Fit_Lyr2[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_predIntersect_1[3], pxd_predIntersect_1[4]);
             h_Lyr2[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
-            h_Fit_Lyr2[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_predIntersect_2[3], pxd_predIntersect_2[4]);
             h_U_DeltaRes_PXD_Lyr2->Fill(over_U_PXD);
             h_V_DeltaRes_PXD_Lyr2->Fill(over_V_PXD);
             h_DeltaResUPhi_Lyr2->Fill(pxdPhi_1, over_U_PXD);
@@ -650,9 +576,7 @@ void OverlapResidualsModule::event()
             //Fill sensor hit-maps and 2D histograms with SVD u clusters
             if (svd_Layer_1 == 3 && svd_Layer_2 == 3) {
               h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Fit_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(svd_predIntersect_1[3], 0.);
               h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
-              h_Fit_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(svd_predIntersect_2[3], 0.);
               h_U_DeltaRes_SVD_Lyr3->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr3->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr3->Fill(svdPhi_2, over_U_SVD);
@@ -661,9 +585,7 @@ void OverlapResidualsModule::event()
             }
             if (svd_Layer_1 == 4 && svd_Layer_2 == 4) {
               h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Fit_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(svd_predIntersect_1[3], 0.);
               h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
-              h_Fit_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(svd_predIntersect_2[3], 0.);
               h_U_DeltaRes_SVD_Lyr4->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr4->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr4->Fill(svdPhi_2, over_U_SVD);
@@ -672,9 +594,7 @@ void OverlapResidualsModule::event()
             }
             if (svd_Layer_1 == 5 && svd_Layer_2 == 5) {
               h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Fit_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(svd_predIntersect_1[3], 0.);
               h_Lyr5[svd_Ladder_2][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Fit_Lyr5[svd_Ladder_2][svd_Sensor_2]->Fill(svd_predIntersect_2[3], 0.);
               h_U_DeltaRes_SVD_Lyr5->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr5->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr5->Fill(svdPhi_2, over_U_SVD);
@@ -683,9 +603,7 @@ void OverlapResidualsModule::event()
             }
             if (svd_Layer_1 == 6 && svd_Layer_2 == 6) {
               h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Fit_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(svd_predIntersect_1[3], 0.);
               h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
-              h_Fit_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(svd_predIntersect_2[3], 0.);
               h_U_DeltaRes_SVD_Lyr6->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr6->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr6->Fill(svdPhi_2, over_U_SVD);
@@ -741,9 +659,7 @@ void OverlapResidualsModule::event()
             //Fill sensor hit-maps and 2D histograms with SVD v clusters
             if (svd_Layer_1 == 3 && svd_Layer_2 == 3) {
               h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Fit_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_predIntersect_1[4]);
               h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
-              h_Fit_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_predIntersect_2[4]);
               h_V_DeltaRes_SVD_Lyr3->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr3->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr3->Fill(svdPhi_2, over_V_SVD);
@@ -752,9 +668,7 @@ void OverlapResidualsModule::event()
             }
             if (svd_Layer_1 == 4 && svd_Layer_2 == 4) {
               h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Fit_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_predIntersect_1[4]);
               h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
-              h_Fit_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_predIntersect_2[4]);
               h_V_DeltaRes_SVD_Lyr4->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr4->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr4->Fill(svdPhi_2, over_V_SVD);
@@ -763,9 +677,7 @@ void OverlapResidualsModule::event()
             }
             if (svd_Layer_1 == 5 && svd_Layer_2 == 5) {
               h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Fit_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_predIntersect_1[4]);
               h_Lyr5[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
-              h_Fit_Lyr5[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_predIntersect_2[4]);
               h_V_DeltaRes_SVD_Lyr5->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr5->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr5->Fill(svdPhi_2, over_V_SVD);
@@ -774,9 +686,7 @@ void OverlapResidualsModule::event()
             }
             if (svd_Layer_1 == 6 && svd_Layer_2 == 6) {
               h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Fit_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_predIntersect_1[4]);
               h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
-              h_Fit_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_predIntersect_2[4]);
               h_V_DeltaRes_SVD_Lyr6->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr6->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr6->Fill(svdPhi_2, over_V_SVD);

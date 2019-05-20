@@ -109,13 +109,6 @@ namespace Belle2 {
     TH2F* h_Lyr3[8][3] = {nullptr}; //[Ladder][sensor number]
     TH2F* h_Lyr2[13][3] = {nullptr}; //[Ladder][sensor number]
     TH2F* h_Lyr1[9][3] = {nullptr}; //[Ladder][sensor number]
-    /** Sensor hit-maps from fitted u and v coordinates */
-    TH2F* h_Fit_Lyr6[17][6] = {nullptr};
-    TH2F* h_Fit_Lyr5[13][5] = {nullptr};
-    TH2F* h_Fit_Lyr4[11][4] = {nullptr};
-    TH2F* h_Fit_Lyr3[8][3] = {nullptr}; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr2[13][3] = {nullptr}; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr1[9][3] = {nullptr}; //[Ladder][sensor number]
     /** Trees containing global information on VXD overlaps */
     TTree* t_PXD = nullptr;
     TTree* t_SVD_U = nullptr;

@@ -119,12 +119,6 @@ namespace Belle2 {
     //! Export BKLM time window cut
     void exportBklmTimeWindow();
 
-    //! Import BKLM strip efficiencies into the database
-    void importBklmStripEfficiency(int expStart, int runStart, int expStop, int runStop, std::string fileName);
-
-    //! Export BKLM bad channels from the database
-    void exportBklmStripEfficiency();
-
   private:
 
     /** Electronics mapping. */

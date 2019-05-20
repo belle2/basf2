@@ -324,13 +324,20 @@ void SVDClusterEvaluationModule::terminate()
               continue;
             }
             TF1* func = res->GetFunction("function");
-            if (func == NULL) func = res->GetFunction("functionG1");
-            if (func != NULL) {
+            //            if (func == NULL) func = res->GetFunction("functionG1");
+            //            if (func != NULL) {
+            Double_t median, q;
+            q = 0.5; // 0.5 for "median"
+            {
               if (view == SVDHistograms<TH1F>::UIndex) {
                 sensorU[s] = Form("%d.%d.%dU", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 B2DEBUG(10, "U-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
-                residU[s] = func->GetParameter("sigma1");
-                misU[s] = func->GetParameter("mean1");
+
+                res->GetQuantiles(1, &median, &q);
+
+                residU[s] = getOneSigma(res); //func->GetParameter("sigma1");
+                misU[s] = median; //func->GetParameter("mean1");
+
                 float halfWindow = m_nSigma * residU[s];
                 if (m_nSigma == 0)
                   halfWindow = m_halfWidth;
@@ -339,9 +346,19 @@ void SVDClusterEvaluationModule::terminate()
                 int binMax = res->FindBin(misU[s] + halfWindow);
                 B2DEBUG(10, "from " << misU[s] - halfWindow << " -> binMin = " << binMin);
                 B2DEBUG(10, "to " << misU[s] + halfWindow << " -> binMax = " << binMax);
+
                 int num = 0;
                 for (int bin = binMin; bin < binMax + 1; bin++)
                   num = num + res->GetBinContent(bin);
+
+                float bkg = 0;
+                for (int bin = 1; bin < binMin; bin++)
+                  bkg = bkg + res->GetBinContent(bin);
+                for (int bin = binMax; bin < res->GetNbinsX() + 1; bin++)
+                  bkg = bkg + res->GetBinContent(bin);
+                //remove background clusters from sidebands
+                num = num - bkg * (binMax - binMin + 1.) / (binMin + res->GetNbinsX() - binMax - 1);
+
                 if (den > 0) {
                   effU[s] = 1.*num / den;
                   //filling efficiency histogram
@@ -366,8 +383,11 @@ void SVDClusterEvaluationModule::terminate()
               } else {
                 sensorV[s] = Form("%d.%d.%dV", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 B2DEBUG(10, "V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
-                residV[s] = func->GetParameter("sigma1");
-                misV[s] = func->GetParameter("mean1");
+
+                res->GetQuantiles(1, &median, &q);
+
+                residV[s] = getOneSigma(res); //func->GetParameter("sigma1");
+                misV[s] = median; //func->GetParameter("mean1");
 
                 float halfWindow = m_nSigma * residV[s];
                 if (m_nSigma == 0)
@@ -377,9 +397,20 @@ void SVDClusterEvaluationModule::terminate()
                 int binMax = res->FindBin(misV[s] + halfWindow);
                 B2DEBUG(10, "from " << misV[s] - halfWindow << " -> binMin = " << binMin);
                 B2DEBUG(10, "to " << misV[s] + halfWindow << " -> binMax = " << binMax);
+
+                //determine signal clusters
                 int num = 0;
                 for (int bin = binMin; bin < binMax + 1; bin++)
                   num = num + res->GetBinContent(bin);
+
+                float bkg = 0;
+                for (int bin = 1; bin < binMin; bin++)
+                  bkg = bkg + res->GetBinContent(bin);
+                for (int bin = binMax; bin < res->GetNbinsX() + 1; bin++)
+                  bkg = bkg + res->GetBinContent(bin);
+                //remove background clusters from sidebands
+                num = num - bkg * (binMax - binMin + 1.) / (binMin + res->GetNbinsX() - binMax - 1);
+
                 if (den > 0) {
                   effV[s] = 1.*num / den;
                   //filling efficiency histogram
@@ -416,13 +447,6 @@ void SVDClusterEvaluationModule::terminate()
 
 
 
-    TGraphErrors* g_effU = new TGraphErrors(Nsensors, sensors, effU, sensorsErr, effUErr);
-    g_effU->SetName("geffU");
-    g_effU->SetTitle(Form("U-Side Summary, %.1f#sigma or #pm%.1f mm", m_nSigma, m_halfWidth * 10));
-    TGraphErrors* g_effV = new TGraphErrors(Nsensors, sensors, effV, sensorsErr, effVErr);
-    g_effV->SetName("geffV");
-    g_effV->SetTitle(Form("V-Side Summary, %.1f#sigma or #pm%.1f mm", m_nSigma, m_halfWidth * 10));
-
     oldDir->cd();
     for (int bin = 0; bin < h_residU->GetNbinsX(); bin++)
       h_residU->SetBinError(bin, 0.);
@@ -448,55 +472,6 @@ void SVDClusterEvaluationModule::terminate()
     for (int bin = 0; bin < h_effV->GetNbinsX(); bin++)
       h_effV->SetBinError(bin, 0.);
     h_effV->Write();
-
-    TCanvas* c_summaryU = new TCanvas("summaryU", "U-side Summary");
-    h_residU->Draw("P");
-    h_residU->SetLineColor(kRed);
-    h_residU->SetMarkerColor(kRed);
-    h_residU->SetMarkerStyle(20);
-    h_statU->Draw("sameP");
-    h_statU->SetLineColor(kBlue);
-    h_statU->SetMarkerColor(kBlue);
-    h_statU->SetMarkerStyle(22);
-    h_misU->Draw("sameP");
-    h_misU->SetLineColor(kBlack);
-    h_misU->SetMarkerColor(kBlack);
-    h_misU->SetMarkerStyle(21);
-    TLegend* leg = new TLegend(0.7, 0.7, 0.9, 0.9);
-    leg->AddEntry(h_residU, "residuals", "lP");
-    leg->AddEntry(h_statU, "extrapolation", "lP");
-    leg->AddEntry(h_misU, "misalignment", "lP");
-    leg->Draw("same");
-    c_summaryU->Write();
-
-    TCanvas* c_summaryV = new TCanvas("summaryV", "V-side Summary");
-    h_residV->Draw("P");
-    h_residV->SetLineColor(kRed);
-    h_residV->SetMarkerColor(kRed);
-    h_residV->SetMarkerStyle(20);
-    h_statV->Draw("sameP");
-    h_statV->SetLineColor(kBlue);
-    h_statV->SetMarkerColor(kBlue);
-    h_statV->SetMarkerStyle(22);
-    h_misV->Draw("sameP");
-    h_misV->SetLineColor(kBlack);
-    h_misV->SetMarkerColor(kBlack);
-    h_misV->SetMarkerStyle(21);
-    leg->Draw("same");
-    c_summaryV->Write();
-
-    TCanvas* c_effU = new TCanvas("effU", "U-side Cluster Efficiency");
-    h_effU->Draw("P");
-    h_effU->SetLineColor(kRed);
-    h_effU->SetMarkerColor(kRed);
-    h_effU->SetMarkerStyle(20);
-    c_effU->Write();
-    TCanvas* c_effV = new TCanvas("effV", "V-side Cluster Efficiency");
-    h_effV->Draw("P");
-    h_effV->SetLineColor(kRed);
-    h_effV->SetMarkerColor(kRed);
-    h_effV->SetMarkerStyle(20);
-    c_effV->Write();
   }
 
   m_rootFilePtr->Close();
@@ -730,4 +705,21 @@ void SVDClusterEvaluationModule::create_SVDHistograms_clsResid()
                                           h_clminresidV_LargeSensor);
 
 
+}
+
+
+double SVDClusterEvaluationModule::getOneSigma(TH1F* h1)
+{
+
+  TH1F* h1_res = (TH1F*)h1->Clone("h1_res");
+  double probs[2] = {0.16, 1 - 0.16};
+  double quant[2] = {0, 0};
+  int nbinsHisto = h1_res->GetNbinsX();
+  h1_res->SetBinContent(1, h1_res->GetBinContent(0) + h1_res->GetBinContent(1));
+  h1_res->SetBinContent(nbinsHisto, h1_res->GetBinContent(nbinsHisto) + h1_res->GetBinContent(nbinsHisto + 1));
+  h1_res->SetBinContent(0, 0);
+  h1_res->SetBinContent(nbinsHisto + 1, 0);
+  h1_res->GetQuantiles(2, quant, probs);
+
+  return (-quant[0] + quant[1]) / 2;
 }

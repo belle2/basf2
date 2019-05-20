@@ -116,6 +116,8 @@ namespace Belle2 {
     void create_SVDHistograms_clsCoor(); /**< create cluster coordinates plots */
     void create_SVDHistograms_clsResid(); /**< create slucter resid plots */
 
+    double getOneSigma(TH1F* h); /**<returns one sigma using quantiles */
+
     bool isRelatedToTrack(SVDIntercept* inter); /**< is the intercept related to a track */
 
     bool fitResiduals(TH1F* res); /**< is the fit to residuals good? */

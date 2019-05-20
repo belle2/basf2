@@ -8,12 +8,14 @@ Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
 https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
 
 Usage:
-    integrated_luminosity.py --exp <E> --runs <Range> [--verbose]
+    b2integrated_luminosity_online.py --exp <E> --runs <Range> [--verbose] [--db db_path]
 
 <E> experiment number (mandatory)
 <Range> run range (mandatory)
     syntax is: xx-yy,zz
     all runs between xx and yy (included) and run zz. Can have multiple ranges xx-yy,zz-ww
+--verbose print lumi for each run
+--db path of database to use
 
 """
 
@@ -26,9 +28,8 @@ import re
 from argparse import ArgumentParser, ArgumentTypeError
 import sqlite3
 import time
-
-reco = "lum_det_shift"
-DB = "/gpfs/group/belle2/group/detector/ECL/ecl_lom.db"
+import os
+import basf2 as b2
 
 
 def parseNumRange(string):
@@ -78,12 +79,23 @@ def argparser():
                         default=False,
                         help="Print each run luminosity")
 
+    parser.add_argument("--db",
+                        dest="db",
+                        action="store",
+                        default="/gpfs/group/belle2/group/detector/ECL/ecl_lom.db",
+                        help="EC: DataBase path")
+
     return parser
 
 
 if __name__ == '__main__':
 
     args = argparser().parse_args()
+
+    reco = "lum_det_shift"
+    DB = args.db
+    if not os.path.exists(DB):
+        b2.B2FATAL(f"DB {DB} not found. The live luminosity is only available on KEKCC (sorry)")
 
     L = 0
     conn = sqlite3.connect(DB)

@@ -34,6 +34,25 @@ This line selectes B+, anti-D0 and pi+ from the anti-D0 decay:
 
 :code:`'^B+ -> [^anti-D0 -> K- ^pi+] pi^+'`
 
+Marker of inclusive particle
+----------------------------
+
+Particle can be marked as inclusive with an at-sign, :code:`'@'`, in the decayString.
+If a particle is marked as inclusive, it does not fire the flag of c_AddedWrongParticle. In the sum-of-exclusive method analysis, one can use a inclusive particle to study some different resonance with a same code.
+Here is an example of use:
+
+.. code-block:: python
+ 
+        from modularAnalysis import reconstructDecay, copyLists
+	reconstructDecay('@Xsd:0 -> K_S0:all',                   '', path=mypath)
+	reconstructDecay('@Xsd:1 -> K+:loose pi-:loose',         '', path=mypath)
+	reconstructDecay('@Xsd:2 -> K+:loose pi-:loose pi0:all', '', path=mypath)
+
+	copyLists('Xsd:comb', ['Xsd:0', 'Xsd:1', 'Xsd:2'], path=mypath)
+	# copyLists('@Xsd:comb', ['Xsd:0', 'Xsd:1', 'Xsd:2'], path=mypath) # this can't work
+
+	reconstructDecay('B0:Xsdee -> Xsd:comb e+:loose e-:loose', '', path=mypath)
+
 Inclusive Decays
 ----------------
 The decay descriptor for inclusive decays can be used only in MCDecayFinder module and nowhere else. Inclusive decays can be specified by with :code:`'...'` for unreconstructed particles:

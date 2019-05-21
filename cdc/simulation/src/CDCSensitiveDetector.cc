@@ -187,6 +187,8 @@ namespace Belle2 {
 
     const G4int pid = t.GetDefinition()->GetPDGEncoding();
     const G4double charge = t.GetDefinition()->GetPDGCharge();
+    const auto def = dynamic_cast<Monopoles::G4Monopole*>(t.GetDefinition());
+    const G4double magCharge = def ? def->MagneticCharge() : 0.0; //G4Monopole inherits from G4ParticleDefinition
     const G4int trackID = t.GetTrackID();
     //    std::cout << "pid,stepl,trackID,trackl,weight= " << pid <<" "<< stepLength <<" "<< trackID <<" "<< t.GetTrackLength() <<" "<< hitWeight << std::endl;
 

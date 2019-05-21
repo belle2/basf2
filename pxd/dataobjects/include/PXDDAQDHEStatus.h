@@ -134,11 +134,6 @@ namespace Belle2 {
     std::vector<PXDDAQDHPStatus>::iterator begin()  { return m_pxdDHP.begin(); };
     /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator end()  { return m_pxdDHP.end(); };
-
-    /** const iterator-based iteration for DHPs */
-    std::vector<PXDDAQDHPStatus>::const_iterator cbegin() const { return m_pxdDHP.cbegin(); };
-    /** const iterator-based iteration for DHPs */
-    std::vector<PXDDAQDHPStatus>::const_iterator cend() const { return m_pxdDHP.cend(); };
     /** Returns PXDDAQDHPStatus for the last DHP */
     PXDDAQDHPStatus& dhp_back()  { return m_pxdDHP.back(); };
     /** Returns number of DHPs */

@@ -93,7 +93,7 @@ def start_path(args, location):
 
     # Histogram Handling
     if not args.histo_output_file:
-        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName="/tmp/")
+        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000)
     else:
         path.add_module('HistoManager', histoFileName=args.histo_output_file)
 

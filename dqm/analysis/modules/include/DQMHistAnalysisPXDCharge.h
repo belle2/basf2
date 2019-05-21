@@ -17,7 +17,6 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <vector>
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -68,8 +67,8 @@ namespace Belle2 {
     TCanvas* m_cCharge = nullptr;
 
 #ifdef _BELLE2_EPICS
-    //! Place for EPICS PVs, Mean and maximum deviation
-    std::vector <chid> mychid;
+    //! Place for two EPICS PVs, Mean and maximum deviation
+    chid  mychid[2];
 #endif
   };
 } // end namespace Belle2

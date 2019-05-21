@@ -115,8 +115,8 @@ namespace Belle2 {
 
   private:
 
-    std::map<int, float> m_efficiency; /**< strip efficiency */
-    std::map<int, float> m_efficiencyError; /**< strip efficiency error */
+    std::map<int, float> m_efficiency; /** strip efficiency */
+    std::map<int, float> m_efficiencyError; /** strip efficiency error */
 
     ClassDef(BKLMStripEfficiency, 1); /**< ClassDef */
   };

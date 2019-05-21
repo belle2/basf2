@@ -17,7 +17,6 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <vector>
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -66,8 +65,8 @@ namespace Belle2 {
     TLine* m_line3 = nullptr;
 
 #ifdef _BELLE2_EPICS
-    //! epics PVs
-    std::vector <chid> mychid;
+    //! one epics PV
+    chid  mychid;
 #endif
   };
 } // end namespace Belle2

@@ -112,7 +112,6 @@ namespace Belle2 {
     SVDHistograms<TH1F>* h_clusterTrkSNR = NULL; /**< SVDClusters SNR */
     SVDHistograms<TH1F>* h_clusterTrkEnergy = NULL; /**< SVDClusters Energy */
     SVDHistograms<TH1F>* h_clusterTrkTime = NULL; /**< SVDClusters Time */
-    SVDHistograms<TH1F>* h_clusterTrkInterstripPos = NULL; /**< SVDClusters InterstripPosition */
 
   };
 }

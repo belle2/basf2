@@ -39,7 +39,6 @@ cal.param("nrun", 100)
 cal.param("nevents", 1000)
 cal.param("dth", 0.01)
 cal.param("th0", -0.5)
-cal.param("internal", False)
 
 unpack = register_module('ARICHUnpacker')
 unpack.param('RawUnpackerMode', 1)

@@ -79,11 +79,8 @@ namespace Belle2 {
     double m_dth;
     double m_th0;
     bool m_debugmode;
-    bool m_internalmode;
     std::string m_daqdb;
     unsigned int m_ibyte = 0;
-    int m_run_count = 0;
-    int m_evt_count = 0;
 
   };
 

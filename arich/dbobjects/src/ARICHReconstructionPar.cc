@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <iostream>
 #include <iomanip>
-#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -86,8 +85,8 @@ void ARICHReconstructionPar::print() const
   cout << endl << "-----bkg PDF-----" << endl;
   m_bkgPDF->Print();
   int Npar = m_bkgPDF->GetNpar();
-  std::vector<double> bkgPars(Npar, 0);
-  m_bkgPDF->GetParameters(bkgPars.data());
+  double bkgPars[Npar];
+  m_bkgPDF->GetParameters(bkgPars);
   for (int i = 0; i < Npar; i++)cout << Form("bkg Pars %d = %e", i, bkgPars[i]) << endl;
 
   cout << endl << "-----flat backgroud per pad-----"  << endl;

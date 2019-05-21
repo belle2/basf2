@@ -33,7 +33,6 @@ PXDTrackClusterDQMModule::PXDTrackClusterDQMModule() : HistoModule(), m_vxdGeome
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDER"));
-  addParam("moreHistos", m_moreHistos, "Fill additional histograms (not for ereco)", false);
 }
 
 
@@ -70,12 +69,7 @@ void PXDTrackClusterDQMModule::defineHisto()
     buff.ReplaceAll(".", "_");
 
     m_trackClusterCharge[avxdid] = new TH1F("PXD_Track_Cluster_Charge_" + buff, "PXD Track Cluster Charge " + buff + ";Charge/ADU;",
-                                            100, 0, 100);
-    if (m_moreHistos) {
-      m_trackClusterChargeUC[avxdid] = new TH1F("PXD_Track_Cluster_Charge_UC_" + buff,
-                                                "PXD Track Cluster Charge (uncorrected)" + buff + ";Charge/ADU;",
-                                                100, 0, 100);
-    }
+                                            256, 0, 256);
   }
 
   oldDir->cd();
@@ -85,7 +79,6 @@ void PXDTrackClusterDQMModule::defineHisto()
 void PXDTrackClusterDQMModule::beginRun()
 {
   for (auto& it : m_trackClusterCharge) it.second->Reset();
-  for (auto& it : m_trackClusterChargeUC) it.second->Reset();
 }
 
 
@@ -99,13 +92,8 @@ void PXDTrackClusterDQMModule::event()
     if (!recoTrack.size()) continue;
     RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(recoTrack[0]);
 
-    const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
-    double correction = 1.0;
-    if (tfr) correction = sin(tfr->getMomentum().Theta());
     for (auto& cluster : pxdClustersTrack) {
-      if (m_trackClusterChargeUC[cluster.getSensorID()]) m_trackClusterChargeUC[cluster.getSensorID()]->Fill(cluster.getCharge());
-      if (tfr && m_trackClusterCharge[cluster.getSensorID()]) m_trackClusterCharge[cluster.getSensorID()]->Fill(
-          cluster.getCharge()*correction);
+      if (m_trackClusterCharge[cluster.getSensorID()]) m_trackClusterCharge[cluster.getSensorID()]->Fill(cluster.getCharge());
     }
   }
 }

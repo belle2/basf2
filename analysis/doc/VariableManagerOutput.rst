@@ -108,30 +108,3 @@ Modular analysis convenience function
 Here is the full function documentation of the modular analysis convenience function:
 
 .. autofunction:: modularAnalysis.variablesToHistogram
-
-.. _v2hdf5:
-
-VariablesToHDF5
----------------
-
-Writes out variables to a flat HDF5 format file (for use with `pandas.DataFrame`_ tools).
-Analogous to `VariablesToNtuple <v2nt>`.
-
-
-.. _pandas.DataFrame: https://pandas.pydata.org
-
-.. note:: 
-        There is currently no `modularAnalysis` convenience function. 
-        Instead you can add the module to your path explicitly (it only takes two lines).
-
-.. code-block:: python
- 
-        from b2pandas_utils import VariablesToHDF5
-        v2hdf5 = VariablesToHDF5(
-                filename="variables.hdf5", listname="pi+:all",
-                variables=list_of_interesting_event_variables)
-        path.add_module(v2hdf5)
-
-.. autoclass:: modularAnalysis.VariablesToHDF5
-   :members:
-

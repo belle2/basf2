@@ -36,7 +36,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
+  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode"));
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
@@ -64,7 +64,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cCommonMode = new TCanvas((m_histogramDirectoryName + "/c_CommonMode").data());
+  m_cCommonMode = new TCanvas("c_CommonMode");
   m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 64, 0, 64);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
@@ -92,9 +92,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  mychid.resize(2);
-  SEVCHK(ca_create_channel((m_pvPrefix + "Outside").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   B2DEBUG(99, "DQMHistAnalysisPXDCM: initialized.");
@@ -152,24 +150,18 @@ void DQMHistAnalysisPXDCMModule::event()
 
 
   // not enough Entries
-  int status = 0;
   if (all < 100.) {
     m_cCommonMode->Pad()->SetFillColor(kGray);// Magenta or Gray
-    status = 0; // default
   } else {
     /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
     if (all_outside / all > 1e-6 || dhp_fifo_overflow || error_flag) {
       m_cCommonMode->Pad()->SetFillColor(kRed);// Red
-      status = 4;
     } else if (all_outside / all > 1e-8 || warn_flag) {
       m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
-      status = 3;
     } else if (all_outside == 0.) {
       m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
-      status = 2;
     } else { // between 0 and 50 ...
       m_cCommonMode->Pad()->SetFillColor(kWhite);// White
-      status = 1;
     }
   }
 
@@ -189,8 +181,7 @@ void DQMHistAnalysisPXDCMModule::event()
   m_cCommonMode->Update();
 #ifdef _BELLE2_EPICS
   double data = all > 0 ? (all_outside / all) : 0;
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-  SEVCHK(ca_put(DBR_INT, mychid[1], (void*)&status), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
@@ -198,9 +189,10 @@ void DQMHistAnalysisPXDCMModule::event()
 void DQMHistAnalysisPXDCMModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
+  // m_cCommonMode->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
+  if (mychid) SEVCHK(ca_clear_channel(mychid), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }

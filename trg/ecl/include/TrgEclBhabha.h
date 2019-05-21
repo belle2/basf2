@@ -44,12 +44,8 @@ namespace Belle2 {
   public:
     //!  Belle 2D Bhabha veto method
     bool GetBhabha00(std::vector<double>);
-    //!  Belle II 3D Bhabha method for veto
+    //!  Belle II 3D Bhabha veto method
     bool GetBhabha01();
-    //!  Belle II 3D Bhabha method for selection
-    bool GetBhabha02();
-    //!  MuMu selection for calibration
-    bool Getmumu();
     //! Output 2D Bhabha combination
     std::vector<double> GetBhabhaComb() {return BhabhaComb ;}
     //! Save

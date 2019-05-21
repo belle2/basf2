@@ -24,7 +24,7 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('RootInput')
+input = register_module('SeqRootInput')
 # unpacker
 unpacker = register_module('TRGECLUnpacker')
 # output
@@ -41,13 +41,7 @@ input.param("inputFileName", f_in_root)
 output.param("outputFileName", "ecltrg_unpacker.root")
 
 # main.add_module(output);
-main.add_module(
-    output,
-    branchNames=[
-        "TRGECLUnpackerStores",
-        "TRGECLUnpackerEvtStores",
-        "TRGECLUnpackerSumStores",
-        "TRGECLClusters"])
+main.add_module(output, branchNames=["TRGECLUnpackerStores", "TRGECLUnpackerEvtStores", "TRGECLUnpackerSumStores"])
 
 # Process all events
 process(main)

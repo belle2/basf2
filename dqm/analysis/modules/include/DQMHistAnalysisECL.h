@@ -78,9 +78,6 @@ namespace Belle2 {
     /** Sigma level which determines 'large time offsets'. */
     Double_t m_level = 5.;
 
-    //** TCanvas  for adc_flag. */
-    TCanvas* c_adc_flag_title = nullptr;
-
     /** TCanvas for time offsets. */
     TCanvas* c_crate_time_offsets = nullptr;
 

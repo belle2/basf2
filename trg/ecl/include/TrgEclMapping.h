@@ -57,8 +57,7 @@ namespace Belle2 {
     int getTCIdFromFAMChannel(int , int);
     /** Get FAM # and Channel # from TC Id*/
     std::vector<int> getFAMChannelFromTCId(int);
-    //! get TCId from phi and theta position(LSB = 1.4)
-    int getTCIdFromPosition(int, int);
+
   private:
 
 

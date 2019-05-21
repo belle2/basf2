@@ -48,8 +48,6 @@ void PXDDAQDQMModule::defineHisto()
   hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 16, 0, 16, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQErrorDHE = new TH2F("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;", 64, 0, 64, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
-  hDAQUseableModule = new TH1F("PXDDAQUseableModule", "PXDDAQUseableModule/DHE;DHE ID;", 64, 0, 64);
-  hDAQNotUseableModule = new TH1F("PXDDAQNotUseableModule", "PXDDAQNotUseableModule/DHE;DHE ID;", 64, 0, 64);
   hDAQEndErrorDHC = new TH2F("PXDDAQDHCEndError", "PXDDAQEndError/DHC;DHC ID;", 16, 0, 16, 32, 0, 32);
   hDAQEndErrorDHE = new TH2F("PXDDAQDHEEndError", "PXDDAQEndError/DHE;DHE ID;", 64, 0, 64, 32, 0, 32);
 
@@ -111,8 +109,6 @@ void PXDDAQDQMModule::beginRun()
   hDAQErrorEvent->Reset();
   hDAQErrorDHC->Reset();
   hDAQErrorDHE->Reset();
-  hDAQUseableModule->Reset();
-  hDAQNotUseableModule->Reset();
   hDAQEndErrorDHC->Reset();
   hDAQEndErrorDHE->Reset();
   for (auto& it : hDAQDHETriggerGate) it.second->Reset();
@@ -159,12 +155,6 @@ void PXDDAQDQMModule::event()
           PXDErrorFlags mask = (1ull << i);
           if ((dhe_emask & mask) == mask) hDAQErrorDHE->Fill(dhe.getDHEID(), i);
         }
-        if (dhe.isUsable()) {
-          hDAQUseableModule->Fill(dhe.getDHEID());
-        } else {
-          hDAQNotUseableModule->Fill(dhe.getDHEID());
-        }
-
         unsigned int emask = dhe.getEndErrorInfo();
         for (int i = 0; i < 32; i++) {
           unsigned int mask = (1 << i);

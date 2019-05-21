@@ -10,7 +10,7 @@
 
 #ifdef _BELLE2_EPICS
 // EPICS
-#include "cadef.h"
+// #include "cadef.h"
 #endif
 
 #include <framework/core/Module.h>
@@ -23,15 +23,6 @@ namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
 
   class DQMHistInjectionModule : public DQMHistAnalysisModule {
-
-#ifdef _BELLE2_EPICS
-    typedef struct {
-      chid    mychid;
-      TH1*  histo = {};
-      std::vector <double> data;
-    } MYNODE;
-
-#endif
 
     // Public functions
   public:
@@ -54,9 +45,8 @@ namespace Belle2 {
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
-    std::string m_pvPrefix;
+//     std::string m_pvPrefix;
 
-    void cleanPVs(void);
 
     //! PXD Hits
     TH1F* m_hInjectionLERPXD = nullptr;
@@ -84,8 +74,8 @@ namespace Belle2 {
     TCanvas* m_cInjectionHERECL = nullptr;
 
 #ifdef _BELLE2_EPICS
-    //! EPICS PVs
-    std::vector <MYNODE>  m_nodes;
+    //! one EPICS PV
+//     chid  mychid;
 #endif
   };
 } // end namespace Belle2

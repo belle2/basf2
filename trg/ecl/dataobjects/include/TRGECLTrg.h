@@ -139,12 +139,8 @@ namespace Belle2 {
     int m_physics ;
     //! 2D Bhabha
     int m_2DBhabha;
-    //! 3D Bhabha for veto
+    //! 3D Bhabha
     int m_3DBhabha;
-    //! 3D Bhabha for selection
-    int m_3DBhabha_sel;
-    //! Prescale bit for selection Bhabha
-    int m_BhabhaPrescaleBit;
     //! E low
     int m_ELow;
     //! E high
@@ -155,8 +151,6 @@ namespace Belle2 {
     int m_ClusterOverflow;
     //! Low multi bit
     int m_LowMultiBit;
-    //! mumu bit
-    int m_mumuBit;
 
 
 
@@ -256,9 +250,6 @@ namespace Belle2 {
     void setBeamBkgVeto(int BeamBkgVeto) { m_BeamBkgVeto = BeamBkgVeto; }
     //! Set Bhabha veto
     void setBhabhaVeto(int bhabhaveto) { m_BhabhaVeto = bhabhaveto; }
-    //! Set Bhabha veto
-    void setBhabhaPrescaleBit(int prebit) { m_BhabhaPrescaleBit = prebit; }
-
     //! Set Event Timing
     void setEventTiming(double eventtiming) { m_eventtiming = eventtiming; }
 
@@ -280,10 +271,8 @@ namespace Belle2 {
     void setPhysics(int physics) { m_physics = physics; }
     //! Set 2DBhabha
     void set2DBhabha(int v2DBhabha) { m_2DBhabha = v2DBhabha; }
-    //! Set 3DBhabha for veto
+    //! Set 3DBhabha
     void set3DBhabha(int v3DBhabha) { m_3DBhabha = v3DBhabha; }
-    //! Set 3DBhabha for selection
-    void set3DBhabhaSel(int v3DBhabha_sel) { m_3DBhabha_sel = v3DBhabha_sel; }
     //! Set ELow
     void setELow(int ELow) { m_ELow = ELow; }
     //! Set EHihg
@@ -294,8 +283,6 @@ namespace Belle2 {
     void setClusterOverflow(int ClusterOverflow) { m_ClusterOverflow = ClusterOverflow; }
     //! Set LowMultiBit
     void setLowMultiBit(int LowMultiBit) { m_LowMultiBit = LowMultiBit; }
-    //! Set LowMultiBit
-    void setmumuBit(int mumuBit) { m_mumuBit = mumuBit; }
 
     //! Get No of TC Hit
     double getNofTCHit() { return m_NofTCHit; }
@@ -369,14 +356,14 @@ namespace Belle2 {
       m_physics = 0;
       m_2DBhabha = 0;
       m_3DBhabha = 0;
-      m_3DBhabha_sel = 0;
-      m_BhabhaPrescaleBit = 0;
       m_ELow = 0;
       m_EHigh = 0;
       m_ELum = 0;
       m_ClusterOverflow = 0;
       m_LowMultiBit = 0;
-      m_mumuBit = 0;
+
+
+
       m_BeamBkgVeto = 0;
       m_BhabhaVeto = 0;
       m_eventtiming = 0;
@@ -386,8 +373,135 @@ namespace Belle2 {
       m_FwdNofTCHit = 0;
       m_BwdNofTCHit = 0;
     }
+
+    //!! Useful Constructor
+    TRGECLTrg(
+      int eventId,
+      //!
+      double prs01,
+      double prs02,
+      double prs03,
+      double prs04,
+      double prs05,
+      double prs06,
+      double prs07,
+      double prs08,
+      double prs09,
+      double prs10,
+      double prs11,
+      double prs12,
+      double prs13,
+      double prs14,
+      double prs15,
+      double prs16,
+      double prs17,
+      //!
+      double etot,
+      //!
+      double bhabha01,
+      double bhabha02,
+      double bhabha03,
+      double bhabha04,
+      double bhabha05,
+      double bhabha06,
+      double bhabha07,
+      double bhabha08,
+      double bhabha09,
+      double bhabha10,
+      double bhabha11,
+      double bhabha12,
+      double bhabha13,
+      double bhabha14,
+      double bhabha15,
+      double bhabha16,
+      double bhabha17,
+      double bhabha18,
+      //!
+      int icn,
+      int icn_br,
+      int icn_fw,
+      int icn_bw,
+      //!
+      int bitECLtoGDL1,
+      int bitECLtoGDL2,
+      int bitECLtoGDL3,
+      int bitECLtoGDL4,
+
+      int BeamBkgVeto,
+      int BhabhaVeto,
+      int itimebin,
+      double eventtiming,
+      int NofTCHit,
+      int BrNofTCHit,
+      int FwdNofTCHit,
+      int BwdNofTCHit
+    )
+    {
+      m_eventId = eventId;
+      //!
+      m_prs01 = prs01;
+      m_prs02 = prs02;
+      m_prs03 = prs03;
+      m_prs04 = prs04;
+      m_prs05 = prs05;
+      m_prs06 = prs06;
+      m_prs07 = prs07;
+      m_prs08 = prs08;
+      m_prs09 = prs09;
+      m_prs10 = prs10;
+      m_prs11 = prs11;
+      m_prs12 = prs12;
+      m_prs13 = prs13;
+      m_prs14 = prs14;
+      m_prs15 = prs15;
+      m_prs16 = prs16;
+      m_prs17 = prs17;
+      //!
+      m_etot = etot;
+      //!
+      m_bhabha01 = bhabha01;
+      m_bhabha02 = bhabha02;
+      m_bhabha03 = bhabha03;
+      m_bhabha04 = bhabha04;
+      m_bhabha05 = bhabha05;
+      m_bhabha06 = bhabha06;
+      m_bhabha07 = bhabha07;
+      m_bhabha08 = bhabha08;
+      m_bhabha09 = bhabha09;
+      m_bhabha10 = bhabha10;
+      m_bhabha11 = bhabha11;
+      m_bhabha12 = bhabha12;
+      m_bhabha13 = bhabha13;
+      m_bhabha14 = bhabha14;
+      m_bhabha15 = bhabha15;
+      m_bhabha16 = bhabha16;
+      m_bhabha17 = bhabha17;
+      m_bhabha18 = bhabha18;
+      //
+      m_bitECLtoGDL[0] =  bitECLtoGDL1;
+      m_bitECLtoGDL[1] =  bitECLtoGDL2;
+      m_bitECLtoGDL[2] =  bitECLtoGDL3;
+      m_bitECLtoGDL[3] =  bitECLtoGDL4;
+
+      //!
+      m_icn = icn;
+      m_icn_br = icn_br;
+      m_icn_fw = icn_fw;
+      m_icn_bw = icn_bw;
+      //!
+      //      m_bitECLtoGDL = bitECLtoGDL;
+      m_BhabhaVeto =  BhabhaVeto;
+      m_BeamBkgVeto = BeamBkgVeto;
+      m_eventtiming = eventtiming;
+      m_itimebin = itimebin;
+      m_NofTCHit = NofTCHit;
+      m_BrNofTCHit = BrNofTCHit;
+      m_FwdNofTCHit = FwdNofTCHit;
+      m_BwdNofTCHit = BwdNofTCHit;
+
+    }
     //! the class title
-    ClassDef(TRGECLTrg, 3);
+    ClassDef(TRGECLTrg, 2);
 
   };
 

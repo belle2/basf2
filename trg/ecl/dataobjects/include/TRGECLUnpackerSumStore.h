@@ -99,9 +99,6 @@ namespace Belle2 {
     //! The mothod to set the sumamry revoclk
     void setSumRevo(int sum_revo) {s_sum_revo = sum_revo;}
 
-    //! The mothod to set Timing
-    void setTime(int time) {s_time = time;}
-
     //! The method to set Cluster Theta
     void setCLTheta(int cl_theta[6])
     {
@@ -133,7 +130,6 @@ namespace Belle2 {
         s_cl_energy[i] = cl_energy[i];
       }
     }
-
 
     //! The mothod to set Number of Cluster
     void setNCL(int ncl) {s_ncl = ncl;}
@@ -176,6 +172,9 @@ namespace Belle2 {
 
     //! The mothod to set Total Energy Type
     void setEtotType(int etot_type) {s_etot_type = etot_type;}
+
+    //! The mothod to set Timing
+    void setTime(int time) {s_time = time;}
 
     //! The mothod to set Timing Type
     void setTimeType(int time_type) {s_time_type = time_type;}
@@ -252,10 +251,10 @@ namespace Belle2 {
     TRGECLUnpackerSumStore()
     {
       s_eventId   = 0;
-      memset(s_cl_theta,   0, sizeof(s_cl_theta));
-      memset(s_cl_phi,     0, sizeof(s_cl_phi));
-      memset(s_cl_time,    0, sizeof(s_cl_time));
-      memset(s_cl_energy,  0, sizeof(s_cl_energy));
+      memset(s_cl_theta,  0, sizeof(s_cl_theta));
+      memset(s_cl_phi,    0, sizeof(s_cl_phi));
+      memset(s_cl_time,   0, sizeof(s_cl_time));
+      memset(s_cl_energy, 0, sizeof(s_cl_energy));
       s_ncl       = 0;
       s_icn       = 0;
       s_icn_over  = 0;
@@ -301,10 +300,10 @@ namespace Belle2 {
     {
       s_eventId   = eventId;
       for (int i = 0; i < 6; i++) {
-        s_cl_theta[i]   = cl_theta[i];
-        s_cl_phi[i]     = cl_phi[i];
-        s_cl_time[i]    = cl_time[i];
-        s_cl_energy[i]  = cl_energy[i];
+        s_cl_theta[i]  = cl_theta[i];
+        s_cl_phi[i]    = cl_phi[i];
+        s_cl_time[i]   = cl_time[i];
+        s_cl_energy[i] = cl_energy[i];
       }
       s_ncl       = ncl;
       s_icn       = icn;
@@ -324,7 +323,7 @@ namespace Belle2 {
       s_time_type = time_type;
     }
     /** the class title */
-    ClassDef(TRGECLUnpackerSumStore, 3);
+    ClassDef(TRGECLUnpackerSumStore, 2);
   };
 
 } // end namespace Belle2

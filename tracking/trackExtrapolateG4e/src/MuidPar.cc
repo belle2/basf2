@@ -221,7 +221,7 @@ namespace Belle2 {
             pdf *= m_LayerPDF[outcome][lastLayer][layer];
           } else {
             if (((layer == 0) && (outcome < c_CrossBarrelStopInForwardMin)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
-              pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * extBKLMEfficiencyVector.at(layer);
+              pdf *= 1 - m_LayerPDF[outcome][lastLayer][layer] * extBKLMEfficiencyVector.at(layer);
             }
           }
         }

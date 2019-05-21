@@ -14,7 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
-#include <bklm/dbobjects/BKLMStripEfficiency.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <eklm/geometry/TransformDataGlobalAligned.h>
@@ -485,8 +485,8 @@ namespace Belle2 {
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;
 
-    //! Conditions-database object for BKLM strip efficiency
-    DBObjPtr<BKLMStripEfficiency> m_bklmStripEfficiency;
+    //! Conditions-database object for KLM strip efficiency
+    DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
     //! Conditions-database object for EKLM dead-channel list (updated at start of each run)
     DBObjPtr<EKLMChannels> m_eklmChannels;

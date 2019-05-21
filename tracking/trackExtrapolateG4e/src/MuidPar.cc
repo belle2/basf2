@@ -179,7 +179,7 @@ namespace Belle2 {
   {
 
     int outcome = muid->getOutcome();
-    if ((outcome <= 0) || (outcome > 4)) return 0.0;
+    if ((outcome <= 0) || (outcome > c_ExitForwardEndcap)) return 0.0;
 
     int barrelExtLayer = muid->getBarrelExtLayer();
     int endcapExtLayer = muid->getEndcapExtLayer();
@@ -189,34 +189,24 @@ namespace Belle2 {
     unsigned int hitLayerPattern = muid->getHitLayerPattern();
 
     int lastLayer = barrelExtLayer;
-    if (outcome == 2) { // forward endcap stop (no barrel hits)
+    if (outcome == c_StopInForwardEndcap) { // forward endcap stop (no barrel hits)
       lastLayer = endcapExtLayer;
       if (barrelExtLayer < 0) {
-        outcome = isForward ? 2 : 5; // forward or backward endcap stop (no barrel hits)
+        outcome = isForward ? c_StopInForwardEndcap : c_StopInBackwardEndcap; // forward or backward endcap stop (no barrel hits)
       } else {
-        outcome = (isForward ? 7 : 22) + barrelExtLayer; // forward/backward endcap stop (B+E)
+        outcome = (isForward ? c_CrossBarrelStopInForwardMin : c_CrossBarrelStopInBackwardMin) +
+                  barrelExtLayer; // forward/backward endcap stop (B+E)
       }
-    } else if (outcome == 4) { // forward endcap exit (no barrel hits)
+    } else if (outcome == c_ExitForwardEndcap) { // forward endcap exit (no barrel hits)
       lastLayer = endcapExtLayer;
       if (barrelExtLayer < 0) {
-        outcome = isForward ? 4 : 6;  // forward or backward endcap exit (no barrel hits)
+        outcome = isForward ? c_ExitForwardEndcap : c_ExitBackWardEndcap;  // forward or backward endcap exit (no barrel hits)
       } else {
-        outcome = (isForward ? 37 : 52) + barrelExtLayer; // forward/backward endcap exit (B+E)
+        outcome = (isForward ? c_CrossBarrelExitForwardMin : c_CrossBarrelExitBackwardMin) +
+                  barrelExtLayer; // forward/backward endcap exit (B+E)
       }
     }
 
-
-    int nBarrelExt = 0;
-    int nBarrelHit = 0;
-    for (int layer_new_BKLM = 0; layer_new_BKLM < 15; ++layer_new_BKLM) { // 15 barrel layers
-      unsigned int bit = (1 << layer_new_BKLM);
-      if ((extLayerPattern & bit) != 0) {
-        nBarrelExt += 1; //counting the number of BKLM extrapolated layers
-        if ((hitLayerPattern & bit) != 0) {
-          nBarrelHit += ((hitLayerPattern & bit) != 0) ? 1 : 0; //counting the number of BKLM layers with hits in the pattern
-        }
-      }
-    }
 
     //Pdf treatment used to avoid layer inefficiency problems
     double pdf = 1.0;
@@ -228,10 +218,10 @@ namespace Belle2 {
       for (int layer = 0; layer <= barrelExtLayer; ++layer) {
         if ((testBit & extLayerPattern) != 0) {
           if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
-            pdf *= m_LayerPDF[outcome][lastLayer][layer] * extBKLMEfficiencyVector.at(layer);
+            pdf *= m_LayerPDF[outcome][lastLayer][layer];
           } else {
-            if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
-              pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer] * extBKLMEfficiencyVector.at(layer));
+            if (((layer == 0) && (outcome < c_CrossBarrelStopInForwardMin)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
+              pdf *= (1 - m_LayerPDF[outcome][lastLayer][layer]) * extBKLMEfficiencyVector.at(layer);
             }
           }
         }
@@ -239,41 +229,15 @@ namespace Belle2 {
       }
     }
 
-    int nEndcapExt = 0;
-    int nEndcapHit = 0;
-    int outermostEndcapLayerWithHit = -1;
-    unsigned int hitPattern_EKLM = 0;
-    for (int layer_new_EKLM = 0; layer_new_EKLM < 14; ++layer_new_EKLM) { // 14 endcap layers
-      unsigned int bit = (0x8000 << layer_new_EKLM);
-      if ((extLayerPattern & bit) != 0) {
-        nEndcapExt += 1; //counting the number of extrapolated EKLM layers
-        if ((hitLayerPattern & bit) != 0) {
-          outermostEndcapLayerWithHit = layer_new_EKLM;
-          nEndcapHit += 1;//counting the number of EKLM layers with hits in the pattern
-        }
-      }
-    }
-
-    // re-write a hit pattern forcing the presence of a hit in each of the layer before the outermost one with a real hit
-    if ((nBarrelHit + nEndcapHit) >= 1) {
-      for (int layer_new_EKLM_bitPattern = 0; layer_new_EKLM_bitPattern < outermostEndcapLayerWithHit;
-           ++layer_new_EKLM_bitPattern) { // 14 endcap layers
-        unsigned int bit_pattern_EKLM = (0x8000 << layer_new_EKLM_bitPattern);
-        if ((extLayerPattern & bit_pattern_EKLM) != 0) {
-          hitPattern_EKLM |= bit_pattern_EKLM;
-        }
-      }
-    }
-
     int maxLayer = isForward ? MUID_MaxForwardEndcapLayer : MUID_MaxBackwardEndcapLayer;
     testBit = 1 << (MUID_MaxBarrelLayer + 1);
     for (int layer = 0; layer <= endcapExtLayer; ++layer) {
       if ((testBit & extLayerPattern) != 0) {
-        if ((testBit & hitPattern_EKLM) != 0) {//checking the presence of a hit in the layer
+        if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
           pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
         } else {
           if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer)) {
-            pdf *= (1.0 - std::min(0.9, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]));
+            pdf *= 1.0 - std::min(0.95, m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
           }
         }
       }
@@ -283,6 +247,7 @@ namespace Belle2 {
     return pdf;
 
   }
+
 
   double MuidPar::getPDFRchisq(const Muid* muid) const
   {

@@ -105,6 +105,15 @@ class beamSpotImporter(basf2.Module):
         hVertexXZ = dqmFile.Get("IPMonitoring/Y4S_Prod.XZ")
         hVertexXZ.GetXaxis().UnZoom()
 
+        hVertexXX = dqmFile.Get("IPMonitoring/Y4S_Prod.XX")
+        hVertexXX.GetXaxis().UnZoom()
+
+        hVertexYY = dqmFile.Get("IPMonitoring/Y4S_Prod.YY")
+        hVertexYY.GetXaxis().UnZoom()
+
+        hVertexZZ = dqmFile.Get("IPMonitoring/Y4S_Prod.ZZ")
+        hVertexZZ.GetXaxis().UnZoom()
+
         q = array('d', [0.5])
         medianX = array('d', [0.])
         medianY = array('d', [0.])
@@ -112,6 +121,9 @@ class beamSpotImporter(basf2.Module):
         medianXY = array('d', [0.])
         medianYZ = array('d', [0.])
         medianXZ = array('d', [0.])
+        medianXX = array('d', [0.])
+        medianYY = array('d', [0.])
+        medianZZ = array('d', [0.])
 
         hVertexX.GetQuantiles(1, medianX, q)
         hVertexY.GetQuantiles(1, medianY, q)
@@ -119,27 +131,24 @@ class beamSpotImporter(basf2.Module):
         hVertexXY.GetQuantiles(1, medianXY, q)
         hVertexYZ.GetQuantiles(1, medianYZ, q)
         hVertexXZ.GetQuantiles(1, medianXZ, q)
+        hVertexXX.GetQuantiles(1, medianXX, q)
+        hVertexYY.GetQuantiles(1, medianYY, q)
+        hVertexZZ.GetQuantiles(1, medianZZ, q)
 
         # vertex position
         # Computed as the medians of the vertex position histograms
+
         vertexPos = ROOT.TVector3(medianX[0], medianY[0], medianZ[0])
 
-        # vertex position covariance matrix
-        # Computed as the squared RMS of the vertex position histograms, divided by the number of entries
-        vertexCov = ROOT.TMatrixDSym(3)
-        xRMS = max(hVertexX.GetRMS(), hVertexX.GetBinWidth(1) / 2)
-        yRMS = max(hVertexY.GetRMS(), hVertexY.GetBinWidth(1) / 2)
-        zRMS = max(hVertexZ.GetRMS(), hVertexZ.GetBinWidth(1) / 2)
-        xyRMS = hVertexXY.GetMean() - hVertexX.GetMean() * hVertexY.GetMean()
-        yzRMS = hVertexYZ.GetMean() - hVertexY.GetMean() * hVertexZ.GetMean()
-        xzRMS = hVertexXZ.GetMean() - hVertexX.GetMean() * hVertexZ.GetMean()
-
-        vertexCov[0][0] = xRMS * xRMS / entries
-        vertexCov[1][1] = yRMS * yRMS / entries
-        vertexCov[2][2] = zRMS * zRMS / entries
-        vertexCov[0][1] = vertexCov[1][0] = xyRMS * xyRMS / entries
-        vertexCov[0][2] = vertexCov[2][0] = xzRMS * xzRMS / entries
-        vertexCov[1][2] = vertexCov[2][1] = yzRMS * yzRMS / entries
+        xRMS = hVertexX.GetRMS()
+        yRMS = hVertexY.GetRMS()
+        zRMS = hVertexZ.GetRMS()
+        xyRMS = hVertexXY.GetRMS()
+        yzRMS = hVertexYZ.GetRMS()
+        xzRMS = hVertexXZ.GetRMS()
+        xxRMS = hVertexXX.GetRMS()
+        yyRMS = hVertexYY.GetRMS()
+        zzRMS = hVertexZZ.GetRMS()
 
         # Beam spot size matrix
         # Computed from the histograms of the coordinates and their products,
@@ -151,9 +160,12 @@ class beamSpotImporter(basf2.Module):
         hVertexX.SetAxisRange(medianX[0] - nSigmacut * xRMS, medianX[0] + nSigmacut * xRMS, "X")
         hVertexY.SetAxisRange(medianY[0] - nSigmacut * yRMS, medianY[0] + nSigmacut * yRMS, "X")
         hVertexZ.SetAxisRange(medianZ[0] - nSigmacut * zRMS, medianZ[0] + nSigmacut * zRMS, "X")
+        hVertexXX.SetAxisRange(medianXX[0] - nSigmacut * xxRMS, medianXX[0] + nSigmacut * xxRMS, "X")
+        hVertexYY.SetAxisRange(medianYY[0] - nSigmacut * yyRMS, medianYY[0] + nSigmacut * yyRMS, "X")
+        hVertexZZ.SetAxisRange(medianZZ[0] - nSigmacut * zzRMS, medianZZ[0] + nSigmacut * zzRMS, "X")
         hVertexXY.SetAxisRange(medianXY[0] - nSigmacut * xyRMS, medianXY[0] + nSigmacut * xyRMS, "X")
         hVertexYZ.SetAxisRange(medianYZ[0] - nSigmacut * yzRMS, medianYZ[0] + nSigmacut * yzRMS, "X")
-        hVertexXZ.SetAxisRange(medianXZ[0] - nSigmacut * xzRMS, medianYZ[0] + nSigmacut * xzRMS, "X")
+        hVertexXZ.SetAxisRange(medianXZ[0] - nSigmacut * xzRMS, medianXZ[0] + nSigmacut * xzRMS, "X")
 
         vertexSize[0][1] = vertexSize[1][0] = hVertexXY.GetMean() - hVertexX.GetMean() * hVertexY.GetMean()
         vertexSize[0][2] = vertexSize[2][0] = hVertexXZ.GetMean() - hVertexX.GetMean() * hVertexZ.GetMean()
@@ -161,6 +173,17 @@ class beamSpotImporter(basf2.Module):
         vertexSize[0][0] = hVertexXX.GetMean() - hVertexX.GetMean() * hVertexX.GetMean()
         vertexSize[1][1] = hVertexYY.GetMean() - hVertexY.GetMean() * hVertexY.GetMean()
         vertexSize[2][2] = hVertexZZ.GetMean() - hVertexZ.GetMean() * hVertexZ.GetMean()
+
+        # vertex position covariance matrix
+        # As firs rough estimate, the vertex size divided by the number of entries
+
+        vertexCov = ROOT.TMatrixDSym(3)
+        vertexCov[0][0] = vertexSize[0][0] / entries
+        vertexCov[1][1] = vertexSize[1][1] / entries
+        vertexCov[2][2] = vertexSize[2][2] / entries
+        vertexCov[0][1] = vertexCov[1][0] = vertexSize[0][1] / entries
+        vertexCov[0][2] = vertexCov[2][0] = vertexSize[0][2] / entries
+        vertexCov[1][2] = vertexCov[2][1] = vertexSize[1][2] / entries
 
         if args.verbose:
             bBLUE = "\033[1;34m"

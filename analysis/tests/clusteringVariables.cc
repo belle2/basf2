@@ -43,7 +43,7 @@ namespace {
   class ECLVariableTest : public ::testing::Test {
   protected:
     /** register Particle and ECLCluster arrays. */
-    virtual void SetUp()
+    void SetUp() override
     {
       // setup the DataStore
       DataStore::Instance().setInitializeActive(true);
@@ -78,7 +78,7 @@ namespace {
       // mock up some TrackFits for them (all pions)
       TRandom3 generator;
       TMatrixDSym cov6(6);
-      unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+      auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
       for (int i = 0; i < tracks.getEntries(); ++i) {
         int charge = (i % 2 == 0) ? +1 : -1;
@@ -144,7 +144,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -595,7 +595,7 @@ namespace {
   class KLMVariableTest : public ::testing::Test {
   protected:
     /** register Particle and KLMCluster arrays. */
-    virtual void SetUp()
+    void SetUp() override
     {
       // setup the DataStore
       DataStore::Instance().setInitializeActive(true);
@@ -620,7 +620,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -665,7 +665,7 @@ namespace {
     // mock up some TrackFits for them (all muons)
     TRandom3 generator;
     TMatrixDSym cov6(6);
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     for (int i = 0; i < tracks.getEntries(); ++i) {
       int charge = (i % 2 == 0) ? +1 : -1;
@@ -777,7 +777,7 @@ namespace {
     TVector3 position(1.0, 0, 0);
     TVector3 momentum(0, 1.0, 0);
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     trackFits.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
 

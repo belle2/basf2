@@ -12,6 +12,8 @@
 #define SVDCrossTalkFinderModule_H
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -37,6 +39,13 @@ namespace Belle2 {
     /* Constructor */
     SVDCrossTalkFinderModule();
 
+
+    /* Deconstructor */
+    ~SVDCrossTalkFinderModule()
+    {
+      if (m_ptrDBObjPtr != nullptr) delete m_ptrDBObjPtr;
+    };
+
     /** Init the module.*/
     virtual void initialize() override;
     /** Event. */
@@ -51,6 +60,9 @@ namespace Belle2 {
 
     // Data members
 
+    /**Pointer to the DBObjPtr for the payloadfile from which the occupancy file will be read */
+    DBObjPtr<PayloadFile>* m_ptrDBObjPtr = nullptr;
+
     /** SVDRecoDigit collection name. */
     std::string m_svdRecoDigitsName;
 
@@ -63,7 +75,11 @@ namespace Belle2 {
 
     int m_nAPVFactor; /**Parameter to set number of sensors with possible cross-talk clusters required for event flagging.*/
 
+    bool m_readFromDB; /**If true read calibration occupancy file from database. */
+
     std::string m_inputFilePath; /** Filepath of root file containing sensor occupancy sample */
+
+    std::string m_occupancyInputFile; /** Name of the root file containing sensor occupancy sample */
 
     TFile* m_calibrationFile; /**Pointer to root TFile containing sensor occupancy sample */
 

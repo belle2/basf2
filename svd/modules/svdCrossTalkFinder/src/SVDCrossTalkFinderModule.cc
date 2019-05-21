@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdCrossTalkFinder/SVDCrossTalkFinderModule.h>
+#include <svd/modules/svdCrossTalkFinder/SVDCrossTalkFinderHelperFunctions.h>
 
 using namespace std;
 using namespace Belle2;
@@ -18,15 +19,21 @@ REG_MODULE(SVDCrossTalkFinder)
 SVDCrossTalkFinderModule::SVDCrossTalkFinderModule() : Module()
 
 {
-  setDescription("Detect SVDRecoDigits created from cross-talk in the detector");
+  setDescription("Detect SVDRecoDigits created from cross-talk present in the origami sensors");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDRecoDigits", m_svdRecoDigitsName,
            "SVDRecoDigit collection name", string(""));
 
+  addParam("readFromDB", m_readFromDB,
+           "Read occupancy file from the databse", bool(true));
+
   addParam("inputFilePath", m_inputFilePath,
-           "Path containing occupancy root file", std::string("/data/svd/occupancyMap.root"));
+           "Path containing occupancy root file", std::string("/data/svd/SVDOccupancyMap.root"));
+
+  addParam("occupancyInputFile", m_occupancyInputFile,
+           "Name of the occupancy root file", std::string("SVDOccupancyMap.root"));
 
   addParam("uSideOccupancyFactor", m_uSideOccupancyFactor,
            "Multiple of the average occupancy for high occupancy strip classification", 2);
@@ -43,21 +50,38 @@ SVDCrossTalkFinderModule::SVDCrossTalkFinderModule() : Module()
 void SVDCrossTalkFinderModule::initialize()
 {
 
-  if (m_inputFilePath.empty()) {
-    B2ERROR("Path to occupancy file not set!");
-  } else {
-    std::string fullPath = FileSystem::findFile(m_inputFilePath);
-    if (fullPath.empty()) {
-      B2ERROR("Occupancy file:" << m_inputFilePath << "not located! Check filename input matches name of occupancy file!");
-    }
-    m_inputFilePath = fullPath;
+  std::string rootFile;
+  if (m_readFromDB) {
+    B2DEBUG(1, "SVDCrossTalkFinderModule: Retrieving occupancy file from DB. Filename: " << m_occupancyInputFile.c_str());
+    m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_occupancyInputFile.c_str());
+    if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the DBObjPtr is not initialized");
+
+    if (!(*m_ptrDBObjPtr).isValid()) B2FATAL("SVDCrossTalkFinderModule the DB object is not valid!");
+
+    rootFile = (*m_ptrDBObjPtr)->getFileName();
+    m_calibrationFile = new TFile(rootFile.c_str(), "READ");
+
+    if (!m_calibrationFile->IsOpen())
+      B2FATAL("Couldn't open occupancy file:" << m_inputFilePath);
+
   }
 
-  m_calibrationFile = new TFile(m_inputFilePath.c_str(), "READ");
+  else {
+    if (m_inputFilePath.empty()) {
+      B2ERROR("Path to occupancy file not set!");
+    } else {
+      std::string fullPath = FileSystem::findFile(m_inputFilePath);
+      if (fullPath.empty()) {
+        B2ERROR("Occupancy file:" << m_inputFilePath << "not located! Check filename input matches name of occupancy file!");
+      }
+      m_inputFilePath = fullPath;
+    }
 
-  if (!m_calibrationFile->IsOpen())
-    B2FATAL("Couldn't open occupancy file:" << m_inputFilePath);
+    m_calibrationFile = new TFile(m_inputFilePath.c_str(), "READ");
 
+    if (!m_calibrationFile->IsOpen())
+      B2FATAL("Couldn't open occupancy file:" << m_inputFilePath);
+  }
   // prepare storeArray
   m_svdRecoDigits.isRequired(m_svdRecoDigitsName);
 
@@ -78,7 +102,6 @@ void SVDCrossTalkFinderModule::event()
   vector<int> strips_vSide;
 
   for (auto& svdRecoDigit : m_svdRecoDigits) {
-    std::string sensorName = svdRecoDigit.getSensorID();
     //Remove L3 and +fw sensors, not affected by cross-talk
     if (svdRecoDigit.getSensorID().getLayerNumber() == 3 or svdRecoDigit.getSensorID().getSensorNumber() == 1) {
       continue;
@@ -86,15 +109,17 @@ void SVDCrossTalkFinderModule::event()
 
     int side = svdRecoDigit.isUStrip();
 
-    std::string completeName = sensorName + "." + std::to_string(side);
+    std::string sensorName;
+    occupancyPDFName(svdRecoDigit.getSensorID(), side, sensorName);
+
 
     TH1F* occupancy = nullptr;
-    m_calibrationFile->GetObject(completeName.c_str(), occupancy);
+    m_calibrationFile->GetObject(sensorName.c_str(), occupancy);
     double sensorAverage = 0;
     calculateAverage(occupancy, sensorAverage);
     int stripID = svdRecoDigit.getCellID();
-    std::string stripNum = completeName + "." + std::to_string(stripID);
-    //Cluster only works assuming digits are ordered.//
+    std::string sensorStripNum = sensorName + "." + std::to_string(stripID);
+    //Clustering only works assuming digits are ordered.//
 
     if (side == 1 && occupancy->GetBinContent(stripID) > (m_uSideOccupancyFactor * sensorAverage)) {
 
@@ -103,15 +128,15 @@ void SVDCrossTalkFinderModule::event()
         adjacentStrip = stripID - strips_uSide.back();
       }
       strips_uSide.push_back(stripID);
-      if (!highOccChips_uSide.empty() && completeName == highOccChips_uSide.back() && adjacentStrip == 1) {
-        clusterChips_uSide.push_back(completeName);
-        if (clusterStrips_uSide.empty() || clusterStrips_uSide.back() != stripNum) {
+      if (!highOccChips_uSide.empty() && sensorName == highOccChips_uSide.back() && adjacentStrip == 1) {
+        clusterChips_uSide.push_back(sensorName);
+        if (clusterStrips_uSide.empty() || clusterStrips_uSide.back() != sensorStripNum) {
           clusterStrips_uSide.push_back(highOccChipsStripNum_uSide.back());
         }
-        clusterStrips_uSide.push_back(stripNum);
+        clusterStrips_uSide.push_back(sensorStripNum);
       }
-      highOccChipsStripNum_uSide.push_back(stripNum);
-      highOccChips_uSide.push_back(completeName);
+      highOccChipsStripNum_uSide.push_back(sensorStripNum);
+      highOccChips_uSide.push_back(sensorName);
     }
 
     if (side == 0 && occupancy->GetBinContent(stripID) > (m_vSideOccupancyFactor * sensorAverage)) {
@@ -120,14 +145,14 @@ void SVDCrossTalkFinderModule::event()
         adjacentStrip = stripID - strips_vSide.back();
       }
       strips_vSide.push_back(stripID);
-      if (!highOccChips_vSide.empty() && completeName == highOccChips_vSide.back() && adjacentStrip == 1) {
-        if (clusterStrips_vSide.empty() || clusterStrips_vSide.back() != stripNum) {
+      if (!highOccChips_vSide.empty() && sensorName == highOccChips_vSide.back() && adjacentStrip == 1) {
+        if (clusterStrips_vSide.empty() || clusterStrips_vSide.back() != sensorStripNum) {
           clusterStrips_vSide.push_back(highOccChipsStripNum_vSide.back());
         }
-        clusterStrips_vSide.push_back(stripNum);
+        clusterStrips_vSide.push_back(sensorStripNum);
       }
-      highOccChipsStripNum_vSide.push_back(stripNum);
-      highOccChips_vSide.push_back(completeName);
+      highOccChipsStripNum_vSide.push_back(sensorStripNum);
+      highOccChips_vSide.push_back(sensorName);
     }
 
   }

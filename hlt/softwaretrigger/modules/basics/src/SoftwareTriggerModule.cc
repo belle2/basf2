@@ -56,11 +56,6 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "to the trigger decisions into a ROOT file. The file path and name of this file can be handled by the "
            "debugOutputFileName parameter. Not supported during parallel processing.", m_param_storeDebugOutputToROOTFile);
 
-  addParam("storeAdditionalInformation", m_param_storeAdditionalInformation, "Flag to store additional information "
-           "of the result to the data store. This will store things like the used prescaling or the result "
-           "before prescaling to an additional object. It costs additional storage, but might be interesting for "
-           "analysis.", m_param_storeAdditionalInformation);
-
   addParam("preScaleStoreDebugOutputToDataStore", m_param_preScaleStoreDebugOutputToDataStore,
            "Prescale with which to save the results of the calculations leading "
            "to the trigger decisions into the DataStore. Leave to zero, to not store them at all.",
@@ -75,10 +70,6 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
 void SoftwareTriggerModule::initialize()
 {
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
-  if (m_param_storeAdditionalInformation) {
-    m_additionalInformationStoreObjectPointer.registerInDataStore();
-  }
-
   m_dbHandler.reset(new SoftwareTriggerDBHandler(m_param_baseIdentifier));
 
   initializeCalculation();
@@ -105,9 +96,6 @@ void SoftwareTriggerModule::event()
 {
   if (not m_resultStoreObjectPointer.isValid()) {
     m_resultStoreObjectPointer.construct();
-  }
-  if (not m_additionalInformationStoreObjectPointer.isValid() and m_param_storeAdditionalInformation) {
-    m_additionalInformationStoreObjectPointer.construct();
   }
 
   if (m_param_preScaleStoreDebugOutputToDataStore > 0 and not m_debugOutputStoreObject.isValid()) {
@@ -160,13 +148,8 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
-    const auto& [cutResult, prescaledCutResult] = cut->check(prefilledObject);
-    m_resultStoreObjectPointer->addResult(cutIdentifier, prescaledCutResult);
-
-    if (m_param_storeAdditionalInformation) {
-      m_additionalInformationStoreObjectPointer->addNonPrescaledResult(cutIdentifier, cutResult);
-      m_additionalInformationStoreObjectPointer->addPrescaling(cutIdentifier, cut->getPreScaleFactor());
-    }
+    const auto& [prescaledCutResult, nonPrescaledCutResult] = cut->check(prefilledObject);
+    m_resultStoreObjectPointer->addResult(cutIdentifier, prescaledCutResult, nonPrescaledCutResult);
   }
 
   // Also add the module result ( = the result of all cuts with this basename) for later reference.

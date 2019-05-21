@@ -48,17 +48,19 @@ namespace Belle2 {
           // if yes, we have to use the prescale factor to see, if the result is really yes.
           if (makePreScale(getPreScaleFactor())) {
             return {SoftwareTriggerCutResult::c_accept, SoftwareTriggerCutResult::c_accept};
+          } else {
+            // This is the only case were prescaled and non-prescaled results are different.
+            return {SoftwareTriggerCutResult::c_noResult, SoftwareTriggerCutResult::c_accept};
           }
+        } else {
+          return {SoftwareTriggerCutResult::c_noResult, SoftwareTriggerCutResult::c_noResult};
         }
-
-        // This is the only case were prescaled and non-prescaled results are different.
-        return {SoftwareTriggerCutResult::c_accept, SoftwareTriggerCutResult::c_noResult};
       }
     }
 
     SoftwareTriggerCutResult SoftwareTriggerCut::checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const
     {
-      return check(prefilledObject).second;
+      return check(prefilledObject).first;
     }
   }
 }

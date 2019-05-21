@@ -112,9 +112,9 @@ namespace Belle2 {
       SoftwareTriggerCutResult checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const;
 
       /**
-       * Return both the non-prescaled and the prescaled result. This function should only be use experts, you basically always want to
+       * Return both the prescaled and the non-prescaled result. This function should only be use experts, you basically always want to
        * use the checkPreScaled function.
-       * Returns a pair [non-prescaled, prescaled]
+       * Returns a pair [prescaled, non-prescaled]
        */
       std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> check(const SoftwareTriggerVariableManager::Object& prefilledObject)
       const;

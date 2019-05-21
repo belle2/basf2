@@ -39,8 +39,20 @@
 
 #pragma link C++ class Belle2::TRGSummary+;
 #pragma link C++ class Belle2::SoftwareTriggerResult+;
-#pragma link C++ class Belle2::SoftwareTriggerInformation+;
 
+// ----------------------------------------------------------------------------
+// SoftwareTriggerResult
+// As of version 5, the result consists of a pair of prescaled - non prescaled result. We just full up with 0 = no result.
+#pragma read sourceClass="Belle2::SoftwareTriggerResult" version="[-4]" \
+  source="std::map<std::string, int> m_results" \
+  targetClass="Belle2::SoftwareTriggerResult" target="m_results" \
+  code="{ \
+    for(const auto& [key, prescaledResult] : onfile.m_results) { \
+      m_results[key] = std::make_pair(prescaledResult, 0); \
+    } \
+	}"
+
+// ----------------------------------------------------------------------------
 // Allow reading PIDLikelihood version <=2 (less particle types, different order)
 //
 // schema evolution rule as described in "Support For Significant Evolutions of the User Data Model In ROOT Files"

@@ -17,6 +17,7 @@
 #include <bklm/dbobjects/BKLMTimeWindow.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dataobjects/BKLMElementID.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>

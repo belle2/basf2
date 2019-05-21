@@ -162,6 +162,19 @@ namespace Belle2 {
     const double c_minT99 = 3.5; /**< The minimum t99 */
 
     bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
+
+    // For the energy dependence correction to the time
+    // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
+
+    double energyDependentTimeOffsetElectronic(const double amplitude)
+    ;  /**< Function to calculate "energy dependence equation using Alex function" */
+    double m_energyDependenceTimeOffsetFitParam_p1 = 0  ;               /**< p1 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p2 = 88449. ;           /**< p2 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p3 = 0.20867E+06 ;      /**< p3 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p4 = 3.1482 ;           /**< p4 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p5 = 7.4747 ;           /**< p5 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p6 = 1279.3 ;           /**< p6 in "energy dependence equation" */
+
   };
 
   /** Class derived from ECLDigitCalibratorModule, only difference are the names */

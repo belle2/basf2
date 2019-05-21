@@ -34,9 +34,9 @@ SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nul
 {
   //Set module properties
   setDescription("Save a sequential ROOT file (non-standard I/O format used in DAQ). See https://confluence.desy.de/display/BI/Software+PersistencyModules for further information and a comparison with the .root format.");
-  m_file = 0;
-  m_msghandler = 0;
-  m_streamerinfo = NULL;
+  m_file = nullptr;
+  m_msghandler = nullptr;
+  m_streamerinfo = nullptr;
   m_streamerinfo_size = 0;
 
   vector<string> emptyvector;
@@ -55,7 +55,7 @@ SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nul
 
 SeqRootOutputModule::~SeqRootOutputModule()
 {
-  if (m_streamerinfo != NULL) delete m_streamerinfo;
+  if (m_streamerinfo != nullptr) delete m_streamerinfo;
 }
 
 void SeqRootOutputModule::initialize()
@@ -87,7 +87,7 @@ void SeqRootOutputModule::beginRun()
 {
 
   // Statistics
-  gettimeofday(&m_t0, 0);
+  gettimeofday(&m_t0, nullptr);
   m_size = 0.0;
   m_size2 = 0.0;
   m_nevt = 0;
@@ -118,9 +118,9 @@ void SeqRootOutputModule::endRun()
   //fill Run data
 
   // End time
-  gettimeofday(&m_tend, 0);
-  double etime = (double)((m_tend.tv_sec - m_t0.tv_sec) * 1000000 +
-                          (m_tend.tv_usec - m_t0.tv_usec));
+  gettimeofday(&m_tend, nullptr);
+  auto etime = (double)((m_tend.tv_sec - m_t0.tv_sec) * 1000000 +
+                        (m_tend.tv_usec - m_t0.tv_usec));
 
   // Statistics
   // Sigma^2 = Sum(X^2)/n - (Sum(X)/n)^2
@@ -161,12 +161,12 @@ void SeqRootOutputModule::getStreamerInfos()
     return;
   }
 
-  TList* minilist = 0 ;
+  TList* minilist = nullptr ;
   for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {
     DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
 
-    for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
-      const TClass* entryClass = iter->second.objClass;
+    for (auto& iter : map) {
+      const TClass* entryClass = iter.second.objClass;
       TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
       B2INFO("Recording StreamerInfo : durability " << durability << " : Class Name " << entryClass->GetName());
       if (!minilist) minilist  =  new TList();
@@ -189,7 +189,7 @@ void SeqRootOutputModule::getStreamerInfos()
     //copy the steamerINfo for later use
     if (m_streamerinfo_size > 0) {
       B2INFO("Get StreamerInfo from DataStore : " << m_streamerinfo_size << "bytes");
-      if (m_streamerinfo != NULL) {
+      if (m_streamerinfo != nullptr) {
         B2FATAL("getStreamerInfo() is called twice in the same run ");
       } else {
         m_streamerinfo = new char[ m_streamerinfo_size ];

@@ -16,13 +16,9 @@
 namespace Belle2 {
 
   /**
-   * This class import to the database the dbobjects
-   * SVDNoiseCalibrations and SVDPulseShapeCalibrations.
+   * This class import to the database the dbobjects storing the
+   * SVD Local Calibrations.
    *
-   * Currently, no input file is read to fill them, default
-   *  values are written on the dbobjects for the needed calibrations
-   * constants as noise, charge, ADC pulse, peaking time and
-   * pulse width.
    */
   class SVDLocalCalibrationsImporter {
 
@@ -60,38 +56,14 @@ namespace Belle2 {
 
     void importSVDChannelMapping(const std::string& fileName = std::string("svd/data/svd_mapping.xml"));
 
-    /**
-     * This method import to the database the global configuration xml file
-     * used during data taking
-     */
 
-    void importSVDGlobalXMLFile(const std::string& fileName = std::string("svd/data/global.xml"));
-
-    /**
-     * This method import to the database the global configuration parameters
-     * used during data taking
-     * @param xmlFileName is the file name of the xml file
-     * @param errorTollerant if true bypasses sanity checks
-     */
-
-    void importSVDGlobalConfigParametersFromXML(const std::string& xmlfileName, bool errorTollerant = false);
-
-    /**
-     * This method import to the database the local configuration parameters
-     * used during data taking
-     * @param xmlFileName is the file name of the xml file
-     * @param errorTollerant if true bypasses sanity checks
-     */
-
-    void importSVDLocalConfigParametersFromXML(const std::string& xmlfileName, bool errorTollerant = false);
 
     /**
      * This method import to the database the strip
-     * noise from the noise local runs.
+     * noise from the pedestal local runs.
      * @param xmlFileName is the file name of the xml file
      * @param errorTollerant if true bypasses sanity checks
      */
-
     void importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
 
     /**
@@ -157,7 +129,8 @@ namespace Belle2 {
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
-    ClassDef(SVDLocalCalibrationsImporter, 1);
+
+    ClassDef(SVDLocalCalibrationsImporter, 1); /**< needed by root */
   };
 
 } // Belle2 namespace

@@ -112,9 +112,9 @@ void VariablesToNtupleModule::initialize()
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   }
-  for (unsigned iVar = 0; iVar < m_variables.size(); ++iVar)
-    if (Variable::isCounterVariable(m_variables[iVar])) {
-      B2WARNING("The counter '" << m_variables[iVar]
+  for (const auto& variable : m_variables)
+    if (Variable::isCounterVariable(variable)) {
+      B2WARNING("The counter '" << variable
                 << "' is handled automatically by VariablesToNtuple, you don't need to add it.");
     }
 

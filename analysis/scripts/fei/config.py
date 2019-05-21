@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# @cond
+# @cond SUPPRESS_DOXYGEN
 
 # Thomas Keck 2016
 
@@ -237,3 +237,5 @@ class Particle(object):
                                           preCutConfig=preCutConfig,
                                           decayModeID=decayModeID))
         return self
+
+# @endcond

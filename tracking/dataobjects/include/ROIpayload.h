@@ -36,6 +36,7 @@ namespace Belle2 {
     enum { HEADER_SIZE_WO_LENGTH = 3, HEADER_SIZE_WITH_LENGTH = 5, HEADER_SIZE_WITH_LENGTH_AND_CRC = 6};
 
   public:
+    /** Shorthand for 32-bit integer stored in big-endian format */
     typedef boost::spirit::endian::ubig32_t ubig32_t;
 
     /** Default constructor.
@@ -49,11 +50,11 @@ namespace Belle2 {
 
     int m_packetLengthByte = 0; /**< packet length  in byte*/
     int m_length; /**< packet length*/
-    int*  m_rootdata; //[m_length] /**< */
+    int*  m_rootdata; /**< pointer to data packet of m_length bytes*/
 
-    int m_index; //! transient value /**< index*/
-    uint32_t* m_data32; //! transient value /**< data32*/
-    ROIrawID::baseType* m_data64; //! transient value /**< data64*/
+    int m_index; /**< transient index*/
+    uint32_t* m_data32; /**< pointer to transient 32-bit value*/
+    ROIrawID::baseType* m_data64; /**< pointer to transient 64-bit value*/
 
     void setPayloadLength(int length); /**< set payload length*/
     void setPayloadLength(); /**< set payload length*/
@@ -67,9 +68,9 @@ namespace Belle2 {
     void addROIraw(unsigned long int roiraw); /**< add a ROIrawID */
     void setCRC(); /**< set CRC */
 
-    int getPacketLengthByte() {return m_packetLengthByte;}; /**< get packet length in byte*/
-    int getLength() {return m_length;}; /**< get length*/
-    int* getRootdata() {return m_rootdata;}; //[m_length] /**< */
+    int getPacketLengthByte() {return m_packetLengthByte;}; /**< get packet length in bytes*/
+    int getLength() {return m_length;}; /**< get packet length*/
+    int* getRootdata() {return m_rootdata;}; /**< get pointer to the data packet*/
 
     void init(int length); /**< initializer*/
 

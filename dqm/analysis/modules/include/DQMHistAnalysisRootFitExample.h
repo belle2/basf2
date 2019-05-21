@@ -34,8 +34,10 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     DQMHistAnalysisRooFitExampleModule();
+    //! Destructor
+    ~DQMHistAnalysisRooFitExampleModule();
   private:
 
     //! Module functions to be called from main process

@@ -171,6 +171,21 @@ namespace Belle2 {
     void dumpQEMap(bool simple = false);
 
     /**
+     * Dumps detector map of HAPD modules to HV cable channels
+     */
+    void dumpHvMappings();
+
+    /**
+     * Prints electronics mappings for all modules (merger ID + SN, merger port, copper, finnese)
+     */
+    void printFEMappings();
+
+    /**
+     * Dumps module - merger mapping into root file
+     */
+    void dumpMergerMapping(bool sn = true);
+
+    /**
      * Dumps module numbering scheme into root file (module position on the detector plane -> module number)
      */
     void dumpModuleNumbering();

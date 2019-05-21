@@ -60,6 +60,7 @@ namespace Belle2 {
     addParam("dth", m_dth, "dth", v);
     addParam("th0", m_th0, "th0", v);
     addParam("debug", m_debugmode, "debug mode", false);
+    addParam("internal", m_internalmode, "Internal thscan mode", false);
     addParam("daqdb", m_daqdb, "daqdb config name", std::string(""));
   }
 
@@ -111,7 +112,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtmetadata;
     //int expno = evtmetadata->getExperiment();
     int runno = evtmetadata->getRun();
-    if (runno == 100) {
+    if (runno == 100 && !m_internalmode) {
       terminate();
     }
   }
@@ -119,9 +120,8 @@ namespace Belle2 {
   void ARICHRateCalModule::event()
   {
     StoreObjPtr<EventMetaData> evtmetadata;
-    //int runno = evtmetadata->getRun();
-    int raw_evtno = evtmetadata->getEvent();
-    int runno = raw_evtno / m_nevents;
+    int runno = m_internalmode ? m_run_count : evtmetadata->getRun();
+    int raw_evtno = m_internalmode ? m_evt_count : evtmetadata->getEvent();
     ARICHThParam param(runno, m_dth, m_th0, m_nrun);
     StoreArray<ARICHRawDigit> rawdigits;
     for (auto& rawdigit : rawdigits) {
@@ -140,6 +140,14 @@ namespace Belle2 {
         }
       }
     }
+
+    // evt,run counter for internal thscan mode
+    m_evt_count++;
+    if (m_evt_count == m_nevents) {
+      m_evt_count = 0;
+      m_run_count++;
+    }
+
   }
 
 
@@ -153,4 +161,3 @@ namespace Belle2 {
 
 
 } // end Belle2 namespace
-

@@ -28,7 +28,7 @@ geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
 geobuilder.param('components', ['BKLM'])
 
-bklmUnpack = register_module('BKLMUnpacker')
+klmUnpack = register_module('KLMUnpacker')
 # BKLM reco
 bklmreco = register_module('BKLMReconstructor')
 bklmreco.log_level = LogLevel.INFO
@@ -47,7 +47,7 @@ main = create_path()
 main.add_module(packer)
 main.add_module(gearbox)
 main.add_module(geobuilder)
-main.add_module(bklmUnpack)
+main.add_module(klmUnpack)
 main.add_module(bklmreco)
 main.add_module(bklmEff)
 # main.add_module(output)

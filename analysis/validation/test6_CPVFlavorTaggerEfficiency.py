@@ -12,11 +12,11 @@
 """
 
 
-import ROOT
 from basf2 import B2INFO, B2FATAL
 import flavorTagger as ft
+import ROOT
+from ROOT import Belle2
 from array import array
-import shutil
 
 ROOT.gROOT.SetBatch(True)
 
@@ -864,9 +864,3 @@ outputFile.Close()
 
 print('*                                                                                                                 *')
 print('*******************************************************************************************************************')
-
-if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging', True):
-    B2FATAL('flavorTaggerEfficiency: THE "FlavorTagging" DIRECTORY COULD NOT BE FOUND IN THE WORKING DIRECTORY.')
-else:
-    shutil.rmtree(workingDirectory + '/FlavorTagging')
-    B2INFO('flavorTaggerEfficiency: THE "FlavorTagging" DIRECTORY WAS FOUND IN THE WORKING DIRECTORY AND DELETED.')

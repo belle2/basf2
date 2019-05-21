@@ -52,12 +52,15 @@ namespace Belle2 {
   private:
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
     double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
+    double m_clusterLossyFraction; /**< Maximum allowed fractional difference between nPhotons and neutralHadron number of crystals */
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigits */
     StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */
     StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
     StoreObjPtr<EventT0> m_eventT0; /**< Event T0 */
+
+    int makeCluster(int, double); /**< Make a cluster from a given shower array index */
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/

@@ -34,7 +34,7 @@ def getBelleOrBelle2():
     return belleOrBelle2Flag
 
 
-def setInteractionWithDatabase(downloadFromDatabaseIfNotfound=True, uploadToDatabaseAfterTraining=False):
+def setInteractionWithDatabase(downloadFromDatabaseIfNotFound=False, uploadToDatabaseAfterTraining=False):
     """
     Sets the interaction with the database: download trained weight files or upload weight files after training.
     """
@@ -42,12 +42,12 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotfound=True, uploadToData
     global downloadFlag
     global uploadFlag
 
-    downloadFlag = downloadFromDatabaseIfNotfound
+    downloadFlag = downloadFromDatabaseIfNotFound
     uploadFlag = uploadToDatabaseAfterTraining
 
 
 # Default list of aliases that should be used to save the flavor tagging information using VariablesToNtuple
-flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC',
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC', 'mcFlavorOfOtherB0',
                   'qpElectron', 'hasTrueTargetElectron', 'isRightCategoryElectron',
                   'qpIntermediateElectron', 'hasTrueTargetIntermediateElectron', 'isRightCategoryIntermediateElectron',
                   'qpMuon', 'hasTrueTargetMuon', 'isRightCategoryMuon',
@@ -529,37 +529,47 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
         methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
-        identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
+        identifierEventLevel = methodPrefixEventLevel
         targetVariable = 'isRightCategory(' + category + ')'
         extraInfoName = targetVariable
 
-        if not os.path.isfile(identifierEventLevel) and mode == 'Expert':
-            if downloadFlag:
-                basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
+        if mode == 'Expert':
+
+            if downloadFlag or useOnlyLocalFlag:
+                identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
                 if not os.path.isfile(identifierEventLevel):
-                    B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
-                            ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
-            else:
-                B2FATAL(
-                    'Flavor Tagger: ' +
-                    particleList +
-                    ' Eventlevel was not trained. Weight file ' +
-                    identifierEventLevel + ' was not found. Stopped')
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
+                        if not os.path.isfile(identifierEventLevel):
+                            B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
+                                    ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'Flavor Tagger: ' + particleList + ' Eventlevel was not trained. Weight file ' +
+                            identifierEventLevel + ' was not found. Stopped')
 
-        if os.path.isfile(identifierEventLevel) and mode != 'Teacher':
+                else:
+                    B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
 
-            B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
+        elif mode == 'Sampler':
 
-            if mode == 'Sampler':
+            identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
+            if os.path.isfile(identifierEventLevel):
+                B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
+
                 if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
                     methodPrefixEventLevelKaonPion = "FlavorTagger_" + belleOrBelle2Flag + \
                         "_" + weightFiles + 'EventLevelKaonPionFBDT'
                     identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
                     if not os.path.isfile(identifierEventLevelKaonPion):
-                        # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
-                        # sampling. The others are not needed and skipped
+                                # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
+                                # sampling. The others are not needed and skipped
                         if category != "SlowPion" and category != "Kaon":
                             continue
+
+        if mode != 'Teacher':
+
+            B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixEventLevel + '.')
 
             if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
                 identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
@@ -744,88 +754,100 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
         if TMVAfbdt and not FANNmlp:
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', filesDirectory +
-                                   '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
-                    B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
-                            '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            identifier = methodPrefixCombinerLevel + 'FBDT'
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
+            if downloadFlag or useOnlyLocalFlag:
 
-                B2FATAL('flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
-            else:
-                B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
-                B2INFO('flavorTagger: Apply FBDTMethod ' + methodPrefixCombinerLevel + 'FBDT')
-                path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'FBDT', signalFraction=signalFraction,
-                                identifier=filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root")
-                return True
+                identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'
+                if not os.path.isfile(identifier):
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', identifier)
+                        if not os.path.isfile(identifier):
+                            B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
+                                    '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories.' +
+                            ' Weight file ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
+                else:
+                    B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
+
+            B2INFO('flavorTagger: Apply FBDTMethod ' + methodPrefixCombinerLevel + 'FBDT')
+            path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'FBDT', signalFraction=signalFraction,
+                            identifier=identifier)
+            return True
 
         if FANNmlp and not TMVAfbdt:
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixCombinerLevel + 'FANN', filesDirectory +
-                                   '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
-                    B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
-                            '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            identifier = methodPrefixCombinerLevel + 'FANN'
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
+            if downloadFlag or useOnlyLocalFlag:
+                identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'
 
-                B2FATAL('flavorTagger: Combinerlevel FANN was not trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
+                if not os.path.isfile(identifier):
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixCombinerLevel + 'FANN', identifier)
+                        if not os.path.isfile(identifier):
+                            B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
+                                    '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'flavorTagger: Combinerlevel FANNMLP was not trained with this combination of categories. ' +
+                            ' Weight file ' + methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
+                else:
+                    B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
 
-            else:
-                B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
-
-                B2INFO('flavorTagger: Apply FANNMethod on combiner level')
-                path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'FANN', signalFraction=signalFraction,
-                                identifier=filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root")
-                return True
+            B2INFO('flavorTagger: Apply FANNMethod on combiner level')
+            path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'FANN', signalFraction=signalFraction,
+                            identifier=identifier)
+            return True
 
         if FANNmlp and TMVAfbdt:
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', filesDirectory +
-                                   '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
-                    B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
-                            '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            identifierFBDT = methodPrefixCombinerLevel + 'FBDT'
+            identifierFANN = methodPrefixCombinerLevel + 'FANN'
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixCombinerLevel + 'FANN', filesDirectory +
-                                   '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
-                    B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
-                            '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            if downloadFlag or useOnlyLocalFlag:
+                identifierFBDT = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'
+                identifierFANN = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
+                if not os.path.isfile(identifierFBDT):
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', identifierFBDT)
+                        if not os.path.isfile(identifierFBDT):
+                            B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
+                                    '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories. ' +
+                            'Weight file ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
 
-                B2FATAL('flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
+                if not os.path.isfile(identifierFANN):
+                    if downloadFlag:
+                        basf2_mva.download(methodPrefixCombinerLevel + 'FANN', identifierFANN)
+                        if not os.path.isfile(identifierFANN):
+                            B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
+                                    '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                    else:
+                        B2FATAL(
+                            'flavorTagger: Combinerlevel FANNMLP was not trained with this combination of categories. ' +
+                            'Weight file ' + methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
 
-            elif not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
+                if os.path.isfile(identifierFBDT) and os.path.isfile(identifierFANN):
+                    B2INFO('flavorTagger: Ready to be used with weightFiles ' + methodPrefixCombinerLevel +
+                           'FBDT' + '_1.root and ' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
 
-                B2FATAL('flavorTagger: Combinerlevel FANN was not trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
+            B2INFO('flavorTagger: Apply FANNMethod and FBDTMethod  on combiner level')
 
-            else:
-                B2INFO('flavorTagger: Ready to be used with weightFiles ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root and ' +
-                       methodPrefixCombinerLevel + 'FANN' + '_1.root')
+            mvaMultipleExperts = register_module('MVAMultipleExperts')
+            mvaMultipleExperts.set_name('MVAMultipleExperts_Combiners')
+            mvaMultipleExperts.param('listNames', [])
+            mvaMultipleExperts.param('extraInfoNames', ['qrCombined' + 'FBDT', 'qrCombined' + 'FANN'])
+            mvaMultipleExperts.param('signalFraction', signalFraction)
+            mvaMultipleExperts.param('identifiers', [identifierFBDT, identifierFANN])
+            path.add_module(mvaMultipleExperts)
 
-                B2INFO('flavorTagger: Apply FANNMethod on combiner level')
-
-                mvaMultipleExperts = register_module('MVAMultipleExperts')
-                mvaMultipleExperts.set_name('MVAMultipleExperts_Combiners')
-                mvaMultipleExperts.param('listNames', [])
-                mvaMultipleExperts.param('extraInfoNames', ['qrCombined' + 'FBDT', 'qrCombined' + 'FANN'])
-                mvaMultipleExperts.param('signalFraction', signalFraction)
-                mvaMultipleExperts.param('identifiers', [filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root",
-                                                         filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root"])
-                path.add_module(mvaMultipleExperts)
-
-                return True
+            return True
 
 
 def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
@@ -929,7 +951,8 @@ def flavorTagger(
         'KaonPion'],
     belleOrBelle2="Belle2",
     saveCategoriesInfo=True,
-    downloadFromDatabaseIfNotfound=True,
+    useOnlyLocalWeightFiles=False,
+    downloadFromDatabaseIfNotFound=False,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
     path=analysis_main,
@@ -948,7 +971,7 @@ def flavorTagger(
                                                trained, for this step you do not reconstruct any particle or do any analysis,
                                                you just run the flavorTagger alone.
       @param weightFiles                       Weight files name. Default=
-                                               ``B2nunubarBGx1``. For Belle MC/data use  ``B2JpsiKs_muBGx1``. If the user self
+                                               ``B2nunubarBGx1`` (official weight files). If the user self
                                                wants to train the FlavorTagger, the weightfiles name should correspond to the
                                                analysed CP channel in order to avoid confusions. The default name
                                                ``B2nunubarBGx1`` corresponds to
@@ -961,9 +984,10 @@ def flavorTagger(
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param belleOrBelle2                     Uses files trained for ``Belle`` or ``Belle2`` MC.
       @param saveCategoriesInfo                Sets to save information of individual categories.
-      @param downloadFromDatabaseIfNotfound    Weight files are downloaded from
+      @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
+      @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from
                                                the conditions database if not available in workingDirectory.
-      @param uploadToDatabaseAfterTraining     For librarians only: uploads weight files to localdb after training.
+      @param uploadToDatabaseAfterTraining     [Expert] For librarians only: uploads weight files to localdb after training.
       @param samplerFileId                     Identifier to paralellize
                                                sampling. Only used in ``Sampler`` mode.  If you are training by yourself and
                                                want to parallelize the sampling, you can run several sampling scripts in
@@ -981,16 +1005,16 @@ def flavorTagger(
     if not Belle2.FileSystem.findFile(workingDirectory, True):
         B2FATAL('flavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
 
-    if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotfound):
+    global filesDirectory
+    filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
+
+    if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotFound):
         if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging', True):
             os.mkdir(workingDirectory + '/FlavorTagging')
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
         elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods', True):
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
-
-    global filesDirectory
-
-    filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
+        filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
     if not (belleOrBelle2 == 'Belle2' or belleOrBelle2 == 'Belle'):
         B2FATAL('flavorTagger: Wrong argument for belleOrBelle2 given: The available modes are "Belle2" or "Belle"')
@@ -1013,8 +1037,10 @@ def flavorTagger(
             B2FATAL('flavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
 
     global fileId
-
     fileId = samplerFileId
+
+    global useOnlyLocalFlag
+    useOnlyLocalFlag = useOnlyLocalWeightFiles
 
     B2INFO('*** FLAVOR TAGGING ***')
     B2INFO(' ')
@@ -1022,7 +1048,7 @@ def flavorTagger(
     B2INFO(' ')
 
     setBelleOrBelle2(belleOrBelle2)
-    setInteractionWithDatabase(downloadFromDatabaseIfNotfound, uploadToDatabaseAfterTraining)
+    setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
     WhichCategories(categories)
     set_FlavorTagger_pid_aliases()
     setVariables()

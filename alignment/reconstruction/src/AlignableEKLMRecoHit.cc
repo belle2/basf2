@@ -9,15 +9,14 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
+#include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformDataGlobalAligned.h>
-#include <alignment/GlobalDerivatives.h>
-#include <alignment/GlobalLabel.h>
-#include <eklm/dbobjects/EKLMAlignment.h>
 
 using namespace Belle2;
 using namespace alignment;
@@ -132,17 +131,20 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
   double x = globalPos.x() / CLHEP::cm * Unit::cm;
   double y = globalPos.y() / CLHEP::cm * Unit::cm;
   /*
-   * Matrix of global derivatives (second dimension is added because of
-   * resizing in GblFitterInfo::constructGblPoint()).
+   * Matrix of global derivatives of local coordinate (second dimension is
+   * added because of resizing in GblFitterInfo::constructGblPoint()) by
+   * variations of the detector element position.
+   * The sign is inverted to match the convention for other detectors.
    */
   TMatrixD derGlobal(2, 3);
   derGlobal(0, 0) = 0;
   derGlobal(0, 1) = 0;
   derGlobal(0, 2) = 0;
-  derGlobal(1, 0) = -(cosda * m_StripV.X() - sinda * m_StripV.Y());
-  derGlobal(1, 1) = -(sinda * m_StripV.X() + cosda * m_StripV.Y());
-  derGlobal(1, 2) = (x - dxs) * (-sinda * m_StripV.X() - cosda * m_StripV.Y()) +
-                    (y - dys) * (cosda * m_StripV.X() - sinda * m_StripV.Y());
+  derGlobal(1, 0) = cosda * m_StripV.X() - sinda * m_StripV.Y();
+  derGlobal(1, 1) = sinda * m_StripV.X() + cosda * m_StripV.Y();
+  derGlobal(1, 2) =
+    -((x - dxs) * (-sinda * m_StripV.X() - cosda * m_StripV.Y()) +
+      (y - dys) * (cosda * m_StripV.X() - sinda * m_StripV.Y()));
   //derGlobal(1, 3) = -cosda;
   //derGlobal(1, 4) = -u * cosda - (v - dy) * sinda;
 

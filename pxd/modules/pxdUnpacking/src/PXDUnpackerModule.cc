@@ -43,8 +43,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   Module(),
   m_storeRawHits(),
   m_storeROIs(),
-  m_storeRawAdc(),
-  m_storeRawCluster()
+  m_storeRawAdc()
 {
   //Set module properties
   setDescription("Unpack Raw PXD Hits from ONSEN data stream");
@@ -56,7 +55,6 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of generated PXDRawAdcs", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
-  addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task", (uint64_t)0);
   addParam("SuppressErrorMask", m_suppressErrorMask, "Set mask for errors msgs which are not printed", (uint64_t)0);
   addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
@@ -89,7 +87,6 @@ void PXDUnpackerModule::initialize()
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeDAQEvtStats.registerInDataStore(m_PXDDAQEvtStatsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
-  m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   /// actually, later we do not want to store ROIs and raw ADC into output file ...  aside from debugging
 
   B2DEBUG(29, "ForceMapping: " << m_forceMapping);
@@ -316,7 +313,8 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   // Size: 64*768 + 8 bytes for a full frame readout
   if (frame_len != 0xC008) {
     if (!(m_suppressErrorMask & c_FIX_SIZE)) B2WARNING("Frame size unsupported for RAW ADC frame! $" <<
-                                                         LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str()));
+                                                         LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str())
+                                                         << LogVar("DHE", dhe_ID) << LogVar("DHP", dhe_DHPport));
     m_errorMask |= c_FIX_SIZE;
     return;
   }
@@ -360,7 +358,8 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   m_storeRawAdc.appendNew(vxd_id, data, frame_len);
 };
 
-void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
+void PXDUnpackerModule::unpack_fce([[maybe_unused]] unsigned short* data, [[maybe_unused]] unsigned int length,
+                                   [[maybe_unused]] VxdID vxd_id)
 {
   //! *************************************************************
   //! Important Remark:
@@ -372,35 +371,36 @@ void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, Vx
   B2WARNING("FCE (Cluster) Packet have not yet been tested with real HW clusters. Dont assume that this code is working!");
   return;
 
-  ubig16_t* cluster = (ubig16_t*)data;
-  int nr_words; //words in dhp frame
-  unsigned int words_in_cluster = 0; //counts 16bit words in cluster
-  nr_words = length / 2;
-  ubig16_t sor;
-  sor = 0x0000;
-
-  for (int i = 2 ; i < nr_words ; i++) {
-    if (i != 2) { //skip header
-      if ((((cluster[i] & 0x8000) == 0)
-           && ((cluster[i] & 0x4000) >> 14) == 1)) {  //searches for start of row frame with start of cluster flag = 1 => new cluster
-        if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster], words_in_cluster, vxd_id);
-        words_in_cluster = 0;
-      }
-    }
-    if ((cluster[i] & 0x8000) == 0) {
-      sor = cluster[i];
-    }
-    words_in_cluster++;
-
-    if ((cluster[nr_words - 1] & 0xFFFF) == (sor &
-                                             0xFFFF)) {//if frame is not 32bit aligned last word will be the last start of row word
-      cluster[nr_words - 1] = 0x0000;//overwrites the last redundant word with zero to make checking easier in PXDHardwareClusterUnpacker
-    }
-
-    if (i == nr_words - 1) {
-      if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster + 1], words_in_cluster, vxd_id);
-    }
-  }
+  // implement the unpacking here and not as a separate module ... when it is available in HW
+//   ubig16_t* cluster = (ubig16_t*)data;
+//   int nr_words; //words in dhp frame
+//   unsigned int words_in_cluster = 0; //counts 16bit words in cluster
+//   nr_words = length / 2;
+//   ubig16_t sor;
+//   sor = 0x0000;
+//
+//   for (int i = 2 ; i < nr_words ; i++) {
+//     if (i != 2) { //skip header
+//       if ((((cluster[i] & 0x8000) == 0)
+//            && ((cluster[i] & 0x4000) >> 14) == 1)) {  //searches for start of row frame with start of cluster flag = 1 => new cluster
+//         if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster], words_in_cluster, vxd_id);
+//         words_in_cluster = 0;
+//       }
+//     }
+//     if ((cluster[i] & 0x8000) == 0) {
+//       sor = cluster[i];
+//     }
+//     words_in_cluster++;
+//
+//     if ((cluster[nr_words - 1] & 0xFFFF) == (sor &
+//                                              0xFFFF)) {//if frame is not 32bit aligned last word will be the last start of row word
+//       cluster[nr_words - 1] = 0x0000;//overwrites the last redundant word with zero to make checking easier in PXDHardwareClusterUnpacker
+//     }
+//
+//     if (i == nr_words - 1) {
+//       if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster + 1], words_in_cluster, vxd_id);
+//     }
+//   }
 }
 
 void PXDUnpackerModule::dump_dhp(void* data, unsigned int frame_len)
@@ -456,7 +456,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int dhp_dhp_id       = 0;
 
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
-//   unsigned int dhp_offset = 0;
+//  unsigned int dhp_offset = 0;
   bool rowflag = false;
   bool pixelflag = true; // just for first row start
 
@@ -516,7 +516,9 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
   /* // TODO removed because data format error is not to be fixed soon
   if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
-    if(!m_suppressErrorMask&c_DHP_DHE_FRAME_DIFFER ) B2WARNING("DHP Frame Nr differ from DHE Frame Nr by >1 DHE " << dhe_first_readout_frame_id_lo << " != DHP " << (dhp_readout_frame_lo & 0x3F) << " delta "<< ((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) );
+    if (!m_suppressErrorMask & c_DHP_DHE_FRAME_DIFFER) B2WARNING("DHP Frame Nr differ from DHE Frame Nr by >1 DHE " <<
+          dhe_first_readout_frame_id_lo << " != DHP " << (dhp_readout_frame_lo & 0x3F) << " delta " << ((
+                dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F));
     m_errorMask |= c_DHP_DHE_FRAME_DIFFER;
   }
   */
@@ -582,6 +584,11 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
         pixelflag = false;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
+        if (dhp_cm == 63) { // fifo overflow
+          B2WARNING("DHP data loss (CM=63) in " << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
+          /// FIXME TODO set an error bit ... but define one first
+          m_errorMask |= c_DHH_MISC_ERROR;
+        }
         if (daqpktstat.dhc_size() > 0) {
           if (daqpktstat.dhc_back().dhe_size() > 0) {
             PXDDAQDHPComMode cm(dhp_dhp_id, dhp_row, dhp_cm);
@@ -1180,6 +1187,11 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         }
       }
       /// TODO how to handle error flags set in in DHC_END?
+      if (dhc.data_dhc_end_frame->getErrorInfo() != 0) {
+        if (!(m_suppressErrorMask & c_DHH_END_ERRORBITS)) B2ERROR("DHC END Error Info set to $" << hex <<
+                                                                    dhc.data_dhc_end_frame->getErrorInfo());
+        m_errorMask |= c_DHH_END_ERRORBITS;
+      }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       m_errorMaskDHC |= m_errorMask; // do latest updates
 
@@ -1190,6 +1202,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         daqpktstat.dhc_back().setErrorMask(m_errorMaskDHC);
         //B2DEBUG(98,"** DHC "<<currentDHCID<<" Raw"<<dhc.data_dhc_end_frame->get_words() * 4 <<" Red"<<countedBytesInDHC);
         daqpktstat.dhc_back().setCounters(dhc.data_dhc_end_frame->get_words() * 4, countedBytesInDHC);
+        daqpktstat.dhc_back().setEndErrorInfo(dhc.data_dhc_end_frame->getErrorInfo());
       }
       m_errorMaskDHC = 0;
       currentDHEID = 0xFFFFFFFF;
@@ -1208,6 +1221,11 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= c_DHE_START_END_ID;
       }
       /// TODO how to handle error flags set in in DHE_END?
+      if (dhc.data_dhe_end_frame->getErrorInfo() != 0) {
+        if (!(m_suppressErrorMask & c_DHH_END_ERRORBITS)) B2ERROR("DHE END Error Info set to $" << hex <<
+                                                                    dhc.data_dhe_end_frame->getErrorInfo());
+        m_errorMask |= c_DHH_END_ERRORBITS;
+      }
       m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       if (found_mask_active_dhp != mask_active_dhp) {
         if (!(m_suppressErrorMask & c_DHP_ACTIVE)) {
@@ -1251,6 +1269,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
           daqpktstat.dhc_back().dhe_back().setErrorMask(m_errorMaskDHE);
           // B2DEBUG(98,"** DHC "<<currentDHEID<<" Raw "<<dhc.data_dhe_end_frame->get_words() * 2 <<" Red"<<countedBytesInDHE);
           daqpktstat.dhc_back().dhe_back().setCounters(dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
+          daqpktstat.dhc_back().dhe_back().setEndErrorInfo(dhc.data_dhe_end_frame->getErrorInfo());
         }
       }
       m_errorMaskDHE = 0;
@@ -1431,4 +1450,3 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   }
   B2DEBUG(29, "DHC/DHE $" << hex << countedBytesInDHC << ", $" << hex << countedBytesInDHE);
 }
-

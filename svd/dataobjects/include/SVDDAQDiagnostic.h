@@ -47,9 +47,11 @@ namespace Belle2 {
       APVMatchBits = 1,
       /** Number of bits available to represent an upset APV code */
       UpsetAPVBits = 1,
-      /** Number of bits available to represent bad mapping, bad header and bad trailer code */
+      /** Number of bits available to represent bad mapping */
       BadMappingBits = 1,
+      /** Numbner of Bits available to represent bad header */
       BadHeaderBits = 1,
+      /** Numbner of Bits available to represent bad trailer code */
       BadTrailerBits = 1,
 
       /** Total bit size of the SVDDAQDiagnostic */
@@ -122,7 +124,9 @@ namespace Belle2 {
     bool getUpsetAPV() const {return m_upsetApv; }
     /** Get the BadMapping, BadHeader and BadTrailer code */
     bool getBadMapping() const {return m_badMapping; }
+    /** Get the BadTrailer code */
     bool getBadTrailer() const {return m_badTrailer; }
+    /** Get the BadHeader */
     bool getBadHeader() const {return m_badHeader; }
 
     /** Get FADC number */
@@ -133,19 +137,25 @@ namespace Belle2 {
 
 
     /** functions for setting values unpacked from FADC trailer
-     * - FTB Flags Field
-     * - emulated pipeline Address
-     * - APV errors OR
-     * - APV match code
-     * - Upset APVs
-     * - Bad Mapping
-     * - Bad FADC Trailer */
+     * - FTB Flags Field */
     void setFTBFlags(uint16_t ftbFlags) { m_ftbFlags = ftbFlags; }
+    /** functions for setting values unpacked from FADC trailer
+     * - emulated pipeline Address */
     void setEmuPipelineAddress(uint8_t emuPipelineAddress) { m_emuPipelineAddress = emuPipelineAddress; }
+    /** functions for setting values unpacked from FADC trailer
+     * - APV errors OR*/
     void setApvErrorOR(uint8_t apvErrorOR) { m_apvErrorOR = apvErrorOR; }
+    /** functions for setting values unpacked from FADC trailer
+     * - APV match code*/
     void setAPVMatch(bool APVMatch) { m_apvMatch = APVMatch; }
+    /** functions for setting values unpacked from FADC trailer
+     * - Upset APVs*/
     void setUpsetAPV(bool UpsetAPV) { m_upsetApv = UpsetAPV; }
+    /** functions for setting values unpacked from FADC trailer     * - APV errors OR
+     * - Bad Mapping*/
     void setBadMapping(bool BadMapping) { m_badMapping = BadMapping; }
+    /** functions for setting values unpacked from FADC trailer
+     * - Bad FADC Trailer */
     void setBadTrailer(bool BadTrailer) { m_badTrailer = BadTrailer; }
 
   private:

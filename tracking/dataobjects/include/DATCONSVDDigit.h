@@ -82,6 +82,8 @@ namespace Belle2 {
     }
 
     /** Default constructor for the ROOT IO. */
+    // cppcheck does not recognize initialization through other constructor
+    // cppcheck-suppress uninitMemberVar
     DATCONSVDDigit() : DATCONSVDDigit(
         0, true, 0, APVRawSamples( {{0, 0, 0, 0, 0, 0}})
     )

@@ -58,7 +58,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DHP_SIZE |
     c_DHE_DHP_DHEID |
     c_DHE_DHP_PORT |
-    c_DHP_PIX_WO_ROW |
+//    c_DHP_PIX_WO_ROW | // FIXME this should not be needed
     //
     c_DHE_START_END_ID |
     c_DHE_START_ID |
@@ -113,7 +113,6 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("PXDRawHitsName", m_PXDRawHitsName, "The name of the StoreArray of input PXDRawHits", std::string(""));
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of input PXDRawAdcs", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of input PXDRawROIs", std::string(""));
-  addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of input PXDClusters", std::string(""));
 
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
   B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
@@ -132,7 +131,6 @@ void PXDPostErrorCheckerModule::initialize()
   m_storeRawHits.isOptional(m_PXDRawHitsName);
   m_storeRawAdc.isOptional(m_PXDRawAdcsName);
   m_storeROIs.isOptional(m_PXDRawROIsName);
-  m_storeRawCluster.isOptional(m_RawClusterName);
 
   B2DEBUG(25, "The set error mask is $" << std::hex << m_criticalErrorMask);
 }
@@ -182,6 +180,14 @@ void PXDPostErrorCheckerModule::event()
           // TODO check against other DHP (full bits) and DHE (limited bits)
           // TODO We know that this will fail with current firmware and most likely will not be fixed...
         }
+        for (auto it = dhe.cm_begin(); it < dhe.cm_end(); ++it)  {
+          if (std::get<2>(*it) == 63) {
+            // TODO Check that we dont have CM=63 indicating fifo overflow, check and set bits
+            // mask |= c_DHH_MISC_ERROR; // unpacker should set this already, anyway we would want it set only on the DHP/DHE level...
+            B2ERROR("DHP data loss (CM=63) in " << LogVar("DHE", dhe.getDHEID()) << LogVar("DHP", int(std::get<0>(*it))) << LogVar("Row",
+                    std::get<1>(*it)));
+          }
+        }
       }
     }
   }
@@ -193,7 +199,6 @@ void PXDPostErrorCheckerModule::event()
     m_storeRawHits.clear();
     m_storeROIs.clear();
     m_storeRawAdc.clear();
-    m_storeRawCluster.clear();
     setReturnValue(false); // allows special processing in case
   } else {
     // setReturnValue(true); // default, it is not needed

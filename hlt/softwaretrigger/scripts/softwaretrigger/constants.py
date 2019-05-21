@@ -3,19 +3,25 @@ from enum import Enum
 
 class RunTypes(Enum):
     """Enum of possible run types"""
+    # beam (thank you documentation check)
     beam = "beam"
+    # cosmics (thank you documentation check)
     cosmic = "cosmic"
 
 
 class SoftwareTriggerModes(Enum):
     """Enum of possible software trigger modes"""
+    # monitor (thank you documentation check)
     monitor = "monitor"
+    # filter (thank you documentation check)
     filter = "filter"
 
 
 class Location(Enum):
     """Enum of possible run locations"""
+    # hlt (thank you documentation check)
     hlt = "hlt"
+    # expressreco (thank you documentation check)
     expressreco = "expressreco"
 
 

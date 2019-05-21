@@ -8,8 +8,6 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
-
 #include <tracking/modules/VXDTFHelperTools/SecMapTrainerBaseModule.h>
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include "framework/datastore/StoreObjPtr.h"

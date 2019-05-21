@@ -40,6 +40,7 @@ main.add_module(eventinfosetter)
 add_simulation(main, bkgfiles=bg, bkgOverlay=True)
 
 # additional modules, if needed for hit processing
+main.add_module("ARICHFillHits")
 main.add_module('TOPChannelMasker')
 
 # Bkg rate monitor: output to flat ntuple

@@ -338,7 +338,7 @@ namespace {
     TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
     Track mytrack;
@@ -347,6 +347,13 @@ namespace {
 
     Particle* part = myParticles.appendNew(savedTrack, Const::ChargedStable(11));
 
+    const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
+    const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
+    const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+
+    EXPECT_TRUE(vIsFromTrack->function(part));
+    EXPECT_FALSE(vIsFromECL->function(part));
+    EXPECT_FALSE(vIsFromKLM->function(part));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
@@ -359,7 +366,7 @@ namespace {
   class ROEVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
 
       StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
@@ -385,7 +392,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -448,7 +455,7 @@ namespace {
     TVector3 position(1.0, 0, 0);
     TVector3 momentum(0, 1.0, 0);
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     myTFRs.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
 
@@ -696,7 +703,7 @@ namespace {
   class EventVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle>().registerInDataStore();
@@ -706,7 +713,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -722,9 +729,9 @@ namespace {
     const Manager::Var* time = Manager::Instance().getVariable("eventTimeSeconds");
 
     // there is no EventMetaData so expect nan
-    EXPECT_FALSE(date->function(NULL) == date->function(NULL));
-    EXPECT_FALSE(year->function(NULL) == year->function(NULL));
-    EXPECT_FALSE(time->function(NULL) == time->function(NULL));
+    EXPECT_FALSE(date->function(nullptr) == date->function(nullptr));
+    EXPECT_FALSE(year->function(nullptr) == year->function(nullptr));
+    EXPECT_FALSE(time->function(nullptr) == time->function(nullptr));
 
     DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -855,7 +862,7 @@ namespace {
   class MetaVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
@@ -866,7 +873,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -1792,6 +1799,126 @@ namespace {
     EXPECT_FLOAT_EQ(varCMS->function(par), M_PI);
   }
 
+  TEST_F(MetaVariableTest, grandDaughterDiffOfs)
+  {
+    // declare all the array we need
+    StoreArray<Particle> particles, particles_noclst;
+    std::vector<int> daughterIndices0_noclst, daughterIndices1_noclst, daughterIndices2_noclst;
+    std::vector<int> daughterIndices0, daughterIndices1, daughterIndices2;
+
+    //proxy initialize where to declare the needed array
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<ECLCluster> eclclusters;
+    eclclusters.registerInDataStore();
+    particles.registerRelationTo(eclclusters);
+    DataStore::Instance().setInitializeActive(false);
+
+    // create two Lorentz vectors
+    const float px_0 = 2.;
+    const float py_0 = 1.;
+    const float pz_0 = 3.;
+    const float px_1 = 1.5;
+    const float py_1 = 1.5;
+    const float pz_1 = 2.5;
+    float E_0, E_1;
+    E_0 = sqrt(pow(px_0, 2) + pow(py_0, 2) + pow(pz_0, 2));
+    E_1 = sqrt(pow(px_1, 2) + pow(py_1, 2) + pow(pz_1, 2));
+    TLorentzVector momentum_0, momentum_1, momentum;
+    TLorentzVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
+
+    // add the two photons as the two daughters of some particle and create the latter
+    // Particle dau0_noclst(dau0_4vec, 22);
+    // momentum += dau0_noclst.get4Vector();
+    // Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
+    // daughterIndices_noclst.push_back(newDaughter0_noclst->getArrayIndex());
+    // Particle dau1_noclst(dau1_4vec, 22);
+    // momentum += dau1_noclst.get4Vector();
+    // Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
+    // daughterIndices_noclst.push_back(newDaughter1_noclst->getArrayIndex());
+    // const Particle* par_noclst = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices_noclst);
+
+    Particle dau0_noclst(dau0_4vec, 22);
+    momentum_0 = dau0_4vec;
+    Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
+    daughterIndices0_noclst.push_back(newDaughter0_noclst->getArrayIndex());
+    const Particle* par0_noclst = particles.appendNew(momentum_0, 111, Particle::c_Unflavored, daughterIndices0_noclst);
+    Particle dau1_noclst(dau1_4vec, 22);
+    momentum_1 = dau1_4vec;
+    Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
+    daughterIndices1_noclst.push_back(newDaughter1_noclst->getArrayIndex());
+    const Particle* par1_noclst = particles.appendNew(momentum_1, 111, Particle::c_Unflavored, daughterIndices1_noclst);
+
+    momentum = momentum_0 + momentum_1;
+    daughterIndices2_noclst.push_back(par0_noclst->getArrayIndex());
+    daughterIndices2_noclst.push_back(par1_noclst->getArrayIndex());
+    const Particle* parGranny_noclst = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices2_noclst);
+
+    // grab variables
+    const Manager::Var* var_Theta = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,theta)");
+    const Manager::Var* var_ClusterTheta = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,clusterTheta)");
+    const Manager::Var* var_E = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,E)");
+    const Manager::Var* var_ClusterE = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,clusterE)");
+    const Manager::Var* var_E_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,E)");
+    const Manager::Var* var_ClusterE_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterE)");
+
+    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,0,0)");
+    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,0,0)");
+    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,2,3)");
+    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,2,3)");
+
+    // when no relations are set between the particles and the eclClusters, nan is expected to be returned for the Cluster- vars
+    // no problems are supposed to happen for non-Cluster- vars
+    // also, we expect NaN when we pass wrong indexes
+    ASSERT_NE(var_ClusterPhi, nullptr);
+    EXPECT_TRUE(std::isnan(var_ClusterPhi->function(parGranny_noclst)));
+    EXPECT_TRUE(std::isnan(var_ClusterTheta->function(parGranny_noclst)));
+    EXPECT_TRUE(std::isnan(var_ClusterE->function(parGranny_noclst)));
+    EXPECT_FLOAT_EQ(var_Phi->function(parGranny_noclst), 0.32175055);
+    EXPECT_FLOAT_EQ(var_Theta->function(parGranny_noclst), 0.06311664);
+    EXPECT_FLOAT_EQ(var_E->function(parGranny_noclst), -0.46293831);
+    EXPECT_TRUE(std::isnan(var_ClusterPhi_wrongIndexes->function(parGranny_noclst)));
+    EXPECT_TRUE(std::isnan(var_Phi_wrongIndexes->function(parGranny_noclst)));
+    EXPECT_TRUE(std::isnan(var_ClusterE_wrongIndexes->function(parGranny_noclst)));
+    EXPECT_TRUE(std::isnan(var_E_wrongIndexes->function(parGranny_noclst)));
+
+    // set relations between particles and eclClusters
+    ECLCluster* eclst0 = eclclusters.appendNew(ECLCluster());
+    eclst0->setEnergy(dau0_4vec.E());
+    eclst0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    eclst0->setClusterId(1);
+    eclst0->setTheta(dau0_4vec.Theta());
+    eclst0->setPhi(dau0_4vec.Phi());
+    eclst0->setR(148.4);
+    ECLCluster* eclst1 = eclclusters.appendNew(ECLCluster());
+    eclst1->setEnergy(dau1_4vec.E());
+    eclst1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    eclst1->setClusterId(2);
+    eclst1->setTheta(dau1_4vec.Theta());
+    eclst1->setPhi(dau1_4vec.Phi());
+    eclst1->setR(148.5);
+
+    const Particle* newDaughter0 = particles.appendNew(Particle(eclclusters[0]));
+    daughterIndices0.push_back(newDaughter0->getArrayIndex());
+    const Particle* par0 = particles.appendNew(momentum_0, 111, Particle::c_Unflavored, daughterIndices0);
+
+    const Particle* newDaughter1 = particles.appendNew(Particle(eclclusters[1]));
+    daughterIndices1.push_back(newDaughter1->getArrayIndex());
+    const Particle* par1 = particles.appendNew(momentum_1, 111, Particle::c_Unflavored, daughterIndices1);
+
+    daughterIndices2.push_back(par0->getArrayIndex());
+    daughterIndices2.push_back(par1->getArrayIndex());
+    const Particle* parGranny = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices2);
+    //const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
+
+    //now we expect non-nan results
+    EXPECT_FLOAT_EQ(var_ClusterPhi->function(parGranny), 0.32175055);
+    EXPECT_FLOAT_EQ(var_Phi->function(parGranny), 0.32175055);
+    EXPECT_FLOAT_EQ(var_ClusterTheta->function(parGranny), 0.06311664);
+    EXPECT_FLOAT_EQ(var_Theta->function(parGranny), 0.06311664);
+    EXPECT_FLOAT_EQ(var_ClusterE->function(parGranny), -0.46293831);
+    EXPECT_FLOAT_EQ(var_E->function(parGranny), -0.46293813);
+  }
+
   TEST_F(MetaVariableTest, daughterNormDiffOf)
   {
     TLorentzVector momentum;
@@ -2079,7 +2206,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2120,7 +2247,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2161,7 +2288,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2202,7 +2329,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2243,7 +2370,7 @@ namespace {
     };
 
     // put the photons in the StoreArray
-    for (const auto g : gammavector)
+    for (const auto& g : gammavector)
       particles.appendNew(g);
 
     // put the photons in the test list
@@ -2349,7 +2476,7 @@ namespace {
   class PIDVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap> peim;
@@ -2370,7 +2497,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -2397,7 +2524,7 @@ namespace {
     TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
@@ -2581,7 +2708,7 @@ namespace {
     TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
@@ -2648,7 +2775,7 @@ namespace {
   class ECLVariableTest : public ::testing::Test {
   protected:
     /** register Particle and ECLCluster arrays. */
-    virtual void SetUp()
+    void SetUp() override
     {
       // setup the DataStore
       DataStore::Instance().setInitializeActive(true);
@@ -2683,7 +2810,7 @@ namespace {
       // mock up some TrackFits for them (all pions)
       TRandom3 generator;
       TMatrixDSym cov6(6);
-      unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+      auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
       for (int i = 0; i < tracks.getEntries(); ++i) {
         int charge = (i % 2 == 0) ? +1 : -1;
@@ -2749,7 +2876,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -2908,11 +3035,30 @@ namespace {
     } // end loop over test list
   }
 
+  TEST_F(ECLVariableTest, IsFromECL)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+
+    const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
+    const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
+    const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+
+    for (int i = 0; i < eclclusters.getEntries(); ++i)
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        EXPECT_TRUE(vIsFromECL->function(p));
+        EXPECT_FALSE(vIsFromKLM->function(p));
+        EXPECT_FALSE(vIsFromTrack->function(p));
+      }
+  }
+
   TEST_F(ECLVariableTest, WholeEventClosure)
   {
     // we need the particles, tracks, and ECLClusters StoreArrays
     StoreArray<Particle> particles;
-    StoreArray<Track> tracks; StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+    StoreArray<ECLCluster> eclclusters;
 
     // create a photon (clusters) and pion (tracks) lists
     StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
@@ -2973,10 +3119,82 @@ namespace {
     EXPECT_FLOAT_EQ(totalNeutralClusterE + totalTrackClusterE, eclEnergy);
   }
 
+  TEST_F(ECLVariableTest, eclClusterOnlyInvariantMass)
+  {
+    // declare all the array we need
+    StoreArray<Particle> particles, particles_noclst;
+    std::vector<int> daughterIndices, daughterIndices_noclst;
+
+    //proxy initialize where to declare the needed array
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<ECLCluster> eclclusters_new;
+    eclclusters_new.registerInDataStore();
+    particles.registerRelationTo(eclclusters_new);
+    DataStore::Instance().setInitializeActive(false);
+
+    // create two Lorentz vectors
+    const float px_0 = 2.;
+    const float py_0 = 1.;
+    const float pz_0 = 3.;
+    const float px_1 = 1.5;
+    const float py_1 = 1.5;
+    const float pz_1 = 2.5;
+    float E_0, E_1;
+    E_0 = sqrt(pow(px_0, 2) + pow(py_0, 2) + pow(pz_0, 2));
+    E_1 = sqrt(pow(px_1, 2) + pow(py_1, 2) + pow(pz_1, 2));
+    TLorentzVector momentum;
+    TLorentzVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
+
+    // add the two photons as the two daughters of some particle and create the latter
+    Particle dau0_noclst(dau0_4vec, 22);
+    momentum += dau0_noclst.get4Vector();
+    Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
+    daughterIndices_noclst.push_back(newDaughter0_noclst->getArrayIndex());
+    Particle dau1_noclst(dau1_4vec, 22);
+    momentum += dau1_noclst.get4Vector();
+    Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
+    daughterIndices_noclst.push_back(newDaughter1_noclst->getArrayIndex());
+    const Particle* par_noclst = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices_noclst);
+
+    // grab variables
+    const Manager::Var* var = Manager::Instance().getVariable("eclClusterOnlyInvariantMass");
+
+    // when no relations are set between the particles and the eclClusters, nan is expected to be returned
+    ASSERT_NE(var, nullptr);
+    EXPECT_TRUE(std::isnan(var->function(par_noclst)));
+
+    // set relations between particles and eclClusters
+    ECLCluster* eclst0 = eclclusters_new.appendNew(ECLCluster());
+    eclst0->setEnergy(dau0_4vec.E());
+    eclst0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    eclst0->setClusterId(1);
+    eclst0->setTheta(dau0_4vec.Theta());
+    eclst0->setPhi(dau0_4vec.Phi());
+    eclst0->setR(148.4);
+    ECLCluster* eclst1 = eclclusters_new.appendNew(ECLCluster());
+    eclst1->setEnergy(dau1_4vec.E());
+    eclst1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    eclst1->setClusterId(2);
+    eclst1->setTheta(dau1_4vec.Theta());
+    eclst1->setPhi(dau1_4vec.Phi());
+    eclst1->setR(148.5);
+
+    // use these new-created clusters rather than the 6 default ones
+    const Particle* newDaughter0 = particles.appendNew(Particle(eclclusters_new[6]));
+    daughterIndices.push_back(newDaughter0->getArrayIndex());
+    const Particle* newDaughter1 = particles.appendNew(Particle(eclclusters_new[7]));
+    daughterIndices.push_back(newDaughter1->getArrayIndex());
+
+    const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
+
+    //now we expect non-nan results
+    EXPECT_FLOAT_EQ(var->function(par), 0.73190731);
+  }
+
   class KLMVariableTest : public ::testing::Test {
   protected:
     /** register Particle and KLMCluster arrays. */
-    virtual void SetUp()
+    void SetUp() override
     {
       // setup the DataStore
       DataStore::Instance().setInitializeActive(true);
@@ -3001,7 +3219,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -3046,7 +3264,7 @@ namespace {
     // mock up some TrackFits for them (all muons)
     TRandom3 generator;
     TMatrixDSym cov6(6);
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     for (int i = 0; i < tracks.getEntries(); ++i) {
       int charge = (i % 2 == 0) ? +1 : -1;
@@ -3158,7 +3376,7 @@ namespace {
     TVector3 position(1.0, 0, 0);
     TVector3 momentum(0, 1.0, 0);
 
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
     trackFits.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
 
@@ -3209,7 +3427,7 @@ namespace {
   class FlightInfoTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle>().registerInDataStore();
@@ -3224,9 +3442,13 @@ namespace {
       // Insert MC particle logic here
       MCParticle mcKs;
       mcKs.setPDG(310);
+      mcKs.setProductionVertex(1.0, 1.0, 0.0);
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
+      mcKs.setProductionTime(0);
       mcKs.setMassFromPDG();
       mcKs.setMomentum(1.164, 1.55200, 0);
+      float decayTime = 5 * mcKs.getMass() / mcKs.getEnergy();
+      mcKs.setDecayTime(decayTime);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);
       MCParticle* newMCKs = mcParticles.appendNew(mcKs);
 
@@ -3299,7 +3521,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -3419,9 +3641,10 @@ namespace {
     const Manager::Var* var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(1)");
     ASSERT_NE(var, nullptr);
     auto* Ks = newDp->getDaughter(1)->getRelatedTo<MCParticle>();
-    double p = sqrt(Ks->getMomentum().X() * Ks->getMomentum().X() + Ks->getMomentum().Y() *
-                    Ks->getMomentum().Y() + Ks->getMomentum().Z() * Ks->getMomentum().Z());
-    EXPECT_FLOAT_EQ(var->function(newDp), 5.0 / Const::speedOfLight * Ks->getMass() / p);
+    //    double p = Ks->getMomentum().Mag();
+    //    EXPECT_FLOAT_EQ(var->function(newDp), 5.0 / Const::speedOfLight * Ks->getMass() / p);
+
+    EXPECT_FLOAT_EQ(var->function(newDp), Ks->getLifetime() / Ks->getEnergy()*Ks->getMass());
 
     var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(3)");
     ASSERT_NE(var, nullptr);
@@ -3507,7 +3730,7 @@ namespace {
   class VertexVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle>().registerInDataStore();
@@ -3548,7 +3771,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }

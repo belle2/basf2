@@ -19,9 +19,9 @@
 namespace Belle2 {
   namespace OrcaKinFit {
 
-    BaseTracer::BaseTracer(): next(0) {}
+    BaseTracer::BaseTracer(): next(nullptr) {}
 
-    BaseTracer::~BaseTracer() {}
+    BaseTracer::~BaseTracer() = default;
 
     void BaseTracer::initialize(BaseFitter& fitter)
     {

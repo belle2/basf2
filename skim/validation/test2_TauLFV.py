@@ -12,14 +12,14 @@ from skim.standardlists.lightmesons import *
 """
 <header>
   <input>../TauLFV.udst.root</input>
-  <output>../TauLFV_Validation.root</output>
+  <output>TauLFV_Validation.root</output>
   <contact>kenji@hepl.phys.nagoya-u.ac.jp</contact>
 </header>
 """
 
 taulfvskim = Path()
 
-inputMdst('MC9', '../TauLFV.udst.root', path=taulfvskim)
+inputMdst('default', '../TauLFV.udst.root', path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)
 stdK('loose', path=taulfvskim)

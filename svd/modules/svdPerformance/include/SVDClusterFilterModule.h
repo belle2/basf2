@@ -3,13 +3,13 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Lueck                                             *
+ * Contributors: Thomas Lueck, Giulia Casarosa                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REMOVESVDCLUSTERSMODULE_H
-#define REMOVESVDCLUSTERSMODULE_H
+#ifndef CLUSTERFILTERMODULE_H
+#define CLUSTERFILTERMODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
@@ -19,8 +19,6 @@
 
 namespace Belle2 {
   /**
-   * generates a new StoreArray from the input StoreArray which has all specified Clusters removed
-   *
    * generates a new StoreArray from the input StoreArray which has all specified Clusters removed
    *
    */
@@ -56,12 +54,12 @@ namespace Belle2 {
     std::string m_inputArrayName;  /**< StoreArray with the input clusters */
     std::string m_outputINArrayName;  /**< StoreArray with the selectd output clusters */
     std::string m_outputOUTArrayName;  /**< StoreArray with the NOT selected output clusters */
-    int m_layerNum;  /** the layer number from which the clusters should be excluded  m_sensorID*/
-    int m_xShell;  /** X shell identificator: +1(+X), -1 (-X), 0(both)*/
-    int m_yShell;  /** Y shell identificator: +1(+Y), -1 (-Y), 0(both)*/
-    float m_minClSNR; /** minimum cluster SNR */
+    int m_layerNum;  /**< the layer number from which the clusters should be excluded  m_sensorID*/
+    int m_xShell;  /**< X shell identificator: +1(+X), -1 (-X), 0(both)*/
+    int m_yShell;  /**< Y shell identificator: +1(+Y), -1 (-Y), 0(both)*/
+    float m_minClSNR; /**< minimum cluster SNR */
 
-    std::set<VxdID> m_outVxdID;
+    std::set<VxdID> m_outVxdID; /**<set  containing the VxdID of the DUT sensors */
     void create_outVxdID_set(); /**creates the set containing the VxdID of the DUT sensors */
 
     SelectSubset<SVDCluster> m_selectedClusters; /** all clusters NOT on the layer with m_layerNum */
@@ -69,4 +67,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* REMOVESVDCLUSTERSMODULE_H */
+#endif /* CLUSTERFILTERMODULE_H */

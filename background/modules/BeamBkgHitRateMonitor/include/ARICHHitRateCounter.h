@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Luka Santelj                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,10 @@
 
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
 #include <framework/datastore/StoreArray.h>
-#include <arich/dataobjects/ARICHDigit.h>
+#include <framework/database/DBObjPtr.h>
+#include <arich/dataobjects/ARICHHit.h>
+#include <arich/dbobjects/ARICHChannelMask.h>
+#include <arich/dbobjects/ARICHModulesInfo.h>
 #include <TTree.h>
 #include <map>
 
@@ -32,7 +35,8 @@ namespace Belle2 {
        */
       struct TreeStruct {
 
-        float averageRate = 0; /**< total detector average hit rate */
+        float segmentRates[18] = {0}; /**< hit rates per HAPD [Hz] for 18 segments of arich */
+        float averageRate = 0; /**< total detector average hit rate per HAPD [Hz] */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
 
@@ -42,6 +46,7 @@ namespace Belle2 {
         void normalize()
         {
           if (numEvents == 0) return;
+          for (auto& segmentRate : segmentRates) segmentRate /= numEvents;
           averageRate /= numEvents;
         }
 
@@ -78,7 +83,10 @@ namespace Belle2 {
 
     private:
 
-      // class parameters: to be set via constructor or setters
+      /**
+       * Sets number of active hapds in each segment
+       */
+      void setActiveHapds();
 
       // tree structure
       TreeStruct m_rates; /**< tree variables */
@@ -87,12 +95,16 @@ namespace Belle2 {
       std::map<unsigned, TreeStruct> m_buffer; /**< average rates in time stamps */
 
       // collections
-      StoreArray<ARICHDigit> m_digits;  /**< collection of digits */
+      StoreArray<ARICHHit> m_hits;  /**< collection of digits */
 
       // DB payloads
+      DBObjPtr<ARICHChannelMask> m_channelMask; /**< channel mask */
+      DBObjPtr<ARICHModulesInfo> m_modulesInfo; /**< HAPD modules info */
 
       // other
-
+      double m_activeHapds[18] = {0}; /**< number of active HAPDS in each segment */
+      double m_activeTotal = 0; /**< total number of active HAPDS */
+      int  m_segmentMap[420] = {0}; /**< mapping from module ID to segments */
     };
 
   } // Background namespace

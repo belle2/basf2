@@ -18,6 +18,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/utility/MCMatching.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -45,13 +46,12 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::Variable;
 
-
 namespace {
 
   class FlavorTaggingVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<ECLCluster> testsECLClusters;
@@ -59,6 +59,8 @@ namespace {
       StoreArray<TrackFitResult> testsTFRs;
       StoreArray<Track> testsTracks;
       StoreArray<Particle> testsParticles;
+      StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+      StoreArray<MCParticle> testsMCParticles;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       StoreArray<RestOfEvent> testsROEs;
       StoreArray<PIDLikelihood> testsPIDLikelihoods;
@@ -67,18 +69,22 @@ namespace {
       testsTFRs.registerInDataStore();
       testsTracks.registerInDataStore();
       testsParticles.registerInDataStore();
+      extraInfoMap.registerInDataStore();
+      testsMCParticles.registerInDataStore();
       roe.registerInDataStore();
       testsROEs.registerInDataStore();
       testsPIDLikelihoods.registerInDataStore();
       testsParticles.registerRelationTo(testsROEs);
+      testsParticles.registerRelationTo(testsMCParticles);
       testsTracks.registerRelationTo(testsPIDLikelihoods);
       testsTracks.registerRelationTo(testsECLClusters);
+      testsTracks.registerRelationTo(testsMCParticles);
       testsECLClusters.registerRelationTo(testsTracks);
       DataStore::Instance().setInitializeActive(false);
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -291,9 +297,9 @@ namespace {
 
     double refsBtagToWBosonPMissCMS = 0.542734;
 
-    for (unsigned i = 0; i < roeChargedParticles.size(); i++) {
+    for (auto& roeChargedParticle : roeChargedParticles) {
 
-      double output = var -> function(roeChargedParticles[i]);
+      double output = var -> function(roeChargedParticle);
 
       EXPECT_NEAR(output, refsBtagToWBosonPMissCMS, 0.000005);
 
@@ -327,4 +333,63 @@ namespace {
     }
 
   }
+
+
+  /** Test isSignal variable. */
+  TEST_F(FlavorTaggingVariablesTest, isSignalVariable)
+  {
+
+    /**In this function we test the isSignal variable because it is used in target variables which are essential
+    * for the flavor tagger module. The variables that use isSignal are:
+    * isRelatedRestOfEventB0Flavor, isRestOfEventB0Flavor (qrCombined), isRelatedRestOfEventMajorityB0Flavor,
+    * isRestOfEventMajorityB0Flavor, McFlavorOfTagSide.  */
+
+    /** In the following we will test the output of isSignal for the 12 possible basic mc error flags.*/
+
+    StoreArray<Particle> testsParticles;
+    StoreArray<MCParticle> testsMCParticles;
+
+    /** Here we create a mc B0 particle*/
+    MCParticle MCB0;
+    MCB0.setEnergy(5.68161);
+    MCB0.setPDG(511);
+    MCB0.setMassFromPDG();
+    MCB0.setMomentum(-0.12593, -0.143672, 2.09072);
+    MCParticle* savedMCB0 = testsMCParticles.appendNew(MCB0);
+
+    /** Here we create a B0 particle and set its relation to the mc B0 particle.*/
+    Particle B0({ -0.129174, -0.148899, 2.09292, 5.67644}, 511);
+    Particle* savedB0 = testsParticles.appendNew(B0);
+    savedB0->addRelationTo(savedMCB0);
+
+    /** Here we test the isSignal variable */
+    const Manager::Var* var = Manager::Instance().getVariable("isSignal");
+    ASSERT_NE(var, nullptr);
+
+    /** Here we set the mc error flag corresponding to a perfectly matched particle,
+    * we expect isSignal to return 1.0 .*/
+    savedB0->addExtraInfo(MCMatching::c_extraInfoMCErrors, 0);
+    double output1 = var -> function(savedB0);
+    ASSERT_EQ(output1, 1.0);
+
+    /** We consider also as correctly matched those particles with the mc error flags
+    * MissFSR, MissingResonance and MissPHOTOS. 1 + 2 + 1024 = 1027. */
+    savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, 1027);
+    double output2 = var -> function(savedB0);
+    ASSERT_EQ(output2, 1.0);
+
+    /** We do not consider as signal those particles with other mc error flags. See definition in
+    * analysis/utility/include/MCMatching.h */
+    vector<int> notAcceptedMCErrorFlags{4, 8, 16, 32, 64, 128, 256, 512};
+
+    for (int notAcceptedMCErrorFlag : notAcceptedMCErrorFlags) {
+
+      savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, notAcceptedMCErrorFlag);
+      double output = var -> function(savedB0);
+      ASSERT_EQ(output, 0);
+
+    }
+
+  }
+
 }

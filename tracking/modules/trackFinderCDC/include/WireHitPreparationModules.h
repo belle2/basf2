@@ -55,7 +55,9 @@ namespace Belle2 {
       TFCDC_WireHitCreatorModule();
     };
 
-
+    /**
+     * Module to reclaim CDC hits
+     */
     class TFCDC_HitReclaimerModule : public FindletModule<HitReclaimer> {
 
       /// Type of the base class

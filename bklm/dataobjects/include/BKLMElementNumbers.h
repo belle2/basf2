@@ -60,6 +60,53 @@ namespace Belle2 {
     static bool checkChannelNumber(
       int forward, int sector, int layer, int plane, int strip);
 
+    /**
+     * Get maximal forward number (0-based).
+     */
+    static constexpr int getMaximalForwardNumber()
+    {
+      return m_MaximalForwardNumber;
+    }
+
+    /**
+     * Get maximal sector number (1-based).
+     */
+    static constexpr int getMaximalSectorNumber()
+    {
+      return m_MaximalSectorNumber;
+    }
+
+    /**
+     * Get maximal layer number (1-based).
+     */
+    static constexpr int getMaximalLayerNumber()
+    {
+      return m_MaximalLayerNumber;
+    }
+
+    /**
+     * Get maximal plane numbe (0-based).
+     */
+    static constexpr int getMaximalPlaneNumber()
+    {
+      return m_MaximalPlaneNumber;
+    }
+
+  protected:
+
+    /** Maximal forward number (0-based). */
+    static constexpr int m_MaximalForwardNumber = 1;
+
+    /** Maximal sector number (1-based). */
+    static constexpr int m_MaximalSectorNumber = 8;
+
+    /** Maximal layer number (1-based). */
+    static constexpr int m_MaximalLayerNumber = 15;
+
+    /** Maximal plane numbe (0-based). */
+    static constexpr int m_MaximalPlaneNumber = 1;
+
+
   };
 
 }

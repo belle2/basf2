@@ -49,8 +49,16 @@ BKLMChannelIndex& BKLMChannelIndex::begin()
 
 BKLMChannelIndex& BKLMChannelIndex::end()
 {
-  static BKLMChannelIndex index(1, 8, 15, 1,
-                                BKLMElementNumbers::getNStrips(1, 8, 15, 1));
+  static BKLMChannelIndex index(
+    BKLMElementNumbers::getMaximalForwardNumber(),
+    BKLMElementNumbers::getMaximalSectorNumber(),
+    BKLMElementNumbers::getMaximalLayerNumber(),
+    BKLMElementNumbers::getMaximalPlaneNumber(),
+    BKLMElementNumbers::getNStrips(
+      BKLMElementNumbers::getMaximalForwardNumber(),
+      BKLMElementNumbers::getMaximalSectorNumber(),
+      BKLMElementNumbers::getMaximalLayerNumber(),
+      BKLMElementNumbers::getMaximalPlaneNumber()));
   return index;
 }
 
@@ -60,16 +68,16 @@ BKLMChannelIndex& BKLMChannelIndex::operator++()
   if (m_Strip > m_NStripsPlane) {
     m_Strip = 1;
     m_Plane++;
-    if (m_Plane > 1) {
+    if (m_Plane > BKLMElementNumbers::getMaximalPlaneNumber()) {
       m_Plane = 0;
       m_Layer++;
-      if (m_Layer > 15) {
+      if (m_Layer > BKLMElementNumbers::getMaximalLayerNumber()) {
         m_Layer = 1;
         m_Sector++;
-        if (m_Sector > 8) {
+        if (m_Sector > BKLMElementNumbers::getMaximalSectorNumber()) {
           m_Sector = 1;
           m_Forward++;
-          if (m_Forward > 1)
+          if (m_Forward > BKLMElementNumbers::getMaximalForwardNumber())
             m_Forward = 0;
         }
       }

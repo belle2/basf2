@@ -88,6 +88,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         path.add_module(ecldqm)
         ecldqmext = register_module('ECLDQMEXTENDED')
         path.add_module(ecldqmext)
+        # we dont want to create large histograms on HLT, thus ERECO only
+        if dqm_environment == "expressreco":
+            path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')
     # TOP
     if components is None or 'TOP' in components:
         topdqm = register_module('TOPDQM')

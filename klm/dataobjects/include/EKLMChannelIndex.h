@@ -16,38 +16,38 @@
 namespace Belle2 {
 
   /**
-   * BKLM channel index.
+   * EKLM channel index.
    */
-  class BKLMChannelIndex {
+  class EKLMChannelIndex {
 
   public:
 
     /**
      * Constructor.
      */
-    BKLMChannelIndex();
+    EKLMChannelIndex();
 
     /**
      * Constructor.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
-     * @param[in] sector  Sector (1-based).
-     * @param[in] layer   Layer (1-based).
-     * @param[in] plane   Plane (0-based).
-     * @param[in] strip   Strip (1-based).
+     * @param[in] endcap Endcap.
+     * @param[in] sector Sector.
+     * @param[in] layer  Layer.
+     * @param[in] plane  Plane.
+     * @param[in] strip  Strip.
      */
-    BKLMChannelIndex(int forward, int sector, int layer, int plane, int strip);
+    EKLMChannelIndex(int endcap, int sector, int layer, int plane, int strip);
 
     /**
      * Destructor.
      */
-    ~BKLMChannelIndex();
+    ~EKLMChannelIndex();
 
     /**
-     * Get forward.
+     * Get endcap.
      */
-    int getForward()
+    int getEndcap()
     {
-      return m_Forward;
+      return m_Endcap;
     }
 
     /**
@@ -90,37 +90,37 @@ namespace Belle2 {
     /**
      * First channel.
      */
-    BKLMChannelIndex& begin();
+    EKLMChannelIndex& begin();
 
     /**
      * Last channel.
      */
-    BKLMChannelIndex& end();
+    EKLMChannelIndex& end();
 
     /**
      * Operator ++.
      */
-    BKLMChannelIndex& operator++();
+    EKLMChannelIndex& operator++();
 
     /**
      * Operator ==.
      */
-    bool operator==(BKLMChannelIndex& index);
+    bool operator==(EKLMChannelIndex& index);
 
     /**
      * Operator !=.
      */
-    bool operator!=(BKLMChannelIndex& index);
+    bool operator!=(EKLMChannelIndex& index);
 
     /**
      * Operator *.
      */
-    BKLMChannelIndex& operator*();
+    EKLMChannelIndex& operator*();
 
   protected:
 
-    /** Forward. */
-    int m_Forward;
+    /** Endcap. */
+    int m_Endcap;
 
     /** Sector. */
     int m_Sector;
@@ -134,11 +134,11 @@ namespace Belle2 {
     /** Strip. */
     int m_Strip;
 
-    /** Number of strips in current plane. */
-    int m_NStripsPlane;
-
     /** KLM element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
+
+    /** EKLM element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
 
   };
 

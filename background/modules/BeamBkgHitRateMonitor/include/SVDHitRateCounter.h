@@ -122,7 +122,7 @@ namespace Belle2 {
       SVDFADCMaskedStrips m_FADCMaskedStrips; /**< payload for strips masked on FADC level */
 
       // other
-      int m_activeStrips; /**< number of active strips */
+      int m_activeStrips = 0; /**< number of active strips */
       int m_layerActiveStrips[4] = {0}; /**< number of active strips in each layer */
       int m_layerLadderActiveStrips[4][16] = {0}; /**< number of active strips in each layer, ladder */
       int m_layerSensorActiveStrips[4][5] = {0}; /**< number of active strips in each layer, sensor position */

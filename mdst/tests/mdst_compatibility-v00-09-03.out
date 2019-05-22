@@ -100,7 +100,10 @@ Untested method TRGSummary::testPsnm
 Untested method SoftwareTriggerResult::addResult
 Untested method SoftwareTriggerResult::clear
 Untested method SoftwareTriggerResult::getInfoHTML
+Untested method SoftwareTriggerResult::getNonPrescaledResult
 Untested method SoftwareTriggerResult::getResult
+Untested method SoftwareTriggerResult::getResultPair
+Untested method SoftwareTriggerResult::getResultPairs
 Untested method MCParticle::addSeenInDetector
 Untested method MCParticle::addStatus
 Untested method MCParticle::fixParticleList
@@ -3121,6 +3124,82 @@ KLMCluster#1:
  ... message repeated 14 times
 [ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
 SoftwareTriggerResult:
+  getNonPrescaledResults(): size(25)
+    pair
+      software_trigger_cut&calib&accept_D0_Kpi
+      0
+    pair
+      software_trigger_cut&calib&accept_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_Xi_piLambda
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_D0
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dplus
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsiee
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsimumu
+      0
+    pair
+      software_trigger_cut&calib&accept_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gee
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_4pi
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gmumu
+      0
+    pair
+      software_trigger_cut&calib&accept_mumu
+      0
+    pair
+      software_trigger_cut&calib&accept_test
+      0
+    pair
+      software_trigger_cut&fast_reco&accept_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_bkg
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_ee
+      0
+    pair
+      software_trigger_cut&hlt&accept_1_track1_cluster
+      0
+    pair
+      software_trigger_cut&hlt&accept_2_tracks
+      0
+    pair
+      software_trigger_cut&hlt&accept_bhabha
+      0
+    pair
+      software_trigger_cut&hlt&accept_gamma_gamma
+      0
+    pair
+      software_trigger_cut&hlt&accept_hadron
+      0
+    pair
+      software_trigger_cut&hlt&accept_mu_mu
+      0
+    pair
+      software_trigger_cut&hlt&accept_tau_tau
+      0
   getResults(): size(25)
     pair
       software_trigger_cut&calib&accept_D0_Kpi
@@ -9328,6 +9407,82 @@ ECLCluster#44:
  ... message repeated 20 times
 [ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
 SoftwareTriggerResult:
+  getNonPrescaledResults(): size(25)
+    pair
+      software_trigger_cut&calib&accept_D0_Kpi
+      0
+    pair
+      software_trigger_cut&calib&accept_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_Xi_piLambda
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_D0
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dplus
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsiee
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsimumu
+      0
+    pair
+      software_trigger_cut&calib&accept_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gee
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_4pi
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gmumu
+      0
+    pair
+      software_trigger_cut&calib&accept_mumu
+      0
+    pair
+      software_trigger_cut&calib&accept_test
+      0
+    pair
+      software_trigger_cut&fast_reco&accept_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_bkg
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_ee
+      0
+    pair
+      software_trigger_cut&hlt&accept_1_track1_cluster
+      0
+    pair
+      software_trigger_cut&hlt&accept_2_tracks
+      0
+    pair
+      software_trigger_cut&hlt&accept_bhabha
+      0
+    pair
+      software_trigger_cut&hlt&accept_gamma_gamma
+      0
+    pair
+      software_trigger_cut&hlt&accept_hadron
+      0
+    pair
+      software_trigger_cut&hlt&accept_mu_mu
+      0
+    pair
+      software_trigger_cut&hlt&accept_tau_tau
+      0
   getResults(): size(25)
     pair
       software_trigger_cut&calib&accept_D0_Kpi
@@ -16379,6 +16534,82 @@ KLMCluster#0:
  ... message repeated 24 times
 [ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
 SoftwareTriggerResult:
+  getNonPrescaledResults(): size(25)
+    pair
+      software_trigger_cut&calib&accept_D0_Kpi
+      0
+    pair
+      software_trigger_cut&calib&accept_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_Xi_piLambda
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_D0
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dplus
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Dstar
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsiee
+      0
+    pair
+      software_trigger_cut&calib&accept_dqm_Jpsimumu
+      0
+    pair
+      software_trigger_cut&calib&accept_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gee
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_4pi
+      0
+    pair
+      software_trigger_cut&calib&accept_gg_ee
+      0
+    pair
+      software_trigger_cut&calib&accept_gmumu
+      0
+    pair
+      software_trigger_cut&calib&accept_mumu
+      0
+    pair
+      software_trigger_cut&calib&accept_test
+      0
+    pair
+      software_trigger_cut&fast_reco&accept_ee
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_bkg
+      0
+    pair
+      software_trigger_cut&fast_reco&reject_ee
+      0
+    pair
+      software_trigger_cut&hlt&accept_1_track1_cluster
+      0
+    pair
+      software_trigger_cut&hlt&accept_2_tracks
+      0
+    pair
+      software_trigger_cut&hlt&accept_bhabha
+      0
+    pair
+      software_trigger_cut&hlt&accept_gamma_gamma
+      0
+    pair
+      software_trigger_cut&hlt&accept_hadron
+      0
+    pair
+      software_trigger_cut&hlt&accept_mu_mu
+      0
+    pair
+      software_trigger_cut&hlt&accept_tau_tau
+      0
   getResults(): size(25)
     pair
       software_trigger_cut&calib&accept_D0_Kpi

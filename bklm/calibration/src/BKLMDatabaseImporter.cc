@@ -50,11 +50,11 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
   int laneId = 0;
   int axisId = 0;
   int BKLM_ID = 117440512;
-  for (int isForward = 0; isForward < 2; isForward++) {
-    for (int sector = 1; sector < 9; sector++) {
-      for (int layer = 1; layer < 16; layer++) {
+  for (int isForward = 0; isForward <= BKLMElementNumbers::getMaximalForwardNumber(); isForward++) {
+    for (int sector = 1; sector <= BKLMElementNumbers::getMaximalSectorNumber(); sector++) {
+      for (int layer = 1; layer <= BKLMElementNumbers::getMaximalLayerNumber(); layer++) {
         //plane = 0 for z; plane = 1 for phi
-        for (int plane = 0; plane < 2; plane++) {
+        for (int plane = 0; plane <= BKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
 
           if (isForward == 1 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1 + BKLM_ID;
           if (isForward == 1 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2 + BKLM_ID;

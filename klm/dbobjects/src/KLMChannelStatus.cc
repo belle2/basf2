@@ -11,6 +11,8 @@
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/dataobjects/BKLMChannelIndex.h>
+#include <klm/dataobjects/EKLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <framework/logging/Logger.h>
@@ -49,46 +51,12 @@ void KLMChannelStatus::setChannelStatus(uint16_t channel,
 
 void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
 {
-  const EKLM::ElementNumbersSingleton* eklmElementNumbers =
-    &(EKLM::ElementNumbersSingleton::Instance());
-  const KLMElementNumbers* elementNumbers =
-    &(KLMElementNumbers::Instance());
-  for (int isForward = 0; isForward < 2; isForward++) {
-    for (int sector = 1; sector < 9; sector++) {
-      for (int layer = 1; layer < 16; layer++) {
-        for (int plane = 0; plane < 2; plane++) {
-          int nStrips = BKLMElementNumbers::getNStrips(
-                          isForward, sector, layer, plane);
-          for (int strip = 1; strip <= nStrips; strip++) {
-            uint16_t channel = elementNumbers->channelNumberBKLM(
-                                 isForward, sector, layer, plane, strip);
-            setChannelStatus(channel, status);
-          }
-        }
-      }
-    }
-  }
-  int endcap, layer, sector, plane, strip;
-  int nEndcaps, nLayers[2], nSectors, nPlanes, nStrips;
-  nEndcaps = eklmElementNumbers->getMaximalEndcapNumber();
-  nLayers[0] = eklmElementNumbers->getMaximalDetectorLayerNumber(1);
-  nLayers[1] = eklmElementNumbers->getMaximalDetectorLayerNumber(2);
-  nSectors = eklmElementNumbers->getMaximalSectorNumber();
-  nPlanes = eklmElementNumbers->getMaximalPlaneNumber();
-  nStrips = eklmElementNumbers->getMaximalStripNumber();
-  for (endcap = 1; endcap <= nEndcaps; endcap++) {
-    for (layer = 1; layer <= nLayers[endcap - 1]; layer++) {
-      for (sector = 1; sector <= nSectors; sector++) {
-        for (plane = 1; plane <= nPlanes; plane++) {
-          for (strip = 1; strip <= nStrips; strip++) {
-            uint16_t channel = elementNumbers->channelNumberEKLM(
-                                 endcap, layer, sector, plane, strip);
-            setChannelStatus(channel, status);
-          }
-        }
-      }
-    }
-  }
+  BKLMChannelIndex bklmChannels;
+  for (BKLMChannelIndex& bklmChannel : bklmChannels)
+    setChannelStatus(bklmChannel.getKLMChannelNumber(), status);
+  EKLMChannelIndex eklmChannels;
+  for (EKLMChannelIndex& eklmChannel : eklmChannels)
+    setChannelStatus(eklmChannel.getKLMChannelNumber(), status);
 }
 
 int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const

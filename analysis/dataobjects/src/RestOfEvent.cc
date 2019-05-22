@@ -357,8 +357,8 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(const std::string& ma
   std::vector<const ECLCluster*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
   for (auto* particle : allParticles) {
-    //Get all ECL clusters independently of the particle type, for neutrals: if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
-    if (particle->getECLCluster()) {
+    //Get all ECL clusters independently of the particle type, (both charged and neutral)
+    if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
       result.push_back(particle->getECLCluster());
     }
   }

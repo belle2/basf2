@@ -127,10 +127,9 @@ Analogous to `VariablesToNtuple <v2nt>`.
 .. code-block:: python
  
         from b2pandas_utils import VariablesToHDF5
-        v2hdf5 = VariablesToHDF5(
-                filename="variables.hdf5", listname="pi+:all",
-                variables=list_of_interesting_event_variables)
-        path.add_module(v2hdf5)
+        v2hdf5 = VariablesToHDF5("pi+:all", list_of_interesting_variables,
+                                 filename="variables.hdf5")
+        mypath.add_module(v2hdf5)
 
 .. autoclass:: modularAnalysis.VariablesToHDF5
    :members:

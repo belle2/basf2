@@ -10,6 +10,9 @@
 
 #pragma once
 
+/* Belle2 headers. */
+#include <klm/dataobjects/KLMElementNumbers.h>
+
 namespace Belle2 {
 
   /**
@@ -80,6 +83,11 @@ namespace Belle2 {
     };
 
     /**
+     * Get KLM channel number.
+     */
+    uint16_t getKLMChannelNumber();
+
+    /**
      * First channel.
      */
     BKLMChannelIndex& begin();
@@ -128,6 +136,9 @@ namespace Belle2 {
 
     /** Number of strips in current plane. */
     int m_NStripsPlane;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
   };
 

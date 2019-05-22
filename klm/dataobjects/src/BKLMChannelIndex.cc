@@ -9,8 +9,8 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMChannelIndex.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/BKLMChannelIndex.h>
 
 using namespace Belle2;
 
@@ -23,6 +23,7 @@ BKLMChannelIndex::BKLMChannelIndex() :
 {
   m_NStripsPlane = BKLMElementNumbers::getNStrips(
                      m_Forward, m_Sector, m_Layer, m_Plane);
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 BKLMChannelIndex::BKLMChannelIndex(
@@ -35,10 +36,17 @@ BKLMChannelIndex::BKLMChannelIndex(
 {
   m_NStripsPlane = BKLMElementNumbers::getNStrips(
                      m_Forward, m_Sector, m_Layer, m_Plane);
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 BKLMChannelIndex::~BKLMChannelIndex()
 {
+}
+
+uint16_t BKLMChannelIndex::getKLMChannelNumber()
+{
+  return m_ElementNumbers->channelNumberBKLM(
+           m_Forward, m_Sector, m_Layer, m_Plane, m_Strip);
 }
 
 BKLMChannelIndex& BKLMChannelIndex::begin()

@@ -9,9 +9,9 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <bklm/dataobjects/BKLMChannelIndex.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/dataobjects/BKLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <framework/logging/Logger.h>
@@ -55,13 +55,8 @@ void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
   const KLMElementNumbers* elementNumbers =
     &(KLMElementNumbers::Instance());
   BKLMChannelIndex bklmChannels;
-  for (BKLMChannelIndex& bklmChannel : bklmChannels) {
-    uint16_t channel = elementNumbers->channelNumberBKLM(
-                         bklmChannel.getForward(), bklmChannel.getSector(),
-                         bklmChannel.getLayer(), bklmChannel.getPlane(),
-                         bklmChannel.getStrip());
-    setChannelStatus(channel, status);
-  }
+  for (BKLMChannelIndex& bklmChannel : bklmChannels)
+    setChannelStatus(bklmChannel.getKLMChannelNumber(), status);
   int endcap, layer, sector, plane, strip;
   int nEndcaps, nLayers[2], nSectors, nPlanes, nStrips;
   nEndcaps = eklmElementNumbers->getMaximalEndcapNumber();

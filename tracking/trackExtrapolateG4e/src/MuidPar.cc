@@ -227,6 +227,8 @@ namespace Belle2 {
         }
         testBit <<= 1; // move to next bit
       }
+    } else {
+      B2WARNING("Mismatch between BKLM efficiency vector size and outermost BKLM extrapolated layer");
     }
 
     int maxLayer = isForward ? MUID_MaxForwardEndcapLayer : MUID_MaxBackwardEndcapLayer;

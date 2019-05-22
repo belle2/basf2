@@ -10,8 +10,6 @@
 
 #include <tracking/trackExtrapolateG4e/MuidPar.h>
 #include <tracking/dataobjects/Muid.h>
-#include <tracking/dataobjects/MuidHit.h>
-#include <tracking/dbobjects/MuidParameters.h>
 
 #include <fstream>
 #include <exception>

@@ -86,7 +86,7 @@ class MCParticleHarvester(HarvestingModule):
     def pick(self, mc_particle):
         """Select the MCParticle if it is a primary pion and has some PXD and/or SVD clusters"""
         pxd_clusters = mc_particle.getRelationsFrom("PXDClusters")
-        svd_clusters = mc_particle.getRelationsFrom("PXDClusters")
+        svd_clusters = mc_particle.getRelationsFrom("SVDClusters")
         return (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and
                 abs(mc_particle.getPDG()) == 211 and
                 len(pxd_clusters) + len(svd_clusters) > 0)

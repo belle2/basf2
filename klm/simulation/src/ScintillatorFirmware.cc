@@ -8,10 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TFile.h>
-#include <TH1F.h>
-
 /* Belle2 headers. */
 #include <klm/simulation/ScintillatorFirmware.h>
 #include <framework/utilities/FileSystem.h>

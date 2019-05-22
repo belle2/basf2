@@ -43,9 +43,9 @@ namespace Belle2 {
     ROIDQMModule();
 
   private:
-    StoreArray<PXDDigit> m_pxdDigits;
-    StoreArray<ROIid> m_roiIDs;
-    StoreArray<PXDIntercept> m_pxdIntercept;
+    StoreArray<PXDDigit> m_pxdDigits; /**< the PXDDigits dataobjects collection */
+    StoreArray<ROIid> m_roiIDs; /**< the ROIids dataobjects colleciton */
+    StoreArray<PXDIntercept> m_pxdIntercept; /**< the PXDIntercepts dataobjects collection */
 
     std::string m_PXDDigitsName; /**< digit list name*/
 

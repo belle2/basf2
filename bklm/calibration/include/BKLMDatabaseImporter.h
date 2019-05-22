@@ -11,8 +11,6 @@
 #pragma once
 
 // ROOT include
-#include <TFile.h>
-#include <TTree.h>
 #include <TObject.h>
 
 #include <stdio.h>

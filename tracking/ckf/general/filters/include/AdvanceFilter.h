@@ -42,6 +42,7 @@ namespace Belle2 {
   template <class AState, class AnAdvancer>
   class AdvanceFilter : public
     TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>> {
+    /// Type of the base class
     using Super = TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>>;
 
   public:

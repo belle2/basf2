@@ -9,6 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <bklm/dataobjects/BKLMChannelIndex.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -53,20 +54,13 @@ void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
     &(EKLM::ElementNumbersSingleton::Instance());
   const KLMElementNumbers* elementNumbers =
     &(KLMElementNumbers::Instance());
-  for (int isForward = 0; isForward < 2; isForward++) {
-    for (int sector = 1; sector < 9; sector++) {
-      for (int layer = 1; layer < 16; layer++) {
-        for (int plane = 0; plane < 2; plane++) {
-          int nStrips = BKLMElementNumbers::getNStrips(
-                          isForward, sector, layer, plane);
-          for (int strip = 1; strip <= nStrips; strip++) {
-            uint16_t channel = elementNumbers->channelNumberBKLM(
-                                 isForward, sector, layer, plane, strip);
-            setChannelStatus(channel, status);
-          }
-        }
-      }
-    }
+  BKLMChannelIndex bklmChannels;
+  for (BKLMChannelIndex& bklmChannel : bklmChannels) {
+    uint16_t channel = elementNumbers->channelNumberBKLM(
+                         bklmChannel.getForward(), bklmChannel.getSector(),
+                         bklmChannel.getLayer(), bklmChannel.getPlane(),
+                         bklmChannel.getStrip());
+    setChannelStatus(channel, status);
   }
   int endcap, layer, sector, plane, strip;
   int nEndcaps, nLayers[2], nSectors, nPlanes, nStrips;

@@ -80,10 +80,8 @@ CDCTriggerNeuroModule::initialize()
   m_tracks2D.requireRelationTo(m_segmentHits);
   m_tracksNN.registerRelationTo(m_segmentHits);
   if (m_writeMLPinput) {
-    m_mlpInput.registerInDataStore(m_outputCollectionName + "Input",
-                                   DataStore::c_DontWriteOut);
-    m_tracksNN.registerRelationTo(m_mlpInput, DataStore::c_Event,
-                                  DataStore::c_DontWriteOut);
+    m_mlpInput.registerInDataStore(m_outputCollectionName + "Input");
+    m_tracksNN.registerRelationTo(m_mlpInput, DataStore::c_Event);
   }
 }
 

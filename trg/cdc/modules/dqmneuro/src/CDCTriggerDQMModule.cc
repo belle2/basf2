@@ -1192,7 +1192,7 @@ void CDCTriggerDQMModule::initialize()
   m_unpackedNeuroInput2DTracks.isRequired(m_unpackedNeuroInput2DTracksName);
   m_unpackedNeuroInputSegments.isRequired(m_unpackedNeuroInputSegmentsName);
   m_unpackedNeuroTracks.requireRelationTo(m_unpackedNeuroInputSegments);
-  m_unpackedNeuroTracks.requireRelationTo(m_unpackedNeuroInput2DTracks);
+  m_unpackedNeuroInput2DTracks.requireRelationTo(m_unpackedNeuroTracks);
   m_unpackedNeuroInputVectorName = m_unpackedNeuroTracksName + "Input";
   m_unpackedNeuroInputVector.isRequired(m_unpackedNeuroInputVectorName);
   m_unpackedNeuroTracks.requireRelationTo(m_unpackedNeuroInputVector);
@@ -2176,7 +2176,7 @@ void CDCTriggerDQMModule::event()
     if (m_simNeuroTracksName != "") {
       // get related track from TSIM (via 2D finder track)
       CDCTriggerTrack* finderTrack =
-        neuroTrack.getRelatedTo<CDCTriggerTrack>(m_unpackedNeuroInput2DTracksName);
+        neuroTrack.getRelatedFrom<CDCTriggerTrack>(m_unpackedNeuroInput2DTracksName);
       if (finderTrack) {
         CDCTriggerTrack* neuroSimTrack =
           finderTrack->getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);

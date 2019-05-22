@@ -58,8 +58,10 @@ void PXDDQMEfficiencyNtupleModule::terminate()
 {
   auto dir = gDirectory;
   if (m_tuple) {
-    m_file->cd();
-    m_tuple->Write();
+    if (m_file) { // no file -> no write to file
+      m_file->cd();
+      m_tuple->Write();
+    }
     delete m_tuple;
   }
   if (m_file) {

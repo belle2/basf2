@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
+#include <tracking/dbobjects/MuidParameters.h>
 #include <tracking/trackExtrapolateG4e/MuidPar.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -507,6 +508,7 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
                                       const G4ErrorSymMatrix& covariance, // (6x6) using cm, GeV/c (genfit2 units)
                                       const std::string&) // DIVOT: NO LONGER USED - REMOVE THIS ARGUMENT
 {
+
   bool isCosmic = false; // DIVOT
   if ((!m_ExtInitialized) && (!m_MuidInitialized)) {
     // No EXT nor MUID module in analysis path ==> mimic ext::initialize() with reasonable defaults.
@@ -546,8 +548,9 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
   G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
+  std::vector<float> empty; // used to initialize the vector
   ExtState extState = { NULL, pdgCode, isCosmic, tof, 0.0,                         // for EXT and MUID
-                        momentumG4e.unit(), 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false  // for MUID only
+                        momentumG4e.unit(), 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, empty, false  // for MUID only
                       };
   swim(extState, g4eState);
 }
@@ -604,8 +607,9 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
   G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
+  std::vector<float> empty; // used to initialize the vector
   ExtState extState = { NULL, pdgCode, isCosmic, tof, 0.0,                             // for EXT and MUID
-                        momentumG4e.unit(), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false  // for MUID only
+                        momentumG4e.unit(), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, empty, false  // for MUID only
                       };
   swim(extState, g4eState, NULL, NULL, NULL);
 }
@@ -1045,8 +1049,9 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
 
 ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G4ErrorFreeTrajState& g4eState)
 {
+  std::vector<float> empty; // used to initialize the vector
   ExtState extState = {&b2track, pdgCode, false, 0.0, 0.0,                               // for EXT and MUID
-                       G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false // for MUID only
+                       G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, empty, false // for MUID only
                       };
   RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
   if (recoTrack == NULL) {
@@ -1328,6 +1333,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       if (findMatchingBarrelHit(intersection, extState.track)) {
         (*bklmHitUsed)[intersection.hit].insert(std::pair<const Track*, double>(extState.track, intersection.chi2));
         extState.extLayerPattern |= (0x00000001 << intersection.layer);
+        //efficiency implementation
+        extState.extBKLMEfficiencyVector.push_back(m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
+                                                   intersection.sector + 1, intersection.layer + 1, 1, 1));
         if (extState.lastBarrelExtLayer < intersection.layer) {
           extState.lastBarrelExtLayer = intersection.layer;
         }
@@ -1373,10 +1381,21 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           }
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+            //efficiency storage
+            if (m_klmStripEfficiency.isValid()) {
+              extState.extBKLMEfficiencyVector.push_back(m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
+                                                         intersection.sector + 1, intersection.layer + 1, 1, 1));
+            } else {
+              extState.extBKLMEfficiencyVector.push_back(0);
+            }
+          } else {
+            extState.extBKLMEfficiencyVector.push_back(0);
           }
           if (extState.lastBarrelExtLayer < intersection.layer) {
             extState.lastBarrelExtLayer = intersection.layer;
           }
+        } else {// extrapolation is crossing a not instrumented section: we need to push_back a value.
+          extState.extBKLMEfficiencyVector.push_back(0);
         }
       }
     }
@@ -1389,6 +1408,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       fromG4eToPhasespace(g4eState, intersection.covariance);
       if (findMatchingEndcapHit(intersection, extState.track)) {
         extState.extLayerPattern |= (0x00008000 << intersection.layer);
+        //        extState.extEKLMEfficiencyVector.push_back(1); TODO
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
         }
@@ -1424,6 +1444,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+          //          extState.extEKLMEfficiencyVector.push_back(1); TODO
+        } else {
+          //          extState.extEKLMEfficiencyVector.push_back(0); TODO
         }
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
@@ -1852,6 +1875,8 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, Muid* muid, bool
   muid->setDegreesOfFreedom(extState.nPoint);
   muid->setExtLayerPattern(extState.extLayerPattern);
   muid->setHitLayerPattern(extState.hitLayerPattern);
+  muid->setExtBKLMEfficiencyVector(extState.extBKLMEfficiencyVector);
+  //  muid->setExtEKLMEfficiencyVector(extState.extEKLMEfficiencyVector); FIXME
 
 // Do likelihood calculation
 

@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <eklm/geometry/TransformDataGlobalAligned.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -105,6 +107,10 @@ namespace Belle2 {
     int extLayerPattern;
     //! MUID: accumulated bit pattern of layers with matching hits
     int hitLayerPattern;
+    //! MUID: vector of BKLM layer efficiencies
+    std::vector<float> extBKLMEfficiencyVector;
+    //! MUID: vector of EKLM layer efficiencies
+    //    std::vector<float> extEKLMEfficiencyVector;
     //! MUID: flag to indicate that the extrapolated track escaped from the KLM
     bool escaped;
   };
@@ -478,6 +484,12 @@ namespace Belle2 {
 
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;
+
+    //! Conditions-database object for KLM strip efficiency
+    DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
+
+    //! Conditions-database object for EKLM dead-channel list (updated at start of each run)
+    DBObjPtr<EKLMChannels> m_eklmChannels;
 
     //! Conditions-database object for KLM channel status (updated at start of each run)
     DBObjPtr<KLMChannelStatus> m_klmChannelStatus;

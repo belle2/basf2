@@ -258,16 +258,16 @@ class beamSpotImporter(basf2.Module):
         Belle2.Database.Instance().storeData("BeamSpot", payload, iov)
 
 
-use_local_database("localDB_BeamSpot/database.txt", "localDB_BeamSpot")
+basf2.use_local_database("localDB_BeamSpot/database.txt", "localDB_BeamSpot")
 
-main = create_path()
+main = basf2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module(beamSpotImporter())
 
 # Process events
-process(main)
+basf2.process(main)

@@ -27,18 +27,18 @@ with open(current_localDB + '/database.txt') as fp:
         runList.append(int(run[1]))
         evtList.append(int(1))
 
-reset_database()
-use_database_chain()
-use_central_database("data_reprocessing_prompt")
-use_local_database(current_localDB + "/database.txt", current_localDB, invertLogging=True)
+basf2.reset_database()
+basf2.use_database_chain()
+basf2.use_central_database("data_reprocessing_prompt")
+basf2.use_local_database(current_localDB + "/database.txt", current_localDB, invertLogging=True)
 
-main = create_path()
+main = basf2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': evtList, 'expList': expList, 'runList': runList})
 main.add_module(eventinfosetter)
 
 main.add_module('BeamSpotMonitor')
 
-print_path(main)
-process(main)
+basf2.print_path(main)
+basf2.process(main)

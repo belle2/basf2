@@ -12,7 +12,7 @@
 #include <cmath>
 #include <string>
 
-/* External headers. */
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
 

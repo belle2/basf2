@@ -109,9 +109,6 @@ namespace Belle2 {
     //! Get the per-layer PDF for a particular hypothesis
     double getPDFLayer(const Muid*, bool) const;
 
-    //! Get the per-layer PDF for a muon
-    //    double getPDFLayer_muon(const Muid*, bool) const;
-
     //! Get the transverse-coordinate PDF for a particular hypothesis
     double getPDFRchisq(const Muid*) const;
 

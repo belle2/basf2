@@ -22,7 +22,6 @@
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <simulation/dataobjects/SimHitBase.h>
 
-#include <TRandom.h>
 #include "TMath.h"
 
 using namespace std;

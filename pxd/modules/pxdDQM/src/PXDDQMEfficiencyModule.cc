@@ -323,20 +323,20 @@ void PXDDQMEfficiencyModule::defineHisto()
     int nv = info.getVCells();
 
     //nu + 1,nv + 1 Bin numbers when using one bin per pixel
-    m_h_track_hits[avxdid] = new TH2D("track_hits_" + buff, "tracks through sensor " + buff,
+    m_h_track_hits[avxdid] = new TH2F("track_hits_" + buff, "tracks through sensor " + buff,
                                       m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
-    m_h_matched_cluster[avxdid] = new TH2D("matched_cluster_" + buff, "clusters matched to track intersections " + buff,
+    m_h_matched_cluster[avxdid] = new TH2F("matched_cluster_" + buff, "clusters matched to track intersections " + buff,
                                            m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
 
     if (m_verboseHistos) {
-      m_h_p[avxdid] = new TH1D("p_" + buff, "p " + buff, 100, 0, 10);
-      m_h_pt[avxdid] = new TH1D("pt_" + buff, "pt " + buff, 100, 0, 10);
-      m_h_su[avxdid] = new TH1D("su_" + buff, "su " + buff, 1000, 0, 1);
-      m_h_sv[avxdid] = new TH1D("sv_" + buff, "sv " + buff, 1000, 0, 1);
-      m_h_p2[avxdid] = new TH1D("p2_" + buff, "p2 " + buff, 100, 0, 10);
-      m_h_pt2[avxdid] = new TH1D("pt2_" + buff, "pt2 " + buff, 100, 0, 10);
-      m_h_su2[avxdid] = new TH1D("su2_" + buff, "su2 " + buff, 1000, 0, 1);
-      m_h_sv2[avxdid] = new TH1D("sv2_" + buff, "sv2 " + buff, 1000, 0, 1);
+      m_h_p[avxdid] = new TH1F("p_" + buff, "p " + buff, 100, 0, 10);
+      m_h_pt[avxdid] = new TH1F("pt_" + buff, "pt " + buff, 100, 0, 10);
+      m_h_su[avxdid] = new TH1F("su_" + buff, "su " + buff, 1000, 0, 1);
+      m_h_sv[avxdid] = new TH1F("sv_" + buff, "sv " + buff, 1000, 0, 1);
+      m_h_p2[avxdid] = new TH1F("p2_" + buff, "p2 " + buff, 100, 0, 10);
+      m_h_pt2[avxdid] = new TH1F("pt2_" + buff, "pt2 " + buff, 100, 0, 10);
+      m_h_su2[avxdid] = new TH1F("su2_" + buff, "su2 " + buff, 1000, 0, 1);
+      m_h_sv2[avxdid] = new TH1F("sv2_" + buff, "sv2 " + buff, 1000, 0, 1);
     }
   }
   // cd back to root directory

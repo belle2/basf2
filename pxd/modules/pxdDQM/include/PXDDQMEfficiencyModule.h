@@ -23,8 +23,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 
-#include "TH1D.h"
-#include "TH2D.h"
+#include "TH1F.h"
+#include "TH2F.h"
 #include "TVector3.h"
 
 
@@ -125,16 +125,16 @@ namespace Belle2 {
     int m_maskedDistance; // Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency
-    std::map<VxdID, TH2D*> m_h_track_hits;
-    std::map<VxdID, TH2D*> m_h_matched_cluster;
-    std::map<VxdID, TH1D*> m_h_p;
-    std::map<VxdID, TH1D*> m_h_pt;
-    std::map<VxdID, TH1D*> m_h_su;
-    std::map<VxdID, TH1D*> m_h_sv;
-    std::map<VxdID, TH1D*> m_h_p2;
-    std::map<VxdID, TH1D*> m_h_pt2;
-    std::map<VxdID, TH1D*> m_h_su2;
-    std::map<VxdID, TH1D*> m_h_sv2;
+    std::map<VxdID, TH2F*> m_h_track_hits;
+    std::map<VxdID, TH2F*> m_h_matched_cluster;
+    std::map<VxdID, TH1F*> m_h_p;
+    std::map<VxdID, TH1F*> m_h_pt;
+    std::map<VxdID, TH1F*> m_h_su;
+    std::map<VxdID, TH1F*> m_h_sv;
+    std::map<VxdID, TH1F*> m_h_p2;
+    std::map<VxdID, TH1F*> m_h_pt2;
+    std::map<VxdID, TH1F*> m_h_su2;
+    std::map<VxdID, TH1F*> m_h_sv2;
 
   };
 }

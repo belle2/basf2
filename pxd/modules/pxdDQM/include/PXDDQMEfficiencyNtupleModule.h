@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Lueck, Ulf Stolzenberg, Benjamin Schwenker, Uwe Gebauer, Bjoern Spruck *
+ * Contributors: Bjoern Spruck                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,9 +23,13 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 
-#include "TH1F.h"
-#include "TH2F.h"
+
+//root stuff
+#include "TString.h"
 #include "TVector3.h"
+
+#include "TFile.h"
+#include "TNtuple.h"
 
 
 namespace Belle2 {
@@ -34,14 +38,14 @@ namespace Belle2 {
    * Creates the basic histograms for PXD Efficiency DQM
    * Simplified and adopted version of the testbeam pxd efficiency module
    */
-  class PXDDQMEfficiencyModule : public HistoModule {
+  class PXDDQMEfficiencyNtupleModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDDQMEfficiencyModule();
+    PXDDQMEfficiencyNtupleModule();
 
   private:
 
@@ -51,20 +55,14 @@ namespace Belle2 {
     void event() override final;
 
     /**
-     * begin run function which resets histograms
-     */
-    void beginRun() override final;
-
-    /**
      * initializes the need store arrays, trees and histograms
      */
     void initialize() override final;
 
     /**
-     * actually defines the trees and histograms
+     * terminate , save tuple to file if needed
      */
-    void defineHisto() override final;
-
+    void terminate() override final;
 
 
   private:
@@ -83,58 +81,28 @@ namespace Belle2 {
 
     bool isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID);
 
-    //Require tracks going through ROIs
-    bool m_requireROIs;
-
     //if true alignment will be used!
     bool m_useAlignment;
 
-    bool m_maskDeadPixels;
-
-    bool m_cutBorders;
-
-    bool m_verboseHistos; //! add some verbose istograms for cuts
-
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
-
-    //Where to save the histograms too
-    std::string m_histogramDirectoryName;
 
     std::string m_pxdClustersName;
     std::string m_tracksName;
     std::string m_ROIsName;
 
-    int m_u_bins;
-    int m_v_bins;
-
     StoreArray<PXDCluster> m_pxdclusters;
     StoreArray<RecoTrack> m_tracks;
     StoreArray<ROIid> m_ROIs;
 
-    double m_distcut; // distance cut in cm!
-    double m_uFactor; // factor for track-error on distcut comparison
-    double m_vFactor; // factor for track-error on distcut comparison
     double m_pcut; // pValue-Cut for tracks
     double m_momCut; // Cut on fitted track momentum
     double m_pTCut; // Cut on fitted track pT
     unsigned int m_minSVDHits; // Required hits in SVD strips for tracks
-    double m_z0minCut;/**> cut z0 minimum in cm (large negativ value eg -9999 disables)*/
-    double m_z0maxCut;/**> cut z0 maximum in cm (large positiv value eg 9999 disables)*/
-    double m_d0Cut;/**> cut abs(d0) in cm (and negativ value eg -9999 disables)*/
     int m_maskedDistance; // Distance inside which no dead pixel or module border is allowed
 
-    //Histograms to later determine efficiency
-    std::map<VxdID, TH2F*> m_h_track_hits;
-    std::map<VxdID, TH2F*> m_h_matched_cluster;
-    std::map<VxdID, TH1F*> m_h_p;
-    std::map<VxdID, TH1F*> m_h_pt;
-    std::map<VxdID, TH1F*> m_h_su;
-    std::map<VxdID, TH1F*> m_h_sv;
-    std::map<VxdID, TH1F*> m_h_p2;
-    std::map<VxdID, TH1F*> m_h_pt2;
-    std::map<VxdID, TH1F*> m_h_su2;
-    std::map<VxdID, TH1F*> m_h_sv2;
+    TFile* m_file{};
+    TNtuple* m_tuple{};
 
   };
 }

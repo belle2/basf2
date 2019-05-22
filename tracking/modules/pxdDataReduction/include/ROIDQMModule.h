@@ -44,7 +44,7 @@ namespace Belle2 {
 
   private:
     StoreArray<PXDDigit> m_pxdDigits; /**< the PXDDigits dataobjects collection */
-    StoreArray<ROIid> m_roiIDs; /**< the ROIids dataobjects colleciton */
+    StoreArray<ROIid> m_roiIDs; /**< the ROIids dataobjects collection */
     StoreArray<PXDIntercept> m_pxdIntercept; /**< the PXDIntercepts dataobjects collection */
 
     std::string m_PXDDigitsName; /**< digit list name*/

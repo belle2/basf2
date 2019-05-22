@@ -63,10 +63,13 @@ namespace Belle2 {
 
   private:
 
+    /// determine if the MCParticle is a K-short
     bool isK_Short(const MCParticle& the_mcParticle);
 
+    /// determine if the MCParticle is a Lambda0
     bool isLambda0(const MCParticle& the_mcParticle);
 
+    /// get the number of matched daughters of the MCParticle
     int nMatchedDaughters(const MCParticle& the_mcParticle);
 
     /** user-defined parameters */

@@ -34,7 +34,8 @@ PXDInjectionDQMModule::PXDInjectionDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDINJ"));
   addParam("PXDRawHitsName", m_PXDRawHitsName, "Name of PXD raw hits", std::string(""));
-  addParam("eachModule", m_eachModule, "creeate for each module", false);
+  addParam("eachModule", m_eachModule, "create for each module", false);
+  addParam("offlineStudy", m_offlineStudy, "use finest binning and larger range", false);
 }
 
 void PXDInjectionDQMModule::defineHisto()
@@ -43,12 +44,23 @@ void PXDInjectionDQMModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
   oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
 
-  hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-  hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-  hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
-  hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
-  hMaxOccAfterInjLER  = new TH1F("PXDMaxOccInjLER", "PXDMaxOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
-  hMaxOccAfterInjHER  = new TH1F("PXDMaxOccInjHER", "PXDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+  if (m_offlineStudy) {
+    hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
+    hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
+    hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0, 50000);
+    hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0, 50000);
+    hMaxOccAfterInjLER  = new TH1F("PXDMaxOccInjLER", "PXDMaxOccInjLER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0,
+                                   50000);
+    hMaxOccAfterInjHER  = new TH1F("PXDMaxOccInjHER", "PXDMaxOccInjHER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0,
+                                   50000);
+  } else {
+    hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+    hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+    hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+    hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+    hMaxOccAfterInjLER  = new TH1F("PXDMaxOccInjLER", "PXDMaxOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+    hMaxOccAfterInjHER  = new TH1F("PXDMaxOccInjHER", "PXDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+  }
 
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -61,18 +73,35 @@ void PXDInjectionDQMModule::defineHisto()
       TString bufful = buff;
       bufful.ReplaceAll(".", "_");
 
-      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
-                                            "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful,
-                                            "PXDOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful,
-                                             "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
-      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful,
-                                             "PXDEOccModInjHER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
-      hMaxOccModAfterInjLER[avxdid] = new TH1F("PXDMaxOccInjLER_" + bufful,
-                                               "PXDMaxOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-      hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + bufful,
-                                               "PXDMaxOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+      if (m_offlineStudy) {
+        hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
+                                              "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
+        hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful,
+                                              "PXDOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
+        hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful,
+                                               "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000,
+                                               0, 50000);
+        hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful,
+                                               "PXDEOccModInjHER " + buff + "/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000,
+                                               0, 50000);
+        hMaxOccModAfterInjLER[avxdid] = new TH1F("PXDMaxOccInjLER_" + bufful,
+                                                 "PXDMaxOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
+        hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + bufful,
+                                                 "PXDMaxOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
+      } else {
+        hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
+                                              "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+        hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful,
+                                              "PXDOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+        hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful,
+                                               "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+        hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful,
+                                               "PXDEOccModInjHER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+        hMaxOccModAfterInjLER[avxdid] = new TH1F("PXDMaxOccInjLER_" + bufful,
+                                                 "PXDMaxOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+        hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + bufful,
+                                                 "PXDMaxOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+      }
     }
   }
   // cd back to root directory

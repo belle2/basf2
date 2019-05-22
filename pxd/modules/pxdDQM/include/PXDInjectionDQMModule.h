@@ -41,6 +41,7 @@ namespace Belle2 {
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
 
       bool m_eachModule{false};// create a histo per module
+      bool m_offlineStudy{false};// create histos with much finer binning and larger range
 
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;

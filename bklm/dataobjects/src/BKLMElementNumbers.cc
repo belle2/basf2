@@ -14,6 +14,14 @@
 
 using namespace Belle2;
 
+BKLMElementNumbers::BKLMElementNumbers()
+{
+}
+
+BKLMElementNumbers::~BKLMElementNumbers()
+{
+}
+
 uint16_t BKLMElementNumbers::channelNumber(
   int forward, int sector, int layer, int plane, int strip)
 {

@@ -15,7 +15,19 @@
 
 namespace Belle2 {
 
-  namespace BKLMElementNumbers {
+  class BKLMElementNumbers {
+
+  public:
+
+    /**
+     * Constructor.
+     */
+    BKLMElementNumbers();
+
+    /**
+     * Destructor.
+     */
+    ~BKLMElementNumbers();
 
     /**
      * Get channel number.
@@ -25,8 +37,8 @@ namespace Belle2 {
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    uint16_t channelNumber(int forward, int sector, int layer, int plane,
-                           int strip);
+    static uint16_t channelNumber(int forward, int sector, int layer, int plane,
+                                  int strip);
 
     /**
      * Get number of strips.
@@ -35,7 +47,7 @@ namespace Belle2 {
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
      */
-    int getNStrips(int forward, int sector, int layer, int plane);
+    static int getNStrips(int forward, int sector, int layer, int plane);
 
     /**
      * Check channel number.
@@ -45,9 +57,9 @@ namespace Belle2 {
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    bool checkChannelNumber(int forward, int sector, int layer, int plane,
-                            int strip);
+    static bool checkChannelNumber(
+      int forward, int sector, int layer, int plane, int strip);
 
-  }
+  };
 
 }

@@ -71,8 +71,7 @@ void OverlapResidualsModule::defineHisto()
 {
   //Create directory to store monitoring histograms
   TDirectory* oldDir = gDirectory;
-  TDirectory* ResDir = nullptr;
-  ResDir = oldDir->mkdir("Monitoring_VXDOverlaps");
+  TDirectory* ResDir = oldDir->mkdir("Monitoring_VXDOverlaps");
   ResDir->cd();
   //Define histograms of residuals differences
   h_U_DeltaRes = new TH1F("h_U_DeltaRes", "Histrogram of residual difference #Delta res_{u} for overlapping hits", 100, -1000, 1000);
@@ -242,8 +241,7 @@ void OverlapResidualsModule::defineHisto()
   //Special case of ExpertLevel option enabled
   if (m_ExpertLevel) {
     //Create directory to store PXD and SVD hitmaps for overlapping hits
-    TDirectory* HMDir = nullptr;
-    HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
+    TDirectory* HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
     HMDir->cd();
     //Define 2D sensor hit-maps for reconstructed hits
     for (int i = 1; i <= 5; i++) {
@@ -301,8 +299,7 @@ void OverlapResidualsModule::defineHisto()
       }
     }
     //Create directory to store PXD and SVD trees
-    TDirectory* TreeDir = nullptr;
-    TreeDir = oldDir->mkdir("Trees_VXDOverlaps");
+    TDirectory* TreeDir = oldDir->mkdir("Trees_VXDOverlaps");
     TreeDir->cd();
     //Tree for PXD
     t_PXD = new TTree("t_PXD", "Tree for PXD overlaps");

@@ -63,6 +63,12 @@ namespace Belle2 {
       std::map<VxdID, TH1F*> hEOccModAfterInjLER; /**<  Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
       std::map<VxdID, TH1F*> hEOccModAfterInjHER; /**<  Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
+      TH1F* hMaxOccAfterInjLER{};          /**< Histogram Max Occupancy after LER injection */
+      TH1F* hMaxOccAfterInjHER{};          /**< Histogram Max Occupancy after HER injection */
+
+      std::map<VxdID, TH1F*> hMaxOccModAfterInjLER; /**< Histogram Max Occupancy after LER injection */
+      std::map<VxdID, TH1F*> hMaxOccModAfterInjHER; /**< Histogram Max Occupancy after HER injection */
+
       void initialize() override final; /**< initialize function */
 
       void beginRun() override final;  /**< beginRun function */

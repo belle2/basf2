@@ -47,6 +47,8 @@ void PXDInjectionDQMModule::defineHisto()
   hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
   hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
   hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+  hMaxOccAfterInjLER  = new TH1F("PXDMaxOccInjLER", "PXDMaxOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+  hMaxOccAfterInjHER  = new TH1F("PXDMaxOccInjHER", "PXDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
 
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -56,15 +58,21 @@ void PXDInjectionDQMModule::defineHisto()
       // Only interested in PXD sensors
 
       TString buff = (std::string)avxdid;
-      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + buff,
-                                            "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + buff,
-                                            "PXDOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + buff,
-                                             "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
-      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + buff,
-                                             "PXDEOccModInjHER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+      TString bufful = buff;
+      bufful.ReplaceAll(".", "_");
 
+      hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
+                                            "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+      hOccModAfterInjHER[avxdid] = new TH1F("PXDOccInjHER_" + bufful,
+                                            "PXDOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+      hEOccModAfterInjLER[avxdid] = new TH1F("PXDEOccInjLER_" + bufful,
+                                             "PXDEOccModInjLER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+      hEOccModAfterInjHER[avxdid] = new TH1F("PXDEOccInjHER_" + bufful,
+                                             "PXDEOccModInjHER " + buff + "/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+      hMaxOccModAfterInjLER[avxdid] = new TH1F("PXDMaxOccInjLER_" + bufful,
+                                               "PXDMaxOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+      hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + bufful,
+                                               "PXDMaxOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
     }
   }
   // cd back to root directory
@@ -83,8 +91,16 @@ void PXDInjectionDQMModule::beginRun()
   // Assume that everthing is non-yero ;-)
   hOccAfterInjLER->Reset();
   hOccAfterInjHER->Reset();
+  hEOccAfterInjLER->Reset();
+  hEOccAfterInjHER->Reset();
+  hMaxOccAfterInjLER->Reset();
+  hMaxOccAfterInjHER->Reset();
   for (auto& a : hOccModAfterInjLER) a.second->Reset();
   for (auto& a : hOccModAfterInjHER) a.second->Reset();
+  for (auto& a : hEOccModAfterInjLER) a.second->Reset();
+  for (auto& a : hEOccModAfterInjHER) a.second->Reset();
+  for (auto& a : hMaxOccModAfterInjLER) a.second->Reset();
+  for (auto& a : hMaxOccModAfterInjHER) a.second->Reset();
 }
 
 void PXDInjectionDQMModule::event()
@@ -110,20 +126,40 @@ void PXDInjectionDQMModule::event()
       if (it.GetIsHER(0)) {
         hOccAfterInjHER->Fill(diff2, all);
         hEOccAfterInjHER->Fill(diff2);
+        auto bin = hMaxOccAfterInjHER->FindBin(diff2);
+        auto value = hMaxOccAfterInjHER->GetBinContent(bin);
+        if (all > value) hMaxOccAfterInjHER->SetBinContent(bin, all);
         for (auto& a : hOccModAfterInjHER) {
-          if (a.second) a.second->Fill(difference, freq[a.first]);
+          if (a.second) a.second->Fill(diff2, freq[a.first]);
         }
         for (auto& a : hEOccModAfterInjHER) {
-          if (a.second) a.second->Fill(difference);
+          if (a.second) a.second->Fill(diff2);
+        }
+        for (auto& a : hMaxOccModAfterInjHER) {
+          if (a.second) {
+            bin = a.second->FindBin(diff2);
+            value = a.second->GetBinContent(bin);
+            if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
+          }
         }
       } else {
         hOccAfterInjLER->Fill(diff2, all);
         hEOccAfterInjLER->Fill(diff2);
+        auto bin = hMaxOccAfterInjLER->FindBin(diff2);
+        auto value = hMaxOccAfterInjLER->GetBinContent(bin);
+        if (all > value) hMaxOccAfterInjLER->SetBinContent(bin, all);
         for (auto& a : hOccModAfterInjLER) {
-          if (a.second) a.second->Fill(difference, freq[a.first]);
+          if (a.second) a.second->Fill(diff2, freq[a.first]);
         }
         for (auto& a : hEOccModAfterInjLER) {
-          if (a.second) a.second->Fill(difference);
+          if (a.second) a.second->Fill(diff2);
+        }
+        for (auto& a : hMaxOccModAfterInjLER) {
+          if (a.second) {
+            bin = a.second->FindBin(diff2);
+            value = a.second->GetBinContent(bin);
+            if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
+          }
         }
       }
     }

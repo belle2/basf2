@@ -56,6 +56,32 @@ namespace Belle2 {
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns a function which returns the the variable for the closest
+     * particle in the provided particle list
+     */
+    Manager::FunctionPtr closestInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the angle to the closest particle
+     * in the provided particle list. See also closestInList.
+     */
+    Manager::FunctionPtr angleToClosestInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the the variable for the most
+     * back-to-back (closest to 180 degrees) particle in the provided particle list
+     */
+    Manager::FunctionPtr mostB2BInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the angle to the most back-to-back
+     * (closest to 180 degrees) particle in the provided particle list.
+     * See also mostB2BInList.
+     */
+    Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
+
+
+    /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
      */

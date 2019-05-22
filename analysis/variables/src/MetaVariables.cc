@@ -1839,6 +1839,166 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr angleToClosestInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments for meta function angleToClosestInList");
+      std::string listname = arguments[0];
+
+      // get the list and check it's valid
+      StoreObjPtr<ParticleList> list(listname);
+      if (not list.isValid())
+        B2FATAL("Invalid particle list name " << listname << " given to angleToClosestInList");
+
+      auto func = [list](const Particle * particle) -> double {
+
+        // check the list isn't empty
+        if (list->getListSize() == 0)
+          return std::numeric_limits<double>::quiet_NaN();
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto p_this = frame.getMomentum(particle).Vect();
+
+        // find the particle index with the smallest opening angle
+        double minAngle = 2 * M_PI;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto p_compare = frame.getMomentum(compareme).Vect();
+          double angle = p_compare.Angle(p_this);
+          if (minAngle > angle) minAngle = angle;
+        }
+        return minAngle;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr closestInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name
+      if (arguments.size() != 2)
+        B2FATAL("Wrong number of arguments for meta function closestInList");
+
+      // get the list and check it's valid
+      StoreObjPtr<ParticleList> list(arguments[0]);
+      if (not list.isValid())
+        B2FATAL("Invalid particle list name " << arguments[0] << " given to closestInList");
+
+      // the requested variable and check it exists
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+      if (not var)
+        B2FATAL("Invalid variable name " << arguments[1] << " given to closestInList");
+
+      auto func = [list, var](const Particle * particle) -> double {
+        // check the list isn't empty
+        if (list->getListSize() == 0)
+          return std::numeric_limits<double>::quiet_NaN();
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto p_this = frame.getMomentum(particle).Vect();
+
+        // find the particle index with the smallest opening angle
+        double minAngle = 2 * M_PI;
+        int iClosest = -1;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto p_compare = frame.getMomentum(compareme).Vect();
+          double angle = p_compare.Angle(p_this);
+          if (minAngle > angle) {
+            minAngle = angle;
+            iClosest = i;
+          }
+        }
+        return var->function(list->getParticle(iClosest));
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments for meta function angleToMostB2BInList");
+      std::string listname = arguments[0];
+
+      // get the list and check it's valid
+      StoreObjPtr<ParticleList> list(listname);
+      if (not list.isValid())
+        B2FATAL("Invalid particle list name " << listname << " given to angleToMostB2BInList");
+
+      auto func = [list](const Particle * particle) -> double {
+
+        // check the list isn't empty
+        if (list->getListSize() == 0)
+          return std::numeric_limits<double>::quiet_NaN();
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto p_this = frame.getMomentum(particle).Vect();
+
+        // find the most back-to-back (the largest opening angle before they
+        // start getting smaller again!)
+        double maxAngle = 0;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto p_compare = frame.getMomentum(compareme).Vect();
+          double angle = p_compare.Angle(p_this);
+          if (maxAngle < angle) maxAngle = angle;
+        }
+        return maxAngle;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr mostB2BInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name
+      if (arguments.size() != 2)
+        B2FATAL("Wrong number of arguments for meta function mostB2BInList");
+
+      // get the list and check it's valid
+      StoreObjPtr<ParticleList> list(arguments[0]);
+      if (not list.isValid())
+        B2FATAL("Invalid particle list name " << arguments[0] << " given to mostB2BInList");
+
+      // the requested variable and check it exists
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+      if (not var)
+        B2FATAL("Invalid variable name " << arguments[1] << " given to mostB2BInList");
+
+      auto func = [list, var](const Particle * particle) -> double {
+        // check the list isn't empty
+        if (list->getListSize() == 0)
+          return std::numeric_limits<double>::quiet_NaN();
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto p_this = frame.getMomentum(particle).Vect();
+
+        // find the most back-to-back (the largest opening angle before they
+        // start getting smaller again!)
+        double maxAngle = 0;
+        int iMostB2B = -1;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto p_compare = frame.getMomentum(compareme).Vect();
+          double angle = p_compare.Angle(p_this);
+          if (maxAngle < angle) {
+            maxAngle = angle;
+            iMostB2B = i;
+          }
+        }
+        return var->function(list->getParticle(iMostB2B));
+      };
+      return func;
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                       "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -2090,5 +2250,13 @@ arguments. Operator precedence is taken into account. For example ::
                       "Returns maximum transverse momentum Pt in the given particle List.");
     REGISTER_VARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
                       "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.");
+    REGISTER_VARIABLE("angleToClosestInList(particleListName)", angleToClosestInList,
+                      "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided.");
+    REGISTER_VARIABLE("closestInList(particleListName, variable)", closestInList,
+                      "Returns `variable` for the closest particle (smallest opening angle) in the list provided.");
+    REGISTER_VARIABLE("angleToMostB2BInList(particleListName)", angleToMostB2BInList,
+                      "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
+    REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
+                      "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
   }
 }

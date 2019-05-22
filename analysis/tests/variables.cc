@@ -2182,6 +2182,124 @@ namespace {
     EXPECT_FLOAT_EQ(vsensible->function(notinthelist), 0.0);
   }
 
+  TEST_F(MetaVariableTest, mostB2BAndClosestParticles)
+  {
+    /* Mock up an event with a "photon" and an "electron" which are nearly back to
+     * back, and second "photon" which is close-ish to the "electron".
+     *
+     * Other test of non-existent / empty lists and variables also included.
+     */
+
+    // Connect gearbox for CMS variables
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    StoreObjPtr<ParticleList> emptylist("testEmptyList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    emptylist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+    emptylist.create();
+    emptylist->initialize(22, "testEmptyList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({ -1.0 , -1.0 , 0.8, 1.2}, // this should be the most b2b to our reference particle
+      22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.2 , 0.7 , 0.9, 3.4},    // should be the closest
+      22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+    };
+    // put the photons in the StoreArray
+    for (const auto& g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // add the reference particle (electron) to the StoreArray
+    const auto* electron = particles.appendNew(
+                             Particle({1.0 , 1.0 , 0.5, 0.8},  // somewhere in the +ve quarter of the detector
+                                      11, Particle::c_Unflavored, Particle::c_Undefined, 2) // needs to be incremented if we add to gamma vector
+                           );
+
+    {
+      EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList"));
+      EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList(A, B)"));
+      EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList(NONEXISTANTLIST)"));
+
+      const auto* empty = Manager::Instance().getVariable("angleToClosestInList(testEmptyList)");
+      EXPECT_TRUE(std::isnan(empty->function(electron)));
+
+      const auto* closest = Manager::Instance().getVariable("angleToClosestInList(testGammaList)");
+      EXPECT_FLOAT_EQ(closest->function(electron), 0.68014491);
+
+      const auto* closestCMS = Manager::Instance().getVariable("useCMSFrame(angleToClosestInList(testGammaList))");
+      EXPECT_FLOAT_EQ(closestCMS->function(electron), 0.72592634);
+    }
+
+    {
+      EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList"));
+      EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList(NONEXISTANTLIST, E)"));
+      EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList(A, B, C)"));
+
+      const auto* empty = Manager::Instance().getVariable("closestInList(testEmptyList, E)");
+      EXPECT_TRUE(std::isnan(empty->function(electron)));
+
+      const auto* closest = Manager::Instance().getVariable("closestInList(testGammaList, E)");
+      EXPECT_FLOAT_EQ(closest->function(electron), 3.4);
+
+      const auto* closestCMS = Manager::Instance().getVariable("useCMSFrame(closestInList(testGammaList, E))");
+      EXPECT_FLOAT_EQ(closestCMS->function(electron), 3.2732551); // the energy gets smeared because of boost
+
+      const auto* closestCMSLabE = Manager::Instance().getVariable("useCMSFrame(closestInList(testGammaList, useLabFrame(E)))");
+      EXPECT_FLOAT_EQ(closestCMSLabE->function(electron), 3.4); // aaand should be back to the lab frame value
+    }
+
+    {
+      EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList"));
+      EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList(A, B)"));
+      EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList(NONEXISTANTLIST)"));
+
+      const auto* empty = Manager::Instance().getVariable("angleToMostB2BInList(testEmptyList)");
+      EXPECT_TRUE(std::isnan(empty->function(electron)));
+
+      const auto* mostB2B = Manager::Instance().getVariable("angleToMostB2BInList(testGammaList)");
+      EXPECT_FLOAT_EQ(mostB2B->function(electron), 2.2869499);
+
+      const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(angleToMostB2BInList(testGammaList))");
+      EXPECT_FLOAT_EQ(mostB2BCMS->function(electron), 2.6054888);
+    }
+
+    {
+      EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList"));
+      EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList(NONEXISTANTLIST, E)"));
+      EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList(A, B, C)"));
+
+      const auto* empty = Manager::Instance().getVariable("mostB2BInList(testEmptyList, E)");
+      EXPECT_TRUE(std::isnan(empty->function(electron)));
+
+      const auto* mostB2B = Manager::Instance().getVariable("mostB2BInList(testGammaList, E)");
+      EXPECT_FLOAT_EQ(mostB2B->function(electron), 1.2);
+
+      const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, E))");
+      EXPECT_FLOAT_EQ(mostB2BCMS->function(electron), 1.0647389); // the energy gets smeared because of boost
+
+      const auto* mostB2BCMSLabE = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, useLabFrame(E)))");
+      EXPECT_FLOAT_EQ(mostB2BCMSLabE->function(electron), 1.2); // aaand should be back to the lab frame value
+    }
+  }
+
   TEST_F(MetaVariableTest, totalEnergyOfParticlesInList)
   {
     // we need the particles StoreArray

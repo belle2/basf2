@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Björn Spruck                                             *
- * Use: PXD-Tracking-Cluster DQM                                              *
+ * Use: PXD-Tracking-Cluster DQM                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -73,8 +73,7 @@ void PXDTrackClusterDQMModule::defineHisto()
                                             100, 0, 100);
     if (m_moreHistos) {
       m_trackClusterChargeUC[avxdid] = new TH1F("PXD_Track_Cluster_Charge_UC_" + buff,
-                                                "PXD Track Cluster Charge (uncorrected)" + buff + ";Charge/ADU;",
-                                                100, 0, 100);
+                                                "PXD Track Cluster Charge (uncorrected)" + buff + ";Charge/ADU;", 100, 0, 100);
     }
   }
 

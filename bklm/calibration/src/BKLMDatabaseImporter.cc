@@ -33,7 +33,9 @@
 #include <map>
 #include <fstream>
 #include <iostream>
-#include <TClonesArray.h>
+
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;

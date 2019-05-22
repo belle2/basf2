@@ -19,9 +19,9 @@
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include "TFile.h"
+#include <TH1F.h>
+#include <TH2F.h>
 #include "TTree.h"
-#include "TCanvas.h"
-#include "TH2D.h"
 
 #include <map>
 #include <iostream>

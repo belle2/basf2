@@ -38,18 +38,25 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class ClusterFilterValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
+    """Prepare and execute a basf2 job to read generated events or generate new events then validate the CDC cluster filter"""
+    #: basf2 module for CDC cluster preparation
     cluster_preparation_module = basf2.register_module("TFCDC_ClusterPreparer")
 
+    #: create a python profile
     py_profile = True
+    #: output ROOT file
     output_file_name = "ClusterFilterValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
 
     def create_argument_parser(self, **kwds):
+        """Configure the basf2 job script using the translated command-line arguments"""
         argument_parser = super(ClusterFilterValidationRun, self).create_argument_parser(**kwds)
         return argument_parser
 
     def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
+        """
+        Sets up a path that plays back pregenerated events or generates events
+        based on the properties in the base class.
+        """
         main_path = super(ClusterFilterValidationRun, self).create_path()
 
         cluster_preparation_module = self.get_basf2_module(self.cluster_preparation_module)
@@ -70,26 +77,33 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
     """Module to collect information about the facet creation cuts and compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
+        """Constructor"""
         super(ClusterFilterValidationModule, self).__init__(foreach="CDCWireHitClusterVector",
                                                             output_file_name=output_file_name)
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         self.cluster_varset = Belle2.TrackFindingCDC.CDCWireHitClusterVarSet()
 
     def initialize(self):
+        """Receive signal at the start of event processing"""
         self.cluster_varset.initialize()
         super(ClusterFilterValidationModule, self).initialize()
 
     def terminate(self):
+        """Receive signal at the end of event processing"""
         self.cluster_varset.terminate()
         super(ClusterFilterValidationModule, self).terminate()
 
     def prepare(self):
+        """Fill the MC hit table"""
         self.mc_hit_lookup.fill()
 
     def pick(self, facet):
+        """Always pick, never reject"""
         return True
 
     def peel(self, cluster):
+        """Extract and store CDC hit and cluster information"""
+
         mc_hit_lookup = self.mc_hit_lookup
 
         self.cluster_varset.extract(cluster)
@@ -111,7 +125,9 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
         cluster_crops.update(truth_dict)
         return cluster_crops
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="tree")
+    #: Save histograms in a sub folder
     save_histograms = refiners.save_histograms(outlier_z_score=5.0,
                                                allow_discrete=True,
                                                folder_name="histograms")

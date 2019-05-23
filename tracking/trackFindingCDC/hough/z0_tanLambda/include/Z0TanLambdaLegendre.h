@@ -42,6 +42,7 @@ namespace Belle2 {
       {
       }
 
+      /// Side view: use the linear formula for z(s)
       static const bool m_lookingForQuadraticTracks = false;
     };
   }

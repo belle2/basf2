@@ -33,16 +33,6 @@ namespace Belle2 {
     ~EKLMChannelData();
 
     /**
-     * Get if channel is active or not.
-     */
-    bool getActive() const;
-
-    /**
-     * Set if channel is active or not.
-     */
-    void setActive(bool active);
-
-    /**
      * Get pedestal.
      */
     float getPedestal() const;

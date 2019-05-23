@@ -81,12 +81,6 @@ namespace Belle2 {
     //! Export BKLM simulation parameters from the database
     void exportBklmSimulationPar();
 
-    //! Import BKLM bad channels into the database
-    void importBklmBadChannels(int expNoStart, int runStart, int expNoStop, int runStop, std::string fileName);
-
-    //! Export BKLM bad channels from the database
-    void exportBklmBadChannels();
-
     //! Import BKLM Misalignment parameters into the database
     void importBklmMisAlignment();
 
@@ -122,12 +116,6 @@ namespace Belle2 {
 
     //! Export BKLM time window cut
     void exportBklmTimeWindow();
-
-    //! Import BKLM strip efficiencies into the database
-    void importBklmStripEfficiency(int expStart, int runStart, int expStop, int runStop, std::string fileName);
-
-    //! Export BKLM bad channels from the database
-    void exportBklmStripEfficiency();
 
   private:
 

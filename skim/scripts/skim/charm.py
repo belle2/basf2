@@ -10,6 +10,7 @@ __authors__ = [
 
 from basf2 import *
 from modularAnalysis import *
+from vertex import *
 
 
 def D0ToHpJm(path):
@@ -186,3 +187,45 @@ def CharmRareList(path):
 
     Lists = D0List
     return Lists
+
+
+def DstToD0LeptonicDecay(path):
+    charmcuts = '1.81 < M < 1.91'
+    Dstcuts = '0 < Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5'
+
+    # I will give e, mu, and pi a criteria of PID, e-ID > 0.9, mu-ID > 0.9, pi-ID > 0.6 when I analyze.
+
+    D0_Channels = ['e-:all e+:all',
+                   'e+:all mu-:all',
+                   'e-:all mu+:all',
+                   'mu+:all mu-:all',
+                   'pi+:all pi-:all']
+
+    # all? loose?
+    # pipi is just for normalization.
+
+    DstList = []
+
+    for chID, channel in enumerate(D0_Channels):
+        reconstructDecay('D0:LeptonicDecay' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        reconstructDecay('D*+:Primary' + str(chID) + ' -> pi+:spi D0:LeptonicDecay' + str(chID),
+                         Dstcuts, chID, path=path)  # spi means slow pion produced by D*+
+
+        matchMCTruth('D0:LeptonicDecay' + str(chID), path=path)
+        matchMCTruth('D*+:Primary' + str(chID), path=path)
+
+        vertexRave('D0:LeptonicDecay' + str(chID), 0.001, path=path)
+        vertexRave(
+            'D*+:Primary' +
+            str(chID),
+            0.001,
+            'D*+:all' +
+            str(chID) +
+            ' -> ^pi+:spi ^D0:LeptonicDecay' +
+            str(chID),
+            'ipprofile',
+            path=path)
+
+        DstList.append('D*+:Primary' + str(chID))
+
+    return DstList

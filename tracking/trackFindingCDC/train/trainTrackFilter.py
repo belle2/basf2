@@ -16,10 +16,15 @@ from tracking.adjustments import adjust_module
 
 class TrackFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
     """Run to record tracks encountered at the TrackRejecter and retrain its mva method"""
+
+    #: number of events to generate
     n_events = 3000
+    #: use the generic event generator
     generator_module = "generic"
+    #: overlay background hits from the events in these files
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
+    #: degree of MC truth-matching
     truth = "truth"
 
     @property
@@ -33,6 +38,7 @@ class TrackFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
 
         add_cdc_track_finding(path)
 
+        #: Process each event according to the user's desired task (train, eval, explore)
         if self.task == "train":
             filterName = "recording"
 
@@ -53,6 +59,7 @@ class TrackFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
         return path
 
     def postprocess(self):
+        """Post-process the results for MC-truth acceptance"""
         if self.task == "eval":
             self.truth = "truth_accept"
         super().postprocess()

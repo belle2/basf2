@@ -33,19 +33,26 @@ import basf2 as b2
 
 
 def parseNumRange(string):
+    """
+    Parse range of integers like xx-yy
+    """
     m = re.match(r'(\d+)(?:-(\d+))?$', string)
     if not m:
         raise ArgumentTypeError("'" + string + "' is not a range of number. Expected forms like '0-5' or '2'.")
     start = m.group(1)
     end = m.group(2) or start
-    return list(range(int(start, 10), int(end, 10) + 1))
+    return set(range(int(start, 10), int(end, 10) + 1))
 
 
 def parseNumList(string):
-    result = []
+    """
+    Parse range of integers like xx-yy,zz
+    """
+    result = set()
     for rr in [x.strip() for x in string.split(',')]:
-        result = result + parseNumRange(rr)
-    return result
+        result |= parseNumRange(rr)
+
+    return list(result)
 
 
 def argparser():
@@ -99,19 +106,25 @@ if __name__ == '__main__':
 
     L = 0
     conn = sqlite3.connect(DB)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+    cmd = f"SELECT SUM({reco}) as lumi, start_time, end_time FROM prev_bhacnt_det_run WHERE exp = ? and run = ?"
+    if(args.verb):
+        print('-' * 61)
+        print(f"Run No   : Delivererd Lumi  | Run start [JST]")
+        print('-' * 61)
     for run in args.runs:
-        cmd = f"SELECT SUM({reco}),start_time,end_time FROM prev_bhacnt_det_run WHERE exp = {args.exp} AND run = {run}"
-        cursor.execute(cmd)
-        test = cursor.fetchone()
-        # print(test,test[0])
-        if (test[0]):
+        cursor.execute(cmd, (args.exp, run))
+        row = cursor.fetchone()
+
+        if (row['lumi']):
             if(args.verb):
-                runDate = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(test[1]))
-                print(f"Run {run}: L={test[0]:8.2f} /nb {runDate}")
-            L += float(test[0])
+                runDate = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(row['start_time']))
+                print(f"Run {run:5d}: L={row['lumi']:8.2f} nb^{-1} | {runDate}")
+            L += float(row['lumi'])
 
     conn.close()
-    print("-----------------------------------------")
+    if(args.verb):
+        print('-' * 61)
 
     print(f"TOTAL    : L={L:5.2f} /nb = {L/1E3:5.2f} /pb = {L/1E6:5.3f} /fb = {L/1E9:5.4f} /ab")

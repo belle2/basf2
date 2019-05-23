@@ -1,21 +1,19 @@
 import glob
 import subprocess
 
-import b2luigi as luigi
-from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
+try:
+    import b2luigi as luigi
+    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
+except ImportError as e:
+    print("Could not import ``b2luigi`` python package. Try ``python3 -m pip3 install [--user] b2luigi`` to install it from PiPI.")
+    raise e
 
 import basf2
 import basf2_mva
 import simulation
 import tracking
 import tracking.root_utils as root_utils
-from tracking.harvesting_validation.combined_module import (
-    CombinedTrackingValidationModule,
-)
-
-
-class Basf2ModuleNotFoundError(Exception):
-    pass
+from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 
 
 def my_basf2_mva_teacher(
@@ -23,7 +21,7 @@ def my_basf2_mva_teacher(
 ):
     """
     My custom wrapper for basf2 mva teacher
-    """
+   """
 
     # extract names of all variables from one record file
     with root_utils.root_open(records_files[0]) as records_tfile:
@@ -648,10 +646,6 @@ class MasterTask(luigi.WrapperTask):
 
 
 if __name__ == "__main__":
-    # set other default number of processes for basf2 path tasks
+    # TODO use argparse to use command line settings
     luigi.set_setting("result_path", "/storage/8/meliachevitch/quality_estimator/")
     luigi.process(MasterTask(), workers=2)
-
-# Local Variables:
-# eval: (blacken-mode t)
-# End:

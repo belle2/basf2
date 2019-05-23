@@ -102,23 +102,18 @@ namespace TreeFitter {
         }
         m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
-        double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);//protected against m_ndf<1
         double deltachisq = chisq - m_chiSquare;
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
+          setExtraInfo(m_particle, "failed", 5);
         } else {
           if (m_niter > 0) {
-            if ((std::abs(deltachisq) < dChisqConv)) {
+            if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
               m_chiSquare = chisq;
               m_status = VertexStatus::Success;
               finished = true ;
               setExtraInfo(m_particle, "failed", 0);
-            } else if (m_niter > 1 && deltachisq > dChisqQuit) {
-              setExtraInfo(m_particle, "failed", 1);
-              m_status  = VertexStatus::Failed;
-              m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
-              finished = true;
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
               setExtraInfo(m_particle, "failed", 2);
               m_status = VertexStatus::NonConverged;

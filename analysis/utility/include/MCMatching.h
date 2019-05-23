@@ -154,5 +154,12 @@ namespace Belle2 {
      * @return number of daughters which are not neutrinos
      */
     static int getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle);
+
+    /**
+     * Add extraInfo of NMissingParticle to the particle, if the particle does not have it.
+     * If the particle has it, increment it.
+     */
+    static void addNMissingParticle(const Particle* particle, const std::string nMissingParticle);
+
   };
 }

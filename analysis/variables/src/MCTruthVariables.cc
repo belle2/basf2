@@ -553,6 +553,44 @@ namespace Belle2 {
       return (double)mcp->hasSeenInDetector(Const::KLM);
     }
 
+    int genNMissingDaughter(const Particle* p, const std::vector<double>& arguments)
+    {
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments for genNMissingDaughter");
+
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (!mcp) {
+        B2WARNING("No MCParticle is associated to the particle");
+        return -1;
+      }
+
+      int PDG = (int)arguments[0];
+      if (PDG == 111) { // pi0
+        return (p->hasExtraInfo("nMissingPi0")) ? p->getExtraInfo("nMissingPi0") : 0;
+      } else if (PDG == 211) { // pi
+        return (p->hasExtraInfo("nMissingPi")) ? p->getExtraInfo("nMissingPi") : 0;
+      } else if (PDG == 321) { // K
+        return (p->hasExtraInfo("nMissingK")) ? p->getExtraInfo("nMissingK") : 0;
+      } else if (PDG == 310) { // K_S0
+        return (p->hasExtraInfo("nMissingKS0")) ? p->getExtraInfo("nMissingKS0") : 0;
+      } else if (PDG == 130) { // K_L0
+        return (p->hasExtraInfo("nMissingKL0")) ? p->getExtraInfo("nMissingKL0") : 0;
+      } else if (PDG == 12 || PDG == 14 || PDG == 16) { // Neutrino
+        return (p->hasExtraInfo("nMissingNeutrino")) ? p->getExtraInfo("nMissingNeutrino") : 0;
+      } else if (PDG == 11) { // E
+        return (p->hasExtraInfo("nMissingE")) ? p->getExtraInfo("nMissingE") : 0;
+      } else if (PDG == 13) { // Mu
+        return (p->hasExtraInfo("nMissingMu")) ? p->getExtraInfo("nMissingMu") : 0;
+      } else if (PDG == 2212) { // Proton
+        return (p->hasExtraInfo("nMissingP")) ? p->getExtraInfo("nMissingP") : 0;
+      } else if (PDG == 2112) { // Neutron
+        return (p->hasExtraInfo("nMissingN")) ? p->getExtraInfo("nMissingN") : 0;
+      } else {
+        return -999;
+      }
+    }
+
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -646,6 +684,11 @@ namespace Belle2 {
                       "Prong for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "Prong for the negative tau lepton in a tau pair generated event.")
+
+    REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
+                      "Returns the number of missing daughter having assigned PDG code."
+                      "-1 if the no MCParticle is associated to the particle."
+                      "-999 if PDG code is not of FSP")
 
 
     VARIABLE_GROUP("MC particle seen in subdetectors");

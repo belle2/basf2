@@ -8,7 +8,7 @@ Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
 https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
 
 Usage:
-    b2integrated_luminosity_online.py --exp <E> --runs <Range> [--verbose] [--db db_path]
+    b2info-luminosity-online --exp <E> --runs <Range> [--verbose] [--db db_path]
 
 <E> experiment number (mandatory)
 <Range> run range (mandatory)

@@ -50,7 +50,7 @@ namespace Belle2 {
 
     int m_packetLengthByte = 0; /**< packet length  in byte*/
     int m_length; /**< packet length*/
-    int*  m_rootdata; /**< pointer to data packet of m_length bytes*/
+    int*  m_rootdata; /**< pointer to data packet of m_length words*/
 
     int m_index; /**< transient index*/
     uint32_t* m_data32; /**< pointer to transient 32-bit value*/
@@ -68,9 +68,9 @@ namespace Belle2 {
     void addROIraw(unsigned long int roiraw); /**< add a ROIrawID */
     void setCRC(); /**< set CRC */
 
-    int getPacketLengthByte() {return m_packetLengthByte;}; /**< get packet length in bytes*/
-    int getLength() {return m_length;}; /**< get packet length*/
-    int* getRootdata() {return m_rootdata;}; /**< get pointer to the data packet*/
+    int getPacketLengthByte() {return m_packetLengthByte;} /**< get packet length in bytes*/
+    int getLength() {return m_length;} /**< get packet length*/
+    int* getRootdata() {return m_rootdata;} /**< get pointer to the data packet*/
 
     void init(int length); /**< initializer*/
 

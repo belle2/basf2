@@ -42,7 +42,8 @@
 
 // ----------------------------------------------------------------------------
 // SoftwareTriggerResult
-// As of version 5, the result consists of a pair of prescaled - non prescaled result. We just full up with 0 = no result.
+// As of version 5, the result consists of a pair of prescaled - non prescaled result, not only a prescaled result.
+// We pad the non-prescaled one with 0, which is equal to "no result".
 #pragma read sourceClass="Belle2::SoftwareTriggerResult" version="[-4]" \
   source="std::map<std::string, int> m_results" \
   targetClass="Belle2::SoftwareTriggerResult" target="m_results" \

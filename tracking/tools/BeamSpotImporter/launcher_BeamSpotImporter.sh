@@ -41,7 +41,7 @@ while IFS="" read -r line; do
     echo "basf2 ${IMPORTER} -- --exp 7 --run ${line:71-10:4} --dqm $line"
     bsub -q s -o importer_$iterator.log basf2 ${IMPORTER} -- --exp 7 --run ${line:71-10:4} --dqm $line
     let iterator=iterator+1
-done < run_bucket6.list
+done < run.list
 
 cd -
 echo "processed ${iterator} DQM files"

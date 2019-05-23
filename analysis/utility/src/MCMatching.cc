@@ -369,6 +369,9 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
 
       if (!isFSP(generatedPDG)) {
         flags |= c_MissingResonance;
+        if (absGeneratedPDG == 111) { // missing pi0
+          addNMissingParticle(particle, "nMissingPi0");
+        }
       } else if (generatedPDG == 22) { //missing photon
         if (AnalysisConfiguration::instance()->useLegacyMCMatching()) {
           if (!(flags & c_MissFSR) or !(flags & c_MissGamma)) {
@@ -389,14 +392,43 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
         }
       } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
         flags |= c_MissNeutrino;
-
+        addNMissingParticle(particle, "nMissingNeutrino");
       } else { //neither photon nor neutrino -> massive
         flags |= c_MissMassiveParticle;
-        if (absGeneratedPDG == 130) {
+        if (absGeneratedPDG == 321) {
+          addNMissingParticle(particle, "nMissingK");
+        } else if (absGeneratedPDG == 310) {
+          addNMissingParticle(particle, "nMissingKS0");
+        } else if (absGeneratedPDG == 130) {
           flags |= c_MissKlong;
+          addNMissingParticle(particle, "nMissingKL0");
+        } else if (absGeneratedPDG == 211) {
+          addNMissingParticle(particle, "nMissingPi");
+        } else if (absGeneratedPDG == 11) {
+          addNMissingParticle(particle, "nMissingE");
+        } else if (absGeneratedPDG == 13) {
+          addNMissingParticle(particle, "nMissingMu");
+        } else if (absGeneratedPDG == 2212) {
+          addNMissingParticle(particle, "nMissingP");
+        } else if (absGeneratedPDG == 2112) {
+          addNMissingParticle(particle, "nMissingN");
         }
       }
     }
   }
   return flags;
 }
+
+void MCMatching::addNMissingParticle(const Particle* particle, const std::string nMissingParticle)
+{
+  if (particle->hasExtraInfo(nMissingParticle)) {
+    // increment nMissingNeutrino, if particle has
+    const_cast<Particle*>(particle)->setExtraInfo(nMissingParticle, particle->getExtraInfo(nMissingParticle) + 1);
+  } else {
+    // add nMissingParticle as extraInfo, if particle does not have
+    const_cast<Particle*>(particle)->addExtraInfo(nMissingParticle, 1);
+  }
+
+  return;
+}
+

@@ -198,12 +198,18 @@ namespace Belle2 {
        */
       int m_errorRate;
 
+      /** this 4-bits value should be 1111 if no headers/trailers are missing */
+      unsigned short seenHeadersAndTrailers: 4;
+
       /** counters for specific ERRORS produced by the Unpacker */
       int nTriggerMatchErrors;
       int nEventMatchErrors;
       int nUpsetAPVsErrors;
       int nErrorFieldErrors;
       int nMissingAPVsErrors;
+      int nFADCMatchErrors;
+      int nAPVErrors;
+      int nFTBFlagsErrors;
 
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;

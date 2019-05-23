@@ -103,6 +103,9 @@ namespace Belle2 {
     bool badMapping; /**<bad mapping error*/
     bool badHeader; /**<bad header error*/
     bool badTrailer; /**<bad trailer error*/
+    bool missedHeader; /** missed Header error*/
+    bool missedTrailer; /** missed Trailer error*/
+
     unsigned short fadcNo; /**<fadc number*/
     //unsigned short apvNo;
 

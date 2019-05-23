@@ -86,10 +86,12 @@ void SVDUnpackerDQMModule::defineHisto()
   const unsigned short Bins_UpsetAPV = 1;
   const unsigned short Bins_BadMapping = 1;
   const unsigned short Bins_BadHeader = 1;
-  const unsigned short Bins_BadTrailer = 1;
+  const unsigned short Bins_MissedTrailer = 1;
+  const unsigned short Bins_MissedHeader = 1;
+
 
   const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
-                               Bins_BadMapping + Bins_BadHeader + Bins_BadTrailer;
+                               Bins_BadMapping + Bins_BadHeader + Bins_MissedTrailer + Bins_MissedHeader;
 
   DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
   DQMEventFractionHisto = new TH1S("DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
@@ -101,7 +103,7 @@ void SVDUnpackerDQMModule::defineHisto()
   DQMEventFractionHisto->GetYaxis()->SetTitleOffset(1.5);
   DQMEventFractionHisto->SetMinimum(0);
 
-  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "badHead", "badTrail", "badMapping"};
+  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "EVTmatch", "missHead", "missTrail", "badMapping"};
 
 
   //preparing X axis of the histograms
@@ -195,6 +197,8 @@ void SVDUnpackerDQMModule::event()
     badMapping = m_svdDAQDiagnostics[i]->getBadMapping();
     badHeader = m_svdDAQDiagnostics[i]->getBadHeader();
     badTrailer = m_svdDAQDiagnostics[i]->getBadTrailer();
+    missedHeader = m_svdDAQDiagnostics[i]->getMissedHeader();
+    missedTrailer = m_svdDAQDiagnostics[i]->getMissedTrailer();
 
     fadcNo = m_svdDAQDiagnostics[i]->getFADCNumber();
     //apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
@@ -205,7 +209,7 @@ void SVDUnpackerDQMModule::event()
     }
 
     if (ftbFlags != 0 or ftbError != 240 or apvError != 0 or !apvMatch or !fadcMatch or upsetAPV or badMapping or badHeader
-        or badTrailer) {
+        or badTrailer or missedHeader or missedTrailer) {
 
       badEvent = 1;
 
@@ -217,12 +221,13 @@ void SVDUnpackerDQMModule::event()
           fadc_map.clear();
           break;
         } else {
-          DQMUnpackerHisto->Fill(19, ybin->second);
+          DQMUnpackerHisto->Fill(20, ybin->second);
         }
       }
 
       if (badHeader) DQMUnpackerHisto->Fill(17, ybin->second);
-      if (badTrailer) DQMUnpackerHisto->Fill(18, ybin->second);
+      if (missedHeader) DQMUnpackerHisto->Fill(18, ybin->second);
+      if (badTrailer or missedTrailer) DQMUnpackerHisto->Fill(19, ybin->second);
 
       if (ftbFlags != 0) {
         if (ftbFlags & 16) DQMUnpackerHisto->Fill(5, ybin->second);
@@ -269,7 +274,7 @@ void SVDUnpackerDQMModule::event()
   errorFraction = 100 * float(nBadEvents) / float(nEvents);
 
   if (DQMEventFractionHisto != NULL) {
-    TString histoFractionTitle = TString::Format("SVD Error fraction: %f %%,  Exp %d Run %d", errorFraction, expNumber, runNumber);
+    TString histoFractionTitle = TString::Format("SVD bad events fraction: %f %%,  Exp %d Run %d", errorFraction, expNumber, runNumber);
     DQMEventFractionHisto->SetTitle(histoFractionTitle.Data());
   }
 
@@ -283,10 +288,10 @@ void SVDUnpackerDQMModule::endRun()
 {
   // Summary report on SVD DQM monitor
   if (nBadEvents) {
-    B2WARNING("======================= SVD DQM Statistics: ===================================");
-    B2WARNING(" We found " << nBadEvents << " corrupted events out of " << nEvents << " total events, which is " << errorFraction <<
+    B2WARNING("=================== SVD DQM Data Format Statistics: =============");
+    B2WARNING(" We found " << nBadEvents << "/" << nEvents << " corrupted events, which is " << errorFraction <<
               "%");
-    B2WARNING("===============================================================================");
+    B2WARNING("=================================================================");
   }
 
 }

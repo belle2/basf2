@@ -46,6 +46,8 @@ namespace Belle2 {
     /** print the payloads uniqueID and write tree to the rootfile  */
     virtual void terminate() override;
 
+  private:
+
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
 
@@ -79,9 +81,7 @@ namespace Belle2 {
     double m_ySize = 0; /**< Y position size of the beam spot*/
     double m_zSize = 0; /**< Z position size of the beam spot*/
 
-  private:
 
-    //std::unique_ptr<DBObjPtr<BeamSpot>> m_BeamSpotDB; /**< beam spot payload from the database*/
     DBObjPtr<BeamSpot> m_BeamSpotDB; /**< beam spot payload from the database*/
     BeamSpot m_BeamSpot; /**< beam spot payload */
 

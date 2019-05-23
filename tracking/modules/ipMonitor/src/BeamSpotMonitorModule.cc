@@ -39,6 +39,7 @@ BeamSpotMonitorModule::BeamSpotMonitorModule() : Module()
 void BeamSpotMonitorModule::initialize()
 {
 
+  TDirectory* olddir = gDirectory;
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
   //tree initialization
@@ -54,6 +55,8 @@ void BeamSpotMonitorModule::initialize()
   b_xSize = m_tree->Branch("xSize", &m_xSize, "xSize/d");
   b_ySize = m_tree->Branch("ySize", &m_ySize, "ySize/d");
   b_zSize = m_tree->Branch("zSize", &m_zSize, "zSize/d");
+
+  olddir->cd();
 
 }
 
@@ -101,6 +104,7 @@ void BeamSpotMonitorModule::event()
 
 void BeamSpotMonitorModule::terminate()
 {
+  TDirectory* olddir = gDirectory;
   if (m_rootFilePtr != nullptr) {
 
     m_rootFilePtr->cd();
@@ -110,6 +114,7 @@ void BeamSpotMonitorModule::terminate()
 
     m_rootFilePtr->Close();
 
+    olddir->cd();
   }
 }
 

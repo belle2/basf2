@@ -47,11 +47,11 @@ void IPDQMExpressRecoModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("IPMonitoring")->cd();
 
-  m_h_x = new TH1F("Y4S_Vertex.X", "IP position - coord. X", 1000, -1, 1);
+  m_h_x = new TH1F("Y4S_Vertex.X", "IP position - coord. X", 1000, -0.5, 0.5);
   m_h_x->SetXTitle("IP_coord. X [cm]");
-  m_h_y = new TH1F("Y4S_Vertex.Y", "IP position - coord. Y", 1000, -1, 1);
+  m_h_y = new TH1F("Y4S_Vertex.Y", "IP position - coord. Y", 1000, -0.5, 0.5);
   m_h_y->SetXTitle("IP_coord. Y [cm]");
-  m_h_z = new TH1F("Y4S_Vertex.Z", "IP position - coord. Z", 1000, -2, 2);
+  m_h_z = new TH1F("Y4S_Vertex.Z", "IP position - coord. Z", 2000, -2, 2);
   m_h_z->SetXTitle("IP_coord. Z [cm]");
   m_h_px = new TH1F("Y4S_Vertex.pX", "Total momentum in lab. frame - coord. X", 100, -2, 2);
   m_h_px->SetXTitle("pX [GeV/c]");

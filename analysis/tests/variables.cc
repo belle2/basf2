@@ -1060,6 +1060,23 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(&p), -0.5);
   }
 
+  TEST_F(MetaVariableTest, basicMathTest)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+
+    const Manager::Var* var = Manager::Instance().getVariable("abs(py)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.4);
+
+    var = Manager::Instance().getVariable("min(E, pz)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.8);
+
+    var = Manager::Instance().getVariable("max(E, pz)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 2.0);
+  }
+
   TEST_F(MetaVariableTest, formula)
   {
     // see also unit tests in framework/formula_parser.cc

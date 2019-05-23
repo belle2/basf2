@@ -38,6 +38,11 @@ uint16_t KLMElementNumbers::channelNumberBKLM(
   return channel + 0x8000;
 }
 
+uint16_t KLMElementNumbers::channelNumberBKLM(int bklmChannel) const
+{
+  return bklmChannel + 0x8000;
+}
+
 uint16_t KLMElementNumbers::channelNumberEKLM(
   int endcap, int layer, int sector, int plane, int strip) const
 {
@@ -45,4 +50,9 @@ uint16_t KLMElementNumbers::channelNumberEKLM(
   channel = m_ElementNumbersEKLM->stripNumber(
               endcap, layer, sector, plane, strip);
   return channel;
+}
+
+uint16_t KLMElementNumbers::channelNumberEKLM(int eklmStrip) const
+{
+  return eklmStrip;
 }

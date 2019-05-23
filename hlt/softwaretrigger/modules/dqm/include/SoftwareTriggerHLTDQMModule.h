@@ -14,9 +14,13 @@
 #include <TH1F.h>
 
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/TRGSummary.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <string>
 #include <vector>
@@ -46,6 +50,8 @@ namespace Belle2 {
       // Parameters
       /// Which cuts should be reported? Please remember to include the total_result also, if wanted.
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiers;
+      /// Which L1 cuts should be reported?
+      std::vector<std::string> m_param_l1Identifiers;
 
       /// Which variables should be reported?
       std::vector<std::string> m_param_variableIdentifiers;
@@ -60,11 +66,24 @@ namespace Belle2 {
       /// histograms for the software trigger variables in all calculators (although maybe not filled)
       std::map<std::string, TH1F*> m_triggerVariablesHistograms;
 
+      /// histogram with the L1 information
+      std::map<std::string, TH1F*> m_l1Histograms;
+
+      /// histograms with the run information
+      std::map<std::string, TH1F*> m_runInfoHistograms;
+
       // Datastore members
       /// STM cut results
       StoreObjPtr<SoftwareTriggerResult> m_triggerResult;
+      /// L1 cut results
+      StoreObjPtr<TRGSummary> m_l1TriggerResult;
       /// STM cut variables
       StoreObjPtr<SoftwareTriggerVariables> m_variables;
+      /// Event Info
+      StoreObjPtr<EventMetaData> m_eventMetaData;
+
+      /// Dataobjects
+      DBObjPtr<TRGGDLDBFTDLBits> m_l1NameLookup;
     };
   }
 }

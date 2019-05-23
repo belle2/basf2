@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015  Belle II Collaboration                              *
+ * Copyright(C) 2019  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -20,7 +20,8 @@ using namespace Belle2;
 REG_MODULE(KLMChannelStatusCalibrationCollector)
 
 KLMChannelStatusCalibrationCollectorModule::KLMChannelStatusCalibrationCollectorModule() :
-  CalibrationCollectorModule()
+  CalibrationCollectorModule(),
+  m_HitMap("KLMChannelMapHits", DataStore::c_Persistent)
 {
   setDescription("Module for KLM channel status calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -35,8 +36,11 @@ void KLMChannelStatusCalibrationCollectorModule::prepare()
 {
   m_BKLMDigits.isRequired();
   m_EKLMDigits.isRequired();
-  m_HitMap.registerInDataStore("KLMChannelMapHits");
+  m_HitMap.registerInDataStore();
+  m_HitMap.create();
   m_HitMap->setDataAllChannels(0);
+  TTree* calibrationData = new TTree("calibration_data", "");
+  registerObject<TTree>("calibration_data", calibrationData);
 }
 
 void KLMChannelStatusCalibrationCollectorModule::collect()
@@ -55,24 +59,25 @@ void KLMChannelStatusCalibrationCollectorModule::collect()
   }
 }
 
-void KLMChannelStatusCalibrationCollectorModule::finish()
+void KLMChannelStatusCalibrationCollectorModule::closeRun()
 {
   uint16_t channel;
   unsigned int hits;
-  TTree* calibrationData = new TTree("calibration_data", "");
+  TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
   calibrationData->Branch("channel", &channel, "channel/s");
   calibrationData->Branch("hits", &hits, "hits/i");
   BKLMChannelIndex bklmChannels;
   for (BKLMChannelIndex& bklmChannel : bklmChannels) {
     channel = bklmChannel.getKLMChannelNumber();
     hits = m_HitMap->getChannelData(channel);
-    calibrationData->Write();
+    calibrationData->Fill();
   }
   EKLMChannelIndex eklmChannels;
   for (EKLMChannelIndex& eklmChannel : eklmChannels) {
     channel = eklmChannel.getKLMChannelNumber();
     hits = m_HitMap->getChannelData(channel);
-    calibrationData->Write();
+    calibrationData->Fill();
   }
-  registerObject<TTree>("calibration_data", calibrationData);
+  /* Clear data for case of multiple runs. */
+  m_HitMap->setDataAllChannels(0);
 }

@@ -19,6 +19,7 @@
 #include <bklm/dataobjects/BKLMElementID.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dataobjects/BKLMChannelIndex.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -50,7 +51,6 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
   int slotId = 0;
   int laneId = 0;
   int axisId = 0;
-  int BKLM_ID = 117440512;
   BKLMChannelIndex bklmPlanes(BKLMChannelIndex::c_IndexLevelPlane);
   for (BKLMChannelIndex& bklmPlane : bklmPlanes) {
     int isForward = bklmPlane.getForward();

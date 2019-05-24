@@ -61,7 +61,7 @@ skims = ' LFVZpInvisible LFVZpVisible LeptonicUntagged PRsemileptonicUntagged'
 skims = ' SLUntagged SinglePhotonDark SystematicsEELL SystematicsRadMuMu SystematicsRadEE'
 skims = ' SystematicsLambda Systematics SystematicsTracking TauLFV TCPV TauGeneric'
 skims = ' feiHadronicB0 feiHadronicBplus feiSLB0WithOneLep feiSLBplusWithOneLep'
-bkgs = 'MC12_mixedBGx1  MC12_chargedBGx1 MC12_ccbarBGx1 MC12_ccbarBGx1 MC12_uubarBGx0  MC12_ddbarBGx1  MC12_taupairBGx1'
+bkgs = 'MC12_mixedBGx1  MC12_chargedBGx1 MC12_ccbarBGx1 MC12_ssbarBGx1 MC12_uubarBGx0  MC12_ddbarBGx1  MC12_taupairBGx1'
 bkgs += ' MC12_mixedBGx0 MC12_chargedBGx0 MC12_ccbarBGx0 MC12_ssbarBGx0 MC12_uubarBGx0 MC12_ddbarBGx0 MC12_taupairBGx0'
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')

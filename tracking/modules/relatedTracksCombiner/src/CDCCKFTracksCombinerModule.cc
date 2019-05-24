@@ -97,10 +97,6 @@ void CDCCKFTracksCombinerModule::event()
   for (RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
     auto alreadyInclded = mergedTracks.count(&vxdRecoTrack) ;
 
-    if (alreadyInclded) {
-      std::cout << " already found \n";
-    }
-
     if (not alreadyInclded) {
       RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
       newTrack->addHitsFromRecoTrack(&vxdRecoTrack);

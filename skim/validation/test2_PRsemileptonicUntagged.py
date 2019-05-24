@@ -1,0 +1,33 @@
+#!/usr/bin/env/python3
+# -*-coding: utf-8-*-
+
+"""
+<header>
+    <input>11110100.udst.root</input>
+    <output>PRsemileptonicUntagged_Validation.root</output>
+    <contact>hannah.wakeling@mail.mcgill.ca, philip.grace@adelaide.edu.au</contact>
+</header>
+"""
+
+from basf2 import *
+from modularAnalysis import *
+from variables import variables
+
+path = Path()
+
+inputMdst('default', '11110100.udst.root', path=path)
+
+cutAndCopyLists('B0:all', ['B0:L1', 'B0:L2'], '', path=path)
+
+variables.addAlias('d1_p', 'daughter(1, p)')
+
+variablesToHistogram(
+    filename='PRsemileptonicUntagged_Validation.root',
+    decayString='B0:all',
+    variables=[
+        ('Mbc', 100, 4.0, 5.3),
+        ('d1_p', 100, 0, 5.2)],  # Lepton momentum
+    path=path)
+
+process(path)
+print(statistics)

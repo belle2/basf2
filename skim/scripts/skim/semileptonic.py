@@ -23,14 +23,14 @@ def SemileptonicList(path):
 
     **Decay Modes**:
 
-        * B+ -> D0 e+
-        * B+ -> D0 mu+
-        * B+ -> D*0 e+
-        * B+ -> D*0 mu+
-        * B0 ->  D+ e-
-        * B0 ->  D+ mu-
-        * B0 ->  D*+ e-
-        * B0 ->  D*+ mu-
+        * B+ -> anti-D0 e+
+        * B+ -> anti-D0 mu+
+        * B+ -> anti-D*0 e+
+        * B+ -> anti-D*0 mu+
+        * B0 ->  D- e+
+        * B0 ->  D- mu+
+        * B0 ->  D*- e+
+        * B0 ->  D*- mu+
 
     **Cuts applied**:
 
@@ -45,20 +45,20 @@ def SemileptonicList(path):
         "Racha Cheaib"
     ]
 
-    cutAndCopyList('e-:SLB', 'e-:all', 'p>0.35', True, path=path)
-    cutAndCopyList('mu-:SLB', 'mu-:all', 'p>0.35', True, path=path)
+    cutAndCopyList('e+:SLB', 'e+:all', 'p>0.35', True, path=path)
+    cutAndCopyList('mu+:SLB', 'mu+:all', 'p>0.35', True, path=path)
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
-    BplusChannels = ['D0:all e+:SLB',
-                     'D0:all mu+:SLB',
-                     'D*0:all e+:SLB',
-                     'D*0:all mu+:SLB'
+    BplusChannels = ['anti-D0:all e+:SLB',
+                     'anti-D0:all mu+:SLB',
+                     'anti-D*0:all e+:SLB',
+                     'anti-D*0:all mu+:SLB'
                      ]
 
-    B0Channels = ['D+:all e-:SLB',
-                  'D+:all mu-:SLB',
-                  'D*+:all e-:SLB',
-                  'D*+:all mu-:SLB'
+    B0Channels = ['D-:all e+:SLB',
+                  'D-:all mu+:SLB',
+                  'D*-:all e+:SLB',
+                  'D*-:all mu+:SLB'
                   ]
 
     bplusList = []

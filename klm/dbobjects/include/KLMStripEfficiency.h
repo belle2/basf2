@@ -119,7 +119,7 @@ namespace Belle2 {
     float getEndcapEfficiency(int endcap, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberEKLM(endcap, layer, sector, plane, strip);
+      uint16_t stripId = elementNumbers->channelNumberEKLM(endcap, sector, layer, plane, strip);
       return getEfficiency(stripId);
     }
 
@@ -161,7 +161,7 @@ namespace Belle2 {
     float getEndcapEfficiencyError(int endcap, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberEKLM(endcap, layer, sector, plane, strip);
+      uint16_t stripId = elementNumbers->channelNumberEKLM(endcap, sector, layer, plane, strip);
       return getEfficiencyError(stripId);
     }
 

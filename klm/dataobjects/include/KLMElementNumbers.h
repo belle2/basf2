@@ -47,12 +47,12 @@ namespace Belle2 {
     /**
      * Get channel number for EKLM.
      * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
      * @param[in] sector Sector number.
+     * @param[in] layer  Layer number.
      * @param[in] plane  Plane number.
      * @param[in] strip  Strip number.
      */
-    uint16_t channelNumberEKLM(int endcap, int layer, int sector, int plane,
+    uint16_t channelNumberEKLM(int endcap, int sector, int layer, int plane,
                                int strip) const;
 
     /**

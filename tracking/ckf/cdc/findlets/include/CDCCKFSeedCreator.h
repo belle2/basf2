@@ -26,9 +26,6 @@ namespace Belle2 {
     void apply(const std::vector<RecoTrack*>& recoTracks, std::vector<CDCCKFPath>& seeds) override
     {
       for (RecoTrack* recoTrack : recoTracks) {
-
-        if (recoTrack->hasCDCHits()) continue;  /// XXXXXXX
-
         CDCCKFState seedState(recoTrack, recoTrack->getMeasuredStateOnPlaneFromLastHit());
         seeds.push_back({seedState});
       }

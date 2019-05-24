@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/modules/relatedTracksCombiner/CDCCKFTracksCombinerModule.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
@@ -47,7 +46,6 @@ void CDCCKFTracksCombinerModule::initialize()
 
 void CDCCKFTracksCombinerModule::event()
 {
-  TrackFitter trackFitter;
   std::set <RecoTrack*> mergedTracks;
   // Loop over all CDC reco tracks and add them to the store array of they do not have a match or combined them with
   // their VXD partner if they do.
@@ -70,7 +68,7 @@ void CDCCKFTracksCombinerModule::event()
     }
 
     // Do not output non-fittable tracks
-    if (not vxdTrackAfter and not vxdTrackBefore and not trackFitter.fit(cdcRecoTrack)) {
+    if (not vxdTrackAfter and not vxdTrackBefore) {
       continue;
     }
 
@@ -105,7 +103,7 @@ void CDCCKFTracksCombinerModule::event()
       std::cout << " already found \n";
     }
 
-    if (not alreadyInclded and trackFitter.fit(vxdRecoTrack)) {
+    if (not alreadyInclded) {
       RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
       newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
       newTrack->addRelationTo(&vxdRecoTrack);

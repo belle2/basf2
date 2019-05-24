@@ -46,22 +46,39 @@ BKLMChannelIndex::~BKLMChannelIndex()
 {
 }
 
-uint16_t BKLMChannelIndex::getKLMChannelNumber()
+void BKLMChannelIndex::setIndexLevel(enum IndexLevel indexLevel)
+{
+  m_IndexLevel = indexLevel;
+  if (indexLevel == c_IndexLevelStrip) {
+    m_NStripsPlane = BKLMElementNumbers::getNStrips(
+                       m_Forward, m_Sector, m_Layer, m_Plane);
+  }
+}
+
+uint16_t BKLMChannelIndex::getKLMChannelNumber() const
 {
   return m_ElementNumbers->channelNumberBKLM(
            m_Forward, m_Sector, m_Layer, m_Plane, m_Strip);
 }
 
-BKLMChannelIndex& BKLMChannelIndex::begin()
+uint16_t BKLMChannelIndex::getKLMModuleNumber() const
 {
-  static BKLMChannelIndex index(0, 1, 1, 0, 1, m_IndexLevel);
-  return index;
+  return m_ElementNumbers->moduleNumberBKLM(m_Forward, m_Sector, m_Layer);
+}
+
+BKLMChannelIndex BKLMChannelIndex::begin()
+{
+  return BKLMChannelIndex(0, 1, 1, 0, 1, m_IndexLevel);
 }
 
 BKLMChannelIndex& BKLMChannelIndex::end()
 {
+  /*
+   * The index level does not matter for end check, thus,
+   * the object can be created once.
+   */
   static BKLMChannelIndex index(
-    BKLMElementNumbers::getMaximalForwardNumber() + 1, 1, 1, 0, 1, m_IndexLevel);
+    BKLMElementNumbers::getMaximalForwardNumber() + 1, 1, 1, 0, 1);
   return index;
 }
 

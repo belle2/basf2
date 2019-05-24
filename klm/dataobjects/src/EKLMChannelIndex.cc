@@ -46,7 +46,7 @@ EKLMChannelIndex::~EKLMChannelIndex()
 uint16_t EKLMChannelIndex::getKLMChannelNumber()
 {
   return m_ElementNumbers->channelNumberEKLM(
-           m_Endcap, m_Layer, m_Sector, m_Plane, m_Strip);
+           m_Endcap, m_Sector, m_Layer, m_Plane, m_Strip);
 }
 
 EKLMChannelIndex& EKLMChannelIndex::begin()
@@ -58,12 +58,7 @@ EKLMChannelIndex& EKLMChannelIndex::begin()
 EKLMChannelIndex& EKLMChannelIndex::end()
 {
   static EKLMChannelIndex index(
-    EKLMElementNumbers::getMaximalEndcapNumber(),
-    EKLMElementNumbers::getMaximalSectorNumber(),
-    EKLMElementNumbers::getMaximalLayerNumber(),
-    EKLMElementNumbers::getMaximalPlaneNumber(),
-    EKLMElementNumbers::getMaximalStripNumber(),
-    m_IndexLevel);
+    EKLMElementNumbers::getMaximalEndcapNumber() + 1, 1, 1, 1, 1, m_IndexLevel);
   return index;
 }
 
@@ -86,7 +81,7 @@ void EKLMChannelIndex::increment(enum IndexLevel indexLevel)
       break;
     case c_IndexLevelLayer:
       m_Layer++;
-      if (m_Layer > EKLMElementNumbers::getMaximalLayerNumber()) {
+      if (m_Layer > m_ElementNumbersEKLM->getMaximalDetectorLayerNumber(m_Endcap)) {
         m_Layer = 1;
         increment(c_IndexLevelSector);
       }
@@ -100,8 +95,6 @@ void EKLMChannelIndex::increment(enum IndexLevel indexLevel)
       break;
     case c_IndexLevelEndcap:
       m_Endcap++;
-      if (m_Endcap > EKLMElementNumbers::getMaximalEndcapNumber())
-        m_Endcap = 1;
       break;
   }
 }

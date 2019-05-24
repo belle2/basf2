@@ -61,16 +61,7 @@ BKLMChannelIndex& BKLMChannelIndex::begin()
 BKLMChannelIndex& BKLMChannelIndex::end()
 {
   static BKLMChannelIndex index(
-    BKLMElementNumbers::getMaximalForwardNumber(),
-    BKLMElementNumbers::getMaximalSectorNumber(),
-    BKLMElementNumbers::getMaximalLayerNumber(),
-    BKLMElementNumbers::getMaximalPlaneNumber(),
-    BKLMElementNumbers::getNStrips(
-      BKLMElementNumbers::getMaximalForwardNumber(),
-      BKLMElementNumbers::getMaximalSectorNumber(),
-      BKLMElementNumbers::getMaximalLayerNumber(),
-      BKLMElementNumbers::getMaximalPlaneNumber()),
-    m_IndexLevel);
+    BKLMElementNumbers::getMaximalForwardNumber() + 1, 1, 1, 0, 1, m_IndexLevel);
   return index;
 }
 
@@ -109,8 +100,6 @@ void BKLMChannelIndex::increment(enum IndexLevel indexLevel)
       break;
     case c_IndexLevelForward:
       m_Forward++;
-      if (m_Forward > BKLMElementNumbers::getMaximalForwardNumber())
-        m_Forward = 0;
       break;
   }
 }

@@ -17,8 +17,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
-
-#include<framework/gearbox/Const.h>
+#include <framework/gearbox/Const.h>
 
 #include <unordered_set>
 

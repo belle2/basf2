@@ -18,6 +18,7 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dataobjects/BKLMElementID.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/BKLMChannelIndex.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -50,52 +51,49 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
   int laneId = 0;
   int axisId = 0;
   int BKLM_ID = 117440512;
-  for (int isForward = 0; isForward <= BKLMElementNumbers::getMaximalForwardNumber(); isForward++) {
-    for (int sector = 1; sector <= BKLMElementNumbers::getMaximalSectorNumber(); sector++) {
-      for (int layer = 1; layer <= BKLMElementNumbers::getMaximalLayerNumber(); layer++) {
-        //plane = 0 for z; plane = 1 for phi
-        for (int plane = 0; plane <= BKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
+  BKLMChannelIndex bklmPlanes(BKLMChannelIndex::c_IndexLevelPlane);
+  for (BKLMChannelIndex& bklmPlane : bklmPlanes) {
+    int isForward = bklmPlane.getForward();
+    int sector = bklmPlane.getSector();
+    int layer = bklmPlane.getLayer();
+    int plane = bklmPlane.getPlane();
+    if (isForward == 1 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1 + BKLM_ID;
+    if (isForward == 1 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2 + BKLM_ID;
+    if (isForward == 0 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3 + BKLM_ID;
+    if (isForward == 0 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 4 + BKLM_ID;
+    if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
+    if (sector == 1 || sector == 2) slotId = sector + 2;
+    if (sector == 7 || sector == 8) slotId = sector - 6;
 
-          if (isForward == 1 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1 + BKLM_ID;
-          if (isForward == 1 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2 + BKLM_ID;
-          if (isForward == 0 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3 + BKLM_ID;
-          if (isForward == 0 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 4 + BKLM_ID;
-          if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
-          if (sector == 1 || sector == 2) slotId = sector + 2;
-          if (sector == 7 || sector == 8) slotId = sector - 6;
+    if (layer > 2)  laneId = layer + 5;
+    else laneId = layer;
 
-          if (layer > 2)  laneId = layer + 5;
-          else laneId = layer;
+    if (layer < 3) {
+      if (plane == 0) axisId = 1;
+      else if (plane == 1) axisId = 0;
+    } else axisId = plane;
 
-          if (layer < 3) {
-            if (plane == 0) axisId = 1;
-            else if (plane == 1) axisId = 0;
-          } else axisId = plane;
+    int MaxiChannel = BKLMElementNumbers::getNStrips(
+                        isForward, sector, layer, plane);
 
-          int MaxiChannel = BKLMElementNumbers::getNStrips(
-                              isForward, sector, layer, plane);
+    bool dontFlip = false;
+    if (isForward == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
+    if (isForward == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
 
-          bool dontFlip = false;
-          if (isForward == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
-          if (isForward == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
+    for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
+      int channelId = iStrip;
+      if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
 
-          for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
-            int channelId = iStrip;
-            if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
+      if (plane == 1) { //phi strips
+        if (layer == 1)  channelId = channelId + 4;
+        if (layer == 2)  channelId = channelId + 2;
+      } else if (plane == 0) { //z strips
+        if (layer < 3 && channelId > 9) channelId = channelId + 6;
+      }
 
-            if (plane == 1) { //phi strips
-              if (layer == 1)  channelId = channelId + 4;
-              if (layer == 2)  channelId = channelId + 2;
-            } else if (plane == 0) { //z strips
-              if (layer < 3 && channelId > 9) channelId = channelId + 6;
-            }
-
-            m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, isForward, sector, layer, plane, iStrip);
-          }// end of loop channels
-        }//end of loop plane
-      }//end of loop layers
-    }//end of loop sectors
-  }//end fb
+      m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, isForward, sector, layer, plane, iStrip);
+    }
+  }
 }
 
 void BKLMDatabaseImporter::setElectronicMappingLane(

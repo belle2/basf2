@@ -60,3 +60,23 @@ uint16_t KLMElementNumbers::channelNumberEKLM(int eklmStrip) const
 {
   return eklmStrip;
 }
+
+uint16_t KLMElementNumbers::moduleNumberBKLM(
+  int forward, int sector, int layer) const
+{
+  uint16_t module;
+  module = BKLMElementNumbers::moduleNumber(forward, sector, layer);
+  return module + m_BKLMOffset;
+}
+
+uint16_t KLMElementNumbers::moduleNumberEKLM(
+  int endcap, int sector, int layer) const
+{
+  uint16_t module;
+  /*
+   * Note that the default order of elements is different
+   * for EKLM-specific code!
+   */
+  module = m_ElementNumbersEKLM->sectorNumber(endcap, layer, sector);
+  return module;
+}

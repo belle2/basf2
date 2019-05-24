@@ -32,6 +32,13 @@ uint16_t BKLMElementNumbers::channelNumber(
          | ((strip - 1) << BKLM_STRIP_BIT);
 }
 
+uint16_t BKLMElementNumbers::moduleNumber(int forward, int sector, int layer)
+{
+  return (forward ? BKLM_END_MASK : 0)
+         | ((sector - 1) << BKLM_SECTOR_BIT)
+         | ((layer - 1) << BKLM_LAYER_BIT);
+}
+
 int BKLMElementNumbers::getNStrips(
   int forward, int sector, int layer, int plane)
 {

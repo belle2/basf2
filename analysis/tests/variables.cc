@@ -454,12 +454,24 @@ namespace {
     }
   };
 
-  TEST_F(MCTruthVariablesTest, ECLMCMatchVariables)
+  TEST_F(MCTruthVariablesTest, ECLMCMatchWeightVariable)
+  {
+    StoreArray<Particle> particles;
+    const auto* photon = particles[0];
+    const auto* electron = particles[1];
+
+    const auto* weight = Manager::Instance().getVariable("clusterMCMatchWeight");
+    EXPECT_FLOAT_EQ(weight->function(photon),   12.3);
+    EXPECT_FLOAT_EQ(weight->function(electron), 45.6);
+  }
+
+  TEST_F(MCTruthVariablesTest, ECLBestMCMatchVariables)
   {
     StoreArray<Particle> particles;
     const auto* photon = particles[0];
     const auto* electron = particles[1];
     const auto* misid_photon = particles[2];
+
 
     const auto* pdgcode = Manager::Instance().getVariable("clusterBestMCPDG");
     EXPECT_EQ(pdgcode->function(photon),       22);

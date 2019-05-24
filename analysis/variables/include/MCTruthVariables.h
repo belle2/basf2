@@ -228,6 +228,12 @@ namespace Belle2 {
     double seenInKLM(const Particle*);
 
     /**
+     * retruns the weight of the ECLCluster -> MCParticle relation for the
+     * MCParticle related to the particle provided.
+     */
+    double particleClusterMatchWeight(const Particle* particle);
+
+    /**
      * returns the weight of the ECLCluster -> MCParticle relation for the
      * relation with the largest weight.
      */

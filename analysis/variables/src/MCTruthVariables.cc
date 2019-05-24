@@ -555,6 +555,31 @@ namespace Belle2 {
       return (double)mcp->hasSeenInDetector(Const::KLM);
     }
 
+    double particleClusterMatchWeight(const Particle* particle)
+    {
+      /* Get the weight of the *cluster* mc match for the mcparticle matched to
+       * this particle.
+       *
+       * Note that for track-based particles this is different from the mc match
+       * of the partcle (which it inherits from the mc match of the track)
+       */
+      const MCParticle* matchedToParticle = particle->getMCParticle();
+      if (!matchedToParticle) return std::numeric_limits<float>::quiet_NaN();
+      int matchedToIndex = matchedToParticle->getArrayIndex();
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return std::numeric_limits<float>::quiet_NaN();
+
+      for (unsigned int i = 0; i < mcps.size(); ++i)
+        if (mcps[i]->getArrayIndex() == matchedToIndex)
+          return mcps.weight(i);
+
+      return -1.0;
+    }
+
     double particleClusterBestMCMatchWeight(const Particle* particle)
     {
       /* Get the weight of the best mc match of the cluster associated to
@@ -728,6 +753,10 @@ namespace Belle2 {
                       "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
 
     VARIABLE_GROUP("MC Matching for ECLClusters");
+    REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight,
+                      "Returns the weight of the ECLCluster -> MCParticle relation for the MCParticle matched to the particle. "
+                      "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for rhe cluster. "
+                      "Returns -1 if the cluster *was* matched to particles, but not the match of the particle provided.");
     REGISTER_VARIABLE("clusterBestMCMatchWeight", particleClusterBestMCMatchWeight,
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,

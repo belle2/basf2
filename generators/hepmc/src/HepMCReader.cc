@@ -100,7 +100,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     if (production_vertex) {
       const auto pos = production_vertex->position();
       p.setProductionVertex(TVector3(pos.x(), pos.y(), pos.z()) * len_conv);
-      p.setProductionTime(pos.t() * len_conv / Const::speedOfLight);
+      p.setProductionTime(pos.t() * len_conv * Unit::mm / Const::speedOfLight);
       p.setValidVertex(true);
     }
 

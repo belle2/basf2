@@ -22,20 +22,42 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor.
-     */
-    EKLMChannelIndex();
+    enum IndexLevel {
+
+      /** Endcap. */
+      c_IndexLevelEndcap = 1,
+
+      /** Sector. */
+      c_IndexLevelSector = 2,
+
+      /** Layer. */
+      c_IndexLevelLayer = 3,
+
+      /** Plane. */
+      c_IndexLevelPlane = 4,
+
+      /** Strip. */
+      c_IndexLevelStrip = 5,
+
+    };
 
     /**
      * Constructor.
-     * @param[in] endcap Endcap.
-     * @param[in] sector Sector.
-     * @param[in] layer  Layer.
-     * @param[in] plane  Plane.
-     * @param[in] strip  Strip.
+     * @param[in] indexLevel Index level.
      */
-    EKLMChannelIndex(int endcap, int sector, int layer, int plane, int strip);
+    EKLMChannelIndex(enum IndexLevel indexLevel = c_IndexLevelStrip);
+
+    /**
+     * Constructor.
+     * @param[in] endcap     Endcap.
+     * @param[in] sector     Sector.
+     * @param[in] layer      Layer.
+     * @param[in] plane      Plane.
+     * @param[in] strip      Strip.
+     * @param[in] indexLevel Index level.
+     */
+    EKLMChannelIndex(int endcap, int sector, int layer, int plane, int strip,
+                     enum IndexLevel indexLevel = c_IndexLevelStrip);
 
     /**
      * Destructor.
@@ -118,6 +140,14 @@ namespace Belle2 {
     EKLMChannelIndex& operator*();
 
   protected:
+
+    /**
+     * Increment the index.
+     */
+    void increment(enum IndexLevel indexLevel);
+
+    /** Index level. */
+    enum IndexLevel m_IndexLevel;
 
     /** Endcap. */
     int m_Endcap;

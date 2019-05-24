@@ -41,6 +41,14 @@ namespace Belle2 {
                                   int strip);
 
     /**
+     * Get module number.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     */
+    static uint16_t moduleNumber(int forward, int sector, int layer);
+
+    /**
      * Get number of strips.
      * @param[in] forward Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).

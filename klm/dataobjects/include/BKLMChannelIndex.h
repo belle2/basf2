@@ -22,20 +22,42 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor.
-     */
-    BKLMChannelIndex();
+    enum IndexLevel {
+
+      /** Forward. */
+      c_IndexLevelForward = 1,
+
+      /** Sector. */
+      c_IndexLevelSector = 2,
+
+      /** Layer. */
+      c_IndexLevelLayer = 3,
+
+      /** Plane. */
+      c_IndexLevelPlane = 4,
+
+      /** Strip. */
+      c_IndexLevelStrip = 5,
+
+    };
 
     /**
      * Constructor.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
-     * @param[in] sector  Sector (1-based).
-     * @param[in] layer   Layer (1-based).
-     * @param[in] plane   Plane (0-based).
-     * @param[in] strip   Strip (1-based).
+     * @param[in] indexLevel Index level.
      */
-    BKLMChannelIndex(int forward, int sector, int layer, int plane, int strip);
+    BKLMChannelIndex(enum IndexLevel indexLevel = c_IndexLevelStrip);
+
+    /**
+     * Constructor.
+     * @param[in] forward    Forward (1) or backward (0) BKLM.
+     * @param[in] sector     Sector (1-based).
+     * @param[in] layer      Layer (1-based).
+     * @param[in] plane      Plane (0-based).
+     * @param[in] strip      Strip (1-based).
+     * @param[in] indexLevel Index level.
+     */
+    BKLMChannelIndex(int forward, int sector, int layer, int plane, int strip,
+                     enum IndexLevel indexLevel = c_IndexLevelStrip);
 
     /**
      * Destructor.
@@ -118,6 +140,14 @@ namespace Belle2 {
     BKLMChannelIndex& operator*();
 
   protected:
+
+    /**
+     * Increment the index.
+     */
+    void increment(enum IndexLevel indexLevel);
+
+    /** Index level. */
+    enum IndexLevel m_IndexLevel;
 
     /** Forward. */
     int m_Forward;

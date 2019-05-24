@@ -73,6 +73,9 @@ namespace Belle2 {
      */
     ~KLMElementNumbers();
 
+    /** BKLM offset. */
+    static constexpr uint16_t m_BKLMOffset = 0x8000;
+
     /** EKLM element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
 

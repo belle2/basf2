@@ -35,12 +35,12 @@ uint16_t KLMElementNumbers::channelNumberBKLM(
   uint16_t channel;
   channel = BKLMElementNumbers::channelNumber(
               forward, sector, layer, plane, strip);
-  return channel + 0x8000;
+  return channel + m_BKLMOffset;
 }
 
 uint16_t KLMElementNumbers::channelNumberBKLM(int bklmChannel) const
 {
-  return bklmChannel + 0x8000;
+  return bklmChannel + m_BKLMOffset;
 }
 
 uint16_t KLMElementNumbers::channelNumberEKLM(

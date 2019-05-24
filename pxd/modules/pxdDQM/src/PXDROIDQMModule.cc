@@ -66,10 +66,8 @@ void PXDROIDQMModule::defineHisto()
   hrawROIDCsizeV = new TH1F("hrawROIDCsizeV", "DATCON ROI size;V", 768, 0, 768);
   hrawROIDCsizeU = new TH1F("hrawROIDCsizeU", "DATCON ROI size;U", 250, 0, 250);
 
-  hrawROINrDCvsNrHLT = new TH2F("hrawROINrDCvsNrHLT", "Nr DATCON ROI vs Nr HLT ROI; Nr HLT ROI;Nr DATCON ROI", 100, 0, 100, 100, 0,
-                                100);
-  hrawROIEVTsWithOneSource = new TH2F("hrawROIEVTsWithOneSource", "ROI sources in events; HLT;DATCON", 2, 0, 2, 2,
-                                      0, 2);
+  hrawROINrDCvsNrHLT = new TH2F("hrawROINrDCvsNrHLT", "Nr DATCON ROI vs Nr HLT ROI; Nr HLT ROI;Nr DATCON ROI",
+                                100, 0, 100, 100, 0, 100);
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
     for (VxdID& avxdid : sensors) {
@@ -135,7 +133,6 @@ void PXDROIDQMModule::beginRun()
   hrawROIDCsizeU->Reset();
 
   hrawROINrDCvsNrHLT->Reset();
-  hrawROIEVTsWithOneSource->Reset();
 }
 
 void PXDROIDQMModule::event()
@@ -188,16 +185,4 @@ void PXDROIDQMModule::event()
     }
   }
   hrawROINrDCvsNrHLT->Fill(nr_HLT, nr_DC);
-  if (nr_DC == 0 && nr_HLT == 0) {
-    hrawROIEVTsWithOneSource->Fill("NO", "NO", 1);
-  }
-  if (nr_DC == 0 && nr_HLT != 0) {
-    hrawROIEVTsWithOneSource->Fill("YES", "NO", 1);
-  }
-  if (nr_DC != 0 && nr_HLT == 0) {
-    hrawROIEVTsWithOneSource->Fill("NO", "YES", 1);
-  }
-  if (nr_DC != 0 && nr_HLT != 0) {
-    hrawROIEVTsWithOneSource->Fill("YES", "YES", 1);
-  }
 }

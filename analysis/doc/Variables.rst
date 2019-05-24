@@ -94,6 +94,12 @@ There is further detailed documentation available `here <https://confluence.desy
 .. b2-variables::
    :group: ECL Cluster related
 
+There are also some special variables related to the MC matching of ECL clusters (specifically).
+
+.. b2-variables::
+   :group: MC Matching for ECLClusters
+
+
 Acceptance
 ~~~~~~~~~~
 

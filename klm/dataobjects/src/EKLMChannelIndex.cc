@@ -43,22 +43,30 @@ EKLMChannelIndex::~EKLMChannelIndex()
 {
 }
 
-uint16_t EKLMChannelIndex::getKLMChannelNumber()
+uint16_t EKLMChannelIndex::getKLMChannelNumber() const
 {
   return m_ElementNumbers->channelNumberEKLM(
            m_Endcap, m_Sector, m_Layer, m_Plane, m_Strip);
 }
 
-EKLMChannelIndex& EKLMChannelIndex::begin()
+uint16_t EKLMChannelIndex::getKLMModuleNumber() const
 {
-  static EKLMChannelIndex index(1, 1, 1, 1, 1, m_IndexLevel);
-  return index;
+  return m_ElementNumbers->moduleNumberEKLM(m_Endcap, m_Sector, m_Layer);
+}
+
+EKLMChannelIndex EKLMChannelIndex::begin()
+{
+  return EKLMChannelIndex(1, 1, 1, 1, 1, m_IndexLevel);
 }
 
 EKLMChannelIndex& EKLMChannelIndex::end()
 {
+  /*
+   * The index level does not matter for end check, thus,
+   * the object can be created once.
+   */
   static EKLMChannelIndex index(
-    EKLMElementNumbers::getMaximalEndcapNumber() + 1, 1, 1, 1, 1, m_IndexLevel);
+    EKLMElementNumbers::getMaximalEndcapNumber() + 1, 1, 1, 1, 1);
   return index;
 }
 

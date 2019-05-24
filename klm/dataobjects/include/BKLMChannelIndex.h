@@ -65,9 +65,14 @@ namespace Belle2 {
     ~BKLMChannelIndex();
 
     /**
+     * Set index level.
+     */
+    void setIndexLevel(enum IndexLevel indexLevel);
+
+    /**
      * Get forward.
      */
-    int getForward()
+    int getForward() const
     {
       return m_Forward;
     }
@@ -75,7 +80,7 @@ namespace Belle2 {
     /**
      * Get sector.
      */
-    int getSector()
+    int getSector() const
     {
       return m_Sector;
     }
@@ -83,7 +88,7 @@ namespace Belle2 {
     /**
      * Get layer.
      */
-    int getLayer()
+    int getLayer() const
     {
       return m_Layer;
     }
@@ -91,7 +96,7 @@ namespace Belle2 {
     /**
      * Get plane.
      */
-    int getPlane()
+    int getPlane() const
     {
       return m_Plane;
     }
@@ -99,7 +104,7 @@ namespace Belle2 {
     /**
      * Get strip.
      */
-    int getStrip()
+    int getStrip() const
     {
       return m_Strip;
     }
@@ -107,12 +112,17 @@ namespace Belle2 {
     /**
      * Get KLM channel number.
      */
-    uint16_t getKLMChannelNumber();
+    uint16_t getKLMChannelNumber() const;
+
+    /**
+     * Get KLM module number.
+     */
+    uint16_t getKLMModuleNumber() const;
 
     /**
      * First channel.
      */
-    BKLMChannelIndex& begin();
+    BKLMChannelIndex begin();
 
     /**
      * Last channel.

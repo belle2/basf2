@@ -47,7 +47,7 @@ void TrackLoader::exposeParameters(ModuleParamList* moduleParamList, const std::
                                 "Check for this direction when checking for related tracks.");
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ignoreTracksWithCDChits"),
-                                m_noCDChits, "Do not consider tracks containing CDC hits.");
+                                m_noCDChits, "Do not consider tracks containing CDC hits.", false);
 
 }
 

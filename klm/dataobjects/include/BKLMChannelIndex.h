@@ -120,11 +120,6 @@ namespace Belle2 {
     uint16_t getKLMModuleNumber() const;
 
     /**
-     * Get KLM module number.
-     */
-    uint16_t getKLMModuleNumber();
-
-    /**
      * First channel.
      */
     BKLMChannelIndex begin();

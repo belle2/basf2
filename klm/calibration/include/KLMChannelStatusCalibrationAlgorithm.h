@@ -37,6 +37,19 @@ namespace Belle2 {
      */
     CalibrationAlgorithm::EResult calibrate() override;
 
+    /**
+     * Set minimal average number of hits per channel required for calibration.
+     */
+    void setMinimalAverageHitNumber(double minimalAverageHitNumber)
+    {
+      m_MinimalAverageHitNumber = minimalAverageHitNumber;
+    }
+
+  protected:
+
+    /** Minimal average number of hits per channel required for calibration. */
+    double m_MinimalAverageHitNumber = 25;
+
   };
 
 }

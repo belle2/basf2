@@ -21,7 +21,7 @@ from skimExpertFunctions import *
 
 gb2_setuprel = 'release-03-01-01'
 skimCode = encodeSkimName('feiSLBplusWithOneLep')
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 
 path = create_path()

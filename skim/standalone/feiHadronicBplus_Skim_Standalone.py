@@ -22,7 +22,7 @@ import sys
 import os
 import glob
 skimCode = encodeSkimName('feiHadronicBplus')
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 
 path = create_path()

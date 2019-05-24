@@ -46,8 +46,8 @@ void PXDROIDQMModule::defineHisto()
   hrawROIcount = new TH1F("hrawROIcount", "ROI count;Nr per Event", 250, 0, 250);
   hrawROItype = new TH1F("hrawROItype", "ROI type;Nr per Event", 2, 0, 2);
 
-  hrawROIHLTmap  = new TH2F("hrawROIHLTmap", "HLT ROI Middle Map;Ucell;Vcell", 250 / 4, 0, 250, 768 / 4, 0, 768);
-  hrawROIHLTsize  = new TH2F("hrawROIHLTsize", "HLT ROI Size Map;;Ucell;Vcell", 250 / 4, 0, 250, 768 / 4, 0, 768);
+  hrawROIHLTmap  = new TH2F("hrawROIHLTmap", "HLT ROI Middle Map;Ucell;Vcell", 250 / 5, 0, 250, 768 / 4, 0, 768);
+  hrawROIHLTsize  = new TH2F("hrawROIHLTsize", "HLT ROI Size Map;;Ucell;Vcell", 50, 0, 200, 50, 0, 200);
   hrawROIHLT_DHHID = new TH1F("hrawROIHLT_DHHID", "HLT ROI DHHID;ROIs per Module;DHH ID", 64, 0, 64);
   hrawROIHLTminV = new TH1F("hrawROIHLTminV", "HLT ROI minV;V", 768, 0, 768);
   hrawROIHLTmaxV = new TH1F("hrawROIHLTmaxV", "HLT ROI maxV;V", 768, 0, 768);
@@ -56,8 +56,8 @@ void PXDROIDQMModule::defineHisto()
   hrawROIHLTsizeV = new TH1F("hrawROIHLTsizeV", "HLT ROI size;V", 768, 0, 768);
   hrawROIHLTsizeU = new TH1F("hrawROIHLTsizeU", "HLT ROI size;U", 250, 0, 250);
 
-  hrawROIDCmap  = new TH2F("hrawROIDCmap", "DATCON ROI Middle Map ;U;V", 250 / 4, 0, 250, 768 / 4, 0, 768);
-  hrawROIDCsize  = new TH2F("hrawROIDCsize", "DATCON ROI Size Map ;U;V", 250 / 4, 0, 250, 768 / 4, 0, 768);
+  hrawROIDCmap  = new TH2F("hrawROIDCmap", "DATCON ROI Middle Map ;U;V", 250 / 5, 0, 250, 768 / 4, 0, 768);
+  hrawROIDCsize  = new TH2F("hrawROIDCsize", "DATCON ROI Size Map ;U;V",  50, 0, 200, 50, 0, 200);
   hrawROIDC_DHHID = new TH1F("hrawROIDC_DHHID", "DATCON ROI DHHID;ROIs per Module; DHH ID", 64, 0, 64);
   hrawROIDCminV = new TH1F("hrawROIDCminV", "DATCON ROI minV;V", 768, 0, 768);
   hrawROIDCmaxV = new TH1F("hrawROIDCmaxV", "DATCON ROI maxV;V", 768, 0, 768);
@@ -84,13 +84,13 @@ void PXDROIDQMModule::defineHisto()
       int dhh_id = ((avxdid.getLayerNumber() - 1) << 5) | ((avxdid.getLadderNumber()) << 1) | (avxdid.getSensorNumber() - 1);
 
       hrawROIHLTmapModule[dhh_id] = new TH2F("hrawROIHLTmap_" + bufful,
-                                             "HLT ROI Middle Map  " + buff + ";Ucell;Vcell", 250 / 4, 0, 250, 768 / 4, 0, 768);
+                                             "HLT ROI Middle Map  " + buff + ";Ucell;Vcell", 250, 0, 250, 768, 0, 768);
       hrawROIHLTsizeModule[dhh_id] = new TH2F("hrawROIHLTsize" + bufful,
-                                              "HLT ROI Size Map " + buff + ";Ucell;Vcell", 250 / 4, 0, 250, 768 / 4, 0, 768);
+                                              "HLT ROI Size Map " + buff + ";Ucell;Vcell",  50, 0, 200, 50, 0, 200);
       hrawROIDCmapModule[dhh_id] = new TH2F("hrawROIDCmap_" + bufful,
-                                            "DC ROI Middle Map  " + buff + ";Ucell;Vcell", 250 / 4, 0, 250, 768 / 4, 0, 768);
+                                            "DC ROI Middle Map  " + buff + ";Ucell;Vcell", 250, 0, 250, 768, 0, 768);
       hrawROIDCsizeModule[dhh_id] = new TH2F("hrawROIDCsize" + bufful,
-                                             "DC ROI Size Map " + buff + ";Ucell;Vcell", 250 / 4, 0, 250, 768 / 4, 0, 768);
+                                             "DC ROI Size Map " + buff + ";Ucell;Vcell",  50, 0, 200, 50, 0, 200);
     }
   }
 
@@ -160,7 +160,7 @@ void PXDROIDQMModule::event()
       auto id = it.getDHHID(j);
       if (it.getType(j)) {
         nr_DC++;
-        hrawROIDC_DHHID->Fill(it.getDHHID(j));
+        hrawROIDC_DHHID->Fill(id);
         if (hrawROIDCmapModule[id]) hrawROIDCmapModule[id]->Fill(Umean, Vmean);
         if (hrawROIDCsizeModule[id]) hrawROIDCsizeModule[id]->Fill(Usize, Vsize);
         hrawROIDCmap->Fill(Umean, Vmean);
@@ -173,7 +173,7 @@ void PXDROIDQMModule::event()
         hrawROIDCsizeU->Fill(Usize);
       } else {
         nr_HLT++;
-        hrawROIHLT_DHHID->Fill(it.getDHHID(j));
+        hrawROIHLT_DHHID->Fill(id);
         if (hrawROIHLTmapModule[id]) hrawROIHLTmapModule[id]->Fill(Umean, Vmean);
         if (hrawROIHLTsizeModule[id]) hrawROIHLTsizeModule[id]->Fill(Usize, Vsize);
         hrawROIHLTmap->Fill(Umean, Vmean);

@@ -654,6 +654,12 @@ void SVDDigitizerModule::saveDigits()
   int bunchXingsSinceAPVstart = gRandom->Integer(bunchXingsInAPVclock);
   double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
+  //set run type (0 = raw, 1 = transparent, 2 = zero-suppressed, 3 = zero-suppressed + hit finding
+  int runType = 2; //zero-suppressed
+
+  //set event type (0 = global run, 1 = local run)
+  int eventType = 0; //global run
+
   //set the DAQ mode to 1, 3, or 6-samples:
   int daqMode = 3;  //does not correspond to anything expected on data
   if (m_nAPV25Samples == 6)
@@ -733,7 +739,7 @@ void SVDDigitizerModule::saveDigits()
       if (n_over < m_nSamplesOverZS) continue;
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(runType, eventType, daqMode,
                                                  bunchXingsSinceAPVstart >> 1)));
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
@@ -805,7 +811,7 @@ void SVDDigitizerModule::saveDigits()
       if (n_over < m_nSamplesOverZS) continue;
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(runType, eventType, daqMode,
                                                  bunchXingsSinceAPVstart >> 1)));
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {

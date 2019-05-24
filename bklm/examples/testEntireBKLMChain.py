@@ -58,7 +58,7 @@ sim.add_simulation(path=main,
 
 # Pack and unpack data
 main.add_module('BKLMRawPacker')
-main.add_module('BKLMUnpacker')
+main.add_module('KLMUnpacker')
 
 # Add the digit analyzer module (optional)
 main.add_module('BKLMDigitAnalyzer',

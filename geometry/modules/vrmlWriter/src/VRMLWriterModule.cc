@@ -98,7 +98,7 @@ void VRMLWriterModule::event()
   for (unsigned int solidIndex = 0; solidIndex < solidStore->size(); ++solidIndex) {
     if ((*m_SolidName)[solidIndex].length() != 0) {
       if ((*solidStore)[solidIndex]->GetEntityType() == "G4Tubs") {
-        G4Tubs* tube = (G4Tubs*)((*solidStore)[solidIndex]);
+        auto* tube = (G4Tubs*)((*solidStore)[solidIndex]);
         (*m_IsCylinder)[solidIndex] = ((tube->GetInnerRadius() == 0.0) && (tube->GetDeltaPhiAngle() == 2.0 * M_PI));
       }
       describeSolid((*solidStore)[solidIndex], (*m_SolidName)[solidIndex], (*m_IsCylinder)[solidIndex]);
@@ -159,7 +159,7 @@ void VRMLWriterModule::assignName(std::vector<std::string>* names, unsigned int 
       if (name.length() == (*names)[j].length()) {
         (*names)[j].append("_1");
       }
-      int n = std::stoi((*names)[j].substr(name.length() + 1), NULL);
+      int n = std::stoi((*names)[j].substr(name.length() + 1), nullptr);
       name.append("_");
       name.append(std::to_string(n + 1));
       break;
@@ -172,7 +172,7 @@ void VRMLWriterModule::describeSolid(G4VSolid* solid, const std::string& solidNa
 {
   m_File << "# Solid " << solid->GetName() << " of type " << solid->GetEntityType() << std::endl;
   if (isCylinder) {
-    G4Tubs* tube = (G4Tubs*)solid;
+    auto* tube = (G4Tubs*)solid;
     // VRML cylinder is along y axis but G4Tubs is along z axis => rotate in logical volume
     m_File << "PROTO solid_" << solidName << " [ ] {" << std::endl <<
            " Cylinder {" << std::endl << std::setprecision(10) <<
@@ -181,7 +181,7 @@ void VRMLWriterModule::describeSolid(G4VSolid* solid, const std::string& solidNa
            " }" << std::endl <<
            "}" << std::endl;
   } else if (solid->GetEntityType() == "G4Box") {
-    G4Box* box = (G4Box*)solid;
+    auto* box = (G4Box*)solid;
     m_File << "PROTO solid_" << solidName << " [ ] {" << std::endl <<
            " Box {" << std::endl << std::setprecision(10) <<
            "  size " << box->GetXHalfLength() * 2.0 << " " <<
@@ -194,7 +194,7 @@ void VRMLWriterModule::describeSolid(G4VSolid* solid, const std::string& solidNa
              (solid->GetEntityType() == "G4SubtractionSolid") ||
              (solid->GetEntityType() == "G4BooleanSolid")) {
     HepPolyhedron* polyhedron = getBooleanSolidPolyhedron(solid);
-    G4Polyhedron* g4polyhedron = new G4Polyhedron(*polyhedron);
+    auto* g4polyhedron = new G4Polyhedron(*polyhedron);
     writePolyhedron(g4polyhedron, solidName);
     delete polyhedron;
     delete g4polyhedron;
@@ -234,7 +234,7 @@ void VRMLWriterModule::describeLogicalVolume(G4LogicalVolume* logVol, const std:
     visible = "#";
   }
   bool hasDaughters = (visible.length() == 0) || ((*m_PVIndex)[lvIndex].size() > 0);
-  if (logVol->GetSensitiveDetector() != NULL) visible = "";
+  if (logVol->GetSensitiveDetector() != nullptr) visible = "";
   m_File << "# LogicalVolume " << logVol->GetName() << " containing " << materialName << std::endl <<
          "PROTO lv_" << lvName << " [ ] {" << std::endl <<
          " Group {" << std::endl <<
@@ -452,7 +452,7 @@ void VRMLWriterModule::descendAndDescribe(G4VPhysicalVolume* physVol, const std:
   if (replica <= 0) describeLogicalVolume(logVol, lvName, (*m_SolidName)[solidIndex], (*m_IsCylinder)[solidIndex]);
 }
 
-void VRMLWriterModule::writePreamble(void)
+void VRMLWriterModule::writePreamble()
 {
   m_File << "#VRML V2.0 utf8" << std::endl << std::endl <<
          "WorldInfo {" << std::endl <<
@@ -579,7 +579,7 @@ HepPolyhedron* VRMLWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
 {
   G4VSolid* solidA = solid->GetConstituentSolid(0);
   G4VSolid* solidB = solid->GetConstituentSolid(1);
-  HepPolyhedron* polyhedronA = NULL;
+  HepPolyhedron* polyhedronA = nullptr;
   if ((solidA->GetEntityType() == "G4IntersectionSolid") ||
       (solidA->GetEntityType() == "G4UnionSolid") ||
       (solidA->GetEntityType() == "G4SubtractionSolid") ||
@@ -588,7 +588,7 @@ HepPolyhedron* VRMLWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
   } else {
     polyhedronA = new HepPolyhedron(*(solidA->GetPolyhedron()));
   }
-  HepPolyhedron* polyhedronB = NULL;
+  HepPolyhedron* polyhedronB = nullptr;
   G4VSolid* solidB2 = solidB;
   if (solidB->GetEntityType() == "G4DisplacedSolid") {
     solidB2 = ((G4DisplacedSolid*)solidB)->GetConstituentMovedSolid();
@@ -606,7 +606,7 @@ HepPolyhedron* VRMLWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
   } else {
     polyhedronB = new HepPolyhedron(*(solidB->GetPolyhedron()));
   }
-  HepPolyhedron* result = new HepPolyhedron();
+  auto* result = new HepPolyhedron();
   if (solid->GetEntityType() == "G4UnionSolid") {
     *result = polyhedronA->add(*polyhedronB);
   } else if (solid->GetEntityType() == "G4SubtractionSolid") {

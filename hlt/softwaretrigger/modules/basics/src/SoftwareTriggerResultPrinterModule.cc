@@ -95,6 +95,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
     accepted = false;
     counter = 0;
     for (auto& cutResult : m_passedEventsPerTrigger) {
+      // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
       numberOfEvents[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
       counter++;
     }

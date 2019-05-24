@@ -61,7 +61,7 @@ void NtupleRecoStatsTool::eval(const  Particle*)
     if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
     if (cluster->isNeutral()) {
-      Particle* gamma = new Particle(cluster);
+      auto* gamma = new Particle(cluster);
 
       m_neutralECLEnergy += gamma->getEnergy();
       m_iNeutralClusters++;

@@ -24,6 +24,8 @@ AddOption('--extra-ccflags', dest='extraccflags', action='store', help='Addition
 AddOption('--ignore-externals-version', dest='check_externals', action='store_false', default=True,
           help="if given the externals version will not checked for consistency between .externals and the environment")
 AddOption('--light', dest='light', action='store_true', default=False, help='Build a light release')
+AddOption('--create-json', dest="create_json", action="store_true", default=False,
+          help="Create a compile_commands.json suitable for clang tools and many code completion libraries")
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
@@ -97,7 +99,7 @@ global_env = Environment(
     # disable warnings when compiling dictionaries, too much root problems
     # involved
     ROOTCLING_EXTRA_CCFLAGS=["-w"],
-    CPPDEFINES={'_PACKAGE_': '\\"$PACKAGE\\"'},
+    CPPDEFINES={'_PACKAGE_': '\'"$PACKAGE"\''},
     CPPPATH=['include'],
     LIBPATH=['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
     DATAOBJECT_LIBS=[],
@@ -122,6 +124,13 @@ global_env = Environment(
         "-Wl,--copy-dt-needed-entries"
     ],
 )
+
+# add this early because we want to be sure it's enabled before we create any
+# targets as it needs to modify the object/shared object builders
+if GetOption("create_json"):
+    tool = Tool('compilation_db', COMPILATIONDB_COMSTR="*** compilation database: $TARGET")
+    tool(global_env)
+    global_env.CompilationDatabase("#compile_commands.json")
 
 # recalculate MD5 sums only if the file changed in the last 10 minutes
 SetOption("max_drift", 600)
@@ -237,15 +246,9 @@ if os.environ.get("BELLE2_USE_CCACHE", "no").lower() in ["yes", "true", "on", "1
     # It may also replace the compiler with CCACHE_CC for other tools
 
 # central release
-repository = None
 if analysis:
     global_env.Append(CCFLAGS=['-I' + os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'include')])
     global_env.Append(LIBPATH=[os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'lib', subdir)])
-else:
-    # use central release as repository if it is set up
-    if 'BELLE2_RELEASE_DIR' in os.environ:
-        repository = os.environ['BELLE2_RELEASE_DIR']
-        global_env.Repository(repository)
 
 # set variant directory for object files
 VariantDir(global_env['BUILDDIR'], '.', duplicate=0)
@@ -273,46 +276,31 @@ global_env.Library(os.path.join(global_env['LIBDIR'], 'test_main'), "$BUILDDIR/s
 if analysis:
     global_env['PACKAGE'] = os.path.basename(os.environ['BELLE2_ANALYSIS_DIR'])
     global_env['AVAILABLE_PACKAGES'] = []
-    global_env.ProcessDirectory('.', True, None)
+    global_env.ProcessDirectory('.', True)
 
 # process the package directories
 else:
     # loop over directory entries and select package directories
     exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
-    available_packages = {}
+    available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:
             continue
-
-        available_packages[entry] = None
-
-    # loop over directory entries in central release
-    if repository and not GetOption('local'):
-        for entry in os.listdir(repository):
-            if (entry.find('.') > -1 or os.path.isfile(os.path.join(repository, entry)) or
-               (entry in exclude_dirs + available_packages.keys())):
-                continue
-
-            available_packages[entry] = repository
+        available_packages.add(entry)
 
     # retain only packages specified in the .light file if the light option is given
     if GetOption('light'):
-        light_path = '.' if os.path.exists('.light') else release
-        light_packages = [entry.strip('/') for entry in open(os.path.join(light_path, '.light')).read().split() if entry.endswith('/')]
-        selected_packages = {}
-        for package in light_packages:
-            if package in available_packages.keys():
-                selected_packages[package] = available_packages[package]
-        available_packages = selected_packages
+        light_packages = set([entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')])
+        available_packages = available_packages.intersection(light_packages)
 
     # we looped over all of them and know what's available so let's compile
     # whatever was selected
-    global_env['AVAILABLE_PACKAGES'] = set(available_packages.keys())
-    for package, repository in sorted(available_packages.items()):
+    global_env['AVAILABLE_PACKAGES'] = available_packages
+    for package in sorted(list(available_packages)):
         if explicit_package_targets and package not in explicit_package_targets:
             continue
         global_env['PACKAGE'] = package
-        global_env.ProcessDirectory(package, False, repository)
+        global_env.ProcessDirectory(package, False)
 
     # for global things (e.g. tests) no package should be set
     del global_env['PACKAGE']

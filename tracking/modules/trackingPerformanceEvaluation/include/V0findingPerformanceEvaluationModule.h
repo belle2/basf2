@@ -99,17 +99,17 @@ namespace Belle2 {
     TH1F* m_h1_nMatchedDau = nullptr; /**< TH1F n matched daughters*/
 
     //histograms used for efficiency plots
-    TH3F* m_h3_MCParticle = nullptr; /**< */
-    TH3F* m_h3_V0sPerMCParticle = nullptr; /**< */
-    TH1F* m_h1_MCParticle_R = nullptr; /**< */
-    TH1F* m_h1_V0sPerMCParticle_R = nullptr; /**< */
+    TH3F* m_h3_MCParticle = nullptr; /**< V0-finding denominator */
+    TH3F* m_h3_V0sPerMCParticle = nullptr; /**< V0-finding numerator */
+    TH1F* m_h1_MCParticle_R = nullptr; /**< V0-finding denominator by radius */
+    TH1F* m_h1_V0sPerMCParticle_R = nullptr; /**< V0-finding numerator by radius */
 
     //histograms used for purity plots
-    TH3F* m_h3_V0s = nullptr; /**< */
-    TH3F* m_h3_MCParticlesPerV0 = nullptr; /**< */
+    TH3F* m_h3_V0s = nullptr; /**< V0-finding purity denominator */
+    TH3F* m_h3_MCParticlesPerV0 = nullptr; /**< V0-finding numerator */
 
   };
 } // end of namespace
 
 
-#endif /* V0DFINDINGPERFORMANCEEVALUAITONMODULE_H_ */
+#endif /* V0FINDINGPERFORMANCEEVALUATIONMODULE_H_ */

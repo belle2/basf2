@@ -342,8 +342,7 @@ namespace {
       return; //stop at the bottom of the MC decay tree (ignore secondaries)
 
     const vector<MCParticle*>& genDaughters = gen->getDaughters();
-    for (unsigned i = 0; i < genDaughters.size(); ++i) {
-      const MCParticle* daug = genDaughters[i];
+    for (auto daug : genDaughters) {
       children.push_back(daug);
       appendParticles(daug, children);
     }

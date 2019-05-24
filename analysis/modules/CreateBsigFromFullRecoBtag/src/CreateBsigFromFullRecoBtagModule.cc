@@ -61,9 +61,7 @@ CreateBsigFromFullRecoBtagModule::CreateBsigFromFullRecoBtagModule() : Module(),
   m_isSelfConjugatedParticle = true; // FIXME BII-4106
 }
 
-CreateBsigFromFullRecoBtagModule::~CreateBsigFromFullRecoBtagModule()
-{
-}
+CreateBsigFromFullRecoBtagModule::~CreateBsigFromFullRecoBtagModule() = default;
 
 void CreateBsigFromFullRecoBtagModule::initialize()
 {

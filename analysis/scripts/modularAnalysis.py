@@ -1536,7 +1536,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
     fillParticleList('gamma:roe_default', '', path=path)
-    fillParticleList('K_L0:roe_default', '', path=path)
+    fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
     inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
@@ -2221,17 +2221,18 @@ def buildEventShape(inputListNames=[],
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(path=analysis_main):
+def labelTauPairMC(printDecayInfo=False, path=analysis_main):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
+    @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
     """
     tauDecayMarker = register_module('TauDecayMarker')
     tauDecayMarker.set_name('TauDecayMarker_')
 
-    path.add_module(tauDecayMarker)
+    path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
 
 
 def tagCurlTracks(particleLists,

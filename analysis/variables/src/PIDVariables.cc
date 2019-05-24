@@ -115,7 +115,7 @@ namespace Belle2 {
       std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
 
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCode));
+      auto hypType = Const::ChargedStable(abs(pdgCode));
 
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
@@ -154,8 +154,8 @@ namespace Belle2 {
 
       std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
-      Const::ChargedStable testType = Const::ChargedStable(abs(pdgCodeTest));
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto testType = Const::ChargedStable(abs(pdgCodeTest));
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
@@ -193,8 +193,8 @@ namespace Belle2 {
       std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
 
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
-      Const::ChargedStable testType = Const::ChargedStable(abs(pdgCodeTest));
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto testType = Const::ChargedStable(abs(pdgCodeTest));
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
@@ -224,12 +224,12 @@ namespace Belle2 {
 
       std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
 
       // Placeholder for the priors
       const unsigned int n = Const::ChargedStable::c_SetSize;
       double frac[n];
-      for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // flat priors
+      for (double& i : frac) i = 1.0;  // flat priors
 
       auto func = [hypType, frac, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();

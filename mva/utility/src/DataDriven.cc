@@ -34,7 +34,7 @@ namespace Belle2 {
     }
 
     SidebandDataset::SidebandDataset(const GeneralOptions& general_options, Dataset& dataset, Dataset& mc_dataset,
-                                     std::string sideband_variable) : Dataset(general_options), m_dataset(dataset)
+                                     const std::string& sideband_variable) : Dataset(general_options), m_dataset(dataset)
     {
 
       m_spectator_index = dataset.getSpectatorIndex(sideband_variable);

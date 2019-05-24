@@ -44,9 +44,13 @@ uint16_t KLMElementNumbers::channelNumberBKLM(int bklmChannel) const
 }
 
 uint16_t KLMElementNumbers::channelNumberEKLM(
-  int endcap, int layer, int sector, int plane, int strip) const
+  int endcap, int sector, int layer, int plane, int strip) const
 {
   uint16_t channel;
+  /*
+   * Note that the default order of elements is different
+   * for EKLM-specific code!
+   */
   channel = m_ElementNumbersEKLM->stripNumber(
               endcap, layer, sector, plane, strip);
   return channel;

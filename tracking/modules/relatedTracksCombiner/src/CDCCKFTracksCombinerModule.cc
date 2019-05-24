@@ -76,7 +76,6 @@ void CDCCKFTracksCombinerModule::event()
 
     if (vxdTrackBefore) {
       mergedTracks.insert(vxdTrackBefore);
-      std::cout << " save before\n";
       newMergedTrack = vxdTrackBefore->copyToStoreArray(m_recoTracks);
       newMergedTrack->addHitsFromRecoTrack(vxdTrackBefore, newMergedTrack->getNumberOfTotalHits());
       newMergedTrack->addRelationTo(vxdTrackBefore);
@@ -89,7 +88,6 @@ void CDCCKFTracksCombinerModule::event()
 
     if (vxdTrackAfter) {
       mergedTracks.insert(vxdTrackAfter);
-      std::cout << " save after\n";
       newMergedTrack->addHitsFromRecoTrack(vxdTrackAfter, newMergedTrack->getNumberOfTotalHits(), true);
       newMergedTrack->addRelationTo(vxdTrackAfter);
     }

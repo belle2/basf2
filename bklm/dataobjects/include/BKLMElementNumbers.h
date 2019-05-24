@@ -15,7 +15,19 @@
 
 namespace Belle2 {
 
-  namespace BKLMElementNumbers {
+  class BKLMElementNumbers {
+
+  public:
+
+    /**
+     * Constructor.
+     */
+    BKLMElementNumbers();
+
+    /**
+     * Destructor.
+     */
+    ~BKLMElementNumbers();
 
     /**
      * Get channel number.
@@ -25,8 +37,17 @@ namespace Belle2 {
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    uint16_t channelNumber(int forward, int sector, int layer, int plane,
-                           int strip);
+    static uint16_t channelNumber(int forward, int sector, int layer, int plane,
+                                  int strip);
+
+    /**
+     * Get number of strips.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     * @param[in] plane   Plane (0-based).
+     */
+    static int getNStrips(int forward, int sector, int layer, int plane);
 
     /**
      * Check channel number.
@@ -36,9 +57,56 @@ namespace Belle2 {
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    bool checkChannelNumber(int forward, int sector, int layer, int plane,
-                            int strip);
+    static bool checkChannelNumber(
+      int forward, int sector, int layer, int plane, int strip);
 
-  }
+    /**
+     * Get maximal forward number (0-based).
+     */
+    static constexpr int getMaximalForwardNumber()
+    {
+      return m_MaximalForwardNumber;
+    }
+
+    /**
+     * Get maximal sector number (1-based).
+     */
+    static constexpr int getMaximalSectorNumber()
+    {
+      return m_MaximalSectorNumber;
+    }
+
+    /**
+     * Get maximal layer number (1-based).
+     */
+    static constexpr int getMaximalLayerNumber()
+    {
+      return m_MaximalLayerNumber;
+    }
+
+    /**
+     * Get maximal plane numbe (0-based).
+     */
+    static constexpr int getMaximalPlaneNumber()
+    {
+      return m_MaximalPlaneNumber;
+    }
+
+  protected:
+
+    /** Maximal forward number (0-based). */
+    static constexpr int m_MaximalForwardNumber = 1;
+
+    /** Maximal sector number (1-based). */
+    static constexpr int m_MaximalSectorNumber = 8;
+
+    /** Maximal layer number (1-based). */
+    static constexpr int m_MaximalLayerNumber = 15;
+
+    /** Maximal plane numbe (0-based). */
+    static constexpr int m_MaximalPlaneNumber = 1;
+
+
+  };
 
 }

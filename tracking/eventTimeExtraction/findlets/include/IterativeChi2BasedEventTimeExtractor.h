@@ -17,8 +17,10 @@
 #include <string>
 
 namespace Belle2 {
+  /// Class to iteratively extract the event t0 using the chi-squared approach
   class IterativeChi2BasedEventTimeExtractor final : public IterativeEventTimeExtractor<Chi2BasedEventTimeExtractor> {
   private:
+    /// Type of the base class
     using Super = IterativeEventTimeExtractor<Chi2BasedEventTimeExtractor>;
 
   public:

@@ -39,7 +39,9 @@ Muid::Muid() :
   m_ExtLayer(-1),
   m_HitLayer(-1),
   m_ExtLayerPattern(0),
-  m_HitLayerPattern(0)
+  m_HitLayerPattern(0),
+  m_ExtBKLMEfficiencyVector(0)
+  //  m_ExtEKLMEfficiencyVector(0)
 {
 }
 
@@ -69,6 +71,8 @@ Muid::Muid(int pdgCode) :
   m_ExtLayer(-1),
   m_HitLayer(-1),
   m_ExtLayerPattern(0),
-  m_HitLayerPattern(0)
+  m_HitLayerPattern(0),
+  m_ExtBKLMEfficiencyVector(0)
+  //  m_ExtEKLMEfficiencyVector(0)
 {
 }

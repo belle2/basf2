@@ -16,7 +16,7 @@ def get_logger():
 
 
 class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
-    #: Descriptio fof the run setup to be displayed on command line
+    #: Description of the run setup to be displayed on command line
     description = "Apply tracking to presimulated events or events generated on the fly."
 
     #: Name of the finder module to be used - can be everything that is accepted by tracking.run.utilities.extend_path
@@ -34,10 +34,11 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         'WhichParticles': [],
     }
 
-    #: Add the track fitting to the execution
+    #: By default, do not add the track fitting to the execution
     fit_tracks = False
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
         argument_parser = super().create_argument_parser(**kwds)
 
         tracking_argument_group = argument_parser.add_argument_group("Tracking setup arguments")
@@ -61,8 +62,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         return argument_parser
 
     def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
+        """Sets up a path that plays back pregenerated events or generates events
+           based on the properties in the base class."""
         path = super().create_path()
 
         # setting up fitting is only necessary when testing
@@ -221,7 +222,10 @@ finder_modules_by_short_name = {
 
 
 class StandardReconstructionEventsRun(ReadOrGenerateTrackedEventsRun):
+    """Generate, simulate and reconstruct events"""
+    #: Use EvtGen for the event generator
     generator_module = 'EvtGenInput'
 
     def finder_module(self, path):
+        """Add track reconstruction to the basf2 path"""
         tracking.add_tracking_reconstruction(path, components=self.components)

@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
       B2ERROR("Couldn't open file " << fileName);
       return 1;
     }
-    TTree* tree = (TTree*) file->Get("persistent");
+    auto* tree = (TTree*) file->Get("persistent");
     if (!tree) {
       B2ERROR("No tree persistent found in " << fileName);
       return 1;
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
       B2ERROR("No meta data found in " << fileName);
       return 1;
     }
-    metaDataPtr = 0;
+    metaDataPtr = nullptr;
     branch->SetAddress(&metaDataPtr);
     tree->GetEntry(0);
 

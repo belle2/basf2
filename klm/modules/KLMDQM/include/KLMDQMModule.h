@@ -12,7 +12,6 @@
 
 /* External headers. */
 #include <TH1F.h>
-#include <TH2F.h>
 
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMDigit.h>

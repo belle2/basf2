@@ -300,8 +300,8 @@ namespace Belle2 {
       TLorentzVector pInitial = mcparticles[0]->get4Vector();
       TLorentzVector pDaughters;
       const std::vector<Particle*> daughters = part->getDaughters();
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        const MCParticle* mcD = daughters[i]->getRelatedTo<MCParticle>();
+      for (auto daughter : daughters) {
+        const MCParticle* mcD = daughter->getRelatedTo<MCParticle>();
         if (mcD == nullptr)
           return -999;
 
@@ -735,5 +735,3 @@ namespace Belle2 {
 
   }
 }
-
-

@@ -1229,7 +1229,7 @@ endloop:
 
         auto func = [var1, var2](const Particle * particle) -> double {
           double min = var1->function(particle);
-          if (min < var2->function(particle))
+          if (min > var2->function(particle))
             min = var2->function(particle);
           return min;
         };
@@ -1718,17 +1718,16 @@ endloop:
           std::vector<Particle*> particlePool;
 
           (void) particle;
-          for (unsigned int arg = 0; arg < arguments.size(); ++arg)
+          for (const auto& argument : arguments)
           {
-            StoreObjPtr <ParticleList> listOfParticles(arguments[arg]);
+            StoreObjPtr <ParticleList> listOfParticles(argument);
 
-            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << arguments[arg] << " given to invMassInLists");
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << argument << " given to invMassInLists");
             int nParticles = listOfParticles->getListSize();
             for (int i = 0; i < nParticles; i++) {
               bool overlaps = false;
               Particle* part = listOfParticles->getParticle(i);
-              for (unsigned int j = 0; j < particlePool.size(); ++j) {
-                Particle* poolPart = particlePool.at(j);
+              for (auto poolPart : particlePool) {
                 if (part->overlapsWith(poolPart)) {
                   overlaps = true;
                   break;
@@ -2034,7 +2033,7 @@ arguments. Operator precedence is taken into account. For example ::
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
     REGISTER_VARIABLE("max(var1,var2)", max,
                       "Returns max value of two variables.\n");
-    REGISTER_VARIABLE("min(var1,var2)", max,
+    REGISTER_VARIABLE("min(var1,var2)", min,
                       "Returns min value of two variables.\n");
     REGISTER_VARIABLE("sin(variable)", sin,
                       "Returns sin value of the given variable.\n"

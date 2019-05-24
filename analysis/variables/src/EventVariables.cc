@@ -66,7 +66,6 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       if (!mcParticles) {
-        B2ERROR("Cannot find MCParticles array.");
         return 0.0;
       }
       for (const MCParticle& mcp : mcParticles) {

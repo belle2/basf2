@@ -11,10 +11,6 @@
 /* C++ headers. */
 #include <cmath>
 
-/* External headers. */
-#include <TFile.h>
-#include <TTree.h>
-
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMDatabaseImporter.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>

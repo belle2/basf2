@@ -564,6 +564,8 @@ namespace Belle2 {
         return -1;
       }
 
+      MCMatching::countMissingParticle(p, mcp);
+
       int PDG = (int)arguments[0];
       if (PDG == 111) { // pi0
         return (p->hasExtraInfo("nMissingPi0")) ? p->getExtraInfo("nMissingPi0") : 0;
@@ -575,17 +577,17 @@ namespace Belle2 {
         return (p->hasExtraInfo("nMissingKS0")) ? p->getExtraInfo("nMissingKS0") : 0;
       } else if (PDG == 130) { // K_L0
         return (p->hasExtraInfo("nMissingKL0")) ? p->getExtraInfo("nMissingKL0") : 0;
-      } else if (PDG == 12 || PDG == 14 || PDG == 16) { // Neutrino
-        return (p->hasExtraInfo("nMissingNeutrino")) ? p->getExtraInfo("nMissingNeutrino") : 0;
-      } else if (PDG == 11) { // E
-        return (p->hasExtraInfo("nMissingE")) ? p->getExtraInfo("nMissingE") : 0;
-      } else if (PDG == 13) { // Mu
-        return (p->hasExtraInfo("nMissingMu")) ? p->getExtraInfo("nMissingMu") : 0;
       } else if (PDG == 2212) { // Proton
         return (p->hasExtraInfo("nMissingP")) ? p->getExtraInfo("nMissingP") : 0;
       } else if (PDG == 2112) { // Neutron
         return (p->hasExtraInfo("nMissingN")) ? p->getExtraInfo("nMissingN") : 0;
-      } else {
+      } else if (PDG == 11) { // E
+        return (p->hasExtraInfo("nMissingE")) ? p->getExtraInfo("nMissingE") : 0;
+      } else if (PDG == 13) { // Mu
+        return (p->hasExtraInfo("nMissingMu")) ? p->getExtraInfo("nMissingMu") : 0;
+      } else if (PDG == 12 || PDG == 14 || PDG == 16) { // Neutrino
+        return (p->hasExtraInfo("nMissingNeutrino")) ? p->getExtraInfo("nMissingNeutrino") : 0;
+      } else { // not FSP, gamma
         return -999;
       }
     }

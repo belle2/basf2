@@ -4,7 +4,7 @@
  * Copyright(C) 2013-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Christian Pulvermacher                      *
+ * Contributors: Anze Zupanc, Christian Pulvermacher, Yo Sato             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -154,6 +154,11 @@ namespace Belle2 {
      * @return number of daughters which are not neutrinos
      */
     static int getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle);
+
+    /**
+     * Count the number of missing daughter of the 'particles' and set these numbers to extraInfo
+     */
+    static void countMissingParticle(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
 
     /**
      * Add extraInfo of NMissingParticle to the particle, if the particle does not have it.

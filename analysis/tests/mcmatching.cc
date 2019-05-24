@@ -1038,8 +1038,8 @@ namespace {
     }
   }
 
-  /** check missing particles. */
-  TEST_F(MCMatchingTest, CheckMissingParticle)
+  /** count the number of missing particles */
+  TEST_F(MCMatchingTest, CountMissingParticle)
   {
     {
       // pi0 not reconstructed
@@ -1047,6 +1047,8 @@ namespace {
       d.reconstruct({421, {321, -211, {0}}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_MissGamma | MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingPi0"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingPi0"), 1);
     }
@@ -1056,6 +1058,8 @@ namespace {
       d.reconstruct({421, {321, 0, {111, {22, 22}}}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingPi"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingPi"), 1);
     }
@@ -1065,6 +1069,8 @@ namespace {
       d.reconstruct({421, {0, -211, {111, {22, 22}}}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingK"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingK"), 1);
     }
@@ -1074,6 +1080,8 @@ namespace {
       d.reconstruct({ -521, {0, {421, {0, -211, {111, {22, 22}}}}}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingK"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingK"), 2);
     }
@@ -1093,8 +1101,11 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_MissMassiveParticle | MCMatching::c_MissingResonance,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingKS0"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingKS0"), 1);
+      ASSERT_FALSE(d.m_particle->hasExtraInfo("nMissingPi"));
     }
     {
       //K0L not reconstructed
@@ -1108,24 +1119,34 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_MissKlong | MCMatching::c_MissMassiveParticle | MCMatching::c_MissingResonance,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingKL0"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingKL0"), 1);
     }
     {
+      // e and nutrino not reconstructed
       Decay d(521, { -11, 12, 22});
       d.reconstruct({521, {0, 0, 22}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle,
+                MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingE"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingE"), 1);
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingNeutrino"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingNeutrino"), 1);
     }
     {
+      // e and nutrino not reconstructed
       Decay d(521, { -13, 14, 22});
       d.reconstruct({521, {0, 0, 22}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle,
+                MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingMu"));
       EXPECT_EQ(d.m_particle->getExtraInfo("nMissingMu"), 1);
       ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingNeutrino"));

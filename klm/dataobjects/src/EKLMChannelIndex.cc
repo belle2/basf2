@@ -23,6 +23,7 @@ EKLMChannelIndex::EKLMChannelIndex(enum IndexLevel indexLevel) :
   m_Strip(1)
 {
   m_ElementNumbers = &(KLMElementNumbers::Instance());
+  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 EKLMChannelIndex::EKLMChannelIndex(

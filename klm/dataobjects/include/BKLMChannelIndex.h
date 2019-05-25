@@ -22,6 +22,9 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * Index level (loop over KLM elements at the specified level).
+     */
     enum IndexLevel {
 
       /** Forward. */
@@ -45,7 +48,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] indexLevel Index level.
      */
-    BKLMChannelIndex(enum IndexLevel indexLevel = c_IndexLevelStrip);
+    explicit BKLMChannelIndex(enum IndexLevel indexLevel = c_IndexLevelStrip);
 
     /**
      * Constructor.

@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['bklm_dataobjects', '$ROOT_LIBS', 'framework', 'calibration']
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'calibration']
 env['SUBLIB'] = True
 
 Return('env')

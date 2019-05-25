@@ -214,10 +214,10 @@ namespace Belle2 {
     void setHitLayerPattern(unsigned int pattern) { m_HitLayerPattern = pattern; }
 
     //! assign BKLMefficiency vector
-    void setExtBKLMEfficiencyVector(const std::vector<float> efficiencyVector) { m_ExtBKLMEfficiencyVector = efficiencyVector; }
+    void setExtBKLMEfficiencyVector(const std::vector<float>& efficiencyVector) { m_ExtBKLMEfficiencyVector = efficiencyVector; }
 
     //! assign EKLM efficiency vector
-    //    void setExtEKLMEfficiencyVector(std::vector<float> efficiencyVector) { m_ExtEKLMEfficiencyVector = efficiencyVector; }
+    //    void setExtEKLMEfficiencyVector(std::vector<float>& efficiencyVector) { m_ExtEKLMEfficiencyVector = efficiencyVector; }
 
 
   private:

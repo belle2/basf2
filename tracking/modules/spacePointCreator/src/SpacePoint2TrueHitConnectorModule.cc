@@ -527,7 +527,7 @@ void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spa
 {
   B2DEBUG(250, "Doing position analysis for SpacePoint "  << spacePoint->getArrayIndex() << " from Array " <<
           spacePoint->getArrayName());
-  simpleBitfield<unsigned short int> relationStatus; // = simpleBitfield<unsigned short int>();
+  simpleBitfield<unsigned short int> relationStatus;
 
   // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
   pair<unsigned short int, unsigned short int> clusterSizes = getClusterSizes(spacePoint, detType);

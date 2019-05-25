@@ -15,6 +15,9 @@
 
 namespace Belle2 {
 
+  /**
+   * BKLM element numbers.
+   */
   class BKLMElementNumbers {
 
   public:

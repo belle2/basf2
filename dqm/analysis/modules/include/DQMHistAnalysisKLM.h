@@ -25,8 +25,6 @@
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 
-#define NSECTORFB 16
-
 namespace Belle2 {
 
   /**
@@ -70,6 +68,11 @@ namespace Belle2 {
      * This method is called at the end of the event processing.
      */
     virtual void terminate() override;
+
+    /**
+     * Total Number of sectors in BKLM.
+     */
+    static constexpr int NSECTORFB = 16;
 
   protected:
 

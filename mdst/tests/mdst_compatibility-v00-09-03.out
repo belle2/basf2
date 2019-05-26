@@ -38,7 +38,6 @@ Untested method PIDLikelihood::setLogLikelihood
 Untested method ECLCluster::addHypothesis
 Untested method ECLCluster::addStatus
 Untested method ECLCluster::getHypothesisId
-Untested method ECLCluster::getMaxECellId
 Untested method ECLCluster::hasStatus
 Untested method ECLCluster::removeHypothesis
 Untested method ECLCluster::removeStatus
@@ -1561,6 +1560,7 @@ ECLCluster#0:
   getEnergyRaw(): 0.103597
   getHypotheses(): 16
   getLAT(): 0.183594
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.4043
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -1608,6 +1608,7 @@ ECLCluster#1:
   getEnergyRaw(): 0.290484
   getHypotheses(): 16
   getLAT(): 0.371094
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.6484
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -1655,6 +1656,7 @@ ECLCluster#2:
   getEnergyRaw(): 0.130644
   getHypotheses(): 16
   getLAT(): 0.274414
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 3.32031
   getNumberOfHadronDigits(): 0
@@ -1703,6 +1705,7 @@ ECLCluster#3:
   getEnergyRaw(): 0.0723845
   getHypotheses(): 16
   getLAT(): 0.21582
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.1602
   getNumberOfCrystals(): 5.66406
   getNumberOfHadronDigits(): 0
@@ -1751,6 +1754,7 @@ ECLCluster#4:
   getEnergyRaw(): 0.0227185
   getHypotheses(): 16
   getLAT(): 0.244141
+  getMaxECellId(): 0
   getMinTrkDistance(): 74.2188
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -1798,6 +1802,7 @@ ECLCluster#5:
   getEnergyRaw(): 0.195755
   getHypotheses(): 16
   getLAT(): 0.117188
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -1845,6 +1850,7 @@ ECLCluster#6:
   getEnergyRaw(): 0.177001
   getHypotheses(): 16
   getLAT(): 0.208984
+  getMaxECellId(): 0
   getMinTrkDistance(): 13.916
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -1892,6 +1898,7 @@ ECLCluster#7:
   getEnergyRaw(): 0.346277
   getHypotheses(): 16
   getLAT(): 0.433594
+  getMaxECellId(): 0
   getMinTrkDistance(): 55.9082
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -1939,6 +1946,7 @@ ECLCluster#8:
   getEnergyRaw(): 0.136964
   getHypotheses(): 16
   getLAT(): 0.317383
+  getMaxECellId(): 0
   getMinTrkDistance(): 110.596
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -1986,6 +1994,7 @@ ECLCluster#9:
   getEnergyRaw(): 0.400856
   getHypotheses(): 16
   getLAT(): 0.499023
+  getMaxECellId(): 0
   getMinTrkDistance(): 152.588
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
@@ -2036,6 +2045,7 @@ ECLCluster#10:
   getEnergyRaw(): 0.11537
   getHypotheses(): 16
   getLAT(): 0.286133
+  getMaxECellId(): 0
   getMinTrkDistance(): 119.141
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -2083,6 +2093,7 @@ ECLCluster#11:
   getEnergyRaw(): 0.124013
   getHypotheses(): 16
   getLAT(): 0.15625
+  getMaxECellId(): 0
   getMinTrkDistance(): 97.4121
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -2130,6 +2141,7 @@ ECLCluster#12:
   getEnergyRaw(): 0.0902353
   getHypotheses(): 16
   getLAT(): 0.176758
+  getMaxECellId(): 0
   getMinTrkDistance(): 37.1094
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -2177,6 +2189,7 @@ ECLCluster#13:
   getEnergyRaw(): 0.898695
   getHypotheses(): 16
   getLAT(): 0.520508
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.1602
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
@@ -2224,6 +2237,7 @@ ECLCluster#14:
   getEnergyRaw(): 0.33227
   getHypotheses(): 16
   getLAT(): 0.313477
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.3105
   getNumberOfCrystals(): 10.7422
   getNumberOfHadronDigits(): 0
@@ -2274,6 +2288,7 @@ ECLCluster#15:
   getEnergyRaw(): 0.526095
   getHypotheses(): 16
   getLAT(): 0.206055
+  getMaxECellId(): 0
   getMinTrkDistance(): 10.2539
   getNumberOfCrystals(): 9.17969
   getNumberOfHadronDigits(): 0
@@ -2324,6 +2339,7 @@ ECLCluster#16:
   getEnergyRaw(): 0.0459444
   getHypotheses(): 16
   getLAT(): 0.0839844
+  getMaxECellId(): 0
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -2376,6 +2392,7 @@ ECLCluster#17:
   getEnergyRaw(): 0.103597
   getHypotheses(): 32
   getLAT(): 0.183594
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.4043
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -2423,6 +2440,7 @@ ECLCluster#18:
   getEnergyRaw(): 0.291301
   getHypotheses(): 32
   getLAT(): 0.382812
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.6484
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -2470,6 +2488,7 @@ ECLCluster#19:
   getEnergyRaw(): 0.203045
   getHypotheses(): 32
   getLAT(): 0.670898
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.625
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -2518,6 +2537,7 @@ ECLCluster#20:
   getEnergyRaw(): 0.0227185
   getHypotheses(): 32
   getLAT(): 0.244141
+  getMaxECellId(): 0
   getMinTrkDistance(): 74.2188
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -2565,6 +2585,7 @@ ECLCluster#21:
   getEnergyRaw(): 0.195755
   getHypotheses(): 32
   getLAT(): 0.117188
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -2612,6 +2633,7 @@ ECLCluster#22:
   getEnergyRaw(): 0.177001
   getHypotheses(): 32
   getLAT(): 0.208984
+  getMaxECellId(): 0
   getMinTrkDistance(): 13.916
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -2659,6 +2681,7 @@ ECLCluster#23:
   getEnergyRaw(): 0.346277
   getHypotheses(): 32
   getLAT(): 0.433594
+  getMaxECellId(): 0
   getMinTrkDistance(): 55.9082
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -2706,6 +2729,7 @@ ECLCluster#24:
   getEnergyRaw(): 0.139921
   getHypotheses(): 32
   getLAT(): 0.405273
+  getMaxECellId(): 0
   getMinTrkDistance(): 110.596
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -2753,6 +2777,7 @@ ECLCluster#25:
   getEnergyRaw(): 0.405977
   getHypotheses(): 32
   getLAT(): 0.549805
+  getMaxECellId(): 0
   getMinTrkDistance(): 152.588
   getNumberOfCrystals(): 17.9688
   getNumberOfHadronDigits(): 0
@@ -2803,6 +2828,7 @@ ECLCluster#26:
   getEnergyRaw(): 0.11537
   getHypotheses(): 32
   getLAT(): 0.286133
+  getMaxECellId(): 0
   getMinTrkDistance(): 119.141
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -2850,6 +2876,7 @@ ECLCluster#27:
   getEnergyRaw(): 0.124013
   getHypotheses(): 32
   getLAT(): 0.15625
+  getMaxECellId(): 0
   getMinTrkDistance(): 97.4121
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -2897,6 +2924,7 @@ ECLCluster#28:
   getEnergyRaw(): 0.0902353
   getHypotheses(): 32
   getLAT(): 0.176758
+  getMaxECellId(): 0
   getMinTrkDistance(): 37.1094
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -2944,6 +2972,7 @@ ECLCluster#29:
   getEnergyRaw(): 0.908706
   getHypotheses(): 32
   getLAT(): 0.561523
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.1602
   getNumberOfCrystals(): 19.9219
   getNumberOfHadronDigits(): 0
@@ -2991,6 +3020,7 @@ ECLCluster#30:
   getEnergyRaw(): 0.858431
   getHypotheses(): 32
   getLAT(): 0.509766
+  getMaxECellId(): 0
   getMinTrkDistance(): 13.1836
   getNumberOfCrystals(): 19.9219
   getNumberOfHadronDigits(): 0
@@ -3041,6 +3071,7 @@ ECLCluster#31:
   getEnergyRaw(): 0.0459444
   getHypotheses(): 32
   getLAT(): 0.0839844
+  getMaxECellId(): 0
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -7192,6 +7223,7 @@ ECLCluster#0:
   getEnergyRaw(): 0.209471
   getHypotheses(): 16
   getLAT(): 0.0078125
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -7239,6 +7271,7 @@ ECLCluster#1:
   getEnergyRaw(): 0.218875
   getHypotheses(): 16
   getLAT(): 0.390625
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.7344
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -7288,6 +7321,7 @@ ECLCluster#2:
   getEnergyRaw(): 0.246328
   getHypotheses(): 16
   getLAT(): 0.192383
+  getMaxECellId(): 0
   getMinTrkDistance(): 79.5898
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -7335,6 +7369,7 @@ ECLCluster#3:
   getEnergyRaw(): 0.323851
   getHypotheses(): 16
   getLAT(): 0.421875
+  getMaxECellId(): 0
   getMinTrkDistance(): 23.6816
   getNumberOfCrystals(): 11.5234
   getNumberOfHadronDigits(): 0
@@ -7384,6 +7419,7 @@ ECLCluster#4:
   getEnergyRaw(): 0.0500415
   getHypotheses(): 16
   getLAT(): 0.414062
+  getMaxECellId(): 0
   getMinTrkDistance(): 20.752
   getNumberOfCrystals(): 6.44531
   getNumberOfHadronDigits(): 0
@@ -7433,6 +7469,7 @@ ECLCluster#5:
   getEnergyRaw(): 0.544687
   getHypotheses(): 16
   getLAT(): 0.137695
+  getMaxECellId(): 0
   getMinTrkDistance(): 138.916
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -7480,6 +7517,7 @@ ECLCluster#6:
   getEnergyRaw(): 0.269541
   getHypotheses(): 16
   getLAT(): 0.217773
+  getMaxECellId(): 0
   getMinTrkDistance(): 106.201
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -7527,6 +7565,7 @@ ECLCluster#7:
   getEnergyRaw(): 0.0551665
   getHypotheses(): 16
   getLAT(): 0.204102
+  getMaxECellId(): 0
   getMinTrkDistance(): 123.779
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -7575,6 +7614,7 @@ ECLCluster#8:
   getEnergyRaw(): 0.0272079
   getHypotheses(): 16
   getLAT(): 0.0859375
+  getMaxECellId(): 0
   getMinTrkDistance(): 181.152
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -7622,6 +7662,7 @@ ECLCluster#9:
   getEnergyRaw(): 0.0559703
   getHypotheses(): 16
   getLAT(): 0.120117
+  getMaxECellId(): 0
   getMinTrkDistance(): 108.154
   getNumberOfCrystals(): 3.125
   getNumberOfHadronDigits(): 0
@@ -7670,6 +7711,7 @@ ECLCluster#10:
   getEnergyRaw(): 0.411566
   getHypotheses(): 16
   getLAT(): 0.331055
+  getMaxECellId(): 0
   getMinTrkDistance(): 96.1914
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -7718,6 +7760,7 @@ ECLCluster#11:
   getEnergyRaw(): 0.132116
   getHypotheses(): 16
   getLAT(): 0.125
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -7766,6 +7809,7 @@ ECLCluster#12:
   getEnergyRaw(): 0.149182
   getHypotheses(): 16
   getLAT(): 0.443359
+  getMaxECellId(): 0
   getMinTrkDistance(): 29.0527
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -7815,6 +7859,7 @@ ECLCluster#13:
   getEnergyRaw(): 0.0208986
   getHypotheses(): 16
   getLAT(): 0.0546875
+  getMaxECellId(): 0
   getMinTrkDistance(): 116.699
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -7862,6 +7907,7 @@ ECLCluster#14:
   getEnergyRaw(): 0.0613757
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 140.381
   getNumberOfCrystals(): 0.976562
   getNumberOfHadronDigits(): 0
@@ -7909,6 +7955,7 @@ ECLCluster#15:
   getEnergyRaw(): 0.0215114
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 136.963
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -7958,6 +8005,7 @@ ECLCluster#16:
   getEnergyRaw(): 0.15136
   getHypotheses(): 16
   getLAT(): 0.0585938
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.625
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -8006,6 +8054,7 @@ ECLCluster#17:
   getEnergyRaw(): 0.304862
   getHypotheses(): 16
   getLAT(): 0.396484
+  getMaxECellId(): 0
   getMinTrkDistance(): 135.986
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -8054,6 +8103,7 @@ ECLCluster#18:
   getEnergyRaw(): 0.060426
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 30.2734
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -8101,6 +8151,7 @@ ECLCluster#19:
   getEnergyRaw(): 0.0339094
   getHypotheses(): 16
   getLAT(): 0.639648
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -8149,6 +8200,7 @@ ECLCluster#20:
   getEnergyRaw(): 0.329051
   getHypotheses(): 16
   getLAT(): 0.327148
+  getMaxECellId(): 0
   getMinTrkDistance(): 162.109
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -8196,6 +8248,7 @@ ECLCluster#21:
   getEnergyRaw(): 0.214451
   getHypotheses(): 16
   getLAT(): 0.125
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.9785
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -8243,6 +8296,7 @@ ECLCluster#22:
   getEnergyRaw(): 0.0652405
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -8293,6 +8347,7 @@ ECLCluster#23:
   getEnergyRaw(): 0.0859404
   getHypotheses(): 16
   getLAT(): 0.22168
+  getMaxECellId(): 0
   getMinTrkDistance(): 100.098
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -8345,6 +8400,7 @@ ECLCluster#24:
   getEnergyRaw(): 0.209471
   getHypotheses(): 32
   getLAT(): 0.0078125
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -8392,6 +8448,7 @@ ECLCluster#25:
   getEnergyRaw(): 0.218875
   getHypotheses(): 32
   getLAT(): 0.390625
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.7344
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -8441,6 +8498,7 @@ ECLCluster#26:
   getEnergyRaw(): 0.246328
   getHypotheses(): 32
   getLAT(): 0.192383
+  getMaxECellId(): 0
   getMinTrkDistance(): 79.5898
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -8488,6 +8546,7 @@ ECLCluster#27:
   getEnergyRaw(): 0.373912
   getHypotheses(): 32
   getLAT(): 0.62793
+  getMaxECellId(): 0
   getMinTrkDistance(): 22.2168
   getNumberOfCrystals(): 17.9688
   getNumberOfHadronDigits(): 0
@@ -8537,6 +8596,7 @@ ECLCluster#28:
   getEnergyRaw(): 0.544687
   getHypotheses(): 32
   getLAT(): 0.137695
+  getMaxECellId(): 0
   getMinTrkDistance(): 138.916
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -8584,6 +8644,7 @@ ECLCluster#29:
   getEnergyRaw(): 0.269541
   getHypotheses(): 32
   getLAT(): 0.217773
+  getMaxECellId(): 0
   getMinTrkDistance(): 106.201
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -8631,6 +8692,7 @@ ECLCluster#30:
   getEnergyRaw(): 0.0551665
   getHypotheses(): 32
   getLAT(): 0.204102
+  getMaxECellId(): 0
   getMinTrkDistance(): 123.779
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -8679,6 +8741,7 @@ ECLCluster#31:
   getEnergyRaw(): 0.0272079
   getHypotheses(): 32
   getLAT(): 0.0859375
+  getMaxECellId(): 0
   getMinTrkDistance(): 181.152
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -8726,6 +8789,7 @@ ECLCluster#32:
   getEnergyRaw(): 0.467562
   getHypotheses(): 32
   getLAT(): 0.646484
+  getMaxECellId(): 0
   getMinTrkDistance(): 98.3887
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
@@ -8774,6 +8838,7 @@ ECLCluster#33:
   getEnergyRaw(): 0.282735
   getHypotheses(): 32
   getLAT(): 0.913086
+  getMaxECellId(): 0
   getMinTrkDistance(): 22.2168
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -8824,6 +8889,7 @@ ECLCluster#34:
   getEnergyRaw(): 0.0208986
   getHypotheses(): 32
   getLAT(): 0.0546875
+  getMaxECellId(): 0
   getMinTrkDistance(): 116.699
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -8871,6 +8937,7 @@ ECLCluster#35:
   getEnergyRaw(): 0.0613757
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 140.381
   getNumberOfCrystals(): 0.976562
   getNumberOfHadronDigits(): 0
@@ -8918,6 +8985,7 @@ ECLCluster#36:
   getEnergyRaw(): 0.0215114
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 136.963
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -8967,6 +9035,7 @@ ECLCluster#37:
   getEnergyRaw(): 0.15136
   getHypotheses(): 32
   getLAT(): 0.0585938
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.625
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
@@ -9015,6 +9084,7 @@ ECLCluster#38:
   getEnergyRaw(): 0.306616
   getHypotheses(): 32
   getLAT(): 0.416992
+  getMaxECellId(): 0
   getMinTrkDistance(): 135.986
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -9063,6 +9133,7 @@ ECLCluster#39:
   getEnergyRaw(): 0.060426
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 30.2734
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -9110,6 +9181,7 @@ ECLCluster#40:
   getEnergyRaw(): 0.0367219
   getHypotheses(): 32
   getLAT(): 0.729492
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -9158,6 +9230,7 @@ ECLCluster#41:
   getEnergyRaw(): 0.329051
   getHypotheses(): 32
   getLAT(): 0.327148
+  getMaxECellId(): 0
   getMinTrkDistance(): 162.109
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -9205,6 +9278,7 @@ ECLCluster#42:
   getEnergyRaw(): 0.214451
   getHypotheses(): 32
   getLAT(): 0.125
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.9785
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -9252,6 +9326,7 @@ ECLCluster#43:
   getEnergyRaw(): 0.0652405
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -9302,6 +9377,7 @@ ECLCluster#44:
   getEnergyRaw(): 0.0859404
   getHypotheses(): 32
   getLAT(): 0.22168
+  getMaxECellId(): 0
   getMinTrkDistance(): 100.098
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -13894,6 +13970,7 @@ ECLCluster#0:
   getEnergyRaw(): 0.239216
   getHypotheses(): 16
   getLAT(): 0.245117
+  getMaxECellId(): 0
   getMinTrkDistance(): 45.8984
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -13941,6 +14018,7 @@ ECLCluster#1:
   getEnergyRaw(): 0.138633
   getHypotheses(): 16
   getLAT(): 0.119141
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.2461
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -13988,6 +14066,7 @@ ECLCluster#2:
   getEnergyRaw(): 0.166709
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -14035,6 +14114,7 @@ ECLCluster#3:
   getEnergyRaw(): 0.199257
   getHypotheses(): 16
   getLAT(): 0.146484
+  getMaxECellId(): 0
   getMinTrkDistance(): 34.4238
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -14082,6 +14162,7 @@ ECLCluster#4:
   getEnergyRaw(): 0.137634
   getHypotheses(): 16
   getLAT(): 0.15332
+  getMaxECellId(): 0
   getMinTrkDistance(): 77.8809
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -14129,6 +14210,7 @@ ECLCluster#5:
   getEnergyRaw(): 0.13854
   getHypotheses(): 16
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 36.377
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -14178,6 +14260,7 @@ ECLCluster#6:
   getEnergyRaw(): 0.0465769
   getHypotheses(): 16
   getLAT(): 0.078125
+  getMaxECellId(): 0
   getMinTrkDistance(): 76.1719
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -14225,6 +14308,7 @@ ECLCluster#7:
   getEnergyRaw(): 0.215225
   getHypotheses(): 16
   getLAT(): 0.496094
+  getMaxECellId(): 0
   getMinTrkDistance(): 20.0195
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -14272,6 +14356,7 @@ ECLCluster#8:
   getEnergyRaw(): 0.32876
   getHypotheses(): 16
   getLAT(): 0.539062
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -14319,6 +14404,7 @@ ECLCluster#9:
   getEnergyRaw(): 0.184547
   getHypotheses(): 16
   getLAT(): 0.651367
+  getMaxECellId(): 0
   getMinTrkDistance(): 107.422
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -14367,6 +14453,7 @@ ECLCluster#10:
   getEnergyRaw(): 0.0755119
   getHypotheses(): 16
   getLAT(): 0.329102
+  getMaxECellId(): 0
   getMinTrkDistance(): 98.6328
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -14415,6 +14502,7 @@ ECLCluster#11:
   getEnergyRaw(): 0.70742
   getHypotheses(): 16
   getLAT(): 0.245117
+  getMaxECellId(): 0
   getMinTrkDistance(): 30.7617
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -14462,6 +14550,7 @@ ECLCluster#12:
   getEnergyRaw(): 0.405705
   getHypotheses(): 16
   getLAT(): 0.266602
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 13.0859
   getNumberOfHadronDigits(): 0
@@ -14509,6 +14598,7 @@ ECLCluster#13:
   getEnergyRaw(): 0.501789
   getHypotheses(): 16
   getLAT(): 0.230469
+  getMaxECellId(): 0
   getMinTrkDistance(): 96.1914
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -14558,6 +14648,7 @@ ECLCluster#14:
   getEnergyRaw(): 0.16044
   getHypotheses(): 16
   getLAT(): 0.331055
+  getMaxECellId(): 0
   getMinTrkDistance(): 113.77
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -14605,6 +14696,7 @@ ECLCluster#15:
   getEnergyRaw(): 0.0310601
   getHypotheses(): 16
   getLAT(): 0.170898
+  getMaxECellId(): 0
   getMinTrkDistance(): 98.1445
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -14652,6 +14744,7 @@ ECLCluster#16:
   getEnergyRaw(): 0.121826
   getHypotheses(): 16
   getLAT(): 0.0996094
+  getMaxECellId(): 0
   getMinTrkDistance(): 140.625
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -14699,6 +14792,7 @@ ECLCluster#17:
   getEnergyRaw(): 0.111365
   getHypotheses(): 16
   getLAT(): 0.0634766
+  getMaxECellId(): 0
   getMinTrkDistance(): 128.662
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -14746,6 +14840,7 @@ ECLCluster#18:
   getEnergyRaw(): 0.254737
   getHypotheses(): 16
   getLAT(): 0.169922
+  getMaxECellId(): 0
   getMinTrkDistance(): 73.4863
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -14794,6 +14889,7 @@ ECLCluster#19:
   getEnergyRaw(): 0.091132
   getHypotheses(): 16
   getLAT(): 0.360352
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.8223
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -14841,6 +14937,7 @@ ECLCluster#20:
   getEnergyRaw(): 0.141566
   getHypotheses(): 16
   getLAT(): 0.464844
+  getMaxECellId(): 0
   getMinTrkDistance(): 30.7617
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -14889,6 +14986,7 @@ ECLCluster#21:
   getEnergyRaw(): 0.444289
   getHypotheses(): 16
   getLAT(): 0.689453
+  getMaxECellId(): 0
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -14941,6 +15039,7 @@ ECLCluster#22:
   getEnergyRaw(): 0.13138
   getHypotheses(): 16
   getLAT(): 0.367188
+  getMaxECellId(): 0
   getMinTrkDistance(): 20.9961
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -14992,6 +15091,7 @@ ECLCluster#23:
   getEnergyRaw(): 0.327778
   getHypotheses(): 16
   getLAT(): 0.392578
+  getMaxECellId(): 0
   getMinTrkDistance(): 19.043
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -15039,6 +15139,7 @@ ECLCluster#24:
   getEnergyRaw(): 0.108377
   getHypotheses(): 16
   getLAT(): 0.283203
+  getMaxECellId(): 0
   getMinTrkDistance(): 37.1094
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -15086,6 +15187,7 @@ ECLCluster#25:
   getEnergyRaw(): 0.256994
   getHypotheses(): 16
   getLAT(): 0.34375
+  getMaxECellId(): 0
   getMinTrkDistance(): 65.6738
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -15133,6 +15235,7 @@ ECLCluster#26:
   getEnergyRaw(): 0.49994
   getHypotheses(): 16
   getLAT(): 0.195312
+  getMaxECellId(): 0
   getMinTrkDistance(): 86.1816
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -15185,6 +15288,7 @@ ECLCluster#27:
   getEnergyRaw(): 0.239216
   getHypotheses(): 32
   getLAT(): 0.245117
+  getMaxECellId(): 0
   getMinTrkDistance(): 45.8984
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
@@ -15232,6 +15336,7 @@ ECLCluster#28:
   getEnergyRaw(): 0.138633
   getHypotheses(): 32
   getLAT(): 0.119141
+  getMaxECellId(): 0
   getMinTrkDistance(): 52.2461
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -15279,6 +15384,7 @@ ECLCluster#29:
   getEnergyRaw(): 0.166709
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -15326,6 +15432,7 @@ ECLCluster#30:
   getEnergyRaw(): 0.199257
   getHypotheses(): 32
   getLAT(): 0.146484
+  getMaxECellId(): 0
   getMinTrkDistance(): 34.4238
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -15373,6 +15480,7 @@ ECLCluster#31:
   getEnergyRaw(): 0.137634
   getHypotheses(): 32
   getLAT(): 0.15332
+  getMaxECellId(): 0
   getMinTrkDistance(): 77.8809
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -15420,6 +15528,7 @@ ECLCluster#32:
   getEnergyRaw(): 0.13854
   getHypotheses(): 32
   getLAT(): 0
+  getMaxECellId(): 0
   getMinTrkDistance(): 36.377
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
@@ -15469,6 +15578,7 @@ ECLCluster#33:
   getEnergyRaw(): 0.0465769
   getHypotheses(): 32
   getLAT(): 0.078125
+  getMaxECellId(): 0
   getMinTrkDistance(): 76.1719
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -15516,6 +15626,7 @@ ECLCluster#34:
   getEnergyRaw(): 0.215225
   getHypotheses(): 32
   getLAT(): 0.496094
+  getMaxECellId(): 0
   getMinTrkDistance(): 20.0195
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -15563,6 +15674,7 @@ ECLCluster#35:
   getEnergyRaw(): 0.32876
   getHypotheses(): 32
   getLAT(): 0.539062
+  getMaxECellId(): 0
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -15610,6 +15722,7 @@ ECLCluster#36:
   getEnergyRaw(): 0.186877
   getHypotheses(): 32
   getLAT(): 0.676758
+  getMaxECellId(): 0
   getMinTrkDistance(): 107.422
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
@@ -15658,6 +15771,7 @@ ECLCluster#37:
   getEnergyRaw(): 0.0755119
   getHypotheses(): 32
   getLAT(): 0.329102
+  getMaxECellId(): 0
   getMinTrkDistance(): 98.6328
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -15706,6 +15820,7 @@ ECLCluster#38:
   getEnergyRaw(): 0.70742
   getHypotheses(): 32
   getLAT(): 0.245117
+  getMaxECellId(): 0
   getMinTrkDistance(): 30.7617
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
@@ -15753,6 +15868,7 @@ ECLCluster#39:
   getEnergyRaw(): 0.406597
   getHypotheses(): 32
   getLAT(): 0.27832
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
@@ -15800,6 +15916,7 @@ ECLCluster#40:
   getEnergyRaw(): 0.501789
   getHypotheses(): 32
   getLAT(): 0.230469
+  getMaxECellId(): 0
   getMinTrkDistance(): 96.1914
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -15849,6 +15966,7 @@ ECLCluster#41:
   getEnergyRaw(): 0.16044
   getHypotheses(): 32
   getLAT(): 0.331055
+  getMaxECellId(): 0
   getMinTrkDistance(): 113.77
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
@@ -15896,6 +16014,7 @@ ECLCluster#42:
   getEnergyRaw(): 0.0310601
   getHypotheses(): 32
   getLAT(): 0.170898
+  getMaxECellId(): 0
   getMinTrkDistance(): 98.1445
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
@@ -15943,6 +16062,7 @@ ECLCluster#43:
   getEnergyRaw(): 0.121826
   getHypotheses(): 32
   getLAT(): 0.0996094
+  getMaxECellId(): 0
   getMinTrkDistance(): 140.625
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -15990,6 +16110,7 @@ ECLCluster#44:
   getEnergyRaw(): 0.111365
   getHypotheses(): 32
   getLAT(): 0.0634766
+  getMaxECellId(): 0
   getMinTrkDistance(): 128.662
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
@@ -16037,6 +16158,7 @@ ECLCluster#45:
   getEnergyRaw(): 0.254737
   getHypotheses(): 32
   getLAT(): 0.169922
+  getMaxECellId(): 0
   getMinTrkDistance(): 73.4863
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -16085,6 +16207,7 @@ ECLCluster#46:
   getEnergyRaw(): 0.233041
   getHypotheses(): 32
   getLAT(): 0.816406
+  getMaxECellId(): 0
   getMinTrkDistance(): 24.1699
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
@@ -16133,6 +16256,7 @@ ECLCluster#47:
   getEnergyRaw(): 0.585274
   getHypotheses(): 32
   getLAT(): 0.833008
+  getMaxECellId(): 0
   getMinTrkDistance(): 15.625
   getNumberOfCrystals(): 19.9219
   getNumberOfHadronDigits(): 0
@@ -16185,6 +16309,7 @@ ECLCluster#48:
   getEnergyRaw(): 0.349878
   getHypotheses(): 32
   getLAT(): 0.491211
+  getMaxECellId(): 0
   getMinTrkDistance(): 18.0664
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
@@ -16232,6 +16357,7 @@ ECLCluster#49:
   getEnergyRaw(): 0.108377
   getHypotheses(): 32
   getLAT(): 0.283203
+  getMaxECellId(): 0
   getMinTrkDistance(): 37.1094
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
@@ -16279,6 +16405,7 @@ ECLCluster#50:
   getEnergyRaw(): 0.256994
   getHypotheses(): 32
   getLAT(): 0.34375
+  getMaxECellId(): 0
   getMinTrkDistance(): 65.6738
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
@@ -16326,6 +16453,7 @@ ECLCluster#51:
   getEnergyRaw(): 0.49994
   getHypotheses(): 32
   getLAT(): 0.195312
+  getMaxECellId(): 0
   getMinTrkDistance(): 86.1816
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0

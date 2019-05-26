@@ -3,7 +3,7 @@
  * Copyright(C) 2019  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Vipin Gaur                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

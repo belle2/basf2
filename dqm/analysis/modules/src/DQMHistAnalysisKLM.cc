@@ -3,7 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Leo Piilonen                            *
+ * Contributors: Kirill Chilikin, Leo Piilonen, Vipin Gaur                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,9 +24,9 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   const double histMinNDC = 0.1;
   const double histMaxNDC = 0.9;
   const double histRangeNDC = histMaxNDC - histMinNDC;
-  for (int sectorFB = 0; sectorFB < NSECTORFB; ++sectorFB) {
-    double xLineNDC = histMinNDC + (histRangeNDC * sectorFB) / NSECTORFB;
-    double xTextNDC = histMinNDC + (histRangeNDC * (sectorFB + 0.5)) / NSECTORFB;
+  for (int sectorFB = 0; sectorFB < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sectorFB) {
+    double xLineNDC = histMinNDC + (histRangeNDC * sectorFB) / BKLMElementNumbers::getMaximalSectorGlobalNumber();
+    double xTextNDC = histMinNDC + (histRangeNDC * (sectorFB + 0.5)) / BKLMElementNumbers::getMaximalSectorGlobalNumber();
     double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
     m_sectorLine[sectorFB] = new TLine(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
     m_sectorLine[sectorFB]->SetNDC(true);
@@ -45,7 +45,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
 
 DQMHistAnalysisKLMModule::~DQMHistAnalysisKLMModule()
 {
-  for (int sectorFB = 0; sectorFB < NSECTORFB; ++sectorFB) {
+  for (int sectorFB = 0; sectorFB < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sectorFB) {
     delete m_sectorLine[sectorFB];
     delete m_sectorText[sectorFB];
   }
@@ -157,7 +157,7 @@ void DQMHistAnalysisKLMModule::processBKLMSectorLayerHistogram(const std::string
   histogram->SetStats(false);
   histogram->Draw();
   canvas->Modified();
-  for (int sectorFB = 0; sectorFB < NSECTORFB; ++sectorFB) {
+  for (int sectorFB = 0; sectorFB < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sectorFB) {
     m_sectorLine[sectorFB]->Draw();
     m_sectorText[sectorFB]->Draw();
   }

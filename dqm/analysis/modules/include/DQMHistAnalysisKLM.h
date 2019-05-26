@@ -22,6 +22,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 
@@ -69,11 +70,6 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
-    /**
-     * Total Number of sectors in BKLM.
-     */
-    static constexpr int NSECTORFB = 16;
-
   protected:
 
     /**
@@ -109,10 +105,10 @@ namespace Belle2 {
       EKLMElementNumbers::getMaximalLayerGlobalNumber()];
 
     /** TLine for BKLM sector boundary in histogram. */
-    TLine* m_sectorLine[NSECTORFB];
+    TLine* m_sectorLine[BKLMElementNumbers::getMaximalSectorGlobalNumber()];
 
     /** TText for BKLM sector name in histogram. */
-    TText* m_sectorText[NSECTORFB];
+    TText* m_sectorText[BKLMElementNumbers::getMaximalSectorGlobalNumber()];
 
   };
 

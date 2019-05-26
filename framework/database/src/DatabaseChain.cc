@@ -22,7 +22,7 @@ using namespace Belle2;
 
 void DatabaseChain::createInstance(bool resetIoVs, LogConfig::ELogLevel logLevel, bool invertLogging)
 {
-  DatabaseChain* database = new DatabaseChain(resetIoVs);
+  auto* database = new DatabaseChain(resetIoVs);
   database->setLogLevel(logLevel, invertLogging);
   Database::setInstance(database);
 }

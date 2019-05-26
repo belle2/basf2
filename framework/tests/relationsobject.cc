@@ -14,7 +14,7 @@ namespace {
   class RelationsObjectTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp()
+    void SetUp() override
     {
       evtData.registerInDataStore();
       profileData.registerInDataStore();
@@ -28,7 +28,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -85,20 +85,20 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     //not yet set
-    EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != nullptr);
 
     (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
 
     //now it should be found (index updated because RelationContainer was just created)
-    EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != nullptr);
 
     //test again with different object
-    EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != nullptr);
 
     (relObjData)[1]->addRelationTo((profileData)[0], -42.0);
 
     //now it should be found (index updated because addRelation marks RelationContainer as modified)
-    EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != nullptr);
   }
 
   /** Test getting array name/index from a RelationsObject. */

@@ -250,7 +250,10 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   eclCluster->setPhi(eclShower->getPhi());
   eclCluster->setR(eclShower->getR());
   eclCluster->setPulseShapeDiscriminationMVA(eclShower->getPulseShapeDiscriminationMVA());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   eclCluster->setClusterHadronIntensity(eclShower->getShowerHadronIntensity());
+#pragma GCC diagnostic pop
   eclCluster->setNumberOfHadronDigits(eclShower->getNumberOfHadronDigits());
 
   // set relation to ECLShower

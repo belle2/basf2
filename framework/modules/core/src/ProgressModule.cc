@@ -47,6 +47,6 @@ void ProgressModule::event()
   ++m_evtNr;
   //Calculate the order of magnitude
   int order = (m_evtNr == 0) ? 1 : (int)(min(log10(m_evtNr), (double)m_maxOrder));
-  int interval = (int)pow(10., order);
+  auto interval = (int)pow(10., order);
   if (m_evtNr % interval == 0) B2INFO(m_output % m_runNr % m_evtNr);
 }

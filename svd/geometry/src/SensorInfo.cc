@@ -48,8 +48,8 @@ const TVector3 SensorInfo::getEField(const TVector3& point) const
 {
 
   TVector3 E(0, 0,
-             - 2.0 * m_depletionVoltage / m_thickness
-             * ((point.Z() + 0.5 * m_thickness) / m_thickness)
+             + 2.0 * m_depletionVoltage / m_thickness
+             * ((+point.Z() - 0.5 * m_thickness) / m_thickness)
              - (m_biasVoltage - m_depletionVoltage) / m_thickness);
 
   return E;
@@ -57,6 +57,10 @@ const TVector3 SensorInfo::getEField(const TVector3& point) const
 
 const TVector3& SensorInfo::getBField(const TVector3& point) const
 {
+  //  useful just for testing:
+  //  static TVector3 noBfield(0,0,0);
+  //  return noBfield;
+
   static TVector3 oldPoint(0, 0, 1000 * Unit::cm);
   static TVector3 oldField(0, 0, 0);
   static double bRadius = 0.5 * Unit::cm;
@@ -79,17 +83,20 @@ const TVector3 SensorInfo::getVelocity(CarrierType carrier,
   // Set mobility parameters
   double mobility = 0;
   double hallFactor = getHallFactor(carrier);
+
   if (carrier == electron) {
     mobility = -getElectronMobility(E.Mag());
   } else {
     mobility = getHoleMobility(E.Mag());
   }
-  double mobilityH = hallFactor * mobility;
+
+  double mobilityH = hallFactor * fabs(mobility);
+
   // Calculate products
   TVector3 EcrossB = E.Cross(B);
   TVector3 BEdotB = E.Dot(B) * B;
   TVector3 velocity = mobility * E + mobility * mobilityH * EcrossB
-                      + +mobility * mobilityH * mobilityH * BEdotB;
+                      + mobility * mobilityH * mobilityH * BEdotB;
   velocity *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
   return velocity;
 }

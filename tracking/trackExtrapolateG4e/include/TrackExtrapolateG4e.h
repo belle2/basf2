@@ -14,11 +14,13 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
-#include <bklm/dbobjects/BKLMBadChannels.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
 #include <eklm/dbobjects/EKLMChannels.h>
-#include <eklm/geometry/TransformDataGlobalAligned.h>
-#include <tracking/dataobjects/ExtHit.h>
 #include <bklm/geometry/GeometryPar.h>
+#include <eklm/geometry/TransformDataGlobalAligned.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
@@ -105,6 +107,10 @@ namespace Belle2 {
     int extLayerPattern;
     //! MUID: accumulated bit pattern of layers with matching hits
     int hitLayerPattern;
+    //! MUID: vector of BKLM layer efficiencies
+    std::vector<float> extBKLMEfficiencyVector;
+    //! MUID: vector of EKLM layer efficiencies
+    //    std::vector<float> extEKLMEfficiencyVector;
     //! MUID: flag to indicate that the extrapolated track escaped from the KLM
     bool escaped;
   };
@@ -476,17 +482,20 @@ namespace Belle2 {
     //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
     bool m_addHitsToRecoTrack = false;
 
-    //! Conditions-database object for BKLM dead-channel list (updated at start of each run)
-    DBObjPtr<BKLMBadChannels> m_bklmBadChannels;
+    //! KLM element numbers.
+    const KLMElementNumbers* m_klmElementNumbers;
 
-    //! Flag to indicate that the BKLM dead-channel list is valid for the given run
-    bool m_bklmBadChannelsValid;
+    //! Conditions-database object for KLM strip efficiency
+    DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
     //! Conditions-database object for EKLM dead-channel list (updated at start of each run)
     DBObjPtr<EKLMChannels> m_eklmChannels;
 
-    //! Flag to indicate that the EKLM dead-channel list is valid for the given run
-    bool m_eklmChannelsValid;
+    //! Conditions-database object for KLM channel status (updated at start of each run)
+    DBObjPtr<KLMChannelStatus> m_klmChannelStatus;
+
+    //! Flag to indicate that the KLM channel status is valid for the given run
+    bool m_klmChannelStatusValid;
 
     //! EKLM transformation data.
     const EKLM::TransformDataGlobalAligned* m_eklmTransformData;

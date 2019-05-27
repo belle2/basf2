@@ -44,6 +44,7 @@ class SegmentTrackFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
 
         elif self.task == "eval":
             filterName = "eval"
+            #: modify degree of MC truth-matching
             self.truth = "truth_accepted"
 
         elif self.task == "explore":

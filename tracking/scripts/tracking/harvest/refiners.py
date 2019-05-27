@@ -111,7 +111,9 @@ class SaveFiguresOfMeritRefiner(Refiner):
         #: cached contact person of the figure of merit
         self.contact = contact
 
+        #: cached copy of the figures-of-merit key
         self.key = key
+        #: cached copy of the crops-aggregation method
         self.aggregation = aggregation
 
     def refine(self,
@@ -340,11 +342,13 @@ class Plot2DRefiner(Refiner):
         #: cached user-defined contact person for this profile histogram / scatterplot
         self.contact = contact
 
-        #: cached value of x
+        #: cached value of abscissa
         self.x = x
+        #: cached value of ordinate
         self.y = y
         #: cached stacking selection for this profile histogram / scatterplot
         self.stackby = stackby
+        #: cached measurement unit for ordinate
         self.y_unit = y_unit
 
         #: cached lower bound for this profile histogram / scatterplot

@@ -44,6 +44,7 @@ class TrackFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
 
         elif self.task == "eval":
             filterName = "eval"
+            #: Modify degree of MC truth-matching
             self.truth = "truth_accepted"
 
         elif self.task == "explore":

@@ -41,6 +41,7 @@ class RealisticAxialSegmentPairFilterTrainingRun(TrainingRunMixin, ReadOrGenerat
         path.add_module("TFCDC_SegmentFinderFacetAutomaton")
 
         # Also fix the segment orientation to outwards to make training additionally aggressive
+        #: Process each event according to the user's desired task (train, eval, explore)
         if self.task == "train":
             varSets = [
                 "realistic",

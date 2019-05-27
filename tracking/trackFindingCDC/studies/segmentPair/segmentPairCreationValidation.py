@@ -92,8 +92,11 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         """Constructor"""
         super(SegmentPairCreationValidationModule, self).__init__(foreach="CDCSegmentPairVector",
                                                                   output_file_name=output_file_name)
+        #: defer reference to CDCMCSegment2dLookUp singleton until after it is constructed
         self.mc_segment_lookup = None
+        #: defer reference to MCSegmentPairFilter until after it is constructed
         self.mc_segment_pair_filter = None
+        #: defer reference to CDCAxialStereoFusion until after it is constructed
         self.segment_pair_fusion = None
 
     def initialize(self):

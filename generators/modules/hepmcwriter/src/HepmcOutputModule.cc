@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Unit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -82,19 +83,29 @@ void HepMCOutputModule::event()
     if (mcPart.isInitial()) isthep = 2;
 
     int motherIndex = 0;
+
     if (mcPart.getMother() != NULL) motherIndex = mcPart.getMother()->getIndex();
 
     HepMC::HEPEVT_Wrapper::set_status(iPart, isthep);
     HepMC::HEPEVT_Wrapper::set_id(iPart, mcPart.getPDG());
     HepMC::HEPEVT_Wrapper::set_parents(iPart, motherIndex, motherIndex);
     HepMC::HEPEVT_Wrapper::set_children(iPart, mcPart.getFirstDaughter(), mcPart.getLastDaughter());
-    HepMC::HEPEVT_Wrapper::set_momentum(iPart, mom.X(), mom.Y(), mom.Z(), mcPart.getEnergy());
-    HepMC::HEPEVT_Wrapper::set_mass(iPart, mcPart.getMass());
-    HepMC::HEPEVT_Wrapper::set_position(iPart, vert.X(), vert.Y(), vert.Z(), mcPart.getProductionTime() * Const::speedOfLight);
+    HepMC::HEPEVT_Wrapper::set_momentum(iPart,
+                                        mom.X() * Unit::GeV,
+                                        mom.Y() * Unit::GeV,
+                                        mom.Z() * Unit::GeV,
+                                        mcPart.getEnergy() * Unit::GeV);
+    HepMC::HEPEVT_Wrapper::set_mass(iPart, mcPart.getMass() * Unit::GeV);
+    HepMC::HEPEVT_Wrapper::set_position(iPart,
+                                        vert.X() * Unit::cm,
+                                        vert.Y() * Unit::cm,
+                                        vert.Z() * Unit::cm,
+                                        mcPart.getProductionTime() * Const::speedOfLight * Unit::cm);
   }
 
   // read from buffers and write event to disk
   HepMC::GenEvent* evt = m_hepevtio.read_next_event();
+  evt->use_units(HepMC::Units::GEV, HepMC::Units::CM);
   *m_ascii_io << evt;
   delete evt;
 

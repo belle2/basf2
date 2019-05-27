@@ -555,7 +555,7 @@ namespace Belle2 {
 
     int genNMissingDaughter(const Particle* p, const std::vector<double>& arguments)
     {
-      if (arguments.size() != 1)
+      if (arguments.size() < 1)
         B2FATAL("Wrong number of arguments for genNMissingDaughter");
 
       const MCParticle* mcp = p->getRelated<MCParticle>();
@@ -564,32 +564,7 @@ namespace Belle2 {
         return -1;
       }
 
-      MCMatching::countMissingParticle(p, mcp);
-
-      int PDG = (int)arguments[0];
-      if (PDG == abs(Const::pi0.getPDGCode())) { // pi0, 111
-        return (p->hasExtraInfo("nMissingPi0")) ? p->getExtraInfo("nMissingPi0") : 0;
-      } else if (PDG == abs(Const::pion.getPDGCode())) { // pi, 211
-        return (p->hasExtraInfo("nMissingPi")) ? p->getExtraInfo("nMissingPi") : 0;
-      } else if (PDG == abs(Const::kaon.getPDGCode())) { // K, 321
-        return (p->hasExtraInfo("nMissingK")) ? p->getExtraInfo("nMissingK") : 0;
-      } else if (PDG == abs(Const::Kshort.getPDGCode())) { // K_S0, 310
-        return (p->hasExtraInfo("nMissingKS0")) ? p->getExtraInfo("nMissingKS0") : 0;
-      } else if (PDG == abs(Const::Klong.getPDGCode())) { // K_L0, 130
-        return (p->hasExtraInfo("nMissingKL0")) ? p->getExtraInfo("nMissingKL0") : 0;
-      } else if (PDG == abs(Const::proton.getPDGCode())) { // Proton, 2212
-        return (p->hasExtraInfo("nMissingP")) ? p->getExtraInfo("nMissingP") : 0;
-      } else if (PDG == abs(Const::neutron.getPDGCode())) { // Neutron, 2112
-        return (p->hasExtraInfo("nMissingN")) ? p->getExtraInfo("nMissingN") : 0;
-      } else if (PDG == abs(Const::electron.getPDGCode())) { // E, 11
-        return (p->hasExtraInfo("nMissingE")) ? p->getExtraInfo("nMissingE") : 0;
-      } else if (PDG == abs(Const::muon.getPDGCode())) { // Mu, 13
-        return (p->hasExtraInfo("nMissingMu")) ? p->getExtraInfo("nMissingMu") : 0;
-      } else if (PDG == 12 || PDG == 14 || PDG == 16) { // Neutrino
-        return (p->hasExtraInfo("nMissingNeutrino")) ? p->getExtraInfo("nMissingNeutrino") : 0;
-      } else { // not FSP, gamma
-        return -999;
-      }
+      return MCMatching::countMissingParticle(p, mcp, arguments);
     }
 
 

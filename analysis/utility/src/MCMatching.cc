@@ -407,15 +407,14 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
   return flags;
 }
 
-void MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle)
+int MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle, const vector<double>& daughterPDG)
 {
-  if (particle->hasExtraInfo("countMissingParticle"))
-    return;
-
   unordered_set<const MCParticle*> mcMatchedParticles;
   appendParticles(particle, mcMatchedParticles);
   vector<const MCParticle*> genParts;
   appendParticles(mcParticle, genParts);
+
+  int nMissingDaughter = 0;
 
   for (const MCParticle* genPart : genParts) {
     const bool missing = (mcMatchedParticles.find(genPart) == mcMatchedParticles.end());
@@ -424,45 +423,13 @@ void MCMatching::countMissingParticle(const Particle* particle, const MCParticle
       const int generatedPDG = genPart->getPDG();
       const int absGeneratedPDG = abs(generatedPDG);
 
-      if (absGeneratedPDG == abs(Const::pi0.getPDGCode())) { // missing pi0
-        addNMissingParticle(particle, "nMissingPi0");
-      } else if (absGeneratedPDG == abs(Const::pion.getPDGCode())) { // missing pi
-        addNMissingParticle(particle, "nMissingPi");
-      } else if (absGeneratedPDG == abs(Const::kaon.getPDGCode())) { // missing K
-        addNMissingParticle(particle, "nMissingK");
-      } else if (absGeneratedPDG == abs(Const::Kshort.getPDGCode())) { // missing K_S0
-        addNMissingParticle(particle, "nMissingKS0");
-      } else if (absGeneratedPDG == abs(Const::Klong.getPDGCode())) { // missing K_L0
-        addNMissingParticle(particle, "nMissingKL0");
-      } else if (absGeneratedPDG == abs(Const::proton.getPDGCode())) { // missing proton
-        addNMissingParticle(particle, "nMissingP");
-      } else if (absGeneratedPDG == abs(Const::neutron.getPDGCode())) { // missing neutron
-        addNMissingParticle(particle, "nMissingN");
-      } else if (absGeneratedPDG == abs(Const::electron.getPDGCode())) { // missing e
-        addNMissingParticle(particle, "nMissingE");
-      } else if (absGeneratedPDG == abs(Const::muon.getPDGCode())) { // missing mu
-        addNMissingParticle(particle, "nMissingMu");
-      } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
-        addNMissingParticle(particle, "nMissingNeutrino");
-      }
+      // const bool matchingPDG = (daughterPDG.find(absGeneratedPDG) != daughterPDG.end());
+      auto result = find(daughterPDG.begin(), daughterPDG.end(), absGeneratedPDG);
+      if (result != daughterPDG.end())
+        nMissingDaughter++;
+
     }
   }
 
-  const_cast<Particle*>(particle)->addExtraInfo("countMissingParticle", true);
-
-  return;
+  return nMissingDaughter;
 }
-
-void MCMatching::addNMissingParticle(const Particle* particle, const std::string nMissingParticle)
-{
-  if (particle->hasExtraInfo(nMissingParticle)) {
-    // increment nMissingNeutrino, if particle has
-    const_cast<Particle*>(particle)->setExtraInfo(nMissingParticle, particle->getExtraInfo(nMissingParticle) + 1);
-  } else {
-    // add nMissingParticle as extraInfo, if particle does not have
-    const_cast<Particle*>(particle)->addExtraInfo(nMissingParticle, 1);
-  }
-
-  return;
-}
-

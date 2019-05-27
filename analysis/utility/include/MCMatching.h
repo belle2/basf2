@@ -156,15 +156,11 @@ namespace Belle2 {
     static int getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle);
 
     /**
-     * Count the number of missing daughter of the 'particles' and set these numbers to extraInfo
+     * Count the number of missing daughter of the 'particles'.
+     * @return number of missing daughters having given PDG code
      */
-    static void countMissingParticle(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
-
-    /**
-     * Add extraInfo of NMissingParticle to the particle, if the particle does not have it.
-     * If the particle has it, increment it.
-     */
-    static void addNMissingParticle(const Particle* particle, const std::string nMissingParticle);
+    static int countMissingParticle(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle,
+                                    const std::vector<double>& daughterPDG);
 
   };
 }

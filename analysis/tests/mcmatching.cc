@@ -1048,9 +1048,8 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_MissGamma | MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingPi0"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingPi0"), 1);
+      vector<double> daughterPDG{111};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
       // pi not reconstructed
@@ -1059,9 +1058,8 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingPi"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingPi"), 1);
+      vector<double> daughterPDG{211};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
       // K not reconstructed
@@ -1070,9 +1068,8 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingK"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingK"), 1);
+      vector<double> daughterPDG{321};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
       // 2K not reconstructed
@@ -1081,9 +1078,8 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingK"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingK"), 2);
+      vector<double> daughterPDG{321};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 2);
     }
     {
       //K0S not reconstructed
@@ -1102,10 +1098,8 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissMassiveParticle | MCMatching::c_MissingResonance,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingKS0"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingKS0"), 1);
-      ASSERT_FALSE(d.m_particle->hasExtraInfo("nMissingPi"));
+      vector<double> daughterPDG{310};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
       //K0L not reconstructed
@@ -1120,9 +1114,8 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissKlong | MCMatching::c_MissMassiveParticle | MCMatching::c_MissingResonance,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingKL0"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingKL0"), 1);
+      vector<double> daughterPDG{130};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
       // e and nutrino not reconstructed
@@ -1132,11 +1125,12 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingE"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingE"), 1);
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingNeutrino"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingNeutrino"), 1);
+      vector<double> daughterPDG_E{11};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_E), 1);
+      vector<double> daughterPDG_NuE{12};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_NuE), 1);
+      vector<double> daughterPDG_Nu{12, 14, 16};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_Nu), 1);
     }
     {
       // e and nutrino not reconstructed
@@ -1146,11 +1140,12 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>());
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingMu"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingMu"), 1);
-      ASSERT_TRUE(d.m_particle->hasExtraInfo("nMissingNeutrino"));
-      EXPECT_EQ(d.m_particle->getExtraInfo("nMissingNeutrino"), 1);
+      vector<double> daughterPDG_Mu{13};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_Mu), 1);
+      vector<double> daughterPDG_NuMu{14};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_NuMu), 1);
+      vector<double> daughterPDG_Nu{12, 14, 16};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_Nu), 1);
     }
 
   }

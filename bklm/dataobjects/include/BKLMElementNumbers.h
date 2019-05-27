@@ -3,7 +3,7 @@
  * Copyright(C) 2019  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Vipin Gaur                              *
+ * Contributors: Kirill Chilikin                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -103,6 +103,14 @@ namespace Belle2 {
       return m_MaximalPlaneNumber;
     }
 
+    /**
+     * Get maximal sector global number.
+     */
+    static constexpr int getMaximalSectorGlobalNumber()
+    {
+      return m_MaximalSectorGlobalNumber;
+    }
+
   protected:
 
     /** Maximal forward number (0-based). */
@@ -114,8 +122,11 @@ namespace Belle2 {
     /** Maximal layer number (1-based). */
     static constexpr int m_MaximalLayerNumber = 15;
 
-    /** Maximal plane numbe (0-based). */
+    /** Maximal plane number (0-based). */
     static constexpr int m_MaximalPlaneNumber = 1;
+
+    /** Maximal sector global number. */
+    static constexpr int m_MaximalSectorGlobalNumber = 16;
 
 
   };

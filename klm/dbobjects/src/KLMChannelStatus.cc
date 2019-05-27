@@ -86,3 +86,21 @@ int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
   }
   return active;
 }
+
+bool KLMChannelStatus::operator==(KLMChannelStatus& status)
+{
+  if (this->m_ChannelStatus.size() != status.m_ChannelStatus.size())
+    return false;
+  std::map<uint16_t, enum ChannelStatus>::iterator it, it2;
+  it = this->m_ChannelStatus.begin();
+  it2 = status.m_ChannelStatus.begin();
+  while (it != this->m_ChannelStatus.end()) {
+    if (it->first != it2->first)
+      return false;
+    if (it->second != it2->second)
+      return false;
+    ++it;
+    ++it2;
+  }
+  return true;
+}

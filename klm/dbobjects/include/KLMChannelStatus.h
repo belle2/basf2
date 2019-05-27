@@ -80,6 +80,11 @@ namespace Belle2 {
      */
     int getActiveStripsEKLMSector(int sectorGlobal) const;
 
+    /**
+     * Operator ==.
+     */
+    bool operator==(KLMChannelStatus& status);
+
   private:
 
     /** Channel data. */

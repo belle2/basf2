@@ -14,7 +14,6 @@
 /* Belle2 headers. */
 #include <klm/calibration/KLMChannelStatusCalibrationAlgorithm.h>
 #include <klm/dataobjects/KLMChannelMapValue.h>
-#include <klm/dbobjects/KLMChannelStatus.h>
 
 using namespace Belle2;
 
@@ -32,15 +31,21 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
   uint16_t channel, module;
   unsigned int hits, moduleHits;
   KLMChannelMapValue<unsigned int> hitMap, hitMapModule;
-  /* Fill channel hit map. */
+  /*
+   * Fill channel hit map. Note that more than one entry can exist for the same
+   * channel due to merging of collected data for several runs. Thus, the
+   * number of hits is summed.
+   */
   std::shared_ptr<TTree> calibrationData;
   calibrationData = getObjectPtr<TTree>("calibration_data");
   calibrationData->SetBranchAddress("channel", &channel);
   calibrationData->SetBranchAddress("hits", &hits);
   int n = calibrationData->GetEntries();
+  hitMap.setDataAllChannels(0);
   for (int i = 0; i < n; ++i) {
     calibrationData->GetEntry(i);
-    hitMap.setChannelData(channel, hits);
+    hitMap.setChannelData(channel, hitMap.getChannelData(channel) + hits);
+    m_TotalHitNumber += hits;
   }
   KLMChannelStatus* channelStatus = new KLMChannelStatus();
   /* Fill module hit map. */
@@ -136,5 +141,6 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     }
   }
   saveCalibration(channelStatus, "KLMChannelStatus");
+  m_LastCalibrationResult = channelStatus;
   return CalibrationAlgorithm::c_OK;
 }

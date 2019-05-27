@@ -12,6 +12,7 @@
 
 /* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 
 namespace Belle2 {
 
@@ -45,10 +46,32 @@ namespace Belle2 {
       m_MinimalAverageHitNumber = minimalAverageHitNumber;
     }
 
+    /**
+     * Get last calibration result.
+     */
+    KLMChannelStatus& getLastCalibrationResult() const
+    {
+      return *m_LastCalibrationResult;
+    }
+
+    /**
+     * Get total hit number.
+     */
+    unsigned int getTotalHitNumber() const
+    {
+      return m_TotalHitNumber;
+    }
+
   protected:
 
     /** Minimal average number of hits per channel required for calibration. */
     double m_MinimalAverageHitNumber = 25;
+
+    /** Last calivbration result. */
+    KLMChannelStatus* m_LastCalibrationResult = nullptr;
+
+    /** Total hit number. */
+    int m_TotalHitNumber = 0;
 
   };
 

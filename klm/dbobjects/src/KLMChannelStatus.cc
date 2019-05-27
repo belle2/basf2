@@ -104,3 +104,21 @@ bool KLMChannelStatus::operator==(KLMChannelStatus& status)
   }
   return true;
 }
+
+bool KLMChannelStatus::hasNewNormalChannels(KLMChannelStatus& status)
+{
+  if (this->m_ChannelStatus.size() != status.m_ChannelStatus.size())
+    return false;
+  std::map<uint16_t, enum ChannelStatus>::iterator it, it2;
+  it = this->m_ChannelStatus.begin();
+  it2 = status.m_ChannelStatus.begin();
+  while (it != this->m_ChannelStatus.end()) {
+    if (it->first != it2->first)
+      return false;
+    if ((it->second == c_Normal) && (it2->second != c_Normal))
+      return true;
+    ++it;
+    ++it2;
+  }
+  return false;
+}

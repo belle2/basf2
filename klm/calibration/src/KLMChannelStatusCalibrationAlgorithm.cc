@@ -12,6 +12,7 @@
 #include <TTree.h>
 
 /* Belle2 headers. */
+#include <framework/logging/Logger.h>
 #include <klm/calibration/KLMChannelStatusCalibrationAlgorithm.h>
 #include <klm/dataobjects/KLMChannelMapValue.h>
 
@@ -24,6 +25,8 @@ KLMChannelStatusCalibrationAlgorithm::KLMChannelStatusCalibrationAlgorithm() :
 
 KLMChannelStatusCalibrationAlgorithm::~KLMChannelStatusCalibrationAlgorithm()
 {
+  if (m_ModuleStatus != nullptr)
+    delete m_ModuleStatus;
 }
 
 CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
@@ -71,7 +74,26 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     hitMapModule.setChannelData(
       module, hitMapModule.getChannelData(module) + hits);
   }
-  /* Determine the channel status. */
+  /* Module status. */
+  if (m_ModuleStatus == nullptr)
+    m_ModuleStatus = new KLMChannelStatus();
+  for (BKLMChannelIndex& bklmModule : bklmModules) {
+    module = bklmModule.getKLMModuleNumber();
+    hits = hitMapModule.getChannelData(module);
+    if (hits >= m_MinimalModuleHitNumber)
+      m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Normal);
+    else
+      m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Dead);
+  }
+  for (BKLMChannelIndex& bklmModule : bklmModules) {
+    module = bklmModule.getKLMModuleNumber();
+    hits = hitMapModule.getChannelData(module);
+    if (hits >= m_MinimalModuleHitNumber)
+      m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Normal);
+    else
+      m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Dead);
+  }
+  /* Channel-based calibration. */
   for (BKLMChannelIndex& bklmModule : bklmModules) {
     moduleHits = hitMapModule.getChannelData(bklmModule.getKLMModuleNumber());
     BKLMChannelIndex bklmNextModule(bklmModule);
@@ -93,8 +115,9 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
         activeChannels++;
     }
     double averageHits = double(moduleHits) / activeChannels;
-    if (averageHits < m_MinimalAverageHitNumber)
+    if (averageHits < m_MinimalAverageHitNumber) {
       return CalibrationAlgorithm::c_NotEnoughData;
+    }
     bklmChannel = bklmModule;
     bklmChannel.setIndexLevel(BKLMChannelIndex::c_IndexLevelStrip);
     for (; bklmChannel != bklmNextModule; ++bklmChannel) {
@@ -127,8 +150,9 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
         activeChannels++;
     }
     double averageHits = double(moduleHits) / activeChannels;
-    if (averageHits < m_MinimalAverageHitNumber)
+    if (averageHits < m_MinimalAverageHitNumber) {
       return CalibrationAlgorithm::c_NotEnoughData;
+    }
     eklmChannel = eklmModule;
     eklmChannel.setIndexLevel(EKLMChannelIndex::c_IndexLevelStrip);
     for (; eklmChannel != eklmNextModule; ++eklmChannel) {

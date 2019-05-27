@@ -39,11 +39,27 @@ namespace Belle2 {
     CalibrationAlgorithm::EResult calibrate() override;
 
     /**
+     * Set minimal number of hits per module for module-based calibration.
+     */
+    void setMinimalModuleHitNumber(unsigned int minimalModuleHitNumber)
+    {
+      m_MinimalModuleHitNumber = minimalModuleHitNumber;
+    }
+
+    /**
      * Set minimal average number of hits per channel required for calibration.
      */
     void setMinimalAverageHitNumber(double minimalAverageHitNumber)
     {
       m_MinimalAverageHitNumber = minimalAverageHitNumber;
+    }
+
+    /**
+     * Get module status for last calibration.
+     */
+    KLMChannelStatus& getModuleStatus() const
+    {
+      return *m_ModuleStatus;
     }
 
     /**
@@ -64,10 +80,19 @@ namespace Belle2 {
 
   protected:
 
+    /** Whether the calibration is module-based. */
+    bool m_ModuleBasedCalibration = false;
+
+    /** Minimal module hit number for module-based calibration. */
+    unsigned int m_MinimalModuleHitNumber = 1;
+
     /** Minimal average number of hits per channel required for calibration. */
     double m_MinimalAverageHitNumber = 25;
 
-    /** Last calivbration result. */
+    /** Module status. */
+    KLMChannelStatus* m_ModuleStatus = nullptr;
+
+    /** Last calibration result. */
     KLMChannelStatus* m_LastCalibrationResult = nullptr;
 
     /** Total hit number. */

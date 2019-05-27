@@ -2052,7 +2052,7 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("cos(variable)", cos,
                       "Returns cos value of the given variable.\n"
                       "E.g. sin(?) returns the cosine of the value of the variable.");
-    REGISTER_VARIABLE("log10(variable)", cos,
+    REGISTER_VARIABLE("log10(variable)", log10,
                       "Returns log10 value of the given variable.\n"
                       "E.g. log10(?) returns the log10 of the value of the variable.");
     REGISTER_VARIABLE("isNAN(variable)", isNAN,

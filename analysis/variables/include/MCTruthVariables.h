@@ -248,7 +248,6 @@ namespace Belle2 {
     /**
      * return number of missing daughter having assigned PDG code
      * return -1, if the particle does not have related MC Particle
-     * return -999, if PDG code is not of the FSP.
      */
     int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);
   }

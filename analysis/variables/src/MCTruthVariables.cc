@@ -664,8 +664,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
                       "Returns the number of missing daughter having assigned PDG code."
-                      "-1 if the no MCParticle is associated to the particle."
-                      "-999 if PDG code is not of FSP")
+                      "-1 if the no MCParticle is associated to the particle.")
 
 
     VARIABLE_GROUP("MC particle seen in subdetectors");

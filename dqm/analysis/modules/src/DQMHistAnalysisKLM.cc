@@ -28,7 +28,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
     double xLineNDC = histMinNDC + (histRangeNDC * sectorFB) / BKLMElementNumbers::getMaximalSectorGlobalNumber();
     double xTextNDC = histMinNDC + (histRangeNDC * (sectorFB + 0.5)) / BKLMElementNumbers::getMaximalSectorGlobalNumber();
     double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
-    m_sectorLine[sectorFB] = new TLine(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
+    m_sectorLine[sectorFB] = new TLine(xLineNDC, histMinNDC, xLineNDC, (sectorFB == 0 ? histMinNDC : histMaxNDC));
     m_sectorLine[sectorFB]->SetNDC(true);
     m_sectorLine[sectorFB]->SetLineColor(8); // dark green
     m_sectorLine[sectorFB]->SetLineWidth(1);

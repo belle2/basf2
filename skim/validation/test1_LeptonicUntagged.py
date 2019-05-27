@@ -4,7 +4,7 @@
 """
 <header>
     <input>../LeptonicUntagged.dst.root</input>
-    <output>11130300.udst.root</output>
+    <output>../LeptonicUntagged.udst.root</output>
     <contact>hannah.wakeling@mail.mcgill.ca, philip.grace@adelaide.edu.au</contact>
     <interval>nightly</interval>
 </header>

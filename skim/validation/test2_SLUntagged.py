@@ -3,7 +3,7 @@
 
 """
 <header>
-    <input>11160200.udst.root</input>
+    <input>../SLUntagged.udst.root</input>
     <output>SLUntagged_Validation.root</output>
     <contact>hannah.wakeling@mail.mcgill.ca, philip.grace@adelaide.edu.au</contact>
 </header>
@@ -15,7 +15,7 @@ from variables import variables
 
 path = Path()
 
-inputMdst('default', '11160200.udst.root', path=path)
+inputMdst('default', '../SLUntagged.udst.root', path=path)
 
 cutAndCopyLists('B+:all', ['B+:SL0', 'B+:SL1', 'B+:SL2', 'B+:SL3'], '', path=path)
 

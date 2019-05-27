@@ -4,7 +4,7 @@
 """
 <header>
     <input>../feiHadronicBplus.dst.root</input>
-    <output>11180200.udst.root</output>
+    <output>../feiHadronicB0.udst.root</output>
     <contact>sophie.hollitt@adelaide.edu.au, philip.grace@adelaide.edu.au</contact>
     <interval>nightly</interval>
 </header>

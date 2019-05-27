@@ -29,7 +29,7 @@ main.add_module(eventinfosetter)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/skim/validation/feiHadronicBplus.dec'))
+evtgeninput.param('userDECFile', find_file('/skim/validation/feiHadronicBplus.dec'))
 main.add_module(evtgeninput)
 
 # detector simulation

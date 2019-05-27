@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Descriptor: [B+ -> tau+ nu_tau]cc
+# Descriptor: [B0 -> D(*) pi]cc
 
 """
 <header>

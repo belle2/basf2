@@ -110,7 +110,7 @@ void DQMHistAnalysisARICHModule::event()
     double mean = m_h_mergerHit->Integral() / 72;
     for (int i = 0; i < 72; i++) {
       int hit = m_h_mergerHit->GetBinContent(i + 1);
-      if (hit == 0) {
+      if ((bool)hit ^ (bool)m_h_mergerHit->GetEntries()) {
         alertMerger = 2;
         break;
       }

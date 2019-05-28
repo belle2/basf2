@@ -12,7 +12,6 @@
 #pragma once
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/VariableManager/Manager.h>
 
 namespace Belle2 {
 
@@ -114,18 +113,6 @@ namespace Belle2 {
      * returns the minimum angle of a KLMCluster to this Particle in the CMS frame
      */
     double minimumKLMAngleCMS(const Particle* particle);
-
-    /**
-     * returns a function which returns the value of a variable for the closest
-     * KLM cluster particle (in the CM system) to this particle
-     */
-    Manager::FunctionPtr closestKLMCMS(const std::vector<std::string>& arguments);
-
-    /**
-     * returns a function which returns the value of a variable for the furthest
-     * KLM cluster particle (in the CM system) to this particle
-     */
-    Manager::FunctionPtr furthestKLMCMS(const std::vector<std::string>& arguments);
 
     /**
      * returns the number of Tracks matched to the KLMCluster associated to this Particle

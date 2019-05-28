@@ -138,8 +138,8 @@ void DQMHistAnalysisARICHModule::event()
 
     double side = m_h_bits->GetBinContent(2) + m_h_bits->GetBinContent(5);
     double center = m_h_bits->GetBinContent(3) + m_h_bits->GetBinContent(4);
-    if (center / side < 1.5) alertBits = 1;
-    if (center / side < 2) alertBits = 2;
+    if (center / side < 2) alertBits = 1;
+    if (center / side < 1.5) alertBits = 2;
     if (m_enableAlert && alertBits) m_c_bits->SetFillColor(alertColor[alertBits]);
 
     m_c_bits->Modified();

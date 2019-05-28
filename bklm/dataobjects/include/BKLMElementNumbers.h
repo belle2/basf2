@@ -96,11 +96,19 @@ namespace Belle2 {
     }
 
     /**
-     * Get maximal plane numbe (0-based).
+     * Get maximal plane number (0-based).
      */
     static constexpr int getMaximalPlaneNumber()
     {
       return m_MaximalPlaneNumber;
+    }
+
+    /**
+     * Get maximal sector global number.
+     */
+    static constexpr int getMaximalSectorGlobalNumber()
+    {
+      return (m_MaximalForwardNumber + 1) * m_MaximalSectorNumber;
     }
 
   protected:
@@ -114,9 +122,8 @@ namespace Belle2 {
     /** Maximal layer number (1-based). */
     static constexpr int m_MaximalLayerNumber = 15;
 
-    /** Maximal plane numbe (0-based). */
+    /** Maximal plane number (0-based). */
     static constexpr int m_MaximalPlaneNumber = 1;
-
 
   };
 

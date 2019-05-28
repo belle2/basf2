@@ -22,8 +22,6 @@ from skimExpertFunctions import *
 
 leppath = Path()
 
-skimCode = encodeSkimName('LeptonicUntagged')
-
 fileList = ['../LeptonicUntagged.dst.root']
 
 inputMdstList('default', fileList, path=leppath)
@@ -43,7 +41,7 @@ stdPhotons('loose', path=leppath)
 from skim.leptonic import LeptonicList
 
 lepList = LeptonicList(path=leppath)
-skimOutputUdst(skimCode, lepList, path=leppath)
+skimOutputUdst('../LeptonicUntagged', lepList, path=leppath)
 
 summaryOfLists(lepList, path=leppath)
 

@@ -19,8 +19,6 @@ from skimExpertFunctions import *
 
 path = Path()
 
-skimCode = encodeSkimName('feiHadronicB0')
-
 fileList = ['../feiHadronicB0.dst.root']
 
 inputMdstList('default', fileList, path=path)
@@ -34,7 +32,7 @@ path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=Tru
 
 # Apply final B0 tag cuts
 B0hadronicList = B0hadronic(path)
-skimOutputUdst(skimCode, B0hadronicList, path=path)
+skimOutputUdst('../feiHadronicB0', B0hadronicList, path=path)
 summaryOfLists(B0hadronicList, path=path)
 
 # Suppress noisy modules, and then process

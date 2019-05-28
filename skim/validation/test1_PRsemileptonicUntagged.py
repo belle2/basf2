@@ -22,8 +22,6 @@ from skim.standardlists.charm import *
 
 PRSLpath = Path()
 
-skimCode = encodeSkimName('PRsemileptonicUntagged')
-
 fileList = ['../PRsemileptonicUntagged.dst.root']
 
 inputMdstList('default', fileList, path=PRSLpath)
@@ -36,7 +34,7 @@ stdMu('all', path=PRSLpath)
 # PR Skim
 from skim.semileptonic import PRList
 PRList = PRList(path=PRSLpath)
-skimOutputUdst(skimCode, PRList, path=PRSLpath)
+skimOutputUdst('../PRsemileptonicUntagged', PRList, path=PRSLpath)
 
 summaryOfLists(PRList, path=PRSLpath)
 

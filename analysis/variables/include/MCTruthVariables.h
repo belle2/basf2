@@ -246,7 +246,7 @@ namespace Belle2 {
     double seenInKLM(const Particle*);
 
     /**
-     * return number of missing daughter having assigned PDG code
+     * return number of missing daughters having assigned PDG codes
      * return -1, if the particle does not have related MC Particle
      */
     int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);

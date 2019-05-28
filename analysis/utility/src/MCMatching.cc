@@ -406,7 +406,7 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
   return flags;
 }
 
-int MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle, const vector<double>& daughterPDG)
+int MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle, const vector<int>& daughterPDG)
 {
   unordered_set<const MCParticle*> mcMatchedParticles;
   appendParticles(particle, mcMatchedParticles);
@@ -422,11 +422,9 @@ int MCMatching::countMissingParticle(const Particle* particle, const MCParticle*
       const int generatedPDG = genPart->getPDG();
       const int absGeneratedPDG = abs(generatedPDG);
 
-      // const bool matchingPDG = (daughterPDG.find(absGeneratedPDG) != daughterPDG.end());
       auto result = find(daughterPDG.begin(), daughterPDG.end(), absGeneratedPDG);
       if (result != daughterPDG.end())
         nMissingDaughter++;
-
     }
   }
 

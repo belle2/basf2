@@ -558,13 +558,15 @@ namespace Belle2 {
       if (arguments.size() < 1)
         B2FATAL("Wrong number of arguments for genNMissingDaughter");
 
+      const std::vector<int> PDGcodes(arguments.begin(), arguments.end());
+
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
         return -1;
       }
 
-      return MCMatching::countMissingParticle(p, mcp, arguments);
+      return MCMatching::countMissingParticle(p, mcp, PDGcodes);
     }
 
 

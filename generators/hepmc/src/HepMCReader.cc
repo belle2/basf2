@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-# include <generators/hepmc/HepMCReader.h>
+#include <generators/hepmc/HepMCReader.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -43,7 +43,7 @@ int HepMCReader::nextValidEvent(HepMC::GenEvent& evt)
 
 int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 {
-  int eventID = -1;
+  int eventID;
 
   HepMC::GenEvent evt;
   // read event number once

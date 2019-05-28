@@ -85,10 +85,22 @@ namespace Belle2 {
 
   protected:
     bool m_debug;/**<debug*/
+    bool m_enableAlert;/**<Enable alert by base color of canvases*/
+
+
+    int alertBits = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+    int alertMerger = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+    int alertHitsPerEvent = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+    int alertTheta = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+
+    int alertColor[3] = {kWhite, kYellow, kRed};/**<Alert color of canvases*/
 
     //TObjects for DQM analysis
     TLine* m_LineForMB[5] = {}; /**<Lines to divide the sectors on mergerHit histogram*/
+    TCanvas* m_c_bits = NULL; /**<Canvas for modified bits histogram*/
     TCanvas* m_c_mergerHit = NULL; /**<Canvas for modified mergerHit histogram*/
+    TCanvas* m_c_hitsPerEvent = NULL; /**<Canvas for modified hitsPerTrack histogram*/
+    TCanvas* m_c_theta = NULL; /**<Canvas for modified theta histogram*/
 
     Belle2::ARICHChannelHist* m_apdHist = NULL; /**<ARICH TObject to draw hit map for each APD*/
     TH2Poly* m_apdPoly = NULL;  /**< hit map for each APD */

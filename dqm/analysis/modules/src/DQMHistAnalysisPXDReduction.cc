@@ -34,8 +34,8 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:ReductionFlag"));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
@@ -65,7 +65,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cReduction = new TCanvas("c_Reduction");
+  m_cReduction = new TCanvas((m_histogramDirectoryName + "/c_Reduction").data());
   m_hReduction = new TH1F("Reduction", "Reduction; Module; Reduction", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hReduction->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hReduction->SetStats(false);
@@ -93,7 +93,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }

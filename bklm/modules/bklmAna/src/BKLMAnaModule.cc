@@ -26,8 +26,6 @@
 #include <tracking/dataobjects/MuidHit.h>
 #include <tracking/dataobjects/Muid.h>
 
-#include <TRandom.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::bklm;

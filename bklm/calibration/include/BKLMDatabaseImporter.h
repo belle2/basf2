@@ -8,11 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMDATABASEIMPORTER_H
-#define BKLMDATABASEIMPORTER_H
+#pragma once
+
+// ROOT include
+#include <TObject.h>
 
 #include <stdio.h>
-#include <TObject.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -20,18 +21,18 @@
 #include <iostream>
 
 #include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <bklm/dbobjects/BKLMElectronicMapping.h>
+#include <framework/database/DBImportArray.h>
 
 namespace Belle2 {
 
 //! BKLM database importer.
+
   /*!
-   This module writes bklm data to database
+   This module writes BKLM data to database
   */
   class BKLMDatabaseImporter {
   public:
-
-//  BKLMDatabaseImporter(std::vector<std::string> inputFiles, std::vector<std::string> inputFilesAsicRoot,
-//                      std::vector<std::string> inputFilesAsicTxt);
 
     /**
     * Constructor
@@ -42,6 +43,21 @@ namespace Belle2 {
     * Destructor
     */
     virtual ~BKLMDatabaseImporter() {};
+
+    /**
+     * Load default electronics mapping.
+     */
+    void loadDefaultBklmElectronicMapping();
+
+    /**
+     * Set non-default lane.
+     * @param[in] forward Forward.
+     * @param[in] sector  Sector.
+     * @param[in] leyar   Layer.
+     * @param[in] lane    Lane.
+     */
+    void setElectronicMappingLane(
+      int forward, int sector, int layer, int lane);
 
     /**
      * Import BKLM electronics mapping in the database.
@@ -64,13 +80,6 @@ namespace Belle2 {
 
     //! Export BKLM simulation parameters from the database
     void exportBklmSimulationPar();
-
-    //! Import BKLM bad channels into the database
-    //void importBklmBadChannels();
-    void importBklmBadChannels(int expNoStart, int runStart, int expNoStop, int runStop, std::string fileName);
-
-    //! Export BKLM bad channels from the database
-    void exportBklmBadChannels();
 
     //! Import BKLM Misalignment parameters into the database
     void importBklmMisAlignment();
@@ -110,11 +119,10 @@ namespace Belle2 {
 
   private:
 
+    /** Electronics mapping. */
+    DBImportArray<BKLMElectronicMapping> m_bklmMapping;
+
     ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */
-
   };
-
-
 }
 
-#endif

@@ -92,7 +92,7 @@ namespace Belle2 {
     /** make LowMultiTriggerBit **/
     void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>);
     /** make Trigger bit except for Low Multiplicity related bit **/
-    void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int);
+    void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int, int, int, int);
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
     int getTriggerbit(int i) {return _Triggerbit[i];}
@@ -166,6 +166,10 @@ namespace Belle2 {
     int _Triggerbit[4];
     //  LowMultibit
     int _Lowmultibit;
+    // Bhabha Prescale Factor
+    int _PrescaleFactor;
+    // Bhabha Prescale Countor
+    int _PrescaleCounter;
 
     //! 2D Bhabha Energy Threshold
     std::vector<double> _2DBhabhaThresholdFWD;

@@ -34,8 +34,8 @@ ParticleStatsModule::ParticleStatsModule() : Module()
   // initializing the rest of private memebers
   m_nPass   = 0;
   m_nParticles = 0;
-  m_PassMatrix = 0;
-  m_MultiplicityMatrix = 0;
+  m_PassMatrix = nullptr;
+  m_MultiplicityMatrix = nullptr;
 }
 
 void ParticleStatsModule::initialize()
@@ -129,7 +129,7 @@ void ParticleStatsModule::event()
 void ParticleStatsModule::terminate()
 {
   B2INFO("ParticleStats Summary: \n");
-  float m_nEvents = (float)Environment::Instance().getNumberOfEvents();
+  auto m_nEvents = (float)Environment::Instance().getNumberOfEvents();
   int nParticleLists = m_strParticleLists.size();
   for (int iList = 0; iList < nParticleLists; ++iList) {
     for (int jList = 0; jList < nParticleLists + 1; ++jList) {

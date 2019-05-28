@@ -27,7 +27,7 @@ namespace TreeFitter {
                          const std::vector<double>& customOriginCovariance
                         ) :
     m_dim(0),
-    m_headOfChain(0),
+    m_headOfChain(nullptr),
     m_isOwner(true)
   {
 
@@ -44,7 +44,7 @@ namespace TreeFitter {
                                                 );
     } else if ((!customOrigin) && (!ipConstraint)) {
 
-      m_headOfChain = ParticleBase::createParticle(particle, 0, forceFitAll);
+      m_headOfChain = ParticleBase::createParticle(particle, nullptr, forceFitAll);
     }
 
     m_headOfChain->updateIndex(m_dim);
@@ -71,7 +71,7 @@ namespace TreeFitter {
   {
     for (auto removeConstraint : removeConstraintList) {
       m_constraintlist.erase(std::remove_if(m_constraintlist.begin(), m_constraintlist.end(),
-      [&](Constraint constraint) { return constraint.name() == removeConstraint ;}),
+      [&](const Constraint & constraint) { return constraint.name() == removeConstraint ;}),
       m_constraintlist.end());
     }
   }
@@ -119,7 +119,7 @@ namespace TreeFitter {
 
   const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const
   {
-    const ParticleBase* rc(0);
+    const ParticleBase* rc(nullptr);
     const auto mapRow = m_particleMap.find(particle) ;
 
     if (mapRow == m_particleMap.end()) {

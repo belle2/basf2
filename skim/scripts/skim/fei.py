@@ -203,7 +203,7 @@ def runFEIforB0Hadronic(path):
     * B0 -> J/Psi K+ pi-
     * B0 -> J/Psi KS0 pi+ pi-
 
-    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+    FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
     From Thomas Keck's thesis, 'the channel B0 -> anti-D0 pi0 was
     used by the FR, but is not yet used in the FEI due to unexpected
@@ -237,7 +237,7 @@ def runFEIforB0Hadronic(path):
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
     particles = fei.get_default_channels(neutralB=True, chargedB=False, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -283,7 +283,7 @@ def runFEIforBplusHadronic(path):
     * B+ -> J/Psi K+ pi0
     * B+ -> J/Psi KS0 pi+
 
-    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+    FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
@@ -314,7 +314,7 @@ def runFEIforBplusHadronic(path):
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
     particles = fei.get_default_channels(neutralB=False, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -331,7 +331,7 @@ def runFEIforHadronicCombined(path):
     Physics channels: (All available FEI B0 and B+ Hadronic tags are
     reconstructed)
 
-    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+    FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
@@ -356,7 +356,7 @@ def runFEIforHadronicCombined(path):
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
     particles = fei.get_default_channels(neutralB=True, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -531,7 +531,7 @@ def runFEIforB0SLWithOneLep(path):
     * B0 -> anti-D0* pi- e+ nu
     * B0 -> anti-D0* pi- mu+ nu
 
-    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+    FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
     Skimming script reconstructs SL Btag using generically trained FEI
     and Bsig with at least one lepton (e, mu). Signal side lepton is not
@@ -577,7 +577,7 @@ def runFEIforB0SLWithOneLep(path):
         semileptonic=True,
         KLong=False,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -603,7 +603,7 @@ def runFEIforBplusSLWithOneLep(path):
     * B+ -> D+* pi+ e+ nu
     * B+ -> D+* pi+ mu+ nu
 
-    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+    FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
     Skimming script reconstructs SL Btag using generically trained FEI
     and Bsig with at least one lepton (e, mu). Signal side lepton is not
@@ -648,7 +648,7 @@ def runFEIforBplusSLWithOneLep(path):
         semileptonic=True,
         KLong=False,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -667,7 +667,7 @@ def runFEIforSLWithOneLepCombined(path):
     reconstructed. The Hadronic B with semileptonic D tags are
     not reconstructed)
 
-    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+    FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
@@ -691,7 +691,7 @@ def runFEIforSLWithOneLepCombined(path):
         semileptonic=True,
         KLong=False,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -711,7 +711,7 @@ def runFEIforSkimCombined(path):
     reconstructed. The Hadronic B with semileptonic D tags from the semileptonic
     FEI are not reconstructed)
 
-    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+    FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
@@ -741,6 +741,6 @@ def runFEIforSkimCombined(path):
         semileptonic=True,
         KLong=False,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)

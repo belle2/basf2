@@ -34,6 +34,11 @@ namespace Belle2 {
     }
   };
 
+  /**
+   * Seed-finding combinatorical Kalman Filter that combines every RecoTrack with every
+   * SVD track, then filters the combinations.
+   * All implementation is done in the corresponding findlet.
+   */
   class CDCToSVDSeedCKFModule : public TrackFindingCDC::FindletModule<CKFToSVDSeedFindlet> {
 
   public:
@@ -45,6 +50,11 @@ namespace Belle2 {
     }
   };
 
+  /**
+   * Combinatorical Kalman Filter that extrapolates every RecoTrack into the PXD
+   * and collects space points.
+   * All implementation is done in the corresponding findlet.
+   */
   class ToPXDCKFModule : public TrackFindingCDC::FindletModule<CKFToPXDFindlet> {
 
   public:
@@ -56,6 +66,11 @@ namespace Belle2 {
     }
   };
 
+  /**
+   * Combinatorical Kalman Filter that extrapolates every RecoTrack into the CDC
+   * and collects wire hits.
+   * All implementation is done in the corresponding findlet.
+   */
   class ToCDCCKFModule : public TrackFindingCDC::FindletModule<CKFToCDCFindlet> {
 
   public:

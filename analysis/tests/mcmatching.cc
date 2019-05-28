@@ -55,13 +55,13 @@ namespace {
       c_ReconstructFrom, /**< Create Particle from given Decay (and associated daughters). */
     };
     /** create MCParticles for decay of particle with 'pdg' to given daughter PDG codes. */
-    Decay(int pdg, std::vector<Decay> daughters = std::vector<Decay>()):
+    Decay(int pdg, const std::vector<Decay>& daughters = std::vector<Decay>()):
       m_pdg(pdg), m_daughterDecays(daughters), m_mcparticle(nullptr), m_particle(nullptr)
     {
       m_graphParticle = &gParticleGraph.addParticle();
       m_graphParticle->setPDG(m_pdg);
       m_graphParticle->setStatus(MCParticle::c_PrimaryParticle);
-      for (Decay& d : daughters) {
+      for (const Decay& d : daughters) {
         gParticleGraph.addDecay(*m_graphParticle, *d.m_graphParticle);
       }
     }
@@ -79,7 +79,7 @@ namespace {
     }
 
     /** get first Particle with matching PDG code. */
-    Particle* getParticle(int pdg) const
+    [[nodiscard]] Particle* getParticle(int pdg) const
     {
       if (m_pdg == pdg and m_particle)
         return m_particle;
@@ -92,7 +92,7 @@ namespace {
       return nullptr;
     }
     /** get first MCParticle with matching PDG code. */
-    MCParticle* getMCParticle(int pdg) const
+    [[nodiscard]] MCParticle* getMCParticle(int pdg) const
     {
       if (m_pdg == pdg and m_mcparticle)
         return m_mcparticle;
@@ -213,7 +213,7 @@ namespace {
       }
     }
 
-    string getString() const { return "Particles(MCParticles,MCMatch,Flags):\n" + getStringInternal(); }
+    [[nodiscard]] string getString() const { return "Particles(MCParticles,MCMatch,Flags):\n" + getStringInternal(); }
 
     int m_pdg; /**< PDG code of this MCParticle. */
     vector<Decay> m_daughterDecays; /**< decay products. */
@@ -224,7 +224,7 @@ namespace {
 
   private:
     /** implementation of getString(), without descriptive prefix. */
-    string getStringInternal(int depth = 0) const
+    [[nodiscard]] string getStringInternal(int depth = 0) const
     {
       stringstream s;
       string spaces;
@@ -274,7 +274,7 @@ namespace {
   class MCMatchingTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       StoreObjPtr<ParticleExtraInfoMap> particleExtraInfo;
       StoreArray<Particle> particles;
@@ -286,7 +286,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }

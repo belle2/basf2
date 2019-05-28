@@ -268,6 +268,7 @@ class ValidationPlot(object):
                        cumulation_direction=cumulation_direction)
 
         if not self.ylabel:
+            #: default label for the histogram's Y axis
             self.ylabel = 'count'
 
         return self
@@ -527,7 +528,9 @@ class ValidationPlot(object):
 
         n_x_bins = len(x_bin_edges) - 1
         n_y_bins = len(y_bin_edges) - 1
+        #: lower left corner of the histogram
         self.lower_bound = (x_bin_edges[0], y_bin_edges[0])
+        #: upper right corner of the hisogram
         self.upper_bound = (x_bin_edges[-1], y_bin_edges[-1])
 
         histogram = ROOT.TH2D(name,
@@ -1038,6 +1041,7 @@ class ValidationPlot(object):
                stackby=None,
                cumulation_direction=None,
                reverse_stack=None):
+        """Create histograms from a template, possibly stacked"""
 
         histograms = []
 
@@ -1073,6 +1077,7 @@ class ValidationPlot(object):
 
     @classmethod
     def create_stack(cls, histograms, name, reverse_stack, force_graph=False):
+        """Create a stack of histograms"""
         if len(histograms) == 1:
             plot = histograms[0]
         else:
@@ -1104,6 +1109,7 @@ class ValidationPlot(object):
 
     @classmethod
     def convert_tprofile_to_tgrapherrors(cls, tprofile, abs_x=False):
+        """Extract errors from a TProfile histogram and create a TGraph from these"""
         if isinstance(tprofile, ROOT.TGraph):
             return tprofile
 
@@ -1489,6 +1495,7 @@ class ValidationPlot(object):
 
     @classmethod
     def gaus_slice_fit(cls, th2, name, z_score=None):
+        """Extract a slice of a scatterplot and apply a Gaussian fit to it"""
         # profile = th2.ProfileX(name)
 
         y_taxis = th2.GetYaxis()
@@ -2220,14 +2227,18 @@ class ValidationPlot(object):
     def attach_attributes(self):
         """Reassign the special attributes of the plot forwarding them to the ROOT plot."""
         # Forward the attributes to the plot by auto assignment
+        #: cached value of the user-check action for this plot
         self.check = self.check
         #: contact information for this plot
         self.contact = self.contact
         #: description of the plot
         self.description = self.description
 
+        #: cached value of the x-axis label for this plot
         self.xlabel = self.xlabel
+        #: cached value of the y-axis label for this plot
         self.ylabel = self.ylabel
+        #: cached value of the title for this plot
         self.title = self.title
 
     def set_maximum(self, maximum):

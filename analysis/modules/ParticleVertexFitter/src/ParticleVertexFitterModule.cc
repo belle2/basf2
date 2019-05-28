@@ -367,8 +367,8 @@ namespace Belle2 {
     analysis::VertexFitKFit kv;
     kv.setMagneticField(m_Bfield);
 
-    for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-      kv.addParticle(mother->getDaughter(fitChildren[iChild]));
+    for (unsigned int iChild : fitChildren)
+      kv.addParticle(mother->getDaughter(iChild));
 
     if (ipProfileConstraint)
       addIPProfileToKFitter(kv);
@@ -450,8 +450,8 @@ namespace Belle2 {
       analysis::MassVertexFitKFit kmv;
       kmv.setMagneticField(m_Bfield);
 
-      for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        kmv.addParticle(mother->getDaughter(fitChildren[iChild]));
+      for (unsigned int iChild : fitChildren)
+        kmv.addParticle(mother->getDaughter(iChild));
 
       kmv.setInvariantMass(mother->getPDGMass());
       int err = kmv.doFit();
@@ -468,8 +468,8 @@ namespace Belle2 {
       analysis::VertexFitKFit kv;
       kv.setMagneticField(m_Bfield);
 
-      for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        kv.addParticle(mother->getDaughter(fitChildren[iChild]));
+      for (unsigned int iChild : fitChildren)
+        kv.addParticle(mother->getDaughter(iChild));
 
       // Perform vertex fit using only the particles with valid error matrices
       int err = kv.doFit();
@@ -542,8 +542,8 @@ namespace Belle2 {
     analysis::MassPointingVertexFitKFit kmpv;
     kmpv.setMagneticField(m_Bfield);
 
-    for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-      kmpv.addParticle(mother->getDaughter(fitChildren[iChild]));
+    for (unsigned int iChild : fitChildren)
+      kmpv.addParticle(mother->getDaughter(iChild));
 
     kmpv.setInvariantMass(mother->getPDGMass());
     HepPoint3D productionVertex(mother->getExtraInfo("prodVertX"),
@@ -783,15 +783,15 @@ namespace Belle2 {
         TLorentzVector childMoms;
         TVector3 childPoss;
         TMatrixFSym childErrMatrixs(7);
-        for (unsigned iChild = 0; iChild < pars[iDaug].size(); iChild++) {
+        for (unsigned int iChild : pars[iDaug]) {
           childMoms = childMoms +
                       CLHEPToROOT::getTLorentzVector(
-                        kf.getTrackMomentum(pars[iDaug][iChild]));
+                        kf.getTrackMomentum(iChild));
           childPoss = childPoss +
                       CLHEPToROOT::getTVector3(
-                        kf.getTrackPosition(pars[iDaug][iChild]));
+                        kf.getTrackPosition(iChild));
           TMatrixFSym childErrMatrix =
-            CLHEPToROOT::getTMatrixFSym(kf.getTrackError(pars[iDaug][iChild]));
+            CLHEPToROOT::getTMatrixFSym(kf.getTrackError(iChild));
           childErrMatrixs = childErrMatrixs + childErrMatrix;
         }
         allparticles[iDaug]->set4Vector(childMoms);
@@ -846,8 +846,8 @@ namespace Belle2 {
       std::vector<std::string> tracksName = m_decaydescriptor.getSelectionNames();
 
       if (allSelectedDaughters(mother, tracksVertex)) {
-        for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
-          if (tracksVertex[itrack] != mother) rf.addTrack(tracksVertex[itrack]);
+        for (auto& itrack : tracksVertex) {
+          if (itrack != mother) rf.addTrack(itrack);
         }
         rf.setMother(mother);
       } else {
@@ -883,8 +883,8 @@ namespace Belle2 {
         // one track fit is not kinematic
         if (nTrk == 1) {
           analysis::RaveVertexFitter rsg;
-          for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
-            rsg.addTrack(tracksVertex[itrack]);
+          for (auto& itrack : tracksVertex) {
+            rsg.addTrack(itrack);
             nvert = rsg.fit("kalman");
             if (nvert > 0) {
               pos = rsg.getPos(0);
@@ -984,7 +984,7 @@ namespace Belle2 {
   }
 
   bool ParticleVertexFitterModule::allSelectedDaughters(const Particle* mother,
-                                                        std::vector<const Particle*> tracksVertex)
+                                                        const std::vector<const Particle*>& tracksVertex)
   {
     bool isAll = false;
     if (mother->getNDaughters() == 0) return false;
@@ -993,8 +993,8 @@ namespace Belle2 {
 
     for (unsigned i = 0; i < mother->getNDaughters(); i++) {
       bool dauOk = false;
-      for (unsigned vi = 0; vi < tracksVertex.size(); vi++) {
-        if (tracksVertex[vi] == mother->getDaughter(i)) {
+      for (auto& vi : tracksVertex) {
+        if (vi == mother->getDaughter(i)) {
           nNotIncluded = nNotIncluded - 1;
           dauOk = true;
         }

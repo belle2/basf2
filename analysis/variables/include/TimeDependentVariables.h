@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -137,13 +137,25 @@ namespace Belle2 {
     double particleDeltaZ(const Particle* particle);
 
     /**
+     * returns the error of Delta Z (Brec - Btag) in cm
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaZErr(const Particle* particle);
+
+    /**
      * return Delta Boost direction (Brec - Btag) in cm
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleDeltaB(const Particle* particle);
 
-
+    /**
+     * returns the error of the difference Delta Boost direction (Brec - Btag) in cm
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaBErr(const Particle* particle);
 
     /**
      * returns the vertex component in the boost direction

@@ -438,7 +438,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getExtTheta();
@@ -457,7 +457,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getExtPhi();
@@ -475,7 +475,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getExtPhiId();
@@ -494,7 +494,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getEnergy3FWDBarrel();
@@ -513,7 +513,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getEnergy3FWDEndcap();
@@ -531,7 +531,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getEnergy3BWDEndcap();
@@ -550,7 +550,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getEnergy3BWDBarrel();
@@ -822,7 +822,7 @@ namespace Belle2 {
         int maxTheta = int(std::lround(vars[2]));
 
         unsigned nTCs = 0;
-        for (const auto tc : ecltcs) {
+        for (const auto& tc : ecltcs) {
           if (tc.getFADC() >= fadccut and
               tc.getThetaId() >= minTheta and
               tc.getThetaId() <= maxTheta) nTCs++;

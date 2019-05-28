@@ -37,7 +37,7 @@ namespace TreeFitter {
     return status;
   }
 
-  Resonance::~Resonance() {};
+  Resonance::~Resonance() = default;
 
   std::string Resonance::parname(int index) const
   {

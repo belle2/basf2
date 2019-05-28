@@ -15,6 +15,7 @@ from kinfit import *
 from analysisPath import analysis_main
 from variables import variables
 import basf2_mva
+import pdg
 
 
 def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
@@ -1535,7 +1536,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
     fillParticleList('gamma:roe_default', '', path=path)
-    fillParticleList('K_L0:roe_default', '', path=path)
+    fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
     inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
@@ -2220,17 +2221,18 @@ def buildEventShape(inputListNames=[],
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(path=analysis_main):
+def labelTauPairMC(printDecayInfo=False, path=analysis_main):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
+    @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
     """
     tauDecayMarker = register_module('TauDecayMarker')
     tauDecayMarker.set_name('TauDecayMarker_')
 
-    path.add_module(tauDecayMarker)
+    path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
 
 
 def tagCurlTracks(particleLists,
@@ -2287,6 +2289,70 @@ def tagCurlTracks(particleLists,
     curlTagger.param('train', train)
 
     path.add_module(curlTagger)
+
+
+def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path=analysis_main):
+    """
+    Apply an MVA (BDT) to perform particle identification for charged stable particles using `ChargedPidMVA` module.
+
+    Note:
+        Currently, the MVA is trained including only **ECL-based inputs**.
+        Hence, it is mostly suited for **electron (muon) identification**.
+        For the future, this approach could however be extended to include info from other subdetetctors,
+        as long as they are made available in the Mdst format...
+
+    The module decorates Particle objects in the input ParticleList(s) w/ variables
+    containing the appropriate MVA score, which can be used to select candidates.
+
+    Note:
+        Currently, particle identification works as 'binary' separation between
+        input S, B particle mass hypotheses according to the following scheme:
+
+        - e (11) vs. pi (211)
+
+        - mu (13) vs. pi (211)
+
+        - pi (211) vs K (321)
+
+        - K (321) vs pi (211)
+
+        - p (2212) vs pi (211)
+
+        - d : NOT AVAILABLE
+
+        The MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
+
+    The MVA algorithm used is a gradient boosted decision tree (`TMVA 4.2.1`, `ROOT 6.14/06`).
+
+    Parameters:
+        sigHypoPDGCode (int): the pdgId of the signal mass hypothesis.
+        bkgHypoPDGCode (int): the pdgId of the background mass hypothesis.
+        particleLists list(str): list of names of ParticleList objects for charged stable particles.
+                                 The charge-conjugate ParticleLists will be also stored automatically.
+        path (basf2.Path): the module is added to this path.
+
+    """
+
+    # Enforce check on input S, B hypotheses compatibility.
+    binaryOpts = [(11, 211), (13, 211), (211, 321), (321, 211), (2212, 211)]
+
+    if (sigHypoPDGCode, bkgHypoPDGCode) not in binaryOpts:
+        B2FATAL("No charged pid MVA was trained to separate ", sigHypoPDGCode, " vs. ", bkgHypoPDGCode,
+                ". Please choose among the following pairs:\n",
+                "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
+
+    plSet = set(particleLists)
+    for pList in particleLists:
+        name, label = pList.split(':')
+        plSet.add(f"{pdg.conjugate(name)}:{label}")
+
+    chargedpid = register_module("ChargedPidMVA")
+    chargedpid.set_name(f"ChargedPidMVA_{sigHypoPDGCode}_vs_{bkgHypoPDGCode}")
+    chargedpid.param("sigHypoPDGCode", sigHypoPDGCode)
+    chargedpid.param("bkgHypoPDGCode", bkgHypoPDGCode)
+    chargedpid.param("particleLists", list(plSet))
+
+    path.add_module(chargedpid)
 
 
 if __name__ == '__main__':

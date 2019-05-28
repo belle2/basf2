@@ -4,6 +4,26 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* The variables ``mcDX``, ``mcDY``, ``mcDZ`` are now deprecated, 
+  because they are duplicates of :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ`.
+  A warning had been added in documentation.
+
 * Added the meta variable :b2:var:`eclClusterSpecialTrackMatched` to check if
   any track related to an ECL cluster satisfies certain criteria. It can be used
   to apply an individual track-cluster matching.
+
+* Added missing error variable DeltaZErr and DeltaBoostErr. Fixed bug in TagV error functions.
+
+* Replaced pValue (tracking variable) with chiProb (vertexing variable) in the vertexing variable collection.
+
+TreeFitter
+++++++++++
+
+* Fix the :math:`\phi`-dependent loss of performance for displaced vertices (:issue:`BII-4753`).  
+
+Flavor Tagger
++++++++++++++
+
+* Default Expert (testing mode) does not create repositories and does not save weight files locally. 
+  It only loads the payloads directly from the database using the database payload names
+  as mva identifiers.

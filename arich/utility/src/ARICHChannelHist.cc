@@ -14,6 +14,7 @@
 #include <iostream>
 #include <algorithm>
 #include <TVector2.h>
+#include <TList.h>
 
 using namespace std;
 using namespace Belle2;
@@ -192,12 +193,12 @@ void ARICHChannelHist::setBinContent(unsigned hapdID, unsigned chID, double valu
 
 void ARICHChannelHist::setBinContent(unsigned hapdID, double value)
 {
-  SetBinContent(m_hapd2binMap[hapdID], value);
+  SetBinContent(m_hapd2binMap[hapdID - 1], value);
 }
 
 void ARICHChannelHist::fillBin(unsigned hapdID, double weight)
 {
-  SetBinContent(m_hapd2binMap[hapdID], GetBinContent(hapdID) + weight);
+  SetBinContent(m_hapd2binMap[hapdID - 1], GetBinContent(hapdID) + weight);
 }
 
 void ARICHChannelHist::fillFromTH1(TH1* hist)
@@ -232,3 +233,21 @@ void ARICHChannelHist::fillFromTH1(TH1* hist)
     }
   } else return;
 }
+
+void ARICHChannelHist::setPoly(TH2Poly* poly)
+{
+
+  if (poly->GetNumberOfBins() == 0) {
+    for (const auto && bin : *fBins) {
+      poly->AddBin((TGraph*)((TH2PolyBin*)bin)->GetPolygon());
+    }
+  }
+  if (poly->GetNumberOfBins() != GetNumberOfBins()) {std::cout << "Mismatch between number of bins in TH2Poly and ARICHChannelHist" << std::endl; return;}
+
+  double max = poly->GetMaximum();
+  for (int i = 1; i < GetNumberOfBins() + 1; i++) {
+    poly->SetBinContent(i, GetBinContent(i) > max ? max : GetBinContent(i));
+  }
+  return;
+}
+

@@ -130,7 +130,7 @@ namespace Belle2 {
      * @param decayString
      * @param cutParameter
      */
-    explicit ParticleGenerator(std::string decayString, std::string cutParameter = "");
+    explicit ParticleGenerator(const std::string& decayString, const std::string& cutParameter = "");
 
     /**
      * Initialises the generator to produce the given type of sublist

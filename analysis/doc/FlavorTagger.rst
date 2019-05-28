@@ -193,7 +193,7 @@ steering file right before calling the flavor tagger:
 
 ::
  
-  basf2.use_central_database("analysis_tools_release-03")
+  basf2.use_central_database("analysis_tools_release-03-01-00")
 
 +---------------------------+-------------------------------------------+
 | Release                   | Global DataBase Tag                       |

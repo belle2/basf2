@@ -295,13 +295,13 @@ class EventDisplayer(basf2.Module):
         #: map for data concentrator -> sectorFB
         self.dcToSectorFB = [10, 14, 2, 6, 11, 15, 3, 7, 12, 8, 4, 0, 13, 9, 5, 1]
         #: RPC-time calibration adjustment (ns) for rawKLMs
-        self.t0Cal = 236
+        self.t0Cal = 312
         #: RPC-time calibration adjustment (ns) for BKLMHit2ds
-        self.t0Cal2d = 217
+        self.t0Cal2d = 308
         #: scint-ctime calibration adjustment (ns) for rawKLMs
-        self.ct0Cal = 368
+        self.ct0Cal = 455
         #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
-        self.ct0Cal2d = 349
+        self.ct0Cal2d = 520
         #: per-sector variations in RPC-time calibration adjustment (ns) for rawKLMs
         self.t0RPC = [8, -14, -6, -14, -2, 10, 9, 13, 0, -10, -14, -20, 2, 6, 14, 11]
         #: per-sector variations in scint-ctime calibration adjustment (ns) for rawKLMs

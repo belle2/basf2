@@ -21,7 +21,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/100_B_Jpsi_ks_pipi.root'), path=main)
+        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/1000_B_Jpsi_ks_pipi.root'), path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
@@ -64,12 +64,59 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertFalse(falsePositives < 199, "No background survived the fit. This is weird.")
+        self.assertTrue(falsePositives < 2425, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives > 62, "Signal rejection too high")
+        self.assertTrue(truePositives > 541, "Signal rejection too high")
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")
+
+    @unittest.skip("Displaced vertex KFIT skipped. For reasons.")
+    def test_KFit(self):
+        testFile = tempfile.NamedTemporaryFile()
+
+        main = create_path()
+
+        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/1000_B_Jpsi_ks_pipi.root'), path=main)
+
+        fillParticleList('pi+:a', 'pionID > 0.5', path=main)
+
+        reconstructDecay('K_S0:all -> pi+:a pi-:a', '', 0, path=main)
+        matchMCTruth('K_S0:all', path=main)
+
+        conf = 0
+        vertexKFit('K_S0:all', conf_level=conf, path=main)
+
+        ntupler = register_module('VariablesToNtuple')
+        ntupler.param('fileName', testFile.name)
+        ntupler.param('variables', ['chiProb', 'M', 'isSignal'])
+        ntupler.param('particleList', 'K_S0:all')
+        main.add_module(ntupler)
+
+        process(main)
+
+        ntuplefile = TFile(testFile.name)
+        ntuple = ntuplefile.Get('ntuple')
+
+        self.assertFalse(ntuple.GetEntries() == 0, "Ntuple is empty.")
+
+        allBkg = ntuple.GetEntries("isSignal == 0")
+        allSig = ntuple.GetEntries("isSignal > 0")
+
+        truePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal > 0)")
+        falsePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal == 0)")
+
+        mustBeZero = ntuple.GetEntries("(chiProb < {})".format(conf))
+
+        print("True fit survivors: {0} out of {1} true candidates".format(truePositives, allSig))
+        print("False fit survivors: {0} out of {1} false candidates".format(falsePositives, allBkg))
+
+        self.assertFalse(truePositives == 0, "KFIT No signal survived the fit.")
+
+        self.assertTrue(falsePositives < 199, f"KFIT: Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
+
+        self.assertTrue(truePositives > 62, "KFIT Signal rejection too high")
+        self.assertFalse(mustBeZero, "KFIT We should have dropped all candidates with confidence level less than {}.".format(conf))
 
 
 if __name__ == '__main__':

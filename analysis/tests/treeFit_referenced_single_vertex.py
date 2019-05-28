@@ -21,30 +21,27 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
+        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/1000_B_Jpsi_ks_pipi.root'), path=main)
 
-        fillParticleList('pi+:a', 'pionID > 0.5', path=main)
+        fillParticleList('mu+', 'muonID > 0.5', path=main)
 
-        fillParticleList('gamma:a', '', path=main)
-        reconstructDecay('pi0:a -> gamma:a gamma:a', '0.125 < InvM < 0.145', 0, path=main)
-
-        reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
-        matchMCTruth('B0:rec', path=main)
+        reconstructDecay('J/psi:all -> mu+ mu-', '', 0, path=main)
+        matchMCTruth('J/psi:all', path=main)
 
         conf = 0
         main.add_module('TreeFitter',
-                        particleList='B0:rec',
+                        particleList='J/psi:all',
                         confidenceLevel=conf,
                         massConstraintList=[],
                         massConstraintListParticlename=[],
                         expertUseReferencing=True,
-                        ipConstraint=True,
-                        updateAllDaughters=True)
+                        ipConstraint=False,
+                        updateAllDaughters=False)
 
         ntupler = register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
         ntupler.param('variables', ['chiProb', 'M', 'isSignal'])
-        ntupler.param('particleList', 'B0:rec')
+        ntupler.param('particleList', 'J/psi:all')
         main.add_module(ntupler)
 
         process(main)
@@ -67,9 +64,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertFalse(falsePositives == 2069, "No background survived the fit. This is weird.")
+        self.assertTrue(falsePositives < 1471, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives > 29, "Signal rejection too high")
+        self.assertTrue(truePositives > 741, "Signal rejection too high")
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")

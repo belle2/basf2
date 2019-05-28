@@ -32,7 +32,7 @@ MC12_types = {
     "MC12_taupairBGx1": '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007404/s00/e1003/4S/r00000/taupair/' +
     'mdst/sub00/mdst_000171_prod00007404_task10020000172.root',
     "MC12_mixedBGx0": '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007393/s00/e1003/4S/r00000/mixed/' +
-    'mdst_000018_prod00007393_task10020000018.root',
+    'mdst/sub00/mdst_000018_prod00007393_task10020000018.root',
     "MC12_chargedBGx0": '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007395/s00/e1003/4S/r00000/charged/' +
     'mdst/sub00/mdst_000007_prod00007395_task10020000007.root',
     "MC12_ccbarBGx0": '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007403/s00/e1003/4S/r00000/ccbar/' +

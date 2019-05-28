@@ -15,6 +15,9 @@
 
 namespace Belle2 {
 
+  /**
+   * BKLM element numbers.
+   */
   class BKLMElementNumbers {
 
   public:
@@ -39,6 +42,14 @@ namespace Belle2 {
      */
     static uint16_t channelNumber(int forward, int sector, int layer, int plane,
                                   int strip);
+
+    /**
+     * Get module number.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     */
+    static uint16_t moduleNumber(int forward, int sector, int layer);
 
     /**
      * Get number of strips.

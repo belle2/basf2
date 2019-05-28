@@ -19,6 +19,7 @@ class ReconstructionPositionHarvester(HarvestingModule):
             foreach=tracks_store_vector_name,
             output_file_name=output_file_name)
 
+        #: function to look up CDC MC hits
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp()
 
     def peel(self, track_cand):
@@ -57,6 +58,7 @@ class ReconstructionPositionHarvester(HarvestingModule):
                     number_of_wrong_rl_infos=number_of_wrong_rl_infos,
                     mean_wrong_rl_infos=np.true_divide(number_of_wrong_rl_infos, num_norms_stereo))
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="tree")
 
 
@@ -74,6 +76,7 @@ class WrongRLInfoCounter(HarvestingModule):
                                   foreach=tracks_store_vector_name,
                                   output_file_name=output_file_name)
 
+        #: function to look up CDC MC hits
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp()
 
     def peel(self, track_cand):
@@ -115,6 +118,7 @@ class WrongRLInfoCounter(HarvestingModule):
                     mean_wrong_rl=np.true_divide(number_of_wrong_rl_infos, number_of_hits),
                     mean_wrong_rl_stereo=np.true_divide(number_of_wrong_rl_infos_stereo_only, number_of_stereo))
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="tree")
 
 
@@ -148,16 +152,21 @@ class SegmentFakeRatesModule(HarvestingModule):
             foreach=local_track_cands_store_array_name,
             output_file_name=output_file_name)
 
+        #: cached name of the TrackCands StoreArray
         self.mc_track_cands_store_array_name = mc_track_cands_store_array_name
+        #: cached name of the Legendre TrackCands StoreArray
         self.legendre_track_cand_store_array_name = legendre_track_cand_store_array_name
 
+        #: function to match local tracks to MC tracks
         self.mc_track_matcher_local = Belle2.TrackMatchLookUp(self.mc_track_cands_store_array_name, self.foreach)
+        #: function to match Legendre tracks to MC tracks
         self.mc_track_matcher_legendre = Belle2.TrackMatchLookUp(
             self.mc_track_cands_store_array_name,
             legendre_track_cand_store_array_name)
 
     def prepare(self):
         """ Prepare the CDC lookup. """
+        #: cached CDCHits StoreArray
         self.cdcHits = Belle2.PyStoreArray("CDCHits")
         return HarvestingModule.prepare(self)
 
@@ -238,6 +247,7 @@ class SegmentFakeRatesModule(HarvestingModule):
                     number_of_hits_in_same_superlayer=number_of_hits_in_same_superlayer,
                     partner_has_stereo_information=partner_has_stereo_information)
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="tree")
 
 
@@ -258,8 +268,10 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
             foreach=local_track_cands_store_array_name,
             output_file_name=output_file_name)
 
+        #: cached name of the TrackCands StoreArray
         self.mc_track_cands_store_array_name = mc_track_cands_store_array_name
 
+        #: function to match tracks to MC tracks
         self.mc_track_matcher = Belle2.TrackMatchLookUp(self.mc_track_cands_store_array_name,
                                                         self.foreach)
 
@@ -312,6 +324,7 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
                     track_phi=track_phi,
                     difference_phi=segment_phi - track_phi)
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="tree")
 
 
@@ -328,6 +341,7 @@ class SeedsAnalyser(HarvestingModule):
         """
         HarvestingModule.__init__(self, foreach=track_cands, output_file_name=output_file_name)
 
+        #: cached flag to use VXD hits
         self.use_vxd_hits = use_vxd_hits
 
     def peel(self, legendre_track_cand):
@@ -408,4 +422,5 @@ class SeedsAnalyser(HarvestingModule):
 
         return return_dict
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()

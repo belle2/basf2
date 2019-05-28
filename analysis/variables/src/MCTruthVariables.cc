@@ -167,6 +167,41 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+    double isSignalAcceptMissingMassive(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissingResonance);
+      status &= (~MCMatching::c_MissMassiveParticle);
+      status &= (~MCMatching::c_MissKlong);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
+    double isSignalAcceptMissing(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissingResonance);
+      status &= (~MCMatching::c_MissMassiveParticle);
+      status &= (~MCMatching::c_MissKlong);
+      status &= (~MCMatching::c_MissNeutrino);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
     double particleMCMatchPDGCode(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -572,6 +607,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
                       isSignalAcceptMissingNeutrino,
                       "same as isSignal, but also accept missing neutrino");
+    REGISTER_VARIABLE("isSignalAcceptMissingMassive",
+                      isSignalAcceptMissingMassive,
+                      "same as isSignal, but also accept missing massive particle");
+    REGISTER_VARIABLE("isSignalAcceptMissing",
+                      isSignalAcceptMissing,
+                      "same as isSignal, but also accept missing particle");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
                       "return 1 if the partice is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,

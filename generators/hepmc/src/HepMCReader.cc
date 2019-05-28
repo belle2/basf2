@@ -89,7 +89,12 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     const double mass = (*read_particle)->generated_mass() * mom_conv;
     auto const mom_tmp = (*read_particle)->momentum();
     //whatever genius wrote this vector class did not implement an operator for multiplication with a scalar or even access via []
-    const HepMC::FourVector momentum(mom_tmp.x()*mom_conv,  mom_tmp.y()*mom_conv, mom_tmp.z()*mom_conv, mom_tmp.t()*mom_conv);
+    const HepMC::FourVector momentum(
+      mom_tmp.x()*mom_conv * Unit::GeV,
+      mom_tmp.y()*mom_conv * Unit::GeV,
+      mom_tmp.z()*mom_conv * Unit::GeV,
+      mom_tmp.t()*mom_conv * Unit::GeV
+    );
 
     B2DEBUG(20, "Read particle: status " << status << " isFinal " << isFinalstate << " isVirtual " << isVirtual << " pdg " << pdg_code
             << " mass " << mass << " px " << momentum.x() << " py " << momentum.y() << " px " << momentum.z() << " E " << momentum.t());
@@ -99,8 +104,8 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     p.setMass(mass);
     if (production_vertex) {
       const auto pos = production_vertex->position();
-      p.setProductionVertex(TVector3(pos.x(), pos.y(), pos.z()) * len_conv);
-      p.setProductionTime(pos.t() * len_conv * Unit::mm / Const::speedOfLight);
+      p.setProductionVertex(TVector3(pos.x(), pos.y(), pos.z()) * len_conv * Unit::cm);
+      p.setProductionTime(pos.t() * len_conv * Unit::cm / Const::speedOfLight);
       p.setValidVertex(true);
     }
 

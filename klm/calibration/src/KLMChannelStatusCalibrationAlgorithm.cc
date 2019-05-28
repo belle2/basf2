@@ -85,8 +85,8 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     else
       m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Dead);
   }
-  for (BKLMChannelIndex& bklmModule : bklmModules) {
-    module = bklmModule.getKLMModuleNumber();
+  for (EKLMChannelIndex& eklmModule : eklmModules) {
+    module = eklmModule.getKLMModuleNumber();
     hits = hitMapModule.getChannelData(module);
     if (hits >= m_MinimalModuleHitNumber)
       m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Normal);

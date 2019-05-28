@@ -1,13 +1,12 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Thomas Keck                                              *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
-
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <analysis/variables/MetaVariables.h>
 #include <analysis/VariableManager/Utility.h>

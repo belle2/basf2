@@ -3,8 +3,7 @@
  * Copyright(C) 2015-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Torben Ferber, Giacomo De Pietro,           *
- *               Sam Cunliffe                                             *
+ * Contributors: Anze Zupanc, Torben Ferber, Giacomo De Pietro            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

@@ -72,6 +72,55 @@ void SVDClusterEvaluationModule::initialize()
   m_abs_SmallS_U = m_width_SmallS_U / 2 + m_safety_margin;
   m_abs_SmallS_V = m_width_SmallS_V / 2 + m_safety_margin;
 
+  // create new root file
+  m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
+
+  //tree initialization
+  m_tree = new TTree("tree", "RECREATE");
+  b_experiment = m_tree->Branch("exp", &m_experiment, "exp/i");
+  b_run = m_tree->Branch("run", &m_run, "run/i");
+  b_layer = m_tree->Branch("layer", &m_layer, "layer/i");
+  b_ladder = m_tree->Branch("ladder", &m_ladder, "ladder/i");
+  b_sensor = m_tree->Branch("sensor", &m_sensor, "sensor/i");
+  b_interU = m_tree->Branch("interU", &m_interU, "interU/F");
+  b_interV = m_tree->Branch("interV", &m_interV, "interV/F");
+  b_interErrU = m_tree->Branch("interErrU", &m_interErrU, "interErrU/F");
+  b_interErrV = m_tree->Branch("interErrV", &m_interErrV, "interErrV/F");
+  b_interUprime = m_tree->Branch("interUprime", &m_interUprime, "interUprime/F");
+  b_interVprime = m_tree->Branch("interVprime", &m_interVprime, "interVprime/F");
+  b_interErrUprime = m_tree->Branch("interErrUprime", &m_interErrUprime, "interErrUprime/F");
+  b_interErrVprime = m_tree->Branch("interErrVprime", &m_interErrVprime, "interErrVprime/F");
+  b_residU = m_tree->Branch("residU", &m_residU, "residU/F");
+  b_residV = m_tree->Branch("residV", &m_residV, "residV/F");
+  b_clUpos = m_tree->Branch("clUpos", &m_clUpos, "clUpos/F");
+  b_clVpos = m_tree->Branch("clVpos", &m_clVpos, "clVpos/F");
+  b_clUcharge = m_tree->Branch("clUcharge", &m_clUcharge, "clUcharge/F");
+  b_clVcharge = m_tree->Branch("clVcharge", &m_clVcharge, "clVcharge/F");
+  b_clUsnr = m_tree->Branch("clUsnr", &m_clUsnr, "clUsnr/F");
+  b_clVsnr = m_tree->Branch("clVsnr", &m_clVsnr, "clVsnr/F");
+  b_clUsize = m_tree->Branch("clUsize", &m_clUsize, "clUsize/i");
+  b_clVsize = m_tree->Branch("clVsize", &m_clVsize, "clVsize/i");
+  b_clUtime = m_tree->Branch("clUtime", &m_clUtime, "clUtime/F");
+  b_clVtime = m_tree->Branch("clVtime", &m_clVtime, "clVtime/F");
+
+  //tree initialization
+  m_treeSummary = new TTree("summary", "RECREATE");
+  bs_experiment = m_treeSummary->Branch("exp", &m_experiment, "exp/i");
+  bs_run = m_treeSummary->Branch("run", &ms_run, "run/i");
+  bs_layer = m_treeSummary->Branch("layer", &ms_layer, "layer/i");
+  bs_ladder = m_treeSummary->Branch("ladder", &ms_ladder, "ladder/i");
+  bs_sensor = m_treeSummary->Branch("sensor", &ms_sensor, "sensor/i");
+  bs_effU = m_treeSummary->Branch("effU", &ms_effU, "effU/F");
+  bs_effV = m_treeSummary->Branch("effV", &ms_effV, "effU/F");
+  bs_effErrU = m_treeSummary->Branch("effErrU", &ms_effErrU, "effErrU/F");
+  bs_effErrV = m_treeSummary->Branch("effErrV", &ms_effErrV, "effErrU/F");
+  bs_residU = m_treeSummary->Branch("residU", &ms_residU, "residU/F");
+  bs_residV = m_treeSummary->Branch("residV", &ms_residV, "residU/F");
+  bs_misU = m_treeSummary->Branch("misU", &ms_misU, "misU/F");
+  bs_misV = m_treeSummary->Branch("misV", &ms_misV, "misU/F");
+  bs_statU = m_treeSummary->Branch("statU", &ms_statU, "statU/F");
+  bs_statV = m_treeSummary->Branch("statV", &ms_statV, "statU/F");
+
 }
 
 
@@ -111,6 +160,12 @@ void SVDClusterEvaluationModule::beginRun()
 
 void SVDClusterEvaluationModule::event()
 {
+
+  //tree variables - event
+  StoreObjPtr<EventMetaData> meta;
+  m_run = meta->getRun();
+  m_experiment = meta->getExperiment();
+
   //  int nEvent = m_eventMetaData->getEvent();
   //  B2DEBUG(10, "nEvent = " << nEvent << ": n intercepts = " << m_svdIntercepts.getEntries() << "n clusters DUT = " << m_svdClusters.getEntries());
   bool isU = true;
@@ -129,6 +184,20 @@ void SVDClusterEvaluationModule::event()
     double sigmaU = m_svdIntercepts[inter]->getSigmaU();
     double sigmaV = m_svdIntercepts[inter]->getSigmaV();
 
+    //tree variables - sensor
+    m_layer = VxdID(theVxdID).getLayerNumber();
+    m_ladder = VxdID(theVxdID).getLadderNumber();
+    m_sensor = VxdID(theVxdID).getSensorNumber();
+    //tree variables - intercept
+    m_interU =  coorU;
+    m_interV =  coorV;
+    m_interErrU = sigmaU;
+    m_interErrV = sigmaV;
+    m_interUprime = m_svdIntercepts[inter]->getUprime();
+    m_interVprime = m_svdIntercepts[inter]->getVprime();
+    m_interErrUprime = m_svdIntercepts[inter]->getSigmaUprime();
+    m_interErrVprime = m_svdIntercepts[inter]->getSigmaVprime();
+
     const VXD::SensorInfoBase& theSensorInfo = m_geoCache.getSensorInfo(theVxdID);
     if (theSensorInfo.inside(coorU, coorV, -m_uFiducial, -m_vFiducial)) {
       B2DEBUG(10, "intercept is inside fiducial area");
@@ -141,6 +210,20 @@ void SVDClusterEvaluationModule::event()
       bool minfoundU = false;
       double minresidV = 999;
       bool minfoundV = false;
+      int idU = -99;
+      int idV = -99;
+      m_residU = -99;
+      m_clUpos = -99;
+      m_clUcharge = -99;
+      m_clUsnr = -99;
+      m_clUsize = -99;
+      m_clUtime = -99;
+      m_residV = -99;
+      m_clVpos = -99;
+      m_clVcharge = -99;
+      m_clVsnr = -99;
+      m_clVsize = -99;
+      m_clVtime = -99;
 
       //loop on clusters
       for (int cls = 0 ; cls < m_svdClusters.getEntries(); cls++) {
@@ -166,19 +249,41 @@ void SVDClusterEvaluationModule::event()
           if (fabs(resid) < fabs(minresidU)) {
             minfoundU = true;
             minresidU = resid;
+            idU = cls;
           }
         } else {
           if (fabs(resid) < fabs(minresidV)) {
             minfoundV = true;
             minresidV = resid;
+            idV = cls;
           }
         }
       }
-      if (minfoundU)
+      if (minfoundU) {
         m_clsMinResid->fill(theVxdID, true, minresidU);
-      if (minfoundV)
+        m_residU = minresidU;
+        m_clUpos = m_svdClusters[idU]->getPosition(coorV);
+        m_clUcharge = m_svdClusters[idU]->getCharge();
+        m_clUsnr = m_svdClusters[idU]->getSNR();
+        m_clUsize = (int)m_svdClusters[idU]->getSize();
+        m_clUtime = m_svdClusters[idU]->getClsTime();
+      }
+      if (minfoundV) {
         m_clsMinResid->fill(theVxdID, false, minresidV);
+        m_residV = minresidV;
+        m_clVpos = m_svdClusters[idV]->getPosition();
+        m_clVcharge = m_svdClusters[idV]->getCharge();
+        m_clVsnr = m_svdClusters[idV]->getSNR();
+        m_clVsize = (int)m_svdClusters[idV]->getSize();
+        m_clVtime = m_svdClusters[idV]->getClsTime();
+      }
+
+      //fill only if inside fiducial area
+      m_tree->Fill();
+
     }
+
+
   }
 
   //clusters
@@ -193,21 +298,26 @@ void SVDClusterEvaluationModule::event()
 }
 
 
-void SVDClusterEvaluationModule::endRun()
+void SVDClusterEvaluationModule::terminate()
 {
-
 }
 
 
-void SVDClusterEvaluationModule::terminate()
+void SVDClusterEvaluationModule::endRun()
 {
+
+  StoreObjPtr<EventMetaData> meta;
+  ms_run = meta->getRun();
+  ms_experiment = meta->getExperiment();
 
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
 
+    m_tree->Write();
+
     const int Nsensors = 172;//L6
-    float sensors[Nsensors]; //sensor identificator
-    float sensorsErr[Nsensors]; //sensor identificator
+    //    float sensors[Nsensors]; //sensor identificator
+    //    float sensorsErr[Nsensors]; //sensor identificator
     float residU[Nsensors]; //U residuals
     float residV[Nsensors]; //V residuals
     float misU[Nsensors]; //U misalignment
@@ -222,8 +332,8 @@ void SVDClusterEvaluationModule::terminate()
     TString sensorV[Nsensors];
 
     for (int i = 0; i < Nsensors; i++) {
-      sensors[i] = i;
-      sensorsErr[i] = 0;
+      //      sensors[i] = i;
+      //      sensorsErr[i] = 0;
       residU[i] = 0;
       residV[i] = 0;
       misU[i] = 0;
@@ -289,6 +399,7 @@ void SVDClusterEvaluationModule::terminate()
 
     for (auto layer : m_geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
       int currentLayer = layer.getLayerNumber();
+      ms_layer = currentLayer;
 
       if (m_theLayer != 0 && currentLayer != m_theLayer)
         continue;
@@ -301,6 +412,9 @@ void SVDClusterEvaluationModule::terminate()
       TDirectory* dir_resid = oldDir->mkdir(residName.Data());
       for (auto ladder : m_geoCache.getLadders(layer))
         for (Belle2::VxdID sensor :  m_geoCache.getSensors(ladder)) {
+          ms_ladder = (VxdID)sensor.getLadderNumber();
+          ms_sensor = (VxdID)sensor.getSensorNumber();
+
           dir_inter->cd();
           (m_interCoor->getHistogram(sensor, 1))->Write();
           for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
@@ -314,18 +428,18 @@ void SVDClusterEvaluationModule::terminate()
 
             dir_resid->cd();
             TH1F* res = m_clsMinResid->getHistogram(sensor, view);
-            if (! fitResiduals(res)) {
-              if (view == SVDHistograms<TH1F>::UIndex)
-                B2DEBUG(10, "Fit to the Residuals of U-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
-                        << " not succesfull, skipping this side");
-              else
-                B2DEBUG(10, "Fit to the Residuals of V-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
-                        << " not succesfull, skipping this side");
-              continue;
-            }
-            TF1* func = res->GetFunction("function");
-            //            if (func == NULL) func = res->GetFunction("functionG1");
-            //            if (func != NULL) {
+            /*            if (! fitResiduals(res)) {
+                    if (view == SVDHistograms<TH1F>::UIndex)
+                      B2DEBUG(10, "Fit to the Residuals of U-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
+                              << " not succesfull, skipping this side");
+                    else
+                      B2DEBUG(10, "Fit to the Residuals of V-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
+                              << " not succesfull, skipping this side");
+                    continue;
+                  }
+            //            TF1* func = res->GetFunction("function");
+                  //            if (func == NULL) func = res->GetFunction("functionG1");
+                  //            if (func != NULL) {*/
             Double_t median, q;
             q = 0.5; // 0.5 for "median"
             {
@@ -336,7 +450,9 @@ void SVDClusterEvaluationModule::terminate()
                 res->GetQuantiles(1, &median, &q);
 
                 residU[s] = getOneSigma(res); //func->GetParameter("sigma1");
+                ms_residU = residU[s];
                 misU[s] = median; //func->GetParameter("mean1");
+                ms_misU = misU[s];
 
                 float halfWindow = m_nSigma * residU[s];
                 if (m_nSigma == 0)
@@ -361,11 +477,13 @@ void SVDClusterEvaluationModule::terminate()
 
                 if (den > 0) {
                   effU[s] = 1.*num / den;
+                  ms_effU = effU[s];
                   //filling efficiency histogram
                   h_effU->Fill(sensorU[s], effU[s]);
                   if (effU[s] > 1)
                     B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << den);
                   effUErr[s] = sqrt(effU[s] * (1 - effU[s]) / den);
+                  ms_effErrU = effUErr[s];
                 }
                 B2DEBUG(10, "num = " << num);
                 B2DEBUG(10, "den = " << den);
@@ -374,6 +492,7 @@ void SVDClusterEvaluationModule::terminate()
 
                 //filling summary Histograms for the U side
                 h_statU->Fill(sensorU[s], stat);
+                ms_statU = stat / m_cmTomicron;
 
                 residU[s] *= m_cmTomicron;
                 h_residU->Fill(sensorU[s], residU[s]);
@@ -387,7 +506,9 @@ void SVDClusterEvaluationModule::terminate()
                 res->GetQuantiles(1, &median, &q);
 
                 residV[s] = getOneSigma(res); //func->GetParameter("sigma1");
+                ms_residV = residV[s];
                 misV[s] = median; //func->GetParameter("mean1");
+                ms_misV = misV[s];
 
                 float halfWindow = m_nSigma * residV[s];
                 if (m_nSigma == 0)
@@ -413,11 +534,13 @@ void SVDClusterEvaluationModule::terminate()
 
                 if (den > 0) {
                   effV[s] = 1.*num / den;
+                  ms_effV = effV[s];
                   //filling efficiency histogram
                   h_effV->Fill(sensorV[s], effV[s]);
                   if (effV[s] > 1)
                     B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << den);
                   effVErr[s] = sqrt(effV[s] * (1 - effV[s]) / den);
+                  ms_effErrV = effVErr[s];
                 }
                 B2DEBUG(10, "num = " << num);
                 B2DEBUG(10, "den = " << den);
@@ -426,6 +549,7 @@ void SVDClusterEvaluationModule::terminate()
 
                 //filing summay histograms for the V side
                 h_statV->Fill(sensorV[s], stat);
+                ms_statV = stat / m_cmTomicron;
 
                 residV[s] *= m_cmTomicron;
                 h_residV->Fill(sensorV[s], residV[s]);
@@ -433,14 +557,15 @@ void SVDClusterEvaluationModule::terminate()
                 h_misV->Fill(sensorV[s], misV[s]);
               }
             }
-            B2INFO("writing out resid histograms for " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." <<
-                   sensor.getSensorNumber() << "." << view);
+            B2DEBUG(50, "writing out resid histograms for " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." <<
+                    sensor.getSensorNumber() << "." << view);
             (m_clsResid->getHistogram(sensor, view))->Write();
             (res)->Write();
             (m_clsResid2D->getHistogram(sensor, view))->Write();
 
 
           }
+          m_treeSummary->Fill();
           s++;
         }
     }
@@ -448,6 +573,8 @@ void SVDClusterEvaluationModule::terminate()
 
 
     oldDir->cd();
+    m_treeSummary->Write();
+
     for (int bin = 0; bin < h_residU->GetNbinsX(); bin++)
       h_residU->SetBinError(bin, 0.);
     h_residU->Write();

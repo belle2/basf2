@@ -21,7 +21,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/1000_B_DstD0Kpi.root'), path=main)
+        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/1000_B_DstD0Kpi_skimmed.root'), path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
         fillParticleList('K+:a', 'kaonID > 0.5', path=main)
@@ -69,7 +69,7 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertTrue(falsePositives < 1521, f"Background rejection to high {falsePositives} out of {allBkg}")
 
-        self.assertTrue(truePositives > 154, "Signal rejection too high {truePositives} out of {allSig}")
+        self.assertTrue(truePositives > 152, "Signal rejection too high {truePositives} out of {allSig}")
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")

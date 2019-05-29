@@ -657,7 +657,7 @@ namespace Belle2 {
     //** extra leafs */
     int m_clk;
     /** the class title */
-    ClassDef(TRGCDCT3DUnpackerStore, 2);
+    ClassDef(TRGCDCT3DUnpackerStore, 3);
 
   };
 

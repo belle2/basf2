@@ -65,7 +65,7 @@ void FillTrackFitNtupleModule::event()
   B2DEBUG(29, "+++++ Loop on Tracks");
   StoreArray<Track> tracks(m_Tracks);
 
-  BOOST_FOREACH(Track & track, tracks) {
+  for (Track& track : tracks) {
 
     const RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
     if (recoTrack == nullptr) B2WARNING(" the RecoTrack associated to Track is nullptr!");

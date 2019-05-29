@@ -8,13 +8,14 @@
 import basf2
 import bklmDB
 import math
+import array
 import ctypes
 import ROOT
 from ROOT import Belle2, TH1F, TH2F, TCanvas, THistPainter, TPad
 
 
-class EventInspectorCoarseWindowStart(basf2.Module):
-    """Fill BKLM histograms of values from RawKLMs and BKLMHit2ds"""
+class EventInspectorLookback(basf2.Module):
+    """Analyze RPC lookback-window parameter settings, fill histograms"""
 
     #: COPPER base identifier for BKLM readout
     BKLM_ID = 0x07000000
@@ -47,7 +48,7 @@ class EventInspectorCoarseWindowStart(basf2.Module):
     #: bit mask for unique module identifier (end, sector, layer)
     BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
-    def __init__(self, exp, run, histName, pdfName, verbosity):
+    def __init__(self, exp, run, histName, pdfName, mode, window):
         """Constructor
 
         Arguments:
@@ -55,7 +56,12 @@ class EventInspectorCoarseWindowStart(basf2.Module):
             run (str): formatter run number
             histName (str): path name of the output histogram ROOT file
             pdfName (str): path name of the output histogram PDF file
-            verbosity (int): histogram-plot verbosity (0=minimal, 1=all)
+            mode (int): specifies the lookback-window mode
+                        0: coarse window start values
+                        1: coarse window width values
+                        2: fine window start values
+                        3: fine window width values
+            window (int, int, int): specifies the lookback-window min, max and step values
         """
         super().__init__()
         #: internal copy of experiment number
@@ -66,8 +72,17 @@ class EventInspectorCoarseWindowStart(basf2.Module):
         self.histName = histName
         #: internal copy of the pathname of the output histogram PDF file
         self.pdfName = pdfName
-        #: internal copy of the histogram-plot verbosity
-        self.verbosity = verbosity
+
+        windowModes = {0: "coarse start", 1: "coarse width", 2: "fine start", 3: "fine width"}
+        #: window mode as a string for histogram labels/titles
+        self.windowMode = windowModes[mode]
+        #: highest observed lookback-window value
+        self.windowMinValue = window[0]
+        #: highest observed lookback-window value
+        self.windowMaxValue = window[1]
+        #: lookback-window value step
+        self.windowStepValue = window[2]
+        print("Mode = {0}  start = {1}  end = {2}  step = {3}".format(mode, window[0], window[1], window[2]))
 
     def initialize(self):
         """Handle job initialization: fill the mapping database, create histograms"""
@@ -151,20 +166,17 @@ class EventInspectorCoarseWindowStart(basf2.Module):
 
         #: histogram of RPC mapped-channel TDC - trigger value, corrected for inter-layer variation
         self.hist_mappedRPCTimeCal = ROOT.TH1F(
-            'mappedRPCTimeCal', expRun + 'RPC mapped-strip time distribution;t - t(trigger) - dt(layer) (ns)', 256, -0.5, 1023.5)
-        #: dictionary of histograms of RPC layer-corrected TDC - trigger value, keyed by coarse window-start value
+            'mappedRPCTimeCal', expRun + 'RPC time distribution;t - t(trigger) - dt(layer) (ns)', 256, -0.5, 1023.5)
+        #: dictionary of histograms of RPC layer-corrected TDC - trigger value, keyed by lookback-window value
         self.dict_mappedRPCTimeCalByWindow = {}
-        #: cached window-start value (initialized to known 'CAFE')
-        self.windowStartValue = 0xcafe
-        print("WindowStartValue = {0:04x} n = 0".format(self.windowStartValue))
-        label = "mappedRPCTimeCalByWindow{0:04x}".format(self.windowStartValue)
-        title = "{0}RPC mapped-strip time distribution for coarse lookback-window start {1:04x}".format(
-            expRun, self.windowStartValue) + ";t - t(trigger) - dt(layer) (ns)"
-        self.dict_mappedRPCTimeCalByWindow[self.windowStartValue] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
-        self.hist_mappedRPCTimeCalByWindow = self.dict_mappedRPCTimeCalByWindow[self.windowStartValue]
-        #: dictionary of the number of RawKLM hits for each window-start value
+        #: dictionary of the number of RawKLM hits for each lookback-window value
         self.dict_nRawKLMs = {}
-        self.dict_nRawKLMs[self.windowStartValue] = 0
+        for window in range(self.windowMinValue, self.windowMaxValue+1, self.windowStepValue):
+            label = "mappedRPCTimeCalByWindow{0:04x}".format(window)
+            title = "{0}RPC time distribution for lookback-window {1} = {2:04x}".format(
+                expRun, self.windowMode, window) + ";t - t(trigger) - dt(layer) (ns)"
+            self.dict_mappedRPCTimeCalByWindow[window] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
+            self.dict_nRawKLMs[window] = 0
 
         # Create the BKLMHit2d-related histograms
 
@@ -173,21 +185,27 @@ class EventInspectorCoarseWindowStart(basf2.Module):
                                                  expRun + 'Forward xy occupancy;x(cm);y(cm)',
                                                  230, -345.0, 345.0, 230, -345.0, 345.0)
         #: scatterplot of end view of backward BKLM for all BKLMHit2ds
-        self.hist_occupancyBackwardXY = ROOT.TH2F('occupancyBackwardXYPrompt',
+        self.hist_occupancyBackwardXY = ROOT.TH2F('occupancyBackwardXY',
                                                   expRun + 'Backward xy occupancy;x(cm);y(cm)',
                                                   230, -345.0, 345.0, 230, -345.0, 345.0)
 
-        #: dictionary of scatterplots of end view of forward BKLM, keyed by coarse window-start value
+        #: dictionary of scatterplots of end view of forward BKLM, keyed by lookback-window value
         self.dict_occupancyXYByWindow = {}
-        label = "occupancyXYByWindow{0:04x}".format(self.windowStartValue)
-        title = "{0}Forward xy occupancy for coarse lookback-window start {1:04x};x(cm);y(cm)".format(expRun, self.windowStartValue)
-        self.dict_occupancyXYByWindow[self.windowStartValue] = ROOT.TH2F(label, title, 230, -345.0, 345.0, 230, -345.0, 345.0)
-        self.hist_occupancyXYByWindow = self.dict_occupancyXYByWindow[self.windowStartValue]
-        #: dictionary of the number of BKLMHit2ds for each window-start value
+        #: dictionary of the number of BKLMHit2ds for each lookback-window value
         self.dict_nHit2ds = {}
-        self.dict_nHit2ds[self.windowStartValue] = 0
-        #: highest observed window-start value
-        self.maxWindowStartValue = 0
+        for window in range(self.windowMinValue, self.windowMaxValue+1, self.windowStepValue):
+            label = "occupancyXYByWindow{0:04x}".format(window)
+            title = "{0}Forward xy occupancy for lookback-window {1} = {2:04x};x(cm);y(cm)".format(expRun, self.windowMode, window)
+            self.dict_occupancyXYByWindow[window] = ROOT.TH2F(label, title, 230, -345.0, 345.0, 230, -345.0, 345.0)
+            self.dict_nHit2ds[window] = 0
+
+        #: dictionary of the number of events for each lookback-window value, for normalization
+        self.dict_nEvents = {}
+        for window in range(self.windowMinValue, self.windowMaxValue+1, self.windowStepValue):
+            self.dict_nEvents[window] = 0
+
+        #: cached value of the lookback-window value, to avoid unnecessary reassignments-to-same-value in event()
+        self.windowValue = -1
 
     def terminate(self):
         """Handle job termination: draw histograms, close output files"""
@@ -199,40 +217,84 @@ class EventInspectorCoarseWindowStart(basf2.Module):
         canvas.Divide(1, 1)
         canvas.GetPad(0).SetGrid(1, 1)
         canvas.GetPad(0).Update()
-        nWindows = int(self.maxWindowStartValue / 64)
-        hist_nRawKLMs = ROOT.TH1F('nRawKLMs', 'Total number of RawKLM hits;Window-start value',
-                                  nWindows, 0, self.maxWindowStartValue)
+        nWindows = int((self.windowMaxValue - self.windowMinValue) / self.windowStepValue) + 1
+        hist_nEvents = ROOT.TH1F('nEvents',
+                                 'Number of events;Lookback-window {0} value'.format(self.windowMode),
+                                 nWindows, self.windowMinValue, self.windowMaxValue+self.windowStepValue)
+        hist_nEvents.SetStats(False)
+        hist_nEvents.SetMinimum(0)
+        values = array.array('d', [0])  # dummy vaue for the histogram's underflow bin
+        for key in self.dict_nEvents:
+            values.append(self.dict_nEvents[key])
+        values.append(0)  # dummy value for the histogram's overflow bin
+        hist_nEvents.SetContent(values)
+        hist_nEvents.Draw("HIST")
+        canvas.Print(self.pdfName, "Title:{0}".format(hist_nEvents.GetName()))
+        hist_nRawKLMs = ROOT.TH1F('nRawKLMs',
+                                  'Mean number of RawKLM hits per event;Lookback-window {0} value'.format(self.windowMode),
+                                  nWindows, self.windowMinValue, self.windowMaxValue+self.windowStepValue)
         hist_nRawKLMs.SetStats(False)
+        hist_nRawKLMs.SetMinimum(0)
+        ratios = array.array('d', [0])  # dummy ratio for the histogram's underflow bin
+        errors = array.array('d', [0])  # dummy error for the histogram's underflow bin
         for key in self.dict_nRawKLMs:
-            hist_nRawKLMs.Fill(key, self.dict_nRawKLMs[key])
-        hist_nRawKLMs.Draw("HIST")
+            numerator = self.dict_nRawKLMs[key]
+            denominator = float(self.dict_nEvents[key])
+            if denominator > 0:
+                ratio = numerator / denominator
+                ratios.append(ratio)
+                errors.append(math.sqrt(ratio * (ratio + 1.0) / denominator))  # avoid 1/numerator
+            else:
+                ratios.append(0)
+                errors.append(0)
+        ratios.append(0)  # dummy ratio for the histogram's overflow bin
+        errors.append(0)  # dummy error for the histogram's overflow bin
+        hist_nRawKLMs.SetContent(ratios)
+        hist_nRawKLMs.SetError(errors)
+        hist_nRawKLMs.Draw("E0 X0 L")
+        hist_nRawKLMs.Draw("HIST SAME")
         canvas.Print(self.pdfName, "Title:{0}".format(hist_nRawKLMs.GetName()))
-        hist_nHit2ds = ROOT.TH1F('nBKLMHit2ds', 'Total number of BKLMHit2ds;Window-start value',
-                                 nWindows, 0, self.maxWindowStartValue)
+        hist_nHit2ds = ROOT.TH1F('nBKLMHit2ds',
+                                 'Mean number of BKLMHit2ds per event;Lookback-window {0} value'.format(self.windowMode),
+                                 nWindows, self.windowMinValue, self.windowMaxValue+self.windowStepValue)
         hist_nHit2ds.SetStats(False)
+        hist_nHit2ds.SetMinimum(0)
+        ratios = array.array('d', [0])  # dummy ratio for the histogram's underflow bin
+        errors = array.array('d', [0])  # dummy error for the histogram's underflow bin
         for key in self.dict_nHit2ds:
-            hist_nHit2ds.Fill(key, self.dict_nHit2ds[key])
-        hist_nHit2ds.Draw("HIST")
-        lastTitle = "Title:{0}".format(hist_nHit2ds.GetName())
+            numerator = self.dict_nHit2ds[key]
+            denominator = float(self.dict_nEvents[key])
+            if denominator > 0:
+                ratio = numerator / denominator
+                ratios.append(ratio)
+                errors.append(math.sqrt(ratio * (ratio + 1.0) / denominator))  # avoid 1/numerator
+            else:
+                ratios.append(0)
+                errors.append(0)
+        ratios.append(0)  # dummy ratio for the histogram's overflow bin
+        errors.append(0)  # dummy error for the histogram's overflow bin
+        hist_nHit2ds.SetContent(ratios)
+        hist_nHit2ds.SetError(errors)
+        hist_nHit2ds.Draw("E0 X0 L")
+        hist_nHit2ds.Draw("HIST SAME")
         canvas.Print(self.pdfName, "Title:{0}".format(hist_nHit2ds.GetName()))
 
-        if self.verbosity > 0:
-            self.hist_mappedRPCTimeCal.Draw()
-            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal.GetName()))
-            for key in self.dict_mappedRPCTimeCalByWindow:
-                theHist = self.dict_mappedRPCTimeCalByWindow[key]
-                theHist.Draw()
-                canvas.Print(self.pdfName, "Title:{0}".format(theHist.GetName()))
+        self.hist_mappedRPCTimeCal.Draw()
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal.GetName()))
+        for key in self.dict_mappedRPCTimeCalByWindow:
+            theHist = self.dict_mappedRPCTimeCalByWindow[key]
+            theHist.Draw()
+            canvas.Print(self.pdfName, "Title:{0}".format(theHist.GetName()))
 
-            self.hist_occupancyBackwardXY.Draw("colz")
-            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyBackwardXY.GetName()))
-            self.hist_occupancyForwardXY.Draw("colz")
-            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyForwardXY.GetName()))
-            for key in self.dict_occupancyXYByWindow:
-                theHist = self.dict_occupancyXYByWindow[key]
-                theHist.Draw("colz")
-                lastTitle = "Title:{0}".format(theHist.GetName())
-                canvas.Print(self.pdfName, lastTitle)
+        self.hist_occupancyBackwardXY.Draw("colz")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyBackwardXY.GetName()))
+        self.hist_occupancyForwardXY.Draw("colz")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyForwardXY.GetName()))
+        for key in self.dict_occupancyXYByWindow:
+            theHist = self.dict_occupancyXYByWindow[key]
+            theHist.Draw("colz")
+            lastTitle = "Title:{0}".format(theHist.GetName())
+            canvas.Print(self.pdfName, lastTitle)
         pdfNameLast = '{0}]'.format(self.pdfName)
         canvas.Print(pdfNameLast, lastTitle)
         self.histogramFile.Write()
@@ -278,43 +340,22 @@ class EventInspectorCoarseWindowStart(basf2.Module):
                     continue
                 bufSlot = rawklm.GetDetectorBuffer(0, finesse)
                 lastWord = bufSlot[nWords - 1]
-                windowStartValue = (lastWord >> 16) & 0xffff
-                if windowStartValue != self.windowStartValue:
-                    if windowStartValue in self.dict_mappedRPCTimeCalByWindow:
-                        self.windowStartValue = windowStartValue
-                        self.hist_mappedRPCTimeCalByWindow = self.dict_mappedRPCTimeCalByWindow[windowStartValue]
-                        self.hist_occupancyXYByWindow = self.dict_occupancyXYByWindow[windowStartValue]
+                windowValue = (lastWord >> 16) & 0xffff
+                if windowValue != self.windowValue:
+                    if windowValue in self.dict_nEvents:
+                        self.windowValue = windowValue
+                        self.hist_mappedRPCTimeCalByWindow = self.dict_mappedRPCTimeCalByWindow[windowValue]
+                        self.hist_occupancyXYByWindow = self.dict_occupancyXYByWindow[windowValue]
                     else:
-                        if (copper == 0) and (finesse == 0):
-                            print("Event {2}: new WindowStartValue = {0:04x} n = {1}".format(windowStartValue, nWords, event))
-                            if windowStartValue > self.maxWindowStartValue:
-                                self.maxWindowStartValue = windowStartValue
-                            self.windowStartValue = windowStartValue
-                            expRun = 'e{0:02d}r{1}: '.format(int(self.exp), int(self.run))
-                            label = "mappedRPCTimeCalByWindow{0:04x}".format(windowStartValue)
-                            title = "{0}RPC mapped-strip time distribution for coarse lookback-window start {1:04x}".format(
-                                expRun, windowStartValue) + ";t - t(trigger) - dt(layer) (ns)"
-                            self.dict_mappedRPCTimeCalByWindow[windowStartValue] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
-                            self.hist_mappedRPCTimeCalByWindow = self.dict_mappedRPCTimeCalByWindow[windowStartValue]
-                            self.dict_nRawKLMs[windowStartValue] = 0
-                            label = "occupancyXYByWindow{0:04x}".format(windowStartValue)
-                            title = "{0}Forward xy occupancy for coarse lookback-window start {1:04x};x(cm);y(cm)".format(
-                                expRun, windowStartValue)
-                            self.dict_occupancyXYByWindow[windowStartValue] = ROOT.TH2F(label, title,
-                                                                                        230, -345.0, 345.0, 230, -345.0, 345.0)
-                            self.hist_occupancyXYByWindow = self.dict_occupancyXYByWindow[windowStartValue]
-                            self.dict_nHit2ds[windowStartValue] = 0
-                        else:
-                            print("Event {2}: lastWord = {0:04x} n = {1} for copper {3} finesse {4}".format(
-                                windowStartValue, nWords, event, copper, finesse))
+                        return  # skip bogus event, incuding event with seed value of 0xcafe
                 if lastWord & 0xffff != 0:
                     print("##1 Event", event, 'copper', copper, 'finesse', finesse, 'n=', nWords, 'lastWord=', hex(lastWord))
                 if (nWords % 2) == 0:
                     print("##2 Event", event, 'copper', copper, 'finesse', finesse, 'n=', nWords, 'should be odd -- skipping')
                     continue
                 n = nWords >> 1  # number of Data-Concentrator data packets
-                self.dict_nRawKLMs[windowStartValue] += n
-                # first (only) pass over this DC's hits: histogram everything
+                self.dict_nRawKLMs[self.windowValue] += n
+                # first (and only) pass over this DC's hits: histogram everything
                 for j in range(0, n):
                     word0 = bufSlot[j * 2]
                     word1 = bufSlot[j * 2 + 1]
@@ -333,9 +374,13 @@ class EventInspectorCoarseWindowStart(basf2.Module):
                             self.hist_mappedRPCTimeCal.Fill(tCal)
                             self.hist_mappedRPCTimeCalByWindow.Fill(tCal)
 
+        # for normalization of the hit-counter dictionaries, now that we know that this is a valid event
+
+        self.dict_nEvents[self.windowValue] += 1
+
         # Process the BKLMHit2ds
 
-        self.dict_nHit2ds[windowStartValue] += len(hit2ds)
+        self.dict_nHit2ds[self.windowValue] += len(hit2ds)
         for hit2d in hit2ds:
             key = hit2d.getModuleID()
             fb = (key & self.BKLM_END_MASK) >> self.BKLM_END_BIT

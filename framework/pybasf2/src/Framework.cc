@@ -39,7 +39,9 @@ Framework::Framework()
   DataStore::s_DoCleanup = true;
   LogSystem::Instance().enableErrorSummary(true);
 
-  RandomNumbers::initialize();
+  if (!RandomNumbers::isInitialized()) {
+    RandomNumbers::initialize();
+  }
   Environment::Instance();
 }
 

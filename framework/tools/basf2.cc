@@ -371,7 +371,7 @@ int main(int argc, char* argv[])
     }
 
     if (varMap.count("rng-seed")) {
-      RandomNumbers::setSeed(varMap["rng-seed"].as<string>());
+      RandomNumbers::initialize(varMap["rng-seed"].as<string>());
     }
 
 

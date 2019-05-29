@@ -588,6 +588,23 @@ namespace Belle2 {
       return (double)mcp->hasSeenInDetector(Const::KLM);
     }
 
+    int genNMissingDaughter(const Particle* p, const std::vector<double>& arguments)
+    {
+      if (arguments.size() < 1)
+        B2FATAL("Wrong number of arguments for genNMissingDaughter");
+
+      const std::vector<int> PDGcodes(arguments.begin(), arguments.end());
+
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (!mcp) {
+        B2WARNING("No MCParticle is associated to the particle");
+        return -1;
+      }
+
+      return MCMatching::countMissingParticle(p, mcp, PDGcodes);
+    }
+
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -687,6 +704,10 @@ namespace Belle2 {
                       "Prong for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "Prong for the negative tau lepton in a tau pair generated event.")
+
+    REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
+                      "Returns the number of missing daughter having assigned PDG code."
+                      "-1 if the no MCParticle is associated to the particle.")
 
 
     VARIABLE_GROUP("MC particle seen in subdetectors");

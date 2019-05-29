@@ -87,12 +87,6 @@ namespace Belle2 {
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
 
-
-    int alertBits = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-    int alertMerger = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-    int alertHitsPerEvent = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-    int alertTheta = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-
     int alertColor[3] = {kWhite, kYellow, kRed};/**<Alert color of canvases*/
 
     //TObjects for DQM analysis

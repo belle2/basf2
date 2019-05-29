@@ -98,6 +98,12 @@ void DQMHistAnalysisARICHModule::beginRun()
 void DQMHistAnalysisARICHModule::event()
 {
 
+  int alertBits = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+  int alertMerger = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+  int alertHitsPerEvent = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+  int alertTheta = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+
+
   //Show alert by empty bins = red and strange entries = yellow
   //Draw lines on mergerHits histogram for shifters to divide sectors
   TH1* m_h_mergerHit = findHist("ARICH/mergerHit");/**<The number of hits in each Merger Boards*/
@@ -116,7 +122,7 @@ void DQMHistAnalysisARICHModule::event()
       }
       if (hit > mean * 100 && alertMerger < 1) alertMerger = 1;
     }
-    if (m_enableAlert && alertMerger) m_c_mergerHit->SetFillColor(alertColor[alertMerger]);
+    if (m_enableAlert) m_c_mergerHit->SetFillColor(alertColor[alertMerger]);
 
     for (int i = 0; i < 5; i++) {
       m_LineForMB[i]->DrawLine(12 * (i + 1) + 0.5, 0, 12 * (i + 1) + 0.5, gPad->GetUymax());
@@ -140,7 +146,7 @@ void DQMHistAnalysisARICHModule::event()
     double center = m_h_bits->GetBinContent(3) + m_h_bits->GetBinContent(4);
     if (center / side < 2) alertBits = 1;
     if (center / side < 1.5) alertBits = 2;
-    if (m_enableAlert && alertBits) m_c_bits->SetFillColor(alertColor[alertBits]);
+    if (m_enableAlert) m_c_bits->SetFillColor(alertColor[alertBits]);
 
     m_c_bits->Modified();
   } else {
@@ -159,7 +165,7 @@ void DQMHistAnalysisARICHModule::event()
     if (mean < 1) alertHitsPerEvent = 1;
     double entry = m_h_hitsPerEvent->GetEntries();
     if (entry == 0) alertHitsPerEvent = 2;
-    if (m_enableAlert && alertHitsPerEvent) m_c_hitsPerEvent->SetFillColor(alertColor[alertHitsPerEvent]);
+    if (m_enableAlert) m_c_hitsPerEvent->SetFillColor(alertColor[alertHitsPerEvent]);
 
     m_c_hitsPerEvent->Modified();
   } else {

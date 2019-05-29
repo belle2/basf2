@@ -15,7 +15,7 @@ using namespace Belle2::Background;
 
 void BKLMHitRateCounter::initialize(TTree* tree)
 {
-  // register collection(s) as optional, your detector might be excluded in DAQ
+  // register collection(s) as optional: BKLM might be excluded in DAQ
   m_digits.isOptional();
 
   // set branch address
@@ -46,13 +46,15 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
 
   // accumulate hits
   for (const BKLMDigit& digit : m_digits) {
-    //if (!digit.isGood())
-    //  continue;
+    // Discard scintillators hits below the theshdold
+    if (!digit.inRPC() && !digit.isAboveThreshold())
+      continue;
+
     int globalLayer = digit.getLayer() - 1;
     globalLayer += (digit.getSector() - 1) * BKLMElementNumbers::getMaximalLayerNumber();
     globalLayer += digit.isForward() * BKLMElementNumbers::getMaximalSectorNumber() * BKLMElementNumbers::getMaximalLayerNumber();
-    rates.sectorRates[globalLayer] += 1;
-    rates.averageRate += 1;
+    rates.layerRates[globalLayer]++;
+    rates.averageRate++;
   }
 
   // set flag to true to indicate the rates are valid
@@ -64,22 +66,23 @@ void BKLMHitRateCounter::normalize(unsigned timeStamp)
   // copy buffer element
   m_rates = m_buffer[timeStamp];
 
-  if (!m_rates.valid) return;
+  if (!m_rates.valid)
+    return;
 
   // normalize
   m_rates.normalize();
 
-  /* Normalize the hit rate per 1 strip. */
-  for (int i = 0; i < m_maxGlobalLayer; ++i) {
-    int activeStrips = getActiveStripsBKLMLayer(i);
+  // Normalize the hit rate per one strip.
+  for (int globalLayer = 0; globalLayer < m_maxGlobalLayer; ++globalLayer) {
+    int activeStrips = getActiveStripsBKLMLayer(globalLayer);
     if (activeStrips == 0)
-      m_rates.sectorRates[i] = 0;
+      m_rates.layerRates[globalLayer] = 0;
     else {
-      m_rates.sectorRates[i] /= activeStrips;
-      if ((i % BKLMElementNumbers::getMaximalLayerNumber()) > 2) {
-        // The layer is an RPC-layer: there are two digits per hit
+      m_rates.layerRates[globalLayer] /= activeStrips;
+      if ((globalLayer % BKLMElementNumbers::getMaximalLayerNumber()) >= 2) {
+        // The layer is an RPC-layer: there are two digits per "real" hit
         // so it's better to divide by 2 the rate
-        m_rates.sectorRates[i] /= 2;
+        m_rates.layerRates[globalLayer] /= 2;
       }
     }
   }
@@ -99,6 +102,8 @@ int BKLMHitRateCounter::getActiveStripsBKLMLayer(int globalLayer) const
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
       uint16_t channel = elementNumbers->channelNumberBKLM(isForward, layer, sector, plane, strip);
       enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
+
+      // Count only the non-dead channels
       if (status == KLMChannelStatus::c_Unknown)
         B2FATAL("Incomplete KLM channel status data.");
       if (status != KLMChannelStatus::c_Dead)

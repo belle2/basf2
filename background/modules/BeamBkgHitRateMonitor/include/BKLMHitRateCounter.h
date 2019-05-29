@@ -41,8 +41,8 @@ namespace Belle2 {
        */
       struct TreeStruct {
 
-        /** Hit rates in each sector. */
-        float sectorRates[240] = {0};
+        /** Hit rates in each layer. */
+        float layerRates[240] = {0};
 
         /** Total detector average hit rate. */
         float averageRate = 0;
@@ -61,7 +61,7 @@ namespace Belle2 {
           if (numEvents == 0)
             return;
           for (int i = 0; i < m_maxGlobalLayer; ++i)
-            sectorRates[i] /= numEvents;
+            layerRates[i] /= numEvents;
           averageRate /= numEvents;
         }
 
@@ -103,15 +103,15 @@ namespace Belle2 {
 
     private:
 
-      /** Total number of layers (here called sectors). */
-      static constexpr int m_maxGlobalLayer = (BKLMElementNumbers::getMaximalForwardNumber() + 1) *
-                                              BKLMElementNumbers::getMaximalSectorNumber() * BKLMElementNumbers::getMaximalLayerNumber();
-
       /** Tree data. */
       TreeStruct m_rates;
 
       /** Buffer. */
       std::map<unsigned, TreeStruct> m_buffer;
+
+      /** Total number of layers. */
+      static constexpr int m_maxGlobalLayer = (BKLMElementNumbers::getMaximalForwardNumber() + 1) *
+                                              BKLMElementNumbers::getMaximalSectorNumber() * BKLMElementNumbers::getMaximalLayerNumber();
 
       /** BKLM digits. */
       StoreArray<BKLMDigit> m_digits;

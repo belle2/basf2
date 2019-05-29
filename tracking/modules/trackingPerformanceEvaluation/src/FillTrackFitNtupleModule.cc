@@ -15,8 +15,6 @@
 
 #include <genfit/KalmanFitterInfo.h>
 
-#include <boost/foreach.hpp>
-
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -68,7 +66,13 @@ void FillTrackFitNtupleModule::event()
   for (Track& track : tracks) {
 
     const RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
-    if (recoTrack == nullptr) B2WARNING(" the RecoTrack associated to Track is nullptr!");
+    if (recoTrack == nullptr) {
+      // if no recoTrack is associated to Track, we don't break but we use an
+      // empty recoTrack to fill the ntuple, thus to backtrace the cases when
+      // the associated recoTrack is missing
+      B2WARNING(" the RecoTrack associated to Track is nullptr!");
+      recoTrack = new RecoTrack();
+    }
 
     const TrackFitResult* fitResult_pi = track.getTrackFitResult(Const::pion);
     const TrackFitResult* fitResult_k = track.getTrackFitResult(Const::kaon);

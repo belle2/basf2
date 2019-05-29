@@ -3,97 +3,123 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Giacomo De Pietro                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-#include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
-#include <framework/datastore/StoreArray.h>
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <TTree.h>
+/* C++ headers. */
 #include <map>
 
+/* External headers. */
+#include <TTree.h>
+
+/* Belle2 headers. */
+#include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
+#include <bklm/dataobjects/BKLMDigit.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
+
   namespace Background {
 
     /**
-     * Class for monitoring beam background hit rates of BKLM
+     * Class for monitoring beam background hit rates of BKLM.
      */
     class BKLMHitRateCounter: public HitRateBase {
 
     public:
 
       /**
-       * tree structure
+       * Tree data structure.
        */
       struct TreeStruct {
 
-        float averageRate = 0; /**< total detector average hit rate */
-        int numEvents = 0; /**< number of events accumulated */
-        bool valid = false;  /**< status: true = rates valid */
+        /** Hit rates in each sector. */
+        float sectorRates[240] = {0};
+
+        /** Total detector average hit rate. */
+        float averageRate = 0;
+
+        /** Number of accumulated events. */
+        int numEvents = 0;
+
+        /** Whether the rates are valid. */
+        bool valid = false;
 
         /**
-         * normalize accumulated hits to single event
+         * Normalize accumulated hits to single event.
          */
         void normalize()
         {
-          if (numEvents == 0) return;
+          if (numEvents == 0)
+            return;
+          for (int i = 0; i < m_maxGlobalLayer; ++i)
+            sectorRates[i] /= numEvents;
           averageRate /= numEvents;
         }
 
       };
 
       /**
-       * Constructor
+       * Constructor.
        */
-      BKLMHitRateCounter()
-      {}
+      BKLMHitRateCounter() {};
 
       /**
-       * Class initializer: set branch addresses and other staf
-       * @param tree a valid TTree pointer
+       * Class initializer.
+       * @param[in,out] tree Data tree.
        */
       virtual void initialize(TTree* tree) override;
 
       /**
-       * Clear time-stamp buffer to prepare for 'accumulate'
+       * Clear time-stamp buffer to prepare for 'accumulate'.
        */
       virtual void clear() override;
 
       /**
-       * Accumulate hits
-       * @param timeStamp time stamp
+       * Accumulate hits.
+       * @param[in] timeStamp Time stamp.
        */
       virtual void accumulate(unsigned timeStamp) override;
 
       /**
-       * Normalize accumulated hits (e.g. transform to rates)
-       * @param timeStamp time stamp
+       * Normalize accumulated hits (i.e. transform to rates).
+       * @param[in] timeStamp Time stamp.
        */
       virtual void normalize(unsigned timeStamp) override;
 
+      /**
+       * Get number of active strips in the specified BKLM global layer.
+       * @param[in] globalLayer Layer global number.
+       */
+      int getActiveStripsBKLMLayer(int globalLayer) const;
+
     private:
 
-      // class parameters: to be set via constructor or setters
+      /** Total number of layers (here called sectors). */
+      static constexpr int m_maxGlobalLayer = (BKLMElementNumbers::getMaximalForwardNumber() + 1) *
+                                              BKLMElementNumbers::getMaximalSectorNumber() * BKLMElementNumbers::getMaximalLayerNumber();
 
-      // tree structure
-      TreeStruct m_rates; /**< tree variables */
+      /** Tree data. */
+      TreeStruct m_rates;
 
-      // buffer
-      std::map<unsigned, TreeStruct> m_buffer; /**< average rates in time stamps */
+      /** Buffer. */
+      std::map<unsigned, TreeStruct> m_buffer;
 
-      // collections
-      StoreArray<BKLMDigit> m_digits;  /**< collection of digits */
+      /** BKLM digits. */
+      StoreArray<BKLMDigit> m_digits;
 
-      // DB payloads
-
-      // other
-
+      /** KLM channel status. */
+      DBObjPtr<KLMChannelStatus> m_ChannelStatus;
     };
 
-  } // Background namespace
-} // Belle2 namespace
+  }
+
+}

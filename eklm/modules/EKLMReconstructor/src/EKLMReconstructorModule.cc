@@ -116,8 +116,12 @@ double EKLMReconstructorModule::getTime(EKLMDigit* d, double dist)
                                 d->getPlane(), d->getStrip()) - 1;
   return d->getTime() -
          (dist / m_TimeCalibration->getEffectiveLightSpeed() +
-          m_TimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPE()) +
           m_TimeCalibrationData[strip]->getTimeShift());
+  /**
+   * TODO: Subtract time correction given by
+   * m_TimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPE()).
+   * It requires a new firmware version that will be able to extract amplitude.
+   */
 }
 
 void EKLMReconstructorModule::event()

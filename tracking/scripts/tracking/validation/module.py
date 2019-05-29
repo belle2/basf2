@@ -626,7 +626,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         output_tfile.Close()
 
     def profiles_by_mc_parameters(
-        """Create profile histograms by MC-track parameters"""
         self,
         xs,
         quantity_name,
@@ -644,6 +643,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         make_hist=True,
         weights=None
     ):
+        """Create profile histograms by MC-track parameters"""
 
         # apply exclusion list
         new_parameter_names = [item for item in parameter_names if item
@@ -672,7 +672,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         )
 
     def profiles_by_pr_parameters(
-        """Create profile histograms by PR-track parameters"""
         self,
         xs,
         quantity_name,
@@ -680,6 +679,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         parameter_names=['Seed tan #lambda', 'Seed #phi', 'Seed #theta'],
         make_hist=True,
     ):
+        """Create profile histograms by PR-track parameters"""
 
         # apply exclusion list
         new_parameter_names = [item for item in parameter_names if item
@@ -700,7 +700,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         )
 
     def profiles_by_parameters_base(
-        """Create profile histograms for generic parameters"""
         self,
         xs,
         quantity_name,
@@ -711,6 +710,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         non_expert_parameters=[],
         weights=None,
     ):
+        """Create profile histograms for generic parameters"""
 
         contact = self.contact
 

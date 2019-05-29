@@ -29,7 +29,6 @@ EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
-  int strip, maxStrip;
   const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
   m_ChannelActive = nullptr;
   m_GeoDat = &(EKLM::GeometryData::Instance());
@@ -40,14 +39,14 @@ EKLMSensitiveDetector(G4String name)
   DBObjPtr<KLMChannelStatus> channelStatus;
   if (!channelStatus.isValid())
     B2FATAL("KLM channel status data are not available.");
-  maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
+  int maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_ChannelActive = new bool[maxStrip];
   EKLMChannelIndex eklmChannels;
   for (EKLMChannelIndex& eklmChannel : eklmChannels) {
-    strip = m_GeoDat->stripNumber(
-              eklmChannel.getEndcap(), eklmChannel.getLayer(),
-              eklmChannel.getSector(), eklmChannel.getPlane(),
-              eklmChannel.getStrip());
+    int strip = m_GeoDat->stripNumber(
+                  eklmChannel.getEndcap(), eklmChannel.getLayer(),
+                  eklmChannel.getSector(), eklmChannel.getPlane(),
+                  eklmChannel.getStrip());
     uint16_t channel = elementNumbers->channelNumberEKLM(strip);
     enum KLMChannelStatus::ChannelStatus status =
       channelStatus->getChannelStatus(channel);

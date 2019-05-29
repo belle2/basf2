@@ -35,7 +35,7 @@ except ImportError:
 
 
 # Only execute the program if a basf2 release is set up!
-if os.environ.get('BELLE2_RELEASE', None) is None:
+if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
     sys.exit('Error: No basf2 release set up!')
 
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)

@@ -9,6 +9,7 @@ from tracking.run.utilities import NonstrictChoices
 
 
 class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
+    """Prepare and execute a basf2 job to train neural network, postprocess, and inspect"""
 
     #: Recording / training task selected
     task = "train"
@@ -108,7 +109,7 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
             ]
             print("Running", cmd)
             subprocess.call(cmd)
-            # Set file name for the TBrowser to show if demanded
+            #: Set file name for the TBrowser to show if demanded
             self.output_file_name = self.sample_file_name[:-len(".root")] + ".overview.root"
 
         super().postprocess()

@@ -167,10 +167,15 @@ namespace Belle2 {
 
   private:
 
-    std::map<uint16_t, float> m_efficiency; /** KLM strip efficiency */
-    std::map<uint16_t, float> m_efficiencyError; /** KLM strip efficiency error */
+    /** KLM strip efficiency */
+    std::map<uint16_t, float> m_efficiency;
 
-    ClassDef(KLMStripEfficiency, 1); /**< ClassDef */
+    /** KLM strip efficiency error */
+    std::map<uint16_t, float> m_efficiencyError;
+
+    /** Class version. */
+    ClassDef(KLMStripEfficiency, 1);
+
   };
 
-} // end namespace Belle2
+}

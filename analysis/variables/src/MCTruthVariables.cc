@@ -748,7 +748,7 @@ namespace Belle2 {
                       "-999 if i-th daughter does not exist.");
 
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
-                      "Returns the number of missing daughter having assigned PDG code."
+                      "Returns the number of missing daughters having assigned PDG codes."
                       "-1 if the no MCParticle is associated to the particle.")
 
 

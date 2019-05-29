@@ -21,6 +21,7 @@ The main command line tool for the Belle2 Software is ``basf2``::
                           Set global log level (one of DEBUG, INFO, RESULT,
                           WARNING, or ERROR). Takes precedence over
                           set_log_level() in steering file.
+--rng-seed                Set the Random Number Generator's seed.
 -d DEBUGLEVEL, --debug_level DEBUGLEVEL
                           Set the default debug level and also enable DEBUG as
                           the default log level. This does not override

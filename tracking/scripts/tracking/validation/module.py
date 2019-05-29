@@ -48,12 +48,19 @@ class FilterProperties(object):
         fitResult=None,
         seedResult=None,
     ):
+        """Constructor"""
 
+        #: cached value of the track candidate
         self.trackCand = trackCand
+        #: cached value of the MC particle
         self.mcParticle = mcParticle
+        #: cached value of the MCParticles StoreArray
         self.mcParticles = mcParticles
+        #: cached value of the fitted flag
         self.wasFitted = wasFitted
+        #: cached value of the fit result
         self.fitResult = fitResult
+        #: cached value of the seed result
         self.seedResult = seedResult
 
 
@@ -76,11 +83,14 @@ class FilterProperties(object):
 #
 
 class AlwaysPassFilter(object):
+    """Filter that always passes"""
 
     def doesPrPass(self, filterProperties):
+        """Pattern-reconstructed track always passes"""
         return True
 
     def doesMcPass(self, filterProperties):
+        """MC track always passes"""
         return True
 
 
@@ -106,22 +116,38 @@ class TrackingValidationModule(basf2.Module):
         trackCandidatesColumnName="RecoTracks",
         mcTrackCandidatesColumName="MCRecoTracks"
     ):
+        """Constructor"""
 
         super(TrackingValidationModule, self).__init__()
+
+        #: cached value of the tracking-validation name
         self.validation_name = name
+        #: cached value of the contact person name
         self.contact = contact
+        #: cached value of the track fit
         self.fit = fit
+        #: cached values of the track-fit pulls
         self.pulls = pulls
+        #: cached value of the resolution
         self.resolution = resolution
+        #: cached value of the output ROOT TFile
         self.output_file_name = output_file_name or self.validation_name \
             + 'TrackingValidation.root'
+        #: cached value of the track-filter object
         self.track_filter_object = track_filter_object
+        #: cached value of the suffix appended to the plot names
         self.plot_name_postfix = plot_name_postfix
+        #: cached value of the suffix appended to the plot titles
         self.plot_title_postfix = plot_title_postfix
+        #: cached list of perigee parameters excluded from PR side plots
         self.exclude_profile_pr_parameter = exclude_profile_pr_parameter
+        #: cached list of perigee parameters excluded from MC side plots
         self.exclude_profile_mc_parameter = exclude_profile_mc_parameter
+        #: cached flag to use the "expert" folder for the pull and residual plots
         self.use_expert_folder = use_expert_folder
+        #: cached name of the RecoTracks StoreArray
         self.trackCandidatesColumnName = trackCandidatesColumnName
+        #: cached name of the MCRecoTracks StoreArray
         self.mcTrackCandidatesColumnName = mcTrackCandidatesColumName
 
         #: default binning used for resolution plots over pt
@@ -141,48 +167,80 @@ class TrackingValidationModule(basf2.Module):
             basf2.B2INFO("Will not read binning from reference files.")
 
     def initialize(self):
+        """Receive signal at the start of event processing"""
+
+        #: Track-match object that examines relation information from MCMatcherTracksModule
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
         #: Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+
+        #: list of PR-track clones and matches
         self.pr_clones_and_matches = collections.deque()
+        #: list of PR-track matches
         self.pr_matches = collections.deque()
+        #: list of PR-track fakes
         self.pr_fakes = collections.deque()
 
+        #: list of PR-track seed tan(lambda) values
         self.pr_seed_tan_lambdas = collections.deque()
+        #: list of PR-track seed phi values
         self.pr_seed_phi = collections.deque()
+        #: list of PR-track seed theta values
         self.pr_seed_theta = collections.deque()
 
+        #: list of PR-track seed omega-truth values
         self.pr_omega_truths = collections.deque()
+        #: list of PR-track seed omega-estimate values
         self.pr_omega_estimates = collections.deque()
+        #: list of PR-track seed omega-variance values
         self.pr_omega_variances = collections.deque()
 
+        #: list of PR-track seed tan(lambda)-truth values
         self.pr_tan_lambda_truths = collections.deque()
+        #: list of PR-track seed tan(lambda)-estimate values
         self.pr_tan_lambda_estimates = collections.deque()
+        #: list of PR-track seed tan(lambda)-variance values
         self.pr_tan_lambda_variances = collections.deque()
 
+        #: list of PR-track seed d0-truth values
         self.pr_d0_truths = collections.deque()
+        #: list of PR-track seed d0-estimate values
         self.pr_d0_estimates = collections.deque()
+        #: list of PR-track seed d0-variance values
         self.pr_d0_variances = collections.deque()
 
+        #: list of PR-track seed z0-truth values
         self.pr_z0_truths = collections.deque()
+        #: list of PR-track seed z0-estimate values
         self.pr_z0_estimates = collections.deque()
 
+        #: list of PR-track seed pt-truth values
         self.pr_pt_truths = collections.deque()
+        #: list of PR-track seed pt-estimate values
         self.pr_pt_estimates = collections.deque()
 
+        #: list of PR-track binning values
         self.pr_bining_pt = collections.deque()
 
+        #: list of MC-track matches
         self.mc_matches = collections.deque()
+        #: list of MC-track primaries
         self.mc_primaries = collections.deque()
+        #: list of MC-track d0 values
         self.mc_d0s = collections.deque()
+        #: list of MC-track tan(lambda) values
         self.mc_tan_lambdas = collections.deque()
         #: direction of the track in theta
         self.mc_theta = collections.deque()
         #: direction of the track in phi
         self.mc_phi = collections.deque()
+        #: list of MC-track pt values
         self.mc_pts = collections.deque()
+        #: list of MC-track hit efficiencies
         self.mc_hit_efficiencies = collections.deque()
+        #: list of MC-track multiplicities
         self.mc_multiplicities = collections.deque()
+        #: list of MC-track number of degrees of freedom
         self.mc_ndf = collections.deque()
 
     def event(self):
@@ -192,7 +250,7 @@ class TrackingValidationModule(basf2.Module):
         self.examine_mc_tracks()
 
     def examine_pr_tracks(self):
-        """Looks at the individual pattern recognition tracks and store information about them"""
+        """Looks at the individual pattern reconstructed tracks and store information about them"""
 
         # Analyse from the pattern recognition side
         trackMatchLookUp = self.trackMatchLookUp
@@ -359,6 +417,7 @@ class TrackingValidationModule(basf2.Module):
             self.mc_ndf.append(ndf)
 
     def terminate(self):
+        """Receive signal at the end of event processing"""
         name = self.validation_name
         contact = self.contact
 
@@ -584,6 +643,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         make_hist=True,
         weights=None
     ):
+        """Create profile histograms by MC-track parameters"""
 
         # apply exclusion list
         new_parameter_names = [item for item in parameter_names if item
@@ -619,6 +679,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         parameter_names=['Seed tan #lambda', 'Seed #phi', 'Seed #theta'],
         make_hist=True,
     ):
+        """Create profile histograms by PR-track parameters"""
 
         # apply exclusion list
         new_parameter_names = [item for item in parameter_names if item
@@ -649,6 +710,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         non_expert_parameters=[],
         weights=None,
     ):
+        """Create profile histograms for generic parameters"""
 
         contact = self.contact
 

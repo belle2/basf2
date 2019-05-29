@@ -252,12 +252,18 @@ namespace Belle2 {
     /**
      * Get maximal endcap number.
      */
-    int getMaximalEndcapNumber() const;
+    static constexpr int getMaximalEndcapNumber()
+    {
+      return m_MaximalEndcapNumber;
+    }
 
     /**
      * Get maximal layer number.
      */
-    int getMaximalLayerNumber() const;
+    static constexpr int getMaximalLayerNumber()
+    {
+      return m_MaximalLayerNumber;
+    }
 
     /**
      * Get maximal detector layer number.
@@ -284,7 +290,10 @@ namespace Belle2 {
     /**
      * Get maximal segment number.
      */
-    int getMaximalSegmentNumber() const;
+    static constexpr int getMaximalSegmentNumber()
+    {
+      return m_MaximalSegmentNumber;
+    }
 
     /**
      * Get maximal strip number.

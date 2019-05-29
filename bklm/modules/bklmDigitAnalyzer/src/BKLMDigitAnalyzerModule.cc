@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <TGaxis.h>
+
 #include <bklm/modules/bklmDigitAnalyzer/BKLMDigitAnalyzerModule.h>
 
 using namespace Belle2;

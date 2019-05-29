@@ -31,26 +31,34 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class LegendreBinningValidationRun(HarvestingRun):
+    """Harvester to generate, postprocess and inspect MC events for track-segment evaluation"""
+    #: number of events to generate
     n_events = 10000
+    #: use the generic event generator
     generator_module = "generic"
 
     @property
     def output_file_name(self):
+        """Get the output ROOT filename"""
         return 'legendre_binning.root'
 
     def harvesting_module(self, path=None):
+        """Harvest and post-process the generated events"""
         harvesting_module = LegendreBinningValidationModule(self.output_file_name)
         if path:
             path.add_module(harvesting_module)
         return harvesting_module
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
         argument_parser = super().create_argument_parser(**kwds)
         return argument_parser
 
     def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
+        """
+        Sets up a path that plays back pregenerated events or generates events
+        based on the properties in the base class.
+        """
         path = super().create_path()
 
         path.add_module("TFCDC_WireHitPreparer",
@@ -74,13 +82,16 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
     compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
+        """Constructor"""
         super().__init__(foreach='CDCTrackVector',
                          output_file_name=output_file_name)
 
+        #: by default, there is no method to find matching MC tracks
         self.mc_track_lookup = None
 
         origin_track_fitter = TFCDC.CDCRiemannFitter()
         origin_track_fitter.setOriginConstrained()
+        #: Use the CDCReimannFitter with a constrained origin for track fitting
         self.track_fitter = origin_track_fitter
 
         curv_bounds = []
@@ -97,14 +108,19 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
         assert(len(self.lower_curv_bounds) == len(self.upper_curv_bounds))
 
     def initialize(self):
+        """Receive signal at the start of event processing"""
         super().initialize()
+        #: Method to find matching MC tracks
         self.mc_track_lookup = TFCDC.CDCMCTrackLookUp.getInstance()
+        #: Method to find matching MC hits
         self.mc_hit_lookup = TFCDC.CDCMCHitLookUp.getInstance()
 
     def prepare(self):
+        """Initialize the MC-hit lookup method"""
         TFCDC.CDCMCHitLookUp.getInstance().fill()
 
     def pick(self, track):
+        """Select tracks with at least 4 segments and associated primary MC particle"""
         mc_track_lookup = self.mc_track_lookup
         mc_particle = mc_track_lookup.getMCParticle(track)
 
@@ -112,6 +128,7 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
         return mc_particle and is_primary(mc_particle) and track.size() > 3
 
     def peel(self, track):
+        """Aggregate the track and MC information for track-segment analysis"""
         mc_track_lookup = self.mc_track_lookup
         mc_hit_lookup = self.mc_hit_lookup
 
@@ -188,13 +205,17 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
         )
 
     # Refiners to be executed at the end of the harvesting / termination of the module
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree()
+    #: Save histograms in a sub folder
     save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
 
+    #: Save profile histograms in a sub folder
     save_profiles = refiners.save_profiles(x=['curvature_estimate', 'phi0'],
                                            y='curvature_variance',
                                            outlier_z_score=5.0)
 
+    #: Save cross-curvature profile histograms in a sub folder
     save_cross_curv_profile = refiners.save_profiles(x=['cross_curv'],
                                                      y=['cross_curv_var',
                                                         'curvature_estimate',
@@ -205,6 +226,7 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
                                                         ],
                                                      outlier_z_score=5.0)
 
+    #: Save scatterplots in a sub folder
     save_scatter = refiners.save_scatters(x=['curvature_estimate'], y='n_hits')
 
 

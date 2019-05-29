@@ -16,6 +16,7 @@ class VXDMomentumEnergyEstimator:
 
     @staticmethod
     def do_for_each_hit_type(cluster, svd_function, pxd_function):
+        """Apply a PXD selection to a PXDCluster or an SVD selection to an SVDCluster"""
         cluster_type = cluster.__class__.__name__
         if cluster_type == "Belle2::PXDCluster":
             return pxd_function(cluster)
@@ -26,6 +27,7 @@ class VXDMomentumEnergyEstimator:
 
     @staticmethod
     def calculate_charges_and_path_lengths_for_one_type(clusters, mc_particle):
+        """Return lists of charges and path lengths for the clusters associated with an MCParticle"""
         charge_list = []
         path_length_list = []
 
@@ -49,6 +51,7 @@ class VXDMomentumEnergyEstimator:
 
     @staticmethod
     def generate_truncated(charge_list):
+        """Sort then truncate a list to all but the last 2 entries or the first 4 entries or the first 6 entries"""
         sorted_list = sorted(charge_list)
         if len(sorted_list) > 2:
             return sorted_list[:-2], sorted_list[:4], sorted_list[:6]
@@ -61,9 +64,11 @@ class MCTrajectoryHarvester(HarvestingModule):
     """ A harvester to check for the positions of the track points in the MCParticleTrajectories"""
 
     def __init__(self):
+        """Constructor"""
         HarvestingModule.__init__(self, foreach="MCParticleTrajectorys", output_file_name="mc_trajectory.root")
 
     def peel(self, mc_particle_trajectory):
+        """Aggregate track-point position information for the trajectory"""
         for track_point in mc_particle_trajectory:
             yield {"x": track_point.x, "y": track_point.y, "z": track_point.z, "index": self.counter}
 
@@ -75,16 +80,20 @@ class MCParticleHarvester(HarvestingModule):
     """ A harvester to redo parts of the analysis in the Belle II Paper by Robert """
 
     def __init__(self):
+        """Constructor"""
         HarvestingModule.__init__(self, foreach="MCParticles", output_file_name="mc_particle.root")
 
     def pick(self, mc_particle):
+        """Select the MCParticle if it is a primary pion and has some PXD and/or SVD clusters"""
         pxd_clusters = mc_particle.getRelationsFrom("PXDClusters")
-        svd_clusters = mc_particle.getRelationsFrom("PXDClusters")
+        svd_clusters = mc_particle.getRelationsFrom("SVDClusters")
         return (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and
                 abs(mc_particle.getPDG()) == 211 and
                 len(pxd_clusters) + len(svd_clusters) > 0)
 
     def generate_cluster_dicts(self, charge_list, path_length_list, normalized_charge_list, name):
+        """Create a dictionary from the lists of charges, normalized charges, and path lengths of the
+           clusters associated with an MCParticle"""
         result = dict()
 
         truncated, first4, first6 = VXDMomentumEnergyEstimator.generate_truncated(normalized_charge_list)
@@ -104,6 +113,8 @@ class MCParticleHarvester(HarvestingModule):
         return result
 
     def peel(self, mc_particle):
+        """Aggregate the PXD and SVD cluster information for an MCParticle"""
+
         pxd_clusters = mc_particle.getRelationsFrom("PXDClusters")
         svd_clusters = mc_particle.getRelationsFrom("SVDClusters")
 
@@ -135,6 +146,7 @@ class VXDHarvester(QueueHarvester):
     """ A base class for the VXD hitwise analysis. Collect dE/dX and the correct p of each hit of the MC particles. """
 
     def __init__(self, clusters, detector, output_file_name, use_mc_info=True):
+        """Constructor"""
         HarvestingModule.__init__(self, foreach="TrackCands", output_file_name=output_file_name)
 
         self.svd_tools = Belle2.VXDMomentumEstimationTools("Belle2::SVDCluster").getInstance()
@@ -146,6 +158,7 @@ class VXDHarvester(QueueHarvester):
         self.use_mc_info = use_mc_info
 
     def is_valid_cluster(self, cluster):
+        """Determine if a cluster has an associated SpacePoint and is associated with a primary pion MCParticle"""
         mc_particles = cluster.getRelationsTo("MCParticles")
 
         space_point = cluster.getRelated("SpacePoints")
@@ -162,12 +175,14 @@ class VXDHarvester(QueueHarvester):
         return False
 
     def get_tools(self, cluster):
+        """Get the PXD tools for a PXD cluster or the SVD tools for an SVD cluster"""
         return VXDMomentumEnergyEstimator.do_for_each_hit_type(
             cluster,
             lambda cluster: self.svd_tools,
             lambda cluster: self.pxd_tools)
 
     def peel(self, track_cand):
+        """Aggregate the cluster and MCParticle (for primary pion) information associated with the track candidate"""
         vxd_hit_ids = track_cand.getHitIDs(self.detector)
 
         vxd_hits = Belle2.PyStoreArray(self.clusters)
@@ -282,30 +297,38 @@ class VXDHarvester(QueueHarvester):
 
             yield result_dict
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()
 
 
 class PXDHarvester(VXDHarvester):
+    """Collect dE/dX and the correct p of each PXD hit of the MC particles. """
 
     def __init__(self, output_file_name, use_mc_info):
+        """Constructor"""
         VXDHarvester.__init__(self, clusters="PXDClusters", detector=Belle2.Const.PXD, output_file_name=output_file_name,
                               use_mc_info=use_mc_info)
 
 
 class SVDHarvester(VXDHarvester):
+    """Collect dE/dX and the correct p of each SVD hit of the MC particles. """
 
     def __init__(self, output_file_name, use_mc_info):
+        """Constructor"""
         VXDHarvester.__init__(self, clusters="SVDClusters", detector=Belle2.Const.SVD, output_file_name=output_file_name,
                               use_mc_info=use_mc_info)
 
 
 class FitHarvester(QueueHarvester):
+    """Collect dE/dX and the correct p of each VXD hit associated with the fitted tracks. """
 
     def __init__(self, output_file_name, queue):
+        """Constructor"""
         QueueHarvester.__init__(self, queue, foreach="TrackFitResults", output_file_name=output_file_name)
         self.data_store = Belle2.DataStore.Instance()
 
     def pick(self, track_fit_result):
+        """Select a TrackFitResult if it is associated with exactly one MCParticle"""
         mc_track_cands = track_fit_result.getRelationsFrom("TrackCands")
         if len(mc_track_cands) != 1:
             return False
@@ -316,6 +339,7 @@ class FitHarvester(QueueHarvester):
         return len(mc_particles) == 1
 
     def peel(self, track_fit_result):
+        """Aggregate the track-fit information associated with a TrackFitResult"""
         mc_track_cand = track_fit_result.getRelationsFrom("TrackCands")[0]
         mc_particle = self.data_store.getRelated(mc_track_cand, "MCParticles")
 
@@ -366,4 +390,5 @@ class FitHarvester(QueueHarvester):
                     number_of_momentum_measurements_in_total=number_of_momentum_measurements_in_total,
                     number_of_momentum_measurements_with_smaller_weight=number_of_momentum_measurements_with_smaller_weight)
 
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()

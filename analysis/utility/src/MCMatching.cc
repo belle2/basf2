@@ -1,7 +1,13 @@
-// ******************************************************************
-// MC Matching
-// authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
-// ******************************************************************
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ *                                                                        *
+ * Copyright(C) 2013-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Anze Zupanc, Christian Pulvermacher, Yo Sato             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <analysis/utility/MCMatching.h>
 #include <analysis/utility/AnalysisConfiguration.h>
@@ -390,7 +396,6 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
         }
       } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
         flags |= c_MissNeutrino;
-
       } else { //neither photon nor neutrino -> massive
         flags |= c_MissMassiveParticle;
         if (absGeneratedPDG == 130) {
@@ -400,4 +405,29 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
     }
   }
   return flags;
+}
+
+int MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle, const vector<int>& daughterPDG)
+{
+  unordered_set<const MCParticle*> mcMatchedParticles;
+  appendParticles(particle, mcMatchedParticles);
+  vector<const MCParticle*> genParts;
+  appendParticles(mcParticle, genParts);
+
+  int nMissingDaughter = 0;
+
+  for (const MCParticle* genPart : genParts) {
+    const bool missing = (mcMatchedParticles.find(genPart) == mcMatchedParticles.end());
+    if (missing) {
+
+      const int generatedPDG = genPart->getPDG();
+      const int absGeneratedPDG = abs(generatedPDG);
+
+      auto result = find(daughterPDG.begin(), daughterPDG.end(), absGeneratedPDG);
+      if (result != daughterPDG.end())
+        nMissingDaughter++;
+    }
+  }
+
+  return nMissingDaughter;
 }

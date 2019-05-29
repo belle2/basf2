@@ -327,8 +327,10 @@ class Calibration(CalibrationBase):
     >>> cal.pre_collector_path = my_basf2_path
 
     You don't have to put a RootInput module in this pre-collection path, but you can if
-    you need some special parameters.
-    The inputFileNames parameter of RootInput will be set by the CAF automatically for you.
+    you need some special parameters. If you want to process sroot files the you have to explicitly add
+    SeqRootInput to your pre-collection path.
+    The inputFileNames parameter of (Seq)RootInput will be set by the CAF automatically for you.
+
 
     You can use optional arguments to pass in some/all during initialisation of the `Calibration` class
 

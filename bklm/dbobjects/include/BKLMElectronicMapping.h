@@ -17,9 +17,6 @@
 //#include <framework/logging/Logger.h>
 #include <vector>
 
-#include <TROOT.h>
-#include <TClass.h>
-
 namespace Belle2 {
 
   /**

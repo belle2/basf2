@@ -9,7 +9,9 @@ import logging
 
 
 class CDCDebugDisplayRun(CDCDisplayRun):
+    """Read generated events or generate new events then display the CDC tracks"""
 
+    #: track-finder basf2 module
     finder_module = basf2.register_module("TFCDC_TrackFinderAutomaton")
     # finder_module = basf2.register_module("TFCDC_SegmentFinderFacetAutomaton")
     # finder_module.param({
@@ -24,6 +26,7 @@ class CDCDebugDisplayRun(CDCDisplayRun):
     finder_module = ["TFCDC_WireHitPreparer", "TFCDC_ClusterPreparer", finder_module, "PrintCollections"]
     finder_module = basf2.register_module("TFCDC_WireHitPreparer")
 
+    #: by default, show all of the drawing options
     show_all_drawoptions = True
     # Also show draw options that are related to the cellular automaton track finder
     # on the command line!

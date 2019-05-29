@@ -50,10 +50,8 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
     if (!digit.inRPC() && !digit.isAboveThreshold())
       continue;
 
-    int globalLayer = digit.getLayer() - 1;
-    globalLayer += (digit.getSector() - 1) * BKLMElementNumbers::getMaximalLayerNumber();
-    globalLayer += digit.isForward() * BKLMElementNumbers::getMaximalSectorNumber() * BKLMElementNumbers::getMaximalLayerNumber();
-    rates.layerRates[globalLayer]++;
+    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.isForward(), digit.getSector(), digit.getLayer());
+    rates.layerRates[layerGlobal]++;
     rates.averageRate++;
   }
 
@@ -73,29 +71,27 @@ void BKLMHitRateCounter::normalize(unsigned timeStamp)
   m_rates.normalize();
 
   // Normalize the hit rate per one strip.
-  for (int globalLayer = 0; globalLayer < m_maxGlobalLayer; ++globalLayer) {
-    int activeStrips = getActiveStripsBKLMLayer(globalLayer);
+  for (int layerGlobal = 0; layerGlobal < m_maxGlobalLayer; ++layerGlobal) {
+    int activeStrips = getActiveStripsBKLMLayer(layerGlobal);
     if (activeStrips == 0)
-      m_rates.layerRates[globalLayer] = 0;
+      m_rates.layerRates[layerGlobal] = 0;
     else {
-      m_rates.layerRates[globalLayer] /= activeStrips;
-      if ((globalLayer % BKLMElementNumbers::getMaximalLayerNumber()) >= 2) {
+      m_rates.layerRates[layerGlobal] /= activeStrips;
+      if ((layerGlobal % BKLMElementNumbers::getMaximalLayerNumber()) >= 2) {
         // The layer is an RPC-layer: there are two digits per "real" hit
         // so it's better to divide by 2 the rate
-        m_rates.layerRates[globalLayer] /= 2;
+        m_rates.layerRates[layerGlobal] /= 2;
       }
     }
   }
 }
 
-int BKLMHitRateCounter::getActiveStripsBKLMLayer(int globalLayer) const
+int BKLMHitRateCounter::getActiveStripsBKLMLayer(int layerGlobal) const
 {
   int active = 0;
 
-  int layer = (globalLayer % BKLMElementNumbers::getMaximalLayerNumber()) + 1;
-  int sector = ((globalLayer / BKLMElementNumbers::getMaximalLayerNumber()) % BKLMElementNumbers::getMaximalSectorNumber()) + 1;
-  int isForward = ((globalLayer / BKLMElementNumbers::getMaximalLayerNumber()) / BKLMElementNumbers::getMaximalSectorNumber()) %
-                  (BKLMElementNumbers::getMaximalLayerNumber() + 1);
+  int isForward, sector, layer;
+  BKLMElementNumbers::layerGlobalNumberToElementNumbers(layerGlobal, &isForward, &sector, &layer);
 
   for (int plane = 0; plane < BKLMElementNumbers::getMaximalPlaneNumber(); ++plane) {
     for (int strip = 1; strip <= BKLMElementNumbers::getNStrips(isForward, sector, layer, plane); ++strip) {
@@ -103,7 +99,7 @@ int BKLMHitRateCounter::getActiveStripsBKLMLayer(int globalLayer) const
       uint16_t channel = elementNumbers->channelNumberBKLM(isForward, layer, sector, plane, strip);
       enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
 
-      // Count only the non-dead channels
+      // Ignore the unknown and dead channels
       if (status == KLMChannelStatus::c_Unknown)
         B2FATAL("Incomplete KLM channel status data.");
       if (status != KLMChannelStatus::c_Dead)

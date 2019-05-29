@@ -97,9 +97,9 @@ namespace Belle2 {
 
       /**
        * Get number of active strips in the specified BKLM global layer.
-       * @param[in] globalLayer Layer global number.
+       * @param[in] layerGlobal Layer global number.
        */
-      int getActiveStripsBKLMLayer(int globalLayer) const;
+      int getActiveStripsBKLMLayer(int layerGlobal) const;
 
     private:
 
@@ -110,8 +110,7 @@ namespace Belle2 {
       std::map<unsigned, TreeStruct> m_buffer;
 
       /** Total number of layers. */
-      static constexpr int m_maxGlobalLayer = (BKLMElementNumbers::getMaximalForwardNumber() + 1) *
-                                              BKLMElementNumbers::getMaximalSectorNumber() * BKLMElementNumbers::getMaximalLayerNumber();
+      static constexpr int m_maxGlobalLayer = BKLMElementNumbers::getMaximalSectorGlobalNumber();
 
       /** BKLM digits. */
       StoreArray<BKLMDigit> m_digits;

@@ -746,7 +746,6 @@ namespace Belle2 {
                       "Returns number of steps to i-th daughter from the particle at generator level."
                       "-1 if the no MCParticle is associated to the particle or i-th daughter."
                       "-999 if i-th daughter does not exist.");
-
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
                       "Returns the number of missing daughters having assigned PDG codes."
                       "-1 if the no MCParticle is associated to the particle.")

@@ -12,6 +12,7 @@
 
 /* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
+#include <klm/dataobjects/KLMChannelMapValue.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 
 namespace Belle2 {
@@ -55,7 +56,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get module status for last calibration.
+     * Get module status (last calibration).
      */
     KLMChannelStatus& getModuleStatus() const
     {
@@ -63,11 +64,11 @@ namespace Belle2 {
     }
 
     /**
-     * Get last calibration result.
+     * Get channel status (last calibration).
      */
-    KLMChannelStatus& getLastCalibrationResult() const
+    KLMChannelStatus& getChannelStatus() const
     {
-      return *m_LastCalibrationResult;
+      return *m_ChannelStatus;
     }
 
     /**
@@ -79,6 +80,18 @@ namespace Belle2 {
     }
 
   protected:
+
+    /**
+     * Calibrate module.
+     * @param[in] module Module number.
+     */
+    void calibrateModule(uint16_t module);
+
+    /**
+     * Calibrate channel.
+     * @param[in] channel Channel number.
+     */
+    void calibrateChannel(uint16_t channel);
 
     /** Whether the calibration is module-based. */
     bool m_ModuleBasedCalibration = false;
@@ -92,11 +105,17 @@ namespace Belle2 {
     /** Module status. */
     KLMChannelStatus* m_ModuleStatus = nullptr;
 
-    /** Last calibration result. */
-    KLMChannelStatus* m_LastCalibrationResult = nullptr;
+    /** Channel status. */
+    KLMChannelStatus* m_ChannelStatus = nullptr;
+
+    /** Channel hit map. */
+    KLMChannelMapValue<unsigned int> m_HitMapChannel;
+
+    /** Module hit map. */
+    KLMChannelMapValue<unsigned int> m_HitMapModule;
 
     /** Total hit number. */
-    int m_TotalHitNumber = 0;
+    unsigned int m_TotalHitNumber = 0;
 
   };
 

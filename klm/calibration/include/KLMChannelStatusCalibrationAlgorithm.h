@@ -40,6 +40,15 @@ namespace Belle2 {
     CalibrationAlgorithm::EResult calibrate() override;
 
     /**
+     * Set whether the calibration is forced (calibrate even for
+     * insufficient average number of hits).
+     */
+    void setForcedCalibration(bool forcedCalibration)
+    {
+      m_ForcedCalibration = forcedCalibration;
+    }
+
+    /**
      * Set minimal number of hits per module for module-based calibration.
      */
     void setMinimalModuleHitNumber(unsigned int minimalModuleHitNumber)
@@ -93,8 +102,11 @@ namespace Belle2 {
      */
     void calibrateChannel(uint16_t channel);
 
-    /** Whether the calibration is module-based. */
-    bool m_ModuleBasedCalibration = false;
+    /**
+     * Whether the calibration is forced (calibrate even for
+     * insufficient average number of hits).
+     */
+    bool m_ForcedCalibration = false;
 
     /** Minimal module hit number for module-based calibration. */
     unsigned int m_MinimalModuleHitNumber = 1;

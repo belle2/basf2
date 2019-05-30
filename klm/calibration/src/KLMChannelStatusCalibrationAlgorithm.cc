@@ -102,7 +102,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
         activeChannels++;
     }
     double averageHits = double(moduleHits) / activeChannels;
-    if (averageHits < m_MinimalAverageHitNumber) {
+    if (averageHits < m_MinimalAverageHitNumber && !m_ForcedCalibration) {
       return CalibrationAlgorithm::c_NotEnoughData;
     }
     bklmChannel = bklmModule;
@@ -131,7 +131,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
         activeChannels++;
     }
     double averageHits = double(moduleHits) / activeChannels;
-    if (averageHits < m_MinimalAverageHitNumber) {
+    if (averageHits < m_MinimalAverageHitNumber && !m_ForcedCalibration) {
       return CalibrationAlgorithm::c_NotEnoughData;
     }
     eklmChannel = eklmModule;

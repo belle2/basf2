@@ -120,7 +120,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get maximal layer global number.
+     * Get maximal layer global number (0-based).
      */
     static constexpr int getMaximalLayerGlobalNumber()
     {
@@ -128,7 +128,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get element numbers by layer global number.
+     * Get element numbers by layer global number (0-based).
      * @param[in]  layerGlobal  Layer global number.
      * @param[out] forward      Forward (1) or backward (0) BKLM.
      * @param[out] sector       Sector (1-based).

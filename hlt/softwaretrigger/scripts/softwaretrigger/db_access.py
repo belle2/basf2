@@ -33,7 +33,7 @@ def upload_cut_to_db(cut_string, base_identifier, cut_identifier, prescale_facto
         iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
     if isinstance(prescale_factor, list):
-        prescale_factor = list_to_vector(prescale_factor)
+        raise AttributeError("The only allowed type for the prescaling is a single factor")
 
     db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler
     software_trigger_cut = Belle2.SoftwareTrigger.SoftwareTriggerCut.compile(

@@ -140,6 +140,7 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   else { H2 = H0; };
   A6 = F3 * (H2[0] - A5*AH3); B6 = F3 * (H2[1] - B5*AH3); C6 = F3 * (H2[2] - C5*AH3); // h/2 * k_4
   D4 = F3 * D3 * AH3 - D0; // h/2 * l_4 - p_n
+  D5 = P3*(D1 + 2*D2 + D3 + D4); //p_n+1
 
   //
   // Derivatives of track parameters
@@ -211,7 +212,6 @@ double MplTrackRep::RKPropagate(M1x7& state7,
         J(i, 0) += (dA2+dA3+dA4)*S3;  J(i, 3) = ((dA0+2.*dA3)+(dA5+dA6))*P3; // dR := dR + S3*[(dA2, dB2, dC2) +   (dA3, dB3, dC3) + (dA4, dB4, dC4)]
         J(i, 1) += (dB2+dB3+dB4)*S3;  J(i, 4) = ((dB0+2.*dB3)+(dB5+dB6))*P3; // dA :=     1/3*[(dA0, dB0, dC0) + 2*(dA3, dB3, dC3) + (dA5, dB5, dC5) + (dA6, dB6, dC6)]
         J(i, 2) += (dC2+dC3+dC4)*S3;  J(i, 5) = ((dC0+2.*dC3)+(dC5+dC6))*P3;
-        D5 = P3*(D1 + 2*D2 + D3 + D4); //p_n+1
         J(i,6) = -sign/D5/D5*P3*(dD1 + 2*dD2 + dD3 + dD4);
       }
 

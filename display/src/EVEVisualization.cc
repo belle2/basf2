@@ -267,6 +267,7 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
   // Create a track as a polyline through reconstructed points
   // FIXME this is snatched from PrimitivePlotter, need to add extrapolation out of CDC
   TEveLine* track = new TEveLine(); // We are going to just add points with SetNextPoint
+  std::vector<TVector3> posPoints; // But first we'll have to sort them as in RecoHits axial and stereo come in blocks
   track->SetName(label); //popup label set at end of function
   track->SetLineColor(c_recoTrackColor);
   track->SetLineWidth(3);
@@ -296,9 +297,16 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
       continue;
     }
 
-    track->SetNextPoint(pos.X(), pos.Y(), pos.Z());
+    posPoints.push_back(TVector3(pos.X(), pos.Y(), pos.Z()));
   }
 
+  sort(posPoints.begin(), posPoints.end(),
+  [](const TVector3 & a, const TVector3 & b) -> bool {
+    return a.X() * a.X() + a.Y() * a.Y() > b.X() * b.X() + b.Y() * b.Y();
+  });
+  for (auto vec : posPoints) {
+    track->SetNextPoint(vec.X(), vec.Y(), vec.Z());
+  }
   // add corresponding hits     ---------------------------------------------------------------------
   TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
   lines->SetMainColor(c_recoTrackColor);

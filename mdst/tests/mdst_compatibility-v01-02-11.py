@@ -19,6 +19,8 @@ CHANGES since release-01-02-11:
   + isTriggerCluster
   * getCovarianceMatrixAsArray removed
 - KlIds are added
+- SoftwareTriggerResult:
+  * non-prescaled results added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel

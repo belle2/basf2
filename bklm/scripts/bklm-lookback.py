@@ -125,5 +125,5 @@ rawdata.add_unpackers(main, components=['BKLM'])
 main.add_module('BKLMReconstructor')
 main.add_module(eventInspector)
 
-process(main, max_event=40000)
+process(main)
 print(statistics)

@@ -55,11 +55,11 @@ namespace Belle2 {
     /**
      * Event.
      */
-    void event();
+    void event() override;
     /**
      * End run.
      */
-    void endRun();
+    void endRun() override;
   private:
     /**
      * Calculate time shift.
@@ -159,7 +159,7 @@ namespace Belle2 {
      * will be filled only if the histogram
      * filling mode is enabled.
      */
-    TH1F* m_histo_time;
+    TH1F* m_histo_time{nullptr};
     /**
      * m_histo_ampl is the name of
      * the histogram, which contains
@@ -168,7 +168,7 @@ namespace Belle2 {
      * will be filled only if the histogram
      * filling mode is enabled.
      */
-    TH1F* m_histo_ampl;
+    TH1F* m_histo_ampl{nullptr};
     /**
      * Name of the time payload.
      */
@@ -207,27 +207,27 @@ namespace Belle2 {
      per each cellid before calculating
      mean values.
      */
-    TTree* m_tree;
+    TTree* m_tree{nullptr};
     /**
      * Cellid varible used
      to fill tree.
      */
-    int m_tree_cellid;
+    int m_tree_cellid{0};
     /**
      * Time varible used
      to fill tree.
      */
-    float m_tree_time;
+    float m_tree_time{0};
     /**
      * Amplitude varible used
      to fill tree.
      */
-    float m_tree_ampl;
+    float m_tree_ampl{0};
     /**
      * Event varible used
      to fill tree.
      */
-    int m_tree_event;
+    int m_tree_event{0};
     /**
      * Write histograms to file in
      * the case, if the histogram

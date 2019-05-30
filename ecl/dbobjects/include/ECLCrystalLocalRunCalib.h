@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * ECLCrystalLocalRunCalib                                                *
  *                                                                        *
@@ -33,7 +33,7 @@ namespace Belle2 {
      * @param isNegAmpl is true, when there are
      negative amplitude values.
      */
-    ECLCrystalLocalRunCalib(bool isNegAmpl = false);
+    explicit ECLCrystalLocalRunCalib(bool isNegAmpl = false);
     /**
      * Destructor.
      */

@@ -10,6 +10,7 @@
 
 /* Belle2 headers. */
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
+#include <klm/dataobjects/EKLMChannelIndex.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
@@ -59,38 +60,26 @@ void EKLMDigitizerModule::initialize()
 
 void EKLMDigitizerModule::checkChannelParameters()
 {
-  int endcap, layer, sector, plane, strip, stripGlobal;
-  int nEndcaps, nLayers[2], nSectors, nPlanes, nStrips;
-  const EKLMChannelData* channel;
-  nEndcaps = m_ElementNumbers->getMaximalEndcapNumber();
-  nLayers[0] = m_ElementNumbers->getMaximalDetectorLayerNumber(1);
-  nLayers[1] = m_ElementNumbers->getMaximalDetectorLayerNumber(2);
-  nSectors = m_ElementNumbers->getMaximalSectorNumber();
-  nPlanes = m_ElementNumbers->getMaximalPlaneNumber();
-  nStrips = m_ElementNumbers->getMaximalStripNumber();
-  for (endcap = 1; endcap <= nEndcaps; endcap++) {
-    for (layer = 1; layer <= nLayers[endcap - 1]; layer++) {
-      for (sector = 1; sector <= nSectors; sector++) {
-        for (plane = 1; plane <= nPlanes; plane++) {
-          for (strip = 1; strip <= nStrips; strip++) {
-            stripGlobal = m_ElementNumbers->stripNumber(endcap, layer, sector,
-                                                        plane, strip);
-            channel = m_Channels->getChannelData(stripGlobal);
-            if (channel == nullptr)
-              B2FATAL("Incomplete channel data.");
-            if (channel->getPhotoelectronAmplitude() <= 0) {
-              B2ERROR("Non-positive photoelectron amplitude. The requested "
-                      "channel-specific simulation is impossible. "
-                      "EKLMDigitizer is switched to the generic mode."
-                      << LogVar("Endcap", endcap) << LogVar("Layer", layer)
-                      << LogVar("Sector", sector) << LogVar("Plane", plane)
-                      << LogVar("Strip", strip));
-              m_ChannelSpecificSimulation = false;
-              return;
-            }
-          }
-        }
-      }
+  EKLMChannelIndex eklmChannels;
+  for (EKLMChannelIndex& eklmChannel : eklmChannels) {
+    int stripGlobal = m_ElementNumbers->stripNumber(
+                        eklmChannel.getEndcap(), eklmChannel.getLayer(),
+                        eklmChannel.getSector(), eklmChannel.getPlane(),
+                        eklmChannel.getStrip());
+    const EKLMChannelData* channel = m_Channels->getChannelData(stripGlobal);
+    if (channel == nullptr)
+      B2FATAL("Incomplete channel data.");
+    if (channel->getPhotoelectronAmplitude() <= 0) {
+      B2ERROR("Non-positive photoelectron amplitude. The requested "
+              "channel-specific simulation is impossible. "
+              "EKLMDigitizer is switched to the generic mode."
+              << LogVar("Endcap", eklmChannel.getEndcap())
+              << LogVar("Layer", eklmChannel.getLayer())
+              << LogVar("Sector", eklmChannel.getSector())
+              << LogVar("Plane", eklmChannel.getPlane())
+              << LogVar("Strip", eklmChannel.getStrip()));
+      m_ChannelSpecificSimulation = false;
+      return;
     }
   }
 }

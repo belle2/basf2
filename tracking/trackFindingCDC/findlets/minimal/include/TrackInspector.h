@@ -16,10 +16,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
 
-    /* Findlet for inspecting and printing out CDCtracks on a R-z plane for debug purposes
-    *
-    * can be done before interfacing to genfit, while the track is just a vector of found hits
-    * */
+    /** Findlet for inspecting and printing out CDCtracks on a R-z plane for debug purposes
+     *
+     * can be done before interfacing to genfit, while the track is just a vector of found hits
+     */
     class TrackInspector : public Findlet<CDCTrack&> {
 
     private:
@@ -37,6 +37,7 @@ namespace Belle2 {
       void removeIncompleteTracks(std::vector<CDCTrack>& tracks);
 
     private:
+      /// Flag to draw the CDCTrack (true) or not (false)
       bool m_param_debugDraw = false;
     };
   }

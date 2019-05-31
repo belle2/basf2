@@ -59,6 +59,9 @@ def run():
 
 
 class VxdCdcMergerHarvester(HarvestingModule):
+    """
+    Harvester module to extract useful information from VXD-CDC track merging.
+    """
 
     def __init__(self):
         """
@@ -74,6 +77,7 @@ class VxdCdcMergerHarvester(HarvestingModule):
         self.mc_track_matcher_vxd = Belle2.TrackMatchLookUp("MCRecoTracks", "SVDRecoTracks")
 
     def pick(self, mc_particle):
+        """Select the MCParticle if it is related to an MCRecoTrack"""
         # mc_track = mc_particle.getRelated("MCRecoTracks")
         # return mc_track is not None
         mc_track = mc_particle.getRelatedFrom("MCRecoTracks")
@@ -83,6 +87,10 @@ class VxdCdcMergerHarvester(HarvestingModule):
             return False
 
     def peel(self, mc_particle):
+        """
+        Extract the information.
+        """
+
         # mc is a genfit::TrackCand
 
         mc_track = mc_particle.getRelatedFrom("MCRecoTracks")
@@ -126,6 +134,7 @@ class VxdCdcMergerHarvester(HarvestingModule):
             "GOOD_MERGE": good_merge
         }
 
+    #: Store as a table in a ROOT file
     save_tree = refiners.SaveTreeRefiner()
 
 

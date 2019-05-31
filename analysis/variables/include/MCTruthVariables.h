@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace Belle2 {
   class Particle;
 
@@ -52,9 +54,19 @@ namespace Belle2 {
     double isExtendedSignal(const Particle* part);
 
     /**
-     * return 1 if Particle is correctly reconstructed (SIGNAL including misssing neutrino), 0 otherwise
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing neutrino), 0 otherwise
      */
     double isSignalAcceptMissingNeutrino(const Particle* part);
+
+    /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing massive), 0 otherwise
+     */
+    double isSignalAcceptMissingMassive(const Particle* part);
+
+    /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing all particles), 0 otherwise
+     */
+    double isSignalAcceptMissing(const Particle* part);
 
     /**
      * return 1 if the charge of the particle is wrong. 0 in
@@ -226,6 +238,19 @@ namespace Belle2 {
 
     /** the particle was seen in the KLM */
     double seenInKLM(const Particle*);
+
+    /**
+     * return number of steps to i-th daughter from the particle at generator level.
+     * return -1, if no MCParticle is associated to the particle or the i-th daughter.
+     * return -999, if i-th daughter does not exist.
+     */
+    int genNStepsToDaughter(const Particle* particle, const std::vector<double>& arguments);
+
+    /**
+     * return number of missing daughters having assigned PDG codes
+     * return -1, if the particle does not have related MC Particle
+     */
+    int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);
 
     /**
      * retruns the weight of the ECLCluster -> MCParticle relation for the

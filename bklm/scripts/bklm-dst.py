@@ -22,9 +22,10 @@
 #      -r #   to specify the run number (no default)
 # Optional arguments:
 #      -s #   to select events with all (0) or exactly one (1) or two or more (2) entries/channel (default is 0)
-#      -v #   to specify how many histograms to save in the PDF file (0=minimal, 1=all) [default is 0]
 #      -n #   to specify the maximum number of events to analyze (no default -> all events)
+#      -h #   to specify how many histograms to save in the PDF file (0=minimal, 1=all) [default is 0]
 #      -d #   to specify the maximum number of event displays (default is 0)
+#      -v #   to specify whether to use BKLMHit1ds (1) or BKLMHit2ds (2) for event-display views [2]
 #      -m #   to specify the minimum number of RPC BKLMHit2ds in any one sector (default is 4)
 #      -t tagName   to specify the name of conditions-database global tag (no default)
 #      -l #   to specify whether to use legacy time calculations (1) or not (0) (default is 0)

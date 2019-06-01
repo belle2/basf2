@@ -115,6 +115,8 @@ class EventInspectorLookback(basf2.Module):
                 expRun, self.windowMode, window) + ";t - t(trigger) (ns)"
             self.dict_mappedRPCTimeCalByWindow[window] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
             self.dict_nRawKLMs[window] = 0
+        #: reference to the RPC-time histogram for the currevent value of the lookback window parameter
+        self.hist_mappedRPCTimeCalByWindow = self.dict_mappedRPCTimeCalByWindow[self.windowMinValue]
 
         # Create the BKLMHit2d-related histograms
 
@@ -126,6 +128,8 @@ class EventInspectorLookback(basf2.Module):
         self.hist_occupancyBackwardXY = ROOT.TH2F('occupancyBackwardXY',
                                                   expRun + 'Backward xy occupancy;x(cm);y(cm)',
                                                   230, -345.0, 345.0, 230, -345.0, 345.0)
+        #: reference to the xy scatterplot for the currevent value of the lookback window parameter
+        self.hist_occupancyXYByWindow = self.dict_occupancyXYByWindow[self.windowMinValue]
 
         #: dictionary of scatterplots of end view of forward BKLM, keyed by lookback-window value
         self.dict_occupancyXYByWindow = {}

@@ -1839,6 +1839,64 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr averageValueInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        std::string listName = arguments[0];
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [listName, var](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid list name " << listName << " given to averageValueInList");
+          int nParticles = listOfParticles->getListSize();
+          double average = 0;
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            average += var->function(part) / nParticles;
+          }
+          return average;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function averageValueInList");
+      }
+    }
+
+    Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        std::string listName = arguments[0];
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [listName, var](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid list name " << listName << " given to medianValueInList");
+          int nParticles = listOfParticles->getListSize();
+          if (nParticles == 0)
+          {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+          std::vector<double> valuesInList;
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            valuesInList.push_back(var->function(part));
+          }
+          std::sort(valuesInList.begin(), valuesInList.end());
+          if (nParticles % 2 != 0)
+          {
+            return valuesInList[nParticles / 2];
+          } else {
+            return 0.5 * (valuesInList[nParticles / 2] + valuesInList[nParticles / 2 - 1]);
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function medianValueInList");
+      }
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                       "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -2090,5 +2148,9 @@ arguments. Operator precedence is taken into account. For example ::
                       "Returns maximum transverse momentum Pt in the given particle List.");
     REGISTER_VARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
                       "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.");
+    REGISTER_VARIABLE("averageValueInList(particleListName, variable)", averageValueInList,
+                      "Returns the arithmetic mean of the given variable of the particles in the given particle list.");
+    REGISTER_VARIABLE("medianValueInList(particleListName, variable)", medianValueInList,
+                      "Returns the median value of the given variable of the particles in the given particle list.")
   }
 }

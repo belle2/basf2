@@ -23,7 +23,9 @@
 # Optional arguments:
 #      -s #   to select events with all (0) or exactly one (1) or two or more (2) entries/channel (default is 0)
 #      -n #   to specify the maximum number of events to analyze (no default -> all events)
+#      -h #   to specify how many histograms to save in the PDF file (0=minimal, 1=all) [default is 0]
 #      -d #   to specify the maximum number of event displays (default is 0)
+#      -v #   to specify whether to use BKLMHit1ds (1) or BKLMHit2ds (2) for event-display views [2]
 #      -m #   to specify the minimum number of RPC BKLMHit2ds in any one sector (default is 4)
 #      -t tagName   to specify the name of conditions-database global tag (no default)
 #      -l #   to specify whether to use legacy time calculations (1) or not (0) (default is 0)
@@ -62,27 +64,30 @@ parser.add_option('-r', '--run',
 parser.add_option('-n', '--nEvents',
                   dest='nEvents', default='',
                   help='Max # of analyzed events [no default]')
-parser.add_option('-s', '--singleEntry',
-                  dest='singleEntry', default='0',
+parser.add_option('-s', '--singleEntry', type="int",
+                  dest='singleEntry', default=0,
                   help='Select events with any (0) or exactly one (1) or more than one (2) entries/channel [0]')
-parser.add_option('-d', '--displays',
-                  dest='displays', default='0',
+parser.add_option('-h', '--histograms', type="int",
+                  dest='histogramVerbosity', default=0,
+                  help='How many histograms to save (0=minimal, 1=all) [0]')
+parser.add_option('-d', '--displays', type="int",
+                  dest='displays', default=0,
                   help='Max # of displayed events [0]')
-parser.add_option('-v', '--view',
-                  dest='view', default='2',
+parser.add_option('-v', '--view', type="int",
+                  dest='view', default=2,
                   help='View event displays using one-dimensional (1) or two-dimensional (2) hits [2]')
-parser.add_option('-m', '--minRPCHits',
-                  dest='minRPCHits', default='4',
+parser.add_option('-m', '--minRPCHits', type="int",
+                  dest='minRPCHits', default=4,
                   help='Min # of RPC hits in any one sector to display the event [4]')
-parser.add_option('-l', '--legacyTimes',
-                  dest='legacyTimes', default='0',
+parser.add_option('-l', '--legacyTimes', type="int",
+                  dest='legacyTimes', default=0,
                   help='Perform legacy time calculations (1) or not (0) for BKLMHit1ds,2ds [0]')
 parser.add_option('-t', '--tagName',
                   dest='tagName', default='data_reprocessing_prompt',
                   help='Conditions-database global-tag name [data_reprocessing_prompt]')
 (options, args) = parser.parse_args()
 
-singleEntry = int(options.singleEntry)
+singleEntry = options.singleEntry
 if singleEntry < 0 or singleEntry > 2:
     singleEntry = 0
 
@@ -93,13 +98,15 @@ if options.nEvents != '':
         print("Maximum number of events to analyze is", maxCount, " - nothing to do.")
         sys.exit()
 
-view = int(options.view)
+view = options.view
 
-maxDisplays = int(options.displays)
+histogramVerbosity = options.histogramVerbosity
 
-minRPCHits = int(options.minRPCHits)
+maxDisplays = options.displays
 
-legacyTimes = int(options.legacyTimes)
+minRPCHits = options.minRPCHits
+
+legacyTimes = options.legacyTimes
 
 tagName = options.tagName
 
@@ -107,12 +114,11 @@ inputName = ''
 exp = ''
 run = ''
 if options.infilename != '':
-    inputName = options.infilename
+    inputName = re.sub("HLT.\.f0....", "HLT*.f*", options.infilename)
     fileList = glob.glob(inputName)
     if len(fileList) == 0:
         print("No file(s) match {0}".format(inputName))
         sys.exit()
-    inputName = fileList[0].replace("f00000", "f*")
 if options.eNumber != '':
     if not options.eNumber.isdecimal():
         print("Experiment number ({0}) is not valid".format(options.eNumber))
@@ -144,11 +150,11 @@ else:
         print("Input filename's run number ({0}) is not valid".format(run))
         sys.exit()
 if len(inputName) == 0:
-    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT1.f00000.root'.format(exp, run))
+    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT*.f*.root'.format(exp, run))
     if len(fileList) == 0:
         print("No file(s) found for experiment <{0}> run <{1}>".format(options.eNumber, options.rNumber))
         sys.exit()
-    inputName = fileList[0].replace("f00000", "f*")
+    inputName = re.sub("HLT.\.f0....", "HLT*.f*", fileList[0])
 
 suffix = '' if singleEntry == 0 else '-singleEntry' if singleEntry == 1 else '-multipleEntries'
 histName = 'bklmHists-e{0}r{1}{2}.root'.format(exp, run, suffix)
@@ -171,7 +177,8 @@ else:
     main.add_module('RootInput', inputFileName=inputName)
 main.add_module('ProgressBar')
 
-eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, maxDisplays, minRPCHits, legacyTimes, singleEntry, view)
+eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, histogramVerbosity,
+                                maxDisplays, minRPCHits, legacyTimes, singleEntry, view)
 rawdata.add_unpackers(main, components=['BKLM'])
 main.add_module('BKLMReconstructor')
 main.add_module(eventInspector)

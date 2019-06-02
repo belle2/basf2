@@ -39,6 +39,14 @@ uint16_t BKLMElementNumbers::moduleNumber(int forward, int sector, int layer)
          | ((layer - 1) << BKLM_LAYER_BIT);
 }
 
+int BKLMElementNumbers::layerGlobalNumber(int forward, int sector, int layer)
+{
+  int layerGlobal = layer - 1;
+  layerGlobal += (sector - 1) * m_MaximalLayerNumber;
+  layerGlobal += forward * m_MaximalSectorNumber * m_MaximalLayerNumber;
+  return layerGlobal;
+}
+
 int BKLMElementNumbers::getNStrips(
   int forward, int sector, int layer, int plane)
 {
@@ -74,4 +82,11 @@ bool BKLMElementNumbers::checkChannelNumber(
 {
   return (strip >= 1) && (strip <= BKLMElementNumbers::getNStrips(
                             forward, sector, layer, plane));
+}
+
+void BKLMElementNumbers::layerGlobalNumberToElementNumbers(int layerGlobal, int* forward, int* sector, int* layer)
+{
+  *forward = ((layerGlobal / m_MaximalLayerNumber) / m_MaximalSectorNumber) % (m_MaximalLayerNumber + 1);
+  *sector = ((layerGlobal / m_MaximalLayerNumber) % m_MaximalSectorNumber) + 1;
+  *layer = (layerGlobal % m_MaximalLayerNumber) + 1;
 }

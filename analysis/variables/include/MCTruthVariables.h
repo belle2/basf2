@@ -256,6 +256,13 @@ namespace Belle2 {
     double seenInKLM(const Particle*);
 
     /**
+     * return number of steps to i-th daughter from the particle at generator level.
+     * return -1, if no MCParticle is associated to the particle or the i-th daughter.
+     * return -999, if i-th daughter does not exist.
+     */
+    int genNStepsToDaughter(const Particle* particle, const std::vector<double>& arguments);
+
+    /**
      * return number of missing daughters having assigned PDG codes
      * return -1, if the particle does not have related MC Particle
      */

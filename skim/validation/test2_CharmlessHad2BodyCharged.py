@@ -3,7 +3,7 @@
 
 """
 <header>
-    <input>CharmlessHad2BodyCharged.udst.root</input>
+    <input>../CharmlessHad2BodyCharged.udst.root</input>
     <output>CharmlessHad2BodyCharged_Validation.root</output>
     <contact>khsmith@student.unimelb.edu.au</contact>
 </header>
@@ -15,7 +15,7 @@ from modularAnalysis import *
 charmless2chargedpath = Path()
 
 # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-inputMdst('MC9', 'CharmlessHad2BodyCharged.udst.root', path=charmless2chargedpath)
+inputMdst('default', '../CharmlessHad2BodyCharged.udst.root', path=charmless2chargedpath)
 
 from variables import variables
 variablesToHistogram(
@@ -27,7 +27,7 @@ variablesToHistogram(
         ('daughter(0, InvM)', 100, 0.5, 1.2),  # K*+ invariant mass
         ('daughter(1, InvM)', 100, 0.5, 1.2)],  # rho0 invariant mass
     variables_2d=[
-        ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)])
+        ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=charmless2chargedpath)
 
 process(charmless2chargedpath)
 print(statistics)

@@ -360,5 +360,15 @@ namespace Belle2 {
     * Returns function which returns if at least one track is related to the cluster of the particle and this track satisfies the given condition.
     */
     Manager::FunctionPtr eclClusterTrackMatchedWithCondition(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the arithmetic mean of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr averageValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the median value of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments);
   }
 }

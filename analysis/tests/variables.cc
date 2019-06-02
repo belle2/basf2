@@ -2616,6 +2616,151 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, averageValueInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto& g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get the average px, py, pz, E of the gammas in the list
+    const Manager::Var* vmeanpx = Manager::Instance().getVariable(
+                                    "averageValueInList(testGammaList, px)");
+    const Manager::Var* vmeanpy = Manager::Instance().getVariable(
+                                    "averageValueInList(testGammaList, py)");
+    const Manager::Var* vmeanpz = Manager::Instance().getVariable(
+                                    "averageValueInList(testGammaList, pz)");
+    const Manager::Var* vmeanE = Manager::Instance().getVariable(
+                                   "averageValueInList(testGammaList, E)");
+
+    EXPECT_FLOAT_EQ(vmeanpx->function(nullptr), 0.44);
+    EXPECT_FLOAT_EQ(vmeanpy->function(nullptr), 0.3);
+    EXPECT_FLOAT_EQ(vmeanpz->function(nullptr), 0.62);
+    EXPECT_FLOAT_EQ(vmeanE->function(nullptr), 0.86);
+
+    // wrong number of arguments (no variable provided)
+    EXPECT_B2FATAL(Manager::Instance().getVariable("averageValueInList(testGammaList)"));
+
+    // non-existing variable
+    EXPECT_B2FATAL(Manager::Instance().getVariable("averageValueInList(testGammaList, NONEXISTANTVARIABLE)"));
+
+    // non-existing list
+    const Manager::Var* vnolist = Manager::Instance().getVariable(
+                                    "averageValueInList(NONEXISTANTLIST, px)");
+
+    EXPECT_B2FATAL(vnolist->function(nullptr));
+  }
+
+  TEST_F(MetaVariableTest, medianValueInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create two photon lists for testing (one with odd and one with even number of particles)
+    StoreObjPtr<ParticleList> oddgammalist("oddGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    oddgammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    oddgammalist.create();
+    oddgammalist->initialize(22, "oddGammaList");
+    StoreObjPtr<ParticleList> evengammalist("evenGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    evengammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    evengammalist.create();
+    evengammalist->initialize(22, "evenGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto& g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test lists
+    if (gammavector.size() % 2 == 0) {
+      evengammalist->addParticle(0, 22, Particle::c_Unflavored);
+    } else
+      oddgammalist->addParticle(0, 22, Particle::c_Unflavored);
+    for (size_t i = 1; i < gammavector.size(); i++) {
+      oddgammalist->addParticle(i, 22, Particle::c_Unflavored);
+      evengammalist->addParticle(i, 22, Particle::c_Unflavored);
+    }
+
+    // get the median px, py, pz, E of the gammas in the list with odd number of particles
+    const Manager::Var* voddmedianpx = Manager::Instance().getVariable(
+                                         "medianValueInList(oddGammaList, px)");
+    const Manager::Var* voddmedianpy = Manager::Instance().getVariable(
+                                         "medianValueInList(oddGammaList, py)");
+    const Manager::Var* voddmedianpz = Manager::Instance().getVariable(
+                                         "medianValueInList(oddGammaList, pz)");
+    const Manager::Var* voddmedianE = Manager::Instance().getVariable(
+                                        "medianValueInList(oddGammaList, E)");
+
+    EXPECT_FLOAT_EQ(voddmedianpx->function(nullptr), 0.5);
+    EXPECT_FLOAT_EQ(voddmedianpy->function(nullptr), 0.3);
+    EXPECT_FLOAT_EQ(voddmedianpz->function(nullptr), 0.7);
+    EXPECT_FLOAT_EQ(voddmedianE->function(nullptr), 0.9);
+
+    // get the median px, py, pz, E of the gammas in the list with odd number of particles
+    const Manager::Var* vevenmedianpx = Manager::Instance().getVariable(
+                                          "medianValueInList(evenGammaList, px)");
+    const Manager::Var* vevenmedianpy = Manager::Instance().getVariable(
+                                          "medianValueInList(evenGammaList, py)");
+    const Manager::Var* vevenmedianpz = Manager::Instance().getVariable(
+                                          "medianValueInList(evenGammaList, pz)");
+    const Manager::Var* vevenmedianE = Manager::Instance().getVariable(
+                                         "medianValueInList(evenGammaList, E)");
+
+    EXPECT_FLOAT_EQ(vevenmedianpx->function(nullptr), 0.45);
+    EXPECT_FLOAT_EQ(vevenmedianpy->function(nullptr), 0.25);
+    EXPECT_FLOAT_EQ(vevenmedianpz->function(nullptr), 0.7);
+    EXPECT_FLOAT_EQ(vevenmedianE->function(nullptr), 0.9);
+
+    // wrong number of arguments (no variable provided)
+    EXPECT_B2FATAL(Manager::Instance().getVariable("medianValueInList(oddGammaList)"));
+
+    // non-existing variable
+    EXPECT_B2FATAL(Manager::Instance().getVariable("medianValueInList(oddGammaList, NONEXISTANTVARIABLE)"));
+
+    // non-existing list
+    const Manager::Var* vnolist = Manager::Instance().getVariable(
+                                    "medianValueInList(NONEXISTANTLIST, px)");
+
+    EXPECT_B2FATAL(vnolist->function(nullptr));
+  }
+
   class PIDVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */

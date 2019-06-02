@@ -1844,6 +1844,9 @@ endloop:
       if (arguments.size() == 2) {
         std::string listName = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        if (not var) {
+          B2FATAL("Could not find variable named " << arguments[1] << " given to averageValueInList");
+        }
         auto func = [listName, var](const Particle*) -> double {
           StoreObjPtr<ParticleList> listOfParticles(listName);
 
@@ -1868,6 +1871,9 @@ endloop:
       if (arguments.size() == 2) {
         std::string listName = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        if (not var) {
+          B2FATAL("Could not find variable named " << arguments[1] << " given to medianValueInList");
+        }
         auto func = [listName, var](const Particle*) -> double {
           StoreObjPtr<ParticleList> listOfParticles(listName);
 

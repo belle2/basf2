@@ -2236,7 +2236,9 @@ namespace {
     {
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList"));
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList(A, B)"));
-      EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList(NONEXISTANTLIST)"));
+
+      const auto* nonexistant = Manager::Instance().getVariable("angleToClosestInList(NONEXISTANTLIST)");
+      EXPECT_B2FATAL(nonexistant->function(electron));
 
       const auto* empty = Manager::Instance().getVariable("angleToClosestInList(testEmptyList)");
       EXPECT_TRUE(std::isnan(empty->function(electron)));
@@ -2250,8 +2252,10 @@ namespace {
 
     {
       EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList"));
-      EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList(NONEXISTANTLIST, E)"));
       EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList(A, B, C)"));
+
+      const auto* nonexistant = Manager::Instance().getVariable("closestInList(NONEXISTANTLIST, E)");
+      EXPECT_B2FATAL(nonexistant->function(electron));
 
       const auto* empty = Manager::Instance().getVariable("closestInList(testEmptyList, E)");
       EXPECT_TRUE(std::isnan(empty->function(electron)));
@@ -2269,7 +2273,9 @@ namespace {
     {
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList"));
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList(A, B)"));
-      EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList(NONEXISTANTLIST)"));
+
+      const auto* nonexistant = Manager::Instance().getVariable("angleToMostB2BInList(NONEXISTANTLIST)");
+      EXPECT_B2FATAL(nonexistant->function(electron));
 
       const auto* empty = Manager::Instance().getVariable("angleToMostB2BInList(testEmptyList)");
       EXPECT_TRUE(std::isnan(empty->function(electron)));
@@ -2283,8 +2289,10 @@ namespace {
 
     {
       EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList"));
-      EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList(NONEXISTANTLIST, E)"));
       EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList(A, B, C)"));
+
+      const auto* nonexistant = Manager::Instance().getVariable("mostB2BInList(NONEXISTANTLIST, E)");
+      EXPECT_B2FATAL(nonexistant->function(electron));
 
       const auto* empty = Manager::Instance().getVariable("mostB2BInList(testEmptyList, E)");
       EXPECT_TRUE(std::isnan(empty->function(electron)));

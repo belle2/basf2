@@ -1845,12 +1845,12 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function angleToClosestInList");
       std::string listname = arguments[0];
 
-      // get the list and check it's valid
-      StoreObjPtr<ParticleList> list(listname);
-      if (not list.isValid())
-        B2FATAL("Invalid particle list name " << listname << " given to angleToClosestInList");
 
-      auto func = [list](const Particle * particle) -> double {
+      auto func = [listname](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to angleToClosestInList");
 
         // check the list isn't empty
         if (list->getListSize() == 0)
@@ -1876,24 +1876,21 @@ endloop:
 
     Manager::FunctionPtr closestInList(const std::vector<std::string>& arguments)
     {
-      // expecting the list name
+      // expecting the list name and a variable name
       if (arguments.size() != 2)
         B2FATAL("Wrong number of arguments for meta function closestInList");
-
-      // get the list and check it's valid
-      StoreObjPtr<ParticleList> list(arguments[0]);
-      if (not list.isValid())
-        B2FATAL("Invalid particle list name " << arguments[0] << " given to closestInList");
+      std::string listname = arguments[0];
 
       // the requested variable and check it exists
       const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
       if (not var)
         B2FATAL("Invalid variable name " << arguments[1] << " given to closestInList");
 
-      auto func = [list, var](const Particle * particle) -> double {
-        // check the list isn't empty
-        if (list->getListSize() == 0)
-          return std::numeric_limits<double>::quiet_NaN();
+      auto func = [listname, var](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to closestInList");
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -1912,6 +1909,10 @@ endloop:
             iClosest = i;
           }
         }
+
+        // final check that the list wasn't empty (or some other problem)
+        if (iClosest == -1) return std::numeric_limits<double>::quiet_NaN();
+
         return var->function(list->getParticle(iClosest));
       };
       return func;
@@ -1924,12 +1925,11 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function angleToMostB2BInList");
       std::string listname = arguments[0];
 
-      // get the list and check it's valid
-      StoreObjPtr<ParticleList> list(listname);
-      if (not list.isValid())
-        B2FATAL("Invalid particle list name " << listname << " given to angleToMostB2BInList");
-
-      auto func = [list](const Particle * particle) -> double {
+      auto func = [listname](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to angleToMostB2BInList");
 
         // check the list isn't empty
         if (list->getListSize() == 0)
@@ -1956,24 +1956,21 @@ endloop:
 
     Manager::FunctionPtr mostB2BInList(const std::vector<std::string>& arguments)
     {
-      // expecting the list name
+      // expecting the list name and a variable name
       if (arguments.size() != 2)
         B2FATAL("Wrong number of arguments for meta function mostB2BInList");
-
-      // get the list and check it's valid
-      StoreObjPtr<ParticleList> list(arguments[0]);
-      if (not list.isValid())
-        B2FATAL("Invalid particle list name " << arguments[0] << " given to mostB2BInList");
+      std::string listname = arguments[0];
 
       // the requested variable and check it exists
       const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
       if (not var)
         B2FATAL("Invalid variable name " << arguments[1] << " given to mostB2BInList");
 
-      auto func = [list, var](const Particle * particle) -> double {
-        // check the list isn't empty
-        if (list->getListSize() == 0)
-          return std::numeric_limits<double>::quiet_NaN();
+      auto func = [listname, var](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to mostB2BInList");
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -1981,7 +1978,7 @@ endloop:
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
-        double maxAngle = 0;
+        double maxAngle = -1.0;
         int iMostB2B = -1;
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
@@ -1993,6 +1990,10 @@ endloop:
             iMostB2B = i;
           }
         }
+
+        // final check that the list wasn't empty (or some other problem)
+        if (iMostB2B == -1) return std::numeric_limits<double>::quiet_NaN();
+
         return var->function(list->getParticle(iMostB2B));
       };
       return func;

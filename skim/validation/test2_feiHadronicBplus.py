@@ -18,16 +18,18 @@ path = Path()
 inputMdst('default', '../feiHadronicBplus.udst.root', path=path)
 
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
-variables.addAlias('log10_sigProb', 'log10(sigProb)')
+variables.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
 variables.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
 variables.addAlias('d0_M', 'daughter(0,M)')
 variables.addAlias('decayModeID', 'extraInfo(decayModeID)')
+variables.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
 variablesToHistogram(
     filename='feiHadronicBplus_Validation.root',
     decayString='B+:generic',
     variables=[
         ('sigProb', 100, 0.0, 1.0),
+        ('nDaug', 6, 0.0, 6),
         ('d0_massDiff', 100, 0.0, 0.5),
         ('d0_M', 100, 0.0, 3.0),
         ('deltaE', 100, -0.2, 0.2),

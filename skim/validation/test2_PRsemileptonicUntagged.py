@@ -26,7 +26,9 @@ variablesToHistogram(
     decayString='B0:all',
     variables=[
         ('Mbc', 100, 4.0, 5.3),
-        ('d1_p', 100, 0, 5.2)],  # Lepton momentum
+        ('d0_p', 100, 0, 5.2),  # Pion momentum
+        ('d1_p', 100, 0, 5.2)   # Lepton momentum
+    ],
     variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3)],
     path=path)
 

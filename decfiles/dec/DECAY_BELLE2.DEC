@@ -1213,7 +1213,7 @@ Decay B0
 0.000025500 J/psi rho0  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #CPV included, Oberhof 03/09/2018
 0.000018000 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #CPV included, Oberhof 03/09/2018
 
-0.000871000 J/psi  K0              PHSP;
+#0.000871000 J/psi  K0              PHSP; #Double counting (already contained in K_L,K_S) [FB 03/06/2019]
 0.0001      J/psi  K0  pi0         PHSP;
 0.00044     J/psi  K0  pi-  pi+    PHSP;  #Added by Yubo Li 03/09/2018
 #0.00035    J/psi  K0  pi0  pi0    PHSP;  #Cannot find in PDG. Exclude? [PG 05/02/2018]
@@ -2534,7 +2534,7 @@ Decay anti-B0
 0.000025500 J/psi rho0  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #CPV included, Oberhof 09/11/2017
 0.000018000 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #CPV included, Oberhof 09/11/2017
 
-0.000871000 J/psi  anti-K0               PHSP;
+#0.000871000 J/psi  anti-K0               PHSP; #Double counting (already contained in K_L,K_S) [FB 03/06/2019]
 0.0001      J/psi  anti-K0  pi0          PHSP;
 0.00044     J/psi  anti-K0   pi+  pi-    PHSP;  #CP-conjugate added by PG 05/02/2018
 #0.00035    J/psi  anti-K0   pi0  pi0    PHSP;  #Cannot find in PDG. Exclude? [PG 05/02/2018]

@@ -29,7 +29,7 @@ main.add_module(eventinfosetter)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', find_file('/decfiles/dec/1293710005test.dec'))
+evtgeninput.param('userDECFile', find_file('/skim/validation/PRsemileptonicUntagged.dec'))
 main.add_module(evtgeninput)
 
 # detector simulation

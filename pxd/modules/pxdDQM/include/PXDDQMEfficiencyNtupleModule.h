@@ -19,7 +19,7 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 
@@ -94,7 +94,7 @@ namespace Belle2 {
 
     StoreArray<PXDCluster> m_pxdclusters;
     StoreArray<RecoTrack> m_recoTracks;
-    StoreArray<Tracka> m_tracks;
+    StoreArray<Track> m_tracks;
     StoreArray<ROIid> m_ROIs;
 
     double m_pcut; // pValue-Cut for tracks

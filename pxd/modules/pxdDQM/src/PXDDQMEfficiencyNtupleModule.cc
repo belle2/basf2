@@ -36,7 +36,8 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
 
   // Parameter definitions
   addParam("pxdClustersName", m_pxdClustersName, "name of StoreArray with PXD cluster", std::string(""));
-  addParam("tracksName", m_recoTracksName, "name of StoreArray with RecoTracks", std::string(""));
+  addParam("recoTracksName", m_recoTracksName, "name of StoreArray with RecoTracks", std::string(""));
+  addParam("tracksName", m_tracksName, "name of StoreArray with Tracks", std::string(""));
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", true);
@@ -83,6 +84,7 @@ void PXDDQMEfficiencyNtupleModule::initialize()
   //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them
   m_pxdclusters.isOptional(m_pxdClustersName);
   m_recoTracks.isOptional(m_recoTracksName);
+  m_tracks.isOptional(m_tracksName);
   m_ROIs.isOptional(m_ROIsName);
 }
 
@@ -97,29 +99,30 @@ void PXDDQMEfficiencyNtupleModule::event()
     B2INFO("RecoTrack array is missing, no efficiencies");
     return;
   }
+  if (!m_tracks.isValid()) {
+    B2INFO("Track array is missing, no efficiencies");
+    return;
+  }
 
-  for (auto& a_track : m_recoTracks) {
+  for (auto& track : m_tracks) {
+    RelationVector<RecoTrack> recoTrack = track.getRelationsTo<RecoTrack>(m_recoTracksName);
+    if (!recoTrack.size()) continue;
 
+    auto a_track = recoTrack[0];
     //If fit failed assume position pointed to is useless anyway
-    if (!a_track.wasFitSuccessful()) continue;
+    if (!a_track->wasFitSuccessful()) continue;
 
-    if (a_track.getNumberOfSVDHits() < m_minSVDHits) continue;
+    if (a_track->getNumberOfSVDHits() < m_minSVDHits) continue;
 
-    const genfit::FitStatus* fitstatus = a_track.getTrackFitStatus();
+    const genfit::FitStatus* fitstatus = a_track->getTrackFitStatus();
     if (fitstatus->getPVal() < m_pcut) continue;
 
     genfit::MeasuredStateOnPlane trackstate;
-    trackstate = a_track.getMeasuredStateOnPlaneFromFirstHit();
+    trackstate = a_track->getMeasuredStateOnPlaneFromFirstHit();
     if (trackstate.getMom().Mag() < m_momCut) continue;
     if (trackstate.getMom().Pt() < m_pTCut) continue;
 
-    auto ptr = a_track.getRelated<Track>("Tracks");
-
-    if (!ptr) {
-      B2ERROR("expect a track for fitted recotracks");
-      continue;
-    }
-    auto ptr2 = ptr->getTrackFitResultWithClosestMass(Const::pion);
+    const TrackFitResult* ptr2 = track.getTrackFitResultWithClosestMass(Const::pion);
     if (!ptr2) {
       B2ERROR("expect a track fit result for mass");
       continue;
@@ -138,7 +141,7 @@ void PXDDQMEfficiencyNtupleModule::event()
       //true = track intersects current sensor
       double sigu(-9999);
       double sigv(-9999);
-      TVector3 intersec_buff = getTrackInterSec(info, a_track, isgood, sigu, sigv);
+      TVector3 intersec_buff = getTrackInterSec(info, *a_track, isgood, sigu, sigv);
 
       if (!isgood) {
         continue;//track does not go through this sensor-> nothing to measure anyway
@@ -201,7 +204,7 @@ void PXDDQMEfficiencyNtupleModule::event()
         float fill[22] = {float((int)aVxdID), float(u_fit), float(v_fit), float(trackstate.getMom().Mag()), float(trackstate.getMom().Pt()),
                           float(du_clus), float(dv_clus), float(sigu), float(sigv), float(d_clus),
                           float(fitInsideROI), float(closeToBoarder), float(closeToDead), float(matched),
-                          float(ptr2->getZ0()), float(ptr2->getD0()), float(a_track.getNumberOfSVDHits()),
+                          float(ptr2->getZ0()), float(ptr2->getD0()), float(a_track->getNumberOfSVDHits()),
                           charge, float(trackstate.getMom().Phi()), float(trackstate.getMom().CosTheta())
                          };
         m_tuple->Fill(fill);

@@ -34,6 +34,7 @@
 
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
+#include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
@@ -135,6 +136,10 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("random-seed", prog::value<string>(),
+     "Set the default initial seed for the random number generator. "
+     "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "
+     "If no seed is set via either of these mechanisms, the initial seed will be taken from the system's entropy pool.")
     ("debug_level,d", prog::value<unsigned int>(), "Set default debug level. Also sets the log level to DEBUG.")
     ("events,n", prog::value<unsigned int>(), "Override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("run", prog::value<int>(), "Override run for EventInfoSetter, must be used with -n and --experiment")
@@ -366,6 +371,10 @@ int main(int argc, char* argv[])
 
     if (varMap.count("dump-path")) {
       Environment::Instance().setPicklePath(varMap["dump-path"].as<string>());
+    }
+
+    if (varMap.count("random-seed")) {
+      RandomNumbers::initialize(varMap["random-seed"].as<string>());
     }
 
 

@@ -36,7 +36,7 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
 
   // Parameter definitions
   addParam("pxdClustersName", m_pxdClustersName, "name of StoreArray with PXD cluster", std::string(""));
-  addParam("tracksName", m_tracksName, "name of StoreArray with RecoTracks", std::string(""));
+  addParam("tracksName", m_recoTracksName, "name of StoreArray with RecoTracks", std::string(""));
   addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", true);
@@ -82,7 +82,7 @@ void PXDDQMEfficiencyNtupleModule::initialize()
   //register the required arrays
   //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them
   m_pxdclusters.isOptional(m_pxdClustersName);
-  m_tracks.isOptional(m_tracksName);
+  m_recoTracks.isOptional(m_recoTracksName);
   m_ROIs.isOptional(m_ROIsName);
 }
 
@@ -93,12 +93,12 @@ void PXDDQMEfficiencyNtupleModule::event()
     B2INFO("PXDClusters array is missing, no efficiencies");
     return;
   }
-  if (!m_tracks.isValid()) {
+  if (!m_recoTracks.isValid()) {
     B2INFO("RecoTrack array is missing, no efficiencies");
     return;
   }
 
-  for (auto& a_track : m_tracks) {
+  for (auto& a_track : m_recoTracks) {
 
     //If fit failed assume position pointed to is useless anyway
     if (!a_track.wasFitSuccessful()) continue;

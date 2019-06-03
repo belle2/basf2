@@ -88,11 +88,13 @@ namespace Belle2 {
     VXD::GeoCache& m_vxdGeometry;
 
     std::string m_pxdClustersName;
+    std::string m_recoTracksName;
     std::string m_tracksName;
     std::string m_ROIsName;
 
     StoreArray<PXDCluster> m_pxdclusters;
-    StoreArray<RecoTrack> m_tracks;
+    StoreArray<RecoTrack> m_recoTracks;
+    StoreArray<Tracka> m_tracks;
     StoreArray<ROIid> m_ROIs;
 
     double m_pcut; // pValue-Cut for tracks

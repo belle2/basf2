@@ -13,8 +13,10 @@ def mc_gen_topo(n=200):
         nMCGen (number of MC generated particles in a given event),
         MCGenPDG_i (PDG code of the ith MC generated particle in a given event), i=0, 1, ... n-2, n-1,
         MCGenMothIndex_i (mother index of the ith MC generated particle in a given event), i=0, 1, ... n-2, n-1.
-    Here, nMCGen, MCGenPDG_i and MCGenMothIndex_i are just aliases of nMCParticles, MCGenPDG(i) and MCGenMothIndex(i), respectively.
-    For more details, please refer to the documentation strings of nMCParticles, MCGenPDG(i) and MCGenMothIndex(i).
+    Here, nMCGen, MCGenPDG_i and MCGenMothIndex_i are just aliases of nMCParticles, genParticle(i, varForMCGen(PDG))
+    and genParticle(i, varForMCGen(mcMother(mdstIndex))), respectively.
+    For more details, please refer to the documentation strings of nMCParticles, genParticle, varForMCGen, PDG,
+    mcMother, and mdstIndex.
 
     Note that the function has a parameter that specifies the number of MCGenPDG_i/MCGenMothIndex_i variables.
     To completely examine the topology information of the events in an MC sample,
@@ -29,10 +31,10 @@ def mc_gen_topo(n=200):
         n (int): number of MCGenPDG_i/MCGenMothIndex_i variables.
     """
     list_of_indexes = range(n)
-    wrapper = 'genParticle({variable},varForMCGen(PDG))'
+    wrapper = 'genParticle({variable}, varForMCGen(PDG))'
     prefix = 'MCGenPDG'
     MCGenPDG = create_aliases(list_of_indexes, wrapper, prefix)
-    wrapper = 'genParticle({variable},varForMCGen(mcMother(mdstIndex)))'
+    wrapper = 'genParticle({variable}, varForMCGen(mcMother(mdstIndex)))'
     prefix = 'MCGenMothIndex'
     MCGenMothIndex = create_aliases(list_of_indexes, wrapper, prefix)
     variables.addAlias('nMCGen', 'nMCParticles')

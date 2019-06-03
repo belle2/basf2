@@ -22,8 +22,6 @@ from skimExpertFunctions import *
 
 SLpath = Path()
 
-skimCode = encodeSkimName('SLUntagged')
-
 fileList = ['../SLUntagged.dst.root']
 
 inputMdstList('default', fileList, path=SLpath)
@@ -46,7 +44,7 @@ loadStdDstarPlus(path=SLpath)
 # SL Skim
 from skim.semileptonic import SemileptonicList
 SLList = SemileptonicList(SLpath)
-skimOutputUdst(skimCode, SLList, path=SLpath)
+skimOutputUdst('../SLUntagged', SLList, path=SLpath)
 
 summaryOfLists(SLList, path=SLpath)
 

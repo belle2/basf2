@@ -3,7 +3,7 @@
 
 """
 <header>
-    <input>../feiHadronicBplus.udst.root</input>
+    <input>../feiHadronicB0.udst.root</input>
     <output>feiHadronicB0_Validation.root</output>
     <contact>sophie.hollitt@adelaide.edu.au, philip.grace@adelaide.edu.au</contact>
 </header>
@@ -15,7 +15,7 @@ from variables import variables
 
 path = Path()
 
-inputMdst('default', '../feiHadronicBplus.udst.root', path=path)
+inputMdst('default', '../feiHadronicB0.udst.root', path=path)
 
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
 variables.addAlias('log10_sigProb', 'log10(sigProb)')

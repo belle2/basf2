@@ -42,6 +42,11 @@ void CDCCKFResultStorer::exposeParameters(ModuleParamList* moduleParamList, cons
                                 m_param_trackFindingDirectionAsString,
                                 "Direction in which the track is reconstructed (SVD/ECL seed)",
                                 m_param_trackFindingDirectionAsString);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "exportAllTracks"),
+                                m_param_exportAllTracks,
+                                "Export all tracks, even if they did not reach the center of the CDC",
+                                m_param_exportAllTracks);
 }
 
 void CDCCKFResultStorer::initialize()
@@ -67,7 +72,7 @@ void CDCCKFResultStorer::initialize()
 void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
 {
   for (const CDCCKFResult& result : results) {
-    if (result.size() < 2) {
+    if (result.size() == 1) {
       continue;
     }
 
@@ -78,6 +83,13 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
       trackState = &result.back().getTrackState();
     } else {
       B2ERROR("CDCCKFResultStorer: No valid direction specified. Please use forward/backward.");
+    }
+
+    // only accept paths that reached the center of the CDC
+    if (not m_param_exportAllTracks
+        && m_param_trackFindingDirection == TrackFindingCDC::EForwardBackward::c_Backward
+        && result.back().getWireHit()->getWire().getICLayer() > 2) {
+      continue;
     }
 
     const TVector3& trackPosition = trackState->getPos();

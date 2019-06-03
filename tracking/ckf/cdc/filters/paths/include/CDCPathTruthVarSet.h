@@ -18,7 +18,9 @@ namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const cdcPathTruthVarNames[] = {
+    "mcTrackHits",
     "matched",
+    "daughters",
     "PDG",
     "seed_p_truth",
     "seed_theta_truth",

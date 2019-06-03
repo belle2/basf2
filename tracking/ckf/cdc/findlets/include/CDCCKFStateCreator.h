@@ -61,8 +61,16 @@ namespace Belle2 {
       Super::beginEvent();
       m_wireHitCache.clear();
 
-      //Determine direction of track building
+      // Determine direction of track building
       m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
+
+      if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Forward) {
+        doForward = true;
+      } else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
+        doForward = false;
+      } else {
+        B2WARNING("CDCCKFStateCreator: No valid direction specified. Please use forward/backward.");
+      }
     }
 
     /// Main method of the findlet. Select + create states (output parameter nextStates) suitable for the input path, based on input wireHits
@@ -87,19 +95,16 @@ namespace Belle2 {
       double lastPhi = 0;
       double lastICLayer = -1;
       if (lastState.isSeed()) {
-        if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Forward) {
+        if (doForward) {
           lastICLayer = 0;
-        } else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
-          const TrackFindingCDC::Vector3D seedPos(lastState.getSeed()->getPositionSeed());
-          const float seedPosZ = seedPos.z();
-
-          // get wires
+        } else {
           const auto& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
           const auto& wires = wireTopology.getWires();
+          const float maxForwardZ = wires.back().getForwardZ();     // 157.615
+          const float maxBackwardZ = wires.back().getBackwardZ();   // -72.0916
 
-          // forward/backward wall of CDC
-          const float maxForwardZ = wires.back().getForwardZ();
-          const float maxBackwardZ = wires.back().getBackwardZ();
+          const TrackFindingCDC::Vector3D seedPos(lastState.getSeed()->getPositionSeed());
+          const float seedPosZ = seedPos.z();
 
           if (seedPosZ < maxForwardZ && seedPosZ > maxBackwardZ) {
             lastICLayer = 56;
@@ -124,8 +129,6 @@ namespace Belle2 {
             }
             B2DEBUG(100, lastICLayer << " (d=" << minDist << ")");
           }
-        } else {
-          B2WARNING("CDCCKFStateCreator: No valid direction specified. Please use foward/backward.");
         }
       } else {
         lastPhi = lastState.getWireHit()->getRefPos2D().phi();
@@ -141,8 +144,18 @@ namespace Belle2 {
       }
       std::sort(wireHitsOnPath.begin(), wireHitsOnPath.end());
 
-      for (size_t i = 0; i < wireHits.size(); i++) {
-        const auto iCLayer =  m_wireHitCache[i].icLayer; // wireHit->getWire().getICLayer();
+      size_t nHits = wireHits.size();
+      for (size_t i = 0; i < nHits; i++) {
+        // adjust direction of loop (minimal speed gain)
+        int idx = doForward ? i : nHits - i - 1;
+
+        const TrackFindingCDC::CDCWireHit* wireHit = wireHits[idx];
+
+        if (wireHit->getAutomatonCell().hasBackgroundFlag() || wireHit->getAutomatonCell().hasTakenFlag()) {
+          continue;
+        }
+
+        const auto iCLayer =  m_wireHitCache[idx].icLayer; // wireHit->getWire().getICLayer();
         if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward && lastState.isSeed()) {
           if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump_eclSeed) {
             continue;
@@ -151,15 +164,13 @@ namespace Belle2 {
           continue;
         }
 
-        const TrackFindingCDC::CDCWireHit* wireHit = wireHits[i];
-
         if (std::binary_search(wireHitsOnPath.begin(), wireHitsOnPath.end(), wireHit)) {
           continue;
         }
 
 
         if (! lastState.isSeed()) {
-          double deltaPhi = TrackFindingCDC::AngleUtil::normalised(lastPhi - m_wireHitCache[i].phi);
+          double deltaPhi = TrackFindingCDC::AngleUtil::normalised(lastPhi - m_wireHitCache[idx].phi);
           if (fabs(deltaPhi)  > m_maximalDeltaPhi)  {
             continue;
           }
@@ -180,8 +191,11 @@ namespace Belle2 {
     std::string m_param_writeOutDirectionAsString = "forward";
     /// Direction parameter converted from the string parameters
     TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    /// Direction parameter converted to boolean for convenience
+    bool doForward = true;
 
     /// Cache to store frequently used information
     std::vector<CDCCKFWireHitCache> m_wireHitCache = {};
+
   };
 }

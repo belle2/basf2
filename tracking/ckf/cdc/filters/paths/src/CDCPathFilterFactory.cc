@@ -24,6 +24,8 @@
 #include <tracking/ckf/cdc/filters/paths/CDCPathTruthVarSet.h>
 #include <tracking/ckf/cdc/filters/paths/CDCfromEclPathTruthVarSet.h>
 
+#include <tracking/ckf/cdc/filters/paths/SeedChargeCDCPathFilter.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -60,6 +62,10 @@ std::map<std::string, std::string> CDCPathFilterFactory::getValidFilterNamesAndD
     {"size", "very rough filtering"},
     {"recording", "record variables to a TTree"},
     {"size_and_recording", "record variables to a TTree"},
+    {"recording_fromEcl", "record variables to a TTree"},
+    {"size_and_recording_fromEcl", "record variables to a TTree"},
+    {"seedCharge", "charge of path corresponds to charge of seed"},
+    {"seedCharge_and_recording_fromEcl", "record variables to a TTree"}
     //{"mc_truth", "Extrapolation and update"},
   };
 }
@@ -89,6 +95,14 @@ CDCPathFilterFactory::create(const std::string& filterName) const
              std::make_unique<RecordingCDCfromEclPathFilter>("CDCfromEclPathFilter.root"),
              std::make_unique<SizeCDCPathFilter>()
            );
+  } else if (filterName == "seedCharge") {
+    return std::make_unique<SeedChargeCDCPathFilter>();
+  } else if (filterName == "seedCharge_and_recording_fromEcl") {
+    return std::make_unique<AndCDCPathFilter>(
+             std::make_unique<RecordingCDCfromEclPathFilter>("CDCfromEclPathFilter.root"),
+             std::make_unique<SeedChargeCDCPathFilter>()
+           );
+
   } else {
     return Super::create(filterName);
   }

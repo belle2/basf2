@@ -45,13 +45,18 @@ namespace Belle2 {
 
   private:
     // Findlets
+
     // Parameters
     /// StoreArray name of the input Ecl Shower Store Array
     std::string m_param_inputEclShowerStoreArrayName = "ECLShowers";
     /// StoreArray name of the output Track Store Array.
     std::string m_param_eclSeedRecoTrackStoreArrayName = "EclSeedRecoTracks";
     /// Minimal pt requirement
-    double m_param_minimalEnRequirement = 0.0;
+    double m_param_minimalEnRequirement = 0.3;
+    // Define region (phi) around seed so that additional ECLShowers are ignored (likely from Bremsstrahlung)
+    double m_param_seedDeadRegionPhi = -2.0; // negative: accept all
+    // Define region (theta) around seed so that additional ECLShowers are ignored (likely from Bremsstrahlung)
+    double m_param_seedDeadRegionTheta = -0.1; // negative: accept all
 
 
     // Store Arrays

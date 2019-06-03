@@ -39,11 +39,25 @@ bool CDCPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
     seedMCParticle = seedEclShower->getRelated<MCParticle>();
   }
 
+  int daughters = 0;
+  std::vector<MCParticle*> daughterMCParticles;
+  if (seedMCParticle->getNDaughters() > 0) {
+    daughterMCParticles = seedMCParticle->getDaughters();
+
+    while (daughterMCParticles.size() == 1) {
+      daughterMCParticles = daughterMCParticles.at(0)->getDaughters();
+    }
+    if (daughterMCParticles.size() > 1) {
+      daughters = daughterMCParticles.size();
+    }
+  }
+
   while (seedMCParticle->getMother()) {
     seedMCParticle = seedMCParticle->getMother();
   }
 
   int matched = 0;
+  int mcTrackHits = 0;
   /*
     for (auto const& state : *path) {
       if (state.isSeed()) {
@@ -61,12 +75,18 @@ bool CDCPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
     }
   */
 
+  if (seedMCTrack) {
+    mcTrackHits = seedMCTrack->getNumberOfCDCHits();
+  }
+  var<named("mcTrackHits")>() = mcTrackHits;
+
   var<named("matched")>() = matched;
+  var<named("daughters")>() = daughters;
   var<named("PDG")>() = seedMCParticle->getPDG();
 
   auto seedMom = seedMCParticle->getMomentum();
   var<named("seed_p_truth")>() = seedMom.Mag();
-  var<named("seed_theta_truth")>() = seedMom.Theta() * 180 / M_PI;
+  var<named("seed_theta_truth")>() = seedMom.Theta() * 180. / M_PI;
   var<named("seed_pt_truth")>() = seedMom.Perp();
   var<named("seed_pz_truth")>() = seedMom.Z();
   var<named("seed_px_truth")>() = seedMom.X();

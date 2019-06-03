@@ -77,6 +77,8 @@ std::map<std::string, std::string> CDCStateFilterFactory::getValidFilterNamesAnd
     {"recording_eclSeed", "record variables to a TTree"},
     {"rough_and_recording", "very rough filtering, seed created from SVD track"},
     {"rough_and_recording_eclSeed", "very rough filtering, seed created from ECL shower"},
+    {"distance_and_recording_eclSeed", "Give a weight based on the distance"},
+
   };
 }
 
@@ -103,15 +105,20 @@ CDCStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<RecordingCDCStateFilter>("CDCStateFilter.root");
   } else if (filterName == "rough_and_recording") {
     return std::make_unique<AndCDCStateFilter>(
-             std::make_unique<RoughCDCStateFilter>(),
-             std::make_unique<RecordingCDCStateFilter>("CDCStateFilter.root")
+             std::make_unique<RecordingCDCStateFilter>("CDCStateFilter.root"),
+             std::make_unique<RoughCDCStateFilter>()
            );
   } else if (filterName == "recording_eclSeed") {
     return std::make_unique<RecordingCDCfromEclStateFilter>("CDCfromECLStateFilter.root");
   } else if (filterName == "rough_and_recording_eclSeed") {
     return std::make_unique<AndCDCStateFilter>(
-             std::make_unique<RoughCDCfromEclStateFilter>(),
-             std::make_unique<RecordingCDCfromEclStateFilter>("CDCfromECLStateFilter.root")
+             std::make_unique<RecordingCDCfromEclStateFilter>("CDCfromECLStateFilter.root"),
+             std::make_unique<RoughCDCfromEclStateFilter>()
+           );
+  } else if (filterName == "distance_and_recording_eclSeed") {
+    return std::make_unique<AndCDCStateFilter>(
+             std::make_unique<RecordingCDCfromEclStateFilter>("CDCfromECLStateFilter.root"),
+             std::make_unique<DistanceCDCStateFilter>()
            );
   } else {
     return Super::create(filterName);

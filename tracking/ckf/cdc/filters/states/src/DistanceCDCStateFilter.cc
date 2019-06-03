@@ -31,14 +31,6 @@ TrackFindingCDC::Weight DistanceCDCStateFilter::operator()(const BaseCDCStateFil
   if (dist > m_maximalDistance) {
     return NAN;
   }
-  /*
-    // TEST!!!
-    const CDCCKFPath* path = pair.first;
-    const CDCCKFState& lastState = path->back();
-    if (state.getTrackState().getCharge() != lastState.getTrackState().getCharge()) {
-      return NAN;
-    }
-    // END TEST
-  */
+
   return 1 / dist;
 }

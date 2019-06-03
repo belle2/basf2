@@ -74,5 +74,13 @@ bool CDCfromEclStateTruthVarSet::extract(const BaseCDCStateFilter::Object* pair)
   var<named("match")>() = seedMCParticle == hitMCParticle ? true : false;
   var<named("PDG")>() = seedMCParticle->getPDG();
 
+  auto seedMom = seedMCParticle->getMomentum();
+  var<named("seed_p_truth")>() = seedMom.Mag();
+  var<named("seed_theta_truth")>() = seedMom.Theta() * 180. / M_PI;
+  var<named("seed_pt_truth")>() = seedMom.Perp();
+  var<named("seed_pz_truth")>() = seedMom.Z();
+  var<named("seed_px_truth")>() = seedMom.X();
+  var<named("seed_py_truth")>() = seedMom.Y();
+
   return true;
 }

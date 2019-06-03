@@ -15,11 +15,17 @@
 #include <tracking/ckf/cdc/findlets/StackTreeSearcher.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFResultFinalizer.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFResultStorer.h>
+#include <tracking/ckf/cdc/findlets/CDCCKFDuplicateRemover.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <framework/dataobjects/EventMetaData.h> // FOR TESTING
+
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h> // FOR TESTING
+#include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h> // FOR TESTING
 
 #include <vector>
 
@@ -59,6 +65,11 @@ namespace Belle2 {
     CDCCKFResultFinalizer m_resultFinalizer;
     /// Result Storer
     CDCCKFResultStorer m_resultStorer;
+    /// Showers from Bremsstrahlung might lead to duplicate tracks
+    CDCCKFDuplicateRemover m_duplicateRemover;
+
+    /// FOR TESTING
+    TrackFindingCDC::ChooseableFilter<CDCPathFilterFactory> m_finalFilter;
 
     // Object pools
     /// Current list of paths
@@ -67,5 +78,7 @@ namespace Belle2 {
     std::vector<CDCCKFPath> m_seeds;
     /// Current list of results
     std::vector<CDCCKFResult> m_results;
+
+    StoreObjPtr<EventMetaData> m_eventMetaData; // FOR TESTING
   };
 }

@@ -61,6 +61,7 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
                 name=self.name,
                 contact=self.contact,
                 output_file_name=self.output_file_name,
+                expert_level=200
                 )
         else:
             # Validation module generating plots

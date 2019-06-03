@@ -29,7 +29,7 @@ TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStat
   if (!lastState.isSeed() and (arcLength >= 0 or arcLength < -20)) {
     return NAN;
   }
-  if (lastState.isSeed() and (arcLength >= 0 or arcLength < -150)) {
+  if (lastState.isSeed() and (arcLength >= 0 or arcLength < -75)) {
     return NAN;
   }
 

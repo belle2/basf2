@@ -28,10 +28,17 @@ namespace Belle2 {
 
     /**
      * Returns function which returns the value of the given variable for the given particle if its abs(pdgCode) agrees with the given one
-     * First argument in the argument vector must be the name of variable.
-     * Second argument in the argument vector must be an integers corresponding to a PDG code.
+     * First argument in the argument vector must be an integer corresponding to a PDG code.
+     * Second argument in the argument vector must be the name of an variable.
      */
     Manager::FunctionPtr varFor(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the value of the given variable for the MC particle related to the given particle if it is primary, not virtual, and not initial.
+     * If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.
+     * Only one argument is allowed in the argument vector and it must be the name of an variable.
+     */
+    Manager::FunctionPtr varForMCGen(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the number of particles in the given particle List.
@@ -235,7 +242,7 @@ namespace Belle2 {
      * Returns function which returns the variable for the Monte Carlo mother of the given particle.
      * The argument of the function must be a valid variable name.
      * If the particle is not matched with a Monte Carlo particle, or does not have a Monte Carlo
-     * mother, -999 will be returned.
+     * mother, NaN will be returned.
      */
     Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments);
 
@@ -244,7 +251,7 @@ namespace Belle2 {
      * The arguments of the function must be
      *     argument 1: Index of the particle in the MCParticle Array
      *     argument 2: Valid basf2 function name of the function that shall be evaluated.
-     * If the provided index goes beyond the length of the mcParticles array, -999 will be returned.
+     * If the provided index goes beyond the length of the mcParticles array, NaN will be returned.
      */
     Manager::FunctionPtr genParticle(const std::vector<std::string>& arguments);
 

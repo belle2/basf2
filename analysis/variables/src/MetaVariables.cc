@@ -356,6 +356,27 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr varForMCGen(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+
+          if (particle -> getMCParticle())
+          {
+            if (particle -> getMCParticle() -> getStatus(MCParticle::c_PrimaryParticle)
+            && (! particle -> getMCParticle() -> getStatus(MCParticle::c_IsVirtual))
+            && (! particle -> getMCParticle() -> getStatus(MCParticle::c_Initial))) {
+              return var -> function(particle);
+            } else return std::numeric_limits<float>::quiet_NaN();
+          } else return std::numeric_limits<float>::quiet_NaN();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function varForMCGen");
+      }
+    }
+
     Manager::FunctionPtr nParticlesInList(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1178,16 +1199,16 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
             if (particle->getMCParticle()->getMother() == nullptr) {
-              return -999;
+              return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getMother());
             return var->function(&tempParticle);
           } else {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
         };
         return func;
@@ -1212,7 +1233,7 @@ endloop:
           StoreArray<MCParticle> mcParticles("MCParticles");
           if (particleNumber >= mcParticles.getEntries())
           {
-            return -999;
+            return std::numeric_limits<float>::quiet_NaN();
           }
 
           MCParticle* mcParticle = mcParticles[particleNumber];
@@ -1710,6 +1731,10 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
+    REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
+                      "Returns the value of the variable for the MC particle related to the given particle if it is primary, not virtual, and not initial.\n"
+                      "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
+                      "E.g. varForMCGen(PDG) returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "Returns number of particles in the given particle List.");
     REGISTER_VARIABLE("isInList(particleListName)", isInList,
@@ -1732,7 +1757,7 @@ arguments. Operator precedence is taken into account. For example ::
                       "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).")
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
-                      "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
+                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
@@ -1742,7 +1767,7 @@ arguments. Operator precedence is taken into account. For example ::
                       "The arguments of the function must be:\n"
                       "    argument 1: Index of the particle in the MCParticle Array\n"
                       "    argument 2: Valid basf2 variable name of the function that shall be evaluated.\n"
-                      "If the provided index goes beyond the length of the mcParticles array, -999 will be returned."
+                      "If the provided index goes beyond the length of the mcParticles array, NaN will be returned."
                       "E.g. genParticle(0, p) returns the total momentum of the first MC Particle, which is "
                       "the Upsilon(4S) in a generic decay.\n"
                       "     genParticle(0, mcDaughter(1, p) returns the total momentum of the second daughter of "

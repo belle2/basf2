@@ -84,7 +84,7 @@ namespace Belle2 {
     /** Switch to skip events without unpacked TS */
     bool m_skipWithoutHWTS;
     /** Select only RecoTracks with a maximum z distance to the IP. -1 for all tracks */
-    float m_maxRecoZDist;
+    double m_maxRecoZDist;
 
     /** Name for simulated TS hits */
     std::string m_simSegmentHitsName;

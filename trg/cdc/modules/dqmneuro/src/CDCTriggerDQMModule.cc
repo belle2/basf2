@@ -72,7 +72,7 @@ CDCTriggerDQMModule::CDCTriggerDQMModule() : HistoModule()
            true);
   addParam("maxRecoZDist", m_maxRecoZDist,
            "Select only RecoTracks with a maximum z distance to the IP. -1.0 for all tracks",
-           (float)(- 1.0));
+           (double)(- 1.0));
 }
 
 
@@ -395,7 +395,7 @@ void CDCTriggerDQMModule::defineHisto()
 
   m_neuroHWSelTSID = new TH1F("NeuroHWSelTSID", "ID of selected track segments",
                               2336, 0, 2335);
-  m_neuroHWSelTSCount = new TH1F("NeuroHWSelTSCount", "number of selected TS per SL", 9, 0, 8);
+  m_neuroHWSelTSCount = new TH1F("NeuroHWSelTSCount", "number of selected TS per SL; sl", 9, 0, 9);
   m_neuroHWSelTSPrioT_Layer0 = new TH1F("NeuroHWSelTSPrioT_Layer0", "Priority time of track segments in layer 0",
                                         512, 0, 511);
   m_neuroHWSelTSPrioT_Layer1 = new TH1F("NeuroHWSelTSPrioT_Layer1", "Priority time of track segments in layer 1",
@@ -535,7 +535,7 @@ void CDCTriggerDQMModule::defineHisto()
     // hw TS selected by sw NN
     m_neuroSWSelTSID = new TH1F("NeuroSWSelTSID", "ID of selected track segments",
                                 2336, 0, 2335);
-    m_neuroSWSelTSCount = new TH1F("NeuroSWSelTSCount", "number of selected TS per SL", 9, 0, 8);
+    m_neuroSWSelTSCount = new TH1F("NeuroSWSelTSCount", "number of selected TS per SL; sl", 9, 0, 9);
     m_neuroSWSelTSPrioT_Layer0 = new TH1F("NeuroSWSelTSPrioT_Layer0", "Priority time of track segments in layer 0",
                                           512, 0, 511);
     m_neuroSWSelTSPrioT_Layer1 = new TH1F("NeuroSWSelTSPrioT_Layer1", "Priority time of track segments in layer 1",
@@ -628,7 +628,7 @@ void CDCTriggerDQMModule::defineHisto()
     // sw TS incoming
     m_neuroSWTSSW2DInTSID = new TH1F("NeuroSWTSSW2DInTSID", "ID of simulated track segments",
                                      2336, 0, 2335);
-    m_neuroSWTSSW2DInTSCount = new TH1F("NeuroSWTSSW2DInTSCount", "number of simulated TS per event", 200, 0, 200);
+    m_neuroSWTSSW2DInTSCount = new TH1F("NeuroSWTSSW2DInTSCount", "number of simulated TS per event", 200, 0, 800);
     m_neuroSWTSSW2DInTSPrioT_Layer0 = new TH1F("NeuroSWTSSW2DInTSPrioT_Layer0", "Priority time of track segments in layer 0",
                                                512, 0, 511);
     m_neuroSWTSSW2DInTSPrioT_Layer1 = new TH1F("NeuroSWTSSW2DInTSPrioT_Layer1", "Priority time of track segments in layer 1",
@@ -719,7 +719,7 @@ void CDCTriggerDQMModule::defineHisto()
     // sw TS selected
     m_neuroSWTSSW2DSelTSID = new TH1F("NeuroSWTSSW2DSelTSID", "ID of selected track segments",
                                       2336, 0, 2335);
-    m_neuroSWTSSW2DSelTSCount = new TH1F("NeuroSWTSSW2DSelTSCount", "number of selected TS per SL", 9, 0, 8);
+    m_neuroSWTSSW2DSelTSCount = new TH1F("NeuroSWTSSW2DSelTSCount", "number of selected TS per SL; sl", 9, 0, 9);
     m_neuroSWTSSW2DSelTSPrioT_Layer0 = new TH1F("NeuroSWTSSW2DSelTSPrioT_Layer0", "Priority time of track segments in layer 0",
                                                 512, 0, 511);
     m_neuroSWTSSW2DSelTSPrioT_Layer1 = new TH1F("NeuroSWTSSW2DSelTSPrioT_Layer1", "Priority time of track segments in layer 1",
@@ -1682,10 +1682,10 @@ void CDCTriggerDQMModule::event()
     m_RecoTrackCount->Fill(m_RecoTracks.getEntries());
     bool foundValidRep = false;
     for (RecoTrack& recoTrack : m_RecoTracks) {
-      float phi0Target = 0;
-      float invptTarget = 0;
-      float cosThetaTarget = 0;
-      float zTarget = 0;
+      double phi0Target = 0;
+      double invptTarget = 0;
+      double cosThetaTarget = 0;
+      double zTarget = 0;
       for (genfit::AbsTrackRep* rep : recoTrack.getRepresentations()) {
         if (!recoTrack.wasFitSuccessful(rep))
           continue;
@@ -2283,10 +2283,9 @@ void CDCTriggerDQMModule::event()
                   iTS -= nwires;
                 }
               }
-              int tsIDInTracker = iTS;
-              if (iTS > nwires / 2) {
-                tsIDInTracker -= (nwires / 2);
-              }
+              int tsIDInTracker = iTS - nwires * xhit.getQuadrant() / 4;
+              if (tsIDInTracker < 0)
+                tsIDInTracker += nwires;
               cout << ", " << setw(5) << tsIDInTracker << ")" << endl;
             }
             cout << "All TS NN   (SL, quadrant, segment id, relative id in SL,  priority position, left right, priority time, found time, raw Tracker ID)"
@@ -2305,10 +2304,9 @@ void CDCTriggerDQMModule::event()
                   iTS -= nwires;
                 }
               }
-              int tsIDInTracker = iTS;
-              if (iTS > nwires / 2) {
-                tsIDInTracker -= (nwires / 2);
-              }
+              int tsIDInTracker = iTS - nwires * xhit.getQuadrant() / 4;
+              if (tsIDInTracker < 0)
+                tsIDInTracker += nwires;
               cout << ", " << setw(5) << tsIDInTracker << ")" << endl;
             }
             cout << "Selected TS (SL, quadrant, segment id, relative id in SL,  priority position, left right, priority time, found time, raw Tracker ID)"
@@ -2329,10 +2327,9 @@ void CDCTriggerDQMModule::event()
                   iTS -= nwires;
                 }
               }
-              int tsIDInTracker = iTS;
-              if (iTS > nwires / 2) {
-                tsIDInTracker -= (nwires / 2);
-              }
+              int tsIDInTracker = iTS - nwires * xhit.getQuadrant() / 4;
+              if (tsIDInTracker < 0)
+                tsIDInTracker += nwires;
               cout << ", " << setw(5) << tsIDInTracker << ")" << endl;
             }
             cout << "Unpacked sector " << unpackedSector << ", sim sector " << simSector << endl;

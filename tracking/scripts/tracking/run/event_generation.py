@@ -24,16 +24,28 @@ def get_logger():
 ################################################
 
 class ReadOrGenerateEventsRun(MinimalRun):
+    """Read generated events or generate new events"""
+
+    #: Description of the run setup to be displayed on command line
     description = "Simulate events using various generator and detector setups from command line."
+
     # Declarative section which can be redefined in a subclass
+
+    #: By default, do not generate events
     generator_module = None
+    #: By default, use the default detector setup
     detector_setup = "Default"
+    #: By default, no background overlay
     bkg_files = []
+    #: By default, do specific components
     components = None
+    #: By default, do not disable delta-ray generation
     disable_deltas = False
+    #: By default, do no store the simulation output
     simulation_output = None
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
         argument_parser = super().create_argument_parser(**kwds)
 
         setup_argument_group = argument_parser.add_argument_group("Detector setup arguments")
@@ -100,12 +112,14 @@ class ReadOrGenerateEventsRun(MinimalRun):
         return argument_parser
 
     def configure(self, arguments):
+        """Configure for basf2 job; disable ROOT input if simulating events"""
         super().configure(arguments)
         if self.simulation_output:
             get_logger().info("Requested to simulation run. Deactivate input file")
             self.root_input_file = None
 
     def execute(self):
+        """Run the basf2 job"""
         if not self.simulation_output:
             super().execute()
             return
@@ -115,6 +129,7 @@ class ReadOrGenerateEventsRun(MinimalRun):
         self.run(path)
 
     def create_path(self):
+        """Create and configure the basf2 path"""
         path = super().create_path()
 
         # Gearbox & Geometry must always be registered
@@ -170,6 +185,8 @@ class ReadOrGenerateEventsRun(MinimalRun):
 
 
 class StandardEventGenerationRun(ReadOrGenerateEventsRun):
+    """Generate events using the EvtGen generator"""
+    #: Use EvtGen for the event generator
     generator_module = "EvtGenInput"
 
 

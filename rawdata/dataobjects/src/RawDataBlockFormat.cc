@@ -11,8 +11,6 @@
 using namespace std;
 using namespace Belle2;
 
-
-
 RawDataBlockFormat::RawDataBlockFormat()
 {
   m_nwords = 0;
@@ -22,7 +20,6 @@ RawDataBlockFormat::RawDataBlockFormat()
   m_num_events = 0;
 }
 
-
 RawDataBlockFormat::~RawDataBlockFormat()
 {
   if (!m_use_prealloc_buf && m_buffer != NULL) {
@@ -30,25 +27,22 @@ RawDataBlockFormat::~RawDataBlockFormat()
   }
 }
 
-
-
-
 int RawDataBlockFormat::GetBufferPos(int n)
 {
   if (m_buffer == NULL || m_nwords <= 0) {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] RawPacket buffer(%p) is not available or length(%d) is not set.\n %s %s %d\n",
             m_buffer, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf);
-    string err_str = err_buf;     throw (err_str);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   if (n >= (m_num_events * m_num_nodes)) {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] Invalid COPPER block No. (%d : max %d ) is specified. Exiting... \n %s %s %d\n",
             n, (m_num_events * m_num_nodes), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf);
-    string err_str = err_buf;     throw (err_str);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   int pos_nwords = 0;
@@ -59,7 +53,7 @@ int RawDataBlockFormat::GetBufferPos(int n)
               "[FATAL] ERROR_EVENT : length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...",
               m_buffer[ pos_nwords ]);
       printf("%s", err_buf);
-      string err_str = err_buf;     throw (err_str);
+      B2FATAL(err_buf);
     } else {
       pos_nwords +=      m_buffer[ pos_nwords ];
     }
@@ -67,9 +61,8 @@ int RawDataBlockFormat::GetBufferPos(int n)
       char err_buf[500];
       sprintf(err_buf, "[FATAL] ERROR_EVENT : value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printf("%s", err_buf);
-      string err_str = err_buf;     throw (err_str);
-      //      exit(1);
+      printf("%s", err_buf); fflush(stdout);
+      B2FATAL(err_buf); // to reduce multiple error messages
     }
   }
   return pos_nwords;
@@ -137,14 +130,12 @@ int* RawDataBlockFormat::GetBuffer(int n)
 
 void RawDataBlockFormat::SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes)
 {
-//   if (delete_flag  == 1) {
-//     printf("RawCOPPER format class does not delete m_buffer. Please specify 0 for delete_flag. Exiting...\n");
-//     exit(1);
-//   }
 
   if (bufin == NULL) {
-    printf("[DEBUG] bufin is NULL. Exting...\n");
-    exit(1);
+    char err_buf[500];
+    sprintf(err_buf, "[DEBUG] bufin is NULL. Exting...\n");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;

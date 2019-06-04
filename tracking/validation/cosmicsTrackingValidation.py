@@ -35,7 +35,7 @@ class Cosmics(TrackingValidationRun):
     generator_module = 'Cosmics'
     #: the input file on which the validation is performed
     root_input_file = '../CosmicsSimNoBkg.root'
-    #: detector components used for the validation
+    #: use full detector for validation
     components = None
     #: finder module: sets up the track finder used in this validation
     finder_module = staticmethod(add_cr_tracking_reconstruction)

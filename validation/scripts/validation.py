@@ -1327,7 +1327,7 @@ def execute(tag=None, is_test=None):
 
     # If there is no release of basf2 set up, we can stop the execution
     # right here!
-    if os.environ.get('BELLE2_RELEASE', None) is None:
+    if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
     # Otherwise we can start the execution. The mainpart is wrapped in a

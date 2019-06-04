@@ -37,6 +37,9 @@ namespace Belle2 {
   class SVDOnlineToOfflineMap {
   public:
 
+    /** Setter for suppression factor given by the Unpacker */
+    void setErrorRate(int errorRate) {m_errorRate = errorRate;}
+
     /** Class to hold FADC+APV25 numbers */
     class ChipID {
     public:
@@ -256,7 +259,11 @@ namespace Belle2 {
     std::unordered_map< ChipID::baseType, SensorInfo > m_sensors; /**<mao for chip ID to VxdID*/
     std::unordered_map< SensorID::baseType, std::vector<ChipInfo> > m_chips; /**< needed for the packer, map of VxdID to chips*/
 
+    /** Counter of the BadMapping errors*/
+    unsigned int nBadMappingErrors = 0;
 
+    /** The suppression factor of BadMapping ERRORs messages to be shown */
+    int m_errorRate;
 
     /** add chipN on FADCn to the map
      */

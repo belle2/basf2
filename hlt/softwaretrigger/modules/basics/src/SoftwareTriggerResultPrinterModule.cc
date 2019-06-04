@@ -56,11 +56,28 @@ void SoftwareTriggerResultPrinterModule::terminate()
     const double passedEvents = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_accept]);
     const double rejectedEvents = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
 
-    B2RESULT("\t" << std::setw(50) << cutName.substr(0, 50) << "\t"
+    std::string printName = cutName;
+    boost::replace_all(printName, "software_trigger_cut&", "");
+
+    B2RESULT("\t" << std::setw(50) << printName.substr(0, 50) << "\t"
              << std::setw(8) << passedEvents << "/" << std::setw(8) << m_numberOfEvents << " (" <<
              std::setw(8) << std::setprecision(6) << 100 * passedEvents / m_numberOfEvents << " %)" << "\t"
              << std::setw(8) << rejectedEvents << "/" << std::setw(8) << m_numberOfEvents << " (" <<
              std::setw(8) << std::setprecision(6) << 100 * rejectedEvents / m_numberOfEvents << " %)" << "\t");
+
+    if (m_passedEventsPerTriggerNonPrescaled.find(cutName) != m_passedEventsPerTriggerNonPrescaled.end()) {
+      auto cutResultNoPre = m_passedEventsPerTriggerNonPrescaled[cutName];
+      const double passedEventsNoPre = static_cast<double>(cutResultNoPre[SoftwareTriggerCutResult::c_accept]);
+      const double rejectedEventsNoPre = static_cast<double>(cutResultNoPre[SoftwareTriggerCutResult::c_reject]);
+
+      const std::string& cutNameNoPre = "not prescaled: " + printName;
+
+      B2RESULT("\t" << std::setw(50) << cutNameNoPre.substr(0, 50) << "\t"
+               << std::setw(8) << passedEventsNoPre << "/" << std::setw(8) << m_numberOfEvents << " (" <<
+               std::setw(8) << std::setprecision(6) << 100 * passedEventsNoPre / m_numberOfEvents << " %)" << "\t"
+               << std::setw(8) << rejectedEventsNoPre << "/" << std::setw(8) << m_numberOfEvents << " (" <<
+               std::setw(8) << std::setprecision(6) << 100 * rejectedEventsNoPre / m_numberOfEvents << " %)" << "\t");
+    }
   }
 
   if (m_param_storeResultsToDisk) {
@@ -113,8 +130,10 @@ void SoftwareTriggerResultPrinterModule::event()
 {
   m_numberOfEvents++;
 
-  for (const auto& triggerResult : m_resultStoreObjectPointer->getResults()) {
-    m_passedEventsPerTrigger[triggerResult.first][static_cast<SoftwareTriggerCutResult >(triggerResult.second)]++;
+  for (const auto& triggerResult : m_resultStoreObjectPointer->getResultPairs()) {
+    auto cutResults = triggerResult.second;
+    m_passedEventsPerTrigger[triggerResult.first][static_cast<SoftwareTriggerCutResult >(cutResults.first)]++;
+    m_passedEventsPerTriggerNonPrescaled[triggerResult.first][static_cast<SoftwareTriggerCutResult >(cutResults.second)]++;
   }
 
   const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);

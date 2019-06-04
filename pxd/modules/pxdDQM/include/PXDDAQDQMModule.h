@@ -36,14 +36,6 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDDAQDQMModule();
 
-      // virtual ~PXDDAQDQMModule();
-
-      virtual void initialize() override;
-
-      virtual void beginRun() override;
-
-      virtual void event() override;
-
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
@@ -70,7 +62,13 @@ namespace Belle2 {
       std::map<VxdID, TH1F*> hDAQCM2;/** Common Mode per DHE to gate and DHP level */
       std::map<int, TH1F*> hDAQDHCReduction;/** DHC data reduction  */
 
-      virtual void defineHisto() override;
+      void initialize() override final;
+
+      void beginRun() override final;
+
+      void event() override final;
+
+      void defineHisto() override final;
 
       std::vector<std::string> err;
 

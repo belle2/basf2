@@ -17,8 +17,10 @@
 #include <string>
 
 namespace Belle2 {
+  /// Class to iteratively extract the event t0 using the drift-length approach
   class IterativeDriftLengthBasedEventTimeExtractor : public IterativeEventTimeExtractor<DriftLengthBasedEventTimeExtractor> {
   private:
+    /// Type of the base class
     using Super = IterativeEventTimeExtractor<DriftLengthBasedEventTimeExtractor>;
 
   public:

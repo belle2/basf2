@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -54,6 +54,32 @@ namespace Belle2 {
      * given particle Lists.
      */
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the the variable for the closest
+     * particle in the provided particle list
+     */
+    Manager::FunctionPtr closestInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the angle to the closest particle
+     * in the provided particle list. See also closestInList.
+     */
+    Manager::FunctionPtr angleToClosestInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the the variable for the most
+     * back-to-back (closest to 180 degrees) particle in the provided particle list
+     */
+    Manager::FunctionPtr mostB2BInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the angle to the most back-to-back
+     * (closest to 180 degrees) particle in the provided particle list.
+     * See also mostB2BInList.
+     */
+    Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
+
 
     /**
      * Returns function which returns the product of a variable over all daughters of the given particle
@@ -334,5 +360,15 @@ namespace Belle2 {
     * Returns function which returns if at least one track is related to the cluster of the particle and this track satisfies the given condition.
     */
     Manager::FunctionPtr eclClusterTrackMatchedWithCondition(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the arithmetic mean of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr averageValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the median value of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments);
   }
 }

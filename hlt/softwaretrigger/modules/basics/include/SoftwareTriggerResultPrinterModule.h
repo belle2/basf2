@@ -60,6 +60,8 @@ namespace Belle2 {
       std::unique_ptr<TTree> m_debugTTree;
       /// Internal map of summed results
       std::map<std::string, std::map<SoftwareTriggerCutResult, unsigned int>> m_passedEventsPerTrigger;
+      /// Internal map of summed results
+      std::map<std::string, std::map<SoftwareTriggerCutResult, unsigned int>> m_passedEventsPerTriggerNonPrescaled;
       /// Internal counter for the number of seen events
       unsigned int m_numberOfEvents = 0;
     };

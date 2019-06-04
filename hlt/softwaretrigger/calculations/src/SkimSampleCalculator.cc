@@ -11,6 +11,7 @@
 #include <hlt/softwaretrigger/calculations/utilities.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <numeric>
 #include <iostream>
@@ -334,4 +335,74 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // Monopole searches
   calculationResult["nMplTracks"] = m_monopoleRecoTracks.getEntries();
+
+
+
+  // new addition of radee skim
+  double Radee = 0.;
+  int chargep1 = -10, chargep2 = -10;
+  if (m_pionParticles->getListSize() == 2) {
+    //------------First track variables----------------
+    for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
+      Particle* part1 = m_pionParticles->getParticle(i);
+      chargep1 = part1->getCharge();
+      const double& momentum1 = part1->getMomentumMagnitude();
+
+      const ECLCluster* eclTrack1 = part1->getECLCluster();
+      if (eclTrack1) {
+        const double& energyOverMomentum1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum1;
+        if (energyOverMomentum1 > 0.8 && energyOverMomentum1 < 1.2 && abs(chargep1) == 1) {
+
+          const Track* track1 = part1->getTrack();
+          if (track1) {
+
+            const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
+            if (trackFit1 && trackFit1->getHitPatternCDC().getNHits() > 0) {
+
+              const CDCDedxTrack* dedxTrack1 = track1->getRelatedTo<CDCDedxTrack>();
+              if (dedxTrack1) {
+                double P1_dedxnosat = dedxTrack1->getDedxNoSat();
+
+                // ------------Second track variables----------------
+                for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
+                  Particle* part2 = m_pionParticles->getParticle(j);
+                  chargep2 = part2->getCharge();
+                  const double& momentum2 = part2->getMomentumMagnitude();
+
+                  const ECLCluster* eclTrack2 = part2->getECLCluster();
+                  if (eclTrack2) {
+                    if (eclTrack2 && eclTrack2->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+                      const double& energyOverMomentum2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum2;
+                      if (energyOverMomentum2 > 0.8 && energyOverMomentum2 < 1.2 && abs(chargep2) == 1) {
+
+                        const Track* track2 = part2->getTrack();
+                        if (track2) {
+
+                          const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
+                          if (trackFit2 && trackFit2->getHitPatternCDC().getNHits() > 0) {
+
+                            CDCDedxTrack* dedxTrack2 = track2->getRelatedTo<CDCDedxTrack>();
+                            if (dedxTrack2) {
+                              double P2_dedxnosat = dedxTrack2->getDedxNoSat();
+                              if ((P1_dedxnosat > 0.8 && P1_dedxnosat < 1.2)  || (P2_dedxnosat > 0.8 && P2_dedxnosat < 1.2)) {
+                                if (chargep1 + chargep2 == 0) {
+                                  Radee = 1;
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  calculationResult["Radee"] = Radee;
+
 }

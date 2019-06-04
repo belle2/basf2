@@ -42,6 +42,8 @@ namespace Belle2 {
 
       std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
+      /** Cuts parameter fore each module */
+      std::vector <std::vector <int>> m_nrHitsCut;
 
       /** Input array for PXD Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;

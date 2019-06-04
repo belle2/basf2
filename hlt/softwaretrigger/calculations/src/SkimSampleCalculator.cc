@@ -338,7 +338,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
 
 
-  // new addition of radee skim
+  // Radiative Bhabha skim (radee) for CDC dE/dx calib studies
   double Radee = 0.;
   int chargep1 = -10, chargep2 = -10;
   if (m_pionParticles->getListSize() == 2) {
@@ -349,7 +349,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const double& momentum1 = part1->getMomentumMagnitude();
 
       const ECLCluster* eclTrack1 = part1->getECLCluster();
-      if (eclTrack1) {
+      if (eclTrack1 && eclTrack1->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         const double& energyOverMomentum1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum1;
         if (energyOverMomentum1 > 0.8 && energyOverMomentum1 < 1.2 && abs(chargep1) == 1) {
 
@@ -367,13 +367,13 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
                 for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
                   Particle* part2 = m_pionParticles->getParticle(j);
                   chargep2 = part2->getCharge();
-                  const double& momentum2 = part2->getMomentumMagnitude();
+                  if (abs(chargep2) == 1 && (chargep1 + chargep2 == 0)) {
+                    const double& momentum2 = part2->getMomentumMagnitude();
 
-                  const ECLCluster* eclTrack2 = part2->getECLCluster();
-                  if (eclTrack2) {
+                    const ECLCluster* eclTrack2 = part2->getECLCluster();
                     if (eclTrack2 && eclTrack2->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
                       const double& energyOverMomentum2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum2;
-                      if (energyOverMomentum2 > 0.8 && energyOverMomentum2 < 1.2 && abs(chargep2) == 1) {
+                      if (energyOverMomentum2 > 0.8 && energyOverMomentum2 < 1.2) {
 
                         const Track* track2 = part2->getTrack();
                         if (track2) {
@@ -385,9 +385,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
                             if (dedxTrack2) {
                               double P2_dedxnosat = dedxTrack2->getDedxNoSat();
                               if ((P1_dedxnosat > 0.8 && P1_dedxnosat < 1.2)  || (P2_dedxnosat > 0.8 && P2_dedxnosat < 1.2)) {
-                                if (chargep1 + chargep2 == 0) {
-                                  Radee = 1;
-                                }
+                                Radee = 1;
                               }
                             }
                           }
@@ -395,7 +393,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
                       }
                     }
                   }
-                }
+                }//2nd trk loop
               }
             }
           }

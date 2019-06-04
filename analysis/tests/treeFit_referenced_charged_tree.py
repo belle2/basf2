@@ -21,7 +21,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('validation', '1000_B_DstD0Kpi_skimmed.root', path=main)
+        inputMdst('default',  Belle2.FileSystem.findFile('1000_B_DstD0Kpi_skimmed.root', 'validation'), path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
         fillParticleList('K+:a', 'kaonID > 0.5', path=main)

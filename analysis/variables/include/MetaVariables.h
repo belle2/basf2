@@ -242,7 +242,7 @@ namespace Belle2 {
      * Returns function which returns the variable for the Monte Carlo mother of the given particle.
      * The argument of the function must be a valid variable name.
      * If the particle is not matched with a Monte Carlo particle, or does not have a Monte Carlo
-     * mother, NaN will be returned.
+     * mother, -999 will be returned.
      */
     Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments);
 
@@ -251,7 +251,7 @@ namespace Belle2 {
      * The arguments of the function must be
      *     argument 1: Index of the particle in the MCParticle Array
      *     argument 2: Valid basf2 function name of the function that shall be evaluated.
-     * If the provided index goes beyond the length of the mcParticles array, NaN will be returned.
+     * If the provided index goes beyond the length of the mcParticles array, -999 will be returned.
      */
     Manager::FunctionPtr genParticle(const std::vector<std::string>& arguments);
 

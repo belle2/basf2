@@ -1199,16 +1199,16 @@ endloop:
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
-            return std::numeric_limits<float>::quiet_NaN();
+            return -999;
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
             if (particle->getMCParticle()->getMother() == nullptr) {
-              return std::numeric_limits<float>::quiet_NaN();
+              return -999;
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getMother());
             return var->function(&tempParticle);
           } else {
-            return std::numeric_limits<float>::quiet_NaN();
+            return -999;
           }
         };
         return func;
@@ -1233,7 +1233,7 @@ endloop:
           StoreArray<MCParticle> mcParticles("MCParticles");
           if (particleNumber >= mcParticles.getEntries())
           {
-            return std::numeric_limits<float>::quiet_NaN();
+            return -999;
           }
 
           MCParticle* mcParticle = mcParticles[particleNumber];
@@ -1757,7 +1757,7 @@ arguments. Operator precedence is taken into account. For example ::
                       "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).")
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
-                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
+                      "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
@@ -1767,7 +1767,7 @@ arguments. Operator precedence is taken into account. For example ::
                       "The arguments of the function must be:\n"
                       "    argument 1: Index of the particle in the MCParticle Array\n"
                       "    argument 2: Valid basf2 variable name of the function that shall be evaluated.\n"
-                      "If the provided index goes beyond the length of the mcParticles array, NaN will be returned."
+                      "If the provided index goes beyond the length of the mcParticles array, -999 will be returned."
                       "E.g. genParticle(0, p) returns the total momentum of the first MC Particle, which is "
                       "the Upsilon(4S) in a generic decay.\n"
                       "     genParticle(0, mcDaughter(1, p) returns the total momentum of the second daughter of "

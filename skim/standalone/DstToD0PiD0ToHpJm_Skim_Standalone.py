@@ -13,7 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-03-01-02'
 set_log_level(LogLevel.INFO)
 skimCode = encodeSkimName('Charm2BodyHadronic')
 

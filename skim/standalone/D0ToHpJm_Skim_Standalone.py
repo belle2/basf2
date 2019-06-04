@@ -14,7 +14,7 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-03-01-02'
 skimCode = encodeSkimName('Charm2BodyHadronicD0')
 
 # create a new path for each WG

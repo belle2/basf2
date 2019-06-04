@@ -9,7 +9,6 @@ from stdPi0s import *
 from stdPhotons import *
 from stdCharged import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging
-gb2_setuprel = 'release-02-00-01'
 
 # create a new path
 BottomoniumPiPiUpsilonskimpath = Path()

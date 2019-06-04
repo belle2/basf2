@@ -1,8 +1,8 @@
 //+
 // File : DQMHistAnalysisV0.h
-// Description : An example module for DQM histogram analysis
+// Description : Overlay plotting for V0
 //
-// Author : Bryan Fulsom (PNNL)
+// Author : Bryan Fulsom (PNNL), B Spruck
 // Date : 2019-01-17
 //-
 
@@ -31,31 +31,21 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DQMHistAnalysisV0Module();
-    virtual ~DQMHistAnalysisV0Module();
 
-    //! Module functions to be called from main process
-    virtual void initialize() override;
-
-    //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
-
-    //parameters
-
-    //! Parameters accesible from basf2 scripts
-    //  protected:
-
-    //! Data members
   private:
 
     TCanvas* m_c_xvsy[32] = {nullptr};
     TCanvas* m_c_xvsz = nullptr;
-    TImage* m_img[32] = {nullptr};
-    TImage* m_img_xz = nullptr;
-    TPad* p, *pxz;
+    std::vector<TList*> contLevelXY;
+    TList* contLevelXZ;
+
     std::string m_OverlayPath = "";
+
+    //! Module functions to be called from main process
+    void initialize() override;
+
+    //! Module functions to be called from event process
+    void event() override;
 
   };
 } // end namespace Belle2

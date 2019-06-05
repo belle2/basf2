@@ -98,6 +98,14 @@ namespace Belle2 {
     enum {c_Px, c_Py, c_Pz, c_E, c_X, c_Y, c_Z};
 
     /**
+     * Flags that describe the particle property
+     */
+    enum PropertyFlags {
+      c_Ordinary = 0, /** Ordinary particles */
+      c_IsInclusive = 1, /**< Is the particle is inclusive */
+    };
+
+    /**
      * Default constructor.
      * All private members are set to 0. Particle type is set to c_Undefined.
      */
@@ -148,14 +156,14 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param isInclusive Is the particle inclusive?
+     * @param particle property
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
-             bool isInclusive,
+             int properties,
              TClonesArray* arrayPointer = nullptr);
 
     /**
@@ -249,12 +257,11 @@ namespace Belle2 {
     }
 
     /**
-     * Sets m_isInclusive
-     * @param isInclusive Is the particle Inclusive?
+     * sets m_properties
      */
-    void setInclusive(bool isInclusive)
+    void setProperty(const int properties)
     {
-      m_isInclusive = isInclusive;
+      m_properties = properties;
     }
 
     /**
@@ -346,6 +353,17 @@ namespace Belle2 {
     unsigned getMdstArrayIndex(void) const
     {
       return m_mdstIndex;
+    }
+
+    /**
+     * Returns particle property as a bit pattern
+     * The values are defined in the PropertyFlags enum and described in detail there.
+     *
+     * @return Combination of Properties describing the particle property
+     */
+    int getProperty() const
+    {
+      return m_properties;
     }
 
     /**
@@ -487,15 +505,6 @@ namespace Belle2 {
     float getPValue() const
     {
       return m_pValue;
-    }
-
-    /**
-     * Returns true if the particle is Inclusive
-     * @return p-value of fit (nan means no fit done)
-     */
-    bool isInclusive() const
-    {
-      return m_isInclusive;
     }
 
     /**
@@ -784,7 +793,7 @@ namespace Belle2 {
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
-    bool m_isInclusive; /** Is the particle Inclusive? **/
+    int m_properties; /** particle property */
 
     /**
      * Identifier that can be used to identify whether the particle is unqiue
@@ -852,7 +861,6 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-
     /**
      * set mdst array index
      */
@@ -861,7 +869,7 @@ namespace Belle2 {
     ClassDef(Particle, 10); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
-    // v10: added m_isInclusive
+    // v10: added m_properties
 
     friend class ParticleSubset;
   };

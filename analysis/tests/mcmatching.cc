@@ -1,6 +1,7 @@
 #include <analysis/utility/MCMatching.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <analysis/variables/BasicParticleInformation.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -1048,9 +1049,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Xsd->isInclusive(), false);
-      Xsd->setInclusive(true);
-      EXPECT_EQ(Xsd->isInclusive(), true);
+      EXPECT_EQ(Variable::particleIsInclusive(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsInclusive);
+      EXPECT_EQ(Variable::particleIsInclusive(Xsd), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
@@ -1062,9 +1063,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Xsd->isInclusive(), false);
-      Xsd->setInclusive(true);
-      EXPECT_EQ(Xsd->isInclusive(), true);
+      EXPECT_EQ(Variable::particleIsInclusive(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsInclusive);
+      EXPECT_EQ(Variable::particleIsInclusive(Xsd), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
@@ -1078,9 +1079,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Xsd->isInclusive(), false);
-      Xsd->setInclusive(true);
-      EXPECT_EQ(Xsd->isInclusive(), true);
+      EXPECT_EQ(Variable::particleIsInclusive(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsInclusive);
+      EXPECT_EQ(Variable::particleIsInclusive(Xsd), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();

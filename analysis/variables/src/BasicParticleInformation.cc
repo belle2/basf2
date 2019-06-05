@@ -41,7 +41,8 @@ namespace Belle2 {
 
     double particleIsInclusive(const Particle* part)
     {
-      return (double)part->isInclusive();
+      int properties = part->getProperty();
+      return properties & Particle::PropertyFlags::c_IsInclusive ? 1.0 : 0.0;
     }
 
     VARIABLE_GROUP("Basic particle information");

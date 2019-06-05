@@ -38,7 +38,8 @@ Marker of inclusive particle
 ----------------------------
 
 Particle can be marked as inclusive with an at-sign, :code:`'@'`, in the decayString.
-If a particle is marked as inclusive, it does not fire the flag of c_AddedWrongParticle. In the sum-of-exclusive method analysis, one can use a inclusive particle to study some different resonance with a same code.
+If the particle is marked as inclusive it will not checked for its identity when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. For example the DecayString @Xsd -> K+ pi- would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, ...
+Still the daughters need to be stated correctly so this can be used for "sum of exclusive" decays.
 Here is an example of use:
 
 .. code-block:: python

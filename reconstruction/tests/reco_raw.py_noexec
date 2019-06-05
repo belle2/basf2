@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from basf2 import create_path, process, reset_database, use_central_database
+from rawdata import add_unpackers
+from reconstruction import add_reconstruction
+
+reset_database()
+use_central_database('validation')
+
+main = create_path()
+
+main.add_module('RootInput')
+
+add_unpackers(main)
+add_reconstruction(main)
+
+process(main)

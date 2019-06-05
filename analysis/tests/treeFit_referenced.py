@@ -21,7 +21,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
+        inputMdst('default', find_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 

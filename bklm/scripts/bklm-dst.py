@@ -23,9 +23,8 @@
 # Optional arguments:
 #      -s #   to select events with all (0) or exactly one (1) or two or more (2) entries/channel (default is 0)
 #      -n #   to specify the maximum number of events to analyze (no default -> all events)
-#      -h #   to specify how many histograms to save in the PDF file (0=minimal, 1=all) [default is 0]
+#      --verbosity #   to specify how many histograms to save in the PDF file (0=minimal, 1=all) [default is 0]
 #      -d #   to specify the maximum number of event displays (default is 0)
-#      -v #   to specify whether to use BKLMHit1ds (1) or BKLMHit2ds (2) for event-display views [2]
 #      -m #   to specify the minimum number of RPC BKLMHit2ds in any one sector (default is 4)
 #      -t tagName   to specify the name of conditions-database global tag (no default)
 #      -l #   to specify whether to use legacy time calculations (1) or not (0) (default is 0)
@@ -43,6 +42,8 @@
 
 import basf2
 from basf2 import *
+import sys
+import re
 import EventInspector
 from EventInspector import *
 import simulation
@@ -67,8 +68,8 @@ parser.add_option('-n', '--nEvents',
 parser.add_option('-s', '--singleEntry', type="int",
                   dest='singleEntry', default=0,
                   help='Select events with any (0) or exactly one (1) or more than one (2) entries/channel [0]')
-parser.add_option('-h', '--histograms', type="int",
-                  dest='histogramVerbosity', default=0,
+parser.add_option('--verbosity', type="int",
+                  dest='verbosity', default=0,
                   help='How many histograms to save (0=minimal, 1=all) [0]')
 parser.add_option('-d', '--displays', type="int",
                   dest='displays', default=0,
@@ -98,9 +99,9 @@ if options.nEvents != '':
         print("Maximum number of events to analyze is", maxCount, " - nothing to do.")
         sys.exit()
 
-view = options.view
+verbosity = options.verbosity
 
-histogramVerbosity = options.histogramVerbosity
+view = options.view
 
 maxDisplays = options.displays
 
@@ -150,11 +151,11 @@ else:
         print("Input filename's run number ({0}) is not valid".format(run))
         sys.exit()
 if len(inputName) == 0:
-    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT*.f*.root'.format(exp, run))
+    inputName = '/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT*.f*.root'.format(exp, run)
+    fileList = glob.glob(inputName)
     if len(fileList) == 0:
         print("No file(s) found for experiment <{0}> run <{1}>".format(options.eNumber, options.rNumber))
         sys.exit()
-    inputName = re.sub("HLT.\.f0....", "HLT*.f*", fileList[0])
 
 suffix = '' if singleEntry == 0 else '-singleEntry' if singleEntry == 1 else '-multipleEntries'
 histName = 'bklmHists-e{0}r{1}{2}.root'.format(exp, run, suffix)
@@ -177,7 +178,7 @@ else:
     main.add_module('RootInput', inputFileName=inputName)
 main.add_module('ProgressBar')
 
-eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, histogramVerbosity,
+eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, verbosity,
                                 maxDisplays, minRPCHits, legacyTimes, singleEntry, view)
 rawdata.add_unpackers(main, components=['BKLM'])
 main.add_module('BKLMReconstructor')

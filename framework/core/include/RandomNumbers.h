@@ -34,6 +34,11 @@ namespace Belle2 {
     static void initialize(const std::string& seed);
 
     /**
+     * Truth that the random number generator has been initialized.
+     */
+    static bool isInitialized();
+
+    /**
      * Initialize run independent random generator for begin run. Called by
      * EventProcessor, should not be called by other users
      */

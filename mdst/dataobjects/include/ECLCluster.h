@@ -238,7 +238,7 @@ namespace Belle2 {
     /** Return hypothesis (expert only, this returns a bti pattern). */
     unsigned short getHypotheses() const {return m_hypotheses;}
 
-    //** Return cellID of maximum energy crystal */
+    /** Return cellID of maximum energy crystal */
     unsigned short getMaxECellId() const {return m_maxECellId;}
 
     /** Return connected region id. */

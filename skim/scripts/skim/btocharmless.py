@@ -97,7 +97,7 @@ def CharmlessHad2BodyB0List(path):
     """
     __author__ = "Kim Smith"
 
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2', path=path)
+    applyEventCuts('nTracks >= 2', path=path)
 
     cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
     cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
@@ -181,7 +181,13 @@ def CharmlessHad2BodyB0List(path):
 
     copyLists('B0:2BodyB0', B0PPList + B0PVList + B0VVList + B0PSList + B0VSList + B0SSList, path=path)
 
-    List = ['B0:2BodyB0']
+    buildRestOfEvent('B0:2BodyB0', path=path)
+    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+    appendROEMasks('B0:2BodyB0', [cleanMask], path=path)
+    buildContinuumSuppression('B0:2BodyB0', 'cleanMask', path=path)
+    cutAndCopyList('B0:2BodySkim', 'B0:2BodyB0', 'R2 < 0.5', path=path)
+
+    List = ['B0:2BodySkim']
     return List
 
 
@@ -243,7 +249,7 @@ def CharmlessHad2BodyBmList(path):
     """
     __author__ = "Kim Smith"
 
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2', path=path)
+    applyEventCuts('nTracks >= 2', path=path)
 
     cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
     cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
@@ -309,7 +315,13 @@ def CharmlessHad2BodyBmList(path):
 
     copyLists('B-:2BodyBm', BmPPList + BmPVList + BmVVList + BmPSList + BmVSList, path=path)
 
-    List = ['B-:2BodyBm']
+    buildRestOfEvent('B-:2BodyBm', path=path)
+    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+    appendROEMasks('B-:2BodyBm', [cleanMask], path=path)
+    buildContinuumSuppression('B-:2BodyBm', 'cleanMask', path=path)
+    cutAndCopyList('B-:2BodySkim', 'B-:2BodyBm', 'R2 < 0.5', path=path)
+
+    List = ['B-:2BodySkim']
     return List
 
 
@@ -361,7 +373,7 @@ def CharmlessHad3BodyB0List(path):
     """
     __author__ = "Kim Smith"
 
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2', path=path)
+    applyEventCuts('nTracks >= 2', path=path)
 
     cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
     cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
@@ -407,7 +419,7 @@ def CharmlessHad3BodyB0List(path):
     cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
     appendROEMasks('B0:3BodyB0', [cleanMask], path=path)
     buildContinuumSuppression('B0:3BodyB0', 'cleanMask', path=path)
-    cutAndCopyList('B0:3BodySkim', 'B0:3BodyB0', 'abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
+    cutAndCopyList('B0:3BodySkim', 'B0:3BodyB0', 'R2 < 0.5 and abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
 
     List = ['B0:3BodySkim']
     return List
@@ -462,7 +474,7 @@ def CharmlessHad3BodyBmList(path):
     """
     __author__ = "Kim Smith"
 
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2', path=path)
+    applyEventCuts('nTracks >= 2', path=path)
 
     cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.15 and E > 0.25', path=path)
     cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
@@ -509,7 +521,7 @@ def CharmlessHad3BodyBmList(path):
     cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
     appendROEMasks('B-:3BodyBm', [cleanMask], path=path)
     buildContinuumSuppression('B-:3BodyBm', 'cleanMask', path=path)
-    cutAndCopyList('B-:3BodySkim', 'B-:3BodyBm', 'abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
+    cutAndCopyList('B-:3BodySkim', 'B-:3BodyBm', 'R2 < 0.5 and abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
 
     List = ['B-:3BodySkim']
     return List

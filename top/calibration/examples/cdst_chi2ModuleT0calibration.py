@@ -7,6 +7,8 @@
 #
 # usage: basf2 cdst_chi2ModuleT0calibration.py runFirst runLast
 #   job: bsub -q l "basf2 cdst_chi2ModuleT0calibration.py runFirst runLast"
+#
+# note: runLast is inclusive
 # --------------------------------------------------------------------------------
 
 from basf2 import *
@@ -20,12 +22,14 @@ import os
 
 # ----- those need to be adjusted before running --------------------------------------
 #
+experiment = 7
 input_dir = '/ghi/fs01/belle2/bdata/Data/e0007/4S/Bucket4/release-03-01-01/DB00000598/'
 skim_dir = 'skim/hlt_bhabha/cdst/sub00/'
-globalTag = 'data_reprocessing_prompt_bucket4b'  # base global tag
+globalTag = 'data_reprocessing_prompt'  # base global tag
 stagingTags = []  # list of staging tags with new calibration constants
+localDB = []  # list of local databases with new calibration constants
 minEntries = 10  # minimal number of histogram entries required to perform a fit
-output_dir = 'moduleT0'
+output_dir = 'chi2ModuleT0'  # main output folder
 #
 # -------------------------------------------------------------------------------------
 
@@ -39,17 +43,25 @@ run_last = int(argvs[2])
 
 # Make list of files
 files = []
-for run in range(run_first, run_last):
+for run in range(run_first, run_last + 1):
     runNo = 'r' + '{:0=5d}'.format(run)
     files += glob.glob(input_dir + '/' + runNo + '/' + skim_dir + '/cdst.*.root')
 if len(files) == 0:
-    print('No cdst files found')
+    B2ERROR('No cdst files found')
     sys.exit()
 
 # Output folder
-if not os.path.isdir(output_dir):
-    os.makedirs(output_dir)
-    print('New folder created: ' + output_dir)
+expNo = 'e' + '{:0=4d}'.format(experiment)
+output_folder = output_dir + '/' + expNo
+if not os.path.isdir(output_folder):
+    os.makedirs(output_folder)
+    print('New folder created: ' + output_folder)
+
+# Output file name
+fileName = output_folder + '/moduleT0-' + expNo + '-'
+run1 = 'r' + '{:0=5d}'.format(run_first)
+run2 = 'r' + '{:0=5d}'.format(run_last)
+fileName += run1 + '_to_' + run2 + '.root'
 
 
 class ModuleT0cal(Module):
@@ -59,16 +71,6 @@ class ModuleT0cal(Module):
         ''' initialize and book histograms '''
 
         Belle2.PyStoreArray('TOPTimeZeros').isRequired()
-
-        # output file name and first/last run numbers used to construct it in terminate()
-        evtMetaData = Belle2.PyStoreObj('EventMetaData')
-        expNo = '{:0=4d}'.format(evtMetaData.getExperiment())
-        #: output file name
-        self.fileName = output_dir + '/moduleT0-e' + expNo + '-'
-        #: first run number
-        self.runFirst = evtMetaData.getRun()
-        #: last run number
-        self.runLast = evtMetaData.getRun()
 
         #: module T0 from database
         self.db_moduleT0 = Belle2.PyDBObj('TOPCalModuleT0')
@@ -100,13 +102,6 @@ class ModuleT0cal(Module):
         self.h_moduleT0 = TH1F("moduleT0", "Module T0", 16, 0.5, 16.5)
         self.h_moduleT0.SetXTitle("slot number")
         self.h_moduleT0.SetYTitle("module T0 [ns]")
-
-    def beginRun(self):
-        ''' begin new run: update first/last run number'''
-
-        evtMetaData = Belle2.PyStoreObj('EventMetaData')
-        self.runFirst = min(self.runFirst, evtMetaData.getRun())
-        self.runLast = max(self.runLast, evtMetaData.getRun())
 
     def sortedTimeZeros(self, unsortedPyStoreArray):
         ''' sorting timeZeros according to slot number '''
@@ -268,11 +263,8 @@ class ModuleT0cal(Module):
         # minimize
         OK = self.minimize()
 
-        # construct output file name and open the file for writing
-        run1 = 'r' + '{:0=5d}'.format(self.runFirst)
-        run2 = 'r' + '{:0=5d}'.format(self.runLast)
-        self.fileName += run1 + '_to_' + run2 + '.root'
-        file = TFile.Open(self.fileName, 'recreate')
+        # open output file
+        file = TFile.Open(fileName, 'recreate')
 
         # write histograms and close the file
         self.h_slotPairs.Write()
@@ -284,13 +276,19 @@ class ModuleT0cal(Module):
             h.Write()
         file.Close()
 
-        B2RESULT("Output written to " + self.fileName)
+        B2RESULT("Output written to " + fileName)
 
 
-# global tags
+# Database
 use_central_database(globalTag)
 for tag in stagingTags:
     use_central_database(tag)
+for db in localDB:
+    if os.path.isfile(db):
+        use_local_database(db, invertLogging=True)
+    else:
+        B2ERROR(db + ": local database not found")
+        sys.exit()
 
 # Create paths
 main = create_path()

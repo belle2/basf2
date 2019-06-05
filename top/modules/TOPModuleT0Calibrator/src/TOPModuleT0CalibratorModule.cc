@@ -310,6 +310,9 @@ namespace Belle2 {
         h_moduleT0.SetBinContent(module + 1, minimum.position);
         h_moduleT0.SetBinError(module + 1, minimum.error * scaleError);
       }
+      std::string slotNum = to_string(module + 1);
+      auto h = finder.getHistogram("chi2_slot_" + slotNum, "slot " + slotNum);
+      h.Write();
     }
     h_moduleT0.Write();
 

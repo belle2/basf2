@@ -48,6 +48,11 @@ namespace Belle2 {
       TVector3 getLocalPosition(const Particle* particle);
 
       /**
+       * returns the local coordinate of the MC particle's entry point to the TOP
+       */
+      TVector3 getLocalPositionMCMatch(const Particle* particle);
+
+      /**
        * returns the local coordinates of the particles momentum in the TOP
        */
       TVector3 getLocalMomentum(const Particle* particle);
@@ -85,10 +90,18 @@ namespace Belle2 {
       double topDigitCount(const Particle* particle);
 
       /**
-       * extrapolates the track to TOP
+       * z coordinate of the track extrapolated to TOP using helix data from TrackFitResult
        */
       double extrapTrackToTOPz(const Particle* particle);
+
+      /**
+       * theta coordinate of the track extrapolated to TOP using helix data from TrackFitResult
+       */
       double extrapTrackToTOPtheta(const Particle* particle);
+
+      /**
+       * phi coordinate of the track extrapolated to TOP using helix data from TrackFitResult
+       */
       double extrapTrackToTOPphi(const Particle* particle);
 
       /**
@@ -138,6 +151,21 @@ namespace Belle2 {
        * returns the Z coordinate of the particle entry point to the TOP in the local frame
        */
       double getTOPLocalZ(const Particle* particle);
+
+      /**
+       * returns the X coordinate of the MC particle entry point to the TOP in the local frame
+       */
+      double getTOPLocalXMCMatch(const Particle* particle);
+
+      /**
+       * returns the Y coordinate of the MC particle entry point to the TOP in the local frame
+       */
+      double getTOPLocalYMCMatch(const Particle* particle);
+
+      /**
+       * returns the Z coordinate of the MC particle entry point to the TOP in the local frame
+       */
+      double getTOPLocalZMCMatch(const Particle* particle);
 
       /**
        * returns the local phi component of the particle's momentum in the TOP

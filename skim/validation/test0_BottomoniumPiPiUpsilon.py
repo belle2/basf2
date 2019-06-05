@@ -31,7 +31,7 @@ print_params(beamparameters)
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('evtNumList', [10000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 BottomoniumPiPiUpsilonskimpath.add_module(eventinfosetter)

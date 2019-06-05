@@ -25,7 +25,7 @@ ISRskimpath = Path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('evtNumList', [10000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 ISRskimpath.add_module(eventinfosetter)

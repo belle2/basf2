@@ -76,7 +76,7 @@ int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
   for (plane = 1; plane <= nPlanes; ++plane) {
     for (strip = 1; strip <= nStrips; ++strip) {
       uint16_t channel = elementNumbers->channelNumberEKLM(
-                           endcap, layer, sector, plane, strip);
+                           endcap, sector, layer, plane, strip);
       enum ChannelStatus status = getChannelStatus(channel);
       if (status == c_Unknown)
         B2FATAL("Incomplete KLM channel data.");

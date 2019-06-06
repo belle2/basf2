@@ -140,8 +140,17 @@ if __name__ == '__main__':
     parser.add_argument("--global-tag", help="If given, use this global tag instead")
     parser.add_argument("--experiment-number", help="If given, use this experiment number instead")
     parser.add_argument("--run-number", help="If given, use this run number instead")
-    parser.add_argument("--format", help="Choose the format how to print the trigger cuts.",
-                        choices=["human-readable", "jira", "grid"], default="human-readable")
+
+    choices = ["human-readable"]
+    try:
+        from tabulate import tabulate
+        choices += ['jira', 'grid']
+    except ImportError:
+        pass
+
+    parser.add_argument("--format", help="Choose the format how to print the trigger cuts. "
+                        "To get access to more options please install the tabulate package using pip",
+                        choices=choices, default="human-readable")
 
     args = parser.parse_args()
 

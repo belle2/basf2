@@ -20,7 +20,7 @@ inputMdst('default', '../CharmlessHad2BodyNeutral.udst.root', path=charmless2neu
 from variables import variables
 variablesToHistogram(
     filename='CharmlessHad2BodyNeutral_Validation.root',
-    decayString='B0:2BodyB0',
+    decayString='B0:2BodySkim',
     variables=[
         ('Mbc', 100, 5.2, 5.3),
         ('deltaE', 100, -1, 1),

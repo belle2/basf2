@@ -23,7 +23,6 @@ using namespace SoftwareTrigger;
 
 REG_MODULE(SoftwareTriggerHLTDQM)
 
-
 SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
 {
   setDescription("Monitor Physics Trigger");
@@ -32,14 +31,7 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
   // Fill in the default values of the module parameters
   m_param_variableIdentifiers = {};
 
-  m_param_cutResultIdentifiers["fast_reco"] = {"total_result", "reject_ee", "accept_ee", "reject_bkg"};
-  m_param_cutResultIdentifiers["hlt"] = {"accept_hadron", "accept_2_tracks", "accept_1_track1_cluster",
-                                         "accept_mumu_2trk", "accept_mumu_1trk", "accept_tau_tau",
-                                         "accept_single_photon_2GeV_barrel", "accept_single_photon_2GeV_endcap",
-                                         "accept_single_photon_1GeV", "accept_b2bclusterhigh_phi",
-                                         "accept_b2bclusterlow_phi", "accept_b2bcluster_3D", "accept_gamma_gamma",
-                                         "accept_bhabha"
-                                        };
+  m_param_cutResultIdentifiers["filter"] = {"total_result"};
 
   addParam("cutResultIdentifiers", m_param_cutResultIdentifiers,
            "Which cuts should be reported? Please remember to include the total_result also, if wanted.",
@@ -48,6 +40,10 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
   addParam("variableIdentifiers", m_param_variableIdentifiers,
            "Which variables should be reported?",
            m_param_variableIdentifiers);
+
+  addParam("l1Identifiers", m_param_l1Identifiers,
+           "Which l1 identifiers to report?",
+           m_param_l1Identifiers);
 
   addParam("histogramDirectoryName", m_param_histogramDirectoryName,
            "SoftwareTrigger DQM histograms will be put into this directory", m_param_histogramDirectoryName);
@@ -74,35 +70,47 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
 
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
     const std::string& baseIdentifier = cutIdentifier.first;
-    const auto& cuts = cutIdentifier.second;
 
-    const unsigned int numberOfBins = cuts.size();
-    const double lowerX = 0;
-    const double upperX = numberOfBins;
     m_cutResultHistograms.emplace(baseIdentifier,
-                                  new TH1F(baseIdentifier.c_str(), baseIdentifier.c_str(), numberOfBins, lowerX, upperX));
-    m_cutResultHistograms[baseIdentifier]->SetXTitle(("Cut Result for " + baseIdentifier).c_str());
+                                  new TH1F(baseIdentifier.c_str(), ("Events triggered in HLT baseIdentifier " + baseIdentifier).c_str(), 0, 0, 0));
+    m_cutResultHistograms[baseIdentifier]->SetXTitle(("Prescaled Cut Result for " + baseIdentifier).c_str());
     m_cutResultHistograms[baseIdentifier]->SetOption("bar");
     m_cutResultHistograms[baseIdentifier]->SetFillStyle(0);
     m_cutResultHistograms[baseIdentifier]->SetStats(false);
   }
 
   // We add one for the total result
-  const unsigned int numberOfBins = m_param_cutResultIdentifiers.size() + 1;
-  const double lowerX = 0;
-  const double upperX = numberOfBins;
   m_cutResultHistograms.emplace("total_result",
-                                new TH1F("total_result", "total_result", numberOfBins, lowerX, upperX));
+                                new TH1F("total_result", "Total Result of HLT (absolute numbers)", 0, 0, 0));
   m_cutResultHistograms["total_result"]->SetXTitle("Total Cut Result");
   m_cutResultHistograms["total_result"]->SetOption("bar");
   m_cutResultHistograms["total_result"]->SetFillStyle(0);
   m_cutResultHistograms["total_result"]->SetStats(false);
 
+  for (const std::string& trigger : m_param_l1Identifiers) {
+    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 0, 0, 0));
+    m_l1Histograms[trigger]->SetXTitle(("HLT Result for L1: " + trigger).c_str());
+    m_l1Histograms[trigger]->SetOption("bar");
+    m_l1Histograms[trigger]->SetFillStyle(0);
+    m_l1Histograms[trigger]->SetStats(false);
+  }
+
+  // And also one for the total numbers
+  m_l1Histograms.emplace("l1_total_result",
+                         new TH1F("l1_total_result", "Events triggered in L1 (total results)", 0, 0, 0));
+  m_l1Histograms["l1_total_result"]->SetXTitle("Total L1 Cut Result");
+  m_l1Histograms["l1_total_result"]->SetOption("bar");
+  m_l1Histograms["l1_total_result"]->SetFillStyle(0);
+  m_l1Histograms["l1_total_result"]->SetStats(false);
+
+  m_runInfoHistograms.emplace("run_number", new TH1F("run_number", "Run Number", 100, 0, 10000));
+  m_runInfoHistograms.emplace("event_number", new TH1F("event_number", "Event Number", 100, 0, 1'000'000));
+  m_runInfoHistograms.emplace("experiment_number", new TH1F("experiment_number", "Experiment Number", 50, 0, 50));
+
   if (oldDirectory) {
     oldDirectory->cd();
   }
 }
-
 
 void SoftwareTriggerHLTDQMModule::initialize()
 {
@@ -120,8 +128,8 @@ void SoftwareTriggerHLTDQMModule::event()
       TH1F* histogram = variableNameAndTH1F.second;
 
       // try to load this variable from the computed trigger variables
-      if (!m_variables->has(variable)) {
-        B2FATAL("Variable " << variable << " configured for SoftwareTriggerDQM plotting is not available");
+      if (not m_variables->has(variable)) {
+        B2ERROR("Variable " << variable << " configured for SoftwareTriggerDQM plotting is not available");
       } else {
         const double value = m_variables->getVariable(variable);
         histogram->Fill(value);
@@ -134,7 +142,8 @@ void SoftwareTriggerHLTDQMModule::event()
       const std::string& baseIdentifier = cutIdentifier.first;
       const auto& cuts = cutIdentifier.second;
 
-      for (const std::string& cutName : cuts) {
+      for (const std::string& cutTitle : cuts) {
+        const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
 
         // check if the cutResult is in the list, be graceful when not available
@@ -142,26 +151,72 @@ void SoftwareTriggerHLTDQMModule::event()
 
         if (cutEntry != m_triggerResult->getResults().end()) {
           const int cutResult = cutEntry->second;
-          m_cutResultHistograms[baseIdentifier]->Fill(cutName.c_str(), cutResult);
+          m_cutResultHistograms[baseIdentifier]->Fill(cutTitle.c_str(), cutResult > 0);
         }
       }
 
-      const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(baseIdentifier);
+      const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
       const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
 
-      m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult);
+      m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
     }
 
     const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
-    m_cutResultHistograms["total_result"]->Fill("total_result", totalResult);
+    m_cutResultHistograms["total_result"]->Fill("total_result", totalResult > 0);
+  }
+
+  if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid() and m_triggerResult.isValid()) {
+    for (const std::string& l1Trigger : m_param_l1Identifiers) {
+      const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
+      if (triggerBit < 0) {
+        B2WARNING("Can not find L1 trigger with name " << l1Trigger);
+        continue;
+      }
+      const bool triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+      m_l1Histograms["l1_total_result"]->Fill(l1Trigger.c_str(), triggerResult);
+
+      if (not triggerResult) {
+        continue;
+      }
+
+      for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
+        const std::string& baseIdentifier = cutIdentifier.first;
+        const auto& cuts = cutIdentifier.second;
+
+        for (const std::string& cutTitle : cuts) {
+          const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
+          const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
+
+          // check if the cutResult is in the list, be graceful when not available
+          auto const cutEntry = m_triggerResult->getResults().find(fullCutIdentifier);
+
+          if (cutEntry != m_triggerResult->getResults().end()) {
+            const int cutResult = cutEntry->second;
+            m_l1Histograms[l1Trigger]->Fill(cutTitle.c_str(), cutResult > 0);
+          }
+        }
+      }
+
+      const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
+      m_l1Histograms[l1Trigger]->Fill("hlt_result", totalResult > 0);
+    }
+  }
+
+  if (m_eventMetaData.isValid()) {
+    m_runInfoHistograms["run_number"]->Fill(m_eventMetaData->getRun());
+    m_runInfoHistograms["event_number"]->Fill(m_eventMetaData->getEvent());
+    m_runInfoHistograms["experiment_number"]->Fill(m_eventMetaData->getExperiment());
   }
 }
 
 void SoftwareTriggerHLTDQMModule::beginRun()
 {
   std::for_each(m_cutResultHistograms.begin(), m_cutResultHistograms.end(),
-  [](auto & it) {it.second->Reset();});
+  [](auto & it) { it.second->Reset(); });
   std::for_each(m_triggerVariablesHistograms.begin(), m_triggerVariablesHistograms.end(),
-  [](auto & it) {it.second->Reset();});
+  [](auto & it) { it.second->Reset(); });
+  std::for_each(m_l1Histograms.begin(), m_l1Histograms.end(),
+  [](auto & it) { it.second->Reset(); });
+  std::for_each(m_runInfoHistograms.begin(), m_runInfoHistograms.end(),
+  [](auto & it) { it.second->Reset(); });
 }
-

@@ -45,9 +45,7 @@ void ModuleParamList::throwTypeError(const std::string& name,
   throw (ModuleParameterTypeError() << name << expectedTypeInfo << typeInfo);
 }
 
-ModuleParamList::ModuleParamList()
-{
-}
+ModuleParamList::ModuleParamList() = default;
 
 
 ModuleParamList::~ModuleParamList()
@@ -59,7 +57,7 @@ ModuleParamList::~ModuleParamList()
 std::vector<std::string> ModuleParamList::getUnsetForcedParams() const
 {
   std::vector<std::string> missingParam;
-  for (const std::pair<std::string, ModuleParamPtr>& mapEntry : m_paramMap) {
+  for (const auto& mapEntry : m_paramMap) {
     if (mapEntry.second->isForcedInSteering() && !mapEntry.second->isSetInSteering())
       missingParam.push_back(mapEntry.first);
   }
@@ -136,5 +134,19 @@ ModuleParamPtr ModuleParamList::getParameterPtr(const std::string& name) const
     return mapIter->second;
   } else throw (ModuleParameterNotFoundError() << name);
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+//==================================================================================
+//                          Explicit template instantiations
+//==================================================================================
+
+template void ModuleParamList::addParameter(const std::string&, bool&, const std::string&, const bool&);
+template void ModuleParamList::addParameter(const std::string&, double&, const std::string&, const double&);
+template void ModuleParamList::addParameter(const std::string&, float&, const std::string&, const float&);
+template void ModuleParamList::addParameter(const std::string&, int&, const std::string&, const int&);
+template void ModuleParamList::addParameter(const std::string&, std::string&, const std::string&, const std::string&);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

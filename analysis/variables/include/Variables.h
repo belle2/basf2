@@ -211,6 +211,10 @@ namespace Belle2 {
      */
     double particleInvariantMassBeforeFitSignificance(const Particle* part);
 
+    /**
+     * return mass squared (determined from particle's 4-momentum vector)
+     */
+    double particleMassSquared(const Particle* part);
 
     /**
      * return released energy in decay
@@ -231,16 +235,6 @@ namespace Belle2 {
      * return energy difference in CMS
      */
     double particleDeltaE(const Particle* part);
-
-    /**
-     * return StoreArray index (0-based) of the MDST object from which the Particle was created
-     */
-    double particleMdstArrayIndex(const Particle* part);
-
-    /**
-     * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
-     */
-    double particleMdstSource(const Particle* part);
 
     /**
      * return prob(chi^2,ndf) of fit

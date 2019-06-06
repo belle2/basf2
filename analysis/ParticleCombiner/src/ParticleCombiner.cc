@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck, Anze Zupanc                                 *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +15,8 @@
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
 #include <framework/logging/Logger.h>
+
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <algorithm>
 
@@ -51,6 +54,9 @@ namespace Belle2 {
 
     if (m_iCombination > 0) {
 
+      // TF SC this does not yet account for double counting so will produce:
+      // { 000, 100, 200, ... 010, 110, .... } even if the first and second
+      // place are the same particle list
       for (unsigned int i = 0; i < m_numberOfLists; i++) {
         indices[i]++;
         if (indices[i] < sizes[i]) break;
@@ -98,7 +104,7 @@ namespace Belle2 {
     return m_types;
   }
 
-  ParticleGenerator::ParticleGenerator(std::string decayString, std::string cutParameter) : m_iParticleType(0),
+  ParticleGenerator::ParticleGenerator(const std::string& decayString, const std::string& cutParameter) : m_iParticleType(0),
     m_listIndexGenerator(),
     m_particleIndexGenerator()
   {
@@ -115,6 +121,9 @@ namespace Belle2 {
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
     for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+      // Get the mother of the subdecaystring of the ith daughter
+      // eg. "B -> [D -> K pi] [tau -> pi pi pi]". The 0th daughter is the
+      // *decaystring* D -> K pi whose mother is the D.
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
@@ -138,7 +147,7 @@ namespace Belle2 {
 
         if (daughter_i->getLabel() != daughter_j->getLabel()) {
           m_inputListsCollide = true;
-          m_collidingLists.push_back(std::make_pair(i, j));
+          m_collidingLists.emplace_back(i, j);
         }
       }
     }
@@ -171,9 +180,9 @@ namespace Belle2 {
 
     int uniqueID = 1;
 
-    for (unsigned i = 0; i < m_collidingLists.size(); i++) {
-      StoreObjPtr<ParticleList> listA =  m_plists[m_collidingLists[i].first];
-      StoreObjPtr<ParticleList> listB =  m_plists[m_collidingLists[i].second];
+    for (auto& collidingList : m_collidingLists) {
+      StoreObjPtr<ParticleList> listA =  m_plists[collidingList.first];
+      StoreObjPtr<ParticleList> listB =  m_plists[collidingList.second];
 
       bool sameSign = (listA->getPDGCode() == listB->getPDGCode());
 
@@ -215,25 +224,25 @@ namespace Belle2 {
   {
     const Particle* A, *B;
     bool copies = false;
-    for (unsigned i = 0; i < listA.size(); i++) {
-      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(listA[i]) ? true : false;
+    for (int i : listA) {
+      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(i) ? true : false;
 
       if (not aIsAlreadyIn)
-        m_indicesToUniqueIDs[ listA[i] ] = uniqueID++;
+        m_indicesToUniqueIDs[ i ] = uniqueID++;
 
-      for (unsigned j = 0; j < listB.size(); j++) {
-        bool bIsAlreadyIn = m_indicesToUniqueIDs.count(listB[j]) ? true : false;
+      for (int j : listB) {
+        bool bIsAlreadyIn = m_indicesToUniqueIDs.count(j) ? true : false;
 
         if (bIsAlreadyIn)
           continue;
 
         // are these two particles copies
-        A = m_particleArray[ listA[i] ];
-        B = m_particleArray[ listB[j] ];
+        A = m_particleArray[ i ];
+        B = m_particleArray[ j ];
         copies = B->isCopyOf(A);
 
         if (copies)
-          m_indicesToUniqueIDs[ listB[j] ] = m_indicesToUniqueIDs[ listA[i] ];
+          m_indicesToUniqueIDs[ j ] = m_indicesToUniqueIDs[ i ];
       }
     }
   }
@@ -241,11 +250,11 @@ namespace Belle2 {
 
   void ParticleGenerator::fillIndicesToUniqueIDMap(const std::vector<int>& listA, int& uniqueID)
   {
-    for (unsigned i = 0; i < listA.size(); i++) {
-      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(listA[i]) ? true : false;
+    for (int i : listA) {
+      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(i) ? true : false;
 
       if (not aIsAlreadyIn)
-        m_indicesToUniqueIDs[ listA[i] ] = uniqueID++;
+        m_indicesToUniqueIDs[ i ] = uniqueID++;
     }
   }
 
@@ -301,6 +310,9 @@ namespace Belle2 {
           continue;
 
         if (not currentCombinationIsUnique()) continue;
+
+        if (not currentCombinationIsECLCRUnique()) continue;
+
         return true;
       }
 
@@ -340,6 +352,9 @@ namespace Belle2 {
           continue;
 
         if (not currentCombinationIsUnique()) continue;
+
+        if (not currentCombinationIsECLCRUnique()) continue;
+
         return true;
       }
 
@@ -386,6 +401,7 @@ namespace Belle2 {
     static std::vector<int> sources; // stack for particle sources
     sources.clear();
 
+    // recursively check all daughters and daughters of daughters
     while (!stack.empty()) {
       Particle* p = stack.back();
       stack.pop_back();
@@ -393,12 +409,12 @@ namespace Belle2 {
 
       if (daughters.empty()) {
         int source = p->getMdstSource();
-        for (unsigned i = 0; i < sources.size(); i++) {
-          if (source == sources[i]) return false;
+        for (int i : sources) {
+          if (source == i) return false;
         }
         sources.push_back(source);
       } else {
-        for (unsigned i = 0; i < daughters.size(); i++) stack.push_back(m_particleArray[daughters[i]]);
+        for (int daughter : daughters) stack.push_back(m_particleArray[daughter]);
       }
     }
     return true;
@@ -420,11 +436,63 @@ namespace Belle2 {
 
   bool ParticleGenerator::inputListsCollide(const std::pair<unsigned, unsigned>& pair) const
   {
-    for (unsigned i = 0; i < m_collidingLists.size(); i++)
-      if (pair == m_collidingLists[i])
+    for (const auto& collidingList : m_collidingLists)
+      if (pair == collidingList)
         return true;
 
     return false;
+  }
+
+  bool ParticleGenerator::currentCombinationIsECLCRUnique()
+  {
+    unsigned nECLSource = 0;
+    std::vector<Particle*> stack = m_particles;
+    static std::vector<int> connectedregions;
+    static std::vector<ECLCluster::EHypothesisBit> hypotheses;
+    connectedregions.clear();
+    hypotheses.clear();
+
+    // recursively check all daughters and daughters of daughters
+    while (!stack.empty()) {
+      Particle* p = stack.back();
+      stack.pop_back();
+      const std::vector<int>& daughters = p->getDaughterIndices();
+
+      if (daughters.empty()) {
+        // Only test if the particle was created from an ECLCluster at source.
+        // This CAN CHANGE if we change the cluster <--> track matching,
+        // (currently we match nPhotons clusters to all track type particles,
+        // i.e. electrons, pions, kaons etc. We might gain by matching
+        // neutralHadron hypothesis clusters to kaons, for example).
+        //
+        // In the above case one would need to extend the check to ALL
+        // particles with an associated ECLCluster. Then replace the following
+        // active line with two lines...
+        //
+        // auto cluster = p->getECLCluster();
+        // if (cluster) { // then do stuff
+        if (p->getParticleType() == Particle::EParticleType::c_ECLCluster) {
+          nECLSource++;
+          auto* cluster = p->getECLCluster();
+          connectedregions.push_back(cluster->getConnectedRegionId());
+          hypotheses.push_back(p->getECLClusterEHypothesisBit());
+        }
+      } else {
+        for (int daughter : daughters) stack.push_back(m_particleArray[daughter]);
+      }
+    }
+
+    // less than two particles from an ECL source is fine
+    // (unless cluster <--> track matching changes)
+    if (nECLSource < 2) return true;
+
+    // yes this is a nested for loop but it's fast, we promise
+    for (unsigned icr = 0; icr < connectedregions.size(); ++icr)
+      for (unsigned jcr = icr + 1; jcr < connectedregions.size(); ++jcr)
+        if (connectedregions[icr] == connectedregions[jcr])
+          if (hypotheses[icr] != hypotheses[jcr]) return false;
+
+    return true;
   }
 
   int ParticleGenerator::getUniqueID(int index) const

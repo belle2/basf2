@@ -48,10 +48,7 @@ ExportGeometryModule::ExportGeometryModule() : Module()
 }
 
 
-ExportGeometryModule::~ExportGeometryModule()
-{
-
-}
+ExportGeometryModule::~ExportGeometryModule()  = default;
 
 
 void ExportGeometryModule::initialize()

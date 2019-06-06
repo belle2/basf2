@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Anze Zupanc                                *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,6 +27,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
@@ -167,7 +169,7 @@ namespace Belle2 {
           }
         } else {
           // TODO: test that this actually works
-          B2WARNING("Tha ParticleList with name " << listName << " already exists in the DataStore. Nothing to do.");
+          B2WARNING("The ParticleList with name " << listName << " already exists in the DataStore. Nothing to do.");
           continue;
         }
 
@@ -177,37 +179,39 @@ namespace Belle2 {
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
         if (m_useMCParticles) {
           B2INFO("   -> MDST source: MCParticles");
-          m_MCParticles2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+          m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
         } else {
           bool chargedFSP = Const::chargedStableSet.contains(Const::ParticleType(abs(pdgCode)));
           if (chargedFSP) {
             B2INFO("   -> MDST source: Tracks");
-            m_Tracks2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_Tracks2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
           if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
             if (m_addDaughters == false) {
               B2INFO("   -> MDST source: ECLClusters");
-              m_ECLClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+              m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
             } else {
               B2INFO("   -> MDST source: V0");
-              m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+              m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
             }
           }
 
           if (abs(pdgCode) == abs(Const::Kshort.getPDGCode())) {
             B2INFO("   -> MDST source: V0");
-            m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode())) {
             B2INFO("   -> MDST source: KLMClusters");
-            m_KLMClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            B2INFO("   -> MDST source: ECLClusters");
+            m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
           if (abs(pdgCode) == abs(Const::Lambda.getPDGCode())) {
             B2INFO("   -> MDST source: V0");
-            m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
         }
         B2INFO("   -> With cuts  : " << cutParameter);
@@ -383,7 +387,7 @@ namespace Belle2 {
     if (m_Tracks2Plists.empty()) // nothing to do
       return;
 
-    // create all lists
+    // create and initialize the particle lists
     for (auto track2Plist : m_Tracks2Plists) {
       string listName = get<c_PListName>(track2Plist);
       string antiListName = get<c_AntiPListName>(track2Plist);
@@ -394,6 +398,7 @@ namespace Belle2 {
       plist.create();
       plist->initialize(pdgCode, listName);
 
+      // if cc exists then also create and bind that list
       if (!isSelfConjugatedParticle) {
         StoreObjPtr<ParticleList> antiPlist(antiListName);
         antiPlist.create();
@@ -403,21 +408,25 @@ namespace Belle2 {
       }
     }
 
+    // grab the StoreArray for tracks and particles
     StoreArray<Track> Tracks;
     StoreArray<Particle> particles;
 
+    // the outer loop over all tracks from which Particles
+    // are created, and get sorted in the particle lists
     for (int i = 0; i < Tracks.getEntries(); i++) {
       const Track* track = Tracks[i];
       const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
       const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
 
+      // inner loop over the ParticleLists
       for (size_t ilist = 0; ilist < m_Tracks2Plists.size(); ilist++) {
         auto track2Plist = m_Tracks2Plists[ilist];
         string listName = get<c_PListName>(track2Plist);
         auto& cut = get<c_CutPointer>(track2Plist);
         StoreObjPtr<ParticleList> plist(listName);
 
-        //if no track hypothesis is requested, use the particle's own
+        // if no track hypothesis is requested, use the particle's own
         int pdgCode;
         if (m_trackHypothesis == 0)
           pdgCode = get<c_PListPDGCode>(track2Plist);
@@ -428,7 +437,7 @@ namespace Belle2 {
         // the one with the closest mass
         const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
 
-        if (!trackFit) {
+        if (!trackFit) { // should never happen with the "closest mass" getter - leave as a sanity check
           B2WARNING("Track returned null TrackFitResult pointer for ChargedStable::getPDGCode()  = " << type.getPDGCode());
           continue;
         }
@@ -438,6 +447,8 @@ namespace Belle2 {
           continue;
         }
 
+        // charge zero tracks can appear, filter them and
+        // count number of tracks filtered out
         int charge = trackFit->getChargeSign();
         if (charge == 0) {
           B2DEBUG(19, "Track with charge = 0 skipped!");
@@ -459,9 +470,10 @@ namespace Belle2 {
 
           if (cut->check(newPart))
             plist->addParticle(newPart);
-        }
-      }
-    }
+
+        } // sanity check correct particle type
+      } // particle lists
+    } // loop over tracks
   }
 
   void ParticleLoaderModule::eclClustersToParticles()
@@ -469,7 +481,7 @@ namespace Belle2 {
     if (m_ECLClusters2Plists.empty()) // nothing to do
       return;
 
-    // create all lists
+    // create and register all ParticleLists
     for (auto eclCluster2Plist : m_ECLClusters2Plists) {
       string listName = get<c_PListName>(eclCluster2Plist);
       string antiListName = get<c_AntiPListName>(eclCluster2Plist);
@@ -477,9 +489,12 @@ namespace Belle2 {
       bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(eclCluster2Plist);
 
       StoreObjPtr<ParticleList> plist(listName);
-      plist.create();
-      plist->initialize(pdgCode, listName);
+      if (!plist) { // create the list only if the klmClustersToParticles function has not already created it
+        plist.create();
+        plist->initialize(pdgCode, listName);
+      }
 
+      // create anti-particle list if necessary
       if (!isSelfConjugatedParticle) {
         StoreObjPtr<ParticleList> antiPlist(antiListName);
         antiPlist.create();
@@ -489,71 +504,92 @@ namespace Belle2 {
       }
     }
 
+    // StoreArrays needed to load eclclusters as particles
+    // (and mcmatching)
     StoreArray<ECLCluster> ECLClusters;
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcParticles;
 
+    // outer loop over all ECLClusters
     for (int i = 0; i < ECLClusters.getEntries(); i++) {
       const ECLCluster* cluster      = ECLClusters[i];
 
-      if (!cluster->isNeutral())
+      // ECLClusters can be reconstructed under different hypotheses, for
+      // example photons or neutral hadrons, we only load particles from these
+      // for now
+      if (!cluster->isNeutral()) continue;
+      if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
+          and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
         continue;
 
-      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
-        continue;
-
-      // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles
       // order the relations by weights and set Particle -> multiple MCParticle relation
       // preserve the weight
       RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
-      // order relations bt weights
+      // order relations by weights
       std::vector<std::pair<int, double>> weightsAndIndices;
       for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
         const MCParticle* relMCParticle = mcRelations[iMCParticle];
         double weight = mcRelations.weight(iMCParticle);
         if (relMCParticle)
-          weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
+          weightsAndIndices.emplace_back(relMCParticle->getArrayIndex(), weight);
       }
       // sort descending by weight
-      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(), [](const std::pair<int, double>& left,
-      const std::pair<int, double>& right) {
+      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
+      [](const std::pair<int, double>& left, const std::pair<int, double>& right) {
         return left.second > right.second;
       });
 
-      // create Particle
-      Particle particle(cluster);
-      if (particle.getParticleType() == Particle::c_ECLCluster) { // should always hold but...
+      // inner loop over ParticleLists: fill each relevant list with Particles
+      // created from ECLClusters
+      for (auto eclCluster2Plist : m_ECLClusters2Plists) {
+        string listName = get<c_PListName>(eclCluster2Plist);
+        int listPdgCode = get<c_PListPDGCode>(eclCluster2Plist);
+        Const::ParticleType thisType(listPdgCode);
+
+        // don't fill photon list with clusters that don't have
+        // the nPhotons hypothesis (ECL people call this N1)
+        if (listPdgCode == Const::photon.getPDGCode()
+            and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+          continue;
+
+        // don't fill a KLong list with clusters that don't have the neutral
+        // hadron hypothesis set (ECL people call this N2)
+        if (listPdgCode == Const::Klong.getPDGCode()
+            and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          continue;
+
+        // create particle and check it before adding to list
+        Particle particle(cluster, thisType);
+        if (particle.getParticleType() != Particle::c_ECLCluster) {
+          B2FATAL("Particle created from ECLCluster does not have ECLCluster type.");
+          continue;
+        }
         Particle* newPart = particles.appendNew(particle);
 
-        // set relation
-        for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
-          const MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
-          double weight = weightsAndIndices[j].second;
+        // set relations to mcparticles
+        for (auto& weightsAndIndex : weightsAndIndices) {
+          const MCParticle* relMCParticle = mcParticles[weightsAndIndex.first];
+          double weight = weightsAndIndex.second;
 
           // TODO: study this further and avoid hardcoded values
-          // set the relation only if the MCParticle's energy contribution
-          // to this cluster ammounts to at least 25%
+          // set the relation only if the MCParticle(reconstructed Particle)'s
+          // energy contribution to this cluster ammounts to at least 30(20)%
           if (relMCParticle)
             if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
               newPart->addRelationTo(relMCParticle, weight);
         }
 
-        // old way (to be removed)
-        //if (mcParticle)
-        //newPart->addRelationTo(mcParticle);
 
         // add particle to list if it passes the selection criteria
-        for (auto eclCluster2Plist : m_ECLClusters2Plists) {
-          string listName = get<c_PListName>(eclCluster2Plist);
-          auto& cut = get<c_CutPointer>(eclCluster2Plist);
-          StoreObjPtr<ParticleList> plist(listName);
+        auto& cut = get<c_CutPointer>(eclCluster2Plist);
+        StoreObjPtr<ParticleList> plist(listName);
 
-          if (cut->check(newPart))
-            plist->addParticle(newPart);
-        }
-      }
-    }
+        if (cut->check(newPart))
+          plist->addParticle(newPart);
+
+      } // loop over particle lists to be filled by ECLClusters
+    } // loop over cluster
   }
 
   void ParticleLoaderModule::klmClustersToParticles()
@@ -569,8 +605,10 @@ namespace Belle2 {
       bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(klmCluster2Plist);
 
       StoreObjPtr<ParticleList> plist(listName);
-      plist.create();
-      plist->initialize(pdgCode, listName);
+      if (!plist) { // create the list only if the eclClustersToParticle has not already created it
+        plist.create();
+        plist->initialize(pdgCode, listName);
+      }
 
       if (!isSelfConjugatedParticle) {
         StoreObjPtr<ParticleList> antiPlist(antiListName);
@@ -588,8 +626,17 @@ namespace Belle2 {
     for (int i = 0; i < KLMClusters.getEntries(); i++) {
       const KLMCluster* cluster      = KLMClusters[i];
 
-      if (cluster->getAssociatedTrackFlag())
+      if ((cluster->getRelatedTo<KlId>()) == NULL)
         continue;
+
+      if ((cluster->getRelatedTo<KlId>()->getKlId() < 0) || (cluster->getRelatedTo<KlId>()->getKlId() > 1))
+        continue;
+
+      if (std::isnan(cluster->getMomentumMag())) {
+        B2WARNING("Skipping KLMCluster because of nan momentum.");
+        continue;
+      }
+
 
       const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
 
@@ -694,24 +741,23 @@ namespace Belle2 {
   void ParticleLoaderModule::appendDaughtersRecursive(Particle* mother)
   {
     StoreArray<Particle> particles;
-    MCParticle* mcmother = mother->getRelated<MCParticle>();
+    auto* mcmother = mother->getRelated<MCParticle>();
 
     if (!mcmother)
       return;
 
     vector<MCParticle*> mcdaughters = mcmother->getDaughters();
 
-    for (unsigned int i = 0; i < mcdaughters.size(); i++) {
-      Particle particle(mcdaughters[i]);
+    for (auto& mcdaughter : mcdaughters) {
+      Particle particle(mcdaughter);
       Particle* daughter = particles.appendNew(particle);
-      daughter->addRelationTo(mcdaughters[i]);
+      daughter->addRelationTo(mcdaughter);
       mother->appendDaughter(daughter);
 
-      if (mcdaughters[i]->getNDaughters() > 0)
+      if (mcdaughter->getNDaughters() > 0)
         appendDaughtersRecursive(daughter);
     }
   }
 
 
 } // end Belle2 namespace
-

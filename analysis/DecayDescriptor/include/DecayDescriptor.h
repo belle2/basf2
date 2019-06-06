@@ -85,7 +85,8 @@ namespace Belle2 {
     std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected();
 
     /** Helper function to get hierarchy of selected particles  and their names. Called iteratively and get hierarchy path of a particle as an argument */
-    std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected(std::vector<std::pair<int, std::string>> currentPath);
+    std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected(const std::vector<std::pair<int, std::string>>&
+        currentPath);
 
     /** Initialise the DecayDescriptor from given string.
         Typically, the string is a parameter of an analysis module. */

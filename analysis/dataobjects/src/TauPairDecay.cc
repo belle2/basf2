@@ -25,3 +25,13 @@ void TauPairDecay::addTauMinusIdMode(int mmode)
 {
   m_mmode = mmode;
 }
+
+void TauPairDecay::addTauPlusMcProng(int pprong)
+{
+  m_pprong = pprong;
+}
+
+void TauPairDecay::addTauMinusMcProng(int mprong)
+{
+  m_mprong = mprong;
+}

@@ -7,6 +7,7 @@
 
 #include <bklm/modules/bklmRawPacker/BKLMRawPackerModule.h>
 #include <framework/database/DBArray.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
 
 #include <framework/logging/Logger.h>
@@ -107,11 +108,8 @@ void BKLMRawPackerModule::event()
     short iCTime = bklmDigit->getCTime();
     bool isRPC = bklmDigit->inRPC();
     bool isAboveThresh = bklmDigit->isAboveThreshold();
-    int moduleId = (isForward ? BKLM_END_MASK : 0)
-                   | ((iSector - 1) << BKLM_SECTOR_BIT)
-                   | ((iLayer - 1) << BKLM_LAYER_BIT)
-                   | ((iAx) << BKLM_PLANE_BIT)
-                   | ((iChannelNr - 1) << BKLM_STRIP_BIT);
+    int moduleId = BKLMElementNumbers::channelNumber(isForward, iSector, iLayer,
+                                                     iAx, iChannelNr);
     B2DEBUG(1, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " isforward: " << isForward << " layer: " << iLayer <<
             " plane: " << iAx << " icharge " << icharge << " tdc " << iTdc << " ctime " << iCTime << " isAboveThresh " << isAboveThresh <<
             " isRPC " << isRPC << " " << moduleId << bklmDigit->getModuleID());
@@ -252,7 +250,6 @@ void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, 
                                      unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
 {
 
-  charge = m_scintADCOffset - charge;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
@@ -290,11 +287,8 @@ void BKLMRawPackerModule::loadMapFromDB()
     int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1, laneId, axisId, channelId);
     int moduleId = 0;
     B2DEBUG(1, "BKLMRawPackerModule::reading Data Base for BKLMElectronicMapping...");
-    moduleId = (isForward ? BKLM_END_MASK : 0)
-               | ((sector - 1) << BKLM_SECTOR_BIT)
-               | ((layer - 1) << BKLM_LAYER_BIT)
-               | ((plane) << BKLM_PLANE_BIT)
-               | ((stripId - 1) << BKLM_STRIP_BIT);
+    moduleId = BKLMElementNumbers::channelNumber(isForward, sector, layer,
+                                                 plane, stripId);
     m_ModuleIdToelectId[moduleId] = elecId;
     B2DEBUG(1, " electId: " << elecId << " modId: " << moduleId);
   }

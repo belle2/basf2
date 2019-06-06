@@ -77,7 +77,7 @@ namespace Belle2 {
     *  @param id  Number of the SecID using the encoded format. Careful - SecIDs are not continuously within the encoded number.
     *                The default is set to zero which represents the secID of the IP
     */
-    FullSecID(unsigned int id = 0):
+    explicit FullSecID(unsigned int id = 0):
       m_fullSecID(id) {}
 
 
@@ -86,7 +86,7 @@ namespace Belle2 {
     *
     *  @param sid  global secID encoded in a string file eg "41_12345_3" 41 means layer 4, sublayer 1, 12345 is a dummy for the integer-version of the VxdID and the last digit is the local secID on the sensor
     */
-    FullSecID(std::string sid);
+    explicit FullSecID(std::string sid);
 
 
     /** Constructor. If you want to create a new Full Sec ID using the information which shall be stored there

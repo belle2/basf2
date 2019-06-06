@@ -211,6 +211,22 @@ namespace {
     EXPECT_EQ(dd5.getMother()->getLabel(), "");
   }
 
+  TEST(DecayDescriptorTest, UnicodeTest)
+  {
+    // use of unicode characters in labels
+    const std::string weird = "⨔π⁰=🖼🔰";
+    DecayDescriptor dd1;
+    bool initok = dd1.init("B0:" + weird + " -> K+:💩😜 pi-:💯🍆💦");
+    ASSERT_EQ(initok, true);
+    EXPECT_EQ(dd1.getMother()->getName(), "B0");
+    EXPECT_EQ(dd1.getMother()->getLabel(), weird);
+    ASSERT_EQ(dd1.getNDaughters(), 2);
+    EXPECT_EQ(dd1.getDaughter(0)->getMother()->getName(), "K+");
+    EXPECT_EQ(dd1.getDaughter(1)->getMother()->getName(), "pi-");
+    EXPECT_EQ(dd1.getDaughter(0)->getMother()->getLabel(), "💩😜");
+    EXPECT_EQ(dd1.getDaughter(1)->getMother()->getLabel(), "💯🍆💦");
+  }
+
   TEST(DecayDescriptorTest, BadGrammarTest)
   {
     DecayDescriptor dd1;
@@ -290,12 +306,12 @@ namespace {
     std::vector<std::pair<int, std::string>> K_path;
     std::vector<std::pair<int, std::string>> pi0_path;
 
-    K_path.push_back(std::make_pair(0, std::string("B")));
-    K_path.push_back(std::make_pair(0, std::string("D")));
-    K_path.push_back(std::make_pair(0, std::string("K")));
+    K_path.emplace_back(0, std::string("B"));
+    K_path.emplace_back(0, std::string("D"));
+    K_path.emplace_back(0, std::string("K"));
 
-    pi0_path.push_back(std::make_pair(0, std::string("B")));
-    pi0_path.push_back(std::make_pair(1, std::string("pi0")));
+    pi0_path.emplace_back(0, std::string("B"));
+    pi0_path.emplace_back(1, std::string("pi0"));
 
     EXPECT_NE(expected_hierarchies, selected_hierarchies);
     expected_hierarchies.push_back(K_path);

@@ -51,6 +51,7 @@ namespace Belle2 {
     addParam("maxApdHits" , m_maxApdHits , "Remove hits with more than MaxApdHits per APD chip", (uint8_t)18);
     addParam("maxHapdHits", m_maxHapdHits, "Remove hits with more than MaxHapdHits per HAPD", (uint8_t)100);
     addParam("MagFieldCorrection", m_bcorrect, "Apply hit position correction due to non-perp. mag. field", 0);
+    addParam("fillAll", m_fillall, "Make hits for all active channels (useful for likelihood PDF studies)", 0);
   }
 
   ARICHFillHitsModule::~ARICHFillHitsModule()
@@ -66,6 +67,7 @@ namespace Belle2 {
     StoreArray<ARICHHit> arichHits;
     arichHits.registerInDataStore();
 
+    arichHits.registerRelationTo(digits);
   }
 
   void ARICHFillHitsModule::beginRun()
@@ -96,35 +98,62 @@ namespace Belle2 {
       hapdHits[moduleID]++;
     }
 
-    for (const auto& digit : digits) {
-      int asicCh = digit.getChannelID();
-      int modID = digit.getModuleID();
-      if (modID > 420 || modID < 1) continue;
-      if (asicCh > 143 || asicCh < 0) continue;
-      uint8_t hitBitmap = digit.getBitmap();
-      if (!(hitBitmap & m_bitMask)) continue;
+    if (!m_fillall) {
+      for (const auto& digit : digits) {
+        int asicCh = digit.getChannelID();
+        int modID = digit.getModuleID();
+        if (modID > 420 || modID < 1) continue;
+        if (asicCh > 143 || asicCh < 0) continue;
+        uint8_t hitBitmap = digit.getBitmap();
+        if (!(hitBitmap & m_bitMask)) continue;
 
-      // remove hot and dead channels
-      if (!m_chnMask->isActive(modID, asicCh)) continue;
+        // remove hot and dead channels
+        if (!m_chnMask->isActive(modID, asicCh)) continue;
 
-      int chipID    = (modID - 1) * 4   + asicCh / 36;
+        int chipID    = (modID - 1) * 4   + asicCh / 36;
 
-      if (apdHits[chipID]   > m_maxApdHits) continue;
-      if (hapdHits[modID - 1] > m_maxHapdHits) continue;
+        if (apdHits[chipID]   > m_maxApdHits) continue;
+        if (hapdHits[modID - 1] > m_maxHapdHits) continue;
 
 
-      int xCh, yCh;
-      if (not m_chnMap->getXYFromAsic(asicCh, xCh, yCh)) {
-        B2ERROR("Invalid ARICH hit! This hit will be ignored.");
-        continue;
+        int xCh, yCh;
+        if (not m_chnMap->getXYFromAsic(asicCh, xCh, yCh)) {
+          B2ERROR("Invalid ARICH hit! This hit will be ignored.");
+          continue;
+        }
+
+        TVector2 hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
+        TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
+        hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
+
+        if (m_bcorrect) magFieldCorrection(hitpos3D);
+        ARICHHit* hh = arichHits.appendNew(hitpos3D, modID, asicCh);
+        hh->addRelationTo(&digit);
       }
+    } else {
+      for (int imod = 1; imod < 421; imod++) {
+        for (int ichn = 0; ichn < 144; ichn++) {
 
-      TVector2 hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
-      TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
-      hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
+          // remove hot and dead channels
+          if (!m_chnMask->isActive(imod, ichn)) continue;
+          int chipID    = (imod - 1) * 4   + ichn / 36;
 
-      if (m_bcorrect) magFieldCorrection(hitpos3D);
-      arichHits.appendNew(hitpos3D, modID, asicCh);
+          if (apdHits[chipID]   > m_maxApdHits) continue;
+          if (hapdHits[imod - 1] > m_maxHapdHits) continue;
+
+          int xCh, yCh;
+          if (not m_chnMap->getXYFromAsic(ichn, xCh, yCh)) {
+            B2ERROR("Invalid ARICH hit! This hit will be ignored.");
+            continue;
+          }
+
+          TVector2 hitpos2D = m_geoPar->getChannelPosition(imod, xCh, yCh);
+          TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
+          hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
+          if (m_bcorrect) magFieldCorrection(hitpos3D);
+          arichHits.appendNew(hitpos3D, imod, ichn);
+        }
+      }
     }
 
   }

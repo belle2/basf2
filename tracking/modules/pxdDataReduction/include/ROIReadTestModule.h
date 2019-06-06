@@ -47,7 +47,7 @@ namespace Belle2 {
 
     std::string m_outfileName; /**< produced file name*/
     std::string m_ROIpayloadName; /**< ROI payload name*/
-    FILE* m_pFile; /**< file*/
+    FILE* m_pFile = nullptr; /**< file handler*/
 
   };
 }

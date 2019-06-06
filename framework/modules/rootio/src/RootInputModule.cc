@@ -32,7 +32,7 @@ using namespace RootIOUtilities;
 
 REG_MODULE(RootInput)
 
-RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentEntry(-1), m_tree(0), m_persistent(0)
+RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentEntry(-1), m_tree(nullptr), m_persistent(nullptr)
 {
   //Set module properties
   setDescription("Reads objects/arrays from one or more .root files saved by the RootOutput module and makes them available through the DataStore. Files do not necessarily have to be local, http:// and root:// (for files in xrootd) URLs are supported as well.");
@@ -83,8 +83,7 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "file cache size in Mbytes. If negative, use root default", 0);
 }
 
-
-RootInputModule::~RootInputModule() { }
+RootInputModule::~RootInputModule() = default;
 
 void RootInputModule::initialize()
 {
@@ -178,7 +177,7 @@ void RootInputModule::initialize()
     // see TChain::AddFile
     TObjArray* fileElements = m_tree->GetListOfFiles();
     TIter next(fileElements);
-    TChainElement* chEl = 0;
+    TChainElement* chEl = nullptr;
     while ((chEl = (TChainElement*)next())) {
       if (!unique_filenames.insert(chEl->GetTitle()).second) {
         B2WARNING("The input file '" << chEl->GetTitle() << "' was specified more than once");
@@ -193,7 +192,7 @@ void RootInputModule::initialize()
   }
 
   if (m_entrySequences.size() > 0) {
-    TEventList* elist = new TEventList("input_event_list");
+    auto* elist = new TEventList("input_event_list");
     for (unsigned int iFile = 0; iFile < m_entrySequences.size(); ++iFile) {
       int64_t offset = m_tree->GetTreeOffset()[iFile];
       int64_t next_offset = m_tree->GetTreeOffset()[iFile + 1];
@@ -225,7 +224,7 @@ void RootInputModule::initialize()
 
   if (!connectBranches(m_tree, DataStore::c_Event, &m_storeEntries)) {
     delete m_tree;
-    m_tree = 0; //don't try to read from there
+    m_tree = nullptr; //don't try to read from there
   } else {
     InputController::setCanControlInput(true);
     InputController::setChain(m_tree);
@@ -313,7 +312,7 @@ void RootInputModule::terminate()
   delete m_tree;
   delete m_persistent;
   ReadStats parentReadStats;
-  for (auto entry : m_parentTrees) {
+  for (const auto& entry : m_parentTrees) {
     TFile* f = entry.second->GetCurrentFile();
     if (m_collectStatistics)
       parentReadStats.addFromFile(f);
@@ -326,8 +325,8 @@ void RootInputModule::terminate()
     B2INFO("Statistics for event tree (parent files): " << parentReadStats.getString());
   }
 
-  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
-    m_connectedBranches[ii].clear();
+  for (auto& branch : m_connectedBranches) {
+    branch.clear();
   }
   m_storeEntries.clear();
   m_persistentStoreEntries.clear();
@@ -366,7 +365,7 @@ void RootInputModule::readTree()
   for (auto entry : m_storeEntries) {
     entry->resetForGetEntry();
   }
-  for (auto storeEntries : m_parentStoreEntries) {
+  for (const auto& storeEntries : m_parentStoreEntries) {
     for (auto entry : storeEntries) {
       entry->resetForGetEntry();
     }
@@ -394,7 +393,9 @@ void RootInputModule::readTree()
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
     if (!m_recovery or fileMetaData)
-      B2INFO("Loading new input file with physical path:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
+      B2INFO("Loading new input file"
+             << LogVar("filename", m_tree->GetFile()->GetName())
+             << LogVar("metadata LFN", fileMetaData->getLfn()));
     if (m_processingAllEvents) {
       // add the MCEvents together so that the output contains the sum of generated events
       unsigned int mcEvents = fileMetaData->getMcEvents() + Environment::Instance().getNumberOfMCEvents();
@@ -437,14 +438,14 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
   }
   set<string> branchList;
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-    TBranch* branch = static_cast<TBranch*>(branches->At(jj));
+    auto* branch = static_cast<TBranch*>(branches->At(jj));
     if (branch)
       branchList.insert(branch->GetName());
   }
   //skip branches the user doesn't want
   branchList = filterBranches(branchList, m_branchNames[durability], m_excludeBranchNames[durability], durability);
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-    TBranch* branch = static_cast<TBranch*>(branches->At(jj));
+    auto* branch = static_cast<TBranch*>(branches->At(jj));
     if (!branch) continue;
     const std::string branchName = branch->GetName();
     //skip already connected branches
@@ -454,17 +455,17 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
       //make sure FileMetaData and EventMetaData of the main file are always loaded
       if (((branchName != "FileMetaData") || (tree != m_persistent)) &&
           ((branchName != "EventMetaData") || (tree != m_tree))) {
-        tree->SetBranchStatus(branchName.c_str(), 0);
+        tree->SetBranchStatus(branchName.c_str(), false);
         continue;
       }
     }
 
     //Get information about the object in the branch
-    TObject* objectPtr = 0;
+    TObject* objectPtr = nullptr;
     branch->SetAddress(&objectPtr);
     branch->GetEntry();
     bool array = (string(branch->GetClassName()) == "TClonesArray");
-    TClass* objClass = 0;
+    TClass* objClass = nullptr;
     if (array)
       objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();
     else
@@ -473,7 +474,7 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
 
     //Create a DataStore entry and connect the branch address to it
     if (!DataStore::Instance().registerEntry(branchName, durability, objClass, array, DataStore::c_WriteOut)) {
-      tree->SetBranchStatus(branch->GetName(), 0);
+      tree->SetBranchStatus(branch->GetName(), false);
       continue;
     }
     DataStore::StoreEntry& entry = (map.find(branchName))->second;
@@ -494,7 +495,7 @@ bool RootInputModule::createParentStoreEntries()
   // get the experiment/run/event number and parentLfn of the first entry
   TBranch* branch = m_tree->GetBranch("EventMetaData");
   char* address = branch->GetAddress();
-  EventMetaData* eventMetaData = 0;
+  EventMetaData* eventMetaData = nullptr;
   branch->SetAddress(&eventMetaData);
   branch->GetEntry(0);
   int experiment = eventMetaData->getExperiment();
@@ -511,12 +512,13 @@ bool RootInputModule::createParentStoreEntries()
     TFile* file = TFile::Open(parentPfn.c_str(), "READ");
     dir->cd();
     if (!file || !file->IsOpen()) {
-      B2ERROR("Couldn't open parent file " << parentLfn << " " << parentPfn);
+      B2ERROR("Couldn't open parent file. Maybe you need to create a file catalog using b2file-catalog-add?"
+              << LogVar("LFN", parentLfn) << LogVar("PFN", parentPfn));
       return false;
     }
 
     // get the event tree and connect its branches
-    TTree* tree = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Event].c_str()));
+    auto* tree = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Event].c_str()));
     if (!tree) {
       B2ERROR("No tree " << c_treeNames[DataStore::c_Event] << " found in " << parentPfn);
       return false;
@@ -526,12 +528,12 @@ bool RootInputModule::createParentStoreEntries()
     m_parentTrees.insert(std::make_pair(parentLfn, tree));
 
     // get the persistent tree and read its branches
-    TTree* persistent = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Persistent].c_str()));
+    auto* persistent = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Persistent].c_str()));
     if (!persistent) {
       B2ERROR("No tree " << c_treeNames[DataStore::c_Persistent] << " found in " << parentPfn);
       return false;
     }
-    connectBranches(persistent, DataStore::c_Persistent, 0);
+    connectBranches(persistent, DataStore::c_Persistent, nullptr);
 
     // get parent LFN of parent
     EventMetaData* metaData = nullptr;
@@ -560,7 +562,7 @@ bool RootInputModule::readParentTrees()
     TTree* tree = nullptr;
     if (m_parentTrees.find(parentLfn) == m_parentTrees.end()) {
       TDirectory* dir = gDirectory;
-      B2DEBUG(100, "Opening parent file: " << parentPfn);
+      B2DEBUG(100, "Opening parent file" << LogVar("PFN", parentPfn));
       TFile* file = TFile::Open(parentPfn.c_str(), "READ");
       dir->cd();
       if (!file || !file->IsOpen()) {
@@ -618,12 +620,12 @@ void RootInputModule::addEventListForIndexFile(const std::string& parentLfn)
   TTree* tree = m_parentTrees.at(parentLfn);
 
   //both types of list work, TEventList seems to result in slightly less data being read.
-  TEventList* elist = new TEventList("parent_entrylist");
+  auto* elist = new TEventList("parent_entrylist");
   //TEntryListArray* elist = new TEntryListArray();
 
   TBranch* branch = m_tree->GetBranch("EventMetaData");
   auto* address = branch->GetAddress();
-  EventMetaData* eventMetaData = 0;
+  EventMetaData* eventMetaData = nullptr;
   branch->SetAddress(&eventMetaData);
   long nEntries = m_tree->GetEntries();
   for (long i = m_nextEntry; i < nEntries; i++) {
@@ -686,7 +688,7 @@ void RootInputModule::readPersistentEntry(long fileEntry)
       bool isMergeable = entry->object->InheritsFrom(Mergeable::Class());
       if (isMergeable) {
         const Mergeable* oldObj = static_cast<Mergeable*>(entry->ptr);
-        Mergeable* newObj = static_cast<Mergeable*>(entry->object);
+        auto* newObj = static_cast<Mergeable*>(entry->object);
         newObj->merge(oldObj);
 
         delete entry->ptr;

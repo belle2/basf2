@@ -12,7 +12,6 @@
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/RandomGenerator.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 #include <memory>

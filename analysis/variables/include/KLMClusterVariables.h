@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Torben Ferber, Giacomo De Pietro            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,6 @@
 #pragma once
 
 #include <analysis/dataobjects/Particle.h>
-#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 
@@ -108,6 +107,11 @@ namespace Belle2 {
      * returns the maximum angle of a KLMCluster to this Particle in the CMS frame
      */
     double maximumKLMAngleCMS(const Particle* particle);
+
+    /**
+     * returns the minimum angle of a KLMCluster to this Particle in the CMS frame
+     */
+    double minimumKLMAngleCMS(const Particle* particle);
 
     /**
      * returns the number of Tracks matched to the KLMCluster associated to this Particle

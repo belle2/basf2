@@ -104,7 +104,7 @@ namespace Belle2 {
      * @param globalTag      The name of the global tag
      * @param payloadDir     The name of the directory in which the payloads are stored.
      */
-    explicit ConditionsDatabase(const std::string& globalTag, const std::string& payloadDir = "");
+    explicit ConditionsDatabase(std::string  globalTag, const std::string& payloadDir = "");
 
     /** Hidden copy constructor, as it is a singleton. */
     ConditionsDatabase(const ConditionsDatabase&);

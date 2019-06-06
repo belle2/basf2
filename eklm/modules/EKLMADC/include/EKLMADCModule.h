@@ -14,7 +14,7 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <eklm/simulation/FiberAndElectronics.h>
+#include <klm/simulation/ScintillatorSimulator.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 
@@ -84,11 +84,11 @@ namespace Belle2 {
     /** Output file. */
     TFile* m_fout;
 
-    /** Digitization parameters. */
-    DBObjPtr<EKLMDigitizationParameters> m_DigParDatabase;
+    /** Scintillator simulation parameters. */
+    DBObjPtr<KLMScintillatorDigitizationParameters> m_SciSimParDatabase;
 
-    /** Digitization parameters. */
-    EKLMDigitizationParameters* m_DigPar;
+    /** Scintillator simulation parameters. */
+    KLMScintillatorDigitizationParameters* m_SciSimPar;
 
     /** Direct histogram. */
     float* m_hDir;

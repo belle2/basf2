@@ -7,6 +7,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
 
 namespace Belle2 {
 
@@ -35,6 +36,8 @@ namespace Belle2 {
      * in the same CDCTriggerTrack.
      */
     virtual void event() override;
+    /** shuffle the input ids in the input vector to match the hardware*/
+    float hwInputIdShuffle(float tsid, int sl);
 
   protected:
     /** Name of file where network weights etc. are stored. */
@@ -62,13 +65,32 @@ namespace Belle2 {
      *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
-
+    /** way to obtain the event time, possible values are:
+     *   "etf_only"                 :   only ETF info is used, otherwise an error
+     *                                  is thrown.
+     *   "fastestpriority"          :   event time is estimated by fastest priority
+     *                                  time in selected track segments. if something
+     *                                  fails, it is set to 0.
+     *   "zero"                     :   the event time is set to 0.
+     *   "etf_or_fastestpriority"   :   the event time is obtained by the ETF, if
+     *                                  not possible, the flag
+     *                                  "fastestppriority" is used.
+     *   "etf_or_zero"              :   the event time is obtained by the ETF, if
+     *                                  not possible, it es set to 0
+     */
+    std::string m_et_option;
+    /** Switch for writing out the input vector for each track (off by default). */
+    bool m_writeMLPinput;
+    /** Switch to mimic an apparent bug in the hardware preprocessing. */
+    bool m_hardwareCompatibilityMode;
     /** list of input 2D tracks */
     StoreArray<CDCTriggerTrack> m_tracks2D;
     /** list of output NN tracks */
     StoreArray<CDCTriggerTrack> m_tracksNN;
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** list of input vectors for each NN track */
+    StoreArray<CDCTriggerMLPInput> m_mlpInput;
   };
 }
 #endif

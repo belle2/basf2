@@ -5,7 +5,7 @@
     FEI Hadronic B0 tag skim standalone for generic analysis in the
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180100
-    fei training: MC9 based, release-03-00-00 'FEIv4_2018_MC9_release_02_00_01'
+    fei training: MC12 based, release-03-01-01 'FEIv4_2019_MC12_release_03_01_01'
     """
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
@@ -21,17 +21,13 @@ from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-01-01'
 skimCode = encodeSkimName('feiHadronicB0')
-
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC12")
 
 path = create_path()
 
-inputMdstList('MC9', fileList, path=path)
+inputMdstList('default', fileList, path=path)
 
 from skim.fei import *
 # run pre-selection cuts and FEI

@@ -105,7 +105,7 @@ namespace Belle2 {
       m_VisAttributes.clear();
       for (CreatorBase* creator : m_creators) delete creator;
       m_creators.clear();
-      m_topVolume = 0;
+      m_topVolume = nullptr;
       //Clean up existing Geometry
       G4GeometryManager::GetInstance()->OpenGeometry();
       G4PhysicalVolumeStore::Clean();
@@ -201,7 +201,7 @@ namespace Belle2 {
       //If there are still names left in the componentNames, excludedNames or
       //additionalNames there is probably an typo in the respective component
       //list. Throw an error for each name left using a small lambda function
-      auto checkRemaining = [](const std::string & type, const std::set<std::string> remainingNames) {
+      auto checkRemaining = [](const std::string & type, const std::set<std::string>& remainingNames) {
         for (const std::string& name : remainingNames) {
           B2ERROR("Geometry '" << name << "' is specified in list of "
                   << type << " but could not be found");
@@ -230,7 +230,7 @@ namespace Belle2 {
       // by adding it as a fake database payload
       BFieldMap::Instance().clear();
       if (!useDB) {
-        MagneticField* fieldmap = new MagneticField();
+        auto* fieldmap = new MagneticField();
         fieldmap->addComponent(new BFieldFrameworkInterface());
         DBStore::Instance().addConstantOverride("MagneticField", fieldmap, false);
       }
@@ -260,9 +260,9 @@ namespace Belle2 {
       G4Box*           top_box = new G4Box("Top", xHalfLength > 0 ? xHalfLength : 1,
                                            yHalfLength > 0 ? yHalfLength : 1,
                                            zHalfLength > 0 ? zHalfLength : 1);
-      G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", 0, 0, 0);
+      G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", nullptr, nullptr, nullptr);
       setVisibility(*top_log, false);
-      m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);
+      m_topVolume = new G4PVPlacement(nullptr, G4ThreeVector(), top_log, "Top", nullptr, false, 0);
       B2DEBUG(10, "Created top volume with x= +-" << config.getGlobalWidth() << " cm, y= +-"
               << config.getGlobalHeight() << " cm, z= +-" << config.getGlobalLength() << " cm");
 

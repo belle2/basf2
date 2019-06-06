@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      FacetRelationFilterFactory(const std::string& defaultFilterName = "chi2");
+      explicit FacetRelationFilterFactory(const std::string& defaultFilterName = "chi2");
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

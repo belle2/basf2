@@ -32,54 +32,22 @@ namespace Belle2 {
 
   public:
 
-    /** Number of PXD planes and their numbers.
-     * The actual (layer, ladder, sensor numbers are (i,1,i), i = 1,2
-     */
-    enum {
-      c_nPXDPlanes = 2,
-      c_firstPXDPlane = 1,
-      c_lastPXDPlane = 2,
-    };
-
     /** Constructor */
     PXDRawDQMCorrModule();
-    /* Destructor */
-    virtual ~PXDRawDQMCorrModule();
 
   private:
     /** Module functions */
     void initialize() override final;
     void beginRun() override final;
     void event() override final;
-    void endRun() override final;
-    void terminate() override final;
 
     /**
-     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
+     * Histogram definitions such as TH1(), TH2()TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
     void defineHisto() override final;
 
   private:
-    /** Utility function to convert index to plane number
-     * and to protect against range errors.
-     */
-    inline int indexToPlane(int index) const
-    {
-      return c_firstPXDPlane + index;
-    }
-    /** Utility function to convert plane number to index
-     * and to protect against range errors.
-     */
-    inline int planeToIndex(int iPlane) const
-    {
-      return iPlane - c_firstPXDPlane;
-    }
-    /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
-     * @param index Index of the sensor (0,1), _not_ layer number!
-     * @return SensorInfo object for the desired plane.
-     */
-    inline const PXD::SensorInfo& getInfo(int index) const;
 
     std::string m_storeRawHitsName;             /**< PXDRawHits StoreArray name */
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
@@ -87,29 +55,21 @@ namespace Belle2 {
     /** Storearray for raw pixels   */
     StoreArray<PXDRawHit> m_storeRawHits;
 
-    TH2F* m_CorrelationU;          /**< Correlation Sensor 1 vs 2 */
-    TH2F* m_CorrelationV;          /**< Correlation Sensor 1 vs 2 */
-    TH1F* m_DeltaU;          /**< Correlation Sensor 1 vs 2 */
-    TH1F* m_DeltaV;          /**< Correlation Sensor 1 vs 2 */
+    TH2F* m_CorrelationU = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH2F* m_CorrelationV = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH1F* m_DeltaU = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH1F* m_DeltaV = nullptr;          /**< Correlation Sensor 1 vs 2 */
 
-    TH2F* m_In1CorrelationU;          /**< Correlation Sensor 1 vs 2 */
-    TH2F* m_In1CorrelationV;          /**< Correlation Sensor 1 vs 2 */
-    TH1F* m_In1DeltaU;          /**< Correlation Sensor 1 vs 2 */
-    TH1F* m_In1DeltaV;          /**< Correlation Sensor 1 vs 2 */
+    TH2F* m_In1CorrelationU = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH2F* m_In1CorrelationV = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH1F* m_In1DeltaU = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH1F* m_In1DeltaV = nullptr;          /**< Correlation Sensor 1 vs 2 */
 
-    TH2F* m_In2CorrelationU;          /**< Correlation Sensor 1 vs 2 */
-    TH2F* m_In2CorrelationV;          /**< Correlation Sensor 1 vs 2 */
-    TH1F* m_In2DeltaU;          /**< Correlation Sensor 1 vs 2 */
-    TH1F* m_In2DeltaV;          /**< Correlation Sensor 1 vs 2 */
+    TH2F* m_In2CorrelationU = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH2F* m_In2CorrelationV = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH1F* m_In2DeltaU = nullptr;          /**< Correlation Sensor 1 vs 2 */
+    TH1F* m_In2DeltaV = nullptr;          /**< Correlation Sensor 1 vs 2 */
 
   };
-
-  inline const PXD::SensorInfo& PXDRawDQMCorrModule::getInfo(int index) const
-  {
-    int iPlane = indexToPlane(index);
-    VxdID sensorID(iPlane, 1, iPlane);
-    return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-  }
-
 }
 

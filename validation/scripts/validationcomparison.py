@@ -52,6 +52,7 @@ class ComparisonBase:
     pass
 
 
+# fixme: This currently returns lists for chi2, ndf, and chi2/ndf. This surely isn't what we wanted
 class Chi2Test(ComparisonBase):
 
     """
@@ -82,9 +83,13 @@ class Chi2Test(ComparisonBase):
         self.debug = debug
 
         # Those will only be accessed via methods.
+        #: pvalue
         self._pvalue = None
+        #: chi2
         self._chi2 = None
+        #: chi2 / number of degrees of freedom
         self._chi2ndf = None
+        #: number of degrees of freedom
         self._ndf = None
 
     def can_compare(self):
@@ -95,8 +100,8 @@ class Chi2Test(ComparisonBase):
 
     def correct_types(self):
         """
-        @return: True if the two objects have a) a type supported for comparison
-            and b) can be compared with each other
+        @return: True if the two objects have a) a type supported for
+            comparison and b) can be compared with each other
         """
         if self.object_a is None or self.object_b is None:
             return False
@@ -154,7 +159,7 @@ class Chi2Test(ComparisonBase):
 
         #: compute and store quantities
         self._pvalue, self._chi2, self._chi2ndf, self._ndf = \
-            self.__internal_compare()
+            self._internal_compare()
         self.computed = True
 
     def ensure_zero_error_has_no_content(self, a, b):
@@ -191,7 +196,7 @@ class Chi2Test(ComparisonBase):
         return nbins_a == nbins_b
 
     @staticmethod
-    def __convert_teff_to_hist(teff_a):
+    def _convert_teff_to_hist(teff_a):
         """
         Convert the content of a TEfficiency plot to a histogram and set
         the bin content and errors
@@ -216,7 +221,7 @@ class Chi2Test(ComparisonBase):
 
         return th1
 
-    def __internal_compare(self):
+    def _internal_compare(self):
         """
         Performs the actual Chi^2 test
         @return: The request result quantity
@@ -250,15 +255,15 @@ class Chi2Test(ComparisonBase):
 
         # very special handling for TEfficiencies
         if self.object_a.ClassName() == "TEfficiency":
-            local_object_a = self.__convert_teff_to_hist(self.object_a)
-            local_object_b = self.__convert_teff_to_hist(self.object_b)
+            local_object_a = self._convert_teff_to_hist(self.object_a)
+            local_object_b = self._convert_teff_to_hist(self.object_b)
             if self.debug:
                 print("Converting TEfficiency objects to histograms.")
 
         nbins = local_object_a.GetNbinsX()
 
         if nbins < 2:
-            raise TooFewBins("{} bin(s) is to few to perform the Chi2 "
+            raise TooFewBins("{} bin(s) is too few to perform the Chi2 "
                              "test.".format(nbins))
 
         weighted_types = ["TProfile", "TH1D", "TH1F"]
@@ -319,7 +324,7 @@ class Chi2Test(ComparisonBase):
             tp.print(["chi2", numpy.asscalar(res_chi2),
                       "Should roughly match above 'Total chi2'"])
             tp.print(["ndf", numpy.asscalar(res_ndf), "#Non-empty bins - 1"])
-            tp.print(["chi2/ndf", numpy.asscalar(res_chi2/res_ndf), ""])
+            tp.print(["chi2/ndf", numpy.asscalar(res_chi2 / res_ndf), ""])
             tp.print(["igood", numpy.asscalar(res_igood),
                       "a debug indicator, 0 if all good"])
             tp.print(["pvalue", res_pvalue, ""])
@@ -340,21 +345,24 @@ class Chi2Test(ComparisonBase):
 
         res_chi2ndf = res_chi2 / res_ndf
 
-        return res_pvalue, res_chi2, res_chi2ndf, res_ndf
+        return res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
 
 
 class TablePrinter(object):
     """ A tiny class to print columns of fixed width numbers. """
+
     def __init__(self, ncols, width=None):
         """
         Constructor.
         @param ncols: Number of columns
         @param width: Width of each column. Either int or list.
         """
+        #: the number of columns
         self.ncols = ncols
         if not width:
             width = 10
         if isinstance(width, int):
+            #: width of each column
             self.widths = [width] * ncols
         elif isinstance(width, list) or isinstance(width, tuple):
             # let's hope this is a list then.
@@ -386,7 +394,7 @@ class TablePrinter(object):
                 form = "{{:{}d}}".format(width)
                 out.append(form.format(col))
             elif isinstance(col, float):
-                form = "{{:{}.{}f}}".format(width, width//2)
+                form = "{{:{}.{}f}}".format(width, width // 2)
                 out.append(form.format(col))
             else:
                 # convert everything else to a string if it isn't already
@@ -409,8 +417,8 @@ def print_contents_and_errors(obj_a, obj_b):
     total_a = sum([obj_a.GetBinContent(ibin) for ibin in range(0, nbins + 2)])
     total_b = sum([obj_b.GetBinContent(ibin) for ibin in range(0, nbins + 2)])
 
-    print("Total events/summed weights in object 1: {:10.5f}".format(total_a))
-    print("Total events/summed weights in object 2: {:10.5f}".format(total_b))
+    print(f"Total events/summed weights in object 1: {total_a:10.5f}")
+    print(f"Total events/summed weights in object 2: {total_b:10.5f}")
 
     chi2_tot = 0
 
@@ -443,7 +451,7 @@ def print_contents_and_errors(obj_a, obj_b):
     cp.print_divider()
     print()
 
-    print("Total chi2: {:10.5f}".format(chi2_tot))
+    print(f"Total chi2: {chi2_tot:10.5f}")
 
 
 def debug_cli():
@@ -474,24 +482,24 @@ def debug_cli():
     # =================================
 
     if not os.path.exists(args.rootfile_a):
-        raise ValueError("Could not find '{}'.".format(args.rootfile_a))
+        raise ValueError(f"Could not find '{args.rootfile_a}'.")
 
     if not os.path.exists(args.rootfile_b):
-        raise ValueError("Could not find '{}'.".format(args.rootfile_b))
+        raise ValueError(f"Could not find '{args.rootfile_b}'.")
 
     rootfile_a = ROOT.TFile(args.rootfile_a)
     obj_a = rootfile_a.Get(args.name_a)
     if not obj_a:
-        raise ValueError("Could not find object '{}' in file '{}'.".format(
-            args.name_a, args.rootfile_a
-        ))
+        raise ValueError(
+            f"Could not find object '{args.name_a}' "
+            f"in file '{args.rootfile_a}'.")
 
     rootfile_b = ROOT.TFile(args.rootfile_b)
     obj_b = rootfile_b.Get(args.name_b)
     if not obj_b:
-        raise ValueError("Could not find object '{}' in file '{}'.".format(
-            args.name_b, args.rootfile_b
-        ))
+        raise ValueError(
+            f"Could not find object '{args.name_b}' "
+            f"in file '{args.rootfile_b}'.")
 
     # 3. Performe testing with debug option
     # =====================================
@@ -506,6 +514,7 @@ def debug_cli():
 
     rootfile_a.Close()
     rootfile_b.Close()
+
 
 if __name__ == "__main__":
     # Run command line interface for testing purposes.

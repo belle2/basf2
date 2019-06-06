@@ -35,7 +35,7 @@ void NtupleCustomFloatsTool::setupTree()
   int nVars = m_strVarNames.size();
   for (int iVar = 0; iVar < nVars; iVar++) {
     // dropping possible aliases
-    string varName = m_strVarNames[iVar].substr(0, m_strVarNames[iVar].find("{", 0));
+    string varName = m_strVarNames[iVar].substr(0, m_strVarNames[iVar].find('{', 0));
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varName);
     if (!var) {
       B2ERROR("Variable '" << varName << "' is not available in Variable::Manager!");
@@ -54,9 +54,10 @@ void NtupleCustomFloatsTool::setupTree()
       int iPos = iVar * nDecayProducts + iProduct;
       string varName;
 
-      if (m_strVarNames[iVar].find("{", 0) > 0) {
-        varName = m_strVarNames[iVar].substr(m_strVarNames[iVar].find("{", 0) + 1, m_strVarNames[iVar].find("}",
-                                             0) - m_strVarNames[iVar].find("{", 0) - 1);
+      // cppcheck-suppress stlIfStrFind
+      if (m_strVarNames[iVar].find('{', 0) > 0) {
+        varName = m_strVarNames[iVar].substr(m_strVarNames[iVar].find('{', 0) + 1, m_strVarNames[iVar].find('}',
+                                             0) - m_strVarNames[iVar].find('{', 0) - 1);
         varName = makeROOTCompatible(varName);
         varName = (strNames[iProduct] + "_" + varName);
       } else {

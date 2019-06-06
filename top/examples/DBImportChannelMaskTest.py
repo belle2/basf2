@@ -7,6 +7,7 @@
 # --------------------------------------------------------------------------------
 
 from basf2 import *
+import os
 import ROOT
 from ROOT.Belle2 import TOPDatabaseImporter
 
@@ -18,7 +19,7 @@ main = create_path()
 
 # Event info setter - execute single event
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files

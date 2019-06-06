@@ -4,7 +4,6 @@
 *.class.C
 *.root
 
-
 # Exceptions #
 # ########## #
 
@@ -56,7 +55,7 @@
 # Basf2 compile folders #
 # ##################### #
 /bin/
-/build/
+/build
 /config.log
 /data/
 /include/
@@ -64,15 +63,18 @@
 /modules/
 /.sconf_temp/
 /.sconsign.dblite
+/compile_commands.json
 
 
 # Validation / Run artefacts #
 # ########################## #
 centraldb/
+localdb/
 Belle2FileCatalog.xml
 /results/
 /html/
-/runtime.dat
+/runtimes.dat
+/runtimes-old.dat
 
 
 # Python byte code #
@@ -102,6 +104,8 @@ Belle2FileCatalog.xml
 .dir-locals.el
 .project
 .idea
+.vscode
+.gdb_history
 
 # Compiler output #
 # ############### #

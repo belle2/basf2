@@ -112,9 +112,14 @@ namespace Belle2 {
     double eclClusterErrorTiming(const Particle* particle);
 
     /**
-     * return the energy of the crystall with highest  energy
+     * return the energy of the crystal with highest energy
      */
     double eclClusterHighestE(const Particle* particle);
+
+    /**
+     * return the cellID [1,8736] of the crystal with highest energy
+     */
+    double eclClusterCellId(const Particle* particle);
 
     /**
      * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
@@ -181,19 +186,28 @@ namespace Belle2 {
     double eclClusterConnectedRegionId(const Particle* particle);
 
     /**
-    * return the unique Cluster ID of this cluster
-    */
-    double eclClusterUniqueId(const Particle* particle);
-
-    /**
      * return the Cluster ID within the connected region of this cluster
      */
     double eclClusterId(const Particle* particle);
 
     /**
-     * return the Hypothesis ID of this cluster
+     * [deprecated] return the Hypothesis ID of this cluster
      */
     double eclClusterHypothesisId(const Particle* particle);
+
+    /**
+     * Returns 1.0 if the cluster has the 'N photons' hypothesis (historically
+     * called 'N1'), 0.0 if not, and NaN if no cluster is associated to the
+     * particle.
+     */
+    double eclClusterHasNPhotonsHypothesis(const Particle* particle);
+
+    /**
+     * Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis
+     * (historically called 'N2'), 0.0 if not, and NaN if no cluster is
+     * associated to the particle.
+     */
+    double eclClusterHasNeutralHadronHypothesis(const Particle* particle);
 
     /**
      * return 1 if cluster has pulse shape discrimination variables computed
@@ -297,6 +311,12 @@ namespace Belle2 {
     double eclClusterEoP(const Particle* part);
 
     /**
+     * [Expert] The invariant mass calculated from all ECLCluster daughters (i.e. photons) and cluster-matched tracks using the CLUSTER 4-MOMENTA.
+     * Used for ECL-based dark sector physics and debugging track-cluster matching.
+     */
+    double eclClusterOnlyInvariantMass(const Particle* part);
+
+    /**
      * return the number of TCs above threshold
      */
     double getNumberOfTCs(const Particle*, const std::vector<double>& vars);
@@ -375,6 +395,11 @@ namespace Belle2 {
      * Returns true if cluster is related to maximum TC
      */
     double eclTCIsMaximumForCluster(const Particle* particle);
+
+    /**
+     * Returns cluster mdst array index
+     */
+    double eclClusterMdstIndex(const Particle* particle);
 
   }
 } // Belle2 namespace

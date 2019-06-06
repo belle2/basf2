@@ -109,8 +109,17 @@ class CAFDB(SQLiteDB):
         return self.query("SELECT {} FROM calibrations WHERE name=?".format(column_name), (calibration_name,)).fetchone()[0]
 
     def output_calibration_table(self):
-        table_string = pandas.read_sql_query("SELECT * FROM calibrations", self.conn).to_string()
-        line_len = len(table_string.split("\n")[0])
+        data = {"name": [], "state": [], "checkpoint": [], "iteration": []}
+        for row in self.query("SELECT * FROM calibrations"):
+            data["name"].append(row[0])
+            data["state"].append(row[1])
+            data["checkpoint"].append(row[2])
+            data["iteration"].append(row[3])
+
+        table = pandas.DataFrame(data)
+        table_string = table.to_string()
+
+        line_len = len(table_string.split("\n")[1])
         title = " Calibrations Table ".center(line_len, " ")
         border = line_len * "="
         header = "\n".join((border, title, border))

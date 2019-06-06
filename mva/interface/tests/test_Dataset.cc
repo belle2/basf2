@@ -1,4 +1,5 @@
-/* BASF2 (Belle Analysis Framework 2)                                     *
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -32,23 +33,23 @@ namespace {
       m_weight = -3.0;
     }
 
-    virtual unsigned int getNumberOfFeatures() const override { return 5; }
-    virtual unsigned int getNumberOfSpectators() const override { return 2; }
-    virtual unsigned int getNumberOfEvents() const override { return 20; }
-    virtual void loadEvent(unsigned int iEvent) override
+    [[nodiscard]] unsigned int getNumberOfFeatures() const override { return 5; }
+    [[nodiscard]] unsigned int getNumberOfSpectators() const override { return 2; }
+    [[nodiscard]] unsigned int getNumberOfEvents() const override { return 20; }
+    void loadEvent(unsigned int iEvent) override
     {
-      float f = static_cast<float>(iEvent);
+      auto f = static_cast<float>(iEvent);
       m_input = {f + 1, f + 2, f + 3, f + 4, f + 5};
       m_spectators = {f + 6, f + 7};
     };
-    virtual float getSignalFraction() override { return 0.1; };
-    virtual std::vector<float> getFeature(unsigned int iFeature) override
+    float getSignalFraction() override { return 0.1; };
+    std::vector<float> getFeature(unsigned int iFeature) override
     {
       std::vector<float> a(20, 0.0);
       std::iota(a.begin(), a.end(), iFeature + 1);
       return a;
     }
-    virtual std::vector<float> getSpectator(unsigned int iSpectator) override
+    std::vector<float> getSpectator(unsigned int iSpectator) override
     {
       std::vector<float> a(20, 0.0);
       std::iota(a.begin(), a.end(), iSpectator + 6);
@@ -402,7 +403,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -684,7 +685,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -965,7 +966,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -994,7 +995,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree2.Fill();
@@ -1337,7 +1338,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -1366,7 +1367,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = i % 2 == 0;
+      g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree2.Fill();

@@ -40,6 +40,20 @@
 #pragma link C++ class Belle2::TRGSummary+;
 #pragma link C++ class Belle2::SoftwareTriggerResult+;
 
+// ----------------------------------------------------------------------------
+// SoftwareTriggerResult
+// As of version 5, the result consists of a pair of prescaled - non prescaled result, not only a prescaled result.
+// We pad the non-prescaled one with 0, which is equal to "no result".
+#pragma read sourceClass="Belle2::SoftwareTriggerResult" version="[-4]" \
+  source="std::map<std::string, int> m_results" \
+  targetClass="Belle2::SoftwareTriggerResult" target="m_results" \
+  code="{ \
+    for(const auto& [key, prescaledResult] : onfile.m_results) { \
+      m_results[key] = std::make_pair(prescaledResult, 0); \
+    } \
+	}"
+
+// ----------------------------------------------------------------------------
 // Allow reading PIDLikelihood version <=2 (less particle types, different order)
 //
 // schema evolution rule as described in "Support For Significant Evolutions of the User Data Model In ROOT Files"
@@ -235,5 +249,12 @@
   source="float m_Error[6]" \
   targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_22" \
   code="{m_sqrtcovmat_22 = onfile.m_Error[5];}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-12]" \
+  source="int m_hypothesisId" \
+  targetClass="Belle2::ECLCluster" target="m_hypotheses" \
+  code="{ if(onfile.m_hypothesisId == 5) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_nPhotons); \
+        else if(onfile.m_hypothesisId == 6) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron); \
+        else m_hypotheses = 0;}"
 
 #endif

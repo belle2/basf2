@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      BaseCandidateReceiver(std::vector<const CDCWireHit*> allAxialWireHits);
+      explicit BaseCandidateReceiver(std::vector<const CDCWireHit*> allAxialWireHits);
       /// Destructor
       virtual ~BaseCandidateReceiver();
       /// Main entry point for the post processing call from the QuadTreeProcessor

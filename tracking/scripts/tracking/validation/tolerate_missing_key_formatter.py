@@ -4,10 +4,11 @@ import unittest
 
 class NoReplacementField(object):
 
-    """This class serves as a placeholder for keys in not found during lookup into keyword or positional arguments during a call to
-    TolerateMissingKeyFormatter.
+    """This class serves as a placeholder for keys in not found during lookup into
+    keyword or positional arguments during a call to TolerateMissingKeyFormatter.
 
-    It records potential item and attribute lookups, conversion and format_spec to reproduce original replacement_field entry into the formatted string.
+    It records potential item and attribute lookups, conversion and format_spec to
+    reproduce original replacement_field entry into the formatted string.
 
     Parameters
     ----------
@@ -25,8 +26,13 @@ class NoReplacementField(object):
     """
 
     def __init__(self, field_name, conversion=None, format_spec=None):
+        """Constructor"""
+
+        #: cached value of the field name
         self.field_name = field_name
+        #: cached value of the conversion specifier
         self.conversion = conversion
+        #: cached value of the format specifier
         self.format_spec = format_spec
 
     def __getattr__(self, attr):
@@ -67,9 +73,11 @@ class TolerateMissingKeyFormatter(string.Formatter):
     """
 
     def get_value(self, key, args, kwds):
-        """Retrieves the value that corresponds to the key from either the postional or the keyword arguments given to format
+        """Retrieves the value that corresponds to the key from either the postional or
+        the keyword arguments given to format
 
-        Overrides the standard lookup such that missing keys in the keyword arguments or transformed in a NoReplacementField signal object.
+        Overrides the standard lookup such that missing keys in the keyword arguments or
+        transformed in a NoReplacementField signal object.
         """
 
         if isinstance(key, str):
@@ -110,41 +118,51 @@ class TolerateMissingKeyFormatter(string.Formatter):
 
 
 class TolerateMissingKeyFormatterTest(unittest.TestCase):
+    """Test the string formatter for cases where the keys are missing"""
 
     def setUp(self):
+        """Prepare for the string-formatter test"""
+        #: Use the custom string formatter that tolerates missing values for keywords
         self.formatter = TolerateMissingKeyFormatter()
 
     def test_missing_key(self):
+        """Test for a missing key"""
         template = "{present}_{missing}"
         replaced = self.formatter.format(template, present="replaced")
         self.assertEqual("replaced_{missing}", replaced)
 
     def test_missing_key_attribute(self):
+        """Test for a missing key attribute"""
         template = "{present}_{missing.field}"
         replaced = self.formatter.format(template, present="replaced")
         self.assertEqual("replaced_{missing.field}", replaced)
 
     def test_missing_key_item(self):
+        """Test for a missing key item"""
         template = "{present}_{missing[0]}"
         replaced = self.formatter.format(template, present="replaced")
         self.assertEqual("replaced_{missing[0]}", replaced)
 
     def test_missing_key_with_str_conversion(self):
+        """Test for a missing key item"""
         template = "{present}_{missing!s}"
         replaced = self.formatter.format(template, present="replaced")
         self.assertEqual("replaced_{missing!s}", replaced)
 
     def test_missing_key_with_repr_conversion(self):
+        """Test for a missing key item"""
         template = "{present}_{missing!r}"
         replaced = self.formatter.format(template, present="replaced")
         self.assertEqual("replaced_{missing!r}", replaced)
 
     def test_missing_key_with_conversion_and_format(self):
+        """Test for a missing key item"""
         template = "{present}_{missing!r:^10s}"
         replaced = self.formatter.format(template, present="replaced")
         self.assertEqual("replaced_{missing!r:^10s}", replaced)
 
     def test_missing_key_with_format(self):
+        """Test for a missing key item"""
         template = "{present}_{missing:^10s}"
         replaced = self.formatter.format(template, present="replaced")
         self.assertEqual("replaced_{missing:^10s}", replaced)

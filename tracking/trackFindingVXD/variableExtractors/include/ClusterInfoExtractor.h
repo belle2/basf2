@@ -93,7 +93,7 @@ namespace Belle2 {
     bool m_UseTimingInfo;
 
     /// initialize statistics subsets of variables from clusters that get combined for SPTC
-    void initializeStats(std::string identifier, std::vector<Named<float*>>& variables)
+    void initializeStats(const std::string& identifier, std::vector<Named<float*>>& variables)
     {
       addVariable(identifier + "_max", variables);
       addVariable(identifier + "_min", variables);
@@ -102,9 +102,8 @@ namespace Belle2 {
     }
 
     /// calculated statistics and saves them in variable set
-    void setStats(std::string identifier, std::vector<float>& values)
+    void setStats(const std::string& identifier, std::vector<float>& values)
     {
-
       short size = values.size();
       if (values.size() == 0) {
         m_variables.at(identifier + "_max") = NAN;

@@ -219,8 +219,8 @@ namespace Belle2 {
     SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
     bool m_isCrossTalkEvent = false; /**< True if digit affected by cross talk*/
 
-    ClassDef(SVDRecoDigit, 3)
 
+    ClassDef(SVDRecoDigit, 3)
   }; // class SVDRecoDigit
 
 } // end namespace Belle2

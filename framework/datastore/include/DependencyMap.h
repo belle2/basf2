@@ -43,7 +43,7 @@ namespace Belle2 {
      * E.g. is('EventMetaData', c_Output) asks if EventMetaData was registered,
      *      is('EventMetaData', c_Input) asks if any module has it as required input.
      */
-    bool isUsedAs(std::string branchName, EEntryType type) const;
+    bool isUsedAs(const std::string& branchName, EEntryType type) const;
 
     /** Set the current module (for getCurrentModuleInfo()) */
     void setModule(const Module& mod) { m_currentModule = getModuleID(mod); }

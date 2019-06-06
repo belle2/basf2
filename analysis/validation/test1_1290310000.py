@@ -39,12 +39,6 @@ def remove_module(path, name):
 
 
 from ROOT import Belle2
-
-# To access the FEI training weight files (FEI trained on MC7, also available
-# at KEKCC /home/belle2/tkeck/feiv4/Belle2_2017_MC7_Track14_2/ )
-use_central_database('production', LogLevel.WARNING, 'fei_database')
-
-
 from variables import variables
 
 
@@ -153,17 +147,15 @@ variables.addAlias('d1_d1_mcPDG', 'daughter(1,daughter(1,mcPDG))')
 variables.addAlias('d1_d0_d2_mcPDG', 'daughter(1,daughter(0,daughter(2,mcPDG)))')
 
 
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
-
 outputRootFile = "../1290310000.ntup.root"
 
 
 path = create_path()
 
 import fei
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 particles = fei.get_default_channels()
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 path.add_path(feistate.path)
 

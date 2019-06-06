@@ -43,7 +43,7 @@ void HitLevelInfoWriterModule::initialize()
   std::map<std::string, std::string> pdgMap = {{"pi+", "211"}, {"K+", "321"}, {"mu+", "13"}, {"e+", "11"}, {"p+", "2212"}, {"deuteron", "1000010020"}};
 
   // if no particle lists are given, write out all tracks
-  if (m_strParticleList.size() == 0) bookOutput(m_strOutputBaseName.c_str());
+  if (m_strParticleList.size() == 0) bookOutput(m_strOutputBaseName);
 
   // create a new output file for each particle list specified
   for (unsigned int i = 0; i < m_strParticleList.size(); i++) {
@@ -92,8 +92,8 @@ void HitLevelInfoWriterModule::event()
 
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
-      if (eclCluster) {
-        m_eop = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+      if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
 
         // fill the muon depth
         const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();
@@ -173,8 +173,8 @@ void HitLevelInfoWriterModule::event()
 
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
-      if (eclCluster) {
-        m_eop = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+      if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
 
         // fill the muon depth
         const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();

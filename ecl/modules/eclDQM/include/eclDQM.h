@@ -1,8 +1,8 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
- * ECL Data Quality Monitor                                               *
+ * ECL Data Quality Monitor (First Module)                                *
  *                                                                        *
  * This module provides histograms for ECL Data Quality Monitoring        *
  *                                                                        *
@@ -27,6 +27,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+//ECL
+#include <ecl/utility/ECLChannelMapper.h>
 class TH1F;
 class TH2F;
 
@@ -39,7 +41,7 @@ namespace Belle2 {
   class ECLCalDigit;
 
   /**
-   * This module is for ECL Data Quality Monitor.
+   * This module is created to monitor ECL Data Quality.
    */
   class ECLDQMModule : public HistoModule {  /**< derived from HistoModule class. */
 
@@ -66,6 +68,8 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   private:
+    /** ECL channel mapper. */
+    ECL::ECLChannelMapper mapper;
     /** StoreArray ECLDigit */
     StoreArray<ECLDigit> m_ECLDigits;
     /** StoreArray ECLCalDigit */
@@ -91,8 +95,11 @@ namespace Belle2 {
     int m_PedestalMeanLowerThr;
     /** Upper threshold of pedestal distribution. */
     int m_PedestalMeanUpperThr;
+    /** If true, save histogram with pedestal rms error values. */
+    bool m_PedestalRmsInclude;
     /** Upper threshold of pedestal rms error distribution. */
     double m_PedestalRmsUpperThr;
+
     /** WF sampling points for digit array.   */
     int m_DspArray[8736][31] = {};
     /** Pedestal average values.   */
@@ -134,6 +141,8 @@ namespace Belle2 {
     TH1F* h_adc_flag{nullptr};
     /** Histogram: Fraction of ADC samples in event (w/o 8736 ADC samples). */
     TH1F* h_adc_hits{nullptr};
+    /** Histogram vector: Reconstructed signal time for all ECL crates above the threshold = 1 GeV. */
+    std::vector<TH1F*> h_time_crate_Thr1GeV = {};
     /** Histogram: Trigger time vs. Trig Cell ID.  */
     TH2F* h_trigtime_trigid{nullptr};
     /** Histogram: Trigger tag flag #2 vs. Trig Cell ID.   */

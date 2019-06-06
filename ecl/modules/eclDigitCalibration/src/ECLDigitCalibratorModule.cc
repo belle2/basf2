@@ -43,6 +43,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/core/Environment.h>
 
 //MDST
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
@@ -81,6 +82,21 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   addParam("fileBackgroundName", m_fileBackgroundName, "Background filename.",
            FileSystem::findFile("/data/ecl/background_norm.root"));
   addParam("simulatePure", m_simulatePure, "Flag to simulate pure CsI option", false);
+
+  // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
+  addParam("energyDependenceTimeOffsetFitParam_p1", m_energyDependenceTimeOffsetFitParam_p1,
+           "Fit parameter (p1) for applying correction to the time offset as a function of the energy (amplitude)", 0.) ;
+  addParam("energyDependenceTimeOffsetFitParam_p2", m_energyDependenceTimeOffsetFitParam_p2,
+           "Fit parameter (p2) for applying correction to the time offset as a function of the energy (amplitude)", 88449.) ;
+  addParam("energyDependenceTimeOffsetFitParam_p3", m_energyDependenceTimeOffsetFitParam_p3,
+           "Fit parameter (p3) for applying correction to the time offset as a function of the energy (amplitude)", 0.20867E+06) ;
+  addParam("energyDependenceTimeOffsetFitParam_p4", m_energyDependenceTimeOffsetFitParam_p4,
+           "Fit parameter (p4) for applying correction to the time offset as a function of the energy (amplitude)", 3.1482) ;
+  addParam("energyDependenceTimeOffsetFitParam_p5", m_energyDependenceTimeOffsetFitParam_p5,
+           "Fit parameter (p5) for applying correction to the time offset as a function of the energy (amplitude)", 7.4747) ;
+  addParam("energyDependenceTimeOffsetFitParam_p6", m_energyDependenceTimeOffsetFitParam_p6,
+           "Fit parameter (p6) for applying correction to the time offset as a function of the energy (amplitude)", 1279.3) ;
+
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -251,12 +267,27 @@ void ECLDigitCalibratorModule::event()
       if (is_pure_csi) {
         calibratedTime = m_pureCsITimeCalib * m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                                                     v_calibrationCrystalTimeOffset[cellid - 1] -
-                                                                    v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1] + m_pureCsITimeOffset;
+                                                                    v_calibrationCrateTimeOffset[cellid - 1])
+                         - v_calibrationCrystalFlightTime[cellid - 1] + m_pureCsITimeOffset ;
       } else {
         calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                                v_calibrationCrystalTimeOffset[cellid - 1] -
-                                               v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
+                                               v_calibrationCrateTimeOffset[cellid - 1])
+                         - v_calibrationCrystalFlightTime[cellid - 1] ;
       }
+
+      // For data, apply a correction to the time as a function of the signal amplitude.  Correction determined from a fit.
+      // No correction for MC
+      bool m_IsMCFlag = Environment::Instance().isMC();
+      B2DEBUG(35, "cellid = " << cellid << ", m_IsMCFlag = " << m_IsMCFlag) ;
+      if (!m_IsMCFlag) {
+        double energyTimeShift = energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) ;
+        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude *
+                v_calibrationCrystalElectronics[cellid - 1] << ", time before t(E) shift = " << calibratedTime << ", t(E) shift = " <<
+                energyTimeShift << " ns") ;
+        calibratedTime -= energyTimeShift ;
+      }
+
     }
 
     B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
@@ -416,3 +447,16 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
   return m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
 
 }
+
+
+double ECLDigitCalibratorModule::energyDependentTimeOffsetElectronic(const double amp)
+{
+  double ticks_offset = m_energyDependenceTimeOffsetFitParam_p1 + pow((m_energyDependenceTimeOffsetFitParam_p3 /
+                        (amp + m_energyDependenceTimeOffsetFitParam_p2)),
+                        m_energyDependenceTimeOffsetFitParam_p4) + m_energyDependenceTimeOffsetFitParam_p5 * exp(-amp /
+                            m_energyDependenceTimeOffsetFitParam_p6) ;
+
+  return ticks_offset * m_timeInverseSlope ;
+}
+
+

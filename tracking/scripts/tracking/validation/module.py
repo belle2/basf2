@@ -29,13 +29,16 @@ import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
-# contains all informations necessary for track filters to decide whether
-# track will be included into the processed list of tracks
-# This class is used for both providing information on pattern reco and
-# MC tracks
+import os
 
 
 class FilterProperties(object):
+    """
+    contains all informations necessary for track filters to decide whether
+    track will be included into the processed list of tracks
+    This class is used for both providing information on pattern reco and
+    MC tracks
+    """
 
     def __init__(
         self,
@@ -46,12 +49,19 @@ class FilterProperties(object):
         fitResult=None,
         seedResult=None,
     ):
+        """Constructor"""
 
+        #: cached value of the track candidate
         self.trackCand = trackCand
+        #: cached value of the MC particle
         self.mcParticle = mcParticle
+        #: cached value of the MCParticles StoreArray
         self.mcParticles = mcParticles
+        #: cached value of the fitted flag
         self.wasFitted = wasFitted
+        #: cached value of the fit result
         self.fitResult = fitResult
+        #: cached value of the seed result
         self.seedResult = seedResult
 
 
@@ -74,11 +84,14 @@ class FilterProperties(object):
 #
 
 class AlwaysPassFilter(object):
+    """Filter that always passes"""
 
     def doesPrPass(self, filterProperties):
+        """Pattern-reconstructed track always passes"""
         return True
 
     def doesMcPass(self, filterProperties):
+        """MC track always passes"""
         return True
 
 
@@ -104,70 +117,131 @@ class TrackingValidationModule(basf2.Module):
         trackCandidatesColumnName="RecoTracks",
         mcTrackCandidatesColumName="MCRecoTracks"
     ):
+        """Constructor"""
 
         super(TrackingValidationModule, self).__init__()
+
+        #: cached value of the tracking-validation name
         self.validation_name = name
+        #: cached value of the contact person name
         self.contact = contact
+        #: cached value of the track fit
         self.fit = fit
+        #: cached values of the track-fit pulls
         self.pulls = pulls
+        #: cached value of the resolution
         self.resolution = resolution
+        #: cached value of the output ROOT TFile
         self.output_file_name = output_file_name or self.validation_name \
             + 'TrackingValidation.root'
+        #: cached value of the track-filter object
         self.track_filter_object = track_filter_object
+        #: cached value of the suffix appended to the plot names
         self.plot_name_postfix = plot_name_postfix
+        #: cached value of the suffix appended to the plot titles
         self.plot_title_postfix = plot_title_postfix
+        #: cached list of perigee parameters excluded from PR side plots
         self.exclude_profile_pr_parameter = exclude_profile_pr_parameter
+        #: cached list of perigee parameters excluded from MC side plots
         self.exclude_profile_mc_parameter = exclude_profile_mc_parameter
+        #: cached flag to use the "expert" folder for the pull and residual plots
         self.use_expert_folder = use_expert_folder
+        #: cached name of the RecoTracks StoreArray
         self.trackCandidatesColumnName = trackCandidatesColumnName
+        #: cached name of the MCRecoTracks StoreArray
         self.mcTrackCandidatesColumnName = mcTrackCandidatesColumName
 
-        # default binning used for resolution plots over pt
+        #: default binning used for resolution plots over pt
         self.resolution_pt_binning = [0.05, 0.1, 0.25, 0.4, 0.6, 1., 1.5, 2., 3., 4.]
 
+        #: If this variable is set the code will open the file with same name as the file created here
+        #: and will read the binning from the TH1/TProfile with same name as the one created here. If you
+        #: do not want this feature either remove the corresponding root files from the validation
+        #: directory (this will trigger the default behaviour) or set the environmental variable DO_NOT_READ_BINNING
+        self.referenceFileName = None
+        if "DO_NOT_READ_BINNING" not in os.environ:
+            # the validity of the file will be checked later
+            self.referenceFileName = Belle2.FileSystem.findFile("tracking/validation/" + self.output_file_name, True)
+            basf2.B2INFO("Will read binning from: " + self.referenceFileName)
+            basf2.B2INFO("If this is not wanted set the environment variable DO_NOT_READ_BINNING or remove reference files.")
+        else:
+            basf2.B2INFO("Will not read binning from reference files.")
+
     def initialize(self):
+        """Receive signal at the start of event processing"""
+
+        #: Track-match object that examines relation information from MCMatcherTracksModule
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
-        # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+        #: Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+
+        #: list of PR-track clones and matches
         self.pr_clones_and_matches = collections.deque()
+        #: list of PR-track matches
         self.pr_matches = collections.deque()
+        #: list of PR-track fakes
         self.pr_fakes = collections.deque()
 
+        #: list of PR-track seed tan(lambda) values
         self.pr_seed_tan_lambdas = collections.deque()
+        #: list of PR-track seed phi values
         self.pr_seed_phi = collections.deque()
+        #: list of PR-track seed theta values
         self.pr_seed_theta = collections.deque()
 
+        #: list of PR-track seed omega-truth values
         self.pr_omega_truths = collections.deque()
+        #: list of PR-track seed omega-estimate values
         self.pr_omega_estimates = collections.deque()
+        #: list of PR-track seed omega-variance values
         self.pr_omega_variances = collections.deque()
 
+        #: list of PR-track seed tan(lambda)-truth values
         self.pr_tan_lambda_truths = collections.deque()
+        #: list of PR-track seed tan(lambda)-estimate values
         self.pr_tan_lambda_estimates = collections.deque()
+        #: list of PR-track seed tan(lambda)-variance values
         self.pr_tan_lambda_variances = collections.deque()
 
+        #: list of PR-track seed d0-truth values
         self.pr_d0_truths = collections.deque()
+        #: list of PR-track seed d0-estimate values
         self.pr_d0_estimates = collections.deque()
+        #: list of PR-track seed d0-variance values
         self.pr_d0_variances = collections.deque()
 
+        #: list of PR-track seed z0-truth values
         self.pr_z0_truths = collections.deque()
+        #: list of PR-track seed z0-estimate values
         self.pr_z0_estimates = collections.deque()
 
+        #: list of PR-track seed pt-truth values
         self.pr_pt_truths = collections.deque()
+        #: list of PR-track seed pt-estimate values
         self.pr_pt_estimates = collections.deque()
 
+        #: list of PR-track binning values
         self.pr_bining_pt = collections.deque()
 
+        #: list of MC-track matches
         self.mc_matches = collections.deque()
+        #: list of MC-track primaries
         self.mc_primaries = collections.deque()
+        #: list of MC-track d0 values
         self.mc_d0s = collections.deque()
+        #: list of MC-track tan(lambda) values
         self.mc_tan_lambdas = collections.deque()
-        # direction of the track in theta
+        #: direction of the track in theta
         self.mc_theta = collections.deque()
-        # direction of the track in phi
+        #: direction of the track in phi
         self.mc_phi = collections.deque()
+        #: list of MC-track pt values
         self.mc_pts = collections.deque()
+        #: list of MC-track hit efficiencies
         self.mc_hit_efficiencies = collections.deque()
+        #: list of MC-track multiplicities
         self.mc_multiplicities = collections.deque()
+        #: list of MC-track number of degrees of freedom
         self.mc_ndf = collections.deque()
 
     def event(self):
@@ -177,7 +251,7 @@ class TrackingValidationModule(basf2.Module):
         self.examine_mc_tracks()
 
     def examine_pr_tracks(self):
-        """Looks at the individual pattern recognition tracks and store information about them"""
+        """Looks at the individual pattern reconstructed tracks and store information about them"""
 
         # Analyse from the pattern recognition side
         trackMatchLookUp = self.trackMatchLookUp
@@ -344,6 +418,7 @@ class TrackingValidationModule(basf2.Module):
             self.mc_ndf.append(ndf)
 
     def terminate(self):
+        """Receive signal at the end of event processing"""
         name = self.validation_name
         contact = self.contact
 
@@ -427,7 +502,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
             curvature_pull_analysis = PullAnalysis('#omega', unit='1/cm',
                                                    plot_name_prefix=plot_name_prefix + '_omega',
-                                                   plot_title_postfix=self.plot_title_postfix)
+                                                   plot_title_postfix=self.plot_title_postfix,
+                                                   referenceFileName=self.referenceFileName)
 
             curvature_pull_analysis.analyse(pr_omega_truths,
                                             pr_omega_estimates,
@@ -444,7 +520,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
             curvature_pull_analysis = PullAnalysis('tan #lambda',
                                                    plot_name_prefix=plot_name_prefix + '_tan_lambda',
-                                                   plot_title_postfix=self.plot_title_postfix)
+                                                   plot_title_postfix=self.plot_title_postfix,
+                                                   referenceFileName=self.referenceFileName)
 
             curvature_pull_analysis.analyse(pr_tan_lambda_truths,
                                             pr_tan_lambda_estimates,
@@ -457,7 +534,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             # d0 pull
             curvature_pull_analysis = PullAnalysis('d0',
                                                    plot_name_prefix=plot_name_prefix + '_d0',
-                                                   plot_title_postfix=self.plot_title_postfix)
+                                                   plot_title_postfix=self.plot_title_postfix,
+                                                   referenceFileName=self.referenceFileName)
 
             curvature_pull_analysis.analyse(np.array(self.pr_d0_truths),
                                             np.array(self.pr_d0_estimates),
@@ -475,7 +553,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                         self.resolution_pt_binning,
                                                         'Pt',
                                                         plot_name_prefix=plot_name_prefix + '_d0_res',
-                                                        plot_title_postfix=self.plot_title_postfix)
+                                                        plot_title_postfix=self.plot_title_postfix,
+                                                        referenceFileName=self.referenceFileName)
             d0_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                            np.array(self.pr_d0_truths),
                                            np.array(self.pr_d0_estimates))
@@ -487,7 +566,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                         self.resolution_pt_binning,
                                                         "Pt",
                                                         plot_name_prefix=plot_name_prefix + '_z0_res',
-                                                        plot_title_postfix=self.plot_title_postfix)
+                                                        plot_title_postfix=self.plot_title_postfix,
+                                                        referenceFileName=self.referenceFileName)
             z0_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                            np.array(self.pr_z0_truths),
                                            np.array(self.pr_z0_estimates))
@@ -499,7 +579,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                            self.resolution_pt_binning,
                                                            "Pt",
                                                            plot_name_prefix=plot_name_prefix + '_omega_res',
-                                                           plot_title_postfix=self.plot_title_postfix)
+                                                           plot_title_postfix=self.plot_title_postfix,
+                                                           referenceFileName=self.referenceFileName)
             omega_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                               np.array(self.pr_omega_truths),
                                               np.array(self.pr_omega_estimates))
@@ -511,7 +592,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                         self.resolution_pt_binning,
                                                         "Pt",
                                                         plot_name_prefix=plot_name_prefix + '_pt_res',
-                                                        plot_title_postfix=self.plot_title_postfix)
+                                                        plot_title_postfix=self.plot_title_postfix,
+                                                        referenceFileName=self.referenceFileName)
             pt_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                            np.array(self.pr_pt_truths),
                                            np.array(self.pr_pt_estimates))
@@ -562,6 +644,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         make_hist=True,
         weights=None
     ):
+        """Create profile histograms by MC-track parameters"""
 
         # apply exclusion list
         new_parameter_names = [item for item in parameter_names if item
@@ -597,6 +680,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         parameter_names=['Seed tan #lambda', 'Seed #phi', 'Seed #theta'],
         make_hist=True,
     ):
+        """Create profile histograms by PR-track parameters"""
 
         # apply exclusion list
         new_parameter_names = [item for item in parameter_names if item
@@ -627,6 +711,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         non_expert_parameters=[],
         weights=None,
     ):
+        """Create profile histograms for generic parameters"""
 
         contact = self.contact
 
@@ -636,7 +721,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         if make_hist:
             # Histogram of the quantity
-            histogram = ValidationPlot(plot_name_prefix)
+            histogram = ValidationPlot(plot_name_prefix, self.referenceFileName)
             histogram.hist(xs, weights=weights)
 
             histogram.xlabel = quantity_name
@@ -670,7 +755,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
                 profile_plot_name = plot_name_prefix + '_by_' \
                     + root_save_name(parameter_name)
-                profile_plot = ValidationPlot(profile_plot_name)
+                profile_plot = ValidationPlot(profile_plot_name, self.referenceFileName)
                 profile_plot.profile(parameter_values,
                                      xs,
                                      weights=weights,

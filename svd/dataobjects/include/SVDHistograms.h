@@ -29,7 +29,7 @@ namespace Belle2 {
   public:
     /** Default constructor*/
     SVDHistograms():
-      SVDHistograms(H(), H(), H() , H()) {};
+      SVDHistograms(H(), H(), H() , H()) {}; /**< the class is built with a default histogram for L3 and L456, U and V sides*/
 
     /** Use @param template to initialize all the histograms*/
     SVDHistograms(const H& templateHisto):
@@ -46,9 +46,11 @@ namespace Belle2 {
     SVDHistograms(const H& templateU3, const H& templateV3,
                   const H& templateU456, const H& templateV456);
 
+    /** clean everything in the destructor */
     ~SVDHistograms() { clean(); };
-    // This enumeration assure the same semantic of the
-    // isU methods defined by Peter Kv.
+
+    /** This enumeration assure the same semantic of the
+    isU methods defined by Peter Kv.*/
     enum E_side { VIndex = 0 , UIndex = 1 };
 
     /** get a reference to the histogram for @param vxdID side @param view
@@ -89,6 +91,7 @@ namespace Belle2 {
       getHistogram(vxdID, view)->Fill(args...);
     }
 
+    /** replaces layer ladder sensor view and apv with the current numbers*/
     void customizeString(std::string& base, const VxdID& vxdID, bool isU)
     {
       std::string layer  = std::to_string(vxdID.getLayerNumber());
@@ -123,25 +126,27 @@ namespace Belle2 {
     // Please, please, pleaseeeee use SVDHistograms<...>::UIndex
     // and SVDHistograms<...>::VIndex instead of  1 and 0 for better
     // code readibility
-    typedef std::vector< H* > t_SVDSensor;
+    typedef std::vector< H* > t_SVDSensor;  /**< a vector of H, length = 2 */
 
     // A t_SVDLadder is a vector of t_SVDSensors
-    typedef std::vector< t_SVDSensor > t_SVDLadder;
+    typedef std::vector< t_SVDSensor > t_SVDLadder; /**< a vector of vector of H, length = # svd sensors */
 
     // A t_SVDLayer is a vector of t_SVDLAdders
-    typedef std::vector< t_SVDLadder > t_SVDLayer;
+    typedef std::vector< t_SVDLadder > t_SVDLayer; /**< a vector of vector of vector of H, length = # ladders*/
 
     // The t_SVD is a vector of t_SVDLayers
-    typedef std::vector< t_SVDLayer > t_SVD;
+    typedef std::vector< t_SVDLayer > t_SVD; /**< a vector of vector of vector of vector of H, length = # layers*/
 
-    t_SVD m_histograms;
-    H* m_defaultHistogram;
+    t_SVD m_histograms; /**< the vector of vector ... that contains all histograms */
+    H* m_defaultHistogram; /**< the default histogram */
 
-    void customize(H& histogram, VxdID vxdID, int view);
 
-    ClassDef(SVDHistograms , 1);
+    void customize(H& histogram, VxdID vxdID, int view); /**< customize the histogram with the sensor, view*/
+
+    ClassDef(SVDHistograms , 1); /**< needed by root*/
   };
 
+  /** constructor, builds all histograms and customize them*/
   template <class H>
   SVDHistograms<H>::SVDHistograms(const H& templateU3, const H& templateV3,
                                   const H& templateU456, const H& templateV456)
@@ -177,6 +182,7 @@ namespace Belle2 {
     }
   }
 
+  /** customize the histogram with the sensor and view */
   template < class H >
   void SVDHistograms<H>::customize(H& histogram, VxdID vxdID, int view)
   {

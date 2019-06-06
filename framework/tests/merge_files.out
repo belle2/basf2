@@ -1,11 +1,11 @@
 [INFO] Steering file: framework/tests/merge_files.py
 running check_01_existing: Check that merging a non exsiting file fails
-[ERROR] Input file "test1.root" does not exist
+[ERROR] input file "test1.root": Could not open file
 [WARNING] File "test2.root" is empty.
 [WARNING] All Files were empty
 check_01_existing passed
 running check_02_nonroot: Check that merging fails on non-root input files
-[ERROR] Could not open "test1.root"
+[ERROR] input file "test1.root": Could not open file
 check_02_nonroot passed
 running check_03_overwrite: Check that overwriting fails if -f is missing
 [ERROR] Output file exists, use -f to force overwriting it
@@ -59,16 +59,16 @@ hadd compression setting for all ouput: 1
 hadd Source file 1: test1.root
 hadd Source file 2: test1.root
 hadd Target path: test11.root:/
-[ERROR] Found 2!=1 entries in the persistent tree in "test11.root"
+[ERROR] input file "test11.root": Expected exactly one entry in persistent tree, found 2
 check_12_hadded passed
 running check_13_nopersistent: Check that merging fails without persistent tree
-[ERROR] No persistent tree found in "test1.root"
+[ERROR] input file "test1.root": No persistent tree found
 check_13_nopersistent passed
 running check_14_noeventtree: Check that merging fails without event tree
-[ERROR] No event tree found in "test1.root"
+[ERROR] input file "test1.root": No event tree found
 check_14_noeventtree passed
 running check_15_noeventbranches: Check that merging fails without event tree
-[ERROR] No branches found in event tree in "test1.root"
+[ERROR] input file "test1.root": Could not find any branches in event tree
 check_15_noeventbranches passed
 running check_16_nonmergeable: Check that merging fails it there a ron mergeable persistent trees
 [ERROR] Branch "AnotherMetaData" in persistent tree not inheriting from Mergable
@@ -94,7 +94,7 @@ running check_19_lowhigh: Check that the low/high event numbers are merged corre
 [WARNING] File "test0.root" is empty.
 [WARNING] File "test0.root" is empty.
 check_19_lowhigh passed
-running check_20_test_file: Check that a merged file passes the check_basf2_file program
+running check_20_test_file: Check that a merged file passes the b2file-check program
 [INFO] Steering file: steering-test1.root.py
 [INFO] Steering file: steering-test2.root.py
 check_20_test_file passed

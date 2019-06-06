@@ -20,7 +20,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
 #include <string>

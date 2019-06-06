@@ -60,11 +60,11 @@ namespace Belle2 {
     virtual void endRun() override;
     virtual void terminate() override;
 
-    std::string m_ShaperDigitName; /**< */
-    std::string m_RecoDigitName; /**< */
-    std::string m_ClusterName; /**< */
-    std::string m_TrackFitResultName; /**< */
-    std::string m_TrackName; /**< */
+    std::string m_ShaperDigitName; /**< SVDSHaperDigit StoreArray name*/
+    std::string m_RecoDigitName; /**< SVDRecoDigit StoreArray name*/
+    std::string m_ClusterName; /**< SVDCluster StoreArray name*/
+    std::string m_TrackFitResultName; /**< TrackFitResult name*/
+    std::string m_TrackName; /**< Track StoreArray name*/
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
@@ -74,18 +74,18 @@ namespace Belle2 {
 
   private:
 
-    int m_nEvents = 0;
+    int m_nEvents = 0; /**< number of events*/
 
-    SVDNoiseCalibrations m_NoiseCal;
-    SVDPulseShapeCalibrations m_PulseShapeCal;
+    SVDNoiseCalibrations m_NoiseCal; /**< SVDNoise Calibrations db object*/
+    SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibrations db object*/
 
-    StoreArray<SVDRecoDigit> m_svdRecos;
-    StoreArray<SVDCluster> m_svdClusters;
-    StoreArray<RecoTrack> m_recoTracks;
-    StoreArray<Track> m_Tracks;
-    StoreArray<TrackFitResult> m_tfr;
+    StoreArray<SVDRecoDigit> m_svdRecos; /**<SVDRecoDigit StoreArray*/
+    StoreArray<SVDCluster> m_svdClusters; /**<SVDCluster StoreArray*/
+    StoreArray<RecoTrack> m_recoTracks; /**<RecoTrack StoreArray*/
+    StoreArray<Track> m_Tracks; /**<Track StoreArray*/
+    StoreArray<TrackFitResult> m_tfr; /**<TrackFitResult StoreArray*/
 
-    int m_ntracks = 0;
+    int m_ntracks = 0; /**< number of tracks*/
 
     //TRACKS
     TH1F* m_nTracks = NULL; /**< number of tracks*/
@@ -112,6 +112,7 @@ namespace Belle2 {
     SVDHistograms<TH1F>* h_clusterTrkSNR = NULL; /**< SVDClusters SNR */
     SVDHistograms<TH1F>* h_clusterTrkEnergy = NULL; /**< SVDClusters Energy */
     SVDHistograms<TH1F>* h_clusterTrkTime = NULL; /**< SVDClusters Time */
+    SVDHistograms<TH1F>* h_clusterTrkInterstripPos = NULL; /**< SVDClusters InterstripPosition */
 
   };
 }

@@ -52,7 +52,8 @@ namespace Belle2 {
     double m_confidenceLevel;
 
     /** convergence precision for the newton method
-     * When the detla chiSquared between 2 iterations is smaller than this stop the fit and call it converged
+     * When the delta chiSquared between 2 iterations divided by the chiSquared of the previous iteration
+    * is smaller than this stop the fit and call it converged
      * optimized - don't touch
      * */
     double m_precision;

@@ -14,11 +14,14 @@ import tracking.harvest.harvesting as harvesting
 
 
 class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
+    """Module to perform event-by-event tracking validation."""
 
     """ Expert level behavior:
         expert_level <= default_expert_level: all figures and plots from this module except tree entries
         expert_level > default_expert_level: everything including tree entries
     """
+
+    #: the threshold value for the expert level
     default_expert_level = 10
 
     def __init__(self,
@@ -28,6 +31,7 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
                  reco_tracks_name='RecoTracks',
                  mc_reco_tracks_name='MCRecoTracks',
                  expert_level=None):
+        """Constructor"""
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
 
@@ -37,19 +41,26 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
                          contact=contact,
                          expert_level=expert_level)
 
+        #: cached value of the RecoTracks collection name
         self.reco_tracks_name = reco_tracks_name
+        #: cached value of the MCRecoTracks collection name
         self.mc_reco_tracks_name = mc_reco_tracks_name
+        #: cached value of the CDCHits collection name
         self.cdc_hits_name = "CDCHits"
 
     def initialize(self):
+        """Initialization signal at the start of the event processing"""
         super().initialize()
+        #: Reference to the track-match object that examines relation information from MCMatcherTracksModule
         self.track_match_look_up = Belle2.TrackMatchLookUp(self.mc_reco_tracks_name,
                                                            self.reco_tracks_name)
 
     def pick(self, event_meta_data=None):
+        """Always pick"""
         return True
 
     def peel(self, event_meta_data=None):
+        """Peel information from the event"""
         # Note event_meta_data is just used as a dummy.
 
         track_match_look_up = self.track_match_look_up
@@ -147,11 +158,12 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
     # Refiners to be executed on terminate #
     # #################################### #
 
-    # Save a tree of all collected variables in a sub folder
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="event_tree",
                                    name="event_tree",
                                    above_expert_level=default_expert_level)
 
+    #: Save selected hit counters
     save_clone_rate = refiners.save_fom(
         name="{module.id}_hit_figures_of_merit",
         title="Hit sums in {module.title}",

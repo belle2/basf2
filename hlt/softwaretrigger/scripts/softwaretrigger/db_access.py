@@ -1,5 +1,4 @@
 from ROOT import Belle2
-from softwaretrigger import SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 
 
 def list_to_vector(l):
@@ -34,7 +33,7 @@ def upload_cut_to_db(cut_string, base_identifier, cut_identifier, prescale_facto
         iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
     if isinstance(prescale_factor, list):
-        prescale_factor = list_to_vector(prescale_factor)
+        raise AttributeError("The only allowed type for the prescaling is a single factor")
 
     db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler
     software_trigger_cut = Belle2.SoftwareTrigger.SoftwareTriggerCut.compile(
@@ -143,7 +142,7 @@ if __name__ == '__main__':
     set_event_number(evt_number=0, run_number=int(args.run_number or 0), exp_number=int(args.experiment_number or 0))
 
     print("Currently, the following menus and triggers are in the database")
-    for base_identifier in ["fast_reco", "hlt", "calib"]:
+    for base_identifier in ["filter", "skim"]:
         print(base_identifier)
         menu = download_trigger_menu_from_db(base_name=base_identifier, do_set_event_number=False)
         cuts = menu.getCutIdentifiers()

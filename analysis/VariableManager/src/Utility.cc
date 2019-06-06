@@ -13,7 +13,7 @@
 namespace Belle2 {
   namespace Variable {
 
-    bool isCounterVariable(std::string variableName)
+    bool isCounterVariable(const std::string& variableName)
     {
       if (variableName == "expNum") return true;
       else if (variableName == "runNum") return true;

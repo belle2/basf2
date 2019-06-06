@@ -15,12 +15,12 @@
 
 using namespace Belle2;
 
-void EventKinematics::addMissingMomentum(TVector3 missingMomentum)
+void EventKinematics::addMissingMomentum(const TVector3& missingMomentum)
 {
   m_missingMomentum = missingMomentum;
 }
 
-void EventKinematics::addMissingMomentumCMS(TVector3 missingMomentumCMS)
+void EventKinematics::addMissingMomentumCMS(const TVector3& missingMomentumCMS)
 {
   m_missingMomentumCMS = missingMomentumCMS;
 }

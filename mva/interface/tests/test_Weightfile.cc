@@ -29,9 +29,9 @@ namespace {
 
   public:
     TestOptions(const std::string& _x, const std::string& _y) : x(_x), y(_y) { }
-    virtual void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
-    virtual void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
-    virtual po::options_description getDescription() override
+    void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
+    void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
+    po::options_description getDescription() override
     {
       po::options_description description("General options");
       description.add_options()
@@ -198,6 +198,7 @@ namespace {
     EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("DOES_NOT_EXIST.root"), std::runtime_error);
 
     {
+      // cppcheck-suppress unreadVariable
       std::fstream file("INVALID.root");
     }
     EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("INVALID.root"), std::runtime_error);
@@ -309,6 +310,7 @@ namespace {
       weightfile2.setRemoveTemporaryDirectories(true);
       filename = weightfile2.generateFileName(".xml");
       {
+        // cppcheck-suppress unreadVariable
         std::ofstream a(filename);
       }
       EXPECT_TRUE(boost::filesystem::exists(filename));
@@ -320,6 +322,7 @@ namespace {
       weightfile2.setRemoveTemporaryDirectories(false);
       filename = weightfile2.generateFileName(".xml");
       {
+        // cppcheck-suppress unreadVariable
         std::ofstream a(filename);
       }
       EXPECT_TRUE(boost::filesystem::exists(filename));

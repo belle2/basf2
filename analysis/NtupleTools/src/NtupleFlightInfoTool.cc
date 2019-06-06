@@ -61,7 +61,7 @@ void NtupleFlightInfoTool::eval(const Particle* particle)
   const Particle*  mother = selparticles[0];
 
   //get the DAUGHTER
-  const Particle*  daughter = NULL;
+  const Particle*  daughter = nullptr;
   if (selparticles.size() == 2) daughter = selparticles[1];
   if (selparticles.size() == 1) daughter = mother;
 

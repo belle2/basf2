@@ -38,7 +38,7 @@ beamparameters = add_beamparameters(main, "Y4S")
 kkgeninput = register_module('KKGenInput')
 kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat'))
 kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
-kkgeninput.param('taudecaytableFile', Belle2.FileSystem.findFile('tau_LFV_p.dat'))
+kkgeninput.param('taudecaytableFile', Belle2.FileSystem.findFile('skim/validation/tau_LFV_p.dat'))
 kkgeninput.param('kkmcoutputfilename', 'kkmc_tautau.txt')
 main.add_module(kkgeninput)
 

@@ -57,18 +57,18 @@ void NtupleRecoStatsTool::eval(const  Particle*)
   for (int i = 0; i < ECLClusters.getEntries(); i++) {
     const ECLCluster* cluster      = ECLClusters[i];
 
-    // Only use one hypothesis ID for ECLClusters
-    if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons) continue;
+    // use only ECLClusters which have the nPhotons hypothesis bit set
+    if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
     if (cluster->isNeutral()) {
-      Particle* gamma = new Particle(cluster);
+      auto* gamma = new Particle(cluster);
 
       m_neutralECLEnergy += gamma->getEnergy();
       m_iNeutralClusters++;
 
       delete gamma;
     } else {
-      m_chargedECLEnergy += cluster->getEnergy();
+      m_chargedECLEnergy += cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       m_iChargedClusters++;
     }
   }

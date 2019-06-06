@@ -54,7 +54,7 @@ namespace Belle2 {
        * @param m four momentum
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setFourMomentum(const TLorentzVector m);
+      enum KFitError::ECode       setFourMomentum(const TLorentzVector& m);
       /** Set a flag if to constraint at the decay point in the four momentum-constraint fit.
        * @param flag true for constraint, false for not
        * @return error code (zero if success)

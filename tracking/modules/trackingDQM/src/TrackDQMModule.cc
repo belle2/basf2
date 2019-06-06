@@ -99,11 +99,10 @@ void TrackDQMModule::defineHisto()
 
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
-  TDirectory* DirTracks = NULL;
-  DirTracks = oldDir->mkdir("TracksDQM");
-  TDirectory* DirTracksAlignment = NULL;
-  DirTracksAlignment = oldDir->mkdir("TracksDQMAlignment");
-  DirTracks->cd();
+
+  gDirectory->mkdir("TracksDQM"); // dont use return value, it might be zero ptr if dir is existing already
+  gDirectory->cd("TracksDQM");
+
   // Momentum Phi
   string name = str(format("MomPhi"));
   string title = str(format("Momentum Phi of fit"));
@@ -353,7 +352,10 @@ void TrackDQMModule::defineHisto()
     m_TRClusterCorrelationsTheta[index]->GetZaxis()->SetTitle("counts");
   }
 
-  DirTracksAlignment->cd();
+  oldDir->cd();
+  oldDir->mkdir("TracksDQMAlignment");// dont use returned ptr, it might be zero
+  oldDir->cd("TracksDQMAlignment");
+
   for (int i = 0; i < nVXDSensors; i++) {
     VxdID id = gTools->getSensorIDFromIndex(i);
     int iLayer = id.getLayerNumber();
@@ -386,7 +388,6 @@ void TrackDQMModule::defineHisto()
   }
 
   oldDir->cd();
-
 }
 
 void TrackDQMModule::beginRun()
@@ -500,7 +501,7 @@ void TrackDQMModule::event()
                              (float)tfr->getMomentum().Mag(),
                              nPXD, nSVD, nCDC, nPXD + nSVD + nCDC
                             );
-      B2DEBUG(230, message.Data());
+      B2DEBUG(20, message.Data());
       iTrack++;
 
       float Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
@@ -509,24 +510,22 @@ void TrackDQMModule::event()
       m_MomPhi->Fill(Phi);
       m_MomCosTheta->Fill(cos(Theta));
 
-      float Chi2NDF = 0;
-      float NDF = 0;
-      float pValue = 0;
       if (recoTrack[0]->wasFitSuccessful()) {
         if (!recoTrack[0]->getTrackFitStatus())
           continue;
 
+
         // add NDF:
-        NDF = recoTrack[0]->getTrackFitStatus()->getNdf();
+        float NDF = recoTrack[0]->getTrackFitStatus()->getNdf();
         m_NDF->Fill(NDF);
         // add Chi2/NDF:
         m_Chi2->Fill(recoTrack[0]->getTrackFitStatus()->getChi2());
         if (NDF) {
-          Chi2NDF = recoTrack[0]->getTrackFitStatus()->getChi2() / NDF;
+          float Chi2NDF = recoTrack[0]->getTrackFitStatus()->getChi2() / NDF;
           m_Chi2NDF->Fill(Chi2NDF);
         }
         // add p-value:
-        pValue = recoTrack[0]->getTrackFitStatus()->getPVal();
+        float pValue = recoTrack[0]->getTrackFitStatus()->getPVal();
         m_PValue->Fill(pValue);
         // add residuals:
         int iHit = 0;
@@ -546,7 +545,7 @@ void TrackDQMModule::event()
         int IsSVDU = -1;
         for (auto recoHitInfo : recoTrack[0]->getRecoHitInformations()) {  // over recohits
           if (!recoHitInfo) {
-            B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
+            B2DEBUG(20, "No genfit::pxd recoHitInfo is missing.");
             continue;
           }
           if (!recoHitInfo->useInFit())
@@ -665,6 +664,6 @@ void TrackDQMModule::event()
     if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Fill(iTrackVXDCDC);
     if (m_Tracks != NULL) m_Tracks->Fill(iTrack);
   } catch (...) {
-    B2DEBUG(70, "Some problem in Track DQM module!");
+    B2DEBUG(20, "Some problem in Track DQM module!");
   }
 }

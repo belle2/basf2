@@ -1564,7 +1564,6 @@ bool TrackExtrapolateG4e::findEndcapIntersection(ExtState& extState, const G4Thr
 bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, const Track* track)
 
 {
-  return false;
 
   G4ThreeVector extPos0(intersection.position);
 

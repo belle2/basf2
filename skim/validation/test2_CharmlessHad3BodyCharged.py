@@ -20,7 +20,7 @@ inputMdst('default', '../CharmlessHad3BodyCharged.udst.root', path=charmless3cha
 from variables import variables
 variablesToHistogram(
     filename='CharmlessHad3BodyCharged_Validation.root',
-    decayString='B+:3BodySkim',
+    decayString='B-:3BodySkim',
     variables=[
         ('Mbc', 100, 5.2, 5.3),
         ('deltaE', 100, -1, 1),

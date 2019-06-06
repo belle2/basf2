@@ -18,5 +18,5 @@
 #pragma link C++ class Belle2::SVDDetectorConfiguration+;
 #pragma link C++ class Belle2::SVDDetectorConfigurationImporter+;
 #pragma link C++ class Belle2::SVDCrossTalkStripsCalibrations;
-
+#pragma link C++ class Belle2::SVDOccupancyCalibrations;
 #endif

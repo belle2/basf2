@@ -23,7 +23,7 @@ skimCode = encodeSkimName('TauLFV')
 
 taulfvskim = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)

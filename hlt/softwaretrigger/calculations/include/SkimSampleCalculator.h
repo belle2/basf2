@@ -12,19 +12,10 @@
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
-#include <framework/core/Module.h>
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <string>
-#include <genfit/Track.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {

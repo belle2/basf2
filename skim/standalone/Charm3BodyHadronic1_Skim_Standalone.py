@@ -24,7 +24,7 @@ skimCode = encodeSkimName('Charm3BodyHadronic1')
 
 c3bh1path = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=c3bh1path)
 
 loadStdSkimPhoton(path=c3bh1path)

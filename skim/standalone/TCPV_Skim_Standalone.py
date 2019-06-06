@@ -34,7 +34,7 @@ skimCode = encodeSkimName('TCPV')
 # create a path
 tcpvskimpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 inputMdstList('default', fileList, path=tcpvskimpath)
 

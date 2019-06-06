@@ -25,7 +25,7 @@ import glob
 ISRskimpath = Path()
 
 # Add default samples
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=ISRskimpath)
 
 # use standard final state particle lists

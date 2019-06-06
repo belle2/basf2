@@ -19,7 +19,7 @@ skimCode = encodeSkimName('Charm2BodyHadronicD0')
 
 # create a new path for each WG
 c2bhdpath = Path()
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=c2bhdpath)
 
 stdPi('loose', path=c2bhdpath)

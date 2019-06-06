@@ -46,8 +46,8 @@ namespace Belle2 {
     double particleMdstSource(const Particle* part);
 
     /**
-     * returns 1 if the particle is marked as an inclusive object (like B0 -> @Xsd e+ e-), 0 if not
+     * returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not
      */
-    double particleIsInclusive(const Particle* part);
+    double particleIsUnspecified(const Particle* part);
   }
 }

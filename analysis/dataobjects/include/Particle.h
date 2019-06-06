@@ -102,7 +102,7 @@ namespace Belle2 {
      */
     enum PropertyFlags {
       c_Ordinary = 0, /** Ordinary particles */
-      c_IsInclusive = 1, /**< Is the particle is inclusive */
+      c_IsUnspecified = 1, /**< Is the particle unspecified by marking @ ? */
     };
 
     /**

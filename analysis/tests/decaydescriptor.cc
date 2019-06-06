@@ -147,16 +147,16 @@ namespace {
 
   }
 
-  TEST(DecayDescriptorTest, InclusiveParticleGrammar)
+  TEST(DecayDescriptorTest, UnspecifiedParticleGrammar)
   {
-    // @ means inclusive particle, for example @Xsd -> K+ pi-
+    // @ means unspecified particle, for example @Xsd -> K+ pi-
     DecayDescriptor dd1;
     bool initok = dd1.init("@Xsd:candidates -> K+:loose pi-:loose");
     EXPECT_EQ(initok, true);
 
     ASSERT_NE(dd1.getMother(), nullptr);
     EXPECT_EQ(dd1.getMother()->getName(), "Xsd");
-    EXPECT_EQ(dd1.getMother()->isInclusive(), true);
+    EXPECT_EQ(dd1.getMother()->isUnspecified(), true);
     EXPECT_EQ(dd1.getMother()->isSelected(), false);
 
     // Both selectors, @ and ^, cannot be used in same time
@@ -175,11 +175,11 @@ namespace {
     EXPECT_EQ(initok, true);
 
     ASSERT_NE(dd4.getMother(), nullptr);
-    EXPECT_EQ(dd4.getMother()->isInclusive(), false);
+    EXPECT_EQ(dd4.getMother()->isUnspecified(), false);
     EXPECT_EQ(dd4.getMother()->isSelected(), false);
 
     EXPECT_EQ(dd4.getDaughter(0)->getMother()->getName(), "Xsd");
-    EXPECT_EQ(dd4.getDaughter(0)->getMother()->isInclusive(), true);
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->isUnspecified(), true);
     EXPECT_EQ(dd4.getDaughter(0)->getMother()->isSelected(), false);
 
     // Both selectors, @ and ^, cannot be used in same time

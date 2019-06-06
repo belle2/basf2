@@ -39,10 +39,10 @@ namespace Belle2 {
       return part->getMdstSource();
     }
 
-    double particleIsInclusive(const Particle* part)
+    double particleIsUnspecified(const Particle* part)
     {
       int properties = part->getProperty();
-      return properties & Particle::PropertyFlags::c_IsInclusive ? 1.0 : 0.0;
+      return properties & Particle::PropertyFlags::c_IsUnspecified ? 1.0 : 0.0;
     }
 
     VARIABLE_GROUP("Basic particle information");
@@ -53,7 +53,7 @@ namespace Belle2 {
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
     REGISTER_VARIABLE("mdstSource", particleMdstSource,
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
-    REGISTER_VARIABLE("isInclusive", particleIsInclusive,
-                      "returns 1 if the particle is marked as an inclusive object (like B0 -> @Xsd e+ e-), 0 if not");
+    REGISTER_VARIABLE("isUnspecified", particleIsUnspecified,
+                      "returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not");
   }
 }

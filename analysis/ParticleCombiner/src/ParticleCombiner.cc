@@ -117,7 +117,7 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
-    m_isInclusive = mother->isInclusive();
+    m_isUnspecified = mother->isUnspecified();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
@@ -381,13 +381,13 @@ namespace Belle2 {
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_isInclusive ? Particle::PropertyFlags::c_IsInclusive : Particle::PropertyFlags::c_Ordinary,
+                                m_isUnspecified ? Particle::PropertyFlags::c_IsUnspecified : Particle::PropertyFlags::c_Ordinary,
                                 m_particleArray.getPtr());
       case 1: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_isInclusive ? Particle::PropertyFlags::c_IsInclusive : Particle::PropertyFlags::c_Ordinary,
+                                m_isUnspecified ? Particle::PropertyFlags::c_IsUnspecified : Particle::PropertyFlags::c_Ordinary,
                                 m_particleArray.getPtr());
       case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices,
-                                m_isInclusive ? Particle::PropertyFlags::c_IsInclusive : Particle::PropertyFlags::c_Ordinary,
+                                m_isUnspecified ? Particle::PropertyFlags::c_IsUnspecified : Particle::PropertyFlags::c_Ordinary,
                                 m_particleArray.getPtr());
       default: B2FATAL("You called getCurrentParticle although loadNext should have returned false!");
     }

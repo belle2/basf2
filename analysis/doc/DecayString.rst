@@ -34,11 +34,11 @@ This line selectes B+, anti-D0 and pi+ from the anti-D0 decay:
 
 :code:`'^B+ -> [^anti-D0 -> K- ^pi+] pi^+'`
 
-Marker of inclusive particle
+Marker of unspecified particle
 ----------------------------
 
-Particle can be marked as inclusive with an at-sign, :code:`'@'`, in the decayString.
-If the particle is marked as inclusive it will not checked for its identity when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. For example the DecayString @Xsd -> K+ pi- would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, ...
+Particle can be marked as unspecified particle with an at-sign, :code:`'@'`, in the decayString.
+If the particle is marked as unspecified it will not checked for its identity when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. For example the DecayString @Xsd -> K+ pi- would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, ...
 Still the daughters need to be stated correctly so this can be used for "sum of exclusive" decays.
 Here is an example of use:
 

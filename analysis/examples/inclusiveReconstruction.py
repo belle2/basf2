@@ -4,8 +4,8 @@
 # @cond
 
 """
-An example script to reconstruct inclusive particles and the use of MC
-matching tools for inclusive analyses.
+An example script to reconstruct unspecified particles and the use of MC
+matching tools for inclusive analyses with sum-of-exclusive method.
 """
 
 __authors__ = "Sam Cunliffe and Yo Sato"
@@ -39,9 +39,9 @@ reconstructDecay("B0:inclusive -> Xsd:comb e+:loose e-:loose",
 
 matchMCTruth("B0:inclusive", path=mypath)
 
-interesting_variables = ['isSignal', "Mbc", "deltaE", "isInclusive"]
+interesting_variables = ['isSignal', "Mbc", "deltaE", "isUnspecified"]
 interesting_variables += create_aliases_for_selected(
-    ["px", "py", "pz", "E", "isSignal", "mcErrors", "isInclusive"],
+    ["px", "py", "pz", "E", "isSignal", "mcErrors", "isUnspecified"],
     "B0:inclusive -> ^Xsd:comb ^e+:loose ^e-:loose")
 
 vm.printAliases()

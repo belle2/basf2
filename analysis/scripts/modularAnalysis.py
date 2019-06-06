@@ -864,8 +864,8 @@ def reconstructDecay(
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
     reconstructed as well (meaning that the charge conjugated mother list is created as well). One cay use an
-    at-sign '@' to mark a particle as inclusive, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
-    is marked as inclusive, it will not checked for its identity when doing :ref:`MCMatching`. Any particle which
+    at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
+    is marked as unspecified, it will not checked for its identity when doing :ref:`MCMatching`. Any particle which
     decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
     would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
     need to be stated correctly so this can be used for "sum of exclusive" decays

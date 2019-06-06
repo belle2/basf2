@@ -1040,7 +1040,7 @@ namespace {
   }
 
   /** B0 -> Xsd (-> K+ pi- ) mu+ mu- */
-  TEST_F(MCMatchingTest, InclusiveReconstruction)
+  TEST_F(MCMatchingTest, UnspecifiedParticleReconstruction)
   {
     {
       /** B0 -> Xsd (-> K+ pi- ) mu+ mu- */
@@ -1049,9 +1049,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Variable::particleIsInclusive(Xsd), false);
-      Xsd->setProperty(Particle::PropertyFlags::c_IsInclusive);
-      EXPECT_EQ(Variable::particleIsInclusive(Xsd), true);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsUnspecified);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
@@ -1063,9 +1063,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Variable::particleIsInclusive(Xsd), false);
-      Xsd->setProperty(Particle::PropertyFlags::c_IsInclusive);
-      EXPECT_EQ(Variable::particleIsInclusive(Xsd), true);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsUnspecified);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
@@ -1079,9 +1079,9 @@ namespace {
 
       Particle* Xsd = d.m_particle->getDaughters()[0];
       ASSERT_TRUE(Xsd != nullptr);
-      EXPECT_EQ(Variable::particleIsInclusive(Xsd), false);
-      Xsd->setProperty(Particle::PropertyFlags::c_IsInclusive);
-      EXPECT_EQ(Variable::particleIsInclusive(Xsd), true);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsUnspecified);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), true);
 
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();

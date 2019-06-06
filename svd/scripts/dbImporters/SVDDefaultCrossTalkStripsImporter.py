@@ -10,22 +10,22 @@ from basf2 import *
 from svd import *
 import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import SVDHotStripsCalibrations
+from ROOT.Belle2 import SVDCrossTalkStripsCalibrations
 import datetime
 import os
 
 now = datetime.datetime.now()
 
 
-class defaultHotStripsImporter(basf2.Module):
+class defaultCrossTalkStripsImporter(basf2.Module):
 
     def beginRun(self):
 
         iov = Belle2.IntervalOfValidity.always()
         #      iov = IntervalOfValidity(0,0,-1,-1)
 
-        payload = Belle2.SVDHotStripsCalibrations.t_payload(0, "HotStrips_default_" + str(now.isoformat()) + "_INFO:_noHotstrips")
-
+        payload = Belle2.SVDCrossTalkStripsCalibrations.t_payload(
+            0, "CrossTalkStrips_default_" + str(now.isoformat()) + "_INFO:_noCrossTalkstrips")
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
         for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
@@ -35,14 +35,14 @@ class defaultHotStripsImporter(basf2.Module):
                 for sensor in geoCache.getSensors(ladder):
                     sensorNumber = sensor.getSensorNumber()
                     for side in (0, 1):
-                        print("setting hot strips default value (0, good strip) for " +
+                        print("setting crossTalk strips default value (0, good strip) for " +
                               str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber))
                         payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, 0)
 
-        Belle2.Database.Instance().storeData(Belle2.SVDHotStripsCalibrations.name, payload, iov)
+        Belle2.Database.Instance().storeData(Belle2.SVDCrossTalkStripsCalibrations.name, payload, iov)
 
 
-use_local_database("localDB/database.txt", "localDB")
+use_local_database("localDB_crossTalk/database.txt", "localDB_crossTalk")
 
 main = create_path()
 
@@ -54,7 +54,7 @@ main.add_module(eventinfosetter)
 main.add_module("Gearbox")  # , fileName="/geometry/Beast2_phase2.xml")
 main.add_module("Geometry", components=['SVD'])  # , useDB = True)
 
-main.add_module(defaultHotStripsImporter())
+main.add_module(defaultCrossTalkStripsImporter())
 
 # Show progress of processing
 progress = register_module('Progress')

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sam Cunliffe                                             *
@@ -16,6 +16,8 @@
 #include <analysis/utility/MCMatching.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -642,6 +644,89 @@ namespace Belle2 {
       return MCMatching::countMissingParticle(p, mcp, PDGcodes);
     }
 
+    double particleClusterMatchWeight(const Particle* particle)
+    {
+      /* Get the weight of the *cluster* mc match for the mcparticle matched to
+       * this particle.
+       *
+       * Note that for track-based particles this is different from the mc match
+       * of the partcle (which it inherits from the mc match of the track)
+       */
+      const MCParticle* matchedToParticle = particle->getMCParticle();
+      if (!matchedToParticle) return std::numeric_limits<float>::quiet_NaN();
+      int matchedToIndex = matchedToParticle->getArrayIndex();
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return std::numeric_limits<float>::quiet_NaN();
+
+      for (unsigned int i = 0; i < mcps.size(); ++i)
+        if (mcps[i]->getArrayIndex() == matchedToIndex)
+          return mcps.weight(i);
+
+      return -1.0;
+    }
+
+    double particleClusterBestMCMatchWeight(const Particle* particle)
+    {
+      /* Get the weight of the best mc match of the cluster associated to
+       * this particle.
+       *
+       * Note for electrons (or any track-based particle) this may not be
+       * the same thing as the mc match of the particle (which is taken
+       * from the track).
+       *
+       * For photons (or any ECL-based particle) this will be the same as the
+       * mcMatchWeight
+       */
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      /* loop over all mcparticles related to this cluster, find the largest
+       * weight by std::sort-ing the doubles
+       */
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return std::numeric_limits<float>::quiet_NaN();
+
+      std::vector<double> weights;
+      for (unsigned int i = 0; i < mcps.size(); ++i)
+        weights.emplace_back(mcps.weight(i));
+
+      // sort descending by weight
+      std::sort(weights.begin(), weights.end());
+      return weights[0];
+    }
+
+    double particleClusterBestMCPDGCode(const Particle* particle)
+    {
+      /* Get the PDG code of the best mc match of the cluster associated to this
+       * particle.
+       *
+       * Note for electrons (or any track-based particle) this may not be the
+       * same thing as the mc match of the particle (which is taken from the track).
+       *
+       * For photons (or any ECL-based particle) this will be the same as the mcPDG
+       */
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return std::numeric_limits<float>::quiet_NaN();
+
+      std::vector<std::pair<double, int>> weightsAndIndices;
+      for (unsigned int i = 0; i < mcps.size(); ++i)
+        weightsAndIndices.emplace_back(mcps.weight(i), i);
+
+      // sort descending by weight
+      std::sort(
+        weightsAndIndices.begin(), weightsAndIndices.end(),
+      [](const std::pair<double, int>& l, const std::pair<double, int>& r) {
+        return l.first > r.first;
+      });
+      return mcps.object(weightsAndIndices[0].second)->getPDG();
+    }
 
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
@@ -769,5 +854,15 @@ namespace Belle2 {
                       "returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInKLM", seenInKLM,
                       "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+
+    VARIABLE_GROUP("MC Matching for ECLClusters");
+    REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight,
+                      "Returns the weight of the ECLCluster -> MCParticle relation for the MCParticle matched to the particle. "
+                      "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for rhe cluster. "
+                      "Returns -1 if the cluster *was* matched to particles, but not the match of the particle provided.");
+    REGISTER_VARIABLE("clusterBestMCMatchWeight", particleClusterBestMCMatchWeight,
+                      "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
+    REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
+                      "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
   }
 }

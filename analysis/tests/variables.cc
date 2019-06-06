@@ -363,6 +363,127 @@ namespace {
 
   }
 
+  class MCTruthVariablesTest : public ::testing::Test {
+  protected:
+    virtual void SetUp()
+    {
+      // datastore things
+      DataStore::Instance().reset();
+      DataStore::Instance().setInitializeActive(true);
+
+      // needed to mock up
+      StoreArray<ECLCluster> clusters;
+      StoreArray<MCParticle> mcparticles;
+      StoreArray<Track> tracks;
+      StoreArray<TrackFitResult> trackfits;
+      StoreArray<Particle> particles;
+
+      // register the arrays
+      clusters.registerInDataStore();
+      mcparticles.registerInDataStore();
+      tracks.registerInDataStore();
+      trackfits.registerInDataStore();
+      particles.registerInDataStore();
+
+      // register the relations for mock up mcmatching
+      clusters.registerRelationTo(mcparticles);
+      tracks.registerRelationTo(mcparticles);
+      particles.registerRelationTo(mcparticles);
+
+      // register the relation for mock up track <--> cluster matching
+      //clusters.registerRelationTo(tracks);
+      tracks.registerRelationTo(clusters);
+
+      // end datastore things
+      DataStore::Instance().setInitializeActive(false);
+
+      /* mock up an electron (track with a cluster AND a track-cluster match)
+       * and a photon (cluster, no track) and MCParticles for both
+       *
+       * this assumes that everything (tracking, clustering, track-cluster
+       * matching *and* mcmatching all worked)
+       *
+       * this can be extended to pions, kaons, etc but leave it simple for now
+       */
+
+      // create the true underlying mcparticles
+      auto* true_photon = mcparticles.appendNew(MCParticle());
+      true_photon->setPDG(22);
+      auto* true_electron = mcparticles.appendNew(MCParticle());
+      true_electron->setPDG(11);
+
+      // create the reco clusters
+      auto* cl0 = clusters.appendNew(ECLCluster());
+      cl0->setEnergy(1.0);
+      cl0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cl0->setClusterId(0);
+
+      auto* cl1 = clusters.appendNew(ECLCluster());
+      cl1->setEnergy(0.5);
+      cl1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cl1->setClusterId(1);
+
+      // create a reco track (one has to also mock up a track fit result)
+      TMatrixDSym cov(6);
+      trackfits.appendNew(
+        TVector3(), TVector3(), cov, -1, Const::electron, 0.5, 1.5,
+        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+      auto* tr = tracks.appendNew(Track());
+      tr->setTrackFitResultIndex(Const::electron, 0);
+      tr->addRelationTo(cl1);  // a track <--> cluster match
+
+      // now set mcmatch relations
+      cl0->addRelationTo(true_photon, 12.3);
+      cl1->addRelationTo(true_electron, 45.6);
+      tr->addRelationTo(true_electron);
+
+      // create belle2::Particles from the mdst objects
+      const auto* photon = particles.appendNew(Particle(cl0));
+      const auto* electron = particles.appendNew(Particle(tr, Const::electron));
+      const auto* misid_photon = particles.appendNew(Particle(cl1));
+
+      // now set mcmatch relations
+      photon->addRelationTo(true_photon);
+      electron->addRelationTo(true_electron);
+      misid_photon->addRelationTo(true_electron); // assume MC matching caught this
+    }
+
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(MCTruthVariablesTest, ECLMCMatchWeightVariable)
+  {
+    StoreArray<Particle> particles;
+    const auto* photon = particles[0];
+    const auto* electron = particles[1];
+
+    const auto* weight = Manager::Instance().getVariable("clusterMCMatchWeight");
+    EXPECT_FLOAT_EQ(weight->function(photon),   12.3);
+    EXPECT_FLOAT_EQ(weight->function(electron), 45.6);
+  }
+
+  TEST_F(MCTruthVariablesTest, ECLBestMCMatchVariables)
+  {
+    StoreArray<Particle> particles;
+    const auto* photon = particles[0];
+    const auto* electron = particles[1];
+    const auto* misid_photon = particles[2];
+
+
+    const auto* pdgcode = Manager::Instance().getVariable("clusterBestMCPDG");
+    EXPECT_EQ(pdgcode->function(photon),       22);
+    EXPECT_EQ(pdgcode->function(electron),     11);
+    EXPECT_EQ(pdgcode->function(misid_photon), 11);
+
+    const auto* weight = Manager::Instance().getVariable("clusterBestMCMatchWeight");
+    EXPECT_FLOAT_EQ(weight->function(photon),       12.3);
+    EXPECT_FLOAT_EQ(weight->function(electron),     45.6);
+    EXPECT_FLOAT_EQ(weight->function(misid_photon), 45.6);
+  }
+
   class ROEVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */

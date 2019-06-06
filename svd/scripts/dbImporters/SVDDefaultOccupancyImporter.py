@@ -39,7 +39,7 @@ class defaultOccupancyImporter(basf2.Module):
         iov = Belle2.IntervalOfValidity.always()
 
         payload = Belle2.SVDOccupancyCalibrations.t_payload(-1, "OccupancyCalibrations_default_" +
-                                                            str(now.isoformat()) + "_INFO:_fromPhase3calibrations")
+                                                            str(now.isoformat()) + "_INFO:_testJamesBranch")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 

@@ -696,9 +696,9 @@ namespace Belle2 {
      *
      *  @param storeNNInputs  pointer to the NN Input StoreArray
      *
-     *  @param delayNNOutput  NN output clock cycle delay after NN enable bit
+     *  @param delayNNOutput  NN output clock cycle delay after NN enable bit (by quadrant)
      *
-     *  @param delayNNSelect  NN select clock cycle delay after NN enable bit
+     *  @param delayNNSelect  NN select clock cycle delay after NN enable bit (by quadrant)
      *
      */
     void decodeNNIO(
@@ -708,8 +708,8 @@ namespace Belle2 {
       StoreArray<CDCTriggerTrack>* storeNNTracks,
       StoreArray<CDCTriggerSegmentHit>* tsHits,
       StoreArray<CDCTriggerMLPInput>* storeNNInputs,
-      int delayNNOutput,
-      int delayNNSelect)
+      std::vector<int> delayNNOutput,
+      std::vector<int> delayNNSelect)
     {
       for (short iclock = 0; iclock < bitsFromNN->getEntries(); ++iclock) {
         NNInputBitStream* bitsIn = (*bitsToNN)[iclock];
@@ -720,10 +720,10 @@ namespace Belle2 {
           if (stringOutEnable.c_str()[0] == '1') {
             CDCTriggerTrack* track2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits);
             if (track2D) {
-              int foundTime = iclock + delayNNOutput;
+              int foundTime = iclock + delayNNOutput[iTracker];
               if (foundTime  < bitsFromNN->getEntries()) {
                 NNOutputBitStream* bitsOut = (*bitsFromNN)[foundTime];
-                NNOutputBitStream* bitsSelectTS = (*bitsFromNN)[iclock + delayNNSelect];
+                NNOutputBitStream* bitsSelectTS = (*bitsFromNN)[iclock + delayNNSelect[iTracker]];
                 decodeNNOutput(iclock, iTracker, bitsOut, bitsSelectTS,
                                storeNNTracks, tsHits, storeNNInputs,
                                track2D);

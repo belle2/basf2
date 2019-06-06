@@ -525,10 +525,13 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "number of words (number of bits / 32) of the B2L header", 3);
   addParam("alignFoundTime", m_alignFoundTime,
            "Whether to align out-of-sync Belle2Link data between different sub-modules", true);
+
+  std::vector<int> defaultDelayNNOutput = {10, 10, 10, 10};
+  std::vector<int> defaultDelayNNSelect = {4, 4, 4, 4};
   addParam("delayNNOutput", m_delayNNOutput,
-           "delay of the NN output values clock cycle after the NN enable bit", 8);
+           "delay of the NN output values clock cycle after the NN enable bit (by quadrant)", defaultDelayNNOutput);
   addParam("delayNNSelect", m_delayNNSelect,
-           "delay of the NN selected TS clock cycle after the NN enable bit", 3);
+           "delay of the NN selected TS clock cycle after the NN enable bit (by quadrant)", defaultDelayNNSelect);
 
 }
 

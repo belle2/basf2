@@ -54,6 +54,28 @@ namespace Belle2 {
         histo->Fill(value);
       }
     }
+    unsigned getPattern(CDCTriggerTrack* track, std::string hitCollectionName)
+    {
+      unsigned pattern = 0;
+      for (const CDCTriggerSegmentHit& hit : track->getRelationsTo<CDCTriggerSegmentHit>(hitCollectionName)) {
+        unsigned sl = hit.getISuperLayer();
+        if (sl % 2 == 1) pattern |= (1 << ((sl - 1) / 2));
+      }
+      return pattern;
+    }
+    bool isValidPattern(unsigned pattern)
+    {
+      bool valid = false;
+      switch (pattern) {
+        case 7:
+        case 11:
+        case 13:
+        case 14:
+        case 15:
+          valid = true;
+      }
+      return valid;
+    }
 
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
@@ -85,6 +107,8 @@ namespace Belle2 {
     bool m_skipWithoutHWTS;
     /** Select only RecoTracks with a maximum z distance to the IP. -1 for all tracks */
     double m_maxRecoZDist;
+    /** Select only RecoTracks with a maximum d0 distance to the z axis. -1 for all tracks */
+    double m_maxRecoD0Dist;
 
     /** Name for simulated TS hits */
     std::string m_simSegmentHitsName;
@@ -175,6 +199,7 @@ namespace Belle2 {
     TH1F* m_neuroDeltaZ;                     /**< unpacked z - TSIM z */
     TH1F* m_neuroDeltaTheta;                 /**< unpacked theta - TSIM theta */
     TH2F* m_neuroScatterZ;                   /**< unpacked z vs TSIM z, scatter plot*/
+    TH2F* m_neuroScatterTheta;               /**< unpacked theta vs TSIM theta, scatter plot*/
 
     TH1F* m_neuroDeltaInputID;               /**< unpacked ID input - TSIM ID input */
     TH1F* m_neuroDeltaInputT;                /**< unpacked time input - TSIM time input */
@@ -539,6 +564,7 @@ namespace Belle2 {
     TH1F* m_RecoCosTheta;              /**< reconstructed cos(theta) */
     TH1F* m_RecoInvPt;                 /**< reconstructed inverse Pt */
     TH1F* m_RecoPhi;                   /**< reconstructed phi */
+    TH1F* m_RecoD0;                    /**< reconstructed d0 */
     TH1F* m_RecoTrackCount;            /**< number of reconstructed tracks per event */
 
     // reco values for tracks matched to hw NN tracks
@@ -546,7 +572,17 @@ namespace Belle2 {
     TH1F* m_RecoHWCosTheta;            /**< matched to HW reconstructed cos(theta) */
     TH1F* m_RecoHWInvPt;               /**< matched to HW reconstructed inverse Pt */
     TH1F* m_RecoHWPhi;                 /**< matched to HW reconstructed phi */
+    TH1F* m_RecoHWD0;                  /**< matched to HW reconstructed d0 */
     TH2F* m_RecoHWZScatter;            /**< matched to HW reconstructed z scatter plot*/
+
+    // hw neuro values for tracks matched to reco tracks
+    TH1F* m_neuroRecoHWOutZ;           /**< reco matched z distribution from unpacker */
+    TH1F* m_neuroRecoHWOutCosTheta;    /**< reco matched cos theta distribution from unpacker */
+    TH1F* m_neuroRecoHWOutInvPt;       /**< reco matched Inverse Pt distribution from unpacker */
+    TH1F* m_neuroRecoHWOutPhi0;        /**< reco matched phi distribution from unpacker */
+    TH1F* m_neuroRecoHWOutHitPattern;  /**< reco matched stereo hit pattern from unpacker */
+    TH1F* m_neuroRecoHWOutTrackCount;  /**< reco matched number of unpacked and matched tracks per event */
+    TH1F* m_neuroRecoHWSector;         /**< reco matched NN sector from unpacker */
 
     // hw accuracy
     TH1F* m_DeltaRecoHWZ;              /**< matched to HW reconstructed z */
@@ -559,7 +595,17 @@ namespace Belle2 {
     TH1F* m_RecoSWCosTheta;            /**< matched to SW reconstructed cos(theta) */
     TH1F* m_RecoSWInvPt;               /**< matched to SW reconstructed inverse Pt */
     TH1F* m_RecoSWPhi;                 /**< matched to SW reconstructed phi */
+    TH1F* m_RecoSWD0;                  /**< matched to SW reconstructed d0 */
     TH2F* m_RecoSWZScatter;            /**< matched to SW reconstructed z scatter plot*/
+
+    // sw neuro values for tracks matched to reco tracks
+    TH1F* m_neuroRecoSWOutZ;           /**< reco matched z distribution from simulation (hw TS hw 2D sw NN) */
+    TH1F* m_neuroRecoSWOutCosTheta;    /**< reco matched cos theta distribution from simulation (hw TS hw 2D sw NN) */
+    TH1F* m_neuroRecoSWOutInvPt;       /**< reco matched Inverse Pt distribution from simulation (hw TS hw 2D sw NN) */
+    TH1F* m_neuroRecoSWOutPhi0;        /**< reco matched phi distribution from simulation (hw TS hw 2D sw NN) */
+    TH1F* m_neuroRecoSWOutHitPattern;  /**< reco matched stereo hit pattern of simulated neuro tracks (hw TS hw 2D sw NN) */
+    TH1F* m_neuroRecoSWOutTrackCount;  /**< reco matched number of simulated tracks per event (hw TS hw 2D sw NN) */
+    TH1F* m_neuroRecoSWSector;         /**< reco matched NN sector from simulation (hw TS hw 2D sw NN) */
 
     // sw accuracy (hw TS, hw 2D)
     TH1F* m_DeltaRecoSWZ;              /**< matched to SW reconstructed z */
@@ -572,7 +618,17 @@ namespace Belle2 {
     TH1F* m_RecoSWTSSW2DCosTheta;      /**< matched to SWTSSW2DSWNN reconstructed cos(theta) */
     TH1F* m_RecoSWTSSW2DInvPt;         /**< matched to SWTSSW2DSWNN reconstructed inverse Pt */
     TH1F* m_RecoSWTSSW2DPhi;           /**< matched to SWTSSW2DSWNN reconstructed phi */
+    TH1F* m_RecoSWTSSW2DD0;            /**< matched to SWTSSW2DSWNN reconstructed d0 */
     TH2F* m_RecoSWTSSW2DZScatter;      /**< matched to SWTSSW2DSWNN reconstructed z scatter plot*/
+
+    // sw neuro values for tracks matched to reco tracks (sw TS, sw 2D)
+    TH1F* m_neuroRecoSWTSSW2DOutZ;           /**< reco matched z distribution from simulation (sw TS sw 2D sw NN) */
+    TH1F* m_neuroRecoSWTSSW2DOutCosTheta;    /**< reco matched cos theta distribution from simulation (sw TS sw 2D sw NN) */
+    TH1F* m_neuroRecoSWTSSW2DOutInvPt;       /**< reco matched Inverse Pt distribution from simulation (sw TS sw 2D sw NN) */
+    TH1F* m_neuroRecoSWTSSW2DOutPhi0;        /**< reco matched phi distribution from simulation (sw TS sw 2D sw NN) */
+    TH1F* m_neuroRecoSWTSSW2DOutHitPattern;  /**< reco matched stereo hit pattern of simulated neuro tracks (sw TS sw 2D sw NN) */
+    TH1F* m_neuroRecoSWTSSW2DOutTrackCount;  /**< reco matched number of simulated tracks per event (sw TS sw 2D sw NN) */
+    TH1F* m_neuroRecoSWTSSW2DSector;         /**< reco matched NN sector from simulation (sw TS sw 2D sw NN) */
 
     // sw accuracy (sw TS, sw 2D)
     TH1F* m_DeltaRecoSWTSSW2DZ;        /**< matched to SWTSSW2DSWNN reconstructed z */

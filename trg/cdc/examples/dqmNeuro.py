@@ -38,8 +38,8 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):
 
     unpacker.param('unpackNeuro', True)
     unpacker.param('decodeNeuro', True)
-    unpacker.param('delayNNOutput', 10)
-    unpacker.param('delayNNSelect', 4)
+    unpacker.param('delayNNOutput', [9, 9, 9, 9])
+    unpacker.param('delayNNSelect', [4, 4, 4, 4])
     path.add_module(unpacker)
 
 
@@ -101,6 +101,7 @@ dstputfile = ''
 os.makedirs('dqmoutput/data', exist_ok=True)
 os.makedirs('dqmoutput/hist', exist_ok=True)
 os.makedirs('dqmoutput/log', exist_ok=True)
+
 if '.sroot' in sys.argv[1]:
     outputfile = 'dqmoutput/hist/histo.' + sys.argv[1].split('/')[-1].split('.sroot')[0] + '.root'
     dstputfile = 'dqmoutput/data/dst.' + sys.argv[1].split('/')[-1].split('.sroot')[0] + '.root'
@@ -145,6 +146,7 @@ main.add_module('CDCTriggerDQM',
                 # recoTrackMultiplicity=1,
                 skipWithoutHWTS=skipWithoutHWTS,
                 maxRecoZDist=1.0,
+                maxRecoD0Dist=0.5,
                 )
 main.add_module('RootOutput', outputFileName=dstputfile)
 

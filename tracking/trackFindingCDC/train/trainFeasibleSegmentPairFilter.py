@@ -19,6 +19,7 @@ class FeasibleSegmentPairFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEvent
     #: overlay background hits from the events in these files
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
+    #: degree of MC truth-matching
     truth = "truth_positive"
 
     @property

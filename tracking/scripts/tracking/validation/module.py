@@ -31,13 +31,14 @@ from ROOT import Belle2
 
 import os
 
-# contains all informations necessary for track filters to decide whether
-# track will be included into the processed list of tracks
-# This class is used for both providing information on pattern reco and
-# MC tracks
-
 
 class FilterProperties(object):
+    """
+    contains all informations necessary for track filters to decide whether
+    track will be included into the processed list of tracks
+    This class is used for both providing information on pattern reco and
+    MC tracks
+    """
 
     def __init__(
         self,

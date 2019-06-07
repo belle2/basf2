@@ -330,18 +330,22 @@ namespace Belle2 {
     h_moduleT0.SetXTitle("slot number");
     h_moduleT0.SetYTitle("module T0 [ns]");
 
-    double T0 = 0; // average to be subtracted
+    double average = 0; // average to be subtracted
     int num = 0;
     for (int slot = 1; slot <= c_numModules; slot++) {
       if (h_relModuleT0.GetBinError(slot) > 0) {
-        T0 += h_relModuleT0.GetBinContent(slot) + m_moduleT0->getT0(slot);
+        double T0 = 0;
+        if (m_moduleT0->isCalibrated(slot)) T0 = m_moduleT0->getT0(slot);
+        average += h_relModuleT0.GetBinContent(slot) + T0;
         num++;
       }
     }
-    if (num > 0) T0 /= num;
+    if (num > 0) average /= num;
 
     for (int slot = 1; slot <= c_numModules; slot++) {
-      double t0 = h_relModuleT0.GetBinContent(slot) + m_moduleT0->getT0(slot) - T0;
+      double T0 = 0;
+      if (m_moduleT0->isCalibrated(slot)) T0 = m_moduleT0->getT0(slot);
+      double t0 = h_relModuleT0.GetBinContent(slot) + T0 - average;
       double err = h_relModuleT0.GetBinError(slot);
       h_moduleT0.SetBinContent(slot, t0);
       h_moduleT0.SetBinError(slot, err);
@@ -355,7 +359,7 @@ namespace Belle2 {
     m_tree->Write();
     m_file->Close();
 
-    B2RESULT("Results available in " << m_outFileName);
+    B2RESULT(num << "/16 calibrated. Results available in " << m_outFileName);
   }
 
 

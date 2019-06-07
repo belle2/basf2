@@ -236,20 +236,26 @@ class ModuleT0cal(Module):
         chi_ndf = 'chi^2/NDF = ' + str(round(chi2, 2)) + '/' + str(ndf)
         self.h_relModuleT0.SetTitle(self.h_relModuleT0.GetTitle() + ' (' + chi_ndf + ')')
 
-        # calculate arithmetic average of current calibration constants
-        T0 = 0
-        for i in range(16):
-            T0 += self.db_moduleT0.getT0(i+1)
-        T0 /= 16
-
-        # store relative module T0 in histogram
+        # store relative module T0 in a histogram
         for i in range(16):
             self.h_relModuleT0.SetBinContent(i+1, x[i])
             self.h_relModuleT0.SetBinError(i+1, e[i])
 
+        # calculate arithmetic average of current calibration constants
+        T0 = [0.0 for i in range(16)]
+        average = 0.0
+        num = 0
+        for i in range(16):
+            if self.db_moduleT0.isCalibrated(i+1):
+                T0[i] = self.db_moduleT0.getT0(i+1)
+                average += T0[i]
+                num += 1
+        if num > 0:
+            average /= num
+
         # add current calibration to relative one and subtract the average, then store
         for i in range(16):
-            self.h_moduleT0.SetBinContent(i+1, x[i] + self.db_moduleT0.getT0(i+1) - T0)
+            self.h_moduleT0.SetBinContent(i+1, x[i] + T0[i] - average)
             self.h_moduleT0.SetBinError(i+1, e[i])
 
         B2RESULT("Module T0 calibration constants successfully determined, " + chi_ndf)

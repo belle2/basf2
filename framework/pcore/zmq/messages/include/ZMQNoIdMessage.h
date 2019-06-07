@@ -50,7 +50,7 @@ namespace Belle2 {
     }
 
     /// The if the message is of a given type
-    bool isMessage(c_MessageTypes isType) const;
+    bool isMessage(EMessageTypes isType) const;
 
   private:
     /// Copy the constructors

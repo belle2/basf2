@@ -32,7 +32,7 @@ namespace Belle2 {
     }
 
     /// Create a message out of a type by casting to a char
-    static zmq::message_t createZMQMessage(const c_MessageTypes& c)
+    static zmq::message_t createZMQMessage(const EMessageTypes& c)
     {
       return createZMQMessage(std::string(1, static_cast<char>(c)));
     }

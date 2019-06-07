@@ -35,29 +35,29 @@ void ZMQRxOutputModule::event()
       m_streamer.initialize(m_param_compressionLevel, m_param_handleMergeable);
       m_zmqClient.initialize<ZMQ_PULL>(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, true);
 
-      auto multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
+      auto multicastHelloMsg = ZMQMessageFactory::createMessage(EMessageTypes::c_helloMessage, getpid());
       m_zmqClient.publish(std::move(multicastHelloMsg));
 
       // Listen to event backups, the stop message of the input process and the general stop messages
-      m_zmqClient.subscribe(c_MessageTypes::c_eventMessage);
-      m_zmqClient.subscribe(c_MessageTypes::c_lastEventMessage);
-      m_zmqClient.subscribe(c_MessageTypes::c_terminateMessage);
+      m_zmqClient.subscribe(EMessageTypes::c_eventMessage);
+      m_zmqClient.subscribe(EMessageTypes::c_lastEventMessage);
+      m_zmqClient.subscribe(EMessageTypes::c_terminateMessage);
       m_firstEvent = false;
     }
 
     const auto multicastAnswer = [this](const auto & socket) {
       auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
-      if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+      if (message->isMessage(EMessageTypes::c_eventMessage)) {
         B2DEBUG(100, "Having received an event backup. Will go in with this.");
         m_streamer.read(std::move(message));
         StoreObjPtr<EventMetaData> eventMetaData;
         eventMetaData->addErrorFlag(EventMetaData::EventErrorFlag::c_HLTCrash);
         return false;
-      } else if (message->isMessage(c_MessageTypes::c_lastEventMessage)) {
+      } else if (message->isMessage(EMessageTypes::c_lastEventMessage)) {
         B2DEBUG(100, "Having received an end message. Will not go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;
-      } else if (message->isMessage(c_MessageTypes::c_terminateMessage)) {
+      } else if (message->isMessage(EMessageTypes::c_terminateMessage)) {
         B2DEBUG(100, "Having received an graceful stop message. Will not go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;
@@ -69,10 +69,10 @@ void ZMQRxOutputModule::event()
 
     const auto socketAnswer = [this](const auto & socket) {
       auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
-      if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+      if (message->isMessage(EMessageTypes::c_eventMessage)) {
         m_streamer.read(std::move(message));
         B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
-        auto confirmMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_confirmMessage, m_eventMetaData);
+        auto confirmMessage = ZMQMessageFactory::createMessage(EMessageTypes::c_confirmMessage, m_eventMetaData);
         m_zmqClient.publish(std::move(confirmMessage));
         return false;
       }

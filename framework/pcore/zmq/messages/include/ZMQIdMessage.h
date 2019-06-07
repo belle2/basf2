@@ -33,7 +33,7 @@ namespace Belle2 {
     static constexpr const unsigned int c_additionalData = 3;
 
     /// The if the message is of a given type
-    bool isMessage(const c_MessageTypes isType) const
+    bool isMessage(const EMessageTypes isType) const
     {
       const auto& type = getMessagePartAsString<c_type>();
       return type.size() == 1 and type[0] == static_cast<char>(isType);

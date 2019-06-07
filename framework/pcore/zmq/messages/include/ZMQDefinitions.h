@@ -11,7 +11,7 @@
 
 namespace Belle2 {
   /// Type the messages can have
-  enum class c_MessageTypes {
+  enum class EMessageTypes {
     // Used by DAQ and Framework: general control messages
     c_confirmMessage = 'c',   // is sent when an event is confirmed to be at the output process
     c_helloMessage = 'h',     // registration

@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
     /// Create an ID Message out of an identity, the type and an event message
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
-                                                       const c_MessageTypes msgType,
+                                                       const EMessageTypes msgType,
                                                        const std::unique_ptr<EvtMessage>& eventMessage)
     {
       return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage({
@@ -36,7 +36,7 @@ namespace Belle2 {
 
     /// Create an ID Message out of an identity, the type and a string
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
-                                                       const c_MessageTypes msgType,
+                                                       const EMessageTypes msgType,
                                                        const std::string& msgData = "")
     {
       return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage({
@@ -48,7 +48,7 @@ namespace Belle2 {
 
     /// Create an ID Message out of an identity, the type and another zmq message
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
-                                                       const c_MessageTypes msgType,
+                                                       const EMessageTypes msgType,
                                                        zmq::message_t msgData)
     {
       return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage({
@@ -72,7 +72,7 @@ namespace Belle2 {
 
 
     /// Create a No-ID Message out of an identity, the type and a string
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const EMessageTypes msgType,
                                                          const std::string& msgData = "")
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage({
@@ -82,7 +82,7 @@ namespace Belle2 {
     }
 
     /// Create a No-ID Message out of an identity, the type and an int
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const EMessageTypes msgType,
                                                          int msgData)
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage({
@@ -92,7 +92,7 @@ namespace Belle2 {
     }
 
     /// Create a No-ID Message out of an identity, the type and an event meta data
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const EMessageTypes msgType,
                                                          const StoreObjPtr<EventMetaData>& evtMetaData)
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage({
@@ -102,7 +102,7 @@ namespace Belle2 {
     }
 
     /// Create a No-ID Message out of the type and another zmq message
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const EMessageTypes msgType,
                                                          zmq::message_t msgData)
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage({
@@ -112,7 +112,7 @@ namespace Belle2 {
     }
 
     /// Create a No-ID Message out of the type, another zmq message and an additional message
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const EMessageTypes msgType,
                                                          zmq::message_t msgData,
                                                          zmq::message_t additionalData)
     {
@@ -134,7 +134,7 @@ namespace Belle2 {
 
     /// Create a No-ID Message out of an identity, the type and an event message
     static std::unique_ptr<ZMQNoIdMessage>
-    createMessage(const c_MessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage)
+    createMessage(const EMessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage)
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage({
         ZMQMessageHelper::createZMQMessage(msgType),
@@ -143,7 +143,7 @@ namespace Belle2 {
     }
 
     static std::unique_ptr<ZMQNoIdMessage>
-    createMessage(const c_MessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage,
+    createMessage(const EMessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage,
                   zmq::message_t additionalData)
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage({

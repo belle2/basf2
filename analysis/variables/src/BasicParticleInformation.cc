@@ -42,7 +42,7 @@ namespace Belle2 {
     double particleIsUnspecified(const Particle* part)
     {
       int properties = part->getProperty();
-      return properties & Particle::PropertyFlags::c_IsUnspecified ? 1.0 : 0.0;
+      return (properties & Particle::PropertyFlags::c_IsUnspecified) ? 1.0 : 0.0;
     }
 
     VARIABLE_GROUP("Basic particle information");

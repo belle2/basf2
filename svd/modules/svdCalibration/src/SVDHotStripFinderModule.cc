@@ -17,7 +17,7 @@ SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
   setDescription("The svdHotStripFinder module finds hot strips in SVD data SVDShaperDigit");
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDHotStripFinder.root"));
-  addParam("threshold", m_thr, "Threshold cut for Hot strip finder in percent", float(0.75));
+  addParam("threshold", m_thr, "Threshold cut for Hot strip finder in percent", float(4.0));
   addParam("searchBase", m_base, "0 -> 32, 1 -> 64, 2 -> 128", int(0));
 
 }
@@ -108,7 +108,7 @@ void SVDHotStripFinderModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   int nDigits = m_storeDigits.getEntries();
-  h_nevents->Fill(0.0);
+  h_nevents->Fill(0.0); // number of events count
 
   if (nDigits == 0)
     return;
@@ -152,10 +152,10 @@ void SVDHotStripFinderModule::terminate()
    ***************************************************************************/
 
   //Find low charged clusters with high occupancy.
-  int flag[768];
-  int hsflag[768];
-  int nevents =  h_nevents->GetEntries();
-  int ibase = 768;
+  int flag[768]; // list of working (non zero) strips
+  int hsflag[768]; //found hot strips list;  hsflag[i]==1 for indetified Hot Strip
+  int nevents =  h_nevents->GetEntries(); //number of events processed in events
+  int ibase = 768; // interval used for the hot strip finding
   if (m_base == 1) {ibase = 32;};
   if (m_base == 2) {ibase = 64;};
   if (m_base == 3) {ibase = 128;};
@@ -185,10 +185,11 @@ void SVDHotStripFinderModule::terminate()
           int i = itSvdSensors->getLayerNumber() - 3;
           int m =  itSvdSensors->getLadderNumber() - 1;
           int j = itSvdSensors->getSensorNumber() - 1;
-          float position1[768];
-          float nCltrk[24];
+          float position1[768]; // vector of hits in the sensor
+          float nCltrk[24]; // index to interval if we search in smaller intervals then full sensor
           int it = 0;
           int iths = 0;
+          /* it is safer to initialize the nCltrk vector  */
           for (int l = 0; l < 24; l++) {
             nCltrk[l] = 0.0;
           }
@@ -202,17 +203,21 @@ void SVDHotStripFinderModule::terminate()
             else {
               flag[l] = 1;
               it++; //number of good (non zero ) strips
-              //nCltrk = nCltrk + position1[l]; //number of digits in sensor
+              /* find in which interval the strip lays */
               div_t test = div(l, ibase);
-              nCltrk[test.quot] = nCltrk[test.quot] + position1[l];
+              nCltrk[test.quot] = nCltrk[test.quot] + position1[l]; // number of entries in given interval
             }
 
           }
 
           for (int l = 0; l < 768; l++) {
             div_t test = div(l, ibase);
+            /*
+                     tmp_occ - relative occupancy for Hot Strip search interval,  for channel l
+                     tmp_occ1 - occupancy
+            */
             float tmp_occ = position1[l] / (float)nCltrk[test.quot]; //for hot strip search
-            float  tmp_occ1 = position1[l] / (float)nevents; //for Giuliana - occupancy distribution
+            float  tmp_occ1 = position1[l] / (float)nevents; //for SVDOccupancyCalibration
             position1[l] = tmp_occ; //vector used for Hot strip search
             if (tmp_occ > 0.0) {
               hm_dist->fill(*itSvdSensors, k, tmp_occ); // ..
@@ -223,14 +228,11 @@ void SVDHotStripFinderModule::terminate()
               h_tot_dist12->Fill(tmp_occ, tmp_occ1);
             }
           }
-
           float occupancy[24]; //occupancy for second pass
           for (int l = 0; l < 24; l++) {
             occupancy[l] = 0.0;
           }
           it = 0;
-          //iths=0;
-
           // first pass
           for (int l = 0; l < 768; l++) {
             div_t test = div(l, ibase);
@@ -239,10 +241,9 @@ void SVDHotStripFinderModule::terminate()
             if (ibase == 64) threshold_corrections = 12.0;
             if (ibase == 128) threshold_corrections = 6.0;
 
-            if (position1[l] > 0.01 * m_thr * threshold_corrections) { // if probablity is larger then 1% in given dssd mark it as
-
-              hsflag[l] = 1; // HS
-              flag[l] = 0;
+            if (position1[l] > 0.01 * m_thr * threshold_corrections) { // if probablity is larger then threshold mark as Hot strip
+              hsflag[l] = 1; /* HS vector */
+              flag[l] = 0; /* mark strip as bad for second pass */
               iths++;
               B2RESULT("1st pass HS found! Layer: " << i + 3 << " Ladder: " << m << " Sensor: " << j << " Side: " << k << " channel: " << l);
             } else {
@@ -253,6 +254,10 @@ void SVDHotStripFinderModule::terminate()
             }
 
           }
+          /* Second pass of Hot strip finding
+              After the first pass we remove already found Host strips
+              we do the second pass with the same threshold
+          */
           // second pass
           for (int l = 0; l < 768; l++) {
             div_t test = div(l, ibase);
@@ -263,20 +268,29 @@ void SVDHotStripFinderModule::terminate()
             if (ibase == 128) threshold_corrections = 6.0;
 
             if ((flag[l]) && (position1[l] > 0.01 * m_thr * threshold_corrections)) { //HS
-              hsflag[l] = 1;
-              flag[l] = 0;
+              hsflag[l] = 1;// HS vector
+              flag[l] = 0; // mark strip as bad after second pass
               iths++;
               B2RESULT("2nd pass HS FOUND! Layer: " << i + 3 << " Ladder: " << m << " Sensor: " << j << " Side: " << k << " channel: " << l);
             }
           }
           /* for Laura .. HS flags, place interface for DB */
+          /* outputs :
+                    hsflag[l]  1- HS 0- non HS
+                    flag[l]    0- bad strip, 1 working strip
+                    h_tot_dist1   occupancy as probablity of firing the strip
+
+           */
           for (int l = 0; l < 768; l++) {
             B2DEBUG(1, hsflag[l]);
             if (flag[l] == 1) {
               hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l, hm_occupancy->getHistogram(*itSvdSensors,
-                  k)->GetBinContent(l));
+                  k)->GetBinContent(l)); /*alive strips without identified HS */
             } else
-              hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l, 1);
+              hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l, 1);  /* Not only hot strips but also masked strips */
+            /* to get only  hot strips
+                     if(hsflag[l])
+             */
           }
 
           if (m_rootFilePtr != NULL) {
@@ -290,6 +304,9 @@ void SVDHotStripFinderModule::terminate()
 
           /* end */
 
+          /*
+                  store number hot strips per sensor
+           */
           for (int iy = 0; iy < iths; iy++) {
             h_tot_dqm->Fill(float(itsensor));
             h_tot_dqm1->Fill(float(itsensor));

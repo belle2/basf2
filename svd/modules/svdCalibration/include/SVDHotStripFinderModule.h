@@ -108,12 +108,12 @@ namespace Belle2 {
 
     SVDSummaryPlots* m_hHotStripsSummary = nullptr; /**< hot strip summary  histo */
 
-    TH1F*  h_tot_dqm;
-    TH1F*  h_tot_dqm1;
-    TH1F*  h_tot_dist;
-    TH1F*  h_tot_dist1;
-    TH2F*  h_tot_dist12;
-    TH1F*  h_nevents;
+    TH1F*  h_tot_dqm;   /* number of hot strips per sensor */
+    TH1F*  h_tot_dqm1;  /* number of hot strips per sensor  for layer 3*/
+    TH1F*  h_tot_dist;  /* relative occupancy histogram */
+    TH1F*  h_tot_dist1; /* absolute occupany histogram */
+    TH2F*  h_tot_dist12; /* 2d distributiuons of occupancies */
+    TH1F*  h_nevents;  /* number of events counting */
 
 
     //list of functions to create histograms:

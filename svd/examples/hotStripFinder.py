@@ -33,7 +33,7 @@ main.add_module('Gearbox')
 main.add_module('Geometry')
 
 # default parameters
-main.add_module('SVDHotStripFinder', outputFileName=outputfile, searchBase=2, threshold=0.75)
+main.add_module('SVDHotStripFinder', outputFileName=outputfile, searchBase=0, threshold=4.0)
 
 main.add_module('Progress')
 

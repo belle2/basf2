@@ -91,7 +91,7 @@ void ProcessMonitor::reset()
   m_client.reset();
 }
 
-void ProcessMonitor::killProcesses(int timeout)
+void ProcessMonitor::killProcesses(unsigned int timeout)
 {
   B2ASSERT("Only the monitoring process is allowed to kill processes", GlobalProcHandler::isProcess(ProcType::c_Monitor)
            or GlobalProcHandler::isProcess(ProcType::c_Init));

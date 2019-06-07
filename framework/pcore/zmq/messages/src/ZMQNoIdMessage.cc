@@ -2,13 +2,6 @@
 
 using namespace Belle2;
 
-void ZMQNoIdMessage::toDataStore(std::unique_ptr<ZMQNoIdMessage> message, const std::unique_ptr<DataStoreStreamer>& streamer)
-{
-  // TODO: include the random generator here
-  EvtMessage eventMessage(message->getMessagePartAsCharArray<ZMQNoIdMessage::c_data>());
-  streamer->restoreDataStore(&eventMessage);
-}
-
 /// Get the data as string
 std::string ZMQNoIdMessage::getData() const
 {

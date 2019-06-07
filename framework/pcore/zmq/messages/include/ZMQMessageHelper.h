@@ -25,6 +25,12 @@ namespace Belle2 {
   /// Internal helper for creating ZMQ messages (should not be used otherwise).
   class ZMQMessageHelper {
   public:
+    /// Just pass a zmq message
+    static zmq::message_t createZMQMessage(zmq::message_t message)
+    {
+      return message;
+    }
+
     /// Create a message out of a type by casting to a char
     static zmq::message_t createZMQMessage(const c_MessageTypes& c)
     {

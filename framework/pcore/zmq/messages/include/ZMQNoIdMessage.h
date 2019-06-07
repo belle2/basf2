@@ -26,6 +26,8 @@
 namespace Belle2 {
   /// A message without an associated socket ID. Is used in most cases.
   class ZMQNoIdMessage : public ZMQModuleMessage<3> {
+    friend class ZMQMessageFactory;
+
   public:
     /// Where the type is stored
     static constexpr const unsigned int c_type = 0;

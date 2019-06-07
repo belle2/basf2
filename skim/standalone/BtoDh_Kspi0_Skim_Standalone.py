@@ -21,7 +21,7 @@ kspi0path = Path()
 
 skimCode = encodeSkimName('BtoDh_Kspi0')
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 
 inputMdstList('default', fileList, path=kspi0path)

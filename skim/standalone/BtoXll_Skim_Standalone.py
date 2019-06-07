@@ -21,7 +21,7 @@ skimCode = encodeSkimName('BtoXll')
 
 
 path = Path()
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=path)
 loadStdSkimPi0(path=path)
 loadStdSkimPhoton(path=path)

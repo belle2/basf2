@@ -20,6 +20,8 @@
 namespace Belle2 {
   /// A message with the socket ID. Needed in input<->worker communication.
   class ZMQIdMessage : public ZMQModuleMessage<4> {
+    friend class ZMQMessageFactory;
+
   public:
     /// Where the identity is stored
     static const unsigned int c_identity = 0;

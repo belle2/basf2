@@ -28,14 +28,16 @@ void StreamHelper::initialize(int compressionLevel, bool handleMergeable)
   }
 }
 
-std::unique_ptr<EvtMessage> StreamHelper::stream()
+std::unique_ptr<EvtMessage> StreamHelper::stream(bool addPersistentDurability, bool streamTransientObjects)
 {
-  if (!m_randomGenerator.isValid()) {
-    m_randomGenerator.construct(RandomNumbers::getEventRandomGenerator());
-  } else {
-    *m_randomGenerator = RandomNumbers::getEventRandomGenerator();
+  if (m_randomGenerator.isOptional()) {
+    if (not m_randomGenerator.isValid()) {
+      m_randomGenerator.construct(RandomNumbers::getEventRandomGenerator());
+    } else {
+      *m_randomGenerator = RandomNumbers::getEventRandomGenerator();
+    }
   }
-  return std::unique_ptr<EvtMessage>(m_streamer->streamDataStore(true, true));
+  return std::unique_ptr<EvtMessage>(m_streamer->streamDataStore(addPersistentDurability, streamTransientObjects));
 }
 
 void StreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)

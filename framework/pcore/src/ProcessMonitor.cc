@@ -69,14 +69,14 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
   }
 
   // Time to setup the proxy
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   m_streamer.initialize(0, true);
   m_client.initialize<ZMQ_PUB>(pubSocketAddress, subSocketAddress, controlSocketAddress, false);
   m_client.subscribe(c_MessageTypes::c_helloMessage);
   m_client.subscribe(c_MessageTypes::c_statisticMessage);
-  m_client.subscribe(c_MessageTypes::c_deathMessage);
-  m_client.subscribe(c_MessageTypes::c_terminateMessage);
+  m_client.subscribe(c_MessageTypes::c_killWorkerMessage);
+  m_client.subscribe(c_MessageTypes::c_goodbyeMessage);
 
   B2DEBUG(10, "Started multicast publishing on " << pubSocketAddress << " and subscribing on " << subSocketAddress);
 }
@@ -91,7 +91,7 @@ void ProcessMonitor::reset()
   m_client.reset();
 }
 
-void ProcessMonitor::killProcesses(unsigned int timeout)
+void ProcessMonitor::killProcesses(int timeout)
 {
   B2ASSERT("Only the monitoring process is allowed to kill processes", GlobalProcHandler::isProcess(ProcType::c_Monitor)
            or GlobalProcHandler::isProcess(ProcType::c_Init));
@@ -99,7 +99,7 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
   if (not m_processList.empty() and m_client.isOnline()) {
     B2DEBUG(10, "Try to kill the processes gently...");
     // Try to kill them gently...
-    auto pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_stopMessage);
+    auto pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage);
     m_client.publish(std::move(pcbMulticastMessage));
 
     checkChildProcesses();
@@ -219,7 +219,7 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
     B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
     B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
     B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Worker) << " worker processes.");
-  } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_terminateMessage)) {
+  } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_goodbyeMessage)) {
     const int pid = std::stoi(pcbMulticastMessage->getData());
     const auto& processIt = m_processList.find(pid);
     if (processIt == m_processList.end()) {
@@ -235,7 +235,7 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
     B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
     B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
     B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Worker) << " worker processes.");
-  } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_deathMessage)) {
+  } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_killWorkerMessage)) {
     const int workerPID = atoi(pcbMulticastMessage->getData().c_str());
     B2DEBUG(10, "Got message to kill worker " << workerPID);
     if (kill(workerPID, SIGKILL) == 0) {
@@ -286,7 +286,7 @@ void ProcessMonitor::checkChildProcesses()
     } else if (pair.second == ProcType::c_Worker) {
       B2WARNING("A worker process has died unexpected. If you have requested, I will now restart the workers.");
       B2ASSERT("A worker died but none was present?", processesWithType(ProcType::c_Worker) != 0);
-      auto pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deleteMessage, pair.first);
+      auto pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deleteWorkerMessage, pair.first);
       m_client.publish(std::move(pcbMulticastMessage));
     } else if (pair.second == ProcType::c_Stopped) {
       B2DEBUG(10, "An children process has died expectedly.");

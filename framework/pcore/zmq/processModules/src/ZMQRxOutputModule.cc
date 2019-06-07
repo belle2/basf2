@@ -40,8 +40,8 @@ void ZMQRxOutputModule::event()
 
       // Listen to event backups, the stop message of the input process and the general stop messages
       m_zmqClient.subscribe(c_MessageTypes::c_eventMessage);
-      m_zmqClient.subscribe(c_MessageTypes::c_endMessage);
-      m_zmqClient.subscribe(c_MessageTypes::c_stopMessage);
+      m_zmqClient.subscribe(c_MessageTypes::c_lastEventMessage);
+      m_zmqClient.subscribe(c_MessageTypes::c_terminateMessage);
       m_firstEvent = false;
     }
 
@@ -53,11 +53,11 @@ void ZMQRxOutputModule::event()
         StoreObjPtr<EventMetaData> eventMetaData;
         eventMetaData->addErrorFlag(EventMetaData::EventErrorFlag::c_HLTCrash);
         return false;
-      } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
+      } else if (message->isMessage(c_MessageTypes::c_lastEventMessage)) {
         B2DEBUG(100, "Having received an end message. Will not go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;
-      } else if (message->isMessage(c_MessageTypes::c_stopMessage)) {
+      } else if (message->isMessage(c_MessageTypes::c_terminateMessage)) {
         B2DEBUG(100, "Having received an graceful stop message. Will not go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;

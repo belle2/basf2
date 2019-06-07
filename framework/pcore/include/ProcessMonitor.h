@@ -38,7 +38,7 @@ namespace Belle2 {
     /// Block until either the worker process is running or the timeout (in seconds) is raised.
     void waitForRunningWorker(int timeout);
     /// Ask all processes to terminate. If not, kill them after timeout seconds.
-    void killProcesses(unsigned int timeout);
+    void killProcesses(int timeout);
 
     /// Init the processing with that many workers
     void initialize(unsigned int requestedNumberOfWorkers);

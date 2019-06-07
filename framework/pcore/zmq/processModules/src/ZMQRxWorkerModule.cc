@@ -49,13 +49,13 @@ void ZMQRxWorkerModule::event()
       m_zmqClient.initialize<ZMQ_DEALER>(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, false);
 
       // Listen to stop messages
-      m_zmqClient.subscribe(c_MessageTypes::c_stopMessage);
+      m_zmqClient.subscribe(c_MessageTypes::c_terminateMessage);
 
       // General hello
       auto multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
       m_zmqClient.publish(std::move(multicastHelloMsg));
       // Hello for input process. TODO: merge this
-      auto helloMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_whelloMessage, getpid());
+      auto helloMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
       m_zmqClient.publish(std::move(helloMessage));
 
       bool inputProcessIsGone = false;
@@ -63,11 +63,11 @@ void ZMQRxWorkerModule::event()
       // But in some cases, the input process is already down again (because it was so fast), so will never receive any event...
       const auto socketHelloAnswer = [&inputProcessIsGone](const auto & socket) {
         const auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
-        if (message->isMessage(c_MessageTypes::c_endMessage)) {
+        if (message->isMessage(c_MessageTypes::c_lastEventMessage)) {
           inputProcessIsGone = true;
           return false;
         }
-        B2ASSERT("Received unexpected message from input.", message->isMessage(c_MessageTypes::c_whelloMessage));
+        B2ASSERT("Received unexpected message from input.", message->isMessage(c_MessageTypes::c_helloMessage));
         return false;
       };
       const auto pollResult = m_zmqClient.pollSocket(60 * 1000, socketHelloAnswer);
@@ -86,7 +86,7 @@ void ZMQRxWorkerModule::event()
 
     const auto multicastAnswer = [](const auto & socket) {
       const auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
-      if (message->isMessage(c_MessageTypes::c_stopMessage)) {
+      if (message->isMessage(c_MessageTypes::c_terminateMessage)) {
         B2DEBUG(10, "Having received an graceful stop message. Will now go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;
@@ -104,7 +104,7 @@ void ZMQRxWorkerModule::event()
         auto readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
         m_zmqClient.send(std::move(readyMessage));
         return false;
-      } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
+      } else if (message->isMessage(c_MessageTypes::c_lastEventMessage)) {
         B2DEBUG(10, "received end message from input");
         return false;
       }

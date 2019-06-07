@@ -68,5 +68,7 @@ void MonopoleStereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std:
   m_adder.apply(m_relations);
   m_inspector.apply(tracks);
 
+  for (auto track : tracks)
+    track.sortByArcLength2D();
 //   m_szFitter.apply(tracks);
 }

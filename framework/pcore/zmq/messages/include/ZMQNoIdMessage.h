@@ -34,7 +34,7 @@ namespace Belle2 {
     /// Where the data is stored
     static constexpr const unsigned int c_data = 1;
     /// Where the additional data is stored
-    static const unsigned int c_additionalData = 2;
+    static constexpr const unsigned int c_additionalData = 2;
 
     /// Get the data as string
     std::string getData() const;

@@ -24,13 +24,13 @@ namespace Belle2 {
 
   public:
     /// Where the identity is stored
-    static const unsigned int c_identity = 0;
+    static constexpr const unsigned int c_identity = 0;
     /// Where the type of the message is stored
-    static const unsigned int c_type = 1;
+    static constexpr const unsigned int c_type = 1;
     /// Where the data is stored
-    static const unsigned int c_data = 2;
+    static constexpr const unsigned int c_data = 2;
     /// Where the additional data is stored
-    static const unsigned int c_additionalData = 3;
+    static constexpr const unsigned int c_additionalData = 3;
 
     /// The if the message is of a given type
     bool isMessage(const c_MessageTypes isType) const

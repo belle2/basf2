@@ -16,7 +16,7 @@ if __name__ == "__main__":
     choices = ["human-readable"]
     try:
         from tabulate import tabulate
-        choices += ['jira', 'grid']
+        choices += ['jira', 'grid', 'stash']
     except ImportError:
         pass
 
@@ -65,5 +65,7 @@ if __name__ == "__main__":
         print(df[["Prescaled", "Non Prescaled"]])
     elif args.format == "jira":
         print(tabulate(df, tablefmt="jira", showindex=True, headers="keys"))
+    elif args.format == "stash":
+        print(tabulate(df, tablefmt="pipe", showindex=True, headers="keys"))
     elif args.format == "grid":
         print(tabulate(df, tablefmt="grid", showindex=True, headers="keys"))

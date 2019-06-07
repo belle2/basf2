@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   /**
-   * EKLM time calibration algorithm.
+   * KLM channel status calibration algorithm.
    */
   class KLMChannelStatusCalibrationAlgorithm : public CalibrationAlgorithm {
 

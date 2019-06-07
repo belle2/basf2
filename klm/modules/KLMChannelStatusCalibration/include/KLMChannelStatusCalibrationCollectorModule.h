@@ -21,7 +21,7 @@
 namespace Belle2 {
 
   /**
-   * EKLM time calibration (data collection).
+   * KLM channel status calibration (data collection).
    */
   class KLMChannelStatusCalibrationCollectorModule :
     public CalibrationCollectorModule {

@@ -42,7 +42,8 @@ std::unique_ptr<EvtMessage> StreamHelper::stream(bool addPersistentDurability, b
 
 void StreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
 {
-  ZMQNoIdMessage::toDataStore(std::move(message), m_streamer);
+  EvtMessage eventMessage(message->getMessagePartAsCharArray<ZMQNoIdMessage::c_data>());
+  m_streamer->restoreDataStore(&eventMessage);
 
   if (m_randomGenerator.isValid()) {
     RandomNumbers::getEventRandomGenerator() = *m_randomGenerator;

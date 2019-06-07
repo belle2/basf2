@@ -342,9 +342,9 @@ namespace TreeFitter {
       jac(2) = -1. * mom_vec(1) / mom3 * mBYc;
       jac(3) = -1. * mom_vec(2) / mom3 * mBYc;
 
-      const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
+      const double tErr2 = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
       // time in nanosec
-      return std::make_tuple(t, sqrt(tErr));
+      return std::make_tuple(t, sqrt(tErr2));
     }
     return std::make_tuple(-999, -999);
   }
@@ -360,8 +360,8 @@ namespace TreeFitter {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();
       const double len = fitparams.getStateVector()(tauindex);
-      const double lenErr = fitparams.getCovariance()(tauindex, tauindex);
-      return std::make_tuple(len, sqrt(lenErr));
+      const double lenErr2 = fitparams.getCovariance()(tauindex, tauindex);
+      return std::make_tuple(len, sqrt(lenErr2));
     }
     return std::make_tuple(-999, -999);
   }

@@ -36,6 +36,7 @@ int GlobalProcHandler::s_processID = -1;
 int GlobalProcHandler::s_numEventProcesses = 0;
 
 std::vector<int> GlobalProcHandler::s_pidVector;
+std::list<std::pair<int, int>> GlobalProcHandler::s_pidExitCodes;
 std::map<int, ProcType> GlobalProcHandler::s_startedPIDs;
 
 void GlobalProcHandler::childSignalHandler(int)
@@ -70,6 +71,7 @@ void GlobalProcHandler::childSignalHandler(int)
       }
 
       // errors?
+      s_pidExitCodes.emplace_back(std::make_pair(pid, WEXITSTATUS(status)));
       if (WIFSIGNALED(status) or (WIFEXITED(status) and WEXITSTATUS(status) != 0)) {
         EventProcessor::writeToStdErr("\nSub-process exited with non-zero exit status. Please check other log messages for details.\n");
       }
@@ -244,7 +246,7 @@ void GlobalProcHandler::killAllProcesses()
   for (int& pid : s_pidVector) {
     if (pid != 0) {
       if (kill(pid, SIGKILL) >= 0) {
-        B2DEBUG(100, "hard killed process " << pid);
+        B2ERROR("hard killed process " << pid);
       } else {
         B2DEBUG(100, "no process " << pid << " found, already gone?");
       }
@@ -256,6 +258,11 @@ void GlobalProcHandler::killAllProcesses()
 const std::vector<int>& GlobalProcHandler::getPIDList()
 {
   return s_pidVector;
+}
+
+const std::list<std::pair<int, int>>& GlobalProcHandler::getExitCodeList()
+{
+  return s_pidExitCodes;
 }
 
 ProcType GlobalProcHandler::getProcType(int pid)

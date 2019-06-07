@@ -30,6 +30,8 @@ namespace Belle2 {
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
     int m_iPDGCode;
+    /** Is particle unspecified by marking @ ? */
+    bool m_isUnspecified;
   public:
     /** Default ctor. */
     DecayDescriptorParticle();
@@ -73,6 +75,11 @@ namespace Belle2 {
     int getPDGCode() const
     {
       return m_iPDGCode;
+    }
+    /** Is the particle unspecified? */
+    int isUnspecified() const
+    {
+      return m_isUnspecified;
     }
   };
 }

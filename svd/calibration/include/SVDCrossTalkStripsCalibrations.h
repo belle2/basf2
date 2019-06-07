@@ -55,13 +55,27 @@ namespace Belle2 {
      * it throws std::out_of_range if the strip is unknown
      */
 
-    inline float isCrossTalkStrip(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
+    inline bool isCrossTalkStrip(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
     {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
                               strip);
     }
 
+    /** This is the method for checking if a given region is affected by
+     * Cross Talk, according to the bitmap of strips flagged as cross talk.
+
+     * Input:
+     * @param sensor ID: identity of the sensor for which the
+     * calibration is required
+     * @param isU: sensor side, true for p (u) side, false for n (v) side
+     * @param strip: cluster position in cm
+    *
+     * Output: boolean value, 1 is cross talk region, 0 otherwise.
+     * it throws std::out_of_range if the strip is unknown
+     */
+
+    bool isInCrossTalkRegion(const VxdID& sensorID, const bool& isU , const float& clsPosition);
 
     /** returns the unique ID of the payload */
     TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
@@ -72,7 +86,5 @@ namespace Belle2 {
   private:
     DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDCrossTalkStripsCalibrations payload */
 
-
   };
 }
-

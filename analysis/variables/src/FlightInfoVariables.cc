@@ -63,6 +63,7 @@ namespace Belle2 {
       // get TreeFitter values if they exist.
       // Bypass this in case the variables are requested for the granddaughter with respect to the mother as
       // TreeFitter will return the values of the granddaughter with respect to the daughter
+      /*
       if (!motherToGranddaughter) {
         if (mode == "distance" &&
             daughter->hasExtraInfo("decayLength") &&
@@ -77,7 +78,7 @@ namespace Belle2 {
           return daughter -> getExtraInfo("lifeTime");
         }
       }
-
+      */
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();

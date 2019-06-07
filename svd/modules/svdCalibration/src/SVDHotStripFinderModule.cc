@@ -283,7 +283,7 @@ void SVDHotStripFinderModule::terminate()
            */
           for (int l = 0; l < 768; l++) {
             B2DEBUG(1, hsflag[l]);
-            if (flag[l] == 1) {
+            if (hsflag[l] == 0) {
               hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l, hm_occupancy->getHistogram(*itSvdSensors,
                   k)->GetBinContent(l)); /*alive strips without identified HS */
             } else

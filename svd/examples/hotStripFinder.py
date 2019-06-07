@@ -17,17 +17,17 @@ import glob
 outputfile = "SVDHotStripFinder.root"
 
 use_database_chain()
-use_central_database("data_reprocessing_prompt")
-use_central_database("svd_basic_20190213")
-# use_central_database("svd_loadedOnFADC_20190227")
-# use_central_database("svd_offlineCalibrations_20190307")
-use_central_database("svd_onlySVDinGeoConfiguration_20190427")
+use_central_database("data_reprocessing_prompt_bucket6")
+use_central_database("svd_onlySVDinGeoConfiguration")
 
 main = create_path()
 
 set_random_seed(1)
 
-main.add_module('RootInput', branchNames=['SVDShaperDigits'])
+main.add_module(
+    'RootInput',
+    inputFileName="~/svd/BII-3221-svd-hot-strip-masking/buc6/r03844/all/cdst/sub00/cdst.physics.0007.03844.HLT*",
+    branchNames=['SVDShaperDigits'])
 
 main.add_module('Gearbox')
 main.add_module('Geometry')

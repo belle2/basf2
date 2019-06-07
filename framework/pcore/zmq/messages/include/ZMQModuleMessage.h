@@ -98,8 +98,10 @@ namespace Belle2 {
     /// Do not allow to create a new message from scratch publicly
     ZMQModuleMessage() = default;
 
-    explicit ZMQModuleMessage(MessageParts parts) :
-      m_messageParts(std::move(parts))
+    /// Constructor out of different parts
+    template <class ...T>
+    explicit ZMQModuleMessage(T&& ... arguments) :
+      m_messageParts( {ZMQMessageHelper::createZMQMessage(std::forward<T>(arguments)) ... })
     {
     }
 

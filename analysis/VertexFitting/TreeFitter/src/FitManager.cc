@@ -324,7 +324,8 @@ namespace TreeFitter {
 
       std::tuple<double, double> lenTuple  = getDecayLength(cand);
 
-      comb_cov(0, 0) = std::get<1>(lenTuple);
+      const double lenErr = std::get<1>(lenTuple);
+      comb_cov(0, 0) = lenErr * lenErr;
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
       const double mass = pb->pdgMass();

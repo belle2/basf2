@@ -3,7 +3,9 @@
 [INFO] Starting event processing, random seed is set to '1'
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
+Untested method EventMetaData::isEndOfRun
 Untested method EventMetaData::setEndOfData
+Untested method EventMetaData::setEndOfRun
 Untested method EventMetaData::setErrorFlag
 Untested method EventMetaData::setEvent
 Untested method EventMetaData::setExperiment

@@ -8,7 +8,7 @@ from stdPi0s import *
 from stdPhotons import *
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-03-01-01'  # the latest version
+gb2_setuprel = 'release-03-01-02'  # modified to release-03-01-02 from release-03-01-01
 set_log_level(LogLevel.INFO)
 
 import os
@@ -16,34 +16,37 @@ import sys
 import glob
 
 
-# please adjust the skimCode, fileList and slow pi crieria according to your need.
-
-
 # skimCode = encodeSkimName('D0Leptonic')  #'D0Leptonic' is not included in the skimcode list in release-03-01-01
-skimCode = "pseudoSkimCode"
+skimCode = "D0Leptonic"
 
 CharmLeptonicPath = Path()
 
-# fileList = get_test_file("mixedBGx1", "MC11") # Can I use both BGx0 and BGx1?
+
+modes = ['mixed', 'charged', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair']
+backgrounds = ['BGx0', 'BGx1']
+mcNumber = "MC10"
+fileLists = []
 
 
-fileList = get_test_file("mixedBGx1", "MC10")
-# I'd like to use ccbar.
+# Appending all combinations to input file list.
+for mode in modes:
+    for background in backgrounds:
+        fileLists.append(get_test_file(mode + background, mcNumber))
 
 
 # Can I use both BGx0 and BGx1? #'MC11' is not included in the testfile list in release-03-01-01
-inputMdstList('default', fileList, path=CharmLeptonicPath)
+inputMdstList('default', fileLists, path=CharmLeptonicPath)
 
 
 loadStdSkimPi0(path=CharmLeptonicPath)
 loadStdSkimPhoton(path=CharmLeptonicPath)
-stdMu('all', path=CharmLeptonicPath)  # all? loose?
-stdE('all', path=CharmLeptonicPath)
-stdPi('all', path=CharmLeptonicPath)
-cutAndCopyList('pi+:spi', 'pi+:all', 'pionID > 0.4', path=CharmLeptonicPath)  # the criteria of slow pi need to be decided
+stdMu('loose', path=CharmLeptonicPath)  # I choose loose cut.
+stdE('loose', path=CharmLeptonicPath)
+stdPi('loose', path=CharmLeptonicPath)
+copyList('pi+:spi', 'pi+:loose', path=CharmLeptonicPath)  # the criteria of spi is removed.
 
-# from skim.charm import DstToD0LeptonicDecay #if it defined.
-from D0Leptonic_List import DstToD0LeptonicDecay  # if it defined.
+
+from skim.charm import DstToD0LeptonicDecay
 D0LeptonicDecay = DstToD0LeptonicDecay(CharmLeptonicPath)
 skimOutputUdst(skimCode, D0LeptonicDecay, path=CharmLeptonicPath)
 summaryOfLists(D0LeptonicDecay, path=CharmLeptonicPath)

@@ -193,15 +193,14 @@ def DstToD0LeptonicDecay(path):
     charmcuts = '1.81 < M < 1.91'
     Dstcuts = '0 < Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5'
 
-    # I will give e, mu, and pi a criteria of PID, e-ID > 0.9, mu-ID > 0.9, pi-ID > 0.6 when I analyze.
+    D0_Channels = ['e+:loose e-:loose',
+                   'e+:loose mu-:loose',
+                   'e-:loose mu+:loose',
+                   'mu+:loose mu-:loose',
+                   'pi+:loose pi-:loose']
 
-    D0_Channels = ['e-:all e+:all',
-                   'e+:all mu-:all',
-                   'e-:all mu+:all',
-                   'mu+:all mu-:all',
-                   'pi+:all pi-:all']
+    # modified: to loose cut from 'all'
 
-    # all? loose?
     # pipi is just for normalization.
 
     DstList = []

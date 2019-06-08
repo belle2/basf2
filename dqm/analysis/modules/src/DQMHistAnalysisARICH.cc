@@ -76,22 +76,6 @@ void DQMHistAnalysisARICHModule::initialize()
     m_LineForMB[i]->SetLineWidth(1);
     m_LineForMB[i]->SetLineColor(kBlack);
   }
-  if (!(m_c_mergerHit = find_canvas("ARICH/c_mergerHit"))) {
-    m_c_mergerHit = new TCanvas("ARICH/c_mergerHit");
-    B2INFO("Canvas named c_mergerHit is not found.");
-  }
-  if (!(m_c_bits = find_canvas("ARICH/c_bits"))) {
-    m_c_bits = new TCanvas("ARICH/c_bits");
-    B2INFO("Canvas named c_bits is not found.");
-  }
-  if (!(m_c_hitsPerEvent = find_canvas("ARICH/c_hitsPerEvent"))) {
-    m_c_hitsPerEvent = new TCanvas("ARICH/c_hitsPerEvent");
-    B2INFO("Canvas named c_hitsPerEvent is not found.");
-  }
-  if (!(m_c_theta = find_canvas("ARICH/c_theta"))) {
-    m_c_theta = new TCanvas("ARICH/c_theta");
-    B2INFO("Canvas named c_theta_ is not found.");
-  }
 
   m_apdHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 2); /**<ARICH TObject to draw hit map for each APD*/
   m_apdPoly = new TH2Poly();
@@ -119,7 +103,8 @@ void DQMHistAnalysisARICHModule::event()
   //Show alert by empty bins = red and strange entries = yellow
   //Draw lines on mergerHits histogram for shifters to divide sectors
   TH1* m_h_mergerHit = findHist("ARICH/mergerHit");/**<The number of hits in each Merger Boards*/
-  if (m_h_mergerHit != NULL) {
+  m_c_mergerHit = find_canvas("ARICH/c_mergerHit");
+  if (m_h_mergerHit != NULL && m_c_mergerHit != NULL) {
     m_c_mergerHit->Clear();
     m_c_mergerHit->cd();
     m_h_mergerHit->SetMinimum(0);
@@ -143,13 +128,14 @@ void DQMHistAnalysisARICHModule::event()
 
     m_c_mergerHit->Modified();
   } else {
-    B2INFO("Histogram named mergerHit is not found.");
+    B2INFO("Histogram/canvas named mergerHit is not found.");
   }
 
 
   //Show alert by the ratio of center 2 bins to side 2bins. <1.5 = red, <2 = yellow
   TH1* m_h_bits = findHist("ARICH/bits");/**<The number of hits in each timing bit*/
-  if (m_h_bits != NULL) {
+  m_c_bits = find_canvas("ARICH/c_bits");
+  if (m_h_bits != NULL && m_c_bits != NULL) {
     m_c_bits->Clear();
     m_c_bits->cd();
     m_h_bits->SetMinimum(0);
@@ -164,12 +150,13 @@ void DQMHistAnalysisARICHModule::event()
 
     m_c_bits->Modified();
   } else {
-    B2INFO("Histogram named bits is not found.");
+    B2INFO("Histogram/canvas named bits is not found.");
   }
 
   //Show alert by no entry = red and 0 peak = yellow
   TH1* m_h_hitsPerEvent = findHist("ARICH/hitsPerEvent");/**<The number of hits in each triggered event*/
-  if (m_h_hitsPerEvent != NULL) {
+  m_c_hitsPerEvent = find_canvas("ARICH/c_hitsPerEvent");
+  if (m_h_hitsPerEvent != NULL && m_c_hitsPerEvent  != NULL) {
     m_c_hitsPerEvent->Clear();
     m_c_hitsPerEvent->cd();
     m_h_hitsPerEvent->SetMinimum(0);
@@ -184,7 +171,7 @@ void DQMHistAnalysisARICHModule::event()
 
     m_c_hitsPerEvent->Modified();
   } else {
-    B2INFO("Histogram named hitsPerEvent is not found.");
+    B2INFO("Histogram/canvas named hitsPerEvent is not found.");
   }
 
   //Draw 2D hit map of channels and APDs

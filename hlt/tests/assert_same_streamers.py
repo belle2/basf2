@@ -12,8 +12,9 @@ def get_streamer_checksums(objects):
 
     streamer_checksums = dict()
     for streamer_info in f.GetStreamerInfoList():
-        streamer_checksums[streamer_info.GetName(
-        )] = streamer_info.GetCheckSum()
+        if not isinstance(streamer_info, ROOT.TStreamerInfo):
+            continue
+        streamer_checksums[streamer_info.GetName()] = streamer_info.GetCheckSum()
 
     f.Close()
     return streamer_checksums

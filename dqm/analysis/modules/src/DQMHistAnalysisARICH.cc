@@ -76,10 +76,22 @@ void DQMHistAnalysisARICHModule::initialize()
     m_LineForMB[i]->SetLineWidth(1);
     m_LineForMB[i]->SetLineColor(kBlack);
   }
-  m_c_mergerHit = new TCanvas("ARICH/c_mergerHitModified");
-  m_c_bits = new TCanvas("ARICH/c_bitsModified");
-  m_c_hitsPerEvent = new TCanvas("ARICH/c_hitsPerEventModified");
-  m_c_theta = new TCanvas("ARICH/c_thetaModified");
+  if (!(m_c_mergerHit = find_canvas("ARICH/c_mergerHit"))) {
+    m_c_mergerHit = new TCanvas("ARICH/c_mergerHit");
+    B2INFO("Canvas named c_mergerHit is not found.");
+  }
+  if (!(m_c_bits = find_canvas("ARICH/c_bits"))) {
+    m_c_bits = new TCanvas("ARICH/c_bits");
+    B2INFO("Canvas named c_bits is not found.");
+  }
+  if (!(m_c_hitsPerEvent = find_canvas("ARICH/c_hitsPerEvent"))) {
+    m_c_hitsPerEvent = new TCanvas("ARICH/c_hitsPerEvent");
+    B2INFO("Canvas named c_hitsPerEvent is not found.");
+  }
+  if (!(m_c_theta = find_canvas("ARICH/c_theta"))) {
+    m_c_theta = new TCanvas("ARICH/c_theta");
+    B2INFO("Canvas named c_theta_ is not found.");
+  }
 
   m_apdHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 2); /**<ARICH TObject to draw hit map for each APD*/
   m_apdPoly = new TH2Poly();
@@ -101,7 +113,7 @@ void DQMHistAnalysisARICHModule::event()
   int alertBits = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
   int alertMerger = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
   int alertHitsPerEvent = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-  int alertTheta = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+  //int alertTheta = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
 
 
   //Show alert by empty bins = red and strange entries = yellow
@@ -210,4 +222,16 @@ void DQMHistAnalysisARICHModule::terminate()
   B2DEBUG(20, "terminate called");
 }
 
+TCanvas* DQMHistAnalysisARICHModule::find_canvas(TString canvas_name)
+{
+  TIter nextckey(gROOT->GetListOfCanvases());
+  TObject* cobj = NULL;
 
+  while ((cobj = (TObject*)nextckey())) {
+    if (cobj->IsA()->InheritsFrom("TCanvas")) {
+      if (cobj->GetName() == canvas_name)
+        break;
+    }
+  }
+  return (TCanvas*)cobj;
+}

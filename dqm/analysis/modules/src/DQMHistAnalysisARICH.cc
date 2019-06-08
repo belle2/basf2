@@ -110,6 +110,7 @@ void DQMHistAnalysisARICHModule::event()
   if (m_h_mergerHit != NULL) {
     m_c_mergerHit->Clear();
     m_c_mergerHit->cd();
+    m_h_mergerHit->SetMinimum(0);
     m_h_mergerHit->Draw("hist");
     gPad->Update();
 
@@ -122,7 +123,7 @@ void DQMHistAnalysisARICHModule::event()
       }
       if (hit > mean * 100 && alertMerger < 1) alertMerger = 1;
     }
-    if (m_enableAlert) m_c_mergerHit->SetFillColor(alertColor[alertMerger]);
+    if (m_enableAlert && m_minStats < m_h_mergerHit->GetEntries()) m_c_mergerHit->SetFillColor(alertColor[alertMerger]);
 
     for (int i = 0; i < 5; i++) {
       m_LineForMB[i]->DrawLine(12 * (i + 1) + 0.5, 0, 12 * (i + 1) + 0.5, gPad->GetUymax());
@@ -139,6 +140,7 @@ void DQMHistAnalysisARICHModule::event()
   if (m_h_bits != NULL) {
     m_c_bits->Clear();
     m_c_bits->cd();
+    m_h_bits->SetMinimum(0);
     m_h_bits->Draw("hist");
     gPad->Update();
 
@@ -146,7 +148,7 @@ void DQMHistAnalysisARICHModule::event()
     double center = m_h_bits->GetBinContent(3) + m_h_bits->GetBinContent(4);
     if (center / side < 2) alertBits = 1;
     if (center / side < 1.5) alertBits = 2;
-    if (m_enableAlert) m_c_bits->SetFillColor(alertColor[alertBits]);
+    if (m_enableAlert && m_minStats < m_h_bits->GetEntries()) m_c_bits->SetFillColor(alertColor[alertBits]);
 
     m_c_bits->Modified();
   } else {
@@ -158,6 +160,7 @@ void DQMHistAnalysisARICHModule::event()
   if (m_h_hitsPerEvent != NULL) {
     m_c_hitsPerEvent->Clear();
     m_c_hitsPerEvent->cd();
+    m_h_hitsPerEvent->SetMinimum(0);
     m_h_hitsPerEvent->Draw("hist");
     gPad->Update();
 

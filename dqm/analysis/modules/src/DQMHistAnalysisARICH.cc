@@ -78,7 +78,7 @@ void DQMHistAnalysisARICHModule::initialize()
   }
   m_c_mergerHit = new TCanvas("ARICH/c_mergerHitModified");
   m_c_bits = new TCanvas("ARICH/c_bitsModified");
-  m_c_hitsPerEvent = new TCanvas("ARICH/c_hitPerEventModified");
+  m_c_hitsPerEvent = new TCanvas("ARICH/c_hitsPerEventModified");
   m_c_theta = new TCanvas("ARICH/c_thetaModified");
 
   m_apdHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 2); /**<ARICH TObject to draw hit map for each APD*/

@@ -633,16 +633,31 @@ namespace Belle2 {
     int m_t2d3ts6_pr;
     //** m_t2d3ts8_id leaf */
     int m_t2d3ts8_id;
-    //** tsf leafs */
+    //** m_t2d3ts8_rt leaf */
+    int m_t2d3ts8_rt;
+    //** m_t2d3ts8_lr leaf */
+    int m_t2d3ts8_lr;
+    //** m_t2d3ts8_pr leaf */
+    int m_t2d3ts8_pr;
+    //** m_etf_in leaf */
+    int m_etf_thresh;
+    //** m_etf_in leaf */
+    int m_etf_cc;
+    //** m_etf_in leaf */
+    int m_etf_t0;
+    //** m_etf_in leaf */
+    int m_etf_valid;
+
+    //** extra leafs */
     int m_firmid;
-    //** tsf leafs */
+    //** extra leafs */
     int m_firmver;
-    //** tsf leafs */
+    //** extra leafs */
     int m_evt;
-    //** tsf leafs */
+    //** extra leafs */
     int m_clk;
     /** the class title */
-    ClassDef(TRGCDCT3DUnpackerStore, 2);
+    ClassDef(TRGCDCT3DUnpackerStore, 3);
 
   };
 

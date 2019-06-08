@@ -1,6 +1,8 @@
 import ROOT
 from ROOT import Belle2
 
+from b2test_utils import get_object_with_name, get_streamer_checksums
+
 
 # A mapping name -> version, checksum of the expected objects
 EXPECTED_CHECKSUMS = {
@@ -41,50 +43,6 @@ NAME_TO_CPP_REPLACEMENTS = {
 }
 
 
-def get_streamer_checksums(objects):
-    """
-    Extract the streamer checksum and version of the C++ objects in the given list
-    by writing them all to a TMemFile and getting back the streamer info list
-    automatically created by ROOT afterwards.
-    Please note, that this list also includes the streamer infos of all
-    base objects of the objects you gave.
-    """
-    # Write out the objects to a mem file
-    f = ROOT.TMemFile("test_mem_file", "RECREATE")
-    f.cd()
-
-    for o in objects:
-        o.Write()
-    f.Write()
-
-    # Go through all streamer infos and extract checksum and version
-    streamer_checksums = dict()
-    for streamer_info in f.GetStreamerInfoList():
-        if not isinstance(streamer_info, ROOT.TStreamerInfo):
-            continue
-        streamer_checksums[streamer_info.GetName()] = (streamer_info.GetClassVersion(), streamer_info.GetCheckSum())
-
-    f.Close()
-    return streamer_checksums
-
-
-def get_object(object_name, root=Belle2):
-    """
-    (Possibly) recursively get the object with the given name from the Belle2 namespace.
-
-    If the object name includes a ".", the first part will be turned into an object (probably a module)
-    and the function is continued with this object as the root and the rest of the name.
-
-    If not, the object is extracted via a getattr call.
-    """
-    if "." in object_name:
-        namespace, object_name = object_name.split(".", 1)
-
-        return get_object(object_name, get_object(namespace))
-
-    return getattr(root, object_name)
-
-
 if __name__ == "__main__":
     from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 
@@ -95,7 +53,7 @@ if __name__ == "__main__":
     objects_names = [NAME_TO_CPP_REPLACEMENTS.get(name, name) for name in objects_names]
 
     # Now get the actual objects corresponding to the names
-    objects = [get_object(object_name)() for object_name in objects_names]
+    objects = [get_object_with_name(object_name)() for object_name in objects_names]
 
     # Check the checksums of every entry
     problems = []
@@ -117,4 +75,4 @@ if __name__ == "__main__":
         print("Check finished with problems. ",
               "Either you changed them by accident or you need to adjust the expected checksum list in this test):",
               problems)
-        raise RuntimeError
+        exit(1)

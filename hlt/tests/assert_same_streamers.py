@@ -21,7 +21,7 @@ def get_streamer_checksums(objects):
 
 def get_object(object_name, root=Belle2):
     if "." in object_name:
-        namespace, object_name = object_name.split(".")
+        namespace, object_name = object_name.split(".", 1)
 
         return get_object(object_name, get_object(namespace))
 

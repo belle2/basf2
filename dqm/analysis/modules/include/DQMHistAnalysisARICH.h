@@ -89,6 +89,8 @@ namespace Belle2 {
 
     int alertColor[3] = {kWhite, kYellow, kRed};/**<Alert color of canvases*/
 
+    int m_minStats = 10000;/**<The lower limit on the number of events to enable the alert*/
+
     //TObjects for DQM analysis
     TLine* m_LineForMB[5] = {}; /**<Lines to divide the sectors on mergerHit histogram*/
     TCanvas* m_c_bits = NULL; /**<Canvas for modified bits histogram*/

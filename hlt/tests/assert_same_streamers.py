@@ -56,18 +56,19 @@ EXPECTED_CHECKSUMS = {
     'Belle2::TRGSummary': 2529704859
 }
 
+NAME_TO_CPP_REPLACEMENTS = {
+    "SoftwareTriggerVariables": "SoftwareTrigger::SoftwareTriggerVariables",
+    "ROIs": "ROIid",
+}
+
 
 if __name__ == "__main__":
     from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 
     objects_names = ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
 
-    # We need to fix two names, as they do not correspond to the ROOT object classes
-    objects_names.remove("SoftwareTriggerVariables")
-    objects_names.append("SoftwareTrigger.SoftwareTriggerVariables")
-
-    objects_names.remove("ROIs")
-    objects_names.append("ROIid")
+    # We need to fix some names, as they do not correspond to the ROOT object classes
+    objects_names = [NAME_TO_CPP_REPLACEMENTS.get(name, name) for name in objects_names]
 
     objects = [get_object(object_name)() for object_name in objects_names]
 

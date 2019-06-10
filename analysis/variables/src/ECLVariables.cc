@@ -1190,7 +1190,7 @@ will used mass constrained :math:`\pi^{0}` s anyhow.
     | Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
     | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
     | Precision: :math:`18` bit
-    | This value can be changed to a different reference frame with :b2:var`useCMSFrame`.
+    | This value can be changed to a different reference frame with :b2:var:`useCMSFrame`.
 )DOC");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE, R"DOC(
 Returns ECL cluster's uncertainty on energy

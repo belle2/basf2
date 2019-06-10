@@ -89,7 +89,6 @@ ECL Cluster
 
 Here is a list of variables related to ECL cluster.
 All ECLCluster-based variables return NaN if no ECLCluster is found.
-There is further detailed documentation available `here <https://confluence.desy.de/x/I3I0Aw>`_.
 
 .. _importantNoteECL:
 
@@ -104,6 +103,7 @@ There is further detailed documentation available `here <https://confluence.desy
           these boundaries will be set to the lower (upper) bound.
     
     Lower and uppper limits, and precision of these variables are mentioned inside the note box below them.
+    One should note this in the context of binning effects.
 
 
 .. b2-variables::

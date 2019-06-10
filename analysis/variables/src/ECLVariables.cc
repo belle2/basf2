@@ -1122,7 +1122,7 @@ Returns an integer code for the ECL region of a cluster.
   cluster center and an extrapolated track can be used as reference for the calculation of the shower
   depth. It is defined as the distance between this intersection and the cluster center.
 
-.. note::
+.. warning::
     This distance is calculated on the reconstructed level and is temporarily
     included to the ECL cluster MDST data format for studying purposes. If it is found
     that it is not crucial for physics analysis then this variable will be removed
@@ -1154,10 +1154,6 @@ It is defined as the distance between this intersection and the track hit positi
     | Upper limit: :math:`250.0`
     | Precision: :math:`10` bit
 )DOC");
-    REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma, R"DOC(
-[Legacy] Returns 1.0 if photon candidate passes simple region dependent
-energy selection for Belle data and MC (50/100/150 MeV).
-)DOC");
     REGISTER_VARIABLE("clusterE", eclClusterE, R"DOC(
 Returns ECL cluster's energy corrected for leakage and background.
 
@@ -1186,15 +1182,15 @@ to the PDG value by adjusting the reconstructed photon energies. Selection crite
 the mass for :math:`\pi^{0}` candidates must be based on the biased value. Most analysis
 will used mass constrained :math:`\pi^{0}` s anyhow.
 
-.. note::
-    As of release 00-09-02, we only store clusters with :math:`E > 20\,` MeV.
+.. warning::
+    We only store clusters with :math:`E > 20\,` MeV.
 
 .. note::
     | Please read `this <importantNoteECL>` first.
     | Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
     | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
     | Precision: :math:`18` bit
-    | This value can be changed in different reference frame due to Lorentz boost.
+    | This value can be changed to a different reference frame with :b2:var`useCMSFrame`.
 )DOC");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE, R"DOC(
 Returns ECL cluster's uncertainty on energy
@@ -1245,10 +1241,6 @@ as function of true photon energy, true photon direction and beam background lev
 )DOC");
     REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID, R"DOC(
 Returns ECL cluster's connected region ID.
-)DOC");
-    REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL, R"DOC(
-| Returns ECL cluster's quality indicating a good cluster in GSIM (stored in deltaL of ECL cluster object).
-| The Belle people used only clusters with quality == 0 in their E_{extra_ecl} (Belle only).
 )DOC");
     REGISTER_VARIABLE("clusterTheta", eclClusterTheta, R"DOC(
 Returns ECL cluster's polar angle :math:`\theta`
@@ -1578,6 +1570,16 @@ StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based parti
 cluster-matched tracks using the cluster 4-momenta.
 
 Used for ECL-based dark sector physics and debugging track-cluster matching.
+)DOC");
+
+    VARIABLE_GROUP("Belle Variables");
+    REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma, R"DOC(
+[Legacy] Returns 1.0 if photon candidate passes simple region dependent
+energy selection for Belle data and MC (50/100/150 MeV).
+)DOC");
+    REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL, R"DOC(
+[Legacy] Returns ECL cluster's quality indicating a good cluster in GSIM (stored in deltaL of ECL cluster object).
+Belle analysis typically used clusters with quality == 0 in their :math:`E_{\text{extra ECL}}` (Belle only).
 )DOC");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first

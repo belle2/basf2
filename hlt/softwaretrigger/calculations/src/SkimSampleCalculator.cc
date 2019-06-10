@@ -342,10 +342,36 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   if (gg_tag) ggSel = 1;
   calculationResult["GG"] = ggSel;
 
+  // Bhabha skim with ECL information only (bhabhaecl)
+  double BhabhaECL = 0.;
+  ClusterUtils Cls;
+  for (int i = 0; i < eclClusters.getEntries() - 1; i++) {
+    if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+      continue;
+
+    TLorentzVector V4g1 = PCmsLabTransform::labToCms(Cls.Get4MomentumFromCluster(eclClusters[i],
+                                                     ECLCluster::EHypothesisBit::c_nPhotons));
+    double Eg1ob = V4g1.E() / (2 * BeamEnergyCMS());
+    for (int j = i + 1; j < eclClusters.getEntries(); j++) {
+      if (!eclClusters[j]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+        continue;
+      TLorentzVector V4g2 = PCmsLabTransform::labToCms(Cls.Get4MomentumFromCluster(eclClusters[j],
+                                                       ECLCluster::EHypothesisBit::c_nPhotons));
+      double Eg2ob = V4g2.E() / (2 * BeamEnergyCMS());
+      const TVector3 V3g1 = V4g1.Vect();
+      const TVector3 V3g2 = V4g2.Vect();
+      double Thetag1 = V4g1.Theta() * TMath::RadToDeg();
+      double Thetag2 = V4g2.Theta() * TMath::RadToDeg();
+      double deltphi = fabs(V3g1.DeltaPhi(V3g2) * TMath::RadToDeg());
+      double Tsum = Thetag1 + Thetag2;
+      if ((deltphi > 165. && deltphi < 178.5) && (Eg1ob > 0.4 && Eg2ob > 0.4 && (Eg1ob > 0.45 || Eg2ob > 0.45)) && (Tsum > 178.
+          && Tsum < 182.)) BhabhaECL = 1;
+    }
+  }
+  calculationResult["BhabhaECL"] = BhabhaECL;
+
   // Monopole searches
   calculationResult["nMplTracks"] = m_monopoleRecoTracks.getEntries();
-
-
 
   // Radiative Bhabha skim (radee) for CDC dE/dx calib studies
   double radee = 0.;

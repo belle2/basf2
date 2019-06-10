@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Torben Ferber                               *
+ * Contributors: Anze Zupanc, Torben Ferber, Giacomo De Pietro            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+// mdst dataobjects
 #include <mdst/dataobjects/KlId.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -27,6 +28,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+// std
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -234,21 +236,20 @@ namespace Belle2 {
 
     double maximumKLMAngleCMS(const Particle* particle)
     {
+      // check there actually are KLM clusters in the event
       StoreArray<KLMCluster> clusters;
-      if (clusters.getEntries() == 0) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (clusters.getEntries() == 0) return std::numeric_limits<double>::quiet_NaN();
 
+      // get the input particle's vector momentum in the CMS frame
       PCmsLabTransform T;
       const TVector3 pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
 
+      // find the KLM cluster with the largest angle
       double maxAngle = 0.0;
       for (int iKLM = 0; iKLM < clusters.getEntries(); iKLM++) {
         const TVector3 clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
         double angle = pCms.Angle(clusterMomentumCms);
-        if (angle > maxAngle) {
-          maxAngle = angle;
-        }
+        if (angle > maxAngle) maxAngle = angle;
       }
       return maxAngle;
     }

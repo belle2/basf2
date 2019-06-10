@@ -141,7 +141,7 @@ def add_mdst_dump(path, print_untested=False):
             "getFtdlBits": range(10),
             "getPsnmBits": range(10),
             }, array=False),
-        DataStorePrinter("SoftwareTriggerResult", ["getResults"], array=False),
+        DataStorePrinter("SoftwareTriggerResult", ["getResults", "getNonPrescaledResults"], array=False),
         DataStorePrinter("MCParticle", [
             "getPDG", "getStatus", "getMass", "getCharge", "getEnergy", "hasValidVertex",
             "getProductionTime", "getDecayTime", "getLifetime", "getVertex",

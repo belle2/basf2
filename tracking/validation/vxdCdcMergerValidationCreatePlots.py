@@ -15,6 +15,7 @@ import ROOT
 
 
 class VxdCdcMergerValidationPlots:
+    """Create efficiency plots for the V0 validation"""
 
     def __init__(self, input_file='../VxdCdcValidationHarvested.root', output_file='VxdCdcMergerValidation.root'):
         """Constructor"""

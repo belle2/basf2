@@ -13,13 +13,13 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-03-01-02'
 set_log_level(LogLevel.INFO)
 skimCode = encodeSkimName('Charm2BodyHadronic')
 
 c2bhpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=c2bhpath)
 
 stdPi('loose', path=c2bhpath)

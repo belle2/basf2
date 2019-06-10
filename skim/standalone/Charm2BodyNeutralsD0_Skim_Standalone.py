@@ -20,7 +20,7 @@ skimCode = encodeSkimName('Charm2BodyNeutralsD0')
 
 c2bndpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=c2bndpath)
 
 

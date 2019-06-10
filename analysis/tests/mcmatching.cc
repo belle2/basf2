@@ -1,6 +1,7 @@
 #include <analysis/utility/MCMatching.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <analysis/variables/BasicParticleInformation.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -1036,6 +1037,167 @@ namespace {
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
       EXPECT_EQ(MCMatching::c_MissPHOTOS | MCMatching::c_MissNeutrino, MCMatching::getMCErrors(d.m_particle)) << d.getString();
     }
+  }
+
+  /** B0 -> Xsd (-> K+ pi- ) mu+ mu- */
+  TEST_F(MCMatchingTest, UnspecifiedParticleReconstruction)
+  {
+    {
+      /** B0 -> Xsd (-> K+ pi- ) mu+ mu- */
+      Decay d(511, {{30343, {321, -211}}, -13, 13});
+      d.reconstruct({511, {{30343, {321, -211}}, -13, 13}});
+
+      Particle* Xsd = d.m_particle->getDaughters()[0];
+      ASSERT_TRUE(Xsd != nullptr);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsUnspecified);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), true);
+
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+    }
+    {
+      /** B0 -> K*0 (-> K+ pi- ) mu+ mu- */
+      Decay d(511, {{313, {321, -211}}, -13, 13});
+      d.reconstruct({511, {{30343, {321, -211}}, -13, 13}});
+
+      Particle* Xsd = d.m_particle->getDaughters()[0];
+      ASSERT_TRUE(Xsd != nullptr);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsUnspecified);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), true);
+
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+    }
+    {
+      /** B0 -> K*0 (-> K+ pi- ) J/psi (-> mu+ mu-) */
+      Decay d(511, { {313, {321, -211}}, {443, { -13, 13}}});
+      Decay* mup = &(d[1][0]);
+      Decay* mum = &(d[1][1]);
+      d.reconstruct({511, {{30343, {321, -211}}, { -13, {}, Decay::c_ReconstructFrom, mup}, {13, {}, Decay::c_ReconstructFrom, mum}}});
+
+      Particle* Xsd = d.m_particle->getDaughters()[0];
+      ASSERT_TRUE(Xsd != nullptr);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), false);
+      Xsd->setProperty(Particle::PropertyFlags::c_IsUnspecified);
+      EXPECT_EQ(Variable::particleIsUnspecified(Xsd), true);
+
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+    }
+  }
+
+  /** count the number of missing particles */
+  TEST_F(MCMatchingTest, CountMissingParticle)
+  {
+    {
+      // pi0 not reconstructed
+      Decay d(421, {321, -211, {111, {22, 22}}});
+      d.reconstruct({421, {321, -211, {0}}});
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissGamma | MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      vector<int> daughterPDG{111};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
+    }
+    {
+      // pi not reconstructed
+      Decay d(421, {321, -211, {111, {22, 22}}});
+      d.reconstruct({421, {321, 0, {111, {22, 22}}}});
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      vector<int> daughterPDG{211};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
+    }
+    {
+      // K not reconstructed
+      Decay d(421, {321, -211, {111, {22, 22}}});
+      d.reconstruct({421, {0, -211, {111, {22, 22}}}});
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      vector<int> daughterPDG{321};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
+    }
+    {
+      // 2K not reconstructed
+      Decay d(-521, { -321, {421, {321, -211, {111, {22, 22}}}}});
+      d.reconstruct({ -521, {0, {421, {0, -211, {111, {22, 22}}}}}});
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      vector<int> daughterPDG{321};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 2);
+    }
+    {
+      //K0S not reconstructed
+      Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {{310, {211, -211}}}}});
+      d.finalize();
+      //K0S and daughters are secondary
+      MCParticle* k0s = d.getMCParticle(310);
+      k0s->setStatus(k0s->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
+      MCParticle* pi1 = d.getMCParticle(211);
+      pi1->setStatus(pi1->getStatus() & (~MCParticle::c_PrimaryParticle));
+      MCParticle* pi2 = d.getMCParticle(-211);
+      pi2->setStatus(pi1->getStatus() & (~MCParticle::c_PrimaryParticle));
+
+      d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, 0}});
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissMassiveParticle | MCMatching::c_MissingResonance,
+                MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      vector<int> daughterPDG{310};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
+    }
+    {
+      //K0L not reconstructed
+      Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {130}}});
+      d.finalize();
+      //K0L and daughters are secondary
+      MCParticle* k0l = d.getMCParticle(130);
+      k0l->setStatus(k0l->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
+
+      d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, 0}});
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissKlong | MCMatching::c_MissMassiveParticle | MCMatching::c_MissingResonance,
+                MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      vector<int> daughterPDG{130};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
+    }
+    {
+      // e and nutrino not reconstructed
+      Decay d(521, { -11, 12, 22});
+      d.reconstruct({521, {0, 0, 22}});
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle,
+                MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      vector<int> daughterPDG_E{11};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_E), 1);
+      vector<int> daughterPDG_NuE{12};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_NuE), 1);
+      vector<int> daughterPDG_Nu{12, 14, 16};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_Nu), 1);
+    }
+    {
+      // e and nutrino not reconstructed
+      Decay d(521, { -13, 14, 22});
+      d.reconstruct({521, {0, 0, 22}});
+      ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle,
+                MCMatching::getMCErrors(d.m_particle)) << d.getString();
+      ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+      vector<int> daughterPDG_Mu{13};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_Mu), 1);
+      vector<int> daughterPDG_NuMu{14};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_NuMu), 1);
+      vector<int> daughterPDG_Nu{12, 14, 16};
+      EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_Nu), 1);
+    }
+
   }
 }  // namespace
 #endif

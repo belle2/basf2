@@ -26,6 +26,8 @@
 namespace Belle2 {
   /// A message without an associated socket ID. Is sued in most cases.
   class ZMQNoIdMessage : public ZMQModuleMessage<2> {
+    friend class ZMQMessageFactory;
+
   public:
     /// Rebuild the datastore from a message
     static void toDataStore(std::unique_ptr<ZMQNoIdMessage> message, const std::unique_ptr<DataStoreStreamer>& streamer);

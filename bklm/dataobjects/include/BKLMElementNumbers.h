@@ -52,6 +52,14 @@ namespace Belle2 {
     static uint16_t moduleNumber(int forward, int sector, int layer);
 
     /**
+     * Get layer global number.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     */
+    static int layerGlobalNumber(int forward, int sector, int layer);
+
+    /**
      * Get number of strips.
      * @param[in] forward Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
@@ -110,6 +118,23 @@ namespace Belle2 {
     {
       return (m_MaximalForwardNumber + 1) * m_MaximalSectorNumber;
     }
+
+    /**
+     * Get maximal layer global number (0-based).
+     */
+    static constexpr int getMaximalLayerGlobalNumber()
+    {
+      return (m_MaximalForwardNumber + 1) * m_MaximalSectorNumber * m_MaximalLayerNumber;
+    }
+
+    /**
+     * Get element numbers by layer global number (0-based).
+     * @param[in]  layerGlobal  Layer global number.
+     * @param[out] forward      Forward (1) or backward (0) BKLM.
+     * @param[out] sector       Sector (1-based).
+     * @param[out] layer        Layer (1-based).
+     */
+    static void layerGlobalNumberToElementNumbers(int layerGlobal, int* forward, int* sector, int* layer);
 
   protected:
 

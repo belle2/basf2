@@ -20,6 +20,8 @@
 #include <framework/datastore/RelationArray.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
+#include <simulation/monopoles/MonopoleConstants.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -104,7 +106,7 @@ void BaseRecoFitterModule::event()
 
     for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
       bool wasFitSuccessful; //FIXME this is ugly, but atm changing framework/const.h seems even worse
-      if (pdgCodeToUseForFitting != 99666) {
+      if (pdgCodeToUseForFitting != Monopoles::c_monopolePDGCode) {
         Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
         B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
         wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);

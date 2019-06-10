@@ -1,6 +1,14 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
+"""
+<header>
+  <input>../BottomoniumGammaUpsilon.udst.root</input>
+  <output>BottomoniumGammaUpsilon_Validation.root</output>
+  <contact>jiasen@buaa.edu.cn</contact>
+</header>
+"""
+
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdMu

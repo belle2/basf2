@@ -102,7 +102,9 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
         bin_bounds = list(zip(curv_bounds[0::2], curv_bounds[1::2]))
         bin_bounds = sorted(bin_bounds)
 
+        #: cached copy of lower bounds
         self.lower_curv_bounds = np.array([bin[0] for bin in bin_bounds])
+        #: cached copy of upper bounds
         self.upper_curv_bounds = np.array([bin[1] for bin in bin_bounds])
 
         assert(len(self.lower_curv_bounds) == len(self.upper_curv_bounds))

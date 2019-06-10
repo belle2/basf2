@@ -80,7 +80,9 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
         """Constructor"""
         super(ClusterFilterValidationModule, self).__init__(foreach="CDCWireHitClusterVector",
                                                             output_file_name=output_file_name)
+        #: reference to the CDCMCHitlookUp singleton
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
+        #: reference to the CDCWireHitClusterVarSet
         self.cluster_varset = Belle2.TrackFindingCDC.CDCWireHitClusterVarSet()
 
     def initialize(self):
@@ -125,6 +127,7 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
         cluster_crops.update(truth_dict)
         return cluster_crops
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="tree")
     #: Save histograms in a sub folder

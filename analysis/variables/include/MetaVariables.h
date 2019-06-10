@@ -257,6 +257,11 @@ namespace Belle2 {
      */
     Manager::FunctionPtr cos(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns the log10 value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr log10(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the variable of the nth daughter of the given particle.

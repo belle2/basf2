@@ -886,19 +886,6 @@ class EventInspector(basf2.Module):
         g.SetLineColor(18)
         g.SetLineWidth(1)
         self.bklmZY.append(g)
-        self.lines = []
-        self.texts = []
-        for sector in range(0, 16):
-            x = sector * 15
-            self.lines.append(ROOT.TLine(x, 0, x, 1))
-            self.lines[sector].SetLineColor(8)
-            self.lines[sector].SetLineWidth(1)
-            self.lines[sector].SetLineStyle(2)
-            self.texts.append(ROOT.TText(x+7.5, 1, "B{0}{1}".format(("B" if sector < 8 else "F"), (sector % 8))))
-            self.texts[sector].SetTextAlign(22)
-            self.texts[sector].SetTextColor(8)
-            self.texts[sector].SetTextFont(42)
-            self.texts[sector].SetTextSize(0.02)
 
     def terminate(self):
         """Handle job termination: draw histograms, close output files"""

@@ -5,6 +5,7 @@ import ROOT
 import re
 import functools
 import numpy as np
+#: ignore invalid floating-point operations
 np.seterr(invalid='ignore')
 
 import sys

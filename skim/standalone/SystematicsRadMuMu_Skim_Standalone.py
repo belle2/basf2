@@ -22,7 +22,7 @@ gb2_setuprel = 'release-03-00-03'
 skimpath = Path()
 
 # input test data
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=skimpath)
 stdMu('all', path=skimpath)
 

@@ -23,7 +23,7 @@ import glob
 skimCode = encodeSkimName('Charm3BodyHadronic')
 
 c3bhpath = Path()
-fileList = get_test_file("ddbarBGx0", "MC11")
+fileList = get_test_file("ddbarBGx0", "MC12")
 inputMdstList('default', fileList, path=c3bhpath)
 
 

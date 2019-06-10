@@ -12,6 +12,7 @@ using namespace boost::algorithm;
 DecayDescriptorParticle::DecayDescriptorParticle() :
   m_strName(""),
   m_isSelected(false),
+  m_isUnspecified(false),
   m_strLabel(""),
   m_iPDGCode(0)
 {}
@@ -20,7 +21,10 @@ bool DecayDescriptorParticle::init(const DecayStringParticle& p)
 {
   // Set member variables from the information in the DecayStringParticle p
   m_strName = p.m_strName;
-  m_isSelected = !p.m_strSelector.empty();
+  if (!p.m_strSelector.empty()) {
+    m_isSelected    = (p.m_strSelector ==  "^");
+    m_isUnspecified = (p.m_strSelector ==  "@");
+  }
   if (!p.m_strLabel.empty()) m_strLabel = p.m_strLabel;
   // Determine PDG code using the particle names defined in evt.pdl
   TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(m_strName.c_str());

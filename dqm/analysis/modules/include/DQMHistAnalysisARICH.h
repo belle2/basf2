@@ -83,11 +83,20 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
+    /**
+    * Find canvas by name
+    * @param cname Name of the canvas
+    * @return The pointer to the canvas, or nullptr if not found.
+    */
+    TCanvas* find_canvas(TString cname);
+
   protected:
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
 
     int alertColor[3] = {kWhite, kYellow, kRed};/**<Alert color of canvases*/
+
+    int m_minStats = 10000;/**<The lower limit on the number of events to enable the alert*/
 
     //TObjects for DQM analysis
     TLine* m_LineForMB[5] = {}; /**<Lines to divide the sectors on mergerHit histogram*/

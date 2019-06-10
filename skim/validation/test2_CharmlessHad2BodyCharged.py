@@ -15,11 +15,11 @@ from modularAnalysis import *
 charmless2chargedpath = Path()
 
 # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-inputMdst('default', '../CharmlessHad2BodyCharged_ContinuumTest.udst.root', path=charmless2chargedpath)
+inputMdst('default', '../CharmlessHad2BodyCharged.udst.root', path=charmless2chargedpath)
 
 from variables import variables
 variablesToHistogram(
-    filename='CharmlessHad2BodyCharged_ContinuumTest.root',
+    filename='CharmlessHad2BodyCharged_Validation.root',
     decayString='B-:2BodySkim',
     variables=[
         ('Mbc', 100, 5.2, 5.3),

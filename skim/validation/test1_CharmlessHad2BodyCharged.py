@@ -24,9 +24,7 @@ from skimExpertFunctions import setSkimLogging
 
 charmless2chargedpath = Path()
 
-uubar_file = '/hsm/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002290'
-uubar_file = uubar_file + '/e0000/4S/r00000/uubar/sub01/mdst_005780_prod00002290_task00005780.root'
-fileList = uubar_file
+fileList = ['../CharmlessHad2BodyCharged.dst.root']
 
 inputMdstList('default', fileList, path=charmless2chargedpath)
 
@@ -43,7 +41,7 @@ loadStdLightMesons(path=charmless2chargedpath)
 # Hadronic Bm skim
 from skim.btocharmless import *
 Had2BodyList = CharmlessHad2BodyBmList(path=charmless2chargedpath)
-skimOutputUdst('../CharmlessHad2BodyCharged_ContinuumTest.udst.root', Had2BodyList, path=charmless2chargedpath)
+skimOutputUdst('../CharmlessHad2BodyCharged.udst.root', Had2BodyList, path=charmless2chargedpath)
 summaryOfLists(Had2BodyList, path=charmless2chargedpath)
 
 # Suppress noisy modules, and then process

@@ -181,11 +181,8 @@ def CharmlessHad2BodyB0List(path):
 
     copyLists('B0:2BodyB0', B0PPList + B0PVList + B0VVList + B0PSList + B0VSList + B0SSList, path=path)
 
-    buildRestOfEvent('B0:2BodyB0', path=path)
-    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-    appendROEMasks('B0:2BodyB0', [cleanMask], path=path)
-    buildContinuumSuppression('B0:2BodyB0', 'cleanMask', path=path)
-    cutAndCopyList('B0:2BodySkim', 'B0:2BodyB0', 'R2 < 0.5', path=path)
+    buildEventShape(inputListNames=['B0:2BodyB0'], path=path)
+    cutAndCopyList('B0:2BodySkim', 'B0:2BodyB0', 'foxWolframR2 < 0.5', path=path)
 
     List = ['B0:2BodySkim']
     return List
@@ -315,11 +312,8 @@ def CharmlessHad2BodyBmList(path):
 
     copyLists('B-:2BodyBm', BmPPList + BmPVList + BmVVList + BmPSList + BmVSList, path=path)
 
-    buildRestOfEvent('B-:2BodyBm', path=path)
-    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-    appendROEMasks('B-:2BodyBm', [cleanMask], path=path)
-    buildContinuumSuppression('B-:2BodyBm', 'cleanMask', path=path)
-    cutAndCopyList('B-:2BodySkim', 'B-:2BodyBm', 'R2 < 0.5', path=path)
+    buildEventShape(inputListNames=['B-:2BodyBm'], path=path)
+    cutAndCopyList('B-:2BodySkim', 'B-:2BodyBm', 'foxWolframR2 < 0.5', path=path)
 
     List = ['B-:2BodySkim']
     return List
@@ -419,7 +413,8 @@ def CharmlessHad3BodyB0List(path):
     cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
     appendROEMasks('B0:3BodyB0', [cleanMask], path=path)
     buildContinuumSuppression('B0:3BodyB0', 'cleanMask', path=path)
-    cutAndCopyList('B0:3BodySkim', 'B0:3BodyB0', 'R2 < 0.5 and abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
+    buildEventShape(inputListNames=['B0:3BodyB0'], path=path)
+    cutAndCopyList('B0:3BodySkim', 'B0:3BodyB0', 'foxWolframR2 < 0.5 and abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
 
     List = ['B0:3BodySkim']
     return List
@@ -521,7 +516,8 @@ def CharmlessHad3BodyBmList(path):
     cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
     appendROEMasks('B-:3BodyBm', [cleanMask], path=path)
     buildContinuumSuppression('B-:3BodyBm', 'cleanMask', path=path)
-    cutAndCopyList('B-:3BodySkim', 'B-:3BodyBm', 'R2 < 0.5 and abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
+    buildEventShape(inputListNames=['B-:3BodyBm'], path=path)
+    cutAndCopyList('B-:3BodySkim', 'B-:3BodyBm', 'foxWolframR2 < 0.5 and abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
 
     List = ['B-:3BodySkim']
     return List

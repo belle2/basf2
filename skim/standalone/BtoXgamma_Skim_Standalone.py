@@ -16,9 +16,9 @@ from stdV0s import *
 from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from stdPhotons import *
-from skimExpertFunctions import setSkimLogging, encodeSkimName
+from skimExpertFunctions import setSkimLogging, encodeSkimName, get_test_file
 
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-03-02-00'
 
 
 skimCode = encodeSkimName('BtoXgamma')

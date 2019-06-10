@@ -12,11 +12,10 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdMu, stdPr
 from stdPi0s import *
 from stdPhotons import *
-from skimExpertFunctions import *
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-03-02-00'
 
 syspath = Path()
 fileList = get_test_file("mixedBGx1", "MC12")

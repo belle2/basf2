@@ -36,13 +36,13 @@ from skim.taupair import *
 tauList = TauLFVList(0, path=taulfvskim)
 copyLists('tau+:LFV', tauList, path=taulfvskim)
 
-# the variables that are printed out are: Mbc, deltaE
+# the variables that are printed out are: M, deltaE
 from variables import variables
 variablesToHistogram(
     filename='TauLFV_Validation.root',
     decayString='tau+:LFV',
-    variables=[('Mbc', 100, 1.50, 2.00), ('deltaE', 120, -1.1, 1.1)],
-    variables_2d=[('Mbc', 50, 1.50, 2.00, 'deltaE', 60, -1.1, 1.1)],
+    variables=[('M', 100, 1.50, 2.00), ('deltaE', 120, -1.1, 1.1)],
+    variables_2d=[('M', 50, 1.50, 2.00, 'deltaE', 60, -1.1, 1.1)],
     path=taulfvskim
 )
 process(taulfvskim)

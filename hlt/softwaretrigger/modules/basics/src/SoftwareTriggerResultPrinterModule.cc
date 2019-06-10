@@ -10,6 +10,7 @@
 
 #include <hlt/softwaretrigger/modules/basics/SoftwareTriggerResultPrinterModule.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <hlt/softwaretrigger/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -54,58 +55,79 @@ void SoftwareTriggerResultPrinterModule::terminate()
 
   bool prescaled;
   bool accepted;
+  bool cut;
 
+  debugTTree->Branch("cut", &cut);
   debugTTree->Branch("prescaled", &prescaled);
   debugTTree->Branch("accept_or_reject", &accepted);
   debugTTree->Branch("total_events", &m_numberOfEvents);
-  std::vector<double> numberOfEvents(m_passedEventsPerTrigger.size());
+  std::vector<double> value(m_passedEventsPerTrigger.size());
 
+  cut = true;
   prescaled = true;
   accepted = true;
   unsigned int counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
     std::string cutName = cutResult.first;
     boost::replace_all(cutName, "&", "_");
-    debugTTree->Branch(cutName.c_str(), &numberOfEvents.at(counter));
+    debugTTree->Branch(cutName.c_str(), &value.at(counter));
 
-    numberOfEvents[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_accept]);
+    value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_accept]);
     counter++;
   }
   debugTTree->Fill();
 
+  cut = true;
   prescaled = true;
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
     // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
-    numberOfEvents[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
+    value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
     counter++;
   }
   debugTTree->Fill();
 
+  cut = true;
   prescaled = false;
   accepted = true;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
-      numberOfEvents[counter] = NAN;
+      value[counter] = NAN;
     } else {
-      numberOfEvents[counter] = static_cast<double>(m_passedEventsPerTriggerNonPrescaled[cutName][SoftwareTriggerCutResult::c_accept]);
+      value[counter] = static_cast<double>(m_passedEventsPerTriggerNonPrescaled[cutName][SoftwareTriggerCutResult::c_accept]);
     }
     counter++;
   }
   debugTTree->Fill();
 
+  cut = true;
   prescaled = false;
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
-      numberOfEvents[counter] = NAN;
+      value[counter] = NAN;
     } else {
-      numberOfEvents[counter] = static_cast<double>(m_passedEventsPerTriggerNonPrescaled[cutName][SoftwareTriggerCutResult::c_reject]);
+      value[counter] = static_cast<double>(m_passedEventsPerTriggerNonPrescaled[cutName][SoftwareTriggerCutResult::c_reject]);
+    }
+    counter++;
+  }
+  debugTTree->Fill();
+
+  cut = false;
+  prescaled = false;
+  accepted = false;
+  counter = 0;
+  for (auto& cutResult : m_passedEventsPerTrigger) {
+    const auto& cutName = cutResult.first;
+    if (m_prescales.find(cutName) == m_prescales.end()) {
+      value[counter] = NAN;
+    } else {
+      value[counter] = static_cast<double>(m_prescales[cutName]);
     }
     counter++;
   }
@@ -121,13 +143,17 @@ void SoftwareTriggerResultPrinterModule::event()
 {
   m_numberOfEvents++;
 
-  for (const auto& triggerResult : m_resultStoreObjectPointer->getResultPairs()) {
-    auto cutResults = triggerResult.second;
-    m_passedEventsPerTrigger[triggerResult.first][static_cast<SoftwareTriggerCutResult >(cutResults.first)]++;
+  for (const auto& [cutName, cutResults] : m_resultStoreObjectPointer->getResultPairs()) {
+    m_passedEventsPerTrigger[cutName][static_cast<SoftwareTriggerCutResult >(cutResults.first)]++;
 
     // This does only make sense for non-total results (as they are prescaled)
-    if (triggerResult.first.find("total_result") == std::string::npos) {
-      m_passedEventsPerTriggerNonPrescaled[triggerResult.first][static_cast<SoftwareTriggerCutResult >(cutResults.second)]++;
+    if (cutName.find("total_result") == std::string::npos) {
+      m_passedEventsPerTriggerNonPrescaled[cutName][static_cast<SoftwareTriggerCutResult >(cutResults.second)]++;
+
+      DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(cutName);
+      if (downloadedCut) {
+        m_prescales[cutName] = downloadedCut->getPreScaleFactor();
+      }
     }
   }
 

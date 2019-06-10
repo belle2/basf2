@@ -29,6 +29,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    # The prescales are only valid when using the online database!
+    basf2.reset_database()
+    basf2.use_central_database("online")
+
     path = basf2.Path()
 
     if args.input.endswith(".sroot"):
@@ -41,33 +45,50 @@ if __name__ == "__main__":
 
     df = read_root(args.output)
 
-    df.accept_or_reject = df.accept_or_reject.astype("str")
-    df.prescaled = df.prescaled.astype("str")
+    # Make sure to cope with strings rather than bools (which is a bit strange in pandas)
+    df[["accept_or_reject", "prescaled", "cut"]] = df[["accept_or_reject", "prescaled", "cut"]].astype("str")
 
-    df = df.set_index(["accept_or_reject", "prescaled"]).T
+    # Group and order as we need it
+    df = df.set_index(["cut", "accept_or_reject", "prescaled"]).T
     df.index = df.index.str.replace("software_trigger_cut_", "")
     df.index = df.index.str.replace("_", " ")
 
-    # TODO: also-rejected
-    df = df["True"]
-    df.columns = ["Prescaled", "Non Prescaled"]
+    # Separate cuts and prescaling
+    df_prescales = df["False"]
+    df_cuts = df["True"]
 
+    # For the prescaling, the total_events is nonsense...
+    df_prescales.loc["total events"] = np.NAN
+
+    # Now also separate out only the accepted results
+    df_cuts = df_cuts["True"]
+
+    # Give the columns some meaningful names
+    df_cuts = df_cuts[["True", "False"]]
+    df_cuts.columns = ["Prescaled", "Non Prescaled"]
+
+    # Make sure to print all information
     pd.set_option("display.max_rows", 500)
     pd.set_option("display.max_colwidth", 200)
 
+    # Function used for formatting
     def format(x, total_events):
         if np.isnan(x):
             return ""
-        return f"{x} ({x/total_events:.2%})"
+        return f"{int(x):d} ({x/total_events:7.2%})"
 
-    df["Prescaled"] = df["Prescaled"].apply(lambda x: format(x, df["Prescaled"]["total events"]))
-    df["Non Prescaled"] = df["Non Prescaled"].apply(lambda x: format(x, df["Non Prescaled"]["total events"]))
+    # Create a new dataframe just for printing
+    df_print = pd.DataFrame(index=df_cuts.index)
+
+    df_print["Prescaled"] = df_cuts["Prescaled"].apply(lambda x: format(x, df_cuts["Prescaled"]["total events"]))
+    df_print["Non Prescaled"] = df_cuts["Non Prescaled"].apply(lambda x: format(x, df_cuts["Non Prescaled"]["total events"]))
+    df_print["Prescales"] = df_prescales.fillna("")
 
     if args.format == "human-readable":
-        print(df[["Prescaled", "Non Prescaled"]])
+        print(df_print[["Prescaled", "Non Prescaled", "Prescales"]])
     elif args.format == "jira":
-        print(tabulate(df, tablefmt="jira", showindex=True, headers="keys"))
+        print(tabulate(df_print, tablefmt="jira", showindex=True, headers="keys"))
     elif args.format == "stash":
-        print(tabulate(df, tablefmt="pipe", showindex=True, headers="keys"))
+        print(tabulate(df_print, tablefmt="pipe", showindex=True, headers="keys"))
     elif args.format == "grid":
-        print(tabulate(df, tablefmt="grid", showindex=True, headers="keys"))
+        print(tabulate(df_print, tablefmt="grid", showindex=True, headers="keys"))

@@ -59,6 +59,8 @@ namespace Belle2 {
       std::map<std::string, std::map<SoftwareTriggerCutResult, unsigned int>> m_passedEventsPerTrigger;
       /// Internal map of summed results
       std::map<std::string, std::map<SoftwareTriggerCutResult, unsigned int>> m_passedEventsPerTriggerNonPrescaled;
+      /// Internal map of prescales
+      std::map<std::string, unsigned int> m_prescales;
       /// Internal counter for the number of seen events
       unsigned int m_numberOfEvents = 0;
     };

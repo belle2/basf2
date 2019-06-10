@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+
 import basf2
 from argparse import ArgumentParser
 from root_pandas import read_root

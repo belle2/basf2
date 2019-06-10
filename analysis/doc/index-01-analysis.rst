@@ -53,6 +53,11 @@ Variables
 =========
 
 While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate variables associated with a given candidate or event.
+In ``basf2`` analysis, variables are handled by the VariableManager:
+
+.. _variablemanager:
+   .. autodata:: variables.variables
+
 Here is a list of variables known to ``basf2`` that can be used in cut strings or written out to file.
 
 .. toctree:: Variables

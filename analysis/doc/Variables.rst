@@ -1,17 +1,7 @@
 .. _variables:
 
-Variables
-=========
-
-Variables are handled by the VariableManager:
-
-.. _variablemanager:
-.. automodule:: variables
-   :members:
-   :undoc-members:
-
-   .. autodata:: variables.variables
-
+Variables by group
+==================
 
 Here is a categorised list of variables known to ``basf2``.
 You can also look at the alphabetical index: :ref:`b2-varindex`.
@@ -286,8 +276,43 @@ They have a *[Calibration]* pretag.
 .. b2-variables::
    :group: KLM Calibration | PID
 
-Variables Collections and Lists
-===============================
+
+Aliases
+=======
+
+Variable names are deliberately verbose and explicit (to avoid ambiguity).
+However, it is often not desirable to deal with long unwieldy variable names particularly in the context of `VariableManagerOutput`.
+Aliases to variable names may be set with:
+
+.. code-block:: python
+
+        from variables import variables 
+        variables.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
+
+
+.. note::
+
+        Beware of confusion: the python module ``variables`` contains an object also called ``variables`` which is the ``Belle2.Variable.Manager.Instance()``.
+        This is a historic design choice.
+
+        Often, in examples and snippets we write: ``from varibles import variables as vm``.
+
+
+Note that this does not need the `basf2.Path` as an argument.
+
+.. warning::
+
+        The `VariableManager` instance is a singleton that is configured independently of the `basf2.Path`.
+        The configuration just before calling `basf2.process` is what wins.
+
+
+.. autofunction:: variables.variables.addAlias()
+.. autofunction:: variables.variables.printAliases()
+
+
+
+Collections and Lists
+=====================
 
 To avoid very long lists of variable names in `variablesToNtuple <modularAnalysis.variablesToNtuple>`,
 it is possible to use collections of variables or lists of variables instead.
@@ -300,7 +325,7 @@ One can use the list in the steering file as follows:
   # Defining the list
   my_list = ['p','E']
 
-  # Passing it as an argumet to variablesToNtuple
+  # Passing it as an argument to variablesToNtuple
   modular_analusis.variablesToNtuple(variables=my_list,
                                      ...)
 
@@ -312,7 +337,7 @@ be threated as a variable name, and hence one would have the following syntax in
   # Defining the collection
   variables.utils.add_collection(['p','E'],"my_collection")
 
-  # Passing it as an argumet to variablesToNtuple
+  # Passing it as an argument to variablesToNtuple
   modular_analusis.variablesToNtuple(variables=['my_collection'],
                                      ...)
 
@@ -348,3 +373,10 @@ to help to easily create aliases.
 .. autofunction:: variables.utils.create_aliases_for_selected
 .. autofunction:: variables.utils.create_daughter_aliases
 .. autofunction:: variables.utils.create_mctruth_aliases
+
+Miscelaneous helpers for using variables
+========================================
+
+.. autofunction:: variables.getAllTrgNames
+.. autofunction:: variables.std_vector
+.. autofunction:: variables.printVars

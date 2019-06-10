@@ -179,7 +179,7 @@ namespace Belle2 {
     bool fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const;
 
     /**
-     * FIXME temporary workaround for monopoles, in order not to change Const::ChargedStable types.
+     * Same as above, but hypothesis set by pdg code
      */
     bool fit(RecoTrack& recoTrack, const int pdgCode) const;
 

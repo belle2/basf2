@@ -105,12 +105,13 @@ void BaseRecoFitterModule::event()
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
     for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
-      bool wasFitSuccessful; //FIXME this is ugly, but atm changing framework/const.h seems even worse
+      bool wasFitSuccessful;
       if (pdgCodeToUseForFitting != Monopoles::c_monopolePDGCode) {
         Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
         B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
         wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
       } else {
+        // Different call signature for monopoles in order not to change Const::ChargedStable types
         wasFitSuccessful = fitter.fit(recoTrack, pdgCodeToUseForFitting);
       }
       const genfit::AbsTrackRep* trackRep = recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting);

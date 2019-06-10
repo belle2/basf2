@@ -13,8 +13,8 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdMu, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 
 charmpath = Path()

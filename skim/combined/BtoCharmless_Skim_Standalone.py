@@ -16,9 +16,9 @@ from stdPi0s import loadStdSkimPi0
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
 
-gb2_setuprel = "release-03-00-00"
+gb2_setuprel = "release-03-02-00"
 
 # Create skim path
 btocharmlesspath = Path()

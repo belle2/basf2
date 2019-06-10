@@ -111,7 +111,7 @@ All ECLCluster-based variables return NaN if no ECLCluster is found.
 
 .. b2-variables::
    :group: Belle Variables
-=======
+
 There are also some special variables related to the MC matching of ECL clusters (specifically).
 
 .. b2-variables::

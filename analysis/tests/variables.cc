@@ -1196,6 +1196,10 @@ namespace {
     var = Manager::Instance().getVariable("max(E, pz)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), 2.0);
+
+    var = Manager::Instance().getVariable("log10(px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -1.0);
   }
 
   TEST_F(MetaVariableTest, formula)

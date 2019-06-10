@@ -19,9 +19,9 @@ from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-03-01-00'
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 path = create_path()
 
 inputMdstList('default', fileList, path=path)

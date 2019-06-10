@@ -22,7 +22,7 @@ mypath = Path()
 skimCode = encodeSkimName('BtoDh_Kshh')
 
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=mypath)
 
 

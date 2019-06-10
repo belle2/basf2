@@ -216,7 +216,8 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
                   << mother->getPDG() << " " << particle->getPDGCode() << " " << mcParticle->getPDG());
       }
       status |= MCErrorFlags::c_MissingResonance;
-    } else {
+    } else if (!(particle->getProperty() & Particle::PropertyFlags::c_IsUnspecified)) {
+      // Check if the particle is unspecified. If so the flag of c_AddedWrongParticle will be ignored.
       status |= MCErrorFlags::c_AddedWrongParticle;
     }
   }

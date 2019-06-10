@@ -114,9 +114,9 @@ namespace TreeFitter {
           double flt1(0), flt2(0);
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
-          fitparams.getStateVector()(posindex)     = -v.x();
-          fitparams.getStateVector()(posindex + 1) = -v.y();
-          fitparams.getStateVector()(posindex + 2) = -v.z();
+          fitparams.getStateVector()(posindex)     = v.x();
+          fitparams.getStateVector()(posindex + 1) = v.y();
+          fitparams.getStateVector()(posindex + 2) = v.z();
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);

@@ -78,8 +78,8 @@ namespace Belle2 {
       std::map<std::string, float> importance;
       unsigned int numberOfImportanceVars = m_pt.get<unsigned int>("number_of_importance_vars", 0);
       for (unsigned int i = 0; i < numberOfImportanceVars; ++i) {
-        std::string key = m_pt.get<std::string>(std::string("importance_key") + std::to_string(i));
-        float value = m_pt.get<float>(std::string("importance_value") + std::to_string(i));
+        auto key = m_pt.get<std::string>(std::string("importance_key") + std::to_string(i));
+        auto value = m_pt.get<float>(std::string("importance_value") + std::to_string(i));
         importance[key] = value;
       }
       return importance;
@@ -100,7 +100,7 @@ namespace Belle2 {
       char* directory_template = strdup((m_temporary_directory + "/Basf2MVA.XXXXXX").c_str());
       auto directory = mkdtemp(directory_template);
       std::string tmpfile = std::string(directory) + std::string("/weightfile") + suffix;
-      m_filenames.push_back(directory);
+      m_filenames.emplace_back(directory);
       free(directory_template);
       return tmpfile;
     }
@@ -115,8 +115,8 @@ namespace Belle2 {
 
     void Weightfile::addStream(const std::string& identifier, std::istream& in)
     {
-      typedef boost::archive::iterators::base64_from_binary<boost::archive::iterators::transform_width<std::string::const_iterator, 6, 8>>
-          base64_t;
+      using base64_t =  boost::archive::iterators::base64_from_binary <
+                        boost::archive::iterators::transform_width<std::string::const_iterator, 6, 8 >>;
 
       std::string contents;
       in.seekg(0, std::ios::end);
@@ -136,10 +136,10 @@ namespace Belle2 {
 
     std::string Weightfile::getStream(const std::string& identifier) const
     {
-      typedef boost::archive::iterators::transform_width<boost::archive::iterators::binary_from_base64<std::string::const_iterator>, 8, 6>
-      binary_t;
+      using binary_t = boost::archive::iterators::transform_width <
+                       boost::archive::iterators::binary_from_base64<std::string::const_iterator>, 8, 6 >;
 
-      std::string contents = m_pt.get<std::string>(identifier);
+      auto contents = m_pt.get<std::string>(identifier);
       std::string dec(binary_t(contents.begin()), binary_t(contents.end()));
       return dec;
     }

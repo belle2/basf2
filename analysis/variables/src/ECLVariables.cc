@@ -168,6 +168,16 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
+    double eclClusterCellId(const Particle* particle)
+    {
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->getMaxECellId();
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
     double eclClusterTiming(const Particle* particle)
     {
 
@@ -438,7 +448,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getExtTheta();
@@ -457,7 +467,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getExtPhi();
@@ -475,7 +485,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getExtPhiId();
@@ -494,7 +504,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getEnergy3FWDBarrel();
@@ -513,7 +523,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getEnergy3FWDEndcap();
@@ -531,7 +541,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getEnergy3BWDEndcap();
@@ -550,7 +560,7 @@ namespace Belle2 {
       const Track* track = particle->getTrack();
       if (track) {
 
-        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+        auto* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
 
         if (eclinfo) {
           return eclinfo->getEnergy3BWDBarrel();
@@ -822,7 +832,7 @@ namespace Belle2 {
         int maxTheta = int(std::lround(vars[2]));
 
         unsigned nTCs = 0;
-        for (const auto tc : ecltcs) {
+        for (const auto& tc : ecltcs) {
           if (tc.getFADC() >= fadccut and
               tc.getThetaId() >= minTheta and
               tc.getThetaId() <= maxTheta) nTCs++;
@@ -1132,6 +1142,8 @@ namespace Belle2 {
                       "Returns ECL cluster's timing uncertainty that contains 99% of true photons.");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE,
                       "Returns energy of the crystal with highest energy in the ECLCluster.");
+    REGISTER_VARIABLE("clusterCellID", eclClusterCellId,
+                      "Returns cellId of the crystal with highest energy in the ECLCluster.");
     REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9,
                       "Returns ratio of energies of the central crystal and 3x3 crystals around the central crystal.");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25,

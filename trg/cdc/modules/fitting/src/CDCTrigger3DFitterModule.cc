@@ -275,7 +275,7 @@ CDCTrigger3DFitterModule::finder(int charge, double rho, double phi,
 }
 
 void
-CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, vector<double>& bestTSPhi,
+CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, [[maybe_unused]] vector<double>& bestTSPhi,
                                  int charge, double rho, double phi,
                                  double& z0, double& cot, double& chi2)
 {

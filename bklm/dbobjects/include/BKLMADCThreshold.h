@@ -14,8 +14,6 @@
 #include <TObject.h>
 #include <string>
 #include <cmath>
-#include <TROOT.h>
-#include <TClass.h>
 
 namespace Belle2 {
 

@@ -42,15 +42,19 @@ namespace Belle2 {
       { return *(getUpperBound<DiscreteQ>()); }
 
       //FIXME this interface should not be here, but we need a generically named getter
+      /// Get the lower p bound (alias)
       float getLowerX() const
       { return getLowerP(); }
 
+      /// Get the upper p bound (alias)
       float getUpperX() const
       { return getUpperP(); }
 
+      /// Get the lower q bound (alias)
       float getLowerY() const
       { return getLowerQ(); }
 
+      /// Get the upper q bound (alias)
       float getUpperY() const
       { return getUpperQ(); }
     };

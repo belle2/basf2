@@ -52,12 +52,6 @@ namespace Belle2 {
      */
     const EKLMChannelData* getChannelData(uint16_t strip) const;
 
-    /**
-     * Get number of active strips in the specified sector.
-     * @param[in] sectorGlobal Sector global number.
-     */
-    int getActiveStripsSector(int sectorGlobal) const;
-
   private:
 
     /** Channel data. */

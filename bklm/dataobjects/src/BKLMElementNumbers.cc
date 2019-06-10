@@ -14,6 +14,14 @@
 
 using namespace Belle2;
 
+BKLMElementNumbers::BKLMElementNumbers()
+{
+}
+
+BKLMElementNumbers::~BKLMElementNumbers()
+{
+}
+
 uint16_t BKLMElementNumbers::channelNumber(
   int forward, int sector, int layer, int plane, int strip)
 {
@@ -24,39 +32,61 @@ uint16_t BKLMElementNumbers::channelNumber(
          | ((strip - 1) << BKLM_STRIP_BIT);
 }
 
+uint16_t BKLMElementNumbers::moduleNumber(int forward, int sector, int layer)
+{
+  return (forward ? BKLM_END_MASK : 0)
+         | ((sector - 1) << BKLM_SECTOR_BIT)
+         | ((layer - 1) << BKLM_LAYER_BIT);
+}
+
+int BKLMElementNumbers::layerGlobalNumber(int forward, int sector, int layer)
+{
+  int layerGlobal = layer - 1;
+  layerGlobal += (sector - 1) * m_MaximalLayerNumber;
+  layerGlobal += forward * m_MaximalSectorNumber * m_MaximalLayerNumber;
+  return layerGlobal;
+}
+
+int BKLMElementNumbers::getNStrips(
+  int forward, int sector, int layer, int plane)
+{
+  int strips = 0;
+  if (forward == 0 && sector == 3 && plane == 0) {
+    /* Chimney sector. */
+    if (layer < 3)
+      strips = 38;
+    if (layer > 2)
+      strips = 34;
+  } else {
+    /* Other sectors. */
+    if (layer == 1 && plane == 1)
+      strips = 37;
+    if (layer == 2 && plane == 1)
+      strips = 42;
+    if (layer > 2 && layer < 7 && plane == 1)
+      strips = 36;
+    if (layer > 6 && plane == 1)
+      strips = 48;
+    if (layer == 1 && plane == 0)
+      strips = 54;
+    if (layer == 2 && plane == 0)
+      strips = 54;
+    if (layer > 2 && plane == 0)
+      strips = 48;
+  }
+  return strips;
+}
+
 bool BKLMElementNumbers::checkChannelNumber(
   int forward, int sector, int layer, int plane, int strip)
 {
-  bool flag = false;
-  if (forward >= 0 and forward <= 1) {
-    if (sector >= 1 and sector <= 8) {
-      if (layer >= 1 and layer <= 15) {
-        if (plane == 0) { // phi plane
-          if (layer == 1 and strip >= 1 and strip <= 37)
-            flag = true;
-          if (layer == 2 and strip >= 1 and strip <= 42)
-            flag = true;
-          if (layer >= 3 and layer <= 6 and strip >= 1 and strip <= 36)
-            flag = true;
-          if (layer >= 7 and strip >= 1 and strip <= 48)
-            flag = true;
-        } // phi
-        if (plane == 1) { // z plane
-          if (forward == 0 and sector == 3) { // BB2 is a special case
-            if (layer >= 1 and layer <= 2 and strip >= 1 and strip <= 38)
-              flag = true;
-            if (layer >= 3 and strip >= 1 and strip <= 34)
-              flag = true;
-          } // BB2
-          else {
-            if (layer >= 1 and layer <= 2 and strip >= 1 and strip <= 54)
-              flag = true;
-            if (layer >= 3 and strip >= 1 and strip <= 48)
-              flag = true;
-          }
-        } // z
-      } // layer
-    } // sector
-  } // forward
-  return flag;
+  return (strip >= 1) && (strip <= BKLMElementNumbers::getNStrips(
+                            forward, sector, layer, plane));
+}
+
+void BKLMElementNumbers::layerGlobalNumberToElementNumbers(int layerGlobal, int* forward, int* sector, int* layer)
+{
+  *forward = ((layerGlobal / m_MaximalLayerNumber) / m_MaximalSectorNumber) % (m_MaximalLayerNumber + 1);
+  *sector = ((layerGlobal / m_MaximalLayerNumber) % m_MaximalSectorNumber) + 1;
+  *layer = (layerGlobal % m_MaximalLayerNumber) + 1;
 }

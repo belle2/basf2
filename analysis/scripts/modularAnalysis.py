@@ -863,7 +863,12 @@ def reconstructDecay(
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
-    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+    reconstructed as well (meaning that the charge conjugated mother list is created as well). One cay use an
+    at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
+    is marked as unspecified, it will not checked for its identity when doing :ref:`MCMatching`. Any particle which
+    decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
+    would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
+    need to be stated correctly so this can be used for "sum of exclusive" decays
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -1536,7 +1541,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
     fillParticleList('gamma:roe_default', '', path=path)
-    fillParticleList('K_L0:roe_default', '', path=path)
+    fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
     inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)

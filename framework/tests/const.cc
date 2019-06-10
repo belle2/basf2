@@ -4,7 +4,7 @@
 #include <TParticlePDG.h>
 
 #include <gtest/gtest.h>
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -63,7 +63,7 @@ namespace {
 
     int size = 0;
     //note: iterating over the restricted type (ParticleType would work, too)
-    for (const Const::ChargedStable& c : set) {
+    for (const auto& c : set) {
 
       int pdg = c.getPDGCode();
       unsigned int index = c.getIndex();
@@ -138,7 +138,7 @@ namespace {
 
   TEST(ConstTest, FindInParticleSet)
   {
-    for (const Const::ChargedStable& c : Const::chargedStableSet) {
+    for (const auto& c : Const::chargedStableSet) {
       int pdg = c.getPDGCode();
       EXPECT_EQ(pdg, Const::chargedStableSet.find(pdg).getPDGCode());
     }
@@ -171,8 +171,8 @@ namespace {
     EXPECT_TRUE(Const::muon.getParticlePDG()->Lifetime() > 2.1e-6);
 
     //AntiParticle is non-const...
-    TParticlePDG* protonnonconst = const_cast<TParticlePDG*>(Const::proton.getParticlePDG());
-    TParticlePDG* photonnonconst = const_cast<TParticlePDG*>(Const::photon.getParticlePDG());
+    auto* protonnonconst = const_cast<TParticlePDG*>(Const::proton.getParticlePDG());
+    auto* photonnonconst = const_cast<TParticlePDG*>(Const::photon.getParticlePDG());
 
     //test that AntiParticle() works as expected (not the case for previous implementation)
     EXPECT_DOUBLE_EQ(protonnonconst->AntiParticle()->Charge(), -3);
@@ -181,8 +181,8 @@ namespace {
     EXPECT_TRUE(photonnonconst->AntiParticle() == photonnonconst);
 
 
-    EXPECT_TRUE(Const::invalidParticle.getParticlePDG() == NULL);
-    EXPECT_TRUE(Const::unspecifiedParticle.getParticlePDG() == NULL);
+    EXPECT_TRUE(Const::invalidParticle.getParticlePDG() == nullptr);
+    EXPECT_TRUE(Const::unspecifiedParticle.getParticlePDG() == nullptr);
   }
 
   /** Check DetectorSet. */

@@ -11,10 +11,15 @@ from trackfindingcdc.run.training import TrainingRunMixin
 
 class FeasibleSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
     """Run to record segment relations encountered at the SegmentLinker and retrain its mva method"""
+
+    #: number of events to generate
     n_events = 10000
+    #: use the generic event generator
     generator_module = "generic"
+    #: overlay background hits from the events in these files
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
+    #: degree of MC truth-matching
     truth = "truth_positive"
 
     @property
@@ -32,6 +37,7 @@ class FeasibleSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerateE
                         SuperClusterDegree=3,
                         SuperClusterExpandOverApogeeGap=True)
 
+        #: Process each event according to the user's desired task (train, eval, explore)
         if self.task == "train":
             varSets = [
                 "feasible",

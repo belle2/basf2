@@ -20,6 +20,8 @@
 namespace Belle2 {
   /// A message with the socket ID. Needed in input<->worker communication.
   class ZMQIdMessage : public ZMQModuleMessage<3> {
+    friend class ZMQMessageFactory;
+
   public:
     /// The if the message is of a given type
     bool isMessage(const c_MessageTypes isType) const

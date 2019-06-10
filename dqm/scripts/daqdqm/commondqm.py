@@ -24,6 +24,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
             path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
             path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
+            path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
+            path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
         # SVD
         if components is None or 'SVD' in components:
             # SVD DATA FORMAT
@@ -52,13 +54,18 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                 "filter": [
                     "ge3_loose_tracks_inc_1_tight_not_ee2leg",
                     "selectmumu",
+                    "ECLMuonPair",
+                    "ge3_loose_tracks_inc_1_tight_not_ee2leg",
+                    "2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx",
                     "single_muon\\10"],
                 "skim": [
                     "accept_hadron",
                     "accept_mumu_1trk",
                     "accept_mumu_2trk",
                     "accept_bhabha",
-                    "accept_gamma_gamma"]})
+                    "accept_gamma_gamma"],
+            },
+            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"])
         path.add_module("StatisticsTimingHLTDQM")
 
         # SVD DATA FORMAT
@@ -82,6 +89,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         path.add_module(ecldqm)
         ecldqmext = register_module('ECLDQMEXTENDED')
         path.add_module(ecldqmext)
+        # we dont want to create large histograms on HLT, thus ERECO only
+        if dqm_environment == "expressreco":
+            path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')
     # TOP
     if components is None or 'TOP' in components:
         topdqm = register_module('TOPDQM')

@@ -12,7 +12,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdPi0s import *
-from stdCharged import stdPi, stdK
+from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
 gb2_setuprel = 'release-03-00-03'
 
@@ -22,12 +22,14 @@ import glob
 skimCode = encodeSkimName("CharmSemileptonic")
 
 cslpath = Path()
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=cslpath)
 
 
 stdPi('95eff', path=cslpath)
 stdK('95eff', path=cslpath)
+stdE('95eff', path=cslpath)
+stdMu('95eff', path=cslpath)
 loadStdSkimPi0(path=cslpath)
 
 reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, path=cslpath)

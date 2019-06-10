@@ -96,6 +96,9 @@ namespace Belle2 {
     m_extHits.isRequired();
     m_recBunch.isOptional();
 
+    // toggle has changed status to prevent warning in beginRun for the first IOV
+    m_moduleT0.hasChanged();
+
     // Configure TOP detector for reconstruction
     TOPconfigure config;
 
@@ -178,6 +181,11 @@ namespace Belle2 {
 
   void TOPModuleT0CalibratorModule::beginRun()
   {
+    if (m_moduleT0.hasChanged()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2WARNING("ModuleT0 payload has changed. Calibration results may not be correct."
+                << LogVar("run", evtMetaData->getRun()));
+    }
   }
 
   void TOPModuleT0CalibratorModule::event()
@@ -298,18 +306,49 @@ namespace Belle2 {
 
     // merge two statistically independent finders and store results into histograms
 
-    TH1F h_moduleT0("moduleT0", "Module T0",
-                    c_numModules, 0.5, c_numModules + 0.5);
-    h_moduleT0.SetXTitle("slot number");
-    h_moduleT0.SetYTitle("module T0 [ns]");
+    TH1F h_relModuleT0("relModuleT0", "Module T0 relative to calibration",
+                       c_numModules, 0.5, c_numModules + 0.5);
+    h_relModuleT0.SetXTitle("slot number");
+    h_relModuleT0.SetYTitle("module T0 residual [ns]");
 
     for (unsigned module = 0; module < c_numModules; module++) {
       auto& finder = m_finders[0][module].add(m_finders[1][module]);
       const auto& minimum = finder.getMinimum();
       if (minimum.valid) {
-        h_moduleT0.SetBinContent(module + 1, minimum.position);
-        h_moduleT0.SetBinError(module + 1, minimum.error * scaleError);
+        h_relModuleT0.SetBinContent(module + 1, minimum.position);
+        h_relModuleT0.SetBinError(module + 1, minimum.error * scaleError);
       }
+      std::string slotNum = to_string(module + 1);
+      auto h = finder.getHistogram("chi2_slot_" + slotNum, "slot " + slotNum);
+      h.Write();
+    }
+    h_relModuleT0.Write();
+
+    // absolute module T0
+    TH1F h_moduleT0("moduleT0", "Module T0",
+                    c_numModules, 0.5, c_numModules + 0.5);
+    h_moduleT0.SetXTitle("slot number");
+    h_moduleT0.SetYTitle("module T0 [ns]");
+
+    double average = 0; // average to be subtracted
+    int num = 0;
+    for (int slot = 1; slot <= c_numModules; slot++) {
+      if (h_relModuleT0.GetBinError(slot) > 0) {
+        double T0 = 0;
+        if (m_moduleT0->isCalibrated(slot)) T0 = m_moduleT0->getT0(slot);
+        average += h_relModuleT0.GetBinContent(slot) + T0;
+        num++;
+      }
+    }
+    if (num > 0) average /= num;
+
+    for (int slot = 1; slot <= c_numModules; slot++) {
+      double T0 = 0;
+      if (m_moduleT0->isCalibrated(slot)) T0 = m_moduleT0->getT0(slot);
+      double t0 = h_relModuleT0.GetBinContent(slot) + T0 - average;
+      double err = h_relModuleT0.GetBinError(slot);
+      h_moduleT0.SetBinContent(slot, t0);
+      h_moduleT0.SetBinError(slot, err);
     }
     h_moduleT0.Write();
 
@@ -320,7 +359,7 @@ namespace Belle2 {
     m_tree->Write();
     m_file->Close();
 
-    B2RESULT("Results available in " << m_outFileName);
+    B2RESULT(num << "/16 calibrated. Results available in " << m_outFileName);
   }
 
 

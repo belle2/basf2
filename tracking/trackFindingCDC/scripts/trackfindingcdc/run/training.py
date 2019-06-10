@@ -58,6 +58,7 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
 
         To run only the training run with --postprocess-only
         """
+        #: Process each event according to the user's desired task (train, eval, explore)
         if self.task == "train":
             cmd = [
                 "trackfindingcdc_teacher",

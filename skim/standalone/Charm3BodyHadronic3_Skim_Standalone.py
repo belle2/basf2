@@ -24,7 +24,7 @@ skimCode = encodeSkimName('Charm3BodyHadronic3')
 
 c3bh3path = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=c3bh3path)
 
 

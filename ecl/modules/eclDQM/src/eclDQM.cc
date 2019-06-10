@@ -58,6 +58,7 @@ ECLDQMModule::ECLDQMModule() : HistoModule()
   addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 20.0 * Belle2::Unit::GeV);
   addParam("PedestalMeanUpperThr", m_PedestalMeanUpperThr, "Upper threshold of pedestal distribution", 15000.);
   addParam("PedestalMeanLowerThr", m_PedestalMeanLowerThr, "Lower threshold of pedestal distribution", -15000.);
+
   addParam("PedestalRmsInclude", m_PedestalRmsInclude, "If true, save histogram with pedestal rms error values.", true);
   addParam("PedestalRmsUpperThr", m_PedestalRmsUpperThr, "Upper threshold of pedestal rms error distribution", 1000.);
 }

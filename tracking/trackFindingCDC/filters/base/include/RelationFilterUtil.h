@@ -47,7 +47,7 @@ namespace Belle2 {
      *    It returns NaN in case the neighbor is invalid and shall not be saved.\n
      */
     struct RelationFilterUtil {
-      /**@{*/
+      /* *@{*/
       /// Appends relations between elements in the given AItems using the ARelationFilter.
       template <class AObject, class ARelationFilter>
       static void appendUsing(ARelationFilter& relationFilter,
@@ -76,7 +76,7 @@ namespace Belle2 {
         // sort everything afterwards
         std::sort(std::begin(weightedRelations), std::end(weightedRelations));
       }
-      /**@}*/
+      /* *@}*/
 
       /// Shortcut for applying appendUsing with froms=tos
       template <class AObject, class ARelationFilter>

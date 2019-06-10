@@ -21,7 +21,7 @@ gb2_setuprel = 'release-03-00-03'
 darkskimpath = Path()
 
 # test input file
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=darkskimpath)
 stdPhotons('all', path=darkskimpath)
 stdE('all', path=darkskimpath)

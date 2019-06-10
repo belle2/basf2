@@ -109,6 +109,9 @@ All ECLCluster-based variables return NaN if no ECLCluster is found.
 .. b2-variables::
    :group: ECL Cluster related
 
+.. b2-variables::
+   :group: Belle Variables
+
 Acceptance
 ~~~~~~~~~~
 

@@ -22,7 +22,7 @@ EXPECTED_CHECKSUMS = {
     'Belle2::RawTRG': (1, 1772361339),
     'Belle2::RelationsInterface<TObject>': (0, 3862127315),
     'Belle2::SoftwareTrigger::SoftwareTriggerVariables': (1, 638196437),
-    'Belle2::SoftwareTriggerResult': (5, 3176463974),
+    'Belle2::SoftwareTriggerResult': (5, 241059817),
     'Belle2::TRGSummary': (5, 2529704859),
 }
 

@@ -16,7 +16,6 @@ if __name__ == "__main__":
     parser.add_argument("--output", help="Output file name (will be used internally). "
                                          "Defaults to trigger_results.root.",
                         default="trigger_results.root")
-    parser.add_argument("--also-rejected", action="store_true", default=False)
     choices = ["human-readable"]
     try:
         from tabulate import tabulate
@@ -51,7 +50,6 @@ if __name__ == "__main__":
 
     # TODO: also-rejected
     df = df["True"]
-    df = df[["True", "False"]]
     df.columns = ["Prescaled", "Non Prescaled"]
 
     pd.set_option("display.max_rows", 500)

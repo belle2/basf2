@@ -269,7 +269,7 @@ namespace Belle2 {
                       the momenta of the three daughters in the frame of the given particle (mother)
                       and the momentum of the given particle in the lab frame.
 
-                      Else: 0.)DOC");
+                      Otherwise, it returns 0.)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngleMomentumPi0Dalitz",
                       cosHelicityAngleMomentumPi0Dalitz,
@@ -278,7 +278,7 @@ namespace Belle2 {
                       cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)
                       and the momentum of the given particle in the lab frame.
 
-                      Else: 0.)DOC");
+                      Otherwise, it returns 0.)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngleBeamMomentum", cosHelicityAngleBeamMomentum,
                       R"DOC(

@@ -1330,8 +1330,8 @@ namespace Belle2 {
                       "IP in xy plane (3) The difference of the azimuthal angle of the vertex vector and the "
                       "momentum vector (4) The flight distance of the Lambda0 candidates in xy plane."
                       "It is supposed to be a Belle II copy of the goodLambda() function in Belle."
-                      "goodBelleLambda==1 should be used with prootn PID > 0.6 and goodBelleLambda==2 can be used without "
-                      "proton PID cut."
+                      "goodBelleLambda>=1 should be used with prootn PID > 0.6 and goodBelleLambda>=2 can be used without "
+                      "proton PID cut. The former cut is looser than the latter."
                       "See BELLE NOTE 684 Lambda selection at Belle. K F Chen et al.");
     VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,

@@ -189,7 +189,7 @@ def CharmRareList(path):
     return Lists
 
 
-def DstToD0LeptonicDecay(path):
+def DstToD0Leptonic(path):
     charmcuts = '1.81 < M < 1.91'
     Dstcuts = '0 < Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5'
 

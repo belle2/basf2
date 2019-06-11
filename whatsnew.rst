@@ -12,6 +12,29 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-03-02
+===========================
+
+.. important changes should go here. Especially things that break backwards
+      compatibility 
+
+.. rubric:: Tidy up and rename of Helicity variables.
+
+Renamed helicity variables in the VariableManager following consistent logic.
+We added the new variable :b2:var:`cosAcoplanarityAngle`.
+
+.. warning::  ``cosHelicityAngle`` is now :b2:var:`cosHelicityAngleMomentum`, and :b2:var:`cosHelicityAngle` has a new definition (as in the PDG 2018, p. 722).
+
++--------------------------------------+---------------------------------------------+
+|                Old name              |                New name                     |
++======================================+=============================================+
+|        ``cosHelicityAngle``          |       :b2:var:`cosHelicityAngleMomentum`    |
++--------------------------------------+---------------------------------------------+
+|     ``cosHelicityAnglePi0Dalitz``    | :b2:var:`cosHelicityAngleMomentumPi0Dalitz` |
++--------------------------------------+---------------------------------------------+
+| ``cosHelicityAngleIfCMSIsTheMother`` |    :b2:var:`cosHelicityAngleBeamMomentum`   |
++--------------------------------------+---------------------------------------------+
+
 
 Changes since release-03-00
 ===========================

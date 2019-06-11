@@ -39,10 +39,17 @@ void DQMHistAnalysisECLModule::initialize()
   //Boarder for trigtag2_trigid histogram.
   m_line1 = new TLine(1, 0, 53, 0);
   m_line2 = new TLine(1, 1, 53, 1); //boarder for trigtag2_trigid
+  m_line3 = new TLine(0, 2000, 8736, 2000);
+  m_line4 = new TLine(0, 7000, 8736, 7000);
   m_line1->SetLineWidth(3);
   m_line2->SetLineWidth(3);
   m_line1->SetLineColor(kBlue);
   m_line2->SetLineColor(kBlue);
+  m_line3->SetLineWidth(3);
+  m_line4->SetLineWidth(3);
+  m_line3->SetLineColor(kBlue);
+  m_line4->SetLineColor(kBlue);
+
 
   //New TCanvas for adc_flag
   c_adc_flag_title = new TCanvas("ECL/c_adc_flag_title");
@@ -219,16 +226,19 @@ void DQMHistAnalysisECLModule::event()
   double ymin = h_pedmean_cellid->GetYaxis()->GetXmin();
   double ymax = h_pedmean_cellid->GetYaxis()->GetXmax();
   double binwidth = (ymax - ymin) / 200.;
-  if (h_pedmean_cellid != NULL && ymin < 0) {
+  if (h_pedmean_cellid != NULL) {
     for (int i = 0; i < 8736; i++) {
-      for (int j = 0; j < (int)(-ymin / binwidth); j++) {
-        if (h_pedmean_cellid->GetBinContent(h_pedmean_cellid->GetBin(i + 1, j + 1)) > 0) {
+      for (int j = 0; j < 200; j++) {
+        if ((j > (7000. - ymin) / binwidth || j < (2000. - ymin) / binwidth)
+            && h_pedmean_cellid->GetBinContent(h_pedmean_cellid->GetBin(i + 1, j + 1)) > 0) {
           c_pedmean_cellid->Pad()->SetFillColor(kRed); //to initiate color alert for unknown errors!
           break;
         }
       }
     }
   }
+  m_line3->Draw();
+  m_line4->Draw();
   c_pedmean_cellid->Draw();
   c_pedmean_cellid->Modified();
   c_pedmean_cellid->Update();
@@ -269,6 +279,8 @@ void DQMHistAnalysisECLModule::terminate()
   B2DEBUG(20, "terminate called");
   delete m_line1;
   delete m_line2;
+  delete m_line3;
+  delete m_line4;
   delete c_adc_flag_title;
   delete c_crate_time_offsets;
   delete hs;

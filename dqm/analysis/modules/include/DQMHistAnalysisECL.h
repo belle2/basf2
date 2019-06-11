@@ -65,6 +65,10 @@ namespace Belle2 {
     TLine* m_line1 = nullptr;
     /** TLine to show upper boundary for 'trigtag2_trigid' histogram. */
     TLine* m_line2 = nullptr;
+    /** TLine to show lower boundary for 'pedmean_cellid' histogram. */
+    TLine* m_line3 = nullptr;
+    /** TLine to show upper boundary for 'pedmean_cellid' histogram. */
+    TLine* m_line4 = nullptr;
 
     /** Statistics control flag for time crate histograms from current run. */
     Int_t stat[52] = {};

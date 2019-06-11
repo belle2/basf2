@@ -13,8 +13,8 @@ from modularAnalysis import *
 from stdPi0s import *
 from stdPhotons import *
 from stdCharged import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 import sys
 
 # create a new path

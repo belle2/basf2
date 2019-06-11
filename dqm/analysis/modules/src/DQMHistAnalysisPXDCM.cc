@@ -167,7 +167,7 @@ void DQMHistAnalysisPXDCMModule::event()
     } else if (all_outside / all > 1e-8 || all_cm / all > 1e-8 || warn_flag) {
       m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
       status = 3;
-    } else if (all_outside == 0. && all_cm + 0.) {
+    } else if (all_outside == 0. && all_cm == 0.) {
       m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
       status = 2;
     } else { // between 0 and 50 ...

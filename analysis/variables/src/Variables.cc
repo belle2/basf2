@@ -1152,22 +1152,22 @@ namespace Belle2 {
       double zdist = v0DaughterZ0Diff(Lambda);
       double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
       // Flight distance of Lambda0 in xy plane
-      double fl = abs(flightDistance(Lambda) * sin(particleTheta(Lambda)));
+      double fl = particleDRho(Lambda);
 
       // goodBelleLambda == 1 (optimized for proton PID > 0.6)
-      bool high1 = p > 1.5 && zdist < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
-      bool mid1 = p > 0.5 && p <= 1.5 && zdist < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
-      bool low1 = p <= 0.5 && zdist < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
+      bool high1 = p > 1.5 && abs(zdist) < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
+      bool mid1 = p > 0.5 && p <= 1.5 && abs(zdist) < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
+      bool low1 = p <= 0.5 && abs(zdist) < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
 
       // goodBelleLambda == 2 (optimized without PID selection)
-      bool high2 = p > 1.5 && zdist < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
-      bool mid2 = p > 0.5 && p <= 1.5 && zdist < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
-      bool low2 = p <= 0.5 && zdist < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
+      bool high2 = p > 1.5 && abs(zdist) < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
+      bool mid2 = p > 0.5 && p <= 1.5 && abs(zdist) < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
+      bool low2 = p <= 0.5 && abs(zdist) < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
 
-      if (low1 || mid1 || high1) {
-        return 1.0;
-      } else if (low2 || mid2 || high2) {
+      if (low2 || mid2 || high2) {
         return 2.0;
+      } else if (low1 || mid1 || high1) {
+        return 1.0;
       } else {
         return 0.0;
       }

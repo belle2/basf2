@@ -344,7 +344,7 @@ namespace TreeFitter {
 
       const double tErr2 = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
       // time in nanosec
-      return std::make_tuple(t, sqrt(tErr2));
+      return std::make_tuple(t, std::sqrt(tErr2));
     }
     return std::make_tuple(-999, -999);
   }
@@ -361,7 +361,7 @@ namespace TreeFitter {
       const int tauindex = pb->tauIndex();
       const double len = fitparams.getStateVector()(tauindex);
       const double lenErr2 = fitparams.getCovariance()(tauindex, tauindex);
-      return std::make_tuple(len, sqrt(lenErr2));
+      return std::make_tuple(len, std::sqrt(lenErr2));
     }
     return std::make_tuple(-999, -999);
   }

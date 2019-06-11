@@ -21,7 +21,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('1000_B_Jpsi_ks_pipi.root', 'validation'), path=main)
+        inputMdst('default', Belle2.FileSystem.findFile('analysis/1000_B_Jpsi_ks_pipi.root', 'validation'), path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
@@ -70,7 +70,6 @@ class TestTreeFits(unittest.TestCase):
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")
-
 
 if __name__ == '__main__':
     unittest.main()

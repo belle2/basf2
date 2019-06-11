@@ -1155,10 +1155,12 @@ namespace Belle2 {
       // Flight distance of Lambda0 in xy plane
       double fl = abs(flightDistance(Lambda) * sin(particleTheta(Lambda)));
 
+      // goodBelleLambda == 1 (optimized for proton PID > 0.6)
       bool high1 = p > 1.5 && zdist < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
       bool mid1 = p > 0.5 && p <= 1.5 && zdist < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
       bool low1 = p <= 0.5 && zdist < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
 
+      // goodBelleLambda == 2 (optimized without PID selection)
       bool high2 = p > 1.5 && zdist < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
       bool mid2 = p > 0.5 && p <= 1.5 && zdist < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
       bool low2 = p <= 0.5 && zdist < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
@@ -1329,6 +1331,8 @@ namespace Belle2 {
                       "IP in xy plane (3) The difference of the azimuthal angle of the vertex vector and the "
                       "momentum vector (4) The flight distance of the Lambda0 candidates in xy plane."
                       "It is supposed to be a Belle II copy of the goodLambda() function in Belle."
+                      "goodBelleLambda==1 should be used with prootn PID > 0.6 and goodBelleLambda==2 can be used without "
+                      "proton PID cut."
                       "See BELLE NOTE 684 Lambda selection at Belle. K F Chen et al.");
     VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,

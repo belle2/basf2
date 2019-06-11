@@ -1150,8 +1150,7 @@ namespace Belle2 {
       double p = particleP(Lambda);
       double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
       double zdist = v0DaughterZ0Diff(Lambda);
-      double dphi = acos((particleDX(Lambda) * particlePx(Lambda) + particleDY(Lambda) * particlePy(Lambda)) / (particleDRho(
-                           Lambda) * particlePt(Lambda)));
+      double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
       // Flight distance of Lambda0 in xy plane
       double fl = abs(flightDistance(Lambda) * sin(particleTheta(Lambda)));
 

@@ -5,7 +5,7 @@ env['LIBS'] = [
     "framework",
     "analysis_utility",
     "tracking_dataobjects",
-    "hlt_softwaretrigger_dbobjects",
+    "mdst_dbobjects",
     "analysis_dataobjects",
     "analysis_ClusterUtility",
     "mdst_dataobjects"

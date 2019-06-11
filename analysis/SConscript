@@ -15,8 +15,7 @@ env['LIBS'] = [
     'fann',
     'analysis_utility',
     'analysis_ContinuumSuppression',
-    'analysis_ClusterUtility',
-    'hlt_softwaretrigger_dbobjects'
+    'analysis_ClusterUtility'
 ]
 
 Return('env')

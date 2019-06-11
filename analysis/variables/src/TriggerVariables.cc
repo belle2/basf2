@@ -21,7 +21,7 @@
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
 
 // HLT dbobjects
-#include <hlt/softwaretrigger/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
+#include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
 
 // framework
 #include <framework/logging/Logger.h>

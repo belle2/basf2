@@ -47,3 +47,17 @@ variablesToHistogram(
 )
 process(taulfvskim)
 print(statistics)
+
+# add contact information to histogram
+contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+import ROOT
+
+f = ROOT.TFile.Open('TauLFV_Validation.root', 'update')
+
+f.Get('M').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('deltaE').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('MdeltaE').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+
+f.Write("", ROOT.TObject.kOverwrite)
+f.Close()

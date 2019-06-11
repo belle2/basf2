@@ -793,7 +793,7 @@ namespace Belle2 {
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
-    int m_properties; /** particle property */
+    int m_properties; /**< particle property */
 
     /**
      * Identifier that can be used to identify whether the particle is unqiue

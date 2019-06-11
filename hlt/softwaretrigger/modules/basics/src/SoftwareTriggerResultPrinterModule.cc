@@ -10,6 +10,7 @@
 
 #include <hlt/softwaretrigger/modules/basics/SoftwareTriggerResultPrinterModule.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <hlt/softwaretrigger/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -27,17 +28,11 @@ REG_MODULE(SoftwareTriggerResultPrinter)
 SoftwareTriggerResultPrinterModule::SoftwareTriggerResultPrinterModule()
   : Module()
 {
-  setDescription("Print (and optionally write out) the software trigger "
-                 "results in an easily accessible summary table.");
+  setDescription("Write out the software trigger results in an easily accessible summary table to disk.");
 
-  addParam("storeResultsToDisk", m_param_storeResultsToDisk,
-           "Write out all results to disk also (instead of just printing them",
-           m_param_storeResultsToDisk);
-
-  addParam("debugOutputFileName", m_param_debugOutputFileName, "File path and name of the ROOT "
-           "file, in which the results of the calculation are stored, if storeResultsToDisk is "
-           "turned on. Please note that already present files will be overridden. ",
-           m_param_debugOutputFileName);
+  addParam("outputFileName", m_param_outputFileName, "File path and name of the ROOT "
+           "file, in which the results of the calculation are stored. Please note that already present files will be overridden. ",
+           m_param_outputFileName);
 }
 
 void SoftwareTriggerResultPrinterModule::initialize()
@@ -48,92 +43,118 @@ void SoftwareTriggerResultPrinterModule::initialize()
 
 void SoftwareTriggerResultPrinterModule::terminate()
 {
-  B2RESULT("Results of SoftwareTrigger:");
-  B2RESULT("\t" << std::setw(50) << "Name" << "\t" << std::setw(30) << "Accepted" << "\t" << std::setw(30)
-           << "Rejected");
+
+  auto debugOutputFile = std::unique_ptr<TFile>(TFile::Open(m_param_outputFileName.c_str(), "RECREATE"));
+  if (not debugOutputFile) {
+    B2FATAL("Could not open debug output file. Aborting.");
+  }
+  auto debugTTree = std::make_unique<TTree>("software_trigger_results", "software_trigger_results");
+  if (not debugTTree) {
+    B2FATAL("Could not create debug output tree. Aborting.");
+  }
+
+  bool prescaled;
+  bool accepted;
+  bool cut;
+
+  debugTTree->Branch("cut", &cut);
+  debugTTree->Branch("prescaled", &prescaled);
+  debugTTree->Branch("accept_or_reject", &accepted);
+  debugTTree->Branch("total_events", &m_numberOfEvents);
+  std::vector<double> value(m_passedEventsPerTrigger.size());
+
+  cut = true;
+  prescaled = true;
+  accepted = true;
+  unsigned int counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
-    const std::string& cutName = cutResult.first;
-    const double passedEvents = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_accept]);
-    const double rejectedEvents = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
+    std::string cutName = cutResult.first;
+    boost::replace_all(cutName, "&", "_");
+    debugTTree->Branch(cutName.c_str(), &value.at(counter));
 
-    std::string printName = cutName;
-    boost::replace_all(printName, "software_trigger_cut&", "");
-
-    B2RESULT("\t" << std::setw(50) << printName.substr(0, 50) << "\t"
-             << std::setw(8) << passedEvents << "/" << std::setw(8) << m_numberOfEvents << " (" <<
-             std::setw(8) << std::setprecision(6) << 100 * passedEvents / m_numberOfEvents << " %)" << "\t"
-             << std::setw(8) << rejectedEvents << "/" << std::setw(8) << m_numberOfEvents << " (" <<
-             std::setw(8) << std::setprecision(6) << 100 * rejectedEvents / m_numberOfEvents << " %)" << "\t");
-
-    if (m_passedEventsPerTriggerNonPrescaled.find(cutName) != m_passedEventsPerTriggerNonPrescaled.end()) {
-      auto cutResultNoPre = m_passedEventsPerTriggerNonPrescaled[cutName];
-      const double passedEventsNoPre = static_cast<double>(cutResultNoPre[SoftwareTriggerCutResult::c_accept]);
-      const double rejectedEventsNoPre = static_cast<double>(cutResultNoPre[SoftwareTriggerCutResult::c_reject]);
-
-      const std::string& cutNameNoPre = "not prescaled: " + printName;
-
-      B2RESULT("\t" << std::setw(50) << cutNameNoPre.substr(0, 50) << "\t"
-               << std::setw(8) << passedEventsNoPre << "/" << std::setw(8) << m_numberOfEvents << " (" <<
-               std::setw(8) << std::setprecision(6) << 100 * passedEventsNoPre / m_numberOfEvents << " %)" << "\t"
-               << std::setw(8) << rejectedEventsNoPre << "/" << std::setw(8) << m_numberOfEvents << " (" <<
-               std::setw(8) << std::setprecision(6) << 100 * rejectedEventsNoPre / m_numberOfEvents << " %)" << "\t");
-    }
+    value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_accept]);
+    counter++;
   }
+  debugTTree->Fill();
 
-  if (m_param_storeResultsToDisk) {
-    auto debugOutputFile = std::unique_ptr<TFile>(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
-    if (not debugOutputFile) {
-      B2FATAL("Could not open debug output file. Aborting.");
-    }
-    auto debugTTree = std::make_unique<TTree>("software_trigger_results", "software_trigger_results");
-    if (not debugTTree) {
-      B2FATAL("Could not create debug output tree. Aborting.");
-    }
-
-    bool accepted;
-
-    debugTTree->Branch("accept_or_reject", &accepted);
-    debugTTree->Branch("total_events", &m_numberOfEvents);
-    std::vector<double> numberOfEvents(m_passedEventsPerTrigger.size());
-
-    accepted = true;
-    unsigned int counter = 0;
-    for (auto& cutResult : m_passedEventsPerTrigger) {
-      std::string cutName = cutResult.first;
-      boost::replace_all(cutName, "&", "_");
-      debugTTree->Branch(cutName.c_str(), &numberOfEvents.at(counter));
-
-      numberOfEvents[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_accept]);
-      counter++;
-    }
-
-    debugTTree->Fill();
-
-    accepted = false;
-    counter = 0;
-    for (auto& cutResult : m_passedEventsPerTrigger) {
-      // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
-      numberOfEvents[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
-      counter++;
-    }
-
-    debugTTree->Fill();
-
-    debugOutputFile->cd();
-    debugOutputFile->Write();
-    debugTTree.reset();
-    debugOutputFile.reset();
+  cut = true;
+  prescaled = true;
+  accepted = false;
+  counter = 0;
+  for (auto& cutResult : m_passedEventsPerTrigger) {
+    // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
+    value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
+    counter++;
   }
+  debugTTree->Fill();
+
+  cut = true;
+  prescaled = false;
+  accepted = true;
+  counter = 0;
+  for (auto& cutResult : m_passedEventsPerTrigger) {
+    const auto& cutName = cutResult.first;
+    if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
+      value[counter] = NAN;
+    } else {
+      value[counter] = static_cast<double>(m_passedEventsPerTriggerNonPrescaled[cutName][SoftwareTriggerCutResult::c_accept]);
+    }
+    counter++;
+  }
+  debugTTree->Fill();
+
+  cut = true;
+  prescaled = false;
+  accepted = false;
+  counter = 0;
+  for (auto& cutResult : m_passedEventsPerTrigger) {
+    const auto& cutName = cutResult.first;
+    if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
+      value[counter] = NAN;
+    } else {
+      value[counter] = static_cast<double>(m_passedEventsPerTriggerNonPrescaled[cutName][SoftwareTriggerCutResult::c_reject]);
+    }
+    counter++;
+  }
+  debugTTree->Fill();
+
+  cut = false;
+  prescaled = false;
+  accepted = false;
+  counter = 0;
+  for (auto& cutResult : m_passedEventsPerTrigger) {
+    const auto& cutName = cutResult.first;
+    if (m_prescales.find(cutName) == m_prescales.end()) {
+      value[counter] = NAN;
+    } else {
+      value[counter] = static_cast<double>(m_prescales[cutName]);
+    }
+    counter++;
+  }
+  debugTTree->Fill();
+
+  debugOutputFile->cd();
+  debugOutputFile->Write();
+  debugTTree.reset();
+  debugOutputFile.reset();
 }
 
 void SoftwareTriggerResultPrinterModule::event()
 {
   m_numberOfEvents++;
 
-  for (const auto& triggerResult : m_resultStoreObjectPointer->getResultPairs()) {
-    auto cutResults = triggerResult.second;
-    m_passedEventsPerTrigger[triggerResult.first][static_cast<SoftwareTriggerCutResult >(cutResults.first)]++;
-    m_passedEventsPerTriggerNonPrescaled[triggerResult.first][static_cast<SoftwareTriggerCutResult >(cutResults.second)]++;
+  for (const auto& [cutName, cutResults] : m_resultStoreObjectPointer->getResultPairs()) {
+    m_passedEventsPerTrigger[cutName][static_cast<SoftwareTriggerCutResult >(cutResults.first)]++;
+
+    // This does only make sense for non-total results (as they are prescaled)
+    if (cutName.find("total_result") == std::string::npos) {
+      m_passedEventsPerTriggerNonPrescaled[cutName][static_cast<SoftwareTriggerCutResult >(cutResults.second)]++;
+
+      DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(cutName);
+      if (downloadedCut) {
+        m_prescales[cutName] = downloadedCut->getPreScaleFactor();
+      }
+    }
   }
 
   const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
@@ -149,6 +170,4 @@ void SoftwareTriggerResultPrinterModule::event()
   } else {
     m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_reject]++;
   }
-
-
 }

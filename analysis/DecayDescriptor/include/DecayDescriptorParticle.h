@@ -26,12 +26,12 @@ namespace Belle2 {
     std::string m_strName;
     /** Is particle selected? */
     bool m_isSelected;
+    /** Is particle unspecified by marking @ ? */
+    bool m_isUnspecified;
     /** Label of this particle to distinguish e.g. different decay channels or selection criteria. */
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
     int m_iPDGCode;
-    /** Is particle unspecified by marking @ ? */
-    bool m_isUnspecified;
   public:
     /** Default ctor. */
     DecayDescriptorParticle();

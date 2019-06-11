@@ -22,10 +22,10 @@ from stdV0s import *
 from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-02-00'
 
-from skimExpertFunctions import setSkimLogging, encodeSkimName, add_skim
 fileList = get_test_file("mixedBGx1", "MC12")
 syspath = Path()
 inputMdstList('default', fileList, path=syspath)

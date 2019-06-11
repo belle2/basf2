@@ -11,10 +11,9 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-from skimExpertFunctions import *
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-03'
+gb2_setuprel = 'release-03-02-00'
 
 skimCode = encodeSkimName('TauGeneric')
 

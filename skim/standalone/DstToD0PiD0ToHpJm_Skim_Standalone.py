@@ -12,8 +12,8 @@ from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-01-02'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 skimCode = encodeSkimName('Charm2BodyHadronic')
 

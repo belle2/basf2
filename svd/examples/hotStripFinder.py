@@ -13,8 +13,12 @@ import glob
 #
 #######
 
+# set here the correct exp and run number you like to process
+exp = 8
+run = 2265
+
 # set this string to identify the output rootfiles
-outputfile = "SVDHotStripFinderZS5_exp8run2265.root"
+outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V1.root"
 
 use_database_chain()
 use_central_database("data_reprocessing_prompt_bucket6")
@@ -29,10 +33,10 @@ set_random_seed(1)
 main.add_module(
     'RootInput',
     #    inputFileName="~/svd/BII-3221-svd-hot-strip-masking/buc6/r03844/all/cdst/sub00/cdst.physics.0007.03844.HLT*",
-    inputFileName="/ghi/fs01/belle2/bdata/Data/Raw/e0008/r02265/sub00/physics.0008.02265.HLT1.f00000.root",
-    # luminosity run 2265, exp8, raw data:add unpacker
-    # inputFileName="/ghi/fs01/belle2/bdata/Data/Raw/e0008/r02308/sub00/cosmic.0008.02308.HLT*",
-    # # cosmic run 2308, exp8, raw data:add unpacker
+    # luminosity run 2265, exp8, raw data
+    # cosmic run 2308, exp8, raw data
+    inputFileName="/ghi/fs01/belle2/bdata/Data/Raw/e000" + \
+    str(exp) + "/r0" + str(run) + "/sub00/physics.000" + str(exp) + ".0" + str(run) + ".HLT*",
     branchNames=['RawSVDs'])
 
 main.add_module('Gearbox')

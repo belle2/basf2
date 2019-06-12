@@ -12,6 +12,8 @@
 #include <svd/dataobjects/SVDHistograms.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
+#include <svd/calibration/SVDOccupancyCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <string>
 #include <TTree.h>
 #include <TFile.h>
@@ -73,14 +75,21 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data store array*/
     std::string m_rootFileName;   /**< root file name */
     std::string m_ShaperDigitName; /**< shaper digits name*/
-    float m_thr; /**< Threshold cut for Hot strip finder*/
+    float m_thr;
     int m_base;
-
+    bool m_useHSFinderV1 = true;
+    float m_absThr; /**< Absolute Occupancy Threshold cut for Hot strip finder*/
+    float m_relOccPrec; /**< Relative precision on occupancy which is defined to be negligible for the hit background rate estimate. */
 
 
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
 
+    //dbobject realted parameters
+    int m_firstExp;
+    int m_firstRun;
+    int m_lastExp;
+    int m_lastRun;
 
   private:
     //define your own data members here
@@ -120,12 +129,14 @@ namespace Belle2 {
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
                             const char* xtitle, TList* histoList = nullptr);  /**< thf */
+    //HSFinder algorithm (L&G)
+
+    bool theHSFinder(float* stripOccAfterAbsCut, int* hsflag, int nstrips);
 
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             TList* histoList = nullptr);  /**< thf */
-
 
   protected:
     //definition of input parameters

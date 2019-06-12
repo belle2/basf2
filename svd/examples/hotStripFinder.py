@@ -35,6 +35,8 @@ use_local_database("/home/belle2/casarosa/master/hotStrips/centraldb/database_ok
                    "/home/belle2/casarosa/master/hotStrips/centraldb")
 use_central_database("svd_onlySVDinGeoConfiguration")
 
+use_local_database("localDB_HSF/database.txt", "localDB_HSF")
+
 main = create_path()
 
 set_random_seed(1)
@@ -45,7 +47,7 @@ main.add_module(
     # luminosity run 2265, exp8, raw data
     # cosmic run 2308, exp8, raw data
     inputFileName="/ghi/fs01/belle2/bdata/Data/Raw/e000" + \
-    str(exp) + "/r0" + str(run) + "/sub00/" + str(runType) + ".000" + str(exp) + ".0" + str(run) + ".HLT*",
+    str(exp) + "/r0" + str(run) + "/sub00/" + str(runType) + ".000" + str(exp) + ".0" + str(run) + ".HLT1.f00000.root",
     branchNames=['RawSVDs'])
 
 main.add_module('Gearbox')
@@ -62,7 +64,7 @@ main.add_module(
 
 # default parameters
 main.add_module('SVDHotStripFinder', ShaperDigits='SVDShaperDigitsZS5', outputFileName=outputfile, searchBase=0,
-                threshold=1.0, absOccThreshold=0.20, relOccPrec=5, firstExp=8, firstRun=2265, useHSFinderV1=False)
+                threshold=1.0, absOccThreshold=0.20, relOccPrec=5, useHSFinderV1=False)
 
 main.add_module('Progress')
 

@@ -28,8 +28,9 @@ SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
   addParam("threshold", m_thr, "Threshold cut for Hot strip finder in percent", float(4.0));
   addParam("searchBase", m_base, "0 -> 32, 1 -> 64, 2 -> 128", int(0));
   //additional paramters to import on the DB:
-  addParam("firstExp", m_firstExp, "experiment number");
-  addParam("firstRun", m_firstRun, "run number");
+  addParam("zeroSuppression", m_zs, "ZeroSuppression cut of the input SVDShaperDigits", float(5));
+  addParam("firstExp", m_firstExp, "experiment number", int(-1));
+  addParam("firstRun", m_firstRun, "run number", int(-1));
   addParam("lastExp", m_lastExp, "open iov", int(-1));
   addParam("lastRun", m_lastRun, "open iov", int(-1));
   addParam("ShaperDigits", m_ShaperDigitName, "shaper digit name", std::string(""));
@@ -144,7 +145,7 @@ void SVDHotStripFinderModule::beginRun()
 
 void SVDHotStripFinderModule::event()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+
   int nDigits = m_storeDigits.getEntries();
   h_nevents->Fill(0.0); // number of events count
 
@@ -170,6 +171,9 @@ void SVDHotStripFinderModule::event()
 void SVDHotStripFinderModule::endRun()
 {
 
+  int exp =  m_eventMetaData->getExperiment();
+  int run =  m_eventMetaData->getRun();
+
   if (!m_useHSFinderV1) {
 
     TDirectory* oldDir = NULL;
@@ -193,10 +197,11 @@ void SVDHotStripFinderModule::endRun()
     //Define the DBObj pointers to create the needed payloads
 
     DBImportObjPtr< SVDOccupancyCalibrations::t_payload> occDBObjPtr(SVDOccupancyCalibrations::name);
-    occDBObjPtr.construct(-99.);
+    occDBObjPtr.construct(-99., Form("SVDOccupancy_exp%d_run%d_zs%1.1f", exp, run, m_zs));
 
     DBImportObjPtr< SVDHotStripsCalibrations::t_payload> hotStripsDBObjPtr(SVDHotStripsCalibrations::name);
-    hotStripsDBObjPtr.construct(0);
+    hotStripsDBObjPtr.construct(0, Form("SVDHotStrips_exp%d_run%d_zs%1.1f_absThr%f_relOccPrec%f", exp, run, m_zs, m_absThr,
+                                        m_relOccPrec));
 
     B2RESULT("number of events " << nevents);
 
@@ -263,7 +268,7 @@ void SVDHotStripFinderModule::endRun()
 
             //3. after second step: fill HS histograms and occupancy histograms of survived strips; fill HS payload, SVDHotStripsCalibrations
             for (int l = 0; l < nstrips; l++) {
-              hotStripsDBObjPtr->set(layer, ladder, sensor, k, l, hsflag[l]);
+              hotStripsDBObjPtr->set(layer, ladder, sensor, k, l, (int)hsflag[l]);
               if (hsflag[l] == 0) {
                 hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1 , stripOccAfterAbsCut[l]);
                 hm_occAfter->fill(*itSvdSensors, k, stripOccAfterAbsCut[l]);
@@ -312,7 +317,16 @@ void SVDHotStripFinderModule::endRun()
     }
 
     m_rootFilePtr->Close();
-//import the filled dbobjects to the ConditionDB
+    //import the filled dbobjects to the ConditionDB
+    if (m_firstExp == -1)
+      m_firstExp = exp;
+    if (m_lastExp == -1)
+      m_lastExp = exp;
+    if (m_firstRun == -1)
+      m_firstRun = run;
+    if (m_lastRun == -1)
+      m_lastRun = run;
+
     IntervalOfValidity iov(m_firstExp, m_firstRun, m_lastExp, m_lastRun);
     occDBObjPtr.import(iov);
     hotStripsDBObjPtr.import(iov);

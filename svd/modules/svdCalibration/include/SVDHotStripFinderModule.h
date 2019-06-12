@@ -85,11 +85,12 @@ namespace Belle2 {
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
 
-    //dbobject realted parameters
-    int m_firstExp;
-    int m_firstRun;
-    int m_lastExp;
-    int m_lastRun;
+    //dbobject related parameters
+    float m_zs; /**< zero suppression cut for the input shaper digits */
+    int m_firstExp; /**< first valid experiment */
+    int m_firstRun; /**< first valid run */
+    int m_lastExp; /**< last valid experiment */
+    int m_lastRun; /**<last valid run */
 
   private:
     //define your own data members here

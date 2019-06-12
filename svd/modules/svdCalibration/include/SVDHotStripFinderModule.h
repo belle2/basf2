@@ -136,7 +136,7 @@ namespace Belle2 {
                             const char* xtitle, TList* histoList = nullptr);  /**< thf */
     //HSFinder algorithm (L&G)
 
-    bool theHSFinder(float* stripOccAfterAbsCut, int* hsflag, int nstrips);
+    bool theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips);
 
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,

@@ -71,42 +71,44 @@ void SVDHotStripFinderModule::beginRun()
 
   //create histograms
 
-  TH1F hOccupancy768("Occupancy768_L@layerL@ladderS@sensor@view", "DSSD Occupancy of @layer.@ladder.@sensor @view/@side side", 768, 0,
+  TH1F hOccupancy768("Occupancy768_L@layerL@ladderS@sensor@view", "Strip Occupancy of @layer.@ladder.@sensor @view/@side side", 768,
+                     0,
                      768);
   hOccupancy768.GetXaxis()->SetTitle("cellID");
-  TH1F hOccupancy512("Occupancy512_L@layerL@ladderS@sensor@view", "DSSD Occupancy of @layer.@ladder.@sensor @view/@side side", 512, 0,
+  TH1F hOccupancy512("Occupancy512_L@layerL@ladderS@sensor@view", "Strip Occupancy of @layer.@ladder.@sensor @view/@side side", 512,
+                     0,
                      512);
   hOccupancy512.GetXaxis()->SetTitle("cellID");
   hm_occupancy = new SVDHistograms<TH1F>(hOccupancy768, hOccupancy768, hOccupancy768, hOccupancy512);
 
-  TH1F hHotStrips768("HotStrips768_L@layerL@ladderS@sensor@view", "DSSD HotStrips of @layer.@ladder.@sensor @view/@side side", 768, 0,
+  TH1F hHotStrips768("HotStrips768_L@layerL@ladderS@sensor@view", "Hot Strips of @layer.@ladder.@sensor @view/@side side", 768, 0,
                      768);
   hHotStrips768.GetXaxis()->SetTitle("cellID");
-  TH1F hHotStrips512("HotStrips512_L@layerL@ladderS@sensor@view", "DSSD HotStrips of @layer.@ladder.@sensor @view/@side side", 512, 0,
+  TH1F hHotStrips512("HotStrips512_L@layerL@ladderS@sensor@view", "Hot Strips of @layer.@ladder.@sensor @view/@side side", 512, 0,
                      512);
   hHotStrips512.GetXaxis()->SetTitle("cellID");
   hm_hot_strips = new SVDHistograms<TH1F>(hHotStrips768, hHotStrips768, hHotStrips768, hHotStrips512);
 
   TH1F hOccupancy_after768("OccupancyAfter768_L@layerL@ladderS@sensor@view",
-                           "DSSD Occupancy after HSF of @layer.@ladder.@sensor @view/@side side", 768, 0, 768);
+                           "Non-Hot Strip Occupancy after HSF of @layer.@ladder.@sensor @view/@side side", 768, 0, 768);
   hOccupancy_after768.GetXaxis()->SetTitle("cellID");
   TH1F hOccupancy_after512("OccupancyAfter512_L@layerL@ladderS@sensor@view",
-                           "DSSD Occupancy after HSF of @layer.@ladder.@sensor @view/@side side", 512, 0, 512);
+                           "Non-Hot Strip Occupancy after HSF of @layer.@ladder.@sensor @view/@side side", 512, 0, 512);
   hOccupancy_after512.GetXaxis()->SetTitle("cellID");
   hm_occupancy_after = new SVDHistograms<TH1F>(hOccupancy_after768, hOccupancy_after768, hOccupancy_after768, hOccupancy_after512);
 
-  TH1F hOccAll("occAll_L@layerL@ladderS@sensor@view", "Strip Occupancy Distribution of @layer.@ladder.@sensor @view/@side side", 200,
-               0, m_absThr);
+  TH1F hOccAll("occAll_L@layerL@ladderS@sensor@view", "Strip Occupancy Distribution of @layer.@ladder.@sensor @view/@side side", 1000,
+               0, 1);
   hOccAll.GetXaxis()->SetTitle("occupancy");
   hm_occAll = new SVDHistograms<TH1F>(hOccAll);
 
   TH1F hOccHot("occHot_L@layerL@ladderS@sensor@view", "Hot Strip Occupancy Distribution of @layer.@ladder.@sensor @view/@side side",
-               200, 0, 1);
+               10000, 0, 1);
   hOccHot.GetXaxis()->SetTitle("occupancy");
   hm_occHot = new SVDHistograms<TH1F>(hOccHot);
 
   TH1F hOccAfter("occAfter_L@layerL@ladderS@sensor@view",
-                 "Non-Hot Strip Occupancy Distribution of @layer.@ladder.@sensor @view/@side side", 200, 0, m_absThr);
+                 "Non-Hot Strip Occupancy Distribution of @layer.@ladder.@sensor @view/@side side", 1000, 0, 0.05);
   hOccAfter.GetXaxis()->SetTitle("occupancy");
   hm_occAfter = new SVDHistograms<TH1F>(hOccAfter);
 
@@ -233,15 +235,15 @@ void SVDHotStripFinderModule::endRun()
             int nstrips = 768;
             if (!k && layer != 3) nstrips = 512;
 
-            float stripOcc[768];
+            double stripOcc[768];
             for (int i = 0; i < nstrips; i++) {stripOcc[i] = 0; hsflag[i] = 0;} //initialize vector to zero
-            float stripOccAfterAbsCut[768]; // vector of strip occupancy after first preselection based on absOccupThres cut
+            double stripOccAfterAbsCut[768]; // vector of strip occupancy after first preselection based on absOccupThres cut
             (hm_occupancy->getHistogram(*itSvdSensors, k))->Scale(1. / nevents);
             for (int l = 0; l < nstrips; l++) {
 
               //normalized to the total number of events to have the correct occupancy per strip and fill the corresponding dbobject
 
-              stripOcc[l] = (float)(hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l + 1));
+              stripOcc[l] = (double)(hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l + 1));
 
               //0. Fill SVDOccupancyCalibrations Payload with the measured strip occupancy
               occDBObjPtr->set(layer, ladder, sensor, k, l, stripOcc[l]);
@@ -251,7 +253,6 @@ void SVDHotStripFinderModule::endRun()
               if (stripOcc[l] > m_absThr) {
                 stripOccAfterAbsCut[l] = 0;
                 hsflag[l] = 1;
-
               } else {
                 stripOccAfterAbsCut[l] = stripOcc[l];
                 hsflag[l] = 0;
@@ -273,6 +274,8 @@ void SVDHotStripFinderModule::endRun()
                 hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1 , stripOccAfterAbsCut[l]);
                 hm_occAfter->fill(*itSvdSensors, k, stripOccAfterAbsCut[l]);
               } else {
+                B2RESULT("HS found, occupancy = " << stripOcc[l] << ", Layer: " << layer + 3 << " Ladder: " << ladder << " Sensor: " << sensor <<
+                         " Side: " << k << " channel: " << l);
                 hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, 1);
                 hm_occHot->fill(*itSvdSensors, k, stripOcc[l]);
               }
@@ -286,12 +289,16 @@ void SVDHotStripFinderModule::endRun()
               hm_occupancy->getHistogram(*itSvdSensors, k)->Write();
               hm_hot_strips->getHistogram(*itSvdSensors, k)->SetLineColor(kBlack);
               hm_hot_strips->getHistogram(*itSvdSensors, k)->SetMarkerColor(kBlack);
+              hm_hot_strips->getHistogram(*itSvdSensors,  k)->SetFillStyle(3001);
+              hm_hot_strips->getHistogram(*itSvdSensors,  k)->SetFillColor(kBlack);
               hm_hot_strips->getHistogram(*itSvdSensors, k)->Write();
               hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetLineColor(kRed);
               hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetMarkerColor(kRed);
               hm_occupancy_after->getHistogram(*itSvdSensors,  k)->Write();
               hm_occAll->getHistogram(*itSvdSensors,  k)->Write();
               hm_occHot->getHistogram(*itSvdSensors,  k)->SetLineColor(kBlack);
+              hm_occHot->getHistogram(*itSvdSensors,  k)->SetFillStyle(3001);
+              hm_occHot->getHistogram(*itSvdSensors,  k)->SetFillColor(kBlack);
               hm_occHot->getHistogram(*itSvdSensors,  k)->SetMarkerColor(kBlack);
               hm_occHot->getHistogram(*itSvdSensors,  k)->Write();
               hm_occAfter->getHistogram(*itSvdSensors,  k)->SetLineColor(kRed);
@@ -338,15 +345,18 @@ void SVDHotStripFinderModule::terminate()
 {
   if (m_useHSFinderV1) {
     TDirectory* oldDir = NULL;
+
+    TDirectory* dir_occuL[4] = {NULL, NULL, NULL, NULL};
+
     //prepare ROOT FILE
     if (m_rootFilePtr != NULL) {
       m_rootFilePtr->cd();
       oldDir = gDirectory;
-      TDirectory* dir_occu = oldDir->mkdir("occupancy");
-      dir_occu->cd();
+      dir_occuL[0] = oldDir->mkdir("layer3");
+      dir_occuL[1] = oldDir->mkdir("layer4");
+      dir_occuL[2] = oldDir->mkdir("layer5");
+      dir_occuL[3] = oldDir->mkdir("layer6");
     }
-
-
 
     /**************************************************************************
      * Hotstrips finding algorithm                                             *
@@ -398,7 +408,7 @@ void SVDHotStripFinderModule::terminate()
 
             for (int l = 0; l < 768; l++) {
 
-              position1[l] = hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l);
+              position1[l] = hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l + 1);
               //if no hits in strip, mark the strip as bad
 
               if (position1[l] == 0) { flag[l] = 0;}
@@ -456,7 +466,7 @@ void SVDHotStripFinderModule::terminate()
               } else {
                 hsflag[l] = 0; // not a HS
                 //recalculate the occupancy in DSSD only for good strip after first pass
-                occupancy[test.quot] = occupancy[test.quot] + hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l);
+                occupancy[test.quot] = occupancy[test.quot] + hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l + 1);
                 it++; //number of good strips after first pass
               }
 
@@ -486,22 +496,43 @@ void SVDHotStripFinderModule::terminate()
 
 
             for (int l = 0; l < 768; l++) {
-              B2DEBUG(1, hsflag[l]);
-              if (hsflag[l] == 0) {
-                hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l, hm_occupancy->getHistogram(*itSvdSensors,
-                    k)->GetBinContent(l)); //alive strips without identified HS
-              } else
-                hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l, 1);  // Not only hot strips but also masked strips
-              // to get only  hot strips                  if(hsflag[l])
 
+              B2DEBUG(1, hsflag[l]);
+
+              float tmpOcc = hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l + 1) / (double)nevents;
+              hm_occAll->fill(*itSvdSensors, k, tmpOcc);
+
+              if (hsflag[l] == 0) {
+                hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, tmpOcc); //alive strips without identified HS
+                hm_occAfter->fill(*itSvdSensors, k, tmpOcc);
+              } else {
+                hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, 1);
+                hm_occHot->fill(*itSvdSensors, k, tmpOcc);
+              }
             }
 
             if (m_rootFilePtr != NULL) {
-              hm_occupancy->getHistogram(*itSvdSensors, k)->Scale(1.0 / (float)nevents);
-              hm_occupancy_after->getHistogram(*itSvdSensors, k)->Scale(1.0 / (float)nevents);
+              hm_occupancy->getHistogram(*itSvdSensors, k)->Scale(1.0 / (double)nevents);
+
+              dir_occuL[i]->cd();
               hm_occupancy->getHistogram(*itSvdSensors, k)->Write();
+              hm_hot_strips->getHistogram(*itSvdSensors, k)->SetLineColor(kBlack);
+              hm_hot_strips->getHistogram(*itSvdSensors,  k)->SetFillStyle(3001);
+              hm_hot_strips->getHistogram(*itSvdSensors,  k)->SetFillColor(kBlack);
+              hm_hot_strips->getHistogram(*itSvdSensors, k)->SetMarkerColor(kBlack);
               hm_hot_strips->getHistogram(*itSvdSensors, k)->Write();
-              hm_occupancy_after->getHistogram(*itSvdSensors, k)->Write();
+              hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetLineColor(kRed);
+              hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetMarkerColor(kRed);
+              hm_occupancy_after->getHistogram(*itSvdSensors,  k)->Write();
+              hm_occAll->getHistogram(*itSvdSensors,  k)->Write();
+              hm_occHot->getHistogram(*itSvdSensors,  k)->SetLineColor(kBlack);
+              hm_occHot->getHistogram(*itSvdSensors,  k)->SetFillStyle(3001);
+              hm_occHot->getHistogram(*itSvdSensors,  k)->SetFillColor(kBlack);
+              hm_occHot->getHistogram(*itSvdSensors,  k)->SetMarkerColor(kBlack);
+              hm_occHot->getHistogram(*itSvdSensors,  k)->Write();
+              hm_occAfter->getHistogram(*itSvdSensors,  k)->SetLineColor(kRed);
+              hm_occAfter->getHistogram(*itSvdSensors,  k)->SetMarkerColor(kRed);
+              hm_occAfter->getHistogram(*itSvdSensors,  k)->Write();
               // hm_dist12->getHistogram(*itSvdSensors, k)->Write();
             }
 
@@ -582,9 +613,9 @@ TH2F*  SVDHotStripFinderModule::createHistogram2D(const char* name, const char* 
 }
 
 
-bool SVDHotStripFinderModule::theHSFinder(float* stripOccAfterAbsCut, int* hsflag, int nstrips)
+bool SVDHotStripFinderModule::theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips)
 {
-  float sensorOccAverage = 0;
+  double sensorOccAverage = 0;
   bool found = false;
   int nafter = 0;
   for (int l = 0; l < nstrips; l++) {

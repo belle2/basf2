@@ -1,0 +1,166 @@
+#!/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Script to get the integrated luminosity of a set of runs
+
+Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
+https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
+
+Usage:
+    b2info-luminosity-online --exp <E> --runs <Range> [--verbose] [--db db_path]
+
+<E> experiment number (mandatory)
+<Range> run range (mandatory)
+    syntax is: xx-yy,zz
+    all runs between xx and yy (included) and run zz. Can have multiple ranges xx-yy,zz-ww
+--verbose print lumi for each run
+--db path of database to use
+
+"""
+
+__author__ = "Stefano Lacaprara"
+__email__ = "stefano.lacaprara@pd.infn.it"
+
+
+import argparse
+import re
+from argparse import ArgumentParser, ArgumentTypeError
+import sqlite3
+import time
+import os
+import basf2 as b2
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import numpy as np
+
+def parseNumRange(string):
+    """
+    Parse range of integers like xx-yy
+    """
+    m = re.match(r'(\d+)(?:-(\d+))?$', string)
+    if not m:
+        raise ArgumentTypeError("'" + string + "' is not a range of number. Expected forms like '0-5' or '2'.")
+    start = m.group(1)
+    end = m.group(2) or start
+    return set(range(int(start, 10), int(end, 10) + 1))
+
+
+def parseNumList(string):
+    """
+    Parse range of integers like xx-yy,zz
+    """
+    result = set()
+    for rr in [x.strip() for x in string.split(',')]:
+        result |= parseNumRange(rr)
+
+    return list(result)
+
+
+def argparser():
+    """
+    Parse options as command-line arguments.
+    """
+
+    description = "Script to get the integrated luminosity for a range or runs"
+
+    # Re-use the base argument parser, and add options on top.
+    parser = argparse.ArgumentParser(description=description, usage=__doc__, add_help=True)
+
+    parser.add_argument("--exp",
+                        dest="exp",
+                        action="store",
+                        type=int,
+                        required=True,
+                        help="Experiment number")
+
+    parser.add_argument("--runs",
+                        dest="runs",
+                        action="store",
+                        type=parseNumList,
+                        required=False,
+                        default=None,
+                        help="Process only the selected run range. Syntax is xx-yy,zz")
+
+    parser.add_argument("--verbose",
+                        dest="verb",
+                        action="store_true",
+                        default=False,
+                        help="Print each run luminosity")
+
+    parser.add_argument("--db",
+                        dest="db",
+                        action="store",
+                        default="/gpfs/group/belle2/group/detector/ECL/ecl_lom.db",
+                        help="EC: DataBase path")
+
+    return parser
+
+def plotIntLumiVSDate(plotname="graph_int_lumi__VS__date"):
+    """
+    Make a graph with the integrated lumi VS date
+    """
+
+    # query the DB
+    reco = "lum_det_shift"
+    cmdexp = f"SELECT {reco} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = ? "
+    if (args.runs):
+        cmdexp += f" AND run >= {min(args.runs)} AND run <= {max(args.runs)}"
+
+    conn = sqlite3.connect(DB)
+
+    # Get the csv as a pandas.Dataframe.
+    df = pd.read_sql_query(cmdexp, conn, params=(args.exp,))
+    print(f"Read {len(df)} runs")
+
+    # convert epoch to date
+    df['date'] = pd.to_datetime(df['date'],unit='s')
+        
+    # cumulative integrated luminosity
+    df['intLumi'] = df['lumi'].cumsum()
+
+    # RUN max, min
+    run_min = df["run"].min()
+    run_max = df["run"].max()
+
+    # Group runs by date, and store the int lumi per date as the max cumulative lumi.
+    # This returns a pandas.Series object.
+    srs_lumi_date = df.groupby(df["date"].dt.strftime('%d %m %Y'))["lumi"].sum()*1.E-6 # in /fb
+
+    figure, axes = plt.subplots()
+
+    x = srs_lumi_date.index.values
+    y = srs_lumi_date.values
+
+    labels = {
+        "EXP" : rf"Experiment {int(args.exp)}",
+        "RUNS" : rf"Runs: {run_min}-{run_max}",
+        "TOT" : rf"Total $\int\ L\ dt\ (\mathrm{{ONLINE}}) = {df['intLumi'].max()/1.e6:.3f}\ [\mathrm{{fb}}^{{-1}}]$",
+        }
+    labelstr = "\n".join(labels.values())
+
+    axes.bar(x, y, label=labelstr, color="black")
+
+    axes.fill_between(x, y, color="yellow")#, alpha=0.3)
+
+    axes.set_xlabel(r"Date")
+    axes.set_ylabel(r"Total integrated luminosity per day [$\mathrm{fb}^{-1}$]")
+    axes.tick_params(axis="x", labelrotation=45, labelsize="small")
+    axes.legend(loc="best")
+    axes.xaxis.set_major_locator(ticker.AutoLocator())
+    axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+
+    plt.savefig(f"{plotname}.pdf", bbox_inches="tight")
+
+if __name__ == '__main__':
+
+    args = argparser().parse_args()
+
+    DB = args.db
+    if not os.path.exists(DB):
+        b2.B2FATAL(f"DB {DB} not found. The live luminosity is only available on KEKCC (sorry)")
+
+    plotIntLumiVSDate()
+    

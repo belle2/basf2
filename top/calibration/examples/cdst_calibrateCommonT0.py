@@ -299,7 +299,7 @@ main.add_module('RootInput', inputFileNames=files)
 main.add_module('TOPGeometryParInitializer')
 
 # Time Recalibrator
-main.add_module('TOPTimeRecalibrator')
+main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
 
 # Channel masking
 main.add_module('TOPChannelMasker')

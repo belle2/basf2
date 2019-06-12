@@ -18,13 +18,13 @@ exp = 8
 run = 2265
 
 # set this string to identify the output rootfiles
-outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V2.root"
+outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V1.root"
 
 use_database_chain()
-# use_central_database("data_reprocessing_prompt_bucket6")
-use_central_database("data_reprocessing_prompt")
-use_central_database("svd_basic")
-# use_central_database("svd_onlySVDinGeoConfiguration")
+use_central_database("data_reprocessing_prompt_bucket6")
+# use_central_database("svd_basic")
+use_local_database("centraldb/database_ok.txt", "centraldb")
+use_central_database("svd_onlySVDinGeoConfiguration")
 
 main = create_path()
 
@@ -53,7 +53,7 @@ main.add_module(
 
 # default parameters
 main.add_module('SVDHotStripFinder', ShaperDigits='SVDShaperDigitsZS5', outputFileName=outputfile, searchBase=0,
-                threshold=1.0, absOccThreshold=0.20, relOccPrec=5, firstExp=8, firstRun=2265, useHSFinderV1=False)
+                threshold=1.0, absOccThreshold=0.20, relOccPrec=5, firstExp=8, firstRun=2265, useHSFinderV1=True)
 
 main.add_module('Progress')
 

@@ -94,6 +94,22 @@ void SVDHotStripFinderModule::beginRun()
   hOccupancy_after512.GetXaxis()->SetTitle("cellID");
   hm_occupancy_after = new SVDHistograms<TH1F>(hOccupancy_after768, hOccupancy_after768, hOccupancy_after768, hOccupancy_after512);
 
+  TH1F hOccAll("occAll_L@layerL@ladderS@sensor@view", "Strip Occupancy Distribution of @layer.@ladder.@sensor @view/@side side", 200,
+               0, m_absThr);
+  hOccAll.GetXaxis()->SetTitle("occupancy");
+  hm_occAll = new SVDHistograms<TH1F>(hOccAll);
+
+  TH1F hOccHot("occHot_L@layerL@ladderS@sensor@view", "Hot Strip Occupancy Distribution of @layer.@ladder.@sensor @view/@side side",
+               200, 0, 1);
+  hOccHot.GetXaxis()->SetTitle("occupancy");
+  hm_occHot = new SVDHistograms<TH1F>(hOccHot);
+
+  TH1F hOccAfter("occAfter_L@layerL@ladderS@sensor@view",
+                 "Non-Hot Strip Occupancy Distribution of @layer.@ladder.@sensor @view/@side side", 200, 0, m_absThr);
+  hOccAfter.GetXaxis()->SetTitle("occupancy");
+  hm_occAfter = new SVDHistograms<TH1F>(hOccAfter);
+
+  //
   TH1F hDist("dist_L@layerL@ladderS@sensor@view", "DSSD occupancy distribution of @layer.@ladder.@sensor @view/@side side", 100, 0,
              0.05);
   hDist.GetXaxis()->SetTitle("occupancy");
@@ -155,13 +171,18 @@ void SVDHotStripFinderModule::endRun()
 {
 
   if (!m_useHSFinderV1) {
+
     TDirectory* oldDir = NULL;
+    TDirectory* dir_occuL[4] = {NULL, NULL, NULL, NULL};
+
     //prepare ROOT FILE
     if (m_rootFilePtr != NULL) {
       m_rootFilePtr->cd();
       oldDir = gDirectory;
-      TDirectory* dir_occu = oldDir->mkdir("occupancy");
-      dir_occu->cd();
+      dir_occuL[0] = oldDir->mkdir("layer3");
+      dir_occuL[1] = oldDir->mkdir("layer4");
+      dir_occuL[2] = oldDir->mkdir("layer5");
+      dir_occuL[3] = oldDir->mkdir("layer6");
     }
 
     //Scale strip occupancy plots (per each sensor side) by the number of events. Fill SVDOccupancyCalibrations payload with the measured strip occupancy.
@@ -203,13 +224,12 @@ void SVDHotStripFinderModule::endRun()
             int ladder =  itSvdSensors->getLadderNumber();
             int sensor = itSvdSensors->getSensorNumber();
 
-
-            //          int nafter =0; //number of good strips after first preselection cut
+            // int nafter =0; //number of good strips after first preselection cut
             int nstrips = 768;
             if (!k && layer != 3) nstrips = 512;
 
             float stripOcc[768];
-            for (int i = 0; i < 768; i++) {stripOcc[i] = 0; hsflag[i] = 0;} //initialize vector to zero
+            for (int i = 0; i < nstrips; i++) {stripOcc[i] = 0; hsflag[i] = 0;} //initialize vector to zero
             float stripOccAfterAbsCut[768]; // vector of strip occupancy after first preselection based on absOccupThres cut
             (hm_occupancy->getHistogram(*itSvdSensors, k))->Scale(1. / nevents);
             for (int l = 0; l < nstrips; l++) {
@@ -219,7 +239,8 @@ void SVDHotStripFinderModule::endRun()
               stripOcc[l] = (float)(hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l + 1));
 
               //0. Fill SVDOccupancyCalibrations Payload with the measured strip occupancy
-              occDBObjPtr->set(layer, ladder, sensor, k, l, hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l + 1));
+              occDBObjPtr->set(layer, ladder, sensor, k, l, stripOcc[l]);
+              hm_occAll->fill(*itSvdSensors, k, stripOcc[l]);
 
               //1. Cut based  on absOccupancyThreshold
               if (stripOcc[l] > m_absThr) {
@@ -245,18 +266,32 @@ void SVDHotStripFinderModule::endRun()
               hotStripsDBObjPtr->set(layer, ladder, sensor, k, l, hsflag[l]);
               if (hsflag[l] == 0) {
                 hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1 , stripOccAfterAbsCut[l]);
-              } else
+                hm_occAfter->fill(*itSvdSensors, k, stripOccAfterAbsCut[l]);
+              } else {
                 hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, 1);
+                hm_occHot->fill(*itSvdSensors, k, stripOcc[l]);
+              }
             }
 
             for (int s = 0; s < hm_hot_strips->getHistogram(*itSvdSensors, k)->GetEntries(); s++)
               m_hHotStripsSummary->fill(*itSvdSensors, k, 1);
 
             if (m_rootFilePtr != NULL) {
+              dir_occuL[layer - 3]->cd();
               hm_occupancy->getHistogram(*itSvdSensors, k)->Write();
+              hm_hot_strips->getHistogram(*itSvdSensors, k)->SetLineColor(kBlack);
+              hm_hot_strips->getHistogram(*itSvdSensors, k)->SetMarkerColor(kBlack);
               hm_hot_strips->getHistogram(*itSvdSensors, k)->Write();
+              hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetLineColor(kRed);
+              hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetMarkerColor(kRed);
               hm_occupancy_after->getHistogram(*itSvdSensors,  k)->Write();
-
+              hm_occAll->getHistogram(*itSvdSensors,  k)->Write();
+              hm_occHot->getHistogram(*itSvdSensors,  k)->SetLineColor(kBlack);
+              hm_occHot->getHistogram(*itSvdSensors,  k)->SetMarkerColor(kBlack);
+              hm_occHot->getHistogram(*itSvdSensors,  k)->Write();
+              hm_occAfter->getHistogram(*itSvdSensors,  k)->SetLineColor(kRed);
+              hm_occAfter->getHistogram(*itSvdSensors,  k)->SetMarkerColor(kRed);
+              hm_occAfter->getHistogram(*itSvdSensors,  k)->Write();
             }
 
             B2DEBUG(1, " L" << layer << "." << ladder << "." << sensor << ".isU=" << k);
@@ -271,6 +306,7 @@ void SVDHotStripFinderModule::endRun()
     }
 
     if (m_rootFilePtr != NULL) {
+      oldDir->cd();
       m_hHotStripsSummary->getHistogram(0)->Write();
       m_hHotStripsSummary->getHistogram(1)->Write();
     }
@@ -534,7 +570,7 @@ bool SVDHotStripFinderModule::theHSFinder(float* stripOccAfterAbsCut, int* hsfla
 
   }
   sensorOccAverage = sensorOccAverage / nafter;
-  B2RESULT("Average occupancy: " << sensorOccAverage);
+  B2DEBUG(1, "Average occupancy: " << sensorOccAverage);
 
   for (int l = 0; l < nstrips; l++) {
 

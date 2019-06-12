@@ -111,6 +111,10 @@ namespace Belle2 {
     SVDHistograms<TH1F>* hm_occupancy = nullptr; /**< strip occupancy per sensor*/
     SVDHistograms<TH1F>* hm_hot_strips = nullptr; /**< hot strips per sensor*/
     SVDHistograms<TH1F>* hm_occupancy_after = nullptr; /**< strip occupancy after removal of hot strips, per sensor*/
+    SVDHistograms<TH1F>* hm_occAll = nullptr; /**< occupancy distribution - all strips*/
+    SVDHistograms<TH1F>* hm_occHot = nullptr; /**< occupancy distribution - hot strips*/
+    SVDHistograms<TH1F>* hm_occAfter = nullptr; /**< occupancy distribution - not hot strips*/
+
     SVDHistograms<TH1F>* hm_dist = nullptr;
     SVDHistograms<TH1F>* hm_dist1 = nullptr;
     SVDHistograms<TH2F>* hm_dist12 = nullptr;

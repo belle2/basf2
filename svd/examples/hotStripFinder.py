@@ -34,9 +34,7 @@ if useLauraAlg:
 
 use_database_chain()
 use_central_database("data_reprocessing_prompt_bucket6")
-# use_central_database("svd_basic")
-# use_local_database("/home/belle2/casarosa/master/hotStrips/centraldb/database_ok.txt",
-#                   "/home/belle2/casarosa/master/hotStrips/centraldb")
+use_central_database("svd_basic")
 use_central_database("svd_onlySVDinGeoConfiguration")
 
 use_local_database("localDB_HSF/database.txt", "localDB_HSF")

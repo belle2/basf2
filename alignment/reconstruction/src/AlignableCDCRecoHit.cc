@@ -27,6 +27,8 @@ using namespace CDC;
 using namespace alignment;
 
 bool AlignableCDCRecoHit::s_enableEventT0LocalDerivative = true;
+bool AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = false;
+bool AlignableCDCRecoHit::s_enableWireByWireAlignmentGlobalDerivatives = false;
 
 std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
@@ -141,31 +143,40 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     drldg(0, 5) * zRel
   );
 
-  //
-  /**
-  // Alignment of wires X in global coords
-  globals.add(
-    GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), 1),
-    drldg(0, 0)
-  );
+  // Wire-by-wire alignment (experimental, both wire-ends same derivative - DoF to be
+  // removed by constraints.
+  //WARNING: super-experimental, maybe wrong... disabled by default !!!
+  if (s_enableWireByWireAlignmentGlobalDerivatives) {
+    // Alignment of wires X in global coords
+    globals.add(
+      GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireBwdX),
+      drldg(0, 0)
+    );
 
-  // Alignment of wires Y in global coords
-  globals.add(
-    GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), 2),
-    drldg(0, 1)
-  );
+    globals.add(
+      GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireFwdX),
+      drldg(0, 0)
+    );
 
-  // Alignment of wires rotation (gamma) in global coords
-  globals.add(
-    GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), 6),
-    drldg(0, 5)
-  );
-  */
+    // Alignment of wires Y in global coords
+    globals.add(
+      GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireBwdY),
+      drldg(0, 1)
+    );
 
-  globals.add(
-    GlobalLabel::construct<CDCAlignment>(getWireID(), CDCAlignment::wireTension),
-    drldg(0, 1) * 4.0 * zRel * (1.0 - zRel)
-  );
+    globals.add(
+      GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireFwdY),
+      drldg(0, 1)
+    );
+  }
+
+
+  if (s_enableWireSaggingGlobalDerivative) {
+    globals.add(
+      GlobalLabel::construct<CDCAlignment>(getWireID(), CDCAlignment::wireTension),
+      drldg(0, 1) * 4.0 * zRel * (1.0 - zRel)
+    );
+  }
 
 
   return globals;

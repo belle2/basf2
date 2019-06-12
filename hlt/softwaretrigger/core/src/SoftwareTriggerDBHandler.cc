@@ -14,14 +14,6 @@
 
 namespace Belle2 {
   namespace SoftwareTrigger {
-    /*
-    explicit DBRepresentationOfSoftwareTriggerCut(const std::unique_ptr<SoftwareTrigger::SoftwareTriggerCut>& softwareTriggerCut) :
-
-    {
-    }
-
-     */
-
     const std::string SoftwareTriggerDBHandler::s_dbPackageIdentifier = "software_trigger_cut";
     const std::string SoftwareTriggerDBHandler::s_totalResultIdentifier = "total_result";
 

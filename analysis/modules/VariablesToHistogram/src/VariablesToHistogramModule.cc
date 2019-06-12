@@ -172,7 +172,7 @@ void VariablesToHistogramModule::event()
 void VariablesToHistogramModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
-    TDirectory::TContext directoryguard(m_file.get());
+    TDirectory::TContext directoryGuard(m_file.get());
     if (not m_directory.empty()) {
       m_file->cd(m_directory.c_str());
     }

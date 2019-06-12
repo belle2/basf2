@@ -138,7 +138,7 @@ class ValidationMetadataSetter(basf2.Module):
         self._tfile.reset()
 
 
-def createValidationHistograms(path, rootfile, particlelist, variables_1d=None, variables_2d=None):
+def create_validation_histograms(path, rootfile, particlelist, variables_1d=None, variables_2d=None):
     """
     Create histograms for all the variables and also label them to be useful in validation plots in one go.
     This is similar to the `modularAnalysis.variablesToHistogram` function but also sets the metadata correctly to be

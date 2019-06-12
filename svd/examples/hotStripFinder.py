@@ -15,10 +15,17 @@ import glob
 
 # set here the correct exp and run number you like to process
 exp = 8
-run = 2265
+run = 2308  # 2265
+runTpe = ""
 
+if run == 2308:
+    runType = "cosmic"
+elif run == 2265:
+    runType = "physics"
+else:
+    print("Check the run number!!")
 # set this string to identify the output rootfiles
-outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V1.root"
+outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V2.root"
 
 use_database_chain()
 use_central_database("data_reprocessing_prompt_bucket6")
@@ -36,7 +43,7 @@ main.add_module(
     # luminosity run 2265, exp8, raw data
     # cosmic run 2308, exp8, raw data
     inputFileName="/ghi/fs01/belle2/bdata/Data/Raw/e000" + \
-    str(exp) + "/r0" + str(run) + "/sub00/physics.000" + str(exp) + ".0" + str(run) + ".HLT*",
+    str(exp) + "/r0" + str(run) + "/sub00/" + str(runType) + ".000" + str(exp) + ".0" + str(run) + ".HLT*",
     branchNames=['RawSVDs'])
 
 main.add_module('Gearbox')
@@ -53,7 +60,7 @@ main.add_module(
 
 # default parameters
 main.add_module('SVDHotStripFinder', ShaperDigits='SVDShaperDigitsZS5', outputFileName=outputfile, searchBase=0,
-                threshold=1.0, absOccThreshold=0.20, relOccPrec=5, firstExp=8, firstRun=2265, useHSFinderV1=True)
+                threshold=1.0, absOccThreshold=0.20, relOccPrec=5, firstExp=8, firstRun=2265, useHSFinderV1=False)
 
 main.add_module('Progress')
 

@@ -24,13 +24,15 @@ elif run == 2265:
     runType = "physics"
 else:
     print("Check the run number!!")
+
 # set this string to identify the output rootfiles
 outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V2.root"
 
 use_database_chain()
 use_central_database("data_reprocessing_prompt_bucket6")
 # use_central_database("svd_basic")
-use_local_database("centraldb/database_ok.txt", "centraldb")
+use_local_database("/home/belle2/casarosa/master/hotStrips/centraldb/database_ok.txt",
+                   "/home/belle2/casarosa/master/hotStrips/centraldb")
 use_central_database("svd_onlySVDinGeoConfiguration")
 
 main = create_path()

@@ -42,30 +42,20 @@ namespace Belle2 {
        */
       struct TreeStruct {
 
-        float averageRate = 0; /**< total detector average hit rate */
-        int numEvents = 0; /**< number of events accumulated */
-        bool valid = false;  /**< status: true = rates valid */
-        float averageDspBkgRate[16] = {0}; /**<background rate calculated from ECL waveforms [hits/second] */
-        int numEventsSegments[16] = {0}; /**< number of events per segment */
+        float averageDspBkgRate[16] = {0}; /**< average background rate per crystal in given segment, calculated using ECL waveforms [hits/second] */
+        int numEvents = 0; /**< number of valid events */
         bool validDspRate = false; /**< status for rates calculated from waveforms, true if waveforms for all crystals are recorded */
-
-        /**
-         * normalize accumulated hits to single event
-         */
-        void normalizeDigits()
-        {
-          if (numEvents == 0) return;
-          averageRate /= numEvents;
-        }
 
         /**
          * normalize accumulated rates based on ECL waveforms
          */
-        void normalizeDsps()
+        void normalize()
         {
-          if (numEventsSegments == 0) return;
-          std::transform(averageDspBkgRate, averageDspBkgRate + 16, numEventsSegments, averageDspBkgRate, std::divides<float>());
+          if (numEvents == 0) return;
 
+          for (int i = 0; i < 16; i++) {
+            averageDspBkgRate[i] /= numEvents;
+          }
         }
 
 
@@ -145,11 +135,12 @@ namespace Belle2 {
       StoreArray<ECLDsp> m_dsps; /**< collection of ECL waveforms */
 
       std::vector<float> m_ADCtoEnergy; /**< vector used to store ECL calibration constants for each crystal */
+      std::vector<float> m_waveformNoise; /**< vector used to store ECL electronic noise constants foe each crystal */
 
       // other
       Belle2::ECL::ECLGeometryPar* m_geometry{nullptr}; /**< pointer to ECLGeometryPar */
       std::map<int, int> m_segmentMap; /**< map with keys containing ECL CellID and values containing segment number */
-      std::map<int, float> m_noiseMap; /**< map with keys containing ECL CellID and values containing electronics noise [GeV] */
+      int m_crystalsInSegment[16] = {0}; /** array cotaining the number of crystals in given segment */
     };
   }
 }

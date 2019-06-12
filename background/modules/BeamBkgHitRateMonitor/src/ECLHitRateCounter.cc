@@ -15,8 +15,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-
 #include <numeric>
 
 using namespace std;
@@ -28,19 +26,20 @@ namespace Belle2 {
     void ECLHitRateCounter::initialize(TTree* tree)
     {
       segmentECL();
-      findElectronicsNoise();
       // register collection(s) as optional, your detector might be excluded in DAQ
-      m_digits.isOptional();
       m_dsps.isOptional();
 
       // set branch address
-      tree->Branch("ecl", &m_rates, "averageRate/F:numEvents/I:valid/O:averageDspBkgRate[16]/F:numEventsSegments[16]/I:validDspRate/O");
+      tree->Branch("ecl", &m_rates, "averageDspBkgRate[16]/F:numEvents/I:validDspRate/O");
 
       //ECL calibration
-      DBObjPtr<ECLCrystalCalib> ECLElectronicsCalib("ECLCrystalElectronics"), ECLECalib("ECLCrystalEnergy");
+      DBObjPtr<ECLCrystalCalib> ECLElectronicsCalib("ECLCrystalElectronics"), ECLECalib("ECLCrystalEnergy"),
+               ECLWaveformNoise("ECLWaveformRMS");
       m_ADCtoEnergy.resize(8736);
       if (ECLElectronicsCalib) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = ECLElectronicsCalib->getCalibVector()[i];
       if (ECLECalib) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= ECLECalib->getCalibVector()[i];
+      m_waveformNoise.resize(8736);
+      if (ECLWaveformNoise) for (int i = 0; i < 8736; i++) m_waveformNoise[i] = ECLWaveformNoise->getCalibVector()[i];
     }
 
     void ECLHitRateCounter::clear()
@@ -51,24 +50,19 @@ namespace Belle2 {
     void ECLHitRateCounter::accumulate(unsigned timeStamp)
     {
       // check if data are available
-      if (not m_digits.isValid()) return;
+      if (not m_dsps.isValid()) return;
 
       // get buffer element
       auto& rates = m_buffer[timeStamp];
-
-      // increment event counter
-      rates.numEvents++;
-
-      // accumulate hits
-      /* either count all */
-      rates.averageRate += m_digits.getEntries();
-      rates.valid = true;
 
       //calculate rates using waveforms
       //The background rate for a crystal is calculated as
       //rate = rms_pedestal_squared / (average_photon_energy_squared * time_constant)
       //where time_constant=2.53 us and average_photon_energy_squared = 1 MeV
       if (m_dsps.getEntries() == 8736) {
+        // increment event counter
+        rates.numEvents++;
+
         for (auto& aECLDsp : m_dsps) {
 
           int nadc = aECLDsp.getNADCPoints();
@@ -76,7 +70,6 @@ namespace Belle2 {
           int segmentNumber = findECLSegment(cellID);
           int crysID = cellID - 1;
           std::vector<int> dspAv = aECLDsp.getDspA();
-          rates.numEventsSegments[segmentNumber]++;
 
           //finding the pedestal value
           double dspMean = (std::accumulate(dspAv.begin(), dspAv.begin() + nadc, 0.0)) / nadc;
@@ -87,11 +80,8 @@ namespace Belle2 {
           double dspRMS = sqrt(wpsum / nadc);
           double dspSigma = dspRMS * abs(m_ADCtoEnergy[crysID]);
 
-          //finding the corresponding electronics noise
-          float sigmaNoise = m_noiseMap.find(cellID)->second;
-
           //calculating the background rate per second
-          double dspBkgRate = ((pow(dspSigma, 2)) - (pow(sigmaNoise, 2))) / (2.53 * 1e-12);
+          double dspBkgRate = ((pow(dspSigma, 2)) - (pow(m_waveformNoise[crysID], 2))) / (2.53 * 1e-12);
           if (dspBkgRate < 0) {
             dspBkgRate = 0;
           }
@@ -111,17 +101,15 @@ namespace Belle2 {
       // copy buffer element
       m_rates = m_buffer[timeStamp];
 
-      if (m_rates.valid) {
-        // normalize
-        m_rates.normalizeDigits();
+      if (not m_rates.validDspRate) return;
+
+      // normalize
+      m_rates.normalize();
+
+      //get average ret per crystal in segment
+      for (int i = 0; i < 16; i++) {
+        m_rates.averageDspBkgRate[i] /= m_crystalsInSegment[i];
       }
-
-      if (m_rates.validDspRate) {
-        m_rates.normalizeDsps();
-      }
-
-      // optionally: convert to MHz, correct for the masked-out channels etc.
-
     }
 
 
@@ -137,77 +125,64 @@ namespace Belle2 {
         if (cid < 1297) {
           if (phi > 0.7853 && phi < 2.356) {
             m_segmentMap.insert(std::pair<int, int>(cid, 0));
+            m_crystalsInSegment[0] += 1;
           } else if (phi >= 2.356 || phi <= -2.356) {
             m_segmentMap.insert(std::pair<int, int>(cid, 1));
+            m_crystalsInSegment[1] += 1;
           } else if (phi > -2.356 && phi < -0.7853) {
             m_segmentMap.insert(std::pair<int, int>(cid, 2));
+            m_crystalsInSegment[2] += 1;
           } else {
             m_segmentMap.insert(std::pair<int, int>(cid, 3));
+            m_crystalsInSegment[3] += 1;
           }
         } else if (cid > 1152 && cid < 7777) {
           if (z > 0) {
             if (phi > 0.7853 && phi < 2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 4));
+              m_crystalsInSegment[4] += 1;
             } else if (phi >= 2.356 || phi <= -2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 5));
+              m_crystalsInSegment[5] += 1;
             } else if (phi > -2.356 && phi < -0.7853) {
               m_segmentMap.insert(std::pair<int, int>(cid, 6));
+              m_crystalsInSegment[6] += 1;
             } else {
               m_segmentMap.insert(std::pair<int, int>(cid, 7));
+              m_crystalsInSegment[7] += 1;
             }
           } else {
             if (phi > 0.7853 && phi < 2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 8));
+              m_crystalsInSegment[8] += 1;
             } else if (phi >= 2.356 || phi <= -2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 9));
+              m_crystalsInSegment[9] += 1;
             } else if (phi > -2.356 && phi < -0.7853) {
               m_segmentMap.insert(std::pair<int, int>(cid, 10));
+              m_crystalsInSegment[10] += 1;
             } else {
               m_segmentMap.insert(std::pair<int, int>(cid, 11));
+              m_crystalsInSegment[11] += 1;
             }
           }
         } else {
           if (phi > 0.7853 && phi < 2.356) {
             m_segmentMap.insert(std::pair<int, int>(cid, 12));
+            m_crystalsInSegment[12] += 1;
           } else if (phi >= 2.356 || phi <= -2.356) {
             m_segmentMap.insert(std::pair<int, int>(cid, 13));
+            m_crystalsInSegment[13] += 1;
           } else if (phi > -2.356 && phi < -0.7853) {
             m_segmentMap.insert(std::pair<int, int>(cid, 14));
+            m_crystalsInSegment[14] += 1;
           } else {
             m_segmentMap.insert(std::pair<int, int>(cid, 15));
+            m_crystalsInSegment[15] += 1;
           }
         }
       }
     }
-
-    void ECLHitRateCounter::findElectronicsNoise()
-    {
-      std::string fileName = FileSystem::findFile("ecl/data/sigmaMeanElectronics.root");
-      if (fileName.empty()) {
-        B2WARNING("ECLHitRateCounter: file with electronics noise data not found");
-        for (int i = 1; i < 8737; i++) {
-          m_noiseMap[i] = 0;
-        }
-        return;
-      }
-      TFile noiseFile(fileName.c_str(), "READ");
-      TH1F* h_Noise = dynamic_cast<TH1F*>(noiseFile.Get("sigma_mean"));
-      if (not h_Noise) {
-        B2WARNING("ECLHitRateCounter: histogram with electronics noise data not found");
-        for (int i = 1; i < 8737; i++) {
-          m_noiseMap[i] = 0;
-        }
-        return;
-      } else {
-
-        for (int i = 1; i < 8737; i++) {
-          m_noiseMap[i] = h_Noise->GetBinContent(i);
-        }
-
-        noiseFile.Close();
-      }
-    }
-
 
   } // Background namespace
 } // Belle2 namespace

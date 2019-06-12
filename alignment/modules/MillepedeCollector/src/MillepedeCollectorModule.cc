@@ -146,6 +146,11 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("enableSVDHierarchy", m_enableSVDHierarchy, "Enable SVD in hierarchy (flat or full)",
            bool(true));
 
+  addParam("enableWireByWireAlignment", m_enableWireByWireAlignment, "Enable global derivatives for wire-by-wire alignment",
+           bool(false));
+  addParam("enableWireSagging", m_enableWireSagging, "Enable global derivatives for wire sagging",
+           bool(false));
+
 }
 
 void MillepedeCollectorModule::prepare()
@@ -223,6 +228,8 @@ void MillepedeCollectorModule::prepare()
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   AlignableCDCRecoHit::s_enableEventT0LocalDerivative = m_fitEventT0;
+  AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = m_enableWireSagging;
+  AlignableCDCRecoHit::s_enableWireByWireAlignmentGlobalDerivatives = m_enableWireByWireAlignment;
 }
 
 void MillepedeCollectorModule::collect()

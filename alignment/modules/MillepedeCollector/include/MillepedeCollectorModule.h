@@ -151,6 +151,10 @@ namespace Belle2 {
     bool m_enablePXDHierarchy;
     /** enable SVD hierarchy **/
     bool m_enableSVDHierarchy;
+    /** Enable global derivatives for wire-by-wire alignment **/
+    bool m_enableWireByWireAlignment;
+    /** Enable global derivatives for wire sagging **/
+    bool m_enableWireSagging;
 
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};

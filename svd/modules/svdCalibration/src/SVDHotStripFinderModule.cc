@@ -434,11 +434,16 @@ void SVDHotStripFinderModule::terminate()
             for (int l = 0; l < 24; l++) {
               occupancy[l] = 0.0;
             }
+            int it1st = it; //first pass:number of good strips
             it = 0;
             // first pass
             for (int l = 0; l < 768; l++) {
               div_t test = div(l, ibase);
               float threshold_corrections = 1.0;
+              /*
+                       threshold is corrected by the real number of alive strips
+               */
+              threshold_corrections = threshold_corrections * 768.0 / (float)it1st;
               if (ibase == 32) threshold_corrections = 24.0;
               if (ibase == 64) threshold_corrections = 12.0;
               if (ibase == 128) threshold_corrections = 6.0;
@@ -456,13 +461,15 @@ void SVDHotStripFinderModule::terminate()
               }
 
             }
-            // Second pass of Hot strip finder, After the first pass we remove already found Host strips we do the second pass with the same threshold
-
+            /*
+            Second pass of Hot strip finder, After the first pass we remove already found Host strips we do the second pass with the same threshold
+            */
             // second pass
             for (int l = 0; l < 768; l++) {
               div_t test = div(l, ibase);
               position1[l] = position1[l] * nCltrk[test.quot] / (float)occupancy[test.quot];
               float threshold_corrections = 1.0;
+              threshold_corrections = threshold_corrections * 768.0 / (float)it;
               if (ibase == 32) threshold_corrections =  24.0;
               if (ibase == 64) threshold_corrections =  12.0;
               if (ibase == 128) threshold_corrections = 6.0;
@@ -490,6 +497,8 @@ void SVDHotStripFinderModule::terminate()
             }
 
             if (m_rootFilePtr != NULL) {
+              hm_occupancy->getHistogram(*itSvdSensors, k)->Scale(1.0 / (float)nevents);
+              hm_occupancy_after->getHistogram(*itSvdSensors, k)->Scale(1.0 / (float)nevents);
               hm_occupancy->getHistogram(*itSvdSensors, k)->Write();
               hm_hot_strips->getHistogram(*itSvdSensors, k)->Write();
               hm_occupancy_after->getHistogram(*itSvdSensors, k)->Write();

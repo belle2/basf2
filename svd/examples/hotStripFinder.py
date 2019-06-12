@@ -53,7 +53,7 @@ main.add_module(
 
 # default parameters
 main.add_module('SVDHotStripFinder', ShaperDigits='SVDShaperDigitsZS5', outputFileName=outputfile, searchBase=0,
-                threshold=1.0, absOccThreshold=0.20, relOccPrec=5, firstExp=8, firstRun=2265, useHSFinderV1=True)
+                threshold=1.0, absOccThreshold=0.20, relOccPrec=5, firstExp=8, firstRun=2265, useHSFinderV1=False)
 
 main.add_module('Progress')
 

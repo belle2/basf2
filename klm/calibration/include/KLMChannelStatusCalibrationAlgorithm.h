@@ -81,6 +81,22 @@ namespace Belle2 {
     }
 
     /**
+     * Get channel hit map.
+     */
+    const KLMChannelMapValue<unsigned int>& getHitMapChannel() const
+    {
+      return m_HitMapChannel;
+    }
+
+    /**
+     * Get module hit map.
+     */
+    const KLMChannelMapValue<unsigned int>& getHitMapModule() const
+    {
+      return m_HitMapModule;
+    }
+
+    /**
      * Get total hit number.
      */
     unsigned int getTotalHitNumber() const

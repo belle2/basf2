@@ -127,6 +127,12 @@ BKLMChannelIndex& BKLMChannelIndex::operator++()
   return *this;
 }
 
+BKLMChannelIndex& BKLMChannelIndex::increment()
+{
+  increment(m_IndexLevel);
+  return *this;
+}
+
 bool BKLMChannelIndex::operator==(BKLMChannelIndex& index)
 {
   switch (m_IndexLevel) {

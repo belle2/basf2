@@ -138,6 +138,11 @@ namespace Belle2 {
     BKLMChannelIndex& operator++();
 
     /**
+     * Increment (to use in Python).
+     */
+    BKLMChannelIndex& increment();
+
+    /**
      * Operator ==.
      */
     bool operator==(BKLMChannelIndex& index);

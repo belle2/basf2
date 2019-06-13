@@ -141,6 +141,11 @@ namespace Belle2 {
     EKLMChannelIndex& operator++();
 
     /**
+     * Increment (to use in Python).
+     */
+    EKLMChannelIndex& increment();
+
+    /**
      * Operator ==.
      */
     bool operator==(EKLMChannelIndex& index);

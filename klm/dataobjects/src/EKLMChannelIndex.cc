@@ -114,6 +114,12 @@ EKLMChannelIndex& EKLMChannelIndex::operator++()
   return *this;
 }
 
+EKLMChannelIndex& EKLMChannelIndex::increment()
+{
+  increment(m_IndexLevel);
+  return *this;
+}
+
 bool EKLMChannelIndex::operator==(EKLMChannelIndex& index)
 {
   switch (m_IndexLevel) {

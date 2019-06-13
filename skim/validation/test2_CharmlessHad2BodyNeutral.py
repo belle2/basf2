@@ -20,7 +20,7 @@ inputMdst('default', '../CharmlessHad2BodyNeutral.udst.root', path=charmless2neu
 from variables import variables
 variablesToHistogram(
     filename='CharmlessHad2BodyNeutral_Validation.root',
-    decayString='B0:2BodyB0',
+    decayString='B0:2BodySkim',
     variables=[
         ('Mbc', 100, 5.2, 5.3),
         ('deltaE', 100, -1, 1),
@@ -31,3 +31,21 @@ variablesToHistogram(
 
 process(charmless2neutralpath)
 print(statistics)
+
+import ROOT
+
+# add contact information to histograms
+variables_list = [
+    'Mbc',
+    'deltaE',
+    'daughter__bo0__cm__spInvM__bc',
+    'daughter__bo1__cm__spInvM__bc',
+    'MbcdeltaE'
+]
+
+file = ROOT.TFile("CharmlessHad2BodyNeutral_Validation.root", "UPDATE")
+for name in variables_list:
+    hist = file.Get(name)
+    hist.GetListOfFunctions().Add(ROOT.TNamed("Contact", "khsmith@student.unimelb.edu.au"))
+    hist.Write("", ROOT.TObject.kOverwrite)
+file.Close()

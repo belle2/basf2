@@ -32,3 +32,22 @@ variablesToHistogram(
 
 process(charmless3neutralpath)
 print(statistics)
+
+import ROOT
+
+# add contact information to histograms
+variables_list = [
+    'Mbc',
+    'deltaE',
+    'daughter__bo0__cm__spInvM__bc',
+    'daughter__bo1__cm__spInvM__bc',
+    'daughter__bo2__cm__spInvM__bc',
+    'MbcdeltaE'
+]
+
+file = ROOT.TFile("CharmlessHad3BodyNeutral_Validation.root", "UPDATE")
+for name in variables_list:
+    hist = file.Get(name)
+    hist.GetListOfFunctions().Add(ROOT.TNamed("Contact", "khsmith@student.unimelb.edu.au"))
+    hist.Write("", ROOT.TObject.kOverwrite)
+file.Close()

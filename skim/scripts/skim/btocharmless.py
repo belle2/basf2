@@ -42,55 +42,56 @@ def CharmlessHad2BodyB0List(path):
     **Working Group**: BtoCharmless (WG9)
 
     **Decay Modes**:
-    1. B0 -> pi+ pi-
-    2. B0 -> pi0 pi0
-    3. B0 -> K+ pi-
-    4. B0 -> K+ K-
-    5. B0 -> eta pi0
-    6. B0 -> eta eta
-    7. B0 -> K_S0 pi0
-    8. B0 -> rho0 pi0
-    9. B0 -> rho- pi+
-    10. B0 -> K+ rho-
-    11. B0 -> eta rho0
-    12. B0 -> omega eta
-    13. B0 -> phi pi0
-    14. B0 -> phi eta
-    15. B0 -> omega pi0
-    16. B0 -> eta K*0
-    17. B0 -> K*+ pi-
-    18. B0 -> K*0 pi0
-    19. B0 -> K*+ K-
-    20. B0 -> rho0 rho0
-    21. B0 -> rho+ rho-
-    22. B0 -> omega rho0
-    23. B0 -> omega omega
-    24. B0 -> phi rho0
-    25. B0 -> phi omega
-    26. B0 -> phi phi
-    27. B0 -> omega K*0
-    28. B0 -> K*0 rho0
-    29. B0 -> K*+ rho-
-    30. B0 -> K*0 phi
-    31. B0 -> K*0 anti-K*0
-    32. B0 -> K*0 K*0
-    33. B0 -> K*+ K*-
-    34. B0 -> eta f_0
-    35. B0 -> omega f_0
-    36. B0 -> phi f_0
-    37. B0 -> rho0 f_0
-    38. B0 -> K*0 f_0
-    39. B0 -> f_0 f_0
+    * B0 -> pi+ pi-
+    * B0 -> pi0 pi0
+    * B0 -> K+ pi-
+    * B0 -> K+ K-
+    * B0 -> eta pi0
+    * B0 -> eta eta
+    * B0 -> K_S0 pi0
+    * B0 -> rho0 pi0
+    * B0 -> rho- pi+
+    * B0 -> K+ rho-
+    * B0 -> eta rho0
+    * B0 -> omega eta
+    * B0 -> phi pi0
+    * B0 -> phi eta
+    * B0 -> omega pi0
+    * B0 -> eta K*0
+    * B0 -> K*+ pi-
+    * B0 -> K*0 pi0
+    * B0 -> K*+ K-
+    * B0 -> rho0 rho0
+    * B0 -> rho+ rho-
+    * B0 -> omega rho0
+    * B0 -> omega omega
+    * B0 -> phi rho0
+    * B0 -> phi omega
+    * B0 -> phi phi
+    * B0 -> omega K*0
+    * B0 -> K*0 rho0
+    * B0 -> K*+ rho-
+    * B0 -> K*0 phi
+    * B0 -> K*0 anti-K*0
+    * B0 -> K*0 K*0
+    * B0 -> K*+ K*-
+    * B0 -> eta f_0
+    * B0 -> omega f_0
+    * B0 -> phi f_0
+    * B0 -> rho0 f_0
+    * B0 -> K*0 f_0
+    * B0 -> f_0 f_0
 
-    **Particle Lists**: Standard loose lists for all light mesons.
-    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
-    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+    **Particle Lists**:
+    * Standard loose lists for all light mesons.
+    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
-    1. R2EventLevel < 0.5 (event level)
-    2. nTracks >= 2 (event level)
-    3. 5.24 < Mbc < 5.29
-    4. abs(deltaE) < 0.5
+    * R2 < 0.5
+    * nTracks >= 2 (event level)
+    * 5.24 < Mbc < 5.29
+    * abs(deltaE) < 0.5
 
     Note:
       Does not include decay modes involving eta prime at the current time.
@@ -206,43 +207,44 @@ def CharmlessHad2BodyBmList(path):
     **Working Group**: BtoCharmless (WG9)
 
     **Decay Modes**:
-    1. B- -> pi- pi0
-    2. B- -> K- pi0
-    3. B- -> eta pi-
-    4. B- -> eta K-
-    5. B- -> rho0 pi-
-    6. B- -> rho- pi0
-    7. B- -> K- rho0
-    8. B- -> omega pi-
-    9. B- -> eta rho-
-    10. B- -> phi pi-
-    11. B- -> eta K*-
-    12. B- -> omega K-
-    13. B- -> K*0 pi-
-    14. B- -> K*- pi0
-    15. B- -> K- phi
-    16. B- -> rho- rhro0
-    17. B- -> omega rho-
-    18. B- -> phi rho-
-    19. B- -> omega K*-
-    20. B- -> K*- rho0
-    21. B- -> K*0 rho-
-    22. B- -> K*- K*0
-    23. B- -> K*- phi
-    24. B- -> pi- f_0
-    25. B- -> f_0 K-
-    26. B- -> rho- f_0
-    27. B- -> K*- f_0
+    * B- -> pi- pi0
+    * B- -> K- pi0
+    * B- -> eta pi-
+    * B- -> eta K-
+    * B- -> rho0 pi-
+    * B- -> rho- pi0
+    * B- -> K- rho0
+    * B- -> omega pi-
+    * B- -> eta rho-
+    * B- -> phi pi-
+    * B- -> eta K*-
+    * B- -> omega K-
+    * B- -> K*0 pi-
+    * B- -> K*- pi0
+    * B- -> K- phi
+    * B- -> rho- rhro0
+    * B- -> omega rho-
+    * B- -> phi rho-
+    * B- -> omega K*-
+    * B- -> K*- rho0
+    * B- -> K*0 rho-
+    * B- -> K*- K*0
+    * B- -> K*- phi
+    * B- -> pi- f_0
+    * B- -> f_0 K-
+    * B- -> rho- f_0
+    * B- -> K*- f_0
 
-    **Particle Lists**: Standard loose lists for all light mesons.
-    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
-    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+    **Particle Lists**:
+    * Standard loose lists for all light mesons.
+    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
-    1. R2EventLevel < 0.5 (event level)
-    2. nTracks >= 2 (event level)
-    3. 5.24 < Mbc < 5.29
-    4. abs(deltaE) < 0.5
+    * R2 < 0.5
+    * nTracks >= 2 (event level)
+    * 5.24 < Mbc < 5.29
+    * abs(deltaE) < 0.5
 
     Note:
       Does not include decay modes involving eta prime at the current time.
@@ -340,33 +342,34 @@ def CharmlessHad3BodyB0List(path):
     **Working Group**: BtoCharmless (WG9)
 
     **Decay Modes**:
-    1. B0 -> pi+ pi- pi0
-    2. B0 -> K+ pi- pi0
-    3. B0 -> K+ K- pi0
-    4. B0 -> K_S0 K_S0 pi0
-    5. B0 -> K_S0 K_S0 eta
-    6. B0 -> K_S0 K_S0 K_S0
-    7. B0 -> rho0 pi+ pi-
-    8. B0 -> rho0 K+ pi-
-    9. B0 -> phi pi+ pi-
-    10. B0 -> K*0 pi+ pi-
-    11. B0 -> K*0 K+ K-
-    12. B0 -> K*0 K- pi+
-    13. B0 -> K*0 K+ pi-
-    14. B0 -> f_0 pi+ pi-
-    15. B0 -> f_0 K+ pi-
+    * B0 -> pi+ pi- pi0
+    * B0 -> K+ pi- pi0
+    * B0 -> K+ K- pi0
+    * B0 -> K_S0 K_S0 pi0
+    * B0 -> K_S0 K_S0 eta
+    * B0 -> K_S0 K_S0 K_S0
+    * B0 -> rho0 pi+ pi-
+    * B0 -> rho0 K+ pi-
+    * B0 -> phi pi+ pi-
+    * B0 -> K*0 pi+ pi-
+    * B0 -> K*0 K+ K-
+    * B0 -> K*0 K- pi+
+    * B0 -> K*0 K+ pi-
+    * B0 -> f_0 pi+ pi-
+    * B0 -> f_0 K+ pi-
 
-    **Particle Lists**: Standard loose lists for all light mesons.
-    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
-    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+    **Particle Lists**:
+    * Standard loose lists for all light mesons.
+    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
-    1. R2EventLevel < 0.5 (event level)
-    2. nTracks >= 2 (event level)
-    3. 5.24 < Mbc < 5.29
-    4. abs(deltaE) < 0.5
-    5. abs(cosTBTO) < 0.9
-    6. abs(cosTBz) < 0.85
+    * R2 < 0.5
+    * nTracks >= 2 (event level)
+    * 5.24 < Mbc < 5.29
+    * abs(deltaE) < 0.5
+    * abs(cosTBTO) < 0.9
+    * abs(cosTBz) < 0.85
 
     Note:
       Does not include decay modes involving eta prime at the current time.
@@ -440,34 +443,35 @@ def CharmlessHad3BodyBmList(path):
     **Working Group**: BtoCharmless (WG9)
 
     **Decay Modes**:
-    1. B- -> K- pi+ pi-
-    2. B- -> K- pi0 pi0
-    3. B- -> K+ pi- pi-
-    4. B- -> K- K+ pi-
-    5. B- -> K- K+ K-
-    6. B- -> pi- pi- pi+
-    7. B- -> pi- pi0 pi0
-    8. B- -> K- K_S0 K_S0
-    9. B- -> pi- K_S0 K_S0
-    10. B- -> K_S0 pi- pi0
-    11. B- -> K*- pi- pi+
-    12. B- -> K*- pi- K+
-    13. B- -> K*- K- K+
-    14. B- -> phi K_S0 pi-
-    15. B- -> K- phi phi
-    16. B- -> omega phi K-
+    * B- -> K- pi+ pi-
+    * B- -> K- pi0 pi0
+    * B- -> K+ pi- pi-
+    * B- -> K- K+ pi-
+    * B- -> K- K+ K-
+    * B- -> pi- pi- pi+
+    * B- -> pi- pi0 pi0
+    * B- -> K- K_S0 K_S0
+    * B- -> pi- K_S0 K_S0
+    * B- -> K_S0 pi- pi0
+    * B- -> K*- pi- pi+
+    * B- -> K*- pi- K+
+    * B- -> K*- K- K+
+    * B- -> phi K_S0 pi-
+    * B- -> K- phi phi
+    * B- -> omega phi K-
 
-    **Particle Lists**: Standard loose lists for all light mesons.
-    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
-    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+    **Particle Lists**:
+    * Standard loose lists for all light mesons.
+    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
-    1. R2EventLevel < 0.5 (event level)
-    2. nTracks >= 2 (event level)
-    3. 5.24 < Mbc < 5.29
-    4. abs(deltaE) < 0.5
-    5. abs(cosTBTO) < 0.9
-    6. abs(cosTBz) < 0.85
+    * R2 < 0.5
+    * nTracks >= 2 (event level)
+    * 5.24 < Mbc < 5.29
+    * abs(deltaE) < 0.5
+    * abs(cosTBTO) < 0.9
+    * abs(cosTBz) < 0.85
 
     Note:
       Does not include decay modes involving eta prime at the current time.

@@ -40,7 +40,7 @@ SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
            "Absolute occupancy threshold: at a first loop, flag as Hot Strip (HS) all those whose occupancy > absOccThreshold", float(0.2));
   addParam("relOccPrec", m_relOccPrec,
            "Precision level on occupancy which is defined to be negligible the calculation of the hit background rate", float(0.1));
-  addParam("verbose", m_verbose, " False by default, it allows to switch on the printing of all found HS.", bool(false));
+  addParam("verbose", m_verbose, " True by default, it allows to switch off the printing of all found HS.", bool(true));
 
 }
 

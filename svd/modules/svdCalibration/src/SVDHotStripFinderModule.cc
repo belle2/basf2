@@ -26,7 +26,9 @@ SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDHotStripFinder.root"));
   addParam("threshold", m_thr, "Threshold cut for Hot strip finder in percent", float(4.0));
-  addParam("searchBase", m_base, "0 -> 32, 1 -> 64, 2 -> 128", int(0));
+  addParam("searchBase", m_base,
+           "number of strips used to compute the average occupancy, possible choices = 32, 64, 128. Default = -1, use all sensor strips.",
+           int(-1));
   //additional paramters to import on the DB:
   addParam("zeroSuppression", m_zs, "ZeroSuppression cut of the input SVDShaperDigits", float(5));
   addParam("firstExp", m_firstExp, "experiment number", int(-1));
@@ -374,9 +376,8 @@ void SVDHotStripFinderModule::terminate()
     int hsflag[768]; //found hot strips list;  hsflag[i]==1 for indetified Hot Strip
     int nevents =  h_nevents->GetEntries(); //number of events processed in events
     int ibase = 768; // interval used for the hot strip finding
-    if (m_base == 1) {ibase = 32;};
-    if (m_base == 2) {ibase = 64;};
-    if (m_base == 3) {ibase = 128;};
+    if (m_base != -1)
+      ibase = m_base;
 
     B2DEBUG(1, "number of events " << nevents);
 
@@ -436,7 +437,7 @@ void SVDHotStripFinderModule::terminate()
 
               float tmp_occ = position1[l] / (float)nCltrk[test.quot]; //for hot strip search
               float  tmp_occ1 = position1[l] / (float)nevents; //for SVDOccupancyCalibration
-              position1[l] = tmp_occ; //vector used for Hot strip search
+              position1[l] = tmp_occ; //vector used for Hot strip search<
               if (tmp_occ > 0.0) {
                 hm_dist->fill(*itSvdSensors, k, tmp_occ); // ..
                 h_tot_dist->Fill(tmp_occ);
@@ -621,29 +622,38 @@ TH2F*  SVDHotStripFinderModule::createHistogram2D(const char* name, const char* 
 
 bool SVDHotStripFinderModule::theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips)
 {
-  double sensorOccAverage = 0;
   bool found = false;
-  int nafter = 0;
-  for (int l = 0; l < nstrips; l++) {
-    sensorOccAverage = sensorOccAverage + stripOccAfterAbsCut[l];
-    if (stripOccAfterAbsCut[l] > 0) nafter++;
 
-  }
-  sensorOccAverage = sensorOccAverage / nafter;
-  B2DEBUG(1, "Average occupancy: " << sensorOccAverage);
+  if (m_base == -1)
+    m_base = nstrips;
 
-  for (int l = 0; l < nstrips; l++) {
+  int N = nstrips / m_base;
 
-    // flag additional HS by comparing each strip occupancy with the sensor-based average occupancy
+  for (int sector = 0; sector < N; sector++) {
 
-    if (stripOccAfterAbsCut[l] > sensorOccAverage * m_relOccPrec) {
-      hsflag[l] = 1;
-      found = true;
-      stripOccAfterAbsCut[l] = 0;
+    int nafter = 0;
+    double sensorOccAverage = 0;
+
+    for (int l = sector * m_base; l < sector * m_base + m_base; l++) {
+      sensorOccAverage = sensorOccAverage + stripOccAfterAbsCut[l];
+      if (stripOccAfterAbsCut[l] > 0) nafter++;
     }
-    //    else hsflag[l]=0;
+    sensorOccAverage = sensorOccAverage / nafter;
 
+    B2DEBUG(1, "Average occupancy: " << sensorOccAverage);
 
+    for (int l = sector * m_base; l < sector * m_base + m_base; l++) {
+
+      // flag additional HS by comparing each strip occupancy with the sensor-based average occupancy
+
+      if (stripOccAfterAbsCut[l] > sensorOccAverage * m_relOccPrec) {
+        hsflag[l] = 1;
+        found = true;
+        stripOccAfterAbsCut[l] = 0;
+      }
+      //    else hsflag[l]=0;
+    }
   }
+
   return found;
 }

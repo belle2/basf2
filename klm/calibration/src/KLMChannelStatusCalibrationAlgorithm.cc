@@ -103,6 +103,10 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     }
     double averageHits = double(moduleHits) / activeChannels;
     if (averageHits < m_MinimalAverageHitNumber && !m_ForcedCalibration) {
+      B2INFO("BKLM module " << bklmModule.getKLMModuleNumber() << " (forward "
+             << bklmModule.getForward() << ", sector " <<
+             bklmModule.getSector() << ", layer " << bklmModule.getLayer() <<
+             "): " << moduleHits << " hits, average: " << averageHits << ".");
       return CalibrationAlgorithm::c_NotEnoughData;
     }
     bklmChannel = bklmModule;
@@ -132,6 +136,10 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     }
     double averageHits = double(moduleHits) / activeChannels;
     if (averageHits < m_MinimalAverageHitNumber && !m_ForcedCalibration) {
+      B2INFO("EKLM module " << eklmModule.getKLMModuleNumber() << " (endcap "
+             << eklmModule.getEndcap() << ", sector " <<
+             eklmModule.getSector() << ", layer " << eklmModule.getLayer() <<
+             "): " << moduleHits << " hits, average: " << averageHits << ".");
       return CalibrationAlgorithm::c_NotEnoughData;
     }
     eklmChannel = eklmModule;

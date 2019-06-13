@@ -279,7 +279,7 @@ void SVDHotStripFinderModule::endRun()
 
                 TString aux_side = "V/N";
                 if (k) aux_side = "U/P";
-                if (m_verbose) B2RESULT("HS found, occupancy = " << stripOcc[l] << ", Layer: " << layer + 3 << " Ladder: " << ladder << " Sensor: "
+                if (m_verbose) B2RESULT("HS found, occupancy = " << stripOcc[l] << ", Layer: " << layer << " Ladder: " << ladder << " Sensor: "
                                           << sensor <<
                                           " Side: " << k << " channel: " << l);
 

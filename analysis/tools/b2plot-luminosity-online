@@ -30,6 +30,7 @@ import sqlite3
 import time
 import os
 import basf2 as b2
+import datetime
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -127,7 +128,7 @@ def plotIntLumiVSDate(plotname="graph_int_lumi__VS__date"):
 
     # Group runs by date, and store the int lumi per date as the max cumulative lumi.
     # This returns a pandas.Series object.
-    srs_lumi_date = df.groupby(df["date"].dt.strftime('%d %m %Y'))["lumi"].sum()*1.E-6 # in /fb
+    srs_lumi_date = df.groupby(df["date"].dt.strftime('%Y %m %d'))["lumi"].sum()*1.E-6 # in /fb
 
     figure, axes = plt.subplots()
 
@@ -141,12 +142,198 @@ def plotIntLumiVSDate(plotname="graph_int_lumi__VS__date"):
         }
     labelstr = "\n".join(labels.values())
 
-    axes.bar(x, y, label=labelstr, color="black")
+    axes.plot(x, y, label=labelstr, color="black")
 
     axes.fill_between(x, y, color="yellow")#, alpha=0.3)
 
     axes.set_xlabel(r"Date")
     axes.set_ylabel(r"Total integrated luminosity per day [$\mathrm{fb}^{-1}$]")
+    axes.tick_params(axis="x", labelrotation=45, labelsize="small")
+    axes.legend(loc="best")
+    axes.xaxis.set_major_locator(ticker.AutoLocator())
+    axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+
+    plt.savefig(f"{plotname}.pdf", bbox_inches="tight")
+
+def plotIntLumi(plotname="graph_int_lumi"):
+    """
+    Make a graph with the integrated lumi VS date
+    """
+
+    # query the DB
+    reco = "lum_det_shift"
+    cmdexp = f"SELECT {reco} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = ? "
+    if (args.runs):
+        cmdexp += f" AND run >= {min(args.runs)} AND run <= {max(args.runs)}"
+
+    conn = sqlite3.connect(DB)
+
+    # Get the csv as a pandas.Dataframe.
+    df = pd.read_sql_query(cmdexp, conn, params=(args.exp,))
+    print(f"Read {len(df)} runs")
+
+    # convert epoch to date
+    df['date'] = pd.to_datetime(df['date'],unit='s')
+        
+    # cumulative integrated luminosity
+    df['intLumi'] = df['lumi'].cumsum()
+
+    # RUN max, min
+    run_min = df["run"].min()
+    run_max = df["run"].max()
+
+    # Group runs by date, and store the int lumi per date as the max cumulative lumi.
+    # This returns a pandas.Series object.
+    srs_lumi_date = df.groupby(df["date"].dt.strftime('%Y %m %d'))["lumi"].sum()*1.E-6 # in /fb
+
+    figure, axes = plt.subplots()
+
+    x = srs_lumi_date.cumsum().index.values
+    y = srs_lumi_date.cumsum().values
+
+    labels = {
+        "EXP" : rf"Experiment {int(args.exp)}",
+        "RUNS" : rf"Runs: {run_min}-{run_max}",
+        "TOT" : rf"Total $\int\ L\ dt\ (\mathrm{{ONLINE}}) = {df['intLumi'].max()/1.e6:.3f}\ [\mathrm{{fb}}^{{-1}}]$",
+        }
+    labelstr = "\n".join(labels.values())
+
+    axes.plot(x, y, label=labelstr, color="black")
+
+    axes.fill_between(x, y, color="yellow")#, alpha=0.3)
+
+    axes.set_xlabel(r"Date")
+    axes.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]")
+    axes.tick_params(axis="x", labelrotation=45, labelsize="small")
+    axes.legend(loc="best")
+    axes.xaxis.set_major_locator(ticker.AutoLocator())
+    axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+
+    plt.savefig(f"{plotname}.pdf", bbox_inches="tight")
+
+def plotIntLumiVSDateTotal(plotname="graph_total_int_lumi__VS__date"):
+    """
+    Make a graph with the integrated lumi VS date
+    """
+
+    # query the DB
+    reco = "lum_det_shift"
+    cmdexp = f"SELECT {reco} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = ? "
+    if (args.runs):
+        cmdexp += f" AND run >= {min(args.runs)} AND run <= {max(args.runs)}"
+
+    conn = sqlite3.connect(DB)
+
+    # Get the csv as a pandas.Dataframe.
+    df2 = pd.read_sql_query(cmdexp, conn, params=(args.exp,))
+
+    # Include exp 7 runs
+    cmdexp7 = f"SELECT {reco} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = 7 AND run >= 909 AND run <= 4120"
+    df1 = pd.read_sql_query(cmdexp7, conn)
+
+    frames = [df1, df2]
+
+    df = pd.concat(frames)
+
+    print(f"Read {len(df)} runs")
+
+    # convert epoch to date
+    df['date'] = pd.to_datetime(df['date'],unit='s')
+        
+    # cumulative integrated luminosity
+    df['intLumi'] = df['lumi'].cumsum()
+
+    # RUN max, min
+    run_min = df["run"].min()
+    run_max = df["run"].max()
+
+    # Group runs by date, and store the int lumi per date as the max cumulative lumi.
+    # This returns a pandas.Series object.
+    srs_lumi_date = df.groupby(df["date"].dt.strftime('%Y %m %d'))["lumi"].sum()*1.E-6 # in /fb
+
+    figure, axes = plt.subplots()
+
+    x = srs_lumi_date.index.values
+    y = srs_lumi_date.values
+
+    labels = {
+#        "EXP" : rf"Experiment {int(args.exp)}",
+#        "RUNS" : rf"Runs: {run_min}-{run_max}",
+        "TOT" : rf"Total $\int\ L\ dt\ (\mathrm{{ONLINE}}) = {df['intLumi'].max()/1.e6:.3f}\ [\mathrm{{fb}}^{{-1}}]$",
+        }
+    labelstr = "\n".join(labels.values())
+
+    axes.plot(x, y, label=labelstr, color="black")
+
+    axes.fill_between(x, y, color="yellow")#, alpha=0.3)
+
+    axes.set_xlabel(r"Date")
+    axes.set_ylabel(r"Total integrated luminosity per day [$\mathrm{fb}^{-1}$]")
+    axes.tick_params(axis="x", labelrotation=45, labelsize="small")
+    axes.legend(loc="best")
+    axes.xaxis.set_major_locator(ticker.AutoLocator())
+    axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+
+    plt.savefig(f"{plotname}.pdf", bbox_inches="tight")
+
+def plotIntLumiTotal(plotname="graph_total_int_lumi"):
+    """
+    Make a graph with the integrated lumi VS date
+    """
+
+    # query the DB
+    reco = "lum_det_shift"
+    cmdexp = f"SELECT {reco} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = ? "
+    if (args.runs):
+        cmdexp += f" AND run >= {min(args.runs)} AND run <= {max(args.runs)}"
+
+    conn = sqlite3.connect(DB)
+
+    # Get the csv as a pandas.Dataframe.
+    df2 = pd.read_sql_query(cmdexp, conn, params=(args.exp,))
+
+    # Include exp 7 runs
+    cmdexp7 = f"SELECT {reco} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = 7 AND run >= 909 AND run <= 4120"
+    df1 = pd.read_sql_query(cmdexp7, conn)
+
+    frames = [df1, df2]
+
+    df = pd.concat(frames)
+
+    print(f"Read {len(df)} runs")
+
+    # convert epoch to date
+    df['date'] = pd.to_datetime(df['date'],unit='s')
+        
+    # cumulative integrated luminosity
+    df['intLumi'] = df['lumi'].cumsum()
+
+    # RUN max, min
+    run_min = df["run"].min()
+    run_max = df["run"].max()
+
+    # Group runs by date, and store the int lumi per date as the max cumulative lumi.
+    # This returns a pandas.Series object.
+    srs_lumi_date = df.groupby(df["date"].dt.strftime('%Y %m %d'))["lumi"].sum()*1.E-6 # in /fb
+
+    figure, axes = plt.subplots()
+
+    x = srs_lumi_date.cumsum().index.values
+    y = srs_lumi_date.cumsum().values
+
+    labels = {
+#        "EXP" : rf"Experiment {int(args.exp)}",
+#        "RUNS" : rf"Runs: {run_min}-{run_max}",
+        "TOT" : rf"Total $\int\ L\ dt\ (\mathrm{{ONLINE}}) = {df['intLumi'].max()/1.e6:.3f}\ [\mathrm{{fb}}^{{-1}}]$",
+        }
+    labelstr = "\n".join(labels.values())
+
+    axes.plot(x, y, label=labelstr, color="black")
+
+    axes.fill_between(x, y, color="yellow")#, alpha=0.3)
+
+    axes.set_xlabel(r"Date")
+    axes.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]")
     axes.tick_params(axis="x", labelrotation=45, labelsize="small")
     axes.legend(loc="best")
     axes.xaxis.set_major_locator(ticker.AutoLocator())
@@ -163,4 +350,7 @@ if __name__ == '__main__':
         b2.B2FATAL(f"DB {DB} not found. The live luminosity is only available on KEKCC (sorry)")
 
     plotIntLumiVSDate()
+    plotIntLumi()
+    plotIntLumiVSDateTotal()
+    plotIntLumiTotal()
     

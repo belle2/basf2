@@ -32,7 +32,7 @@ namespace Belle2 {
   namespace TRGGRLUNPACKERSPACE {
 
     /** num of leafs in data_b2l **/
-    const int nLeafs = 123 + 3 + 32;
+    const int nLeafs = 123 + 3 + 32 + 7;
     /** num of leafs for others **/
     const int nLeafsExtra = 7;
     /** num of clk time window **/
@@ -127,6 +127,9 @@ namespace Belle2 {
       "X_0",
       "N_cluster_0",
       "ECL_trg_0",
+      "N_track_cut",
+      "N_track_3D",
+      "N_track_NN",
       "CDCL1_count",
       "phi_CDC_int_1",
       "phi_CDC_int_0",
@@ -180,6 +183,10 @@ namespace Belle2 {
       "TSFL1_count",
       "slot64b_TOP_int_1",
       "slot64b_TOP_int_0",
+      "map_TSF3_int_1",
+      "map_TSF3_int_0",
+      "map_TSF1_int_1",
+      "map_TSF1_int_0",
       "map_N_ST",
       "map_ST2_int_1",
       "map_ST2_int_0",
@@ -290,6 +297,9 @@ namespace Belle2 {
       e_ECL_trg_0,
       e_ECL_trg,
       e_ECL_trg_delay,
+      e_N_track_cut,
+      e_N_track_NN,
+      e_N_track_3D,
       e_CDCL1_count,
       e_phi_CDC_int_1,
       e_phi_CDC_int_0,
@@ -343,6 +353,10 @@ namespace Belle2 {
       e_TSFL1_count,
       e_slot64b_TOP_int_1,
       e_slot64b_TOP_int_0,
+      e_map_TSF3_int_1,
+      e_map_TSF3_int_0,
+      e_map_TSF1_int_1,
+      e_map_TSF1_int_0,
       e_N_ST,
       e_map_ST2_int_1,
       e_map_ST2_int_0,
@@ -470,6 +484,9 @@ namespace Belle2 {
 
       991, 0, // ECL_trg (991)
       990, 0, // ECL_trg_delay (990)
+      998, 2, // N_track_cut (998 downto 996)
+      995, 2, // N_track_NN (995 downto 993)
+      992, 2, // N_track_3D (992 downto 990)
       989, 9, // CDCL1_count (989 downto 980)
       979, 3, // phi_CDC_int_1 (979 downto 976)
       975, 31, // phi_CDC_int_0 (975 downto 943)
@@ -523,6 +540,10 @@ namespace Belle2 {
       749, 9, // TSFL1_count
       739, 31, // slot64b_TOP_int_1
       708, 31, // slot64b_TOP_int_0
+      546, 31, // map_TSF3_int_1 (63 downto 32)
+      514, 31, // map_TSF3_int_0 (31 downto 0)
+      482, 31, // map_TSF1_int_1 (63 downto 32)
+      450, 31, // map_TSF1_int_0 (31 downto 0)
       418, 2, // N_ST
       415, 31, // map_ST2_int_1 (63 downto 32)
       383, 31, // map_ST2_int_0 (31 downto 0)
@@ -636,6 +657,9 @@ namespace Belle2 {
       bitArray[e_ECL_trg_0    ] = &(store->m_ECL_trg_0);
       bitArray[e_ECL_trg    ] = &(store->m_ECL_trg);
       bitArray[e_ECL_trg_delay    ] = &(store->m_ECL_trg_delay);
+      bitArray[e_N_track_cut    ] = &(store->m_N_track_cut);
+      bitArray[e_N_track_NN    ] = &(store->m_N_track_NN);
+      bitArray[e_N_track_3D    ] = &(store->m_N_track_3D);
       bitArray[e_CDCL1_count    ] = &(store->m_CDCL1_count);
       bitArray[e_phi_CDC_int_1    ] = &(store->m_phi_CDC_int[1]);
       bitArray[e_phi_CDC_int_0    ] = &(store->m_phi_CDC_int[0]);
@@ -689,6 +713,10 @@ namespace Belle2 {
       bitArray[e_TSFL1_count    ] = &(store->m_TSFL1_count);
       bitArray[e_slot64b_TOP_int_1    ] = &(store->m_slot64b_TOP_int_1);
       bitArray[e_slot64b_TOP_int_0    ] = &(store->m_slot64b_TOP_int_0);
+      bitArray[e_map_TSF3_int_1    ] = &(store->m_map_TSF3_int[1]);
+      bitArray[e_map_TSF3_int_0    ] = &(store->m_map_TSF3_int[0]);
+      bitArray[e_map_TSF1_int_1    ] = &(store->m_map_TSF1_int[1]);
+      bitArray[e_map_TSF1_int_0    ] = &(store->m_map_TSF1_int[0]);
       bitArray[e_N_ST    ] = &(store->m_N_ST);
       bitArray[e_map_ST2_int_1    ] = &(store->m_map_ST2_int[1]);
       bitArray[e_map_ST2_int_0    ] = &(store->m_map_ST2_int[0]);

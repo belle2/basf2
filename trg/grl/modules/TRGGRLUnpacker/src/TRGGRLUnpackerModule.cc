@@ -186,6 +186,8 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
     evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[0] & (1 << i)) != 0);
     evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[0] & (1 << i)) != 0);
     evtinfo->m_map_TSF4[i] = ((rawstore->m_map_TSF4_int[0] & (1 << i)) != 0);
+    evtinfo->m_map_TSF1[i] = ((rawstore->m_map_TSF1_int[0] & (1 << i)) != 0);
+    evtinfo->m_map_TSF3[i] = ((rawstore->m_map_TSF3_int[0] & (1 << i)) != 0);
   }
   for (int i = 32; i < 64; i++) {
     evtinfo->m_map_ST[i] = ((rawstore->m_map_ST_int[1] & (1 << (i - 32))) != 0);
@@ -194,6 +196,8 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
     evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[1] & (1 << (i - 32))) != 0);
     evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[1] & (1 << (i - 32))) != 0);
     evtinfo->m_map_TSF4[i] = ((rawstore->m_map_TSF4_int[1] & (1 << (i - 32))) != 0);
+    evtinfo->m_map_TSF1[i] = ((rawstore->m_map_TSF1_int[1] & (1 << (i - 32))) != 0);
+    evtinfo->m_map_TSF3[i] = ((rawstore->m_map_TSF3_int[1] & (1 << (i - 32))) != 0);
   }
 
 

@@ -49,7 +49,7 @@ main.add_module(
     # luminosity run 2265, exp8, raw data
     # cosmic run 2308, exp8, raw data
     inputFileName="/ghi/fs01/belle2/bdata/Data/Raw/e000" + \
-    str(exp) + "/r0" + str(run) + "/sub00/" + str(runType) + ".000" + str(exp) + ".0" + str(run) + ".HLT*.root",
+    str(exp) + "/r0" + str(run) + "/sub00/" + str(runType) + ".000" + str(exp) + ".0" + str(run) + ".HLT5*",
     branchNames=['RawSVDs'])
 
 main.add_module('Gearbox')

@@ -40,7 +40,7 @@ SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
            "Absolute occupancy threshold: at a first loop, flag as Hot Strip (HS) all those whose occupancy > absOccThreshold", float(0.2));
   addParam("relOccPrec", m_relOccPrec,
            "Precision level on occupancy which is defined to be negligible the calculation of the hit background rate", float(0.1));
-
+  addParam("verbose", m_verbose, " False by default, it allows to switch on the printing of all found HS.", bool(false));
 
 }
 
@@ -274,11 +274,17 @@ void SVDHotStripFinderModule::endRun()
                 hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1 , stripOccAfterAbsCut[l]);
                 hm_occAfter->fill(*itSvdSensors, k, stripOccAfterAbsCut[l]);
               } else {
-                B2RESULT("HS found, occupancy = " << stripOcc[l] << ", Layer: " << layer + 3 << " Ladder: " << ladder << " Sensor: " << sensor <<
-                         " Side: " << k << " channel: " << l);
                 hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, 1);
                 hm_occHot->fill(*itSvdSensors, k, stripOcc[l]);
+
+                TString aux_side = "V/N";
+                if (k) aux_side = "U/P";
+                if (m_verbose) B2RESULT("HS found, occupancy = " << stripOcc[l] << ", Layer: " << layer + 3 << " Ladder: " << ladder << " Sensor: "
+                                          << sensor <<
+                                          " Side: " << k << " channel: " << l);
+
               }
+
             }
 
             for (int s = 0; s < hm_hot_strips->getHistogram(*itSvdSensors, k)->GetEntries(); s++)

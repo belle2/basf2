@@ -80,7 +80,7 @@ namespace Belle2 {
     bool m_useHSFinderV1 = true;
     float m_absThr; /**< Absolute Occupancy Threshold cut for Hot strip finder*/
     float m_relOccPrec; /**< Relative precision on occupancy which is defined to be negligible for the hit background rate estimate. */
-
+    bool m_verbose; /**< False by default, it allows to switch on the printing of all found HS.*/
 
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */

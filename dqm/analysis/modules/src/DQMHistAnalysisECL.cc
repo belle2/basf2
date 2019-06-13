@@ -84,6 +84,7 @@ void DQMHistAnalysisECLModule::initialize()
 void DQMHistAnalysisECLModule::beginRun()
 {
   B2DEBUG(20, "DQMHistAnalysisECL: beginRun called.");
+  m_leg->Clear();
   m_leg->AddEntry(h_crate_time_offsets, "Current run" , "P");
   if (h_crate_time_offsets_ref->GetEntries()) {
     hs->RecursiveRemove(h_crate_time_offsets_ref);

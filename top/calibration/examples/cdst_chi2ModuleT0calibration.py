@@ -262,6 +262,7 @@ class ModuleT0cal(Module):
         return True
 
     def terminate(self):
+        ''' fit histograms, minimize and write results to file '''
 
         # fit time difference distributions
         self.fitHistograms(minEntries)

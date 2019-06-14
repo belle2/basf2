@@ -20,7 +20,7 @@ if __name__ == "__main__":
         nargs="?")
     parser.add_argument("--output", help="Output file name (will be used internally). "
                                          "Defaults to trigger_results.root.",
-                        default="trigger_results.root")
+                        default="software_trigger_results.root")
     choices = ["human-readable"]
     try:
         from tabulate import tabulate

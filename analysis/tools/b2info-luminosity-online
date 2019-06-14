@@ -78,7 +78,7 @@ def argparser():
                         dest="runs",
                         action="store",
                         type=parseNumList,
-                        required=True,
+                        required=False,
                         default=None,
                         help="Process only the selected run range. Syntax is xx-yy,zz")
     parser.add_argument("--verbose",
@@ -93,9 +93,9 @@ def argparser():
                         help="EC: DataBase path")
 
     plot_actions = {
-        "LUMI_PER_DATE" : "Histogram of integrated luminosity per date",
-        "LUMI_PER_RUN"  : "Histogram of integrated luminosity per run",
-        "TOT_LUMI_VS_DATE" : "Graph of total integrated luminosity vs. date",
+        "DATE" : "Histogram of integrated luminosity per date",
+        "RUN"  : "Histogram of integrated luminosity per run",
+        "TOT"  : "Graph of total integrated luminosity vs. date",
         }
 
     parser.add_argument("--plot",
@@ -107,134 +107,180 @@ def argparser():
 
     return parser
 
-
-def create_connection(db_file):
+class luminosity:
     """
-    Create a database connection to the SQLite database specified by the db_file.
-
-    :param db_file: database file
-    :return: Connection object or None
+    class to read lumi info from DB and serve in various way
     """
 
-    if not os.path.exists(db_file):
-        b2.B2FATAL(f"DB {db_file} not found. The live luminosity is only available on KEKCC (sorry)")
+    def __init__(self, args):
+        """
+        initializiation 
 
-    connection = None
-    try:
-        connection = sqlite3.connect(db_file)
-    except sqlite3.Error as e:
-        print(e)
+        :param args: command-line args.
+        """
+        self.DB = args.db
+        self.conn = self.create_connection()
+        self.exp=args.exp
+        self.runs=args.runs
+        self.verb=args.verb
 
-    return connection
+        if not self.conn:
+            b2.b2fatal(f"could not establish connection to db: {db}")
 
+        self.col_lumi = "lum_det_shift"
 
-def printLumi(cursor, args):
-    """
-    Print the integrated lumi for the selected runs.
+        self.df = self.getDataFrameFromDB()
+    
+        
 
-    :param cursor: SQLLite Cursor object.
-    :param args: command-line args.
-    """
+    def create_connection(self):
+        """
+        Create a database connection to the SQLite database specified by the db_file.
 
-    col_lumi = "lum_det_shift"
+        :param db_file: database file
+        :return: Connection object or None
+        """
 
-    cmd = f"SELECT SUM({col_lumi}) as lumi, start_time, end_time FROM prev_bhacnt_det_run WHERE exp = :exp and run = :run"
-    if args.verb:
-        print('-' * 61)
-        print(f"Run No   : Delivererd Lumi  | Run start [JST]")
-        print('-' * 61)
-    L = 0
-    for run in args.runs:
-        cursor.execute(cmd, {"exp":args.exp, "run":run})
-        row = cursor.fetchone()
-        if row['lumi']:
-            if args.verb:
-                runDate = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(row['start_time']))
-                print(f"Run {run:5d}: L = {row['lumi']:8.2f} /nb = {row['lumi']/1E3:8.2f} /pb = {row['lumi']/1E6:8.2f} /fb = {row['lumi']/1E9:8.2f} /ab | {runDate}")
-            L += float(row['lumi'])
+        if not os.path.exists(self.DB):
+            b2.B2FATAL(f"DB {self.DB} not found. The live luminosity is only available on KEKCC (sorry)")
 
-    if args.verb:
-        print('-' * 61)
+        connection = None
+        try:
+            connection = sqlite3.connect(self.DB)
+        except sqlite3.Error as e:
+            print(e)
 
-    print(f"TOTAL    : L = {L:8.2f} /nb = {L/1E3:8.2f} /pb = {L/1E6:8.3f} /fb = {L/1E9:8.4f} /ab")
+        return connection
 
+    def getDataFrameFromDB(self):
+        """
+        crete a panda dataframe from DB
+        """
 
-def plotLumi(connection, args):
-    """
-    Make monitoring plots of luminosity.
+        cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
+        if args.runs:
+            cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
-    :param connection: SQLLite Connection object.
-    :param args: command-line args.
-    """
+        # Get the DB as a pandas.Dataframe.
+        df = pd.read_sql_query(cmdexp, self.conn, params=(self.exp,))
+        print(f"Read {len(df)} runs for experiment {self.exp}")
 
-    col_lumi = "lum_det_shift"
+        # convert epoch to date
+        df['date'] = pd.to_datetime(df['date'],unit='s')
 
-    cmdexp = f"SELECT {col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
-    if args.runs:
-        cmdexp += f" AND run >= {min(args.runs)} AND run <= {max(args.runs)}"
+        # cumulative integrated luminosity
+        df['intLumi'] = df['lumi'].cumsum()
 
-    # Get the DB as a pandas.Dataframe.
-    df = pd.read_sql_query(cmdexp, connection, params=(args.exp,))
-    print(f"Read {len(df)} runs")
+        return df
 
-    # convert epoch to date
-    df['date'] = pd.to_datetime(df['date'],unit='s')
+    def plotLumi(self, period=1):
+        """
+        Make monitoring plots of luminosity.
 
-    # cumulative integrated luminosity
-    df['intLumi'] = df['lumi'].cumsum()
+        :param period: 1 for day, 2 for week (start on monday)
+        """
 
-    # RUN max, min
-    run_min = df["run"].min()
-    run_max = df["run"].max()
+        # RUN max, min
+        run_min = self.df["run"].min()
+        run_max = self.df["run"].max()
 
-    # Group runs by date, and store the int lumi per date as the max cumulative lumi.
-    # This returns a pandas.Series object.
-    srs_lumi_date = df.groupby(df["date"].dt.strftime('%d %m %Y'))["lumi"].sum()*1.E-6 # in /fb
+        # Group runs by date, and store the int lumi per date as the max cumulative lumi.
+        # This returns a pandas.Series object.
+        srs_lumi_date = []
+        if period==1: # per day
+            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()*1.E-6 # in /fb
+            label="Day"
+        if period==2: # per week
+            # not working yet
+            srs_lumi_date = self.df.groupby(self.df["date", pd.Grouper(key='Date', freq='W-MON')])["lumi"].sum()*1.E-6 # in /fb
+            label="Week"
 
-    figure, axes = plt.subplots()
+        figure, ax1 = plt.subplots()
 
-    x = srs_lumi_date.index.values
-    y = srs_lumi_date.values
+        x = srs_lumi_date.index.values
+        x[0] = x[1] # groupby insert first date as eopch 0
+        y = srs_lumi_date.values
 
-    labels = {
-        "EXP" : rf"Experiment {int(args.exp)}",
-        "RUNS" : rf"Runs: {run_min}-{run_max}",
-        "TOT" : rf"Total $\int\ L\ dt\ (\mathrm{{ONLINE}}) = {df['intLumi'].max()/1.e6:.2f}\ [\mathrm{{fb}}^{{-1}}]$",
-        }
-    labelstr = "\n".join(labels.values())
+        # there must be a cleanerr way to do this
+        yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[:-1])
+        
+        ax1.bar(x, y, label=f"{label} per {label}", color="blue")
 
-    axes.bar(x, y, label=labelstr, color="black")
+        ax1.set_xlabel(r"Date")
+        ax1.set_ylabel(rf"Total integrated luminosity per {label} [$\mathrm{{fb}}^{{-1}}$]", color="blue")
+        ax1.tick_params(axis='y', labelcolor="blue")
 
-    axes.fill_between(x, y, color="yellow")#, alpha=0.3)
+        ax1.tick_params(axis="x", labelrotation=45, labelsize="small")
+        ax1.xaxis.set_major_locator(ticker.AutoLocator())
+        ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
 
-    axes.set_xlabel(r"Date")
-    axes.set_ylabel(r"Total integrated luminosity per day [$\mathrm{fb}^{-1}$]")
-    axes.tick_params(axis="x", labelrotation=45, labelsize="small")
-    axes.legend(loc="best")
-    axes.xaxis.set_major_locator(ticker.AutoLocator())
-    axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        # plot integrate lumi
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
+        ax2.tick_params(axis='y', labelcolor="red")
+        full = ax2.plot(x, yInt, color="red", label="Total")
+        ax2.xaxis.set_major_locator(ticker.AutoLocator())
+        ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
 
-    # Text box. Use axis coords.
-    plt.text(0.05, 0.7, r"$Belle\ II$", transform=axes.transAxes, fontsize=16)
+        h1, l1 = ax1.get_legend_handles_labels()
+        h2, l2 = ax2.get_legend_handles_labels()
+        ax2.legend(h1+h2, l1+l2,loc="best",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 
-    plt.savefig(f"{plotname}.pdf", bbox_inches="tight")
+        # Text box. Use axis coords.
+        plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
+        plt.text(.5, 1.03, rf"Exp: {self.exp} - Runs {run_min}-{run_max}", transform=ax1.transAxes, fontsize=12)
+        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max()/1.e6:.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
+
+        plt.savefig(f"LumiPer{label}_Exp{self.exp}.pdf", bbox_inches="tight")
+        plt.savefig(f"LumiPer{label}_Exp{self.exp}.png", bbox_inches="tight")
+
+    def plotLumiPerRun(self):
+        """
+        Make lumi plot per run
+        """
+        pass
+
+    def printLumi(self):
+        """
+        print luminosity for runs and total
+        """
+        # these are the runs to be selected
+        if (self.runs):
+            dfRuns=self.df[self.df['run'].isin(self.runs)]
+            dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
+        else:
+            dfRuns=self.df
+        # create a reduced dataframe with only runs selected
+
+        cols=['run','lumi','date','intLumi']
+        if (self.verb):
+            print('-' * 61)
+            print(dfRuns[cols]
+                .to_string(index=False,
+                    formatters={"run" : "{:5d}".format,
+                    "lumi" : "{:,.2f}".format,
+                    "data" : "".format,
+                    "intLumi" : "{:,.2f}".format,
+                    }
+                                ))
+            print('-' * 61)
+        L=dfRuns['lumi'].sum()
+        print(f"TOTAL    : L = {L:8.2f} /nb = {L/1E3:8.2f} /pb = {L/1E6:8.3f} /fb = {L/1E9:8.4f} /ab")
+        
+        pass
 
 
 if __name__ == '__main__':
 
     args = argparser().parse_args()
+    
+    lumi=luminosity(args)
 
-    DB = args.db
-    conn = create_connection(DB)
-    if not conn:
-        b2.B2FATAL(f"Could not establish connection to DB: {DB}")
+    lumi.printLumi()
 
-    with conn:
-
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-
-        printLumi(cursor, args)
-
-        if args.plot:
-            plotLumi(conn, args)
+    if args.plot:
+        if "DATE" in args.plot():
+            lumi.plotLumi(1)
+            #lumi.plotLumi(2)
+        if "RUN" in args.plot():
+            lumi.plotLumiPerRun(1)

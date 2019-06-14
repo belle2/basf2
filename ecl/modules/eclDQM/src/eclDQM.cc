@@ -176,7 +176,7 @@ void ECLDQMModule::defineHisto()
     std::string h_name, h_title;
     h_name = str(boost::format("time_crate_%1%_Thr1GeV") % (crate));
     h_title = str(boost::format("Reconstructed time for ECL crate #%1% with Thr = 1 GeV") % (crate));
-    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 8240, -1030, 1030);
+    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 400, -100, 100);
     h->GetXaxis()->SetTitle("time [ns]");
     h->SetOption("LIVE");
     h_time_crate_Thr1GeV.push_back(h);

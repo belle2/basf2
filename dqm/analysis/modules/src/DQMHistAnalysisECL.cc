@@ -115,12 +115,9 @@ void DQMHistAnalysisECLModule::timeCrate(TH1F* h, Int_t* st)
     std::string h_title = "ECL/time_crate_" + std::to_string(i + 1) + "_Thr1GeV";
     h_time_crate_Thr1GeV = findHist(h_title);
     if (h_time_crate_Thr1GeV != NULL) {
-      TH1* hclone = h_time_crate_Thr1GeV->Rebin(2, "hclone");
-      hclone->GetXaxis()->SetRange(2020, 2100);
-      if (hclone->GetEntries() < 100) st[i] = 1;
-      h->SetBinContent(i + 1, hclone->GetMean());
-      h->SetBinError(i + 1, hclone->GetMeanError());
-      delete hclone;
+      if (h_time_crate_Thr1GeV->GetEntries() < 100) st[i] = 1;
+      h->SetBinContent(i + 1, h_time_crate_Thr1GeV->GetMean());
+      h->SetBinError(i + 1, h_time_crate_Thr1GeV->GetMeanError());
     } else {
       st[i] = 1;
       h->SetBinContent(i + 1, 0);

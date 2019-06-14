@@ -460,7 +460,7 @@ void SVDHotStripFinderModule::terminate()
               /*
                        threshold is corrected by the real number of alive strips
                */
-              threshold_corrections = threshold_corrections * 768.0 / (float)it1st;
+              threshold_corrections = threshold_corrections * sqrt(768.0 / (float)it1st);
               if (ibase == 32) threshold_corrections = 24.0;
               if (ibase == 64) threshold_corrections = 12.0;
               if (ibase == 128) threshold_corrections = 6.0;
@@ -486,7 +486,7 @@ void SVDHotStripFinderModule::terminate()
               div_t test = div(l, ibase);
               position1[l] = position1[l] * nCltrk[test.quot] / (float)occupancy[test.quot];
               float threshold_corrections = 1.0;
-              threshold_corrections = threshold_corrections * 768.0 / (float)it;
+              threshold_corrections = threshold_corrections * sqrt(768.0 / (float)it);
               if (ibase == 32) threshold_corrections =  24.0;
               if (ibase == 64) threshold_corrections =  12.0;
               if (ibase == 128) threshold_corrections = 6.0;

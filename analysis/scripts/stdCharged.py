@@ -54,7 +54,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
 
     # basic quality cut strings
     trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
-    ipCut = 'dr < 0.5 and abs(z0) < 2'
+    ipCut = 'dr < 0.5 and abs(dz) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 
     if particletype not in _chargednames:

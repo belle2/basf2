@@ -141,7 +141,7 @@ void DQMHistAnalysisPXDCMModule::event()
       // outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside;
       all += current;
-      double dhpc = m_hCommonMode->GetBinContent(64);
+      double dhpc = hh1->GetBinContent(64);
       all_cm += dhpc;
       if (current > 1) {
         error_flag |= (outside / current > 1e-6); /// TODO level might need adjustment

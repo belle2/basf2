@@ -12,7 +12,12 @@ import numpy as np
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Print the results of the SoftwareTrigger decision for a certain file.")
-    parser.add_argument("input", help="Input file name (where to read the events from)")
+    parser.add_argument(
+        "input",
+        help="Input file name (where to read the events from). "
+        "If omitted, just use the already produced result by another SoftwareTriggerResultPrinter execution",
+        default="",
+        nargs="?")
     parser.add_argument("--output", help="Output file name (will be used internally). "
                                          "Defaults to trigger_results.root.",
                         default="trigger_results.root")
@@ -29,19 +34,20 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # The prescales are only valid when using the online database!
-    basf2.reset_database()
-    basf2.use_central_database("online")
+    if args.input:
+        # The prescales are only valid when using the online database!
+        basf2.reset_database()
+        basf2.use_central_database("online")
 
-    path = basf2.Path()
+        path = basf2.Path()
 
-    if args.input.endswith(".sroot"):
-        path.add_module("SeqRootInput", inputFileName=args.input)
-    else:
-        path.add_module("RootInput", inputFileName=args.input)
-    path.add_module("SoftwareTriggerResultPrinter", outputFileName=args.output)
+        if args.input.endswith(".sroot"):
+            path.add_module("SeqRootInput", inputFileName=args.input)
+        else:
+            path.add_module("RootInput", inputFileName=args.input)
+        path.add_module("SoftwareTriggerResultPrinter", outputFileName=args.output)
 
-    basf2.process(path)
+        basf2.process(path)
 
     df = read_root(args.output)
 

@@ -240,6 +240,6 @@ def get_object_with_name(object_name, root=None):
     if "." in object_name:
         namespace, object_name = object_name.split(".", 1)
 
-        return get_object_with_name(object_name, get_object_with_name(namespace))
+        return get_object_with_name(object_name, get_object_with_name(namespace, root=root))
 
     return getattr(root, object_name)

@@ -17,9 +17,6 @@ import multiprocessing
 import basf2
 import subprocess
 
-import ROOT
-from ROOT import Belle2
-
 
 def skip_test(reason):
     """Skip a test script with a given reason. This function will end the script
@@ -206,6 +203,8 @@ def get_streamer_checksums(objects):
 
     Returns a dictionary object name -> (version, checksum).
     """
+    import ROOT
+
     # Write out the objects to a mem file
     f = ROOT.TMemFile("test_mem_file", "RECREATE")
     f.cd()
@@ -225,7 +224,7 @@ def get_streamer_checksums(objects):
     return streamer_checksums
 
 
-def get_object_with_name(object_name, root=Belle2):
+def get_object_with_name(object_name, root=None):
     """
     (Possibly) recursively get the object with the given name from the Belle2 namespace.
 
@@ -234,6 +233,10 @@ def get_object_with_name(object_name, root=Belle2):
 
     If not, the object is extracted via a getattr call.
     """
+    if root is None:
+        from ROOT import Belle2
+        root = Belle2
+
     if "." in object_name:
         namespace, object_name = object_name.split(".", 1)
 

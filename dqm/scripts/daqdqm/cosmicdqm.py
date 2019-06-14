@@ -21,9 +21,11 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                      For dqm_mode == "dont_care" all the DQM modules should be added.
                      For dqm_mode == "all_events" only the DQM modules which should run on all events
                             (filtered and dismissed) should be added
+                     For dqm_mode == "before_reco" only thw DQM modules which should run before
+                            all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
     """
-    assert dqm_mode in ["dont_care", "all_events", "filtered"]
+    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_reco"]
 
     add_common_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode="dont_care")

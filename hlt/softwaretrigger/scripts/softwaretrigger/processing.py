@@ -126,6 +126,9 @@ def add_hlt_processing(path,
     add_geometry_if_not_present(path)
     add_unpackers(path, components=unpacker_components)
 
+    # Add the part of the dqm modules, which should run before every reconstruction
+    add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_reco)
+
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:
             accept_path = add_softwaretrigger_reconstruction(path, components=reco_components,

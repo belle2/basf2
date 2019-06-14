@@ -97,6 +97,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get module active-channel map.
+     */
+    const KLMChannelMapValue<unsigned int>& getModuleActiveChannelMap() const
+    {
+      return m_ModuleActiveChannelMap;
+    }
+
+    /**
      * Get total hit number.
      */
     unsigned int getTotalHitNumber() const
@@ -141,6 +149,9 @@ namespace Belle2 {
 
     /** Module hit map. */
     KLMChannelMapValue<unsigned int> m_HitMapModule;
+
+    /** Module active-channel map (number of active channels in module). */
+    KLMChannelMapValue<unsigned int> m_ModuleActiveChannelMap;
 
     /** Total hit number. */
     unsigned int m_TotalHitNumber = 0;

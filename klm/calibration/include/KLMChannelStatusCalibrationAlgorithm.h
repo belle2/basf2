@@ -57,6 +57,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get minimal average number of hits per channel required for calibration.
+     */
+    double getMinimalAverageHitNumber() const
+    {
+      return m_MinimalAverageHitNumber;
+    }
+
+    /**
      * Set minimal average number of hits per channel required for calibration.
      */
     void setMinimalAverageHitNumber(double minimalAverageHitNumber)

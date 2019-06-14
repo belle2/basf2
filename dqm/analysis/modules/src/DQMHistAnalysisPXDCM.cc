@@ -144,10 +144,10 @@ void DQMHistAnalysisPXDCMModule::event()
       double dhpc = hh1->GetBinContent(64);
       all_cm += dhpc;
       if (current > 1) {
-        error_flag |= (outside / current > 1e-6); /// TODO level might need adjustment
-        warn_flag |= (outside / current > 1e-8); /// TODO level might need adjustment
-        error_flag |= (dhpc / current > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
-        warn_flag |= (dhpc / current > 1e-8); // DHP Fifo overflow ... might be critical/unrecoverable
+        error_flag |= (outside / current > 1e-5); /// TODO level might need adjustment
+        warn_flag |= (outside / current > 1e-6); /// TODO level might need adjustment
+        error_flag |= (dhpc / current > 1e-5); // DHP Fifo overflow ... might be critical/unrecoverable
+        warn_flag |= (dhpc / current > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
       }
     }
   }
@@ -161,10 +161,10 @@ void DQMHistAnalysisPXDCMModule::event()
     status = 0; // default
   } else {
     /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-    if (all_outside / all > 1e-6 || all_cm / all > 1e-6 || error_flag) {
+    if (all_outside / all > 1e-5 || all_cm / all > 1e-5 || error_flag) {
       m_cCommonMode->Pad()->SetFillColor(kRed);// Red
       status = 4;
-    } else if (all_outside / all > 1e-8 || all_cm / all > 1e-8 || warn_flag) {
+    } else if (all_outside / all > 1e-6 || all_cm / all > 1e-6 || warn_flag) {
       m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
       status = 3;
     } else if (all_outside == 0. && all_cm == 0.) {

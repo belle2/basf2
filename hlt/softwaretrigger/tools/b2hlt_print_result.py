@@ -54,14 +54,14 @@ if __name__ == "__main__":
     df.index = df.index.str.replace("_", " ")
 
     # Separate cuts and prescaling
-    df_prescales = df["False"]
-    df_cuts = df["True"]
+    df_prescales = df["False"].copy()
+    df_cuts = df["True"].copy()
 
     # For the prescaling, the total_events is nonsense...
     df_prescales.loc["total events"] = np.NAN
 
     # Now also separate out only the accepted results
-    df_cuts = df_cuts["True"]
+    df_cuts = df_cuts["True"].copy()
 
     # Give the columns some meaningful names
     df_cuts = df_cuts[["True", "False"]]
@@ -70,6 +70,8 @@ if __name__ == "__main__":
     # Make sure to print all information
     pd.set_option("display.max_rows", 500)
     pd.set_option("display.max_colwidth", 200)
+    pd.set_option('display.max_columns', 500)
+    pd.set_option('display.width', 1000)
 
     # Function used for formatting
     def format(x, total_events):

@@ -28,4 +28,4 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     """
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_reco"]
 
-    add_common_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode="dont_care")
+    add_common_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)

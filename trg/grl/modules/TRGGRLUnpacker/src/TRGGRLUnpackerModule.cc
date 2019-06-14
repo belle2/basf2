@@ -2,9 +2,9 @@
 // $Id$
 //---------------------------------------------------------------
 // Filename : TRGGRLUnpackerModule.cc
-// Section  :
-// Owner    :
-// Email    :
+// Section  : TRG GRL
+// Owner    : Yun-Tsung Lai
+// Email    : ytlai@post.kek.jp
 //---------------------------------------------------------------
 // Description : TRGGRLUnpacker Module
 //---------------------------------------------------------------

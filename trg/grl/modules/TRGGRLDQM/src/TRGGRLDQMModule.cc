@@ -1,14 +1,14 @@
 //---------------------------------------------------------------
 // $Id$
 //---------------------------------------------------------------
-// Filename : TRGGRLModule.cc
+// Filename : TRGGRLDQMModule.cc
 // Section  : TRG GRL
-// Owner    :
-// Email    :
+// Owner    : Yun-Tsung Lai
+// Email    : ytlai@post.kek.jp
 //---------------------------------------------------------------
-// Description : A trigger module for TRG GRL
+// Description : DQM module for TRGGRL
 //---------------------------------------------------------------
-// 1.00 : 2017/05/08 : First version
+// 1.00 : 2019/06/14 : First version
 //---------------------------------------------------------------
 #include <trg/grl/modules/TRGGRLDQM/TRGGRLDQMModule.h>
 

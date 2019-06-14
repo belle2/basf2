@@ -2,9 +2,9 @@
 // $Id$
 //---------------------------------------------------------------
 // Filename : TRGGRLUnpackerModule.cc
-// Section  : TRG GRL
-// Owner    : Yun-Tsung Lai
-// Email    : ytlai@post.kek.jp
+// Section  :
+// Owner    :
+// Email    :
 //---------------------------------------------------------------
 // Description : TRGGRLUnpacker Module
 //---------------------------------------------------------------
@@ -32,6 +32,7 @@ TRGGRLUnpackerModule::TRGGRLUnpackerModule()
 
   string desc = "TRGGRLUnpackerModule(" + version() + ")";
   setDescription(desc);
+  setPropertyFlags(c_ParallelProcessingCertified);
   B2INFO("TRGGRLUnpacker: Constructor done.");
 }
 

@@ -145,10 +145,10 @@ def add_hlt_processing(path,
         add_roi_finder(accept_path)
 
         # Add the HLT DQM modules only in case the event is accepted
-        add_hlt_dqm(accept_path, run_type=run_type, components=reco_components)
+        add_hlt_dqm(accept_path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
     else:
         # Add the HLT DQM modules always
-        add_hlt_dqm(path, run_type=run_type, components=reco_components)
+        add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
 
     # Make sure to create ROI payloads for sending them to ONSEN
     # Do this for all events
@@ -157,6 +157,9 @@ def add_hlt_processing(path,
     # (b) we are running in monitoring mode, we ignore the decision
     pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor) or not do_reconstruction
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
+
+    # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
+    add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events)
 
     if prune_output:
         path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS)

@@ -86,21 +86,31 @@ void SVDUnpackerDQMModule::defineHisto()
   const unsigned short Bins_UpsetAPV = 1;
   const unsigned short Bins_BadMapping = 1;
   const unsigned short Bins_BadHeader = 1;
-  const unsigned short Bins_BadTrailer = 1;
+  const unsigned short Bins_MissedTrailer = 1;
+  const unsigned short Bins_MissedHeader = 1;
+
 
   const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
-                               Bins_BadMapping + Bins_BadHeader + Bins_BadTrailer;
+                               Bins_BadMapping + Bins_BadHeader + Bins_MissedTrailer + Bins_MissedHeader;
 
   DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
+  DQMEventFractionHisto = new TH1S("DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
 
   DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
 
+  DQMEventFractionHisto->GetYaxis()->SetTitle("# of Events");
+  DQMEventFractionHisto->GetYaxis()->SetTitleOffset(1.5);
+  DQMEventFractionHisto->SetMinimum(0);
 
-  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "badHead", "badTrail", "badMapping"};
+  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "EVTmatch", "missHead", "missTrail", "badMapping"};
 
-  //preparing X axis of the histogram
+
+  //preparing X axis of the histograms
   for (unsigned short i = 0; i < nBits; i++) DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
+
+  DQMEventFractionHisto->GetXaxis()->SetBinLabel(1, "OK");
+  DQMEventFractionHisto->GetXaxis()->SetBinLabel(2, "Error(s)");
 
 
   oldDir->cd();
@@ -121,16 +131,21 @@ void SVDUnpackerDQMModule::beginRun()
 {
 
   StoreObjPtr<EventMetaData> evtMetaData;
-  int expNumber = evtMetaData->getExperiment();
-  int runNumber = evtMetaData->getRun();
+  expNumber = evtMetaData->getExperiment();
+  runNumber = evtMetaData->getRun();
+  errorFraction = 0;
+
   TString histoTitle = TString::Format("SVD Data Format Monitor, Exp %d Run %d", expNumber, runNumber);
-
-
 
   if (DQMUnpackerHisto != NULL) {
     DQMUnpackerHisto->Reset();
     DQMUnpackerHisto->SetTitle(histoTitle.Data());
   }
+
+  if (DQMEventFractionHisto != NULL) {
+    DQMEventFractionHisto->Reset();
+  }
+
 
   shutUpNoData = false;
 
@@ -150,6 +165,9 @@ void SVDUnpackerDQMModule::beginRun()
     fadc_map.insert(make_pair(fadc, ++ifadc));
     DQMUnpackerHisto->GetYaxis()->SetBinLabel(ifadc, to_string(fadc).c_str());
   }
+
+  nEvents = 0;
+  nBadEvents = 0;
 }
 
 
@@ -160,6 +178,8 @@ void SVDUnpackerDQMModule::event()
       shutUpNoData = true;
     }
 
+  badEvent = 0;
+  nEvents++;
 
   unsigned int nDiagnostics = m_svdDAQDiagnostics.getEntries();
 
@@ -177,6 +197,8 @@ void SVDUnpackerDQMModule::event()
     badMapping = m_svdDAQDiagnostics[i]->getBadMapping();
     badHeader = m_svdDAQDiagnostics[i]->getBadHeader();
     badTrailer = m_svdDAQDiagnostics[i]->getBadTrailer();
+    missedHeader = m_svdDAQDiagnostics[i]->getMissedHeader();
+    missedTrailer = m_svdDAQDiagnostics[i]->getMissedTrailer();
 
     fadcNo = m_svdDAQDiagnostics[i]->getFADCNumber();
     //apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
@@ -187,7 +209,10 @@ void SVDUnpackerDQMModule::event()
     }
 
     if (ftbFlags != 0 or ftbError != 240 or apvError != 0 or !apvMatch or !fadcMatch or upsetAPV or badMapping or badHeader
-        or badTrailer) {
+        or badTrailer or missedHeader or missedTrailer) {
+
+      badEvent = 1;
+
       auto ybin = fadc_map.find(fadcNo);
 
       if (badMapping)  {
@@ -196,12 +221,13 @@ void SVDUnpackerDQMModule::event()
           fadc_map.clear();
           break;
         } else {
-          DQMUnpackerHisto->Fill(19, ybin->second);
+          DQMUnpackerHisto->Fill(20, ybin->second);
         }
       }
 
       if (badHeader) DQMUnpackerHisto->Fill(17, ybin->second);
-      if (badTrailer) DQMUnpackerHisto->Fill(18, ybin->second);
+      if (missedHeader) DQMUnpackerHisto->Fill(18, ybin->second);
+      if (badTrailer or missedTrailer) DQMUnpackerHisto->Fill(19, ybin->second);
 
       if (ftbFlags != 0) {
         if (ftbFlags & 16) DQMUnpackerHisto->Fill(5, ybin->second);
@@ -244,6 +270,28 @@ void SVDUnpackerDQMModule::event()
   if (changeFADCaxis) {
     for (auto& iFADC : fadc_map)  DQMUnpackerHisto->GetYaxis()->SetBinLabel(iFADC.second, to_string(iFADC.first).c_str());
   }
+  if (badEvent) nBadEvents++;
+  errorFraction = 100 * float(nBadEvents) / float(nEvents);
+
+  if (DQMEventFractionHisto != NULL) {
+    TString histoFractionTitle = TString::Format("SVD bad events fraction: %f %%,  Exp %d Run %d", errorFraction, expNumber, runNumber);
+    DQMEventFractionHisto->SetTitle(histoFractionTitle.Data());
+  }
+
+
+  DQMEventFractionHisto->Fill(badEvent);
 
 } // end event function
 
+
+void SVDUnpackerDQMModule::endRun()
+{
+  // Summary report on SVD DQM monitor
+  if (nBadEvents) {
+    B2WARNING("=================== SVD DQM Data Format Statistics: =============");
+    B2WARNING(" We found " << nBadEvents << "/" << nEvents << " corrupted events, which is " << errorFraction <<
+              "%");
+    B2WARNING("=================================================================");
+  }
+
+}

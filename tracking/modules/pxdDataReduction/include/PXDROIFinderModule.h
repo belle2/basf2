@@ -56,8 +56,8 @@ namespace Belle2 {
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
 
-    double m_toleranceZ;
-    double m_tolerancePhi;
+    double m_toleranceZ; /**< tolerance for finding sensor in Z coordinate (cm) */
+    double m_tolerancePhi; /**< tolerance for finding sensor in phi coordinate (radians) */
 
     double m_sigmaSystU; /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI U width */
     double m_sigmaSystV;  /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI V width */

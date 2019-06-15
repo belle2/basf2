@@ -10,9 +10,6 @@
 
 #pragma once
 
-/* External headers. */
-#include <TObject.h>
-
 namespace Belle2 {
 
   /**

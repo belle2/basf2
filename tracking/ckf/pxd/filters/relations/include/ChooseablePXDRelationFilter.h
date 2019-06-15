@@ -16,5 +16,6 @@
 namespace Belle2 {
   /// A chooseable filter for picking out the relations between states
   extern template class LayerPXDRelationFilter<TrackFindingCDC::ChooseableFilter<PXDPairFilterFactory>>;
+  /// A chooseable filter for picking out the relations between states
   using ChooseablePXDRelationFilter = LayerPXDRelationFilter<TrackFindingCDC::ChooseableFilter<PXDPairFilterFactory>>;
 }

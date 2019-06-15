@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
+#include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -35,7 +36,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
@@ -63,7 +64,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cCommonMode = new TCanvas("c_CommonMode");
+  m_cCommonMode = new TCanvas((m_histogramDirectoryName + "/c_CommonMode").data());
   m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 64, 0, 64);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
@@ -91,7 +92,9 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  mychid.resize(2);
+  SEVCHK(ca_create_channel((m_pvPrefix + "Outside").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   B2DEBUG(99, "DQMHistAnalysisPXDCM: initialized.");
@@ -108,7 +111,7 @@ void DQMHistAnalysisPXDCMModule::beginRun()
 void DQMHistAnalysisPXDCMModule::event()
 {
   double all_outside = 0.0, all = 0.0;
-  bool dhp_fifo_overflow = false;
+  double all_cm = 0.0;
   bool error_flag = false;
   bool warn_flag = false;
   if (!m_cCommonMode) return;
@@ -130,17 +133,21 @@ void DQMHistAnalysisPXDCMModule::event()
         v = hh1->GetBinContent(bin);
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         current += v;
-        dhp_fifo_overflow |= (bin == 64 && v > 0.0); // DHP Fifo overflow ... might be critical/unrecoverable
       }
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
-      outside += hh1->Integral(16, 64);
-      outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
+      outside += hh1->Integral(16, 63);
+      // FIXME currently we have to much noise below the line ... thsu excluding this to avoid false alarms
+      // outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside;
       all += current;
+      double dhpc = hh1->GetBinContent(64);
+      all_cm += dhpc;
       if (current > 1) {
         error_flag |= (outside / current > 1e-6); /// TODO level might need adjustment
         warn_flag |= (outside / current > 1e-8); /// TODO level might need adjustment
+        error_flag |= (dhpc / current > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
+        warn_flag |= (dhpc / current > 1e-8); // DHP Fifo overflow ... might be critical/unrecoverable
       }
     }
   }
@@ -148,18 +155,24 @@ void DQMHistAnalysisPXDCMModule::event()
 
 
   // not enough Entries
+  int status = 0;
   if (all < 100.) {
     m_cCommonMode->Pad()->SetFillColor(kGray);// Magenta or Gray
+    status = 0; // default
   } else {
     /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-    if (all_outside / all > 1e-6 || dhp_fifo_overflow || error_flag) {
+    if (all_outside / all > 1e-6 || all_cm / all > 1e-6 || error_flag) {
       m_cCommonMode->Pad()->SetFillColor(kRed);// Red
-    } else if (all_outside / all > 1e-8 || warn_flag) {
+      status = 4;
+    } else if (all_outside / all > 1e-8 || all_cm / all > 1e-8 || warn_flag) {
       m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
-    } else if (all_outside == 0.) {
+      status = 3;
+    } else if (all_outside == 0. && all_cm == 0.) {
       m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
+      status = 2;
     } else { // between 0 and 50 ...
       m_cCommonMode->Pad()->SetFillColor(kWhite);// White
+      status = 1;
     }
   }
 
@@ -170,11 +183,17 @@ void DQMHistAnalysisPXDCMModule::event()
     m_line3->Draw();
   }
 
+  auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+  tt->SetTextAngle(90);// Rotated
+  tt->SetTextAlign(12);// Centered
+  tt->Draw();
+
   m_cCommonMode->Modified();
   m_cCommonMode->Update();
 #ifdef _BELLE2_EPICS
   double data = all > 0 ? (all_outside / all) : 0;
-  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+  SEVCHK(ca_put(DBR_INT, mychid[1], (void*)&status), "ca_set failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
@@ -182,10 +201,9 @@ void DQMHistAnalysisPXDCMModule::event()
 void DQMHistAnalysisPXDCMModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
-  // m_cCommonMode->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  if (mychid) SEVCHK(ca_clear_channel(mychid), "ca_clear_channel failure");
+  for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }

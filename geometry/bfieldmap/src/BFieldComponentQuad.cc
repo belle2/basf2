@@ -40,7 +40,7 @@ ForwardIterator linear_sentinel(ForwardIterator it, const T& val, Compare comp)
   do {
     if (comp(val, *it)) break;
     ++it;
-  } while (1);
+  } while (true);
   return it;
 }
 

@@ -82,12 +82,12 @@ void SelectDaughtersModule::event()
     std::vector<Particle*> daughters = particle->getDaughters();
     std::vector<const Particle*> selParticles = m_decaydescriptor.getSelectionParticles(particle);
 
-    for (unsigned idau = 0; idau < daughters.size(); idau++) {
+    for (auto& daughter : daughters) {
       bool isSel = false;
-      for (unsigned isel = 0; isel < selParticles.size(); isel++) {
-        if (daughters[idau] == selParticles[isel]) isSel = true;
+      for (auto& selParticle : selParticles) {
+        if (daughter == selParticle) isSel = true;
       }
-      if (!isSel) particle->removeDaughter(daughters[idau]);
+      if (!isSel) particle->removeDaughter(daughter);
     }
   }
 }

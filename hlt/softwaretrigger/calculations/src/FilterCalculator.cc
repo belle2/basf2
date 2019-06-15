@@ -61,6 +61,7 @@ void FilterCalculator::requireStoreArrays()
 {
   m_tracks.isRequired();
   m_eclClusters.isRequired();
+  m_l1Trigger.isOptional();
 }
 
 void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
@@ -119,6 +120,14 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["eeFlat6"] = 0;
   calculationResult["eeFlat7"] = 0;
   calculationResult["eeFlat8"] = 0;
+  // Passed on L1 information
+  if (m_l1Trigger.isValid()) {
+    calculationResult["l1_trigger_random"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND;
+    calculationResult["l1_trigger_delayed_bhabha"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
+  } else {
+    calculationResult["l1_trigger_random"] = -1;
+    calculationResult["l1_trigger_delayed_bhabha"] = -1;
+  }
 
   calculationResult["true"] = 1;
   calculationResult["false"] = 0;

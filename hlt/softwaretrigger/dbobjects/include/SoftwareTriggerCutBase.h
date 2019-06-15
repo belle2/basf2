@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <vector>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   /**
@@ -22,15 +23,16 @@ namespace Belle2 {
   class SoftwareTriggerCutBase {
   public:
     /// Create a new base instance. This should rarely be called by yourself.
-    SoftwareTriggerCutBase(const std::vector<unsigned int>& preScaleFactor = {1}, const bool& isRejectCut = false) :
-      m_preScaleFactor(preScaleFactor), m_isRejectCut(isRejectCut)
+    SoftwareTriggerCutBase(unsigned int preScaleFactor = 1, const bool& isRejectCut = false) :
+      m_preScaleFactor( {preScaleFactor}), m_isRejectCut(isRejectCut)
     {
     }
 
     /// Return the list of pre scale factors.
-    const std::vector<unsigned int>& getPreScaleFactor() const
+    unsigned int getPreScaleFactor() const
     {
-      return m_preScaleFactor;
+      B2ASSERT("Prescale factor should only have a single entry!", m_preScaleFactor.size() == 1);
+      return m_preScaleFactor[0];
     }
 
     /// Returns true, if the cut is a reject cut and false otherwise.
@@ -45,7 +47,7 @@ namespace Belle2 {
     /// Do not copy this object.
     SoftwareTriggerCutBase(const SoftwareTriggerCutBase& rhs) = delete;
 
-    /// The internal storage of the prescale factor of the cut.
+    /// The internal storage of the prescale factor of the cut. In former times, this was a vector but is not used anymore (only single entry)
     std::vector<unsigned int> m_preScaleFactor = {1};
     /// The internal storage if it is a reject cut.
     bool m_isRejectCut = false;

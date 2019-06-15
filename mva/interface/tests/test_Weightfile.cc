@@ -29,9 +29,9 @@ namespace {
 
   public:
     TestOptions(const std::string& _x, const std::string& _y) : x(_x), y(_y) { }
-    virtual void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
-    virtual void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
-    virtual po::options_description getDescription() override
+    void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
+    void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
+    po::options_description getDescription() override
     {
       po::options_description description("General options");
       description.add_options()

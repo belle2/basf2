@@ -24,7 +24,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/TagVertex.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 
 // utilities
@@ -93,7 +93,7 @@ namespace Belle2 {
     StoreArray<Particle> particles;
     particles.isRequired();
     // output
-    StoreArray<Vertex> verArray;
+    StoreArray<TagVertex> verArray;
     verArray.registerInDataStore();
     particles.registerRelationTo(verArray);
   }
@@ -116,7 +116,7 @@ namespace Belle2 {
     StoreArray<Particle> Particles(plist->getParticleCollectionName());
 
     // output
-    StoreArray<Vertex> verArray;
+    StoreArray<TagVertex> verArray;
     analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
@@ -132,7 +132,7 @@ namespace Belle2 {
         toRemove.push_back(particle->getArrayIndex());
       } else {
         // save information in the Vertex StoreArray
-        Vertex* ver = verArray.appendNew();
+        TagVertex* ver = verArray.appendNew();
         // create relation: Particle <-> Vertex
         particle->addRelationTo(ver);
         // fill Vertex with content
@@ -513,13 +513,9 @@ namespace Belle2 {
     const std::vector<Belle2::MCParticle*> genDau = Bgen->getDaughters();
 
     if (recDau.size() > 0 && genDau.size() > 0) {
-      for (unsigned int i = 0; i < recDau.size(); i++) {
+      for (auto dauRec : recDau) {
         bool isDau = false;
-        Particle* dauRec = recDau[i];
-
-        for (unsigned int j = 0; j < genDau.size(); j++) {
-          MCParticle* dauGen = genDau[j];
-
+        for (auto dauGen : genDau) {
           if (dauGen->getPDG() == dauRec->getPDGCode())
             isDau = compBrecoBgen(dauRec, dauGen) ;
         }
@@ -548,7 +544,7 @@ namespace Belle2 {
   {
 
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
-    FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
+    auto* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
 
     if (!flavorTagInfo) return;
 
@@ -566,13 +562,13 @@ namespace Belle2 {
        The iteration will go on while the mother is an immediately decaying particle (PDG). The iteration will stop tracking back mothers once it reaches either the B0, or another particle coming from the B0 that does not decay immediately. In the later case it assumes that the correspondent track does not share its production point with the decaying point of the B0 */
     for (unsigned i = 0; i < tracksFT.size(); i++) {
 
-      if (i == 6 || (tracksFT[i] == NULL)) { // Tracks belonging to the Lambda category or not well reconstructed are discarted
+      if (i == 6 || (tracksFT[i] == nullptr)) { // Tracks belonging to the Lambda category or not well reconstructed are discarted
         flavorTagInfo->setIsFromB(0);
         flavorTagInfo->setProdPointResolutionZ(100);
         continue;
       }
 
-      MCParticle* trackMCParticle = particle[i]->getRelatedTo<MCParticle>();
+      auto* trackMCParticle = particle[i]->getRelatedTo<MCParticle>();
       flavorTagInfo->setMCParticle(trackMCParticle);
 
       flavorTagInfo->setProdPointResolutionZ((trackMCParticle->getProductionVertex() - m_MCtagV).Mag2());
@@ -673,7 +669,7 @@ namespace Belle2 {
     bool exitROEWhile = false;
     int ROETotalTracks = ROETracks.size();
     for (int i = 0; i < ROETotalTracks; i++) {
-      MCParticle* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
+      auto* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
       MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
       do {
         int PDG = TMath::Abs(roeTrackMCParticleMother->getPDG());
@@ -745,7 +741,7 @@ namespace Belle2 {
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     std::vector<const Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
 
-    FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
+    auto* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
     if (!flavorTagInfo) return false;
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     std::vector<float> listMomentum = flavorTagInfo->getP(); // Momentum of the tracks
@@ -775,7 +771,7 @@ namespace Belle2 {
                                          };
 
     for (unsigned i = 0; i < listCategoryP.size(); i++) {
-      if (i ==  6 || (originalTracks[i] == NULL)) { // Skip Lambdas and non-reconstructed tracks
+      if (i ==  6 || (originalTracks[i] == nullptr)) { // Skip Lambdas and non-reconstructed tracks
 
         flavorTagInfo->setD0(1.0); // Giving by hand 1cm is more than enough to make Lambdas discardable
         flavorTagInfo->setZ0(1.0);
@@ -873,9 +869,9 @@ namespace Belle2 {
   {
     if (listTracks[trackPosition] == 0) return;
     int toEliminate = listTracks[trackPosition];
-    for (unsigned i = 0; i < listTracks.size(); i++) {
-      if (listTracks[i] == toEliminate) {
-        listTracks.at(i) = 0;
+    for (int& listTrack : listTracks) {
+      if (listTrack == toEliminate) {
+        listTrack = 0;
       }
     }
   }
@@ -891,17 +887,17 @@ namespace Belle2 {
     std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     if (ROETracks.size() == 0) return false;
     std::vector<const Track*> fitTracks;
-    for (unsigned i = 0; i < ROETracks.size(); i++) {
+    for (auto& ROETrack : ROETracks) {
       // TODO: this will always return something (so not nullptr) contrary to the previous method
       // used here. This line can be removed as soon as the multi hypothesis fitting method
       // has been properly established
-      if (!ROETracks[i]->getTrackFitResultWithClosestMass(Const::pion)) {
+      if (!ROETrack->getTrackFitResultWithClosestMass(Const::pion)) {
         continue;
       }
-      HitPatternVXD roeTrackPattern = ROETracks[i]->getTrackFitResultWithClosestMass(Const::pion)->getHitPatternVXD();
+      HitPatternVXD roeTrackPattern = ROETrack->getTrackFitResultWithClosestMass(Const::pion)->getHitPatternVXD();
 
       if (roeTrackPattern.getNPXDHits() >= reqPXDHits) {
-        fitTracks.push_back(ROETracks[i]);
+        fitTracks.push_back(ROETrack);
       }
     }
     if (fitTracks.size() == 0) return false;
@@ -923,7 +919,7 @@ namespace Belle2 {
     // remove traks from KS
     for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
       const Track* trak1 = m_tagTracks[i];
-      const TrackFitResult* trak1Res = NULL;
+      const TrackFitResult* trak1Res = nullptr;
       if (trak1) trak1Res = trak1->getTrackFitResultWithClosestMass(Const::pion);
       TVector3 mom1;
       if (trak1Res) mom1 = trak1Res->getMomentum();
@@ -936,7 +932,7 @@ namespace Belle2 {
       for (unsigned int j = 0; j < m_tagTracks.size(); j++) {
         if (i != j) {
           const Track* trak2 = m_tagTracks[j];
-          const TrackFitResult* trak2Res = NULL;
+          const TrackFitResult* trak2Res = nullptr;
 
           if (trak2) trak2Res = trak2->getTrackFitResultWithClosestMass(Const::pion);
 

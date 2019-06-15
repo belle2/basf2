@@ -46,10 +46,10 @@ stdPi('loose', path=CharmLeptonicPath)
 copyList('pi+:spi', 'pi+:loose', path=CharmLeptonicPath)  # the criteria of spi is removed.
 
 
-from skim.charm import DstToD0LeptonicDecay
-D0LeptonicDecay = DstToD0LeptonicDecay(CharmLeptonicPath)
-skimOutputUdst(skimCode, D0LeptonicDecay, path=CharmLeptonicPath)
-summaryOfLists(D0LeptonicDecay, path=CharmLeptonicPath)
+from skim.charm import DstToD0Leptonic
+D0LeptonicList = DstToD0Leptonic(CharmLeptonicPath)
+skimOutputUdst(skimCode, D0LeptonicList, path=CharmLeptonicPath)
+summaryOfLists(D0LeptonicList, path=CharmLeptonicPath)
 
 setSkimLogging(path=CharmLeptonicPath)
 process(CharmLeptonicPath)

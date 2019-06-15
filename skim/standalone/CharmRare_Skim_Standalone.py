@@ -13,8 +13,9 @@ from modularAnalysis import *
 from stdCharged import stdE, stdMu
 from stdPi0s import *
 from stdPhotons import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 import os
 import sys
@@ -23,7 +24,7 @@ skimCode = encodeSkimName('CharmRare')
 
 crpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=crpath)
 
 

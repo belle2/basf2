@@ -14,8 +14,8 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdMu, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 import sys
 import os
@@ -23,7 +23,7 @@ import glob
 skimCode = encodeSkimName('Charm3BodyHadronic')
 
 c3bhpath = Path()
-fileList = get_test_file("ddbarBGx0", "MC11")
+fileList = get_test_file("ddbarBGx0", "MC12")
 inputMdstList('default', fileList, path=c3bhpath)
 
 

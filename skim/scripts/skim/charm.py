@@ -203,7 +203,6 @@ def DstToD0Leptonic(path):
                    'e-:loose mu+:loose',
                    'mu+:loose mu-:loose',
                    'pi+:loose pi-:loose']
-
     # pipi is just for normalization.
 
     DstList = []

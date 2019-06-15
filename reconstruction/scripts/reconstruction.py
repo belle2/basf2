@@ -277,6 +277,7 @@ def add_cdst_output(
         'TRGECLUnpackerStores',
         'TRGECLUnpackerEvtStores',
         'BKLMHit2ds',
+        'TRGGRLUnpackerStore',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
         'RecoHitInformationsToBKLMHit2ds',

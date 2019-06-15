@@ -46,7 +46,7 @@ void TRGGRLUnpackerModule::terminate()
 
 void TRGGRLUnpackerModule::initialize()
 {
-  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("GRLevt");
+  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("TRGGRLUnpackerStore");
   evtinfo.registerInDataStore();
 }
 

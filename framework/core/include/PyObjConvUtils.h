@@ -507,7 +507,7 @@ namespace Belle2 {
       if (valueProxy.check()) {
         tmpValue = static_cast<Scalar>(valueProxy);
       } else {
-        throw std::runtime_error(std::string("Could not set module parameter: Expected type '") + Type<Scalar>::name() + "' instead of '" +
+        throw std::runtime_error(std::string("Could not convert value: Expected type '") + Type<Scalar>::name() + "' instead of '" +
                                  pyObject.ptr()->ob_type->tp_name + "'.");
       }
       return tmpValue;
@@ -524,11 +524,16 @@ namespace Belle2 {
     template<typename Value>
     std::vector<Value> convertPythonObject(const boost::python::object& pyObject, const std::vector<Value>&)
     {
+
       std::vector<Value> tmpVector;
-      iteratePythonObject(pyObject, [&tmpVector](const boost::python::object & element) {
-        tmpVector.emplace_back(convertPythonObject(element, Value()));
-        return true;
-      });
+      if (PyList_Check(pyObject.ptr()) or PyGen_Check(pyObject.ptr())) {
+        iteratePythonObject(pyObject, [&tmpVector](const boost::python::object & element) {
+          tmpVector.emplace_back(convertPythonObject(element, Value()));
+          return true;
+        });
+      } else {
+        tmpVector.emplace_back(convertPythonObject(pyObject, Value()));
+      }
       return tmpVector;
     }
 
@@ -537,10 +542,14 @@ namespace Belle2 {
     std::set<Value> convertPythonObject(const boost::python::object& pyObject, const std::set<Value>&)
     {
       std::set<Value> result;
-      iteratePythonObject(pyObject, [&result](const boost::python::object & element) {
-        result.emplace(convertPythonObject(element, Value()));
-        return true;
-      });
+      if (PyAnySet_Check(pyObject.ptr())) {
+        iteratePythonObject(pyObject, [&result](const boost::python::object & element) {
+          result.emplace(convertPythonObject(element, Value()));
+          return true;
+        });
+      } else {
+        result.emplace(convertPythonObject(pyObject, Value()));
+      }
       return result;
     }
 

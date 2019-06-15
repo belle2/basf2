@@ -56,7 +56,7 @@ def parseNumList(string):
     for rr in [x.strip() for x in string.split(',')]:
         result |= parseNumRange(rr)
 
-    return list(result)
+    return sorted(list(result))
 
 
 def argparser():
@@ -71,9 +71,9 @@ def argparser():
     parser.add_argument("--exp",
                         dest="exp",
                         action="store",
-                        type=int,
+                        type=parseNumList,
                         required=True,
-                        help="Experiment number")
+                        help="Experiment numbers")
     parser.add_argument("--runs",
                         dest="runs",
                         action="store",
@@ -121,6 +121,7 @@ class luminosity:
         self.DB = args.db
         self.conn = self.create_connection()
         self.exp=args.exp
+        self.expstr="-".join(str(_) for _ in args.exp)
         self.runs=args.runs
         self.verb=args.verb
 
@@ -157,13 +158,14 @@ class luminosity:
         crete a panda dataframe from DB
         """
 
-        cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
+        #cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
+        cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
         if args.runs:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
         # Get the DB as a pandas.Dataframe.
-        df = pd.read_sql_query(cmdexp, self.conn, params=(self.exp,))
-        print(f"Read {len(df)} runs for experiment {self.exp}")
+        df = pd.read_sql(cmdexp, self.conn, params=self.exp)
+        print(f"Read {len(df)} runs for experiment {self.expstr}")
 
         # convert epoch to date
         df['date'] = pd.to_datetime(df['date'],unit='s')
@@ -218,7 +220,7 @@ class luminosity:
         ax2 = ax1.twinx()
         ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
         ax2.tick_params(axis='y', labelcolor="red")
-        full = ax2.plot(x, yInt, color="red", label="Total")
+        ax2.plot(x, yInt, color="red", label="Total")
         ax2.xaxis.set_major_locator(ticker.AutoLocator())
         ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
 
@@ -228,16 +230,57 @@ class luminosity:
 
         # Text box. Use axis coords.
         plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
-        plt.text(.5, 1.03, rf"Exp: {self.exp} - Runs {run_min}-{run_max}", transform=ax1.transAxes, fontsize=12)
+        plt.text(.5, 1.03, rf"Exp: {self.expstr} - Runs {run_min}-{run_max}", transform=ax1.transAxes, fontsize=12)
+        #plt.text(.5, 1.03, rf"Exp: 7 - 8  - All Runs ", transform=ax1.transAxes, fontsize=12)
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max()/1.e6:.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
 
-        plt.savefig(f"LumiPer{label}_Exp{self.exp}.pdf", bbox_inches="tight")
-        plt.savefig(f"LumiPer{label}_Exp{self.exp}.png", bbox_inches="tight")
+        plt.savefig(f"LumiPer{label}_Exp{self.expstr}.pdf", bbox_inches="tight")
+        plt.savefig(f"LumiPer{label}_Exp{self.expstr}.png", bbox_inches="tight")
 
     def plotLumiPerRun(self):
         """
         Make lumi plot per run
         """
+
+        # these are the runs to be selected
+        if (self.runs):
+            dfRuns=self.df[self.df['run'].isin(self.runs)]
+            dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
+        else:
+            dfRuns=self.df
+
+        # create a reduced dataframe with only runs selected
+        # RUN max, min
+        run_min = dfRuns["run"].min()
+        run_max = dfRuns["run"].max()
+
+        figure, ax1 = plt.subplots()
+
+        dfRuns.plot.bar(x='run', y='lumi', label=f"Run by run", color="blue", ax=ax1, legend=None)
+        ax1.set_xlabel(r"Run")
+        ax1.set_ylabel(rf"Total integrated luminosity per Run [$\mathrm{{fb}}^{{-1}}$]", color="blue")
+        ax1.tick_params(axis='y', labelcolor="blue")
+        ax1.tick_params(axis="x", labelrotation=45, labelsize="small")
+        ax1.xaxis.set_major_locator(ticker.AutoLocator())
+
+        # plot integrate lumi
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
+        ax2.tick_params(axis='y', labelcolor="red")
+        dfRuns.plot(x='run', y='intLumi', color="red", label="Total", ax=ax2)
+        ax2.xaxis.set_major_locator(ticker.AutoLocator())
+
+        h1, l1 = ax1.get_legend_handles_labels()
+        h2, l2 = ax2.get_legend_handles_labels()
+        ax2.legend(h1+h2, l1+l2,loc="best",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
+
+        # Text box. Use axis coords.
+        plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
+        plt.text(.5, 1.03, rf"Exp: {self.expstr} - Runs {run_min}-{run_max}", transform=ax1.transAxes, fontsize=12)
+        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max()/1.e6:.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
+
+        plt.savefig(f"LumiPerRun_Exp{self.expstr}.pdf", bbox_inches="tight")
+        plt.savefig(f"LumiPerRun_Exp{self.expstr}.png", bbox_inches="tight")
         pass
 
     def printLumi(self):
@@ -279,8 +322,8 @@ if __name__ == '__main__':
     lumi.printLumi()
 
     if args.plot:
-        if "DATE" in args.plot():
+        if args.plot == 'DATE':
             lumi.plotLumi(1)
             #lumi.plotLumi(2)
-        if "RUN" in args.plot():
-            lumi.plotLumiPerRun(1)
+        if args.plot == 'RUN':
+            lumi.plotLumiPerRun()

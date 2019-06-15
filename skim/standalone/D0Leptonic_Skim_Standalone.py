@@ -24,7 +24,7 @@ CharmLeptonicPath = Path()
 
 modes = ['mixed', 'charged', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair']
 backgrounds = ['BGx0', 'BGx1']
-mcNumber = "MC10"
+mcNumber = "MC12"
 fileLists = []
 
 

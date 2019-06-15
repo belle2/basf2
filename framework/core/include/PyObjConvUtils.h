@@ -266,10 +266,7 @@ namespace Belle2 {
     template<typename Value>
     bool checkPythonObject(const boost::python::object& pyObject, const std::vector<Value>& /*dispatch tag*/)
     {
-      if (not PyList_Check(pyObject.ptr())) {
-        // not a list, maybe it's at least a single object of the correct type
-        return checkPythonObject(pyObject, Value());
-      }
+      if (not PyList_Check(pyObject.ptr())) return false;
       return iteratePythonObject(pyObject, [](const boost::python::object & element) {
         return checkPythonObject(element, Value());
       });
@@ -278,10 +275,7 @@ namespace Belle2 {
     template<typename Value>
     bool checkPythonObject(const boost::python::object& pyObject, const std::set<Value>&)
     {
-      if (not PyAnySet_Check(pyObject.ptr())) {
-        // not a list, maybe it's at least a single object of the correct type
-        return checkPythonObject(pyObject, Value());
-      }
+      if (not PyAnySet_Check(pyObject.ptr())) return false;
       return iteratePythonObject(pyObject, [](const boost::python::object & element) {
         return checkPythonObject(element, Value());
       });
@@ -530,17 +524,11 @@ namespace Belle2 {
     template<typename Value>
     std::vector<Value> convertPythonObject(const boost::python::object& pyObject, const std::vector<Value>&)
     {
-
       std::vector<Value> tmpVector;
-
-      if (PyList_Check(pyObject.ptr())) {
-        iteratePythonObject(pyObject, [&tmpVector](const boost::python::object & element) {
-          tmpVector.emplace_back(convertPythonObject(element, Value()));
-          return true;
-        });
-      } else {
-        tmpVector.emplace_back(convertPythonObject(pyObject, Value()));
-      }
+      iteratePythonObject(pyObject, [&tmpVector](const boost::python::object & element) {
+        tmpVector.emplace_back(convertPythonObject(element, Value()));
+        return true;
+      });
       return tmpVector;
     }
 
@@ -549,14 +537,10 @@ namespace Belle2 {
     std::set<Value> convertPythonObject(const boost::python::object& pyObject, const std::set<Value>&)
     {
       std::set<Value> result;
-      if (PyAnySet_Check(pyObject.ptr())) {
-        iteratePythonObject(pyObject, [&result](const boost::python::object & element) {
-          result.emplace(convertPythonObject(element, Value()));
-          return true;
-        });
-      } else {
-        result.emplace(convertPythonObject(pyObject, Value()));
-      }
+      iteratePythonObject(pyObject, [&result](const boost::python::object & element) {
+        result.emplace(convertPythonObject(element, Value()));
+        return true;
+      });
       return result;
     }
 

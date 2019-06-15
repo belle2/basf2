@@ -86,6 +86,16 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
 
+    proton = Particle('p+',
+                      MVAConfiguration(variables=chargedVariables,
+                                       target='isPrimarySignal'),
+                      PreCutConfiguration(userCut=charged_user_cut,
+                                          bestCandidateMode='highest',
+                                          bestCandidateVariable='protonID' if not convertedFromBelle else 'atcPIDBelle(4,3)',
+                                          bestCandidateCut=20),
+                      PostCutConfiguration(bestCandidateCut=10, value=0.01))
+    proton.addChannel(['p+:FSP'])
+
     electron = Particle('e+',
                         MVAConfiguration(variables=chargedVariables,
                                          target='isPrimarySignal'),
@@ -93,7 +103,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                                             bestCandidateMode='highest',
                                             bestCandidateVariable='electronID' if not convertedFromBelle else 'eIDBelle',
                                             bestCandidateCut=10),
-                        PostCutConfiguration(bestCandidateCut=5, value=0.01))
+                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
     electron.addChannel(['e+:FSP'])
 
     muon = Particle('mu+',
@@ -103,7 +113,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                                         bestCandidateMode='highest',
                                         bestCandidateVariable='muonID' if not convertedFromBelle else 'muIDBelle',
                                         bestCandidateCut=10),
-                    PostCutConfiguration(bestCandidateCut=5, value=0.01))
+                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
     muon.addChannel(['mu+:FSP'])
 
     if convertedFromBelle:
@@ -230,6 +240,19 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     # We can not do this in the generic case (because this would heavily influence our performance on the unkown signal events
     # but in the specific case this could work well
     #    intermediate_vars = ['nRemainingTracksInEvent']
+    LC = Particle('Lambda_c+',
+                  MVAConfiguration(variables=intermediate_vars,
+                                   target='isSignal'),
+                  PreCutConfiguration(userCut='2.22 < M < 2.24',
+                                      bestCandidateVariable='abs(dM)',
+                                      bestCandidateCut=20),
+                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    LC.addChannel(['p+', 'K-', 'pi+'])
+    LC.addChannel(['p+', 'pi-', 'pi+'])
+    LC.addChannel(['p+', 'K-', 'pi+', 'pi0'])
+    LC.addChannel(['p+', 'K_S0'])
+    LC.addChannel(['p+', 'K_S0', 'pi0'])
+    LC.addChannel(['p+', 'K_S0', 'pi+', 'pi-'])
 
     D0 = Particle('D0',
                   MVAConfiguration(variables=intermediate_vars,
@@ -529,6 +552,13 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     BP.addChannel(['J/psi', 'K+', 'pi+', 'pi-'])
     BP.addChannel(['J/psi', 'K+', 'pi0'])
     BP.addChannel(['J/psi', 'K_S0', 'pi+'])
+    BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi0'])
+    BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi-', 'pi-'])
+    BP.addChannel(['anti-D0', 'p+', 'anti-p-', 'pi+'])
+    BP.addChannel(['anti-D*0', 'p+', 'anti-p-', 'pi+'])
+    BP.addChannel(['D-', 'p+', 'anti-p-', 'pi+', 'pi-'])
+    BP.addChannel(['D*-', 'p+', 'anti-p-', 'pi+', 'pi-'])
+    BP.addChannel(['anti-Lambda_c-', 'p+', 'pi-'])
 
     mva_BPlusSemileptonic = MVAConfiguration(
         variables=B_vars,
@@ -677,6 +707,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     B0.addChannel(['J/psi', 'K_S0'])
     B0.addChannel(['J/psi', 'K+', 'pi-'])
     B0.addChannel(['J/psi', 'K_S0', 'pi+', 'pi-'])
+    B0.addChannel(['anti-Lambda_c-', 'p+', 'pi+', 'pi-'])
 
     B0_SL = Particle('B0:semileptonic',
                      MVAConfiguration(variables=B_vars,
@@ -782,6 +813,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     particles = []
     particles.append(pion)
     particles.append(kaon)
+    particles.append(proton)
     particles.append(muon)
     particles.append(electron)
     particles.append(gamma)
@@ -793,6 +825,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     particles.append(D0)
     particles.append(DP)
     particles.append(DS)
+    particles.append(LC)
 
     particles.append(DS0)
     particles.append(DSP)
@@ -1229,7 +1262,6 @@ def get_fr_channels(convertedFromBelle=False):
     B0.addChannel(['D_s*+', 'D*-'])
     B0.addChannel(['J/psi', 'K_S0'])
     B0.addChannel(['J/psi', 'K+', 'pi-'])
-    B0.addChannel(['J/psi', 'K_S0', 'pi+', 'pi-'])
 
     particles = []
     particles.append(pion)

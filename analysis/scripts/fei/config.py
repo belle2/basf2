@@ -54,12 +54,13 @@ MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."
 MVAConfiguration.sPlotVariable.__doc__ = "Discriminating variable used by sPlot to do data-driven training."
 
 
-PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, bestCandidateVariable, '
+PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, decayTreeFitter, vertexCut, bestCandidateVariable,'
                                              'bestCandidateCut, bestCandidateMode')
-PreCutConfiguration.__new__.__defaults__ = ('', -2, None, 0, 'lowest')
+PreCutConfiguration.__new__.__defaults__ = ('', True, -2, None, 0, 'lowest')
 PreCutConfiguration.__doc__ = "PreCut configuration class. These cuts is employed before training the mva classifier."
 PreCutConfiguration.userCut.__doc__ = "The user cut is passed directly to the ParticleCombiner."\
                                       "Particles which do not pass this cut are immediatly discarded."
+PreCutConfiguration.decayTreeFitter.__doc__ = "Boolean which sets whether or not DecayTreeFitter is used."
 PreCutConfiguration.vertexCut.__doc__ = "The vertex cut is passed as confidence level to the VertexFitter."
 PreCutConfiguration.bestCandidateVariable.__doc__ = "Variable from the VariableManager which is used to rank all candidates."
 PreCutConfiguration.bestCandidateMode.__doc__ = "Either lowest or highest."

@@ -150,7 +150,7 @@ def plotIntLumiVSDate(plotname="graph_int_lumi__VS__date"):
     axes.set_ylabel(r"Total integrated luminosity per day [$\mathrm{fb}^{-1}$]")
     axes.tick_params(axis="x", labelrotation=45, labelsize="small")
     axes.legend(loc="best")
-    axes.xaxis.set_major_locator(ticker.AutoLocator())
+    axes.xaxis.set_major_locator(ticker.IndexLocator(base=10, offset=1))
     axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
 
     plt.savefig(f"{plotname}.pdf", bbox_inches="tight")
@@ -206,7 +206,7 @@ def plotIntLumi(plotname="graph_int_lumi"):
     axes.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]")
     axes.tick_params(axis="x", labelrotation=45, labelsize="small")
     axes.legend(loc="best")
-    axes.xaxis.set_major_locator(ticker.AutoLocator())
+    axes.xaxis.set_major_locator(ticker.IndexLocator(base=10, offset=1))
     axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
 
     plt.savefig(f"{plotname}.pdf", bbox_inches="tight")
@@ -271,7 +271,7 @@ def plotIntLumiVSDateTotal(plotname="graph_total_int_lumi__VS__date"):
     axes.set_ylabel(r"Total integrated luminosity per day [$\mathrm{fb}^{-1}$]")
     axes.tick_params(axis="x", labelrotation=45, labelsize="small")
     axes.legend(loc="best")
-    axes.xaxis.set_major_locator(ticker.AutoLocator())
+    axes.xaxis.set_major_locator(ticker.IndexLocator(base=10, offset=1))
     axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
 
     plt.savefig(f"{plotname}.pdf", bbox_inches="tight")
@@ -336,7 +336,7 @@ def plotIntLumiTotal(plotname="graph_total_int_lumi"):
     axes.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]")
     axes.tick_params(axis="x", labelrotation=45, labelsize="small")
     axes.legend(loc="best")
-    axes.xaxis.set_major_locator(ticker.AutoLocator())
+    axes.xaxis.set_major_locator(ticker.IndexLocator(base=10, offset=1))
     axes.xaxis.set_minor_locator(ticker.MultipleLocator(1))
 
     plt.savefig(f"{plotname}.pdf", bbox_inches="tight")

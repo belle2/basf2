@@ -237,8 +237,12 @@ void Module::setParamPython(const std::string& name, const boost::python::object
 {
   LogSystem& logSystem = LogSystem::Instance();
   logSystem.updateModule(&(getLogConfig()), getName());
-
-  m_moduleParamList.setParamPython(name, pyObj);
+  try {
+    m_moduleParamList.setParamPython(name, pyObj);
+  } catch (std::runtime_error& e) {
+    throw std::runtime_error("Cannot set parameter '" + name + "' for module '"
+                             + m_name + "': " + e.what());
+  }
 
   logSystem.updateModule(nullptr);
 }

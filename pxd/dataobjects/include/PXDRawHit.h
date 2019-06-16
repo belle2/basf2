@@ -35,8 +35,8 @@ namespace Belle2 {
 
     /**
      * @param sensorID Sensor compact ID.
-     * @param row Pixel row coordinate.
-     * @param column Pixel column coordinate.
+     * @param row Pixel row coordinate (V Cell ID).
+     * @param column Pixel column coordinate ( U Cell ID).
      * @param charge The Pixel charge.
      * @param frameNr number of the (readout) frame.
      */
@@ -105,8 +105,8 @@ namespace Belle2 {
 
   private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object*/
-    short m_row;         /**< Absolute pixel position in v. */
-    short m_column;         /**< Absolute pixel position in v. */
+    short m_row;         /**< Absolute pixel position in v (V Cell ID). */
+    short m_column;         /**< Absolute pixel position in u (U Cell ID). */
     short m_charge;           /**< Deposited charge in pixel. */
     unsigned short m_frameNr;    /**< Number of the Frames */
 

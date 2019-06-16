@@ -54,18 +54,34 @@ namespace Belle2 {
       return m_sensorID;
     }
 
-    /** Get v coordinate of hit position.
-     * @return v coordinate of hit position.
+    /** Get v cell id of hit position.
+     * @return v cell id of hit position.
      */
     short getRow() const
     {
       return m_row;
     }
 
-    /** Get u coordinate of hit position.
-     * @return u coordinate of hit position.
+    /** Get v cell id of hit position.
+     * @return v cell id of hit position.
+     */
+    short getVCellID() const
+    {
+      return m_row;
+    }
+
+    /** Get u cell id of hit position.
+     * @return u cell id of hit position.
      */
     short getColumn() const
+    {
+      return m_column;
+    }
+
+    /** Get u cell id of hit position.
+     * @return u cell id of hit position.
+     */
+    short getUCellID() const
     {
       return m_column;
     }

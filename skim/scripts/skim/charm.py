@@ -203,14 +203,13 @@ def DstToD0Leptonic(path):
                    'e-:loose mu+:loose',
                    'mu+:loose mu-:loose',
                    'pi+:loose pi-:loose']
-    # pipi is just for normalization.
 
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
         reconstructDecay('D0:LeptonicDecay' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        reconstructDecay('D*+:Primary' + str(chID) + ' -> pi+:spi D0:LeptonicDecay' + str(chID),
-                         Dstcuts, chID, path=path)  # spi means slow pion produced by D*+
+        reconstructDecay('D*+:Primary' + str(chID) + ' -> pi+:loose D0:LeptonicDecay' + str(chID),
+                         Dstcuts, chID, path=path)
 
         matchMCTruth('D0:LeptonicDecay' + str(chID), path=path)
         matchMCTruth('D*+:Primary' + str(chID), path=path)

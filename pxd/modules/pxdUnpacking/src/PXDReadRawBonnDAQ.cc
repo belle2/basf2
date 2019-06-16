@@ -32,18 +32,14 @@ REG_MODULE(PXDReadRawBonnDAQ)
 PXDReadRawBonnDAQModule::PXDReadRawBonnDAQModule() : Module()
 {
   fh = 0;
-  m_msghandler = 0;
   //Set module properties
   setDescription("Read a BonnDAQ file and stores it as RawPXD in Data Store");
-  //setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-  //setPropertyFlags(c_Input);
+  //setPropertyFlags(c_Input | c_ParallelProcessingCertified); // not parallel processing!
 
   addParam("FileName", m_filename, "file name");
   addParam("SubRunNr", m_subRunNr, "sub-run number", 0u);
   addParam("RunNr", m_runNr, "run number", 0u);
   addParam("ExpNr", m_expNr, "exp number", 0u);
-  m_nread = 0;
-  m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
 
   B2DEBUG(29, "PXDReadRawBonnDAQModule: Constructor done.");
@@ -57,17 +53,13 @@ PXDReadRawBonnDAQModule::~PXDReadRawBonnDAQModule()
 
 void PXDReadRawBonnDAQModule::initialize()
 {
-  // Open receiver sockets
-//  m_recv = new EvtSocketSend(m_host, m_port);
+  // Open file
   fh = fopen(m_filename.c_str(), "rb");
   if (fh) {
     B2INFO("Read BonnDAQ Data from " << m_filename);
   } else {
     B2ERROR("Could not open BonnDAQ Data: " << m_filename);
   }
-
-  // Open message handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Register EvtMetaData
   m_eventMetaDataPtr.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
@@ -252,7 +244,7 @@ void PXDReadRawBonnDAQModule::event()
     return;
   }
 
-  // Get a record from socket
+  // Get a record from file
   int stat;
   do {
     stat = readOneEvent();

@@ -10,8 +10,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -47,8 +45,6 @@ namespace Belle2 {
 
       // Data members
 
-      // Parallel processing parameters
-
       //! Event Meta Data
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
@@ -57,15 +53,6 @@ namespace Belle2 {
 
       //! File Name
       std::string m_filename;
-
-      //! Message handler
-      MsgHandler* m_msghandler;
-
-      //! Compression Level
-      int m_compressionLevel;
-
-      //! No. of sent events
-      int m_nread;
 
       //! buffer
       int* m_buffer;

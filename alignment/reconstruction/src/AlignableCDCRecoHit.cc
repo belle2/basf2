@@ -101,6 +101,9 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   const double zWireP = s_cdcGeometryTranslator->getWireForwardPosition(getWireID(), CDCGeometryPar::c_Aligned)[2];
   // relative Z position [0..1]
   const double zRel = std::max(0., std::min(1., (pos[2] - zWireM) / (zWireP - zWireM)));
+  //
+  double zRelM = fabs(1. - zRel);
+  double zRelP = fabs(zRel - 0.);
 
   // Layer alignment
   // wire 511 = no wire (0 is reserved for existing wires) - this has to be compatible with code in CDCGeometryPar::setWirPosAlignParams
@@ -150,23 +153,23 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     // Alignment of wires X in global coords
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireBwdX),
-      drldg(0, 0)
+      drldg(0, 0) * zRelM
     );
 
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireFwdX),
-      drldg(0, 0)
+      drldg(0, 0) * zRelP
     );
 
     // Alignment of wires Y in global coords
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireBwdY),
-      drldg(0, 1)
+      drldg(0, 1) * zRelM
     );
 
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireFwdY),
-      drldg(0, 1)
+      drldg(0, 1) * zRelP
     );
   }
 

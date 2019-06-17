@@ -12,9 +12,9 @@ from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
-from skimExpertFunctions import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-01-02'
+gb2_setuprel = 'release-03-02-00'
 skimCode = encodeSkimName('Charm2BodyHadronicD0')
 
 # create a new path for each WG

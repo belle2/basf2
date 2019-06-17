@@ -15,8 +15,8 @@ from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
 
-from skimExpertFunctions import setSkimLogging, encodeSkimName, add_skim
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
 fileList = get_test_file("mixedBGx1", "MC12")
 darkskimpath = Path()

@@ -14,8 +14,8 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 
 import os
@@ -24,7 +24,7 @@ import glob
 skimCode = encodeSkimName('SLUntagged')
 
 SLpath = Path()
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=SLpath)
 
 stdPi('loose', path=SLpath)

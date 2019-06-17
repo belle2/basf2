@@ -3,80 +3,108 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Giacomo De Pietro                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Own include
+/* Belle2 headers. */
 #include <background/modules/BeamBkgHitRateMonitor/BKLMHitRateCounter.h>
 
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
+using namespace Belle2::Background;
 
-using namespace std;
+void BKLMHitRateCounter::initialize(TTree* tree)
+{
+  // register collection(s) as optional: BKLM might be excluded in DAQ
+  m_digits.isOptional();
 
-namespace Belle2 {
-  namespace Background {
+  // set branch address
+  std::string branches;
+  branches =
+    "sectorRates[" +
+    std::to_string(static_cast<int>(m_maxGlobalLayer)) +
+    "]/F:averageRate/F:numEvents/I:valid/O";
+  tree->Branch("bklm", &m_rates, branches.c_str());
+}
 
-    void BKLMHitRateCounter::initialize(TTree* tree)
-    {
-      // register collection(s) as optional, your detector might be excluded in DAQ
-      m_digits.isOptional();
+void BKLMHitRateCounter::clear()
+{
+  m_buffer.clear();
+}
 
-      // set branch address
-      tree->Branch("bklm", &m_rates, "averageRate/F:numEvents/I:valid/O");
+void BKLMHitRateCounter::accumulate(unsigned timeStamp)
+{
+  // check if data are available
+  if (!m_digits.isValid())
+    return;
 
-    }
+  // get buffer element
+  auto& rates = m_buffer[timeStamp];
 
-    void BKLMHitRateCounter::clear()
-    {
-      m_buffer.clear();
-    }
+  // increment event counter
+  rates.numEvents++;
 
-    void BKLMHitRateCounter::accumulate(unsigned timeStamp)
-    {
-      // check if data are available
-      if (not m_digits.isValid()) return;
+  // accumulate hits
+  for (const BKLMDigit& digit : m_digits) {
+    // Discard scintillators hits below the theshdold
+    if (!digit.inRPC() && !digit.isAboveThreshold())
+      continue;
 
-      // get buffer element
-      auto& rates = m_buffer[timeStamp];
+    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.isForward(), digit.getSector(), digit.getLayer());
+    rates.layerRates[layerGlobal]++;
+    rates.averageRate++;
+  }
 
-      // increment event counter
-      rates.numEvents++;
+  // set flag to true to indicate the rates are valid
+  rates.valid = true;
+}
 
-      // accumulate hits
-      /* either count all */
-      rates.averageRate += m_digits.getEntries();
-      /* or count selected ones only
-      for(const auto& digit: m_digits) {
-      // select digits to count (usualy only good ones)
-         rates.averageRate += 1;
+void BKLMHitRateCounter::normalize(unsigned timeStamp)
+{
+  // copy buffer element
+  m_rates = m_buffer[timeStamp];
+
+  if (!m_rates.valid)
+    return;
+
+  // normalize
+  m_rates.normalize();
+
+  // Normalize the hit rate per one strip.
+  for (int layerGlobal = 0; layerGlobal < m_maxGlobalLayer; ++layerGlobal) {
+    int activeStrips = getActiveStripsBKLMLayer(layerGlobal);
+    if (activeStrips == 0)
+      m_rates.layerRates[layerGlobal] = 0;
+    else {
+      m_rates.layerRates[layerGlobal] /= activeStrips;
+      if ((layerGlobal % BKLMElementNumbers::getMaximalLayerNumber()) >= 2) {
+        // The layer is an RPC-layer: there are two digits per "real" hit
+        // so it's better to divide by 2 the rate
+        m_rates.layerRates[layerGlobal] /= 2;
       }
-      */
-
-      // set flag to true to indicate the rates are valid
-      rates.valid = true;
-
     }
+  }
+}
 
-    void BKLMHitRateCounter::normalize(unsigned timeStamp)
-    {
-      // copy buffer element
-      m_rates = m_buffer[timeStamp];
+int BKLMHitRateCounter::getActiveStripsBKLMLayer(int layerGlobal) const
+{
+  int active = 0;
 
-      if (not m_rates.valid) return;
+  int isForward, sector, layer;
+  BKLMElementNumbers::layerGlobalNumberToElementNumbers(layerGlobal, &isForward, &sector, &layer);
 
-      // normalize
-      m_rates.normalize();
+  for (int plane = 0; plane < BKLMElementNumbers::getMaximalPlaneNumber(); ++plane) {
+    for (int strip = 1; strip <= BKLMElementNumbers::getNStrips(isForward, sector, layer, plane); ++strip) {
+      const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
+      uint16_t channel = elementNumbers->channelNumberBKLM(isForward, sector, layer, plane, strip);
+      enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
 
-      // optionally: convert to MHz, correct for the masked-out channels etc.
-
+      // Ignore the unknown and dead channels
+      if (status == KLMChannelStatus::c_Unknown)
+        B2FATAL("Incomplete KLM channel status data.");
+      if (status != KLMChannelStatus::c_Dead)
+        active++;
     }
-
-
-  } // Background namespace
-} // Belle2 namespace
-
+  }
+  return active;
+}

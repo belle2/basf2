@@ -165,6 +165,14 @@ namespace Belle2 {
       //! Return z strip (including fractional part) corresponding to local z coordinate
       double getZStrip(const CLHEP::Hep3Vector& p) const { return p.z() / m_ZStripWidth + m_ZPositionBase; }
 
+      //! Get phi strip corresponding to local phi coordinate
+      //! @return Strip number, -1 if not found.
+      int getPhiStripNumber(const CLHEP::Hep3Vector& p) const;
+
+      //! Get z strip corresponding to local z coordinate
+      //! @return Strip number, -1 if not found.
+      int getZStripNumber(const CLHEP::Hep3Vector& p) const;
+
       //! Transform space-point within this module from local to global coordinates
       //! @param reco set transformation for reconstruction including alignment correctoin (true) or nominal without alignment correction (false)
       const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v, bool reco = false) const;

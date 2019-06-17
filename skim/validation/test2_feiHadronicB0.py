@@ -35,7 +35,7 @@ variablesToHistogram(
         ('deltaE', 100, -0.2, 0.2),
         ('Mbc', 100, 5.2, 5.3)],
     variables_2d=[('deltaE', 100, -0.2, 0.2, 'Mbc', 100, 5.2, 5.3),
-                  ('decayModeID', 25, 0, 25, 'log10_sigProb', 100, -3.0, 0.0)],
+                  ('decayModeID', 26, 0, 26, 'log10_sigProb', 100, -3.0, 0.0)],
     path=path)
 
 process(path)

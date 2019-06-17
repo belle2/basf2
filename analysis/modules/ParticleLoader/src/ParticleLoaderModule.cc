@@ -632,6 +632,12 @@ namespace Belle2 {
       if ((cluster->getRelatedTo<KlId>()->getKlId() < 0) || (cluster->getRelatedTo<KlId>()->getKlId() > 1))
         continue;
 
+      if (std::isnan(cluster->getMomentumMag())) {
+        B2WARNING("Skipping KLMCluster because of nan momentum.");
+        continue;
+      }
+
+
       const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
 
       Particle particle(cluster);

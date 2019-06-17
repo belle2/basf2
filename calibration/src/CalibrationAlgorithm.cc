@@ -385,7 +385,7 @@ string CalibrationAlgorithm::getGranularityFromData() const
   f.reset(TFile::Open(fileName.c_str(), "READ"));
   runRange = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
   if (!runRange) {
-    B2FATAL("The input file " << fileName << "does not conatin a RunRange object at "
+    B2FATAL("The input file " << fileName << " does not contain a RunRange object at "
             << runRangeObjName << ". Please set your input files to exclude it.");
     return "";
   }

@@ -42,7 +42,7 @@ namespace Belle2 {
 
     // particle composed of selector, particle name, and user label: "^D_s+:label"
     particle %= -selector >> lexeme[+(char_ - reserved)] >> -label;
-    selector = string("^");
+    selector = string("^") | string("@");
     label %= lit(":") >> lexeme[+(char_ - reserved)];
 
     // Arrow types

@@ -80,6 +80,7 @@ RecoTrack* RecoTrackUtil::storeInto(const CDCTrajectory3D& traj3D,
 /// List of explicit specialisations - at the moment only CDCTrack.
 template void RecoTrackUtil::fill<CDCTrack>(const CDCTrack&, RecoTrack&);
 
+/// fill() specialisation for a class that holds right-left wire-hit information
 template <class ARLHitHolderRange>
 void RecoTrackUtil::fill(const ARLHitHolderRange& rlWireHitHolders, RecoTrack& recoTrack)
 {

@@ -16,12 +16,13 @@ namespace Belle2 {
     class CDCTrack;
     class CDCWireHit;
 
-    /*
+    /**
      * Utility structure gathering heuristic functions used during the search for non-helix or low hit count tracks
      */
     struct LowHitsAxialTrackUtil {
     public:
-      /* Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it if need be.
+      /**
+       * Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it if need be.
        * Uses extra assumptions like track coming from origin
        */
       static void addCandidateFromHits(const std::vector<const CDCWireHit*>& foundAxialWireHits,

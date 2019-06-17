@@ -4,7 +4,7 @@
 """
 <header>
     <input>../CharmlessHad2BodyNeutral.dst.root</input>
-    <output>CharmlessHad2BodyNeutral.udst.root</output>
+    <output>../CharmlessHad2BodyNeutral.udst.root</output>
     <contact>khsmith@student.unimelb.edu.au</contact>
     <interval>nightly</interval>
 </header>
@@ -26,7 +26,7 @@ charmless2neutralpath = Path()
 
 fileList = ['../CharmlessHad2BodyNeutral.dst.root']
 
-inputMdstList('MC9', fileList, path=charmless2neutralpath)
+inputMdstList('default', fileList, path=charmless2neutralpath)
 
 # Load particle lists
 stdPhotons('loose', path=charmless2neutralpath)
@@ -40,8 +40,8 @@ loadStdLightMesons(path=charmless2neutralpath)
 
 # Hadronic B0 skim
 from skim.btocharmless import *
-Had2BodyList = CharmlessHad2BodyB0List(path=charmless2neutralpath) + CharmlessHad2BodyBmList(path=charmless2neutralpath)
-skimOutputUdst('CharmlessHad2BodyNeutral.udst.root', Had2BodyList, path=charmless2neutralpath)
+Had2BodyList = CharmlessHad2BodyB0List(path=charmless2neutralpath)
+skimOutputUdst('../CharmlessHad2BodyNeutral.udst.root', Had2BodyList, path=charmless2neutralpath)
 summaryOfLists(Had2BodyList, path=charmless2neutralpath)
 
 # Suppress noisy modules, and then process

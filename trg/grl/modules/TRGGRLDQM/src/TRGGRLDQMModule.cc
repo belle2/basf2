@@ -1,14 +1,14 @@
 //---------------------------------------------------------------
 // $Id$
 //---------------------------------------------------------------
-// Filename : TRGGRLModule.cc
+// Filename : TRGGRLDQMModule.cc
 // Section  : TRG GRL
-// Owner    :
-// Email    :
+// Owner    : Yun-Tsung Lai
+// Email    : ytlai@post.kek.jp
 //---------------------------------------------------------------
-// Description : A trigger module for TRG GRL
+// Description : DQM module for TRGGRL
 //---------------------------------------------------------------
-// 1.00 : 2017/05/08 : First version
+// 1.00 : 2019/06/14 : First version
 //---------------------------------------------------------------
 #include <trg/grl/modules/TRGGRLDQM/TRGGRLDQMModule.h>
 
@@ -95,6 +95,8 @@ void TRGGRLDQMModule::defineHisto()
 
   h_map_ST  = new TH1F("h_map_ST",  "CDCTRG short track map [5.625 degrees]", 64, 0, 360);
   h_map_ST->GetXaxis()->SetTitle("CDCTRG short track map [5.625 degrees]");
+  h_map_ST2  = new TH1F("h_map_ST2",  "CDCTRG short track map [5.625 degrees]", 64, 0, 360);
+  h_map_ST2->GetXaxis()->SetTitle("CDCTRG short track map [5.625 degrees]");
   h_map_veto  = new TH1F("h_map_veto",  "CDCTRG 2D veto map [5.625 degrees]", 64, 0, 360);
   h_map_veto->GetXaxis()->SetTitle("CDCTRG 2D veto map [5.625 degrees]");
   h_map_TSF0 = new TH1F("h_map_TSF0",  "CDCTRG TSF0 map [5.625 degrees]", 64, 0, 360);
@@ -103,6 +105,10 @@ void TRGGRLDQMModule::defineHisto()
   h_map_TSF2->GetXaxis()->SetTitle("CDCTRG TSF2 map [5.625 degrees]");
   h_map_TSF4 = new TH1F("h_map_TSF4",  "CDCTRG TSF4 map [5.625 degrees]", 64, 0, 360);
   h_map_TSF4->GetXaxis()->SetTitle("CDCTRG TSF4 map [5.625 degrees]");
+  h_map_TSF1 = new TH1F("h_map_TSF1",  "CDCTRG TSF1 map [5.625 degrees]", 64, 0, 360);
+  h_map_TSF1->GetXaxis()->SetTitle("CDCTRG TSF1 map [5.625 degrees]");
+  h_map_TSF3 = new TH1F("h_map_TSF3",  "CDCTRG TSF3 map [5.625 degrees]", 64, 0, 360);
+  h_map_TSF3->GetXaxis()->SetTitle("CDCTRG TSF3 map [5.625 degrees]");
 
   oldDir->cd();
 }
@@ -131,10 +137,13 @@ void TRGGRLDQMModule::beginRun()
   h_TSFL1->Reset();
   h_B2LL1->Reset();
   h_map_ST->Reset();
+  h_map_ST2->Reset();
   h_map_veto->Reset();
   h_map_TSF0->Reset();
   h_map_TSF2->Reset();
   h_map_TSF4->Reset();
+  h_map_TSF1->Reset();
+  h_map_TSF3->Reset();
 
   oldDir->cd();
 }
@@ -224,6 +233,9 @@ void TRGGRLDQMModule::event()
     if (evtinfo->m_map_ST[i]) {
       h_map_ST->Fill(2.8 + i * 360.0 / 64.0);
     }
+    if (evtinfo->m_map_ST2[i]) {
+      h_map_ST2->Fill(2.8 + i * 360.0 / 64.0);
+    }
     if (evtinfo->m_map_veto[i]) {
       h_map_veto->Fill(2.8 + i * 360.0 / 64.0);
     }
@@ -235,6 +247,12 @@ void TRGGRLDQMModule::event()
     }
     if (evtinfo->m_map_TSF4[i]) {
       h_map_TSF4->Fill(2.8 + i * 360.0 / 64.0);
+    }
+    if (evtinfo->m_map_TSF1[i]) {
+      h_map_TSF1->Fill(2.8 + i * 360.0 / 64.0);
+    }
+    if (evtinfo->m_map_TSF3[i]) {
+      h_map_TSF3->Fill(2.8 + i * 360.0 / 64.0);
     }
   }
 }

@@ -290,6 +290,22 @@ namespace Belle2 {
       return vlocal;
     }
 
+    int Module::getPhiStripNumber(const CLHEP::Hep3Vector& p) const
+    {
+      int strip = std::floor(getPhiStrip(p));
+      if (strip < m_PhiStripMin || strip > m_PhiStripMax)
+        return -1;
+      return strip;
+    }
+
+    int Module::getZStripNumber(const CLHEP::Hep3Vector& p) const
+    {
+      int strip = std::floor(getZStrip(p));
+      if (strip < m_ZStripMin || strip > m_ZStripMax)
+        return -1;
+      return strip;
+    }
+
     void Module::setAlignment(const HepGeom::Transform3D& moduleAlignment)
     {
       m_Alignment = moduleAlignment;

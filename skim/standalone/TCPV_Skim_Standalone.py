@@ -14,15 +14,14 @@ __author__ = " Reem Rasheed"
 from basf2 import *
 from modularAnalysis import *
 from beamparameters import add_beamparameters
-from skimExpertFunctions import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import loadStdDiLeptons
-
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 
 
@@ -34,7 +33,7 @@ skimCode = encodeSkimName('TCPV')
 # create a path
 tcpvskimpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 inputMdstList('default', fileList, path=tcpvskimpath)
 

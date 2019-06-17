@@ -14,9 +14,9 @@
 
 namespace Belle2 {
 
-  /* Based on R. Fruehwirth, A. Strandlie, W. Waltenberger,
-  * Nuclear instruments and Methods in Physics Research A 490 (2002) 366-378
-  */
+  /** Based on R. Fruehwirth, A. Strandlie, W. Waltenberger,
+   * Nuclear instruments and Methods in Physics Research A 490 (2002) 366-378
+   */
   class QualityEstimatorRiemannHelixFit : public QualityEstimatorBase {
 
   public:

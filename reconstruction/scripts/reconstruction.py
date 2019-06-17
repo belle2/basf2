@@ -338,7 +338,6 @@ def add_top_modules(path, components=None, cosmics=False):
         else:
             top_finder = register_module('TOPBunchFinder')
             path.add_module(top_finder)
-            top_finder.param('addOffset', True)
         top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 

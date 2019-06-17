@@ -72,6 +72,8 @@ class MCTrajectoryHarvester(HarvestingModule):
         for track_point in mc_particle_trajectory:
             yield {"x": track_point.x, "y": track_point.y, "z": track_point.z, "index": self.counter}
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()
 
 
@@ -138,6 +140,8 @@ class MCParticleHarvester(HarvestingModule):
 
         return result
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()
 
 
@@ -149,10 +153,14 @@ class VXDHarvester(QueueHarvester):
         """Constructor"""
         HarvestingModule.__init__(self, foreach="TrackCands", output_file_name=output_file_name)
 
+        #: cached accessor to the SVD-tools singleton
         self.svd_tools = Belle2.VXDMomentumEstimationTools("Belle2::SVDCluster").getInstance()
+        #: cached accessor to the PXD-tools singleton
         self.pxd_tools = Belle2.VXDMomentumEstimationTools("Belle2::PXDCluster").getInstance()
 
+        #: cached copy of the name of the cluster StoreArray
         self.clusters = clusters
+        #: cached copy of the detector identifier (PXD or SVD)
         self.detector = detector
 
         self.use_mc_info = use_mc_info
@@ -297,6 +305,7 @@ class VXDHarvester(QueueHarvester):
 
             yield result_dict
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()
 
@@ -325,6 +334,7 @@ class FitHarvester(QueueHarvester):
     def __init__(self, output_file_name, queue):
         """Constructor"""
         QueueHarvester.__init__(self, queue, foreach="TrackFitResults", output_file_name=output_file_name)
+        #: access the DataStore singletion
         self.data_store = Belle2.DataStore.Instance()
 
     def pick(self, track_fit_result):
@@ -390,5 +400,6 @@ class FitHarvester(QueueHarvester):
                     number_of_momentum_measurements_in_total=number_of_momentum_measurements_in_total,
                     number_of_momentum_measurements_with_smaller_weight=number_of_momentum_measurements_with_smaller_weight)
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.SaveTreeRefiner()

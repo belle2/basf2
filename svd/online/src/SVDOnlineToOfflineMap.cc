@@ -72,17 +72,20 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUn
     // SVDDigits filling
     return;
   }
-
 }
-
 
 const SVDOnlineToOfflineMap::SensorInfo& SVDOnlineToOfflineMap::getSensorInfo(unsigned char FADC, unsigned char APV25)
 {
+
   ChipID id(FADC, APV25);
   auto sensorIter = m_sensors.find(id);
 
   if (sensorIter == m_sensors.end()) {
-    B2WARNING("Combination not found in the SVD On-line to Off-line map:" << LogVar("FADC", int(FADC)) << LogVar("APV", int(APV25)));
+    nBadMappingErrors++;
+
+    if (!(nBadMappingErrors % m_errorRate)) B2ERROR("Combination not found in the SVD On-line to Off-line map:" << LogVar("FADC",
+                                                      int(FADC)) << LogVar("APV", int(APV25)));
+
     m_currentSensorInfo.m_sensorID = 0;
     m_currentSensorInfo.m_channel0 = 0;
     m_currentSensorInfo.m_channel127 = 0;

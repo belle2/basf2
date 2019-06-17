@@ -60,23 +60,6 @@ namespace Belle2 {
         outErr = -999;
         return -999;
       }
-      // get TreeFitter values if they exist.
-      // Bypass this in case the variables are requested for the granddaughter with respect to the mother as
-      // TreeFitter will return the values of the granddaughter with respect to the daughter
-      if (!motherToGranddaughter) {
-        if (mode == "distance" &&
-            daughter->hasExtraInfo("decayLength") &&
-            daughter->hasExtraInfo("decayLengthErr")) {
-          outErr = daughter -> getExtraInfo("decayLengthErr");
-          return daughter -> getExtraInfo("decayLength");
-        }
-        if (mode == "time" &&
-            daughter->hasExtraInfo("lifeTime") &&
-            daughter->hasExtraInfo("lifeTimeErr")) {
-          outErr = daughter -> getExtraInfo("lifeTimeErr");
-          return daughter -> getExtraInfo("lifeTime");
-        }
-      }
 
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();

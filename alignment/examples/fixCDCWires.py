@@ -20,11 +20,11 @@ first_layer = 0
 last_layer = 55
 
 
-class WriteConstraints(Module):
+class FixWires(Module):
 
     def __init__(self):
         """ init """
-        super(WriteConstraints, self).__init__()
+        super(FixWires, self).__init__()
         self.consts = []
 
     def event(self):
@@ -35,22 +35,22 @@ class WriteConstraints(Module):
         self.consts.append('Parameters')
         for layer in range(first_layer, last_layer + 1):
             for wire in range(0, wires_in_layer[layer]):
+                # Unique id of CDCAlignment db object
+                cdcid = Belle2.CDCAlignment.getGlobalUniqueID()
+
                 wireid = Belle2.WireID(layer, wire).getEWire()
-
                 label = Belle2.GlobalLabel()
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireBwdX)
+
+                label.construct(cdcid, wireid, Belle2.CDCAlignment.wireBwdX)
                 self.consts.append('{} 0. -1.'.format(str(label.label())))
 
-                label = Belle2.GlobalLabel()
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireFwdX)
+                label.construct(cdcid, wireid, Belle2.CDCAlignment.wireFwdX)
                 self.consts.append('{} 0. -1.'.format(str(label.label())))
 
-                label = Belle2.GlobalLabel()
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireBwdY)
+                label.construct(cdcid, wireid, Belle2.CDCAlignment.wireBwdY)
                 self.consts.append('{} 0. -1.'.format(str(label.label())))
 
-                label = Belle2.GlobalLabel()
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireFwdY)
+                label.construct(cdcid, wireid, Belle2.CDCAlignment.wireFwdY)
                 self.consts.append('{} 0. -1.'.format(str(label.label())))
 
     def terminate(self):
@@ -62,7 +62,6 @@ class WriteConstraints(Module):
 main = create_path()
 main.add_module('EventInfoSetter')
 main.add_module('Gearbox')
-
 main.add_module('Geometry')
-main.add_module(WriteConstraints())
+main.add_module(FixWires())
 process(main)

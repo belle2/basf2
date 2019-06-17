@@ -29,7 +29,7 @@ class WriteConstraints(Module):
             return
 
         for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire X (BWD) in layer=0')
+            self.consts.append('Constraint 0. ! sum of wire X (BWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
                 wireid = Belle2.WireID(layer, wire).getEWire()
 
@@ -39,7 +39,7 @@ class WriteConstraints(Module):
                 self.consts.append('{} 1.'.format(str(label.label())))
 
         for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire Y (BWD) in layer=0')
+            self.consts.append('Constraint 0. ! sum of wire Y (BWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
                 wireid = Belle2.WireID(layer, wire).getEWire()
 
@@ -49,7 +49,7 @@ class WriteConstraints(Module):
                 self.consts.append('{} 1.'.format(str(label.label())))
 
         for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire rotations (BWD) in layer=0')
+            self.consts.append('Constraint 0. ! sum of wire rotations (BWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
                 wireid = Belle2.WireID(layer, wire).getEWire()
                 wid = Belle2.WireID(layer, wire)
@@ -68,7 +68,7 @@ class WriteConstraints(Module):
                 self.consts.append('{} {}.'.format(str(label.label()), math.cos(wirePhi)))
 
         for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire X (FWD) in layer=0')
+            self.consts.append('Constraint 0. ! sum of wire X (FWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
                 wireid = Belle2.WireID(layer, wire).getEWire()
 
@@ -78,7 +78,7 @@ class WriteConstraints(Module):
                 self.consts.append('{} 1.'.format(str(label.label())))
 
         for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire Y (FWD) in layer=0')
+            self.consts.append('Constraint 0. ! sum of wire Y (FWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
                 wireid = Belle2.WireID(layer, wire).getEWire()
 
@@ -88,7 +88,7 @@ class WriteConstraints(Module):
                 self.consts.append('{} 1.'.format(str(label.label())))
 
         for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire rotations (FWD) in layer=0')
+            self.consts.append('Constraint 0. ! sum of wire rotations (FWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
                 wireid = Belle2.WireID(layer, wire).getEWire()
                 wid = Belle2.WireID(layer, wire)
@@ -115,7 +115,6 @@ class WriteConstraints(Module):
 main = create_path()
 main.add_module('EventInfoSetter')
 main.add_module('Gearbox')
-
 main.add_module('Geometry')
 main.add_module(WriteConstraints())
 process(main)

@@ -179,7 +179,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   // Gravitational sagging per wire
   if (s_enableWireSaggingGlobalDerivative) {
     globals.add(
-      GlobalLabel::construct<CDCAlignment>(getWireID(), CDCAlignment::wireTension),
+      GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireTension),
       drldg(0, 1) * 4.0 * zRel * (1.0 - zRel)
     );
   }

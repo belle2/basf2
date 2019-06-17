@@ -304,7 +304,6 @@ def add_cdst_output(
         'TracksToEKLMAlignmentHits'
         'EKLMHit2ds',
         'EKLMDigits',
-        'KLMDigitEventInfos'
         'Muids',
         'TracksToMuids',
         'ARICHDigits',

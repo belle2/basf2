@@ -90,6 +90,8 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
 
   double lambda = 0;
 
+  // capture the original propagation direction
+  auto originalPropDirection = gfTrack.getCardinalRep()->getPropDir();
 
   for (int propDir = -1; propDir <= 1; propDir += 2) {
     gfTrack.getCardinalRep()->setPropDir(propDir);
@@ -128,5 +130,7 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
     }
   }
 
+  // restore the original propagation direction
+  gfTrack.getCardinalRep()->setPropDir(originalPropDirection);
 
 }

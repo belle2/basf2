@@ -27,6 +27,7 @@ import argparse
 import re
 import sqlite3
 import time
+import datetime
 import os
 import basf2 as b2
 
@@ -107,7 +108,7 @@ def argparser():
 
     return parser
 
-class luminosity:
+class Luminosity:
     """
     class to read lumi info from DB and serve in various way
     """
@@ -123,10 +124,18 @@ class luminosity:
         self.exp=args.exp
         self.expstr="-".join(str(_) for _ in args.exp)
         self.runs=args.runs
+        if len(self.exp)>1 and self.runs:
+            b2.B2FATAL(f"No run range (--runs ) allowed if multiple experiments are selected (--exp {self.exp})")
+
+
+        self.runRangeStr="All runs"
+        if self.runs:
+            self.runRangeStr="Runs {min(self.runs)}-{self.runs(run_max)}"
+
         self.verb=args.verb
 
         if not self.conn:
-            b2.b2fatal(f"could not establish connection to db: {db}")
+            b2.B2FATAL(f"could not establish connection to db: {db}")
 
         self.col_lumi = "lum_det_shift"
 
@@ -170,59 +179,60 @@ class luminosity:
         # convert epoch to date
         df['date'] = pd.to_datetime(df['date'],unit='s')
 
+        # lumi in /fb
+        df['lumi'] *= 1E-6
         # cumulative integrated luminosity
         df['intLumi'] = df['lumi'].cumsum()
 
         return df
 
-    def plotLumi(self, period=1):
+    def plotLumiPerPeriod(self, period=1):
         """
         Make monitoring plots of luminosity.
 
         :param period: 1 for day, 2 for week (start on monday)
         """
 
-        # RUN max, min
-        run_min = self.df["run"].min()
-        run_max = self.df["run"].max()
-
         # Group runs by date, and store the int lumi per date as the max cumulative lumi.
         # This returns a pandas.Series object.
         srs_lumi_date = []
         if period==1: # per day
-            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()*1.E-6 # in /fb
+            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()
             label="Day"
         if period==2: # per week
             # not working yet
-            srs_lumi_date = self.df.groupby(self.df["date", pd.Grouper(key='Date', freq='W-MON')])["lumi"].sum()*1.E-6 # in /fb
+            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%w'))["lumi"].sum()
+            #srs_lumi_date = self.df.groupby(pd.TimeGrouper(key='date',freq='W-MON'))["lumi"].sum()
             label="Week"
+
 
         figure, ax1 = plt.subplots()
 
         x = srs_lumi_date.index.values
-        x[0] = x[1] # groupby insert first date as eopch 0
+        x[0] = x[1] # groupby insert first date as epoch 0
         y = srs_lumi_date.values
 
-        # there must be a cleanerr way to do this
+        # there must be a cleaner way to do this
         yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[:-1])
         
-        ax1.bar(x, y, label=f"{label} per {label}", color="blue")
+        ax1.bar(x, y, label=f"{label} per {label}", color="blue", width=1.0)
 
         ax1.set_xlabel(r"Date")
         ax1.set_ylabel(rf"Total integrated luminosity per {label} [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
 
-        ax1.tick_params(axis="x", labelrotation=45, labelsize="small")
-        ax1.xaxis.set_major_locator(ticker.AutoLocator())
+        ax1.xaxis.set_major_locator(ticker.LinearLocator())
         ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
 
         # plot integrate lumi
         ax2 = ax1.twinx()
         ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
         ax2.tick_params(axis='y', labelcolor="red")
-        ax2.plot(x, yInt, color="red", label="Total")
-        ax2.xaxis.set_major_locator(ticker.AutoLocator())
-        ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        ax2.plot(x, yInt, color="red", label="Total",lw=3)
+        # ax2.xaxis.set_major_locator(ticker.AutoLocator())
+        # ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        ax2.set_ylim(bottom=0)
 
         h1, l1 = ax1.get_legend_handles_labels()
         h2, l2 = ax2.get_legend_handles_labels()
@@ -230,9 +240,9 @@ class luminosity:
 
         # Text box. Use axis coords.
         plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
-        plt.text(.5, 1.03, rf"Exp: {self.expstr} - Runs {run_min}-{run_max}", transform=ax1.transAxes, fontsize=12)
-        #plt.text(.5, 1.03, rf"Exp: 7 - 8  - All Runs ", transform=ax1.transAxes, fontsize=12)
-        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max()/1.e6:.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
+        plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
+        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
+        plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
         plt.savefig(f"LumiPer{label}_Exp{self.expstr}.pdf", bbox_inches="tight")
         plt.savefig(f"LumiPer{label}_Exp{self.expstr}.png", bbox_inches="tight")
@@ -242,6 +252,7 @@ class luminosity:
         Make lumi plot per run
         """
 
+        # create a reduced dataframe with only runs selected
         # these are the runs to be selected
         if (self.runs):
             dfRuns=self.df[self.df['run'].isin(self.runs)]
@@ -249,35 +260,33 @@ class luminosity:
         else:
             dfRuns=self.df
 
-        # create a reduced dataframe with only runs selected
-        # RUN max, min
-        run_min = dfRuns["run"].min()
-        run_max = dfRuns["run"].max()
-
         figure, ax1 = plt.subplots()
 
-        dfRuns.plot.bar(x='run', y='lumi', label=f"Run by run", color="blue", ax=ax1, legend=None)
+        ax1.bar(dfRuns['run'], dfRuns['lumi'], label=f"Run by run", color="blue", width=1.0)
         ax1.set_xlabel(r"Run")
         ax1.set_ylabel(rf"Total integrated luminosity per Run [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
-        ax1.tick_params(axis="x", labelrotation=45, labelsize="small")
-        ax1.xaxis.set_major_locator(ticker.AutoLocator())
+        ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
+        ax1.set_xlim(left=dfRuns['run'].min())
+        ax1.xaxis.set_major_locator(ticker.LinearLocator(numticks=10))
 
         # plot integrate lumi
         ax2 = ax1.twinx()
         ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
+        ax2.set_ylim(bottom=0,top=dfRuns['intLumi'].max()*1.2)
         ax2.tick_params(axis='y', labelcolor="red")
-        dfRuns.plot(x='run', y='intLumi', color="red", label="Total", ax=ax2)
-        ax2.xaxis.set_major_locator(ticker.AutoLocator())
+        ax2.xaxis.set_major_locator(ticker.LinearLocator(numticks=10))
+        ax2.plot(dfRuns['run'], dfRuns['intLumi'], color="red", label="Total")
 
         h1, l1 = ax1.get_legend_handles_labels()
         h2, l2 = ax2.get_legend_handles_labels()
-        ax2.legend(h1+h2, l1+l2,loc="best",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
+        ax2.legend(h1+h2, l1+l2, loc=2, title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 
         # Text box. Use axis coords.
         plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
-        plt.text(.5, 1.03, rf"Exp: {self.expstr} - Runs {run_min}-{run_max}", transform=ax1.transAxes, fontsize=12)
-        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max()/1.e6:.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
+        plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
+        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
+        plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
         plt.savefig(f"LumiPerRun_Exp{self.expstr}.pdf", bbox_inches="tight")
         plt.savefig(f"LumiPerRun_Exp{self.expstr}.png", bbox_inches="tight")
@@ -308,7 +317,7 @@ class luminosity:
                                 ))
             print('-' * 61)
         L=dfRuns['lumi'].sum()
-        print(f"TOTAL    : L = {L:8.2f} /nb = {L/1E3:8.2f} /pb = {L/1E6:8.3f} /fb = {L/1E9:8.4f} /ab")
+        print(f"TOTAL    : L = {L*1E6:8.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
         
         pass
 
@@ -317,13 +326,13 @@ if __name__ == '__main__':
 
     args = argparser().parse_args()
     
-    lumi=luminosity(args)
+    lumi=Luminosity(args)
 
     lumi.printLumi()
 
     if args.plot:
         if args.plot == 'DATE':
-            lumi.plotLumi(1)
-            #lumi.plotLumi(2)
+            lumi.plotLumiPerPeriod(1)
+            #lumi.plotLumiPerPeriod(2)
         if args.plot == 'RUN':
             lumi.plotLumiPerRun()

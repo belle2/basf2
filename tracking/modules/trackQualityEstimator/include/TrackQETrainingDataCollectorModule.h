@@ -85,7 +85,7 @@ namespace Belle2 {
     float m_truth = NAN;
 
     /// Parameter to enable event-wise features
-    bool m_param_useEventwiseFeatures = false;
+    bool m_param_collectEventFeatures = false;
 
 //    /** number of RecoTracks in an event*/
 //    float m_nRecoTracks = NAN;

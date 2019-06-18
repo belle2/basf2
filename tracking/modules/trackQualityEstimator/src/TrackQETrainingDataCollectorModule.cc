@@ -33,14 +33,14 @@ TrackQETrainingDataCollectorModule::TrackQETrainingDataCollectorModule() : Modul
            std::string("PXDRecoTracks"));
   addParam("TrainingDataOutputName", m_TrainingDataOutputName, "Name of the output rootfile.",
            std::string("QETrainingOutput.root"));
-  addParam("useEventFeatures", m_param_useEventwiseFeatures, "Whether to use eventwise features.",
+  addParam("collectEventFeatures", m_param_collectEventFeatures, "Whether to use eventwise features.",
            false);
 }
 
 void TrackQETrainingDataCollectorModule::initialize()
 {
   m_recoTracks.isRequired(m_recoTracksStoreArrayName);
-  if (m_param_useEventwiseFeatures) {
+  if (m_param_collectEventFeatures) {
     m_eventInfoExtractor = std::make_unique<EventInfoExtractor>(m_variableSet);
   }
   m_recoTrackExtractor = std::make_unique<RecoTrackExtractor>(m_variableSet);
@@ -70,7 +70,7 @@ void TrackQETrainingDataCollectorModule::event()
       svdRecoTrack = svdcdcRecoTrack->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);
     }
     pxdRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName);
-    if (m_param_useEventwiseFeatures) {
+    if (m_param_collectEventFeatures) {
       m_eventInfoExtractor->extractVariables(m_recoTracks, recoTrack);
     }
     m_recoTrackExtractor->extractVariables(recoTrack);

@@ -302,7 +302,7 @@ class Luminosity:
         """
         # these are the runs to be selected
         if (self.runs):
-            dfRuns=self.df[self.df['run'].isin(self.runs)]
+            dfRuns=self.df[self.df['run'].isin(self.runs)].copy()
             dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
         else:
             dfRuns=self.df

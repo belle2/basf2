@@ -126,6 +126,8 @@ class Luminosity:
         self.runs=args.runs
         if len(self.exp)>1 and self.runs:
             b2.B2FATAL(f"No run range (--runs ) allowed if multiple experiments are selected (--exp {self.exp})")
+        if args.plot == 'RUN' and len(self.exp)>1:
+            b2.B2FATAL(f"If plotting lumi per run (--plot RUN) you can select only one experiment (--exp {self.exp})")
 
 
         self.runRangeStr="All runs"
@@ -244,6 +246,7 @@ class Luminosity:
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
+        print(f"Creating LumiPer{label}_Exp{self.expstr}.pdf|png files")
         plt.savefig(f"LumiPer{label}_Exp{self.expstr}.pdf", bbox_inches="tight")
         plt.savefig(f"LumiPer{label}_Exp{self.expstr}.png", bbox_inches="tight")
 
@@ -288,6 +291,7 @@ class Luminosity:
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
+        print(f"Creating LumiPerRun_Exp{self.expstr}.pdf|png files")
         plt.savefig(f"LumiPerRun_Exp{self.expstr}.pdf", bbox_inches="tight")
         plt.savefig(f"LumiPerRun_Exp{self.expstr}.png", bbox_inches="tight")
         pass

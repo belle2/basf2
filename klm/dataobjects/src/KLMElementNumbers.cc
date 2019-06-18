@@ -61,6 +61,16 @@ uint16_t KLMElementNumbers::channelNumberEKLM(int eklmStrip) const
   return eklmStrip;
 }
 
+bool KLMElementNumbers::isBKLMChannel(uint16_t channel) const
+{
+  return (channel >= m_BKLMOffset);
+}
+
+bool KLMElementNumbers::isEKLMChannel(uint16_t channel) const
+{
+  return (channel < m_BKLMOffset);
+}
+
 uint16_t KLMElementNumbers::moduleNumberBKLM(
   int forward, int sector, int layer) const
 {

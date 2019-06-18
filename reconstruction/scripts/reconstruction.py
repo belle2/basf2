@@ -281,6 +281,7 @@ def add_cdst_output(
         'RecoHitInformations',
         'RecoHitInformationsToBKLMHit2ds',
         'EKLMAlignmentHits',
+        'TracksToEKLMAlignmentHits'
         'EKLMHit2ds',
         'EKLMDigits',
         'Muids',

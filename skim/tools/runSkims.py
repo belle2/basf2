@@ -4,7 +4,7 @@ from skimExpertFunctions import *
 all_skims = [
     "ALP3Gamma", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
     "BtoDh_Kspipipi0", "BtoDh_Kspi0", "BtoDh_hh", "BtoDh_Kshh",
-    "BtoPi0Pi0", "BtoXll", "BtoXgamma", "Charm2BodyHadronic", "Charm2BodyHadronicD0",
+    "BtoPi0Pi0", "BtoXll", "BtoXgamma", "DstToD0PiD0ToHpJm", "D0ToHpJm",
     "Charm2BodyNeutrals", "Charm2BodyNeutralsD0", "Charm3BodyHadronic", "Charm3BodyHadronic2",
     "Charm3BodyHadronic1", "Charm3BodyHadronic3", "CharmRare", "CharmSemileptonic",
     "CharmlessHad2Body", "CharmlessHad3Body", "ISRpipicc",

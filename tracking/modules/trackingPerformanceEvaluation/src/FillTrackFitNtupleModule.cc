@@ -15,6 +15,8 @@
 
 #include <genfit/KalmanFitterInfo.h>
 
+#include <map>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -65,7 +67,7 @@ void FillTrackFitNtupleModule::event()
 
   for (Track& track : tracks) {
 
-    const RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
+    RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
     if (recoTrack == nullptr) {
       // if no recoTrack is associated to Track, we don't break but we use an
       // empty recoTrack to fill the ntuple, thus to backtrace the cases when
@@ -74,194 +76,92 @@ void FillTrackFitNtupleModule::event()
       recoTrack = new RecoTrack();
     }
 
-    const TrackFitResult* fitResult_pi = track.getTrackFitResult(Const::pion);
-    const TrackFitResult* fitResult_k = track.getTrackFitResult(Const::kaon);
-    const TrackFitResult* fitResult_p = track.getTrackFitResult(Const::proton);
-    const TrackFitResult* fitResult_d = track.getTrackFitResult(Const::deuteron);
+    Float_t nhits = recoTrack->getNumberOfTrackingHits();
+    Float_t ncdc = recoTrack->getNumberOfCDCHits();
+    Float_t npxd = recoTrack->getNumberOfPXDHits();
+    Float_t nsvd =  recoTrack->getNumberOfSVDHits();
 
-    Float_t flag_pi = kTRUE, flag_k = kTRUE, flag_p = kTRUE, flag_d = kTRUE;
-    if ((fitResult_pi == nullptr) || (fitResult_pi->getParticleType() != Const::pion)) flag_pi = kFALSE;
-    if ((fitResult_k == nullptr) || (fitResult_k->getParticleType() != Const::kaon)) flag_k = kFALSE;
-    if ((fitResult_p == nullptr) || (fitResult_p->getParticleType() != Const::proton)) flag_p = kFALSE;
-    if ((fitResult_d == nullptr) || (fitResult_d->getParticleType() != Const::deuteron)) flag_d = kFALSE;
+    const Const::ChargedStable pdg_list[4] = {Const::pion, Const::kaon, Const::proton, Const::deuteron}; // loop only on these hypotheses
 
-    Float_t trk_x_pi = 0, trk_y_pi = 0, trk_z_pi = 0, trk_px_pi = 0, trk_py_pi = 0, trk_pz_pi = 0, trk_p_pi = 0, trk_pt_pi = 0,
-            trk_theta_pi = 0, trk_phi_pi = 0,
-            trk_charge_pi = 0, trk_chi2_pi = 0, trk_ndf_pi = 0, trk_pvalue_pi = 0, nfailed_pi = 0;
-    Float_t trk_x_k = 0, trk_y_k = 0, trk_z_k = 0, trk_px_k = 0, trk_py_k = 0, trk_pz_k = 0, trk_p_k = 0, trk_pt_k = 0, trk_theta_k = 0,
-            trk_phi_k = 0, trk_charge_k = 0,
-            trk_chi2_k = 0, trk_ndf_k = 0, trk_pvalue_k = 0, nfailed_k = 0;
-    Float_t trk_x_p = 0, trk_y_p = 0, trk_z_p = 0, trk_px_p = 0, trk_py_p = 0, trk_pz_p = 0, trk_p_p = 0, trk_pt_p = 0, trk_theta_p = 0,
-            trk_phi_p = 0, trk_charge_p = 0,
-            trk_chi2_p = 0, trk_ndf_p = 0, trk_pvalue_p = 0, nfailed_p = 0;
-    Float_t trk_x_d = 0, trk_y_d = 0, trk_z_d = 0, trk_px_d = 0, trk_py_d = 0, trk_pz_d = 0, trk_p_d = 0, trk_pt_d = 0, trk_theta_d = 0,
-            trk_phi_d = 0, trk_charge_d = 0,
-            trk_chi2_d = 0, trk_ndf_d = 0, trk_pvalue_d = 0, nfailed_d = 0;
-    Float_t nhits = 0, ncdc = 0, npxd = 0, nsvd = 0;
-    Float_t nhits_pi = 0, ncdc_pi = 0, npxd_pi = 0, nsvd_pi = 0;
-    Float_t nhits_k = 0, ncdc_k = 0, npxd_k = 0, nsvd_k = 0;
-    nhits = recoTrack->getNumberOfTrackingHits();
-    ncdc = recoTrack->getNumberOfCDCHits();
-    npxd = recoTrack->getNumberOfPXDHits();
-    nsvd = recoTrack->getNumberOfSVDHits();
-    Float_t nhits_p = 0, ncdc_p = 0, npxd_p = 0, nsvd_p = 0;
-    Float_t nhits_d = 0, ncdc_d = 0, npxd_d = 0, nsvd_d = 0;
-    Float_t first_cdc_pi = -100, last_cdc_pi = -100, first_svd_pi = -100, last_svd_pi = -100;
-    Float_t first_cdc_k = -100, last_cdc_k = -100, first_svd_k = -100, last_svd_k = -100;
-    Float_t first_cdc_p = -100, last_cdc_p = -100, first_svd_p = -100, last_svd_p = -100;
-    Float_t first_cdc_d = -100, last_cdc_d = -100, first_svd_d = -100, last_svd_d = -100;
-    const auto& trackReps = recoTrack->getRepresentations();
-    for (const auto& trackRep : trackReps) {
-      int PDG = std::abs(trackRep->getPDG());
+    std::map <Const::ChargedStable, Float_t> flag; // is the particle hypothesis existing in the track?
+    std::map <Const::ChargedStable, Float_t> trk_x, trk_y, trk_z, trk_px, trk_py, trk_pz, trk_p, trk_pt, trk_theta, trk_phi;
+    std::map <Const::ChargedStable, Float_t> trk_charge, trk_chi2, trk_ndf, trk_pvalue, trk_nfailed;
+    std::map <Const::ChargedStable, Float_t> nhits_pid, ncdc_pid, nsvd_pid, npxd_pid;
+    std::map <Const::ChargedStable, Float_t> first_cdc, last_cdc, first_svd, last_svd;
 
-      switch (PDG) {
-        case 211:
-          if (flag_pi) {
-            trk_x_pi = fitResult_pi->getPosition().X();
-            trk_y_pi = fitResult_pi->getPosition().Y();
-            trk_z_pi = fitResult_pi->getPosition().Z();
-            trk_px_pi = fitResult_pi->getMomentum().X();
-            trk_py_pi = fitResult_pi->getMomentum().Y();
-            trk_pz_pi = fitResult_pi->getMomentum().Z();
-            trk_p_pi = fitResult_pi->getMomentum().Mag();
-            trk_pt_pi = fitResult_pi->getMomentum().Pt();
-            trk_theta_pi = fitResult_pi->getMomentum().Theta() * TMath::RadToDeg();
-            trk_phi_pi = fitResult_pi->getMomentum().Phi() * TMath::RadToDeg();
-            trk_charge_pi = fitResult_pi->getChargeSign();
-            double chi2 = recoTrack->getTrackFitStatus(trackRep)->getChi2();
-            if (isnan(chi2)) chi2 = -10;
-            if (isinf(chi2)) chi2 = -20;
-            trk_chi2_pi =  chi2;
-            trk_ndf_pi =  recoTrack->getTrackFitStatus(trackRep)->getNdf();;
-            trk_pvalue_pi =  fitResult_pi->getPValue();
-            nfailed_pi = recoTrack->getTrackFitStatus(trackRep)->getNFailedPoints();
-            ncdc_pi = fitResult_pi->getHitPatternCDC().getNHits();
-            npxd_pi = fitResult_pi->getHitPatternVXD().getNPXDHits();
-            nsvd_pi = fitResult_pi->getHitPatternVXD().getNSVDHits();
-            nhits_pi = ncdc_pi + npxd_pi + nsvd_pi;
-            first_cdc_pi = fitResult_pi->getHitPatternCDC().getFirstLayer();
-            last_cdc_pi = fitResult_pi->getHitPatternCDC().getLastLayer();
-            first_svd_pi = fitResult_pi->getHitPatternVXD().getFirstSVDLayer();
-            last_svd_pi = fitResult_pi->getHitPatternVXD().getLastSVDLayer();
-          }
-          break;
+    for (const Const::ChargedStable& pdgIter : pdg_list) {
+      trk_x[pdgIter] = 0.; trk_y[pdgIter] = 0.; trk_z[pdgIter] = 0.;
+      trk_px[pdgIter] = 0.; trk_py[pdgIter] = 0.; trk_pz[pdgIter] = 0.;
+      trk_p[pdgIter] = 0.; trk_pt[pdgIter] = 0.; trk_theta[pdgIter] = 0.; trk_phi[pdgIter] = 0.;
+      trk_charge[pdgIter] = 0.;
+      trk_chi2[pdgIter] = 0.; trk_ndf[pdgIter] = 0.; trk_pvalue[pdgIter] = 0.; trk_nfailed[pdgIter] = 0.;
+      nhits_pid[pdgIter] = 0.; ncdc_pid[pdgIter] = 0.; nsvd_pid[pdgIter] = 0.; npxd_pid[pdgIter] = 0.;
+      first_cdc[pdgIter] = -100.; last_cdc [pdgIter] = -100.;
+      first_svd[pdgIter] = -100.; last_svd [pdgIter] = -100.;
 
-        case 321:
-          if (flag_k) {
-            trk_x_k = fitResult_k->getPosition().X();
-            trk_y_k = fitResult_k->getPosition().Y();
-            trk_z_k = fitResult_k->getPosition().Z();
-            trk_px_k = fitResult_k->getMomentum().X();
-            trk_py_k = fitResult_k->getMomentum().Y();
-            trk_pz_k = fitResult_k->getMomentum().Z();
-            trk_p_k = fitResult_k->getMomentum().Mag();
-            trk_pt_k = fitResult_k->getMomentum().Pt();
-            trk_theta_k = fitResult_k->getMomentum().Theta() * TMath::RadToDeg();
-            trk_phi_k = fitResult_k->getMomentum().Phi() * TMath::RadToDeg();
-            trk_charge_k = fitResult_k->getChargeSign();
-            double chi2 = recoTrack->getTrackFitStatus(trackRep)->getChi2();
-            if (isnan(chi2)) chi2 = -10;
-            if (isinf(chi2)) chi2 = -20;
-            trk_chi2_k =  chi2;
-            trk_ndf_k =  recoTrack->getTrackFitStatus(trackRep)->getNdf();;
-            trk_pvalue_k =  fitResult_k->getPValue();
-            nfailed_k = recoTrack->getTrackFitStatus(trackRep)->getNFailedPoints();
-            ncdc_k = fitResult_k->getHitPatternCDC().getNHits();
-            npxd_k = fitResult_k->getHitPatternVXD().getNPXDHits();
-            nsvd_k = fitResult_k->getHitPatternVXD().getNSVDHits();
-            nhits_k = ncdc_k + npxd_k + nsvd_k;
-            first_cdc_k = fitResult_k->getHitPatternCDC().getFirstLayer();
-            last_cdc_k = fitResult_k->getHitPatternCDC().getLastLayer();
-            first_svd_k = fitResult_k->getHitPatternVXD().getFirstSVDLayer();
-            last_svd_k = fitResult_k->getHitPatternVXD().getLastSVDLayer();
-          }
-          break;
-
-        case 2212:
-          if (flag_p) {
-            trk_x_p = fitResult_p->getPosition().X();
-            trk_y_p = fitResult_p->getPosition().Y();
-            trk_z_p = fitResult_p->getPosition().Z();
-            trk_px_p = fitResult_p->getMomentum().X();
-            trk_py_p = fitResult_p->getMomentum().Y();
-            trk_pz_p = fitResult_p->getMomentum().Z();
-            trk_p_p = fitResult_p->getMomentum().Mag();
-            trk_pt_p = fitResult_p->getMomentum().Pt();
-            trk_theta_p = fitResult_p->getMomentum().Theta() * TMath::RadToDeg();
-            trk_phi_p = fitResult_p->getMomentum().Phi() * TMath::RadToDeg();
-            trk_charge_p = fitResult_p->getChargeSign();
-            double chi2 = recoTrack->getTrackFitStatus(trackRep)->getChi2();
-            if (isnan(chi2)) chi2 = -10;
-            if (isinf(chi2)) chi2 = -20;
-            trk_chi2_p =  chi2;
-            trk_ndf_p =  recoTrack->getTrackFitStatus(trackRep)->getNdf();;
-            trk_pvalue_p =  fitResult_p->getPValue();
-            nfailed_p = recoTrack->getTrackFitStatus(trackRep)->getNFailedPoints();
-            ncdc_p = fitResult_p->getHitPatternCDC().getNHits();
-            npxd_p = fitResult_p->getHitPatternVXD().getNPXDHits();
-            nsvd_p = fitResult_p->getHitPatternVXD().getNSVDHits();
-            nhits_p = ncdc_p + npxd_p + nsvd_p;
-            first_cdc_p = fitResult_p->getHitPatternCDC().getFirstLayer();
-            last_cdc_p = fitResult_p->getHitPatternCDC().getLastLayer();
-            first_svd_p = fitResult_p->getHitPatternVXD().getFirstSVDLayer();
-            last_svd_p = fitResult_p->getHitPatternVXD().getLastSVDLayer();
-          }
-          break;
-
-        case 1000010020:
-          if (flag_d) {
-            trk_x_d = fitResult_d->getPosition().X();
-            trk_y_d = fitResult_d->getPosition().Y();
-            trk_z_d = fitResult_d->getPosition().Z();
-            trk_px_d = fitResult_d->getMomentum().X();
-            trk_py_d = fitResult_d->getMomentum().Y();
-            trk_pz_d = fitResult_d->getMomentum().Z();
-            trk_p_d = fitResult_d->getMomentum().Mag();
-            trk_pt_d = fitResult_d->getMomentum().Pt();
-            trk_theta_d = fitResult_d->getMomentum().Theta() * TMath::RadToDeg();
-            trk_phi_d = fitResult_d->getMomentum().Phi() * TMath::RadToDeg();
-            trk_charge_d = fitResult_d->getChargeSign();
-            double chi2 = recoTrack->getTrackFitStatus(trackRep)->getChi2();
-            if (isnan(chi2)) chi2 = -10;
-            if (isinf(chi2)) chi2 = -20;
-            trk_chi2_d =  chi2;
-            trk_ndf_d =  recoTrack->getTrackFitStatus(trackRep)->getNdf();;
-            trk_pvalue_d =  fitResult_d->getPValue();
-            nfailed_d = recoTrack->getTrackFitStatus(trackRep)->getNFailedPoints();
-            ncdc_d = fitResult_d->getHitPatternCDC().getNHits();
-            npxd_d = fitResult_d->getHitPatternVXD().getNPXDHits();
-            nsvd_d = fitResult_d->getHitPatternVXD().getNSVDHits();
-            nhits_d = ncdc_d + npxd_d + nsvd_d;
-            first_cdc_d = fitResult_d->getHitPatternCDC().getFirstLayer();
-            last_cdc_d = fitResult_d->getHitPatternCDC().getLastLayer();
-            first_svd_d = fitResult_d->getHitPatternVXD().getFirstSVDLayer();
-            last_svd_d = fitResult_d->getHitPatternVXD().getLastSVDLayer();
-          }
+      const TrackFitResult* fitResult = track.getTrackFitResult(pdgIter);
+      if ((fitResult != nullptr) && (fitResult->getParticleType() == pdgIter)) {
+        flag[pdgIter] = kTRUE;
+      } else {
+        flag[pdgIter] = kFALSE;
+        continue;
       }
+
+      trk_x[pdgIter] = fitResult->getPosition().X();
+      trk_y[pdgIter] = fitResult->getPosition().Y();
+      trk_z[pdgIter] = fitResult->getPosition().Z();
+      trk_px[pdgIter] = fitResult->getMomentum().X();
+      trk_py[pdgIter] = fitResult->getMomentum().Y();
+      trk_pz[pdgIter] = fitResult->getMomentum().Z();
+      trk_p[pdgIter] = fitResult->getMomentum().Mag();
+      trk_pt[pdgIter] = fitResult->getMomentum().Pt();
+      trk_theta[pdgIter] = fitResult->getMomentum().Theta() * TMath::RadToDeg();
+      trk_phi[pdgIter] = fitResult->getMomentum().Phi() * TMath::RadToDeg();
+      trk_charge[pdgIter] = fitResult->getChargeSign();
+      double chi2 = recoTrack->getTrackFitStatus(recoTrack->getTrackRepresentationForPDG(pdgIter.getPDGCode()))->getChi2();
+      if (isnan(chi2)) chi2 = -10;
+      if (isinf(chi2)) chi2 = -20;
+      trk_chi2[pdgIter] =  chi2;
+      trk_ndf[pdgIter] =  recoTrack->getTrackFitStatus(recoTrack->getTrackRepresentationForPDG(pdgIter.getPDGCode()))->getNdf();
+      trk_pvalue[pdgIter] =  fitResult->getPValue();
+      trk_nfailed[pdgIter] = recoTrack->getTrackFitStatus(recoTrack->getTrackRepresentationForPDG(
+                                                            pdgIter.getPDGCode()))->getNFailedPoints();
+      ncdc_pid[pdgIter] = fitResult->getHitPatternCDC().getNHits();
+      npxd_pid[pdgIter] = fitResult->getHitPatternVXD().getNPXDHits();
+      nsvd_pid[pdgIter] = fitResult->getHitPatternVXD().getNSVDHits();
+      nhits_pid[pdgIter] = ncdc_pid[pdgIter] + npxd_pid[pdgIter] + nsvd_pid[pdgIter];
+      first_cdc[pdgIter] = fitResult->getHitPatternCDC().getFirstLayer();
+      last_cdc[pdgIter] = fitResult->getHitPatternCDC().getLastLayer();
+      first_svd[pdgIter] = fitResult->getHitPatternVXD().getFirstSVDLayer();
+      last_svd[pdgIter] = fitResult->getHitPatternVXD().getLastSVDLayer();
     }
+
     Float_t buffer[] = {event_num, event_run, event_exp, event_prod,
                         nhits, ncdc, npxd, nsvd,
                         (Float_t)recoTrack->getPositionSeed().X(), (Float_t)recoTrack->getPositionSeed().Y(), (Float_t)recoTrack->getPositionSeed().Z(),
                         (Float_t)recoTrack->getMomentumSeed().X(), (Float_t)recoTrack->getMomentumSeed().Y(), (Float_t)recoTrack->getMomentumSeed().Z(), (Float_t)recoTrack->getMomentumSeed().Mag(), (Float_t)recoTrack->getMomentumSeed().Perp(),
                         (Float_t)(recoTrack->getMomentumSeed().Theta()* TMath::RadToDeg()), (Float_t)(recoTrack->getMomentumSeed().Phi()* TMath::RadToDeg()), (Float_t)recoTrack->getChargeSeed(),
-                        nhits_pi, ncdc_pi, npxd_pi, nsvd_pi, nhits_k, ncdc_k, npxd_k, nsvd_k, nhits_p, ncdc_p, npxd_p, nsvd_p, nhits_d, ncdc_d, npxd_d, nsvd_d,
-                        flag_pi, flag_k, flag_p, flag_d,
-                        trk_x_pi, trk_y_pi, trk_z_pi,
-                        trk_px_pi, trk_py_pi, trk_pz_pi, trk_p_pi, trk_pt_pi, trk_theta_pi,
-                        trk_phi_pi, trk_charge_pi, trk_chi2_pi, trk_ndf_pi, trk_pvalue_pi, nfailed_pi,
-                        trk_x_k, trk_y_k, trk_z_k,
-                        trk_px_k, trk_py_k, trk_pz_k, trk_p_k, trk_pt_k, trk_theta_k,
-                        trk_phi_k, trk_charge_k, trk_chi2_k, trk_ndf_k, trk_pvalue_k, nfailed_k,
-                        trk_x_p, trk_y_p, trk_z_p,
-                        trk_px_p, trk_py_p, trk_pz_p, trk_p_p, trk_pt_p, trk_theta_p,
-                        trk_phi_p, trk_charge_p, trk_chi2_p, trk_ndf_p, trk_pvalue_p, nfailed_p,
-                        trk_x_d, trk_y_d, trk_z_d,
-                        trk_px_d, trk_py_d, trk_pz_d, trk_p_d, trk_pt_d, trk_theta_d,
-                        trk_phi_d, trk_charge_d, trk_chi2_d, trk_ndf_d, trk_pvalue_d, nfailed_d,
-                        first_cdc_pi, last_cdc_pi, first_svd_pi, last_svd_pi,
-                        first_cdc_k, last_cdc_k, first_svd_k, last_svd_k,
-                        first_cdc_p, last_cdc_p, first_svd_p, last_svd_p,
-                        first_cdc_d, last_cdc_d, first_svd_d, last_svd_d
+                        nhits_pid[Const::pion], ncdc_pid[Const::pion], npxd_pid[Const::pion], nsvd_pid[Const::pion],
+                        nhits_pid[Const::kaon], ncdc_pid[Const::kaon], npxd_pid[Const::kaon], nsvd_pid[Const::kaon],
+                        nhits_pid[Const::proton], ncdc_pid[Const::proton], npxd_pid[Const::proton], nsvd_pid[Const::proton],
+                        nhits_pid[Const::deuteron], ncdc_pid[Const::deuteron], npxd_pid[Const::deuteron], nsvd_pid[Const::deuteron],
+                        flag[Const::pion], flag[Const::kaon], flag[Const::proton], flag[Const::deuteron],
+                        trk_x[Const::pion], trk_y[Const::pion], trk_z[Const::pion],
+                        trk_px[Const::pion], trk_py[Const::pion], trk_pz[Const::pion], trk_p[Const::pion], trk_pt[Const::pion], trk_theta[Const::pion],
+                        trk_phi[Const::pion], trk_charge[Const::pion], trk_chi2[Const::pion], trk_ndf[Const::pion], trk_pvalue[Const::pion], trk_nfailed[Const::pion],
+                        trk_x[Const::kaon], trk_y[Const::kaon], trk_z[Const::kaon],
+                        trk_px[Const::kaon], trk_py[Const::kaon], trk_pz[Const::kaon], trk_p[Const::kaon], trk_pt[Const::kaon], trk_theta[Const::kaon],
+                        trk_phi[Const::kaon], trk_charge[Const::kaon], trk_chi2[Const::kaon], trk_ndf[Const::kaon], trk_pvalue[Const::kaon], trk_nfailed[Const::kaon],
+                        trk_x[Const::proton], trk_y[Const::proton], trk_z[Const::proton],
+                        trk_px[Const::proton], trk_py[Const::proton], trk_pz[Const::proton], trk_p[Const::proton], trk_pt[Const::proton], trk_theta[Const::proton],
+                        trk_phi[Const::proton], trk_charge[Const::proton], trk_chi2[Const::proton], trk_ndf[Const::proton], trk_pvalue[Const::proton], trk_nfailed[Const::proton],
+                        trk_x[Const::deuteron], trk_y[Const::deuteron], trk_z[Const::deuteron],
+                        trk_px[Const::deuteron], trk_py[Const::deuteron], trk_pz[Const::deuteron], trk_p[Const::deuteron], trk_pt[Const::deuteron], trk_theta[Const::deuteron],
+                        trk_phi[Const::deuteron], trk_charge[Const::deuteron], trk_chi2[Const::deuteron], trk_ndf[Const::deuteron], trk_pvalue[Const::deuteron], trk_nfailed[Const::deuteron],
+                        first_cdc[Const::pion], last_cdc[Const::pion], first_svd[Const::pion], last_svd[Const::pion],
+                        first_cdc[Const::kaon], last_cdc[Const::kaon], first_svd[Const::kaon], last_svd[Const::kaon],
+                        first_cdc[Const::proton], last_cdc[Const::proton], first_svd[Const::proton], last_svd[Const::proton],
+                        first_cdc[Const::deuteron], last_cdc[Const::deuteron], first_svd[Const::deuteron], last_svd[Const::deuteron]
                        };
     m_n_MultiParticle->Fill(buffer);
   }

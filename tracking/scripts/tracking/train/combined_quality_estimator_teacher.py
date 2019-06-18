@@ -22,7 +22,11 @@ except ImportError as e:
 
 
 def my_basf2_mva_teacher(
-    records_files, tree_name, weightfile_identifier, target_variable="truth"
+    records_files,
+    tree_name,
+    weightfile_identifier,
+    target_variable="truth",
+    exclude_variables=[],
 ):
     """
     My custom wrapper for basf2 mva teacher
@@ -32,7 +36,15 @@ def my_basf2_mva_teacher(
     with root_utils.root_open(records_files[0]) as records_tfile:
         input_tree = records_tfile.Get(tree_name)
         feature_names = [leave.GetName() for leave in input_tree.GetListOfLeaves()]
-    truth_free_variable_names = [name for name in feature_names if "truth" not in name]
+    truth_free_variable_names = [
+        name
+        for name in feature_names
+        if (
+            ("truth" not in name) and
+            (name != target_variable) and
+            (name not in exclude_variables)
+        )
+    ]
     if "weight" in truth_free_variable_names:
         truth_free_variable_names.remove("weight")
         weight_variable = "weight"
@@ -176,7 +188,8 @@ class VXDQEDataCollectionTask(Basf2PathTask):
 
 class TrackQETeacherBaseTask(Basf2Task):
     n_events_training = luigi.IntParameter()
-    training_target = "truth"
+    training_target = luigi.Parameter(default="truth")
+    exclude_variables = luigi.ListParameter(hashed=True, default=[])
 
     @property
     def weightfile_identifier(self):
@@ -217,14 +230,11 @@ class TrackQETeacherBaseTask(Basf2Task):
             tree_name=self.tree_name,
             weightfile_identifier=self.get_output_file_name(self.weightfile_identifier),
             target_variable=self.training_target,
+            exclude_variables=self.exclude_variables,
         )
 
 
-TrackQETeacherBaseTask.tree_name
-
-
 class CDCQETeacherTask(TrackQETeacherBaseTask):
-    training_target = luigi.Parameter(default="truth")
     weightfile_identifier = "trackfindingcdc_TrackQualityIndicator.weights.xml"
     tree_name = "records"
     random_seed = "traincdc_0"
@@ -305,7 +315,7 @@ class CDCQEHarvestingValidationTask(Basf2PathTask):
     n_events_training = luigi.IntParameter()
     validation_output_file_name = "cdc_qe_harvesting_validation.root"
     reco_output_file_name = "cdc_qe_reconstruction.root"
-    training_target = luigi.BoolParameter()
+    training_target = luigi.Parameter()
 
     def requires(self):
         yield CDCQETeacherTask(
@@ -365,6 +375,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
     n_events = luigi.IntParameter()
     random_seed = luigi.Parameter()
     records_file_name = "fulltrack_qe_records.root"
+    cdc_training_target = luigi.Parameter()
 
     def requires(self):
         yield GenerateSimTask(
@@ -372,7 +383,10 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             random_seed=self.random_seed,
             n_events=self.n_events,
         )
-        yield CDCQETeacherTask(n_events_training=MasterTask.n_events_training)
+        yield CDCQETeacherTask(
+            n_events_training=MasterTask.n_events_training,
+            training_target=self.cdc_training_target,
+        )
         yield VXDQETeacherTask(n_events_training=MasterTask.n_events_training)
 
     def output(self):
@@ -428,15 +442,25 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
         path.add_module(
             "TrackQETrainingDataCollector",
             TrainingDataOutputName=self.get_output_file_name(self.records_file_name),
+            collectEventFeatures=True,
         )
         return path
 
 
-class FullTrackQETeacher(TrackQETeacherBaseTask):
+class FullTrackQETeacherTask(TrackQETeacherBaseTask):
     weightfile_identifier = "fullTrackQualityIndicator.weights.xml"
     tree_name = "tree"
     random_seed = "trainingdata_0"
     dataCollectionTask = FullTrackQEDataCollectionTask
+    cdc_training_target = luigi.Parameter()
+
+    def requires(self):
+        yield self.dataCollectionTask(
+            cdc_training_target=self.cdc_training_target,
+            num_processes=MasterTask.num_processes,
+            n_events=self.n_events_training,
+            random_seed=self.random_seed,
+        )
 
 
 class TrackQEEvaluationBaseTask(Basf2Task):
@@ -447,7 +471,7 @@ class TrackQEEvaluationBaseTask(Basf2Task):
 
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
-    training_target = luigi.Parameter(default="truth")
+    training_target = luigi.Parameter()
 
     @property
     def teacherTask(self):
@@ -508,8 +532,24 @@ class CDCTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
 
 
 class FullTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
-    teacherTask = FullTrackQETeacher
+    teacherTask = FullTrackQETeacherTask
     dataCollectionTask = FullTrackQEDataCollectionTask
+    exclude_variables = luigi.ListParameter(hashed=True)
+    cdc_training_target = luigi.Parameter()
+
+    def requires(self):
+        yield self.teacherTask(
+            exclude_variables=self.exclude_variables,
+            n_events_training=self.n_events_training,
+            training_target=self.training_target,
+            cdc_training_target=self.cdc_training_target,
+        )
+        yield self.dataCollectionTask(
+            num_processes=MasterTask.num_processes,
+            n_events=self.n_events_testing,
+            random_seed="testdata_0",
+            cdc_training_target=self.cdc_training_target,
+        )
 
 
 class FullTrackQEHarvestingValidationTask(Basf2PathTask):
@@ -517,14 +557,20 @@ class FullTrackQEHarvestingValidationTask(Basf2PathTask):
     n_events_training = luigi.IntParameter()
     validation_output_file_name = "full_qe_harvesting_validation.root"
     reco_output_file_name = "full_qe_reconstruction.root"
-    training_target = luigi.Parameter(default="truth")
+    cdc_training_target = luigi.Parameter()
+    exclude_variables = luigi.ListParameter(hashed=True)
 
     def requires(self):
         yield CDCQETeacherTask(
-            n_events_training=self.n_events_training, recect_clones=self.training_target
+            n_events_training=self.n_events_training,
+            training_target=self.cdc_training_target,
         )
         yield VXDQETeacherTask(n_events_training=self.n_events_training)
-        yield FullTrackQETeacher(n_events_training=self.n_events_training)
+        yield FullTrackQETeacherTask(
+            n_events_training=self.n_events_training,
+            exclude_variables=self.exclude_variables,
+            cdc_training_target=self.cdc_training_target,
+        )
         yield GenerateSimTask(
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
@@ -585,7 +631,7 @@ class FullTrackQEHarvestingValidationTask(Basf2PathTask):
         path.add_module(
             "TrackQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                FullTrackQETeacher.weightfile_identifier
+                FullTrackQETeacherTask.weightfile_identifier
             )[0],
         )
         path.add_module(
@@ -615,39 +661,68 @@ class MasterTask(luigi.WrapperTask):
     n_events_testing = 5000
 
     def requires(self):
-        for cdc_training_target in ["truth", "track_is_best_match_truth"]:
-            yield VXDQEHarvestingValidationTask(
-                n_events_training=self.n_events_training,
-                n_events_testing=self.n_events_testing,
-                num_processes=self.num_processes,
-            )
-            yield CDCQEHarvestingValidationTask(
-                training_target=cdc_training_target,
-                n_events_training=self.n_events_training,
-                n_events_testing=self.n_events_testing,
-                num_processes=self.num_processes,
-            )
-            yield FullTrackQEHarvestingValidationTask(
-                cdc_training_target=training_target,
-                n_events_training=self.n_events_training,
-                n_events_testing=self.n_events_testing,
-                num_processes=self.num_processes,
-            )
-            yield VXDTrackQEEvaluationTask(
-                n_events_training=self.n_events_training,
-                n_events_testing=self.n_events_testing,
-            )
-            yield CDCTrackQEEvaluationTask(
-                cdc_training_target=training_target,
-                n_events_training=self.n_events_training,
-                n_events_testing=self.n_events_testing,
-            )
-            yield FullTrackQEEvaluationTask(
-                cdc_
-                training_target=training_target,
-                n_events_training=self.n_events_training,
-                n_events_testing=self.n_events_testing,
-            )
+
+        # reco track difference variables,
+        # calculated in eventwise extractor -> eventwise?
+        rt_diff_variables = [
+            "RTs_Min_Mom_diff_Mag",
+            "RTs_Min_Mom_diff_Mag_idx",
+            "RTs_Min_Mom_diff_Pt",
+            "RTs_Min_Mom_diff_Pt_idx",
+            "RTs_Min_Pos_diff_Theta",
+            "RTs_Min_Pos_diff_Theta_idx",
+            "RTs_Min_Pos_diff_Phi",
+            "RTs_Min_Pos_diff_Phi_idx",
+        ]
+
+        # eventwise n_track_variables
+        ntrack_variables = [
+            "N_RecoTracks",
+            "N_PXDRecoTracks",
+            "N_SVDRecoTracks",
+            "N_CDCRecoTracks",
+            "N_diff_PXD_SVD_RecoTracks",
+            "N_diff_SVD_CDC_RecoTracks",
+        ]
+
+        for exclude_variables in [ntrack_variables]:
+            for cdc_training_target in [
+                "truth_track_is_matched",
+                # "truth" # truth includes clones as signal
+            ]:
+                yield VXDQEHarvestingValidationTask(
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    num_processes=self.num_processes,
+                )
+                yield CDCQEHarvestingValidationTask(
+                    training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    num_processes=self.num_processes,
+                )
+                yield FullTrackQEHarvestingValidationTask(
+                    cdc_training_target=cdc_training_target,
+                    exclude_variables=exclude_variables,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    num_processes=self.num_processes,
+                )
+                yield VXDTrackQEEvaluationTask(
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
+                yield CDCTrackQEEvaluationTask(
+                    training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
+                yield FullTrackQEEvaluationTask(
+                    exclude_variables=self.exclude_variables,
+                    cdc_training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
 
 
 if __name__ == "__main__":

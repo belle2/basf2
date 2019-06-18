@@ -1,5 +1,5 @@
 #!/bin/env python3
-# -*- coding: utf-8 -*-
+# -*- mode: Python; coding: utf-8 -*-
 
 """
 Script to get the integrated luminosity of a set of runs
@@ -19,17 +19,22 @@ Usage:
 
 """
 
-__author__ = "Stefano Lacaprara"
-__email__ = "stefano.lacaprara@pd.infn.it"
+__author__ = "Stefano Lacaprara, Marco Milesi"
+__email__ = "stefano.lacaprara@pd.infn.it, marco.milesi@unimelb.edu.au"
 
 
 import argparse
 import re
-from argparse import ArgumentParser, ArgumentTypeError
 import sqlite3
 import time
+import datetime
 import os
 import basf2 as b2
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import numpy as np
 
 
 def parseNumRange(string):
@@ -38,7 +43,7 @@ def parseNumRange(string):
     """
     m = re.match(r'(\d+)(?:-(\d+))?$', string)
     if not m:
-        raise ArgumentTypeError("'" + string + "' is not a range of number. Expected forms like '0-5' or '2'.")
+        raise argparse.ArgumentTypeError("'" + string + "' is not a range of number. Expected forms like '0-5' or '2'.")
     start = m.group(1)
     end = m.group(2) or start
     return set(range(int(start, 10), int(end, 10) + 1))
@@ -52,7 +57,7 @@ def parseNumList(string):
     for rr in [x.strip() for x in string.split(',')]:
         result |= parseNumRange(rr)
 
-    return list(result)
+    return sorted(list(result))
 
 
 def argparser():
@@ -60,71 +65,278 @@ def argparser():
     Parse options as command-line arguments.
     """
 
-    description = "Script to get the integrated luminosity for a range or runs"
+    description = "Script to get the online integrated luminosity for a range or runs."
 
-    # Re-use the base argument parser, and add options on top.
     parser = argparse.ArgumentParser(description=description, usage=__doc__, add_help=True)
 
     parser.add_argument("--exp",
                         dest="exp",
                         action="store",
-                        type=int,
+                        type=parseNumList,
                         required=True,
-                        help="Experiment number")
-
+                        help="Experiment numbers")
     parser.add_argument("--runs",
                         dest="runs",
                         action="store",
                         type=parseNumList,
-                        required=True,
+                        required=False,
                         default=None,
                         help="Process only the selected run range. Syntax is xx-yy,zz")
-
     parser.add_argument("--verbose",
                         dest="verb",
                         action="store_true",
                         default=False,
                         help="Print each run luminosity")
-
     parser.add_argument("--db",
                         dest="db",
                         action="store",
                         default="/gpfs/group/belle2/group/detector/ECL/ecl_lom.db",
                         help="EC: DataBase path")
 
+    plot_actions = {
+        "DATE" : "Histogram of integrated luminosity per date",
+        "RUN"  : "Histogram of integrated luminosity per run",
+        "TOT"  : "Graph of total integrated luminosity vs. date",
+        }
+
+    parser.add_argument("--plot",
+                        dest="plot",
+                        action="store",
+                        choices=list(plot_actions.keys()),
+                        default=None,
+                        help="")
+
     return parser
+
+class Luminosity:
+    """
+    class to read lumi info from DB and serve in various way
+    """
+
+    def __init__(self, args):
+        """
+        initializiation 
+
+        :param args: command-line args.
+        """
+        self.DB = args.db
+        self.conn = self.create_connection()
+        self.exp=args.exp
+        self.expstr="-".join(str(_) for _ in args.exp)
+        self.runs=args.runs
+        if len(self.exp)>1 and self.runs:
+            b2.B2FATAL(f"No run range (--runs ) allowed if multiple experiments are selected (--exp {self.exp})")
+        if args.plot == 'RUN' and len(self.exp)>1:
+            b2.B2FATAL(f"If plotting lumi per run (--plot RUN) you can select only one experiment (--exp {self.exp})")
+
+
+        self.runRangeStr="All runs"
+        if self.runs:
+            self.runRangeStr="Runs {min(self.runs)}-{self.runs(run_max)}"
+
+        self.verb=args.verb
+
+        if not self.conn:
+            b2.B2FATAL(f"could not establish connection to db: {db}")
+
+        self.col_lumi = "lum_det_shift"
+
+        self.df = self.getDataFrameFromDB()
+    
+        
+
+    def create_connection(self):
+        """
+        Create a database connection to the SQLite database specified by the db_file.
+
+        :param db_file: database file
+        :return: Connection object or None
+        """
+
+        if not os.path.exists(self.DB):
+            b2.B2FATAL(f"DB {self.DB} not found. The live luminosity is only available on KEKCC (sorry)")
+
+        connection = None
+        try:
+            connection = sqlite3.connect(self.DB)
+        except sqlite3.Error as e:
+            print(e)
+
+        return connection
+
+    def getDataFrameFromDB(self):
+        """
+        crete a panda dataframe from DB
+        """
+
+        #cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
+        cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
+        if args.runs:
+            cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
+
+        # Get the DB as a pandas.Dataframe.
+        df = pd.read_sql(cmdexp, self.conn, params=self.exp)
+        print(f"Read {len(df)} runs for experiment {self.expstr}")
+
+        # convert epoch to date
+        df['date'] = pd.to_datetime(df['date'],unit='s')
+
+        # lumi in /fb
+        df['lumi'] *= 1E-6
+        # cumulative integrated luminosity
+        df['intLumi'] = df['lumi'].cumsum()
+
+        return df
+
+    def plotLumiPerPeriod(self, period=1):
+        """
+        Make monitoring plots of luminosity.
+
+        :param period: 1 for day, 2 for week (start on monday)
+        """
+
+        # Group runs by date, and store the int lumi per date as the max cumulative lumi.
+        # This returns a pandas.Series object.
+        srs_lumi_date = []
+        if period==1: # per day
+            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()
+            label="Day"
+        if period==2: # per week
+            # not working yet
+            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%w'))["lumi"].sum()
+            #srs_lumi_date = self.df.groupby(pd.TimeGrouper(key='date',freq='W-MON'))["lumi"].sum()
+            label="Week"
+
+
+        figure, ax1 = plt.subplots()
+
+        x = srs_lumi_date.index.values
+        x[0] = x[1] # groupby insert first date as epoch 0
+        y = srs_lumi_date.values
+
+        # there must be a cleaner way to do this
+        yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[:-1])
+        
+        ax1.bar(x, y, label=f"{label} per {label}", color="blue", width=1.0)
+
+        ax1.set_xlabel(r"Date")
+        ax1.set_ylabel(rf"Total integrated luminosity per {label} [$\mathrm{{fb}}^{{-1}}$]", color="blue")
+        ax1.tick_params(axis='y', labelcolor="blue")
+
+        ax1.xaxis.set_major_locator(ticker.LinearLocator())
+        ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
+
+        # plot integrate lumi
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
+        ax2.tick_params(axis='y', labelcolor="red")
+        ax2.plot(x, yInt, color="red", label="Total",lw=3)
+        # ax2.xaxis.set_major_locator(ticker.AutoLocator())
+        # ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        ax2.set_ylim(bottom=0)
+
+        h1, l1 = ax1.get_legend_handles_labels()
+        h2, l2 = ax2.get_legend_handles_labels()
+        ax2.legend(h1+h2, l1+l2,loc="best",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
+
+        # Text box. Use axis coords.
+        plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
+        plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
+        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
+        plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
+
+        print(f"Creating LumiPer{label}_Exp{self.expstr}.pdf|png files")
+        plt.savefig(f"LumiPer{label}_Exp{self.expstr}.pdf", bbox_inches="tight")
+        plt.savefig(f"LumiPer{label}_Exp{self.expstr}.png", bbox_inches="tight")
+
+    def plotLumiPerRun(self):
+        """
+        Make lumi plot per run
+        """
+
+        # create a reduced dataframe with only runs selected
+        # these are the runs to be selected
+        if (self.runs):
+            dfRuns=self.df[self.df['run'].isin(self.runs)]
+            dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
+        else:
+            dfRuns=self.df
+
+        figure, ax1 = plt.subplots()
+
+        ax1.bar(dfRuns['run'], dfRuns['lumi'], label=f"Run by run", color="blue", width=1.0)
+        ax1.set_xlabel(r"Run")
+        ax1.set_ylabel(rf"Total integrated luminosity per Run [$\mathrm{{fb}}^{{-1}}$]", color="blue")
+        ax1.tick_params(axis='y', labelcolor="blue")
+        ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
+        ax1.set_xlim(left=dfRuns['run'].min())
+        ax1.xaxis.set_major_locator(ticker.LinearLocator(numticks=10))
+
+        # plot integrate lumi
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
+        ax2.set_ylim(bottom=0,top=dfRuns['intLumi'].max()*1.2)
+        ax2.tick_params(axis='y', labelcolor="red")
+        ax2.xaxis.set_major_locator(ticker.LinearLocator(numticks=10))
+        ax2.plot(dfRuns['run'], dfRuns['intLumi'], color="red", label="Total")
+
+        h1, l1 = ax1.get_legend_handles_labels()
+        h2, l2 = ax2.get_legend_handles_labels()
+        ax2.legend(h1+h2, l1+l2, loc=2, title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
+
+        # Text box. Use axis coords.
+        plt.text(0., 1.03, rf"Belle II online luminosity", transform=ax1.transAxes, fontsize=12)
+        plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
+        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
+        plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
+
+        print(f"Creating LumiPerRun_Exp{self.expstr}.pdf|png files")
+        plt.savefig(f"LumiPerRun_Exp{self.expstr}.pdf", bbox_inches="tight")
+        plt.savefig(f"LumiPerRun_Exp{self.expstr}.png", bbox_inches="tight")
+        pass
+
+    def printLumi(self):
+        """
+        print luminosity for runs and total
+        """
+        # these are the runs to be selected
+        if (self.runs):
+            dfRuns=self.df[self.df['run'].isin(self.runs)].copy()
+            dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
+        else:
+            dfRuns=self.df
+        # create a reduced dataframe with only runs selected
+
+        cols=['run','lumi','date','intLumi']
+        if (self.verb):
+            print('-' * 61)
+            print(dfRuns[cols]
+                .to_string(index=False,
+                    formatters={"run" : "{:5d}".format,
+                    "lumi" : "{:,.2f}".format,
+                    "data" : "".format,
+                    "intLumi" : "{:,.2f}".format,
+                    }
+                                ))
+            print('-' * 61)
+        L=dfRuns['lumi'].sum()
+        print(f"TOTAL    : L = {L*1E6:8.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
+        
+        pass
 
 
 if __name__ == '__main__':
 
     args = argparser().parse_args()
+    
+    lumi=Luminosity(args)
 
-    reco = "lum_det_shift"
-    DB = args.db
-    if not os.path.exists(DB):
-        b2.B2FATAL(f"DB {DB} not found. The live luminosity is only available on KEKCC (sorry)")
+    lumi.printLumi()
 
-    L = 0
-    conn = sqlite3.connect(DB)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cmd = f"SELECT SUM({reco}) as lumi, start_time, end_time FROM prev_bhacnt_det_run WHERE exp = ? and run = ?"
-    if(args.verb):
-        print('-' * 61)
-        print(f"Run No   : Delivererd Lumi  | Run start [JST]")
-        print('-' * 61)
-    for run in args.runs:
-        cursor.execute(cmd, (args.exp, run))
-        row = cursor.fetchone()
-
-        if (row['lumi']):
-            if(args.verb):
-                runDate = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(row['start_time']))
-                print(f"Run {run:5d}: L={row['lumi']:8.2f} nb^{-1} | {runDate}")
-            L += float(row['lumi'])
-
-    conn.close()
-    if(args.verb):
-        print('-' * 61)
-
-    print(f"TOTAL    : L={L:5.2f} /nb = {L/1E3:5.2f} /pb = {L/1E6:5.3f} /fb = {L/1E9:5.4f} /ab")
+    if args.plot:
+        if args.plot == 'DATE':
+            lumi.plotLumiPerPeriod(1)
+            #lumi.plotLumiPerPeriod(2)
+        if args.plot == 'RUN':
+            lumi.plotLumiPerRun()

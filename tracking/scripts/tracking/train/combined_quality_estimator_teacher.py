@@ -1,19 +1,24 @@
 import glob
 import subprocess
-
-try:
-    import b2luigi as luigi
-    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
-except ImportError as e:
-    print("Could not import ``b2luigi`` python package. Try ``python3 -m pip3 install [--user] b2luigi`` to install it from PiPI.")
-    raise e
-
 import basf2
 import basf2_mva
 import simulation
 import tracking
 import tracking.root_utils as root_utils
-from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
+from tracking.harvesting_validation.combined_module import (
+    CombinedTrackingValidationModule,
+)
+
+try:
+    import b2luigi as luigi
+    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
+except ImportError as e:
+    print(
+        "Could not import ``b2luigi`` python package. Try running\n"
+        "  python3 -m pip3 install [--user] b2luigi\n"
+        "to install it from PiPI."
+    )
+    raise e
 
 
 def my_basf2_mva_teacher(

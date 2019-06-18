@@ -59,6 +59,9 @@ namespace Belle2 {
     /** identifier of weightfile in Database or local root/xml file */
     std::string m_WeightFileIdentifier;
 
+    /// Parameter to enable event-wise features
+    bool m_param_collectEventFeatures = false;
+
     /// Store Array of the recoTracks
     StoreArray<RecoTrack> m_recoTracks;
 

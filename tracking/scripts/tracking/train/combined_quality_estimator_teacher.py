@@ -656,9 +656,9 @@ class MasterTask(luigi.WrapperTask):
     Entry point: Task that defines the configurations that shall be tested.
     """
 
-    num_processes = 10
     n_events_training = 5000
     n_events_testing = 5000
+    num_processes = 1
 
     def requires(self):
 
@@ -729,3 +729,6 @@ if __name__ == "__main__":
     # TODO use argparse to use command line settings
     luigi.set_setting("result_path", "/storage/8/meliachevitch/quality_estimator/")
     luigi.process(MasterTask(), workers=2)
+
+# Further todos
+# TODO: for base tasks, maybe use instances of objects instead of classes as members, as this allows for more flexibility

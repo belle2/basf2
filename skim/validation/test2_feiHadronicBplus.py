@@ -5,7 +5,7 @@
 <header>
     <input>../feiHadronicBplus.udst.root</input>
     <output>feiHadronicBplus_Validation.root</output>
-    <contact>sophie.hollitt@adelaide.edu.au, philip.grace@adelaide.edu.au</contact>
+    <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """
 

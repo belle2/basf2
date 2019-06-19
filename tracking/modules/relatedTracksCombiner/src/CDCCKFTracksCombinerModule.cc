@@ -3,15 +3,12 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Sasha Glazov                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <tracking/modules/relatedTracksCombiner/CDCCKFTracksCombinerModule.h>
-
-#include <framework/dataobjects/Helix.h>
-#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 
@@ -47,10 +44,10 @@ void CDCCKFTracksCombinerModule::initialize()
 void CDCCKFTracksCombinerModule::event()
 {
   std::set <RecoTrack*> mergedTracks;
-  // Loop over all CDC reco tracks and add them to the store array of they do not have a match or combined them with
+  // Loop over all CDC reco tracks and add them to the store array if they do not have a match or combined them with
   // their VXD partner if they do.
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
-  for (RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
+  for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     const RelationVector<RecoTrack>& relatedVXDRecoTracks = cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName);
 
     B2ASSERT("Can not handle more than 2 relations!", relatedVXDRecoTracks.size() <= 2);
@@ -95,9 +92,9 @@ void CDCCKFTracksCombinerModule::event()
 
   // Now we have to add remaining tracks
   for (RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
-    auto alreadyInclded = mergedTracks.count(&vxdRecoTrack) ;
+    auto alreadyIncluded = mergedTracks.count(&vxdRecoTrack) ;
 
-    if (not alreadyInclded) {
+    if (not alreadyIncluded) {
       RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
       newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
       newTrack->addRelationTo(&vxdRecoTrack);

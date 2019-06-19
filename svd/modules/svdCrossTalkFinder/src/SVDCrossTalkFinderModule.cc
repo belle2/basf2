@@ -26,14 +26,11 @@ SVDCrossTalkFinderModule::SVDCrossTalkFinderModule() : Module()
   addParam("SVDRecoDigits", m_svdRecoDigitsName,
            "SVDRecoDigit collection name", string(""));
 
-  addParam("readFromDB", m_readFromDB,
-           "Read occupancy file from the databse", bool(true));
+  addParam("createCalibrationPayload", m_createCalibrationPayload,
+           "Create cross-talk strip channel payload", false);
 
-  addParam("inputFilePath", m_inputFilePath,
-           "Path containing occupancy root file", std::string("/data/svd/SVDOccupancyMap.root"));
-
-  addParam("occupancyInputFile", m_occupancyInputFile,
-           "Name of the occupancy root file", std::string("SVDOccupancyMap.root"));
+  addParam("outputFilename", m_outputFilename,
+           "Filename of root file for calibration payload", std::string("crossTalkStripsCalibration.root"));
 
   addParam("uSideOccupancyFactor", m_uSideOccupancyFactor,
            "Multiple of the average occupancy for high occupancy strip classification", 2);
@@ -50,38 +47,32 @@ SVDCrossTalkFinderModule::SVDCrossTalkFinderModule() : Module()
 void SVDCrossTalkFinderModule::initialize()
 {
 
-  std::string rootFile;
-  if (m_readFromDB) {
-    B2DEBUG(1, "SVDCrossTalkFinderModule: Retrieving occupancy file from DB. Filename: " << m_occupancyInputFile.c_str());
-    m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_occupancyInputFile.c_str());
-    if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the DBObjPtr is not initialized");
+  if (m_createCalibrationPayload) {
+    std::string sensorName;
+    TH1F* sensorHist;
+    //Prepare histograms for payload.
+    VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+    for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {
+      for (auto& ladders : geo.getLadders(layers)) {
+        for (auto& sensors : geo.getSensors(ladders)) {
+          for (int side = 0; side <= 1; side++) {
+            occupancyPDFName(sensors, side, sensorName);
+            if (m_sensorHistograms.count(sensorName) == 0) {
+              if (layers.getLayerNumber() == 3 or side == 1) {
+                sensorHist  = new TH1F(sensorName.c_str(), "", 768, 0, 768);
+              } else {
+                sensorHist  = new TH1F(sensorName.c_str(), "", 512, 0, 512);
+              }
+              m_sensorHistograms[sensorName] = sensorHist;
 
-    if (!(*m_ptrDBObjPtr).isValid()) B2FATAL("SVDCrossTalkFinderModule the DB object is not valid!");
+            }
 
-    rootFile = (*m_ptrDBObjPtr)->getFileName();
-    m_calibrationFile = new TFile(rootFile.c_str(), "READ");
-
-    if (!m_calibrationFile->IsOpen())
-      B2FATAL("Couldn't open occupancy file:" << m_inputFilePath);
-
-  }
-
-  else {
-    if (m_inputFilePath.empty()) {
-      B2ERROR("Path to occupancy file not set!");
-    } else {
-      std::string fullPath = FileSystem::findFile(m_inputFilePath);
-      if (fullPath.empty()) {
-        B2ERROR("Occupancy file:" << m_inputFilePath << "not located! Check filename input matches name of occupancy file!");
+          }
+        }
       }
-      m_inputFilePath = fullPath;
     }
-
-    m_calibrationFile = new TFile(m_inputFilePath.c_str(), "READ");
-
-    if (!m_calibrationFile->IsOpen())
-      B2FATAL("Couldn't open occupancy file:" << m_inputFilePath);
   }
+
   // prepare storeArray
   m_svdRecoDigits.isRequired(m_svdRecoDigitsName);
 
@@ -108,20 +99,17 @@ void SVDCrossTalkFinderModule::event()
     }
 
     int side = svdRecoDigit.isUStrip();
-
     std::string sensorName;
     occupancyPDFName(svdRecoDigit.getSensorID(), side, sensorName);
 
-
-    TH1F* occupancy = nullptr;
-    m_calibrationFile->GetObject(sensorName.c_str(), occupancy);
-    double sensorAverage = 0;
-    calculateAverage(occupancy, sensorAverage);
+    double sensorAverage = 0.;
+    calculateAverage(svdRecoDigit.getSensorID(), sensorAverage, side);
     int stripID = svdRecoDigit.getCellID();
     std::string sensorStripNum = sensorName + "." + std::to_string(stripID);
+    double stripOccupancy = m_OccupancyCal.getOccupancy(svdRecoDigit.getSensorID(), side, stripID);
     //Clustering only works assuming digits are ordered.//
 
-    if (side == 1 && occupancy->GetBinContent(stripID) > (m_uSideOccupancyFactor * sensorAverage)) {
+    if (side == 1 && stripOccupancy > (m_uSideOccupancyFactor * sensorAverage)) {
 
       int adjacentStrip = 0;
       if (!strips_uSide.empty()) {
@@ -139,7 +127,7 @@ void SVDCrossTalkFinderModule::event()
       highOccChips_uSide.push_back(sensorName);
     }
 
-    if (side == 0 && occupancy->GetBinContent(stripID) > (m_vSideOccupancyFactor * sensorAverage)) {
+    if (side == 0 && stripOccupancy > (m_vSideOccupancyFactor * sensorAverage)) {
       int adjacentStrip = 0;
       if (!strips_vSide.empty()) {
         adjacentStrip = stripID - strips_vSide.back();
@@ -170,11 +158,28 @@ void SVDCrossTalkFinderModule::event()
       std::string stripID = digitID + "." + std::to_string(svdRecoDigit.getCellID());
       if (std::find(clusterStrips_uSide.begin(), clusterStrips_uSide.end(), stripID) != clusterStrips_uSide.end()) {
         svdRecoDigit.setCrossTalkEventFlag(true);
+        if (m_createCalibrationPayload) {
+          std::string sensorName;
+          occupancyPDFName(svdRecoDigit.getSensorID(), svdRecoDigit.isUStrip(), sensorName);
+          auto xTalkStrip = m_sensorHistograms.at(sensorName);
+          xTalkStrip->Fill(svdRecoDigit.getCellID(), true);
+        }
+
       }
 
       if (std::find(clusterStrips_vSide.begin(), clusterStrips_vSide.end(), stripID) != clusterStrips_vSide.end()) {
         svdRecoDigit.setCrossTalkEventFlag(true);
+        if (m_createCalibrationPayload) {
+          std::string sensorName;
+          occupancyPDFName(svdRecoDigit.getSensorID(), svdRecoDigit.isUStrip(), sensorName);
+          auto xTalkStrip = m_sensorHistograms.at(sensorName);
+          xTalkStrip->Fill(svdRecoDigit.getCellID(), true);
+        }
+
       }
+
+
+
 
     }//reco digit loop
   }
@@ -185,16 +190,37 @@ void SVDCrossTalkFinderModule::terminate()
 {
   B2INFO("SVDCrossTalkFinderModule::terminate");
 
-  m_calibrationFile->Delete();
+  if (m_createCalibrationPayload) {
+    m_histogramFile = new TFile(m_outputFilename.c_str(), "RECREATE");
+    m_histogramFile->cd();
+    std::string sensorName;
+    VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+    for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {
+      for (auto& ladders : geo.getLadders(layers)) {
+        for (auto& sensors : geo.getSensors(ladders)) {
+          for (int side = 0; side <= 1; side++) {
+
+            occupancyPDFName(sensors, side, sensorName);
+            auto sensorOnMap = m_sensorHistograms.at(sensorName);
+            sensorOnMap->Write();
+
+          }
+        }
+      }
+    }
+    m_histogramFile->Close();
+  }
 }
 
 
-void SVDCrossTalkFinderModule::calculateAverage(TH1F* occupancyHist, double& mean)
+void SVDCrossTalkFinderModule::calculateAverage(const VxdID& sensorID, double& mean, int side)
 {
-  double nBins = occupancyHist->GetXaxis()->GetNbins();
+  double nBins = 0;
+  if (side == 1) nBins = 768; //U-side 768 channels
+  else nBins = 512;
   double count = 0;
   for (int i = 0; i < nBins; i++) {
-    count += occupancyHist->GetBinContent(i);
+    count += m_OccupancyCal.getOccupancy(sensorID, side, i);
   }
-  mean /= nBins;
+  mean = count / nBins;
 }

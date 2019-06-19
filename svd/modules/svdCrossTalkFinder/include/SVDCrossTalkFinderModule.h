@@ -13,19 +13,19 @@
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/PayloadFile.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/geometry/GeoCache.h>
+#include <svd/calibration/SVDOccupancyCalibrations.h>
 
 #include <string>
 #include <TH2.h>
 #include <TFile.h>
-#include <iostream>
-#include <framework/utilities/FileSystem.h>
+#include <map>
 
 namespace Belle2 {
 
@@ -40,12 +40,6 @@ namespace Belle2 {
     SVDCrossTalkFinderModule();
 
 
-    /* Deconstructor */
-    ~SVDCrossTalkFinderModule()
-    {
-      if (m_ptrDBObjPtr != nullptr) delete m_ptrDBObjPtr;
-    };
-
     /** Init the module.*/
     virtual void initialize() override;
     /** Event. */
@@ -56,12 +50,10 @@ namespace Belle2 {
 
   protected:
 
-    void calculateAverage(TH1F* occupancyHist, double& mean); /**Function to calculate sensor average occupancy */
+    void calculateAverage(const VxdID& sensorID, double& mean, int side); /**Function to calculate sensor average occupancy */
 
     // Data members
 
-    /**Pointer to the DBObjPtr for the payloadfile from which the occupancy file will be read */
-    DBObjPtr<PayloadFile>* m_ptrDBObjPtr = nullptr;
 
     /** SVDRecoDigit collection name. */
     std::string m_svdRecoDigitsName;
@@ -75,13 +67,15 @@ namespace Belle2 {
 
     int m_nAPVFactor; /**Parameter to set number of sensors with possible cross-talk clusters required for event flagging.*/
 
-    bool m_readFromDB; /**If true read calibration occupancy file from database. */
+    bool m_createCalibrationPayload; /**If true module will produce and write-out payload for SVDCrossTalkStripsCalibrations. */
 
-    std::string m_inputFilePath; /** Filepath of root file containing sensor occupancy sample */
+    std::string m_outputFilename; /** Filename of root file containing cross-talk strip calibration payload */
 
-    std::string m_occupancyInputFile; /** Name of the root file containing sensor occupancy sample */
+    TFile* m_histogramFile; /**Pointer to root TFile containing histograms for calibration payload */
+    std::map<std::string, TH1F* > m_sensorHistograms; /**< map to store cross-talk strip histograms */
 
-    TFile* m_calibrationFile; /**Pointer to root TFile containing sensor occupancy sample */
+    //calibration objects
+    SVDOccupancyCalibrations m_OccupancyCal; /**<SVDOccupancy calibrations db object */
 
 
   };

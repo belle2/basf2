@@ -1,9 +1,12 @@
+# Jochen Gemmler 2017 - 2019
+
 from __future__ import division, print_function, generators
 
 import os
 import sys
 import time
 import numpy
+import pickle
 
 import tensorflow as tf
 
@@ -14,7 +17,7 @@ class Layer(object):
     """
 
     def __init__(self, name, tf_activation_str, dim_input, dim_output, p_bias, p_w,
-                 seed=None):
+                 operation_seed=None):
         """
         :param name:
         :param tf_activation: string, name of an available tensorflow activations function
@@ -30,8 +33,10 @@ class Layer(object):
         tf_activation_dict = {
             'tanh': tf.tanh,
             'sigmoid': tf.sigmoid,
-            'relu': tf.nn.relu
+            'relu': tf.nn.relu,
+            'leaky_relu': tf.nn.leaky_relu,
         }
+
         if tf_activation_str not in tf_activation_dict:
             raise ValueError
 
@@ -45,7 +50,7 @@ class Layer(object):
         self.shape = [dim_input, dim_output]
 
         #: init parameters for uniform distribution
-        self.w = self._init_weight(self.shape, p_w, seed)
+        self.w = self._init_weight(self.shape, p_w, operation_seed)
 
         #: init parameters for bias
         self.b = self._init_bias(self.shape[1], p_bias)
@@ -71,13 +76,13 @@ class Layer(object):
         initial = tf.constant(init_val, shape=[width], name=name)
         return tf.Variable(initial, name=name)
 
-    def _init_weight(self, shape, stddev, seed, name=None):
+    def _init_weight(self, shape, stddev, operation_seed, name=None):
         """
         define weight variables
         """
         if name is None:
             name = self.name + '_w'
-        initial = tf.truncated_normal(shape, stddev=stddev, seed=seed, name=name)
+        initial = tf.truncated_normal(shape, stddev=stddev, seed=operation_seed, name=name)
         return tf.Variable(initial, name=name)
 
     def initialize(self, layer_input):
@@ -545,6 +550,15 @@ class Trainer(object):
         #: optimizer
         self.minimizer = self.model.get_minimizer()
 
+        #: train_log_dict
+        self.train_log_dict = {}
+        for label in self.model.monitoring_labels:
+            self.train_log_dict['train_' + label] = []
+            self.train_log_dict['valid_' + label] = []
+
+        for label in self.model.mon_dict.keys():
+            self.train_log_dict[label] = []
+
         self._add_to_basf2_collections()
 
         if log_dir is not None:
@@ -552,9 +566,6 @@ class Trainer(object):
 
         #: saver
         self.saver = tf.train.Saver()
-
-        #: best meta graph
-        self.best_meta_graph = None
 
         init_op = tf.global_variables_initializer()
 
@@ -627,6 +638,7 @@ class Trainer(object):
         mon_param = monitoring_params[loss_idx]
 
         if mon_param < self.model.best_value:
+            self.train_log_dict['best_epoch'] = self.current_epoch
             self.saver.save(self.sess, self.save_name)
 
     def _closing_ops(self):
@@ -636,6 +648,8 @@ class Trainer(object):
         if self.log_dir is not None:
             self.train_writer.close()
             self.test_writer.close()
+            with open(os.path.join(self.log_dir, 'training_params.pkl'), 'wb') as f:
+                pickle.dump(self.train_log_dict, f)
 
         # FIXME: raises an exception when calling session._del -> session.TF_DeleteStatus() !
         # FIXME: not closing a session can cause memory leaks!
@@ -657,7 +671,7 @@ class Trainer(object):
             feed = {self.x: batch[0], self.y_: batch[1]}
             self.sess.run(self.minimizer, feed_dict=feed)
             if i % int(.2 * self.data_set.batches) == 0:
-                print('Current Epoch: %1.2f' % (i / self.data_set.batches))
+                print('Epoch status: %1.2f' % (i / self.data_set.batches))
 
         train_mon_dict = {self.x: self.data_set.train_x[:self.train_monitor],
                           self.y_: self.data_set.train_y[:self.train_monitor]}
@@ -675,17 +689,31 @@ class Trainer(object):
             #: epoch parameters
             self.epoch_parameters = self.sess.run(self.monitoring_params + [self.merged_summary],
                                                   feed_dict=valid_dict)
+            epoch_parameters_train = self.sess.run(
+                self.monitoring_params + [self.merged_summary], feed_dict=train_mon_dict)
+
             # merged summary will be at last position
             self.test_writer.add_summary(self.epoch_parameters.pop(-1), current_epoch)
         else:
             self.epoch_parameters = self.sess.run(self.monitoring_params,
                                                   feed_dict=valid_dict)
+            epoch_parameters_train = self.sess.run(self.monitoring_params, feed_dict=train_mon_dict)
+
+        model_mon_params = []
+        for key, entry in self.model.mon_dict.items():
+            model_mon_params.append((key, self.sess.run(entry)))
 
         print('Current Epoch: %d' % self.current_epoch)
         for label, param in zip(self.model.monitoring_labels, self.epoch_parameters):
-            print("%s: %1.5f" % (label, param))
-        for key, entry in self.model.mon_dict.items():
-            print("%s: %f" % (key, self.sess.run(entry)))
+            self.train_log_dict['valid_' + label].append(param)
+            print("valid: %s: %1.5f" % (label, param))
+        for label, param in zip(self.model.monitoring_labels, epoch_parameters_train):
+            print("train: %s: %1.5f" % (label, param))
+            self.train_log_dict['train_' + label].append(param)
+
+        for val in model_mon_params:
+            print("%s: %f" % val)
+            self.train_log_dict[val[0]].append(val[1])
 
         print('Epoch training time: %.1f' % (time.time() - self._time))
         self._time = time.time()

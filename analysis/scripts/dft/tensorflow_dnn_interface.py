@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Jochen Gemmler 2017
+# Jochen Gemmler 2017 - 2019
 
 # default python packages
 import os
@@ -58,6 +58,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     min_epochs = parameters.pop('min_epochs', 300)
     max_epochs = parameters.pop('max_epochs', 400)
     stop_epochs = parameters.pop('stop_epochs', 10)
+    seed = parameters.pop('seed', None)
 
     # postprocessing parameters, from dictionary
     transform_to_probability = parameters.pop('transform_to_probability', False)
@@ -82,8 +83,14 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     # mask cuda devices
     os.environ['CUDA_VISIBLE_DEVICES'] = cuda_mask
 
+    tf.reset_default_graph()
     # initialize session
     gpu_options = tf.GPUOptions(allow_growth=True)
+
+    # set random state
+    if seed:
+        print('Seed: ', seed)
+        tf.set_random_seed(seed)
     session = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
     # initialize model
@@ -111,6 +118,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     state.save_dir = save_dir
 
     state.transform_to_probability = transform_to_probability
+
+    state.seed = seed
     return state
 
 
@@ -165,6 +174,9 @@ def load(obj):
     state.transform_to_probability = obj[5]
     state.sig_back_tuple = obj[6]
 
+    seed = obj[7]
+    print('Deep FlavorTagger loading... Training seed: ', seed)
+
     return state
 
 
@@ -205,7 +217,7 @@ def partial_fit(state, X, S, y, w, epoch):
         raise ValueError('NaN values in Dataset. Preprocessing transformations failed.')
 
     # replace stub dataset
-    data_set = TfDataBasf2(X, y, state.Xvalid, state.yvalid, state.batch_size)
+    data_set = TfDataBasf2(X, y, state.Xvalid, state.yvalid, state.batch_size, seed=state.seed)
 
     state.training.data_set = data_set
 
@@ -237,7 +249,7 @@ def end_fit(state):
     y_hat = apply(state, state.Xtest)
     test_df = pandas.DataFrame.from_dict({'y': state.ytest.reshape(-1), 'y_hat': y_hat.reshape(-1)})
     (sig_pdf, back_pdf) = binning.get_signal_background_pdf(test_df)
-
+    seed = state.seed
     del state
     return [meta_graph, os.path.basename(filename), data1, data2, binning_parameters, transform_to_probability,
-            (sig_pdf, back_pdf)]
+            (sig_pdf, back_pdf), seed]

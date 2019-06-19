@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Jochen Gemmler 2016
+# Jochen Gemmler 2016 - 2019
 
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')

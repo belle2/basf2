@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Jochen Gemmler 2017 - 2019
+
 from __future__ import division, print_function, generators
 
 import numpy as np
@@ -52,7 +54,7 @@ class TfDataBasf2():
         self.batch_train_y = np.zeros(self.batch_size)
 
         #: set random generator
-        np.random.seed(seed)
+        self.random_state = np.random.RandomState(seed)
 
         #: sanitize labels
         self.sanitize_labels()
@@ -88,7 +90,7 @@ class TfDataBasf2():
         self.train_idx = np.arange(len(self.train_idx))
 
         if self.epoch_random_shuffle:
-            np.random.shuffle(self.train_idx)
+            self.random_state.shuffle(self.train_idx)
 
         for i in range(self.batches):
             self.batch_train_x = self.train_x[self.train_idx[i * self.batch_size: (i + 1) * self.batch_size]]

@@ -197,15 +197,9 @@ namespace TreeFitter {
 
     // `this` always has an energy row
     p.getResiduals().segment(0, 4) = fitparams.getStateVector().segment(momindex, 4);
-    //p.getResiduals().segment(0, 3) = fitparams.getStateVector().segment(momindex, 3);
-    //const double m = this->pdgMass();
-    //const double p_2 = fitparams.getStateVector().segment(momindex, 3).squaredNorm();
-    //const double e = std::sqrt(m*m + p_2);
-    //p.getResiduals()(3) = e;
 
     for (int imom = 0; imom < 4; ++imom) {
       p.getH()(imom, momindex + imom) = 1;
-      //p.getH()(3, momindex + imom) = -fitparams.getStateVector()(momindex+imom) / e;
     }
 
     for (const auto daughter : m_daughters) {
@@ -240,57 +234,6 @@ namespace TreeFitter {
         p.getH()(i, daumomindex + i) = -1;
       }
     }
-
-    //int dautauindex = daughter->tauIndex();
-    //int daumomindex = daughter->momIndex();
-    //double mass = daughter->pdgMass();
-    //int maxrow = daughter->hasEnergy() ? 4 : 3;
-    //double e2 = mass * mass;
-
-    //double px = 0, py = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
-
-    //for (int imom = 0; imom < maxrow; ++imom) {
-    //  px = fitparams.getStateVector()(daumomindex + imom);
-    //  e2 += px * px;
-    //  p.getResiduals()(imom) += -px;
-    //  p.getH()(imom, daumomindex + imom) = -1;
-    //}
-
-    //if (maxrow == 3) {
-    //  double energy = sqrt(e2);
-    //  p.getResiduals()(3) += -energy;
-
-    //  for (int jmom = 0; jmom < 3; ++jmom) {
-    //    px = fitparams.getStateVector()(daumomindex + jmom);
-    //    p.getH()(3, daumomindex + jmom) = -px / energy;
-    //  }
-
-    //} else if (false && dautauindex >= 0 && daughter->charge() != 0) {
-    //  tau =  fitparams.getStateVector()(dautauindex);
-    //  lambda = bFieldOverC() * daughter->charge();
-
-    //  px0 = fitparams.getStateVector()(daumomindex);
-    //  py0 = fitparams.getStateVector()(daumomindex + 1);
-    //  pt0 = sqrt(px0 * px0 + py0 * py0);
-
-    //  if (fabs(pt0 * lambda * tau * tau) > posprecision) {
-    //    sinlt = sin(lambda * tau);
-    //    coslt = cos(lambda * tau);
-    //    px = px0 * coslt - py0 * sinlt;
-    //    py = py0 * coslt + px0 * sinlt;
-
-    //    p.getResiduals()(0) += px0 - px;
-    //    p.getResiduals()(1) += py0 - py;
-
-    //    p.getH()(0, daumomindex) += 1 - coslt  ;
-    //    p.getH()(0, daumomindex + 1) += sinlt      ;
-    //    p.getH()(0, dautauindex) += lambda * py;
-    //    p.getH()(1, daumomindex) -= sinlt      ;
-    //    p.getH()(1, daumomindex + 1) += 1 - coslt  ;
-    //    p.getH()(1, dautauindex) -= lambda * px;
-    //  }
-    //}
-    //}
     return ErrCode(ErrCode::Status::success);
   }
 

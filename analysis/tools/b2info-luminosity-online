@@ -223,7 +223,7 @@ class Luminosity:
         ax1.set_ylabel(rf"Total integrated luminosity per {label} [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
 
-        ax1.xaxis.set_major_locator(ticker.LinearLocator())
+        ax1.xaxis.set_major_locator(ticker.AutoLocator())
         ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
 
@@ -232,8 +232,8 @@ class Luminosity:
         ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
         ax2.tick_params(axis='y', labelcolor="red")
         ax2.plot(x, yInt, color="red", label="Total",lw=3)
-        # ax2.xaxis.set_major_locator(ticker.AutoLocator())
-        # ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        ax2.xaxis.set_major_locator(ticker.AutoLocator())
+        ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
         ax2.set_ylim(bottom=0)
 
         h1, l1 = ax1.get_legend_handles_labels()

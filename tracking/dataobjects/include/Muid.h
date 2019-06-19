@@ -11,7 +11,7 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <bklm/dbobjects/BKLMGeometryPar.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 
 namespace Belle2 {
 
@@ -312,7 +312,7 @@ namespace Belle2 {
     unsigned int m_HitLayerPattern;
 
     //! Vector of BKLM layer efficiencies.
-    float m_ExtBKLMEfficiencyValue[NLAYER];
+    float m_ExtBKLMEfficiencyValue[BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Vector of EKLM layer efficiencies TODO
     // float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];

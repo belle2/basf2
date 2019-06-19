@@ -21,7 +21,6 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <bklm/dbobjects/BKLMGeometryPar.h>
 
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>

@@ -214,19 +214,20 @@ namespace TreeFitter {
 
     // dr'/dm  | m:={x,y,z,px,py,pz,E}
     // x := x_vertex (decay vertex of mother)
-    p.getH()(0, posindex + i1) =  p_vec[i2] / p_vec[i1]; //sign?
+    p.getH()(0, posindex + i1) =  p_vec[i2] / p_vec[i1];
     p.getH()(0, posindex + i2) = -1.0;
     p.getH()(0, posindex + i3) = 0;
 
-    p.getH()(1, posindex + i1) =  p_vec[i3] / p_vec[i1]; //sign?
+    p.getH()(1, posindex + i1) =  p_vec[i3] / p_vec[i1];
     p.getH()(1, posindex + i2) = 0;
     p.getH()(1, posindex + i3) = -1.0;
 
-    p.getH()(0, momindex + i1) = 1.0 / (p_vec[i1] * p_vec[i1]);
+    // elim already devided by p_vec[i1]
+    p.getH()(0, momindex + i1) = p_vec[i2] * elim / p_vec[i1];
     p.getH()(0, momindex + i2) = -1. * elim;
     p.getH()(0, momindex + i3) = 0;
 
-    p.getH()(1, momindex + i1) = 1.0 / (p_vec[i1] * p_vec[i1]);
+    p.getH()(1, momindex + i1) = p_vec[i3] * elim / p_vec[i1];
     p.getH()(1, momindex + i2) = 0;
     p.getH()(1, momindex + i3) = -1. * elim;
 

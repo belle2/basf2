@@ -47,7 +47,7 @@ namespace TreeFitter {
     ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const override;
 
     /** space reserved in fit params, if has mother then it has tau */
-    virtual int dim() const override { return mother() && !isAResonance(m_particle) ? 8 : 7 ;}
+    virtual int dim() const override;
 
     /**  type */
     virtual int type() const override { return kInternalParticle ; }
@@ -56,10 +56,10 @@ namespace TreeFitter {
     virtual int posIndex() const override { return index()   ; }
 
     /** tau index in fit params only if it has a mother */
-    virtual int tauIndex() const override { return mother() ? index() + 3 : -1; }
+    virtual int tauIndex() const override;
 
     /** momentum index in fit params depending on whether it has a mother  */
-    virtual int momIndex() const override { return mother() ? index() + 4 : index() + 3 ; }
+    virtual int momIndex() const override;
 
     /** has energy in fitparams  */
     virtual bool hasEnergy() const override { return true ; }

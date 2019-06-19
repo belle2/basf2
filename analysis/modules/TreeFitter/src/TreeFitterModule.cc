@@ -46,6 +46,11 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
   addParam("massConstraintListParticlename", m_massConstraintListParticlename,
            "Type::[string]. List of particles to mass constrain with string = particle name.", {});
+
+
+  addParam("geoConstraintList", m_geoConstraintListPDG, "Type::[int]", {});
+  addParam("sharedVertexList", m_fixedToMotherVertexListPDG, "Type::[int]", {});
+
   addParam("customOriginVertex", m_customOriginVertex,
            "Type::[double]. List of vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
@@ -93,6 +98,10 @@ void TreeFitterModule::initialize()
   } else {
     TreeFitter::massConstraintListPDG = m_massConstraintList;
   }
+
+  TreeFitter::geoConstraintListPDG = m_geoConstraintListPDG;
+  TreeFitter::fixedToMotherVertexListPDG = m_fixedToMotherVertexListPDG;
+
 
 }
 

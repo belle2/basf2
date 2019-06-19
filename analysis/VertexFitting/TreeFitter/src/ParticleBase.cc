@@ -30,6 +30,8 @@ namespace TreeFitter {
 
   bool massConstraintType;
   std::vector<int> massConstraintListPDG;
+  std::vector<int> fixedToMotherVertexListPDG;
+  std::vector<int> geoConstraintListPDG;
   std::vector<std::string> removeConstraintList;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
@@ -194,7 +196,7 @@ namespace TreeFitter {
   bool ParticleBase::isAResonance(Belle2::Particle* particle)
   {
     bool rc = false ;
-    const int pdgcode = particle->getPDGCode();
+    const int pdgcode = std::abs(particle->getPDGCode());
 
     if (pdgcode && !(particle->getMdstArrayIndex())) {
       switch (pdgcode) {
@@ -206,7 +208,10 @@ namespace TreeFitter {
         case 11:
           rc = true ;
           break ;
-
+        case 413:
+        case 423:
+          rc = false;
+          break;
         default: //everything with boosted flight length less than 1 micrometer
           rc = (pdgcode && pdgLifeTime(particle) < 1e-5);
       }
@@ -258,7 +263,7 @@ namespace TreeFitter {
       double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass() * 3;
       double sigtau = tau > 0 ? std::min(20 * tau, maxDecayLengthSigma)  : maxDecayLengthSigma;
 
-      fitparams.getCovariance()(tauindex, tauindex) = sigtau * sigtau;
+      fitparams.getCovariance()(tauindex, tauindex) = 1000;
     }
     return status;
   }
@@ -332,7 +337,6 @@ namespace TreeFitter {
     const Eigen::Matrix<double, 1, 3> x_m = fitparams.getStateVector().segment(posindexmother, 3);
 
     double tau = fitparams.getStateVector()(tauindex);
-
     // linear approximation is fine
     for (int row = 0; row < 3; ++row) {
       double posxmother = x_m(row);
@@ -348,12 +352,12 @@ namespace TreeFitter {
       p.getH()(row, posindex + row) = -1;
       p.getH()(row, tauindex) = momx / mom;
     }
-
+    //diagonal momentum
     p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
     p.getH()(1, momindex + 1) = tau * (p_vec(0) * p_vec(0) + p_vec(2) * p_vec(2)) / mom3 ;
     p.getH()(2, momindex + 2) = tau * (p_vec(1) * p_vec(1) + p_vec(0) * p_vec(0)) / mom3 ;
 
-
+    //offdiagonal momentum
     p.getH()(0, momindex + 1) = - tau * p_vec(0) * p_vec(1) / mom3 ;
     p.getH()(0, momindex + 2) = - tau * p_vec(0) * p_vec(2) / mom3 ;
 
@@ -500,7 +504,7 @@ namespace TreeFitter {
        * */
       const double value = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
 
-      fitparams.getStateVector()(tauindex) = value;
+      fitparams.getStateVector()(tauindex) = value * 100;
     }
 
     return ErrCode(ErrCode::Status::success);

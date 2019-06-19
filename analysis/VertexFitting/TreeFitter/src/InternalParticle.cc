@@ -14,7 +14,6 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
-
 using std::vector;
 
 namespace TreeFitter {
@@ -196,65 +195,102 @@ namespace TreeFitter {
   {
     const int momindex = momIndex();
 
+    // `this` always has an energy row
     p.getResiduals().segment(0, 4) = fitparams.getStateVector().segment(momindex, 4);
+    //p.getResiduals().segment(0, 3) = fitparams.getStateVector().segment(momindex, 3);
+    //const double m = this->pdgMass();
+    //const double p_2 = fitparams.getStateVector().segment(momindex, 3).squaredNorm();
+    //const double e = std::sqrt(m*m + p_2);
+    //p.getResiduals()(3) = e;
+
     for (int imom = 0; imom < 4; ++imom) {
       p.getH()(imom, momindex + imom) = 1;
+      //p.getH()(3, momindex + imom) = -fitparams.getStateVector()(momindex+imom) / e;
     }
-
-    const double posprecision = 1e-4; // 1mu
 
     for (const auto daughter : m_daughters) {
+      const int daumomindex = daughter->momIndex();
+      const Eigen::Matrix<double, 1, 3> p3_vec = fitparams.getStateVector().segment(daumomindex, 3);
 
-      int dautauindex = daughter->tauIndex();
-      int daumomindex = daughter->momIndex();
-      double mass = daughter->pdgMass();
-      int maxrow = daughter->hasEnergy() ? 4 : 3;
-      double e2 = mass * mass;
+      // three momentum is easy just substract the vectors
+      p.getResiduals().segment(0, 3) -= p3_vec;
 
-      double px = 0, py = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
+      // energy depends on the parametrisation!
+      if (daughter->hasEnergy()) {
+        p.getResiduals()(3) -= fitparams.getStateVector()(daumomindex + 3);
+        p.getH()(3, daumomindex + 3) = -1; // d/dE -E
+      } else {
+        // m^2 + p^2 = E^2
+        // so
+        // E = sqrt(m^2 + p^2)
+        const double mass = daughter->pdgMass();
+        const double p2 = p3_vec.squaredNorm();
+        const double energy = std::sqrt(mass * mass + p2);
+        p.getResiduals()(3) -= energy;
 
-      for (int imom = 0; imom < maxrow; ++imom) {
-        px = fitparams.getStateVector()(daumomindex + imom);
-        e2 += px * px;
-        p.getResiduals()(imom) += -px;
-        p.getH()(imom, daumomindex + imom) = -1;
+        for (unsigned i = 0; i < 3; ++i) {
+          // d/dpx_i sqrt(m^2 + p^2)
+          p.getH()(3, daumomindex + i) = -1 * p3_vec(i) / energy;
+        }
       }
 
-      if (maxrow == 3) {
-        double energy = sqrt(e2);
-        p.getResiduals()(3) += -energy;
-
-        for (int jmom = 0; jmom < 3; ++jmom) {
-          px = fitparams.getStateVector()(daumomindex + jmom);
-          p.getH()(3, daumomindex + jmom) = -px / energy;
-        }
-
-      } else if (false && dautauindex >= 0 && daughter->charge() != 0) {
-        tau =  fitparams.getStateVector()(dautauindex);
-        lambda = bFieldOverC() * daughter->charge();
-
-        px0 = fitparams.getStateVector()(daumomindex);
-        py0 = fitparams.getStateVector()(daumomindex + 1);
-        pt0 = sqrt(px0 * px0 + py0 * py0);
-
-        if (fabs(pt0 * lambda * tau * tau) > posprecision) {
-          sinlt = sin(lambda * tau);
-          coslt = cos(lambda * tau);
-          px = px0 * coslt - py0 * sinlt;
-          py = py0 * coslt + px0 * sinlt;
-
-          p.getResiduals()(0) += px0 - px;
-          p.getResiduals()(1) += py0 - py;
-
-          p.getH()(0, daumomindex) += 1 - coslt  ;
-          p.getH()(0, daumomindex + 1) += sinlt      ;
-          p.getH()(0, dautauindex) += lambda * py;
-          p.getH()(1, daumomindex) -= sinlt      ;
-          p.getH()(1, daumomindex + 1) += 1 - coslt  ;
-          p.getH()(1, dautauindex) -= lambda * px;
-        }
+      // this has to be in any case
+      // d/dp_i p_i
+      for (unsigned i = 0; i < 3; ++i) {
+        p.getH()(i, daumomindex + i) = -1;
       }
     }
+
+    //int dautauindex = daughter->tauIndex();
+    //int daumomindex = daughter->momIndex();
+    //double mass = daughter->pdgMass();
+    //int maxrow = daughter->hasEnergy() ? 4 : 3;
+    //double e2 = mass * mass;
+
+    //double px = 0, py = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
+
+    //for (int imom = 0; imom < maxrow; ++imom) {
+    //  px = fitparams.getStateVector()(daumomindex + imom);
+    //  e2 += px * px;
+    //  p.getResiduals()(imom) += -px;
+    //  p.getH()(imom, daumomindex + imom) = -1;
+    //}
+
+    //if (maxrow == 3) {
+    //  double energy = sqrt(e2);
+    //  p.getResiduals()(3) += -energy;
+
+    //  for (int jmom = 0; jmom < 3; ++jmom) {
+    //    px = fitparams.getStateVector()(daumomindex + jmom);
+    //    p.getH()(3, daumomindex + jmom) = -px / energy;
+    //  }
+
+    //} else if (false && dautauindex >= 0 && daughter->charge() != 0) {
+    //  tau =  fitparams.getStateVector()(dautauindex);
+    //  lambda = bFieldOverC() * daughter->charge();
+
+    //  px0 = fitparams.getStateVector()(daumomindex);
+    //  py0 = fitparams.getStateVector()(daumomindex + 1);
+    //  pt0 = sqrt(px0 * px0 + py0 * py0);
+
+    //  if (fabs(pt0 * lambda * tau * tau) > posprecision) {
+    //    sinlt = sin(lambda * tau);
+    //    coslt = cos(lambda * tau);
+    //    px = px0 * coslt - py0 * sinlt;
+    //    py = py0 * coslt + px0 * sinlt;
+
+    //    p.getResiduals()(0) += px0 - px;
+    //    p.getResiduals()(1) += py0 - py;
+
+    //    p.getH()(0, daumomindex) += 1 - coslt  ;
+    //    p.getH()(0, daumomindex + 1) += sinlt      ;
+    //    p.getH()(0, dautauindex) += lambda * py;
+    //    p.getH()(1, daumomindex) -= sinlt      ;
+    //    p.getH()(1, daumomindex + 1) += 1 - coslt  ;
+    //    p.getH()(1, dautauindex) -= lambda * px;
+    //  }
+    //}
+    //}
     return ErrCode(ErrCode::Status::success);
   }
 
@@ -281,6 +317,26 @@ namespace TreeFitter {
     return status;
   }
 
+  int InternalParticle::dim() const
+  {
+    /** if this particle is geo constraint the dimension is 8, because tau has to be extracted */
+    return mother() && !isAResonance(m_particle) ? 8 : 7 ;
+  }
+
+  int InternalParticle::tauIndex() const
+  {
+    /** only exists if particle is geo cosntraint */
+    return mother() ? index() + 3 : -1;
+  }
+
+  int InternalParticle::momIndex() const
+  {
+    /** indexing in { x, y, z, tau, px, py, pz, E }
+     * but tau is not existing for all InternalParticles
+     * */
+    return mother() ? index() + 4 : index() + 3 ;
+  }
+
   void InternalParticle::addToConstraintList(constraintlist& list,
                                              int depth) const
   {
@@ -297,10 +353,32 @@ namespace TreeFitter {
     if (mother() && tauIndex() >= 0) {
       list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
     }
+
     if (std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
                   std::abs(particle()->getPDGCode())) != TreeFitter::massConstraintListPDG.end()) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
+
+
+    //FIXME needs mother and has to change index of this
+    const bool pin_vertex_to_mother_vertex = std::find(TreeFitter::fixedToMotherVertexListPDG.begin(),
+                                                       TreeFitter::fixedToMotherVertexListPDG.end(),
+                                                       std::abs(particle()->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end();
+
+    if (pin_vertex_to_mother_vertex) {
+      list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
+    }
+
+    // use geo constraint if this particle is in the list to cosntrain
+    const bool geo_constrain_this = std::find(TreeFitter::geoConstraintListPDG.begin(),
+                                              TreeFitter::geoConstraintListPDG.end(),
+                                              std::abs(particle()->getPDGCode())) != TreeFitter::geoConstraintListPDG.end();
+
+    // FIXME tauindex
+    if (geo_constrain_this && mother() && tauIndex() >= 0) {
+      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
+    }
+
   }
 
   std::string InternalParticle::parname(int thisindex) const

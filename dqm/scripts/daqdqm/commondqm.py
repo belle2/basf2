@@ -55,7 +55,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
 
-    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "all_events"]):
+    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT
         path.add_module(
             "SoftwareTriggerHLTDQM",

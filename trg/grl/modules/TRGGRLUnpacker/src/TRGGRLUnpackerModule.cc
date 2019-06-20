@@ -84,7 +84,7 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
 
 //  StoreArray<TRGGRLUnpackerStore> storeAry("GRLclk");
   TRGGRLUnpackerStore* rawstore = new TRGGRLUnpackerStore();
-  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("GRLevt");
+  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("TRGGRLUnpackerStore");
 //  evtinfo.registerInDataStore();
 //    storeAry.appendNew();
 //    int ntups = storeAry.getEntries() - 1;

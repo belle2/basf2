@@ -29,8 +29,10 @@ buildContinuumSuppression('B+:all', 'basic', path=path)
 variables.addAlias('d1_p', 'daughter(1,p)')
 variables.addAlias('MissM2', 'WE_MissM2(basic,0)')
 
+histogramFilename = 'SLUntagged_Validation.root'
+
 variablesToHistogram(
-    filename='SLUntagged_Validation.root',
+    filename=histogramFilename,
     decayString='B+:all',
     variables=[
         ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0),
@@ -44,3 +46,17 @@ variablesToHistogram(
 
 process(path)
 print(statistics)
+
+# Reopen file to add contact details
+import ROOT
+
+histfile = ROOT.TFile(histogramFilename, 'UPDATE')
+
+histnames = [histname.GetTitle() for histname in histfile.GetListOfKeys()]
+for histname in histnames:
+    hist = histfile.Get(histname)
+
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'philip.grace@adelaide.edu.au'))
+
+    hist.Write('', ROOT.TObject.kOverwrite)
+histfile.Close()

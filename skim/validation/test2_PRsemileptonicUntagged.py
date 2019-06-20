@@ -30,8 +30,10 @@ variables.addAlias('d0_p', 'daughter(0, p)')
 variables.addAlias('d1_p', 'daughter(1, p)')
 variables.addAlias('MissM2', 'WE_MissM2(basic,0)')
 
+histogramFilename = 'PRsemileptonicUntagged_Validation.root'
+
 variablesToHistogram(
-    filename='PRsemileptonicUntagged_Validation.root',
+    filename=histogramFilename,
     decayString='B0:all',
     variables=[
         ('Mbc', 100, 4.0, 5.3),
@@ -44,3 +46,17 @@ variablesToHistogram(
 
 process(path)
 print(statistics)
+
+# Reopen file to add contact details
+import ROOT
+
+histfile = ROOT.TFile(histogramFilename, 'UPDATE')
+
+histnames = [histname.GetTitle() for histname in histfile.GetListOfKeys()]
+for histname in histnames:
+    hist = histfile.Get(histname)
+
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'philip.grace@adelaide.edu.au'))
+
+    hist.Write('', ROOT.TObject.kOverwrite)
+histfile.Close()

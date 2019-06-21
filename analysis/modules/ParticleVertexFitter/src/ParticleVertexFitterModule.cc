@@ -340,7 +340,7 @@ namespace Belle2 {
 
   bool ParticleVertexFitterModule::doKVertexFit(Particle* mother, bool ipProfileConstraint, bool ipTubeConstraint)
   {
-    if (mother->getNDaughters() < 2 && !ipTubeConstraint) return false;
+    if ((mother->getNDaughters() < 2 && !ipTubeConstraint) || mother->getNDaughters() < 1) return false;
 
     std::vector<unsigned> fitChildren;
     std::vector<unsigned> pi0Children;
@@ -354,8 +354,8 @@ namespace Belle2 {
       B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFitter does not support fit with multiple pi0s (yet).");
     }
 
-    if (fitChildren.size() < 2 && !ipTubeConstraint) {
-      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+    if ((fitChildren.size() < 2 && !ipTubeConstraint) || fitChildren.size() < 1) {
+      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is too low.");
       return false;
     }
 

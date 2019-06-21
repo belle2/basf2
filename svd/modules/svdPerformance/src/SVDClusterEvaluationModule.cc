@@ -114,6 +114,7 @@ void SVDClusterEvaluationModule::initialize()
   bs_effV = m_treeSummary->Branch("effV", &ms_effV, "effU/F");
   bs_effErrU = m_treeSummary->Branch("effErrU", &ms_effErrU, "effErrU/F");
   bs_effErrV = m_treeSummary->Branch("effErrV", &ms_effErrV, "effErrU/F");
+  bs_nIntercepts = m_treeSummary->Branch("nIntercepts", &ms_nIntercepts, "nIntercepts/i");
   bs_residU = m_treeSummary->Branch("residU", &ms_residU, "residU/F");
   bs_residV = m_treeSummary->Branch("residV", &ms_residV, "residU/F");
   bs_misU = m_treeSummary->Branch("misU", &ms_misU, "misU/F");
@@ -422,24 +423,12 @@ void SVDClusterEvaluationModule::endRun()
             (m_clsCoor->getHistogram(sensor, view))->Write();
 
             dir_inter->cd();
-            float stat = (m_interSigma->getHistogram(sensor, view))->GetMean() * m_cmTomicron;;
-            int den = (m_interSigma->getHistogram(sensor, view))->GetEntries();
+            float stat = (m_interSigma->getHistogram(sensor, view))->GetMean();
+            ms_nIntercepts = (m_interSigma->getHistogram(sensor, view))->GetEntries();
             (m_interSigma->getHistogram(sensor, view))->Write();
 
             dir_resid->cd();
             TH1F* res = m_clsMinResid->getHistogram(sensor, view);
-            /*            if (! fitResiduals(res)) {
-                    if (view == SVDHistograms<TH1F>::UIndex)
-                      B2DEBUG(10, "Fit to the Residuals of U-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
-                              << " not succesfull, skipping this side");
-                    else
-                      B2DEBUG(10, "Fit to the Residuals of V-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
-                              << " not succesfull, skipping this side");
-                    continue;
-                  }
-            //            TF1* func = res->GetFunction("function");
-                  //            if (func == NULL) func = res->GetFunction("functionG1");
-                  //            if (func != NULL) {*/
             Double_t median, q;
             q = 0.5; // 0.5 for "median"
             {
@@ -447,115 +436,137 @@ void SVDClusterEvaluationModule::endRun()
                 sensorU[s] = Form("%d.%d.%dU", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 B2DEBUG(10, "U-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
 
-                res->GetQuantiles(1, &median, &q);
+                if (res->GetEntries() > 0) {
 
-                residU[s] = getOneSigma(res); //func->GetParameter("sigma1");
-                ms_residU = residU[s];
-                misU[s] = median; //func->GetParameter("mean1");
-                ms_misU = misU[s];
+                  res->GetQuantiles(1, &median, &q);
 
-                float halfWindow = m_nSigma * residU[s];
-                if (m_nSigma == 0)
-                  halfWindow = m_halfWidth;
+                  residU[s] = getOneSigma(res);
+                  misU[s] = median;
 
-                int binMin = res->FindBin(misU[s] - halfWindow);
-                int binMax = res->FindBin(misU[s] + halfWindow);
-                B2DEBUG(10, "from " << misU[s] - halfWindow << " -> binMin = " << binMin);
-                B2DEBUG(10, "to " << misU[s] + halfWindow << " -> binMax = " << binMax);
+                  float halfWindow = m_nSigma * residU[s];
+                  if (m_nSigma == 0)
+                    halfWindow = m_halfWidth;
 
-                int num = 0;
-                for (int bin = binMin; bin < binMax + 1; bin++)
-                  num = num + res->GetBinContent(bin);
+                  int binMin = res->FindBin(misU[s] - halfWindow);
+                  int binMax = res->FindBin(misU[s] + halfWindow);
+                  B2DEBUG(10, "from " << misU[s] - halfWindow << " -> binMin = " << binMin);
+                  B2DEBUG(10, "to " << misU[s] + halfWindow << " -> binMax = " << binMax);
 
-                float bkg = 0;
-                for (int bin = 1; bin < binMin; bin++)
-                  bkg = bkg + res->GetBinContent(bin);
-                for (int bin = binMax; bin < res->GetNbinsX() + 1; bin++)
-                  bkg = bkg + res->GetBinContent(bin);
-                //remove background clusters from sidebands
-                num = num - bkg * (binMax - binMin + 1.) / (binMin + res->GetNbinsX() - binMax - 1);
+                  int num = 0;
+                  for (int bin = binMin; bin < binMax + 1; bin++)
+                    num = num + res->GetBinContent(bin);
 
-                if (den > 0) {
-                  effU[s] = 1.*num / den;
+                  float bkg = 0;
+                  for (int bin = 1; bin < binMin; bin++)
+                    bkg = bkg + res->GetBinContent(bin);
+                  for (int bin = binMax; bin < res->GetNbinsX() + 1; bin++)
+                    bkg = bkg + res->GetBinContent(bin);
+                  //remove background clusters estimated from sidebands
+                  num = num - bkg * (binMax - binMin + 1.) / (binMin + res->GetNbinsX() - binMax - 1);
+
+                  if (ms_nIntercepts > 0) {
+                    effU[s] = 1.*num / ms_nIntercepts;
+                    //filling efficiency histogram
+                    h_effU->Fill(sensorU[s], effU[s]);
+                    if (effU[s] > 1)
+                      B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << ms_nIntercepts);
+                    effUErr[s] = sqrt(effU[s] * (1 - effU[s]) / ms_nIntercepts);
+                  }
+                  B2DEBUG(10, "num = " << num);
+                  B2DEBUG(10, "den = " << ms_nIntercepts);
+                  B2RESULT("U-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber() << " = " <<
+                           effU[s] << " ± " << effUErr[s]);
+
+                  //filling summary Histograms for the U side
+                  h_statU->Fill(sensorU[s], stat * m_cmTomicron);
+                  h_residU->Fill(sensorU[s], residU[s]*m_cmTomicron);
+                  h_misU->Fill(sensorU[s], misU[s]*m_cmTomicron);
+
+                  //finally set branch values
+                  ms_residU = residU[s];
+                  ms_misU = misU[s];
                   ms_effU = effU[s];
-                  //filling efficiency histogram
-                  h_effU->Fill(sensorU[s], effU[s]);
-                  if (effU[s] > 1)
-                    B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << den);
-                  effUErr[s] = sqrt(effU[s] * (1 - effU[s]) / den);
                   ms_effErrU = effUErr[s];
+                  ms_statU = stat;
+                } else {
+                  //set to some values if residual histogram is empty
+                  ms_residU = -99;
+                  ms_misU = -99;
+                  ms_effU = -99;
+                  ms_effErrU = -99;
+                  ms_statU = -99;
                 }
-                B2DEBUG(10, "num = " << num);
-                B2DEBUG(10, "den = " << den);
-                B2RESULT("U-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber() << " = " <<
-                         effU[s] << " ± " << effUErr[s]);
 
-                //filling summary Histograms for the U side
-                h_statU->Fill(sensorU[s], stat);
-                ms_statU = stat / m_cmTomicron;
 
-                residU[s] *= m_cmTomicron;
-                h_residU->Fill(sensorU[s], residU[s]);
-
-                misU[s] *= m_cmTomicron;
-                h_misU->Fill(sensorU[s], misU[s]);
-              } else {
+              } else { // V-side
                 sensorV[s] = Form("%d.%d.%dV", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 B2DEBUG(10, "V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
 
-                res->GetQuantiles(1, &median, &q);
+                if (res->GetEntries() > 0) {
 
-                residV[s] = getOneSigma(res); //func->GetParameter("sigma1");
-                ms_residV = residV[s];
-                misV[s] = median; //func->GetParameter("mean1");
-                ms_misV = misV[s];
+                  res->GetQuantiles(1, &median, &q);
 
-                float halfWindow = m_nSigma * residV[s];
-                if (m_nSigma == 0)
-                  halfWindow = m_halfWidth;
+                  residV[s] = getOneSigma(res);
+                  misV[s] = median;
+                  ms_misV = misV[s];
 
-                int binMin = res->FindBin(misV[s] - halfWindow);
-                int binMax = res->FindBin(misV[s] + halfWindow);
-                B2DEBUG(10, "from " << misV[s] - halfWindow << " -> binMin = " << binMin);
-                B2DEBUG(10, "to " << misV[s] + halfWindow << " -> binMax = " << binMax);
+                  float halfWindow = m_nSigma * residV[s];
+                  if (m_nSigma == 0)
+                    halfWindow = m_halfWidth;
 
-                //determine signal clusters
-                int num = 0;
-                for (int bin = binMin; bin < binMax + 1; bin++)
-                  num = num + res->GetBinContent(bin);
+                  int binMin = res->FindBin(misV[s] - halfWindow);
+                  int binMax = res->FindBin(misV[s] + halfWindow);
+                  B2DEBUG(10, "from " << misV[s] - halfWindow << " -> binMin = " << binMin);
+                  B2DEBUG(10, "to " << misV[s] + halfWindow << " -> binMax = " << binMax);
 
-                float bkg = 0;
-                for (int bin = 1; bin < binMin; bin++)
-                  bkg = bkg + res->GetBinContent(bin);
-                for (int bin = binMax; bin < res->GetNbinsX() + 1; bin++)
-                  bkg = bkg + res->GetBinContent(bin);
-                //remove background clusters from sidebands
-                num = num - bkg * (binMax - binMin + 1.) / (binMin + res->GetNbinsX() - binMax - 1);
+                  //determine signal clusters
+                  int num = 0;
+                  for (int bin = binMin; bin < binMax + 1; bin++)
+                    num = num + res->GetBinContent(bin);
 
-                if (den > 0) {
-                  effV[s] = 1.*num / den;
+                  float bkg = 0;
+                  for (int bin = 1; bin < binMin; bin++)
+                    bkg = bkg + res->GetBinContent(bin);
+                  for (int bin = binMax; bin < res->GetNbinsX() + 1; bin++)
+                    bkg = bkg + res->GetBinContent(bin);
+                  //remove background clusters estimated from sidebands
+                  num = num - bkg * (binMax - binMin + 1.) / (binMin + res->GetNbinsX() - binMax - 1);
+
+                  if (ms_nIntercepts > 0) {
+                    effV[s] = 1.*num / ms_nIntercepts;
+                    //filling efficiency histogram
+                    h_effV->Fill(sensorV[s], effV[s]);
+                    if (effV[s] > 1)
+                      B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << ms_nIntercepts);
+                    effVErr[s] = sqrt(effV[s] * (1 - effV[s]) / ms_nIntercepts);
+                  }
+                  B2DEBUG(10, "num = " << num);
+                  B2DEBUG(10, "den = " << ms_nIntercepts);
+                  B2RESULT("V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber() << " = " <<
+                           effV[s] << " ± " << effVErr[s]);
+
+                  //filling summary Histograms for the V side
+                  h_statV->Fill(sensorV[s], stat * m_cmTomicron);
+                  h_residV->Fill(sensorV[s], residV[s]*m_cmTomicron);
+                  h_misV->Fill(sensorV[s], misV[s]*m_cmTomicron);
+
+                  //finally set branch values
+                  ms_residV = residV[s];
+                  ms_misV = misV[s];
                   ms_effV = effV[s];
-                  //filling efficiency histogram
-                  h_effV->Fill(sensorV[s], effV[s]);
-                  if (effV[s] > 1)
-                    B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << den);
-                  effVErr[s] = sqrt(effV[s] * (1 - effV[s]) / den);
                   ms_effErrV = effVErr[s];
+                  ms_statV = stat;
+                } else {
+                  //set to some values if residual histogram is empty
+                  ms_residV = -99;
+                  ms_misV = -99;
+                  ms_effV = -99;
+                  ms_effErrV = -99;
+                  ms_statV = -99;
                 }
-                B2DEBUG(10, "num = " << num);
-                B2DEBUG(10, "den = " << den);
-                B2RESULT("V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber() << " = " <<
-                         effV[s] << " ± " << effVErr[s]);
 
-                //filing summay histograms for the V side
-                h_statV->Fill(sensorV[s], stat);
-                ms_statV = stat / m_cmTomicron;
-
-                residV[s] *= m_cmTomicron;
-                h_residV->Fill(sensorV[s], residV[s]);
-                misV[s] *= m_cmTomicron;
-                h_misV->Fill(sensorV[s], misV[s]);
               }
+
             }
             B2DEBUG(50, "writing out resid histograms for " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." <<
                     sensor.getSensorNumber() << "." << view);

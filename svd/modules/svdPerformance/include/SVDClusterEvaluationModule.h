@@ -135,6 +135,7 @@ namespace Belle2 {
     TBranch* bs_effV = nullptr; /**< efficiency V*/
     TBranch* bs_effErrU = nullptr; /**< efficiency error U*/
     TBranch* bs_effErrV = nullptr; /**< efficiency error V*/
+    TBranch* bs_nIntercepts = nullptr; /**< number of intercepts*/
     TBranch* bs_residU = nullptr; /**< residual U*/
     TBranch* bs_residV = nullptr; /**< residual V*/
     TBranch* bs_misU = nullptr; /**< misalignment U*/
@@ -152,6 +153,7 @@ namespace Belle2 {
     float ms_effV = -1; /**< efficiency V*/
     float ms_effErrU = -1; /**< efficiency error U*/
     float ms_effErrV = -1; /**< efficiency error V*/
+    int ms_nIntercepts = -1; /**< number of intercepts*/
     float ms_residU = -1; /**< residual U*/
     float ms_residV = -1; /**< residual V*/
     float ms_misU = -1; /**< misalignment U*/

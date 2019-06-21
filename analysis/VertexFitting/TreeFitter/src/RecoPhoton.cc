@@ -141,6 +141,22 @@ namespace TreeFitter {
     m_clusterPars(2) = centroid.Z();
     m_clusterPars(3) = energy;
 
+
+    auto p_vec = particle()->getMomentum();
+    // find highest momentum, eliminate dim with highest mom
+    if ((std::abs(p_vec(0)) >= std::abs(p_vec(1))) && (std::abs(p_vec(0)) >= std::abs(p_vec(2)))) {
+      m_i1 = 0; m_i2 = 1; m_i3 = 2;
+    } else if ((std::abs(p_vec(1)) >= std::abs(p_vec(0))) && (std::abs(p_vec(1)) >= std::abs(p_vec(2)))) {
+      m_i1 = 1; m_i2 = 0; m_i3 = 2;
+    } else if ((std::abs(p_vec(2)) >= std::abs(p_vec(1))) && (std::abs(p_vec(2)) >= std::abs(p_vec(0)))) {
+      m_i1 = 2; m_i2 = 1; m_i3 = 0;
+    } else {
+      B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
+              << p_vec(0) << " py: " << p_vec(1) << " pz: " << p_vec(2) << " calculated from Ec: " << m_clusterPars(3));
+      return ErrCode(ErrCode::Status::photondimerror);
+    }
+
+
     return ErrCode(ErrCode::Status::success);
   }
 
@@ -168,43 +184,26 @@ namespace TreeFitter {
     const Eigen::Matrix<double, 1, 3> x_vertex = fitparams.getStateVector().segment(posindex, 3);
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
 
-    int i1(-1);// index of momentum par with highest momentum
-    int i2(-1);// this gives an assertion in Eigen if for some reason this will not be updated
-    int i3(-1);
+    if (0 == p_vec[m_i1]) { return ErrCode(ErrCode::photondimerror); }
 
-    // find highest momentum, eliminate dim with highest mom
-    if ((std::abs(p_vec[0]) >= std::abs(p_vec[1])) && (std::abs(p_vec[0]) >= std::abs(p_vec[2]))) {
-      i1 = 0; i2 = 1; i3 = 2;
-    } else if ((std::abs(p_vec[1]) >= std::abs(p_vec[0])) && (std::abs(p_vec[1]) >= std::abs(p_vec[2]))) {
-      i1 = 1; i2 = 0; i3 = 2;
-    } else if ((std::abs(p_vec[2]) >= std::abs(p_vec[1])) && (std::abs(p_vec[2]) >= std::abs(p_vec[0]))) {
-      i1 = 2; i2 = 1; i3 = 0;
-    } else {
-      B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
-              << p_vec[0] << " py: " << p_vec[1] << " pz: " << p_vec[2] << " calculated from Ec: " << m_clusterPars[3]);
-      return ErrCode(ErrCode::Status::photondimerror);
-    }
-
-    if (0 == p_vec[i1]) { return ErrCode(ErrCode::photondimerror); }
-
-    // p_vec[i1] must not be 0
-    const double elim = (m_clusterPars[i1] - x_vertex[i1]) / p_vec[i1];
+    // p_vec[m_i1] must not be 0
+    const double elim = (m_clusterPars[m_i1] - x_vertex[m_i1]) / p_vec[m_i1];
     const double mom = p_vec.norm();
 
     // r'
     Eigen::Matrix<double, 3, 1> residual3 = Eigen::Matrix<double, 3, 1>::Zero(3, 1);
-    residual3(0) = m_clusterPars[i2] - x_vertex[i2] - p_vec[i2] * elim;
-    residual3(1) = m_clusterPars[i3] - x_vertex[i3] - p_vec[i3] * elim;
+    residual3(0) = m_clusterPars[m_i2] - x_vertex[m_i2] - p_vec[m_i2] * elim;
+    residual3(1) = m_clusterPars[m_i3] - x_vertex[m_i3] - p_vec[m_i3] * elim;
     residual3(2) = m_clusterPars[3] - mom;
 
     // dr'/dm | m:={xc,yc,zc,Ec} the measured quantities
     Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
     // deriving by the cluster pars
-    P(0, i2) = 1;
-    P(0, i1) = - p_vec[i2] / p_vec[i1];
+    P(0, m_i2) = 1;
+    P(0, m_i1) = - p_vec[m_i2] / p_vec[m_i1];
 
-    P(1, i3) = 1;
-    P(1, i1) = - p_vec[i3] / p_vec[i1];
+    P(1, m_i3) = 1;
+    P(1, m_i1) = - p_vec[m_i3] / p_vec[m_i1];
     P(2, 3) = 1; // dE/dEc
 
 
@@ -214,26 +213,26 @@ namespace TreeFitter {
 
     // dr'/dm  | m:={x,y,z,px,py,pz,E}
     // x := x_vertex (decay vertex of mother)
-    p.getH()(0, posindex + i1) =  p_vec[i2] / p_vec[i1];
-    p.getH()(0, posindex + i2) = -1.0;
-    p.getH()(0, posindex + i3) = 0;
+    p.getH()(0, posindex + m_i1) =  p_vec[m_i2] / p_vec[m_i1];
+    p.getH()(0, posindex + m_i2) = -1.0;
+    p.getH()(0, posindex + m_i3) = 0;
 
-    p.getH()(1, posindex + i1) =  p_vec[i3] / p_vec[i1];
-    p.getH()(1, posindex + i2) = 0;
-    p.getH()(1, posindex + i3) = -1.0;
+    p.getH()(1, posindex + m_i1) =  p_vec[m_i3] / p_vec[m_i1];
+    p.getH()(1, posindex + m_i2) = 0;
+    p.getH()(1, posindex + m_i3) = -1.0;
 
-    // elim already devided by p_vec[i1]
-    p.getH()(0, momindex + i1) = p_vec[i2] * elim / p_vec[i1];
-    p.getH()(0, momindex + i2) = -1. * elim;
-    p.getH()(0, momindex + i3) = 0;
+    // elim already devided by p_vec[m_i1]
+    p.getH()(0, momindex + m_i1) = p_vec[m_i2] * elim / p_vec[m_i1];
+    p.getH()(0, momindex + m_i2) = -1. * elim;
+    p.getH()(0, momindex + m_i3) = 0;
 
-    p.getH()(1, momindex + i1) = p_vec[i3] * elim / p_vec[i1];
-    p.getH()(1, momindex + i2) = 0;
-    p.getH()(1, momindex + i3) = -1. * elim;
+    p.getH()(1, momindex + m_i1) = p_vec[m_i3] * elim / p_vec[m_i1];
+    p.getH()(1, momindex + m_i2) = 0;
+    p.getH()(1, momindex + m_i3) = -1. * elim;
 
-    p.getH()(2, momindex + i1) = -1. * p_vec[i1] / mom;
-    p.getH()(2, momindex + i2) = -1. * p_vec[i2] / mom;
-    p.getH()(2, momindex + i3) = -1. * p_vec[i3] / mom;
+    p.getH()(2, momindex + m_i1) = -1. * p_vec[m_i1] / mom;
+    p.getH()(2, momindex + m_i2) = -1. * p_vec[m_i2] / mom;
+    p.getH()(2, momindex + m_i3) = -1. * p_vec[m_i3] / mom;
     // the photon does not store an energy in the state vector
     // so no p.getH()(2, momindex + 3) here
 

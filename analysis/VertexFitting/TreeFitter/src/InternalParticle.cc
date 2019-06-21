@@ -42,7 +42,9 @@ namespace TreeFitter {
     ParticleBase(particle, mother),
     m_massconstraint(false),
     m_lifetimeconstraint(false),
-    m_isconversion(false)
+    m_isconversion(false),
+    m_shares_vertex_with_mother(std::find(TreeFitter::fixedToMotherVertexListPDG.begin(), TreeFitter::fixedToMotherVertexListPDG.end(),
+                                          std::abs(m_particle->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end() && this->mother())
   {
 
     if (particle) {
@@ -52,6 +54,18 @@ namespace TreeFitter {
     } else {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
     }
+
+    //m_shares_vertex_with_mother = std::find(TreeFitter::fixedToMotherVertexListPDG.begin(),
+    //                                        TreeFitter::fixedToMotherVertexListPDG.end(), std::abs(m_particle->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end()
+    //                              && this->mother();
+
+    m_massconstraint = std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
+                                 std::abs(m_particle->getPDGCode())) != TreeFitter::massConstraintListPDG.end();
+
+    // use geo constraint if this particle is in the list to constrain
+    m_geo_constraint = std::find(TreeFitter::geoConstraintListPDG.begin(),
+                                 TreeFitter::geoConstraintListPDG.end(),
+                                 std::abs(m_particle->getPDGCode())) != TreeFitter::geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
   }
 
   bool InternalParticle::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
@@ -63,75 +77,76 @@ namespace TreeFitter {
   ErrCode InternalParticle::initMotherlessParticle(FitParams& fitparams)
   {
     ErrCode status ;
-    int posindex = posIndex();
-
-    assert(hasPosition());
-
-    fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 3, 1>::Zero(3);
-
     for (auto daughter : m_daughters) {
       status |= daughter->initMotherlessParticle(fitparams);
     }
 
-    if (fitparams.getStateVector()(posindex)  == 0 &&
-        fitparams.getStateVector()(posindex + 1) == 0 &&
-        fitparams.getStateVector()(posindex + 2) == 0) {
+    int posindex = posIndex();
+    // FIXME update this and check if this position is already initialised
+    // lower stream vertices might be better
+    if (hasPosition()) {
+      fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 3, 1>::Zero(3);
 
-      TVector3 vtx = particle()->getVertex();
-      if (vtx.Mag()) { //if it's not zero
-        fitparams.getStateVector()(posindex) = vtx.X();
-        fitparams.getStateVector()(posindex + 1) = vtx.Y();
-        fitparams.getStateVector()(posindex + 2) = vtx.Z();
-      } else {
+      if (fitparams.getStateVector()(posindex)  == 0 &&
+          fitparams.getStateVector()(posindex + 1) == 0 &&
+          fitparams.getStateVector()(posindex + 2) == 0) {
 
-        std::vector<ParticleBase*> alldaughters;
-        ParticleBase::collectVertexDaughters(alldaughters, posindex);
-
-        std::vector<ParticleBase*> vtxdaughters;
-
-        vector<RecoTrack*> trkdaughters;
-        for (auto daughter : alldaughters) {
-          if (daughter->type() == ParticleBase::TFParticleType::kRecoTrack) {
-            trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
-          } else if (daughter->hasPosition()
-                     && fitparams.getStateVector()(daughter->posIndex()) != 0) {
-            vtxdaughters.push_back(daughter);
-          }
-        }
-
-        TVector3 v;
-
-        if (trkdaughters.size() >= 2) {
-          std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
-
-          RecoTrack* dau1 = trkdaughters[0];
-          RecoTrack* dau2 = trkdaughters[1];
-
-          Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
-          Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
-
-          double flt1(0), flt2(0);
-          HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
-
-          fitparams.getStateVector()(posindex)     = v.x();
-          fitparams.getStateVector()(posindex + 1) = v.y();
-          fitparams.getStateVector()(posindex + 2) = v.z();
-
-          dau1->setFlightLength(flt1);
-          dau2->setFlightLength(flt2);
-
-          /** temporarily disabled */
-        } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
-          B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
-
-        } else if (mother() && mother()->posIndex() >= 0) {
-          int posindexmother = mother()->posIndex();
-
-          fitparams.getStateVector().segment(posindex, 3) = fitparams.getStateVector().segment(posindexmother, 3);
-
+        TVector3 vtx = particle()->getVertex();
+        if (vtx.Mag()) { //if it's not zero
+          fitparams.getStateVector()(posindex) = vtx.X();
+          fitparams.getStateVector()(posindex + 1) = vtx.Y();
+          fitparams.getStateVector()(posindex + 2) = vtx.Z();
         } else {
-          /** (0,0,0) is the best guess in any other case */
-          fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
+
+          std::vector<ParticleBase*> alldaughters;
+          ParticleBase::collectVertexDaughters(alldaughters, posindex);
+
+          std::vector<ParticleBase*> vtxdaughters;
+
+          vector<RecoTrack*> trkdaughters;
+          for (auto daughter : alldaughters) {
+            if (daughter->type() == ParticleBase::TFParticleType::kRecoTrack) {
+              trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
+            } else if (daughter->hasPosition()
+                       && fitparams.getStateVector()(daughter->posIndex()) != 0) {
+              vtxdaughters.push_back(daughter);
+            }
+          }
+
+          TVector3 v;
+
+          if (trkdaughters.size() >= 2) {
+            std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
+
+            RecoTrack* dau1 = trkdaughters[0];
+            RecoTrack* dau2 = trkdaughters[1];
+
+            Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
+            Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
+
+            double flt1(0), flt2(0);
+            HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
+
+            fitparams.getStateVector()(posindex)     = v.x();
+            fitparams.getStateVector()(posindex + 1) = v.y();
+            fitparams.getStateVector()(posindex + 2) = v.z();
+
+            dau1->setFlightLength(flt1);
+            dau2->setFlightLength(flt2);
+
+            /** temporarily disabled */
+          } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
+            B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
+
+          } else if (mother() && mother()->posIndex() >= 0) {
+            int posindexmother = mother()->posIndex();
+
+            fitparams.getStateVector().segment(posindex, 3) = fitparams.getStateVector().segment(posindexmother, 3);
+
+          } else {
+            /** (0,0,0) is the best guess in any other case */
+            fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
+          }
         }
       }
     }
@@ -260,16 +275,31 @@ namespace TreeFitter {
     return status;
   }
 
+  int InternalParticle::posIndex() const
+  {
+    // for example B0 and D* can share the same vertex
+    return m_shares_vertex_with_mother ? this->mother()->posIndex() : index();
+  }
+
   int InternalParticle::dim() const
   {
-    /** if this particle is geo constraint the dimension is 8, because tau has to be extracted */
-    return mother() && !isAResonance(m_particle) ? 8 : 7 ;
+    // { x, y, z, tau, px, py, pz, E }
+    // the last 4 always exists for composite particles
+    // tau index conly exist with a vertex and geo constraint
+    //
+    if (m_shares_vertex_with_mother) { return 4; }
+    if (!m_shares_vertex_with_mother && !m_geo_constraint) { return 7; }
+    if (!m_shares_vertex_with_mother && m_geo_constraint) { return 8; }
+
+    // this case should not appear
+    if (m_shares_vertex_with_mother && m_geo_constraint) { return -1; }
+    return -1;
   }
 
   int InternalParticle::tauIndex() const
   {
-    /** only exists if particle is geo cosntraint */
-    return mother() ? index() + 3 : -1;
+    /** only exists if particle is geo cosntraint and has a mother */
+    return m_geo_constraint ? index() + 3 : -1;
   }
 
   int InternalParticle::momIndex() const
@@ -277,7 +307,22 @@ namespace TreeFitter {
     /** indexing in { x, y, z, tau, px, py, pz, E }
      * but tau is not existing for all InternalParticles
      * */
-    return mother() ? index() + 4 : index() + 3 ;
+
+    if (m_geo_constraint && !m_shares_vertex_with_mother) { return this->index() + 4; }
+
+    if (m_shares_vertex_with_mother) { return this->index(); }
+
+    if (!m_shares_vertex_with_mother && !m_geo_constraint) {return index() + 3 ;}
+
+    // this will crash the initialisation
+    return -1;
+  }
+
+  bool InternalParticle::hasPosition() const
+  {
+    //  does this particle have a position index (decayvertex)
+    //  true in any case
+    return true;
   }
 
   void InternalParticle::addToConstraintList(constraintlist& list,
@@ -293,34 +338,14 @@ namespace TreeFitter {
     if (momIndex() >= 0) {
       list.push_back(Constraint(this, Constraint::kinematic, depth, 4, 3));
     }
-    if (mother() && tauIndex() >= 0) {
+    if (m_geo_constraint) {
       list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
     }
 
-    if (std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
-                  std::abs(particle()->getPDGCode())) != TreeFitter::massConstraintListPDG.end()) {
+    if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
 
-
-    //FIXME needs mother and has to change index of this
-    const bool pin_vertex_to_mother_vertex = std::find(TreeFitter::fixedToMotherVertexListPDG.begin(),
-                                                       TreeFitter::fixedToMotherVertexListPDG.end(),
-                                                       std::abs(particle()->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end();
-
-    if (pin_vertex_to_mother_vertex) {
-      list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
-    }
-
-    // use geo constraint if this particle is in the list to cosntrain
-    const bool geo_constrain_this = std::find(TreeFitter::geoConstraintListPDG.begin(),
-                                              TreeFitter::geoConstraintListPDG.end(),
-                                              std::abs(particle()->getPDGCode())) != TreeFitter::geoConstraintListPDG.end();
-
-    // FIXME tauindex
-    if (geo_constrain_this && mother() && tauIndex() >= 0) {
-      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
-    }
 
   }
 

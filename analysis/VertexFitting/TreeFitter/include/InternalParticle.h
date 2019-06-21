@@ -53,7 +53,7 @@ namespace TreeFitter {
     virtual int type() const override { return kInternalParticle ; }
 
     /**   position index in fit params*/
-    virtual int posIndex() const override { return index()   ; }
+    virtual int posIndex() const override;
 
     /** tau index in fit params only if it has a mother */
     virtual int tauIndex() const override;
@@ -65,7 +65,7 @@ namespace TreeFitter {
     virtual bool hasEnergy() const override { return true ; }
 
     /** has position index  */
-    virtual bool hasPosition() const override { return true ; }
+    virtual bool hasPosition() const override;
 
     /** name  */
     virtual std::string parname(int index) const override ;
@@ -91,6 +91,12 @@ namespace TreeFitter {
 
     /** has mass cosntraint */
     bool m_massconstraint ;
+
+    /** shares vertex with mother, that means decay vertex = productionvertex */
+    bool m_shares_vertex_with_mother;
+
+    /** use a geo metric constraint */
+    bool m_geo_constraint;
 
     /** has lifetime constraint  */
     bool m_lifetimeconstraint ;

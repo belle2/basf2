@@ -21,6 +21,8 @@ namespace TreeFitter {
   {
     return m_depth < rhs.m_depth  ||
            (m_depth == rhs.m_depth && m_type < rhs.m_type);
+//    return m_type < rhs.m_type  ||
+//           (m_type == rhs.m_type && m_depth < rhs.m_depth);
   }
 
   ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
@@ -30,6 +32,7 @@ namespace TreeFitter {
 
   ErrCode Constraint::filter(FitParams& fitpar)
   {
+    //std::cout << "Filter conistraint " <<this->name()  << std::endl;
     ErrCode status;
     Projection p(fitpar.getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
@@ -37,7 +40,6 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
-
     bool deleteFitpars = false;
 
     FitParams* unfilteredState = nullptr;
@@ -47,6 +49,7 @@ namespace TreeFitter {
     }
     while (!finished && !status.failure()) {
 
+      //std::cout << "Iter " <<iter  << std::endl;
       p.resetProjection();
       status |= project(fitpar, p);
 
@@ -91,6 +94,7 @@ namespace TreeFitter {
 
   ErrCode Constraint::filterWithReference(FitParams& fitpar, const FitParams& oldState)
   {
+    //std::cout << "Filter conistraint " <<this->name()  << std::endl;
     ErrCode status;
     Projection p(fitpar.getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
@@ -98,9 +102,8 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
-
     while (!finished && !status.failure()) {
-
+      //std::cout << "Iter " <<iter  << std::endl;
       p.resetProjection();
 
       /** here we project the old state and use only the change with respect to the new state

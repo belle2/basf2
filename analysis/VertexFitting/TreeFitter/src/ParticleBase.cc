@@ -237,14 +237,14 @@ namespace TreeFitter {
     const int posindex = posIndex();
     if (posindex >= 0) {
       for (int i = 0; i < 3; ++i) {
-        fitparams.getCovariance()(posindex + i, posindex + i) = 50;
+        fitparams.getCovariance()(posindex + i, posindex + i) = 1000;
       }
     }
 
     // momentum
     const int momindex = momIndex();
     if (momindex >= 0) {
-      const double initVal = 0.5;
+      const double initVal = 10;
       const int maxrow = hasEnergy() ? 4 : 3;
 
       for (int i = 0; i < maxrow; ++i) {
@@ -259,10 +259,12 @@ namespace TreeFitter {
       /** cant multiply by momentum here because unknown but average mom is 3 Gev */
       /** if pdgMass = 0 then tauindex is always = -1, so this is safe */
 
+      const int mother_ps_index = mother()->posIndex();
       const double maxDecayLengthSigma = 1000;
-      double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass() * 3;
+      double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
       double sigtau = tau > 0 ? std::min(20 * tau, maxDecayLengthSigma)  : maxDecayLengthSigma;
-
+      const double vertex_dist = (fitparams.getStateVector().segment(posindex, 3) - fitparams.getStateVector().segment(mother_ps_index,
+                                  3)).norm();
       fitparams.getCovariance()(tauindex, tauindex) = 1000;
     }
     return status;
@@ -347,7 +349,7 @@ namespace TreeFitter {
        *  that is why we do not extract the distance as a vector here
        * */
       p.getResiduals()(row) = posxmother + tau * momx / mom - posx ;
-
+      p.getResiduals()(row) *= -1;
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, posindex + row) = -1;
       p.getH()(row, tauindex) = momx / mom;
@@ -366,6 +368,8 @@ namespace TreeFitter {
 
     p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
     p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
+
+    p.getH() *= -1;
     return ErrCode(ErrCode::Status::success);
   }
 
@@ -496,15 +500,12 @@ namespace TreeFitter {
     const int tauindex = tauIndex();
     if (tauindex >= 0 && hasPosition()) {
 
-      assert(mother());
-
-      /**
-       * In principle we have to divide by a momentum here but since the initial momentum is unknown
-       * and is maximally a factor of 5 we don't need to do that here
-       * */
-      const double value = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
-
-      fitparams.getStateVector()(tauindex) = value * 100;
+      const int posindex = posIndex();
+      const int mother_ps_index = mother()->posIndex();
+      const Eigen::Matrix<double, 1 , 3 > vertex_dist = fitparams.getStateVector().segment(posindex,
+                                                        3) - fitparams.getStateVector().segment(mother_ps_index, 3);
+      const Eigen::Matrix<double, 1, 3 > mom = fitparams.getStateVector().segment(momIndex(), 3);
+      fitparams.getStateVector()(tauindex) = std::abs(vertex_dist.dot(mom)) / mom.norm();
     }
 
     return ErrCode(ErrCode::Status::success);

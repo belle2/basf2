@@ -253,7 +253,6 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
-
     if (m_updateDaugthers || isTreeHead) {
       if (posindex >= 0) {
         const TVector3 pos(m_fitparams->getStateVector()(posindex),
@@ -359,7 +358,7 @@ namespace TreeFitter {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();
       const double len = fitparams.getStateVector()(tauindex);
-      const double lenErr = fitparams.getCovariance()(tauindex, tauindex);
+      const double lenErr = std::sqrt(fitparams.getCovariance()(tauindex, tauindex));
       return std::make_tuple(len, lenErr);
     }
     return std::make_tuple(-999, -999);

@@ -36,9 +36,9 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   B2INFO("DQMHistAnalysisSVDEfficiency: Constructor done.");
 
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
-  addParam("effLevel_Error", m_effError, "Maximum Efficiency (%) allowed for safe operations (red)", float(0.5));
-  addParam("effLevel_Warning", m_effWarning, "Efficiency (%) at WARNING level (orange)", float(0.7));
-  addParam("effLevel_Empty", m_effEmpty, "Maximum Efficiency (%) for which the sensor is considered empty", float(0));
+  addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.5));
+  addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.7));
+  addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   /*  addParam("errEffLevel_Error", m_errEffError, "Maximum Efficiency Error allowed for safe operations (red)", float(5));
   addParam("errEffLevel_Warning", m_errEffWarning, "Efficiency Error at WARNING level (orange)", float(3));*/
@@ -68,11 +68,11 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_legWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legWarning->AddText("WARNING!");
   m_legWarning->AddText("at least one sensor with:");
-  m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effWarning * 100, m_effError * 100));
+  m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
   m_legWarning->SetFillColor(kOrange);
   m_legNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
-  m_legNormal->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effEmpty * 100, m_effWarning * 100));
+  m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
   m_legNormal->SetFillColor(kGreen);
   m_legNormal->SetBorderSize(0.);
   m_legNormal->SetLineColor(kBlack);
@@ -188,8 +188,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       if (effU <= m_effEmpty) {
         if (m_effUstatus < 1) m_effUstatus = 1;
-      } else if (effU > m_effWarning) {
-        if (effU < m_effError) {
+      } else if (effU < m_effWarning) {
+        if (effU > m_effError) {
           if (m_effUstatus < 2) m_effUstatus = 2;
         } else {
           if (m_effUstatus < 3) m_effUstatus = 3;
@@ -233,8 +233,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       if (effV <= m_effEmpty) {
         if (m_effVstatus < 1) m_effVstatus = 1;
-      } else if (effV > m_effWarning) {
-        if (effV < m_effError) {
+      } else if (effV < m_effWarning) {
+        if (effV > m_effError) {
           if (m_effVstatus < 2) m_effVstatus = 2;
         } else {
           if (m_effVstatus < 3) m_effVstatus = 3;
@@ -248,12 +248,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   //update summary
   m_cEfficiencyU->cd();
-  B2INFO("mah");
-  if (m_hEfficiency->getHistogram(1) == nullptr)
-    B2INFO("segmentation violation in arrivo");
+
+
 
   m_hEfficiency->getHistogram(1)->Draw("text");
-  B2INFO("mah2");
+
   if (m_effUstatus == 0) {
     m_cEfficiencyU->SetFillColor(kGreen);
     m_cEfficiencyU->SetFrameFillColor(10);

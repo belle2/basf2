@@ -63,7 +63,7 @@ reconstructDecay('D0:kpi_mass -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_p
 
 # perform D0 vertex fit
 # First, saving mass before fit
-variablesToExtraInfo("D0", variables={'M': 'M_before_vertex_fit'}, path=my_path)
+variablesToExtraInfo("D0:kpi", variables={'M': 'M_before_vertex_fit'}, path=my_path)
 # Second, creating alias for the extra info variable
 vm.addAlias("M_BeforeFit", "extraInfo(M_before_vertex_fit)")
 # Now, do the fit keeping candidates only passing C.L. value of the fit > 0.0 (no cut)
@@ -71,6 +71,8 @@ vertexRave('D0:kpi', 0.0, path=my_path)
 
 # perform mass constrained D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+variablesToExtraInfo("D0:kpi_mass", variables={'M': 'M_before_vertex_fit'}, path=my_path)
+# no need to create alias again
 massVertexRave('D0:kpi_mass', 0.0, path=my_path)
 
 # reconstruct two D*+ -> D0 pi+ decay

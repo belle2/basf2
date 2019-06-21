@@ -696,6 +696,7 @@ namespace Belle2 {
 
       // sort descending by weight
       std::sort(weights.begin(), weights.end());
+      std::reverse(weights.begin(), weights.end());
       return weights[0];
     }
 

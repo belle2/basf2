@@ -265,7 +265,7 @@ namespace TreeFitter {
       double sigtau = tau > 0 ? std::min(20 * tau, maxDecayLengthSigma)  : maxDecayLengthSigma;
       const double vertex_dist = (fitparams.getStateVector().segment(posindex, 3) - fitparams.getStateVector().segment(mother_ps_index,
                                   3)).norm();
-      fitparams.getCovariance()(tauindex, tauindex) = 1000;
+      fitparams.getCovariance()(tauindex, tauindex) = 1;
     }
     return status;
   }

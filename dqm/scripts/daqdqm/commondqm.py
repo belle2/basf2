@@ -29,16 +29,21 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
             # SVD DATA FORMAT
             svdunpackerdqm = register_module('SVDUnpackerDQM')
             path.add_module(svdunpackerdqm)
-            # ZeroSuppression Emulator
+            # SVDDQMExpressReco General
             path.add_module(
                 'SVDZeroSuppressionEmulator',
                 SNthreshold=5,
                 ShaperDigits='SVDShaperDigits',
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
-            svddqm = register_module('SVDDQMExpressReco')
-            svddqm.param('offlineZSShaperDigits', 'SVDShaperDigitsZS5')
-            path.add_module(svddqm)
+            path.add_module('SVDDQMExpressReco',
+                            offlineZSShaperDigits='SVDShaperDigitsZS5')
+            # SVD Efficiency
+            path.add_module('SVDROIFinder',
+                            recoTrackListName='RecoTracks',
+                            SVDInterceptListName='SVDIntercepts')
+            path.add_module('SVDDQMEfficiency')
+
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
             vxddqm = register_module('VXDDQMExpressReco')

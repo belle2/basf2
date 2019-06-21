@@ -31,10 +31,13 @@ from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import vertexRave
 from modularAnalysis import massVertexRave
+from modularAnalysis import variablesToExtraInfo
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
+from variables import variables as vm
 import variables.collections as vc
 import variables.utils as vu
+
 
 # create path
 my_path = b2.create_path()
@@ -59,7 +62,11 @@ reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
 reconstructDecay('D0:kpi_mass -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
 
 # perform D0 vertex fit
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+# First, saving mass before fit
+variablesToExtraInfo("D0", variables={'M': 'M_before_vertex_fit'}, path=my_path)
+# Second, creating alias for the extra info variable
+vm.addAlias("M_BeforeFit", "extraInfo(M_before_vertex_fit)")
+# Now, do the fit keeping candidates only passing C.L. value of the fit > 0.0 (no cut)
 vertexRave('D0:kpi', 0.0, path=my_path)
 
 # perform mass constrained D0 vertex fit
@@ -86,6 +93,7 @@ vertexRave('D*+:2', 0.0, '', 'ipprofile', path=my_path)
 matchMCTruth('D*+:1', path=my_path)
 matchMCTruth('D*+:2', path=my_path)
 
+
 # Select variables that we want to store to ntuple
 dstar_vars = vc.inv_mass + vc.mc_truth + \
     vc.mc_flight_info + vc.flight_info
@@ -95,7 +103,7 @@ fs_hadron_vars = vu.create_aliases_for_selected(
     'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
 d0_vars = vu.create_aliases_for_selected(
-    vc.inv_mass + vc.mc_truth,
+    vc.inv_mass + vc.mc_truth + ["M_BeforeFit"],
     'D*+ -> ^D0 pi+', 'D0')
 
 

@@ -22,7 +22,7 @@ REG_MODULE(SVDDQMEfficiency)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDQMEfficiencyModule::SVDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
+SVDDQMEfficiencyModule::SVDDQMEfficiencyModule() : HistoModule(), m_geoCache(VXD::GeoCache::getInstance())
 {
   // Set module properties
   setDescription("Create basic histograms for SVD efficiency");
@@ -32,34 +32,32 @@ SVDDQMEfficiencyModule::SVDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   // Parameter definitions
   addParam("svdClustersName", m_svdClustersName, "name of StoreArray with SVD cluster", std::string(""));
-  addParam("tracksName", m_tracksName, "name of StoreArray with RecoTracks", std::string(""));
+  addParam("interceptsName", m_interceptsName, "name of StoreArray with SVDIntercepts", std::string(""));
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
-           std::string("svdeff"));
+           std::string("SVDEfficiency"));
 
   addParam("binsU", m_u_bins, "histogram bins in u direction", int(4));
   addParam("binsV", m_v_bins, "histogram bins in v direction", int(6));
 
-  addParam("distCut", m_distcut, "max distance in [cm] for cluster to be counted to a track", double(0.0500));
 
-  addParam("pCut", m_pcut, "Set a cut on the p-value ", double(0));
+  addParam("saveExpertHistos", m_saveExpertHistos, "if true save additional histograms", bool(false));
 
-  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
-  addParam("saveExpertHistos", m_saveExpertHistos, "if true save additional histograms", bool(true));
+  addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 1u);
+  addParam("minCDCHits", m_minCDCHits, "Number of CDC hits required in a track to be considered", 20u);
 
-  addParam("maskStrips", m_maskStrips, "Do not consider tracks going through known masked strips for the efficiency",
-           bool(false));
-
-  addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
-  addParam("minPXDHits", m_minPXDHits, "Number of PXD hits required in a track to be considered", 0u);
-  addParam("minCDCHits", m_minCDCHits, "Number of CDC hits required in a track to be considered", 0u);
+  addParam("pValCut", m_pcut, "Set a cut on the p-value ", double(0));
+  //  addParam("d0Cut", m_d0cut, "|d0| smaller than the cut", double(0.5));
+  //  addParam("z0Cut", m_z0cut, "|z0| smaller than the cut", double(2));
 
   addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
-  addParam("ptCut", m_ptCut, "Set a cut on the track transverse momentum", double(0));
+  addParam("ptCut", m_ptCut, "Set a cut on the track transverse momentum", double(1));
 
-  addParam("cutBorders", m_cutBorders, "Do not use tracks near the borders of the sensor", bool(true));
+  addParam("fiducialU", m_fiducialU, "Fiducial Area, U direction", float(0.5));
+  addParam("fiducialV", m_fiducialV, "Fiducial Area, V direction", float(0.5));
+  addParam("maxHalfResidU", m_maxResidU, "half window for cluster search around intercept, U direction", float(0.05));
+  addParam("maxHalfResidV", m_maxResidV, "half window for cluster search around intercept, V direction", float(0.05));
 
-  addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked strip or sensor border is allowed", int(10));
 }
 
 
@@ -70,167 +68,94 @@ void SVDDQMEfficiencyModule::initialize()
 
   //register the required arrays
   //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them
-  m_svdclusters.isOptional(m_svdClustersName);
-  m_tracks.isOptional(m_tracksName);
+  m_svdClusters.isOptional(m_svdClustersName);
+  m_intercepts.isOptional(m_interceptsName);
 }
 
 
 void SVDDQMEfficiencyModule::event()
 {
-  if (!m_svdclusters.isValid()) {
-    B2INFO("SVDClusters array is missing, no efficiencies");
+  if (!m_svdClusters.isValid()) {
+    B2INFO("SvdClusters array is missing, no efficiencies");
     return;
   }
-  if (!m_tracks.isValid()) {
+  if (!m_intercepts.isValid()) {
     B2INFO("RecoTrack array is missing, no efficiencies");
     return;
   }
 
-  for (auto& a_track : m_tracks) {
 
-    //If fit failed assume position pointed to is useless anyway
-    if (!a_track.wasFitSuccessful()) continue;
+  //intercepts
+  for (int inter = 0 ; inter < m_intercepts.getEntries(); inter++) {
 
-    if (a_track.getNumberOfSVDHits() < m_minSVDHits) continue;
+    if (!isGoodIntercept(m_intercepts[inter]))
+      continue;
 
-    if (a_track.getNumberOfCDCHits() < m_minCDCHits) continue;
+    B2DEBUG(10, "this intercept is related to a good track");
 
-    const genfit::FitStatus* fitstatus = a_track.getTrackFitStatus();
-    if (fitstatus->getPVal() < m_pcut) continue;
+    VxdID::baseType theVxdID = (VxdID::baseType)m_intercepts[inter]->getSensorID();
+    double coorU = m_intercepts[inter]->getCoorU();
+    double coorV = m_intercepts[inter]->getCoorV();
+    VXD::SensorInfoBase info = m_geoCache.getSensorInfo(theVxdID);
+    int cellU = info.getUCellID(coorU);
+    int cellV = info.getVCellID(coorV);
 
-    genfit::MeasuredStateOnPlane trackstate;
-    trackstate = a_track.getMeasuredStateOnPlaneFromFirstHit();
-    if (trackstate.getMom().Mag() < m_momCut) continue;
+    const VXD::SensorInfoBase& theSensorInfo = m_geoCache.getSensorInfo(theVxdID);
+    if (theSensorInfo.inside(coorU, coorV, -m_fiducialU, -m_fiducialV)) {
 
-    if (trackstate.getMom().Perp() < m_ptCut) continue;
+      //This track should be on the sensor
+      if (m_saveExpertHistos)
+        m_h_track_hits[theVxdID]->Fill(cellU, cellV);
 
-    //loop over all SVD sensors to get the intersections
-    std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-    for (VxdID& aVxdID : sensors) {
-      VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
-      if (info.getType() != VXD::SensorInfoBase::SVD) continue;
+      m_TrackHits->fill(theVxdID, 0, 1);
+      m_TrackHits->fill(theVxdID, 1, 1);
 
-      //Search for intersections of the track with all SVD layers
-      //Traditional (aka the person before did it like this) method
-      //If there is a way to find out sensors crossed by a track directly, that would most likely be faster
+      bool foundU = false;
+      bool foundV = false;
 
-      bool isgood = false;
-      //true = track intersects current sensor
-      double sigu(-9999);
-      double sigv(-9999);
-      TVector3 intersec_buff = getTrackInterSec(info, a_track, isgood, sigu, sigv);
+      //loop on clusters
+      for (int cls = 0 ; cls < m_svdClusters.getEntries(); cls++) {
 
-      if (!isgood) {
-        continue;//track does not go through this sensor-> nothing to measure anyway
-      } else {
+        VxdID::baseType clVxdID = (VxdID::baseType)m_svdClusters[cls]->getSensorID();
+        if (clVxdID != theVxdID)
+          continue;
 
-        double u_fit = intersec_buff.X();
-        double v_fit = intersec_buff.Y();
-
-        int ucell_fit = info.getUCellID(intersec_buff.X());
-        int vcell_fit = info.getVCellID(intersec_buff.Y());
-
-        /*        if (m_cutBorders && isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
-                continue;
-              }
-
-              if (m_maskStrips && isMaskedStripClose(ucell_fit, vcell_fit, m_maskedDistance, aVxdID)) {
-                continue;
-          }*/
-
-        //This track should be on the sensor
-        if (m_saveExpertHistos)
-          m_h_track_hits[aVxdID]->Fill(ucell_fit, vcell_fit);
-        m_TrackHits->fill(aVxdID, 0, 1);
-        m_TrackHits->fill(aVxdID, 1, 1);
-        //Now check if the sensor measured a hit here
-        TVector3 dist_clus(0, 0, 0);
-        int bestclusterU = findClosestCluster(aVxdID, intersec_buff, true);
-        if (bestclusterU >= 0) {
-          double u_clus = m_svdclusters[bestclusterU]->getPosition(intersec_buff.Y());
-          dist_clus.SetXYZ(u_fit - u_clus, 0, 0);
-          if (dist_clus.Mag() <= m_distcut) {
-            m_MatchedHits->fill(aVxdID, 1, 1);
-            if (m_saveExpertHistos)
-              m_h_matched_clusterU[aVxdID]->Fill(ucell_fit, vcell_fit);
-          }
+        double maxResid = m_maxResidV;
+        double interCoor = coorV;
+        double resid = interCoor - m_svdClusters[cls]->getPosition();
+        if (m_svdClusters[cls]->isUCluster()) {
+          interCoor = coorU;
+          maxResid = m_maxResidU;
+          resid = interCoor - m_svdClusters[cls]->getPosition(coorV);
         }
 
-        int bestclusterV = findClosestCluster(aVxdID, intersec_buff, false);
-        if (bestclusterV >= 0) {
-          double v_clus = m_svdclusters[bestclusterV]->getPosition();
-          dist_clus.SetXYZ(0, v_fit - v_clus, 0);
-          if (dist_clus.Mag() <= m_distcut) {
-            m_MatchedHits->fill(aVxdID, 0, 1);
-            if (m_saveExpertHistos)
-              m_h_matched_clusterV[aVxdID]->Fill(ucell_fit, vcell_fit);
-          }
+
+        if (resid < maxResid) {
+          if (m_svdClusters[cls]->isUCluster()) {
+            foundU = true;
+          } else
+            foundV = true;
         }
 
+        if (foundU && foundV)
+          break;
       }
+
+      if (foundU) {
+        m_MatchedHits->fill(theVxdID, 1, 1);
+        if (m_saveExpertHistos) m_h_matched_clusterU[theVxdID]->Fill(cellU, cellV);
+      }
+
+      if (foundV) {
+        m_MatchedHits->fill(theVxdID, 0, 1);
+        if (m_saveExpertHistos)m_h_matched_clusterV[theVxdID]->Fill(cellU, cellV);
+      }
+
     }
   }
+
 }
 
-
-
-TVector3 SVDDQMEfficiencyModule::getTrackInterSec(VXD::SensorInfoBase& svdSensorInfo, const RecoTrack& aTrack, bool& isgood,
-                                                  double& du, double& dv)
-{
-  //will be set true if the intersect was found
-  isgood = false;
-
-  TVector3 intersec(99999999, 9999999, 0); //point outside the sensor
-
-  genfit::MeasuredStateOnPlane gfTrackState = aTrack.getMeasuredStateOnPlaneFromFirstHit();
-
-  //adopted (aka stolen) from tracking/modules/pxdClusterRescue/PXDClusterRescueROIModule
-  try {
-    // get sensor plane
-    TVector3 zeroVec(0, 0, 0);
-    TVector3 uVec(1, 0, 0);
-    TVector3 vVec(0, 1, 0);
-
-    genfit::DetPlane* sensorPlane = new genfit::DetPlane();
-    sensorPlane->setO(svdSensorInfo.pointToGlobal(zeroVec, m_useAlignment));
-    sensorPlane->setUV(svdSensorInfo.vectorToGlobal(uVec, m_useAlignment), svdSensorInfo.vectorToGlobal(vVec, m_useAlignment));
-
-    //boost pointer (will be deleted automatically ?!?!?)
-    genfit::SharedPlanePtr sensorPlaneSptr(sensorPlane);
-
-    // do extrapolation
-    gfTrackState.extrapolateToPlane(sensorPlaneSptr);
-  } catch (genfit::Exception& gfException) {
-    B2WARNING("Fitting failed: " << gfException.getExcString());
-    isgood = false;
-    return intersec;
-  } catch (...) {
-    B2WARNING("Fitting failed: for some reason");
-    isgood = false;
-    return intersec;
-  }
-
-  //local position
-  intersec = svdSensorInfo.pointToLocal(gfTrackState.getPos(), m_useAlignment);
-
-  //try to get the momentum
-  B2DEBUG(1, "Fitted momentum on the plane p = " << gfTrackState.getMom().Mag());
-
-  // no tolerance currently! Maybe one should be added!
-  double tolerance = 0.0;
-  bool inside = svdSensorInfo.inside(intersec.X(), intersec.Y(), tolerance, tolerance);
-
-  // get intersection point in local coordinates with covariance matrix
-  TMatrixDSym covMatrix = gfTrackState.getCov(); // 5D with elements q/p,u',v',u,v in plane system
-
-  // get ROI by covariance matrix and local intersection point
-  du = std::sqrt(covMatrix(3, 3));
-  dv = std::sqrt(covMatrix(4, 4));
-
-  if (inside) isgood = true;
-
-  return intersec;
-}
 
 
 void SVDDQMEfficiencyModule::defineHisto()
@@ -249,9 +174,9 @@ void SVDDQMEfficiencyModule::defineHisto()
     return;
   }
 
-  std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+  std::vector<VxdID> sensors = m_geoCache.getListOfSensors();
   for (VxdID& avxdid : sensors) {
-    VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
+    VXD::SensorInfoBase info = m_geoCache.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::SVD) continue;
     //Only interested in SVD sensors
 
@@ -261,7 +186,6 @@ void SVDDQMEfficiencyModule::defineHisto()
     int nu = info.getUCells();
     int nv = info.getVCells();
 
-    //nu + 1,nv + 1 Bin numbers when using one bin per pixel
     m_h_track_hits[avxdid] = new TH2D("track_hits_" + buff, "tracks through sensor " + buff,
                                       m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     m_h_matched_clusterU[avxdid] = new TH2D("matched_clusterU_" + buff, "track intersections with a matched U cluster" + buff,
@@ -274,75 +198,36 @@ void SVDDQMEfficiencyModule::defineHisto()
 }
 
 
-int
-SVDDQMEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection, bool isU)
+
+bool SVDDQMEfficiencyModule::isGoodIntercept(SVDIntercept* inter)
 {
-  int closestU = -1;
-  double mindistU = 999999999999; //definitely outside of the sensor
-  int closestV = -1;
-  double mindistV = 999999999999; //definitely outside of the sensor
 
-  VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
+  RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(inter);
 
-  //loop the clusters
-  for (int iclus = 0; iclus < m_svdclusters.getEntries(); iclus++) {
+  if (theRC.size() == 0)
+    return false;
 
-    if (m_svdclusters[iclus]->isUCluster() != isU)
-      continue;
 
-    VxdID clusterID = m_svdclusters[iclus]->getSensorID();
-    if (avxdid.getLayerNumber() != clusterID.getLayerNumber() ||
-        avxdid.getLadderNumber() != clusterID.getLadderNumber() ||
-        avxdid.getSensorNumber() != clusterID.getSensorNumber()) {
-      continue;
-    }
-    //only cluster on the correct sensor and direction should survive
+  //If fit failed assume position pointed to is useless anyway
+  if (!theRC[0]->wasFitSuccessful()) return false;
 
-    if (isU) {
-      double current = m_svdclusters[iclus]->getPosition(intersection.Y());
-      double dist = fabs(intersection.X() - current);
-      if (dist < mindistU) {
-        closestU = iclus;
-        mindistU = dist;
-      }
-    } else {
-      double current = m_svdclusters[iclus]->getPosition();
-      double dist = fabs(intersection.Y() - current);
-      if (dist < mindistV) {
-        closestV = iclus;
-        mindistV = dist;
-      }
-    }
-  }
+  if (theRC[0]->getNumberOfSVDHits() < m_minSVDHits) return false;
 
-  if (isU)
-    return closestU;
-  else
-    return closestV;
+  if (theRC[0]->getNumberOfCDCHits() < m_minCDCHits) return false;
+
+  const genfit::FitStatus* fitstatus = theRC[0]->getTrackFitStatus();
+  if (fitstatus->getPVal() < m_pcut) return false;
+  //  if (fabs(fitstatus->getD0() < m_d0cut) return false;
+  //  if (fabs(fitstatus->getZ0() < m_z0cut) return false;
+
+
+
+  genfit::MeasuredStateOnPlane trackstate;
+  trackstate = theRC[0]->getMeasuredStateOnPlaneFromFirstHit();
+  if (trackstate.getMom().Mag() < m_momCut) return false;
+
+  if (trackstate.getMom().Perp() < m_ptCut) return false;
+
+  return true;
 
 }
-
-/*bool SVDDQMEfficiencyModule::isCloseToBorder(int u, int v, int checkDistance)
-{
-
-  if (u - checkDistance < 0 || u + checkDistance >= 250 ||
-      v - checkDistance < 0 || v + checkDistance >= 768) {
-    return true;
-  }
-  return false;
-  }*/
-
-/*bool SVDDQMEfficiencyModule::isMaskedStripClose(int u, int v, int checkDistance, VxdID& moduleID)
-{
- return false;
- //Iterate over square around the intersection to see if any close pixel is dead
- for (int u_iter = u - checkDistance; u_iter <= u + checkDistance ; ++u_iter) {
-   for (int v_iter = v - checkDistance; v_iter <= v + checkDistance ; ++v_iter) {
-     if (PXD::PXDPixelMasker::getInstance().pixelDead(moduleID, u_iter, v_iter)
-         || !PXD::PXDPixelMasker::getInstance().pixelOK(moduleID, u_iter, v_iter)) {
-       return true;
-     }
-   }
- }
- return false;
-}*/

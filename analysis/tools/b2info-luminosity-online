@@ -8,12 +8,14 @@ Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
 https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
 
 Usage:
-    b2info-luminosity-online --exp <E> --runs <Range> [--verbose] [--db db_path]
+    b2info-luminosity-online --exp <E> --runs <Range> --plot [DATE|RUN] [--verbose] [--db db_path]
 
-<E> experiment number (mandatory)
+<E> experiment number (mandatory) A range is allowed
 <Range> run range (mandatory)
     syntax is: xx-yy,zz
     all runs between xx and yy (included) and run zz. Can have multiple ranges xx-yy,zz-ww
+    not allowed if exp has range as well
+--plot Produce plot of integrated luminosity vs day (DATE) or vs run (RUN)
 --verbose print lumi for each run
 --db path of database to use
 
@@ -132,7 +134,7 @@ class Luminosity:
 
         self.runRangeStr="All runs"
         if self.runs:
-            self.runRangeStr="Runs {min(self.runs)}-{self.runs(run_max)}"
+            self.runRangeStr=f"Runs {min(self.runs)}-{max(self.runs)}"
 
         self.verb=args.verb
 

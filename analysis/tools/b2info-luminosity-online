@@ -248,9 +248,12 @@ class Luminosity:
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        print(f"Creating LumiPer{label}_Exp{self.expstr}.pdf|png files")
-        plt.savefig(f"LumiPer{label}_Exp{self.expstr}.pdf", bbox_inches="tight")
-        plt.savefig(f"LumiPer{label}_Exp{self.expstr}.png", bbox_inches="tight")
+        filename=f"LumiPer{label}_Exp{self.expstr}"
+        if self.runs:
+            filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
+        print(f"Creating {filename}.pdf|png files")
+        for fileformat in ['pdf','png']:
+            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight")
 
     def plotLumiPerRun(self):
         """
@@ -293,10 +296,12 @@ class Luminosity:
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        print(f"Creating LumiPerRun_Exp{self.expstr}.pdf|png files")
-        plt.savefig(f"LumiPerRun_Exp{self.expstr}.pdf", bbox_inches="tight")
-        plt.savefig(f"LumiPerRun_Exp{self.expstr}.png", bbox_inches="tight")
-        pass
+        filename=f"LumiPerRun_Exp{self.expstr}"
+        if self.runs:
+            filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
+        print(f"Creating {filename}.pdf|png files")
+        for fileformat in ['pdf','png']:
+            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight")
 
     def printLumi(self):
         """

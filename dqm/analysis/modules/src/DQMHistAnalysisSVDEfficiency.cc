@@ -36,8 +36,8 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   B2INFO("DQMHistAnalysisSVDEfficiency: Constructor done.");
 
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
-  addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.5));
-  addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.7));
+  addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.6));
+  addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.8));
   addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   /*  addParam("errEffLevel_Error", m_errEffError, "Maximum Efficiency Error allowed for safe operations (red)", float(5));

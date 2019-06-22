@@ -30,6 +30,7 @@
 #include <mdst/dataobjects/KlId.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
@@ -67,6 +68,12 @@ namespace Belle2 {
 
     addParam("useMCParticles", m_useMCParticles,
              "Use MCParticles instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+
+    addParam("useROEs", m_useROEs,
+             "Use ROE instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+
+    addParam("roeMaskName", m_roeMaskName,
+             "ROE mask name to load", std::string(""));
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
@@ -129,7 +136,7 @@ namespace Belle2 {
         int pdgCode  = mother->getPDGCode();
         string listName = mother->getFullName();
 
-        if (not isValidPDGCode(pdgCode) and m_useMCParticles == false)
+        if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 
         // if we're not loading MCParticles and we are loading K0S, Lambdas, or photons --> ee then this decaystring is a V0
@@ -177,7 +184,10 @@ namespace Belle2 {
 
         // add PList to corresponding collection of Lists
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
-        if (m_useMCParticles) {
+        if (m_useROEs) {
+          B2INFO("   -> MDST source: RestOfEvents");
+          m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+        } else if (m_useMCParticles) {
           B2INFO("   -> MDST source: MCParticles");
           m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
         } else {
@@ -230,8 +240,9 @@ namespace Belle2 {
       particleExtraInfoMap.create();
     }
 
-
-    if (m_useMCParticles)
+    if (m_useROEs)
+      roeToParticles();
+    else if (m_useMCParticles)
       mcParticlesToParticles();
     else {
       tracksToParticles();
@@ -251,6 +262,46 @@ namespace Belle2 {
                   << " tracks skipped because of zero charge for "
                   << get<c_PListName>(track2Plist));
       }
+  }
+
+  void ParticleLoaderModule::roeToParticles()
+  {
+    if (m_ROE2Plists.empty()) // nothing to do
+      return;
+    for (auto roe2Plist : m_ROE2Plists) {
+      string listName = get<c_PListName>(roe2Plist);
+      string antiListName = get<c_AntiPListName>(roe2Plist);
+      int pdgCode = get<c_PListPDGCode>(roe2Plist);
+      bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(roe2Plist);
+
+      StoreObjPtr<ParticleList> plist(listName);
+      plist.create();
+      plist->initialize(pdgCode, listName);
+
+      if (!isSelfConjugatedParticle) {
+        StoreObjPtr<ParticleList> antiPlist(antiListName);
+        antiPlist.create();
+        antiPlist->initialize(-1 * pdgCode, antiListName);
+
+        antiPlist->bindAntiParticleList(*(plist));
+      }
+    }
+
+
+    StoreArray<RestOfEvent> ROEs;
+    StoreArray<Particle> particles;
+    for (int i = 0; i < ROEs.getEntries(); i++) {
+      Particle* newPart = ROEs[i]->convertToParticle(m_roeMaskName);
+      for (auto roe2Plist : m_ROE2Plists) {
+        string listName = get<c_PListName>(roe2Plist);
+        auto& cut = get<c_CutPointer>(roe2Plist);
+        StoreObjPtr<ParticleList> plist(listName);
+
+        if (cut->check(newPart))
+          plist->addParticle(newPart);
+
+      }
+    }
   }
 
   void ParticleLoaderModule::v0sToParticles()

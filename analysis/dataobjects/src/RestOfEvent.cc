@@ -570,7 +570,29 @@ void RestOfEvent::printIndices(const std::set<int>& indices) const
   }
   B2INFO(printout);
 }
-
+Particle* RestOfEvent::convertToParticle(const std::string& maskName)
+{
+  StoreArray<Particle> particles;
+  std::set<int> source;
+  if (maskName == "") {
+    // if no mask provided work with internal source
+    source = m_particleIndices;
+  } else {
+    bool maskFound = false;
+    for (auto& mask : m_masks) {
+      if (mask.getName() == maskName) {
+        maskFound = true;
+        source = mask.getParticles();
+        break;
+      }
+    }
+    if (!maskFound) {
+      B2FATAL("No " << maskName << " mask defined in current ROE!");
+    }
+  }
+  return particles.appendNew(get4Vector(maskName), getPDGCode(), Particle::EFlavorType::c_Unflavored, std::vector(source.begin(),
+                             source.end()));
+}
 double RestOfEvent::atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const
 {
   // ACC = ARICH

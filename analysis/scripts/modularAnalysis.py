@@ -764,8 +764,9 @@ def fillParticleListFromROE(
     path=analysis_main,
 ):
     """
-    Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
-    loads them to the StoreArray<Particle> and fills the ParticleList.
+    Creates Particle object for each ROE of the desired type found in the
+    StoreArray<RestOfEvent>, loads them to the StoreArray<Particle>
+    and fills the ParticleList.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
 

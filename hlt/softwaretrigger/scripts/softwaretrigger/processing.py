@@ -170,6 +170,7 @@ def add_hlt_processing(path,
 
 def add_expressreco_processing(path,
                                run_type=constants.RunTypes.beam,
+                               select_only_accepted_events=False,
                                prune_input=True,
                                prune_output=True,
                                unpacker_components=None,
@@ -183,6 +184,13 @@ def add_expressreco_processing(path,
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
     if reco_components is None:
         reco_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
+
+    # If turned on, only events selected by the HLT will go to ereco.
+    # this is needed as by default also un-selected events will get passed to ereco,
+    # however they are empty.
+    if select_only_accepted_events:
+        skim_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
+        skim_module.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     # ensure that only DataStore content is present that we expect in
     # in the ExpressReco configuration. If tracks are present in the

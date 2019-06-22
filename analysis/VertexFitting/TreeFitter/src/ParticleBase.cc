@@ -212,8 +212,6 @@ namespace TreeFitter {
         case 11:
           rc = true ;
           break ;
-          rc = false;
-          break;
         default: //everything with boosted flight length less than 1 micrometer
           rc = (pdgcode && pdgLifeTime(particle) < 1e-5);
       }
@@ -343,7 +341,6 @@ namespace TreeFitter {
        *  that is why we do not extract the distance as a vector here
        * */
       p.getResiduals()(row) = posxmother + tau * momx / mom - posx ;
-      p.getResiduals()(row) *= -1;
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, posindex + row) = -1;
       p.getH()(row, tauindex) = momx / mom;
@@ -363,7 +360,6 @@ namespace TreeFitter {
     p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
     p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
 
-    p.getH() *= -1;
     return ErrCode(ErrCode::Status::success);
   }
 

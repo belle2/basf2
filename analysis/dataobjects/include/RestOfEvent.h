@@ -215,6 +215,11 @@ namespace Belle2 {
     {
       m_pdgCode = pdgCode;
     }
+    /**
+     * Converts ROE to Particle and adds it to StoreArray
+     *
+     * @param Name of the ROE mask to use for 4-vector and daughters
+     */
     Particle* convertToParticle(const std::string& maskName = "");
     /**
      * Gets the PDG code of the rest of event.

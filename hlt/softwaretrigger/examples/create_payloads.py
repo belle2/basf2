@@ -351,6 +351,16 @@ SKIM_CUTS = [
          cut_identifier="accept_bhabha",
          prescale_factor=1,
          reject_cut=False),
+    dict(cut_string="[BhabhaECL == 1]",
+         base_identifier="skim",
+         cut_identifier="accept_bhabhaecl",
+         prescale_factor=1,
+         reject_cut=False),
+    dict(cut_string="[Radee == 1]",
+         base_identifier="skim",
+         cut_identifier="accept_radee",
+         prescale_factor=1,
+         reject_cut=False),
 ]
 
 

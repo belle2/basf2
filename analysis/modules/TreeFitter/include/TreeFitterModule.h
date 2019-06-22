@@ -113,5 +113,9 @@ namespace Belle2 {
      * */
     std::vector<std::string> m_removeConstraintList;
 
+    /** should the vertex be joined with the mother and should it be geometrically cosntrained?
+     *  'I dont know hat I am doing'
+     * */
+    bool m_automatic_vertex_constraining;
   };
 }

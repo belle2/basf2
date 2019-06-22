@@ -28,15 +28,18 @@
 
 namespace TreeFitter {
 
+  //externs
   bool massConstraintType;
   std::vector<int> massConstraintListPDG;
   std::vector<int> fixedToMotherVertexListPDG;
   std::vector<int> geoConstraintListPDG;
   std::vector<std::string> removeConstraintList;
+  bool automatic_vertex_constraining;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
     m_particle(particle),
     m_mother(mother),
+    m_isStronglyDecayingResonance(false),
     m_index(0),
     m_pdgMass(particle->getPDGMass()),
     m_pdgWidth(0),
@@ -45,6 +48,7 @@ namespace TreeFitter {
     m_name("Unknown")
   {
     if (particle) {
+      m_isStronglyDecayingResonance = isAResonance(particle);
       const int pdgcode = particle->getPDGCode();
       if (pdgcode) { // PDG code != 0
 
@@ -208,8 +212,6 @@ namespace TreeFitter {
         case 11:
           rc = true ;
           break ;
-        case 413:
-        case 423:
           rc = false;
           break;
         default: //everything with boosted flight length less than 1 micrometer
@@ -255,16 +257,8 @@ namespace TreeFitter {
     const int tauindex = tauIndex();
 
     if (tauindex >= 0) {
-
-      /** cant multiply by momentum here because unknown but average mom is 3 Gev */
-      /** if pdgMass = 0 then tauindex is always = -1, so this is safe */
-
-      const int mother_ps_index = mother()->posIndex();
-      const double maxDecayLengthSigma = 1000;
-      double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
-      double sigtau = tau > 0 ? std::min(20 * tau, maxDecayLengthSigma)  : maxDecayLengthSigma;
-      const double vertex_dist = (fitparams.getStateVector().segment(posindex, 3) - fitparams.getStateVector().segment(mother_ps_index,
-                                  3)).norm();
+      // this is very sensitive and can heavily effect the
+      // efficency of the fits
       fitparams.getCovariance()(tauindex, tauindex) = 1;
     }
     return status;

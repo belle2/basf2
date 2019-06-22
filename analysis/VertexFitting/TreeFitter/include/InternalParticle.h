@@ -103,6 +103,10 @@ namespace TreeFitter {
 
     /** is conversion  */
     bool m_isconversion ;
+
+    /** automatically figure out if mother and particle vertex should be the same
+     * and also add geometric constraints */
+    bool m_automatic_vertex_constraining;
   } ;
 
 }

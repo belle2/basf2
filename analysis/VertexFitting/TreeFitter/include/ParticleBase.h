@@ -216,6 +216,8 @@ namespace TreeFitter {
     /** daughter container  */
     std::vector<ParticleBase*> m_daughters;
 
+    /** decay length less than 1 micron  */
+    bool m_isStronglyDecayingResonance;
   private:
     /** index */
     int m_index;

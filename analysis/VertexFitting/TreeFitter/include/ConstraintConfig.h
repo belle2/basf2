@@ -30,4 +30,6 @@ namespace TreeFitter {
   /** list of constraints not to apply in tree fit */
   extern std::vector<std::string> removeConstraintList;
 
+  /** automatically determing if it is worth extrating a vertex for this particle or if it should be joined with the mother */
+  extern bool automatic_vertex_constraining;
 }

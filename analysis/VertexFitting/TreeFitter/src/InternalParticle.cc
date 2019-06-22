@@ -43,8 +43,7 @@ namespace TreeFitter {
     m_massconstraint(false),
     m_lifetimeconstraint(false),
     m_isconversion(false),
-    m_shares_vertex_with_mother(std::find(TreeFitter::fixedToMotherVertexListPDG.begin(), TreeFitter::fixedToMotherVertexListPDG.end(),
-                                          std::abs(m_particle->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end() && this->mother())
+    m_automatic_vertex_constraining(automatic_vertex_constraining) // this is an extern FIXME -> move to config class
   {
 
     if (particle) {
@@ -55,17 +54,24 @@ namespace TreeFitter {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
     }
 
-    //m_shares_vertex_with_mother = std::find(TreeFitter::fixedToMotherVertexListPDG.begin(),
-    //                                        TreeFitter::fixedToMotherVertexListPDG.end(), std::abs(m_particle->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end()
-    //                              && this->mother();
-
     m_massconstraint = std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
                                  std::abs(m_particle->getPDGCode())) != TreeFitter::massConstraintListPDG.end();
 
-    // use geo constraint if this particle is in the list to constrain
-    m_geo_constraint = std::find(TreeFitter::geoConstraintListPDG.begin(),
-                                 TreeFitter::geoConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != TreeFitter::geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
+    if (!m_automatic_vertex_constraining) {
+      // if this is a hadronically decaying resonance it is usefule to constraint the decay vertex to its mothers decay vertex.
+      //
+      m_shares_vertex_with_mother  = std::find(TreeFitter::fixedToMotherVertexListPDG.begin(),
+                                               TreeFitter::fixedToMotherVertexListPDG.end(),
+                                               std::abs(m_particle->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end() && this->mother();
+
+      // use geo constraint if this particle is in the list to constrain
+      m_geo_constraint = std::find(TreeFitter::geoConstraintListPDG.begin(),
+                                   TreeFitter::geoConstraintListPDG.end(),
+                                   std::abs(m_particle->getPDGCode())) != TreeFitter::geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
+    } else {
+      m_shares_vertex_with_mother = this->mother() && m_isStronglyDecayingResonance;
+      m_geo_constraint = this->mother() && !m_shares_vertex_with_mother;
+    }
   }
 
   bool InternalParticle::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)

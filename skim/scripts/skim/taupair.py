@@ -128,7 +128,7 @@ def TauLFVList(flag=1, path=analysis_main):
     """
     __author__ = "P. Urquijo, K. Inami"
 
-    tauLFVCuts = '1.58 < Mbc < 1.98 and abs(deltaE) < 1.0'
+    tauLFVCuts = '1.58 < M < 1.98 and abs(deltaE) < 1.0'
 
     tau_lgamma_Channels = ['e+:loose gamma:loose',
                            'mu+:loose gamma:loose'

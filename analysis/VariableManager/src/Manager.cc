@@ -282,6 +282,13 @@ std::vector<std::string> Variable::Manager::getNames() const
   return names;
 }
 
+std::vector<std::string> Variable::Manager::getAliasNames() const
+{
+  std::vector<std::string> names;
+  for (auto al : m_alias) names.push_back(al.first);
+  return names;
+}
+
 double Variable::Manager::evaluate(const std::string& varName, const Particle* p)
 {
   const Var* var = getVariable(varName);

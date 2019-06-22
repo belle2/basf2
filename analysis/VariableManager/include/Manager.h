@@ -206,6 +206,9 @@ namespace Belle2 {
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;
 
+      /** Return a list of all variable alias names (in reverse order added). */
+      std::vector<std::string> getAliasNames() const;
+
       /** Abort with B2FATAL if name is not a valid name for a variable. */
       void assertValidName(const std::string& name);
 

@@ -14,14 +14,14 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
 skimCode = encodeSkimName('Charm2BodyNeutrals2')
 
 c2bn2path = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=c2bn2path)
 
 stdPi('loose', path=c2bn2path)

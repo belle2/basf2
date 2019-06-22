@@ -14,14 +14,14 @@ from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
 kspi0path = Path()
 
 skimCode = encodeSkimName('BtoDh_Kspi0')
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 
 inputMdstList('default', fileList, path=kspi0path)

@@ -50,7 +50,7 @@ namespace Belle2 {
     void cleanup();
 
     /** Append a buffer to the RingBuffer */
-    int insq(const int* buf, int size);
+    int insq(const int* buf, int size, bool checkTx = false);
     /** Pick up a buffer from the RingBuffer */
     int remq(int* buf);
     /** Prefetch a buffer from the RingBuffer w/o removing it*/

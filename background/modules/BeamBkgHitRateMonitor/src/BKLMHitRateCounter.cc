@@ -96,7 +96,7 @@ int BKLMHitRateCounter::getActiveStripsBKLMLayer(int layerGlobal) const
   for (int plane = 0; plane < BKLMElementNumbers::getMaximalPlaneNumber(); ++plane) {
     for (int strip = 1; strip <= BKLMElementNumbers::getNStrips(isForward, sector, layer, plane); ++strip) {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t channel = elementNumbers->channelNumberBKLM(isForward, layer, sector, plane, strip);
+      uint16_t channel = elementNumbers->channelNumberBKLM(isForward, sector, layer, plane, strip);
       enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
 
       // Ignore the unknown and dead channels

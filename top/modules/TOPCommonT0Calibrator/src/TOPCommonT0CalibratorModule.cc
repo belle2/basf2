@@ -272,7 +272,7 @@ namespace Belle2 {
   void TOPCommonT0CalibratorModule::terminate()
   {
 
-    // determine scaling factor for errors from two statistically independent results
+    // determine scaling factor for errors from statistically independent results
 
     TH1F h_pulls("pulls", "Pulls of statistically independent results",
                  200, -15.0, 15.0);
@@ -296,18 +296,28 @@ namespace Belle2 {
 
     // merge statistically independent finders and store results into histograms
 
-    TH1F h_commonT0("commonT0", "Common T0", 1, 0, 1);
-    h_commonT0.SetYTitle("common T0 [ns]");
-
     auto finder = m_finders[0];
     for (int i = 1; i < c_numSets; i++) {
       finder.add(m_finders[i]);
     }
+
+    TH1F h_relCommonT0("relCommonT0", "relative common T0", 1, 0, 1);
+    h_relCommonT0.SetYTitle("common T0 residual [ns]");
+    TH1F h_commonT0("commonT0", "Common T0", 1, 0, 1);
+    h_commonT0.SetYTitle("common T0 [ns]");
+
     const auto& minimum = finder.getMinimum();
+    auto h = finder.getHistogram("chi2", "chi2");
+    h.Write();
     if (minimum.valid) {
-      h_commonT0.SetBinContent(1, minimum.position);
+      h_relCommonT0.SetBinContent(1, minimum.position);
+      h_relCommonT0.SetBinError(1, minimum.error * scaleError);
+      double T0 = 0;
+      if (m_commonT0->isCalibrated()) T0 = m_commonT0->getT0();
+      h_commonT0.SetBinContent(1, minimum.position + T0);
       h_commonT0.SetBinError(1, minimum.error * scaleError);
     }
+    h_relCommonT0.Write();
     h_commonT0.Write();
 
     // write other histograms and ntuple; close the file

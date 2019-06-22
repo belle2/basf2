@@ -1,3 +1,13 @@
+//---------------------------------------------------------------
+// $Id$
+//---------------------------------------------------------------
+// Filename : TRGGRLDQMModule.h
+// Section  : TRG GRL
+// Owner    : Yun-Tsung Lai
+// Email    : ytlai@post.kek.jp
+//---------------------------------------------------------------
+// Description : DQM module for TRGGRL
+//---------------------------------------------------------------
 #ifndef TRCGRLDQMMODULE_h
 #define TRCGRLDQMMODULE_h
 
@@ -84,6 +94,8 @@ namespace Belle2 {
 
     /** Short track map */
     TH1F* h_map_ST;
+    /** Short track map */
+    TH1F* h_map_ST2;
     /** Full track veto map */
     TH1F* h_map_veto;
     /** TSF0 map */
@@ -92,6 +104,10 @@ namespace Belle2 {
     TH1F* h_map_TSF2;
     /** TSF4 map */
     TH1F* h_map_TSF4;
+    /** TSF1 map */
+    TH1F* h_map_TSF1;
+    /** TSF3 map */
+    TH1F* h_map_TSF3;
   };
 
 }

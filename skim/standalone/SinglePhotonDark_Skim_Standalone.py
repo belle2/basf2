@@ -13,15 +13,14 @@ from basf2 import process, statistics, Path
 from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
-from skimExpertFunctions import setSkimLogging, encodeSkimName
-
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
 # create a path
 darkskimpath = Path()
 
 # test input file
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=darkskimpath)
 stdPhotons('all', path=darkskimpath)
 stdE('all', path=darkskimpath)

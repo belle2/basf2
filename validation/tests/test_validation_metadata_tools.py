@@ -62,7 +62,7 @@ class TestValidationMetadataSetter(unittest.TestCase):
         out_file_path = tmp_dir_path / "out.root"
         create_validation_histograms(
             path,
-            str(out_file_path),
+            out_file_path,
             "Upsilon(4S)",
             variables_1d=[
                 (

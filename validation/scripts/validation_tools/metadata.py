@@ -6,6 +6,7 @@ Small module containing helper functions to set the metadata on objects created 
 
 # std
 from typing import Optional, Union, List, Tuple
+import pathlib
 
 import basf2
 import ROOT
@@ -69,8 +70,9 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
             pass
 
 
-def validation_metadata_update(rootfile: Union[str, ROOT.TFile], name: str,
-                               *args, **argk) -> None:
+def validation_metadata_update(
+        rootfile: Union[str, ROOT.TFile, pathlib.PurePath],
+        name: str, *args, **argk) -> None:
     """
     This is a convenience helper for `validation_metadata_set` in case the objects
     have already been saved in a ROOT file before: It will open the file (or use
@@ -78,8 +80,8 @@ def validation_metadata_update(rootfile: Union[str, ROOT.TFile], name: str,
     version to the file
 
     Arguments:
-        rootfile (str or ROOT.TFile): Name of the root file to open or an already
-            open TFile instance
+        rootfile (str, ROOT.TFile or pathlib.PurePath): Name of the root file
+            to open or an already open TFile instance
         name (str): Name of the object in the file
         title (str): Title to use for the object
         contact (str): Contact person, usually in the form "Name <email>"
@@ -94,6 +96,8 @@ def validation_metadata_update(rootfile: Union[str, ROOT.TFile], name: str,
 
     opened = False
     if not isinstance(rootfile, ROOT.TFile):
+        if isinstance(rootfile, pathlib.PurePath):
+            rootfile = str(rootfile)
         rootfile = ROOT.TFile(rootfile, "UPDATE")
         opened = True
     if not rootfile.IsOpen() or not rootfile.IsWritable():
@@ -102,6 +106,8 @@ def validation_metadata_update(rootfile: Union[str, ROOT.TFile], name: str,
     if not obj:
         raise RuntimeError(f"Cannot find object named {name} in {rootfile.GetName()}")
     validation_metadata_set(obj, *args, **argk)
+    # scope guard to avoid side effects by changing the global gDirectory
+    # in modules ...
     directoryGuard = ROOT.TDirectory.TContext(rootfile)
     obj.Write("", ROOT.TObject.kOverwrite)
     if opened:
@@ -122,7 +128,8 @@ class ValidationMetadataSetter(basf2.Module):
         module is after the creation modules the metadata might not be set correctly
     """
 
-    def __init__(self, variables: List[Tuple[str]], rootfile: str):
+    def __init__(self, variables: List[Tuple[str]],
+                 rootfile: Union[str, pathlib.PurePath]):
         """
 
         Arguments:
@@ -131,7 +138,8 @@ class ValidationMetadataSetter(basf2.Module):
                 values which will be forwarded to `validation_metadata_set`:
                 ``(name, title, contact, description, check, xlabel, ylabel)``
                 where ``xlabel`` and ``ylabel`` are optional
-            rootfile (str): The name of the ROOT file where the objects can be found
+            rootfile (str or pathlib.PurePath): The name of the ROOT file where
+                the objects can be found
         """
         super().__init__()
         #: Remember the metadata

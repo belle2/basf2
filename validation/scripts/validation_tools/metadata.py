@@ -4,15 +4,22 @@
 Small module containing helper functions to set the metadata on objects created for the validation correctly
 """
 
+# std
+from typing import Optional, Union, List, Tuple
 
 import basf2
 import ROOT
 from ROOT import Belle2
+
 # circumvent BII-1264
 ROOT.gInterpreter.Declare("#include <framework/utilities/MakeROOTCompatible.h>")
 
 
-def validation_metadata_set(obj, title, contact, description, check, xlabel=None, ylabel=None, metaoptions=""):
+def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
+                            description: str, check: str,
+                            xlabel: Optional[str] = None,
+                            ylabel: Optional[str] = None,
+                            metaoptions="") -> None:
     """
     Set the validation metadata for a given object by setting the necessary values.
     This function can be used on any object supported by the Validation (histograms, profiles, ntuples)
@@ -62,7 +69,8 @@ def validation_metadata_set(obj, title, contact, description, check, xlabel=None
             pass
 
 
-def validation_metadata_update(rootfile, name, *args, **argk):
+def validation_metadata_update(rootfile: Union[str, ROOT.TFile], name: str,
+                               *args, **argk) -> None:
     """
     This is a convenience helper for `validation_metadata_set` in case the objects
     have already been saved in a ROOT file before: It will open the file (or use
@@ -114,7 +122,7 @@ class ValidationMetadataSetter(basf2.Module):
         module is after the creation modules the metadata might not be set correctly
     """
 
-    def __init__(self, variables, rootfile):
+    def __init__(self, variables: List[Tuple[str]], rootfile: str):
         """
 
         Arguments:
@@ -144,7 +152,12 @@ class ValidationMetadataSetter(basf2.Module):
         self._tfile.reset()
 
 
-def create_validation_histograms(path, rootfile, particlelist, variables_1d=None, variables_2d=None):
+def create_validation_histograms(
+    path: basf2.Path, rootfile: str,
+    particlelist: str,
+    variables_1d: Optional[List[Tuple]] = None,
+    variables_2d: Optional[List[Tuple]] = None
+) -> None:
     """
     Create histograms for all the variables and also label them to be useful in validation plots in one go.
     This is similar to the `modularAnalysis.variablesToHistogram` function but also sets the metadata correctly to be

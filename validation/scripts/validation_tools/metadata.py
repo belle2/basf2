@@ -154,8 +154,10 @@ class ValidationMetadataSetter(basf2.Module):
         super().__init__()
         #: Remember the metadata
         self._variables = variables
+        if isinstance(rootfile, pathlib.PurePath):
+            rootfile = str(rootfile)
         #: And the name of the root file
-        self._rootfile = rootfile
+        self._rootfile = rootfile  # type: str
         #: Shared pointer to the root file that will be closed when the last
         #: user disconnects
         self._tfile = None  # type: ROOT.TFile
@@ -174,7 +176,7 @@ class ValidationMetadataSetter(basf2.Module):
 
 
 def create_validation_histograms(
-    path: basf2.Path, rootfile: str,
+    path: basf2.Path, rootfile: Union[str, pathlib.PurePath],
     particlelist: str,
     variables_1d: Optional[List[Tuple]] = None,
     variables_2d: Optional[List[Tuple]] = None
@@ -187,7 +189,7 @@ def create_validation_histograms(
 
     Arguments:
         path (basf2.Path): Path where to put the modules
-        rootfile (str): Name of the output root file
+        rootfile (str or pathlib.PurePath): Name of the output root file
         particlelist (str): Name of the particle list, can be empty for event
             dependent variables
         variables_1d: List of 1D histogram definitions of the form
@@ -197,7 +199,8 @@ def create_validation_histograms(
             ``var1, bins1, min1, max1, var2, bins2, min2, max2, title, contact,
             description, check_for [, xlabel [, ylabel [, metaoptions]]]``
     """
-
+    if isinstance(rootfile, pathlib.PurePath):
+        rootfile = str(rootfile)
     histograms_1d = []
     histograms_2d = []
     metadata = []

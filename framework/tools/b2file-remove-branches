@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#coding: utf8
 
 """\
 This program can be used to create a copy of a basf2 root file with a list of
@@ -19,13 +20,17 @@ PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
 import ROOT
 
+
 def create_argumentparser():
-    "Return a fully configured argument parser"
+    """Return a fully configured argument parser"""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("-o", "--output", type=str, required=True, help="Name of the output file. If the file already exists it will be overwritten")
+    parser.add_argument("-o", "--output", type=str, required=True, help="Name of the output file. "
+                        "If the file already exists it will be overwritten")
     parser.add_argument("-i", "--input", type=str, required=True, help="Name of the input file.")
-    parser.add_argument("branch", nargs='+', help="Branch name to omit from the output file if present in the input file")
+    parser.add_argument("branch", nargs='+', help="Branch name to omit from the output file"
+                        "if present in the input file")
     return parser
+
 
 if __name__ == "__main__":
     parser = create_argumentparser()

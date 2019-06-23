@@ -674,14 +674,10 @@ void MillepedeCollectorModule::collect()
       dBoost_dVect(1, 0) = 0.;     dBoost_dVect(1, 1) = 0.;      dBoost_dVect(1, 2) = 1. / pz;
       dBoost_dVect(2, 0) = pz / E; dBoost_dVect(2, 1) = 0.;      dBoost_dVect(2, 2) = 0.;
 
-      dBoost_dVect.Print();
-
       TMatrixD dVect_dBoost(3, 3);
       dVect_dBoost(0, 0) = 0.;     dVect_dBoost(0, 1) = 0.;      dVect_dBoost(0, 2) = E / pz;
       dVect_dBoost(1, 0) = pz;     dVect_dBoost(1, 1) = 0.;      dVect_dBoost(1, 2) = 0.;
       dVect_dBoost(2, 0) = 0.;     dVect_dBoost(2, 1) = pz;      dVect_dBoost(2, 2) = 0.;
-
-      dVect_dBoost.Print();
 
       TMatrixD covBoost(3, 3);
       for (int i = 0; i < 3; ++i) {
@@ -694,15 +690,8 @@ void MillepedeCollectorModule::collect()
 //       if (covBoost(2, 2) == 0.) covBoost(2, 2) = 1.;
       if (covBoost(1, 1) == 0.) covBoost(1, 1) = 1.e-4;
       if (covBoost(2, 2) == 0.) covBoost(2, 2) = 1.e-4;
-      (beam->getCovHER() + beam->getCovLER()).Print();
-
-      covBoost.Print();
 
       TMatrixD covVect =  dBoost_dVect * covBoost * dVect_dBoost;
-
-      covVect.Print();
-
-
 
       extCov.SetSub(3, 3, covVect);
 
@@ -713,14 +702,7 @@ void MillepedeCollectorModule::collect()
 
       extCov(6, 6) = (E_HER / M) * (E_HER / M) * beam->getCovLER()(0, 0) + (E_LER / M) * (E_LER / M) * beam->getCovHER()(0, 0);
 
-      extCov.Print();
-
       auto extPrec = extCov; extPrec.Invert();
-
-//       if (covVect(0, 0) == 0.) extPrec(3, 3) = 0.;
-//       if (covVect(1, 1) == 0.) extPrec(4, 4) = 0.;
-
-      extPrec.Print();
 
       TVectorD extMeasurements(7);
       extMeasurements[0] = - (mother->getVertex() - beam->getVertex())[0];

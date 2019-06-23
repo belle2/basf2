@@ -266,9 +266,27 @@ namespace Belle2 {
       B2DEBUG(10, "Created top volume with x= +-" << config.getGlobalWidth() << " cm, y= +-"
               << config.getGlobalHeight() << " cm, z= +-" << config.getGlobalLength() << " cm");
 
+
+      auto getDensityScale = [this](const std::string & name) {
+        std::optional<double> scale;
+        if (auto it = m_densityScaling.find(name); it != m_densityScaling.end()) {
+          scale = it->second;
+        }
+        return scale;
+      };
+      auto globalScale = getDensityScale("*");
+
       for (const GeoComponent& component : config.getComponents()) {
         CreatorBase* creator = CreatorManager::getCreator(component.getCreator(), component.getLibrary());
         if (creator) {
+          // Do we want to scale the density for this or all components?
+          auto componentScale = getDensityScale(component.getName());
+          if (componentScale or globalScale) {
+            double scale = globalScale ? *globalScale : 1.0;
+            if (componentScale) scale *= *componentScale;
+            Materials::getInstance().setDensityScale(scale);
+          }
+          // remember how many we had to print the difference
           int oldSolids = G4SolidStore::GetInstance()->size();
           int oldLogical = G4LogicalVolumeStore::GetInstance()->size();
           int oldPhysical = G4PhysicalVolumeStore::GetInstance()->size();
@@ -289,6 +307,8 @@ namespace Belle2 {
                   << " solids, " << newLogical << " logical volumes and "
                   << newPhysical << " physical volumes");
           m_creators.push_back(creator);
+          //Done creating things, please reset density scaling
+          Materials::getInstance().resetDensityScale();
           if (m_assignRegions) {
             //Automatically assign a region with the creator name to all volumes
             G4Region* region {nullptr};

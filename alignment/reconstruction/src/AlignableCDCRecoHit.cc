@@ -26,7 +26,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace alignment;
 
-bool AlignableCDCRecoHit::s_enableEventT0LocalDerivative = true;
+bool AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = true;
 bool AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = false;
 bool AlignableCDCRecoHit::s_enableWireByWireAlignmentGlobalDerivatives = false;
 

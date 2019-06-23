@@ -185,7 +185,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
 
 TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane* sop)
 {
-  if (!s_enableEventT0LocalDerivative)
+  if (!s_enableTrackT0LocalDerivative)
     return TMatrixD();
 
   unsigned short LR = (int(m_leftRight) > 0.) ? 1 : 0;

@@ -511,6 +511,7 @@ class Plotuple:
             self.height = 525
         canvas = ROOT.TCanvas('', '', self.width, self.height)
 
+        # todo [ref, trivial, low] Use MetaOptionParser instead for consistency
         # Allow possibility to turn off the stats box
         if 'nostats' in self.metaoptions:
             ROOT.gStyle.SetOptStat("")
@@ -673,6 +674,7 @@ class Plotuple:
         canvas = ROOT.TCanvas('', '', self.width, self.height)
 
         # Allow possibility to turn off the stats box
+        # todo [ref, trivial, low] Use MetaOptionParser instead for consistency
         if 'nostats' in self.metaoptions:
             ROOT.gStyle.SetOptStat("")
         else:

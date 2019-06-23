@@ -12,7 +12,7 @@ from ROOT import Belle2
 ROOT.gInterpreter.Declare("#include <framework/utilities/MakeROOTCompatible.h>")
 
 
-def validation_metadata_set(obj, title, contact, description, check, xlabel=None, ylabel=None):
+def validation_metadata_set(obj, title, contact, description, check, xlabel=None, ylabel=None, metaoptions=""):
     """
     Set the validation metadata for a given object by setting the necessary values.
     This function can be used on any object supported by the Validation (histograms, profiles, ntuples)
@@ -26,6 +26,8 @@ def validation_metadata_set(obj, title, contact, description, check, xlabel=None
             shifters to easily see if the distribution looks ok
         xlabel (str): If given try to set this as the label for the x axis
         ylabel (str): If given try to set this as the label for the y axis
+        metaoptions (str): Metaoptions (additional options to influence the
+            comparison between revisions, styling of the plot, etc.)
     """
     obj.SetTitle(title)
     # For ntuples we add the metadata as aliases ...
@@ -33,6 +35,7 @@ def validation_metadata_set(obj, title, contact, description, check, xlabel=None
         obj.SetAlias("Contact", contact)
         obj.SetAlias("Description", description)
         obj.SetAlias("Check", check)
+        obj.SetAlias("MetaOptions", metaoptions)
     except AttributeError:
         pass
     # for TH*, TProfile we add it to the list of functions
@@ -41,6 +44,7 @@ def validation_metadata_set(obj, title, contact, description, check, xlabel=None
         function_list.Add(ROOT.TNamed("Contact", contact))
         function_list.Add(ROOT.TNamed("Description", description))
         function_list.Add(ROOT.TNamed("Check", check))
+        function_list.Add(ROOT.TNamed("MetaOptions", metaoptions))
     except AttributeError:
         pass
 
@@ -76,6 +80,8 @@ def validation_metadata_update(rootfile, name, *args, **argk):
             shifters to easily see if the distribution looks ok
         xlabel (str): If given try to set this as the label for the x axis
         ylabel (str): If given try to set this as the label for the y axis
+        metaoptions (str): Metaoptions (additional options to influence the
+            comparison between revisions, styling of the plot, etc.)
     """
 
     opened = False
@@ -149,9 +155,10 @@ def create_validation_histograms(path, rootfile, particlelist, variables_1d=None
         rootfile (str): Name of the output root file
         particlelist (str): Name of the particle list, can be empty for event dependent variables
         variables_1d: List of 1D histogram definitions of the form
-            ``var, bins, min, max, title, contact, description, check_for [, xlabel [,ylabel]]``
+            ``var, bins, min, max, title, contact, description, check_for [, xlabel [, ylabel [, metaoptions]]]``
         variables_2d: List of 2D histogram definitions of the form
-            ``var1, bins1, min1, max1, var2, bins2, min2, max2, title, contact, description, check_for [, xlabel [,ylabel]]``
+            ``var1, bins1, min1, max1, var2, bins2, min2, max2, title, contact, description,
+            check_for [, xlabel [, ylabel [, metaoptions]]]``
     """
 
     histograms_1d = []
@@ -160,7 +167,7 @@ def create_validation_histograms(path, rootfile, particlelist, variables_1d=None
     if variables_1d is not None:
         for var, nbins, vmin, vmax, *data in variables_1d:
             histograms_1d.append((var, nbins, vmin, vmax))
-            metadata.append([var]+data)
+            metadata.append([var] + data)
 
     if variables_2d is not None:
         for row in variables_2d:

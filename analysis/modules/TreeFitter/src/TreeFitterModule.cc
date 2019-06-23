@@ -138,12 +138,9 @@ void TreeFitterModule::event()
     bool ok = false;
     try {
       ok = fitTree(particle);
+      if (!ok) { particle->setPValue(-1); }
     } catch (TreeFitter::FitParameterDimensionException const& e) {
       B2ERROR(e.what());
-    }
-
-    if (!ok) {
-      particle->setPValue(-1);
     }
 
     if (particle->getPValue() < m_confidenceLevel) {

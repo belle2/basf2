@@ -7,8 +7,8 @@ import pathlib
 
 # 3rd
 import ROOT
-import basf2 as b2
-import modularAnalysis as ma
+import basf2
+import modularAnalysis
 import generators as ge
 
 # ours
@@ -47,17 +47,17 @@ class TestValidationMetadataSetter(unittest.TestCase):
         # Run basf2
         # ----------------------------------------------------------------------
 
-        path = b2.create_path()
-        ma.setupEventInfo(noEvents=10, path=path)
+        path = basf2.create_path()
+        modularAnalysis.setupEventInfo(noEvents=10, path=path)
         ge.add_evtgen_generator(
             path=path,
             finalstate='signal',
-            signaldecfile=b2.find_file(str(dec_path))
+            signaldecfile=basf2.find_file(str(dec_path))
         )
 
-        ma.loadGearbox(path=path)
+        modularAnalysis.loadGearbox(path=path)
 
-        ma.fillParticleListFromMC("Upsilon(4S)", "", path=path)
+        modularAnalysis.fillParticleListFromMC("Upsilon(4S)", "", path=path)
 
         out_file_path = tmp_dir_path / "out.root"
         create_validation_histograms(
@@ -79,7 +79,7 @@ class TestValidationMetadataSetter(unittest.TestCase):
             ]
         )
 
-        b2.process(path=path)
+        basf2.process(path=path)
 
         # Test outcome
         # ----------------------------------------------------------------------

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-"""
-Small module containing helper functions to set the metadata on objects created for the validation correctly
-"""
+"""Small module containing helper functions to set the metadata on objects
+created for the validation correctly """
 
 # std
 from typing import Optional, Union, List, Tuple
@@ -22,8 +21,9 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
                             ylabel: Optional[str] = None,
                             metaoptions="") -> None:
     """
-    Set the validation metadata for a given object by setting the necessary values.
-    This function can be used on any object supported by the Validation (histograms, profiles, ntuples)
+    Set the validation metadata for a given object by setting the necessary
+    values. This function can be used on any object supported by the
+    Validation (histograms, profiles, ntuples)
 
     Arguments:
         obj: Instance of the object which should get the metadata
@@ -70,14 +70,15 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
             pass
 
 
+# noinspection PyIncorrectDocstring
 def validation_metadata_update(
         rootfile: Union[str, ROOT.TFile, pathlib.PurePath],
         name: str, *args, **argk) -> None:
     """
-    This is a convenience helper for `validation_metadata_set` in case the objects
-    have already been saved in a ROOT file before: It will open the file (or use
-    an existing TFile), extract the object, add the metadata and save the new
-    version to the file
+    This is a convenience helper for `validation_metadata_set` in case the
+    objects have already been saved in a ROOT file before: It will open the
+    file (or use an existing TFile), extract the object, add the metadata and
+    save the new version to the file
 
     Arguments:
         rootfile (str, ROOT.TFile or pathlib.PurePath): Name of the root file
@@ -101,14 +102,19 @@ def validation_metadata_update(
         rootfile = ROOT.TFile(rootfile, "UPDATE")
         opened = True
     if not rootfile.IsOpen() or not rootfile.IsWritable():
-        raise RuntimeError(f"ROOT file {rootfile.GetName()} is not open for writing")
+        raise RuntimeError(
+            f"ROOT file {rootfile.GetName()} is not open for writing"
+        )
     obj = rootfile.Get(name)
     if not obj:
-        raise RuntimeError(f"Cannot find object named {name} in {rootfile.GetName()}")
+        raise RuntimeError(
+            f"Cannot find object named {name} in {rootfile.GetName()}"
+        )
     validation_metadata_set(obj, *args, **argk)
     # scope guard to avoid side effects by changing the global gDirectory
     # in modules ...
-    directoryGuard = ROOT.TDirectory.TContext(rootfile)
+    # noinspection PyUnusedLocal
+    directory_guard = ROOT.TDirectory.TContext(rootfile)
     obj.Write("", ROOT.TObject.kOverwrite)
     if opened:
         rootfile.Close()
@@ -119,13 +125,15 @@ class ValidationMetadataSetter(basf2.Module):
     Simple module to set the valdiation metadata for a given list of objects
     automatically at the end of event processing
 
-    Just add this module **before** any VariablesToNtuple/VariablesToHistogram
-    modules and it will set the correct validation metadata at the end of processing
+    Just add this module **before** any
+    VariablesToNtuple/VariablesToHistogram modules and it will set the
+    correct validation metadata at the end of processing
 
     Warning:
-        The module needs to be before the modules creating the objects as terminate()
-        functions are executed in reverse order from last to first module.  If this
-        module is after the creation modules the metadata might not be set correctly
+        The module needs to be before the modules creating the objects
+        as terminate() functions are executed in reverse order from last to
+        first module.  If this module is after the creation modules the metadata
+        might not be set correctly
     """
 
     def __init__(self, variables: List[Tuple[str]],
@@ -133,11 +141,13 @@ class ValidationMetadataSetter(basf2.Module):
         """
 
         Arguments:
-            variables (list(tuple(str))): List of objects to set the metadata for.
-                Each entry should be the name of an object followed by the metadata
-                values which will be forwarded to `validation_metadata_set`:
-                ``(name, title, contact, description, check, xlabel, ylabel)``
-                where ``xlabel`` and ``ylabel`` are optional
+            variables (list(tuple(str))): List of objects to set the metadata
+                for. Each entry should be the name of an object followed by the
+                metadata values which will be forwarded to
+                `validation_metadata_set`:
+                ``(name, title, contact, description, check, xlabel, ylabel,
+                metaoptions)``
+                where ``xlabel``, ``ylabel`` and ``metaoptions`` are optional
             rootfile (str or pathlib.PurePath): The name of the ROOT file where
                 the objects can be found
         """
@@ -146,11 +156,14 @@ class ValidationMetadataSetter(basf2.Module):
         self._variables = variables
         #: And the name of the root file
         self._rootfile = rootfile
+        #: Shared pointer to the root file that will be closed when the last
+        #: user disconnects
+        self._tfile = None  # type: ROOT.TFile
 
     def initialize(self):
         """Make sure we keep the file open"""
-        #: Shared pointer to the root file that will be closed when the last user disconnects
-        self._tfile = Belle2.RootFileCreationManager.getInstance().getFile(self._rootfile)
+        self._tfile = \
+            Belle2.RootFileCreationManager.getInstance().getFile(self._rootfile)
 
     def terminate(self):
         """And update the metadata at the end"""
@@ -167,19 +180,22 @@ def create_validation_histograms(
     variables_2d: Optional[List[Tuple]] = None
 ) -> None:
     """
-    Create histograms for all the variables and also label them to be useful in validation plots in one go.
-    This is similar to the `modularAnalysis.variablesToHistogram` function but also sets the metadata correctly to be
-    used by the validation
+    Create histograms for all the variables and also label them to be useful
+    in validation plots in one go. This is similar to the
+    `modularAnalysis.variablesToHistogram` function but also sets the
+    metadata correctly to be used by the validation
 
     Arguments:
         path (basf2.Path): Path where to put the modules
         rootfile (str): Name of the output root file
-        particlelist (str): Name of the particle list, can be empty for event dependent variables
+        particlelist (str): Name of the particle list, can be empty for event
+            dependent variables
         variables_1d: List of 1D histogram definitions of the form
-            ``var, bins, min, max, title, contact, description, check_for [, xlabel [, ylabel [, metaoptions]]]``
+            ``var, bins, min, max, title, contact, description, check_for
+            [, xlabel [, ylabel [, metaoptions]]]``
         variables_2d: List of 2D histogram definitions of the form
-            ``var1, bins1, min1, max1, var2, bins2, min2, max2, title, contact, description,
-            check_for [, xlabel [, ylabel [, metaoptions]]]``
+            ``var1, bins1, min1, max1, var2, bins2, min2, max2, title, contact,
+            description, check_for [, xlabel [, ylabel [, metaoptions]]]``
     """
 
     histograms_1d = []
@@ -198,5 +214,10 @@ def create_validation_histograms(
             metadata.append([var1 + var2] + list(row[8:]))
 
     path.add_module(ValidationMetadataSetter(metadata, rootfile))
-    path.add_module("VariablesToHistogram", particleList=particlelist, variables=histograms_1d,
-                    variables_2d=histograms_2d, fileName=rootfile)
+    path.add_module(
+        "VariablesToHistogram",
+        particleList=particlelist,
+        variables=histograms_1d,
+        variables_2d=histograms_2d,
+        fileName=rootfile
+    )

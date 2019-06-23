@@ -135,9 +135,8 @@ void TreeFitterModule::event()
       ParticleCopy::copyDaughters(particle);
     }
 
-    bool ok = false;
     try {
-      ok = fitTree(particle);
+      const bool ok = fitTree(particle);
       if (!ok) { particle->setPValue(-1); }
     } catch (TreeFitter::FitParameterDimensionException const& e) {
       B2ERROR(e.what());

@@ -10,9 +10,11 @@
 #include <stdexcept>
 #pragma once
 namespace TreeFitter {
+  /** exception template, runtime_error implements what() */
   class FitParameterDimensionException : public std::runtime_error {
   public:
-    FitParameterDimensionException(std::string const& msg):
+    /** throw a helpful message like this one. */
+    explicit FitParameterDimensionException(std::string const& msg):
       runtime_error(msg)
     {}
   };

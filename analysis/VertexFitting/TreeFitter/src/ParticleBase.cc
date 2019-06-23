@@ -67,6 +67,7 @@ namespace TreeFitter {
   ParticleBase::ParticleBase(const std::string& name) :
     m_particle(nullptr),
     m_mother(nullptr),
+    m_isStronglyDecayingResonance(false),
     m_index(0),
     m_pdgMass(0),
     m_pdgWidth(0),

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from basf2 import *
 from ROOT import Belle2
+
+import math
 
 wires_in_layer = [
     160, 160, 160, 160, 160, 160, 160, 160,
@@ -15,96 +16,66 @@ wires_in_layer = [
     352, 352, 352, 352, 352, 352,
     384, 384, 384, 384, 384, 384]
 
+layers = [l for l in range(0, 56)]
+
+
+def get_consts_line(layer, wire, parameter, coefficient):
+    wireid = Belle2.WireID(layer, wire).getEWire()
+    label = Belle2.GlobalLabel()
+    label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, parameter)
+    return '{} {}'.format(str(label.label()), coefficient)
+
 
 class WriteConstraints(Module):
-
     def __init__(self):
         """ init """
         super(WriteConstraints, self).__init__()
         self.consts = []
 
+    def add(self, text):
+        self.consts.append(text)
+
     def event(self):
-        """ Return True if event should be selected, False otherwise """
         if self.consts:
             return
 
-        for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire X (BWD) in layer {} = 0'.format(layer))
+        for layer in layers:
+            self.add('Constraint 0. ! sum of wire X (BWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
-                wireid = Belle2.WireID(layer, wire).getEWire()
+                self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireBwdX, 1.))
 
-                label = Belle2.GlobalLabel()
-
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireBwdX)
-                self.consts.append('{} 1.'.format(str(label.label())))
-
-        for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire Y (BWD) in layer {} = 0'.format(layer))
+        for layer in layers:
+            self.add('Constraint 0. ! sum of wire Y (BWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
-                wireid = Belle2.WireID(layer, wire).getEWire()
+                self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireBwdY, 1.))
 
-                label = Belle2.GlobalLabel()
-
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireBwdY)
-                self.consts.append('{} 1.'.format(str(label.label())))
-
-        for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire rotations (BWD) in layer {} = 0'.format(layer))
+        for layer in layers:
+            self.add('Constraint 0. ! sum of wire rotations (BWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
-                wireid = Belle2.WireID(layer, wire).getEWire()
-                wid = Belle2.WireID(layer, wire)
-                wh = Belle2.TrackFindingCDC.CDCWire.getInstance(wid)
 
-                wirePhi = wh.getBackwardPos3D().phi()
+                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
 
-                label = Belle2.GlobalLabel()
-                import math
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireBwdX)
-                self.consts.append('{} {}.'.format(str(label.label()), -math.sin(wirePhi)))
+                self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireBwdX, -math.sin(wirePhi)))
+                self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireBwdY, +math.cos(wirePhi)))
 
-                label = Belle2.GlobalLabel()
-
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireBwdY)
-                self.consts.append('{} {}.'.format(str(label.label()), math.cos(wirePhi)))
-
-        for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire X (FWD) in layer {} = 0'.format(layer))
+        for layer in layers:
+            self.add('Constraint 0. ! sum of wire X (FWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
-                wireid = Belle2.WireID(layer, wire).getEWire()
+                self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireFwdX, 1.))
 
-                label = Belle2.GlobalLabel()
-
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireFwdX)
-                self.consts.append('{} 1.'.format(str(label.label())))
-
-        for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire Y (FWD) in layer {} = 0'.format(layer))
+        for layer in layers:
+            self.add('Constraint 0. ! sum of wire Y (FWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
-                wireid = Belle2.WireID(layer, wire).getEWire()
+                self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireFwdY, 1.))
 
-                label = Belle2.GlobalLabel()
-
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireFwdY)
-                self.consts.append('{} 1.'.format(str(label.label())))
-
-        for layer in range(0, 56):
-            self.consts.append('Constraint 0. ! sum of wire rotations (FWD) in layer {} = 0'.format(layer))
+        for layer in layers:
+            self.add('Constraint 0. ! sum of wire rotations (FWD) in layer {} = 0'.format(layer))
             for wire in range(0, wires_in_layer[layer]):
-                wireid = Belle2.WireID(layer, wire).getEWire()
-                wid = Belle2.WireID(layer, wire)
-                wh = Belle2.TrackFindingCDC.CDCWire.getInstance(wid)
 
-                wirePhi = wh.getBackwardPos3D().phi()
+                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
 
-                label = Belle2.GlobalLabel()
-                import math
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireFwdX)
-                self.consts.append('{} {}.'.format(str(label.label()), -math.sin(wirePhi)))
-
-                label = Belle2.GlobalLabel()
-
-                label.construct(Belle2.CDCAlignment.getGlobalUniqueID(), wireid, Belle2.CDCAlignment.wireFwdY)
-                self.consts.append('{} {}.'.format(str(label.label()), math.cos(wirePhi)))
+                self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireFwdX, -math.sin(wirePhi)))
+                self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireFwdY, +math.cos(wirePhi)))
 
     def terminate(self):
         with open('cdc-wire-constraints.txt', 'w') as txt:

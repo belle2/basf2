@@ -176,7 +176,9 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   }
 
   //WARNING: experimental (disabled by default)
-  // Gravitational sagging per wire
+  //TODO: missing some factors (we do not align directly the wire-sag coefficient, but
+  // wire tension ... coef = pi * ro * r * r / 8 / tension
+  //TODO: need to get these numbers from CDCGeometryPar!
   if (s_enableWireSaggingGlobalDerivative) {
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireTension),

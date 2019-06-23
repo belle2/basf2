@@ -139,6 +139,7 @@ namespace Belle2 {
                                      mat->GetState(), mat->GetTemperature(), mat->GetPressure());
           m_materialCache.insert(scaled, scaledMat);
         }
+        return scaledMat;
       }
       return mat;
     }

@@ -135,6 +135,7 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
   fitTree->Branch<float>("secondPulserSigma", &secondPulserSigma);
   fitTree->Branch<float>("channelT0", &channelT0);
   fitTree->Branch<float>("channelT0Err", &channelT0Err);
+  fitTree->Branch<short>("fitStatus", &fitStatus);
 
   fitTree->Branch<float>("chi2", &chi2);
   fitTree->Branch<float>("rms", &rms);
@@ -319,13 +320,15 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
       channelT0 = peakTime - peakTimeMC;
       channelT0Err = peakTimeErr;
 
+
+      if (chi2 < 4 && sigma < 0.2 & yieldLaser > 1000) {
+        fitStatus = 0;
+      } else {
+        fitStatus = 1;
+      }
+
       h_profile->Write();
 
-      // normalization of rthe channelT0
-      if (sigma < 0.2 && yieldLaser > 100) {
-        averages[iSlot] += peakTime - peakTimeMC;
-        goodChannels[iSlot]++;
-      }
 
 
       // Now let's fit the pulser

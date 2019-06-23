@@ -83,6 +83,7 @@ namespace Belle2 {
       float secondPulserTime = 0.;
       float secondPulserSigma = 0.;
 
+      short fitStatus = 1;
     };
   }
 } // namespace Belle2

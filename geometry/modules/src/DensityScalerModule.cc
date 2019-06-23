@@ -24,7 +24,7 @@ DensityScalerModule::DensityScalerModule() : Module()
   setDescription(R"DOC("Scale density of simulation/reconstruction geometry
 
 This is obviously only meant for systematic studies to scale the density in different
-parts of the detector to estimate the effect on for example trackinrmance.
+parts of the detector to estimate the effect on for example tracking performance.
 
 This module is to be placed **before** the Geometry module itself and will then
 change the density of all materials which are created using the Materials service
@@ -42,7 +42,8 @@ Warning:
            "can be used to scale all components by the same factor. If a component is "
            "specified manually and '*' is present the result will be the product of both)");
   addParam("ignoredMaterials", m_ignoredMaterials, "A set of material names which should "
-           "**not** be scaled, usually things like vaccum or air. Set to empty set to scale everything",
+           "**not** be scaled, usually things like vaccum or air. To scale everything this "
+           "parameter should be set to an empty set (``{}`` or ``set()``)",
            geometry::Materials::getInstance().getDensityScaleIgnoredMaterials());
 }
 

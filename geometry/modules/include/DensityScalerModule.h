@@ -18,7 +18,7 @@ namespace Belle2 {
   *
   * This is obviously only meant for systematic studies to scale the density in
   * different parts of the detector to estimate the effect on for example
-  * trackinrmance.
+  * tracking performance.
   */
   class DensityScalerModule : public Module {
   public:

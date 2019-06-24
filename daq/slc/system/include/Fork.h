@@ -1,5 +1,5 @@
-#ifndef _Belle2_Process_h
-#define _Belle2_Process_h
+#ifndef _Belle2_Fork_hh
+#define _Belle2_Fork_hh
 
 #include <unistd.h>
 #include <signal.h>
@@ -9,7 +9,7 @@
 
 namespace Belle2 {
 
-  class Process {
+  class Fork {
 
   public:
     template <class WORKER>
@@ -21,10 +21,10 @@ namespace Belle2 {
     static void g_handler_int(int) { exit(0); }
 
   public:
-    Process() : m_pid(-1) {}
+    Fork() : m_pid(-1) {}
 
     template<class WORKER>
-    Process(WORKER* worker, bool detached = true)
+    Fork(WORKER* worker, bool detached = true)
     {
       m_pid = fork();
       if (m_pid == 0) {
@@ -38,40 +38,29 @@ namespace Belle2 {
         delete worker;
       }
     }
-    ~Process() {}
+    ~Fork() {}
 
   public:
     pid_t get_id() const { return m_pid; }
-    pid_t id() const { return m_pid; }
     void set_id(pid_t id) { m_pid = id; }
     bool isAlive() const { return kill(0); }
     bool kill(int signo) const
     {
-      if (m_pid <= 0) return false;
+      if (m_pid < 0) return false;
       return ::kill(m_pid, signo) == 0;
     }
     bool wait(int opt = 0)
     {
       if (m_pid < 0) return false;
-      if (m_waitpid_result = ::waitpid(m_pid, &m_waitpid_status, opt)) {
+      if (::waitpid(m_pid, NULL, opt)) {
         m_pid = -1;
       }
       return true;
     }
     bool cancel() { return kill(SIGINT); }
-    int waitpid_result() const
-    {
-      return m_waitpid_result;
-    };
-    int waitpid_status() const
-    {
-      return m_waitpid_status;
-    };
 
   private:
     pid_t m_pid;
-    int m_waitpid_result;
-    int m_waitpid_status;
 
   };
 

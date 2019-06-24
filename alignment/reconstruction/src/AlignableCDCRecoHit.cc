@@ -143,41 +143,48 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     drldg(0, 5) * zRel
   );
 
-  // Wire-by-wire alignment (experimental, both wire-ends same derivative - DoF to be
-  // removed by constraints.
-  //WARNING: super-experimental, maybe wrong... disabled by default !!!
+  //WARNING: experimental (disabled by default)
+  // Wire-by-wire alignment
   if (s_enableWireByWireAlignmentGlobalDerivatives) {
-    // Alignment of wires X in global coords
+    // How much shift (in X or Y) on BWD wire-end will change the residual at estimated track crossing
+    // with the wire (at relative z-position on wire = zRel)
+    double zRelM = fabs(1. - zRel);
+    // Same as above but for FWD wire-end (residual at zRel = zRel * delta(X or Y at FWD wire-end)
+    double zRelP = fabs(zRel - 0.);
+
+    // Alignment of wires X in global coords at BWD wire-end
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireBwdX),
-      drldg(0, 0)
+      drldg(0, 0) * zRelM
     );
-
+    // Alignment of wires X in global coords at FWD wire-end
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireFwdX),
-      drldg(0, 0)
+      drldg(0, 0) * zRelP
     );
 
-    // Alignment of wires Y in global coords
+    // Alignment of wires Y in global coords at BWD wire-end
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireBwdY),
-      drldg(0, 1)
+      drldg(0, 1) * zRelM
     );
-
+    // Alignment of wires Y in global coords at FWD wire-end
     globals.add(
       GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireFwdY),
-      drldg(0, 1)
+      drldg(0, 1) * zRelP
     );
   }
 
-
+  //WARNING: experimental (disabled by default)
+  //TODO: missing some factors (we do not align directly the wire-sag coefficient, but
+  // wire tension ... coef = pi * ro * r * r / 8 / tension
+  //TODO: need to get these numbers from CDCGeometryPar!
   if (s_enableWireSaggingGlobalDerivative) {
     globals.add(
-      GlobalLabel::construct<CDCAlignment>(getWireID(), CDCAlignment::wireTension),
+      GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), CDCAlignment::wireTension),
       drldg(0, 1) * 4.0 * zRel * (1.0 - zRel)
     );
   }
-
 
   return globals;
 }

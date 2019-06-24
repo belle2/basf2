@@ -20,7 +20,7 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
                             xlabel: Optional[str] = None,
                             ylabel: Optional[str] = None,
                             metaoptions="") -> None:
-    """
+    """!
     Set the validation metadata for a given object by setting the necessary
     values. This function can be used on any object supported by the
     Validation (histograms, profiles, ntuples)
@@ -74,7 +74,7 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
 def validation_metadata_update(
         rootfile: Union[str, ROOT.TFile, pathlib.PurePath],
         name: str, *args, **argk) -> None:
-    """
+    """!
     This is a convenience helper for `validation_metadata_set` in case the
     objects have already been saved in a ROOT file before: It will open the
     file (or use an existing TFile), extract the object, add the metadata and
@@ -121,7 +121,7 @@ def validation_metadata_update(
 
 
 class ValidationMetadataSetter(basf2.Module):
-    """
+    """!
     Simple module to set the valdiation metadata for a given list of objects
     automatically at the end of event processing
 
@@ -138,7 +138,7 @@ class ValidationMetadataSetter(basf2.Module):
 
     def __init__(self, variables: List[Tuple[str]],
                  rootfile: Union[str, pathlib.PurePath]):
-        """
+        """!
 
         Arguments:
             variables (list(tuple(str))): List of objects to set the metadata
@@ -181,7 +181,7 @@ def create_validation_histograms(
     variables_1d: Optional[List[Tuple]] = None,
     variables_2d: Optional[List[Tuple]] = None
 ) -> None:
-    """
+    """!
     Create histograms for all the variables and also label them to be useful
     in validation plots in one go. This is similar to the
     `modularAnalysis.variablesToHistogram` function but also sets the

@@ -29,11 +29,7 @@ namespace TreeFitter {
   FitManager::FitManager(Belle2::Particle* particle,
                          const TreeFitter::ConstraintConfiguration& config,
                          double prec,
-                         bool ipConstraint,
-                         bool customOrigin,
                          bool updateDaughters,
-                         const std::vector<double>& customOriginVertex,
-                         const std::vector<double>& customOriginCovariance,
                          const bool useReferencing
                         ) :
     m_particle(particle),
@@ -50,11 +46,7 @@ namespace TreeFitter {
   {
     m_decaychain =  new DecayChain(particle,
                                    config,
-                                   false,
-                                   ipConstraint,
-                                   customOrigin,
-                                   customOriginVertex,
-                                   customOriginCovariance
+                                   false
                                   );
     m_fitparams  = new FitParams(m_decaychain->dim());
   }

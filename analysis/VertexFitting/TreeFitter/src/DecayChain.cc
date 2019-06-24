@@ -21,11 +21,7 @@ namespace TreeFitter {
 
   DecayChain::DecayChain(Belle2::Particle* particle,
                          const ConstraintConfiguration& config,
-                         bool forceFitAll,
-                         const bool ipConstraint,
-                         const bool customOrigin,
-                         const std::vector<double>& customOriginVertex,
-                         const std::vector<double>& customOriginCovariance
+                         bool forceFitAll
                         ) :
     m_dim(0),
     m_headOfChain(nullptr),
@@ -33,19 +29,16 @@ namespace TreeFitter {
     m_config(config)
   {
 
-    if (ipConstraint && customOrigin) {
+    if (config.m_ipConstraint && config.m_customOrigin) {
       B2FATAL("Setup error. Cant have both custom origin and ip constraint.");
     }
 
-    if (ipConstraint || customOrigin) {
+    if (config.m_ipConstraint || config.m_customOrigin) {
       m_headOfChain = ParticleBase::createOrigin(particle,
                                                  config,
-                                                 forceFitAll,
-                                                 customOriginVertex,
-                                                 customOriginCovariance,
-                                                 ipConstraint // is beamspot
+                                                 forceFitAll
                                                 );
-    } else if ((!customOrigin) && (!ipConstraint)) {
+    } else if ((!config.m_customOrigin) && (!config.m_ipConstraint)) {
 
       m_headOfChain = ParticleBase::createParticle(particle, nullptr, config, forceFitAll);
     }

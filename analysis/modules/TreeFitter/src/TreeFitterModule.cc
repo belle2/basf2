@@ -156,25 +156,25 @@ void TreeFitterModule::terminate()
 
 bool TreeFitterModule::fitTree(Belle2::Particle* head)
 {
-  const TreeFitter::ConstraintConfiguration config(
+  const TreeFitter::ConstraintConfiguration constrConfig(
     m_massConstraintType,
     m_massConstraintList,
     m_fixedToMotherVertexListPDG,
     m_geoConstraintListPDG,
     m_removeConstraintList,
-    m_automatic_vertex_constraining
+    m_automatic_vertex_constraining,
+    m_ipConstraint,
+    m_customOrigin,
+    m_customOriginVertex,
+    m_customOriginCovariance
   );
 
   std::unique_ptr<TreeFitter::FitManager> TreeFitter(
     new TreeFitter::FitManager(
       head,
-      config,
+      constrConfig,
       m_precision,
-      m_ipConstraint,
-      m_customOrigin,
       m_updateDaughters,
-      m_customOriginVertex,
-      m_customOriginCovariance,
       m_useReferencing
     )
   );

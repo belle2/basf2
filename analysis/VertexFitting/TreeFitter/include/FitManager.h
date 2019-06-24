@@ -39,11 +39,7 @@ namespace TreeFitter {
     FitManager(Belle2::Particle* particle,
                const ConstraintConfiguration& config,
                double prec = 0.01,
-               bool ipConstraint = false,
-               bool customOrigin = false,
                bool updateDaughters = false,
-               const std::vector<double>& customOriginVertex = {0, 0, 0},
-               const std::vector<double>& customOriginCovariance = {0, 0, 0},
                const bool useReferencing = false
               );
 

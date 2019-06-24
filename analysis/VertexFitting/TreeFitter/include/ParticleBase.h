@@ -66,10 +66,7 @@ namespace TreeFitter {
     /** create a custom origin particle or a beamspot*/
     static ParticleBase* createOrigin(Belle2::Particle* daughter,
                                       const ConstraintConfiguration& config,
-                                      bool forceFitAll,
-                                      const std::vector<double>& customOriginVertex,
-                                      const std::vector<double>& customOriginCovariance,
-                                      const bool isBeamSpot
+                                      bool forceFitAll
                                      );
 
     /** init particle that does not need a mother vertex  */

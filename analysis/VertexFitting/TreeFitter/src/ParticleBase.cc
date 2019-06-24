@@ -106,13 +106,10 @@ namespace TreeFitter {
   ParticleBase* ParticleBase::createOrigin(
     Belle2::Particle* daughter,
     const ConstraintConfiguration& config,
-    bool forceFitAll,
-    const std::vector<double>& customOriginVertex,
-    const std::vector<double>& customOriginCovariance,
-    const bool isBeamSpot
+    bool forceFitAll
   )
   {
-    return new Origin(daughter, config, forceFitAll, customOriginVertex, customOriginCovariance, isBeamSpot);
+    return new Origin(daughter, config, forceFitAll);
   }
 
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother,

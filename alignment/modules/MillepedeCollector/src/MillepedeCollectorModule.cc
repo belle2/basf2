@@ -130,7 +130,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            double(-1.));
 
   // Configure CDC specific options
-  addParam("fitTrackT0", m_fitTrackT0, "Add local parameter for event T0 fit in GBL",
+  addParam("fitTrackT0", m_fitTrackT0, "Add local parameter for track T0 fit in GBL",
            bool(true));
   addParam("updateCDCWeights", m_updateCDCWeights, "Update L/R weights from previous DAF fit result",
            bool(true));

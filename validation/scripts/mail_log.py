@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
+import copy
 import re
 import os
 import json
 import sys
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Optional
 
+# ours
 import validationpath
 from validationfunctions import available_revisions
 # martin's mail utils
@@ -27,29 +30,6 @@ def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
         ]
     else:
         raise TypeError("must be string or list of strings")
-
-
-def check_if_same(new: Dict[str, Dict[str, str]],
-                  old: Dict[str, Dict[str, str]]) -> bool:
-    """!
-    Checks if the failed plots in new are the same as in old. new and old are
-    only considered to be different if the comparison_result of a same plot
-    changed or if new contains _more_ failed plots than old.
-
-    See :meth:`Mails._create_mail_log` for a description of the dictionary
-    format.
-
-    @return: True if something has changed.
-    """
-
-    for plot in new:
-        # new plot failed
-        if plot not in old:
-            return False
-        # comparison_result changed
-        if new[plot]["comparison_result"] != old[plot]["comparison_result"]:
-            return False
-    return True
 
 
 class Mails:
@@ -232,7 +212,45 @@ class Mails:
                 for script in failed_scripts[contact]:
                     mail_log[contact][script] = failed_scripts[contact][script]
 
-        return mail_log
+        return self._flag_new_failures(mail_log, self.mail_data_old)
+
+    @staticmethod
+    def _flag_new_failures(
+        mail_log: Dict[str, Dict[str, Dict[str, str]]],
+        old_mail_log: Optional[Dict[str, Dict[str, Dict[str, str]]]]) \
+            -> Dict[str, Dict[str, Dict[str, str]]]:
+        """ Add a new field 'compared_to_yesterday' which takes one of the
+        values 'unchanged' (same revision comparison result as in yesterday's
+        mail log, 'new' (new warning/failure), 'changed' (comparison result
+        changed). """
+        mail_log_flagged = copy.deepcopy(mail_log)
+        for contact in mail_log:
+            for plot in mail_log[contact]:
+                if old_mail_log is None:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "n/a"
+                if plot not in old_mail_log[contact]:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "new"
+                elif mail_log[contact][plot]["comparison_result"] != \
+                        old_mail_log[contact][plot]["comparison_result"]:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "changed"
+                else:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "unchanged"
+        return mail_log_flagged
+
+    @staticmethod
+    def _check_if_same(plot_errors: Dict[str, Dict[str, str]]) -> bool:
+        """
+        @param plot_errors: ``_create_mail_log[contact]``.
+        @return True, if there is at least one new/changed plot status
+        """
+        for plot in plot_errors:
+            if plot_errors[plot]["compared_to_yesterday"] != "unchanged":
+                return False
+        return True
 
     @staticmethod
     def _compose_message(plots):
@@ -256,6 +274,11 @@ class Mails:
                 errormsg = plots[plot]["comparison_result"]
 
             body_plot = ""
+            if plots[plot]["compared_to_yesterday"] == "new":
+                body_plot += '<b style="color: red;">[NEW]</b><br>'
+            elif plots[plot]["compared_to_yesterday"] == "changed":
+                body_plot += '<b style="color: red;">' \
+                             '[COMPARISON RESULT CHANGED]</b><br>'
             body_plot += "<b>{plot}</b><br>"
             body_plot += "<b>Package:</b> {package}<br>"
             body_plot += "<b>Rootfile:</b> {rootfile}.root<br>"
@@ -294,11 +317,9 @@ class Mails:
 
         for contact in self.mail_data_new:
             # if the errors are the same as yesterday, don't send a new mail
-            if self.mail_data_old and contact in self.mail_data_old:
-                if check_if_same(self.mail_data_new[contact],
-                                 self.mail_data_old[contact]):
-                    # don't send mail
-                    continue
+            if self._check_if_same(self.mail_data_new[contact]):
+                # don't send mail
+                continue
 
             # set the mood of the b2bot
             if len(self.mail_data_new[contact]) < 4:

@@ -42,7 +42,11 @@ namespace TreeFitter {
                         };
 
     /** default constructor  */
+    ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) ;
+
+    /** constructor used for final states */
     ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) ;
+
 
     /** constructor only used by inter action point (ip constraint)  */
     ParticleBase(const std::string& name);
@@ -219,6 +223,10 @@ namespace TreeFitter {
 
     /** decay length less than 1 micron  */
     bool m_isStronglyDecayingResonance;
+
+    /** has all the constraint config */
+    const ConstraintConfiguration* m_config;
+
   private:
     /** index */
     int m_index;
@@ -237,10 +245,6 @@ namespace TreeFitter {
 
     /** name  */
     std::string m_name;
-
-    /** config container */
-    const ConstraintConfiguration m_config;
-
 
   }; // end class ParticleBase
 } // end namespace TreeFitter

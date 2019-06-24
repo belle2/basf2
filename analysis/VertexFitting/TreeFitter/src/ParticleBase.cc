@@ -26,10 +26,11 @@
 
 namespace TreeFitter {
 
-  ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
+  ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) :
     m_particle(particle),
     m_mother(mother),
     m_isStronglyDecayingResonance(false),
+    m_config(config),
     m_index(0),
     m_pdgMass(particle->getPDGMass()),
     m_pdgWidth(0),
@@ -53,11 +54,39 @@ namespace TreeFitter {
     }
   }
 
+  ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
+    m_particle(particle),
+    m_mother(mother),
+    m_isStronglyDecayingResonance(false),
+    m_config(nullptr),
+    m_index(0),
+    m_pdgMass(particle->getPDGMass()),
+    m_pdgWidth(0),
+    m_pdgLifeTime(TDatabasePDG::Instance()->GetParticle(particle->getPDGCode())->Lifetime() * 1e9),
+    m_charge(0),
+    m_name("Unknown")
+  {
+    if (particle) {
+      m_isStronglyDecayingResonance = isAResonance(particle);
+      const int pdgcode = particle->getPDGCode();
+      if (pdgcode) { // PDG code != 0
+
+        double fltcharge = particle->getCharge();
+
+        //  round to nearest integer
+        m_charge = fltcharge < 0 ? int(fltcharge - 0.5) : int(fltcharge + 0.5);
+        m_name = particle->getName();
+      } else {// PDG code = 0
+        m_charge = particle->getCharge() > 0 ? 1 : (particle->getCharge() < 0 ? -1 : 0);
+      }
+    }
+  }
 
   ParticleBase::ParticleBase(const std::string& name) :
     m_particle(nullptr),
     m_mother(nullptr),
     m_isStronglyDecayingResonance(false),
+    m_config(nullptr),
     m_index(0),
     m_pdgMass(0),
     m_pdgWidth(0),
@@ -453,7 +482,8 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectMassConstraint(const FitParams& fitparams,
                                               Projection& p) const
   {
-    if (m_config.m_massConstraintType == 0) {
+    assert(m_config);
+    if (m_config->m_massConstraintType == 0) {
       return projectMassConstraintParticle(fitparams, p);
     } else {
       return projectMassConstraintDaughters(fitparams, p);

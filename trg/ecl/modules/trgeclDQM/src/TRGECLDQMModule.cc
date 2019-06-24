@@ -75,7 +75,7 @@ void TRGECLDQMModule::defineHisto()
   h_Cal_TCTiming       = new TH1D("h_Cal_TCTiming",      "Cal TC Timing  (ns)",      100, -400, 400);
   h_Cal_TRGTiming      = new TH1D("h_Cal_TRGTiming",     "TRG Timing  (ns)",     100, -400, 400);
   h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "ECL Trigger Bit",     26, 0, 26);
-
+  h_Cluster_Energy_Sum    = new TH1D("h_Cluster_Energy_Sum",   "Sum of 2 Cluster Energy (ADC)",       100, 0, 3000);
 
   oldDir->cd();
 }
@@ -256,8 +256,40 @@ void TRGECLDQMModule::event()
 
   int c = _TCCluster.getNofCluster();
   h_Cluster->Fill(c);
+  std::vector<double> ClusterTiming;
+  std::vector<double> ClusterEnergy;
+  std::vector<int> MaxTCId;
+  ClusterTiming.clear();
+  ClusterEnergy.clear();
+  MaxTCId.clear();
 
-  //
+  for (int iii = 0; iii < trgeclCluster.getEntries(); iii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclCluster[iii];
+    int maxTCId    = aTRGECLCluster ->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster ->getEnergyDep();
+    double clustertiming  =  aTRGECLCluster -> getTimeAve();
+    ClusterTiming.push_back(clustertiming);
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+  }
+
+  double maxCluster1 = 0;
+  double maxCluster2 = 0;
+  const int cl_size = ClusterEnergy.size();
+  for (int icl = 0; icl < cl_size; icl++) {
+    if (maxCluster1 < ClusterEnergy[icl]) {
+      maxCluster1 = ClusterEnergy[icl];
+    } else if (maxCluster2 < ClusterEnergy[icl]) {
+      maxCluster2 = ClusterEnergy[icl];
+    }
+
+  }
+
+  if (trgbit[6]) {
+    h_Cluster_Energy_Sum -> Fill((maxCluster1 + maxCluster2) / 5.25);
+  }
+
+
   const int NofTCHit = TCId.size();
 
   double totalEnergy = 0;
@@ -302,7 +334,6 @@ void TRGECLDQMModule::event()
   h_Cal_TRGTiming -> Fill(caltrgtiming);
   h_TotalEnergy -> Fill(totalEnergy);
   h_Narrow_TotalEnergy -> Fill(totalEnergy);
-
 
   // usleep(100);
 }

@@ -591,7 +591,7 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName)
     }
   }
   return particles.appendNew(get4Vector(maskName), getPDGCode(), Particle::EFlavorType::c_Unflavored, std::vector(source.begin(),
-                             source.end()));
+                             source.end()), Particle::PropertyFlags::c_IsUnspecified);
 }
 double RestOfEvent::atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const
 {

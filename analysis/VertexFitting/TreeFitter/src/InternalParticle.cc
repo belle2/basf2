@@ -41,13 +41,12 @@ namespace TreeFitter {
                                      const TreeFitter::ConstraintConfiguration& config,
                                      bool forceFitAll
                                     ) :
-    ParticleBase(particle, mother),
+    ParticleBase(particle, mother, &config),// config pointer here to allow final states not to have it
     m_massconstraint(false),
     m_lifetimeconstraint(false),
     m_isconversion(false),
-    m_automatic_vertex_constraining(config.m_automatic_vertex_constraining) // this is an extern FIXME -> move to config class
+    m_automatic_vertex_constraining(config.m_automatic_vertex_constraining)
   {
-
     if (particle) {
       for (auto daughter : particle->getDaughters()) {
         addDaughter(daughter, config, forceFitAll);

@@ -164,7 +164,6 @@ def load(obj):
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     session = tf.Session(config=config)
-    saver = tf.train.Saver()
 
     parameters = json.loads(obj[0])
 
@@ -182,6 +181,7 @@ def load(obj):
 
     model = get_tensorflow_model(number_of_features, parameters)
     model.initialize(DataStub(), [x, y])
+    saver = tf.train.Saver()
 
     # tensorflow is a moving target, file loading and saving of mid-level api changes rapidly. so we use the legacy here
     with tempfile.TemporaryDirectory() as path:
@@ -274,7 +274,7 @@ def end_fit(state):
 
     # sample pdfs of trained model on test_dataset, return test df
     state.get_from_collection()
-    y_hat = state(*state.Xtest)
+    y_hat = apply(state, state.Xtest)
     test_df = pandas.DataFrame.from_dict({'y': state.ytest.reshape(-1), 'y_hat': y_hat.reshape(-1)})
     (sig_pdf, back_pdf) = binning.get_signal_background_pdf(test_df)
     seed = state.seed

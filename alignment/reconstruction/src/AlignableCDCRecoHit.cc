@@ -26,7 +26,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace alignment;
 
-bool AlignableCDCRecoHit::s_enableEventT0LocalDerivative = true;
+bool AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = true;
 bool AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = false;
 bool AlignableCDCRecoHit::s_enableWireByWireAlignmentGlobalDerivatives = false;
 
@@ -185,7 +185,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
 
 TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane* sop)
 {
-  if (!s_enableEventT0LocalDerivative)
+  if (!s_enableTrackT0LocalDerivative)
     return TMatrixD();
 
   unsigned short LR = (int(m_leftRight) > 0.) ? 1 : 0;

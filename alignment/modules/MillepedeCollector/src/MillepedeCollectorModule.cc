@@ -130,7 +130,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            double(-1.));
 
   // Configure CDC specific options
-  addParam("fitEventT0", m_fitEventT0, "Add local parameter for event T0 fit in GBL",
+  addParam("fitTrackT0", m_fitTrackT0, "Add local parameter for track T0 fit in GBL",
            bool(true));
   addParam("updateCDCWeights", m_updateCDCWeights, "Update L/R weights from previous DAF fit result",
            bool(true));
@@ -227,7 +227,7 @@ void MillepedeCollectorModule::prepare()
   Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
-  AlignableCDCRecoHit::s_enableEventT0LocalDerivative = m_fitEventT0;
+  AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = m_fitTrackT0;
   AlignableCDCRecoHit::s_enableWireSaggingGlobalDerivative = m_enableWireSagging;
   AlignableCDCRecoHit::s_enableWireByWireAlignmentGlobalDerivatives = m_enableWireByWireAlignment;
 }

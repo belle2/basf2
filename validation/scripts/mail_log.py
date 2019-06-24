@@ -4,6 +4,8 @@
 import re
 import os
 import json
+import sys
+from typing import Dict, Union, List
 
 import validationpath
 from validationfunctions import available_revisions
@@ -11,7 +13,7 @@ from validationfunctions import available_revisions
 import mail_utils
 
 
-def parse_mail_address(obj):
+def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
     """!
     Take a string or list and return list of email addresses that appear in it
     """
@@ -27,18 +29,18 @@ def parse_mail_address(obj):
         raise TypeError("must be string or list of strings")
 
 
-def check_if_same(new, old):
+def check_if_same(new: Dict[str, Dict[str, str]],
+                  old: Dict[str, Dict[str, str]]) -> bool:
     """!
     Checks if the failed plots in new are the same as in old. new and old are
     only considered to be different if the comparison_result of a same plot
     changed or if new contains _more_ failed plots than old.
 
+    See :meth:`Mails._create_mail_log` for a description of the dictionary
+    format.
+
     @return: True if something has changed.
     """
-
-    # if new is larger than old, there are new failed plots
-    if len(new) > len(old):
-        return False
 
     for plot in new:
         # new plot failed
@@ -93,17 +95,24 @@ class Mails:
         self.mail_data_new = self._create_mail_log(self.comparison_json)
 
         # yesterday's mail data
+        old_mail_data_path = os.path.join(
+            self.validator.get_log_folder(), "mail_data.json"
+        )
         try:
-            with open(os.path.join(self.validator.get_log_folder(),
-                                   "mail_data.json")) as f:
+            with open(old_mail_data_path) as f:
                 self.mail_data_old = json.load(f)
         except FileNotFoundError:
-            # todo: shouldn't we at least warn about this?
+            print(
+                f"Could not find old mail_data.json at {old_mail_data_path}.",
+                file=sys.stderr
+            )
             self.mail_data_old = None
 
-    def _create_mail_log_failed_scripts(self):
+    def _create_mail_log_failed_scripts(self) -> Dict[str, Dict[str, str]]:
         """!
         Looks up all scripts that failed and collects information about them.
+        See :meth:`_create_mail_log` for the structure of the resulting
+        dictionary.
         """
 
         # get failed scripts
@@ -156,7 +165,7 @@ class Mails:
 
         return mail_log
 
-    def _create_mail_log(self, comparison):
+    def _create_mail_log(self, comparison) -> Dict[str, Dict[str, Dict[str, str]]]:
         """!
         Takes the entire comparison json file, finds all the plots where
         comparison failed, finds info about failed scripts and saves them in
@@ -165,7 +174,12 @@ class Mails:
         {
              "email@address.test" : {
                  "title1": {
-                         "package": ... "description": ....
+                         "package": str,
+                         "description": str,
+                         "rootfile": str,
+                         "comparison_text": str,
+                         "description": str,
+                         "comparison_result": str
                      },
                  "title2": {...}
              },

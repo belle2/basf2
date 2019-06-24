@@ -117,5 +117,8 @@ namespace Belle2 {
      *  'I dont know hat I am doing'
      * */
     bool m_automatic_vertex_constraining;
+
+    /** dimension to use for beam/origin cosntraint and ALL geometric constraints */
+    int m_originDimension;
   };
 }

@@ -27,7 +27,8 @@ namespace TreeFitter {
                              m_ipConstraint(false),
                              m_customOrigin(false),
                              m_customOriginVertex({}),
-                             m_customOriginCovariance({})
+                             m_customOriginCovariance({}),
+                             m_originDimension(3)
     {};
 
     /** constructor */
@@ -40,7 +41,8 @@ namespace TreeFitter {
                             const bool& ipConstraint,
                             const bool& customOrigin,
                             const std::vector<double>& customOriginVertex,
-                            const std::vector<double>& customOriginCovariance
+                            const std::vector<double>& customOriginCovariance,
+                            const int& originDimension
                            ) :
       m_massConstraintType(massConstraintType),
       m_massConstraintListPDG(massConstraintListPDG),
@@ -51,7 +53,8 @@ namespace TreeFitter {
       m_ipConstraint(ipConstraint),
       m_customOrigin(customOrigin),
       m_customOriginVertex(customOriginVertex),
-      m_customOriginCovariance(customOriginCovariance)
+      m_customOriginCovariance(customOriginCovariance),
+      m_originDimension(originDimension)
     {}
 
     /** const flag for the type of the mass constraint */
@@ -84,6 +87,8 @@ namespace TreeFitter {
     /** covariance matrix of origin as row major vector len = 9 */
     const std::vector<double> m_customOriginCovariance;
 
+    /** dimension of the origin constraint and ALL geometric gcosntraints */
+    const int m_originDimension;
   };
 }
 

@@ -21,11 +21,11 @@ namespace TreeFitter {
                  bool forceFitAll
                 ) :
     ParticleBase("Origin"),
-    m_constraintDimension(3),
+    m_constraintDimension(config.m_originDimension), //this also affects the geometric constraint
     m_customOriginVertex(config.m_customOriginVertex),
     m_customOriginCovariance(config.m_customOriginCovariance),
-    m_posVec(3),
-    m_covariance(3, 3),
+    m_posVec(config.m_originDimension),
+    m_covariance(config.m_originDimension, config.m_originDimension),
     m_isBeamSpot(config.m_ipConstraint)
   {
     addDaughter(daughter, config, forceFitAll);
@@ -41,7 +41,7 @@ namespace TreeFitter {
   {
     ErrCode status;
     const int posindex = posIndex();
-    fitparams.getStateVector().segment(posindex, m_constraintDimension) = m_posVec.segment(0, 3);
+    fitparams.getStateVector().segment(posindex, m_constraintDimension) = m_posVec.segment(0, m_constraintDimension);
 
     for (auto daughter : m_daughters) {
       status |= daughter->initMotherlessParticle(fitparams);
@@ -53,9 +53,9 @@ namespace TreeFitter {
   ErrCode Origin::initOrigin()
   {
     ErrCode status;
-    m_covariance = Eigen::Matrix<double, 3, 3>::Zero(3, 3);
 
-    if (m_beamParams && m_isBeamSpot) {
+    if (m_beamParams && m_isBeamSpot && m_constraintDimension == 3) {
+      m_covariance = Eigen::Matrix<double, 3, 3>::Zero(3, 3);
       const TVector3& vertexVector = m_beamParams->getVertex();
       const TMatrixDSym& covVertex = m_beamParams->getCovVertex();
       m_posVec(0) = vertexVector.x();
@@ -67,7 +67,18 @@ namespace TreeFitter {
       m_covariance(1, 0) = covVertex(1 , 0);
       m_covariance(2, 0) = covVertex(2 , 0);
       m_covariance(2, 1) = covVertex(2 , 1);
-    } else if (!m_isBeamSpot) {
+
+    } else if (m_beamParams && m_isBeamSpot && m_constraintDimension == 2) {
+      m_covariance = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
+      const TVector3& vertexVector = m_beamParams->getVertex();
+      const TMatrixDSym& covVertex = m_beamParams->getCovVertex();
+      m_posVec(0) = vertexVector.x();
+      m_posVec(1) = vertexVector.y();
+      m_covariance(0, 0) = covVertex(0 , 0);
+      m_covariance(1, 1) = covVertex(1 , 1);
+      m_covariance(1, 0) = covVertex(1 , 0);
+
+    } else if (!m_isBeamSpot && m_constraintDimension == 3) {
 
       if (!(m_customOriginVertex.size() == 3) || !(m_customOriginCovariance.size() == 9)) {
         B2FATAL("Incorrect dimension of customOriginVertex or customOriginCovariance. customOriginVertex dim = "

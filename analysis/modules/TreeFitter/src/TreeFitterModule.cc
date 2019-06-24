@@ -73,6 +73,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("ipConstraint", m_ipConstraint,
            "Type::[bool]. Use the IP as the origin of the tree. This registers an internal IP particle as the mother of the list you give. Or in other words forces the PRODUCTION vertex of your particle to be the IP and its covariance as specified in the database.",
            false);
+  addParam("originDimension", m_originDimension,
+           "Type int, default 3. If origin or ip constraint used, specify the dimension of the constraint 3->x,y,z; 2->x,y. This also changes the dimension of the geometric constraints! So you might want to turn them off for some particles. (That means turn auto off and manually on for the ones you want to cosntrain)",
+           3);
   addParam("updateAllDaughters", m_updateDaughters,
            "Type::[bool]. Update all daughters (vertex position and momenta) in the tree. If not set only the 4-momenta for the head of the tree will be updated. We also update the vertex position of the daughters regardless of what you put here, because otherwise the default when the particle list is created is {0,0,0}.",
            false);
@@ -166,7 +169,8 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     m_ipConstraint,
     m_customOrigin,
     m_customOriginVertex,
-    m_customOriginCovariance
+    m_customOriginCovariance,
+    m_originDimension
   );
 
   std::unique_ptr<TreeFitter::FitManager> TreeFitter(

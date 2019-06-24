@@ -69,6 +69,8 @@ void BaseRecoFitterModule::initialize()
   if (!genfit::FieldManager::getInstance()->isInitialized()) {
     B2FATAL("Magnetic field not set up. Please use SetupGenfitExtrapolationModule.");
   }
+
+  genfit::MaterialEffects::getInstance()->setMagCharge(1.0); //FIXME prototyping
 }
 
 

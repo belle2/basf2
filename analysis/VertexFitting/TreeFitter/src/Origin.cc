@@ -18,6 +18,7 @@
 namespace TreeFitter {
 
   Origin::Origin(Belle2::Particle* daughter,
+                 const ConstraintConfiguration& config,
                  bool forceFitAll,
                  const std::vector<double>& customOriginVertex,
                  const std::vector<double>& customOriginCovariance,
@@ -31,7 +32,7 @@ namespace TreeFitter {
     m_covariance(3, 3),
     m_isBeamSpot(isBeamSpot)
   {
-    addDaughter(daughter, forceFitAll);
+    addDaughter(daughter, config, forceFitAll);
     initOrigin();
   }
 

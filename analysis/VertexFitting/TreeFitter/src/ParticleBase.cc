@@ -24,17 +24,7 @@
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
-
 namespace TreeFitter {
-
-  //externs
-  bool massConstraintType;
-  std::vector<int> massConstraintListPDG;
-  std::vector<int> fixedToMotherVertexListPDG;
-  std::vector<int> geoConstraintListPDG;
-  std::vector<std::string> removeConstraintList;
-  bool automatic_vertex_constraining;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
     m_particle(particle),
@@ -85,9 +75,9 @@ namespace TreeFitter {
     m_daughters.clear();
   }
 
-  ParticleBase* ParticleBase::addDaughter(Belle2::Particle* cand, bool forceFitAll)
+  ParticleBase* ParticleBase::addDaughter(Belle2::Particle* cand, const ConstraintConfiguration& config, bool forceFitAll)
   {
-    auto newDaughter = ParticleBase::createParticle(cand, this, forceFitAll);
+    auto newDaughter = ParticleBase::createParticle(cand, this, config, forceFitAll);
     m_daughters.push_back(newDaughter);
     return m_daughters.back();
   }
@@ -115,26 +105,29 @@ namespace TreeFitter {
 
   ParticleBase* ParticleBase::createOrigin(
     Belle2::Particle* daughter,
+    const ConstraintConfiguration& config,
     bool forceFitAll,
     const std::vector<double>& customOriginVertex,
     const std::vector<double>& customOriginCovariance,
     const bool isBeamSpot
   )
   {
-    return new Origin(daughter, forceFitAll, customOriginVertex, customOriginCovariance, isBeamSpot);
+    return new Origin(daughter, config, forceFitAll, customOriginVertex, customOriginCovariance, isBeamSpot);
   }
 
-  ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
+  ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother,
+                                             const ConstraintConfiguration& config, bool forceFitAll)
   {
     ParticleBase* rc = nullptr;
 
     if (!mother) { // 'head of tree' particles
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
-        rc = new InternalParticle(particle, nullptr, forceFitAll);
+        rc = new InternalParticle(particle, nullptr, config, forceFitAll);
 
       } else {
 
-        rc = new InternalParticle(particle, nullptr, forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
+        rc = new InternalParticle(particle, nullptr, config,
+                                  forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
 
       }
 
@@ -174,10 +167,10 @@ namespace TreeFitter {
       } else {         // unfitted composites
 
         if (isAResonance(particle)) {
-          rc = new Resonance(particle, mother, forceFitAll);
+          rc = new Resonance(particle, mother, config, forceFitAll);
 
         } else {
-          rc = new InternalParticle(particle, mother, forceFitAll);
+          rc = new InternalParticle(particle, mother, config, forceFitAll);
         }
       }
     }
@@ -463,7 +456,7 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectMassConstraint(const FitParams& fitparams,
                                               Projection& p) const
   {
-    if (TreeFitter::massConstraintType == 0) {
+    if (m_config.m_massConstraintType == 0) {
       return projectMassConstraintParticle(fitparams, p);
     } else {
       return projectMassConstraintDaughters(fitparams, p);

@@ -13,13 +13,14 @@
 #include <analysis/dataobjects/Particle.h>
 #include <vector>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <Eigen/Core>
 
 namespace TreeFitter {
   class DecayChain;
   class FitParams;
   class ParticleBase;
-
+  class ConstraintConfiguration;
 
   /** this class */
   class FitManager {
@@ -36,6 +37,7 @@ namespace TreeFitter {
 
     /** constructor  */
     FitManager(Belle2::Particle* particle,
+               const ConstraintConfiguration& config,
                double prec = 0.01,
                bool ipConstraint = false,
                bool customOrigin = false,
@@ -148,6 +150,7 @@ namespace TreeFitter {
     /** use referencing */
     bool m_useReferencing;
 
-
+    /** config container */
+    const ConstraintConfiguration m_config;
   };
 }

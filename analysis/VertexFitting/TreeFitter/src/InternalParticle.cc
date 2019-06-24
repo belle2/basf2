@@ -38,36 +38,38 @@ namespace TreeFitter {
 
   InternalParticle::InternalParticle(Belle2::Particle* particle,
                                      const ParticleBase* mother,
-                                     bool forceFitAll) :
+                                     const TreeFitter::ConstraintConfiguration& config,
+                                     bool forceFitAll
+                                    ) :
     ParticleBase(particle, mother),
     m_massconstraint(false),
     m_lifetimeconstraint(false),
     m_isconversion(false),
-    m_automatic_vertex_constraining(automatic_vertex_constraining) // this is an extern FIXME -> move to config class
+    m_automatic_vertex_constraining(config.m_automatic_vertex_constraining) // this is an extern FIXME -> move to config class
   {
 
     if (particle) {
       for (auto daughter : particle->getDaughters()) {
-        addDaughter(daughter, forceFitAll);
+        addDaughter(daughter, config, forceFitAll);
       }
     } else {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
     }
 
-    m_massconstraint = std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != TreeFitter::massConstraintListPDG.end();
+    m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
+                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
 
     if (!m_automatic_vertex_constraining) {
       // if this is a hadronically decaying resonance it is usefule to constraint the decay vertex to its mothers decay vertex.
       //
-      m_shares_vertex_with_mother  = std::find(TreeFitter::fixedToMotherVertexListPDG.begin(),
-                                               TreeFitter::fixedToMotherVertexListPDG.end(),
-                                               std::abs(m_particle->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end() && this->mother();
+      m_shares_vertex_with_mother  = std::find(config.m_fixedToMotherVertexListPDG.begin(),
+                                               config.m_fixedToMotherVertexListPDG.end(),
+                                               std::abs(m_particle->getPDGCode())) != config.m_fixedToMotherVertexListPDG.end() && this->mother();
 
       // use geo constraint if this particle is in the list to constrain
-      m_geo_constraint = std::find(TreeFitter::geoConstraintListPDG.begin(),
-                                   TreeFitter::geoConstraintListPDG.end(),
-                                   std::abs(m_particle->getPDGCode())) != TreeFitter::geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
+      m_geo_constraint = std::find(config.m_geoConstraintListPDG.begin(),
+                                   config.m_geoConstraintListPDG.end(),
+                                   std::abs(m_particle->getPDGCode())) != config.m_geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
     } else {
       m_shares_vertex_with_mother = this->mother() && m_isStronglyDecayingResonance;
       m_geo_constraint = this->mother() && !m_shares_vertex_with_mother;

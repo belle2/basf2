@@ -10,9 +10,10 @@
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
-
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 namespace TreeFitter {
   class FitParams;
+  class ConstraintConfiguration;
 
   /** class for resonances as internal particles */
   class Resonance : public InternalParticle {
@@ -20,6 +21,7 @@ namespace TreeFitter {
     /** constructor */
     Resonance(Belle2::Particle* particle,
               const ParticleBase* mother,
+              const ConstraintConfiguration& config,
               bool forceFitAll);
 
     /** destructor  */

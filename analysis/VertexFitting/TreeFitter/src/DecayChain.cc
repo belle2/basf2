@@ -20,6 +20,7 @@
 namespace TreeFitter {
 
   DecayChain::DecayChain(Belle2::Particle* particle,
+                         const ConstraintConfiguration& config,
                          bool forceFitAll,
                          const bool ipConstraint,
                          const bool customOrigin,
@@ -28,7 +29,8 @@ namespace TreeFitter {
                         ) :
     m_dim(0),
     m_headOfChain(nullptr),
-    m_isOwner(true)
+    m_isOwner(true),
+    m_config(config)
   {
 
     if (ipConstraint && customOrigin) {
@@ -37,6 +39,7 @@ namespace TreeFitter {
 
     if (ipConstraint || customOrigin) {
       m_headOfChain = ParticleBase::createOrigin(particle,
+                                                 config,
                                                  forceFitAll,
                                                  customOriginVertex,
                                                  customOriginCovariance,
@@ -44,7 +47,7 @@ namespace TreeFitter {
                                                 );
     } else if ((!customOrigin) && (!ipConstraint)) {
 
-      m_headOfChain = ParticleBase::createParticle(particle, nullptr, forceFitAll);
+      m_headOfChain = ParticleBase::createParticle(particle, nullptr, config, forceFitAll);
     }
 
     m_headOfChain->updateIndex(m_dim);
@@ -69,7 +72,7 @@ namespace TreeFitter {
 
   void DecayChain::removeConstraintFromList()
   {
-    for (auto removeConstraint : removeConstraintList) {
+    for (auto removeConstraint : m_config.m_removeConstraintList) {
       m_constraintlist.erase(std::remove_if(m_constraintlist.begin(), m_constraintlist.end(),
       [&](const Constraint & constraint) { return constraint.name() == removeConstraint ;}),
       m_constraintlist.end());

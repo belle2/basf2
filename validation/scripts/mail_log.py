@@ -71,9 +71,6 @@ class Mails:
         with open(comparison_json_file) as f:
             self.comparison_json = json.load(f)
 
-        # current mail data
-        self.mail_data_new = self._create_mail_log(self.comparison_json)
-
         # yesterday's mail data
         old_mail_data_path = os.path.join(
             self.validator.get_log_folder(), "mail_data.json"
@@ -87,6 +84,9 @@ class Mails:
                 file=sys.stderr
             )
             self.mail_data_old = None
+
+        # current mail data
+        self.mail_data_new = self._create_mail_log(self.comparison_json)
 
     def _create_mail_log_failed_scripts(self) -> Dict[str, Dict[str, str]]:
         """!
@@ -229,7 +229,10 @@ class Mails:
                 if old_mail_log is None:
                     mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
                         "n/a"
-                if plot not in old_mail_log[contact]:
+                elif contact not in old_mail_log:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "new"
+                elif plot not in old_mail_log[contact]:
                     mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
                         "new"
                 elif mail_log[contact][plot]["comparison_result"] != \
@@ -262,7 +265,7 @@ class Mails:
         url = "https://b2-master.belle2.org/validation/static/validation.html"
         # url = "http://localhost:8000/static/validation.html"
 
-        body = "There were problem(s) with the validation of the " \
+        body = "There were problems with the validation of the " \
                "following plots/scripts:\n\n"
         for plot in plots:
             # compose descriptive error message
@@ -285,9 +288,10 @@ class Mails:
             body_plot += "<b>Description:</b> {description}<br>"
             body_plot += "<b>Comparison:</b> {comparison_text}<br>"
             body_plot += "<b>Error type:</b> {errormsg}<br>"
-            if plots[plot]["rootfile"] != "--":
-                body_plot += '<a href="{url}#{package}-{rootfile}">' \
-                             'Click me for details</a>'
+            # URLs are currently not working.
+            # if plots[plot]["rootfile"] != "--":
+            #     body_plot += '<a href="{url}#{package}-{rootfile}">' \
+            #                  'Click me for details</a>'
             body_plot += "\n\n"
 
             # Fill in fields
@@ -303,8 +307,8 @@ class Mails:
 
             body += body_plot
 
-        body += "You can take a look on the plots/scripts in more detail at " \
-                "the links provided for each failed plot/script. "
+        body += f"You can take a look on the plots/scripts in more detail at " \
+                "{url}. "
 
         return body
 

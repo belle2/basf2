@@ -1281,7 +1281,9 @@ def variablesToHistogram(
     variables,
     variables_2d=[],
     filename='ntuple.root',
-    path=analysis_main,
+    path=analysis_main, *,
+    directory=None,
+    prefixDecayString=False,
 ):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
@@ -1292,6 +1294,10 @@ def variablesToHistogram(
         variables_2d (list(tuple)): pair of variables + binning for each which must be registered in the VariableManager
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
+        directory (str): directory inside the output file where the histograms should be saved.
+            Useful if you want to have different histograms in the same file to separate them.
+        prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
+            programmatic naming of the structure in the file.
     """
 
     output = register_module('VariablesToHistogram')
@@ -1300,6 +1306,12 @@ def variablesToHistogram(
     output.param('variables', variables)
     output.param('variables_2d', variables_2d)
     output.param('fileName', filename)
+    if directory is not None or prefixDecayString:
+        if directory is None:
+            directory = ""
+        if prefixDecayString:
+            directory = decayString + "_" + directory
+        output.param("directory", directory)
     path.add_module(output)
 
 

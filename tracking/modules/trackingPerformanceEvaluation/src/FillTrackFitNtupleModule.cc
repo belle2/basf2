@@ -83,11 +83,9 @@ void FillTrackFitNtupleModule::event()
 
     RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
     if (recoTrack == nullptr) {
-      // if no recoTrack is associated to Track, we don't break but we use an
-      // empty recoTrack to fill the ntuple, thus to backtrace the cases when
-      // the associated recoTrack is missing
+      // if no recoTrack is associated to Track, we skip the track
       B2WARNING(" the RecoTrack associated to Track is nullptr!");
-      recoTrack = new RecoTrack();
+      continue;
     }
 
     Float_t nhits = recoTrack->getNumberOfTrackingHits();

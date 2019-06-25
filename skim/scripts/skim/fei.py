@@ -8,7 +8,8 @@
 __authors__ = [
     "Sophie Hollit",
     "Racha Cheaib",
-    "Hannah Wakeling"
+    "Hannah Wakeling",
+    "Phil Grace"
 ]
 
 import basf2
@@ -17,6 +18,10 @@ from modularAnalysis import *
 
 from variables import *
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
+variables.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+variables.addAlias('dmID', 'extraInfo(decayModeID)')
+variables.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
+variables.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
 
 from stdCharged import *
 
@@ -64,7 +69,7 @@ def B0hadronic(path):
     used by the FR, but is not yet used in the FEI due to unexpected
     technical restrictions in the KFitter algorithm'.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 
@@ -135,7 +140,7 @@ def BplusHadronic(path):
     This function applies cuts to the FEI-reconstructed tag side B, and
     the pre-cuts and FEI must be applied separately.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 
@@ -209,7 +214,7 @@ def runFEIforB0Hadronic(path):
     used by the FR, but is not yet used in the FEI due to unexpected
     technical restrictions in the KFitter algorithm'.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
    ** Cuts applied are**:
 
@@ -285,7 +290,7 @@ def runFEIforBplusHadronic(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 
@@ -333,7 +338,7 @@ def runFEIforHadronicCombined(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 
@@ -388,7 +393,7 @@ def B0SLWithOneLep(path):
     stored in skim output. FEI is run with removeSLD=True to deactivate
     rare but time-intensive semileptonic D channels in skim.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 
@@ -399,9 +404,10 @@ def B0SLWithOneLep(path):
 
         Tag side B:
 
-        * -5 < cosThetaBetweenParticleAndNominalB < 3
-        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
-        * sigProb > 0.005 to give < 10% retention
+        * -4 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 4 to remove semileptonic D channels and D pi channels
+        * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
+        * useCMSFrame(daughter(1,p)) > 1.0
 
         Signal side:
 
@@ -416,8 +422,8 @@ def B0SLWithOneLep(path):
 """
     # Reconstruct tag side
     # Apply cuts
-    applyCuts('B0:semileptonic', '-5<cosThetaBetweenParticleAndNominalB<3 and sigProb>0.005 and extraInfo(decayModeID)<8',
-              path=path)
+    B0SLcuts = ['dmID<4', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
+    applyCuts('B0:semileptonic', ' and '.join(B0SLcuts), path=path)
 
     # Reconstruct signal side to lepton
     stdE('95eff', path=path)
@@ -463,7 +469,7 @@ def BplusSLWithOneLep(path):
     is not stored in skim output. FEI is run with removeSLD=True to
     deactivate rare but time-intensive semileptonic D channels in skim.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
         Event precuts:
 
@@ -472,9 +478,10 @@ def BplusSLWithOneLep(path):
 
         Tag side B:
 
-        * -5 < cosThetaBetweenParticleAndNominalB < 3
-        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
-        * sigProb > 0.009 to give < 10% retention
+        * -4 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 4 to remove semileptonic D channels and D pi channels
+        * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
+        * useCMSFrame(daughter(1,p)) > 1.0
 
         Signal side:
         * electron or muon from list 95eff
@@ -489,8 +496,8 @@ def BplusSLWithOneLep(path):
 
     # Reconstruct tag side
     # Apply cuts
-    applyCuts('B+:semileptonic', '-5<cosThetaBetweenParticleAndNominalB<3 and sigProb>0.009 and extraInfo(decayModeID)<8',
-              path=path)
+    BplusSLcuts = ['dmID<4', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
+    applyCuts('B+:semileptonic', ' and '.join(BplusSLcuts), path=path)
 
     # Reconstruct signal side to lepton
     stdE('95eff', path=path)
@@ -538,7 +545,7 @@ def runFEIforB0SLWithOneLep(path):
     stored in skim output. FEI is run with removeSLD=True to deactivate
     rare but time-intensive semileptonic D channels in skim.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 
@@ -549,9 +556,10 @@ def runFEIforB0SLWithOneLep(path):
 
         Tag side B:
 
-        * -5 < cosThetaBetweenParticleAndNominalB < 3
-        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
-        * sigProb > 0.005 to give < 10% retention
+        * -4 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 4 to remove semileptonic D channels and D pi channels
+        * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
+        * useCMSFrame(daughter(1,p)) > 1.0
 
         Signal side:
 
@@ -610,7 +618,7 @@ def runFEIforBplusSLWithOneLep(path):
     stored in skim output. FEI is run with removeSLD=True to deactivate
     rare but time-intensive semileptonic D channels in skim.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 
@@ -621,9 +629,10 @@ def runFEIforBplusSLWithOneLep(path):
 
         Tag side B:
 
-        * -5 < cosThetaBetweenParticleAndNominalB < 3
-        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
-        * sigProb > 0.009 to give < 10% retention
+        * -4 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 4 to remove semileptonic D channels and D pi channels
+        * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
+        * useCMSFrame(daughter(1,p)) > 1.0
 
         Signal side:
 
@@ -669,7 +678,7 @@ def runFEIforSLWithOneLepCombined(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 
@@ -713,7 +722,7 @@ def runFEIforSkimCombined(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liasons: S. Hollitt, H. Wakeling & P. Grace
 
     **Cuts applied are**:
 

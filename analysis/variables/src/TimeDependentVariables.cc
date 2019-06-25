@@ -188,6 +188,30 @@ namespace Belle2 {
       return vert->getFitType();
     }
 
+    double particleTagVNDF(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVNDF();
+    }
+
+    double particleTagVChi2(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVChi2();
+    }
+
+    double particleTagVChi2IP(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVChi2IP();
+    }
+
 
     // Delta t and related
 
@@ -530,7 +554,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
     REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
     REGISTER_VARIABLE("TagVType", particleTagVType, "Fit type of the tag vertex");
-
+    REGISTER_VARIABLE("TagVNDF", particleTagVNDF, "Number of degrees of freedom in the tag vertex fit");
+    REGISTER_VARIABLE("TagVChi2", particleTagVChi2, "chi2 value of the tag vertex fit");
+    REGISTER_VARIABLE("TagVChi2IP", particleTagVChi2IP, "IP component of chi2 value of the tag vertex fit");
 
     REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
     REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");

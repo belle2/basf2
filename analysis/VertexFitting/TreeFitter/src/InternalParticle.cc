@@ -14,6 +14,7 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
+#include <iostream>
 using std::vector;
 
 namespace TreeFitter {
@@ -147,9 +148,7 @@ namespace TreeFitter {
 
           } else if (mother() && mother()->posIndex() >= 0) {
             int posindexmother = mother()->posIndex();
-
             fitparams.getStateVector().segment(posindex, 3) = fitparams.getStateVector().segment(posindexmother, 3);
-
           } else {
             /** (0,0,0) is the best guess in any other case */
             fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
@@ -169,7 +168,6 @@ namespace TreeFitter {
   ErrCode InternalParticle::initParticleWithMother(FitParams& fitparams)
   {
     int posindex = posIndex();
-
     if (hasPosition() &&
         mother() &&
         fitparams.getStateVector()(posindex) == 0 &&
@@ -346,13 +344,12 @@ namespace TreeFitter {
       list.push_back(Constraint(this, Constraint::kinematic, depth, 4, 3));
     }
     if (m_geo_constraint) {
-      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
+      assert(m_config);
+      list.push_back(Constraint(this, Constraint::geometric, depth, m_config->m_originDimension, 3));
     }
-
     if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
-
 
   }
 

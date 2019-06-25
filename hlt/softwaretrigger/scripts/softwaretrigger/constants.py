@@ -25,6 +25,18 @@ class Location(Enum):
     expressreco = "expressreco"
 
 
+class DQMModes(Enum):
+    """Split between DQM modules that need to run on all events and on the filtered ones"""
+    # DQM modules which should run on dismissed and non_dismissed events
+    all_events = "all_events"
+    # DQM modules which should run before every reconstruction
+    before_reco = "before_reco"
+    # DQM modules which should only run on the filtered ones
+    filtered = "filtered"
+    # If not in HLT, just all all DQM modules
+    dont_care = "dont_care"
+
+
 # Always store those objects
 ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTriggerResult", "TRGSummary", "ROIpayload", "SoftwareTriggerVariables"]
 # Objects to be left on output

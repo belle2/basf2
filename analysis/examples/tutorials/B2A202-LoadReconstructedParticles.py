@@ -38,7 +38,7 @@ ma.inputMdst(environmentType='default',
              path=my_path)
 
 # print contents of the DataStore before loading Particles
-ma.printDataStore()
+ma.printDataStore(path=my_path)
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all

@@ -13,6 +13,7 @@
 #include <trg/ecl/TrgEclMapping.h>
 #include <trg/ecl/TrgEclCluster.h>
 #include <trg/ecl/TrgEclMaster.h>
+#include <trg/ecl/TrgEclDataBase.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -75,7 +76,7 @@ void TRGECLDQMModule::defineHisto()
   h_Cal_TCTiming       = new TH1D("h_Cal_TCTiming",      "Cal TC Timing  (ns)",      100, -400, 400);
   h_Cal_TRGTiming      = new TH1D("h_Cal_TRGTiming",     "TRG Timing  (ns)",     100, -400, 400);
   h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "ECL Trigger Bit",     26, 0, 26);
-  h_Cluster_Energy_Sum    = new TH1D("h_Cluster_Energy_Sum",   "Sum of 2 Cluster Energy (ADC)",       100, 0, 3000);
+  h_Cluster_Energy_Sum    = new TH1D("h_Cluster_Energy_Sum",   "Energy Sum of 2 Clusters (ADC)",       300, 0, 3000);
 
   oldDir->cd();
 }
@@ -178,8 +179,6 @@ void TRGECLDQMModule::event()
   trgbit.resize(41, 0);
   for (int iii = 0; iii < trgeclSumArray.getEntries(); iii++) {
     TRGECLUnpackerSumStore* aTRGECLUnpackerSumStore = trgeclSumArray[iii];
-    //    s_hit_win = aTRGECLUnpackerSumStore ->getSumNum();
-    //    if(s_hit_win != 3|| s_hit_win!=4){continue;}
 
     tsource = aTRGECLUnpackerSumStore ->getTimeType();
     phy     = aTRGECLUnpackerSumStore ->getPhysics();
@@ -273,20 +272,66 @@ void TRGECLDQMModule::event()
     MaxTCId.push_back(maxTCId);
   }
 
-  double maxCluster1 = 0;
-  double maxCluster2 = 0;
+
+  std::vector<double> maxClusterEnergy;
+  std::vector<double> maxClusterTiming;
+  std::vector<int> maxCenterTCId;
+  maxClusterTiming.clear();
+  maxClusterEnergy.clear();
+  maxCenterTCId.clear();
+
+  maxClusterEnergy.resize(2, 0.0);
+  maxClusterTiming.resize(2, 0.0);
+  maxCenterTCId.resize(2, 0.0);
   const int cl_size = ClusterEnergy.size();
   for (int icl = 0; icl < cl_size; icl++) {
-    if (maxCluster1 < ClusterEnergy[icl]) {
-      maxCluster1 = ClusterEnergy[icl];
-    } else if (maxCluster2 < ClusterEnergy[icl]) {
-      maxCluster2 = ClusterEnergy[icl];
+    if (maxClusterEnergy[0] < ClusterEnergy[icl]) {
+      maxClusterEnergy[0] = ClusterEnergy[icl];
+      maxClusterTiming[0] = ClusterTiming[icl];
+      maxCenterTCId[0] = MaxTCId[icl];
+    } else if (maxClusterEnergy[1] < ClusterEnergy[icl]) {
+      maxClusterEnergy[1] = ClusterEnergy[icl];
+      maxClusterTiming[1] = ClusterTiming[icl];
+      maxCenterTCId[1] = MaxTCId[icl];
+
     }
 
   }
+  TrgEclDataBase _database;
 
-  if (trgbit[6]) {
-    h_Cluster_Energy_Sum -> Fill((maxCluster1 + maxCluster2) / 5.25);
+  std::vector<double> _3DBhabhaThreshold;
+  _3DBhabhaThreshold = {30, 45}; //  /10 MeV
+
+
+  bool BtoBFlag = false;
+  bool BhabhaFlag = false;
+  int lut1 = _database.Get3DBhabhaLUT(maxCenterTCId[0]);
+  int lut2 = _database.Get3DBhabhaLUT(maxCenterTCId[1]);
+  int energy1 = 15 & lut1;
+  int energy2 = 15 & lut2;
+  lut1 >>= 4;
+  lut2 >>= 4;
+  int phi1 = 511 & lut1;
+  int phi2 = 511 & lut2;
+  lut1 >>= 9;
+  lut2 >>= 9;
+  int theta1 = lut1;
+  int theta2 = lut2;
+  int dphi = abs(phi1 - phi2);
+  if (dphi > 180) {dphi = 360 - dphi;}
+  int thetaSum = theta1 + theta2;
+  if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
+
+  if ((maxClusterEnergy[0] * 0.1) > _3DBhabhaThreshold[0] * energy1
+      && (maxClusterEnergy[1] * 0.1) > _3DBhabhaThreshold[0] * (energy2)
+      && ((maxClusterEnergy[0] * 0.1) > _3DBhabhaThreshold[1] * energy1
+          || (maxClusterEnergy[1] * 0.1) > _3DBhabhaThreshold[1] * (energy2))) {
+    if (BtoBFlag) {BhabhaFlag = true;}
+  }
+
+
+  if (BhabhaFlag) {
+    h_Cluster_Energy_Sum -> Fill((maxClusterEnergy[0] + maxClusterEnergy[1]) / 5.25);
   }
 
 

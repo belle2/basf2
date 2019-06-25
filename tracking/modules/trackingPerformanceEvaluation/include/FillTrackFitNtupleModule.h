@@ -42,6 +42,7 @@ namespace Belle2 {
 
   public:
 
+    /// Default Empty Constructor
     FillTrackFitNtupleModule();
 
     /// Require the store arrays and create the output root file

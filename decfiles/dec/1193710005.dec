@@ -23,7 +23,7 @@ Decay anti-B0sig
 #                   b -> c semileptonic
 #
 0.0511     D*+     e-   anti-nu_e       PHOTOS  HQET3 0.912 1.205 1.15 1.404 0.854; #18.09.2018: updated to main BELLE2_DECAY.DEC 
-0.0214     D+      e-   anti-nu_e       PHOTOS  HQET3 1.0541 1.128 1.0;             #18.09.2018: updated to main BELLE2_DECAY.DEC
+0.02140    D+      e-   anti-nu_e          BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00704    D_1+    e-   anti-nu_e    PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.00362    D_0*+   e-   anti-nu_e       PHOTOS  LLSW 0.68 -0.2 0.3;
 0.00401    D'_1+   e-   anti-nu_e       PHOTOS  LLSW 0.68 -0.2 0.3;
@@ -47,7 +47,7 @@ Decay anti-B0sig
 0.00217  D*+ eta  e-   anti-nu_e      PHOTOS  PHSP;
 
 0.0511   D*+     mu-  anti-nu_mu         PHOTOS  HQET3 0.912 1.205 1.15 1.404 0.854; # 18.09.2018: updated to main DECAY_BELLE2.DEC
-0.0214   D+      mu-  anti-nu_mu         PHOTOS  HQET3 1.0541 1.128 1.0;             # 18.09.2018: updated to main DECAY_BELLE2.DEC
+0.02140  D+      mu-  anti-nu_mu           BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
 0.00704  D_1+    mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.00362  D_0*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
 0.00401  D'_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;

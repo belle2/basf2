@@ -11,7 +11,6 @@
 
 #include <framework/pcore/ProcHelper.h>
 #include <vector>
-#include <list>
 #include <string>
 #include <map>
 
@@ -58,8 +57,6 @@ namespace Belle2 {
     static void killAllProcesses();
     /// Return the PID list handled by the running GlobalProcHandler. This PID list is updated using the signal handlers and the startup of processes.
     static const std::vector<int>& getPIDList();
-    /// Return the PID list handled by the running GlobalProcHandler. This PID list is updated using the signal handlers and the startup of processes.
-    static const std::list<std::pair<int, int>>& getExitCodeList();
 
     /// Return true if the process is of type procType.
     static bool isProcess(ProcType procType);
@@ -79,8 +76,6 @@ namespace Belle2 {
 
     /// global list of PIDs managed by GlobalProcHandler.
     static std::vector<int> s_pidVector;
-    /// the exit code of a specific pid (if any)
-    static std::list<std::pair<int, int>> s_pidExitCodes;
     /// Which PIDs were started with which types
     static std::map<int, ProcType> s_startedPIDs;
 

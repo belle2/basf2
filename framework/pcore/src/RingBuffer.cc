@@ -19,10 +19,10 @@
 #include <sys/shm.h>
 #include <sys/stat.h>
 
-#include <errno.h>
-#include <stdio.h>
+#include <cerrno>
+#include <cstdio>
 #include <unistd.h>
-#include <string.h>
+#include <cstring>
 #include <fcntl.h>
 #include <cstdlib>
 #include <sys/sem.h>
@@ -108,7 +108,7 @@ void RingBuffer::openSHM(int nwords)
               ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
     }
   }
-  m_shmadr = (int*) shmat(m_shmid, 0, 0);
+  m_shmadr = (int*) shmat(m_shmid, nullptr, 0);
   if (m_shmadr == (int*) - 1) {
     B2FATAL("RingBuffer: Attaching to shared memory segment via shmat() failed");
   }
@@ -174,7 +174,7 @@ void RingBuffer::cleanup()
   shmdt(m_shmadr);
   B2DEBUG(32, "RingBuffer: Cleaning up IPC");
   if (m_new) {
-    shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
+    shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) nullptr);
     SemaphoreLocker::destroy(m_semid);
     if (m_file) {
       unlink(m_pathname.c_str());
@@ -190,12 +190,12 @@ void RingBuffer::dump_db()
          m_bufinfo->wptr, m_bufinfo->rptr, m_bufinfo->nbuf);
 }
 
-int RingBuffer::insq(const int* buf, int size)
+int RingBuffer::insq(const int* buf, int size, bool checkTx)
 {
   if (size <= 0) {
     B2FATAL("RingBuffer::insq() failed: invalid buffer size = " << size);
   }
-  if (m_bufinfo->numAttachedTx == 0) {
+  if (m_bufinfo->numAttachedTx == 0 and checkTx) {
     //safe abort was requested
     B2WARNING("Number of attached Tx is 0, so I will not go on with the processing.");
     exit(0);

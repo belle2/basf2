@@ -36,9 +36,12 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
+    """Generate, postprocess and inspect MC events for track segment-pair validation"""
+    #: Use the SegmentFinderFacetAutomaton for track-segment creation with MC truth-matching
     segment_finder_module = basf2.register_module("TFCDC_SegmentCreatorMCTruth")
     segment_finder_module.param({"MinCDCHits": 4})
 
+    #: use the TrackFinderSegmentPairAutomaton for track-segment finding
     segment_pair_finder_module = basf2.register_module("TFCDC_TrackFinderSegmentPairAutomaton")
     segment_pair_finder_module.param({
         "WriteSegmentPairs": True,
@@ -46,16 +49,21 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
         "SegmentPairRelationFilter": "none",
     })
 
+    #: post-process with profiling validation
     py_profile = True
+    #: specify the output ROOT file
     output_file_name = "SegmentPairCreationValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
         argument_parser = super(SegmentPairCreationValidationRun, self).create_argument_parser(**kwds)
         return argument_parser
 
     def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
+        """
+        Sets up a path that plays back pregenerated events or generates events
+        based on the properties in the base class.
+        """
         main_path = super(SegmentPairCreationValidationRun, self).create_path()
 
         segment_finder_module = self.get_basf2_module(self.segment_finder_module)
@@ -81,22 +89,29 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
     """Module to collect information about the generated segments and compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
+        """Constructor"""
         super(SegmentPairCreationValidationModule, self).__init__(foreach="CDCSegmentPairVector",
                                                                   output_file_name=output_file_name)
+        #: defer reference to CDCMCSegment2dLookUp singleton until after it is constructed
         self.mc_segment_lookup = None
+        #: defer reference to MCSegmentPairFilter until after it is constructed
         self.mc_segment_pair_filter = None
+        #: defer reference to CDCAxialStereoFusion until after it is constructed
         self.segment_pair_fusion = None
 
     def initialize(self):
+        """Receive signal at the start of event processing"""
         super(SegmentPairCreationValidationModule, self).initialize()
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
         self.mc_segment_pair_filter = Belle2.TrackFindingCDC.MCSegmentPairFilter()
         self.segment_pair_fusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
     def prepare(self):
+        """Initialize the MC-hit lookup method"""
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
 
     def pick(self, segment_pair_relation):
+        """Select segment pairs with 4 or more hit in each segments and a matching primary MC particle"""
         mc_segment_lookup = self.mc_segment_lookup
         start_segment = segment_pair_relation.getStartSegment()
         end_segment = segment_pair_relation.getEndSegment()
@@ -107,12 +122,14 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
                 end_segment.size() > 3)
 
     def peel(self, segment_pair_relation):
+        """Aggregate the track and MC information for track segment-pair analysis"""
         crops = self.peel_target(segment_pair_relation)
         crops.update(self.peel_mc(segment_pair_relation))
         crops.update(self.peel_fit(segment_pair_relation))
         return crops
 
     def peel_target(self, segment_pair_relation):
+        """Create a dictionary of MC-truth (weight,decision) pairs"""
         mc_weight = self.mc_segment_pair_filter(segment_pair_relation)
         mc_decision = np.isfinite(mc_weight)  # Filters for nan
 
@@ -122,6 +139,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         )
 
     def peel_mc(self, segment_pair_relation):
+        """Create a dictionary of MC-truth (curvature,tanlambda) pairs"""
         mc_segment_lookup = self.mc_segment_lookup
 
         end_segment = segment_pair_relation.getEndSegment()
@@ -136,6 +154,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         )
 
     def peel_fit(self, segment_pair_relation):
+        """Create a dictionary of track-segment-fit information"""
         fitless_crops = self.peel_fitless(segment_pair_relation)
 
         select_fitless = fitless_crops["select_fitless"]
@@ -195,6 +214,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         return crops
 
     def peel_fitless(self, segment_pair_relation):
+        """Create a dictionary of track-segments-without-fit information"""
         # Try to make some judgements without executing the common fit.
         mc_segment_lookup = self.mc_segment_lookup
 
@@ -233,12 +253,16 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         return fitless_crops
 
     def fit(self, segment_pair_relation):
+        """Fit the segment pair"""
         self.segment_pair_fusion.reconstructFuseTrajectories(segment_pair_relation, True)
 
+    #: default selection for the delta-phi of the segment pair
     delta_phi_cut_value = 1.0
+    #: default selection for the ordering of the segment pair
     is_after_cut_value = 1.0
 
     def select_fitless(self, fitless_crops):
+        """Selection of track-segments-without-fit"""
         delta_phi = fitless_crops["delta_phi"]
         start_is_before_end = fitless_crops["start_is_before_end"]
         end_is_after_start = fitless_crops["end_is_after_start"]
@@ -246,13 +270,17 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         return (abs(delta_phi) < self.delta_phi_cut_value) & is_after_select
 
     def select(self, crops):
+        """Select every track-segment-pair"""
         return True
 
     # Refiners to be executed at the end of the harvesting / termination of the module
+    #: Save histograms in a sub folder
     save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree()
 
     # Investigate the preselection
+    #: Save a tree of track-segment-without-fit variables in a sub folder
     save_fitless_selection_variables_histograms = refiners.save_histograms(
         select=["mc_decision", "delta_phi", "start_is_before_end", "end_is_after_start", "is_coaligned"],
         outlier_z_score=5.0,
@@ -261,6 +289,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         folder_name="fitless_selection_variables",
     )
 
+    #: Save a tree of mal-ordered track-segment-pair variables in a sub folder
     save_view_is_after_cut_histograms = refiners.save_histograms(
         select=["mc_decision", "start_is_before_end", "end_is_after_start"],
         lower_bound=-is_after_cut_value,
@@ -269,6 +298,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         folder_name="view_fitless_cuts",
     )
 
+    #: Save a tree of delta-phi-cut track-segment-pair variables in a sub folder
     save_view_delta_phi_cut_histograms = refiners.save_histograms(
         select=["mc_decision", "delta_phi"],
         lower_bound=-delta_phi_cut_value,
@@ -278,6 +308,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
     )
 
     # Investigate the main selection
+    #: Save a tree of track-segment-pair selection variables in a sub folder
     save_selection_variables_after_fitless_selection_histograms = refiners.save_histograms(
         select=["mc_decision", "chi2", "ndf", "p_value"],
         outlier_z_score=5.0,
@@ -288,6 +319,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
     )
 
     # TODO: Is this interesting enough to keep it.
+    #: Save a tree of track-segment-pair p-value and curvature variables in a sub folder
     save_p_value_over_curvature_profile = refiners.save_profiles(
         select={"p_value": "p-value", "curvature_truth": "true curvature"},
         y="p-value",
@@ -298,6 +330,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
 
     @refiners.context(groupby=[None, "superlayer_id_pair"], exclude_groupby=False)
     def print_signal_number(self, crops, tdirectory, **kwds):
+        """Print diagnostic information about the track-segment-pair selection"""
         info = get_logger().info
 
         start_superlayer_ids = crops["start_superlayer_id"]

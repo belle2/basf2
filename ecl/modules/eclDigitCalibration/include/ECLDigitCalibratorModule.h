@@ -164,14 +164,16 @@ namespace Belle2 {
     bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
 
     // For the energy dependence correction to the time
-    // t-t0 =  e^{ L_1 A } ( C_1 + L_2  A + Q_1 A^2  )  + C_2     ("Energy dependence equation")
-    //    where  A = amplitude / 10000
-    double energyDependentTimeOffset(const double amplitude) ;            /**< Function to calculate "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_expLinear = -0.9952 ;     /**< L_1 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_polyConst = 10.4 ;        /**< C_1 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_polyLinear = 4.493 ;      /**< L_2 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_polyQuadratic = 3.916 ;   /**< Q_1 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_overallConst = -0.1403 ;  /**< C_2 in "energy dependence equation" */
+    // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
+
+    double energyDependentTimeOffsetElectronic(const double amplitude)
+    ;  /**< Function to calculate "energy dependence equation using Alex function" */
+    double m_energyDependenceTimeOffsetFitParam_p1 = 0  ;               /**< p1 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p2 = 88449. ;           /**< p2 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p3 = 0.20867E+06 ;      /**< p3 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p4 = 3.1482 ;           /**< p4 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p5 = 7.4747 ;           /**< p5 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p6 = 1279.3 ;           /**< p6 in "energy dependence equation" */
 
   };
 

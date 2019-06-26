@@ -35,7 +35,7 @@ except ImportError:
 
 
 # Only execute the program if a basf2 release is set up!
-if os.environ.get('BELLE2_RELEASE', None) is None:
+if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
     sys.exit('Error: No basf2 release set up!')
 
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
@@ -676,7 +676,9 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
                 if metaoptions is None:
                     metaoptions = []
                 else:
-                    metaoptions = [_.strip() for _ in metaoptions.split(',')]
+                    metaoptions = [
+                        _.strip() for _ in metaoptions.split(',') if _.strip()
+                    ]
 
         # If we are dealing with an n-tuple
         elif root_object_type == 'TNtuple':
@@ -708,7 +710,9 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
             if _metaoptions:
                 # If there are meta-options, split the string on commas and
                 # remove unnecessary whitespaces
-                metaoptions = [_.strip() for _ in _metaoptions.split(',')]
+                metaoptions = [
+                    _.strip() for _ in _metaoptions.split(',') if _.strip()
+                ]
 
             # Overwrite 'root_object' with the dictionary that contains the
             # values, because the values are what we want to save, and we

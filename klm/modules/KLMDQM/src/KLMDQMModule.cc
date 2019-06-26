@@ -3,7 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Vipin Gaur                              *
+ * Contributors: Kirill Chilikin, Vipin Gaur, Leo Piilonen                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,19 +25,10 @@ KLMDQMModule::KLMDQMModule() :
   m_TimeScintillatorEKLM(nullptr),
   m_eklmSector(nullptr),
   m_eklmStripLayer(nullptr),
-  m_bklmLayerHits(nullptr),
-  m_bklmEDep(nullptr),
-  m_bklmNPixel(nullptr),
-  m_bklmZStrips(nullptr),
-  m_bklmPhiStrip(nullptr),
-  m_bklmSector(nullptr),
-  m_bklmLayer(nullptr),
-  m_bklmHit2dsR(nullptr),
   m_bklmHit2dsZ(nullptr),
-  m_bklmHit2dsYvsx(nullptr),
-  m_bklmHit2dsXvsz(nullptr),
-  m_bklmHit2dsYvsz(nullptr),
-  m_bklmLayerVsSector{nullptr, nullptr}
+  m_bklmSectorLayerPhi(nullptr),
+  m_bklmSectorLayerZ(nullptr),
+  m_bklmDigitsN(nullptr)
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -50,7 +41,7 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
            "Directory for BKLM DQM histograms in ROOT file.",
            std::string("BKLM"));
-  addParam("outputDigitsName", m_outputDigitsName,
+  addParam("inputDigitsName", m_inputDigitsName,
            "Name of BKLMDigit store array", std::string("BKLMDigits"));
   m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
 }
@@ -100,67 +91,24 @@ void KLMDQMModule::defineHistoBKLM()
 
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_HistogramDirectoryNameBKLM.c_str())->cd();
-  m_bklmLayerHits = new TH1F("layer hits", "layer hits", 40, 0, 15);
-  m_bklmEDep = new TH1F("eDep", "Reconstructed pulse height",
-                        25, 0, 25);
-  m_bklmEDep->GetXaxis()->SetTitle("pulse height [MeV]");
-  m_bklmEDep->SetOption("LIVE");
-  m_bklmNPixel = new TH1F("nPixel", "Reconstructed number of MPPC pixels",
-                          500, 0, 500);
-  m_bklmNPixel->GetXaxis()->SetTitle("Reconstructed number of MPPC pixels");
-  m_bklmZStrips = new TH1F("zStrips", "z-measuring strip numbers of the 2D hit",
-                           54, 0, 54);
-  m_bklmZStrips->GetXaxis()->SetTitle("z-measuring strip numbers of the 2D hit");
-  m_bklmZStrips->SetOption("LIVE");
-  m_bklmPhiStrip = new TH1F("phiStrip", "Phi strip number of muon hit",
-                            50, -0.5, 49.5);
-  m_bklmPhiStrip->GetXaxis()->SetTitle("Phi strip number of muon hit");
-  m_bklmPhiStrip->SetOption("LIVE");
-  m_bklmSector = new TH1F("sector", "Sector number of muon hit",
-                          10, -0.5, 9.5);
-  m_bklmSector->GetXaxis()->SetTitle("Sector number of muon hit");
-  m_bklmSector->SetOption("LIVE");
-  m_bklmLayer = new TH1F("layer", "Layer number of muon hit",
-                         16, -0.5, 15.5);
-  m_bklmLayer->GetXaxis()->SetTitle("Layer number of muon hit");
-  m_bklmLayer->SetOption("LIVE");
-  m_bklmHit2dsR = new TH1F("rBKLMHit2ds", "Distance from z axis in transverse plane of muon hit",
-                           30, 200.0, 350.0);
-  m_bklmHit2dsR->GetXaxis()->SetTitle("Distance from z axis in transverse plane of muon hit");
-  m_bklmHit2dsR->SetOption("LIVE");
+
+
+  m_bklmSectorLayerPhi = new TH1F("SectorLayerPhi", "Sector and layer number occupancy for phi-readout hits",
+                                  240, 0.0, 239.0);
+  m_bklmSectorLayerPhi->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = forward)");
+  m_bklmSectorLayerPhi->SetOption("LIVE");
+  m_bklmSectorLayerZ = new TH1F("SectorLayerZ", "Sector and layer number occupancy for Z-readout hits",
+                                240, 0.0, 239.0);
+  m_bklmSectorLayerZ->GetXaxis()->SetTitle("sector*15 + layer (0..120 = backward, 120..240 = forward)");
+  m_bklmSectorLayerZ->SetOption("LIVE");
   m_bklmHit2dsZ = new TH1F("zBKLMHit2ds", "Axial position of muon hit",
-                           100, -200.0, 300.0);
+                           97, -172.22, 266.22);
   m_bklmHit2dsZ->GetXaxis()->SetTitle("Axial position of muon hit");
   m_bklmHit2dsZ->SetOption("LIVE");
-  m_bklmHit2dsYvsx = new TH2F("yvsx", "Position projected into y-x plane of muon hit",
-                              140, -350.0, 350.0, 140, -350.0, 350.0);
-  m_bklmHit2dsYvsx->GetXaxis()->SetTitle("x, cm");
-  m_bklmHit2dsYvsx->GetYaxis()->SetTitle("y, cm");
-  m_bklmHit2dsYvsx->SetOption("LIVE");
-  m_bklmHit2dsXvsz = new TH2F("xvsz", "Position projected into x-z plane of muon hit",
-                              140, -300.0, 400.0, 140, -350.0, 350.0);
-  m_bklmHit2dsXvsz->GetXaxis()->SetTitle("z, cm");
-  m_bklmHit2dsXvsz->GetYaxis()->SetTitle("x, cm");
-  m_bklmHit2dsXvsz->SetOption("LIVE");
-  m_bklmHit2dsYvsz = new TH2F("yvsz", "Position projected into y-z plane of muon hit",
-                              140, -300.0, 400.0, 140, -350.0, 350.0);
-  m_bklmHit2dsYvsz->GetXaxis()->SetTitle("z, cm");
-  m_bklmHit2dsYvsz->GetYaxis()->SetTitle("y, cm");
-  m_bklmHit2dsYvsz->SetOption("LIVE");
-  m_bklmLayerVsSector[0] =
-    new TH2F("BackwardLayerVSSector", "Sector VS Layer in barrel forward",
-             30, -0.25, 14.75, 16, -0.25, 7.75);
-  m_bklmLayerVsSector[0]->GetXaxis()->SetTitle("Layer");
-  m_bklmLayerVsSector[0]->GetYaxis()->SetTitle("Sector");
-  m_bklmLayerVsSector[0]->SetStats(0);
-  m_bklmLayerVsSector[0]->SetOption("colz");
-  m_bklmLayerVsSector[1] =
-    new TH2F("ForwardLayerVSSector", "Sector VS Layer in barrel backward",
-             30, -0.25, 14.75, 16, -0.25, 7.75);
-  m_bklmLayerVsSector[1]->GetXaxis()->SetTitle("Layer");
-  m_bklmLayerVsSector[1]->GetYaxis()->SetTitle("Sector");
-  m_bklmLayerVsSector[1]->SetStats(0);
-  m_bklmLayerVsSector[1]->SetOption("colz");
+  m_bklmDigitsN = new TH1F("bklmDigitsN", "Number of BKLM Digits",
+                           250.0, 0.0, 250.0);
+  m_bklmDigitsN->GetXaxis()->SetTitle("Number of BKLM Digits");
+  m_bklmDigitsN->SetOption("LIVE");
   oldDir->cd();
 }
 
@@ -195,7 +143,7 @@ void KLMDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_Digits.isRequired();
-  StoreArray<BKLMDigit> digits(m_outputDigitsName);
+  StoreArray<BKLMDigit> digits(m_inputDigitsName);
   digits.isRequired();
 }
 
@@ -212,20 +160,10 @@ void KLMDQMModule::beginRun()
   for (i = 0; i < n; i++)
     m_eklmStripLayer[i]->Reset();
   /* BKLM. */
-  m_bklmLayerHits->Reset();
-  m_bklmEDep->Reset();
-  m_bklmNPixel->Reset();
-  m_bklmZStrips->Reset();
-  m_bklmPhiStrip->Reset();
-  m_bklmSector->Reset();
-  m_bklmLayer->Reset();
-  m_bklmHit2dsR->Reset();
   m_bklmHit2dsZ->Reset();
-  m_bklmHit2dsYvsx->Reset();
-  m_bklmHit2dsXvsz->Reset();
-  m_bklmHit2dsYvsz->Reset();
-  m_bklmLayerVsSector[0]->Reset();
-  m_bklmLayerVsSector[1]->Reset();
+  m_bklmSectorLayerPhi->Reset();
+  m_bklmSectorLayerZ->Reset();
+  m_bklmDigitsN->Reset();
 }
 
 void KLMDQMModule::event()
@@ -257,34 +195,32 @@ void KLMDQMModule::event()
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
   }
   /* BKLM. */
-  StoreArray<BKLMDigit> digits(m_outputDigitsName);
+  StoreArray<BKLMDigit> digits(m_inputDigitsName);
   int nent = digits.getEntries();
+  m_bklmDigitsN->Fill((double)digits.getEntries());
   for (i = 0; i < nent; i++) {
     BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
-    m_bklmLayerHits->Fill(digit->getLayer());
     if (digit->inRPC())
       m_TimeRPC->Fill(digit->getTime());
     else
       m_TimeScintillatorBKLM->Fill(digit->getTime());
-    m_bklmEDep->Fill(digit->getEDep());
-    m_bklmNPixel->Fill(digit->getNPixel());
-    m_bklmLayerVsSector[1 - digit->isForward()]->Fill(
-      digit->getLayer() - 1, digit->getSector() - 1);
   }
-  StoreArray<BKLMHit2d> hits(m_outputHitsName);
+  StoreArray<BKLMHit2d> hits(m_inputHitsName2d);
   int nnent = hits.getEntries();
   for (i = 0; i < nnent; i++) {
     BKLMHit2d* hit = static_cast<BKLMHit2d*>(hits[i]);
-    m_bklmZStrips->Fill(hit->getZStripAve());
-    m_bklmPhiStrip->Fill(hit->getPhiStripAve());
-    m_bklmSector->Fill(hit->getSector());
-    m_bklmLayer->Fill(hit->getLayer());
     TVector3 hitPosition = hit->getGlobalPosition();
-    m_bklmHit2dsR->Fill(hitPosition.Perp());
     m_bklmHit2dsZ->Fill(hitPosition.Z());
-    m_bklmHit2dsYvsx->Fill(hitPosition.Y(), hitPosition.X());
-    m_bklmHit2dsXvsz->Fill(hitPosition.X(), hitPosition.Z());
-    m_bklmHit2dsYvsz->Fill(hitPosition.Y(), hitPosition.Z());
+  }
+  StoreArray<BKLMHit1d> hits1d(m_inputHitsName1d);
+  int nent1d = hits1d.getEntries();
+  for (i = 0; i < nent1d; i++) {
+    BKLMHit1d* hit1d = static_cast<BKLMHit1d*>(hits1d[i]);
+    if (hit1d->isPhiReadout()) {
+      m_bklmSectorLayerPhi->Fill((hit1d->isForward() ? 120 : 0) + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
+    } else {
+      m_bklmSectorLayerZ->Fill((hit1d->isForward() ? 120 : 0) + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
+    }
   }
 }
 

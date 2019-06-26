@@ -6,48 +6,22 @@
 # TCPV skims
 # P. Urquijo, 29/Sep/2016
 #
-######################################################
-"""
-Time dependent CP violation skim for the analysis of TDCPV analysis in WG3 .
-Physics channels : bd → qqs and bd → ccs .
-Skim code : 13160100
-for analysis users we will reconstruct again in the analysis steering file
-The skim uses standard particles from analysis package , except one list of gamma:E15,
-of specific energy range, for 'B0 -> Kshort pi+ pi- gamma' channel.
+#####################################################
 
-Particle lists used :
-
-phi:loose
-k_S0:all
-eta:loose
-pi0:loose
-pi0:skim
-rho0:loose
-pi+:all
-gamma:E15
-omega:loose
-J/psi: eeLoose
-J/psi: mumuLoose
-psi(2S): eeLoose
-psi(2S): mumuloose
-K*0:loose
-phi:loose
-"""
 __author__ = " Reem Rasheed"
 
 
 from basf2 import *
 from modularAnalysis import *
 from beamparameters import add_beamparameters
-from skimExpertFunctions import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import loadStdDiLeptons
-
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 
 
@@ -59,7 +33,7 @@ skimCode = encodeSkimName('TCPV')
 # create a path
 tcpvskimpath = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 inputMdstList('default', fileList, path=tcpvskimpath)
 

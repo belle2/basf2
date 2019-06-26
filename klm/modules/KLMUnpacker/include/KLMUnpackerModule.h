@@ -101,20 +101,6 @@ namespace Belle2 {
     void loadMapFromDB();
 
     /**
-     * In case the module id is not found in the mapping and useDefaultModuleId
-     * flag is set, this computes the default module id from the lane and
-     * the axis. Sector etc are set to 0.
-     *
-     * @param lane
-     * The lane number, giving for the rpcs the slot number in the crate.
-     *
-     * @param axis
-     * Z or phi.
-     */
-    int getDefaultModuleId(int copperId, int finesse, int lane, int axis,
-                           int channel, bool& outOfRange);
-
-    /**
      * To be used to map electronics address to module id.
      *
      * @param copperId
@@ -130,18 +116,6 @@ namespace Belle2 {
      * The axis bit in the datapacket.
      */
     int electCooToInt(int copper, int finesse, int lane, int axis, int channel);
-
-    /**
-     * Remap the channel ID for scitilators and RPCs.
-     */
-    unsigned short getChannel(int isForward, int sector, int layer, int plane,
-                              unsigned short channel);
-
-    /**
-     * Handle 0-->max max-->0 channel number flip between software and detector.
-     */
-    unsigned short flipChannel(int isForward, int sector, int layer, int plane,
-                               unsigned short channel, bool& isOutRange);
 
     /* Module parameters. */
 
@@ -172,12 +146,6 @@ namespace Belle2 {
 
     /** The flag to keep the even packages. */
     bool m_keepEvenPackages = false;
-
-    /** Use default module id, if not found in mapping file. */
-    bool m_useDefaultModuleId = false;
-
-    /** Use electronic map from DataBase or not. */
-    bool m_loadMapFromDB = true;
 
     /** Load threshold from DataBase (true) or not (false). */
     bool m_loadThresholdFromDB = true;

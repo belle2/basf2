@@ -86,9 +86,11 @@ main.add_module(particlegun)
 
 add_simulation(main, components=['TOP'])
 set_module_parameters(main, type="Geometry", useDB=False, components=["TOP"])
+set_module_parameters(main, type="TOPDigitizer", lookBackWindows=220)
 
 converter = register_module('TOPRawDigitConverter')
 converter.param('outputDigitsName', 'TOPDigitsUnpacked')
+converter.param('lookBackWindows', 220)
 converter.param('minPulseWidth', 0.0)
 converter.param('maxPulseWidth', 1000.0)
 main.add_module(converter)

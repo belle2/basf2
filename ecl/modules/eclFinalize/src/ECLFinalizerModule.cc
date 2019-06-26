@@ -224,6 +224,7 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   eclCluster->setEnergy(eclShower->getEnergy());
   eclCluster->setEnergyRaw(eclShower->getEnergyRaw());
   eclCluster->setEnergyHighestCrystal(eclShower->getEnergyHighestCrystal());
+  eclCluster->setMaxECellId(static_cast<unsigned short>(eclShower->getCentralCellId()));
 
   double covmat[6] = {
     eclShower->getUncertaintyEnergy()* eclShower->getUncertaintyEnergy(),
@@ -249,7 +250,10 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   eclCluster->setPhi(eclShower->getPhi());
   eclCluster->setR(eclShower->getR());
   eclCluster->setPulseShapeDiscriminationMVA(eclShower->getPulseShapeDiscriminationMVA());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   eclCluster->setClusterHadronIntensity(eclShower->getShowerHadronIntensity());
+#pragma GCC diagnostic pop
   eclCluster->setNumberOfHadronDigits(eclShower->getNumberOfHadronDigits());
 
   // set relation to ECLShower

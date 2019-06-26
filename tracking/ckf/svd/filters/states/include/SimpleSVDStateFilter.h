@@ -29,6 +29,7 @@ namespace Belle2 {
     /// Cache for the B field at the IP
     double m_cachedBField;
 
+    /// Kalman stepper (CKF) for SVD
     SVDKalmanStepper m_kalmanStepper;
 
     /// Shortcut for a 4x3 array.

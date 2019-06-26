@@ -69,7 +69,7 @@ NtupleMaker_ntupleFile_hello.root
 NtupleMaker_ntupleTree_
 [INFO] Starting event processing, random seed is set to '1337'
 [ERROR] There is no module that provides event and run numbers (EventMetaData). You must add either the EventInfoSetter or an input module (e.g. RootInput) to the beginning of your path.
-[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.  { function: void Belle2::EventProcessor::process(Belle2::PathPtr, long int) }
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.  { function: void Belle2::EventProcessor::process(const PathPtr&, long int) }
 [INFO] ================================================================================
 [INFO] Error summary: 1 errors and 0 warnings occurred.
 [ERROR] There is no module that provides event and run numbers (EventMetaData). You must add either the EventInfoSetter or an input module (e.g. RootInput) to the beginning of your path.

@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+    <input>../ISRpipimumu.dst.root</input>
+    <output>../ISRpipimumu.udst.root</output>
+    <contact>jiasen@buaa.edu.cn</contact>
+    <interval>nightly</interval>
+</header>
+"""
+
 __author__ = "S. Jia"
 
 import sys
@@ -19,7 +28,7 @@ ISRskimpath = Path()
 
 fileList = ['../ISRpipimumu.dst.root']
 
-inputMdstList('MC9', fileList, path=ISRskimpath)
+inputMdstList('default', fileList, path=ISRskimpath)
 
 # use standard final state particle lists
 stdPi('loose', path=ISRskimpath)
@@ -36,13 +45,13 @@ from skim.quarkonium import ISRpipiccList
 ISRpipicc = ISRpipiccList(path=ISRskimpath)
 
 # output to Udst file
-skimOutputUdst('ISRpipimumu.udst.root', ISRpipicc, path=ISRskimpath)
+skimOutputUdst('../ISRpipimumu.udst.root', ISRpipicc, path=ISRskimpath)
 
 # print out Particle List statistics
 summaryOfLists(ISRpipicc, path=ISRskimpath)
 
 # output skim log information
-setSkimLogging(skim_path=ISRskimpath)
+setSkimLogging(path=ISRskimpath)
 
 # process the path
 process(ISRskimpath)

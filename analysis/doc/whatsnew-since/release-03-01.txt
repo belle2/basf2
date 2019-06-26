@@ -4,6 +4,8 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* The event-based variable ``KLMEnergy`` is removed. It is completely meaningless (:issue:`BII-5002`).
+
 * The variables ``mcDX``, ``mcDY``, ``mcDZ`` are now deprecated, 
   because they are duplicates of :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ`.
   A warning had been added in documentation.
@@ -15,6 +17,15 @@ Variables
 * Added missing error variable DeltaZErr and DeltaBoostErr. Fixed bug in TagV error functions.
 
 * Replaced pValue (tracking variable) with chiProb (vertexing variable) in the vertexing variable collection.
+
+* Added the meta variables :b2:var:`averageValueInList` and
+  :b2:var:`medianValueInList` which calculate the arithmetic mean and median of
+  a given variable in a given particle list.
+
+TreeFitter
+++++++++++
+
+* Fix the :math:`\phi`-dependent loss of performance for displaced vertices (:issue:`BII-4753`).  
 
 Flavor Tagger
 +++++++++++++

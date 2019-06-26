@@ -93,6 +93,7 @@ namespace Belle2 {
         openedRootFile.Close();
       }
 
+      /// Draw the results to a ROOT TCanvas
       void drawDebugPlot(const std::vector<CDCRecoHit3D>& allHits,
                          const std::vector<CDCRecoHit3D>& foundHits,
                          const typename AInBoxAlgorithm::HoughBox& node)

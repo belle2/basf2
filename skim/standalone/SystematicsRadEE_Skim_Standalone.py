@@ -12,15 +12,14 @@ from basf2 import process, statistics, Path
 from modularAnalysis import analysis_main, inputMdstList, \
     skimOutputUdst, summaryOfLists
 from stdCharged import stdE
-from skimExpertFunctions import encodeSkimName, setSkimLogging
-
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
 # create a path to build skim lists
 skimpath = Path()
 
 # some test input data
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=skimpath)
 stdE('all', path=skimpath)
 

@@ -13,13 +13,15 @@
 #include <G4Step.hh>
 
 /* Belle2 headers. */
-#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <klm/dataobjects/EKLMChannelIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 
 using namespace Belle2;
 
@@ -27,35 +29,30 @@ EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
-  int iEndcap, iLayer, iSector, iPlane, iStrip, strip, maxStrip;
-  const EKLMChannelData* channelData;
+  const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
   m_ChannelActive = nullptr;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");
   m_ThresholdHitTime = simPar->getHitTimeThreshold();
-  DBObjPtr<EKLMChannels> channels;
-  if (!channels.isValid())
-    B2FATAL("EKLM channel data are not available.");
-  maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
+  DBObjPtr<KLMChannelStatus> channelStatus;
+  if (!channelStatus.isValid())
+    B2FATAL("KLM channel status data are not available.");
+  int maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_ChannelActive = new bool[maxStrip];
-  for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
-    for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
-         iLayer++) {
-      for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
-        for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
-          for (iStrip = 1; iStrip <= m_GeoDat->getNStrips(); iStrip++) {
-            strip = m_GeoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
-                                          iStrip);
-            channelData = channels->getChannelData(strip);
-            if (channelData == nullptr)
-              B2FATAL("Incomplete EKLM channel data.");
-            m_ChannelActive[strip - 1] = channelData->getActive();
-          }
-        }
-      }
-    }
+  EKLMChannelIndex eklmChannels;
+  for (EKLMChannelIndex& eklmChannel : eklmChannels) {
+    int strip = m_GeoDat->stripNumber(
+                  eklmChannel.getEndcap(), eklmChannel.getLayer(),
+                  eklmChannel.getSector(), eklmChannel.getPlane(),
+                  eklmChannel.getStrip());
+    uint16_t channel = elementNumbers->channelNumberEKLM(strip);
+    enum KLMChannelStatus::ChannelStatus status =
+      channelStatus->getChannelStatus(channel);
+    if (status == KLMChannelStatus::c_Unknown)
+      B2FATAL("Incomplete KLM channel status data.");
+    m_ChannelActive[strip - 1] = (status != KLMChannelStatus::c_Dead);
   }
   StoreArray<MCParticle> particles;
   m_SimHits.registerInDataStore();

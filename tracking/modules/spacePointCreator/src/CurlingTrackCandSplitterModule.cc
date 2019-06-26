@@ -527,6 +527,8 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 }
 
 // ======================================= GET GLOBAL POSITION AND MOMENTUM ============================================================
+
+/// Helper class to retrieve the global position and momentum of a TrueHit
 template<class TrueHit>
 std::pair<const Belle2::B2Vector3<double>, const Belle2::B2Vector3<double> >
 CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)

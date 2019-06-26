@@ -22,6 +22,7 @@ namespace Belle2 {
     /// Structure to summarize utility function to output a list of hits into a RecoTrack.
     struct RecoTrackUtil {
 
+      /// Copies the track information to the RecoTrack
       static RecoTrack* storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks);
 
       /// Copies the trajectory information to the RecoTrack

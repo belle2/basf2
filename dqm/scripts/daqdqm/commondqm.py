@@ -38,11 +38,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                 FADCmode=True)
             path.add_module('SVDDQMExpressReco',
                             offlineZSShaperDigits='SVDShaperDigitsZS5')
-            # SVD Efficiency
-            path.add_module('SVDROIFinder',
-                            recoTrackListName='RecoTracks',
-                            SVDInterceptListName='SVDIntercepts')
-            path.add_module('SVDDQMEfficiency')
 
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
@@ -131,6 +126,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # ARICH
     if components is None or 'ARICH' in components:
         path.add_module('ARICHDQM')
+    # SVD Efficiency
+    if components is None or 'SVD' in components:
+        path.add_module('SVDROIFinder',
+                        recoTrackListName='RecoTracks',
+                        SVDInterceptListName='SVDIntercepts')
+        path.add_module('SVDDQMEfficiency')
     # PhysicsObjectsDQM
     add_analysis_dqm(path)
     # DAQ Monitor

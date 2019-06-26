@@ -348,19 +348,14 @@ namespace TreeFitter {
     const int tauindex = tauIndex();
     const int momindex = momIndex();
 
-    Eigen::Matrix < double, 1, -1, 1, 1, 3 > p_vec = Eigen::Matrix < double, 1, -1, 1, 1, 3 >::Zero(1, dim);
-    Eigen::Matrix < double, 1, -1, 1, 1, 3 > x_m = Eigen::Matrix < double, 1, -1, 1, 1, 3 >::Zero(1, dim);
-    Eigen::Matrix < double, 1, -1, 1, 1, 3 > x_vec = Eigen::Matrix < double, 1, -1, 1, 1, 3 >::Zero(1, dim);
-    double tau = fitparams.getStateVector()(tauindex);
-    double mom = 0;
-    double mom3 = 0;
+    const double tau = fitparams.getStateVector()(tauindex);
+    Eigen::Matrix < double, 1, -1, 1, 1, 3 > x_vec = fitparams.getStateVector().segment(posindex, dim);
+    Eigen::Matrix < double, 1, -1, 1, 1, 3 > x_m = fitparams.getStateVector().segment(posindexmother, dim);
+    Eigen::Matrix < double, 1, -1, 1, 1, 3 > p_vec = fitparams.getStateVector().segment(momindex, dim);
+    const double mom = p_vec.norm();
+    const double mom3 = mom * mom * mom;
+
     if (3 == dim) {
-
-      p_vec = fitparams.getStateVector().segment(momindex, 3);
-      x_m = fitparams.getStateVector().segment(posindexmother, 3);
-      mom = p_vec.norm();
-      mom3 = mom * mom * mom;
-
       // we can already set these
       //diagonal momentum
       p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
@@ -375,13 +370,8 @@ namespace TreeFitter {
 
       p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
       p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
-      p.getH()(2, momindex + 2) = tau * (p_vec(1) * p_vec(1) + p_vec(0) * p_vec(0)) / mom3 ;
 
     } else if (2 == dim) {
-      p_vec = fitparams.getStateVector().segment(momindex, 2);
-      x_m = fitparams.getStateVector().segment(posindexmother, 2);
-      mom = p_vec.norm();
-      mom3 = mom * mom * mom;
 
       // NOTE THAT THESE ARE DIFFERENT IN 2d
       p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1)) / mom3 ;
@@ -391,7 +381,7 @@ namespace TreeFitter {
       p.getH()(0, momindex + 1) = - tau * p_vec(0) * p_vec(1) / mom3 ;
       p.getH()(1, momindex + 0) = - tau * p_vec(1) * p_vec(0) / mom3 ;
     } else {
-      B2FATAL("Dimension of Geometric cosntraint is not 2 or 3. This will crash many things.");
+      B2FATAL("Dimension of Geometric constraint is not 2 or 3. This will crash many things. You should feel bad.");
     }
 
     for (int row = 0; row < dim; ++row) {
@@ -546,23 +536,11 @@ namespace TreeFitter {
 
       // tau has different meaning depending on the dimension of the cosntraint
       // 2-> use x-y projection
-      if (2 == dim) {
-        const Eigen::Matrix<double, 1, 2>
-        vertex_dist = fitparams.getStateVector().segment(posindex, 2) -
-                      fitparams.getStateVector().segment(mother_ps_index, 2);
-        const Eigen::Matrix<double, 1, 2>
-        mom = fitparams.getStateVector().segment(posindex, 2) -
-              fitparams.getStateVector().segment(mother_ps_index, 2);
-        fitparams.getStateVector()(tauindex) = std::abs(vertex_dist.dot(mom)) / mom.norm();
-      } else if (3 == dim) {
-        const Eigen::Matrix<double, 1, 3>
-        vertex_dist = fitparams.getStateVector().segment(posindex, 3) -
-                      fitparams.getStateVector().segment(mother_ps_index, 3);
-        const Eigen::Matrix<double, 1, 3>
-        mom = fitparams.getStateVector().segment(posindex, 3) -
-              fitparams.getStateVector().segment(mother_ps_index, 3);
-        fitparams.getStateVector()(tauindex) = std::abs(vertex_dist.dot(mom)) / mom.norm();
-      }
+      const Eigen::Matrix < double, 1, -1, 1, 1, 3 > vertex_dist =
+        fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
+      const Eigen::Matrix < double, 1, -1, 1, 1, 3 >
+      mom = fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
+      fitparams.getStateVector()(tauindex) = std::abs(vertex_dist.dot(mom)) / mom.norm();
     }
 
     return ErrCode(ErrCode::Status::success);

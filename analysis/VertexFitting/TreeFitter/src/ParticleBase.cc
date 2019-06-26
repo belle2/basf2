@@ -360,6 +360,7 @@ namespace TreeFitter {
       //diagonal momentum
       p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
       p.getH()(1, momindex + 1) = tau * (p_vec(0) * p_vec(0) + p_vec(2) * p_vec(2)) / mom3 ;
+      p.getH()(2, momindex + 2) = tau * (p_vec(0) * p_vec(0) + p_vec(1) * p_vec(1)) / mom3 ;
 
       //offdiagonal momentum
       p.getH()(0, momindex + 1) = - tau * p_vec(0) * p_vec(1) / mom3 ;

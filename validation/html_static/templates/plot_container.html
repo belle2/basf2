@@ -203,11 +203,8 @@
   <span><strong>Package: </strong>{{ package }}</span><br>
   <span><strong>Description: </strong>{{{ description }}}</span><br>
   <span><strong>ROOT file: </strong>{{ rootfile }}.root</span><br>
-  <span><strong>$\chi^2$-Test: </strong>{{ comparison_text }}</span><br>
+  <span><strong>Comparison: </strong>{{ comparison_text }}</span><br>
   {{! if the warning has not been set, no pvalue is available either }}
-  {{#comparison_pvalue_warn}}
-  <span><strong>Comparison p-value: </strong>{{ comparison_pvalue }} (Warning below {{ comparison_pvalue_warn }} | Error below {{ comparison_pvalue_error }})</span><br>
-  {{/comparison_pvalue_warn}}
   <span><strong>Contact: </strong>{{ contact }}</span><br>
   <span><strong>Check for: </strong>{{ check }}</span><br>
   <!-- todo: share this plot -->

@@ -142,19 +142,6 @@ class Plotuple:
 
         self.comparison_result = "not_compared"
 
-        # The p-value that the Chi^2-Test returned.
-        self.pvalue = 'n/a'
-
-        #: an comparison error will be shown if the p-value is smaller than
-        #: this number
-        #: will bet set by the chi2test function
-        self.pvalue_error = None
-
-        #: an comparison warning will be shown if the p-value is smaller than
-        #: this number
-        #: will bet set by the chi2test function
-        self.pvalue_warn = None
-
         # The json file, in which the ntuple information is stored
         self.file = None
 
@@ -224,12 +211,11 @@ class Plotuple:
         mop = metaoptions.MetaOptionParser(self.metaoptions)
         return mop.has_option("expert")
 
-    def chi2test(self):
+    def perform_comparison(self):
         """!
         Takes the reference (self.reference.object) and the newest revision
-        (self.newest.object) and a canvas. Performs a Chi^2-Test on the
-        two histograms and sets the background of the canvas correspondingly.
-        Sets self.pvalue to the p-value of the Chi^2-Test.
+        (self.newest.object) and a canvas. Performs a comparison of the
+        two objects.
         @return: None
         """
         tester = validationcomparison.get_comparison(
@@ -469,7 +455,7 @@ class Plotuple:
         # the plot list:
         if self.reference is not None and self.newest \
                 and not self.reference == self.newest:
-            self.chi2test()
+            self.perform_comparison()
 
         # A variable which holds whether we
         # have drawn on the canvas already or not
@@ -631,7 +617,7 @@ class Plotuple:
         # the plot list:
         if self.reference is not None and self.newest \
                 and not self.reference == self.newest:
-            self.chi2test()
+            self.perform_comparison()
 
         if 'nogrid' not in self.metaoptions:
             canvas.SetGrid()
@@ -836,9 +822,6 @@ class Plotuple:
                 title=self.get_plot_title(),
                 comparison_result=self.comparison_result,
                 comparison_text=self.comparison_result_long,
-                comparison_pvalue=self.pvalue,
-                comparison_pvalue_warn=self.pvalue_warn,
-                comparison_pvalue_error=self.pvalue_error,
                 description=self.description,
                 contact=self.contact,
                 check=self.check,

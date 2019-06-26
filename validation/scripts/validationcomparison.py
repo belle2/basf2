@@ -448,34 +448,39 @@ class Chi2Test(ComparisonBase):
         if self._pvalue is None:
             return "error"
 
-        pvalue_warn = self.mop.pvalue_warn()
-        pvalue_error = self.mop.pvalue_error()
+        self._pvalue_warn = self.mop.pvalue_warn()
+        self._pvalue_error = self.mop.pvalue_error()
 
-        if pvalue_warn is None:
-            pvalue_warn = 1.0
-        if pvalue_error is None:
-            pvalue_error = 0.01
+        if self._pvalue_warn is None:
+            self._pvalue_warn = 1.0
+        if self._pvalue_error is None:
+            self._pvalue_error = 0.01
 
         # If pvalue < 0.01: Very strong presumption against neutral
         # hypothesis
-        if self._pvalue < pvalue_error:
+        if self._pvalue < self._pvalue_error:
             return "error"
         # If pvalue < 1: Deviations at least exists
-        elif self._pvalue < pvalue_warn:
+        elif self._pvalue < self._pvalue_warn:
             return "warning"
         else:
             return "equal"
 
     def _get_comparison_result_long(self) -> str:
-        # Will call format once more on this result to fill revision1
-        # and revision2.
-        # In particular that means that we have to use quadruple braces
-        # on anything that shall remain braces.
+        if isinstance(self._pvalue, float):
+            pvalue_str = f"{self._pvalue:.6f}"
+        else:
+            pvalue_str = str(self._pvalue)
+
         return r'Performed $\chi^2$-Test between {{revision1}} ' \
                r'and {{revision2}} ' \
                r'($\chi^2$ = {chi2:.4f}; NDF = {ndf}; ' \
-               r'$\chi^2/\text{{{{NDF}}}}$ = {chi2ndf:.4f})'.format(
-                   chi2=self._chi2, ndf=self._ndf, chi2ndf=self._chi2ndf
+               r'$\chi^2/\text{{{{NDF}}}}$ = {chi2ndf:.4f}).' \
+               r' <b>p-value: {pvalue}</b> (p-value warn: {pvalue_warn}, ' \
+               r'p-value error: {pvalue_error})'.format(
+                   chi2=self._chi2, ndf=self._ndf, chi2ndf=self._chi2ndf,
+                   pvalue=pvalue_str, pvalue_warn=self._pvalue_warn,
+                   pvalue_error=self._pvalue_error
                )
 
 

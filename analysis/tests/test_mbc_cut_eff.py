@@ -11,7 +11,7 @@ from ROOT import TNtuple
 
 
 class TestMbcEff(unittest.TestCase):
-    """The unit test case for TreeFitter"""
+    """The unit test"""
 
     def testMbcEff(self):
         """Reconstruct stuff with tight Mbc cut."""

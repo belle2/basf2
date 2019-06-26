@@ -167,7 +167,7 @@ def DstToD0PiD0ToHpHmKs(path):
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:HpHmKs' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        reconstructDecay('D0:HpHmKs' + str(chID) + ' -> ' + channel, D0cuts, chID, path=path)
 
         reconstructDecay('D*+:HpHmKs' + str(chID) + ' -> pi+:all D0:HpHmKs' + str(chID), Dstcuts, chID, path=path)
         DstList.append('D*+:HpHmKs' + str(chID))

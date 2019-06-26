@@ -52,7 +52,6 @@ class ComparisonBase:
     pass
 
 
-# fixme: This currently returns lists for chi2, ndf, and chi2/ndf. This surely isn't what we wanted
 class Chi2Test(ComparisonBase):
 
     """
@@ -96,9 +95,9 @@ class Chi2Test(ComparisonBase):
         """
         @return: True if the two objects can be compared, False otherwise
         """
-        return self.correct_types() and self.has_compatible_bins()
+        return self._correct_types() and self._has_compatible_bins()
 
-    def correct_types(self):
+    def _correct_types(self):
         """
         @return: True if the two objects have a) a type supported for
             comparison and b) can be compared with each other
@@ -162,7 +161,7 @@ class Chi2Test(ComparisonBase):
             self._internal_compare()
         self.computed = True
 
-    def ensure_zero_error_has_no_content(self, a, b):
+    def _ensure_zero_error_has_no_content(self, a, b):
         """
         Ensure there are no bins which have a content set, but 0 error
         This bin content will be set to 0 to disable this bin completely during
@@ -180,7 +179,7 @@ class Chi2Test(ComparisonBase):
                           "zero for both histograms, because both histograms "
                           "have vanishing errors there.".format(ibin))
 
-    def has_compatible_bins(self):
+    def _has_compatible_bins(self):
         """
         Check if both ROOT obeject have the same amount of bins
         @return: True if the bins are equal, otherwise False
@@ -226,7 +225,7 @@ class Chi2Test(ComparisonBase):
         Performs the actual Chi^2 test
         @return: The request result quantity
         """
-        if not self.correct_types():
+        if not self._correct_types():
             msg = "Comparison of {} (Type {}) with {} (Type {}) not " \
                   "supported.\nPlease open a JIRA issue (validation " \
                   "component) if you need this supported. "
@@ -238,7 +237,7 @@ class Chi2Test(ComparisonBase):
                     self.object_b.ClassName()
                 )
             )
-        if not self.has_compatible_bins():
+        if not self._has_compatible_bins():
             msg = "The objects have differing x bin count: {} has {} vs. {} " \
                   "has {}."
             raise DifferingBinCount(
@@ -293,7 +292,7 @@ class Chi2Test(ComparisonBase):
             comp_options += "UU"
 
         if comp_weight_a and comp_weight_b:
-            self.ensure_zero_error_has_no_content(first_obj, second_obj)
+            self._ensure_zero_error_has_no_content(first_obj, second_obj)
 
         # use numpy arrays to support ROOT's pass-by-reference interface here
         res_chi2 = numpy.array([1], numpy.float64)

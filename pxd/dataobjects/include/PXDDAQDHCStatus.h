@@ -92,6 +92,12 @@ namespace Belle2 {
     void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};
     uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
 
+    void setGatedInfo(uint32_t e) { m_gated_mode = e;};
+    bool getGatedInfo(void) const { return m_gated_mode;};
+
+    void setGatedHER(uint32_t e) { m_gated_her = e;};
+    bool getGatedHER(void) const { return m_gated_her;};
+
 
     /** Add DHE information
      * @param daqdhe DHE Status Object
@@ -131,11 +137,13 @@ namespace Belle2 {
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
     uint32_t m_errorinfo; /* erroinfo from the DHC END */
+    bool m_gated_mode{false}; /* gated info from the DHC START */
+    bool m_gated_her{false}; /* gated info from the DHC START - true HER, 0 LER*/
 
     /** Vector of DHE informations belonging to this event */
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
-    ClassDef(PXDDAQDHCStatus, 3);
+    ClassDef(PXDDAQDHCStatus, 4);
 
   }; // class PXDDAQDHCStatus
 

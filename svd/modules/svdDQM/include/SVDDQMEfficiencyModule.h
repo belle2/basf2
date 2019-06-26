@@ -70,6 +70,7 @@ namespace Belle2 {
 
     StoreArray<SVDCluster> m_svdClusters; /**< SVDCluster StoreArray*/
     StoreArray<SVDIntercept> m_intercepts; /**< SVDIntercept StoreArray*/
+    StoreArray<RecoTrack> m_recoTracks; /**< RecoTrack StoreArray*/
 
     float m_fiducialU; /**< stay away from the U border by m_fiducialU (in cm)*/
     float m_fiducialV; /**< stay away from the U border by m_fiducialU (in cm)*/

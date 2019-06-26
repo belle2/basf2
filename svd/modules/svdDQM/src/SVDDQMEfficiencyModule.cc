@@ -70,17 +70,24 @@ void SVDDQMEfficiencyModule::initialize()
   //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them
   m_svdClusters.isOptional(m_svdClustersName);
   m_intercepts.isOptional(m_interceptsName);
+  m_recoTracks.isOptional();
+
 }
 
 
 void SVDDQMEfficiencyModule::event()
 {
   if (!m_svdClusters.isValid()) {
-    B2INFO("SvdClusters array is missing, no efficiencies");
+    B2INFO("SVDClusters array is missing, no SVD efficiencies");
     return;
   }
   if (!m_intercepts.isValid()) {
-    B2INFO("RecoTrack array is missing, no efficiencies");
+    B2INFO("SVDIntercepts array is missing, no SVD efficiencies");
+    return;
+  }
+
+  if (!m_recoTracks.isValid()) {
+    B2INFO("RecoTracks array is missing, no SVD efficiencies");
     return;
   }
 

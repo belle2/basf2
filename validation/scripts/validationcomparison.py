@@ -9,11 +9,16 @@ Run `python3 validationcomparison.py --help` for more information. """
 import argparse
 import os.path
 import numpy
+from metaoptions import MetaOptionParser
 from abc import ABC, abstractmethod
 
 # external
 import ROOT
 
+
+# ==============================================================================
+# Custom Exceptions
+# ==============================================================================
 
 class ComparisonFailed(Exception):
     """
@@ -46,23 +51,86 @@ class TooFewBins(Exception):
     pass
 
 
+# ==============================================================================
+# Comparison class selector
+# ==============================================================================
+
+
+def get_comparison(object_1, object_2, metaoptions):
+    """ Uses the metaoptions to determine which comparison algorithm is used
+    and initializes the corresponding subclass of :class:`ComparisonBase` that
+    implements the actual comparison and holds the results.
+    """
+    mop = MetaOptionParser(metaoptions)
+
+    if not mop.has_option("kolmogorov"):
+        tester = Chi2Test(
+            object_1,
+            object_2,
+            metaoptions=metaoptions
+        )
+    else:
+        tester = None
+
+    return tester
+
+
+# ==============================================================================
+# Comparison Base Class
+# ==============================================================================
+
 class ComparisonBase(ABC):
     """
-    Base class for all comparison implementations
+    Base class for all comparison implementations.
+
+    Follows 3 steps:
+
+    1. Initialize the class together with two ROOT objects of different
+    revisions (that are to be compared) and the metaoptions (given in the
+    corresponding validation (steering) file), that determine how to compare
+    them.
+
+    2. The Comparison class saves the ROOT objects and the metaoptions
+    internally, but does not compute anything yet
+
+    3. If :meth:`ensure_compute` is called, or any property is accessed that
+    depends on computation, the internal implementation :meth:`_compute`
+    (to be implemented in the subclass) is called.
+
+    4. :meth:`_compute` ensures that all values, like chi2, p-value etc. are
+    computed
+
+    5. Two properties :meth:`comparison_result` (pass/warning/error) and
+    :meth:`comparison_result_long` (longer description of the comparison result)
+    allow to access the results.
     """
 
-    def __init__(self, object_a, object_b, debug=False):
+    def __init__(self, object_a, object_b, metaoptions="", debug=False):
         #: store the first object to compare
         self.object_a = object_a
 
         #: store the second object to compare
         self.object_b = object_b
 
+        #: MetaOptionParser
+        self.mop = MetaOptionParser(metaoptions)
+
         #: enable debug?
         self.debug = debug
 
         #: used to store, whether the quantities have already been compared
         self.computed = False
+
+        # will be set to true, if for some reason no test could be
+        # performed, but the two objects are still different (for example
+        # different bin size)
+        self._no_comparison_but_still_different = False
+
+        #: Comparison result, i.e. pass/warning/error
+        self._comparison_result = ""
+        #: Longer description of the comparison result (e.g. 'performed Chi2
+        #: Test ... with chi2 = ...').
+        self._comparison_result_long = ""
 
     def ensure_compute(self):
         """
@@ -72,8 +140,55 @@ class ComparisonBase(ABC):
         if self.computed:
             return
 
-        self._compute()
+        if self.mop.has_option("nocompare"):
+            # is comparison disabled for this plot ?
+            self._comparison_result_long = 'Testing is disabled for this plot'
+            return
+
+        fail_message = "Comparison failed: "
+
+        try:
+            self._compute()
+        except ObjectsNotSupported as e:
+            self._comparison_result_long = fail_message + str(e)
+        except DifferingBinCount as e:
+            self._comparison_result_long = fail_message + str(e)
+            self._no_comparison_but_still_different = True
+        except TooFewBins as e:
+            self._comparison_result_long = fail_message + str(e)
+        except ComparisonFailed as e:
+            self._comparison_result_long = fail_message + str(e)
+            self._no_comparison_but_still_different = True
+
+        self._comparison_result = self._get_comparison_result()
+        self._comparison_result_long = self._get_comparison_result_long()
+
+        if self._no_comparison_but_still_different:
+            self._comparison_result = "error"
+
         self.computed = True
+
+    @abstractmethod
+    def _get_comparison_result(self) -> str:
+        """ Used to format the value of :attr:`_comparison_result`. """
+        pass
+
+    @abstractmethod
+    def _get_comparison_result_long(self) -> str:
+        """ Used to format the value of :attr:`_comparison_result_long`. """
+        pass
+
+    @property
+    def comparison_result(self):
+        """ Comparison result, i.e. pass/warning/error """
+        self.ensure_compute()
+        return self._comparison_result
+
+    @property
+    def comparison_result_long(self):
+        """ Longer description of the comparison result """
+        self.ensure_compute()
+        return self._comparison_result_long
 
     @abstractmethod
     def _compute(self):
@@ -149,6 +264,10 @@ class ComparisonBase(ABC):
 
         return th1
 
+# ==============================================================================
+# Implementation of specific comparison algorithms
+# ==============================================================================
+
 
 class Chi2Test(ComparisonBase):
 
@@ -159,16 +278,17 @@ class Chi2Test(ComparisonBase):
     tests for a wider selection of ROOT objects.
     """
 
-    def __init__(self, object_a, object_b, debug=False):
+    def __init__(self, object_a, object_b, metaoptions="", debug=False):
         """
         Constructor. Store the two histograms/profiles operated on.
         :param object_a: First object
         :param object_b: Second object
         :param debug: Print debug information?
         """
-        super().__init__(object_a, object_b, debug=debug)
+        super().__init__(object_a, object_b, metaoptions=metaoptions, debug=debug)
 
-        # Those will only be accessed via methods.
+        # The following attributes will only be accessed via methods.
+
         #: pvalue
         self._pvalue = None
         #: chi2
@@ -177,34 +297,6 @@ class Chi2Test(ComparisonBase):
         self._chi2ndf = None
         #: number of degrees of freedom
         self._ndf = None
-
-    def pvalue(self):
-        """
-        @return the probaility value of the comparison
-        """
-        self.ensure_compute()
-        return self._pvalue
-
-    def chi2(self):
-        """
-        @return the chi2 value of the comparison
-        """
-        self.ensure_compute()
-        return self._chi2
-
-    def chi2ndf(self):
-        """
-        @return the chi2 divided by the number of degrees of freedom
-        """
-        self.ensure_compute()
-        return self._chi2ndf
-
-    def ndf(self):
-        """
-        @return the number of degrees of freedom
-        """
-        self.ensure_compute()
-        return self._ndf
 
     def _ensure_zero_error_has_no_content(self, a, b):
         """
@@ -352,6 +444,45 @@ class Chi2Test(ComparisonBase):
         self._pvalue, self._chi2, self._chi2ndf, self._ndf = \
             res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
 
+    def _get_comparison_result(self) -> str:
+        if self._pvalue is None:
+            return "error"
+
+        pvalue_warn = self.mop.pvalue_warn()
+        pvalue_error = self.mop.pvalue_error()
+
+        if pvalue_warn is None:
+            pvalue_warn = 1.0
+        if pvalue_error is None:
+            pvalue_error = 0.01
+
+        # If pvalue < 0.01: Very strong presumption against neutral
+        # hypothesis
+        if self._pvalue < pvalue_error:
+            return "error"
+        # If pvalue < 1: Deviations at least exists
+        elif self._pvalue < pvalue_warn:
+            return "warning"
+        else:
+            return "equal"
+
+    def _get_comparison_result_long(self) -> str:
+        # Will call format once more on this result to fill revision1
+        # and revision2.
+        # In particular that means that we have to use quadruple braces
+        # on anything that shall remain braces.
+        return r'Performed $\chi^2$-Test between {{revision1}} ' \
+               r'and {{revision2}} ' \
+               r'($\chi^2$ = {chi2:.4f}; NDF = {ndf}; ' \
+               r'$\chi^2/\text{{{{NDF}}}}$ = {chi2ndf:.4f})'.format(
+                   chi2=self._chi2, ndf=self._ndf, chi2ndf=self._chi2ndf
+               )
+
+
+# ==============================================================================
+# Helpers
+# ==============================================================================
+
 
 class TablePrinter(object):
     """ A tiny class to print columns of fixed width numbers. """
@@ -458,6 +589,10 @@ def print_contents_and_errors(obj_a, obj_b):
 
     print(f"Total chi2: {chi2_tot:10.5f}")
 
+
+# ==============================================================================
+# Command Line Interface
+# ==============================================================================
 
 def debug_cli():
     """ A small command line interface for debugging purposes. """

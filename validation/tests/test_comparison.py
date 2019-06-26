@@ -142,7 +142,8 @@ class TestComparison(unittest.TestCase):
         c = validationcomparison.Chi2Test(self.profileA, self.profileB)
 
         self.assertTrue(c.can_compare())
-        self.assertAlmostEqual(c.pvalue(), 0.22495088947037362)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 0.22495088947037362)
 
     def test_compare_profiles_almost_equal(self):
         """
@@ -152,8 +153,9 @@ class TestComparison(unittest.TestCase):
             self.profileAequal, self.profileBequal)
 
         self.assertTrue(c.can_compare())
-        self.assertAlmostEqual(c.pvalue(), 0.43093514577898634)
-        self.assertAlmostEqual(c.ndf(), 49)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 0.43093514577898634)
+        self.assertAlmostEqual(c._ndf, 49)
 
     def test_compare_zero_error_profiles(self):
         """
@@ -173,13 +175,12 @@ class TestComparison(unittest.TestCase):
             self.profileZeroErrorBinsTwo)
 
         self.assertTrue(c.can_compare())
-        pvalue = c.pvalue()
-        # chi2 = c.chi2()
-        # chi2ndf = c.chi2ndf()
 
-        self.assertAlmostEqual(pvalue, 0.4835651485797353)
+        c.ensure_compute()
+
+        self.assertAlmostEqual(c._pvalue, 0.4835651485797353)
         # should still be only 49 ndf
-        self.assertEqual(c.ndf(), 49)
+        self.assertEqual(c._ndf, 49)
 
     def test_compare_histograms(self):
         """
@@ -189,10 +190,11 @@ class TestComparison(unittest.TestCase):
         c = validationcomparison.Chi2Test(self.histogramA, self.histogramB)
 
         self.assertTrue(c.can_compare())
-        self.assertAlmostEqual(c.pvalue(), 0.371600562118221)
-        self.assertAlmostEqual(c.chi2(), 42.308970111484086)
-        self.assertAlmostEqual(c.chi2ndf(), 1.0577242527871022)
-        self.assertEqual(c.ndf(), 40)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 0.371600562118221)
+        self.assertAlmostEqual(c._chi2, 42.308970111484086)
+        self.assertAlmostEqual(c._chi2ndf, 1.0577242527871022)
+        self.assertEqual(c._ndf, 40)
 
     def test_compare_unsupported_object(self):
         """
@@ -210,7 +212,7 @@ class TestComparison(unittest.TestCase):
         self.assertFalse(c.can_compare())
 
         with self.assertRaises(validationcomparison.ObjectsNotSupported):
-            c.pvalue()
+            c._compute()
 
     def test_compare_tefficiencies(self):
         """
@@ -221,11 +223,11 @@ class TestComparison(unittest.TestCase):
         c = validationcomparison.Chi2Test(self.teffA, self.teffB)
 
         self.assertTrue(c.can_compare())
-
-        self.assertAlmostEqual(c.pvalue(), 0.9760318312199932)
-        self.assertAlmostEqual(c.chi2(), 8.16784873)
-        self.assertAlmostEqual(c.chi2ndf(), 0.45376937)
-        self.assertEqual(c.ndf(), 18)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 0.9760318312199932)
+        self.assertAlmostEqual(c._chi2, 8.16784873)
+        self.assertAlmostEqual(c._chi2ndf, 0.45376937)
+        self.assertEqual(c._ndf, 18)
 
     def test_compare_tefficiencies_same(self):
         """
@@ -236,11 +238,11 @@ class TestComparison(unittest.TestCase):
 
         c = validationcomparison.Chi2Test(self.teffA, self.teffA)
         self.assertTrue(c.can_compare())
-
-        self.assertAlmostEqual(c.pvalue(), 1.0)
-        self.assertAlmostEqual(c.chi2(), 0.0)
-        self.assertAlmostEqual(c.chi2ndf(), 0.0)
-        self.assertEqual(c.ndf(), 18)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 1.0)
+        self.assertAlmostEqual(c._chi2, 0.0)
+        self.assertAlmostEqual(c._chi2ndf, 0.0)
+        self.assertEqual(c._ndf, 18)
 
     def test_compare_differing_bins(self):
         """
@@ -254,7 +256,7 @@ class TestComparison(unittest.TestCase):
         self.assertFalse(c.can_compare())
 
         with self.assertRaises(validationcomparison.DifferingBinCount):
-            c.pvalue()
+            c._compute()
 
 
 if __name__ == "__main__":

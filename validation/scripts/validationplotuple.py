@@ -138,7 +138,7 @@ class Plotuple:
         # The result of the Chi^2-Test. By default, there is no such result.
         # If the Chi^2-Test has been performed, this variable holds between
         # which objects it has been performed.
-        self.chi2test_result = 'n/a'
+        self.comparison_result_long = 'n/a'
 
         self.comparison_result = "not_compared"
 
@@ -232,77 +232,23 @@ class Plotuple:
         Sets self.pvalue to the p-value of the Chi^2-Test.
         @return: None
         """
-        mop = metaoptions.MetaOptionParser(self.metaoptions)
+        tester = validationcomparison.get_comparison(
+            self.reference.object,
+            self.newest.object,
+            self.metaoptions
+        )
 
-        if mop.has_option("nocompare"):
-            # is comparison disabled for this plot ?
-            self.chi2test_result = 'Chi^2 test is disabled for this plot'
-            self.pvalue = None
-            return
-
-        fail_message = "Comparison failed: "
-
-        # will be set to true, if for some reason no Chi^2 test could be
-        # performed, but the two objects are still different (for example
-        # different bin size)
-        no_comparison_but_still_different = False
-
-        # execute the chi2 test, extract the relevant values and handle
-        # possible exceptions
-        pvalue = None
-        chi2 = None
-        chi2ndf = None
-        ndf = None
-        try:
-            ctest = validationcomparison.Chi2Test(self.reference.object,
-                                                  self.newest.object)
-            pvalue = ctest.pvalue()
-            chi2 = ctest.chi2()
-            chi2ndf = ctest.chi2ndf()
-            ndf = ctest.ndf()
-        except validationcomparison.ObjectsNotSupported as e:
-            self.chi2test_result = fail_message + str(e)
-        except validationcomparison.DifferingBinCount as e:
-            self.chi2test_result = fail_message + str(e)
-            no_comparison_but_still_different = True
-        except validationcomparison.TooFewBins as e:
-            self.chi2test_result = fail_message + str(e)
-        except validationcomparison.ComparisonFailed as e:
-            self.chi2test_result = fail_message + str(e)
-            no_comparison_but_still_different = True
-
-        if no_comparison_but_still_different:
+        if tester is None:
+            self.comparison_result_long = "Comparison not possible, because no" \
+                "appropriate comparison class could be " \
+                "found."
             self.comparison_result = "error"
-            self.pvalue = 0.0
-
-        if pvalue is not None:
-            # check if there is a custom setting for pvalue sensitivity
-            self.pvalue_warn = mop.pvalue_warn()
-            self.pvalue_error = mop.pvalue_error()
-
-            if self.pvalue_warn is None:
-                self.pvalue_warn = 1.0
-            if self.pvalue_error is None:
-                self.pvalue_error = 0.01
-
-            # If pvalue < 0.01: Very strong presumption against neutral
-            # hypothesis
-            if pvalue < self.pvalue_error:
-                self.comparison_result = "error"
-            # If pvalue < 1: Deviations at least exists
-            elif pvalue < self.pvalue_warn:
-                self.comparison_result = "warning"
-            else:
-                self.comparison_result = "equal"
-
-            self.chi2test_result = \
-                rf'Performed $\chi^2$-Test between {self.reference.revision} ' \
-                rf'and {self.newest.revision} ' \
-                rf'($\chi^2$ = {chi2:.4f}; NDF = {ndf}; ' \
-                rf'$\chi^2/\text{{NDF}}$ = {chi2ndf:.4f})'
-            self.pvalue = pvalue
         else:
-            self.pvalue = None
+            self.comparison_result_long = tester.comparison_result_long.format(
+                revision1=self.reference.revision,
+                revision2=self.newest.revision
+            )
+            self.comparison_result = tester.comparison_result
 
     def _set_background(self, canvas):
 
@@ -889,7 +835,7 @@ class Plotuple:
             return json_objects.ComparisonPlot(
                 title=self.get_plot_title(),
                 comparison_result=self.comparison_result,
-                comparison_text=self.chi2test_result,
+                comparison_text=self.comparison_result_long,
                 comparison_pvalue=self.pvalue,
                 comparison_pvalue_warn=self.pvalue_warn,
                 comparison_pvalue_error=self.pvalue_error,

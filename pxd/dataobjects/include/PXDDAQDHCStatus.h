@@ -92,8 +92,8 @@ namespace Belle2 {
     void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};
     uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
 
-    void setGatedInfo(uint32_t e) { m_gated_mode = e;};
-    bool getGatedInfo(void) const { return m_gated_mode;};
+    void setGatedFlag(uint32_t e) { m_gated_mode = e;};
+    bool getGatedFlag(void) const { return m_gated_mode;};
 
     void setGatedHER(uint32_t e) { m_gated_her = e;};
     bool getGatedHER(void) const { return m_gated_her;};

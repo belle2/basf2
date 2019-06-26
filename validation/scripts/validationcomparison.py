@@ -9,6 +9,7 @@ Run `python3 validationcomparison.py --help` for more information. """
 import argparse
 import os.path
 import numpy
+from abc import ABC, abstractmethod
 
 # external
 import ROOT
@@ -45,51 +46,38 @@ class TooFewBins(Exception):
     pass
 
 
-class ComparisonBase:
+class ComparisonBase(ABC):
     """
     Base class for all comparison implementations
     """
-    pass
-
-
-class Chi2Test(ComparisonBase):
-
-    """
-    Perform a Chi2Test for ROOT objects. The chi2 test method is e.g. described
-    in the documentation of TH1::Chi2Test. Basically this class wraps around
-    this Chi2Test function, and takes care that we can call perform these
-    tests for a wider selection of ROOT objects.
-    """
 
     def __init__(self, object_a, object_b, debug=False):
-        """
-        Constructor. Store the two histograms/profiles operated on.
-        :param object_a: First object
-        :param object_b: Second object
-        :param debug: Print debug information?
-        """
-
         #: store the first object to compare
         self.object_a = object_a
 
         #: store the second object to compare
         self.object_b = object_b
 
-        #: used to store, whether the quantities have already been compared
-        self.computed = False
-
         #: enable debug?
         self.debug = debug
 
-        # Those will only be accessed via methods.
-        #: pvalue
-        self._pvalue = None
-        #: chi2
-        self._chi2 = None
-        #: chi2 / number of degrees of freedom
-        self._chi2ndf = None
-        #: number of degrees of freedom
-        self._ndf = None
+        #: used to store, whether the quantities have already been compared
+        self.computed = False
+
+    def ensure_compute(self):
+        """
+        Ensure all required quantities get computed and are cached inside the
+        class
+        """
+        if self.computed:
+            return
+
+        self._compute()
+        self.computed = True
+
+    @abstractmethod
+    def _compute(self):
+        pass
 
     def can_compare(self):
         """
@@ -119,65 +107,6 @@ class Chi2Test(ComparisonBase):
                 return False
 
         return True
-
-    def pvalue(self):
-        """
-        @return the probaility value of the comparison
-        """
-        self.ensure_compute()
-        return self._pvalue
-
-    def chi2(self):
-        """
-        @return the chi2 value of the comparison
-        """
-        self.ensure_compute()
-        return self._chi2
-
-    def chi2ndf(self):
-        """
-        @return the chi2 divided by the number of degrees of freedom
-        """
-        self.ensure_compute()
-        return self._chi2ndf
-
-    def ndf(self):
-        """
-        @return the number of degrees of freedom
-        """
-        self.ensure_compute()
-        return self._ndf
-
-    def ensure_compute(self):
-        """
-        Ensure all required quantities get computed and are cached inside the
-        class
-        """
-        if self.computed:
-            return
-
-        #: compute and store quantities
-        self._pvalue, self._chi2, self._chi2ndf, self._ndf = \
-            self._internal_compare()
-        self.computed = True
-
-    def _ensure_zero_error_has_no_content(self, a, b):
-        """
-        Ensure there are no bins which have a content set, but 0 error
-        This bin content will be set to 0 to disable this bin completely during
-        the comparison
-        """
-        nbins = a.GetNbinsX()
-        for ibin in range(1, nbins + 1):
-            if a.GetBinError(ibin) <= 0.0 and b.GetBinError(ibin) <= 0.0:
-                # set the bin content of the profile plots to zero so ROOT
-                # will ignore this bin in its comparison
-                a.SetBinContent(ibin, 0.0)
-                b.SetBinContent(ibin, 0.0)
-                if self.debug:
-                    print("DEBUG: Warning: Setting bin content of bin {} to "
-                          "zero for both histograms, because both histograms "
-                          "have vanishing errors there.".format(ibin))
 
     def _has_compatible_bins(self):
         """
@@ -220,10 +149,85 @@ class Chi2Test(ComparisonBase):
 
         return th1
 
-    def _internal_compare(self):
+
+class Chi2Test(ComparisonBase):
+
+    """
+    Perform a Chi2Test for ROOT objects. The chi2 test method is e.g. described
+    in the documentation of TH1::Chi2Test. Basically this class wraps around
+    this Chi2Test function, and takes care that we can call perform these
+    tests for a wider selection of ROOT objects.
+    """
+
+    def __init__(self, object_a, object_b, debug=False):
+        """
+        Constructor. Store the two histograms/profiles operated on.
+        :param object_a: First object
+        :param object_b: Second object
+        :param debug: Print debug information?
+        """
+        super().__init__(object_a, object_b, debug=debug)
+
+        # Those will only be accessed via methods.
+        #: pvalue
+        self._pvalue = None
+        #: chi2
+        self._chi2 = None
+        #: chi2 / number of degrees of freedom
+        self._chi2ndf = None
+        #: number of degrees of freedom
+        self._ndf = None
+
+    def pvalue(self):
+        """
+        @return the probaility value of the comparison
+        """
+        self.ensure_compute()
+        return self._pvalue
+
+    def chi2(self):
+        """
+        @return the chi2 value of the comparison
+        """
+        self.ensure_compute()
+        return self._chi2
+
+    def chi2ndf(self):
+        """
+        @return the chi2 divided by the number of degrees of freedom
+        """
+        self.ensure_compute()
+        return self._chi2ndf
+
+    def ndf(self):
+        """
+        @return the number of degrees of freedom
+        """
+        self.ensure_compute()
+        return self._ndf
+
+    def _ensure_zero_error_has_no_content(self, a, b):
+        """
+        Ensure there are no bins which have a content set, but 0 error
+        This bin content will be set to 0 to disable this bin completely during
+        the comparison
+        """
+        nbins = a.GetNbinsX()
+        for ibin in range(1, nbins + 1):
+            if a.GetBinError(ibin) <= 0.0 and b.GetBinError(ibin) <= 0.0:
+                # set the bin content of the profile plots to zero so ROOT
+                # will ignore this bin in its comparison
+                a.SetBinContent(ibin, 0.0)
+                b.SetBinContent(ibin, 0.0)
+                if self.debug:
+                    print("DEBUG: Warning: Setting bin content of bin {} to "
+                          "zero for both histograms, because both histograms "
+                          "have vanishing errors there.".format(ibin))
+
+    def _compute(self) -> None:
         """
         Performs the actual Chi^2 test
-        @return: The request result quantity
+        @return: None
         """
         if not self._correct_types():
             msg = "Comparison of {} (Type {}) with {} (Type {}) not " \
@@ -249,6 +253,7 @@ class Chi2Test(ComparisonBase):
                 )
             )
 
+        # fixme: This doesn't work for sure
         local_object_a = self.object_a
         local_object_b = self.object_b
 
@@ -344,7 +349,8 @@ class Chi2Test(ComparisonBase):
 
         res_chi2ndf = res_chi2 / res_ndf
 
-        return res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
+        self._pvalue, self._chi2, self._chi2ndf, self._ndf = \
+            res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
 
 
 class TablePrinter(object):

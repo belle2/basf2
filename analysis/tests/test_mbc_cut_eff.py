@@ -10,11 +10,11 @@ from ROOT import TFile
 from ROOT import TNtuple
 
 
-class TestTreeFits(unittest.TestCase):
+class TestMbcEff(unittest.TestCase):
     """The unit test case for TreeFitter"""
 
-    def testFit(self):
-        """Run the test fit"""
+    def testMbcEff(self):
+        """Reconstruct stuff with tight Mbc cut."""
 
         testFile = tempfile.NamedTemporaryFile()
 

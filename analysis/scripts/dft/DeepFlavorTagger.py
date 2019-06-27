@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Jochen Gemmler 2016 - 2019
+##########################################################################
+# BASF2 (Belle Analysis Framework 2)                                     #
+# Copyright(C) 2016-2019  Belle II Collaboration                         #
+#                                                                        #
+# Author: The Belle II Collaboration                                     #
+# Contributors: Jochen Gemmler                                           #
+#                                                                        #
+# This software is provided "as is" without any warranty.                #
+##########################################################################
 
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')

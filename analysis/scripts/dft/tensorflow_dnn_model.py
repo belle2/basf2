@@ -1,4 +1,15 @@
-# Jochen Gemmler 2017 - 2019
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# BASF2 (Belle Analysis Framework 2)                                     #
+# Copyright(C) 2016-2019  Belle II Collaboration                         #
+#                                                                        #
+# Author: The Belle II Collaboration                                     #
+# Contributors: Jochen Gemmler                                           #
+#                                                                        #
+# This software is provided "as is" without any warranty.                #
+##########################################################################
 
 from __future__ import division, print_function, generators
 

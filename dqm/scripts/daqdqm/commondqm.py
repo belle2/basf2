@@ -144,6 +144,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')
         path.add_module(trackDqm)
+        path.add_module('SetupGenfitExtrapolation')
         path.add_module('SVDROIFinder',
                         recoTrackListName='RecoTracks',
                         SVDInterceptListName='SVDIntercepts')

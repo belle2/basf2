@@ -64,7 +64,7 @@ SVDROIFinderModule::~SVDROIFinderModule()
 
 void SVDROIFinderModule::initialize()
 {
-  m_recotracks.isRequired(m_recoTracksListName);
+  m_recotracks.isOptional(m_recoTracksListName);
 
   m_rois.registerInDataStore(m_ROIListName);
 
@@ -113,6 +113,10 @@ void SVDROIFinderModule::beginRun()
 void SVDROIFinderModule::event()
 {
 
+  if (!m_recotracks.isValid()) {
+    B2DEBUG(1, "RecoTracks array is missing, no SVD ROIs");
+    return;
+  }
 
 
   B2DEBUG(1, "%%%%%%%% Number of RecoTracks in the events =  " << m_recotracks.getEntries());

@@ -41,28 +41,21 @@ import subprocess
 import json
 
 
-skims = '  ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
-skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
-skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0'  # CharmSemileptonic   '
-skims += ' feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 Charm3BodyHadronic'
-skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  '
-skims += ' CharmRare BtoXll BtoXgamma  TauLFV  Charm2BodyNeutrals2 CharmlessHad2Body CharmlessHad3Body'
-skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1 Charm3BodyHadronic3   Charm2BodyNeutrals Charm2BodyNeutralsD0'
-skims += ' Charm2BodyHadronic Charm2BodyHadronicD0'
+skims = ['ALP3Gamma', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon',
+         'BtoDh_Kspipipi0', 'BtoDh_Kspi0', 'BtoDh_hh', 'BtoDh_Kshh',
+         'BtoPi0Pi0', 'BtoXll', 'BtoXgamma', 'Charm2BodyHadronic', 'Charm2BodyHadronicD0',
+         'Charm2BodyNeutrals', 'Charm2BodyNeutralsD0', 'Charm3BodyHadronic', 'Charm3BodyHadronic2',
+         'Charm3BodyHadronic1', 'Charm3BodyHadronic3', 'CharmRare', 'CharmSemileptonic',
+         'CharmlessHad2Body', 'CharmlessHad3Body', 'ISRpipicc',
+         'LFVZpInvisible', 'LFVZpVisible', 'LeptonicUntagged', 'PRsemileptonicUntagged',
+         'SLUntagged', 'SinglePhotonDark', 'SystematicsEELL', 'SystematicsRadMuMu', 'SystematicsRadEE',
+         'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'TauLFV', 'TCPV', 'TauGeneric',
+         'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0WithOneLep', 'feiSLBplusWithOneLep']
 
-
-skims = 'ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon'
-skims = ' BtoDh_Kspipipi0 BtoDh_Kspi0 BtoDh_hh BtoDh_Kshh'
-skims = ' BtoPi0Pi0 BtoXll BtoXgamma Charm2BodyHadronic Charm2BodyHadronicD0'
-skims = ' Charm2BodyNeutrals Charm2BodyNeutralsD0 Charm3BodyHadronic Charm3BodyHadronic2'
-skims = ' Charm3BodyHadronic1 Charm3BodyHadronic3 CharmRare CharmSemileptonic'
-skims = ' CharmlessHad2Body CharmlessHad3Body ISRpipicc'
-skims = ' LFVZpInvisible LFVZpVisible LeptonicUntagged PRsemileptonicUntagged'
-skims = ' SLUntagged SinglePhotonDark SystematicsEELL SystematicsRadMuMu SystematicsRadEE'
-skims = ' SystematicsLambda Systematics SystematicsTracking TauLFV TCPV TauGeneric'
-skims = ' feiHadronicB0 feiHadronicBplus feiSLB0WithOneLep feiSLBplusWithOneLep'
-bkgs = 'MC12_mixedBGx1  MC12_chargedBGx1 MC12_ccbarBGx1 MC12_ssbarBGx1 MC12_uubarBGx1  MC12_ddbarBGx1  MC12_taupairBGx1'
-bkgs += ' MC12_mixedBGx0 MC12_chargedBGx0 MC12_ccbarBGx0 MC12_ssbarBGx0 MC12_uubarBGx0 MC12_ddbarBGx0 MC12_taupairBGx0'
+bkgs = ['MC12_mixedBGx1', 'MC12_chargedBGx1', 'MC12_ccbarBGx1', 'MC12_ssbarBGx1',
+        'MC12_uubarBGx1', 'MC12_ddbarBGx1', 'MC12_taupairBGx1',
+        'MC12_mixedBGx0', 'MC12_chargedBGx0', 'MC12_ccbarBGx0', 'MC12_ssbarBGx0',
+        'MC12_uubarBGx0', 'MC12_ddbarBGx0', 'MC12_taupairBGx0']
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
 jsonEvtSizeInput = open('JsonEvtSizeInput.txt', 'w')
@@ -73,17 +66,17 @@ nFullEvents = 200000
 avgUdstSizePerEventPerSample = 0
 avgRetentionPerSample = 0
 avgProcessingTimePerEventPerSample = 0
-for skim in skims.split():
+for skim in skims:
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
-    title = '|Bkg        |  InputEvents  |  Skimmed Events  |   Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
+    title = '| MC type   |  InputEvents  |  Skimmed Events  |   Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
     title += ' MaxMemory (GB)  | AvgMemory (GB) | FullSkimSize(GB)|'
     title += ' FullSkimLogSize(GB)|'
     print(title)
-    for bkg in bkgs.split():
+    for bkg in bkgs:
         inputFileName = skim + '_' + bkg + '.out'
         outputFileName = skim + '_' + bkg
         outputUdstName = skim + '_' + bkg

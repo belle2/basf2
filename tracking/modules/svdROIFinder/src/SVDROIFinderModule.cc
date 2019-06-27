@@ -83,15 +83,15 @@ void SVDROIFinderModule::initialize()
 void SVDROIFinderModule::beginRun()
 {
 
-  B2DEBUG(1, "||| SVDROIFinder Parameters:");
-  B2DEBUG(1, "    tolerance: phi = " << m_tolerancePhi);
-  B2DEBUG(1, "                z = " << m_toleranceZ);
-  B2DEBUG(1, "    n sigma:    u = " << m_numSigmaTotU);
-  B2DEBUG(1, "                v = " << m_numSigmaTotV);
-  B2DEBUG(1, "    systematic: u = " << m_sigmaSystU);
-  B2DEBUG(1, "                v = " << m_sigmaSystV);
-  B2DEBUG(1, "    max width:  u = " << m_maxWidthU);
-  B2DEBUG(1, "                v = " << m_maxWidthV);
+  B2DEBUG(21, "||| SVDROIFinder Parameters:");
+  B2DEBUG(21, "    tolerance: phi = " << m_tolerancePhi);
+  B2DEBUG(21, "                z = " << m_toleranceZ);
+  B2DEBUG(21, "    n sigma:    u = " << m_numSigmaTotU);
+  B2DEBUG(21, "                v = " << m_numSigmaTotV);
+  B2DEBUG(21, "    systematic: u = " << m_sigmaSystU);
+  B2DEBUG(21, "                v = " << m_sigmaSystV);
+  B2DEBUG(21, "    max width:  u = " << m_maxWidthU);
+  B2DEBUG(21, "                v = " << m_maxWidthV);
 
   m_ROIinfo.sigmaSystU = m_sigmaSystU;
   m_ROIinfo.sigmaSystV = m_sigmaSystV;
@@ -114,12 +114,12 @@ void SVDROIFinderModule::event()
 {
 
   if (!m_recotracks.isValid()) {
-    B2DEBUG(1, "RecoTracks array is missing, no SVD ROIs");
+    B2DEBUG(21, "RecoTracks array is missing, no SVD ROIs");
     return;
   }
 
 
-  B2DEBUG(1, "%%%%%%%% Number of RecoTracks in the events =  " << m_recotracks.getEntries());
+  B2DEBUG(21, "%%%%%%%% Number of RecoTracks in the events =  " << m_recotracks.getEntries());
 
   RelationArray recoTrackToSVDIntercepts(m_recotracks, m_intercepts);
   recoTrackToSVDIntercepts.create();

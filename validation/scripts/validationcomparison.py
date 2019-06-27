@@ -63,16 +63,20 @@ def get_comparison(object_1, object_2, metaoptions):
     """
     mop = MetaOptionParser(metaoptions)
 
-    if not mop.has_option("kolmogorov"):
-        tester = Chi2Test(
-            object_1,
-            object_2,
-            metaoptions=metaoptions
-        )
+    if mop.has_option("kolmogorov"):
+        tester = KolmogorovTest
+    elif mop.has_option("andersondarling"):
+        tester = AndersonDarlingTest
     else:
-        tester = None
+        tester = Chi2Test
 
-    return tester
+    test = tester(
+        object_1,
+        object_2,
+        metaoptions=metaoptions
+    )
+
+    return test
 
 
 # ==============================================================================
@@ -126,7 +130,7 @@ class ComparisonBase(ABC):
         # different bin size)
         self._no_comparison_but_still_different = False
 
-        #: Comparison result, i.e. pass/warning/error
+        #: Comparison result, i.e. equal/warning/error
         self._comparison_result = ""
         #: Longer description of the comparison result (e.g. 'performed Chi2
         #: Test ... with chi2 = ...').
@@ -257,7 +261,7 @@ class ComparisonBase(ABC):
 
         return nbins_a == nbins_b
 
-    def _raise_has_compatible_hins(self) -> None:
+    def _raise_has_compatible_bins(self) -> None:
         """
         Raise Exception if not both ROOT obeject have the same amount of bins
         @return: None
@@ -300,12 +304,61 @@ class ComparisonBase(ABC):
 
         return th1
 
+
+class PvalueTest(ComparisonBase):
+    """ Test with a pvalue """
+
+    #: Default pvalue below which a warning is issued (unless supplied in
+    #: metaoptions)
+    _default_pvalue_warn = 1.0
+
+    #: Default pvalue below which an error is issued (unless supplied in
+    #: metaoptions)
+    _default_pvalue_error = 0.01
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #: pvalue
+        self._pvalue = None
+        #: pvalue below which a warning is issued
+        self._pvalue_warn = self.mop.pvalue_warn()
+        #: pvalue below which an error is issued
+        self._pvalue_error = self.mop.pvalue_error()
+
+        if self._pvalue_warn is None:
+            self._pvalue_warn = self._default_pvalue_warn
+        if self._pvalue_error is None:
+            self._pvalue_error = self._default_pvalue_error
+
+    def _get_comparison_result(self) -> str:
+        if self._pvalue is None:
+            return "error"
+
+        if self._pvalue < self._pvalue_error:
+            return "error"
+        elif self._pvalue < self._pvalue_warn:
+            return "warning"
+        else:
+            return "equal"
+
+    @abstractmethod
+    def _compute(self):
+        pass
+
+    @abstractmethod
+    def _get_comparison_result_long(self):
+        pass
+
+
 # ==============================================================================
 # Implementation of specific comparison algorithms
 # ==============================================================================
 
+# ------------------------------------------------------------------------------
+# Chi2 Test
+# ------------------------------------------------------------------------------
 
-class Chi2Test(ComparisonBase):
+class Chi2Test(PvalueTest):
 
     """
     Perform a Chi2Test for ROOT objects. The chi2 test method is e.g. described
@@ -314,19 +367,16 @@ class Chi2Test(ComparisonBase):
     tests for a wider selection of ROOT objects.
     """
 
-    def __init__(self, object_a, object_b, metaoptions="", debug=False):
+    def __init__(self, *args, **kwargs):
         """
-        Constructor. Store the two histograms/profiles operated on.
-        :param object_a: First object
-        :param object_b: Second object
-        :param debug: Print debug information?
+        Initialize Chi2Test.
+        :param args: See arguments of :class:`ComparisonBase`
+        :param kwargs:  See arguments of :class:`ComparisonBase`
         """
-        super().__init__(object_a, object_b, metaoptions=metaoptions, debug=debug)
+        super().__init__(*args, **kwargs)
 
-        # The following attributes will only be accessed via methods.
+        # The following attributes will be set in :meth:`_compute`
 
-        #: pvalue
-        self._pvalue = None
         #: chi2
         self._chi2 = None
         #: chi2 / number of degrees of freedom
@@ -358,9 +408,8 @@ class Chi2Test(ComparisonBase):
         @return: None
         """
         self._raise_has_correct_types()
-        self._raise_has_compatible_hins()
+        self._raise_has_compatible_bins()
 
-        # fixme: This doesn't work for sure
         local_object_a = self.object_a
         local_object_b = self.object_b
 
@@ -459,28 +508,6 @@ class Chi2Test(ComparisonBase):
         self._pvalue, self._chi2, self._chi2ndf, self._ndf = \
             res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
 
-    def _get_comparison_result(self) -> str:
-        if self._pvalue is None:
-            return "error"
-
-        self._pvalue_warn = self.mop.pvalue_warn()
-        self._pvalue_error = self.mop.pvalue_error()
-
-        if self._pvalue_warn is None:
-            self._pvalue_warn = 1.0
-        if self._pvalue_error is None:
-            self._pvalue_error = 0.01
-
-        # If pvalue < 0.01: Very strong presumption against neutral
-        # hypothesis
-        if self._pvalue < self._pvalue_error:
-            return "error"
-        # If pvalue < 1: Deviations at least exists
-        elif self._pvalue < self._pvalue_warn:
-            return "warning"
-        else:
-            return "equal"
-
     def _get_comparison_result_long(self) -> str:
         if isinstance(self._pvalue, float):
             pvalue_str = f"{self._pvalue:.6f}"
@@ -498,6 +525,111 @@ class Chi2Test(ComparisonBase):
                    pvalue_error=self._pvalue_error
                )
 
+# ------------------------------------------------------------------------------
+# Kolmogorov Test
+# ------------------------------------------------------------------------------
+
+
+class KolmogorovTest(PvalueTest):
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize Kolmogorov test.
+        @param args: See arguments of :class:`ComparisonBase`
+        @param kwargs:  See arguments of :class:`ComparisonBase`
+        """
+        super().__init__(*args, **kwargs)
+
+    def _compute(self):
+        """
+        Perform the actual test
+        @return: None
+        """
+        self._raise_has_correct_types()
+        self._raise_has_compatible_bins()
+
+        local_object_a = self.object_a
+        local_object_b = self.object_b
+
+        # very special handling for TEfficiencies
+        if self.object_a.ClassName() == "TEfficiency":
+            local_object_a = self._convert_teff_to_hist(self.object_a)
+            local_object_b = self._convert_teff_to_hist(self.object_b)
+            if self.debug:
+                print("Converting TEfficiency objects to histograms.")
+
+        option_str = "UON"
+        if self.debug:
+            option_str += "D"
+
+        self._pvalue = local_object_a.KolmogorovTest(local_object_b, option_str)
+
+    def _get_comparison_result_long(self) -> str:
+        if isinstance(self._pvalue, float):
+            pvalue_str = f"{self._pvalue:.6f}"
+        else:
+            pvalue_str = str(self._pvalue)
+
+        return r'Performed Komlogorov test between {{revision1}} ' \
+               r'and {{revision2}} ' \
+               r' <b>p-value: {pvalue}</b> (p-value warn: {pvalue_warn}, ' \
+               r'p-value error: {pvalue_error})'.format(
+                   pvalue=pvalue_str, pvalue_warn=self._pvalue_warn,
+                   pvalue_error=self._pvalue_error
+               )
+
+# ------------------------------------------------------------------------------
+# Anderson Darling Test
+# ------------------------------------------------------------------------------
+
+
+class AndersonDarlingTest(PvalueTest):
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize Kolmogorov test.
+        @param args: See arguments of :class:`ComparisonBase`
+        @param kwargs:  See arguments of :class:`ComparisonBase`
+        """
+        super().__init__(*args, **kwargs)
+
+    def _compute(self):
+        """
+        Perform the actual test
+        @return: None
+        """
+        self._raise_has_correct_types()
+        # description on
+        # https://root.cern.ch/doc/master/classTH1.html#aa6b386786876dc304d73ab6b2606d4f6
+        # sounds like we don't have to have the same bins
+
+        local_object_a = self.object_a
+        local_object_b = self.object_b
+
+        # very special handling for TEfficiencies
+        if self.object_a.ClassName() == "TEfficiency":
+            local_object_a = self._convert_teff_to_hist(self.object_a)
+            local_object_b = self._convert_teff_to_hist(self.object_b)
+            if self.debug:
+                print("Converting TEfficiency objects to histograms.")
+
+        option_str = ""
+        if self.debug:
+            option_str += "D"
+
+        self._pvalue = local_object_a.KolmogorovTest(local_object_b, option_str)
+
+    def _get_comparison_result_long(self) -> str:
+        if isinstance(self._pvalue, float):
+            pvalue_str = f"{self._pvalue:.6f}"
+        else:
+            pvalue_str = str(self._pvalue)
+
+        return r'Performed Anderson Darling test between {{revision1}} ' \
+               r'and {{revision2}} ' \
+               r' <b>p-value: {pvalue}</b> (p-value warn: {pvalue_warn}, ' \
+               r'p-value error: {pvalue_error})'.format(
+                   pvalue=pvalue_str, pvalue_warn=self._pvalue_warn,
+                   pvalue_error=self._pvalue_error
+               )
 
 # ==============================================================================
 # Helpers

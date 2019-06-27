@@ -70,70 +70,65 @@ class TestComparison(unittest.TestCase):
         #: However not implemented yet.
         self.call_iteration = 0
 
-        p_a = self.create_profile(self.root_name("profileA"))
-        #: store for later use
-        self.profileA = p_a
+        #: Prfile A
+        self.profileA = self.create_profile(self.root_name("profileA"))
 
-        p_b = self.create_profile(self.root_name("profileB"))
-        #: store for later use
-        self.profileB = p_b
+        #: Profile B
+        self.profileB = self.create_profile(self.root_name("profileB"))
 
-        p_c = self.create_profile(self.root_name("profileC"), 5000, 5, 3)
-        #: store for later use
-        self.profileC = p_c
+        #: Profile C
+        self.profileC = self.create_profile(
+            self.root_name("profileC"), 5000, 5, 3
+        )
 
-        p_zero_error_bins = self.create_profile(
+        #: Profile with bins with 0 error
+        self.profileZeroErrorBins = self.create_profile(
             self.root_name("profileZeroErrorBins"),
             max_fill=49
         )
-        p_zero_error_bins.SetBinError(35, 0.0)
-        #: store for later use
-        self.profileZeroErrorBins = p_zero_error_bins
+        self.profileZeroErrorBins.SetBinError(35, 0.0)
 
-        p_zero_error_bins_two = self.create_profile(
+        #: Profile with bins with 0 error
+        self.profileZeroErrorBinsTwo = self.create_profile(
             self.root_name("profileZeroErrorBinsTwo"),
             max_fill=49
         )
-        p_zero_error_bins_two.SetBinError(35, 0.0)
-        #: store for later use
-        self.profileZeroErrorBinsTwo = p_zero_error_bins_two
+        self.profileZeroErrorBinsTwo.SetBinError(35, 0.0)
 
-        h_a = self.create_histogram(self.root_name("histogramA"), 5000, 5, 3)
-        #: store for later use
-        self.histogramA = h_a
+        #: Histogram A
+        self.histogramA = self.create_histogram(
+            self.root_name("histogramA"), 5000, 5, 3
+        )
 
-        h_b = self.create_histogram(self.root_name("histogramB"), 5000, 5, 3)
-        #: store for later use
-        self.histogramB = h_b
+        #: Histogram B (should be almost equal to profile A)
+        self.histogramB = self.create_histogram(
+            self.root_name("histogramB"), 5000, 5, 3
+        )
 
-        p_aequal = self.create_profile(
+        #: Profile should be almost equal to A
+        self.profileAequal = self.create_profile(
             self.root_name("profileA_almostequal"),
             sigma=0.4
         )
-        #: store for later use
-        self.profileAequal = p_aequal
 
-        p_bequal = self.create_profile(
+        #:  Profile should be almost equal to B
+        self.profileBequal = self.create_profile(
             self.root_name("profileB_almostequal"),
             sigma=0.4
         )
-        #: store for later use
-        self.profileBequal = p_bequal
 
-        #: store for later use
+        #: Profile with different bins
         self.profileDifferentBins = ROOT.TProfile(
             self.root_name("profileDifferentBins"),
             self.root_name("profileDifferentBins"),
             40, 0, 50.0
         )
 
-        p_a = self.create_teff(self.root_name("teffA"))
-        #: store for later use
-        self.teffA = p_a
+        #: TEfficiemcy A
+        self.teffA = self.create_teff(self.root_name("teffA"))
 
-        p_b = self.create_teff(self.root_name("teffB"))
-        #: store for later use
-        self.teffB = p_b
+        #: TEfficiency B
+        self.teffB = self.create_teff(self.root_name("teffB"))
 
     def test_compare_profiles(self):
         """
@@ -144,6 +139,23 @@ class TestComparison(unittest.TestCase):
         self.assertTrue(c.can_compare())
         c.ensure_compute()
         self.assertAlmostEqual(c._pvalue, 0.22495088947037362)
+
+    def test_compare_profiles_identical(self):
+        """
+        Test if comparing two identical TProfiles works
+        """
+        c = validationcomparison.Chi2Test(self.profileA, self.profileA)
+
+        self.assertTrue(c.can_compare())
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 1)
+
+    def test_compare_identical_profiles_kolmogorov(self):
+        """ Test if comparing to identical TProfiles with Kolmo Test works"""
+        c = validationcomparison.KolmogorovTest(self.profileA, self.profileA)
+        self.assertTrue(c.can_compare())
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 1)
 
     def test_compare_profiles_almost_equal(self):
         """

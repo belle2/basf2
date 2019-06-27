@@ -39,18 +39,21 @@ import collections
 from skimExpertFunctions import get_eventN, get_total_infiles, get_test_file, encodeSkimName
 import subprocess
 import json
+import csv
 
 
-skims = ['ALP3Gamma', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon',
-         'BtoDh_Kspipipi0', 'BtoDh_Kspi0', 'BtoDh_hh', 'BtoDh_Kshh',
-         'BtoPi0Pi0', 'BtoXll', 'BtoXgamma', 'Charm2BodyHadronic', 'Charm2BodyHadronicD0',
-         'Charm2BodyNeutrals', 'Charm2BodyNeutralsD0', 'Charm3BodyHadronic', 'Charm3BodyHadronic2',
-         'Charm3BodyHadronic1', 'Charm3BodyHadronic3', 'CharmRare', 'CharmSemileptonic',
-         'CharmlessHad2Body', 'CharmlessHad3Body', 'ISRpipicc',
-         'LFVZpInvisible', 'LFVZpVisible', 'LeptonicUntagged', 'PRsemileptonicUntagged',
-         'SLUntagged', 'SinglePhotonDark', 'SystematicsEELL', 'SystematicsRadMuMu', 'SystematicsRadEE',
-         'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'TauLFV', 'TCPV', 'TauGeneric',
-         'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0WithOneLep', 'feiSLBplusWithOneLep']
+skims = [
+    'ALP3Gamma', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon',
+    'BtoDh_Kspipipi0', 'BtoDh_Kspi0', 'BtoDh_hh', 'BtoDh_Kshh',
+    'BtoPi0Pi0', 'BtoXll', 'BtoXgamma', 'Charm2BodyHadronic', 'Charm2BodyHadronicD0',
+    'Charm2BodyNeutrals', 'Charm2BodyNeutralsD0', 'Charm3BodyHadronic', 'Charm3BodyHadronic2',
+    'Charm3BodyHadronic1', 'Charm3BodyHadronic3', 'CharmRare', 'CharmSemileptonic',
+    'CharmlessHad2Body', 'CharmlessHad3Body', 'ISRpipicc',
+    'LFVZpInvisible', 'LFVZpVisible', 'LeptonicUntagged', 'PRsemileptonicUntagged',
+    'SLUntagged', 'SinglePhotonDark', 'SystematicsEELL', 'SystematicsRadMuMu', 'SystematicsRadEE',
+    'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'TauLFV', 'TCPV', 'TauGeneric',
+    'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0WithOneLep', 'feiSLBplusWithOneLep'
+]
 
 bkgs = ['MC12_mixedBGx1', 'MC12_chargedBGx1', 'MC12_ccbarBGx1', 'MC12_ssbarBGx1',
         'MC12_uubarBGx1', 'MC12_ddbarBGx1', 'MC12_taupairBGx1',
@@ -67,6 +70,14 @@ avgUdstSizePerEventPerSample = 0
 avgRetentionPerSample = 0
 avgProcessingTimePerEventPerSample = 0
 for skim in skims:
+    csvFile = open(skim + '_stats.csv', 'w')
+    csvWriter = csv.writer(csvFile)
+    csvWriter.writerow(['MC type', 'Input Events', 'Skimmed Events' 'Retention',
+                        'Time/Evt (HEPSEC)', 'Total Time (s)', 'uDST Size/Evt (KB)',
+                        'uDST Size(MB)', 'ACMPE', 'Log Size/evt(KB)', 'Log Size(MB)',
+                        'Max Memory (GB)', 'Avg Memory (GB)', 'FullSkimSize (GB)',
+                        'Full Skim Log Size (GB)'])
+
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
@@ -232,6 +243,13 @@ for skim in skims:
               '   |    ' +
               str(fullLogSkimSizeGB)[:5] +
               "\n")
+
+        csvWriter.writerow([bkg, str(nFullEvents), str(nSkimmedEvents), str(retention),
+                            str(timePerEvent)[:5], str(totalTime)[:5], str(udstSizePerEvent)[:5],
+                            str(fullFileSizeMB)[:5], str(acm)[:5], str(logFileSizePerEvent)[:5],
+                            str(fullLogFileMB)[:5], str(maxMemory)[:5], str(avgMemory)[:5],
+                            str(fullSkimSizeGB)[:5], str(fullLogSkimSizeGB)[:5]])
+
         outTimePerEvent = timePerEvent
         if (timePerEvent >= 0.5):
             outTimePerEvent = timePerEvent + 1
@@ -295,6 +313,8 @@ for skim in skims:
             jsonTimeInput.write(']')
             jsonEvtSizeInput.write(']')
             jsonMergeFactorInput.write(']')
+    csvFile.close()
+    print(f'Wrote skim stats to {skim}_stats.csv')
     jsonTimeInput.write('\n')
     jsonEvtSizeInput.write('\n')
     jsonMergeFactorInput.write('\n')

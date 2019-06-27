@@ -25,9 +25,9 @@ for skim in skims:
     for MCType in MCTypes:
         input_file = get_test_file(MCType, MCCampaign)
         script = f'../standalone/{skim}_Skim_Standalone.py'
-        log_file = f'{skim}_{MCType}.out'
-        err_file = f'{skim}_{MCType}.err'
-        output_file = f'{skim}_{MCType}.udst.root'
+        log_file = f'{skim}_{MCCampaign}_{MCType}.out'
+        err_file = f'{skim}_{MCCampaign}_{MCType}.err'
+        output_file = f'{skim}_{MCCampaign}_{MCType}.udst.root'
 
         print(f'Running {script} on {input_file} (MC type {MCCampaign}_{MCType}) to {output_file}')
         subprocess.run(['bsub', '-q', 'l', '-oo', log_file, '-e', err_file, 'basf2', script,

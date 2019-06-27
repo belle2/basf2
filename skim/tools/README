@@ -36,12 +36,14 @@ If you have the samples ready for testing, then you need to first run your skim
 
 Run the skim on all the different samples.
 Make sure you edit skimRun.csh to include the samples you want to test your skim on. 
-   basf2 runSkims.pu
+   basf2 runSkims.py
 
 
 After the completion of all the jobs, to find the statistics of your skim, run printSkimStats.py:
 
   basf2 printSkimStats.py
 
+
+This will print a table of statistics, and save the table in a .csv file.
 
 For every new release you need to copy the statistics to the Skimming Homepage, under the headline Skim Statistics. 

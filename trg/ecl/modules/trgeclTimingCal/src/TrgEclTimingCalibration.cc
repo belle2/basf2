@@ -23,6 +23,7 @@ TRGECLTimingCalModule::TRGECLTimingCalModule() : Module()
 {
 
   setDescription("example module for TRGECL timing calibration");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("TRGECLCalSim", fSimulation,
            "0 : Raw data  1 : Simulation data", 0);

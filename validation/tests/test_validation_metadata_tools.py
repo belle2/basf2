@@ -70,13 +70,15 @@ class TestValidationMetadataSetter(unittest.TestCase):
                     "description of M", "nothing to check",
                     "x label"
                 )
-            ], variables_2d=[
+            ],
+            variables_2d=[
                 (
                     "M", 100, 5, 15, "M", 100, 5, 15, "mass vs mass",
                     "me <wontreply@dont.try>", "some description nobody reads",
                     "nothing to check", "x label", "why label?", "mop1, mop2"
                 )
-            ]
+            ],
+            description="Overall description of plots in this package."
         )
 
         basf2.process(path=path)
@@ -85,6 +87,15 @@ class TestValidationMetadataSetter(unittest.TestCase):
         # ----------------------------------------------------------------------
 
         tf = ROOT.TFile(str(out_file_path))
+
+        # Overall
+        # *******
+
+        d = tf.Get("Description")
+        self.assertEqual(
+            d.GetTitle(),
+            "Overall description of plots in this package."
+        )
 
         # 1D Histogram
         # ************

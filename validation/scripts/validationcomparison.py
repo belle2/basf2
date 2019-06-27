@@ -198,9 +198,9 @@ class ComparisonBase(ABC):
         """
         @return: True if the two objects can be compared, False otherwise
         """
-        return self._correct_types() and self._has_compatible_bins()
+        return self._has_correct_types() and self._has_compatible_bins()
 
-    def _correct_types(self):
+    def _has_correct_types(self) -> bool:
         """
         @return: True if the two objects have a) a type supported for
             comparison and b) can be compared with each other
@@ -223,7 +223,26 @@ class ComparisonBase(ABC):
 
         return True
 
-    def _has_compatible_bins(self):
+    def _raise_has_correct_types(self) -> None:
+        """
+        Raise Exception if not the two objects have a) a type supported for
+        comparison and b) can be compared with each other
+        @return: None
+        """
+        if not self._has_correct_types():
+            msg = "Comparison of {} (Type {}) with {} (Type {}) not " \
+                  "supported.\nPlease open a JIRA issue (validation " \
+                  "component) if you need this supported. "
+            raise ObjectsNotSupported(
+                msg.format(
+                    self.object_a.GetName(),
+                    self.object_a.ClassName(),
+                    self.object_b.GetName(),
+                    self.object_b.ClassName()
+                )
+            )
+
+    def _has_compatible_bins(self) -> bool:
         """
         Check if both ROOT obeject have the same amount of bins
         @return: True if the bins are equal, otherwise False
@@ -237,6 +256,23 @@ class ComparisonBase(ABC):
             nbins_b = self.object_b.GetNbinsX()
 
         return nbins_a == nbins_b
+
+    def _raise_has_compatible_hins(self) -> None:
+        """
+        Raise Exception if not both ROOT obeject have the same amount of bins
+        @return: None
+        """
+        if not self._has_compatible_bins():
+            msg = "The objects have differing x bin count: {} has {} vs. {} " \
+                  "has {}."
+            raise DifferingBinCount(
+                msg.format(
+                    self.object_a.GetName(),
+                    self.object_a.GetNbinsX(),
+                    self.object_b.GetName(),
+                    self.object_b.GetNbinsX()
+                )
+            )
 
     @staticmethod
     def _convert_teff_to_hist(teff_a):
@@ -321,29 +357,8 @@ class Chi2Test(ComparisonBase):
         Performs the actual Chi^2 test
         @return: None
         """
-        if not self._correct_types():
-            msg = "Comparison of {} (Type {}) with {} (Type {}) not " \
-                  "supported.\nPlease open a JIRA issue (validation " \
-                  "component) if you need this supported. "
-            raise ObjectsNotSupported(
-                msg.format(
-                    self.object_a.GetName(),
-                    self.object_a.ClassName(),
-                    self.object_b.GetName(),
-                    self.object_b.ClassName()
-                )
-            )
-        if not self._has_compatible_bins():
-            msg = "The objects have differing x bin count: {} has {} vs. {} " \
-                  "has {}."
-            raise DifferingBinCount(
-                msg.format(
-                    self.object_a.GetName(),
-                    self.object_a.GetNbinsX(),
-                    self.object_b.GetName(),
-                    self.object_b.GetNbinsX()
-                )
-            )
+        self._raise_has_correct_types()
+        self._raise_has_compatible_hins()
 
         # fixme: This doesn't work for sure
         local_object_a = self.object_a

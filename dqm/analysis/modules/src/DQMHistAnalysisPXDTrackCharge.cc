@@ -157,10 +157,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     canvas->cd();
     canvas->Clear();
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
+    TH1* hh1 = findHist(m_histogramDirectoryName, name);
     if (hh1) {
 
       /// FIXME Replace by a nice fit
@@ -180,8 +177,6 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         m_gCharge->SetPoint(p, i + 0.5, m_fLandau->GetParameter(1));
         m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
       }
-      hh1->Draw();
-      if (hh1->GetEntries() > 100) m_fLandau->Draw("same");
 
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
 
@@ -214,7 +209,6 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
           hh1->SetMaximum(1.1 * h->GetMaximum());
         hh1->Draw("hist");
         h->Draw("same hist");
-        if (hh1->GetEntries() > 100) m_fLandau->Draw("same");
 
         double data = 1.0;
         canvas->Pad()->SetFrameFillColor(10);

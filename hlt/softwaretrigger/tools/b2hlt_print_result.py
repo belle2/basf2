@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", help="Output file name (will be used internally). "
                                          "Defaults to trigger_results.root.",
                         default="software_trigger_results.root")
-    choices = ["human-readable", "categorized"]
+    choices = ["list", "categorized"]
     try:
         from tabulate import tabulate
         choices += ['jira', 'grid', 'stash']
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     df_print["Prescales"] = df_prescales.fillna("")
     df_print = df_print[["Prescaled", "Non Prescaled", "Prescales"]]
 
-    if args.format == "human-readable":
+    if args.format == "list":
         print(df_print)
     elif args.format == "categorized":
         from softwaretrigger import filter_categories

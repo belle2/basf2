@@ -26,7 +26,7 @@ def D0ToHpJm(path):
     D0List = []
     for chID, channel in enumerate(D0_Channels):
         reconstructDecay('D0:HpJm' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        vertexKFit('D0:HpJm' + str(chID), 0.000, path=path)
+        # vertexKFit('D0:HpJm' + str(chID), 0.000, path=path)
         D0List.append('D0:HpJm' + str(chID))
 
     Lists = D0List
@@ -42,7 +42,7 @@ def DstToD0PiD0ToHpJm(path):
     DstList = []
     for chID, channel in enumerate(D0List):
         reconstructDecay('D*+:HpJm' + str(chID) + ' -> D0:HpJm' + str(chID) + ' pi+:all', Dstcuts, chID, path=path)
-        vertexRave('D*+:HpJm' + str(chID), 0.000, path=path)
+        # vertexRave('D*+:HpJm' + str(chID), 0.000, path=path)
         DstList.append('D*+:HpJm' + str(chID))
         DstList += D0List
 

@@ -48,12 +48,12 @@ skims += ' feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 Charm3Bo
 skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  '
 skims += ' CharmRare BtoXll BtoXgamma  TauLFV  Charm2BodyNeutrals2 CharmlessHad2Body CharmlessHad3Body'
 skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1 Charm3BodyHadronic3   Charm2BodyNeutrals Charm2BodyNeutralsD0'
-skims += ' Charm2BodyHadronic Charm2BodyHadronicD0'
+skims += ' DstToD0PiD0ToHpJm D0ToHpJm'
 
 
 skims = 'ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon'
 skims = ' BtoDh_Kspipipi0 BtoDh_Kspi0 BtoDh_hh BtoDh_Kshh'
-skims = ' BtoPi0Pi0 BtoXll BtoXgamma Charm2BodyHadronic Charm2BodyHadronicD0'
+skims = ' BtoPi0Pi0 BtoXll BtoXgamma DstToD0PiD0ToHpJm D0ToHpJm'
 skims = ' Charm2BodyNeutrals Charm2BodyNeutralsD0 Charm3BodyHadronic Charm3BodyHadronic2'
 skims = ' Charm3BodyHadronic1 Charm3BodyHadronic3 CharmRare CharmSemileptonic'
 skims = ' CharmlessHad2Body CharmlessHad3Body ISRpipicc'

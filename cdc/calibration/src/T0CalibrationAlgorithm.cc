@@ -34,12 +34,12 @@ void T0CalibrationAlgorithm::createHisto()
 {
 
   B2INFO("Creating histograms");
-  double x;
-  double t_mea;
-  double w;
-  double t_fit;
-  double ndf;
-  double Pval;
+  float x;
+  float t_mea;
+  float w;
+  float t_fit;
+  float ndf;
+  float Pval;
   int IWire;
   int lay;
 
@@ -174,6 +174,15 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
       hs_All->Fill(par[2]); // sigma of gauss fitting.
     }
   }
+
+  // mean shift
+  const double dt0Mean = hm_All->GetMean();
+  for (int ilay = 0; ilay < 56; ++ilay) {
+    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+      dt[ilay][iwire] -= dt0Mean;
+    }
+  }
+
 
 
   if (m_storeHisto) {

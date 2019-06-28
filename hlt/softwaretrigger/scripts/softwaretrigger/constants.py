@@ -43,7 +43,7 @@ ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTriggerResult", "TRGSummary", "
 RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "RawTRGs",
                    "ROIs"]
 # Objects which will be kept after the ExpressReconstruction, for example for the Event Display
-PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults', 'RecoTracks',
+PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'SVDClusters', 'PXDClusters',
                      'CDCHits', 'TOPDigits', 'ARICHHits',
                      'ECLClusters',

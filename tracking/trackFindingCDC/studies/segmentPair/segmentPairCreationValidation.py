@@ -328,6 +328,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         filter_on="select_fitless",
     )
 
+    # ! @cond Doxygen_Suppress
     @refiners.context(groupby=[None, "superlayer_id_pair"], exclude_groupby=False)
     def print_signal_number(self, crops, tdirectory, **kwds):
         """Print diagnostic information about the track-segment-pair selection"""
@@ -349,6 +350,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         fitless_selections = np.nonzero(crops["select_fitless"])
         info("#Signal after precut : %s", np.sum(mc_decisions[fitless_selections]))
         info("#Background after precut : %s", np.sum(1 - mc_decisions[fitless_selections]))
+    # ! @endcond
 
 
 def main():

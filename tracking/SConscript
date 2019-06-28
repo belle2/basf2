@@ -13,7 +13,7 @@ env['LIBS'] = [
     'vxd', 'vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
     'bklm', 'bklm_dataobjects',
-    'klm', 'klm_dataobjects', 'klm_dbobjects',
+    'klm_dataobjects', 'klm_dbobjects',
     'eklm', 'eklm_dataobjects', 'eklm_dbobjects',
     'ecl',
     'mdst_dataobjects',

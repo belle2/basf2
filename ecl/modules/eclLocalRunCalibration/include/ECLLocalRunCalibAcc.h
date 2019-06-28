@@ -14,6 +14,9 @@
  **************************************************************************/
 #ifndef _ECLLocalRunCalibAcc_H_
 #define  _ECLLocalRunCalibAcc_H_
+
+#pragma once
+
 // STL
 #include <vector>
 // BOOST

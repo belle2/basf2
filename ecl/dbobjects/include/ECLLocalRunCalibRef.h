@@ -14,6 +14,9 @@
  **************************************************************************/
 #ifndef _ECLLocalRunCalibRef_H_
 #define _ECLLocalRunCalibRef_H_
+
+#pragma once
+
 // ROOT
 #include <TObject.h>
 namespace Belle2 {

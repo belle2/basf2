@@ -13,6 +13,9 @@
  **************************************************************************/
 #ifndef _ECLDBTool_H_
 #define _ECLDBTool_H_
+
+#pragma once
+
 // FRAMEWORK
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/dataobjects/EventMetaData.h>

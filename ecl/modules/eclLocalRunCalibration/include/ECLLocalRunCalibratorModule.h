@@ -15,6 +15,9 @@
  **************************************************************************/
 #ifndef _ECLLocalRunCalibratorModule_H_
 #define _ECLLocalRunCalibratorModule_H_
+
+#pragma once
+
 // STL
 #include <cstdint>
 #include <vector>

@@ -14,6 +14,9 @@
  **************************************************************************/
 #ifndef _ECLLocalCalibUnit_H_
 #define _ECLLocalCalibUnit_H_
+
+#pragma once
+
 #include <string>
 #include <vector>
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibAcc.h>

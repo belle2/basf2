@@ -147,8 +147,9 @@ namespace TreeFitter {
             B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
           } else if (mother() && mother()->posIndex() >= 0) {
-            int posindexmother = mother()->posIndex();
-            fitparams.getStateVector().segment(posindex, 3) = fitparams.getStateVector().segment(posindexmother, 3);
+            const int posindexmother = mother()->posIndex();
+            const int dim = m_config->m_originDimension; //TODO acess mother
+            fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
           } else {
             /** (0,0,0) is the best guess in any other case */
             fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
@@ -173,8 +174,9 @@ namespace TreeFitter {
         fitparams.getStateVector()(posindex) == 0 &&
         fitparams.getStateVector()(posindex + 1) == 0 && \
         fitparams.getStateVector()(posindex + 2) == 0) {
-      int posindexmom = mother()->posIndex();
-      fitparams.getStateVector().segment(posindex , 3) = fitparams.getStateVector().segment(posindexmom, 3);
+      const int posindexmom = mother()->posIndex();
+      const int dim = m_config->m_originDimension; //TODO acess mother?
+      fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);
     }
     return initTau(fitparams);
   }

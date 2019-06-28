@@ -178,27 +178,12 @@ def DstToD0PiD0ToHpHmKs(path):
     return DstList
 
 
-def CharmRareList(path):
-    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2.2'
+def CharmRare(path):
+    charmcuts = '1.78 < M < 1.94'
+    Dstcuts = '0 < Q < 0.02 and 2.2 < useCMSFrame(p)'
+
     D0_Channels = ['gamma:skim gamma:skim',
                    'e+:loose e-:loose',
-                   'mu+:loose mu-:loose'
-                   ]
-
-    D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Rare' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        D0List.append('D0:Rare' + str(chID))
-
-    Lists = D0List
-    return Lists
-
-
-def DstToD0Leptonic(path):
-    charmcuts = '1.81 < M < 1.91'
-    Dstcuts = '0 < Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5'
-
-    D0_Channels = ['e+:loose e-:loose',
                    'e+:loose mu-:loose',
                    'e-:loose mu+:loose',
                    'mu+:loose mu-:loose',
@@ -207,26 +192,10 @@ def DstToD0Leptonic(path):
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:LeptonicDecay' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        reconstructDecay('D*+:Primary' + str(chID) + ' -> pi+:loose D0:LeptonicDecay' + str(chID),
+        reconstructDecay('D0:Rare' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        reconstructDecay('D*+:' + str(chID) + ' -> pi+:loose D0:Rare' + str(chID),
                          Dstcuts, chID, path=path)
-
-        matchMCTruth('D0:LeptonicDecay' + str(chID), path=path)
-        matchMCTruth('D*+:Primary' + str(chID), path=path)
-
-        vertexRave('D0:LeptonicDecay' + str(chID), 0.001, path=path)
-        vertexRave(
-            'D*+:Primary' +
-            str(chID),
-            0.001,
-            'D*+:all' +
-            str(chID) +
-            ' -> ^pi+:spi ^D0:LeptonicDecay' +
-            str(chID),
-            'ipprofile',
-            path=path)
-
-        DstList.append('D*+:Primary' + str(chID))
+        DstList.append('D*+:' + str(chID))
 
     return DstList
 

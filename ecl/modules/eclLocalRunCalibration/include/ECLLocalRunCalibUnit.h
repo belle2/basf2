@@ -12,9 +12,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef _ECLLocalCalibUnit_H_
-#define _ECLLocalCalibUnit_H_
-
 #pragma once
 
 #include <string>
@@ -133,4 +130,4 @@ namespace Belle2 {
       T(ECLLocalRunCalibAcc::*getter)() const);
   };
 } // Belle2
-#endif
+

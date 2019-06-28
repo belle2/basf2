@@ -12,9 +12,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef _ECLLocalRunCalibRef_H_
-#define _ECLLocalRunCalibRef_H_
-
 #pragma once
 
 // ROOT
@@ -62,4 +59,4 @@ namespace Belle2 {
     ClassDef(ECLLocalRunCalibRef, 1);
   };
 }
-#endif
+

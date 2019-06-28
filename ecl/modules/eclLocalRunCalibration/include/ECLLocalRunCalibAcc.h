@@ -12,9 +12,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef _ECLLocalRunCalibAcc_H_
-#define  _ECLLocalRunCalibAcc_H_
-
 #pragma once
 
 // STL
@@ -136,4 +133,4 @@ namespace Belle2 {
     std::vector<int> m_data;
   };
 }
-#endif
+

@@ -11,9 +11,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef _ECLDBTool_H_
-#define _ECLDBTool_H_
-
 #pragma once
 
 // FRAMEWORK
@@ -99,4 +96,4 @@ namespace Belle2 {
     std::string m_payloadName;
   };
 }
-#endif
+

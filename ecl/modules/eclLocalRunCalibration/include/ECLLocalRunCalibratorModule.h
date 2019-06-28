@@ -13,9 +13,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef _ECLLocalRunCalibratorModule_H_
-#define _ECLLocalRunCalibratorModule_H_
-
 #pragma once
 
 // STL
@@ -245,4 +242,3 @@ namespace Belle2 {
   };
 }  // namespace Belle2
 
-#endif

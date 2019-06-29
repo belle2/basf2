@@ -69,11 +69,6 @@ namespace Belle2 {
     class CDCMCHitCollectionLookUp  {
 
     public:
-      /// Provide a user-defined constructor because the Intel compiler complains (wrongfully)
-      /// that a const-instance of a class w/o user-defined ctor is useless. But in C++11 we have
-      /// per-member initialization ...
-      CDCMCHitCollectionLookUp() = default;
-
       /// Clears all Monte Carlo information left from the last event
       void clear();
 

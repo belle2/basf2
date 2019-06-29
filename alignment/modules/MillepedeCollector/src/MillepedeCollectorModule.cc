@@ -30,6 +30,7 @@
 #include <alignment/GlobalLabel.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/dataobjects/EventT0.h>
 
 #include <TMath.h>
 #include <TH1F.h>
@@ -158,6 +159,9 @@ void MillepedeCollectorModule::prepare()
   StoreObjPtr<EventMetaData> emd;
   emd.isRequired();
 
+  StoreObjPtr<EventT0> eventT0;
+  eventT0.isRequired();
+
   if (m_tracks.empty() &&
       m_particles.empty() &&
       m_vertices.empty() &&
@@ -211,6 +215,7 @@ void MillepedeCollectorModule::prepare()
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
 
   registerObject<TH1F>("cdc_hit_fraction", new TH1F("cdc_hit_fraction", "cdc_hit_fraction", 100, 0., 1.));
+  registerObject<TH1F>("evt0", new TH1F("evt0", "evt0", 400, -100., 100.));
 
   // Configure the (VXD) hierarchy before being built
   if (m_hierarchyType == 0)
@@ -236,6 +241,7 @@ void MillepedeCollectorModule::collect()
 {
   StoreObjPtr<EventMetaData> emd;
   alignment::GlobalCalibrationManager::getInstance().preCollect(*emd);
+  StoreObjPtr<EventT0> eventT0;
 
   if (!m_useGblTree) {
     // Open new file on request (at start or after being closed)
@@ -248,6 +254,7 @@ void MillepedeCollectorModule::collect()
   double chi2 = -1.;
   double lostWeight = -1.;
   int ndf = -1;
+  float evt0 = -9999.;
 
   for (auto arrayName : m_tracks) {
     StoreArray<RecoTrack> recoTracks(arrayName);
@@ -276,6 +283,10 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
+        getObjectPtr<TH1F>("evt0")->Fill(evt0);
+      }
 
       if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(trajectory);
 
@@ -298,6 +309,10 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
+          getObjectPtr<TH1F>("evt0")->Fill(evt0);
+        }
 
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(trajectory);
 
@@ -327,6 +342,11 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
+          getObjectPtr<TH1F>("evt0")->Fill(evt0);
+        }
+
 
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
@@ -459,6 +479,10 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+          if (eventT0.isValid() && eventT0->hasEventT0()) {
+            evt0 =  eventT0->getEventT0();
+            getObjectPtr<TH1F>("evt0")->Fill(evt0);
+          }
 
           if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
           B2RESULT("Beam vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
@@ -471,6 +495,11 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+          if (eventT0.isValid() && eventT0->hasEventT0()) {
+            evt0 =  eventT0->getEventT0();
+            getObjectPtr<TH1F>("evt0")->Fill(evt0);
+          }
+
           if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
           B2RESULT("Beam vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
@@ -527,6 +556,11 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
+        getObjectPtr<TH1F>("evt0")->Fill(evt0);
+      }
+
 
       B2RESULT("Mass(PDG) + vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
@@ -572,6 +606,11 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
+        getObjectPtr<TH1F>("evt0")->Fill(evt0);
+      }
+
 
       B2RESULT("Mass constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
@@ -630,6 +669,11 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
+        getObjectPtr<TH1F>("evt0")->Fill(evt0);
+      }
+
 
       if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
@@ -859,6 +903,11 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
+          getObjectPtr<TH1F>("evt0")->Fill(evt0);
+        }
+
 
         B2RESULT("Full kinematic-constrained fit (calibration version) results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
@@ -874,6 +923,11 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
+          getObjectPtr<TH1F>("evt0")->Fill(evt0);
+        }
+
 
         B2RESULT("Full kinematic-constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 

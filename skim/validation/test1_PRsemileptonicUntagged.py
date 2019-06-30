@@ -5,7 +5,7 @@
 <header>
     <input>../PRsemileptonicUntagged.dst.root</input>
     <output>../PRsemileptonic.udst.root</output>
-    <contact>hannah.wakeling@mail.mcgill.ca, philip.grace@adelaide.edu.au</contact>
+    <contact>philip.grace@adelaide.edu.au</contact>
     <interval>nightly</interval>
 </header>
 """

@@ -42,7 +42,7 @@ add_skim("Charm3BodyHadronic", DstToD0PiD0ToHpJmPi0List, path=charmpath)
 
 from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(charmpath)
-add_skim("Charm2BodyHadronic", DstToD0PiD0ToHpJmList, path=charmpath)
+add_skim("DstToD0PiD0ToHpJm", DstToD0PiD0ToHpJmList, path=charmpath)
 
 
 from skim.charm import DstToD0PiD0ToHpHmPi0

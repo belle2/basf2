@@ -25,6 +25,9 @@ namespace Belle2 {
   class AlignablePXDRecoHit : public PXDRecoHit, public genfit::ICalibrationParametersDerivatives  {
     friend class PXDRecoHit;
   public:
+    /// Static enabling(true) or disabling(false) addition of global derivatives for Lorentz shift
+    static bool s_enableLorentzGlobalDerivatives;
+
     /** Inherit constructors */
     using PXDRecoHit::PXDRecoHit;
 

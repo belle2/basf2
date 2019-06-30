@@ -1200,7 +1200,7 @@ def context(refiner=None,
     if refiner is None:
         return context_decorator
     else:
-        return context_decorator(refiner)
+        return functools.wraps(refiner)(context_decorator(refiner))
 
 
 def refiner_with_context(refiner_factory):

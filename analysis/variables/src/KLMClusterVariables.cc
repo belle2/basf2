@@ -222,7 +222,7 @@ namespace Belle2 {
       if (!cluster) {
         return std::numeric_limits<double>::quiet_NaN();
       }
-      return cluster->getMomentum().Theta();
+      return cluster->getClusterPosition().Theta();
     }
 
     double klmClusterPhi(const Particle* particle)
@@ -231,7 +231,7 @@ namespace Belle2 {
       if (!cluster) {
         return std::numeric_limits<double>::quiet_NaN();
       }
-      return cluster->getMomentum().Phi();
+      return cluster->getClusterPosition().Phi();
     }
 
     double maximumKLMAngleCMS(const Particle* particle)

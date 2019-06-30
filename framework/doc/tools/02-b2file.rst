@@ -183,6 +183,18 @@ restrictions apply:
     :nogroupsections:
 
 
+``b2file-remove-branches``: Create a copy of a basf2 output file removing a list of given branches in the process
+-----------------------------------------------------------------------------------------------------------------
+
+.. argpase::
+    :filename: framework/tools/b2file-remove-branches
+    :func: create_argumentparser
+    :prog: b2file-remove-branches
+    :nodefaultconst:
+    :nogroupsections:
+
+.. versionadded:: release-04-00-00
+
 ``b2file-size``: Show detailed size information about the content of a file
 ---------------------------------------------------------------------------
 

@@ -96,11 +96,11 @@ add_skim('CharmlessHad3Body', Had3BodyList, path=skimpath)
 # Charm skims
 # charm Skim: D0 -> K pi/ pi pi /K K
 from skim.charm import D0ToHpJm
-add_skim('Charm2BodyHadronicD0', D0ToHpJm(path=skimpath), path=skimpath)
+add_skim('D0ToHpJm', D0ToHpJm(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi/ pi pi /K K) pi
 from skim.charm import DstToD0PiD0ToHpJm
-add_skim('Charm2BodyHadronic', DstToD0PiD0ToHpJm(path=skimpath), path=skimpath)
+add_skim('DstToD0PiD0ToHpJm', DstToD0PiD0ToHpJm(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi pi0) pi
 from skim.charm import DstToD0PiD0ToHpJmPi0

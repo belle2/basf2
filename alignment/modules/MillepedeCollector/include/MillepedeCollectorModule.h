@@ -136,8 +136,8 @@ namespace Belle2 {
     std::string m_internalIterations;
     /** Up to which external iteration propagation Jacobians should be re-calculated */
     int m_recalcJacobians;
-    /** Add local parameter for event T0 fit in GBL **/
-    bool m_fitEventT0;
+    /** Add local parameter for track T0 fit in GBL (local derivative) **/
+    bool m_fitTrackT0;
     /** Update L/R weights from previous DAF fit result? **/
     bool m_updateCDCWeights;
     /** Minimum CDC hit weight **/

@@ -23,7 +23,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  @name Structured creation of neighborhoods
+     *  name Structured creation of neighborhoods
      *
      *  Often one faces the problem of having to build a graph between elements of the \n
      *  same kind. To find suitable neighbors in a general container it would take an amount of time \n
@@ -48,7 +48,7 @@ namespace Belle2 {
      */
     struct RelationFilterUtil {
       /* *@{*/
-      /// Appends relations between elements in the given AItems using the ARelationFilter.
+      /** Appends relations between elements in the given AItems using the ARelationFilter. */
       template <class AObject, class ARelationFilter>
       static void appendUsing(ARelationFilter& relationFilter,
                               const std::vector<AObject*>& froms,

@@ -33,3 +33,8 @@ Flavor Tagger
 * Default Expert (testing mode) does not create repositories and does not save weight files locally. 
   It only loads the payloads directly from the database using the database payload names
   as mva identifiers.
+
+Vertex Fitting
+++++++++++++++
+
+* Added IP tube constraint to KFit

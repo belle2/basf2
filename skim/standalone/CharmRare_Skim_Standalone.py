@@ -21,7 +21,8 @@ import os
 import sys
 import glob
 
-skimCode = encodeSkimName('CharmRare')
+# skimCode = encodeSkimName('CharmRare')
+skimCode = "CharmRare"
 
 crpath = Path()
 

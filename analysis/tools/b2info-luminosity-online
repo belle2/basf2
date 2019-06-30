@@ -8,12 +8,14 @@ Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
 https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
 
 Usage:
-    b2info-luminosity-online --exp <E> --runs <Range> [--verbose] [--db db_path]
+    b2info-luminosity-online --exp <E> --runs <Range> --plot [DATE|RUN] [--verbose] [--db db_path]
 
-<E> experiment number (mandatory)
+<E> experiment number (mandatory) A range is allowed
 <Range> run range (mandatory)
     syntax is: xx-yy,zz
     all runs between xx and yy (included) and run zz. Can have multiple ranges xx-yy,zz-ww
+    not allowed if exp has range as well
+--plot Produce plot of integrated luminosity vs day (DATE) or vs run (RUN)
 --verbose print lumi for each run
 --db path of database to use
 
@@ -132,7 +134,7 @@ class Luminosity:
 
         self.runRangeStr="All runs"
         if self.runs:
-            self.runRangeStr="Runs {min(self.runs)}-{self.runs(run_max)}"
+            self.runRangeStr=f"Runs {min(self.runs)}-{max(self.runs)}"
 
         self.verb=args.verb
 
@@ -246,9 +248,12 @@ class Luminosity:
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        print(f"Creating LumiPer{label}_Exp{self.expstr}.pdf|png files")
-        plt.savefig(f"LumiPer{label}_Exp{self.expstr}.pdf", bbox_inches="tight")
-        plt.savefig(f"LumiPer{label}_Exp{self.expstr}.png", bbox_inches="tight")
+        filename=f"LumiPer{label}_Exp{self.expstr}"
+        if self.runs:
+            filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
+        print(f"Creating {filename}.pdf|png files")
+        for fileformat in ['pdf','png']:
+            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight")
 
     def plotLumiPerRun(self):
         """
@@ -291,10 +296,12 @@ class Luminosity:
         plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
         plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        print(f"Creating LumiPerRun_Exp{self.expstr}.pdf|png files")
-        plt.savefig(f"LumiPerRun_Exp{self.expstr}.pdf", bbox_inches="tight")
-        plt.savefig(f"LumiPerRun_Exp{self.expstr}.png", bbox_inches="tight")
-        pass
+        filename=f"LumiPerRun_Exp{self.expstr}"
+        if self.runs:
+            filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
+        print(f"Creating {filename}.pdf|png files")
+        for fileformat in ['pdf','png']:
+            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight")
 
     def printLumi(self):
         """

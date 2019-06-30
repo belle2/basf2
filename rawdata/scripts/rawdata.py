@@ -119,6 +119,8 @@ def add_unpackers(path, components=None):
         path.add_module(trggdlsummary)
         trgeclunpacker = register_module('TRGECLUnpacker')
         path.add_module(trgeclunpacker)
+        trggrlunpacker = register_module('TRGGRLUnpacker')
+        path.add_module(trggrlunpacker)
 
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:

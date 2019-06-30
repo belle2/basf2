@@ -4,6 +4,8 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* The event-based variable ``KLMEnergy`` is removed. It is completely meaningless (:issue:`BII-5002`).
+
 * The variables ``mcDX``, ``mcDY``, ``mcDZ`` are now deprecated, 
   because they are duplicates of :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ`.
   A warning had been added in documentation.

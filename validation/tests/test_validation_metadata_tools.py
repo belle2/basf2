@@ -32,12 +32,16 @@ class TestValidationMetadataSetter(unittest.TestCase):
     :func:`validation_tools.metadata.create_validation_histograms`
     """
     def setUp(self):
+        """ Open temporary directory to work in. """
+        #: Temporary directory
         self.tmp_dir = tempfile.TemporaryDirectory()
 
     def tearDown(self):
+        """ Clean up temporary directory """
         self.tmp_dir.cleanup()
 
     def test(self):
+        """ Perform tests """
         tmp_dir_path = pathlib.Path(self.tmp_dir.name)
 
         dec_path = tmp_dir_path / "test_y4s_trivial.dec"

@@ -110,9 +110,9 @@ if __name__ == "__main__":
         df_sorted = pd.concat([
             local_print_function("Overview", filter_categories.RESULTS),
             local_print_function("ECL - Physics", filter_categories.ECL_PHYSICS),
-            local_print_function("ECL - Prescaled", filter_categories.ECL_PRESCALED),
+            local_print_function("ECL - Potentially Prescaled", filter_categories.ECL_PRESCALED),
             local_print_function("CDC - Physics", filter_categories.CDC_PHYSICS),
-            local_print_function("CDC - Prescaled", filter_categories.CDC_PRESCALED),
+            local_print_function("CDC - Potentially Prescaled", filter_categories.CDC_PRESCALED),
             local_print_function("Targeted Physics Lines", filter_categories.PHYSICS),
             local_print_function("QED / Control Samples", filter_categories.QED),
             local_print_function("Level 1 Passthrough ", filter_categories.LEVEL1),

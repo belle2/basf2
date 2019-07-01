@@ -6,19 +6,22 @@ A small command line interface for testing/debugging purposes is included.
 Run `python3 validationcomparison.py --help` for more information. """
 
 # std
-import argparse
-import os.path
-import numpy
-from metaoptions import MetaOptionParser
 from abc import ABC, abstractmethod
+import argparse
+import numpy
+import os.path
+from typing import Optional
 
-# external
+# 3rd
 import ROOT
 
+# ours
+from metaoptions import MetaOptionParser
 
 # ==============================================================================
 # Custom Exceptions
 # ==============================================================================
+
 
 class ComparisonFailed(Exception):
     """
@@ -107,7 +110,8 @@ class ComparisonBase(ABC):
     allow to access the results.
     """
 
-    def __init__(self, object_a, object_b, mop, debug=False):
+    def __init__(self, object_a, object_b,
+                 mop: Optional[MetaOptionParser] = None, debug=False):
         #: store the first object to compare
         self.object_a = object_a
 
@@ -115,6 +119,8 @@ class ComparisonBase(ABC):
         self.object_b = object_b
 
         #: MetaOptionParser
+        if mop is None:
+            mop = MetaOptionParser()
         self.mop = mop
 
         #: enable debug?

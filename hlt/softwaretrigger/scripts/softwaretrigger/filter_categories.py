@@ -1,9 +1,11 @@
+# ECL Physics channels
 ECL_PHYSICS = [
     "filter 0.3ltEstar max clustlt2 GeV plus 2 others gt 0.2 GeV",
     "filter ge1 Estargt2 GeV neutral clst 2232 or 130145 not gg2clst ee2clst ee1leg eeBrem",
     "filter ge1 Estargt2 GeV neutral clst 32130 not gg2clst ee1leg1clst ee1leg1trk eeBrem",
 ]
 
+# ECL Potentially Prescaled channels
 ECL_PRESCALED = [
     "filter 1 electron Estargt1 GeV clust in 45115 and no other clust Estargt0.3 GeV",
     "filter 1 Estargt1 GeV cluster no other cluster Estargt0.3 GeV",
@@ -17,25 +19,29 @@ ECL_PRESCALED = [
     "filter ECLMuonPair",
 ]
 
+# CDC Physics channels
 CDC_PHYSICS = [
     "filter ge3 loose tracks inc 1 tight not ee2leg",
-    "filter 2 loose tracks 0.8ltpstarmaxlt4.5 GeVc",
+    "filter 2 loose tracks inc 1 tight q==0 pstarmaxlt0.8 GeVc not eexx",
     "filter 2 loose tracks 0.8ltpstarmaxlt4.5 GeVc not ee2leg ee1leg1trk eexx",
     "filter 2 loose tracks pstarmaxgt4.5 GeVc not ee2leg ee1leg1trk ee1leg1e eeBrem muonPairV",
 ]
 
+# CDC Potentially Prescaled channels
 CDC_PRESCALED = [
-    "filter 2 loose tracks inc 1 tight q==0 pstarmaxlt0.8 GeVc not eexx",
-    "filter 2 loose tracks pstarmaxgt4.5 GeVc",
     "filter 2 loose tracks pstarmaxlt0.8 GeVc",
+    "filter 2 loose tracks 0.8ltpstarmaxlt4.5 GeVc",
+    "filter 2 loose tracks pstarmaxgt4.5 GeVc",
     "filter ge1 tight track",
 ]
 
+# Targeted Physics channels
 PHYSICS = [
     "filter 1 photon Estargt1 GeV clust in 45115 and no other clust Estargt0.3 GeV",
     "filter ggBarrelLoose"
 ]
 
+# QED channels
 QED = [
     "filter ee flat 0 19",
     "filter ee flat 19 22",
@@ -55,6 +61,7 @@ QED = [
     "filter single muon",
 ]
 
+# L1 Passthrough channels
 LEVEL1 = [
     "filter L1 trigger",
     "filter passthrough l1 trigger delayed bhabha",
@@ -62,6 +69,7 @@ LEVEL1 = [
     "filter dummy"
 ]
 
+# Veto channels
 VETOES = [
     "filter ee1leg",
     "filter ee1leg1clst",
@@ -74,6 +82,7 @@ VETOES = [
     "filter muonPairV",
 ]
 
+# General channels
 RESULTS = [
     "total events",
     "l1 decision",

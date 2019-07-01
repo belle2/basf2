@@ -135,7 +135,7 @@ class ComparisonBase(ABC):
         self._no_comparison_but_still_different = False
 
         #: Comparison result, i.e. equal/warning/error
-        self._comparison_result = ""
+        self._comparison_result = "not_compared"
         #: Longer description of the comparison result (e.g. 'performed Chi2
         #: Test ... with chi2 = ...').
         self._comparison_result_long = ""

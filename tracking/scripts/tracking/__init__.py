@@ -361,30 +361,3 @@ def add_vxd_standalone_cosmics_finder(
     converter = register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
     path.add_module(converter)
-
-
-def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_reco_tracks="SVDCDCRecoTracks",
-                                     cdc_reco_tracks="CDCRecoTracks", svd_reco_tracks="SVDRecoTracks",
-                                     pxd_reco_tracks="PXDRecoTracks",
-                                     weightfile_id='tracking/data/TrackQE_weight_files/FullTrackQE-Default.xml',
-                                     do_training=False):
-    if not do_training:
-        path.add_module(
-            'TrackQualityEstimatorMVA',
-            recoTracksStoreArrayName=reco_tracks,
-            SVDCDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
-            CDCRecoTracksStoreArrayName=cdc_reco_tracks,
-            SVDRecoTracksStoreArrayName=svd_reco_tracks,
-            PXDRecoTracksStoreArrayName=pxd_reco_tracks,
-            WeightFileIdentifier=weightfile_id,
-        )
-    else:
-        path.add_module(
-            'TrackQETrainingDataCollector',
-            recoTracksStoreArrayName=reco_tracks,
-            SVDCDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
-            CDCRecoTracksStoreArrayName=cdc_reco_tracks,
-            SVDRecoTracksStoreArrayName=svd_reco_tracks,
-            PXDRecoTracksStoreArrayName=pxd_reco_tracks,
-            TrainingDataOutputName=weightfile_id,
-        )

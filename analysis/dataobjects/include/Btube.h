@@ -39,10 +39,14 @@ namespace Belle2 {
     TMatrixFSym getTubeMatrix();
 
 
-
+    /**
+     * Sets Btube Center
+     */
     void setTubeCenter(const TVector3& tubecenter);
 
-
+    /**
+     * Sets Btube Error Matrix
+     */
     void setTubeMatrix(const TMatrixFSym& tubematrix);
 
 
@@ -62,3 +66,6 @@ namespace Belle2 {
   };
 }
 #endif
+
+
+

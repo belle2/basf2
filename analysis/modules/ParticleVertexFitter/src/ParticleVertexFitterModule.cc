@@ -24,7 +24,7 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-
+#include <analysis/dataobjects/Btube.h>
 // utilities
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -64,7 +64,8 @@ namespace Belle2 {
              0.001);
     addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
-    addParam("withConstraint", m_withConstraint, "additional constraint on vertex: ipprofile, iptube, mother, iptubecut, pointing",
+    addParam("withConstraint", m_withConstraint,
+             "additional constraint on vertex: ipprofile, iptube, mother, iptubecut, pointing, btube",
              string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
     addParam("updateDaughters", m_updateDaughters, "true: update the daughters after the vertex fit", false);
@@ -124,7 +125,7 @@ namespace Belle2 {
       findConstraintBoost(0.03);
     }
     if ((m_vertexFitter == "rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
-                                       || m_withConstraint == "mother" || m_withConstraint == "iptubecut"))
+                                       || m_withConstraint == "mother" || m_withConstraint == "iptubecut" || m_withConstraint == "btube"))
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
     std::vector<unsigned int> toRemove;
@@ -151,6 +152,16 @@ namespace Belle2 {
           }
         }
       }
+      if (m_withConstraint == "btube") {
+        Btube* Ver = particle->getRelatedTo<Btube>();
+        if (!Ver) {
+          toRemove.push_back(particle->getArrayIndex());
+        } else {
+          m_BeamSpotCenter = Ver->getTubeCenter();
+          m_beamSpotCov = Ver->getTubeMatrix();
+        }
+      }
+
       bool ok = doVertexFit(particle);
       if (!ok) particle->setPValue(-1);
       if (m_confidenceLevel == 0. && particle->getPValue() == 0.) {
@@ -179,6 +190,7 @@ namespace Belle2 {
         m_withConstraint != "mother" &&
         m_withConstraint != "iptubecut" &&
         m_withConstraint != "pointing" &&
+        m_withConstraint != "btube" &&
         m_withConstraint != "")
       B2FATAL("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
 
@@ -188,8 +200,8 @@ namespace Belle2 {
       // TODO: add this functionality
       if (m_decayString != "")
         B2FATAL("ParticleVertexFitter: kfitter does not support yet selection of daughters via decay string!");
-      if (m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
-        B2FATAL("ParticleVertexFitter: kfitter does not support yet the iptube constraint ");
+      if (m_withConstraint == "iptube" || m_withConstraint == "iptubecut" || m_withConstraint == "btube")
+        B2FATAL("ParticleVertexFitter: kfitter does not support yet the iptube or btube constraint ");
 
       // vertex fit
       if (m_fitType == "vertex") {
@@ -830,10 +842,9 @@ namespace Belle2 {
   {
     if ((m_decayString.empty() ||
          (m_withConstraint == "" && m_fitType != "mass")) && mother->getNDaughters() < 2) return false;
-
     if (m_withConstraint == "") analysis::RaveSetup::getInstance()->unsetBeamSpot();
     if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"  || m_withConstraint == "mother"
-        || m_withConstraint == "iptubecut")
+        || m_withConstraint == "iptubecut" || m_withConstraint == "btube")
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
     analysis::RaveKinematicVertexFitter rf;

@@ -69,7 +69,7 @@ namespace Belle2 {
      * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel
      */
     bool doVertexFit(Particle* p);
-    bool doRaveFit(Particle* q, Particle* r);
+    bool doRaveFit(Particle* q);
     bool m_verbose;
   };
 }

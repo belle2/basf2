@@ -31,10 +31,7 @@
 
 #include <TMath.h>
 
-
-
 using namespace std;
-
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -69,25 +66,19 @@ void BtubeCreatorModule::initialize()
   // magnetic field
   m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
-  //  analysis::RaveSetup::initialize(1, m_Bfield);
   m_BeamSpotCenter = m_beamParams->getVertex();
   m_beamSpotCov.ResizeTo(3, 3);
   m_beamSpotCov = m_beamParams->getCovVertex();
   B2INFO("BtubeCreator : magnetic field = " << m_Bfield);
 
   StoreArray<Particle> PARTICLES;
-  //  PARTICLES.isRequired();
-
-
   StoreArray<Btube> tubeconstraint;
   tubeconstraint.registerInDataStore();
   PARTICLES.registerRelationTo(tubeconstraint);
 }
 
-
 void BtubeCreatorModule::event()
 {
-
   StoreObjPtr<ParticleList> plist(m_listName);
   if (!plist) {
     B2ERROR("ParticleList " << m_listName << " not found");
@@ -114,7 +105,6 @@ void BtubeCreatorModule::event()
     Particle* dummyP;
     dummyP  = &BtagCopy;
 
-    bool ok = 0;
     TVector3 tagdecaypos(dummyP->getVertex()[0], dummyP->getVertex()[1], dummyP->getVertex()[2]);
 
     if (m_verbose) {
@@ -143,12 +133,9 @@ void BtubeCreatorModule::event()
       TLorentzVector v4Final = dummyP->get4Vector();
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * v4Final;
-      //--//            TLorentzVector v4Mother = particle->get4Vector();
-      //TLorentzVector v4Mother_cms = T.rotateLabToCms() * v4Mother;
-      //TLorentzVector vecNew = v4Mother_cms - vec;
       TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
       TLorentzVector v4FinalNew = T.rotateCmsToLab() * vecNew;
-      //--//    TLorentzVector v4FinalNew = v4Mother - v4Final;
+
       if (m_verbose) {
         cout << "beamspot center :" << endl;
         cout << "{" << std::fixed << std::setprecision(20) << m_BeamSpotCenter.X() << "," << std::fixed << std::setprecision(
@@ -190,18 +177,13 @@ void BtubeCreatorModule::event()
       TMatrix r2(3, 3);  r2.Mult(r2z, r2y);
       TMatrix r2t(3, 3); r2t.Transpose(r2);
 
-
       TMatrix longerror(3, 3); longerror(2, 2) = 1;
       TMatrix longerror_temp(3, 3); longerror_temp.Mult(r2, longerror);
       TMatrix longerrorRotated(3, 3); longerrorRotated.Mult(longerror_temp, r2t);
 
-      //      TMatrix xFat(3, 3);
-      // xFat(0,0) = 4 * pv(0,0);
-
       TMatrix pvNew(3, 3);
       pvNew += pv;
       pvNew += longerrorRotated;
-      //      pvNew += xFat;
 
       TMatrixFSym errNew(7);
       errNew.SetSub(0, 0, pp);
@@ -219,29 +201,26 @@ void BtubeCreatorModule::event()
              1) << "," << std::fixed << std::setprecision(20) << pv(1, 2) << "}," << endl;
         cout << "{" << std::fixed << std::setprecision(20) <<  pv(2, 0) << "," << std::fixed << std::setprecision(20) << pv(2,
              1) << "," << std::fixed << std::setprecision(20) << pv(2, 2) << "}" << endl;
+
+        cout << "B tube error matrix  :  " << endl;
+        cout << "{" << std::fixed << std::setprecision(20) <<  pvNew(0, 0) << "," << std::fixed << std::setprecision(20) << pvNew(0,
+             1) << "," << std::fixed << std::setprecision(20) << pvNew(0, 2) << "}," << endl;
+        cout << "{" << std::fixed << std::setprecision(20) <<  pvNew(1, 0) << "," << std::fixed << std::setprecision(20) << pvNew(1,
+             1) << "," << std::fixed << std::setprecision(20) << pvNew(1, 2) << "}," << endl;
+        cout << "{" << std::fixed << std::setprecision(20) << pvNew(2, 0) << "," << std::fixed << std::setprecision(20) << pvNew(2,
+             1) << "," << std::fixed << std::setprecision(20) << pvNew(2, 2) << "}" << endl;
+
+        cout << "B origin  " << endl;
+        cout << "{" << std::fixed << std::setprecision(20) << dummyP->getVertex()[0] << "," << std::fixed << std::setprecision(
+               20) << dummyP->getVertex()[1] << "," << std::fixed << std::setprecision(20) << dummyP->getVertex()[2] << "}" << endl;
       }
-      cout << "B tube error matrix  :  " << endl;
-      cout << "{" << std::fixed << std::setprecision(20) <<  pvNew(0, 0) << "," << std::fixed << std::setprecision(20) << pvNew(0,
-           1) << "," << std::fixed << std::setprecision(20) << pvNew(0, 2) << "}," << endl;
-      cout << "{" << std::fixed << std::setprecision(20) <<  pvNew(1, 0) << "," << std::fixed << std::setprecision(20) << pvNew(1,
-           1) << "," << std::fixed << std::setprecision(20) << pvNew(1, 2) << "}," << endl;
-      cout << "{" << std::fixed << std::setprecision(20) << pvNew(2, 0) << "," << std::fixed << std::setprecision(20) << pvNew(2,
-           1) << "," << std::fixed << std::setprecision(20) << pvNew(2, 2) << "}" << endl;
-      //      }
-      cout << "B origin  " << endl;
-      cout << "{" << std::fixed << std::setprecision(20) << dummyP->getVertex()[0] << "," << std::fixed << std::setprecision(
-             20) << dummyP->getVertex()[1] << "," << std::fixed << std::setprecision(20) << dummyP->getVertex()[2] << "}" << endl;
-      //      }
 
       dummyP->setMomentumVertexErrorMatrix(errNew);
 
-      Btube* tubeconstraint = tubeArray.appendNew(
-                                Btube());//tagOriginpos,tubeMat));
-      particle->addRelationTo(tubeconstraint);
+      Btube* tubeconstraint = tubeArray.appendNew(Btube());
+      child1->addRelationTo(tubeconstraint);
       tubeconstraint->setTubeCenter(tagOriginpos);
       tubeconstraint->setTubeMatrix(tubeMat);
-
-      ok = doRaveFit(child1, particle);
 
       child1->writeExtraInfo("TubeX", dummyP->getVertex()[0]);
       child1->writeExtraInfo("TubeY", dummyP->getVertex()[1]);
@@ -262,28 +241,7 @@ void BtubeCreatorModule::event()
       child1->writeExtraInfo("tubedirZ", v4FinalNew.Pz());
 
     }
-
-    if (ok) {
-      if (m_verbose) {
-        cout << "B sig decay  " << endl;
-        cout << "{" << std::fixed << std::setprecision(20) << child1->getVertex()[0] << "," << std::fixed << std::setprecision(
-               20) << child1->getVertex()[1] << "," << std::fixed << std::setprecision(20) << child1->getVertex()[2] << "}" << endl;
-        cout << "B sig error matrix  " << endl;
-      }
-      TMatrixFSym sigE = child1->getVertexErrorMatrix();
-      if (m_verbose) {
-        cout << "{" << std::fixed << std::setprecision(20) <<  sigE(0, 0) << "," << std::fixed << std::setprecision(20) << sigE(0,
-             1) << "," << std::fixed << std::setprecision(20) << sigE(0, 2) << "}," << endl;
-        cout << "{" << std::fixed << std::setprecision(20) <<  sigE(1, 0) << "," << std::fixed << std::setprecision(20) << sigE(1,
-             1) << "," << std::fixed << std::setprecision(20) << sigE(1, 2) << "}," << endl;
-        cout << "{" << std::fixed << std::setprecision(20) <<  sigE(2, 0) << "," << std::fixed << std::setprecision(20) << sigE(2,
-             1) << "," << std::fixed << std::setprecision(20) << sigE(2, 2) << "}" << endl;
-      }
-
-
-    }
-    if (!ok || !ok0) toRemove.push_back(particle->getArrayIndex());
-
+    if (!ok0) toRemove.push_back(particle->getArrayIndex());
   }
   plist->removeParticles(toRemove);
 
@@ -293,7 +251,6 @@ void BtubeCreatorModule::event()
 
 bool BtubeCreatorModule::doVertexFit(Particle* mother)
 {
-  //  analysis::RaveSetup::initialize(1, m_Bfield);
   analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
   analysis::RaveVertexFitter rsg;
@@ -304,29 +261,4 @@ bool BtubeCreatorModule::doVertexFit(Particle* mother)
     rsg.updateDaughters();
   } else {return false;}
   return true;
-  //analysis::RaveSetup::getInstance()->reset();
-}
-
-bool BtubeCreatorModule::doRaveFit(Particle* mother2, Particle* constraintP)
-{
-  //  analysis::RaveSetup::initialize(1, m_Bfield); //added
-  //              analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
-  //            analysis::RaveSetup::getInstance()->setBeamSpot(constraintP->getVertex(), constraintP->getVertexErrorMatrix());
-  //               analysis::RaveSetup::getInstance()->unsetBeamSpot();
-  auto* Ver = constraintP->getRelatedTo<Btube>();
-  cout << "  object X " << (Ver->getTubeCenter()).X() << "  object Y " << (Ver->getTubeCenter()).Y() << "  object Z " <<
-       (Ver->getTubeCenter()).Z() << endl;
-  analysis::RaveSetup::getInstance()->setBeamSpot(Ver->getTubeCenter(), Ver->getTubeMatrix());
-
-  analysis::RaveKinematicVertexFitter rf;
-  rf.addMother(mother2);
-
-  int nVert2 = rf.fit();
-
-  if (nVert2 == 1) {
-    rf.updateMother();
-    rf.updateDaughters();
-  } else {return false;}
-  return true;
-  //analysis::RaveSetup::getInstance()->reset();//added
 }

@@ -13,6 +13,9 @@ from validationfunctions import strip_ext, index_from_revision, get_style
 import json_objects
 
 
+# todo: [Ref, low prio, medium work] Refactor into class with uniform interface
+#   and subclasses implementing actual functionality for Plot/Tuple etc.
+#   /klieret
 class Plotuple:
 
     """!

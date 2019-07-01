@@ -423,6 +423,8 @@ class IntervalSelector:
 ###############################################################################
 
 
+# todo: [Ref, low prio, low work] Denote private methods with underscore
+#  /klieret
 class Validation:
 
     """!

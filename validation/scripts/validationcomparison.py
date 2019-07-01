@@ -513,19 +513,18 @@ class Chi2Test(PvalueTest):
             res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
 
     def _get_comparison_result_long(self) -> str:
-        if isinstance(self._pvalue, float):
-            pvalue_str = f"{self._pvalue:.6f}"
-        else:
-            pvalue_str = str(self._pvalue)
+        if self._pvalue is None or self._chi2ndf is None or self._chi2 is None:
+            return "Could not perform $\chi^2$-Test  between {{revision1}} ' \
+               r'and {{revision2}}."
 
         return r'Performed $\chi^2$-Test between {{revision1}} ' \
                r'and {{revision2}} ' \
                r'($\chi^2$ = {chi2:.4f}; NDF = {ndf}; ' \
                r'$\chi^2/\text{{{{NDF}}}}$ = {chi2ndf:.4f}).' \
-               r' <b>p-value: {pvalue}</b> (p-value warn: {pvalue_warn}, ' \
+               r' <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, ' \
                r'p-value error: {pvalue_error})'.format(
                    chi2=self._chi2, ndf=self._ndf, chi2ndf=self._chi2ndf,
-                   pvalue=pvalue_str, pvalue_warn=self._pvalue_warn,
+                   pvalue=self._pvalue, pvalue_warn=self._pvalue_warn,
                    pvalue_error=self._pvalue_error
                )
 
@@ -568,16 +567,15 @@ class KolmogorovTest(PvalueTest):
         self._pvalue = local_object_a.KolmogorovTest(local_object_b, option_str)
 
     def _get_comparison_result_long(self) -> str:
-        if isinstance(self._pvalue, float):
-            pvalue_str = f"{self._pvalue:.6f}"
-        else:
-            pvalue_str = str(self._pvalue)
+        if self._pvalue is None:
+            return "Could not perform Kolmogorov test  between {{revision1}} ' \
+               r'and {{revision2}}."
 
         return r'Performed Komlogorov test between {{revision1}} ' \
                r'and {{revision2}} ' \
-               r' <b>p-value: {pvalue}</b> (p-value warn: {pvalue_warn}, ' \
+               r' <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, ' \
                r'p-value error: {pvalue_error})'.format(
-                   pvalue=pvalue_str, pvalue_warn=self._pvalue_warn,
+                   pvalue=self._pvalue, pvalue_warn=self._pvalue_warn,
                    pvalue_error=self._pvalue_error
                )
 
@@ -622,16 +620,15 @@ class AndersonDarlingTest(PvalueTest):
         self._pvalue = local_object_a.KolmogorovTest(local_object_b, option_str)
 
     def _get_comparison_result_long(self) -> str:
-        if isinstance(self._pvalue, float):
-            pvalue_str = f"{self._pvalue:.6f}"
-        else:
-            pvalue_str = str(self._pvalue)
+        if self._pvalue is None:
+            return "Could not perform Anderson Darling test  between " \
+                   "{{revision1}} and {{revision2}}."
 
         return r'Performed Anderson Darling test between {{revision1}} ' \
                r'and {{revision2}} ' \
-               r' <b>p-value: {pvalue}</b> (p-value warn: {pvalue_warn}, ' \
+               r' <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, ' \
                r'p-value error: {pvalue_error})'.format(
-                   pvalue=pvalue_str, pvalue_warn=self._pvalue_warn,
+                   pvalue=self._pvalue, pvalue_warn=self._pvalue_warn,
                    pvalue_error=self._pvalue_error
                )
 

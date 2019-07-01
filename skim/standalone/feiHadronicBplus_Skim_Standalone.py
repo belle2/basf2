@@ -7,7 +7,7 @@
     fei training: MC12 based, release-03-02-00 'FEIv4_2019_MC12_release_03_01_01'
     """
 
-__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
 
 from basf2 import *

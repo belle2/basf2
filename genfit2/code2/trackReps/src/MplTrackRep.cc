@@ -10,7 +10,6 @@
 
 #include "MplTrackRep.h"
 
-#include <framework/logging/Logger.h>
 #include <FieldManager.h>
 #include <TDatabasePDG.h>
 #include <MeasurementOnPlane.h>
@@ -25,7 +24,6 @@ MplTrackRep::MplTrackRep(int pdgCode, float magCharge, char propDir) :
   m_magCharge(magCharge),
   m_mass(TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass()) // We could ofc use AbsTrackRep::getMass(state) but we have no state here to call on
 {
-  B2RESULT("Monopole representation is created");
 }
 
 MplTrackRep::~MplTrackRep()
@@ -56,7 +54,6 @@ double MplTrackRep::RKPropagate(M1x7& state7,
                                 bool varField,
                                 bool calcOnlyLastRowOfJ) const
 {
-  B2RESULT("Propagation with monopole representation is called");
   // The algorithm is
   //  E Lund et al 2009 JINST 4 P04001 doi:10.1088/1748-0221/4/04/P04001
   //  "Track parameter propagation through the application of a new adaptive Runge-Kutta-Nyström method in the ATLAS experiment"

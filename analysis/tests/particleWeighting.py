@@ -154,12 +154,13 @@ addtable2.param('runHigh', 1000)
 addtable2.param('runLow', 0)
 addtable2.param('tableName', "ParticleReweighting:TestMomentum2")
 
-analysis_main.add_module(addtable)
-analysis_main.add_module(addtable2)
-analysis_main.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
+testpath = Path()
+testpath.add_module(addtable)
+testpath.add_module(addtable2)
+testpath.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
 
 # Process the events
-process(analysis_main)
+process(testpath)
 B2RESULT("Weights are created and loaded to DB")
 
 

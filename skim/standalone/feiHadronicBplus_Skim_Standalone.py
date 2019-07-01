@@ -12,7 +12,6 @@ __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 gb2_setuprel = 'release-03-02-00'

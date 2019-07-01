@@ -103,7 +103,7 @@ matchMCTruth('B0:jpsiks', path=main)
 flavorTagger('B0:jpsiks', path=main)
 
 # calculate the Tag Vertex and Delta t (in ps), breco: type of MC association.
-TagV('B0:jpsiks', 'breco')
+TagV('B0:jpsiks', 'breco', path=main)
 
 # select variables that we want to store to ntuple
 fs_vars = ['kaonID', 'muonID', 'dr', 'dz', 'pValue', 'isSignal', 'mcErrors', 'genMotherID']

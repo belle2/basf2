@@ -19,6 +19,7 @@
 #
 ################################################################################
 
+import basf2
 from modularAnalysis import *
 import glob
 import os
@@ -62,33 +63,34 @@ outfile = step + '.root'
 # ---------------------------------------------------------------------------------------------
 
 # Perform analysis.
+firstpath = basf2.Path()
 
-inputMdstList('default', input)
+inputMdstList('default', input, path=firstpath)
 
-analysis_main.add_module('ProgressBar')
+firstpath.add_module('ProgressBar')
 
 # Build B candidate like in B2A701-ContinuumSuppression_Input.py
-fillParticleList('gamma', 'goodGamma == 1')
+fillParticleList('gamma', 'goodGamma == 1', path=firstpath)
 
-fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5')
+fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=firstpath)
 
-reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516')
-reconstructDecay('pi0  -> gamma gamma', '0.115<=M<=0.152')
-reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2')
+reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', path=firstpath)
+reconstructDecay('pi0  -> gamma gamma', '0.115<=M<=0.152', path=firstpath)
+reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=firstpath)
 
-matchMCTruth('B0')
-buildRestOfEvent('B0')
+matchMCTruth('B0', path=firstpath)
+buildRestOfEvent('B0', path=firstpath)
 
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-appendROEMasks('B0', [cleanMask])
+appendROEMasks('B0', [cleanMask], path=firstpath)
 
-buildContinuumSuppression('B0', 'cleanMask')
+buildContinuumSuppression('B0', 'cleanMask', path=firstpath)
 
 # Accept only correctly reconstructed B candidates as signal
-applyCuts('B0', 'isSignal or isContinuumEvent')
+applyCuts('B0', 'isSignal or isContinuumEvent', path=firstpath)
 
 # Tag B candidate for Vertex information
-TagV('B0')
+TagV('B0', path=firstpath)
 
 # Loop over each possible ROE (1 for every B candidate) in every event
 roe_path = create_path()

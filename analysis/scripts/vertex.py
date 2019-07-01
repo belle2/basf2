@@ -5,7 +5,6 @@ from basf2 import register_module
 from basf2 import B2WARNING
 import sys
 import inspect
-from analysisPath import analysis_main
 
 
 def fitVertex(
@@ -16,7 +15,7 @@ def fitVertex(
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
@@ -60,7 +59,7 @@ def _fitVertex(
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
@@ -93,7 +92,7 @@ def vertexKFit(
     conf_level,
     decay_string='',
     constraint='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -142,7 +141,7 @@ def vertexKFitDaughtersUpdate(
     list_name,
     conf_level,
     constraint='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -190,7 +189,7 @@ def massVertexKFit(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -238,7 +237,7 @@ def massVertexKFitDaughtersUpdate(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -286,7 +285,7 @@ def massKFit(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -334,7 +333,7 @@ def massKFitDaughtersUpdate(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -382,7 +381,7 @@ def fourCKFit(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -409,7 +408,7 @@ def fourCKFitDaughtersUpdate(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
@@ -437,7 +436,7 @@ def vertexRave(
     conf_level,
     decay_string='',
     constraint='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -487,7 +486,7 @@ def vertexRaveDaughtersUpdate(
     conf_level,
     decay_string='',
     constraint='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -543,7 +542,7 @@ def massVertexRave(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -591,7 +590,7 @@ def massVertexRaveDaughtersUpdate(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -639,7 +638,7 @@ def massRave(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
     silence_warning=True,
 ):
     """
@@ -693,7 +692,7 @@ def vertexTree(
     customOriginConstraint=False,
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
@@ -751,7 +750,7 @@ def TagV(
     askMCInfo=False,
     reqPXDHits=0,
     maskName='',
-    path=analysis_main,
+    path=None,
 ):
     """
     For each Particle in the given Breco ParticleList:
@@ -781,16 +780,9 @@ def TagV(
     path.add_module(tvfit)
 
 
-if __name__ == '__main__':
-    from basf2.utils import pretty_print_module
-    pretty_print_module(__name__, "vertex", {
-        repr(analysis_main): "analysis_main",
-    })
-
-
 def fitPseudo(
     list_name,
-    path=analysis_main,
+    path=None,
 ):
     """
     Add a pseudo \"vertex fit\" which adds a covariance matrix from the combination of the four-vectors of the daughters.
@@ -814,3 +806,8 @@ def fitPseudo(
     pseudofit.set_name('PseudoVertexFitter_' + list_name)
     pseudofit.param('listName', list_name)
     path.add_module(pseudofit)
+
+
+if __name__ == '__main__':
+    from basf2.utils import pretty_print_module
+    pretty_print_module(__name__, "vertex")

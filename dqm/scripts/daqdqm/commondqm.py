@@ -40,16 +40,16 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # SVD DATA FORMAT
             svdunpackerdqm = register_module('SVDUnpackerDQM')
             path.add_module(svdunpackerdqm)
-            # ZeroSuppression Emulator
+            # SVDDQMExpressReco General
             path.add_module(
                 'SVDZeroSuppressionEmulator',
                 SNthreshold=5,
                 ShaperDigits='SVDShaperDigits',
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
-            svddqm = register_module('SVDDQMExpressReco')
-            svddqm.param('offlineZSShaperDigits', 'SVDShaperDigitsZS5')
-            path.add_module(svddqm)
+            path.add_module('SVDDQMExpressReco',
+                            offlineZSShaperDigits='SVDShaperDigitsZS5')
+
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
             vxddqm = register_module('VXDDQMExpressReco')
@@ -144,6 +144,11 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')
         path.add_module(trackDqm)
+        path.add_module('SetupGenfitExtrapolation')
+        path.add_module('SVDROIFinder',
+                        recoTrackListName='RecoTracks',
+                        SVDInterceptListName='SVDIntercepts')
+        path.add_module('SVDDQMEfficiency')
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):
         path.add_module('ARICHDQM')

@@ -485,7 +485,6 @@ class Comparison(JsonBase):
     between revisions
     """
 
-    # todo: Don't use lists as default /klieret
     def __init__(self, revisions=None, packages=None):
         """
         Create a new ComparisonRevision object and fill all members

@@ -63,7 +63,7 @@ if int(options.gdl):
 
 output = register_module('RootOutput')
 output.param("outputFileName", options.output)
-main.add_module(output, branchNames=["GRLevt"])
+main.add_module(output, branchNames=["TRGGRLUnpackerStore"])
 
 # Process all events
 process(main)

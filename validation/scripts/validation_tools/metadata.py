@@ -15,12 +15,46 @@ from ROOT import Belle2
 ROOT.gInterpreter.Declare("#include <framework/utilities/MakeROOTCompatible.h>")
 
 
+def file_description_set(rootfile: Union[ROOT.TFile, str, pathlib.PurePath],
+                         description: str) -> None:
+    """
+    Add file description validation metdata to a ROOT file.
+
+    Args:
+        rootfile (TFile, str or pathlib.PurePath): Name of the root file
+            to open or an already open TFile instance
+        description (str):  Common description/information of/about all plots
+            in this ROOT file (will be displayed above the plots)
+
+    Returns:
+        None
+    """
+    opened = False
+    if not isinstance(rootfile, ROOT.TFile):
+        if isinstance(rootfile, pathlib.PurePath):
+            rootfile = str(rootfile)
+        rootfile = ROOT.TFile(rootfile, "UPDATE")
+        opened = True
+    if not rootfile.IsOpen() or not rootfile.IsWritable():
+        raise RuntimeError(
+            f"ROOT file {rootfile.GetName()} is not open for writing"
+        )
+    # scope guard to avoid side effects by changing the global gDirectory
+    # in modules ...
+    # noinspection PyUnusedLocal
+    directory_guard = ROOT.TDirectory.TContext(rootfile)
+    desc = ROOT.TNamed("Description", description)
+    desc.Write()
+    if opened:
+        rootfile.Close()
+
+
 def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
                             description: str, check: str,
                             xlabel: Optional[str] = None,
                             ylabel: Optional[str] = None,
                             metaoptions="") -> None:
-    """
+    """!
     Set the validation metadata for a given object by setting the necessary
     values. This function can be used on any object supported by the
     Validation (histograms, profiles, ntuples)
@@ -74,7 +108,7 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
 def validation_metadata_update(
         rootfile: Union[str, ROOT.TFile, pathlib.PurePath],
         name: str, *args, **argk) -> None:
-    """
+    """!
     This is a convenience helper for `validation_metadata_set` in case the
     objects have already been saved in a ROOT file before: It will open the
     file (or use an existing TFile), extract the object, add the metadata and
@@ -121,7 +155,7 @@ def validation_metadata_update(
 
 
 class ValidationMetadataSetter(basf2.Module):
-    """
+    """!
     Simple module to set the valdiation metadata for a given list of objects
     automatically at the end of event processing
 
@@ -137,8 +171,8 @@ class ValidationMetadataSetter(basf2.Module):
     """
 
     def __init__(self, variables: List[Tuple[str]],
-                 rootfile: Union[str, pathlib.PurePath]):
-        """
+                 rootfile: Union[str, pathlib.PurePath], description=""):
+        """!
 
         Arguments:
             variables (list(tuple(str))): List of objects to set the metadata
@@ -150,6 +184,8 @@ class ValidationMetadataSetter(basf2.Module):
                 where ``xlabel``, ``ylabel`` and ``metaoptions`` are optional
             rootfile (str or pathlib.PurePath): The name of the ROOT file where
                 the objects can be found
+            description (str): Common description/information of/about all plots
+                in this ROOT file (will be displayed above the plots)
         """
         super().__init__()
         #: Remember the metadata
@@ -158,6 +194,9 @@ class ValidationMetadataSetter(basf2.Module):
             rootfile = str(rootfile)
         #: And the name of the root file
         self._rootfile = rootfile  # type: str
+        #: Common description/information of/about all plots
+        #: in this ROOT file (will be displayed above the plots)
+        self._description = description
         #: Shared pointer to the root file that will be closed when the last
         #: user disconnects
         self._tfile = None  # type: ROOT.TFile
@@ -172,6 +211,8 @@ class ValidationMetadataSetter(basf2.Module):
         for name, *metadata in self._variables:
             name = Belle2.makeROOTCompatible(name)
             validation_metadata_update(self._tfile.get(), name, *metadata)
+        if self._description:
+            file_description_set(self._tfile.get(), self._description)
         self._tfile.reset()
 
 
@@ -179,9 +220,10 @@ def create_validation_histograms(
     path: basf2.Path, rootfile: Union[str, pathlib.PurePath],
     particlelist: str,
     variables_1d: Optional[List[Tuple]] = None,
-    variables_2d: Optional[List[Tuple]] = None
+    variables_2d: Optional[List[Tuple]] = None,
+    description=""
 ) -> None:
-    """
+    """!
     Create histograms for all the variables and also label them to be useful
     in validation plots in one go. This is similar to the
     `modularAnalysis.variablesToHistogram` function but also sets the
@@ -198,6 +240,8 @@ def create_validation_histograms(
         variables_2d: List of 2D histogram definitions of the form
             ``var1, bins1, min1, max1, var2, bins2, min2, max2, title, contact,
             description, check_for [, xlabel [, ylabel [, metaoptions]]]``
+        description: Common description/information of/about all plots in this
+            ROOT file (will be displayed above the plots)
     """
     if isinstance(rootfile, pathlib.PurePath):
         rootfile = str(rootfile)
@@ -216,11 +260,13 @@ def create_validation_histograms(
             histograms_2d.append(row[:8])
             metadata.append([var1 + var2] + list(row[8:]))
 
-    path.add_module(ValidationMetadataSetter(metadata, rootfile))
+    path.add_module(
+        ValidationMetadataSetter(metadata, rootfile, description=description)
+    )
     path.add_module(
         "VariablesToHistogram",
         particleList=particlelist,
         variables=histograms_1d,
         variables_2d=histograms_2d,
-        fileName=rootfile
+        fileName=rootfile,
     )

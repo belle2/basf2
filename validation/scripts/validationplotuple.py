@@ -126,8 +126,8 @@ class Plotuple:
         # will yield
         self.contact = self.newest.contact
 
-        # The meta-options for this Plotuple object
-        self.metaoptions = self.newest.metaoptions
+        # MetaOptionParser for the meta-options for this Plotuple object
+        self.mop = metaoptions.MetaOptionParser(self.newest.metaoptions)
 
         # The package to which the elements in this Plotuple object belong
         self.package = self.newest.package
@@ -208,8 +208,7 @@ class Plotuple:
         """!
         @return Returns true if this plotuple has the expert option
         """
-        mop = metaoptions.MetaOptionParser(self.metaoptions)
-        return mop.has_option("expert")
+        return self.mop.has_option("expert")
 
     def perform_comparison(self):
         """!
@@ -218,10 +217,11 @@ class Plotuple:
         two objects.
         @return: None
         """
+
         tester = validationcomparison.get_comparison(
             self.reference.object,
             self.newest.object,
-            self.metaoptions
+            self.mop
         )
 
         if tester is None:
@@ -229,6 +229,7 @@ class Plotuple:
                 "appropriate comparison class could be " \
                 "found."
             self.comparison_result = "error"
+
         else:
             self.comparison_result_long = tester.comparison_result_long.format(
                 revision1=self.reference.revision,
@@ -443,9 +444,8 @@ class Plotuple:
             self.height = 525
         canvas = ROOT.TCanvas('', '', self.width, self.height)
 
-        # todo [ref, trivial, low] Use MetaOptionParser instead for consistency
         # Allow possibility to turn off the stats box
-        if 'nostats' in self.metaoptions:
+        if self.mop.has_option('nostats'):
             ROOT.gStyle.SetOptStat("")
         else:
             ROOT.gStyle.SetOptStat("nemr")
@@ -466,11 +466,11 @@ class Plotuple:
         # If we have a 1D histogram
         if mode == '1D':
 
-            if 'nogrid' not in self.metaoptions:
+            if not self.mop.has_option('nogrid'):
                 canvas.SetGrid()
-            if 'logx' in self.metaoptions:
+            if self.mop.has_option('logx'):
                 canvas.SetLogx()
-            if 'logy' in self.metaoptions:
+            if self.mop.has_option('logy'):
                 canvas.SetLogy()
 
             # If there is a reference object, plot it first
@@ -524,10 +524,10 @@ class Plotuple:
                     # Get additional options for 1D histograms
                     # (Intersection with self.metaoptions)
                     additional_options = ['C']
-                    additional_options = list(
-                        set(additional_options) & set(self.metaoptions)
-                    )
-
+                    additional_options = [
+                        option for option in additional_options
+                        if self.mop.has_option(option)
+                    ]
                     options_str = plot.object.GetOption() + \
                         ' '.join(additional_options)
                     drawn = True
@@ -537,7 +537,7 @@ class Plotuple:
                 self._draw_root_object(self.type, plot.object, options_str)
 
                 # redraw grid ontop of histogram, if selected
-                if 'nogrid' not in self.metaoptions:
+                if not self.mop.has_option('nogrid'):
                     canvas.RedrawAxis("g")
 
                 canvas.Update()
@@ -559,7 +559,7 @@ class Plotuple:
                 # Get additional options for 2D histograms
                 additional_options = ''
                 for _ in ['col', 'colz', 'cont', 'contz', 'box']:
-                    if _ in self.metaoptions:
+                    if self.mop.has_option(_):
                         additional_options += ' ' + _
 
                 # Draw the reference on the canvas
@@ -606,8 +606,7 @@ class Plotuple:
         canvas = ROOT.TCanvas('', '', self.width, self.height)
 
         # Allow possibility to turn off the stats box
-        # todo [ref, trivial, low] Use MetaOptionParser instead for consistency
-        if 'nostats' in self.metaoptions:
+        if self.mop.has_option('nostats'):
             ROOT.gStyle.SetOptStat("")
         else:
             ROOT.gStyle.SetOptStat("nemr")
@@ -619,11 +618,11 @@ class Plotuple:
                 and not self.reference == self.newest:
             self.perform_comparison()
 
-        if 'nogrid' not in self.metaoptions:
+        if not self.mop.has_option('nogrid'):
             canvas.SetGrid()
-        if 'logx' in self.metaoptions:
+        if self.mop.has_option('logx'):
             canvas.SetLogx()
-        if 'logy' in self.metaoptions:
+        if self.mop.has_option('logy'):
             canvas.SetLogy()
 
         # A variable which holds whether we
@@ -657,7 +656,7 @@ class Plotuple:
                 # Get additional options for 1D histograms
                 additional_options = ''
                 for _ in ['C']:
-                    if _ in self.metaoptions:
+                    if self.mop.has_option(_):
                         additional_options += ' ' + _
 
                 # Draw the reference on the canvas
@@ -671,7 +670,7 @@ class Plotuple:
                 self._draw_root_object(self.type, plot.object, "SAME")
 
             # redraw grid ontop of histogram, if selected
-            if 'nogrid' not in self.metaoptions:
+            if not self.mop.has_option('nogrid'):
                 canvas.RedrawAxis("g")
 
             canvas.Update()
@@ -735,8 +734,7 @@ class Plotuple:
         #     ]
         # }
 
-        mop = metaoptions.MetaOptionParser(self.metaoptions)
-        precision = mop.int_value("float-precision", default=4)
+        precision = self.mop.int_value("float-precision", default=4)
         format_str = "{{0:.{}f}}".format(precision)
 
         def value2str(obj):

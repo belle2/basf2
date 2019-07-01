@@ -32,12 +32,16 @@ class TestValidationMetadataSetter(unittest.TestCase):
     :func:`validation_tools.metadata.create_validation_histograms`
     """
     def setUp(self):
+        """ Open temporary directory to work in. """
+        #: Temporary directory
         self.tmp_dir = tempfile.TemporaryDirectory()
 
     def tearDown(self):
+        """ Clean up temporary directory """
         self.tmp_dir.cleanup()
 
     def test(self):
+        """ Perform tests """
         tmp_dir_path = pathlib.Path(self.tmp_dir.name)
 
         dec_path = tmp_dir_path / "test_y4s_trivial.dec"
@@ -70,13 +74,15 @@ class TestValidationMetadataSetter(unittest.TestCase):
                     "description of M", "nothing to check",
                     "x label"
                 )
-            ], variables_2d=[
+            ],
+            variables_2d=[
                 (
                     "M", 100, 5, 15, "M", 100, 5, 15, "mass vs mass",
                     "me <wontreply@dont.try>", "some description nobody reads",
                     "nothing to check", "x label", "why label?", "mop1, mop2"
                 )
-            ]
+            ],
+            description="Overall description of plots in this package."
         )
 
         basf2.process(path=path)
@@ -85,6 +91,15 @@ class TestValidationMetadataSetter(unittest.TestCase):
         # ----------------------------------------------------------------------
 
         tf = ROOT.TFile(str(out_file_path))
+
+        # Overall
+        # *******
+
+        d = tf.Get("Description")
+        self.assertEqual(
+            d.GetTitle(),
+            "Overall description of plots in this package."
+        )
 
         # 1D Histogram
         # ************

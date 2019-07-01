@@ -56,13 +56,11 @@ class TooFewBins(Exception):
 # ==============================================================================
 
 
-def get_comparison(object_1, object_2, metaoptions):
+def get_comparison(object_1, object_2, mop):
     """ Uses the metaoptions to determine which comparison algorithm is used
     and initializes the corresponding subclass of :class:`ComparisonBase` that
     implements the actual comparison and holds the results.
     """
-    mop = MetaOptionParser(metaoptions)
-
     if mop.has_option("kolmogorov"):
         tester = KolmogorovTest
     elif mop.has_option("andersondarling"):
@@ -73,7 +71,7 @@ def get_comparison(object_1, object_2, metaoptions):
     test = tester(
         object_1,
         object_2,
-        metaoptions=metaoptions
+        mop=mop
     )
 
     return test
@@ -109,7 +107,7 @@ class ComparisonBase(ABC):
     allow to access the results.
     """
 
-    def __init__(self, object_a, object_b, metaoptions="", debug=False):
+    def __init__(self, object_a, object_b, mop, debug=False):
         #: store the first object to compare
         self.object_a = object_a
 
@@ -117,7 +115,7 @@ class ComparisonBase(ABC):
         self.object_b = object_b
 
         #: MetaOptionParser
-        self.mop = MetaOptionParser(metaoptions)
+        self.mop = mop
 
         #: enable debug?
         self.debug = debug

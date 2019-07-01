@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Jochen Gemmler 2016
+##########################################################################
+# BASF2 (Belle Analysis Framework 2)                                     #
+# Copyright(C) 2016-2019  Belle II Collaboration                         #
+#                                                                        #
+# Author: The Belle II Collaboration                                     #
+# Contributors: Jochen Gemmler                                           #
+#                                                                        #
+# This software is provided "as is" without any warranty.                #
+##########################################################################
 
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
@@ -57,7 +65,7 @@ def construct_default_variable_names(particle_lists=None, ranked_variable='p', v
     return root_compatible_list
 
 
-def DeepFlavorTagger(particle_list, mode='expert', working_dir='', uniqueIdentifier='standard', variable_list=None,
+def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier='standard', variable_list=None,
                      output_variable='networkOutput', target='qrCombined', overwrite=False,
                      transform_to_probability=False, signal_fraction=-1.0, classifier_args=None,
                      train_valid_fraction=.92, mva_steering_file='analysis/scripts/dft/tensorflow_dnn_interface.py',
@@ -82,6 +90,9 @@ def DeepFlavorTagger(particle_list, mode='expert', working_dir='', uniqueIdentif
     :return: None
     """
 
+    if isinstance(particle_lists, str):
+        particle_lists = [particle_lists]
+
     if mode not in ['expert', 'teacher', 'sampler']:
         B2FATAL('Invalid mode  %s' % mode)
 
@@ -105,25 +116,26 @@ def DeepFlavorTagger(particle_list, mode='expert', working_dir='', uniqueIdentif
     roe_path = create_path()
     dead_end_path = create_path()
 
-    # define dft specific lists
+    # define dft specific lists to enable multiple calls, if someone really wants to do that
+    extension = particle_lists[0].replace(':', '_to_')
     roe_particle_list_cut = ''
-    roe_particle_list = 'pi+:dft'
+    roe_particle_list = 'pi+:dft' + '_' + extension
 
     tree_name = 'dft_variables'
 
     # filter rest of events only for specific particle list
-    signalSideParticleFilter(particle_list, 'hasRestOfEventTracks > 0', roe_path, dead_end_path)
+    signalSideParticleListsFilter(particle_lists, 'hasRestOfEventTracks > 0', roe_path, dead_end_path)
 
     # TODO: particles with empty rest of events seems not to show up in efficiency statistics anymore
 
     # create final state particle lists
     fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
 
-    particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
+    dft_particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
 
-    cutAndCopyList(particle_lists[0], roe_particle_list, 'charge > 0 and isInRestOfEvent == 1 and p < infinity',
+    cutAndCopyList(dft_particle_lists[0], roe_particle_list, 'charge > 0 and isInRestOfEvent == 1 and p < infinity',
                    writeOut=True, path=roe_path)
-    cutAndCopyList(particle_lists[1], roe_particle_list, 'charge < 0 and isInRestOfEvent == 1 and p < infinity',
+    cutAndCopyList(dft_particle_lists[1], roe_particle_list, 'charge < 0 and isInRestOfEvent == 1 and p < infinity',
                    writeOut=True, path=roe_path)
 
     # sort pattern for tagging specific variables
@@ -132,10 +144,10 @@ def DeepFlavorTagger(particle_list, mode='expert', working_dir='', uniqueIdentif
 
     # create tagging specific variables
     if mode is not 'expert':
-        features = get_variables(particle_lists[0], rank_variable, variable_list, particleNumber=5)
-        features += get_variables(particle_lists[1], rank_variable, variable_list, particleNumber=5)
+        features = get_variables(dft_particle_lists[0], rank_variable, variable_list, particleNumber=5)
+        features += get_variables(dft_particle_lists[1], rank_variable, variable_list, particleNumber=5)
 
-    for particles in particle_lists:
+    for particles in dft_particle_lists:
         rankByHighest(particles, rank_variable, path=roe_path)
 
     if mode is 'sampler':
@@ -195,7 +207,7 @@ def DeepFlavorTagger(particle_list, mode='expert', working_dir='', uniqueIdentif
         # mod_ft_info_filler = register_module('FlavorTaggerInfoFiller')
 
         expert_module = register_module('MVAExpert')
-        expert_module.param('listNames', [particle_list])
+        expert_module.param('listNames', particle_lists)
         expert_module.param('identifier', uniqueIdentifier)
 
         expert_module.param('extraInfoName', output_variable)

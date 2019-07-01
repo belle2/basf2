@@ -129,11 +129,6 @@ class ComparisonBase(ABC):
         #: used to store, whether the quantities have already been compared
         self.computed = False
 
-        # will be set to true, if for some reason no test could be
-        # performed, but the two objects are still different (for example
-        # different bin size)
-        self._no_comparison_but_still_different = False
-
         #: Comparison result, i.e. equal/warning/error
         self._comparison_result = "not_compared"
         #: Longer description of the comparison result (e.g. 'performed Chi2
@@ -155,24 +150,28 @@ class ComparisonBase(ABC):
 
         fail_message = "Comparison failed: "
 
+        # Note: default for comparison_result is "not_compared"
         try:
             self._compute()
         except ObjectsNotSupported as e:
             self._comparison_result_long = fail_message + str(e)
         except DifferingBinCount as e:
+            self._comparison_result = "error"
             self._comparison_result_long = fail_message + str(e)
-            self._no_comparison_but_still_different = True
         except TooFewBins as e:
             self._comparison_result_long = fail_message + str(e)
         except ComparisonFailed as e:
-            self._comparison_result_long = fail_message + str(e)
-            self._no_comparison_but_still_different = True
-
-        self._comparison_result = self._get_comparison_result()
-        self._comparison_result_long = self._get_comparison_result_long()
-
-        if self._no_comparison_but_still_different:
             self._comparison_result = "error"
+            self._comparison_result_long = fail_message + str(e)
+        except Exception as e:
+            self._comparison_result = "error"
+            self._comparison_result_long = "Unknown error occurred. Please " \
+                                           "submit a bug report. " + str(e)
+        else:
+            # Will be already set in case of errors above and we don't want
+            # to overwrite this.
+            self._comparison_result_long = self._get_comparison_result_long()
+            self._comparison_result = self._get_comparison_result()
 
         self.computed = True
 
@@ -514,8 +513,9 @@ class Chi2Test(PvalueTest):
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None or self._chi2ndf is None or self._chi2 is None:
-            return "Could not perform $\chi^2$-Test  between {{revision1}} ' \
-               r'and {{revision2}}."
+            return r"Could not perform $\chi^2$-Test  between {{revision1}} " \
+                   r"and {{revision2}} due to an unknown error. Please " \
+                   r"submit a bug report."
 
         return r'Performed $\chi^2$-Test between {{revision1}} ' \
                r'and {{revision2}} ' \
@@ -568,8 +568,9 @@ class KolmogorovTest(PvalueTest):
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None:
-            return "Could not perform Kolmogorov test  between {{revision1}} ' \
-               r'and {{revision2}}."
+            return r"Could not perform Kolmogorov test between {{revision1}} " \
+                   r"and {{revision2}} due to an unknown error. Please submit " \
+                   r"a bug report."
 
         return r'Performed Komlogorov test between {{revision1}} ' \
                r'and {{revision2}} ' \
@@ -621,8 +622,9 @@ class AndersonDarlingTest(PvalueTest):
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None:
-            return "Could not perform Anderson Darling test  between " \
-                   "{{revision1}} and {{revision2}}."
+            return r"Could not perform Anderson Darling test between " \
+                   r"{{revision1}} and {{revision2}} due to an unknown error." \
+                   r" Please support a bug report."
 
         return r'Performed Anderson Darling test between {{revision1}} ' \
                r'and {{revision2}} ' \

@@ -3,6 +3,9 @@ from ROOT import Belle2
 import sys
 import os
 
+showRecoTracks = True
+skipWithoutHWTS = True
+
 
 def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):
     unpacker = register_module('CDCTriggerUnpacker')
@@ -35,6 +38,8 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):
 
     unpacker.param('unpackNeuro', True)
     unpacker.param('decodeNeuro', True)
+    unpacker.param('delayNNOutput', [9, 9, 9, 9])
+    unpacker.param('delayNNSelect', [4, 4, 4, 4])
     path.add_module(unpacker)
 
 
@@ -73,6 +78,18 @@ def add_neuro_simulation(path):
                     )
 
 
+class FilterTrgPresent(Module):
+    def event(self):
+        self.return_value(bool(Belle2.PyStoreArray('CDCTriggerNNInputSegmentHits').getEntries() > 0))
+
+
+def add_filter(path, checkBranchName='CDCTriggerNNInputSegmentHits'):
+    filterObj = FilterTrgPresent()
+    main.add_module(filterObj)
+    empty_path = create_path()
+    filterObj.if_false(empty_path)
+
+
 set_log_level(LogLevel.ERROR)
 use_central_database("data_reprocessing_prompt")
 
@@ -84,6 +101,7 @@ dstputfile = ''
 os.makedirs('dqmoutput/data', exist_ok=True)
 os.makedirs('dqmoutput/hist', exist_ok=True)
 os.makedirs('dqmoutput/log', exist_ok=True)
+
 if '.sroot' in sys.argv[1]:
     outputfile = 'dqmoutput/hist/histo.' + sys.argv[1].split('/')[-1].split('.sroot')[0] + '.root'
     dstputfile = 'dqmoutput/data/dst.' + sys.argv[1].split('/')[-1].split('.sroot')[0] + '.root'
@@ -98,9 +116,15 @@ main.add_module('Geometry')
 
 main.add_module('Progress', maxN=3)
 add_neuro_2d_unpackers(main, debug_level=2, debugout=False)
+if skipWithoutHWTS:
+    add_filter(main)
 add_neuro_simulation(main)
-add_neuro_simulation_swts(main)
-showRecoTracks = True
+
+simNeuroTracksSWTSSW2DName = ''
+if showRecoTracks:
+    add_neuro_simulation_swts(main)
+    simNeuroTracksSWTSSW2DName = 'TRGCDCNeuroTracksSWTSSW2D'
+
 if showRecoTracks:
     main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='TSimNeuroTracks',
                     hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
@@ -117,11 +141,12 @@ main.add_module('HistoManager',
                 histoFileName=outputfile)
 main.add_module('CDCTriggerDQM',
                 simNeuroTracksName='TSimNeuroTracks',
-                simNeuroTracksSWTSSW2DName='TRGCDCNeuroTracksSWTSSW2D',
+                simNeuroTracksSWTSSW2DName=simNeuroTracksSWTSSW2DName,
                 showRecoTracks=showRecoTracks,
-                recoTrackMultiplicity=1,
-                skipWithoutHWTS=False,
-                maxRecoZDist=3.0
+                # recoTrackMultiplicity=1,
+                skipWithoutHWTS=skipWithoutHWTS,
+                maxRecoZDist=1.0,
+                maxRecoD0Dist=0.5,
                 )
 main.add_module('RootOutput', outputFileName=dstputfile)
 

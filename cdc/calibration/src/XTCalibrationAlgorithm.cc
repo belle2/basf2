@@ -29,7 +29,7 @@ using namespace Belle2;
 using namespace CDC;
 
 typedef std::array<float, 3> array3; /**< angle bin info. */
-XTCalibrationAlgorithm::XTCalibrationAlgorithm() :  CalibrationAlgorithm("CDCCalibrationCollector")
+XTCalibrationAlgorithm::XTCalibrationAlgorithm() : CalibrationAlgorithm("CDCCalibrationCollector")
 {
   setDescription(
     " -------------------------- XT Calibration Algorithm -------------------------\n"
@@ -55,7 +55,7 @@ void XTCalibrationAlgorithm::createHisto()
           if (lr == 1)
             m_hist2dDraw[i][al][th] = new TH2F(Form("h_draw%d_%d_%d", i, al, th),
                                                Form("(L=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
-                                                    i, m_iAlpha[al], m_iTheta[th]), 210, -20, 600, 2200, -1.2, 1.2);
+                                                    i, m_iAlpha[al], m_iTheta[th]), 210, -20, 600, 220, -1.2, 1.2);
         }
       }
     }
@@ -66,10 +66,10 @@ void XTCalibrationAlgorithm::createHisto()
   auto tree = getObjectPtr<TTree>("tree");
 
   int lay;
-  double dt;
-  double dx;
-  double Pval, alpha, theta;
-  double ndf;
+  float dt;
+  float dx;
+  float Pval, alpha, theta;
+  float ndf;
 
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("t", &dt);
@@ -122,6 +122,7 @@ void XTCalibrationAlgorithm::createHisto()
 CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
 {
   gROOT->SetBatch(1);
+  gPrintViaErrorHandler = true; // Suppress huge log output from TMinuit
   gErrorIgnoreLevel = 3001;
   B2INFO("Start calibration");
 

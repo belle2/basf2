@@ -5,7 +5,7 @@
 <header>
     <input>../feiHadronicBplus.udst.root</input>
     <output>feiHadronicBplus_Validation.root</output>
-    <contact>sophie.hollitt@adelaide.edu.au, philip.grace@adelaide.edu.au</contact>
+    <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """
 
@@ -24,8 +24,10 @@ variables.addAlias('d0_M', 'daughter(0,M)')
 variables.addAlias('decayModeID', 'extraInfo(decayModeID)')
 variables.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
+histogramFilename = 'feiHadronicBplus_Validation.root'
+
 variablesToHistogram(
-    filename='feiHadronicBplus_Validation.root',
+    filename=histogramFilename,
     decayString='B+:generic',
     variables=[
         ('sigProb', 100, 0.0, 1.0),
@@ -40,3 +42,17 @@ variablesToHistogram(
 
 process(path)
 print(statistics)
+
+# Reopen file to add contact details
+import ROOT
+
+histfile = ROOT.TFile(histogramFilename, 'UPDATE')
+
+histnames = [histname.GetTitle() for histname in histfile.GetListOfKeys()]
+for histname in histnames:
+    hist = histfile.Get(histname)
+
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'philip.grace@adelaide.edu.au'))
+
+    hist.Write('', ROOT.TObject.kOverwrite)
+histfile.Close()

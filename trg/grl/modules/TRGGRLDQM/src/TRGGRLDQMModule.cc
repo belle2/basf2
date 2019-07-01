@@ -160,7 +160,7 @@ void TRGGRLDQMModule::endRun()
 
 void TRGGRLDQMModule::event()
 {
-  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("GRLevt");
+  StoreObjPtr<TRGGRLUnpackerStore> evtinfo("TRGGRLUnpackerStore");
   if (!evtinfo) return;
 
   int N_track = evtinfo->m_N_track;

@@ -15,7 +15,7 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-03-02-00'
-skimCode = encodeSkimName('Charm2BodyHadronicD0')
+skimCode = encodeSkimName('D0ToHpJm')
 
 # create a new path for each WG
 c2bhdpath = Path()

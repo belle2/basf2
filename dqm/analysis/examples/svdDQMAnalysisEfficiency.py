@@ -8,10 +8,9 @@ mypath = Path()
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
 
-reset_database()
+# reset_database()
 use_database_chain()
-use_central_database('data_reprocessing_prompt_bucket4b')
-# mypath.add_module('SetupGenfitExtrapolation')
+use_central_database('data_reprocessing_prompt')
 
 inroot = register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', inputFile)
@@ -22,10 +21,6 @@ mypath.add_module('Geometry')
 
 dqm = register_module('DQMHistAnalysisSVDEfficiency')
 dqm.set_log_level(LogLevel.INFO)
-dqm.param("RefHistoFile", "")
-dqm.param("effLevel_Error", 0.5)
-dqm.param("effLevel_Warning", 0.7)
-dqm.param("effLevel_Empty", 0)
 dqm.param("printCanvas", True)
 mypath.add_module(dqm)
 

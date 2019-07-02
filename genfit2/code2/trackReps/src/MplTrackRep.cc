@@ -1,12 +1,21 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Dmitrii Neverov                                          *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/* Copyright 2019, Belle II Collaboration
+   Authors: Dmitrii Neverov
+
+   This file is part of GENFIT.
+
+   GENFIT is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published
+   by the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   GENFIT is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with GENFIT.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "MplTrackRep.h"
 
@@ -16,6 +25,8 @@
 #include <Exception.h>
 
 #include <math.h>
+
+#include <TBuffer.h>
 
 using namespace genfit;
 
@@ -244,4 +255,22 @@ double MplTrackRep::RKPropagate(M1x7& state7,
   // Step length increase for a fifth order Runge-Kutta, see e.g. 17.2
   // in Numerical Recipes.  FIXME: move to caller.
   return pow(DLT/EST, 1./5.);
+}
+
+void MplTrackRep::Streamer(TBuffer &R__b)
+{
+   // I guess I have to reimplement this since it can not be taken from RKTrackRep?
+   typedef ::genfit::MplTrackRep thisClass;
+   UInt_t R__s, R__c;
+   if (R__b.IsReading()) {
+      ::genfit::AbsTrackRep::Streamer(R__b);
+      Version_t R__v = R__b.ReadVersion(&R__s, &R__c); if (R__v) { }
+      R__b.CheckByteCount(R__s, R__c, thisClass::IsA());
+      lastStartState_.setRep(this);
+      lastEndState_.setRep(this);
+   } else {
+      ::genfit::AbsTrackRep::Streamer(R__b);
+      R__c = R__b.WriteVersion(thisClass::IsA(), kTRUE);
+      R__b.SetByteCount(R__c, kTRUE);
+   }
 }

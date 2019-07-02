@@ -72,7 +72,7 @@ avgProcessingTimePerEventPerSample = 0
 for skim in skims:
     csvFile = open(skim + '_stats.csv', 'w')
     csvWriter = csv.writer(csvFile)
-    csvWriter.writerow(['MC type', 'Input Events', 'Skimmed Events' 'Retention',
+    csvWriter.writerow(['MC type', 'Input Events', 'Skimmed Events', 'Retention',
                         'Time/Evt (HEPSEC)', 'Total Time (s)', 'uDST Size/Evt (KB)',
                         'uDST Size(MB)', 'ACMPE', 'Log Size/evt(KB)', 'Log Size(MB)',
                         'Max Memory (GB)', 'Avg Memory (GB)', 'FullSkimSize (GB)',

@@ -291,7 +291,7 @@ void BKLMEffnRadioModule::event()
       continue;
     }
     hitsPerLayer[layer]++;
-    int fwd = 0;
+    int fwd = hits1D[h]->getForward();
     int isPhi = 0;
 
     int channelMin = hits1D[h]->getStripMin() - 1;
@@ -307,9 +307,6 @@ void BKLMEffnRadioModule::event()
       continue;
     }
 
-    if (hits1D[h]->isForward()) {
-      fwd = 1;
-    }
     if (hits1D[h]->isPhiReadout()) {
       isPhi = 1;
     }
@@ -534,13 +531,9 @@ void BKLMEffnRadioModule::getEffs()
         }
 
         int sector1 = hits2D[h]->getSector();
-        int fwd1 = 0;
-        if (hits2D[h]->isForward())
-          fwd1 = 1;
+        int fwd1 = hits2D[h]->getForward();
         int sector2 = hits2D[h2]->getSector();
-        int fwd2 = 0;
-        if (hits2D[h]->isForward())
-          fwd2 = 1;
+        int fwd2 = hits2D[h]->getForward();
 
         //let's stay in the same module...(that is what we use for the simple tracking as well...)
         if (sector1 != sector2  || fwd1 != fwd2)
@@ -595,7 +588,7 @@ void BKLMEffnRadioModule::getEffs()
           //check if we find a point in effLayer which is also in this sector and close to the track
           bool found = false;
           for (int e = 0; e < hits2D.getEntries(); e++) {
-            if ((hits2D[e]->getLayer() != effLayer) || (hits2D[e]->getSector() != sector1) || (hits2D[e]->isForward() != fwd1))
+            if ((hits2D[e]->getLayer() != effLayer) || (hits2D[e]->getSector() != sector1) || (hits2D[e]->getForward() != fwd1))
               continue;
             //looking at hit in this layer..., see how far away we are from the projected hit...
             TVector3 candGlPos = hits2D[e]->getGlobalPosition();
@@ -683,18 +676,11 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
 
   int layer1 = bklmHits2D[firstHit]->getLayer();
   int sector1 = bklmHits2D[firstHit]->getSector();
-  int fwd1 = 0;
-
-  if (bklmHits2D[firstHit]->isForward())
-    fwd1 = 1;
+  int fwd1 = bklmHits2D[firstHit]->getForward();
 
   int layer2 = bklmHits2D[secondHit]->getLayer();
   int sector2 = bklmHits2D[secondHit]->getSector();
-  int fwd2 = 0;
-
-  if (bklmHits2D[secondHit]->isForward())
-    fwd2 = 1;
-
+  int fwd2 = bklmHits2D[secondHit]->getForward();
 
   for (int h = 0; h < bklmHits2D.getEntries(); ++h) {
     int layer = bklmHits2D[h]->getLayer();
@@ -705,7 +691,7 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
     if ((layer == layer1) || (layer == layer2))
       continue;
     //same sector necessary? probably not, the test is pretty simple...
-    if ((sector != sector1) || (sector != sector2) || (fwd1 != bklmHits2D[h]->isForward()) || (fwd2 != fwd1))
+    if ((sector != sector1) || (sector != sector2) || (fwd1 != bklmHits2D[h]->getForward()) || (fwd2 != fwd1))
       continue;
     //don't use points that are already part of other tracks... So don't allow sharing
     //tried only to disallow the same seeds but that doesn't seem to be enough...

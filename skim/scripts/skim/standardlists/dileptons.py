@@ -5,7 +5,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def loadStdDiLeptons(persistent=True, path=analysis_main):
+def loadStdDiLeptons(persistent=True, path):
     """
     Create the following lists of di-leptons:
       - 'J/psi:mumuLoose'
@@ -23,7 +23,7 @@ def loadStdDiLeptons(persistent=True, path=analysis_main):
     loadStdLoosepsi2s2ee(persistent, path)
 
 
-def loadStdLooseJpsi2mumu(persistent=True, path=analysis_main):
+def loadStdLooseJpsi2mumu(persistent=True, path):
     """
     Load the 'J/psi:mumuLoose' list from 'mu-:loose mu+:loose', with :math:`2.8 < M < 3.7~GeV`
 
@@ -34,7 +34,7 @@ def loadStdLooseJpsi2mumu(persistent=True, path=analysis_main):
     return 'J/psi:mumuLoose'
 
 
-def loadStdLooseJpsi2ee(persistent=True, path=analysis_main):
+def loadStdLooseJpsi2ee(persistent=True, path):
     """
     Load the 'J/psi:eeLoose' list from 'e-:loose e+:loose', with :math:`2.8 < M < 3.7~GeV`
 
@@ -45,7 +45,7 @@ def loadStdLooseJpsi2ee(persistent=True, path=analysis_main):
     return 'J/psi:eeLoose'
 
 
-def loadStdLoosepsi2s2mumu(persistent=True, path=analysis_main):
+def loadStdLoosepsi2s2mumu(persistent=True, path):
     """
     Load the 'psi(2S):mumuLoose' list from 'mu-:loose mu+:loose', with :math:`3.2 < M < 4.1~GeV`
 
@@ -56,7 +56,7 @@ def loadStdLoosepsi2s2mumu(persistent=True, path=analysis_main):
     return 'psi(2S):mumuLoose'
 
 
-def loadStdLoosepsi2s2ee(persistent=True, path=analysis_main):
+def loadStdLoosepsi2s2ee(persistent=True, path):
     """
     Load the 'psi(2S):eeLoose' list from 'e-:loose e+:loose', with :math:`3.2 < M < 4.1~GeV`
 

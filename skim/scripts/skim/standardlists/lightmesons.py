@@ -7,7 +7,7 @@ from modularAnalysis import *
 # Call to build all light mesons. Not recommended to use this general function as it creates many candidates
 
 
-def loadStdLightMesons(persistent=True, path=analysis_main):
+def loadStdLightMesons(persistent=True, path):
     """
     Create the following lists of light mesons:
       - 'rho0:loose'
@@ -37,7 +37,7 @@ def loadStdLightMesons(persistent=True, path=analysis_main):
 # NoCut mesons not to be included by default
 
 
-def loadStdLooseRho0(persistent=True, path=analysis_main):
+def loadStdLooseRho0(persistent=True, path):
     """
     Create a list of 'rho0:loose' list from 'pi-:loose pi+:loose' with :math:`0.47 < M < 1.07~GeV`
 
@@ -48,7 +48,7 @@ def loadStdLooseRho0(persistent=True, path=analysis_main):
     return 'rho0:loose'
 
 
-def loadStdAllRho0(persistent=True, path=analysis_main):
+def loadStdAllRho0(persistent=True, path):
     """
     Create a list of 'rho0:all' list from 'pi-:all pi+:all' with :math:`0.47 < M < 1.07~GeV`
 
@@ -59,7 +59,7 @@ def loadStdAllRho0(persistent=True, path=analysis_main):
     return 'rho0:all'
 
 
-def loadStdLooseRhoPlus(persistent=True, path=analysis_main):
+def loadStdLooseRhoPlus(persistent=True, path):
     """
     Create a list of 'rho+:loose' list from 'pi0:loose pi+:loose' with :math:`0.47 < M < 1.07~GeV`
 
@@ -70,7 +70,7 @@ def loadStdLooseRhoPlus(persistent=True, path=analysis_main):
     return 'rho+:loose'
 
 
-def loadStdAllRhoPlus(persistent=True, path=analysis_main):
+def loadStdAllRhoPlus(persistent=True, path):
     """
     Create a list of 'rho+:all' list from 'pi0:loose pi+:all' with :math:`0.47 < M < 1.07~GeV`
 
@@ -81,7 +81,7 @@ def loadStdAllRhoPlus(persistent=True, path=analysis_main):
     return 'rho+:all'
 
 
-def loadStdLooseKstar0(persistent=True, path=analysis_main):
+def loadStdLooseKstar0(persistent=True, path):
     """
     Create a list of 'K*0:loose' list from 'pi-:loose K+:loose' with :math:`0.74 < M < 1.04~GeV`
 
@@ -92,7 +92,7 @@ def loadStdLooseKstar0(persistent=True, path=analysis_main):
     return 'K*0:loose'
 
 
-def loadStdAllKstar0(persistent=True, path=analysis_main):
+def loadStdAllKstar0(persistent=True, path):
     """
     Create a list of 'K*0:all' list from 'pi-:all K+:all' with :math:`0.74 < M < 1.04~GeV`
 
@@ -103,7 +103,7 @@ def loadStdAllKstar0(persistent=True, path=analysis_main):
     return 'K*0:all'
 
 
-def loadStdLooseKstarPlus(persistent=True, path=analysis_main):
+def loadStdLooseKstarPlus(persistent=True, path):
     """
     Create a list of 'K*+:loose' list from 'pi+:loose K_S0:all' with :math:`0.74 < M < 1.04~GeV`
 
@@ -114,7 +114,7 @@ def loadStdLooseKstarPlus(persistent=True, path=analysis_main):
     return 'K*+:loose'
 
 
-def loadStdAllKstarPlus(persistent=True, path=analysis_main):
+def loadStdAllKstarPlus(persistent=True, path):
     """
     Create a list of 'K*+:all' list from 'pi+:all K_S0:all' with :math:`0.74 < M < 1.04~GeV`
 
@@ -125,7 +125,7 @@ def loadStdAllKstarPlus(persistent=True, path=analysis_main):
     return 'K*+:all'
 
 
-def loadStdAllPhi(persistent=True, path=analysis_main):
+def loadStdAllPhi(persistent=True, path):
     """
     Create a list of 'phi:all' list from 'K+:all K-:all' with :math:`0.97 < M < 1.1~GeV`
 
@@ -136,7 +136,7 @@ def loadStdAllPhi(persistent=True, path=analysis_main):
     return 'phi:all'
 
 
-def loadStdLoosePhi(persistent=True, path=analysis_main):
+def loadStdLoosePhi(persistent=True, path):
     """
     Create a list of 'phi:loose' list from 'K+:loose K-:loose' with :math:`0.97 < M < 1.1~GeV`
 
@@ -147,7 +147,7 @@ def loadStdLoosePhi(persistent=True, path=analysis_main):
     return 'phi:loose'
 
 
-def loadStdAllF_0(persistent=True, path=analysis_main):
+def loadStdAllF_0(persistent=True, path):
     """
     Create a list of 'f_0:all' list from 'pi+:all pi-:all' with :math:`0.78 < M < 1.18~GeV`
 
@@ -158,7 +158,7 @@ def loadStdAllF_0(persistent=True, path=analysis_main):
     return 'f_0:all'
 
 
-def loadStdLooseF_0(persistent=True, path=analysis_main):
+def loadStdLooseF_0(persistent=True, path):
     """
     Create a list of 'f_0:loose' list from 'pi+:loose pi1:loose' with :math:`0.78 < M < 1.18~GeV`
 
@@ -169,7 +169,7 @@ def loadStdLooseF_0(persistent=True, path=analysis_main):
     return 'f_0:loose'
 
 
-def loadStdAllOmega(persistent=True, path=analysis_main):
+def loadStdAllOmega(persistent=True, path):
     """
     Create a list of 'omega:all' list from 'pi0:loose pi-:all pi+:all' with :math:`0.73 < M < 0.83~GeV`
 
@@ -180,7 +180,7 @@ def loadStdAllOmega(persistent=True, path=analysis_main):
     return 'omega:all'
 
 
-def loadStdLooseOmega(persistent=True, path=analysis_main):
+def loadStdLooseOmega(persistent=True, path):
     """
     Create a list of 'omega:loose' list from 'pi0:loose pi-:loose pi+:loose' with :math:`0.73 < M < 0.83~GeV`
 
@@ -191,7 +191,7 @@ def loadStdLooseOmega(persistent=True, path=analysis_main):
     return 'omega:loose'
 
 
-def loadStdLooseEta(persistent=True, path=analysis_main):
+def loadStdLooseEta(persistent=True, path):
     """
     Create a list of 'eta:loose' list from 'gamma:loose gamma:loose' (dmID=1) and 'pi0:loose pi-:loose pi+:loose'
     (dmID=2), with :math:`0.4< M < 0.6~GeV`
@@ -205,7 +205,7 @@ def loadStdLooseEta(persistent=True, path=analysis_main):
     return 'eta:loose'
 
 
-def loadStdLooseEtaPrime(persistent=True, path=analysis_main):
+def loadStdLooseEtaPrime(persistent=True, path):
     """
     Create a list of 'eta\':loose' list from 'pi+:loose pi-:loose gamma:loose' (dmID=1) and 'pi+:loose pi-:loose eta:loose'
     (dmID=2), with :math:`0.8< M < 1.1~GeV`

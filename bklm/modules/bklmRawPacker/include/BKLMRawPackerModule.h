@@ -63,12 +63,6 @@ namespace Belle2 {
 
     //    StoreArray<RawFTSW> raw_ftswarray;
 
-    //! use default elect id, if not found in mapping file
-    bool m_useDefaultElectId = true;
-
-    //! use electronic map from DataBase or not
-    bool m_loadMapFromDB = false;
-
     //! offset of the scintillator ADC
     int m_scintADCOffset = 3400;
 

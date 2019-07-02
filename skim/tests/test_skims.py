@@ -131,8 +131,8 @@ from skim.charm import DstToD0PiD0ToHpHmKs
 add_skim('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
 
 # charm Skim: D -> gamma gamma/ e e/ mu mu
-from skim.charm import CharmRareList
-add_skim('CharmRare', CharmRareList(path=skimpath), path=skimpath)
+from skim.charm import CharmRare
+add_skim('CharmRare', CharmRare(path=skimpath), path=skimpath)
 
 
 # Systematics skim

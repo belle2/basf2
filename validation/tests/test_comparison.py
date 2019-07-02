@@ -4,7 +4,7 @@
 # std
 import unittest
 import random
-from typing import List
+from typing import List, Tuple
 
 # 3rd
 import ROOT
@@ -26,8 +26,13 @@ class TestGetComparison(unittest.TestCase):
         }
         basic_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
         basic_gaus_th1f.FillRandom("gaus", 1000)
+        different_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
+        different_gaus_th1f.FillRandom("expo", 1000)
         #: ROOT objects used to check if comparison executes
-        self.objs = [basic_gaus_th1f]  # type: List[ROOT.TObject]
+        self.obj_pairs = [
+            (basic_gaus_th1f, basic_gaus_th1f, "equal"),
+            (basic_gaus_th1f, different_gaus_th1f, "error"),
+        ]  # type: List[Tuple[ROOT.TObject, ROOT.TObject, str]]
 
     def test_get_comparison(self):
         """ Use get_tester on the metaoptions to get the requested
@@ -35,16 +40,20 @@ class TestGetComparison(unittest.TestCase):
         Check that this indeed returns 'equal'.
         """
         for tester_name in self.test_options:
-            for obj in self.objs:
-                with self.subTest(tester=tester_name, obj=obj.GetName()):
+            for obj in self.obj_pairs:
+                with self.subTest(
+                        tester=tester_name,
+                        obj1=obj[0].GetName(),
+                        obj2=obj[1].GetName()
+                ):
                     tester = validationcomparison.get_comparison(
-                        obj,
-                        obj,
+                        obj[0],
+                        obj[1],
                         metaoptions.MetaOptionParser(
                             self.test_options[tester_name].split(" ")
                         )
                     )
-                    self.assertEqual(tester.comparison_result, "equal")
+                    self.assertEqual(tester.comparison_result, obj[2])
 
 
 class TestComparison(unittest.TestCase):

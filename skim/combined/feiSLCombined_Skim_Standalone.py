@@ -25,21 +25,21 @@ inputMdstList('default', fileList, path=path)
 
 from skim.fei import *
 # run pre-selection  cuts and FEI
-runFEIforSLWithOneLepCombined(path)
+runFEIforSLCombined(path)
 
 # Include MC matching
 path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
 
 # Apply final B0 semileptonic tag cuts
-B0semileptonicList = B0SLWithOneLep(path)
-skimCode1 = encodeSkimName('feiSLB0WithOneLep')
+B0semileptonicList = B0SL(path)
+skimCode1 = encodeSkimName('feiSLB0')
 skimOutputUdst(skimCode1, B0semileptonicList, path=path)
 summaryOfLists(B0semileptonicList, path=path)
 
 # Apply final B+ semileptonic tag cuts
-BpsemileptonicList = BplusSLWithOneLep(path)
-skimCode2 = encodeSkimName('feiSLBplusWithOneLep')
+BpsemileptonicList = BplusSL(path)
+skimCode2 = encodeSkimName('feiSLBplus')
 skimOutputUdst(skimCode2, BpsemileptonicList, path=path)
 summaryOfLists(BpsemileptonicList, path=path)
 

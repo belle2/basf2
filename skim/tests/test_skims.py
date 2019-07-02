@@ -221,11 +221,10 @@ from skim.fei import*
 add_skim('feiHadronicBplus', BplusHadronic(path=skimpath), path=skimpath)
 
 from skim.fei import*
-add_skim('feiSLBplusWithOneLep', BplusSLWithOneLep(path=skimpath), path=skimpath)
-
+add_skim('feiSLBplus', BplusSL(path=skimpath), path=skimpath)
 
 from skim.fei import*
-add_skim('feiSLB0WithOneLep', B0SLWithOneLep(path=skimpath), path=skimpath)
+add_skim('feiSLB0', B0SL(path=skimpath), path=skimpath)
 
 
 from skim.dark import SinglePhotonDarkList

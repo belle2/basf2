@@ -415,7 +415,7 @@ def runFEIforHadronicCombined(path):
     path.add_path(feistate.path)
 
 
-def B0SLWithOneLep(path):
+def B0SL(path):
     """FEI Semi-Leptonic B0 tag (with Bsig with at least one lepton) skim list
     for generic analysis in the (Semi-)Leptonic and
     Missing Energy Working Group.
@@ -491,7 +491,7 @@ def B0SLWithOneLep(path):
     return BtagList
 
 
-def BplusSLWithOneLep(path):
+def BplusSL(path):
     """ FEI semi-leptonic (SL) Bplus tag with one lepton skim
     list for generic analysis in the (Semi-)Leptonic and
     Missing Energy Working Group.
@@ -566,10 +566,10 @@ def BplusSLWithOneLep(path):
     return BtagList
 
 
-def runFEIforB0SLWithOneLep(path):
+def runFEIforB0SL(path):
     """Generates FEI B0:semileptonic list with FEI removeSLD=True flag.
     This includes applying FEI weights and skim
-    pre-selection cuts. Use B0SLWithOneLep(path) for skim cuts on FEI output list.
+    pre-selection cuts. Use B0SL(path) for skim cuts on FEI output list.
 
     (Semi-)Leptonic and Missing Energy Working Group
 
@@ -656,10 +656,10 @@ def runFEIforB0SLWithOneLep(path):
     path.add_path(feistate.path)
 
 
-def runFEIforBplusSLWithOneLep(path):
+def runFEIforBplusSL(path):
     """Generates FEI B+:semileptonic list with FEI removeSLD=True flag.
     This includes applying FEI weights and skim
-    pre-selection cuts. Use BplusSLWithOneLep(path) for skim cuts on FEI output list.
+    pre-selection cuts. Use BplusSL(path) for skim cuts on FEI output list.
 
     (Semi-)Leptonic and Missing Energy Working Group
 
@@ -745,11 +745,11 @@ def runFEIforBplusSLWithOneLep(path):
     path.add_path(feistate.path)
 
 
-def runFEIforSLWithOneLepCombined(path):
+def runFEIforSLCombined(path):
     """Generates FEI B+:semileptonic and B0:semileptonic lists
     (without semileptonic D candidates) for FEI Semileptonic+lepton skims, including
     applying FEI weights and skim pre-selection cuts.
-    Use BplusSLWithOneLep(path) and B0SLWithOneLep(path) for skim cuts on FEI output lists
+    Use BplusSL(path) and B0SL(path) for skim cuts on FEI output lists
 
     (Semi-)Leptonic and Missing Energy Working Group.
 
@@ -809,8 +809,8 @@ def runFEIforSkimCombined(path):
     """Generates FEI B0:generic, B+:generic, B+:semileptonic and B0:semileptonic lists
     (without semileptonic D candidates) for all FEI skims, including
     applying FEI weights and skim pre-selection cuts.
-    Use B0Hadronic(path), BplusHadronic(path), BplusSLWithOneLep(path)
-    and B0SLWithOneLep(path) for skim cuts on FEI output lists
+    Use B0Hadronic(path), BplusHadronic(path), BplusSL(path)
+    and B0SL(path) for skim cuts on FEI output lists
 
     (Semi-)Leptonic and Missing Energy Working Group.
 

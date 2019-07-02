@@ -47,14 +47,14 @@ skimOutputUdst(skimCode2, BphadronicList, path=path)
 summaryOfLists(BphadronicList, path=path)
 
 # Apply final B0 semileptonic tag cuts
-B0semileptonicList = B0SLWithOneLep(path)
-skimCode3 = encodeSkimName('feiSLB0WithOneLep')
+B0semileptonicList = B0SL(path)
+skimCode3 = encodeSkimName('feiSLB0')
 skimOutputUdst(skimCode3, B0semileptonicList, path=path)
 summaryOfLists(B0semileptonicList, path=path)
 
 # Apply final B+ semileptonic tag cuts
-BpsemileptonicList = BplusSLWithOneLep(path)
-skimCode4 = encodeSkimName('feiSLBplusWithOneLep')
+BpsemileptonicList = BplusSL(path)
+skimCode4 = encodeSkimName('feiSLBplus')
 skimOutputUdst(skimCode4, BpsemileptonicList, path=path)
 summaryOfLists(BpsemileptonicList, path=path)
 

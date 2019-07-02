@@ -18,7 +18,7 @@ from modularAnalysis import *
 from beamparameters import add_beamparameters
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 gb2_setuprel = 'release-03-02-00'
-skimCode = encodeSkimName('feiSLB0WithOneLep')
+skimCode = encodeSkimName('feiSLB0')
 
 fileList = get_test_file("mixedBGx1", "MC12")
 
@@ -28,13 +28,13 @@ inputMdstList('default', fileList, path=path)
 
 from skim.fei import *
 # run pre-selection cuts and FEI
-runFEIforB0SLWithOneLep(path)
+runFEIforB0SL(path)
 
 # Include MC matching
 path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
 # Apply final  B0 tag cuts
-BtagList = B0SLWithOneLep(path)
+BtagList = B0SL(path)
 skimOutputUdst(skimCode, BtagList, path=path)
 summaryOfLists(BtagList, path=path)
 

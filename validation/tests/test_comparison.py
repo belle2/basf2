@@ -1,14 +1,53 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
 import unittest
-import validationcomparison
-import ROOT
 import random
+from typing import List
+
+# 3rd
+import ROOT
+
+# ours
+import validationcomparison
+import metaoptions
+
+
+class TestGetComparison(unittest.TestCase):
+    """ Test get_comparison """
+
+    def setUp(self):
+        """ Set up testing of get_comparison """
+        self.test_options = {
+            "chi2": "",
+            "kolmogorov": "kolmogorov",
+            "andersondarling": "andersondarling"
+        }
+        basic_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
+        basic_gaus_th1f.FillRandom("gaus", 1000)
+        #: ROOT objects used to check if comparison executes
+        self.objs = [basic_gaus_th1f]  # type: List[ROOT.TObject]
+
+    def test_get_comparison(self):
+        """ Use get_tester on the metaoptions to get the requested
+        comparison object and run that on two identical ROOT object.
+        Check that this indeed returns 'equal'.
+        """
+        for tester_name in self.test_options:
+            for obj in self.objs:
+                with self.subTest(tester=tester_name, obj=obj.GetName()):
+                    tester = validationcomparison.get_comparison(
+                        obj,
+                        obj,
+                        metaoptions.MetaOptionParser(
+                            self.test_options[tester_name].split(" ")
+                        )
+                    )
+                    self.assertEqual(tester.comparison_result, "equal")
 
 
 class TestComparison(unittest.TestCase):
-
     """
     Various test cases for the Chi2Test wrapper class
     """
@@ -43,6 +82,7 @@ class TestComparison(unittest.TestCase):
 
         return p
 
+    # todo: Can't I use FillRandom for this?
     @staticmethod
     def create_histogram(name, entries=5000, mu=10, sigma=3):
         """
@@ -70,7 +110,7 @@ class TestComparison(unittest.TestCase):
         #: However not implemented yet.
         self.call_iteration = 0
 
-        #: Prfile A
+        #: Profile A
         self.profileA = self.create_profile(self.root_name("profileA"))
 
         #: Profile B

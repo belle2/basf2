@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
+import copy
 import re
 import os
 import json
+import sys
+from typing import Dict, Union, List, Optional
 
+# ours
 import validationpath
 from validationfunctions import available_revisions
 # martin's mail utils
 import mail_utils
 
 
-def parse_mail_address(obj):
+def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
     """!
     Take a string or list and return list of email addresses that appear in it
     """
@@ -25,29 +30,6 @@ def parse_mail_address(obj):
         ]
     else:
         raise TypeError("must be string or list of strings")
-
-
-def check_if_same(new, old):
-    """!
-    Checks if the failed plots in new are the same as in old. new and old are
-    only considered to be different if the comparison_result of a same plot
-    changed or if new contains _more_ failed plots than old.
-
-    @return: True if something has changed.
-    """
-
-    # if new is larger than old, there are new failed plots
-    if len(new) > len(old):
-        return False
-
-    for plot in new:
-        # new plot failed
-        if plot not in old:
-            return False
-        # comparison_result changed
-        if new[plot]["comparison_result"] != old[plot]["comparison_result"]:
-            return False
-    return True
 
 
 class Mails:
@@ -89,21 +71,28 @@ class Mails:
         with open(comparison_json_file) as f:
             self.comparison_json = json.load(f)
 
+        # yesterday's mail data
+        old_mail_data_path = os.path.join(
+            self.validator.get_log_folder(), "mail_data.json"
+        )
+        try:
+            with open(old_mail_data_path) as f:
+                self.mail_data_old = json.load(f)
+        except FileNotFoundError:
+            print(
+                f"Could not find old mail_data.json at {old_mail_data_path}.",
+                file=sys.stderr
+            )
+            self.mail_data_old = None
+
         # current mail data
         self.mail_data_new = self._create_mail_log(self.comparison_json)
 
-        # yesterday's mail data
-        try:
-            with open(os.path.join(self.validator.get_log_folder(),
-                                   "mail_data.json")) as f:
-                self.mail_data_old = json.load(f)
-        except FileNotFoundError:
-            # todo: shouldn't we at least warn about this?
-            self.mail_data_old = None
-
-    def _create_mail_log_failed_scripts(self):
+    def _create_mail_log_failed_scripts(self) -> Dict[str, Dict[str, str]]:
         """!
         Looks up all scripts that failed and collects information about them.
+        See :meth:`_create_mail_log` for the structure of the resulting
+        dictionary.
         """
 
         # get failed scripts
@@ -156,7 +145,7 @@ class Mails:
 
         return mail_log
 
-    def _create_mail_log(self, comparison):
+    def _create_mail_log(self, comparison) -> Dict[str, Dict[str, Dict[str, str]]]:
         """!
         Takes the entire comparison json file, finds all the plots where
         comparison failed, finds info about failed scripts and saves them in
@@ -165,7 +154,12 @@ class Mails:
         {
              "email@address.test" : {
                  "title1": {
-                         "package": ... "description": ....
+                         "package": str,
+                         "description": str,
+                         "rootfile": str,
+                         "comparison_text": str,
+                         "description": str,
+                         "comparison_result": str
                      },
                  "title2": {...}
              },
@@ -218,7 +212,48 @@ class Mails:
                 for script in failed_scripts[contact]:
                     mail_log[contact][script] = failed_scripts[contact][script]
 
-        return mail_log
+        return self._flag_new_failures(mail_log, self.mail_data_old)
+
+    @staticmethod
+    def _flag_new_failures(
+        mail_log: Dict[str, Dict[str, Dict[str, str]]],
+        old_mail_log: Optional[Dict[str, Dict[str, Dict[str, str]]]]) \
+            -> Dict[str, Dict[str, Dict[str, str]]]:
+        """ Add a new field 'compared_to_yesterday' which takes one of the
+        values 'unchanged' (same revision comparison result as in yesterday's
+        mail log, 'new' (new warning/failure), 'changed' (comparison result
+        changed). """
+        mail_log_flagged = copy.deepcopy(mail_log)
+        for contact in mail_log:
+            for plot in mail_log[contact]:
+                if old_mail_log is None:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "n/a"
+                elif contact not in old_mail_log:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "new"
+                elif plot not in old_mail_log[contact]:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "new"
+                elif mail_log[contact][plot]["comparison_result"] != \
+                        old_mail_log[contact][plot]["comparison_result"]:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "changed"
+                else:
+                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
+                        "unchanged"
+        return mail_log_flagged
+
+    @staticmethod
+    def _check_if_same(plot_errors: Dict[str, Dict[str, str]]) -> bool:
+        """
+        @param plot_errors: ``_create_mail_log[contact]``.
+        @return True, if there is at least one new/changed plot status
+        """
+        for plot in plot_errors:
+            if plot_errors[plot]["compared_to_yesterday"] != "unchanged":
+                return False
+        return True
 
     @staticmethod
     def _compose_message(plots):
@@ -230,7 +265,7 @@ class Mails:
         url = "https://b2-master.belle2.org/validation/static/validation.html"
         # url = "http://localhost:8000/static/validation.html"
 
-        body = "There were problem(s) with the validation of the " \
+        body = "There were problems with the validation of the " \
                "following plots/scripts:\n\n"
         for plot in plots:
             # compose descriptive error message
@@ -242,15 +277,21 @@ class Mails:
                 errormsg = plots[plot]["comparison_result"]
 
             body_plot = ""
+            if plots[plot]["compared_to_yesterday"] == "new":
+                body_plot += '<b style="color: red;">[NEW]</b><br>'
+            elif plots[plot]["compared_to_yesterday"] == "changed":
+                body_plot += '<b style="color: red;">' \
+                             '[COMPARISON RESULT CHANGED]</b><br>'
             body_plot += "<b>{plot}</b><br>"
             body_plot += "<b>Package:</b> {package}<br>"
             body_plot += "<b>Rootfile:</b> {rootfile}.root<br>"
             body_plot += "<b>Description:</b> {description}<br>"
             body_plot += "<b>Comparison:</b> {comparison_text}<br>"
             body_plot += "<b>Error type:</b> {errormsg}<br>"
-            if plots[plot]["rootfile"] != "--":
-                body_plot += '<a href="{url}#{package}-{rootfile}">' \
-                             'Click me for details</a>'
+            # URLs are currently not working.
+            # if plots[plot]["rootfile"] != "--":
+            #     body_plot += '<a href="{url}#{package}-{rootfile}">' \
+            #                  'Click me for details</a>'
             body_plot += "\n\n"
 
             # Fill in fields
@@ -266,8 +307,8 @@ class Mails:
 
             body += body_plot
 
-        body += "You can take a look on the plots/scripts in more detail at " \
-                "the links provided for each failed plot/script. "
+        body += f"You can take a look on the plots/scripts in more detail at " \
+                "{url}. "
 
         return body
 
@@ -280,11 +321,9 @@ class Mails:
 
         for contact in self.mail_data_new:
             # if the errors are the same as yesterday, don't send a new mail
-            if self.mail_data_old and contact in self.mail_data_old:
-                if check_if_same(self.mail_data_new[contact],
-                                 self.mail_data_old[contact]):
-                    # don't send mail
-                    continue
+            if self._check_if_same(self.mail_data_new[contact]):
+                # don't send mail
+                continue
 
             # set the mood of the b2bot
             if len(self.mail_data_new[contact]) < 4:

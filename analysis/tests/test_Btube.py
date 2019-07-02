@@ -7,7 +7,9 @@ import stdCharged as stdc
 import sys
 
 from variables import variables
-
+from ROOT import Belle2
+from ROOT import TFile
+from ROOT import TNtuple
 
 variables.addAlias('TubeX', 'extraInfo(TubeX)')
 variables.addAlias('TubeY', 'extraInfo(TubeY)')
@@ -53,9 +55,14 @@ variables.addAlias('truez', 'matchedMC(z)')
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdstList(environmentType='default',
-                 filelist=['analysis/tests/btubetest.root'],
-                 path=my_path)
+
+# ma.inputMdstList(environmentType='default',
+#                 filelist=['analysis/tests/btubetest.root'],
+#                 path=my_path)
+
+ma.inputMdst('default',
+             Belle2.FileSystem.findFile('analysis/tests/btubetest.root'),
+             path=my_path)
 
 stdc.stdPi(listtype='all', path=my_path)
 stdc.stdPi(listtype='good', path=my_path)

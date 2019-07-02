@@ -188,7 +188,6 @@ def CharmRare(path):
                    'e-:loose mu+:loose',
                    'mu+:loose mu-:loose',
                    'pi+:loose pi-:loose']
-
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):

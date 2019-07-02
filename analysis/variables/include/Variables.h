@@ -378,6 +378,28 @@ namespace Belle2 {
      */
     double goodBelleKshort(const Particle* KS);
 
+    /**
+     * returns the longitudinal momentum asymmetry
+     * alpha = (p_{L}^{+} - p_{L}^{-}) / (p_{L}^{+} - p_{L}^{-})
+     * for the Armenteros plot.
+     * The particle (mother) is required to have exactly two daughters.
+     * In case the two daughters have same charge it will return
+     * alpha = (p_{L}^{d1} - p_{L}^{d2}) / (p_{L}^{d1} - p_{L}^{d2})
+     * where d1 is the first daughter, d2 the second daughter.
+     */
+    double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part);
+
+    /**
+     * returns the transverse momentum of the first daughter with
+     * respect to the V0 mother
+     */
+    double ArmenterosDaughter1Qt(const Particle* part);
+
+    /**
+     * returns the transverse momentum of the second daughter with
+     * respect to the V0 mother
+     */
+    double ArmenterosDaughter2Qt(const Particle* part);
 
   }
 } // Belle2 namespace

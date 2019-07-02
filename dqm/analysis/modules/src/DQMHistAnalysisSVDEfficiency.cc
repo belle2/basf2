@@ -156,6 +156,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.1f");
 
+  m_hEfficiency->getHistogram(0)->Clear();
+  m_hEfficiency->getHistogram(1)->Clear();
+  m_hEfficiencyErr->getHistogram(0)->Clear();
+  m_hEfficiencyErr->getHistogram(1)->Clear();
 
   //Efficiency for the U side
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");

@@ -54,7 +54,7 @@ my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdstList(environmentType='default',
-                 filelist=['/gpfs/group/belle2/users/sdey/newrelease_03/generatedbysourav/onemil_jpsikV1/EventSIG10*.root'],
+                 filelist=['analysis/tests/btubetest.root'],
                  path=my_path)
 
 stdc.stdPi(listtype='all', path=my_path)

@@ -20,7 +20,7 @@ def SetTauGenericSkimVariables(path=analysis_main):
     """
     Set particle lists and variables for TauGeneric skim
 
-    * inout particle lists: pi+:all, gamma:all
+    * input particle lists: pi+:all, gamma:all
 
     * output particle lists: pi+:tauskim, gamma:tauskim, pi+:S1/S2, gamma:S1/S2
 
@@ -242,7 +242,7 @@ def SetTauThrustSkimVariables(path=analysis_main):
     """
     Set particle lists and variables for TauThrust skim
 
-    * inout particle lists: pi+:all, gamma:all
+    * input particle lists: pi+:all, gamma:all
 
     * output particle lists: pi+:good, gamma:good, pi+:S1/S2
 
@@ -254,7 +254,7 @@ def SetTauThrustSkimVariables(path=analysis_main):
     __author__ = "Ami Rostomyan, Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = '-5.0 < dz < 5.0 and dr < 1.0 and nCDCHits > 0'
+    trackCuts = '-5.0 < dz < 5.0 and dr < 1.0 and nSVDHits >= 6'
     cutAndCopyList('pi+:good', 'pi+:all', trackCuts, path=path)
     gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
     cutAndCopyList('gamma:good', 'gamma:all', gammaCuts, path=path)

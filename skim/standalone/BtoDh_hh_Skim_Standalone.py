@@ -14,30 +14,30 @@ from stdCharged import stdPi, stdK
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-03-02-00'
-hhpath = Path()
+path = Path()
 
 skimCode = encodeSkimName('BtoDh_hh')
 
 fileList = get_test_file("mixedBGx1", "MC12")
 
 
-inputMdstList('default', fileList, path=hhpath)
+inputMdstList('default', fileList, path=path)
 
 
 # create and fill pion and kaon ParticleLists
-stdPi('all', path=hhpath)
-stdK('all', path=hhpath)
+stdPi('all', path=path)
+stdK('all', path=path)
 
 # B+ to D(->h+h-)h+ Skim
 from skim.btocharm import loadD0bar, BsigToDhTohhList
-loadD0bar(path=hhpath)
-BtoDhList = BsigToDhTohhList(path=hhpath)
-skimOutputUdst(skimCode, BtoDhList, path=hhpath)
-summaryOfLists(BtoDhList, path=hhpath)
+loadD0bar(path=path)
+BtoDhList = BsigToDhTohhList(path=path)
+skimOutputUdst(skimCode, BtoDhList, path=path)
+summaryOfLists(BtoDhList, path=path)
 
 
 setSkimLogging(path)
-process(hhpath)
+process(path)
 
 # print out the summary
 print(statistics)

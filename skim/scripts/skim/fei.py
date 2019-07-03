@@ -521,20 +521,6 @@ def BplusSL(path):
     BplusSLcuts = ['dmID<8', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
     applyCuts('B+:semileptonic', ' and '.join(BplusSLcuts), path=path)
 
-    # Reconstruct signal side to lepton
-    stdE('95eff', path=path)
-    stdMu('95eff', path=path)
-    reconstructDecay('B+:sig1 -> e+:95eff', 'Mbc>0', 1, path=path)
-    reconstructDecay('B+:sig2 -> mu+:95eff', 'Mbc>0', 2, path=path)
-    reconstructDecay('B+:sig3 -> e-:95eff', 'Mbc>0', 3, path=path)
-    reconstructDecay('B+:sig4 -> mu-:95eff', 'Mbc>0', 4, path=path)
-
-    copyLists('B+:sigall', ['B+:sig1', 'B+:sig2', 'B+:sig3', 'B+:sig4'], path=path)
-
-    reconstructDecay('Upsilon(4S):Bpsig -> B-:semileptonic B+:sigall', '', path=path)
-    # Apply cuts
-    applyCuts('B+:semileptonic', 'nParticlesInList(Upsilon(4S):Bpsig)>0', path=path)
-
     BtagList = ['B+:semileptonic']
     return BtagList
 

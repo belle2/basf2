@@ -1,4 +1,5 @@
 import glob
+import os
 import subprocess
 import basf2
 import basf2_mva
@@ -30,7 +31,7 @@ def my_basf2_mva_teacher(
 ):
     """
     My custom wrapper for basf2 mva teacher
-   """
+    """
 
     # extract names of all variables from one record file
     with root_utils.root_open(records_files[0]) as records_tfile:
@@ -68,10 +69,8 @@ class GenerateSimTask(Basf2PathTask):
 
     n_events = luigi.IntParameter()
     random_seed = luigi.Parameter()
+    bkgfiles_dir = luigi.Parameter(hashed=True)
     output_file_name = "generated_mc.root"
-    bkg_files = glob.glob(
-        "/storage/b/nbraun/data/bkg/15th_overlay_phase3_Feb2018/*.root"
-    )
 
     def output(self):
         yield self.add_to_output(self.output_file_name)
@@ -83,7 +82,8 @@ class GenerateSimTask(Basf2PathTask):
             "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[0]
         )
         path.add_module("EvtGenInput")
-        simulation.add_simulation(path, bkgfiles=self.bkg_files, bkgOverlay=True)
+        bkg_files = glob.glob(os.path.join(self.bkgfiles_dir, "*"))
+        simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True)
         path.add_module(
             "RootOutput",
             outputFileName=self.get_output_file_name(self.output_file_name),
@@ -309,9 +309,9 @@ class VXDQEHarvestingValidationTask(Basf2PathTask):
 class CDCQEHarvestingValidationTask(Basf2PathTask):
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
+    training_target = luigi.Parameter()
     validation_output_file_name = "cdc_qe_harvesting_validation.root"
     reco_output_file_name = "cdc_qe_reconstruction.root"
-    training_target = luigi.Parameter()
 
     def requires(self):
         yield CDCQETeacherTask(
@@ -551,10 +551,10 @@ class FullTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
 class FullTrackQEHarvestingValidationTask(Basf2PathTask):
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
-    validation_output_file_name = "full_qe_harvesting_validation.root"
-    reco_output_file_name = "full_qe_reconstruction.root"
     cdc_training_target = luigi.Parameter()
     exclude_variables = luigi.ListParameter(hashed=True)
+    validation_output_file_name = "full_qe_harvesting_validation.root"
+    reco_output_file_name = "full_qe_reconstruction.root"
 
     def requires(self):
         yield CDCQETeacherTask(
@@ -651,10 +651,10 @@ class MasterTask(luigi.WrapperTask):
     """
     Entry point: Task that defines the configurations that shall be tested.
     """
-
-    n_events_training = 5000
-    n_events_testing = 5000
-    num_processes = 1
+    n_events_training = luigi.get_setting("n_events_training", default=3000)
+    n_events_testing = luigi.get_setting("n_events_testing", default=1000)
+    num_processes = luigi.get_setting("basf2_processes_per_worker", default=0)
+    bkgfiles_dir = luigi.get_setting("bkgfiles_directory")
 
     def requires(self):
 
@@ -724,4 +724,5 @@ class MasterTask(luigi.WrapperTask):
 if __name__ == "__main__":
     # TODO Add comment block with usage instructions
     # TODO complete docstrings for all tasks
-    luigi.process(MasterTask(), workers=2)
+    workers = luigi.get_setting("workers", default=1)
+    luigi.process(MasterTask(), workers=workers)

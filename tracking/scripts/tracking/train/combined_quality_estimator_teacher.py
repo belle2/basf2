@@ -95,6 +95,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
 
     def requires(self):
         yield GenerateSimTask(
+            bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=self.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
@@ -135,6 +136,7 @@ class VXDQEDataCollectionTask(Basf2PathTask):
 
     def requires(self):
         yield GenerateSimTask(
+            bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=self.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
@@ -250,6 +252,7 @@ class VXDQEHarvestingValidationTask(Basf2PathTask):
     def requires(self):
         yield VXDQETeacherTask(n_events_training=self.n_events_training)
         yield GenerateSimTask(
+            bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
             random_seed="testdata_0",
@@ -316,6 +319,7 @@ class CDCQEHarvestingValidationTask(Basf2PathTask):
             training_target=self.training_target,
         )
         yield GenerateSimTask(
+            bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
             random_seed="testdata_0",
@@ -372,6 +376,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
 
     def requires(self):
         yield GenerateSimTask(
+            bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=MasterTask.num_processes,
             random_seed=self.random_seed,
             n_events=self.n_events,
@@ -565,6 +570,7 @@ class FullTrackQEHarvestingValidationTask(Basf2PathTask):
             cdc_training_target=self.cdc_training_target,
         )
         yield GenerateSimTask(
+            bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=MasterTask.num_processes,
             n_events=self.n_events_testing,
             random_seed="testdata_0",

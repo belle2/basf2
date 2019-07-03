@@ -859,7 +859,7 @@ namespace Belle2 {
     VARIABLE_GROUP("MC Matching for ECLClusters");
     REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight,
                       "Returns the weight of the ECLCluster -> MCParticle relation for the MCParticle matched to the particle. "
-                      "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for rhe cluster. "
+                      "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for the cluster. "
                       "Returns -1 if the cluster *was* matched to particles, but not the match of the particle provided.");
     REGISTER_VARIABLE("clusterBestMCMatchWeight", particleClusterBestMCMatchWeight,
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");

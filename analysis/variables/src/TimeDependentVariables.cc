@@ -518,15 +518,15 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
 
-    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
-    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
-    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
-    REGISTER_VARIABLE("mcTagVx", particleTruthTagVx, "MC Tag vertex X");
-    REGISTER_VARIABLE("mcTagVy", particleTruthTagVy, "MC Tag vertex Y");
-    REGISTER_VARIABLE("mcTagVz", particleTruthTagVz, "MC Tag vertex Z");
-    REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X Error");
-    REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y Error");
-    REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z Error");
+    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X component");
+    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y component");
+    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z component");
+    REGISTER_VARIABLE("mcTagVx", particleTruthTagVx, "Generated Tag vertex X component");
+    REGISTER_VARIABLE("mcTagVy", particleTruthTagVy, "Generated Tag vertex Y component");
+    REGISTER_VARIABLE("mcTagVz", particleTruthTagVz, "Generated Tag vertex Z component");
+    REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X component uncertainty");
+    REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty");
+    REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty");
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
     REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
     REGISTER_VARIABLE("TagVType", particleTagVType, "Fit type of the tag vertex");
@@ -539,11 +539,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
-                      R"DOC(Difference of decay vertex longitudinal components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:  :math:`z(B_{rec}) - z(B_{tag})`)DOC");
+                      R"DOC(Difference of decay vertex longitudinal components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
+:math:`\Delta z = z(B_{rec}) - z(B_{tag})`)DOC");
     REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr,
                       R"DOC(Uncertainty of the difference :math:`z(B_{rec}) - z(B_{tag})`)DOC");
-    REGISTER_VARIABLE("DeltaBoost", particleDeltaB, "Boost direction: Brec - Btag");
-    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, "Error of the difference in Boost direction: Brec - Btag");
+    REGISTER_VARIABLE("DeltaBoost", particleDeltaB, R"DOC(:math:`\Delta z` in the boost direction)DOC");
+    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, R"DOC(Uncertanty of :math:`\Delta z` in the boost direction)DOC");
 
     REGISTER_VARIABLE("LBoost", vertexBoostDirection,
                       "Returns the vertex component in the boost direction");

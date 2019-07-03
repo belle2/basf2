@@ -207,7 +207,7 @@ Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 Time Dependent CPV Analysis Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of TDCPV variables:
+To use most of the variables in this section on need to run `vertex.TagV` method:
 
 .. b2-variables::
    :group: Time Dependent CPV Analysis Variables

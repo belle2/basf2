@@ -14,6 +14,7 @@ __authors__ = [
 
 from basf2 import *
 from modularAnalysis import *
+from vertex import *
 
 
 def D0ToHpJm(path):
@@ -177,20 +178,25 @@ def DstToD0PiD0ToHpHmKs(path):
     return DstList
 
 
-def CharmRareList(path):
-    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2.2'
+def CharmRare(path):
+    charmcuts = '1.78 < M < 1.94'
+    Dstcuts = '0 < Q < 0.02 and 2.2 < useCMSFrame(p)'
+
     D0_Channels = ['gamma:skim gamma:skim',
                    'e+:loose e-:loose',
-                   'mu+:loose mu-:loose'
-                   ]
+                   'e+:loose mu-:loose',
+                   'e-:loose mu+:loose',
+                   'mu+:loose mu-:loose',
+                   'pi+:loose pi-:loose']
+    DstList = []
 
-    D0List = []
     for chID, channel in enumerate(D0_Channels):
         reconstructDecay('D0:Rare' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        D0List.append('D0:Rare' + str(chID))
+        reconstructDecay('D*+:' + str(chID) + ' -> pi+:loose D0:Rare' + str(chID),
+                         Dstcuts, chID, path=path)
+        DstList.append('D*+:' + str(chID))
 
-    Lists = D0List
-    return Lists
+    return DstList
 
 
 def CharmSemileptonicList(path):

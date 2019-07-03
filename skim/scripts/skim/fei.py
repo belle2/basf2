@@ -416,9 +416,8 @@ def runFEIforHadronicCombined(path):
 
 
 def B0SL(path):
-    """FEI Semi-Leptonic B0 tag (with Bsig with at least one lepton) skim list
-    for generic analysis in the (Semi-)Leptonic and
-    Missing Energy Working Group.
+    """FEI Semi-Leptonic B0 tag skim list for generic analysis in the
+    (Semi-)Leptonic and Missing Energy Working Group.
 
     Skim LFN code: 11180300
 
@@ -437,10 +436,9 @@ def B0SL(path):
     This function applies cuts to the FEI-reconstructed tag side B, and
     the pre-cuts and FEI must be applied separately.
 
-    Skimming script reconstructs SL Btag using generically trained FEI
-    and Bsig with at least one lepton (e, mu). Signal side lepton is not
-    stored in skim output. FEI is run with removeSLD=True to deactivate
-    rare but time-intensive semileptonic D channels in skim.
+    Skimming script reconstructs SL Btag using generically trained FEI.
+    FEI is run with removeSLD=True to deactivate rare but time-intensive
+    semileptonic D channels in skim.
 
     Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
@@ -454,47 +452,28 @@ def B0SL(path):
         Tag side B:
 
         * -4 < cosThetaBetweenParticleAndNominalB < 3
-        * extraInfo(decayModeID) < 4 to remove semileptonic D channels and D pi channels
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
         * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
         * useCMSFrame(daughter(1,p)) > 1.0
-
-        Signal side:
-
-        * electron or muon from list 95eff
-        * B Mbc > 0
 
     Parameters:
         path (basf2.Path) the path to add the skim list builders
 
     Returns:
         list name of the skim candidates
+
     """
-    # Reconstruct tag side
     # Apply cuts
-    B0SLcuts = ['dmID<4', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
+    B0SLcuts = ['dmID<8', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
     applyCuts('B0:semileptonic', ' and '.join(B0SLcuts), path=path)
 
-    # Reconstruct signal side to lepton
-    stdE('95eff', path=path)
-    stdMu('95eff', path=path)
-    reconstructDecay('B0:sig1 -> e+:95eff', 'Mbc>0', 1, path=path)
-    reconstructDecay('B0:sig2 -> mu+:95eff', 'Mbc>0', 2, path=path)
-    reconstructDecay('B0:sig3 -> e-:95eff', 'Mbc>0', 3, path=path)
-    reconstructDecay('B0:sig4 -> mu-:95eff', 'Mbc>0', 4, path=path)
-
-    copyLists('B0:sigall', ['B0:sig1', 'B0:sig2', 'B0:sig3', 'B0:sig4'], path=path)
-
-    reconstructDecay('Upsilon(4S):B0sig -> anti-B0:semileptonic B0:sigall', '', path=path)
-    # Apply cuts
-    applyCuts('B0:semileptonic', 'nParticlesInList(Upsilon(4S):B0sig)>0', path=path)
     BtagList = ['B0:semileptonic']
     return BtagList
 
 
 def BplusSL(path):
-    """ FEI semi-leptonic (SL) Bplus tag with one lepton skim
-    list for generic analysis in the (Semi-)Leptonic and
-    Missing Energy Working Group.
+    """FEI semi-leptonic (SL) Bplus tag for generic analysis in the
+    (Semi-)Leptonic and Missing Energy Working Group.
 
     Skim LFN code: 11180400
 
@@ -513,10 +492,9 @@ def BplusSL(path):
     This function applies cuts to the FEI-reconstructed tag side B, and
     the pre-cuts and FEI must be applied separately.
 
-    Skimming script reconstructs SL Btag using generically trained
-    FEI and Bsig with at least one lepton (e, mu). Signal side lepton
-    is not stored in skim output. FEI is run with removeSLD=True to
-    deactivate rare but time-intensive semileptonic D channels in skim.
+    Skimming script reconstructs SL Btag using generically trained FEI.
+    FEI is run with removeSLD=True to deactivate rare but time-intensive
+    semileptonic D channels in skim.
 
     Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
@@ -528,24 +506,19 @@ def BplusSL(path):
         Tag side B:
 
         * -4 < cosThetaBetweenParticleAndNominalB < 3
-        * extraInfo(decayModeID) < 4 to remove semileptonic D channels and D pi channels
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
         * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
         * useCMSFrame(daughter(1,p)) > 1.0
-
-        Signal side:
-        * electron or muon from list 95eff
-        * B Mbc > 0
 
     Parameters:
         path (basf2.Path) the path to add the skim list builders
 
     Returns:
         list name of the skim candidates
-    """
 
-    # Reconstruct tag side
+    """
     # Apply cuts
-    BplusSLcuts = ['dmID<4', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
+    BplusSLcuts = ['dmID<8', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
     applyCuts('B+:semileptonic', ' and '.join(BplusSLcuts), path=path)
 
     # Reconstruct signal side to lepton
@@ -589,10 +562,9 @@ def runFEIforB0SL(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skimming script reconstructs SL Btag using generically trained FEI
-    and Bsig with at least one lepton (e, mu). Signal side lepton is not
-    stored in skim output. FEI is run with removeSLD=True to deactivate
-    rare but time-intensive semileptonic D channels in skim.
+    Skimming script reconstructs SL Btag using generically trained FEI.
+    FEI is run with removeSLD=True to deactivate rare but time-intensive
+    semileptonic D channels in skim.
 
     Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
@@ -606,20 +578,16 @@ def runFEIforB0SL(path):
         Tag side B:
 
         * -4 < cosThetaBetweenParticleAndNominalB < 3
-        * extraInfo(decayModeID) < 4 to remove semileptonic D channels and D pi channels
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
         * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
         * useCMSFrame(daughter(1,p)) > 1.0
-
-        Signal side:
-
-        * electron or muon from list 95eff
-        * B Mbc > 0
 
     Parameters:
         path (basf2.Path) the path to add the skim list builders
 
     Returns:
         list name of the skim candidates
+
     """
     # Pre-selection cuts
     fillParticleList(decayString='pi+:all',
@@ -679,10 +647,9 @@ def runFEIforBplusSL(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skimming script reconstructs SL Btag using generically trained FEI
-    and Bsig with at least one lepton (e, mu). Signal side lepton is not
-    stored in skim output. FEI is run with removeSLD=True to deactivate
-    rare but time-intensive semileptonic D channels in skim.
+    Skimming script reconstructs SL Btag using generically trained FEI.
+    FEI is run with removeSLD=True to deactivate rare but time-intensive
+    semileptonic D channels in skim.
 
     Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
@@ -696,7 +663,7 @@ def runFEIforBplusSL(path):
         Tag side B:
 
         * -4 < cosThetaBetweenParticleAndNominalB < 3
-        * extraInfo(decayModeID) < 4 to remove semileptonic D channels and D pi channels
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
         * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
         * useCMSFrame(daughter(1,p)) > 1.0
 
@@ -709,6 +676,7 @@ def runFEIforBplusSL(path):
         path (basf2.Path) the path to add the skim list builders
     Returns:
         list name of the skim candidates
+
     """
     # Pre-selection cuts
     fillParticleList(decayString='pi+:all',

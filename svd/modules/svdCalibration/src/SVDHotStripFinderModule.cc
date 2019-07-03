@@ -37,11 +37,13 @@ SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
   addParam("lastRun", m_lastRun, "open iov", int(-1));
   addParam("ShaperDigits", m_ShaperDigitName, "shaper digit name", std::string(""));
   //new parameters for HSFinderV2:
-  addParam("useHSFinderV1", m_useHSFinderV1, "Set to false only if you want to test the second version of the algorithm", bool(true));
+  addParam("useHSFinderV1", m_useHSFinderV1, "Set to false only if you want to test the second version of the algorithm",
+           bool(false));
   addParam("absOccThreshold", m_absThr,
            "Absolute occupancy threshold: at a first loop, flag as Hot Strip (HS) all those whose occupancy > absOccThreshold", float(0.2));
   addParam("relOccPrec", m_relOccPrec,
-           "Precision level on occupancy which is defined to be negligible the calculation of the hit background rate", float(0.1));
+           "Number of times the average sensor occupancy considered to fix the sensor dependent threshold, as for example occ_threshold = relOccPrec x occ_average",
+           float(5));
   addParam("verbose", m_verbose, " True by default, it allows to switch off the printing of all found HS.", bool(true));
 
 }

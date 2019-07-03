@@ -16,9 +16,12 @@ import glob
 # set here the correct exp and run number you like to process
 exp = 8
 run = 2265  # 2308  # 2265
-runTpe = ""
-
 useLauraAlg = True
+searchbaseValue = -1  # default value, use all sensor strips
+setLauraThreshold = 5
+
+runType = ""
+myflag = ""
 
 if run == 2308:
     runType = "cosmic"
@@ -27,10 +30,13 @@ elif run == 2265:
 else:
     print("Check the run number!!")
 
+if searchbaseValue != -1:
+    myflag = "searchBase" + str(searchbaseValue) + "_thr" + str(setLauraThreshold)
+
 # set this string to identify the output rootfiles
-outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V1.root"
+outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V1_" + str(myflag) + ".root"
 if useLauraAlg:
-    outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V2.root"
+    outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V2_" + str(myflag) + ".root"
 
 use_database_chain()
 use_central_database("data_reprocessing_prompt_bucket6")
@@ -65,8 +71,8 @@ main.add_module(
     FADCmode=True)
 
 # default parameters
-main.add_module('SVDHotStripFinder', ShaperDigits='SVDShaperDigitsZS5', outputFileName=outputfile, searchBase=-1,
-                threshold=1, absOccThreshold=0.20, relOccPrec=5, useHSFinderV1=not useLauraAlg)
+main.add_module('SVDHotStripFinder', ShaperDigits='SVDShaperDigitsZS5', outputFileName=outputfile, searchBase=searchbaseValue,
+                threshold=1, absOccThreshold=0.20, relOccPrec=setLauraThreshold, useHSFinderV1=not useLauraAlg)
 
 main.add_module('Progress')
 

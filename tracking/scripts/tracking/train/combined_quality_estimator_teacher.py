@@ -37,7 +37,11 @@ def my_basf2_mva_teacher(
     truth_free_variable_names = [
         name
         for name in feature_names
-        if ("truth" not in name) and (name != target_variable)
+        if (
+            ("truth" not in name) and
+            (name != target_variable) and
+            (name not in exclude_variables)
+        )
     ]
     if "weight" in truth_free_variable_names:
         truth_free_variable_names.remove("weight")
@@ -469,7 +473,7 @@ class TrackQEEvaluationBaseTask(Basf2Task):
 
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
-    training_target = luigi.Parameter(default="truth")
+    training_target = luigi.Parameter()
 
     @property
     def teacherTask(self):
@@ -654,6 +658,7 @@ class MasterTask(luigi.WrapperTask):
     """
     Entry point: Task that defines the configurations that shall be tested.
     """
+
     n_events_training = luigi.get_setting("n_events_training", default=3000)
     n_events_testing = luigi.get_setting("n_events_testing", default=1000)
     num_processes = luigi.get_setting("basf2_processes_per_worker", default=0)

@@ -5,8 +5,7 @@
 // Author : Anselm Vossen, based on Satoru Yamada's DummyDataPacker
 //-
 
-#ifndef BKLMRAWPACKER_H
-#define BKLMRAWPACKER_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -142,5 +141,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif // MODULEHELLO_H

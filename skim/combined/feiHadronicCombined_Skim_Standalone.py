@@ -54,7 +54,7 @@ skimCode2 = encodeSkimName('feiHadronicBplus')
 skimOutputUdst(skimCode2, BphadronicList, path=path)
 summaryOfLists(BphadronicList, path=path)
 
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

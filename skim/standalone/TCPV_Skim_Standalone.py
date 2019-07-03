@@ -57,7 +57,7 @@ tcpvList = TCPVList(path=tcpvskimpath)
 skimOutputUdst(skimCode, tcpvList, path=tcpvskimpath)
 summaryOfLists(tcpvList, path=tcpvskimpath)
 
-setSkimLogging()
+setSkimLogging(path)
 process(tcpvskimpath)
 
 # print out the summary

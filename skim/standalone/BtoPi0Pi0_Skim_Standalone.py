@@ -39,7 +39,7 @@ skimOutputUdst(skimCode, Pi0Pi0List, path=path)
 summaryOfLists(Pi0Pi0List, path=path)
 
 
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

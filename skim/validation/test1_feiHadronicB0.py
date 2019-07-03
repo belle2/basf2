@@ -35,7 +35,7 @@ skimOutputUdst('../feiHadronicB0', B0hadronicList, path=path)
 summaryOfLists(B0hadronicList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

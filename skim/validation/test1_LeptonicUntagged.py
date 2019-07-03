@@ -46,7 +46,7 @@ skimOutputUdst('../LeptonicUntagged', lepList, path=leppath)
 summaryOfLists(lepList, path=leppath)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
+setSkimLogging(path)
 process(leppath)
 
 # print out the summary

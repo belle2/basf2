@@ -36,7 +36,7 @@ skimOutputUdst(skimCode, BtoDhList, path=hhpath)
 summaryOfLists(BtoDhList, path=hhpath)
 
 
-setSkimLogging()
+setSkimLogging(path)
 process(hhpath)
 
 # print out the summary

@@ -46,7 +46,7 @@ skimOutputUdst('../WG6_DstToD0ToKpi.udst.root', DstToD0PiD0ToHpJmList, path=myAn
 summaryOfLists(DstToD0PiD0ToHpJmList, path=myAna_Main)
 
 
-setSkimLogging()
+setSkimLogging(path)
 process(myAna_Main)
 
 print(statistics)

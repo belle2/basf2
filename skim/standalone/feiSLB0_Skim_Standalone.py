@@ -50,7 +50,7 @@ skimOutputUdst(skimCode, BtagList, path=path)
 summaryOfLists(BtagList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

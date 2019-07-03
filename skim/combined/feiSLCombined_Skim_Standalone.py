@@ -44,7 +44,7 @@ skimOutputUdst(skimCode2, BpsemileptonicList, path=path)
 summaryOfLists(BpsemileptonicList, path=path)
 
 
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

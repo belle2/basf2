@@ -44,7 +44,7 @@ skimOutputUdst(skimCode, BtoDhList, path=kspi0)
 summaryOfLists(BtoDhList, path=kspi0)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
+setSkimLogging(path)
 process(kspi0)
 
 # print out the summary

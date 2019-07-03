@@ -22,6 +22,7 @@ variables.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
 variables.addAlias('dmID', 'extraInfo(decayModeID)')
 variables.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
 variables.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
+variables.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
 
 from stdCharged import *
 
@@ -464,8 +465,16 @@ def B0SL(path):
 
     """
     # Apply cuts
-    B0SLcuts = ['dmID<8', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
+    B0SLcuts = ['log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0']
     applyCuts('B0:semileptonic', ' and '.join(B0SLcuts), path=path)
+
+    # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
+    # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
+    cutAndCopyList('B0:Dl', 'B0:semileptonic',
+                   'dmID<4 and dmID>=0 and d1_p_CMSframe>1.0', path=path)
+    cutAndCopyList('B0:Dpil', 'B0:semileptonic',
+                   'dmID<8 and dmID>=4 and d2_p_CMSframe>1.0', path=path)
+    copyLists('B0:semileptonic', ['B0:Dl', 'B0:Dpil'], path=path)
 
     BtagList = ['B0:semileptonic']
     return BtagList
@@ -518,8 +527,16 @@ def BplusSL(path):
 
     """
     # Apply cuts
-    BplusSLcuts = ['dmID<8', 'log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0', 'd1_p_CMSframe>1.0']
+    BplusSLcuts = ['log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0']
     applyCuts('B+:semileptonic', ' and '.join(BplusSLcuts), path=path)
+
+    # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
+    # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
+    cutAndCopyList('B+:Dl', 'B+:semileptonic',
+                   'dmID<4 and dmID>=0 and d1_p_CMSframe>1.0', path=path)
+    cutAndCopyList('B+:Dpil', 'B+:semileptonic',
+                   'dmID<8 and dmID>=4 and d2_p_CMSframe>1.0', path=path)
+    copyLists('B+:semileptonic', ['B+:Dl', 'B+:Dpil'], path=path)
 
     BtagList = ['B+:semileptonic']
     return BtagList

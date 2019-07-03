@@ -25,6 +25,7 @@
 #include <framework/geometry/BFieldManager.h>
 
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
 #include <framework/particledb/EvtGenDatabasePDG.h>
 using namespace Belle2;
@@ -46,6 +47,16 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
   addParam("massConstraintListParticlename", m_massConstraintListParticlename,
            "Type::[string]. List of particles to mass constrain with string = particle name.", {});
+
+
+  addParam("geoConstraintList", m_geoConstraintListPDG,
+           "Type::[int], if `autoSetGeoConstraintAndMergeVertices==False` you can manually set the particles that will be geometrically constrained here.", {});
+  addParam("sharedVertexList", m_fixedToMotherVertexListPDG,
+           "Type::[int], if `autoSetGeoConstraintAndMergeVertices==False` you can manually set the particles that share the vertex with their mother here.", {});
+  addParam("autoSetGeoConstraintAndMergeVertices", m_automatic_vertex_constraining,
+           "Type::bool, shall vertices of strong resonance be merged with their mothers? Can the particles vertex be constraint geometrically?",
+           true);
+
   addParam("customOriginVertex", m_customOriginVertex,
            "Type::[double]. List of vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
@@ -94,6 +105,10 @@ void TreeFitterModule::initialize()
     TreeFitter::massConstraintListPDG = m_massConstraintList;
   }
 
+  TreeFitter::geoConstraintListPDG = m_geoConstraintListPDG;
+  TreeFitter::fixedToMotherVertexListPDG = m_fixedToMotherVertexListPDG;
+
+
 }
 
 void TreeFitterModule::beginRun()
@@ -120,10 +135,11 @@ void TreeFitterModule::event()
       ParticleCopy::copyDaughters(particle);
     }
 
-    bool ok = fitTree(particle);
-
-    if (!ok) {
-      particle->setPValue(-1);
+    try {
+      const bool ok = fitTree(particle);
+      if (!ok) { particle->setPValue(-1); }
+    } catch (TreeFitter::FitParameterDimensionException const& e) {
+      B2ERROR(e.what());
     }
 
     if (particle->getPValue() < m_confidenceLevel) {
@@ -164,7 +180,7 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
   //  TreeFitter::massConstraintListPDG = m_massConstraintList;
   TreeFitter::massConstraintType = m_massConstraintType;
   TreeFitter::removeConstraintList = m_removeConstraintList;
-
+  TreeFitter::automatic_vertex_constraining = m_automatic_vertex_constraining;
   bool rc = TreeFitter->fit();
   return rc;
 }

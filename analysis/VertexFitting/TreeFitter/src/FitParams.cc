@@ -12,8 +12,10 @@
 
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
-
+#include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
+#include <string>
 namespace TreeFitter {
+
 
   FitParams::FitParams(int dim)
     : m_globalState(dim),
@@ -60,8 +62,15 @@ namespace TreeFitter {
 
   int FitParams::nDof() const
   {
-    const double ndf = nConstraints() - dim();
-    if (ndf < 1) { B2FATAL("Not enough constraints for this fit, cannot guarantee convergence. Add a mass or beam constraint. N constraints (equations) = " << nConstraints() << "; N free parameters = " << dim()); }
+    const int nConstr = nConstraints();
+    const int nPars = dim();
+    const int ndf = nConstr - nPars;
+    if (ndf < 1) {
+      const std::string error_string =
+        "Not enough constraints for this fit. Try adding a mass or beam cosntraint. constraints: " + std::to_string(
+          nConstr) + " parameters to extract: " + std::to_string(nPars) + " ndf: " + std::to_string(ndf);
+      throw FitParameterDimensionException(error_string);
+    }
     return ndf;
   }
 

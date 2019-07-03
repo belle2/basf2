@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include <simulation/dataobjects/SimHitBase.h>
-#include <framework/datastore/RelationsObject.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
+#include <framework/datastore/RelationsObject.h>
+#include <simulation/dataobjects/SimHitBase.h>
 
 //#define BKLM_INNER 1
 //#define BKLM_OUTER 2
@@ -60,8 +61,9 @@ namespace Belle2 {
     //! @return layer number of this hit
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
-    //! returns plane (0=inner or 1=outer) of this hit
-    //int getPlane() const { return (((m_ModuleID & BKLM_PLANE_MASK) != 0) ? BKLM_INNER : BKLM_OUTER); }
+    //! Get plane number.
+    //! @return Plane number (0=z, 1=phi).
+    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
 
     //! Get readout coordinate
     //! @return readout coordinate (TRUE=phi, FALSE=z) of this hit

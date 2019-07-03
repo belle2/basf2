@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 #include <vector>
@@ -55,6 +56,10 @@ namespace Belle2 {
     //! Get layer number
     //! @return layer number (1..15) of this 1D hit
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
+
+    //! Get plane number.
+    //! @return Plane number (0=z, 1=phi).
+    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
 
     //! Get readout coordinate
     //! @return readout coordinate of this 1D hit

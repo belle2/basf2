@@ -9,16 +9,16 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
+#include <klm/modules/KLMDigitizer/KLMDigitizerModule.h>
 #include <klm/dataobjects/EKLMChannelIndex.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
 using namespace Belle2;
 
-REG_MODULE(EKLMDigitizer)
+REG_MODULE(KLMDigitizer)
 
-EKLMDigitizerModule::EKLMDigitizerModule() : Module(),
+KLMDigitizerModule::KLMDigitizerModule() : Module(),
   m_ChannelSpecificSimulation(false)
 {
   setDescription("EKLM digitization module");
@@ -36,11 +36,11 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module(),
   m_Fitter = nullptr;
 }
 
-EKLMDigitizerModule::~EKLMDigitizerModule()
+KLMDigitizerModule::~KLMDigitizerModule()
 {
 }
 
-void EKLMDigitizerModule::initialize()
+void KLMDigitizerModule::initialize()
 {
   m_Digits.registerInDataStore();
   m_Digits.registerRelationTo(m_SimHits);
@@ -58,7 +58,7 @@ void EKLMDigitizerModule::initialize()
   }
 }
 
-void EKLMDigitizerModule::checkChannelParameters()
+void KLMDigitizerModule::checkChannelParameters()
 {
   EKLMChannelIndex eklmChannels;
   for (EKLMChannelIndex& eklmChannel : eklmChannels) {
@@ -72,7 +72,7 @@ void EKLMDigitizerModule::checkChannelParameters()
     if (channel->getPhotoelectronAmplitude() <= 0) {
       B2ERROR("Non-positive photoelectron amplitude. The requested "
               "channel-specific simulation is impossible. "
-              "EKLMDigitizer is switched to the generic mode."
+              "KLMDigitizer is switched to the generic mode."
               << LogVar("Endcap", eklmChannel.getEndcap())
               << LogVar("Layer", eklmChannel.getLayer())
               << LogVar("Sector", eklmChannel.getSector())
@@ -84,7 +84,7 @@ void EKLMDigitizerModule::checkChannelParameters()
   }
 }
 
-void EKLMDigitizerModule::beginRun()
+void KLMDigitizerModule::beginRun()
 {
   if (!m_DigPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
@@ -96,7 +96,7 @@ void EKLMDigitizerModule::beginRun()
     checkChannelParameters();
 }
 
-void EKLMDigitizerModule::readAndSortSimHits()
+void KLMDigitizerModule::readAndSortSimHits()
 {
   EKLMSimHit* hit;
   /* cppcheck-suppress variableScope */
@@ -119,7 +119,7 @@ void EKLMDigitizerModule::readAndSortSimHits()
  * Light propagation into the fiber, SiPM and electronics effects
  * are simulated in KLM::ScintillatorSimulator class.
  */
-void EKLMDigitizerModule::mergeSimHitsToStripHits()
+void KLMDigitizerModule::mergeSimHitsToStripHits()
 {
   uint16_t tdc;
   int strip;
@@ -170,17 +170,17 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
   }
 }
 
-void EKLMDigitizerModule::event()
+void KLMDigitizerModule::event()
 {
   readAndSortSimHits();
   mergeSimHitsToStripHits();
 }
 
-void EKLMDigitizerModule::endRun()
+void KLMDigitizerModule::endRun()
 {
 }
 
-void EKLMDigitizerModule::terminate()
+void KLMDigitizerModule::terminate()
 {
   delete m_Fitter;
 }

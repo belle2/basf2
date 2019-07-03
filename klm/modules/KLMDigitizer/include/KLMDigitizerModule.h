@@ -25,23 +25,21 @@
 namespace Belle2 {
 
   /**
-   * Module EKLMDigitizationModule.
-   * @details
-   * Simple module for reading EKLM hits.
+   * KLM digitization module.
    */
-  class EKLMDigitizerModule : public Module {
+  class KLMDigitizerModule : public Module {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMDigitizerModule();
+    KLMDigitizerModule();
 
     /**
      * Destructor
      */
-    virtual ~EKLMDigitizerModule();
+    virtual ~KLMDigitizerModule();
 
     /**
      * Initializer.

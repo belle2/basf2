@@ -722,9 +722,6 @@ class MasterTask(luigi.WrapperTask):
 
 
 if __name__ == "__main__":
-    # TODO use argparse to use command line settings
-    luigi.set_setting("result_path", "/storage/8/meliachevitch/quality_estimator/")
+    # TODO Add comment block with usage instructions
+    # TODO complete docstrings for all tasks
     luigi.process(MasterTask(), workers=2)
-
-# Further todos
-# TODO: for base tasks, maybe use instances of objects instead of classes as members, as this allows for more flexibility

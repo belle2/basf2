@@ -469,7 +469,7 @@ class TrackQEEvaluationBaseTask(Basf2Task):
 
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
-    training_target = luigi.Parameter()
+    training_target = luigi.Parameter(default="truth")
 
     @property
     def teacherTask(self):

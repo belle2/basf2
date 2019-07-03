@@ -19,9 +19,20 @@ from basf2 import *
 from modularAnalysis import *
 from beamparameters import add_beamparameters
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
 gb2_setuprel = 'release-03-02-00'
 skimCode = encodeSkimName('feiHadronicB0')
 fileList = get_test_file("mixedBGx1", "MC12")
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("proc9_global_tag")
 
 path = create_path()
 

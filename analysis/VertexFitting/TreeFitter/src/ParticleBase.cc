@@ -541,7 +541,22 @@ namespace TreeFitter {
         fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 >
       mom = fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
-      fitparams.getStateVector()(tauindex) = std::abs(vertex_dist.dot(mom)) / mom.norm();
+
+// if an intermediate vertex is not well defined by a track or so it will be initialised with 0
+// same for the momentum of for example B0, it might be initialsed with 0
+// in those cases use pdg value
+      const double mom_norm = mom.norm();
+      const double dot = std::abs(vertex_dist.dot(mom));
+      const double tau = dot / mom_norm;
+      if (0 == mom_norm || 0 == dot) {
+        fitparams.getStateVector()(tauindex) = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
+      } else {
+        fitparams.getStateVector()(tauindex) = tau;
+      }
+
+
+
+
     }
 
     return ErrCode(ErrCode::Status::success);

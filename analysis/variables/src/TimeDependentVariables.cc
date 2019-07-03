@@ -532,12 +532,16 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVType", particleTagVType, "Fit type of the tag vertex");
 
 
-    REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
+    REGISTER_VARIABLE("DeltaT", particleDeltaT,
+                      R"DOC(Proper decay time difference :math:`\Delta t` between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})` in ps.)DOC");
+    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr,
+                      R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
-                      "Generated Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
-    REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr, "Error of the difference Z(Brec) - Z(Btag)");
+                      R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
+    REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
+                      R"DOC(Difference of decay vertex longitudinal components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:  :math:`z(B_{rec}) - z(B_{tag})`)DOC");
+    REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr,
+                      R"DOC(Uncertainty of the difference :math:`z(B_{rec}) - z(B_{tag})`)DOC");
     REGISTER_VARIABLE("DeltaBoost", particleDeltaB, "Boost direction: Brec - Btag");
     REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, "Error of the difference in Boost direction: Brec - Btag");
 

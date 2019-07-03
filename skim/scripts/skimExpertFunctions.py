@@ -424,7 +424,7 @@ def get_eventN(fileName):
         B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
-def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path, *,
+def skimOutputMdst(skimDecayMode, path, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
                    outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.

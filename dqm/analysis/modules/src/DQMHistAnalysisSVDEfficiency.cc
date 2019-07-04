@@ -161,6 +161,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_hEfficiencyErr->getHistogram(0)->Clear();
   m_hEfficiencyErr->getHistogram(1)->Clear();
 
+  Float_t effU = 0;
+  Float_t effV = 0;
+  Float_t erreffU = 0;
+  Float_t erreffV = 0;
+
   //Efficiency for the U side
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
   TH2F* matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");

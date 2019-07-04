@@ -132,7 +132,7 @@ void BKLMReconstructorModule::event()
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
     int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;
-    const bklm::Module* m = m_GeoPar->findModule(hit1ds[i]->isForward(), hit1ds[i]->getSector(), hit1ds[i]->getLayer());
+    const bklm::Module* m = m_GeoPar->findModule(hit1ds[i]->getForward(), hit1ds[i]->getSector(), hit1ds[i]->getLayer());
     bool isPhiReadout = hit1ds[i]->isPhiReadout();
     for (int j = i + 1; j < hit1ds.getEntries(); ++j) {
       if (moduleID != (hit1ds[j]->getModuleID() & BKLM_MODULEID_MASK)) continue;

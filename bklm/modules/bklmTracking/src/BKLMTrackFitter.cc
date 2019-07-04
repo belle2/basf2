@@ -96,7 +96,7 @@ double BKLMTrackFitter::fit(std::list<BKLMHit2d* >& listHitSector)
 
   if (!m_globalFit) {
     //transfer to the global system, choose two abitrary points on track within in the sector jpionts on this track
-    const Belle2::bklm::Module* refMod = m_GeoPar->findModule((*listHitSector.begin())->isForward(),
+    const Belle2::bklm::Module* refMod = m_GeoPar->findModule((*listHitSector.begin())->getForward(),
                                                               (*listHitSector.begin())->getSector(), 1);
 
     Hep3Vector p1(0, 0, 0); Hep3Vector p2(0, 0, 0);
@@ -161,8 +161,8 @@ double BKLMTrackFitter::distanceToHit(BKLMHit2d* hit,
   }
 
   m_GeoPar = GeometryPar::instance();
-  const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), 1);
-  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
+  const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), 1);
+  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
 
   CLHEP::Hep3Vector globalPos(hit->getGlobalPosition()[0], hit->getGlobalPosition()[1], hit->getGlobalPosition()[2]);
 
@@ -264,7 +264,7 @@ double BKLMTrackFitter::globalDistanceToHit(BKLMHit2d* hit,
   errors = A * m_GlobalErr * A.T();
 
   //here get the resolustion of a hit, repeated several times, ugly. should we store this in BKLMHit2d object ?
-  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
+  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
   double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);
   double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
 
@@ -359,23 +359,23 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
 
   iHit = hitList.begin();
   BKLMHit2d* hit = *iHit;
-  bool isForward = hit->isForward();
-  int sector    = hit->getSector();
+  int forward = hit->getForward();
+  int sector  = hit->getSector();
 
   m_GeoPar = GeometryPar::instance();
-  const Belle2::bklm::Module* refMod = m_GeoPar->findModule((*hitList.begin())->isForward(), (*hitList.begin())->getSector(), 1);
+  const Belle2::bklm::Module* refMod = m_GeoPar->findModule((*hitList.begin())->getForward(), (*hitList.begin())->getSector(), 1);
 
   int n = 0;
   for (iHit = hitList.begin(); iHit != hitList.end(); ++iHit) {
 
     hit = *iHit;
-    if (hit->isForward() != isForward || hit->getSector() != sector) {
+    if (hit->getForward() != forward || hit->getSector() != sector) {
       continue;
     }
 
     // m_GeoPar = GeometryPar::instance();
-    //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), 1);
-    const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
+    //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), 1);
+    const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
 
     CLHEP::Hep3Vector globalPos;
     globalPos[0] = hit->getGlobalPosition()[0];
@@ -516,8 +516,8 @@ double BKLMTrackFitter::fit1dTrack(std::list< BKLMHit2d* > hitList,
     BKLMHit2d* hit = *iHit;
 
     // m_GeoPar = GeometryPar::instance();
-    //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), 1);
-    corMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
+    //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), 1);
+    corMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
 
     CLHEP::Hep3Vector globalPos;
     globalPos[0] = hit->getGlobalPosition()[0];

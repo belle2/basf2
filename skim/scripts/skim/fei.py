@@ -8,7 +8,8 @@
 __authors__ = [
     "Sophie Hollit",
     "Racha Cheaib",
-    "Hannah Wakeling"
+    "Hannah Wakeling",
+    "Phil Grace"
 ]
 
 import basf2
@@ -64,13 +65,13 @@ def B0hadronic(path):
     used by the FR, but is not yet used in the FEI due to unexpected
     technical restrictions in the KFitter algorithm'.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
         Tag side B:
@@ -135,13 +136,13 @@ def BplusHadronic(path):
     This function applies cuts to the FEI-reconstructed tag side B, and
     the pre-cuts and FEI must be applied separately.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
         Tag side B:
@@ -209,13 +210,13 @@ def runFEIforB0Hadronic(path):
     used by the FR, but is not yet used in the FEI due to unexpected
     technical restrictions in the KFitter algorithm'.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
    ** Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
         Tag side B:
@@ -229,9 +230,26 @@ def runFEIforB0Hadronic(path):
 
     Returns:
         list name of the skim candidates
- """
+    """
     # Pre-selection cuts
-    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+    fillParticleList(decayString='pi+:all',
+                     cut='pt> 0.1', path=path)
+    fillParticleList(decayString='gamma:all',
+                     cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -285,13 +303,13 @@ def runFEIforBplusHadronic(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
         Tag side B:
@@ -306,9 +324,25 @@ def runFEIforBplusHadronic(path):
     Returns:
         list name of the skim candidates
     """
-
     # Pre-selection cuts
-    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+    fillParticleList(decayString='pi+:all',
+                     cut='pt> 0.1', path=path)
+    fillParticleList(decayString='gamma:all',
+                     cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -333,13 +367,13 @@ def runFEIforHadronicCombined(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
     Parameters:
@@ -347,10 +381,26 @@ def runFEIforHadronicCombined(path):
 
     Returns:
         list name of the skim candidates
-"""
-
+    """
     # Pre-selection cuts
-    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+    fillParticleList(decayString='pi+:all',
+                     cut='pt> 0.1', path=path)
+    fillParticleList(decayString='gamma:all',
+                     cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -388,13 +438,13 @@ def B0SLWithOneLep(path):
     stored in skim output. FEI is run with removeSLD=True to deactivate
     rare but time-intensive semileptonic D channels in skim.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
         Tag side B:
@@ -413,7 +463,7 @@ def B0SLWithOneLep(path):
 
     Returns:
         list name of the skim candidates
-"""
+    """
     # Reconstruct tag side
     # Apply cuts
     applyCuts('B0:semileptonic', '-5<cosThetaBetweenParticleAndNominalB<3 and sigProb>0.005 and extraInfo(decayModeID)<8',
@@ -463,11 +513,11 @@ def BplusSLWithOneLep(path):
     is not stored in skim output. FEI is run with removeSLD=True to
     deactivate rare but time-intensive semileptonic D channels in skim.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
         Tag side B:
@@ -485,7 +535,7 @@ def BplusSLWithOneLep(path):
 
     Returns:
         list name of the skim candidates
-"""
+    """
 
     # Reconstruct tag side
     # Apply cuts
@@ -538,13 +588,13 @@ def runFEIforB0SLWithOneLep(path):
     stored in skim output. FEI is run with removeSLD=True to deactivate
     rare but time-intensive semileptonic D channels in skim.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
         Tag side B:
@@ -563,9 +613,26 @@ def runFEIforB0SLWithOneLep(path):
 
     Returns:
         list name of the skim candidates
- """
+    """
     # Pre-selection cuts
-    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+    fillParticleList(decayString='pi+:all',
+                     cut='pt> 0.1', path=path)
+    fillParticleList(decayString='gamma:all',
+                     cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -610,13 +677,13 @@ def runFEIforBplusSLWithOneLep(path):
     stored in skim output. FEI is run with removeSLD=True to deactivate
     rare but time-intensive semileptonic D channels in skim.
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
         Tag side B:
@@ -634,9 +701,26 @@ def runFEIforBplusSLWithOneLep(path):
         path (basf2.Path) the path to add the skim list builders
     Returns:
         list name of the skim candidates
- """
+    """
     # Pre-selection cuts
-    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+    fillParticleList(decayString='pi+:all',
+                     cut='pt> 0.1', path=path)
+    fillParticleList(decayString='gamma:all',
+                     cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -669,17 +753,34 @@ def runFEIforSLWithOneLepCombined(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
     """
     # Pre-selection cuts
-    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+    fillParticleList(decayString='pi+:all',
+                     cut='pt> 0.1', path=path)
+    fillParticleList(decayString='gamma:all',
+                     cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
@@ -713,13 +814,13 @@ def runFEIforSkimCombined(path):
 
     FEI weightfiles: FEIv4_2019_MC12_release_03_01_01
 
-    Skim Liasons: S. Hollitt & H. Wakeling
+    Skim Liaisons: S. Hollitt, H. Wakeling, & P. Grace
 
     **Cuts applied are**:
 
         Event precuts:
 
-        * R2EventLevel < 0.4
+        * foxWolframR2 < 0.4
         * nTracks >= 4
 
     Parameters:
@@ -727,9 +828,26 @@ def runFEIforSkimCombined(path):
 
     Returns:
         list name of the skim candidates
-"""
+    """
     # Pre-selection cuts
-    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+    fillParticleList(decayString='pi+:all',
+                     cut='pt> 0.1', path=path)
+    fillParticleList(decayString='gamma:all',
+                     cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2<0.4 and nTracks>=4', path=path)
 
     # Run FEI
     basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')

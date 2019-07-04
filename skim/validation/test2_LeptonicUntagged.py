@@ -12,6 +12,7 @@
 from basf2 import *
 from modularAnalysis import *
 from variables import variables
+from validation_tools.metadata import create_validation_histograms
 
 path = Path()
 
@@ -32,34 +33,21 @@ variables.addAlias('d0_muonID', 'daughter(0,muonID)')
 variables.addAlias('MissP', 'WE_MissP(basic,0)')
 
 histogramFilename = 'LeptonicUntagged_Validation.root'
+myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'
 
-variablesToHistogram(
-    filename=histogramFilename,
-    decayString='B-:all',
-    variables=[
-        ('Mbc', 100, 4.0, 5.3),
-        ('d0_p', 100, 0, 5.2),  # Lepton momentum
-        ('d0_electronID', 100, 0, 1),
-        ('d0_muonID', 100, 0, 1),
-        ('R2', 100, 0, 1),
-        ('MissP', 100, 0, 5.3)
+create_validation_histograms(
+    rootfile=histogramFilename,
+    particlelist='B-:all',
+    variables_1d=[
+        ('Mbc', 100, 4.0, 5.3, 'Mbc', myEmail, '', ''),
+        ('d0_p', 100, 0, 5.2, 'Signal-side lepton momentum', myEmail, '', ''),
+        ('d0_electronID', 100, 0, 1, 'electronID of signal-side lepton', myEmail, '', ''),
+        ('d0_muonID', 100, 0, 1, 'electronID of signal-side lepton', myEmail, '', ''),
+        ('R2', 100, 0, 1, 'R2', myEmail, '', ''),
+        ('MissP', 100, 0, 5.3, 'Missing momentum of event (CMS frame)', myEmail, '', '')
     ],
-    variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3)],
+    variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', myEmail, '', '')],
     path=path)
 
 process(path)
 print(statistics)
-
-# Reopen file to add contact details
-import ROOT
-
-histfile = ROOT.TFile(histogramFilename, 'UPDATE')
-
-histnames = [histname.GetTitle() for histname in histfile.GetListOfKeys()]
-for histname in histnames:
-    hist = histfile.Get(histname)
-
-    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'philip.grace@adelaide.edu.au'))
-
-    hist.Write('', ROOT.TObject.kOverwrite)
-histfile.Close()

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMElementID_H
-#define BKLMElementID_H
+#pragma once
 
 #include <string>
 #include <ostream>
@@ -123,5 +122,3 @@ baseType layer: LayerBits;
   /** Print id to stream by converting it to string */
   std::ostream& operator<<(std::ostream& out, const BKLMElementID& id);
 }
-
-#endif //BKLMElementID_H

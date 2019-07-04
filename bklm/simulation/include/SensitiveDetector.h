@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SENSITIVEDETECTOR_H
-#define SENSITIVEDETECTOR_H
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
@@ -64,4 +63,3 @@ namespace Belle2 {
   } // end of namespace bklm
 
 } // end of namespace Belle2
-#endif // SENSITIVEDETECTOR_H

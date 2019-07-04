@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMGEOMETRYPAR_H
-#define BKLMGEOMETRYPAR_H
+#pragma once
 
 #include "bklm/geometry/Module.h"
 #include "bklm/dbobjects/BKLMGeometryPar.h"
@@ -740,5 +739,3 @@ namespace Belle2 {
   } // end of namespace bklm
 
 } // end of namespace Belle2
-
-#endif // BKLMGEOMETRYPAR_H

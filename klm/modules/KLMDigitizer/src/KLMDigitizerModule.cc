@@ -116,7 +116,9 @@ void KLMDigitizerModule::digitizeBKLM()
     BKLMSimHit* simHit = it->second;
     ub = m_bklmSimHitChannelMap.upper_bound(it->first);
     if (simHit->inRPC()) {
-      BKLMDigit* bklmDigit = m_bklmDigits.appendNew(simHit, 1);
+      int strip = BKLMElementNumbers::getStripByModule(
+                    m_ElementNumbers->localChannelNumberBKLM(it->first));
+      BKLMDigit* bklmDigit = m_bklmDigits.appendNew(simHit, strip);
       bklmDigit->addRelationTo(simHit);
     } else {
       simulator.simulate(it, ub);

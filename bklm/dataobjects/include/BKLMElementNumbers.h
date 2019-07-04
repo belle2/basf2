@@ -147,6 +147,14 @@ namespace Belle2 {
       return (module & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
     }
 
+    /**
+     * Get strip number by module identifier.
+     */
+    static int getStripByModule(int module)
+    {
+      return ((module & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
+    }
+
   protected:
 
     /** Maximal forward number (0-based). */

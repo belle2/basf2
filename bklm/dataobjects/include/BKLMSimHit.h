@@ -71,11 +71,11 @@ namespace Belle2 {
 
     //! Get strip number of this hit
     //! @return readout strip number of this hit (assuming one strip per hit)
-    int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStrip() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get lowest readout strip number of a contiguous set
     //! @return lowest readout strip number of this hit (assuming a contiguous set of RPC strips)
-    int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStripMin() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get highest readout strip number of a contiguous set
     //! @return highest readout strip number of this hit (assuming a contiguous set of RPC strips)

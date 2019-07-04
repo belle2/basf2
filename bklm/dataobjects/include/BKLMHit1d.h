@@ -67,7 +67,7 @@ namespace Belle2 {
 
     //! Get lowest strip number of this 1D hit
     //! @return lowest strip number of this 1D hit
-    int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStripMin() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get highest strip number of this 1D hit
     //! @return highest strip number of this 1D hit

@@ -95,7 +95,7 @@ namespace Belle2 {
 
     //! Get strip number
     //! @return strip number (1..64)
-    int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStrip() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get detector-module ID
     //! @return unique detector-module ID (internally calculated)

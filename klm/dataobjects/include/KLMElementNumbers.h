@@ -74,6 +74,18 @@ namespace Belle2 {
     bool isEKLMChannel(uint16_t channel) const;
 
     /**
+     * Get local BKLM channel number.
+     * @param[in] channel KLM channel number.
+     */
+    int localChannelNumberBKLM(uint16_t channel) const;
+
+    /**
+     * Get local EKLM channel number.
+     * @param[in] channel KLM channel number.
+     */
+    int localChannelNumberEKLM(uint16_t channel) const;
+
+    /**
      * Get module number for BKLM.
      * @param[in] forward Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).

@@ -156,10 +156,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.1f");
 
-  m_hEfficiency->getHistogram(0)->Clear();
-  m_hEfficiency->getHistogram(1)->Clear();
-  m_hEfficiencyErr->getHistogram(0)->Clear();
-  m_hEfficiencyErr->getHistogram(1)->Clear();
+  m_hEfficiency->getHistogram(0)->Reset();
+  m_hEfficiency->getHistogram(1)->Reset();
+  m_hEfficiencyErr->getHistogram(0)->Reset();
+  m_hEfficiencyErr->getHistogram(1)->Reset();
 
   Float_t effU = 0;
   Float_t effV = 0;

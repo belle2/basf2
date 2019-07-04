@@ -76,14 +76,6 @@ If a likelihood is not available from the selected detector list, `NaN` is retur
 .. b2-variables::
    :group: PID_expert
 
-PID for B2BII
-"""""""""""""
-.. warning :: 
-  These variables are to be used only when analysing converted Belle samples.
-
-.. b2-variables::
-   :group: PID_belle
-
 ECL Cluster
 ~~~~~~~~~~~
 
@@ -108,9 +100,6 @@ All ECLCluster-based variables return NaN if no ECLCluster is found.
 
 .. b2-variables::
    :group: ECL Cluster related
-
-.. b2-variables::
-   :group: Belle Variables
 
 There are also some special variables related to the MC matching of ECL clusters (specifically).
 
@@ -277,6 +266,25 @@ Here is a list of production and decay vertex variables:
 .. b2-variables::
    :group: Vertex Information   
 
+Belle and ``b2bii`` variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Several legacy Belle variables are provided. 
+
+.. info::
+   These are intended for studies with ``b2bii`` and for comparison between Belle and Belle II.
+
+.. b2-variables::
+   :group: Belle Variables
+
+PID for B2BII
+"""""""""""""
+
+.. warning:: 
+   These variables are to be used only when analysing converted Belle samples.
+
+.. b2-variables::
+   :group: PID_belle
 
 
 Miscellaneous
@@ -290,8 +298,10 @@ Other variable that can be handy in development:
 Calibration
 ~~~~~~~~~~~
 
-There are several variables also available for calibration experts who are working on cdst format files.
-Many of these will not work for- and should not be used by- normal analyses.
+There are several variables also available for calibration experts who are working on ``cdst`` format files.
+
+.. warning:: Many of these will not work for- and should not be used by- normal analyses.
+
 They have a *[Calibration]* pretag.
 
 .. b2-variables::

@@ -1,6 +1,12 @@
 import glob
 import os
 import subprocess
+
+import matplotlib.pyplot as plt
+import numpy as np
+import root_pandas
+from matplotlib.backends.backend_pdf import PdfPages
+
 import basf2
 import basf2_mva
 import simulation
@@ -16,6 +22,11 @@ try:
     from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
 except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="b2luigi"))
+    raise
+try:
+    from uncertain_panda import pandas as upd
+except ModuleNotFoundError:
+    print(install_helpstring_formatter.format(module="uncertain_panda"))
     raise
 
 
@@ -61,6 +72,24 @@ def my_basf2_mva_teacher(
     fastbdt_options = basf2_mva.FastBDTOptions()
     # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
     basf2_mva.teacher(general_options, fastbdt_options)
+
+
+def plot_with_errobands(uncertain_series,
+                        error_band_alpha=0.3,
+                        plot_kwargs={},
+                        fill_between_kwargs={},
+                        ax=None):
+    """
+    Plot an uncertain series with error bands in y
+    """
+    if ax is None:
+        ax = plt.gca()
+    ax.plot(uncertain_series.index, uncertain_series.nominal_value, **plot_kwargs)
+    ax.fill_between(x=uncertain_series.index,
+                    y1=uncertain_series.nominal_value - uncertain_series.std_dev,
+                    y2=uncertain_series.nominal_value + uncertain_series.std_dev,
+                    alpha=error_band_alpha,
+                    **fill_between_kwargs)
 
 
 class GenerateSimTask(Basf2PathTask):
@@ -654,6 +683,211 @@ class FullTrackQEHarvestingValidationTask(Basf2PathTask):
         return path
 
 
+class PlotsFromHarvestingValidationBaseTask(Basf2Task):
+    """
+    Create PDF with QI validation plots from ROOT file produced by harvesting validation task
+    """
+    primaries_only = luigi.BoolParameter(default=True)  # normalize finding efficiencies to primary MC-tracks
+
+    # harvesting task static variable can be used to adapt plotting task to different harvesting validation tasks
+    @property
+    def harvesting_validation_task_instance(self):
+        raise NotImplementedError("Must define a QI harvesting validation task for which to do the plots")
+
+    @property
+    def output_pdf_file_basename(self):
+        validation_harvest_basename = self.harvesting_validation_task_instance.validation_output_file_name
+        return validation_harvest_basename.replace(".root", "_plots.pdf")
+
+    def requires(self):
+        yield self.harvesting_validation_task_instance
+
+    def output(self):
+        yield self.add_to_output(self.output_pdf_file_basename)
+
+    def run(self):
+        validation_harvest_basename = self.harvesting_validation_task_instance.validation_output_file_name
+        validation_harvest_path = self.get_input_file_names(validation_harvest_basename)[0]
+        output_pdf_file_path = self.get_output_file_name(self.output_pdf_file_basename)
+        # Load "harvested" validation data from root files into dataframes (might require a lot of RAM)
+        pr_df = root_pandas.read_root(validation_harvest_path, key='pr_tree/pr_tree')
+        mc_df = root_pandas.read_root(validation_harvest_path, key='mc_tree/mc_tree')
+        if self.primaries_only:
+            mc_df = mc_df[mc_df.is_primary.eq(True)]
+
+        # Define QI thresholds for the FOM plots and the ROC curves
+        qi_cuts = np.linspace(0., 1, 10, endpoint=False)
+        # # Add more points at the very end between the previous maximum and 1
+        # qi_cuts = np.append(qi_cuts, np.linspace(np.max(qi_cuts), 1, 20, endpoint=False))
+
+        # Create plots and append them to single output pdf
+
+        with PdfPages(output_pdf_file_path) as pdf:
+            # Plot fake rates by using the
+            fake_rate_list = [pr_df[pr_df["quality_indicator"] > cut]['is_fake'].unc.mean() for cut in qi_cuts]
+            fake_rate_useries = upd.Series(data=fake_rate_list, index=qi_cuts)
+            fake_fig, fake_ax = plt.subplots()
+            plot_with_errobands(fake_rate_useries, ax=fake_ax)
+            fake_ax.set_ylabel("fake rate")
+            fake_ax.set_xlabel("quality indicator requirement")
+            pdf.savefig(fake_fig, bbox_inches="tight")
+
+            # Plot clone rates
+            clone_rate_list = [pr_df[pr_df["quality_indicator"] > cut]['is_clone'].unc.mean() for cut in qi_cuts]
+            clone_rate_useries = upd.Series(data=clone_rate_list, index=qi_cuts)
+            clone_fig, clone_ax = plt.subplots()
+            plot_with_errobands(clone_rate_useries, ax=clone_ax)
+            clone_ax.set_ylabel("clone rate")
+            clone_ax.set_xlabel("quality indicator requirement")
+            pdf.savefig(clone_fig, bbox_inches="tight")
+
+            # Plot finding efficieny
+
+            # The Quality Indicator is only avaiable in pr_tree and thus the
+            # PR-track dataframe. To get the QI of the related PR track for an MC
+            # track, merge the PR dataframe into the MC dataframe
+            pr_track_identifiers = ['experiment_number', 'run_number', 'event_number', 'pr_store_array_number']
+            mc_df = upd.merge(
+                left=mc_df, right=pr_df[pr_track_identifiers + ['quality_indicator']],
+                how='left',
+                on=pr_track_identifiers
+            )
+
+            missing_fraction_list = [
+                mc_df[mc_df.quality_indicator.isnull() | (mc_df.quality_indicator > i)]['is_missing'].unc.mean()
+                for i in qi_cuts
+            ]
+
+            findeff_fig, findeff_ax = plt.subplots()
+            findeff_useries = 1 - upd.Series(data=missing_fraction_list, index=qi_cuts)
+            plot_with_errobands(findeff_useries, ax=findeff_ax)
+            findeff_ax.set_ylabel("finding efficiency")
+            findeff_ax.set_xlabel("quality indicator requirement")
+            pdf.savefig(findeff_fig, bbox_inches="tight")
+
+            # Plot ROC curves
+
+            # Fake rate vs. finding efficiency ROC curve
+            fake_roc_fig, fake_roc_ax = plt.subplots()
+            fake_roc_ax.errorbar(x=findeff_useries.nominal_value, y=fake_rate_useries.nominal_value,
+                                 xerr=findeff_useries.std_dev, yerr=fake_rate_useries.std_dev, elinewidth=0.8)
+            fake_roc_ax.set_xlabel('finding efficiency')
+            fake_roc_ax.set_ylabel('fake rate')
+            pdf.savefig(fake_roc_fig, bbox_inches="tight")
+
+            # Clone rate vs. finding efficiency ROC curve
+            clone_roc_fig, clone_roc_ax = plt.subplots()
+            clone_roc_ax.errorbar(x=findeff_useries.nominal_value, y=clone_rate_useries.nominal_value,
+                                  xerr=findeff_useries.std_dev, yerr=clone_rate_useries.std_dev, elinewidth=0.8)
+            clone_roc_ax.set_xlabel('finding efficiency')
+            clone_roc_ax.set_ylabel('clone rate')
+            pdf.savefig(clone_roc_fig, bbox_inches="tight")
+
+            # Plot kinematic distributions
+
+            # use fewer qi cuts as each cut will be it's own subplot now and not a point
+            kinematic_qi_cuts = [0, 0.5, 0.9]
+
+            # Define kinematic parameters which we want to histogram and define
+            # dictionaries relating them to latex labels, units and binnings
+            params = ['d0', 'z0', 'pt', 'tan_lambda', 'phi0']
+            label_by_param = {
+                "pt": "$p_T$",
+                "z0": "$z_0$",
+                "d0": "$d_0$",
+                "tan_lambda": "$\\tan{\lambda}$",
+                "phi0": "$\phi_0$"
+            }
+            unit_by_param = {
+                "pt": "GeV",
+                "z0": "cm",
+                "d0": "cm",
+                "tan_lambda": "rad",
+                "phi0": "rad"
+            }
+            n_kinematic_bins = 75  # number of bins per kinematic variable
+            bins_by_param = {
+                "pt": np.linspace(0, np.percentile(pr_df['pt_truth'].dropna(), 95), n_kinematic_bins),
+                "z0": np.linspace(-0.1, 0.1, n_kinematic_bins),
+                "d0": np.linspace(0, 0.01, n_kinematic_bins),
+                "tan_lambda": np.linspace(-2, 3, n_kinematic_bins),
+                "phi0": np.linspace(0, 2 * np.pi, n_kinematic_bins)
+            }
+
+            # Iterate over each parameter and for each make stacked histograms for different QI cuts
+            kinematic_qi_cuts = [0, 0.5, 0.9]
+            blue, yellow, green = plt.get_cmap("tab10").colors[0:3]
+            for param in params:
+                fig, axarr = plt.subplots(ncols=len(kinematic_qi_cuts), sharey=True, sharex=True, figsize=(14, 6))
+                for i, qi in enumerate(kinematic_qi_cuts):
+                    ax = axarr[i]
+                    incut = pr_df[(pr_df['quality_indicator'] > qi)]
+                    incut_matched = incut[incut.is_matched.eq(True)]
+                    incut_clones = incut[incut.is_clone.eq(True)]
+                    incut_fake = incut[incut.is_fake.eq(True)]
+                    bins = bins_by_param[param]
+                    stacked_histogram_series_tuple = (
+                        incut_matched[f'{param}_estimate'],
+                        incut_clones[f'{param}_estimate'],
+                        incut_fake[f'{param}_estimate'],
+                    )
+                    histvals, _, _ = ax.hist(stacked_histogram_series_tuple,
+                                             stacked=True,
+                                             bins=bins, range=(bins.min(), bins.max()),
+                                             # color=[blue, green, yellow],
+                                             label=["matched", "clones", "fakes"])
+                    ax.set_title(f"QI > {qi}")
+                    ax.set_xlabel(f'{label_by_param[param]} estimate / ({unit_by_param[param]})')
+                    ax.set_ylabel('# tracks')
+                ax.legend(loc="upper center", bbox_to_anchor=(-1, -0.15))
+                pdf.savefig(fig, bbox_inches="tight")
+
+
+class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
+    n_events_testing = luigi.IntParameter()
+    n_events_training = luigi.IntParameter()
+    cdc_training_target = luigi.Parameter()
+    exclude_variables = luigi.ListParameter(hashed=True)
+
+    @property
+    def harvesting_validation_task_instance(self):
+        return FullTrackQEHarvestingValidationTask(
+            n_events_testing=self.n_events_testing,
+            n_events_training=self.n_events_training,
+            cdc_training_target=self.cdc_training_target,
+            exclude_variables=self.exclude_variables,
+            num_processes=MasterTask.num_processes,
+        )
+
+
+class CDCQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
+    n_events_testing = luigi.IntParameter()
+    n_events_training = luigi.IntParameter()
+    training_target = luigi.Parameter()
+
+    @property
+    def harvesting_validation_task_instance(self):
+        return CDCQEHarvestingValidationTask(
+            n_events_testing=self.n_events_testing,
+            n_events_training=self.n_events_training,
+            training_target=self.training_target,
+            num_processes=MasterTask.num_processes,
+        )
+
+
+class VXDQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
+    n_events_testing = luigi.IntParameter()
+    n_events_training = luigi.IntParameter()
+
+    @property
+    def harvesting_validation_task_instance(self):
+        return VXDQEHarvestingValidationTask(
+            n_events_testing=self.n_events_testing,
+            n_events_training=self.n_events_training,
+            num_processes=MasterTask.num_processes,
+        )
+
+
 class MasterTask(luigi.WrapperTask):
     """
     Entry point: Task that defines the configurations that shall be tested.
@@ -694,25 +928,20 @@ class MasterTask(luigi.WrapperTask):
                 "truth_track_is_matched",
                 # "truth" # truth includes clones as signal
             ]:
-                yield VXDQEHarvestingValidationTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    num_processes=self.num_processes,
-                )
-                yield CDCQEHarvestingValidationTask(
-                    training_target=cdc_training_target,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    num_processes=self.num_processes,
-                )
-                yield FullTrackQEHarvestingValidationTask(
+                yield FullTrackQEValidationPlotsTask(
                     cdc_training_target=cdc_training_target,
                     exclude_variables=exclude_variables,
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
-                    num_processes=self.num_processes,
                 )
-                yield VXDTrackQEEvaluationTask(
+                yield FullTrackQEEvaluationTask(
+                    exclude_variables=exclude_variables,
+                    cdc_training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
+                yield CDCQEValidationPlotsTask(
+                    training_target=cdc_training_target,
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
@@ -721,9 +950,11 @@ class MasterTask(luigi.WrapperTask):
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                yield FullTrackQEEvaluationTask(
-                    exclude_variables=exclude_variables,
-                    cdc_training_target=cdc_training_target,
+                yield VXDQEValidationPlotsTask(
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
+                yield VXDTrackQEEvaluationTask(
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )

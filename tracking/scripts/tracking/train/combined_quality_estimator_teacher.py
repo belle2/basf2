@@ -1,6 +1,137 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+combined_module_quality_estimator_teacher
+-----------------------------------------
+
+Purpose of this script: The track quality estimators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This python script is used for the combined training and validation of the following
+track quality estimators (QE):
+
+- **MVA track quality estimator:** The final quality estimator for fully merged and
+  fitted tracks. Its classifier uses features from the track fitting, merger, hit
+  pattern, ... But it also uses the outputs from respective intermediate quality
+  estimators for the VXD and the CDC track finding as inputs.
+
+- **VXD track quality estimator:**
+  Quality estimator for the VXDTF2 track finder.
+
+- **CDC track quality estimator:**
+  Quality estimator for the CDC track finding.
+
+ The reason why separate quality estimators for the subdetectors is that some variables
+ are only available for the track finders in the subdetectors, e.g. are available in
+ ``CDCTrack`` objects (e.g. ADC counts), but not anymore in ``RecoTrack`` objects.
+ Therefore VXD and CDC quality estimators have to be trained before the final, full track
+ quality estimator can be trained with their outputs as input. The classifier outputs of
+ the quality estimators are called **quality indicators (QI)**
+
+b2luigi: Understanding the steering file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ All trainings and validations are done in the correct order in this steering file. For
+ the purpose of creating a dependency graph, the  `b2luigi
+ <https://b2luigi.readthedocs.io>`_ python package, which extends the `luigi
+ <https://luigi.readthedocs.io>`_ packaged developed by spotify.
+
+ Each task that has to be done is represented by a special class, which defines which
+ defines parameters, output files and which other tasks with which parameters it depends
+ on. For example a teacher task, which runs ``basf2_mva_teacher.py`` to train the
+ classifier, depends on a data collection task which runs a reconstruction and writes out
+ track-wise variables into a root file for training. An evaluation/validation task for
+ testing the classifier requires both the teacher task, as it needs the weightfile to be
+ present, and also a data collection task, because it needs a dataset for testing
+ classifier.
+
+ The import root task needs to be finished for the script to finish is the
+ ``MasterTask``. It defines via its requirements which tasks need to run. Its
+ requirements are the tasks that run at the very end, such as validation tasks. All other
+ tasks run automatically as they are defined as their dependencies. When you only want to
+ run parts of the training/validation pipeline, you can comment out requirements in the
+ Master Task or replace them by lower-level tasks during debugging.
+
+Requirements
+~~~~~~~~~~~~
+This steering file currently requires only two packages not in the externals, b2luigi_
+for task scheduling and `uncertain_panda
+<https://github.com/nils-braun/uncertain_panda>`_ for uncertainty calculations. They can
+be simply installed via pip::
+
+  python3 -m pip install [--user] b2luigi uncertain_panda
+
+You can use the ``--user`` option if you have not rights to install python packages into
+your externals (e.g. because you are using cvmfs) and install them in ``$HOME/.local``
+instead. An alternative is to use a virtual environment.
+
+Configuration
+~~~~~~~~~~~~~
+Instead of command line arguments, the b2luigi script is configured via a ``settings.json``
+file. Open it in your favorite text editor and modify it to fit to your requirements. It
+should look like this (The contents in ``<...>`` represent placeholders):
+
+.. code-block:: json
+   {
+       "result_path": "<Root path for the b2luigi outputs>"
+       "bkgfiles_directory": "<Directory with overlay background root files>",
+       "n_events_training": <Number of events to be used for training data>,
+       "n_events_testing": <Number of events to be used for the validation/evaluation data>,
+       "workers": <Number of luigi workers, which execute tasks in parallel.>,
+       "basf2_processes_per_worker": <Number of basf2 processes per worker. 0 disables multiprocessing.>
+   }
+
+Usage
+~~~~~
+Once you have done the Configuration_, you can test the b2luigi without running it via::
+
+  python3 combined_quality_estimator_teacher.py --dry-run
+  python3 combined_quality_estimator_teacher.py --show-output
+
+This will show the outputs and show potential errors in the definitions of the luigi task
+dependencies. To run the the steering file in normal (local) mode with debugging information, run::
+
+  python3 combined_quality_estimator_teacher.py --test
+
+If you want to run it in ``--batch`` mode on an LSF batch system, you can refer to the
+`documentation <https://b2luigi.readthedocs.io/en/latest/usage/quickstart.html>` I
+usually like using the interactive luigi web interface which also visualizes the task
+graph while it is running. Therefore, the scheduler daemon ``luigid`` has to run in the
+background, which is located in ``~/.local/bin/luigid`` in case b2luigi had been
+installed with ``--user``. For example use a screen/tmux session and run::
+
+  luigid --port 8886
+
+Any other free port will do as well. Then, execute your steering in another terminal /
+window with::
+
+  python3 combined_quality_estimator_teacher.py --scheduler-port 8886
+
+To view the interactive luigi interface, open your webbrowser enter into the url bar::
+
+  localhost:8886
+
+If you don't run the steering file on the machine on which you run your web browser, you
+have two options:
+
+1. You can run the ``luigid`` scheduler locally and use the ``--scheduler-host <your local machine>``
+   argument when calling the steering file
+2. I usually run both the steering file and ``luigid`` remotely and just use
+   ssh-port-forwarding to my local machine. Therefore, I run on my local machine::
+
+     ssh -N -f -L 8886:localhost:8886 <remote_user>@<remote_host>
+
+Accessing the results / output files ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ All output
+files are stored in a deep directory structure in the ``result_path`` (see
+Configuration_). The directory structure encodes the b2luigi parameters that were used to
+produce the respective output file. This ensures reproducability and facilitates
+parameter optimizations. Sometimes, it is hard to find the interesting output files. You
+can view the whole directory structure by running ``tree <result_path`. You can use unix
+``find`` to find the files that interest you, e.g.::
+
+  find <result_path> -name "*.pdf" # find the plots
+  find <result_path> -name "*.root" # find the ROOT files
+"""
+
 import glob
 from datetime import datetime
 import os

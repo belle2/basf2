@@ -57,7 +57,9 @@ REG_MODULE(SVDDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDigitizerModule::SVDDigitizerModule() : Module()
+std::string Belle2::SVD::SVDDigitizerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
+SVDDigitizerModule::SVDDigitizerModule() : Module(),
+  m_mapping(m_xmlFileName)
 {
   //Set module properties
   setDescription("Create SVDShaperDigits from SVDSimHits");
@@ -260,6 +262,9 @@ void SVDDigitizerModule::initialize()
 
 void SVDDigitizerModule::beginRun()
 {
+
+  if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
+
   //Fill map with all possible sensors This is too slow to be done every event so
   //we fill it once and only clear the content of the sensors per event, not
   //the whole map
@@ -272,6 +277,12 @@ void SVDDigitizerModule::beginRun()
       }
     }
   }
+
+  if (!m_MaskedStr.isValid())
+    B2WARNING("No valid SVDFADCMaskedStrip for the requested IoV -> no strips masked");
+  if (!m_map)
+    B2WARNING("No valid channel mapping -> all APVs will be enabled");
+
 }
 
 void SVDDigitizerModule::event()
@@ -730,13 +741,20 @@ void SVDDigitizerModule::saveDigits()
       [&](double x)->SVDShaperDigit::APVRawSampleType {
         return SVDShaperDigit::trimToSampleRange(x / aduEquivalentU);
       });
-      // 2. Check if over threshold
+      // 2.a Check if over threshold
       auto rawThreshold = charge_thresholdU / aduEquivalentU;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
                                   std::bind2nd(std::greater<double>(), rawThreshold)
                                  );
       if (n_over < m_nSamplesOverZS) continue;
+
+      // 2.b check if the strip is masked
+      if (m_MaskedStr.isMasked(sensorID, true, iStrip)) continue;
+
+      // 2.c check if the APV is disabled
+      if (!m_map->isAPVinMap(sensorID, true, iStrip)) continue;
+
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
       storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(runType, eventType, daqMode,
@@ -802,13 +820,20 @@ void SVDDigitizerModule::saveDigits()
       [&](double x)->SVDShaperDigit::APVRawSampleType {
         return SVDShaperDigit::trimToSampleRange(x / aduEquivalentV);
       });
-      // 2. Check if over threshold
+      // 2.a Check if over threshold
       auto rawThreshold = charge_thresholdV / aduEquivalentV;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
                                   std::bind2nd(std::greater<double>(), rawThreshold)
                                  );
       if (n_over < m_nSamplesOverZS) continue;
+
+      // 2.b check if the strip is masked
+      if (m_MaskedStr.isMasked(sensorID, false, iStrip)) continue;
+
+      // 2.c check if the APV is disabled
+      if (!m_map->isAPVinMap(sensorID, false, iStrip)) continue;
+
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
       storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(runType, eventType, daqMode,

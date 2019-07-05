@@ -30,6 +30,8 @@ except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="uncertain_panda"))
     raise
 
+# Utility functions
+
 
 def my_basf2_mva_teacher(
     records_files,
@@ -39,7 +41,7 @@ def my_basf2_mva_teacher(
     exclude_variables=[],
 ):
     """
-    My custom wrapper for basf2 mva teacher
+    My custom wrapper for basf2 mva teacher. Adapted from code in ``trackfindingcdc_teacher``.
     """
 
     # extract names of all variables from one record file
@@ -81,7 +83,7 @@ def plot_with_errobands(uncertain_series,
                         fill_between_kwargs={},
                         ax=None):
     """
-    Plot an uncertain series with error bands in y
+    Plot an uncertain series with error bands for y-errors
     """
     if ax is None:
         ax = plt.gca()
@@ -93,9 +95,16 @@ def plot_with_errobands(uncertain_series,
                     **fill_between_kwargs)
 
 
+# Begin definitions of b2luigi task classes
+
+
 class GenerateSimTask(Basf2PathTask):
     """
-    Generate simulated Monte Carlo with background overlay
+    Generate simulated Monte Carlo with background overlay.
+
+    Make sure to use different ``random_seed`` parameters for the training data
+    format the classifier trainings and for the test data for the respective
+    evaluation/validation tasks.
     """
 
     n_events = luigi.IntParameter()
@@ -123,6 +132,12 @@ class GenerateSimTask(Basf2PathTask):
 
 
 class CDCQEDataCollectionTask(Basf2PathTask):
+    """
+    Collect variables/features from CDC tracking and write them to a ROOT file.
+
+    These variables are to be used as labelled training data for the MVA
+    classifier which is the CDC track quality estimator
+    """
     n_events = luigi.IntParameter()
     random_seed = luigi.Parameter()
     records_file_name = "cdc_qe_records.root"
@@ -164,6 +179,13 @@ class CDCQEDataCollectionTask(Basf2PathTask):
 
 
 class VXDQEDataCollectionTask(Basf2PathTask):
+    """
+    Collect variables/features from VXDTF2 tracking and write them to a ROOT
+    file.
+
+    These variables are to be used as labelled training data for the MVA
+    classifier which is the VXD track quality estimator
+    """
     n_events = luigi.IntParameter()
     random_seed = luigi.Parameter()
     records_file_name = "vxd_qe_records.root"
@@ -216,6 +238,16 @@ class VXDQEDataCollectionTask(Basf2PathTask):
 
 
 class TrackQETeacherBaseTask(Basf2Task):
+    """
+    A teacher task runs the basf2 mva teacher on the training data provided by a
+    data collection task.
+
+    Since teacher tasks are needed for all quality estimators covered by this
+    steering file and the only thing that changes is the required data
+    collection task and some training parameters, I decided to use inheritance
+    and have the basic functionality in this base class/interface and have the
+    specific teacher tasks inherit from it.
+    """
     n_events_training = luigi.IntParameter()
     training_target = luigi.Parameter(default="truth")
     exclude_variables = luigi.ListParameter(hashed=True, default=[])
@@ -264,6 +296,9 @@ class TrackQETeacherBaseTask(Basf2Task):
 
 
 class CDCQETeacherTask(TrackQETeacherBaseTask):
+    """
+    Task to run basf2 mva teacher on collected data for CDC track quality estimator
+    """
     weightfile_identifier = "trackfindingcdc_TrackQualityIndicator.weights.xml"
     tree_name = "records"
     random_seed = "traincdc_0"
@@ -271,6 +306,9 @@ class CDCQETeacherTask(TrackQETeacherBaseTask):
 
 
 class VXDQETeacherTask(TrackQETeacherBaseTask):
+    """
+    Task to run basf2 mva teacher on collected data for VXDTF2 track quality estimator
+    """
     weightfile_identifier = "trackfindingvxd_TrackQualityIndicator.weights.xml"
     tree_name = "tree"
     random_seed = "trainvxd_0"
@@ -278,6 +316,11 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
 
 
 class VXDQEHarvestingValidationTask(Basf2PathTask):
+    """
+    Run VXDTF2 track finding and write out (="harvest") a root file with
+    variables useful for validation of the VXD Quality Estimator.
+    """
+
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
     validation_output_file_name = "vxd_qe_harvesting_validation.root"
@@ -341,6 +384,10 @@ class VXDQEHarvestingValidationTask(Basf2PathTask):
 
 
 class CDCQEHarvestingValidationTask(Basf2PathTask):
+    """
+    Run CDC reconstruction and write out (="harvest") a root file with variables
+    useful for validation of the CDC Quality Estimator.
+    """
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
     training_target = luigi.Parameter()
@@ -403,6 +450,18 @@ class CDCQEHarvestingValidationTask(Basf2PathTask):
 
 
 class FullTrackQEDataCollectionTask(Basf2PathTask):
+    """
+    Collect variables/features from the full track reconstruction including the
+    fit and write them to a ROOT file.
+
+    These variables are to be used as labelled training data for the MVA
+    classifier which is the MVA track quality estimator.  The collected
+    variables include the classifier outputs from the VXD and CDC quality
+    estimators, namely the CDC and VXD quality indicators, combined with fit,
+    merger, timing, energy loss information etc.  This task requires the
+    subdetector quality estimators to be trained.
+    """
+
     n_events = luigi.IntParameter()
     random_seed = luigi.Parameter()
     records_file_name = "fulltrack_qe_records.root"
@@ -480,6 +539,10 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
 
 
 class FullTrackQETeacherTask(TrackQETeacherBaseTask):
+    """
+    Task to run basf2 mva teacher on collected data for the final, combined
+    track quality estimator
+    """
     weightfile_identifier = "fullTrackQualityIndicator.weights.xml"
     tree_name = "tree"
     random_seed = "trainingdata_0"
@@ -497,8 +560,10 @@ class FullTrackQETeacherTask(TrackQETeacherBaseTask):
 
 class TrackQEEvaluationBaseTask(Basf2Task):
     """
-    Base class for quality estimator MVA evaluation task, from which evaluation
-    tasks for vxd, cdc and combined QE can inherit from.
+    Base class for evaluating a quality estimator ``basf2_mva_evaluate.py`` on a
+    separate test data set.
+
+    Evaluation tasks for VXD, CDC and combined QE can inherit from it.
     """
 
     n_events_testing = luigi.IntParameter()
@@ -554,16 +619,26 @@ class TrackQEEvaluationBaseTask(Basf2Task):
 
 
 class VXDTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
+    """
+    Run ``basf2_mva_evaluate.py`` for the VXD quality estimator on separate test data
+    """
     teacherTask = VXDQETeacherTask
     dataCollectionTask = VXDQEDataCollectionTask
 
 
 class CDCTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
+    """
+    Run ``basf2_mva_evaluate.py`` for the CDC quality estimator on separate test data
+    """
     teacherTask = CDCQETeacherTask
     dataCollectionTask = CDCQEDataCollectionTask
 
 
 class FullTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
+    """
+    Run ``basf2_mva_evaluate.py`` for the final, combined quality estimator on
+    separate test data
+    """
     teacherTask = FullTrackQETeacherTask
     dataCollectionTask = FullTrackQEDataCollectionTask
     exclude_variables = luigi.ListParameter(hashed=True)
@@ -585,6 +660,10 @@ class FullTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
 
 
 class FullTrackQEHarvestingValidationTask(Basf2PathTask):
+    """
+    Run track reconstruction and write out (="harvest") a root file with variables
+    useful for validation of the MVA track Quality Estimator.
+    """
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
     cdc_training_target = luigi.Parameter()
@@ -686,7 +765,8 @@ class FullTrackQEHarvestingValidationTask(Basf2PathTask):
 
 class PlotsFromHarvestingValidationBaseTask(Basf2Task):
     """
-    Create PDF with QI validation plots from ROOT file produced by harvesting validation task
+    Create a PDF file with validation plots for a quality estimator produced
+    from the ROOT ntuples produced by a harvesting validation task
     """
     primaries_only = luigi.BoolParameter(default=True)  # normalize finding efficiencies to primary MC-tracks
 
@@ -858,6 +938,11 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
 
 
 class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
+    """
+    Create a PDF file with validation plots for the full MVA track quality
+    estimator produced from the ROOT ntuples produced by a full track QE
+    harvesting validation task
+    """
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
     cdc_training_target = luigi.Parameter()
@@ -875,6 +960,11 @@ class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
 
 
 class CDCQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
+    """
+    Create a PDF file with validation plots for the CDC track quality estimator
+    produced from the ROOT ntuples produced by a CDC track QE harvesting
+    validation task
+    """
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
     training_target = luigi.Parameter()
@@ -890,6 +980,11 @@ class CDCQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
 
 
 class VXDQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
+    """
+    Create a PDF file with validation plots for the VXDTF2 track quality
+    estimator produced from the ROOT ntuples produced by a VXDTF2 track QE
+    harvesting validation task
+    """
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
 
@@ -914,20 +1009,8 @@ class MasterTask(luigi.WrapperTask):
 
     def requires(self):
 
-        # reco track difference variables,
-        # calculated in eventwise extractor -> eventwise?
-        rt_diff_variables = [
-            "RTs_Min_Mom_diff_Mag",
-            "RTs_Min_Mom_diff_Mag_idx",
-            "RTs_Min_Mom_diff_Pt",
-            "RTs_Min_Mom_diff_Pt_idx",
-            "RTs_Min_Pos_diff_Theta",
-            "RTs_Min_Pos_diff_Theta_idx",
-            "RTs_Min_Pos_diff_Phi",
-            "RTs_Min_Pos_diff_Phi_idx",
-        ]
-
-        # eventwise n_track_variables
+        # eventwise n_track_variables should not be used by teacher tasks in
+        # training
         ntrack_variables = [
             "N_RecoTracks",
             "N_PXDRecoTracks",

@@ -103,6 +103,9 @@ namespace Belle2 {
     double m_tagVol;              /**< tagV component in the direction orthogonal to the boost */
     double m_truthTagVol;         /**< MC tagV component in the direction orthogonal to the boost */
     double m_tagVolErr;           /**< Error of the tagV component in the direction orthogonal to the boost */
+    double m_tagVNDF;             /**< Number of degrees of freedom in the tag vertex fit */
+    double m_tagVChi2;            /**< chi^2 value of the tag vertex fit result */
+    double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);

@@ -1,0 +1,7 @@
+Changes in the analysis package
+-------------------------------
+
+Variables
++++++++++
+
+* Access to tag vertexing quality indicators for resolution function study, :b2:var:`TagVNDF`, :b2:var:`TagVChi2`, and :b2:var:`TagVChi2IP`.

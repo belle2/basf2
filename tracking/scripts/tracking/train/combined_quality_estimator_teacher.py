@@ -1192,7 +1192,5 @@ class MasterTask(luigi.WrapperTask):
 
 
 if __name__ == "__main__":
-    # TODO Add comment block with usage instructions
-    # TODO complete docstrings for all tasks
     workers = luigi.get_setting("workers", default=1)
     luigi.process(MasterTask(), workers=workers)

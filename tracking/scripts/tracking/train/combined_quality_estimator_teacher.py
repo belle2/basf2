@@ -1,4 +1,5 @@
 import glob
+from datetime import datetime
 import os
 import subprocess
 
@@ -725,10 +726,16 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         # Create plots and append them to single output pdf
 
         with PdfPages(output_pdf_file_path, keep_empty=False) as pdf:
+            # Add some metadata to pdf
+            d = pdf.infodict()
+            d['Title'] = f"Quality Estimator validation plots from {validation_harvest_basename}"
+            d['ModDate'] = datetime.today()
+
             # Plot fake rates
             fake_rate_list = [pr_df[pr_df["quality_indicator"] > cut]['is_fake'].unc.mean() for cut in qi_cuts]
             fake_rate_useries = upd.Series(data=fake_rate_list, index=qi_cuts)
             fake_fig, fake_ax = plt.subplots()
+            fake_ax.set_title("Fake rate")
             plot_with_errobands(fake_rate_useries, ax=fake_ax)
             fake_ax.set_ylabel("fake rate")
             fake_ax.set_xlabel("quality indicator requirement")
@@ -738,6 +745,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             clone_rate_list = [pr_df[pr_df["quality_indicator"] > cut]['is_clone'].unc.mean() for cut in qi_cuts]
             clone_rate_useries = upd.Series(data=clone_rate_list, index=qi_cuts)
             clone_fig, clone_ax = plt.subplots()
+            clone_ax.set_title("Clone rate")
             plot_with_errobands(clone_rate_useries, ax=clone_ax)
             clone_ax.set_ylabel("clone rate")
             clone_ax.set_xlabel("quality indicator requirement")
@@ -761,6 +769,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             ]
 
             findeff_fig, findeff_ax = plt.subplots()
+            findeff_ax.set_title("Finding efficiency")
             findeff_useries = 1 - upd.Series(data=missing_fraction_list, index=qi_cuts)
             plot_with_errobands(findeff_useries, ax=findeff_ax)
             findeff_ax.set_ylabel("finding efficiency")
@@ -771,6 +780,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
 
             # Fake rate vs. finding efficiency ROC curve
             fake_roc_fig, fake_roc_ax = plt.subplots()
+            fake_roc_ax.set_title("Fake rate vs. finding efficiency ROC curve")
             fake_roc_ax.errorbar(x=findeff_useries.nominal_value, y=fake_rate_useries.nominal_value,
                                  xerr=findeff_useries.std_dev, yerr=fake_rate_useries.std_dev, elinewidth=0.8)
             fake_roc_ax.set_xlabel('finding efficiency')
@@ -779,6 +789,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
 
             # Clone rate vs. finding efficiency ROC curve
             clone_roc_fig, clone_roc_ax = plt.subplots()
+            clone_roc_ax.set_title("Clone rate vs. finding efficiency ROC curve")
             clone_roc_ax.errorbar(x=findeff_useries.nominal_value, y=clone_rate_useries.nominal_value,
                                   xerr=findeff_useries.std_dev, yerr=clone_rate_useries.std_dev, elinewidth=0.8)
             clone_roc_ax.set_xlabel('finding efficiency')
@@ -821,6 +832,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             blue, yellow, green = plt.get_cmap("tab10").colors[0:3]
             for param in params:
                 fig, axarr = plt.subplots(ncols=len(kinematic_qi_cuts), sharey=True, sharex=True, figsize=(14, 6))
+                fig.suptitle(f"{label_by_param[param]}  distributions")
                 for i, qi in enumerate(kinematic_qi_cuts):
                     ax = axarr[i]
                     incut = pr_df[(pr_df['quality_indicator'] > qi)]
@@ -836,8 +848,8 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                     histvals, _, _ = ax.hist(stacked_histogram_series_tuple,
                                              stacked=True,
                                              bins=bins, range=(bins.min(), bins.max()),
-                                             # color=[blue, green, yellow],
-                                             label=["matched", "clones", "fakes"])
+                                             color=(blue, green, yellow),
+                                             label=("matched", "clones", "fakes"))
                     ax.set_title(f"QI > {qi}")
                     ax.set_xlabel(f'{label_by_param[param]} estimate / ({unit_by_param[param]})')
                     ax.set_ylabel('# tracks')

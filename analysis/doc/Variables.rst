@@ -68,7 +68,7 @@ LogLikelihood values, the binary likelihood ratios and the global likelihood
 ratios for any arbitrary detector combination of mass hypothesis. The accepted
 detector codes are SVD, TOP, CDC, ARICH, ECL, KLM and ALL.
 
-If a likelihood is not available from the selected detector list, `NaN` is returned.
+If a likelihood is not available from the selected detector list, **NaN** is returned.
 
 .. warning :: 
   These variables are not to be used in physics analyses, but only by experts doing performance studies.
@@ -321,7 +321,7 @@ One can use the list in the steering file as follows:
   modular_analusis.variablesToNtuple(variables=my_list,
                                      ...)
 
-It is also possible to use `variableCollection`. Name of the variable collection can
+It is also possible to create user-defined variable collections. Name of the variable collection can
 be threated as a variable name, and hence one would have the following syntax in the steering file:
 
 .. code:: python

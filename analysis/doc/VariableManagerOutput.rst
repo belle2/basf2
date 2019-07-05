@@ -24,9 +24,11 @@ Writes out Variables to a flat `ROOT`_ TTree (it is also possible to write out s
 
 Candidate-wise
 ~~~~~~~~~~~~~~
-For each candidate in the given `ParticleList`, there will be one entry in the TTree containing the desired Variables. 
+For each candidate in the given `ParticleList`_, there will be one entry in the TTree containing the desired Variables. 
 In other words, this produces a candidate-based ROOT file.
 Here is an example of use:
+
+.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 
 .. code-block:: python
  
@@ -131,6 +133,6 @@ Analogous to `VariablesToNtuple <v2nt>`.
                                  filename="variables.hdf5")
         mypath.add_module(v2hdf5)
 
-.. autoclass:: modularAnalysis.VariablesToHDF5
+.. autoclass:: b2pandas_utils.VariablesToHDF5
    :members:
 

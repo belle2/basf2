@@ -49,13 +49,10 @@ def add_packers(path, components=None):
         arichpacker = register_module('ARICHPacker')
         path.add_module(arichpacker)
 
-    # BKLM
-    if components is None or 'BKLM' in components:
+    # KLM
+    if components is None or 'KLM' in components:
         bklmpacker = register_module('BKLMRawPacker')
         path.add_module(bklmpacker)
-
-    # EKLM
-    if components is None or 'EKLM' in components:
         eklmpacker = register_module('EKLMRawPacker')
         path.add_module(eklmpacker)
 
@@ -106,7 +103,7 @@ def add_unpackers(path, components=None):
         path.add_module(arichunpacker)
 
     # KLM
-    if components is None or 'BKLM' in components or 'EKLM' in components:
+    if components is None or 'KLM' in components:
         klmunpacker = register_module('KLMUnpacker')
         path.add_module(klmunpacker)
 

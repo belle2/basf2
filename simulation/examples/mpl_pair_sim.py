@@ -3,7 +3,7 @@
 
 ######################################################
 # Simple monopole pair production for monopoles
-# with magnetic charge 'mag', electric charge 'el' 
+# with magnetic charge 'mag', electric charge 'el'
 #
 ######################################################
 
@@ -40,8 +40,8 @@ GEARBOX = register_module('Gearbox')
 
 GEOMETRY = register_module('Geometry')
 GEOMETRY_param = {
-	'components': [ 'BeamPipe', 'MagneticField', 'PXD', 'SVD', 'CDC', 'ECL', 'ARICH', 'TOP', 'BKLM' ],
-	'geometryType': 0
+    'components': ['BeamPipe', 'MagneticField', 'PXD', 'SVD', 'CDC', 'ECL', 'ARICH', 'TOP', 'KLM'],
+    'geometryType': 0
 }
 GEOMETRY.param(GEOMETRY_param)
 
@@ -54,21 +54,21 @@ g4sim.param('trajectoryStore', 1)
 # digitization
 PXDDIGI = register_module('PXDDigitizer')
 PXDDIGI_param = {
-	'Digits': 'PXDDigits',
-	'PoissonSmearing': True,
-	'ElectronicEffects': True
+    'Digits': 'PXDDigits',
+    'PoissonSmearing': True,
+    'ElectronicEffects': True
 }
 PXDDIGI.param(PXDDIGI_param)
 
-#SVDDIGITIZER = register_module('SVDDigitizer')
-#SVDDIGITIZER_param = {
-#	'PoissonSmearing': True,
-#	'ElectronicEffects': True
-#}
-#SVDDIGITIZER.param(SVDDIGITIZER_param)
+# SVDDIGITIZER = register_module('SVDDigitizer')
+# SVDDIGITIZER_param = {
+#     'PoissonSmearing': True,
+#     'ElectronicEffects': True
+# }
+# SVDDIGITIZER.param(SVDDIGITIZER_param)
 
-#CDCDIGITIZER = register_module('CDCDigitizer')
-#CDCDIGITIZER.param("Output2ndHit", False)
+# CDCDIGITIZER = register_module('CDCDigitizer')
+# CDCDIGITIZER.param("Output2ndHit", False)
 
 pxdClusterizer = register_module('PXDClusterizer')
 
@@ -93,4 +93,3 @@ process(analysis_main)
 
 # print out the summary
 print(statistics)
-

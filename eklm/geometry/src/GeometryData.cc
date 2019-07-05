@@ -258,7 +258,7 @@ void EKLM::GeometryData::readXMLDataStrips(const GearDir& gd)
   int i;
   std::string name;
   GearDir Strips(gd);
-  Strips.append("Strip");
+  Strips.append("/Strip");
   m_StripGeometry.setWidth(Strips.getLength("Width") * CLHEP::cm);
   m_StripGeometry.setThickness(Strips.getLength("Thickness") * CLHEP::cm);
   m_StripGeometry.setGrooveDepth(Strips.getLength("GrooveDepth") * CLHEP::cm);
@@ -478,6 +478,7 @@ void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
   std::string name;
   ShieldDetailGeometry shieldDetailGeometry;
   GearDir gd(*gearDir);
+  gd.append("/EKLM");
   /* Numbers of elements. */
   m_NEndcaps = gd.getInt("NEndcaps");
   checkEndcap(m_NEndcaps);

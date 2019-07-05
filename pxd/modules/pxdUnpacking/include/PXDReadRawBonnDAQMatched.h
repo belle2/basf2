@@ -61,21 +61,11 @@ namespace Belle2 {
 
       std::string m_RawPXDsName;  /**< The name of the StoreArray RawPXDs to create */
 
-      //! Compression Level
-      int m_compressionLevel;
-
-      //! No. of sent events
-      int m_nread;
-
       //! buffer
       int* m_buffer;
 
       //! File handle
       FILE* fh;
-
-      unsigned int m_expNr; ///< set by Param
-      unsigned int m_runNr; ///< set by Param
-      unsigned int m_subRunNr; ///< set by Param
 
       void endian_swapper(void* a, unsigned int len);///< swaps memory region, quick and dirty
       int readOneEvent(unsigned int& tnr); ///< Read event and store it in datastore if trigger nr matches

@@ -40,11 +40,6 @@ PXDReadRawBonnDAQMatchedModule::PXDReadRawBonnDAQMatchedModule() : Module()
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of RawPXDs to be written", std::string(""));
 
   addParam("FileName", m_filename, "file name");
-  addParam("SubRunNr", m_subRunNr, "sub-run number", 0u);
-  addParam("RunNr", m_runNr, "run number", 0u);
-  addParam("ExpNr", m_expNr, "exp number", 0u);
-  m_nread = 0;
-  m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
 
   B2DEBUG(29, "PXDReadRawBonnDAQMatchedModule: Constructor done.");
@@ -136,7 +131,7 @@ int PXDReadRawBonnDAQMatchedModule::readOneEvent(unsigned int& rettriggernr)
       continue;
     } else if (evt->get_header12() == 0xe100) {
       B2DEBUG(29, "Info Event " << std::hex << evt->get_header12() << " RunNr $" << std::hex << data32[1]);
-      if (m_runNr == 0) m_runNr = data32[1]; // we assume it will not change within one file
+      // if (m_runNr == 0) m_runNr = data32[1]; // we assume it will not change within one file
       continue;
     } else if (evt->get_header10() == 0x0000) { // war 0x0020
       B2DEBUG(29, "Run Event Group " << std::hex << evt->get_header10() << " Magic $" << std::hex << data32[1]);

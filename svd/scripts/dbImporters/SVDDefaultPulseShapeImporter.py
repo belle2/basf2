@@ -96,16 +96,17 @@ class defaultPulseShapeImporter(basf2.Module):
                                         gain = gain_origami_U
 
                         tmp_calAmp.gain = 1 / gain
-                        print(str(Nstrips))
+
+                        # print(str(Nstrips))
                         for strip in range(0, Nstrips):
-                            print("setting Gain for strip " + str(strip) + " to " + str(tmp_calAmp.gain))
+                            # print("setting Gain for strip " + str(strip) + " to " + str(tmp_calAmp.gain))
 
                             calAmp_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), strip, tmp_calAmp)
 
         Belle2.Database.Instance().storeData(Belle2.SVDPulseShapeCalibrations.calAmp_name, calAmp_payload, iov)
 
 
-use_local_database("localDB/database.txt", "localDB")
+use_local_database("localDB_defaultPulseShapeCalibrations/database.txt", "localDB_defaultPulseShapeCalibrations")
 
 main = create_path()
 

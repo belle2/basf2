@@ -93,15 +93,15 @@ class defaultNoiseImporter(basf2.Module):
                                         noise = noise_bkw_U
                                     else:  # BARREL U
                                         noise = noise_origami_U
+
                         print(str(Nstrips))
                         for strip in range(0, Nstrips):
-                            #                            print("setting Noise for strip " + str(strip))
                             payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), strip, noise)
 
         Belle2.Database.Instance().storeData(Belle2.SVDNoiseCalibrations.name, payload, iov)
 
 
-use_local_database("localDB/database.txt", "localDB")
+use_local_database("localDB_defaultNoiseCalibrations/database.txt", "localDB_defaultNoiseCalibrations")
 
 main = create_path()
 

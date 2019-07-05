@@ -159,8 +159,8 @@ def DstToD0Neutrals(path):
 
 def DstToD0PiD0ToHpHmKs(path):
 
-    charmcuts = '1.80 < M < 1.93 and useCMSFrame(p)>2.2'
-    Dstcuts = '0 < Q < 0.018'
+    D0cuts = '1.80 < M < 1.93'
+    Dstcuts = '0 < Q < 0.015 and useCMSFrame(p)>2.3'
 
     D0_Channels = ['pi-:loose pi+:loose K_S0:merged',
                    'K-:loose K+:loose K_S0:merged'
@@ -168,11 +168,9 @@ def DstToD0PiD0ToHpHmKs(path):
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:HpHmKs' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        vertexKFit('D0:HpHmKs' + str(chID), 0.001, path=path)
+        reconstructDecay('D0:HpHmKs' + str(chID) + ' -> ' + channel, D0cuts, chID, path=path)
 
         reconstructDecay('D*+:HpHmKs' + str(chID) + ' -> pi+:all D0:HpHmKs' + str(chID), Dstcuts, chID, path=path)
-        vertexKFit('D*+:HpHmKs' + str(chID), 0.001, path=path)
         DstList.append('D*+:HpHmKs' + str(chID))
 
     return DstList

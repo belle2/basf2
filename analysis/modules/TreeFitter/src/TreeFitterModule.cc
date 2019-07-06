@@ -50,9 +50,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
 
 
   addParam("geoConstraintList", m_geoConstraintListPDG,
-           "Type::[int], if `autoSetGeoConstraintAndMergeVertices==False` you can manually set the particles that will be geometrically constrained here.", {});
+           "Type::[int], if 'autoSetGeoConstraintAndMergeVertices==False' you can manually set the particles that will be geometrically constrained here.", {});
   addParam("sharedVertexList", m_fixedToMotherVertexListPDG,
-           "Type::[int], if `autoSetGeoConstraintAndMergeVertices==False` you can manually set the particles that share the vertex with their mother here.", {});
+           "Type::[int], if 'autoSetGeoConstraintAndMergeVertices==False' you can manually set the particles that share the vertex with their mother here.", {});
   addParam("autoSetGeoConstraintAndMergeVertices", m_automatic_vertex_constraining,
            "Type::bool, shall vertices of strong resonance be merged with their mothers? Can the particles vertex be constraint geometrically?",
            true);

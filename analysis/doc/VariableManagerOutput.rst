@@ -87,7 +87,7 @@ VariablesToEventBasedTree
 Writes out Variables to a structured `ROOT`_ TTree.
 For each **event** an entry is written into the Tree containing one array (for each Particle in the ParticleList) for each Variable.
 
-.. seealso:: More information for working event-wise is given in the section about `EventBased`.
+.. seealso:: More information for working event-wise is given in the section about :doc:`EventBased`.
 
 VariablesToHistogram
 --------------------

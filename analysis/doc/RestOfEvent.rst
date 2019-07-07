@@ -152,7 +152,7 @@ which have passed a selection criteria:
   # Create a mask tuple:
   cleanMask = ('cleanMask', 'abs(d0) < 10.0 and abs(z0) < 20.0', 'E > 0.06 and abs(clusterTiming) < 20')
   # append masks to existing ROE object
-  appendROEMasks('D0:tag', [cleanMask], path = mainPath)
+  appendROEMasks('B0:rec', [cleanMask], path = mainPath)
   
 The mask tuples should contain a mask name and cuts for charged particles, for photons and for :math:`K_L^0` or hadrons.
 In the example above a cut is not set, therefore, all hadrons will pass the mask.
@@ -184,7 +184,7 @@ These methods should be executed inside the ROE loop:
   # Create a mask tuple:
   cleanMask = ('cleanMask', 'abs(d0) < 10.0 and abs(z0) < 20.0', 'E > 0.06 and abs(clusterTiming) < 20')
   # append masks to the existing ROE object
-  appendROEMasks('D0:tag', [cleanMask], path = mainPath)
+  appendROEMasks('B0:rec', [cleanMask], path = mainPath)
   
   # Create a path for ROE logic
   roe_path = b2.create_path()
@@ -226,7 +226,7 @@ particles from host ROE object:
   # Create a mask tuple:
   cleanMask = ('cleanMask', 'abs(d0) < 10.0 and abs(z0) < 20.0', 'E > 0.06 and abs(clusterTiming) < 20')
   # append masks to existing ROE object
-  appendROEMasks('D0:tag', [cleanMask], path = mainPath)
+  appendROEMasks('B0:rec', [cleanMask], path = mainPath)
   # Create a path for ROE logic
   roe_path = b2.create_path()
   # Associate a module to be executed for each ROE candidate:
@@ -253,6 +253,43 @@ This is needed to clean up the nested ROE from the beam-background energy deposi
 Then we create ``nestedroe_path`` path for the nested ROE modules and finally we reconstruct a :math:`K_S^0` inside the nested ROE.
 One can execute all possible ROE-related methods using nested ROE objects or loops. 
 
+
+Load ROE as a particle
+----------------------
+
+It is possible to load ROE as a particle, which can be manipulated as all other particles in ``basf2``:
+
+::
+  
+  import basf2 as b2
+  import modularAnalysis as ma
+  mainPath = b2.create_path()
+  # Suppose we have a signal B meson stored in a particle list 'B0:rec'
+  ma.fillParticleList('B0:rec', path = mainPath)
+  # build the ROE object
+  ma.buildRestOfEvent('B0:rec', path = mainPath)
+  # Create a mask tuple:
+  cleanMask = ('cleanMask', 'abs(d0) < 10.0 and abs(z0) < 20.0', 'E > 0.06 and abs(clusterTiming) < 20')
+  # append masks to existing ROE object
+  appendROEMasks('B0:rec', [cleanMask], path = mainPath)
+  # Load ROE as a particle and use a mask 'cleanMask':
+  ma.fillParticleListFromROE('B0:tagFromROE', '', maskName='cleanMask', 
+    sourceParticleListName='B0:rec', path=main_path)
+  
+  # A shorter option:
+  # ma.fillParticleListFromROE('B0:tagFromROE -> B0:rec', '', 'cleanMask', path=main_path)
+
+Other option is to load a missing momentum as a particle:
+
+::
+  
+  ma.fillParticleListFromROE('nu:missing', '', maskName='cleanMask', 
+    sourceParticleListName='B0:rec', useMissing = True, path=main_path)
+  
+
+.. warning::
+  The resulted particles cannot be used for vertexing or MC matching.
+  This functionality is under development.
 
 
 MVA based cleaning

@@ -773,14 +773,15 @@ def fillParticleListFromROE(
 
     The type of the particles to be loaded is specified via the decayString module parameter.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList.
-                         Source ROEs can be taken as a daughter list, for example:
-                         'B0:tagFromROE -> B0:signal'
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param maskName      Name of the ROE mask to use
-    @param useMissing    Use missing momentum instead of ROE momentum
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    @param decayString             specifies type of Particles and determines the name of the ParticleList.
+                                   Source ROEs can be taken as a daughter list, for example:
+                                   'B0:tagFromROE -> B0:signal'
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param maskName                Name of the ROE mask to use
+    @param sourceParticleListName  Use related ROEs to this particle list as a source
+    @param useMissing              Use missing momentum instead of ROE momentum
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
     """
 
     pload = register_module('ParticleLoader')

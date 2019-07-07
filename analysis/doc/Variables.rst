@@ -199,11 +199,15 @@ Here is a list of variables getting info from particle's daughters:
 KLM Cluster and :math:`K_{L}^0` Identification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables.
-Please note that these variables refer to KLMClusters, which are designed to reconstruct :math:`K_{L}^0` and other
-neutral particles with the KLM subdetector. These variables MUST NOT be used to do particle identification of
-charged tracks (for example, they MUST NOT be used to identify muons), otherwise there is a serious risk to spoil
-a physics analysis. For particle identification of charged tracks, please use the canonical PID variables.
+Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
+
+.. warning ::
+  Please note that these variables refer to KLMClusters, which are designed to reconstruct :math:`K_{L}^0` and other
+  neutral particles with the KLM subdetector. These variables **must not be used to do particle identification of
+  charged tracks** (for example, they must not be used to identify muons), otherwise there is a serious risk to spoil
+  a physics analysis. 
+  
+  For particle identification of charged tracks, please use the canonical PID variables.
 
 .. b2-variables::
    :group: KLM Cluster and KlongID

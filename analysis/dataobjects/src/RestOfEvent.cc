@@ -570,7 +570,8 @@ void RestOfEvent::printIndices(const std::set<int>& indices) const
   }
   B2INFO(printout);
 }
-Particle* RestOfEvent::convertToParticle(const std::string& maskName)
+
+Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode)
 {
   StoreArray<Particle> particles;
   std::set<int> source;
@@ -590,9 +591,11 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName)
       B2FATAL("No " << maskName << " mask defined in current ROE!");
     }
   }
-  return particles.appendNew(get4Vector(maskName), getPDGCode(), Particle::EFlavorType::c_Unflavored, std::vector(source.begin(),
+  int particlePDG = (pdgCode == 0) ? getPDGCode() : pdgCode;
+  return particles.appendNew(get4Vector(maskName), particlePDG, Particle::EFlavorType::c_Unflavored, std::vector(source.begin(),
                              source.end()), Particle::PropertyFlags::c_IsUnspecified);
 }
+
 double RestOfEvent::atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const
 {
   // ACC = ARICH

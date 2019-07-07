@@ -220,7 +220,7 @@ namespace Belle2 {
      *
      * @param Name of the ROE mask to use for 4-vector and daughters
      */
-    Particle* convertToParticle(const std::string& maskName = "");
+    Particle* convertToParticle(const std::string& maskName = "", int pdgCode = 0);
     /**
      * Gets the PDG code of the rest of event.
      */

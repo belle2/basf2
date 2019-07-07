@@ -51,26 +51,26 @@ def DstToD0PiD0ToHpJm(path):
 
 
 def DstToD0PiD0ToHpJmPi0(path):
-    Dstcuts = '0 < Q < 0.018'
-    charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
-    cutAndCopyList('pi0:myskim', 'pi0:skim', '0.11 < M < 0.15 and p > 0.28', path=path)
+    Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
+    charmcuts = '1.70 < M < 2.10'
+    cutAndCopyList('pi0:myskim', 'pi0:skim', '', path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
 
     DstList = []
     reconstructDecay('D0:HpJmPi0 -> K-:loose pi+:loose pi0:myskim', charmcuts, path=path)
-    vertexTree('D0:HpJmPi0', 0.001, path=path)
+    # vertexTree('D0:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
     reconstructDecay('D*+:HpJmPi0RS -> D0:HpJmPi0 pi+:all', Dstcuts, path=path)
     reconstructDecay('D*-:HpJmPi0WS -> D0:HpJmPi0 pi-:all', Dstcuts, path=path)
     copyLists('D*+:HpJmPi0', ['D*+:HpJmPi0RS', 'D*+:HpJmPi0WS'], path=path)
-    vertexKFit('D*+:HpJmPi0', 0.001, path=path)
+    # vertexKFit('D*+:HpJmPi0', 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
     DstList.append('D*+:HpJmPi0')
 
     return DstList
 
 
 def DstToD0PiD0ToHpHmPi0(path):
-    Dstcuts = '0 < Q < 0.018'
-    charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
-    cutAndCopyList('pi0:myskim', 'pi0:skim', '0.11 < M < 0.15 and p > 0.28', path=path)
+    Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
+    charmcuts = '1.70 < M < 2.10'
+    cutAndCopyList('pi0:myskim', 'pi0:skim', '', path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
     D0_Channels = ['pi+:loose pi-:loose pi0:myskim',
                    'K+:loose K-:loose pi0:myskim',
                    ]
@@ -79,9 +79,9 @@ def DstToD0PiD0ToHpHmPi0(path):
 
     for chID, channel in enumerate(D0_Channels):
         reconstructDecay('D0:HpHmPi0' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        vertexTree('D0:HpHmPi0' + str(chID), 0.001, path=path)
-        reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> pi+:all D0:HpHmPi0' + str(chID), Dstcuts, chID, path=path)
-        vertexKFit('D*+:HpHmPi0' + str(chID), 0.001, path=path)
+        # vertexTree('D0:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
+        reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> D0:HpHmPi0' + str(chID) + ' pi+:all', Dstcuts, chID, path=path)
+        # vertexKFit('D*+:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
         DstList.append('D*+:HpHmPi0' + str(chID))
 
     return DstList

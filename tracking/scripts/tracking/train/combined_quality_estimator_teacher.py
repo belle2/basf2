@@ -132,10 +132,11 @@ can view the whole directory structure by running ``tree <result_path`. You can 
   find <result_path> -name "*.root" # find the ROOT files
 """
 
+import errno
 import glob
-from datetime import datetime
 import os
 import subprocess
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -292,6 +293,8 @@ class GenerateSimTask(Basf2PathTask):
             "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[0]
         )
         path.add_module("EvtGenInput")
+        if not os.path.isdir(self.bkgfiles_dir):
+            raise OSError(errno.ENOTDIR, "Directory does not exist", self.bkgfiles_dir)
         bkg_files = glob.glob(os.path.join(self.bkgfiles_dir, "*"))
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True)
         path.add_module(

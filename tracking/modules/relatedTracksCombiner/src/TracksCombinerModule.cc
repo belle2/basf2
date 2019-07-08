@@ -49,9 +49,9 @@ void TracksCombinerModule::event()
 
   for (RecoTrack& temp1RecoTrack : m_temp1RecoTracks) {
     // Do not output non-fittable tracks
-    if (not trackFitter.fit(temp1RecoTrack)) {
+//   if (not trackFitter.fit(temp1RecoTrack)) {
 //      continue;
-    }
+//    }
 
     RecoTrack* newTrack = temp1RecoTrack.copyToStoreArray(m_recoTracks);
     newTrack->addHitsFromRecoTrack(&temp1RecoTrack, newTrack->getNumberOfTotalHits());
@@ -60,9 +60,9 @@ void TracksCombinerModule::event()
 
   for (RecoTrack& temp2RecoTrack : m_temp2RecoTracks) {
     // Do not output non-fittable tracks
-    if (not trackFitter.fit(temp2RecoTrack)) {
+//    if (not trackFitter.fit(temp2RecoTrack)) {
 //      continue;
-    }
+//    }
 
     RecoTrack* newTrack = temp2RecoTrack.copyToStoreArray(m_recoTracks);
     newTrack->addHitsFromRecoTrack(&temp2RecoTrack, newTrack->getNumberOfTotalHits());

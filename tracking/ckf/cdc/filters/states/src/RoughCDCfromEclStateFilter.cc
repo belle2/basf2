@@ -34,8 +34,26 @@ TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStat
   }
 
 
-  const double& hitDistance = state.getHitDistance();
+  double hitDistance = state.getHitDistance();
 
+  // correct for offset from first hit
+  /*  if (lastState.isSeed()) {
+      if (lastState.getSeed()->getChargeSeed() < 0) {
+        hitDistance -= 10.;
+      } else if (lastState.getSeed()->getChargeSeed() > 0) {
+        hitDistance += 10.;
+      }
+    }
+  */
+  /*
+    if (lastState.isSeed()) {
+      double pt = lastState.getSeed()->getMomentumSeed().Perp();
+      m_maximalHitDistanceSeed = 60. - 11. * pt;
+    } else {
+      double pt = lastState.getTrackState().getMom().Perp();
+      m_maximalHitDistance = 3. - 0.1 * pt;
+    }
+  */
   if (!lastState.isSeed() and std::abs(hitDistance) > m_maximalHitDistance) {
     return NAN;
   }

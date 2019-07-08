@@ -86,7 +86,12 @@ namespace Belle2 {
         const size_t nHits = wireHits.size();
         m_wireHitCache.reserve(nHits);
         for (auto  hitPtr : wireHits) {
-          m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().phi()});
+          // to speed things up, don't consider background/taken hits at all (and not just in the loop below)
+          if (hitPtr->getAutomatonCell().hasBackgroundFlag() || hitPtr->getAutomatonCell().hasTakenFlag()) {
+            m_wireHitCache.push_back(CDCCKFWireHitCache{99999, 0.});
+          } else {
+            m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().phi()});
+          }
         }
       }
 
@@ -149,12 +154,6 @@ namespace Belle2 {
         // adjust direction of loop (minimal speed gain)
         int idx = doForward ? i : nHits - i - 1;
 
-        const TrackFindingCDC::CDCWireHit* wireHit = wireHits[idx];
-
-        if (wireHit->getAutomatonCell().hasBackgroundFlag() || wireHit->getAutomatonCell().hasTakenFlag()) {
-          continue;
-        }
-
         const auto iCLayer =  m_wireHitCache[idx].icLayer; // wireHit->getWire().getICLayer();
         if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward && lastState.isSeed()) {
           if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump_eclSeed) {
@@ -164,16 +163,21 @@ namespace Belle2 {
           continue;
         }
 
-        if (std::binary_search(wireHitsOnPath.begin(), wireHitsOnPath.end(), wireHit)) {
-          continue;
-        }
-
-
         if (! lastState.isSeed()) {
           double deltaPhi = TrackFindingCDC::AngleUtil::normalised(lastPhi - m_wireHitCache[idx].phi);
           if (fabs(deltaPhi)  > m_maximalDeltaPhi)  {
             continue;
           }
+          //} else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
+          //if (fabs(deltaPhi)  > m_maximalDeltaPhi_eclSeed)  {
+          //  continue;
+          //}
+        }
+
+        const TrackFindingCDC::CDCWireHit* wireHit = wireHits[idx];
+
+        if (std::binary_search(wireHitsOnPath.begin(), wireHitsOnPath.end(), wireHit)) {
+          continue;
         }
 
         nextStates.emplace_back(wireHit);
@@ -187,6 +191,8 @@ namespace Belle2 {
     int m_maximalLayerJump_eclSeed = 3;
     /// Maximal distance in phi between the path last hit/seed and the candidate hit
     double m_maximalDeltaPhi =  TMath::Pi() / 8;
+    /// Maximal distance in phi between the path last hit/seed and the candidate hit
+    double m_maximalDeltaPhi_eclSeed =  TMath::Pi() / 4;
     /// Parameter for the direction in which the tracks are built
     std::string m_param_writeOutDirectionAsString = "forward";
     /// Direction parameter converted from the string parameters

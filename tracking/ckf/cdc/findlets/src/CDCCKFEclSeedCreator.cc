@@ -128,10 +128,11 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     const double cosPhi = cos(phiClus);
 
     TVector3 pos(rClus * sinTheta * cosPhi, rClus * sinTheta * sinPhi, rClus * cosTheta);
-    TVector3 mom(Eclus * sinTheta * cosPhi, Eclus * sinTheta * sinPhi, Eclus * cosTheta);
 
     // Shower assumed to be in 12cm depth
-    // pos = pos - 12. / mom.Mag() * mom;
+    pos = pos - 12. / pos.Mag() * pos;
+
+    TVector3 mom = Eclus / pos.Mag() * pos;
 
     // Find center of circular trajectory
     double rad = std::abs(mom.Pt() / (29.9792458 * 1e-4 * 1. *
@@ -141,6 +142,9 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     if (2. * rad < pos.Perp()) {
       rad = pos.Perp() / 2.0 + 1.0;
     }
+
+    // TODO
+    // Check if following code can be replaced with existing functions from class CDCTrajectory2D
 
     // Use pq formula (center of circle has to be on perpendicular line through center of line between (0,0) and seed position)
     double q = pos.Perp();
@@ -185,10 +189,41 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     TVector3 mom1(momx1 * mom.Perp(), momy1 * mom.Perp(), mom.Z());
     TVector3 mom2(momx2 * mom.Perp(), momy2 * mom.Perp(), mom.Z());
 
+    // Pick the right momentum for positive/negative charge
+    // Use cross product if momentum vector is (counter)clockwise wrt position vector
+    bool clockwise1 = true;
+    bool clockwise2 = true;
+    if (pos.Y() * mom1.X() - pos.X() * mom1.Y() > 0) {
+      clockwise1 = false;
+    }
+    if (pos.Y() * mom2.X() - pos.X() * mom2.Y() > 0) {
+      clockwise2 = false;
+    }
+
+    if (clockwise1 == clockwise2) {
+      B2INFO("-------------------------------------->>>>>>>>> Same orientation!!! <<<<<<<<<<<-----------------------------------------------------");
+    }
+
+    TVector3 mompos;
+    TVector3 momneg;
+    if (clockwise1) {
+      mompos = mom2;
+      momneg = mom1;
+    } else {
+      mompos = mom1;
+      momneg = mom2;
+    }
+
+    //mompos = 0.5 * (mompos + mom);
+    //momneg = 0.5 * (momneg + mom);
+
+    //mompos = mom;
+    //momneg = mom;
+
     // electron and positron hypothesis
-    RecoTrack* eclSeedNeg = m_eclSeedRecoTracks.appendNew(pos, mom, -1);
+    RecoTrack* eclSeedNeg = m_eclSeedRecoTracks.appendNew(pos, momneg, -1);
     eclSeedNeg->addRelationTo(&shower);
-    RecoTrack* eclSeedPos = m_eclSeedRecoTracks.appendNew(pos, mom, +1);
+    RecoTrack* eclSeedPos = m_eclSeedRecoTracks.appendNew(pos, mompos, +1);
     eclSeedPos->addRelationTo(&shower);
 
     // define MeasuredStateOnPlane
@@ -223,8 +258,8 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     */
     // double dpx2 = 0.25 * 0.25 * mom.X() * mom.X();
     // double dpy2 = 0.25 * 0.25 * mom.Y() * mom.Y();
-    double dpx2 = std::abs(mom1.X() - mom2.X()) / 2.0 * std::abs(mom1.X() - mom2.X()) / 4.0;
-    double dpy2 = std::abs(mom1.Y() - mom2.Y()) / 2.0 * std::abs(mom1.Y() - mom2.Y()) / 4.0;
+    double dpx2 = std::abs(mom1.X() - mom2.X()) / 4.0 * std::abs(mom1.X() - mom2.X()) / 4.0;
+    double dpy2 = std::abs(mom1.Y() - mom2.Y()) / 4.0 * std::abs(mom1.Y() - mom2.Y()) / 4.0;
     double dpz2 = 0.25 * 0.25 * mom.Z() * mom.Z();
 
     cov(0, 0) = dx2;
@@ -238,9 +273,9 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 
     genfit::SharedPlanePtr planeNeg(new genfit::DetPlane(pos, pos));
     genfit::SharedPlanePtr planePos(new genfit::DetPlane(pos, pos));
-    msopNeg.setPosMomCov(pos, mom, cov);
+    msopNeg.setPosMomCov(pos, momneg, cov);
     msopNeg.setPlane(planeNeg);
-    msopPos.setPosMomCov(pos, mom, cov);
+    msopPos.setPosMomCov(pos, mompos, cov);
     msopPos.setPlane(planePos);
 
     //B2INFO("Theta: " << thetaClus * 180 / M_PI);
@@ -248,6 +283,9 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     //B2INFO("- Pos: " << pos.X() << " (" << sqrt(dx2) << "), " << pos.Y() << " (" << sqrt(dy2) << "), " << pos.Z() << " (" << sqrt(dz2) << ")");
     //B2INFO("- Mom: " << mom.X() << " (" << sqrt(dpx2) << "), " << mom.Y() << " (" << sqrt(dpy2) << "), " << mom.Z() << " (" << sqrt(dpz2) << ")");
     //B2INFO("- Mom(Old): " << mom.X() << " (" << sqrt(0.25 * 0.25 * mom.X() * mom.X()) << "), " << mom.Y() << " (" << sqrt(0.25 * 0.25 * mom.Y() * mom.Y()) << "), " << mom.Z() << " (" << sqrt(dpz2) << ")");
+    //B2INFO("-MPos: " << mompos.X() << " (" << sqrt(dpx2) << "), " << mompos.Y() << " (" << sqrt(dpy2) << "), " << mompos.Z() << " (" << sqrt(dpz2) << ")");
+    //B2INFO("-MNeg: " << momneg.X() << " (" << sqrt(dpx2) << "), " << momneg.Y() << " (" << sqrt(dpy2) << "), " << momneg.Z() << " (" << sqrt(dpz2) << ")");
+
 
     // create CDCCKF states
     CDCCKFState seedStateNeg(eclSeedNeg, msopNeg);

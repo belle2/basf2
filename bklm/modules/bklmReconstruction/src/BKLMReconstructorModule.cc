@@ -82,7 +82,7 @@ void BKLMReconstructorModule::initialize()
 void BKLMReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2DEBUG(1, "BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+  B2DEBUG(20, "BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
 
   if (m_loadTimingFromDB) {
     m_DtMax = m_timing->getCoincidenceWindow();

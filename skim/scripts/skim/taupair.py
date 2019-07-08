@@ -111,7 +111,7 @@ def TauList(path):
     return eventParticle
 
 
-def TauLFVList(flag=1, path):
+def TauLFVList(flag=1, path=None):
     """
     Note:
         * Skim for Tau LFV decays

@@ -271,7 +271,7 @@ Belle and ``b2bii`` variables
 
 Several legacy Belle variables are provided. 
 
-.. info::
+.. note::
    These are intended for studies with ``b2bii`` and for comparison between Belle and Belle II.
 
 .. b2-variables::

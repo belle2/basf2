@@ -137,10 +137,11 @@ based on:
 
 It reproduces the ``goodLambda()`` function in Belle.
 
-``goodBelleLambda>=1`` should be used with ``protonID > 0.6`` and ``goodBelleLambda>=2`` can be used without a proton PID cut. 
+``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) should be used with ``atcPIDBelle(4,2) > 0.6``,
+and ``goodBelleLambda`` selecton 2 (``goodBelleLambda>1``) can be used without a proton PID cut. 
 The former cut is looser than the latter."
 
-See `BN-684` Lambda selection at Belle. K F Chen et al.
+See `BN-684`_ Lambda selection at Belle. K F Chen et al.
 
 .. _BN-684: https://belle.kek.jp/secured/belle_note/gn684/bn684.ps.gz
 

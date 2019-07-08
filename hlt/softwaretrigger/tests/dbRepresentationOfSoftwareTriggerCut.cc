@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
+#include <mdst/dbobjects/SoftwareTriggerCutBase.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -52,16 +55,16 @@ namespace Belle2 {
     TEST_F(DBRepresentationOfSoftwareTriggerCutTest, basic)
     {
       auto cut = SoftwareTriggerCut::compile("1 == 2", 10, true);
-      DBRepresentationOfSoftwareTriggerCut representation(cut);
-      auto returnedCut = representation.getCut();
+      DBRepresentationOfSoftwareTriggerCut representation(cut->getPreScaleFactor(), cut->isRejectCut(), cut->decompile());
+      auto returnedCut = SoftwareTriggerDBHandler::createCutFromDB(representation);
 
       EXPECT_EQ(cut->decompile(), returnedCut->decompile());
       EXPECT_EQ(cut->getPreScaleFactor(), returnedCut->getPreScaleFactor());
       EXPECT_EQ(cut->isRejectCut(), returnedCut->isRejectCut());
 
       auto cut2 = SoftwareTriggerCut::compile("1 == 2", 10, false);
-      DBRepresentationOfSoftwareTriggerCut representation2(cut2);
-      auto returnedCut2 = representation2.getCut();
+      DBRepresentationOfSoftwareTriggerCut representation2(cut2->getPreScaleFactor(), cut2->isRejectCut(), cut2->decompile());
+      auto returnedCut2 = SoftwareTriggerDBHandler::createCutFromDB(representation2);
 
       EXPECT_EQ(cut2->decompile(), returnedCut2->decompile());
       EXPECT_EQ(cut2->getPreScaleFactor(), returnedCut2->getPreScaleFactor());

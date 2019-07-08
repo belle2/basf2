@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <mdst/dbobjects/SoftwareTriggerCutBase.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
@@ -26,30 +27,18 @@ namespace Belle2 {
    */
   class DBRepresentationOfSoftwareTriggerCut : public TObject, public SoftwareTriggerCutBase {
   public:
-    /// Empty constructor for ROOT (you will probably want to use the explicit copy from SoftwareTriggerCut).
-    DBRepresentationOfSoftwareTriggerCut() {}
+    /// Default constructor for ROOT
+    DBRepresentationOfSoftwareTriggerCut() = default;
 
-    /**
-     * Create a new representation for uploading into the database of the given
-     * SoftwareTriggerCut. This is done by decompiling the cut into its string
-     * representation and storing also the prescale factor.
-     * Both can be easily uploaded into the database.
-     */
-    explicit DBRepresentationOfSoftwareTriggerCut(const std::unique_ptr<SoftwareTrigger::SoftwareTriggerCut>& softwareTriggerCut) :
-      SoftwareTriggerCutBase(softwareTriggerCut->getPreScaleFactor(), softwareTriggerCut->isRejectCut()),
-      m_cutString(softwareTriggerCut->decompile())
+    /// Constructor from the three components pre scale factor, reject flag and cut string
+    DBRepresentationOfSoftwareTriggerCut(unsigned int preScaleFactor, const bool& isRejectCut, const std::string& cutString) :
+      SoftwareTriggerCutBase(preScaleFactor, isRejectCut), m_cutString(cutString) {}
+
+    /// Return the cut string stored in this db representation
+    const std::string& getCutString() const
     {
+      return m_cutString;
     }
-
-    /**
-     * Getter for the cut. This cut is created by compiling the
-     * string representation back into a real cut.
-     */
-    std::unique_ptr<SoftwareTrigger::SoftwareTriggerCut> getCut() const
-    {
-      return SoftwareTrigger::SoftwareTriggerCut::compile(m_cutString, getPreScaleFactor(), isRejectCut());
-    }
-
   private:
     /// The internal storage of the string representation of the cut.
     std::string m_cutString = "";

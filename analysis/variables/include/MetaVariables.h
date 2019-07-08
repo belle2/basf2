@@ -230,6 +230,12 @@ namespace Belle2 {
     Manager::FunctionPtr isInfinity(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the combined p-value of the two given p-values
+     * Both arguments should be p-values in the range 0 to 1.
+     */
+    Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the absolute value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */

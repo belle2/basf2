@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * right(C) 2018 - Belle II Collaboration                                 *
+ * right(C) 2019 - Belle II Collaboration                                 *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor: Jo-Frederik Krohn                                         *

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 namespace TreeFitter {
   class FitParams;
   class ConstraintConfiguration;

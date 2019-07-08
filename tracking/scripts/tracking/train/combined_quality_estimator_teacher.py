@@ -211,6 +211,41 @@ def my_basf2_mva_teacher(
     basf2_mva.teacher(general_options, fastbdt_options)
 
 
+def _my_uncertain_mean(series):
+    """
+    Temporary Workaround bug in ``uncertain_panda`` where a ``ValueError`` is
+    thrown for ``Series.unc.mean`` if the series is empty.  Can be replaced by
+    .unc.mean when the issue is fixed.
+    https://github.com/nils-braun/uncertain_panda/issues/2
+    """
+    try:
+        return series.unc.mean()
+    except ValueError:
+        if series.empty:
+            return np.nan
+        else:
+            raise
+
+
+def get_uncertain_means_for_qi_cuts(df, column, qi_cuts):
+    """
+    Return a pandas series with an mean of the dataframe column and
+    uncertainty for each quality indicator cut.
+
+    :param df: Pandas dataframe with at least ``quality_indicator``
+        and another numeric ``column``.
+    :param column: Column of which we want to aggregate the means
+        and uncertainties for different QI cuts
+    :param qi_cuts: Iterable of quality indicator minimal thresholds.
+    :returns: Series of of means and uncertainties with ``qi_cuts`` as index
+    """
+
+    uncertain_means = (_my_uncertain_mean(df.query(f"quality_indicator > {qi_cut}")[column])
+                       for qi_cut in qi_cuts)
+    uncertain_means_series = upd.Series(data=uncertain_means, index=qi_cuts)
+    return uncertain_means_series
+
+
 def plot_with_errobands(uncertain_series,
                         error_band_alpha=0.3,
                         plot_kwargs={},
@@ -221,6 +256,7 @@ def plot_with_errobands(uncertain_series,
     """
     if ax is None:
         ax = plt.gca()
+    uncertain_series = uncertain_series.dropna()
     ax.plot(uncertain_series.index, uncertain_series.nominal_value, **plot_kwargs)
     ax.fill_between(x=uncertain_series.index,
                     y1=uncertain_series.nominal_value - uncertain_series.std_dev,
@@ -946,21 +982,20 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             d['ModDate'] = datetime.today()
 
             # Plot fake rates
-            fake_rate_list = [pr_df[pr_df["quality_indicator"] > cut]['is_fake'].unc.mean() for cut in qi_cuts]
-            fake_rate_useries = upd.Series(data=fake_rate_list, index=qi_cuts)
+
+            fake_rates = get_uncertain_means_for_qi_cuts(pr_df, "is_fake", qi_cuts)
             fake_fig, fake_ax = plt.subplots()
             fake_ax.set_title("Fake rate")
-            plot_with_errobands(fake_rate_useries, ax=fake_ax)
+            plot_with_errobands(fake_rates, ax=fake_ax)
             fake_ax.set_ylabel("fake rate")
             fake_ax.set_xlabel("quality indicator requirement")
             pdf.savefig(fake_fig, bbox_inches="tight")
 
             # Plot clone rates
-            clone_rate_list = [pr_df[pr_df["quality_indicator"] > cut]['is_clone'].unc.mean() for cut in qi_cuts]
-            clone_rate_useries = upd.Series(data=clone_rate_list, index=qi_cuts)
+            clone_rates = get_uncertain_means_for_qi_cuts(pr_df, "is_clone", qi_cuts)
             clone_fig, clone_ax = plt.subplots()
             clone_ax.set_title("Clone rate")
-            plot_with_errobands(clone_rate_useries, ax=clone_ax)
+            plot_with_errobands(clone_rates, ax=clone_ax)
             clone_ax.set_ylabel("clone rate")
             clone_ax.set_xlabel("quality indicator requirement")
             pdf.savefig(clone_fig, bbox_inches="tight")
@@ -977,15 +1012,16 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                 on=pr_track_identifiers
             )
 
-            missing_fraction_list = [
-                mc_df[mc_df.quality_indicator.isnull() | (mc_df.quality_indicator > i)]['is_missing'].unc.mean()
-                for i in qi_cuts
-            ]
+            missing_fractions = (
+                _my_uncertain_mean(mc_df[
+                    mc_df.quality_indicator.isnull() | (mc_df.quality_indicator > qi_cut)]['is_missing'])
+                for qi_cut in qi_cuts
+            )
 
             findeff_fig, findeff_ax = plt.subplots()
             findeff_ax.set_title("Finding efficiency")
-            findeff_useries = 1 - upd.Series(data=missing_fraction_list, index=qi_cuts)
-            plot_with_errobands(findeff_useries, ax=findeff_ax)
+            finding_efficiencies = 1.0 - upd.Series(data=missing_fractions, index=qi_cuts)
+            plot_with_errobands(finding_efficiencies, ax=findeff_ax)
             findeff_ax.set_ylabel("finding efficiency")
             findeff_ax.set_xlabel("quality indicator requirement")
             pdf.savefig(findeff_fig, bbox_inches="tight")
@@ -995,8 +1031,8 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             # Fake rate vs. finding efficiency ROC curve
             fake_roc_fig, fake_roc_ax = plt.subplots()
             fake_roc_ax.set_title("Fake rate vs. finding efficiency ROC curve")
-            fake_roc_ax.errorbar(x=findeff_useries.nominal_value, y=fake_rate_useries.nominal_value,
-                                 xerr=findeff_useries.std_dev, yerr=fake_rate_useries.std_dev, elinewidth=0.8)
+            fake_roc_ax.errorbar(x=finding_efficiencies.nominal_value, y=fake_rates.nominal_value,
+                                 xerr=finding_efficiencies.std_dev, yerr=fake_rates.std_dev, elinewidth=0.8)
             fake_roc_ax.set_xlabel('finding efficiency')
             fake_roc_ax.set_ylabel('fake rate')
             pdf.savefig(fake_roc_fig, bbox_inches="tight")
@@ -1004,8 +1040,8 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             # Clone rate vs. finding efficiency ROC curve
             clone_roc_fig, clone_roc_ax = plt.subplots()
             clone_roc_ax.set_title("Clone rate vs. finding efficiency ROC curve")
-            clone_roc_ax.errorbar(x=findeff_useries.nominal_value, y=clone_rate_useries.nominal_value,
-                                  xerr=findeff_useries.std_dev, yerr=clone_rate_useries.std_dev, elinewidth=0.8)
+            clone_roc_ax.errorbar(x=finding_efficiencies.nominal_value, y=clone_rates.nominal_value,
+                                  xerr=finding_efficiencies.std_dev, yerr=clone_rates.std_dev, elinewidth=0.8)
             clone_roc_ax.set_xlabel('finding efficiency')
             clone_roc_ax.set_ylabel('clone rate')
             pdf.savefig(clone_roc_fig, bbox_inches="tight")

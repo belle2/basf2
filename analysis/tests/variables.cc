@@ -2908,6 +2908,34 @@ namespace {
     EXPECT_B2FATAL(vnolist->function(nullptr));
   }
 
+  TEST_F(MetaVariableTest, pValueCombination)
+  {
+    TLorentzVector momentum;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    Particle KS(TLorentzVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
+    KS.setPValue(0.1);
+    momentum += KS.get4Vector();
+    Particle* newDaughters = particles.appendNew(KS);
+    daughterIndices.push_back(newDaughters->getArrayIndex());
+    Particle Jpsi(TLorentzVector(-1, 1, 1, 3.548), 443, Particle::c_Unflavored, Particle::c_Composite, 1);
+    momentum += Jpsi.get4Vector();
+    newDaughters = particles.appendNew(Jpsi);
+    daughterIndices.push_back(newDaughters->getArrayIndex());
+    Particle* B = particles.appendNew(momentum, 521, Particle::c_Flavored, daughterIndices);
+    B->setPValue(0.5);
+
+    const Manager::Var* var = Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(B), 0.05 * (1 - log(0.05)));
+
+    // wrong number of arguments
+    EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination(chiProb)"));
+
+    // non-existing variable
+    EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination(chiProb, NONEXISTANTVARIABLE)"));
+  }
+
   class PIDVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */

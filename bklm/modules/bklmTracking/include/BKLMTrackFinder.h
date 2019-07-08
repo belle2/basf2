@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMTRACKFINDER_H
-#define BKLMTRACKFINDER_H
+#pragma once
 
 #include <list>
 
@@ -57,5 +56,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif

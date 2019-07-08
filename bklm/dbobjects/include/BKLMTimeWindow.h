@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMTIMEWINDOW_DB_H
-#define BKLMTIMEWINDOW_DB_H
+#pragma once
 
 #include <TObject.h>
 #include <string>
@@ -100,5 +99,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

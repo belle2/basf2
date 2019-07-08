@@ -1,5 +1,5 @@
-#ifndef BKLMRECONSTRUCTIONMODULE_H
-#define BKLMRECONSTRUCTIONMODULE_H
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
@@ -79,5 +79,3 @@ namespace Belle2 {
     StoreArray<BKLMHit2d> hit2ds;
   };
 } // end namespace Belle2
-#endif
-

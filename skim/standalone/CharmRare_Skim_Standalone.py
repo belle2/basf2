@@ -10,7 +10,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import stdE, stdMu
+from stdCharged import stdE, stdMu, stdPi
 from stdPi0s import *
 from stdPhotons import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
@@ -43,9 +43,10 @@ loadStdSkimPi0(path=crpath)
 loadStdSkimPhoton(path=crpath)
 stdMu('loose', path=crpath)
 stdE('loose', path=crpath)
+stdPi('loose', path=crpath)
 
-from skim.charm import CharmRareList
-CharmRareList = CharmRareList(crpath)
+from skim.charm import CharmRare
+CharmRareList = CharmRare(crpath)
 skimOutputUdst(skimCode, CharmRareList, path=crpath)
 summaryOfLists(CharmRareList, path=crpath)
 

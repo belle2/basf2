@@ -513,20 +513,38 @@ class TrackQETeacherBaseTask(Basf2Task):
 
     @property
     def weightfile_identifier(self):
+        """
+        Property defining the name for the weightfile that is generated.  Has to
+        be implemented by the inheriting specific teacher task class.
+        """
         return NotImplementedError(
             "Teacher Task must define a static weightfile_identifier"
         )
 
     @property
     def tree_name(self):
+        """
+        Property defining the name of their in the ROOT file from the
+        ``dataCollectionTask`` that contains the recorded training data.  Must
+        implemented by the inheriting specific teacher task class.
+        """
         return NotImplementedError("Teacher Task must define a static tree_name")
 
     @property
     def random_seed(self):
+        """
+        Property defining random seed to be used by the ``GenerateSimTask``.
+        Should differ from the random seed in the test data samples.  Must
+        implemented by the inheriting specific teacher task class.
+        """
         return NotImplementedError("Teacher Task must define a static random seed")
 
     @property
     def dataCollectionTask(self):
+        """
+        Property defining the specific ``DataCollectionTask`` to require.  Must
+        implemented by the inheriting specific teacher task class.
+        """
         raise NotImplementedError(
             "Teacher Task must define a data collection task to require "
         )
@@ -846,12 +864,19 @@ class TrackQEEvaluationBaseTask(Basf2Task):
 
     @property
     def teacherTask(self):
+        """
+        Property defining specific teacher task to require.
+        """
         raise NotImplementedError(
             "Evaluation Tasks must define a teacher task to require "
         )
 
     @property
     def dataCollectionTask(self):
+        """
+        Property defining the specific ``DataCollectionTask`` to require.  Must
+        implemented by the inheriting specific teacher task class.
+        """
         raise NotImplementedError(
             "Evaluation Tasks must define a data collection task to require "
         )
@@ -1201,30 +1226,30 @@ class MasterTask(luigi.WrapperTask):
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                yield FullTrackQEEvaluationTask(
-                    exclude_variables=exclude_variables,
-                    cdc_training_target=cdc_training_target,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+                # yield FullTrackQEEvaluationTask(
+                #     exclude_variables=exclude_variables,
+                #     cdc_training_target=cdc_training_target,
+                #     n_events_training=self.n_events_training,
+                #     n_events_testing=self.n_events_testing,
+                # )
                 yield CDCQEValidationPlotsTask(
                     training_target=cdc_training_target,
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                yield CDCTrackQEEvaluationTask(
-                    training_target=cdc_training_target,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+                # yield CDCTrackQEEvaluationTask(
+                #     training_target=cdc_training_target,
+                #     n_events_training=self.n_events_training,
+                #     n_events_testing=self.n_events_testing,
+                # )
                 yield VXDQEValidationPlotsTask(
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                yield VXDTrackQEEvaluationTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+                # yield VXDTrackQEEvaluationTask(
+                #     n_events_training=self.n_events_training,
+                #     n_events_testing=self.n_events_testing,
+                # )
 
 
 if __name__ == "__main__":

@@ -455,7 +455,7 @@ def B0SL(path):
         * -4 < cosThetaBetweenParticleAndNominalB < 3
         * extraInfo(decayModeID) < 8 to remove semileptonic D channels
         * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
-        * useCMSFrame(daughter(1,p)) > 1.0
+        * lepton momentum > 1.0 in CMS frame (daughter(1,p) or daughter(2,p), depending on dmID)
 
     Parameters:
         path (basf2.Path) the path to add the skim list builders
@@ -465,16 +465,12 @@ def B0SL(path):
 
     """
     # Apply cuts
-    B0SLcuts = ['log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0']
-    applyCuts('B0:semileptonic', ' and '.join(B0SLcuts), path=path)
+    B0SLcuts = ['log10_sigProb>-2.4', '-4.0<cosThetaBY<3.0', 'dmID<8'
+                # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
+                # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
+                '[[dmID<4 and d1_p_CMSframe>1.0] or [dmID>=4 and d2_p_CMSframe>1.0]]']
 
-    # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
-    # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
-    cutAndCopyList('B0:Dl', 'B0:semileptonic',
-                   'dmID<4 and dmID>=0 and d1_p_CMSframe>1.0', path=path)
-    cutAndCopyList('B0:Dpil', 'B0:semileptonic',
-                   'dmID<8 and dmID>=4 and d2_p_CMSframe>1.0', path=path)
-    copyLists('B0:semileptonic', ['B0:Dl', 'B0:Dpil'], path=path)
+    applyCuts('B0:semileptonic', ' and '.join(B0SLcuts), path=path)
 
     BtagList = ['B0:semileptonic']
     return BtagList
@@ -517,7 +513,7 @@ def BplusSL(path):
         * -4 < cosThetaBetweenParticleAndNominalB < 3
         * extraInfo(decayModeID) < 8 to remove semileptonic D channels
         * log10(sigProb) > -2.4 to lower retention (corresponds to sigProb > 0.003981)
-        * useCMSFrame(daughter(1,p)) > 1.0
+        * lepton momentum > 1.0 in CMS frame (daughter(1,p) or daughter(2,p), depending on dmID)
 
     Parameters:
         path (basf2.Path) the path to add the skim list builders
@@ -527,16 +523,12 @@ def BplusSL(path):
 
     """
     # Apply cuts
-    BplusSLcuts = ['log10_sigProb>-2.4', 'cosThetaBY>-4.0', 'cosThetaBY<3.0']
-    applyCuts('B+:semileptonic', ' and '.join(BplusSLcuts), path=path)
+    BplusSLcuts = ['log10_sigProb>-2.4', '-4.0<cosThetaBY<3.0', 'dmID<8',
+                   # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
+                   # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
+                   '[[dmID<4 and d1_p_CMSframe>1.0] or [dmID>=4 and d2_p_CMSframe>1.0]]']
 
-    # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
-    # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
-    cutAndCopyList('B+:Dl', 'B+:semileptonic',
-                   'dmID<4 and dmID>=0 and d1_p_CMSframe>1.0', path=path)
-    cutAndCopyList('B+:Dpil', 'B+:semileptonic',
-                   'dmID<8 and dmID>=4 and d2_p_CMSframe>1.0', path=path)
-    copyLists('B+:semileptonic', ['B+:Dl', 'B+:Dpil'], path=path)
+    applyCuts('B+:semileptonic', ' and '.join(BplusSLcuts), path=path)
 
     BtagList = ['B+:semileptonic']
     return BtagList

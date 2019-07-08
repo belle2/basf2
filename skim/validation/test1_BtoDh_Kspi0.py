@@ -21,31 +21,31 @@ from stdV0s import stdKshorts
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 
-kspi0 = Path()
+path = Path()
 
 skimCode = encodeSkimName('BtoDh_Kspi0')
 
 fileList = ['../BtoDh_Kspi0.dst.root']
 
-inputMdstList('default', fileList, path=kspi0)
+inputMdstList('default', fileList, path=path)
 
 # Load particle lists
-stdPi('all', path=kspi0)
-stdK('all', path=kspi0)
-loadStdSkimPi0(path=kspi0)
-stdKshorts(path=kspi0)
+stdPi('all', path=path)
+stdK('all', path=path)
+loadStdSkimPi0(path=path)
+stdKshorts(path=path)
 
 
 # Kspi0 skim
 from skim.btocharm import loadDkspi0, BsigToDhToKspi0List
-loadDkspi0(path=kspi0)
-BtoDhList = BsigToDhToKspi0List(path=kspi0)
-skimOutputUdst(skimCode, BtoDhList, path=kspi0)
-summaryOfLists(BtoDhList, path=kspi0)
+loadDkspi0(path=path)
+BtoDhList = BsigToDhToKspi0List(path=path)
+skimOutputUdst(skimCode, BtoDhList, path=path)
+summaryOfLists(BtoDhList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
-process(kspi0)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

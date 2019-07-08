@@ -36,7 +36,7 @@ parser.add_argument('--data',
 args = parser.parse_args()
 
 if args.data:
-    use_central_database("proc9_global_tag")
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 # create a new path
 PRSLpath = Path()

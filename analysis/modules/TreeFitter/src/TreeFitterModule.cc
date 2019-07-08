@@ -86,8 +86,11 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("expertRemoveConstraintList", m_removeConstraintList,
            "Type::[string]. List of constraints that you do not want to be used in the fit. WARNING don't use if you don't know exactly what it does.", {});
   addParam("expertUseReferencing", m_useReferencing,
-           "Type::[bool]. Use the Extended Kalman Fitler. This implementation linearises around the previous state vector which gives smoother convergence.",
+           "Type::[bool]. Use the Extended Kalman Filter. This implementation linearises around the previous state vector which gives smoother convergence.",
            true);
+  addParam("inflationFactorCovZ", m_inflationFactorCovZ,
+           "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
+           1);
 }
 
 void TreeFitterModule::initialize()
@@ -170,7 +173,8 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     m_customOrigin,
     m_customOriginVertex,
     m_customOriginCovariance,
-    m_originDimension
+    m_originDimension,
+    m_inflationFactorCovZ
   );
 
   std::unique_ptr<TreeFitter::FitManager> TreeFitter(

@@ -347,7 +347,8 @@ namespace TreeFitter {
     }
     if (m_geo_constraint) {
       assert(m_config);
-      list.push_back(Constraint(this, Constraint::geometric, depth, m_config->m_originDimension, 3));
+      const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
+      list.push_back(Constraint(this, Constraint::geometric, depth, dim, 3));
     }
     if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));

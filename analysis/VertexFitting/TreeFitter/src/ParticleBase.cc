@@ -340,9 +340,8 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectGeoConstraint(const FitParams& fitparams, Projection& p) const
   {
     assert(m_config);
-    // ideally we have to make this particle dependent what the size is
-    const int dim = m_config->m_originDimension; //<- here we do it for all paritlces the same way
-
+    // only allow 2d for head of tree particles that are beam cosntraint
+    const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
     const int posindexmother = mother()->posIndex();
     const int posindex = posIndex();
     const int tauindex = tauIndex();

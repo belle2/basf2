@@ -26,7 +26,8 @@ namespace TreeFitter {
     m_customOriginCovariance(config.m_customOriginCovariance),
     m_posVec(config.m_originDimension),
     m_covariance(config.m_originDimension, config.m_originDimension),
-    m_isBeamSpot(config.m_ipConstraint)
+    m_isBeamSpot(config.m_ipConstraint),
+    m_inflationFactorCovZ(config.m_inflationFactorCovZ)
   {
     addDaughter(daughter, config, forceFitAll);
     initOrigin();
@@ -92,13 +93,15 @@ namespace TreeFitter {
       m_posVec(2) = m_customOriginVertex[2];
       m_covariance(0, 0) = m_customOriginCovariance[0];
       m_covariance(0, 1) = m_customOriginCovariance[1];
-      m_covariance(0, 2) = m_customOriginCovariance[2];
       m_covariance(1, 0) = m_customOriginCovariance[3];
       m_covariance(1, 1) = m_customOriginCovariance[4];
-      m_covariance(1, 2) = m_customOriginCovariance[5];
-      m_covariance(2, 0) = m_customOriginCovariance[6];
-      m_covariance(2, 1) = m_customOriginCovariance[7];
-      m_covariance(2, 2) = m_customOriginCovariance[8];
+
+      // all with z
+      m_covariance(1, 2) = m_inflationFactorCovZ * m_customOriginCovariance[5];
+      m_covariance(2, 0) = m_inflationFactorCovZ * m_customOriginCovariance[6];
+      m_covariance(2, 1) = m_inflationFactorCovZ * m_customOriginCovariance[7];
+      m_covariance(2, 2) = m_inflationFactorCovZ * m_customOriginCovariance[8];
+      m_covariance(0, 2) = m_inflationFactorCovZ * m_customOriginCovariance[2];
     } else {
       B2FATAL("The Origin is nether beamspot nor custom. This is ether a configuration error or no beam parameters were found to build the beam spot.");
     }

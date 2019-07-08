@@ -28,7 +28,9 @@ namespace TreeFitter {
                              m_customOrigin(false),
                              m_customOriginVertex({}),
                              m_customOriginCovariance({}),
-                             m_originDimension(3)
+                             m_originDimension(3),
+                             m_headOfTreePDG(0),
+                             m_inflationFactorCovZ(1)
     {};
 
     /** constructor */
@@ -42,7 +44,8 @@ namespace TreeFitter {
                             const bool& customOrigin,
                             const std::vector<double>& customOriginVertex,
                             const std::vector<double>& customOriginCovariance,
-                            const int& originDimension
+                            const int& originDimension,
+                            const int& inflationFactorCovZ = 1
                            ) :
       m_massConstraintType(massConstraintType),
       m_massConstraintListPDG(massConstraintListPDG),
@@ -54,7 +57,9 @@ namespace TreeFitter {
       m_customOrigin(customOrigin),
       m_customOriginVertex(customOriginVertex),
       m_customOriginCovariance(customOriginCovariance),
-      m_originDimension(originDimension)
+      m_originDimension(originDimension),
+      m_headOfTreePDG(0),
+      m_inflationFactorCovZ(inflationFactorCovZ)
     {}
 
     /** const flag for the type of the mass constraint */
@@ -89,6 +94,12 @@ namespace TreeFitter {
 
     /** dimension of the origin constraint and ALL geometric gcosntraints */
     const int m_originDimension;
+
+    /** PDG code of the head particle */
+    mutable int m_headOfTreePDG;
+
+    /** inflate covariance of z by this number -> iptube  */
+    const int m_inflationFactorCovZ;
   };
 }
 

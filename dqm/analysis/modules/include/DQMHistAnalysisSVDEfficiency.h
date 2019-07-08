@@ -44,8 +44,8 @@ namespace Belle2 {
     float m_effError; /**<error level of the efficiency */
     float m_effWarning; /**< warning level of the efficiency */
     float m_effEmpty; /**<empty level of the efficiency */
-    float m_errEffError; /**<error level of the efficiency error*/
-    float m_errEffWarning; /**< warning level of the efficiency error*/
+    float m_errEffError = 1; /**<error level of the efficiency error*/
+    float m_errEffWarning = 0.5; /**< warning level of the efficiency error*/
 
     //! Data members
   private:
@@ -54,7 +54,6 @@ namespace Belle2 {
     std::string m_refFileName;
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
-    TFile* m_HistoName = nullptr;
 
     TCanvas* m_cEfficiencyU = nullptr; /**< efficiency U plot canvas */
     TCanvas* m_cEfficiencyV = nullptr; /**< efficiency V plot canvas */
@@ -63,27 +62,18 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency Verror plot canvas */
     SVDSummaryPlots* m_hEfficiencyErr = nullptr; /**< efficiency error histo */
 
-    const int nSensors = 172; /**< total number of sensors */
-
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
 
     TPaveText* m_legProblem = nullptr; /**< efficiency plot legend, problem */
     TPaveText* m_legWarning = nullptr; /**< efficiency plot legend, warning */
     TPaveText* m_legNormal = nullptr; /**< efficiency plot legend, normal */
     TPaveText* m_legEmpty = nullptr; /**< efficiency plot legend, empty */
-    TPaveText* m_legError = nullptr; /**< efficiency plot legend, error*/
 
-    TText* m_yTitle = nullptr; /**< y axis title text*/
+    Int_t m_effUstatus; /**< number representing the status of the efficiency U side */
+    Int_t m_effVstatus;/**< number representing the status of the efficiency V side */
+    Int_t m_effUErrstatus; /**< number representing the status of the efficiency error U side */
+    Int_t m_effVErrstatus; /**< number representing the status of the efficiency error V side */
 
-    Int_t m_effUstatus;
-    Int_t m_effVstatus;
-    Int_t m_effUErrstatus;
-    Int_t m_effVErrstatus;
-
-    Float_t effU = 0;
-    Float_t effV = 0;
-    Float_t erreffU = 0;
-    Float_t erreffV = 0;
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 

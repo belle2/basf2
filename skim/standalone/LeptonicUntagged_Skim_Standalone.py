@@ -15,12 +15,12 @@ from stdPi0s import *
 from stdV0s import stdKshorts
 from skim.standardlists.charm import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
 
 set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
+import argparse
 gb2_setuprel = 'release-03-02-00'
 skimCode = encodeSkimName('LeptonicUntagged')
 

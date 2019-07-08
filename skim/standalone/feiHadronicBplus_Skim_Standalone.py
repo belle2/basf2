@@ -14,12 +14,12 @@ from basf2 import *
 from modularAnalysis import *
 from beamparameters import add_beamparameters
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
 gb2_setuprel = 'release-03-02-00'
 
 import sys
 import os
 import glob
+import argparse
 skimCode = encodeSkimName('feiHadronicBplus')
 fileList = get_test_file("mixedBGx1", "MC12")
 

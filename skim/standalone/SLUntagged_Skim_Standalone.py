@@ -15,13 +15,13 @@ from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
 gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 
 import os
 import sys
 import glob
+import argparse
 skimCode = encodeSkimName('SLUntagged')
 
 # Read optional --data argument

@@ -465,7 +465,7 @@ def B0SL(path):
 
     """
     # Apply cuts
-    B0SLcuts = ['log10_sigProb>-2.4', '-4.0<cosThetaBY<3.0', 'dmID<8'
+    B0SLcuts = ['log10_sigProb>-2.4', '-4.0<cosThetaBY<3.0', 'dmID<8',
                 # Decay mode IDs 0--3 (B -> D l) need to be treated differently to
                 # IDs 4--7 (B -> D pi l) to make a cut on tag-side lepton momentum.
                 '[[dmID<4 and d1_p_CMSframe>1.0] or [dmID>=4 and d2_p_CMSframe>1.0]]']

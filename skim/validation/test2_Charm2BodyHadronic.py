@@ -4,7 +4,7 @@
 """
 <header>
     <input>17240100.udst.root</input>
-    <output>DstToD0PiD0ToHpJm_Validation.root</output>
+    <output>Charm2BodyHadronic_Validation.root</output>
     <contact>gonggd@mail.ustc.edu.cn</contact>
 </header>
 """
@@ -37,7 +37,7 @@ variables.addAlias('dz_spi', 'daughter(1,dz)')
 variables.addAlias('Pcms_spi', 'daughter(1,useCMSFrame(p))')
 variables.addAlias('Pcms_Dst', 'useCMSFrame(p)')
 variablesToHistogram(
-    filename='DstToD0PiD0ToHpJm_Validation.root',
+    filename='Charm2BodyHadronic_Validation.root',
     decayString='D*+:HpJm0_test',
     variables=[
                     ('M_D0', 100, 1.80, 1.),

@@ -136,11 +136,14 @@ import errno
 import glob
 import os
 import subprocess
+import textwrap
+from collections import OrderedDict
 from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
 import root_pandas
+import yaml
 from matplotlib.backends.backend_pdf import PdfPages
 
 import basf2
@@ -265,6 +268,22 @@ def plot_with_errobands(uncertain_series,
                     alpha=error_band_alpha,
                     **fill_between_kwargs)
 
+
+def format_dictionary(adict, width=80, bullet="•"):
+    """
+    Helper function to format dictionary to string as a wrapped key-value bullet
+    list.  Useful to print metadata from dictionaries.
+
+    :param adict: Dictionary to format
+    :param width: Characters after which to wrap a key-value line
+    :param bullet: Character to begin a key-value line with, e.g. ``-`` for a
+        yaml-like string
+    """
+    # It might be possible to replace this function yaml.dump, but the current
+    # version in the externals does not allow to disable the sorting of the
+    # dictionary yet and also I am not sure if it is wrappable
+    return "\n".join(textwrap.fill(f"{bullet} {key}: {value}", width=width)
+                     for (key, value) in adict.items())
 
 # Begin definitions of b2luigi task classes
 
@@ -985,9 +1004,10 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         yield self.add_to_output(self.output_pdf_file_basename)
 
     def run(self):
+        # get the validation "harvest", which is the ROOT file with ntuples for validation
         validation_harvest_basename = self.harvesting_validation_task_instance.validation_output_file_name
         validation_harvest_path = self.get_input_file_names(validation_harvest_basename)[0]
-        output_pdf_file_path = self.get_output_file_name(self.output_pdf_file_basename)
+
         # Load "harvested" validation data from root files into dataframes (requires enough memory to hold data)
         # In ``pr_df`` each row corresponds to a track from Pattern Recognition
         pr_df = root_pandas.read_root(validation_harvest_path, key='pr_tree/pr_tree')
@@ -1002,14 +1022,36 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         # qi_cuts = np.append(qi_cuts, np.linspace(np.max(qi_cuts), 1, 20, endpoint=False))
 
         # Create plots and append them to single output pdf
-
+        output_pdf_file_path = self.get_output_file_name(self.output_pdf_file_basename)
         with PdfPages(output_pdf_file_path, keep_empty=False) as pdf:
-            # Add some metadata to pdf
-            d = pdf.infodict()
-            d['Title'] = f"Quality Estimator validation plots from {validation_harvest_basename}"
-            d['ModDate'] = datetime.today()
+            # Add a title page to validation plot PDF with some metadata
+            # Remember that most metadata is in the xml file of the weightfile
+            # and in the b2luigi directory structure
+            titlepage_fig, titlepage_ax = plt.subplots()
+            titlepage_ax.axis("off")
+            title = f"Quality Estimator validation plots from {self.__class__.__name__}"
+            titlepage_ax.set_title(title)
 
-            # Plot fake rates
+            meta_data = {
+                "Date": datetime.today().strftime("%Y-%m-%d %H:%M"),
+                "Created by steering file": os.path.realpath(__file__),
+                "Created from data in": validation_harvest_path,
+                "Background files": MasterTask.bkgfiles_dir,
+            }
+            try:
+                meta_data["Excluded variables"] = ", ".join(self.exclude_variables)
+            except AttributeError:
+                pass
+
+            meta_data_string = format_dictionary(meta_data)
+
+            luigi_params = self.get_serialized_parameters()
+            luigi_param_string = (f"\n\nb2luigi parameters for {self.__class__.__name__}\n" +
+                                  format_dictionary(luigi_params))
+            title_page_text = meta_data_string + luigi_param_string
+            titlepage_ax.text(0, 1, title_page_text, ha="left", va="top", wrap=True, fontsize=8)
+            pdf.savefig(titlepage_fig)
+            plt.close(titlepage_fig)
 
             fake_rates = get_uncertain_means_for_qi_cuts(pr_df, "is_fake", qi_cuts)
             fake_fig, fake_ax = plt.subplots()
@@ -1018,6 +1060,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             fake_ax.set_ylabel("fake rate")
             fake_ax.set_xlabel("quality indicator requirement")
             pdf.savefig(fake_fig, bbox_inches="tight")
+            plt.close(fake_fig)
 
             # Plot clone rates
             clone_rates = get_uncertain_means_for_qi_cuts(pr_df, "is_clone", qi_cuts)
@@ -1027,6 +1070,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             clone_ax.set_ylabel("clone rate")
             clone_ax.set_xlabel("quality indicator requirement")
             pdf.savefig(clone_fig, bbox_inches="tight")
+            plt.close(clone_fig)
 
             # Plot finding efficieny
 
@@ -1053,6 +1097,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             findeff_ax.set_ylabel("finding efficiency")
             findeff_ax.set_xlabel("quality indicator requirement")
             pdf.savefig(findeff_fig, bbox_inches="tight")
+            plt.close(findeff_fig)
 
             # Plot ROC curves
 
@@ -1064,6 +1109,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             fake_roc_ax.set_xlabel('finding efficiency')
             fake_roc_ax.set_ylabel('fake rate')
             pdf.savefig(fake_roc_fig, bbox_inches="tight")
+            plt.close(fake_roc_fig)
 
             # Clone rate vs. finding efficiency ROC curve
             clone_roc_fig, clone_roc_ax = plt.subplots()
@@ -1073,6 +1119,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             clone_roc_ax.set_xlabel('finding efficiency')
             clone_roc_ax.set_ylabel('clone rate')
             pdf.savefig(clone_roc_fig, bbox_inches="tight")
+            plt.close(clone_roc_fig)
 
             # Plot kinematic distributions
 
@@ -1086,8 +1133,8 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                 "pt": "$p_T$",
                 "z0": "$z_0$",
                 "d0": "$d_0$",
-                "tan_lambda": "$\\tan{\lambda}$",
-                "phi0": "$\phi_0$"
+                "tan_lambda": r"$\tan{\lambda}$",
+                "phi0": r"$\phi_0$"
             }
             unit_by_param = {
                 "pt": "GeV",
@@ -1133,6 +1180,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                     ax.set_ylabel('# tracks')
                 ax.legend(loc="upper center", bbox_to_anchor=(-1, -0.15))
                 pdf.savefig(fig, bbox_inches="tight")
+                plt.close(fig)
 
 
 class VXDQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
@@ -1229,30 +1277,30 @@ class MasterTask(luigi.WrapperTask):
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                # yield FullTrackQEEvaluationTask(
-                #     exclude_variables=exclude_variables,
-                #     cdc_training_target=cdc_training_target,
-                #     n_events_training=self.n_events_training,
-                #     n_events_testing=self.n_events_testing,
-                # )
+                yield FullTrackQEEvaluationTask(
+                    exclude_variables=exclude_variables,
+                    cdc_training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
                 yield CDCQEValidationPlotsTask(
                     training_target=cdc_training_target,
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                # yield CDCTrackQEEvaluationTask(
-                #     training_target=cdc_training_target,
-                #     n_events_training=self.n_events_training,
-                #     n_events_testing=self.n_events_testing,
-                # )
+                yield CDCTrackQEEvaluationTask(
+                    training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
                 yield VXDQEValidationPlotsTask(
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                # yield VXDTrackQEEvaluationTask(
-                #     n_events_training=self.n_events_training,
-                #     n_events_testing=self.n_events_testing,
-                # )
+                yield VXDTrackQEEvaluationTask(
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                )
 
 
 if __name__ == "__main__":

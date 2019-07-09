@@ -324,8 +324,8 @@ class Mails:
 
             body += body_plot
 
-        body += f"You can take a look on the plots/scripts in more detail at " \
-                "{url}. "
+        body += f"You can take a look at the plots/scripts " \
+                f'<a href="{url}">here</a>.'
 
         return body
 

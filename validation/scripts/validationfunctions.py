@@ -286,6 +286,13 @@ def get_argument_parser(modes=None):
              "/usr/sbin/sendmail.",
         action='store_true')
     parser.add_argument(
+        "--send-mails-mode",
+        help="How to send mails: Full report, incremental report (new/changed "
+             "warnings/failures only) or automatic (default).",
+        choices=["full", "incremental", "automatic"],
+        default="automatic"
+    )
+    parser.add_argument(
         "-q",
         "--quiet",
         help="Suppress the progress bar",

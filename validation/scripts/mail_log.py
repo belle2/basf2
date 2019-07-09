@@ -334,16 +334,23 @@ class Mails:
         """ Should a full (=non incremental) report be sent?
         Use case e.g.: Send a full report every Monday.
         """
-        return date.today().weekday() == 0
+        is_monday = date.today().weekday() == 0
+        if is_monday:
+            print("Forcing full report because today is Monday.")
+            return True
+        return False
 
-    def send_all_mails(self):
+    def send_all_mails(self, incremental=None):
         """
         Send mails to all contacts in self.mail_data_new. If
         self.mail_data_old is given, a mail is only sent if there are new
         failed plots
+        @param incremental: True/False/None (=automatic). Whether to send a
+            full or incremental report.
         """
-        is_full_report = self._force_full_report()
-        if is_full_report:
+        if incremental is None:
+            incremental = not self._force_full_report()
+        if not incremental:
             print("Sending full ('Monday') report.")
         else:
             print("Sending incremental report.")
@@ -351,8 +358,7 @@ class Mails:
         recipients = []
         for contact in self.mail_data_new:
             # if the errors are the same as yesterday, don't send a new mail
-            if not is_full_report and \
-                    self._check_if_same(self.mail_data_new[contact]):
+            if incremental and self._check_if_same(self.mail_data_new[contact]):
                 # don't send mail
                 continue
             recipients.append(contact)
@@ -369,10 +375,10 @@ class Mails:
 
             body = self._compose_message(
                 self.mail_data_new[contact],
-                incremental=not is_full_report
+                incremental=incremental
             )
 
-            if is_full_report:
+            if incremental:
                 header = "Validation: New/changed warnings/errors"
             else:
                 header = "Validation: Monday report"

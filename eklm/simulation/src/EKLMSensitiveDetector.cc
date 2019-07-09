@@ -29,14 +29,11 @@ EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_GeoDat = &(EKLM::GeometryData::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");
   m_ThresholdHitTime = simPar->getHitTimeThreshold();
-  if (!m_ChannelStatus.isValid())
-    B2FATAL("KLM channel status data are not available.");
   StoreArray<MCParticle> particles;
   m_SimHits.registerInDataStore();
   particles.registerRelationTo(m_SimHits);
@@ -60,13 +57,6 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   plane = hist->GetVolume(stripLevel + 3)->GetCopyNo();
   strip = hist->GetVolume(stripLevel)->GetCopyNo();
   stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane, strip);
-  uint16_t channel = m_ElementNumbers->channelNumberEKLM(strip);
-  enum KLMChannelStatus::ChannelStatus status =
-    m_ChannelStatus->getChannelStatus(channel);
-  if (status == KLMChannelStatus::c_Unknown)
-    B2FATAL("Incomplete KLM channel status data.");
-  if (status == KLMChannelStatus::c_Dead)
-    return false;
   const G4double eDep = aStep->GetTotalEnergyDeposit();
   /* Do not record hits without deposited energy. */
   if (eDep <= 0)

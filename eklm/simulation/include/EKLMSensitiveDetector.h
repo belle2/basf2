@@ -15,10 +15,7 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dbobjects/EKLMGeometry.h>
 #include <eklm/geometry/GeometryData.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/KLMChannelStatus.h>
 
 namespace Belle2 {
 
@@ -56,14 +53,8 @@ namespace Belle2 {
       /** Geometry data. */
       const EKLM::GeometryData* m_GeoDat;
 
-      /** Element numbers. */
-      const KLMElementNumbers* m_ElementNumbers;
-
       /** Simulation hits. */
       StoreArray<EKLMSimHit> m_SimHits;
-
-      /** KLM channel status. */
-      DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
       /**
        * All hits with time large  than m_ThresholdHitTime

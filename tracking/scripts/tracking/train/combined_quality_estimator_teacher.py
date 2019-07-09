@@ -137,8 +137,8 @@ import glob
 import os
 import subprocess
 import textwrap
-from collections import OrderedDict
 from datetime import datetime
+from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -215,7 +215,7 @@ def my_basf2_mva_teacher(
     basf2_mva.teacher(general_options, fastbdt_options)
 
 
-def _my_uncertain_mean(series):
+def _my_uncertain_mean(series: upd.Series):
     """
     Temporary Workaround bug in ``uncertain_panda`` where a ``ValueError`` is
     thrown for ``Series.unc.mean`` if the series is empty.  Can be replaced by
@@ -231,7 +231,7 @@ def _my_uncertain_mean(series):
             raise
 
 
-def get_uncertain_means_for_qi_cuts(df, column, qi_cuts):
+def get_uncertain_means_for_qi_cuts(df: upd.DataFrame, column: str, qi_cuts: Iterable[float]):
     """
     Return a pandas series with an mean of the dataframe column and
     uncertainty for each quality indicator cut.
@@ -513,7 +513,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
         path.add_module(
             "TrackQETrainingDataCollector",
             TrainingDataOutputName=self.get_output_file_name(self.records_file_name),
-            collectEventFeatures=True,
+            collectEventFeatures=True,  # collect event features and then just don't train on them via ``exclude_features``
         )
         return path
 
@@ -562,7 +562,7 @@ class TrackQETeacherBaseTask(Basf2Task):
         raise NotImplementedError("Teacher Task must define a static random seed")
 
     @property
-    def dataCollectionTask(self):
+    def dataCollectionTask(self) -> Basf2PathTask:
         """
         Property defining the specific ``DataCollectionTask`` to require.  Must
         implemented by the inheriting specific teacher task class.
@@ -885,7 +885,7 @@ class TrackQEEvaluationBaseTask(Basf2Task):
     training_target = luigi.Parameter(default="truth")
 
     @property
-    def teacherTask(self):
+    def teacherTask(self) -> TrackQETeacherBaseTask:
         """
         Property defining specific teacher task to require.
         """
@@ -894,7 +894,7 @@ class TrackQEEvaluationBaseTask(Basf2Task):
         )
 
     @property
-    def dataCollectionTask(self):
+    def dataCollectionTask(self) -> Basf2PathTask:
         """
         Property defining the specific ``DataCollectionTask`` to require.  Must
         implemented by the inheriting specific teacher task class.
@@ -987,13 +987,19 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
     """
     primaries_only = luigi.BoolParameter(default=True)  # normalize finding efficiencies to primary MC-tracks
 
-    # harvesting task static variable can be used to adapt plotting task to different harvesting validation tasks
     @property
     def harvesting_validation_task_instance(self):
+        """
+        Specifies related harvesting validation task which produces the ROOT
+        files with the data that is plotted by this task.
+        """
         raise NotImplementedError("Must define a QI harvesting validation task for which to do the plots")
 
     @property
     def output_pdf_file_basename(self):
+        """
+        Name of the output PDF file containing the validation plots
+        """
         validation_harvest_basename = self.harvesting_validation_task_instance.validation_output_file_name
         return validation_harvest_basename.replace(".root", "_plots.pdf")
 
@@ -1024,6 +1030,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         # Create plots and append them to single output pdf
         output_pdf_file_path = self.get_output_file_name(self.output_pdf_file_basename)
         with PdfPages(output_pdf_file_path, keep_empty=False) as pdf:
+
             # Add a title page to validation plot PDF with some metadata
             # Remember that most metadata is in the xml file of the weightfile
             # and in the b2luigi directory structure
@@ -1031,7 +1038,6 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             titlepage_ax.axis("off")
             title = f"Quality Estimator validation plots from {self.__class__.__name__}"
             titlepage_ax.set_title(title)
-
             meta_data = {
                 "Date": datetime.today().strftime("%Y-%m-%d %H:%M"),
                 "Created by steering file": os.path.realpath(__file__),

@@ -3,6 +3,7 @@
 
 # std
 import copy
+from datetime import date
 import re
 import os
 import json
@@ -256,17 +257,33 @@ class Mails:
         return True
 
     @staticmethod
-    def _compose_message(plots):
+    def _compose_message(plots, incremental=True):
         """!
         Takes a dict (like in _create_mail_log) and composes a mail body
+        @param plots
+        @param incremental (bool): Is this an incremental report or a full
+            ("Monday") report?
         """
 
         # link to validation page
         url = "https://b2-master.belle2.org/validation/static/validation.html"
         # url = "http://localhost:8000/static/validation.html"
 
-        body = "There were problems with the validation of the " \
-               "following plots/scripts:\n\n"
+        if incremental:
+            body = "You are receiving this email, because additional" \
+                   " validation plots/scripts (that include you as contact " \
+                   "person) produced warnings/errors or " \
+                   "because their warning/error status " \
+                   "changed. \n" \
+                   "Below is a detailed list of all problematic " \
+                   "plots/scripts with new/changed offenders highlighted:\n\n"
+        else:
+            body = "This is a full list of validation plots/scripts that" \
+                   " produced warnings/errors and include you as contact" \
+                   "person (sent out once a week).\n\n"
+
+        body += "There were problems with the validation of the " \
+            "following plots/scripts:\n\n"
         for plot in plots:
             # compose descriptive error message
             if plots[plot]["comparison_result"] == "error":
@@ -312,18 +329,33 @@ class Mails:
 
         return body
 
+    @staticmethod
+    def _force_full_report() -> bool:
+        """ Should a full (=non incremental) report be sent?
+        Use case e.g.: Send a full report every Monday.
+        """
+        return date.today().weekday() == 0
+
     def send_all_mails(self):
         """
         Send mails to all contacts in self.mail_data_new. If
         self.mail_data_old is given, a mail is only sent if there are new
         failed plots
         """
+        is_full_report = self._force_full_report()
+        if is_full_report:
+            print("Sending full ('Monday') report.")
+        else:
+            print("Sending incremental report.")
 
+        recipients = []
         for contact in self.mail_data_new:
             # if the errors are the same as yesterday, don't send a new mail
-            if self._check_if_same(self.mail_data_new[contact]):
+            if not is_full_report and \
+                    self._check_if_same(self.mail_data_new[contact]):
                 # don't send mail
                 continue
+            recipients.append(contact)
 
             # set the mood of the b2bot
             if len(self.mail_data_new[contact]) < 4:
@@ -335,11 +367,20 @@ class Mails:
             else:
                 mood = "dead"
 
-            body = self._compose_message(self.mail_data_new[contact])
+            body = self._compose_message(
+                self.mail_data_new[contact],
+                incremental=not is_full_report
+            )
+
+            if is_full_report:
+                header = "Validation: New/changed warnings/errors"
+            else:
+                header = "Validation: Monday report"
+
             mail_utils.send_mail(
                 contact.split('@')[0],
                 contact,
-                "Validation failure",
+                header,
                 body,
                 mood=mood
             )
@@ -348,6 +389,7 @@ class Mails:
         if self.mail_data_old:
             for contact in self.mail_data_old:
                 if contact not in self.mail_data_new:
+                    recipients.append(contact)
                     body = "Your validation plots work fine now!"
                     mail_utils.send_mail(
                         contact.split('@')[0],
@@ -356,6 +398,8 @@ class Mails:
                         body,
                         mood="happy"
                     )
+
+        print(f"Sent mails to the following people: {', '.join(recipients)}")
 
     def write_log(self):
         """

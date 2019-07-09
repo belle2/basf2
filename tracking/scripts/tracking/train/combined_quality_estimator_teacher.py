@@ -634,19 +634,36 @@ class FullTrackQETeacherTask(TrackQETeacherBaseTask):
         )
 
 
-class VXDQEHarvestingValidationTask(Basf2PathTask):
+class HarvestingValidationBaseTask(Basf2PathTask):
     """
-    Run VXDTF2 track finding and write out (="harvest") a root file with
-    variables useful for validation of the VXD Quality Estimator.
+    Run track reconstruction with MVA quality estimator and write out
+    (="harvest") a root file with variables useful for the validation.
     """
 
     n_events_testing = luigi.IntParameter()
     n_events_training = luigi.IntParameter()
-    validation_output_file_name = "vxd_qe_harvesting_validation.root"
-    reco_output_file_name = "vxd_qe_reconstruction.root"
+    validation_output_file_name = "harvesting_validation.root"
+    reco_output_file_name = "reconstruction.root"
+    components = None  # components for the MC matching and track fit creation
+
+    @property
+    def teacherTask(self) -> TrackQETeacherBaseTask:
+        """
+        Teacher task to require so that a quality estimator weightfile is
+        available in ``add_tracking_with_quality_estimation``
+        """
+        raise NotImplementedError()
+
+    def add_tracking_with_quality_estimation(self, path: basf2.Path) -> None:
+        """
+        Add modules for track reconstruction to basf2 ``path`` that are to be
+        validated.  Besides track finding it should include MC matching, fitted
+        track creation and a quality estimator module.
+        """
+        raise NotImplementedError()
 
     def requires(self):
-        yield VXDQETeacherTask(n_events_training=self.n_events_training)
+        yield self.teacherTask(n_events_training=self.n_events_training)
         yield GenerateSimTask(
             bkgfiles_dir=MasterTask.bkgfiles_dir,
             num_processes=MasterTask.num_processes,
@@ -659,6 +676,7 @@ class VXDQEHarvestingValidationTask(Basf2PathTask):
         yield self.add_to_output(self.reco_output_file_name)
 
     def create_path(self):
+        # prepare track finding
         path = basf2.create_path()
         path.add_module(
             "RootInput",
@@ -670,6 +688,38 @@ class VXDQEHarvestingValidationTask(Basf2PathTask):
         path.add_module(
             "SetupGenfitExtrapolation", energyLossBrems=False, noiseBrems=False
         )
+        # add track finding module that needs to be validated
+        self.add_tracking_with_quality_estimation(path)
+        # add modules for validation
+        path.add_module(
+            CombinedTrackingValidationModule(
+                name=None,
+                contact=None,
+                expert_level=200,
+                output_file_name=self.get_output_file_name(
+                    self.validation_output_file_name
+                ),
+            )
+        )
+        path.add_module(
+            "RootOutput",
+            outputFileName=self.get_output_file_name(self.reco_output_file_name),
+        )
+        return path
+
+
+class VXDQEHarvestingValidationTask(HarvestingValidationBaseTask):
+    """
+    Run VXDTF2 track reconstruction and write out (="harvest") a root file with
+    variables useful for validation of the VXD Quality Estimator.
+    """
+
+    validation_output_file_name = "vxd_qe_harvesting_validation.root"
+    reco_output_file_name = "vxd_qe_reconstruction.root"
+
+    teacherTask = VXDQETeacherTask
+
+    def add_tracking_with_quality_estimation(self, path):
         tracking.add_vxd_track_finding_vxdtf2(
             path,
             components=["SVD"],
@@ -680,41 +730,26 @@ class VXDQEHarvestingValidationTask(Basf2PathTask):
             path,
             name="VXDQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                VXDQETeacherTask.weightfile_identifier
+                self.teacherTask.weightfile_identifier
             )[0],
         )
         tracking.add_mc_matcher(path, components=["SVD"])
         tracking.add_track_fit_and_track_creator(path, components=["SVD"])
-        path.add_module(
-            CombinedTrackingValidationModule(
-                name="Harvesting Validation",
-                contact="michael.eliachevitch@kit.edu",
-                expert_level=200,
-                output_file_name=self.get_output_file_name(
-                    self.validation_output_file_name
-                ),
-            )
-        )
-        path.add_module(
-            "RootOutput",
-            outputFileName=self.get_output_file_name(self.reco_output_file_name),
-        )
-        return path
 
 
-class CDCQEHarvestingValidationTask(Basf2PathTask):
+class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
     """
     Run CDC reconstruction and write out (="harvest") a root file with variables
     useful for validation of the CDC Quality Estimator.
     """
-    n_events_testing = luigi.IntParameter()
-    n_events_training = luigi.IntParameter()
     training_target = luigi.Parameter()
     validation_output_file_name = "cdc_qe_harvesting_validation.root"
     reco_output_file_name = "cdc_qe_reconstruction.root"
 
+    teacherTask = CDCQETeacherTask
+
     def requires(self):
-        yield CDCQETeacherTask(
+        yield self.teacherTask(
             n_events_training=self.n_events_training,
             training_target=self.training_target,
         )
@@ -725,50 +760,20 @@ class CDCQEHarvestingValidationTask(Basf2PathTask):
             random_seed="testdata_0",
         )
 
-    def output(self):
-        yield self.add_to_output(self.validation_output_file_name)
-        yield self.add_to_output(self.reco_output_file_name)
-
-    def create_path(self):
-        path = basf2.create_path()
-        path.add_module(
-            "RootInput",
-            inputFileNames=self.get_input_file_names(GenerateSimTask.output_file_name),
-        )
-        path.add_module("Gearbox")
-        tracking.add_geometry_modules(path)
-        tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
-        path.add_module(
-            "SetupGenfitExtrapolation", energyLossBrems=False, noiseBrems=False
-        )
+    def add_tracking_with_quality_estimation(self, path):
         tracking.add_cdc_track_finding(
             path,
             output_reco_tracks="RecoTracks",
             use_cdc_quality_estimator=True,
             cdc_quality_estimator_weightfile=self.get_input_file_names(
-                CDCQETeacherTask.weightfile_identifier
+                self.teacherTask.weightfile_identifier
             )[0],
         )
         tracking.add_mc_matcher(path, components=["CDC"])
         tracking.add_track_fit_and_track_creator(path, components=["CDC"])
-        path.add_module(
-            CombinedTrackingValidationModule(
-                name="Harvesting Validation",
-                contact="michael.eliachevitch@kit.edu",
-                expert_level=200,
-                output_file_name=self.get_output_file_name(
-                    self.validation_output_file_name
-                ),
-            )
-        )
-        path.add_module(
-            "RootOutput",
-            outputFileName=self.get_output_file_name(self.reco_output_file_name),
-        )
-        return path
 
 
-class FullTrackQEHarvestingValidationTask(Basf2PathTask):
+class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
     """
     Run track reconstruction and write out (="harvest") a root file with variables
     useful for validation of the MVA track Quality Estimator.
@@ -780,13 +785,15 @@ class FullTrackQEHarvestingValidationTask(Basf2PathTask):
     validation_output_file_name = "full_qe_harvesting_validation.root"
     reco_output_file_name = "full_qe_reconstruction.root"
 
+    teacherTask = FullTrackQETeacherTask
+
     def requires(self):
         yield CDCQETeacherTask(
             n_events_training=self.n_events_training,
             training_target=self.cdc_training_target,
         )
         yield VXDQETeacherTask(n_events_training=self.n_events_training)
-        yield FullTrackQETeacherTask(
+        yield self.teacherTask(
             n_events_training=self.n_events_training,
             exclude_variables=self.exclude_variables,
             cdc_training_target=self.cdc_training_target,
@@ -798,22 +805,7 @@ class FullTrackQEHarvestingValidationTask(Basf2PathTask):
             random_seed="testdata_0",
         )
 
-    def output(self):
-        yield self.add_to_output(self.validation_output_file_name)
-        yield self.add_to_output(self.reco_output_file_name)
-
-    def create_path(self):
-        path = basf2.create_path()
-        path.add_module(
-            "RootInput",
-            inputFileNames=self.get_input_file_names(GenerateSimTask.output_file_name),
-        )
-        path.add_module("Gearbox")
-        tracking.add_geometry_modules(path)
-        tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
-        path.add_module(
-            "SetupGenfitExtrapolation", energyLossBrems=False, noiseBrems=False
-        )
+    def add_tracking_with_quality_estimation(self, path):
         tracking.add_cdc_track_finding(
             path,
             output_reco_tracks="CDCRecoTracks",
@@ -855,21 +847,6 @@ class FullTrackQEHarvestingValidationTask(Basf2PathTask):
                 FullTrackQETeacherTask.weightfile_identifier
             )[0],
         )
-        path.add_module(
-            CombinedTrackingValidationModule(
-                name="Harvesting Validation",
-                contact="michael.eliachevitch@kit.edu",
-                expert_level=200,
-                output_file_name=self.get_output_file_name(
-                    self.validation_output_file_name
-                ),
-            )
-        )
-        path.add_module(
-            "RootOutput",
-            outputFileName=self.get_output_file_name(self.reco_output_file_name),
-        )
-        return path
 
 
 class TrackQEEvaluationBaseTask(Basf2Task):
@@ -988,7 +965,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
     primaries_only = luigi.BoolParameter(default=True)  # normalize finding efficiencies to primary MC-tracks
 
     @property
-    def harvesting_validation_task_instance(self):
+    def harvesting_validation_task_instance(self) -> HarvestingValidationBaseTask:
         """
         Specifies related harvesting validation task which produces the ROOT
         files with the data that is plotted by this task.
@@ -1044,13 +1021,9 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                 "Created from data in": validation_harvest_path,
                 "Background files": MasterTask.bkgfiles_dir,
             }
-            try:
+            if hasattr(self, 'exclude_variables'):
                 meta_data["Excluded variables"] = ", ".join(self.exclude_variables)
-            except AttributeError:
-                pass
-
             meta_data_string = format_dictionary(meta_data)
-
             luigi_params = self.get_serialized_parameters()
             luigi_param_string = (f"\n\nb2luigi parameters for {self.__class__.__name__}\n" +
                                   format_dictionary(luigi_params))

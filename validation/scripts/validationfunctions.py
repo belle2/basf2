@@ -288,7 +288,8 @@ def get_argument_parser(modes=None):
     parser.add_argument(
         "--send-mails-mode",
         help="How to send mails: Full report, incremental report (new/changed "
-             "warnings/failures only) or automatic (default).",
+             "warnings/failures only) or automatic (default; follow hard coded "
+             "rule, e.g. full reports every Monday).",
         choices=["full", "incremental", "automatic"],
         default="automatic"
     )

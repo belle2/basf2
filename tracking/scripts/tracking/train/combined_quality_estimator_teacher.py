@@ -1230,12 +1230,16 @@ class MasterTask(luigi.WrapperTask):
     n_events_training = luigi.get_setting("n_events_training", default=3000)
     n_events_testing = luigi.get_setting("n_events_testing", default=1000)
     num_processes = luigi.get_setting("basf2_processes_per_worker", default=0)
+    # directory with MC overlay background root files
     bkgfiles_dir = luigi.get_setting("bkgfiles_directory")
+    # Choose whether to run basf2_mva_evaluate tasks on weightfiles. These will
+    # fail if no LaTeX is installed, but we still have our own independent
+    # validation tasks.
+    run_mva_evaluate = luigi.get_setting("run_mva_evaluate", default=True)
 
     def requires(self):
 
-        # eventwise n_track_variables should not be used by teacher tasks in
-        # training
+        # eventwise n_track_variables should not be used by teacher tasks in training
         ntrack_variables = [
             "N_RecoTracks",
             "N_PXDRecoTracks",
@@ -1256,30 +1260,34 @@ class MasterTask(luigi.WrapperTask):
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                yield FullTrackQEEvaluationTask(
-                    exclude_variables=exclude_variables,
-                    cdc_training_target=cdc_training_target,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+
                 yield CDCQEValidationPlotsTask(
                     training_target=cdc_training_target,
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                yield CDCTrackQEEvaluationTask(
-                    training_target=cdc_training_target,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+
                 yield VXDQEValidationPlotsTask(
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                 )
-                yield VXDTrackQEEvaluationTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                )
+
+                if self.run_mva_evaluate:
+                    yield FullTrackQEEvaluationTask(
+                        exclude_variables=exclude_variables,
+                        cdc_training_target=cdc_training_target,
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                    )
+                    yield CDCTrackQEEvaluationTask(
+                        training_target=cdc_training_target,
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                    )
+                    yield VXDTrackQEEvaluationTask(
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                    )
 
 
 if __name__ == "__main__":

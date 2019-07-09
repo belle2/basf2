@@ -4,5 +4,6 @@
     "n_events_training": 3000,
     "n_events_testing": 1000,
     "workers": 1,
-    "basf2_processes_per_worker": 0
+    "basf2_processes_per_worker": 0,
+    "run_mva_evaluate": true
 }

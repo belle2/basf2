@@ -539,7 +539,7 @@ class TrackQETeacherBaseTask(Basf2Task):
         Property defining the name for the weightfile that is generated.  Has to
         be implemented by the inheriting specific teacher task class.
         """
-        return NotImplementedError(
+        raise NotImplementedError(
             "Teacher Task must define a static weightfile_identifier"
         )
 
@@ -550,7 +550,7 @@ class TrackQETeacherBaseTask(Basf2Task):
         ``dataCollectionTask`` that contains the recorded training data.  Must
         implemented by the inheriting specific teacher task class.
         """
-        return NotImplementedError("Teacher Task must define a static tree_name")
+        raise NotImplementedError("Teacher Task must define a static tree_name")
 
     @property
     def random_seed(self):
@@ -559,7 +559,7 @@ class TrackQETeacherBaseTask(Basf2Task):
         Should differ from the random seed in the test data samples.  Must
         implemented by the inheriting specific teacher task class.
         """
-        return NotImplementedError("Teacher Task must define a static random seed")
+        raise NotImplementedError("Teacher Task must define a static random seed")
 
     @property
     def dataCollectionTask(self):

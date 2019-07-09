@@ -1187,20 +1187,29 @@ endloop:
 
     Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 2) {
-        const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
-        const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
+      if (arguments.size() > 0) {
+        std::vector<const Variable::Manager::Var*> variables;
+        for (auto& argument : arguments)
+          variables.push_back(Manager::Instance().getVariable(argument));
 
-        if (!var1 or !var2)
-          B2FATAL("One or both of the used variables doesn't exist!");
-
-        auto func = [var1, var2](const Particle * particle) -> double {
-          double p1 = var1->function(particle);
-          double p2 = var2->function(particle);
-          if (p1 < 0 or p2 < 0)
-            return -1;
-          else
-            return p1 * p2 * (1 - std::log(p1 * p2));
+        auto func = [variables, arguments](const Particle * particle) -> double {
+          double pValueProduct = 1.;
+          for (auto variable : variables)
+          {
+            double pValue = variable->function(particle);
+            if (pValue < 0)
+              return -1;
+            else
+              pValueProduct *= pValue;
+          }
+          double pValueSum = 1.;
+          double factorial = 1.;
+          for (unsigned int i = 1; i < arguments.size(); ++i)
+          {
+            factorial *= i;
+            pValueSum += pow(-log(pValueProduct), i) / factorial;
+          }
+          return pValueProduct * pValueSum;
         };
         return func;
       } else {
@@ -2311,8 +2320,9 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
-    REGISTER_VARIABLE("pValueCombination(p1, p2)", pValueCombination,
-                      "Returns the combined p-value of the two provided p-values.");
+    REGISTER_VARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
+                      "Returns the combined p-value of the provided p-values.\n"
+                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"

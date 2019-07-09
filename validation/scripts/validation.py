@@ -756,18 +756,18 @@ class Validation:
             for script in skipped_scripts:
                 list_skipped.write(script.path.split("/")[-1] + "\n")
 
-    def report_on_scripts(self, verbosity=2):
+    def report_on_scripts(self):
         """!
         Print a summary about all scripts, especially highlighting
         skipped and failed scripts.
         """
 
         failed_scripts = [
-            script.name for script in self.scripts
+            script.package + "/" + script.name for script in self.scripts
             if script.status == ScriptStatus.failed
         ]
         skipped_scripts = [
-            script.name for script in self.scripts
+            script.package + "/" + script.name for script in self.scripts
             if script.status == ScriptStatus.skipped
         ]
 

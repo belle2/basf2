@@ -257,7 +257,7 @@ One can execute all possible ROE-related methods using nested ROE objects or loo
 Load ROE as a particle
 ----------------------
 
-It is possible to load ROE as a particle, which can be manipulated as all other particles in ``basf2``:
+It is possible to load ROE as a particle, which can be manipulated as any other particle in ``basf2``:
 
 ::
   
@@ -279,16 +279,27 @@ It is possible to load ROE as a particle, which can be manipulated as all other 
   # A shorter option:
   # ma.fillParticleListFromROE('B0:tagFromROE -> B0:rec', '', 'cleanMask', path=main_path)
 
-Other option is to load a missing momentum as a particle:
+The resulted particle list can be combined with other particles, like
+``Upsilon(4S) -> B0:tagFromROE B0:rec`` in this example.
+Also, any variable should be valid for the ROE particle, however, one should be
+aware that these particles typically have a very large amount of daughter
+particles.
+
+
+Another option is to load a particle, which represents missing momentum in the
+event:
 
 ::
   
   ma.fillParticleListFromROE('nu:missing', '', maskName='cleanMask', 
     sourceParticleListName='B0:rec', useMissing = True, path=main_path)
-  
+
+These reconstructed neutrino particles have no daughters, and they can be
+useful in combination with the visible signal side, for example in semileptonic
+:math:`B`-meson decays, where tag side has been reconstructed using :doc:`Full Event Interpretation`.
 
 .. warning::
-  The resulted particles cannot be used for vertexing or MC matching.
+  The resulted particles described here cannot be used for vertexing nor MC matching.
   This functionality is under development.
 
 

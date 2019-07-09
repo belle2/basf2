@@ -118,6 +118,7 @@ class Mails:
             script.load_header()
 
             failed_script = {}
+            failed_script["warnings"] = []
             # give failed_script the same format as error_data in method
             # create_mail_log
             failed_script["package"] = script.package
@@ -160,7 +161,8 @@ class Mails:
                          "rootfile": str,
                          "comparison_text": str,
                          "description": str,
-                         "comparison_result": str
+                         "comparison_result": str,
+                         "warnings": str
                      },
                  "title2": {...}
              },
@@ -174,16 +176,15 @@ class Mails:
         mail_log = {}
         # search for plots where comparison resulted in an error
         for package in comparison["packages"]:
-            # todo: why do I even have to test this?
-            if package["comparison_error"] == 0:
-                continue
             for plotfile in package["plotfiles"]:
-                # todo: why do I even have to test this?
-                if plotfile["comparison_error"] == 0:
-                    continue
                 for plot in plotfile["plots"]:
-                    if plot["comparison_result"] not in \
-                            ["error", "not_compared"]:
+                    print(plot["title"], plot["warnings"])
+                    skip = True
+                    if plot["comparison_result"] in ["error"]:
+                        skip = False
+                    if set(plot["warnings"]) - {"No reference object"}:
+                        skip = False
+                    if skip:
                         continue
                     # save all the information that's needed for
                     # an informative email
@@ -192,7 +193,10 @@ class Mails:
                         "rootfile": plotfile["rootfile"],
                         "comparison_text": plot["comparison_text"],
                         "description": plot["description"],
-                        "comparison_result": plot["comparison_result"]
+                        "comparison_result": plot["comparison_result"],
+                        "warnings": sorted(list(
+                            set(plot["warnings"]) - {"No reference object"}
+                        ))
                     }
                     # every contact gets an email
                     for contact in parse_mail_address(plot["contact"]):
@@ -237,7 +241,9 @@ class Mails:
                     mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
                         "new"
                 elif mail_log[contact][plot]["comparison_result"] != \
-                        old_mail_log[contact][plot]["comparison_result"]:
+                        old_mail_log[contact][plot]["comparison_result"] or \
+                        mail_log[contact][plot]["warnings"] != \
+                        old_mail_log[contact][plot]["warnings"]:
                     mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
                         "changed"
                 else:
@@ -289,7 +295,7 @@ class Mails:
             if plots[plot]["comparison_result"] == "error":
                 errormsg = "comparison unequal"
             elif plots[plot]["comparison_result"] == "not_compared":
-                errormsg = "not compared"
+                errormsg = ""
             else:
                 errormsg = plots[plot]["comparison_result"]
 
@@ -298,13 +304,17 @@ class Mails:
                 body_plot += '<b style="color: red;">[NEW]</b><br>'
             elif plots[plot]["compared_to_yesterday"] == "changed":
                 body_plot += '<b style="color: red;">' \
-                             '[COMPARISON RESULT CHANGED]</b><br>'
+                             '[Warnings/comparison CHANGED]</b><br>'
             body_plot += "<b>{plot}</b><br>"
             body_plot += "<b>Package:</b> {package}<br>"
             body_plot += "<b>Rootfile:</b> {rootfile}.root<br>"
             body_plot += "<b>Description:</b> {description}<br>"
             body_plot += "<b>Comparison:</b> {comparison_text}<br>"
-            body_plot += "<b>Error type:</b> {errormsg}<br>"
+            if errormsg:
+                body_plot += f"<b>Error:</b> {errormsg}<br>"
+            warnings_str = ", ".join(plots[plot]["warnings"]).strip()
+            if warnings_str:
+                body_plot += f"<b>Warnings:</b> {warnings_str}<br>"
             # URLs are currently not working.
             # if plots[plot]["rootfile"] != "--":
             #     body_plot += '<a href="{url}#{package}-{rootfile}">' \
@@ -318,8 +328,7 @@ class Mails:
                 rootfile=plots[plot]["rootfile"],
                 description=plots[plot]["description"],
                 comparison_text=plots[plot]["comparison_text"],
-                errormsg=errormsg,
-                url=url
+                url=url,
             )
 
             body += body_plot

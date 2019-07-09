@@ -424,7 +424,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
         break;
 
       default:
-        B2DEBUG(1, "error in klm_trackSectorFit: illegal direction");
+        B2DEBUG(20, "error in klm_trackSectorFit: illegal direction");
 
     }
 
@@ -443,7 +443,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
         break;
 
       default:
-        B2DEBUG(1, "error in klm_trackSectorFit: illegal direction");
+        B2DEBUG(20, "error in klm_trackSectorFit: illegal direction");
 
     }
 
@@ -570,7 +570,7 @@ double BKLMTrackFitter::fit1dTrack(std::list< BKLMHit2d* > hitList,
         break;
 
       default:
-        B2DEBUG(1, "error in bklm trackFit: illegal direction");
+        B2DEBUG(20, "error in bklm trackFit: illegal direction");
 
     }
 
@@ -589,7 +589,7 @@ double BKLMTrackFitter::fit1dTrack(std::list< BKLMHit2d* > hitList,
         break;
 
       default:
-        B2DEBUG(1, "error in bklm trackFit: illegal direction");
+        B2DEBUG(20, "error in bklm trackFit: illegal direction");
 
     }
 

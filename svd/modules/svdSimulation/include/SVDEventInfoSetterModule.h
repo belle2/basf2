@@ -60,6 +60,7 @@ namespace Belle2 {
     bool m_xTalk; /**<  Cross-talk flag to be set */
 
     bool m_ModeByteMatch = true; /**< SVDModeByte matching flag to be set */
+    bool m_TriggerTypeMatch = true; /**< SVDTriggerType matching flag to be set */
 
     SVDModeByte m_SVDModeByte;  /**<  SVDModeByte object */
     SVDTriggerType m_SVDTriggerType;  /**<  SVDTriggerType object */

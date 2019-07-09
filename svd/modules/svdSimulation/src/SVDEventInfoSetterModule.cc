@@ -36,7 +36,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
   addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples", int(2));
   addParam("triggerBin", m_triggerBin, "Trigger time info: 0/1/2/3 - useful to synchronise the SVD with the machine", int(0));
-  addParam("triggerType", m_triggerType, "Defines the trigger type, default: random trigger", uint8_t(7));
+  addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
   addParam("crossTalk", m_xTalk, "Defines the cross-talk flag for the event", bool(false));
 
   // default ModeByte settings: 10 0 10 000 (144)
@@ -64,6 +64,7 @@ void SVDEventInfoSetterModule::event()
   m_svdEventInfoPtr->setModeByte(m_SVDModeByte);
   m_svdEventInfoPtr->setMatchModeByte(m_ModeByteMatch);
   m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
+  m_svdEventInfoPtr->setMatchTriggerType(m_TriggerTypeMatch);
   m_svdEventInfoPtr->setCrossTalk(m_xTalk);
 }
 

@@ -15,7 +15,7 @@ import requests
 import re
 import subprocess
 import getpass
-from versioning import upload_global_tag, jira_global_tag
+from versioning import upload_global_tag, jira_global_tag_v2
 import readline  # wraps `input()` to have gnu readline functionality
 import terminal_utils
 
@@ -86,42 +86,66 @@ def create_jira_issue(task, data, time, password):
     Create a jira sub-issue for the given request
     """
 
-    issue = jira_global_tag(task)
+    issue = jira_global_tag_v2(task)
     if issue is None:
         return
 
     global_tag = staging_global_tag(task, data, time)
     keys = data
+    keys['tag'] = global_tag
     keys['task'] = task
     keys['time'] = time
-    if "summary" in issue.keys():
-        issue["summary"] = issue["summary"].format(**keys)
+
+    if type(issue) is tuple:
+        description = issue[1].format(**keys)
+        issue = issue[0]
     else:
-        issue["summary"] = 'Global tag request for %s by %s at %s' % (task, data['user'], time)
-    issue["description"] = """
+        description = """
 Upload global tag : %s
 Request reason : %s
 Required release : %s
 Type of request : %s
-""" % (data[task], data['reason'], data['release'], data['request'])
-    if task == 'master':
-        issue["description"] += 'Branch              : %s\nPhase               : %s\n' % (
-            data['master_branch'], data['master_phases'])
-    elif task == 'online':
-        issue["description"] += 'Software update     : %s\n' % data['online_update']
-    if 'details' in data.keys():
-        issue["description"] += 'Details :\n' + ''.join(data['details'])
-    issue["description"] += '\nPayloads/IoVs :\n' + ''.join(data['content'])
+""" % (global_tag, data['reason'], data['release'], data['request'])
+        if task == 'master':
+            description += 'Branch              : %s\nPhase               : %s\n' % (
+                data['master_branch'], data['master_phases'])
+        elif task == 'online':
+            description += 'Software update     : %s\n' % data['online_update']
+        if 'details' in data.keys():
+            description += 'Details :\n' + ''.join(data['details'])
+        description += '\nPayloads/IoVs :\n' + ''.join(data['content'])
 
-    print('\nCreating jira issue for %s global tag request' % task)
-    response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password), json={'fields': issue})
-    if response.status_code in range(200, 210):
-        print('Issue successfully created: %s' % response.json()['key'])
+    if type(issue) is dict:
+        issue["description"] = description
+        if "summary" in issue.keys():
+            issue["summary"] = issue["summary"].format(**keys)
+        else:
+            issue["summary"] = 'Global tag request for %s by %s at %s' % (task, data['user'], time)
+        if "project" not in issue.keys():
+            issue["project"] = {"key": "BII"}
+        if "issuetype" not in issue.keys():
+            issue["issuetype"] = {"name": "Task"}
+
+        print('\nCreating jira issue for %s global tag request' % task)
+        response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password), json={'fields': issue})
+        if response.status_code in range(200, 210):
+            print('Issue successfully created: %s' % response.json()['key'])
+        else:
+            print('ERROR: The creation of the issue failed:')
+            print(response)
+            print(response.text)
+            sys.exit(1)
+
     else:
-        print('ERROR: The creation of the issue failed:')
-        print(response)
-        print(response.text)
-        sys.exit(1)
+        print('\nCommenting on jira issue for %s global tag request' % task)
+        response = requests.post('https://agira.desy.de/rest/api/latest/issue/%s/comment' % issue, auth=(data['user'], password), json={'body': description})
+        if response.status_code in range(200, 210):
+            print('Issue successfully updated: %s' % issue)
+        else:
+            print('ERROR: The commenting on the issue failed:')
+            print(response)
+            print(response.text)
+            sys.exit(1)
 
 
 if __name__ == "__main__":

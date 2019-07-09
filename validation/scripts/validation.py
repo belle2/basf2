@@ -1463,7 +1463,15 @@ def execute(tag=None, is_test=None):
                 mails = mail_log.Mails(validation)
                 validation.log.note('Start sending mails...')
                 # send mails to all users with failed scripts/comparison
-                mails.send_all_mails()
+                if cmd_arguments.send_mails_mode == "incremental":
+                    incremental = True
+                elif cmd_arguments.send_mails_mode == "full":
+                    incremental = False
+                else:
+                    incremental = None
+                mails.send_all_mails(
+                    incremental=incremental
+                )
                 validation.log.note(
                     'Save mail data to {}'.format(
                         validation.get_log_folder()

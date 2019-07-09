@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>DstToD0PiD0ToHpJm.dst.root</output>
+  <output>Charm2BodyHadronic.dst.root</output>
   <contact>gonggd@mail.ustc.edu.cn</contact>
 </header>
 """
@@ -40,7 +40,7 @@ add_reconstruction(main)
 
 
 # Finally add mdst output
-output_filename = "../DstToD0PiD0ToHpJm.dst.root"
+output_filename = "../Charm2BodyHadronic.dst.root"
 add_mdst_output(main, filename=output_filename)
 
 # process events and print call statistics

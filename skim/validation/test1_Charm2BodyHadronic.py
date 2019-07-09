@@ -3,7 +3,7 @@
 
 """
 <header>
-    <input>../DstToD0PiD0ToHpJm.dst.root</input>
+    <input>../Charm2BodyHadronic.dst.root</input>
     <output>17240100.udst.root</output>
     <contact>gonggd@mail.ustc.edu.cn</contact>
     <interval>nightly</interval>
@@ -20,9 +20,9 @@ from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 c2bhdpath = Path()
 
-skimCode = encodeSkimName('DstToD0PiD0ToHpJm')
+skimCode = encodeSkimName('Charm2BodyHadronic')
 
-fileList = ['../DstToD0PiD0ToHpJm.dst.root']
+fileList = ['../Charm2BodyHadronic.dst.root']
 
 inputMdstList('default', fileList, path=c2bhdpath)
 

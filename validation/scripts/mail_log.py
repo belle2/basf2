@@ -178,7 +178,6 @@ class Mails:
         for package in comparison["packages"]:
             for plotfile in package["plotfiles"]:
                 for plot in plotfile["plots"]:
-                    print(plot["title"], plot["warnings"])
                     skip = True
                     if plot["comparison_result"] in ["error"]:
                         skip = False

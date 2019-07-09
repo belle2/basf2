@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMHIT2D_H
-#define BKLMHIT2D_H
+#pragma once
 
 #include <TVector3.h>
 #include <framework/datastore/RelationsObject.h>
@@ -183,5 +182,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //BKLMHIT2D_H

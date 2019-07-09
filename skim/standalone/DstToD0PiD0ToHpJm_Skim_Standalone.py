@@ -13,9 +13,20 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
 gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 skimCode = encodeSkimName('DstToD0PiD0ToHpJm')
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 c2bhpath = Path()
 

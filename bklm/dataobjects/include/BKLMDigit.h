@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMDIGIT_H
-#define BKLMDIGIT_H
+#pragma once
 
 //#include <framework/datastore/RelationsObject.h>
 #include <framework/dataobjects/DigitBase.h>
@@ -202,5 +201,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //BKLMDIGIT_H

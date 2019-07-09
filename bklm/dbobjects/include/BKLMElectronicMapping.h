@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMELECTRONICMAPPING_DB_H
-#define BKLMELECTRONICMAPPING_DB_H
+#pragma once
 
 #include <TObject.h>
 #include <string>
@@ -135,5 +134,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMMODULE_H
-#define BKLMMODULE_H
+#pragma once
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/Rotation.h"
@@ -317,5 +316,3 @@ namespace Belle2 {
   } // end of namespace bklm
 
 } // end of namespace Belle2
-
-#endif // BKLMMODULE_H

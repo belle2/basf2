@@ -125,4 +125,3 @@ namespace Belle2 {
     ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */
   };
 }
-

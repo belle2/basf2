@@ -2339,12 +2339,12 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path=analy
 
         The MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
 
-    The MVA algorithm used is a gradient boosted decision tree (`TMVA 4.2.1`, `ROOT 6.14/06`).
+    The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.2.1**, **ROOT 6.14/06**).
 
     Parameters:
         sigHypoPDGCode (int): the pdgId of the signal mass hypothesis.
         bkgHypoPDGCode (int): the pdgId of the background mass hypothesis.
-        particleLists list(str): list of names of ParticleList objects for charged stable particles.
+        particleLists (list): list of names of ParticleList objects for charged stable particles.
                                  The charge-conjugate ParticleLists will be also stored automatically.
         path (basf2.Path): the module is added to this path.
 

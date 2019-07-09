@@ -253,7 +253,6 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
-
     if (m_updateDaugthers || isTreeHead) {
       if (posindex >= 0) {
         const TVector3 pos(m_fitparams->getStateVector()(posindex),

@@ -41,6 +41,28 @@ namespace Belle2 {
      */
 
   private:
+
+    /**
+       how to interpret the 4 bits:
+
+       PID0 0x0 fine-timing trigger, tfine=0
+       PID1 0x4 fine-timing trigger, tfine=1
+       PID2 0x8 fine-timing trigger, tfine=2
+       PID3 0xc fine-timing trigger, tfine=3
+       RSV0 0x2 reserve 0
+       RSV1 0x6 reserve 1
+       RSV2 0xa reserve 2
+       RSV3 0xe reserve 3
+       ECL  0x1 ECL trigger, coarse-timing
+       CDC  0x3 CDC trigger, coarse-timing
+       DPHY 0x5 delayed physics trigger
+       RAND 0x7 random trigger
+       TEST 0x9 test trigger
+       RSV4 0xb reserve 4
+       RSV5 0xd reserve 5
+       NONE 0xf not a trigger
+     */
+
     union {
       /** Unique id */
       baseType type: 4;

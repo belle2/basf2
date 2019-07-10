@@ -1046,13 +1046,12 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             }
             if hasattr(self, 'exclude_variables'):
                 meta_data["Excluded variables"] = ", ".join(self.exclude_variables)
-            meta_data_string = format_dictionary(meta_data)
+            meta_data_string = (format_dictionary(meta_data) +
+                                "\n\n(For all MVA training parameters look into the produced weight file)")
             luigi_params = get_serialized_parameters(self)
             luigi_param_string = (f"\n\nb2luigi parameters for {self.__class__.__name__}\n" +
                                   format_dictionary(luigi_params))
-            title_page_text = (meta_data_string +
-                               "\n(For all MVA training parameters look into the produced weight file)" +
-                               luigi_param_string)
+            title_page_text = meta_data_string + luigi_param_string
             titlepage_ax.text(0, 1, title_page_text, ha="left", va="top", wrap=True, fontsize=8)
             pdf.savefig(titlepage_fig)
             plt.close(titlepage_fig)

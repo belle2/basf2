@@ -38,7 +38,7 @@ class TestTreeFits(unittest.TestCase):
                         massConstraintList=[],
                         massConstraintListParticlename=[],
                         expertUseReferencing=True,
-                        ipConstraint=True,
+                        ipConstraint=False,
                         updateAllDaughters=False)
 
         ntupler = register_module('VariablesToNtuple')
@@ -67,9 +67,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 1521, f"Background rejection to high {falsePositives} out of {allBkg}")
+        self.assertTrue(falsePositives < 1341, f"Background rejection {falsePositives} out of {allBkg}")
 
-        self.assertTrue(truePositives > 152, "Signal rejection too high {truePositives} out of {allSig}")
+        self.assertTrue(truePositives > 147, f"Signal rejection too high {truePositives} out of {allSig}")
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")

@@ -330,12 +330,10 @@ class ComparisonPlot(Plot):
             check=None,
             is_expert=None,
             plot_path=None,
-            comparison_pvalue=None,
-            comparison_pvalue_warn=None,
-            comparison_pvalue_error=None,
             comparison_text=None,
             height=None,
-            width=None):
+            width=None,
+            warnings=None):
         """
         Create a new ComparisonPlot object and fill all members
         """
@@ -358,19 +356,6 @@ class ComparisonPlot(Plot):
         #: verbose text describing the outcome of the comparison
         self.comparison_text = comparison_text
 
-        if isinstance(comparison_pvalue, float):
-            pvalue_str = f"{comparison_pvalue:.6f}"
-        else:
-            pvalue_str = str(comparison_pvalue)
-        #: the p-value computed during the comparison
-        self.comparison_pvalue = pvalue_str
-
-        #: the p-value at below which a warning is indicated on the website
-        self.comparison_pvalue_warn = comparison_pvalue_warn
-
-        #: the p-value at below which an error is indicated on the website
-        self.comparison_pvalue_error = comparison_pvalue_error
-
         #: the filename of the png file plotted with the comparison graphs
         self.png_filename = png_filename
 
@@ -379,6 +364,11 @@ class ComparisonPlot(Plot):
 
         #: path were the png and pdf files are located
         self.plot_path = plot_path
+
+        #: Warnings ("no contact" person etc.)
+        if warnings is None:
+            warnings = []
+        self.warnings = warnings
 
 
 class ComparisonNTuple(NTuple):

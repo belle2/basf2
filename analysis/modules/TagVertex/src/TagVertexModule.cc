@@ -38,6 +38,8 @@
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
 
+#include <TVector.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -54,7 +56,7 @@ namespace Belle2 {
 
   TagVertexModule::TagVertexModule() : Module(),
     m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0), m_tagVl(0),
-    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0)
+    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0)
   {
     // Set module properties
     setDescription("Tag side Vertex Fitter for modular analysis");
@@ -153,6 +155,9 @@ namespace Belle2 {
           ver->setTagVol(m_tagVol);
           ver->setTruthTagVol(m_truthTagVol);
           ver->setTagVolErr(m_tagVolErr);
+          ver->setTagVNDF(m_tagVNDF);
+          ver->setTagVChi2(m_tagVChi2);
+          ver->setTagVChi2IP(m_tagVChi2IP);
         } else {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
@@ -166,6 +171,9 @@ namespace Belle2 {
           ver->setTagVol(-1111.);
           ver->setTruthTagVol(-1111.);
           ver->setTagVolErr(-1111.);
+          ver->setTagVNDF(-1111.);
+          ver->setTagVChi2(-1111.);
+          ver->setTagVChi2IP(-1111.);
         }
       }
 
@@ -963,9 +971,23 @@ namespace Belle2 {
       return false;
     }
 
+    if (m_useFitAlgorithm != "noConstraint") {
+      TMatrixDSym tubeInv = m_tube;
+      tubeInv.Invert();
+      TVector3 dTagV = rFit.getPos(0) - m_BeamSpotCenter;
+      TVectorD dV(0, 2,
+                  dTagV.X(),
+                  dTagV.Y(),
+                  dTagV.Z(),
+                  "END");
+      m_tagVChi2IP = tubeInv.Similarity(dV);
+    }
+
     m_tagV = rFit.getPos(0);
     m_tagVErrMatrix.ResizeTo(rFit.getCov(0));
     m_tagVErrMatrix = rFit.getCov(0);
+    m_tagVNDF = rFit.getNdf(0);
+    m_tagVChi2 = rFit.getChi2(0);
 
     m_fitPval = rFit.getPValue();
 

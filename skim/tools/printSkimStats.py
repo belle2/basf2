@@ -52,7 +52,7 @@ skims = [
     'LFVZpInvisible', 'LFVZpVisible', 'LeptonicUntagged', 'PRsemileptonicUntagged',
     'SLUntagged', 'SinglePhotonDark', 'SystematicsEELL', 'SystematicsRadMuMu', 'SystematicsRadEE',
     'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'TauLFV', 'TCPV', 'TauGeneric',
-    'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0WithOneLep', 'feiSLBplusWithOneLep'
+    'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
 ]
 
 bkgs = ['MC12_mixedBGx1', 'MC12_chargedBGx1', 'MC12_ccbarBGx1', 'MC12_ssbarBGx1',
@@ -72,7 +72,7 @@ avgProcessingTimePerEventPerSample = 0
 for skim in skims:
     csvFile = open(skim + '_stats.csv', 'w')
     csvWriter = csv.writer(csvFile)
-    csvWriter.writerow(['MC type', 'Input Events', 'Skimmed Events' 'Retention',
+    csvWriter.writerow(['MC type', 'Input Events', 'Skimmed Events', 'Retention',
                         'Time/Evt (HEPSEC)', 'Total Time (s)', 'uDST Size/Evt (KB)',
                         'uDST Size(MB)', 'ACMPE', 'Log Size/evt(KB)', 'Log Size(MB)',
                         'Max Memory (GB)', 'Avg Memory (GB)', 'FullSkimSize (GB)',

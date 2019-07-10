@@ -461,7 +461,7 @@ def setVariables():
                              'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', KId[getBelleOrBelle2()]]
 
 
-def FillParticleLists(mode='Expert', path=analysis_main):
+def FillParticleLists(mode='Expert', path=None):
     """
     Fills the particle Lists for all categories.
     """
@@ -513,7 +513,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
     return True
 
 
-def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
+def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
     """
     Samples data for training or tests all categories all categories at event level.
     """
@@ -712,7 +712,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
         return True
 
 
-def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
+def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
     """
     Samples the input data or tests the combiner according to the selected categories.
     """
@@ -955,7 +955,7 @@ def flavorTagger(
     downloadFromDatabaseIfNotFound=False,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
-    path=analysis_main,
+    path=None,
 ):
     """
       Defines the whole flavor tagging process for each selected Rest of Event (ROE) built in the steering file.
@@ -1110,7 +1110,6 @@ if __name__ == '__main__':
 
     function = globals()["flavorTagger"]
     signature = inspect.formatargspec(*inspect.getfullargspec(function))
-    signature = signature.replace(repr(analysis_main), 'analysis_main')
     desc_list.append((function.__name__, signature + '\n' + function.__doc__))
 
     from terminal_utils import Pager

@@ -14,14 +14,15 @@
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 
 
-#include <G4PhysicalConstants.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Electron.hh>
 #include <G4EmParameters.hh>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4mplIonisation::G4mplIonisation(G4double mCharge, const G4String& name)
   : G4VEnergyLossProcess(name),

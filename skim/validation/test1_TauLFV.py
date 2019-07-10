@@ -27,7 +27,7 @@ from skim.standardlists.lightmesons import *
 taulfvskim = Path()
 
 fileList = ['../TauLFV.dst.root']
-inputMdstList('MC9', fileList, path=taulfvskim)
+inputMdstList('default', fileList, path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)
 stdK('loose', path=taulfvskim)

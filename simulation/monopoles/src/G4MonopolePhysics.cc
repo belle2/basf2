@@ -29,12 +29,13 @@
 #include <G4hIonisation.hh>
 #include <G4PhysicsListHelper.hh>
 #include <G4BuilderType.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <cmath>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4MonopolePhysics::G4MonopolePhysics(double magneticCharge)
   : G4VPhysicsConstructor("Monopole physics"),

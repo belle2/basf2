@@ -39,7 +39,6 @@
 // ROOT
 #include <TH1.h>
 #include <TKey.h>
-#include <string>
 #include <TClonesArray.h>
 #include <TTree.h>
 #include <TDirectory.h>

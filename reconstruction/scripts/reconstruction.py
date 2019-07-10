@@ -269,16 +269,20 @@ def add_cdst_output(
         'ExtHits',
         'TOPLikelihoods',
         'TOPRecBunch',
+        'TOPTimeZeros',
+        'TOPAsicMask',
         'ECLDigits',
         'ECLCalDigits',
         'TRGECLClusters',
         'TRGECLUnpackerStores',
         'TRGECLUnpackerEvtStores',
         'BKLMHit2ds',
+        'TRGGRLUnpackerStore',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
         'RecoHitInformationsToBKLMHit2ds',
         'EKLMAlignmentHits',
+        'TracksToEKLMAlignmentHits'
         'EKLMHit2ds',
         'EKLMDigits',
         'Muids',
@@ -336,7 +340,6 @@ def add_top_modules(path, components=None, cosmics=False):
         else:
             top_finder = register_module('TOPBunchFinder')
             path.add_module(top_finder)
-            top_finder.param('addOffset', True)
         top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 

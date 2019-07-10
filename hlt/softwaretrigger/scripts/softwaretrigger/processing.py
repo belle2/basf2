@@ -1,4 +1,6 @@
 import argparse
+import multiprocessing
+import sys
 
 import basf2
 import ROOT
@@ -26,7 +28,7 @@ def setup_basf2_and_db():
                         help='Output Ring Buffer name')
     parser.add_argument('histo_port', type=int,
                         help='Port of the HistoManager to connect to')
-    parser.add_argument('number_processes', type=int, default=0,
+    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count(),
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local database.txt to use for the ConditionDB",
@@ -91,7 +93,7 @@ def start_path(args, location):
 
     # Histogram Handling
     if not args.histo_output_file:
-        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000)
+        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName="/tmp/")
     else:
         path.add_module('HistoManager', histoFileName=args.histo_output_file)
 
@@ -124,6 +126,9 @@ def add_hlt_processing(path,
     add_geometry_if_not_present(path)
     add_unpackers(path, components=unpacker_components)
 
+    # Add the part of the dqm modules, which should run before every reconstruction
+    add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_reco)
+
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:
             accept_path = add_softwaretrigger_reconstruction(path, components=reco_components,
@@ -143,10 +148,10 @@ def add_hlt_processing(path,
         add_roi_finder(accept_path)
 
         # Add the HLT DQM modules only in case the event is accepted
-        add_hlt_dqm(accept_path, run_type=run_type, components=reco_components)
+        add_hlt_dqm(accept_path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
     else:
         # Add the HLT DQM modules always
-        add_hlt_dqm(path, run_type=run_type, components=reco_components)
+        add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
 
     # Make sure to create ROI payloads for sending them to ONSEN
     # Do this for all events
@@ -156,12 +161,16 @@ def add_hlt_processing(path,
     pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor) or not do_reconstruction
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
 
+    # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
+    add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events)
+
     if prune_output:
         path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS)
 
 
 def add_expressreco_processing(path,
                                run_type=constants.RunTypes.beam,
+                               select_only_accepted_events=False,
                                prune_input=True,
                                prune_output=True,
                                unpacker_components=None,
@@ -175,6 +184,13 @@ def add_expressreco_processing(path,
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
     if reco_components is None:
         reco_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
+
+    # If turned on, only events selected by the HLT will go to ereco.
+    # this is needed as by default also un-selected events will get passed to ereco,
+    # however they are empty.
+    if select_only_accepted_events:
+        skim_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
+        skim_module.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     # ensure that only DataStore content is present that we expect in
     # in the ExpressReco configuration. If tracks are present in the

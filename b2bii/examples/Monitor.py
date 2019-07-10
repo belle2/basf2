@@ -10,7 +10,6 @@ from ROOT import Belle2
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from modularAnalysis import fillParticleList
@@ -46,27 +45,28 @@ inputBelleMDSTFile = sys.argv[2]
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
 # Convert
-convertBelleMdstToBelleIIMdst(inputBelleMDSTFile)
+mypath = create_path()
+convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, path=mypath)
 
 # Reconstruct
 # first the gearbox needs to be loaded
-loadGearbox()
+loadGearbox(mypath)
 
 # Create monitoring histograms
-addBeamParamsConversionMonitors()
-addTrackConversionMonitors()
-addKshortConversionMonitors()
-addKlongConversionMonitors()
-addLambda0ConversionMonitors()
-addConvertedPhotonConversionMonitors()
-addNeutralsConversionMonitors()
-addMCParticlesConversionMonitors()
+addBeamParamsConversionMonitors(path=mypath)
+addTrackConversionMonitors(path=mypath)
+addKshortConversionMonitors(path=mypath)
+addKlongConversionMonitors(path=mypath)
+addLambda0ConversionMonitors(path=mypath)
+addConvertedPhotonConversionMonitors(path=mypath)
+addNeutralsConversionMonitors(path=mypath)
+addMCParticlesConversionMonitors(path=mypath)
 
 # progress
 progress = register_module('Progress')
-analysis_main.add_module(progress)
+mypath.add_module(progress)
 
-process(analysis_main)
+process(mypath)
 
 # Print call statistics
 print(statistics)

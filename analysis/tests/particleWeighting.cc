@@ -12,27 +12,27 @@ namespace {
   TEST(ParticleWeighting, BinLimits)
   {
     EXPECT_B2FATAL(ParticleWeightingBinLimits(42, 42));
-    ParticleWeightingBinLimits* a = new ParticleWeightingBinLimits(0, 1);
+    auto* a = new ParticleWeightingBinLimits(0, 1);
     EXPECT_TRUE(a->first() == 0);
     EXPECT_TRUE(a->second() == 1);
-    ParticleWeightingBinLimits* b = new ParticleWeightingBinLimits(1, 0);
+    auto* b = new ParticleWeightingBinLimits(1, 0);
     EXPECT_TRUE(b->first() == 0);
     EXPECT_TRUE(b->second() == 1);
   }
 
   TEST(ParticleWeighting, Axis)
   {
-    ParticleWeightingAxis* a = new ParticleWeightingAxis();
+    auto* a = new ParticleWeightingAxis();
     EXPECT_TRUE(a->getName() == "");
     a->setName("Test axis name");
     EXPECT_TRUE(a->getName() == "Test axis name");
 
-    ParticleWeightingBinLimits* bin1 = new ParticleWeightingBinLimits(0, 1);
-    ParticleWeightingBinLimits* bin1b = new ParticleWeightingBinLimits(1, 2);
-    ParticleWeightingBinLimits* bin2 = new ParticleWeightingBinLimits(2, 3);
-    ParticleWeightingBinLimits* bin3 = new ParticleWeightingBinLimits(0, 5);
-    ParticleWeightingBinLimits* bin4 = new ParticleWeightingBinLimits(0.5, 1.5);
-    ParticleWeightingBinLimits* bin5 = new ParticleWeightingBinLimits(2.5, 3);
+    auto* bin1 = new ParticleWeightingBinLimits(0, 1);
+    auto* bin1b = new ParticleWeightingBinLimits(1, 2);
+    auto* bin2 = new ParticleWeightingBinLimits(2, 3);
+    auto* bin3 = new ParticleWeightingBinLimits(0, 5);
+    auto* bin4 = new ParticleWeightingBinLimits(0.5, 1.5);
+    auto* bin5 = new ParticleWeightingBinLimits(2.5, 3);
 
     int added_bin_id_1 = a->addBin(bin1);
     EXPECT_EQ(added_bin_id_1 , 1);
@@ -49,9 +49,9 @@ namespace {
 
   TEST(ParticleWeighting, KeyMap)
   {
-    ParticleWeightingBinLimits* bl1 = new ParticleWeightingBinLimits(0, 1);
-    ParticleWeightingBinLimits* bl2 = new ParticleWeightingBinLimits(1, 2);
-    ParticleWeightingBinLimits* bl3 = new ParticleWeightingBinLimits(1, 3);
+    auto* bl1 = new ParticleWeightingBinLimits(0, 1);
+    auto* bl2 = new ParticleWeightingBinLimits(1, 2);
+    auto* bl3 = new ParticleWeightingBinLimits(1, 3);
     string a1 = "Axis1";
     string a2 = "Axis2";
     string a3 = "Axis3";
@@ -84,7 +84,7 @@ namespace {
     entry3.insert(make_pair(a1, 10));
     entry3.insert(make_pair(a2, 10));
 
-    ParticleWeightingKeyMap* kmp = new ParticleWeightingKeyMap();
+    auto* kmp = new ParticleWeightingKeyMap();
     int added_bin_id_1 = kmp->addKey(bin1);
     EXPECT_EQ(added_bin_id_1, 0);
     int added_bin_id_2 = kmp->addKey(bin2);
@@ -100,9 +100,9 @@ namespace {
 
   TEST(ParticleWeighting, LookUpTable)
   {
-    ParticleWeightingBinLimits* bl1 = new ParticleWeightingBinLimits(0, 1);
-    ParticleWeightingBinLimits* bl2 = new ParticleWeightingBinLimits(1, 2);
-    ParticleWeightingBinLimits* bl3 = new ParticleWeightingBinLimits(1, 3);
+    auto* bl1 = new ParticleWeightingBinLimits(0, 1);
+    auto* bl2 = new ParticleWeightingBinLimits(1, 2);
+    auto* bl3 = new ParticleWeightingBinLimits(1, 3);
     string a1 = "Axis1";
     string a2 = "Axis2";
     string v1 = "Var1";
@@ -132,7 +132,7 @@ namespace {
     entry1a.insert(make_pair(a1, 100));
     entry1a.insert(make_pair(a2, 200));
 
-    ParticleWeightingLookUpTable* ltb = new ParticleWeightingLookUpTable();
+    auto* ltb = new ParticleWeightingLookUpTable();
     ltb->addEntry(info1, bin1);
     ltb->addEntry(info2, bin2);
     vector<string> axes = ltb->getAxesNames();

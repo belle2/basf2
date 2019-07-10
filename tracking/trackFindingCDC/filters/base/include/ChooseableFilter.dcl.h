@@ -63,6 +63,13 @@ namespace Belle2 {
        */
       Weight operator()(const Object& object) final;
 
+    public:
+      /// Return name of the selected filter
+      std::string getFilterName() const
+      {
+        return m_param_filterName;
+      }
+
     private:
       /// Parameters : Name of the selected filter
       std::string m_param_filterName;

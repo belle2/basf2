@@ -23,8 +23,6 @@
 #include <TDatabasePDG.h>
 #include <TRandom3.h>
 
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <framework/logging/Logger.h>

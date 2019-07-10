@@ -97,6 +97,7 @@ namespace Belle2 {
               ++nCurrentRepetitions;
               return nCurrentRepetitions > nMaxRepetitions;
             } else {
+              // cppcheck-suppress unreadVariable
               nCurrentRepetitions = 1;
               return false;
             }

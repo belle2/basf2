@@ -1,23 +1,25 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Yinghui GUAN, VIPIN GAUR, Z. S. Stottler                 *
+ * Contributors: Yinghui Guan, Vipin Gaur,                                *
+ *               Zachary S. Stottler, Giacomo De Pietro                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <bklm/calibration/BKLMDatabaseImporter.h>
-#include <bklm/dbobjects/BKLMElectronicMapping.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <bklm/dbobjects/BKLMSimulationPar.h>
-#include <bklm/dbobjects/BKLMBadChannels.h>
 #include <bklm/dbobjects/BKLMMisAlignment.h>
 #include <bklm/dbobjects/BKLMDisplacement.h>
 #include <bklm/dbobjects/BKLMTimeWindow.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dataobjects/BKLMElementID.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/BKLMChannelIndex.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -27,14 +29,15 @@
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBImportArray.h>
 
 #include <string>
 #include <vector>
 #include <map>
 #include <fstream>
 #include <iostream>
-#include <TClonesArray.h>
+
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -42,75 +45,91 @@ using namespace Belle2;
 BKLMDatabaseImporter::BKLMDatabaseImporter()
 {}
 
-void BKLMDatabaseImporter::importBklmElectronicMapping()
+void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
 {
-  DBImportArray<BKLMElectronicMapping> m_bklmMapping;
   int copperId = 0;
   int slotId = 0;
   int laneId = 0;
   int axisId = 0;
-  int BKLM_ID = 117440512;
-  for (int isForward = 0; isForward < 2; isForward++) {
-    for (int sector = 1; sector < 9; sector++) {
-      for (int layer = 1; layer < 16; layer++) {
-        //plane = 0 for z; plane = 1 for phi
-        for (int plane = 0; plane < 2; plane++) {
+  BKLMChannelIndex bklmPlanes(BKLMChannelIndex::c_IndexLevelPlane);
+  for (BKLMChannelIndex& bklmPlane : bklmPlanes) {
+    int isForward = bklmPlane.getForward();
+    int sector = bklmPlane.getSector();
+    int layer = bklmPlane.getLayer();
+    int plane = bklmPlane.getPlane();
+    if (isForward == 1 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1 + BKLM_ID;
+    if (isForward == 1 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2 + BKLM_ID;
+    if (isForward == 0 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3 + BKLM_ID;
+    if (isForward == 0 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 4 + BKLM_ID;
+    if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
+    if (sector == 1 || sector == 2) slotId = sector + 2;
+    if (sector == 7 || sector == 8) slotId = sector - 6;
 
-          if (isForward == 1 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1 + BKLM_ID;
-          if (isForward == 1 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2 + BKLM_ID;
-          if (isForward == 0 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3 + BKLM_ID;
-          if (isForward == 0 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 4 + BKLM_ID;
-          if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
-          if (sector == 1 || sector == 2) slotId = sector + 2;
-          if (sector == 7 || sector == 8) slotId = sector - 6;
+    if (layer > 2)  laneId = layer + 5;
+    else laneId = layer;
 
-          if (layer > 2)  laneId = layer + 5;
-          else laneId = layer;
+    if (layer < 3) {
+      if (plane == 0) axisId = 1;
+      else if (plane == 1) axisId = 0;
+    } else axisId = plane;
 
-          if (layer < 3) {
-            if (plane == 0) axisId = 1;
-            else if (plane == 1) axisId = 0;
-          } else axisId = plane;
+    int MaxiChannel = BKLMElementNumbers::getNStrips(
+                        isForward, sector, layer, plane);
 
-          int MaxiChannel = 0;
-          if (isForward == 0 && sector == 3 && plane == 0) {
-            if (layer < 3) MaxiChannel = 38;
-            if (layer > 2) MaxiChannel = 34;
-          } else {
-            if (layer == 1 && plane == 1) MaxiChannel = 37;
-            if (layer == 2 && plane == 1) MaxiChannel = 42;
-            if (layer > 2 && layer < 7 && plane == 1) MaxiChannel = 36;
-            if (layer > 6 && plane == 1) MaxiChannel = 48;
+    bool dontFlip = false;
+    if (isForward == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
+    if (isForward == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
 
-            if (layer == 1 && plane == 0) MaxiChannel = 54;
-            if (layer == 2 && plane == 0) MaxiChannel = 54;
-            if (layer > 2 && plane == 0) MaxiChannel = 48;
-          }
+    for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
+      int channelId = iStrip;
+      if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
 
-          bool dontFlip = false;
-          if (isForward == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
-          if (isForward == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
-
-          for (int iStrip = 1; iStrip < (MaxiChannel + 1);  iStrip++) {
-            int channelId = iStrip;
-            if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
-
-            if (plane == 1) { //phi strips
-              if (layer == 1)  channelId = channelId + 4;
-              if (layer == 2)  channelId = channelId + 2;
-            } else if (plane == 0) { //z strips
-              if (layer < 3 && channelId > 9) channelId = channelId + 6;
+      if (plane == 1) { //phi strips
+        if (layer == 1)  channelId = channelId + 4;
+        if (layer == 2)  channelId = channelId + 2;
+      } else if (plane == 0) { //z strips
+        if (layer < 3) { //scintillator
+          if (isForward == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
+            if (layer == 1) {
+              if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
+              else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
+              else if (channelId > 23 && channelId < 39) channelId = 54 - channelId;
+            } else {
+              if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
+              else if (channelId > 9 && channelId < 24) channelId = 40 - channelId;
+              else if (channelId > 23 && channelId < 39) channelId = 69 - channelId;
             }
+          } else { //all sectors except backward sector #3
+            if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
+            else if (channelId > 9 && channelId < 25) channelId = 40 - channelId;
+            else if (channelId > 24 && channelId < 40) channelId = 70 - channelId;
+            else if (channelId > 39 && channelId < 55) channelId = 100 - channelId;
+          }
+        }
+      }
 
-            m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, isForward, sector, layer, plane, iStrip);
-          }// end of loop channels
-        }//end of loop plane
-      }//end of loop layers
-    }//end of loop sectors
-  }//end fb
+      m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, isForward, sector, layer, plane, iStrip);
+    }
+  }
+}
+
+void BKLMDatabaseImporter::setElectronicMappingLane(
+  int forward, int sector, int layer, int lane)
+{
+  int n = m_bklmMapping.getEntries();
+  for (int i = 0; i < n; i++) {
+    BKLMElectronicMapping* mapping = m_bklmMapping[i];
+    if ((mapping->getIsForward() == forward) &&
+        (mapping->getSector() == sector) &&
+        (mapping->getLayer() == layer))
+      mapping->setLane(lane);
+  }
+}
+
+void BKLMDatabaseImporter::importBklmElectronicMapping()
+{
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   m_bklmMapping.import(iov);
-
   return;
 }
 
@@ -194,43 +213,6 @@ void BKLMDatabaseImporter::exportBklmSimulationPar()
       B2INFO(ii << ", " << jj << ", :" << element->getPhiWeight(ii, jj) << endl);
     }
   }
-
-}
-
-void BKLMDatabaseImporter::importBklmBadChannels(int expNoStart, int runStart, int expNoStop, int runStop, std::string fileName)
-{
-  std::ifstream stream;
-  stream.open(fileName.c_str());
-  if (!stream) {
-    B2FATAL("openFile: " << fileName << " *** failed to open");
-    return;
-  }
-  B2INFO(fileName << ": open for reading");
-
-  BKLMBadChannels bklmBadChannels;
-
-  int isForward(0), sector(0), layer(0), plane(0), strip(0);
-
-  while (true) {
-    stream >> isForward >> sector >> layer >> plane >> strip;
-    if (stream.eof()) break;
-    B2INFO("Read in line" << isForward << ", " << sector << ", " << layer  << ", " << plane  << ", " << strip << ".");
-    bklmBadChannels.appendDeadChannel(isForward, sector, layer, plane, strip);
-  }
-  stream.close();
-  // define IOV and store data to the DB
-  IntervalOfValidity iov(expNoStart, runStart, expNoStop, runStop);
-  Database::Instance().storeData("BKLMBadChannels", &bklmBadChannels, iov);
-}
-
-void BKLMDatabaseImporter::exportBklmBadChannels()
-{
-  DBObjPtr<BKLMBadChannels> element("BKLMBadChannels");
-
-  element->printDeadChannels();
-
-  B2INFO("is (1,1,1,0,20) dead ? " << element->isDeadChannel(1, 1, 1, 0, 20) << "; is (1,1,1,0,21) hot ? " << element->isHotChannel(1,
-         1, 1, 0, 21));
 
 }
 
@@ -390,6 +372,4 @@ void BKLMDatabaseImporter::exportBklmTimeWindow()
   B2INFO("z/phi coincidence window " << m_timing->getCoincidenceWindow());
   B2INFO(" timing cut reference " << m_timing->getPromptTime());
   B2INFO(" timing window " << m_timing->getPromptWindow());
-
-
 }

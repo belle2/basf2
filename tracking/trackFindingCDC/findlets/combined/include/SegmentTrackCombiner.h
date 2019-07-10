@@ -101,7 +101,7 @@ namespace Belle2 {
       /// Findlet for normalizing the tracks
       TrackNormalizer m_trackNormalizer;
 
-      // Object pools
+      /// Object pools
       std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>> m_relations;
     };
   }

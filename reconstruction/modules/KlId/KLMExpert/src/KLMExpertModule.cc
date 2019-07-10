@@ -197,7 +197,7 @@ void KLMExpertModule::event()
 
 
     for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
-      if (std::isfinite(m_feature_variables[i])) { m_feature_variables[i] = -999; }
+      if (!std::isfinite(m_feature_variables[i])) { m_feature_variables[i] = -999; }
       m_dataset->m_input[i] = m_feature_variables[i];
     }
 

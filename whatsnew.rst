@@ -13,8 +13,24 @@ be adapted when changing to the new release.
    :local:
 
 
-Changes since release-03-00
+Changes since release-03-02
 ===========================
+
+.. important changes should go here. Especially things that break backwards
+   compatibility 
+
+
+.. rubric:: Removal of default analysis path
+
+The default path ("``analysis_main``") is now **removed**.
+
+
+.. rubric:: Loading ECLClusters under multiple hypotheses
+
+It is now possible to load :math:`K_L^0` particles from clusters in the ECL. 
+This has several important consequences for the creation of particles and using combinations containing :math:`K_L^0` s or other neutral hadrons in the analysis package.
+This is handled correctly by the ParticleLoader and ParticleCombiner (the corresponding convenience functions are `modularAnalysis.fillParticleList` and `modularAnalysis.reconstructDecay`).
+Essentially: it is forbidden from now onwards for any other analysis modules to create particles.
 
 .. rubric:: Abort processing for invalid or missing global tags
 
@@ -55,26 +71,11 @@ Changes since release-02-01
 .. important changes should go here. Especially things that break backwards
    compatibility 
 
-.. rubric:: Deprecated the ``analysis_main`` path and NtupleTools
+.. rubric:: Deprecated NtupleTools
 
-Two major backward-compatibility-breaking changes to `modularAnalysis` scripts come
-with this release.
- 
-  1. The default path ("``analysis_main``") is now **deprecated**. 
-     This was originally intended to be a convenience but can cause subtle bugs.
-     Importantly, the default path also introduced misconceptions with what 
-     the active code actually does in user-analysis scripts.
-     More detail is available on the `ModularAnalysis <mawrappers>` page and 
-     there is also the full documentation for `Modules and Paths 
-     <general_modpath>` if you want a refresher.
-     There is an example of a script update below.
-
-
-  2. The suite of NtupleTools is now **deprecated** in favour of the
-     `variable manager tools <variablemanageroutput>` (such as 
-     `VariablesToNtuple <v2nt>`).
-
-
+The suite of NtupleTools is now **deprecated** in favour of the
+`variable manager tools <variablemanageroutput>` (such as 
+`VariablesToNtuple <v2nt>`).
 
 To give a worked example, if your script from ``release-02-01-00`` looked something like this:
 

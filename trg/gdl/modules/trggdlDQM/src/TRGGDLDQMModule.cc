@@ -147,6 +147,8 @@ void TRGGDLDQMModule::defineHisto()
                                     2000);
     h_c2_cdcToecl[iskim]->GetXaxis()->SetTitle("clk2ns");
 
+    h_timtype[iskim] = new TH1I(Form("hGDL_timtype_%s", skim_smap[iskim].c_str()), "timtype", 7, 0, 7);
+
     h_itd[iskim] = new TH1I(Form("hGDL_itd_%s", skim_smap[iskim].c_str()), "itd", n_inbit + 1, -1, n_inbit);
     h_ftd[iskim] = new TH1I(Form("hGDL_ftd_%s", skim_smap[iskim].c_str()), "ftd", n_outbit + 1, -1, n_outbit);
     h_psn[iskim] = new TH1I(Form("hGDL_psn_%s", skim_smap[iskim].c_str()), "psn", n_outbit + 1, -1, n_outbit);
@@ -155,6 +157,18 @@ void TRGGDLDQMModule::defineHisto()
     for (int i = 0; i < n_output_extra; i++) {
       h_psn_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
     }
+
+    for (unsigned i = 0; i < n_inbit; i++) {
+      if (m_bitNameOnBinLabel) {
+        h_itd[iskim]->GetXaxis()->SetBinLabel(h_itd[iskim]->GetXaxis()->FindBin(i + 0.5), inbitname[i]);
+        h_ftd[iskim]->GetXaxis()->SetBinLabel(h_ftd[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
+        h_psn[iskim]->GetXaxis()->SetBinLabel(h_psn[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
+      }
+    }
+
+    //reduce #plot
+    if (iskim != 0)continue;
+
     // rise/fall
     for (unsigned i = 0; i < n_inbit; i++) {
       h_itd_rise[i][iskim] = new TH1I(Form("hGDL_itd_%s_rise_%s", inbitname[i], skim_smap[iskim].c_str()),
@@ -163,9 +177,6 @@ void TRGGDLDQMModule::defineHisto()
       h_itd_fall[i][iskim] = new TH1I(Form("hGDL_itd_%s_fall_%s", inbitname[i], skim_smap[iskim].c_str()),
                                       Form("itd%d(%s) falling", i, inbitname[i]), 48, 0, 48);
       h_itd_fall[i][iskim]->SetLineColor(kGreen);
-      if (m_bitNameOnBinLabel) {
-        h_itd[iskim]->GetXaxis()->SetBinLabel(h_itd[iskim]->GetXaxis()->FindBin(i + 0.5), inbitname[i]);
-      }
     }
     for (unsigned i = 0; i < n_outbit; i++) {
       h_ftd[iskim]->GetXaxis()->SetBinLabel(h_ftd[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
@@ -182,12 +193,7 @@ void TRGGDLDQMModule::defineHisto()
       h_psn_fall[i][iskim] = new TH1I(Form("hGDL_psn_%s_fall_%s", outbitname[i], skim_smap[iskim].c_str()),
                                       Form("psn%d(%s) falling", i, outbitname[i]), 48, 0, 48);
       h_psn_fall[i][iskim]->SetLineColor(kGreen);
-      if (m_bitNameOnBinLabel) {
-        h_ftd[iskim]->GetXaxis()->SetBinLabel(h_ftd[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
-        h_psn[iskim]->GetXaxis()->SetBinLabel(h_psn[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
-      }
     }
-    h_timtype[iskim] = new TH1I(Form("hGDL_timtype_%s", skim_smap[iskim].c_str()), "timtype", 7, 0, 7);
   }
 
 
@@ -316,13 +322,7 @@ void TRGGDLDQMModule::endRun()
     c1.cd();
 
     for (int iskim = 0; iskim < nskim_gdldqm; iskim++) {
-      for (unsigned i = 0; i < n_inbit; i++) {
-        h_itd_rise[i][iskim]->SetTitle(Form("itd%d(%s) rising(red), falling(green)",
-                                            i, inbitname[i]));
-        h_itd_rise[i][iskim]->Draw();
-        h_itd_fall[i][iskim]->Draw("same");
-        c1.Update();
-      }
+
       h_itd[iskim]->GetXaxis()->SetRange(h_itd[iskim]->GetXaxis()->FindBin(0.5),
                                          h_itd[iskim]->GetXaxis()->FindBin(n_inbit - 0.5));
       h_itd[iskim]->Draw();
@@ -377,6 +377,18 @@ void TRGGDLDQMModule::endRun()
       c1.Update();
       h_ns_cdcToecl[iskim]->Draw();
       c1.Update();
+
+      //reduce #plot
+      if (iskim != 0)continue;
+      for (unsigned i = 0; i < n_inbit; i++) {
+
+        h_itd_rise[i][iskim]->SetTitle(Form("itd%d(%s) rising(red), falling(green)",
+                                            i, inbitname[i]));
+        h_itd_rise[i][iskim]->Draw();
+        h_itd_fall[i][iskim]->Draw("same");
+        c1.Update();
+      }
+
     }
 
     ps->Close();
@@ -490,8 +502,8 @@ void TRGGDLDQMModule::event()
     begin_run = false;
   }
 
-  int psn[3] = {0};
-  int ftd[3] = {0};
+  int psn[5] = {0};
+  int ftd[5] = {0};
   int itd[5] = {0};
   int timtype  = 0;
 
@@ -500,8 +512,8 @@ void TRGGDLDQMModule::event()
 
   // fill event by event timing histogram and get time integrated bit info
   for (unsigned clk = 1; clk <= n_clocks; clk++) {
-    int psn_tmp[3] = {0};
-    int ftd_tmp[3] = {0};
+    int psn_tmp[5] = {0};
+    int ftd_tmp[5] = {0};
     int itd_tmp[5] = {0};
     for (unsigned j = 0; j < (unsigned)nword_input; j++) {
       itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);
@@ -868,6 +880,9 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
   //std::cout << "rise " << skim.size() << std::endl;
 
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
+    //reduce #plot
+    if (skim[ifill] != 0)continue;
+
     for (unsigned i = 0; i < n_inbit; i++) {
       if (n_clocks == 32) {
         h_itd_rise[i][skim[ifill]]->GetXaxis()->SetTitle("clk32ns");

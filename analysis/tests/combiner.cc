@@ -22,11 +22,12 @@
 #include <framework/logging/Logger.h>
 
 #include <utility>
+#include <algorithm>
 
 #include <gtest/gtest.h>
 #include <set>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 namespace {
@@ -34,7 +35,7 @@ namespace {
   class ParticleCombinerTest : public ::testing::Test {
   protected:
     /** register Particle array */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle> particles;
@@ -45,7 +46,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -290,8 +291,8 @@ namespace {
 
     void addExpectedParticle(Particle::EFlavorType flavourType, int pdg_code, std::vector<int> daughter_indices)
     {
-      expected_particles.push_back(std::make_tuple(flavourType, pdg_code, std::set<int>(daughter_indices.begin(),
-                                                   daughter_indices.end())));
+      expected_particles.emplace_back(flavourType, pdg_code, std::set<int>(daughter_indices.begin(),
+                                      daughter_indices.end()));
     }
 
     void addAndCheckParticlesFromGenerator()
@@ -313,8 +314,8 @@ namespace {
           Particle* part = particles.appendNew(particle);
           added_particles.push_back(part);
           auto daughter_indices = part->getDaughterIndices();
-          received_particles.push_back(std::make_tuple(part->getFlavorType(), part->getPDGCode(), std::set<int>(daughter_indices.begin(),
-                                                       daughter_indices.end())));
+          received_particles.emplace_back(part->getFlavorType(), part->getPDGCode(), std::set<int>(daughter_indices.begin(),
+                                          daughter_indices.end()));
         }
       }
       EXPECT_FALSE(generator.loadNext());
@@ -710,6 +711,130 @@ namespace {
     EXPECT_TRUE(comb7.inputListsCollide(std::make_pair(3, 4)));
   }
 
+  TEST_F(ParticleCombinerTest, ECLCombinationsTest)
+  {
+    /**
+     * This test checks that **no two clusters are combined with different
+     * hypotheses from the same connected region of the ECL**.
+     * This is an important consequence of including multiple hypotheses of ECL
+     * clusters.
+     *
+     * We mock up a test with 3 connected regions.
+     * CR #1 has two photons (they may be combined)
+     * CR #2 has one photon
+     * CR #3 has one photon and a neutral hadron... they MUST NOT be combined as
+     * hypotheses from the same connected region overlap energies
+     */
+
+    // create particles
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclClusters;
+
+    // mock up the clusters
+    ECLCluster* eclGamma1 = eclClusters. appendNew(ECLCluster());
+    eclGamma1->setConnectedRegionId(1);
+    eclGamma1->setClusterId(1);
+    eclGamma1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    ECLCluster* eclGamma2 = eclClusters. appendNew(ECLCluster());
+    eclGamma2->setConnectedRegionId(1);
+    eclGamma2->setClusterId(2);
+    eclGamma2->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    ECLCluster* eclGamma3 = eclClusters. appendNew(ECLCluster());
+    eclGamma3->setConnectedRegionId(2);
+    eclGamma3->setClusterId(3);
+    eclGamma3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    ECLCluster* eclGamma4 = eclClusters. appendNew(ECLCluster());
+    eclGamma4->setConnectedRegionId(3);
+    eclGamma4->setClusterId(4);
+    eclGamma4->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    ECLCluster* eclKL = eclClusters. appendNew(ECLCluster());
+    eclKL->setConnectedRegionId(3);
+    eclKL->setClusterId(5);
+    eclKL->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+
+    // particles
+    Particle* g_1 = particles.appendNew(Particle(eclGamma1, Const::photon));
+    Particle* g_2 = particles.appendNew(Particle(eclGamma2, Const::photon));
+    Particle* g_3 = particles.appendNew(Particle(eclGamma3, Const::photon));
+    Particle* g_4 = particles.appendNew(Particle(eclGamma4, Const::photon));
+    Particle* KL  = particles.appendNew(Particle(eclKL, Const::Klong));
+
+    // create Particle Lists
+    StoreObjPtr<ParticleList> gamma("gamma:test");
+    StoreObjPtr<ParticleList> klong("K_L0:test");
+    StoreObjPtr<ParticleList> vpho("vpho:test"); // dummy particle list
+
+    // datastore initialization
+    DataStore::Instance().setInitializeActive(true);
+    gamma.registerInDataStore();
+    klong.registerInDataStore();
+    vpho.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+
+    // create and initialize the lists
+    gamma.create();
+    gamma->initialize(22, "gamma:test");
+    klong.create();
+    klong->initialize(130, "K_L0:test");
+    vpho.create();
+    vpho->initialize(10022, "vpho:test");
+
+    gamma->addParticle(g_1);
+    gamma->addParticle(g_2);
+    gamma->addParticle(g_3);
+    gamma->addParticle(g_4);
+    // --
+    klong->addParticle(KL);
+
+    // the photon (particle array index #3) from CR 3 must not be combined with the
+    // KLong (particle index #4) but the Klong can be combined with all others
+    auto isForbidden = [](std::vector<int> v) -> bool {
+      if (std::find(v.begin(), v.end(), 3) != v.end())
+        if (std::find(v.begin(), v.end(), 4) != v.end())
+          return true;
+      return false;
+    };
+
+    // check lists
+    EXPECT_EQ(4, gamma->getListSize());
+    EXPECT_EQ(1, klong->getListSize());
+    EXPECT_EQ(0, vpho->getListSize());
+
+    // now test the combiner functions and functionality
+    ParticleGenerator combiner3("vpho:test -> gamma:test gamma:test K_L0:test");
+    combiner3.init();
+    while (combiner3.loadNext()) {
+      const Particle& particle = combiner3.getCurrentParticle();
+
+      const std::vector<int>& indices = particle.getDaughterIndices();
+      EXPECT_FALSE(isForbidden(indices)); // check we don't have particles 3 and 4
+
+      particles.appendNew(particle);
+      int iparticle = particles.getEntries() - 1;
+
+      vpho->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+    }
+    // a somewhat redundant check, but there are only 3 acceptable combinations in this test.
+    EXPECT_EQ(3, vpho->getListSize());
+
+    // similar test but with two bodies
+    ParticleGenerator combiner2("vpho:test -> gamma:test K_L0:test");
+    combiner2.init();
+    while (combiner2.loadNext()) {
+      const Particle& particle = combiner2.getCurrentParticle();
+
+      const std::vector<int>& indices = particle.getDaughterIndices();
+      EXPECT_FALSE(isForbidden(indices)); // check we don't have particles 3 and 4
+
+      particles.appendNew(particle);
+      int iparticle = particles.getEntries() - 1;
+
+      vpho->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+    }
+    // there are another 3 acceptable combinations
+    EXPECT_EQ(6, vpho->getListSize());
+  }
+
   TEST_F(ParticleCombinerTest, FSPCopies)
   {
     // create particles
@@ -960,15 +1085,15 @@ namespace {
         // loop over all pairs of particles within these two lists
         // this is overkill (not optimal), but for testing purposes
         // the execution time is not a concern
-        for (unsigned int k = 0; k < iAll.size(); k++) {
-          for (unsigned int m = 0; m < jAll.size(); m++) {
-            const Particle* iP = particles[iAll[k]];
-            const Particle* jP = particles[jAll[m]];
+        for (int k : iAll) {
+          for (int m : jAll) {
+            const Particle* iP = particles[k];
+            const Particle* jP = particles[m];
 
             bool copies = iP->isCopyOf(jP);
 
-            int iID = comb7.getUniqueID(iAll[k]);
-            int jID = comb7.getUniqueID(jAll[m]);
+            int iID = comb7.getUniqueID(k);
+            int jID = comb7.getUniqueID(m);
 
             EXPECT_TRUE(iID > 0);
             EXPECT_TRUE(jID > 0);

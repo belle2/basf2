@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <analysis/KFit/KFitTrack.h>
 
@@ -19,7 +19,7 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 
 
-KFitTrack::KFitTrack(void)
+KFitTrack::KFitTrack()
 {
   this->m_PXEBefore.m_P  = HepLorentzVector();
   this->m_PXEBefore.m_X  = HepPoint3D();
@@ -34,15 +34,7 @@ KFitTrack::KFitTrack(void)
 }
 
 
-KFitTrack::KFitTrack(const KFitTrack& a) :
-  m_PXEBefore(a.m_PXEBefore),
-  m_PXEAfter(a.m_PXEAfter),
-  m_Charge(a.m_Charge),
-  m_Mass(a.m_Mass),
-  m_Vertex(a.m_Vertex),
-  m_VertexError(a.m_VertexError)
-{
-}
+KFitTrack::KFitTrack(const KFitTrack& a)  = default;
 
 
 KFitTrack::KFitTrack
@@ -81,9 +73,7 @@ KFitTrack::KFitTrack
 }
 
 
-KFitTrack::~KFitTrack(void)
-{
-}
+KFitTrack::~KFitTrack() = default;
 
 
 KFitTrack&
@@ -188,28 +178,28 @@ KFitTrack::getError(const int flag) const
 
 
 double
-KFitTrack::getCharge(void) const
+KFitTrack::getCharge() const
 {
   return m_Charge;
 }
 
 
 double
-KFitTrack::getMass(void) const
+KFitTrack::getMass() const
 {
   return m_Mass;
 }
 
 
 const HepPoint3D
-KFitTrack::getVertex(void) const
+KFitTrack::getVertex() const
 {
   return m_Vertex;
 }
 
 
 const HepSymMatrix
-KFitTrack::getVertexError(void) const
+KFitTrack::getVertexError() const
 {
   return m_VertexError;
 }

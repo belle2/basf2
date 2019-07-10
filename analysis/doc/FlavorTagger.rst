@@ -100,7 +100,7 @@ ECL and KLM clusters.
 
 In the first step a dedicated ParticleList is created for each type of
 reconstructed tracks (electrons, muons, Kaons, pions and protons). The
-particles in each list correspond to the whole set of `RestOfEvent` (ROE) tracks
+particles in each list correspond to the whole set of :doc:`RestOfEvent` (ROE) tracks
 fitted with a specific mass hypothesis. The mass hypothesis of each
 ParticleList corresponds to the searched flavor signature, e.g. "K+:KaonROE" is
 created for the categories using the information of kaons. Several flavor
@@ -159,27 +159,27 @@ At the beginning of your steering file you have to import:
 
 Do not forget to buildRestOfEvent for your ``B0`` recoParticle before calling the flavor tagger.
 
-If you just want to use the flavor tagger as standard user you only need:
+If you just want to use the flavor tagger as standard user you need only:
 
 :: 
 
   ft.flavorTagger( particleLists=['B0:yourSignalBlist'], weightFiles='B2nunubarBGx1')
 
-and to add the nTuple tools as explained below. BGx1 stays for MC generated
+and to add the ``flavor_tagging`` variables to your nTuple as explained below. BGx1 stays for MC generated
 with machine Background. Only BGx1 files are provided centrally.
  
-If you use a release that is older tha release-03 or if you use converted Belle MC/data please use 
+If you use a release that is older than release-03 please use 
 
 ::
 
   weightFiles='B2JpsiKs_muBGx1'
 
-The reason for the different names of the weight files is that the flavor tagger for Belle II 
-is trained with MC samples for the signal channel :math:`B^0 \to \overline{\nu}\nu` which has
-no built in CP violation. This is needed to avoid that the flavorTagger learns CP asymmetries
-on the tag side. This effect was discovered first before release-03. Belle is not sensitive to
-this effect due to its wider beam spot and therefore training with :math:`B^0 \to J/\Psi K^0_{\rm S}` 
-is ok for Belle MC/data.
+The current flavor tagger is trained with MC samples for the signal channel 
+:math:`B^0 \to \overline{\nu}\nu` which has
+no built-in CP violation. This is needed to avoid that the flavorTagger learns CP asymmetries
+on the tag side. This effect was discovered first before release-03. 
+Before release-03-01-00, the flavor tagger was trained with MC samples for the signal channel 
+:math:`B^0 \to J/\Psi K^0_{\rm S}`.
 
 The full interface of :func:`flavorTagger` function has 10 possible arguments and it is described below.
 
@@ -188,12 +188,12 @@ How to get the weight files?
 
 To download the weightfiles from the conditionsdb you have to append a special global tag 
 that depends on the release that you are using.
-Therefore, one needs to add in the
+You need to add in the
 steering file right before calling the flavor tagger:
 
 ::
  
-  basf2.use_central_database("analysis_tools_release-03")
+  basf2.use_central_database("analysis_tools_release-03-01-00")
 
 +---------------------------+-------------------------------------------+
 | Release                   | Global DataBase Tag                       |
@@ -208,9 +208,9 @@ Saving to nTuples
 
 The flavor tagger provides the output of the two combiners and the outputs 
 of the 13 categories. It provides also the MC information relevant for the categories. 
-To save this information you just have to add the predefined predefined list
+To save this information you just have to add the predefined list
 ``ft.flavor_tagging``
-to the variables that you use as argument for the module :func:`variablesToNtuple`.
+to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be
 found in the ntupleTree of the output root file: ``FBDT_qrCombined`` or

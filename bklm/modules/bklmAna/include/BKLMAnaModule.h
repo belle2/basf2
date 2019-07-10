@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMANA_H
-#define BKLMANA_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -19,9 +18,9 @@
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include "TFile.h"
+#include <TH1F.h>
+#include <TH2F.h>
 #include "TTree.h"
-#include "TCanvas.h"
-#include "TH2D.h"
 
 #include <map>
 #include <iostream>
@@ -148,5 +147,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //MODULEBKLMANA_H 

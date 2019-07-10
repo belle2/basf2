@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMRAWHIT_H
-#define BKLMRAWHIT_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -97,5 +96,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //BKLMRAWHIT_H

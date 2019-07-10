@@ -4,6 +4,7 @@
 #include <framework/core/HistoModule.h>
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
+#include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
 #include <trg/ecl/TrgEclCluster.h>
@@ -51,10 +52,14 @@ namespace Belle2 {
     TH1* h_TCphiId_BR;
     //! TCphiId histogram
     TH1* h_TCphiId_FWD;
-    //! TCphiId histogram
+    //! TC Energy
     TH1* h_TCEnergy;
     //! Total  Energy
     TH1* h_TotalEnergy;
+    //! TC Energy histogram on narrow range
+    TH1* h_Narrow_TCEnergy;
+    //! Total  Energy  on narrow range
+    TH1* h_Narrow_TotalEnergy;
     //! N of TC Hit / event
     TH1* h_n_TChit_event;
     //! N of Cluster / event
@@ -63,7 +68,14 @@ namespace Belle2 {
     TH1* h_TCTiming;
     //! Event Timing / event
     TH1* h_TRGTiming;
-
+    //! TC Timing / event
+    TH1* h_Cal_TCTiming;
+    //! Event Timing / event
+    TH1* h_Cal_TRGTiming;
+    //! ECL Trigger Bit
+    TH1* h_ECL_TriggerBit;
+    //! Energy sum of 2 Top energetic clusters when 3D bhabnha bit on
+    TH1* h_Cluster_Energy_Sum;
 
 
     //! Hit TCId
@@ -85,6 +97,8 @@ namespace Belle2 {
     StoreArray<TRGECLUnpackerStore> trgeclHitArray;
     StoreArray<TRGECLUnpackerEvtStore> trgeclEvtArray;
     StoreArray<TRGECLCluster> trgeclCluster;
+    StoreArray<TRGECLUnpackerSumStore> trgeclSumArray;
+
   };
 
 }

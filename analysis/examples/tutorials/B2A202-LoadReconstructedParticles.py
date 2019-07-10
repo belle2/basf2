@@ -38,7 +38,7 @@ ma.inputMdst(environmentType='default',
              path=my_path)
 
 # print contents of the DataStore before loading Particles
-ma.printDataStore()
+ma.printDataStore(path=my_path)
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
@@ -68,7 +68,7 @@ stdPi0s(listtype='looseFit', path=my_path)
 stdKlongs(listtype='all', path=my_path)  # only create the 'all' list with no cuts
 
 # print contents of the DataStore after loading Particles
-ma.printDataStore()
+ma.printDataStore(path=my_path)
 
 # print out the contents of each ParticleList
 ma.printList('gamma:all', False, path=my_path)

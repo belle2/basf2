@@ -17,7 +17,6 @@
 #include <arich/dbobjects/ARICHMergerMapping.h>
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>

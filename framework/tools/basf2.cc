@@ -34,6 +34,7 @@
 
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
+#include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
@@ -44,7 +45,7 @@
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
 #include <unistd.h>
-#include <signal.h>
+#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
@@ -135,6 +136,10 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("random-seed", prog::value<string>(),
+     "Set the default initial seed for the random number generator. "
+     "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "
+     "If no seed is set via either of these mechanisms, the initial seed will be taken from the system's entropy pool.")
     ("debug_level,d", prog::value<unsigned int>(), "Set default debug level. Also sets the log level to DEBUG.")
     ("events,n", prog::value<unsigned int>(), "Override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("run", prog::value<int>(), "Override run for EventInfoSetter, must be used with -n and --experiment")
@@ -252,7 +257,8 @@ int main(int argc, char* argv[])
           "--callgrind-out-file=callgrind." + profileModule + ".%p",
         };
         //As execvp wants non-const char* pointers we have to copy the string contents.
-        for (auto arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
+        cmd.reserve(valgrind_argv.size());
+        for (const auto& arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
         //And now we add our own arguments, including the program name.
         for (int i = 0; i < argc; ++i)  { cmd.push_back(argv[i]); }
         //Finally, execvp wants a nullptr as last argument
@@ -304,13 +310,13 @@ int main(int argc, char* argv[])
 
     // -i
     if (varMap.count("input")) {
-      const vector<string>& names = varMap["input"].as<vector<string> >();
+      const auto& names = varMap["input"].as<vector<string>>();
       Environment::Instance().setInputFilesOverride(names);
     }
 
     // -S
     if (varMap.count("sequence")) {
-      const vector<string>& sequences = varMap["sequence"].as<vector<string> >();
+      const auto& sequences = varMap["sequence"].as<vector<string>>();
       Environment::Instance().setEntrySequencesOverride(sequences);
     }
 
@@ -365,6 +371,10 @@ int main(int argc, char* argv[])
 
     if (varMap.count("dump-path")) {
       Environment::Instance().setPicklePath(varMap["dump-path"].as<string>());
+    }
+
+    if (varMap.count("random-seed")) {
+      RandomNumbers::initialize(varMap["random-seed"].as<string>());
     }
 
 

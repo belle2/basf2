@@ -28,13 +28,18 @@
 
 namespace TreeFitter {
 
+  //externs
   bool massConstraintType;
   std::vector<int> massConstraintListPDG;
+  std::vector<int> fixedToMotherVertexListPDG;
+  std::vector<int> geoConstraintListPDG;
   std::vector<std::string> removeConstraintList;
+  bool automatic_vertex_constraining;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
     m_particle(particle),
     m_mother(mother),
+    m_isStronglyDecayingResonance(false),
     m_index(0),
     m_pdgMass(particle->getPDGMass()),
     m_pdgWidth(0),
@@ -43,6 +48,7 @@ namespace TreeFitter {
     m_name("Unknown")
   {
     if (particle) {
+      m_isStronglyDecayingResonance = isAResonance(particle);
       const int pdgcode = particle->getPDGCode();
       if (pdgcode) { // PDG code != 0
 
@@ -59,8 +65,9 @@ namespace TreeFitter {
 
 
   ParticleBase::ParticleBase(const std::string& name) :
-    m_particle(NULL),
-    m_mother(NULL),
+    m_particle(nullptr),
+    m_mother(nullptr),
+    m_isStronglyDecayingResonance(false),
     m_index(0),
     m_pdgMass(0),
     m_pdgWidth(0),
@@ -88,7 +95,7 @@ namespace TreeFitter {
 
   void ParticleBase::removeDaughter(const ParticleBase* pb)
   {
-    std::vector<ParticleBase*>::iterator iter = std::find(m_daughters.begin(), m_daughters.end(), pb);
+    auto iter = std::find(m_daughters.begin(), m_daughters.end(), pb);
     if (iter != m_daughters.end()) {
       delete *iter;
       m_daughters.erase(iter);
@@ -119,15 +126,15 @@ namespace TreeFitter {
 
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
   {
-    ParticleBase* rc = 0;
+    ParticleBase* rc = nullptr;
 
     if (!mother) { // 'head of tree' particles
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
-        rc = new InternalParticle(particle, 0, forceFitAll);
+        rc = new InternalParticle(particle, nullptr, forceFitAll);
 
       } else {
 
-        rc = new InternalParticle(particle, 0, forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
+        rc = new InternalParticle(particle, nullptr, forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
 
       }
 
@@ -194,7 +201,7 @@ namespace TreeFitter {
   bool ParticleBase::isAResonance(Belle2::Particle* particle)
   {
     bool rc = false ;
-    const int pdgcode = particle->getPDGCode();
+    const int pdgcode = std::abs(particle->getPDGCode());
 
     if (pdgcode && !(particle->getMdstArrayIndex())) {
       switch (pdgcode) {
@@ -206,7 +213,6 @@ namespace TreeFitter {
         case 11:
           rc = true ;
           break ;
-
         default: //everything with boosted flight length less than 1 micrometer
           rc = (pdgcode && pdgLifeTime(particle) < 1e-5);
       }
@@ -232,14 +238,14 @@ namespace TreeFitter {
     const int posindex = posIndex();
     if (posindex >= 0) {
       for (int i = 0; i < 3; ++i) {
-        fitparams.getCovariance()(posindex + i, posindex + i) = 50;
+        fitparams.getCovariance()(posindex + i, posindex + i) = 1000;
       }
     }
 
     // momentum
     const int momindex = momIndex();
     if (momindex >= 0) {
-      const double initVal = 0.5;
+      const double initVal = 10;
       const int maxrow = hasEnergy() ? 4 : 3;
 
       for (int i = 0; i < maxrow; ++i) {
@@ -250,15 +256,9 @@ namespace TreeFitter {
     const int tauindex = tauIndex();
 
     if (tauindex >= 0) {
-
-      /** cant multiply by momentum here because unknown but average mom is 3 Gev */
-      /** if pdgMass = 0 then tauindex is always = -1, so this is safe */
-
-      const double maxDecayLengthSigma = 1000;
-      double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass() * 3;
-      double sigtau = tau > 0 ? std::min(20 * tau, maxDecayLengthSigma)  : maxDecayLengthSigma;
-
-      fitparams.getCovariance()(tauindex, tauindex) = sigtau * sigtau;
+      // this is very sensitive and can heavily effect the
+      // efficency of the fits
+      fitparams.getCovariance()(tauindex, tauindex) = 1;
     }
     return status;
   }
@@ -282,7 +282,7 @@ namespace TreeFitter {
 
   const ParticleBase* ParticleBase::locate(Belle2::Particle* particle) const
   {
-    const ParticleBase* rc = (m_particle == particle) ? this : 0;
+    const ParticleBase* rc = (m_particle == particle) ? this : nullptr;
     if (!rc) {
       for (auto* daughter : m_daughters) {
         rc = daughter->locate(particle);
@@ -332,7 +332,6 @@ namespace TreeFitter {
     const Eigen::Matrix<double, 1, 3> x_m = fitparams.getStateVector().segment(posindexmother, 3);
 
     double tau = fitparams.getStateVector()(tauindex);
-
     // linear approximation is fine
     for (int row = 0; row < 3; ++row) {
       double posxmother = x_m(row);
@@ -343,17 +342,16 @@ namespace TreeFitter {
        *  that is why we do not extract the distance as a vector here
        * */
       p.getResiduals()(row) = posxmother + tau * momx / mom - posx ;
-
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, posindex + row) = -1;
       p.getH()(row, tauindex) = momx / mom;
     }
-
+    //diagonal momentum
     p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
     p.getH()(1, momindex + 1) = tau * (p_vec(0) * p_vec(0) + p_vec(2) * p_vec(2)) / mom3 ;
     p.getH()(2, momindex + 2) = tau * (p_vec(1) * p_vec(1) + p_vec(0) * p_vec(0)) / mom3 ;
 
-
+    //offdiagonal momentum
     p.getH()(0, momindex + 1) = - tau * p_vec(0) * p_vec(1) / mom3 ;
     p.getH()(0, momindex + 2) = - tau * p_vec(0) * p_vec(2) / mom3 ;
 
@@ -362,6 +360,7 @@ namespace TreeFitter {
 
     p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
     p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
+
     return ErrCode(ErrCode::Status::success);
   }
 
@@ -492,15 +491,12 @@ namespace TreeFitter {
     const int tauindex = tauIndex();
     if (tauindex >= 0 && hasPosition()) {
 
-      assert(mother());
-
-      /**
-       * In principle we have to divide by a momentum here but since the initial momentum is unknown
-       * and is maximally a factor of 5 we don't need to do that here
-       * */
-      const double value = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
-
-      fitparams.getStateVector()(tauindex) = value;
+      const int posindex = posIndex();
+      const int mother_ps_index = mother()->posIndex();
+      const Eigen::Matrix<double, 1 , 3 > vertex_dist = fitparams.getStateVector().segment(posindex,
+                                                        3) - fitparams.getStateVector().segment(mother_ps_index, 3);
+      const Eigen::Matrix<double, 1, 3 > mom = fitparams.getStateVector().segment(momIndex(), 3);
+      fitparams.getStateVector()(tauindex) = std::abs(vertex_dist.dot(mom)) / mom.norm();
     }
 
     return ErrCode(ErrCode::Status::success);

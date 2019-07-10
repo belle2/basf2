@@ -3,12 +3,16 @@
 Event based analysis
 ====================
 
-.. note::
-        The analysis software framework is designed to work with particles. In the default candidate-wise paradigm the analyst takes lists of particles, builds up candidates, loads analysis modules, and saves information (i.e. using the NtupleMaker) for each candidate. If you are new, it is probably best to start with this approach.
+.. note:: 
+
+        The analysis software framework is designed to work with particles.
+        In the default candidate-wise paradigm the analyst takes lists of particles, builds up candidates, loads analysis modules, and saves information (i.e. using the NtupleMaker) for each candidate. 
+        If you are new, it is probably best to start with this approach.
 
 In some situations, it is useful to make cuts on, and write out event-wise information.
 
 .. warning::
+
         Please note that this use model and the documentation are under development. 
         Things may not immediately work. 
 
@@ -65,4 +69,5 @@ Here is a list of event based variables on which you can make a cut using the ab
 
 .. b2-variables::
    :description-regex-filter: ^\[Eventbased\].*
+   :noindex:
 

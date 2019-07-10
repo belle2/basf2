@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMTRACK_H
-#define BKLMTRACK_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVectorD.h>
@@ -129,5 +128,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //BKLMTRACK_H

@@ -97,7 +97,7 @@ void RestOfEventBuilderModule::createNestedROE()
   for (unsigned i = 0; i < nParticles; i++) {
     const Particle* particle = plist->getParticle(i);
     // check if a Particle object is already related to a RestOfEvent object
-    RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
+    auto* check_roe = particle->getRelated<RestOfEvent>();
     if (check_roe != nullptr) {
       return;
     }
@@ -137,7 +137,7 @@ void RestOfEventBuilderModule::createROE()
     const Particle* particle = plist->getParticle(i);
 
     // check if a Particle object is already related to a RestOfEvent object
-    RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
+    auto* check_roe = particle->getRelated<RestOfEvent>();
     if (check_roe != nullptr)
       return;
 
@@ -246,22 +246,22 @@ void RestOfEventBuilderModule::printParticle(const Particle* particle)
   B2INFO("[RestOfEventBuilderModule] tracks  : ");
 
   std::string printout;
-  for (unsigned i = 0; i < trackFSPs.size(); i++)
-    printout += std::to_string(trackFSPs[i]) + " ";
+  for (int trackFSP : trackFSPs)
+    printout += std::to_string(trackFSP) + " ";
   B2INFO(printout);
 
   printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] eclFSPs : ");
-  for (unsigned i = 0; i < eclFSPs.size(); i++)
-    printout += std::to_string(eclFSPs[i]) + " ";
+  for (int eclFSP : eclFSPs)
+    printout += std::to_string(eclFSP) + " ";
   B2INFO(printout);
 
   printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] klmFSPs : ");
-  for (unsigned i = 0; i < klmFSPs.size(); i++)
-    printout += std::to_string(klmFSPs[i]) + " ";
+  for (int klmFSP : klmFSPs)
+    printout += std::to_string(klmFSP) + " ";
   B2INFO(printout);
 
 }

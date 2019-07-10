@@ -3,20 +3,38 @@ from enum import Enum
 
 class RunTypes(Enum):
     """Enum of possible run types"""
+    # beam (thank you documentation check)
     beam = "beam"
+    # cosmics (thank you documentation check)
     cosmic = "cosmic"
 
 
 class SoftwareTriggerModes(Enum):
     """Enum of possible software trigger modes"""
+    # monitor (thank you documentation check)
     monitor = "monitor"
+    # filter (thank you documentation check)
     filter = "filter"
 
 
 class Location(Enum):
     """Enum of possible run locations"""
+    # hlt (thank you documentation check)
     hlt = "hlt"
+    # expressreco (thank you documentation check)
     expressreco = "expressreco"
+
+
+class DQMModes(Enum):
+    """Split between DQM modules that need to run on all events and on the filtered ones"""
+    # DQM modules which should run on dismissed and non_dismissed events
+    all_events = "all_events"
+    # DQM modules which should run before every reconstruction
+    before_reco = "before_reco"
+    # DQM modules which should only run on the filtered ones
+    filtered = "filtered"
+    # If not in HLT, just all all DQM modules
+    dont_care = "dont_care"
 
 
 # Always store those objects

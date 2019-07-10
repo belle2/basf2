@@ -82,7 +82,9 @@ namespace Belle2 {
       /// Get number of hits in track that are correctly matched
       unsigned int getNumberOfCorrectHits(const CDCTrack* ptrCDCTrack) const;
 
+      /// Reference to a CDCMCTrackLookUp instance, assigned in the constructor of this functor
       const CDCMCTrackLookUp& m_CDCMCTrackLookUp;
+      /// Reference to a CDCMCHitLookUp instance, assigned in the constructor of this functor
       const CDCMCHitLookUp& m_CDCMCHitLookUp;
     };
   } // namespace TrackFindingCDC

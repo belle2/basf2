@@ -215,12 +215,12 @@ def get_argument_parser(modes=None):
              "actually executing thesteering files (for debugging purposes).",
         action='store_true'
     )
-    # todo: use the options keyword here?
     parser.add_argument(
         "-m",
         "--mode",
         help="The mode which will be used for running the validation. "
-             "Possible values: " + str(modes) + " Default is 'local'",
+             "Possible values: " + ", ".join(modes) + ". Default is 'local'",
+        choices=modes,
         type=str,
         nargs='?',
         default='local'
@@ -281,10 +281,18 @@ def get_argument_parser(modes=None):
     )
     parser.add_argument(
         "--send-mails",
-        help="Send email to the contact personswho have failed comparison "
-             "plots. Mail is sent fromb2soft@mail.desy.de via "
+        help="Send email to the contact persons who have failed comparison "
+             "plots. Mail is sent from b2soft@mail.desy.de via "
              "/usr/sbin/sendmail.",
         action='store_true')
+    parser.add_argument(
+        "--send-mails-mode",
+        help="How to send mails: Full report, incremental report (new/changed "
+             "warnings/failures only) or automatic (default; follow hard coded "
+             "rule, e.g. full reports every Monday).",
+        choices=["full", "incremental", "automatic"],
+        default="automatic"
+    )
     parser.add_argument(
         "-q",
         "--quiet",
@@ -455,14 +463,12 @@ def index_from_revision(revision, work_folder):
         be found for 'revision'
     """
 
-    # If the requested revision exists, return its index
-    if revision in available_revisions(work_folder):
-        index = available_revisions(work_folder).index(revision)
-    # Else return a None object
-    else:
-        index = None
+    revisions = available_revisions(work_folder) + ["reference"]
 
-    return index
+    if revision in revisions:
+        return revisions.index(revision)
+    else:
+        return None
 
 
 def get_log_file_paths(logger):

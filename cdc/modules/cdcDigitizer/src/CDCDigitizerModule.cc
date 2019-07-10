@@ -398,12 +398,40 @@ void CDCDigitizerModule::event()
       continue;
     }
 
+    // For TOT simulation, calculate drift length from In to the wire, and Out to the wire. The calculation is apprximate ignoring wire sag (this would be ok because TOT simulation is not required to be so accurate).
+    const double a = bwpAlign.X();
+    const double b = bwpAlign.Y();
+    const double c = bwpAlign.Z();
+    const TVector3 fmbAlign = fwpAlign - bwpAlign;
+    const double lmn = 1. / fmbAlign.Mag();
+    const double l = fmbAlign.X() * lmn;
+    const double m = fmbAlign.Y() * lmn;
+    const double n = fmbAlign.Z() * lmn;
+
+    double dx = m_aCDCSimHit->getPosIn().X() - a;
+    double dy = m_aCDCSimHit->getPosIn().Y() - b;
+    double dz = m_aCDCSimHit->getPosIn().Z() - c;
+    double sub = l * dx + m * dy + n * dz;
+    const double driftLFromIn = sqrt(dx * dx + dy * dy + dz * dz - sub * sub);
+
+    dx = m_aCDCSimHit->getPosOut().X() - a;
+    dy = m_aCDCSimHit->getPosOut().Y() - b;
+    dz = m_aCDCSimHit->getPosOut().Z() - c;
+    sub = l * dx + m * dy + n * dz;
+    const double driftLFromOut = sqrt(dx * dx + dy * dy + dz * dz - sub * sub);
+
+    const double maxDriftL = std::max(driftLFromIn, driftLFromOut);
+    const double minDriftL = m_driftLength;
+    B2DEBUG(29, "driftLFromIn= " << driftLFromIn << " driftLFromOut= " << driftLFromOut << " minDriftL= " << minDriftL << " maxDriftL= "
+            <<
+            maxDriftL << "m_driftLength= " << m_driftLength);
+
     iterSignalMap = signalMap.find(m_wireID);
 
     if (iterSignalMap == signalMap.end()) {
       // new entry
       //      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdE)));
-      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, adcCount)));
+      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, adcCount, maxDriftL, minDriftL)));
       B2DEBUG(29, "Creating new Signal with encoded wire number: " << m_wireID);
     } else {
       // ... smallest drift time has to be checked, ...
@@ -427,6 +455,12 @@ void CDCDigitizerModule::event()
       // ... total charge has to be updated.
       //      iterSignalMap->second.m_charge += hitdE;
       iterSignalMap->second.m_charge += adcCount;
+
+      // set max and min driftLs
+      if (iterSignalMap->second.m_maxDriftL < maxDriftL) iterSignalMap->second.m_maxDriftL = maxDriftL;
+      if (iterSignalMap->second.m_minDriftL > minDriftL) iterSignalMap->second.m_minDriftL = minDriftL;
+      B2DEBUG(29, "maxDriftL in struct= " << iterSignalMap->second.m_maxDriftL << "minDriftL in struct= " <<
+              iterSignalMap->second.m_minDriftL);
     }
 
     // add one hit per trigger time window to the trigger signal map
@@ -485,7 +519,16 @@ void CDCDigitizerModule::event()
     //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.
     unsigned short tdcCount = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
                                                           m_tdcBinWidthInv + 0.5);
-    CDCHit* firstHit = m_cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first);
+
+    //calculate tot; hard-coded currently
+    double deltaDL = iterSignalMap->second.m_maxDriftL - iterSignalMap->second.m_minDriftL;
+    if (deltaDL < 0.) {
+      B2DEBUG(29, "negative deltaDL= " << deltaDL);
+      deltaDL = 0.;
+    }
+    const unsigned short tot = std::min(std::round(5.92749 * deltaDL + 2.59706), 29.);
+
+    CDCHit* firstHit = m_cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first, 0, tot);
     //    std::cout <<"firsthit?= " << firstHit->is2ndHit() << std::endl;
     //set a relation: CDCSimHit -> CDCHit
     cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);
@@ -504,7 +547,7 @@ void CDCDigitizerModule::event()
       unsigned short tdcCount2 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime2) *
                                                              m_tdcBinWidthInv + 0.5);
       if (tdcCount2 != tdcCount) {
-        CDCHit* secondHit = m_cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first);
+        CDCHit* secondHit = m_cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first, 0, tot);
         secondHit->set2ndHitFlag();
         secondHit->setOtherHitIndices(firstHit);
         //  std::cout <<"2ndhit?= " << secondHit->is2ndHit() << std::endl;
@@ -535,7 +578,7 @@ void CDCDigitizerModule::event()
                                                                  m_tdcBinWidthInv + 0.5);
           //          std::cout << "tdcCount3= " << tdcCount3 << " " << tdcCount << std::endl;
           if (tdcCount3 != tdcCount) {
-            CDCHit* secondHit = m_cdcHits.appendNew(tdcCount3, adcCount, iterSignalMap->first);
+            CDCHit* secondHit = m_cdcHits.appendNew(tdcCount3, adcCount, iterSignalMap->first, 0, tot);
             secondHit->set2ndHitFlag();
             secondHit->setOtherHitIndices(firstHit);
             //      secondHit->setOtherHitIndex(firstHit->getArrayIndex());
@@ -829,4 +872,3 @@ void CDCDigitizerModule::setFEElectronics()
     }
   }
 }
-

@@ -185,7 +185,7 @@ def plotInputVariablesOfFlavorTagger():
         tree = ROOT.TChain(treeName)
 
         workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled*.root')
-        print("workingFiles = ", workingFiles)
+        # print("workingFiles = ", workingFiles)
         # workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled1?.root')
 
         for iFile in workingFiles:

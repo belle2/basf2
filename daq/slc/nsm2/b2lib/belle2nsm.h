@@ -16,12 +16,14 @@ extern "C" {
 }
 #endif
 
-const void* b2nsm_getwrapptr();
-int b2nsm_setwrapptr(const void* ptr);
+void* b2nsm_getwrapptr();
+int b2nsm_setwrapptr(void* ptr);
 int b2nsm_addincpath(const char* path);
 const char* b2nsm_nodename(int nodeid);
 int b2nsm_nodeid(const char* nodename);
 int b2nsm_nodepid(const char* nodename);
+int b2nsm_nodeproc(const char* nodename);
+const char* b2nsm_reqname(int reqid);
 int b2nsm_reqid(const char* reqname);
 int b2nsm_loghook(NSMmsg* msg, NSMcontext* nsmc);
 void b2nsm_checkpoint(NSMcontext* nsmc, int val);
@@ -46,6 +48,7 @@ int b2nsm_wait(float timeout);
 NSMcontext* b2nsm_init2(const char* nodename, int usesig, const char* host,
                         int port, int shmkey);
 NSMcontext* b2nsm_init(const char* nodename);
+int b2nsm_term();
 
 void nsmlib_log(const char* fmt, ...);
 #define b2nsm_printf nsmlib_log

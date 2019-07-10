@@ -82,7 +82,7 @@ bool BKLMTrackFinder::filter(std::list<BKLMHit2d*>& seed,
 
   // Fit with new hits
   double chisqr = m_Fitter->fit(track);
-  B2DEBUG(1, "BKLMTrackFinder:" << "ChiSqr: " << chisqr);
+  B2DEBUG(20, "BKLMTrackFinder:" << "ChiSqr: " << chisqr);
 
   // Do this the hard way to count each layer separately.
   std::list<int> hitLayers;

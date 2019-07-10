@@ -66,7 +66,6 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       if (!mcParticles) {
-        B2ERROR("Cannot find MCParticles array.");
         return 0.0;
       }
       for (const MCParticle& mcp : mcParticles) {
@@ -126,16 +125,6 @@ namespace Belle2 {
     {
       StoreArray<KLMCluster> klmClusters;
       return klmClusters.getEntries();
-    }
-
-    double KLMEnergy(const Particle*)
-    {
-      StoreArray<KLMCluster> klmClusters;
-      double result = 0;
-      for (int i = 0; i < klmClusters.getEntries(); ++i) {
-        result += klmClusters[i]->getMomentum().Energy();
-      }
-      return result;
     }
 
     double expNum(const Particle*)
@@ -501,8 +490,6 @@ namespace Belle2 {
                       "consider totalEnergyOfParticlesInList(gamma:all) instead");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] number of KLM in the event");
-    REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
-                      "[Eventbased] total energy in KLM in the event");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
                       "[Eventbased] number of MCParticles in the event");
 

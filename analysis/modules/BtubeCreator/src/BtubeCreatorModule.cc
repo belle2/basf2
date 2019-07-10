@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sourav Dey                                               *
+ * Contributors: Sourav Dey, Abi Soffer                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,7 +21,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
-#include <analysis/dataobjects/Btube.h>
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
@@ -57,10 +56,6 @@ BtubeCreatorModule::BtubeCreatorModule() : Module(),
   addParam("verbosity", m_verbose, "print statements", false);
 }
 
-BtubeCreatorModule::~BtubeCreatorModule()
-{
-}
-
 void BtubeCreatorModule::initialize()
 {
   // magnetic field
@@ -71,10 +66,8 @@ void BtubeCreatorModule::initialize()
   m_beamSpotCov = m_beamParams->getCovVertex();
   B2INFO("BtubeCreator : magnetic field = " << m_Bfield);
 
-  StoreArray<Particle> PARTICLES;
-  StoreArray<Btube> tubeconstraint;
-  tubeconstraint.registerInDataStore();
-  PARTICLES.registerRelationTo(tubeconstraint);
+  tubeArray.registerInDataStore();
+  particles.registerRelationTo(tubeArray);
 }
 
 void BtubeCreatorModule::event()
@@ -84,7 +77,6 @@ void BtubeCreatorModule::event()
     B2ERROR("ParticleList " << m_listName << " not found");
     return;
   }
-  StoreArray<Btube> tubeArray;
   analysis::RaveSetup::initialize(1, m_Bfield);
 
   std::vector<unsigned int> toRemove;
@@ -93,68 +85,65 @@ void BtubeCreatorModule::event()
   for (unsigned i = 0; i < n; i++) {
     Particle* particle = plist->getParticle(i);
 
-    Particle* child0 = const_cast<Particle*>(particle->getDaughter(0));
-    Particle* child1 = const_cast<Particle*>(particle->getDaughter(1));
+    Particle* fullRecoB = const_cast<Particle*>(particle->getDaughter(0));
+    Particle* otherB = const_cast<Particle*>(particle->getDaughter(1));
 
-    //make a copy of child0 aka Btag
+    //make a copy of fullRecoB
 
-    Particle BtagCopy(child0->get4Vector(), child0->getPDGCode());
-    BtagCopy.setVertex(child0->getVertex());
-    BtagCopy.setMomentumVertexErrorMatrix(child0->getMomentumVertexErrorMatrix());
+    Particle fullRecoBCopy(fullRecoB->get4Vector(), fullRecoB->getPDGCode());
+    fullRecoBCopy.setVertex(fullRecoB->getVertex());
+    fullRecoBCopy.setMomentumVertexErrorMatrix(fullRecoB->getMomentumVertexErrorMatrix());
 
-    Particle* dummyP;
-    dummyP  = &BtagCopy;
-
-    TVector3 tagdecaypos(dummyP->getVertex()[0], dummyP->getVertex()[1], dummyP->getVertex()[2]);
+    TVector3 tagdecaypos(fullRecoBCopy.getVertex()[0], fullRecoBCopy.getVertex()[1], fullRecoBCopy.getVertex()[2]);
 
     if (m_verbose) {
-      cout << "B tag decay  " << endl;
-      cout << "{" << std::fixed << std::setprecision(20) << dummyP->getVertex()[0] << "," << std::fixed << std::setprecision(
-             20) << dummyP->getVertex()[1] << "," << std::fixed << std::setprecision(20) << dummyP->getVertex()[2] << "}" << endl;
+      B2DEBUG(10, "fullreco B decay  ");
+      B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << fullRecoBCopy.getVertex()[0] << "," << std::fixed << std::setprecision(
+                20) << fullRecoBCopy.getVertex()[1] << "," << std::fixed << std::setprecision(20) << fullRecoBCopy.getVertex()[2] << "}");
     }
-    bool ok0 = doVertexFit(dummyP);
+    bool ok0 = doVertexFit(&fullRecoBCopy);
 
     if (ok0) {
-      child0->writeExtraInfo("avf_fitted_ellipsoid00", dummyP->getVertexErrorMatrix()(0, 0));
-      child0->writeExtraInfo("avf_fitted_ellipsoid01", dummyP->getVertexErrorMatrix()(0, 1));
-      child0->writeExtraInfo("avf_fitted_ellipsoid02", dummyP->getVertexErrorMatrix()(0, 2));
-      child0->writeExtraInfo("avf_fitted_ellipsoid10", dummyP->getVertexErrorMatrix()(1, 0));
-      child0->writeExtraInfo("avf_fitted_ellipsoid11", dummyP->getVertexErrorMatrix()(1, 1));
-      child0->writeExtraInfo("avf_fitted_ellipsoid12", dummyP->getVertexErrorMatrix()(1, 2));
-      child0->writeExtraInfo("avf_fitted_ellipsoid20", dummyP->getVertexErrorMatrix()(2, 0));
-      child0->writeExtraInfo("avf_fitted_ellipsoid21", dummyP->getVertexErrorMatrix()(2, 1));
-      child0->writeExtraInfo("avf_fitted_ellipsoid22", dummyP->getVertexErrorMatrix()(2, 2));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid00", fullRecoBCopy.getVertexErrorMatrix()(0, 0));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid01", fullRecoBCopy.getVertexErrorMatrix()(0, 1));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid02", fullRecoBCopy.getVertexErrorMatrix()(0, 2));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid10", fullRecoBCopy.getVertexErrorMatrix()(1, 0));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid11", fullRecoBCopy.getVertexErrorMatrix()(1, 1));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid12", fullRecoBCopy.getVertexErrorMatrix()(1, 2));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid20", fullRecoBCopy.getVertexErrorMatrix()(2, 0));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid21", fullRecoBCopy.getVertexErrorMatrix()(2, 1));
+      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid22", fullRecoBCopy.getVertexErrorMatrix()(2, 2));
 
-      child0->writeExtraInfo("Px_after_avf", (dummyP->get4Vector()).Px());
-      child0->writeExtraInfo("Py_after_avf", (dummyP->get4Vector()).Py());
-      child0->writeExtraInfo("Pz_after_avf", (dummyP->get4Vector()).Pz());
-      child0->writeExtraInfo("E_after_avf", (dummyP->get4Vector()).E());
-      TVector3 tagOriginpos(dummyP->getVertex()[0], dummyP->getVertex()[1], dummyP->getVertex()[2]);
-      TLorentzVector v4Final = dummyP->get4Vector();
+      fullRecoB->writeExtraInfo("Px_after_avf", (fullRecoBCopy.get4Vector()).Px());
+      fullRecoB->writeExtraInfo("Py_after_avf", (fullRecoBCopy.get4Vector()).Py());
+      fullRecoB->writeExtraInfo("Pz_after_avf", (fullRecoBCopy.get4Vector()).Pz());
+      fullRecoB->writeExtraInfo("E_after_avf", (fullRecoBCopy.get4Vector()).E());
+      TVector3 tagOriginpos(fullRecoBCopy.getVertex()[0], fullRecoBCopy.getVertex()[1], fullRecoBCopy.getVertex()[2]);
+      TLorentzVector v4Final = fullRecoBCopy.get4Vector();
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * v4Final;
       TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
       TLorentzVector v4FinalNew = T.rotateCmsToLab() * vecNew;
 
       if (m_verbose) {
-        cout << "beamspot center :" << endl;
-        cout << "{" << std::fixed << std::setprecision(20) << m_BeamSpotCenter.X() << "," << std::fixed << std::setprecision(
-               20) << m_BeamSpotCenter.Y() << "," << std::fixed << std::setprecision(20) << m_BeamSpotCenter.Z() << "}" << endl;
-        cout << "beamspot cov" << endl;
+        B2DEBUG(10, "beamspot center :");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << m_BeamSpotCenter.X() << "," << std::fixed << std::setprecision(
+                  20) << m_BeamSpotCenter.Y() << "," << std::fixed << std::setprecision(20) << m_BeamSpotCenter.Z() << "}");
+        B2DEBUG(10, "beamspot cov");
 
-        cout << "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(0,
-             0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0,
-                 1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0, 2) << "}," << endl;
-        cout << "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(1,
-             0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(1,
-                 1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(1, 2) << "}," << endl;
-        cout << "{" << std::fixed << std::setprecision(20) << m_beamSpotCov(2,
-             0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(2,
-                 1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(2, 2) << "}" << endl;
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(0,
+                0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0,
+                    1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0, 2) << "},");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(1,
+                0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(1,
+                    1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(1, 2) << "},");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << m_beamSpotCov(2,
+                0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(2,
+                    1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(2, 2) << "}");
       }
-      TMatrixFSym pp = dummyP->getMomentumErrorMatrix().GetSub(0, 2, 0, 2, "S");
-      double pe = dummyP->getMomentumErrorMatrix()(2, 2);
-      TMatrixFSym pv = dummyP->getVertexErrorMatrix();
+      TMatrixFSym pp = (fullRecoBCopy.getMomentumErrorMatrix()).GetSub(0, 2, 0, 2, "S");
+      double pe = fullRecoBCopy.getMomentumErrorMatrix()(2, 2);
+      TMatrixFSym pv = fullRecoBCopy.getVertexErrorMatrix();
 
       // start rotation
 
@@ -194,58 +183,57 @@ void BtubeCreatorModule::event()
       tubeMat.SetSub(0, 0, pvNew);
 
       if (m_verbose) {
-        cout << "B origin error matrix  :  " << endl;
-        cout << "{" << std::fixed << std::setprecision(20) <<  pv(0, 0) << "," << std::fixed << std::setprecision(20) << pv(0,
-             1) << "," << std::fixed << std::setprecision(20) << pv(0, 2) << "}," << endl;
-        cout << "{" << std::fixed << std::setprecision(20) << pv(1, 0) << "," << std::fixed << std::setprecision(20) << pv(1,
-             1) << "," << std::fixed << std::setprecision(20) << pv(1, 2) << "}," << endl;
-        cout << "{" << std::fixed << std::setprecision(20) <<  pv(2, 0) << "," << std::fixed << std::setprecision(20) << pv(2,
-             1) << "," << std::fixed << std::setprecision(20) << pv(2, 2) << "}" << endl;
+        B2DEBUG(10, "B origin error matrix  :  ");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(0, 0) << "," << std::fixed << std::setprecision(20) << pv(0,
+                1) << "," << std::fixed << std::setprecision(20) << pv(0, 2) << "},");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(1, 0) << "," << std::fixed << std::setprecision(20) << pv(1,
+                1) << "," << std::fixed << std::setprecision(20) << pv(1, 2) << "},");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(2, 0) << "," << std::fixed << std::setprecision(20) << pv(2,
+                1) << "," << std::fixed << std::setprecision(20) << pv(2, 2) << "}");
 
-        cout << "B tube error matrix  :  " << endl;
-        cout << "{" << std::fixed << std::setprecision(20) <<  pvNew(0, 0) << "," << std::fixed << std::setprecision(20) << pvNew(0,
-             1) << "," << std::fixed << std::setprecision(20) << pvNew(0, 2) << "}," << endl;
-        cout << "{" << std::fixed << std::setprecision(20) <<  pvNew(1, 0) << "," << std::fixed << std::setprecision(20) << pvNew(1,
-             1) << "," << std::fixed << std::setprecision(20) << pvNew(1, 2) << "}," << endl;
-        cout << "{" << std::fixed << std::setprecision(20) << pvNew(2, 0) << "," << std::fixed << std::setprecision(20) << pvNew(2,
-             1) << "," << std::fixed << std::setprecision(20) << pvNew(2, 2) << "}" << endl;
+        B2DEBUG(10, "B tube error matrix  :  ");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  pvNew(0, 0) << "," << std::fixed << std::setprecision(20) << pvNew(0,
+                1) << "," << std::fixed << std::setprecision(20) << pvNew(0, 2) << "},");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  pvNew(1, 0) << "," << std::fixed << std::setprecision(20) << pvNew(1,
+                1) << "," << std::fixed << std::setprecision(20) << pvNew(1, 2) << "},");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pvNew(2, 0) << "," << std::fixed << std::setprecision(20) << pvNew(2,
+                1) << "," << std::fixed << std::setprecision(20) << pvNew(2, 2) << "}");
 
-        cout << "B origin  " << endl;
-        cout << "{" << std::fixed << std::setprecision(20) << dummyP->getVertex()[0] << "," << std::fixed << std::setprecision(
-               20) << dummyP->getVertex()[1] << "," << std::fixed << std::setprecision(20) << dummyP->getVertex()[2] << "}" << endl;
+        B2DEBUG(10, "B origin  ");
+        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << fullRecoBCopy.getVertex()[0] << "," << std::fixed << std::setprecision(
+                  20) << fullRecoBCopy.getVertex()[1] << "," << std::fixed << std::setprecision(20) << fullRecoBCopy.getVertex()[2] << "}");
       }
 
-      dummyP->setMomentumVertexErrorMatrix(errNew);
+      fullRecoBCopy.setMomentumVertexErrorMatrix(errNew);
 
       Btube* tubeconstraint = tubeArray.appendNew(Btube());
-      child1->addRelationTo(tubeconstraint);
+      otherB->addRelationTo(tubeconstraint);
       tubeconstraint->setTubeCenter(tagOriginpos);
       tubeconstraint->setTubeMatrix(tubeMat);
 
-      child1->writeExtraInfo("TubeX", dummyP->getVertex()[0]);
-      child1->writeExtraInfo("TubeY", dummyP->getVertex()[1]);
-      child1->writeExtraInfo("TubeZ", dummyP->getVertex()[2]);
+      otherB->writeExtraInfo("TubeX", fullRecoBCopy.getVertex()[0]);
+      otherB->writeExtraInfo("TubeY", fullRecoBCopy.getVertex()[1]);
+      otherB->writeExtraInfo("TubeZ", fullRecoBCopy.getVertex()[2]);
 
-      child1->writeExtraInfo("Tube00", pvNew(0, 0));
-      child1->writeExtraInfo("Tube01", pvNew(0, 1));
-      child1->writeExtraInfo("Tube02", pvNew(0, 2));
-      child1->writeExtraInfo("Tube10", pvNew(1, 0));
-      child1->writeExtraInfo("Tube11", pvNew(1, 1));
-      child1->writeExtraInfo("Tube12", pvNew(1, 2));
-      child1->writeExtraInfo("Tube20", pvNew(2, 0));
-      child1->writeExtraInfo("Tube21", pvNew(2, 1));
-      child1->writeExtraInfo("Tube22", pvNew(2, 2));
+      otherB->writeExtraInfo("Tube00", pvNew(0, 0));
+      otherB->writeExtraInfo("Tube01", pvNew(0, 1));
+      otherB->writeExtraInfo("Tube02", pvNew(0, 2));
+      otherB->writeExtraInfo("Tube10", pvNew(1, 0));
+      otherB->writeExtraInfo("Tube11", pvNew(1, 1));
+      otherB->writeExtraInfo("Tube12", pvNew(1, 2));
+      otherB->writeExtraInfo("Tube20", pvNew(2, 0));
+      otherB->writeExtraInfo("Tube21", pvNew(2, 1));
+      otherB->writeExtraInfo("Tube22", pvNew(2, 2));
 
-      child1->writeExtraInfo("tubedirX", v4FinalNew.Px());
-      child1->writeExtraInfo("tubedirY", v4FinalNew.Py());
-      child1->writeExtraInfo("tubedirZ", v4FinalNew.Pz());
+      otherB->writeExtraInfo("tubedirX", v4FinalNew.Px());
+      otherB->writeExtraInfo("tubedirY", v4FinalNew.Py());
+      otherB->writeExtraInfo("tubedirZ", v4FinalNew.Pz());
 
     }
     if (!ok0) toRemove.push_back(particle->getArrayIndex());
   }
   plist->removeParticles(toRemove);
 
-  //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
   analysis::RaveSetup::getInstance()->reset();
 }
 

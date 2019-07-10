@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sourav Dey                                               *
+ * Contributors: Sourav Dey, Abi Soffer                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,6 +22,7 @@
 // DataObjects
 #include <framework/dbobjects/BeamParameters.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/Btube.h>
 
 // rave
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
@@ -44,9 +45,6 @@ namespace Belle2 {
      */
     BtubeCreatorModule();
 
-    /** destructor */
-    virtual ~BtubeCreatorModule();
-
     /** declare data store elements */
     virtual void initialize() override;
 
@@ -58,18 +56,18 @@ namespace Belle2 {
     std::string m_listName;  /**< name of particle list */
     double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
-    //    bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
-    //std::string m_listOutput;
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
+    StoreArray<Particle> particles;
+    StoreArray<Btube> tubeArray;
+
     /**
      * Main steering routine
      * @param p pointer to particle
      * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel
      */
-    bool doVertexFit(Particle* p);
-    bool doRaveFit(Particle* q);
+    bool doVertexFit(Particle* p);  /**< does the vertex fit with RAVE :  adaptive vertex fitter mode */
     bool m_verbose;
   };
 }

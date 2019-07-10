@@ -1,7 +1,14 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Sourav Dey, Abi Soffer                                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #include <analysis/dataobjects/Btube.h>
-
 #include <framework/datastore/StoreArray.h>
-
 #include <framework/logging/Logger.h>
 #include <iostream>
 

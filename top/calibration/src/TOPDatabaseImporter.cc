@@ -420,10 +420,12 @@ namespace Belle2 {
   }
 
   void TOPDatabaseImporter::importCommonT0(double value, double error,
-                                           int expNo, int firstRun, int lastRun)
+                                           int expNo, int firstRun, int lastRun,
+                                           bool roughyCalibrated)
   {
     DBImportObjPtr<TOPCalCommonT0> commonT0;
     commonT0.construct(value, error);
+    if (roughyCalibrated) commonT0->setRoughlyCalibrated();
 
     IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
     commonT0.import(iov);

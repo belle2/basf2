@@ -154,14 +154,16 @@ namespace Belle2 {
 
         int nProducts = m_decaydescriptor.getNDaughters();
         if (mdstSourceIsV0 == false) {
-          if (nProducts > 0 and !m_useROEs)
-            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
-                    << ". DecayString should not contain any daughters, only the mother particle.");
-          if (m_useROEs and m_decaydescriptor.getNDaughters() > 0) {
-            B2INFO("ParticleLoaderModule: Replacing the source particle list name by " <<
-                   m_decaydescriptor.getDaughter(0)->getMother()->getFullName()
-                   << " all other daughters will be ignored.");
-            m_sourceParticleListName = m_decaydescriptor.getDaughter(0)->getMother()->getFullName();
+          if (nProducts > 0) {
+            if (!m_useROEs) {
+              B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                      << ". DecayString should not contain any daughters, only the mother particle.");
+            } else {
+              B2INFO("ParticleLoaderModule: Replacing the source particle list name by " <<
+                     m_decaydescriptor.getDaughter(0)->getMother()->getFullName()
+                     << " all other daughters will be ignored.");
+              m_sourceParticleListName = m_decaydescriptor.getDaughter(0)->getMother()->getFullName();
+            }
           }
         } else {
           if (nProducts != 2)

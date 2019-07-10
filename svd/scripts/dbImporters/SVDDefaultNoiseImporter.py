@@ -101,6 +101,8 @@ class defaultNoiseImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDNoiseCalibrations.name, payload, iov)
 
 
+use_database_chain()
+use_central_database("svd_onlySVDinGeoConfiguration")
 use_local_database("localDB_defaultNoiseCalibrations/database.txt", "localDB_defaultNoiseCalibrations")
 
 main = create_path()

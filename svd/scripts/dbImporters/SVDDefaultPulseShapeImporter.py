@@ -106,6 +106,8 @@ class defaultPulseShapeImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDPulseShapeCalibrations.calAmp_name, calAmp_payload, iov)
 
 
+use_database_chain()
+use_central_database("svd_onlySVDinGeoConfiguration")
 use_local_database("localDB_defaultPulseShapeCalibrations/database.txt", "localDB_defaultPulseShapeCalibrations")
 
 main = create_path()

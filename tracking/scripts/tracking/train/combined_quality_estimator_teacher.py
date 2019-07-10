@@ -1027,7 +1027,8 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                 "Date": datetime.today().strftime("%Y-%m-%d %H:%M"),
                 "Created by steering file": os.path.realpath(__file__),
                 "Created from data in": validation_harvest_path,
-                "Background files": MasterTask.bkgfiles_dir,
+                "Background directory": MasterTask.bkgfiles_dir,
+                "weight file": self.harvesting_validation_task_instance.teacherTask.weightfile_identifier
             }
             if hasattr(self, 'exclude_variables'):
                 meta_data["Excluded variables"] = ", ".join(self.exclude_variables)
@@ -1035,7 +1036,9 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             luigi_params = get_serialized_parameters(self)
             luigi_param_string = (f"\n\nb2luigi parameters for {self.__class__.__name__}\n" +
                                   format_dictionary(luigi_params))
-            title_page_text = meta_data_string + luigi_param_string
+            title_page_text = (meta_data_string +
+                               "\n(For all MVA training parameters look into the produced weight file)" +
+                               luigi_param_string)
             titlepage_ax.text(0, 1, title_page_text, ha="left", va="top", wrap=True, fontsize=8)
             pdf.savefig(titlepage_fig)
             plt.close(titlepage_fig)

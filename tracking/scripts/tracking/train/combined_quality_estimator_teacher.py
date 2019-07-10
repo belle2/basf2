@@ -1156,17 +1156,24 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             }
 
             # Iterate over each parameter and for each make stacked histograms for different QI cuts
-            kinematic_qi_cuts = [0, 0.5, 0.9]
+            kinematic_qi_cuts = [0, 0.5, 0.8]
             blue, yellow, green = plt.get_cmap("tab10").colors[0:3]
             for param in params:
                 fig, axarr = plt.subplots(ncols=len(kinematic_qi_cuts), sharey=True, sharex=True, figsize=(14, 6))
                 fig.suptitle(f"{label_by_param[param]}  distributions")
                 for i, qi in enumerate(kinematic_qi_cuts):
                     ax = axarr[i]
+                    ax.set_title(f"QI > {qi}")
                     incut = pr_df[(pr_df['quality_indicator'] > qi)]
                     incut_matched = incut[incut.is_matched.eq(True)]
                     incut_clones = incut[incut.is_clone.eq(True)]
                     incut_fake = incut[incut.is_fake.eq(True)]
+
+                    # if any series is empty, break ouf loop and don't draw try to draw a stacked histogram
+                    if any(series.empty for series in (incut, incut_matched, incut_clones, incut_fake)):
+                        ax.text(0.5, 0.5, "Not enough data in bin", ha="center", va="center", transform=ax.transAxes)
+                        continue
+
                     bins = bins_by_param[param]
                     stacked_histogram_series_tuple = (
                         incut_matched[f'{param}_estimate'],
@@ -1178,10 +1185,9 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                                              bins=bins, range=(bins.min(), bins.max()),
                                              color=(blue, green, yellow),
                                              label=("matched", "clones", "fakes"))
-                    ax.set_title(f"QI > {qi}")
                     ax.set_xlabel(f'{label_by_param[param]} estimate / ({unit_by_param[param]})')
                     ax.set_ylabel('# tracks')
-                ax.legend(loc="upper center", bbox_to_anchor=(-1, -0.15))
+                axarr[0].legend(loc="upper center", bbox_to_anchor=(0, -0.15))
                 pdf.savefig(fig, bbox_inches="tight")
                 plt.close(fig)
 

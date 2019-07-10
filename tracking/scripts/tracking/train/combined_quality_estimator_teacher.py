@@ -158,6 +158,7 @@ install_helpstring_formatter = ("\nCould not find {module} python module.Try ins
                                 "  python3 -m pip install [--user] {module}\n")
 try:
     import b2luigi as luigi
+    from b2luigi.core.utils import get_serialized_parameters
     from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
 except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="b2luigi"))
@@ -1024,7 +1025,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             if hasattr(self, 'exclude_variables'):
                 meta_data["Excluded variables"] = ", ".join(self.exclude_variables)
             meta_data_string = format_dictionary(meta_data)
-            luigi_params = self.get_serialized_parameters()
+            luigi_params = get_serialized_parameters(self)
             luigi_param_string = (f"\n\nb2luigi parameters for {self.__class__.__name__}\n" +
                                   format_dictionary(luigi_params))
             title_page_text = meta_data_string + luigi_param_string

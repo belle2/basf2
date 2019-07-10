@@ -30,6 +30,9 @@ if DefalutValue == 0:
     # Input the thickness of the matirial in the forward gap between CDC and ARICH
     thickness_CDCfor = (np.ones((16, 144)) * 1.0e-5).ravel()
 
+    # Input the thickness of the matirial in the forward gap between ARICH and TOP
+    thickness_ARICH = (np.ones((3, 144)) * 1.0e-5).ravel()
+
     # Input the thickness of the matirial in the backward gap between TOP and ECL
     thickness_TOPback = (np.ones(144) * 1.0e-5).ravel()
 
@@ -37,7 +40,7 @@ if DefalutValue == 0:
     thickness_TOPfor = (np.ones(144) * 1.0e-5).ravel()
 
     # Input the thickness of the matirial in the forward gap between ARICH and TOP
-    thickness_ARICH = (np.ones((3, 144)) * 1.0e-5).ravel()
+    thickness_ECLCOIL = (np.ones((92, 144)) * 1.0e-5).ravel()
 
     # Input the thickness of the matirial in the backward gap between barrel and endcap of ECL
     thickness_ECLback = (np.ones((3, 5, 144)) * 1.0e-5).ravel()
@@ -57,6 +60,10 @@ else:
     thickness_CDCfor = (np.loadtxt(open("thickness_CDCfor.csv", "rb"), delimiter=",")).ravel()
     thickness_CDCfor[thickness_CDCfor < 1.0e-5] = 1.0e-5
 
+    # Input the thickness of the matirial in the forward gap between ARICH and TOP
+    thickness_ARICH = (np.loadtxt(open("thickness_ARICH.csv", "rb"), delimiter=",")).ravel()
+    thickness_ARICH[thickness_ARICH < 1.0e-5] = 1.0e-5
+
     # Input the thickness of the matirial in the backward gap between TOP and ECL
     thickness_TOPback = (np.loadtxt(open("thickness_TOP_back.csv", "rb"), delimiter=",")).ravel()
     thickness_TOPback[thickness_TOPback < 1.0e-5] = 1.0e-5
@@ -65,9 +72,9 @@ else:
     thickness_TOPfor = (np.loadtxt(open("thickness_TOP_for.csv", "rb"), delimiter=",")).ravel()
     thickness_TOPfor[thickness_TOPfor < 1.0e-5] = 1.0e-5
 
-    # Input the thickness of the matirial in the forward gap between ARICH and TOP
-    thickness_ARICH = (np.loadtxt(open("thickness_ARICH.csv", "rb"), delimiter=",")).ravel()
-    thickness_ARICH[thickness_ARICH < 1.0e-5] = 1.0e-5
+    # Input the thickness of the matirial in the barrel gap between ECL and Coil
+    thickness_ECLCOIL = (np.loadtxt(open("thickness_ECLCOIL.csv", "rb"), delimiter=",")).ravel()
+    thickness_ECLCOIL[thickness_ECLCOIL < 1.0e-5] = 1.0e-5
 
     # Input the thickness of the matirial in the backward gap between barrel and endcap of ECL
     thickness_ECLback = (np.loadtxt(open("thickness_ECLback.csv", "rb"), delimiter=",")).ravel()
@@ -82,6 +89,7 @@ thickness_list = list(map(str, thickness_CDCback.tolist() +
                           thickness_ARICH.tolist() +
                           thickness_TOPback.tolist() +
                           thickness_TOPfor.tolist() +
+                          thickness_ECLCOIL.tolist() +
                           thickness_ECLback.tolist() +
                           thickness_ECLfor.tolist()))
 
@@ -91,18 +99,21 @@ if DefalutValue == 0:
     density_ARICH = (np.ones(3) * 1.29e-10).ravel()
     density_TOPback = (np.ones(1) * 1.29e-10).ravel()
     density_TOPfor = (np.ones(1) * 1.29e-10).ravel()
+    density_ECLCOIL = (np.ones(1) * 1.29e-10).ravel()
     density_ECLback = (np.ones(5) * 1.29e-10).ravel()
     density_ECLfor = (np.ones(5) * 1.29e-10).ravel()
 else:
     density_ARICH = (np.ones(3) * 8.96).ravel()
     density_TOPback = (np.ones(1) * 8.96).ravel()
     density_TOPfor = (np.ones(1) * 8.96).ravel()
+    density_ECLCOIL = (np.ones(1) * 8.96).ravel()
     density_ECLback = (np.ones(5) * 8.96).ravel()
     density_ECLfor = (np.ones(5) * 8.96).ravel()
 
 
 density_list = list(map(str, density_ARICH.tolist() + density_TOPback.tolist() +
-                        density_TOPfor.tolist() + density_ECLback.tolist() + density_ECLfor.tolist()))
+                        density_TOPfor.tolist() + density_ECLCOIL.tolist() +
+                        density_ECLback.tolist() + density_ECLfor.tolist()))
 
 desc = {
     'IRCDCBack': u'segmentation in R of backward',
@@ -114,6 +125,8 @@ desc = {
     'IPhiARICHFor': u'segmentation in Phi of forward',
     'IPhiTOPBack': u'segmentation in Phi of backward',
     'IPhiTOPFor': u'segmentation in Phi of forward',
+    'IZECLCOILBar': u'segmentation in Z of barrel',
+    'IPhiECLCOILBar': u'segmentation in Phi of barrel',
     'IRECLBack': u'segmentation in R of backward',
     'IZECLBack': u'segmentation in Z of backward',
     'IPhiECLBack': u'segmentation in Phi of backward',
@@ -133,6 +146,8 @@ value = {
     'IPhiARICHFor': 144,
     'IPhiTOPBack': 144,
     'IPhiTOPFor': 144,
+    'IZECLCOILBar': 92,
+    'IPhiECLCOILBar': 144,
     'IRECLBack': 3,
     'IZECLBack': 5,
     'IPhiECLBack': 144,
@@ -151,6 +166,8 @@ elements = [
     'IPhiARICHFor',
     'IPhiTOPBack',
     'IPhiTOPFor',
+    'IZECLCOILBar',
+    'IPhiECLCOILBar',
     'IRECLBack',
     'IZECLBack',
     'IPhiECLBack',

@@ -16,6 +16,18 @@
         <Rmax unit="mm">1245.</Rmax>
       </ZBound>
     </GapMomVolTopBack>
+    <GapMomVolEclCoilBarrel id="0" desc="Material in gap between Barrel ECL and coil">
+      <ZBound id="0">
+        <Z unit="mm">-1830.0</Z>
+        <Rmin unit="mm">1672.</Rmin>
+        <Rmax unit="mm">1700.</Rmax>
+      </ZBound>
+      <ZBound id="1">
+        <Z unit="mm">2770.</Z>
+        <Rmin unit="mm">1672.</Rmin>
+        <Rmax unit="mm">1700.</Rmax>
+      </ZBound>
+    </GapMomVolEclCoilBarrel>
     <GapMomVolBack id="0" desc="Backward Material">
       <ZBound id="0">
         <Z unit="mm">-1220.0</Z>
@@ -191,7 +203,7 @@
       </ZBound>
     </GapMomVolFor>
 
-    <!-- Geometry Parameter of Serves Materials between CDC and ECL, CDC and ARICH, ARICH and TOP, TOP and ECL -->
+    <!-- Geometry Parameter of Serves Materials between CDC and ECL, CDC and ARICH, ARICH and TOP, TOP and ECL, ECL and COIL -->
     <ServiceGapsMaterials  desc="Parameters of ServiceGaps Materials between CDC and ECL">   
       <ServiceGapsMaterial id="0" desc="Backward Material">
         <Name>BackwardMaterial</Name>
@@ -217,8 +229,8 @@
         <BackwardZ desc="Backward z position of ServiceGaps Materials block" unit="mm">1668.0</BackwardZ>
         <ForwardZ desc="Forward z position of ServiceGaps Materials block" unit="mm">1960.0</ForwardZ>
       </ServiceGapsMaterial>
-      <ServiceGapsMaterial id="3" desc="backward Material behind of Top">
-        <Name>ForwardMaterial</Name>
+      <ServiceGapsMaterial id="3" desc="Backward Material behind of Top">
+        <Name>BackwardMaterial</Name>
 	<material>Air</material>
         <InnerR desc="Inner radius of ServiceGaps Materials block" unit="mm">1140.0</InnerR>
         <OuterR desc="Outer radius of ServiceGaps Materials block" unit="mm">1245.0</OuterR>
@@ -232,6 +244,14 @@
         <OuterR desc="Outer radius of ServiceGaps Materials block" unit="mm">1245.0</OuterR>
         <BackwardZ desc="Backward z position of ServiceGaps Materials block" unit="mm">1938.0</BackwardZ>
         <ForwardZ desc="Forward z position of ServiceGaps Materials block" unit="mm">1960.0</ForwardZ>
+      </ServiceGapsMaterial>
+      <ServiceGapsMaterial id="5" desc="Material in the gap of barrel ECL and COIL">
+        <Name>BarrelMaterial</Name>
+	<material>Air</material>	
+        <InnerR desc="Inner radius of ServiceGaps Materials block" unit="mm">1672.0</InnerR>
+        <OuterR desc="Outer radius of ServiceGaps Materials block" unit="mm">1700.0</OuterR>
+        <BackwardZ desc="Backward z position of ServiceGaps Materials block" unit="mm">-1830.0</BackwardZ>
+        <ForwardZ desc="Forward z position of ServiceGaps Materials block" unit="mm">2770.0</ForwardZ>
       </ServiceGapsMaterial>
     </ServiceGapsMaterials>
 

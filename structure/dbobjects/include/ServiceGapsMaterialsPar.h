@@ -165,12 +165,13 @@ namespace Belle2 {
     ThicknessDensityPar(int IRCDCB = 0, int IPhiCDCB = 0, int IRCDCF = 0, int IPhiCDCF = 0, int IRECLB = 0,
                         int IZECLB = 0, int IPhiECLB = 0, int IRECLF = 0, int IZECLF = 0, int IPhiECLF = 0,
                         int IZARICHF = 0, int IPhiARICHF = 0, int IPhiTOPB = 0, int IPhiTOPF = 0,
+                        int IPhiECLCOILB = 0, int IZECLCOILB = 0,
                         const std::vector<double>& thicknesses = std::vector<double>(),
                         const std::vector<double>& density = std::vector<double>()):
       m_IRCDCB(IRCDCB), m_IPhiCDCB(IPhiCDCB), m_IRCDCF(IRCDCF), m_IPhiCDCF(IPhiCDCF), m_IRECLB(IRECLB),
       m_IZECLB(IZECLB), m_IPhiECLB(IPhiECLB), m_IRECLF(IRECLF), m_IZECLF(IZECLF), m_IPhiECLF(IPhiECLF),
-      m_IZARICHF(IZARICHF), m_IPhiARICHF(IPhiARICHF), m_IPhiTOPB(IPhiTOPB), m_IPhiTOPF(IPhiTOPF), m_thick(thicknesses),
-      m_density(density) {}
+      m_IZARICHF(IZARICHF), m_IPhiARICHF(IPhiARICHF), m_IPhiTOPB(IPhiTOPB), m_IPhiTOPF(IPhiTOPF),
+      m_IPhiECLCOILB(IPhiECLCOILB), m_IZECLCOILB(IZECLCOILB), m_thick(thicknesses), m_density(density) {}
 
     /** Destructor */
     ~ThicknessDensityPar() {}
@@ -211,6 +212,10 @@ namespace Belle2 {
     int getIPhiTOPB() const { return m_IPhiTOPB;}
     /** Get the segmentation in Phi of TOP gap forward */
     int getIPhiTOPF() const { return m_IPhiTOPF;}
+    /** Get the segmentation in Phi of gap between ECL and COIL barrel */
+    int getIPhiECLCOILB() const { return m_IPhiECLCOILB;}
+    /** Get the segmentation in Z of gap between ECL and COIL barrel */
+    int getIZECLCOILB() const { return m_IZECLCOILB;}
     /** Get the list of the thicknesses */
     std::vector<double> getthickness() const { return m_thick;}
     /** Get the list of the density */
@@ -246,6 +251,10 @@ namespace Belle2 {
     int m_IPhiTOPB;
     /** segmentation in Phi of TOP forward    */
     int m_IPhiTOPF;
+    /** segmentation in Phi of gap between ECL and COIL barrel */
+    int m_IPhiECLCOILB;
+    /** segmentation in Z of gap between ECL and COIL barrel */
+    int m_IZECLCOILB;
     /** Thickness list of CDC gap element cell. */
     std::vector<double> m_thick;
     /** Densities list of ECL, ARICH and top gap element cell. */
@@ -296,6 +305,10 @@ namespace Belle2 {
     const ServiceGapsMomVolPar& getMomVolFor(void) const { return m_momvolfor; }
     /** Get Forward Gap MomVolume */
     ServiceGapsMomVolPar& getMomVolFor(void)  { return m_momvolfor; }
+    /** Get Barrel ECL and Coil Gap MomVolume */
+    const ServiceGapsMomVolPar& getMomVolEclCoilBarrel(void) const { return m_momvoleclcoilbarrel; }
+    /** Get Barrel ECL and Coil Gap MomVolume */
+    ServiceGapsMomVolPar& getMomVolEclCoilBarrel(void)  { return m_momvoleclcoilbarrel; }
     /** Get Service Materials */
     const std::vector<ServiceGapsMaterialsCdcArichTopPar>& getServiceGapsMaterials(void) const { return m_ServiceGapsMaterials; }
     /** Get Service Materials */
@@ -329,6 +342,8 @@ namespace Belle2 {
     ServiceGapsMomVolPar m_momvolback;
     /** Backward mother volume for Service Materials. */
     ServiceGapsMomVolPar m_momvolfor;
+    /** Barrel ECL and COIL gap mother volume for Service Materials. */
+    ServiceGapsMomVolPar m_momvoleclcoilbarrel;
     /** Gap element cell Thickness and density for Service Materials. */
     ThicknessDensityPar m_thick;
 

@@ -279,7 +279,7 @@ It is possible to load ROE as a particle, which can be manipulated as any other 
   # A shorter option:
   # ma.fillParticleListFromROE('B0:tagFromROE -> B0:rec', '', 'cleanMask', path=main_path)
 
-The resulted particle list can be combined with other particles, like
+The resulting particle list can be combined with other particles, like
 ``Upsilon(4S) -> B0:tagFromROE B0:rec`` in this example.
 Also, any variable should be valid for the ROE particle, however, one should be
 aware that these particles typically have a very large amount of daughter
@@ -299,7 +299,7 @@ useful in combination with the visible signal side, for example in semileptonic
 :math:`B`-meson decays, where tag side has been reconstructed using :doc:`Full Event Interpretation`.
 
 .. warning::
-  The resulted particles described here cannot be used for vertexing nor MC matching.
+  The resulting particles described here cannot be used for vertexing nor MC matching.
   This functionality is under development.
 
 

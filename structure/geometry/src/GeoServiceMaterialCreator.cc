@@ -52,10 +52,10 @@ namespace Belle2 {
       }
       ServiceMaterialGeometryPar.getMomVolTopBack() = MomVolTopBackPar;
 
-      GearDir content6(content, "GapMomVolEclCoilBarrel");
+      GearDir content1(content, "GapMomVolEclCoilBarrel");
       // Read parameters for Backward Gap Mom Volume
       ServiceGapsMomVolPar MomVolEclCoilBarrelPar;
-      for (const GearDir& GapVol : content6.getNodes("ZBound")) {
+      for (const GearDir& GapVol : content1.getNodes("ZBound")) {
         const double rmin = GapVol.getLength("Rmin") / Unit::mm;
         const double rmax = GapVol.getLength("Rmax") / Unit::mm;
         const double z = GapVol.getLength("Z") / Unit::mm;
@@ -63,10 +63,10 @@ namespace Belle2 {
       }
       ServiceMaterialGeometryPar.getMomVolEclCoilBarrel() = MomVolEclCoilBarrelPar;
 
-      GearDir content1(content, "GapMomVolBack");
+      GearDir content2(content, "GapMomVolBack");
       // Read parameters for Backward Gap Mom Volume
       ServiceGapsMomVolPar MomVolBackPar;
-      for (const GearDir& GapVol : content1.getNodes("ZBound")) {
+      for (const GearDir& GapVol : content2.getNodes("ZBound")) {
         const double rmin = GapVol.getLength("Rmin") / Unit::mm;
         const double rmax = GapVol.getLength("Rmax") / Unit::mm;
         const double z = GapVol.getLength("Z") / Unit::mm;
@@ -74,10 +74,10 @@ namespace Belle2 {
       }
       ServiceMaterialGeometryPar.getMomVolBack() = MomVolBackPar;
 
-      GearDir content2(content, "GapMomVolFor");
+      GearDir content3(content, "GapMomVolFor");
       // Read parameters for Forward Gap Mom Volume
       ServiceGapsMomVolPar MomVolForPar;
-      for (const GearDir& GapVol : content2.getNodes("ZBound")) {
+      for (const GearDir& GapVol : content3.getNodes("ZBound")) {
         const double rmin = GapVol.getLength("Rmin") / Unit::mm;
         const double rmax = GapVol.getLength("Rmax") / Unit::mm;
         const double z = GapVol.getLength("Z") / Unit::mm;
@@ -85,9 +85,9 @@ namespace Belle2 {
       }
       ServiceMaterialGeometryPar.getMomVolFor() = MomVolForPar;
 
-      GearDir content3(content, "ServiceGapsMaterials");
+      GearDir content4(content, "ServiceGapsMaterials");
       // Read parameters to creates ServiceGaps Material in the gap between CDC and ECL, ARICH and TOP, TOP and ECL.
-      for (const GearDir& material : content3.getNodes("ServiceGapsMaterial")) {
+      for (const GearDir& material : content4.getNodes("ServiceGapsMaterial")) {
         ServiceGapsMaterialsCdcArichTopPar MaterialPar(
           material.getString("Name"),
           material.getString("material"),
@@ -100,9 +100,9 @@ namespace Belle2 {
         ServiceMaterialGeometryPar.getServiceGapsMaterials().push_back(MaterialPar);
       }
 
-      GearDir content4(content, "ServiceGapsEclMaterials");
+      GearDir content5(content, "ServiceGapsEclMaterials");
       // Read parameters to creates ServiceGaps Material in the gap between barrel and endcap of ECL.
-      for (const GearDir& material : content4.getNodes("ServiceGapsMaterial")) {
+      for (const GearDir& material : content5.getNodes("ServiceGapsMaterial")) {
         ServiceGapsMaterialsEclPar MaterialPar(
           material.getString("Name"),
           material.getString("material"),
@@ -117,27 +117,27 @@ namespace Belle2 {
         ServiceMaterialGeometryPar.getServiceGapsEclMaterials().push_back(MaterialPar);
       }
 
-      GearDir content5(content, "TicknessDensity");
+      GearDir content6(content, "TicknessDensity");
       // Read thickness and density for Gaps Volume
       ThicknessDensityPar ThickPar(
-        content5.getInt("IRCDCBack"),
-        content5.getInt("IPhiCDCBack"),
-        content5.getInt("IRCDCFor"),
-        content5.getInt("IPhiCDCFor"),
-        content5.getInt("IRECLBack"),
-        content5.getInt("IZECLBack"),
-        content5.getInt("IPhiECLBack"),
-        content5.getInt("IRECLFor"),
-        content5.getInt("IZECLFor"),
-        content5.getInt("IPhiECLFor"),
-        content5.getInt("IZARICHFor"),
-        content5.getInt("IPhiARICHFor"),
-        content5.getInt("IPhiTOPBack"),
-        content5.getInt("IPhiTOPFor"),
-        content5.getInt("IZECLCOILBar"),
-        content5.getInt("IPhiECLCOILBar"),
-        content5.getArray("thicknesses"),
-        content5.getArray("density")
+        content6.getInt("IRCDCBack"),
+        content6.getInt("IPhiCDCBack"),
+        content6.getInt("IRCDCFor"),
+        content6.getInt("IPhiCDCFor"),
+        content6.getInt("IRECLBack"),
+        content6.getInt("IZECLBack"),
+        content6.getInt("IPhiECLBack"),
+        content6.getInt("IRECLFor"),
+        content6.getInt("IZECLFor"),
+        content6.getInt("IPhiECLFor"),
+        content6.getInt("IZARICHFor"),
+        content6.getInt("IPhiARICHFor"),
+        content6.getInt("IPhiTOPBack"),
+        content6.getInt("IPhiTOPFor"),
+        content6.getInt("IZECLCOILBar"),
+        content6.getInt("IPhiECLCOILBar"),
+        content6.getArray("thicknesses"),
+        content6.getArray("density")
       );
       ServiceMaterialGeometryPar.getthick() = ThickPar;
 
@@ -381,7 +381,7 @@ namespace Belle2 {
               }
               if (materialID == 1) {
                 const double thick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB + IPhiTOPF +
-                                               IPhiECLCOILB *           IZECLCOILB + IZECLB * IRECLB * IPhiECLB ] / Unit::mm;
+                                               IPhiECLCOILB * IZECLCOILB + IZECLB * IRECLB * IPhiECLB ] / Unit::mm;
                 const double rmin1 = Rmin1 + Hrmin * iZ;
                 const double rmax1 = Rmax1 + Hrmax * iZ;
                 const double rmin2 = rmin1 + Hrmin * thick / interval;

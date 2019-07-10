@@ -571,7 +571,7 @@ void RestOfEvent::printIndices(const std::set<int>& indices) const
   B2INFO(printout);
 }
 
-Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode)
+Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode, bool isSelfConjugated)
 {
   StoreArray<Particle> particles;
   std::set<int> source;
@@ -592,7 +592,8 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCod
     }
   }
   int particlePDG = (pdgCode == 0) ? getPDGCode() : pdgCode;
-  return particles.appendNew(get4Vector(maskName), particlePDG, Particle::EFlavorType::c_Unflavored, std::vector(source.begin(),
+  auto isFlavored = (isSelfConjugated) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+  return particles.appendNew(get4Vector(maskName), particlePDG, isFlavored, std::vector(source.begin(),
                              source.end()), Particle::PropertyFlags::c_IsUnspecified);
 }
 

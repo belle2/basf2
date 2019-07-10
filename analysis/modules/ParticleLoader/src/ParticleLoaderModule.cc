@@ -320,13 +320,13 @@ namespace Belle2 {
     }
   }
 
-  void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int pdgCode)
+  void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int pdgCode, bool isSelfConjugatedParticle)
   {
 
     Particle* newPart = nullptr;
     if (!m_useMissing) {
       // Convert ROE to particle
-      newPart = roe->convertToParticle(m_roeMaskName, pdgCode);
+      newPart = roe->convertToParticle(m_roeMaskName, pdgCode, isSelfConjugatedParticle);
     } else {
       // Create a particle from missing momentum
       StoreArray<Particle> particles;

@@ -135,7 +135,7 @@ namespace Belle2 {
     /**
      * Helper method to load ROE object as Particle
      */
-    void addROEToParticleList(RestOfEvent* roe, int pdgCode = 0);
+    void addROEToParticleList(RestOfEvent* roe, int pdgCode = 0, bool isSelfConjugatedParticle = true);
 
     /**
      * returns true if the PDG code determined from the decayString is valid

@@ -858,7 +858,7 @@ def reconstructDecay(
     candidate_limit=None,
     ignoreIfTooManyCandidates=True,
 ):
-    """
+    r"""
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection

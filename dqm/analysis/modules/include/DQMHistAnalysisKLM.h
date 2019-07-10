@@ -3,7 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Leo Piilonen                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,13 +11,18 @@
 #pragma once
 
 /* External headers. */
+#include <TROOT.h>
+#include <TClass.h>
 #include <TCanvas.h>
 #include <TLatex.h>
+#include <TText.h>
+#include <TLine.h>
 
 /* Belle2 headers. */
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 
@@ -76,6 +81,19 @@ namespace Belle2 {
     void analyseStripLayerHistogram(int layerGlobal, TH1* histogram,
                                     TLatex& latex);
 
+    /**
+     * Process one BKLM sector+layer histogram.
+     * @param[in]  histName  Histogram name.
+     */
+    void processBKLMSectorLayerHistogram(const std::string& histName);
+
+    /**
+     * Find TCanvas that matches a given name.
+     * @param[in]  canvasName   name of the desired TCanvas.
+     * @param[out] TCanvas*     matching TCanvas.
+     */
+    TCanvas* findCanvas(const std::string& canvasName);
+
     /** Electronics map. */
     DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
 
@@ -85,6 +103,12 @@ namespace Belle2 {
     /** EKLM strip number within a layer. */
     TCanvas* m_eklmStripLayer[
       EKLMElementNumbers::getMaximalLayerGlobalNumber()];
+
+    /** TLine for BKLM sector boundary in histogram. */
+    TLine* m_sectorLine[BKLMElementNumbers::getMaximalSectorGlobalNumber()];
+
+    /** TText for BKLM sector name in histogram. */
+    TText* m_sectorText[BKLMElementNumbers::getMaximalSectorGlobalNumber()];
 
   };
 

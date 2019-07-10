@@ -7,7 +7,8 @@
 __authors__ = [
     "Sophie Hollit",
     "Racha Cheaib",
-    "Hannah Wakeling"
+    "Hannah Wakeling",
+    "Phil Grace"
 ]
 
 from basf2 import *

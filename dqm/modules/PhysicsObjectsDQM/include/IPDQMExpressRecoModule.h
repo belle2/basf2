@@ -20,21 +20,50 @@
 #include "TPaveStats.h"
 
 namespace Belle2 {
-  /*
-    This Module, made for ExpressReco, monitors the position
-    and the dimension of the beamspot using mu+mu- events
+  /**
+   * This Module, made for ExpressReco, monitors the position
+   * and the dimension of the beamspot using mu+mu- events
    */
   class IPDQMExpressRecoModule : public HistoModule {
 
   public:
-
+    /**
+     * Constructor
+     */
     IPDQMExpressRecoModule();
 
+    /**
+     * Initialize the module
+     */
     void initialize() override;
+
+    /**
+     * Called when entering a new run
+     * Reset the histograms and counter m_r and clear the vectors
+     */
     void beginRun() override;
+
+    /**
+     * Event processor
+     * The main analysis happens here
+     */
     void event() override;
+
+    /**
+     * End-of-run action.
+     * The histograms range is set to be large 10 sigmas and centered on the mean
+     */
     void endRun() override;
+
+    /**
+     * Termination action.
+     */
     void terminate() override;
+
+    /**
+     * Defining the histograms.
+     * Every new histogram added to the module has to be initialized here.
+     */
     void defineHisto() override;
 
 
@@ -93,7 +122,9 @@ namespace Belle2 {
     Double_t m_median = 0; /**<The median of y coord*/
     Double_t m_quantile = 0.5;/**<The 0.5 quantile for the median*/
     Int_t m_r = 0; /**<Counter for sampling*/
-
+    Int_t m_size = 200; /**<Size for sampling*/
+    Int_t m_no_units = 5; /**<Number of units*/
+    Int_t m_size_per_unit = m_size / m_no_units; /**<Size for sampling per each unit*/
     /** Name of the Y4S particle list */
     std::string m_Y4SPListName = "";
 

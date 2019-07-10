@@ -19,7 +19,8 @@ Convenience
 ~~~~~~~~~~~
 
 .. b2-variables::
-        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack
+        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :noindex:
 
 -----------
 More detais
@@ -184,7 +185,9 @@ Understanding the decay string
 
 The following is an example of a decay string:
 
-:code:`' -413 (--> -421 (--> 321 -211) -211) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) ^-413 (--> -421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> ^-421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> ^321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 ^-211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 -211) ^-211))'`
+.. code-block:: python
+
+  '-413 (--> -421 (--> 321 -211) -211) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) ^-413 (--> -421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> ^-421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> ^321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 ^-211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 -211) ^-211))'
 
 The string consists of several parts, separated by pipes :code:`|`.
 
@@ -227,17 +230,23 @@ The decay string format is rather long, and it is possible to use a shorter form
 
 The concise string has the following format:
 
-:code:`521 (--> 310 211 111 (--> 22 22)) | 300553 (--> a521 (--> b310 c211 d111 (--> e22 f22)) -521 (--> 421 (--> 223 (--> -211 211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211))`
+.. code-block:: python
+
+  '521 (--> 310 211 111 (--> 22 22)) | 300553 (--> a521 (--> b310 c211 d111 (--> e22 f22)) -521 (--> 421 (--> 223 (--> -211 211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211))'
 
 In this example each of the six particles in the decay that is searched for are given an identifier (by default the minuscule Roman alphabet / Romaji, i.e. "a", "b", "c", etc, incrementing alphabetically).  There is only one string giving the actual MC decay, and it contains the identifiers with the particle to which they are matched.
 
 Multiple identifiers could match up to a single particle, commonly this might be an Y(4S) or a virtual photon:
 
-:code:`521 (--> 310 211 111 (--> 22 22)) |  ab300553 (--> 521 (--> 310 c211 111 (--> 22 22)) -521 (--> 413 (--> 421 (--> 310 310 211 -211) 211) 313 (--> 311 (--> 310) 111 (--> 22 22)) -321 -213 (--> -211 d111 (--> f22 e22))))`
+.. code-block:: python
+
+  '521 (--> 310 211 111 (--> 22 22)) |  ab300553 (--> 521 (--> 310 c211 111 (--> 22 22)) -521 (--> 413 (--> 421 (--> 310 310 211 -211) 211) 313 (--> 311 (--> 310) 111 (--> 22 22)) -321 -213 (--> -211 d111 (--> f22 e22))))'
 
 It there were unmatched particles it would look something like this:
 
-:code:`521 (--> 310 211 111 (--> 22 22)) | 300553 (--> 521 (--> b310 211 111 (--> 22 f22)) -521 (--> 421 (--> 223 (--> -211 c211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211)) | No match: ade`
+.. code-block:: python
+
+  '521 (--> 310 211 111 (--> 22 22)) | 300553 (--> 521 (--> b310 211 111 (--> 22 f22)) -521 (--> 421 (--> 223 (--> -211 c211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211)) | No match: ade'
 
 
 If it is not possible to convert the string to the concise format then the standard string format is returned instead. 

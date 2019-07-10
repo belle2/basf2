@@ -13,10 +13,6 @@
 /* C++ headers. */
 #include <string>
 
-/* External headers. */
-#include <TFile.h>
-#include <TTree.h>
-
 /* Belle2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <eklm/calibration/EKLMAlignmentAlongStripsAlgorithm.h>

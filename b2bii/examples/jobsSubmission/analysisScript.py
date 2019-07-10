@@ -12,7 +12,6 @@ from basf2 import *
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from modularAnalysis import fillParticleList
@@ -69,8 +68,9 @@ else:
     url = getBelleUrl_data(expNo, minRunNo, maxRunNo,
                            skimType, dataType, belleLevel)
 
-b2biiConversion.convertBelleMdstToBelleIIMdst(url, applyHadronBJSkim=True)
-loadGearbox()
+mypath = create_path()
+b2biiConversion.convertBelleMdstToBelleIIMdst(url, applyHadronBJSkim=True, path=mypath)
+loadGearbox(mypath)
 
 
 # ------- Output file
@@ -81,25 +81,25 @@ filenameEnd = '_'.join(sys.argv[2:]) + '.root'
 
 outputFileName = outDir + '/output_' + filenameEnd
 
-ntupleFile(outputFileName)
+ntupleFile(outputFileName, mypath)
 
 
 # ------- Rest of analysis script goes here...
 
 # this sample code is taken from b2bii/examples
 
-fillParticleList('pi+:all', '')
+fillParticleList('pi+:all', '', mypath)
 
 toolsTrackPI = ['EventMetaData', 'pi+']
 toolsTrackPI += ['Kinematics', '^pi+']
 
-ntupleTree('pion', 'pi+:all', toolsTrackPI)
+ntupleTree('pion', 'pi+:all', toolsTrackPI, mypath)
 
 # progress
 progress = register_module('Progress')
-analysis_main.add_module(progress)
+mypath.add_module(progress)
 
-process(analysis_main)
+process(mypath)
 
 # Print call statistics
 print(statistics)

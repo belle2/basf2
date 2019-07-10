@@ -13,10 +13,9 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK
 from stdPhotons import *
 from stdPi0s import *
-from skimExpertFunctions import *
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb_setuprel = 'release-03-00-03'
+gb_setuprel = 'release-03-02-00'
 
 import sys
 import os
@@ -26,7 +25,7 @@ argvs = sys.argv
 argc = len(argvs)
 
 skimpath = Path()
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 
 
 inputMdstList('default', fileList, path=skimpath)

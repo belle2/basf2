@@ -102,23 +102,18 @@ namespace TreeFitter {
         }
         m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
-        double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);//protected against m_ndf<1
         double deltachisq = chisq - m_chiSquare;
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
+          setExtraInfo(m_particle, "failed", 5);
         } else {
           if (m_niter > 0) {
-            if ((std::abs(deltachisq) < dChisqConv)) {
+            if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
               m_chiSquare = chisq;
               m_status = VertexStatus::Success;
               finished = true ;
               setExtraInfo(m_particle, "failed", 0);
-            } else if (m_niter > 1 && deltachisq > dChisqQuit) {
-              setExtraInfo(m_particle, "failed", 1);
-              m_status  = VertexStatus::Failed;
-              m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
-              finished = true;
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
               setExtraInfo(m_particle, "failed", 2);
               m_status = VertexStatus::NonConverged;
@@ -258,20 +253,21 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
-    if (posindex >= 0) {
-      const TVector3 pos(m_fitparams->getStateVector()(posindex),
-                         m_fitparams->getStateVector()(posindex + 1),
-                         m_fitparams->getStateVector()(posindex + 2));
-      cand.setVertex(pos);
-      if (&pb == m_decaychain->cand()) { // if head
-        const double fitparchi2 = m_fitparams->chiSquare();
-        cand.setPValue(TMath::Prob(fitparchi2, m_ndf));//if m_ndf<1, this is 0.
-        setExtraInfo(&cand, "chiSquared", fitparchi2);
-        setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
-        setExtraInfo(&cand, "ndf", m_ndf);
-      }
-    }
     if (m_updateDaugthers || isTreeHead) {
+      if (posindex >= 0) {
+        const TVector3 pos(m_fitparams->getStateVector()(posindex),
+                           m_fitparams->getStateVector()(posindex + 1),
+                           m_fitparams->getStateVector()(posindex + 2));
+        cand.setVertex(pos);
+        if (&pb == m_decaychain->cand()) { // if head
+          const double fitparchi2 = m_fitparams->chiSquare();
+          cand.setPValue(TMath::Prob(fitparchi2, m_ndf));//if m_ndf<1, this is 0.
+          setExtraInfo(&cand, "chiSquared", fitparchi2);
+          setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
+          setExtraInfo(&cand, "ndf", m_ndf);
+        }
+      }
+
       const int momindex = pb.momIndex();
       TLorentzVector p;
       p.SetPx(m_fitparams->getStateVector()(momindex));
@@ -327,7 +323,8 @@ namespace TreeFitter {
 
       std::tuple<double, double> lenTuple  = getDecayLength(cand);
 
-      comb_cov(0, 0) = std::get<1>(lenTuple);
+      const double lenErr = std::get<1>(lenTuple);
+      comb_cov(0, 0) = lenErr * lenErr;
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
       const double mass = pb->pdgMass();
@@ -344,9 +341,9 @@ namespace TreeFitter {
       jac(2) = -1. * mom_vec(1) / mom3 * mBYc;
       jac(3) = -1. * mom_vec(2) / mom3 * mBYc;
 
-      const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
+      const double tErr2 = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
       // time in nanosec
-      return std::make_tuple(t, tErr);
+      return std::make_tuple(t, std::sqrt(tErr2));
     }
     return std::make_tuple(-999, -999);
   }
@@ -362,8 +359,8 @@ namespace TreeFitter {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();
       const double len = fitparams.getStateVector()(tauindex);
-      const double lenErr = fitparams.getCovariance()(tauindex, tauindex);
-      return std::make_tuple(len, lenErr);
+      const double lenErr2 = fitparams.getCovariance()(tauindex, tauindex);
+      return std::make_tuple(len, std::sqrt(lenErr2));
     }
     return std::make_tuple(-999, -999);
   }

@@ -20,6 +20,7 @@ namespace Belle2 {
   // Guard to prevent repeated instantiations
   extern template class GridEventTimeExtractor<DriftLengthBasedEventTimeExtractor>;
 
+  /// Class to extract the event t0 using the drift-length approach
   class FullGridDriftLengthTrackTimeExtractor final : public BaseEventTimeExtractor<RecoTrack*> {
   private:
     /// Type of the base class

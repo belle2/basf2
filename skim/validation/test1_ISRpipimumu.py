@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+    <input>../ISRpipimumu.dst.root</input>
+    <output>../ISRpipimumu.udst.root</output>
+    <contact>jiasen@buaa.edu.cn</contact>
+    <interval>nightly</interval>
+</header>
+"""
+
 __author__ = "S. Jia"
 
 import sys
@@ -9,7 +18,6 @@ import os.path
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 from stdCharged import stdPi, stdK, stdE, stdMu

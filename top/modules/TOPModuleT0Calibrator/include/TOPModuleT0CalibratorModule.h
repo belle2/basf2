@@ -21,6 +21,9 @@
 #include <top/utilities/Chi2MinimumFinder1D.h>
 #include <top/reconstruction/TOPreco.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <top/dbobjects/TOPCalModuleT0.h>
+
 #include <string>
 #include <vector>
 
@@ -112,6 +115,9 @@ namespace Belle2 {
     StoreArray<Track> m_tracks;    /**< collection of tracks */
     StoreArray<ExtHit> m_extHits;  /**< collection of extrapolated hits */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
+
+    // database
+    DBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
 
     // output root file
     TFile* m_file = 0;                 /**< TFile */

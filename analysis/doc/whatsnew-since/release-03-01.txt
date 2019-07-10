@@ -4,6 +4,8 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* The event-based variable ``KLMEnergy`` is removed. It is completely meaningless (:issue:`BII-5002`).
+
 * The variables ``mcDX``, ``mcDY``, ``mcDZ`` are now deprecated, 
   because they are duplicates of :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ`.
   A warning had been added in documentation.
@@ -16,6 +18,10 @@ Variables
 
 * Replaced pValue (tracking variable) with chiProb (vertexing variable) in the vertexing variable collection.
 
+* Added the meta variables :b2:var:`averageValueInList` and
+  :b2:var:`medianValueInList` which calculate the arithmetic mean and median of
+  a given variable in a given particle list.
+
 TreeFitter
 ++++++++++
 
@@ -27,3 +33,8 @@ Flavor Tagger
 * Default Expert (testing mode) does not create repositories and does not save weight files locally. 
   It only loads the payloads directly from the database using the database payload names
   as mva identifiers.
+
+Vertex Fitting
+++++++++++++++
+
+* Added IP tube constraint to KFit

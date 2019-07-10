@@ -47,25 +47,25 @@ namespace TreeFitter {
     ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const override;
 
     /** space reserved in fit params, if has mother then it has tau */
-    virtual int dim() const override { return mother() && !isAResonance(m_particle) ? 8 : 7 ;}
+    virtual int dim() const override;
 
     /**  type */
     virtual int type() const override { return kInternalParticle ; }
 
     /**   position index in fit params*/
-    virtual int posIndex() const override { return index()   ; }
+    virtual int posIndex() const override;
 
     /** tau index in fit params only if it has a mother */
-    virtual int tauIndex() const override { return mother() ? index() + 3 : -1; }
+    virtual int tauIndex() const override;
 
     /** momentum index in fit params depending on whether it has a mother  */
-    virtual int momIndex() const override { return mother() ? index() + 4 : index() + 3 ; }
+    virtual int momIndex() const override;
 
     /** has energy in fitparams  */
     virtual bool hasEnergy() const override { return true ; }
 
     /** has position index  */
-    virtual bool hasPosition() const override { return true ; }
+    virtual bool hasPosition() const override;
 
     /** name  */
     virtual std::string parname(int index) const override ;
@@ -92,11 +92,21 @@ namespace TreeFitter {
     /** has mass cosntraint */
     bool m_massconstraint ;
 
+    /** shares vertex with mother, that means decay vertex = productionvertex */
+    bool m_shares_vertex_with_mother;
+
+    /** use a geo metric constraint */
+    bool m_geo_constraint;
+
     /** has lifetime constraint  */
     bool m_lifetimeconstraint ;
 
     /** is conversion  */
     bool m_isconversion ;
+
+    /** automatically figure out if mother and particle vertex should be the same
+     * and also add geometric constraints */
+    bool m_automatic_vertex_constraining;
   } ;
 
 }

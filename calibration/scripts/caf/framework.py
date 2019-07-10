@@ -92,6 +92,9 @@ class Collection():
         #: the `Algorithm.data_input` function to handle the different types of files and call the
         #: CalibrationAlgorithm.setInputFiles() with the correct ones.
         self.output_patterns = ['CollectorOutput.root']
+        if output_patterns:
+            self.output_patterns = output_patterns
+
         #: Maximum number of input files per subjob during the collector step (passed to a `caf.backends.Job` object).
         #: -1 is the default meaning that all input files are run in one big collector job.
         self.max_files_per_collector_job = max_files_per_collector_job
@@ -99,6 +102,8 @@ class Collection():
         #: the collector job. Currently only useful for setting the 'queue' of the batch system backends that the collector
         #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
         self.backend_args = {}
+        if backend_args:
+            self.backend_args = backend_args
 
         if database_chain:
             #: The database chain used for this Collection. NOT necessarily the same database chain used for the algorithm
@@ -327,8 +332,10 @@ class Calibration(CalibrationBase):
     >>> cal.pre_collector_path = my_basf2_path
 
     You don't have to put a RootInput module in this pre-collection path, but you can if
-    you need some special parameters.
-    The inputFileNames parameter of RootInput will be set by the CAF automatically for you.
+    you need some special parameters. If you want to process sroot files the you have to explicitly add
+    SeqRootInput to your pre-collection path.
+    The inputFileNames parameter of (Seq)RootInput will be set by the CAF automatically for you.
+
 
     You can use optional arguments to pass in some/all during initialisation of the `Calibration` class
 

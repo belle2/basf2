@@ -26,9 +26,6 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TList.h"
-#include "TGaxis.h"
-#include "TString.h"
-#include "TCanvas.h"
 
 #include <sstream>
 #include <string>
@@ -135,4 +132,3 @@ namespace Belle2 {
   };
 
 }
-

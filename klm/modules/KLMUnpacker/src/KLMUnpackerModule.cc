@@ -100,6 +100,8 @@ void KLMUnpackerModule::unpackEKLMDigit(
   int endcap, layer, sector, strip = 0;
   KLM::RawData raw;
   KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
+  if ((raw.triggerBits & 0x10) != 0)
+    return;
   /**
    * The possible values of the strip number in the raw data are
    * from 0 to 127, while the actual range of strip numbers is from
@@ -223,6 +225,8 @@ void KLMUnpackerModule::unpackBKLMDigit(
 
   // moduleId counts are zero based
   int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+  if ((layer < 2) && ((raw.triggerBits & 0x10) != 0))
+    return;
   // int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
   // int isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
   // int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;

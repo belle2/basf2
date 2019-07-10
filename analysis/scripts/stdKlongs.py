@@ -24,8 +24,8 @@ def stdKlongs(listtype='all', path=None):
 
     Parameters:
         listtype (str): name of standard list options (currently only
-        'all' is supported/recommended)
-        param path (basf2.Path): modules are added to this path
+            'all' is supported/recommended)
+        path (basf2.Path): modules are added to this path
     """
 
     # all KLM clusters
@@ -82,7 +82,7 @@ def loadStdSkimKL0(path):
     """Load KLongs for skimming.
 
     Parameters:
-        path (belle2.Path) modules are added to this path
+        path (basf2.Path): modules are added to this path
     """
     stdKlongs('loose', path)
     cutAndCopyList(

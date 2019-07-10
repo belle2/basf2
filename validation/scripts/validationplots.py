@@ -485,7 +485,7 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         rf = os.path.basename(plotuple.rootfile)
         if len(rf) > 30:
             rf = rf[:30] + "..."
-        return f"'{key}' from '{rf}'"
+        return f"{plotuple.package}/{key}/{rf}"
 
     n_warnings = 0
     plotuple_no_warning = []
@@ -819,9 +819,6 @@ class RootObject:
                 False for revision objects.
         """
 
-        # todo: If this is what we want, why don't we just create a dictionary
-        #  in the first place? Or at least implement this by filtering through
-        #  self.__dict__
         # A dict with all information about the Root-object
         # Have all information as a dictionary so that we can search and
         # filter the objects by properties
@@ -838,46 +835,71 @@ class RootObject:
                      'metaoptions': metaoptions,
                      'is_reference': is_reference}
 
-        # For convenient access, define the following variables, which are
-        # only references to the values from the dict
+    # For convenient access, define the following properties, which are
+    # only references to the values from the dict
 
-        # The revision to which the object belongs to
-        self.revision = self.data['revision']
+    @property
+    def revision(self):
+        """ The revision to which the object belongs to """
+        return self.data['revision']
 
-        # The package to which the object belongs to
-        self.package = self.data['package']
+    @property
+    def package(self):
+        """ The package to which the object belongs to"""
+        return self.data['package']
 
-        # The root file to which the object belongs to
-        self.rootfile = self.data['rootfile']
+    @property
+    def rootfile(self):
+        """ The root file to which the object belongs to"""
+        return self.data['rootfile']
 
-        # The key (more precisely: the name of they) which the object has
-        # within the root file
-        self.key = self.data['key']
+    @property
+    def key(self):
+        """ The key (more precisely: the name of they) which the object has
+        within the root file
+        """
+        return self.data['key']
 
-        # The root object itself
-        self.object = self.data['object']
+    @property
+    def object(self):
+        """ The root object itself """
+        return self.data['object']
 
-        # The type, i.e. whether its a histogram or an n-tuple
-        self.type = self.data['type']
+    @property
+    def type(self):
+        """ The type, i.e. whether its a histogram or an n-tuple """
+        return self.data['type']
 
-        # The description, what the histogram/n-tuple contains
-        self.description = self.data['description']
+    @property
+    def description(self):
+        """ The description, what the histogram/n-tuple contains """
+        return self.data['description']
 
-        # A brief description how the histogram or the values should look
-        # like (e.g. characteristic peaks etc.)
-        self.check = self.data['check']
+    @property
+    def check(self):
+        """ A brief description how the histogram or the values should look
+        like (e.g. characteristic peaks etc.) """
+        return self.data['check']
 
-        # A contact person for this histogram/n-tuple
-        self.contact = self.data['contact']
+    @property
+    def contact(self):
+        """ A contact person for this histogram/n-tuple """
+        return self.data['contact']
 
-        # The date of the object (identical with the date of its rootfile)
-        self.date = self.data['date']
+    @property
+    def date(self):
+        """ The date of the object (identical with the date of its rootfile) """
+        return self.data['date']
 
-        # Meta-options for the object, e.g. colz or log-scale for the axes
-        self.metaoptions = self.data['metaoptions']
+    @property
+    def metaoptions(self):
+        """ Meta-options for the object, e.g. colz or log-scale for the axes """
+        return self.data['metaoptions']
 
-        # Boolean value if it is an object from a reference file or not
-        self.is_reference = self.data['is_reference']
+    @property
+    def is_reference(self):
+        """ Boolean value if it is an object from a reference file or not """
+        return self.data['is_reference']
 
     def __str__(self):
         return str(self.data)

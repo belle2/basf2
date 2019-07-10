@@ -13,7 +13,6 @@
 #include <Eigen/Core>
 #include <vector>
 #include <framework/logging/Logger.h>
-
 namespace TreeFitter {
 
   class ParticleBase;

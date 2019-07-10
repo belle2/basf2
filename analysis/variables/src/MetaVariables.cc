@@ -1185,6 +1185,38 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+        std::vector<const Variable::Manager::Var*> variables;
+        for (auto& argument : arguments)
+          variables.push_back(Manager::Instance().getVariable(argument));
+
+        auto func = [variables, arguments](const Particle * particle) -> double {
+          double pValueProduct = 1.;
+          for (auto variable : variables)
+          {
+            double pValue = variable->function(particle);
+            if (pValue < 0)
+              return -1;
+            else
+              pValueProduct *= pValue;
+          }
+          double pValueSum = 1.;
+          double factorial = 1.;
+          for (unsigned int i = 1; i < arguments.size(); ++i)
+          {
+            factorial *= i;
+            pValueSum += pow(-log(pValueProduct), i) / factorial;
+          }
+          return pValueProduct * pValueSum;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function pValueCombination");
+      }
+    }
+
     Manager::FunctionPtr abs(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -2288,6 +2320,9 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
+    REGISTER_VARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
+                      "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
+                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"

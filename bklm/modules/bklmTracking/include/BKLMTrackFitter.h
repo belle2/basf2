@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMTRACKFITTER_H
-#define BKLMTRACKFITTER_H
+#pragma once
 
 #include <list>
 #include "CLHEP/Matrix/Vector.h"
@@ -136,5 +135,3 @@ namespace Belle2 {
 
   };
 } // end of namespace Belle2
-#endif
-

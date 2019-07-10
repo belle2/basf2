@@ -156,10 +156,19 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.1f");
 
+  m_hEfficiency->getHistogram(0)->Reset();
+  m_hEfficiency->getHistogram(1)->Reset();
+  m_hEfficiencyErr->getHistogram(0)->Reset();
+  m_hEfficiencyErr->getHistogram(1)->Reset();
+
+  Float_t effU = 0;
+  Float_t effV = 0;
+  Float_t erreffU = 0;
+  Float_t erreffV = 0;
 
   //Efficiency for the U side
-  TH2F* found_tracksU = (TH2F*)findHist("svdeff/TrackHitsU");
-  TH2F* matched_clusU = (TH2F*)findHist("svdeff/MatchedHitsU");
+  TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
+  TH2F* matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
 
   B2INFO("DQMHistAnalysisSVDEfficiency: before cycle.");
 
@@ -201,8 +210,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   B2INFO("DQMHistAnalysisSVDEfficiency: after cycle.");
 
   //Efficiency for the V side
-  TH2F* found_tracksV = (TH2F*)findHist("svdeff/TrackHitsV");
-  TH2F* matched_clusV = (TH2F*)findHist("svdeff/MatchedHitsV");
+  TH2F* found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
+  TH2F* matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
 
   B2INFO("DQMHistAnalysisSVDEfficiency: before cycle.");
 
@@ -335,7 +344,7 @@ void DQMHistAnalysisSVDEfficiencyModule::endRun()
     m_cEfficiencyU->Print("c_SVDEfficiencyU.pdf");
     m_cEfficiencyV->Print("c_SVDEfficiencyV.pdf");
     m_cEfficiencyErrU->Print("c_SVDEfficiencyErrU.pdf");
-    m_cEfficiencyErrU->Print("c_SVDEfficiencyErrV.pdf");
+    m_cEfficiencyErrV->Print("c_SVDEfficiencyErrV.pdf");
   }
 }
 

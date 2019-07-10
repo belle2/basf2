@@ -8,7 +8,7 @@
     fei training: MC11 based, release-03-02-00 'FEIv4_2018_MC11_release_03_00_00'
     """
 
-__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
 ######################################################
 #
@@ -54,7 +54,7 @@ skimCode2 = encodeSkimName('feiHadronicBplus')
 skimOutputUdst(skimCode2, BphadronicList, path=path)
 summaryOfLists(BphadronicList, path=path)
 
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

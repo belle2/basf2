@@ -13,6 +13,9 @@ from validationfunctions import strip_ext, index_from_revision, get_style
 import json_objects
 
 
+# todo: [Ref, low prio, medium work] Refactor into class with uniform interface
+#   and subclasses implementing actual functionality for Plot/Tuple etc.
+#   /klieret
 class Plotuple:
 
     """!
@@ -126,8 +129,8 @@ class Plotuple:
         # will yield
         self.contact = self.newest.contact
 
-        # The meta-options for this Plotuple object
-        self.metaoptions = self.newest.metaoptions
+        # MetaOptionParser for the meta-options for this Plotuple object
+        self.mop = metaoptions.MetaOptionParser(self.newest.metaoptions)
 
         # The package to which the elements in this Plotuple object belong
         self.package = self.newest.package
@@ -138,22 +141,9 @@ class Plotuple:
         # The result of the Chi^2-Test. By default, there is no such result.
         # If the Chi^2-Test has been performed, this variable holds between
         # which objects it has been performed.
-        self.chi2test_result = 'n/a'
+        self.comparison_result_long = 'n/a'
 
         self.comparison_result = "not_compared"
-
-        # The p-value that the Chi^2-Test returned.
-        self.pvalue = 'n/a'
-
-        #: an comparison error will be shown if the p-value is smaller than
-        #: this number
-        #: will bet set by the chi2test function
-        self.pvalue_error = None
-
-        #: an comparison warning will be shown if the p-value is smaller than
-        #: this number
-        #: will bet set by the chi2test function
-        self.pvalue_warn = None
 
         # The json file, in which the ntuple information is stored
         self.file = None
@@ -221,88 +211,34 @@ class Plotuple:
         """!
         @return Returns true if this plotuple has the expert option
         """
-        mop = metaoptions.MetaOptionParser(self.metaoptions)
-        return mop.has_option("expert")
+        return self.mop.has_option("expert")
 
-    def chi2test(self):
+    def perform_comparison(self):
         """!
         Takes the reference (self.reference.object) and the newest revision
-        (self.newest.object) and a canvas. Performs a Chi^2-Test on the
-        two histograms and sets the background of the canvas correspondingly.
-        Sets self.pvalue to the p-value of the Chi^2-Test.
+        (self.newest.object) and a canvas. Performs a comparison of the
+        two objects.
         @return: None
         """
-        mop = metaoptions.MetaOptionParser(self.metaoptions)
 
-        if mop.has_option("nocompare"):
-            # is comparison disabled for this plot ?
-            self.chi2test_result = 'Chi^2 test is disabled for this plot'
-            self.pvalue = None
-            return
+        tester = validationcomparison.get_comparison(
+            self.reference.object,
+            self.newest.object,
+            self.mop
+        )
 
-        fail_message = "Comparison failed: "
-
-        # will be set to true, if for some reason no Chi^2 test could be
-        # performed, but the two objects are still different (for example
-        # different bin size)
-        no_comparison_but_still_different = False
-
-        # execute the chi2 test, extract the relevant values and handle
-        # possible exceptions
-        pvalue = None
-        chi2 = None
-        chi2ndf = None
-        ndf = None
-        try:
-            ctest = validationcomparison.Chi2Test(self.reference.object,
-                                                  self.newest.object)
-            pvalue = ctest.pvalue()
-            chi2 = ctest.chi2()
-            chi2ndf = ctest.chi2ndf()
-            ndf = ctest.ndf()
-        except validationcomparison.ObjectsNotSupported as e:
-            self.chi2test_result = fail_message + str(e)
-        except validationcomparison.DifferingBinCount as e:
-            self.chi2test_result = fail_message + str(e)
-            no_comparison_but_still_different = True
-        except validationcomparison.TooFewBins as e:
-            self.chi2test_result = fail_message + str(e)
-        except validationcomparison.ComparisonFailed as e:
-            self.chi2test_result = fail_message + str(e)
-            no_comparison_but_still_different = True
-
-        if no_comparison_but_still_different:
+        if tester is None:
+            self.comparison_result_long = "Comparison not possible, because no" \
+                "appropriate comparison class could be " \
+                "found."
             self.comparison_result = "error"
-            self.pvalue = 0.0
 
-        if pvalue is not None:
-            # check if there is a custom setting for pvalue sensitivity
-            self.pvalue_warn = mop.pvalue_warn()
-            self.pvalue_error = mop.pvalue_error()
-
-            if self.pvalue_warn is None:
-                self.pvalue_warn = 1.0
-            if self.pvalue_error is None:
-                self.pvalue_error = 0.01
-
-            # If pvalue < 0.01: Very strong presumption against neutral
-            # hypothesis
-            if pvalue < self.pvalue_error:
-                self.comparison_result = "error"
-            # If pvalue < 1: Deviations at least exists
-            elif pvalue < self.pvalue_warn:
-                self.comparison_result = "warning"
-            else:
-                self.comparison_result = "equal"
-
-            self.chi2test_result = \
-                rf'Performed $\chi^2$-Test between {self.reference.revision} ' \
-                rf'and {self.newest.revision} ' \
-                rf'($\chi^2$ = {chi2:.4f}; NDF = {ndf}; ' \
-                rf'$\chi^2/\text{{NDF}}$ = {chi2ndf:.4f})'
-            self.pvalue = pvalue
         else:
-            self.pvalue = None
+            self.comparison_result_long = tester.comparison_result_long.format(
+                revision1=self.reference.revision,
+                revision2=self.newest.revision
+            )
+            self.comparison_result = tester.comparison_result
 
     def _set_background(self, canvas):
 
@@ -511,9 +447,8 @@ class Plotuple:
             self.height = 525
         canvas = ROOT.TCanvas('', '', self.width, self.height)
 
-        # todo [ref, trivial, low] Use MetaOptionParser instead for consistency
         # Allow possibility to turn off the stats box
-        if 'nostats' in self.metaoptions:
+        if self.mop.has_option('nostats'):
             ROOT.gStyle.SetOptStat("")
         else:
             ROOT.gStyle.SetOptStat("nemr")
@@ -523,7 +458,7 @@ class Plotuple:
         # the plot list:
         if self.reference is not None and self.newest \
                 and not self.reference == self.newest:
-            self.chi2test()
+            self.perform_comparison()
 
         # A variable which holds whether we
         # have drawn on the canvas already or not
@@ -534,11 +469,11 @@ class Plotuple:
         # If we have a 1D histogram
         if mode == '1D':
 
-            if 'nogrid' not in self.metaoptions:
+            if not self.mop.has_option('nogrid'):
                 canvas.SetGrid()
-            if 'logx' in self.metaoptions:
+            if self.mop.has_option('logx'):
                 canvas.SetLogx()
-            if 'logy' in self.metaoptions:
+            if self.mop.has_option('logy'):
                 canvas.SetLogy()
 
             # If there is a reference object, plot it first
@@ -592,10 +527,10 @@ class Plotuple:
                     # Get additional options for 1D histograms
                     # (Intersection with self.metaoptions)
                     additional_options = ['C']
-                    additional_options = list(
-                        set(additional_options) & set(self.metaoptions)
-                    )
-
+                    additional_options = [
+                        option for option in additional_options
+                        if self.mop.has_option(option)
+                    ]
                     options_str = plot.object.GetOption() + \
                         ' '.join(additional_options)
                     drawn = True
@@ -605,7 +540,7 @@ class Plotuple:
                 self._draw_root_object(self.type, plot.object, options_str)
 
                 # redraw grid ontop of histogram, if selected
-                if 'nogrid' not in self.metaoptions:
+                if not self.mop.has_option('nogrid'):
                     canvas.RedrawAxis("g")
 
                 canvas.Update()
@@ -627,7 +562,7 @@ class Plotuple:
                 # Get additional options for 2D histograms
                 additional_options = ''
                 for _ in ['col', 'colz', 'cont', 'contz', 'box']:
-                    if _ in self.metaoptions:
+                    if self.mop.has_option(_):
                         additional_options += ' ' + _
 
                 # Draw the reference on the canvas
@@ -674,8 +609,7 @@ class Plotuple:
         canvas = ROOT.TCanvas('', '', self.width, self.height)
 
         # Allow possibility to turn off the stats box
-        # todo [ref, trivial, low] Use MetaOptionParser instead for consistency
-        if 'nostats' in self.metaoptions:
+        if self.mop.has_option('nostats'):
             ROOT.gStyle.SetOptStat("")
         else:
             ROOT.gStyle.SetOptStat("nemr")
@@ -685,13 +619,13 @@ class Plotuple:
         # the plot list:
         if self.reference is not None and self.newest \
                 and not self.reference == self.newest:
-            self.chi2test()
+            self.perform_comparison()
 
-        if 'nogrid' not in self.metaoptions:
+        if not self.mop.has_option('nogrid'):
             canvas.SetGrid()
-        if 'logx' in self.metaoptions:
+        if self.mop.has_option('logx'):
             canvas.SetLogx()
-        if 'logy' in self.metaoptions:
+        if self.mop.has_option('logy'):
             canvas.SetLogy()
 
         # A variable which holds whether we
@@ -725,7 +659,7 @@ class Plotuple:
                 # Get additional options for 1D histograms
                 additional_options = ''
                 for _ in ['C']:
-                    if _ in self.metaoptions:
+                    if self.mop.has_option(_):
                         additional_options += ' ' + _
 
                 # Draw the reference on the canvas
@@ -739,7 +673,7 @@ class Plotuple:
                 self._draw_root_object(self.type, plot.object, "SAME")
 
             # redraw grid ontop of histogram, if selected
-            if 'nogrid' not in self.metaoptions:
+            if not self.mop.has_option('nogrid'):
                 canvas.RedrawAxis("g")
 
             canvas.Update()
@@ -803,8 +737,7 @@ class Plotuple:
         #     ]
         # }
 
-        mop = metaoptions.MetaOptionParser(self.metaoptions)
-        precision = mop.int_value("float-precision", default=4)
+        precision = self.mop.int_value("float-precision", default=4)
         format_str = "{{0:.{}f}}".format(precision)
 
         def value2str(obj):
@@ -889,10 +822,7 @@ class Plotuple:
             return json_objects.ComparisonPlot(
                 title=self.get_plot_title(),
                 comparison_result=self.comparison_result,
-                comparison_text=self.chi2test_result,
-                comparison_pvalue=self.pvalue,
-                comparison_pvalue_warn=self.pvalue_warn,
-                comparison_pvalue_error=self.pvalue_error,
+                comparison_text=self.comparison_result_long,
                 description=self.description,
                 contact=self.contact,
                 check=self.check,
@@ -901,5 +831,6 @@ class Plotuple:
                 is_expert=self.is_expert(),
                 plot_path=self.get_plot_path(),
                 png_filename=self.get_png_filename(),
-                pdf_filename=self.get_pdf_filename()
+                pdf_filename=self.get_pdf_filename(),
+                warnings=self.warnings
             )

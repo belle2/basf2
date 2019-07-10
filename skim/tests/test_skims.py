@@ -96,11 +96,11 @@ add_skim('CharmlessHad3Body', Had3BodyList, path=skimpath)
 # Charm skims
 # charm Skim: D0 -> K pi/ pi pi /K K
 from skim.charm import D0ToHpJm
-add_skim('D0ToHpJm', D0ToHpJm(path=skimpath), path=skimpath)
+add_skim('Charm2BodyHadronicD0', D0ToHpJm(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi/ pi pi /K K) pi
 from skim.charm import DstToD0PiD0ToHpJm
-add_skim('DstToD0PiD0ToHpJm', DstToD0PiD0ToHpJm(path=skimpath), path=skimpath)
+add_skim('Charm2BodyHadronic', DstToD0PiD0ToHpJm(path=skimpath), path=skimpath)
 
 # charm Skim: D* -> D0 (-> K pi pi0) pi
 from skim.charm import DstToD0PiD0ToHpJmPi0
@@ -131,8 +131,8 @@ from skim.charm import DstToD0PiD0ToHpHmKs
 add_skim('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
 
 # charm Skim: D -> gamma gamma/ e e/ mu mu
-from skim.charm import CharmRareList
-add_skim('CharmRare', CharmRareList(path=skimpath), path=skimpath)
+from skim.charm import CharmRare
+add_skim('CharmRare', CharmRare(path=skimpath), path=skimpath)
 
 
 # Systematics skim
@@ -221,11 +221,10 @@ from skim.fei import*
 add_skim('feiHadronicBplus', BplusHadronic(path=skimpath), path=skimpath)
 
 from skim.fei import*
-add_skim('feiSLBplusWithOneLep', BplusSLWithOneLep(path=skimpath), path=skimpath)
-
+add_skim('feiSLBplus', BplusSL(path=skimpath), path=skimpath)
 
 from skim.fei import*
-add_skim('feiSLB0WithOneLep', B0SLWithOneLep(path=skimpath), path=skimpath)
+add_skim('feiSLB0', B0SL(path=skimpath), path=skimpath)
 
 
 from skim.dark import SinglePhotonDarkList

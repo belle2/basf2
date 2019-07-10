@@ -150,7 +150,6 @@ from typing import Iterable
 import matplotlib.pyplot as plt
 import numpy as np
 import root_pandas
-import yaml
 from matplotlib.backends.backend_pdf import PdfPages
 
 import basf2
@@ -1000,10 +999,25 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         validation_harvest_path = self.get_input_file_names(validation_harvest_basename)[0]
 
         # Load "harvested" validation data from root files into dataframes (requires enough memory to hold data)
+        pr_columns = [  # Restrict memory usage by only reading in columns that are used in the steering file
+            'is_fake', 'is_clone', 'is_matched', 'quality_indicator',
+            'experiment_number', 'run_number', 'event_number', 'pr_store_array_number',
+            'pt_estimate', 'z0_estimate', 'd0_estimate', 'tan_lambda_estimate',
+            'phi0_estimate', 'pt_truth', 'z0_truth', 'd0_truth', 'tan_lambda_truth',
+            'phi0_truth',
+        ]
         # In ``pr_df`` each row corresponds to a track from Pattern Recognition
-        pr_df = root_pandas.read_root(validation_harvest_path, key='pr_tree/pr_tree')
+        pr_df = root_pandas.read_root(validation_harvest_path, key='pr_tree/pr_tree', columns=pr_columns)
+        mc_columns = [  # restrict mc_df to these columns
+            'experiment_number',
+            'run_number',
+            'event_number',
+            'pr_store_array_number',
+            'is_missing',
+            'is_primary',
+        ]
         # In ``mc_df`` each row corresponds to an MC track
-        mc_df = root_pandas.read_root(validation_harvest_path, key='mc_tree/mc_tree')
+        mc_df = root_pandas.read_root(validation_harvest_path, key='mc_tree/mc_tree', columns=mc_columns)
         if self.primaries_only:
             mc_df = mc_df[mc_df.is_primary.eq(True)]
 

@@ -39,7 +39,7 @@ if DefalutValue == 0:
     # Input the thickness of the matirial in the forward gap between TOP and ECL
     thickness_TOPfor = (np.ones(144) * 1.0e-5).ravel()
 
-    # Input the thickness of the matirial in the forward gap between ARICH and TOP
+    # Input the thickness of the matirial in the barrel gap between ECL and COIL
     thickness_ECLCOIL = (np.ones((92, 144)) * 1.0e-5).ravel()
 
     # Input the thickness of the matirial in the backward gap between barrel and endcap of ECL

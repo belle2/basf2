@@ -16,7 +16,6 @@ import argparse
 
 from basf2 import *
 from modularAnalysis import *
-from beamparameters import add_beamparameters
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 gb2_setuprel = 'release-03-02-00'
 skimCode = encodeSkimName('feiSLBplus')

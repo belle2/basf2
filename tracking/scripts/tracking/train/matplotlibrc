@@ -1,0 +1,7 @@
+# Use non-interactive plotting backend so that the steering file won't fail on  servers without X.
+
+# Some existing steering files use matplotlib.use(<backend>),
+# but that is not possible anymore because b2code-style-fix puts that line under
+# the import of pyplot, which does not help.
+
+backend : PDF

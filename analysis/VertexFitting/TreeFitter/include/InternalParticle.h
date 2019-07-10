@@ -23,7 +23,7 @@ namespace TreeFitter {
     /** constructor */
     InternalParticle(Belle2::Particle* particle,
                      const ParticleBase* mother,
-                     const TreeFitter::ConstraintConfiguration& config,
+                     const ConstraintConfiguration& config,
                      bool forceFitAll
                     ) ;
 

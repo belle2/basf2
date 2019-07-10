@@ -27,7 +27,7 @@
 namespace TreeFitter {
 
   FitManager::FitManager(Belle2::Particle* particle,
-                         const TreeFitter::ConstraintConfiguration& config,
+                         const ConstraintConfiguration& config,
                          double prec,
                          bool updateDaughters,
                          const bool useReferencing

@@ -38,7 +38,7 @@ namespace TreeFitter {
 
   InternalParticle::InternalParticle(Belle2::Particle* particle,
                                      const ParticleBase* mother,
-                                     const TreeFitter::ConstraintConfiguration& config,
+                                     const ConstraintConfiguration& config,
                                      bool forceFitAll
                                     ) :
     ParticleBase(particle, mother, &config),// config pointer here to allow final states not to have it

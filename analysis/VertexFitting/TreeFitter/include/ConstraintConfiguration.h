@@ -22,6 +22,7 @@ namespace TreeFitter {
       m_massConstraintType(false),
       m_massConstraintListPDG( {}),
                              m_fixedToMotherVertexListPDG({}),
+                             m_geoConstraintListPDG({}),
                              m_removeConstraintList({}),
                              m_automatic_vertex_constraining(false),
                              m_ipConstraint(false),

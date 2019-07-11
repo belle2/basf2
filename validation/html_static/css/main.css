@@ -766,6 +766,9 @@ td.show {
 
     border-style: solid;
     border-color: #666666;
+
+    width: 100%;
+    overflow-x: auto;
 }
 
 .wrap_rootfile{

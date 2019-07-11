@@ -2908,6 +2908,44 @@ namespace {
     EXPECT_B2FATAL(vnolist->function(nullptr));
   }
 
+  TEST_F(MetaVariableTest, pValueCombination)
+  {
+    TLorentzVector momentum;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    Particle KS(TLorentzVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
+    KS.setPValue(0.1);
+    momentum += KS.get4Vector();
+    Particle* newDaughters = particles.appendNew(KS);
+    daughterIndices.push_back(newDaughters->getArrayIndex());
+    Particle Jpsi(TLorentzVector(-1, 1, 1, 3.548), 443, Particle::c_Unflavored, Particle::c_Composite, 1);
+    Jpsi.setPValue(0.9);
+    momentum += Jpsi.get4Vector();
+    newDaughters = particles.appendNew(Jpsi);
+    daughterIndices.push_back(newDaughters->getArrayIndex());
+    Particle* B = particles.appendNew(momentum, 521, Particle::c_Flavored, daughterIndices);
+    B->setPValue(0.5);
+
+    const Manager::Var* singlePvalue = Manager::Instance().getVariable("pValueCombination(chiProb)");
+    ASSERT_NE(singlePvalue, nullptr);
+    EXPECT_FLOAT_EQ(singlePvalue->function(B), 0.5);
+
+    const Manager::Var* twoPvalues = Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb))");
+    ASSERT_NE(twoPvalues, nullptr);
+    EXPECT_FLOAT_EQ(twoPvalues->function(B), 0.05 * (1 - log(0.05)));
+
+    const Manager::Var* threePvalues =
+      Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb), daughter(1, chiProb))");
+    ASSERT_NE(threePvalues, nullptr);
+    EXPECT_FLOAT_EQ(threePvalues->function(B), 0.045 * (1 - log(0.045) + 0.5 * log(0.045) * log(0.045)));
+
+    // wrong number of arguments
+    EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination()"));
+
+    // non-existing variable
+    EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination(chiProb, NONEXISTANTVARIABLE)"));
+  }
+
   class PIDVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */

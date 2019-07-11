@@ -9,7 +9,6 @@ from basf2 import *
 import os
 import sys
 import inspect
-from analysisPath import *
 import subprocess
 import json
 # For channels in fei skim
@@ -26,7 +25,7 @@ all_skims = [
     "CharmSemileptonic", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
     "feiSLB0", "feiBplus", "feiHadronicB0",
     "feiHadronicBplus", "BtoPi0Pi0", "Charm3BodyHadronic2",
-    "Charm3BodyHadronic", "Charm3BodyHadronicD0", "Charm2BodyHadronic",
+    "Charm3BodyHadronic", "Charm3BodyHadronic1", "Charm3BodyHadronic3", "Charm2BodyHadronic", "Charm2BodyHadronicD0",
     "Charm2BodyNeutrals", "Charm2BodyNeutralsD0", "BtoDh_Kspi0", "BtoDh_hh",
     "BtoDh_Kshh", "Tau", "PRsemileptonicUntagged", "SLUntagged",
     "LeptonicUntagged", "TCPV", "CharmRare", "BtoXll", "BtoXgamma", "TauLFV",
@@ -275,16 +274,16 @@ _skimNameMatching = [
     ('12160100', 'BtoXgamma'),
     ('12160200', 'BtoXll'),
     ('14120500', 'BtoPi0Pi0'),
-    # ('17240100', 'Charm2BodyHadronic'),  # D* -> D0 -> K pi/pi pi/K K
-    ('17240100', 'DstToD0PiD0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K
+    ('17240100', 'Charm2BodyHadronic'),  # D* -> D0 -> K pi/pi pi/K K
+    # ('17240100', 'DstToD0PiD0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K
     ('17240200', 'Charm3BodyHadronic'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
     ('17240300', 'Charm3BodyHadronic1'),  # D* -> D0 -> h h pi0
     ('17240400', 'Charm2BodyNeutrals2'),  # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0
     ('17240500', 'Charm3BodyHadronic3'),  # D* -> D0 -> K- pi+ eta (RS+WS)
     ('17240600', 'Charm2BodyNeutrals'),  # D* -> D0 -> pi0 pi0/Ks pi0/Ks Ks
     ('17240700', 'Charm3BodyHadronic2'),  # D* -> D0 -> h h Ks
-    # ('17230100', 'Charm2BodyHadronicD0'),  # D0 -> K pi/pi pi/K K
-    ('17230100', 'D0ToHpJm'),  # D0 -> K pi/pi pi/K K
+    ('17230100', 'Charm2BodyHadronicD0'),  # D0 -> K pi/pi pi/K K
+    # ('17230100', 'D0ToHpJm'),  # D0 -> K pi/pi pi/K K
     ('17230200', 'Charm2BodyNeutralsD0'),  # D0 -> pi0 pi0/Ks pi0/Ks Ks
     ('17230300', 'CharmRare'),  # D0 -> g g/e e/mu mu
     ('17260900', 'CharmSemileptonic'),
@@ -424,7 +423,7 @@ def get_eventN(fileName):
         B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
-def skimOutputMdst(skimDecayMode, path, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
+def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
                    outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.

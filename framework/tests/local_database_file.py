@@ -5,9 +5,12 @@
 test parsing of local database files
 """
 
-from basf2 import logging, LogLevel, LogInfo, reset_database, use_local_database
+from basf2 import logging, LogLevel, LogInfo
 from conditions_db.cli_upload import parse_database_file
-from b2test_utils import clean_working_directory
+from b2test_utils import clean_working_directory, run_in_subprocess
+import ROOT
+
+ROOT.gInterpreter.Declare("#include <framework/database/TestingPayloadStorage.h>")
 
 
 entries = """
@@ -42,17 +45,23 @@ dbstore/bad_text_run2 1 0,0,0,run2
 for level in LogLevel.values.values():
     logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
 
+logging.enable_summary(False)
+logging.log_level = LogLevel.DEBUG
+logging.debug_level = 39
+evt = ROOT.Belle2.EventMetaData(0, 0, 0)
+payload = ROOT.Belle2.Conditions.PayloadMetadata("test")
+
 with clean_working_directory():
     for i, entry in enumerate(entries.splitlines(True)):
         print("testing", repr(entry))
         filename = "database-%02d.txt" % i
-        logging.log_level = LogLevel.ERROR
         with open(filename, "w") as f:
             f.write(entry)
-        reset_database()
-        logging.log_level = LogLevel.DEBUG
-        logging.debug_level = 200
-        use_local_database(filename)
+
+        # parse in python
         entries = parse_database_file(filename, check_existing=False)
         if entries:
             print(entries)
+        # and parse in C++
+        storage = ROOT.Belle2.Conditions.TestingPayloadStorage(filename)
+        run_in_subprocess(evt, payload, target=storage.get)

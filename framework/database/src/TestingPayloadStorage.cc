@@ -64,10 +64,11 @@ namespace Belle2::Conditions {
 
   void TestingPayloadStorage::read()
   {
-    if (!fs::is_regular_file(m_absoluteFilename)) {
-      B2FATAL("Given testing payload storage file doesn't exist or is not a regular file" << LogVar("storage file", m_filename));
-    }
     m_payloads.clear();
+    if (!fs::is_regular_file(m_absoluteFilename)) {
+      B2WARNING("Given testing payload storage file doesn't exist or is not a regular file" << LogVar("storage file", m_filename));
+      return;
+    }
     // read and parse the database content
     std::ifstream file(m_absoluteFilename.c_str());
     if (!file.is_open()) {

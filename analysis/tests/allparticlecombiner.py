@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 import basf2
 import b2test_utils
@@ -21,9 +20,9 @@ class TestAllParticleCombiner(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
-        main = basf2.create_path()
-
+        basf2.logging.package("framework").log_level = basf2.LogLevel.WARNING
         basf2.set_random_seed("1234")
+        main = basf2.create_path()
         inputfile = b2test_utils.require_file(
             'analysis/tests/mdst.root', py_case=self)
         main.add_module(

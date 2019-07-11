@@ -1,5 +1,4 @@
-[INFO] Steering file: /home/sbilokin/basf2-v1.0/releases/development/analysis/tests/particleloader_clone.py
-[INFO] The random number seed is set to "1337"
+[INFO] Steering file: analysis/tests/particleloader_clone.py
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)

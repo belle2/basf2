@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
-#include <framework/database/LocalDatabase.h>
+#include <framework/database/Configuration.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <boost/filesystem.hpp>
 
@@ -37,7 +37,9 @@ namespace Belle2 {
         DataStore::Instance().setInitializeActive(false);
         evtPtr.construct(1, 0, 0);
 
-        LocalDatabase::createInstance(m_tmpDir->getTempDir() + "/testPayloads/TestDatabase.txt");
+        auto& conf = Conditions::Configuration::getInstance();
+        conf.setNewPayloadLocation(m_tmpDir->getTempDir() + "/testPayloads/TestDatabase.txt");
+        conf.prependTestingPayloadLocation(m_tmpDir->getTempDir() + "/testPayloads/TestDatabase.txt");
       }
 
       /// Destroy the DB and the DataStore.

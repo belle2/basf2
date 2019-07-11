@@ -11,13 +11,14 @@ CHANGES since release-03-01-02:
   + isEndOfRun
 """
 
-from basf2 import create_path, process, set_random_seed, find_file, LogLevel
+from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging
 from mdst import add_mdst_dump
 
 if __name__ == "__main__":
+    logging.package("framework").log_level = LogLevel.WARNING
     set_random_seed(1)
     main = create_path()
     main.add_module("RootInput", inputFileName=find_file("mdst/tests/mdst-v03-01-02.root"), logLevel=LogLevel.WARNING)
-    main.add_module("EventInfoPrinter")
+    main.add_module("EventInfoPrinter", logLevel=LogLevel.INFO)
     add_mdst_dump(main, True)
     process(main, 3)

@@ -16,6 +16,7 @@
 #include <framework/core/PathIterator.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/database/DBStore.h>
+#include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
@@ -218,6 +219,7 @@ void EventProcessor::callEvent(Module* module)
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool setEventInfo)
 {
   LogSystem& logSystem = LogSystem::Instance();
+  auto dbsession = Database::Instance().startUpdate();
 
   m_processStatisticsPtr.registerInDataStore();
   //TODO I might want to overwrite it in initialize (e.g. if read from file)
@@ -432,6 +434,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 void EventProcessor::processBeginRun(bool skipDB)
 {
   m_inRun = true;
+  auto dbsession = Database::Instance().startUpdate();
 
   LogSystem& logSystem = LogSystem::Instance();
   m_processStatisticsPtr->startGlobal();

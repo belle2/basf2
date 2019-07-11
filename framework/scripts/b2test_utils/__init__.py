@@ -89,6 +89,17 @@ def show_only_errors():
         yield
 
 
+def configure_logging_for_tests():
+    """Change the log system to behave a bit more appropriately for testing scenarios:
+
+    * don't show C++ function names as they are not always the same across compilers
+    * disable error summary, just additional noise
+    """
+    basf2.logging.enable_summary(False)
+    for level in basf2.LogLevel.values.values():
+        basf2.logging.set_info(level, basf2.logging.get_info(level) & ~basf2.LogInfo.FUNCTION)
+
+
 @contextmanager
 def working_directory(path):
     """temprarily change the working directory to path

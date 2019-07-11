@@ -13,6 +13,7 @@ import b2test_utils
 
 inputFile = b2test_utils.require_file('mdst12.root', 'validation')
 
+basf2.logging.package("framework").log_level = basf2.LogLevel.WARNING
 basf2.set_random_seed("1337")
 fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']
 

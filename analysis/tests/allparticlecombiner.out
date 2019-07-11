@@ -1,5 +1,4 @@
 [INFO] Steering file: analysis/tests/allparticlecombiner.py
-[INFO] The random number seed is set to "1234"
 [INFO] Starting event processing, random seed is set to '1234'
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:fromPV (pi-:fromPV)

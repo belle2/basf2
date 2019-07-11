@@ -68,7 +68,7 @@ LogLikelihood values, the binary likelihood ratios and the global likelihood
 ratios for any arbitrary detector combination of mass hypothesis. The accepted
 detector codes are SVD, TOP, CDC, ARICH, ECL, KLM and ALL.
 
-If a likelihood is not available from the selected detector list, `NaN` is returned.
+If a likelihood is not available from the selected detector list, **NaN** is returned.
 
 .. warning :: 
   These variables are not to be used in physics analyses, but only by experts doing performance studies.
@@ -201,13 +201,21 @@ KLM Cluster and :math:`K_{L}^0` Identification
 
 Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 
+.. warning ::
+  Please note that these variables refer to KLMClusters, which are designed to reconstruct :math:`K_{L}^0` and other
+  neutral particles with the KLM subdetector. These variables **must not be used to do particle identification of
+  charged tracks** (for example, they must not be used to identify muons), otherwise there is a serious risk to spoil
+  a physics analysis. 
+  
+  For particle identification of charged tracks, please use the canonical PID variables.
+
 .. b2-variables::
    :group: KLM Cluster and KlongID
 
 Time Dependent CPV Analysis Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of TDCPV variables:
+To use most of the variables in this section on need to run `vertex.TagV` method:
 
 .. b2-variables::
    :group: Time Dependent CPV Analysis Variables
@@ -321,7 +329,7 @@ One can use the list in the steering file as follows:
   modular_analusis.variablesToNtuple(variables=my_list,
                                      ...)
 
-It is also possible to use `variableCollection`. Name of the variable collection can
+It is also possible to create user-defined variable collections. Name of the variable collection can
 be threated as a variable name, and hence one would have the following syntax in the steering file:
 
 .. code:: python

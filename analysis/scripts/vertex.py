@@ -699,7 +699,7 @@ def vertexTree(
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
     :Example:
-        An example of usage for the decay chain: math:`B^0\\to\\pi^+\\pi^-\\pi^0`  is the following:
+        An example of usage for the decay chain :math:`B^0\\to\\pi^+\\pi^-\\pi^0`  is the following:
 
     ::
 

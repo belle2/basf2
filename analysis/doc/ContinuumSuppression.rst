@@ -52,7 +52,7 @@ Here is a simple example that you can use as a starting point:
         Prior to Feb. 2017 B2GM, these selections for ROE: ``'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2'`` were hard coded in the module. Since then the explicit usage of a cleanMask is mandatory.
 
 Another new feature is the addition of an event-level R2 variable
-(`R2EventLevel`). It has been added as a `Continuum Suppression` variable, even
+(`R2EventLevel`). It has been added as a Continuum Suppression variable, even
 though it is event-level. This returns the event-level R2, where no cuts have
 been applied. Being event-level, it does not reconstruct a B or build a ROE, so
 no masks can be applied. This may be useful for skimming purposes, as R2 is a

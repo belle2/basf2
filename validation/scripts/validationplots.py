@@ -485,7 +485,7 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         rf = os.path.basename(plotuple.rootfile)
         if len(rf) > 30:
             rf = rf[:30] + "..."
-        return f"'{key}' from '{rf}'"
+        return f"{plotuple.package}/{key}/{rf}"
 
     n_warnings = 0
     plotuple_no_warning = []

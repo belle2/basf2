@@ -54,7 +54,7 @@ void test2_Validation_pi0() {
 
     /* Take the pi0tuple prepared by the NtupleMaker */
     TChain * recoTree = new TChain("pi0tuple");
-    recoTree->AddFile("../GenericB.ntup.root");
+    recoTree->AddFile("GenericB.ntup.root");
 
     //Plots for online/web validation
     TFile* output = new TFile("test2_Validation_pi0_output.root","recreate");
@@ -67,10 +67,11 @@ void test2_Validation_pi0() {
     h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Contact",contact));
 
     /* Mass constrained fit value,as stored in Particle */
-    TH1F * h_pi0_m_fit = new TH1F("pi0_m_fit",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
+    /*    TH1F * h_pi0_m_fit = new TH1F("pi0_m_fit",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
     h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Description","pi0 Mass constrained fit mass,with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0."));
     h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
     h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Contact",contact));
+    */
 
     /* Invariant mass determined from the two photon daughters */
     TH1F * h_pi0_m    = new TH1F("pi0_m",";Mass without photon energy cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
@@ -78,7 +79,7 @@ void test2_Validation_pi0() {
     h_pi0_m->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
     h_pi0_m->GetListOfFunctions()->Add(new TNamed("Contact",contact));
     
-    TH1F * h_pi0_m_truth    = new TH1F("pi0_m",";Mass without cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
+    TH1F * h_pi0_m_truth    = new TH1F("pi0_m",";True mass without cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
     h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Description","pi0 mass from photons,with mcErrors==0. A Generic BBbar sample is used."));
     h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Check","Check if mean is correct. Currently photon energy is wrong and gives wrong mean."));
     h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Contact",contact));
@@ -99,7 +100,7 @@ void test2_Validation_pi0() {
         TLorentzVector lv_pi0_gamma1(pi0_gamma1_P4);
         TLorentzVector lv_pi0_raw = lv_pi0_gamma0+lv_pi0_gamma1;
         float pi0_raw_M = lv_pi0_raw.M();
-        h_pi0_m_fit->Fill(pi0_M);
+	//        h_pi0_m_fit->Fill(pi0_M);
         h_pi0_m->Fill(pi0_raw_M);
         if(lv_pi0_gamma0.E()>0.05&&lv_pi0_gamma1.E()>0.05)h_pi0_m_cut->Fill(pi0_raw_M);
         if( pi0_mcErrors<1 )h_pi0_m_truth->Fill(pi0_raw_M);
@@ -108,29 +109,19 @@ void test2_Validation_pi0() {
     TCanvas *canvas = new TCanvas ("canvas","canvasReco",1000,800);
     canvas->Print("test2_Validation_pi0_plots.pdf[");
 
-    // Mass constrained fit mass
-    h_pi0_m_truth->SetLineColor(kGreen);
+    // Truth matched pi0 mass
     h_pi0_m_truth->SetMinimum(0.);
     h_pi0_m_truth->Draw();
     canvas->Print("test2_Validation_pi0_plots.pdf");
     
-    // Mass constrained fit mass
-    h_pi0_m_fit->SetLineColor(kRed);
-    h_pi0_m_fit->SetMinimum(0.);
-    h_pi0_m_fit->Draw();
-    canvas->Print("test2_Validation_pi0_plots.pdf");
-
-    // Raw masses (unfit)
-    h_pi0_m->SetLineColor(kRed);
-    h_pi0_m->Draw();
-    h_pi0_m->SetMinimum(0.);
-    h_pi0_m_cut->SetLineColor(kBlue);
-    h_pi0_m_cut->Draw("same");
+    // Pi0 mass with photon energy cut
+    //    h_pi0_m_cut->SetMinimum(0.);
+    h_pi0_m_cut->Draw();
     canvas->Print("test2_Validation_pi0_plots.pdf");
 
     RooRealVar *mass  =  new RooRealVar("mass","m(#pi^{0}) GeV" ,0.08,0.18);
     RooDataHist h_pi0_cut("h_pi0_cut","h_pi0_cut",*mass,h_pi0_m_cut);
-    RooDataHist h_pi0_nocut("h_pi0_nocut","h_pi0_nocut",*mass,h_pi0_m);
+    //    RooDataHist h_pi0_nocut("h_pi0_nocut","h_pi0_nocut",*mass,h_pi0_m);
 
     //pi0 signal PDF is a Crystal Ball (Gaussian also listed in case we want to switch)
     RooRealVar mean("mean","mean",0.14,0.11,0.16);
@@ -138,7 +129,7 @@ void test2_Validation_pi0() {
     RooGaussian gau1("gau1","gau1",*mass,mean,sig1);
 
     RooRealVar alphacb("alphacb","alpha",1.4,0.1,1.8);
-    RooRealVar ncb("ncb","n",8,2.,15);
+    RooRealVar ncb("ncb","n",8); //,2.,15);
     RooCBShape sigcb("sigcb","sig",*mass,mean,sig1,alphacb,ncb);
 
     //pi0 background PDF is a 2nd order Chebyshev
@@ -180,21 +171,6 @@ void test2_Validation_pi0() {
     float widtherror = sig1.getError();
 
     framex->Draw("");
-    canvas->Print("test2_Validation_pi0_plots.pdf");
-
-    /* Fit to the unfit mass with cuts */
-    totalPdf.fitTo(h_pi0_nocut,RooFit::Extended(kTRUE),Minos(1));
-    RooPlot *framey = mass->frame();
-    h_pi0_nocut.plotOn(framey,Binning(40),Name("Hist"));
-    framey->SetMaximum(framey->GetMaximum());
-    totalPdf.plotOn(framey,Normalization(1.0,RooAbsReal::RelativeExpected),Name("curve"));
-    //  totalPdf.plotOn(framey,Components(RooArgSet(gau1)),LineStyle(kDashed),LineColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected),ProjectionRange("sigreg"));
-    totalPdf.plotOn(framey,Components(RooArgSet(sigcb)),LineStyle(kDashed),LineColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected),ProjectionRange("sigreg"));
-    totalPdf.plotOn(framey,Components(RooArgSet(bkg)),LineStyle(3),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected),ProjectionRange("sigreg"));
-    totalPdf.paramOn(framey,Parameters(RooArgSet(sig1,mean,nsig)),Format("NELU",AutoPrecision(2)),Layout(0.4,0.95,0.95) );
-    framey->getAttText()->SetTextSize(0.03);
-    framey->SetMaximum(h_pi0_m->GetMaximum()*1.5);
-    framey->Draw();
     canvas->Print("test2_Validation_pi0_plots.pdf");
 
     /* Save the numerical fit results to a validation ntuple */

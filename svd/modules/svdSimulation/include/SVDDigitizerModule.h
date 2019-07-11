@@ -155,10 +155,6 @@ namespace Belle2 {
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
       double m_startSampling;
-      /** Number of samples
-       * Number of consecutive APV25 samples
-       */
-      int m_nAPV25Samples;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */

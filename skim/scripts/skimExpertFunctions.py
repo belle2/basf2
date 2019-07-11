@@ -24,7 +24,7 @@ all_skims = [
     "BottomoniumEtabExclusive", "SystematicsLambda", "Systematics",
     "Resonance", "ISRpipicc", "BtoDh_Kspipipi0", "BtoPi0Pi0",
     "CharmSemileptonic", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
-    "feiSLB0WithOneLep", "feiBplusWithOneLep", "feiHadronicB0",
+    "feiSLB0", "feiBplus", "feiHadronicB0",
     "feiHadronicBplus", "BtoPi0Pi0", "Charm3BodyHadronic2",
     "Charm3BodyHadronic", "Charm3BodyHadronicD0", "Charm2BodyHadronic",
     "Charm2BodyNeutrals", "Charm2BodyNeutralsD0", "BtoDh_Kspi0", "BtoDh_hh",
@@ -270,8 +270,8 @@ _skimNameMatching = [
     ('14120400', 'BtoDh_Kspipipi0'),
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
-    ('11180300', 'feiSLB0WithOneLep'),
-    ('11180400', 'feiSLBplusWithOneLep'),
+    ('11180300', 'feiSLB0'),
+    ('11180400', 'feiSLBplus'),
     ('12160100', 'BtoXgamma'),
     ('12160200', 'BtoXll'),
     ('14120500', 'BtoPi0Pi0'),
@@ -375,7 +375,7 @@ def add_skim(label, lists, path):
     summaryOfLists(lists, path=path)
 
 
-def setSkimLogging(path=analysis_main, additional_modules=[]):
+def setSkimLogging(path, additional_modules=[]):
     """
     Turns the log level to ERROR for  several modules to decrease
     the total size of the skim log files
@@ -392,7 +392,7 @@ def setSkimLogging(path=analysis_main, additional_modules=[]):
     return
 
 
-def ifEventPasses(cut, conditional_path, path=analysis_main):
+def ifEventPasses(cut, conditional_path, path):
     """
     If the event passes the given ``cut`` proceed to process everything in ``conditional_path``.
     Afterwards return here and continue processing with the next module.
@@ -424,7 +424,7 @@ def get_eventN(fileName):
         B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
-def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,
+def skimOutputMdst(skimDecayMode, path, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
                    outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.

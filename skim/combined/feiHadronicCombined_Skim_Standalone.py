@@ -25,7 +25,6 @@ import os.path
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
 gb2_setuprel = 'release-03-02-00'
@@ -55,7 +54,7 @@ skimCode2 = encodeSkimName('feiHadronicBplus')
 skimOutputUdst(skimCode2, BphadronicList, path=path)
 summaryOfLists(BphadronicList, path=path)
 
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

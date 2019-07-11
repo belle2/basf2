@@ -3,7 +3,7 @@ from skimExpertFunctions import get_test_file
 
 all_skims = [
     "Dark", "Charm", "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "MiscCombined", "feiHadronic",
-    "Semileptonic", "Quarkonium", "feiSLWithOneLepCombined"
+    "Semileptonic", "Quarkonium", "feiSLCombined"
 ]
 
 MCTypes = ['mixedBGx1', 'chargedBGx1', 'ccbarBGx1', 'ssbarBGx1',

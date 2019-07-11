@@ -15,6 +15,7 @@ from ROOT import TFile
 from argparse import ArgumentParser
 import os
 import glob
+import sys
 
 # parse command line options
 parser = ArgumentParser(description='Measure the execution time.')
@@ -72,6 +73,7 @@ if args.file is not None:
 # print benchmark results and write them to the output file
 set_log_level(LogLevel.INFO)
 categories = ['Simulation', 'TriggerSimulation', 'Tracking', 'PID', 'Clustering']
+max_fraction = -1
 for module in statistics.modules:
     if module.name not in ['Sum_' + category for category in categories]:
         continue
@@ -81,6 +83,8 @@ for module in statistics.modules:
     fraction = -1
     if category in limits.keys():
         fraction = time / limits[category]
+        if fraction > max_fraction:
+            max_fraction = fraction
         message += ' = %.f%% of the limit.' % (100 * fraction)
         if fraction <= 0.9:
             B2INFO(message)
@@ -96,3 +100,6 @@ for module in statistics.modules:
         if fraction >= 0:
             output.write(' %.4f' % fraction)
         output.write('\n')
+
+# fail if above limit
+sys.exit(0 if max_fraction <= 1 else 1)

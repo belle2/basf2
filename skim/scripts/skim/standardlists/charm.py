@@ -5,7 +5,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def loadStdD0(path=analysis_main):
+def loadStdD0(path):
     """
     Create a list of 'D0:all' list, with an invariant mass cut :math:`1.82 < M < 1.92 GeV`, from the following particles lists:
 
@@ -33,7 +33,7 @@ def loadStdD0(path=analysis_main):
     return DList
 
 
-def loadStdDplus(path=analysis_main):
+def loadStdDplus(path):
     """
     Create a list of 'D+:all' list, with an invariant mass cut :math:`1.82 < M < 1.92 GeV`, from the following particles lists:
 
@@ -59,7 +59,7 @@ def loadStdDplus(path=analysis_main):
     return DList
 
 
-def loadStdDstar0(path=analysis_main):
+def loadStdDstar0(path):
     """
     Create a list of 'D*0:all' list, with an invariant mass cut :math:`1.95 < M < 2.05 GeV`, from the following particles lists:
 
@@ -80,7 +80,7 @@ def loadStdDstar0(path=analysis_main):
     return DList
 
 
-def loadStdDstarPlus(path=analysis_main):
+def loadStdDstarPlus(path):
     """
     Create a list of 'D*++:all' list, with an invariant mass cut :math:`1.95 < M < 2.05 GeV`, from the following particles lists:
       - 'D0:all pi+:all'

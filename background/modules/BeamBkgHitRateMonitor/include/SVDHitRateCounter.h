@@ -17,6 +17,7 @@
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <TTree.h>
 #include <map>
+#include <string>
 
 
 namespace Belle2 {
@@ -63,8 +64,10 @@ namespace Belle2 {
 
       /**
        * Constructor
+       * @param svdShaperDigitsName name of the input SVDShaperDigits collection
        */
-      SVDHitRateCounter()
+      SVDHitRateCounter(std::string svdShaperDigitsName):
+        m_svdShaperDigitsName(svdShaperDigitsName)
       {}
 
       /**
@@ -122,6 +125,7 @@ namespace Belle2 {
       SVDFADCMaskedStrips m_FADCMaskedStrips; /**< payload for strips masked on FADC level */
 
       // other
+      std::string m_svdShaperDigitsName; /**< name of the input SVDShaperDigits collection */
       int m_activeStrips = 0; /**< number of active strips */
       int m_layerActiveStrips[4] = {0}; /**< number of active strips in each layer */
       int m_layerLadderActiveStrips[4][16] = {0}; /**< number of active strips in each layer, ladder */

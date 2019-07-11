@@ -24,7 +24,7 @@ namespace Belle2 {
     void SVDHitRateCounter::initialize(TTree* tree)
     {
       // register collection(s) as optional, your detector might be excluded in DAQ
-      m_digits.isOptional();
+      m_digits.isOptional(m_svdShaperDigitsName);
 
       B2DEBUG(10, "SVDHitRateCounter: initialize()");
       // set branch address

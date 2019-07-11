@@ -54,7 +54,7 @@ void test2_Validation_pi0() {
 
     /* Take the pi0tuple prepared by the NtupleMaker */
     TChain * recoTree = new TChain("pi0tuple");
-    recoTree->AddFile("GenericB.ntup.root");
+    recoTree->AddFile("../GenericB.ntup.root");
 
     //Plots for online/web validation
     TFile* output = new TFile("test2_Validation_pi0_output.root","recreate");
@@ -65,13 +65,6 @@ void test2_Validation_pi0() {
     h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Description","pi0 invariant mass after Egamma>0.05 GeV cut. A Generic BBbar sample is used."));
     h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
     h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Contact",contact));
-
-    /* Mass constrained fit value,as stored in Particle */
-    /*    TH1F * h_pi0_m_fit = new TH1F("pi0_m_fit",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
-    h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Description","pi0 Mass constrained fit mass,with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0."));
-    h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
-    h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Contact",contact));
-    */
 
     /* Invariant mass determined from the two photon daughters */
     TH1F * h_pi0_m    = new TH1F("pi0_m",";Mass without photon energy cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
@@ -100,7 +93,6 @@ void test2_Validation_pi0() {
         TLorentzVector lv_pi0_gamma1(pi0_gamma1_P4);
         TLorentzVector lv_pi0_raw = lv_pi0_gamma0+lv_pi0_gamma1;
         float pi0_raw_M = lv_pi0_raw.M();
-	//        h_pi0_m_fit->Fill(pi0_M);
         h_pi0_m->Fill(pi0_raw_M);
         if(lv_pi0_gamma0.E()>0.05&&lv_pi0_gamma1.E()>0.05)h_pi0_m_cut->Fill(pi0_raw_M);
         if( pi0_mcErrors<1 )h_pi0_m_truth->Fill(pi0_raw_M);
@@ -115,13 +107,11 @@ void test2_Validation_pi0() {
     canvas->Print("test2_Validation_pi0_plots.pdf");
     
     // Pi0 mass with photon energy cut
-    //    h_pi0_m_cut->SetMinimum(0.);
     h_pi0_m_cut->Draw();
     canvas->Print("test2_Validation_pi0_plots.pdf");
 
     RooRealVar *mass  =  new RooRealVar("mass","m(#pi^{0}) GeV" ,0.08,0.18);
     RooDataHist h_pi0_cut("h_pi0_cut","h_pi0_cut",*mass,h_pi0_m_cut);
-    //    RooDataHist h_pi0_nocut("h_pi0_nocut","h_pi0_nocut",*mass,h_pi0_m);
 
     //pi0 signal PDF is a Crystal Ball (Gaussian also listed in case we want to switch)
     RooRealVar mean("mean","mean",0.14,0.11,0.16);

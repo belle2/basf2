@@ -360,6 +360,8 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
   int expNo = evtMetaData->getExperiment();
   B2DEBUG(1, (byMuid ? "muid" : "ext") << ": Experiment " << expNo << "  run " << evtMetaData->getRun());
   if (byMuid) {
+    if (!m_muidParameters.isValid())
+      B2FATAL("Muid parameters are not available.");
     if (m_MuonPlusPar != NULL) {
       if (m_ExpNo == expNo) { return; }
       delete m_MuonPlusPar;

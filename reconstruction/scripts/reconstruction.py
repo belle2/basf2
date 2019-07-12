@@ -184,7 +184,6 @@ def add_pretracking_reconstruction(path, components=None):
 
     :param path: The path to add the modules to.
     :param components: list of geometry components to include reconstruction for, or None for all components.
-    :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     """
 
     add_ecl_modules(path, components)

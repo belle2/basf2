@@ -217,7 +217,6 @@ namespace {
     DecayDescriptor dd1;
     bool initok = dd1.init("@Xsd:candidates -> K+:loose pi-:loose");
     EXPECT_EQ(initok, true);
-
     ASSERT_NE(dd1.getMother(), nullptr);
     EXPECT_EQ(dd1.getMother()->getName(), "Xsd");
     EXPECT_EQ(dd1.getMother()->isUnspecified(), true);
@@ -226,11 +225,17 @@ namespace {
     // Both selectors, @ and ^, cannot be used in same time
     DecayDescriptor dd2;
     initok = dd2.init("^@Xsd:candidates -> K+:loose pi-:loose");
-    EXPECT_EQ(initok, false);
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd2.getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd2.getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd2.getMother()->isSelected(), true);
 
     DecayDescriptor dd3;
     initok = dd3.init("@^Xsd:candidates -> K+:loose pi-:loose");
-    EXPECT_EQ(initok, false);
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd3.getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd3.getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd3.getMother()->isSelected(), true);
 
 
     // @ can be attached to a daughter
@@ -249,11 +254,17 @@ namespace {
     // Both selectors, @ and ^, cannot be used in same time
     DecayDescriptor dd5;
     initok = dd5.init("B0:Xsdee -> ^@Xsd e+:loose e-:loose");
-    EXPECT_EQ(initok, false);
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd5.getDaughter(0)->getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd5.getDaughter(0)->getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd5.getDaughter(0)->getMother()->isSelected(), true);
 
     DecayDescriptor dd6;
     initok = dd6.init("B0:Xsdee -> @^Xsd e+:loose e-:loose");
-    EXPECT_EQ(initok, false);
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd6.getDaughter(0)->getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd6.getDaughter(0)->getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd6.getDaughter(0)->getMother()->isSelected(), true);
 
   }
 

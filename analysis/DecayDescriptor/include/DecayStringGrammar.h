@@ -41,7 +41,7 @@ namespace Belle2 {
     reserved = space || '^' || '[' || ']' || '>' || ':' || '.' || '?' || '!' || '@';
 
     // particle composed of selector, particle name, and user label: "^D_s+:label"
-    particle %= -selector >> lexeme[+(char_ - reserved)] >> -label;
+    particle %= *selector >> lexeme[+(char_ - reserved)] >> -label;
     selector = string("^") | string("@");
     label %= lit(":") >> lexeme[+(char_ - reserved)];
 

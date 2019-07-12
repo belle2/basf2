@@ -123,11 +123,11 @@ namespace Belle2 {
      * @param expNo experiment number of IOV
      * @param firstRun first run number of IOV
      * @param lastRun last run number of IOV
-     * @param roughyCalibrated if true set payload status to roughy calibrated
+     * @param roughlyCalibrated if true set payload status to roughly calibrated
      */
     void importCommonT0(double value, double error,
                         int expNo, int firstRun, int lastRun,
-                        bool roughyCalibrated = false);
+                        bool roughlyCalibrated = false);
 
     /**
      * Prints sample time calibration info about constants stored in database

@@ -53,12 +53,12 @@
 		<height unit="um">300</height>
 		<Active>
 			<u unit="mm"> 1.520</u>
-			<v unit="mm"> 1.390</v>
+			<v unit="mm"> 1.330</v>
 			<stripsU>768</stripsU>
 			<stripsV>512</stripsV>
-			<width  unit="mm">57.590</width>
-			<width2 unit="mm">38.420</width2>
-			<length unit="mm">122.760</length>
+			<width  unit="mm">57.600</width>
+			<width2 unit="mm">38.400</width2>
+			<length unit="mm">122.880</length>
 			<height unit="um"> 300</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
@@ -87,12 +87,12 @@
 		<length unit="mm">124.880</length>
 		<height unit="um">320</height>
 		<Active>
-			<u unit="mm"> 0.940</u>
-			<v unit="mm"> 0.990</v>
+			<u unit="mm"> 0.950</u>
+			<v unit="mm"> 1.05</v>
 			<stripsU>768</stripsU>
 			<stripsV>512</stripsV>
-			<width  unit="mm">57.720</width>
-			<length unit="mm">122.900</length>
+			<width  unit="mm">57.60</width>
+			<length unit="mm">122.880</length>
 			<height unit="um"> 320</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
@@ -126,12 +126,12 @@
 		<length unit="mm">124.880</length>
 		<height unit="um">320.000</height>
 		<Active>
-			<u unit="mm"> 0.940</u>
-			<v unit="mm"> 0.990</v>
+			<u unit="mm"> 1.00</u>
+			<v unit="mm"> 1.05</v>
 			<stripsU>768</stripsU>
 			<stripsV>768</stripsV>
-			<width  unit="mm">38.520</width>
-			<length unit="mm">122.900</length>
+			<width  unit="mm">38.400</width>
+			<length unit="mm">122.880</length>
 			<height unit="um">320.000</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>

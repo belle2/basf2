@@ -26,12 +26,16 @@ namespace Belle2 {
 
     /**
      * hit quality enumerators
+     *
+     * Note: the only alowed place for switching to c_Uncalibrated is TOPChannelMasker
+     * because this information must be also passed to reconstruction
      */
     enum EHitQuality {
       c_Junk = 0,
       c_Good = 1,
       c_CrossTalk = 3,
-      c_CalPulse = 4
+      c_CalPulse = 4,
+      c_Uncalibrated = 5
     };
 
     /**

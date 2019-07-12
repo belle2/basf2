@@ -19,11 +19,12 @@ namespace Belle2 {
 
   namespace Conditions {
 
-    /** Class to store and retrieve temporary payloads Temporary payloads are
-     * stored in a simple way where we create a root files and a plain text file
-     * with name, revision and iov for each of these files. This is not very
-     * safe but ideal for testing and manual adjustments before final validation
-     * and upload to the cental server.
+    /** Class to store and retrieve temporary payloads.
+     *
+     * Temporary payloads are stored in a directory where we create a root files
+     * and a plain text file with name, revision and iov for each of these
+     * files. This is not very safe but ideal for testing and manual adjustments
+     * before final validation and upload to the cental server.
      *
      * The interface is very basic: We create an instance with a filename and
      * then we either get() payload information for a given event and payload

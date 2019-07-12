@@ -17,12 +17,12 @@ namespace Belle2::Conditions {
   struct PayloadMetadata {
     /** Constructor to request a payload with a given name and indicate whether non-existence is ok */
     PayloadMetadata(const std::string& _name, bool _required = true): name{_name}, required{_required} {}
-    /** Constructor for all the information which is usually obtained from providers. missingOk and filename are not part of this as they get filled in later steps or from other parties */
+    /** Constructor for all the information which is usually obtained from providers. "required" and "filename" are not part of this as they get filled in later steps or from other parties */
     PayloadMetadata(const std::string& _name, const std::string& _globaltag, const std::string& _payloadUrl,
                     const std::string& _baseUrl, const std::string& _checksum, int firstExp, int firstRun, int finalExp, int finalRun,
                     int _revision): name(_name), globaltag(_globaltag), payloadUrl(_payloadUrl), baseUrl(_baseUrl), checksum(_checksum),
       iov{firstExp, firstRun, finalExp, finalRun}, revision(_revision) {}
-    /** Update information from another instance but keep the missingOk flag untouched */
+    /** Update information from another instance but keep the "required" flag untouched */
     void update(const PayloadMetadata& other)
     {
       bool r{required};

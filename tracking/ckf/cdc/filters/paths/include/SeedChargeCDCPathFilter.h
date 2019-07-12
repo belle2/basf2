@@ -23,7 +23,6 @@ namespace Belle2 {
       // Not able to find any hits
       if (path.size() == 1)
       {
-        // B2INFO("No hits found.");
         return NAN;
       }
 
@@ -36,7 +35,7 @@ namespace Belle2 {
       // We don't want tracks that flipped charge
       if (path.front().getSeed()->getChargeSeed() != path.back().getTrackState().getCharge())
       {
-        // B2INFO("Flipped charge: " << path.front().getSeed()->getChargeSeed() << "->" << path.back().getTrackState().getCharge());
+        B2DEBUG(100, "Flipped charge: " << path.front().getSeed()->getChargeSeed() << "->" << path.back().getTrackState().getCharge());
         return NAN;
       }
 

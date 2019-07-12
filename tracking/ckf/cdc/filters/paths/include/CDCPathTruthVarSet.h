@@ -19,7 +19,6 @@ namespace Belle2 {
   constexpr
   static char const* const cdcPathTruthVarNames[] = {
     "mcTrackHits",
-    "matched",
     "daughters",
     "PDG",
     "seed_p_truth",
@@ -46,8 +45,7 @@ namespace Belle2 {
   };
 
   /**
-   * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
-   * which knows the truth information if two tracks belong together or not.
+   * Var set to store basic quantities related to CDC CKF (using truth information)
    */
   class CDCPathTruthVarSet : public TrackFindingCDC::VarSet<CDCPathTruthVarNames> {
 

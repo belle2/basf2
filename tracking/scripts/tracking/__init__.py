@@ -54,7 +54,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks,
-                          use_second_cdc_hits=use_second_cdc_hits)
+                          use_second_cdc_hits=use_second_cdc_hits, use_ecl_to_cdc_ckf=True)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -158,7 +158,8 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
 
 def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
-                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True):
+                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
+                      use_ecl_to_cdc_ckf=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -172,6 +173,7 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
     :param components: the list of geometry components in use or None for all components.
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
+    :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
@@ -192,7 +194,8 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
     latest_reco_tracks = None
 
     if trigger_mode in ["fast_reco", "all"] and is_cdc_used(components):
-        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks)
+        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
+                              use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf)
         latest_reco_tracks = cdc_reco_tracks
 
     if trigger_mode in ["hlt", "all"] and is_svd_used(components):

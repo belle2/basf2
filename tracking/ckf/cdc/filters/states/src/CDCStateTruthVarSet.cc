@@ -33,7 +33,6 @@ bool CDCStateTruthVarSet::extract(const BaseCDCStateFilter::Object* pair)
   const auto* wireHit = state->getWireHit();
   const auto* cdcHit = wireHit->getHit();
   const auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
-  //const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
 
   // Bremsstrahlung etc (works for electron gun, check for other events later)
   while (seedMCParticle->getMother()) {

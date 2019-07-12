@@ -80,7 +80,6 @@ namespace Belle2 {
       // TODO: as we do not need any information on the current state (track state) of the path, we could in principle
       // TODO: precalculate everything in here
 
-
       // Create cache over wirehits, if empty:
       if (m_wireHitCache.empty()) {
         const size_t nHits = wireHits.size();
@@ -168,10 +167,6 @@ namespace Belle2 {
           if (fabs(deltaPhi)  > m_maximalDeltaPhi)  {
             continue;
           }
-          //} else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
-          //if (fabs(deltaPhi)  > m_maximalDeltaPhi_eclSeed)  {
-          //  continue;
-          //}
         }
 
         const TrackFindingCDC::CDCWireHit* wireHit = wireHits[idx];
@@ -191,8 +186,6 @@ namespace Belle2 {
     int m_maximalLayerJump_eclSeed = 3;
     /// Maximal distance in phi between the path last hit/seed and the candidate hit
     double m_maximalDeltaPhi =  TMath::Pi() / 8;
-    /// Maximal distance in phi between the path last hit/seed and the candidate hit
-    double m_maximalDeltaPhi_eclSeed =  TMath::Pi() / 4;
     /// Parameter for the direction in which the tracks are built
     std::string m_param_writeOutDirectionAsString = "forward";
     /// Direction parameter converted from the string parameters

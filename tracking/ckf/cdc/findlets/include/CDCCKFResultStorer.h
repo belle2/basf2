@@ -55,6 +55,8 @@ namespace Belle2 {
     std::string m_param_trackFindingDirectionAsString = "forward";
     /// Direction parameter converted from the string parameters
     TrackFindingCDC::EForwardBackward m_param_trackFindingDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    /// Set flag that hit is taken
+    bool m_param_setTakenFlag = true;
 
     // Store Arrays
     /// Output Reco Tracks Store Array

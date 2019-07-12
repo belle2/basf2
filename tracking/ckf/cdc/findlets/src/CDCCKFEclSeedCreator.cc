@@ -40,15 +40,10 @@ void CDCCKFEclSeedCreator::exposeParameters(ModuleParamList* moduleParamList, co
                                 "Minimal energy requirement for the input clusters",
                                 m_param_minimalEnRequirement);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "seedDeadRegionPhi"),
-                                m_param_seedDeadRegionPhi,
-                                "Area in phi around seed in which additional showers are ignored",
-                                m_param_seedDeadRegionPhi);
-
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "seedDeadRegionTheta"),
-                                m_param_seedDeadRegionTheta,
-                                "Area in theta around seed in which additional showers are ignored",
-                                m_param_seedDeadRegionTheta);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "restrictToForwardSeeds"),
+                                m_param_restrictToForwardSeeds,
+                                "Don't do Ecl seeding in central region to save computing time",
+                                m_param_restrictToForwardSeeds);
 }
 
 void CDCCKFEclSeedCreator::initialize()
@@ -65,36 +60,6 @@ void CDCCKFEclSeedCreator::initialize()
 
 void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 {
-  std::vector<ECLShower> goodShowers;
-
-  // TODO: Improve this loop. It is not necessary to create the "goodShowers" first.
-  // Avoid Bremsstrahlung showers by simple dR criterion
-  for (auto& shower : m_inputECLshowers) {
-    if (shower.getHypothesisId() != ECLShower::c_nPhotons) {
-      continue;
-    }
-
-    const double Eclus  = shower.getEnergy();
-    if (Eclus < m_param_minimalEnRequirement) {
-      continue;
-    }
-
-    bool addShower = true;
-    for (auto& shower2 : m_inputECLshowers) {
-      if (shower2.getHypothesisId() == ECLShower::c_nPhotons && Eclus < shower2.getEnergy()) {
-        if (std::abs(TVector2::Phi_mpi_pi(shower2.getPhi() - shower.getPhi())) < m_param_seedDeadRegionPhi
-            && std::abs(shower2.getTheta() - shower.getTheta()) < m_param_seedDeadRegionTheta) {
-          addShower = false;
-          break;
-        }
-      }
-    }
-    if (addShower) {
-      goodShowers.push_back(shower);
-    }
-
-  }
-
   // loop over all showers and create seed objects
   for (auto& shower : m_inputECLshowers) {
     if (shower.getHypothesisId() != ECLShower::c_nPhotons) {
@@ -103,17 +68,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 
     const double Eclus  = shower.getEnergy();
     if (Eclus < m_param_minimalEnRequirement) {
-      continue;
-    }
-
-    // find the good showers selected above
-    bool match = false;
-    for (auto& goodShower : goodShowers) {
-      if (std::abs(goodShower.getEnergy() - shower.getEnergy()) < 0.0001) {
-        match = true;
-      }
-    }
-    if (!match) {
       continue;
     }
 
@@ -128,12 +82,21 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     const double cosPhi = cos(phiClus);
 
     TVector3 pos(rClus * sinTheta * cosPhi, rClus * sinTheta * sinPhi, rClus * cosTheta);
+    const double tanLambda = pos.Z() / pos.Perp();
+
+    // restrict to forward seeds
+    if (m_param_restrictToForwardSeeds) {
+      if (tanLambda > -0.8 && tanLambda < 1.8) {
+        continue;
+      }
+    }
 
     // Shower assumed to be in 12cm depth
     pos = pos - 12. / pos.Mag() * pos;
 
     TVector3 mom = Eclus / pos.Mag() * pos;
 
+    // Calculate helix trajectory for negative and positive charge seeds
     // Find center of circular trajectory
     double rad = std::abs(mom.Pt() / (29.9792458 * 1e-4 * 1. *
                                       1.5)); // factor 1. for charge // speed of light in [cm per ns] // const magnetic field
@@ -142,9 +105,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     if (2. * rad < pos.Perp()) {
       rad = pos.Perp() / 2.0 + 1.0;
     }
-
-    // TODO
-    // Check if following code can be replaced with existing functions from class CDCTrajectory2D
 
     // Use pq formula (center of circle has to be on perpendicular line through center of line between (0,0) and seed position)
     double q = pos.Perp();
@@ -159,13 +119,11 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     double centerx2 = x3 - basex;
     double centery2 = y3 - basey;
 
-
     // vectors for tangent at seed position (perpendicular to radius at seed position)
     double momx1 = pos.Y() - centery1;
     double momy1 = - (pos.X() - centerx1);
     double momx2 = pos.Y() - centery2;
     double momy2 = - (pos.X() - centerx2);
-
 
     // two solutions (pointing toward and away from center)
     // make sure that particle moves inwards
@@ -201,7 +159,7 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     }
 
     if (clockwise1 == clockwise2) {
-      B2INFO("-------------------------------------->>>>>>>>> Same orientation!!! <<<<<<<<<<<-----------------------------------------------------");
+      B2WARNING("Something went wrong during helix extrapolation.");
     }
 
     TVector3 mompos;
@@ -213,12 +171,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
       mompos = mom1;
       momneg = mom2;
     }
-
-    //mompos = 0.5 * (mompos + mom);
-    //momneg = 0.5 * (momneg + mom);
-
-    //mompos = mom;
-    //momneg = mom;
 
     // electron and positron hypothesis
     RecoTrack* eclSeedNeg = m_eclSeedRecoTracks.appendNew(pos, momneg, -1);
@@ -236,6 +188,7 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     TMatrixDSym cov(6);
     double covArray[6];
     shower.getCovarianceMatrixAsArray(covArray);
+
     // Calculate uncertainties on position from ECLShower
     double dx2 = rClus * cosTheta * cosPhi * rClus * cosTheta * cosPhi * covArray[5]
                  + rClus * sinTheta * sinPhi * rClus * sinTheta * sinPhi * covArray[2];
@@ -243,21 +196,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
                  + rClus * sinTheta * cosPhi * rClus * sinTheta * cosPhi * covArray[2];
     double dz2 = rClus * sinTheta * rClus * sinTheta * covArray[5];
 
-    // As no helix extrapolation is done this is only a very rough momentum estimate
-    // Also, Bremsstrahlung is not considered so far
-    // Set cov matrix to high values!
-    /*
-    double dpx2 = Eclus * cosTheta * cosPhi * Eclus * cosTheta * cosPhi * covArray[5]
-                 + Eclus * sinTheta * sinPhi * Eclus * sinTheta * sinPhi * covArray[2]
-                 + sinTheta * cosPhi * covArray[0];
-    double dpy2 = Eclus * cosTheta * sinPhi * Eclus * cosTheta * sinPhi * covArray[5]
-                 + Eclus * sinTheta * cosPhi * Eclus * sinTheta * cosPhi * covArray[2]
-                 + sinTheta * sinPhi * covArray[0];
-    double dpz2 = Eclus * sinTheta * Eclus * sinTheta * covArray[5]
-                 + cosTheta * covArray[0];
-    */
-    // double dpx2 = 0.25 * 0.25 * mom.X() * mom.X();
-    // double dpy2 = 0.25 * 0.25 * mom.Y() * mom.Y();
     double dpx2 = std::abs(mom1.X() - mom2.X()) / 4.0 * std::abs(mom1.X() - mom2.X()) / 4.0;
     double dpy2 = std::abs(mom1.Y() - mom2.Y()) / 4.0 * std::abs(mom1.Y() - mom2.Y()) / 4.0;
     double dpz2 = 0.25 * 0.25 * mom.Z() * mom.Z();
@@ -268,24 +206,14 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     cov(3, 3) = dpx2;
     cov(4, 4) = dpy2;
     cov(5, 5) = dpz2;
-    // cov(3, 4) = -sqrt(dpx2*dpy2);
-    // cov(4, 3) = -sqrt(dpx2*dpy2);
 
+    // set properties of genfit objects
     genfit::SharedPlanePtr planeNeg(new genfit::DetPlane(pos, pos));
     genfit::SharedPlanePtr planePos(new genfit::DetPlane(pos, pos));
     msopNeg.setPosMomCov(pos, momneg, cov);
     msopNeg.setPlane(planeNeg);
     msopPos.setPosMomCov(pos, mompos, cov);
     msopPos.setPlane(planePos);
-
-    //B2INFO("Theta: " << thetaClus * 180 / M_PI);
-    //B2INFO("En: " << Eclus);
-    //B2INFO("- Pos: " << pos.X() << " (" << sqrt(dx2) << "), " << pos.Y() << " (" << sqrt(dy2) << "), " << pos.Z() << " (" << sqrt(dz2) << ")");
-    //B2INFO("- Mom: " << mom.X() << " (" << sqrt(dpx2) << "), " << mom.Y() << " (" << sqrt(dpy2) << "), " << mom.Z() << " (" << sqrt(dpz2) << ")");
-    //B2INFO("- Mom(Old): " << mom.X() << " (" << sqrt(0.25 * 0.25 * mom.X() * mom.X()) << "), " << mom.Y() << " (" << sqrt(0.25 * 0.25 * mom.Y() * mom.Y()) << "), " << mom.Z() << " (" << sqrt(dpz2) << ")");
-    //B2INFO("-MPos: " << mompos.X() << " (" << sqrt(dpx2) << "), " << mompos.Y() << " (" << sqrt(dpy2) << "), " << mompos.Z() << " (" << sqrt(dpz2) << ")");
-    //B2INFO("-MNeg: " << momneg.X() << " (" << sqrt(dpx2) << "), " << momneg.Y() << " (" << sqrt(dpy2) << "), " << momneg.Z() << " (" << sqrt(dpz2) << ")");
-
 
     // create CDCCKF states
     CDCCKFState seedStateNeg(eclSeedNeg, msopNeg);

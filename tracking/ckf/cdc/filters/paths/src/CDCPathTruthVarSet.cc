@@ -56,31 +56,13 @@ bool CDCPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
     seedMCParticle = seedMCParticle->getMother();
   }
 
-  int matched = 0;
   int mcTrackHits = 0;
-  /*
-    for (auto const& state : *path) {
-      if (state.isSeed()) {
-        continue;
-      }
-
-      const auto wireHit = state.getWireHit();
-      const auto cdcHit = wireHit->getHit();
-      // const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
-      const auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
-
-      if (seedMCTrack == hitMCTrack) {
-        matched += 1;
-      }
-    }
-  */
 
   if (seedMCTrack) {
     mcTrackHits = seedMCTrack->getNumberOfCDCHits();
   }
   var<named("mcTrackHits")>() = mcTrackHits;
 
-  var<named("matched")>() = matched;
   var<named("daughters")>() = daughters;
   var<named("PDG")>() = seedMCParticle->getPDG();
 

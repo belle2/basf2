@@ -29,11 +29,6 @@ bool CDCfromEclPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
   const auto* seedMCParticle = seedEclShower->getRelated<MCParticle>();
   const auto* seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
 
-  // don't do this for photon gun etc
-  //while (seedMCParticle->getMother()) {
-  //  seedMCParticle = seedMCParticle->getMother();
-  //}
-
   int daughters = 0;
   std::vector<MCParticle*> daughterMCParticles;
   if (seedMCParticle->getNDaughters() > 0) {
@@ -49,7 +44,6 @@ bool CDCfromEclPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
 
     const auto wireHit = state.getWireHit();
     const auto cdcHit = wireHit->getHit();
-    // const auto* hitMCParticle = cdcHit->getRelated<MCParticle>();
     auto* hitMCTrack = cdcHit->getRelated<RecoTrack>("MCRecoTracks");
 
     if (seedMCTrack != 0 && seedMCTrack == hitMCTrack) {
@@ -73,29 +67,11 @@ bool CDCfromEclPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
   // before, I used "RecoTracks" instead so I could get the msop.
   // Gets track of mother particle (be careful, eg for photon guns)
   const auto* particleMCTrack = seedMCParticle->getRelated<RecoTrack>("MCRecoTracks");
-  //const auto* particleMCTrack = seedMCTrack;
   int mcTrackHits = -1;
-  TVector3 trackPos(0, 0, 0);
-  TVector3 trackMom(0, 0, 0);
   if (particleMCTrack) {
     mcTrackHits = particleMCTrack->getNumberOfCDCHits();
-    //auto msop = particleMCTrack->getMeasuredStateOnPlaneFromLastHit();
-    //trackPos = msop.getPos();
-    //trackMom = msop.getMom();
   }
   var<named("mcTrackHits")>() = mcTrackHits;
-
-  var<named("mcTrackEnd_p")>() = trackMom.Mag();
-  var<named("mcTrackEnd_momTheta")>() = trackMom.Theta() * 180. / M_PI;
-  var<named("mcTrackEnd_pt")>() = trackMom.Perp();
-  var<named("mcTrackEnd_pz")>() = trackMom.Z();
-  var<named("mcTrackEnd_px")>() = trackMom.X();
-  var<named("mcTrackEnd_py")>() = trackMom.Y();
-
-  var<named("mcTrackEnd_z")>() = trackPos.Z();
-  var<named("mcTrackEnd_x")>() = trackPos.X();
-  var<named("mcTrackEnd_y")>() = trackPos.Y();
-  var<named("mcTrackEnd_posTheta")>() = trackPos.Theta() * 180. / M_PI;
 
   return true;
 }

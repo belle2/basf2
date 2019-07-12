@@ -33,8 +33,6 @@ CKFToCDCFromEclFindlet::CKFToCDCFromEclFindlet()
   addProcessingSignalListener(&m_resultFinalizer);
   addProcessingSignalListener(&m_resultStorer);
   addProcessingSignalListener(&m_duplicateRemover);
-
-  addProcessingSignalListener(&m_finalFilter);
 }
 
 void CKFToCDCFromEclFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -48,16 +46,13 @@ void CKFToCDCFromEclFindlet::exposeParameters(ModuleParamList* moduleParamList, 
   m_duplicateRemover.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->getParameter<std::string>("statePreFilter").setDefaultValue("all");
-  moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough_eclSeed"); // rough_and_recording_eclSeed
+  moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough_eclSeed");
   moduleParamList->getParameter<std::string>("stateExtrapolationFilter").setDefaultValue("extrapolate_and_update");
-  moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance"); // distance_and_recording_eclSeed
+  moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance");
 
   moduleParamList->getParameter<std::string>("badTracksFilter").setDefaultValue("seedCharge");
   moduleParamList->getParameter<std::string>("duplicateTrackFilter").setDefaultValue("hitDistance");
   moduleParamList->getParameter<std::string>("duplicateSeedFilter").setDefaultValue("duplicateHits");
-
-  m_finalFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("final", prefix));
-  moduleParamList->getParameter<std::string>("finalFilter").setDefaultValue("all");
 }
 
 void CKFToCDCFromEclFindlet::beginEvent()
@@ -80,18 +75,10 @@ void CKFToCDCFromEclFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit
 {
   const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
 
-  int firstLayer = -1;
-  int lastLayer = -1;
-  if (wireHitPtrs.size() > 2) {
-    firstLayer = wireHitPtrs.front()->getWire().getICLayer();
-    lastLayer = wireHitPtrs.back()->getWire().getICLayer();
-  }
-  B2INFO("Event " << m_eventMetaData->getEvent() << ": " << wireHitPtrs.size() << " hits (" << firstLayer << "->" << lastLayer <<
-         ")");
-
-
+  // create the seed objects
   m_seedCreator.apply(m_seeds);
 
+  // find the paths
   for (const auto& seed : m_seeds) {
     B2DEBUG(100, "Starting new seed");
     m_paths.clear();
@@ -100,14 +87,10 @@ void CKFToCDCFromEclFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit
     m_resultFinalizer.apply(m_paths, m_results);
   }
 
-  // Remove duplicate tracks (additional seeds from Bremsstrahlung)
+  // remove duplicate tracks (additional seeds from Bremsstrahlung)
   m_duplicateRemover.apply(m_results);
 
-  // FOR TESTING ONLY
-  for (const auto& result : m_results) {
-    m_finalFilter(result);
-  }
-
+  // and store output
   m_resultStorer.apply(m_results);
 }
 

@@ -53,10 +53,8 @@ namespace Belle2 {
     std::string m_param_eclSeedRecoTrackStoreArrayName = "EclSeedRecoTracks";
     /// Minimal pt requirement
     double m_param_minimalEnRequirement = 0.3;
-    // Define region (phi) around seed so that additional ECLShowers are ignored (likely from Bremsstrahlung)
-    double m_param_seedDeadRegionPhi = -2.0; // negative: accept all
-    // Define region (theta) around seed so that additional ECLShowers are ignored (likely from Bremsstrahlung)
-    double m_param_seedDeadRegionTheta = -0.1; // negative: accept all
+    /// Don't do Ecl seeding in central region to save computing time
+    bool m_param_restrictToForwardSeeds = true;
 
 
     // Store Arrays

@@ -40,36 +40,6 @@ bool CDCfromEclStateTruthVarSet::extract(const BaseCDCStateFilter::Object* pair)
     hitMCParticle = hitMCParticle->getMother();
   }
 
-  /*
-  bool match = false;
-  if (seedMCParticle == hitMCParticle) {
-    match = true;
-  }else{
-    B2INFO("seed:" << seedMCParticle->getPDG());
-    if(seedMCParticle->getMother()){
-      B2INFO("->" << seedMCParticle->getMother()->getPDG());
-      if(seedMCParticle->getMother()->getMother()){
-        B2INFO("-->" << seedMCParticle->getMother()->getMother()->getPDG());
-      }
-    }
-    B2INFO("trk:" << hitMCParticle->getPDG());
-    if(hitMCParticle->getMother()){
-      B2INFO("->" << hitMCParticle->getMother()->getPDG());
-      if(hitMCParticle->getMother()->getMother()){
-        B2INFO("-->" << hitMCParticle->getMother()->getMother()->getPDG());
-      }
-    }
-  }
-
-  const auto& lastState = path->back();
-  if(lastState.isSeed()){
-    const auto* seedEclSimHit = seedMCParticle->getRelated<ECLSimHit>("ECLSimHits");
-    const G4ThreeVector simHitPos = seedEclSimHit->getPosition();
-    B2INFO("SimHit: " << simHitPos.x()*simHitPos.x() + simHitPos.y()*simHitPos.y() << "," << simHitPos.z());
-    B2INFO("Seed:   " << seedRecoTrack->getPositionSeed().x()*seedRecoTrack->getPositionSeed().x() + seedRecoTrack->getPositionSeed().y()*seedRecoTrack->getPositionSeed().y() << "," << seedRecoTrack->getPositionSeed().z());
-  }
-  */
-
   // calculate the interesting quantities
   var<named("match")>() = seedMCParticle == hitMCParticle ? true : false;
   var<named("PDG")>() = seedMCParticle->getPDG();

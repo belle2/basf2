@@ -29,9 +29,6 @@ bool CDCStateBasicVarSet::extract(const BaseCDCStateFilter::Object* pair)
   const auto& seed = path->front();
   const auto* seedRecoTrack = seed.getSeed();
 
-  //const auto* wireHit = state->getWireHit();
-  //const auto* cdcHit = wireHit->getHit();
-
   // general stuff
   var<named("eventNumber")>() = m_eventMetaData->getEvent();
 
@@ -63,35 +60,6 @@ bool CDCStateBasicVarSet::extract(const BaseCDCStateFilter::Object* pair)
   var<named("seed_px")>() = seedMom.X();
   var<named("seed_py")>() = seedMom.Y();
   var<named("seed_charge")>() = seedRecoTrack->getChargeSeed();
-  /*
-    // track representation
-    genfit::MeasuredStateOnPlane trackState = state->getTrackState();
-    TVector3 trackPos = trackState.getPos();
-    TVector3 trackMom = trackState.getMom();
-    var<named("track_momTheta")>() = seedMom.Theta() * 180. / M_PI;
-    var<named("track_p")>() = trackMom.Mag();
-    var<named("track_pt")>() = trackMom.Perp();
-    var<named("track_pz")>() = trackMom.Z();
-    var<named("track_px")>() = trackMom.X();
-    var<named("track_py")>() = trackMom.Y();
-    var<named("track_charge")>() = trackState.getCharge();
-    var<named("track_posTheta")>() = trackPos.Theta() * 180. / M_PI;
-    var<named("track_r")>() = trackPos.Perp();
-    var<named("track_z")>() = trackPos.Z();
-    var<named("track_x")>() = trackPos.X();
-    var<named("track_y")>() = trackPos.Y();
 
-    genfit::MeasuredStateOnPlane oldTrackState = trackState;
-    if (path->size() > 1) {
-      oldTrackState = path->at(1).getTrackState();
-    }
-    TVector3 oldTrackMom = oldTrackState.getMom();
-    TVector3 oldTrackPos = oldTrackState.getPos();
-
-    var<named("track_pt_firstHit")>() = oldTrackMom.Perp();
-    var<named("track_pz_firstHit")>() = oldTrackMom.Z();
-    var<named("track_r_firstHit")>() = oldTrackPos.Perp();
-    var<named("track_z_firstHit")>() = oldTrackPos.Z();
-  */
   return true;
 }

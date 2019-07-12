@@ -27,16 +27,13 @@ class toCDCfromEclCKF(TrackingValidationRun):
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
-    root_input_file = '/nfs/dust/belle2/user/kurzsimo/evtSamples/ElecGenSimNoBkg_highStats.root'
-    # root_input_file = 'EvtGenSimNoBkg.root'
+    root_input_file = 'EvtGenSimNoBkg.root'
 
     @staticmethod
     def finder_module(path):
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
 
-        tracking.add_svd_reconstruction(path)
-        tracking.add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracksSVD", components=["SVD"])
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksSVD")
 
         reconstruction.add_ecl_modules(path)
@@ -52,25 +49,15 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         UseSVDHits=False,
                         UseCDCHits=True)
 
-        # reconstruction.add_ecl_finalizer_module(path)
-        # reconstruction.add_ecl_mc_matcher_module(path)
-
         path.add_module("TFCDC_WireHitPreparer",
                         wirePosition="aligned",
                         useSecondHits=False,
                         flightTimeEstimation="outwards")
 
-        cdcfromeclckf = basf2.register_module("ToCDCFromEclCKF")
-
-        path.add_module(cdcfromeclckf,
+        path.add_module("ToCDCFromEclCKF",
                         inputWireHits="CDCWireHitVector",
                         minimalEnRequirementCluster=0.3,
-                        seedDeadRegionPhi=-1,
-                        seedDeadRegionTheta=-1,
-                        #                relatedRecoTrackStoreArrayName="CKFCDCfromEclRecoTracks",
-                        #                relationCheckForDirection="forward",
                         eclSeedRecoTrackStoreArrayName='EclSeedRecoTracks',
-                        # outputRecoTrackStoreArrayName="CKFCDCfromEclRecoTracks",
                         hitFindingDirection="backward",
                         outputRecoTrackStoreArrayName="RecoTracks",
                         outputRelationRecoTrackStoreArrayName="EclSeedRecoTracks",
@@ -88,24 +75,13 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         trackFindingDirection="backward",
                         # filter="size_and_recording_fromEcl",
                         # filterParameters={"returnWeight": 1.},
-                        # stateMaximalHitCandidates=10
-                        #
                         # finalFilter="recording_fromEcl",
                         # finalFilterParameters={"returnWeight": 1.},
                         )
 
-        # Do not combine tracks for testing
-        # path.add_module("RelatedTracksCombiner",
-        #                #                CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
-        #                CDCRecoTracksStoreArrayName="CKFCDCfromEclRecoTracks",
-        #                VXDRecoTracksStoreArrayName="RecoTracksSVD",
-        #                recoTracksStoreArrayName="RecoTracks")
-
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 
         path.add_module('TrackCreator', recoTrackColName='RecoTracks')
-
-        # path.add_module("PrintCollections", printForEvent=-1)
 
         path.add_module("MCRecoTracksMatcher",
                         mcRecoTracksStoreArrayName="MCRecoTracks",

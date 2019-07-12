@@ -25,16 +25,8 @@ namespace Belle2 {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;
 
-      // Idea: The hits in the center of the CDC cannot be used for a duplicate check
-      // Typically, pair production electrons are close to each other there, so that only single hits
-      // are produced for both particles
-      // However, close to the ECL, the tracks should diverge
-      // In contrast to that, if a second track is created by Bremsstrahlung, one of the
-      // tracks should be a subset of the other one (more or less)
-
-      // Unfortunately, charge conservation cannot be used to distinguish both effects
-
-      // Right now, use simpler algorithm
+      // Right now, use simple (yet efficient) algorithm to distinguish between
+      // photon conversion and Bremsstrahlung
       // Check if 90% of the hits shared by both tracks
       // Might not be optimal for short tracks? (forward region)
 
@@ -59,8 +51,6 @@ namespace Belle2 {
           }
         }
       }
-
-      B2INFO("~~~~~~~~~~>>> Matched hits: " << double(match) / double(total));
 
       return double(match) / double(total) > 0.9;
     }

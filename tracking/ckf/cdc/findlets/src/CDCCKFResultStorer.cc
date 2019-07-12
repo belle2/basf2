@@ -47,6 +47,11 @@ void CDCCKFResultStorer::exposeParameters(ModuleParamList* moduleParamList, cons
                                 m_param_exportAllTracks,
                                 "Export all tracks, even if they did not reach the center of the CDC",
                                 m_param_exportAllTracks);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "setTakenFlag"),
+                                m_param_setTakenFlag,
+                                "Set flag that hit is taken",
+                                m_param_setTakenFlag);
 }
 
 void CDCCKFResultStorer::initialize()
@@ -85,7 +90,7 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
       B2ERROR("CDCCKFResultStorer: No valid direction specified. Please use forward/backward.");
     }
 
-    // only accept paths that reached the center of the CDC
+    // only accept paths that reached the center of the CDC (for ECL seeding)
     if (not m_param_exportAllTracks
         && m_param_trackFindingDirection == TrackFindingCDC::EForwardBackward::c_Backward
         && result.back().getWireHit()->getWire().getICLayer() > 2) {
@@ -111,8 +116,11 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
                 RecoHitInformation::RightLeftInformation::c_left;
 
       newRecoTrack->addCDCHit(wireHit->getHit(), sortingParameter, rl);
-
       sortingParameter++;
+
+      if (m_param_setTakenFlag) {
+        wireHit->getAutomatonCell().setTakenFlag();
+      }
     }
 
     const RecoTrack* seed = result.front().getSeed();

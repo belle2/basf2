@@ -22,11 +22,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <framework/dataobjects/EventMetaData.h> // FOR TESTING
-
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h> // FOR TESTING
-#include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h> // FOR TESTING
-
 #include <vector>
 
 namespace Belle2 {
@@ -68,9 +63,6 @@ namespace Belle2 {
     /// Showers from Bremsstrahlung might lead to duplicate tracks
     CDCCKFDuplicateRemover m_duplicateRemover;
 
-    /// FOR TESTING
-    TrackFindingCDC::ChooseableFilter<CDCPathFilterFactory> m_finalFilter;
-
     // Object pools
     /// Current list of paths
     std::vector<CDCCKFPath> m_paths;
@@ -78,7 +70,5 @@ namespace Belle2 {
     std::vector<CDCCKFPath> m_seeds;
     /// Current list of results
     std::vector<CDCCKFResult> m_results;
-
-    StoreObjPtr<EventMetaData> m_eventMetaData; // FOR TESTING
   };
 }

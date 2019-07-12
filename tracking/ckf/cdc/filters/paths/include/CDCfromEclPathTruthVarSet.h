@@ -27,17 +27,7 @@ namespace Belle2 {
     "seed_pt_truth",
     "seed_pz_truth",
     "seed_px_truth",
-    "seed_py_truth",
-    "mcTrackEnd_p",
-    "mcTrackEnd_pt",
-    "mcTrackEnd_pz",
-    "mcTrackEnd_px",
-    "mcTrackEnd_py",
-    "mcTrackEnd_z",
-    "mcTrackEnd_x",
-    "mcTrackEnd_y",
-    "mcTrackEnd_posTheta",
-    "mcTrackEnd_momTheta"
+    "seed_py_truth"
   };
 
   /// Vehicle class to transport the variable names
@@ -56,8 +46,7 @@ namespace Belle2 {
   };
 
   /**
-   * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
-   * which knows the truth information if two tracks belong together or not.
+   * Var set to store basic quantities related to CDC CKF (using truth information)
    */
   class CDCfromEclPathTruthVarSet : public TrackFindingCDC::VarSet<CDCfromEclPathTruthVarNames> {
 

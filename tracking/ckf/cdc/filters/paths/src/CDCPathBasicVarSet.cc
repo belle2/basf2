@@ -38,7 +38,7 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
 
   unsigned int chargeFlip = 0;
   int lastCharge = seedRecoTrack->getChargeSeed();
-  std::string str("Full path:\n");
+
   for (auto const& state : *path) {
     if (state.isSeed()) {
       continue;
@@ -61,40 +61,10 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
       chargeFlip += 1;
       lastCharge = stateCharge;
     }
-
-    // some debugging
-    //str += std::to_string(state.getWireHit()->getWire().getICLayer());
-    //str += "(";
-    //str += std::to_string(state.getHitDistance());
-    //str += ") - ";
-
-    if (state.getWireHit()->getWire().getICLayer() % 5 == 0) {
-      str += std::to_string(state.getWireHit()->getWire().getICLayer());
-      str += " (pos=";
-      str += std::to_string(trackState.getPos().X());
-      str += ",";
-      str += std::to_string(trackState.getPos().Y());
-      str += ",";
-      str += std::to_string(trackState.getPos().Z());
-      str += "; mom=";
-      str += std::to_string(trackState.getMom().X());
-      str += ",";
-      str += std::to_string(trackState.getMom().Y());
-      str += ",";
-      str += std::to_string(trackState.getMom().Z());
-      str += "; t=";
-      str += std::to_string(trackState.getTime());
-      str += "; q=";
-      str += std::to_string((int)trackState.getCharge());
-      str += ") \n";
-    }
   }
-  //B2INFO(str);
 
   // general stuff
   var<named("eventNumber")>() = m_eventMetaData->getEvent();
-
-  // B2INFO("Event " << m_eventMetaData->getEvent() << ": next seed");
 
   // track properties
   var<named("totalHits")>() = path->size() - 1;
@@ -143,8 +113,6 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
   } else {
     // do straight extrapolation of seed momentum to CDC outer walls
     TVector3 seedMomZOne(seedMom * (1. / seedMom.Z()));
-    // const float maxZ = seedPosZ > 0 ? maxForwardZ : maxBackwardZ;
-    // const TrackFindingCDC::Vector3D extrapolatedPos = seedPos - seedMom / seedMom.norm() * (seedPosZ - maxZ);
 
     // find closest iCLayer
     float minDist = 99999;
@@ -170,7 +138,7 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
   float lastICLayer = 0;
   if (path->size() > 1) {
     genfit::MeasuredStateOnPlane trackState = path->back().getTrackState();
-    //TVector3 trackPosition = trackState.getPos();
+
     trackMom = trackState.getMom();
     trackCharge = trackState.getCharge();
 

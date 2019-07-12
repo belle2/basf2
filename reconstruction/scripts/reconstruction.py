@@ -212,8 +212,6 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     path.add_module('StatisticsSummary').set_name('Sum_PID')
 
-    add_ecl_modules(path, components)
-
     path.add_module("EventT0Combiner")
 
     add_ecl_finalizer_module(path, components)

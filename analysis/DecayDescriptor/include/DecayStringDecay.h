@@ -1,3 +1,4 @@
+
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
 * Copyright(C) 2010 - Belle II Collaboration                             *
@@ -28,8 +29,8 @@ namespace Belle2 {
     std::string m_strArrow;
     /** The decay products. */
     std::vector<DecayString> m_daughters;
-    /** Is the decay inclusive? */
-    std::string m_strInclusive;
+    /** The keyword list for custom MC Matching */
+    std::vector<std::string> m_keywords;
   };
 }
 
@@ -41,7 +42,7 @@ BOOST_FUSION_ADAPT_STRUCT(
   (Belle2::DecayStringParticle, m_mother)
   (std::string, m_strArrow)
   (std::vector<Belle2::DecayString>, m_daughters)
-  (std::string, m_strInclusive)
+  (std::vector<std::string>, m_keywords)
 )
 
 

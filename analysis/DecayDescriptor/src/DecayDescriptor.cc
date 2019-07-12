@@ -31,6 +31,8 @@ DecayDescriptor::DecayDescriptor() :
   m_daughters(),
   m_isIgnorePhotons(false),
   m_isIgnoreIntermediate(false),
+  m_isIgnoreMassive(false),
+  m_isIgnoreNeutrino(false),
   m_isInclusive(false),
   m_isNULL(false)
 {
@@ -101,7 +103,27 @@ bool DecayDescriptor::init(const DecayString& s)
       }
       m_daughters.push_back(daughter);
     }
-    if (!d->m_strInclusive.empty()) m_isInclusive = true;
+
+    // Inclusive
+    // if (!d->m_strInclusive.empty()) m_isInclusive = true;
+
+    // Keywords
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
+      m_isIgnoreNeutrino = true;
+    } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!nu")) != d->m_keywords.end()) {
+      m_isIgnoreNeutrino = false;
+    }
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?rad")) != d->m_keywords.end()) {
+      m_isIgnorePhotons = true;
+    } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!rad")) != d->m_keywords.end()) {
+      m_isIgnorePhotons = false;
+    }
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
+      m_isIgnoreMassive = true;
+    }
+
+    if (m_isIgnoreMassive and m_isIgnoreNeutrino) m_isInclusive = true;
+
     return true;
   }
   return false;

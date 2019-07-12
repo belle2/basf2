@@ -40,6 +40,10 @@ namespace Belle2 {
     bool m_isIgnorePhotons;
     /** Ignore intermediate particles or resonances? */
     bool m_isIgnoreIntermediate;
+    /** Ignore missing massive final state particles? */
+    bool m_isIgnoreMassive;
+    /** Ignore missing neutrino? */
+    bool m_isIgnoreNeutrino;
     /** Is this decay inclusive? */
     bool m_isInclusive;
     /** Is this the NULL object? */
@@ -144,6 +148,16 @@ namespace Belle2 {
     bool isIgnoreIntermediate() const
     {
       return m_isIgnoreIntermediate;
+    }
+    /** Check if missing massive final state particles shall be ignored. */
+    bool isIgnoreMassive() const
+    {
+      return m_isIgnoreMassive;
+    }
+    /** Check if missing neutrinos shall be ignored. */
+    bool isIgnoreNeutrino() const
+    {
+      return m_isIgnoreNeutrino;
     }
     /** Is the decay inclusive? */
     bool isInclusive() const

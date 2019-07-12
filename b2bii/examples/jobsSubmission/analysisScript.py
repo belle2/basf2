@@ -12,8 +12,7 @@ from basf2 import *
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
+from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
 from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
@@ -81,19 +80,16 @@ filenameEnd = '_'.join(sys.argv[2:]) + '.root'
 
 outputFileName = outDir + '/output_' + filenameEnd
 
-ntupleFile(outputFileName, mypath)
-
-
 # ------- Rest of analysis script goes here...
 
 # this sample code is taken from b2bii/examples
 
 fillParticleList('pi+:all', '', mypath)
 
-toolsTrackPI = ['EventMetaData', 'pi+']
-toolsTrackPI += ['Kinematics', '^pi+']
+kinematic_variables = ['px', 'py', 'pz', 'E']
 
-ntupleTree('pion', 'pi+:all', toolsTrackPI, mypath)
+variablesToNtuple(
+    'pi+:all', kinematic_variables, filename=outputFileName, path=mypath)
 
 # progress
 progress = register_module('Progress')

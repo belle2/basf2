@@ -32,6 +32,14 @@ namespace Belle2 {
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
     int m_iPDGCode;
+    /** Ignore radiated photons? */
+    bool m_isIgnorePhotons;
+    /** Ignore intermediate particles or resonances? */
+    bool m_isIgnoreIntermediate;
+    /** Ignore missing massive final state particles? */
+    bool m_isIgnoreMassive;
+    /** Ignore missing neutrino? */
+    bool m_isIgnoreNeutrino;
   public:
     /** Default ctor. */
     DecayDescriptorParticle();

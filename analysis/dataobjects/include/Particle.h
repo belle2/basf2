@@ -103,6 +103,10 @@ namespace Belle2 {
     enum PropertyFlags {
       c_Ordinary = 0, /** Ordinary particles */
       c_IsUnspecified = 1, /**< Is the particle unspecified by marking @ ? */
+      c_isIgnorePhotons = 2,
+      c_isIgnoreIntermediate = 4,
+      c_isIgnoreMassive = 8,
+      c_isIgnoreNeutrino = 16,
     };
 
     /**

@@ -47,6 +47,26 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+    double isCustomSignal(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      if (part->getProperty() & Particle::PropertyFlags::c_isIgnorePhotons) {
+        status &= (~MCMatching::c_MissFSR);
+        status &= (~MCMatching::c_MissPHOTOS);
+        status &= (~MCMatching::c_MissGamma);
+      }
+      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreIntermediate) status &= (~MCMatching::c_MissingResonance);
+      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreMassive) status &= (~MCMatching::c_MissMassiveParticle);
+      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreNeutrino) status &= (~MCMatching::c_MissNeutrino);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
     double isExtendedSignal(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -732,6 +752,9 @@ namespace Belle2 {
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
+    REGISTER_VARIABLE("isCustomSignal", isCustomSignal,
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
+                      "It bevaives according to DecayStringGrammar.");
     REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Misidentification of charged FSP is allowed.");

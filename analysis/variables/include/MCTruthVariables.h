@@ -48,6 +48,12 @@ namespace Belle2 {
     double isSignal(const Particle* part);
 
     /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
+     * It behaives according to DecayStringGrammer.
+     */
+    double isCustomSignal(const Particle* part);
+
+    /**
      * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
      * Misidentification of charged FSP is allowed.
      */

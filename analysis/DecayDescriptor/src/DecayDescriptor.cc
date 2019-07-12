@@ -33,7 +33,7 @@ DecayDescriptor::DecayDescriptor() :
   m_isIgnoreIntermediate(false),
   m_isIgnoreMassive(false),
   m_isIgnoreNeutrino(false),
-  m_isInclusive(false),
+  // m_isInclusive(false),
   m_isNULL(false)
 {
 }
@@ -104,10 +104,8 @@ bool DecayDescriptor::init(const DecayString& s)
       m_daughters.push_back(daughter);
     }
 
-    // Inclusive
-    // if (!d->m_strInclusive.empty()) m_isInclusive = true;
-
-    // Keywords
+    // Initialise list of keywords
+    // Keyword has higher priority than arrow for m_isIgnorePhotons
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
       m_isIgnoreNeutrino = true;
     } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!nu")) != d->m_keywords.end()) {
@@ -122,7 +120,8 @@ bool DecayDescriptor::init(const DecayString& s)
       m_isIgnoreMassive = true;
     }
 
-    if (m_isIgnoreMassive and m_isIgnoreNeutrino) m_isInclusive = true;
+    // If both Massive and Neutrino are ignored, m_isInclusive will be true
+    // if (m_isIgnoreMassive and m_isIgnoreNeutrino) m_isInclusive = true;
 
     return true;
   }
@@ -211,7 +210,8 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   // Now, all daughters of the particles should be matched to at least one DecayDescriptor daughter
-  if (!m_isInclusive && int(matches_global.size()) != nDaughters_p) return 0;
+  // if (!m_isInclusive && int(matches_global.size()) != nDaughters_p) return 0;
+  if (int(matches_global.size()) != nDaughters_p) return 0;
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
   // by removing the daughter candidates which are already used in other unambigous relations.

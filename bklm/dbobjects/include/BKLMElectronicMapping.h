@@ -36,12 +36,12 @@ namespace Belle2 {
      * Constructor
      */
 
-    BKLMElectronicMapping(int version, int copperId, int slotId, int laneId, int axisId, int channelId, int isForward, int sector,
+    BKLMElectronicMapping(int version, int copperId, int slotId, int laneId, int axisId, int channelId, int forward, int sector,
                           int layer,
                           int plane, int stripId)
     {
       m_version = version; m_copperId = copperId; m_slotId = slotId; m_laneId = laneId; m_axisId = axisId; m_channelId = channelId;
-      m_isForward = isForward; m_sector = sector; m_layer = layer; m_plane = plane; m_strip = stripId;
+      m_isForward = forward; m_sector = sector; m_layer = layer; m_plane = plane; m_strip = stripId;
     };
 
     /**
@@ -84,7 +84,7 @@ namespace Belle2 {
 
     /** Return forward/backward info. in the map
      */
-    int getIsForward() const {return m_isForward; }
+    int getForward() const {return m_isForward; }
 
     /** Return sector #No in the map
      */

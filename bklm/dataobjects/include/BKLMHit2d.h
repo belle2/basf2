@@ -49,8 +49,8 @@ namespace Belle2 {
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
     //! Get detector end
-    //! @return detector end (TRUE=forward or FALSE=backward) of this 2D hit
-    bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
+    //! @return detector end (1=forward or 0=backward) of this 2d hit.
+    int getForward() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
 
     //! Get sector number
     //! @return sector number (1..8) of this 2D hit

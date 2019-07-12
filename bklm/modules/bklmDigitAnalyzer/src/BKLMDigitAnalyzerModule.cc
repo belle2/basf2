@@ -186,22 +186,22 @@ void BKLMDigitAnalyzerModule::event()
 
       KLMDigitRaw* digitRaw = digit.getRelatedTo<KLMDigitRaw>();
 
-      m_histoLayerVsSector[1 - digit.isForward()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
+      m_histoLayerVsSector[1 - digit.getForward()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
 
-      m_histoLayerVsSectorPerPlane[1 - digit.isForward()][digit.isPhiReadout()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
+      m_histoLayerVsSectorPerPlane[1 - digit.getForward()][digit.isPhiReadout()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
 
-      m_histoLayer[1 - digit.isForward()][digit.getSector() - 1]->Fill(digit.getLayer() - 1);
+      m_histoLayer[1 - digit.getForward()][digit.getSector() - 1]->Fill(digit.getLayer() - 1);
 
-      m_histoChannel[1 - digit.isForward()][digit.getSector() - 1][digit.isPhiReadout()]->Fill(digit.getLayer() - 1,
+      m_histoChannel[1 - digit.getForward()][digit.getSector() - 1][digit.isPhiReadout()]->Fill(digit.getLayer() - 1,
           digitRaw->getChannel() - 1);
 
-      m_histoStrip[1 - digit.isForward()][digit.getSector() - 1][digit.isPhiReadout()]->Fill(digit.getLayer() - 1,
+      m_histoStrip[1 - digit.getForward()][digit.getSector() - 1][digit.isPhiReadout()]->Fill(digit.getLayer() - 1,
           digit.getStrip() - 1);
 
       // getTime() retruns the TDC
-      m_histoTdc[1 - digit.isForward()][digit.getSector() - 1][digit.inRPC()]->Fill(digit.getTime());
+      m_histoTdc[1 - digit.getForward()][digit.getSector() - 1][digit.inRPC()]->Fill(digit.getTime());
 
-      m_histoCTimeDiff[1 - digit.isForward()][digit.getSector() - 1][digit.inRPC()]->Fill(digit.getCTime() -
+      m_histoCTimeDiff[1 - digit.getForward()][digit.getSector() - 1][digit.inRPC()]->Fill(digit.getCTime() -
           digitEventInfo->getIntTriggerCTime());
 
     }

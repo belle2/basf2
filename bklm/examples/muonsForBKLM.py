@@ -67,7 +67,7 @@ mcprint = register_module('PrintMCParticles')
 # ------------  BKLM-related modules
 
 # BKLM digi
-bklmdigi = register_module('BKLMDigitizer')
+klmdigi = register_module('KLMDigitizer')
 bklmdigi.log_level = LogLevel.INFO
 # BKLM reco
 bklmreco = register_module('BKLMReconstructor')
@@ -86,7 +86,7 @@ main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(g4sim)
 
-main.add_module(bklmdigi)
+main.add_module(klmdigi)
 main.add_module(bklmreco)
 main.add_module(bklmEff)
 # main.add_module(output)

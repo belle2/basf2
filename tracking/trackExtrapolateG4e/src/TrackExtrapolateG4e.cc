@@ -1611,7 +1611,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
 
   if (bestHit >= 0) {
     BKLMHit2d* hit = bklmHits[bestHit];
-    intersection.isForward = hit->isForward();
+    intersection.isForward = (hit->getForward() == 1);
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
     double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};

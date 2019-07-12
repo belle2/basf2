@@ -416,6 +416,47 @@ def correctFSR(
     path.add_module(fsrcorrector)
 
 
+def correctbelleFSR(
+    outputListName,
+    inputListName,
+    gammaListName,
+    minimum_energy=0.05,
+    angleThreshold=0.05,
+    writeOut=False,
+    path=None
+):
+    """
+    Takes the charged particle from the given charged particle list and copies them to the output list
+    and adds the 4-vector of the all the photon (considered as radiative) to the charged particle, if the given criteria
+    for maximum angle and minimum energy are fulfilled.
+      Please note, a new charge particle is generated, with the old electron and -if found- gammas as daughters.
+    Information attached to the track is only available for the old lepton, accessable via the daughter
+    metavariable, e.g. <daughter(0, eid)>.
+      The number of photon added to the electron can be obtained by using the variables 'extraInfo(nGamma)' refer
+    to new corrected charged particle
+      The angle between ith(i starts from 1) bremphoton and electron can be obtained by 'daughter(i,theta_e_gamma)'
+     and energy of ith bremphoton can be obtained by 'daughter(i,energy_gamma)'
+
+
+    @param outputListName The output charged particle list containing the corrected charged particles
+    @param inputListName The initial charged particle list containing the charged particles to correct, should already exists.
+    @param gammaListName The gammas list containing possibly radiative gammas, should already exist.
+    @param angleThreshold The maximum angle in radian  between the charged particle  and the (radiative) gamma to be accepted..
+    @param minimum_energy The minimum energy in GeV of the (radiative) gamma to be accepted..
+    @param writeOut      whether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+    fsrcorrector = register_module('BelleBremRecovery')
+    fsrcorrector.set_name('BelleFSRCorrection_' + outputListName)
+    fsrcorrector.param('inputListName', inputListName)
+    fsrcorrector.param('outputListName', outputListName)
+    fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('minimum_energy', minimum_energy)
+    fsrcorrector.param('writeOut', writeOut)
+    path.add_module(fsrcorrector)
+
+
 def copyLists(
     outputListName,
     inputListNames,

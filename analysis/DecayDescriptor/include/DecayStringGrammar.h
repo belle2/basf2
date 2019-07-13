@@ -49,8 +49,8 @@ namespace Belle2 {
     arrow %= string("->") | string("-->") | string("=>") | string("==>");
 
     // Keyword for custom MC Matching
-    reserved_keyword = string("...") | string("?nu") | string("!nu") | string("?rad") | string("!rad");
-    keywordlist = *reserved_keyword;
+    keyword = string("...") | string("?nu") | string("!nu") | string("?rad") | string("!rad");
+    keywordlist = *keyword;
 
     // Basic decay: mother -> daughterlist
     decay %= particle >> arrow >> daughterlist >> -keywordlist;
@@ -73,7 +73,8 @@ namespace Belle2 {
   /** Allowed arrow types. */
   boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> arrow;
   /** Syntax keyword */
-  boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> reserved_keyword;
+  boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> keyword;
+  /** The list of the keywords */
   boost::spirit::qi::rule<Iterator, std::vector<std::string>(), boost::spirit::unicode::space_type> keywordlist;
   /** Syntax of a decay: 'mother arrow daughters ...'. */
   boost::spirit::qi::rule<Iterator, DecayStringDecay(), boost::spirit::unicode::space_type> decay;

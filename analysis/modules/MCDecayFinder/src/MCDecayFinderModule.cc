@@ -193,7 +193,6 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   }
   // Ok, it seems that everything from the DecayDescriptor could be matched.
   // If the decay is NOT INCLUSIVE,  no unmatched MCParticles should be left
-  // bool isInclusive = d->isInclusive();
   bool isInclusive = (d->isIgnoreMassive() or d->isIgnoreNeutrino());
   if (!isInclusive) {
     B2DEBUG(10, "Decay is not inclusive, check for left over MCParticles!\n");

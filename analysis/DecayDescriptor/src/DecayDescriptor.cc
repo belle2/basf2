@@ -33,7 +33,6 @@ DecayDescriptor::DecayDescriptor() :
   m_isIgnoreIntermediate(false),
   m_isIgnoreMassive(false),
   m_isIgnoreNeutrino(false),
-  // m_isInclusive(false),
   m_isNULL(false)
 {
 }
@@ -75,17 +74,17 @@ bool DecayDescriptor::init(const DecayString& s)
 
     // Identify arrow type
     if (d->m_strArrow == "->") {
-      m_isIgnorePhotons = false;
-      m_isIgnoreIntermediate = false;
+      m_isIgnorePhotons = true;
+      m_isIgnoreIntermediate = true;
     } else if (d->m_strArrow == "=>") {
-      m_isIgnorePhotons = true;
-      m_isIgnoreIntermediate = false;
-    } else if (d->m_strArrow == "-->") {
       m_isIgnorePhotons = false;
       m_isIgnoreIntermediate = true;
-    } else if (d->m_strArrow == "==>") {
+    } else if (d->m_strArrow == "-->") {
       m_isIgnorePhotons = true;
-      m_isIgnoreIntermediate = true;
+      m_isIgnoreIntermediate = false;
+    } else if (d->m_strArrow == "==>") {
+      m_isIgnorePhotons = false;
+      m_isIgnoreIntermediate = false;
     } else {
       B2WARNING("Unknown arrow: " << d->m_strArrow);
       return false;
@@ -119,9 +118,6 @@ bool DecayDescriptor::init(const DecayString& s)
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
       m_isIgnoreMassive = true;
     }
-
-    // If both Massive and Neutrino are ignored, m_isInclusive will be true
-    // if (m_isIgnoreMassive and m_isIgnoreNeutrino) m_isInclusive = true;
 
     return true;
   }

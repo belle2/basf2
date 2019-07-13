@@ -70,7 +70,6 @@ namespace Belle2 {
       int m_wrongFTBcrc;
 
 
-
     private:
 
       /**how many FADCs we have */
@@ -100,8 +99,8 @@ namespace Belle2 {
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
         unsigned int trgType   : 4;
-        unsigned int trgTiming : 3;
-        unsigned int onebit    : 1;
+        unsigned int trgTiming : 2;
+        unsigned int xTalk     : 2;
         unsigned int FADCnum   : 8;
         unsigned int evtType   : 1; // Event type(0): 0…TTD event, 1…standalone event
         unsigned int DAQMode   : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
@@ -112,9 +111,6 @@ namespace Belle2 {
       struct APVHeader {
         unsigned int CMC1      : 8; //LSB
         unsigned int CMC2      : 4;
-//         unsigned int fifoErr   : 1;
-//         unsigned int frameErr  : 1;
-//         unsigned int detectErr : 1;
         unsigned int apvErr    : 4;
         unsigned int pipelineAddr : 8;
         unsigned int APVnum : 6;
@@ -140,10 +136,8 @@ namespace Belle2 {
 
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
-        unsigned int emuPipeAddr: 8;
-//         unsigned int fifoErrOR   : 1;
-//         unsigned int frameErrOR  : 1;
-//         unsigned int detectErrOR : 1;
+        unsigned int dataSizeCut: 1;
+        unsigned int nullDigits: 7;
         unsigned int apvErrOR  : 4;
         unsigned int check : 4; //MSB
       };
@@ -198,6 +192,24 @@ namespace Belle2 {
        *  APV/FADC combination in the mapping -> wrong payload is identified
        */
       bool m_badMappingFatal = false;
+
+      /** The parameter that indicates what fraction of B2ERRORs messages
+       * should be suppressed to not overload HLT while data taking
+       */
+      int m_errorRate;
+
+      /** this 4-bits value should be 1111 if no headers/trailers are missing */
+      unsigned short seenHeadersAndTrailers: 4;
+
+      /** counters for specific ERRORS produced by the Unpacker */
+      int nTriggerMatchErrors;
+      int nEventMatchErrors;
+      int nUpsetAPVsErrors;
+      int nErrorFieldErrors;
+      int nMissingAPVsErrors;
+      int nFADCMatchErrors;
+      int nAPVErrors;
+      int nFTBFlagsErrors;
 
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;

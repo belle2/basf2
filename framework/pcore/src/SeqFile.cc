@@ -10,10 +10,10 @@
 #include <framework/logging/Logger.h>
 
 #include <ios>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 #include <fcntl.h>
-#include <errno.h>
+#include <cerrno>
 
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -50,9 +50,9 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, char* s
   }
 
   // Store StreamerInfo 2017.5.8
-  m_streamerinfo = NULL;
+  m_streamerinfo = nullptr;
   m_streamerinfo_size = 0;
-  if (streamerinfo != NULL && streamerinfo_size > 0) {
+  if (streamerinfo != nullptr && streamerinfo_size > 0) {
     m_streamerinfo_size = streamerinfo_size;
     m_streamerinfo = new char[ m_streamerinfo_size ];
     memcpy(m_streamerinfo, streamerinfo, m_streamerinfo_size);
@@ -93,11 +93,11 @@ void SeqFile::openFile(std::string filename, bool readonly)
     //
     // Write StreamerInfo  (2017.5.8)
     //
-    if (m_streamerinfo == NULL || m_streamerinfo_size <= 0) {
+    if (m_streamerinfo == nullptr || m_streamerinfo_size <= 0) {
       // If you want to use SeqFile for non-sroot file type, please skip this B2FATAL
       B2FATAL("Invalid size of StreamerInfo : " << m_streamerinfo_size << "bytes");
     } else {
-      std::ostream* out = dynamic_cast<std::ostream*>(m_stream.get());
+      auto* out = dynamic_cast<std::ostream*>(m_stream.get());
       if (!out) {
         B2FATAL("SeqFile::write() called on a file opened in read mode");
       }
@@ -125,7 +125,7 @@ void SeqFile::openFile(std::string filename, bool readonly)
 
 SeqFile::~SeqFile()
 {
-  if (m_streamerinfo != NULL) delete m_streamerinfo;
+  if (m_streamerinfo != nullptr) delete m_streamerinfo;
   B2INFO("Closing SeqFile " << m_nfile);
   //closed automatically by m_stream.
 }
@@ -138,7 +138,7 @@ int SeqFile::status() const
 int SeqFile::write(const char* buf)
 {
   // cast stream object
-  std::ostream* out = dynamic_cast<std::ostream*>(m_stream.get());
+  auto* out = dynamic_cast<std::ostream*>(m_stream.get());
   if (!out) {
     B2FATAL("SeqFile::write() called on a file opened in read mode");
   }
@@ -172,7 +172,7 @@ int SeqFile::write(const char* buf)
 int SeqFile::read(char* buf, int size)
 {
   // cast stream object
-  std::istream* in = dynamic_cast<std::istream*>(m_stream.get());
+  auto* in = dynamic_cast<std::istream*>(m_stream.get());
   if (!in) {
     B2FATAL("SeqFile::read() called on a file opened in write mode");
   }

@@ -2,58 +2,96 @@
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------------------------------------------
-# Calibrate module T0 with Bhabha (or dimuon) events using new constants from local DB
+# Calibrate module T0 with Bhabha (or dimuon) events using likelihood method
+# Note: this method works correctly only if initial calibration is reasonably good
 #
-# usage: cdst_calibrateModuleT0.py -i <cdst_file.root>
+# usage: basf2 cdst_calibrateModuleT0.py runFirst runLast
+#   job: bsub -q l "basf2 cdst_calibrateModuleT0.py runFirst runLast"
 #
-# Note: replace local database name/location before running or comment it out
-#       check global tag: it must be the same as used in production of input file(s)
+# note: runLast is inclusive
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *
 import sys
+import glob
+import os
 
-# Database:
-# - replace the name and location of the local DB before running!
-# - payloads are searched for in the reverse order of DB's given below;
-#   therefore the new calibration, if provided, is taken from the local DB.
-# - one can even use several local DB's
-use_central_database('data_reprocessing_proc7')  # global tag used in reprocessing
-use_local_database('localDB/localDB.txt', 'localDB/')  # new calibration
+# ----- those need to be adjusted before running --------------------------------------
+#
+experiment = 7
+sample = 'bhabha'
+input_dir = '/ghi/fs01/belle2/bdata/Data/e0007/4S/Bucket4/release-03-01-01/DB00000598/'
+skim_dir = 'skim/hlt_bhabha/cdst/sub00/'
+globalTag = 'data_reprocessing_prompt'  # base global tag
+stagingTags = []  # list of staging tags with new calibration constants
+localDB = []  # list of local databases with new calibration constants
+output_dir = 'moduleT0'  # main output folder
+#
+# -------------------------------------------------------------------------------------
+
+# Argument parsing
+argvs = sys.argv
+if len(argvs) < 3:
+    print("usage: basf2", argvs[0], "runFirst runLast")
+    sys.exit()
+run_first = int(argvs[1])
+run_last = int(argvs[2])
+
+# Make list of files
+files = []
+for run in range(run_first, run_last + 1):
+    runNo = 'r' + '{:0=5d}'.format(run)
+    files += glob.glob(input_dir + '/' + runNo + '/' + skim_dir + '/cdst.*.root')
+if len(files) == 0:
+    B2ERROR('No cdst files found')
+    sys.exit()
+
+# Output folder
+expNo = 'e' + '{:0=4d}'.format(experiment)
+output_folder = output_dir + '/' + expNo
+if not os.path.isdir(output_folder):
+    os.makedirs(output_folder)
+    print('New folder created: ' + output_folder)
+
+# Output file name
+fileName = output_folder + '/moduleT0-' + expNo + '-'
+run1 = 'r' + '{:0=5d}'.format(run_first)
+run2 = 'r' + '{:0=5d}'.format(run_last)
+fileName += run1 + '_to_' + run2 + '.root'
+
+# Database
+use_central_database(globalTag)
+for tag in stagingTags:
+    use_central_database(tag)
+for db in localDB:
+    if os.path.isfile(db):
+        use_local_database(db, invertLogging=True)
+    else:
+        B2ERROR(db + ": local database not found")
+        sys.exit()
 
 # Create path
 main = create_path()
 
-# Input: cdst file(s) - bhabha skim, use -i option
-roinput = register_module('RootInput')
-main.add_module(roinput)
+# Input (cdst files)
+main.add_module('RootInput', inputFileNames=files)
 
-# Geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry
-geometry = register_module('Geometry')
-geometry.param('components', ['MagneticField', 'TOP'])
-geometry.param('useDB', False)
-main.add_module(geometry)
+# Initialize TOP geometry parameters
+main.add_module('TOPGeometryParInitializer')
 
 # Time Recalibrator
-recalibrator = register_module('TOPTimeRecalibrator')
-recalibrator.param('useSampleTimeCalibration', True)
-recalibrator.param('useChannelT0Calibration', True)
-recalibrator.param('useModuleT0Calibration', False)
-recalibrator.param('useCommonT0Calibration', True)
-recalibrator.param('subtractBunchTime', True)
-main.add_module(recalibrator)
+main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
 
 # Channel masking
 main.add_module('TOPChannelMasker')
 
+# Bunch finder
+main.add_module('TOPBunchFinder', usePIDLikelihoods=True)
+
 # Module T0 calibration
 calibrator = register_module('TOPModuleT0Calibrator')
-calibrator.param('sample', 'bhabha')
-calibrator.param('outputFileName', 'moduleT0_r*.root')
+calibrator.param('sample', sample)
+calibrator.param('outputFileName', fileName)
 main.add_module(calibrator)
 
 # Print progress

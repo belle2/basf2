@@ -9,21 +9,29 @@
 #######################################################
 
 from basf2 import process, statistics, Path
-from modularAnalysis import analysis_main, inputMdstList, \
+from modularAnalysis import inputMdstList, \
     skimOutputUdst, summaryOfLists
 from stdCharged import stdE
-from skimExpertFunctions import encodeSkimName, setSkimLogging
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
+gb2_setuprel = 'release-03-02-00'
 
-gb2_setuprel = 'release-03-00-00'
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 # create a path to build skim lists
 skimpath = Path()
 
 # some test input data
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002314/e0000/4S/r00000/mumu_ecldigits/sub00/' +
-    'mdst_000001_prod00002314_task00000001.root']
-inputMdstList('MC9', fileList, path=skimpath)
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=skimpath)
 stdE('all', path=skimpath)
 
 # setup the skim get the skim code

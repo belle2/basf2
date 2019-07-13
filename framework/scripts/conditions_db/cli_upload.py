@@ -18,6 +18,7 @@ from collections import defaultdict
 
 class LocalDatabaseEntry:
     """Class to keep information about an entry in the local database file"""
+
     def __init__(self, line, basedir):
         """Create new entry from line in database file"""
         try:
@@ -26,7 +27,8 @@ class LocalDatabaseEntry:
             raise ValueError("line must be of the form 'dbstore/<payloadname> <revision> "
                              "<firstExp>,<firstRun>,<finalExp>,<finalRun>'")
         try:
-            revision = int(revision)
+            #: revision stored in the file
+            self.revision = int(revision)
         except ValueError:
             raise ValueError("revision must be an integer")
 
@@ -45,9 +47,7 @@ class LocalDatabaseEntry:
             raise ValueError("IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)")
 
         #: filename
-        self.filename = os.path.join(basedir, "dbstore_{module}_rev_{revision}.root".format(
-            module=self.module, revision=revision,
-        ))
+        self.filename = os.path.join(basedir, f"dbstore_{self.module}_rev_{self.revision}.root")
         #: experiment/run of the first run
         self.firstRun = {"exp": iov[0], "run": iov[1]}
         #: experiment/run of the final run

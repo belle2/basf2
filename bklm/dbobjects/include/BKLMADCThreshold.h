@@ -8,14 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMADCTHRESHOLD_DB_H
-#define BKLMADCTHRESHOLD_DB_H
+#pragma once
 
 #include <TObject.h>
 #include <string>
 #include <cmath>
-#include <TROOT.h>
-#include <TClass.h>
 
 namespace Belle2 {
 
@@ -78,5 +75,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

@@ -69,6 +69,24 @@ add_properties(
 
 gaus_h.Write()
 
+# Warnings
+# ======================================
+
+warnings_h = ROOT.TH1F("warnings_histogram", "Histogram", 100, -3, 3)
+warnings_h.FillRandom("gaus", 500)
+
+add_properties(
+    warnings_h,
+    {
+        'Description': "",
+        'Check': "",
+        'Contact': "Kilian Lieret, Kilian.Lieret@campus.lmu.de",
+        'MetaOptions': "logx, nostats"
+    }
+)
+
+warnings_h.Write()
+
 # Exp histograms
 # ======================================
 
@@ -111,7 +129,7 @@ for i in range(500):
 add_properties(
     gaus_changing,
     {
-        'Description': "xlog ylog with stats",
+        'Description': "xlog ylog with stats. I can haz $\LaTeX$?",
         'Check': "Gaus Changing Histogram Check",
         'Contact': "Gaus Changing Histogram Contact",
         'MetaOptions': "logx, logy"

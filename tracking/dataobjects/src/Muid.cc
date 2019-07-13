@@ -41,6 +41,9 @@ Muid::Muid() :
   m_ExtLayerPattern(0),
   m_HitLayerPattern(0)
 {
+  for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
+    m_ExtBKLMEfficiencyValue[i] = 1.0;
+  }
 }
 
 Muid::Muid(int pdgCode) :
@@ -71,4 +74,7 @@ Muid::Muid(int pdgCode) :
   m_ExtLayerPattern(0),
   m_HitLayerPattern(0)
 {
+  for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
+    m_ExtBKLMEfficiencyValue[i] = 1.0;
+  }
 }

@@ -52,6 +52,8 @@ namespace Belle2 {
     void beginRun() override final;
     /** Module function event */
     void event() override final;
+    /** Module function endRun */
+    void endRun() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -74,33 +76,46 @@ namespace Belle2 {
 
     /** mapping implementation */
     std::unique_ptr<SVDOnlineToOfflineMap> m_map;
-    static std::string m_xmlFileName;
-    DBObjPtr<PayloadFile> m_mapping;
+    static std::string m_xmlFileName; /**< xml filename*/
+    DBObjPtr<PayloadFile> m_mapping; /**< channel map payload*/
 
-    StoreArray<SVDShaperDigit> m_svdShapers;
-    StoreArray<SVDDAQDiagnostic> m_svdDAQDiagnostics;
-    StoreObjPtr<EventMetaData> m_eventMetaData;
+    StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigits Store Arrra*/
+    StoreArray<SVDDAQDiagnostic> m_svdDAQDiagnostics; /**<SVDDAQDiagnostic StoreArray*/
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**<EvtMetaData StoreObjectPointer*/
 
-    bool changeFADCaxis;
+    bool changeFADCaxis; /**<change FADC (y) axis*/
+    bool shutUpNoData; /**<shut up if no data comes*/
 
-    uint16_t ftbError;
-    uint16_t ftbFlags;
-    uint16_t apvError;
-    bool apvMatch;
-    bool fadcMatch;
-    bool upsetAPV;
-    bool badMapping;
-    bool badHeader;
-    bool badTrailer;
-    unsigned short fadcNo;
+    int expNumber; /**< experiment number*/
+    int runNumber; /**< run number*/
+
+    bool badEvent; /**<indicates if the particular event has any SVD error*/
+    unsigned int nEvents;  /**<event counter */
+    unsigned int nBadEvents;  /**<counter of events with any kind of error*/
+    float errorFraction; /**<fraction of events with any kind of error*/
+
+    uint16_t ftbError; /**<FTB error container*/
+    uint16_t ftbFlags; /**<FTB flags container*/
+    uint16_t apvError; /**< APV error container*/
+    bool apvMatch; /**< apv match error*/
+    bool fadcMatch; /**<fadcc match error*/
+    bool upsetAPV; /**<upset APV error*/
+    bool badMapping; /**<bad mapping error*/
+    bool badHeader; /**<bad header error*/
+    bool badTrailer; /**<bad trailer error*/
+    bool missedHeader; /** missed Header error*/
+    bool missedTrailer; /** missed Trailer error*/
+
+    unsigned short fadcNo; /**<fadc number*/
     //unsigned short apvNo;
 
-    std::unordered_set<unsigned char>* FADCs;
-    std::unordered_map<unsigned short, unsigned short> fadc_map;
-    std::vector<unsigned short> vec_fadc;
+    std::unordered_set<unsigned char>* FADCs; /**< FADC boards number*/
+    std::unordered_map<unsigned short, unsigned short> fadc_map; /**< FADC board number map*/
+    std::vector<unsigned short> vec_fadc; /**<vector of FADC boards*/
 
     //histogram
-    TH2S* DQMUnpackerHisto;
+    TH2S* DQMUnpackerHisto; /**< TH2S histogram with Unpacking errors*/
+    TH1S* DQMEventFractionHisto; /**< TH1S histogram showing the fraction of events affected by errors*/
 
   };
 

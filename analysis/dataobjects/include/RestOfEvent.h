@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #pragma once
-#include <analysis/VariableManager/Utility.h>
 #include <framework/datastore/RelationsObject.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/gearbox/Const.h>
@@ -229,8 +229,9 @@ namespace Belle2 {
      * @param Cut on KLM particles
      * @param Update existing mask if true or not if false
      */
-    void updateMaskWithCuts(const std::string& name, std::shared_ptr<Variable::Cut> trackCut = nullptr,
-                            std::shared_ptr<Variable::Cut> eclCut = nullptr, std::shared_ptr<Variable::Cut> klmCut = nullptr, bool updateExisting = false);
+    void updateMaskWithCuts(const std::string& name, const std::shared_ptr<Variable::Cut>& trackCut = nullptr,
+                            const std::shared_ptr<Variable::Cut>& eclCut = nullptr, const std::shared_ptr<Variable::Cut>& klmCut = nullptr,
+                            bool updateExisting = false);
     /**
      * Update mask by keeping or excluding particles
      * @param Name of the mask to work with
@@ -424,11 +425,10 @@ namespace Belle2 {
     /**
      * Prints indices in the given set in a single line
      */
-    void printIndices(std::set<int> indices) const;
+    void printIndices(const std::set<int>& indices) const;
     ClassDef(RestOfEvent, 5) /**< class definition */
 
   };
 
 
 } // end namespace Belle2
-

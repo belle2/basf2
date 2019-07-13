@@ -398,10 +398,12 @@ def start_rfarm_components(conffile):
 
 def stop_rfarm_components(conffile):
     stop_roisender(conffile)
+    print("stop dqmserver")
     stop_dqmserver(conffile)
+    print("done")
     stop_eventserver(conffile)
     stop_outputserver(conffile)
-    stop_eventprocessor(conffile)
+#    stop_eventprocessor(conffile)
 
 
 # Start RFARM local operation
@@ -414,6 +416,9 @@ def start_rfarm_local(conffile):
 # Stop RFARM local operation
 
 def stop_rfarm_local(conffile):
+    print("stopping eventprocessors")
     stop_eventprocessor(conffile)
+    print("stopping rfarm components")
     stop_rfarm_components(conffile)
+    print("stopping master")
     stop_master(conffile)

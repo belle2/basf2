@@ -34,7 +34,7 @@ import pprint
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
     LogPythonInterface
 from basf2.utils import pretty_print_table
-from pager import Pager
+from terminal_utils import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
 from . import ConditionsDB, enable_debugging, encode_name

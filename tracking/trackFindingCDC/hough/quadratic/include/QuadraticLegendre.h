@@ -41,6 +41,7 @@ namespace Belle2 {
       {
       }
 
+      /// End view: use the quadratic expression for z(s)
       static const bool m_lookingForQuadraticTracks = true;
     };
   }

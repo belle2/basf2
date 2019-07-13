@@ -54,7 +54,7 @@ void FlavorTaggerInfoFillerModule::event()
   StoreObjPtr<EventExtraInfo> eventExtraInfo;
   StoreObjPtr<RestOfEvent> RestOfEvent("RestOfEvent");
 
-  FlavorTaggerInfo* flavorTaggerInfo = RestOfEvent->getRelatedTo<FlavorTaggerInfo>();
+  auto* flavorTaggerInfo = RestOfEvent->getRelatedTo<FlavorTaggerInfo>();
 
   Variable::Manager& manager = Variable::Manager::Instance();
 

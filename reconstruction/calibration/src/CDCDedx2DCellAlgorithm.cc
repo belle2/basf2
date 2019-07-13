@@ -1,5 +1,5 @@
 /**************************************************************************
-1;4205;0c * BASF2 (Belle Analysis Framework 2)                                     *
+ * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -10,6 +10,8 @@
 
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include "TStyle.h"
 
 #include <reconstruction/calibration/CDCDedx2DCellAlgorithm.h>
 
@@ -30,6 +32,7 @@ CDCDedx2DCellAlgorithm::CDCDedx2DCellAlgorithm():
   feaUE(+TMath::Pi() / 2),
   fdocaLE(-1.50),
   fdocaUE(1.50),
+  fSetPrefix("_it0"),
   IsLocalBin(true),
   IsMakePlots(false),
   IsRS(true)
@@ -76,19 +79,11 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   fDocaBinNums = globalbinsDoca;
   fnDocaBinL = fnDocaBinG;
 
-  //enta dedx distributions for inner and outer layer
   std::vector<std::vector<TH1F*>> hILdEdxhitInEntaDocaBin(fnEntaBinL, std::vector<TH1F*>(fnDocaBinL, 0));
-  // hILdEdxhitInEntaDocaBin.reserve(fnEntaBinL);
-  // for (int i = 0; i < fnEntaBinL; i++)hILdEdxhitInEntaDocaBin[i].reserve(fnDocaBinL);
-
   std::vector<std::vector<TH1F*>> hOLdEdxhitInEntaDocaBin(fnEntaBinL, std::vector<TH1F*>(fnDocaBinL, 0));
-  // std::vector<std::vector<TH1F*>> hOLdEdxhitInEntaDocaBin;
-  // hOLdEdxhitInEntaDocaBin.reserve(fnEntaBinL);
-  // for (int i = 0; i < fnEntaBinL; i++)hOLdEdxhitInEntaDocaBin[i].reserve(fnDocaBinL);
-
   Double_t ifeaLE = 0, ifeaUE = 0, ifdocaLE = 0, ifdocaUE = 0;
-  for (int iea = 0; iea < fnEntaBinL; iea++) {
 
+  for (int iea = 0; iea < fnEntaBinL; iea++) {
     if (IsLocalBin) {
       ifeaLE = fEntaBinValues.at(iea);
       ifeaUE = fEntaBinValues.at(iea + 1);
@@ -102,20 +97,20 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       ifdocaLE = idoca * fdocaBS - fdocaUE;
       ifdocaUE = ifdocaLE + fdocaBS;
 
-      hILdEdxhitInEntaDocaBin[iea][idoca] = new TH1F(Form("hILdEdxhitInEntaBin%dDocaBin%d", iea, idoca), "bla-bla", 250, 0., 5.);
-      hILdEdxhitInEntaDocaBin[iea][idoca]->SetTitle(Form("IL: dedxhit in EntA = (%0.03f to %0.03f) and Doca = (%0.03f to %0.03f)", ifeaLE,
+      hILdEdxhitInEntaDocaBin[iea][idoca] = new TH1F(Form("hILdEdxhitInEntaBin%dDocaBin%d", iea, idoca), "bla-bla", 500, 0., 5.);
+      hILdEdxhitInEntaDocaBin[iea][idoca]->SetTitle(Form("IL: EntA = (%0.03f to %0.03f) and Doca = (%0.03f to %0.03f)", ifeaLE,
                                                          ifeaUE, ifdocaLE, ifdocaUE));
       hILdEdxhitInEntaDocaBin[iea][idoca]->GetXaxis()->SetTitle("dedxhits in Inner Layer");
       hILdEdxhitInEntaDocaBin[iea][idoca]->GetYaxis()->SetTitle("Entries");
 
-      hOLdEdxhitInEntaDocaBin[iea][idoca] = new TH1F(Form("hOLdEdxhitInEntaBin%dDocaBin%d", iea, idoca), "bla-bla", 250, 0., 5.);
-      hOLdEdxhitInEntaDocaBin[iea][idoca]->SetTitle(Form("OL: dedxhit in EntA = (%0.03f to %0.03f) and Doca = (%0.03f to %0.03f)", ifeaLE,
+      hOLdEdxhitInEntaDocaBin[iea][idoca] = new TH1F(Form("hOLdEdxhitInEntaBin%dDocaBin%d", iea, idoca), "bla-bla", 500, 0., 5.);
+      hOLdEdxhitInEntaDocaBin[iea][idoca]->SetTitle(Form("OL: EntA = (%0.03f to %0.03f) and Doca = (%0.03f to %0.03f)", ifeaLE,
                                                          ifeaUE, ifdocaLE, ifdocaUE));
       hOLdEdxhitInEntaDocaBin[iea][idoca]->GetXaxis()->SetTitle("dedxhits in Outer Layer");
       hOLdEdxhitInEntaDocaBin[iea][idoca]->GetYaxis()->SetTitle("Entries");
+
     }
   }
-
 
   //Doca vs Enta stats
   TH2D* hILDocaEntaG = new TH2D("hILDocaEntaG", "Doca vs EntA: Inner Layer", fnDocaBinG, fdocaLE, fdocaUE, fnEntaBinG, feaLE, feaUE);
@@ -138,8 +133,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   hOLDocaEntaL->GetXaxis()->SetTitle("Doca");
   hOLDocaEntaL->GetYaxis()->SetTitle("Entrance angle (#theta)");
 
-  TH1D* hILdEdx_all = new TH1D("hILdEdx_all", "", 250, 0., 5.);
-  TH1D* hOLdEdx_all = new TH1D("hOLdEdx_all", "", 250, 0., 5.);
+  TH1D* hILdEdx_all = new TH1D("hILdEdx_all", "", 500, 0., 5.);
+  TH1D* hOLdEdx_all = new TH1D("hOLdEdx_all", "", 500, 0., 5.);
 
 
   Int_t ibinEA = 0, ibinDOCA = 0;
@@ -168,9 +163,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
 
       if (ibinEA >= fnEntaBinG || ibinDOCA >= fnDocaBinG) continue; //bin stats from 0
 
-      if (IsLocalBin) {
-        ibinEA = fEntaBinNums.at(ibinEA);
-      }
+      if (IsLocalBin) ibinEA = fEntaBinNums.at(ibinEA);
 
       if (layer->at(j) < 8) {
         hILDocaEntaG->Fill(idocaHit, ieaHit);
@@ -186,6 +179,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     }
   }
 
+
   if (IsMakePlots) {
     TCanvas* ctmpde = new TCanvas("DocavsEnta", "Doca vs Enta distributions", 800, 400);
     if (IsLocalBin) {
@@ -200,16 +194,18 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       ctmpde->cd(1); hILDocaEntaG->Draw("colz");
       ctmpde->cd(2); hOLDocaEntaG->Draw("colz");
     }
-    ctmpde->SaveAs("DocavsEnta.pdf");
+    ctmpde->SaveAs(Form("DocavsEnta_%s.pdf", fSetPrefix.data()));
+    ctmpde->SaveAs(Form("DocavsEnta_%s.root", fSetPrefix.data()));
 
     TCanvas* ctem = new TCanvas("Layerhisto", "Inner and Outer Histo", 600, 600);
     hOLdEdx_all->Draw("histo");
     hILdEdx_all->SetMarkerColor(kRed);
     hILdEdx_all->Draw("same histo");
-    ctem->SaveAs("Layerhistodedxhit_TwoDCorr.pdf");
+    ctem->SaveAs(Form("Layerhistodedxhit_TwoDCorr_%s.pdf", fSetPrefix.data()));
   }
 
 
+  //Calculationg 5-75% global truncation mean
   double InsumPer5 = 0.0, InsumPer75 = 0.0;
   double OutsumPer5 = 0.0, OutsumPer75 = 0.0;
   double InLayInt = hILdEdx_all->Integral();
@@ -242,28 +238,33 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   }
 
   short version = 1;
-  TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 900);
-  ctmp->Divide(4, 3);
-  std::stringstream psname; psname << "dedx_2dcell.pdf[";
+  TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 1200);
+  ctmp->Divide(4, 4);
+  std::stringstream psname; psname << Form("dedx_2dcell_%s.pdf[", fSetPrefix.data());
   TLine* tl = new TLine();
   tl->SetLineColor(kRed);
 
+  TBox* tb = new TBox();
+
   if (IsMakePlots) {
     ctmp->Print(psname.str().c_str());
-    psname.str(""); psname << "dedx_2dcell.pdf";
+    psname.str(""); psname << Form("dedx_2dcell_%s.pdf", fSetPrefix.data());
   }
 
-
-
-  TH1D* htemp = 0x0;
+  gStyle->SetOptStat("nemriou");
+  TH1D* htemp = NULL;
   std::vector<TH2F> twodcors;
-  TH2F tempTwoD = TH2F("tempTwoD", "dE/dx in bins of DOCA/Enta;DOCA;Entrance Angle", fnDocaBinG, fdocaLE, fdocaUE, fnEntaBinG, feaLE,
-                       feaUE);
+  TH2F tempTwoD = TH2F("tempTwoD", "dE/dx in bins of DOCA/Enta;DOCA;Entrance Angle", fnDocaBinL, fdocaLE, fdocaUE, fnEntaBinL,
+                       RmapEntaValue);
   TH2F twodcor = TH2F("twodcorrection", "dE/dx in bins of DOCA/Enta;DOCA;Entrance Angle", fnDocaBinG, fdocaLE, fdocaUE, fnEntaBinG,
                       feaLE, feaUE);
 
+  std::ofstream file2DILout;
+
   int startfrom = 1, endat = 1;
   for (int iIOLayer = 0; iIOLayer <= 1; iIOLayer++) {
+
+    file2DILout.open(Form("f2D_Constants_Local_Layer%d_%s.txt", iIOLayer, fSetPrefix.data()));
 
     if (iIOLayer == 0) {
       startfrom = lBinInLayer; endat = hBinInLayer;
@@ -277,7 +278,6 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       Int_t ieaprime = iea; //rotation symmtery for 1<->3 and 4<->2
       if (IsRS)ieaprime = GetRotationSymmericBin(fnEntaBinL, iea);
 
-      //std::cout << "iea(prime) bin = " << iea << "(" << ieaprime << ")" << std::endl;
       for (int idoca = 1; idoca <= fnDocaBinL; idoca++) {
 
         if (iIOLayer == 0)
@@ -287,7 +287,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
         else continue;
 
         double truncMean  = 1.0;
-        if (htemp->GetEntries() < 100) truncMean  = 1.0; //low stats
+        if (htemp->GetEntries() < 400) truncMean  = 1.0; //low stats
         else {
           double binweights = 0.0;
           int sumofbc = 0;
@@ -306,13 +306,30 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
         tempTwoD.SetBinContent(idoca, iea, truncMean); //binning starts at 1
 
         if (IsMakePlots) {
-          ctmp->cd(((idoca - 1) % 12) + 1);
+          ctmp->cd(((idoca - 1) % 16) + 1);
+          htemp->SetTitle(Form("%s, mean = %0.4f", htemp->GetTitle(), truncMean));
+          htemp->SetFillColorAlpha(kGreen, 0.30);
+          if (truncMean >= 1.02 || truncMean <= 0.98)htemp->SetFillColor(kYellow);
+          if (truncMean >= 1.05 || truncMean <= 0.95)htemp->SetFillColor(kOrange);
+          if (truncMean >= 1.10 || truncMean <= 0.90)htemp->SetFillColor(kRed);
           htemp->DrawClone(); //clone is nessesory for pointer survival
+          tl->SetLineColor(kRed);
           tl->SetX1(truncMean); tl->SetX2(truncMean);
           tl->SetY1(0); tl->SetY2(htemp->GetMaximum());
           tl->DrawClone("same");
-          if (idoca % 12 == 0)ctmp->Print(psname.str().c_str());
+
+          tb->SetLineColor(kPink);
+          tb->SetLineStyle(6);
+          tb->SetFillColorAlpha(kPink, 0.15);
+          tb->SetX1(htemp->GetBinLowEdge(startfrom));
+          tb->SetY1(0);
+          tb->SetX2(htemp->GetBinLowEdge(endat));
+          tb->SetY2(htemp->GetMaximum());
+          tb->DrawClone("same");
+          if (idoca % 16 == 0)ctmp->Print(psname.str().c_str());
         }
+
+        file2DILout << iea << ",   \t" << idoca << ",    \t" << truncMean << "\n";
         htemp->Reset();
       }
     }
@@ -328,13 +345,16 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       }
     }
 
+    if (iIOLayer == 0)twodcor.SetTitle("InnerLayer: dE/dx in bins of DOCA/Enta");
+    else if (iIOLayer == 1)twodcor.SetTitle("OuterLayer: dE/dx in bins of DOCA/Enta");
     twodcors.push_back(twodcor);
     twodcor.Reset();
     tempTwoD.Reset();
+    file2DILout.close();
   }
 
   if (IsMakePlots) {
-    psname.str(""); psname << "dedx_2dcell.pdf]";
+    psname.str(""); psname << Form("dedx_2dcell_%s.pdf]", fSetPrefix.data());
     ctmp->Print(psname.str().c_str());
 
     // //Drawing final constants
@@ -342,7 +362,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     cconst->Divide(2, 1);
     cconst->cd(1); twodcors.at(0).Draw("colz");
     cconst->cd(2); twodcors.at(1).Draw("colz");
-    cconst->SaveAs("Final2DConstantMap.pdf");
+    cconst->SaveAs(Form("Final2DConstantMap_wGlobalBin_%s.pdf", fSetPrefix.data()));
+    cconst->SaveAs(Form("Final2DConstantMap_wGlobalBin_%s.root", fSetPrefix.data()));
   }
 
 
@@ -353,6 +374,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   delete htemp;
   delete ctmp;
   delete tl;
+  delete tb;
   return c_OK;
 
 }

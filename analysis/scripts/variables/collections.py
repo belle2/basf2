@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 from variables import utils
 
-#: Placehoder for FT variables collection
-#: (not complete, see :issue:`BII-3853`)
-flavor_tagging = ["qrOutput(FBDT)"]
-
 #: Replacement for DeltaEMbc
 deltae_mbc = ["Mbc", "deltaE"]
 
@@ -14,9 +10,9 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
-    'PulseShapeDiscriminationMVA',
-    'ClusterHasPulseShapeDiscrimination',
-    'ClusterNumberOfHadronDigits',
+    'clusterPulseShapeDiscriminationMVA',
+    'clusterHasPulseShapeDiscrimination',
+    'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
     'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
@@ -64,6 +60,27 @@ cluster = [
     'nRejectedECLShowersFWDEndcap',
 ]
 
+#: KLM cluster information
+klm_cluster = [
+    'klmClusterKlId',
+    'klmClusterTiming',
+    'klmClusterPositionX',
+    'klmClusterPositionY',
+    'klmClusterPositionZ',
+    'klmClusterInnermostLayer',
+    'klmClusterLayers',
+    'klmClusterEnergy',
+    'klmClusterMomentum',
+    'klmClusterIsBKLM',
+    'klmClusterIsEKLM',
+    'klmClusterIsForwardEKLM',
+    'klmClusterIsBackwardEKLM',
+    'klmClusterTheta',
+    'klmClusterPhi',
+    'nKLMClusterTrackMatches',
+    'nMatchedKLMClusters',
+]
+
 #: Dalitz masses for three body decays
 dalitz_3body = [
     'daughterInvM(0, 1)',  # invariant mass of daughters 1 and 2
@@ -91,9 +108,9 @@ mc_variables = [
     'genMotherPDG',
     'genParticleID',
     'isCloneTrack',
-    'mcDX',
-    'mcDY',
-    'mcDZ',
+    'mcX',
+    'mcY',
+    'mcZ',
     'mcDecayTime',
     'mcE',
     'mcErrors',
@@ -158,7 +175,7 @@ vertex = [
     'prodVertexXErr',
     'prodVertexYErr',
     'prodVertexZErr',
-    'pValue',
+    'chiProb',
 ]
 
 #: Replacement for MCVertex tuple tool
@@ -173,13 +190,22 @@ mc_vertex = [
     'mcProdVertexZ'
 ]
 
-#: Tag-side related variables
+#: CPV and Tag-side related variables
 tag_vertex = [
+    'DeltaT',
+    'DeltaTErr',
+    'DeltaZ',
+    'DeltaZErr',
+    'DeltaBoost',
+    'DeltaBoostErr',
     'TagVLBoost',
     'TagVLBoostErr',
     'TagVOBoost',
     'TagVOBoostErr',
     'TagVpVal',
+    'TagVNDF',
+    'TagVChi2',
+    'TagVChi2IP',
     'TagVx',
     'TagVxErr',
     'TagVy',
@@ -191,7 +217,6 @@ tag_vertex = [
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
     'MCDeltaT',
-    'MCTagBFlavor',
     'TagVmcLBoost',
     'TagVmcOBoost',
     'mcLBoost',
@@ -211,7 +236,6 @@ momentum_uncertainty = [
 
 #: Replacement for RecoStats tool
 reco_stats = [
-    'nECLClusters',
     'nTracks',
 ]
 

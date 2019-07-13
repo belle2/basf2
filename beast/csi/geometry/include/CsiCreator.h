@@ -20,7 +20,6 @@
 #include "TString.h"
 #include "Riostream.h"
 //#include <boost/algorithm/string.hpp>
-#include <string>
 
 class G4Box;
 class G4Tubs;

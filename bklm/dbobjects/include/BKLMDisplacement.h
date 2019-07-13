@@ -15,8 +15,7 @@
  * constructor.                                                           *
  **************************************************************************/
 
-#ifndef BKLMDISPLACEMENT_H
-#define BKLMDISPLACEMENT_H
+#pragma once
 
 //#include <bklm/dataobjects/BKLMElementID.h>
 #include <TObject.h>
@@ -99,5 +98,3 @@ namespace Belle2 {
     ClassDef(BKLMDisplacement, 1); /**< BKLM displaced-geometry*/
   };
 } // end namespace Belle2
-
-#endif

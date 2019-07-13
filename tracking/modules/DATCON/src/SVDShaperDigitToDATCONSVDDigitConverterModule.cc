@@ -71,9 +71,8 @@ void SVDShaperDigitToDATCONSVDDigitConverterModule::event()
     bool isu = shaperdigit.isUStrip();
     short cellid = shaperdigit.getCellID();
     DATCONSVDDigit::APVFloatSamples rawsamples = shaperdigit.getSamples();
-    SVDModeByte mode = shaperdigit.getModeByte();
 
-    DATCONSVDDigit newDATCONSVDDigit(sensorid, isu, cellid, rawsamples, mode);
+    DATCONSVDDigit newDATCONSVDDigit(sensorid, isu, cellid, rawsamples);
     DATCONSVDDigit* datcondigit = storeDATCONSVDDigits.appendNew(newDATCONSVDDigit);
 
     // Register relation to the SVDShaperDigit the DATCONSVDDigit is derived from

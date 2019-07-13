@@ -25,7 +25,7 @@ vector<string> PyStoreObj::list(DataStore::EDurability durability)
 
 void PyStoreObj::printList(DataStore::EDurability durability)
 {
-  for (auto n : list(durability))
+  for (const auto& n : list(durability))
     B2INFO(n);
 }
 
@@ -60,7 +60,7 @@ bool PyStoreObj::registerInDataStore(DataStore::EStoreFlags storeFlags)
   return registerInDataStore(m_storeAccessor.getName(), storeFlags);
 }
 
-bool PyStoreObj::registerInDataStore(std::string name, DataStore::EStoreFlags storeFlags)
+bool PyStoreObj::registerInDataStore(const std::string& name, DataStore::EStoreFlags storeFlags)
 {
   if (not hasValidClass()) {
     B2ERROR("Cannot register PyStoreObj '" << name << "' with unknown TClass. Please supply one to the PyStoreObj constructor.");

@@ -21,6 +21,11 @@ namespace Belle2 {
     samplePeak -= m_startSample;
     sampleFall -= m_startSample;
 
+    return Integral(sampleRise, samplePeak, sampleFall);
+  }
+
+  int TOPRawWaveform::Integral(int sampleRise, int samplePeak, int sampleFall) const
+  {
     int min = samplePeak - 3 * (samplePeak - sampleRise);
     if (min < 0) min = 0;
     int max = samplePeak + 4 * (sampleFall + 1 - samplePeak);
@@ -73,7 +78,7 @@ namespace Belle2 {
           feature.vPeak = m_data[samplePeak];
           feature.vFall0 = m_data[sampleFall];
           feature.vFall1 = m_data[sampleFall + 1];
-          feature.integral = getIntegral(sampleRise, samplePeak, sampleFall);
+          feature.integral = Integral(sampleRise, samplePeak, sampleFall);
           m_features.push_back(feature);
         }
         lastState = false;

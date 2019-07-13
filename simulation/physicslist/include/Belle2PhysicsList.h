@@ -25,8 +25,9 @@ namespace Belle2 {
     class Belle2PhysicsList: public G4VModularPhysicsList {
 
     public:
-      /** Constructor and destructor */
-      Belle2PhysicsList(const G4String& physicsListName);
+      /** Constructor */
+      explicit Belle2PhysicsList(const G4String& physicsListName);
+      /** destructor */
       ~Belle2PhysicsList();
 
       /** Build all particle types used in physics list */

@@ -8,17 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMELECTRONICMAPPING_DB_H
-#define BKLMELECTRONICMAPPING_DB_H
+#pragma once
 
 #include <TObject.h>
 #include <string>
 #include <cmath>
 //#include <framework/logging/Logger.h>
 #include <vector>
-
-#include <TROOT.h>
-#include <TClass.h>
 
 namespace Belle2 {
 
@@ -73,6 +69,15 @@ namespace Belle2 {
      */
     int getLaneId() const {return m_laneId; }
 
+    /**
+     * Set lane.
+     * @param[in] lane Lane.
+     */
+    void setLane(int lane)
+    {
+      m_laneId = lane;
+    }
+
     /** Return electronics channelId in the map
      */
     int getChannelId() const {return m_channelId; }
@@ -88,6 +93,15 @@ namespace Belle2 {
     /** Return layer #No in the map
      */
     int getLayer() const {return m_layer; }
+
+    /**
+     * Set layer.
+     * @param[in] layer layer.
+     */
+    void setLayer(int layer)
+    {
+      m_layer = layer;
+    }
 
     /** Return which plane (z/phi) in the map
      */
@@ -120,5 +134,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

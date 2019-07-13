@@ -8,12 +8,13 @@
 #include <boost/python/docstring_options.hpp>
 
 #include <map>
+#include <utility>
 
 using namespace Belle2;
 using namespace boost::python;
 
 ModuleCondition::ModuleCondition(std::string expression, PathPtr conditionPath, EAfterConditionPath afterConditionPath):
-  m_conditionPath(conditionPath),
+  m_conditionPath(std::move(conditionPath)),
   m_afterConditionPath(afterConditionPath)
 {
   /** Maps the operator string to a EConditionOperators value. */

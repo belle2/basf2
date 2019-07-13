@@ -29,16 +29,6 @@ EKLMChannelData::~EKLMChannelData()
 {
 }
 
-bool EKLMChannelData::getActive() const
-{
-  return m_Active;
-}
-
-void EKLMChannelData::setActive(bool active)
-{
-  m_Active = active;
-}
-
 float EKLMChannelData::getPedestal() const
 {
   return m_Pedestal;

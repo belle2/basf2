@@ -14,6 +14,7 @@
 #include <framework/gearbox/Unit.h>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -81,4 +82,31 @@ double ARICHReconstructionPar::getNPadsInRing(double maxThc, double minThc, doub
 
 void ARICHReconstructionPar::print() const
 {
+
+  cout << endl << "-----bkg PDF-----" << endl;
+  m_bkgPDF->Print();
+  int Npar = m_bkgPDF->GetNpar();
+  std::vector<double> bkgPars(Npar, 0);
+  m_bkgPDF->GetParameters(bkgPars.data());
+  for (int i = 0; i < Npar; i++)cout << Form("bkg Pars %d = %e", i, bkgPars[i]) << endl;
+
+  cout << endl << "-----flat backgroud per pad-----"  << endl;
+  cout << " flat background per pad is " << m_flatBkgPerPad << endl;
+
+  cout << endl << "----additional parameters (for wide gaus)-----"  << endl;
+  for (int i = 0; i < (int)m_pars.size(); i++) {
+    printf("m_pars[%d] = %e\n", i, m_pars[i]);
+  }
+
+  cout << endl << "----Aerogel FOM-----"  << endl;
+  for (int i = 0; i < (int)m_aerogelFOM.size(); i++) {
+    printf("m_aerogelFOM[%d] = %f\n", i, m_aerogelFOM[i]);
+  }
+
+  cout << endl << "----- Resolution PDF-----" << endl;
+  m_thcResolution->Print();
+  double resPars[4];
+  m_thcResolution->GetParameters(resPars);
+  for (int i = 0; i < 4; i++)cout << Form("resolution Pars %d = %e", i, resPars[i]) << endl;
+
 }

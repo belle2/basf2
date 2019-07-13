@@ -34,8 +34,10 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     DQMHistAnalysisRooFitExampleModule();
+    //! Destructor
+    ~DQMHistAnalysisRooFitExampleModule();
   private:
 
     //! Module functions to be called from main process
@@ -48,14 +50,21 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data member
+    /** The RooFit work space. */
     RooWorkspace* w = nullptr;
+    /** The fitting variable. */
     RooRealVar* x = nullptr;
+    /** The data of histogram for fitting. */
     RooDataHist* data = nullptr;
+    /** The plot of the fitting result. */
     RooPlot* plot = nullptr;
+    /** The fitting result. */
     RooFitResult* r = nullptr;
+    /** The PDF for fitting. */
     RooAbsPdf* model = nullptr;
 
 
+    /** The drawing canvas for plotting the fitting result. */
     TCanvas* m_c0 = nullptr;
 
 #ifdef _BELLE2_EPICS

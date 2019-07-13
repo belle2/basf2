@@ -225,3 +225,67 @@ def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=F
                     relationCheckForDirection=direction,
 
                     **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")
+
+
+def add_cosmics_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, use_best_results=5,
+                        use_best_seeds=10, direction="backward"):
+    """
+    Convenience function to add the SVD ckf to the path with cosmics settings valid for phase2 and 3.
+    :param path: The path to add the module to
+    :param cdc_reco_tracks: The name of the already created CDC reco tracks
+    :param svd_reco_tracks: The name to output the SVD reco tracks to
+    :param use_mc_truth: Use the MC information in the CKF
+    :param use_best_results: CKF parameter for useNResults
+    :param use_best_seeds: CKF parameter for useBestNInSeed
+    :param direction: where to extrapolate to. Valid options are forward and backward
+    """
+    if direction == "forward":
+        reverse_seed = True
+    else:
+        reverse_seed = False
+
+    if use_mc_truth:
+        module_parameters = dict(
+            firstHighFilter="truth",
+            secondHighFilter="all",
+            thirdHighFilter="all",
+
+            filter="truth",
+            useBestNInSeed=1
+        )
+    else:
+        module_parameters = dict(
+             hitFilter="all",
+             seedFilter="all",
+
+             firstHighFilter="non_ip_crossing",
+             firstHighFilterParameters={"direction": direction},
+             firstHighUseNStates=0,
+
+             secondHighFilter="residual",
+             secondHighFilterParameters={},
+             secondHighUseNStates=use_best_seeds,
+
+             thirdHighFilter="residual",
+             thirdHighFilterParameters={},
+             thirdHighUseNStates=use_best_seeds,
+
+             filter="weight",
+             filterParameters={},
+             useBestNInSeed=use_best_results,
+        )
+
+    path.add_module("CDCToSVDSpacePointCKF",
+                    inputRecoTrackStoreArrayName=cdc_reco_tracks,
+                    outputRecoTrackStoreArrayName=svd_reco_tracks,
+                    outputRelationRecoTrackStoreArrayName=cdc_reco_tracks,
+                    relatedRecoTrackStoreArrayName=svd_reco_tracks,
+
+                    advanceHighFilterParameters={"direction": direction},
+                    reverseSeed=reverse_seed,
+
+                    writeOutDirection=direction,
+                    relationCheckForDirection=direction,
+
+                    seedHitJumping=3,
+                    **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")

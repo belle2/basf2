@@ -14,6 +14,7 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/ParameterVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -31,7 +32,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
-#include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -411,7 +411,7 @@ namespace Belle2 {
           return -999.0;
         }
 
-        TLorentzVector beam4Vector(getBeamPx(NULL), getBeamPy(NULL), getBeamPz(NULL), getBeamE(NULL));
+        TLorentzVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));
         TLorentzVector part4Vector = part->get4Vector();
         TLorentzVector mother4Vector = mother->get4Vector();
 
@@ -578,8 +578,8 @@ namespace Belle2 {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() > 0) {
         TLorentzVector sum;
-        for (unsigned i = 0; i < daughters.size(); i++)
-          sum += daughters[i]->get4Vector();
+        for (auto daughter : daughters)
+          sum += daughter->get4Vector();
 
         result = sum.M();
       } else {
@@ -655,6 +655,12 @@ namespace Belle2 {
       float massErr = particleInvariantMassError(part);
 
       return (invMass - nomMass) / massErr;
+    }
+
+    double particleMassSquared(const Particle* part)
+    {
+      TLorentzVector p4 = part->get4Vector();
+      return p4.M2();
     }
 
     double b2bTheta(const Particle* part)
@@ -759,16 +765,6 @@ namespace Belle2 {
 
 // other ------------------------------------------------------------
 
-    double particleMdstArrayIndex(const Particle* part)
-    {
-      return part->getMdstArrayIndex();
-    }
-
-    double particleMdstSource(const Particle* part)
-    {
-      return part->getMdstSource();
-    }
-
     double particlePvalue(const Particle* part)
     {
       return part->getPValue();
@@ -838,9 +834,7 @@ namespace Belle2 {
       // q = pB - pX
       TLorentzVector pX;
 
-      for (unsigned i = 0; i < mcDaug.size(); i++) {
-        const MCParticle* mcTemp = mcDaug[i];
-
+      for (auto mcTemp : mcDaug) {
         if (abs(mcTemp->getPDG()) <= 16)
           continue;
 
@@ -958,7 +952,7 @@ namespace Belle2 {
 
     double recoilMCDecayType(const Particle* particle)
     {
-      MCParticle* mcp = particle->getRelatedTo<MCParticle>();
+      auto* mcp = particle->getRelatedTo<MCParticle>();
 
       if (!mcp)
         return -1.0;
@@ -998,21 +992,21 @@ namespace Belle2 {
       std::vector<MCParticle*> daughters = mcp->getDaughters();
 
       // Are any of the daughters primary particles? How many of them are hadrons?
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+      for (auto& daughter : daughters) {
+        if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
           continue;
 
         nPrimaryParticleDaughters++;
-        if (abs(daughters[i]->getPDG()) > 22)
+        if (abs(daughter->getPDG()) > 22)
           nHadronicParticles++;
       }
 
       if (nPrimaryParticleDaughters > 1) {
-        for (unsigned i = 0; i < daughters.size(); i++) {
-          if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+        for (auto& daughter : daughters) {
+          if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
             continue;
 
-          if (abs(daughters[i]->getPDG()) == 12 or abs(daughters[i]->getPDG()) == 14 or abs(daughters[i]->getPDG()) == 16) {
+          if (abs(daughter->getPDG()) == 12 or abs(daughter->getPDG()) == 14 or abs(daughter->getPDG()) == 16) {
             if (!recursive) {
               if (nHadronicParticles == 0) {
                 decayType = 1.0;
@@ -1028,7 +1022,7 @@ namespace Belle2 {
           }
 
           else if (recursive)
-            checkMCParticleDecay(daughters[i], decayType, recursive);
+            checkMCParticleDecay(daughter, decayType, recursive);
         }
       }
     }
@@ -1137,6 +1131,48 @@ namespace Belle2 {
         return 0.0;
     }
 
+    double goodBelleLambda(const Particle* Lambda)
+    {
+      if (Lambda->getNDaughters() != 2) {
+        B2WARNING("goodBelleLambda is only defined for a particle with two daughters");
+        return 0.;
+      }
+      const Particle* d0 = Lambda->getDaughter(0);
+      const Particle* d1 = Lambda->getDaughter(1);
+      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
+        B2WARNING("goodBelleLambda is only defined for a particle with charged daughters");
+        return 0.;
+      }
+      if (abs(Lambda->getPDGCode()) != 3122) {
+        B2WARNING("goodBelleLambda is being applied to a candidate with PDG " << Lambda->getPDGCode());
+      }
+
+      double p = particleP(Lambda);
+      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double zdist = v0DaughterZ0Diff(Lambda);
+      double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
+      // Flight distance of Lambda0 in xy plane
+      double fl = particleDRho(Lambda);
+
+      // goodBelleLambda == 1 (optimized for proton PID > 0.6)
+      bool high1 = p >= 1.5 && abs(zdist) < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
+      bool mid1 = p >= 0.5 && p < 1.5 && abs(zdist) < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
+      bool low1 = p < 0.5 && abs(zdist) < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
+
+      // goodBelleLambda == 2 (optimized without PID selection)
+      bool high2 = p >= 1.5 && abs(zdist) < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
+      bool mid2 = p >= 0.5 && p < 1.5 && abs(zdist) < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
+      bool low2 = p < 0.5 && abs(zdist) < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
+
+      if (low2 || mid2 || high2) {
+        return 2.0;
+      } else if (low1 || mid1 || high1) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1204,18 +1240,20 @@ namespace Belle2 {
 
 
     REGISTER_VARIABLE("M", particleMass,
-                      "invariant mass(determined from particle's 4-momentum vector)");
+                      "invariant mass (determined from particle's 4-momentum vector)");
     REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
     REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
     REGISTER_VARIABLE("dQ", particleDQ,
                       "released energy in decay minus nominal one");
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
+    REGISTER_VARIABLE("M2", particleMassSquared,
+                      "invariant mass squared (determined from particle's 4-momentum vector)");
 
     REGISTER_VARIABLE("InvM", particleInvariantMass,
-                      "invariant mass (determined from particle's daughter 4 - momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
-                      "invariant mass(determined from particle's daughter 4-momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
                       "uncertainty of invariant mass (determined from particle's daughter 4 - momentum vectors)");
@@ -1268,10 +1306,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("trackMatchType", trackMatchType,
                       "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
                       "called connected - region(CR) track match");
-    REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
-                      "StoreArray index(0 - based) of the MDST object from which the Particle was created");
-    REGISTER_VARIABLE("mdstSource", particleMdstSource,
-                      "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"
@@ -1289,7 +1323,16 @@ namespace Belle2 {
                       "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
                       "a momentum-binned selection including requirements on impact parameter of, and"
                       "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
-
+    REGISTER_VARIABLE("goodBelleLambda", goodBelleLambda,
+                      "[legacy] Return 2.0, 1.0, 0.0 as an indication of goodness of Lambda0 candidates, "
+                      "based on the (1) the distance of the two daughter tracks at "
+                      "their interception at z axis (2) The minimum distance of the daughter tracks and the "
+                      "IP in xy plane (3) The difference of the azimuthal angle of the vertex vector and the "
+                      "momentum vector (4) The flight distance of the Lambda0 candidates in xy plane."
+                      "It is supposed to be a Belle II copy of the goodLambda() function in Belle."
+                      "goodBelleLambda>=1 should be used with prootn PID > 0.6 and goodBelleLambda>=2 can be used without "
+                      "proton PID cut. The former cut is looser than the latter."
+                      "See BELLE NOTE 684 Lambda selection at Belle. K F Chen et al.");
     VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,
                       "returns std::numeric_limits<double>::infinity()");

@@ -33,7 +33,6 @@
 #include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
-#include "trg/cdc/TRGCDC.h"
 
 using namespace std;
 

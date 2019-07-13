@@ -37,7 +37,9 @@ namespace Belle2 {
 
     /// Store basic wire info for faster access
     struct CDCCKFWireHitCache {
+      /// layer index
       int     icLayer;
+      /// azimuthal coordinate
       double  phi;
     };
 

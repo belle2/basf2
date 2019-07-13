@@ -97,8 +97,7 @@ class Cluster:
                             os.environ.get('BELLE2_OPTION')
 
         # Write to log which revision we are using
-        self.logger.debug('Setting up the following release: {0}'
-                          .format(self.b2setup))
+        self.logger.debug(f'Setting up the following release: {self.b2setup}')
 
         # Define the folder in which the log of the cluster messages will be
         # stored (same folder like the log for validate_basf2.py)
@@ -146,8 +145,7 @@ class Cluster:
         # convention, data files will be stored in the parent dir.
         # Then make sure the folder exists (create if it does not exist) and
         # change to cwd to this folder.
-        output_dir = os.path.abspath('./results/{0}/{1}'.
-                                     format(tag, job.package))
+        output_dir = os.path.abspath(f'./results/{tag}/{job.package}')
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -155,7 +153,7 @@ class Cluster:
         log_file = output_dir + '/' + os.path.basename(job.path) + '.log'
 
         # Remove any left over done files
-        donefile_path = "{0}/script_{1}.done".format(self.path, job.name)
+        donefile_path = f"{self.path}/script_{job.name}.done"
         if os.path.isfile(donefile_path):
             os.remove(donefile_path)
 
@@ -216,9 +214,8 @@ class Cluster:
             if process.wait() != 0:
                 job.status = 'failed'
         else:
-            os.system('echo 0 > {0}/script_{1}.done'.format(self.path,
-                                                            job.name))
-            os.system('rm {0}'.format(tmp_name))
+            os.system(f'echo 0 > {self.path}/script_{job.name}.done')
+            os.system(f'rm {tmp_name}')
 
     def is_job_finished(self, job):
         """!
@@ -231,7 +228,7 @@ class Cluster:
         """
 
         # If there is a file indicating the job is done, that is its name:
-        donefile_path = "{0}/script_{1}.done".format(self.path, job.name)
+        donefile_path = f"{self.path}/script_{job.name}.done"
 
         # Check if such a file exists. If so, this means that the job has
         # finished.

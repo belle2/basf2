@@ -80,6 +80,7 @@ namespace Belle2 {
     std::vector<std::string> m_saveObjs;
 
     StoreArray<RawCOPPER> rawcprarray;
+    StoreArray<RawPXD> rawpxdarray;
 
   };
 

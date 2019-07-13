@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# @cond
+# @cond SUPPRESS_DOXYGEN
 
 # Thomas Keck 2017
 
@@ -899,3 +899,5 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
 
     # Finally we return the path, the stage and the used lists to the user.
     return FeiState(path, stage + 1, plists=used_lists)
+
+# @endcond

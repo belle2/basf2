@@ -465,7 +465,12 @@ namespace Belle2 {
                                     ts[2], // L/R
                                     ts[1], // priority time
                                     0, // fastest time (unknown)
-                                    foundTime); // found time (using the unpacked clock cycle)
+                                    2000 + iTracker * 100 + foundTime);
+                // set to a clock definitely outside the time window to receive the TS from TSF,
+                // so it won't cause any confusion of the TS origin.
+                // what I want to is to set it to (200 + 2DmoduleID[0,1,2,3]),
+                // so one can distinguish in which 2D this track is found.
+                // foundTime); // found time (using the unpacked clock cycle)
                 track->addRelationTo(hit);
               }
             }

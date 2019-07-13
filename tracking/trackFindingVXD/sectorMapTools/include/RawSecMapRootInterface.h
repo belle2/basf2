@@ -23,8 +23,6 @@
 #include <TList.h>
 #include <TTree.h>
 #include <string>
-// #include <map>
-// #include <limits>       // std::numeric_limits
 
 
 namespace Belle2 {
@@ -56,8 +54,7 @@ namespace Belle2 {
 
 
     /** Constructor - prepares ttree. Without calling the initializer-functions this Object is still not working! */
-    RawSecMapRootInterface(std::string mapName,  std::string tag) :
-//       m_file(file),
+    RawSecMapRootInterface(const std::string& mapName,  const std::string& tag) :
       m_name(mapName),
       m_tree2Hit((m_name + std::string("2Hit")), DataStore::c_Persistent),
       m_data2Hit( {}),
@@ -75,24 +72,40 @@ namespace Belle2 {
     }
 
     /** destructor deleting the rootFile. */
-    ~RawSecMapRootInterface() { /*delete m_file;*/ }
+    ~RawSecMapRootInterface() { if (m_file) delete m_file; }
 
 
     /** That class shall not be copied. */
-//     RawSecMapRootInterface(const RawSecMapRootInterface& rawSecMapInterFace)  = delete;
+    RawSecMapRootInterface(const RawSecMapRootInterface& rawSecMapInterFace) = delete;
+    /** but it may be moved */
+    RawSecMapRootInterface(RawSecMapRootInterface&& other) :
+      m_file(nullptr),
+      m_name(std::move(other.m_name)),
+      m_tree2Hit(std::move(other.m_tree2Hit)),
+      m_data2Hit(std::move(other.m_data2Hit)),
+      m_tree3Hit(std::move(other.m_tree3Hit)),
+      m_data3Hit(std::move(other.m_data3Hit))
+    {
+      // the new object takes ownership of the file
+      m_file = other.m_file;
+      other.m_file = nullptr;
+    }
+
+    /** That class shall not be copied. */
+    RawSecMapRootInterface& operator = (const RawSecMapRootInterface& rawSecMapInterFace) = delete;
 
 
     /** initialize the RawSecMapRootInterface for two-hit-combinations (to be called in Module::initialize(). */
     void initialize2Hit(std::vector<std::string> filterNames)
     {
-      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: start - got " << filterNames.size() << " filters");
-      B2DEBUG(1, "and root file got size of: " << m_file->GetSize());
+      B2DEBUG(20, "RawSecMapRootInterface::initialize2Hit: start - got " << filterNames.size() << " filters");
+      B2DEBUG(20, "and root file got size of: " << m_file->GetSize());
       m_file->cd();
 
       // preparing StoreObjPtr:
       bool registered = m_tree2Hit.registerInDataStore((m_name + std::string("2Hit")), DataStore::c_ErrorIfAlreadyRegistered);
       bool constructed = m_tree2Hit.construct((m_name + std::string("2Hit")).c_str(), "Raw data of two-hit-combinations for a sectorMap");
-      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: isRegistered/isConstructed: " << registered << "/" << constructed);
+      B2DEBUG(20, "RawSecMapRootInterface::initialize2Hit: isRegistered/isConstructed: " << registered << "/" << constructed);
 
       // preparing data-mask for 2-hit-combinations:
       m_data2Hit = FilterValueDataSet<SecIDPair>(filterNames);
@@ -105,11 +118,11 @@ namespace Belle2 {
       m_tree2Hit->get().Branch("outerSecID", &(m_data2Hit.secIDs.outer));
       m_tree2Hit->get().Branch("innerSecID", &(m_data2Hit.secIDs.inner));
 
-      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: adding " << filterNames.size() << " filters as branches to ttree ");
+      B2DEBUG(20, "RawSecMapRootInterface::initialize2Hit: adding " << filterNames.size() << " filters as branches to ttree ");
       for (auto& name : filterNames) {
         double* valuePtr = m_data2Hit.getValuePtr(name);
         if (valuePtr != nullptr) {
-          B2DEBUG(5, "RawSecMapRootInterface::initialize2Hit: adding now branch with name " << name);
+          B2DEBUG(20, "RawSecMapRootInterface::initialize2Hit: adding now branch with name " << name);
           m_tree2Hit->get().Branch(name.c_str(), valuePtr);
         } else {
           B2ERROR("RawSecMapRootInterface::initialize2Hit: filterName " << name <<
@@ -117,7 +130,7 @@ namespace Belle2 {
         }
 
       }
-      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: nBranches/nEntries: " << m_tree2Hit->get().GetNbranches() << "/" <<
+      B2DEBUG(20, "RawSecMapRootInterface::initialize2Hit: nBranches/nEntries: " << m_tree2Hit->get().GetNbranches() << "/" <<
               m_tree2Hit->get().GetEntries());
     }
 
@@ -126,14 +139,14 @@ namespace Belle2 {
     /** initialize the RawSecMapRootInterface for three-hit-combinations (to be called in Module::initialize(). */
     void initialize3Hit(std::vector<std::string> filterNames)
     {
-      B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: start");
+      B2DEBUG(20, "RawSecMapRootInterface::initialize3Hit: start");
       m_file->cd();
 
       // preparing StoreObjPtr:
       bool registered = m_tree3Hit.registerInDataStore((m_name + std::string("3Hit")), DataStore::c_ErrorIfAlreadyRegistered);
       bool constructed = m_tree3Hit.construct((m_name + std::string("3Hit")).c_str(),
                                               "Raw data of three-hit-combinations for a sectorMap");
-      B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: isRegistered/isConstructed: " << registered << "/" << constructed);
+      B2DEBUG(20, "RawSecMapRootInterface::initialize3Hit: isRegistered/isConstructed: " << registered << "/" << constructed);
 
       // preparing data-mask for 2-hit-combinations:
       m_data3Hit = FilterValueDataSet<SecIDTriplet>(filterNames);
@@ -147,11 +160,11 @@ namespace Belle2 {
       m_tree3Hit->get().Branch("centerSecID", &(m_data3Hit.secIDs.center));
       m_tree3Hit->get().Branch("innerSecID", &(m_data3Hit.secIDs.inner));
 
-      B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: adding " << filterNames.size() << " filters as branches to ttree ");
+      B2DEBUG(20, "RawSecMapRootInterface::initialize3Hit: adding " << filterNames.size() << " filters as branches to ttree ");
       for (auto& name : filterNames) {
         double* valuePtr = m_data3Hit.getValuePtr(name);
         if (valuePtr != nullptr) {
-          B2DEBUG(5, "RawSecMapRootInterface::initialize3Hit: adding now branch with name " << name);
+          B2DEBUG(20, "RawSecMapRootInterface::initialize3Hit: adding now branch with name " << name);
           m_tree3Hit->get().Branch(name.c_str(), valuePtr);
         } else {
           B2ERROR("RawSecMapRootInterface::initialize3Hit: filterName " << name <<
@@ -159,7 +172,7 @@ namespace Belle2 {
         }
 
       }
-      B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: nBranches/nEntries: " << m_tree3Hit->get().GetNbranches() << "/" <<
+      B2DEBUG(20, "RawSecMapRootInterface::initialize3Hit: nBranches/nEntries: " << m_tree3Hit->get().GetNbranches() << "/" <<
               m_tree3Hit->get().GetEntries());
     }
 
@@ -203,7 +216,7 @@ namespace Belle2 {
     /** write all trees to file at end of processing. */
     void write()
     {
-      B2DEBUG(1, "RawSecMapRootInterface::write: start");
+      B2DEBUG(20, "RawSecMapRootInterface::write: start");
       m_file->cd();
 
       if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {

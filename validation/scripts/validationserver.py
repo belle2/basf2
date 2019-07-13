@@ -3,16 +3,18 @@ from glob import glob
 import json
 import json_objects
 import os.path
-import time
 import argparse
 import logging
 import sys
 import queue
 import webbrowser
+import datetime
 from multiprocessing import Process, Queue
 from validationplots import create_plots
+import validationfunctions
 import validationpath
 import functools
+import time
 
 g_plottingProcesses = {}
 
@@ -66,7 +68,7 @@ def deliver_json(file_name):
     return data
 
 
-def create_revsion_key(revision_names):
+def create_revision_key(revision_names):
     """
     Create a string key out of a revision list, which is handed to tho browser
     in form of a progress key
@@ -105,7 +107,7 @@ def start_plotting_request(revision_names, results_folder):
     Start a new comparison between the supplied revisions
     """
 
-    rev_key = create_revsion_key(revision_names)
+    rev_key = create_revision_key(revision_names)
 
     # still running a plotting for this combination ?
     if rev_key in g_plottingProcesses:
@@ -158,6 +160,14 @@ class ValidationRoot(object):
 
         #: folder where the comparison plots and json result files are located
         self.comparison_folder = comparison_folder
+
+        #: Date when this object was instantiated
+        self.last_restart = datetime.datetime.now()
+
+        #: Git version
+        self.version = validationfunctions.get_compact_git_hash(
+            os.environ["BELLE2_LOCAL_DIR"]
+        )
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -229,8 +239,45 @@ class ValidationRoot(object):
             j["label"] = lbl_folder
             combined_list.append(j)
 
-        # sort by name
-        combined_list.sort(key=lambda rev: rev["creation_date"], reverse=True)
+        # Sorting
+
+        # Order by categories (nightly, build, etc.) first, then by date
+        # A pure chronological order doesn't make sense, because we do not
+        # have a linear history ((pre)releases branch off) and for the builds
+        # the date corresponds to the build date, not to the date of the
+        # actual commit.
+        def sort_key(label: str):
+            if "-" not in label:
+                logging.warning(
+                    f"Misformatted label encountered: '{label}' "
+                    f"(doesn't seem to include date?)"
+                )
+                return label
+            category, datetag = label.split("-", maxsplit=1)
+            print(category, datetag)
+            # Will later reverse order to bring items in the same category
+            # in reverse chronological order, so the following list will have
+            # the items in reverse order as well:
+            order = [
+                "release",
+                "prerelease",
+                "build",
+                "nightly"
+            ]
+            try:
+                index = order.index(category)
+            except ValueError:
+                index = 9
+                logging.warning(
+                    f"Misformatted label encountered: '{label}' (doesn't seem "
+                    f"to belong to any known category?)"
+                )
+            return "{}-{}".format(index, datetag)
+
+        combined_list.sort(
+            key=lambda rev: sort_key(rev["label"]),
+            reverse=True
+        )
 
         # reference always on top
         combined_list = [reference_revision] + combined_list
@@ -289,10 +336,29 @@ class ValidationRoot(object):
         if not os.path.isfile(full_path):
             raise cherrypy.HTTPError(
                 404,
-                "Json Comparison file {} does not exist".format(full_path)
+                f"Json Comparison file {full_path} does not exist"
             )
 
         return deliver_json(full_path)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def system_info(self):
+        """
+        Returns:
+            JSON file containing git versions and time of last restart
+        """
+        # note: for some reason %Z doesn't work like this, so we use
+        # time.tzname for the time zone.
+        return {
+            "last_restart":
+                self.last_restart.strftime("%-d %b %H:%M ") + time.tzname[1],
+            "version_restart": self.version,
+            "version_current":
+                validationfunctions.get_compact_git_hash(
+                    os.environ["BELLE2_LOCAL_DIR"]
+                )
+        }
 
 
 def setup_gzip_compression(path, cherry_config):
@@ -363,7 +429,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cwd_folder = os.getcwd()
 
     # Only execute the program if a basf2 release is set up!
-    if os.environ.get('BELLE2_RELEASE', None) is None:
+    if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
     cherry_config = dict()
@@ -398,8 +464,8 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     results_folder = validationpath.get_results_folder(cwd_folder)
     comparison_folder = validationpath.get_html_plots_folder(cwd_folder)
 
-    logging.info("Serving static content from {}".format(static_folder))
-    logging.info("Serving result content and plots from {}".format(cwd_folder))
+    logging.info(f"Serving static content from {static_folder}")
+    logging.info(f"Serving result content and plots from {cwd_folder}")
 
     # check if the results folder exists and has at least one folder
     if not os.path.isdir(results_folder):
@@ -411,8 +477,9 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
         for f in os.listdir(results_folder)
     ])
     if results_count == 0:
-        sys.exit("Result folder {} contains no folders, run validate_basf2 "
-                 "first to create validation output".format(results_folder))
+        sys.exit(
+            f"Result folder {results_folder} contains no folders, run "
+            f"validate_basf2 first to create validation output")
 
     # Go to the html directory
     if not os.path.exists('html'):
@@ -426,7 +493,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cherry_config["/static"] = {
         'tools.staticdir.on': True,
         # only serve js, css, html and png files
-        'tools.staticdir.match': "^.*\.(js|css|html|png)$",
+        'tools.staticdir.match': "^.*\.(js|css|html|png|js.map)$",
         'tools.staticdir.dir': static_folder
     }
     setup_gzip_compression("/static", cherry_config)
@@ -475,7 +542,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     if production_env:
         cherrypy.config.update({'environment': 'production'})
 
-    logging.info("Server: Starting HTTP server on {0}:{1}".format(ip, port))
+    logging.info(f"Server: Starting HTTP server on {ip}:{port}")
 
     if open_site:
         webbrowser.open("http://" + ip + ":" + str(port))

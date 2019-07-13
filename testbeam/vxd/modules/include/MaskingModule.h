@@ -37,8 +37,6 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <testbeam/vxd/dataobjects/TelDigit.h>
 
-#include <framework/core/HistoModule.h>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>

@@ -130,9 +130,9 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
     boost::algorithm::trim(line);
     if (line.compare("</File>") == 0) return true;
 
-    int pos = line.find(">") + 1;
+    int pos = line.find('>') + 1;
     std::string tag = line.substr(0, pos);
-    std::string value = line.substr(pos, line.rfind("<") - pos);
+    std::string value = line.substr(pos, line.rfind('<') - pos);
     if (tag.compare("<LFN>") == 0) {
       m_lfn = HTML::unescape(value);
     } else if (tag.compare("<PFN>") == 0) {
@@ -150,11 +150,11 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
     } else if (tag.compare("<EventHigh>") == 0) {
       m_eventHigh = stoi(value);
     } else if (tag.compare("<Parents>") == 0) {
-      pos = value.find(",");
+      pos = value.find(',');
       while (pos > 0) {
         m_parentLfns.push_back(HTML::unescape(value.substr(0, pos)));
         value.erase(0, pos + 1);
-        pos = value.find(",");
+        pos = value.find(',');
       }
       m_parentLfns.push_back(HTML::unescape(value));
     }

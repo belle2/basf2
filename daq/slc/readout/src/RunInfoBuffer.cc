@@ -1,6 +1,7 @@
 #include "daq/slc/readout/RunInfoBuffer.h"
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/LockGuard.h>
 
 #include <cstring>
 #include <cstdlib>
@@ -51,9 +52,8 @@ bool RunInfoBuffer::init()
 void RunInfoBuffer::clear()
 {
   if (m_info == NULL) return;
-  m_mutex.lock();
+  MLockGuard lockGuard(m_mutex);
   memset(m_info, 0, sizeof(ronode_info));
-  m_mutex.unlock();
 }
 
 bool RunInfoBuffer::close()
@@ -102,72 +102,64 @@ bool RunInfoBuffer::notify()
 bool RunInfoBuffer::waitRunning(int timeout)
 {
   if (m_info == NULL) return false;
-  lock();
+  MLockGuard lockGuard(m_mutex);
   if (getState() != RunInfoBuffer::RUNNING) {
     if (!wait(timeout)) {
-      unlock();
       return false;
     }
   }
-  unlock();
   return true;
 }
 
 bool RunInfoBuffer::waitReady(int timeout)
 {
   if (m_info == NULL) return false;
-  lock();
+  MLockGuard lockGuard(m_mutex);
   if (getState() != RunInfoBuffer::READY &&
       getState() != RunInfoBuffer::RUNNING) {
     if (!wait(timeout)) {
       if (getState() != RunInfoBuffer::READY &&
           getState() != RunInfoBuffer::RUNNING) {
-        unlock();
         return false;
       }
     }
   }
-  unlock();
   return true;
 }
 
 bool RunInfoBuffer::reportRunning()
 {
   if (m_info == NULL) return false;
-  lock();
+  MLockGuard lockGuard(m_mutex);
   setState(RunInfoBuffer::RUNNING);
   notify();
-  unlock();
   return true;
 }
 
 bool RunInfoBuffer::reportError(EFlag eflag)
 {
   if (m_info == NULL) return false;
-  lock();
+  MLockGuard lockGuard(m_mutex);
   setErrorFlag(eflag);
   notify();
-  unlock();
   return true;
 }
 
 bool RunInfoBuffer::reportReady()
 {
   if (m_info == NULL) return false;
-  lock();
+  MLockGuard lockGuard(m_mutex);
   setState(RunInfoBuffer::READY);
   notify();
-  unlock();
   return true;
 }
 
 bool RunInfoBuffer::reportNotReady()
 {
   if (m_info == NULL) return false;
-  lock();
+  MLockGuard lockGuard(m_mutex);
   setState(RunInfoBuffer::NOTREADY);
   notify();
-  unlock();
   return true;
 }
 

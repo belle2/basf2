@@ -112,9 +112,14 @@ namespace Belle2 {
     double eclClusterErrorTiming(const Particle* particle);
 
     /**
-     * return the energy of the crystall with highest  energy
+     * return the energy of the crystal with highest energy
      */
     double eclClusterHighestE(const Particle* particle);
+
+    /**
+     * return the cellID [1,8736] of the crystal with highest energy
+     */
+    double eclClusterCellId(const Particle* particle);
 
     /**
      * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
@@ -306,6 +311,12 @@ namespace Belle2 {
     double eclClusterEoP(const Particle* part);
 
     /**
+     * [Expert] The invariant mass calculated from all ECLCluster daughters (i.e. photons) and cluster-matched tracks using the CLUSTER 4-MOMENTA.
+     * Used for ECL-based dark sector physics and debugging track-cluster matching.
+     */
+    double eclClusterOnlyInvariantMass(const Particle* part);
+
+    /**
      * return the number of TCs above threshold
      */
     double getNumberOfTCs(const Particle*, const std::vector<double>& vars);
@@ -384,6 +395,11 @@ namespace Belle2 {
      * Returns true if cluster is related to maximum TC
      */
     double eclTCIsMaximumForCluster(const Particle* particle);
+
+    /**
+     * Returns cluster mdst array index
+     */
+    double eclClusterMdstIndex(const Particle* particle);
 
   }
 } // Belle2 namespace

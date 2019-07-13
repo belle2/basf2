@@ -131,9 +131,7 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
         if (layerFilter(layerHit)) {
           // recursive / iterative call of fastInterceptFinder2d, until iterations = critIterations (critIterations-1),
           // actual values for v1...v4 are new startingpoints
-          if (iterations != maxIterations /*critIterations*/) {
-//             fastInterceptFinder2d(hits, uSide, v1, v2, v4,
-//                                   iterations + 1, maxIterations);
+          if (iterations != maxIterations) {
             fastInterceptFinder2d(containedHits, uSide, v1, v2, v4,
                                   iterations + 1, maxIterations);
           } else {

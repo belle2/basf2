@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from modularAnalysis import analysis_main
 from modularAnalysis import setAnalysisConfigParams
 import os
 import re
@@ -28,7 +27,7 @@ def setupBelleDatabaseServer():
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
-def setupBelleMagneticField(path=analysis_main):
+def setupBelleMagneticField(path):
     """
     This function set the Belle Magnetic field (constant).
     """
@@ -54,8 +53,8 @@ def setupB2BIIDatabase(isMC=False):
     # fallback to previously downloaded payloads if offline
     if not isMC:
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, True, LogLevel.ERROR)
-    # get payloads from central database
-    use_central_database(tagname, LogLevel.INFO if isMC else LogLevel.WARNING, payloaddir)
+        # get payloads from central database
+        use_central_database(tagname, LogLevel.WARNING, payloaddir)
     # unless they are already found locally
     if isMC:
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)
@@ -65,7 +64,9 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   useBelleDBServer=None,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
-                                  path=analysis_main, entrySequences=None):
+                                  path=None, entrySequences=None,
+                                  convertECLCrystalEnergies=False,
+                                  convertExtHits=False):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -89,11 +90,12 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
     # input.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(input)
 
-    gearbox = register_module('Gearbox')
-    gearbox.param('fileName', 'b2bii/Belle.xml')
-    path.add_module(gearbox)
-
-    path.add_module('Geometry', ignoreIfPresent=False, useDB=False, components=['MagneticField'])
+    # we need magnetic field which is different than default.
+    # shamelessly copied from analysis/scripts/modularAnalysis.py:inputMdst
+    from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+    field = Belle2.MagneticField()
+    field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+    Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
 
     if (not generatorLevelReconstruction):
         # Fix MSDT Module
@@ -111,6 +113,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
     convert = register_module('B2BIIConvertMdst')
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
+    convert.param("convertECLCrystalEnergies", convertECLCrystalEnergies)
+    convert.param("convertExtHits", convertExtHits)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

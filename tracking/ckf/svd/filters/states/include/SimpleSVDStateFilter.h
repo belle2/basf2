@@ -20,12 +20,16 @@ namespace Belle2 {
     /// Set the cached B field
     void beginRun() final;
 
+    /// default constructor to silence cppcheck warnings
+    SimpleSVDStateFilter() = default;
+
     TrackFindingCDC::Weight operator()(const BaseSVDStateFilter::Object& pair) final;
 
   private:
     /// Cache for the B field at the IP
     double m_cachedBField;
 
+    /// Kalman stepper (CKF) for SVD
     SVDKalmanStepper m_kalmanStepper;
 
     /// Shortcut for a 4x3 array.

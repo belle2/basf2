@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sam Cunliffe                                             *
@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #pragma once
+
+#include <vector>
 
 namespace Belle2 {
   class Particle;
@@ -52,9 +54,19 @@ namespace Belle2 {
     double isExtendedSignal(const Particle* part);
 
     /**
-     * return 1 if Particle is correctly reconstructed (SIGNAL including misssing neutrino), 0 otherwise
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing neutrino), 0 otherwise
      */
     double isSignalAcceptMissingNeutrino(const Particle* part);
+
+    /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing massive), 0 otherwise
+     */
+    double isSignalAcceptMissingMassive(const Particle* part);
+
+    /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing all particles), 0 otherwise
+     */
+    double isSignalAcceptMissing(const Particle* part);
 
     /**
      * return 1 if the charge of the particle is wrong. 0 in
@@ -163,21 +175,6 @@ namespace Belle2 {
     double particleMCMatchPT(const Particle* particle);
 
     /**
-     * return decay x-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDX(const Particle* particle);
-
-    /**
-     * return decay y-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDY(const Particle* particle);
-
-    /**
-     * return decay z-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDZ(const Particle* particle);
-
-    /**
      * return Energy of matched MCParticle (-999.0 if the particle is not matched)
      */
     double particleMCMatchE(const Particle* particle);
@@ -209,43 +206,71 @@ namespace Belle2 {
     int tauMinusMcMode(const Particle*);
 
     /**
-     * check that neutrals were seen in ECL, and charged were seen in SVD
+     * return the prong of the generated decay of positive tau in a tau pair event.
      */
+    int tauPlusMcProng(const Particle*);
+
+    /**
+     * return the prong of the generated decay of negative tau in a tau pair event.
+     */
+    int tauMinusMcProng(const Particle*);
+
+    /** check that neutrals were seen in ECL, and charged were seen in SVD */
     double isReconstructible(const Particle*);
 
-    /**
-     * was theicle seen in the PXD
-     */
+    /** the particle was seen in the PXD */
     double seenInPXD(const Particle*);
 
-    /**
-     * was theicle seen in the SVD
-     */
+    /** the particle was seen in the SVD */
     double seenInSVD(const Particle*);
 
-    /**
-     * was theicle seen in the CDC
-     */
+    /** the particle was seen in the CDC */
     double seenInCDC(const Particle*);
 
-    /**
-     * was theicle seen in the TOP
-     */
+    /** the particle was seen in the TOP */
     double seenInTOP(const Particle*);
 
-    /**
-     * was theicle seen in the ECL
-     */
+    /** the particle was seen in the ECL */
     double seenInECL(const Particle*);
 
-    /**
-     * was theicle seen in the ARICH
-     */
+    /** the particle was seen in the ARICH */
     double seenInARICH(const Particle*);
 
-    /**
-     * was theicle seen in the KLM
-     */
+    /** the particle was seen in the KLM */
     double seenInKLM(const Particle*);
+
+    /**
+     * return number of steps to i-th daughter from the particle at generator level.
+     * return -1, if no MCParticle is associated to the particle or the i-th daughter.
+     * return -999, if i-th daughter does not exist.
+     */
+    int genNStepsToDaughter(const Particle* particle, const std::vector<double>& arguments);
+
+    /**
+     * return number of missing daughters having assigned PDG codes
+     * return -1, if the particle does not have related MC Particle
+     */
+    int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);
+
+    /**
+     * retruns the weight of the ECLCluster -> MCParticle relation for the
+     * MCParticle related to the particle provided.
+     */
+    double particleClusterMatchWeight(const Particle* particle);
+
+    /**
+     * returns the weight of the ECLCluster -> MCParticle relation for the
+     * relation with the largest weight.
+     */
+    double particleClusterBestMCMatchWeight(const Particle*);
+
+    /**
+     * returns the PDG code of the MCParticle for the ECLCluster -> MCParticle
+     * relation with the largest weight. For particles created from ECLClusters
+     * (photons) this will be the same as the mcPDG, for electrons or other
+     * track based particles, the best mc match for the ECLCluster but might not
+     * correspont to the track's mcmatch (== the particle)
+     */
+    double particleClusterBestMCPDGCode(const Particle*);
   }
 }

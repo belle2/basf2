@@ -14,22 +14,29 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
+import argparse
 skimCode = encodeSkimName('Charm3BodyHadronic3')
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 c3bh3path = Path()
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
-
-inputMdstList('MC9', fileList, path=c3bh3path)
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=c3bh3path)
 
 
 loadStdSkimPhoton(path=c3bh3path)

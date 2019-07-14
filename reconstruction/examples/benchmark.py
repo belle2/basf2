@@ -65,6 +65,17 @@ if limits_file is not None:
         if len(entries) > 2:
             limits[entries[0]] /= float(entries[2])
 
+# get execution times
+categories = ['Simulation', 'TriggerSimulation', 'Tracking', 'PID', 'Clustering']
+times = {}
+for module in statistics.modules:
+    if module.name not in ['Sum_' + category for category in categories]:
+        continue
+    category = module.name[4:]
+    if category not in times.keys():
+        times[category] = 0
+    times[category] += module.time_mean(statistics.EVENT) * 1e-6
+
 # open output file
 output = None
 if args.file is not None:
@@ -72,13 +83,11 @@ if args.file is not None:
 
 # print benchmark results and write them to the output file
 set_log_level(LogLevel.INFO)
-categories = ['Simulation', 'TriggerSimulation', 'Tracking', 'PID', 'Clustering']
 max_fraction = -1
-for module in statistics.modules:
-    if module.name not in ['Sum_' + category for category in categories]:
+for category in categories:
+    if category not in times.keys():
         continue
-    category = module.name[4:]
-    time = module.time_mean(statistics.EVENT) * 1e-6
+    time = times[category]
     message = 'Execution time per event for %s is %.f ms' % (category, time)
     fraction = -1
     if category in limits.keys():

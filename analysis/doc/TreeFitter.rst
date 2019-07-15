@@ -29,8 +29,8 @@ Usage:
 The user reconstructs the desired decay chain and then passes the head of the tree to the vertex fitter. So when you are reconstructing :math:`B->D(K \pi)pi` the list name of the B-meson has to be passed and the fit fits everything down the stream. The vertex fitter has a convenience function in `/analysis/scripts/vertex.py` the current name is `vertexTree()`. See the documentation there.
 
 
-Parameters of the conveniece function
-#########################
+Parameters of the convenience function
+######################################
 Import and use the convenience function::
     from vertex import vertexTree
     ...
@@ -84,8 +84,9 @@ Known problems:
 - The TreeFitter is extremely sensitive to how the initial covariance matrix is initialised I haven't found a good general way to do it. If you see that the signal efficiency of you fit is below 95% this might be the problem. Feel free to send me an email. But keep in mind garbage in -> garbage out.  
 - Currently we are constraint by stack sizes to not extract more than 100 parameters per fit. If this is a problem let me know and I can extend this (at the cost of speed of the fits).
 
-.. autofunction:: vertex.vertexTree
 
 Cite:
 #####
 Soon, paper under review for NIM.
+
+.. autofunction:: vertex.vertexTree

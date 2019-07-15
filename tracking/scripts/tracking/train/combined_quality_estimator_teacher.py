@@ -322,8 +322,10 @@ class GenerateSimTask(Basf2PathTask):
         )
         path.add_module("EvtGenInput")
         if not os.path.isdir(self.bkgfiles_dir):
-            raise OSError(errno.ENOTDIR, "Directory does not exist", self.bkgfiles_dir)
-        bkg_files = glob.glob(os.path.join(self.bkgfiles_dir, "*"))
+            raise NotADirectoryError(errno.ENOTDIR, os.strerror(errno.ENOTDIR), self.bkgfiles_dir)
+        bkg_files = glob.glob(os.path.join(self.bkgfiles_dir, "*.root"))
+        if not bkg_files:
+            raise FileNotFoundError(errno.ENOENT, "No *.root background files found in", self.bkgfiles_dir)
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True)
         path.add_module(
             "RootOutput",

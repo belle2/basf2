@@ -80,12 +80,12 @@ namespace Belle2 {
         POCA_extrapolation(CDCRecoTrack, SVDRecoTrack);
 
       } else {
-        setDiffs("SVD_CDC_CDCwall_Pos", NULL, NULL);
-        setDiffs("SVD_CDC_CDCwall_Mom", NULL, NULL);
+        setDiffs("SVD_CDC_CDCwall_Pos", nullptr, nullptr);
+        setDiffs("SVD_CDC_CDCwall_Mom", nullptr, nullptr);
         m_variables.at("SVD_CDC_CDCwall_Chi2") = -1.;
 
-        setDiffs("SVD_CDC_POCA_Pos", NULL, NULL);
-        setDiffs("SVD_CDC_POCA_Mom", NULL, NULL);
+        setDiffs("SVD_CDC_POCA_Pos", nullptr, nullptr);
+        setDiffs("SVD_CDC_POCA_Mom", nullptr, nullptr);
       }
 
     }
@@ -141,8 +141,8 @@ namespace Belle2 {
         // extrapolation not possible, skip this track
         B2WARNING("SubRecoTrackExtractor: SVDRecoTrack and/or CDCRecoTrack extrapolation to the CDCwall failed!\n"
                   << "-->" << e.what());
-        setDiffs("SVD_CDC_CDCwall_Pos", NULL, NULL);
-        setDiffs("SVD_CDC_CDCwall_Mom", NULL, NULL);
+        setDiffs("SVD_CDC_CDCwall_Pos", nullptr, nullptr);
+        setDiffs("SVD_CDC_CDCwall_Mom", nullptr, nullptr);
         m_variables.at("SVD_CDC_CDCwall_Chi2") = -1.;
         return;
       }
@@ -188,8 +188,8 @@ namespace Belle2 {
         // extrapolation not possible, skip this track
         B2WARNING("SubRecoTrackExtractor: SVDRecoTrack and/or CDCRecoTrack extrapolation to POCA failed!\n"
                   << "-->" << e.what());
-        setDiffs("SVD_CDC_POCA_Pos", NULL, NULL);
-        setDiffs("SVD_CDC_POCA_Mom", NULL, NULL);
+        setDiffs("SVD_CDC_POCA_Pos", nullptr, nullptr);
+        setDiffs("SVD_CDC_POCA_Mom", nullptr, nullptr);
         return;
       }
 

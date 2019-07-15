@@ -98,9 +98,9 @@ namespace Belle2 {
 
     /** Get the primary vertex position estimation and its size
      *  from BeamSpot
-     @return tuple<TVectorD, TMatrixDSym> tuple with position and size as covariance matrix
+     @return tuple<TVector3, TMatrixDSym> tuple with position and size as covariance matrix
      */
-    std::tuple<TVectorD, TMatrixDSym> getPrimaryVertexAndCov() const;
+    std::tuple<TVector3, TMatrixDSym> getPrimaryVertexAndCov() const;
 
 
   private:

@@ -383,11 +383,11 @@ void MillepedeCollectorModule::collect()
       }
 
       if (daughters.size() > 1) {
-        DBObjPtr<BeamParameters> beam;
+        auto beam = getPrimaryVertexAndCov();
 
-        TMatrixDSym vertexCov(beam->getCovVertex());
-        TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
-        TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
+        TMatrixDSym vertexCov(get<TMatrixDSym>(beam));
+        TMatrixDSym vertexPrec(get<TMatrixDSym>(beam).Invert());
+        TVector3 vertexResidual = - (mother->getVertex() - get<TVector3>(beam));
 
         TVectorD extMeasurements(3);
         extMeasurements[0] = vertexResidual[0];
@@ -640,8 +640,8 @@ void MillepedeCollectorModule::collect()
       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
-      TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
-      TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
+      TMatrixDSym vertexPrec(get<TMatrixDSym>(getPrimaryVertexAndCov()).Invert());
+      TVector3 vertexResidual = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()));
 
       TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / (beam->getCovHER() + beam->getCovLER())(0, 0);
       TVectorD massResidual(1); massResidual = - (mother->getMass() - beam->getMass());
@@ -712,7 +712,7 @@ void MillepedeCollectorModule::collect()
       TMatrixDSym extCov(7); extCov.Zero();
 
       // 3x3 IP vertex covariance
-      extCov.SetSub(0, 0, beam->getCovVertex());
+      extCov.SetSub(0, 0, get<TMatrixDSym>(getPrimaryVertexAndCov()));
 
       // 3x3 boost vector covariance
       //NOTE: BeamParameters return covarince in variables (E, theta_x, theta_y)
@@ -756,9 +756,9 @@ void MillepedeCollectorModule::collect()
       auto extPrec = extCov; extPrec.Invert();
 
       TVectorD extMeasurements(7);
-      extMeasurements[0] = - (mother->getVertex() - beam->getVertex())[0];
-      extMeasurements[1] = - (mother->getVertex() - beam->getVertex())[1];
-      extMeasurements[2] = - (mother->getVertex() - beam->getVertex())[2];
+      extMeasurements[0] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[0];
+      extMeasurements[1] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[1];
+      extMeasurements[2] = - (mother->getVertex() - get<TVector3>(getPrimaryVertexAndCov()))[2];
       extMeasurements[3] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[0];
       extMeasurements[4] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[1];
       extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
@@ -1522,16 +1522,8 @@ TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::Measu
 
 }
 
-tuple<TVectorD, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() const
+tuple<TVector3, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() const
 {
   DBObjPtr<BeamSpot> beam;
-
-  TVectorD pos(3);
-  pos[0] = beam->getVertex()[0];
-  pos[1] = beam->getVertex()[1];
-  pos[2] = beam->getVertex()[2];
-
-  TMatrixDSym size = beam->getSize();
-
-  return {pos, size};
+  return {beam->getVertex(), beam->getSize()};
 }

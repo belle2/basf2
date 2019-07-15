@@ -14,6 +14,7 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
+#include <iostream>
 using std::vector;
 
 namespace TreeFitter {
@@ -146,10 +147,9 @@ namespace TreeFitter {
             B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
           } else if (mother() && mother()->posIndex() >= 0) {
-            int posindexmother = mother()->posIndex();
-
-            fitparams.getStateVector().segment(posindex, 3) = fitparams.getStateVector().segment(posindexmother, 3);
-
+            const int posindexmother = mother()->posIndex();
+            const int dim = m_config->m_originDimension; //TODO acess mother
+            fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
           } else {
             /** (0,0,0) is the best guess in any other case */
             fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
@@ -169,14 +169,14 @@ namespace TreeFitter {
   ErrCode InternalParticle::initParticleWithMother(FitParams& fitparams)
   {
     int posindex = posIndex();
-
     if (hasPosition() &&
         mother() &&
         fitparams.getStateVector()(posindex) == 0 &&
         fitparams.getStateVector()(posindex + 1) == 0 && \
         fitparams.getStateVector()(posindex + 2) == 0) {
-      int posindexmom = mother()->posIndex();
-      fitparams.getStateVector().segment(posindex , 3) = fitparams.getStateVector().segment(posindexmom, 3);
+      const int posindexmom = mother()->posIndex();
+      const int dim = m_config->m_originDimension; //TODO acess mother?
+      fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);
     }
     return initTau(fitparams);
   }
@@ -346,13 +346,13 @@ namespace TreeFitter {
       list.push_back(Constraint(this, Constraint::kinematic, depth, 4, 3));
     }
     if (m_geo_constraint) {
-      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
+      assert(m_config);
+      const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
+      list.push_back(Constraint(this, Constraint::geometric, depth, dim, 3));
     }
-
     if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
-
 
   }
 

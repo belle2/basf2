@@ -28,7 +28,10 @@ namespace TreeFitter {
                              m_ipConstraint(false),
                              m_customOrigin(false),
                              m_customOriginVertex({}),
-                             m_customOriginCovariance({})
+                             m_customOriginCovariance({}),
+                             m_originDimension(3),
+                             m_headOfTreePDG(0),
+                             m_inflationFactorCovZ(1)
     {};
 
     /** constructor */
@@ -41,7 +44,9 @@ namespace TreeFitter {
                             const bool& ipConstraint,
                             const bool& customOrigin,
                             const std::vector<double>& customOriginVertex,
-                            const std::vector<double>& customOriginCovariance
+                            const std::vector<double>& customOriginCovariance,
+                            const int& originDimension,
+                            const int& inflationFactorCovZ = 1
                            ) :
       m_massConstraintType(massConstraintType),
       m_massConstraintListPDG(massConstraintListPDG),
@@ -52,7 +57,10 @@ namespace TreeFitter {
       m_ipConstraint(ipConstraint),
       m_customOrigin(customOrigin),
       m_customOriginVertex(customOriginVertex),
-      m_customOriginCovariance(customOriginCovariance)
+      m_customOriginCovariance(customOriginCovariance),
+      m_originDimension(originDimension),
+      m_headOfTreePDG(0),
+      m_inflationFactorCovZ(inflationFactorCovZ)
     {}
 
     /** const flag for the type of the mass constraint */
@@ -85,6 +93,14 @@ namespace TreeFitter {
     /** covariance matrix of origin as row major vector len = 9 */
     const std::vector<double> m_customOriginCovariance;
 
+    /** dimension of the origin constraint and ALL geometric gcosntraints */
+    const int m_originDimension;
+
+    /** PDG code of the head particle */
+    mutable int m_headOfTreePDG;
+
+    /** inflate covariance of z by this number -> iptube  */
+    const int m_inflationFactorCovZ;
   };
 }
 

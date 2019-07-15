@@ -21,14 +21,14 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', find_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
+        inputMdst('default',  Belle2.FileSystem.findFile('analysis/1000_B_DstD0Kpi_skimmed.root', 'validation'), path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
+        fillParticleList('K+:a', 'kaonID > 0.5', path=main)
 
-        fillParticleList('gamma:a', '', path=main)
-        reconstructDecay('pi0:a -> gamma:a gamma:a', '0.125 < InvM < 0.145', 0, path=main)
-
-        reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
+        reconstructDecay('D0:rec -> K-:a pi+:a', '', 0, path=main)
+        reconstructDecay('D*+:rec -> D0:rec pi+:a', '', 0, path=main)
+        reconstructDecay('B0:rec -> D*+:rec pi-:a', ' InvM > 5', 0, path=main)
         matchMCTruth('B0:rec', path=main)
 
         conf = 0
@@ -39,7 +39,8 @@ class TestTreeFits(unittest.TestCase):
                         massConstraintListParticlename=[],
                         expertUseReferencing=True,
                         ipConstraint=True,
-                        updateAllDaughters=True)
+                        originDimension=2,
+                        updateAllDaughters=False)
 
         ntupler = register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
@@ -67,9 +68,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 2129, "Background rejection too small.")
+        self.assertTrue(falsePositives < 1300, f"Background rejection {falsePositives} out of {allBkg}")
 
-        self.assertTrue(truePositives > 32, "Signal rejection too high")
+        self.assertTrue(truePositives > 146, f"Signal rejection too high {truePositives} out of {allSig}")
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")

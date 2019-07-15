@@ -23,7 +23,7 @@
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-
+#include <iostream>
 namespace TreeFitter {
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) :
@@ -339,20 +339,53 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::projectGeoConstraint(const FitParams& fitparams, Projection& p) const
   {
+    assert(m_config);
+    // only allow 2d for head of tree particles that are beam cosntraint
+    const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
     const int posindexmother = mother()->posIndex();
     const int posindex = posIndex();
     const int tauindex = tauIndex();
     const int momindex = momIndex();
 
-    const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
+    const double tau = fitparams.getStateVector()(tauindex);
+    Eigen::Matrix < double, 1, -1, 1, 1, 3 > x_vec = fitparams.getStateVector().segment(posindex, dim);
+    Eigen::Matrix < double, 1, -1, 1, 1, 3 > x_m = fitparams.getStateVector().segment(posindexmother, dim);
+    Eigen::Matrix < double, 1, -1, 1, 1, 3 > p_vec = fitparams.getStateVector().segment(momindex, dim);
     const double mom = p_vec.norm();
     const double mom3 = mom * mom * mom;
-    const Eigen::Matrix<double, 1, 3> x_vec = fitparams.getStateVector().segment(posindex, 3);
-    const Eigen::Matrix<double, 1, 3> x_m = fitparams.getStateVector().segment(posindexmother, 3);
 
-    double tau = fitparams.getStateVector()(tauindex);
-    // linear approximation is fine
-    for (int row = 0; row < 3; ++row) {
+    if (3 == dim) {
+      // we can already set these
+      //diagonal momentum
+      p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
+      p.getH()(1, momindex + 1) = tau * (p_vec(0) * p_vec(0) + p_vec(2) * p_vec(2)) / mom3 ;
+      p.getH()(2, momindex + 2) = tau * (p_vec(0) * p_vec(0) + p_vec(1) * p_vec(1)) / mom3 ;
+
+      //offdiagonal momentum
+      p.getH()(0, momindex + 1) = - tau * p_vec(0) * p_vec(1) / mom3 ;
+      p.getH()(0, momindex + 2) = - tau * p_vec(0) * p_vec(2) / mom3 ;
+
+      p.getH()(1, momindex + 0) = - tau * p_vec(1) * p_vec(0) / mom3 ;
+      p.getH()(1, momindex + 2) = - tau * p_vec(1) * p_vec(2) / mom3 ;
+
+      p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
+      p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
+
+    } else if (2 == dim) {
+
+      // NOTE THAT THESE ARE DIFFERENT IN 2d
+      p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1)) / mom3 ;
+      p.getH()(1, momindex + 1) = tau * (p_vec(0) * p_vec(0)) / mom3 ;
+
+      //offdiagonal momentum
+      p.getH()(0, momindex + 1) = - tau * p_vec(0) * p_vec(1) / mom3 ;
+      p.getH()(1, momindex + 0) = - tau * p_vec(1) * p_vec(0) / mom3 ;
+    } else {
+      B2FATAL("Dimension of Geometric constraint is not 2 or 3. This will crash many things. You should feel bad.");
+    }
+
+    for (int row = 0; row < dim; ++row) {
+
       double posxmother = x_m(row);
       double posx       = x_vec(row);
       double momx       = p_vec(row);
@@ -365,20 +398,6 @@ namespace TreeFitter {
       p.getH()(row, posindex + row) = -1;
       p.getH()(row, tauindex) = momx / mom;
     }
-    //diagonal momentum
-    p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
-    p.getH()(1, momindex + 1) = tau * (p_vec(0) * p_vec(0) + p_vec(2) * p_vec(2)) / mom3 ;
-    p.getH()(2, momindex + 2) = tau * (p_vec(1) * p_vec(1) + p_vec(0) * p_vec(0)) / mom3 ;
-
-    //offdiagonal momentum
-    p.getH()(0, momindex + 1) = - tau * p_vec(0) * p_vec(1) / mom3 ;
-    p.getH()(0, momindex + 2) = - tau * p_vec(0) * p_vec(2) / mom3 ;
-
-    p.getH()(1, momindex + 0) = - tau * p_vec(1) * p_vec(0) / mom3 ;
-    p.getH()(1, momindex + 2) = - tau * p_vec(1) * p_vec(2) / mom3 ;
-
-    p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
-    p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
 
     return ErrCode(ErrCode::Status::success);
   }
@@ -513,10 +532,30 @@ namespace TreeFitter {
 
       const int posindex = posIndex();
       const int mother_ps_index = mother()->posIndex();
-      const Eigen::Matrix<double, 1 , 3 > vertex_dist = fitparams.getStateVector().segment(posindex,
-                                                        3) - fitparams.getStateVector().segment(mother_ps_index, 3);
-      const Eigen::Matrix<double, 1, 3 > mom = fitparams.getStateVector().segment(momIndex(), 3);
-      fitparams.getStateVector()(tauindex) = std::abs(vertex_dist.dot(mom)) / mom.norm();
+      const int dim  = m_config->m_originDimension; // TODO can we configure this to be particle specific?
+
+      // tau has different meaning depending on the dimension of the cosntraint
+      // 2-> use x-y projection
+      const Eigen::Matrix < double, 1, -1, 1, 1, 3 > vertex_dist =
+        fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
+      const Eigen::Matrix < double, 1, -1, 1, 1, 3 >
+      mom = fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
+
+// if an intermediate vertex is not well defined by a track or so it will be initialised with 0
+// same for the momentum of for example B0, it might be initialsed with 0
+// in those cases use pdg value
+      const double mom_norm = mom.norm();
+      const double dot = std::abs(vertex_dist.dot(mom));
+      const double tau = dot / mom_norm;
+      if (0 == mom_norm || 0 == dot) {
+        fitparams.getStateVector()(tauindex) = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
+      } else {
+        fitparams.getStateVector()(tauindex) = tau;
+      }
+
+
+
+
     }
 
     return ErrCode(ErrCode::Status::success);

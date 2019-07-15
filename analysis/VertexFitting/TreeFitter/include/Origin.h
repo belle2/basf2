@@ -103,5 +103,7 @@ namespace TreeFitter {
     /** the parameters are initialize elsewhere this is just a pointer to that */
     Belle2::DBObjPtr<Belle2::BeamParameters> m_beamParams;
 
+    /** inflated the covariance matrix in z by this number */
+    const int m_inflationFactorCovZ;
   };
 }

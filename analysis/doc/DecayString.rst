@@ -54,8 +54,16 @@ Here is an example of use:
 
 	reconstructDecay('B0:Xsdee -> Xsd:comb e+:loose e-:loose', '', path=mypath)
 
-Inclusive Decays
-----------------
+Keywords for custom MCMatching
+------------------------------
+One can use the keyeords for decay string to configure how :code:`'isCustomSignal'` is behaving. If these keywords are used, the missing particles are ignored or taken into account. For example, if :code:`'...'` is used, missing final state particles are ignored, hence :code:`'isCustomSignal'` works as :code:`'isSignalAcceptMissingMassive'`.
+
+* :code:`'...'` Missing massive final state particles are ignored
+* :code:`'?nu'` Missing neutrinos are ignored
+* :code:`'!nu'` Missing neutrinos are taken into account (default)
+* :code:`'?rad'` Missing radiated photons are ignored (default)
+* :code:`'!rad'` Missing radiated photons are taken into account
+
 The decay descriptor for inclusive decays can be used only in MCDecayFinder module and nowhere else. Inclusive decays can be specified by with :code:`'...'` for unreconstructed particles:
 
 :code:`'B+ -> [anti-D0 -> K- pi+] ...'`
@@ -64,9 +72,8 @@ Arrows
 ------
 For truth matching purposes different types of arrows are defined:
 
-* :code:`'->'` exact match of the decay including intermediate resonances
-* :code:`'-->'` intermediate resonances are ignored
-* :code:`'=>'` radiated photons are ignored
-* :code:`'==>'` intermediate resonances and radiated photons are ignored
- 
+* :code:`'->'` intermediate resonances and radiated photons are ignored
+* :code:`'-->'` radiated photons are ignored
+* :code:`'=>'` intermediate resonances are ignored
+* :code:`'==>'` exact match of the decay including intermediate resonances
 

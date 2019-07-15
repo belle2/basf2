@@ -24,6 +24,7 @@ CHANGES since release-00-09-03:
   * getTimTypeBits is replaced by getTimType
 - SoftwareTriggerResult:
   * getTotalResult removed
+  * non-prescaled results added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel

@@ -9,13 +9,12 @@ from modularAnalysis import copyParticles
 from modularAnalysis import copyList
 from modularAnalysis import cutAndCopyLists
 from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
 
 from vertex import vertexKFit
 from vertex import massKFit
 
 
-def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMonitors.root', path=analysis_main):
+def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMonitors.root', path=None):
     """
     In each event saves HER, LER, CMS, x-angle to histograms for monitoring purpuses: e.g. to be compared with
     same distributions obtained within BASF.
@@ -73,7 +72,7 @@ def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMon
     path.add_module(beam2hist)
 
 
-def addKshortConversionMonitors(outputRootFile='b2biiKshortConversionMonitors.root', path=analysis_main):
+def addKshortConversionMonitors(outputRootFile='b2biiKshortConversionMonitors.root', path=None):
     """
     Creates copies of KShort particles from 'K_S0:mdst' ParticleList and fills them to a new ParticleList called
     'K_S0:b2bii_monitor'. For each KShort candidate several quantities are stored to histograms with 'VariablesToHistogram' module
@@ -203,7 +202,7 @@ def addKshortConversionMonitors(outputRootFile='b2biiKshortConversionMonitors.ro
     path.add_module(fittdKS2hist)
 
 
-def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root', path=analysis_main):
+def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root', path=None):
     """
     Creates copies of KLong particles from 'K_L0:mdst' ParticleList and fills them to a new ParticleList called
     'K_L0:b2bii_monitor'. For each Klong candidate several quantities are stored to histograms with 'VariablesToHistogram' module
@@ -245,7 +244,7 @@ def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root
     path.add_module(klong2hist)
 
 
-def addLambda0ConversionMonitors(outputRootFile='b2biiLambda0ConversionMonitors.root', path=analysis_main):
+def addLambda0ConversionMonitors(outputRootFile='b2biiLambda0ConversionMonitors.root', path=None):
     """
     Creates copies of Lambda0 particles from 'Lambda0:mdst' ParticleList and c.c. and fills them to a new ParticleList called
     'Lambda0:b2bii_monitor'. For each Lambda0 candidate several quantities are stored to histograms with 'VariablesToHistogram'
@@ -369,7 +368,7 @@ def addLambda0ConversionMonitors(outputRootFile='b2biiLambda0ConversionMonitors.
     path.add_module(fittdL02hist)
 
 
-def addConvertedPhotonConversionMonitors(outputRootFile='b2biiConvertedPhotonConversionMonitors.root', path=analysis_main):
+def addConvertedPhotonConversionMonitors(outputRootFile='b2biiConvertedPhotonConversionMonitors.root', path=None):
     """
     Creates copies of gamma particles from 'gamma:v0mdst' ParticleList and fills them to a new ParticleList called
     'gamma:v0_b2bii_monitor'. For each gamma candidate several quantities are stored to histograms with 'VariablesToHistogram'
@@ -493,7 +492,7 @@ def addConvertedPhotonConversionMonitors(outputRootFile='b2biiConvertedPhotonCon
     path.add_module(fittdCG2hist)
 
 
-def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root', path=analysis_main):
+def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root', path=None):
     """
     Creates 'pi+:b2bii_monitor' ParticleLists and fills it with all converted charged tracks as charged pions.
     For each charged pion (track) several quantities are stored to histograms with 'VariablesToHistogram' module
@@ -579,7 +578,7 @@ def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root
 def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonitors.root',
                                   neutralPiOutputRootFile='b2biiPi0ConversionMonitors.root',
                                   MCneutralPiOutputRootFile='b2biiMCPi0ConversionMonitors.root',
-                                  path=analysis_main):
+                                  path=None):
     """
     Creates 'gamma:b2bii_monitor' and 'pi0:b2bii_monitor' from already existing 'gamma:mdst' and
     'pi0:mdst' ParticleList and fills it with all converted neutral gammas.
@@ -851,7 +850,7 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
     path.add_module(MCneutralPi2hist)
 
 
-def addMCParticlesConversionMonitors(outputRootFile='b2biiMCParticlesConversionMonitors.root', path=analysis_main):
+def addMCParticlesConversionMonitors(outputRootFile='b2biiMCParticlesConversionMonitors.root', path=None):
     """
     'HistoManager' and 'B2BIIMCParticlesMonitor' modules create and fill the monitoring
     histograms using all MCParticles.

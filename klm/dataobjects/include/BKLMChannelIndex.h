@@ -23,19 +23,44 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor.
+     * Index level (loop over KLM elements at the specified level).
      */
-    BKLMChannelIndex();
+    enum IndexLevel {
+
+      /** Forward. */
+      c_IndexLevelForward = 1,
+
+      /** Sector. */
+      c_IndexLevelSector = 2,
+
+      /** Layer. */
+      c_IndexLevelLayer = 3,
+
+      /** Plane. */
+      c_IndexLevelPlane = 4,
+
+      /** Strip. */
+      c_IndexLevelStrip = 5,
+
+    };
 
     /**
      * Constructor.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
-     * @param[in] sector  Sector (1-based).
-     * @param[in] layer   Layer (1-based).
-     * @param[in] plane   Plane (0-based).
-     * @param[in] strip   Strip (1-based).
+     * @param[in] indexLevel Index level.
      */
-    BKLMChannelIndex(int forward, int sector, int layer, int plane, int strip);
+    explicit BKLMChannelIndex(enum IndexLevel indexLevel = c_IndexLevelStrip);
+
+    /**
+     * Constructor.
+     * @param[in] forward    Forward (1) or backward (0) BKLM.
+     * @param[in] sector     Sector (1-based).
+     * @param[in] layer      Layer (1-based).
+     * @param[in] plane      Plane (0-based).
+     * @param[in] strip      Strip (1-based).
+     * @param[in] indexLevel Index level.
+     */
+    BKLMChannelIndex(int forward, int sector, int layer, int plane, int strip,
+                     enum IndexLevel indexLevel = c_IndexLevelStrip);
 
     /**
      * Destructor.
@@ -43,9 +68,14 @@ namespace Belle2 {
     ~BKLMChannelIndex();
 
     /**
+     * Set index level.
+     */
+    void setIndexLevel(enum IndexLevel indexLevel);
+
+    /**
      * Get forward.
      */
-    int getForward()
+    int getForward() const
     {
       return m_Forward;
     }
@@ -53,7 +83,7 @@ namespace Belle2 {
     /**
      * Get sector.
      */
-    int getSector()
+    int getSector() const
     {
       return m_Sector;
     }
@@ -61,7 +91,7 @@ namespace Belle2 {
     /**
      * Get layer.
      */
-    int getLayer()
+    int getLayer() const
     {
       return m_Layer;
     }
@@ -69,7 +99,7 @@ namespace Belle2 {
     /**
      * Get plane.
      */
-    int getPlane()
+    int getPlane() const
     {
       return m_Plane;
     }
@@ -77,7 +107,7 @@ namespace Belle2 {
     /**
      * Get strip.
      */
-    int getStrip()
+    int getStrip() const
     {
       return m_Strip;
     }
@@ -85,12 +115,17 @@ namespace Belle2 {
     /**
      * Get KLM channel number.
      */
-    uint16_t getKLMChannelNumber();
+    uint16_t getKLMChannelNumber() const;
+
+    /**
+     * Get KLM module number.
+     */
+    uint16_t getKLMModuleNumber() const;
 
     /**
      * First channel.
      */
-    BKLMChannelIndex& begin();
+    BKLMChannelIndex begin();
 
     /**
      * Last channel.
@@ -118,6 +153,14 @@ namespace Belle2 {
     BKLMChannelIndex& operator*();
 
   protected:
+
+    /**
+     * Increment the index.
+     */
+    void increment(enum IndexLevel indexLevel);
+
+    /** Index level. */
+    enum IndexLevel m_IndexLevel;
 
     /** Forward. */
     int m_Forward;

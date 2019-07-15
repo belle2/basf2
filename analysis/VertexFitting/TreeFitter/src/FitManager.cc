@@ -253,7 +253,6 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
-
     if (m_updateDaugthers || isTreeHead) {
       if (posindex >= 0) {
         const TVector3 pos(m_fitparams->getStateVector()(posindex),
@@ -324,7 +323,8 @@ namespace TreeFitter {
 
       std::tuple<double, double> lenTuple  = getDecayLength(cand);
 
-      comb_cov(0, 0) = std::get<1>(lenTuple);
+      const double lenErr = std::get<1>(lenTuple);
+      comb_cov(0, 0) = lenErr * lenErr;
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
       const double mass = pb->pdgMass();
@@ -341,9 +341,9 @@ namespace TreeFitter {
       jac(2) = -1. * mom_vec(1) / mom3 * mBYc;
       jac(3) = -1. * mom_vec(2) / mom3 * mBYc;
 
-      const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
+      const double tErr2 = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
       // time in nanosec
-      return std::make_tuple(t, tErr);
+      return std::make_tuple(t, std::sqrt(tErr2));
     }
     return std::make_tuple(-999, -999);
   }
@@ -359,8 +359,8 @@ namespace TreeFitter {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();
       const double len = fitparams.getStateVector()(tauindex);
-      const double lenErr = fitparams.getCovariance()(tauindex, tauindex);
-      return std::make_tuple(len, lenErr);
+      const double lenErr2 = fitparams.getCovariance()(tauindex, tauindex);
+      return std::make_tuple(len, std::sqrt(lenErr2));
     }
     return std::make_tuple(-999, -999);
   }

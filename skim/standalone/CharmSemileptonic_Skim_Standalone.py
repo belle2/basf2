@@ -12,22 +12,35 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdPi0s import *
-from stdCharged import stdPi, stdK
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from stdCharged import stdPi, stdK, stdE, stdMu
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
 import os
 import sys
 import glob
+import argparse
 skimCode = encodeSkimName("CharmSemileptonic")
 
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
 cslpath = Path()
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=cslpath)
 
 
 stdPi('95eff', path=cslpath)
 stdK('95eff', path=cslpath)
+stdE('95eff', path=cslpath)
+stdMu('95eff', path=cslpath)
 loadStdSkimPi0(path=cslpath)
 
 reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, path=cslpath)

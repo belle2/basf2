@@ -37,7 +37,6 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
-
     bool deleteFitpars = false;
 
     FitParams* unfilteredState = nullptr;
@@ -98,9 +97,7 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
-
     while (!finished && !status.failure()) {
-
       p.resetProjection();
 
       /** here we project the old state and use only the change with respect to the new state

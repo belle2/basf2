@@ -60,6 +60,14 @@ namespace Belle2 {
 
     /** vector carrying the PDG codes of the particles to be mass constraint */
     std::vector<int> m_massConstraintList;
+
+    /** list of pdg codes of particles to use a geo cosntraint for */
+    std::vector<int> m_geoConstraintListPDG;
+
+    /** list of pdg codes of particles where we use thesame vertex for production and decay
+     * which is the vertex of the mother */
+    std::vector<int> m_fixedToMotherVertexListPDG;
+
     /** vector carrying the names of the particles to be mass constraint */
     std::vector<std::string> m_massConstraintListParticlename;
     /** type of the mass constraint false: use normal one. true: use parameters of daughters experimental!
@@ -105,5 +113,9 @@ namespace Belle2 {
      * */
     std::vector<std::string> m_removeConstraintList;
 
+    /** should the vertex be joined with the mother and should it be geometrically cosntrained?
+     *  'I dont know hat I am doing'
+     * */
+    bool m_automatic_vertex_constraining;
   };
 }

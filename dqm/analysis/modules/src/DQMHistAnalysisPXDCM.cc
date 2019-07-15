@@ -111,7 +111,7 @@ void DQMHistAnalysisPXDCMModule::beginRun()
 void DQMHistAnalysisPXDCMModule::event()
 {
   double all_outside = 0.0, all = 0.0;
-  bool dhp_fifo_overflow = false;
+  double all_cm = 0.0;
   bool error_flag = false;
   bool warn_flag = false;
   if (!m_cCommonMode) return;
@@ -133,18 +133,21 @@ void DQMHistAnalysisPXDCMModule::event()
         v = hh1->GetBinContent(bin);
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         current += v;
-        dhp_fifo_overflow |= (bin == 64 && v > 0.0); // DHP Fifo overflow ... might be critical/unrecoverable
       }
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
-      outside += hh1->Integral(16, 64);
+      outside += hh1->Integral(16, 63);
       // FIXME currently we have to much noise below the line ... thsu excluding this to avoid false alarms
       // outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside;
       all += current;
+      double dhpc = hh1->GetBinContent(64);
+      all_cm += dhpc;
       if (current > 1) {
-        error_flag |= (outside / current > 1e-6); /// TODO level might need adjustment
-        warn_flag |= (outside / current > 1e-8); /// TODO level might need adjustment
+        error_flag |= (outside / current > 1e-5); /// TODO level might need adjustment
+        warn_flag |= (outside / current > 1e-6); /// TODO level might need adjustment
+        error_flag |= (dhpc / current > 1e-5); // DHP Fifo overflow ... might be critical/unrecoverable
+        warn_flag |= (dhpc / current > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
       }
     }
   }
@@ -158,13 +161,13 @@ void DQMHistAnalysisPXDCMModule::event()
     status = 0; // default
   } else {
     /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-    if (all_outside / all > 1e-6 || dhp_fifo_overflow || error_flag) {
+    if (all_outside / all > 1e-5 || all_cm / all > 1e-5 || error_flag) {
       m_cCommonMode->Pad()->SetFillColor(kRed);// Red
       status = 4;
-    } else if (all_outside / all > 1e-8 || warn_flag) {
+    } else if (all_outside / all > 1e-6 || all_cm / all > 1e-6 || warn_flag) {
       m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
       status = 3;
-    } else if (all_outside == 0.) {
+    } else if (all_outside == 0. && all_cm == 0.) {
       m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
       status = 2;
     } else { // between 0 and 50 ...

@@ -86,6 +86,7 @@ void AxialTrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
   AxialTrackUtil::deleteShortTracks(axialTracks);
 }
 
+/// Determine the best track for merging with the candidate track
 template <class ACDCTracks>
 WithWeight<MayBePtr<CDCTrack> > AxialTrackMerger::calculateBestTrackToMerge(CDCTrack& track, ACDCTracks& tracks)
 {

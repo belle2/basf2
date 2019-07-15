@@ -77,7 +77,6 @@ klm_cluster = [
     'klmClusterIsBackwardEKLM',
     'klmClusterTheta',
     'klmClusterPhi',
-    'maximumKLMAngleCMS',
     'nKLMClusterTrackMatches',
     'nMatchedKLMClusters',
 ]
@@ -204,6 +203,9 @@ tag_vertex = [
     'TagVOBoost',
     'TagVOBoostErr',
     'TagVpVal',
+    'TagVNDF',
+    'TagVChi2',
+    'TagVChi2IP',
     'TagVx',
     'TagVxErr',
     'TagVy',

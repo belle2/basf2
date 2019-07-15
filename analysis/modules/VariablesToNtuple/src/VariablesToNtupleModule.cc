@@ -81,7 +81,7 @@ void VariablesToNtupleModule::initialize()
     return;
   }
 
-  m_file->cd();
+  TDirectory::TContext directoryGuard(m_file.get());
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
@@ -208,14 +208,13 @@ void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing NTuple " << m_treeName);
-    m_file->cd();
+    TDirectory::TContext directoryGuard(m_file.get());
     m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
+    m_file.reset();
     if (writeError) {
-      m_file.reset();
       B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
-    m_file.reset();
   }
 }

@@ -14,8 +14,19 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
+gb2_setuprel = 'release-03-02-02'
 set_log_level(LogLevel.INFO)
 import sys
 import os
@@ -24,7 +35,7 @@ skimCode = encodeSkimName('Charm3BodyHadronic1')
 
 c3bh1path = Path()
 
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=c3bh1path)
 
 loadStdSkimPhoton(path=c3bh1path)

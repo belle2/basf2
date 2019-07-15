@@ -26,6 +26,8 @@
 #include <bitset>
 #include <vector>
 #include <string>
+#include <iostream>
+#include <iomanip>
 #include <utility>
 #include <typeinfo>
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMHIT1D_H
-#define BKLMHIT1D_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <bklm/dataobjects/BKLMStatus.h>
@@ -108,5 +107,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //BKLMHIT1D_H

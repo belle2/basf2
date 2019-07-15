@@ -79,7 +79,7 @@ VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe) {
 
 
 enum KFitError::ECode
-VertexFitKFit::setIpTubeProfile(const KFitTrack& p) {
+VertexFitKFit::setIpTubeProfile(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q) {
   if (m_FlagBeam)
   {
     char buf[1024];
@@ -88,7 +88,7 @@ VertexFitKFit::setIpTubeProfile(const KFitTrack& p) {
   }
 
   m_FlagTube = true;
-  m_TubeTrack = p;
+  m_TubeTrack = KFitTrack(p, x, e, q);
 
   return m_ErrorCode = KFitError::kNoError;
 }

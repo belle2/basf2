@@ -9,6 +9,7 @@ from tracking.run.utilities import NonstrictChoices
 
 
 class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
+    """Prepare and execute a basf2 job to train neural network, postprocess, and inspect"""
 
     #: Recording / training task selected
     task = "train"
@@ -57,6 +58,7 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
 
         To run only the training run with --postprocess-only
         """
+        #: Process each event according to the user's desired task (train, eval, explore)
         if self.task == "train":
             cmd = [
                 "trackfindingcdc_teacher",
@@ -108,7 +110,7 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
             ]
             print("Running", cmd)
             subprocess.call(cmd)
-            # Set file name for the TBrowser to show if demanded
+            #: Set file name for the TBrowser to show if demanded
             self.output_file_name = self.sample_file_name[:-len(".root")] + ".overview.root"
 
         super().postprocess()

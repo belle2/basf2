@@ -6,7 +6,8 @@
 
 __authors__ = [
     "Racha Cheaib",
-    "Hannah Wakeling"
+    "Hannah Wakeling",
+    "Phil Grace"
 ]
 
 from basf2 import *
@@ -23,14 +24,14 @@ def SemileptonicList(path):
 
     **Decay Modes**:
 
-        * B+ -> D0 e+
-        * B+ -> D0 mu+
-        * B+ -> D*0 e+
-        * B+ -> D*0 mu+
-        * B0 ->  D+ e-
-        * B0 ->  D+ mu-
-        * B0 ->  D*+ e-
-        * B0 ->  D*+ mu-
+        * B+ -> anti-D0 e+
+        * B+ -> anti-D0 mu+
+        * B+ -> anti-D*0 e+
+        * B+ -> anti-D*0 mu+
+        * B0 ->  D- e+
+        * B0 ->  D- mu+
+        * B0 ->  D*- e+
+        * B0 ->  D*- mu+
 
     **Cuts applied**:
 
@@ -45,20 +46,20 @@ def SemileptonicList(path):
         "Racha Cheaib"
     ]
 
-    cutAndCopyList('e-:SLB', 'e-:all', 'p>0.35', True, path=path)
-    cutAndCopyList('mu-:SLB', 'mu-:all', 'p>0.35', True, path=path)
+    cutAndCopyList('e+:SLB', 'e+:all', 'p>0.35', True, path=path)
+    cutAndCopyList('mu+:SLB', 'mu+:all', 'p>0.35', True, path=path)
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
-    BplusChannels = ['D0:all e+:SLB',
-                     'D0:all mu+:SLB',
-                     'D*0:all e+:SLB',
-                     'D*0:all mu+:SLB'
+    BplusChannels = ['anti-D0:all e+:SLB',
+                     'anti-D0:all mu+:SLB',
+                     'anti-D*0:all e+:SLB',
+                     'anti-D*0:all mu+:SLB'
                      ]
 
-    B0Channels = ['D+:all e-:SLB',
-                  'D+:all mu-:SLB',
-                  'D*+:all e-:SLB',
-                  'D*+:all mu-:SLB'
+    B0Channels = ['D-:all e+:SLB',
+                  'D-:all mu+:SLB',
+                  'D*-:all e+:SLB',
+                  'D*-:all mu+:SLB'
                   ]
 
     bplusList = []
@@ -94,7 +95,7 @@ def PRList(path):
     * electronID>0.5
     * muonID>0.5
     * lepton Momentum>1.5
-    * R2EventLevel<0.5
+    * foxWolframR2<0.5
     * nTracks>4
     """
 
@@ -103,6 +104,25 @@ def PRList(path):
         "Racha Cheaib",
         "Romulus Godang"
     ]
+
+    fillParticleList(decayString='pi+:all',
+                     cut='pt> 0.1', path=path)
+    fillParticleList(decayString='gamma:all',
+                     cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2<0.5 and nTracks>4', path=path)
 
     cutAndCopyList('e+:PR1', 'e+:all', 'useCMSFrame(p) > 1.50 and electronID > 0.5', path=path)
     cutAndCopyList('mu+:PR1', 'mu+:all', 'useCMSFrame(p) > 1.50 and muonID > 0.5', path=path)
@@ -113,16 +133,9 @@ def PRList(path):
     cutAndCopyList('pi-:PR2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path)
 
     reconstructDecay('B0:L1 ->  pi-:PR1 e+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 1, path=path)
-    applyCuts('B0:L1', 'R2EventLevel<0.5 and nTracks>4', path=path)
-
     reconstructDecay('B0:L2 ->  pi-:PR1 mu+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 2, path=path)
-    applyCuts('B0:L2', 'R2EventLevel<0.5 and nTracks>4', path=path)
-
     reconstructDecay('B0:L3 ->  pi-:PR2 e+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 3, path=path)
-    applyCuts('B0:L3', 'R2EventLevel<0.5 and nTracks>4', path=path)
-
     reconstructDecay('B0:L4 ->  pi-:PR2 mu+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 4, path=path)
-    applyCuts('B0:L4', 'R2EventLevel<0.5 and nTracks>4', path=path)
 
     PRList = ['B0:L1', 'B0:L2']
 

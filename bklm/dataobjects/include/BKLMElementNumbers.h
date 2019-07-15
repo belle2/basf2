@@ -15,6 +15,9 @@
 
 namespace Belle2 {
 
+  /**
+   * BKLM element numbers.
+   */
   class BKLMElementNumbers {
 
   public:
@@ -39,6 +42,22 @@ namespace Belle2 {
      */
     static uint16_t channelNumber(int forward, int sector, int layer, int plane,
                                   int strip);
+
+    /**
+     * Get module number.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     */
+    static uint16_t moduleNumber(int forward, int sector, int layer);
+
+    /**
+     * Get layer global number.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     */
+    static int layerGlobalNumber(int forward, int sector, int layer);
 
     /**
      * Get number of strips.
@@ -85,12 +104,37 @@ namespace Belle2 {
     }
 
     /**
-     * Get maximal plane numbe (0-based).
+     * Get maximal plane number (0-based).
      */
     static constexpr int getMaximalPlaneNumber()
     {
       return m_MaximalPlaneNumber;
     }
+
+    /**
+     * Get maximal sector global number.
+     */
+    static constexpr int getMaximalSectorGlobalNumber()
+    {
+      return (m_MaximalForwardNumber + 1) * m_MaximalSectorNumber;
+    }
+
+    /**
+     * Get maximal layer global number (0-based).
+     */
+    static constexpr int getMaximalLayerGlobalNumber()
+    {
+      return (m_MaximalForwardNumber + 1) * m_MaximalSectorNumber * m_MaximalLayerNumber;
+    }
+
+    /**
+     * Get element numbers by layer global number (0-based).
+     * @param[in]  layerGlobal  Layer global number.
+     * @param[out] forward      Forward (1) or backward (0) BKLM.
+     * @param[out] sector       Sector (1-based).
+     * @param[out] layer        Layer (1-based).
+     */
+    static void layerGlobalNumberToElementNumbers(int layerGlobal, int* forward, int* sector, int* layer);
 
   protected:
 
@@ -103,9 +147,8 @@ namespace Belle2 {
     /** Maximal layer number (1-based). */
     static constexpr int m_MaximalLayerNumber = 15;
 
-    /** Maximal plane numbe (0-based). */
+    /** Maximal plane number (0-based). */
     static constexpr int m_MaximalPlaneNumber = 1;
-
 
   };
 

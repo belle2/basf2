@@ -107,10 +107,6 @@ namespace Belle2 {
     int extLayerPattern;
     //! MUID: accumulated bit pattern of layers with matching hits
     int hitLayerPattern;
-    //! MUID: vector of BKLM layer efficiencies
-    std::vector<float> extBKLMEfficiencyVector;
-    //! MUID: vector of EKLM layer efficiencies
-    //    std::vector<float> extEKLMEfficiencyVector;
     //! MUID: flag to indicate that the extrapolated track escaped from the KLM
     bool escaped;
   };
@@ -303,7 +299,7 @@ namespace Belle2 {
                       const std::pair<ECLCluster*, G4ThreeVector>&, double, double);
 
     //! Create another MUID extrapolation hit for a track candidate
-    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, std::vector<std::map<const Track*, double> >*);
+    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, Muid*, std::vector<std::map<const Track*, double> >*);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(ExtState&, const G4ThreeVector&, Intersection&);

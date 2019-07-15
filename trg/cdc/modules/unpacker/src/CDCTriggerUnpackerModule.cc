@@ -340,7 +340,7 @@ namespace Belle2 {
               cc(3) & tsfs(3)(209 downto 0) &
               cc(2) & tsfs(2)(209 downto 0) &
               cc(1) & tsfs(1)(209 downto 0) &
-              cc(4) & tsfs(0)(209 downto 0) &
+              cc(0) & tsfs(0)(209 downto 0) &
             */
             // fill the cc and TS hit
             offsetBitWidth = 64;

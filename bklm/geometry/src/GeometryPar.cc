@@ -402,7 +402,7 @@ namespace Belle2 {
         B2INFO("BKLM::GeometryPar: DoBeamBackgroundStudy is enabled");
         m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
       } else {
-        B2DEBUG(1, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
+        B2DEBUG(20, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
       }
       m_Gap1ActualHeight = m_Gap1NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
       m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);

@@ -5,7 +5,6 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
-
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
 #include <trg/ecl/TrgEclCluster.h>
@@ -75,7 +74,8 @@ namespace Belle2 {
     TH1* h_Cal_TRGTiming;
     //! ECL Trigger Bit
     TH1* h_ECL_TriggerBit;
-
+    //! Energy sum of 2 Top energetic clusters when 3D bhabnha bit on
+    TH1* h_Cluster_Energy_Sum;
 
 
     //! Hit TCId

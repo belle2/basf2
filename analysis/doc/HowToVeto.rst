@@ -33,17 +33,17 @@ Here we use the worked example of a veto for background photons from a :math:`\p
 
 #. Reconstruct signal decay candidates
     * this includes filling of final-state particle lists, making combinations, performing vertex fits, applying cuts, etc...
-#. Create a `RestOfEvent` object for each signal candidate
-#. Create new `basf2.Path` to be executed for each `RestOfEvent` object in the event (one for each signal candidate)
+#. Create a :doc:`RestOfEvent` object for each signal candidate
+#. Create new `basf2.Path` to be executed for each :doc:`RestOfEvent` object in the event (one for each signal candidate)
 
    .. warning:: 
-        It is important to check if the current `RestOfEvent` object is related to a Particle from our signal ParticleList. 
-        This is a subtlety, but you may find unrelated `RestOfEvent` objects in the `DataStore` (from some other decay mode).
-        In this case we simply skip the `RestOfEvent` by executing a *so called* "dead end" path.
+        It is important to check if the current :doc:`RestOfEvent` object is related to a Particle from our signal ParticleList. 
+        This is a subtlety, but you may find unrelated :doc:`RestOfEvent` objects in the DataStore (from some other decay mode).
+        In this case we simply skip the :doc:`RestOfEvent` by executing a *so called* "dead end" path.
         
      
-#. Fill a `ParticleList` with all (or selected) photons from the `RestOfEvent`
-#. Fill a `ParticleList` with signal photon candidates which is used in the reconstruction of the current signal side candidate (related to current `RestOfEvent`)
+#. Fill a `ParticleList`_ with all (or selected) photons from the :doc:`RestOfEvent`
+#. Fill a `ParticleList`_ with signal photon candidates which is used in the reconstruction of the current signal side candidate (related to current :doc:`RestOfEvent`)
 #. Combine the two lists to form pi0 candidates
 #. Use TMVA or any other method to determine the probability or likelihood that signal photon originates from :math:`\pi^0` decay
 #. Select the best :math:`\pi^0` candidate
@@ -52,9 +52,11 @@ Here we use the worked example of a veto for background photons from a :math:`\p
     * continuum suppression, flavour tagging, tag vertex, etc...
 #. Fill flat `ntuple for offline analysis <v2nt>`.
 
-All analysis actions coloured in blue are executed once per event and all coloured in green are executed once per each `RestOfEvent` object in the event. The analysis actions coloured with green together construct a veto.
+All analysis actions coloured in blue are executed once per event and all coloured in green are executed once per each :doc:`RestOfEvent` object in the event. The analysis actions coloured with green together construct a veto.
 
 .. seealso:: This is an important usecase of the `basf2.Path.for_each` functionality.
+
+.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 
 Examples
 --------
@@ -63,7 +65,7 @@ Examples
 The code is taken from an existing tutorial: :code:`B2A306-B02RhoGamma-withPi0Veto.py`
 
 1. The B0 -> rho0 gamma candidates are reconstructed and collected in the ParticleList with name B0.
-2. Create `RestOfEvent` objects
+2. Create :doc:`RestOfEvent` objects
 
 .. code-block:: python
 
@@ -86,21 +88,21 @@ In next steps the veto is constructed. In this example the veto works in the fol
 * find best pi0 candidate with invariant mass closest to :math:`\pi^0`'s nominal mass
 * write value of invariant mass of the best :math:`\pi^0` as 'pi0veto' extraInfo
 
-o. check if `RestOfEvent` is related to any Particle from :code:`B0` list
+o. check if :doc:`RestOfEvent` is related to any Particle from :code:`B0` list
 
 .. code-block:: python
 
     signalSideParticleFilter('B0', '', roe_path, deadEndPath)  
  
 
-4. fill ParticleList with all photons that have 'E>0.050' from `RestOfEvent` (using isInRestOfEvent variable)
+4. fill ParticleList with all photons that have 'E>0.050' from :doc:`RestOfEvent` (using isInRestOfEvent variable)
 
 .. code-block:: python
 
     fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and E > 0.050', path=roe_path)
  
 
-5. fill ParticleList with signal photon candidate which is used in the reconstruction of the current signal side candidate (related to current `RestOfEvent`)
+5. fill ParticleList with signal photon candidate which is used in the reconstruction of the current signal side candidate (related to current :doc:`RestOfEvent`)
 
 .. code-block:: python
 
@@ -141,5 +143,5 @@ o. check if `RestOfEvent` is related to any Particle from :code:`B0` list
 
     printVariableValues('B0', ['pi0veto'], path=mymainpath)
 
-If the signal photon candidate could not be paired with any other photon candidate from the `RestOfEvent` to form a :math:`\pi^0` candidate, then ``extraInfo(pi0veto) = -999``.
+If the signal photon candidate could not be paired with any other photon candidate from the :doc:`RestOfEvent` to form a :math:`\pi^0` candidate, then ``extraInfo(pi0veto) = -999``.
 

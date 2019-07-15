@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMANA_H
-#define BKLMANA_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -148,5 +147,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //MODULEBKLMANA_H 

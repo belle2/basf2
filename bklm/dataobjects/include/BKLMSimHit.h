@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMSIMHIT_H
-#define BKLMSIMHIT_H
+#pragma once
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <framework/datastore/RelationsObject.h>
@@ -129,5 +128,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //BKLMSIMHIT_H

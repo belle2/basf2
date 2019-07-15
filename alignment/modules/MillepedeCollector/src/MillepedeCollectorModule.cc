@@ -1521,3 +1521,17 @@ TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::Measu
   return J_pM_5x6.T();
 
 }
+
+tuple<TVectorD, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() const
+{
+  DBObjPtr<BeamSpot> beam;
+
+  TVectorD pos(3);
+  pos[0] = beam->getVertex()[0];
+  pos[1] = beam->getVertex()[1];
+  pos[2] = beam->getVertex()[2];
+
+  TMatrixDSym size = beam->getSize();
+
+  return {pos, size};
+}

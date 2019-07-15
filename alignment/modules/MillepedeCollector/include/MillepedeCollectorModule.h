@@ -96,6 +96,13 @@ namespace Belle2 {
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
+    /** Get the primary vertex position estimation and its size
+     *  from BeamSpot
+     @return tuple<TVectorD, TMatrixDSym> tuple with position and size as covariance matrix
+     */
+    std::tuple<TVectorD, TMatrixDSym> getPrimaryVertexAndCov() const;
+
+
   private:
     /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;

@@ -24,7 +24,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/Track.h>
 
 #include <alignment/GlobalLabel.h>
@@ -409,7 +409,7 @@ void MillepedeCollectorModule::collect()
           derivatives(2, 2) = 1.;
 
           std::vector<int> labels;
-          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          GlobalLabel label = GlobalLabel::construct<BeamSpot>(0, 0);
           labels.push_back(label.setParameterId(1));
           labels.push_back(label.setParameterId(2));
           labels.push_back(label.setParameterId(3));
@@ -792,7 +792,7 @@ void MillepedeCollectorModule::collect()
           derivatives(0, 0) = 1.;
           derivatives(1, 1) = 1.;
           derivatives(2, 2) = 1.;
-          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          GlobalLabel label = GlobalLabel::construct<BeamSpot>(0, 0);
           labels.push_back(label.setParameterId(1));
           labels.push_back(label.setParameterId(2));
           labels.push_back(label.setParameterId(3));
@@ -807,7 +807,7 @@ void MillepedeCollectorModule::collect()
           derivatives(4, 4) = mother->getMomentumMagnitude();
           derivatives(8, 5) = (beam->getLER().E() + beam->getHER().E()) / beam->getMass();
 
-          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          GlobalLabel label = GlobalLabel::construct<BeamSpot>(0, 0);
           labels.push_back(label.setParameterId(4)); //theta_x
           labels.push_back(label.setParameterId(5)); //theta_y
           labels.push_back(label.setParameterId(6)); //E

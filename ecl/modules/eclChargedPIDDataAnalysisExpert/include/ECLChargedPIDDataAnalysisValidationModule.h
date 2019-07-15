@@ -77,16 +77,6 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
-    /**
-     * Compute PID efficiency vs clusterTheta, clusterPhi, p... for a fixed cut on PID as speciified below.
-     */
-    void computePIDEfficiency();
-
-    /**
-     * Compute track-to-ECL-cluster matching efficiency vs clusterTheta, clusterPhi, p....
-     */
-    void computeMatchingEfficiency();
-
   private:
 
     /**
@@ -96,59 +86,66 @@ namespace Belle2 {
     static constexpr float c_PID = 0.5;
 
     /**
-     * Output ROOT file used for storing info.
+     * The maximal number of charged stable particle hypotheses.
+     * this takes particles & antiparticles into account.
      */
-    TFile* m_outputFile = nullptr;
+    static constexpr unsigned int c_chargedStableHypos = 2 * Const::ChargedStable::c_SetSize;
 
     /**
-     * Name of the output ROOT file.
+     * The pdgId list of the charged stable particles of interest.
+     */
+    std::vector<int> m_inputPdgIdList;
+
+    /**
+     * The pdgIds of the charged stable particles of interest.
+     * Make it a std::set to ensure its elements are unique.
+     */
+    std::set<int> m_inputPdgIdSet;
+
+    /**
+     * Output ROOT file used for storing info.
+     */
+    std::vector<TFile*> m_outputFile = std::vector<TFile*>(c_chargedStableHypos);
+
+    /**
+     * Base name of the output ROOT file.
      */
     std::string m_outputFileName;
 
     /**
-     *The pdgId of the charged stable particle of interest.
-     */
-    int m_inputPdgId;
-
-    /**
-     *The pdgId (as a string) of the charged stable particle of interest.
-     */
-    std::string m_inputPdgIdStr;
-
-    /**
      * TTree.
      */
-    TTree* m_tree = nullptr;
+    std::vector<TTree*> m_tree = std::vector<TTree*>(c_chargedStableHypos);
 
     /**
      * Track momentum in [GeV/c].
      */
-    float m_p;
+    std::vector<float> m_p = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Track polar angle in [rad].
      */
-    float m_trkTheta;
+    std::vector<float> m_trkTheta = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Track azimuthal angle in [rad].
      */
-    float m_trkPhi;
+    std::vector<float> m_trkPhi = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Cluster polar angle in [rad].
      */
-    float m_clusterTheta;
+    std::vector<float> m_clusterTheta = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Cluster azimuthal angle in [rad].
      */
-    float m_clusterPhi;
+    std::vector<float> m_clusterPhi = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Track has matching ECL cluster.
      */
-    char m_trackClusterMatch;
+    std::vector<char> m_trackClusterMatch = std::vector<char>(c_chargedStableHypos);
 
     /**
      * Global PID as likelihod ratio:
@@ -157,7 +154,7 @@ namespace Belle2 {
      *
      * for the m_inputPdgId particle hypothesis.
      */
-    float m_pid;
+    std::vector<float> m_pid = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Binning w/ variable bin size for track momentum (in [GeV/c]).
@@ -171,6 +168,23 @@ namespace Belle2 {
      */
     std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057, 3.1415926};
 
+    /**
+     * Compute PID efficiency vs clusterTheta, clusterPhi, p... for a fixed cut on PID as previously initialised.
+     */
+    void computePIDEfficiency(TTree* tree, const std::string& pdgIdStr);
+
+    /**
+     * Compute track-to-ECL-cluster matching efficiency vs clusterTheta, clusterPhi, p....
+     */
+    void computeMatchingEfficiency(TTree* tree, const std::string& pdgIdStr);
+
+    /**
+     * Check if the input pdgId is that of a valid charged particle.
+     */
+    bool isValidChargedPdg(const int pdg) const
+    {
+      return (Const::chargedStableSet.find(pdg) != Const::invalidParticle);
+    }
+
   };
 }
-

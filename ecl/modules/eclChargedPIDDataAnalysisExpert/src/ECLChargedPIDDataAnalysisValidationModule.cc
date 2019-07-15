@@ -16,12 +16,21 @@ ECLChargedPIDDataAnalysisValidationModule::ECLChargedPIDDataAnalysisValidationMo
 {
   // Set module properties
   setDescription("This module dumps a set of histograms with ECL charged PID-related info used for validation.");
-  addParam("inputPdgId", m_inputPdgId,
-           "The pdgId of the charged stable particle of interest.",
-           int(0));
+
+  // Default charged stable pdgIds (particles & antiparticles)
+  std::vector<int> defaultChargedPdgIds;
+  for (const auto& hypo : Const::chargedStableSet) {
+    defaultChargedPdgIds.push_back(hypo.getPDGCode());
+    defaultChargedPdgIds.push_back(-hypo.getPDGCode());
+  }
+
+  addParam("inputPdgIdList", m_inputPdgIdList,
+           "The list of (signed) pdgIds of the charged stable particles of interest. Default is ALL charged stable particles.",
+           defaultChargedPdgIds);
   addParam("outputFileName", m_outputFileName,
-           "The name of the output file.",
+           "The base name of the output file. The pdgId of the charged particle is appended to the name.",
            std::string("ECLChargedPid"));
+
 }
 
 ECLChargedPIDDataAnalysisValidationModule::~ECLChargedPIDDataAnalysisValidationModule()
@@ -33,25 +42,44 @@ void ECLChargedPIDDataAnalysisValidationModule::initialize()
 {
   B2INFO("Initialising ROOT objects...");
 
-  if (m_inputPdgId > 0) {
-    m_inputPdgIdStr = std::to_string(m_inputPdgId);
-  } else {
-    m_inputPdgIdStr = "anti" + std::to_string(std::abs(m_inputPdgId));
+  // Convert pdgId list to a set to remove any accidental repetitions.
+  m_inputPdgIdSet = std::set<int>(m_inputPdgIdList.begin(), m_inputPdgIdList.end());
+
+  std::string chargedPdgIdStr;
+  std::string fname;
+
+  for (const auto& chargedPdgId : m_inputPdgIdSet) {
+
+    // Check if this pdgId is that of a legit Const::ChargedStable particle.
+    if (!isValidChargedPdg(std::abs(chargedPdgId))) {
+      B2FATAL("PDG: " << chargedPdgId << " in m_inputPdgIdSet is not that of a valid particle in Const::chargedStableSet! Aborting...");
+    }
+
+    // Get the idx of this pdgId in the Const::chargedStableSet
+    auto chargedIdx = Const::chargedStableSet.find(std::abs(chargedPdgId)).getIndex();
+
+    if (chargedPdgId > 0) {
+      chargedPdgIdStr = std::to_string(chargedPdgId);
+    } else {
+      chargedPdgIdStr = "anti" + std::to_string(std::abs(chargedPdgId));
+      // Add offset to idx.
+      chargedIdx += Const::ChargedStable::c_SetSize;
+    }
+
+    fname = m_outputFileName + "_" + chargedPdgIdStr + ".root";
+
+    m_outputFile[chargedIdx] = new TFile(fname.c_str(), "RECREATE");
+
+    m_tree[chargedIdx] = new TTree("ECLChargedPid", "ECLChargedPid");
+    m_tree[chargedIdx]->Branch("p", &m_p[chargedIdx], "p/F");
+    m_tree[chargedIdx]->Branch("trkTheta", &m_trkTheta[chargedIdx], "trkTheta/F");
+    m_tree[chargedIdx]->Branch("trkPhi", &m_trkPhi[chargedIdx], "trkPhi/F");
+    m_tree[chargedIdx]->Branch("clusterTheta", &m_clusterTheta[chargedIdx], "clusterTheta/F");
+    m_tree[chargedIdx]->Branch("clusterPhi", &m_clusterPhi[chargedIdx], "clusterPhi/F");
+    m_tree[chargedIdx]->Branch("trackClusterMatch", &m_trackClusterMatch[chargedIdx], "trackClusterMatch/B");
+    m_tree[chargedIdx]->Branch("pid", &m_pid[chargedIdx], "pid/F");
+
   }
-
-  std::string fname = m_outputFileName + "_" + m_inputPdgIdStr + ".root";
-
-  m_outputFile = new TFile(fname.c_str(), "RECREATE");
-
-  m_tree = new TTree("ECLChargedPid", "ECLChargedPid");
-  m_tree->Branch("p", &m_p, "p/F");
-  m_tree->Branch("trkTheta", &m_trkTheta, "trkTheta/F");
-  m_tree->Branch("trkPhi", &m_trkPhi, "trkPhi/F");
-  m_tree->Branch("clusterTheta", &m_clusterTheta, "clusterTheta/F");
-  m_tree->Branch("clusterPhi", &m_clusterPhi, "clusterPhi/F");
-  m_tree->Branch("trackClusterMatch", &m_trackClusterMatch, "trackClusterMatch/B");
-  m_tree->Branch("pid", &m_pid, "pid/F");
-
 }
 
 void ECLChargedPIDDataAnalysisValidationModule::beginRun()
@@ -61,85 +89,97 @@ void ECLChargedPIDDataAnalysisValidationModule::beginRun()
 void ECLChargedPIDDataAnalysisValidationModule::event()
 {
 
-  // Initialise branches to unphysical values.
-  m_p = -1.0;
-  m_trkTheta = -1.0;
-  m_trkPhi = -4.0;
-  m_clusterTheta = -1.0;
-  m_clusterPhi = -4.0;
-  m_trackClusterMatch = -1;
-  m_pid = -1.0;
+  std::string chargedPdgIdStr;
 
-  StoreArray<MCParticle> particles;
+  for (const auto& chargedPdgId : m_inputPdgIdSet) {
 
-  for (const auto& particle : particles) {
+    // Get the idx of this pdgId in the Const::chargedStableSet
+    auto chargedIdx = Const::chargedStableSet.find(std::abs(chargedPdgId)).getIndex();
 
-    if (!particle.hasStatus(MCParticle::c_PrimaryParticle)) continue; // Only check primaries.
-    if (particle.hasStatus(MCParticle::c_Initial)) continue; // Ignore initial particles.
-    if (particle.hasStatus(MCParticle::c_IsVirtual)) continue; // Ignore virtual particles.
+    if (chargedPdgId < 0) {
+      // Add offset to idx.
+      chargedIdx += Const::ChargedStable::c_SetSize;
+    }
 
-    // Skip all particles expect for the one of interest.
-    if (particle.getPDG() != m_inputPdgId) continue;
+    // Initialise branches to unphysical values.
+    m_p[chargedIdx] = -1.0;
+    m_trkTheta[chargedIdx] = -1.0;
+    m_trkPhi[chargedIdx] = -4.0;
+    m_clusterTheta[chargedIdx] = -1.0;
+    m_clusterPhi[chargedIdx] = -4.0;
+    m_trackClusterMatch[chargedIdx] = -1;
+    m_pid[chargedIdx] = -1.0;
 
-    // Get the matching track w/ max momentum.
-    int itrack(0);
-    int itrack_max(-1);
-    double p_max(-999.0);
-    for (const auto& track : particle.getRelationsFrom<Track>()) {
-      const auto fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
-      if (!fitRes) continue;
-      if (fitRes->getMomentum().Mag() > p_max) {
-        p_max = fitRes->getMomentum().Mag();
-        itrack_max = itrack;
+    StoreArray<MCParticle> particles;
+
+    for (const auto& particle : particles) {
+
+      if (!particle.hasStatus(MCParticle::c_PrimaryParticle)) continue; // Only check primaries.
+      if (particle.hasStatus(MCParticle::c_Initial)) continue; // Ignore initial particles.
+      if (particle.hasStatus(MCParticle::c_IsVirtual)) continue; // Ignore virtual particles.
+
+      // Skip all particles expect for the one of interest.
+      if (particle.getPDG() != chargedPdgId) continue;
+
+      // Get the matching track w/ max momentum.
+      int itrack(0);
+      int itrack_max(-1);
+      double p_max(-999.0);
+      for (const auto& track : particle.getRelationsFrom<Track>()) {
+        const auto fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
+        if (!fitRes) continue;
+        if (fitRes->getMomentum().Mag() > p_max) {
+          p_max = fitRes->getMomentum().Mag();
+          itrack_max = itrack;
+        }
+        itrack++;
       }
-      itrack++;
+      if (itrack_max < 0) continue; // Go to next particle if no track found.
+
+      const auto track = particle.getRelationsFrom<Track>()[itrack_max];
+      const auto fitRes = track->getTrackFitResultWithClosestMass(Const::pion);
+
+      m_p[chargedIdx] = p_max;
+      m_trkTheta[chargedIdx] = fitRes->get4Momentum().Theta();
+      m_trkPhi[chargedIdx] = fitRes->get4Momentum().Phi();
+
+      // Get the ECL cluster matching this track.
+      int icluster_match(-1);
+      auto eclClusters = track->getRelationsTo<ECLCluster>();
+      for (unsigned int icluster(0); icluster < eclClusters.size(); ++icluster) {
+        const auto eclCluster = eclClusters[icluster];
+        if (!eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+        if (!eclCluster->isTrack()) continue;
+        icluster_match = icluster;
+        break;
+      }
+      // If no cluster match, skip to next particle, but keep track of counter.
+      if (icluster_match < 0) {
+        m_trackClusterMatch[chargedIdx] = 0;
+        continue;
+      }
+
+      const auto eclCluster = eclClusters[icluster_match];
+
+      m_clusterTheta[chargedIdx] = eclCluster->getTheta();
+      m_clusterPhi[chargedIdx] = eclCluster->getPhi();
+      m_trackClusterMatch[chargedIdx] = 1;
+
+      const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
+
+      double lh_sig = eclLikelihood->getLikelihood(Const::chargedStableSet.find(std::abs(chargedPdgId)));
+
+      double lh_all(0);
+      for (const auto& chargedStable : Const::chargedStableSet) {
+        lh_all += eclLikelihood->getLikelihood(chargedStable);
+      }
+
+      m_pid[chargedIdx] = lh_sig / lh_all;
+
     }
-    if (itrack_max < 0) continue; // Go to next particle if no track found.
 
-    const auto track = particle.getRelationsFrom<Track>()[itrack_max];
-    const auto fitRes = track->getTrackFitResultWithClosestMass(Const::pion);
-
-    m_p = p_max;
-    m_trkTheta = fitRes->get4Momentum().Theta();
-    m_trkPhi = fitRes->get4Momentum().Phi();
-
-    // Get the ECL cluster matching this track.
-    int icluster_match(-1);
-    auto eclClusters = track->getRelationsTo<ECLCluster>();
-    for (unsigned int icluster(0); icluster < eclClusters.size(); ++icluster) {
-      const auto eclCluster = eclClusters[icluster];
-      if (!eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
-      if (!eclCluster->isTrack()) continue;
-      icluster_match = icluster;
-      break;
-    }
-    // If no cluster match, skip to next particle, but keep track of counter.
-    if (icluster_match < 0) {
-      m_trackClusterMatch = 0;
-      continue;
-    }
-
-    const auto eclCluster = eclClusters[icluster_match];
-
-    m_clusterTheta = eclCluster->getTheta();
-    m_clusterPhi = eclCluster->getPhi();
-    m_trackClusterMatch = 1;
-
-    const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
-
-    double lh_sig = eclLikelihood->getLikelihood(Const::chargedStableSet.find(std::abs(m_inputPdgId)));
-
-    double lh_all(0);
-    for (const auto& chargedStable : Const::chargedStableSet) {
-      lh_all += eclLikelihood->getLikelihood(chargedStable);
-    }
-
-    m_pid = lh_sig / lh_all;
-
+    m_tree[chargedIdx]->Fill();
   }
-
-  m_tree->Fill();
-
 }
 
 void ECLChargedPIDDataAnalysisValidationModule::endRun()
@@ -149,28 +189,51 @@ void ECLChargedPIDDataAnalysisValidationModule::endRun()
 void ECLChargedPIDDataAnalysisValidationModule::terminate()
 {
 
-  computePIDEfficiency();
-  computeMatchingEfficiency();
+  std::string chargedPdgIdStr;
 
-  m_outputFile->cd();
-  m_tree->Write();
-  m_outputFile->Close();
+  for (const auto& chargedPdgId : m_inputPdgIdSet) {
+
+    // Get the idx of this pdgId in the Const::chargedStableSet
+    auto chargedIdx = Const::chargedStableSet.find(std::abs(chargedPdgId)).getIndex();
+
+    if (chargedPdgId > 0) {
+      chargedPdgIdStr = std::to_string(chargedPdgId);
+    } else {
+      chargedPdgIdStr = "anti" + std::to_string(std::abs(chargedPdgId));
+      // Add offset to idx.
+      chargedIdx += Const::ChargedStable::c_SetSize;
+    }
+
+    m_outputFile[chargedIdx]->cd();
+
+    computePIDEfficiency(m_tree[chargedIdx], chargedPdgIdStr);
+    computeMatchingEfficiency(m_tree[chargedIdx], chargedPdgIdStr);
+
+    m_tree[chargedIdx]->Write();
+
+    m_outputFile[chargedIdx]->Close();
+
+  }
 }
 
 
-void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency()
+void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency(TTree* tree, const std::string& pdgIdStr)
 {
 
-  m_outputFile->cd();
+  std::string h_p_N_name = "h_pid_p_N_" + pdgIdStr;
+  std::string h_p_D_name = "h_pid_p_D_" + pdgIdStr;
+  TH1F* h_p_N = new TH1F(h_p_N_name.c_str(), "h_pid_p_N", m_p_binedges.size() - 1, m_p_binedges.data());
+  TH1F* h_p_D = new TH1F(h_p_D_name.c_str(), "h_pid_p_D", m_p_binedges.size() - 1, m_p_binedges.data());
 
-  TH1F* h_p_N = new TH1F("h_p_N", "h_p_N", m_p_binedges.size() - 1, m_p_binedges.data());
-  TH1F* h_p_D = new TH1F("h_p_D", "h_p_D", m_p_binedges.size() - 1, m_p_binedges.data());
+  std::string h_th_N_name = "h_pid_th_N_" + pdgIdStr;
+  std::string h_th_D_name = "h_pid_th_D_" + pdgIdStr;
+  TH1F* h_th_N = new TH1F(h_th_N_name.c_str(), "h_pid_th_N", m_th_binedges.size() - 1, m_th_binedges.data());
+  TH1F* h_th_D = new TH1F(h_th_D_name.c_str(), "h_pid_th_D", m_th_binedges.size() - 1, m_th_binedges.data());
 
-  TH1F* h_th_N = new TH1F("h_th_N", "h_th_N", m_th_binedges.size() - 1, m_th_binedges.data());
-  TH1F* h_th_D = new TH1F("h_th_D", "h_th_D", m_th_binedges.size() - 1, m_th_binedges.data());
-
-  TH1F* h_phi_N = new TH1F("h_phi_N", "h_phi_N", 60, -3.14159, 3.14159);
-  TH1F* h_phi_D = new TH1F("h_phi_D", "h_phi_D", 60, -3.14159, 3.14159);
+  std::string h_phi_N_name = "h_pid_phi_N_" + pdgIdStr;
+  std::string h_phi_D_name = "h_pid_phi_D_" + pdgIdStr;
+  TH1F* h_phi_N = new TH1F(h_phi_N_name.c_str(), "h_pid_phi_N", 60, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F(h_phi_D_name.c_str(), "h_pid_phi_D", 60, -3.14159, 3.14159);
 
   // Just to get rid of warnings.
   h_p_N = h_p_N;
@@ -182,20 +245,20 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency()
 
   std::string pid_cut = "pid > " + std::to_string(c_PID);
 
-  m_tree->Project("h_p_N", "p", pid_cut.c_str());
-  m_tree->Project("h_p_D", "p");
+  tree->Project(h_p_N_name.c_str(), "p", pid_cut.c_str());
+  tree->Project(h_p_D_name.c_str(), "p");
 
-  m_tree->Project("h_th_N", "clusterTheta", pid_cut.c_str());
-  m_tree->Project("h_th_D", "clusterTheta");
+  tree->Project(h_th_N_name.c_str(), "clusterTheta", pid_cut.c_str());
+  tree->Project(h_th_D_name.c_str(), "clusterTheta");
 
-  m_tree->Project("h_phi_N", "clusterPhi", pid_cut.c_str());
-  m_tree->Project("h_phi_D", "clusterPhi");
+  tree->Project(h_phi_N_name.c_str(), "clusterPhi", pid_cut.c_str());
+  tree->Project(h_phi_D_name.c_str(), "clusterPhi");
 
   // Compute the efficiency.
 
-  std::string pid_eff_p_name = "pid_eff_" + m_inputPdgIdStr + "__VS_p";
-  std::string pid_eff_th_name = "pid_eff_" + m_inputPdgIdStr + "__VS_th";
-  std::string pid_eff_phi_name = "pid_eff_" + m_inputPdgIdStr + "__VS_phi";
+  std::string pid_eff_p_name = "pid_eff_" + pdgIdStr + "__VS_p";
+  std::string pid_eff_th_name = "pid_eff_" + pdgIdStr + "__VS_th";
+  std::string pid_eff_phi_name = "pid_eff_" + pdgIdStr + "__VS_phi";
 
   // Use TH1::Divide with binomial errors.
   TH1F* h_pid_eff_p = dynamic_cast<TH1F*>(h_p_N->Clone(pid_eff_p_name.c_str()));
@@ -252,7 +315,6 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency()
     tpid_eff_th->SetStatisticOption(TEfficiency::kBUniform);
     tpid_eff_th->SetPosteriorMode();
 
-    m_outputFile->cd();
     tpid_eff_th->Write();
 
   }
@@ -266,25 +328,29 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency()
     tpid_eff_phi->SetStatisticOption(TEfficiency::kBUniform);
     tpid_eff_phi->SetPosteriorMode();
 
-    m_outputFile->cd();
     tpid_eff_phi->Write();
 
   }
 
 }
 
-void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency()
+void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency(TTree* tree, const std::string& pdgIdStr)
 {
-  m_outputFile->cd();
 
-  TH1F* h_p_N = new TH1F("h_p_N", "h_p_N", 50, 0.0, 5.0);
-  TH1F* h_p_D = new TH1F("h_p_D", "h_p_D", 50, 0.0, 5.0);
+  std::string h_p_N_name = "h_trkclusmatch_p_N_" + pdgIdStr;
+  std::string h_p_D_name = "h_trkclusmatch_p_D_" + pdgIdStr;
+  TH1F* h_p_N = new TH1F(h_p_N_name.c_str(), "h_trkclusmatch_p_N", 50, 0.0, 5.0);
+  TH1F* h_p_D = new TH1F(h_p_D_name.c_str(), "h_trkclusmatch_p_D", 50, 0.0, 5.0);
 
-  TH1F* h_th_N = new TH1F("h_th_N", "h_th_N", m_th_binedges.size() - 1, m_th_binedges.data());
-  TH1F* h_th_D = new TH1F("h_th_D", "h_th_D", m_th_binedges.size() - 1, m_th_binedges.data());
+  std::string h_th_N_name = "h_trkclusmatch_th_N_" + pdgIdStr;
+  std::string h_th_D_name = "h_trkclusmatch_th_D_" + pdgIdStr;
+  TH1F* h_th_N = new TH1F(h_th_N_name.c_str(), "h_trkclusmatch_th_N", m_th_binedges.size() - 1, m_th_binedges.data());
+  TH1F* h_th_D = new TH1F(h_th_D_name.c_str(), "h_trkclusmatch_th_D", m_th_binedges.size() - 1, m_th_binedges.data());
 
-  TH1F* h_phi_N = new TH1F("h_phi_N", "h_phi_N", 60, -3.14159, 3.14159);
-  TH1F* h_phi_D = new TH1F("h_phi_D", "h_phi_D", 60, -3.14159, 3.14159);
+  std::string h_phi_N_name = "h_trkclusmatch_phi_N_" + pdgIdStr;
+  std::string h_phi_D_name = "h_trkclusmatch_phi_D_" + pdgIdStr;
+  TH1F* h_phi_N = new TH1F(h_phi_N_name.c_str(), "h_trkclusmatch_phi_N", 60, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F(h_phi_D_name.c_str(), "h_trkclusmatch_phi_D", 60, -3.14159, 3.14159);
 
   // Just to get rid of warnings.
   h_p_N = h_p_N;
@@ -297,20 +363,20 @@ void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency()
   std::string match_cut_N = "trackClusterMatch == 1";
   std::string match_cut_D = "trackClusterMatch >= 0";
 
-  m_tree->Project("h_p_N", "p", match_cut_N.c_str());
-  m_tree->Project("h_p_D", "p", match_cut_D.c_str());
+  tree->Project(h_p_N_name.c_str(), "p", match_cut_N.c_str());
+  tree->Project(h_p_D_name.c_str(), "p", match_cut_D.c_str());
 
-  m_tree->Project("h_th_N", "trkTheta", match_cut_N.c_str());
-  m_tree->Project("h_th_D", "trkTheta", match_cut_D.c_str());
+  tree->Project(h_th_N_name.c_str(), "trkTheta", match_cut_N.c_str());
+  tree->Project(h_th_D_name.c_str(), "trkTheta", match_cut_D.c_str());
 
-  m_tree->Project("h_phi_N", "trkPhi", match_cut_N.c_str());
-  m_tree->Project("h_phi_D", "trkPhi", match_cut_D.c_str());
+  tree->Project(h_phi_N_name.c_str(), "trkPhi", match_cut_N.c_str());
+  tree->Project(h_phi_D_name.c_str(), "trkPhi", match_cut_D.c_str());
 
   // Compute the efficiency.
 
-  std::string match_eff_p_name = "match_eff_" + m_inputPdgIdStr + "__VS_p";
-  std::string match_eff_th_name = "match_eff_" + m_inputPdgIdStr + "__VS_th";
-  std::string match_eff_phi_name = "match_eff_" + m_inputPdgIdStr + "__VS_phi";
+  std::string match_eff_p_name = "trkclusmatch_eff_" + pdgIdStr + "__VS_p";
+  std::string match_eff_th_name = "trkclusmatch_eff_" + pdgIdStr + "__VS_th";
+  std::string match_eff_phi_name = "trkclusmatch_eff_" + pdgIdStr + "__VS_phi";
 
   // Use TH1::Divide with binomial errors.
   TH1F* h_match_eff_p = dynamic_cast<TH1F*>(h_p_N->Clone(match_eff_p_name.c_str()));

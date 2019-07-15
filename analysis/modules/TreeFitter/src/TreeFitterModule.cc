@@ -24,7 +24,7 @@
 
 #include <framework/geometry/BFieldManager.h>
 
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
 #include <framework/particledb/EvtGenDatabasePDG.h>
@@ -100,15 +100,7 @@ void TreeFitterModule::initialize()
       TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
       m_massConstraintList.push_back(particletemp->PdgCode());
     }
-    TreeFitter::massConstraintListPDG = m_massConstraintList;
-  } else {
-    TreeFitter::massConstraintListPDG = m_massConstraintList;
   }
-
-  TreeFitter::geoConstraintListPDG = m_geoConstraintListPDG;
-  TreeFitter::fixedToMotherVertexListPDG = m_fixedToMotherVertexListPDG;
-
-
 }
 
 void TreeFitterModule::beginRun()
@@ -164,23 +156,28 @@ void TreeFitterModule::terminate()
 
 bool TreeFitterModule::fitTree(Belle2::Particle* head)
 {
+  const TreeFitter::ConstraintConfiguration constrConfig(
+    m_massConstraintType,
+    m_massConstraintList,
+    m_fixedToMotherVertexListPDG,
+    m_geoConstraintListPDG,
+    m_removeConstraintList,
+    m_automatic_vertex_constraining,
+    m_ipConstraint,
+    m_customOrigin,
+    m_customOriginVertex,
+    m_customOriginCovariance
+  );
+
   std::unique_ptr<TreeFitter::FitManager> TreeFitter(
     new TreeFitter::FitManager(
       head,
+      constrConfig,
       m_precision,
-      m_ipConstraint,
-      m_customOrigin,
       m_updateDaughters,
-      m_customOriginVertex,
-      m_customOriginCovariance,
       m_useReferencing
     )
   );
-  /** TODO this is a bit of a hack. Make a config struct or so. */
-  //  TreeFitter::massConstraintListPDG = m_massConstraintList;
-  TreeFitter::massConstraintType = m_massConstraintType;
-  TreeFitter::removeConstraintList = m_removeConstraintList;
-  TreeFitter::automatic_vertex_constraining = m_automatic_vertex_constraining;
   bool rc = TreeFitter->fit();
   return rc;
 }

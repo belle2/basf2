@@ -17,7 +17,7 @@
 namespace TreeFitter {
 
 
-  FitParams::FitParams(int dim)
+  FitParams::FitParams(const int dim)
     : m_globalState(dim),
       m_globalCovariance(dim, dim),
       m_dim(dim),

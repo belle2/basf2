@@ -26,10 +26,8 @@ namespace TreeFitter {
 
     /** Constructor */
     Origin(Belle2::Particle* particle,
-           const bool forceFitAll,
-           const std::vector<double>& customOriginVertex,
-           const std::vector<double>& customOriginCovariance,
-           const bool isBeamSpot
+           const ConstraintConfiguration& config,
+           const bool forceFitAll
           );
 
     /** Constructor */

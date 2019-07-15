@@ -14,24 +14,21 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
-
 namespace TreeFitter {
 
   Origin::Origin(Belle2::Particle* daughter,
-                 bool forceFitAll,
-                 const std::vector<double>& customOriginVertex,
-                 const std::vector<double>& customOriginCovariance,
-                 const bool isBeamSpot
+                 const ConstraintConfiguration& config,
+                 bool forceFitAll
                 ) :
     ParticleBase("Origin"),
     m_constraintDimension(3),
-    m_customOriginVertex(customOriginVertex),
-    m_customOriginCovariance(customOriginCovariance),
+    m_customOriginVertex(config.m_customOriginVertex),
+    m_customOriginCovariance(config.m_customOriginCovariance),
     m_posVec(3),
     m_covariance(3, 3),
-    m_isBeamSpot(isBeamSpot)
+    m_isBeamSpot(config.m_ipConstraint)
   {
-    addDaughter(daughter, forceFitAll);
+    addDaughter(daughter, config, forceFitAll);
     initOrigin();
   }
 
@@ -79,7 +76,6 @@ namespace TreeFitter {
         B2WARNING("An element of customOriginCovariance diagonal is smaller than 0.");
         return ErrCode(ErrCode::Status::badsetup);
       }
-
       m_posVec(0) = m_customOriginVertex[0];
       m_posVec(1) = m_customOriginVertex[1];
       m_posVec(2) = m_customOriginVertex[2];

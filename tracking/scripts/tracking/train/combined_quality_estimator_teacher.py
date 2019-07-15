@@ -90,50 +90,43 @@ run::
 
     python3 combined_quality_estimator_teacher.py
 
-To add debugging information, you can add the ``--test`` parameter.  If you want
-to run it in ``--batch`` mode on an LSF batch system, you can refer to the
-`documentation <https://b2luigi.readthedocs.io/en/latest/usage/quickstart.html>`
-I usually like using the interactive luigi web interface which also visualizes
-the task graph while it is running.  Therefore, the scheduler daemon ``luigid``
-has to run in the background, which is located in ``~/.local/bin/luigid`` in
-case b2luigi had been installed with ``--user``.  For example, use a screen/tmux
-session and run::
+I usually use the interactive luigi web interface via the central scheduler
+which visualizes the task graph while it is running. Therefore, the scheduler
+daemon ``luigid`` has to run in the background, which is located in
+``~/.local/bin/luigid`` in case b2luigi had been installed with ``--user``. For
+example, run::
 
     luigid --port 8886
 
-Any other free port will do as well.  Then, execute your steering in another
-terminal / window with::
+Then, execute your steering (e.g. in another terminal) with::
 
     python3 combined_quality_estimator_teacher.py --scheduler-port 8886
 
-To view the interactive luigi interface, open your webbrowser enter into the url
-bar::
+To view the web interface, open your webbrowser enter into the url bar::
 
     localhost:8886
 
 If you don't run the steering file on the same machine on which you run your web
 browser, you have two options:
 
-    1. You can run the ``luigid`` scheduler locally and use the
-       ``--scheduler-host <your local machine>`` argument when calling the
-       steering file
-
-    2. I usually run both the steering file and ``luigid`` remotely and just use
-       ssh-port-forwarding to my local machine.  Therefore, I run on my local
+    1. Run both the steering file and ``luigid`` remotely and use
+       ssh-port-forwarding to your local host. Therefore, run on your local
        machine::
 
            ssh -N -f -L 8886:localhost:8886 <remote_user>@<remote_host>
 
+    2. Run the ``luigid`` scheduler locally and use the ``--scheduler-host <your
+       local host>`` argument when calling the steering file
+
 Accessing the results / output files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All output files are stored in a deep directory structure in the ``result_path``
-(see Configuration_).  The directory structure encodes the b2luigi parameters
-that were used to produce the respective output file.  This ensures
-reproducability and facilitates parameter optimizations.  Sometimes, it is hard
-to find the interesting output files.  You can view the whole directory
-structure by running ``tree <result_path>``.  You can use unix ``find`` to find
-the files that interest you, e.g.::
+All output files are stored in a directory structure in the ``result_path``. The
+directory tree encodes the used b2luigi parameters. This ensures reproducability
+and makes parameter searches easy. Sometimes, it is hard to find the relevant
+output files. You can view the whole directory structure by running ``tree
+<result_path>``. Ise the unix ``find`` command to find the files that interest
+you, e.g.::
 
     find <result_path> -name "*.pdf" # find all validation plot files
     find <result_path> -name "*.root" # find all ROOT files

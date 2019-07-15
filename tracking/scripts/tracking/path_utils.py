@@ -634,7 +634,7 @@ def add_vxd_track_finding_vxdtf2(
                                  0 means no cut. Default: 0
     :param filter_overlapping: Whether to use SVDOverlapResolver, Default: True
     :param use_vxdtf2_quality_estimator: Whether to use the MVA Quality Estimator, if weight file is
-    available.Default: False.
+           available. Default: False.
     """
     ##########################
     # some setting for VXDTF2

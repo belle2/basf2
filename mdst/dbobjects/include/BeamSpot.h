@@ -61,26 +61,26 @@ namespace Belle2 {
     }
 
     /** Get the interaction point position */
-    const TVector3& getVertex()
+    const TVector3& getVertex() const
     {
       return m_position;
     }
 
     /** Get the covariance matrix of the measured vertex position */
-    const TMatrixDSym& getPositionError()
+    const TMatrixDSym& getPositionError() const
     {
       return m_positionError;
     }
 
     /** Get the size of the luminous regione modeled as a gaussian */
-    const TMatrixDSym& getSize()
+    const TMatrixDSym& getSize() const
     {
       return m_size;
     }
 
     /** Get the covariance matrix of the vertex position
      * (for compatibility with BeamParameters)*/
-    const TMatrixDSym& getCovVertex()
+    const TMatrixDSym& getCovVertex() const
     {
       return getSize();
     }

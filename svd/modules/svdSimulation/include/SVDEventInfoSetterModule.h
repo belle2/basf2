@@ -38,14 +38,14 @@ namespace Belle2 {
 
     /** Initializes the Module.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Stores the SVD event info into the DataStore.
      *
      * Based on the parameters set by the user the current SVD event info
      * is calculated and stored into the DataStore.
      */
-    virtual void event();
+    virtual void event() override;
 
   private:
     StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr; /**< Output object. */

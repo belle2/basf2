@@ -6,9 +6,10 @@ combined_module_quality_estimator_teacher
 -----------------------------------------
 
 Purpose of this script: The track quality estimators
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This python script is used
-for the combined training and validation of the following track quality
-estimators (QE):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This python script is used for the combined training and validation of the
+following track quality estimators (QE):
 
     - **MVA track quality estimator:** The final quality estimator for fully
       merged and fitted tracks.  Its classifier uses features from the track
@@ -31,11 +32,12 @@ outputs as input.  The classifier outputs of the quality estimators are called
 **quality indicators (QI)**
 
 b2luigi: Understanding the steering file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ All trainings and validations are done
-in the correct order in this steering file.  For the purpose of creating a
-dependency graph, the `b2luigi <https://b2luigi.readthedocs.io>`_ python
-package, which extends the `luigi <https://luigi.readthedocs.io>`_ packaged
-developed by spotify.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All trainings and validations are done in the correct order in this steering
+file. For the purpose of creating a dependency graph, the `b2luigi
+<https://b2luigi.readthedocs.io>`_ python package is used, which extends the
+`luigi <https://luigi.readthedocs.io>`_ packag developed by spotify.
 
 Each task that has to be done is represented by a special class, which defines
 which defines parameters, output files and which other tasks with which
@@ -46,40 +48,47 @@ file for training.  An evaluation/validation task for testing the classifier
 requires both the teacher task, as it needs the weightfile to be present, and
 also a data collection task, because it needs a dataset for testing classifier.
 
-The import root task needs to be finished for the script to finish is the
-``MasterTask``.  It defines via its requirements which tasks need to run.  Its
-requirements are the tasks that run at the very end, such as validation tasks.
-All other tasks run automatically as they are defined as their dependencies.
-When you only want to run parts of the training/validation pipeline, you can
-comment out requirements in the Master Task or replace them by lower-level tasks
-during debugging.
+The final task that defines which tasks need to be done for the steering file to
+finish is the ``MasterTask``. When you only want to run parts of the
+training/validation pipeline, you can comment out requirements in the Master
+task or replace them by lower-level tasks during debugging.
 
-Requirements ~~~~~~~~~~~~ This steering file currently requires only two
-packages not in the externals, b2luigi_ for task scheduling and `uncertain_panda
+Requirements
+~~~~~~~~~~~~
+
+This steering file relies on b2luigi_ for task scheduling and `uncertain_panda
 <https://github.com/nils-braun/uncertain_panda>`_ for uncertainty calculations.
-They can be simply installed via pip::
+uncertain_panda is not in the externals and b2luigi is not upto v01-07-01. Both
+can be installed via pip::
 
     python3 -m pip install [--user] b2luigi uncertain_panda
 
-You can use the ``--user`` option if you have not rights to install python
-packages into your externals (e.g. because you are using cvmfs) and install them
-in ``$HOME/.local`` instead.  An alternative is to use a virtual environment.
+Use the ``--user`` option if you have not rights to install python packages into
+your externals (e.g. because you are using cvmfs) and install them in
+``$HOME/.local`` instead.
 
-Configuration ~~~~~~~~~~~~~ Instead of command line arguments, the b2luigi
-script is configured via a ``settings.json`` file.  Open it in your favorite
-text editor and modify it to fit to your requirements.  It should look like this
-(The contents in ``<...>`` represent placeholders):
+Configuration
+~~~~~~~~~~~~~
 
-..  code-block:: json { "result_path": "<Root path for the b2luigi outputs>"
-"bkgfiles_directory": "<Directory with overlay background root files>",
-"n_events_training": <Number of events to be used for training data>,
-"n_events_testing": <Number of events to be used for the validation/evaluation
-data>, "workers": <Number of luigi workers, which execute tasks in parallel.>,
-"basf2_processes_per_worker": <Number of basf2 processes per worker.  0 disables
-multiprocessing.> }
+Instead of command line arguments, the b2luigi script is configured via a
+``settings.json`` file. Open it in your favorite text editor and modify it to
+fit to your requirements. It should look like this (The contents in ``<...>``
+represent placeholders):
 
-Usage ~~~~~ Once you have done the Configuration_, you can test the b2luigi
-without running it via::
+.. code-block:: json
+    {
+        "result_path": "<Root path for the b2luigi outputs>"
+        "bkgfiles_directory": "<Directory with overlay background root files>",
+        "n_events_training": <Number of events to be used for training data>,
+        "n_events_testing": <Number of events to be used for the validation/evaluation data>,
+        "workers": <Number of luigi workers, which execute tasks in parallel.>,
+        "basf2_processes_per_worker": <Number of basf2 processes per worker. 0 disables multiprocessing.>
+    }
+
+Usage
+~~~~~
+
+You can test the b2luigi without running it via::
 
     python3 combined_quality_estimator_teacher.py --dry-run
     python3 combined_quality_estimator_teacher.py --show-output

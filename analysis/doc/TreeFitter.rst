@@ -75,7 +75,7 @@ To use the module add it to the path::
 - **inflationFactorCovZ** a scalar to multiply the z-components (all of them zz, zx, zy) of the 3d ip-constraint covariance matrix with. This weakens the constraints z-component. Example: :math:`inflationFactorCovZ=1e5`.
 - **autoSetGeoConstraintAndMergeVertices** Automatically determine what particles can have a geometric constraint and which decay vertices can be joined with the mother. Default is True. Don't touch this unless you really know why. Example: :math:`autoSetGeoConstraintAndMergeVertices=False`
 - **geoConstraintList** If **autoSetGeoConstraintAndMergeVertices** is set to false this can be used to set the pdg codes of the particle you want to mass constrain. Example: :math:`geoConstraintList=[310] # 310 is K_S0`.  
-- **sharedVertexList** If **autoSetGeoConstraintAndMergeVertices** is set to false this can be used to set the pdg codes of the particles who's decay vertices should be joined with their mothers. Example: :math:`sharedVertexList=[443] # 310 is Jpsi`.
+- **sharedVertexList** If **autoSetGeoConstraintAndMergeVertices** is set to false this can be used to set the pdg codes of the particles who's decay vertices should be joined with their mothers. Example: :math:`sharedVertexList=[443] # 443 is Jpsi`.
 
 There are more parameters which are based on optimisations we made. I strongly recommend to not touch them.
 

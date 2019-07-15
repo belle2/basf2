@@ -151,6 +151,11 @@ namespace Belle2 {
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
+      if (!m_asicShift.isValid()) {
+        B2FATAL("ASIC shifts calibration requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
     }
     if (m_useModuleT0Calibration) {
       if (!m_moduleT0.isValid()) {
@@ -368,6 +373,10 @@ namespace Belle2 {
             double err = cal->getT0Error(moduleID, channel);
             calErrorSq += err * err;
             statusBits |= TOPDigit::c_ChannelT0Calibrated;
+          }
+          auto asic = channel / 8;
+          if (m_asicShift->isCalibrated(moduleID, asic)) {
+            time -= m_asicShift->getT0(moduleID, asic);
           }
         }
         if (m_useModuleT0Calibration) {

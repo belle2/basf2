@@ -78,6 +78,19 @@ namespace Belle2 {
 
 
     /**
+     * Import ASIC shifts of BS13d
+     * @param s0 shift of carrier 0 [ns]
+     * @param s1 shift of carrier 1 [ns]
+     * @param s2 shift of carrier 2 [ns]
+     * @param s3 shift of carrier 3 [ns]
+     * @param expNo experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importAsicShifts_BS13d(double s0, double s1, double s2, double s3,
+                                int expNo, int firstRun, int lastRun);
+
+    /**
      * Import module T0 calibration constants to database
      * The input is the text file
      * @param fileName name of the dat file with constants of all modules
@@ -363,6 +376,16 @@ namespace Belle2 {
      */
     void importDummyCalIntegratedCharge(int firstExp = 0, int firstRun = 0,
                                         int lastExp = -1, int lastRun = -1);
+
+    /**
+     * import a dummy payload of TOPCalAsicShift DB objects
+     * @param firstExp first experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastExp first experiment number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importDummyCalAsicShift(int firstExp = 0, int firstRun = 0,
+                                 int lastExp = -1, int lastRun = -1);
 
     /**
      * correct QE values in database for the reflection on window surface

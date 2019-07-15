@@ -24,6 +24,7 @@
 #include <top/dbobjects/TOPSampleTimes.h>
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalAsicShift.h>
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPCalChannelPulseHeight.h>
@@ -110,6 +111,7 @@ namespace Belle2 {
     // constants from conditions DB
     DBObjPtr<TOPCalTimebase> m_timebases; /**< sample times from database */
     DBObjPtr<TOPCalChannelT0> m_channelT0; /**< channel T0 calibration constants */
+    DBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
     DBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
     DBObjPtr<TOPCalChannelPulseHeight> m_pulseHeights; /**< pulse height param. */

@@ -44,7 +44,7 @@
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPCalIntegratedCharge.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
-
+#include <top/dbobjects/TOPCalAsicShift.h>
 
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
@@ -342,6 +342,36 @@ namespace Belle2 {
     B2INFO("Channel T0 for exp " << expNo << " run " << firstRun << " to " << lastRun
            << " imported. Calibrated channels: " << count << "/" << nModules * 512);
 
+  }
+
+
+  void TOPDatabaseImporter::importAsicShifts_BS13d(double s0, double s1, double s2, double s3,
+                                                   int expNo, int firstRun, int lastRun)
+  {
+
+    std::vector<double> shifts;
+    shifts.push_back(s0);
+    shifts.push_back(s1);
+    shifts.push_back(s2);
+    shifts.push_back(s3);
+
+    DBImportObjPtr<TOPCalAsicShift> asicShift;
+    asicShift.construct();
+
+    int moduleID = 13;
+    unsigned bs = 3;
+    for (unsigned carrier = 0; carrier < 4; carrier++) {
+      for (unsigned a = 0; a < 4; a++) {
+        unsigned asic = a + carrier * 4 + bs * 16;
+        asicShift->setT0(moduleID, asic, shifts[carrier]);
+      }
+    }
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    asicShift.import(iov);
+
+    B2INFO("ASIC shifts of BS13d imported for exp " << expNo << " run " << firstRun <<
+           " to " << lastRun);
   }
 
 
@@ -1332,6 +1362,16 @@ namespace Belle2 {
     integratedCharge.import(iov);
     B2INFO("Dummy TOPCalIntegratedCharge imported");
     return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalAsicShift(int firstExp, int firstRun,
+                                                    int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalAsicShift> asicShift;
+    asicShift.construct();
+    asicShift.import(iov);
+    B2INFO("Dummy TOPCalAsicShift imported");
   }
 
   void TOPDatabaseImporter::correctTOPPmtQE()

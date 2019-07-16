@@ -64,9 +64,6 @@ One can use the keyeords for decay string to configure how :code:`'isCustomSigna
 * :code:`'?rad'` Missing radiated photons are ignored (default)
 * :code:`'!rad'` Missing radiated photons are taken into account
 
-The decay descriptor for inclusive decays can be used only in MCDecayFinder module and nowhere else. Inclusive decays can be specified by with :code:`'...'` for unreconstructed particles:
-
-:code:`'B+ -> [anti-D0 -> K- pi+] ...'`
 
 Arrows
 ------

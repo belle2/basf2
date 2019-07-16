@@ -75,9 +75,35 @@ namespace Belle2::Conditions {
     /** Default destructible */
     virtual ~MetadataProvider() = default;
     /** Set the list of globaltag names to be considered for payloads.
-     * @returns true if all globaltags can be found and are in a valid state */
+     *
+     * This should be called before requesting any payloads but after calling
+     * setValidTagStates().
+     *
+     * @return true if all globaltags can be found and are in a valid state */
     bool setTags(const std::vector<std::string>& tags);
-    /** Update the information in the vector of metadata instances with the actual values */
+    /** Update the information in the vector of metadata instances with the
+     * actual values.
+     *
+     * The input is a list of metadata instances and the metadata provider will
+     * try to modify them in place and add all the missing information it can
+     * find.
+     *
+     * * It will try to find iov, revision, checksum, url for each entry which
+     *   doesn't have a valid revision number (revision=0)
+     * * It will ignore any entries with a valid revision number (revision>0)
+     * * any payload which cannot be found in any globaltag will raise an error
+     *   as long as required=true
+     * * the modified list can still contain payloads without a valid revision
+     *   some payloads could not be found
+     *
+     * @param exp the experiment number
+     * @param run the run number
+     * @param[in,out] info a list of metadata instances which we try to find the
+     *     missing metadata for.
+     * @return true if all required payloads could be found, false if at least
+     *     one payload which still didn't have a valid revision number and is
+     *     required could not be found.
+     */
     bool getPayloads(int exp, int run, std::vector<PayloadMetadata>& info);
     /** Get the valid tag states when checking globaltag status */
     std::set<std::string> getValidTagStates() { return m_validTagStates; }
@@ -85,11 +111,12 @@ namespace Belle2::Conditions {
      * Should be called before setTags() if necessary */
     void setValidTagStates(const std::set<std::string>& states) { m_validTagStates = states; }
   protected:
-    /** check the status of a global tag with the given name. Returns "" if the tag doesn't exist or any other error occured */
+    /** Check the status of a global tag with the given name.
+     * Returns "" if the tag doesn't exist or any other error occured */
     virtual std::string getGlobaltagStatus(const std::string& name) = 0;
     /** Update the list of existing payloads from a given globaltag, exp and run combination.
      * Supposed to call addPayload() for each payload it finds.
-     * @returns true on success, false on failure
+     * @return true on success, false on failure (e.g. network or file problems)
      */
     virtual bool updatePayloads(const std::string& globaltag, int exp, int run) = 0;
     /** Add a payload information to the internal list. This should be called by
@@ -110,8 +137,9 @@ namespace Belle2::Conditions {
     std::set<std::string> m_validTagStates{"TESTING", "VALIDATED", "RUNNING", "PUBLISHED"};
   };
 
-  /** Fallback provider if no providers are given: Will raise an error if used but allows processing if no payloads are
-   * requested or all are taken locally rom testing payload storage. */
+  /** Fallback provider if no providers are given: Will raise an error if used
+   * but allows processing if no payloads are requested or all are taken
+   * locally rom testing payload storage. */
   class NullMetadataProvider: public MetadataProvider {
     /** Nope, no update */
     bool updatePayloads([[maybe_unused]] const std::string& globaltag, [[maybe_unused]] int exp,

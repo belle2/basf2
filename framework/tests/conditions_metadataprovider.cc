@@ -58,7 +58,7 @@ namespace {
   /** We want to inspect the log messages emitted */
   using MetadataProviderTest = TestHelpers::LogMessageTest;
 
-  /** Check wiehter states get rejected correctly */
+  /** Check whether states get rejected correctly */
   TEST_F(MetadataProviderTest, tagstates)
   {
     TestMetadataProvider provider({});
@@ -77,6 +77,15 @@ namespace {
     expectErrorWithVariables({{"globaltag", "INVALID"}, {"status", "INVALID"}});
     EXPECT_FALSE(provider.setTags({""}));
     expectErrorWithVariables({{"globaltag", ""}, {"error", "missing"}});
+  }
+
+  /** Test that returning false from updatePayloads throws an exception */
+  TEST_F(MetadataProviderTest, exception)
+  {
+    TestMetadataProvider provider({});
+    std::vector<Conditions::PayloadMetadata> query{{"A"}};
+    ASSERT_TRUE(provider.setTags({"tag1"}));
+    ASSERT_THROW(provider.getPayloads(0, 0, query), std::runtime_error);
   }
 
   /** Test that the metadata provider only fills metadata for payloads which

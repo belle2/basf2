@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <TVector3.h>
@@ -46,6 +47,9 @@ void ParticleCreatorModule::initialize()
   StoreArray<Particle> particles(m_particleColName);
   particles.registerInDataStore();
   particles.registerRelationTo(recoTracks);
+
+  StoreObjPtr<ParticleExtraInfoMap> extraInfo;
+  extraInfo.registerInDataStore();
 }
 
 void ParticleCreatorModule::event()
@@ -66,11 +70,16 @@ void ParticleCreatorModule::event()
     firstHit.getPosMomCov(pos, mom, cov);
     int pdg = rep->getPDG();
     double mass = rep->getMass(firstHit);
-    double charge = rep->getCharge(firstHit);
+    double charge = rep->getCharge(firstHit); // mplTrackRep returns magnetic charge
     double E = std::sqrt(mom.x() * mom.x() + mom.y() * mom.y() + mom.z() * mom.z() + mass * mass);
-
+    double pValue = recoTrack.getTrackFitStatus(rep)->getPVal();
     TLorentzVector lorentzMom(mom.x(), mom.y(), mom.z(), E);
+
     Particle newPart(lorentzMom, pdg);
+    newPart.setVertex(pos);
+    newPart.setPValue(pValue);
+    newPart.writeExtraInfo("magCharge", charge);
+    newPart.writeExtraInfo("massFromFit", mass);
     particles.appendNew(newPart);
   }
 }

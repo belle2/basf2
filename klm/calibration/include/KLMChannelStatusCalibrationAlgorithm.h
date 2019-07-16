@@ -75,6 +75,14 @@ namespace Belle2 {
     }
 
     /**
+     * Set inimal number of hits to mark to mark the channel as hot.
+     */
+    void setMinimalHitNumberHotChannel(unsigned int minimalHitNumberHotChannel)
+    {
+      m_MinimalHitNumberHotChannel = minimalHitNumberHotChannel;
+    }
+
+    /**
      * Minimal ratio of number of hits in this channel and average over other
      * channels in this module to mark it as hot.
      */
@@ -242,6 +250,9 @@ namespace Belle2 {
 
     /** Minimal number of hits in a single channel to mark it as hot. */
     unsigned int m_MinimalHitNumberSingleHotChannel = 1000;
+
+    /** Minimal number of hits to mark to mark the channel as hot. */
+    unsigned int m_MinimalHitNumberHotChannel = 100;
 
     /**
      * Minimal ratio of number of hits in this channel and average over other

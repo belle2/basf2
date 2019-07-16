@@ -351,7 +351,8 @@ void KLMChannelStatusCalibrationAlgorithm::markHotChannels(
       m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Hot);
   } else {
     double r = hits / (double(moduleHits - hits) / (activeChannels - 1));
-    if (r > m_MinimalHitNumberRatioHotChannel)
+    if (hits >= m_MinimalHitNumberHotChannel &&
+        r > m_MinimalHitNumberRatioHotChannel)
       m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Hot);
   }
 }

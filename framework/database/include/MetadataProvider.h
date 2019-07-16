@@ -42,7 +42,7 @@ namespace Belle2::Conditions {
       struct CacheEntry {
         int exp{ -1}; /**< experiment number */
         int run{ -1}; /**< run number */
-        PayloadMap map; /** Map of all known name -> PayloadMetadata entries */
+        PayloadMap map; /**< Map of all known name -> PayloadMetadata entries */
       };
       /** Get the list of map payloads from the cache
        * This returns a tuple containing two elements:
@@ -66,8 +66,8 @@ namespace Belle2::Conditions {
         return {found, &current.map};
       }
     private:
-      CacheEntry current; /** < currently valid conditions */
-      CacheEntry previous; /** < previously valid conditions */
+      CacheEntry current; /**< currently valid conditions */
+      CacheEntry previous; /**< previously valid conditions */
     };
 
     /** Default constructible */
@@ -79,6 +79,11 @@ namespace Belle2::Conditions {
     bool setTags(const std::vector<std::string>& tags);
     /** Update the information in the vector of metadata instances with the actual values */
     bool getPayloads(int exp, int run, std::vector<PayloadMetadata>& info);
+    /** Get the valid tag states when checking globaltag status */
+    std::set<std::string> getValidTagStates() { return m_validTagStates; }
+    /** Set the valid tag states for this provider when checking globaltag status.
+     * Should be called before setTags() if necessary */
+    void setValidTagStates(const std::set<std::string>& states) { m_validTagStates = states; }
   protected:
     /** check the status of a global tag with the given name. Returns "" if the tag doesn't exist or any other error occured */
     virtual std::string getGlobaltagStatus(const std::string& name) = 0;
@@ -102,7 +107,7 @@ namespace Belle2::Conditions {
     /** Map of known payloads for current conditions */
     PayloadMap* m_payloads{nullptr};
     /** Set of global tag states to consider valid (except for 'INVALID' which is always considered invalid) */
-    static std::set<std::string> s_validTagStates;
+    std::set<std::string> m_validTagStates{"TESTING", "VALIDATED", "RUNNING", "PUBLISHED"};
   };
 
   /** Fallback provider if no providers are given: Will raise an error if used but allows processing if no payloads are

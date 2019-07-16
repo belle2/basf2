@@ -17,8 +17,6 @@
 #include <iomanip>
 
 namespace Belle2::Conditions {
-  std::set<std::string> MetadataProvider::s_validTagStates{"TESTING", "VALIDATED", "RUNNING", "PUBLISHED"};
-
   bool MetadataProvider::setTags(const std::vector<std::string>& tags)
   {
     m_tags = tags;
@@ -28,11 +26,11 @@ namespace Belle2::Conditions {
       // empty status: Unspecified error already dealt with
       if (status.empty()) return false;
       // otherwise check for valid states
-      if (status == "INVALID" or s_validTagStates.count(status) == 0) {
+      if (status == "INVALID" or m_validTagStates.count(status) == 0) {
         B2ERROR("The globaltag has a status which is not permitted for use. This is for your own protection"
                 << LogVar("globaltag", name)
                 << LogVar("status", status)
-                << LogVar("allowed states", boost::algorithm::join(s_validTagStates, ", ")));
+                << LogVar("allowed states", boost::algorithm::join(m_validTagStates, ", ")));
         return false;
       }
       return true;

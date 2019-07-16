@@ -57,6 +57,15 @@ namespace Belle2 {
     }
 
     /**
+     * Set maximal absolute value of the logarithm (base 10) of the ratio of
+     * the number of hits in this sector and the average number of hits.
+     */
+    void setMaximalLogSectorHitsRatio(double maximalLogSectorHitsRatio)
+    {
+      m_MaximalLogSectorHitsRatio = maximalLogSectorHitsRatio;
+    }
+
+    /**
      * Get minimal average number of hits per channel required for calibration.
      */
     double getMinimalAverageHitNumber() const
@@ -128,7 +137,34 @@ namespace Belle2 {
       return m_TotalHitNumber;
     }
 
+    /**
+     * Get number of hits in EKLM.
+     */
+    unsigned int getHitNumberEKLM() const
+    {
+      return m_HitNumberEKLM;
+    }
+
+    /**
+     * Get number of hits in BKLM.
+     */
+    unsigned int getHitNumberBKLM() const
+    {
+      return m_HitNumberBKLM;
+    }
+
   protected:
+
+    /**
+     * Caliobrate sector.
+     *
+     * @param[in] sector
+     * sector number.
+     *
+     * @param[in] averageHitsActiveSector
+     * Average number of hits per active sector.
+     */
+    void calibrateSector(uint16_t sector, double averageHitsActiveSector);
 
     /**
      * Calibrate module.
@@ -154,6 +190,15 @@ namespace Belle2 {
     /** Minimal average number of hits per channel required for calibration. */
     double m_MinimalAverageHitNumber = 25;
 
+    /**
+     * Maximal absolute value of the logarithm (base 10) of the ratio of
+     * the number of hits in this sector and the average number of hits.
+     */
+    double m_MaximalLogSectorHitsRatio = 1;
+
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
     /** Module status. */
     KLMChannelStatus* m_ModuleStatus = nullptr;
 
@@ -174,6 +219,12 @@ namespace Belle2 {
 
     /** Total hit number. */
     unsigned int m_TotalHitNumber = 0;
+
+    /** Number of hits in EKLM. */
+    unsigned int m_HitNumberEKLM = 0;
+
+    /** Number of hits in BKLM. */
+    unsigned int m_HitNumberBKLM = 0;
 
   };
 

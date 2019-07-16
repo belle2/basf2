@@ -3,7 +3,6 @@
 [INFO] Starting event processing, random seed is set to '1'
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
-Untested method EventMetaData::isEndOfRun
 Untested method EventMetaData::setEndOfData
 Untested method EventMetaData::setEndOfRun
 Untested method EventMetaData::setErrorFlag
@@ -145,6 +144,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541271770826344879
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -4916,6 +4916,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541271819204440573
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -12752,6 +12753,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541271822415596744
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0

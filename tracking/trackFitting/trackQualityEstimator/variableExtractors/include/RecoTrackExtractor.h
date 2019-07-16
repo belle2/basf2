@@ -43,8 +43,7 @@ namespace Belle2 {
 
       addVariable(prefix + "seed_Time", variableSet);
 
-      addVariable(prefix + "N_total_hits", variableSet);
-      addVariable(prefix + "_N_tracking_hits", variableSet);
+      addVariable(prefix + "N_tracking_hits", variableSet);
       addVariable(prefix + "N_CDC_hits", variableSet);
       addVariable(prefix + "N_SVD_hits", variableSet);
       addVariable(prefix + "N_PXD_hits", variableSet);
@@ -88,8 +87,7 @@ namespace Belle2 {
 
       m_variables.at(m_prefix + "seed_Time") = recoTrack.getTimeSeed();
 
-      m_variables.at(m_prefix + "N_total_hits") = recoTrack.getNumberOfTotalHits();
-      m_variables.at(m_prefix + "_N_tracking_hits") = recoTrack.getNumberOfTrackingHits();
+      m_variables.at(m_prefix + "N_tracking_hits") = recoTrack.getNumberOfTrackingHits();
       m_variables.at(m_prefix + "N_CDC_hits") = recoTrack.getNumberOfCDCHits();
       m_variables.at(m_prefix + "N_SVD_hits") = recoTrack.getNumberOfSVDHits();
       m_variables.at(m_prefix + "N_PXD_hits") = recoTrack.getNumberOfPXDHits();

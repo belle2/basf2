@@ -44,8 +44,8 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
   int n = calibrationData->GetEntries();
   m_HitMapChannel.setDataAllChannels(0);
   m_TotalHitNumber = 0;
-  m_HitNumberEKLM = 0;
   m_HitNumberBKLM = 0;
+  m_HitNumberEKLM = 0;
   for (int i = 0; i < n; ++i) {
     calibrationData->GetEntry(i);
     m_HitMapChannel.setChannelData(
@@ -57,6 +57,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
       m_HitNumberBKLM += hits;
   }
   m_ChannelStatus = new KLMChannelStatus();
+  m_ChannelStatus->setStatusAllChannels(KLMChannelStatus::c_Undetermined);
   /* If there are no hits, then mark all channels as dead. */
   BKLMChannelIndex bklmChannels;
   EKLMChannelIndex eklmChannels;
@@ -74,15 +75,15 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
   }
   /* Fill module and sector hit maps. */
   BKLMChannelIndex bklmModules(BKLMChannelIndex::c_IndexLevelLayer);
+  EKLMChannelIndex eklmModules(EKLMChannelIndex::c_IndexLevelLayer);
   for (BKLMChannelIndex& bklmModule : bklmModules)
     m_HitMapModule.setChannelData(bklmModule.getKLMModuleNumber(), 0);
-  EKLMChannelIndex eklmModules(EKLMChannelIndex::c_IndexLevelLayer);
   for (EKLMChannelIndex& eklmModule : eklmModules)
     m_HitMapModule.setChannelData(eklmModule.getKLMModuleNumber(), 0);
   BKLMChannelIndex bklmSectors(BKLMChannelIndex::c_IndexLevelSector);
+  EKLMChannelIndex eklmSectors(EKLMChannelIndex::c_IndexLevelSector);
   for (BKLMChannelIndex& bklmSector : bklmSectors)
     m_HitMapSector.setChannelData(bklmSector.getKLMSectorNumber(), 0);
-  EKLMChannelIndex eklmSectors(EKLMChannelIndex::c_IndexLevelSector);
   for (EKLMChannelIndex& eklmSector : eklmSectors)
     m_HitMapSector.setChannelData(eklmSector.getKLMSectorNumber(), 0);
   for (BKLMChannelIndex& bklmChannel : bklmChannels) {
@@ -105,30 +106,131 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     m_HitMapSector.setChannelData(
       sector, m_HitMapSector.getChannelData(sector) + hits);
   }
+  /*
+   * Mark all channels in modules without hits as dead.
+   * Search for hot channels.
+   */
+  for (BKLMChannelIndex& bklmModule : bklmModules) {
+    module = bklmModule.getKLMModuleNumber();
+    moduleHits = m_HitMapModule.getChannelData(module);
+    BKLMChannelIndex bklmNextModule(bklmModule);
+    ++bklmNextModule;
+    BKLMChannelIndex bklmChannel(bklmModule);
+    bklmChannel.setIndexLevel(BKLMChannelIndex::c_IndexLevelStrip);
+    if (moduleHits == 0) {
+      for (; bklmChannel != bklmNextModule; ++bklmChannel) {
+        channel = bklmChannel.getKLMChannelNumber();
+        m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
+      }
+      m_ModuleActiveChannelMap.setChannelData(module, 0);
+      continue;
+    }
+    unsigned int activeChannels = 0;
+    for (; bklmChannel != bklmNextModule; ++bklmChannel) {
+      channel = bklmChannel.getKLMChannelNumber();
+      hits = m_HitMapChannel.getChannelData(channel);
+      if (hits > 0)
+        activeChannels++;
+    }
+    m_ModuleActiveChannelMap.setChannelData(module, activeChannels);
+    bklmChannel = bklmModule;
+    bklmChannel.setIndexLevel(BKLMChannelIndex::c_IndexLevelStrip);
+    for (; bklmChannel != bklmNextModule; ++bklmChannel) {
+      markHotChannels(bklmChannel.getKLMChannelNumber(), moduleHits,
+                      activeChannels);
+    }
+  }
+  for (EKLMChannelIndex& eklmModule : eklmModules) {
+    module = eklmModule.getKLMModuleNumber();
+    moduleHits = m_HitMapModule.getChannelData(module);
+    EKLMChannelIndex eklmNextModule(eklmModule);
+    ++eklmNextModule;
+    EKLMChannelIndex eklmChannel(eklmModule);
+    eklmChannel.setIndexLevel(EKLMChannelIndex::c_IndexLevelStrip);
+    if (moduleHits == 0) {
+      for (; eklmChannel != eklmNextModule; ++eklmChannel) {
+        channel = eklmChannel.getKLMChannelNumber();
+        m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
+      }
+      m_ModuleActiveChannelMap.setChannelData(module, 0);
+      continue;
+    }
+    unsigned int activeChannels = 0;
+    for (; eklmChannel != eklmNextModule; ++eklmChannel) {
+      channel = eklmChannel.getKLMChannelNumber();
+      hits = m_HitMapChannel.getChannelData(channel);
+      if (hits > 0)
+        activeChannels++;
+    }
+    m_ModuleActiveChannelMap.setChannelData(module, activeChannels);
+    eklmChannel = eklmModule;
+    eklmChannel.setIndexLevel(EKLMChannelIndex::c_IndexLevelStrip);
+    for (; eklmChannel != eklmNextModule; ++eklmChannel) {
+      markHotChannels(eklmChannel.getKLMChannelNumber(), moduleHits,
+                      activeChannels);
+    }
+  }
+  /* Fill module and sector hit maps with hot channels subtracted. */
+  for (BKLMChannelIndex& bklmModule : bklmModules)
+    m_HitMapModuleNoHot.setChannelData(bklmModule.getKLMModuleNumber(), 0);
+  for (EKLMChannelIndex& eklmModule : eklmModules)
+    m_HitMapModuleNoHot.setChannelData(eklmModule.getKLMModuleNumber(), 0);
+  for (BKLMChannelIndex& bklmSector : bklmSectors)
+    m_HitMapSectorNoHot.setChannelData(bklmSector.getKLMSectorNumber(), 0);
+  for (EKLMChannelIndex& eklmSector : eklmSectors)
+    m_HitMapSectorNoHot.setChannelData(eklmSector.getKLMSectorNumber(), 0);
+  m_HitNumberBKLMNoHot = 0;
+  m_HitNumberEKLMNoHot = 0;
+  for (BKLMChannelIndex& bklmChannel : bklmChannels) {
+    channel = bklmChannel.getKLMChannelNumber();
+    if (m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)
+      continue;
+    module = bklmChannel.getKLMModuleNumber();
+    sector = bklmChannel.getKLMSectorNumber();
+    hits = m_HitMapChannel.getChannelData(channel);
+    m_HitMapModuleNoHot.setChannelData(
+      module, m_HitMapModuleNoHot.getChannelData(module) + hits);
+    m_HitMapSectorNoHot.setChannelData(
+      sector, m_HitMapSectorNoHot.getChannelData(sector) + hits);
+    m_HitNumberBKLMNoHot += hits;
+  }
+  for (EKLMChannelIndex& eklmChannel : eklmChannels) {
+    channel = eklmChannel.getKLMChannelNumber();
+    if (m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)
+      continue;
+    module = eklmChannel.getKLMModuleNumber();
+    sector = eklmChannel.getKLMSectorNumber();
+    hits = m_HitMapChannel.getChannelData(channel);
+    m_HitMapModuleNoHot.setChannelData(
+      module, m_HitMapModuleNoHot.getChannelData(module) + hits);
+    m_HitMapSectorNoHot.setChannelData(
+      sector, m_HitMapSectorNoHot.getChannelData(sector) + hits);
+    m_HitNumberEKLMNoHot += hits;
+  }
   /* Sector status. */
   int activeSectorsBKLM = 0;
   for (BKLMChannelIndex& bklmSector : bklmSectors) {
     sector = bklmSector.getKLMSectorNumber();
-    hits = m_HitMapSector.getChannelData(sector);
+    hits = m_HitMapSectorNoHot.getChannelData(sector);
     if (hits > 0)
       activeSectorsBKLM++;
   }
   int activeSectorsEKLM = 0;
   for (EKLMChannelIndex& eklmSector : eklmSectors) {
     sector = eklmSector.getKLMSectorNumber();
-    hits = m_HitMapSector.getChannelData(sector);
+    hits = m_HitMapSectorNoHot.getChannelData(sector);
     if (hits > 0)
       activeSectorsEKLM++;
   }
   double averageHitsActiveSector = 0;
   if (activeSectorsBKLM > 0)
-    averageHitsActiveSector = double(m_HitNumberBKLM) / activeSectorsBKLM;
+    averageHitsActiveSector = double(m_HitNumberBKLMNoHot) / activeSectorsBKLM;
   for (BKLMChannelIndex& bklmSector : bklmSectors) {
     sector = bklmSector.getKLMSectorNumber();
     calibrateSector(sector, averageHitsActiveSector);
   }
   if (activeSectorsEKLM > 0)
-    averageHitsActiveSector = double(m_HitNumberEKLM) / activeSectorsBKLM;
+    averageHitsActiveSector = double(m_HitNumberEKLMNoHot) / activeSectorsBKLM;
   for (EKLMChannelIndex& eklmSector : eklmSectors) {
     sector = eklmSector.getKLMSectorNumber();
     calibrateSector(sector, averageHitsActiveSector);
@@ -149,14 +251,8 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     ++bklmNextModule;
     BKLMChannelIndex bklmChannel(bklmModule);
     bklmChannel.setIndexLevel(BKLMChannelIndex::c_IndexLevelStrip);
-    if (moduleHits == 0) {
-      for (; bklmChannel != bklmNextModule; ++bklmChannel) {
-        channel = bklmChannel.getKLMChannelNumber();
-        m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
-      }
-      m_ModuleActiveChannelMap.setChannelData(module, 0);
+    if (moduleHits == 0)
       continue;
-    }
     unsigned int activeChannels = 0;
     for (; bklmChannel != bklmNextModule; ++bklmChannel) {
       channel = bklmChannel.getKLMChannelNumber();
@@ -188,14 +284,8 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     ++eklmNextModule;
     EKLMChannelIndex eklmChannel(eklmModule);
     eklmChannel.setIndexLevel(EKLMChannelIndex::c_IndexLevelStrip);
-    if (moduleHits == 0) {
-      for (; eklmChannel != eklmNextModule; ++eklmChannel) {
-        channel = eklmChannel.getKLMChannelNumber();
-        m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
-      }
-      m_ModuleActiveChannelMap.setChannelData(module, 0);
+    if (moduleHits == 0)
       continue;
-    }
     unsigned int activeChannels = 0;
     for (; eklmChannel != eklmNextModule; ++eklmChannel) {
       channel = eklmChannel.getKLMChannelNumber();
@@ -229,7 +319,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
 void KLMChannelStatusCalibrationAlgorithm::calibrateSector(
   uint16_t sector, double averageHitsActiveSector)
 {
-  int hits = m_HitMapSector.getChannelData(sector);
+  unsigned int hits = m_HitMapSectorNoHot.getChannelData(sector);
   if (hits == 0)
     return;
   double r = log(hits / averageHitsActiveSector) / log(10.);
@@ -248,6 +338,22 @@ void KLMChannelStatusCalibrationAlgorithm::calibrateModule(uint16_t module)
     m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Normal);
   else
     m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Dead);
+}
+
+void KLMChannelStatusCalibrationAlgorithm::markHotChannels(
+  uint16_t channel, unsigned int moduleHits, int activeChannels)
+{
+  unsigned int hits = m_HitMapChannel.getChannelData(channel);
+  if (hits == 0)
+    return;
+  if (activeChannels == 1) {
+    if (hits >= m_MinimalHitNumberSingleHotChannel)
+      m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Hot);
+  } else {
+    double r = hits / (double(moduleHits - hits) / (activeChannels - 1));
+    if (r > m_MinimalHitNumberRatioHotChannel)
+      m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Hot);
+  }
 }
 
 void KLMChannelStatusCalibrationAlgorithm::calibrateChannel(uint16_t channel)

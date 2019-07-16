@@ -66,6 +66,25 @@ namespace Belle2 {
     }
 
     /**
+     * Set minimal number of hits in a single channel to mark it as hot.
+     */
+    void setMinimalHitNumberSingleHotChannel(
+      unsigned int minimalHitNumberSingleHotChannel)
+    {
+      m_MinimalHitNumberSingleHotChannel = minimalHitNumberSingleHotChannel;
+    }
+
+    /**
+     * Minimal ratio of number of hits in this channel and average over other
+     * channels in this module to mark it as hot.
+     */
+    void setMinimalHitNumberRatioHotChannel(
+      double minimalHitNumberRatioHotChannel)
+    {
+      m_MinimalHitNumberRatioHotChannel = minimalHitNumberRatioHotChannel;
+    }
+
+    /**
      * Get minimal average number of hits per channel required for calibration.
      */
     double getMinimalAverageHitNumber() const
@@ -122,6 +141,22 @@ namespace Belle2 {
     }
 
     /**
+     * Get module hit map (no hot channels).
+     */
+    const KLMChannelMapValue<unsigned int>& getHitMapModuleNoHot() const
+    {
+      return m_HitMapModuleNoHot;
+    }
+
+    /**
+     * Get sector hit map (no hot channels).
+     */
+    const KLMChannelMapValue<unsigned int>& getHitMapSectorNoHot() const
+    {
+      return m_HitMapSectorNoHot;
+    }
+
+    /**
      * Get module active-channel map.
      */
     const KLMChannelMapValue<unsigned int>& getModuleActiveChannelMap() const
@@ -173,6 +208,15 @@ namespace Belle2 {
     void calibrateModule(uint16_t module);
 
     /**
+     * Mark hot channels.
+     * @param[in] channel        Channel number.
+     * @param[in] moduleHits     Number of hits in this module.
+     * @param[in] activeChannels Number of active channels in this module.
+     */
+    void markHotChannels(uint16_t channel, unsigned int moduleHits,
+                         int activeChannels);
+
+    /**
      * Calibrate channel.
      * @param[in] channel Channel number.
      */
@@ -196,6 +240,15 @@ namespace Belle2 {
      */
     double m_MaximalLogSectorHitsRatio = 1;
 
+    /** Minimal number of hits in a single channel to mark it as hot. */
+    unsigned int m_MinimalHitNumberSingleHotChannel = 1000;
+
+    /**
+     * Minimal ratio of number of hits in this channel and average over other
+     * channels in this module to mark it as hot.
+     */
+    double m_MinimalHitNumberRatioHotChannel = 50;
+
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
 
@@ -214,17 +267,29 @@ namespace Belle2 {
     /** Sector hit map. */
     KLMChannelMapValue<unsigned int> m_HitMapSector;
 
+    /** Module hit map (no hit channels). */
+    KLMChannelMapValue<unsigned int> m_HitMapModuleNoHot;
+
+    /** Sector hit map (no hot channels). */
+    KLMChannelMapValue<unsigned int> m_HitMapSectorNoHot;
+
     /** Module active-channel map (number of active channels in module). */
     KLMChannelMapValue<unsigned int> m_ModuleActiveChannelMap;
 
     /** Total hit number. */
     unsigned int m_TotalHitNumber = 0;
 
+    /** Number of hits in BKLM. */
+    unsigned int m_HitNumberBKLM = 0;
+
     /** Number of hits in EKLM. */
     unsigned int m_HitNumberEKLM = 0;
 
-    /** Number of hits in BKLM. */
-    unsigned int m_HitNumberBKLM = 0;
+    /** Number of hits in BKLM (no hot channels). */
+    unsigned int m_HitNumberBKLMNoHot = 0;
+
+    /** Number of hits in EKLM (no hot channels). */
+    unsigned int m_HitNumberEKLMNoHot = 0;
 
   };
 

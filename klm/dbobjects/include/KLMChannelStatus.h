@@ -31,7 +31,7 @@ namespace Belle2 {
      */
     enum ChannelStatus {
 
-      /** Unknown status. */
+      /** Unknown status (no data). */
       c_Unknown,
 
       /** Normally operating channel. */
@@ -42,6 +42,9 @@ namespace Belle2 {
 
       /** Hot channel (large background). */
       c_Hot,
+
+      /** Undetermined (used during calibration). */
+      c_Undetermined,
 
     };
 

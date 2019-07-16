@@ -32,6 +32,8 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
     "the conditions for creating ShaperDigits."
   );
 
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   //Parameter definition for SVDModeByte, TriggerType and cross-talk
   addParam("runType", m_runType, "Defines the run type: raw/transparent/zero-suppressed/z-s+hit time finding", int(2));
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
@@ -57,9 +59,8 @@ void SVDEventInfoSetterModule::initialize()
 void SVDEventInfoSetterModule::event()
 {
   if (m_randomTriggerBin) {
-    const int bunchXingsInAPVclock = 8; //hard coded for the moment
-    int bunchXingsSinceAPVstart = gRandom->Integer(bunchXingsInAPVclock / 2);
-    m_triggerBin = bunchXingsSinceAPVstart;
+    const int triggerBinsInAPVclock = 4; //hard coded for the moment
+    m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
   } else if (m_triggerBin < 0 || m_triggerBin > 3)
     B2ERROR("the triggerBin value is wrong, it must be an integer between 0 and 3, check and fix");
 

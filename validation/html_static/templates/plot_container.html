@@ -56,11 +56,16 @@
   <div class="wrap_rootfile">
     <!-- Header -->
     <!------------>
-    <h2>Result File: {{rootfile}} <a href="../results/{{newest_revision}}/{{package}}/{{rootfile}}.root">download {{newest_revision}}</a>
+    <h2>Result File: <code>{{rootfile}}</code>
       {{#if !has_reference}}
-      <div class="no_reference">NO REFERENCE FILE</div>
+        <span class="no_reference">[No reference]</span>
       {{/if}}
     </h2>
+    {{ #if newest_revision }}
+    <div class="downloads">
+      <b>Downloads:</b> <a href="../results/{{newest_revision}}/{{package}}/{{rootfile}}.root">{{newest_revision}}</a>
+    </div>
+    {{ /if }}
     {{#if description }}
     <b>Description: </b>
     {{ description }}
@@ -71,7 +76,7 @@
     <!------------------------------>
     {{#html_content}}
     <div class="wrap_boxes">
-      <h2 class="persistent-header">HTML Content: {{title}}</h2>
+      <h3 class="persistent-header">HTML Content: {{title}}</h3>
       <div>
         {{{html_content}}}
       </div>
@@ -82,8 +87,8 @@
     <!------------------------->
     {{#ntuples}}
     <div class="wrap_boxes">
-      <h2 class="persistent-header">NTuple: {{title}}</h2>
-      <table id={{title}}></table>
+      <h3 class="persistent-header">NTuple: <code>{{title}}</code></h3>
+      <table class="ntuple_table" id={{title}}></table>
       <script type="text/javascript">
           fillNtupleTable("{{title}}","{{json_file_path}}");
       </script>

@@ -40,7 +40,10 @@ namespace Belle2 {
     // Name of the collection holding the input RecoTracks
     std::string m_recoTrackColName = "RecoTracks";
 
-    // Name of the collection holding the output Particles
-    std::string m_particleColName = "Particles";
+    // Name of the particleList holding the output Particles
+    std::string m_particleListName = "ParticlesFromRecoTracks";
+
+    // PDG code of the hypothesis of the output Particles
+    int m_pdgCode = 211;
   };
 }

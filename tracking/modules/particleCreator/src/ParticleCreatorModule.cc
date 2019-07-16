@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -34,9 +35,10 @@ ParticleCreatorModule::ParticleCreatorModule() :
 
   addParam("recoTrackColName", m_recoTrackColName,
            "Name of the collection holding the input RecoTrack", m_recoTrackColName);
-  addParam("particleColName", m_particleColName,
-           "Name of the collection holding the output Particles", m_particleColName);
-
+  addParam("particleListName", m_particleListName,
+           "Name of the particleList holding the output Particles", m_particleListName);
+  addParam("pdgCode", m_pdgCode,
+           "PDG code of the hypothesis of the output Particles", m_pdgCode);
 }
 
 void ParticleCreatorModule::initialize()
@@ -44,18 +46,24 @@ void ParticleCreatorModule::initialize()
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
   recoTracks.isRequired();
 
-  StoreArray<Particle> particles(m_particleColName);
+  StoreArray<Particle> particles;
   particles.registerInDataStore();
   particles.registerRelationTo(recoTracks);
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfo;
   extraInfo.registerInDataStore();
+
+  StoreObjPtr<ParticleList> pList(m_particleListName);
+  pList.registerInDataStore();
 }
 
 void ParticleCreatorModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
-  StoreArray<Particle> particles(m_particleColName);
+  StoreArray<Particle> particles;
+  StoreObjPtr<ParticleList> pList(m_particleListName);
+  pList.create();
+  pList->initialize(m_pdgCode, m_particleListName);
 
   for (auto& recoTrack : recoTracks) {
     if (!recoTrack.wasFitSuccessful()) {
@@ -81,5 +89,6 @@ void ParticleCreatorModule::event()
     newPart->writeExtraInfo("magCharge", charge);
     newPart->writeExtraInfo("massFromFit", mass);
     newPart->addRelationTo(&recoTrack);
+    if (std::abs(pdg) == m_pdgCode) pList->addParticle(newPart);
   }
 }

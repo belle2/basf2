@@ -763,7 +763,7 @@ def fillParticleListFromROE(
     sourceParticleListName='',
     useMissing=False,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Creates Particle object for each ROE of the desired type found in the

@@ -126,8 +126,9 @@ namespace Belle2 {
                                  0.5, 71 - 0.5);
     }
 
-    TDirectory* dirAerogel =  dirARICHDQM->mkdir("ARICHExpert");
-    dirAerogel->cd();
+    oldDir->cd();
+    TDirectory* dirExpert =  oldDir->mkdir("ARICHExpert");
+    dirExpert->cd();
 
     h_chDigit = new TH1D("chDigit", "Number of raw digits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
     h_chipDigit = new TH1D("chipDigit", "Number of raw digits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);

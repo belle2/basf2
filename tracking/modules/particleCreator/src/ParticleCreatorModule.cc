@@ -75,11 +75,11 @@ void ParticleCreatorModule::event()
     double pValue = recoTrack.getTrackFitStatus(rep)->getPVal();
     TLorentzVector lorentzMom(mom.x(), mom.y(), mom.z(), E);
 
-    Particle newPart(lorentzMom, pdg);
-    newPart.setVertex(pos);
-    newPart.setPValue(pValue);
-    newPart.writeExtraInfo("magCharge", charge);
-    newPart.writeExtraInfo("massFromFit", mass);
-    particles.appendNew(newPart);
+    Particle* newPart = particles.appendNew(lorentzMom, pdg);
+    newPart->setVertex(pos);
+    newPart->setPValue(pValue);
+    newPart->writeExtraInfo("magCharge", charge);
+    newPart->writeExtraInfo("massFromFit", mass);
+    newPart->addRelationTo(&recoTrack);
   }
 }

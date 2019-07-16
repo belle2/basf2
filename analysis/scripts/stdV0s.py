@@ -6,7 +6,7 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdPr
 
 
-def stdKshorts(path=analysis_main):
+def stdKshorts(path):
     """
     Load :math:`K_{S}^{0}` s from the mdst V0 objects (created when the
     tracking was run). The ParticleList is named 'K_S0:all'. A vertex fit is
@@ -25,7 +25,7 @@ def stdKshorts(path=analysis_main):
     applyCuts('K_S0:all', '0.450 < M < 0.550', path=path)
 
 
-def mergedKshorts(prioritiseV0=True, path=analysis_main):
+def mergedKshorts(prioritiseV0=True, path=None):
     """
     Load a combined list of the :func:`stdKshorts` list from V0 objects merged with
     a list of particles combined using the analysis ParticleCombiner module.
@@ -55,7 +55,7 @@ def mergedKshorts(prioritiseV0=True, path=analysis_main):
     applyCuts('K_S0:merged', 'extraInfo(highQualityVertex) and 0.450 < M < 0.550', path=path)
 
 
-def goodBelleKshort(path=analysis_main):
+def goodBelleKshort(path):
     """
     Load the Belle goodKshort list. Creates a ParticleList named
     'K_S0:legacyGoodKS'. A vertex fit is performed: and only candidates that
@@ -70,7 +70,7 @@ def goodBelleKshort(path=analysis_main):
     applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path=path)
 
 
-def stdLambdas(path=analysis_main):
+def stdLambdas(path):
     """
     Load :math:`\Lambda^{0}`s from the mdst V0 objects (created when the
     tracking was run). The ParticleList is named "Lambda0:all". A vertex fit is
@@ -90,7 +90,7 @@ def stdLambdas(path=analysis_main):
     applyCuts('Lambda0:all', '1.10 < M < 1.13', path=path)
 
 
-def mergedLambdas(prioritiseV0=True, path=analysis_main):
+def mergedLambdas(prioritiseV0=True, path=None):
     """
     Load a combined list of the :func:`stdLambdas` list from V0 objects merged with
     a list of particles combined using the analysis ParticleCombiner module.

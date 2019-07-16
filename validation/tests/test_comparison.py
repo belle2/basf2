@@ -1,14 +1,62 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
 import unittest
-import validationcomparison
-import ROOT
 import random
+from typing import List, Tuple
+
+# 3rd
+import ROOT
+
+# ours
+import validationcomparison
+import metaoptions
+
+
+class TestGetComparison(unittest.TestCase):
+    """ Test get_comparison """
+
+    def setUp(self):
+        """ Set up testing of get_comparison """
+        self.test_options = {
+            "chi2": "",
+            "kolmogorov": "kolmogorov",
+            "andersondarling": "andersondarling"
+        }
+        basic_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
+        basic_gaus_th1f.FillRandom("gaus", 1000)
+        different_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
+        different_gaus_th1f.FillRandom("expo", 1000)
+        #: ROOT objects used to check if comparison executes
+        self.obj_pairs = [
+            (basic_gaus_th1f, basic_gaus_th1f, "equal"),
+            (basic_gaus_th1f, different_gaus_th1f, "error"),
+        ]  # type: List[Tuple[ROOT.TObject, ROOT.TObject, str]]
+
+    def test_get_comparison(self):
+        """ Use get_tester on the metaoptions to get the requested
+        comparison object and run that on two identical ROOT object.
+        Check that this indeed returns 'equal'.
+        """
+        for tester_name in self.test_options:
+            for obj in self.obj_pairs:
+                with self.subTest(
+                        tester=tester_name,
+                        obj1=obj[0].GetName(),
+                        obj2=obj[1].GetName()
+                ):
+                    tester = validationcomparison.get_comparison(
+                        obj[0],
+                        obj[1],
+                        metaoptions.MetaOptionParser(
+                            self.test_options[tester_name].split(" ")
+                        )
+                    )
+                    self.assertEqual(tester.comparison_result, obj[2])
 
 
 class TestComparison(unittest.TestCase):
-
     """
     Various test cases for the Chi2Test wrapper class
     """
@@ -43,6 +91,7 @@ class TestComparison(unittest.TestCase):
 
         return p
 
+    # todo: Can't I use FillRandom for this?
     @staticmethod
     def create_histogram(name, entries=5000, mu=10, sigma=3):
         """
@@ -70,70 +119,65 @@ class TestComparison(unittest.TestCase):
         #: However not implemented yet.
         self.call_iteration = 0
 
-        p_a = self.create_profile(self.root_name("profileA"))
-        #: store for later use
-        self.profileA = p_a
+        #: Profile A
+        self.profileA = self.create_profile(self.root_name("profileA"))
 
-        p_b = self.create_profile(self.root_name("profileB"))
-        #: store for later use
-        self.profileB = p_b
+        #: Profile B
+        self.profileB = self.create_profile(self.root_name("profileB"))
 
-        p_c = self.create_profile(self.root_name("profileC"), 5000, 5, 3)
-        #: store for later use
-        self.profileC = p_c
+        #: Profile C
+        self.profileC = self.create_profile(
+            self.root_name("profileC"), 5000, 5, 3
+        )
 
-        p_zero_error_bins = self.create_profile(
+        #: Profile with bins with 0 error
+        self.profileZeroErrorBins = self.create_profile(
             self.root_name("profileZeroErrorBins"),
             max_fill=49
         )
-        p_zero_error_bins.SetBinError(35, 0.0)
-        #: store for later use
-        self.profileZeroErrorBins = p_zero_error_bins
+        self.profileZeroErrorBins.SetBinError(35, 0.0)
 
-        p_zero_error_bins_two = self.create_profile(
+        #: Profile with bins with 0 error
+        self.profileZeroErrorBinsTwo = self.create_profile(
             self.root_name("profileZeroErrorBinsTwo"),
             max_fill=49
         )
-        p_zero_error_bins_two.SetBinError(35, 0.0)
-        #: store for later use
-        self.profileZeroErrorBinsTwo = p_zero_error_bins_two
+        self.profileZeroErrorBinsTwo.SetBinError(35, 0.0)
 
-        h_a = self.create_histogram(self.root_name("histogramA"), 5000, 5, 3)
-        #: store for later use
-        self.histogramA = h_a
+        #: Histogram A
+        self.histogramA = self.create_histogram(
+            self.root_name("histogramA"), 5000, 5, 3
+        )
 
-        h_b = self.create_histogram(self.root_name("histogramB"), 5000, 5, 3)
-        #: store for later use
-        self.histogramB = h_b
+        #: Histogram B (should be almost equal to profile A)
+        self.histogramB = self.create_histogram(
+            self.root_name("histogramB"), 5000, 5, 3
+        )
 
-        p_aequal = self.create_profile(
+        #: Profile should be almost equal to A
+        self.profileAequal = self.create_profile(
             self.root_name("profileA_almostequal"),
             sigma=0.4
         )
-        #: store for later use
-        self.profileAequal = p_aequal
 
-        p_bequal = self.create_profile(
+        #:  Profile should be almost equal to B
+        self.profileBequal = self.create_profile(
             self.root_name("profileB_almostequal"),
             sigma=0.4
         )
-        #: store for later use
-        self.profileBequal = p_bequal
 
-        #: store for later use
+        #: Profile with different bins
         self.profileDifferentBins = ROOT.TProfile(
             self.root_name("profileDifferentBins"),
             self.root_name("profileDifferentBins"),
             40, 0, 50.0
         )
 
-        p_a = self.create_teff(self.root_name("teffA"))
-        #: store for later use
-        self.teffA = p_a
+        #: TEfficiemcy A
+        self.teffA = self.create_teff(self.root_name("teffA"))
 
-        p_b = self.create_teff(self.root_name("teffB"))
-        #: store for later use
-        self.teffB = p_b
+        #: TEfficiency B
+        self.teffB = self.create_teff(self.root_name("teffB"))
 
     def test_compare_profiles(self):
         """
@@ -142,7 +186,25 @@ class TestComparison(unittest.TestCase):
         c = validationcomparison.Chi2Test(self.profileA, self.profileB)
 
         self.assertTrue(c.can_compare())
-        self.assertAlmostEqual(c.pvalue(), 0.22495088947037362)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 0.22495088947037362)
+
+    def test_compare_profiles_identical(self):
+        """
+        Test if comparing two identical TProfiles works
+        """
+        c = validationcomparison.Chi2Test(self.profileA, self.profileA)
+
+        self.assertTrue(c.can_compare())
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 1)
+
+    def test_compare_identical_profiles_kolmogorov(self):
+        """ Test if comparing to identical TProfiles with Kolmo Test works"""
+        c = validationcomparison.KolmogorovTest(self.profileA, self.profileA)
+        self.assertTrue(c.can_compare())
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 1)
 
     def test_compare_profiles_almost_equal(self):
         """
@@ -152,8 +214,9 @@ class TestComparison(unittest.TestCase):
             self.profileAequal, self.profileBequal)
 
         self.assertTrue(c.can_compare())
-        self.assertAlmostEqual(c.pvalue(), 0.43093514577898634)
-        self.assertAlmostEqual(c.ndf(), 49)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 0.43093514577898634)
+        self.assertAlmostEqual(c._ndf, 49)
 
     def test_compare_zero_error_profiles(self):
         """
@@ -173,13 +236,12 @@ class TestComparison(unittest.TestCase):
             self.profileZeroErrorBinsTwo)
 
         self.assertTrue(c.can_compare())
-        pvalue = c.pvalue()
-        # chi2 = c.chi2()
-        # chi2ndf = c.chi2ndf()
 
-        self.assertAlmostEqual(pvalue, 0.4835651485797353)
+        c.ensure_compute()
+
+        self.assertAlmostEqual(c._pvalue, 0.4835651485797353)
         # should still be only 49 ndf
-        self.assertEqual(c.ndf(), 49)
+        self.assertEqual(c._ndf, 49)
 
     def test_compare_histograms(self):
         """
@@ -189,10 +251,11 @@ class TestComparison(unittest.TestCase):
         c = validationcomparison.Chi2Test(self.histogramA, self.histogramB)
 
         self.assertTrue(c.can_compare())
-        self.assertAlmostEqual(c.pvalue(), 0.371600562118221)
-        self.assertAlmostEqual(c.chi2(), 42.308970111484086)
-        self.assertAlmostEqual(c.chi2ndf(), 1.0577242527871022)
-        self.assertEqual(c.ndf(), 40)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 0.371600562118221)
+        self.assertAlmostEqual(c._chi2, 42.308970111484086)
+        self.assertAlmostEqual(c._chi2ndf, 1.0577242527871022)
+        self.assertEqual(c._ndf, 40)
 
     def test_compare_unsupported_object(self):
         """
@@ -210,7 +273,7 @@ class TestComparison(unittest.TestCase):
         self.assertFalse(c.can_compare())
 
         with self.assertRaises(validationcomparison.ObjectsNotSupported):
-            c.pvalue()
+            c._compute()
 
     def test_compare_tefficiencies(self):
         """
@@ -221,11 +284,11 @@ class TestComparison(unittest.TestCase):
         c = validationcomparison.Chi2Test(self.teffA, self.teffB)
 
         self.assertTrue(c.can_compare())
-
-        self.assertAlmostEqual(c.pvalue(), 0.9760318312199932)
-        self.assertAlmostEqual(c.chi2(), 8.16784873)
-        self.assertAlmostEqual(c.chi2ndf(), 0.45376937)
-        self.assertEqual(c.ndf(), 18)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 0.9760318312199932)
+        self.assertAlmostEqual(c._chi2, 8.16784873)
+        self.assertAlmostEqual(c._chi2ndf, 0.45376937)
+        self.assertEqual(c._ndf, 18)
 
     def test_compare_tefficiencies_same(self):
         """
@@ -236,11 +299,11 @@ class TestComparison(unittest.TestCase):
 
         c = validationcomparison.Chi2Test(self.teffA, self.teffA)
         self.assertTrue(c.can_compare())
-
-        self.assertAlmostEqual(c.pvalue(), 1.0)
-        self.assertAlmostEqual(c.chi2(), 0.0)
-        self.assertAlmostEqual(c.chi2ndf(), 0.0)
-        self.assertEqual(c.ndf(), 18)
+        c.ensure_compute()
+        self.assertAlmostEqual(c._pvalue, 1.0)
+        self.assertAlmostEqual(c._chi2, 0.0)
+        self.assertAlmostEqual(c._chi2ndf, 0.0)
+        self.assertEqual(c._ndf, 18)
 
     def test_compare_differing_bins(self):
         """
@@ -254,7 +317,7 @@ class TestComparison(unittest.TestCase):
         self.assertFalse(c.can_compare())
 
         with self.assertRaises(validationcomparison.DifferingBinCount):
-            c.pvalue()
+            c._compute()
 
 
 if __name__ == "__main__":

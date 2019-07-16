@@ -72,7 +72,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
   addParam("silentlyAppend", m_silentAppend, "Append digits to a pre-existing non-empty storeArray", bool(false));
   addParam("badMappingFatal", m_badMappingFatal, "Throw B2FATAL if there's a wrong payload in the database", bool(false));
   addParam("UnpackerErrorRate", m_errorRate, "Unpacker will print one error every UnpackerErrorRate", int(1000));
-
+  addParam("PrintRawData", m_printRaw, "Printing Raw data words for debugging", bool(false));
 }
 
 SVDUnpackerModule::~SVDUnpackerModule()
@@ -227,7 +227,7 @@ void SVDUnpackerModule::event()
       for (unsigned int buf = 0; buf < 4; buf++) { // loop over 4 buffers
 
         if (data32tab[buf] == NULL && nWords[buf] == 0) continue;
-        //printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
+        if (m_printRaw) printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
 
         missedHeader = false;
         missedTrailer = false;

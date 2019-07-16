@@ -24,16 +24,12 @@
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
 
-
 namespace TreeFitter {
 
   FitManager::FitManager(Belle2::Particle* particle,
+                         const ConstraintConfiguration& config,
                          double prec,
-                         bool ipConstraint,
-                         bool customOrigin,
                          bool updateDaughters,
-                         const std::vector<double>& customOriginVertex,
-                         const std::vector<double>& customOriginCovariance,
                          const bool useReferencing
                         ) :
     m_particle(particle),
@@ -45,14 +41,12 @@ namespace TreeFitter {
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
     m_fitparams(nullptr),
-    m_useReferencing(useReferencing)
+    m_useReferencing(useReferencing),
+    m_config(config)
   {
     m_decaychain =  new DecayChain(particle,
-                                   false,
-                                   ipConstraint,
-                                   customOrigin,
-                                   customOriginVertex,
-                                   customOriginCovariance
+                                   config,
+                                   false
                                   );
     m_fitparams  = new FitParams(m_decaychain->dim());
   }
@@ -141,7 +135,7 @@ namespace TreeFitter {
     if (m_status == VertexStatus::Success) {
       // mass constraints comes after kine so we have to
       // update the mothers with the values set by the mass constraint
-      if (TreeFitter::massConstraintListPDG.size() != 0) {
+      if (m_config.m_massConstraintListPDG.size() != 0) {
         m_decaychain->locate(m_particle)->forceP4Sum(*m_fitparams);
       }
       updateTree(*m_particle, true);
@@ -253,7 +247,6 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
-
     if (m_updateDaugthers || isTreeHead) {
       if (posindex >= 0) {
         const TVector3 pos(m_fitparams->getStateVector()(posindex),

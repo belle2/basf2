@@ -33,7 +33,10 @@
 namespace Belle2 {
   namespace SVD {
 
-
+    /** SVDPackerModule: The SVD Raw Hits Creator.
+     *
+     * This module produces SVD Raw Data from simulated SVDShaperDigits
+     */
     class SVDPackerModule : public Module {
 
     public:
@@ -57,7 +60,7 @@ namespace Belle2 {
       std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
 
       bool m_simulate3sampleData; /**<if true, simulate 3-sample data taking*/
-
+      bool m_binPrintout;  /**< if true, print data created by the Packer */
 
     private:
 
@@ -167,14 +170,14 @@ namespace Belle2 {
 
 
       union {
-        uint32_t data32; // output
-        FTBHeader m_FTBHeader;
-        MainHeader m_MainHeader;
-        APVHeader m_APVHeader;
-        data_A  m_data_A;
-        data_B  m_data_B;
-        FADCTrailer m_FADCTrailer;
-        FTBTrailer m_FTBTrailer;
+        uint32_t data32; /**< Output 32-bit data word */
+        FTBHeader m_FTBHeader; /**< Implementation of FTB Header */
+        MainHeader m_MainHeader; /**< Implementation of FADC Header */
+        APVHeader m_APVHeader; /**< Implementation of APV Header */
+        data_A  m_data_A; /**< Implementation of 1st data word */
+        data_B  m_data_B; /**< Implementation of 2nd data word */
+        FADCTrailer m_FADCTrailer; /**< Implementation of FADC Trailer */
+        FTBTrailer m_FTBTrailer; /**< Implementation of FTB Trailer */
       };
 
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */

@@ -55,19 +55,19 @@ namespace Belle2 {
       /**
        *Initializes the Module.
        */
-      virtual void initialize() override;
-      virtual void beginRun() override;
-      virtual void event() override;
-      virtual void endRun() override;
+      virtual void initialize() override; /**<initialize*/
+      virtual void beginRun() override; /**<begin run*/
+      virtual void event() override; /**<event*/
+      virtual void endRun() override; /**<end run*/
 
-      std::string m_rawSVDListName;
-      std::string m_svdDigitListName;
+      std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
+      std::string m_svdDigitListName; /**<SVDDigit StoreArray name*/
 
-      bool m_generateOldDigits;
-      std::string m_svdShaperDigitListName;
-      std::string m_svdDAQDiagnosticsListName;
+      bool m_generateOldDigits;  /**< whether to produce old SVDDigit format*/
+      std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
+      std::string m_svdDAQDiagnosticsListName; /**<SVDDAQDiagnostic StoreArray name*/
 
-      int m_wrongFTBcrc;
+      int m_wrongFTBcrc; /**<FTB CRC no-Match counter*/
 
 
     private:
@@ -150,14 +150,14 @@ namespace Belle2 {
 
 
       union {  // The 4 byte words of the stream can be interpreted as:
-        uint32_t m_data32;
-        FTBHeader m_FTBHeader;
-        MainHeader m_MainHeader;
-        APVHeader m_APVHeader;
-        data_A  m_data_A;
-        data_B  m_data_B;
-        FADCTrailer m_FADCTrailer;
-        FTBTrailer m_FTBTrailer;
+        uint32_t m_data32; /**< Input 32-bit data word */
+        FTBHeader m_FTBHeader; /**< Implementation of FTB Header */
+        MainHeader m_MainHeader;  /**< Implementation of FADC Header */
+        APVHeader m_APVHeader;  /**< Implementation of APV Header */
+        data_A  m_data_A; /**< Implementation of 1st data word */
+        data_B  m_data_B; /**< Implementation of 2nd data word */
+        FADCTrailer m_FADCTrailer;  /**< Implementation of FADC Trailer */
+        FTBTrailer m_FTBTrailer; /**< Implementation of FTB Trailer */
       };
 
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
@@ -192,6 +192,9 @@ namespace Belle2 {
        *  APV/FADC combination in the mapping -> wrong payload is identified
        */
       bool m_badMappingFatal = false;
+
+      /** Optionally we can get printout of Raw Data words */
+      bool m_printRaw;
 
       /** The parameter that indicates what fraction of B2ERRORs messages
        * should be suppressed to not overload HLT while data taking

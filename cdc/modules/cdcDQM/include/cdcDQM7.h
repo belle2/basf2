@@ -44,18 +44,18 @@ namespace Belle2 {
 
   private:
     TH1D* h_nhits_L[56] = {nullptr}; /**<histogram hit in each layer*/
-    TH1D* h_tdc_L[56] = {nullptr}; /**<histogram tdc in each layer*/
-    TH1D* h_adc_L[56] = {nullptr};/**<histogram adc in each layer*/
 
     TH1D* h_tdc_sL[9] = {nullptr};/**<tdc each super layer*/
     TH1D* h_adc_sL[9] = {nullptr};/**<adc each super layer*/
 
     TH1D* h_fast_tdc = nullptr;/**<fastest TDC in each event*/
+    TH1D* h_board_out_tdc = nullptr;/**<board w/ out of range TDC*/
 
     TH2D* bmap_2 = nullptr;/**<board status map 2D*/
     // add
     TH1D* h_occ = nullptr;/**<occupancy*/
-    TH1D* h_occ_L_px = nullptr;/**<occupancy*/
+    TH1D* h_occ_L[56] = {nullptr}; /**<occupancy-layer-dep.*/
+
 
   };
 }

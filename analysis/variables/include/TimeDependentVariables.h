@@ -84,6 +84,27 @@ namespace Belle2 {
      */
     double particleTagVNTracks(const Particle* particle);
 
+    /**
+     * returns the number of degrees of freedom in the tag vertex fit. can be non-integer due to adaptive vertex fitting.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVNDF(const Particle*);
+
+    /**
+     * returns chi^2 value of the tag vertex fit result.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVChi2(const Particle*);
+
+    /**
+     * returns the IP component of chi^2 value of the tag vertex fit result.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVChi2IP(const Particle*);
+
 
     /**
      * return the error of the X component of the tag vertex

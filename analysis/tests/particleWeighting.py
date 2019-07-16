@@ -42,14 +42,14 @@ def check(ntupleName, treeName):
     ntuple = ntuplefile.Get(treeName)
 
     if ntuple.GetEntries() == 0:
-        B2FATAL("No piions saved")
+        B2FATAL("No pions saved")
 
-    if not(ntuple.GetEntries("pi_binID > 0 ") > 0):
+    if not(ntuple.GetEntries("binID > 0 ") > 0):
         B2FATAL("Binning was applied incorrectly: no pions in physical bins")
     else:
         B2RESULT("Bins are defined")
 
-    if not(ntuple.GetEntries("pi_Weight > 0") > 0):
+    if not(ntuple.GetEntries("Weight > 0") > 0):
         B2FATAL("Weights are not applied")
     else:
         B2RESULT("Weights are applied")
@@ -154,12 +154,13 @@ addtable2.param('runHigh', 1000)
 addtable2.param('runLow', 0)
 addtable2.param('tableName', "ParticleReweighting:TestMomentum2")
 
-analysis_main.add_module(addtable)
-analysis_main.add_module(addtable2)
-analysis_main.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
+testpath = Path()
+testpath.add_module(addtable)
+testpath.add_module(addtable2)
+testpath.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
 
 # Process the events
-process(analysis_main)
+process(testpath)
 B2RESULT("Weights are created and loaded to DB")
 
 
@@ -188,7 +189,7 @@ variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
 variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
 variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')
 variables.addAlias('binID', 'extraInfo(' + weight_table_id + '_binID)')
-toolsPi = ['CustomFloats[p:pz:Weight:StatErr:SystErr:binID]', '^pi+:gen']
+varsPi = ['p', 'pz', 'Weight', 'StatErr', 'SystErr', 'binID']
 
 
 # We configure weighing module
@@ -199,8 +200,8 @@ main.add_module(reweighter)
 
 
 # write out the flat ntuple
-ntupleFile(ntupleName, path=main)
-ntupleTree(treeName, 'pi+:gen', toolsPi, path=main)
+variablesToNtuple('pi+:gen', varsPi, filename=ntupleName, treename=treeName,
+                  path=main)
 
 # Process the events
 process(main)

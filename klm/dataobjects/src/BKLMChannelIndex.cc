@@ -66,6 +66,11 @@ uint16_t BKLMChannelIndex::getKLMModuleNumber() const
   return m_ElementNumbers->moduleNumberBKLM(m_Forward, m_Sector, m_Layer);
 }
 
+uint16_t BKLMChannelIndex::getKLMSectorNumber() const
+{
+  return m_ElementNumbers->sectorNumberBKLM(m_Forward, m_Sector);
+}
+
 BKLMChannelIndex BKLMChannelIndex::begin()
 {
   return BKLMChannelIndex(0, 1, 1, 0, 1, m_IndexLevel);

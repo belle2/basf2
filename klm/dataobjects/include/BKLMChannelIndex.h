@@ -123,6 +123,11 @@ namespace Belle2 {
     uint16_t getKLMModuleNumber() const;
 
     /**
+     * Get KLM sector number.
+     */
+    uint16_t getKLMSectorNumber() const;
+
+    /**
      * First channel.
      */
     BKLMChannelIndex begin();

@@ -105,6 +105,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get sector hit map.
+     */
+    const KLMChannelMapValue<unsigned int>& getHitMapSector() const
+    {
+      return m_HitMapSector;
+    }
+
+    /**
      * Get module active-channel map.
      */
     const KLMChannelMapValue<unsigned int>& getModuleActiveChannelMap() const
@@ -157,6 +165,9 @@ namespace Belle2 {
 
     /** Module hit map. */
     KLMChannelMapValue<unsigned int> m_HitMapModule;
+
+    /** Sector hit map. */
+    KLMChannelMapValue<unsigned int> m_HitMapSector;
 
     /** Module active-channel map (number of active channels in module). */
     KLMChannelMapValue<unsigned int> m_ModuleActiveChannelMap;

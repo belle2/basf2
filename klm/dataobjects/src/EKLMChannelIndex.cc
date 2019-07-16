@@ -55,6 +55,11 @@ uint16_t EKLMChannelIndex::getKLMModuleNumber() const
   return m_ElementNumbers->moduleNumberEKLM(m_Endcap, m_Sector, m_Layer);
 }
 
+uint16_t EKLMChannelIndex::getKLMSectorNumber() const
+{
+  return m_ElementNumbers->sectorNumberEKLM(m_Endcap, m_Sector);
+}
+
 EKLMChannelIndex EKLMChannelIndex::begin()
 {
   return EKLMChannelIndex(1, 1, 1, 1, 1, m_IndexLevel);

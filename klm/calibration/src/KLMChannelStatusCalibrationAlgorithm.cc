@@ -30,7 +30,7 @@ KLMChannelStatusCalibrationAlgorithm::~KLMChannelStatusCalibrationAlgorithm()
 
 CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
 {
-  uint16_t channel, module;
+  uint16_t channel, module, sector;
   unsigned int hits, moduleHits;
   /*
    * Fill channel hit map. Note that more than one entry can exist for the same
@@ -50,28 +50,40 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     m_TotalHitNumber += hits;
   }
   m_ChannelStatus = new KLMChannelStatus();
-  /* Fill module hit map. */
+  /* Fill module and sector hit maps. */
   BKLMChannelIndex bklmModules(BKLMChannelIndex::c_IndexLevelLayer);
   for (BKLMChannelIndex& bklmModule : bklmModules)
     m_HitMapModule.setChannelData(bklmModule.getKLMModuleNumber(), 0);
   EKLMChannelIndex eklmModules(EKLMChannelIndex::c_IndexLevelLayer);
   for (EKLMChannelIndex& eklmModule : eklmModules)
     m_HitMapModule.setChannelData(eklmModule.getKLMModuleNumber(), 0);
+  BKLMChannelIndex bklmSectors(BKLMChannelIndex::c_IndexLevelSector);
+  for (BKLMChannelIndex& bklmSector : bklmSectors)
+    m_HitMapSector.setChannelData(bklmSector.getKLMSectorNumber(), 0);
+  EKLMChannelIndex eklmSectors(EKLMChannelIndex::c_IndexLevelSector);
+  for (EKLMChannelIndex& eklmSector : eklmSectors)
+    m_HitMapSector.setChannelData(eklmSector.getKLMSectorNumber(), 0);
   BKLMChannelIndex bklmChannels;
   for (BKLMChannelIndex& bklmChannel : bklmChannels) {
     channel = bklmChannel.getKLMChannelNumber();
     module = bklmChannel.getKLMModuleNumber();
+    sector = bklmChannel.getKLMSectorNumber();
     hits = m_HitMapChannel.getChannelData(channel);
     m_HitMapModule.setChannelData(
       module, m_HitMapModule.getChannelData(module) + hits);
+    m_HitMapSector.setChannelData(
+      sector, m_HitMapModule.getChannelData(sector) + hits);
   }
   EKLMChannelIndex eklmChannels;
   for (EKLMChannelIndex& eklmChannel : eklmChannels) {
     channel = eklmChannel.getKLMChannelNumber();
     module = eklmChannel.getKLMModuleNumber();
+    sector = eklmChannel.getKLMSectorNumber();
     hits = m_HitMapChannel.getChannelData(channel);
     m_HitMapModule.setChannelData(
       module, m_HitMapModule.getChannelData(module) + hits);
+    m_HitMapSector.setChannelData(
+      sector, m_HitMapModule.getChannelData(sector) + hits);
   }
   /* Module status. */
   if (m_ModuleStatus == nullptr)

@@ -23,6 +23,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDModeByte.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <boost/tuple/tuple.hpp>
 #include <fstream>
 #include <sstream>
@@ -100,8 +101,6 @@ SVDDigitizerModule::SVDDigitizerModule() : Module()
            "Interval between ADC samples in ns", double(31.44));
   addParam("StartSampling", m_startSampling,
            "Start of the sampling window, in ns", double(-31.44));
-  addParam("nAPV25Samples", m_nAPV25Samples, "number of APV25 samples",
-           6);
   addParam("RandomizeEventTimes", m_randomizeEventTimes,
            "Randomize event times over a frame interval", bool(false));
   addParam("TimeFrameLow", m_minTimeFrame,
@@ -187,7 +186,6 @@ void SVDDigitizerModule::initialize()
   B2DEBUG(1, " -->  APV25 shaping time: " << m_shapingTime);
   B2DEBUG(1, " -->  Sampling time:      " << m_samplingTime);
   B2DEBUG(1, " -->  Start of int. wind.:" << m_startSampling);
-  B2DEBUG(1, " -->  Number of samples:  " << m_nAPV25Samples);
   B2DEBUG(1, " -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
   B2DEBUG(1, " REPORTING: ");
   B2DEBUG(1, " -->  statisticsFilename: " << m_rootFilename);
@@ -640,6 +638,9 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
 
 void SVDDigitizerModule::saveDigits()
 {
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
@@ -648,28 +649,26 @@ void SVDDigitizerModule::saveDigits()
   RelationArray relShaperDigitTrueHit(storeShaperDigits, storeTrueHits,
                                       m_relShaperDigitTrueHitName);
 
-  //Set time of the first sample
+  //Get time of the first sample
   const double bunchTimeSep = 2 * 1.96516; //in ns
-  const int bunchXingsInAPVclock = 8; //m_samplingTime/bunchTimeSep;
-  int bunchXingsSinceAPVstart = gRandom->Integer(bunchXingsInAPVclock);
+  int triggerBin = modeByte.getTriggerBin();
+  int bunchXingsSinceAPVstart  = 2 * triggerBin + gRandom->Integer(2);
   double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
-  //set run type (0 = raw, 1 = transparent, 2 = zero-suppressed, 3 = zero-suppressed + hit finding
-  int runType = 2; //zero-suppressed
+  //Get SVD config from SVDEventInfo
+  //  int runType = (int) modeByte.getRunType();
+  //  int eventType = (int) modeByte.getEventType();
+  int daqMode = (int) modeByte.getDAQMode();
 
-  //set event type (0 = global run, 1 = local run)
-  int eventType = 0; //global run
-
-  //set the DAQ mode to 1, 3, or 6-samples:
-  int daqMode = 3;  //does not correspond to anything expected on data
-  if (m_nAPV25Samples == 6)
-    daqMode = 2;
-  else if (m_nAPV25Samples == 3)
-    daqMode = 1;
-  else if (m_nAPV25Samples == 1)
-    daqMode = 0;
+  int nAPV25Samples = 0;
+  if (daqMode == 2)
+    nAPV25Samples = 6;
+  else if (daqMode == 1)
+    nAPV25Samples = 3;
+  else if (daqMode == 0)
+    nAPV25Samples = 1;
   else
-    B2WARNING("The number of APV samples that you are simulating is not expected! If you are using the CoG in recontruction, do not expect to get reasonable RecoDigits");
+    B2ERROR("daqMode not recongized, check SVDEventInfoSetter parameters");
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;
@@ -705,8 +704,8 @@ void SVDDigitizerModule::saveDigits()
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
       // For noise digits, just generate random variates on randomly selected samples
       if (s.isNoise()) {
-        double pSelect = 1.0 / m_nAPV25Samples;
-        for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
+        double pSelect = 1.0 / nAPV25Samples;
+        for (int iSample = 0; iSample < nAPV25Samples; iSample++) {
           if (gRandom->Uniform() < pSelect)
             samples.push_back(addNoise(-1, elNoiseU));
           else
@@ -714,7 +713,7 @@ void SVDDigitizerModule::saveDigits()
         }
       } else {
         double t = initTime;
-        for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+        for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
           samples.push_back(addNoise(s(t), elNoiseU));
           t += m_samplingTime;
         }
@@ -739,8 +738,8 @@ void SVDDigitizerModule::saveDigits()
       if (n_over < m_nSamplesOverZS) continue;
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(runType, eventType, daqMode,
-                                                 bunchXingsSinceAPVstart >> 1)));
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, modeByte));
+
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
         relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
@@ -777,8 +776,8 @@ void SVDDigitizerModule::saveDigits()
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
       // For noise digits, just generate random variates on randomly selected samples
       if (s.isNoise()) {
-        double pSelect = 1.0 / m_nAPV25Samples;
-        for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
+        double pSelect = 1.0 / nAPV25Samples;
+        for (int iSample = 0; iSample < nAPV25Samples; iSample++) {
           if (gRandom->Uniform() < pSelect)
             samples.push_back(addNoise(-1, elNoiseV));
           else
@@ -786,7 +785,7 @@ void SVDDigitizerModule::saveDigits()
         }
       } else {
         double t = initTime;
-        for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+        for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
           samples.push_back(addNoise(s(t), elNoiseV));
           t += m_samplingTime;
         }
@@ -811,8 +810,8 @@ void SVDDigitizerModule::saveDigits()
       if (n_over < m_nSamplesOverZS) continue;
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(runType, eventType, daqMode,
-                                                 bunchXingsSinceAPVstart >> 1)));
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, modeByte));
+
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
         relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());

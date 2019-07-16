@@ -56,7 +56,7 @@ Here is an example of use:
 
 Keywords for custom MCMatching
 ------------------------------
-One can use the keyeords for decay string to configure how :code:`'isCustomSignal'` is behaving. If these keywords are used, the missing particles are ignored or taken into account. For example, if :code:`'...'` is used, missing final state particles are ignored, hence :code:`'isCustomSignal'` works as :code:`'isSignalAcceptMissingMassive'`.
+One can use the keywords for decay string to configure how :code:`'isCustomSignal'` is behaving. If these keywords are used, the missing particles are ignored or taken into account. For example, if :code:`'...'` is used, missing final state particles are ignored, hence :code:`'isCustomSignal'` works as :code:`'isSignalAcceptMissingMassive'`.
 
 * :code:`'...'` Missing massive final state particles are ignored
 * :code:`'?nu'` Missing neutrinos are ignored

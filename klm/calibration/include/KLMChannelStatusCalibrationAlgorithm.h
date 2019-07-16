@@ -216,13 +216,14 @@ namespace Belle2 {
     void calibrateModule(uint16_t module);
 
     /**
-     * Mark hot channels.
+     * Mark hot channel.
      * @param[in] channel        Channel number.
      * @param[in] moduleHits     Number of hits in this module.
      * @param[in] activeChannels Number of active channels in this module.
+     * @return True if the channel is marked as hot.
      */
-    void markHotChannels(uint16_t channel, unsigned int moduleHits,
-                         int activeChannels);
+    bool markHotChannel(uint16_t channel, unsigned int moduleHits,
+                        int activeChannels);
 
     /**
      * Calibrate channel.

@@ -651,13 +651,15 @@ void SVDDigitizerModule::saveDigits()
 
   //Get time of the first sample
   const double bunchTimeSep = 2 * 1.96516; //in ns
-  int bunchXingsSinceAPVstart = modeByte.getTriggerBin();
+  int triggerBin = modeByte.getTriggerBin();
+  int bunchXingsSinceAPVstart  = 2 * triggerBin + gRandom->Integer(2);
   double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
   //Get SVD config from SVDEventInfo
-  int runType = modeByte.getRunType();
-  int eventType = modeByte.getEventType();
-  int daqMode = modeByte.getDAQMode();
+  //  int runType = (int) modeByte.getRunType();
+  //  int eventType = (int) modeByte.getEventType();
+  int daqMode = (int) modeByte.getDAQMode();
+
   int nAPV25Samples = 0;
   if (daqMode == 2)
     nAPV25Samples = 6;
@@ -736,8 +738,8 @@ void SVDDigitizerModule::saveDigits()
       if (n_over < m_nSamplesOverZS) continue;
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(runType, eventType, daqMode,
-                                                 bunchXingsSinceAPVstart >> 1)));
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, modeByte));
+
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
         relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
@@ -808,8 +810,8 @@ void SVDDigitizerModule::saveDigits()
       if (n_over < m_nSamplesOverZS) continue;
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(runType, eventType, daqMode,
-                                                 bunchXingsSinceAPVstart >> 1)));
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, modeByte));
+
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
         relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());

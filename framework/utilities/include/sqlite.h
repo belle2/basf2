@@ -14,7 +14,24 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <tuple>
 
+/** C++ wrapper around the sqlite C Api for convenient use of SQLite statements in C++
+ *
+ * This namespace contains a header only interface to the
+ * <a href="https://www.sqlite.org/">sqlite library</a>. It mainly consists of
+ * of a Connection class to wrap the underlying C api sqlite object in a safe way.
+ * It is intended for comfortable read only access to sqlite files.
+ *
+ * It also contains three classes to handle SQL statements in sqlite files in a type safe way:
+ *
+ * * Statement: execute statement and return rows as std::tuple<Columns...>
+ * * ObjectStatement: execute statement and return rows as any object with a
+ *   constructor accepting all elements of the std::tuple<Columns...>
+ * * SimpleStatement: execute a statement returning a single column and return
+ *   that column without any wrapper.
+ *
+ */
 namespace sqlite {
   /** Simple error class to be thrown if there is any sqlite error on any of the operations */
   class SQLiteError: public std::runtime_error {
@@ -32,7 +49,7 @@ namespace sqlite {
      * @param code return code from a sqlite api call
      * @param prefix text to prepend in front of the sqlite error message
      */
-    inline void throwSQLiteError(int code, const std::string& prefix = "")
+    inline void checkSQLiteError(int code, const std::string& prefix = "")
     {
       if (code != SQLITE_OK) throw SQLiteError(code, prefix);
     }
@@ -45,8 +62,8 @@ namespace sqlite {
      * into the given references with the correct types.
      */
     class ColumnFiller {
-      sqlite3_stmt* stmt; /**< statement on which to work on */
     public:
+      /** Create a new instance for the given statement */
       ColumnFiller(sqlite3_stmt* statement): m_stmt(statement) {}
       /** Fill integer column */
       void operator()(int index, int& col) { col = sqlite3_column_int(m_stmt, index); }
@@ -57,6 +74,7 @@ namespace sqlite {
       /** Fill string column */
       void operator()(int index, std::string& col)
       {
+        // ptr is owned by sqlite, no need to free but we need to copy
         if (auto ptr = reinterpret_cast<const char*>(sqlite3_column_text(m_stmt, index)); ptr != nullptr) {
           col = ptr;
         }
@@ -64,19 +82,23 @@ namespace sqlite {
       /* Fill blob column */
       void operator()(int index, std::vector<std::byte>& col)
       {
+        // ptr is owned by sqlite, no need to free but we need to copy
         if (auto ptr = reinterpret_cast<const std::byte*>(sqlite3_column_blob(m_stmt, index)); ptr != nullptr) {
           size_t bytes = sqlite3_column_bytes(m_stmt, index);
           col = std::vector<std::byte>(ptr, ptr + bytes);
         }
       }
       /** Fill an possibly null column in an optional */
-      template<class T> void operator()(int index, std::optional<T>& col)
+      template<class T>
+      void operator()(int index, std::optional<T>& col)
       {
-        if (sqlite3_column_type(stmt, index) != SQLITE_NULL) {
+        if (sqlite3_column_type(m_stmt, index) != SQLITE_NULL) {
           col.emplace();
           (*this)(index, *col);
         }
       }
+    private:
+      sqlite3_stmt* m_stmt; /**< statement on which to work on */
     };
 
     /** Bind the given parameter to the sqlite statement
@@ -87,16 +109,18 @@ namespace sqlite {
      * correct type.
     */
     class ParameterBinder {
-      sqlite3_stmt* m_stmt; /**< statement on which to work on */
-      /** Bind the parameter with the given index to the statement */
     public:
+      /** Create a new object for the given statement*/
       ParameterBinder(sqlite3_stmt* statement): m_stmt(statement) {}
 
-      template<class T> void operator()(int index, T&& param)
+      /** Bind the parameter with the given index to the statement */
+      template<class T>
+      void operator()(int index, T&& param)
       {
         // For some reason bind parameters start at one ...
-        throwSQLiteError(bind(index + 1, std::forward<T>(param)));
+        checkSQLiteError(bind(index + 1, std::forward<T>(param)));
       }
+    private:
       /** bind an integer parameter */
       int bind(int index, int param) { return sqlite3_bind_int(m_stmt, index, param);}
       /** bind a 64bit integer parameter */
@@ -114,11 +138,13 @@ namespace sqlite {
         return sqlite3_bind_blob(m_stmt, index, param.data(), param.size(), SQLITE_TRANSIENT);
       }
       /** bind an optional: if it doesn't have a value we bind NULL */
-      template<class T> int bind(int index, const std::optional<T>& param)
+      template<class T>
+      int bind(int index, const std::optional<T>& param)
       {
         if (param.has_value()) return bind(*param);
         return sqlite3_bind_null(m_stmt, index);
       }
+      sqlite3_stmt* m_stmt; /**< statement on which to work on */
     };
 
     /** Implementation function to call a functor for each element in a tuple with the index and a reference to the value. */
@@ -148,9 +174,9 @@ namespace sqlite {
    * result is supposed to fill one object of type ObjectType.
    *
    * Columns is the type of each of the columns in the returned data. When
-   * calling getRow() the data current result row will be converted to the types
-   * specified by Columns and passed to the constructor of ObjectType and the
-   * resulting object is returned.
+   * calling getRow() the selected columns from the current result row will
+   * be converted to the typesspecified by Columns and passed to the constructor
+   * of ObjectType and the resulting object is returned.
    *
    * After calling execute one can iterate over the statement to get all rows.
    *
@@ -168,7 +194,7 @@ namespace sqlite {
   template<class ObjectType, class ... Columns>
   class ObjectStatement {
   public:
-    /** each row is a tuple of all column types */
+    /** each row gets converted to a instance of this type */
     using value_type = ObjectType;
 
     /** Iterator class to allow iterating over the rows */
@@ -212,7 +238,7 @@ namespace sqlite {
     /** Create a statement for an existing database object */
     ObjectStatement(sqlite3* db, const std::string& query, bool persistent)
     {
-      detail::throwSQLiteError(sqlite3_prepare_v3(db, query.data(), query.size(), persistent ? SQLITE_PREPARE_PERSISTENT : 0,
+      detail::checkSQLiteError(sqlite3_prepare_v3(db, query.data(), query.size(), persistent ? SQLITE_PREPARE_PERSISTENT : 0,
                                                   &m_statement, nullptr), "Cannot prepare database statement: ");
       if (auto cols = sqlite3_column_count(m_statement); cols != sizeof...(Columns)) {
         throw std::runtime_error("Number of column (" + std::to_string(cols) + ") doesn't match number of template parameters (" +
@@ -223,15 +249,16 @@ namespace sqlite {
     ~ObjectStatement() { if (m_statement) sqlite3_finalize(m_statement); }
 
     /** Execute the statement, providing all necessary parameters */
-    template<class ... Parameters> ObjectStatement& execute(Parameters... values)
+    template<class ... Parameters>
+    ObjectStatement& execute(Parameters... parameters)
     {
       if (auto params = sqlite3_bind_parameter_count(m_statement); params != sizeof...(Parameters)) {
         throw std::runtime_error("Number of arguments (" + std::to_string(sizeof...(Parameters)) +
                                  ") doesn't match number of statement parameters (" + std::to_string(params) + ")");
       }
       sqlite3_reset(m_statement);
-      auto value_tuple = std::make_tuple(values...);
-      detail::visitTupleWithIndex(value_tuple, detail::ParameterBinder{m_statement});
+      auto parameter_tuple = std::make_tuple(parameters...);
+      detail::visitTupleWithIndex(parameter_tuple, detail::ParameterBinder{m_statement});
       return *this;
     }
 
@@ -242,7 +269,7 @@ namespace sqlite {
     {
       if (auto ret = sqlite3_step(m_statement); ret != SQLITE_ROW) {
         if (ret == SQLITE_DONE) return false;
-        detail::throwSQLiteError(ret);
+        detail::checkSQLiteError(ret);
       }
       return true;
     }
@@ -268,14 +295,15 @@ namespace sqlite {
   class Connection {
   public:
     /** Create from filename */
-    Connection(const std::string& filename)
+    explicit Connection(const std::string& filename)
     {
-      detail::throwSQLiteError(sqlite3_open_v2(filename.c_str(), &m_connection, SQLITE_OPEN_READONLY, nullptr));
+      detail::checkSQLiteError(sqlite3_open_v2(filename.c_str(), &m_connection, SQLITE_OPEN_READONLY, nullptr));
     }
     /** And clean up */
     ~Connection() { if (m_connection) sqlite3_close_v2(m_connection); }
     /** Return a prepared statement for execution */
-    template<class ... Columns> Statement<Columns...> prepare(const std::string& query, bool persistent = false) { return Statement<Columns...>(m_connection, query, persistent); }
+    template<class ... Columns>
+    Statement<Columns...> prepare(const std::string& query, bool persistent = false) { return Statement<Columns...>(m_connection, query, persistent); }
     /** Convert to raw sqlite3 pointer to allow initialization of statements without calling prepare */
     operator sqlite3* () const { return m_connection; }
   private:

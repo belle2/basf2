@@ -101,11 +101,6 @@ std::string LogMessage::toJSON(bool complete) const
     buffer << ",\"timestamp\":" << std::fixed << std::setprecision(3) << time;
   if (ProcHandler::EvtProcID() != -1 or complete)
     buffer << ",\"proc\":" << ProcHandler::EvtProcID();
-  if (complete) {
-    std::stringstream tmp;
-    print(tmp);
-    buffer << R"(,"full_message":")" << create_escapes(tmp.str()) << '"';
-  }
   //variables ...
   buffer << "}\n";
   return buffer.str();

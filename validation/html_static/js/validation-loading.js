@@ -674,47 +674,47 @@ function loadValidationPlots(packageLoadName="") {
 function fillNtupleTable(domId, jsonLoadingPath) {
     // move out of the static folder
     $.getJSON(`../${jsonLoadingPath}`, function (ntuple_data) {
-        let items = [];
+        let table_str = "";
 
         // add header
-        items.push("<tr>");
-        items.push("<th>tag</th>");
+        table_str += "<tr>";
+        table_str += "<th>tag</th>";
 
         // get the name of each value which is plotted
         for (let rev in ntuple_data) {
             for (let val_pair of ntuple_data[rev]) {
-                items.push(`<th>${val_pair[0]}</th>`);
+                table_str += `<th>${val_pair[0]}</th>`;
             }
             break;
         }
 
-        items.push("</tr>");
+        table_str += "</tr>";
 
         // reference first, if available
         $.each(ntuple_data, function (key) {
             if (key === "reference") {
-                items.push("<tr>");
-                items.push(`<td>${key}</td>`);
+                table_str += "<tr>";
+                table_str += `<td>${key}</td>`;
                 for (let val_pair of ntuple_data[key]) {
-                    items.push(`<td>${val_pair[1]}</td>`);
+                    table_str += `<td>${val_pair[1]}</td>`;
                 }
-                items.push("</tr>");
+                table_str += "</tr>";
             }
         });
 
         // now the rest
         $.each(ntuple_data, function (key) {
             if (key !== "reference") {
-                items.push("<tr>");
-                items.push(`<td>${key}</td>`);
+                table_str += "<tr>";
+                table_str += `<td>${key}</td>`;
                 for (let val_pair of ntuple_data[key]) {
-                    items.push(`<td>${val_pair[1]}</td>`);
+                    table_str += `<td>${val_pair[1]}</td>`;
                 }
-                items.push("</tr>");
+                table_str += "</tr>";
             }
         });
 
-        $(`#${domId}`).after(items);
+        $(`#${domId}`).append(table_str);
     });
 }
 

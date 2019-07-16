@@ -254,11 +254,6 @@ textarea {
     border: 0;
 }
 
-#content table {
-    border: 1px solid #bdc3c7;
-    width: 100%;
-}
-
 #loglist {
     background: #FFF;
     border: 1px solid gray;
@@ -819,11 +814,39 @@ tr:nth-child(even) td {
     margin: 0.3em 0;
 }
 
-.wrap_boxes th{
+.ntuple_table th{
     border-style: solid;
     border-color: black;
     border-width: 0 0 1px 0;
 }
+
+.ntuple_table tr, td, th{
+    white-space: nowrap;
+}
+
+.ntuple_table tr:hover{
+    background-color: #49c7c3;
+}
+
+.ntuple_table tr:nth-child(even):hover td {
+    background-color: #49c7c3;
+}
+
+/*.ntuple_table {
+    border: none;
+}
+
+tr, td {
+    border: none;
+}
+
+table {
+    border: none;
+}
+
+tbody {
+    border: none;
+}*/
 
 /* ==========================================================================
    Helper classes

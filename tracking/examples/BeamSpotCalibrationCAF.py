@@ -74,8 +74,8 @@ if __name__ == "__main__":
     input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
 
     if not len(input_files):
-        print("You have to specify some input file(s)(raw data or di - muon skim with raw objects)
-              using the standard basf2 command line option - i")
+        print("You have to specify some input file(s) (raw data or di - muon skim with raw objects)\n"
+              "using the standard basf2 command line option - i")
         print("See: basf2 -h")
         sys.exit(1)
 

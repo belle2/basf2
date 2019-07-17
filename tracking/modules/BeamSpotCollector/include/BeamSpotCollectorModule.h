@@ -21,8 +21,9 @@
 
 namespace Belle2 {
   /**
-   * This Module, made for ExpressReco, monitors the position
-   * and the dimension of the beamspot using mu+mu- events
+   * This collects the position
+   * and the dimension of the beamspot using mu+mu- events for
+   * calibration of the BeamSpot using CAF
    */
   class BeamSpotCollectorModule : public CalibrationCollectorModule {
 

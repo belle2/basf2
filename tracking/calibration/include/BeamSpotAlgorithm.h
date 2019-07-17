@@ -14,12 +14,12 @@
 
 namespace Belle2 {
   /**
-   * Class implementing Millepede calibration algorithm
+   * Class implementing BeamSpot calibration algorithm
    */
   class BeamSpotAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /// Constructor set the prefix to MillepedeCalibration
+    /// Constructor set the prefix to BeamSpotCollector
     BeamSpotAlgorithm();
 
     /// Destructor

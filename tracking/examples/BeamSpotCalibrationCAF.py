@@ -31,34 +31,6 @@ input_branches = [
     'RawKLMs']
 
 
-def main(argv):
-
-    input_files_physics = ['/ghi/fs01/belle2/bdata/Data/Raw/e0007/r0158*/sub00/physics.*.root']
-
-    if len(argv) == 0:
-        pass
-    elif len(argv) == 1:
-        data_dir_1 = argv[0]
-
-        input_files_physics = [os.path.join(os.path.abspath(data_dir_1), '*.root')]
-    else:
-        print("Usage: basf2 ", sys.argv[0], " [<directory with physics raw data or di-muon skim>]")
-        sys.exit(1)
-
-    beamspot = BeamSpotCalibration(input_files_physics, ['data_reprocessing_proc9'])
-    # beamspot.max_iterations = 0
-
-    cal_fw = CAF()
-    cal_fw.add_calibration(beamspot)
-    cal_fw.backend = backends.LSF()
-
-    # Try to guess if we are at KEKCC and change the backend to Local if not
-    if multiprocessing.cpu_count() < 10:
-        cal_fw.backend = backends.Local(8)
-
-    cal_fw.run()
-
-
 def BeamSpotCalibration(files, tags):
 
     # Set-up re-processing path
@@ -99,4 +71,23 @@ def BeamSpotCalibration(files, tags):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
+
+    if not len(input_files):
+        print("You have to specify some input file(s)(raw data or di - muon skim with raw objects)
+              using the standard basf2 command line option - i")
+        print("See: basf2 -h")
+        sys.exit(1)
+
+    beamspot = BeamSpotCalibration(input_files, ['data_reprocessing_proc9'])
+    # beamspot.max_iterations = 0
+
+    cal_fw = CAF()
+    cal_fw.add_calibration(beamspot)
+    cal_fw.backend = backends.LSF()
+
+    # Try to guess if we are at KEKCC and change the backend to Local if not
+    if multiprocessing.cpu_count() < 10:
+        cal_fw.backend = backends.Local(8)
+
+    cal_fw.run()

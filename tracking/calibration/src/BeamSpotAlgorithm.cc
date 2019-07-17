@@ -1,4 +1,14 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Gaetano de Marino, Tadeas Bilka                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #include <tracking/calibration/BeamSpotAlgorithm.h>
+
 #include <mdst/dbobjects/BeamSpot.h>
 
 #include <TH1F.h>

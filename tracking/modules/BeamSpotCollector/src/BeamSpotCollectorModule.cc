@@ -6,18 +6,16 @@
  * Contributors: Gaetano de Marino, Tadeas Bilka                          *
  *                                                                        *
  *                                                                        *
- *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/BeamSpotCollector/BeamSpotCollectorModule.h>
+
 #include <analysis/variables/ContinuumSuppressionVariables.h>
 #include <analysis/variables/VertexVariables.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <TLorentzVector.h>
 #include <TStyle.h>
-#include <TDirectory.h>
 #include <iostream>
 #include <framework/logging/Logger.h>
 

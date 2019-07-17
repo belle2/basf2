@@ -12,6 +12,7 @@ import os
 import tempfile
 import shutil
 from B2Tools.b2root import RawRootFile, byteorder
+from basf2 import B2ERROR
 
 
 def get_argument_parser():
@@ -111,6 +112,13 @@ if __name__ == "__main__":
             key.data = buffer
 
         else:
+            # check whether we break pointers in TTrees
+            if key.classname == b'TTree' and offset != 0:
+                B2ERROR('Changing the name of root files containing a tree is not supported.')
+                if not args.in_place:
+                    os.remove(newrootfile.name)
+                sys.exit(1)
+
             # update key data in KeysList: number of keys and key headers
             # and remember key position
             if key.showname == b'KeysList':

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from modularAnalysis import analysis_main
 from modularAnalysis import setAnalysisConfigParams
 import os
 import re
@@ -28,7 +27,7 @@ def setupBelleDatabaseServer():
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
-def setupBelleMagneticField(path=analysis_main):
+def setupBelleMagneticField(path):
     """
     This function set the Belle Magnetic field (constant).
     """
@@ -65,7 +64,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   useBelleDBServer=None,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
-                                  path=analysis_main, entrySequences=None,
+                                  path=None, entrySequences=None,
                                   convertECLCrystalEnergies=False,
                                   convertExtHits=False):
     """

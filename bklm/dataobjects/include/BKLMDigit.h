@@ -73,8 +73,8 @@ namespace Belle2 {
     bool isAboveThreshold() const { return ((m_ModuleID & BKLM_ABOVETHRESHOLD_MASK) != 0); }
 
     //! Get detector end
-    //! @return detector end (TRUE=forward or FALSE=backward) of this strip
-    bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
+    //! @return detector end (1=forward or 0=backward) of this strip
+    int getForward() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
 
     //! Get sector number
     //! @return sector number of this strip (1..8)

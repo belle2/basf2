@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
       /** Constructor taking a compound id */
-      ChipID(baseType id = 0) { m_id.id = id; }
+      explicit ChipID(baseType id = 0) { m_id.id = id; }
       /** Constructor taking chip numbers */
       ChipID(chipNumberType FADC, chipNumberType APV25)
       { m_id.parts.FADC = FADC; m_id.parts.APV25 = APV25; }
@@ -95,7 +95,7 @@ namespace Belle2 {
       } m_id;
     }; //ChipID class
 
-
+    /** Class to hold numbers related to sensor */
     class SensorID {
     public:
       /** Typedefs of the compound id type and chip number types */
@@ -105,7 +105,7 @@ namespace Belle2 {
 
 
       /** Constructor taking a compound id */
-      SensorID(baseType id = 0) { m_ID.id = id; }
+      explicit SensorID(baseType id = 0) { m_ID.id = id; }
       /** Constructor taking sensor info */
       SensorID(sensorNumberType layer,  sensorNumberType ladder, sensorNumberType dssd, bool side)
       { m_ID.PARTS.layer = layer; m_ID.PARTS.ladder = ladder; m_ID.PARTS.dssd = dssd; m_ID.PARTS.side = side; }
@@ -132,7 +132,7 @@ namespace Belle2 {
       } m_ID;
     }; //SensorID class
 
-    /** Struct to hold data about an APV25 chip.*/
+    /** Struct to hold data about a sensor.*/
     struct SensorInfo {
       VxdID m_sensorID;           /**< Sensor ID */
       bool m_uSide;               /**< True if u-side of the sensor */
@@ -141,7 +141,7 @@ namespace Belle2 {
       unsigned short m_channel127; /**< Strip corresponding to channel 127 */
     }; // SensorInfo struct
 
-
+    /** Struct to hold data about an APV25 chip.*/
     struct ChipInfo {
       unsigned short fadc; /**<fadc number*/
       unsigned char apv; /**< apv number*/
@@ -155,7 +155,7 @@ namespace Belle2 {
     /** Constructor
      * @param xml_filename is the name of the xml file containing the map.
      */
-    SVDOnlineToOfflineMap(const std::string& xml_filename);
+    explicit SVDOnlineToOfflineMap(const std::string& xml_filename);
 
     /** No default constructor */
     SVDOnlineToOfflineMap() = delete;

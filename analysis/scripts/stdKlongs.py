@@ -10,10 +10,10 @@
 #
 ########################################################
 
-from modularAnalysis import fillParticleList, cutAndCopyList, analysis_main
+from modularAnalysis import fillParticleList, cutAndCopyList
 
 
-def stdKlongs(listtype='all', path=analysis_main):
+def stdKlongs(listtype='all', path=None):
     """
     Warning:
         This function is a placeholder for Klong selections. Currently
@@ -78,7 +78,7 @@ def stdKlongs(listtype='all', path=analysis_main):
 
 
 # Used in skimming code
-def loadStdSkimKL0(path=analysis_main):
+def loadStdSkimKL0(path):
     """Load KLongs for skimming.
 
     Parameters:

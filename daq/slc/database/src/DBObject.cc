@@ -14,10 +14,12 @@ using namespace Belle2;
 
 DBObject::DBObject()
 {
+  setDate(0);
 }
 
 DBObject::DBObject(const std::string& path)
 {
+  setDate(0);
   setPath(path);
 }
 
@@ -36,6 +38,7 @@ const DBObject& DBObject::operator=(const DBObject& obj)
 void DBObject::copy(const DBObject& obj)
 {
   reset();
+  setDate(obj.getDate());
   setIndex(obj.getIndex());
   setId(obj.getId());
   setPath(obj.getPath());
@@ -132,6 +135,7 @@ void DBObject::readObject(Reader& reader)
   reset();
   setPath(reader.readString());
   setName(reader.readString());
+  setDate(reader.readInt());
   int npar = reader.readInt();
   for (int i = 0; i < npar; i++) {
     std::string name = reader.readString();
@@ -165,6 +169,7 @@ void DBObject::writeObject(Writer& writer) const
 {
   writer.writeString(getPath());
   writer.writeString(getName());
+  writer.writeInt(getDate());
   const DBField::NameList& name_v(getFieldNames());
   writer.writeInt(name_v.size());
   for (DBField::NameList::const_iterator iname = name_v.begin();
@@ -281,7 +286,7 @@ void DBObject::print(bool isfull) const
     if (it->name.size() > length) length = it->name.size();
   }
   printf("#\n");
-  printf("# DB object (confname = %s)\n", getName().c_str());
+  printf("# DB object (confname = %s) stored at %s\n", getName().c_str(), Date(getDate()).toString());
   printf("#\n");
   printf("\n");
   StringList s = StringUtil::split(getName(), '@');

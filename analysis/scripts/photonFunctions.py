@@ -12,7 +12,6 @@ Contributor(s): Torben Ferber
 from basf2 import *
 import string
 import random
-from analysisPath import *
 from variables import variables
 from modularAnalysis import *
 

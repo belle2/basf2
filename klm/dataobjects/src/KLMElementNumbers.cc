@@ -90,3 +90,17 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
   module = m_ElementNumbersEKLM->sectorNumber(endcap, layer, sector);
   return module;
 }
+
+uint16_t KLMElementNumbers::sectorNumberBKLM(int forward, int sector) const
+{
+  uint16_t sect;
+  sect = BKLMElementNumbers::sectorNumber(forward, sector);
+  return sect + m_BKLMOffset;
+}
+
+uint16_t KLMElementNumbers::sectorNumberEKLM(int endcap, int sector) const
+{
+  uint16_t sect;
+  sect = m_ElementNumbersEKLM->sectorNumberKLMOrder(endcap, sector);
+  return sect;
+}

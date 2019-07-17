@@ -9,7 +9,6 @@ from basf2 import *
 import os
 import sys
 import inspect
-from analysisPath import *
 import subprocess
 import json
 # For channels in fei skim
@@ -424,7 +423,7 @@ def get_eventN(fileName):
         B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
-def skimOutputMdst(skimDecayMode, path, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
+def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
                    outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.

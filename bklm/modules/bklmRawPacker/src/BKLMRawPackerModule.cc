@@ -32,8 +32,6 @@ BKLMRawPackerModule::BKLMRawPackerModule() : Module()
 
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
-  addParam("useDefaultModuleId", m_useDefaultElectId, "use default elect id if not found in mapping", true);
-  addParam("loadMapFromDB", m_loadMapFromDB, "load electronic map from DataBase or not", true);
 
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("NodeID", m_nodeid, "Node ID", 0);
@@ -59,8 +57,7 @@ void BKLMRawPackerModule::initialize()
 
   rawklmarray.registerInDataStore();
 
-  if (m_loadMapFromDB)
-    loadMapFromDB();
+  loadMapFromDB();
 }
 
 
@@ -92,29 +89,23 @@ void BKLMRawPackerModule::event()
     int iAx = bklmDigit->isPhiReadout();
     int iLayer = bklmDigit->getLayer();
     int iSector = bklmDigit->getSector();
-    int isForward = bklmDigit->isForward();
+    int iForward = bklmDigit->getForward();
     float iTdc = bklmDigit->getTime();
     float icharge = bklmDigit->getCharge();
     short iCTime = bklmDigit->getCTime();
     bool isRPC = bklmDigit->inRPC();
     bool isAboveThresh = bklmDigit->isAboveThreshold();
-    int moduleId = BKLMElementNumbers::channelNumber(isForward, iSector, iLayer,
+    int moduleId = BKLMElementNumbers::channelNumber(iForward, iSector, iLayer,
                                                      iAx, iChannelNr);
-    B2DEBUG(20, "BKLMRawPackerModule:: digit before packer: sector: " << iSector << " isforward: " << isForward << " layer: " << iLayer
-            <<
+    B2DEBUG(20, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " isforward: " << iForward << " layer: " << iLayer <<
             " plane: " << iAx << " icharge " << icharge << " tdc " << iTdc << " ctime " << iCTime << " isAboveThresh " << isAboveThresh <<
             " isRPC " << isRPC << " " << moduleId << bklmDigit->getModuleID());
 
     int electId = 0;
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
-      if (m_useDefaultElectId) {
-        B2DEBUG(20, "BKLMRawPacker:: can not find in mapping, using the default ElectId");
-        electId = getDefaultElectId(isForward, iSector, iLayer, iAx, iChannelNr);
-      } else {
-        B2DEBUG(20, "BKLMRawPacker:: can not find in mapping for moduleId " << moduleId << " isForward? " << isForward << " , sector " <<
-                iSector);
-        continue;
-      }
+      B2DEBUG(20, "BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " forward? " << iForward << " , sector " <<
+              iSector);
+      continue;
     } else {
       electId = m_ModuleIdToelectId[moduleId];
     }
@@ -126,7 +117,7 @@ void BKLMRawPackerModule::event()
     int channelId;
     intToElectCoo(electId, copperId, finesse, lane, axis, channelId);
 
-    B2DEBUG(20, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << lane << " " << axis << " " <<
+    B2DEBUG(20, "BKLMRawPacker::copperId " << copperId << " " << iForward << " " << iSector << " " << lane << " " << axis << " " <<
             channelId << " " << iTdc << " " << icharge << " " << iCTime);
 
     unsigned short bword1 = 0;
@@ -262,7 +253,7 @@ void BKLMRawPackerModule::loadMapFromDB()
   for (const auto& element : elements) {
     B2DEBUG(20, "Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
             ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-            ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+            ", forward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
             " plane(z/phi) = " << element.getPlane());
 
     int copperId = element.getCopperId();
@@ -271,13 +262,13 @@ void BKLMRawPackerModule::loadMapFromDB()
     int axisId = element.getAxisId();
     int channelId = element.getChannelId();
     int sector = element.getSector();
-    int isForward = element.getIsForward();
+    int forward = element.getForward();
     int layer = element.getLayer();
     int plane =  element.getPlane();
     int stripId = element.getStripId();
     int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1, laneId, axisId, channelId);
     int moduleId = 0;
-    moduleId = BKLMElementNumbers::channelNumber(isForward, sector, layer,
+    moduleId = BKLMElementNumbers::channelNumber(forward, sector, layer,
                                                  plane, stripId);
     m_ModuleIdToelectId[moduleId] = elecId;
     B2DEBUG(20, " electId: " << elecId << " modId: " << moduleId);
@@ -323,84 +314,3 @@ int BKLMRawPackerModule::electCooToInt(int copper, int finesse, int lane, int ax
   return ret;
 
 }
-
-int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer, int plane, int stripId)
-{
-
-  int copperId = 0;
-  int finesse = 0;
-  int lane = 0;
-  int axisId = 0;
-  if (isForward && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1;
-  if (isForward && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2;
-  if (!isForward && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3;
-  if (!isForward && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 4;
-  if (sector == 3 || sector == 4 || sector == 5 || sector == 6) finesse = sector - 3;
-  if (sector == 1 || sector == 2) finesse = sector + 1;
-  if (sector == 7 || sector == 8) finesse = sector - 7;
-  if (layer > 2) lane = layer + 5;
-  else lane = layer;
-  if (layer > 2) axisId = plane;
-  else { if (plane == 0) axisId = 1; else axisId = 0; }
-
-  int channelId = getChannel(isForward, sector, layer, plane, stripId);
-  return electCooToInt(copperId, finesse , lane, axisId, channelId);
-
-}
-
-//better to put into database
-int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int plane, int channel)
-{
-
-  //we flip channel to match raw data
-  int MaxiChannel = 0;
-  if (!isForward && sector == 3 && plane == 0) {
-    if (layer < 3) MaxiChannel = 38;
-    if (layer > 2) MaxiChannel = 34;
-  } else {
-    if (layer == 1 && plane == 1) MaxiChannel = 37;
-    if (layer == 2 && plane == 1) MaxiChannel = 42;
-    if (layer > 2 && layer < 7 && plane == 1) MaxiChannel = 36;
-    if (layer > 6 && plane == 1) MaxiChannel = 48;
-
-    if (layer == 1 && plane == 0) MaxiChannel = 54;
-    if (layer == 2 && plane == 0) MaxiChannel = 54;
-    if (layer > 2 && plane == 0) MaxiChannel = 48;
-  }
-
-  bool dontFlip = false;
-  if (isForward && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
-  if (!isForward && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
-  if (!(dontFlip && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
-
-  if (plane == 1) { //phi strips
-    if (layer == 1)  channel = channel + 4;
-    if (layer == 2)  channel = channel + 2;
-  } else if (plane == 0) { //z strips
-    if (layer < 3) { //scintillator
-      if (isForward == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
-        if (layer == 1) {
-          if (channel > 0 && channel < 9) channel = 9 - channel;
-          else if (channel > 8 && channel < 24) channel = 54 - channel;
-          else if (channel > 23 && channel < 39) channel = 54 - channel;
-        } else {
-          if (channel > 0 && channel < 10) channel = 10 - channel;
-          else if (channel > 9 && channel < 24) channel = 40 - channel;
-          else if (channel > 23 && channel < 39) channel = 69 - channel;
-        }
-      } else { //all sectors except backward sector #3
-        if (channel > 0 && channel < 10) channel = 10 - channel;
-        else if (channel > 9 && channel < 25) channel = 40 - channel;
-        else if (channel > 24 && channel < 40) channel = 70 - channel;
-        else if (channel > 39 && channel < 55) channel = 100 - channel;
-      }
-    }
-  }
-
-  return channel;
-}
-
-//    void getTrack(int channel, short& bword1, short& bword2, short& bword3, short& bword4)
-//    {
-//
-//    }

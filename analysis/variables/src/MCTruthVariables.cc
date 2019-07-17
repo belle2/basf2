@@ -206,6 +206,22 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+    double isSignalAcceptMissingGamma(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissGamma);
+      status &= (~MCMatching::c_MissingResonance);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
     double isSignalAcceptMissing(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -216,6 +232,7 @@ namespace Belle2 {
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
       status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissGamma);
       status &= (~MCMatching::c_MissingResonance);
       status &= (~MCMatching::c_MissMassiveParticle);
       status &= (~MCMatching::c_MissKlong);
@@ -774,6 +791,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptMissingMassive",
                       isSignalAcceptMissingMassive,
                       "same as isSignal, but also accept missing massive particle");
+    REGISTER_VARIABLE("isSignalAcceptMissingGamma",
+                      isSignalAcceptMissingGamma,
+                      "same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma");
     REGISTER_VARIABLE("isSignalAcceptMissing",
                       isSignalAcceptMissing,
                       "same as isSignal, but also accept missing particle");

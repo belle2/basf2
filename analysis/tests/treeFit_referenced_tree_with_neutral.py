@@ -70,9 +70,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 2939, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
+        self.assertTrue(falsePositives < 2950, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives > 62, "Signal rejection too high")
+        self.assertTrue(truePositives > 63, "Signal rejection too high")
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")

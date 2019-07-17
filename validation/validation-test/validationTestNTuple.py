@@ -44,6 +44,21 @@ tntuple_hp.SetAlias('MetaOptions', "float-precision=8")
 
 tntuple_hp.Write()
 
+# Long
+# =================
+
+variables = "l" + "o" * 200 + "ngvariable"
+tntuple_hp = ROOT.TNtuple("ntuple_test_long_names", "ntuple test", variables)
+
+array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
+tntuple_hp.Fill(array_of_values)
+
+tntuple_hp.SetAlias('Description', "Test loooooong ntuples")
+tntuple_hp.SetAlias('Check', "Should display horizontal scrollbar.")
+tntuple_hp.SetAlias('Contact', "Kilian Lieret, Kilian.Lieret@campus.lmu.de")
+
+tntuple_hp.Write()
+
 # Closing
 
 tfile.Close()

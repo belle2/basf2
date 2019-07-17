@@ -1333,6 +1333,39 @@ def variableToSignalSideExtraInfo(
     path.add_module(mod)
 
 
+def signalRegion(
+        particleList,
+        cut,
+        path=None,
+        name="SignalRegion",
+        blind_data=True,
+):
+    """
+    Define and blind a signal region.
+    Per default, the defined signal region is cut out if ran on data.
+    This function will provide a new variable 'SignalRegion' as default, which is either 0 or 1 depending on the cut
+    provided.
+
+    @param particleList: The input ParticleList
+    @param cut: cut string describing the signal region
+    @param path          modules are added to this path
+    @param name:   Name of the Signal region in the variable manager
+    @param blind_data: Automatically exclude signal region from data
+
+    """
+
+    mod = register_module('VariablesToExtraInfo')
+    mod.set_name('%s_' % name + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', {"passesCut(%s)" % cut: name})
+    variables.addAlias(name, "extraInfo(%s)" % name)
+    path.add_module(mod)
+
+    magic_way_to_find_out_we_have_data = True
+    if magic_way_to_find_out_we_have_data and blind_data:
+        applyCuts(particleList, "%s==0" % name, path=path)
+
+
 def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
     """
     Removes the ExtraInfo of the given particleLists. If specified (removeEventExtraInfo = True) also the EventExtraInfo is removed.

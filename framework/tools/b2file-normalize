@@ -33,6 +33,8 @@ def get_argument_parser():
                               help='Overwrite the input file')
     parser.add_argument('--name', '-n', type=str, default=None,
                         help='The file name to be stored in the file, default is to not change it')
+    parser.add_argument('--root-version', '-r', type=int, default=None,
+                        help='The root version number to be set, default is to not change it')
     parser.add_argument('filename', help='Name of the input root file')
     return parser
 
@@ -43,6 +45,10 @@ if __name__ == "__main__":
 
     # open input file
     rootfile = RawRootFile(args.filename)
+
+    # adjust root version number
+    if args.root_version:
+        rootfile.version = args.root_version
 
     # create output file
     if args.output:

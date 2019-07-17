@@ -20,6 +20,7 @@ using namespace Belle2;
 KLMChannelStatusCalibrationAlgorithm::KLMChannelStatusCalibrationAlgorithm() :
   CalibrationAlgorithm("KLMChannelStatusCalibrationCollector")
 {
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMChannelStatusCalibrationAlgorithm::~KLMChannelStatusCalibrationAlgorithm()

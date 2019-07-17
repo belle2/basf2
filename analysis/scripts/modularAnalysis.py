@@ -1371,10 +1371,8 @@ def signalRegion(
     path.add_module(mod)
 
     # Check if we run on Data
-    from ROOT import Belle2
-    is_data = not Belle2.Environment.Instance().isMC()
-    if is_data and blind_data:
-        applyCuts(particleList, "%s==0" % name, path=path)
+    if blind_data:
+        applyCuts(particleList, "isMC==0 and %s==0" % name, path=path)
 
 
 def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):

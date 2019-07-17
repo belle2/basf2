@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdSimulation/SVDEventInfoSetterModule.h>
+#include <root/TRandom.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,11 +32,14 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
     "the conditions for creating ShaperDigits."
   );
 
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   //Parameter definition for SVDModeByte, TriggerType and cross-talk
   addParam("runType", m_runType, "Defines the run type: raw/transparent/zero-suppressed/z-s+hit time finding", int(2));
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
   addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples", int(2));
-  addParam("triggerBin", m_triggerBin, "Trigger time info: 0/1/2/3 - useful to synchronise the SVD with the machine", int(0));
+  addParam("randomTriggerBin", m_randomTriggerBin, "Trigger bin is randomly chosen between 0/1/2/3.", bool(true));
+  addParam("triggerBin", m_triggerBin, "Trigger bin 0/1/2/3 - useful for timing studies. The default is random.", int(999));
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
   addParam("crossTalk", m_xTalk, "Defines the cross-talk flag for the event", bool(false));
 
@@ -54,6 +58,12 @@ void SVDEventInfoSetterModule::initialize()
 
 void SVDEventInfoSetterModule::event()
 {
+  if (m_randomTriggerBin) {
+    const int triggerBinsInAPVclock = 4; //hard coded for the moment
+    m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
+  } else if (m_triggerBin < 0 || m_triggerBin > 3)
+    B2ERROR("the triggerBin value is wrong, it must be an integer between 0 and 3, check and fix");
+
   m_SVDModeByte.setRunType(m_runType);
   m_SVDModeByte.setEventType(m_eventType);
   m_SVDModeByte.setDAQMode(m_daqMode);

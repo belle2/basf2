@@ -126,6 +126,11 @@ namespace Belle2 {
     uint16_t getKLMModuleNumber() const;
 
     /**
+     * Get KLM sector number.
+     */
+    uint16_t getKLMSectorNumber() const;
+
+    /**
      * First channel.
      */
     EKLMChannelIndex begin();
@@ -139,6 +144,11 @@ namespace Belle2 {
      * Operator ++.
      */
     EKLMChannelIndex& operator++();
+
+    /**
+     * Increment (to use in Python).
+     */
+    EKLMChannelIndex& increment();
 
     /**
      * Operator ==.

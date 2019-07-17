@@ -39,6 +39,12 @@ uint16_t BKLMElementNumbers::moduleNumber(int forward, int sector, int layer)
          | ((layer - 1) << BKLM_LAYER_BIT);
 }
 
+uint16_t BKLMElementNumbers::sectorNumber(int forward, int sector)
+{
+  return (forward ? BKLM_END_MASK : 0)
+         | ((sector - 1) << BKLM_SECTOR_BIT);
+}
+
 int BKLMElementNumbers::layerGlobalNumber(int forward, int sector, int layer)
 {
   int layerGlobal = layer - 1;

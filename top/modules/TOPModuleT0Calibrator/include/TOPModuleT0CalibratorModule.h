@@ -84,6 +84,12 @@ namespace Belle2 {
   private:
 
     /**
+     * Checks if running offset is subtracted in TOPDigits
+     * @return true if subtracted at least in one digit
+     */
+    bool isRunningOffsetSubtracted();
+
+    /**
      * Sizes
      */
     enum {c_numModules = 16,  /**< number of modules */

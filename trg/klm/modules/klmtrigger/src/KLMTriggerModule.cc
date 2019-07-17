@@ -106,11 +106,11 @@ void KLMTriggerModule::fillHits()
       const BKLMDigit* bklmDigit_i = bklmDigits[i];
       const BKLMDigit* bklmDigit_j = bklmDigits[j];
 
-      if (bklmDigit_i->isForward() == bklmDigit_j->isForward() &&
+      if (bklmDigit_i->getForward() == bklmDigit_j->getForward() &&
           bklmDigit_i->getSector() == bklmDigit_j->getSector() &&
           bklmDigit_i->getLayer() == bklmDigit_j->getLayer() &&
           bklmDigit_i->isPhiReadout() != bklmDigit_j->isPhiReadout()) {  // phi-theta match
-        bool fwd = bklmDigit_i->isForward();
+        int fwd = bklmDigit_i->getForward();
         int sector = bklmDigit_i->getSector() - 1; // zero-based
         int layer = bklmDigit_i->getLayer() - 1; // zero-based
         int phiStrip = 0;
@@ -164,11 +164,10 @@ void KLMTriggerModule::fillTracks()
   for (int i = 0; i < nEntries; ++i) {
     const KLMTriggerHit* hit = klmTriggerHits[i];
 
-    bool fwd = hit->isForward();
+    int fwd = hit->getForward();
     int sector = hit->getSector();
 
-    int fwdInt = fwd ? 1 : 0;
-    int sectorID = fwdInt * c_TotalSectors + sector;
+    int sectorID = fwd * c_TotalSectors + sector;
 
     if (trackMap.find(sectorID) == trackMap.end())
       trackMap[sectorID] = klmTriggerTracks.appendNew(fwd, sector);
@@ -402,7 +401,7 @@ void KLMTriggerModule::calcChisq()
 //}
 
 
-void KLMTriggerModule::geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z)
+void KLMTriggerModule::geometryConverter(int fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z)
 {
   const int c_LayerXCoord[c_TotalLayers] = {1628, 1700, 1773, 1846, 1919, 1992, 2064, 2137, 2210, 2283, 2356, 2428, 2501, 2574, 2647};
   const int c_LayerY0[c_TotalLayers] = { -2403, -2566, -2744, -2862, -2979, -3097, -3234, -3354, -3474, -3587, -3708, -3828, -3948, -4061, -4181};

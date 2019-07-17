@@ -19,7 +19,7 @@ Convenience
 ~~~~~~~~~~~
 
 .. b2-variables::
-        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
 -----------

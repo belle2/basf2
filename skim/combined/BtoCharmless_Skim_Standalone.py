@@ -17,8 +17,19 @@ from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+import argparse
 
 gb2_setuprel = "release-03-02-00"
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 # Create skim path
 btocharmlesspath = Path()

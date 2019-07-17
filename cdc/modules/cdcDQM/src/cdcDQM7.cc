@@ -234,7 +234,7 @@ void cdcDQM7Module::event()
   // each layer
   int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
   for (int b = 0; b < 56; b++) {
-    int n_wire;
+    int n_wire = 0;
     if (b < 8) {
       n_wire = ndiv[0];
     } else if (b >= 8 && b < 14) {

@@ -254,7 +254,7 @@ namespace Belle2 {
       // generate waveform
 
       std::vector<unsigned short> windowNumbers;
-      int winnum = m_window - m_offsetWindows;
+      int winnum = m_window + m_offsetWindows;
       if (winnum < 0) winnum += m_storageDepth;
       windowNumbers.push_back(winnum);
       for (unsigned i = 1; i < m_readoutWindows; i++) {
@@ -266,7 +266,7 @@ namespace Belle2 {
       std::vector<double> pedestals(windowNumbers.size(), averagePedestal);
       int adcRange = tdc.getADCRange();
 
-      int startSample = m_offsetWindows * TOPRawWaveform::c_WindowSize;
+      int startSample = -m_offsetWindows * TOPRawWaveform::c_WindowSize;
       auto wfData = generateWaveform(startSample, baselines, rmsNoises, pedestals,
                                      adcRange);
 
@@ -328,7 +328,7 @@ namespace Belle2 {
         double rawTimeErr = rawDigit->getCFDLeadingTimeError(m_rmsNoise); // in [samples]
 
         // convert to [ns] using time base calibration
-        int nwin = iwin - m_offsetWindows;
+        int nwin = iwin + m_offsetWindows;
         rawTimeLeading += nwin * TOPRawDigit::c_WindowSize;
         rawTimeFalling += nwin * TOPRawDigit::c_WindowSize;
 

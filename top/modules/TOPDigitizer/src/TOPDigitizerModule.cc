@@ -89,11 +89,6 @@ namespace Belle2 {
              "if true, simulate time transition spread. "
              "Should be always switched ON, except for some dedicated timing studies.",
              true);
-    addParam("lookBackWindows", m_lookBackWindows, "number of look back windows", 220);
-    addParam("readoutWindows", m_readoutWindows, "number of readout windows", 8);
-    addParam("offsetWindows", m_offsetWindows,
-             "number of offset windows. This is the number of windows before "
-             "the one determined by look-back (firstWindow)", 2);
 
   }
 
@@ -115,27 +110,6 @@ namespace Belle2 {
     m_rawDigits.registerRelationTo(m_waveforms, DataStore::c_Event,
                                    DataStore::c_DontWriteOut);
 
-    // set write-window depths of production debug format (write-window is 128 samples)
-    for (int i = 0; i < 3; i++) {
-      m_writeDepths.push_back(214);
-      m_writeDepths.push_back(212);
-      m_writeDepths.push_back(214);
-    }
-
-    // check some steering parameters
-    for (auto writeDepth : m_writeDepths) {
-      if (m_lookBackWindows >= writeDepth * 2) {
-        B2ERROR("Number of look-back windows must be smaller that write depth");
-      }
-    }
-    if (m_readoutWindows >= m_lookBackWindows) {
-      B2ERROR("Number of readout windows must be smaller that look-back");
-    }
-
-    // pass parameters to TimeDigitizer
-    TimeDigitizer::setReadoutWindows(m_readoutWindows);
-    TimeDigitizer::setOffsetWindows(m_offsetWindows);
-
     // geometry and nominal data
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
@@ -150,11 +124,6 @@ namespace Belle2 {
     // default sample times (equidistant)
     m_syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
     m_sampleTimes.setTimeAxis(m_syncTimeBase); // equidistant time base
-
-    // time range for digitization
-    m_timeMin = geo->getSignalShape().getTMin() - m_offsetWindows * m_syncTimeBase / 2;
-    m_timeMax = geo->getSignalShape().getTMax() +
-                (m_readoutWindows - m_offsetWindows) * m_syncTimeBase / 2;
 
     // default pulse height generator
     m_pulseHeightGenerator = PulseHeightGenerator(m_ADCx0, m_ADCp1, m_ADCp2, m_ADCmax);
@@ -230,6 +199,16 @@ namespace Belle2 {
       }
     }
 
+    // check availability of front-end settings
+    if (not m_feSetting.isValid()) {
+      B2FATAL("Front-end settings are not available for run "
+              << evtMetaData->getRun()
+              << " of experiment " << evtMetaData->getExperiment());
+    }
+
+    // pass a parameter to TimeDigitizer
+    TimeDigitizer::setReadoutWindows(m_feSetting->getReadoutWindows());
+
   }
 
   void TOPDigitizerModule::event()
@@ -237,15 +216,25 @@ namespace Belle2 {
 
     // generate revo9 count
     unsigned revo9cnt = gRandom->Integer(11520);
-    int SSTcnt = revo9cnt / 6;
-    double SSTfrac = (revo9cnt % 6) / 6.0;
-    double trgTimeOffset = SSTfrac * m_syncTimeBase;  // in [ns], to be subtracted
 
-    // find first window number
+    // from revo9 count determine trigger time offset and the number of offset windows
+    double SSTfrac = (revo9cnt % 6) / 6.0;
+    double offset = m_feSetting->getOffset() / 24.0;
+    double trgTimeOffset = (SSTfrac + offset) * m_syncTimeBase;  // in [ns]
+    int offsetWindows = (revo9cnt % 6) / 3;
+    TimeDigitizer::setOffsetWindows(offsetWindows);
+
+    // from revo9 and write depths determine reference window, phase and storage depth
+    int SSTcnt = revo9cnt / 6;
     int refWindow = SSTcnt * 2;  // same as lastWriteAddr
-    int lastDepth = m_writeDepths.back();
+    const auto& writeDepths = m_feSetting->getWriteDepths();
+    if (writeDepths.empty()) {
+      B2ERROR("TOPDigitzer: vector of write depths is empty. No digitization possible");
+      return;
+    }
+    int lastDepth = writeDepths.back();
     unsigned phase = 0;
-    for (auto depth : m_writeDepths) {
+    for (auto depth : writeDepths) {
       SSTcnt -= depth;
       if (SSTcnt < 0) break;
       phase++;
@@ -254,12 +243,21 @@ namespace Belle2 {
     }
     unsigned storageDepth = lastDepth * 2;
     TimeDigitizer::setStorageDepth(storageDepth);
-    int window = refWindow - m_lookBackWindows;
+
+    // from reference window and lookback determine first of the readout windows
+    int lookBackWindows = m_feSetting->getLookbackWindows() -
+                          m_feSetting->getExtraWindows();
+    int window = refWindow - lookBackWindows;
     if (window < 0) window += storageDepth;
     TimeDigitizer::setFirstWindow(window);
 
     // geometry and nominal data
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+
+    // time range for digitization
+    double timeMin = geo->getSignalShape().getTMin() + offsetWindows * m_syncTimeBase / 2;
+    double timeMax = geo->getSignalShape().getTMax() +
+                     (m_feSetting->getReadoutWindows() + offsetWindows) * m_syncTimeBase / 2;
 
     // simulate start time jitter
     double startTimeJitter = gRandom->Gaus(0, m_timeZeroJitter);
@@ -294,44 +292,20 @@ namespace Belle2 {
         time += tts.generateTTS();
       }
 
-      double timeOffset = trgTimeOffset;
-      double calErrorSq = 0; // calibration uncertainties
-      if (m_useDatabase) {
-        const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
-        auto channel = channelMapper.getChannel(pixelID);
-        if (m_channelT0->isCalibrated(moduleID, channel)) {
-          timeOffset += m_channelT0->getT0(moduleID, channel);
-          double err = m_channelT0->getT0Error(moduleID, channel);
-          calErrorSq += err * err;
-        }
-        auto asic = channel / 8;
-        if (m_asicShift->isCalibrated(moduleID, asic)) {
-          timeOffset += m_asicShift->getT0(moduleID, asic);
-        }
-        if (m_moduleT0->isCalibrated(moduleID)) {
-          timeOffset += m_moduleT0->getT0(moduleID);
-          double err = m_moduleT0->getT0Error(moduleID);
-          calErrorSq += err * err;
-
-        }
-        if (m_commonT0->isCalibrated()) {
-          timeOffset += m_commonT0->getT0();
-          double err = m_commonT0->getT0Error();
-          calErrorSq += err * err;
-        }
-      }
+      // get time offset for a given pixel
+      auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
 
       // time range cut (to speed up digitization)
-      if (time + timeOffset < m_timeMin) continue;
-      if (time + timeOffset > m_timeMax) continue;
+      if (time + timeOffset.value < timeMin) continue;
+      if (time + timeOffset.value > timeMax) continue;
 
       // generate pulse height
       double pulseHeight = generatePulseHeight(moduleID, pixelID);
       auto hitType = TimeDigitizer::c_Hit;
 
       // add time and pulse height to digitizer of a given pixel
-      TimeDigitizer digitizer(moduleID, pixelID, timeOffset, calErrorSq, m_rmsNoise,
-                              m_sampleTimes);
+      TimeDigitizer digitizer(moduleID, pixelID, timeOffset.value, timeOffset.error,
+                              m_rmsNoise, m_sampleTimes);
       if (!digitizer.isValid()) continue;
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
@@ -346,9 +320,17 @@ namespace Belle2 {
       auto pulseHeight = simCalPulses.getAmplitude();
       auto time = simCalPulses.getTime();
       auto hitType = TimeDigitizer::c_CalPulse;
-      double timeOffset = trgTimeOffset;
-      TimeDigitizer digitizer(moduleID, pixelID, timeOffset, 0.0, m_rmsNoise,
-                              m_sampleTimes);
+
+      // get time offset for a given pixel
+      auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
+
+      // time range cut (to speed up digitization)
+      if (time + timeOffset.value < timeMin) continue;
+      if (time + timeOffset.value > timeMax) continue;
+
+      // add time and pulse height to digitizer of a given pixel
+      TimeDigitizer digitizer(moduleID, pixelID, timeOffset.value, timeOffset.error,
+                              m_rmsNoise, m_sampleTimes);
       if (!digitizer.isValid()) continue;
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
@@ -364,12 +346,13 @@ namespace Belle2 {
         int numHits = gRandom->Poisson(m_darkNoise);
         for (int i = 0; i < numHits; i++) {
           int pixelID = int(gRandom->Rndm() * numPixels) + 1;
-          double time = (m_timeMax - m_timeMin) * gRandom->Rndm() + m_timeMin;
+          double time = (timeMax - timeMin) * gRandom->Rndm() + timeMin;
           double pulseHeight = generatePulseHeight(moduleID, pixelID);
           auto hitType = TimeDigitizer::c_Hit;
-          double timeOffset = 0;
-          TimeDigitizer digitizer(moduleID, pixelID, timeOffset, 0.0, m_rmsNoise,
-                                  m_sampleTimes);
+          auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
+          time -= timeOffset.value;
+          TimeDigitizer digitizer(moduleID, pixelID, timeOffset.value, timeOffset.error,
+                                  m_rmsNoise, m_sampleTimes);
           if (!digitizer.isValid()) continue;
           unsigned id = digitizer.getUniqueID();
           Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
@@ -385,9 +368,9 @@ namespace Belle2 {
       for (int moduleID = 1; moduleID <= numModules; moduleID++) {
         int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
         for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
-          double timeOffset = 0; // unused since no real signal generated here
-          TimeDigitizer digitizer(moduleID, pixelID, timeOffset, 0.0, m_rmsNoise,
-                                  m_sampleTimes);
+          auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
+          TimeDigitizer digitizer(moduleID, pixelID, timeOffset.value, timeOffset.error,
+                                  m_rmsNoise, m_sampleTimes);
           if (!digitizer.isValid()) continue;
           unsigned id = digitizer.getUniqueID();
           pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer));
@@ -444,13 +427,13 @@ namespace Belle2 {
       rawDigit.setRevo9Counter(revo9cnt);
       rawDigit.setPhase(phase);
       rawDigit.setLastWriteAddr(refWindow);
-      rawDigit.setLookBackWindows(m_lookBackWindows);
+      rawDigit.setLookBackWindows(lookBackWindows);
       rawDigit.setOfflineFlag();
     }
 
     for (auto& waveform : m_waveforms) {
       waveform.setRevo9Counter(revo9cnt);
-      waveform.setOffsetWindows(m_offsetWindows);
+      waveform.setOffsetWindows(offsetWindows);
     }
 
     // set calibration flags
@@ -469,6 +452,39 @@ namespace Belle2 {
       }
     }
 
+  }
+
+
+  TOPDigitizerModule::ValueWithError TOPDigitizerModule::getTimeOffset(double trgOffset,
+      int moduleID,
+      int pixelID)
+  {
+    double timeOffset = trgOffset;
+    double calErrorSq = 0;
+    if (m_useDatabase) {
+      const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
+      auto channel = channelMapper.getChannel(pixelID);
+      if (m_channelT0->isCalibrated(moduleID, channel)) {
+        timeOffset += m_channelT0->getT0(moduleID, channel);
+        double err = m_channelT0->getT0Error(moduleID, channel);
+        calErrorSq += err * err;
+      }
+      auto asic = channel / 8;
+      if (m_asicShift->isCalibrated(moduleID, asic)) {
+        timeOffset += m_asicShift->getT0(moduleID, asic);
+      }
+      if (m_moduleT0->isCalibrated(moduleID)) {
+        timeOffset += m_moduleT0->getT0(moduleID);
+        double err = m_moduleT0->getT0Error(moduleID);
+        calErrorSq += err * err;
+      }
+      if (m_commonT0->isCalibrated()) {
+        timeOffset += m_commonT0->getT0();
+        double err = m_commonT0->getT0Error();
+        calErrorSq += err * err;
+      }
+    }
+    return ValueWithError(timeOffset, calErrorSq);
   }
 
 

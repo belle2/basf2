@@ -277,6 +277,18 @@ namespace Belle2 {
      */
     void exportPmtTTSHisto(std::string outFileName = "RetrievedHistos.root");
 
+    /**
+     * Import front-end settings
+     * @param lookback the number of lookback windows
+     * @param readoutWin the number of readout windows
+     * @param extraWin the number of extra windows btw. lookback and readout window
+     * @param offset offset to photon peak [RF clocks]
+     * @param expNo experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importFrontEndSettings(int lookback, int readoutWin, int extraWin, int offset,
+                                int expNo, int firstRun, int lastRun);
 
     /**
      * import a dummy payload of TOPCalModuleAlignment DB objects

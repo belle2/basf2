@@ -84,37 +84,43 @@ namespace Belle2 {
     // check if calibrations are available when needed - if not, terminate
 
     if (m_useSampleTimeCalibration) {
-      if (!m_timebase.isValid()) {
+      if (not m_timebase.isValid()) {
         B2FATAL("Sample time calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
     if (m_useChannelT0Calibration) {
-      if (!m_channelT0.isValid()) {
+      if (not m_channelT0.isValid()) {
         B2FATAL("Channel T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
-      if (!m_asicShift.isValid()) {
+      if (not m_asicShift.isValid()) {
         B2FATAL("ASIC shifts calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
     if (m_useModuleT0Calibration) {
-      if (!m_moduleT0.isValid()) {
+      if (not m_moduleT0.isValid()) {
         B2FATAL("Module T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
     if (m_useCommonT0Calibration) {
-      if (!m_commonT0.isValid()) {
+      if (not m_commonT0.isValid()) {
         B2FATAL("Common T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
+    }
+
+    if (not m_feSetting.isValid()) {
+      B2FATAL("Front-end settings are not available for run "
+              << evtMetaData->getRun()
+              << " of experiment " << evtMetaData->getExperiment());
     }
 
   }
@@ -123,7 +129,8 @@ namespace Belle2 {
   {
     int revo9cnt = m_recBunch->getRevo9Counter();
     double SSTfrac = (revo9cnt % 6) / 6.0;
-    double timeOffset = SSTfrac * m_syncTimeBase;  // in [ns], to be subtracted
+    double offset = m_feSetting->getOffset() / 24.0;
+    double timeOffset = (SSTfrac + offset) * m_syncTimeBase;  // in [ns], to be subtracted
     const auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
@@ -147,7 +154,7 @@ namespace Belle2 {
       if (m_useSampleTimeCalibration) {
         auto bs = channel / 128;
         const auto* feemap = feMapper.getMap(moduleID, bs);
-        if (!feemap) {
+        if (not feemap) {
           B2ERROR("No front-end map available."
                   << LogVar("slot", moduleID)
                   << LogVar("boardstack", bs));

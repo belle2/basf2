@@ -53,6 +53,8 @@
 #include <top/dbobjects/TOPPmtTTSPar.h>
 #include <top/dbobjects/TOPPmtTTSHisto.h>
 
+#include <top/dbobjects/TOPFrontEndSetting.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -1242,6 +1244,33 @@ namespace Belle2 {
     file.Close();
 
     return;
+  }
+
+  void TOPDatabaseImporter::importFrontEndSettings(int lookback, int readoutWin,
+                                                   int extraWin, int offset,
+                                                   int expNo, int firstRun, int lastRun)
+  {
+    DBImportObjPtr<TOPFrontEndSetting> feSetting;
+    feSetting.construct();
+
+    // write-window depths (write-window is 128 samples)
+    std::vector<int> writeDepths;
+    for (int i = 0; i < 3; i++) {
+      writeDepths.push_back(214);
+      writeDepths.push_back(212);
+      writeDepths.push_back(214);
+    }
+    feSetting->setWriteDepths(writeDepths);
+    feSetting->setLookbackWindows(lookback);
+    feSetting->setReadoutWindows(readoutWin);
+    feSetting->setExtraWindows(extraWin);
+    feSetting->setOffset(offset);
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    feSetting.import(iov);
+
+    B2INFO("Front-end settings imported for exp " << expNo << " run " << firstRun <<
+           " to " << lastRun);
   }
 
 

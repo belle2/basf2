@@ -28,7 +28,7 @@
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPCalChannelNoise.h>
-
+#include <top/dbobjects/TOPFrontEndSetting.h>
 
 namespace Belle2 {
 
@@ -100,6 +100,9 @@ namespace Belle2 {
     int m_calpulseHeightMin;    /**< minimal height of calibration pulse */
     int m_calpulseHeightMax;    /**< maximal height of calibration pulse */
 
+    // front-end settings (lookback, storage depths etc)
+    DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
+
     // time calibration
     DBObjPtr<TOPCalTimebase> m_timebase;   /**< sample time calibration constants */
     DBObjPtr<TOPCalChannelT0> m_channelT0; /**< channel T0 calibration constants */
@@ -118,7 +121,6 @@ namespace Belle2 {
     StoreObjPtr<TOPAsicMask> m_asicMask; /**< masked asics in firmware */
 
     // other
-    std::vector<int> m_writeDepths;  /**< write depths of production debug format */
     double m_syncTimeBase = 0; /**< SSTin period */
 
   };

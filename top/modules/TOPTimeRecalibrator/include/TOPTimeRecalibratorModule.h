@@ -22,7 +22,7 @@
 #include <top/dbobjects/TOPCalAsicShift.h>
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
-
+#include <top/dbobjects/TOPFrontEndSetting.h>
 
 namespace Belle2 {
 
@@ -64,6 +64,9 @@ namespace Belle2 {
     bool m_useModuleT0Calibration;     /**< if true, use module T0 calibration */
     bool m_useCommonT0Calibration;     /**< if true, use common T0 calibration */
     bool m_subtractBunchTime;          /**< if true, subtract reconstructed bunch time */
+
+    // front-end settings (lookback, storage depths etc)
+    DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
 
     // time calibration
     DBObjPtr<TOPCalTimebase> m_timebase;   /**< sample time calibration constants */

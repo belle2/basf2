@@ -770,7 +770,7 @@ namespace Belle2 {
                       "same as isSignal, but also accept missing massive particle");
     REGISTER_VARIABLE("isSignalAcceptMissingGamma",
                       isSignalAcceptMissingGamma,
-                      "same as isSignal, but also accept missing gamma, such as B->K* gamma, pi0 -> gamma gamma");
+                      "same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma");
     REGISTER_VARIABLE("isSignalAcceptMissing",
                       isSignalAcceptMissing,
                       "same as isSignal, but also accept missing particle");

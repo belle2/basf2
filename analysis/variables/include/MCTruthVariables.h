@@ -64,7 +64,7 @@ namespace Belle2 {
     double isSignalAcceptMissingMassive(const Particle* part);
 
     /**
-     * return 1 if Particle is correctly reconstructed (SIGNAL including missing massive), 0 otherwise
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing gamma), 0 otherwise
      */
     double isSignalAcceptMissingGamma(const Particle* part);
 

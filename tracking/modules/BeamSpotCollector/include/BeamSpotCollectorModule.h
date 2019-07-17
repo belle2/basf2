@@ -77,9 +77,9 @@ namespace Belle2 {
 //     /**Energy in LAB frame*/
 //     TH1F* m_h_E = nullptr;
 //     /** y pull*/
-//     TH1F* m_h_pull = nullptr;
-//     /** y resolution */
-//     TH1F* m_h_y_risol = nullptr;
+    TH1F* m_h_pull = nullptr;
+    /** y resolution */
+    TH1F* m_h_y_risol = nullptr;
     /** initial histogram for median calculation*/
     TH1F* m_h_temp = nullptr;
 //     /** xx coord*/

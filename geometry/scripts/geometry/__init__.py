@@ -15,9 +15,9 @@ def check_components(components):
     :param components: List of geometry components.
     """
 
-    if (components is None):
+    if components is None:
         return
-    component_list = ['PXD', 'SVD', 'ECL', 'TOP', 'ARICH', 'BKLM', 'EKLM', 'TRG']
-    for (component in components):
-        if (not (component in component_list)):
+    allowed_components = ['PXD', 'SVD', 'ECL', 'TOP', 'ARICH', 'BKLM', 'EKLM', 'TRG']
+    for component in components:
+        if not (component in allowed_components):
             basf2.B2FATAL('Geometry component %s is unknown or it cannot be used in standard scripts.' % (component))

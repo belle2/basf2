@@ -369,7 +369,7 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency(TTree* tree
 void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency(TTree* tree, const std::string& pdgIdStr)
 {
 
-  // Histograms of p, clusterTheta, clusterPhi... for pass/all events.
+  // Histograms of p, trkTheta, trkPhi... for pass/all events.
   std::string h_p_N_name = "h_p_N_" + pdgIdStr;
   std::string h_p_D_name = "h_p_D_" + pdgIdStr;
   TH1F* h_p_N = new TH1F(h_p_N_name.c_str(), "h_p_N", 25, 0.0, 5.0);

@@ -47,7 +47,7 @@ void KLMChannelStatusCalibrationCollectorModule::collect()
 {
   for (BKLMDigit& digit : m_BKLMDigits) {
     uint16_t channel = m_ElementNumbers->channelNumberBKLM(
-                         digit.isForward(), digit.getSector(), digit.getLayer(),
+                         digit.getForward(), digit.getSector(), digit.getLayer(),
                          digit.isPhiReadout(), digit.getStrip());
     m_HitMap->setChannelData(channel, m_HitMap->getChannelData(channel) + 1);
   }

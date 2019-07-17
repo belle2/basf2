@@ -1346,6 +1346,15 @@ def signalRegion(
     This function will provide a new variable 'SignalRegion' as default, which is either 0 or 1 depending on the cut
     provided.
 
+    - Example usage:
+
+        >>> ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
+        >>> ma.signalRegion("B+:sig",
+        >>>                  "Mbc>5.27 and abs(deltaE)<0.2",
+        >>>                  blind_data=True,
+        >>>                  path=path)
+        >>> ma.variablesToNtuples("B+:sig", ["SignalRegion"], path=path)
+
     @param particleList: The input ParticleList
     @param cut: cut string describing the signal region
     @param path          modules are added to this path
@@ -1361,8 +1370,10 @@ def signalRegion(
     variables.addAlias(name, "extraInfo(%s)" % name)
     path.add_module(mod)
 
-    magic_way_to_find_out_we_have_data = True
-    if magic_way_to_find_out_we_have_data and blind_data:
+    # Check if we run on Data
+    from ROOT import Belle2
+    is_data = not Belle2.Environment.Instance().isMC()
+    if is_data and blind_data:
         applyCuts(particleList, "%s==0" % name, path=path)
 
 

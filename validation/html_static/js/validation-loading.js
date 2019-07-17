@@ -678,7 +678,7 @@ function fillNtupleTable(domId, jsonLoadingPath) {
 
         // add header
         table_str += "<tr>";
-        table_str += "<th>tag</th>";
+        table_str += "<th>Tag</th>";
 
         // get the name of each value which is plotted
         for (let rev in ntuple_data) {

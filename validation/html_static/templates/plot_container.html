@@ -124,7 +124,7 @@
     <div id="no_failed_scripts">No failed scripts</div>
     {{#scriptfiles}}
     {{#if status == "failed" }}
-    <div class="failed_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="failed_script">{{name}} - {{status}} (exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
     {{/if}}
     {{/scriptfiles}}
   </div>
@@ -133,7 +133,7 @@
     <div id="no_finished_scripts">No finished scripts</div>
     {{#scriptfiles}}
     {{#if status == "finished" }}
-    <div class="finished_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="finished_script">{{name}} - {{status}} (exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
     {{/if}}
     {{/scriptfiles}}
   </div>
@@ -142,7 +142,7 @@
     <div id="no_skipped_scripts">No skipped scripts</div>
     {{#scriptfiles}}
     {{#if status == "skipped" }}
-    <div class="skipped_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="skipped_script">{{name}} - {{status}} (exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
     {{/if}}
     {{/scriptfiles}}
   </div>
@@ -208,7 +208,7 @@
 <div class="wrap_boxes_descriptions">
   <span><strong>Package: </strong>{{ package }}</span><br>
   <span><strong>Description: </strong>{{{ description }}}</span><br>
-  <span><strong>ROOT file: </strong>{{ rootfile }}.root</span><br>
+  <span><strong>ROOT file: </strong> <code>{{ rootfile }}.root</code></span><br>
   <span><strong>Comparison: </strong>{{{ comparison_text }}}</span><br>
   {{! if the warning has not been set, no pvalue is available either }}
   <span><strong>Contact: </strong>{{ contact }}</span><br>

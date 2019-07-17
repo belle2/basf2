@@ -9,19 +9,19 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
+#include <klm/modules/KLMDigitizer/KLMDigitizerModule.h>
 #include <klm/dataobjects/EKLMChannelIndex.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
 using namespace Belle2;
 
-REG_MODULE(EKLMDigitizer)
+REG_MODULE(KLMDigitizer)
 
-EKLMDigitizerModule::EKLMDigitizerModule() : Module(),
+KLMDigitizerModule::KLMDigitizerModule() : Module(),
   m_ChannelSpecificSimulation(false)
 {
-  setDescription("EKLM digitization module");
+  setDescription("KLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("SimulationMode", m_SimulationMode,
            "Simulation mode (\"Generic\" or \"ChannelSpecific\")",
@@ -32,21 +32,27 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module(),
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
+  m_eklmElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_Fitter = nullptr;
 }
 
-EKLMDigitizerModule::~EKLMDigitizerModule()
+KLMDigitizerModule::~KLMDigitizerModule()
 {
 }
 
-void EKLMDigitizerModule::initialize()
+void KLMDigitizerModule::initialize()
 {
-  m_Digits.registerInDataStore();
-  m_Digits.registerRelationTo(m_SimHits);
+  m_bklmSimHits.isRequired();
+  m_eklmSimHits.isRequired();
+  m_bklmDigits.registerInDataStore();
+  m_bklmDigits.registerRelationTo(m_bklmSimHits);
+  m_eklmDigits.registerInDataStore();
+  m_eklmDigits.registerRelationTo(m_eklmSimHits);
   if (m_SaveFPGAFit) {
     m_FPGAFits.registerInDataStore();
-    m_Digits.registerRelationTo(m_FPGAFits);
+    m_bklmDigits.registerRelationTo(m_FPGAFits);
+    m_eklmDigits.registerRelationTo(m_FPGAFits);
   }
   m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
   if (m_SimulationMode == "Generic") {
@@ -58,11 +64,11 @@ void EKLMDigitizerModule::initialize()
   }
 }
 
-void EKLMDigitizerModule::checkChannelParameters()
+void KLMDigitizerModule::checkChannelParameters()
 {
   EKLMChannelIndex eklmChannels;
   for (EKLMChannelIndex& eklmChannel : eklmChannels) {
-    int stripGlobal = m_ElementNumbers->stripNumber(
+    int stripGlobal = m_eklmElementNumbers->stripNumber(
                         eklmChannel.getEndcap(), eklmChannel.getLayer(),
                         eklmChannel.getSector(), eklmChannel.getPlane(),
                         eklmChannel.getStrip());
@@ -72,7 +78,7 @@ void EKLMDigitizerModule::checkChannelParameters()
     if (channel->getPhotoelectronAmplitude() <= 0) {
       B2ERROR("Non-positive photoelectron amplitude. The requested "
               "channel-specific simulation is impossible. "
-              "EKLMDigitizer is switched to the generic mode."
+              "KLMDigitizer is switched to the generic mode."
               << LogVar("Endcap", eklmChannel.getEndcap())
               << LogVar("Layer", eklmChannel.getLayer())
               << LogVar("Sector", eklmChannel.getSector())
@@ -84,55 +90,82 @@ void EKLMDigitizerModule::checkChannelParameters()
   }
 }
 
-void EKLMDigitizerModule::beginRun()
+void KLMDigitizerModule::beginRun()
 {
   if (!m_DigPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
   if (!m_TimeConversion.isValid())
-    B2FATAL("EKLM time conversion parameters are not available.");
+    B2FATAL("KLM time conversion parameters are not available.");
   if (!m_Channels.isValid())
-    B2FATAL("EKLM channel data are not available.");
+    B2FATAL("KLM channel data are not available.");
   if (m_ChannelSpecificSimulation)
     checkChannelParameters();
-}
-
-void EKLMDigitizerModule::readAndSortSimHits()
-{
-  EKLMSimHit* hit;
-  /* cppcheck-suppress variableScope */
-  int i, strip, maxStrip;
-  maxStrip = m_ElementNumbers->getMaximalStripGlobalNumber();
-  m_SimHitVolumeMap.clear();
-  for (i = 0; i < m_SimHits.getEntries(); i++) {
-    hit = m_SimHits[i];
-    strip = hit->getVolumeID();
-    if (strip <= 0)
-      B2FATAL("Incorrect (non-positive) strip number in EKLM digitizer.");
-    /* Background study mode: ignore hits from SiPMs and boards. */
-    if (strip > maxStrip)
-      continue;
-    m_SimHitVolumeMap.insert(std::pair<int, EKLMSimHit*>(strip, hit));
-  }
 }
 
 /*
  * Light propagation into the fiber, SiPM and electronics effects
  * are simulated in KLM::ScintillatorSimulator class.
  */
-void EKLMDigitizerModule::mergeSimHitsToStripHits()
+void KLMDigitizerModule::digitizeBKLM()
+{
+  int tdc;
+  KLM::ScintillatorSimulator simulator(&(*m_DigPar), m_Fitter, 0, false);
+  std::multimap<uint16_t, BKLMSimHit*>::iterator it, ub;
+  for (it = m_bklmSimHitChannelMap.begin(); it != m_bklmSimHitChannelMap.end();
+       it = m_bklmSimHitChannelMap.upper_bound(it->first)) {
+    BKLMSimHit* simHit = it->second;
+    ub = m_bklmSimHitChannelMap.upper_bound(it->first);
+    if (simHit->inRPC()) {
+      int strip = BKLMElementNumbers::getStripByModule(
+                    m_ElementNumbers->localChannelNumberBKLM(it->first));
+      BKLMDigit* bklmDigit = m_bklmDigits.appendNew(simHit, strip);
+      bklmDigit->addRelationTo(simHit);
+    } else {
+      simulator.simulate(it, ub);
+      if (simulator.getGeneratedNPE() == 0)
+        continue;
+      BKLMDigit* bklmDigit = m_bklmDigits.appendNew(simHit);
+      bklmDigit->addRelationTo(simHit);
+      // Not implemented in BKLMDigit.
+      // eklmDigit->setMCTime(simHit->getTime());
+      // eklmDigit->setSiPMMCTime(simulator.getMCTime());
+      // eklmDigit->setPosition(simHit->getPosition());
+      bklmDigit->setSimNPixel(simulator.getGeneratedNPE());
+      if (simulator.getFitStatus() ==
+          KLM::c_ScintillatorFirmwareSuccessfulFit) {
+        tdc = simulator.getFPGAFit()->getStartTime();
+        /* Differs from original BKLM definition! */
+        bklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
+        bklmDigit->isAboveThreshold(true);
+      } else {
+        tdc = 0;
+        bklmDigit->setCharge(m_DigPar->getADCRange() - 1);
+        bklmDigit->isAboveThreshold(false);
+      }
+      // Not implemented in BKLMDigit.
+      // eklmDigit->setTDC(tdc);
+      bklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
+      bklmDigit->setFitStatus(simulator.getFitStatus());
+      bklmDigit->setNPixel(simulator.getNPE());
+      bklmDigit->setEDep(simulator.getEnergy());
+    }
+  }
+}
+
+void KLMDigitizerModule::digitizeEKLM()
 {
   uint16_t tdc;
   int strip;
   KLM::ScintillatorSimulator simulator(&(*m_DigPar), m_Fitter,
                                        m_DigitizationInitialTime, m_Debug);
   const EKLMChannelData* channelData;
-  std::multimap<int, EKLMSimHit*>::iterator it, ub;
-  for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
-       it = m_SimHitVolumeMap.upper_bound(it->first)) {
+  std::multimap<uint16_t, EKLMSimHit*>::iterator it, ub;
+  for (it = m_eklmSimHitChannelMap.begin(); it != m_eklmSimHitChannelMap.end();
+       it = m_eklmSimHitChannelMap.upper_bound(it->first)) {
     EKLMSimHit* simHit = it->second;
-    ub = m_SimHitVolumeMap.upper_bound(it->first);
+    ub = m_eklmSimHitChannelMap.upper_bound(it->first);
     if (m_ChannelSpecificSimulation) {
-      strip = m_ElementNumbers->stripNumber(
+      strip = m_eklmElementNumbers->stripNumber(
                 simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
                 simHit->getPlane(), simHit->getStrip());
       channelData = m_Channels->getChannelData(strip);
@@ -144,7 +177,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     simulator.simulate(it, ub);
     if (simulator.getGeneratedNPE() == 0)
       continue;
-    EKLMDigit* eklmDigit = m_Digits.appendNew(simHit);
+    EKLMDigit* eklmDigit = m_eklmDigits.appendNew(simHit);
     eklmDigit->addRelationTo(simHit);
     eklmDigit->setMCTime(simHit->getTime());
     eklmDigit->setSiPMMCTime(simulator.getMCTime());
@@ -170,17 +203,47 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
   }
 }
 
-void EKLMDigitizerModule::event()
+void KLMDigitizerModule::event()
 {
-  readAndSortSimHits();
-  mergeSimHitsToStripHits();
+  int i;
+  uint16_t channel;
+  m_bklmSimHitChannelMap.clear();
+  m_eklmSimHitChannelMap.clear();
+  for (i = 0; i < m_bklmSimHits.getEntries(); i++) {
+    BKLMSimHit* hit = m_bklmSimHits[i];
+    if (hit->inRPC()) {
+      if (hit->getStripMin() > 0) {
+        for (int s = hit->getStripMin(); s <= hit->getStripMax(); ++s) {
+          channel = m_ElementNumbers->channelNumberBKLM(
+                      hit->getForward(), hit->getSector(), hit->getLayer(),
+                      hit->getPlane(), s);
+          m_bklmSimHitChannelMap.insert(
+            std::pair<int, BKLMSimHit*>(channel, hit));
+        }
+      }
+    } else {
+      channel = m_ElementNumbers->channelNumberBKLM(
+                  hit->getForward(), hit->getSector(), hit->getLayer(),
+                  hit->getPlane(), hit->getStrip());
+      m_bklmSimHitChannelMap.insert(std::pair<int, BKLMSimHit*>(channel, hit));
+    }
+  }
+  for (i = 0; i < m_eklmSimHits.getEntries(); i++) {
+    EKLMSimHit* hit = m_eklmSimHits[i];
+    channel = m_ElementNumbers->channelNumberEKLM(
+                hit->getEndcap(), hit->getSector(), hit->getLayer(),
+                hit->getPlane(), hit->getStrip());
+    m_eklmSimHitChannelMap.insert(std::pair<int, EKLMSimHit*>(channel, hit));
+  }
+  digitizeBKLM();
+  digitizeEKLM();
 }
 
-void EKLMDigitizerModule::endRun()
+void KLMDigitizerModule::endRun()
 {
 }
 
-void EKLMDigitizerModule::terminate()
+void KLMDigitizerModule::terminate()
 {
   delete m_Fitter;
 }

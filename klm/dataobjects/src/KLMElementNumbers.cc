@@ -10,6 +10,7 @@
 
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <framework/logging/Logger.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 
 using namespace Belle2;
@@ -69,6 +70,20 @@ bool KLMElementNumbers::isBKLMChannel(uint16_t channel) const
 bool KLMElementNumbers::isEKLMChannel(uint16_t channel) const
 {
   return (channel < m_BKLMOffset);
+}
+
+int KLMElementNumbers::localChannelNumberBKLM(uint16_t channel) const
+{
+  if (!isBKLMChannel(channel))
+    B2FATAL("Cannot get BKLM local channel number for non-BKLM channel.");
+  return channel - m_BKLMOffset;
+}
+
+int KLMElementNumbers::localChannelNumberEKLM(uint16_t channel) const
+{
+  if (!isEKLMChannel(channel))
+    B2FATAL("Cannot get EKLM local channel number for non-EKLM channel.");
+  return channel;
 }
 
 uint16_t KLMElementNumbers::moduleNumberBKLM(

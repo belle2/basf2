@@ -149,8 +149,8 @@ void KLM::ScintillatorSimulator::prepareSimulation()
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  std::multimap<int, BKLMSimHit*>::iterator& firstHit,
-  std::multimap<int, BKLMSimHit*>::iterator& end)
+  std::multimap<uint16_t, BKLMSimHit*>::iterator& firstHit,
+  std::multimap<uint16_t, BKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
@@ -162,7 +162,7 @@ void KLM::ScintillatorSimulator::simulate(
     2.0 * (hit->isPhiReadout() ?
            module->getPhiScintHalfLength(hit->getStrip()) :
            module->getZScintHalfLength(hit->getStrip()));
-  for (std::multimap<int, BKLMSimHit*>::iterator it = firstHit;
+  for (std::multimap<uint16_t, BKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
     m_Energy = m_Energy + hit->getEDep();
@@ -187,15 +187,15 @@ void KLM::ScintillatorSimulator::simulate(
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  std::multimap<int, EKLMSimHit*>::iterator& firstHit,
-  std::multimap<int, EKLMSimHit*>::iterator& end)
+  std::multimap<uint16_t, EKLMSimHit*>::iterator& firstHit,
+  std::multimap<uint16_t, EKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
   const EKLMSimHit* hit = firstHit->second;
   double stripLength = EKLM::GeometryData::Instance().getStripLength(
                          hit->getStrip()) / CLHEP::mm * Unit::mm;
-  for (std::multimap<int, EKLMSimHit*>::iterator it = firstHit;
+  for (std::multimap<uint16_t, EKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
     m_Energy = m_Energy + hit->getEDep();

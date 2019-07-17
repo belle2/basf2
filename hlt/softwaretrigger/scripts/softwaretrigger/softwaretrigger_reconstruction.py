@@ -1,6 +1,7 @@
 import basf2
 
 import reconstruction
+from geometry import check_components
 from softwaretrigger import constants
 from softwaretrigger.path_utils import get_store_only_metadata_path, add_filter_software_trigger, \
     add_skim_software_trigger
@@ -42,6 +43,9 @@ def add_softwaretrigger_reconstruction(
     :param components: the detector components to do reconstruction on
     :param softwaretrigger_mode: which mode (filter/monitor) the trigger should have
     """
+    # Check components.
+    check_components(components)
+
     # In the following, we will need some paths:
     # (1) A "store-metadata" path (deleting everything except the trigger tags and some metadata)
     store_only_metadata_path = get_store_only_metadata_path()

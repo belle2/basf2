@@ -3,6 +3,8 @@
 
 from basf2 import *
 
+from geometry import check_components
+
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
@@ -46,6 +48,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
     """
+
+    # Check components.
+    check_components(components)
 
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,
@@ -113,6 +118,9 @@ def add_cosmics_reconstruction(
 
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     """
+
+    # Check components.
+    check_components(components)
 
     # Add cdc tracking reconstruction modules
     add_cr_tracking_reconstruction(path,

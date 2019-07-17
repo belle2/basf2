@@ -124,7 +124,10 @@
     <div id="no_failed_scripts">No failed scripts</div>
     {{#scriptfiles}}
     {{#if status == "failed" }}
-    <div class="failed_script">{{name}} - {{status}} (exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="failed_script">
+      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    </div>
     {{/if}}
     {{/scriptfiles}}
   </div>
@@ -133,7 +136,10 @@
     <div id="no_finished_scripts">No finished scripts</div>
     {{#scriptfiles}}
     {{#if status == "finished" }}
-    <div class="finished_script">{{name}} - {{status}} (exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="finished_script">
+      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    </div>
     {{/if}}
     {{/scriptfiles}}
   </div>
@@ -142,7 +148,7 @@
     <div id="no_skipped_scripts">No skipped scripts</div>
     {{#scriptfiles}}
     {{#if status == "skipped" }}
-    <div class="skipped_script">{{name}} - {{status}} (exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="skipped_script"><code>{{name}}</code> - {{status}}</div>
     {{/if}}
     {{/scriptfiles}}
   </div>

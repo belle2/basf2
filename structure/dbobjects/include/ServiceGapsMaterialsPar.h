@@ -260,7 +260,8 @@ namespace Belle2 {
     /** Densities list of ECL, ARICH and top gap element cell. */
     std::vector<double> m_density;
 
-    ClassDef(ThicknessDensityPar, 1); /**< ClassDef, must be the last term before the closing {} */
+    ClassDef(ThicknessDensityPar, 2); /**< 2. Added members for gap between ECL and COIL.
+             1. Initial version */
 
   };
 
@@ -347,7 +348,8 @@ namespace Belle2 {
     /** Gap element cell Thickness and density for Service Materials. */
     ThicknessDensityPar m_thick;
 
-    ClassDef(ServiceGapsMaterialsPar, 1); /**< ClassDef, must be the last term before the closing {} */
+    ClassDef(ServiceGapsMaterialsPar, 2); /**< 2. Added gap mother volume between ECL and COIL.
+                 1. Initial version of class. */
 
   };
 } // end of namespace Belle2

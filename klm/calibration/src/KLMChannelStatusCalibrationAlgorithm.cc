@@ -218,7 +218,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
     if (averageHits < m_MinimalAverageHitNumber && !m_ForcedCalibration) {
       if (!notEnoughData) {
         B2INFO("KLM module " << klmModule.getKLMModuleNumber() <<
-               " (subdetector" << klmModule.getSubdetector() <<
+               " (subdetector " << klmModule.getSubdetector() <<
                ", forward " << klmModule.getSection() <<
                ", sector " << klmModule.getSector() <<
                ", layer " << klmModule.getLayer() <<

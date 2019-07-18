@@ -41,7 +41,7 @@ geometry.param('useDB', False)
 g4sim = register_module('FullSim')
 
 # EKLM Modules
-eklmDigitizer = register_module('EKLMDigitizer')
+klmDigitizer = register_module('KLMDigitizer')
 eklmReconstructor = register_module('EKLMReconstructor')
 
 # Output
@@ -58,7 +58,7 @@ main.add_module(paramloader)
 main.add_module(geometry)
 main.add_module(g4sim)
 
-main.add_module(eklmDigitizer)
+main.add_module(klmDigitizer)
 main.add_module(eklmReconstructor)
 
 main.add_module(output)

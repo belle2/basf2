@@ -217,6 +217,12 @@ namespace Belle2 {
                      digit.getTimeError());
     }
 
+    // running offset must not be subtracted in TOPDigits: issue an error if it is
+
+    if (isRunningOffsetSubtracted()) {
+      B2ERROR("Running offset subtracted in TOPDigits: module T0 will not be correct");
+    }
+
     // loop over reconstructed tracks, make a selection and accumulate log likelihoods
 
     for (const auto& track : m_tracks) {
@@ -362,6 +368,14 @@ namespace Belle2 {
     B2RESULT(num << "/16 calibrated. Results available in " << m_outFileName);
   }
 
+
+  bool TOPModuleT0CalibratorModule::isRunningOffsetSubtracted()
+  {
+    for (const auto& digit : m_digits) {
+      if (digit.hasStatus(TOPDigit::c_BunchOffsetSubtracted)) return true;
+    }
+    return false;
+  }
 
 } // end Belle2 namespace
 

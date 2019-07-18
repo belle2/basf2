@@ -342,7 +342,7 @@ namespace Belle2 {
       bool hasRPCs(int layer) const;
 
       //! Get the pointer to the definition of a module
-      const Module* findModule(bool isForward, int sector, int layer) const;
+      const Module* findModule(int forward, int sector, int layer) const;
 
       //! Get the pointer to the definition of a module
       const Module* findModule(int layer, bool hasChimney) const;

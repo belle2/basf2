@@ -29,31 +29,11 @@ EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
-  const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-  m_ChannelActive = nullptr;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");
   m_ThresholdHitTime = simPar->getHitTimeThreshold();
-  DBObjPtr<KLMChannelStatus> channelStatus;
-  if (!channelStatus.isValid())
-    B2FATAL("KLM channel status data are not available.");
-  int maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
-  m_ChannelActive = new bool[maxStrip];
-  EKLMChannelIndex eklmChannels;
-  for (EKLMChannelIndex& eklmChannel : eklmChannels) {
-    int strip = m_GeoDat->stripNumber(
-                  eklmChannel.getEndcap(), eklmChannel.getLayer(),
-                  eklmChannel.getSector(), eklmChannel.getPlane(),
-                  eklmChannel.getStrip());
-    uint16_t channel = elementNumbers->channelNumberEKLM(strip);
-    enum KLMChannelStatus::ChannelStatus status =
-      channelStatus->getChannelStatus(channel);
-    if (status == KLMChannelStatus::c_Unknown)
-      B2FATAL("Incomplete KLM channel status data.");
-    m_ChannelActive[strip - 1] = (status != KLMChannelStatus::c_Dead);
-  }
   StoreArray<MCParticle> particles;
   m_SimHits.registerInDataStore();
   particles.registerRelationTo(m_SimHits);
@@ -63,8 +43,6 @@ EKLMSensitiveDetector(G4String name)
 
 EKLM::EKLMSensitiveDetector::~EKLMSensitiveDetector()
 {
-  if (m_ChannelActive != nullptr)
-    delete[] m_ChannelActive;
 }
 
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
@@ -79,8 +57,6 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   plane = hist->GetVolume(stripLevel + 3)->GetCopyNo();
   strip = hist->GetVolume(stripLevel)->GetCopyNo();
   stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane, strip);
-  if (!m_ChannelActive[stripGlobal - 1])
-    return false;
   const G4double eDep = aStep->GetTotalEnergyDeposit();
   /* Do not record hits without deposited energy. */
   if (eDep <= 0)

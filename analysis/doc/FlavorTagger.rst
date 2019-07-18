@@ -213,7 +213,7 @@ To save this information you just have to add the predefined list
 to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be
-found in the ntupleTree of the output root file: ``FBDT_qrCombined`` or
+found in the ntuple of the output root file: ``FBDT_qrCombined`` or
 ``FANN_qrCombined``. FBDT is the output of a fast boosted decision tree and
 FANN is the output of a multi-layer perceptron of the open source library fast
 artificial neural network . The default output -2 is saved for events without

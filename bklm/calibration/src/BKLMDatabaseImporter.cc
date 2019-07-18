@@ -119,7 +119,7 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
   int n = m_bklmMapping.getEntries();
   for (int i = 0; i < n; i++) {
     BKLMElectronicMapping* mapping = m_bklmMapping[i];
-    if ((mapping->getIsForward() == forward) &&
+    if ((mapping->getForward() == forward) &&
         (mapping->getSector() == sector) &&
         (mapping->getLayer() == layer))
       mapping->setLane(lane);
@@ -147,7 +147,7 @@ void BKLMDatabaseImporter::exportBklmElectronicMapping()
       B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
              ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
              ", channelId = " << element.getChannelId() <<
-             ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+             ", isForward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
              " plane(z/phi) = " << element.getPlane() << " stripId = " << element.getStripId());
     }
   }
@@ -326,10 +326,10 @@ void BKLMDatabaseImporter::exportBklmDisplacement()
   for (const auto& disp : displacements) {
     unsigned short bklmElementID = disp.getElementID();
     BKLMElementID bklmid(bklmElementID);
-    unsigned short isForward = bklmid.getIsForward();
+    unsigned short forward = bklmid.getForward();
     unsigned short sector = bklmid.getSectorNumber();
     unsigned short layer = bklmid.getLayerNumber();
-    B2INFO("displacement of " << isForward << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
+    B2INFO("displacement of " << forward << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
            ", " <<
            disp.getWShift() << ", " << disp.getAlphaRotation() << ", " << disp.getBetaRotation() << ", " << disp.getGammaRotation());
   }//end loop layer

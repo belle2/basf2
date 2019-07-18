@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
     //! Empty constructor for ROOT IO (needed to make the class storable)
     KLMTriggerHit():
-      m_fwd(false),
+      m_fwd(0),
       m_sector(0),
       m_layer(0),
       m_phiStrip(0),
@@ -39,7 +39,7 @@ namespace Belle2 {
     //! @param layer layer number
     //! @param phiStrip phi strip number
     //! @param zStrip z strip number
-    KLMTriggerHit(bool fwd, int sector, int layer, int phiStrip, int zStrip):
+    KLMTriggerHit(int fwd, int sector, int layer, int phiStrip, int zStrip):
       m_fwd(fwd),
       m_sector(sector),
       m_layer(layer),
@@ -60,7 +60,7 @@ namespace Belle2 {
 
     //! Get detector end
     //! @return detector end (forward=true and backward=false)
-    bool isForward() const { return m_fwd; }
+    int getForward() const { return m_fwd; }
 
     //! Get sector number
     //! @return sector number of the hit (0..7)
@@ -130,7 +130,7 @@ namespace Belle2 {
 
   private:
     //! forward-backward
-    bool m_fwd;
+    int m_fwd;
 
     //! sector number
     int m_sector;
@@ -163,7 +163,7 @@ namespace Belle2 {
     int m_zInt;
 
     //! Needed to make the ROOT object storable
-    ClassDef(KLMTriggerHit, 1);
+    ClassDef(KLMTriggerHit, 2);
   };
 } // end of namespace Belle2
 

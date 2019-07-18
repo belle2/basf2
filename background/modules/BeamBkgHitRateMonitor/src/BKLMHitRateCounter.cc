@@ -50,7 +50,7 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
     if (!digit.inRPC() && !digit.isAboveThreshold())
       continue;
 
-    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.isForward(), digit.getSector(), digit.getLayer());
+    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getForward(), digit.getSector(), digit.getLayer());
     rates.layerRates[layerGlobal]++;
     rates.averageRate++;
   }

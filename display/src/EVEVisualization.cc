@@ -1405,7 +1405,7 @@ void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
 {
   //TVector3 globalPosition=  bklm2dhit->getGlobalPosition();
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
-  const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->isForward(), bklm2dhit->getSector(), bklm2dhit->getLayer());
+  const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->getForward(), bklm2dhit->getSector(), bklm2dhit->getLayer());
 
   CLHEP::Hep3Vector global;
   //+++ global coordinates of the hit

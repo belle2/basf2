@@ -3,24 +3,23 @@
 
 """
 <header>
-<contact>Marco Milesi, marco.milesi@unimelb.edu.au</contact>
-<description> This steering script generates 1000 particle gun events for a set of charged stable particles,
-runs the fullsim and dumps info in a file.</description>
+  <output>PartGunChargedStableGenSim.root</output>
+  <cacheable/>
+  <contact>Marco Milesi, marco.milesi@unimelb.edu.au</contact>
+  <description> This steering script generates 1000 particle gun events for a set of charged stable particles,
+runs the fullsim w/ mixed in background, and dumps full output (*Digits containers) in a file.</description>
 </header>
 """
 
-import os
-import glob
 import basf2
 from simulation import add_simulation
+from background import get_background_files
 from ROOT import Belle2
 
 # Pdg code of the charged stable particles & antiparticles.
 chargedStableList = []
 for idx in range(len(Belle2.Const.chargedStableSet)):
     particle = Belle2.Const.chargedStableSet.at(idx)
-    if particle == Belle2.Const.deuteron:
-        continue
     pdgId = particle.getPDGCode()
     chargedStableList.extend([pdgId, -pdgId])
 
@@ -57,18 +56,14 @@ main.add_module("Gearbox")
 # Create geometry.
 main.add_module("Geometry")
 
-bg_dir = os.getenv("BELLE2_BACKGROUND_DIR")
-if bg_dir:
-    bg = glob.glob(f"{bg_dir}/*.root")
-else:
-    basf2.B2WARNING("Env variable BELLE2_BACKGROUND_DIR is not set.")
-    bg = None
+# Detector simulation + bkg.
+add_simulation(main, bkgfiles=get_background_files())
 
-# Detector simulation.
-add_simulation(main, bkgfiles=bg)
+# Memory profile.
+main.add_module("Profile")
 
 # Create output of event generation + detector simulation.
-main.add_module("RootOutput", outputFileName="1000_PartGun_ChargedStable_EvtGenSim.root")
+main.add_module("RootOutput", outputFileName="../PartGunChargedStableGenSim.root")
 
 # Show progress of processing.
 main.add_module("Progress")

@@ -54,10 +54,11 @@ namespace Belle2 {
       for (int j = 0; j < 3; j++)
         EXPECT_EQ(testSize(i, j) , sizeElement(i, j));
 
-    TMatrixDSym testSize2 = bs.getCovVertex();
+
+    TMatrixDSym testCovVertex = bs.getCovVertex();
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++)
-        EXPECT_EQ(testSize2(i, j) , sizeElement(i, j));
+        EXPECT_EQ(testCovVertex(i, j) , (sizeElement(i, j) + errorElement(i, j)));
 
     EXPECT_EQ(bs.getGlobalUniqueID() , 1);
     BeamSpot bs2(bs);

@@ -11,7 +11,7 @@
 /* Belle2 headers. */
 #include <framework/core/RandomNumbers.h>
 #include <klm/modules/KLMDigitizer/KLMDigitizerModule.h>
-#include <klm/dataobjects/EKLMChannelIndex.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
@@ -67,10 +67,11 @@ void KLMDigitizerModule::initialize()
 
 void KLMDigitizerModule::checkChannelParameters()
 {
-  EKLMChannelIndex eklmChannels;
-  for (EKLMChannelIndex& eklmChannel : eklmChannels) {
+  KLMChannelIndex klmChannels;
+  for (KLMChannelIndex eklmChannel = klmChannels.beginEKLM();
+       eklmChannel != klmChannels.endEKLM(); ++eklmChannel) {
     int stripGlobal = m_eklmElementNumbers->stripNumber(
-                        eklmChannel.getEndcap(), eklmChannel.getLayer(),
+                        eklmChannel.getSection(), eklmChannel.getLayer(),
                         eklmChannel.getSector(), eklmChannel.getPlane(),
                         eklmChannel.getStrip());
     const EKLMChannelData* channel = m_Channels->getChannelData(stripGlobal);
@@ -80,7 +81,7 @@ void KLMDigitizerModule::checkChannelParameters()
       B2ERROR("Non-positive photoelectron amplitude. The requested "
               "channel-specific simulation is impossible. "
               "KLMDigitizer is switched to the generic mode."
-              << LogVar("Endcap", eklmChannel.getEndcap())
+              << LogVar("Endcap", eklmChannel.getSection())
               << LogVar("Layer", eklmChannel.getLayer())
               << LogVar("Sector", eklmChannel.getSector())
               << LogVar("Plane", eklmChannel.getPlane())

@@ -23,6 +23,19 @@ namespace Belle2 {
   public:
 
     /**
+     * Subdetector constants.
+     */
+    enum Subdetector {
+
+      /** BKLM. */
+      c_BKLM = 1,
+
+      /** EKLM. */
+      c_EKLM = 2,
+
+    };
+
+    /**
      * Instantiation.
      */
     static const KLMElementNumbers& Instance();

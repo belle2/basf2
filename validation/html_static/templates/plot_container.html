@@ -56,15 +56,24 @@
   <div class="wrap_rootfile">
     <!-- Header -->
     <!------------>
-    <h2>Result File: <code>{{rootfile}}</code>
+    <h2>Result File: {{rootfile}}
       {{#if !has_reference}}
         <span class="no_reference">[No reference]</span>
       {{/if}}
     </h2>
     {{ #if newest_revision }}
-    <div class="downloads">
-      <b>Downloads:</b> <a href="../results/{{newest_revision}}/{{package}}/{{rootfile}}.root">{{newest_revision}}</a>
-    </div>
+      <div class="downloads">
+          <b>Downloads: </b>
+          {{ #compared_revision:i_revision}}
+            {{ #if (compared_revision[i_revision] != 'reference') }}
+              <span style="margin-right:0.5em">
+                <a href="../results/{{compared_revision[i_revision]}}/{{package}}/{{rootfile}}.root">
+                  {{compared_revision[i_revision]}}
+                </a>
+              </span>
+            {{ /if }}
+          {{ /compared_revision }}
+      </div>
     {{ /if }}
     {{#if description }}
     <b>Description: </b>

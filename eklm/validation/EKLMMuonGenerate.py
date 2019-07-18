@@ -36,7 +36,7 @@ particlegun.param('phiParams', [0, 360])
 # Geometry and Geant simulation
 paramloader = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('components', ['EKLM'])
+geometry.param('components', ['EKLM', 'BKLM'])
 geometry.param('useDB', False)
 g4sim = register_module('FullSim')
 

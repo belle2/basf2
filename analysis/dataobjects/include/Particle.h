@@ -198,7 +198,7 @@ namespace Belle2 {
                       const Const::ParticleType& type = Const::photon);
 
     /**
-     * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
+     * Constructor of a KLong from a reconstructed KLM cluster.
      * @param klmCluster pointer to KLMCluster object
      */
     explicit Particle(const KLMCluster* klmCluster);
@@ -651,7 +651,7 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
-     * Returns the pointer to the largest KLMCluster object associated to this Particle if ParticleType == c_Track.
+     * Returns the pointer to the KLMCluster object associated to this Particle if ParticleType == c_Track.
      * NULL pointer is returned, if the Particle has no relation to the KLMCluster.
      * @return const pointer to the KLMCluster
      */

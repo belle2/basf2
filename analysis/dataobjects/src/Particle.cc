@@ -597,20 +597,12 @@ const KLMCluster* Particle::getKLMCluster() const
     StoreArray<KLMCluster> klmClusters;
     return klmClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
-    // a track may be matched to several clusters under different hypotheses
-    // take the cluster with largest number of layers as "the" cluster
+    // A Track can have up to one KLMCluster associated (only the closest one).
+    // It's extremely unlikely that there are two or more KLMClusters associated:
+    // if this is the case, pick the first KLMCluster in the RelationVector.
     StoreArray<Track> tracks;
-    const KLMCluster* longestTrackMatchedCluster = nullptr;
-    int numberOfLayers = -1;
-    // loop over all clusters matched to this track
-    for (const KLMCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<KLMCluster>()) {
-      // check if we're the longest cluster thus far
-      if (cluster.getLayers() > numberOfLayers) {
-        numberOfLayers = cluster.getLayers();
-        longestTrackMatchedCluster = &cluster;
-      }
-    }
-    return longestTrackMatchedCluster;
+    const KLMCluster* klmCluster = tracks[m_mdstIndex]->getRelatedTo<KLMCluster>();
+    return klmCluster;
   } else {
     return nullptr;
   }

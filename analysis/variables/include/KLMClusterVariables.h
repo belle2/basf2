@@ -125,6 +125,12 @@ namespace Belle2 {
      */
     double nMatchedKLMClusters(const Particle* particle);
 
+    /**
+     * returns the distance between the Track and the KLMCluster associated to this Particle.
+     * This variable returns NaN if there is no Track-to-KLMCluster relationship.
+     */
+    double klmClusterTrackDistance(const Particle* particle);
+
   }
 } // Belle2 namespace
 

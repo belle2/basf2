@@ -272,6 +272,17 @@ namespace Belle2 {
       return double(out);
     }
 
+    double klmClusterTrackDistance(const Particle* particle)
+    {
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (!cluster)
+        return std::numeric_limits<double>::quiet_NaN();
+      auto trackWithWeight = cluster->getRelatedFromWithWeight<Track>();
+      if (!trackWithWeight.first)
+        return std::numeric_limits<double>::quiet_NaN();
+      return 1. / trackWithWeight.second;
+    }
+
     VARIABLE_GROUP("KLM Cluster and KlongID");
 
     REGISTER_VARIABLE("klmClusterKlId", klmClusterKlId, "Returns the KlId associated to the KLMCluster.");
@@ -299,6 +310,8 @@ namespace Belle2 {
                       "Returns the number of Tracks matched to the KLMCluster associated to this Particle (0 for K_L0, >0 for matched Tracks, NaN for not-matched Tracks).");
     REGISTER_VARIABLE("nMatchedKLMClusters", nMatchedKLMClusters,
                       "Returns the number of KLMClusters matched to the Track associated to this Particle. This variable returns NaN for K_L0 (they have no Tracks associated). It can return >1");
+    REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
+                      "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.");
 
   }
 }

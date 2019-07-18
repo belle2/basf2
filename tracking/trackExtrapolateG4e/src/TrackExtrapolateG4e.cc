@@ -810,7 +810,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
     }
     if (minDistance < m_MaxKLMTrackClusterDistance) {
       // set the relation Track to KLMCluster, using the distance as weight
-      extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, minDistance);
+      extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / minDistance);
     }
   }
 

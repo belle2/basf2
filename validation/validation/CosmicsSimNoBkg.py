@@ -4,7 +4,7 @@
 """
 <header>
   <output>CosmicsSimNoBkg.root</output>
-  <contact>tkuhr</contact>
+  <contact>Thomas Kuhr thomas.kuhr@lmu.de</contact>
   <cacheable/>
   <description>
     This steering file produces 10000 cosmic ray events without background, for the early_phase3 geometry.
@@ -42,13 +42,13 @@ print(statistics)
 
 statistics_plots(
     'CosmicsSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation job with Cosmics events',
     prefix='CosmicsSimNoBkg'
 )
 event_timing_plot(
     '../CosmicsSimNoBkg.root', 'CosmicsSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation job with Cosmics events',
     prefix='CosmicsSimNoBkg'
 )

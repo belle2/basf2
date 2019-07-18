@@ -4,7 +4,7 @@
 """
 <header>
   <output>KLongGenSimNoBkg.root</output>
-  <contact>tkuhr</contact>
+  <contact>Thomas Kuhr thomas.kuhr@lmu.de</contact>
   <cacheable/>
   <description>This steering file produces 1000 events with one KLong each
   and runs the detector simulation without mixing in background.</description>
@@ -63,14 +63,14 @@ print(statistics)
 from validation import *
 statistics_plots(
     'KLongGenSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation job with generic KLongGenSimNoBkg events',
     prefix='KLongGenSimNoBkg'
 )
 event_timing_plot(
     '../KLongGenSimNoBkg.root',
     'KLongGenSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation job with Klong events',
     prefix='KLongGenSimNoBkg'
 )

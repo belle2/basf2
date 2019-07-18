@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tkuhr</contact>
+  <contact>Thomas Kuhr thomas.kuhr@lmu.de</contact>
   <output>EvtGenSimRecLarge.root</output>
   <description>
     This steering file produces 10000 generic BBbar events with
@@ -65,7 +65,7 @@ print(statistics)
 from validation import *
 statistics_plots(
     'EvtGenSimRecLarge_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation and reconstruction job with generic '
              'EvtGen events',
     prefix='EvtGenSimRecLarge'
@@ -73,7 +73,7 @@ statistics_plots(
 event_timing_plot(
     '../EvtGenSimRecLarge.root',
     'EvtGenSimRecLarge_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation and reconstruction job with generic '
              'EvtGen events',
     prefix='EvtGenSimRecLarge'

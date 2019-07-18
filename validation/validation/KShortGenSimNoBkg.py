@@ -4,7 +4,7 @@
 """
 <header>
   <output>KShortGenSimNoBkg.root</output>
-  <contact>tkuhr</contact>
+  <contact>Thomas Kuhr thomas.kuhr@lmu.de</contact>
   <cacheable/>
   <description>This steering file produces 500 events with five KLong each
   and runs the detector simulation without mixing in background.</description>
@@ -53,14 +53,14 @@ print(statistics)
 from validation import *
 statistics_plots(
     'KShortGenSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation job with KShortGenSimNoBkg particleGun',
     prefix='KShortGenSimNoBkg'
 )
 event_timing_plot(
     '../KShortGenSimNoBkg.root',
     'KShortGenSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation job with Klong particleGun',
     prefix='KShortGenSimNoBkg'
 )

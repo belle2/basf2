@@ -4,7 +4,7 @@
 """
 <header>
   <output>EvtGenSimNoBkg.root</output>
-  <contact>tkuhr</contact>
+  <contact>Thomas Kuhr thomas.kuhr@lmu.de</contact>
   <cacheable/>
   <description>This steering file produces 1000 generic BBbar events with EvtGen
   and runs the detector simulation without mixing in background.</description>
@@ -58,13 +58,13 @@ print(statistics)
 from validation import *
 statistics_plots(
     'EvtGenSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation job with generic EvtGen events',
     prefix='EvtGenSimNoBkg'
 )
 event_timing_plot(
     '../EvtGenSimNoBkg.root', 'EvtGenSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Thomas Kuhr thomas.kuhr@lmu.de',
     job_desc='a standard simulation job with generic EvtGen events',
     prefix='EvtGenSimNoBkg'
 )

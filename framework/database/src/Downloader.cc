@@ -37,15 +37,6 @@ namespace Belle2::Conditions {
     double lasttime{0};
   };
 
-  /** Timeout to wait for connections in seconds */
-  unsigned int Downloader::s_connectionTimeout{60};
-  /** Timeout to wait for stalled connections (<10KB/s) */
-  unsigned int Downloader::s_stalledTimeout{60};
-  /** Number of retries to perform when downloading failes with HTTP response code >=500 */
-  unsigned int Downloader::s_maxRetries{3};
-  /** Backoff factor for retries in seconds */
-  unsigned int Downloader::s_backoffFactor{5};
-
   namespace {
     /** Callback to handle the bytes downloaded by curl.
      * See https://curl.haxx.se/libcurl/c/CURLOPT_WRITEFUNCTION.html
@@ -187,9 +178,9 @@ namespace Belle2::Conditions {
     m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
     curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
     curl_easy_setopt(m_session->curl, CURLOPT_TCP_KEEPALIVE, 1L);
-    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, s_connectionTimeout);
+    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, m_connectionTimeout);
     curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_LIMIT, 10 * 1024); //10 kB/s
-    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, s_stalledTimeout);
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, m_stalledTimeout);
     curl_easy_setopt(m_session->curl, CURLOPT_WRITEFUNCTION, write_function);
     curl_easy_setopt(m_session->curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(m_session->curl, CURLOPT_NOPROGRESS, 0);
@@ -245,6 +236,22 @@ namespace Belle2::Conditions {
     return md5.AsString();
   }
 
+  void Downloader::setConnectionTimeout(unsigned int timeout)
+  {
+    m_connectionTimeout = timeout;
+    if (m_session) {
+      curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, m_connectionTimeout);
+    }
+  }
+
+  void Downloader::setStalledTimeout(unsigned int timeout)
+  {
+    m_stalledTimeout = timeout;
+    if (m_session) {
+      curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, m_stalledTimeout);
+    }
+  }
+
   bool Downloader::download(const std::string& url, std::ostream& buffer, bool silentOnMissing)
   {
     //make sure we have an active curl session ...
@@ -275,8 +282,8 @@ namespace Belle2::Conditions {
       if (res != CURLE_OK) {
         size_t len = strlen(m_session->errbuf);
         const std::string error = len ? m_session->errbuf : curl_easy_strerror(res);
-        if (s_maxRetries > 0 && res == CURLE_HTTP_RETURNED_ERROR) {
-          if (retry <= s_maxRetries) {
+        if (m_maxRetries > 0 && res == CURLE_HTTP_RETURNED_ERROR) {
+          if (retry <= m_maxRetries) {
             // we treat everything below 500 as permanent error with the request,
             // only retry on 500.
             long responseCode{0};
@@ -285,7 +292,7 @@ namespace Belle2::Conditions {
               // use exponential backoff but don't restrict to exact slots like
               // Ethernet, just use a random wait time between 1s and maxDelay =
               // 2^(retry)-1 * backoffFactor
-              double maxDelay = (std::pow(2, retry) - 1) * s_backoffFactor;
+              double maxDelay = (std::pow(2, retry) - 1) * m_backoffFactor;
               double seconds = gRandom->Uniform(1., maxDelay);
               B2WARNING("Could not download url, retrying ..."
                         << LogVar("url", url) << LogVar("error", error)

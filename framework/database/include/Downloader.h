@@ -49,21 +49,21 @@ namespace Belle2::Conditions {
     }
 
     /** Get the timeout to wait for connections in seconds, 0 means the built in curl default */
-    static unsigned int getConnectionTimeout() { return s_connectionTimeout; }
+    unsigned int getConnectionTimeout() const { return m_connectionTimeout; }
     /** Get the timeout to wait for stalled connections (<10KB/s), 0 means no timeout */
-    static unsigned int getStalledTimeout() { return s_stalledTimeout; }
+    unsigned int getStalledTimeout() const { return m_stalledTimeout; }
     /** Get the number of retries to perform when downloading failes with HTTP response code >=500, 0 means no retries*/
-    static unsigned int getMaxRetries() { return s_maxRetries; }
+    unsigned int getMaxRetries() const { return m_maxRetries; }
     /** Get the backoff factor for retries in seconds */
-    static unsigned int getBackoffFactor() { return s_backoffFactor; }
-    /** Set the timeout to wait for connections in seconds, 0 means built in default */
-    static void setConnectionTimeout(unsigned int timeout) { s_connectionTimeout = timeout; }
+    unsigned int getBackoffFactor() const { return m_backoffFactor; }
+    /** Set the timeout to wait for connections in seconds, 0 means built in curl default. */
+    void setConnectionTimeout(unsigned int timeout);
     /** Set the timeout to wait for stalled connections (<10KB/s), 0 disables timeout */
-    static void setStalledTimeout(unsigned int timeout) { s_stalledTimeout = timeout; }
+    void setStalledTimeout(unsigned int timeout);
     /** Set the number of retries to perform when downloading failes with HTTP response code >=500, 0 disables retry */
-    static void setMaxRetries(unsigned int retries) { s_maxRetries = retries; }
+    void setMaxRetries(unsigned int retries) { m_maxRetries = retries; }
     /** Set the backoff factor for retries in seconds. Minimum is 1 and 0 will be silently converted to 1 */
-    static void setBackoffFactor(unsigned int factor) { s_backoffFactor = std::max(1u, factor); }
+    void setBackoffFactor(unsigned int factor) { m_backoffFactor = std::max(1u, factor); }
 
     /** get an url and save the content to stream
      * This function raises exceptions when there are any problems
@@ -99,12 +99,12 @@ namespace Belle2::Conditions {
     /** flag to indicate whether curl has been initialized already */
     static bool s_globalInit;
     /** Timeout to wait for connections in seconds */
-    static unsigned int s_connectionTimeout;
+    unsigned int m_connectionTimeout{60};
     /** Timeout to wait for stalled connections (<10KB/s) */
-    static unsigned int s_stalledTimeout;
+    unsigned int m_stalledTimeout{60};
     /** Number of retries to perform when downloading failes with HTTP response code >=500 */
-    static unsigned int s_maxRetries;
+    unsigned int m_maxRetries{3};
     /** Backoff factor for retries in seconds */
-    static unsigned int s_backoffFactor;
+    unsigned int m_backoffFactor{5};
   };
 } // namespace Belle2::Conditions

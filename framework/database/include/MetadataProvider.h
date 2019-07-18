@@ -22,6 +22,9 @@ namespace Belle2::Conditions {
    * This class is supposed to know what payloads exist and if asked will update
    * a given list of PayloadMetadata instances with the actual values valid for
    * the given exp/run.
+   *
+   * It will keep an internal cache of all valid payload metadata so that
+   * requesting new metadata should be as cheap as possible.
    */
   class MetadataProvider {
   public:
@@ -94,7 +97,17 @@ namespace Belle2::Conditions {
      * * any payload which cannot be found in any globaltag will raise an error
      *   as long as required=true
      * * the modified list can still contain payloads without a valid revision
-     *   some payloads could not be found
+     *   some payloads could not be found.
+     *
+     * This function will call updatePayloads() if necessary to update the list
+     * of known payloads for a given run but it will try to cache these results
+     * so incrementally asking for new payloads as they get requested is
+     * perfectly fine.
+     *
+     * updatePayloads() will only called for globaltags if we still need to find
+     * payload information. If all payloads are found no further queries will be
+     * made so adding additional globaltags that are not used at the end is not
+     * expensive.
      *
      * @param exp the experiment number
      * @param run the run number
@@ -107,20 +120,41 @@ namespace Belle2::Conditions {
     bool getPayloads(int exp, int run, std::vector<PayloadMetadata>& info);
     /** Get the valid tag states when checking globaltag status */
     std::set<std::string> getValidTagStates() { return m_validTagStates; }
-    /** Set the valid tag states for this provider when checking globaltag status.
-     * Should be called before setTags() if necessary */
-    void setValidTagStates(const std::set<std::string>& states) { m_validTagStates = states; }
+    /** Set the valid tag states for this provider when checking globaltag
+     * status. Should be called before setTags() if necessary.
+     *
+     * \warning The state "INVALID" will never be accepted and removed from the
+     *     given set if present */
+    void setValidTagStates(const std::set<std::string>& states)
+    {
+      m_validTagStates = states;
+      m_validTagStates.erase("INVALID");
+    }
   protected:
     /** Check the status of a global tag with the given name.
      * Returns "" if the tag doesn't exist or any other error occured */
     virtual std::string getGlobaltagStatus(const std::string& name) = 0;
-    /** Update the list of existing payloads from a given globaltag, exp and run combination.
-     * Supposed to call addPayload() for each payload it finds.
+    /** Update the list of existing payloads from a given globaltag, exp and run
+     * combination.
+     *
+     * This function has to be implemented by specializations. It will be called
+     * whenever we need to know the list of payloads available for a given
+     * globaltag, exp, run combination. The base class will make sure to call
+     * this class only if necessary, so hopefully only once per combination but
+     * could be more often if processing jumps between runs.
+     *
+     * The implementation should then obtain **all metadata valid for this
+     * globaltag, exp, run combination** and call addPayload() once for each
+     * payload to add it to the internal cache.
+     *
      * @return true on success, false on failure (e.g. network or file problems)
      */
     virtual bool updatePayloads(const std::string& globaltag, int exp, int run) = 0;
-    /** Add a payload information to the internal list. This should be called by
-     * implementations during updatePayloads() for each payload found.
+    /** Add a payload information to the internal list.
+     *
+     * This should be called by implementations during updatePayloads() for each
+     * payload found.
+     *
      * @param payload payload information filled from the globaltag
      * @param messagePrefix a message prefix to be shown for possible log
      *    messages to indicate the correct metadata provider

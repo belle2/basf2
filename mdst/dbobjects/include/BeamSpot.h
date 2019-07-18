@@ -80,7 +80,7 @@ namespace Belle2 {
 
     /** Get the total covariance matrix of the vertex position
      * (for compatibility with BeamParameters)*/
-    const TMatrixDSym& getCovVertex() const
+    TMatrixDSym getCovVertex() const
     {
       return  getSizeCovMatrix() + getIPPositionCovMatrix();
     }

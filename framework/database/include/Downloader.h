@@ -48,7 +48,7 @@ namespace Belle2::Conditions {
       return ScopeGuard([this, started] {if (started) finishSession();});
     }
 
-    /** Get the timeout to wait for connections in seconds, 0 means built in default */
+    /** Get the timeout to wait for connections in seconds, 0 means the built in curl default */
     static unsigned int getConnectionTimeout() { return s_connectionTimeout; }
     /** Get the timeout to wait for stalled connections (<10KB/s), 0 means no timeout */
     static unsigned int getStalledTimeout() { return s_stalledTimeout; }
@@ -70,13 +70,16 @@ namespace Belle2::Conditions {
      * @warning any contents in the stream will be overwritten
      * @param url the url to download
      * @param stream the stream to save the output to
+     * @param silentOnMissing if true do not emit a warning on 404 Not Found but
+     *     just return false silently. Useful when checking if a file exists on the server
+     * @return true on success, false on any error
      */
     bool download(const std::string& url, std::ostream& stream, bool silentOnMissing = false);
 
     /** check the digest of a stream
      * @param input stream to check, make sure the stream is in a valid state pointing to the correct position
-     * @param digest expected hash digest of the data
-     * @returns true if digest matches, false otherwise
+     * @param checksum expected hash digest of the data
+     * @return true if digest matches, false otherwise
      */
     bool verifyChecksum(std::istream& input, const std::string& checksum) { return calculateChecksum(input) == checksum; }
     /** Escape a string to make it safe to be used in web requests */
@@ -90,11 +93,6 @@ namespace Belle2::Conditions {
      * @returns the hex digest of the checksum
      */
     static std::string calculateChecksum(std::istream& input);
-
-    /** Verify if the global tag can be used: It needs to exist and not have status INVALID.
-     * This function will not return in case of error but just raise a B2FATAL.
-     */
-    void verifyUsableGlobaltag(const std::string& globalTag);
 
     /** curl session handle */
     std::unique_ptr<CurlSession> m_session;

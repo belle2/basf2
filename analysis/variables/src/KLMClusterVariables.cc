@@ -296,7 +296,8 @@ namespace Belle2 {
                       "Returns KLM cluster's number of the innermost layer with hits.");
     REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers, "Returns KLM cluster's number of layers with hits.");
     REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, "Returns KLMCluster's energy (assuming K_L0 hypothesis).");
-    REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, "Returns KLMCluster's momentum magnitude.")
+    REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum,
+                      "Returns KLMCluster's momentum magnitude. N.B.: klmClusterMomentum is proportional to klmClusterLayers.")
     REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM, "Returns 1 if the associated KLMCluster is in BKLM.");
     REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM, "Returns 1 if the associated KLMCluster is in EKLM.");
     REGISTER_VARIABLE("klmClusterIsForwardEKLM", klmClusterIsForwardEKLM, "Returns 1 if the associated KLMCluster is in forward EKLM.");
@@ -307,9 +308,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
                       "Returns the maximum angle in the CMS between the Particle and all KLM clusters in the event.");
     REGISTER_VARIABLE("nKLMClusterTrackMatches", nKLMClusterTrackMatches,
-                      "Returns the number of Tracks matched to the KLMCluster associated to this Particle (0 for K_L0, >0 for matched Tracks, NaN for not-matched Tracks).");
+                      "Returns the number of Tracks matched to the KLMCluster associated to this Particle (>0 for K_L0 and matched Tracks, NaN for not-matched Tracks).");
     REGISTER_VARIABLE("nMatchedKLMClusters", nMatchedKLMClusters,
-                      "Returns the number of KLMClusters matched to the Track associated to this Particle. This variable returns NaN for K_L0 (they have no Tracks associated). It can return >1");
+                      "Returns the number of KLMClusters matched to the Track associated to this Particle. It can return only 0, 1 or NaN (it returns NaN for K_L0 candidates with no Tracks associated).");
     REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
                       "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.");
 

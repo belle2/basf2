@@ -86,7 +86,10 @@ def create_jira_issue(task, data, time, password):
     Create a jira sub-issue for the given request
     """
 
-    issue = jira_global_tag_v2(task)
+    if data['issue']:
+        issue = data['issue']
+    else:
+        issue = jira_global_tag_v2(task)
     if issue is None:
         return
 
@@ -217,6 +220,7 @@ if __name__ == "__main__":
         print('\nIf you want to add already uploaded payloads to a new global tag, send the request including the list',
               'of payload names, the source, and the destination global tag to mgt-global-tag@belle2.org.')
         sys.exit(1)
+    data['issue'] = input('\nIdentifier of existing jira issue, leave empty to take default: ')
 
     if len(set(data.keys()) & set(['data', 'mc', 'analysis'])) > 0:
         # Ask user to enter detailed instructions. For this multiline input, offer option to use temporary editor

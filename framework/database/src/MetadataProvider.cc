@@ -57,17 +57,17 @@ namespace Belle2::Conditions {
       // Warning: **DO NOT** use `std::all_of` here which looks better but stops
       // iteration on the first missing payload instead of going through all the
       // remaining as well.
-      const size_t found = std::count_if(info.begin(), info.end(), [&existing](auto & p) {
+      const size_t found = std::count_if(info.begin(), info.end(), [&existing](auto & payload) {
         // already filled by previous gt so don't do anything
-        if (p.revision > 0) return true;
+        if (payload.revision > 0) return true;
         // otherwise look for the payload in the list of existing payloads for this run
-        if (auto && it = existing.find(p.name); it != existing.end()) {
-          p.update(it->second);
+        if (auto && it = existing.find(payload.name); it != existing.end()) {
+          payload.update(it->second);
           B2DEBUG(35, "Fround requested payload metadata"
-                  << LogVar("globaltag", p.globaltag)
-                  << LogVar("name", p.name)
-                  << LogVar("revision", p.revision)
-                  << LogVar("checksum", p.checksum));
+                  << LogVar("globaltag", payload.globaltag)
+                  << LogVar("name", payload.name)
+                  << LogVar("revision", payload.revision)
+                  << LogVar("checksum", payload.checksum));
           return true;
         }
         // Not found, fine, not a big problem yet, there can be multiple global tags

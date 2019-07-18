@@ -139,7 +139,7 @@ namespace Belle2::Conditions {
 
   /** Fallback provider if no providers are given: Will raise an error if used
    * but allows processing if no payloads are requested or all are taken
-   * locally rom testing payload storage. */
+   * locally from testing payload storage. */
   class NullMetadataProvider: public MetadataProvider {
     /** Nope, no update */
     bool updatePayloads([[maybe_unused]] const std::string& globaltag, [[maybe_unused]] int exp,

@@ -8,6 +8,9 @@ from softwaretrigger.path_utils import get_store_only_metadata_path, add_filter_
 
 
 def add_cosmic_softwaretrigger_reconstruction(path, components, **kwargs):
+    # Check components.
+    check_components(components)
+
     # no filtering, don't prune RecoTracks so the Tracking DQM module has access to all hits
     reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True,
                                               components=components, pruneTracks=False, **kwargs)

@@ -1066,10 +1066,22 @@ def rankByHighest(
 ):
     """
     Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
-    in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
+    in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
+    The list is also sorted from best to worst candidate
     (each charge, e.g. B+/B-, separately).
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
+
+    .. tip::
+        Extra-info fields can be accessed by the :b2:var:`extraInfo` metavariable.
+        These variable names can become clunky, so it's probably a good idea to set an alias.
+        For example if you rank your B candidates by momentum,
+
+        .. code:: python
+
+            rankByHighest("B0:myCandidates", "p", path=mypath)
+            vm.addAlias("momentumRank", "extraInfo(p_rank)")
+
 
     @param particleList     The input ParticleList
     @param variable         Variable to order Particles by.
@@ -1102,10 +1114,22 @@ def rankByLowest(
 ):
     """
     Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
-    in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
+    in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
+    The list is also sorted from best to worst candidate
     (each charge, e.g. B+/B-, separately).
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
+
+    .. tip::
+        Extra-info fields can be accessed by the :b2:var:`extraInfo` metavariable.
+        These variable names can become clunky, so it's probably a good idea to set an alias.
+        For example if you rank your B candidates by :b2:var:`dM`,
+
+        .. code:: python
+
+            rankByLowest("B0:myCandidates", "dM", path=mypath)
+            vm.addAlias("massDifferenceRank", "extraInfo(dM_rank)")
+
 
     @param particleList     The input ParticleList
     @param variable         Variable to order Particles by.

@@ -56,32 +56,32 @@ namespace Belle2 {
     virtual void terminate() override;
 
     /* user-defined parameters */
-    std::string m_rootFileName;   /**< root file name */
-    std::string m_ShaperDigitName;   /**< root file name */
+    std::string m_rootFileName = "";   /**< root file name */
+    std::string m_ShaperDigitName = "SVDShaperDigits";   /**< ShaperDigit StoreArray name */
 
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-    float m_group = 10000;
-    float m_minZS = 3;
-    float m_maxZS = 6;
-    int m_pointsZS = 7;
-    bool m_FADCmode;
+    float m_group = 10000; /**<number of events to comput occupancy for occ VS time*/
+    float m_minZS = 3; /**<minimum zero suppresion cut*/
+    float m_maxZS = 6; /**max zero suppression cut*/
+    int m_pointsZS = 7; /**<num,ner of steps for different ZS cuts*/
+    bool m_FADCmode = true; /**if true, ZS done with same algorithm as on FADC*/
 
   private:
 
-    int m_nEvents;
-    StoreArray<SVDShaperDigit> m_svdShapers;
-    StoreObjPtr<EventMetaData> m_eventMetaData;
+    int m_nEvents = 0; /**< number of events*/
+    StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigit StoreArray*/
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**<Event Meta Data StoreObjectPointer*/
 
-    SVDNoiseCalibrations m_NoiseCal;
+    SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
 
 
     //SHAPER
-    SVDHistograms<TH1F>* m_histo_occ;
-    SVDHistograms<TH1F>* m_histo_zsOcc;
-    SVDHistograms<TH1F>* m_histo_zsOccSQ;
-    SVDHistograms<TH2F>* m_histo_occtdep;
+    SVDHistograms<TH1F>* m_histo_occ = nullptr; /**<occupancy histograms*/
+    SVDHistograms<TH1F>* m_histo_zsOcc = nullptr; /**<occupancy VS ZScut histograms*/
+    SVDHistograms<TH1F>* m_histo_zsOccSQ = nullptr; /**< occupancy VS ZS cut swuared histograms*/
+    SVDHistograms<TH2F>* m_histo_occtdep = nullptr; /**< occupancy VS event number*/
 
   };
 }

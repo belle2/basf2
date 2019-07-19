@@ -56,6 +56,7 @@ namespace Belle2 {
         }
       }
 
+      /// ROOT-compatible formula for z(s) = z0 + tanlambda * s
       static const char* debugLine() { return "[0] + [1] * x";}
     };
   }

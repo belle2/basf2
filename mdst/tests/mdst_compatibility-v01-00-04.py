@@ -21,6 +21,8 @@ CHANGES since release-01-00-04:
 - KlIds are added
 - TRGSummary:
   * getTimTypeBits is replaced by getTimType
+- SoftwareTriggerResult:
+  * non-prescaled results added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel

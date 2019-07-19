@@ -314,12 +314,12 @@ namespace Belle2 {
      */
     virtual void shiftInTime(float delta) override
     {
-      m_globalTime = m_flightTime + delta;
+      m_globalTime += delta;
     }
 
 
     /** ROOT Macro. */
-    ClassDef(CDCSimHit, 5);
+    ClassDefOverride(CDCSimHit, 6);
   };
 } // end namespace Belle2
 #endif

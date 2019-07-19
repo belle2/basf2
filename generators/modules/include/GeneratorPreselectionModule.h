@@ -43,19 +43,16 @@ namespace Belle2 {
 
   protected:
     /** called for each particle, checks for cuts. */
-    void checkParticle(const MCParticle& mc, int level = 0);
+    void checkParticle(const MCParticle& mc);
 
     std::string m_particleList; /**< The name of the MCParticle collection. */
-    std::vector<bool> m_seen;   /**< Tag the particles which were already visited using their index. */
-    bool m_onlyPrimaries;       /**< Print only primary particles. */
-    int m_maxLevel;             /**< Show only up to specified depth level. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
     StoreObjPtr<MCInitialParticles> m_initial; /**< pointer to the actual beam parameters */
 
   private:
 
     /**charged*/
-    int m_nCharged; /**< number of charged particles (counted per event). */
+    int m_nCharged = 0; /**< number of charged particles (counted per event). */
     int m_nChargedMin; /**< minimum number of charged particles. */
     int m_nChargedMax; /**< minimum number of charged particles. */
 
@@ -68,7 +65,7 @@ namespace Belle2 {
                                    charged in the center of mass system */
 
     /**number of photons*/
-    double m_nPhoton; /**< number of photons (counted per event). */
+    double m_nPhoton = 0; /**< number of photons (counted per event). */
     int m_nPhotonMin; /**< minimum number of photons. */
     int m_nPhotonMax; /**< minimum number of photons. */
 

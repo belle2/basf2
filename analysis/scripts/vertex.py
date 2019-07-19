@@ -5,7 +5,6 @@ from basf2 import register_module
 from basf2 import B2WARNING
 import sys
 import inspect
-from analysisPath import analysis_main
 
 
 def fitVertex(
@@ -16,7 +15,7 @@ def fitVertex(
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
@@ -28,7 +27,7 @@ def fitVertex(
     @param fitter       rave or kfitter
     @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
     @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube/mother)
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param path         modules are added to this path
     """
 
@@ -36,7 +35,7 @@ def fitVertex(
         "Direct use of fitVertex is deprecated.\n"
         "Please use vertexKFit, vertexRave, or any of the other convenience functions as appropriate.\n"
         "See documentation at \n  https://software.belle2.org/analysis/doc/Vertex.html"
-        )
+    )
 
     B2WARNING(warning)
 
@@ -47,7 +46,7 @@ def fitVertex(
         fitter,
         fit_type,
         constraint,
-        daugthersUpdate,
+        daughtersUpdate,
         path,
     )
 
@@ -60,7 +59,7 @@ def _fitVertex(
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
@@ -72,7 +71,7 @@ def _fitVertex(
     @param fitter       rave or kfitter
     @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
     @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube/mother)
-    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param path         modules are added to this path
     """
 
@@ -93,8 +92,8 @@ def vertexKFit(
     conf_level,
     decay_string='',
     constraint='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -111,7 +110,7 @@ def vertexKFit(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ", updateAllDaughters=False)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if constraint is '':
@@ -121,7 +120,7 @@ def vertexKFit(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -142,8 +141,8 @@ def vertexKFitDaughtersUpdate(
     list_name,
     conf_level,
     constraint='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the Daughters.
@@ -159,7 +158,7 @@ def vertexKFitDaughtersUpdate(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ", updateAllDaughters=True)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if constraint is '':
@@ -169,7 +168,7 @@ def vertexKFitDaughtersUpdate(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -190,8 +189,8 @@ def massVertexKFit(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -207,7 +206,7 @@ def massVertexKFit(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if decay_string is '':
@@ -217,7 +216,7 @@ def massVertexKFit(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -238,8 +237,8 @@ def massVertexKFitDaughtersUpdate(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
@@ -255,7 +254,7 @@ def massVertexKFitDaughtersUpdate(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if decay_string is '':
@@ -265,7 +264,7 @@ def massVertexKFitDaughtersUpdate(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -286,8 +285,8 @@ def massKFit(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -303,7 +302,7 @@ def massKFit(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if decay_string is '':
@@ -313,7 +312,7 @@ def massKFit(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -334,8 +333,8 @@ def massKFitDaughtersUpdate(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
@@ -351,7 +350,7 @@ def massKFitDaughtersUpdate(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if decay_string is '':
@@ -361,7 +360,7 @@ def massKFitDaughtersUpdate(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -382,7 +381,7 @@ def fourCKFit(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -409,7 +408,7 @@ def fourCKFitDaughtersUpdate(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
@@ -437,8 +436,8 @@ def vertexRave(
     conf_level,
     decay_string='',
     constraint='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform vertex fit using the RAVE for each Particle in the given ParticleList.
@@ -455,7 +454,7 @@ def vertexRave(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ", updateAllDaughters=False)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if constraint is '':
@@ -465,7 +464,7 @@ def vertexRave(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -487,15 +486,25 @@ def vertexRaveDaughtersUpdate(
     conf_level,
     decay_string='',
     constraint='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
-    Perform vertex fit using RAVE for each Particle in the given ParticleList and update the Daughters.
+    Performs a vertex fit using RAVE for each Particle in the given ParticleList and updating fully the
+    daughters used in the fit.
+    The mother is only used in the fit if all daugthers (charged and neutral) are selected.
+    For this, leave the decay_string empty.
+
+    .. warning::
+       For vertices with a single track the mother is not used.
+       When a particle is fully updated its 4momentum, 3D vertex, covariance Matrix
+       and p-value are updated.
+       When the mother is not used in the fit, only its 3D vertex, covariance Matrix
+       and p-value are updated.
 
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit
-    @param decay_string select particles used for the vertex fit
+    @param decay_string select particles used for the vertex fit (if given, only the selected particles are updated)
     @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
     @param path         modules are added to this path
     @param silence_warning silence warning advertising TreeFitter use
@@ -505,7 +514,7 @@ def vertexRaveDaughtersUpdate(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ", updateAllDaughters=True)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if constraint is '':
@@ -515,7 +524,7 @@ def vertexRaveDaughtersUpdate(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -533,8 +542,8 @@ def massVertexRave(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList.
@@ -550,7 +559,7 @@ def massVertexRave(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if decay_string is '':
@@ -560,7 +569,7 @@ def massVertexRave(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -581,8 +590,8 @@ def massVertexRaveDaughtersUpdate(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList and update the daughters.
@@ -598,7 +607,7 @@ def massVertexRaveDaughtersUpdate(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if decay_string is '':
@@ -608,7 +617,7 @@ def massVertexRaveDaughtersUpdate(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -629,8 +638,8 @@ def massRave(
     list_name,
     conf_level,
     decay_string='',
-    path=analysis_main,
-    silence_warning=False,
+    path=None,
+    silence_warning=True,
 ):
     """
     Perform mass fit using the RAVE for each Particle in the given ParticleList.
@@ -647,7 +656,7 @@ def massRave(
         "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
         ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
-        )
+    )
     message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
 
     if decay_string is '':
@@ -657,7 +666,7 @@ def massRave(
             "Please consult the documentation at\n"
             "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
-            )
+        )
 
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
@@ -683,13 +692,13 @@ def vertexTree(
     customOriginConstraint=False,
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
-    path=analysis_main,
+    path=None,
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
     :Example:
-        An example of usage for decay chain :math:`B\\to\pi^+\pi^-\pi^0` is the following:
+        An example of usage for the decay chain :math:`B^0\\to\\pi^+\\pi^-\\pi^0`  is the following:
 
     ::
 
@@ -718,7 +727,7 @@ def vertexTree(
     treeFitter = register_module("TreeFitter")
     treeFitter.set_name('TreeFitter_' + list_name)
     if massConstraint:
-        if type(massConstraint[0]) is str:
+        if isinstance(massConstraint[0], str):
             treeFitter.param('massConstraintListParticlename', massConstraint)
         else:
             treeFitter.param('massConstraintList', massConstraint)
@@ -741,7 +750,7 @@ def TagV(
     askMCInfo=False,
     reqPXDHits=0,
     maskName='',
-    path=analysis_main,
+    path=None,
 ):
     """
     For each Particle in the given Breco ParticleList:
@@ -749,9 +758,11 @@ def TagV(
     save the MC Btag in case of signal MC
 
     @param list_name name of the input Breco ParticleList
-    @param confidenceLevel minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
     @param MCassociation: use standard MC association or the internal one
-    @param useConstraint: choose constraint for the tag vertes fit
+    @param confidenceLevel: minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
+    @param useFitAlgorithm: choose the fit algorithm: boost, breco, standard, standard_pxd, singleTrack,
+           singleTrack_pxd, noConstraint
+    @param askMCInfo: True when requesting MC Information from the tracks performing the vertex fit
     @param reqPXDHits: minimum N PXD hits for a track
     @param maskName: get particles from a specified ROE mask
     @param path      modules are added to this path
@@ -769,16 +780,9 @@ def TagV(
     path.add_module(tvfit)
 
 
-if __name__ == '__main__':
-    from basf2.utils import pretty_print_module
-    pretty_print_module(__name__, "vertex", {
-        repr(analysis_main): "analysis_main",
-    })
-
-
 def fitPseudo(
     list_name,
-    path=analysis_main,
+    path=None,
 ):
     """
     Add a pseudo \"vertex fit\" which adds a covariance matrix from the combination of the four-vectors of the daughters.
@@ -802,3 +806,8 @@ def fitPseudo(
     pseudofit.set_name('PseudoVertexFitter_' + list_name)
     pseudofit.param('listName', list_name)
     path.add_module(pseudofit)
+
+
+if __name__ == '__main__':
+    from basf2.utils import pretty_print_module
+    pretty_print_module(__name__, "vertex")

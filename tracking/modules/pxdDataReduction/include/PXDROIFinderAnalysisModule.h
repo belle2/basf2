@@ -76,8 +76,8 @@ namespace Belle2 {
     TGraphErrors* m_gEff2 = nullptr; /**< efficiency graph */
     TGraphErrors* m_gEff = nullptr; /**< efficiency graph */
 
-    TH1F* m_h1DigitsPerParticle = nullptr;
-    TH1F* m_h1RecoTracksPerParticle = nullptr;
+    TH1F* m_h1DigitsPerParticle = nullptr; /**< number of digits per particle */
+    TH1F* m_h1RecoTracksPerParticle = nullptr; /**< number of RecoTracks per particle */
 
     TH1F* m_h1digiIn = nullptr; /**< digits contained in ROI histogram*/
     TH1F* m_h1digiOut2 = nullptr; /**< lost digit: ROI exist with right vxdID */
@@ -177,10 +177,10 @@ namespace Belle2 {
     TH2F* m_h2MaplocL2_out5 = nullptr; /**< L2 ladder u,v */
 
     //ROI stuff
-    TH2F* m_h2ROIbottomLeft = nullptr;
-    TH2F* m_h2ROItopRight = nullptr;
-    TH2F* m_h2ROIuMinMax = nullptr;
-    TH2F* m_h2ROIvMinMax = nullptr;
+    TH2F* m_h2ROIbottomLeft = nullptr; /**< u,v coordinates of the bottom left pixel */
+    TH2F* m_h2ROItopRight = nullptr; /**< u,v coordinates of the top right pixel */
+    TH2F* m_h2ROIuMinMax = nullptr; /**< u-coordinate Min vs Max */
+    TH2F* m_h2ROIvMinMax = nullptr; /**< v-coordinate Min vs Max */
     TH1F* m_h1totROIs = nullptr; /**< distribution of number of all ROIs*/
     TH1F* m_h1okROIs = nullptr; /**< distribution of number of ROIs containin a PXDDigit*/
     TH1F* m_h1okROIfrac = nullptr; /**< distribution of number of ROIsreduction factor*/
@@ -190,7 +190,7 @@ namespace Belle2 {
     TH1F* m_h1totArea = nullptr; /**< distribution of Area of all ROIs*/
     TH1F* m_h1okArea = nullptr; /**< distribution of Area of ROIs containing a PXDDigit*/
 
-    TH1F* m_h1effPerTrack = nullptr;
+    TH1F* m_h1effPerTrack = nullptr; /**< fraction of digits in ROI per track*/
 
 
 
@@ -216,16 +216,16 @@ namespace Belle2 {
     double m_phimc;  /**< true phi */
     double m_lambdamc;  /**< true lambda = pi/2 - theta*/
 
-    unsigned int Ntrack; /**< nuner of tracks with pxd digits */
-    unsigned int NtrackHit; /**< nuner of tracks with hits */
-    unsigned int n_notINtrack2; /**< nuner of tracks with no digits in ROI (correct vxdID) */
-    unsigned int n_notINtrack3; /**< nuner of tracks with no digits in ROI (wrong vxdID) */
-    unsigned int n_notINtrack4; /**< nuner of tracks with no ROI (intercept with correct vxdID) */
-    unsigned int n_notINtrack5; /**< nuner of tracks with no ROI (intercept with wrong vxdID) */
+    unsigned int Ntrack; /**< number of tracks with pxd digits */
+    unsigned int NtrackHit; /**< number of tracks with hits */
+    unsigned int n_notINtrack2; /**< number of tracks with no digits in ROI (correct vxdID) */
+    unsigned int n_notINtrack3; /**< number of tracks with no digits in ROI (wrong vxdID) */
+    unsigned int n_notINtrack4; /**< number of tracks with no ROI (intercept with correct vxdID) */
+    unsigned int n_notINtrack5; /**< number of tracks with no ROI (intercept with wrong vxdID) */
 
 
-    unsigned int n_rois;
-    unsigned int n_intercepts;
+    unsigned int n_rois; /**< number of ROIs*/
+    unsigned int n_intercepts; /**< number of PXDIntercepts*/
     unsigned int n_tracks; /**< number of tracks */
     unsigned int n_tracksWithDigits; /**< number of tracks with digits */
     unsigned int n_tracksWithDigitsInROI; /**< number of tracks with digits in ROI */
@@ -243,11 +243,11 @@ namespace Belle2 {
     unsigned int nnotINdigit3[6]; /**< number of lost digits in bins of pt: no hit, wrong vxdID*/
     unsigned int nnotINdigit4[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with correct vxdID*/
     unsigned int nnotINdigit5[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with wrong vxdID*/
-    unsigned int TrackOneDigiIn[6];
-    unsigned int nnotINtrack2[6];
-    unsigned int nnotINtrack3[6];
-    unsigned int nnotINtrack4[6];
-    unsigned int nnotINtrack5[6];
+    unsigned int TrackOneDigiIn[6]; /**< number of tracks with one digit inside ROI in bins of pt*/
+    unsigned int nnotINtrack2[6]; /**< number of tracks in bins of pt: no hit, correct vxdID*/
+    unsigned int nnotINtrack3[6]; /**< number of tracks in bins of pt: no hit, wrong vxdID*/
+    unsigned int nnotINtrack4[6]; /**< number of tracks in bins of pt: no ROI, intercepts with correct vxdID*/
+    unsigned int nnotINtrack5[6]; /**< number of tracks in bins of pt: no ROI, intercepts with wrong vxdID*/
 
   };
 

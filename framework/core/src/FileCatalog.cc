@@ -83,13 +83,13 @@ bool FileCatalog::writeCatalog(const FileCatalog::FileMap& fileMap)
 
   file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
   file << "<FileCatalog>\n";
-  for (auto entry : fileMap) entry.second.second.write(file, entry.second.first);
+  for (const auto& entry : fileMap) entry.second.second.write(file, entry.second.first);
   file << "</FileCatalog>\n";
 
   return true;
 }
 
-bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData, const std::string& oldLFN)
+bool FileCatalog::registerFile(const std::string& fileName, FileMetaData& metaData, const std::string& oldLFN)
 {
   if (m_fileName.empty()) return false;
 
@@ -168,7 +168,7 @@ bool FileCatalog::getMetaData(std::string& fileName, FileMetaData& metaData)
     if (!iEntry->second.first.empty()) fileName = iEntry->second.first;
     return true;
   }
-  for (auto entry : fileMap) {
+  for (const auto& entry : fileMap) {
     if (fileName.compare(entry.second.first) == 0) {
       metaData = entry.second.second;
       return true;
@@ -179,7 +179,7 @@ bool FileCatalog::getMetaData(std::string& fileName, FileMetaData& metaData)
 }
 
 
-std::string FileCatalog::getPhysicalFileName(std::string lfn)
+std::string FileCatalog::getPhysicalFileName(const std::string& lfn)
 {
   std::string fileName = lfn;
   FileMetaData metaData;
@@ -188,4 +188,3 @@ std::string FileCatalog::getPhysicalFileName(std::string lfn)
   }
   return fileName;
 }
-

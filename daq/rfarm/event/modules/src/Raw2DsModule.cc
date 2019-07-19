@@ -94,7 +94,6 @@ void Raw2DsModule::initialize()
 
 void Raw2DsModule::beginRun()
 {
-  /*
   if (Environment::Instance().getNumberProcesses() != 0) {
     struct sigaction s;
     memset(&s, '\0', sizeof(s));
@@ -105,7 +104,6 @@ void Raw2DsModule::beginRun()
     }
     printf("Raw2Ds : Signal Handler installed.\n");
   }
-  */
   B2INFO("beginRun called.");
 }
 
@@ -130,7 +128,7 @@ void Raw2DsModule::registerRawCOPPERs()
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    usleep(100);
     //    usleep(20);
-    if (signalled != 0) break;
+    if (signalled != 0) return;
     usleep(5);
   }
   //  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<

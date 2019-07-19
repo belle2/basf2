@@ -51,20 +51,6 @@ namespace Belle2 {
     double eclClusterDeltaL(const Particle* particle);
 
     /**
-     * [Legacy] Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
-     */
-    bool isGoodBelleGamma(int region, double energy);
-
-    /**
-     * [Legacy]
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E > 100 MeV
-     * Barrel   : E >  50 MeV
-     * Backward : E > 150 MeV
-     */
-    double goodBelleGamma(const Particle* particle);
-
-    /**
      * return ECL cluster's Error on Energy
      */
     double eclClusterErrorE(const Particle* particle);
@@ -112,9 +98,14 @@ namespace Belle2 {
     double eclClusterErrorTiming(const Particle* particle);
 
     /**
-     * return the energy of the crystall with highest  energy
+     * return the energy of the crystal with highest energy
      */
     double eclClusterHighestE(const Particle* particle);
+
+    /**
+     * return the cellID [1,8736] of the crystal with highest energy
+     */
+    double eclClusterCellId(const Particle* particle);
 
     /**
      * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
@@ -304,6 +295,12 @@ namespace Belle2 {
 
     /** energy over momentum can be used to separate electrons from muons*/
     double eclClusterEoP(const Particle* part);
+
+    /**
+     * [Expert] The invariant mass calculated from all ECLCluster daughters (i.e. photons) and cluster-matched tracks using the CLUSTER 4-MOMENTA.
+     * Used for ECL-based dark sector physics and debugging track-cluster matching.
+     */
+    double eclClusterOnlyInvariantMass(const Particle* part);
 
     /**
      * return the number of TCs above threshold

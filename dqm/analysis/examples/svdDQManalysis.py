@@ -21,10 +21,11 @@ inroot.param('InputRootFile', "SVDDQM.root")
 main.add_module(inroot)
 
 main.add_module('Gearbox')
-main.add_module('Geometry', components=['SVD'])
+main.add_module('Geometry')
 
 svd = register_module('DQMHistAnalysisSVDGeneral')
 svd.param('printCanvas', True)
+svd.param('unpackerErrorLevel', 0.00001)
 svd.param('RefHistoFile', "SVDrefHisto.root")
 main.add_module(svd)
 

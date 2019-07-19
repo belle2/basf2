@@ -189,11 +189,11 @@ namespace Belle2 {
       void setVariableGroup(const std::string& groupName);
 
       /** Register a variable. */
-      void registerVariable(const std::string& name, Manager::FunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, const Manager::FunctionPtr& f, const std::string& description);
       /** Register a variable that takes floating-point arguments (see Variable::Manager::ParameterFunctionPtr). */
-      void registerVariable(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, const Manager::ParameterFunctionPtr& f, const std::string& description);
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
-      void registerVariable(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, const Manager::MetaFunctionPtr& f, const std::string& description);
 
       /** evaluate variable 'varName' on given Particle.
        *
@@ -205,6 +205,9 @@ namespace Belle2 {
 
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;
+
+      /** Return a list of all variable alias names (in reverse order added). */
+      std::vector<std::string> getAliasNames() const;
 
       /** Abort with B2FATAL if name is not a valid name for a variable. */
       void assertValidName(const std::string& name);

@@ -426,7 +426,9 @@ namespace Belle2 {
 
   public:
     simpleBitfield() { __bits = T(); } /**< default constructor */
-    simpleBitfield(const simpleBitfield<T>& __otherBitfield) { __bits = __otherBitfield.__bits; } /**< constructor from other bitfield */
+
+    simpleBitfield(const simpleBitfield<T>& __otherBitfield) = delete; /**< not needed */
+    simpleBitfield<T>& operator = (simpleBitfield<T>&) = delete; /**< not needed */
 
     /** check if a certain status has been set to the bitfield */
     const T hasStatus(T __statusBits) const { return (__bits & __statusBits) == __statusBits; }

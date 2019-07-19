@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <bklm/geometry/GeometryPar.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 #include <simulation/background/BkgSensitiveDetector.h>
@@ -402,7 +403,7 @@ namespace Belle2 {
         B2INFO("BKLM::GeometryPar: DoBeamBackgroundStudy is enabled");
         m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
       } else {
-        B2DEBUG(1, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
+        B2DEBUG(20, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
       }
       m_Gap1ActualHeight = m_Gap1NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
       m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);
@@ -717,11 +718,9 @@ namespace Belle2 {
       return m_HasRPCs[layer - 1];
     }
 
-    const Module* GeometryPar::findModule(bool isForward, int sector, int layer) const
+    const Module* GeometryPar::findModule(int forward, int sector, int layer) const
     {
-      int moduleID = (isForward ? BKLM_END_MASK : 0)
-                     | ((sector - 1) << BKLM_SECTOR_BIT)
-                     | ((layer - 1) << BKLM_LAYER_BIT);
+      int moduleID = BKLMElementNumbers::moduleNumber(forward, sector, layer);
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
       return (iM == m_Modules.end() ? NULL : iM->second);
     }
@@ -767,17 +766,16 @@ namespace Belle2 {
         for (int sector = 1; sector <= m_NSector; ++sector) {
           for (int layer = 1; layer <= m_NLayer; ++layer) {
 
-            // BKLM_FORWARD =1, BKLM_BACKWARD=2.
-            BKLMElementID bklmid(fb - 1, sector - 1, layer - 1);
-
+            BKLMElementID bklmid(int(isForward), sector, layer);
+            int id = bklmid.getID();
             HepGeom::Transform3D alignment;
-            alignment = getTransformFromRigidBodyParams(bklmAlignments->get(bklmid, 1),
-                                                        bklmAlignments->get(bklmid, 2),
-                                                        bklmAlignments->get(bklmid, 3),
-                                                        bklmAlignments->get(bklmid, 4),
-                                                        bklmAlignments->get(bklmid, 5),
-                                                        bklmAlignments->get(bklmid, 6)
-                                                       );
+            alignment = getTransformFromRigidBodyParams(
+                          bklmAlignments->getGlobalParam(id, 1),
+                          bklmAlignments->getGlobalParam(id, 2),
+                          bklmAlignments->getGlobalParam(id, 3),
+                          bklmAlignments->getGlobalParam(id, 4),
+                          bklmAlignments->getGlobalParam(id, 5),
+                          bklmAlignments->getGlobalParam(id, 6));
 
             int moduleID = (isForward ? BKLM_END_MASK : 0)
                            | ((sector - 1) << BKLM_SECTOR_BIT)
@@ -804,7 +802,7 @@ namespace Belle2 {
       for (const auto& disp : displacements) {
         unsigned short bklmElementID = disp.getElementID();
         BKLMElementID bklmid(bklmElementID);
-        unsigned short isForward = bklmid.getIsForward();
+        unsigned short forward = bklmid.getForward();
         unsigned short sector = bklmid.getSectorNumber();
         unsigned short layer = bklmid.getLayerNumber();
 
@@ -816,9 +814,7 @@ namespace Belle2 {
                                             disp.getGammaRotation()
                                                                            );
 
-        int moduleID = (isForward ? BKLM_END_MASK : 0)
-                       | ((sector - 1) << BKLM_SECTOR_BIT)
-                       | ((layer - 1) << BKLM_LAYER_BIT);
+        int moduleID = BKLMElementNumbers::moduleNumber(forward, sector, layer);
 
         m_Displacements.insert(std::pair<int, HepGeom::Transform3D>(moduleID, displacement));
       }
@@ -830,9 +826,9 @@ namespace Belle2 {
         double dGamma)
     {
 
-      CLHEP::HepRotation dx = CLHEP::HepRotationX(dGamma);
-      CLHEP::HepRotation dy = CLHEP::HepRotationY(dAlpha);
-      CLHEP::HepRotation dz = CLHEP::HepRotationZ(dBeta);
+      CLHEP::HepRotation dy = CLHEP::HepRotationY(-dAlpha);
+      CLHEP::HepRotation dz = CLHEP::HepRotationZ(-dBeta);
+      CLHEP::HepRotation dx = CLHEP::HepRotationX(-dGamma);
       CLHEP::Hep3Vector shift(dW, dU, dV);
 
       //we do dx-->dz-->dy ( local w-->v-->u), because angles are definded as intrinsic rotations u-->v'-->w''

@@ -14,7 +14,6 @@
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
-#include <pxd/dataobjects/PXDRawCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
@@ -57,7 +56,6 @@ namespace Belle2 {
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
-      std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
 
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore{false};
@@ -113,8 +111,6 @@ namespace Belle2 {
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
-      /** Output array for Clusters. */
-      StoreArray<PXDRawCluster> m_storeRawCluster;
 
       /** Unpack one event (several frames) stored in RawPXD object
        * @param px RawPXD data object

@@ -10,6 +10,8 @@ CHANGES since release-02-01-00:
 - ECLCluster:
   + getPulseShapeDiscriminationMVA added
   - getCovarianceMatrixAsArray removed
+- SoftwareTriggerResult:
+  * non-prescaled results added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel

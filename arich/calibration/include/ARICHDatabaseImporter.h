@@ -143,9 +143,19 @@ namespace Belle2 {
     void importFEMappings();
 
     /**
-     * Prints mappings of FE electronics from the database
+     * Prints merger to FEB mappings from the database
      */
-    void printFEMappings();
+    void printMergerMapping();
+
+    /**
+     * Prints Copper to merger mappings from the database
+     */
+    void printCopperMapping();
+
+    /**
+     * Prints reconstruction parameters
+     */
+    void printReconstructionPar();
 
     /**
      * Prints geometry configuration parameters from the database
@@ -159,6 +169,21 @@ namespace Belle2 {
      * for simple option, draw TGraph2D with "pcolz" option and set view to "top"
      */
     void dumpQEMap(bool simple = false);
+
+    /**
+     * Dumps detector map of HAPD modules to HV cable channels
+     */
+    void dumpHvMappings();
+
+    /**
+     * Prints electronics mappings for all modules (merger ID + SN, merger port, copper, finnese)
+     */
+    void printFEMappings();
+
+    /**
+     * Dumps module - merger mapping into root file
+     */
+    void dumpMergerMapping(bool sn = true);
 
     /**
      * Dumps module numbering scheme into root file (module position on the detector plane -> module number)

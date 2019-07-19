@@ -22,7 +22,6 @@
 using namespace std;
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
     SoftGaussParticleConstraint::SoftGaussParticleConstraint(double sigma_)
@@ -106,7 +105,7 @@ namespace Belle2 {
       // with ii=0, 1, 2, 3 for E, px, py, pz
       const int KMAX = 4;
       const int n = fitobjects.size();
-      double* dPidAk = new double[n * KMAX * 4];
+      auto* dPidAk = new double[n * KMAX * 4];
       bool* dPidAkval = new bool[n];
 
       for (int i = 0; i < n; ++i) dPidAkval[i] = false;
@@ -207,7 +206,7 @@ namespace Belle2 {
        * the FitObject
        */
 
-      double* v = new double[idim];
+      auto* v = new double[idim];
       for (int i = 0; i < idim; ++i) v[i] = 0;
       double sqrtfact2 = sqrt(2.0) / s;
 
@@ -255,7 +254,7 @@ namespace Belle2 {
     {
       B2INFO("SoftGaussParticleConstraint::test1stDerivatives for " << getName());
       double y[100];
-      for (int i = 0; i < 100; ++i) y[i] = 0;
+      for (double& i : y) i = 0;
       addToGlobalChi2DerVector(y, 100);
       double eps = 0.00001;
       for (unsigned int ifo = 0; ifo < fitobjects.size(); ++ifo) {
@@ -275,7 +274,7 @@ namespace Belle2 {
     {
       B2INFO("SoftGaussParticleConstraint::test2ndDerivatives for " << getName());
       const int idim = 100;
-      double* M = new double[idim * idim];
+      auto* M = new double[idim * idim];
       for (int i = 0; i < idim * idim; ++i) M[i] = 0;
       add2ndDerivativesToMatrix(M, idim);
       double eps = 0.0001;
@@ -365,5 +364,4 @@ namespace Belle2 {
     }
   }// end OrcaKinFit namespace
 } // end Belle2 namespace
-
 

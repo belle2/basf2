@@ -11,35 +11,41 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-from skimExpertFunctions import *
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-02-00'
 
 skimCode = encodeSkimName('TauGeneric')
-import sys
-import os
-import glob
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
-inputMdstList('MC9', fileList)
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
-stdPi('all')
-stdPhotons('all')
+taugenericskim = Path()
+
+fileList = get_test_file("mixedBGx1", "MC12")
+
+inputMdstList('default', fileList, path=taugenericskim)
+
+stdPi('all', path=taugenericskim)
+stdPhotons('all', path=taugenericskim)
 
 # Tau Skim
 from skim.taupair import *
-tauList = TauList()
+tauList = TauList(path=taugenericskim)
 
-skimOutputUdst(skimCode, tauList)
-summaryOfLists(tauList)
+skimOutputUdst(skimCode, tauList, path=taugenericskim)
+summaryOfLists(tauList, path=taugenericskim)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=taugenericskim)
+process(taugenericskim)
 
 # print out the summary
 print(statistics)

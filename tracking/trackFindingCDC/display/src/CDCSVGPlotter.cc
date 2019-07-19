@@ -37,8 +37,6 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>

@@ -24,7 +24,7 @@ from stdPhotons import *
 taugenericskim = Path()
 
 fileList = ['../TauGeneric.dst.root']
-inputMdstList('MC9', fileList, path=taugenericskim)
+inputMdstList('default', fileList, path=taugenericskim)
 
 stdPi('all', path=taugenericskim)
 stdPhotons('all', path=taugenericskim)

@@ -35,6 +35,8 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("SelectFolders", m_folders, "List of folders for which to process, empty for all", std::vector<std::string>());
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
            std::vector<std::string>());
+  addParam("Experiment", m_expno, "Experiment Nr" , 7u);
+  addParam("RunNr", m_runno, "Run Nr" , 1u);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 

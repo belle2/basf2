@@ -51,12 +51,12 @@ PXDBgTupleProducerModule::PXDBgTupleProducerModule() : Module()
   //Set module properties
   setDescription("PXD background tuple producer module");
   addParam("integrationTime", m_integrationTime, "PXD integration time in micro seconds", double(20));
+  addParam("timePeriod", m_timePeriod, "Period for background time series in seconds.", double(1));
   addParam("outputFileName", m_outputFileName, "Output file name", string("beast_tuple.root"));
   addParam("maskDeadPixels", m_maskDeadPixels, "Correct bg rates by known dead pixels", bool(true));
   addParam("nBinsU", m_nBinsU, "Number of regions per sensor along u side", int(1));
   addParam("nBinsV", m_nBinsV, "Number of regions per sensor along v side", int(6));
 }
-
 
 
 void PXDBgTupleProducerModule::initialize()
@@ -74,6 +74,9 @@ void PXDBgTupleProducerModule::initialize()
   // PXD integration time
   m_integrationTime *= Unit::us;
 
+  // Period for time series
+  m_timePeriod *= Unit::s;
+
   // So far, we did not see PXD data
   m_hasPXDData = false;
 
@@ -82,10 +85,10 @@ void PXDBgTupleProducerModule::initialize()
   if (gTools->getNumberOfPXDLayers() == 0) {
     B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
   }
-  int nPXDSensors = gTools->getNumberOfPXDSensors();
+  m_nPXDSensors = gTools->getNumberOfPXDSensors();
 
   // Initialize m_sensorData with empty sensorData for all sensors
-  for (int i = 0; i < nPXDSensors; i++) {
+  for (int i = 0; i < m_nPXDSensors; i++) {
     VxdID sensorID = gTools->getSensorIDFromPXDIndex(i);
     m_sensorData[sensorID] = SensorData();
     // Start value for minOccupancy should be one not zero
@@ -164,7 +167,7 @@ void PXDBgTupleProducerModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   // Compute the curent one second timestamp
-  unsigned long long int ts = eventMetaDataPtr->getTime() / 1000000000;
+  unsigned long long int ts = eventMetaDataPtr->getTime() / m_timePeriod;
 
   // If needed, add a new one second block to buffer
   auto iter = m_buffer.find(ts);
@@ -174,6 +177,11 @@ void PXDBgTupleProducerModule::event()
 
   // Empty map for computing event wise occupancy
   std::map<VxdID, double> occupancyMap;
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  for (int i = 0; i < m_nPXDSensors; i++) {
+    VxdID sensorID = gTools->getSensorIDFromPXDIndex(i);
+    occupancyMap[sensorID] = 0.0;
+  }
 
   // Check if there is PXD data
   if (storeDigits.getEntries() > 0) {

@@ -152,7 +152,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
 
 def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
-                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True):
+                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True, use_svd_to_cdc_ckf=True):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -165,6 +165,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     :param components: the list of geometry components in use or None for all components.
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
+    :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
@@ -189,13 +190,11 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         latest_reco_tracks = cdc_reco_tracks
 
     if is_svd_used(components):
-        if latest_reco_tracks is None:
-            latest_reco_tracks = cdc_reco_tracks
-
         add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                               output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
                               temporary_reco_tracks=svd_reco_tracks,
-                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions)
+                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
+                              use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks)
         latest_reco_tracks = svd_cdc_reco_tracks
 
     if is_pxd_used(components):

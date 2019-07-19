@@ -26,8 +26,6 @@
 #include <tracking/dataobjects/MuidHit.h>
 #include <tracking/dataobjects/Muid.h>
 
-#include <TRandom.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::bklm;
@@ -212,7 +210,7 @@ void BKLMAnaModule::event()
       ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
       int copyid = exthit->getCopyID();
-      bool isForward = ((copyid & BKLM_END_MASK) >> BKLM_END_BIT) != 0;
+      int forward = ((copyid & BKLM_END_MASK) >> BKLM_END_BIT);
       int sector = ((copyid & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
       int layer = ((copyid & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
       //int plane = (copyid & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;//only for sci
@@ -243,7 +241,7 @@ void BKLMAnaModule::event()
       for (int mHit = 0; mHit < hits2D.getEntries(); mHit++) {
         BKLMHit2d* hit = hits2D[mHit];
         //if(!hit->inRPC()) continue;
-        if (hit->isForward() != isForward) continue;
+        if (hit->getForward() != forward) continue;
         if (hit->getSector() != sector) continue;
         if (hit->getLayer() != layer) continue;
         TVector3 position = hit->getGlobalPosition();

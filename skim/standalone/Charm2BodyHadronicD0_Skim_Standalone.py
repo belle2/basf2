@@ -13,10 +13,20 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-02-02'
 
 import os
 import sys
@@ -32,10 +42,10 @@ fileList = [
 ]
 inputMdstList('MC9', fileList, path=c2bhdpath)
 
-stdPi('loose', path=c2bhdpath)
-stdK('loose', path=c2bhdpath)
-stdPi('all', path=c2bhdpath)
-stdK('all', path=c2bhdpath)
+# stdPi('loose', path=c2bhdpath)
+# stdK('loose', path=c2bhdpath)
+# stdPi('all', path=c2bhdpath)
+# stdK('all', path=c2bhdpath)
 
 from skim.charm import D0ToHpJm
 D0ToHpJmList = D0ToHpJm(c2bhdpath)

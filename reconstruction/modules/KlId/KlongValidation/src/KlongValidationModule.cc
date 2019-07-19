@@ -9,7 +9,6 @@
  * **************************************************************************/
 
 
-
 #include <reconstruction/modules/KlId/KlongValidation/KlongValidationModule.h>
 #include <mdst/dataobjects/KlId.h>
 
@@ -62,36 +61,36 @@ void KlongValidationModule::initialize()
   // initialize root tree to write stuff into
   m_f =     new TFile(m_outPath.c_str(), "recreate");
   /** using TH1F because the validation server does not support TEfficiency  */
-  m_effPhi_Pass      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 5, -3.2, 3.2);
-  m_Phi_all  = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 5, -3.2, 3.2);
-  m_effPhi      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 5, -3.2, 3.2);
+  m_effPhi_Pass      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 32, -3.2, 3.2);
+  m_Phi_all  = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 32, -3.2, 3.2);
+  m_effPhi      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 32, -3.2, 3.2);
 
-  m_effTheta_Pass    = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 5, 0, 3.2);
-  m_Theta_all  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 5, 0, 3.2);
-  m_effTheta  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 5, 0, 3.2);
+  m_effTheta_Pass    = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 32, 0, 3.2);
+  m_Theta_all  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 32, 0, 3.2);
+  m_effTheta  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 32, 0, 3.2);
 
-  m_effMom_Pass      = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 5, 0, 5);
-  m_Mom_all    = new TH1F("Momentum Efficiency normalise", "Efficiency Momentum;Momentum;Count", 5, 0, 5);
-  m_Mom_all_plot    = new TH1F("Momentum Efficiency all, obtained from clsuters", "Efficiency Momentum;Momentum;Count", 50, 0, 5);
-  m_effMom    = new TH1F("Momentum Efficiency obtained from cluster", "Efficiency Momentum;Momentum;Efficiency", 5, 0, 5);
+  m_effMom_Pass      = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 25, 0, 5);
+  m_Mom_all    = new TH1F("Momentum Efficiency normalise", "Efficiency Momentum;Momentum;Count", 25, 0, 5);
+  m_Mom_all_plot    = new TH1F("Momentum Efficiency all, obtained from clusters", "Efficiency Momentum;Momentum;Count", 25, 0, 5);
+  m_effMom    = new TH1F("Momentum Efficiency obtained from cluster", "Efficiency Momentum;Momentum;Efficiency", 25, 0, 5);
 
-  m_fakePhi_Pass     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 5, -3.2, 3.2);
-  m_fakePhi     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 5, -3.2, 3.2);
+  m_fakePhi_Pass     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 32, -3.2, 3.2);
+  m_fakePhi     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 32, -3.2, 3.2);
 
-  m_fakeTheta_Pass = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 5, 0, 3.2);
-  m_fakeTheta = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 5, 0, 3.2);
+  m_fakeTheta_Pass = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 32, 0, 3.2);
+  m_fakeTheta = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 32, 0, 3.2);
 
-  m_fakeMom_Pass   = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 5, 0, 5);
-  m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 5, 0, 5);
+  m_fakeMom_Pass   = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 25, 0, 5);
+  m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 25, 0, 5);
 
   m_time     = new TH1F("KLM Cluster Timing", "Cluster Timing;Momentum;Count", 100, -600, 600);
   m_trackSep     = new TH1F("KLM trackSeperation Distance", "KLM trackSeperation Distance;Distance;Count", 100, 0, 4000);
-  m_energy     = new TH1F("KLM Energy", "KLM Energy;Energy;count", 20, 0, 5);
+  m_energy     = new TH1F("KLM Energy", "KLM Energy;Energy;count", 25, 0, 5);
   m_nLayer     = new TH1F("KLM N-Layer", "N-layer;N-layer;count", 20, 0, 20);
 
-  m_bkgPhi      = new TH1F("Phi Beam BKG", "BeamBKG #Phi;#Phi;Background count", 50, -3.2, 3.2);
-  m_bkgTheta      = new TH1F("Theta Beam BKG", "BeamBKG #Theta;#Theta;Background count", 50, 0, 3.2);
-  m_bkgMom      = new TH1F("Momentum Beam BKG", "BeamBKG #Momentum;#Momentum;Background count", 50, 0, 5);
+  m_bkgPhi      = new TH1F("Phi Beam BKG", "BeamBKG #Phi;#Phi;Background count", 32, -3.2, 3.2);
+  m_bkgTheta      = new TH1F("Theta Beam BKG", "BeamBKG #Theta;#Theta;Background count", 32, 0, 3.2);
+  m_bkgMom      = new TH1F("Momentum Beam BKG", "BeamBKG #Momentum;#Momentum;Background count", 25, 0, 5);
 
   m_innermostLayer = new TH1F("Innermost layer", "Innermost layer;Innermost layer; Count", 20, 0, 20);
   m_trackFlag      = new TH1F("Track flag", "TrackFlag;Flag; Count", 2, 0, 1);
@@ -180,7 +179,7 @@ void KlongValidationModule::event()
 
     m_phi      = cluster.getMomentum().Phi();
     m_theta    = cluster.getMomentum().Theta();
-    m_momentum = std::abs(cluster.getMomentum().Mag());//Mag2(); ??
+    m_momentum = std::abs(cluster.getMomentumMag());//Mag2(); ??
 
     if (m_passed) {
       m_effPhi_Pass    -> Fill(m_phi);
@@ -199,6 +198,25 @@ void KlongValidationModule::event()
       m_bkgTheta-> Fill(m_theta);
       m_bkgMom-> Fill(m_momentum);
     }
+
+    m_klidAll->SetMinimum(0.);
+    m_Mom_all_plot->SetMinimum(0.);
+    m_effPhi->SetMinimum(0.);
+    m_effTheta->SetMinimum(0.);
+    m_effMom->SetMinimum(0.);
+    m_fakePhi->SetMinimum(0.);
+    m_fakeTheta->SetMinimum(0.);
+    m_fakeMom->SetMinimum(0.);
+    m_time->SetMinimum(0.);
+    m_trackSep->SetMinimum(0.);
+    m_energy->SetMinimum(0.);
+    m_nLayer->SetMinimum(0.);
+    m_bkgPhi->SetMinimum(0.);
+    m_bkgTheta->SetMinimum(0.);
+    m_bkgMom->SetMinimum(0.);
+    m_innermostLayer->SetMinimum(0.);
+    m_trackFlag->SetMinimum(0.);
+    m_ECLFlag->SetMinimum(0.);
 
     //fil all to normalise later
     m_Phi_all -> Fill(m_phi);
@@ -235,7 +253,7 @@ void KlongValidationModule::terminate()
   // TH1F is not compatible with the validation server
   m_effPhi->Divide(m_effPhi_Pass, m_Phi_all);
   m_effTheta->Divide(m_effTheta_Pass, m_Theta_all);
-  m_effMom->Divide(m_effTheta_Pass, m_Mom_all);
+  m_effMom->Divide(m_effMom_Pass, m_Mom_all);
 
   m_fakePhi->Divide(m_fakePhi_Pass, m_Phi_all);
   m_fakeTheta->Divide(m_fakeTheta_Pass, m_Theta_all);

@@ -19,7 +19,8 @@ Convenience
 ~~~~~~~~~~~
 
 .. b2-variables::
-        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack
+        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :noindex:
 
 -----------
 More detais
@@ -184,7 +185,9 @@ Understanding the decay string
 
 The following is an example of a decay string:
 
-:code:`' -413 (--> -421 (--> 321 -211) -211) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) ^-413 (--> -421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> ^-421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> ^321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 ^-211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 -211) ^-211))'`
+.. code-block:: python
+
+  '-413 (--> -421 (--> 321 -211) -211) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) ^-413 (--> -421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> ^-421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> ^321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 ^-211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 -211) ^-211))'
 
 The string consists of several parts, separated by pipes :code:`|`.
 
@@ -227,17 +230,23 @@ The decay string format is rather long, and it is possible to use a shorter form
 
 The concise string has the following format:
 
-:code:`521 (--> 310 211 111 (--> 22 22)) | 300553 (--> a521 (--> b310 c211 d111 (--> e22 f22)) -521 (--> 421 (--> 223 (--> -211 211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211))`
+.. code-block:: python
+
+  '521 (--> 310 211 111 (--> 22 22)) | 300553 (--> a521 (--> b310 c211 d111 (--> e22 f22)) -521 (--> 421 (--> 223 (--> -211 211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211))'
 
 In this example each of the six particles in the decay that is searched for are given an identifier (by default the minuscule Roman alphabet / Romaji, i.e. "a", "b", "c", etc, incrementing alphabetically).  There is only one string giving the actual MC decay, and it contains the identifiers with the particle to which they are matched.
 
 Multiple identifiers could match up to a single particle, commonly this might be an Y(4S) or a virtual photon:
 
-:code:`521 (--> 310 211 111 (--> 22 22)) |  ab300553 (--> 521 (--> 310 c211 111 (--> 22 22)) -521 (--> 413 (--> 421 (--> 310 310 211 -211) 211) 313 (--> 311 (--> 310) 111 (--> 22 22)) -321 -213 (--> -211 d111 (--> f22 e22))))`
+.. code-block:: python
+
+  '521 (--> 310 211 111 (--> 22 22)) |  ab300553 (--> 521 (--> 310 c211 111 (--> 22 22)) -521 (--> 413 (--> 421 (--> 310 310 211 -211) 211) 313 (--> 311 (--> 310) 111 (--> 22 22)) -321 -213 (--> -211 d111 (--> f22 e22))))'
 
 It there were unmatched particles it would look something like this:
 
-:code:`521 (--> 310 211 111 (--> 22 22)) | 300553 (--> 521 (--> b310 211 111 (--> 22 f22)) -521 (--> 421 (--> 223 (--> -211 c211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211)) | No match: ade`
+.. code-block:: python
+
+  '521 (--> 310 211 111 (--> 22 22)) | 300553 (--> 521 (--> b310 211 111 (--> 22 f22)) -521 (--> 421 (--> 223 (--> -211 c211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211)) | No match: ade'
 
 
 If it is not possible to convert the string to the concise format then the standard string format is returned instead. 
@@ -287,35 +296,39 @@ A special case is the decay of generated tau lepton pairs. For their study, it i
         labelTauPairMC()
 
 .. b2-variables::
-        :variables: tauPlusMcMode,tauMinusMcMode
+        :variables: tauPlusMcMode,tauMinusMcMode,tauPlusMCProng,tauMinusMCProng
 
-Using MC information, ``labelTauPairMC`` identifies if the generated event is a tau pair decay. The channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode`` (one for the positive and the other for the negative) according to the following table:
+Using MC information, ``labelTauPairMC`` identifies if the generated event is a tau pair decay.
 
-============  ==============================  ============  ==============================
-MC mode       Decay channel                   MC mode       Decay channel
-============  ==============================  ============  ==============================
- -1           Not a tau pair event             24           tau- -> pi- omega pi0 nu
- 1            tau- -> e- nu anti_nu            25           tau- -> pi- pi+ pi- eta nu
- 2            tau- -> mu- nu anti_nu           26           tau- -> pi- pi0 pi0 eta nu
- 3            tau- -> pi- nu                   27           tau- -> K- eta nu
- 4            tau- -> rho- nu                  28           tau- -> K*- eta nu
- 5            tau- -> a1- nu                   29           tau- -> K- pi+ pi- pi0 nu
- 6            tau- -> K- nu                    30           tau- -> K- pi0 pi0 pi0 nu
- 7            tau- -> K*- nu                   31           tau- -> K0 pi- pi+ pi- nu
- 8            tau- -> pi- pi+ pi- pi0 nu       32           tau- -> pi- K0bar pi0 pi0 nu
- 9            tau- -> pi- pi0 pi0 pi0 nu       33           tau- -> pi- K+ K- pi0 nu
- 10           tau- -> 2pi- pi+ 2pi0 nu         34           tau- -> pi- K0 K0bar pi0 nu
- 11           tau- -> 3pi- 2pi+ nu             35           tau- -> pi- omega pi+ pi- nu
- 12           tau- -> 3pi- 2pi+ pi0 nu         36           tau- -> pi- omega pi0 pi0 nu
- 13           tau- -> 2pi- pi+ 3pi0 nu         37           tau- -> e- e- e+ nu anti_nu
- 14           tau- -> K- pi- K+ nu             38           tau- -> f1 pi- nu
- 15           tau- -> K0 pi- K0bar nu          39           tau- -> K- omega nu
- 16           tau- -> K- K0 pi0 nu             40           tau- -> K- K0 pi+ pi- nu
- 17           tau- -> K- pi0 pi0 nu            41           tau- -> K- K0 pi0 pi0 nu
- 18           tau- -> K- pi- pi+ nu            42           tau- -> pi- K+ K0bar pi- nu
- 19           tau- -> pi- K0bar pi0 nu
- 20           tau- -> eta pi- pi0 nu
- 21           tau- -> pi- pi0 gamma nu
- 22           tau- -> K- K0 nu
- 23           tau- -> pi- 4pi0 nu
-============  ==============================  ============  ==============================
+The variables ``tauPlusMCProng`` and ``tauMinusMCProng`` stores the prong (number of final state charged particles) coming from each one of the generated tau leptons. If the event is not a tau pair decay, the value in each one of these variables will be 0.
+
+The channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode`` (one for the positive and the other for the negative) according to the following table:
+
+============  ===============================================  ============  ==================================================
+MC mode       Decay channel                                    MC mode       Decay channel
+============  ===============================================  ============  ==================================================
+ -1           Not a tau pair event                             24            :math:`\tau^- \to \pi^- \omega \pi^0 \nu`
+ 1            :math:`\tau^- \to e^- \nu \bar{\nu}`             25            :math:`\tau^- \to \pi^- \pi^+ \pi^- \eta \nu`
+ 2            :math:`\tau^- \to \mu^- \nu \bar{\nu}`           26            :math:`\tau^- \to \pi^- \pi^0 \pi^0 \eta \nu`
+ 3            :math:`\tau^- \to \pi^- \nu`                     27            :math:`\tau^- \to K^- \eta \nu`
+ 4            :math:`\tau^- \to \rho^- \nu`                    28            :math:`\tau^- \to K^{*-} \eta \nu`
+ 5            :math:`\tau^- \to a_1^- \nu`                     29            :math:`\tau^- \to K^- \pi^+ \pi^- \pi^0 \nu`
+ 6            :math:`\tau^- \to K^- \nu`                       30            :math:`\tau^- \to K^- \pi^0 \pi^0 \pi^0 \nu`
+ 7            :math:`\tau^- \to K^{*-} \nu`                    31            :math:`\tau^- \to K^0 \pi^- \pi^+ \pi^- \nu`
+ 8            :math:`\tau^- \to \pi^- \pi^+ \pi^- \pi^0 \nu`   32            :math:`\tau^- \to \pi^- \bar{K}^0 \pi^0 \pi^0 \nu`
+ 9            :math:`\tau^- \to \pi^- \pi^0 \pi^0 \pi^0 \nu`   33            :math:`\tau^- \to \pi^- K^+ K^- \pi^0 \nu`
+ 10           :math:`\tau^- \to 2\pi^- \pi^+ 2\pi^0 \nu`       34            :math:`\tau^- \to \pi^- K^0 \bar{K}^0 \pi^0 \nu`
+ 11           :math:`\tau^- \to 3\pi^- 2\pi^+ \nu`             35            :math:`\tau^- \to \pi^- \omega \pi^+ \pi^- \nu`
+ 12           :math:`\tau^- \to 3\pi^- 2\pi^+ \pi^0 \nu`       36            :math:`\tau^- \to \pi^- \omega \pi^0 \pi^0 \nu`
+ 13           :math:`\tau^- \to 2\pi^- \pi^+ 3\pi^0 \nu`       37            :math:`\tau^- \to e^- e^- e^+ \nu \bar{\nu}`
+ 14           :math:`\tau^- \to K^- \pi^- K^+ \nu`             38            :math:`\tau^- \to f_1 \pi^- \nu`
+ 15           :math:`\tau^- \to K^0 \pi^- K^0bar \nu`          39            :math:`\tau^- \to K^- \omega \nu`
+ 16           :math:`\tau^- \to K^- K^0 \pi^0 \nu`             40            :math:`\tau^- \to K^- K^0 \pi^+ \pi^- \nu`
+ 17           :math:`\tau^- \to K^- \pi^0 \pi^0 \nu`           41            :math:`\tau^- \to K^- K^0 \pi^0 \pi^0 \nu`
+ 18           :math:`\tau^- \to K^- \pi^- \pi^+ \nu`           42            :math:`\tau^- \to \pi^- K^+ \bar{K}^0 \pi^- \nu`
+ 19           :math:`\tau^- \to \pi^- \bar{K}^0 \pi^0 \nu`
+ 20           :math:`\tau^- \to \eta \pi^- \pi^0 \nu`
+ 21           :math:`\tau^- \to \pi^- \pi^0 \gamma \nu`
+ 22           :math:`\tau^- \to K^- K^0 \nu`
+ 23           :math:`\tau^- \to \pi^- 4\pi^0 \nu`
+============  ===============================================  ============  ==================================================

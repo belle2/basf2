@@ -1,0 +1,2 @@
+#!/bin/bash
+exec b2hlt_socket2rb --raw --connect-to $2 --port $3 --ring-buffer-name $1 --shm-name $4 --shm-id $5

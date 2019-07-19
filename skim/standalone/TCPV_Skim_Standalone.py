@@ -6,89 +6,70 @@
 # TCPV skims
 # P. Urquijo, 29/Sep/2016
 #
-######################################################
-"""
-Time dependent CP violation skim for the analysis of TDCPV analysis in WG3 .
-Physics channels : bd → qqs and bd → ccs .
-Skim code : 13160100
-for analysis users we will reconstruct again in the analysis steering file
-The skim uses standard particles from analysis package , except one list of gamma:E15,
-of specific energy range, for 'B0 -> Kshort pi+ pi- gamma' channel.
+#####################################################
 
-Particle lists used :
-
-phi:loose
-k_S0:all
-eta:loose
-pi0:loose
-pi0:skim
-rho0:loose
-pi+:all
-gamma:E15
-omega:loose
-J/psi: eeLoose
-J/psi: mumuLoose
-psi(2S): eeLoose
-psi(2S): mumuloose
-K*0:loose
-phi:loose
-"""
 __author__ = " Reem Rasheed"
 
 
 from basf2 import *
 from modularAnalysis import *
 from beamparameters import add_beamparameters
-from skimExpertFunctions import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import loadStdDiLeptons
-
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 
 
 import sys
 import os
 import glob
+import argparse
 skimCode = encodeSkimName('TCPV')
 
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
 # create a path
-tcpvskimpath = Path()
+path = Path()
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC12")
 
+inputMdstList('default', fileList, path=path)
 
-inputMdstList('MC9', fileList, path=tcpvskimpath)
-
-loadStdSkimPi0(path=tcpvskimpath)
-loadStdSkimPhoton(path=tcpvskimpath)
-stdPi0s('loose', path=tcpvskimpath)
-stdPi('loose', path=tcpvskimpath)
-stdK('loose', path=tcpvskimpath)
-stdE('loose', path=tcpvskimpath)
-stdMu('loose', path=tcpvskimpath)
-stdPi('all', path=tcpvskimpath)
-stdPhotons('loose', path=tcpvskimpath)
-stdKshorts(path=tcpvskimpath)
-loadStdDiLeptons(True, path=tcpvskimpath)
-loadStdLightMesons(path=tcpvskimpath)
-cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
+loadStdSkimPi0(path=path)
+loadStdSkimPhoton(path=path)
+stdPi0s('loose', path=path)
+stdPi('loose', path=path)
+stdK('loose', path=path)
+stdE('loose', path=path)
+stdMu('loose', path=path)
+stdPi('all', path=path)
+stdPhotons('loose', path=path)
+stdKshorts(path=path)
+loadStdDiLeptons(True, path=path)
+loadStdLightMesons(path=path)
+cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
 
 # TCPV Skim
 from skim.tcpv import TCPVList
-tcpvList = TCPVList(path=tcpvskimpath)
-skimOutputUdst(skimCode, tcpvList, path=tcpvskimpath)
-summaryOfLists(tcpvList, path=tcpvskimpath)
+tcpvList = TCPVList(path=path)
+skimOutputUdst(skimCode, tcpvList, path=path)
+summaryOfLists(tcpvList, path=path)
 
-setSkimLogging()
-process(tcpvskimpath)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

@@ -82,8 +82,9 @@ class Local:
             self.max_number_of_processes = 10
 
         # noinspection PyUnresolvedReferences
-        self.logger.note("Local job control will use {0} parallel processes.".
-                         format(self.max_number_of_processes))
+        self.logger.note(
+            f"Local job control will use {self.max_number_of_processes} "
+            f"parallel processes.")
 
         #: Counter for number of running parallel processes
         self.current_number_of_processes = 0

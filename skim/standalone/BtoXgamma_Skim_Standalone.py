@@ -16,19 +16,27 @@ from stdV0s import *
 from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from stdPhotons import *
-from skimExpertFunctions import setSkimLogging, encodeSkimName
+from skimExpertFunctions import setSkimLogging, encodeSkimName, get_test_file
+import argparse
 
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-02-00'
 
 
 skimCode = encodeSkimName('BtoXgamma')
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC12")
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 path = Path()
-inputMdstList('MC9', fileList, path=path)
+inputMdstList('default', fileList, path=path)
 stdPi0s('loose', path=path)
 stdPhotons('tight', path=path)  # also builds loose list
 loadStdSkimPhoton(path=path)

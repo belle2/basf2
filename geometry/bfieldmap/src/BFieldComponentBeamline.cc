@@ -60,12 +60,12 @@ namespace Belle2 {
   class TriangularInterpolation {
   public:
     /** returns list of verticies */
-    const vector<xy_t>& getPoints() const { return m_points;}
+    [[nodiscard]] const vector<xy_t>& getPoints() const { return m_points;}
     /** returns list of triangles */
-    const vector<triangle_t>& getTriangles() const { return m_triangles;}
+    [[nodiscard]] const vector<triangle_t>& getTriangles() const { return m_triangles;}
 
     /** Default constructor */
-    TriangularInterpolation() {}
+    TriangularInterpolation() = default;
 
     /** More complex constructor */
     TriangularInterpolation(vector<xy_t>& pc, vector<triangle_t>& ts, double d)
@@ -74,7 +74,7 @@ namespace Belle2 {
     }
 
     /** Destructor */
-    ~TriangularInterpolation() {}
+    ~TriangularInterpolation() = default;
 
     /**
      * Calculate extents of a triangular mesh and build spatial
@@ -116,7 +116,7 @@ namespace Belle2 {
      *
      * @param p    Triangle
      */
-    xy_t triangleCenter(const triangle_t& p) const
+    [[nodiscard]] xy_t triangleCenter(const triangle_t& p) const
     {
       const xy_t& p0 = m_points[p.j0], &p1 = m_points[p.j1], &p2 = m_points[p.j2];
       return {(p0.x + p1.x + p2.x)* (1. / 3), (p0.y + p1.y + p2.y)* (1. / 3)};
@@ -177,7 +177,7 @@ namespace Belle2 {
      * @param ny    Ending point of the line segment
      * @return      Next triangle index in the list if nothing found returns the total number of triangles in the list
      */
-    short int sideCross(short int prev, short int curr, const xy_t& r, const xy_t& v0) const
+    [[nodiscard]] short int sideCross(short int prev, short int curr, const xy_t& r, const xy_t& v0) const
     {
       const double vx = r.x - v0.x, vy = r.y - v0.y;
       auto isCrossed = [&vx, &vy, &v0](const xy_t & p1, const xy_t & p0) -> bool {
@@ -228,7 +228,7 @@ namespace Belle2 {
      * @param r0  2d cartesian point
      * @return    Triangle index in the list
      */
-    short int findTriangle(const xy_t& r0) const
+    [[nodiscard]] short int findTriangle(const xy_t& r0) const
     {
       unsigned int ix = lrint((r0.x - m_xmin) * m_ixnorm), iy = lrint((r0.y - m_ymin) * m_iynorm);
       short int curr = (ix < m_nx && iy < m_ny) ? m_spatialIndex[iy + m_ny * ix] : 0;
@@ -240,7 +240,7 @@ namespace Belle2 {
         if (next == end) break;
         prev = curr;
         curr = next;
-      } while (1);
+      } while (true);
       return curr;
     }
   protected:
@@ -288,15 +288,15 @@ namespace Belle2 {
      *
      * @return constant reference to the interpolation
      */
-    const TriangularInterpolation& getTriangularInterpolation() const {return m_triInterpol;}
+    [[nodiscard]] const TriangularInterpolation& getTriangularInterpolation() const {return m_triInterpol;}
     /**
      * Default constructor
      */
-    BeamlineFieldMapInterpolation() {}
+    BeamlineFieldMapInterpolation() = default;
     /**
      * Default destructor
      */
-    ~BeamlineFieldMapInterpolation() {}
+    ~BeamlineFieldMapInterpolation() = default;
 
     /**
      * Initializes the magnetic field component.
@@ -370,7 +370,7 @@ namespace Belle2 {
         strtod(next, &next);
         double Br   = strtod(next, &next);
         double Bphi = strtod(next, &next);
-        double Bz   = strtod(next, NULL);
+        double Bz   = strtod(next, nullptr);
         r *= 100;
         rmax = std::max(r, rmax);
         if (phi == 0) {
@@ -386,7 +386,7 @@ namespace Belle2 {
         if (cs[j].s == 0) Bphi = 0;
         double Bx = Br * cs[j].c - Bphi * cs[j].s;
         double By = Br * cs[j].s + Bphi * cs[j].c;
-        tbc.push_back({Bx, By, Bz});
+        tbc.emplace_back(Bx, By, Bz);
       }
       //    cout<<"Field map has data points up to R="<<rmax<<" cm."<<endl;
 
@@ -409,10 +409,10 @@ namespace Belle2 {
           const triangle_t& p = ts[i];
           const xy_t& p0 = pc[p.j0], &p1 = pc[p.j1], &p2 = pc[p.j2];
           if (inside(p0) || inside(p1) || inside(p2)) {
-            it[i] = 1;
-            ip[p.j0] = 1;
-            ip[p.j1] = 1;
-            ip[p.j2] = 1;
+            it[i] = true;
+            ip[p.j0] = true;
+            ip[p.j1] = true;
+            ip[p.j2] = true;
           }
         }
 
@@ -470,7 +470,7 @@ namespace Belle2 {
           next = strchr(next + 1, ' ');
           double Br   = strtod(next, &next);
           double Bphi = strtod(next, &next);
-          double Bz   = strtod(next, NULL);
+          double Bz   = strtod(next, nullptr);
           if (cs[j].s == 0) Bphi = 0;
           double Bx = Br * cs[j].c - Bphi * cs[j].s;
           double By = Br * cs[j].s + Bphi * cs[j].c;
@@ -523,7 +523,7 @@ namespace Belle2 {
      * [T]. Returns false if the space point lies outside the valid
      * region.
      */
-    bool inRange(const B2Vector3D& v) const
+    [[nodiscard]] bool inRange(const B2Vector3D& v) const
     {
       if (std::abs(v.z()) > m_zmax) return false;
       double R2 = v.x() * v.x() + v.y() * v.y();
@@ -540,7 +540,7 @@ namespace Belle2 {
      * [T]. Returns a zero vector (0,0,0) if the space point lies
      * outside the region described by the component.
      */
-    B2Vector3D interpolateField(const B2Vector3D& v) const
+    [[nodiscard]] B2Vector3D interpolateField(const B2Vector3D& v) const
     {
       B2Vector3D res = {0, 0, 0};
       double R2 = v.x() * v.x() + v.y() * v.y();
@@ -555,7 +555,7 @@ namespace Belle2 {
         double w0, w1, w2;
         short int it = m_triInterpol.findTriangle(xy);
         m_triInterpol.weights(it, xy, w0, w1, w2);
-        vector<triangle_t>::const_iterator t = m_triInterpol.getTriangles().begin() + it;
+        auto t = m_triInterpol.getTriangles().begin() + it;
         int j0 = t->j0, j1 = t->j1, j2 = t->j2;
         const B2Vector3F* B = m_B.data() + m_nxy * iz;
         B2Vector3D b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;

@@ -37,7 +37,7 @@ namespace Belle2 {
     position.SetXYZ(1., 2., 3.);
 
     bs.setSizeCovMatrix(size);
-    bs.setVertex(position, positionError);
+    bs.setIP(position, positionError);
 
     TVector3 testPosition = bs.getIPPosition();
     EXPECT_EQ(testPosition.X() , 1.);

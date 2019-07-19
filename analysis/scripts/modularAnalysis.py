@@ -907,7 +907,7 @@ def combineAllParticles(
     outputList,
     cut='',
     writeOut=False,
-    path=analysis_main
+    path=None
 ):
     """
     Creates a new Particle as the combination of all Particles from all

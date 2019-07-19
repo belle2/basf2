@@ -798,8 +798,9 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
     double minDistance = m_MaxKLMTrackClusterDistance;
     unsigned int closestCluster = 0;
     for (unsigned int c = 0; c < klmClusterInfo->size(); ++c) {
-      if (klmHit[c].getDistance() > 1.0E9)
+      if (klmHit[c].getDistance() > 1.0E9) {
         continue;
+      }
       TrackClusterSeparation* h = trackClusterSeparations.appendNew(klmHit[c]);
       (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
       extState.track->addRelationTo(h); // relation Track to TrackSep

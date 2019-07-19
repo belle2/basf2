@@ -122,6 +122,10 @@ CalibrationAlgorithm::EResult PXDDataMCGainCalibrationAlgorithm::calibrate()
 
   // Get counter histogram
   auto cluster_counter = getObjectPtr<TH1I>("PXDClusterCounter");
+  if (!cluster_counter) {
+    B2INFO("Not enough Data: cluster counter does not exist ");
+    return c_NotEnoughData;
+  }
 
   // Extract number of sensors from counter histograms
   auto nSensors = getNumberOfSensors(cluster_counter);

@@ -153,7 +153,6 @@ void PXDClusterChargeCollectorModule::startRun() // Do your beginRun() stuff her
 
 void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 {
-  B2INFO("collect");
   // If no input, nothing to do
   if (!m_pxdClusters) return;
 

@@ -18,9 +18,9 @@ namespace Belle2 {
   public:
 
     /** equality operator */
-    bool operator==(const CollisionInvariantMass& b) const
+    bool operator==(const CollisionInvariantMass& other) const
     {
-      return b.m_mass == m_mass && b.m_massError == m_massError;
+      return other.m_mass == m_mass && other.m_massError == m_massError;
     }
 
     /** Set the CMS energy and its uncertainty.
@@ -34,13 +34,13 @@ namespace Belle2 {
     }
 
     /** Get the measured average CMS energy */
-    double getMass()
+    double getMass() const
     {
       return m_mass;
     }
 
     /** Get the uncertainty of the measured average CMS energy */
-    double getMassError()
+    double getMassError() const
     {
       return m_massError;
     }

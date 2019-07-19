@@ -14,16 +14,17 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /** This class contains the measured average boost vector (beta_x, beta_y, beta_z)
+  /** This class contains the measured average boost vector
+   * vec(beta) = (beta_x, beta_y, beta_z) = vec(p_e+e-)/E_e+e-
    * of the center-of-mass system in the lab frame and its uncertainty.
    */
   class CollisionBoostVector: public TObject {
   public:
 
     /** equality operator */
-    bool operator==(const CollisionBoostVector& b) const
+    bool operator==(const CollisionBoostVector& other) const
     {
-      return b.m_boost == m_boost && b.m_boostCovariance == m_boostCovariance;
+      return other.m_boost == m_boost && other.m_boostCovariance == m_boostCovariance;
     }
 
     /** Set the boost vector and its error matrix.
@@ -37,13 +38,13 @@ namespace Belle2 {
     }
 
     /** Get the measured average boost vector */
-    const TVector3& getBoost()
+    const TVector3& getBoost() const
     {
       return m_boost;
     }
 
     /** Get the error matrix of the measured average boost vector */
-    const TMatrixDSym& getBoostCovariance()
+    const TMatrixDSym& getBoostCovariance() const
     {
       return m_boostCovariance;
     }

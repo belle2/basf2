@@ -47,7 +47,7 @@ void KLMChannelStatusCalibrationCollectorModule::collect()
 {
   for (BKLMDigit& digit : m_BKLMDigits) {
     uint16_t channel = m_ElementNumbers->channelNumberBKLM(
-                         digit.isForward(), digit.getSector(), digit.getLayer(),
+                         digit.getForward(), digit.getSector(), digit.getLayer(),
                          digit.isPhiReadout(), digit.getStrip());
     m_HitMap->setChannelData(channel, m_HitMap->getChannelData(channel) + 1);
   }
@@ -66,15 +66,9 @@ void KLMChannelStatusCalibrationCollectorModule::closeRun()
   TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
   calibrationData->Branch("channel", &channel, "channel/s");
   calibrationData->Branch("hits", &hits, "hits/i");
-  BKLMChannelIndex bklmChannels;
-  for (BKLMChannelIndex& bklmChannel : bklmChannels) {
-    channel = bklmChannel.getKLMChannelNumber();
-    hits = m_HitMap->getChannelData(channel);
-    calibrationData->Fill();
-  }
-  EKLMChannelIndex eklmChannels;
-  for (EKLMChannelIndex& eklmChannel : eklmChannels) {
-    channel = eklmChannel.getKLMChannelNumber();
+  KLMChannelIndex klmChannels;
+  for (KLMChannelIndex& klmChannel : klmChannels) {
+    channel = klmChannel.getKLMChannelNumber();
     hits = m_HitMap->getChannelData(channel);
     calibrationData->Fill();
   }

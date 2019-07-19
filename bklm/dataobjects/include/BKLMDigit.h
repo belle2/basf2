@@ -12,6 +12,7 @@
 
 //#include <framework/datastore/RelationsObject.h>
 #include <framework/dataobjects/DigitBase.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 namespace Belle2 {
@@ -84,13 +85,17 @@ namespace Belle2 {
     //! @return layer number of this strip (1..15)
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
+    //! Get plane number.
+    //! @return Plane number (0=z, 1=phi).
+    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
+
     //! Get readout coordinate
     //! @return readout coordinate (TRUE=phi, FALSE=z) of this strip
     bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
     //! Get strip number
     //! @return strip number (1..64)
-    int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStrip() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get detector-module ID
     //! @return unique detector-module ID (internally calculated)

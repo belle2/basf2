@@ -23,6 +23,19 @@ namespace Belle2 {
   public:
 
     /**
+     * Subdetector constants.
+     */
+    enum Subdetector {
+
+      /** BKLM. */
+      c_BKLM = 1,
+
+      /** EKLM. */
+      c_EKLM = 2,
+
+    };
+
+    /**
      * Instantiation.
      */
     static const KLMElementNumbers& Instance();
@@ -72,6 +85,18 @@ namespace Belle2 {
      * @param[in] channel KLM channel number.
      */
     bool isEKLMChannel(uint16_t channel) const;
+
+    /**
+     * Get local BKLM channel number.
+     * @param[in] channel KLM channel number.
+     */
+    int localChannelNumberBKLM(uint16_t channel) const;
+
+    /**
+     * Get local EKLM channel number.
+     * @param[in] channel KLM channel number.
+     */
+    int localChannelNumberEKLM(uint16_t channel) const;
 
     /**
      * Get module number for BKLM.

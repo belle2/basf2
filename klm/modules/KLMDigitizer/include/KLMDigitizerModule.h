@@ -11,6 +11,8 @@
 #pragma once
 
 /* Belle2 headers. */
+#include <bklm/dataobjects/BKLMDigit.h>
+#include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
@@ -18,30 +20,31 @@
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
 
   /**
-   * Module EKLMDigitizationModule.
-   * @details
-   * Simple module for reading EKLM hits.
+   * KLM digitization module.
    */
-  class EKLMDigitizerModule : public Module {
+  class KLMDigitizerModule : public Module {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMDigitizerModule();
+    KLMDigitizerModule();
 
     /**
      * Destructor
      */
-    virtual ~EKLMDigitizerModule();
+    virtual ~KLMDigitizerModule();
 
     /**
      * Initializer.
@@ -76,14 +79,27 @@ namespace Belle2 {
     void checkChannelParameters();
 
     /**
-     * Read hits from the store, sort sim hits and fill m_HitStripMap.
+     * Digitization in BKLM.
      */
-    void readAndSortSimHits();
+    void digitizeBKLM();
 
     /**
-     * Merge hits from the same strip. Create EKLMDigits.
+     * Digitization in EKLM.
      */
-    void mergeSimHitsToStripHits();
+    void digitizeEKLM();
+
+    /**
+     * Check if channel is active (status is not KLMChannelStatus::c_Dead).
+     * @param[in] channel Channel.
+     */
+    bool checkActive(uint16_t channel);
+
+    /**
+     * Efficiency correction.
+     * @param[in] efficiency Efficiency.
+     * @return True if the digitization passes the efficiency correction.
+     */
+    bool efficiencyCorrection(float efficiency);
 
     /** Digitization parameters. */
     DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
@@ -94,8 +110,17 @@ namespace Belle2 {
     /** Channel data. */
     DBObjPtr<EKLMChannels> m_Channels;
 
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** Strip efficiency. */
+    DBObjPtr<KLMStripEfficiency> m_StripEfficiency;
+
     /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /** EKLM element numbers. */
+    const EKLM::ElementNumbersSingleton* m_eklmElementNumbers;
 
     /** Simulation mode. */
     std::string m_SimulationMode;
@@ -112,17 +137,26 @@ namespace Belle2 {
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 
-    /** Map for EKLMSimHit sorting according sensitive volumes. */
-    std::multimap<int, EKLMSimHit*> m_SimHitVolumeMap;
+    /** Simulation hit map for BKLM. */
+    std::multimap<uint16_t, BKLMSimHit*> m_bklmSimHitChannelMap;
+
+    /** Simulation hit map for EKLM. */
+    std::multimap<uint16_t, EKLMSimHit*> m_eklmSimHitChannelMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;
 
-    /** Simulation hits. */
-    StoreArray<EKLMSimHit> m_SimHits;
+    /** BKLM simulation hits. */
+    StoreArray<BKLMSimHit> m_bklmSimHits;
 
-    /** Digits. */
-    StoreArray<EKLMDigit> m_Digits;
+    /** EKLM simulation hits. */
+    StoreArray<EKLMSimHit> m_eklmSimHits;
+
+    /** BKLM digits. */
+    StoreArray<BKLMDigit> m_bklmDigits;
+
+    /** EKLM digits. */
+    StoreArray<EKLMDigit> m_eklmDigits;
 
     /** FPGA fits. */
     StoreArray<KLMScintillatorFirmwareFitResult> m_FPGAFits;

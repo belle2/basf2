@@ -584,7 +584,7 @@ namespace {
     t3->addRelationTo(klm5);
 
     // case 3: 1 track --> 2 clusters
-    // almost impossible case: not covered
+    // not possible
 
     // make the KLong from clusters (and sum up the total KLM momentum magnitude)
     double klmMomentum = 0.0;
@@ -662,9 +662,13 @@ namespace {
 
     // and add a weighted relationship between the track and both clusters
     // only the relation with klm1 must be returned
-    float distance = 11.1;
-    muonTrack->addRelationTo(klm1, 1. / distance);
-    muonTrack->addRelationTo(klm2, 1. / distance);
+    // in reconstruction we set a relation to only one cluster (if any),
+    // so here we test that getKLMCluster() returns the first cluster
+    // stored in the RelationVector
+    float distance1 = 11.1;
+    muonTrack->addRelationTo(klm1, 1. / distance1);
+    float distance2 = 2.2;
+    muonTrack->addRelationTo(klm2, 1. / distance2);
 
     // add a Particle
     const Particle* muon = particles.appendNew(Particle(muonTrack, Const::muon));
@@ -676,7 +680,7 @@ namespace {
 
     EXPECT_POSITIVE(vTrNClusters->function(muon));
     EXPECT_FLOAT_EQ(1.0, vClusterInnermostLayer->function(muon));
-    EXPECT_FLOAT_EQ(distance, vClusterTrackDistance->function(muon));
+    EXPECT_FLOAT_EQ(distance1, vClusterTrackDistance->function(muon));
 
     // add a Pion - no clusters matched here
     trackFits.appendNew(position, momentum, cov6, charge, Const::pion, pValue, bField, CDCValue, 16777215);

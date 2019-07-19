@@ -295,9 +295,20 @@ namespace Belle2 {
     REGISTER_VARIABLE("klmClusterInnermostLayer", klmClusterInnermostLayer,
                       "Returns KLM cluster's number of the innermost layer with hits.");
     REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers, "Returns KLM cluster's number of layers with hits.");
-    REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, "Returns KLMCluster's energy (assuming K_L0 hypothesis).");
-    REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum,
-                      "Returns KLMCluster's momentum magnitude. N.B.: klmClusterMomentum is proportional to klmClusterLayers.")
+    REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, R"DOC(
+Returns the energy of the KLMCluster. 
+
+.. warning::
+    klmClusterEnergy is an approximation of the energy: it uses :b2:var:klmClusterMomentum: as momentum and the hypothesis that the cluster was originated by a :math:`K_{L}^0`.
+    It should be used with caution, and may not be physically meaningful.
+)DOC");
+    REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
+Returns the magnitude of the KLMCluster momentum. 
+
+.. warning::
+    klmClusterMomentum is an approximation of the momentum, it is proportional to :b2:var:`klmClusterLayers`.
+    It should be used with caution, and may not be physically meaningful.
+)DOC");
     REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM, "Returns 1 if the associated KLMCluster is in BKLM.");
     REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM, "Returns 1 if the associated KLMCluster is in EKLM.");
     REGISTER_VARIABLE("klmClusterIsForwardEKLM", klmClusterIsForwardEKLM, "Returns 1 if the associated KLMCluster is in forward EKLM.");

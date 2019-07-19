@@ -597,9 +597,7 @@ const KLMCluster* Particle::getKLMCluster() const
     StoreArray<KLMCluster> klmClusters;
     return klmClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
-    // A Track can have up to one KLMCluster associated (only the closest one).
-    // It's extremely unlikely that there are two or more KLMClusters associated:
-    // if this is the case, pick the first KLMCluster in the RelationVector.
+    // If there is an associated KLMCluster, it's the closest one
     StoreArray<Track> tracks;
     const KLMCluster* klmCluster = tracks[m_mdstIndex]->getRelatedTo<KLMCluster>();
     return klmCluster;

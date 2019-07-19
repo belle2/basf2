@@ -241,7 +241,7 @@ if __name__ == '__main__':
             # create and fill the payload
             payload = Belle2.BeamSpot()
 
-            payload.setVertex(vertexPos, vertexCov)
+            payload.setIP(vertexPos, vertexCov)
             payload.setSizeCovMatrix(vertexSize)
 
             Belle2.Database.Instance().storeData("BeamSpot", payload, iov)

@@ -567,7 +567,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
                         if category != "SlowPion" and category != "Kaon":
                             continue
 
-        if mode != 'Teacher':
+        if mode == 'Expert' or (mode == 'Sampler' and os.path.isfile(identifierEventLevel)):
 
             B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixEventLevel + '.')
 

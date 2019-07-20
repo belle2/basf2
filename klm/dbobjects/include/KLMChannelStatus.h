@@ -31,7 +31,7 @@ namespace Belle2 {
      */
     enum ChannelStatus {
 
-      /** Unknown status. */
+      /** Unknown status (no data). */
       c_Unknown,
 
       /** Normally operating channel. */
@@ -42,6 +42,9 @@ namespace Belle2 {
 
       /** Hot channel (large background). */
       c_Hot,
+
+      /** Undetermined (used during calibration). */
+      c_Undetermined,
 
     };
 
@@ -79,6 +82,17 @@ namespace Belle2 {
      * @param[in] sectorGlobal Sector global number.
      */
     int getActiveStripsEKLMSector(int sectorGlobal) const;
+
+    /**
+     * Operator ==.
+     */
+    bool operator==(KLMChannelStatus& status);
+
+    /**
+     * Number of new channels with status c_Normal
+     * that have a different status in another channel-status data.
+     */
+    unsigned int newNormalChannels(KLMChannelStatus& status);
 
   private:
 

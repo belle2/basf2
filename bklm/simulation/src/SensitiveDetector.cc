@@ -12,6 +12,7 @@
 #include <bklm/simulation/SimulationPar.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <bklm/dataobjects/BKLMStatus.h>
@@ -119,14 +120,13 @@ namespace Belle2 {
         int plane = hist->GetCopyNumber(depth - DEPTH_PLANE);
         int layer = hist->GetCopyNumber(depth - DEPTH_LAYER);
         int sector = hist->GetCopyNumber(depth - DEPTH_SECTOR);
-        bool isForward = (hist->GetCopyNumber(depth - DEPTH_FORWARD) == BKLM_FORWARD);
-        int moduleID = (isForward ? BKLM_END_MASK : 0)
-                       | ((sector - 1) << BKLM_SECTOR_BIT)
-                       | ((layer - 1) << BKLM_LAYER_BIT)
-                       | BKLM_MC_MASK;
+        int forward = (hist->GetCopyNumber(depth - DEPTH_FORWARD) == BKLM_FORWARD) ? 1 : 0;
+        int moduleID =
+          int(BKLMElementNumbers::moduleNumber(forward, sector, layer))
+          | BKLM_MC_MASK;
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
         const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
-        const Module* m = m_GeoPar->findModule(isForward, sector, layer);
+        const Module* m = m_GeoPar->findModule(forward, sector, layer);
         const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
         const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
         if (postStep->GetProcessDefinedStep() != 0) {

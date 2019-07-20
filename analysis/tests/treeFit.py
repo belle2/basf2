@@ -55,9 +55,9 @@ class TestTreeFits(unittest.TestCase):
         print("True fit survivors: {0} out of {1} true candidates".format(truePositives, allSig))
         print("False fit survivors: {0} out of {1} false candidates".format(falsePositives, allBkg))
 
-        self.assertTrue(truePositives > 31, f"Signal rejection too high. True positives: {truePositives}")
+        self.assertTrue(truePositives > 32, f"Signal rejection too high. True positives: {truePositives}")
 
-        self.assertTrue(falsePositives < 2136, f"Background rejection got worse. False positives: {falsePositives}")
+        self.assertTrue(falsePositives < 2129, f"Background rejection got worse. False positives: {falsePositives}")
 
         print("Test passed, cleaning up.")
 

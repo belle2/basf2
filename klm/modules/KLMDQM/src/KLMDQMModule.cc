@@ -217,9 +217,9 @@ void KLMDQMModule::event()
   for (i = 0; i < nent1d; i++) {
     BKLMHit1d* hit1d = static_cast<BKLMHit1d*>(hits1d[i]);
     if (hit1d->isPhiReadout()) {
-      m_bklmSectorLayerPhi->Fill((hit1d->isForward() ? 120 : 0) + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
+      m_bklmSectorLayerPhi->Fill(hit1d->getForward() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
     } else {
-      m_bklmSectorLayerZ->Fill((hit1d->isForward() ? 120 : 0) + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
+      m_bklmSectorLayerZ->Fill(hit1d->getForward() * 120 + (hit1d->getSector() - 1) * 15 + (hit1d->getLayer() - 1));
     }
   }
 }

@@ -68,11 +68,11 @@ namespace Belle2 {
         for (unsigned channel = 0; channel < numPixels; channel++) {
           if (channelT0->isCalibrated(moduleID, channel)) continue;
           int mdn = moduleID - 1; // 0-based used in fortran
-          int ich = mapper.getPixelID(channel) - 1; // 0-base used in fortran
+          int ich = mapper.getPixelID(channel) - 1; // 0-based used in fortran
           set_channel_off_(&mdn, &ich);
         }
       }
-      B2INFO("TOPreco: channelT0-uncalibrated channels have been masked-off");
+      B2INFO("TOPreco: channelT0-uncalibrated channels have been masked off");
     }
 
 
@@ -94,11 +94,11 @@ namespace Belle2 {
           const auto* sampleTimes = timebase->getSampleTimes(scrodID, channel);
           if (sampleTimes->isCalibrated()) continue;
           int mdn = moduleID - 1; // 0-based used in fortran
-          int ich = ch_mapper.getPixelID(channel) - 1; // 0-base used in fortran
+          int ich = ch_mapper.getPixelID(channel) - 1; // 0-based used in fortran
           set_channel_off_(&mdn, &ich);
         }
       }
-      B2INFO("TOPreco: timebase-uncalibrated channels have been masked-off");
+      B2INFO("TOPreco: timebase-uncalibrated channels have been masked off");
     }
 
 

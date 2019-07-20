@@ -34,7 +34,7 @@
 
       IMPLICIT NONE
       INTEGER MDN               ! module ID
-      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER ICH               ! channel (i.e. pixelID-1)
 
 #include "TOP_GEO.fi"
 #include "TOP_PIK.fi"

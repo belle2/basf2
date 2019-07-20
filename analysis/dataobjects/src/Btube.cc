@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-TVector3 Btube::getTubeCenter()
+Eigen::Matrix<double, 3, 1> Btube::getTubeCenter()
 {
   return m_tubecenter;
 }
@@ -24,7 +24,7 @@ TMatrixFSym Btube::getTubeMatrix()
   return m_tubematrix;
 }
 
-void Btube::setTubeCenter(const TVector3& tubecenter)
+void Btube::setTubeCenter(const Eigen::Matrix<double, 3, 1>& tubecenter)
 {
   m_tubecenter = tubecenter;
 }

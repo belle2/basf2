@@ -153,17 +153,21 @@ namespace Belle2 {
           }
         }
       }
+      bool hasTube = true;
       if (m_withConstraint == "btube") {
         Btube* Ver = particle->getRelatedTo<Btube>();
         if (!Ver) {
+          hasTube = false;
           toRemove.push_back(particle->getArrayIndex());
         } else {
-          m_BeamSpotCenter = Ver->getTubeCenter();
+          m_BeamSpotCenter.SetXYZ(Ver->getTubeCenter()(0, 0), Ver->getTubeCenter()(1, 0), Ver->getTubeCenter()(2, 0));
           m_beamSpotCov = Ver->getTubeMatrix();
         }
       }
-
-      bool ok = doVertexFit(particle);
+      bool ok = false;
+      if (hasTube) {
+        ok = doVertexFit(particle);
+      }
       if (!ok) particle->setPValue(-1);
       if (m_confidenceLevel == 0. && particle->getPValue() == 0.) {
         toRemove.push_back(particle->getArrayIndex());

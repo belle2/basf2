@@ -29,6 +29,7 @@
 #include <framework/geometry/BFieldManager.h>
 
 #include <TMath.h>
+#include <Eigen/Core>
 
 using namespace std;
 using namespace Belle2;
@@ -88,37 +89,55 @@ void BtubeCreatorModule::event()
     Particle* fullRecoB = const_cast<Particle*>(particle->getDaughter(0));
     Particle* otherB = const_cast<Particle*>(particle->getDaughter(1));
 
-    //make a copy of fullRecoB
+    if (
+      ((fullRecoB->getVertexErrorMatrix()(0, 0)) == 0.0) &&
+      ((fullRecoB->getVertexErrorMatrix()(0, 1)) == 0.0) &&
+      ((fullRecoB->getVertexErrorMatrix()(0, 2)) == 0.0) &&
+      ((fullRecoB->getVertexErrorMatrix()(1, 1)) == 0.0) &&
+      ((fullRecoB->getVertexErrorMatrix()(1, 2)) == 0.0) &&
+      ((fullRecoB->getVertexErrorMatrix()(2, 2)) == 0.0)
+    ) {
+
+      B2FATAL("Please fit fully reconstructed B first");
+    }
+
+    //make a copy of fullRecoB so as not to modify the original object
 
     Particle fullRecoBCopy(fullRecoB->get4Vector(), fullRecoB->getPDGCode());
     fullRecoBCopy.setVertex(fullRecoB->getVertex());
     fullRecoBCopy.setMomentumVertexErrorMatrix(fullRecoB->getMomentumVertexErrorMatrix());
 
-    TVector3 tagdecaypos(fullRecoBCopy.getVertex()[0], fullRecoBCopy.getVertex()[1], fullRecoBCopy.getVertex()[2]);
-
     if (m_verbose) {
-      B2DEBUG(10, "fullreco B decay  ");
+      B2DEBUG(10, "fullreco B decay vertex: ");
       B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << fullRecoBCopy.getVertex()[0] << "," << std::fixed << std::setprecision(
                 20) << fullRecoBCopy.getVertex()[1] << "," << std::fixed << std::setprecision(20) << fullRecoBCopy.getVertex()[2] << "}");
     }
     bool ok0 = doVertexFit(&fullRecoBCopy);
 
     if (ok0) {
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid00", fullRecoBCopy.getVertexErrorMatrix()(0, 0));
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid01", fullRecoBCopy.getVertexErrorMatrix()(0, 1));
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid02", fullRecoBCopy.getVertexErrorMatrix()(0, 2));
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid10", fullRecoBCopy.getVertexErrorMatrix()(1, 0));
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid11", fullRecoBCopy.getVertexErrorMatrix()(1, 1));
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid12", fullRecoBCopy.getVertexErrorMatrix()(1, 2));
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid20", fullRecoBCopy.getVertexErrorMatrix()(2, 0));
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid21", fullRecoBCopy.getVertexErrorMatrix()(2, 1));
-      fullRecoB->writeExtraInfo("avf_fitted_ellipsoid22", fullRecoBCopy.getVertexErrorMatrix()(2, 2));
+      particle->setVertex(fullRecoBCopy.getVertex());
+      particle->setMomentumVertexErrorMatrix(fullRecoBCopy.getMomentumVertexErrorMatrix());
+
+      fullRecoB->writeExtraInfo("prod_vtx_x", fullRecoBCopy.getVertex()[0]);
+      fullRecoB->writeExtraInfo("prod_vtx_y", fullRecoBCopy.getVertex()[1]);
+      fullRecoB->writeExtraInfo("prod_vtx_z", fullRecoBCopy.getVertex()[2]);
+      fullRecoB->writeExtraInfo("prod_vtx_cov00", fullRecoBCopy.getVertexErrorMatrix()(0, 0));
+      fullRecoB->writeExtraInfo("prod_vtx_cov01", fullRecoBCopy.getVertexErrorMatrix()(0, 1));
+      fullRecoB->writeExtraInfo("prod_vtx_cov02", fullRecoBCopy.getVertexErrorMatrix()(0, 2));
+      fullRecoB->writeExtraInfo("prod_vtx_cov10", fullRecoBCopy.getVertexErrorMatrix()(1, 0));
+      fullRecoB->writeExtraInfo("prod_vtx_cov11", fullRecoBCopy.getVertexErrorMatrix()(1, 1));
+      fullRecoB->writeExtraInfo("prod_vtx_cov12", fullRecoBCopy.getVertexErrorMatrix()(1, 2));
+      fullRecoB->writeExtraInfo("prod_vtx_cov20", fullRecoBCopy.getVertexErrorMatrix()(2, 0));
+      fullRecoB->writeExtraInfo("prod_vtx_cov21", fullRecoBCopy.getVertexErrorMatrix()(2, 1));
+      fullRecoB->writeExtraInfo("prod_vtx_cov22", fullRecoBCopy.getVertexErrorMatrix()(2, 2));
 
       fullRecoB->writeExtraInfo("Px_after_avf", (fullRecoBCopy.get4Vector()).Px());
       fullRecoB->writeExtraInfo("Py_after_avf", (fullRecoBCopy.get4Vector()).Py());
       fullRecoB->writeExtraInfo("Pz_after_avf", (fullRecoBCopy.get4Vector()).Pz());
       fullRecoB->writeExtraInfo("E_after_avf", (fullRecoBCopy.get4Vector()).E());
-      TVector3 tagOriginpos(fullRecoBCopy.getVertex()[0], fullRecoBCopy.getVertex()[1], fullRecoBCopy.getVertex()[2]);
+
+      Eigen::Matrix<double, 3, 1> fullRecoBOriginpos(fullRecoBCopy.getVertex()[0], fullRecoBCopy.getVertex()[1],
+                                                     fullRecoBCopy.getVertex()[2]);
       TLorentzVector v4Final = fullRecoBCopy.get4Vector();
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * v4Final;
@@ -129,7 +148,7 @@ void BtubeCreatorModule::event()
         B2DEBUG(10, "beamspot center :");
         B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << m_BeamSpotCenter.X() << "," << std::fixed << std::setprecision(
                   20) << m_BeamSpotCenter.Y() << "," << std::fixed << std::setprecision(20) << m_BeamSpotCenter.Z() << "}");
-        B2DEBUG(10, "beamspot cov");
+        B2DEBUG(10, "beamspot cov :");
 
         B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(0,
                 0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0,
@@ -208,26 +227,26 @@ void BtubeCreatorModule::event()
 
       Btube* tubeconstraint = tubeArray.appendNew(Btube());
       otherB->addRelationTo(tubeconstraint);
-      tubeconstraint->setTubeCenter(tagOriginpos);
+      tubeconstraint->setTubeCenter(fullRecoBOriginpos);
       tubeconstraint->setTubeMatrix(tubeMat);
 
-      otherB->writeExtraInfo("TubeX", fullRecoBCopy.getVertex()[0]);
-      otherB->writeExtraInfo("TubeY", fullRecoBCopy.getVertex()[1]);
-      otherB->writeExtraInfo("TubeZ", fullRecoBCopy.getVertex()[2]);
+      otherB->writeExtraInfo("TubePosX", fullRecoBCopy.getVertex()[0]);
+      otherB->writeExtraInfo("TubePosY", fullRecoBCopy.getVertex()[1]);
+      otherB->writeExtraInfo("TubePosZ", fullRecoBCopy.getVertex()[2]);
 
-      otherB->writeExtraInfo("Tube00", pvNew(0, 0));
-      otherB->writeExtraInfo("Tube01", pvNew(0, 1));
-      otherB->writeExtraInfo("Tube02", pvNew(0, 2));
-      otherB->writeExtraInfo("Tube10", pvNew(1, 0));
-      otherB->writeExtraInfo("Tube11", pvNew(1, 1));
-      otherB->writeExtraInfo("Tube12", pvNew(1, 2));
-      otherB->writeExtraInfo("Tube20", pvNew(2, 0));
-      otherB->writeExtraInfo("Tube21", pvNew(2, 1));
-      otherB->writeExtraInfo("Tube22", pvNew(2, 2));
+      otherB->writeExtraInfo("TubeCov00", pvNew(0, 0));
+      otherB->writeExtraInfo("TubeCov01", pvNew(0, 1));
+      otherB->writeExtraInfo("TubeCov02", pvNew(0, 2));
+      otherB->writeExtraInfo("TubeCov10", pvNew(1, 0));
+      otherB->writeExtraInfo("TubeCov11", pvNew(1, 1));
+      otherB->writeExtraInfo("TubeCov12", pvNew(1, 2));
+      otherB->writeExtraInfo("TubeCov20", pvNew(2, 0));
+      otherB->writeExtraInfo("TubeCov21", pvNew(2, 1));
+      otherB->writeExtraInfo("TubeCov22", pvNew(2, 2));
 
-      otherB->writeExtraInfo("tubedirX", v4FinalNew.Px());
-      otherB->writeExtraInfo("tubedirY", v4FinalNew.Py());
-      otherB->writeExtraInfo("tubedirZ", v4FinalNew.Pz());
+      otherB->writeExtraInfo("TubeDirX", v4FinalNew.Px());
+      otherB->writeExtraInfo("TubeDirY", v4FinalNew.Py());
+      otherB->writeExtraInfo("TubeDirZ", v4FinalNew.Pz());
 
     }
     if (!ok0) toRemove.push_back(particle->getArrayIndex());

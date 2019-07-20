@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <set>
+#include <Eigen/Core>
 
 namespace Belle2 {
   /** For each MCParticle with hits in the CDC, this class stores some summarising information on those hits. */
@@ -29,40 +30,34 @@ namespace Belle2 {
      *  You must not allocate heap memory here (with 'new'), otherwise it will be lost when reading objects from file.
      */
     Btube()
-
     {
-      m_tubecenter(0) = 0; m_tubecenter(1) = 0; m_tubecenter(2) = 0;
+      m_tubecenter(0, 0) = 0; m_tubecenter(1, 0) = 0; m_tubecenter(2, 0) = 0;
       resetTubeMatrix();
     }
 
     /**
      * Returns Btube center
      */
-    TVector3 getTubeCenter();
-
+    Eigen::Matrix<double, 3, 1> getTubeCenter();
     /**
      * Returns Btube matrix
      */
     TMatrixFSym getTubeMatrix();
-
-
     /**
      * Sets Btube Center
      */
-    void setTubeCenter(const TVector3& tubecenter);
-
+    void setTubeCenter(const Eigen::Matrix<double, 3, 1>& tubecenter);
     /**
      * Sets Btube Error Matrix
      */
     void setTubeMatrix(const TMatrixFSym& tubematrix);
-
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~Btube() { }
 
 
   private:
-    TVector3 m_tubecenter;               /**< Btube center */
+    Eigen::Matrix<double, 3, 1> m_tubecenter;   /**< Btube center */
     TMatrixFSym m_tubematrix;   /**< Btube (3x3)  matrix */
 
     void resetTubeMatrix(); /**< resets the tube  matrix */

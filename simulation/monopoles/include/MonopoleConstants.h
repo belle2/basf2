@@ -15,6 +15,7 @@ namespace Belle2 {
   namespace Monopoles {
 
     const int c_monopolePDGCode = 99666;
+    float monopoleMagCharge = 1.0;
 
   }
 

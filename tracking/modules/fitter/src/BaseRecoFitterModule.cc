@@ -55,6 +55,9 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   addParam("initializeCDCTranslators", m_param_initializeCDCTranslators,
            "Configures whether the CDC Translators should be initialized by the FitterModule",
            m_param_initializeCDCTranslators);
+  addParam("monopoleMagCharge", Monopoles::monopoleMagCharge,
+           "Sets monopole magnetic charge hypothesis if it is in the pdgCodesToUseForFitting",
+           Monopoles::monopoleMagCharge);
 }
 
 void BaseRecoFitterModule::initialize()

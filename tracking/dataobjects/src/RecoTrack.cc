@@ -400,8 +400,8 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
 
   // not available? create one
   if (trackRepresentation == nullptr) {
-    if (PDGcode == Monopoles::c_monopolePDGCode) { //FIXME prototyping
-      trackRepresentation = new genfit::MplTrackRep(PDGcode, 1.0);
+    if (PDGcode == Monopoles::c_monopolePDGCode) {
+      trackRepresentation = new genfit::MplTrackRep(PDGcode, Monopoles::monopoleMagCharge);
     } else {
       trackRepresentation = new genfit::RKTrackRep(PDGcode);
     }

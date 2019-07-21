@@ -420,6 +420,7 @@ def correctbelleFSR(
     outputListName,
     inputListName,
     gammaListName,
+    multiplePhotons=True,
     minimum_energy=0.05,
     angleThreshold=0.05,
     writeOut=False,
@@ -435,12 +436,13 @@ def correctbelleFSR(
       The number of photon added to the electron can be obtained by using the variables 'extraInfo(nGamma)' refer
     to new corrected charged particle
       The angle between ith(i starts from 1) bremphoton and electron can be obtained by 'daughter(i,theta_e_gamma)'
-     and energy of ith bremphoton can be obtained by 'daughter(i,energy_gamma)'
 
 
     @param outputListName The output charged particle list containing the corrected charged particles
     @param inputListName The initial charged particle list containing the charged particles to correct, should already exists.
     @param gammaListName The gammas list containing possibly radiative gammas, should already exist.
+    @param multiplePhotons  How many photon to add with the charged particle? nearest one-> False,
+               add all photon within the cone->True
     @param angleThreshold The maximum angle in radian  between the charged particle  and the (radiative) gamma to be accepted..
     @param minimum_energy The minimum energy in GeV of the (radiative) gamma to be accepted..
     @param writeOut      whether RootOutput module should save the created ParticleList
@@ -451,6 +453,7 @@ def correctbelleFSR(
     fsrcorrector.param('inputListName', inputListName)
     fsrcorrector.param('outputListName', outputListName)
     fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('multiplePhotons', multiplePhotons)
     fsrcorrector.param('angleThreshold', angleThreshold)
     fsrcorrector.param('minimum_energy', minimum_energy)
     fsrcorrector.param('writeOut', writeOut)

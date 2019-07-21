@@ -60,7 +60,7 @@ namespace Belle2 {
   private:
 
     int m_pdgCode;                /**< PDG code of the combined mother particle */
-
+    typedef std::pair<Particle*, double> pair;
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the charged particle decay */
     DecayDescriptor m_decaydescriptorGamma; /**< Decay descriptor of the decay being reconstructed */
@@ -71,7 +71,7 @@ namespace Belle2 {
     double m_angleThres; /**< input max angle to be accepted (in radian) */
     double m_energy_min; /**< min energy of gamma to be accepted(in GeV) */
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
-
+    bool isMultiPho;
   };
 
 } // Belle2 namespace

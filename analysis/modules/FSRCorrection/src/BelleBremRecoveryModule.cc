@@ -28,6 +28,8 @@
 #include <algorithm>
 #include <TMatrixFSym.h>
 
+#include <map>
+#include <vector>
 using namespace std;
 
 namespace Belle2 {
@@ -58,8 +60,10 @@ namespace Belle2 {
     addParam("angleThreshold", m_angleThres,
              "The maximum angle in radian  between the charged particle  and the (radiative) gamma to be accepted.", 0.05);
     addParam("minimum_energy", m_energy_min, "The minimum energy of the (radiative) gamma to be accepted.", 0.05);
+    addParam("multiplePhotons", isMultiPho, "If only the nearest photon to add then make it False otherwise true", true);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+
   }
 
   void BelleBremRecoveryModule::initialize()
@@ -117,73 +121,67 @@ namespace Belle2 {
     outputAntiList.create();
     outputAntiList->initialize(-1 * m_pdgCode, m_outputAntiListName);
     outputAntiList->bindAntiParticleList(*(outputList));
+    std::vector<int> usedGammas;
     // loop over charged particles, correct them and add them to the output list
     const unsigned int nLep = inputList->getListSize();
     for (unsigned i = 0; i < nLep; i++) {
       const Particle* lepton = inputList->getParticle(i);
       TLorentzVector lepton4Vector = lepton->get4Vector();
       TLorentzVector new4Vec = lepton->get4Vector();
-      std::vector<Particle*> usedGammas;//used to arange in asseding order of angle between charged particle and (radiative)gamma
-      std::vector<double> angle_egamma; //used to arange in asseding order of angle between charged particle and (radiative)gamma
+      std::map<Particle*, double> map;
       // look for all possible (radiative) gamma
       const unsigned int nGam = gammaList->getListSize();
       for (unsigned j = 0; j < nGam; j++) {
         Particle* gamma = gammaList->getParticle(j);
+
         // check if gamma energy is within allowed energy range
         if (gamma->getEnergy() < m_energy_min) continue;
+        bool gammaUsed = std::find(usedGammas.begin(), usedGammas.end(), gamma->getMdstArrayIndex()) != usedGammas.end();
+        if (gammaUsed) continue;
         // get angle (in lab system)
         TVector3 pi = lepton->getMomentum();
         TVector3 pj = gamma->getMomentum();
         double angle = (pi.Angle(pj));
         if (m_angleThres > angle) {
-          new4Vec = lepton4Vector + gamma->get4Vector();
-          B2INFO("[BelleII BremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
-          angle_egamma.push_back(angle);
-          usedGammas.push_back(gamma);
+          B2INFO("[BelleBremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
+          map.insert(std::pair<Particle*, double>(gamma, angle));
         }
       }
-
+      std::vector<pair> vec;
+      std::copy(map.begin(), map.end(), std::back_inserter<std::vector<pair>>(vec));
+      std::sort(vec.begin(), vec.end(), [](const pair & l, const pair & r) {
+        if (l.second != r.second)
+          return l.second < r.second;
+      });
+      if (!isMultiPho && vec.size() > 1)
+        vec.erase(vec.begin() + 1, vec.end());
+      for (auto const& x : vec)
+        new4Vec += x.first->get4Vector();
       Particle correctedLepton(new4Vec, lepton->getPDGCode());
       correctedLepton.appendDaughter(lepton);
-      // rearrange the (radiative)gammas according to angle with charged particle
-      for (int g1 = 0; g1 < int(angle_egamma.size()); g1++) {
-        for (int g2 = 0; g2 < int(angle_egamma.size()) - 1 - g1; g2++) {
-          if (angle_egamma.at(g2) > angle_egamma.at(g2 + 1)) {
-            double swap = angle_egamma.at(g2);
-            angle_egamma.at(g2) = angle_egamma.at(g2 + 1);
-            angle_egamma.at(g2 + 1) = swap;
-
-            Particle* swapP = usedGammas.at(g2);
-            usedGammas.at(g2) = usedGammas.at(g2 + 1);
-            usedGammas.at(g2 + 1) = swapP;
-          }
-        }
-      }
-
       const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
       TMatrixFSym corLepMatrix(c_DimMatrix);
-      for (int g = 0; g < int(usedGammas.size()); g++) {
-        Particle* fsrgamma = (usedGammas.at(g));
-        fsrgamma->removeExtraInfo();
-        fsrgamma->addExtraInfo("theta_e_gamma", angle_egamma.at(g));
-        fsrgamma->addExtraInfo("energy_gamma", fsrgamma->getEnergy());
+      for (auto const& x : vec) {
+        Particle* fsrgamma = x.first;
+        usedGammas.push_back(fsrgamma->getMdstArrayIndex());
+        fsrgamma->addExtraInfo("theta_e_gamma", x.second);
         const TMatrixFSym& fsrErrorMatrix = fsrgamma->getMomentumVertexErrorMatrix();
-        for (int irow = 0; irow < c_DimMatrix; irow++) {
+        for (int irow = 0; irow < c_DimMatrix; irow++)
           for (int icol = irow; icol < c_DimMatrix; icol++) {
-            if (irow > 3 || icol > 3) {
+            if (irow > 3 || icol > 3)
               corLepMatrix(irow, icol) = lepErrorMatrix(irow, icol);
-            } else {
+            else
               corLepMatrix(irow, icol) = lepErrorMatrix(irow, icol) + fsrErrorMatrix(irow, icol);
-            }
           }
-        }
         correctedLepton.appendDaughter(fsrgamma);
         correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
       }
-      if (int(usedGammas.size()) == 0) correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
+      if (int(vec.size()) == 0)
+        correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
-      correctedLepton.addExtraInfo("nGamma", float(angle_egamma.size()));
+      correctedLepton.addExtraInfo("nGamma", float(vec.size()));
+
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();

@@ -91,14 +91,11 @@ void BtubeCreatorModule::event()
 
     if (
       ((fullRecoB->getVertexErrorMatrix()(0, 0)) == 0.0) &&
-      ((fullRecoB->getVertexErrorMatrix()(0, 1)) == 0.0) &&
-      ((fullRecoB->getVertexErrorMatrix()(0, 2)) == 0.0) &&
       ((fullRecoB->getVertexErrorMatrix()(1, 1)) == 0.0) &&
-      ((fullRecoB->getVertexErrorMatrix()(1, 2)) == 0.0) &&
       ((fullRecoB->getVertexErrorMatrix()(2, 2)) == 0.0)
     ) {
 
-      B2FATAL("Please fit fully reconstructed B first");
+      B2FATAL("Please perform a vertex fit of the fully reconstructed B before calling this module");
     }
 
     //make a copy of fullRecoB so as not to modify the original object

@@ -68,6 +68,6 @@ namespace Belle2 {
      * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel
      */
     bool doVertexFit(Particle* p);  /**< does the vertex fit with RAVE :  adaptive vertex fitter mode */
-    bool m_verbose;
+    bool m_verbose;  /**< run fit with a lot of B2INFOs for debugging */
   };
 }

@@ -89,12 +89,7 @@ void BtubeCreatorModule::event()
     Particle* fullRecoB = const_cast<Particle*>(particle->getDaughter(0));
     Particle* otherB = const_cast<Particle*>(particle->getDaughter(1));
 
-    if (
-      ((fullRecoB->getVertexErrorMatrix()(0, 0)) == 0.0) &&
-      ((fullRecoB->getVertexErrorMatrix()(1, 1)) == 0.0) &&
-      ((fullRecoB->getVertexErrorMatrix()(2, 2)) == 0.0)
-    ) {
-
+    if ((fullRecoB->getVertexErrorMatrix()(2, 2)) == 0.0) {
       B2FATAL("Please perform a vertex fit of the fully reconstructed B before calling this module");
     }
 

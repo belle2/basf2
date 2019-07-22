@@ -22,7 +22,12 @@ class TestAllParticleCombiner(unittest.TestCase):
 
         main = basf2.create_path()
 
-        ma.inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
+        basf2.set_random_seed("1234")
+        main.add_module(
+            'RootInput',
+            inputFileNames=[
+                Belle2.FileSystem.findFile('analysis/tests/mdst.root')],
+            logLevel=basf2.LogLevel.ERROR)
 
         ma.fillParticleList('pi+:fromPV', 'dr < 2 and abs(dz) < 5', path=main)
 
@@ -51,6 +56,8 @@ class TestAllParticleCombiner(unittest.TestCase):
                 'chiProb',
                 'nGoodTracksFromPV',
                 'distance'])
+
+        ma.summaryOfLists(['vpho:PVFit'], path=main)
 
         basf2.process(main)
 

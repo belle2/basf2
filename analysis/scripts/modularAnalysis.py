@@ -1356,7 +1356,7 @@ def signalRegion(
 
     Parameters:
         particleList (str):     The input ParticleList
-        cut (str):              cut string describing the signal region
+        cut (str):              Cut string describing the signal region
         path (basf2.Path)::     Modules are added to this path
         name (str):             Name of the Signal region in the variable manager
         blind_data (bool):      Automatically exclude signal region from data
@@ -1364,15 +1364,15 @@ def signalRegion(
     """
 
     mod = register_module('VariablesToExtraInfo')
-    mod.set_name('%s_' % name + particleList)
+    mod.set_name(f'{name}_' + particleList)
     mod.param('particleList', particleList)
-    mod.param('variables', {"passesCut(%s)" % cut: name})
-    variables.addAlias(name, "extraInfo(%s)" % name)
+    mod.param('variables', {f"passesCut({cut})": name})
+    variables.addAlias(name, f"extraInfo({name})")
     path.add_module(mod)
 
     # Check if we run on Data
     if blind_data:
-        applyCuts(particleList, "isMC==0 and %s==0" % name, path=path)
+        applyCuts(particleList, f"{name}==0 or isMC==1", path=path)
 
 
 def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):

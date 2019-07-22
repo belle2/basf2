@@ -131,68 +131,17 @@ def set_event_number(evt_number, run_number, exp_number):
     Belle2.DataStore.Instance().setInitializeActive(False)
 
 
-if __name__ == '__main__':
-    import argparse
-    import basf2
-    import pandas as pd
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--global-tag", help="If given, use this global tag instead")
-    parser.add_argument("--experiment-number", help="If given, use this experiment number instead")
-    parser.add_argument("--run-number", help="If given, use this run number instead")
-
-    choices = ["human-readable"]
-    try:
-        from tabulate import tabulate
-        choices += ['jira', 'grid']
-    except ImportError:
-        pass
-
-    parser.add_argument("--format", help="Choose the format how to print the trigger cuts. "
-                        "To get access to more options please install the tabulate package using pip",
-                        choices=choices, default="human-readable")
-
-    args = parser.parse_args()
-
-    if args.global_tag:
-        basf2.reset_database()
-        basf2.use_central_database(args.global_tag)
-
-    set_event_number(evt_number=0, run_number=int(args.run_number or 0), exp_number=int(args.experiment_number or 0))
-
-    def get_cuts():
-        for base_identifier in ["filter", "skim"]:
-            menu = download_trigger_menu_from_db(base_name=base_identifier, do_set_event_number=False)
-            cuts = menu.getCutIdentifiers()
-            for cut_identifier in cuts:
-                cut = download_cut_from_db(base_name=base_identifier, cut_name=cut_identifier, do_set_event_number=False)
-                yield {
-                    "Base Identifier": base_identifier,
-                    "Reject Menu": menu.isAcceptMode(),
-                    "Cut Identifier": cut_identifier,
-                    "Cut Condition": cut.decompile(),
-                    "Cut Prescaling": cut.getPreScaleFactor(),
-                    "Reject Cut": cut.isRejectCut()
-                }
-
-    df = pd.DataFrame(list(get_cuts()))
-
-    if args.format == "jira":
-        from tabulate import tabulate
-        print(tabulate(df, tablefmt="jira", showindex=False, headers="keys"))
-    if args.format == "grid":
-        from tabulate import tabulate
-        print(tabulate(df, tablefmt="grid", showindex=False, headers="keys"))
-    elif args.format == "human-readable":
-        print("Currently, the following menus and triggers are in the database")
-        for base_identifier, cuts in df.groupby("Base Identifier"):
-            print(base_identifier)
-            print("")
-            print("\tUsed triggers:\n\t\t" + ", ".join(list(cuts["Cut Identifier"])))
-            print("\tIs in accept mode:\n\t\t" + str(cuts["Reject Menu"].iloc[0]))
-            for _, cut in cuts.iterrows():
-                print("\t\tCut Name:\n\t\t\t" + cut["Cut Identifier"])
-                print("\t\tCut condition:\n\t\t\t" + cut["Cut Condition"])
-                print("\t\tCut prescaling\n\t\t\t" + str(cut["Cut Prescaling"]))
-                print("\t\tCut is a reject cut:\n\t\t\t" + str(cut["Reject Cut"]))
-                print()
+def get_all_cuts():
+    for base_identifier in ["filter", "skim"]:
+        menu = download_trigger_menu_from_db(base_name=base_identifier, do_set_event_number=False)
+        cuts = menu.getCutIdentifiers()
+        for cut_identifier in cuts:
+            cut = download_cut_from_db(base_name=base_identifier, cut_name=cut_identifier, do_set_event_number=False)
+            yield {
+                "Base Identifier": base_identifier,
+                "Reject Menu": menu.isAcceptMode(),
+                "Cut Identifier": cut_identifier,
+                "Cut Condition": cut.decompile(),
+                "Cut Prescaling": cut.getPreScaleFactor(),
+                "Reject Cut": cut.isRejectCut()
+            }

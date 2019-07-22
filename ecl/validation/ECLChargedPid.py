@@ -43,8 +43,9 @@ add_reconstruction(main)
 main.add_module("ECLChargedPIDDataAnalysisValidation", outputFileName="ECLChargedPid", inputPdgIdList=chargedStableList)
 
 # Show progress of processing.
-main.add_module("Progress")
+main.add_module("ProgressBar")
 
 basf2.print_path(main)
 
 basf2.process(main)
+print(basf2.statistics)

@@ -430,8 +430,8 @@ flat
 logical
     All revision of a single payload are in a sub directory with the payload name
 digest
-    All payloads are stored in subdirectories ``A/BC/`` where ``A``, ``B``, ``C``
-    are the first three characters of the md5 checksum of the payload file
+    All payloads are stored in subdirectories ``AB/`` where ``A`` and ``B``
+    are the first two characters of the md5 checksum of the payload file
 
 Example:
   Given ``payload_locations = ["dir1/?flat", "dir2/?digest, "dir3/?logical"]``
@@ -440,7 +440,7 @@ Example:
 
   1. ``dir1/dbstore_BeamParameters_rev_45.root``
   2. ``dir2/dbstore/BeamParameters/dbstore_BeamParameters_rev_45.root``
-  3. ``dir3/a/34/dbstore_BeamParameters_rev_45.root``
+  3. ``dir3/a3/dbstore_BeamParameters_rev_45.root``
 
 )DOC")
     .def("expert_settings", expert, R"DOC(expert_settings(**kwargs)

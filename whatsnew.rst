@@ -90,11 +90,6 @@ This also changes the behavior of `add_simulation()
 will now only change the digitization or reconstruction setup but will always
 use the full geometry from the database.
 
-.. rubric:: Signal region function 
-
-There is now a convenience function to declare a signal region in your decay with `modularAnalysis.signalRegion`.
-By default, this function enables a new variable ``isSignalRegion`` and excludes the defined area when processing is done on data.
-
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see
 
@@ -106,8 +101,6 @@ By default, this function enables a new variable ``isSignalRegion`` and excludes
 .. include:: framework/doc/whatsnew-since/release-03-00.txt
 
 .. include:: ecl/doc/whatsnew-since/release-03-00.txt
-
-
 
 
 Changes since release-02-01

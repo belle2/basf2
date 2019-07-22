@@ -180,8 +180,7 @@ namespace Belle2::Conditions {
         path /= fs::path(payload.payloadUrl);
         break;
       case EConditionsDirectoryStructure::c_digestSubdirectories:
-        path /= payload.checksum.substr(0, 1);
-        path /= payload.checksum.substr(1, 2);
+        path /= payload.checksum.substr(0, 2);
         // intentional fall through to get flat name in addition ...
         [[fallthrough]];
       case EConditionsDirectoryStructure::c_flatDirectory:

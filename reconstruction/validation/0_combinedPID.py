@@ -17,9 +17,16 @@ from reconstruction import add_reconstruction
 
 main = basf2.create_path()
 
+# Read input.
 inputFileName = "../PartGunChargedStableGenSim.root"
 main.add_module("RootInput", inputFileName=inputFileName)
 
+# Load parameters.
+main.add_module("Gearbox")
+# Create geometry.
+main.add_module("Geometry")
+
+# Reconstruct events.
 add_reconstruction(main)
 
 # run a module to generate histograms to test pid performance
@@ -28,7 +35,7 @@ pidperformance.param('outputFileName', 'CombinedPIDPerformance.root')
 pidperformance.param('numberOfBins', 50)
 main.add_module(pidperformance)
 
-main.add_module(register_module('ProgressBar'))
+main.add_module("ProgressBar")
 
 basf2.process(main)
 print(basf2.statistics)

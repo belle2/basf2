@@ -148,11 +148,29 @@ namespace Belle2 {
     std::vector<char> m_trackClusterMatch = std::vector<char>(c_chargedStableHypos);
 
     /**
+     * Log-likelihood for the sig=m_inputPdgId particle hypothesis.
+     */
+    std::vector<float> m_logl_sig = std::vector<float>(c_chargedStableHypos);
+
+    /**
+     * Log-likelihood for the bkg particle hypothesis.
+     * bkg = (m_inputPdgId!=pion) ? pion : kaon.
+     */
+    std::vector<float> m_logl_bkg = std::vector<float>(c_chargedStableHypos);
+
+    /**
+     * LogL(bkg)-LogL(sig).
+     * sig = m_inputPdgId
+     * bkg = (m_inputPdgId!=pion) ? pion : kaon.
+     */
+    std::vector<float> m_deltalogl = std::vector<float>(c_chargedStableHypos);
+
+    /**
      * Global PID as likelihod ratio:
      *
      * pid = L_sig / (L_sig + L_bkg0 + L_bkg1 + ...)
      *
-     * for the m_inputPdgId particle hypothesis.
+     * for the sig=m_inputPdgId particle hypothesis.
      */
     std::vector<float> m_pid = std::vector<float>(c_chargedStableHypos);
 
@@ -169,14 +187,19 @@ namespace Belle2 {
     std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057, 3.1415926};
 
     /**
-     * Compute PID efficiency vs clusterTheta, clusterPhi, p... for a fixed cut on PID as previously initialised.
+     * Dump PID vars.
      */
-    void computePIDEfficiency(TTree* tree, const std::string& pdgIdStr);
+    void dumpPIDVars(TTree* tree, const std::string& pdgIdStr);
 
     /**
-     * Compute track-to-ECL-cluster matching efficiency vs clusterTheta, clusterPhi, p....
+     * Dump PID efficiency vs clusterTheta, clusterPhi, p... for a fixed cut on PID as previously initialised.
      */
-    void computeMatchingEfficiency(TTree* tree, const std::string& pdgIdStr);
+    void dumpPIDEfficiency(TTree* tree, const std::string& pdgIdStr);
+
+    /**
+     * Dump track-to-ECL-cluster matching efficiency vs clusterTheta, clusterPhi, p....
+     */
+    void dumpTrkClusMatchingEfficiency(TTree* tree, const std::string& pdgIdStr);
 
     /**
      * Check if the input pdgId is that of a valid charged particle.
@@ -185,6 +208,11 @@ namespace Belle2 {
     {
       return (Const::chargedStableSet.find(pdg) != Const::invalidParticle);
     }
+
+    /**
+     * Draw u/oflow content on top of first/last visible bin.
+     */
+    void paintUnderOverflow(TH1F* h);
 
   };
 }

@@ -77,7 +77,10 @@ void ECLChargedPIDDataAnalysisValidationModule::initialize()
     m_tree[chargedIdx]->Branch("clusterTheta", &m_clusterTheta[chargedIdx], "clusterTheta/F");
     m_tree[chargedIdx]->Branch("clusterPhi", &m_clusterPhi[chargedIdx], "clusterPhi/F");
     m_tree[chargedIdx]->Branch("trackClusterMatch", &m_trackClusterMatch[chargedIdx], "trackClusterMatch/B");
-    m_tree[chargedIdx]->Branch("pid", &m_pid[chargedIdx], "pid/F");
+    m_tree[chargedIdx]->Branch("logl_sig", &m_logl_sig[chargedIdx], "logl_sig/F");
+    m_tree[chargedIdx]->Branch("logl_bkg", &m_logl_bkg[chargedIdx], "logl_bkg/F");
+    m_tree[chargedIdx]->Branch("deltalogl", &m_deltalogl[chargedIdx], "deltalogl/F");
+    m_tree[chargedIdx]->Branch("pid_glob", &m_pid[chargedIdx], "pid_glob/F");
 
   }
 }
@@ -97,18 +100,21 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
     auto chargedIdx = Const::chargedStableSet.find(std::abs(chargedPdgId)).getIndex();
 
     if (chargedPdgId < 0) {
-      // Add offset to idx.
+      // Add offset to idx for antiparticles.
       chargedIdx += Const::ChargedStable::c_SetSize;
     }
 
     // Initialise branches to unphysical values.
-    m_p[chargedIdx] = -1.0;
-    m_trkTheta[chargedIdx] = -1.0;
-    m_trkPhi[chargedIdx] = -4.0;
-    m_clusterTheta[chargedIdx] = -1.0;
-    m_clusterPhi[chargedIdx] = -4.0;
-    m_trackClusterMatch[chargedIdx] = -1;
-    m_pid[chargedIdx] = -1.0;
+    m_p[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_trkTheta[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_trkPhi[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_clusterTheta[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_clusterPhi[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_trackClusterMatch[chargedIdx] = std::numeric_limits<char>::quiet_NaN();
+    m_logl_sig[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_logl_bkg[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_deltalogl[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
+    m_pid[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
 
     StoreArray<MCParticle> particles;
 
@@ -143,7 +149,7 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       m_trkTheta[chargedIdx] = fitRes->get4Momentum().Theta();
       m_trkPhi[chargedIdx] = fitRes->get4Momentum().Phi();
 
-      // Get the ECL cluster matching this track.
+      // Get the index of the ECL cluster matching this track.
       int icluster_match(-1);
       auto eclClusters = track->getRelationsTo<ECLCluster>();
       for (unsigned int icluster(0); icluster < eclClusters.size(); ++icluster) {
@@ -167,8 +173,20 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
 
       const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
 
-      double lh_sig = eclLikelihood->getLikelihood(Const::chargedStableSet.find(std::abs(chargedPdgId)));
+      // The signal likelihood corresponds to the input chargedPdgId.
+      const auto chargedStableSig = Const::chargedStableSet.find(std::abs(chargedPdgId));
+      // For deltaLogL, we do a binary comparison sig/bkg.
+      // If sig=pion, use bkg=kaon. Otherwise, bkg=pion.
+      const auto chargedStableBkg = (chargedStableSig == Const::pion) ? Const::kaon : Const::pion;
 
+      double lh_sig = eclLikelihood->getLikelihood(chargedStableSig);
+      double lh_bkg = eclLikelihood->getLikelihood(chargedStableBkg);
+
+      m_logl_sig[chargedIdx] = log(lh_sig);
+      m_logl_bkg[chargedIdx] = log(lh_bkg);
+      m_deltalogl[chargedIdx] = log(lh_bkg) - log(lh_sig);
+
+      // Get the global likelihood.
       double lh_all(0);
       for (const auto& chargedStable : Const::chargedStableSet) {
         lh_all += eclLikelihood->getLikelihood(chargedStable);
@@ -200,14 +218,19 @@ void ECLChargedPIDDataAnalysisValidationModule::terminate()
       chargedPdgIdStr = std::to_string(chargedPdgId);
     } else {
       chargedPdgIdStr = "anti" + std::to_string(std::abs(chargedPdgId));
-      // Add offset to idx.
+      // Add offset to idx for antiparticles.
       chargedIdx += Const::ChargedStable::c_SetSize;
     }
 
     m_outputFile[chargedIdx]->cd();
 
-    computePIDEfficiency(m_tree[chargedIdx], chargedPdgIdStr);
-    computeMatchingEfficiency(m_tree[chargedIdx], chargedPdgIdStr);
+    // Add summary description of validation file content.
+    std::string fileDescription = "ECL Charged PID control plots for charged stable particle - Signal PDG = " + chargedPdgIdStr;
+    TNamed("Description", fileDescription.c_str()).Write();
+
+    dumpPIDVars(m_tree[chargedIdx], chargedPdgIdStr);
+    dumpPIDEfficiency(m_tree[chargedIdx], chargedPdgIdStr);
+    dumpTrkClusMatchingEfficiency(m_tree[chargedIdx], chargedPdgIdStr);
 
     m_tree[chargedIdx]->Write();
 
@@ -216,13 +239,85 @@ void ECLChargedPIDDataAnalysisValidationModule::terminate()
   }
 }
 
-
-void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency(TTree* tree, const std::string& pdgIdStr)
+void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* tree, const std::string& pdgIdStr)
 {
 
-  // Histogram of PID distribution.
+  // Histogram of global PID distribution for signal=pdgIdStr.
   std::string h_pid_name = "h_pid_" + pdgIdStr;
-  TH1F* h_pid = new TH1F(h_pid_name.c_str(), h_pid_name.c_str(), 100, -1.2, 1.2);
+  TH1F* h_pid = new TH1F(h_pid_name.c_str(), h_pid_name.c_str(), 50, -0.5, 1.2);
+
+  // Histogram of deltalogl(bkg=(pdgIdStr!=pion)?pion:kaon, sig=pdgIdStr).
+  std::string h_deltalogl_name = "h_deltalogl_" + pdgIdStr;
+  double deltalogl_min = -20.0;
+  double deltalogl_max = 20.0;
+  TH1F* h_deltalogl = new TH1F(h_deltalogl_name.c_str(), h_deltalogl_name.c_str(), 40, deltalogl_min, deltalogl_max);
+
+  tree->Project(h_pid_name.c_str(), "pid_glob");
+  tree->Project(h_deltalogl_name.c_str(), "deltalogl");
+
+  // Make sure the plots show the u/oflow.
+  paintUnderOverflow(h_pid);
+  paintUnderOverflow(h_deltalogl);
+
+  h_pid->SetOption("HIST");
+  h_deltalogl->SetOption("HIST");
+
+  // Add histogram info.
+  h_pid->GetListOfFunctions()->Add(new TNamed("Description", TString::Format("ECL global PID distribution - Signal PDG = %s",
+                                              pdgIdStr.c_str()).Data()));
+  h_pid->GetListOfFunctions()->Add(new TNamed("Check",
+                                              "The more peaked at 1, the better. Non-zero U/O-flow indicates failure of MC matching for reco tracks, which results in PID=nan."));
+  h_pid->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+
+  h_deltalogl->GetListOfFunctions()->Add(new TNamed("Description",
+                                                    TString::Format("ECL distribution of binary deltaLogL=logl(bkg)-logl(sig) - Signal PDG = %s, Bkg abs(PDG) = 11 | 321",
+                                                        pdgIdStr.c_str()).Data()));
+  h_deltalogl->GetListOfFunctions()->Add(new TNamed("Check",
+                                                    "Basic metric for signal/bkg separation. The more negative, the better separation is achieved. Entries in U-flow indicate a non-normal PDF value (of sig OR bkg) for some p,clusterTheta range, which might be due to a non-optimal definition of the x-axis range of the PDF templates."));
+  h_deltalogl->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+  h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+
+  h_pid->Write();
+  h_deltalogl->Write();
+
+  delete h_pid;
+  delete h_deltalogl;
+
+}
+
+void ECLChargedPIDDataAnalysisValidationModule::paintUnderOverflow(TH1F* h)
+{
+
+  auto nentries = h->GetEntries();
+  auto nbins_vis = h->GetNbinsX();
+
+  // Get the content and error of first/last visible bin.
+  float bin_vis_first = h->GetBinContent(1);
+  float bin_vis_last = h->GetBinContent(nbins_vis);
+  float bin_vis_first_err = h->GetBinError(1);
+  float bin_vis_last_err = h->GetBinError(nbins_vis);
+
+  // Get the content and error of u/oflow bins.
+  float bin_uflow = h->GetBinContent(0);
+  float bin_oflow = h->GetBinContent(nbins_vis + 1);
+  float bin_uflow_err = h->GetBinError(0);
+  float bin_oflow_err = h->GetBinError(nbins_vis + 1);
+
+  // Reset first/last visible bins to include u/oflow.
+  h->SetBinContent(1, bin_vis_first + bin_uflow);
+  h->SetBinError(1, sqrt(bin_vis_first_err * bin_vis_first_err + bin_uflow_err * bin_uflow_err));
+  h->SetBinContent(nbins_vis, bin_vis_last + bin_oflow);
+  h->SetBinError(nbins_vis, sqrt(bin_vis_last_err * bin_vis_last_err + bin_oflow_err * bin_oflow_err));
+
+  // Reset total entries to the original value.
+  h->SetEntries(nentries);
+
+}
+
+
+void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiency(TTree* tree, const std::string& pdgIdStr)
+{
 
   // Histograms of p, clusterTheta, clusterPhi... for pass/all events.
   std::string h_p_N_name = "h_p_N_" + pdgIdStr;
@@ -240,18 +335,7 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency(TTree* tree
   TH1F* h_phi_N = new TH1F(h_phi_N_name.c_str(), "h_phi_N", 30, -3.14159, 3.14159);
   TH1F* h_phi_D = new TH1F(h_phi_D_name.c_str(), "h_phi_D", 30, -3.14159, 3.14159);
 
-  // Just to get rid of warnings.
-  h_pid = h_pid;
-  h_p_N = h_p_N;
-  h_p_D = h_p_D;
-  h_th_N = h_th_N;
-  h_th_D = h_th_D;
-  h_phi_N = h_phi_N;
-  h_phi_D = h_phi_D;
-
-  tree->Project(h_pid_name.c_str(), "pid");
-
-  std::string pid_cut = "pid > " + std::to_string(c_PID);
+  std::string pid_cut = "pid_glob > " + std::to_string(c_PID);
 
   tree->Project(h_p_N_name.c_str(), "p", pid_cut.c_str());
   tree->Project(h_p_D_name.c_str(), "p");
@@ -263,100 +347,77 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency(TTree* tree
   tree->Project(h_phi_D_name.c_str(), "clusterPhi");
 
   // Compute the efficiency.
-  // Use TH1::Divide with binomial errors.
 
-  std::string pid_eff_p_name = "pid_eff_" + pdgIdStr + "__VS_p";
-  std::string pid_eff_th_name = "pid_eff_" + pdgIdStr + "__VS_th";
-  std::string pid_eff_phi_name = "pid_eff_" + pdgIdStr + "__VS_phi";
+  std::string pid_eff_p_name = "pid_glob_eff_" + pdgIdStr + "__VS_p";
+  std::string pid_eff_th_name = "pid_glob_eff_" + pdgIdStr + "__VS_th";
+  std::string pid_eff_phi_name = "pid_glob_eff_" + pdgIdStr + "__VS_phi";
 
-  TH1F* h_pid_eff_p = dynamic_cast<TH1F*>(h_p_N->Clone(pid_eff_p_name.c_str()));
-  h_pid_eff_p->SetTitle(pid_eff_p_name.c_str());
-  h_pid_eff_p->Divide(h_p_N, h_p_D, 1.0, 1.0, "B");
-  h_pid_eff_p->GetYaxis()->SetRangeUser(0.0, 1.1);
-
-  TH1F* h_pid_eff_th = dynamic_cast<TH1F*>(h_th_N->Clone(pid_eff_th_name.c_str()));
-  h_pid_eff_th->SetTitle(pid_eff_th_name.c_str());
-  h_pid_eff_th->Divide(h_th_N, h_th_D, 1.0, 1.0, "B");
-  h_pid_eff_th->GetYaxis()->SetRangeUser(0.0, 1.1);
-
-  TH1F* h_pid_eff_phi = dynamic_cast<TH1F*>(h_phi_N->Clone(pid_eff_phi_name.c_str()));
-  h_pid_eff_phi->SetTitle(pid_eff_phi_name.c_str());
-  h_pid_eff_phi->Divide(h_phi_N, h_phi_D, 1.0, 1.0, "B");
-  h_pid_eff_phi->GetYaxis()->SetRangeUser(0.0, 1.1);
-
-  // Add histogram info.
-  h_pid->GetListOfFunctions()->Add(new TNamed("Description", "ECL global PID distribution"));
-  h_pid->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_pid->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
-
-  h_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of track momentum."));
-  h_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_pid_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
-
-  h_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of clusterTheta."));
-  h_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_pid_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
-
-  h_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Description", "Efficiency of ECL PID > 0.5 as a function of clusterPhi."));
-  h_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
-
-  h_pid->Write();
-  h_pid_eff_p->Write();
-  h_pid_eff_th->Write();
-  h_pid_eff_phi->Write();
-
-  // No chi-2 test available when using TEfficiency. Just kept for reference.
   if (TEfficiency::CheckConsistency(*h_p_N, *h_p_D)) {
 
-    TEfficiency* tpid_eff_p = new TEfficiency(*h_p_N, *h_p_D);
-    pid_eff_p_name = "t_" + pid_eff_p_name + "_" + pdgIdStr;
-    tpid_eff_p->SetName(pid_eff_p_name.c_str());
+    TEfficiency* t_pid_eff_p = new TEfficiency(*h_p_N, *h_p_D);
+    t_pid_eff_p->SetName(pid_eff_p_name.c_str());
+    t_pid_eff_p->SetTitle(pid_eff_p_name.c_str());
 
-    tpid_eff_p->SetConfidenceLevel(0.683);
-    tpid_eff_p->SetStatisticOption(TEfficiency::kBUniform);
-    tpid_eff_p->SetPosteriorMode();
+    t_pid_eff_p->SetConfidenceLevel(0.683);
+    t_pid_eff_p->SetStatisticOption(TEfficiency::kBUniform);
+    t_pid_eff_p->SetPosteriorMode();
 
-    tpid_eff_p->Write();
+    t_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Description",
+                                                      TString::Format("Efficiency of ECL PID > 0.5 as a function of track momentum - Signal PDG = %s", pdgIdStr.c_str()).Data()));
+    t_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Check",
+                                                      "Shape should be consistent. Obviously, check for decreasing efficiency."));
+    t_pid_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+    t_pid_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
 
-    delete tpid_eff_p;
+    t_pid_eff_p->Write();
+
+    delete t_pid_eff_p;
 
   }
   if (TEfficiency::CheckConsistency(*h_th_N, *h_th_D)) {
 
-    TEfficiency* tpid_eff_th = new TEfficiency(*h_th_N, *h_th_D);
-    pid_eff_th_name = "t_" + pid_eff_th_name + "_" + pdgIdStr;
-    tpid_eff_th->SetName(pid_eff_th_name.c_str());
+    TEfficiency* t_pid_eff_th = new TEfficiency(*h_th_N, *h_th_D);
+    t_pid_eff_th->SetName(pid_eff_th_name.c_str());
+    t_pid_eff_th->SetTitle(pid_eff_th_name.c_str());
 
-    tpid_eff_th->SetConfidenceLevel(0.683);
-    tpid_eff_th->SetStatisticOption(TEfficiency::kBUniform);
-    tpid_eff_th->SetPosteriorMode();
+    t_pid_eff_th->SetConfidenceLevel(0.683);
+    t_pid_eff_th->SetStatisticOption(TEfficiency::kBUniform);
+    t_pid_eff_th->SetPosteriorMode();
 
-    tpid_eff_th->Write();
+    t_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Description",
+                                                       TString::Format("Efficiency of ECL PID > 0.5 as a function of clusterTheta - Signal PDG = %s", pdgIdStr.c_str()).Data()));
+    t_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Check",
+                                                       "Shape should be consistent. Obviously, check for decreasing efficiency."));
+    t_pid_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+    t_pid_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
 
-    delete tpid_eff_th;
+    t_pid_eff_th->Write();
+
+    delete t_pid_eff_th;
 
   }
   if (TEfficiency::CheckConsistency(*h_phi_N, *h_phi_D)) {
 
-    TEfficiency* tpid_eff_phi = new TEfficiency(*h_phi_N, *h_phi_D);
-    pid_eff_phi_name = "t_" + pid_eff_phi_name + "_" + pdgIdStr;
-    tpid_eff_phi->SetName(pid_eff_phi_name.c_str());
+    TEfficiency* t_pid_eff_phi = new TEfficiency(*h_phi_N, *h_phi_D);
+    t_pid_eff_phi->SetName(pid_eff_phi_name.c_str());
+    t_pid_eff_phi->SetTitle(pid_eff_phi_name.c_str());
 
-    tpid_eff_phi->SetConfidenceLevel(0.683);
-    tpid_eff_phi->SetStatisticOption(TEfficiency::kBUniform);
-    tpid_eff_phi->SetPosteriorMode();
+    t_pid_eff_phi->SetConfidenceLevel(0.683);
+    t_pid_eff_phi->SetStatisticOption(TEfficiency::kBUniform);
+    t_pid_eff_phi->SetPosteriorMode();
 
-    tpid_eff_phi->Write();
+    t_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Description",
+                                                        TString::Format("Efficiency of ECL PID > 0.5 as a function of clusterPhi - Signal PDG = %s", pdgIdStr.c_str()).Data()));
+    t_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Check",
+                                                        "Shape should be consistent. Obviously, check for decreasing efficiency."));
+    t_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+    t_pid_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
 
-    delete tpid_eff_phi;
+    t_pid_eff_phi->Write();
+
+    delete t_pid_eff_phi;
   }
 
-  delete h_pid;
   delete h_p_N;
   delete h_p_D;
   delete h_th_N;
@@ -366,7 +427,8 @@ void ECLChargedPIDDataAnalysisValidationModule::computePIDEfficiency(TTree* tree
 
 }
 
-void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency(TTree* tree, const std::string& pdgIdStr)
+
+void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TTree* tree, const std::string& pdgIdStr)
 {
 
   // Histograms of p, trkTheta, trkPhi... for pass/all events.
@@ -385,14 +447,6 @@ void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency(TTree*
   TH1F* h_phi_N = new TH1F(h_phi_N_name.c_str(), "h_phi_N", 30, -3.14159, 3.14159);
   TH1F* h_phi_D = new TH1F(h_phi_D_name.c_str(), "h_phi_D", 30, -3.14159, 3.14159);
 
-  // Just to get rid of warnings.
-  h_p_N = h_p_N;
-  h_p_D = h_p_D;
-  h_th_N = h_th_N;
-  h_th_D = h_th_D;
-  h_phi_N = h_phi_N;
-  h_phi_D = h_phi_D;
-
   std::string match_cut_N = "trackClusterMatch == 1";
   std::string match_cut_D = "trackClusterMatch >= 0";
 
@@ -406,49 +460,78 @@ void ECLChargedPIDDataAnalysisValidationModule::computeMatchingEfficiency(TTree*
   tree->Project(h_phi_D_name.c_str(), "trkPhi", match_cut_D.c_str());
 
   // Compute the efficiency.
-  // Use TH1::Divide with binomial errors.
 
   std::string match_eff_p_name = "trkclusmatch_eff_" + pdgIdStr + "__VS_p";
   std::string match_eff_th_name = "trkclusmatch_eff_" + pdgIdStr + "__VS_th";
   std::string match_eff_phi_name = "trkclusmatch_eff_" + pdgIdStr + "__VS_phi";
 
-  TH1F* h_match_eff_p = dynamic_cast<TH1F*>(h_p_N->Clone(match_eff_p_name.c_str()));
-  h_match_eff_p->SetTitle(match_eff_p_name.c_str());
-  h_match_eff_p->Divide(h_p_N, h_p_D, 1.0, 1.0, "B");
-  h_match_eff_p->GetYaxis()->SetRangeUser(0.0, 1.1);
+  if (TEfficiency::CheckConsistency(*h_p_N, *h_p_D)) {
 
-  TH1F* h_match_eff_th = dynamic_cast<TH1F*>(h_th_N->Clone(match_eff_th_name.c_str()));
-  h_match_eff_th->SetTitle(match_eff_th_name.c_str());
-  h_match_eff_th->Divide(h_th_N, h_th_D, 1.0, 1.0, "B");
-  h_match_eff_th->GetYaxis()->SetRangeUser(0.0, 1.1);
+    TEfficiency* t_match_eff_p = new TEfficiency(*h_p_N, *h_p_D);
+    t_match_eff_p->SetName(match_eff_p_name.c_str());
+    t_match_eff_p->SetTitle(match_eff_p_name.c_str());
 
-  TH1F* h_match_eff_phi = dynamic_cast<TH1F*>(h_phi_N->Clone(match_eff_phi_name.c_str()));
-  h_match_eff_phi->SetTitle(match_eff_phi_name.c_str());
-  h_match_eff_phi->Divide(h_phi_N, h_phi_D, 1.0, 1.0, "B");
-  h_match_eff_phi->GetYaxis()->SetRangeUser(0.0, 1.1);
+    t_match_eff_p->SetConfidenceLevel(0.683);
+    t_match_eff_p->SetStatisticOption(TEfficiency::kBUniform);
+    t_match_eff_p->SetPosteriorMode();
 
-  // Add histogram info.
-  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Description",
-                                                      "Efficiency of track-cluster matching as a function of track momentum."));
-  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-  h_match_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    t_match_eff_p->GetListOfFunctions()->Add(new TNamed("Description",
+                                                        TString::Format("Efficiency of track-eclcluster matching as a function of track momentum - Signal PDG = %s",
+                                                            pdgIdStr.c_str()).Data()));
+    t_match_eff_p->GetListOfFunctions()->Add(new TNamed("Check",
+                                                        "Shape should be consistent. Obviously, check for decreasing efficiency."));
+    t_match_eff_p->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
+    t_match_eff_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
 
-  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Description",
-                                                       "Efficiency of track-cluster matching as a function of clusterTheta."));
-  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-  h_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    t_match_eff_p->Write();
 
-  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Description",
-                                                        "Efficiency of track-cluster matching as a function of clusterPhi."));
-  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check", "Shape should be consistent."));
-  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-  h_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    delete t_match_eff_p;
 
-  h_match_eff_p->Write();
-  h_match_eff_th->Write();
-  h_match_eff_phi->Write();
+  }
+  if (TEfficiency::CheckConsistency(*h_th_N, *h_th_D)) {
+
+    TEfficiency* t_match_eff_th = new TEfficiency(*h_th_N, *h_th_D);
+    t_match_eff_th->SetName(match_eff_th_name.c_str());
+    t_match_eff_th->SetTitle(match_eff_th_name.c_str());
+
+    t_match_eff_th->SetConfidenceLevel(0.683);
+    t_match_eff_th->SetStatisticOption(TEfficiency::kBUniform);
+    t_match_eff_th->SetPosteriorMode();
+
+    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Description",
+                                                         TString::Format("Efficiency of track-eclcluster matching as a function of clusterTheta - Signal PDG = %s",
+                                                             pdgIdStr.c_str()).Data()));
+    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check",
+                                                         "Shape should be consistent. Obviously, check for decreasing efficiency."));
+    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
+    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+
+    t_match_eff_th->Write();
+
+    delete t_match_eff_th;
+
+  }
+  if (TEfficiency::CheckConsistency(*h_phi_N, *h_phi_D)) {
+
+    TEfficiency* t_match_eff_phi = new TEfficiency(*h_phi_N, *h_phi_D);
+    t_match_eff_phi->SetName(match_eff_phi_name.c_str());
+    t_match_eff_phi->SetTitle(match_eff_phi_name.c_str());
+
+    t_match_eff_phi->SetConfidenceLevel(0.683);
+    t_match_eff_phi->SetStatisticOption(TEfficiency::kBUniform);
+    t_match_eff_phi->SetPosteriorMode();
+
+    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Description",
+                                                          TString::Format("Efficiency of track-eclcluster matching as a function of clusterPhi - Signal PDG = %s", pdgIdStr.c_str()).Data()));
+    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check",
+                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
+    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
+    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+
+    t_match_eff_phi->Write();
+
+    delete t_match_eff_phi;
+  }
 
   delete h_p_N;
   delete h_p_D;

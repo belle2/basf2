@@ -902,6 +902,37 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def combineAllParticles(
+    inputParticleLists,
+    outputList,
+    cut='',
+    writeOut=False,
+    path=None
+):
+    """
+    Creates a new Particle as the combination of all Particles from all
+    provided inputParticleLists. However, each particle is used only once
+    (even if duplicates are provided) and the combination has to pass the
+    specified selection criteria to be saved in the newly created (mother)
+    ParticleList.
+
+    @param inputParticleLists List of input particle lists which are combined to the new Particle
+    @param outputList         Name of the particle combination created with this module
+    @param cut                created (mother) Particle is added to the mother ParticleList if it passes
+                              these given cuts (in VariableManager style) and is rejected otherwise
+    @param writeOut           whether RootOutput module should save the created ParticleList
+    @param path               module is added to this path
+    """
+
+    pmake = register_module('AllParticleCombiner')
+    pmake.set_name('AllParticleCombiner_' + outputList)
+    pmake.param('inputListNames', inputParticleLists)
+    pmake.param('outputListName', outputList)
+    pmake.param('cut', cut)
+    pmake.param('writeOut', writeOut)
+    path.add_module(pmake)
+
+
 def reconstructMissingKlongDecayExpert(
     decayString,
     cut,

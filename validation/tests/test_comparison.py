@@ -50,7 +50,7 @@ class TestGetComparison(unittest.TestCase):
                         obj[0],
                         obj[1],
                         metaoptions.MetaOptionParser(
-                            self.test_options[tester_name].split(" ")
+                            self.test_options[tester_name].split(",")
                         )
                     )
                     self.assertEqual(tester.comparison_result, obj[2])

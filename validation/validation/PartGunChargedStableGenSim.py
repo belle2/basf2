@@ -38,7 +38,7 @@ param_pGun = {
     "pdgCodes": chargedStableList,
     "nTracks": 0,  # 0 : generate 1 track per pdgId per event.
     "momentumGeneration": "uniform",
-    "momentumParams": [0.1, 5.0],
+    "momentumParams": [0.05, 5.0],
     "thetaGeneration": "uniform",
     "thetaParams": [17., 150.],
     "phiGeneration": "uniform",

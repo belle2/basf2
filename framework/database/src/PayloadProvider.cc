@@ -22,22 +22,21 @@ namespace Belle2::Conditions {
   {
     // check whether we have a chache directory ... otherwise use default
     if (!cacheDir.empty()) {
-      m_cacheDir = {fs::absolute(cacheDir).string(),
-                    EConditionsDirectoryStructure::c_flatDirectory, false
-                   };
+      m_cacheDir = {fs::absolute(cacheDir).string(), false};
     } else {
-      m_cacheDir = {fs::absolute(fs::temp_directory_path() / "basf2-conditions").string(),
-                    EConditionsDirectoryStructure::c_digestSubdirectories, false
-                   };
+      m_cacheDir = {fs::absolute(fs::temp_directory_path() / "basf2-conditions").string(), false};
     }
     m_locations.reserve(locations.size() + 2); //cache location + all configured + central server
     // always look in cache directory first
     m_locations.emplace_back(m_cacheDir);
-    B2DEBUG(33, "Added payload cache location" << LogVar("path", m_cacheDir.base) << LogVar("structure", (int)m_cacheDir.structure));
+    B2DEBUG(33, "Added payload cache location" << LogVar("path", m_cacheDir.base));
     // and then in the other directories as specified
-    for (auto && loc : locations) {
-      std::string path = loc;
-      EConditionsDirectoryStructure structure{EConditionsDirectoryStructure::c_flatDirectory};
+    for (auto path : locations) {
+      boost::algorithm::trim(path);
+      if (path.empty()) {
+        B2FATAL("Found empty payload location in configuration. "
+                "Please make sure that the conditions database settings are correct");
+      }
       bool remote = false;
       if (auto pos = path.find("://"); pos != std::string::npos) {
         //found a protocol: if file remove, otherwise keep as is and set as remote ...
@@ -52,30 +51,14 @@ namespace Belle2::Conditions {
           continue;
         }
       }
-      // ok also check for ? to specify the structure
-      if (auto pos = path.find('?'); pos != std::string::npos) {
-        auto option = path.substr(pos + 1);
-        path = path.substr(0, pos);
-        boost::algorithm::to_lower(option);
-        if (option == "flat") {
-          structure = EConditionsDirectoryStructure::c_flatDirectory;
-        } else if (option == "digest") {
-          structure = EConditionsDirectoryStructure::c_digestSubdirectories;
-        } else if (option == "logical") {
-          structure = EConditionsDirectoryStructure::c_logicalSubdirectories;
-        } else {
-          B2ERROR("Unknown payload directory structure, choose one of flat, digest or logical" << LogVar("structure", option));
-          continue;
-        }
-      }
       // Also make sure files are absolute
       if (!remote) path = fs::absolute(path).string();
       // And then add it to the list
-      B2DEBUG(33, "Added payload search location" << LogVar(remote ? "url" : "path", path) << LogVar("structure", (int)structure));
-      m_locations.emplace_back(PayloadLocation{path, structure, remote});
+      B2DEBUG(33, "Added payload search location" << LogVar(remote ? "url" : "path", path));
+      m_locations.emplace_back(PayloadLocation{path, remote});
     }
     // and as as last resort always go to the central server
-    m_locations.emplace_back(PayloadLocation{"", EConditionsDirectoryStructure::c_logicalSubdirectories, true});
+    m_locations.emplace_back(PayloadLocation{"", true});
   }
 
   bool PayloadProvider::find(PayloadMetadata& metadata)
@@ -88,29 +71,34 @@ namespace Belle2::Conditions {
 
   bool PayloadProvider::getLocalFile(const PayloadLocation& loc, PayloadMetadata& metadata) const
   {
-    auto fullPath = fs::path(loc.base) / getFilename(loc.structure, metadata);
-    // No such file? nothing to do
-    if (!fs::exists(fullPath)) return false;
-    // Otherwise check the md5
-    B2DEBUG(36, "Checking checksum for payload file" << LogVar("name", metadata.name) << LogVar("local dir", loc.base)
-            << LogVar("revision", metadata.revision) << LogVar("filename", fullPath) << LogVar("checksum", metadata.checksum));
-    const auto actual = FileSystem::calculateMD5(fullPath.string());
-    if (actual == metadata.checksum) {
-      metadata.filename = fullPath.string();
-      B2DEBUG(37, "Found matching payload file");
-      return true;
+    // look in both flat and hashed directory structures.
+    for (EDirectoryLayout structure : {EDirectoryLayout::c_hashed, EDirectoryLayout::c_flat}) {
+      auto fullPath = fs::path(loc.base) / getFilename(structure, metadata);
+      // No such file? nothing to do
+      if (!fs::exists(fullPath)) continue;
+      // Otherwise check the md5
+      B2DEBUG(36, "Checking checksum for payload file" << LogVar("name", metadata.name) << LogVar("local dir", loc.base)
+              << LogVar("revision", metadata.revision) << LogVar("filename", fullPath) << LogVar("checksum", metadata.checksum));
+      const auto actual = FileSystem::calculateMD5(fullPath.string());
+      if (actual == metadata.checksum) {
+        metadata.filename = fullPath.string();
+        B2DEBUG(37, "Found matching payload file");
+        return true;
+      }
+      B2DEBUG(37, "Checksum doesn't match, continue with next");
     }
-    B2DEBUG(37, "Checksum doesn't match, continue with next");
     return false;
   }
 
   bool PayloadProvider::getRemoteFile(const PayloadLocation& loc, PayloadMetadata& metadata)
   {
-    const auto local = fs::path(m_cacheDir.base) / getFilename(m_cacheDir.structure, metadata);
+    // we want to download payloads in a hashed directory structure to keep amount of payloads per directory to a managable level
+    const auto local = fs::path(m_cacheDir.base) / getFilename(EDirectoryLayout::c_hashed, metadata);
     // empty location: use the central server supplied baseUrl from payload metadata
     const bool fallback = loc.base.empty();
     const auto base = fallback ? metadata.baseUrl : loc.base;
-    const auto url = m_downloader.joinWithSlash(base, getFilename(loc.structure, metadata));
+    // but we assume that on servers we have logical directory structure: value of payloadUrl is taken without modification
+    const auto url = m_downloader.joinWithSlash(base, metadata.payloadUrl);
     // If anything fails we might want to go to temporary file and this happens at multiple places so lets use exception for that
     try {
       // now we need to make the directories to the file
@@ -171,20 +159,17 @@ namespace Belle2::Conditions {
     }
   }
 
-  std::string PayloadProvider::getFilename(EConditionsDirectoryStructure structure,
+  std::string PayloadProvider::getFilename(EDirectoryLayout structure,
                                            const PayloadMetadata& payload) const
   {
     fs::path path("");
     switch (structure) {
-      case  EConditionsDirectoryStructure::c_logicalSubdirectories:
-        path /= fs::path(payload.payloadUrl);
-        break;
-      case EConditionsDirectoryStructure::c_digestSubdirectories:
+      case EDirectoryLayout::c_hashed:
         path /= payload.checksum.substr(0, 2);
-        // intentional fall through to get flat name in addition ...
-        [[fallthrough]];
-      case EConditionsDirectoryStructure::c_flatDirectory:
-        path /= fs::path(payload.payloadUrl).filename();
+        path /= "dbstore_" + payload.name + "_rev_" + std::to_string(payload.revision) + ".root";
+        break;
+      case EDirectoryLayout::c_flat:
+        path /= payload.name + "_r" + std::to_string(payload.revision) + ".root";
         break;
     };
     return path.string();

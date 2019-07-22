@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/database/EConditionsDirectoryStructure.h>
 #include <framework/database/PayloadMetadata.h>
 #include <framework/database/Downloader.h>
 #include <framework/utilities/FileSystem.h>
@@ -22,14 +21,24 @@ namespace Belle2::Conditions {
   /** Class to find payload files in a list of locations */
   class PayloadProvider {
   public:
+
     /** Simple struct to represent a lookup location */
     struct PayloadLocation {
       /** base path or uri */
       std::string base;
-      /** How are payloads structured in this location */
-      EConditionsDirectoryStructure structure;
       /** Is this a remote location where we want to download the files? */
       bool isRemote;
+    };
+
+    /** Enumeration of different directory layouts */
+    enum class EDirectoryLayout {
+      /** Flat directory containing the payloads in the form
+       * `dbstore_{NAME}_rev_{REVISION}.root` */
+      c_flat,
+      /** Hashed directory structure containing the payloads in the form
+       * `AB/{NAME}_r{REVISION}.root` where A and B are the first to characters
+       * of the md5 checksum of the payload file */
+      c_hashed,
     };
 
     /** Constructor for a given list of locations and optionally the location
@@ -37,20 +46,25 @@ namespace Belle2::Conditions {
      * path to a directory or a http/https url of a server where the payloads
      * can be downloaded (starting with `http(s)://`).
      *
-     * In addition each path can have an option after a question mark. Possible
-     * values are
-     * - "flat": All payloads in one directory
-     * - "digest": Payloads in subdirectories /A/BC/ where A,B and C are the
-     *   first three characters of the checksum of the payload file
-     * - "logical": As given in the payloadUrl of the metadata with
-     *   subdirectories for the payload name
+     * For remote locations starting with http(s) we require that the payloads
+     * follow the same layout as on the central server. That is the location
+     * plus the value returned by the metadata for `payloadUrl` should point to
+     * the correct file.
+     *
+     * For local locations we support two different layouts which will be auto
+     * detected and can be mixed:
+     *
+     * - "flat": All payloads in one directory named `dbstore_{NAME}_rev_{REVISION}.root`
+     * - "hashed": Payloads in subdirectories named `/AB/{NAME}_r{REVISION}.root`
+     *   where A and B are the first two characters of the md5 checksum of the
+     *   payload file.
      *
      * If cachedir is empty a default value of `$TMPDIR/basf2-conditions?digest`
      * is assumed.
      */
     PayloadProvider(const std::vector<std::string>& locations, const std::string& cachedir = "", int timeout = 60);
 
-    /** try to find a payload, return true on success, false if it cannot be
+    /** Try to find a payload, return true on success, false if it cannot be
      * found.
      *
      * This will go through all configured payloads locations and if it can find
@@ -71,7 +85,7 @@ namespace Belle2::Conditions {
      * message */
     bool getTemporaryFile(const std::string& url, PayloadMetadata& meta, bool silentOnMissing);
     /** Return the filename of a payload to look for given a directory structure and some metadata */
-    std::string getFilename(EConditionsDirectoryStructure structure, const PayloadMetadata& payload) const;
+    std::string getFilename(EDirectoryLayout structure, const PayloadMetadata& payload) const;
     /** List of configured lookup locations: The first one will always be the
      * cache directory and the last one will always be fallback url included in
      * the payload metadata */

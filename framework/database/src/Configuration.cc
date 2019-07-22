@@ -420,28 +420,39 @@ to point to this location.
     .add_property("payload_locations", &Configuration::getPayloadLocationsPy, &Configuration::setPayloadLocationsPy, R"DOC(
 List of payload locations to search for payloads which have been found by any of
 the configured `metadata_providers`. This can be a local directory or a
-``http(s)://`` url pointing to the payload directory.
+``http(s)://`` url pointing to the payload directory on a server.
 
-Each of the entries can have an option separated with a ``?`` to configure the
-directory structure to use when looking for payloads. The supported options are
+For remote locations starting with ``http(s)://`` we assume that the layout of
+the payloads on the server is the same as on the main payload server:
+The combination of given location and the relative url in the payload metadata
+field ``payloadUrl`` should point to the correct payload on the server.
+
+For local directories, two layouts are supported and will be auto detected:
 
 flat
-    All payloads are in the same directory without any substructure
-logical
-    All revision of a single payload are in a sub directory with the payload name
-digest
-    All payloads are stored in subdirectories ``AB/`` where ``A`` and ``B``
-    are the first two characters of the md5 checksum of the payload file
+    All payloads are in the same directory without any substructure with the name
+    ``dbstore_{name}_rev_{revision}.root``
+hashed
+    All payloads are stored in subdirectories in the form``AB/{name}_r{revision}.root``
+    where ``A`` and ``B`` are the first two characters of the md5 checksum of the
+    payload file.
 
 Example:
-  Given ``payload_locations = ["dir1/?flat", "dir2/?digest, "dir3/?logical"]``
+  Given ``payload_locations = ["payload_dir/", "http://server.com/payloads"]``
   the framework we would look for a payload of name `BeamParameters` in revision
   `45` (and checksum ``a34ce5...``) int the following places
 
-  1. ``dir1/dbstore_BeamParameters_rev_45.root``
-  2. ``dir2/dbstore/BeamParameters/dbstore_BeamParameters_rev_45.root``
-  3. ``dir3/a3/dbstore_BeamParameters_rev_45.root``
 
+  1. ``payload_dir/a3/BeamParameters_r45.root``
+  3. ``payload_dir/dbstore_BeamParameters_rev_45.root``
+  3. ``http://server.com/payloads/dbstore/BeamParameters/dbstore_BeamParameters_rev_45.root``
+     given the usual pattern of the ``payloadUrl`` metadata. But this could be
+     changed on the central servers so mirrors should not depend on this convention
+     but copy the actual structure of the central server.
+
+If the payload cannot be found in any of the given locations the framework will
+always attempt to download it directly from the central server and put it in a
+local cache directory.
 )DOC")
     .def("expert_settings", expert, R"DOC(expert_settings(**kwargs)
 

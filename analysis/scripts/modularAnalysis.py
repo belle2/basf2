@@ -1337,29 +1337,29 @@ def signalRegion(
         particleList,
         cut,
         path=None,
-        name="SignalRegion",
+        name="isSignalRegion",
         blind_data=True,
 ):
     """
     Define and blind a signal region.
     Per default, the defined signal region is cut out if ran on data.
-    This function will provide a new variable 'SignalRegion' as default, which is either 0 or 1 depending on the cut
+    This function will provide a new variable 'isSignalRegion' as default, which is either 0 or 1 depending on the cut
     provided.
 
-    - Example usage:
-
+    Example:
         >>> ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
         >>> ma.signalRegion("B+:sig",
         >>>                  "Mbc>5.27 and abs(deltaE)<0.2",
         >>>                  blind_data=True,
         >>>                  path=path)
-        >>> ma.variablesToNtuples("B+:sig", ["SignalRegion"], path=path)
+        >>> ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
 
-    @param particleList: The input ParticleList
-    @param cut: cut string describing the signal region
-    @param path          modules are added to this path
-    @param name:   Name of the Signal region in the variable manager
-    @param blind_data: Automatically exclude signal region from data
+    Parameters:
+        particleList (str):     The input ParticleList
+        cut (str):              cut string describing the signal region
+        path (basf2.Path)::     Modules are added to this path
+        name (str):             Name of the Signal region in the variable manager
+        blind_data (bool):      Automatically exclude signal region from data
 
     """
 

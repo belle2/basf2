@@ -78,7 +78,8 @@ namespace Belle2 {
              "ASIC analog storage depth of Interim FE format (ignored in other formats)",
              (unsigned) 508);
     addParam("lookBackWindows", m_lookBackWindows,
-             "number of look back windows of Interim FE format (ignored in others)", 220);
+             "number of look back windows, if positive override the number from database",
+             0);
     addParam("setPhase", m_setPhase,
              "if true, set (override) phase in TOPRawDigits", true);
     addParam("calibrationChannel", m_calibrationChannel,
@@ -266,7 +267,9 @@ namespace Belle2 {
         int lastWriteAddr = rawDigit.getLastWriteAddr();
         int nback = lastWriteAddr - window;
         if (nback < 0) nback += m_storageDepth;
-        int nwin = m_lookBackWindows - nback;
+        int lookBackWindows = m_feSetting->getLookbackWindows();
+        if (m_lookBackWindows > 0) lookBackWindows = m_lookBackWindows;
+        int nwin = lookBackWindows - nback;
         window -= nwin;
         if (window < 0) window += m_storageDepth;
         if (window >= (int) m_storageDepth) window -= m_storageDepth;
@@ -313,11 +316,7 @@ namespace Belle2 {
         int deltaWindow = window - refWindow;
         if (deltaWindow > 0) deltaWindow -= storageDepth;
         int lookBackWindows = m_feSetting->getLookbackWindows();
-        /* not provided (yet) in raw data
-           if (rawDigit.getLookBackWindows() > 0) {
-             lookBackWindows = rawDigit.getLookBackWindows();
-           }
-        */
+        if (m_lookBackWindows > 0) lookBackWindows = m_lookBackWindows;
         lookBackWindows -= m_feSetting->getExtraWindows();
 
         int nwin = lookBackWindows + deltaWindow;

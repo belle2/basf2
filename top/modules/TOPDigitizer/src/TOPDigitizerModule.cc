@@ -208,6 +208,12 @@ namespace Belle2 {
 
     // pass a parameter to TimeDigitizer
     TimeDigitizer::setReadoutWindows(m_feSetting->getReadoutWindows());
+    if ((evtMetaData->getExperiment() > 0 and evtMetaData->getExperiment() < 5) or
+        evtMetaData->getExperiment() == 1002) {
+      TimeDigitizer::maskSamples(true); // phase-2: mask samples at window boundaries
+    } else {
+      TimeDigitizer::maskSamples(false); // phase-3: no masking
+    }
 
   }
 
@@ -221,7 +227,7 @@ namespace Belle2 {
     double SSTfrac = (revo9cnt % 6) / 6.0;
     double offset = m_feSetting->getOffset() / 24.0;
     double trgTimeOffset = (SSTfrac + offset) * m_syncTimeBase;  // in [ns]
-    int offsetWindows = (revo9cnt % 6) / 3;
+    int offsetWindows = m_feSetting->getWindowShift(revo9cnt);
     TimeDigitizer::setOffsetWindows(offsetWindows);
 
     // from revo9 and write depths determine reference window, phase and storage depth
@@ -272,7 +278,7 @@ namespace Belle2 {
     // add simulated hits to time digitizers
 
     for (const auto& simHit : m_simHits) {
-      if (!m_useWaveforms) {
+      if (not m_useWaveforms) {
         // simulate electronic efficiency
         if (gRandom->Rndm() > electronicEfficiency) continue;
       }
@@ -281,7 +287,7 @@ namespace Belle2 {
       double y = simHit.getY();
       int pmtID = simHit.getPmtID();
       int moduleID = simHit.getModuleID();
-      if (!geo->isModuleIDValid(moduleID)) continue;
+      if (not geo->isModuleIDValid(moduleID)) continue;
       int pixelID = geo->getModule(moduleID).getPMTArray().getPixelID(x, y, pmtID);
       if (pixelID == 0) continue;
 
@@ -296,8 +302,8 @@ namespace Belle2 {
       auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
 
       // time range cut (to speed up digitization)
-      if (time + timeOffset.value < timeMin) continue;
-      if (time + timeOffset.value > timeMax) continue;
+      if (time + timeOffset.value < timeMin + timeOffset.timeShift) continue;
+      if (time + timeOffset.value > timeMax + timeOffset.timeShift) continue;
 
       // generate pulse height
       double pulseHeight = generatePulseHeight(moduleID, pixelID);
@@ -305,8 +311,8 @@ namespace Belle2 {
 
       // add time and pulse height to digitizer of a given pixel
       TimeDigitizer digitizer(moduleID, pixelID, timeOffset.value, timeOffset.error,
-                              m_rmsNoise, m_sampleTimes);
-      if (!digitizer.isValid()) continue;
+                              timeOffset.windowShift, m_rmsNoise, m_sampleTimes);
+      if (not digitizer.isValid()) continue;
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
       it->second.addTimeOfHit(time, pulseHeight, hitType, &simHit);
@@ -325,13 +331,13 @@ namespace Belle2 {
       auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
 
       // time range cut (to speed up digitization)
-      if (time + timeOffset.value < timeMin) continue;
-      if (time + timeOffset.value > timeMax) continue;
+      if (time + timeOffset.value < timeMin + timeOffset.timeShift) continue;
+      if (time + timeOffset.value > timeMax + timeOffset.timeShift) continue;
 
       // add time and pulse height to digitizer of a given pixel
       TimeDigitizer digitizer(moduleID, pixelID, timeOffset.value, timeOffset.error,
-                              m_rmsNoise, m_sampleTimes);
-      if (!digitizer.isValid()) continue;
+                              timeOffset.windowShift, m_rmsNoise, m_sampleTimes);
+      if (not digitizer.isValid()) continue;
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
       it->second.addTimeOfHit(time, pulseHeight, hitType);
@@ -350,10 +356,11 @@ namespace Belle2 {
           double pulseHeight = generatePulseHeight(moduleID, pixelID);
           auto hitType = TimeDigitizer::c_Hit;
           auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
+          time += timeOffset.timeShift;
           time -= timeOffset.value;
           TimeDigitizer digitizer(moduleID, pixelID, timeOffset.value, timeOffset.error,
-                                  m_rmsNoise, m_sampleTimes);
-          if (!digitizer.isValid()) continue;
+                                  timeOffset.windowShift, m_rmsNoise, m_sampleTimes);
+          if (not digitizer.isValid()) continue;
           unsigned id = digitizer.getUniqueID();
           Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
           it->second.addTimeOfHit(time, pulseHeight, hitType);
@@ -370,8 +377,8 @@ namespace Belle2 {
         for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
           auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
           TimeDigitizer digitizer(moduleID, pixelID, timeOffset.value, timeOffset.error,
-                                  m_rmsNoise, m_sampleTimes);
-          if (!digitizer.isValid()) continue;
+                                  timeOffset.windowShift, m_rmsNoise, m_sampleTimes);
+          if (not digitizer.isValid()) continue;
           unsigned id = digitizer.getUniqueID();
           pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer));
         }
@@ -390,13 +397,14 @@ namespace Belle2 {
       }
     }
 
-    // replace default noise level with channel dependent one if available
+    // replace default noise level with channel dependent one if available,
 
     if (m_useDatabase) {
       for (auto& pixel : pixels) {
         auto& digitizer = pixel.second;
-        auto rmsNoise = m_noises->getNoise(digitizer.getModuleID(),
-                                           digitizer.getChannel());
+        auto moduleID = digitizer.getModuleID();
+        auto channel = digitizer.getChannel();
+        auto rmsNoise = m_noises->getNoise(moduleID, channel);
         if (rmsNoise > 0) {
           digitizer.setNoise(rmsNoise);
         }
@@ -455,12 +463,14 @@ namespace Belle2 {
   }
 
 
-  TOPDigitizerModule::ValueWithError TOPDigitizerModule::getTimeOffset(double trgOffset,
+  TOPDigitizerModule::TimeOffset TOPDigitizerModule::getTimeOffset(double trgOffset,
       int moduleID,
       int pixelID)
   {
     double timeOffset = trgOffset;
     double calErrorSq = 0;
+    int winShift = 0;
+    double timeShift = 0;
     if (m_useDatabase) {
       const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
       auto channel = channelMapper.getChannel(pixelID);
@@ -472,6 +482,8 @@ namespace Belle2 {
       auto asic = channel / 8;
       if (m_asicShift->isCalibrated(moduleID, asic)) {
         timeOffset += m_asicShift->getT0(moduleID, asic);
+        winShift = lround(m_asicShift->getT0(moduleID, asic) / m_syncTimeBase * 2);
+        timeShift = winShift * m_syncTimeBase / 2;
       }
       if (m_moduleT0->isCalibrated(moduleID)) {
         timeOffset += m_moduleT0->getT0(moduleID);
@@ -484,7 +496,7 @@ namespace Belle2 {
         calErrorSq += err * err;
       }
     }
-    return ValueWithError(timeOffset, calErrorSq);
+    return TimeOffset(timeOffset, calErrorSq, winShift, timeShift);
   }
 
 

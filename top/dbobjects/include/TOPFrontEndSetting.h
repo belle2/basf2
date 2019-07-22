@@ -58,6 +58,12 @@ namespace Belle2 {
     void setExtraWindows(int extra) {m_extraWindows = extra;}
 
     /**
+     * Sets window shifts
+     * @param shifts vector of size = 6 with window shifts according to revo9count
+     */
+    void setWindowShifts(std::vector<int> shifts);
+
+    /**
      * Sets the offset of a photon peak within the readout window region.
      * This has to be calibrated with data in a such way that the reconstructed bunch
      * distribution peaks at zero.
@@ -95,6 +101,13 @@ namespace Belle2 {
     int getExtraWindows() const {return m_extraWindows;}
 
     /**
+     * Returns window shift at a given revo9count
+     * @param revo9count revo9 count
+     * @return window shift
+     */
+    int getWindowShift(unsigned revo9count) const {return m_windowShifts[revo9count % 6];}
+
+    /**
      * Returns the offset of a photon peak within the readout window region.
      * @return the offset [RF clocks]
      */
@@ -107,6 +120,7 @@ namespace Belle2 {
     int m_lookbackWindows = 0;  /**< number of lookback windows */
     int m_readoutWindows = 0;   /**< number of readout windows */
     int m_extraWindows = 0;     /**< number of extra windows */
+    int m_windowShifts[6] = {0}; /**< window shifts as a function of revo9count%6 */
     int m_offset = 0; /**< position of photon peak within readout region [RF clocks] */
 
     ClassDef(TOPFrontEndSetting, 1); /**< ClassDef */

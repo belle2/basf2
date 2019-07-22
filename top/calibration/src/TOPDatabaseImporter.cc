@@ -1266,6 +1266,10 @@ namespace Belle2 {
     feSetting->setExtraWindows(extraWin);
     feSetting->setOffset(offset);
 
+    // window shifts
+    std::vector<int> shifts = {0, 0, 1, 1, 1, 2};
+    feSetting->setWindowShifts(shifts);
+
     IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
     feSetting.import(iov);
 

@@ -72,15 +72,18 @@ namespace Belle2 {
   private:
 
     /**
-     * A pair of value and error
+     * Utility structure for time offset
      */
-    struct ValueWithError {
+    struct TimeOffset {
       double value = 0; /**< value */
-      double error = 0; /**< error */
+      double error = 0; /**< error squared */
+      int windowShift = 0; /**< number of shifted windows */
+      double timeShift = 0; /**< shift expressed in time */
       /**
        * Full constructor
        */
-      ValueWithError(double v, double e): value(v), error(e)
+      TimeOffset(double v, double e, int n, double t):
+        value(v), error(e), windowShift(n), timeShift(t)
       {}
     };
 
@@ -91,7 +94,7 @@ namespace Belle2 {
      * @param pixelID pixel ID
      * @return time offset and its error squared
      */
-    ValueWithError getTimeOffset(double trgOffset, int moduleID, int pixelID);
+    TimeOffset getTimeOffset(double trgOffset, int moduleID, int pixelID);
 
     /**
      * Generates and returns pulse height

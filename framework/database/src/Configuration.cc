@@ -302,7 +302,7 @@ But for most users the only thing they should need to care about is to set the
 list of additional `globaltags` to use.
 )DOC")
     .add_property("override_enabled", &Configuration::overrideEnabled, R"DOC(
-Indicator whether or not the override of globaltags is enabled. I true then
+Indicator whether or not the override of globaltags is enabled. If true then
 globaltags present in input files  will be ignored and only the ones given in
 `globaltags` will be considered.
 )DOC")
@@ -514,7 +514,7 @@ with three keyword arguments:
 From this information the callback function should then compose the final list
 of globaltags to be used for processing and return this list. If ``None`` is
 returned the default behavior is applied as if there were no callback function.
-If anything else is returned globaltags is returned the processing is aborted.
+If anything else is returned the processing is aborted.
 
 If no callback function is specified the default behavior is equivalent to ::
 

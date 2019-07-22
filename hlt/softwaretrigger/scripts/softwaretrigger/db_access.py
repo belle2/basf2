@@ -145,3 +145,7 @@ def get_all_cuts():
                 "Cut Prescaling": cut.getPreScaleFactor(),
                 "Reject Cut": cut.isRejectCut()
             }
+
+
+if __name__ == "__main__":
+    print("This tool is now replaced by 'b2hlt_triggers print'.")

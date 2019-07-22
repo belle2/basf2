@@ -9,3 +9,9 @@ Variables
 * Statistically correct combination of p-values :b2:var:`pValueCombination`
 
 * chi2 and ndf from KFit vertices stored as extraInfo
+Modules
++++++++
+
+* Added the new module AllParticleCombiner which is also available via the
+  function `modularAnalysis.combineAllParticles`. It creates a new Particle as
+  the combination of all unique Particles from the passed input ParticleLists.

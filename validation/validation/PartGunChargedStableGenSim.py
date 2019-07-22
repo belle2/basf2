@@ -36,11 +36,11 @@ basf2.set_random_seed("P1s@Merd@")
 pGun = basf2.register_module("ParticleGun")
 param_pGun = {
     "pdgCodes": chargedStableList,
-    "nTracks": 0,  # 0 : generate 1 track per pdgId per event.
+    "nTracks": 8,  # 0 : generate 1 track per pdgId per event.
     "momentumGeneration": "uniform",
     "momentumParams": [0.05, 5.0],
     "thetaGeneration": "uniform",
-    "thetaParams": [17., 150.],
+    "thetaParams": [0, 180],
     "phiGeneration": "uniform",
     "phiParams": [0, 360],
     "vertexGeneration": "uniform",
@@ -50,11 +50,6 @@ param_pGun = {
 }
 pGun.param(param_pGun)
 main.add_module(pGun)
-
-# Load parameters.
-main.add_module("Gearbox")
-# Create geometry.
-main.add_module("Geometry")
 
 # Detector simulation + bkg.
 add_simulation(main, bkgfiles=get_background_files())

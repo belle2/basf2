@@ -4,9 +4,7 @@
 """
 
 Skim list building functions for EWP inclusive skims:
-B->Xll (LFV) , B->Xll (no LFV), and B->Xgamma
-
-Note: B->Xll was split into two (LFV and non-LFV modes) in order to reduce the retention rate
+B->Xgamma, B->Xll, B->Xll (LFV modes)
 
 """
 
@@ -44,16 +42,14 @@ def B2XgammaList(path):
     # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
     cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
 
-    # reconstruction of B0(anti-B0) and B+(B-)
-    reconstructDecay('B0:ewp -> gamma:ewp', '', path=path)
     reconstructDecay('B+:ewp -> gamma:ewp', '', path=path)
 
-    BtoXgammaList = ['B0:ewp', 'B+:ewp']
+    BtoXgammaList = ['B+:ewp']
 
     return BtoXgammaList
 
 
-def B2XllListNoLFV(path):
+def B2XllList(path):
     # Build the skim list for B -> X ll decays (no LFV modes, inclusive)
 
     # Create lists for buildEventShape (basically all tracks and clusters)
@@ -84,33 +80,19 @@ def B2XllListNoLFV(path):
     # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
     E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
 
-    # B0 reconstruction:
-    # oppositely charged leptons
-    reconstructDecay('B0:ch1 -> e+:ewp e-:ewp', E_dilep_cut, dmID=1, path=path)
-    reconstructDecay('B0:ch2 -> mu+:ewp mu-:ewp', E_dilep_cut, dmID=2, path=path)
-    # same charge leptons
-    reconstructDecay('B0:ch3 -> e+:ewp e+:ewp', E_dilep_cut, dmID=3, path=path)
-    reconstructDecay('B0:ch4 -> e-:ewp e-:ewp', E_dilep_cut, dmID=4, path=path)
-    reconstructDecay('B0:ch5 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=5, path=path)
-    reconstructDecay('B0:ch6 -> mu-:ewp mu-:ewp', E_dilep_cut, dmID=6, path=path)
-
-    copyLists('B0:ewp', ['B0:ch1', 'B0:ch2', 'B0:ch3', 'B0:ch4', 'B0:ch5', 'B0:ch6'], path=path)
-
     # B+ reconstruction:
     # oppositely charged leptons
     reconstructDecay('B+:ch1 -> e+:ewp e-:ewp', E_dilep_cut, dmID=1, path=path)
     reconstructDecay('B+:ch2 -> mu+:ewp mu-:ewp', E_dilep_cut, dmID=2, path=path)
     # same charge leptons
     reconstructDecay('B+:ch3 -> e+:ewp e+:ewp', E_dilep_cut, dmID=3, path=path)
-    reconstructDecay('B+:ch4 -> e-:ewp e-:ewp', E_dilep_cut, dmID=4, path=path)
-    reconstructDecay('B+:ch5 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=5, path=path)
-    reconstructDecay('B+:ch6 -> mu-:ewp mu-:ewp', E_dilep_cut, dmID=6, path=path)
+    reconstructDecay('B+:ch4 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=4, path=path)
 
-    copyLists('B+:ewp', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4', 'B+:ch5', 'B+:ch6'], path=path)
+    copyLists('B+:ewp', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
 
-    BtoXllListNoLFV = ['B0:ewp', 'B+:ewp']
+    BptoXllList = ['B+:ewp']
 
-    return BtoXllListNoLFV
+    return BptoXllList
 
 
 def B2XllListLFV(path):
@@ -144,26 +126,15 @@ def B2XllListLFV(path):
     # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
     E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
 
-    # B0 reconstruction:
-    # oppositely charged leptons
-    reconstructDecay('B0:ch1 -> e+:ewp mu-:ewp', E_dilep_cut, dmID=1, path=path)
-    reconstructDecay('B0:ch2 -> mu+:ewp e-:ewp', E_dilep_cut, dmID=2, path=path)
-    # same charge leptons
-    reconstructDecay('B0:ch3 -> e+:ewp mu+:ewp', E_dilep_cut, dmID=3, path=path)
-    reconstructDecay('B0:ch4 -> e-:ewp mu-:ewp', E_dilep_cut, dmID=4, path=path)
-
-    copyLists('B0:ewp', ['B0:ch1', 'B0:ch2', 'B0:ch3', 'B0:ch4'], path=path)
-
     # B+ reconstruction:
     # oppositely charged leptons
     reconstructDecay('B+:ch1 -> e+:ewp mu-:ewp', E_dilep_cut, dmID=1, path=path)
     reconstructDecay('B+:ch2 -> mu+:ewp e-:ewp', E_dilep_cut, dmID=2, path=path)
     # same charge leptons
     reconstructDecay('B+:ch3 -> e+:ewp mu+:ewp', E_dilep_cut, dmID=3, path=path)
-    reconstructDecay('B+:ch4 -> e-:ewp mu-:ewp', E_dilep_cut, dmID=4, path=path)
 
-    copyLists('B+:ewp', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
+    copyLists('B+:ewp', ['B+:ch1', 'B+:ch2', 'B+:ch3'], path=path)
 
-    BtoXllListLFV = ['B0:ewp', 'B+:ewp']
+    BtoXllListLFV = ['B+:ewp']
 
     return BtoXllListLFV

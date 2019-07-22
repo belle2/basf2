@@ -5,7 +5,7 @@
 #
 # EWP standalone skim steering
 #
-# B->Xgamma inclusive skim
+# B->Xll (LFV modes only) inclusive skim
 #
 # Trevor Shillington July 2019
 #
@@ -14,7 +14,7 @@
 from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
-from stdCharged import stdPi
+from stdCharged import stdE, stdMu, stdPi
 from skimExpertFunctions import setSkimLogging, encodeSkimName, get_test_file
 import argparse
 
@@ -30,22 +30,23 @@ if args.data:
 
 # basic setup
 gb2_setuprel = 'release-03-02-02'
-skimCode = encodeSkimName('BtoXgamma')
+skimCode = encodeSkimName('BtoXll_LFV')
 
 path = Path()
 fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=path)
 
 # import standard lists
-stdPhotons('loose', path=path)
-stdPhotons('all', path=path)
+stdE('loose', path=path)
+stdMu('loose', path=path)
 stdPi('all', path=path)
+stdPhotons('all', path=path)
 
-# call reconstructed lists from scripts/skim/ewp_incl.py
-from skim.ewp import B2XgammaList
-XgammaList = B2XgammaList(path=path)
-skimOutputUdst(skimCode, XgammaList, path=path)
-summaryOfLists(XgammaList, path=path)
+# call reconstructed lists from scripts/skim/ewp.py
+from skim.ewp import B2XllListLFV
+XllList = B2XllListLFV(path=path)
+skimOutputUdst(skimCode, XllList, path=path)
+summaryOfLists(XllList, path=path)
 
 # process
 setSkimLogging(path=path)

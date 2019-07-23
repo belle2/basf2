@@ -1,4 +1,4 @@
-[INFO] Steering file: analysis/tests/particleloader.py
+[INFO] Steering file: analysis/tests/particleloader_clone.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:

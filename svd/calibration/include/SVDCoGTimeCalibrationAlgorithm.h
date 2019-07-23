@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
 
     /// Constructor set the prefix to SVDCoGTimeCalibrationCollector
-    SVDCoGTimeCalibrationAlgorithm();
+    SVDCoGTimeCalibrationAlgorithm(std::string str);
 
     /// Destructor
     virtual ~SVDCoGTimeCalibrationAlgorithm() {}
@@ -32,6 +32,7 @@ namespace Belle2 {
 
   private:
 
+    std::string m_id;
 
   };
 } // namespace Belle2

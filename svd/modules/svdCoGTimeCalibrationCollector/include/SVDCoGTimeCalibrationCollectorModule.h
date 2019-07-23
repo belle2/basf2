@@ -102,6 +102,8 @@ namespace Belle2 {
     int m_ladder = 0;
     int m_sensor = 0;
     int m_side = 0;
+
+    TH1F* m_hEventT0 = NULL;
   };
 
 } // end namespace Belle2

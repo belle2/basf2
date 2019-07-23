@@ -47,6 +47,7 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);
 
   //auto hEventT0vsCoG_test = new TH2F(" ", " ", 300, -150, 150, 300, -150, 150);
+  m_hEventT0 = new TH1F("hEventT0", "EventT0", 200, -100, 100);
 
   m_histogramTree = new TTree("tree", "tree");
   m_svdCls.isRequired(m_svdClusters);
@@ -60,6 +61,7 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   m_histogramTree->Branch("view", &m_side, "view/I");
   registerObject<TTree>("HTreeCoGTimeCalib", m_histogramTree);
   //registerObject<TH2F>("histogram", hEventT0vsCoG_test);
+  registerObject<TH1F>("histogram", m_hEventT0);
 }
 
 void SVDCoGTimeCalibrationCollectorModule::startRun()
@@ -79,6 +81,7 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
       }
     }
   }
+  m_hEventT0->Reset();
 }
 
 
@@ -121,6 +124,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
       float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
       float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
       m_hEventT0vsCoG->fill(theVxdID, side, clTime, eventT0Sync);
+      getObjectPtr<TH1F>("histogram")->Fill(eventT0Sync);
     }
   };
 }

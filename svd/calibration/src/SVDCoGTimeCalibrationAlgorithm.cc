@@ -22,16 +22,18 @@
 using namespace std;
 using namespace Belle2;
 
-SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm() : CalibrationAlgorithm("SVDCoGTimeCalibrationCollector")
+SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm(std::string str) :
+  CalibrationAlgorithm("SVDCoGTimeCalibrationCollector")
 {
   setDescription("SVDCoGTimeCalibration calibration algorithm");
+  m_id = str;
 }
 
 CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
-  auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, "SVDCoGTimeCalibrationCAF");
+  auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, m_id);
 
   TF1* pol = new TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150);
   pol->SetParameters(-50, 1.5, 0.001, 0.00001);
@@ -42,6 +44,8 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   TFile* f = new TFile("profileOutput.root", "RECREATE");
 
   auto tree = getObjectPtr<TTree>("HTreeCoGTimeCalib");
+  auto h = getObjectPtr<TH1F>("histogram");
+  float meanT0 = h->GetMean();
 
   if (!tree) {
     B2WARNING("No tree object.");
@@ -69,11 +73,12 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
     double par[4];
     pol->GetParameters(par);
     timeCal->set_current(1);
-    timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
+    timeCal->set_pol3parameters(par[0] - meanT0, par[1], par[2], par[3]);
 
     payload->set(layer, ladder, sensor, bool(side), 1, *timeCal);
     f->cd();
     pfx->Write();
+    h->Write();
     hEventT0vsCoG->Clear();
   }
   f->Close();

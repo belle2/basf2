@@ -63,7 +63,7 @@ def SVDCoGTimeCalibration(files, tags):
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
     collector.param("SVDRecoDigitsFromTracksName", "SVDRecoDigitsFromTracks")
-    algorithm = SVDCoGTimeCalibrationAlgorithm()
+    algorithm = SVDCoGTimeCalibrationAlgorithm("SVDCoGTimeCAF")
 
     calibration = Calibration('SVDCoGTime',
                               collector=collector,

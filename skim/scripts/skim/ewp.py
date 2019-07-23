@@ -90,8 +90,23 @@ def B2XgammaList(path):
     """Build the skim list for B --> X(s,d) gamma decays"""
 
     # event level cuts: R2 and require a minimum number of tracks + decent photons
+    fillParticleList(decayString='pi+:all', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:all', cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
     applyEventCuts(
-        'R2EventLevel < 0.7 and ' +
+        'foxWolframR2 < 0.7 and ' +
         'formula(nTracks + nParticlesInList(gamma:loose) / 2) > 4', path=path)
     #
     # cuts in addition to the standard particle lists
@@ -148,7 +163,22 @@ def B2XllList(path):
     """Build the skim list for B --> X(s,d) l+ l- decays"""
 
     # event level cuts: R2 and require a minimum number of tracks
-    applyEventCuts('R2EventLevel < 0.7 and nTracks > 4', path=path)
+    fillParticleList(decayString='pi+:all', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:all', cut='E > 0.1', path=path)
+
+    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+                    allMoments=False,
+                    foxWolfram=True,
+                    harmonicMoments=False,
+                    cleoCones=False,
+                    thrust=False,
+                    collisionAxis=False,
+                    jets=False,
+                    sphericity=False,
+                    checkForDuplicates=False,
+                    path=path)
+
+    applyEventCuts('foxWolframR2 < 0.7 and nTracks > 4', path=path)
 
     # cuts in addition to the standard particle lists
     # should be revised for each new SPL release

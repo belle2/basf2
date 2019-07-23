@@ -95,14 +95,33 @@ namespace Belle2::Conditions {
     boost::python::tuple getDefaultGlobalTagsPy() const;
 
     /** To be called by input modules with the tags to be added from input
-     * files, could be an empty string if the files are not compatible.
-     * In this case the user needs to supply all tags and use the override flag
+     * files.
+     *
+     * This method is to be called by input modules which know the list of
+     * globaltags to be used but cannot provide FileMetaData instances for these
+     * input files.
+     *
+     * In case an empty list is put in this means global tag replay is not
+     * possible for these input files and the user will need to manually supply
+     * all tags and use the override flag to disable any attempt at tag replay.
+     *
+     * \sa setInputMetadata()
      */
-    void setInputGlobalTags(const std::string& inputTags, const std::vector<FileMetaData>& inputMetadata)
+    void setInputGlobaltags(const std::vector<std::string>& inputTags)
     {
-      m_inputGlobalTags = inputTags;
-      m_inputMetadata = inputMetadata;
+      m_inputGlobaltags = inputTags;
     }
+
+    /** To be called by input modules wit hthe list of all input FileMetaData
+     *
+     * This method is to be called by input modules which have a full list of
+     * FileMetaData instances for all input files. It will then check if all
+     * instances have a compatible globaltag setting and call `setInputGlobalTags`
+     * accordingly.
+     *
+     * \sa setInputGlobaltags()
+     */
+    void setInputMetadata(const std::vector<FileMetaData>& inputMetadata);
 
     /** Get the base globaltags to be used in addition to user globaltags.
      *
@@ -277,8 +296,9 @@ namespace Belle2::Conditions {
     }
     /** is the globaltag override enabled? */
     bool m_overrideEnabled{false};
-    /** the string containing the globaltags from all the input files */
-    std::optional<std::string> m_inputGlobalTags;
+    /** the list of globaltags from all the input files to be used in addition
+     * to the user globaltags */
+    std::optional<std::vector<std::string>> m_inputGlobaltags;
     /** the file metadata of all input files if globaltag replay is requested by input module */
     std::vector<FileMetaData> m_inputMetadata;
     /** the list with all user globaltags */

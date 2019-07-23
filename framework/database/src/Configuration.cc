@@ -137,14 +137,41 @@ namespace Belle2::Conditions {
     return py::tuple(list);
   }
 
+  void Configuration::setInputMetadata(const std::vector<FileMetaData>& inputMetadata)
+  {
+    m_inputMetadata = inputMetadata;
+    // make sure the list of globaltags to be used is created but empty
+    m_inputGlobaltags.emplace();
+    // now check for compatibility: make sure all metadata have the same globaltag
+    // setting
+    std::optional<std::string> inputGlobaltags;
+    for (const auto& metadata : inputMetadata) {
+      if (!inputGlobaltags) {
+        inputGlobaltags = metadata.getDatabaseGlobalTag();
+      } else {
+        if (inputGlobaltags != metadata.getDatabaseGlobalTag()) {
+          B2WARNING("Input files metadata contain incompatible globaltag settings, globaltag replay not possible");
+          // no need to set anything
+          inputGlobaltags.reset();
+          return;
+        }
+      }
+    }
+    // if it's still set and empty we have an empty input list ... warn specifically.
+    if (inputGlobaltags and inputGlobaltags->empty()) {
+      B2WARNING("Input files metadata all have empty globaltag setting, globaltag replay not possible");
+      return;
+    }
+    // set the list of globaltags from the
+    boost::split(*m_inputGlobaltags, *inputGlobaltags, boost::is_any_of(","));
+  }
+
   std::vector<std::string> Configuration::getBaseTags() const
   {
     // return the list of base tags to be used: Either the default tag
-    // or the list of globaltags from the input files (which we have to split)
-    if (not m_inputGlobalTags) return getDefaultGlobalTags();
-    std::vector<std::string> result;
-    boost::split(result, *m_inputGlobalTags, boost::is_any_of(","));
-    return result;
+    // or the list of globaltags from the input files
+    if (not m_inputGlobaltags) return getDefaultGlobalTags();
+    return *m_inputGlobaltags;
   }
 
   std::vector<std::string> Configuration::getFinalListOfTags()
@@ -183,7 +210,7 @@ namespace Belle2::Conditions {
     }
     // Default tag replay ... bail if list of globaltags is empty
     if (baseList.empty()) {
-      if (m_inputGlobalTags) {
+      if (m_inputGlobaltags) {
         B2FATAL(R"(No baseline globaltags available.
     The input files you selected don't have compatible globaltags or an empty
     globaltag setting. As such globaltag configuration cannot be determined
@@ -538,7 +565,9 @@ with three keyword arguments:
     The globaltags provided by the user
 
 ``metadata``
-    The ``FileMetaData`` instances from all input files
+    The ``FileMetaData`` instances from all input files. This list can be empty
+    if there is no metadata associated with the input files or if there were no
+    input files at all.
 
 From this information the callback function should then compose the final list
 of globaltags to be used for processing and return this list. If ``None`` is

@@ -36,10 +36,8 @@ create_validation_histograms(
         ('nDaug', 6, 0.0, 6, 'Number of daughters of Btag', myEmail, '', ''),
         ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, 'cosThetaBY', myEmail, '', ''),
         ('d0_massDiff', 100, 0.0, 0.5, 'Mass difference of D* and D', myEmail, '', ''),
-        ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', myEmail, '', ''),
-        ('deltaE', 100, -0.2, 0.2, 'deltaE', myEmail, '', '')],
-    variables_2d=[('deltaE', 100, -0.2, 0.2, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', myEmail, '', ''),
-                  ('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
+        ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', myEmail, '', '')],
+    variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                    'Signal probability for each decay mode ID', myEmail, '', '')],
     path=path)
 

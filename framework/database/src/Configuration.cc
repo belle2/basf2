@@ -20,7 +20,7 @@
 #include <TPython.h>
 #include <TClass.h>
 
-// Current default global tag when generating events.
+// Current default globaltag when generating events.
 #define CURRENT_DEFAULT_TAG "master_2019-07-15"
 
 namespace py = boost::python;
@@ -42,7 +42,7 @@ namespace {
     return py::object(py::handle<>(obj));
   }
   /** extract a list of strings from any iterable python object
-   * This function is much more lenient thant what we usually do: It will use `str()`
+   * This function is much more lenient than what we usually do: It will use `str()`
    * on each object in the list and use the string representation. So it should
    * work with basically any python object.
    */
@@ -85,16 +85,16 @@ namespace Belle2::Conditions {
   void CppOrPyList::append(const std::string& element)
   {
     std::visit(Utils::VisitOverload{
-      [&element](std::vector<std::string>& list) -> void {list.emplace_back(element);},
-      [&element](boost::python::list & list) -> void {list.append(element);}
+      [&element](std::vector<std::string>& list) {list.emplace_back(element);},
+      [&element](boost::python::list & list) {list.append(element);}
     }, m_value);
   }
 
   void CppOrPyList::prepend(const std::string& element)
   {
     std::visit(Utils::VisitOverload{
-      [&element](std::vector<std::string>& list) -> void  {list.emplace(list.begin(), element);},
-      [&element](boost::python::list & list) -> void  {list.insert(0, element);}
+      [&element](std::vector<std::string>& list) {list.emplace(list.begin(), element);},
+      [&element](boost::python::list & list) {list.insert(0, element);}
     }, m_value);
   }
 
@@ -124,7 +124,7 @@ namespace Belle2::Conditions {
 
   std::vector<std::string> Configuration::getDefaultGlobalTags() const
   {
-    // currently the default global tag can be overwritten by environment variable
+    // currently the default globaltag can be overwritten by environment variable
     // so keep that
     return EnvironmentVariables::getOrCreateList("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
   }
@@ -183,12 +183,30 @@ namespace Belle2::Conditions {
     }
     // Default tag replay ... bail if list of globaltags is empty
     if (baseList.empty()) {
-      B2FATAL(R"(No baseline globaltags available.
-      The input files you selected don't have compatible globaltags. As such global tag configuration cannot be determined automatically.
-      If you really sure that it is a good idea to process these files together you have to manually override the list of globaltags.
+      if (m_inputGlobalTags) {
+        B2FATAL(R"(No baseline globaltags available.
+    The input files you selected don't have compatible globaltags or an empty
+    globaltag setting. As such globaltag configuration cannot be determined
+    automatically.
 
-      basf2.conditions.override_globaltags()
-      )");
+    If you really sure that it is a good idea to process these files together
+    you have to manually override the list of globaltags:
+
+    >>> basf2.conditions.override_globaltags()
+)");
+      }else{
+        B2FATAL(R"(No default globaltags available.
+    There is no default globaltag available for processing. This usually means
+    you set the environment variable BELLE2_CONDB_GLOBALTAG to an empty value.
+
+    As this is unlikely to work for even the most basic funtionality this is not
+    directly supported anymore. If you really want to disable any access to the
+    conditions database please configure this explictly
+
+    >>> basf2.conditions.metadata_providers = []
+    >>> basf2.conditions.override_globaltags([])
+)");
+      }
     }
     // We have base tags and possibly user tags, so return both
     std::vector finalList = m_globalTags.ensureCpp();
@@ -246,8 +264,8 @@ namespace Belle2::Conditions {
       [&self](size_t timeout) { self.setDownloadLockTimeout(timeout);},
       [&self]() { return self.getDownloadLockTimeout();});
       checkValue("usable_globaltag_states",
-      [&self](const auto & states) { self.setValidTagStates(states); },
-      [&self]() { return self.getValidTagStates(); });
+      [&self](const auto & states) { self.setUsableTagStates(states); },
+      [&self]() { return self.getUsableTagStates(); });
       checkValue("connection_timeout",
       [&downloader](unsigned int timeout) {downloader.setConnectionTimeout(timeout);},
       [&downloader]() { return downloader.getConnectionTimeout();});
@@ -312,7 +330,7 @@ globaltags present in input files  will be ignored and only the ones given in
 Reset the conditions database configuration to its original state.
 )DOC")
     .add_property("default_globaltags", &Configuration::getDefaultGlobalTagsPy, R"DOC(
-A tuple containing the default global tag to be used if events are generated without an input file.
+A tuple containing the default globaltags to be used if events are generated without an input file.
 )DOC")
     .add_property("globaltags", &Configuration::getGlobalTagsPy, &Configuration::setGlobalTagsPy, R"DOC(
 List of globaltags to be used. These globaltags will be the ones with highest
@@ -324,7 +342,7 @@ the list will be checked first and all other globaltags will only be checked for
 payloads not found so far.
 
 Warning:
-    By default this list contains the global tags to be used **in addition** to
+    By default this list contains the globaltags to be used **in addition** to
     the ones from the input file or the default one if no input file is present.
     If this is not desirable you need to call `override_globaltags()` to disable
     any addition or modification of this list.
@@ -344,7 +362,7 @@ the highest priority of all tags in the list.
     .def("override_globaltags", overrideGTFlag)
     .def("override_globaltags", overrideGTList, py::args("globaltags"), R"DOC(override_globaltags(list=None)
 
-Enable global tag override. This disables all modification of the globaltag list at the beginning of processing:
+Enable globaltag override. This disables all modification of the globaltag list at the beginning of processing:
 
 * the default globaltag or the input file globaltags will be ignored.
 * any callback set with `set_globaltag_callback` will be ignored.
@@ -392,9 +410,9 @@ List of text files to look for local testing payloads. Each entry should be a
 text file containing local payloads and their intervals of validity to be used
 for testing.
 
-If present these local payloads will have a higher priority than any of the
-`globaltags`. If payloads are present in multiple files the first one in the
-list will have higher priority.
+Payloads found in these files and valid for the current run will have a higher
+priority than any of the `globaltags`. If a valid payload is present in multiple
+files the first one in the list will have higher priority.
 
 Warning:
     This functionality is strictly for testing purposes. Using local payloads
@@ -439,8 +457,8 @@ hashed
 
 Example:
   Given ``payload_locations = ["payload_dir/", "http://server.com/payloads"]``
-  the framework we would look for a payload of name `BeamParameters` in revision
-  `45` (and checksum ``a34ce5...``) int the following places
+  the framework would look for a payload of name `BeamParameters` in revision
+  `45` (and checksum ``a34ce5...``) in the following places
 
 
   1. ``payload_dir/a3/BeamParameters_r45.root``
@@ -488,7 +506,7 @@ Parameters:
       concurrently downloading the same payload between different processes.
       If locking fails the payload will be downloaded to a temporary file
       separately for each process.
-  usable_globaltag_states (set(str)): Names of global tag states accepted for
+  usable_globaltag_states (set(str)): Names of globaltag states accepted for
       processing. This can be changed to make sure that only fully published
       globaltags are used or to enable running on an open tag. It is not possible
       to allow usage of 'INVALID' tags, those will always be recjeted.
@@ -513,11 +531,11 @@ processing. It will be called after the input files have been opened and checked
 with three keyword arguments:
 
 ``base_tags``
-    The global tags determined from either the input files or, if no input files
+    The globaltags determined from either the input files or, if no input files
     are present, the default globaltags
 
 ``user_tags``
-    The global tags provided by the user
+    The globaltags provided by the user
 
 ``metadata``
     The ``FileMetaData`` instances from all input files
@@ -536,6 +554,19 @@ If no callback function is specified the default behavior is equivalent to ::
       return user_tags + base_tags
 
 If `override_enabled` is ``True`` then the callback function will not be called.
+
+Warning:
+  If a callback is set it is responsible to select the correct list of globaltags
+  and also make sure that all files are compatible. No further checks will be
+  done by the framework but any list of globaltags which is returned will be used
+  exactly as it is.
+
+  If the list of ``base_tags`` is empty that usually means that the input files
+  had different globaltag settings but it is the responsibility of the callback
+  to then verify if the list of globaltags is usable or not.
+
+  If the callback function determines that no working set of globaltags can be
+  determined then it should abort processing using a FATAL error or an exception
 )DOC")
     ;
 

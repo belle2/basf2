@@ -89,9 +89,9 @@ namespace Belle2::Conditions {
     /** Get the list of user globaltags as python version */
     boost::python::list getGlobalTagsPy() { return m_globalTags.ensurePy(); }
 
-    /** Get the std::vector of default global tags */
+    /** Get the std::vector of default globaltags */
     std::vector<std::string> getDefaultGlobalTags() const;
-    /** Get the tuple of default global tags as python version */
+    /** Get the tuple of default globaltags as python version */
     boost::python::tuple getDefaultGlobalTagsPy() const;
 
     /** To be called by input modules with the tags to be added from input
@@ -124,7 +124,7 @@ namespace Belle2::Conditions {
     /** Check if override is enabled by previous calls to overrideGlobalTags() */
     bool overrideEnabled() const { return m_overrideEnabled; }
 
-    /** Get the final list of global tags to be used for processing.
+    /** Get the final list of globaltags to be used for processing.
      *
      * - if overrideEnabled() is false then processing will use getGlobalTags()
      *   and getBaseTags() (in this order) as the list of globaltags to be used
@@ -150,7 +150,7 @@ namespace Belle2::Conditions {
      * should be a filename of a textfile containing payload information. All
      * payload files need to be in the same directory as the text file.
      *
-     * Entries are highes priority first: Payloads found by earlier entries will
+     * Entries are highest priority first: Payloads found by earlier entries will
      * take precedence over later entries. Payloads found in these text files.
      * take precedence over payloads from globaltags.
      *
@@ -177,7 +177,7 @@ namespace Belle2::Conditions {
     /** @name Configure Metadata providers
      *
      * These members are used to configure metadata providers: Where to look for
-     * payload information given the list of global tags.
+     * payload information given the list of globaltags.
      *
      * - Each entry in the list should be an URI or filename to a central REST
      *   server or a sqlite file containing a previously downloaded dump.
@@ -230,6 +230,9 @@ namespace Belle2::Conditions {
      *
      * These members are for changing some expert settings which should not be
      * necessary for most users.
+     *
+     * These functions are exported to python using one `exper_settings()` function
+     * so no separate signatures for python are necessary.
      */
     ///@{
 
@@ -250,11 +253,11 @@ namespace Belle2::Conditions {
     /** Get the timout we try to lock a file in the download cache directory for downloading */
     size_t getDownloadLockTimeout() const { return m_downloadLockTimeout; }
 
-    /** Set the set of valid global tag states to be allowed for processing.
+    /** Set the set of usable globaltag states to be allowed for processing.
      * The state INVALID will always be ignored and not permitted */
-    void setValidTagStates(const std::set<std::string>& states) { m_validTagStates = states; }
-    /** Get the set of valid global tag states allowed to be used for processing */
-    const std::set<std::string>& getValidTagStates() const { return m_validTagStates; }
+    void setUsableTagStates(const std::set<std::string>& states) { m_usableTagStates = states; }
+    /** Get the set of usable globaltag states allowed to be used for processing */
+    const std::set<std::string>& getUsableTagStates() const { return m_usableTagStates; }
 
     /** Set a callback function from python which will be called when processing starts
      * and should return the final list of globaltags to be used. See the python documentation
@@ -293,7 +296,7 @@ namespace Belle2::Conditions {
     /** the timeout when trying to lock files in the download directory */
     size_t m_downloadLockTimeout{120};
     /** the tag states accepted for processing */
-    std::set<std::string> m_validTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING"};
+    std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING"};
     /** the callback function to determine the final final list of globaltags */
     std::optional<boost::python::object> m_callback;
   };

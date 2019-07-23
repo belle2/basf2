@@ -10,6 +10,8 @@
  **************************************************************************/
 #include <svd/modules/svdCoGTimeCalibrationCollector/SVDCoGTimeCalibrationCollectorModule.h>
 
+#include <TH2F.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -43,6 +45,8 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   hEventT0vsCoG.GetXaxis()->SetTitle("raw_cog (ns)");
   m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);
 
+  //auto hEventT0vsCoG_test = new TH2F(" ", " ", 300, -150, 150, 300, -150, 150);
+
   m_histogramTree = new TTree("tree", "tree");
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
@@ -53,6 +57,7 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   m_histogramTree->Branch("sensor", &m_sensor, "sensor/I");
   m_histogramTree->Branch("view", &m_side, "view/I");
   registerObject<TTree>("HTreeCoGTimeCalib", m_histogramTree);
+  //registerObject<TH2F>("histogram", hEventT0vsCoG_test);
 }
 
 void SVDCoGTimeCalibrationCollectorModule::startRun()
@@ -79,6 +84,8 @@ void SVDCoGTimeCalibrationCollectorModule::closeRun()
 {
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
+  //getObjectPtr<TH2F>("histogram")->Fill(1,1);
+
   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
     for (auto ladder : geoCache.getLadders(layer)) {
       for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
@@ -88,7 +95,7 @@ void SVDCoGTimeCalibrationCollectorModule::closeRun()
           m_ladder = ladder.getLadderNumber();
           m_sensor = sensor.getSensorNumber();
           m_side = view;
-          m_histogramTree->Fill();
+          getObjectPtr<TTree>("HTreeCoGTimeCalib")->Fill();
         }
       }
     }

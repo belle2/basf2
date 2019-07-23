@@ -19,8 +19,12 @@ import modularAnalysis as ana
 # import vertex as vx
 
 input_branches = [
+    'SVDShaperDigitsFromTracks',
+    'EventT0',
     'SVDShaperDigits'
 ]
+
+# set_log_level(LogLevel.WARNING)
 
 
 def SVDCoGTimeCalibration(files, tags):
@@ -28,20 +32,25 @@ def SVDCoGTimeCalibration(files, tags):
     # Set-up re-processing path
     path = create_path()
 
+    # logging.log_level = LogLevel.WARNING
+
     path.add_module('Progress')
     # Remove all non-raw data to run the full reco again
     path.add_module('RootInput', branchNames=input_branches)
 
-    fil = register_module('SVDShaperDigitsFromTracks')
-    fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
-    main.add_module(fil)
+    path.add_module("Gearbox")
+    path.add_module("Geometry", useDB=True)
+
+    # fil = register_module('SVDShaperDigitsFromTracks')
+    # fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
+    # main.add_module(fil)
 
     # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
     # with possibly changed global tags
     # raw.add_unpackers(path)
     reco.add_svd_reconstruction(path)
 
-    for moda in main.modules():
+    for moda in path.modules():
         if moda.name() == 'SVDCoGTimeEstimator':
             moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')

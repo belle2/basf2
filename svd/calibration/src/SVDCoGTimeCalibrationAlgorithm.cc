@@ -15,6 +15,8 @@
 #include <TF1.h>
 #include <TProfile.h>
 #include <TH2F.h>
+#include <framework/logging/Logger.h>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -27,16 +29,24 @@ SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm() : CalibrationAl
 CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
-  auto payload = Belle2::SVDCoGTimeCalibrations::t_payload();
+  auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload();
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
 
-  TF1* pol = new TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150, 4);
+  TF1* pol = new TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150);
   pol->SetParameters(-50, 1.2, 0.001, 0.0001);
 
   TH2F* hEventT0vsCoG = new TH2F("eventT0vsCoG", " ", 300, -150, 150, 300, -150, 150);
   TProfile* pfx = new TProfile("hprof", " ", 300, -150, 150);
 
-  auto tree = getObjectPtr<TTree>("tree");
+  cout << " PRIMA " << endl;
+  auto tree = getObjectPtr<TTree>("HTreeCoGTimeCalib");
+  cout << " DOPO " << endl;
+
+  if (!tree) {
+    B2WARNING("No tree object.");
+  } else if (!tree->GetEntries()) {
+    B2WARNING("No data in the tree.");
+  }
 
   int layer = 0;
   int ladder = 0;
@@ -55,13 +65,14 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
     pfx->Fit("pol", "0");
     double par[4];
     pol->GetParameters(par);
-    timeCal->set_bias(par[0], par[1], par[2], par[3]);
-    timeCal->set_scale(par[0], par[1], par[2], par[3]);
+    timeCal->set_current(1);
+    timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
 
-    payload.set(layer, ladder, sensor, bool(side), 1, *timeCal);
+    payload->set(layer, ladder, sensor, bool(side), 1, *timeCal);
+    hEventT0vsCoG->Clear();
   }
 
-  saveCalibration(&payload);
+  saveCalibration(payload);
 
   // probably not needed - would trigger re-doing the collection
   //if ( ... too large corrections ... ) return c_Iterate;

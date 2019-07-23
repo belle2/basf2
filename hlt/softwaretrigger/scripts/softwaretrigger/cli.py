@@ -222,6 +222,73 @@ def print_function(args):
         raise AttributeError(f"Do not understand format {args.format}")
 
 
+def iov_includes(iov_list, exp, run):
+    """
+    Comparison function between two IoVs (start, end) stored in the database and
+    the given exp/run combination.
+    """
+    # Dirty hack: replace -1 by infinity to make the comparison easier
+    copied_iov_list = iov_list[2:]
+    copied_iov_list = list(map(lambda x: x if x != -1 else float("inf"), copied_iov_list))
+
+    exp_start, run_start, exp_end, run_end = copied_iov_list
+
+    return (exp_start, run_start) <= (exp, run) <= (exp_end, run_end)
+
+
+def download_function(args):
+    """
+    Download the trigger cuts in the given database to disk and set their IoV to infinity.
+    """
+    if len(args.database._database) != 1:
+        raise AttributeError("Can only download from a single database! Please do not specify more than one.")
+
+    global_tag = args.database._database[0]
+
+    # The following is an adapted version of cli_download
+    os.makedirs(args.destination, exist_ok=True)
+
+    db = ConditionsDB()
+    req = db.request("GET", f"/globalTag/{encode_name(global_tag)}/globalTagPayloads",
+                     f"Downloading list of payloads for {global_tag} tag")
+
+    download_list = {}
+    for payload in req.json():
+        name = payload["payloadId"]["basf2Module"]["name"]
+        if not name.startswith("software_trigger_cut"):
+            continue
+
+        local_file, remote_file, checksum, iovlist = cli_download.check_payload(args.destination, payload)
+
+        new_iovlist = list(filter(lambda iov: iov_includes(iov, args.database._experiment, args.database._run), iovlist))
+        if not new_iovlist:
+            continue
+
+        if local_file in download_list:
+            download_list[local_file][-1] += iovlist
+        else:
+            download_list[local_file] = [local_file, remote_file, checksum, iovlist]
+
+    # do the downloading
+    full_iovlist = []
+    failed = 0
+    with ThreadPoolExecutor(max_workers=20) as pool:
+        for iovlist in pool.map(lambda x: cli_download.download_file(db, *x), download_list.values()):
+            if iovlist is None:
+                failed += 1
+                continue
+
+            full_iovlist += iovlist
+
+    dbfile = []
+    for iov in sorted(full_iovlist):
+        # Set the IoV intentionally to 0, 0, -1, -1
+        iov = [iov[0], iov[1], 0, 0, -1, -1]
+        dbfile.append("dbstore/{} {} {},{},{},{}\n".format(*iov))
+    with open(os.path.join(args.destination, "database.txt"), "w") as txtfile:
+        txtfile.writelines(dbfile)
+
+
 def main():
     """
     Main function to be called from b2hlt_triggers.
@@ -276,6 +343,10 @@ Examples:
 * Remove the cut "accept_bhabha" from the trigger menu "skim"
 
     %(prog)s remove_cut skim accept_bhabha
+
+* Download the latest state of the triggers into the folder "localdb", e.g. to be used for local studies
+
+    %(prog)s download
 
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -391,6 +462,34 @@ needed as only cuts specified in a trigger menu are used.
                                    help="Where to take the trigger menu from. Defaults to 'online,localdb:latest'.",
                                    type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
     remove_cut_parser.set_defaults(func=remove_cut_function)
+
+    # download command
+    download_parser = subparsers.add_parser("download", help="Download the trigger menu from the database.",
+                                            formatter_class=argparse.RawDescriptionHelpFormatter,
+                                            description="""
+Download all software trigger related payloads from the specified database
+into the folder localdb and create a localdb/database.txt. This is
+especially useful when doing local trigger studies which should use the
+latest version of the online triggers. By default, the latest
+version of the online GT will be downloaded.
+
+Attention: this script will override a database defined in the destination
+folder (default localdb)!
+Attention 2: all IoVs of the downloaded triggers will be set to 0, 0, -1, -1
+so you can use the payloads fro your local studies for whatever run you want.
+This should not (never!) be used to upload or edit new triggers and
+is purely a convenience function to synchronize your local studies
+with the online database!
+
+Please note that for this command you can only specify a single database
+(all others can work with multiple databases).
+                                              """)
+    download_parser.add_argument("--database",
+                                 help="Single database where to take the trigger menu from. Defaults to 'online:latest'.",
+                                 type=DownloadableDatabase, default=DownloadableDatabase("online:latest"))
+    download_parser.add_argument("--destination",
+                                 help="In which folder to store the output", default="localdb")
+    download_parser.set_defaults(func=download_function)
 
     args = parser.parse_args()
     args.func(args)

@@ -31,7 +31,8 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
   setDescription(" ");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDShaperDigits list", std::string("SVDClustersFromTracks"));
+  addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));
+  addParam("SVDRecoDigitsFromTracksName", m_svdRecoDigits, "Name of the SVDRecoDigits list", std::string("SVDRecoDigitsFromTracks"));
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", std::string("EventT0"));
   addParam("HistogramTree", m_tree, "Name of the tree in which the histograms are saved", std::string("tree"));
 }
@@ -50,6 +51,7 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   m_histogramTree = new TTree("tree", "tree");
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
+  m_svdRD.isRequired(m_svdRecoDigits);
 
   m_histogramTree->Branch("hist", "TH2F", &m_hist, 32000, 0);
   m_histogramTree->Branch("layer", &m_layer, "layer/I");
@@ -109,12 +111,16 @@ void SVDCoGTimeCalibrationCollectorModule::finish()
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {
   for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
+    SVDCluster* cluster = m_svdCls[cl];
+    RelationVector<SVDRecoDigit> reco_rel_cluster = cluster->getRelationsTo<SVDRecoDigit>(m_svdRecoDigits);
     float clTime = m_svdCls[cl]->getClsTime();
     int side = m_svdCls[cl]->isUCluster();
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdCls[cl]->getSensorID();
     if (m_eventT0->hasEventT0()) {
       float eventT0 = m_eventT0->getEventT0();
-      m_hEventT0vsCoG->fill(theVxdID, side, clTime, eventT0);
+      float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
+      float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
+      m_hEventT0vsCoG->fill(theVxdID, side, clTime, eventT0Sync);
     }
   };
 }

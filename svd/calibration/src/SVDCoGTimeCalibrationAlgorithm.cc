@@ -17,6 +17,7 @@
 #include <TH2F.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
+#include <TString.h>
 
 using namespace std;
 using namespace Belle2;
@@ -33,14 +34,14 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
 
   TF1* pol = new TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150);
-  pol->SetParameters(-50, 1.2, 0.001, 0.0001);
+  pol->SetParameters(-50, 1.5, 0.001, 0.00001);
 
-  TH2F* hEventT0vsCoG = new TH2F("eventT0vsCoG", " ", 300, -150, 150, 300, -150, 150);
-  TProfile* pfx = new TProfile("hprof", " ", 300, -150, 150);
+  TH2F* hEventT0vsCoG = new TH2F(" ", " ", 300, -150, 150, 300, -150, 150);
+  //TProfile* pfx = new TProfile("hprof", " ", 300, -150, 150);
 
-  cout << " PRIMA " << endl;
+  TFile* f = new TFile("profileOutput.root", "RECREATE");
+
   auto tree = getObjectPtr<TTree>("HTreeCoGTimeCalib");
-  cout << " DOPO " << endl;
 
   if (!tree) {
     B2WARNING("No tree object.");
@@ -61,7 +62,9 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 
   for (int i = 0; i < tree->GetEntries(); i++) {
     tree->GetEntry(i);
-    pfx = hEventT0vsCoG->ProfileX();
+    TProfile* pfx = hEventT0vsCoG->ProfileX();
+    std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
+    pfx->SetName(name.c_str());
     pfx->Fit("pol", "0");
     double par[4];
     pol->GetParameters(par);
@@ -69,9 +72,11 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
     timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
 
     payload->set(layer, ladder, sensor, bool(side), 1, *timeCal);
+    f->cd();
+    pfx->Write();
     hEventT0vsCoG->Clear();
   }
-
+  f->Close();
   saveCalibration(payload);
 
   // probably not needed - would trigger re-doing the collection

@@ -193,8 +193,11 @@ namespace Belle2::Conditions {
       }
       // and set the user tags from our list.
       arguments["user_tags"] = m_globalTags.ensurePy();
-      // and prepare list of metadata
-      {
+      // and prepare list of metadata. It's None when no replay has been
+      // requested which should mean that we generate events
+      arguments["metadata"] = py::object();
+      // otherwise it's a list of file metadata instances
+      if (m_inputGlobaltags) {
         py::list metaDataList;
         for (const auto& m : m_inputMetadata) metaDataList.append(createPyCopy(m));
         arguments["metadata"] = metaDataList;
@@ -565,9 +568,9 @@ with three keyword arguments:
     The globaltags provided by the user
 
 ``metadata``
-    The ``FileMetaData`` instances from all input files. This list can be empty
-    if there is no metadata associated with the input files or if there were no
-    input files at all.
+    If there are not input files (e.g. generating events) this argument is None.
+    Otherwise it is a list of all the ``FileMetaData`` instances from all input files.
+    This list can be empty if there is no metadata associated with the input files.
 
 From this information the callback function should then compose the final list
 of globaltags to be used for processing and return this list. If ``None`` is

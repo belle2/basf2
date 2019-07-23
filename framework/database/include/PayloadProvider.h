@@ -59,8 +59,9 @@ namespace Belle2::Conditions {
      *   where A and B are the first two characters of the md5 checksum of the
      *   payload file.
      *
-     * If cachedir is empty a default value of `$TMPDIR/basf2-conditions?digest`
-     * is assumed.
+     * If cachedir is empty a default value of `$TMPDIR/basf2-conditions`
+     * is assumed. Downloaded payloads will be placed in the cachedir using the
+     * hashed directory structure.
      */
     PayloadProvider(const std::vector<std::string>& locations, const std::string& cachedir = "", int timeout = 60);
 

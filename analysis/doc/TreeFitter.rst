@@ -38,7 +38,7 @@ Known Errors
 
 The error:
 
-.. code-block:: bash
+.. code-block::
   
   basf2: /home/{user}/belle2/releases/externals/v01-07-01/include/Eigen/src/Core/PlainObjectBase.h:285: void Eigen::PlainObjectBase<Derived>::resize(Eigen::Index, Eigen::Index) [with Derived = Eigen::Matrix<double, -1, -1, 0, 5, 100>; Eigen::Index = long int]: Assertion `(!(RowsAtCompileTime!=Dynamic) || (rows==RowsAtCompileTime)) && (!(ColsAtCompileTime!=Dynamic) || (cols==ColsAtCompileTime)) && (!(RowsAtCompileTime==Dynamic && MaxRowsAtCompileTime!=Dynamic) || (rows<=MaxRowsAtCompileTime)) && (!(ColsAtCompileTime==Dynamic && MaxColsAtCompileTime!=Dynamic) || (cols<=MaxColsAtCompileTime)) && rows>=0 && cols>=0 && "Invalid sizes when resizing a matrix or array."' failed.
 

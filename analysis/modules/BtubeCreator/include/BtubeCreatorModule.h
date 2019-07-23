@@ -59,8 +59,8 @@ namespace Belle2 {
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
-    StoreArray<Particle> particles;
-    StoreArray<Btube> tubeArray;
+    StoreArray<Particle> particles; /**< the particles */
+    StoreArray<Btube> tubeArray; /**< the (output) array of Btube objects */
 
     /**
      * Main steering routine

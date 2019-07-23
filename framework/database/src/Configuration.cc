@@ -322,7 +322,6 @@ namespace Belle2::Conditions {
 
   void Configuration::overrideGlobalTagsPy(const boost::python::list& globalTags)
   {
-    // if the given argument is not None we set the list of globaltags directly
     setGlobalTagsPy(globalTags);
     m_overrideEnabled = true;
   }
@@ -455,7 +454,7 @@ List of metadata providers to use when looking for payload metadata. There are c
 
 2. Local metadata provider to look for payloads in a local SQLite snapshot taken
    from the central server. This provider will be assumed for any entry in this
-   list not starting with a protocol specifier or if the protocol is given as `file://``
+   list not starting with a protocol specifier or if the protocol is given as ``file://``
 
 This list should rarely need to be changed. The only exception is for users who
 want to be able to use the software without internet connection after they
@@ -484,12 +483,12 @@ hashed
 
 Example:
   Given ``payload_locations = ["payload_dir/", "http://server.com/payloads"]``
-  the framework would look for a payload of name `BeamParameters` in revision
-  `45` (and checksum ``a34ce5...``) in the following places
+  the framework would look for a payload with name ``BeamParameters`` in revision
+  ``45`` (and checksum ``a34ce5...``) in the following places
 
 
   1. ``payload_dir/a3/BeamParameters_r45.root``
-  3. ``payload_dir/dbstore_BeamParameters_rev_45.root``
+  2. ``payload_dir/dbstore_BeamParameters_rev_45.root``
   3. ``http://server.com/payloads/dbstore/BeamParameters/dbstore_BeamParameters_rev_45.root``
      given the usual pattern of the ``payloadUrl`` metadata. But this could be
      changed on the central servers so mirrors should not depend on this convention
@@ -527,8 +526,9 @@ Parameters:
       files will be placed in the same directory as the file.
   download_cache_location (str): Where to store payloads which have been downloaded
       from the central server. This could be a user defined directory, otherwise
-      empty string defaults to `$TMPDIR/basf2-conditions` where `$TMPDIR` is the
-      temporary directories defined in the system.
+      empty string defaults to ``$TMPDIR/basf2-conditions`` where ``$TMPDIR`` is the
+      temporary directories defined in the system. Newly downloaded payloads will
+      be stored in this directory in a hashed structure, see `payload_providers`
   download_lock_timeout (int): How many seconds to wait for a write lock when
       concurrently downloading the same payload between different processes.
       If locking fails the payload will be downloaded to a temporary file

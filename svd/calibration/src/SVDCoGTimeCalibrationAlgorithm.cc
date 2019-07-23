@@ -30,8 +30,8 @@ SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm() : CalibrationAl
 CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
-  auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload();
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
+  auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, "SVDCoGTimeCalibrationCAF");
 
   TF1* pol = new TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150);
   pol->SetParameters(-50, 1.5, 0.001, 0.00001);
@@ -77,7 +77,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
     hEventT0vsCoG->Clear();
   }
   f->Close();
-  saveCalibration(payload);
+  saveCalibration(payload, "SVDCoGTimeCalibrations");
 
   // probably not needed - would trigger re-doing the collection
   //if ( ... too large corrections ... ) return c_Iterate;

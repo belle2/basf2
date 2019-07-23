@@ -12,6 +12,8 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <svd/geometry/SensorInfo.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
 using namespace std;
@@ -326,3 +328,33 @@ void SVDOnlineToOfflineMap::prepFADCmaps(FADCmap& map1, FADCmap& map2)
   }
 }
 
+void SVDOnlineToOfflineMap::prepareListOfMissingAPVs()
+{
+
+
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+
+  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
+    for (auto ladder : geoCache.getLadders(layer))
+      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
+        for (int view = 0; view < 2; view++) {
+
+          int nAPVs = 6;
+          if (layer != 3 && view == 0)
+            nAPVs = 4;
+          //loop on all APVs of the side
+          for (int apv = 0; apv < nAPVs; apv++) {
+            if (! isAPVinMap(sensor, view, apv * 128)) {
+              missingAPV tmp_missingAPV;
+              tmp_missingAPV.m_sensorID = sensor;
+              tmp_missingAPV.m_uSide = view;
+              tmp_missingAPV.m_halfStrip = apv * 128 + 63.5;
+
+              m_missingAPVs.push_back(tmp_missingAPV);
+            }
+
+          }
+
+        }
+
+}

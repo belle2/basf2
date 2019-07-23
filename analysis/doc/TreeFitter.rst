@@ -32,3 +32,14 @@ For example, a selection of :math:`0.130 < \texttt{InvM} < 0.14~\rm{GeV}/c^2` al
 
 
 .. autofunction:: vertex.vertexTree
+
+Known Errors
+------------
+
+The error:
+
+.. code-block:: bash
+  
+  basf2: /home/{user}/belle2/releases/externals/v01-07-01/include/Eigen/src/Core/PlainObjectBase.h:285: void Eigen::PlainObjectBase<Derived>::resize(Eigen::Index, Eigen::Index) [with Derived = Eigen::Matrix<double, -1, -1, 0, 5, 100>; Eigen::Index = long int]: Assertion `(!(RowsAtCompileTime!=Dynamic) || (rows==RowsAtCompileTime)) && (!(ColsAtCompileTime!=Dynamic) || (cols==ColsAtCompileTime)) && (!(RowsAtCompileTime==Dynamic && MaxRowsAtCompileTime!=Dynamic) || (rows<=MaxRowsAtCompileTime)) && (!(ColsAtCompileTime==Dynamic && MaxColsAtCompileTime!=Dynamic) || (cols<=MaxColsAtCompileTime)) && rows>=0 && cols>=0 && "Invalid sizes when resizing a matrix or array."' failed.
+
+is known to occur when vertex fitting MC particle lists created via ``fillParticleListFromMC``. MC particles do not need to and should not be vertexed. If you wish to study the vertex resolution please fit the reconstructed particles and compare the vertex variables with those of the truth matched MC values.   

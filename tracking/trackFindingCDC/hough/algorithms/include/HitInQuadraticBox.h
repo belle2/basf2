@@ -59,7 +59,11 @@ namespace Belle2 {
         }
       }
 
-      bool compareZDistances(const HoughBox& pqBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit) const
+      /**
+       * Compares distances from two hits to the track represented by the given box.
+       * The comparison is done based on reconstructed Z coordinates of hits and track Z position.
+       */
+      static bool compareDistances(const HoughBox& pqBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit)
       {
         const double pMean = (pqBox.getLowerP() + pqBox.getUpperP()) / 2.0;
         const double qMean = (pqBox.getLowerQ() + pqBox.getUpperQ()) / 2.0;

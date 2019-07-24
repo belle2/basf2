@@ -714,7 +714,9 @@ def rootobjects_from_file(root_file: str,
             # interested in
             continue
 
-        if root_object_type in ['TH1', 'TH2', 'TEfficiency']:
+        # Ensure that the data read from the ROOT files lives on even
+        # after the ROOT file is closed
+        if root_object.InheritsFrom("TH1"):
             root_object.SetDirectory(0)
 
         metadata = get_metadata(root_object)

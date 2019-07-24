@@ -659,20 +659,20 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
             # Read out meta information:
 
             # Now check if the data exists in the ROOT file and if so, read it
-            if root_object.FindObject('Description'):
-                description = root_object.FindObject('Description').GetTitle()
-            if root_object.FindObject('Check'):
-                check = root_object.FindObject('Check').GetTitle()
-            if root_object.FindObject('Contact'):
-                contact = root_object.FindObject('Contact').GetTitle()
+            if root_object.GetListOfFunctions().FindObject('Description'):
+                description = root_object.GetListOfFunctions().FindObject('Description').GetTitle()
+            if root_object.GetListOfFunctions().FindObject('Check'):
+                check = root_object.GetListOfFunctions().FindObject('Check').GetTitle()
+            if root_object.GetListOfFunctions().FindObject('Contact'):
+                contact = root_object.GetListOfFunctions().FindObject('Contact').GetTitle()
 
             # Now check for meta-options (colz, log-scale, etc.)
             metaoptions = []
-            if root_object.FindObject('MetaOptions'):
+            if root_object.GetListOfFunctions().FindObject('MetaOptions'):
                 # Get the title. If there is no title, set metaoptions to an
                 # empty list again. Otherwise parse the string of options into
                 # a list of options (split on comma, remove whitespaces).
-                metaoptions = root_object.FindObject('MetaOptions').GetTitle()
+                metaoptions = root_object.GetListOfFunctions().FindObject('MetaOptions').GetTitle()
                 if metaoptions is None:
                     metaoptions = []
                 else:

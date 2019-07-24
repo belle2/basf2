@@ -235,7 +235,7 @@ def get_argument_parser(modes=None):
     parser.add_argument(
         "-o",
         "--options",
-        help="One or more strings thatwill be passed to basf2 as arguments. "
+        help="One or more strings that will be passed to basf2 as arguments. "
              "Example: '-n 100'. Quotes are necessary!",
         type=str,
         nargs='+'

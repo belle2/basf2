@@ -57,7 +57,6 @@ SVDPackerModule::SVDPackerModule() : Module(),
   addParam("NodeID", m_nodeid, "Node ID", 0);
   addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
            "number to be added to the FADC trigger number to match the main trigger number", 0);
-  addParam("simulate3sampleData", m_simulate3sampleData, "Simulate 3-sample RAW Data", bool(false));
   addParam("binPrintout", m_binPrintout, "Print binary data created by the Packer", bool(false));
   // initialize event #
   n_basf2evt = 0;
@@ -77,7 +76,7 @@ void SVDPackerModule::initialize()
   m_rawSVD.registerInDataStore(m_rawSVDListName);
   m_svdShaperDigit.isRequired(m_svdShaperDigitListName);
   m_eventMetaDataPtr.isRequired();
-
+  m_svdEventInfoPtr.isRequired("SVDEventInfoSim");
 }
 
 
@@ -108,6 +107,23 @@ void SVDPackerModule::event()
     B2ERROR("Missing valid EventMetaData.");
     return;
   }
+
+  if (!m_svdEventInfoPtr.isValid()) {
+    B2ERROR("Missing valid SVDEventInfo.");
+    return;
+  }
+
+  // retrieve the information from SVDEventInfo to store it in the FADCHeaders for this event
+  SVDModeByte modeByte = m_svdEventInfoPtr->getModeByte();
+
+  uint8_t triggerBin = modeByte.getTriggerBin();
+  uint8_t runType = modeByte.getRunType();
+  uint8_t eventType = modeByte.getEventType();
+  uint8_t daqMode = modeByte.getDAQMode();
+
+  uint8_t xTalk = m_svdEventInfoPtr->isCrossTalkEvent();
+  uint8_t triggerType = (m_svdEventInfoPtr->getTriggerType()).getType();
+
 
   m_rawSVD.clear();
 
@@ -174,14 +190,8 @@ void SVDPackerModule::event()
 
   for (unsigned int iFADC = 0; iFADC < nFADCboards; iFADC++) {
 
-    bool sim3sample = false;
-
     //get original FADC number
     unsigned short FADCorg = FADCnumberMapRev[iFADC];
-
-    // if m_simulate3sampleData==true, 3-sample data will be simulated for FADCs: 168,144,48,24
-    if (m_simulate3sampleData and FADCorg % 24 == 0) sim3sample = true;
-
 
     //new RawSVD entry --> moved inside FADC loop
     RawSVD* raw_svd = m_rawSVD.appendNew();
@@ -203,16 +213,14 @@ void SVDPackerModule::event()
 
     // here goes FADC header
     m_MainHeader.trgNumber = ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF);
-    m_MainHeader.trgType = 0xf;
-    m_MainHeader.trgTiming = 0;
-    m_MainHeader.xTalk = 0;
+    m_MainHeader.trgType = triggerType;
+    m_MainHeader.trgTiming = triggerBin;
+    m_MainHeader.xTalk = xTalk;
     m_MainHeader.FADCnum = FADCorg; // write original FADC number
-    m_MainHeader.evtType = 0;
+    m_MainHeader.evtType = eventType;
+    m_MainHeader.DAQMode = daqMode;
 
-    m_MainHeader.DAQMode = 2;
-    if (sim3sample) m_MainHeader.DAQMode = 1;
-
-    m_MainHeader.runType = 0x2; //zero-suppressed mode
+    m_MainHeader.runType = runType; //zero-suppressed mode
     m_MainHeader.check = 6; // 110
 
     addData32(data32);
@@ -247,7 +255,7 @@ void SVDPackerModule::event()
           // here go DATA words
 
           //skip 1st data frame if simulate 3-sample data
-          if (not sim3sample) {
+          if (daqMode == 2) {
             m_data_A.sample1 = apv_data->data[0];
             m_data_A.sample2 = apv_data->data[1];
             m_data_A.sample3 = apv_data->data[2];

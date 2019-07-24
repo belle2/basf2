@@ -47,6 +47,8 @@ namespace Belle2 {
      */
     virtual void event() override;
 
+    std::string m_svdEventInfoName; /**< Name of the SVDEventInfo object */
+
   private:
     StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr; /**< Output object. */
 

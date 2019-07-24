@@ -649,7 +649,7 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
 
 void SVDDigitizerModule::saveDigits()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo("SVDEventInfoSim");
   SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);

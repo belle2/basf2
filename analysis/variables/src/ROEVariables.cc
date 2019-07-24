@@ -2054,29 +2054,29 @@ namespace Belle2 {
                       "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
     REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
-                      "Returns the invariant mass squared of the missing momentum (see possible options)");
+                      "Returns the invariant mass squared of the missing momentum");
 
     REGISTER_VARIABLE("recMissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"
                       "reco B is at rest and calculating the neutrino (missing) momentum from p_nu = pB - p_had - p_lep");
 
     REGISTER_VARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
-                      "Returns the polar angle of the missing momentum (see possible options)");
+                      "Returns the polar angle of the missing momentum");
 
     REGISTER_VARIABLE("weMissP(maskName, opt)", WE_MissP,
-                      "Returns the magnitude of the missing momentum (see possible options)");
+                      "Returns the magnitude of the missing momentum");
 
     REGISTER_VARIABLE("weMissPx(maskName, opt)", WE_MissPx,
-                      "Returns the x component of the missing momentum (see possible options)");
+                      "Returns the x component of the missing momentum");
 
     REGISTER_VARIABLE("weMissPy(maskName, opt)", WE_MissPy,
-                      "Returns the y component of the missing momentum (see possible options)");
+                      "Returns the y component of the missing momentum");
 
     REGISTER_VARIABLE("weMissPz(maskName, opt)", WE_MissPz,
-                      "Returns the z component of the missing momentum (see possible options)");
+                      "Returns the z component of the missing momentum");
 
     REGISTER_VARIABLE("weMissE(maskName, opt)", WE_MissE,
-                      "Returns the energy of the missing momentum (see possible options)");
+                      "Returns the energy of the missing momentum");
 
     REGISTER_VARIABLE("wexiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");

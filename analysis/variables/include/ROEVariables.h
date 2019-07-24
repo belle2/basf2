@@ -225,7 +225,7 @@ namespace Belle2 {
     Manager::FunctionPtr WE_Mbc(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the invariant mass squared of the missing momentum (see possible options).
+     * Returns the invariant mass squared of the missing momentum.
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
     Manager::FunctionPtr WE_MissM2(const std::vector<std::string>& arguments);
@@ -237,37 +237,37 @@ namespace Belle2 {
     double REC_MissM2(const Particle* particle);
 
     /**
-     * Returns the polar angle of the missing momentum (see possible options).
+     * Returns the polar angle of the missing momentum.
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
     Manager::FunctionPtr WE_MissPTheta(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the magnitude of the missing momentum (see possible options).
+     * Returns the magnitude of the missing momentum.
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
     Manager::FunctionPtr WE_MissP(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the x component of the missing momentum (see possible options).
+     * Returns the x component of the missing momentum.
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
     Manager::FunctionPtr WE_MissPx(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the y component of the missing momentum (see possible options).
+     * Returns the y component of the missing momentum.
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
     Manager::FunctionPtr WE_MissPy(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the z component of the missing momentum (see possible options).
+     * Returns the z component of the missing momentum.
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
     Manager::FunctionPtr WE_MissPz(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the energy of the missing momentum (see possible options).
+     * Returns the energy of the missing momentum.
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
     Manager::FunctionPtr WE_MissE(const std::vector<std::string>& arguments);

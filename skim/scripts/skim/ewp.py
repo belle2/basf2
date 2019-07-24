@@ -90,10 +90,10 @@ def B2XgammaList(path):
     """Build the skim list for B --> X(s,d) gamma decays"""
 
     # event level cuts: R2 and require a minimum number of tracks + decent photons
-    fillParticleList(decayString='pi+:all', cut='pt > 0.1', path=path)
-    fillParticleList(decayString='gamma:all', cut='E > 0.1', path=path)
+    fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -163,10 +163,10 @@ def B2XllList(path):
     """Build the skim list for B --> X(s,d) l+ l- decays"""
 
     # event level cuts: R2 and require a minimum number of tracks
-    fillParticleList(decayString='pi+:all', cut='pt > 0.1', path=path)
-    fillParticleList(decayString='gamma:all', cut='E > 0.1', path=path)
+    fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,

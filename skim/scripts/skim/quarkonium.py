@@ -26,10 +26,10 @@ def EtabList(path):
     __author__ = "Stefano Spataro & Sen Jia"
 
     # create and fill hard photon
-    fillParticleList(decayString='pi+:all', cut='pt > 0.1', path=path)
-    fillParticleList(decayString='gamma:all', cut='E > 0.1', path=path)
+    fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,
@@ -88,10 +88,10 @@ def UpsilonList(path):
     copyLists('Upsilon:all', ['Upsilon:ee', 'Upsilon:mumu'], path=path)
 
     # require foxWolframR2 < 0.995
-    fillParticleList(decayString='pi+:all', cut='pt > 0.1', path=path)
-    fillParticleList(decayString='gamma:all', cut='E > 0.1', path=path)
+    fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                     allMoments=False,
                     foxWolfram=True,
                     harmonicMoments=False,

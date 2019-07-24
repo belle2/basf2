@@ -222,7 +222,6 @@ def get_argument_parser(modes=None):
              "Possible values: " + ", ".join(modes) + ". Default is 'local'",
         choices=modes,
         type=str,
-        nargs='?',
         default='local'
     )
     parser.add_argument(
@@ -231,7 +230,6 @@ def get_argument_parser(modes=None):
         help="Comma seperated list of intervals for which to execute the "
              "validation scripts. Default is 'nightly'",
         type=str,
-        nargs='?',
         default='nightly'
     )
     parser.add_argument(
@@ -249,7 +247,6 @@ def get_argument_parser(modes=None):
              "validation. Only used for local execution. Default is number "
              "of CPU cores.",
         type=int,
-        nargs='?',
         default=None
     )
     parser.add_argument(
@@ -258,26 +255,26 @@ def get_argument_parser(modes=None):
         help="The name(s) of one or multiple packages. Validation will be "
              "run only on these packages! E.g. -pkg analysis arich",
         type=str,
-        nargs='*'
+        nargs='+'
     )
     parser.add_argument(
         "-s",
         "--select",
-        help="The file name of one or more comma separated validation "
+        help="The file name of one or more space separated validation "
              "scripts that should be executed exclusively. All dependent "
              "scripts will also be executed. E.g. -s ECL2D.C",
         type=str,
-        nargs='*'
+        nargs='+'
     )
     parser.add_argument(
         "-si",
         "--select-ignore-dependencies",
-        help="The file name of one or more comma separated validation "
+        help="The file name of one or more space separated validation "
              "scripts that should be executed exclusively. This will ignore "
              "all depencies. This is useful if you modified a script that "
              "produces plots based on the output of its dependencies.",
         type=str,
-        nargs='*'
+        nargs='+'
     )
     parser.add_argument(
         "--send-mails",
@@ -306,7 +303,6 @@ def get_argument_parser(modes=None):
              "results folder. Possibly useful for local basf2 instances "
              "where there is noBuildBot'. Default is 'current'",
         type=str,
-        nargs='?',
         default='current'
     )
     parser.add_argument(

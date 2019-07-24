@@ -7,7 +7,8 @@ env['LIBS'] = ['$ROOT_LIBS', 'PyROOT',
                '$PYTHON_LIBS', '$XML_LIBS', '$MYSQL_LIBS' , '$PGSQL_LIBS',
                'rt', # for clock_gettime() on some systems
                'zmq',
-               'curl' # for REST API access to the database
+               'curl', # for REST API access to the database
+               '$SQLITE_LIBS', # for local conditions metadata
                ]
 
 # Macros to limit the variations of the utilities/sha3hash implementation

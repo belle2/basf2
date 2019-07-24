@@ -62,14 +62,12 @@ namespace Belle2 {
     double klmClusterLayers(const Particle* particle);
 
     /**
-     * returns KLMCluster's energy (assuming the K_L0 hypothesis). N.B.: if the cluster is built
-     * only with RPC hits, the energy is proportional to klmClusterLayers
+     * returns KLMCluster's energy (assuming the K_L0 hypothesis)
      */
     double klmClusterEnergy(const Particle* particle);
 
     /**
-     * returns KLMCluster's momentum magnitude. N.B.: if the cluster is built only with RPC hits,
-     * the momentum is proportional to klmClusterLayers
+     * returns KLMCluster's momentum magnitude. N.B.: klmClusterMomentum is proportional to klmClusterLayers
      */
     double klmClusterMomentum(const Particle* particle);
 
@@ -115,15 +113,21 @@ namespace Belle2 {
 
     /**
      * returns the number of Tracks matched to the KLMCluster associated to this Particle
-     * (0 for K_L0, >0 for matched Tracks, NaN for not-matched Tracks).
+     * (>0 for K_L0 and matched Tracks, NaN for not-matched Tracks).
      */
     double nKLMClusterTrackMatches(const Particle* particle);
 
     /**
      * returns the number of KLMClusters matched to the Track associated to this Particle.
-     * This variable returns NaN for K_L0 (they have no Tracks associated). It can return >1
+     * It can return only 0, 1 or NaN (it returns NaN for K_L0 candidates with no Tracks associated).
      */
     double nMatchedKLMClusters(const Particle* particle);
+
+    /**
+     * returns the distance between the Track and the KLMCluster associated to this Particle.
+     * This variable returns NaN if there is no Track-to-KLMCluster relationship.
+     */
+    double klmClusterTrackDistance(const Particle* particle);
 
   }
 } // Belle2 namespace

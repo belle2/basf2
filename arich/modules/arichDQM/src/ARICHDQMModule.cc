@@ -126,9 +126,6 @@ namespace Belle2 {
                                  0.5, 71 - 0.5);
     }
 
-    TDirectory* dirAerogel =  dirARICHDQM->mkdir("ARICHExpert");
-    dirAerogel->cd();
-
     h_chDigit = new TH1D("chDigit", "Number of raw digits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
     h_chipDigit = new TH1D("chipDigit", "Number of raw digits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
     h_hapdDigit = new TH1D("hapdDigit", "Number of raw digits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
@@ -142,8 +139,6 @@ namespace Belle2 {
 
     h_flashPerAPD = new TH1D("flashPerAPD", "Number of flashes per APD; APD serial; number of flash", 420 * 4, -0.5, 420 * 4 - 0.5);
 
-
-    dirARICHDQM->cd();
 
     //Select "LIVE" monitoring histograms
     h_chStat->SetOption("LIVE");

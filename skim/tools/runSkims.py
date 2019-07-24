@@ -11,7 +11,7 @@ all_skims = [
     'LFVZpInvisible', 'LFVZpVisible', 'LeptonicUntagged', 'PRsemileptonicUntagged',
     'SLUntagged', 'SinglePhotonDark', 'SystematicsEELL', 'SystematicsRadMuMu', 'SystematicsRadEE',
     'SystematicsLambda', 'Systematics', 'SystematicsTracking', 'TauLFV', 'TCPV', 'TauGeneric',
-    'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0WithOneLep', 'feiSLBplusWithOneLep'
+    'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
 ]
 
 MCTypes = ['mixedBGx1', 'chargedBGx1', 'ccbarBGx1', 'ssbarBGx1',
@@ -21,7 +21,7 @@ MCTypes = ['mixedBGx1', 'chargedBGx1', 'ccbarBGx1', 'ssbarBGx1',
 
 MCCampaign = 'MC12'
 
-for skim in skims:
+for skim in all_skims:
     for MCType in MCTypes:
         input_file = get_test_file(MCType, MCCampaign)
         script = f'../standalone/{skim}_Skim_Standalone.py'

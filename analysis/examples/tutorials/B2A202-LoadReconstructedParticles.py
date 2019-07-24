@@ -68,7 +68,7 @@ stdPi0s(listtype='looseFit', path=my_path)
 stdKlongs(listtype='all', path=my_path)  # only create the 'all' list with no cuts
 
 # print contents of the DataStore after loading Particles
-ma.printDataStore()
+ma.printDataStore(path=my_path)
 
 # print out the contents of each ParticleList
 ma.printList('gamma:all', False, path=my_path)

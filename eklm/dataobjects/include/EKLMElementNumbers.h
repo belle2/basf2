@@ -123,6 +123,16 @@ namespace Belle2 {
     int sectorNumber(int endcap, int layer, int sector) const;
 
     /**
+     * Get sector number (KLM order of elements: endcap, sector, layer).
+     * @param[in] endcap Endcap number.
+     * @param[in] sector Sector number.
+     * @return Number of sector.
+     * @details
+     * Number is from 1 to 2*4 = 8.
+     */
+    int sectorNumberKLMOrder(int endcap, int sector) const;
+
+    /**
      * Get element numbers by sector global number.
      * @param[in]  sectorGlobal Sector global number.
      * @param[out] endcap       Endcap number.

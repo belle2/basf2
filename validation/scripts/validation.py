@@ -756,18 +756,18 @@ class Validation:
             for script in skipped_scripts:
                 list_skipped.write(script.path.split("/")[-1] + "\n")
 
-    def report_on_scripts(self, verbosity=2):
+    def report_on_scripts(self):
         """!
         Print a summary about all scripts, especially highlighting
         skipped and failed scripts.
         """
 
         failed_scripts = [
-            script.name for script in self.scripts
+            script.package + "/" + script.name for script in self.scripts
             if script.status == ScriptStatus.failed
         ]
         skipped_scripts = [
-            script.name for script in self.scripts
+            script.package + "/" + script.name for script in self.scripts
             if script.status == ScriptStatus.skipped
         ]
 
@@ -1463,7 +1463,15 @@ def execute(tag=None, is_test=None):
                 mails = mail_log.Mails(validation)
                 validation.log.note('Start sending mails...')
                 # send mails to all users with failed scripts/comparison
-                mails.send_all_mails()
+                if cmd_arguments.send_mails_mode == "incremental":
+                    incremental = True
+                elif cmd_arguments.send_mails_mode == "full":
+                    incremental = False
+                else:
+                    incremental = None
+                mails.send_all_mails(
+                    incremental=incremental
+                )
                 validation.log.note(
                     'Save mail data to {}'.format(
                         validation.get_log_folder()

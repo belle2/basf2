@@ -28,37 +28,48 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
+import argparse
 skimCode = encodeSkimName('TCPV')
 
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
 # create a path
-tcpvskimpath = Path()
+path = Path()
 
 fileList = get_test_file("mixedBGx1", "MC12")
 
-inputMdstList('default', fileList, path=tcpvskimpath)
+inputMdstList('default', fileList, path=path)
 
-loadStdSkimPi0(path=tcpvskimpath)
-loadStdSkimPhoton(path=tcpvskimpath)
-stdPi0s('loose', path=tcpvskimpath)
-stdPi('loose', path=tcpvskimpath)
-stdK('loose', path=tcpvskimpath)
-stdE('loose', path=tcpvskimpath)
-stdMu('loose', path=tcpvskimpath)
-stdPi('all', path=tcpvskimpath)
-stdPhotons('loose', path=tcpvskimpath)
-stdKshorts(path=tcpvskimpath)
-loadStdDiLeptons(True, path=tcpvskimpath)
-loadStdLightMesons(path=tcpvskimpath)
-cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
+loadStdSkimPi0(path=path)
+loadStdSkimPhoton(path=path)
+stdPi0s('loose', path=path)
+stdPi('loose', path=path)
+stdK('loose', path=path)
+stdE('loose', path=path)
+stdMu('loose', path=path)
+stdPi('all', path=path)
+stdPhotons('loose', path=path)
+stdKshorts(path=path)
+loadStdDiLeptons(True, path=path)
+loadStdLightMesons(path=path)
+cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
 
 # TCPV Skim
 from skim.tcpv import TCPVList
-tcpvList = TCPVList(path=tcpvskimpath)
-skimOutputUdst(skimCode, tcpvList, path=tcpvskimpath)
-summaryOfLists(tcpvList, path=tcpvskimpath)
+tcpvList = TCPVList(path=path)
+skimOutputUdst(skimCode, tcpvList, path=path)
+summaryOfLists(tcpvList, path=path)
 
-setSkimLogging()
-process(tcpvskimpath)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

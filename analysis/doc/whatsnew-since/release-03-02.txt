@@ -4,4 +4,16 @@ Changes in the analysis package
 Variables
 +++++++++
 
+* Added a variable that returns the distance between a KLMCluster and its associated Track :b2:var:`klmClusterTrackDistance`
+
 * Access to tag vertexing quality indicators for resolution function study, :b2:var:`TagVNDF`, :b2:var:`TagVChi2`, and :b2:var:`TagVChi2IP`.
+
+* Statistically correct combination of p-values :b2:var:`pValueCombination`
+
+* chi2 and ndf from KFit vertices stored as extraInfo
+Modules
++++++++
+
+* Added the new module AllParticleCombiner which is also available via the
+  function `modularAnalysis.combineAllParticles`. It creates a new Particle as
+  the combination of all unique Particles from the passed input ParticleLists.

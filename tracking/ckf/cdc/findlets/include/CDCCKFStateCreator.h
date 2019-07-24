@@ -93,6 +93,11 @@ namespace Belle2 {
 
         const TrackFindingCDC::CDCWireHit* wireHit = wireHits[i];
 
+        if (wireHit->getAutomatonCell().hasBackgroundFlag()
+            || wireHit->getAutomatonCell().hasTakenFlag()) {
+          continue;
+        }
+
         const auto iCLayer =  m_wireHitCache[i].icLayer; // wireHit->getWire().getICLayer();
         if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {
           continue;

@@ -10,7 +10,7 @@
 
 #include <hlt/softwaretrigger/modules/basics/SoftwareTriggerResultPrinterModule.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
-#include <hlt/softwaretrigger/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
+#include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
 
 #include <TFile.h>
 #include <TTree.h>

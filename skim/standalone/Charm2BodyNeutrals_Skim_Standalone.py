@@ -20,7 +20,18 @@ gb2_setuprel = 'release-03-02-00'
 import os
 import sys
 import glob
+import argparse
 skimCode = encodeSkimName('Charm2BodyNeutrals')
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 c2bnpath = Path()
 

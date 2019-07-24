@@ -7,6 +7,8 @@ Test backwards compatibility for an mdst file produced with release-00-09-03.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-00-09-03:
+- EventMetaData:
+  + isEndOfRun
 - The default magnetic field is changed affecting all momentum measurements.
 - Track:
   * getTrackFitResult behavior changed for non-pion tracks

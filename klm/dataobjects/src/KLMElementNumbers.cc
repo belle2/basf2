@@ -10,6 +10,7 @@
 
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMElementNumbers.h>
+#include <framework/logging/Logger.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 
 using namespace Belle2;
@@ -71,6 +72,20 @@ bool KLMElementNumbers::isEKLMChannel(uint16_t channel) const
   return (channel < m_BKLMOffset);
 }
 
+int KLMElementNumbers::localChannelNumberBKLM(uint16_t channel) const
+{
+  if (!isBKLMChannel(channel))
+    B2FATAL("Cannot get BKLM local channel number for non-BKLM channel.");
+  return channel - m_BKLMOffset;
+}
+
+int KLMElementNumbers::localChannelNumberEKLM(uint16_t channel) const
+{
+  if (!isEKLMChannel(channel))
+    B2FATAL("Cannot get EKLM local channel number for non-EKLM channel.");
+  return channel;
+}
+
 uint16_t KLMElementNumbers::moduleNumberBKLM(
   int forward, int sector, int layer) const
 {
@@ -89,4 +104,18 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
    */
   module = m_ElementNumbersEKLM->sectorNumber(endcap, layer, sector);
   return module;
+}
+
+uint16_t KLMElementNumbers::sectorNumberBKLM(int forward, int sector) const
+{
+  uint16_t sect;
+  sect = BKLMElementNumbers::sectorNumber(forward, sector);
+  return sect + m_BKLMOffset;
+}
+
+uint16_t KLMElementNumbers::sectorNumberEKLM(int endcap, int sector) const
+{
+  uint16_t sect;
+  sect = m_ElementNumbersEKLM->sectorNumberKLMOrder(endcap, sector);
+  return sect;
 }

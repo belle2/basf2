@@ -4,7 +4,7 @@ Analysis
 
 The analysis package collects modules and tools for high-level analysis of Belle II data.
 With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
-With these particle decay candidates, you can use high level tools such as `TreeFitter`, `FlavorTagger`, and the `FullEventInterpretation` (FEI).
+With these particle decay candidates, you can use high level tools such as :doc:`TreeFitter`, :doc:`FlavorTagger`, and the :doc:`FullEventInterpretation` (FEI).
 
 The core data objects of the ``basf2`` analysis package, are the `Particle`_ class, and the `ParticleList`_ class.
 Almost all analysis modules are concerned with the manipulation of `ParticleList`_ s.
@@ -31,7 +31,7 @@ To use them you need to use functions described in the standard particle lists.
 .. toctree:: StandardParticles
 
 Creation of new particle lists by combination of particles is essential part of almost any analysis job.
-The syntax used during this procedure is the `DecayString` and is described below:
+The syntax used during this procedure is the :doc:`DecayString` and is described below:
 
 .. toctree:: DecayString
 
@@ -60,18 +60,11 @@ Here is a list of variables known to ``basf2`` that can be used in cut strings o
 Output for offline analysis
 ===========================
 
-You can save information from analysis jobs directly from the `VariableManager` (e.g. for offline analysis using python tools such as `pandas`_) 
+You can save information from analysis jobs directly from the ``VariableManager`` (e.g. for offline analysis using python tools such as `pandas`_) 
 
 .. _pandas: https://pandas.pydata.org/
 
 .. toctree:: VariableManagerOutput
-
-.. warning::
-        The alternative `NtupleMaker` tools are now deprecated, please update your scripts.
-        We expect to remove this functionality in the next major release.
-        The documentation is included here for completeness. 
-
-.. toctree:: NtupleMaker
 
 Event-based analysis
 ====================

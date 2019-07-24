@@ -328,7 +328,7 @@ def get_argument_parser(modes=None):
     return parser
 
 
-def parse_cmd_line_arguments(is_test=None, tag=None, modes=None):
+def parse_cmd_line_arguments(modes=None):
     """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.

@@ -181,13 +181,9 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
                         foundStereoHits.end());
 
   // Sort the found stereo hits by same CDCHit and smaller distance to the node
-  // FIXME there should be a way to call the right function depending on the templated class
-  // i.e. .getLowerZ0() and .getLowerTanLambda() for z(s)=z0 + tanLambda * s
-  // or .getLowerP() and .getLowerQ() for z(s)=(p + 4q) * s - q^2 / 25 * s^2
-  const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or P
-  const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Q
-  auto sortByHitAndNodeCenterDistance = [xMean, yMean](const CDCRecoHitWithRLPointer & lhs,
+  auto sortByHitAndNodeCenterDistance = [node](const CDCRecoHitWithRLPointer & lhs,
   const CDCRecoHitWithRLPointer & rhs) {
+
 
     const CDCRecoHit3D& rhsRecoHit = rhs.first;
     const CDCRecoHit3D& lhsRecoHit = lhs.first;
@@ -200,24 +196,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
     } else if (rhsWireHit < lhsWireHit)  {
       return false;
     } else {
-      const double lhsZ = lhsRecoHit.getRecoZ();
-      const double rhsZ = rhsRecoHit.getRecoZ();
-
-      const double lhsS = lhsRecoHit.getArcLength2D();
-      const double rhsS = rhsRecoHit.getArcLength2D();
-
-      double lhsZDistance;
-      double rhsZDistance;
-
-      if (AQuadTree::m_lookingForQuadraticTracks) {
-        lhsZDistance = (xMean + 4 * yMean) * lhsS - yMean / 25 * lhsS * lhsS - lhsZ;
-        rhsZDistance = (xMean + 4 * yMean) * rhsS - yMean / 25 * rhsS * rhsS - rhsZ;
-      } else {
-        lhsZDistance = lhsS * yMean + xMean - lhsZ;
-        rhsZDistance = rhsS * yMean + xMean - rhsZ;
-      }
-
-      return lhsZDistance < rhsZDistance;
+      return AQuadTree::DecisionAlgorithm::BoxAlgorithm::compareDistances(node, lhsRecoHit, rhsRecoHit); //returns true if lhs < rhs
     }
   };
 

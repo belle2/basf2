@@ -20,7 +20,7 @@ def fitVertex(
 
     Info:
         Direct use of `fitVertex` is not recommended unless you know what you are doing.
-        If you're unsure, you probably want to use `vertexTree`, `vertexKfit`
+        If you're unsure, you probably want to use `vertexTree`, `vertexKFit`
         or another convenience function where the fitter is configured for you.
 
     Parameters:
@@ -282,7 +282,7 @@ def vertexRave(
         "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
         "Instead, we recommend TreeFitter (vertexTree) or vertexKFit.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
-        ", updateAllDaughters=False)\n"
+        ", updateAllDaughters=False, path=mypath)\n"
     )
     message_b = "To silence this warning, add silence_warning=True when you call this function."
 
@@ -346,7 +346,7 @@ def vertexRaveDaughtersUpdate(
         "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
         "Instead, we recommend TreeFitter (vertexTree) or vertexKFit.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
-        ", updateAllDaughters=True)\n"
+        ", updateAllDaughters=True, path=mypath)\n"
     )
     message_b = "To silence this warning, add silence_warning=True when you call this function."
 
@@ -402,7 +402,7 @@ def massVertexRave(
         "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
         "Instead, we recommend TreeFitter (vertexTree) or vertexKFit.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
-        ", updateAllDaughters=True)\n"
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False, path=mypath)\n"
     )
     message_b = "To silence this warning, add silence_warning=True when you call this function."
 
@@ -452,7 +452,7 @@ def massVertexRaveDaughtersUpdate(
         "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
         "Instead, we recommend TreeFitter (vertexTree) or vertexKFit.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
-        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True)\n"
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True, path=mypath)\n"
     )
     message_b = "To silence this warning, add silence_warning=True when you call this function."
 
@@ -503,7 +503,7 @@ def massRave(
         "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
         "Instead, we recommend TreeFitter (vertexTree) or vertexKFit.\n"
         "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
-        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False, path=mypath)\n"
     )
     message_b = "To silence this warning, add silence_warning=True when you call this function."
 

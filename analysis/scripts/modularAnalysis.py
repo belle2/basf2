@@ -1541,6 +1541,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=Fals
     @param inputParticlelists list of input particle list names, which serve
                               as a source of particles to build ROE, the FSP particles from
                               target_list_name are excluded from ROE object
+    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
     # if (len(inputParticlelists) < 3):

@@ -43,8 +43,6 @@ namespace Belle2 {
         : Super(140, std::tan(75.0 * M_PI / 180.0), 1, 1)
       {
       }
-
-      static const bool m_lookingForQuadraticTracks = false;
     };
   }
 }

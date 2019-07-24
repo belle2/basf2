@@ -42,8 +42,6 @@ namespace Belle2 {
         : Super(2, 2, 1, 1)
       {
       }
-
-      static const bool m_lookingForQuadraticTracks = true;
     };
   }
 }

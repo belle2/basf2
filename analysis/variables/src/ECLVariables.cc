@@ -1448,10 +1448,6 @@ Returns number of charged tracks matched to this cluster.
         - For neutrals, this should always return 0.
         - Returns NaN if there is no cluster.
 )DOC");
-    REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId, R"DOC(
-| Returns ECL cluster's connected region ID.
-| This can be used to find potentially overlapping ECL clusters.
-)DOC");
     REGISTER_VARIABLE("clusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination, R"DOC(
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
 thresholds for computing PSD variables.

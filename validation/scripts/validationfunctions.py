@@ -235,10 +235,10 @@ def get_argument_parser(modes=None):
     parser.add_argument(
         "-o",
         "--options",
-        help="A string which will be givento basf2 as arguments. Example: "
-             "'-n 100'. Quotes are necessary!",
+        help="One or more strings thatwill be passed to basf2 as arguments. "
+             "Example: '-n 100'. Quotes are necessary!",
         type=str,
-        nargs='*'
+        nargs='+'
     )
     parser.add_argument(
         "-p",
@@ -260,7 +260,7 @@ def get_argument_parser(modes=None):
     parser.add_argument(
         "-s",
         "--select",
-        help="The file name of one or more space separated validation "
+        help="The file name(s) of one or more space separated validation "
              "scripts that should be executed exclusively. All dependent "
              "scripts will also be executed. E.g. -s ECL2D.C",
         type=str,
@@ -300,16 +300,15 @@ def get_argument_parser(modes=None):
         "-t",
         "--tag",
         help="The name that will be used for the current revision in the "
-             "results folder. Possibly useful for local basf2 instances "
-             "where there is noBuildBot'. Default is 'current'",
+             "results folder. Default is 'current'.",
         type=str,
         default='current'
     )
     parser.add_argument(
         "--test",
-        help="Execute validation in testing modewhere only the validation "
-             "scripts contained in thevalidation package are executed. "
-             "During regularvalidation, these scripts are ignored.",
+        help="Execute validation in testing mode where only the validation "
+             "scripts contained in the validation package are executed. "
+             "During regular validation, these scripts are ignored.",
         action='store_true'
     )
     parser.add_argument(
@@ -320,8 +319,8 @@ def get_argument_parser(modes=None):
     )
     parser.add_argument(
         "--view",
-        help="Once the validation is finished, startthe local web server and "
-             "display the validationresults in the system's default browser.",
+        help="Once the validation is finished, start the local web server and "
+             "display the validation results in the system's default browser.",
         action='store_true'
     )
 

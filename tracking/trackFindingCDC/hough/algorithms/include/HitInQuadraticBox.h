@@ -59,6 +59,23 @@ namespace Belle2 {
         }
       }
 
+      bool compareZDistances(const HoughBox& pqBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit) const
+      {
+        const double pMean = (pqBox.getLowerP() + pqBox.getUpperP()) / 2.0;
+        const double qMean = (pqBox.getLowerQ() + pqBox.getUpperQ()) / 2.0;
+
+        const double lhsZ = lhsRecoHit.getRecoZ();
+        const double rhsZ = rhsRecoHit.getRecoZ();
+
+        const double lhsS = lhsRecoHit.getArcLength2D();
+        const double rhsS = rhsRecoHit.getArcLength2D();
+
+        const double lhsZDistance = (pMean + 4 * qMean) * lhsS - qMean / 25 * lhsS * lhsS - lhsZ;
+        const double rhsZDistance = (pMean + 4 * qMean) * rhsS - qMean / 25 * rhsS * rhsS - rhsZ;
+
+        return lhsZDistance < rhsZDistance;
+      }
+
       static const char* debugLine() { return "([0] + 4*[1])*x - [1] / 25 * x * x";}
     };
   }

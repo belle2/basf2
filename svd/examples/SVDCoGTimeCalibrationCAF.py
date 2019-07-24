@@ -72,7 +72,7 @@ def SVDCoGTimeCalibration(files, tags):
                               pre_collector_path=path,
                               database_chain=[CentralDatabase(tag) for tag in tags],
                               output_patterns=None,
-                              max_files_per_collector_job=1,
+                              max_files_per_collector_job=-1,
                               backend_args=None
                               )
 
@@ -82,8 +82,10 @@ def SVDCoGTimeCalibration(files, tags):
 
 
 if __name__ == "__main__":
-    input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
-
+    # input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
+    input_files = [os.path.abspath(file) for file in [
+        "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
+         e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"]]
     if not len(input_files):
         print("You have to specify some input file(s)\n"
               "using the standard basf2 command line option - i")

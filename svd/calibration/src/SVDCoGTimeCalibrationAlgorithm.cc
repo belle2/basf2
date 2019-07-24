@@ -44,7 +44,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   TFile* f = new TFile("profileOutput.root", "RECREATE");
 
   auto tree = getObjectPtr<TTree>("HTreeCoGTimeCalib");
-  auto h = getObjectPtr<TH1F>("histogram");
+  auto h = getObjectPtr<TH1F>("hEventT0");
   float meanT0 = h->GetMean();
 
   if (!tree) {
@@ -78,9 +78,9 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
     payload->set(layer, ladder, sensor, bool(side), 1, *timeCal);
     f->cd();
     pfx->Write();
-    h->Write();
     hEventT0vsCoG->Clear();
   }
+  h->Write();
   f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
 

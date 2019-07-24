@@ -46,7 +46,6 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   hEventT0vsCoG.GetXaxis()->SetTitle("raw_cog (ns)");
   m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);
 
-  //auto hEventT0vsCoG_test = new TH2F(" ", " ", 300, -150, 150, 300, -150, 150);
   m_hEventT0 = new TH1F("hEventT0", "EventT0", 200, -100, 100);
 
   m_histogramTree = new TTree("tree", "tree");
@@ -60,8 +59,7 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   m_histogramTree->Branch("sensor", &m_sensor, "sensor/I");
   m_histogramTree->Branch("view", &m_side, "view/I");
   registerObject<TTree>("HTreeCoGTimeCalib", m_histogramTree);
-  //registerObject<TH2F>("histogram", hEventT0vsCoG_test);
-  registerObject<TH1F>("histogram", m_hEventT0);
+  registerObject<TH1F>("hEventT0", m_hEventT0);
 }
 
 void SVDCoGTimeCalibrationCollectorModule::startRun()
@@ -89,7 +87,7 @@ void SVDCoGTimeCalibrationCollectorModule::closeRun()
 {
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
-  //getObjectPtr<TH2F>("histogram")->Fill(1,1);
+  //getObjectPtr<TH2F>("hEventT0")->Fill(1,1);
 
   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
     for (auto ladder : geoCache.getLadders(layer)) {
@@ -124,7 +122,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
       float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
       float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
       m_hEventT0vsCoG->fill(theVxdID, side, clTime, eventT0Sync);
-      getObjectPtr<TH1F>("histogram")->Fill(eventT0Sync);
+      getObjectPtr<TH1F>("hEventT0")->Fill(eventT0Sync);
     }
   };
 }

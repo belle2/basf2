@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                              *
  *                                                                         *
  * Author: The Belle II Collaboration                                      *
- * Contributors: Gaetano de Marino, Tadeas Bilka                           *
+ * Contributors: Luigi Corona, Giulia Casarosa                             *
  *                                                                         *
  *                                                                         *
  * This software is provided "as is" without any warranty.                 *

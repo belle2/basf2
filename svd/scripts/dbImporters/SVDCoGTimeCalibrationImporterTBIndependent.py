@@ -42,9 +42,11 @@ nSVD = 6
 nCDC = 1
 pVal = 0.0  # 0001
 
+
 inputFileList = [
     "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
-    e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"]
+e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"
+]
 '''
 if filename.rfind(".root") != -1:
     inputFileList.append(filename)

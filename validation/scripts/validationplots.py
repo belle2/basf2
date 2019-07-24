@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import queue
+from typing import Dict, Any
 import collections
 
 # Load ROOT
@@ -576,6 +577,91 @@ def tobjects_from_files(root_files_dict, is_reference, work_folder):
     return return_dict
 
 
+def get_root_object_type(root_object: ROOT.TObject) -> str:
+    """
+    Get the type of the ROOT object as a string in a way that makes sense to us.
+    In particular, "" is returned if we have a ROOT object that is of no
+    use to us.
+    :param root_object: ROOT TObject
+    :return: type as string if the ROOT object
+    """
+    if root_object.InheritsFrom('TNtuple'):
+        return 'TNtuple'
+    # this will also match TProfile, as this root class derives from
+    # TH1D
+    elif root_object.InheritsFrom('TH1'):
+        if root_object.InheritsFrom('TH2'):
+            return 'TH2'
+        else:
+            return 'TH1'
+    # TEfficiency barks and quarks like a TProfile, but is unfortunately not
+    elif root_object.InheritsFrom('TEfficiency'):
+        return 'TEfficiency'
+    elif root_object.InheritsFrom('TGraph'):
+        return 'TGraph'
+    elif root_object.ClassName() == 'TNamed':
+        return 'TNamed'
+    elif root_object.InheritsFrom('TASImage'):
+        return 'TASImage'
+    else:
+        return ""
+
+
+def get_metadata(root_object: ROOT.TObject) -> Dict[str, Any]:
+    """ Extract metadata (description, checks etc.) from a ROOT object
+    :param root_object ROOT TObject
+    """
+    root_object_type = get_root_object_type(root_object)
+
+    metadata = {
+        "description": "n/a",
+        "check": "n/a",
+        "contact": "n/a",
+        "metaoptions": []
+    }
+
+    # todo [ref, medium]: we should incorporate this in the MetaOptionParser and
+    #   never pass them around as a list in the first place
+    def metaoption_str_to_list(metaoption_str):
+        return [
+            opt.strip() for opt in metaoption_str.split(',') if opt.strip()
+        ]
+
+    if root_object_type in ['TH1', 'TH2', 'TEfficiency', 'TGraph']:
+        _metadata = {
+            e.GetName(): e.GetTitle()
+            for e in root_object.GetListOfFunctions()
+        }
+
+        metadata["description"] = _metadata.get("Description", "n/a")
+        metadata["check"] = _metadata.get("Check", "n/a")
+        metadata["contact"] = _metadata.get("Contact", "n/a")
+
+        metadata["metaoptions"] = metaoption_str_to_list(
+            _metadata.get("MetaOptions", "")
+        )
+
+    elif root_object_type == 'TNtuple':
+        _description = root_object.GetAlias('Description')
+        _check = root_object.GetAlias('Check')
+        _contact = root_object.GetAlias('Contact')
+
+        if _description:
+            metadata["description"] = _description
+        if _check:
+            metadata["check"] = _check
+        if _contact:
+            metadata["contact"] = _contact
+
+        _metaoptions_str = root_object.GetAlias('MetaOptions')
+        if _metaoptions_str:
+            metadata["metaoptions"] = metaoption_str_to_list(_metaoptions_str)
+
+    # TODO: Can we somehow incorporate TNameds and TASImages?
+
+    return metadata
+
+
 def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
     """
     Takes a root file, loops over its contents and creates the RootObjects
@@ -602,14 +688,7 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
 
     # Loop over all Keys in that ROOT-File
     for key in tfile.GetListOfKeys():
-
-        # Get the name of the Key
         name = key.GetName()
-
-        metaoptions = []
-        description = "n/a"
-        check = "n/a"
-        contact = "n/a"
 
         # temporary workaround for dbstore files located (wrongly)
         # in the validation results folder
@@ -621,68 +700,19 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
         root_object = tfile.Get(name)
         if not root_object:
             continue
-        if root_object is None:
+
+        root_object_type = get_root_object_type(root_object)
+        if not root_object_type:
+            # get_root_object_type returns "" for any type that we're not
+            # interested in
             continue
 
-        # Determine which type of object it is, i.e. TH1, TH2 or TNtuple
+        if root_object_type in ['TH1', 'TH2', 'TEfficiency']:
+            root_object.SetDirectory(0)
 
-        if root_object.InheritsFrom('TNtuple'):
-            root_object_type = 'TNtuple'
-        # this will also match TProfile, as this root class derives from
-        # TH1D
-        elif root_object.InheritsFrom('TH1'):
-            if root_object.InheritsFrom('TH2'):
-                root_object_type = 'TH2'
-            else:
-                root_object_type = 'TH1'
-        # TEfficiency barks and quarks like a TProfile, but is unfortunately not
-        elif root_object.InheritsFrom('TEfficiency'):
-            root_object_type = 'TEfficiency'
-        elif root_object.InheritsFrom('TGraph'):
-            root_object_type = 'TGraph'
-        # use to store user's html output
-        elif root_object.ClassName() == 'TNamed':
-            root_object_type = 'TNamed'
-        elif root_object.InheritsFrom('TASImage'):
-            root_object_type = 'TASImage'
-        else:
-            root_object_type = None
+        metadata = get_metadata(root_object)
 
-        # If we are dealing with a histogram:
-        if root_object_type in ['TH1', 'TH2', 'TEfficiency', 'TGraph']:
-
-            # Ensure that the data read from the ROOT files lives on even
-            # after the ROOT file is closed, but TGraph does not have this ....
-            if not root_object_type == 'TGraph':
-                root_object.SetDirectory(0)
-
-            # Read out meta information:
-
-            # Now check if the data exists in the ROOT file and if so, read it
-            if root_object.GetListOfFunctions().FindObject('Description'):
-                description = root_object.GetListOfFunctions().FindObject('Description').GetTitle()
-            if root_object.GetListOfFunctions().FindObject('Check'):
-                check = root_object.GetListOfFunctions().FindObject('Check').GetTitle()
-            if root_object.GetListOfFunctions().FindObject('Contact'):
-                contact = root_object.GetListOfFunctions().FindObject('Contact').GetTitle()
-
-            # Now check for meta-options (colz, log-scale, etc.)
-            metaoptions = []
-            if root_object.GetListOfFunctions().FindObject('MetaOptions'):
-                # Get the title. If there is no title, set metaoptions to an
-                # empty list again. Otherwise parse the string of options into
-                # a list of options (split on comma, remove whitespaces).
-                metaoptions = root_object.GetListOfFunctions().FindObject('MetaOptions').GetTitle()
-                if metaoptions is None:
-                    metaoptions = []
-                else:
-                    metaoptions = [
-                        _.strip() for _ in metaoptions.split(',') if _.strip()
-                    ]
-
-        # If we are dealing with an n-tuple
-        elif root_object_type == 'TNtuple':
-
+        if root_object_type == "TNtuple":
             # Go to first entry in the n-tuple
             root_object.GetEntry(0)
 
@@ -693,43 +723,12 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
             for leaf in root_object.GetListOfLeaves():
                 ntuple_values[leaf.GetName()] = leaf.GetValue()
 
-            # Get description, check and contact
-            _description = root_object.GetAlias('Description')
-            _check = root_object.GetAlias('Check')
-            _contact = root_object.GetAlias('Contact')
-
-            if _description:
-                description = _description
-            if _check:
-                check = _check
-            if _contact:
-                contact = _contact
-
-            # Now check for meta-options (colz, log-scale, etc.)
-            _metaoptions = root_object.GetAlias('MetaOptions')
-            if _metaoptions:
-                # If there are meta-options, split the string on commas and
-                # remove unnecessary whitespaces
-                metaoptions = [
-                    _.strip() for _ in _metaoptions.split(',') if _.strip()
-                ]
-
             # Overwrite 'root_object' with the dictionary that contains the
             # values, because the values are what we want to save, and we
             # want to use the same RootObject()-call for both histograms and
             # n-tuples :-)
             root_object = ntuple_values
-        elif root_object_type == 'TNamed':
-            # TODO Set description, check, contact somehow?
-            pass
-        elif root_object_type == 'TASImage':
-            # TODO Set description, check, contact somehow?
-            pass
-        else:
-            # Skip all others
-            continue
 
-        # Create the RootObject and append it to the results
         key2object[name].append(
             RootObject(
                 revision,
@@ -739,10 +738,10 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
                 root_object,
                 root_object_type,
                 dir_date,
-                description,
-                check,
-                contact,
-                metaoptions,
+                metadata["description"],
+                metadata["check"],
+                metadata["contact"],
+                metadata["metaoptions"],
                 is_reference
             )
         )

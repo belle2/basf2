@@ -1343,8 +1343,12 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         (*bklmHitUsed)[intersection.hit].insert(std::pair<const Track*, double>(extState.track, intersection.chi2));
         extState.extLayerPattern |= (0x00000001 << intersection.layer);
         //efficiency implementation
-        muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
-                                        intersection.sector + 1, intersection.layer + 1, 1, 1));
+        if (m_klmStripEfficiency.isValid()) {
+          muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
+                                          intersection.sector + 1, intersection.layer + 1, 1, 1));
+        } else {
+          B2INFO("KLM Strip Efficiency is not in the database");
+        }
         if (extState.lastBarrelExtLayer < intersection.layer) {
           extState.lastBarrelExtLayer = intersection.layer;
         }
@@ -1399,6 +1403,8 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
             if (m_klmStripEfficiency.isValid()) {
               muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
                                               intersection.sector + 1, intersection.layer + 1, 1, 1));
+            } else {
+              B2INFO("KLM Strip Efficiency is not in the database");
             }
           } else {
             muid->setExtBKLMEfficiencyValue(intersection.layer, 0);

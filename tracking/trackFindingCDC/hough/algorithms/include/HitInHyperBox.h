@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
+#include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
@@ -18,7 +18,7 @@
 #include <cmath>
 
 namespace Belle2 {
-  namespace trackFindingCDC {
+  namespace TrackFindingCDC {
 
     /** An algorithm to check if a hit is contained in a hyperbolic cosine hough box
     *
@@ -36,19 +36,19 @@ namespace Belle2 {
     class HitInHyperBox {
 
     public:
-      using HoughBox = Box<DiscreteAlpha, DiscreteMu, DiscreteRho>;
+      using HoughBox = Box<DiscreteAlpha, DiscreteRho, DiscreteMu>;
 
       Weight operator()(const CDCRecoHit3D& recoHit,
                         const HoughBox* hyperBox)
       {
-        const double lowerAlpha = hyperBox->getLowerBound<DiscreteAlpha>();
-        const double upperAlpha = hyperBox->getUpperBound<DiscreteAlpha>();
+        const float lowerAlpha = *(hyperBox->getLowerBound<DiscreteAlpha>()); //DiscreteValue is based on std::vector<T>::const_iterator
+        const float upperAlpha = *(hyperBox->getUpperBound<DiscreteAlpha>());
 
-        const double lowerMu = hyperBox->getLowerBound<DiscreteMu>();
-        const double upperMu = hyperBox->getUpperBound<DiscreteMu>();
+        const float lowerMu = *(hyperBox->getLowerBound<DiscreteMu>());
+        const float upperMu = *(hyperBox->getUpperBound<DiscreteMu>());
 
-        const double lowerRho = hyperBox->getLowerBound<DiscreteRho>();
-        const double upperRho = hyperBox->getUpperBound<DiscreteRho>();
+        const float lowerRho = *(hyperBox->getLowerBound<DiscreteRho>());
+        const float upperRho = *(hyperBox->getUpperBound<DiscreteRho>());
 
         const double perpS = recoHit.getArcLength2D();
         const double recoZ = recoHit.getRecoZ();
@@ -68,8 +68,30 @@ namespace Belle2 {
         }
       }
 
+      /**
+      * Compares distances from two hits to the track represented by the given box.
+      * The comparison is done based on reconstructed Z coordinates of hits and track Z position.
+      */
+      static bool compareDistances(const HoughBox& hyperBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit)
+      {
+        const float centerAlpha = *(hyperBox.getCenter<0>()); //TODO getCenter(class T) is not implemented
+        const float centerRho = *(hyperBox.getCenter<1>());
+        const float centerMu = *(hyperBox.getCenter<2>());
+
+        const double lhsZ = lhsRecoHit.getRecoZ();
+        const double rhsZ = rhsRecoHit.getRecoZ();
+
+        const double lhsS = lhsRecoHit.getArcLength2D();
+        const double rhsS = rhsRecoHit.getArcLength2D();
+
+        const double lhsZDistance = deltaZ(centerAlpha, centerMu, centerRho, lhsS, lhsZ);
+        const double rhsZDistance = deltaZ(centerAlpha, centerMu, centerRho, rhsS, rhsZ);
+
+        return lhsZDistance < rhsZDistance;
+      }
+
     private:
-      double deltaZ(alpha, mu, rho, R, Z)
+      static double deltaZ(const double alpha, const double mu, const double rho, const double R, const double Z)
       {
         //100 here is a reference  - size of CDC in cm
         return 100.0 * (1.0 / rho) * std::sqrt(1 + mu * mu * rho * rho) *
@@ -77,5 +99,6 @@ namespace Belle2 {
                 std::cosh(alpha * rho)
                ) - Z;
       }
-    }
+    };
   }
+}

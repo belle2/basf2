@@ -40,10 +40,10 @@ namespace Belle2 {
       static bool sameSign(double n1, double n2, double n3, double n4,
                            double n5, double n6, double n7, double n8)
       {
-        return ((n1 > 0 and n2 > 0 and n3 > 0 and n4 > 0
+        return ((n1 > 0 and n2 > 0 and n3 > 0 and n4 > 0 and
                  n5 > 0 and n6 > 0 and n7 > 0 and n8 > 0)
                 or
-                (n1 < 0 and n2 < 0 and n3 < 0 and n4 < 0,
+                (n1 < 0 and n2 < 0 and n3 < 0 and n4 < 0 and
                  n5 < 0 and n6 < 0 and n7 < 0 and n8 < 0));
       }
 

@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
 #include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
+#include <tracking/trackFindingCDC/hough/hyperbolic/HitHyperHough.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -236,3 +237,4 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::writeDebugInformation()
 
 template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitZ0TanLambdaLegendre>;
 template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitQuadraticLegendre>;
+template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitHyperHough>;

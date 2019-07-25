@@ -19,7 +19,8 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
-
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/Track.h>
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -95,6 +96,11 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);
     antiParticleList.registerInDataStore(flags);
     m_maxAngle = cos(m_angleThres * M_PI / 180.0);
+
+    StoreArray<Particle> particles;
+    StoreArray<PIDLikelihood> pidlikelihoods;
+    particles.registerRelationTo(pidlikelihoods);
+
   }
 
 
@@ -164,10 +170,12 @@ namespace Belle2 {
         B2INFO("[FSRCorrectionModule] Found a radiative gamma and added its 4-vector to the lepton");
       }
 
-      Particle correctedLepton(new4Vec, lepton->getPDGCode());
-      correctedLepton.appendDaughter(lepton);
+      Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
+                               lepton->getTrack()->getArrayIndex());
+
+      correctedLepton.appendDaughter(lepton, false);
       if (fsrGammaFound) {
-        correctedLepton.appendDaughter(fsrGamma);
+        correctedLepton.appendDaughter(fsrGamma, false);
         // update error matrix
         const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
         const TMatrixFSym& fsrErrorMatrix = fsrGamma->getMomentumVertexErrorMatrix();
@@ -188,7 +196,6 @@ namespace Belle2 {
         correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
       }
 
-
       // add the info from original lepton to the new lepton
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
@@ -198,6 +205,13 @@ namespace Belle2 {
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
+
+      const PIDLikelihood* pid = lepton->getPIDLikelihood();
+
+      if (pid) {
+        newLepton->addRelationTo(pid);
+      }
+
       if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
       outputList->addParticle(newLepton);
 

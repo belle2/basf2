@@ -106,23 +106,6 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-    bool isGoodBelleGamma(int region, double energy)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      goodGammaRegion1 = region == 1 && energy > 0.100;
-      goodGammaRegion2 = region == 2 && energy > 0.050;
-      goodGammaRegion3 = region == 3 && energy > 0.150;
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
-    }
-
-    double goodBelleGamma(const Particle* particle)
-    {
-      double energy = eclClusterE(particle);
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodBelleGamma(region, energy);
-    }
 
     double eclClusterErrorE(const Particle* particle)
     {
@@ -1572,15 +1555,6 @@ cluster-matched tracks using the cluster 4-momenta.
 Used for ECL-based dark sector physics and debugging track-cluster matching.
 )DOC");
 
-    VARIABLE_GROUP("Belle Variables");
-    REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma, R"DOC(
-[Legacy] Returns 1.0 if photon candidate passes simple region dependent
-energy selection for Belle data and MC (50/100/150 MeV).
-)DOC");
-    REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL, R"DOC(
-[Legacy] Returns ECL cluster's quality indicating a good cluster in GSIM (stored in deltaL of ECL cluster object).
-Belle analysis typically used clusters with quality == 0 in their :math:`E_{\text{extra ECL}}` (Belle only).
-)DOC");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
     VARIABLE_GROUP("ECL calibration");

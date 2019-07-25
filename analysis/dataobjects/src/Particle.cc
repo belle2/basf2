@@ -464,10 +464,12 @@ std::vector<int> Particle::getMdstArrayIndices(EParticleType type) const
 }
 
 
-void Particle::appendDaughter(const Particle* daughter)
+void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 {
-  // it's a composite particle
-  m_particleType = c_Composite;
+  if (updateType) {
+    // is it a composite particle or fsr corrected?
+    m_particleType = c_Composite;
+  }
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());
@@ -597,20 +599,10 @@ const KLMCluster* Particle::getKLMCluster() const
     StoreArray<KLMCluster> klmClusters;
     return klmClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
-    // a track may be matched to several clusters under different hypotheses
-    // take the cluster with largest number of layers as "the" cluster
+    // If there is an associated KLMCluster, it's the closest one
     StoreArray<Track> tracks;
-    const KLMCluster* longestTrackMatchedCluster = nullptr;
-    int numberOfLayers = -1;
-    // loop over all clusters matched to this track
-    for (const KLMCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<KLMCluster>()) {
-      // check if we're the longest cluster thus far
-      if (cluster.getLayers() > numberOfLayers) {
-        numberOfLayers = cluster.getLayers();
-        longestTrackMatchedCluster = &cluster;
-      }
-    }
-    return longestTrackMatchedCluster;
+    const KLMCluster* klmCluster = tracks[m_mdstIndex]->getRelatedTo<KLMCluster>();
+    return klmCluster;
   } else {
     return nullptr;
   }

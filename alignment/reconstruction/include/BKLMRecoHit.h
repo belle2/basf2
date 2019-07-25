@@ -86,8 +86,8 @@ namespace Belle2 {
 
     unsigned short m_moduleID; /**< Unique module identifier.*/
 
-    /** Forward or not. */
-    bool m_IsForward;
+    /** Forward. */
+    int m_Forward;
 
     /** Sector number. */
     int m_Sector;
@@ -110,7 +110,7 @@ namespace Belle2 {
     //int m_numZStrips;
 
     /** Needed to make object storable. */
-    ClassDefOverride(BKLMRecoHit, 2);
+    ClassDefOverride(BKLMRecoHit, 3);
 
   };
 

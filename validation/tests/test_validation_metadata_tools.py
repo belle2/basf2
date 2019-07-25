@@ -13,6 +13,7 @@ import generators as ge
 
 # ours
 from validation_tools.metadata import create_validation_histograms
+from validationplots import get_metadata
 
 
 TRIVIAL_DECFILE = """
@@ -104,37 +105,20 @@ class TestValidationMetadataSetter(unittest.TestCase):
         # 1D Histogram
         # ************
 
-        m = tf.Get("M")
-        self.assertEqual(
-            m.FindObject("Description").GetTitle(), "description of M"
-        )
-        self.assertEqual(
-            m.FindObject("Check").GetTitle(), "nothing to check"
-        )
-        self.assertEqual(
-            m.FindObject("MetaOptions").GetTitle(), ""
-        )
-        self.assertEqual(
-            m.FindObject("Contact").GetTitle(), "me <wontreply@dont.try>"
-        )
+        md = get_metadata(tf.Get("M"))
+        self.assertEqual(md["description"], "description of M")
+        self.assertEqual(md["check"], "nothing to check")
+        self.assertEqual(md["metaoptions"], [])
+        self.assertEqual(md["contact"], "me <wontreply@dont.try>")
 
         # 2D Histogram
         # ************
 
-        mm = tf.Get("MM")
-        self.assertEqual(
-            mm.FindObject("Description").GetTitle(),
-            "some description nobody reads"
-        )
-        self.assertEqual(
-            mm.FindObject("Check").GetTitle(), "nothing to check"
-        )
-        self.assertEqual(
-            mm.FindObject("MetaOptions").GetTitle(), "mop1, mop2"
-        )
-        self.assertEqual(
-            mm.FindObject("Contact").GetTitle(), "me <wontreply@dont.try>"
-        )
+        md = get_metadata(tf.Get("MM"))
+        self.assertEqual(md["description"], "some description nobody reads")
+        self.assertEqual(md["check"], "nothing to check")
+        self.assertEqual(md["metaoptions"], ["mop1", "mop2"])
+        self.assertEqual(md["contact"], "me <wontreply@dont.try>")
 
 
 if __name__ == "__main__":

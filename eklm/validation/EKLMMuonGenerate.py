@@ -36,12 +36,12 @@ particlegun.param('phiParams', [0, 360])
 # Geometry and Geant simulation
 paramloader = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('components', ['EKLM'])
+geometry.param('components', ['EKLM', 'BKLM'])
 geometry.param('useDB', False)
 g4sim = register_module('FullSim')
 
 # EKLM Modules
-eklmDigitizer = register_module('EKLMDigitizer')
+klmDigitizer = register_module('KLMDigitizer')
 eklmReconstructor = register_module('EKLMReconstructor')
 
 # Output
@@ -58,7 +58,7 @@ main.add_module(paramloader)
 main.add_module(geometry)
 main.add_module(g4sim)
 
-main.add_module(eklmDigitizer)
+main.add_module(klmDigitizer)
 main.add_module(eklmReconstructor)
 
 main.add_module(output)

@@ -16,8 +16,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/core/Environment.h>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -88,7 +86,7 @@ void HepMCInputModule::initialize()
   }
 
   //are we the master module? And do we have all infos?
-  B2INFO("HEPMC reader acts as master module for data processing.");
+  B2INFO("HEPMC reader acts as master module for data processing. This means the event numbers etc will be set by this module.");
   if (m_runNum == 0 && m_expNum == 0) {
     B2WARNING("HEPMC reader acts as master module, but no run and experiment number set. Using defaults.");
   }
@@ -105,7 +103,7 @@ void HepMCInputModule::initialize()
 void HepMCInputModule::event()
 {
   // we get the next event until it is invalid which we catch with that exception
-  B2DEBUG(10,
+  B2DEBUG(20,
           "Event ________________________________________________________________________________________________________________________________________________________________________________________________");
   if (m_beamParams.hasChanged()) {
     if (m_boost2Lab) {
@@ -126,14 +124,14 @@ void HepMCInputModule::event()
     } else {
       id = ++m_evtNum;
     }
-    B2DEBUG(10, "Setting exp " << m_expNum << " run " << m_runNum << " event " << id << ".");
+    B2DEBUG(20, "Setting exp " << m_expNum << " run " << m_runNum << " event " << id << ".");
     m_eventMetaDataPtr->setExperiment(m_expNum);
     m_eventMetaDataPtr->setRun(m_runNum);
     m_eventMetaDataPtr->setEvent(id);
     if (m_useWeights) { m_eventMetaDataPtr->setGeneratedWeight(weight); }
     m_mcParticleGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (HepMCReader::HepMCInvalidEventError&) {
-    B2DEBUG(10, "Reached end of HepMC file.");
+    B2DEBUG(20, "Reached end of HepMC file.");
     m_hepmcreader->closeCurrentInputFile();
     m_iFile++;
     if (m_iFile < m_inputFileNames.size()) {
@@ -146,7 +144,7 @@ void HepMCInputModule::event()
       }
     } else {
       m_eventMetaDataPtr->setEndOfData();
-      B2DEBUG(10, "Reached end of all HepMC files.");
+      B2DEBUG(20, "Reached end of all HepMC files.");
     }
   } catch (runtime_error& e) {
     B2ERROR(e.what());
@@ -155,7 +153,6 @@ void HepMCInputModule::event()
 
 void HepMCInputModule::terminate()
 {
-  if (m_evtNum != m_totalEvents) { B2WARNING("Eventnumber mismatch. (ignore if more than one filed was read.)");}
-
+  if (m_evtNum != m_totalEvents) { B2WARNING("Eventnumber mismatch. (ignore if more than one file was read.)");}
 }
 

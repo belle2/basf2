@@ -11,7 +11,6 @@
    Base styles: opinionated defaults
    ========================================================================== */
 
-
 /* popup for the detail view of validation plots */
 .white-popup {
   position: relative;
@@ -43,7 +42,7 @@
 }
 
 .no_reference {
-    color: red;
+    color: #868686;
 }
 
 .fail_count_greater_zero {
@@ -255,11 +254,6 @@ textarea {
     border: 0;
 }
 
-#content table {
-    border: 1px solid #bdc3c7;
-    width: 100%;
-}
-
 #loglist {
     background: #FFF;
     border: 1px solid gray;
@@ -389,11 +383,6 @@ textarea {
 
 #navigation a:hover {
     text-decoration: underline;
-}
-
-.blue_link {
-    color: blue !important;
-    text-decoration: underline !important;
 }
 
 #outer {
@@ -694,7 +683,6 @@ td.show {
     display: -ms-flexbox; /* TWEENER - IE 10 */
     display: -webkit-flex; /* NEW - Chrome */
     display: flex; /* NEW, Spec - Opera 12.1, Firefox 20+ */
-    border-bottom: 1px solid gray;
     -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
     margin-bottom: 25px;
@@ -756,7 +744,6 @@ td.show {
 }
 
 .wrap_boxes {
-    background: #f5f5f5;
     box-sizing: border-box;
     /*height: intrinsic;*/
     margin-bottom: 10px;
@@ -764,8 +751,9 @@ td.show {
     padding: 10px;
     display: inline-block;
 
-    border-style: solid;
+    border-style: dashed;
     border-color: #666666;
+    border-width: 0 0 1px 0;
 
     width: 100%;
     overflow-x: auto;
@@ -774,7 +762,7 @@ td.show {
 .wrap_rootfile{
     border-style: solid;
     border-width: 5px;
-    border-color: #ffffff #ffffff #ffffff #1d04b5;
+    border-color: #ffffff #ffffff #ffffff #868686;
     margin-bottom: 25px;
     padding-left: 10px;
 }
@@ -804,13 +792,61 @@ td, th {
 }
 
 th {
-    background: #bdc3c7;
     text-align: left;
 }
 
 tr:nth-child(even) td {
     background-color: #f5f5f5;
 }
+
+.downloads {
+    font-weight: 400;
+}
+.downloads a {
+    color: inherit;
+    text-decoration: None;
+}
+.downloads a:hover {
+    text-decoration: underline;
+}
+
+.persistent-header {
+    margin: 0.3em 0;
+}
+
+.ntuple_table th{
+    border-style: solid;
+    border-color: black;
+    border-width: 0 0 1px 0;
+}
+
+.ntuple_table tr, td, th{
+    white-space: nowrap;
+}
+
+.ntuple_table tr:hover{
+    background-color: #49c7c3;
+}
+
+.ntuple_table tr:nth-child(even):hover td {
+    background-color: #49c7c3;
+}
+
+/*.ntuple_table {
+    border: none;
+}
+
+tr, td {
+    border: none;
+}
+
+table {
+    border: none;
+}
+
+tbody {
+    border: none;
+}*/
 
 /* ==========================================================================
    Helper classes

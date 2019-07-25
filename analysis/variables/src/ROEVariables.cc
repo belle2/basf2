@@ -2084,11 +2084,20 @@ namespace Belle2 {
     REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
                       "Bs* - Bs mass difference");
 
-    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll,
-                      "Returns the angle between M and lepton in W rest frame in the decays of the type\n"
-                      "M -> h_1 ... h_n ell, where W 4-momentum is given as pW = p_ell + p_nu. The neutrino\n"
-                      "momentum is calculated from ROE taking into account the specified mask and setting\n"
-                      "E_nu = |p_miss|.");
+    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
+
+Returns the angle between $M$ and lepton in W rest frame in the decays of the type:
+:math`M \to h_1 ... h_n \ell`, where W 4-momentum is given as
+
+.. math::
+    p_W = p_\ell + p_\nu.
+
+The neutrino momentum is calculated from ROE taking into account the specified mask, and setting
+
+.. math::
+    E_{\nu} = |p_{miss}|.
+    
+)DOC");
 
     REGISTER_VARIABLE("REC_q2BhSimple", REC_q2BhSimple,
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"

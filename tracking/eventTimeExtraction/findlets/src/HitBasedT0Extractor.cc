@@ -17,6 +17,7 @@
 #include <framework/core/ModuleParam.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/utilities/ScopeGuard.h>
 
 #include <TFile.h>
 #include <TH1D.h>
@@ -111,7 +112,9 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
                              m_param_binCountTimeHistogram, -m_param_fitWindow,
                              m_param_fitWindow);
 
-  gROOT->SetBatch();
+  // Enable batch mode - we do not want to show the canvas etc.
+  auto batchGuard = ScopeGuard::guardBatchMode();
+
   TCanvas canvas(debugImageName.c_str(), debugImageName.c_str(), 800, 600);
 
   if (inputWireHits.size() == 0) {
@@ -289,6 +292,4 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
     canvas.Draw();
     canvas.SaveAs(debugImageName.c_str());
   }
-
-  gROOT->SetBatch(false);
 }

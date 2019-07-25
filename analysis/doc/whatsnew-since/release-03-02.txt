@@ -27,3 +27,4 @@ Modular Analysis
   switched to True (default is False) if you are analyzing converted Belle MC or
   data. It triggers the ROE to be constructed from all tracks and from Belle's
   specific gamma:mdst list.
+* Added signal region function `modularAnalysis.signalRegion`. By default, this function enables a new variable ``isSignalRegion`` and excludes the defined area when processing is done on data.

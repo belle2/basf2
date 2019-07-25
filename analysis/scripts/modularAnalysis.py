@@ -1388,6 +1388,48 @@ def variableToSignalSideExtraInfo(
     path.add_module(mod)
 
 
+def signalRegion(
+        particleList,
+        cut,
+        path=None,
+        name="isSignalRegion",
+        blind_data=True,
+):
+    """
+    Define and blind a signal region.
+    Per default, the defined signal region is cut out if ran on data.
+    This function will provide a new variable 'isSignalRegion' as default, which is either 0 or 1 depending on the cut
+    provided.
+
+    Example:
+        >>> ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
+        >>> ma.signalRegion("B+:sig",
+        >>>                  "Mbc>5.27 and abs(deltaE)<0.2",
+        >>>                  blind_data=True,
+        >>>                  path=path)
+        >>> ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
+
+    Parameters:
+        particleList (str):     The input ParticleList
+        cut (str):              Cut string describing the signal region
+        path (basf2.Path)::     Modules are added to this path
+        name (str):             Name of the Signal region in the variable manager
+        blind_data (bool):      Automatically exclude signal region from data
+
+    """
+
+    mod = register_module('VariablesToExtraInfo')
+    mod.set_name(f'{name}_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', {f"passesCut({cut})": name})
+    variables.addAlias(name, f"extraInfo({name})")
+    path.add_module(mod)
+
+    # Check if we run on Data
+    if blind_data:
+        applyCuts(particleList, f"{name}==0 or isMC==1", path=path)
+
+
 def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
     """
     Removes the ExtraInfo of the given particleLists. If specified (removeEventExtraInfo = True) also the EventExtraInfo is removed.

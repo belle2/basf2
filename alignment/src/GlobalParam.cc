@@ -42,7 +42,7 @@ namespace Belle2 {
       }
 
       if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj()))
-        return bp->getVertex()[param - 1];
+        return bp->getIPPosition()[param - 1];
 
       B2ERROR("Could not get value for BeamSpot");
       return 0.;
@@ -57,9 +57,9 @@ namespace Belle2 {
         return;
       }
       if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj())) {
-        TVector3 vertex = bp->getVertex();
+        TVector3 vertex = bp->getIPPosition();
         vertex[param - 1] = value;
-        bp->setVertex(vertex, bp->getPositionError());
+        bp->setVertex(vertex, bp->getIPPositionCovMatrix());
       } else {
         B2ERROR("Could not set value for BeamSpot");
       }

@@ -6,14 +6,17 @@
   <input id="check_show_overview" type="checkbox" checked='{{show_overview}}'>
   <label for="check_show_overview">Compact View</label>
   <input id="check_show_expert_plots" type="checkbox" checked='{{show_expert_plots}}'>
-  <label for="check_show_expert_plots">Expert Plots</label>
+  <label for="check_show_expert_plots">Expert Content</label>
 </div>
 
 <!-- temporary announcements -->
-<div class="infobox info">
+<div class="infobox fail">
   <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-  <b>Recent changes:</b> Easy interfaces to generate validation histograms in <code>basf2</code> using <code>create_validation_histograms</code>!
-  Kolmogorov Smirnow and Anderson Darling tests now supported (feedback appreciated)!
+  <b>
+	<span class="blink_me">IMPORTANT NEWS:</span> 
+	On August 8 all plots/tuples without the <code>shifter</code> option will 
+    be declared expert plots/tuples and will be hidden from this page by default. 
+  </b>
   <a target="_blank" href="https://confluence.desy.de/display/BI/News">Details &amp; more news</a>
 </div>
 
@@ -95,6 +98,7 @@
     <!-- If we show ntuples: -->
     <!------------------------->
     {{#ntuples}}
+    {{#if !is_expert || show_expert_plots }}
     <div class="wrap_boxes">
       <h3 class="persistent-header">NTuple: <code>{{title}}</code></h3>
       <table class="ntuple_table" id={{title}}></table>
@@ -103,6 +107,7 @@
       </script>
       {{>ntuple_description}}
     </div>
+    {{/if}}
     {{/ntuples}}
 
     <!-- If we show plots: -->

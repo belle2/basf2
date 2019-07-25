@@ -600,6 +600,16 @@ just use spans /klieret */
     background-color: #f56257;
 }
 
+.blink_me {
+  animation: blinker 2s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
 .infobox a {
     color: white;
 }

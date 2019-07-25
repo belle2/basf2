@@ -59,7 +59,7 @@ namespace Belle2 {
       if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj())) {
         TVector3 vertex = bp->getIPPosition();
         vertex[param - 1] = value;
-        bp->setVertex(vertex, bp->getIPPositionCovMatrix());
+        bp->setIP(vertex, bp->getIPPositionCovMatrix());
       } else {
         B2ERROR("Could not set value for BeamSpot");
       }

@@ -57,6 +57,49 @@ KLMChannelIndex::~KLMChannelIndex()
 
 void KLMChannelIndex::setIndexLevel(enum IndexLevel indexLevel)
 {
+  if (indexLevel > m_IndexLevel) {
+    if (m_Subdetector == KLMElementNumbers::c_BKLM) {
+      switch (m_IndexLevel) {
+        case c_IndexLevelSubdetector:
+          m_Section = 0;
+          [[fallthrough]];
+        case c_IndexLevelSection:
+          m_Sector = 1;
+          [[fallthrough]];
+        case c_IndexLevelSector:
+          m_Layer = 1;
+          [[fallthrough]];
+        case c_IndexLevelLayer:
+          m_Plane = 0;
+          [[fallthrough]];
+        case c_IndexLevelPlane:
+          m_Strip = 1;
+          [[fallthrough]];
+        case c_IndexLevelStrip:
+          break;
+      }
+    } else {
+      switch (m_IndexLevel) {
+        case c_IndexLevelSubdetector:
+          m_Section = 1;
+          [[fallthrough]];
+        case c_IndexLevelSection:
+          m_Sector = 1;
+          [[fallthrough]];
+        case c_IndexLevelSector:
+          m_Layer = 1;
+          [[fallthrough]];
+        case c_IndexLevelLayer:
+          m_Plane = 1;
+          [[fallthrough]];
+        case c_IndexLevelPlane:
+          m_Strip = 1;
+          [[fallthrough]];
+        case c_IndexLevelStrip:
+          break;
+      }
+    }
+  }
   m_IndexLevel = indexLevel;
   if (m_Subdetector == KLMElementNumbers::c_BKLM) {
     if (indexLevel == c_IndexLevelStrip) {

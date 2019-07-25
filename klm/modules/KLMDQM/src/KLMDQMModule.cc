@@ -12,6 +12,7 @@
 #include <TDirectory.h>
 
 /* Belle2 headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/modules/KLMDQM/KLMDQMModule.h>
 
 using namespace Belle2;
@@ -43,6 +44,8 @@ KLMDQMModule::KLMDQMModule() :
            std::string("BKLM"));
   addParam("inputDigitsName", m_inputDigitsName,
            "Name of BKLMDigit store array", std::string("BKLMDigits"));
+  m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
@@ -133,6 +136,43 @@ void KLMDQMModule::defineHisto()
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorEKLM->SetOption("LIVE");
   oldDirectory->cd();
+  /* Number of hits per channel. */
+  int nChannelHistograms = 0;
+  m_ChannelHits = new TH1F*[nChannelHistograms];
+  KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSector : klmSectors) {
+    if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
+      nChannelHistograms += 2;
+    else
+      nChannelHistograms += 3;
+  }
+  uint16_t* firstChannelNumbers = new uint16_t[nChannelHistograms + 1];
+  int i = 0;
+  for (KLMChannelIndex& klmSector : klmSectors) {
+    KLMChannelIndex klmChannel(klmSector);
+    klmChannel.setIndexLevel(KLMChannelIndex::c_IndexLevelStrip);
+    uint16_t channel = klmChannel.getKLMChannelNumber();
+    firstChannelNumbers[i] = m_ChannelArrayIndex->getIndex(channel);
+    if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM) {
+      channel = m_ElementNumbers->channelNumberBKLM(
+                  klmChannel.getSection(), klmChannel.getSector(), 8, 0, 1);
+      firstChannelNumbers[i + 1] = m_ChannelArrayIndex->getIndex(channel);
+      i += 2;
+    } else {
+      int layerIncrease = (klmSector.getSection() == 1) ? 4 : 5;
+      channel = m_ElementNumbers->channelNumberEKLM(
+                  klmChannel.getSection(), klmChannel.getSector(),
+                  1 + layerIncrease, 1, 1);
+      firstChannelNumbers[i + 1] = m_ChannelArrayIndex->getIndex(channel);
+      channel = m_ElementNumbers->channelNumberEKLM(
+                  klmChannel.getSection(), klmChannel.getSector(),
+                  1 + layerIncrease * 2, 1, 1);
+      firstChannelNumbers[i + 2] = m_ChannelArrayIndex->getIndex(channel);
+      i += 3;
+    }
+  }
+  firstChannelNumbers[nChannelHistograms] = m_ChannelArrayIndex->getNChannels();
+  delete[] firstChannelNumbers;
   /* EKLM histograms. */
   defineHistoEKLM();
   /* BKLM histograms. */

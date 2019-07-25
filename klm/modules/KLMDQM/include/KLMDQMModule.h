@@ -21,6 +21,8 @@
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 
 namespace Belle2 {
 
@@ -101,6 +103,12 @@ namespace Belle2 {
     /** Name of BKLMHit1d store array. */
     std::string m_inputHitsName1d;
 
+    /** KLM channel array index. */
+    const KLMChannelArrayIndex* m_ChannelArrayIndex;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
 
@@ -115,6 +123,9 @@ namespace Belle2 {
 
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
+
+    /** Number of hits per channel. */
+    TH1F** m_ChannelHits;
 
     /** Sector number. */
     TH1F* m_eklmSector;

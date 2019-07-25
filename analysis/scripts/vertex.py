@@ -9,7 +9,7 @@ def fitVertex(
     list_name,
     conf_level,
     decay_string='',
-    fitter='rave',
+    fitter='kfitter',
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
@@ -36,7 +36,7 @@ def fitVertex(
     """
 
     warning = (
-        "Direct use of fitVertex is deprecated.\n"
+        "Direct use of fitVertex is not recommended unless you know what you are doing.\n"
         "Please use vertexTree, vertexKFit, or any of the other convenience functions as appropriate.\n"
         "See documentation at \n  https://software.belle2.org/analysis/doc/Vertex.html"
     )
@@ -50,7 +50,7 @@ def _fitVertex(
     list_name,
     conf_level,
     decay_string='',
-    fitter='rave',
+    fitter='kfitter',
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,

@@ -36,7 +36,8 @@
 namespace Belle2 {
 
   /**
-   * This module dumps a tree and a set of histograms of ECL PID-related info used for validation.
+   * This module dumps a tree and a set of histograms of ECL PID-related info used for validation,
+   * starting from an input file w/ particle-gun-generated charged stable particles (and antiparticles).
    */
   class ECLChargedPIDDataAnalysisValidationModule : public Module {
 
@@ -87,92 +88,154 @@ namespace Belle2 {
 
     /**
      * The maximal number of charged stable particle hypotheses.
-     * this takes particles & antiparticles into account.
+     * This includes particles and antiparticles.
      */
     static constexpr unsigned int c_chargedStableHypos = 2 * Const::ChargedStable::c_SetSize;
 
     /**
      * The pdgId list of the charged stable particles of interest.
+     * This is a configurable parameter.
      */
     std::vector<int> m_inputPdgIdList;
 
     /**
-     * The pdgIds of the charged stable particles of interest.
-     * Make it a std::set to ensure its elements are unique.
+     * The pdgId set of the charged stable particles of interest.
+     * Using `std::set` ensures its elements are unique.
      */
     std::set<int> m_inputPdgIdSet;
 
     /**
-     * Output ROOT file used for storing info.
+     * Output `ROOT::TFile` that contains the info to plot.
+     *
+     * Book one `TFile` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<TFile*> m_outputFile = std::vector<TFile*>(c_chargedStableHypos);
 
     /**
-     * Base name of the output ROOT file.
+     * Base name of the output `ROOT::TFile`.
+     * This is a configurable parameter.
      */
     std::string m_outputFileName;
 
     /**
-     * TTree.
+     * A `ROOT::TTree` filled with the info to make control plots.
+     *
+     * Book one `TTree` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<TTree*> m_tree = std::vector<TTree*>(c_chargedStableHypos);
 
     /**
      * Track momentum in [GeV/c].
+     *
+     * Use the MC-matched reconstructed track w/ highest momentum.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<float> m_p = std::vector<float>(c_chargedStableHypos);
 
     /**
+     * Track transverse momentum in [GeV/c].
+     *
+     * Use the MC-matched reconstructed track w/ highest momentum.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
+     */
+    std::vector<float> m_pt = std::vector<float>(c_chargedStableHypos);
+
+    /**
      * Track polar angle in [rad].
+     *
+     * Use the MC-matched reconstructed track w/ highest momentum.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<float> m_trkTheta = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Track azimuthal angle in [rad].
+     *
+     * Use the MC-matched reconstructed track w/ highest momentum.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<float> m_trkPhi = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Cluster polar angle in [rad].
+     *
+     * Use the most energetic ECL cluster associated to the MC-matched reconstructed track w/ highest momentum.
+     * A NaN value is stored if no matching is found.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<float> m_clusterTheta = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Cluster azimuthal angle in [rad].
+     *
+     * Use the most energetic ECL cluster associated to the MC-matched reconstructed track w/ highest momentum.
+     * A NaN value is stored if no matching is found.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<float> m_clusterPhi = std::vector<float>(c_chargedStableHypos);
 
     /**
-     * Track has matching ECL cluster.
+     * Flag for track-cluster matching condition.
+     *
+     * Book one `char` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<char> m_trackClusterMatch = std::vector<char>(c_chargedStableHypos);
 
     /**
-     * Log-likelihood for the sig=m_inputPdgId particle hypothesis.
+     * Log-likelihood for the "signal" particle hypothesis.
+     *
+     * Here, "signal" refers to the charged stable particle under exam.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<float> m_logl_sig = std::vector<float>(c_chargedStableHypos);
 
     /**
-     * Log-likelihood for the bkg particle hypothesis.
-     * bkg = (m_inputPdgId!=pion) ? pion : kaon.
+     * Log-likelihood for the "background" particle hypothesis.
+     *
+     * The "background" hypothesis is defined according to the charged stable particle under exam:
+     *
+     *     chargedStableBkg = (chargedStable != Const::pion) ? Const::pion : Const::kaon.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
     std::vector<float> m_logl_bkg = std::vector<float>(c_chargedStableHypos);
 
     /**
-     * LogL(bkg)-LogL(sig).
-     * sig = m_inputPdgId
-     * bkg = (m_inputPdgId!=pion) ? pion : kaon.
+     * Delta Log-likelihood "signal" vs. "background".
+     *
+     * \f[
+     *   \Delta log(\mathcal{L}) = log(\mathcal{L}_{bkg}) - log(\mathcal{L}_{sig}).
+     * \f]
+     *
+     * Here, "signal" refers to the charged stable particle under exam.
+     * The "background" hypothesis is defined according to the charged stable particle under exam:
+     *
+     *     chargedStableBkg = (chargedStable != Const::pion) ? Const::pion : Const::kaon.
+     *
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
-    std::vector<float> m_deltalogl = std::vector<float>(c_chargedStableHypos);
+    std::vector<float> m_deltalogl_sig_bkg = std::vector<float>(c_chargedStableHypos);
 
     /**
-     * Global PID as likelihod ratio:
+     * List of global PIDs, defined by the likelihod ratio:
      *
-     * pid = L_sig / (L_sig + L_bkg0 + L_bkg1 + ...)
+     * \f[
+     *   PID_{i} = \frac{\matchal{L}_{i}}{\sum_{j}\matchal{L}_{j}},
+     * \f]
      *
-     * for the sig=m_inputPdgId particle hypothesis.
+     * where \f$i\fS represents each charged stable particle hypothesis as defined in `Const::chargedStableSet`.
+     *
+     * Book one `std::vector<float>` for each charged stable particle (and antiparticle) candidate.
      */
-    std::vector<float> m_pid = std::vector<float>(c_chargedStableHypos);
+    std::vector<std::vector<float>> m_pids_glob = std::vector<std::vector<float>>(c_chargedStableHypos,
+                                                  std::vector<float>(Const::ChargedStable::c_SetSize));
 
     /**
      * Binning w/ variable bin size for track momentum (in [GeV/c]).
@@ -189,22 +252,35 @@ namespace Belle2 {
     /**
      * Dump PID vars.
      */
-    void dumpPIDVars(TTree* tree, const std::string& pdgIdStr);
+    void dumpPIDVars(TTree* sampleTree, const Const::ChargedStable& sigHypo, const int sigCharge, const Const::ChargedStable& bkgHypo);
 
     /**
-     * Dump PID efficiency vs clusterTheta, clusterPhi, p... for a fixed cut on PID as previously initialised.
+     * Dump PID efficiency / fake rate vs clusterTheta, clusterPhi, p... for a fixed cut on PID as previously initialised.
+     *
+     * \param[in] sampleTree the `TTree` of the charged particle under consideration.
+     * \param[in] sampleHypo the `Const::ChargedStable` hypothesis corresponding to the charged particle under consideration.
+     * \param[in] sampleCharge the charge (+/- 1) of the charged particle under consideration.
+     * \param[in] sigHypo the `Const::ChargedStable` "signal" hypothesis to test.
+     *
+     * If sampleHypo == sigHypo, will be measuring an efficiency, otherwise a fake rate.
      */
-    void dumpPIDEfficiency(TTree* tree, const std::string& pdgIdStr);
+    void dumpPIDEfficiencyFakeRate(TTree* sampleTree, const Const::ChargedStable& sampleHypo, const int sampleCharge,
+                                   const Const::ChargedStable& sigHypo);
 
     /**
-     * Dump track-to-ECL-cluster matching efficiency vs clusterTheta, clusterPhi, p....
+     * Dump track-to-ECL-cluster matching efficiency vs clusterTheta, clusterPhi, pt....
+     *
+     * \param[in] sampleTree the `TTree` of the charged particle under consideration.
+     * \param[in] sampleHypo the `Const::ChargedStable` hypothesis corresponding to the charged particle under consideration.
+     * \param[in] sampleCharge the charge of the charged particle under consideration.
+     *
      */
-    void dumpTrkClusMatchingEfficiency(TTree* tree, const std::string& pdgIdStr);
+    void dumpTrkClusMatchingEfficiency(TTree* sampleTree, const Const::ChargedStable& sampleHypo, const int sampleCharge);
 
     /**
-     * Check if the input pdgId is that of a valid charged particle.
+     * Check if the input pdgId is that of a valid charged stable particle.
      */
-    bool isValidChargedPdg(const int pdg) const
+    inline bool isValidChargedPdg(const int pdg) const
     {
       return (Const::chargedStableSet.find(pdg) != Const::invalidParticle);
     }

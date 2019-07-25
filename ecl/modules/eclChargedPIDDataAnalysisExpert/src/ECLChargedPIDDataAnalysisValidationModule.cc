@@ -352,8 +352,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
   // Histograms of p, clusterTheta, clusterPhi... for "pass" (N, numerator) and "all" (D, denominator) events.
   TString h_p_N_name = TString::Format("h_p_N_%i", sigHypoPdgId);
   TString h_p_D_name = TString::Format("h_p_D_%i", sigHypoPdgId);
-  TH1F* h_p_N = new TH1F(h_p_N_name.Data(), "h_p_N", 25, 0.0, 5.0);
-  TH1F* h_p_D = new TH1F(h_p_D_name.Data(), "h_p_D", 25, 0.0, 5.0);
+  TH1F* h_p_N = new TH1F(h_p_N_name.Data(), "h_p_N", 15, 0.0, 5.0);
+  TH1F* h_p_D = new TH1F(h_p_D_name.Data(), "h_p_D", 15, 0.0, 5.0);
 
   TString h_th_N_name = TString::Format("h_th_N_%i", sigHypoPdgId);
   TString h_th_D_name = TString::Format("h_th_D_%i", sigHypoPdgId);
@@ -362,8 +362,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
 
   TString h_phi_N_name = TString::Format("h_phi_N_%i", sigHypoPdgId);
   TString h_phi_D_name = TString::Format("h_phi_D_%i", sigHypoPdgId);
-  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 30, -3.14159, 3.14159);
-  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 30, -3.14159, 3.14159);
+  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 15, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 15, -3.14159, 3.14159);
 
   // Fill the histograms from the sample's TTree.
 
@@ -483,8 +483,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
   // Histograms of pt, clusterTheta, clusterPhi... for "pass" (N, numerator) and "all" (D, denominator) events.
   TString h_pt_N_name = TString::Format("h_pt_N_%i", sampleHypoPdgId);
   TString h_pt_D_name = TString::Format("h_pt_D_%i", sampleHypoPdgId);
-  TH1F* h_pt_N = new TH1F(h_pt_N_name.Data(), "h_pt_N", 25, 0.0, 5.0);
-  TH1F* h_pt_D = new TH1F(h_pt_D_name.Data(), "h_pt_D", 25, 0.0, 5.0);
+  TH1F* h_pt_N = new TH1F(h_pt_N_name.Data(), "h_pt_N", 15, 0.0, 5.0);
+  TH1F* h_pt_D = new TH1F(h_pt_D_name.Data(), "h_pt_D", 15, 0.0, 5.0);
 
   TString h_th_N_name = TString::Format("h_th_N_%i", sampleHypoPdgId);
   TString h_th_D_name = TString::Format("h_th_D_%i", sampleHypoPdgId);
@@ -493,8 +493,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
 
   TString h_phi_N_name = TString::Format("h_phi_N_%i", sampleHypoPdgId);
   TString h_phi_D_name = TString::Format("h_phi_D_%i", sampleHypoPdgId);
-  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 30, -3.14159, 3.14159);
-  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 30, -3.14159, 3.14159);
+  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 15, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 15, -3.14159, 3.14159);
 
   TString match_cut_N("trackClusterMatch == 1");
   TString match_cut_D("trackClusterMatch >= 0");

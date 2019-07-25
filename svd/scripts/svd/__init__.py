@@ -140,9 +140,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
         missingAPVCreator = register_module('SVDMissingAPVsClusterCreator')
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
-        missingAPVCreator.param('RecoDigits', recoDigitsName)
-        missingAPVCreator.param('Clusters', clusterName)
-        missingAPVCreator.param('useDB', True)
         path.add_module(missingAPVCreator)
 
     # Add SVDSpacePointCreator

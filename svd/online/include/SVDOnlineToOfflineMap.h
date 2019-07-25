@@ -218,7 +218,7 @@ namespace Belle2 {
     /** struct to hold missing APVs informations */
     struct missingAPV {
       VxdID m_sensorID;           /**< Sensor ID */
-      bool m_uSide;               /**< True if u-side of the sensor */
+      bool m_isUSide;               /**< True if u-side of the sensor */
       float m_halfStrip;          /**< floating strip in the middle of the APV */
     };
 
@@ -226,6 +226,11 @@ namespace Belle2 {
      */
     std::vector< missingAPV > m_missingAPVs;
 
+    /** Get number of missing APVs */
+    int getNumberOfMissingAPVs()
+    {
+      return m_missingAPVs.size();
+    }
 
     /** Get ChipInfo for a given layer/ladder/dssd/side/strip combination.
      * @param layer is the the layer number

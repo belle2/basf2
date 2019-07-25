@@ -340,17 +340,21 @@ void SVDOnlineToOfflineMap::prepareListOfMissingAPVs()
         for (int view = 0; view < 2; view++) {
 
           int nAPVs = 6;
-          if (layer != 3 && view == 0)
+          if (layer.getLayerNumber() != 3 && view == 0)
             nAPVs = 4;
+
           //loop on all APVs of the side
           for (int apv = 0; apv < nAPVs; apv++) {
-            if (! isAPVinMap(sensor, view, apv * 128)) {
+            B2DEBUG(29, "checking " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." << sensor.getSensorNumber() <<
+                    ", view = " << view << ", apv = " << apv);
+            if (! isAPVinMap(sensor, view, apv * 128 + 63.5)) {
               missingAPV tmp_missingAPV;
               tmp_missingAPV.m_sensorID = sensor;
-              tmp_missingAPV.m_uSide = view;
+              tmp_missingAPV.m_isUSide = view;
               tmp_missingAPV.m_halfStrip = apv * 128 + 63.5;
 
               m_missingAPVs.push_back(tmp_missingAPV);
+              B2DEBUG(29, "FOUND MISSING APV: " << sensor << ", " << view << ", " << apv);
             }
 
           }

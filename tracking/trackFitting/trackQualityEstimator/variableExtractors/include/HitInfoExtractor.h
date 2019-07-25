@@ -29,8 +29,8 @@ namespace Belle2 {
     HitInfoExtractor(std::vector<Named<float*>>& variableSet) :
       VariableExtractor()
     {
-      addVariable("N_TP_noKalmanFitterInfo", variableSet);
-      addVariable("N_no_TrackPoint", variableSet);
+      addVariable("N_TrackPoints_without_KalmanFitterInfo", variableSet);
+      addVariable("N_Hits_without_TrackPoint", variableSet);
 
       initializeStats("weight", variableSet);
       initializeStats("smoothedChi2", variableSet);
@@ -39,15 +39,14 @@ namespace Belle2 {
     /// extract variables from SpacePoints
     void extractVariables(const RecoTrack& recoTrack)
     {
-      //get fitting parameters
-      const std::vector<RecoHitInformation*>& relatedRecoHitInformation = recoTrack.getRecoHitInformations(true);
+      // get fitting parameters
+      const std::vector<RecoHitInformation*>& recoHitInformations = recoTrack.getRecoHitInformations(true);
       std::vector<const genfit::KalmanFitterInfo*> kalmanFitterInfos;
-      kalmanFitterInfos.reserve(relatedRecoHitInformation.size());
+      kalmanFitterInfos.reserve(recoHitInformations.size());
 
-      int n_no_KalmanFitterInfo = 0;
-      int n_no_trackPoint = 0;
-
-      for (const RecoHitInformation* recoHitInformation : relatedRecoHitInformation) {
+      int n_no_trackPoint = 0;  // number of recoHitInformations without related track points
+      int n_no_KalmanFitterInfo = 0;   // number of track points without related KalmanFitterInfo
+      for (const RecoHitInformation* recoHitInformation : recoHitInformations) {
         const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
         if (trackPoint) {
           const genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();
@@ -60,42 +59,47 @@ namespace Belle2 {
           n_no_trackPoint++;
         }
       }
-      m_variables.at("N_TP_noKalmanFitterInfo") = n_no_KalmanFitterInfo;
-      m_variables.at("N_no_TrackPoint") = n_no_trackPoint;
+      m_variables.at("N_Hits_without_TrackPoint") = n_no_trackPoint;
+      m_variables.at("N_TrackPoints_without_KalmanFitterInfo") = n_no_KalmanFitterInfo;
 
-      std::vector<float> values(kalmanFitterInfos.size());
+      int i_lastSVDHit = -1;
+      if (recoTrack.hasSVDHits()) {
+        i_lastSVDHit = recoTrack.getNumberOfPXDHits() + recoTrack.getNumberOfSVDHits()
+                       - 1 - n_no_KalmanFitterInfo - n_no_trackPoint;
+      }
+      int i_firstCDCHit = -1;
+      if (recoTrack.hasCDCHits()) {
+        i_firstCDCHit = i_lastSVDHit + 1;
+      }
 
-      int i_lastSVDhit = recoTrack.hasSVDHits() ?
-                         recoTrack.getNumberOfPXDHits() + recoTrack.getNumberOfSVDHits() - 1 - n_no_KalmanFitterInfo - n_no_trackPoint
-                         : -1;
-      int i_firstCDChit = recoTrack.hasCDCHits() ? i_lastSVDhit + 1 : -1;
-
+      std::vector<float> fitWeights(kalmanFitterInfos.size());
       for (unsigned int i = 0; i < kalmanFitterInfos.size(); ++i) {
-        values[i] = kalmanFitterInfos[i]->getWeights().front();
-        if (i == i_lastSVDhit) {
-          m_variables.at("weight_lastSVDhit") = values[i];
-        } else if (i == i_firstCDChit) {
-          m_variables.at("weight_firstCDChit") = values[i];
+        fitWeights[i] = kalmanFitterInfos[i]->getWeights().front();
+        if (i == i_lastSVDHit) {
+          m_variables.at("weight_lastSVDhit") = fitWeights[i];
+        } else if (i == i_firstCDCHit) {
+          m_variables.at("weight_firstCDChit") = fitWeights[i];
         }
       }
-      setStats("weight", values);
+      setStats("weight", fitWeights);
 
+
+      std::vector<float> chit2Values(kalmanFitterInfos.size());
       for (unsigned int i = 0; i < kalmanFitterInfos.size(); ++i) {
         try {
-          values[i] = kalmanFitterInfos[i]->getSmoothedChi2();
+          chit2Values[i] = kalmanFitterInfos[i]->getSmoothedChi2();
         } catch (const std::exception& e) {
           B2WARNING("HitInfoExtractor: Caught exception in kalmanFitterInfos[i]->getSmoothedChi2() \n"
                     << "-->" << e.what());
-          values[i] = -1;
+          chit2Values[i] = -1;
         }
-        if (i == i_lastSVDhit) {
-          m_variables.at("smoothedChi2_lastSVDhit") = values[i];
-        } else if (i == i_firstCDChit) {
-          m_variables.at("smoothedChi2_firstCDChit") = values[i];
+        if (i == i_lastSVDHit) {
+          m_variables.at("smoothedChi2_lastSVDhit") = chit2Values[i];
+        } else if (i == i_firstCDCHit) {
+          m_variables.at("smoothedChi2_firstCDChit") = chit2Values[i];
         }
       }
-      setStats("smoothedChi2", values);
-
+      setStats("smoothedChi2", chit2Values);
     }
 
   protected:

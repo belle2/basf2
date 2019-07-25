@@ -16,9 +16,9 @@
 namespace Belle2 {
 
   /**
-   * BKLM channel index.
+   * KLM channel index.
    */
-  class BKLMChannelIndex {
+  class KLMChannelIndex {
 
   public:
 
@@ -27,20 +27,23 @@ namespace Belle2 {
      */
     enum IndexLevel {
 
-      /** Forward. */
-      c_IndexLevelForward = 1,
+      /** Subdetector (BKLM or EKLM). */
+      c_IndexLevelSubdetector = 1,
+
+      /** Section ("forward" for BKLM, "endcap" for EKLM). */
+      c_IndexLevelSection = 2,
 
       /** Sector. */
-      c_IndexLevelSector = 2,
+      c_IndexLevelSector = 3,
 
       /** Layer. */
-      c_IndexLevelLayer = 3,
+      c_IndexLevelLayer = 4,
 
       /** Plane. */
-      c_IndexLevelPlane = 4,
+      c_IndexLevelPlane = 5,
 
       /** Strip. */
-      c_IndexLevelStrip = 5,
+      c_IndexLevelStrip = 6,
 
     };
 
@@ -48,24 +51,26 @@ namespace Belle2 {
      * Constructor.
      * @param[in] indexLevel Index level.
      */
-    explicit BKLMChannelIndex(enum IndexLevel indexLevel = c_IndexLevelStrip);
+    explicit KLMChannelIndex(enum IndexLevel indexLevel = c_IndexLevelStrip);
 
     /**
      * Constructor.
-     * @param[in] forward    Forward (1) or backward (0) BKLM.
-     * @param[in] sector     Sector (1-based).
-     * @param[in] layer      Layer (1-based).
-     * @param[in] plane      Plane (0-based).
-     * @param[in] strip      Strip (1-based).
-     * @param[in] indexLevel Index level.
+     * @param[in] subdetector Subdetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector.
+     * @param[in] layer       Layer.
+     * @param[in] plane       Plane.
+     * @param[in] strip       Strip.
+     * @param[in] indexLevel  Index level.
      */
-    BKLMChannelIndex(int forward, int sector, int layer, int plane, int strip,
-                     enum IndexLevel indexLevel = c_IndexLevelStrip);
+    KLMChannelIndex(int subdetector, int section, int sector,
+                    int layer, int plane, int strip,
+                    enum IndexLevel indexLevel = c_IndexLevelStrip);
 
     /**
      * Destructor.
      */
-    ~BKLMChannelIndex();
+    ~KLMChannelIndex();
 
     /**
      * Set index level.
@@ -73,11 +78,19 @@ namespace Belle2 {
     void setIndexLevel(enum IndexLevel indexLevel);
 
     /**
-     * Get forward.
+     * Get subdetector.
      */
-    int getForward() const
+    int getSubdetector() const
     {
-      return m_Forward;
+      return m_Subdetector;
+    }
+
+    /**
+     * Get section.
+     */
+    int getSection() const
+    {
+      return m_Section;
     }
 
     /**
@@ -128,39 +141,65 @@ namespace Belle2 {
     uint16_t getKLMSectorNumber() const;
 
     /**
+     * First channel for BKLM.
+     */
+    KLMChannelIndex beginBKLM();
+
+    /**
+     * Last channel for BKLM.
+     */
+    KLMChannelIndex& endBKLM();
+
+    /**
+     * First channel for EKLM.
+     */
+    KLMChannelIndex beginEKLM();
+
+    /**
+     * Last channel for EKLM.
+     */
+    KLMChannelIndex& endEKLM();
+
+    /**
      * First channel.
      */
-    BKLMChannelIndex begin();
+    KLMChannelIndex begin()
+    {
+      return beginBKLM();
+    }
 
     /**
      * Last channel.
      */
-    BKLMChannelIndex& end();
+    KLMChannelIndex& end()
+    {
+      return endEKLM();
+    }
 
     /**
      * Operator ++.
      */
-    BKLMChannelIndex& operator++();
+    KLMChannelIndex& operator++();
 
     /**
      * Increment (to use in Python).
      */
-    BKLMChannelIndex& increment();
+    KLMChannelIndex& increment();
 
     /**
      * Operator ==.
      */
-    bool operator==(BKLMChannelIndex& index);
+    bool operator==(KLMChannelIndex& index);
 
     /**
      * Operator !=.
      */
-    bool operator!=(BKLMChannelIndex& index);
+    bool operator!=(KLMChannelIndex& index);
 
     /**
      * Operator *.
      */
-    BKLMChannelIndex& operator*();
+    KLMChannelIndex& operator*();
 
   protected:
 
@@ -172,8 +211,11 @@ namespace Belle2 {
     /** Index level. */
     enum IndexLevel m_IndexLevel;
 
-    /** Forward. */
-    int m_Forward;
+    /** Subdetector. */
+    int m_Subdetector;
+
+    /** Section. */
+    int m_Section;
 
     /** Sector. */
     int m_Sector;
@@ -192,6 +234,9 @@ namespace Belle2 {
 
     /** KLM element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
+
+    /** EKLM element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
 
   };
 

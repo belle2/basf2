@@ -44,14 +44,6 @@ namespace Belle2 {
     /// Do not allow to copy a message
     void operator=(const ZMQModuleMessage&) = delete;
 
-  protected:
-    /// Constructor out of different parts
-    template <class ...T>
-    explicit ZMQModuleMessage(const T& ... arguments) :
-      m_messageParts( {ZMQMessageHelper::createZMQMessage(arguments)...})
-    {
-    }
-
     /// Get a reference to the message parts
     MessageParts& getMessageParts()
     {
@@ -105,6 +97,13 @@ namespace Belle2 {
   protected:
     /// Do not allow to create a new message from scratch publicly
     ZMQModuleMessage() = default;
+
+    /// Constructor out of different parts
+    template <class ...T>
+    explicit ZMQModuleMessage(T&& ... arguments) :
+      m_messageParts( {ZMQMessageHelper::createZMQMessage(std::forward<T>(arguments)) ... })
+    {
+    }
 
   private:
     /// The content of this message as an array of zmq messages. Will be set during constructor or when coming from a socket.

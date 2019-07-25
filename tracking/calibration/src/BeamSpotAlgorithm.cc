@@ -86,8 +86,8 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 
   auto payload = new BeamSpot();
 
-  payload->setVertex(vertexPos, vertexCov);
-  payload->setSize(vertexSize);
+  payload->setIP(vertexPos, vertexCov);
+  payload->setSizeCovMatrix(vertexSize);
 
   saveCalibration(payload);
 

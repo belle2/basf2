@@ -1531,7 +1531,7 @@ def looseMCTruth(list_name, path):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(target_list_name, inputParticlelists=[], path=None):
+def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=False, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1541,13 +1541,17 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=None):
     @param inputParticlelists list of input particle list names, which serve
                               as a source of particles to build ROE, the FSP particles from
                               target_list_name are excluded from ROE object
+    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
     # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
-    fillParticleList('gamma:roe_default', '', path=path)
-    fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
-    inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    if not belle_sources:
+        fillParticleList('gamma:roe_default', '', path=path)
+        fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
+        inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    else:
+        inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)

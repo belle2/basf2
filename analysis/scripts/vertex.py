@@ -38,7 +38,7 @@ def fitVertex(
     warning = (
         "Direct use of fitVertex is not recommended unless you know what you are doing.\n"
         "Please use vertexTree, vertexKFit, or any of the other convenience functions as appropriate.\n"
-        "See documentation at \n  https://software.belle2.org/analysis/doc/Vertex.html"
+        "See documentation at  https://software.belle2.org"
     )
 
     B2WARNING(warning)
@@ -291,9 +291,8 @@ def vertexRave(
         message_if = ""
     else:
         message_if = (
-            "Please consult the documentation at\n"
-            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
-            "for special constraints.\n"
+            "Please consult the documentation at  https://software.belle2.org \n"
+            "(search for TreeFitter) for special constraints.\n"
         )
 
     if not silence_warning:
@@ -355,9 +354,8 @@ def vertexRaveDaughtersUpdate(
         message_if = ""
     else:
         message_if = (
-            "Please consult the documentation at\n"
-            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
-            "for special constraints.\n"
+            "Please consult the documentation at  https://software.belle2.org \n"
+            "(search for TreeFitter) for special constraints.\n"
         )
 
     if not silence_warning:
@@ -411,9 +409,8 @@ def massVertexRave(
         message_if = ""
     else:
         message_if = (
-            "Please consult the documentation at\n"
-            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
-            "for special constraints.\n"
+            "Please consult the documentation at  https://software.belle2.org \n"
+            "(search for TreeFitter) for special constraints.\n"
         )
 
     if not silence_warning:
@@ -461,9 +458,8 @@ def massVertexRaveDaughtersUpdate(
         message_if = ""
     else:
         message_if = (
-            "Please consult the documentation at\n"
-            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
-            "for special constraints.\n"
+            "Please consult the documentation at  https://software.belle2.org \n"
+            "(search for TreeFitter) for special constraints.\n"
         )
 
     if not silence_warning:
@@ -512,9 +508,8 @@ def massRave(
         message_if = ""
     else:
         message_if = (
-            "Please consult the documentation at\n"
-            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
-            "for special constraints.\n"
+            "Please consult the documentation at  https://software.belle2.org \n"
+            "(search for TreeFitter) for special constraints.\n"
         )
 
     if not silence_warning:

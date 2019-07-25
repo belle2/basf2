@@ -118,6 +118,12 @@ namespace Belle2 {
     std::string m_outputFileName;
 
     /**
+     * Save the `TTree` in the output file alongside the histograms.
+     * This is a configurable parameter.
+     */
+    bool m_saveValidationTree;
+
+    /**
      * A `ROOT::TTree` filled with the info to make control plots.
      *
      * Book one `TTree` for each charged stable particle (and antiparticle) candidate.

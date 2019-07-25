@@ -30,7 +30,9 @@ ECLChargedPIDDataAnalysisValidationModule::ECLChargedPIDDataAnalysisValidationMo
   addParam("outputFileName", m_outputFileName,
            "The base name of the output file. The pdgId of the charged particle is appended to the name.",
            std::string("ECLChargedPid"));
-
+  addParam("saveValidationTree", m_saveValidationTree,
+           "If this flag is set to True, save also the validation TTree. Default is False.",
+           bool(false));
 }
 
 ECLChargedPIDDataAnalysisValidationModule::~ECLChargedPIDDataAnalysisValidationModule()
@@ -251,8 +253,10 @@ void ECLChargedPIDDataAnalysisValidationModule::terminate()
     // Dump plots of matching efficiency for this "sample".
     dumpTrkClusMatchingEfficiency(m_tree[chargedSampleIdx], chargedStableSample, chargeSign);
 
-    // Write the TTree to file.
-    m_tree[chargedSampleIdx]->Write();
+    // Write the TTree to file if requested.
+    if (m_saveValidationTree) {
+      m_tree[chargedSampleIdx]->Write();
+    }
 
     m_outputFile[chargedSampleIdx]->Close();
 

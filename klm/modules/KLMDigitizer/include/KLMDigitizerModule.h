@@ -21,7 +21,9 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
@@ -86,6 +88,19 @@ namespace Belle2 {
      */
     void digitizeEKLM();
 
+    /**
+     * Check if channel is active (status is not KLMChannelStatus::c_Dead).
+     * @param[in] channel Channel.
+     */
+    bool checkActive(uint16_t channel);
+
+    /**
+     * Efficiency correction.
+     * @param[in] efficiency Efficiency.
+     * @return True if the digitization passes the efficiency correction.
+     */
+    bool efficiencyCorrection(float efficiency);
+
     /** Digitization parameters. */
     DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
 
@@ -94,6 +109,12 @@ namespace Belle2 {
 
     /** Channel data. */
     DBObjPtr<EKLMChannels> m_Channels;
+
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** Strip efficiency. */
+    DBObjPtr<KLMStripEfficiency> m_StripEfficiency;
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;

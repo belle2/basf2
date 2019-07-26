@@ -491,7 +491,7 @@ def FillParticleLists(mode='Expert', path=None):
                     cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
                 else:
                     reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
-                    vertexKFit('K_S0:inRoe', 0.01, path=path, silence_warning=True)
+                    vertexKFit('K_S0:inRoe', 0.01, path=path)
                 readyParticleLists.append('K_S0:inRoe')
 
             if particleList == 'K+:inRoe':
@@ -505,7 +505,7 @@ def FillParticleLists(mode='Expert', path=None):
                 fillParticleList(
                     'p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
-                vertexKFit(particleList, 0.01, path=path, silence_warning=True)
+                vertexKFit(particleList, 0.01, path=path)
                 # if mode != 'Expert':
                 matchMCTruth(particleList, path=path)
                 readyParticleLists.append(particleList)
@@ -567,7 +567,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
                         if category != "SlowPion" and category != "Kaon":
                             continue
 
-        if mode != 'Teacher':
+        if mode == 'Expert' or (mode == 'Sampler' and os.path.isfile(identifierEventLevel)):
 
             B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixEventLevel + '.')
 

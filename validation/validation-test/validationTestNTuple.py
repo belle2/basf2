@@ -29,6 +29,20 @@ tntuple.SetAlias('MetaOptions', "some_meta_options")
 
 tntuple.Write()
 
+# Expert
+# =================
+
+tntuple = ROOT.TNtuple("ntuple_expert", "ntuple expert", "x:y:z:k")
+
+array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
+tntuple.Fill(array_of_values)
+
+tntuple.SetAlias('Description', "Test expert ntuple")
+tntuple.SetAlias('Check', "Should be expert.")
+tntuple.SetAlias('MetaOptions', "expert")
+
+tntuple.Write()
+
 # High precision
 # =================
 

@@ -55,6 +55,13 @@ namespace Belle2 {
     static uint16_t moduleNumber(int forward, int sector, int layer);
 
     /**
+     * Get sector number.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     */
+    static uint16_t sectorNumber(int forward, int sector);
+
+    /**
      * Get layer global number.
      * @param[in] forward Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).

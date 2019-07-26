@@ -23,6 +23,19 @@ namespace Belle2 {
   public:
 
     /**
+     * Subdetector constants.
+     */
+    enum Subdetector {
+
+      /** BKLM. */
+      c_BKLM = 1,
+
+      /** EKLM. */
+      c_EKLM = 2,
+
+    };
+
+    /**
      * Instantiation.
      */
     static const KLMElementNumbers& Instance();
@@ -100,6 +113,20 @@ namespace Belle2 {
      * @param[in] layer  Layer number.
      */
     uint16_t moduleNumberEKLM(int endcap, int sector, int layer) const;
+
+    /**
+     * Get sector number for BKLM.
+     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     */
+    uint16_t sectorNumberBKLM(int forward, int sector) const;
+
+    /**
+     * Get sector number for EKLM.
+     * @param[in] endcap Endcap number.
+     * @param[in] sector Sector number.
+     */
+    uint16_t sectorNumberEKLM(int endcap, int sector) const;
 
   private:
 

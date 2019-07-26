@@ -66,13 +66,6 @@ You can save information from analysis jobs directly from the ``VariableManager`
 
 .. toctree:: VariableManagerOutput
 
-.. warning::
-        The alternative `NtupleMaker` tools are now deprecated, please update your scripts.
-        We expect to remove this functionality in the next major release.
-        The documentation is included here for completeness. 
-
-.. toctree:: NtupleMaker
-
 Event-based analysis
 ====================
 
@@ -98,7 +91,7 @@ Advanced Topics
 
 .. toctree:: TreeFitter
 
-.. toctree:: VertexFitter
+.. .. toctree:: VertexFitter
 
 .. toctree:: MVA
 

@@ -14,6 +14,7 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
+#include <iostream>
 using std::vector;
 
 namespace TreeFitter {
@@ -38,36 +39,37 @@ namespace TreeFitter {
 
   InternalParticle::InternalParticle(Belle2::Particle* particle,
                                      const ParticleBase* mother,
-                                     bool forceFitAll) :
-    ParticleBase(particle, mother),
+                                     const ConstraintConfiguration& config,
+                                     bool forceFitAll
+                                    ) :
+    ParticleBase(particle, mother, &config),// config pointer here to allow final states not to have it
     m_massconstraint(false),
     m_lifetimeconstraint(false),
     m_isconversion(false),
-    m_automatic_vertex_constraining(automatic_vertex_constraining) // this is an extern FIXME -> move to config class
+    m_automatic_vertex_constraining(config.m_automatic_vertex_constraining)
   {
-
     if (particle) {
       for (auto daughter : particle->getDaughters()) {
-        addDaughter(daughter, forceFitAll);
+        addDaughter(daughter, config, forceFitAll);
       }
     } else {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
     }
 
-    m_massconstraint = std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != TreeFitter::massConstraintListPDG.end();
+    m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
+                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
 
     if (!m_automatic_vertex_constraining) {
       // if this is a hadronically decaying resonance it is usefule to constraint the decay vertex to its mothers decay vertex.
       //
-      m_shares_vertex_with_mother  = std::find(TreeFitter::fixedToMotherVertexListPDG.begin(),
-                                               TreeFitter::fixedToMotherVertexListPDG.end(),
-                                               std::abs(m_particle->getPDGCode())) != TreeFitter::fixedToMotherVertexListPDG.end() && this->mother();
+      m_shares_vertex_with_mother  = std::find(config.m_fixedToMotherVertexListPDG.begin(),
+                                               config.m_fixedToMotherVertexListPDG.end(),
+                                               std::abs(m_particle->getPDGCode())) != config.m_fixedToMotherVertexListPDG.end() && this->mother();
 
       // use geo constraint if this particle is in the list to constrain
-      m_geo_constraint = std::find(TreeFitter::geoConstraintListPDG.begin(),
-                                   TreeFitter::geoConstraintListPDG.end(),
-                                   std::abs(m_particle->getPDGCode())) != TreeFitter::geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
+      m_geo_constraint = std::find(config.m_geoConstraintListPDG.begin(),
+                                   config.m_geoConstraintListPDG.end(),
+                                   std::abs(m_particle->getPDGCode())) != config.m_geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
     } else {
       m_shares_vertex_with_mother = this->mother() && m_isStronglyDecayingResonance;
       m_geo_constraint = this->mother() && !m_shares_vertex_with_mother;
@@ -145,10 +147,9 @@ namespace TreeFitter {
             B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
           } else if (mother() && mother()->posIndex() >= 0) {
-            int posindexmother = mother()->posIndex();
-
-            fitparams.getStateVector().segment(posindex, 3) = fitparams.getStateVector().segment(posindexmother, 3);
-
+            const int posindexmother = mother()->posIndex();
+            const int dim = m_config->m_originDimension; //TODO acess mother
+            fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
           } else {
             /** (0,0,0) is the best guess in any other case */
             fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
@@ -168,14 +169,14 @@ namespace TreeFitter {
   ErrCode InternalParticle::initParticleWithMother(FitParams& fitparams)
   {
     int posindex = posIndex();
-
     if (hasPosition() &&
         mother() &&
         fitparams.getStateVector()(posindex) == 0 &&
         fitparams.getStateVector()(posindex + 1) == 0 && \
         fitparams.getStateVector()(posindex + 2) == 0) {
-      int posindexmom = mother()->posIndex();
-      fitparams.getStateVector().segment(posindex , 3) = fitparams.getStateVector().segment(posindexmom, 3);
+      const int posindexmom = mother()->posIndex();
+      const int dim = m_config->m_originDimension; //TODO acess mother?
+      fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);
     }
     return initTau(fitparams);
   }
@@ -345,13 +346,13 @@ namespace TreeFitter {
       list.push_back(Constraint(this, Constraint::kinematic, depth, 4, 3));
     }
     if (m_geo_constraint) {
-      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
+      assert(m_config);
+      const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
+      list.push_back(Constraint(this, Constraint::geometric, depth, dim, 3));
     }
-
     if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
-
 
   }
 

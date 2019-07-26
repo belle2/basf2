@@ -64,6 +64,11 @@ namespace Belle2 {
     double isSignalAcceptMissingMassive(const Particle* part);
 
     /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including missing gamma), 0 otherwise
+     */
+    double isSignalAcceptMissingGamma(const Particle* part);
+
+    /**
      * return 1 if Particle is correctly reconstructed (SIGNAL including missing all particles), 0 otherwise
      */
     double isSignalAcceptMissing(const Particle* part);
@@ -272,5 +277,14 @@ namespace Belle2 {
      * correspont to the track's mcmatch (== the particle)
      */
     double particleClusterBestMCPDGCode(const Particle*);
+
+
+    /**
+     * returns True if the environment is MC and False for data
+     */
+    double isMC(const Particle*);
+
+
   }
 }
+

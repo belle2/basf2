@@ -19,8 +19,7 @@
 
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
-#include <klm/dataobjects/BKLMChannelIndex.h>
-#include <klm/dataobjects/EKLMChannelIndex.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 
 namespace Belle2 {
 
@@ -82,12 +81,9 @@ namespace Belle2 {
      */
     void setDataAllChannels(const T data)
     {
-      BKLMChannelIndex bklmChannels;
-      for (BKLMChannelIndex& bklmChannel : bklmChannels)
-        setChannelData(bklmChannel.getKLMChannelNumber(), data);
-      EKLMChannelIndex eklmChannels;
-      for (EKLMChannelIndex& eklmChannel : eklmChannels)
-        setChannelData(eklmChannel.getKLMChannelNumber(), data);
+      KLMChannelIndex klmChannels;
+      for (KLMChannelIndex& klmChannel : klmChannels)
+        setChannelData(klmChannel.getKLMChannelNumber(), data);
     }
 
   private:

@@ -29,7 +29,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   auto hVertexX = getObjectPtr<TH1F>("Y4S_Vertex.X");
   hVertexX->GetXaxis()->UnZoom();
 
-  int entries = double(hVertexX->GetEntries());
+  int entries = hVertexX->GetEntries();
   if (entries < minVertices) {
     return c_NotEnoughData;
   }
@@ -58,18 +58,17 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   hVertexZ->GetQuantiles(1, medianZ, q);
 
   auto vertexPos = TVector3(medianX[0], medianY[0], medianZ[0]);
+  auto vertexSize = TMatrixDSym(3);
+  auto vertexCov = TMatrixDSym(3);
 
   auto xRMS = hVertexX->GetRMS();
   auto yRMS = hVertexY->GetRMS();
   auto zRMS = hVertexZ->GetRMS();
 
-  auto vertexSize = TMatrixDSym(3);
-
   hVertexX->SetAxisRange(medianX[0] - nSigmacut * xRMS, medianX[0] + nSigmacut * xRMS, "X");
   hVertexY->SetAxisRange(medianY[0] - nSigmacut * yRMS, medianY[0] + nSigmacut * yRMS, "X");
   hVertexZ->SetAxisRange(medianZ[0] - nSigmacut * zRMS, medianZ[0] + nSigmacut * zRMS, "X");
 
-  auto vertexCov = TMatrixDSym(3);
   vertexCov[0][1] = vertexCov[1][0] = 0;
   vertexCov[0][2] = vertexCov[2][0] = 0;
   vertexCov[1][2] = vertexCov[2][1] = 0;

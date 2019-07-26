@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
+#include <framework/logging/Logger.h>
 
 #include <cmath>
 
@@ -23,44 +24,43 @@ namespace Belle2 {
     /** An algorithm to check if a hit is contained in a hyperbolic cosine hough box
     *
     * The parameterization is
-    * z(R) = 1/rho * sqrt(1 + mu**2 * rho**2) * (cosh(rho(R - alpha)) - cosh(rho*alpha))
+    * z(R) = mu * (sqrt(1 - p * p) * cosh(R / mu / q + arcsinh(p / sqrt(1 - p * p))) - 1)
     *
-    * rho is g*c*B / p_t
-    * mu is m / g*c*B
-    * alpha is R position of catenary vertex
+    * p is p_z / E - longitudinal fraction of energy
+    * q is p_t / E - transverse fraction of energy
+    * mu is E / gcB - scale
+    * z and R are in units of CDC size
     *
     * The catenary passes through the origin
-    *
-    * TODO maybe there is a better parameterization
     */
     class HitInHyperBox {
 
     public:
-      using HoughBox = Box<DiscreteAlpha, DiscreteRho, DiscreteMu>;
+      using HoughBox = Box<DiscreteP, DiscreteQ, DiscreteMu>;
 
       Weight operator()(const CDCRecoHit3D& recoHit,
                         const HoughBox* hyperBox)
       {
-        const float lowerAlpha = *(hyperBox->getLowerBound<DiscreteAlpha>()); //DiscreteValue is based on std::vector<T>::const_iterator
-        const float upperAlpha = *(hyperBox->getUpperBound<DiscreteAlpha>());
+        const float lowerP = *(hyperBox->getLowerBound<DiscreteP>()); //DiscreteValue is based on std::vector<T>::const_iterator
+        const float upperP = *(hyperBox->getUpperBound<DiscreteP>());
+
+        const float lowerQ = *(hyperBox->getLowerBound<DiscreteQ>());
+        const float upperQ = *(hyperBox->getUpperBound<DiscreteQ>());
 
         const float lowerMu = *(hyperBox->getLowerBound<DiscreteMu>());
         const float upperMu = *(hyperBox->getUpperBound<DiscreteMu>());
 
-        const float lowerRho = *(hyperBox->getLowerBound<DiscreteRho>());
-        const float upperRho = *(hyperBox->getUpperBound<DiscreteRho>());
-
         const double perpS = recoHit.getArcLength2D();
         const double recoZ = recoHit.getRecoZ();
 
-        const bool sameSign = SameSignChecker::sameSign(catZ(lowerAlpha, lowerMu, lowerRho, perpS) - recoZ,
-                                                        catZ(lowerAlpha, lowerMu, upperRho, perpS) - recoZ,
-                                                        catZ(lowerAlpha, upperMu, lowerRho, perpS) - recoZ,
-                                                        catZ(lowerAlpha, upperMu, upperRho, perpS) - recoZ,
-                                                        catZ(upperAlpha, lowerMu, lowerRho, perpS) - recoZ,
-                                                        catZ(upperAlpha, lowerMu, upperRho, perpS) - recoZ,
-                                                        catZ(upperAlpha, upperMu, lowerRho, perpS) - recoZ,
-                                                        catZ(upperAlpha, upperMu, upperRho, perpS) - recoZ);
+        const bool sameSign = SameSignChecker::sameSign(catZ(lowerP, lowerQ, lowerMu, perpS) - recoZ,
+                                                        catZ(lowerP, lowerQ, upperMu, perpS) - recoZ,
+                                                        catZ(lowerP, upperQ, lowerMu, perpS) - recoZ,
+                                                        catZ(lowerP, upperQ, upperMu, perpS) - recoZ,
+                                                        catZ(upperP, lowerQ, lowerMu, perpS) - recoZ,
+                                                        catZ(upperP, lowerQ, upperMu, perpS) - recoZ,
+                                                        catZ(upperP, upperQ, lowerMu, perpS) - recoZ,
+                                                        catZ(upperP, upperQ, upperMu, perpS) - recoZ);
         if (not sameSign) {
           return 1.0;
         } else {
@@ -74,8 +74,8 @@ namespace Belle2 {
       */
       static bool compareDistances(const HoughBox& hyperBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit)
       {
-        const float centerAlpha = *(hyperBox.getCenter<0>()); //TODO getCenter(class T) is not implemented
-        const float centerRho = *(hyperBox.getCenter<1>());
+        const float centerP = *(hyperBox.getCenter<0>()); //TODO getCenter(class T) is not implemented
+        const float centerQ = *(hyperBox.getCenter<1>());
         const float centerMu = *(hyperBox.getCenter<2>());
 
         const double lhsZ = lhsRecoHit.getRecoZ();
@@ -84,19 +84,17 @@ namespace Belle2 {
         const double lhsS = lhsRecoHit.getArcLength2D();
         const double rhsS = rhsRecoHit.getArcLength2D();
 
-        const double lhsZDistance = catZ(centerAlpha, centerMu, centerRho, lhsS) - lhsZ;
-        const double rhsZDistance = catZ(centerAlpha, centerMu, centerRho, rhsS) - rhsZ;
+        const double lhsZDistance = catZ(centerP, centerQ, centerMu, lhsS) - lhsZ;
+        const double rhsZDistance = catZ(centerP, centerQ, centerMu, rhsS) - rhsZ;
 
         return lhsZDistance < rhsZDistance;
       }
 
     private:
-      static double catZ(const double alpha, const double mu, const double rho, const double R)
+      static double catZ(const double p, const double q, const double mu, const double R)
       {
         //100 here is a reference  - size of CDC in cm
-        return 100.0 / rho * std::sqrt(1.0 + mu * mu * rho * rho) *
-               (std::cosh((R / 100.0 - alpha) * rho) -
-                std::cosh(alpha * rho));
+        return 100.0 * mu * (std::sqrt(1 - p * p) * std::cosh(R / 100.0 / mu / q + std::asinh(p / std::sqrt(1 - p * p))) - 1);
       }
     };
   }

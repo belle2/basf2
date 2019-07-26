@@ -20,21 +20,21 @@ namespace Belle2 {
      */
     template <class AHitPointerType,
               class AHitDecisionAlgorithm,
-              size_t alphaDivisions = 2,
-              size_t rhoDivisions = 2,
+              size_t pDivisions = 2,
+              size_t qDivisions = 2,
               size_t muDivisions = 2>
     class HyperHough : public OtherSimpleBoxDivisionHoughTree<AHitPointerType,
       AHitDecisionAlgorithm,
-      alphaDivisions,
-      rhoDivisions,
+      pDivisions,
+      qDivisions,
       muDivisions> {
 
     private:
       /// Super type
       using Super = OtherSimpleBoxDivisionHoughTree<AHitPointerType,
             AHitDecisionAlgorithm,
-            alphaDivisions,
-            rhoDivisions,
+            pDivisions,
+            qDivisions,
             muDivisions>;
 
     public:
@@ -42,7 +42,7 @@ namespace Belle2 {
 
       /// Constructor using the given maximal level setting the maximal values.
       HyperHough()
-        : Super(3, 3, 3, 1, 1, 1)
+        : Super(0.99, 0.99, 3.0, 1, 1, 1)
       {
       }
     };

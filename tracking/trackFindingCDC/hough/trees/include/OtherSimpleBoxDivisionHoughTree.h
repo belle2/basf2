@@ -53,8 +53,8 @@ namespace Belle2 {
       void initialize()
       {
         Super::template constructArray<0>(-getMaximumX(), getMaximumX(), getOverlapX());
-        Super::template constructArray<1>(-getMaximumY(), getMaximumY(), getOverlapY());
-        Super::template constructArray<2>(0.0, getMaximumZ(), getOverlapZ());
+        Super::template constructArray<1>(0.01, getMaximumY(), getOverlapY());
+        Super::template constructArray<2>(0.01, getMaximumZ(), getOverlapZ());
 
         Super::initialize();
       }

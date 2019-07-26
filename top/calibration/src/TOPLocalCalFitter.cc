@@ -14,7 +14,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TOP;
 
-
 double crystalball_function(double x, double alpha, double n, double sigma, double mean)
 {
   // evaluate the crystal ball function
@@ -45,15 +44,21 @@ double crystalball_pdf(double x, double alpha, double n, double sigma, double me
   return N * crystalball_function(x, alpha, n, sigma, mean);
 }
 
+
+
+// Two gaussians to model the TTS of the MCP-PMTs.
 double TTSPDF(double x, double time, double deltaT, double sigma1, double sigma2, double f1)
 {
   return f1 * TMath::Gaus(x, time, sigma1, kTRUE) + (1 - f1) * TMath::Gaus(x, time + deltaT, sigma2, kTRUE)  ;
 }
 
 
+// Full PDF to fit the laser, made of:
+// 2 TTSPDF
+// 1 crystal ball PDF for the extra peak at +1 ns we don't understand
+// 1 gaussian to help modelling the tail
 double laserPDF(double* x, double* p)
 {
-
   double time = p[0];
   double sigma = p[1];
   double fraction = p[2];
@@ -92,23 +97,10 @@ TOPLocalCalFitter::TOPLocalCalFitter(): CalibrationAlgorithm("TOPLaserCalibrator
 }
 
 
-
-
-
-
-CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
+void  TOPLocalCalFitter::setupOutputTreeAndFile()
 {
-
-  std::cout << "Calibrating" << std::endl;
-  gROOT->SetBatch();
-
-  auto hitTree = getObjectPtr<TTree>("hitTree");
-
-
-  std::cout << "HitTree Loaded" << std::endl;
-
-  auto histFile = new TFile(m_output.c_str(), "recreate");
-  auto fitTree = new TTree("fitTree", "fitTree");
+  histFile = new TFile(m_output.c_str(), "recreate");
+  fitTree = new TTree("fitTree", "fitTree");
   fitTree->Branch<short>("channel", &channel);
   fitTree->Branch<short>("slot", &slot);
   fitTree->Branch<short>("row", &row);
@@ -139,26 +131,181 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
 
   fitTree->Branch<float>("chi2", &chi2);
   fitTree->Branch<float>("rms", &rms);
-
-
   std::cout << "tree done" << std::endl;
-
-  TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 20000, -60, 40.); // 10 ps bins
-  std::cout << "Filling the time VS channel histogram" << std::endl;
-
-  hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "dVdt > 80 && amplitude > 80");
-  std::cout << "Histogram Filled" << std::endl;
+  return;
+}
 
 
-  std::cout << "Getting TTS and laser simulation parameters" << std::endl;
 
-  float mean2, sigma1, sigma2, f1, f2;
-  short pixelRow, pixelCol;
+
+void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
+{
+  treeLaser->GetEntry(iChannel);
+  treeTTS->GetEntry(iChannel + 512 * iSlot);
+
+  double maxpos = h_profile->GetBinCenter(h_profile->GetMaximumBin());
+  h_profile->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 2.);
+  double integral = h_profile->Integral();
+
+  TF1 laser = TF1("laser", laserPDF, maxpos - 1, maxpos + 2., 16);
+
+  laser.SetParameter(0, maxpos);
+  laser.SetParLimits(0, maxpos - 0.06, maxpos + 0.06);
+
+  laser.SetParameter(1, 0.1);
+  laser.SetParLimits(1, 0.05, 0.25);
+  laser.SetParameter(2, fractionLaser);
+  laser.SetParLimits(2, 0.5, 1.);
+
+
+  laser.FixParameter(3, deltaTLaser);
+
+  if (deltaTLaser > -0.001) {
+    laser.SetParameter(3, -0.3);
+    laser.SetParLimits(3, -0.4, -0.2);
+  }
+
+  laser.FixParameter(4, TMath::Sqrt(sigma2 * sigma2 - sigma1 * sigma1));
+  laser.FixParameter(5, mean2);
+
+  laser.FixParameter(6, f1);
+
+  laser.SetParameter(7,  integral * 0.005);
+  laser.SetParLimits(7,  0.2 * integral * 0.005, 2.*integral * 0.005);
+
+  laser.SetParameter(8, 1.);
+  laser.SetParLimits(8, 0.3, 2.);
+  laser.SetParameter(9, 0.2);
+  laser.SetParLimits(9, 0.08, 1.);
+
+  laser.SetParameter(10,  0.1 * integral * 0.005);
+  laser.SetParLimits(10,  0., 0.2 * integral * 0.005);
+  laser.SetParameter(14, -2.);
+  laser.SetParameter(15, 2.);
+  laser.SetParLimits(15, 1.01, 20.);
+
+  laser.SetParameter(11, 1.);
+  laser.SetParLimits(11, 0.1, 5.);
+  laser.SetParameter(12, 0.8);
+  laser.SetParLimits(12, 0., 5.);
+  laser.SetParameter(13,  0.01 * integral * 0.005);
+  laser.SetParLimits(13,  0., 0.2 * integral * 0.005);
+
+  if (isMonitoringFit) {
+    laser.FixParameter(2, fractionLaser);
+    laser.FixParameter(3, deltaTLaser);
+  }
+
+  laser.SetNpx(2000);
+
+  h_profile->Fit("laser", "R L Q");
+
+  // Add by hand the different components, mostly for debugging/presentation purposes
+  TF1* peak1 = new TF1("peak1", laserPDF, maxpos - 1, maxpos + 2., 16);
+  TF1* peak2 = new TF1("peak2", laserPDF, maxpos - 1, maxpos + 2., 16);
+  TF1* extra = new TF1("extra", laserPDF, maxpos - 1, maxpos + 2., 16);
+  TF1* background = new TF1("background", laserPDF, maxpos - 1, maxpos + 2., 16);
+  for (int iPar = 0; iPar < 16; iPar++) {
+    peak1->FixParameter(iPar, laser.GetParameter(iPar));
+    peak2->FixParameter(iPar, laser.GetParameter(iPar));
+    extra->FixParameter(iPar, laser.GetParameter(iPar));
+    background->FixParameter(iPar, laser.GetParameter(iPar));
+  }
+  peak1->FixParameter(2, 0.);
+  peak1->FixParameter(7, (1 - laser.GetParameter(2))*laser.GetParameter(7));
+  peak1->FixParameter(10, 0.);
+  peak1->FixParameter(13, 0.);
+
+  peak2->FixParameter(2, 1.);
+  peak2->FixParameter(7, laser.GetParameter(2)*laser.GetParameter(7));
+  peak2->FixParameter(10, 0.);
+  peak2->FixParameter(13, 0.);
+
+  extra->FixParameter(7, 0.);
+  extra->FixParameter(13, 0.);
+
+  background->FixParameter(7, 0.);
+  background->FixParameter(10, 0.);
+
+  h_profile->GetListOfFunctions()->Add(peak1);
+  h_profile->GetListOfFunctions()->Add(peak2);
+  h_profile->GetListOfFunctions()->Add(extra);
+  h_profile->GetListOfFunctions()->Add(background);
+
+
+  channel = iChannel;
+  row = pixelRow;
+  col = pixelCol;
+  slot = iSlot + 1;
+  peakTime = laser.GetParameter(0);
+  peakTimeErr = laser.GetParError(0);
+  deltaT = laser.GetParameter(3);
+  deltaTErr = laser.GetParError(3);
+  sigma = laser.GetParameter(1);
+  sigmaErr = laser.GetParError(1);
+  fraction = laser.GetParameter(2);
+  fractionErr = laser.GetParError(2);
+  yieldLaser = laser.GetParameter(7) / 0.005;
+  yieldLaserErr = laser.GetParError(7) / 0.005;
+  timeExtra = laser.GetParameter(8);
+  sigmaExtra = laser.GetParameter(9);
+  yieldLaserExtra = laser.GetParameter(10) / 0.005;
+
+  fractionMC = fractionLaser;
+  deltaTMC = deltaTLaser;
+  peakTimeMC = peakTimeLaser;
+
+  chi2 = laser.GetChisquare() / laser.GetNDF();
+
+
+  channelT0 = peakTime - peakTimeMC;
+  channelT0Err = peakTimeErr;
+  return;
+}
+
+
+void  TOPLocalCalFitter::fitPulser(TH1* h_profileFirstPulser, TH1* h_profileSecondPulser)
+{
+  float maxpos = h_profileFirstPulser->GetBinCenter(h_profileFirstPulser->GetMaximumBin());
+  h_profileFirstPulser->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 1.);
+  if (h_profileFirstPulser->Integral() > 1000) {
+    TF1 pulser1 = TF1("pulser1", "[0]*TMath::Gaus(x, [1], [2], kTRUE)", maxpos - 1, maxpos + 1.);
+    pulser1.SetParameter(0, 1.);
+    pulser1.SetParameter(1, maxpos);
+    pulser1.SetParameter(2, 0.05);
+    h_profileFirstPulser->Fit("pulser1", "R Q");
+    firstPulserTime = pulser1.GetParameter(1);
+    firstPulserSigma = pulser1.GetParameter(2);
+    h_profileFirstPulser->Write();
+  } else {
+    firstPulserTime = -999;
+    firstPulserSigma = -999;
+  }
+
+  maxpos = h_profileSecondPulser->GetBinCenter(h_profileSecondPulser->GetMaximumBin());
+  h_profileSecondPulser->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 1.);
+  if (h_profileSecondPulser->Integral() > 1000) {
+    TF1 pulser2 = TF1("pulser2", "[0]*TMath::Gaus(x, [1], [2], kTRUE)", maxpos - 1, maxpos + 1.);
+    pulser2.SetParameter(0, 1.);
+    pulser2.SetParameter(1, maxpos);
+    pulser2.SetParameter(2, 0.05);
+    h_profileSecondPulser->Fit("pulser2", "R Q");
+    secondPulserTime = pulser2.GetParameter(1);
+    secondPulserSigma = pulser2.GetParameter(2);
+    h_profileSecondPulser->Write();
+  } else {
+    secondPulserTime = -999;
+    secondPulserSigma = -999;
+  }
+  return;
+}
+
+void  TOPLocalCalFitter::loadMCInfoTrees()
+{
+  B2INFO("Getting the  TTS parameters from " << m_TTSData);
   TFile inputTTS(m_TTSData.c_str());
   inputTTS.cd();
-  TTree* treeTTS = nullptr;
   inputTTS.GetObject("tree", treeTTS);
-
   treeTTS->SetBranchAddress("mean2", &mean2);
   treeTTS->SetBranchAddress("sigma1", &sigma1);
   treeTTS->SetBranchAddress("sigma2", &sigma2);
@@ -167,172 +314,59 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
   treeTTS->SetBranchAddress("pixelRow", &pixelRow);
   treeTTS->SetBranchAddress("pixelCol", &pixelCol);
 
-  short channelLaser;
-  float peakTimeLaser, deltaTLaser, fractionLaser;
-  float extraTimeLaser, extraTimeSigma, backgroundTimeLaser, backgroundTimeSigma;
-
-
-
+  B2INFO("Getting the laser fit parameters from " << m_laserCorrections);
   TFile inputLaser(m_laserCorrections.c_str());
   inputLaser.cd();
-  TTree* treeLaser = nullptr;
   inputLaser.GetObject("fitTree", treeLaser);
-
   treeLaser->SetBranchAddress("peakTime", &peakTimeLaser);
   treeLaser->SetBranchAddress("deltaT", &deltaTLaser);
   treeLaser->SetBranchAddress("fraction", &fractionLaser);
 
-  std::cout << "MC and mapping informations loaded. let's fit!" << std::endl;
   histFile->cd();
+  return;
+}
 
-  float averages[16] = {0.};
-  short goodChannels[16] = {0};
 
+void  TOPLocalCalFitter::determineFitStatus()
+{
+  if (chi2 < 4 && sigma < 0.2 && yieldLaser > 1000) {
+    fitStatus = 0;
+  } else {
+    fitStatus = 1;
+  }
+  return;
+}
+
+
+
+
+
+CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
+{
+  gROOT->SetBatch();
+
+  loadMCInfoTrees();
+
+  // Loads the tree with the hits
+  auto hitTree = getObjectPtr<TTree>("hitTree");
+  TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 20000, -60, 40.); // 10 ps bins
+  std::cout << "Filling the time VS channel histogram" << std::endl;
+  hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "dVdt > 80 && amplitude > 80");
+
+  setupOutputTreeAndFile();
 
   for (short iSlot = 0; iSlot < 16; iSlot++) {
-    std::cout << "Fitting for slot " << iSlot + 1 << std::endl;
-    float refTime = 0.;
-    float refTimeErr = 0.;
-
+    B2INFO("Fitting slot " << iSlot + 1);
     for (short iChannel = 0; iChannel < 512; iChannel++) {
       TH1D* h_profile = h_hitTime->ProjectionY(("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
                                                iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
       h_profile->GetXaxis()->SetRangeUser(-100, -5);
 
-      treeLaser->GetEntry(iChannel);
-      treeTTS->GetEntry(iChannel + 512 * iSlot);
-
-      double maxpos = h_profile->GetBinCenter(h_profile->GetMaximumBin());
-      h_profile->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 2.);
-      double integral = h_profile->Integral();
-
-      TF1 laser = TF1("laser", laserPDF, maxpos - 1, maxpos + 2., 16);
-
-      laser.SetParameter(0, maxpos);
-      laser.SetParLimits(0, maxpos - 0.06, maxpos + 0.06);
-
-      laser.SetParameter(1, 0.1);
-      laser.SetParLimits(1, 0.05, 0.25);
-      laser.SetParameter(2, fractionLaser);
-      laser.SetParLimits(2, 0.5, 1.);
-
-
-      laser.FixParameter(3, deltaTLaser);
-
-      if (deltaTLaser > -0.001) {
-        laser.SetParameter(3, -0.3);
-        laser.SetParLimits(3, -0.4, -0.2);
-      }
-
-      laser.FixParameter(4, TMath::Sqrt(sigma2 * sigma2 - sigma1 * sigma1));
-      laser.FixParameter(5, mean2);
-
-      laser.FixParameter(6, f1);
-
-      laser.SetParameter(7,  integral * 0.005);
-      laser.SetParLimits(7,  0.2 * integral * 0.005, 2.*integral * 0.005);
-
-      laser.SetParameter(8, 1.);
-      laser.SetParLimits(8, 0.3, 2.);
-      laser.SetParameter(9, 0.2);
-      laser.SetParLimits(9, 0.08, 1.);
-
-      laser.SetParameter(10,  0.1 * integral * 0.005);
-      laser.SetParLimits(10,  0., 0.2 * integral * 0.005);
-      laser.SetParameter(14, -2.);
-      laser.SetParameter(15, 2.);
-      laser.SetParLimits(15, 1.01, 20.);
-
-      laser.SetParameter(11, 1.);
-      laser.SetParLimits(11, 0.1, 5.);
-      laser.SetParameter(12, 0.8);
-      laser.SetParLimits(12, 0., 5.);
-      laser.SetParameter(13,  0.01 * integral * 0.005);
-      laser.SetParLimits(13,  0., 0.2 * integral * 0.005);
-
-      if (isMonitoringFit) {
-        laser.FixParameter(2, fractionLaser);
-        laser.FixParameter(3, deltaTLaser);
-      }
-
-      laser.SetNpx(2000);
-
-      h_profile->Fit("laser", "R L Q");
-
-      // Add by hand the different components, mostly for debugging/presentation purposes
-      TF1* peak1 = new TF1("peak1", laserPDF, maxpos - 1, maxpos + 2., 16);
-      TF1* peak2 = new TF1("peak2", laserPDF, maxpos - 1, maxpos + 2., 16);
-      TF1* extra = new TF1("extra", laserPDF, maxpos - 1, maxpos + 2., 16);
-      TF1* background = new TF1("background", laserPDF, maxpos - 1, maxpos + 2., 16);
-      for (int iPar = 0; iPar < 16; iPar++) {
-        peak1->FixParameter(iPar, laser.GetParameter(iPar));
-        peak2->FixParameter(iPar, laser.GetParameter(iPar));
-        extra->FixParameter(iPar, laser.GetParameter(iPar));
-        background->FixParameter(iPar, laser.GetParameter(iPar));
-      }
-      peak1->FixParameter(2, 0.);
-      peak1->FixParameter(7, (1 - laser.GetParameter(2))*laser.GetParameter(7));
-      peak1->FixParameter(10, 0.);
-      peak1->FixParameter(13, 0.);
-
-      peak2->FixParameter(2, 1.);
-      peak2->FixParameter(7, laser.GetParameter(2)*laser.GetParameter(7));
-      peak2->FixParameter(10, 0.);
-      peak2->FixParameter(13, 0.);
-
-      extra->FixParameter(7, 0.);
-      extra->FixParameter(13, 0.);
-
-      background->FixParameter(7, 0.);
-      background->FixParameter(10, 0.);
-
-      h_profile->GetListOfFunctions()->Add(peak1);
-      h_profile->GetListOfFunctions()->Add(peak2);
-      h_profile->GetListOfFunctions()->Add(extra);
-      h_profile->GetListOfFunctions()->Add(background);
-
-
-      channel = iChannel;
-      row = pixelRow;
-      col = pixelCol;
-      slot = iSlot + 1;
-      peakTime = laser.GetParameter(0);
-      peakTimeErr = laser.GetParError(0);
-      deltaT = laser.GetParameter(3);
-      deltaTErr = laser.GetParError(3);
-      sigma = laser.GetParameter(1);
-      sigmaErr = laser.GetParError(1);
-      fraction = laser.GetParameter(2);
-      fractionErr = laser.GetParError(2);
-      yieldLaser = laser.GetParameter(7) / 0.005;
-      yieldLaserErr = laser.GetParError(7) / 0.005;
-      timeExtra = laser.GetParameter(8);
-      sigmaExtra = laser.GetParameter(9);
-      yieldLaserExtra = laser.GetParameter(10) / 0.005;
-
-      fractionMC = fractionLaser;
-      deltaTMC = deltaTLaser;
-      peakTimeMC = peakTimeLaser;
-
-      chi2 = laser.GetChisquare() / laser.GetNDF();
-
-
-      channelT0 = peakTime - peakTimeMC;
-      channelT0Err = peakTimeErr;
-
-
-      if (chi2 < 4 && sigma < 0.2 & yieldLaser > 1000) {
-        fitStatus = 0;
-      } else {
-        fitStatus = 1;
-      }
-
-      h_profile->Write();
-
+      fitChannel(iSlot, iChannel, h_profile);
+      determineFitStatus();
 
 
       // Now let's fit the pulser
-
       TH1D* h_profileFirstPulser = h_hitTime->ProjectionY(("profileFirstPulser_" + std::to_string(iSlot + 1) + "_" + std::to_string(
                                                              iChannel)).c_str(),  iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
       TH1D* h_profileSecondPulser = h_hitTime->ProjectionY(("profileSecondPulser_" + std::to_string(iSlot + 1) + "_" + std::to_string(
@@ -340,39 +374,14 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
       h_profileFirstPulser->GetXaxis()->SetRangeUser(-10, 10);
       h_profileSecondPulser->GetXaxis()->SetRangeUser(10, 40);
 
-      maxpos = h_profileFirstPulser->GetBinCenter(h_profileFirstPulser->GetMaximumBin());
-      h_profileFirstPulser->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 1.);
-      if (h_profileFirstPulser->Integral() > 1000) {
-        TF1 pulser1 = TF1("pulser1", "[0]*TMath::Gaus(x, [1], [2], kTRUE)", maxpos - 1, maxpos + 1.);
-        pulser1.SetParameter(0, 1.);
-        pulser1.SetParameter(1, maxpos);
-        pulser1.SetParameter(2, 0.05);
-        h_profileFirstPulser->Fit("pulser1", "R Q");
-        firstPulserTime = pulser1.GetParameter(1);
-        firstPulserSigma = pulser1.GetParameter(2);
-        h_profileFirstPulser->Write();
-      } else {
-        firstPulserTime = -999;
-        firstPulserSigma = -999;
-      }
+      fitPulser(h_profileFirstPulser, h_profileSecondPulser);
 
-      maxpos = h_profileSecondPulser->GetBinCenter(h_profileSecondPulser->GetMaximumBin());
-      h_profileSecondPulser->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 1.);
-      if (h_profileSecondPulser->Integral() > 1000) {
-        TF1 pulser2 = TF1("pulser2", "[0]*TMath::Gaus(x, [1], [2], kTRUE)", maxpos - 1, maxpos + 1.);
-        pulser2.SetParameter(0, 1.);
-        pulser2.SetParameter(1, maxpos);
-        pulser2.SetParameter(2, 0.05);
-        h_profileSecondPulser->Fit("pulser2", "R Q");
-        secondPulserTime = pulser2.GetParameter(1);
-        secondPulserSigma = pulser2.GetParameter(2);
-        h_profileSecondPulser->Write();
-      } else {
-        secondPulserTime = -999;
-        secondPulserSigma = -999;
-      }
 
       fitTree->Fill();
+
+      h_profile->Write();
+      h_profileFirstPulser->Write();
+      h_profileSecondPulser->Write();
     }
 
     h_hitTime->Write();

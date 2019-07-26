@@ -1,13 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
- * Analyze histograms of amplitudes for each ECL crystal from moun pair   *
- * events. Code can either find most-likely energy deposit for each       *
- * crystal (MC) or calibration constant for each crystal (data)           *
+ * Analyze a tree contaninig laser hit timing and channel, returning      *
+ * a tree  with the fit results and the histograms for each channel.      *
+ * It can be used to produce both channelT0 calibrations and to analyze   *
+ * the daily, low statistics laser runs                                   *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christopher Hearty                                       *
+ * Contributors: Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,7 +20,7 @@
 namespace Belle2 {
   namespace TOP {
 
-    /** Calibrate ecl crystals using muon pair events */
+    /** Fit the laser hits time distribution and caluculates the channelT0 */
     class TOPLocalCalFitter : public CalibrationAlgorithm {
     public:
 
@@ -29,9 +30,8 @@ namespace Belle2 {
       /**..Destructor */
       virtual ~TOPLocalCalFitter() {}
 
-      /** Parameters. Note thate they are public so you can set them in te steering file */
+      /** Parameters. They are public so you can set them in the steering file */
       int minEntries = 50; /**<  Minimum number of entries to perform the fit*/
-      bool isMC = false; /** < The MC tructh requires a simplified PDF and different ranges */
       std::string m_output = "laserFitResult.root"; /**< Name of the output file */
       std::string m_laserCorrections = "LaserMCParameters.root"; /**< Name of the output file */
       std::string m_TTSData = "TTSParametrization.root"; /**< Name of the output file */
@@ -40,11 +40,46 @@ namespace Belle2 {
 
     protected:
 
+      void setupOutputTreeAndFile();
+
+      void loadMCInfoTrees();
+
+      void determineFitStatus();
+
+      void fitChannel(short, short, TH1*);
+
+      void fitPulser(TH1*, TH1*);
+
       /**..Run algorithm on events */
       virtual EResult calibrate() override;
 
     private:
-      int fitOK = 16; /**< fit is OK */
+      TTree* treeTTS = nullptr; /**< Input to the fitter. A tree containing the TTS parametrization for each channel */
+      TTree* treeLaser =
+        nullptr; /**< Input to the fitter. A tree containing the laser MC corrections and all the paraeters to be fixed in the fit*/
+      TFile* histFile = nullptr; /**< Output of the fitter. The file containing the output trees and histograms*/
+      TTree* fitTree = nullptr; /**< Output of the fitter. The tree containg the fit results. */
+
+
+      // Variables associated to the input tree branches
+      float mean2 = 0;  /**< Position of the second gaussian of the TTS parametrization with respect to the first one*/
+      float sigma1 = 0; /**< Width of the first gaussian on the TTS parametrization */
+      float sigma2 = 0; /**< Width of the second gaussian on the TTS parametrization */
+      float f1 = 0; /**< Fraction of the first gaussian on the TTS parametrization */
+      float f2 = 0; /**< Fraction of the second gaussian on the TTS parametrization */
+      short pixelRow = 0; /**< Pixel row */
+      short pixelCol = 0; /**< Pixel column */
+
+
+      short channelLaser = 0; /**< Channel number (0-512) */
+      float peakTimeLaser = 0; /**< Time of the main laser peak in the MC simulation (aka MC correction)  */
+      float deltaTLaser = 0; /**< Distance between the main and the secondary laser peak */
+      float fractionLaser = 0; /**< Fraction of the main peak*/
+      float extraTimeLaser = 0; /**< Position of the guassian used to describe the extra peak on the timing distribution tail */
+      float extraTimeSigma = 0; /**< Width of the guassian used to describe the extra peak on the timing distribution tail */
+      float backgroundTimeLaser = 0; /**< Position of the guassian used to describe the long tail of the timing distribution */
+      float backgroundSigmaLaser = 0; /**< Width of the guassian used to describe the long tail of the timing distribution */
+
 
       //fit results
       short channel = 0;

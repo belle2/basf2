@@ -39,7 +39,7 @@ SVDMissingAPVsClusterCreatorModule::SVDMissingAPVsClusterCreatorModule()
   , m_mapping(m_xmlFileName)
 {
   //Set module properties
-  setDescription("This module produces clusters in the middle of a region read by a disabled APV");
+  setDescription("This module produces clusters in the middle of a region read by a disabled APV. It can be run only after the SVDSimpleClusterizer because it does not register the SVDClusters StoreArray in the DataStore, but only add clusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("Clusters", m_storeClustersName,
@@ -65,8 +65,10 @@ void SVDMissingAPVsClusterCreatorModule::beginRun()
 
 void SVDMissingAPVsClusterCreatorModule::initialize()
 {
-  //Register collections
-  m_storeClusters.registerInDataStore(m_storeClustersName);
+  //Register clusters only if the SVDClusters are not already registered
+  // this makes some test fail. Commented out until we find a bug-fix.
+  //  if(!m_storeClusters.isValid())
+  //    m_storeClusters.registerInDataStore(m_storeClustersName);
 
   //Store names to speed up creation later
   m_storeClustersName = m_storeClusters.getName();

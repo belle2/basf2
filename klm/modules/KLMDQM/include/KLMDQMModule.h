@@ -23,6 +23,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
 
 namespace Belle2 {
 
@@ -106,6 +107,9 @@ namespace Belle2 {
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
 
+    /** KLM sector array index. */
+    const KLMSectorArrayIndex* m_SectorArrayIndex;
+
     /** KLM element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
 
@@ -125,13 +129,18 @@ namespace Belle2 {
     TH1F* m_TimeScintillatorEKLM;
 
     /** Number of hits per channel. */
-    TH1F** m_ChannelHits;
+    TH1F** m_ChannelHits[
+      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
+      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
+
+    /** Number of channel hit histograms per sector for BKLM. */
+    const int m_ChannelHitHistogramsBKLM = 2;
+
+    /** Number of channel hit histograms per sector for EKLM. */
+    const int m_ChannelHitHistogramsEKLM = 3;
 
     /** Sector number. */
     TH1F* m_eklmSector;
-
-    /** Strip number within a layer. */
-    TH1F** m_eklmStripLayer;
 
     /** Axial position of muon hit. */
     TH1F* m_bklmHit2dsZ;

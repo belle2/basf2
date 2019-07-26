@@ -69,7 +69,7 @@ namespace Belle2 {
      * Create a socket of the given type with the given address and bind or not bind it.
      * Typical socket types are ZMQ_ROUTER, ZMQ_DEALER and ZMQ_STREAM.
      *
-     * The address needs to be in the form "tcp://*:<port>" if you want to bind to a local
+     * The address needs to be in the form "tcp://ast:<port>" (with ast = *) if you want to bind to a local
      * interface or "tcp://<host>:<port>" if you want to connect. Use the convenience
      * function below if you want the program to decide based on your address and use
      * this function if you want the program to force a specific bind behaviour
@@ -81,7 +81,7 @@ namespace Belle2 {
     /**
      * Create a socket of the given type while deciding on the bind behaviour via the address.
      *
-     * An address in the form "tcp://*:<port>" means the socket is bound to the own interface.
+     * An address in the form "tcp://ast:<port>" (with ast = *) means the socket is bound to the own interface.
      * An address in the from "tcp://<host>:<port>" means it connects to the given host.
      *
      * If you want to fore a given bind behaviour (and fail if the address is invalid),

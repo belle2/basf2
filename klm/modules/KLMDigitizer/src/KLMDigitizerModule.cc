@@ -9,8 +9,9 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <framework/core/RandomNumbers.h>
 #include <klm/modules/KLMDigitizer/KLMDigitizerModule.h>
-#include <klm/dataobjects/EKLMChannelIndex.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
@@ -66,10 +67,11 @@ void KLMDigitizerModule::initialize()
 
 void KLMDigitizerModule::checkChannelParameters()
 {
-  EKLMChannelIndex eklmChannels;
-  for (EKLMChannelIndex& eklmChannel : eklmChannels) {
+  KLMChannelIndex klmChannels;
+  for (KLMChannelIndex eklmChannel = klmChannels.beginEKLM();
+       eklmChannel != klmChannels.endEKLM(); ++eklmChannel) {
     int stripGlobal = m_eklmElementNumbers->stripNumber(
-                        eklmChannel.getEndcap(), eklmChannel.getLayer(),
+                        eklmChannel.getSection(), eklmChannel.getLayer(),
                         eklmChannel.getSector(), eklmChannel.getPlane(),
                         eklmChannel.getStrip());
     const EKLMChannelData* channel = m_Channels->getChannelData(stripGlobal);
@@ -79,7 +81,7 @@ void KLMDigitizerModule::checkChannelParameters()
       B2ERROR("Non-positive photoelectron amplitude. The requested "
               "channel-specific simulation is impossible. "
               "KLMDigitizer is switched to the generic mode."
-              << LogVar("Endcap", eklmChannel.getEndcap())
+              << LogVar("Endcap", eklmChannel.getSection())
               << LogVar("Layer", eklmChannel.getLayer())
               << LogVar("Sector", eklmChannel.getSector())
               << LogVar("Plane", eklmChannel.getPlane())
@@ -93,19 +95,40 @@ void KLMDigitizerModule::checkChannelParameters()
 void KLMDigitizerModule::beginRun()
 {
   if (!m_DigPar.isValid())
-    B2FATAL("EKLM digitization parameters are not available.");
+    B2FATAL("KLM digitization parameters are not available.");
   if (!m_TimeConversion.isValid())
     B2FATAL("KLM time conversion parameters are not available.");
   if (!m_Channels.isValid())
-    B2FATAL("KLM channel data are not available.");
+    B2FATAL("EKLM channel data are not available.");
+  if (!m_ChannelStatus.isValid())
+    B2FATAL("KLM channel status data are not available.");
+  if (!m_StripEfficiency.isValid())
+    B2FATAL("KLM strip efficiency data are not available.");
   if (m_ChannelSpecificSimulation)
     checkChannelParameters();
 }
 
 /*
- * Light propagation into the fiber, SiPM and electronics effects
+ * Digitization. Light propagation into the fiber, SiPM and electronics effects
  * are simulated in KLM::ScintillatorSimulator class.
  */
+
+bool KLMDigitizerModule::checkActive(uint16_t channel)
+{
+  enum KLMChannelStatus::ChannelStatus status =
+    m_ChannelStatus->getChannelStatus(channel);
+  if (status == KLMChannelStatus::c_Unknown)
+    B2FATAL("Incomplete KLM channel status data.");
+  return (status != KLMChannelStatus::c_Dead);
+}
+
+bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
+{
+  if (isnan(efficiency))
+    B2FATAL("Incomplete KLM efficiency data.");
+  return (gRandom->Rndm() < efficiency);
+}
+
 void KLMDigitizerModule::digitizeBKLM()
 {
   int tdc;
@@ -115,6 +138,12 @@ void KLMDigitizerModule::digitizeBKLM()
        it = m_bklmSimHitChannelMap.upper_bound(it->first)) {
     BKLMSimHit* simHit = it->second;
     ub = m_bklmSimHitChannelMap.upper_bound(it->first);
+    float efficiency = m_StripEfficiency->getBarrelEfficiency(
+                         simHit->getForward(), simHit->getSector(),
+                         simHit->getLayer(), simHit->getPlane(),
+                         simHit->getStrip());
+    if (!efficiencyCorrection(efficiency))
+      continue;
     if (simHit->inRPC()) {
       int strip = BKLMElementNumbers::getStripByModule(
                     m_ElementNumbers->localChannelNumberBKLM(it->first));
@@ -164,6 +193,12 @@ void KLMDigitizerModule::digitizeEKLM()
        it = m_eklmSimHitChannelMap.upper_bound(it->first)) {
     EKLMSimHit* simHit = it->second;
     ub = m_eklmSimHitChannelMap.upper_bound(it->first);
+    float efficiency = m_StripEfficiency->getEndcapEfficiency(
+                         simHit->getEndcap(), simHit->getSector(),
+                         simHit->getLayer(), simHit->getPlane(),
+                         simHit->getStrip());
+    if (!efficiencyCorrection(efficiency))
+      continue;
     if (m_ChannelSpecificSimulation) {
       strip = m_eklmElementNumbers->stripNumber(
                 simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
@@ -217,15 +252,20 @@ void KLMDigitizerModule::event()
           channel = m_ElementNumbers->channelNumberBKLM(
                       hit->getForward(), hit->getSector(), hit->getLayer(),
                       hit->getPlane(), s);
-          m_bklmSimHitChannelMap.insert(
-            std::pair<int, BKLMSimHit*>(channel, hit));
+          if (checkActive(channel)) {
+            m_bklmSimHitChannelMap.insert(
+              std::pair<int, BKLMSimHit*>(channel, hit));
+          }
         }
       }
     } else {
       channel = m_ElementNumbers->channelNumberBKLM(
                   hit->getForward(), hit->getSector(), hit->getLayer(),
                   hit->getPlane(), hit->getStrip());
-      m_bklmSimHitChannelMap.insert(std::pair<int, BKLMSimHit*>(channel, hit));
+      if (checkActive(channel)) {
+        m_bklmSimHitChannelMap.insert(
+          std::pair<int, BKLMSimHit*>(channel, hit));
+      }
     }
   }
   for (i = 0; i < m_eklmSimHits.getEntries(); i++) {
@@ -233,7 +273,8 @@ void KLMDigitizerModule::event()
     channel = m_ElementNumbers->channelNumberEKLM(
                 hit->getEndcap(), hit->getSector(), hit->getLayer(),
                 hit->getPlane(), hit->getStrip());
-    m_eklmSimHitChannelMap.insert(std::pair<int, EKLMSimHit*>(channel, hit));
+    if (checkActive(channel))
+      m_eklmSimHitChannelMap.insert(std::pair<int, EKLMSimHit*>(channel, hit));
   }
   digitizeBKLM();
   digitizeEKLM();

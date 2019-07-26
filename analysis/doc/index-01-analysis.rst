@@ -91,7 +91,7 @@ Advanced Topics
 
 .. toctree:: TreeFitter
 
-.. toctree:: VertexFitter
+.. .. toctree:: VertexFitter
 
 .. toctree:: MVA
 

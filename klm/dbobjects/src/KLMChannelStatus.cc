@@ -11,8 +11,7 @@
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/dataobjects/BKLMChannelIndex.h>
-#include <klm/dataobjects/EKLMChannelIndex.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <framework/logging/Logger.h>
@@ -51,12 +50,9 @@ void KLMChannelStatus::setChannelStatus(uint16_t channel,
 
 void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
 {
-  BKLMChannelIndex bklmChannels;
-  for (BKLMChannelIndex& bklmChannel : bklmChannels)
-    setChannelStatus(bklmChannel.getKLMChannelNumber(), status);
-  EKLMChannelIndex eklmChannels;
-  for (EKLMChannelIndex& eklmChannel : eklmChannels)
-    setChannelStatus(eklmChannel.getKLMChannelNumber(), status);
+  KLMChannelIndex klmChannels;
+  for (KLMChannelIndex& klmChannel : klmChannels)
+    setChannelStatus(klmChannel.getKLMChannelNumber(), status);
 }
 
 int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const

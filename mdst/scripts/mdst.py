@@ -76,6 +76,7 @@ def add_mdst_dump(path, print_untested=False):
         DataStorePrinter("EventMetaData", [
             "getErrorFlag", "getEvent", "getRun", "getSubrun", "getExperiment",
             "getProduction", "getTime", "getParentLfn", "getGeneratedWeight",
+            "isEndOfRun"
             ], array=False),
         DataStorePrinter("Track", ["getNumberOfFittedHypotheses", "getQualityIndicator"], {
             "getTrackFitResult": charged_stables,

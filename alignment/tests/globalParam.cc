@@ -178,6 +178,10 @@ namespace {
 
     EXPECT_EQ(gpvComp.getGlobalParamSet<EmptyGlobalParamSet>().is<EmptyGlobalParamSet>(), true);
 
+    // This commented because BeamSpot is not yet in the DB. Instead, for now
+    // test VXDAlignment and once I get to this back, I want to have test for
+    // all supported db objects.
+    /*
     GlobalParamVector newgpv({"BeamSpot", "CDCAlignment"});
     GlobalCalibrationManager::initGlobalVector(newgpv);
 
@@ -195,6 +199,26 @@ namespace {
 
     newgpv.setGlobalParam(42., CDCAlignment::getGlobalUniqueID(), 0, 1);
     EXPECT_EQ(newgpv.getGlobalParam(CDCAlignment::getGlobalUniqueID(), 0, 1), 42.);
+    */
+
+    GlobalParamVector newgpv({"VXDAlignment", "CDCAlignment"});
+    GlobalCalibrationManager::initGlobalVector(newgpv);
+
+    EXPECT_EQ(newgpv.getGlobalParamSet<VXDAlignment>().isConstructed(), false);
+    newgpv.construct();
+    EXPECT_EQ(newgpv.getGlobalParamSet<VXDAlignment>().isConstructed(), true);
+
+    newgpv.setGlobalParam(42., VXDAlignment::getGlobalUniqueID(), 0, 1);
+    EXPECT_EQ(newgpv.getGlobalParam(VXDAlignment::getGlobalUniqueID(), 0, 1), 42.);
+    newgpv.loadFromDB(EventMetaData(1, 0, 0));
+    EXPECT_EQ(newgpv.getGlobalParam(VXDAlignment::getGlobalUniqueID(), 0, 1), 0.);
+
+    newgpv.updateGlobalParam(42., VXDAlignment::getGlobalUniqueID(), 0, 1);
+    EXPECT_EQ(newgpv.getGlobalParam(VXDAlignment::getGlobalUniqueID(), 0, 1), 42.);
+
+    newgpv.setGlobalParam(42., CDCAlignment::getGlobalUniqueID(), 0, 1);
+    EXPECT_EQ(newgpv.getGlobalParam(CDCAlignment::getGlobalUniqueID(), 0, 1), 42.);
+
   }
 
 }  // namespace

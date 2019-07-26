@@ -26,7 +26,8 @@ def fitVertex(
     Parameters:
         list_name (str):        name of the input ParticleList
         conf_level (float):     minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           rave or kfitter
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
@@ -65,7 +66,8 @@ def _fitVertex(
     Parameters:
         list_name (str):        name of the input ParticleList
         conf_level (float):     minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           rave or kfitter
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
@@ -99,7 +101,8 @@ def vertexKFit(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         constraint (str):   add aditional constraint to the fit (valid options are ipprofile or iptube)
         path (basf2.Path):  modules are added to this path
@@ -120,7 +123,8 @@ def vertexKFitDaughtersUpdate(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         constraint (str):   add aditional constraint to the fit (valid options are ipprofile or iptube)
         path (basf2.Path):  modules are added to this path
     """
@@ -140,7 +144,8 @@ def massVertexKFit(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
     """
@@ -160,7 +165,8 @@ def massVertexKFitDaughtersUpdate(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
     """
@@ -180,7 +186,8 @@ def massKFit(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
     """
@@ -200,7 +207,8 @@ def massKFitDaughtersUpdate(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
     """
@@ -220,7 +228,8 @@ def fourCKFit(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
     """
@@ -240,7 +249,8 @@ def fourCKFitDaughtersUpdate(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
     """
@@ -268,7 +278,8 @@ def vertexRave(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         constraint (str):   add aditional constraint to the fit
             (valid options are ipprofile or iptube).
@@ -331,7 +342,8 @@ def vertexRaveDaughtersUpdate(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         constraint (str):   add aditional constraint to the fit
             (valid options are ipprofile or iptube).
@@ -388,7 +400,8 @@ def massVertexRave(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
         silence_warning (bool): silence the warning advertising TreeFitter use
@@ -437,7 +450,8 @@ def massVertexRaveDaughtersUpdate(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
         silence_warning (bool): silence the warning advertising TreeFitter use
@@ -487,7 +501,8 @@ def massRave(
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
-            Choosing this parameter to be 0 selects CL > 0
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         path (basf2.Path):  modules are added to this path
         silence_warning (bool): silence the warning advertising TreeFitter use
@@ -543,7 +558,9 @@ def vertexTree(
 
     Parameters:
         list_name (str):     name of the input ParticleList
-        conf_level (float):  minimum value of the confidence level to accept the fit. 0 selects CL > 0
+        conf_level (float):  minimum value of the confidence level to accept the fit.
+            Setting this parameter to -1 selects all particle candidates.
+            The value of 0 rejects the particle candidates with failed fit.
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
             Please do not mix PDG id and particle names in massConstraint list.
         ipConstraint (bool): constrain head production vertex to IP (x-y-z) constraint

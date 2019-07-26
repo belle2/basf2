@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor : Soumen Halder and Saurabh Sandilya                       *
@@ -22,9 +22,6 @@
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <string>
-//#include <vector>
-//#include <tuple>
-//#include <memory>
 
 
 namespace Belle2 {
@@ -60,7 +57,6 @@ namespace Belle2 {
   private:
 
     int m_pdgCode;                /**< PDG code of the combined mother particle */
-    typedef std::pair<Particle*, double> pair;
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the charged particle decay */
     DecayDescriptor m_decaydescriptorGamma; /**< Decay descriptor of the decay being reconstructed */
@@ -68,10 +64,14 @@ namespace Belle2 {
     std::string m_gammaListName; /**< input ParticleList names */
     std::string m_outputListName; /**< output ParticleList name */
     std::string m_outputAntiListName;   /**< output anti-particle list name */
+    StoreObjPtr<ParticleList>  m_inputparticleList; /**<StoreObjptr for input charged particlelist */
+    StoreObjPtr<ParticleList>  m_gammaList; /**<StoreObjptr for gamma list */
+    StoreObjPtr<ParticleList>  m_outputparticleList; /**<StoreObjptr for output particlelist */
+    StoreObjPtr<ParticleList>  m_outputAntiparticleList; /**<StoreObjptr for output antiparticlelist */
     double m_angleThres; /**< input max angle to be accepted (in radian) */
-    double m_energy_min; /**< min energy of gamma to be accepted(in GeV) */
+    double m_minimumEnergy; /**< min energy of gamma to be accepted(in GeV) */
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
-    bool isMultiPho;
+    bool m_isMultiPho; /**<multiple or one bremphoton addition option  */
   };
 
 } // Belle2 namespace

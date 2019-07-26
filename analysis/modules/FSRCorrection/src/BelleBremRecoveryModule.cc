@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor : Soumen Halder and Saurabh Sandilya                       *
@@ -19,6 +19,8 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/Track.h>
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
@@ -59,8 +61,8 @@ namespace Belle2 {
     addParam("gammaListName", m_gammaListName, "The gammas list containing possibly radiative gammas, should already exist.");
     addParam("angleThreshold", m_angleThres,
              "The maximum angle in radian  between the charged particle  and the (radiative) gamma to be accepted.", 0.05);
-    addParam("minimum_energy", m_energy_min, "The minimum energy of the (radiative) gamma to be accepted.", 0.05);
-    addParam("multiplePhotons", isMultiPho, "If only the nearest photon to add then make it False otherwise true", true);
+    addParam("minimumEnergy", m_minimumEnergy, "The minimum energy of the (radiative) gamma to be accepted.", 0.05);
+    addParam("multiplePhotons", m_isMultiPho, "If only the nearest photon to add then make it False otherwise true", true);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
@@ -84,21 +86,23 @@ namespace Belle2 {
     } else if (!m_decaydescriptor.init(m_inputListName)) {
       B2ERROR("[BelleBremRecoveryModule] Invalid input particle list name: " << m_inputListName);
     } else {
-      StoreObjPtr<ParticleList>().isRequired(m_inputListName);
+      m_inputparticleList.isRequired(m_inputListName);
     }
 
     if (!m_decaydescriptorGamma.init(m_gammaListName)) {
       B2ERROR("[BelleBremRecoveryModule] Invalid gamma particle list name: " << m_gammaListName);
     } else {
-      StoreObjPtr<ParticleList>().isRequired(m_gammaListName);
+      m_gammaList.isRequired(m_gammaListName);
     }
 
     // make output list
-    StoreObjPtr<ParticleList> particleList(m_outputListName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-    particleList.registerInDataStore(flags);
-    StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);
-    antiParticleList.registerInDataStore(flags);
+    m_outputparticleList.registerInDataStore(m_outputListName, flags);
+    m_outputAntiparticleList.registerInDataStore(m_outputAntiListName, flags);
+
+    StoreArray<Particle> particles;
+    StoreArray<PIDLikelihood> pidlikelihoods;
+    particles.registerRelationTo(pidlikelihoods);
   }
 
 
@@ -109,62 +113,64 @@ namespace Belle2 {
 
     RelationArray particlesToMCParticles(particles, mcParticles);
 
-    const StoreObjPtr<ParticleList> inputList(m_inputListName);
-    const StoreObjPtr<ParticleList> gammaList(m_gammaListName);
-
     // new output particle list
-    StoreObjPtr<ParticleList> outputList(m_outputListName);
-    outputList.create();
-    outputList->initialize(m_pdgCode, m_outputListName);
+    m_outputparticleList.create();
+    m_outputparticleList->initialize(m_pdgCode, m_outputListName);
 
-    StoreObjPtr<ParticleList> outputAntiList(m_outputAntiListName);
-    outputAntiList.create();
-    outputAntiList->initialize(-1 * m_pdgCode, m_outputAntiListName);
-    outputAntiList->bindAntiParticleList(*(outputList));
-    std::vector<int> usedGammas;
+    m_outputAntiparticleList.create();
+    m_outputAntiparticleList->initialize(-1 * m_pdgCode, m_outputAntiListName);
+    m_outputAntiparticleList->bindAntiParticleList(*(m_outputparticleList));
+
+    std::unordered_map<int, int> usedGammas;
     // loop over charged particles, correct them and add them to the output list
-    const unsigned int nLep = inputList->getListSize();
+    const unsigned int nLep = m_inputparticleList->getListSize();
     for (unsigned i = 0; i < nLep; i++) {
-      const Particle* lepton = inputList->getParticle(i);
+      const Particle* lepton = m_inputparticleList->getParticle(i);
       TLorentzVector lepton4Vector = lepton->get4Vector();
       TLorentzVector new4Vec = lepton->get4Vector();
-      std::map<Particle*, double> map;
+      std::vector<Particle*> selectedGammas;
       // look for all possible (radiative) gamma
-      const unsigned int nGam = gammaList->getListSize();
+      const unsigned int nGam = m_gammaList->getListSize();
       for (unsigned j = 0; j < nGam; j++) {
-        Particle* gamma = gammaList->getParticle(j);
-
+        Particle* gamma = m_gammaList->getParticle(j);
         // check if gamma energy is within allowed energy range
-        if (gamma->getEnergy() < m_energy_min) continue;
-        bool gammaUsed = std::find(usedGammas.begin(), usedGammas.end(), gamma->getMdstArrayIndex()) != usedGammas.end();
-        if (gammaUsed) continue;
+        if (gamma->getEnergy() < m_minimumEnergy) continue;
+        //This will prevent double counting of bremphoton
+        bool NotgammaUsed = usedGammas.find(gamma->getMdstArrayIndex()) == usedGammas.end();
+        if (!NotgammaUsed) continue;
         // get angle (in lab system)
         TVector3 pi = lepton->getMomentum();
         TVector3 pj = gamma->getMomentum();
         double angle = (pi.Angle(pj));
         if (m_angleThres > angle) {
-          B2INFO("[BelleBremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
-          map.insert(std::pair<Particle*, double>(gamma, angle));
+          gamma->addExtraInfo("theta_e_gamma", angle);
+          selectedGammas.push_back(gamma);
         }
       }
-      std::vector<pair> vec;
-      std::copy(map.begin(), map.end(), std::back_inserter<std::vector<pair>>(vec));
-      std::sort(vec.begin(), vec.end(), [](const pair & l, const pair & r) {
-        if (l.second != r.second)
-          return l.second < r.second;
+      //sorting the bremphotons in assending order of the angle with the charged particle
+      std::sort(selectedGammas.begin(), selectedGammas.end(), [](const Particle * photon1, const Particle * photon2) {
+        return photon1->getExtraInfo("theta_e_gamma") < photon2->getExtraInfo("theta_e_gamma");
       });
-      if (!isMultiPho && vec.size() > 1)
-        vec.erase(vec.begin() + 1, vec.end());
-      for (auto const& x : vec)
-        new4Vec += x.first->get4Vector();
-      Particle correctedLepton(new4Vec, lepton->getPDGCode());
-      correctedLepton.appendDaughter(lepton);
+
+      //How many brem photons to add (nearest or all)
+      if (!m_isMultiPho && selectedGammas.size() > 1) {
+        std::for_each(selectedGammas.begin() + 1, selectedGammas.end(), [](const auto & fsrgamma) {
+          fsrgamma->removeExtraInfo();
+        });
+        selectedGammas.erase(selectedGammas.begin() + 1, selectedGammas.end());
+      }
+      //Preparing 4-momentum vector of charged particle by adding bremphoton momenta
+      for (auto const& fsrgamma : selectedGammas)
+        new4Vec += fsrgamma->get4Vector();
+      Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
+                               lepton->getTrack()->getArrayIndex());
+      correctedLepton.appendDaughter(lepton, false);
+
       const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
       TMatrixFSym corLepMatrix(c_DimMatrix);
-      for (auto const& x : vec) {
-        Particle* fsrgamma = x.first;
-        usedGammas.push_back(fsrgamma->getMdstArrayIndex());
-        fsrgamma->addExtraInfo("theta_e_gamma", x.second);
+      for (auto const& fsrgamma : selectedGammas) {
+        usedGammas[fsrgamma->getMdstArrayIndex()] = fsrgamma->getMdstArrayIndex();
+        //this extrainfo associated to the brephoton provides angle with the charged particle
         const TMatrixFSym& fsrErrorMatrix = fsrgamma->getMomentumVertexErrorMatrix();
         for (int irow = 0; irow < c_DimMatrix; irow++)
           for (int icol = irow; icol < c_DimMatrix; icol++) {
@@ -173,22 +179,23 @@ namespace Belle2 {
             else
               corLepMatrix(irow, icol) = lepErrorMatrix(irow, icol) + fsrErrorMatrix(irow, icol);
           }
-        correctedLepton.appendDaughter(fsrgamma);
+        correctedLepton.appendDaughter(fsrgamma, false);
+        B2INFO("[BelleBremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
         correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
       }
-      if (int(vec.size()) == 0)
+      if (int(selectedGammas.size()) == 0)
         correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
-      correctedLepton.addExtraInfo("nGamma", float(vec.size()));
-
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
+      const PIDLikelihood* pid = lepton->getPIDLikelihood();
+      if (pid)
+        newLepton->addRelationTo(pid);
       if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
-      outputList->addParticle(newLepton);
+      m_outputparticleList->addParticle(newLepton);
     }
   }
-
 } // end Belle2 namespace
 

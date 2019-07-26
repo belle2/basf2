@@ -421,33 +421,30 @@ def correctbelleFSR(
     inputListName,
     gammaListName,
     multiplePhotons=True,
-    minimum_energy=0.05,
+    minimumEnergy=0.05,
     angleThreshold=0.05,
     writeOut=False,
     path=None
 ):
     """
-    Takes the charged particle from the given charged particle list and copies them to the output list
-    and adds the 4-vector of the all the photon (considered as radiative) to the charged particle, if the given criteria
-    for maximum angle and minimum energy are fulfilled.
-      Please note, a new charge particle is generated, with the old electron and -if found- gammas as daughters.
-    Information attached to the track is only available for the old lepton, accessable via the daughter
-    metavariable, e.g. <daughter(0, eid)>.
-      The number of photon added to the electron can be obtained by using the variables 'extraInfo(nGamma)' refer
-    to new corrected charged particle
-      The angle between ith(i starts from 1) bremphoton and electron can be obtained by 'daughter(i,theta_e_gamma)'
+    Run the Belle - like brems finding on the `inputListName` of charged particles.
 
+    Adds all photons in `gammaListName` to a copy of the charged particle that are within
+    `angleThreshold` and above `minimumEnergy`.
 
-    @param outputListName The output charged particle list containing the corrected charged particles
-    @param inputListName The initial charged particle list containing the charged particles to correct, should already exists.
-    @param gammaListName The gammas list containing possibly radiative gammas, should already exist.
-    @param multiplePhotons  How many photon to add with the charged particle? nearest one-> False,
-               add all photon within the cone->True
-    @param angleThreshold The maximum angle in radian  between the charged particle  and the (radiative) gamma to be accepted..
-    @param minimum_energy The minimum energy in GeV of the (radiative) gamma to be accepted..
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Parameters:
+
+    outputListName(str)   The output charged particle list containing the corrected charged particles
+    inputListName(str)    The initial charged particle list containing the charged particles to correct.
+    gammaListName(str)    The gammas list containing possibly radiative gammas, should already exist.
+    multiplePhotons(bool) How many photon to add with the charged particle? nearest one-> False,
+    add all the photons within the cone->True
+    angleThreshold(double)The maximum angle in radian  between the charged particle and the(radiative) gamma to be accepted..
+    minimumEnergy(double) The minimum energy in GeV of the(radiative) gamma to be accepted..
+    writeOut(bool)        whether RootOutput module should save the created ParticleList
+    path(basf2.Path)      modules are added to this path
     """
+
     fsrcorrector = register_module('BelleBremRecovery')
     fsrcorrector.set_name('BelleFSRCorrection_' + outputListName)
     fsrcorrector.param('inputListName', inputListName)
@@ -455,7 +452,7 @@ def correctbelleFSR(
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('multiplePhotons', multiplePhotons)
     fsrcorrector.param('angleThreshold', angleThreshold)
-    fsrcorrector.param('minimum_energy', minimum_energy)
+    fsrcorrector.param('minimumEnergy', minimumEnergy)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 

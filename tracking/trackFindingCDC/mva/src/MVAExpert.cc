@@ -119,8 +119,7 @@ void MVAExpert::Impl::beginRun()
       B2ASSERT("Number of variables mismatch", nExpectedVars == static_cast<int>(m_selectedNamedVariables.size()));
     } else {
       B2WARNING("Unpacked new kind of classifier. Consider to extend the feature variable check. Identifier name: " << m_identifier
-                << "; method name: " << weightfile->getElement<std::string>("method")
-                << "; version in file: " << weightfile->getElement<int>("FastBDT_version"));
+                << "; method name: " << weightfile->getElement<std::string>("method"));
       m_selectedNamedVariables = m_allNamedVariables;
     }
 

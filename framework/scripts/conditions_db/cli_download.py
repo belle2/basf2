@@ -15,8 +15,9 @@ import shutil
 import fnmatch
 import re
 from urllib.parse import urljoin
-from . import ConditionsDB, calculate_checksum, encode_name
+from . import ConditionsDB, encode_name
 from .cli_utils import ItemFilter
+from checksum import file_checksum
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from concurrent.futures import ThreadPoolExecutor
 
@@ -47,7 +48,7 @@ def download_file(db, local_file, remote_file, checksum, iovlist):
     """Actually download the file"""
     # check if existing
     if os.path.exists(local_file):
-        if calculate_checksum(local_file) == checksum:
+        if file_checksum(local_file) == checksum:
             # done, nothing else to do
             return iovlist
         else:
@@ -63,7 +64,7 @@ def download_file(db, local_file, remote_file, checksum, iovlist):
         shutil.copyfileobj(file_req.raw, out)
 
     # and check it
-    if calculate_checksum(local_file) != checksum:
+    if file_checksum(local_file) != checksum:
         B2ERROR("Checksum mismatch after download: %s" % local_file)
         return None
 

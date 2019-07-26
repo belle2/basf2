@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef BKLMEFFNRADIOMODLUE
-#define  BKLMEFFNRADIOMODLUE
+#pragma once
 
 #include <framework/core/Module.h>
 #include "TFile.h"
@@ -163,6 +161,3 @@ namespace Belle2 {
 
   };
 }
-
-
-#endif

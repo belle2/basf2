@@ -363,6 +363,149 @@ namespace {
 
   }
 
+  class MCTruthVariablesTest : public ::testing::Test {
+  protected:
+    virtual void SetUp()
+    {
+      // datastore things
+      DataStore::Instance().reset();
+      DataStore::Instance().setInitializeActive(true);
+
+      // needed to mock up
+      StoreArray<ECLCluster> clusters;
+      StoreArray<MCParticle> mcparticles;
+      StoreArray<Track> tracks;
+      StoreArray<TrackFitResult> trackfits;
+      StoreArray<Particle> particles;
+
+      // register the arrays
+      clusters.registerInDataStore();
+      mcparticles.registerInDataStore();
+      tracks.registerInDataStore();
+      trackfits.registerInDataStore();
+      particles.registerInDataStore();
+
+      // register the relations for mock up mcmatching
+      clusters.registerRelationTo(mcparticles);
+      tracks.registerRelationTo(mcparticles);
+      particles.registerRelationTo(mcparticles);
+
+      // register the relation for mock up track <--> cluster matching
+      //clusters.registerRelationTo(tracks);
+      tracks.registerRelationTo(clusters);
+
+      // end datastore things
+      DataStore::Instance().setInitializeActive(false);
+
+      /* mock up an electron (track with a cluster AND a track-cluster match)
+       * and a photon (cluster, no track) and MCParticles for both
+       *
+       * this assumes that everything (tracking, clustering, track-cluster
+       * matching *and* mcmatching all worked)
+       *
+       * this can be extended to pions, kaons, etc but leave it simple for now
+       */
+
+      // create the true underlying mcparticles
+      auto* true_photon = mcparticles.appendNew(MCParticle());
+      true_photon->setPDG(22);
+      auto* true_electron = mcparticles.appendNew(MCParticle());
+      true_electron->setPDG(11);
+      auto* true_pion = mcparticles.appendNew(MCParticle());
+      true_pion->setPDG(-211);
+
+      // create the reco clusters
+      auto* cl0 = clusters.appendNew(ECLCluster());
+      cl0->setEnergy(1.0);
+      cl0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cl0->setClusterId(0);
+
+      auto* cl1 = clusters.appendNew(ECLCluster());
+      cl1->setEnergy(0.5);
+      cl1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cl1->setClusterId(1);
+
+      // create a reco track (one has to also mock up a track fit result)
+      TMatrixDSym cov(6);
+      trackfits.appendNew(
+        TVector3(), TVector3(), cov, -1, Const::electron, 0.5, 1.5,
+        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+      auto* electron_tr = tracks.appendNew(Track());
+      electron_tr->setTrackFitResultIndex(Const::electron, 0);
+      electron_tr->addRelationTo(cl1);  // a track <--> cluster match
+
+      TMatrixDSym cov1(6);
+      trackfits.appendNew(
+        TVector3(), TVector3(), cov1, -1, Const::pion, 0.51, 1.5,
+        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+      auto* pion_tr = tracks.appendNew(Track());
+      pion_tr->setTrackFitResultIndex(Const::pion, 0);
+      pion_tr->addRelationTo(cl1);  // a track <--> cluster match
+
+      // now set mcmatch relations
+      cl0->addRelationTo(true_photon,   12.3);
+      cl0->addRelationTo(true_electron,  2.3);
+      cl1->addRelationTo(true_electron, 45.6);
+      cl1->addRelationTo(true_photon,    5.6);
+      cl1->addRelationTo(true_pion,     15.6);
+
+      electron_tr->addRelationTo(true_electron);
+      pion_tr->addRelationTo(true_pion);
+
+      // create belle2::Particles from the mdst objects
+      const auto* photon = particles.appendNew(Particle(cl0));
+      const auto* electron = particles.appendNew(Particle(electron_tr, Const::electron));
+      const auto* pion = particles.appendNew(Particle(pion_tr, Const::pion));
+      const auto* misid_photon = particles.appendNew(Particle(cl1));
+
+      // now set mcmatch relations
+      photon->addRelationTo(true_photon);
+      electron->addRelationTo(true_electron);
+      pion->addRelationTo(true_pion);
+      misid_photon->addRelationTo(true_electron); // assume MC matching caught this
+    }
+
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(MCTruthVariablesTest, ECLMCMatchWeightVariable)
+  {
+    StoreArray<Particle> particles;
+    const auto* photon = particles[0];
+    const auto* electron = particles[1];
+    const auto* pion = particles[2];
+
+    const auto* weight = Manager::Instance().getVariable("clusterMCMatchWeight");
+    EXPECT_FLOAT_EQ(weight->function(photon),   12.3);
+    EXPECT_FLOAT_EQ(weight->function(electron), 45.6);
+    EXPECT_FLOAT_EQ(weight->function(pion), 15.6);
+  }
+
+  TEST_F(MCTruthVariablesTest, ECLBestMCMatchVariables)
+  {
+    StoreArray<Particle> particles;
+    const auto* photon = particles[0];
+    const auto* electron = particles[1];
+    const auto* pion = particles[2];
+    const auto* misid_photon = particles[3];
+
+
+    const auto* pdgcode = Manager::Instance().getVariable("clusterBestMCPDG");
+    EXPECT_EQ(pdgcode->function(photon),       22);
+    EXPECT_EQ(pdgcode->function(electron),     11);
+    EXPECT_EQ(pdgcode->function(pion),     11);
+    EXPECT_EQ(pdgcode->function(misid_photon), 11);
+
+    const auto* weight = Manager::Instance().getVariable("clusterBestMCMatchWeight");
+    EXPECT_FLOAT_EQ(weight->function(photon),       12.3);
+    EXPECT_FLOAT_EQ(weight->function(electron),     45.6);
+    EXPECT_FLOAT_EQ(weight->function(pion),     45.6);
+    EXPECT_FLOAT_EQ(weight->function(misid_photon), 45.6);
+  }
+
   class ROEVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
@@ -1075,6 +1218,10 @@ namespace {
     var = Manager::Instance().getVariable("max(E, pz)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), 2.0);
+
+    var = Manager::Instance().getVariable("log10(px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -1.0);
   }
 
   TEST_F(MetaVariableTest, formula)
@@ -2759,6 +2906,44 @@ namespace {
                                     "medianValueInList(NONEXISTANTLIST, px)");
 
     EXPECT_B2FATAL(vnolist->function(nullptr));
+  }
+
+  TEST_F(MetaVariableTest, pValueCombination)
+  {
+    TLorentzVector momentum;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    Particle KS(TLorentzVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
+    KS.setPValue(0.1);
+    momentum += KS.get4Vector();
+    Particle* newDaughters = particles.appendNew(KS);
+    daughterIndices.push_back(newDaughters->getArrayIndex());
+    Particle Jpsi(TLorentzVector(-1, 1, 1, 3.548), 443, Particle::c_Unflavored, Particle::c_Composite, 1);
+    Jpsi.setPValue(0.9);
+    momentum += Jpsi.get4Vector();
+    newDaughters = particles.appendNew(Jpsi);
+    daughterIndices.push_back(newDaughters->getArrayIndex());
+    Particle* B = particles.appendNew(momentum, 521, Particle::c_Flavored, daughterIndices);
+    B->setPValue(0.5);
+
+    const Manager::Var* singlePvalue = Manager::Instance().getVariable("pValueCombination(chiProb)");
+    ASSERT_NE(singlePvalue, nullptr);
+    EXPECT_FLOAT_EQ(singlePvalue->function(B), 0.5);
+
+    const Manager::Var* twoPvalues = Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb))");
+    ASSERT_NE(twoPvalues, nullptr);
+    EXPECT_FLOAT_EQ(twoPvalues->function(B), 0.05 * (1 - log(0.05)));
+
+    const Manager::Var* threePvalues =
+      Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb), daughter(1, chiProb))");
+    ASSERT_NE(threePvalues, nullptr);
+    EXPECT_FLOAT_EQ(threePvalues->function(B), 0.045 * (1 - log(0.045) + 0.5 * log(0.045) * log(0.045)));
+
+    // wrong number of arguments
+    EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination()"));
+
+    // non-existing variable
+    EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination(chiProb, NONEXISTANTVARIABLE)"));
   }
 
   class PIDVariableTest : public ::testing::Test {

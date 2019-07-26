@@ -28,7 +28,8 @@ namespace Belle2 {
   {
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
       for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
-        for (unsigned int layer = 0; layer < MUID_MaxBarrelLayer + MUID_MaxForwardEndcapLayer + 2; ++layer) {
+        for (unsigned int layer = 0; layer < MUID_MaxBarrelLayer + MUID_MaxForwardEndcapLayer + 2;
+             ++layer) { // MUID_MaxBarrelLayer and MUID_MaxForwardEndcapLayer are 0 index based thus an addition of 2 is needed
           m_LayerPDF[outcome][lastLayer][layer] = 0.0;
         }
       }
@@ -209,24 +210,18 @@ namespace Belle2 {
     //Pdf treatment used to avoid layer inefficiency problems
     double pdf = 1.0;
     unsigned int testBit = 1;
-    const std::vector<float> extBKLMEfficiencyVector = muid->getExtBKLMEfficiencyVector();
-    int BKLMEfficiencyVectorSize = extBKLMEfficiencyVector.size();
 
-    if (barrelExtLayer + 1 == BKLMEfficiencyVectorSize) { // check the size of the Efficiency Vector
-      for (int layer = 0; layer <= barrelExtLayer; ++layer) {
-        if ((testBit & extLayerPattern) != 0) {
-          if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
-            pdf *= m_LayerPDF[outcome][lastLayer][layer];
-          } else {
-            if (((layer == 0) && (outcome < c_CrossBarrelStopInForwardMin)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
-              pdf *= 1 - m_LayerPDF[outcome][lastLayer][layer] * extBKLMEfficiencyVector.at(layer);
-            }
+    for (int layer = 0; layer <= barrelExtLayer; ++layer) {
+      if ((testBit & extLayerPattern) != 0) {
+        if ((testBit & hitLayerPattern) != 0) {//checking the presence of a hit in the layer
+          pdf *= m_LayerPDF[outcome][lastLayer][layer];
+        } else {
+          if (((layer == 0) && (outcome < c_CrossBarrelStopInForwardMin)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
+            pdf *= 1 - m_LayerPDF[outcome][lastLayer][layer] * muid->getExtBKLMEfficiencyValue(layer);
           }
         }
-        testBit <<= 1; // move to next bit
       }
-    } else {
-      B2WARNING("Mismatch between BKLM efficiency vector size and outermost BKLM extrapolated layer");
+      testBit <<= 1; // move to next bit
     }
 
     int maxLayer = isForward ? MUID_MaxForwardEndcapLayer : MUID_MaxBackwardEndcapLayer;

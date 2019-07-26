@@ -12,7 +12,8 @@
 <!-- temporary announcements -->
 <div class="infobox info">
   <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-  <b>Recent changes:</b> Compare different revisions to each other (alias "custom reference selection"); add description to ROOT files!
+  <b>Recent changes:</b> Easy interfaces to generate validation histograms in <code>basf2</code> using <code>create_validation_histograms</code>!
+  Kolmogorov Smirnow and Anderson Darling tests now supported (feedback appreciated)!
   <a target="_blank" href="https://confluence.desy.de/display/BI/News">Details &amp; more news</a>
 </div>
 
@@ -55,11 +56,25 @@
   <div class="wrap_rootfile">
     <!-- Header -->
     <!------------>
-    <h2>Result File: {{rootfile}} <a href="../results/{{newest_revision}}/{{package}}/{{rootfile}}.root">download {{newest_revision}}</a>
+    <h2>Result File: {{rootfile}}
       {{#if !has_reference}}
-      <div class="no_reference">NO REFERENCE FILE</div>
+        <span class="no_reference">[No reference]</span>
       {{/if}}
     </h2>
+    {{ #if newest_revision }}
+      <div class="downloads">
+          <b>Downloads: </b>
+          {{ #compared_revision:i_revision}}
+            {{ #if (compared_revision[i_revision] != 'reference') }}
+              <span style="margin-right:0.5em">
+                <a href="../results/{{compared_revision[i_revision]}}/{{package}}/{{rootfile}}.root">
+                  {{compared_revision[i_revision]}}
+                </a>
+              </span>
+            {{ /if }}
+          {{ /compared_revision }}
+      </div>
+    {{ /if }}
     {{#if description }}
     <b>Description: </b>
     {{ description }}
@@ -70,7 +85,7 @@
     <!------------------------------>
     {{#html_content}}
     <div class="wrap_boxes">
-      <h2 class="persistent-header">HTML Content: {{title}}</h2>
+      <h3 class="persistent-header">HTML Content: {{title}}</h3>
       <div>
         {{{html_content}}}
       </div>
@@ -81,8 +96,8 @@
     <!------------------------->
     {{#ntuples}}
     <div class="wrap_boxes">
-      <h2 class="persistent-header">NTuple: {{title}}</h2>
-      <table id={{title}}></table>
+      <h3 class="persistent-header">NTuple: <code>{{title}}</code></h3>
+      <table class="ntuple_table" id={{title}}></table>
       <script type="text/javascript">
           fillNtupleTable("{{title}}","{{json_file_path}}");
       </script>
@@ -118,7 +133,10 @@
     <div id="no_failed_scripts">No failed scripts</div>
     {{#scriptfiles}}
     {{#if status == "failed" }}
-    <div class="failed_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="failed_script">
+      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    </div>
     {{/if}}
     {{/scriptfiles}}
   </div>
@@ -127,7 +145,10 @@
     <div id="no_finished_scripts">No finished scripts</div>
     {{#scriptfiles}}
     {{#if status == "finished" }}
-    <div class="finished_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="finished_script">
+      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    </div>
     {{/if}}
     {{/scriptfiles}}
   </div>
@@ -136,7 +157,7 @@
     <div id="no_skipped_scripts">No skipped scripts</div>
     {{#scriptfiles}}
     {{#if status == "skipped" }}
-    <div class="skipped_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a></div>
+    <div class="skipped_script"><code>{{name}}</code> - {{status}}</div>
     {{/if}}
     {{/scriptfiles}}
   </div>
@@ -202,12 +223,9 @@
 <div class="wrap_boxes_descriptions">
   <span><strong>Package: </strong>{{ package }}</span><br>
   <span><strong>Description: </strong>{{{ description }}}</span><br>
-  <span><strong>ROOT file: </strong>{{ rootfile }}.root</span><br>
-  <span><strong>$\chi^2$-Test: </strong>{{ comparison_text }}</span><br>
+  <span><strong>ROOT file: </strong> <code>{{ rootfile }}.root</code></span><br>
+  <span><strong>Comparison: </strong>{{{ comparison_text }}}</span><br>
   {{! if the warning has not been set, no pvalue is available either }}
-  {{#comparison_pvalue_warn}}
-  <span><strong>Comparison p-value: </strong>{{ comparison_pvalue }} (Warning below {{ comparison_pvalue_warn }} | Error below {{ comparison_pvalue_error }})</span><br>
-  {{/comparison_pvalue_warn}}
   <span><strong>Contact: </strong>{{ contact }}</span><br>
   <span><strong>Check for: </strong>{{ check }}</span><br>
   <!-- todo: share this plot -->

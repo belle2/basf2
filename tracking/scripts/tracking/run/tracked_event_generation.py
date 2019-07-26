@@ -16,6 +16,8 @@ def get_logger():
 
 
 class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
+    """ Apply tracking to presimulated events or events generated on the fly """
+
     #: Description of the run setup to be displayed on command line
     description = "Apply tracking to presimulated events or events generated on the fly."
 
@@ -126,6 +128,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
 
 def add_standard_finder(path):
+    """adds the standard track finding to the path"""
+
     import tracking
     components = None
     for module in path.modules():
@@ -175,6 +179,7 @@ def add_cosmics_reconstruction(path):
     if not components:
         components = None
     reconstruction.add_cosmics_reconstruction(path, components=components)
+
 
 finder_modules_by_short_name = {
     'MC': 'TrackFinderMCTruthRecoTracks',

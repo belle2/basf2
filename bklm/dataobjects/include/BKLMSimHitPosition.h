@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMSIMHITPOSITION_H
-#define BKLMSIMHITPOSITION_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
@@ -54,5 +53,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //BKLMSIMHITPOSITION_H

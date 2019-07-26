@@ -40,8 +40,7 @@ namespace Belle2 {
 
 
     void TOPreco::setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
-                                 const TOPAsicMask& asicMask,
-                                 bool printMask)
+                                 const TOPAsicMask& asicMask)
     {
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
@@ -56,8 +55,50 @@ namespace Belle2 {
         }
       }
       B2INFO("TOPreco: new channel masks have been passed to reconstruction");
+    }
 
-      if (printMask) print_channel_mask_();
+
+    void TOPreco::setUncalibratedChannelsOff(const DBObjPtr<TOPCalChannelT0>& channelT0)
+    {
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
+      int numModules = geo->getNumModules();
+      for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        unsigned numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
+        for (unsigned channel = 0; channel < numPixels; channel++) {
+          if (channelT0->isCalibrated(moduleID, channel)) continue;
+          int mdn = moduleID - 1; // 0-based used in fortran
+          int ich = mapper.getPixelID(channel) - 1; // 0-based used in fortran
+          set_channel_off_(&mdn, &ich);
+        }
+      }
+      B2INFO("TOPreco: channelT0-uncalibrated channels have been masked off");
+    }
+
+
+    void TOPreco::setUncalibratedChannelsOff(const DBObjPtr<TOPCalTimebase>& timebase)
+    {
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& ch_mapper = TOPGeometryPar::Instance()->getChannelMapper();
+      const auto& fe_mapper = TOPGeometryPar::Instance()->getFrontEndMapper();
+      int numModules = geo->getNumModules();
+      for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        unsigned numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
+        for (unsigned channel = 0; channel < numPixels; channel++) {
+          const auto* fe = fe_mapper.getMap(moduleID, channel / 128);
+          if (not fe) {
+            B2ERROR("TOPreco::setUncalibratedChannelsOff no front-end map found");
+            continue;
+          }
+          auto scrodID = fe->getScrodID();
+          const auto* sampleTimes = timebase->getSampleTimes(scrodID, channel);
+          if (sampleTimes->isCalibrated()) continue;
+          int mdn = moduleID - 1; // 0-based used in fortran
+          int ich = ch_mapper.getPixelID(channel) - 1; // 0-based used in fortran
+          set_channel_off_(&mdn, &ich);
+        }
+      }
+      B2INFO("TOPreco: timebase-uncalibrated channels have been masked off");
     }
 
 
@@ -121,7 +162,7 @@ namespace Belle2 {
                   << LogVar("pixelID", pixelID + 1));
           return status;
         case -3:
-          B2ERROR("TOPReco::addData: digit should already be masked-out (different masks used?)");
+          B2DEBUG(100, "TOPReco::addData: digit should already be masked-out (different masks used?)");
           return status;
         default:
           B2ERROR("TOPReco::addData: unknown return status."

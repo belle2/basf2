@@ -24,7 +24,8 @@
 
 #include <framework/geometry/BFieldManager.h>
 
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
+#include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
 #include <framework/particledb/EvtGenDatabasePDG.h>
 using namespace Belle2;
@@ -46,6 +47,16 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
   addParam("massConstraintListParticlename", m_massConstraintListParticlename,
            "Type::[string]. List of particles to mass constrain with string = particle name.", {});
+
+
+  addParam("geoConstraintList", m_geoConstraintListPDG,
+           "Type::[int], if 'autoSetGeoConstraintAndMergeVertices==False' you can manually set the particles that will be geometrically constrained here.", {});
+  addParam("sharedVertexList", m_fixedToMotherVertexListPDG,
+           "Type::[int], if 'autoSetGeoConstraintAndMergeVertices==False' you can manually set the particles that share the vertex with their mother here.", {});
+  addParam("autoSetGeoConstraintAndMergeVertices", m_automatic_vertex_constraining,
+           "Type::bool, shall vertices of strong resonance be merged with their mothers? Can the particles vertex be constraint geometrically?",
+           true);
+
   addParam("customOriginVertex", m_customOriginVertex,
            "Type::[double]. List of vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
@@ -62,6 +73,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("ipConstraint", m_ipConstraint,
            "Type::[bool]. Use the IP as the origin of the tree. This registers an internal IP particle as the mother of the list you give. Or in other words forces the PRODUCTION vertex of your particle to be the IP and its covariance as specified in the database.",
            false);
+  addParam("originDimension", m_originDimension,
+           "Type int, default 3. If origin or ip constraint used, specify the dimension of the constraint 3->x,y,z; 2->x,y. This also changes the dimension of the geometric constraints! So you might want to turn them off for some particles. (That means turn auto off and manually on for the ones you want to cosntrain)",
+           3);
   addParam("updateAllDaughters", m_updateDaughters,
            "Type::[bool]. Update all daughters (vertex position and momenta) in the tree. If not set only the 4-momenta for the head of the tree will be updated. We also update the vertex position of the daughters regardless of what you put here, because otherwise the default when the particle list is created is {0,0,0}.",
            false);
@@ -72,8 +86,11 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("expertRemoveConstraintList", m_removeConstraintList,
            "Type::[string]. List of constraints that you do not want to be used in the fit. WARNING don't use if you don't know exactly what it does.", {});
   addParam("expertUseReferencing", m_useReferencing,
-           "Type::[bool]. Use the Extended Kalman Fitler. This implementation linearises around the previous state vector which gives smoother convergence.",
+           "Type::[bool]. Use the Extended Kalman Filter. This implementation linearises around the previous state vector which gives smoother convergence.",
            true);
+  addParam("inflationFactorCovZ", m_inflationFactorCovZ,
+           "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
+           1);
 }
 
 void TreeFitterModule::initialize()
@@ -89,11 +106,7 @@ void TreeFitterModule::initialize()
       TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
       m_massConstraintList.push_back(particletemp->PdgCode());
     }
-    TreeFitter::massConstraintListPDG = m_massConstraintList;
-  } else {
-    TreeFitter::massConstraintListPDG = m_massConstraintList;
   }
-
 }
 
 void TreeFitterModule::beginRun()
@@ -120,10 +133,11 @@ void TreeFitterModule::event()
       ParticleCopy::copyDaughters(particle);
     }
 
-    bool ok = fitTree(particle);
-
-    if (!ok) {
-      particle->setPValue(-1);
+    try {
+      const bool ok = fitTree(particle);
+      if (!ok) { particle->setPValue(-1); }
+    } catch (TreeFitter::FitParameterDimensionException const& e) {
+      B2ERROR(e.what());
     }
 
     if (particle->getPValue() < m_confidenceLevel) {
@@ -148,23 +162,30 @@ void TreeFitterModule::terminate()
 
 bool TreeFitterModule::fitTree(Belle2::Particle* head)
 {
+  const TreeFitter::ConstraintConfiguration constrConfig(
+    m_massConstraintType,
+    m_massConstraintList,
+    m_fixedToMotherVertexListPDG,
+    m_geoConstraintListPDG,
+    m_removeConstraintList,
+    m_automatic_vertex_constraining,
+    m_ipConstraint,
+    m_customOrigin,
+    m_customOriginVertex,
+    m_customOriginCovariance,
+    m_originDimension,
+    m_inflationFactorCovZ
+  );
+
   std::unique_ptr<TreeFitter::FitManager> TreeFitter(
     new TreeFitter::FitManager(
       head,
+      constrConfig,
       m_precision,
-      m_ipConstraint,
-      m_customOrigin,
       m_updateDaughters,
-      m_customOriginVertex,
-      m_customOriginCovariance,
       m_useReferencing
     )
   );
-  /** TODO this is a bit of a hack. Make a config struct or so. */
-  //  TreeFitter::massConstraintListPDG = m_massConstraintList;
-  TreeFitter::massConstraintType = m_massConstraintType;
-  TreeFitter::removeConstraintList = m_removeConstraintList;
-
   bool rc = TreeFitter->fit();
   return rc;
 }

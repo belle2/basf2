@@ -2,6 +2,7 @@
 #define _Belle2_NSMNode_hh
 
 #include <daq/slc/base/Connection.h>
+#include <daq/slc/base/Date.h>
 
 #include "daq/slc/nsm/NSMCommand.h"
 #include "daq/slc/nsm/NSMState.h"
@@ -24,12 +25,16 @@ namespace Belle2 {
     void setUsed(bool used) { m_used = used; }
     void setState(const NSMState& state) { m_state = state; }
     void setId(int id) { m_id = id; }
+    int getDate() const { return m_date; }
+    void setDate(int date) { m_date = date; }
+    void setDate(const Date& date) { m_date = date.get(); }
 
   protected:
     std::string m_name;
     int m_id;
     bool m_used;
     NSMState m_state;
+    int m_date;
 
   };
 

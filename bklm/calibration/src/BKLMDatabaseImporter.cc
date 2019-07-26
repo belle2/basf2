@@ -18,7 +18,7 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dataobjects/BKLMElementID.h>
 #include <bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/dataobjects/BKLMChannelIndex.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 #include <framework/gearbox/GearDir.h>
@@ -51,9 +51,10 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
   int slotId = 0;
   int laneId = 0;
   int axisId = 0;
-  BKLMChannelIndex bklmPlanes(BKLMChannelIndex::c_IndexLevelPlane);
-  for (BKLMChannelIndex& bklmPlane : bklmPlanes) {
-    int isForward = bklmPlane.getForward();
+  KLMChannelIndex bklmPlanes(KLMChannelIndex::c_IndexLevelPlane);
+  for (KLMChannelIndex bklmPlane = bklmPlanes.beginBKLM();
+       bklmPlane != bklmPlanes.endBKLM(); ++bklmPlane) {
+    int isForward = bklmPlane.getSection();
     int sector = bklmPlane.getSector();
     int layer = bklmPlane.getLayer();
     int plane = bklmPlane.getPlane();
@@ -88,7 +89,24 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
         if (layer == 1)  channelId = channelId + 4;
         if (layer == 2)  channelId = channelId + 2;
       } else if (plane == 0) { //z strips
-        if (layer < 3 && channelId > 9) channelId = channelId + 6;
+        if (layer < 3) { //scintillator
+          if (isForward == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
+            if (layer == 1) {
+              if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
+              else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
+              else if (channelId > 23 && channelId < 39) channelId = 54 - channelId;
+            } else {
+              if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
+              else if (channelId > 9 && channelId < 24) channelId = 40 - channelId;
+              else if (channelId > 23 && channelId < 39) channelId = 69 - channelId;
+            }
+          } else { //all sectors except backward sector #3
+            if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
+            else if (channelId > 9 && channelId < 25) channelId = 40 - channelId;
+            else if (channelId > 24 && channelId < 40) channelId = 70 - channelId;
+            else if (channelId > 39 && channelId < 55) channelId = 100 - channelId;
+          }
+        }
       }
 
       m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, isForward, sector, layer, plane, iStrip);
@@ -102,7 +120,7 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
   int n = m_bklmMapping.getEntries();
   for (int i = 0; i < n; i++) {
     BKLMElectronicMapping* mapping = m_bklmMapping[i];
-    if ((mapping->getIsForward() == forward) &&
+    if ((mapping->getForward() == forward) &&
         (mapping->getSector() == sector) &&
         (mapping->getLayer() == layer))
       mapping->setLane(lane);
@@ -130,7 +148,7 @@ void BKLMDatabaseImporter::exportBklmElectronicMapping()
       B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
              ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
              ", channelId = " << element.getChannelId() <<
-             ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+             ", isForward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
              " plane(z/phi) = " << element.getPlane() << " stripId = " << element.getStripId());
     }
   }
@@ -309,10 +327,10 @@ void BKLMDatabaseImporter::exportBklmDisplacement()
   for (const auto& disp : displacements) {
     unsigned short bklmElementID = disp.getElementID();
     BKLMElementID bklmid(bklmElementID);
-    unsigned short isForward = bklmid.getIsForward();
+    unsigned short forward = bklmid.getForward();
     unsigned short sector = bklmid.getSectorNumber();
     unsigned short layer = bklmid.getLayerNumber();
-    B2INFO("displacement of " << isForward << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
+    B2INFO("displacement of " << forward << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
            ", " <<
            disp.getWShift() << ", " << disp.getAlphaRotation() << ", " << disp.getBetaRotation() << ", " << disp.getGammaRotation());
   }//end loop layer

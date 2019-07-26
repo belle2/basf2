@@ -1,7 +1,8 @@
 .. _vertex:
 
-Vertex modules
-==============
-   .. automodule:: vertex
-      :members:
-      :undoc-members:
+Vertex-fitting convenience functions
+====================================
+
+.. automodule:: vertex
+   :members:
+   :undoc-members:

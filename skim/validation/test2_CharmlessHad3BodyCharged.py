@@ -20,7 +20,7 @@ inputMdst('default', '../CharmlessHad3BodyCharged.udst.root', path=charmless3cha
 from variables import variables
 variablesToHistogram(
     filename='CharmlessHad3BodyCharged_Validation.root',
-    decayString='B+:3BodySkim',
+    decayString='B-:3BodySkim',
     variables=[
         ('Mbc', 100, 5.2, 5.3),
         ('deltaE', 100, -1, 1),
@@ -32,3 +32,22 @@ variablesToHistogram(
 
 process(charmless3chargedpath)
 print(statistics)
+
+import ROOT
+
+# add contact information to histograms
+variables_list = [
+    'Mbc',
+    'deltaE',
+    'daughter__bo0__cm__spInvM__bc',
+    'daughter__bo1__cm__spInvM__bc',
+    'daughter__bo2__cm__spInvM__bc',
+    'MbcdeltaE'
+]
+
+file = ROOT.TFile("CharmlessHad3BodyCharged_Validation.root", "UPDATE")
+for name in variables_list:
+    hist = file.Get(name)
+    hist.GetListOfFunctions().Add(ROOT.TNamed("Contact", "khsmith@student.unimelb.edu.au"))
+    hist.Write("", ROOT.TObject.kOverwrite)
+file.Close()

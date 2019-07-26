@@ -103,9 +103,9 @@ const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsign
   SensorID id(layer, ladder, dssd, side);
   auto chipIter = m_chips.find(id);
 
-  if (chipIter == m_chips.end())  B2FATAL(" The following combination: sensorID: " <<  layer << "." << ladder << "." << dssd <<
-                                            ", isU=" << side << ", strip=" << strip <<
-                                            " - is not found in the SVD Off-line to On-line map! The payload retrieved from database may be wrong! ");
+  if (chipIter == m_chips.end())  B2WARNING(" The following combination: sensorID: " <<  layer << "." << ladder << "." << dssd <<
+                                              ", isU=" << side << ", strip=" << strip <<
+                                              " - is not found in the SVD Off-line to On-line map! The payload retrieved from database may be wrong! ");
 
 
   vector<ChipInfo> vecChipInfo = chipIter->second;
@@ -128,6 +128,39 @@ const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsign
 
   m_currentChipInfo = *pinfo;
   return m_currentChipInfo;
+}
+
+bool SVDOnlineToOfflineMap::isAPVinMap(unsigned short layer,  unsigned short ladder,
+                                       unsigned short dssd, bool side, unsigned short strip)
+{
+  SensorID id(layer, ladder, dssd, side);
+  auto chipIter = m_chips.find(id);
+
+  if (chipIter == m_chips.end()) return false;
+
+  vector<ChipInfo> vecChipInfo = chipIter->second;
+
+  ChipInfo info = {0, 0, 0, 0, 0};
+  ChipInfo* pinfo = &info;
+
+  for (std::vector<ChipInfo>::iterator it = vecChipInfo.begin() ; it != vecChipInfo.end(); ++it) {
+    ChipInfo& chipInfo = *it;
+    unsigned short channelFirst = min(chipInfo.stripFirst, chipInfo.stripLast);
+    unsigned short channelLast = max(chipInfo.stripFirst, chipInfo.stripLast);
+
+    if (strip >= channelFirst and strip <= channelLast) {
+      pinfo = &chipInfo;
+      pinfo->apvChannel = abs(strip - (pinfo->stripFirst));
+    }
+  }
+  if (pinfo->fadc == 0) return false;
+
+  return true;
+}
+
+bool SVDOnlineToOfflineMap::isAPVinMap(VxdID sensorID, bool side, unsigned short strip)
+{
+  return isAPVinMap(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(), side, strip);
 }
 
 

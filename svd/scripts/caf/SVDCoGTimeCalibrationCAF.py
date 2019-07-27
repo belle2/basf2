@@ -13,10 +13,8 @@ from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDa
 from caf import backends
 from caf import strategies
 
-# import rawdata as raw
 import reconstruction as reco
 import modularAnalysis as ana
-# import vertex as vx
 
 input_branches = [
     'SVDShaperDigitsFromTracks',
@@ -35,7 +33,7 @@ def SVDCoGTimeCalibration(files, tags):
     # logging.log_level = LogLevel.WARNING
 
     path.add_module('Progress')
-    # Remove all non-raw data to run the full reco again
+    # Remove not useful branches
     path.add_module('RootInput', branchNames=input_branches)
 
     path.add_module("Gearbox")
@@ -45,9 +43,7 @@ def SVDCoGTimeCalibration(files, tags):
     # fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
     # main.add_module(fil)
 
-    # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
-    # with possibly changed global tags
-    # raw.add_unpackers(path)
+    # run SVD reconstruction, changing names of StoreArray
     reco.add_svd_reconstruction(path)
 
     for moda in path.modules():
@@ -60,11 +56,13 @@ def SVDCoGTimeCalibration(files, tags):
         if moda.name() == 'SVDSpacePointCreator':
             moda.param("SVDClusters", 'SVDClustersFromTracks')
 
+    # collector setup
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
     collector.param("SVDRecoDigitsFromTracksName", "SVDRecoDigitsFromTracks")
     algorithm = SVDCoGTimeCalibrationAlgorithm("SVDCoGTimeCAF")
 
+    # calibration setup
     calibration = Calibration('SVDCoGTime',
                               collector=collector,
                               algorithms=algorithm,
@@ -82,6 +80,7 @@ def SVDCoGTimeCalibration(files, tags):
 
 
 if __name__ == "__main__":
+
     # input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
     input_files = [os.path.abspath(file) for file in [
         "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
@@ -94,7 +93,6 @@ e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"]]
         sys.exit(1)
 
     svdCoGCAF = SVDCoGTimeCalibration(input_files, ['data_reprocessing_proc9'])
-    # beamspot.max_iterations = 0
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdCoGCAF)

@@ -244,6 +244,8 @@ std::set<int> ProcHandler::processList() const
 
 int ProcHandler::EvtProcID() { return s_processID; }
 
+void ProcHandler::setProcessID(int processID) { s_processID = processID; }
+
 std::string ProcHandler::getProcessName()
 {
   if (isWorkerProcess())

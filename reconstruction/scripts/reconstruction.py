@@ -29,7 +29,9 @@ import mdst
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
-                       use_second_cdc_hits=False, add_muid_hits=False, nCDCHitsMax=4000, nSVDShaperDigitsMax=70000):
+                       use_second_cdc_hits=False, add_muid_hits=False,
+                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=False,
+                       nCDCHitsMax=4000, nSVDShaperDigitsMax=70000):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -49,6 +51,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
+    :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     :param nCDCHitsMax: the max number of CDC hits for an event to be reconstructed.
     :param nSVDShaperDigitsMax: the max number of SVD shaper digits for an event to be reconstructed.
     """
@@ -77,18 +80,24 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    add_muid_hits=add_muid_hits,
-                                    addClusterExpertModules=addClusterExpertModules)
+    # Add only the dE/dx calculation and prune the tracks
+    if reconstruct_cdst:
+        add_dedx_modules(main_path)
+        add_prune_tracks(main_path, components=components)
 
-    # Add the modules calculating the software trigger cuts (but not performing them)
-    if add_trigger_calculation and (not components or (
-            "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
-        add_filter_software_trigger(path)
-        add_skim_software_trigger(path)
+    else:
+        # Add further reconstruction modules
+        add_posttracking_reconstruction(path,
+                                        components=components,
+                                        pruneTracks=pruneTracks,
+                                        add_muid_hits=add_muid_hits,
+                                        addClusterExpertModules=addClusterExpertModules)
+
+        # Add the modules calculating the software trigger cuts (but not performing them)
+        if add_trigger_calculation and (not components or (
+                "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
+            add_filter_software_trigger(path)
+            add_skim_software_trigger(path)
 
 
 def add_cosmics_reconstruction(
@@ -102,7 +111,8 @@ def add_cosmics_reconstruction(
         top_in_counter=False,
         data_taking_period='early_phase3',
         use_second_cdc_hits=False,
-        add_muid_hits=False):
+        add_muid_hits=False,
+        reconstruct_cdst=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -130,6 +140,8 @@ def add_cosmics_reconstruction(
            (assuming PMT is put at -z of the counter).
 
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
+
+    :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     """
 
     # Check components.
@@ -153,13 +165,19 @@ def add_cosmics_reconstruction(
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    addClusterExpertModules=addClusterExpertModules,
-                                    add_muid_hits=add_muid_hits,
-                                    cosmics=True)
+    # Add only the dE/dx calculation and prune the tracks
+    if reconstruct_cdst:
+        add_dedx_modules(main_path)
+        add_prune_tracks(main_path, components=components)
+
+    else:
+        # Add further reconstruction modules
+        add_posttracking_reconstruction(path,
+                                        components=components,
+                                        pruneTracks=pruneTracks,
+                                        addClusterExpertModules=addClusterExpertModules,
+                                        add_muid_hits=add_muid_hits,
+                                        cosmics=True)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,

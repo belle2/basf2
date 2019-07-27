@@ -97,12 +97,14 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
         shaperDigitsName = ""
+        missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
         clusterName = ""
         recoDigitsName = ""
         shaperDigitsName = ""
+        missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
 
 # add strip masking if needed
     if(applyMasking):
@@ -134,6 +136,11 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         clusterizer.param('Clusters', clusterName)
         clusterizer.param('useDB', True)
         path.add_module(clusterizer)
+
+    if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
+        missingAPVCreator = register_module('SVDMissingAPVsClusterCreator')
+        missingAPVCreator.set_name(missingAPVsClusterCreatorName)
+        path.add_module(missingAPVCreator)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)

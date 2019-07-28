@@ -172,20 +172,6 @@ namespace Belle2 {
     SVDModeByte getModeByte() const
     { return m_mode; }
 
-    /** Get the status of whether the recoDigit is affected by cross talk
-    *
-    */
-
-    bool isCrossTalkEvent() const { return m_isCrossTalkEvent; }
-
-    /** Set the status of the cross talk flag for the recoDigit
-    *
-    */
-    void setCrossTalkEventFlag(bool flagCrossTalkEvent)
-    {
-      m_isCrossTalkEvent = flagCrossTalkEvent;
-    }
-
     /** Display main parameters in this object */
     std::string toString() const
     {
@@ -217,10 +203,9 @@ namespace Belle2 {
     StoredProbArray m_probabilities; /**< pdf of the time estimate. */
     float m_fitChi2Ndf; /**< Standardized chi2 of the fit. */
     SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
-    bool m_isCrossTalkEvent = false; /**< True if digit affected by cross talk*/
 
+    ClassDef(SVDRecoDigit, 2)
 
-    ClassDef(SVDRecoDigit, 3)
   }; // class SVDRecoDigit
 
 } // end namespace Belle2

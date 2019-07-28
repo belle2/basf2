@@ -276,7 +276,7 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
         eclCluster->addStatus(ECLCluster::EStatusBit::c_fitTimeFailed);
         eclCluster->setTime(eclShower->getTime());
       }
-      if (!calDigit->isTimeResolutionCalibrated()) {
+      if (calDigit->isTimeResolutionFailed()) {
         eclCluster->addStatus(ECLCluster::EStatusBit::c_timeResolutionFailed);
       }
     }

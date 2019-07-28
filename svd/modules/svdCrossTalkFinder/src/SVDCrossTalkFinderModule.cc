@@ -27,7 +27,7 @@ SVDCrossTalkFinderModule::SVDCrossTalkFinderModule() : Module()
            "SVDRecoDigit collection name", string(""));
 
   addParam("createCalibrationPayload", m_createCalibrationPayload,
-           "Create cross-talk strip channel payload", false);
+           "Create cross-talk strip channel payload", true);
 
   addParam("outputFilename", m_outputFilename,
            "Filename of root file for calibration payload", std::string("crossTalkStripsCalibration.root"));
@@ -75,6 +75,7 @@ void SVDCrossTalkFinderModule::initialize()
 
   // prepare storeArray
   m_svdRecoDigits.isRequired(m_svdRecoDigitsName);
+  m_svdEventInfo.isRequired();
 
 }
 
@@ -152,34 +153,27 @@ void SVDCrossTalkFinderModule::event()
 
 //   Crosstalk events flagged using u-side
   if (numberOfClusterChips > m_nAPVFactor) {
+    m_svdEventInfo->setCrossTalk(true);
     for (auto& svdRecoDigit : m_svdRecoDigits) {
       std::string sensorID = svdRecoDigit.getSensorID();
       std::string digitID = sensorID + "." + std::to_string(svdRecoDigit.isUStrip());
       std::string stripID = digitID + "." + std::to_string(svdRecoDigit.getCellID());
-      if (std::find(clusterStrips_uSide.begin(), clusterStrips_uSide.end(), stripID) != clusterStrips_uSide.end()) {
-        svdRecoDigit.setCrossTalkEventFlag(true);
-        if (m_createCalibrationPayload) {
+      if (m_createCalibrationPayload) {
+        if (std::find(clusterStrips_uSide.begin(), clusterStrips_uSide.end(), stripID) != clusterStrips_uSide.end()) {
           std::string sensorName;
           occupancyPDFName(svdRecoDigit.getSensorID(), svdRecoDigit.isUStrip(), sensorName);
           auto xTalkStrip = m_sensorHistograms.at(sensorName);
-          xTalkStrip->Fill(svdRecoDigit.getCellID(), true);
+          //Only fill bin once
+          if (xTalkStrip->GetBinContent(svdRecoDigit.getCellID()) < 1.) xTalkStrip->Fill(svdRecoDigit.getCellID(), true);
         }
-
-      }
-
-      if (std::find(clusterStrips_vSide.begin(), clusterStrips_vSide.end(), stripID) != clusterStrips_vSide.end()) {
-        svdRecoDigit.setCrossTalkEventFlag(true);
-        if (m_createCalibrationPayload) {
+        if (std::find(clusterStrips_vSide.begin(), clusterStrips_vSide.end(), stripID) != clusterStrips_vSide.end()) {
           std::string sensorName;
           occupancyPDFName(svdRecoDigit.getSensorID(), svdRecoDigit.isUStrip(), sensorName);
           auto xTalkStrip = m_sensorHistograms.at(sensorName);
-          xTalkStrip->Fill(svdRecoDigit.getCellID(), true);
+          if (xTalkStrip->GetBinContent(svdRecoDigit.getCellID()) < 1.) xTalkStrip->Fill(svdRecoDigit.getCellID(), true);
         }
 
       }
-
-
-
 
     }//reco digit loop
   }

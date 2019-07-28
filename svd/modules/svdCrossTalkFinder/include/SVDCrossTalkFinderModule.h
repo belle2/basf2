@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
@@ -60,6 +61,12 @@ namespace Belle2 {
 
     /** The storeArray for svdRecoDigits */
     StoreArray<SVDRecoDigit> m_svdRecoDigits;
+
+    /** SVDEventInfo collection name. */
+    std::string m_svdEventInfoName;
+
+    /** The storeObject for svdEventInfo */
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo;
 
     int m_uSideOccupancyFactor; /**Parameter to define high occupancy strips (some multiple above sensor average occupancy) */
 

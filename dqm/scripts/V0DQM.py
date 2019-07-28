@@ -12,7 +12,7 @@ from modularAnalysis import *
 def add_V0_dqm(path):
     fillParticleList("pi+:V0DQM", '', False, path)
     reconstructDecay('K_S0:V0DQM -> pi-:V0DQM pi+:V0DQM', '', 1, True, path)
-    vertexKFit('K_S0:V0DQM', 0.001, '', '', path, True)
+    vertexKFit('K_S0:V0DQM', 0.001, '', '', path)
 
     dqm = register_module('V0ObjectsDQM')
     dqm.param('V0PListName', 'K_S0:V0DQM')

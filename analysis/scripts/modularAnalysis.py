@@ -902,6 +902,37 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def combineAllParticles(
+    inputParticleLists,
+    outputList,
+    cut='',
+    writeOut=False,
+    path=None
+):
+    """
+    Creates a new Particle as the combination of all Particles from all
+    provided inputParticleLists. However, each particle is used only once
+    (even if duplicates are provided) and the combination has to pass the
+    specified selection criteria to be saved in the newly created (mother)
+    ParticleList.
+
+    @param inputParticleLists List of input particle lists which are combined to the new Particle
+    @param outputList         Name of the particle combination created with this module
+    @param cut                created (mother) Particle is added to the mother ParticleList if it passes
+                              these given cuts (in VariableManager style) and is rejected otherwise
+    @param writeOut           whether RootOutput module should save the created ParticleList
+    @param path               module is added to this path
+    """
+
+    pmake = register_module('AllParticleCombiner')
+    pmake.set_name('AllParticleCombiner_' + outputList)
+    pmake.param('inputListNames', inputParticleLists)
+    pmake.param('outputListName', outputList)
+    pmake.param('cut', cut)
+    pmake.param('writeOut', writeOut)
+    path.add_module(pmake)
+
+
 def reconstructMissingKlongDecayExpert(
     decayString,
     cut,
@@ -1066,10 +1097,22 @@ def rankByHighest(
 ):
     """
     Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
-    in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
+    in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
+    The list is also sorted from best to worst candidate
     (each charge, e.g. B+/B-, separately).
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
+
+    .. tip::
+        Extra-info fields can be accessed by the :b2:var:`extraInfo` metavariable.
+        These variable names can become clunky, so it's probably a good idea to set an alias.
+        For example if you rank your B candidates by momentum,
+
+        .. code:: python
+
+            rankByHighest("B0:myCandidates", "p", path=mypath)
+            vm.addAlias("momentumRank", "extraInfo(p_rank)")
+
 
     @param particleList     The input ParticleList
     @param variable         Variable to order Particles by.
@@ -1102,10 +1145,22 @@ def rankByLowest(
 ):
     """
     Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
-    in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
+    in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
+    The list is also sorted from best to worst candidate
     (each charge, e.g. B+/B-, separately).
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
+
+    .. tip::
+        Extra-info fields can be accessed by the :b2:var:`extraInfo` metavariable.
+        These variable names can become clunky, so it's probably a good idea to set an alias.
+        For example if you rank your B candidates by :b2:var:`dM`,
+
+        .. code:: python
+
+            rankByLowest("B0:myCandidates", "dM", path=mypath)
+            vm.addAlias("massDifferenceRank", "extraInfo(dM_rank)")
+
 
     @param particleList     The input ParticleList
     @param variable         Variable to order Particles by.
@@ -1333,6 +1388,48 @@ def variableToSignalSideExtraInfo(
     path.add_module(mod)
 
 
+def signalRegion(
+        particleList,
+        cut,
+        path=None,
+        name="isSignalRegion",
+        blind_data=True,
+):
+    """
+    Define and blind a signal region.
+    Per default, the defined signal region is cut out if ran on data.
+    This function will provide a new variable 'isSignalRegion' as default, which is either 0 or 1 depending on the cut
+    provided.
+
+    Example:
+        >>> ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
+        >>> ma.signalRegion("B+:sig",
+        >>>                  "Mbc>5.27 and abs(deltaE)<0.2",
+        >>>                  blind_data=True,
+        >>>                  path=path)
+        >>> ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
+
+    Parameters:
+        particleList (str):     The input ParticleList
+        cut (str):              Cut string describing the signal region
+        path (basf2.Path)::     Modules are added to this path
+        name (str):             Name of the Signal region in the variable manager
+        blind_data (bool):      Automatically exclude signal region from data
+
+    """
+
+    mod = register_module('VariablesToExtraInfo')
+    mod.set_name(f'{name}_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', {f"passesCut({cut})": name})
+    variables.addAlias(name, f"extraInfo({name})")
+    path.add_module(mod)
+
+    # Check if we run on Data
+    if blind_data:
+        applyCuts(particleList, f"{name}==0 or isMC==1", path=path)
+
+
 def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
     """
     Removes the ExtraInfo of the given particleLists. If specified (removeEventExtraInfo = True) also the EventExtraInfo is removed.
@@ -1476,7 +1573,7 @@ def looseMCTruth(list_name, path):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(target_list_name, inputParticlelists=[], path=None):
+def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=False, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1486,13 +1583,17 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=None):
     @param inputParticlelists list of input particle list names, which serve
                               as a source of particles to build ROE, the FSP particles from
                               target_list_name are excluded from ROE object
+    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
     # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
-    fillParticleList('gamma:roe_default', '', path=path)
-    fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
-    inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    if not belle_sources:
+        fillParticleList('gamma:roe_default', '', path=path)
+        fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
+        inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    else:
+        inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)

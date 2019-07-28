@@ -323,7 +323,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
     # fragmentation failure as is this currently not supported by do_while
     add_continuum_generator(loop_path, finalstate, userdecfile, useevtgenparticledata, skip_on_failure=False)
     # check for the particles we want
-    loop_path.add_module("InclusiveParticleChecker", particles=particles)
+    loop_path.add_module("InclusiveParticleChecker", particles=particles, includeConjugates=include_conjugates)
     # Done, add this to the path and iterate it until we found our particle
     path.do_while(loop_path, max_iterations=max_iterations)
 

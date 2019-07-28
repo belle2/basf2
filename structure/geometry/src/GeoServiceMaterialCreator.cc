@@ -52,10 +52,21 @@ namespace Belle2 {
       }
       ServiceMaterialGeometryPar.getMomVolTopBack() = MomVolTopBackPar;
 
-      GearDir content1(content, "GapMomVolBack");
+      GearDir content1(content, "GapMomVolEclCoilBarrel");
+      // Read parameters for Backward Gap Mom Volume
+      ServiceGapsMomVolPar MomVolEclCoilBarrelPar;
+      for (const GearDir& GapVol : content1.getNodes("ZBound")) {
+        const double rmin = GapVol.getLength("Rmin") / Unit::mm;
+        const double rmax = GapVol.getLength("Rmax") / Unit::mm;
+        const double z = GapVol.getLength("Z") / Unit::mm;
+        MomVolEclCoilBarrelPar.appendNode(rmin, rmax, z);
+      }
+      ServiceMaterialGeometryPar.getMomVolEclCoilBarrel() = MomVolEclCoilBarrelPar;
+
+      GearDir content2(content, "GapMomVolBack");
       // Read parameters for Backward Gap Mom Volume
       ServiceGapsMomVolPar MomVolBackPar;
-      for (const GearDir& GapVol : content1.getNodes("ZBound")) {
+      for (const GearDir& GapVol : content2.getNodes("ZBound")) {
         const double rmin = GapVol.getLength("Rmin") / Unit::mm;
         const double rmax = GapVol.getLength("Rmax") / Unit::mm;
         const double z = GapVol.getLength("Z") / Unit::mm;
@@ -63,10 +74,10 @@ namespace Belle2 {
       }
       ServiceMaterialGeometryPar.getMomVolBack() = MomVolBackPar;
 
-      GearDir content2(content, "GapMomVolFor");
+      GearDir content3(content, "GapMomVolFor");
       // Read parameters for Forward Gap Mom Volume
       ServiceGapsMomVolPar MomVolForPar;
-      for (const GearDir& GapVol : content2.getNodes("ZBound")) {
+      for (const GearDir& GapVol : content3.getNodes("ZBound")) {
         const double rmin = GapVol.getLength("Rmin") / Unit::mm;
         const double rmax = GapVol.getLength("Rmax") / Unit::mm;
         const double z = GapVol.getLength("Z") / Unit::mm;
@@ -74,9 +85,9 @@ namespace Belle2 {
       }
       ServiceMaterialGeometryPar.getMomVolFor() = MomVolForPar;
 
-      GearDir content3(content, "ServiceGapsMaterials");
+      GearDir content4(content, "ServiceGapsMaterials");
       // Read parameters to creates ServiceGaps Material in the gap between CDC and ECL, ARICH and TOP, TOP and ECL.
-      for (const GearDir& material : content3.getNodes("ServiceGapsMaterial")) {
+      for (const GearDir& material : content4.getNodes("ServiceGapsMaterial")) {
         ServiceGapsMaterialsCdcArichTopPar MaterialPar(
           material.getString("Name"),
           material.getString("material"),
@@ -89,9 +100,9 @@ namespace Belle2 {
         ServiceMaterialGeometryPar.getServiceGapsMaterials().push_back(MaterialPar);
       }
 
-      GearDir content4(content, "ServiceGapsEclMaterials");
+      GearDir content5(content, "ServiceGapsEclMaterials");
       // Read parameters to creates ServiceGaps Material in the gap between barrel and endcap of ECL.
-      for (const GearDir& material : content4.getNodes("ServiceGapsMaterial")) {
+      for (const GearDir& material : content5.getNodes("ServiceGapsMaterial")) {
         ServiceGapsMaterialsEclPar MaterialPar(
           material.getString("Name"),
           material.getString("material"),
@@ -106,25 +117,27 @@ namespace Belle2 {
         ServiceMaterialGeometryPar.getServiceGapsEclMaterials().push_back(MaterialPar);
       }
 
-      GearDir content5(content, "TicknessDensity");
+      GearDir content6(content, "TicknessDensity");
       // Read thickness and density for Gaps Volume
       ThicknessDensityPar ThickPar(
-        content5.getInt("IRCDCBack"),
-        content5.getInt("IPhiCDCBack"),
-        content5.getInt("IRCDCFor"),
-        content5.getInt("IPhiCDCFor"),
-        content5.getInt("IRECLBack"),
-        content5.getInt("IZECLBack"),
-        content5.getInt("IPhiECLBack"),
-        content5.getInt("IRECLFor"),
-        content5.getInt("IZECLFor"),
-        content5.getInt("IPhiECLFor"),
-        content5.getInt("IZARICHFor"),
-        content5.getInt("IPhiARICHFor"),
-        content5.getInt("IPhiTOPBack"),
-        content5.getInt("IPhiTOPFor"),
-        content5.getArray("thicknesses"),
-        content5.getArray("density")
+        content6.getInt("IRCDCBack"),
+        content6.getInt("IPhiCDCBack"),
+        content6.getInt("IRCDCFor"),
+        content6.getInt("IPhiCDCFor"),
+        content6.getInt("IRECLBack"),
+        content6.getInt("IZECLBack"),
+        content6.getInt("IPhiECLBack"),
+        content6.getInt("IRECLFor"),
+        content6.getInt("IZECLFor"),
+        content6.getInt("IPhiECLFor"),
+        content6.getInt("IZARICHFor"),
+        content6.getInt("IPhiARICHFor"),
+        content6.getInt("IPhiTOPBack"),
+        content6.getInt("IPhiTOPFor"),
+        content6.getInt("IZECLCOILBar"),
+        content6.getInt("IPhiECLCOILBar"),
+        content6.getArray("thicknesses"),
+        content6.getArray("density")
       );
       ServiceMaterialGeometryPar.getthick() = ThickPar;
 
@@ -168,6 +181,19 @@ namespace Belle2 {
       G4LogicalVolume* logical_gap_topback = new G4LogicalVolume(solid_gap_topback, medAir, "ServiceMaterial.GAPTopBack", 0, 0, 0);
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logical_gap_topback, "ServiceMaterial.GAPTopBack", &topVolume, false, 1);
 
+      const auto& MomVolEclCoilBarrel = parameters.getMomVolEclCoilBarrel();
+      std::vector<double> mothereclcoilbarrelRmin =  MomVolEclCoilBarrel.getRmin();
+      std::vector<double> mothereclcoilbarrelRmax =  MomVolEclCoilBarrel.getRmax();
+      std::vector<double> mothereclcoilbarrelZ =  MomVolEclCoilBarrel.getZ();
+
+      G4Polycone* solid_gap_eclcoilbarrel = new G4Polycone("ServiceMaterial.GAPEclCoilBarrel", 0 * CLHEP::deg, 360.* CLHEP::deg,
+                                                           MomVolEclCoilBarrel.getNNodes(),
+                                                           mothereclcoilbarrelZ.data(), mothereclcoilbarrelRmin.data(), mothereclcoilbarrelRmax.data());
+      G4LogicalVolume* logical_gap_eclcoilbarrel = new G4LogicalVolume(solid_gap_eclcoilbarrel, medAir,
+          "ServiceMaterial.GAPEclCoilBarrel", 0, 0, 0);
+      new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logical_gap_eclcoilbarrel, "ServiceMaterial.GAPEclCoilBarrel", &topVolume, false,
+                        1);
+
       const auto& Thick = parameters.getthick();
       std::vector<double> Thickness =  Thick.getthickness();
       std::vector<double> Density =  Thick.getdensity();
@@ -185,6 +211,8 @@ namespace Belle2 {
       int IPhiARICHF =  Thick.getIPhiARICHF();
       int IPhiTOPB =  Thick.getIPhiTOPB();
       int IPhiTOPF =  Thick.getIPhiTOPF();
+      int IPhiECLCOILB =  Thick.getIPhiECLCOILB();
+      int IZECLCOILB = Thick.getIZECLCOILB();
 
       for (const ServiceGapsMaterialsCdcArichTopPar& material : parameters.getServiceGapsMaterials()) {
         const int materialID = material.getIdentifier();
@@ -192,7 +220,7 @@ namespace Belle2 {
         const double materialOuterR = material.getOuterR() / Unit::mm;
         const double materialBackwardZ = material.getBackwardZ() / Unit::mm;
         const double materialForwardZ = material.getForwardZ() / Unit::mm;
-        //      Create Materials from BEAST 2 in the gap between CDC and ECL.
+        //      Create Service Materials in the gap between CDC and ECL.
         if (materialID < 2) {
           int blockid = 0;
           double IR = 0, IPhi = 0;
@@ -223,7 +251,7 @@ namespace Belle2 {
             }
           }
         }
-        //      Create Materials from BEAST 2 in the gap between ARICH and TOP.
+        //      Create Service Materials in the gap between ARICH and TOP.
         if (materialID == 2) {
           int blockid = 0;
           const double materialThick = fabs(materialForwardZ - materialBackwardZ) / IZARICHF;
@@ -246,8 +274,8 @@ namespace Belle2 {
             }
           }
         }
-        //      Create Materials from BEAST 2 in the gap between TOP and ECL.
-        if (materialID >= 3) {
+        //      Create Service Materials in the gap between TOP and ECL.
+        if (materialID >= 3 && materialID < 5) {
           int blockid = 0;
           int IPhiTOP = 0;
           if (materialID == 3) {IPhiTOP = IPhiTOPB;}
@@ -281,8 +309,33 @@ namespace Belle2 {
             blockid++;
           }
         }
+        //      Create Service Materials in the gap between barrel ECL and Coil.
+        if (materialID == 5) {
+          int blockid = 0;
+          const double materialThick = fabs(materialForwardZ - materialBackwardZ) / IZECLCOILB;
+          for (int iZ = 0; iZ < IZECLCOILB; iZ++) {
+            const double rmin = materialInnerR;
+            //const double rmax = materialOuterR;
+            const double materialPosZ = materialBackwardZ + iZ * materialThick;
+            for (int iPhi = 0; iPhi < IPhiECLCOILB; iPhi++) {
+              const double SPhi = 360. / IPhiECLCOILB * iPhi;
+              const double DPhi = 360. / IPhiECLCOILB;
+              const double materialRThick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB +
+                                                      IPhiTOPF] / Unit::mm;
+              const double rmax = rmin + materialRThick;
+              double density = Density[2 + IZARICHF] * CLHEP::g / CLHEP::cm3;
+              G4Material* EclCoilAir = geometry::Materials::get("ECL_COILbarrel");
+              G4Material* medEclCoilGap = new G4Material("EclCoilGap_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
+              medEclCoilGap->AddMaterial(EclCoilAir, 1.);
+              const string storageName = "Service_ECL_COIL_Barrel_" + to_string(iZ) + "_" + to_string(iPhi);
+              createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, medEclCoilGap,  storageName, logical_gap_eclcoilbarrel);
+              blockid++;
+            }
+          }
+        }
       }
-      //      Create Materials from BEAST 2 in the gap between barrel and endcap of ECL.
+
+      //      Create Service Materials in the gap between barrel and endcap of ECL.
       for (const ServiceGapsMaterialsEclPar& material : parameters.getServiceGapsEclMaterials()) {
         int blockid = 0;
         int IRECL = 0, IZECL = 0, IPhiECL = 0;
@@ -312,8 +365,8 @@ namespace Belle2 {
               const double SPhi = (360. / IPhiECL) * iPhi;
               const double DPhi = 360. / IPhiECL;
               if (materialID == 0) {
-                const double thick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB + IPhiTOPF] /
-                                     Unit::mm;
+                const double thick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB + IPhiTOPF +
+                                               IPhiECLCOILB * IZECLCOILB] / Unit::mm;
                 const double rmin2 = Rmin1 + Hrmin * (iZ + 1);
                 const double rmax2 = Rmax1 + Hrmax * (iZ + 1);
                 const double rmin1 = rmin2 - Hrmin * thick / interval ;
@@ -328,7 +381,7 @@ namespace Belle2 {
               }
               if (materialID == 1) {
                 const double thick = Thickness[blockid + IRCDCB * IPhiCDCB + IRCDCF * IPhiCDCF + IZARICHF * IPhiARICHF + IPhiTOPB + IPhiTOPF +
-                                               IZECLB * IRECLB * IPhiECLB] / Unit::mm;
+                                               IPhiECLCOILB * IZECLCOILB + IZECLB * IRECLB * IPhiECLB ] / Unit::mm;
                 const double rmin1 = Rmin1 + Hrmin * iZ;
                 const double rmax1 = Rmax1 + Hrmax * iZ;
                 const double rmin2 = rmin1 + Hrmin * thick / interval;

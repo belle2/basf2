@@ -18,11 +18,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     * Hough Tree for finding StereoHits with using CDCRecoHit3D as the item type.
-     * This implementation uses the HitInHyperBox decision algorithm with 2 divisions for each step.
-     * This class is only an alias. The real algorithm can be found in OtherSimpleBoxDivisionHoughTree.
+     * Hough Tree for finding StereoHits using CDCRecoHit3D as the item type.
+     * This implementation uses the HitInHyperBox decision algorithm with 2, 3, or 4 divisions for each step.
+     * Precision is driven by second axis.
+     * This class is only an alias. The real algorithm can be found in OtherSimpleBoxDivisionHoughTree and HitInHyperBox algorithm.
      */
     using HitHyperHough =
-      HyperHough<std::pair<CDCRecoHit3D, const CDCRLWireHit*>, FirstOfPairInBox<HitInHyperBox>, 2, 2, 2>;
+      HyperHough<std::pair<CDCRecoHit3D, const CDCRLWireHit*>, FirstOfPairInBox<HitInHyperBox>, 3, 4, 2>;
   }
 }

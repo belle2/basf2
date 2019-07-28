@@ -42,7 +42,7 @@ namespace Belle2 {
 
       /// Constructor using the given maximal level setting the maximal values.
       HyperHough()
-        : Super(0.99, 0.99, 3.0, 1, 1, 1)
+        : Super(0.99, 10.0, 6.0, 1, 1, 0)
       {
       }
     };

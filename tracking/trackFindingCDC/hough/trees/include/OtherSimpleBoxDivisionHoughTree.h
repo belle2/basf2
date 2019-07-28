@@ -11,11 +11,16 @@
 #include <tracking/trackFindingCDC/hough/trees/BoxDivisionHoughTree.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
+#include <TGraph.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TAxis.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Convenience class for the typical usage-case: A box divisioned hough tree with maximum and minimum values in both directions.
-    /// This time in 3D NOTE Z direction is positive only
+    /// This time in 3D
     template<class AHitPtr, class AInBoxAlgorithm, size_t divisionX, size_t divisionY, size_t divisionZ>
     class OtherSimpleBoxDivisionHoughTree : public
       BoxDivisionHoughTree<AHitPtr, typename AInBoxAlgorithm::HoughBox, divisionX, divisionY, divisionZ> {
@@ -53,13 +58,13 @@ namespace Belle2 {
       void initialize()
       {
         Super::template constructArray<0>(-getMaximumX(), getMaximumX(), getOverlapX());
-        Super::template constructArray<1>(0.01, getMaximumY(), getOverlapY());
-        Super::template constructArray<2>(0.01, getMaximumZ(), getOverlapZ());
+        Super::template constructArray<1>(-getMaximumY(), getMaximumY(), getOverlapY());
+        Super::template constructArray<2>(-getMaximumZ(), getMaximumZ(), getOverlapZ());
 
         Super::initialize();
       }
 
-      /// Find only the leave with the highest weight = number of items
+      /// Find only the leaf with the highest weight (~= number of items)
       std::vector<std::pair<HoughBox, std::vector<AHitPtr>>>
       findSingleBest(const Weight& minWeight)
       {
@@ -82,11 +87,67 @@ namespace Belle2 {
         //do nothing;
       }
 
-      void drawDebugPlot(const std::vector<CDCRecoHit3D>& allHits __attribute__((unused)),
-                         const std::vector<CDCRecoHit3D>& foundHits __attribute__((unused)),
-                         const HoughBox& node __attribute__((unused)))
+      /**
+       * Draws found hits and node boundaries
+       * FIXME this is a copy-paste from DebugableSimpleBoxDivisionHoughTree
+       * It should be possible to unify it with this tree, but not sure of does worth it
+       */
+      void drawDebugPlot(const std::vector<CDCRecoHit3D>& allHits,
+                         const std::vector<CDCRecoHit3D>& foundHits,
+                         const typename AInBoxAlgorithm::HoughBox& node)
       {
-        //do nothing;
+        TGraph* allHitsGraph = new TGraph();
+        allHitsGraph->SetLineWidth(2);
+        allHitsGraph->SetLineColor(9);
+
+        for (const CDCRecoHit3D& recoHit3D : allHits) {
+          const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+          const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
+          const double Z = recoPos3D.z();
+          allHitsGraph->SetPoint(allHitsGraph->GetN(), R, Z);
+        }
+
+        static int nevent(0);
+        TCanvas canv("trackCanvas", "CDC stereo hits in an event", 0, 0, 1600, 1200);
+        canv.cd();
+        allHitsGraph->Draw("APL*");
+        allHitsGraph->GetXaxis()->SetLimits(0, 120);
+        allHitsGraph->GetYaxis()->SetRangeUser(-180, 180);
+
+        TGraph* foundHitsGraph = new TGraph();
+        foundHitsGraph->SetMarkerStyle(8);
+        foundHitsGraph->SetMarkerColor(2);
+
+        for (const CDCRecoHit3D& recoHit3D : foundHits) {
+          const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+          const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
+          const double Z = recoPos3D.z();
+          foundHitsGraph->SetPoint(foundHitsGraph->GetN(), R, Z);
+        }
+        foundHitsGraph->Draw("P");
+
+        const double centerX = (AInBoxAlgorithm::BoxAlgorithm::centerX(node));
+        const double centerY = (AInBoxAlgorithm::BoxAlgorithm::centerY(node));
+        const double deltaY = (AInBoxAlgorithm::BoxAlgorithm::deltaY(node));
+        const double centerZ = (AInBoxAlgorithm::BoxAlgorithm::centerZ(node));
+
+        TF1* candidateL = new TF1("candL", AInBoxAlgorithm::BoxAlgorithm::debugLine(), 0, 120);
+        TF1* candidateH = new TF1("candH", AInBoxAlgorithm::BoxAlgorithm::debugLine(), 0, 120);
+        TF1* candidateMean = new TF1("candMean", AInBoxAlgorithm::BoxAlgorithm::debugLine(), 0, 120);
+
+        candidateL->SetParameters(centerX, centerY - deltaY, centerZ - 100.0 * deltaY);
+        candidateH->SetParameters(centerX, centerY + deltaY, centerZ + 100.0 * deltaY);
+        candidateMean->SetParameters(centerX, centerY, centerZ);
+
+        candidateL->SetLineColor(9);
+        candidateH->SetLineColor(41);
+        candidateMean->SetLineColor(2);
+
+        candidateL->Draw("same");
+        candidateH->Draw("same");
+        candidateMean->Draw("same");
+        canv.SaveAs(Form("CDCRLHits_%i.png", nevent));
+        nevent++;
       }
 
       /// Return the maximum value in x direction.

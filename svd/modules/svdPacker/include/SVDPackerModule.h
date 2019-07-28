@@ -59,7 +59,7 @@ namespace Belle2 {
 
       std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
       std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
-
+      std::string m_svdEventInfoName; /**< SVDEventInfo name */
       bool m_simulate3sampleData; /**<if true, simulate 3-sample data taking*/
       bool m_binPrintout;  /**< if true, print data created by the Packer */
 

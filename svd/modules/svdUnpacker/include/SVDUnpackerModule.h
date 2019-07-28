@@ -68,6 +68,7 @@ namespace Belle2 {
       bool m_generateOldDigits;  /**< whether to produce old SVDDigit format*/
       std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
       std::string m_svdDAQDiagnosticsListName; /**<SVDDAQDiagnostic StoreArray name*/
+      std::string m_svdEventInfoName; /**< SVDEventInfo name */
 
       int m_wrongFTBcrc; /**<FTB CRC no-Match counter*/
 

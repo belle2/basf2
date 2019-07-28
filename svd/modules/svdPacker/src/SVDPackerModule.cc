@@ -51,6 +51,7 @@ SVDPackerModule::SVDPackerModule() : Module(),
 
 
   // Parameter definitions
+  addParam("svdEventInfo", m_svdEventInfoName, "Name of the SVDEventInfo object", string("SVDEventInfoSim"));
   addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVD Shaper Digits List", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
@@ -76,7 +77,7 @@ void SVDPackerModule::initialize()
   m_rawSVD.registerInDataStore(m_rawSVDListName);
   m_svdShaperDigit.isRequired(m_svdShaperDigitListName);
   m_eventMetaDataPtr.isRequired();
-  m_svdEventInfoPtr.isRequired("SVDEventInfoSim");
+  m_svdEventInfoPtr.isRequired(m_svdEventInfoName);
 }
 
 

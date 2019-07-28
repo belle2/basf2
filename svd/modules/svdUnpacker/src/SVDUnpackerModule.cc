@@ -58,6 +58,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
   setDescription("Produce SVDDigits from RawSVD. NOTE: only zero-suppressed mode is currently supported!");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("svdEventInfo", m_svdEventInfoName, "Name of the SVDEventInfo object", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
   addParam("GenerateOldDigits", m_generateOldDigits, "Generate SVDDigits", bool(false));
@@ -86,7 +87,7 @@ void SVDUnpackerModule::initialize()
   m_rawSVD.isOptional(m_rawSVDListName);
 
   // Register default SVDEventInfo for unpacking Raw Data
-  m_svdEventInfoPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  m_svdEventInfoPtr.registerInDataStore(m_svdEventInfoName, DataStore::c_ErrorIfAlreadyRegistered);
 
   StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
   storeDAQDiagnostics.registerInDataStore();

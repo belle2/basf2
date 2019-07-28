@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from svd import add_svd_simulation
+from svd import add_svd_simulation, add_svd_packer
 from ROOT import Belle2, TFile, TTree
 import os
 import numpy
@@ -127,12 +127,8 @@ set_module_parameters(main, type="Geometry", useDB=False, components=["SVD"])
 main.add_module(progress)
 
 nodeid = 0
-Packer = register_module('SVDPacker')
-Packer.param('NodeID', nodeid)
-Packer.param('svdShaperDigitListName', 'SVDShaperDigits')
-Packer.param('rawSVDListName', 'SVDRaw')
 
-main.add_module(Packer)
+add_svd_packer(main)
 
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')

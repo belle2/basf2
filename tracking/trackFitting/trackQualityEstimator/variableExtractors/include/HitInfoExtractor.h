@@ -17,6 +17,7 @@
 #include <genfit/TrackPoint.h>
 #include <numeric>
 #include <algorithm>
+#include <optional>
 
 namespace Belle2 {
   /// class to extract info from individual clusters and combine for SPTC
@@ -45,13 +46,26 @@ namespace Belle2 {
       kalmanFitterInfos.reserve(recoHitInformations.size());
 
       int n_no_trackPoint = 0;  // number of recoHitInformations without related track points
-      int n_no_KalmanFitterInfo = 0;   // number of track points without related KalmanFitterInfo
+      int n_no_KalmanFitterInfo = 0;  // number of track points without related KalmanFitterInfo
+      std::optional<float> weight_firstCDCHit;
+      std::optional<float> weight_lastSVDHit;
+      std::optional<float> smoothedChi2_firstCDCHit;
+      std::optional<float> smoothedChi2_lastSVDHit;
       for (const RecoHitInformation* recoHitInformation : recoHitInformations) {
         const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
         if (trackPoint) {
           const genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();
           if (kalmanFitterInfo) {
             kalmanFitterInfos.push_back(kalmanFitterInfo);
+            if ((not weight_firstCDCHit)
+                and (recoHitInformation->getTrackingDetector() == recoHitInformation->c_CDC)) {
+              weight_firstCDCHit = kalmanFitterInfo->getWeights().front();
+              smoothedChi2_firstCDCHit = this->getSmoothedChi2(kalmanFitterInfo);
+            }
+            if (recoHitInformation->getTrackingDetector() == recoHitInformation->c_SVD) {
+              weight_lastSVDHit = kalmanFitterInfo->getWeights().front();
+              smoothedChi2_lastSVDHit = this->getSmoothedChi2(kalmanFitterInfo);
+            }
           } else {
             n_no_KalmanFitterInfo++;
           }
@@ -61,45 +75,19 @@ namespace Belle2 {
       }
       m_variables.at("N_Hits_without_TrackPoint") = n_no_trackPoint;
       m_variables.at("N_TrackPoints_without_KalmanFitterInfo") = n_no_KalmanFitterInfo;
+      m_variables.at("weight_lastSVDHit") = weight_lastSVDHit.value_or(-1);
+      m_variables.at("weight_firstCDCHit") = weight_firstCDCHit.value_or(-1);
 
-      int i_lastSVDHit = -1;
-      if (recoTrack.hasSVDHits()) {
-        i_lastSVDHit = recoTrack.getNumberOfPXDHits() + recoTrack.getNumberOfSVDHits()
-                       - 1 - n_no_KalmanFitterInfo - n_no_trackPoint;
-      }
-      int i_firstCDCHit = -1;
-      if (recoTrack.hasCDCHits()) {
-        i_firstCDCHit = i_lastSVDHit + 1;
-      }
-
-      std::vector<float> fitWeights(kalmanFitterInfos.size());
-      for (unsigned int i = 0; i < kalmanFitterInfos.size(); ++i) {
-        fitWeights[i] = kalmanFitterInfos[i]->getWeights().front();
-        if (i == i_lastSVDHit) {
-          m_variables.at("weight_lastSVDhit") = fitWeights[i];
-        } else if (i == i_firstCDCHit) {
-          m_variables.at("weight_firstCDChit") = fitWeights[i];
-        }
+      std::vector<float> fitWeights;
+      std::vector<float> chi2Values;
+      fitWeights.reserve(kalmanFitterInfos.size());
+      chi2Values.reserve(kalmanFitterInfos.size());
+      for (const auto& kalmanFitterInfo : kalmanFitterInfos) {
+        fitWeights.push_back(kalmanFitterInfo->getWeights().front());
+        chi2Values.push_back(this->getSmoothedChi2(kalmanFitterInfo).value_or(-1.0));
       }
       setStats("weight", fitWeights);
-
-
-      std::vector<float> chit2Values(kalmanFitterInfos.size());
-      for (unsigned int i = 0; i < kalmanFitterInfos.size(); ++i) {
-        try {
-          chit2Values[i] = kalmanFitterInfos[i]->getSmoothedChi2();
-        } catch (const std::exception& e) {
-          B2WARNING("HitInfoExtractor: Caught exception in kalmanFitterInfos[i]->getSmoothedChi2() \n"
-                    << "-->" << e.what());
-          chit2Values[i] = -1;
-        }
-        if (i == i_lastSVDHit) {
-          m_variables.at("smoothedChi2_lastSVDhit") = chit2Values[i];
-        } else if (i == i_firstCDCHit) {
-          m_variables.at("smoothedChi2_firstCDChit") = chit2Values[i];
-        }
-      }
-      setStats("smoothedChi2", chit2Values);
+      setStats("smoothedChi2", chi2Values);
     }
 
   protected:
@@ -153,6 +141,19 @@ namespace Belle2 {
       m_variables.at(identifier + "_max") = values.back();
       float median = size % 2 ? values[size / 2] : 0.5 * (values[size / 2] + values[size / 2 - 1]);
       m_variables.at(identifier + "_median") = median;
+    }
+
+  private:
+    /// Helper function to safely get Chi2 from a KalmanFitterInfo object if available, and if not return nullopt
+    std::optional<float> getSmoothedChi2(const genfit::KalmanFitterInfo* kalmanFitterInfo)
+    {
+      try {
+        return kalmanFitterInfo->getSmoothedChi2();
+      } catch (const std::exception& e) {
+        B2WARNING("HitInfoExtractor: Caught exception in kalmanFitterInfos[i]->getSmoothedChi2() \n"
+                  << "-->" << e.what());
+        return std::nullopt;
+      }
     }
   };
 }

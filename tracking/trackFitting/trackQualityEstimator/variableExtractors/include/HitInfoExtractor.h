@@ -75,8 +75,8 @@ namespace Belle2 {
       }
       m_variables.at("N_Hits_without_TrackPoint") = n_no_trackPoint;
       m_variables.at("N_TrackPoints_without_KalmanFitterInfo") = n_no_KalmanFitterInfo;
-      m_variables.at("weight_lastSVDHit") = weight_lastSVDHit.value_or(-1);
-      m_variables.at("weight_firstCDCHit") = weight_firstCDCHit.value_or(-1);
+      m_variables.at("weight_lastSVDHit") = weight_lastSVDHit.value_or(m_valueIfVarNotAvailable);
+      m_variables.at("weight_firstCDCHit") = weight_firstCDCHit.value_or(m_valueIfVarNotAvailable);
 
       std::vector<float> fitWeights;
       std::vector<float> chi2Values;
@@ -84,7 +84,7 @@ namespace Belle2 {
       chi2Values.reserve(kalmanFitterInfos.size());
       for (const auto& kalmanFitterInfo : kalmanFitterInfos) {
         fitWeights.push_back(kalmanFitterInfo->getWeights().front());
-        chi2Values.push_back(this->getSmoothedChi2(kalmanFitterInfo).value_or(-1.0));
+        chi2Values.push_back(this->getSmoothedChi2(kalmanFitterInfo).value_or(m_valueIfVarNotAvailable));
       }
       setStats("weight", fitWeights);
       setStats("smoothedChi2", chi2Values);
@@ -110,14 +110,14 @@ namespace Belle2 {
     {
       int size = values.size();
       if (values.size() == 0) {
-        m_variables.at(identifier + "_max") =  -1.;
-        m_variables.at(identifier + "_min") =  -1.;
-        m_variables.at(identifier + "_mean") =  -1.;
-        m_variables.at(identifier + "_std") =  -1.;
-        m_variables.at(identifier + "_median") =  -1.;
-        m_variables.at(identifier + "_n_zeros") = -1;
-        m_variables.at(identifier + "_firstCDChit") = -1;
-        m_variables.at(identifier + "_lastSVDhit") = -1;
+        m_variables.at(identifier + "_max") =  m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_min") =  m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_mean") =  m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_std") =  m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_median") =  m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_n_zeros") = m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_firstCDChit") = m_valueIfVarNotAvailable;
+        m_variables.at(identifier + "_lastSVDhit") = m_valueIfVarNotAvailable;
         return;
       }
 
@@ -155,5 +155,11 @@ namespace Belle2 {
         return std::nullopt;
       }
     }
+
+    /** Define a default value to use if a variable cannot be calculated. A
+     * value different from NAN, but which is not obtainable otherwise, can be
+     * useful if one wants the MVA classifier to train on the variable not being
+     * available instead of ignoring it. */
+    const float m_valueIfVarNotAvailable = -1.0;
   };
 }

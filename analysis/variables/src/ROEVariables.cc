@@ -1947,7 +1947,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
                       "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
-                      "Is required for the specific FEI.");
+                      "Is required for the specific FEI. :noindex:");
+    // nROE_RemainingTracks is overloaded (two C++ functions sharing one
+    // variable name) so one of the two needs to be made the indexed
+    // variable in sphinx
 
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");

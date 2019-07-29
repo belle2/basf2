@@ -115,7 +115,7 @@ class ModuleListDirective(Directive):
                 # run the description through autodoc event to get
                 # Google/Numpy/doxygen style as well
                 env.app.emit('autodoc-process-docstring', 'b2:module:param', module.name() + '.' + p.name, p, None, param_desc)
-                param_desc = textwrap.indent("\n".join(param_desc), 8*" ").splitlines()
+                param_desc = textwrap.indent("\n".join(param_desc), 8 * " ").splitlines()
                 dest += ["    * **{name}** *({type}{default})*".format(name=p.name, type=p.type, default=default)]
                 dest += param_desc
 
@@ -210,6 +210,13 @@ class VariableListDirective(Directive):
         all_nodes = []
         env = self.state.document.settings.env
         for var in sorted(all_variables, key=lambda x: x.name):
+
+            # for overloaded variables, we might have to flag noindex in the
+            # variable description so also check for that
+            if ":noindex:" in var.description:
+                self.noindex = ["    :noindex:"]
+                var.description = var.description.replace(":noindex:", "")
+
             docstring = var.description.splitlines()
             # pretend to be the autodoc extension to let other events process
             # the doc string. Enables Google/Numpy docstrings as well as a bit
@@ -249,12 +256,12 @@ def html_page_context(app, pagename, templatename, context, doctree):
 
 
 def jira_issue_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
-        jira_url = inliner.document.settings.env.app.config.basf2_jira
-        if not jira_url:
-            return [nodes.literal(rawtext, text=text, language=None)], []
+    jira_url = inliner.document.settings.env.app.config.basf2_jira
+    if not jira_url:
+        return [nodes.literal(rawtext, text=text, language=None)], []
 
-        url = f"{jira_url}/browse/{text}"
-        return [nodes.reference(rawtext, text=text, refuri=url)], []
+    url = f"{jira_url}/browse/{text}"
+    return [nodes.reference(rawtext, text=text, refuri=url)], []
 
 
 def setup(app):

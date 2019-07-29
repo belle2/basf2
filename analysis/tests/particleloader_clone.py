@@ -36,9 +36,19 @@ mcps = [particle + ':frommc' for particle in fsps + ['B0', 'D0']]
 for mcp in mcps:
     testpath.add_module('ParticleLoader', decayStringsWithCuts=[(mcp, '')],
                         useMCParticles=True)
+# add RestOfEvents
+signal_side = 'K_S0'
+roe_side = 'Upsilon(4S)'
+testpath.add_module('RestOfEventBuilder', particleList=signal_side,
+                    particleListsInput=['pi+', 'gamma', 'K_L0'])
+# Load RestOfEvents
+testpath.add_module('ParticleLoader', decayStringsWithCuts=[(roe_side, '')],
+                    sourceParticleListName=signal_side, useROEs=True)
+
 
 testpath.add_module('ParticleStats', particleLists=fsps)
 testpath.add_module('ParticleStats', particleLists=mcps)
+testpath.add_module('ParticleStats', particleLists=[roe_side])
 basf2.process(testpath)
 
 # process the first event (again) with the verbose ParticlePrinter

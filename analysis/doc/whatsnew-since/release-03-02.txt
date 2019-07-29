@@ -37,3 +37,12 @@ Vertex Fitting
   Specifically, setting confidenceLevel to 0 does not reject candidates with
   p-value equal to 0 anymore. Thus, the meaning of this parameter is now
   the same as for the module TreeFitter.
+Modules
++++++++
+
+* ParticleLoader can load :doc:`RestOfEvent` as a particle 
+  using a new function `modularAnalysis.fillParticleListFromROE`.
+  This ROE particle can be combined with any other particle or written down 
+  using usual variables. 
+  Another option is to load missing momentum as a particle by supplementing 
+  ``useMissing = True`` argument to the function, mentioned above.

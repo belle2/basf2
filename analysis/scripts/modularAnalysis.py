@@ -756,6 +756,45 @@ def fillConvertedPhotonsList(
     path.add_module(pload)
 
 
+def fillParticleListFromROE(
+    decayString,
+    cut,
+    maskName='',
+    sourceParticleListName='',
+    useMissing=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    Creates Particle object for each ROE of the desired type found in the
+    StoreArray<RestOfEvent>, loads them to the StoreArray<Particle>
+    and fills the ParticleList. If useMissing is True, then the missing
+    momentum is used instead of ROE.
+
+    The type of the particles to be loaded is specified via the decayString module parameter.
+
+    @param decayString             specifies type of Particles and determines the name of the ParticleList.
+                                   Source ROEs can be taken as a daughter list, for example:
+                                   'B0:tagFromROE -> B0:signal'
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param maskName                Name of the ROE mask to use
+    @param sourceParticleListName  Use related ROEs to this particle list as a source
+    @param useMissing              Use missing momentum instead of ROE momentum
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('writeOut', writeOut)
+    pload.param('roeMaskName', maskName)
+    pload.param('useMissing', useMissing)
+    pload.param('sourceParticleListName', sourceParticleListName)
+    pload.param('useROEs', True)
+    path.add_module(pload)
+
+
 def fillParticleListFromMC(
     decayString,
     cut,
@@ -1945,7 +1984,7 @@ def printROEInfo(
     @param full_print   print out mask values for each Track/ECLCLuster in mask
     @param path         modules are added to this path
     """
-    if not isinstance(path, basf2.Path):
+    if not isinstance(path, Path):
         B2FATAL("Error from printROEInfo, please add this to the for_each path")
 
     printMask = register_module('RestOfEventPrinter')

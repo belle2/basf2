@@ -336,7 +336,7 @@ One can use the list in the steering file as follows:
   my_list = ['p','E']
 
   # Passing it as an argumet to variablesToNtuple
-  modular_analusis.variablesToNtuple(variables=my_list,
+  modularAnalysis.variablesToNtuple(variables=my_list,
                                      ...)
 
 It is also possible to create user-defined variable collections. Name of the variable collection can
@@ -348,7 +348,7 @@ be threated as a variable name, and hence one would have the following syntax in
   variables.utils.add_collection(['p','E'],"my_collection")
 
   # Passing it as an argumet to variablesToNtuple
-  modular_analusis.variablesToNtuple(variables=['my_collection'],
+  modularAnalysis.variablesToNtuple(variables=['my_collection'],
                                      ...)
 
 There are several predefined lists of variables and for each predefined list it exists a collection with the same name:

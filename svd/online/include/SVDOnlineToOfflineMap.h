@@ -211,6 +211,27 @@ namespace Belle2 {
      */
     bool isAPVinMap(VxdID sensorID, bool side, unsigned short strip);
 
+    /** prepares the list of the missing APVs
+     *  using the channel mapping
+     */
+    void prepareListOfMissingAPVs();
+    /** struct to hold missing APVs informations */
+    struct missingAPV {
+      VxdID m_sensorID;           /**< Sensor ID */
+      bool m_isUSide;               /**< True if u-side of the sensor */
+      float m_halfStrip;          /**< floating strip in the middle of the APV */
+    };
+
+    /** list of the missing APVs
+     */
+    std::vector< missingAPV > m_missingAPVs;
+
+    /** Get number of missing APVs */
+    int getNumberOfMissingAPVs()
+    {
+      return m_missingAPVs.size();
+    }
+
     /** Get ChipInfo for a given layer/ladder/dssd/side/strip combination.
      * @param layer is the the layer number
      * @param ladder is the the ladder number

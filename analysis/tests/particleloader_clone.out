@@ -1,4 +1,4 @@
-[INFO] Steering file: analysis/tests/particleloader_clone.py
+[INFO] Steering file: /home/sbilokin/basf2-v1.0/releases/development/analysis/tests/particleloader_clone.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:
@@ -82,8 +82,34 @@
 [INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]    -> MDST source: RestOfEvents
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
+[INFO] Number of ParticleLists studied 1 
+[WARNING] Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete  { module: RestOfEventBuilder }
+ ... message repeated 40 times
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+   Upsilon(4S)( 0)	|	0.4915	1.0000	1.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+   Upsilon(4S)( 0)	|	  1.0219	  2.0793	  0.0000	  0.0000	  0.0000	  0.0000	  1.0219	  2.0793
+
+[INFO] 
+=======================================================
+Total Retention: 0.4915
+Total Number of Particles created in the DataStore: 13434153
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
@@ -120,7 +146,7 @@ Lambda0:frommc( 6)	|	  0.1330	  1.1244	  0.0967	  0.8175	  0.0363	  0.3069	  0.0
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 13342179
+Total Number of Particles created in the DataStore: 13434153
 =======================================================
 
 [INFO] ParticleStats Summary: 
@@ -155,7 +181,7 @@ Total Number of Particles created in the DataStore: 13342179
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 13342179
+Total Number of Particles created in the DataStore: 13434153
 =======================================================
 
 [WARNING] There were 500 tracks skipped because of zero charge for mu+  { module: ParticleLoader }
@@ -164,7 +190,9 @@ Total Number of Particles created in the DataStore: 13342179
 [WARNING] There were 500 tracks skipped because of zero charge for pi+  { module: ParticleLoader }
 [WARNING] There were 500 tracks skipped because of zero charge for e+  { module: ParticleLoader }
 [INFO] ================================================================================
-[INFO] Error summary: 0 errors and 5 warnings occurred.
+[INFO] Error summary: 0 errors and 46 warnings occurred.
+[WARNING] Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete
+[INFO]  (last message occurred 41 times in total)
 [WARNING] There were 500 tracks skipped because of zero charge for mu+
 [WARNING] There were 632 tracks skipped because of zero charge for p+
 [WARNING] There were 581 tracks skipped because of zero charge for K+
@@ -255,8 +283,13 @@ Total Number of Particles created in the DataStore: 13342179
 [INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]    -> MDST source: RestOfEvents
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
+[INFO] Number of ParticleLists studied 1 
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles
@@ -1456,6 +1489,25 @@ Total Number of Particles created in the DataStore: 13342179
  extra info=( ) 
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+   Upsilon(4S)( 0)	|	0.0000	1.0000	0.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+   Upsilon(4S)( 0)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+
+[INFO] 
+=======================================================
+Total Retention: 0.0000
+Total Number of Particles created in the DataStore: 107
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================

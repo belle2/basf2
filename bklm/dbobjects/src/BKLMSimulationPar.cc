@@ -31,21 +31,22 @@ BKLMSimulationPar::~BKLMSimulationPar()
 void BKLMSimulationPar::read(const GearDir& content)
 {
   // GearDir content(Gearbox::getInstance().getDetectorComponent("BKLM"), "BKLMSimulationParameters");
-  if (!content) return;
-
-  m_HitTimeMax = content.getWithUnit("/HitTimeMax");
-  B2INFO("HitTimeMax = " << m_HitTimeMax);
+  if (!content)
+    return;
 
   char name[40];
   int div = 0;
   int j = 0;
+  double weight[c_MAX_NHIT];
+
   for (div = 0; div <= c_NDIV; ++div) {
     for (j = 0; j < c_MAX_NHIT; ++j) {
       m_PhiMultiplicityCDF[div][j] = 1.0;
       m_ZMultiplicityCDF[div][j] = 1.0;
     }
   }
-  double weight[c_MAX_NHIT];
+
+  m_HitTimeMax = content.getWithUnit("/HitTimeMax");
 
   GearDir phiContent(content);
   phiContent.append("/RPCStripMultiplicity/Phi");
@@ -68,6 +69,7 @@ void BKLMSimulationPar::read(const GearDir& content)
       m_PhiMultiplicityCDF[div][j] = (j <= nWeight ? weight[j] / weight[0] : 1.0);
     }
   }
+
   GearDir zContent(content);
   zContent.append("/RPCStripMultiplicity/Z");
   nDiv = min(zContent.getNumberNodes("/Division"), c_NDIV + 1);
@@ -89,25 +91,28 @@ void BKLMSimulationPar::read(const GearDir& content)
       m_ZMultiplicityCDF[div][j] = (j <= nWeight ? weight[j] / weight[0] : 1.0);
     }
   }
-
-  m_IsValid = true;
-
 }
 
 double BKLMSimulationPar::getPhiMultiplicityCDF(double stripDiv, int mult) const
 {
-  if (mult < 0) return 0.0;
-  if (mult >= c_MAX_NHIT) return 1.0;
+  if (mult < 0)
+    return 0.0;
+  if (mult >= c_MAX_NHIT)
+    return 1.0;
   int stripIndex = (int) fabs(stripDiv * c_NDIV / 0.5);
-  if (stripIndex > c_NDIV) return 0.0;
+  if (stripIndex > c_NDIV)
+    return 0.0;
   return m_PhiMultiplicityCDF[stripIndex][mult];
 }
 
 double BKLMSimulationPar::getZMultiplicityCDF(double stripDiv, int mult) const
 {
-  if (mult < 0) return 0.0;
-  if (mult >= c_MAX_NHIT) return 1.0;
+  if (mult < 0)
+    return 0.0;
+  if (mult >= c_MAX_NHIT)
+    return 1.0;
   int stripIndex = (int) fabs(stripDiv * c_NDIV / 0.5);
-  if (stripIndex > c_NDIV) return 0.0;
+  if (stripIndex > c_NDIV)
+    return 0.0;
   return m_ZMultiplicityCDF[stripIndex][mult];
 }

@@ -185,21 +185,17 @@ void BKLMDatabaseImporter::exportBklmGeometryPar()
          element->getLocalReconstructionShiftZ(1, 1, 1) << ")");
 }
 
-void BKLMDatabaseImporter::importBklmSimulationPar()
+void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop)
 {
-  GearDir content("/Detector/DetectorComponent/Geometry/BKLM/Content/SimulationParameters");
-
-  // define the data
   BKLMSimulationPar bklmSimulationPar;
+  GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"), "BKLM/SimulationParameters");
 
   // Get Gearbox simulation parameters for BKLM
-  bklmSimulationPar.setVersion(0);
   bklmSimulationPar.read(content);
 
-  // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
+  // Define the IOV and store data to the DB
+  IntervalOfValidity iov(expStart, runStart, expStop, runStop);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
-
 }
 
 void BKLMDatabaseImporter::exportBklmSimulationPar()

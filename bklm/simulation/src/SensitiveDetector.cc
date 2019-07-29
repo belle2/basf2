@@ -43,12 +43,12 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector(const G4String& name) : SensitiveDetectorBase(name, Const::KLM)
     {
       m_FirstCall = true;
-
       m_BkgSensitiveDetector = NULL;
       m_GeoPar = NULL;
       if (!m_SimPar.isValid())
         B2FATAL("BKLM simulation parameters are not available.");
       m_HitTimeMax = m_SimPar->getHitTimeMax();
+
       StoreArray<MCParticle> particles;
       StoreArray<BKLMSimHit> simHits;
       StoreArray<BKLMSimHitPosition> simHitPositions;
@@ -70,11 +70,13 @@ namespace Belle2 {
       if (m_FirstCall) {
         m_FirstCall = false;
         m_GeoPar = GeometryPar::instance();
-        if (m_GeoPar->doBeamBackgroundStudy()) {
+        if (m_GeoPar->doBeamBackgroundStudy())
           m_BkgSensitiveDetector = m_GeoPar->getBkgSensitiveDetector();
-        }
+        if (!m_SimPar.isValid())
+          B2FATAL("BKLM simulation parameters are not available.");
         m_HitTimeMax = m_SimPar->getHitTimeMax();
-        if (!gRandom) B2FATAL("gRandom is not initialized; please set up gRandom first");
+        if (!gRandom)
+          B2FATAL("gRandom is not initialized; please set up gRandom first");
       }
 
       // Record a BeamBackHit for any particle

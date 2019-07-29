@@ -50,16 +50,16 @@ namespace Belle2 {
     //! Get the maximum multiplicity in the RPC strip cumulative prob density functions
     int getMaxMultiplicity(void) const { return c_MAX_NHIT; }
 
-    //!Get number of kind of mutiplicity for phistrips
+    //! Get number of kind of mutiplicity for phistrips
     int getNPhiMultiplicity(int division) const {return m_NPhiMultiplicity[division];}
 
-    //!Get number of kind of mutiplicity for zstrips
+    //! Get number of kind of mutiplicity for zstrips
     int getNZMultiplicity(int division) const {return m_NZMultiplicity[division];}
 
-    //!Get weight table for phi
+    //! Get weight table for phi
     double getPhiWeight(int division, int nmutiplicity) const { return m_PhiWeight[division][nmutiplicity]; }
 
-    //!Get weight table for z
+    //! Get weight table for z
     double getZWeight(int division, int nmutiplicity) const { return m_ZWeight[division][nmutiplicity]; }
 
     //! Get the RPC phi-strip cumulative prob density function
@@ -70,7 +70,7 @@ namespace Belle2 {
 
   private:
 
-    //! Variable For The maximum global time for a recorded sim hit
+    //! Maximum global time for a recorded sim hit
     double m_HitTimeMax;
 
     //! RPC phiStrip multiplicity cumulative probability distribution table
@@ -79,16 +79,16 @@ namespace Belle2 {
     //! RPC zStrip multiplicity cumulative probability distribution table
     double m_ZMultiplicityCDF[c_NDIV + 1][c_MAX_NHIT];
 
-    //! the number of division for phistrips
+    //! Number of division for phistrips
     int m_NPhiDiv;
 
-    //! the number of division for zstrips
+    //! Number of division for zstrips
     int m_NZDiv;
 
-    //! the number of kind of mutiplicity of phistrips in each divison
+    //! Number of kind of mutiplicity of phistrips in each divison
     int m_NPhiMultiplicity[c_NDIV + 1];
 
-    //! the number of weigths of zstrips in each divison
+    //! Number of weigths of zstrips in each divison
     int m_NZMultiplicity[c_NDIV + 1];
 
     //! RPC phiStrip weight table

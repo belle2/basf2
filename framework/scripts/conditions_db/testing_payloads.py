@@ -60,9 +60,9 @@ class TestingPayloadEntry:
         #: iov id, to be filled later
         self.iov = None
 
-    def normalize(self):
+    def normalize(self, name=None, root_version=61408):
         """Normalize the root file to have the same checksum for the same content"""
-        normalize_file(self.filename, in_place=True, name='NormalizedRootFile', root_version=61408)
+        normalize_file(self.filename, in_place=True, name=name, root_version=root_version)
         self.__checksum = file_checksum(self.filename)
 
     @property

@@ -436,7 +436,8 @@ class ConditionsDB:
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
           global_tage (str): name of the global tag to which the data should be uploaded
-          normalize (bool): if True the payload root files will be normalized to have the same checksum for the same content
+          normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
+                                if normalize is a string in addition the file name in the root file metadata will be set to it
           ignore_existing (bool): if True do not upload payloads that already exist
           nprocess (int): maximal number of parallel uploads
           uploaded_entries (list): the list of successfully uploaded entries
@@ -472,8 +473,9 @@ class ConditionsDB:
             payloads[(e.module, e.checksum)].append(e)
 
         if normalize:
+            name = normalize if normalize is not True else None
             for payload in payloads.values():
-                payload[0].normalize()
+                payload[0].normalize(name=name)
 
         existing_payloads = {}
         existing_iovs = {}
@@ -556,7 +558,8 @@ class ConditionsDB:
 
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
-          normalize (bool): if True the payload root files will be normalized to have the same checksum for the same content
+          normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
+                                if normalize is a string in addition the file name in the root file metadata will be set to it
           data (dict): a dictionary with the information provided by the user:
             task: category of global tag, either master, online, prompt, data, mc, or analysis
             tag: the global tage name

@@ -32,6 +32,10 @@ def command_upload(args, db=None):
                           help="Global tag to use for iov creation")
         args.add_argument("payloadsfile", metavar="PAYLOADSFILE",
                           help="Testing payload storage file containing list of iovs")
+        args.add_argument('--normalize', default=True,
+                          help="""By default payload root files are normalized to get the same checksum for the same content.
+                                  This can be disabled with the normalize option 'False'. Any other normalize option will
+                                  set the file name in the root file metadata to the given value.""")
         args.add_argument("--normalize", action="store_true", default=False,
                           help="Normalize the payload root files before the upload")
         args.add_argument("-j", type=int, default=1, dest="nprocess",
@@ -52,4 +56,5 @@ def command_upload(args, db=None):
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.TIMESTAMP)
 
     # do the upload
-    return 0 if db.upload(args.dbfile, args.tag, args.normalize, args.ignore_existing, args.nprocess) else 1
+    normalize = False if normalize == 'False' else args.normalize
+    return 0 if db.upload(args.dbfile, args.tag, normalize, args.ignore_existing, args.nprocess) else 1

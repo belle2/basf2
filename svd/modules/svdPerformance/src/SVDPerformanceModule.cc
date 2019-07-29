@@ -504,7 +504,6 @@ void SVDPerformanceModule::event()
       h_cltrkSN[layer][sensor][side]->Fill(clSN);
       h_cltrkTime[layer][sensor][side]->Fill(clTime);
 
-      //RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svdClustersTrack[cl]);
       SVDModeByte::baseType tb = modeByte.getTriggerBin();
       if ((int) tb == 0) h_cltrkTime_TB1[layer][sensor][side]->Fill(clTime);
       if ((int) tb == 1) h_cltrkTime_TB2[layer][sensor][side]->Fill(clTime);

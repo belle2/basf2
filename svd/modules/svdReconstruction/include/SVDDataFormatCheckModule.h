@@ -93,13 +93,15 @@ namespace Belle2 {
     /** max number of events with at least one strip with a warning*/
     int m_maxProblematicEvts = 10;
     /** max number of strips in one with at least a warning*/
-    //int m_maxProblematicStripsInEvts = 10; xxx
+
   protected:
 
     /** Name of the collection to use for the SVDShaperDigits */
     std::string m_storeShaperDigitsName;
     /** Name of the collection to use for the SVDDAQDiagnostic */
     std::string m_storeDAQName;
+    /** Name of the SVDEventInfo object */
+    std::string m_svdEventInfoName;
 
     //counters
     //    int m_

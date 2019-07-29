@@ -310,7 +310,6 @@ void SVDClusterEvaluationTrueInfoModule::event()
 
       //get trigger bin
       int triggerBin = 0;
-      //RelationVector<SVDRecoDigit> relatVectorClusToRD = DataStore::getRelationsWithObj<SVDRecoDigit>(&clus);
       triggerBin = (int)modeByte.getTriggerBin();
 
       if (triggerBin == 0)

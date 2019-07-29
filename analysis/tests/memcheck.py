@@ -121,6 +121,11 @@ for module in main.modules():
     if module.type() == 'SVDUnpacker':
         module.param('silentlyAppend', True)
 
+# Set the correct SVDEventInfo name in the given modules, when SVDPacker is used and not yet followed by SVDUnpacker
+    for m in main.modules():
+        if m.name() == "SVDDataFormatCheck" or m.name() == "__ROISVDCoGTimeEstimator" or m.name() == "SVDCoGTimeEstimator":
+            m.param('SVDEventInfo', 'SVDEventInfoSim')
+
 # gather profiling information
 main.add_module('Profile', outputFileName='vmem_profile.png', rssOutputFileName='rss_profile.png').set_log_level(LogLevel.INFO)
 

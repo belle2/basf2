@@ -28,6 +28,8 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
   setDescription("From SVDShaperDigit to SVDRecoDigit. Strip charge is evaluated as the max of the 6 samples; hit time is evaluated as a corrected Centre of Gravity (CoG) time.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo name", string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string(""));
   addParam("RecoDigits", m_storeRecoDigitsName,
@@ -102,7 +104,7 @@ void SVDCoGTimeEstimatorModule::beginRun()
 
 void SVDCoGTimeEstimatorModule::event()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
   SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   /** Probabilities, to be defined here */

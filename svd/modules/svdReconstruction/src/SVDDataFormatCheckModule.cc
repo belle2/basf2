@@ -28,6 +28,8 @@ SVDDataFormatCheckModule::SVDDataFormatCheckModule() : Module()
   setDescription("Checks the SVD data format: ");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo name", string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string("SVDShaperDigits"));
   addParam("DAQDiagnostics", m_storeDAQName,
@@ -73,7 +75,6 @@ void SVDDataFormatCheckModule::beginRun()
   m_n3samples = 0;
   m_n6samples = 0;
 
-
 }
 
 
@@ -82,13 +83,10 @@ void SVDDataFormatCheckModule::event()
 
   int evtNumber = m_evtMetaData->getEvent();
 
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
   SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   bool isProblematic = false;
-  //int  problematicStripsInEvtCounter = 0;xxx
-
-  //bool shutUpWarningsPerEvt = false;xxx
 
   // If no digits, nothing to do
   if (!m_storeShaper || !m_storeShaper.getEntries()) {
@@ -102,10 +100,6 @@ void SVDDataFormatCheckModule::event()
 
   m_stripEvtsCounter++;
 
-  //for (const SVDShaperDigit& shaper : m_storeShaper) {xxx
-
-  //  SVDModeByte modeByte = shaper.getModeByte();xxx
-
   //checking the number of acquired samples per APV
   int daqMode = (int) modeByte.getDAQMode();
   //0 -> 1-sample
@@ -117,7 +111,7 @@ void SVDDataFormatCheckModule::event()
   if (daqMode == 1) {
     m_n3samples++;
     isProblematic = true;
-    if ((!m_shutUpWarnings)) //&& (!shutUpWarningsPerEvt))
+    if (!m_shutUpWarnings)
       B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
                 " is apparently taken with 3-sample mode, this is not expected. [daqMode = " << daqMode << "]");
   }
@@ -125,7 +119,7 @@ void SVDDataFormatCheckModule::event()
   if (daqMode == 0) {
     m_n1samples++;
     isProblematic = true;
-    if ((!m_shutUpWarnings))// && (!shutUpWarningsPerEvt))
+    if (!m_shutUpWarnings)
       B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
                 " is apparently taken with 1-sample mode, this is not expected. [daqMode = " << daqMode << "]");
   }
@@ -136,7 +130,7 @@ void SVDDataFormatCheckModule::event()
   if (evtType != 0) { //only global runs are expected
     m_nLocalRunEvts++;
     isProblematic = true;
-    if ((!m_shutUpWarnings))// && (!shutUpWarningsPerEvt))
+    if (!m_shutUpWarnings)
       B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
                 " is apparently taken as Local Run, this is not expected. [evtType = " << evtType << "]");
   }
@@ -149,7 +143,7 @@ void SVDDataFormatCheckModule::event()
   if (runType != 2) { //only zero suppressed events are expected
     m_nNoZSEvts++;
     isProblematic = true;
-    if ((!m_shutUpWarnings))// && (!shutUpWarningsPerEvt))
+    if (!m_shutUpWarnings)
       B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
                 " is apparently not taken as ZeroSuppressed, this is not expected. [runType = " << runType << "]");
   }
@@ -159,18 +153,10 @@ void SVDDataFormatCheckModule::event()
   if (triggerBin < 0 || triggerBin > 3) {
     m_nBadTBEvts++;
     isProblematic = true;
-    if ((!m_shutUpWarnings)) //&& (!shutUpWarningsPerEvt))
+    if (!m_shutUpWarnings)
       B2WARNING("SVDDataFormatCheck: the event " << evtNumber << " of exp " << m_expNumber << ", run " << m_runNumber <<
                 " is apparently not with an unexpected trigger bin = " << triggerBin);
   }
-
-
-  //if (isProblematic)xxx
-  //  problematicStripsInEvtCounter++;xxx
-
-  //if (problematicStripsInEvtCounter > m_maxProblematicStripsInEvts)xxx
-  //  shutUpWarningsPerEvt = true;xxx
-  //}xxx
 
   if (isProblematic)
     m_problematicEvtsCounter++;

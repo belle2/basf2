@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdReconstruction/SVDCoGTimeEstimatorModule.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace Belle2;
 using namespace std;
@@ -101,6 +102,9 @@ void SVDCoGTimeEstimatorModule::beginRun()
 
 void SVDCoGTimeEstimatorModule::event()
 {
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+
   /** Probabilities, to be defined here */
   std::vector<float> probabilities = {0.5};
 
@@ -137,8 +141,6 @@ void SVDCoGTimeEstimatorModule::event()
 
     m_StopCreationReco = false;
 
-
-    SVDModeByte modeByte = shaper.getModeByte();
     m_NumberOfAPVSamples = fromModeToNumberOfSample((int) modeByte.getDAQMode());
     B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
 
@@ -172,7 +174,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     if (m_corrPeakTime)
       m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
-    SVDModeByte::baseType triggerBin = (shaper.getModeByte()).getTriggerBin();
+    SVDModeByte::baseType triggerBin = modeByte.getTriggerBin();
 
     if (m_calEventT0)
       m_weightedMeanTime = m_TimeCal.getCorrectedTime(thisSensorID, thisSide, thisCellID, m_weightedMeanTime, triggerBin);
@@ -191,7 +193,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //recording of the RecoDigit
     m_storeReco.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, shaper.getModeByte()));
+                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, modeByte));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
     int recoDigitIndex = m_storeReco.getEntries() - 1;

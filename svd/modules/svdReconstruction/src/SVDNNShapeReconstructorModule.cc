@@ -19,6 +19,7 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -166,6 +167,9 @@ void SVDNNShapeReconstructorModule::fillRelationMap(const RelationLookup& lookup
 
 void SVDNNShapeReconstructorModule::event()
 {
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+
   const StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
   // If no digits, nothing to do
   if (!storeShaperDigits || !storeShaperDigits.getEntries()) return;
@@ -237,7 +241,7 @@ void SVDNNShapeReconstructorModule::event()
       unsigned short stripNo = shaperDigit.getCellID();
       bool validDigit = true; // FIXME: We don't care about local run bad strips for now.
       const double triggerBinSep = 4 * 1.96516; //in ns
-      double apvPhase = triggerBinSep * (0.5 + static_cast<int>(shaperDigit.getModeByte().getTriggerBin()));
+      double apvPhase = triggerBinSep * (0.5 + static_cast<int>(modeByte.getTriggerBin()));
       // Get things from the database.
       // Noise is good as it comes.
       float stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, stripNo);
@@ -317,7 +321,7 @@ void SVDNNShapeReconstructorModule::event()
       storeRecoDigits.appendNew(
         SVDRecoDigit(sensorID, isU, shaperDigit.getCellID(), stripAmplitude,
                      stripAmplitudeError, stripTime, stripTimeError, *pStrip, stripChi2,
-                     shaperDigit.getModeByte())
+                     modeByte)
       );
 
       //Create relations to RecoDigits

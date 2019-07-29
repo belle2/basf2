@@ -18,6 +18,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <TFile.h>
 #include <TText.h>
 #include <TH1F.h>
@@ -212,6 +213,8 @@ void SVDClusterEvaluationTrueInfoModule::beginRun()
 
 void SVDClusterEvaluationTrueInfoModule::event()
 {
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo;
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   StoreArray<SVDShaperDigit> SVDShaperDigits;
   StoreArray<SVDRecoDigit> SVDRecoDigits;
@@ -307,8 +310,7 @@ void SVDClusterEvaluationTrueInfoModule::event()
 
       //get trigger bin
       int triggerBin = 0;
-      RelationVector<SVDRecoDigit> relatVectorClusToRD = DataStore::getRelationsWithObj<SVDRecoDigit>(&clus);
-      SVDModeByte modeByte = relatVectorClusToRD[0]->getModeByte();
+      //RelationVector<SVDRecoDigit> relatVectorClusToRD = DataStore::getRelationsWithObj<SVDRecoDigit>(&clus);
       triggerBin = (int)modeByte.getTriggerBin();
 
       if (triggerBin == 0)

@@ -189,9 +189,9 @@ namespace Belle2 {
     /**
      * Flag for track-cluster matching condition.
      *
-     * Book one `char` for each charged stable particle (and antiparticle) candidate.
+     * Book one `float` for each charged stable particle (and antiparticle) candidate.
      */
-    std::vector<char> m_trackClusterMatch = std::vector<char>(c_chargedStableHypos);
+    std::vector<float> m_trackClusterMatch = std::vector<float>(c_chargedStableHypos);
 
     /**
      * Log-likelihood for the "signal" particle hypothesis.

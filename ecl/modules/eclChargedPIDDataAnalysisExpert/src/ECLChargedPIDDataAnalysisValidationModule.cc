@@ -79,7 +79,7 @@ void ECLChargedPIDDataAnalysisValidationModule::initialize()
     m_tree[chargedIdx]->Branch("trkPhi", &m_trkPhi[chargedIdx], "trkPhi/F");
     m_tree[chargedIdx]->Branch("clusterTheta", &m_clusterTheta[chargedIdx], "clusterTheta/F");
     m_tree[chargedIdx]->Branch("clusterPhi", &m_clusterPhi[chargedIdx], "clusterPhi/F");
-    m_tree[chargedIdx]->Branch("trackClusterMatch", &m_trackClusterMatch[chargedIdx], "trackClusterMatch/B");
+    m_tree[chargedIdx]->Branch("trackClusterMatch", &m_trackClusterMatch[chargedIdx], "trackClusterMatch/F");
     m_tree[chargedIdx]->Branch("logl_sig", &m_logl_sig[chargedIdx], "logl_sig/F");
     m_tree[chargedIdx]->Branch("logl_bkg", &m_logl_bkg[chargedIdx], "logl_bkg/F");
     m_tree[chargedIdx]->Branch("deltalogl_sig_bkg", &m_deltalogl_sig_bkg[chargedIdx], "deltalogl_sig_bkg/F");
@@ -114,7 +114,7 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
     m_trkPhi[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_clusterTheta[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_clusterPhi[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
-    m_trackClusterMatch[chargedIdx] = std::numeric_limits<char>::quiet_NaN();
+    m_trackClusterMatch[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_logl_sig[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_logl_bkg[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
     m_deltalogl_sig_bkg[chargedIdx] = std::numeric_limits<float>::quiet_NaN();
@@ -291,42 +291,60 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   TH1F* h_deltalogl = new TH1F(h_deltalogl_name.Data(), h_deltalogl_name.Data(), 40, deltalogl_min, deltalogl_max);
   h_deltalogl->GetXaxis()->SetTitle(TString::Format("#Deltaln(L) (%i/%i) (ECL)", bkgHypoPdgId, sigHypoPdgId).Data());
 
+  // Histogram of track-cluster match flag.
+  TString h_trkclusmatch_name = TString::Format("h_trkclusmatch_sig_%i", sigHypoPdgId);
+  TH1F* h_trkclusmatch = new TH1F(h_trkclusmatch_name.Data(), h_trkclusmatch_name.Data(), 4, -1.5, 2.5);
+  h_trkclusmatch->GetXaxis()->SetTitle(TString::Format("Track-ECLCluster match (%i)", sigHypoPdgId).Data());
+
   // Dump histos from TTree.
   sampleTree->Project(h_pid_name.Data(), pidSigBranch.Data());
   sampleTree->Project(h_deltalogl_name.Data(), "deltalogl_sig_bkg");
+  sampleTree->Project(h_trkclusmatch_name.Data(), "trackClusterMatch");
 
   // Make sure the plots show the u/oflow.
   paintUnderOverflow(h_pid);
   paintUnderOverflow(h_deltalogl);
+  paintUnderOverflow(h_trkclusmatch);
 
   h_pid->SetOption("HIST");
   h_deltalogl->SetOption("HIST");
-
+  h_trkclusmatch->SetOption("HIST");
 
   // Add histogram info.
-  h_pid->GetListOfFunctions()->Add(new TNamed("Description", TString::Format("Sample PDG = %i - ECL global PID(%i) distribution.",
-                                              sigHypoPdgId * sigCharge,
-                                              sigHypoPdgId).Data()));
+  h_pid->GetListOfFunctions()->Add(new TNamed("Description",
+                                              TString::Format("Sample PDG = %i - ECL global PID(%i) distribution. U/O flow is added to first (last) bin.",
+                                                              sigHypoPdgId * sigCharge,
+                                                              sigHypoPdgId).Data()));
   h_pid->GetListOfFunctions()->Add(new TNamed("Check",
-                                              "The more peaked at 1, the better. Non-zero U/O-flow indicates either failure of MC matching for reco tracks (unlikely) or of track-ECL-cluster matching (more likely). Both cases result in PID=nan."));
+                                              "The more peaked at 1, the better. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely). Both cases result in PID=nan."));
   h_pid->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.5,pvalue-error=0.01"));
 
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Description",
-                                                    TString::Format("Sample PDG = %i - ECL distribution of binary deltaLogL=logl(%i)-logl(%i)",
+                                                    TString::Format("Sample PDG = %i - ECL distribution of binary deltaLogL=logl(%i)-logl(%i). U/O flow is added to first (last) bin.",
                                                         sigHypoPdgId * sigCharge,
                                                         bkgHypoPdgId,
                                                         sigHypoPdgId).Data()));
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Check",
-                                                    "Basic metric for signal/bkg separation. The more negative, the better separation is achieved. Entries in U-flow indicate a non-normal PDF value (of sig OR bkg) for some p,clusterTheta range, which might be due to a non-optimal definition of the x-axis range of the PDF templates."));
+                                                    "Basic metric for signal/bkg separation. The more negative, the better separation is achieved. Non-zero U-flow indicates a non-normal PDF value (of sig OR bkg) for some p,clusterTheta range, which might be due to a non-optimal definition of the x-axis range of the PDF templates. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely)."));
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
 
+  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Description",
+                                                       TString::Format("Sample PDG = %i - Track-ECLCluster match flag distribution.",
+                                                           sigHypoPdgId * sigCharge).Data()));
+  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Check",
+                                                       "The more peaked at 1, the better. Non-zero population in the bins w/ flag != 0|1 indicates failure of MC matching for reco tracks. In such cases, flag=nan."));
+  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
+  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.5,pvalue-error=0.01"));
+
   h_pid->Write();
   h_deltalogl->Write();
+  h_trkclusmatch->Write();
 
   delete h_pid;
   delete h_deltalogl;
+  delete h_trkclusmatch;
 
 }
 

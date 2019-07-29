@@ -164,10 +164,6 @@ void BeamSpotCollectorModule::closeRun()
 //                                         m_h_cov_y_z->GetMean(1) + 5 * m_h_cov_y_z->GetRMS(1));
 }
 
-void BeamSpotCollectorModule::finish()
-{
-}
-
 void BeamSpotCollectorModule::collect()
 {
 

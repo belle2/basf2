@@ -56,11 +56,6 @@ namespace Belle2 {
      */
     void closeRun() override final;
 
-    /**
-     * Termination action.
-     */
-    void finish() override;
-
   private:
 
 //     /** x coord*/

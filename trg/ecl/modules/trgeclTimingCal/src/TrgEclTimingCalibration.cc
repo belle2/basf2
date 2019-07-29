@@ -34,9 +34,6 @@ TRGECLTimingCalModule::TRGECLTimingCalModule() : Module()
   addParam("TRGECLCal3DBhabhaVeto", f3Dbhabha_veto,
            "0 : Not using 3D bhabha veto bit  1 : Using 3D bhabha veto bit ", 1);
 
-  addParam("TRGECLCalClusterEnergy", ClusterEnergy,
-           "Energy cut for each cluster (GeV), default : 3 GeV", 3.0);
-
   addParam("TRGECLCalTCRef", TC_ref,
            "Reference TCID. Default setting : 184", 184);
 
@@ -84,19 +81,23 @@ void TRGECLTimingCalModule::initialize()
   StoreArray<TRGECLHit> TCHit;
   StoreArray<TRGECLUnpackerStore> TCHitUnpacker;
   StoreArray<TRGECLUnpackerEvtStore> TRGECLEvtStore;
+  StoreArray<TRGECLTrg> TRGECLTrg;
   //StoreArray<TRGECLCluster> TCCluster;
 
   if (fSimulation == 1) {
     TCHit.isRequired();
+    if (f3Dbhabha_veto == 1) {
+      TRGECLTrg.isRequired();
+    }
     //StoreArray<TRGECLHit>::registerPersistent();
   } else if (fSimulation == 0) {
     TCHitUnpacker.isRequired();
+    if (f3Dbhabha_veto == 1) {
+      TRGECLEvtStore.isRequired();
+    }
     //StoreArray<TRGECLUnpackerStore>::registerPersistent();
   }
 
-  if (f3Dbhabha_veto == 1) {
-    TRGECLEvtStore.isRequired();
-  }
   InitParams();
 }
 
@@ -125,41 +126,39 @@ void TRGECLTimingCalModule::event()
   nevt_read++;
 
   if (f3Dbhabha_veto == 1) {
-    StoreArray<TRGECLUnpackerEvtStore> TRGECLEvtStore;
-    int nEvtStore = TRGECLEvtStore.getEntries();
-    if (nEvtStore <= 0) return;
-    if (TRGECLEvtStore[0] -> getCheckSum() != 0) return;
-    if (TRGECLEvtStore[0] -> get3DBhabhaV() != 1)  return;
+    if (fSimulation == 0) {
+      StoreArray<TRGECLUnpackerEvtStore> TRGECLEvtStore;
+      int nEvtStore = TRGECLEvtStore.getEntries();
+      if (nEvtStore <= 0) return;
+      if (TRGECLEvtStore[0] -> getCheckSum() != 0) return;
+      if (TRGECLEvtStore[0] -> get3DBhabhaV() != 1)  return;
+    }
+
+    if (fSimulation == 1) {
+      StoreArray<TRGECLTrg> TRGECLTrg;
+      int nEvtStore = TRGECLTrg.getEntries();
+      if (nEvtStore <= 0) return;
+      if (TRGECLTrg[0] -> get3DBhabha() != 1) return;
+    }
   }
   TRGECLTimingCalClear();
 
-  ReadData();
-  // Cluster analysis for Bhabha or gamma gamma
-  /*
-  if (fCluster == 1){
-    Set_Cluster();
-    const int icn = Cluster_maxtcid.size();
-    if (icn <= 1) return;
-    if (icn != ICN) return;
-    int flag_cecut = 0;
-    for (int i = 0; i < icn; i++){
-      if (Cluster_energy[i] < ClusterEnergy) flag_cecut = 1;
-    }
-    if (flag_cecut == 1) return;
-  }
-  */
-  FillMatrix();
-  nevt_selected++;
+  if (ReadData() == 0) return;
+  if (FillMatrix() == 1)
+    nevt_selected++;
+
+  return;
 }
 
-void TRGECLTimingCalModule::ReadData()
+// 0: Skip this event  1: Use this event
+int TRGECLTimingCalModule::ReadData()
 {
 
   int ntc;
   if (fSimulation == 1) { // Simulation data : TRGECLHit table
     StoreArray<TRGECLHit> TCHit;
     ntc = TCHit.getEntries();
-    if (ntc < 2 || ntc > cut_ntc) return;  // ntc cut
+    if (ntc < 2 || ntc > cut_ntc) return 0;  // ntc cut
     for (int itc = 0; itc < ntc; itc++) {
       TCId.push_back(TCHit[itc]->getTCId());
       TCEnergy.push_back(TCHit[itc]->getEnergyDep());
@@ -168,20 +167,22 @@ void TRGECLTimingCalModule::ReadData()
   } else {              // Raw data : TRGECLUnpackerStore table
     StoreArray<TRGECLUnpackerStore> TCHit;
     ntc = TCHit.getEntries();
-    if (ntc < 2 || ntc > cut_ntc) return;   // ntc cut
+    if (ntc < 2 || ntc > cut_ntc) return 0;   // ntc cut
     for (int itc = 0; itc < ntc; itc++) {
-      if (TCHit[itc] -> getChecksum() != 0) return;
+      if (TCHit[itc] -> getChecksum() != 0) return 0;
       if (!(TCHit[itc] -> getHitWin() == 3 || TCHit[itc] -> getHitWin() == 4)) continue;
       TCId.push_back(TCHit[itc]->getTCId());
       TCEnergy.push_back((double) TCHit[itc]->getTCEnergy() * TCEnergyCalibrationConstant);
       TCTiming.push_back((double) TCHit[itc]->getTCTime());
     }
   }
+  return 1;
 }
 
-
-void TRGECLTimingCalModule::FillMatrix()
+// 0: Skip this event  1: Use this event
+int TRGECLTimingCalModule::FillMatrix()
 {
+  int flag_event_used = 0;
   int ntc = TCId.size();
 
   for (int itc1 = 0; itc1 < ntc; itc1++) {
@@ -237,10 +238,12 @@ void TRGECLTimingCalModule::FillMatrix()
 
       Nevent_TC[m_TCID1]++;
       Nevent_TC[m_TCID2]++;
+      flag_event_used = 1;
       if (b_Inc_TC[m_TCID2] == false) {b_Inc_TC[m_TCID2] = true;}
     }// for itc2
     if (b_Inc_TC[m_TCID1] == false) {b_Inc_TC[m_TCID1] = true;}
   }// for itc1
+  return flag_event_used;
 }
 
 int TRGECLTimingCalModule::Solve_Matrix()
@@ -269,7 +272,10 @@ int TRGECLTimingCalModule::Solve_Matrix()
     }
   }
 
-  // (A^T * A)^-1_ii : error of t_i
+  //     error calculation
+  //**** Not supported yet ***********//
+
+  // (A^T * A)^-1_ii : error^2 of t_i
   //TMatrixDSym mat_offset_err(mat_A);
   //TMatrixDSym mat_offset_errT = mat_offset_err.Transpose();
   //mat_offset_err.ResizeTo(576,576,0.0);
@@ -406,6 +412,8 @@ void TRGECLTimingCalModule::Save_Result()
   tr -> Branch("ChisqComponent1", &Chisq1);
   tr -> Branch("ChisqComponent2", &Chisq2);
   tr -> Branch("ChisqComponent3", &Chisq3);
+  tr -> Branch("NeventRead", &nevt_read);
+  tr -> Branch("NeventUsed", &nevt_selected);
   for (int i = 0; i < 576; i++) {
     TCID[i] = i + 1;
     time_offset[i] = tcal_result[i];

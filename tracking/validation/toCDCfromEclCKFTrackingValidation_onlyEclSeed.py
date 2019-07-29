@@ -27,7 +27,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
-    root_input_file = 'EvtGenSimNoBkg.root'
+    root_input_file = '../EvtGenSimNoBkg.root'
 
     @staticmethod
     def finder_module(path):

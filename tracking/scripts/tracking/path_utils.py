@@ -365,9 +365,7 @@ def add_svd_track_finding(
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False,
-                          temp1_reco_tracks="CDCseedRecoTracks", temp2_reco_tracks="ECLseedRecoTracks",
-                          use_ecl_to_cdc_ckf=False, use_cdc_quality_estimator=False,
-                          cdc_quality_estimator_weightfile=None):
+                          use_cdc_quality_estimator=False, cdc_quality_estimator_weightfile=None):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -378,7 +376,6 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
-    :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     :param use_cdc_quality_estimator: Add the TFCDC_TrackQualityEstimator to set the CDC quality
            indicator for the ``output_reco_tracks``
     :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
@@ -455,49 +452,10 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
             # Set a custom weight file identifier/path instead of default
             cdc_qe_module.param("filterParameters", {"identifier": cdc_quality_estimator_weightfile})
 
-    if use_ecl_to_cdc_ckf:
-        cdcseed_reco_tracks = temp1_reco_tracks
-    else:
-        cdcseed_reco_tracks = output_reco_tracks
-
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
                     inputTracks=output_tracks,
-                    RecoTracksStoreArrayName=cdcseed_reco_tracks)
-
-    # Reconstruct tracks using ECL showers as seeds
-    if use_ecl_to_cdc_ckf:
-        path.add_module("ToCDCFromEclCKF",
-                        inputWireHits="CDCWireHitVector",
-                        minimalEnRequirementCluster=0.3,
-                        eclSeedRecoTrackStoreArrayName='EclSeedRecoTracks',
-                        hitFindingDirection="backward",
-                        outputRecoTrackStoreArrayName="CDCRecoTracksFromEcl",
-                        outputRelationRecoTrackStoreArrayName="EclSeedRecoTracks",
-                        writeOutDirection="forward",
-                        stateBasicFilterParameters={"maximalHitDistance": 7.5, "maximalHitDistanceEclSeed": 75.0},
-                        pathFilter="arc_length_fromEcl",
-                        inputECLshowersStoreArrayName="ECLShowers",
-                        trackFindingDirection="backward",
-                        setTakenFlag=False
-                        )
-
-        path.add_module("ToCDCCKF",
-                        inputWireHits="CDCWireHitVector",
-                        inputRecoTrackStoreArrayName="CDCRecoTracksFromEcl",
-                        relatedRecoTrackStoreArrayName=temp2_reco_tracks,
-                        relationCheckForDirection="backward",
-                        outputRecoTrackStoreArrayName=temp2_reco_tracks,
-                        outputRelationRecoTrackStoreArrayName="CDCRecoTracksFromEcl",
-                        writeOutDirection="backward",
-                        stateBasicFilterParameters={"maximalHitDistance": 0.75},
-                        pathFilter="arc_length"
-                        )
-
-        path.add_module("TracksCombiner",
-                        Temp1RecoTracksStoreArrayName=temp1_reco_tracks,
-                        Temp2RecoTracksStoreArrayName=temp2_reco_tracks,
-                        recoTracksStoreArrayName=output_reco_tracks)
+                    RecoTracksStoreArrayName=output_reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",
@@ -509,6 +467,84 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
 
     # prepare mdst event level info
     path.add_module("CDCTrackingEventLevelMdstInfoFiller")
+
+
+def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", prune_temporary_tracks=True):
+    """
+    Convenience function for adding all track finder modules to the path that are based on ecl seeds.
+
+    The result is a StoreArray with name @param reco_tracks full of RecoTracks.
+    Use the GenfitTrackCandidatesCreator Module to convert back.
+
+    :param path: basf2 path
+    :param components: the list of geometry components in use or None for all components.
+    :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
+    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    """
+    if not is_cdc_used(components) or not is_ecl_used(components):
+        return
+
+    ecl_cdc_reco_tracks = "ECLCDCRecoTracks"
+
+    if not is_svd_used(components):
+        ecl_cdc_reco_tracks = output_reco_tracks
+
+    # collections that will be pruned
+    temporary_reco_track_list = []
+
+    path.add_module("ToCDCFromEclCKF",
+                    inputWireHits="CDCWireHitVector",
+                    minimalEnRequirementCluster=0.3,
+                    eclSeedRecoTrackStoreArrayName='EclSeedRecoTracks',
+                    hitFindingDirection="backward",
+                    outputRecoTrackStoreArrayName="CDCRecoTracksFromEcl",
+                    outputRelationRecoTrackStoreArrayName="EclSeedRecoTracks",
+                    writeOutDirection="forward",
+                    stateBasicFilterParameters={"maximalHitDistance": 7.5, "maximalHitDistanceEclSeed": 75.0},
+                    pathFilter="arc_length_fromEcl",
+                    inputECLshowersStoreArrayName="ECLShowers",
+                    trackFindingDirection="backward",
+                    setTakenFlag=False
+                    )
+
+    path.add_module("ToCDCCKF",
+                    inputWireHits="CDCWireHitVector",
+                    inputRecoTrackStoreArrayName="CDCRecoTracksFromEcl",
+                    relatedRecoTrackStoreArrayName=ecl_cdc_reco_tracks,
+                    relationCheckForDirection="backward",
+                    outputRecoTrackStoreArrayName=ecl_cdc_reco_tracks,
+                    outputRelationRecoTrackStoreArrayName="CDCRecoTracksFromEcl",
+                    writeOutDirection="backward",
+                    stateBasicFilterParameters={"maximalHitDistance": 0.75},
+                    pathFilter="arc_length"
+                    )
+    # EclSeedRecoTracks don't have to be added to the list as these do not contain any hits
+    temporary_reco_track_list.append('CDCRecoTracksFromEcl')
+
+    # Correct time seed (only necessary for the CDC tracks)
+    # path.add_module("IPTrackTimeEstimator",
+    #                useFittedInformation=False,
+    #                recoTracksStoreArrayName=ecl_cdc_reco_tracks)
+
+    # run fast t0 estimation from CDC hits only
+    # path.add_module("CDCHitBasedT0Extraction")
+
+    # prepare mdst event level info
+    # path.add_module("CDCTrackingEventLevelMdstInfoFiller")
+
+    if is_svd_used(components):
+        add_svd_track_finding(path, components=components, input_reco_tracks=ecl_cdc_reco_tracks,
+                              output_reco_tracks=output_reco_tracks, use_mc_truth=False,
+                              svd_ckf_mode="only_ckf", add_both_directions=False,
+                              temporary_reco_tracks="ECLSVDRecoTracks", use_svd_to_cdc_ckf=False,
+                              prune_temporary_tracks=prune_temporary_tracks)
+        temporary_reco_track_list.append(ecl_cdc_reco_tracks)
+        temporary_reco_track_list.append('ECLSVDRecoTracks')
+
+    if prune_temporary_tracks:
+        for temporary_reco_track_name in temporary_reco_track_list:
+            if temporary_reco_track_name != output_reco_tracks:
+                path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
 
 
 def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_point=(0, 0, 0), merge_tracks=True,
@@ -854,3 +890,8 @@ def is_pxd_used(components):
 def is_cdc_used(components):
     """Return true, if the CDC is present in the components list"""
     return components is None or 'CDC' in components
+
+
+def is_ecl_used(components):
+    """Return true, if the ECL is present in the components list"""
+    return components is None or 'ECL' in components

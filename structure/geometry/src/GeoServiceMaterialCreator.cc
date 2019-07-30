@@ -268,7 +268,6 @@ namespace Belle2 {
             }
           }
         }
-
         //      Create Service Materials in the gap between TOP and ECL.
         if (materialID >= 3 && materialID < 5) {
           int blockid = 0;

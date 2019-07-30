@@ -21,8 +21,8 @@
 #include <iostream>
 
 #include <bklm/dbobjects/BKLMADCThreshold.h>
-#include <bklm/dbobjects/BKLMElectronicMapping.h>
-#include <framework/database/DBImportArray.h>
+#include <bklm/dbobjects/BKLMElectronicsMap.h>
+#include <framework/database/DBImportObjPtr.h>
 
 namespace Belle2 {
 
@@ -63,11 +63,6 @@ namespace Belle2 {
      * Import BKLM electronics mapping in the database.
      */
     void importBklmElectronicMapping();
-
-    /**
-     * Export BKLM electronics mapping from the database.
-     */
-    void exportBklmElectronicMapping();
 
     //! Import BKLM geometry parameters into the database
     void importBklmGeometryPar();
@@ -120,8 +115,10 @@ namespace Belle2 {
   private:
 
     /** Electronics mapping. */
-    DBImportArray<BKLMElectronicMapping> m_bklmMapping;
+    std::vector< std::pair<uint16_t, BKLMElectronicsChannel> > m_ElectronicsChannels;
 
-    ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */
+    /** Class version. */
+    ClassDef(BKLMDatabaseImporter, 1);
+
   };
 }

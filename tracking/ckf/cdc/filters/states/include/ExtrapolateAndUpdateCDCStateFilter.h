@@ -38,8 +38,5 @@ namespace Belle2 {
 
     /// Kalman filter updater
     KalmanStepper<1> m_updater;
-
-    /// Parameter for the distance given to the framework
-    std::string m_param_directionAsString = "forward";
   };
 }

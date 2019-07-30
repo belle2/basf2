@@ -54,7 +54,7 @@ class toCDCCKF(TrackingValidationRun):
                         outputRelationRecoTrackStoreArrayName="RecoTracksSVD",
                         writeOutDirection="backward",
                         stateBasicFilterParameters={"maximalHitDistance": 0.75},
-                        stateExtrapolationFilterParameters={"extrapolationDirection": "forward"},
+                        stateExtrapolationFilterParameters={"direction": "forward"},
                         pathFilter="arc_length")
 
         path.add_module("RelatedTracksCombiner",

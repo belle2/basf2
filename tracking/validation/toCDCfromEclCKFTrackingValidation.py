@@ -65,7 +65,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         # stateBasicFilterParameters={"maximalHitDistance": 7.5, "maximalHitDistanceEclSeed": 75.0,
                         #                             "returnWeight": 1.},
                         # stateBasicFilterParameters={"returnWeight": 1.},
-                        stateExtrapolationFilterParameters={"extrapolationDirection": "backward"},
+                        stateExtrapolationFilterParameters={"direction": "backward"},
                         pathFilter="arc_length_fromEcl",
                         inputECLshowersStoreArrayName="ECLShowers",
                         trackFindingDirection="backward",
@@ -83,6 +83,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         writeOutDirection="backward",
                         stateBasicFilterParameters={"maximalHitDistance": 0.75},
                         # stateBasicFilterParameters={"maximalHitDistance": 0.75, "returnWeight": 1.},
+                        stateExtrapolationFilterParameters={"direction": "forward"},
                         pathFilter="arc_length",
                         # filter="size_and_recording",
                         # filterParameters={"returnWeight": 1.}

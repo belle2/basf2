@@ -351,6 +351,7 @@ def add_svd_track_finding(
                         outputRelationRecoTrackStoreArrayName=comb_tracks,
                         writeOutDirection="backward",
                         stateBasicFilterParameters={"maximalHitDistance": 0.15},
+                        stateExtrapolationFilterParameters={"direction": "forward"},
                         pathFilter="arc_length",
                         maximalLayerJump=4)
 
@@ -501,6 +502,7 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
                     outputRelationRecoTrackStoreArrayName="EclSeedRecoTracks",
                     writeOutDirection="forward",
                     stateBasicFilterParameters={"maximalHitDistance": 7.5, "maximalHitDistanceEclSeed": 75.0},
+                    stateExtrapolationFilterParameters={"direction": "backward"},
                     pathFilter="arc_length_fromEcl",
                     inputECLshowersStoreArrayName="ECLShowers",
                     trackFindingDirection="backward",
@@ -516,6 +518,7 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
                     outputRelationRecoTrackStoreArrayName="CDCRecoTracksFromEcl",
                     writeOutDirection="backward",
                     stateBasicFilterParameters={"maximalHitDistance": 0.75},
+                    stateExtrapolationFilterParameters={"direction": "forward"},
                     pathFilter="arc_length"
                     )
     # "EclSeedRecoTracks" don't have to be added to the list as these do not contain any hits

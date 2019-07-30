@@ -32,7 +32,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
         reverse_seed = False
 
     path.add_module("CDCToSVDSeedCKF",
-                    # advanceHighFilterParameters={"direction": direction},
+                    advanceHighFilterParameters={"direction": direction},
 
                     fromRelationStoreArrayName=cdc_reco_tracks,
                     toRelationStoreArrayName=svd_reco_tracks,
@@ -131,7 +131,7 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loos
         module_parameters["onlyUseTracksWithSVD"] = False
 
     path.add_module("ToPXDCKF",
-                    # advanceHighFilterParameters={"direction": direction},
+                    advanceHighFilterParameters={"direction": direction},
 
                     writeOutDirection=direction,
 
@@ -218,7 +218,7 @@ def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=F
                     outputRelationRecoTrackStoreArrayName=cdc_reco_tracks,
                     relatedRecoTrackStoreArrayName=svd_reco_tracks,
 
-                    # advanceHighFilterParameters={"direction": direction},
+                    advanceHighFilterParameters={"direction": direction},
                     reverseSeed=reverse_seed,
 
                     writeOutDirection=direction,

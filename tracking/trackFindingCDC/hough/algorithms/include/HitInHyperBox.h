@@ -64,11 +64,10 @@ namespace Belle2 {
         const double perpS = recoHit.getArcLength2D();
         const double recoZ = recoHit.getRecoZ();
 
-        const double deltaZ = catZ(centerP, lowerQ, perpS) + centerZ0 - recoZ;
         const bool sameSign = SameSignChecker::sameSign(catZ(centerP, lowerQ, perpS) + centerZ0 - 100.0 * deltaQ - recoZ,
                                                         catZ(centerP, upperQ, perpS) + centerZ0 + 100.0 * deltaQ - recoZ); //100 is a reference - size of CDC in cm
         if (not sameSign) {
-          return 1.0 + 1.0 * std::exp(-deltaZ * deltaZ / (0.33 * 0.33 * deltaQ * deltaQ));
+          return 1.0;
         } else {
           return NAN;
         }

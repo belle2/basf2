@@ -5,9 +5,10 @@
 #
 # checks SVD CoG Calibration stored in a localDB
 #
-# usage: basf2 SVDCoGTimeCalibrationCheck -i input_root_file localDB
+# usage: basf2 SVDCoGTimeCalibrationCheck  localDB input_root_file/file_list
 # localDB = name of the local DB folder
-# filename = single root file with SVDShaperDigitsFromTracks and EventT0
+# input_root_file = single root file with SVDShaperDigitsFromTracks and EventT0
+# file_list = text file with a list of rootfiles, one per line
 #
 #################################################################################
 
@@ -28,6 +29,7 @@ import matplotlib.pyplot as plt
 import simulation
 
 localdb = sys.argv[1]
+filename = sys.argv[2]
 branches = ['SVDShaperDigits', 'SVDShaperDigitsFromTracks', 'EventT0']
 
 trk_outputFile = "TrackFilterControlNtuples_" + localdb + ".root"
@@ -36,18 +38,19 @@ nCDC = 1
 pVal = 0.0  # 0001
 
 
-inputFileList = [
-    "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
-e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"
-]
+# inputFileList = [
+#    "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
+# e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"
+# ]
 
-'''
+inputFileList = []
+
 if filename.rfind(".root") != -1:
     inputFileList.append(filename)
 else:
     with open(filename, 'r') as f:
         inputFileList = [line.strip() for line in f]
-'''
+
 
 # reset_database()
 use_database_chain()

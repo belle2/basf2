@@ -40,36 +40,32 @@ gROOT.SetBatch(True)
 
 class SVDCoGTimeCalibrationCheckModule(basf2.Module):
 
-    def fillLists(self, svdRecoDigits_rel_Clusters, svdClusters_rel_RecoTracks_cl):
+    def fillLists(self, svdRecoDigitsFromTracks, svdClustersFromTracks):
 
-        timeCluster = svdClusters_rel_RecoTracks_cl.getClsTime()
-        snrCluster = svdClusters_rel_RecoTracks_cl.getSNR()
-        layerCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getLayerNumber()
+        timeCluster = svdClustersFromTracks.getClsTime()
+        snrCluster = svdClustersFromTracks.getSNR()
+        layerCluster = svdClustersFromTracks.getSensorID().getLayerNumber()
         layerIndex = layerCluster - 3
-        sensorCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getSensorNumber()
+        sensorCluster = svdClustersFromTracks.getSensorID().getSensorNumber()
         sensorIndex = sensorCluster - 1
-        ladderCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getLadderNumber()
+        ladderCluster = svdClustersFromTracks.getSensorID().getLadderNumber()
         ladderIndex = ladderCluster - 1
-        sideCluster = svdClusters_rel_RecoTracks_cl.isUCluster()
+        sideCluster = svdClustersFromTracks.isUCluster()
         if sideCluster:
             sideIndex = 1
         else:
             sideIndex = 0
 
         hasTimezero = self.cdcEventT0.hasEventT0()
-        # print("Time: " + str(hasTimezero))
         if hasTimezero:
-            TBClusters = svdRecoDigits_rel_Clusters.getModeByte().getTriggerBin()
+            TBClusters = svdRecoDigitsFromTracks.getModeByte().getTriggerBin()
             TBIndex = ord(TBClusters)
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
-            tZero_err = 5.1
+            # tZero_err = 5.1
             tZeroSync = tZero - 7.8625 * (3 - TBIndex)
-            et0 = self.EventT0Hist
-            et0.Fill(tZeroSync)
-            # print(str(tZero_err))
 
-            # print(self.resList[sideIndex])
+            # filling histograms
             resHist = self.resList[layerIndex][ladderIndex][sensorIndex][sideIndex]
             resHist.Fill(timeCluster - tZeroSync)
             spHist = self.spList[layerIndex][ladderIndex][sensorIndex][sideIndex]
@@ -80,24 +76,6 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             cdcHist.Fill(tZeroSync)
             snrHist = self.snrList[layerIndex][ladderIndex][sensorIndex][sideIndex]
             snrHist.Fill(snrCluster)
-
-            self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex] += 1
-
-            self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex] += timeCluster
-            self.sumCOGList2[layerIndex][ladderIndex][sensorIndex][sideIndex] += timeCluster * timeCluster
-            self.sumCOGList3[layerIndex][ladderIndex][sensorIndex][sideIndex] += timeCluster * timeCluster * timeCluster
-            self.sumCOGList4[layerIndex][ladderIndex][sensorIndex][sideIndex] += timeCluster * \
-                timeCluster * timeCluster * timeCluster
-            self.sumCOGList5[layerIndex][ladderIndex][sensorIndex][sideIndex] += timeCluster * \
-                timeCluster * timeCluster * timeCluster * timeCluster
-            self.sumCOGList6[layerIndex][ladderIndex][sensorIndex][sideIndex] += timeCluster * \
-                timeCluster * timeCluster * timeCluster * timeCluster * timeCluster
-
-            self.sumCDCList[layerIndex][ladderIndex][sensorIndex][sideIndex] += tZeroSync
-            self.sumCDCCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex] += tZeroSync * timeCluster
-            self.sumCDCCOGList2[layerIndex][ladderIndex][sensorIndex][sideIndex] += tZeroSync * timeCluster * timeCluster
-            self.sumCDCCOGList3[layerIndex][ladderIndex][sensorIndex][sideIndex] += tZeroSync * \
-                timeCluster * timeCluster * timeCluster
 
             self.NTOT = self.NTOT + 1
 
@@ -113,20 +91,6 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         self.cdcList = []
         self.snrList = []
 
-        self.nList = []
-
-        self.sumCOGList = []
-        self.sumCOGList2 = []
-        self.sumCOGList3 = []
-        self.sumCOGList4 = []
-        self.sumCOGList5 = []
-        self.sumCOGList6 = []
-
-        self.sumCDCList = []
-        self.sumCDCCOGList = []
-        self.sumCDCCOGList2 = []
-        self.sumCDCCOGList3 = []
-
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
         self.Evt = 0
@@ -136,20 +100,6 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             layerList2 = []
             layerList3 = []
             layerList4 = []
-            layerList5 = []
-            layerList6 = []
-            layerList7 = []
-            layerList8 = []
-
-            layerList9 = []
-            layerList10 = []
-            layerList11 = []
-            layerList12 = []
-            layerList13 = []
-            layerList14 = []
-            layerList15 = []
-            layerList16 = []
-            layerList17 = []
 
             self.resList.append(layerList0)
             self.spList.append(layerList1)
@@ -157,123 +107,32 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             self.cdcList.append(layerList3)
             self.snrList.append(layerList4)
 
-            self.nList.append(layerList8)
-            self.sumCOGList.append(layerList7)
-            self.sumCOGList2.append(layerList9)
-            self.sumCOGList3.append(layerList10)
-            self.sumCOGList4.append(layerList11)
-            self.sumCOGList5.append(layerList12)
-            self.sumCOGList6.append(layerList13)
-
-            self.sumCDCList.append(layerList14)
-            self.sumCDCCOGList.append(layerList15)
-            self.sumCDCCOGList2.append(layerList16)
-            self.sumCDCCOGList3.append(layerList17)
-
-            # layerNumber = layer.getLayerNumber()
             for ladder in geoCache.getLadders(layer):
                 ladderList0 = []
                 ladderList1 = []
                 ladderList2 = []
                 ladderList3 = []
                 ladderList4 = []
-                ladderList5 = []
-                ladderList6 = []
-                ladderList7 = []
-                ladderList8 = []
-
-                ladderList9 = []
-                ladderList10 = []
-                ladderList11 = []
-                ladderList12 = []
-                ladderList13 = []
-                ladderList14 = []
-                ladderList15 = []
-                ladderList16 = []
-                ladderList17 = []
 
                 layerList0.append(ladderList0)
                 layerList1.append(ladderList1)
                 layerList2.append(ladderList2)
                 layerList3.append(ladderList3)
                 layerList4.append(ladderList4)
-                layerList5.append(ladderList5)
-                layerList6.append(ladderList6)
-                layerList7.append(ladderList7)
-                layerList8.append(ladderList8)
 
-                layerList9.append(ladderList9)
-                layerList10.append(ladderList10)
-                layerList11.append(ladderList11)
-                layerList12.append(ladderList12)
-                layerList13.append(ladderList13)
-                layerList14.append(ladderList14)
-                layerList15.append(ladderList15)
-                layerList16.append(ladderList16)
-                layerList17.append(ladderList17)
-                # ladderNumber = ladder.getLadderNumber()
                 for sensor in geoCache.getSensors(ladder):
                     sensorList0 = []
                     sensorList1 = []
                     sensorList2 = []
                     sensorList3 = []
                     sensorList4 = []
-                    sensorList5 = []
-                    sensorList6 = []
-                    sensorList7 = []
-                    sensorList8 = []
-
-                    sensorList9 = []
-                    sensorList10 = []
-                    sensorList11 = []
-                    sensorList12 = []
-                    sensorList13 = []
-                    sensorList14 = []
-                    sensorList15 = []
-                    sensorList16 = []
-                    sensorList17 = []
 
                     ladderList0.append(sensorList0)
                     ladderList1.append(sensorList1)
                     ladderList2.append(sensorList2)
                     ladderList3.append(sensorList3)
                     ladderList4.append(sensorList4)
-                    ladderList5.append(sensorList5)
-                    ladderList6.append(sensorList6)
-                    ladderList7.append(sensorList7)
-                    ladderList8.append(sensorList8)
 
-                    ladderList9.append(sensorList9)
-                    ladderList10.append(sensorList10)
-                    ladderList11.append(sensorList11)
-                    ladderList12.append(sensorList12)
-                    ladderList13.append(sensorList13)
-                    ladderList14.append(sensorList14)
-                    ladderList15.append(sensorList15)
-                    ladderList16.append(sensorList16)
-                    ladderList17.append(sensorList17)
-                    # sensorNumber = sensor.getSensorNumber()
-                    '''
-                    for side in range(2):
-                        sideList0 = []
-                        sideList1 = []
-                        sideList2 = []
-                        sideList3 = []
-                        sideList4 = []
-                        sideList5 = []
-                        sideList6 = []
-                        sideList7 = []
-                        sideList8 = []
-                        sensorList0.append(sideList0)
-                        sensorList1.append(sideList1)
-                        sensorList2.append(sideList2)
-                        sensorList3.append(sideList3)
-                        sensorList4.append(sideList4)
-                        sensorList5.append(sideList5)
-                        sensorList6.append(sideList6)
-                        sensorList7.append(sideList7)
-                        sensorList8.append(sideList8)
-                     '''
         for i in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
             layerN = i.getLayerNumber()
             li = layerN - 3
@@ -294,19 +153,12 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                             TH1F("cdc" + "_" + str(k) + "." + str(s), " ", 200, -100, 100))
                         self.snrList[li][ldi][si].append(
                             TH1F("snr" + "_" + str(k) + "." + str(s), " ", 100, 0, 100))
-                        self.nList[li][ldi][si].append(0)
-                        self.sumCOGList[li][ldi][si].append(0)
-                        self.sumCOGList2[li][ldi][si].append(0)
-                        self.sumCOGList3[li][ldi][si].append(0)
-                        self.sumCOGList4[li][ldi][si].append(0)
-                        self.sumCOGList5[li][ldi][si].append(0)
-                        self.sumCOGList6[li][ldi][si].append(0)
-                        self.sumCDCList[li][ldi][si].append(0)
-                        self.sumCDCCOGList[li][ldi][si].append(0)
-                        self.sumCDCCOGList2[li][ldi][si].append(0)
-                        self.sumCDCCOGList3[li][ldi][si].append(0)
 
-        self.EventT0Hist = TH1F("EventT0", " ", 200, -100, 100)
+        self.EventT0Hist = TH1F("EventT0", " ", 160, -40, 40)
+        self.alphaU = TH1F("alphaU", "first order coefficient ~ U side", 100, 0, 2)
+        self.alphaV = TH1F("alphaV", "first order coefficient ~ V side", 100, 0, 2)
+        self.betaU = TH1F("betaU", "beta - EventT0Sync average ~ U side", 100, -5, 5)
+        self.betaV = TH1F("betaV", "beta - EventT0Sync average ~ V side", 100, -5, 5)
 
         self.gaus = TF1("gaus", 'gaus(0)', -150, 100)
         self.pol1 = TF1("pol1", "[0] + [1]*x", -150, 150)
@@ -314,6 +166,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         self.NTOT = 0
 
     def event(self):
+
         timeClusterU = 0
         timeClusterV = 0
         sideIndex = 0
@@ -321,7 +174,13 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         TBIndexV = 0
         self.Evt = self.Evt + 1
 
+        # fill EventT0 histogram
         self.cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
+        if self.cdcEventT0.hasEventT0():
+            et0 = self.EventT0Hist
+            et0.Fill(self.cdcEventT0.getEventT0())
+
+        # fill plots
         svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
         svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
 
@@ -349,20 +208,24 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                     sensorNumber = sensor.getSensorNumber()
                     si = sensorNumber - 1
                     for side in range(2):
+
                         # Resolution distribution Histograms with Gaussian Fit
                         res = self.resList[li][ldi][si][side]
-                        fitResult = int(TFitResultPtr(res.Fit(self.gaus, "R")))
-
+                        res.GetXaxis().SetTitle("cluster time - Synchronized EventT0 (ns)")
+                        # fitResult = int(TFitResultPtr(res.Fit(self.gaus, "R")))
                         res.Write()
                         # COG Distribution Histograms
                         cog = self.cogList[li][ldi][si][side]
+                        cog.GetXaxis().SetTitle("cluster time (ns)")
                         cog.Write()
                         # CDC EventT0 Distribution Histograms
                         cdc = self.cdcList[li][ldi][si][side]
+                        cdc.GetXaxis().SetTitle("Synchronized EventT0 (ns)")
                         cdc.Write()
                         # SNR Distribution Histograms
                         snr = self.snrList[li][ldi][si][side]
                         snrMean = snr.GetMean()
+                        snr.GetXaxis().SetTitle("cluster SNR")
                         snr.Write()
                         # ScatterPlot Histograms with Linear Fit
                         sp = self.spList[li][ldi][si][side]
@@ -370,25 +233,24 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                         pfxsp = sp.ProfileX()
                         self.pol1.SetParameters(0, 1)
                         pfxsp.Fit(self.pol1, "R")
+                        sp.GetXaxis().SetTitle("cluster time (ns)")
+                        sp.GetYaxis().SetTitle("synchronized EventT0 (ns)")
                         sp.Write()
                         pfxsp.Write()
 
-                        if sp.GetRMS() != 0:
-                            m = sp.GetCovariance() / pow(sp.GetRMS(1), 2)
-                            # m = sp.GetCovariance()/cog.GetRMS()
-                            m_err = 2 / pow(sp.GetRMS(), 3) * sp.GetRMSError() * sp.GetCovariance()
-                            q = sp.GetMean(2) - m * sp.GetMean(1)
-                            q_err = math.sqrt(pow(sp.GetMeanError(2), 2) +
-                                              pow(m * sp.GetMeanError(1), 2) + pow(m_err * sp.GetMean(1), 2))
+                        if side is 1:
+                            self.alphaU.Fill(self.pol1.GetParameter(1))
+                            self.betaU.Fill(self.pol1.GetParameter(0) - cdc.GetMean())
                         else:
-                            m = 1
-                            m_err = 0
-                            q = 0
-                            q_err = 0
+                            self.alphaV.Fill(self.pol1.GetParameter(1))
+                            self.betaV.Fill(self.pol1.GetParameter(0) - cdc.GetMean())
 
             gDirectory.cd("../")
 
         gDirectory.cd("../")
         self.EventT0Hist.Write()
-
+        self.alphaU.Write()
+        self.alphaV.Write()
+        self.betaU.Write()
+        self.betaV.Write()
         tfile.Close()

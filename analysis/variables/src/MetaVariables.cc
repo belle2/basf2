@@ -2139,10 +2139,10 @@ Returns the value of ``variable`` in the *lab* frame.
 
 .. tip::
     The lab frame is the default reference frame, usually you don't need to use this meta-variable. 
-    E.g. ``useLabFrame(E)    returns the energy of a particle in the Lab frame, same as just ``E``.
+    E.g. ``useLabFrame(E)`` returns the energy of a particle in the Lab frame, same as just ``E``.
 
 Specifying the lab frame is useful in some corner-cases. For example:
-``useRestFrame(daughter(0, formula(E - useLabFrame(E))))``` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame enerfy.
+``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
 )DOC");
     REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
                       "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
@@ -2189,7 +2189,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "particle of the reconstructed particle the function is applied to.\n"
                       "The meta variable can also be nested: mcMother(mcMother(PDG)).");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle, R"DOC(
-[Eventbased] Returns function which returns the variable for the ith generator particle.
+[Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
 and ``variable``, the name of the function or variable for that generator particle.
 If ``index`` goes beyond the length of the MCParticles array, -999 will be returned.
@@ -2200,7 +2200,7 @@ the Upsilon(4S) in a generic decay.
 the first MC Particle, which is the momentum of the second B meson in a generic decay.
 )DOC");
     REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
-[Eventbased] Returns function which returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
+[Eventbased] Returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
 If no generator level :math:`\Upsilon(4S)` exists for the event, -999 will be returned.
 
 E.g. ``genUpsilon4S(p)`` returns the total momentum of the :math:`\Upsilon(4S)` in a generic decay.

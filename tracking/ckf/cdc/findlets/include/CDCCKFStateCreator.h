@@ -11,10 +11,14 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/ckf/general/utilities/SearchDirection.h>
+
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
@@ -49,6 +53,8 @@ namespace Belle2 {
                                     m_maximalLayerJump, "Maximal jump over N layers", m_maximalLayerJump);
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalDeltaPhi"),
                                     m_maximalDeltaPhi, "Maximal distance in phi between wires for Z=0 plane", m_maximalDeltaPhi);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitFindingDirection"),
+                                    m_param_writeOutDirectionAsString, "Start from innermost/outermost CDC layers", m_param_writeOutDirectionAsString);
     }
 
     /// Clear the wireHit cache
@@ -56,6 +62,17 @@ namespace Belle2 {
     {
       Super::beginEvent();
       m_wireHitCache.clear();
+
+      // Determine direction of track building
+      m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
+
+      if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Forward) {
+        doForward = true;
+      } else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
+        doForward = false;
+      } else {
+        B2WARNING("CDCCKFStateCreator: No valid direction specified. Please use forward/backward.");
+      }
     }
 
     /// Main method of the findlet. Select + create states (output parameter nextStates) suitable for the input path, based on input wireHits
@@ -70,14 +87,59 @@ namespace Belle2 {
         const size_t nHits = wireHits.size();
         m_wireHitCache.reserve(nHits);
         for (auto  hitPtr : wireHits) {
-          m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().phi()});
+          // to speed things up, don't consider background/taken hits at all (and not just in the loop below)
+          if (hitPtr->getAutomatonCell().hasBackgroundFlag() || hitPtr->getAutomatonCell().hasTakenFlag()) {
+            m_wireHitCache.push_back(CDCCKFWireHitCache{99999, 0.});
+          } else {
+            m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().phi()});
+          }
         }
       }
 
       // Cache last-on-the-path state info too:
       const auto& lastState = path.back();
-      int lastICLayer =  lastState.isSeed() ? 0 : lastState.getWireHit()->getWire().getICLayer();
-      double lastPhi  =  lastState.isSeed() ? 0 : lastState.getWireHit()->getRefPos2D().phi();
+      double lastPhi = 0;
+      double lastICLayer = -1;
+      if (lastState.isSeed()) {
+        if (doForward) {
+          lastICLayer = 0;
+        } else {
+          const auto& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
+          const auto& wires = wireTopology.getWires();
+          const float maxForwardZ = wires.back().getForwardZ();     // 157.615
+          const float maxBackwardZ = wires.back().getBackwardZ();   // -72.0916
+
+          const TrackFindingCDC::Vector3D seedPos(lastState.getSeed()->getPositionSeed());
+          const float seedPosZ = seedPos.z();
+
+          if (seedPosZ < maxForwardZ && seedPosZ > maxBackwardZ) {
+            lastICLayer = 56;
+          } else {
+            // do straight extrapolation of seed momentum to CDC outer walls
+            TrackFindingCDC::Vector3D seedMomZOne(lastState.getSeed()->getMomentumSeed());
+            seedMomZOne = seedMomZOne / seedMomZOne.z();
+            // const float maxZ = seedPosZ > 0 ? maxForwardZ : maxBackwardZ;
+            // const TrackFindingCDC::Vector3D extrapolatedPos = seedPos - seedMom / seedMom.norm() * (seedPosZ - maxZ);
+
+            // find closest iCLayer
+            float minDist = 99999;
+            for (const auto& wire : wires) {
+              const float maxZ = seedPosZ > 0 ? wire.getForwardZ() : wire.getBackwardZ();
+              const TrackFindingCDC::Vector3D extrapolatedPos = seedPos - seedMomZOne * (seedPosZ - maxZ);
+
+              const auto distance = wire.getDistance(extrapolatedPos);
+              if (distance < minDist) {
+                minDist = distance;
+                lastICLayer = wire.getICLayer();
+              }
+            }
+            B2DEBUG(100, lastICLayer << " (d=" << minDist << ")");
+          }
+        }
+      } else {
+        lastPhi = lastState.getWireHit()->getRefPos2D().phi();
+        lastICLayer = lastState.getWireHit()->getWire().getICLayer();
+      }
 
       // Get sorted vector of wireHits on the path for faster search
       std::vector<const TrackFindingCDC::CDCWireHit*> wireHitsOnPath;
@@ -88,31 +150,31 @@ namespace Belle2 {
       }
       std::sort(wireHitsOnPath.begin(), wireHitsOnPath.end());
 
+      size_t nHits = wireHits.size();
+      for (size_t i = 0; i < nHits; i++) {
+        // adjust direction of loop (minimal speed gain)
+        int idx = doForward ? i : nHits - i - 1;
 
-      for (size_t i = 0; i < wireHits.size(); i++) {
-
-        const TrackFindingCDC::CDCWireHit* wireHit = wireHits[i];
-
-        if (wireHit->getAutomatonCell().hasBackgroundFlag()
-            || wireHit->getAutomatonCell().hasTakenFlag()) {
+        const auto iCLayer =  m_wireHitCache[idx].icLayer; // wireHit->getWire().getICLayer();
+        if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward && lastState.isSeed()) {
+          if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump_eclSeed) {
+            continue;
+          }
+        } else if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {
           continue;
         }
-
-        const auto iCLayer =  m_wireHitCache[i].icLayer; // wireHit->getWire().getICLayer();
-        if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {
-          continue;
-        }
-
-        if (std::binary_search(wireHitsOnPath.begin(), wireHitsOnPath.end(), wireHit)) {
-          continue;
-        }
-
 
         if (! lastState.isSeed()) {
-          double deltaPhi = TrackFindingCDC::AngleUtil::normalised(lastPhi - m_wireHitCache[i].phi);
+          double deltaPhi = TrackFindingCDC::AngleUtil::normalised(lastPhi - m_wireHitCache[idx].phi);
           if (fabs(deltaPhi)  > m_maximalDeltaPhi)  {
             continue;
           }
+        }
+
+        const TrackFindingCDC::CDCWireHit* wireHit = wireHits[idx];
+
+        if (std::binary_search(wireHitsOnPath.begin(), wireHitsOnPath.end(), wireHit)) {
+          continue;
         }
 
         nextStates.emplace_back(wireHit);
@@ -122,9 +184,19 @@ namespace Belle2 {
   private:
     /// Maximum allowed step over layers
     int m_maximalLayerJump = 2;
+    /// Maximum allowed step over layers
+    int m_maximalLayerJump_eclSeed = 3;
     /// Maximal distance in phi between the path last hit/seed and the candidate hit
     double m_maximalDeltaPhi =  TMath::Pi() / 8;
+    /// Parameter for the direction in which the tracks are built
+    std::string m_param_writeOutDirectionAsString = "forward";
+    /// Direction parameter converted from the string parameters
+    TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    /// Direction parameter converted to boolean for convenience
+    bool doForward = true;
+
     /// Cache to store frequently used information
     std::vector<CDCCKFWireHitCache> m_wireHitCache = {};
+
   };
 }

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Simon Kurz, Nils Braun                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,34 +12,16 @@
 #include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 
-#include <tracking/ckf/general/utilities/Advancer.h>
-#include <tracking/ckf/general/utilities/KalmanStepper.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-
 #include <string>
 
 namespace Belle2 {
   class ModuleParamList;
 
-  /// An extrapolateAndUpdate filter for all CDC states.
-  class ExtrapolateAndUpdateCDCStateFilter : public BaseCDCStateFilter {
+  /// Give a weight based on the mc truth information (1 or NAN)
+  class MCTruthEclSeedFilter : public BaseCDCStateFilter {
   public:
-    ExtrapolateAndUpdateCDCStateFilter();
-
-    /// Extrapolate along the path (pair.first) to the CDC wireHit-state (pair.second). Return 1/chi2 if Ok, NAN otherwise.
+    /// return 1 if matched truth hit belongs to matched truth track, NAN otherwise
     TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
-
-    /// Expose the parameters of the sub findlets.
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
-
-  private:
-    /// Kalman filter extrapolator
-    Advancer m_extrapolator;
-
-    /// Kalman filter updater
-    KalmanStepper<1> m_updater;
-
-    /// Parameter for the distance given to the framework
-    std::string m_param_directionAsString = "forward";
   };
 }

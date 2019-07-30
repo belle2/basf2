@@ -45,8 +45,6 @@ ExtrapolateAndUpdateCDCStateFilter::ExtrapolateAndUpdateCDCStateFilter()
 void ExtrapolateAndUpdateCDCStateFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_extrapolator.exposeParameters(moduleParamList, prefix);
-
-  moduleParamList->getParameter<std::string>(TrackFindingCDC::prefixed(prefix, "direction")).setDefaultValue("forward");
 }
 
 TrackFindingCDC::Weight ExtrapolateAndUpdateCDCStateFilter::operator()(const BaseCDCStateFilter::Object& pair)

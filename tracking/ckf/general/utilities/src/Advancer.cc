@@ -58,7 +58,7 @@ void Advancer::exposeParameters(ModuleParamList* moduleParamList, const std::str
                                 "Use the material effects during extrapolation.",
                                 m_param_useMaterialEffects);
 
-  moduleParamList->addParameter(prefixed(prefix, "direction"), m_param_directionAsString,
+  moduleParamList->addParameter(prefixed(prefix, "extrapolationDirection"), m_param_directionAsString,
                                 "The direction where the extrapolation will happen.");
 }
 

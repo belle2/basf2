@@ -45,10 +45,18 @@ namespace Belle2 {
     TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
     /// Export the tracks or not
     bool m_param_exportTracks = true;
+    /// Export all tracks, even if they did not reach the center of the CDC
+    bool m_param_exportAllTracks = false;
     /// StoreArray name of the output Track Store Array.
     std::string m_param_outputRecoTrackStoreArrayName = "CKFRecoTracks";
     /// StoreArray name of the tracks, the output reco tracks should be related to.
     std::string m_param_outputRelationRecoTrackStoreArrayName = "RecoTracks";
+    /// Parameter for the direction of the CKF
+    std::string m_param_trackFindingDirectionAsString = "forward";
+    /// Direction parameter converted from the string parameters
+    TrackFindingCDC::EForwardBackward m_param_trackFindingDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    /// Set flag that hit is taken
+    bool m_param_setTakenFlag = true;
 
     // Store Arrays
     /// Output Reco Tracks Store Array

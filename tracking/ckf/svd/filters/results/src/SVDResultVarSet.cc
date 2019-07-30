@@ -26,7 +26,7 @@ void SVDResultVarSet::initialize()
 {
   ModuleParamList moduleParamList;
   m_advancer.exposeParameters(&moduleParamList, "");
-  moduleParamList.getParameter<std::string>("direction").setValue("both");
+  // moduleParamList.getParameter<std::string>("direction").setValue("both");
 
   Super::initialize();
 }

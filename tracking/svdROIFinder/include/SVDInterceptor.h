@@ -26,6 +26,7 @@ namespace Belle2 {
 
   public:
 
+    /** Constructor */
     SVDInterceptor(const ROIinfo* theROIinfo, double toleranceZ, double tolerancePhi);
 
     /** Destructor.

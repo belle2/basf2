@@ -111,6 +111,7 @@ namespace Belle2 {
 
     digits.clear();
     int trgtype = 16;
+    double vth_thscan = 0.0;
 
     if (m_debug) {
       std::cout << std::endl << "------------------------" << std::endl;
@@ -233,7 +234,12 @@ namespace Belle2 {
             ver = calbyte(buf);
             boardid = calbyte(buf);
             febno = calbyte(buf);
-            unsigned int length = calword(buf);
+
+            // first line: vth value
+            unsigned int vth_int = cal2byte(buf);
+            if (vth_int > 0) { vth_thscan = (vth_int * 0.0024) - 1.27; }
+            // second line: length
+            unsigned int length = cal2byte(buf);
             int evtno = calword(buf);
             unsigned int ibyte = 0;
             std::stringstream ss;
@@ -302,6 +308,7 @@ namespace Belle2 {
     } // end of raw unpacker
 
     arichinfo->settrgtype(trgtype);
+    if (vth_thscan > -1.27) { arichinfo->setvth_thscan(vth_thscan); }
     arichinfo->setntrack(0);
     arichinfo->setnexthit(0);
     arichinfo->setnhit(0);
@@ -327,15 +334,23 @@ namespace Belle2 {
     head.FEBSlot = line1[0];
 
     // data length
-    char len[4];
+    unsigned char len[4];
     for (int i = 0; i < 4; i++) {
       shift = (3 - ibyte % 4) * 8;
       len[3 - i] = buffer[ibyte / 4] >> shift;
       ibyte++;
     }
 
+    unsigned seu = len[2];
+    // This line (16 bits) is actaully not used for data length.
+    len[2] = 0;
+    len[3] = 0;
     uint32_t* tmp = (uint32_t*)len;
     head.length = *tmp;
+
+    for (int i = 0; i < 6; i ++) {
+      head.SEU_FEB[i] = (seu & (1 << i)) != 0;
+    }
 
     // trigger number
     char trg[4];

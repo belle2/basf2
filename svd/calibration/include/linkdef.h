@@ -17,5 +17,6 @@
 #pragma link C++ class Belle2::SVDLocalCalibrationsImporter+;
 #pragma link C++ class Belle2::SVDDetectorConfiguration+;
 #pragma link C++ class Belle2::SVDDetectorConfigurationImporter+;
+#pragma link C++ class Belle2::SVDCoGTimeCalibrationAlgorithm+;
 
 #endif

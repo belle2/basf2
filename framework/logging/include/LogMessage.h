@@ -39,7 +39,7 @@ namespace Belle2 {
      * @param line The line number in the source code where the message was sent from.
      */
     LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
-               const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
+               std::string  function, std::string  file, unsigned int line, int debugLevel = 0);
 
     /**
      * The LogMessage constructor taking a LogVariableStream which can contains name/value pairs
@@ -52,7 +52,7 @@ namespace Belle2 {
      * @param line The line number in the source code where the message was sent from.
      */
     LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
-               const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
+               std::string  function, std::string  file, unsigned int line, int debugLevel = 0);
 
     /**
      * Provide move constructor
@@ -123,6 +123,8 @@ namespace Belle2 {
      */
     std::string toJSON(bool complete) const;
 
+    /** Return a reference to the log variables associated with this message */
+    const std::vector<LogVar>& getLogVariables() const { return m_message.getVariables(); }
   private:
 
     LogConfig::ELogLevel m_logLevel; /**< The log level of the message. */

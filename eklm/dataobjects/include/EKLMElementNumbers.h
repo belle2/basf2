@@ -123,6 +123,16 @@ namespace Belle2 {
     int sectorNumber(int endcap, int layer, int sector) const;
 
     /**
+     * Get sector number (KLM order of elements: endcap, sector, layer).
+     * @param[in] endcap Endcap number.
+     * @param[in] sector Sector number.
+     * @return Number of sector.
+     * @details
+     * Number is from 1 to 2*4 = 8.
+     */
+    int sectorNumberKLMOrder(int endcap, int sector) const;
+
+    /**
      * Get element numbers by sector global number.
      * @param[in]  sectorGlobal Sector global number.
      * @param[out] endcap       Endcap number.
@@ -229,14 +239,41 @@ namespace Belle2 {
     int getStripFirmwareBySoftware(int stripSoftware) const;
 
     /**
+     * Get ASIC and channel numbers (both are 0-based)
+     * by plane and strip numbers.
+     * @param[in]  plane   Plane.
+     * @param[in]  strip   Strip,
+     * @param[out] asic    ASIC.
+     * @param[out] channel Channel.
+     */
+    void getAsicChannel(int plane, int strip, int* asic, int* channel) const;
+
+    /**
+     * Get HSLB name.
+     * @param[in] copper           Copper.
+     * @param[in[ dataConcentrator Data concentrator.
+     */
+    static std::string getHSLBName(int copper, int dataConcentrator)
+    {
+      char hslb = 'a' + dataConcentrator;
+      return "800" + std::to_string(copper) + hslb;
+    }
+
+    /**
      * Get maximal endcap number.
      */
-    int getMaximalEndcapNumber() const;
+    static constexpr int getMaximalEndcapNumber()
+    {
+      return m_MaximalEndcapNumber;
+    }
 
     /**
      * Get maximal layer number.
      */
-    int getMaximalLayerNumber() const;
+    static constexpr int getMaximalLayerNumber()
+    {
+      return m_MaximalLayerNumber;
+    }
 
     /**
      * Get maximal detector layer number.
@@ -247,22 +284,34 @@ namespace Belle2 {
     /**
      * Get maximal sector number.
      */
-    int getMaximalSectorNumber() const;
+    static constexpr int getMaximalSectorNumber()
+    {
+      return m_MaximalSectorNumber;
+    }
 
     /**
      * Get maximal plane number.
      */
-    int getMaximalPlaneNumber() const;
+    static constexpr int getMaximalPlaneNumber()
+    {
+      return m_MaximalPlaneNumber;
+    }
 
     /**
      * Get maximal segment number.
      */
-    int getMaximalSegmentNumber() const;
+    static constexpr int getMaximalSegmentNumber()
+    {
+      return m_MaximalSegmentNumber;
+    }
 
     /**
      * Get maximal strip number.
      */
-    int getMaximalStripNumber() const;
+    static constexpr int getMaximalStripNumber()
+    {
+      return m_MaximalStripNumber;
+    }
 
     /**
      * Get maximal detector layer global number.
@@ -302,6 +351,14 @@ namespace Belle2 {
     static constexpr int getMaximalStripGlobalNumber()
     {
       return m_MaximalStripNumber * getMaximalPlaneGlobalNumber();
+    }
+
+    /**
+     * Get number of strips in a layer.
+     */
+    static constexpr int getNStripsLayer()
+    {
+      return getNStripsSector() * m_MaximalSectorNumber;
     }
 
     /**

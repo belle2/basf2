@@ -119,7 +119,7 @@ namespace Belle2 {
         if (not roe.isValid())
           return 0;
 
-        Particle* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedTo<Particle>();
         return particleList->contains(particle) ? 1 : 0;
 
       };
@@ -141,7 +141,7 @@ namespace Belle2 {
         if (not roe.isValid())
           return -999;
 
-        Particle* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedTo<Particle>();
         return var->function(particle);
 
       };
@@ -149,7 +149,7 @@ namespace Belle2 {
     }
 
     // only the helper function
-    double nRemainingTracksInROE(const Particle* particle, std::string maskName)
+    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
@@ -465,8 +465,8 @@ namespace Belle2 {
         int nNeutrals = 0;
 
         // Select ECLClusters with no associated tracks
-        for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          if (roeClusters[iEcl]->isNeutral())
+        for (auto& roeCluster : roeClusters)
+          if (roeCluster->isNeutral())
             nNeutrals++;
 
         return nNeutrals;
@@ -666,8 +666,8 @@ namespace Belle2 {
         std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         double extraE = 0.0;
 
-        for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          extraE += roeClusters[iEcl]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        for (auto& roeCluster : roeClusters)
+          extraE += roeCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
         return extraE;
       };
@@ -1377,10 +1377,10 @@ namespace Belle2 {
         std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
 
         // Loop the reconstructed side
-        for (unsigned int i = 0; i < recTrackParticles.size(); i++)
+        for (auto& recTrackParticle : recTrackParticles)
         {
-          pz += recTrackParticles[i]->getPz();
-          energy += recTrackParticles[i]->getEnergy();
+          pz += recTrackParticle->getPz();
+          energy += recTrackParticle->getEnergy();
         }
 
         // "Loop" the ROE side
@@ -1741,7 +1741,7 @@ namespace Belle2 {
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
 
-    TLorentzVector missing4Vector(const Particle* particle, std::string maskName, const std::string& opt)
+    TLorentzVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt)
     {
       // Get related ROE object
       const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -1823,14 +1823,14 @@ namespace Belle2 {
     void checkMCParticleMissingFlags(const MCParticle* mcp, std::set<const MCParticle*> mcROEObjects, int& missingFlags)
     {
       std::vector<MCParticle*> daughters = mcp->getDaughters();
-      for (unsigned i = 0; i < daughters.size(); i++) {
+      for (auto& daughter : daughters) {
 
-        if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+        if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
           continue;
 
-        if (mcROEObjects.find(daughters[i]) == mcROEObjects.end()) {
+        if (mcROEObjects.find(daughter) == mcROEObjects.end()) {
 
-          int pdg = abs(daughters[i]->getPDG());
+          int pdg = abs(daughter->getPDG());
 
           // photon
           if (pdg == Const::photon.getPDGCode() and (missingFlags & 1) == 0)
@@ -1862,7 +1862,7 @@ namespace Belle2 {
 
           // kshort
           else if (pdg == Const::Kshort.getPDGCode() and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
-            std::vector<MCParticle*> ksDaug = daughters[i]->getDaughters();
+            std::vector<MCParticle*> ksDaug = daughter->getDaughters();
             if (ksDaug.size() == 2) {
               // K_S0 -> pi+ pi-
               if (abs(ksDaug[0]->getPDG()) == Const::pion.getPDGCode() and abs(ksDaug[1]->getPDG()) == Const::pion.getPDGCode()
@@ -1892,16 +1892,16 @@ namespace Belle2 {
           else if ((pdg == 12 or pdg == 14 or pdg == 16) and (missingFlags & 1024) == 0)
             missingFlags += 1024;
         }
-        checkMCParticleMissingFlags(daughters[i], mcROEObjects, missingFlags);
+        checkMCParticleMissingFlags(daughter, mcROEObjects, missingFlags);
       }
     }
 
-    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, std::string maskName)
+    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
     {
       if (particle->getParticleType() == Particle::c_Composite) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
-        for (unsigned int i = 0; i < fspDaug.size(); i++) {
-          if (isInThisRestOfEvent(fspDaug[i], roe, maskName) == 0)
+        for (auto& i : fspDaug) {
+          if (isInThisRestOfEvent(i, roe, maskName) == 0)
             return 0;
         }
         return 1.0;
@@ -2084,11 +2084,20 @@ namespace Belle2 {
     REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
                       "Bs* - Bs mass difference");
 
-    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll,
-                      "Returns the angle between M and lepton in W rest frame in the decays of the type\n"
-                      "M -> h_1 ... h_n ell, where W 4-momentum is given as pW = p_ell + p_nu. The neutrino\n"
-                      "momentum is calculated from ROE taking into account the specified mask and setting\n"
-                      "E_nu = |p_miss|.");
+    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
+
+Returns the angle between $M$ and lepton in W rest frame in the decays of the type:
+:math`M \to h_1 ... h_n \ell`, where W 4-momentum is given as
+
+.. math::
+    p_W = p_\ell + p_\nu.
+
+The neutrino momentum is calculated from ROE taking into account the specified mask, and setting
+
+.. math::
+    E_{\nu} = |p_{miss}|.
+    
+)DOC");
 
     REGISTER_VARIABLE("REC_q2BhSimple", REC_q2BhSimple,
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"

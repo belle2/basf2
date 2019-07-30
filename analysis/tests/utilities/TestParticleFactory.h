@@ -168,8 +168,7 @@ namespace TestUtilities {
     }
 
   private:
-    // Used to differentiate photons from one another
-    int m_photonIndex;
+    int m_photonIndex; /**< Used to differentiate photons from one another */
   };
 };
 

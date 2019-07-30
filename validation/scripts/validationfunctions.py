@@ -215,14 +215,13 @@ def get_argument_parser(modes=None):
              "actually executing thesteering files (for debugging purposes).",
         action='store_true'
     )
-    # todo: use the options keyword here?
     parser.add_argument(
         "-m",
         "--mode",
         help="The mode which will be used for running the validation. "
-             "Possible values: " + str(modes) + " Default is 'local'",
+             "Possible values: " + ", ".join(modes) + ". Default is 'local'",
+        choices=modes,
         type=str,
-        nargs='?',
         default='local'
     )
     parser.add_argument(
@@ -231,16 +230,15 @@ def get_argument_parser(modes=None):
         help="Comma seperated list of intervals for which to execute the "
              "validation scripts. Default is 'nightly'",
         type=str,
-        nargs='?',
         default='nightly'
     )
     parser.add_argument(
         "-o",
         "--options",
-        help="A string which will be givento basf2 as arguments. Example: "
-             "'-n 100'. Quotes are necessary!",
+        help="One or more strings that will be passed to basf2 as arguments. "
+             "Example: '-n 100'. Quotes are necessary!",
         type=str,
-        nargs='*'
+        nargs='+'
     )
     parser.add_argument(
         "-p",
@@ -249,7 +247,6 @@ def get_argument_parser(modes=None):
              "validation. Only used for local execution. Default is number "
              "of CPU cores.",
         type=int,
-        nargs='?',
         default=None
     )
     parser.add_argument(
@@ -258,33 +255,41 @@ def get_argument_parser(modes=None):
         help="The name(s) of one or multiple packages. Validation will be "
              "run only on these packages! E.g. -pkg analysis arich",
         type=str,
-        nargs='*'
+        nargs='+'
     )
     parser.add_argument(
         "-s",
         "--select",
-        help="The file name of one or more comma separated validation "
+        help="The file name(s) of one or more space separated validation "
              "scripts that should be executed exclusively. All dependent "
              "scripts will also be executed. E.g. -s ECL2D.C",
         type=str,
-        nargs='*'
+        nargs='+'
     )
     parser.add_argument(
         "-si",
         "--select-ignore-dependencies",
-        help="The file name of one or more comma separated validation "
+        help="The file name of one or more space separated validation "
              "scripts that should be executed exclusively. This will ignore "
              "all depencies. This is useful if you modified a script that "
              "produces plots based on the output of its dependencies.",
         type=str,
-        nargs='*'
+        nargs='+'
     )
     parser.add_argument(
         "--send-mails",
-        help="Send email to the contact personswho have failed comparison "
-             "plots. Mail is sent fromb2soft@mail.desy.de via "
+        help="Send email to the contact persons who have failed comparison "
+             "plots. Mail is sent from b2soft@mail.desy.de via "
              "/usr/sbin/sendmail.",
         action='store_true')
+    parser.add_argument(
+        "--send-mails-mode",
+        help="How to send mails: Full report, incremental report (new/changed "
+             "warnings/failures only) or automatic (default; follow hard coded "
+             "rule, e.g. full reports every Monday).",
+        choices=["full", "incremental", "automatic"],
+        default="automatic"
+    )
     parser.add_argument(
         "-q",
         "--quiet",
@@ -295,17 +300,15 @@ def get_argument_parser(modes=None):
         "-t",
         "--tag",
         help="The name that will be used for the current revision in the "
-             "results folder. Possibly useful for local basf2 instances "
-             "where there is noBuildBot'. Default is 'current'",
+             "results folder. Default is 'current'.",
         type=str,
-        nargs='?',
         default='current'
     )
     parser.add_argument(
         "--test",
-        help="Execute validation in testing modewhere only the validation "
-             "scripts contained in thevalidation package are executed. "
-             "During regularvalidation, these scripts are ignored.",
+        help="Execute validation in testing mode where only the validation "
+             "scripts contained in the validation package are executed. "
+             "During regular validation, these scripts are ignored.",
         action='store_true'
     )
     parser.add_argument(
@@ -316,15 +319,15 @@ def get_argument_parser(modes=None):
     )
     parser.add_argument(
         "--view",
-        help="Once the validation is finished, startthe local web server and "
-             "display the validationresults in the system's default browser.",
+        help="Once the validation is finished, start the local web server and "
+             "display the validation results in the system's default browser.",
         action='store_true'
     )
 
     return parser
 
 
-def parse_cmd_line_arguments(is_test=None, tag=None, modes=None):
+def parse_cmd_line_arguments(modes=None):
     """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.
@@ -455,14 +458,12 @@ def index_from_revision(revision, work_folder):
         be found for 'revision'
     """
 
-    # If the requested revision exists, return its index
-    if revision in available_revisions(work_folder):
-        index = available_revisions(work_folder).index(revision)
-    # Else return a None object
-    else:
-        index = None
+    revisions = available_revisions(work_folder) + ["reference"]
 
-    return index
+    if revision in revisions:
+        return revisions.index(revision)
+    else:
+        return None
 
 
 def get_log_file_paths(logger):

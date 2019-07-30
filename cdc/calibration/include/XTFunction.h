@@ -440,6 +440,19 @@ namespace Belle2 {
           continue;
         }
         m_fitFunc->GetParameters(par);
+        if (p[1] < 0) { // negative c1
+          std::cout << " neg c1 converted" << std::endl;
+          p[0] = 0;
+          p[1] *= -1.0;
+          p[2] = 0;
+          p[3] = 0;
+          p[4] = 0;
+          p[5] = 0;
+          m_fitFunc->SetParLimits(1, 0., 0.01);
+          m_tmin += 10.0;
+          continue;
+        }
+
         /*Eval outer region,*/
         double fp6 = m_fitFunc->Eval(par[6]);
         double fbehindp6 = m_fitFunc->Eval(par[6] - 10) - 0.005;

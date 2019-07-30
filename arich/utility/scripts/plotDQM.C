@@ -1,5 +1,5 @@
 /*
- * Plots histograms from ARICHDQM module 
+ * Plots histograms from ARICHDQM module output file 
  * run as: "root -l histogram_file.root plotDQM.C" 
  * By: Luka Santelj
  */
@@ -7,7 +7,8 @@
 void plotDQM(){
   
   gStyle->SetPalette(1);
-  
+  TGaxis::SetMaxDigits(4); 
+
   TH1F* hBits = (TH1F*)_file0->Get("ARICH/bits"); 
   TH1F* hHits = (TH1F*)_file0->Get("ARICH/hitsPerEvent"); 
   TH1F* hHitsHapd = (TH1F*)_file0->Get("ARICH/chHit"); 
@@ -18,13 +19,8 @@ void plotDQM(){
   
   // create 2D hit map using ARICHChannelHist
   Belle2::ARICHChannelHist* chHits = new Belle2::ARICHChannelHist("chHits1","# of hits/channel");
-  for(int i=1;i<421;i++){
-    for(int j=0;j<144;j++){
-      int ch = (i-1)*144 + j;
-      chHits->setBinContent(i,j,double(hHitsHapd->GetBinContent(ch+1)));
-    }
-  }  
-  
+  chHits->fillFromTH1(hHitsHapd);
+
   TCanvas* cc = new TCanvas("cc","cc", 1200,600);
   cc->Divide(3,2);
   cc->cd(1);
@@ -38,6 +34,9 @@ void plotDQM(){
   cc->cd(3);
   chHits->SetStats(false);
   chHits->Draw();
+  cc->Update();
+  TPaletteAxis *palette = (TPaletteAxis*)chHits->GetListOfFunctions()->FindObject("palette");
+  palette->SetX2NDC(0.93);
   
   cc->cd(4);
   hHitsHapd->Draw();

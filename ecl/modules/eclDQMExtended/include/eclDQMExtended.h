@@ -82,6 +82,8 @@ namespace Belle2 {
     std::string m_DSPDirectoryName;
     /** Run with valid DSP coeffs. (only for 'm_InitKey == File'). */
     std::string m_RunName;
+    /** Save detailed fit data for failed fits */
+    bool m_SaveDetailedFitData;
 
     /** DBArray for payload 'ECLDSPPars0'. */
     DBArray<ECLDspData> m_ECLDspDataArray0;
@@ -174,14 +176,14 @@ namespace Belle2 {
     TH2F* h_ampdiff_cellid{nullptr};
     /** Histogram: Time diff.(Emulator-Data) for time fails. */
     TH2F* h_timediff_cellid{nullptr};
-    /** Histogram: Amp. diff. (Emulator-Data) for amp. fails in bins of QualityData. */
-    TH2F* h_ampdiff_quality{nullptr};
-    /** Histogram: Time diff. (Emulator-Data) for time fails in bins of QualityData. */
-    TH2F* h_timediff_quality{nullptr};
     /** Histogram: Amp. diff. (Emulator-Data) for amp. fails in bins of Shaper Id. */
     TH2F* h_ampdiff_shaperid{nullptr};
     /** Histogram: Time diff. (Emulator-Data) for time fails in bins of Shaper Id. */
     TH2F* h_timediff_shaperid{nullptr};
+    /** Histogram: Amp. diff. (Emulator-Data) for amp. fails in bins of QualityData. */
+    TH2F* h_ampdiff_quality{nullptr};
+    /** Histogram: Time diff. (Emulator-Data) for time fails in bins of QualityData. */
+    TH2F* h_timediff_quality{nullptr};
     /** Histogram: QualityFit vs QualityData for quality fails. */
     TH2F* h_quality_fit_data{nullptr};
     /** Histogram: Amp flag (0/1) w/ failed qualities in bins of QualityData. */

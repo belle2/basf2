@@ -3,6 +3,7 @@
 
 from basf2 import *
 from ROOT import Belle2
+from pxd import add_pxd_packer, add_pxd_unpacker
 from svd import add_svd_packer, add_svd_unpacker
 from iov_conditional import make_conditional_at
 
@@ -21,75 +22,7 @@ def add_packers(path, components=None):
 
     # PXD
     if components is None or 'PXD' in components:
-        pxdpacker = register_module('PXDPacker')
-        pxdpacker.param('dhe_to_dhc', [
-            [
-                0,
-                2,
-                4,
-                34,
-                36,
-                38,
-            ],
-            [
-                1,
-                6,
-                8,
-                40,
-                42,
-                44,
-            ],
-            [
-                2,
-                10,
-                12,
-                46,
-                48,
-                50,
-            ],
-            [
-                3,
-                14,
-                16,
-                52,
-                54,
-                56,
-            ],
-            [
-                4,
-                3,
-                5,
-                35,
-                37,
-                39,
-            ],
-            [
-                5,
-                7,
-                9,
-                41,
-                43,
-                45,
-            ],
-            [
-                6,
-                11,
-                13,
-                47,
-                49,
-                51,
-            ],
-            [
-                7,
-                15,
-                17,
-                53,
-                55,
-                57,
-            ],
-        ])
-
-        path.add_module(pxdpacker)
+        add_pxd_packer(path)
 
     # SVD
     if components is None or 'SVD' in components:
@@ -141,15 +74,7 @@ def add_unpackers(path, components=None):
 
     # PXD
     if components is None or 'PXD' in components:
-        pxdunpacker = register_module('PXDUnpacker')
-        path.add_module(pxdunpacker)
-
-        pxderrorcheck = register_module('PXDPostErrorChecker')
-        path.add_module(pxderrorcheck)
-
-        pxdhitsorter = register_module('PXDRawHitSorter')
-        path.add_module(pxdhitsorter)
-        path.add_module('ActivatePXDPixelMasker')
+        add_pxd_unpacker(path)
 
     # SVD
     if components is None or 'SVD' in components:
@@ -180,15 +105,10 @@ def add_unpackers(path, components=None):
         arichunpacker = register_module('ARICHUnpacker')
         path.add_module(arichunpacker)
 
-    # BKLM
-    if components is None or 'BKLM' in components:
-        bklmunpacker = register_module('BKLMUnpacker')
-        path.add_module(bklmunpacker)
-
-    # EKLM
-    if components is None or 'EKLM' in components:
-        eklmunpacker = register_module('EKLMUnpacker')
-        path.add_module(eklmunpacker)
+    # KLM
+    if components is None or 'BKLM' in components or 'EKLM' in components:
+        klmunpacker = register_module('KLMUnpacker')
+        path.add_module(klmunpacker)
 
     # TRG
     if components is None or 'TRG' in components:
@@ -199,6 +119,8 @@ def add_unpackers(path, components=None):
         path.add_module(trggdlsummary)
         trgeclunpacker = register_module('TRGECLUnpacker')
         path.add_module(trgeclunpacker)
+        trggrlunpacker = register_module('TRGGRLUnpacker')
+        path.add_module(trggrlunpacker)
 
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:

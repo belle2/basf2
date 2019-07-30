@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMSTATUS_H
-#define BKLMSTATUS_H
+#pragma once
 
 //! Definition of bit positions/masks for elements of detector-module ID.
 //! Order must be (high bit) END-SECTOR-LAYER-PLANE-STRIP (low bit) for
@@ -126,5 +125,3 @@
 
 //! BKLMHit2d Zstrips bit mask for maxStrip-1 [0..47]
 #define BKLM_ZMAXSTRIP_MASK (63 << BKLM_ZMAXSTRIP_BIT)
-
-#endif //BKLMSTATUS_H

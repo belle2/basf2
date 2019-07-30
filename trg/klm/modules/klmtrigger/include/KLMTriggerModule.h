@@ -49,7 +49,7 @@ namespace Belle2 {
     //! @param x x coordinate of the hit
     //! @param y y coordinate of the hit
     //! @param z x coordinate of the hit
-    void geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z);
+    void geometryConverter(int fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z);
 
     //! Total number of sectors (eight, a constant)
     static const int c_TotalSectors = 8;

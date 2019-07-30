@@ -37,6 +37,9 @@ namespace Belle2 {
   class SVDOnlineToOfflineMap {
   public:
 
+    /** Setter for suppression factor given by the Unpacker */
+    void setErrorRate(int errorRate) {m_errorRate = errorRate;}
+
     /** Class to hold FADC+APV25 numbers */
     class ChipID {
     public:
@@ -47,7 +50,7 @@ namespace Belle2 {
 
 
       /** Constructor taking a compound id */
-      ChipID(baseType id = 0) { m_id.id = id; }
+      explicit ChipID(baseType id = 0) { m_id.id = id; }
       /** Constructor taking chip numbers */
       ChipID(chipNumberType FADC, chipNumberType APV25)
       { m_id.parts.FADC = FADC; m_id.parts.APV25 = APV25; }
@@ -92,7 +95,7 @@ namespace Belle2 {
       } m_id;
     }; //ChipID class
 
-
+    /** Class to hold numbers related to sensor */
     class SensorID {
     public:
       /** Typedefs of the compound id type and chip number types */
@@ -102,7 +105,7 @@ namespace Belle2 {
 
 
       /** Constructor taking a compound id */
-      SensorID(baseType id = 0) { m_ID.id = id; }
+      explicit SensorID(baseType id = 0) { m_ID.id = id; }
       /** Constructor taking sensor info */
       SensorID(sensorNumberType layer,  sensorNumberType ladder, sensorNumberType dssd, bool side)
       { m_ID.PARTS.layer = layer; m_ID.PARTS.ladder = ladder; m_ID.PARTS.dssd = dssd; m_ID.PARTS.side = side; }
@@ -129,7 +132,7 @@ namespace Belle2 {
       } m_ID;
     }; //SensorID class
 
-    /** Struct to hold data about an APV25 chip.*/
+    /** Struct to hold data about a sensor.*/
     struct SensorInfo {
       VxdID m_sensorID;           /**< Sensor ID */
       bool m_uSide;               /**< True if u-side of the sensor */
@@ -138,7 +141,7 @@ namespace Belle2 {
       unsigned short m_channel127; /**< Strip corresponding to channel 127 */
     }; // SensorInfo struct
 
-
+    /** Struct to hold data about an APV25 chip.*/
     struct ChipInfo {
       unsigned short fadc; /**<fadc number*/
       unsigned char apv; /**< apv number*/
@@ -152,7 +155,7 @@ namespace Belle2 {
     /** Constructor
      * @param xml_filename is the name of the xml file containing the map.
      */
-    SVDOnlineToOfflineMap(const std::string& xml_filename);
+    explicit SVDOnlineToOfflineMap(const std::string& xml_filename);
 
     /** No default constructor */
     SVDOnlineToOfflineMap() = delete;
@@ -189,6 +192,45 @@ namespace Belle2 {
      * nonsensical input.
      */
     const SensorInfo& getSensorInfo(unsigned char FADC, unsigned char APV25);
+
+    /** is the APV of the strips in the map? for a given layer/ladder/dssd/side/strip combination.
+     * @param layer is the layer number
+     * @param ladder is the ladder number
+     * @param sensor is the sensor number
+     * @param side is true if U
+     * @param strip is the strip number
+     * @return true if the APV that reads the strip is in the map, false otherwise
+     */
+    bool isAPVinMap(unsigned short layer,  unsigned short ladder, unsigned short dssd, bool side, unsigned short strip);
+
+    /** is the APV of the strips in the map? for a given layer/ladder/dssd/side/strip combination.
+     * @param sensorID is the VxdID of the sensor
+     * @param side is true if U
+     * @param strip is the strip number
+     * @return true if the APV that reads the strip is in the map, false otherwise
+     */
+    bool isAPVinMap(VxdID sensorID, bool side, unsigned short strip);
+
+    /** prepares the list of the missing APVs
+     *  using the channel mapping
+     */
+    void prepareListOfMissingAPVs();
+    /** struct to hold missing APVs informations */
+    struct missingAPV {
+      VxdID m_sensorID;           /**< Sensor ID */
+      bool m_isUSide;               /**< True if u-side of the sensor */
+      float m_halfStrip;          /**< floating strip in the middle of the APV */
+    };
+
+    /** list of the missing APVs
+     */
+    std::vector< missingAPV > m_missingAPVs;
+
+    /** Get number of missing APVs */
+    int getNumberOfMissingAPVs()
+    {
+      return m_missingAPVs.size();
+    }
 
     /** Get ChipInfo for a given layer/ladder/dssd/side/strip combination.
      * @param layer is the the layer number
@@ -256,7 +298,11 @@ namespace Belle2 {
     std::unordered_map< ChipID::baseType, SensorInfo > m_sensors; /**<mao for chip ID to VxdID*/
     std::unordered_map< SensorID::baseType, std::vector<ChipInfo> > m_chips; /**< needed for the packer, map of VxdID to chips*/
 
+    /** Counter of the BadMapping errors*/
+    unsigned int nBadMappingErrors = 0;
 
+    /** The suppression factor of BadMapping ERRORs messages to be shown */
+    int m_errorRate;
 
     /** add chipN on FADCn to the map
      */

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,7 +18,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/TagVertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -50,7 +50,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTagVertex().X();
@@ -62,7 +62,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTagVertex().Y();
@@ -74,7 +74,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTagVertex().Z();
@@ -86,7 +86,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getMCTagVertex().X();
@@ -98,7 +98,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getMCTagVertex().Y();
@@ -110,7 +110,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getMCTagVertex().Z();
@@ -122,11 +122,11 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(0, 0);
+        result = sqrt(TagVErr(0, 0));
       }
 
       return result;
@@ -136,11 +136,11 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(1, 1);
+        result = sqrt(TagVErr(1, 1));
       }
 
       return result;
@@ -150,11 +150,11 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert) {
         TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = TagVErr(2, 2);
+        result = sqrt(TagVErr(2, 2));
       }
 
       return result;
@@ -164,7 +164,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTagVertexPval();
@@ -174,7 +174,7 @@ namespace Belle2 {
 
     double particleTagVNTracks(const Particle* particle)
     {
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
         return -1111.0;
       return vert->getNTracks();
@@ -182,10 +182,34 @@ namespace Belle2 {
 
     double particleTagVType(const Particle* particle)
     {
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
         return -1111.0;
       return vert->getFitType();
+    }
+
+    double particleTagVNDF(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVNDF();
+    }
+
+    double particleTagVChi2(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVChi2();
+    }
+
+    double particleTagVChi2IP(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getTagVChi2IP();
     }
 
 
@@ -195,7 +219,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getDeltaT();
@@ -207,7 +231,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getDeltaTErr();
@@ -219,7 +243,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getMCDeltaT();
@@ -231,7 +255,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert)
         result = particle->getZ() - vert->getTagVertex().Z();
@@ -239,11 +263,26 @@ namespace Belle2 {
       return result;
     }
 
+    double particleDeltaZErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      auto* vert = particle->getRelatedTo<TagVertex>();
+
+      if (vert) {
+        double zVariance = particle->getVertexErrorMatrix()(2, 2);
+        double TagVZVariance = vert->getTagVertexErrMatrix()(2, 2);
+        result = sqrt(zVariance + TagVZVariance);
+        if (std::isnan(result) or std::isinf(result)) result = -1111.0;
+      }
+      return result;
+    }
+
     double particleDeltaB(const Particle* particle)
     {
       double result = -1111.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert) {
         PCmsLabTransform T;
@@ -251,6 +290,22 @@ namespace Belle2 {
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaT() * bg * c;
+      }
+      return result;
+    }
+
+    double particleDeltaBErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      auto* vert = particle->getRelatedTo<TagVertex>();
+
+      if (vert) {
+        PCmsLabTransform T;
+        TVector3 boost = T.getBoostVector().BoostVector();
+        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+        double c = Const::speedOfLight / 1000.; // cm ps-1
+        result = vert->getDeltaTErr() * bg * c;
       }
       return result;
     }
@@ -397,7 +452,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = part->getRelatedTo<Vertex>();
+      auto* vert = part->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTagVl();
@@ -410,7 +465,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = part->getRelatedTo<Vertex>();
+      auto* vert = part->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTagVol();
@@ -423,7 +478,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = part->getRelatedTo<Vertex>();
+      auto* vert = part->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTruthTagVl();
@@ -436,7 +491,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = part->getRelatedTo<Vertex>();
+      auto* vert = part->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTruthTagVol();
@@ -448,7 +503,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = part->getRelatedTo<Vertex>();
+      auto* vert = part->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTagVlErr();
@@ -461,7 +516,7 @@ namespace Belle2 {
     {
       double result = -1111.0;
 
-      Vertex* vert = part->getRelatedTo<Vertex>();
+      auto* vert = part->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getTagVolErr();
@@ -470,11 +525,11 @@ namespace Belle2 {
     }
 
 
-    double particleInternalTagVMCFlavor(const Particle* particle)
+    double particleInternalTagVMCFlavor(const Particle* part)
     {
       double result = 1000.0;
 
-      Vertex* vert = particle->getRelatedTo<Vertex>();
+      auto* vert = part->getRelatedTo<TagVertex>();
 
       if (vert)
         result = vert->getMCTagBFlavor();
@@ -487,26 +542,35 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
 
-    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
-    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
-    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
-    REGISTER_VARIABLE("mcTagVx", particleTruthTagVx, "MC Tag vertex X");
-    REGISTER_VARIABLE("mcTagVy", particleTruthTagVy, "MC Tag vertex Y");
-    REGISTER_VARIABLE("mcTagVz", particleTruthTagVz, "MC Tag vertex Z");
-    REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X Error");
-    REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y Error");
-    REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z Error");
+    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X component");
+    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y component");
+    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z component");
+    REGISTER_VARIABLE("mcTagVx", particleTruthTagVx, "Generated Tag vertex X component");
+    REGISTER_VARIABLE("mcTagVy", particleTruthTagVy, "Generated Tag vertex Y component");
+    REGISTER_VARIABLE("mcTagVz", particleTruthTagVz, "Generated Tag vertex Z component");
+    REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X component uncertainty");
+    REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty");
+    REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty");
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
     REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
     REGISTER_VARIABLE("TagVType", particleTagVType, "Fit type of the tag vertex");
+    REGISTER_VARIABLE("TagVNDF", particleTagVNDF, "Number of degrees of freedom in the tag vertex fit");
+    REGISTER_VARIABLE("TagVChi2", particleTagVChi2, "chi2 value of the tag vertex fit");
+    REGISTER_VARIABLE("TagVChi2IP", particleTagVChi2IP, "IP component of chi2 value of the tag vertex fit");
 
-
-    REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
+    REGISTER_VARIABLE("DeltaT", particleDeltaT,
+                      R"DOC(Proper decay time difference :math:`\Delta t` between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})` in ps.)DOC");
+    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr,
+                      R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
-                      "Generated Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
-    REGISTER_VARIABLE("DeltaBoost", particleDeltaB, "Boost direction: Brec - Btag");
+                      R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
+    REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
+                      R"DOC(Difference of decay vertex longitudinal components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
+:math:`\Delta z = z(B_{rec}) - z(B_{tag})`)DOC");
+    REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr,
+                      R"DOC(Uncertainty of the difference :math:`z(B_{rec}) - z(B_{tag})`)DOC");
+    REGISTER_VARIABLE("DeltaBoost", particleDeltaB, R"DOC(:math:`\Delta z` in the boost direction)DOC");
+    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, R"DOC(Uncertanty of :math:`\Delta z` in the boost direction)DOC");
 
     REGISTER_VARIABLE("LBoost", vertexBoostDirection,
                       "Returns the vertex component in the boost direction");

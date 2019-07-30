@@ -14,6 +14,7 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/ParameterVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -31,7 +32,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
-#include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -411,7 +411,7 @@ namespace Belle2 {
           return -999.0;
         }
 
-        TLorentzVector beam4Vector(getBeamPx(NULL), getBeamPy(NULL), getBeamPz(NULL), getBeamE(NULL));
+        TLorentzVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));
         TLorentzVector part4Vector = part->get4Vector();
         TLorentzVector mother4Vector = mother->get4Vector();
 
@@ -578,8 +578,8 @@ namespace Belle2 {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() > 0) {
         TLorentzVector sum;
-        for (unsigned i = 0; i < daughters.size(); i++)
-          sum += daughters[i]->get4Vector();
+        for (auto daughter : daughters)
+          sum += daughter->get4Vector();
 
         result = sum.M();
       } else {
@@ -834,9 +834,7 @@ namespace Belle2 {
       // q = pB - pX
       TLorentzVector pX;
 
-      for (unsigned i = 0; i < mcDaug.size(); i++) {
-        const MCParticle* mcTemp = mcDaug[i];
-
+      for (auto mcTemp : mcDaug) {
         if (abs(mcTemp->getPDG()) <= 16)
           continue;
 
@@ -954,7 +952,7 @@ namespace Belle2 {
 
     double recoilMCDecayType(const Particle* particle)
     {
-      MCParticle* mcp = particle->getRelatedTo<MCParticle>();
+      auto* mcp = particle->getRelatedTo<MCParticle>();
 
       if (!mcp)
         return -1.0;
@@ -994,21 +992,21 @@ namespace Belle2 {
       std::vector<MCParticle*> daughters = mcp->getDaughters();
 
       // Are any of the daughters primary particles? How many of them are hadrons?
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+      for (auto& daughter : daughters) {
+        if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
           continue;
 
         nPrimaryParticleDaughters++;
-        if (abs(daughters[i]->getPDG()) > 22)
+        if (abs(daughter->getPDG()) > 22)
           nHadronicParticles++;
       }
 
       if (nPrimaryParticleDaughters > 1) {
-        for (unsigned i = 0; i < daughters.size(); i++) {
-          if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+        for (auto& daughter : daughters) {
+          if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
             continue;
 
-          if (abs(daughters[i]->getPDG()) == 12 or abs(daughters[i]->getPDG()) == 14 or abs(daughters[i]->getPDG()) == 16) {
+          if (abs(daughter->getPDG()) == 12 or abs(daughter->getPDG()) == 14 or abs(daughter->getPDG()) == 16) {
             if (!recursive) {
               if (nHadronicParticles == 0) {
                 decayType = 1.0;
@@ -1024,7 +1022,7 @@ namespace Belle2 {
           }
 
           else if (recursive)
-            checkMCParticleDecay(daughters[i], decayType, recursive);
+            checkMCParticleDecay(daughter, decayType, recursive);
         }
       }
     }
@@ -1097,40 +1095,6 @@ namespace Belle2 {
         eventExtraInfo->addExtraInfo(key, value);
         return value;
       }
-    }
-
-    double goodBelleKshort(const Particle* KS)
-    {
-      // check input
-      if (KS->getNDaughters() != 2) {
-        B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
-        return 0.0;
-      }
-      const Particle* d0 = KS->getDaughter(0);
-      const Particle* d1 = KS->getDaughter(1);
-      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
-        B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
-        return 0.0;
-      }
-      if (abs(KS->getPDGCode()) != 310)
-        B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
-
-      // Belle selection
-      double p = particleP(KS);
-      double fl = particleDRho(KS);
-      double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
-                           KS) + particlePy(KS) * particlePy(KS))));
-      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
-      double zdist = v0DaughterZ0Diff(KS);
-
-      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
-      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
-      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
-
-      if (low || mid || high) {
-        return 1.0;
-      } else
-        return 0.0;
     }
 
     VARIABLE_GROUP("Kinematics");
@@ -1279,12 +1243,6 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
                       "returns always 1, used for testing and debugging.");
-    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
-                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
-                      "a momentum-binned selection including requirements on impact parameter of, and"
-                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
-
-    VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random,

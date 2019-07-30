@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -84,6 +84,27 @@ namespace Belle2 {
      */
     double particleTagVNTracks(const Particle* particle);
 
+    /**
+     * returns the number of degrees of freedom in the tag vertex fit. can be non-integer due to adaptive vertex fitting.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVNDF(const Particle*);
+
+    /**
+     * returns chi^2 value of the tag vertex fit result.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVChi2(const Particle*);
+
+    /**
+     * returns the IP component of chi^2 value of the tag vertex fit result.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVChi2IP(const Particle*);
+
 
     /**
      * return the error of the X component of the tag vertex
@@ -137,13 +158,25 @@ namespace Belle2 {
     double particleDeltaZ(const Particle* particle);
 
     /**
+     * returns the error of Delta Z (Brec - Btag) in cm
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaZErr(const Particle* particle);
+
+    /**
      * return Delta Boost direction (Brec - Btag) in cm
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleDeltaB(const Particle* particle);
 
-
+    /**
+     * returns the error of the difference Delta Boost direction (Brec - Btag) in cm
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaBErr(const Particle* particle);
 
     /**
      * returns the vertex component in the boost direction

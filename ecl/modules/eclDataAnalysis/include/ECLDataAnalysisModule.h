@@ -292,6 +292,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterTimingError;  /**< ECLCluster time error */
     std::vector<double>* m_eclClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLCluster*/
     std::vector<double>* m_eclClusterHighestE; /**< Highest energy deposit (per crystal) in ECLCluster */
+    std::vector<int>* m_eclClusterCellId; /**< CellId with highest energy deposit in ECLCluster */
     std::vector<int>* m_eclClusterNofCrystals;  /**< Number of crystals in ECLCluster */
     std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal healt flag */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
@@ -400,6 +401,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterTimingError;  /**< Cluster time error, PureCsI option */
     std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in Cluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterCellId; /**< CellId with highest energy deposit in Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterLat; /**< Cluster shape parameter LAT, PureCsI option */
     std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in Cluster, PureCsI option */
     std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag, PureCsI option */

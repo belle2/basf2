@@ -72,8 +72,8 @@ namespace Belle2 {
     static void fillControlNtuples(const Track* track,
                                    bool isSelected); /**< determine if the track does not satisfies the selection criteria */
 
-    static TNtuple* m_selectedNtpl;
-    static TNtuple* m_rejectedNtpl;
+    static TNtuple* m_selectedNtpl; /**< tuple of selected tracks */
+    static TNtuple* m_rejectedNtpl; /**< tuple of rejected tracks */
   };
 }
 

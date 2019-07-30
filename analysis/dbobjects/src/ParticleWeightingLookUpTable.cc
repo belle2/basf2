@@ -11,23 +11,25 @@
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 #include <framework/logging/Logger.h>
 
+#include <utility>
+
 using namespace Belle2;
 
 void ParticleWeightingLookUpTable::addEntry(WeightInfo entryValue, NDBin bin)
 {
   int id = m_WeightMap.size();
-  this->addEntry(entryValue, bin, id);
+  this->addEntry(std::move(entryValue), std::move(bin), id);
 }
 
 void ParticleWeightingLookUpTable::addEntry(WeightInfo entryValue, NDBin bin, int key_ID)
 {
-  int id = m_KeyMap.addKey(bin, key_ID);
+  int id = m_KeyMap.addKey(std::move(bin), key_ID);
   entryValue.insert(std::make_pair("binID", id));
   m_WeightMap.insert(std::make_pair(id, entryValue));
 }
 
 
-void ParticleWeightingLookUpTable::defineOutOfRangeWeight(WeightInfo entryValue)
+void ParticleWeightingLookUpTable::defineOutOfRangeWeight(const WeightInfo& entryValue)
 {
   m_WeightMap.insert(std::make_pair(m_OutOfRangeBinID, entryValue));
 }
@@ -40,7 +42,7 @@ std::vector<std::string> ParticleWeightingLookUpTable::getAxesNames() const
 
 WeightInfo ParticleWeightingLookUpTable::getInfo(std::map<std::string, double> values) const
 {
-  int id = m_KeyMap.getKey(values);
+  int id = m_KeyMap.getKey(std::move(values));
   auto it = m_WeightMap.find(id);
   if (it != m_WeightMap.end()) {
     return  m_WeightMap.at(id);
@@ -54,12 +56,12 @@ void ParticleWeightingLookUpTable::printParticleWeightingLookUpTable() const
 {
   m_KeyMap.printKeyMap();
   B2INFO("Printing the table");
-  for (auto entry : m_WeightMap) {
+  for (const auto& entry : m_WeightMap) {
     int key_ID = entry.first;
     WeightInfo info = entry.second;
     std::string bin_info = "";
     std::string bin_id = "";
-    for (auto line : info) {
+    for (const auto& line : info) {
       bin_info += line.first + " " + std::to_string(line.second) + " ; ";
     }
     if (key_ID == m_OutOfRangeBinID) {

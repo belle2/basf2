@@ -25,6 +25,7 @@ namespace Belle2 {
       // For magnetic monopoles; estimates charge sign from all stereo hits, momentum direction from hits in closest superlayer, fixing magnitude with given value. Ignores building CDCTrajectory3D since it is based on a helix.
       static RecoTrack* storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks, const double momentumSeedMagnitude);
 
+      /// Copies the track information to the RecoTrack
       static RecoTrack* storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks);
 
       /// Copies the trajectory information to the RecoTrack

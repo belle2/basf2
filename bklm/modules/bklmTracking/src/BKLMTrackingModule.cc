@@ -293,7 +293,7 @@ void BKLMTrackingModule::terminate()
 
 bool BKLMTrackingModule::sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2)
 {
-  if (hit1->isForward() == hit2->isForward() && hit1->getSector() == hit2->getSector()) return true;
+  if (hit1->getForward() == hit2->getForward() && hit1->getSector() == hit2->getSector()) return true;
   else return false;
 }
 
@@ -426,7 +426,6 @@ void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
 
       bool m_iffound = false;
       m_total[iForward][iSector]->Fill(iLayer + 1);
-      //cout<<" isForwadrd "<<iForward<<", layer "<<iLayer + 1<<endl;
       m_totalYX->Fill(global[0], global[1]);
       m_totalYZ->Fill(global[2], global[1]);
 
@@ -472,15 +471,15 @@ bool BKLMTrackingModule::sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2)
 
 }
 
-bool BKLMTrackingModule::isLayerUnderStudy(int isForward, int iSector, int iLayer, BKLMHit2d* hit)
+bool BKLMTrackingModule::isLayerUnderStudy(int forward, int iSector, int iLayer, BKLMHit2d* hit)
 {
-  if (hit->isForward() == (isForward != 0) && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
+  if (hit->getForward() == (forward != 0) && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
   else return false;
 }
 
-bool BKLMTrackingModule::isSectorUnderStudy(int isForward, int iSector, BKLMHit2d* hit)
+bool BKLMTrackingModule::isSectorUnderStudy(int forward, int iSector, BKLMHit2d* hit)
 {
-  if (hit->isForward() == (isForward != 0) && hit->getSector() == iSector + 1) return true;
+  if (hit->getForward() == (forward != 0) && hit->getSector() == iSector + 1) return true;
   else return false;
 }
 
@@ -498,8 +497,8 @@ double BKLMTrackingModule::distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
   TMatrixDSym m_SectorErr = track->getTrackParamErr();
 
   m_GeoPar = GeometryPar::instance();
-  const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), 1);
-  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
+  const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), 1);
+  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
 
   CLHEP::Hep3Vector globalPos(hit->getGlobalPosition()[0], hit->getGlobalPosition()[1], hit->getGlobalPosition()[2]);
   CLHEP::Hep3Vector local = refMod->globalToLocal(globalPos);

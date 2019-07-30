@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shlex
 import config
 import subprocess
 
@@ -17,11 +18,15 @@ if not analysis:
     AddOption('--local', dest='local', action='store_true', default=False,
               help='Enable faster build of local code. No code in the central release should depend on the local code!')
 AddOption('--no-symlink', dest='no-symlink', action='store_true', default=False, help='Use copies instead of symbolic links')
+AddOption('--no-debuginfo', dest='no-debuginfo', action='store_true', default=False, help='If given no debug information will be created')
 AddOption('--extra-libpath', dest='extralibpath', action='store', help='Additional library path')
 AddOption('--extra-ccflags', dest='extraccflags', action='store', help='Additional compiler flags')
+
 AddOption('--ignore-externals-version', dest='check_externals', action='store_false', default=True,
           help="if given the externals version will not checked for consistency between .externals and the environment")
 AddOption('--light', dest='light', action='store_true', default=False, help='Build a light release')
+AddOption('--create-json', dest="create_json", action="store_true", default=False,
+          help="Create a compile_commands.json suitable for clang tools and many code completion libraries")
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
@@ -95,10 +100,11 @@ global_env = Environment(
     # disable warnings when compiling dictionaries, too much root problems
     # involved
     ROOTCLING_EXTRA_CCFLAGS=["-w"],
-    CPPDEFINES={'_PACKAGE_': '\\"$PACKAGE\\"'},
+    CPPDEFINES={'_PACKAGE_': '\'"$PACKAGE"\''},
     CPPPATH=['include'],
     LIBPATH=['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
     DATAOBJECT_LIBS=[],
+    SPLIT_DEBUGINFO=not GetOption('no-debuginfo'),
     TOOLS_LIBS={},
     TOOLS_LIBPATH={},
     TEST_LIBS=[],
@@ -119,6 +125,13 @@ global_env = Environment(
         "-Wl,--copy-dt-needed-entries"
     ],
 )
+
+# add this early because we want to be sure it's enabled before we create any
+# targets as it needs to modify the object/shared object builders
+if GetOption("create_json"):
+    tool = Tool('compilation_db', COMPILATIONDB_COMSTR="*** compilation database: $TARGET")
+    tool(global_env)
+    global_env.CompilationDatabase("#compile_commands.json")
 
 # recalculate MD5 sums only if the file changed in the last 10 minutes
 SetOption("max_drift", 600)
@@ -142,12 +155,12 @@ if option == 'debug':
     global_env.Append(FORTRANFLAGS='-g')
 elif option == 'opt':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
-    global_env.Append(FORTRANFLAGS='-O3')
+    global_env.Append(FORTRANFLAGS=['-O3'])
     # Parallel LTO avoids sequential bottlenecks when large libraries are
     # linked, but causes oversubscription when linking libraries concurrently.
     # Performance and RAM usage measurements suggest that between these two
     # evils, oversubscription is the better choice.
-    global_env.Append(LINKFLAGS='-flto=' + str(GetOption('num_jobs')))
+    global_env.Append(LINKFLAGS='-flto$(=%d$)' % GetOption('num_jobs'))
     # LTO requires some binutils wrappers that preserve the GCC IR
     global_env['AR'] = 'gcc-ar'
     global_env['RANLIB'] = 'gcc-ranlib'
@@ -214,6 +227,9 @@ else:
     print('Aborted because of unknown build option:', option)
     Exit(1)
 
+if(not GetOption('no-debuginfo')):
+    global_env.AppendUnique(CCFLAGS=['-g'], FORTRANFLAGS=['-g'])
+
 # allow overriding some things from command line (e.g. to enable scan-build)
 override_from_environment = ['CC', 'CXX', 'LD']
 for v in override_from_environment:
@@ -231,15 +247,9 @@ if os.environ.get("BELLE2_USE_CCACHE", "no").lower() in ["yes", "true", "on", "1
     # It may also replace the compiler with CCACHE_CC for other tools
 
 # central release
-repository = None
 if analysis:
     global_env.Append(CCFLAGS=['-I' + os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'include')])
     global_env.Append(LIBPATH=[os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'lib', subdir)])
-else:
-    # use central release as repository if it is set up
-    if 'BELLE2_RELEASE_DIR' in os.environ:
-        repository = os.environ['BELLE2_RELEASE_DIR']
-        global_env.Repository(repository)
 
 # set variant directory for object files
 VariantDir(global_env['BUILDDIR'], '.', duplicate=0)
@@ -263,50 +273,42 @@ explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rst
 # make the static library containing the main() function for test executables
 global_env.Library(os.path.join(global_env['LIBDIR'], 'test_main'), "$BUILDDIR/site_scons/test_main.cc")
 
+# figure out where we don't want sphinx to look for documentation. Mostly not
+# in output directories. But depending on whether or not we do a light build we
+# don't want to look in any non-light packages
+sphinx_exclude_pattern = set()
+
 # process the analysis directory
 if analysis:
     global_env['PACKAGE'] = os.path.basename(os.environ['BELLE2_ANALYSIS_DIR'])
     global_env['AVAILABLE_PACKAGES'] = []
-    global_env.ProcessDirectory('.', True, None)
+    global_env.ProcessDirectory('.', True)
 
 # process the package directories
 else:
     # loop over directory entries and select package directories
     exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
-    available_packages = {}
+    sphinx_exclude_pattern |= set(exclude_dirs)
+    available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:
             continue
-
-        available_packages[entry] = None
-
-    # loop over directory entries in central release
-    if repository and not GetOption('local'):
-        for entry in os.listdir(repository):
-            if (entry.find('.') > -1 or os.path.isfile(os.path.join(repository, entry)) or
-               (entry in exclude_dirs + available_packages.keys())):
-                continue
-
-            available_packages[entry] = repository
+        available_packages.add(entry)
 
     # retain only packages specified in the .light file if the light option is given
     if GetOption('light'):
-        light_path = '.' if os.path.exists('.light') else release
-        light_packages = [entry.strip('/') for entry in open(os.path.join(light_path, '.light')).read().split() if entry.endswith('/')]
-        selected_packages = {}
-        for package in light_packages:
-            if package in available_packages.keys():
-                selected_packages[package] = available_packages[package]
-        available_packages = selected_packages
+        light_packages = set([entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')])
+        sphinx_exclude_pattern |= available_packages.difference(light_packages)
+        available_packages = available_packages.intersection(light_packages)
 
     # we looped over all of them and know what's available so let's compile
     # whatever was selected
-    global_env['AVAILABLE_PACKAGES'] = set(available_packages.keys())
-    for package, repository in sorted(available_packages.items()):
+    global_env['AVAILABLE_PACKAGES'] = available_packages
+    for package in sorted(list(available_packages)):
         if explicit_package_targets and package not in explicit_package_targets:
             continue
         global_env['PACKAGE'] = package
-        global_env.ProcessDirectory(package, False, repository)
+        global_env.ProcessDirectory(package, False)
 
     # for global things (e.g. tests) no package should be set
     del global_env['PACKAGE']
@@ -329,16 +331,26 @@ global_env.Alias('lib', lib)
 if len(global_env['TEST_FILES']) > 0:
     test = global_env.Program(os.path.join(global_env['BINDIR'], 'b2test-units'),
                               global_env['TEST_FILES'], LIBS=global_env['TEST_LIBS'])
-    global_env.Alias('b2test-units', test)
-    global_env.Alias('tests', test)
+    debug = global_env.StripDebug(test)
+    global_env.Alias('b2test-units', [test, debug])
+    global_env.Alias('tests', [test, debug])
 
 # build sphinx documentation if the --sphinx option is used
 AddOption("--sphinx", dest="sphinx", action="store_true", default=False, help="if given sphinx documentation will be generated")
 if global_env.GetOption("sphinx"):
+    tools_doc = global_env.Command('build/tools_doc', [], 'ln -sf %s/doc $TARGET' % os.environ.get('BELLE2_TOOLS'))
     sphinx_targets = ['html', 'latex', 'json']
+    # we place the tools doc in the build directory so obviously we don't want
+    # to exclude all of that
+    sphinx_exclude_pattern.remove('build')
+    # but we can exclude most of it ...
+    sphinx_exclude_pattern |= {'build/Linux*', 'build/doctrees'} | {f'build/{e}' for e in sphinx_targets}
+    # and convert to a proper argument for sphinx-build
+    sphinx_exclude_pattern = shlex.quote("exclude_patterns=" + ",".join(sphinx_exclude_pattern))
     for sphinx_target in sphinx_targets:
-        tools_doc = global_env.Command('build/tools_doc', [], 'ln -sf %s/doc $TARGET' % os.environ.get('BELLE2_TOOLS'))
-        sphinx = global_env.Command('build/%s' % sphinx_target, 'index.rst', 'sphinx-build -b %s -c site_scons/sphinx -d build/doctrees . $TARGET' % sphinx_target)
+        sphinx = global_env.Command(f'build/{sphinx_target}', 'index.rst', f"sphinx-build -b {sphinx_target} "
+                                    f"-ENT -D {sphinx_exclude_pattern} "
+                                    "-c site_scons/sphinx -d build/doctrees . $TARGET")
         global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin', tools_doc])
         global_env.SideEffect('PreventParallelSphinxBuilds', sphinx)
         global_env.AlwaysBuild(sphinx)

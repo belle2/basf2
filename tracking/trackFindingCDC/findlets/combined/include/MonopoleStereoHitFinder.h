@@ -73,7 +73,7 @@ namespace Belle2 {
       SingleMatchSelector<CDCTrack, CDCRLWireHit, HitComperator> m_singleMatchSelector;
       /// Add the hits to the tracks
       StereoHitTrackAdder m_adder;
-      // Print found tracks
+      /// Print found tracks
       TrackInspector m_inspector;
       /// Fit the tracks after creation TODO the fitter obviously should be different
 //       TrackSZFitter m_szFitter;

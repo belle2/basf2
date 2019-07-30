@@ -68,7 +68,7 @@ LogLikelihood values, the binary likelihood ratios and the global likelihood
 ratios for any arbitrary detector combination of mass hypothesis. The accepted
 detector codes are SVD, TOP, CDC, ARICH, ECL, KLM and ALL.
 
-If a likelihood is not available from the selected detector list, `NaN` is returned.
+If a likelihood is not available from the selected detector list, **NaN** is returned.
 
 .. warning :: 
   These variables are not to be used in physics analyses, but only by experts doing performance studies.
@@ -76,23 +76,35 @@ If a likelihood is not available from the selected detector list, `NaN` is retur
 .. b2-variables::
    :group: PID_expert
 
-PID for B2BII
-"""""""""""""
-.. warning :: 
-  These variables are to be used only when analysing converted Belle samples.
-
-.. b2-variables::
-   :group: PID_belle
-
 ECL Cluster
 ~~~~~~~~~~~
 
 Here is a list of variables related to ECL cluster.
 All ECLCluster-based variables return NaN if no ECLCluster is found.
-There is further detailed documentation available `here <https://confluence.desy.de/x/I3I0Aw>`_.
+
+.. _importantNoteECL:
+
+.. note::
+    All floating type variables in the mdst dataobject ECLCluster use ROOT Double32_t types with
+    specific range declaration to save disk storage. This has two important consequences for a user:
+        
+        - All ECL cluster variables have a limited precision. This precision is always better than
+          the intrinsic ECL data acquisition precision. However, if these variables are histogrammed,
+          binning effects are likely.
+        - All ECL cluster variables are clipped at the lower and upper boundaries: Values below (above)
+          these boundaries will be set to the lower (upper) bound.
+    
+    Lower and uppper limits, and precision of these variables are mentioned inside the note box below them.
+    One should note this in the context of binning effects.
+
 
 .. b2-variables::
    :group: ECL Cluster related
+
+There are also some special variables related to the MC matching of ECL clusters (specifically).
+
+.. b2-variables::
+   :group: MC Matching for ECLClusters
 
 Acceptance
 ~~~~~~~~~~
@@ -178,13 +190,21 @@ KLM Cluster and :math:`K_{L}^0` Identification
 
 Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 
+.. warning ::
+  Please note that these variables refer to KLMClusters, which are designed to reconstruct :math:`K_{L}^0` and other
+  neutral particles with the KLM subdetector. These variables **must not be used to do particle identification of
+  charged tracks** (for example, they must not be used to identify muons), otherwise there is a serious risk to spoil
+  a physics analysis. 
+  
+  For particle identification of charged tracks, please use the canonical PID variables.
+
 .. b2-variables::
    :group: KLM Cluster and KlongID
 
 Time Dependent CPV Analysis Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of TDCPV variables:
+To use most of the variables in this section on need to run `vertex.TagV` method:
 
 .. b2-variables::
    :group: Time Dependent CPV Analysis Variables
@@ -254,6 +274,25 @@ Here is a list of production and decay vertex variables:
 .. b2-variables::
    :group: Vertex Information   
 
+Belle and ``b2bii`` variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Several legacy Belle variables are provided. 
+
+.. note::
+   These are intended for studies with ``b2bii`` and for comparison between Belle and Belle II.
+
+.. b2-variables::
+   :group: Belle Variables
+
+PID for B2BII
+"""""""""""""
+
+.. warning:: 
+   These variables are to be used only when analysing converted Belle samples.
+
+.. b2-variables::
+   :group: PID_belle
 
 
 Miscellaneous
@@ -267,8 +306,10 @@ Other variable that can be handy in development:
 Calibration
 ~~~~~~~~~~~
 
-There are several variables also available for calibration experts who are working on cdst format files.
-Many of these will not work for- and should not be used by- normal analyses.
+There are several variables also available for calibration experts who are working on ``cdst`` format files.
+
+.. warning:: Many of these will not work for- and should not be used by- normal analyses.
+
 They have a *[Calibration]* pretag.
 
 .. b2-variables::
@@ -298,7 +339,7 @@ One can use the list in the steering file as follows:
   modular_analusis.variablesToNtuple(variables=my_list,
                                      ...)
 
-It is also possible to use `variableCollection`. Name of the variable collection can
+It is also possible to create user-defined variable collections. Name of the variable collection can
 be threated as a variable name, and hence one would have the following syntax in the steering file:
 
 .. code:: python

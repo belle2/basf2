@@ -13,7 +13,10 @@
 
 #include <top/reconstruction/TOPtrack.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
+#include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalTimebase.h>
 #include <framework/database/DBObjPtr.h>
+#include <top/dataobjects/TOPAsicMask.h>
 
 extern "C" {
   void set_beta_rq_(float*);
@@ -24,6 +27,7 @@ extern "C" {
   void get_logl_ch_(float*, float*, float*, float*, float*);
   int data_getnum_();
   void set_channel_mask_(int*, int*, int*);
+  void set_channel_off_(int*, int*);
   void print_channel_mask_();
   void set_channel_effi_(int*, int*, float*);
   void redo_pdf_(float*);
@@ -64,10 +68,26 @@ namespace Belle2 {
       /**
        * Set channel mask
        * @param mask channel mask
-       * @param printMask if true, print masks to std output
        */
       static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
-                                 bool printMask = false);
+                                 const TOPAsicMask& asicMask);
+
+      /**
+       * Set uncalibrated channels off
+       * @param channelT0 channel T0 calibration
+       */
+      static void setUncalibratedChannelsOff(const DBObjPtr<TOPCalChannelT0>& channelT0);
+
+      /**
+       * Set uncalibrated channels off
+       * @param timebase timebase calibration
+       */
+      static void setUncalibratedChannelsOff(const DBObjPtr<TOPCalTimebase>& timebase);
+
+      /**
+       * Print channel mask
+       */
+      static void printChannelMask() {print_channel_mask_();}
 
       /**
        * Set relative efficiencies of pixels

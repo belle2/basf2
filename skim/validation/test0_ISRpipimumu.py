@@ -20,31 +20,30 @@ set_random_seed(12345)
 # background (collision) files
 bg = glob.glob('./BG/[A-Z]*.root')
 
-# create path
-main = create_path()
+# create a new path
+ISRskimpath = Path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10000])
-eventinfosetter.param('runList', [0])
+eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
-main.add_module(eventinfosetter)
+ISRskimpath.add_module(eventinfosetter)
 
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/2411440000.dec'))
-main.add_module(evtgeninput)
+ISRskimpath.add_module(evtgeninput)
 
 # detector simulation
-# add_simulation(main, bkgfiles=bg)
-add_simulation(main)
+add_simulation(ISRskimpath)
 
 # reconstruction
-add_reconstruction(main)
+add_reconstruction(ISRskimpath)
 
 # Finally add mdst output
 output_filename = "../ISRpipimumu.dst.root"
-add_mdst_output(main, filename=output_filename)
+add_mdst_output(ISRskimpath, filename=output_filename)
 
 # process events and print call statistics
-process(main)
+process(ISRskimpath)
 print(statistics)

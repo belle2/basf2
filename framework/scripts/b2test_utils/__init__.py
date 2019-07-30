@@ -191,3 +191,55 @@ Please run:
 and fix any issues you have introduced. Here is what {toolname} found:\n""")
         print("\n".join(clean_log))
         sys.exit(1)
+
+
+def get_streamer_checksums(objects):
+    """
+    Extract the version and streamer checksum of the C++ objects in the given list
+    by writing them all to a TMemFile and getting back the streamer info list
+    automatically created by ROOT afterwards.
+    Please note, that this list also includes the streamer infos of all
+    base objects of the objects you gave.
+
+    Returns a dictionary object name -> (version, checksum).
+    """
+    import ROOT
+
+    # Write out the objects to a mem file
+    f = ROOT.TMemFile("test_mem_file", "RECREATE")
+    f.cd()
+
+    for o in objects:
+        o.Write()
+    f.Write()
+
+    # Go through all streamer infos and extract checksum and version
+    streamer_checksums = dict()
+    for streamer_info in f.GetStreamerInfoList():
+        if not isinstance(streamer_info, ROOT.TStreamerInfo):
+            continue
+        streamer_checksums[streamer_info.GetName()] = (streamer_info.GetClassVersion(), streamer_info.GetCheckSum())
+
+    f.Close()
+    return streamer_checksums
+
+
+def get_object_with_name(object_name, root=None):
+    """
+    (Possibly) recursively get the object with the given name from the Belle2 namespace.
+
+    If the object name includes a ".", the first part will be turned into an object (probably a module)
+    and the function is continued with this object as the root and the rest of the name.
+
+    If not, the object is extracted via a getattr call.
+    """
+    if root is None:
+        from ROOT import Belle2
+        root = Belle2
+
+    if "." in object_name:
+        namespace, object_name = object_name.split(".", 1)
+
+        return get_object_with_name(object_name, get_object_with_name(namespace, root=root))
+
+    return getattr(root, object_name)

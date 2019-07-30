@@ -39,7 +39,9 @@ Framework::Framework()
   DataStore::s_DoCleanup = true;
   LogSystem::Instance().enableErrorSummary(true);
 
-  RandomNumbers::initialize();
+  if (!RandomNumbers::isInitialized()) {
+    RandomNumbers::initialize();
+  }
   Environment::Instance();
 }
 
@@ -97,7 +99,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
     }
 
     //were any modules in moduleListUnique already run?
-    for (auto m : moduleListUnique) {
+    for (const auto& m : moduleListUnique) {
       if (previously_run_modules.count(m.get()) > 0) {
         //only clone if modules have been run before
         startPath = std::static_pointer_cast<Path>(startPath->clone());
@@ -105,7 +107,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
       }
     }
   }
-  for (auto m : moduleListUnique) {
+  for (const auto& m : moduleListUnique) {
     previously_run_modules.insert(m.get());
   }
 
@@ -167,7 +169,7 @@ int Framework::getNumberProcesses()
 }
 
 
-void Framework::setPicklePath(std::string path)
+void Framework::setPicklePath(const std::string& path)
 {
   Environment::Instance().setPicklePath(path);
 }
@@ -178,7 +180,7 @@ std::string Framework::getPicklePath()
   return Environment::Instance().getPicklePath();
 }
 
-void Framework::setStreamingObjects(boost::python::list streamingObjects)
+void Framework::setStreamingObjects(const boost::python::list& streamingObjects)
 {
   auto vec = PyObjConvUtils::convertPythonObject(streamingObjects, std::vector<std::string>());
   Environment::Instance().setStreamingObjects(vec);
@@ -212,7 +214,7 @@ boost::python::list Framework::getModuleSearchPathsPython()
 {
   boost::python::list returnList;
 
-  for (std::string path : ModuleManager::Instance().getModuleSearchPaths())
+  for (const std::string& path : ModuleManager::Instance().getModuleSearchPaths())
     returnList.append(boost::python::object(path));
   return returnList;
 }
@@ -221,7 +223,7 @@ boost::python::list Framework::getModuleSearchPathsPython()
 boost::python::dict Framework::getAvailableModulesPython()
 {
   boost::python::dict returnDict;
-  for (auto modulePair : ModuleManager::Instance().getAvailableModules())
+  for (const auto& modulePair : ModuleManager::Instance().getAvailableModules())
     returnDict[boost::python::object(modulePair.first)] = boost::python::object(modulePair.second);
   return returnDict;
 }
@@ -231,7 +233,7 @@ boost::python::list Framework::getRegisteredModulesPython()
 {
   boost::python::list returnList;
 
-  for (ModulePtr mod : ModuleManager::Instance().getCreatedModules())
+  for (const ModulePtr& mod : ModuleManager::Instance().getCreatedModules())
     returnList.append(boost::python::object(mod));
   return returnList;
 }
@@ -262,7 +264,7 @@ void Framework::exposePythonAPI()
 {
   PyExc_ModuleNotCreatedError = PyErr_NewExceptionWithDoc("basf2.ModuleNotCreatedError",
                                                           "This exception is raised when a basf2 module could not be created for any reason",
-                                                          PyExc_RuntimeError, NULL);
+                                                          PyExc_RuntimeError, nullptr);
   scope().attr("ModuleNotCreatedError") = handle<>(borrowed(PyExc_ModuleNotCreatedError));
   register_exception_translator<ModuleManager::ModuleNotCreatedError>(moduleNotCreatedTranslator);
   //Overloaded methods

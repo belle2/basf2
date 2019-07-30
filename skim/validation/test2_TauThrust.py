@@ -17,7 +17,7 @@ from stdPhotons import *
 
 tauthrustskim = Path()
 
-inputMdst('MC9', '../TauThrust.udst.root', path=tauthrustskim)
+inputMdst('default', '../TauThrust.udst.root', path=tauthrustskim)
 
 stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)
@@ -37,3 +37,17 @@ variablesToHistogram(
 )
 process(tauthrustskim)
 print(statistics)
+
+# add contact information to histogram
+contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+import ROOT
+
+f = ROOT.TFile.Open('TauThrust_Validation.root', 'update')
+
+f.Get('nGoodTracks').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('visibleEnergyOfEventCMS').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('thrust').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+
+f.Write("", ROOT.TObject.kOverwrite)
+f.Close()

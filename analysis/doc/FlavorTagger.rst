@@ -100,7 +100,7 @@ ECL and KLM clusters.
 
 In the first step a dedicated ParticleList is created for each type of
 reconstructed tracks (electrons, muons, Kaons, pions and protons). The
-particles in each list correspond to the whole set of `RestOfEvent` (ROE) tracks
+particles in each list correspond to the whole set of :doc:`RestOfEvent` (ROE) tracks
 fitted with a specific mass hypothesis. The mass hypothesis of each
 ParticleList corresponds to the searched flavor signature, e.g. "K+:KaonROE" is
 created for the categories using the information of kaons. Several flavor
@@ -165,7 +165,7 @@ If you just want to use the flavor tagger as standard user you need only:
 
   ft.flavorTagger( particleLists=['B0:yourSignalBlist'], weightFiles='B2nunubarBGx1')
 
-and to add the `flavor_tagging` variables to your nTuple as explained below. BGx1 stays for MC generated
+and to add the ``flavor_tagging`` variables to your nTuple as explained below. BGx1 stays for MC generated
 with machine Background. Only BGx1 files are provided centrally.
  
 If you use a release that is older than release-03 please use 
@@ -193,7 +193,7 @@ steering file right before calling the flavor tagger:
 
 ::
  
-  basf2.use_central_database("analysis_tools_release-03")
+  basf2.use_central_database("analysis_tools_release-03-01-00")
 
 +---------------------------+-------------------------------------------+
 | Release                   | Global DataBase Tag                       |
@@ -208,12 +208,12 @@ Saving to nTuples
 
 The flavor tagger provides the output of the two combiners and the outputs 
 of the 13 categories. It provides also the MC information relevant for the categories. 
-To save this information you just have to add the predefined predefined list
+To save this information you just have to add the predefined list
 ``ft.flavor_tagging``
-to the variables that you use as argument for the module :func:`variablesToNtuple`.
+to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be
-found in the ntupleTree of the output root file: ``FBDT_qrCombined`` or
+found in the ntuple of the output root file: ``FBDT_qrCombined`` or
 ``FANN_qrCombined``. FBDT is the output of a fast boosted decision tree and
 FANN is the output of a multi-layer perceptron of the open source library fast
 artificial neural network . The default output -2 is saved for events without

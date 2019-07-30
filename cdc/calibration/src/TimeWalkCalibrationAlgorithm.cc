@@ -62,12 +62,12 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  double x;
-  double t_mea;
-  double w;
-  double t_fit;
-  double ndf;
-  double Pval;
+  float x;
+  float t_mea;
+  float w;
+  float t_fit;
+  float ndf;
+  float Pval;
   unsigned short adc;
   int IWire;
   int lay;
@@ -172,6 +172,7 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
       m_tw_new[ib][i - 1] = f1->GetParameter(i);
     }
 
+
     B2DEBUG(21, "Prob of fitting:" << f1->GetProb());
     B2DEBUG(21, "Fitting Param 0-1:" << f1->GetParameter(0) << " - " << f1->GetParameter(1));
 
@@ -224,7 +225,6 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::checkConvergence()
   for (int ib = 0; ib < 300; ++ib) {
     float dtw = (m_tw_new[ib][0] - m_tw_old[ib][0]) / m_tw_old[ib][0];
     if (std::isnan(dtw) == 0) {
-      //      std::cout << dtw << " " << m_tw_new[ib][0] << " " << m_tw_old[ib][0] << std::endl;
       hDtw->Fill(dtw);
     }
   }
@@ -244,14 +244,19 @@ void TimeWalkCalibrationAlgorithm::write()
   B2INFO("Save to the local DB");
   CDCTimeWalks* dbTw = new CDCTimeWalks();
   int nfailure = 0;
+
+  dbTw->setTwParamMode(m_twParamMode);
   for (int ib = 0; ib < 300; ++ib) {
     if (m_flag[ib] != 1) {
       nfailure += 1;
     }
-    const int num = static_cast<int>(m_tw_old[ib].size());
-    for (int i = 0; i < num; ++i) {
-      m_tw_new[ib][i] += m_tw_old[ib][i];
+    if (m_twParamMode == 0) {
+      const int num = static_cast<int>(m_tw_old[ib].size());
+      for (int i = 0; i < num; ++i) {
+        m_tw_new[ib][i] += m_tw_old[ib][i];
+      }
     }
+
     dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
   }
 

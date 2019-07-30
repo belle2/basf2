@@ -41,8 +41,7 @@ namespace Belle2 {
     }
 
     // Helper function for flight distance and its uncertainty (provided as it is)
-    inline double getFlightInfoBtw(const Particle* particle, const Particle* daughter, double& outErr, const std::string& mode,
-                                   const bool motherToGranddaughter = false)
+    inline double getFlightInfoBtw(const Particle* particle, const Particle* daughter, double& outErr, const std::string& mode)
     {
       if (!particle || !daughter) {
         outErr = -999;
@@ -59,23 +58,6 @@ namespace Belle2 {
                   << "'. Only 'distance' and 'time' are available.");
         outErr = -999;
         return -999;
-      }
-      // get TreeFitter values if they exist.
-      // Bypass this in case the variables are requested for the granddaughter with respect to the mother as
-      // TreeFitter will return the values of the granddaughter with respect to the daughter
-      if (!motherToGranddaughter) {
-        if (mode == "distance" &&
-            daughter->hasExtraInfo("decayLength") &&
-            daughter->hasExtraInfo("decayLengthErr")) {
-          outErr = daughter -> getExtraInfo("decayLengthErr");
-          return daughter -> getExtraInfo("decayLength");
-        }
-        if (mode == "time" &&
-            daughter->hasExtraInfo("lifeTime") &&
-            daughter->hasExtraInfo("lifeTimeErr")) {
-          outErr = daughter -> getExtraInfo("lifeTimeErr");
-          return daughter -> getExtraInfo("lifeTime");
-        }
       }
 
       double mumvtxX = particle->getX();
@@ -400,7 +382,7 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
+              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time");
             }
           } else {
             return getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
@@ -444,7 +426,7 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
+              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time");
               return flightTimeErr;
             }
           } else {
@@ -489,7 +471,7 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance", true);
+              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance");
             }
           } else {
             return getFlightInfoBtw(particle, daughter, flightDistanceErr, "distance");
@@ -533,7 +515,7 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance", true);
+              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance");
               return flightDistanceErr;
             }
           } else {

@@ -80,6 +80,7 @@ namespace Belle2 {
         return lhsZDistance < rhsZDistance;
       }
 
+      /// ROOT-compatible formula for z(s) = (p + 4q)*s - q/25 * s^2
       static const char* debugLine() { return "([0] + 4*[1])*x - [1] / 25 * x * x";}
     };
   }

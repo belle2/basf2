@@ -33,7 +33,9 @@ namespace Belle2 {
 
     /// Store basic wire info for faster access
     struct CDCCKFWireHitCache {
+      /// layer index
       int     icLayer;
+      /// azimuthal coordinate
       double  phi;
     };
 
@@ -90,6 +92,11 @@ namespace Belle2 {
       for (size_t i = 0; i < wireHits.size(); i++) {
 
         const TrackFindingCDC::CDCWireHit* wireHit = wireHits[i];
+
+        if (wireHit->getAutomatonCell().hasBackgroundFlag()
+            || wireHit->getAutomatonCell().hasTakenFlag()) {
+          continue;
+        }
 
         const auto iCLayer =  m_wireHitCache[i].icLayer; // wireHit->getWire().getICLayer();
         if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {

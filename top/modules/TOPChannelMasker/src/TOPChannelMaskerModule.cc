@@ -12,6 +12,7 @@
 
 #include <top/modules/TOPChannelMasker/TOPChannelMaskerModule.h>
 #include <top/reconstruction/TOPreco.h>     // reconstruction wrapper
+#include <top/reconstruction/TOPconfigure.h>
 
 using namespace std;
 
@@ -35,44 +36,96 @@ namespace Belle2 {
 
     // Set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
+
+    // Add parameters
+    addParam("printMask", m_printMask,
+             "if true, print channel mask as set in reconstruction", false);
+    addParam("maskUncalibratedChannelT0", m_maskUncalibratedChannelT0,
+             "if true, mask channelT0-uncalibrated channels", true);
+    addParam("maskUncalibratedTimebase", m_maskUncalibratedTimebase,
+             "if true, mask timebase-uncalibrated channels ", true);
   }
 
   void TOPChannelMaskerModule::initialize()
   {
     // register data objects
     m_digits.isRequired();
+    m_eventAsicMask.isOptional();
+
+    // Configure TOP detector in FORTRAN code
+    TOPconfigure config;
+  }
+
+  void TOPChannelMaskerModule::beginRun()
+  {
+
+    if (not m_channelMask.isValid()) {
+      B2FATAL("channel mask not available");
+    }
+    if (not m_channelT0.isValid()) {
+      B2FATAL("channel T0 calibration not available");
+    }
+    if (not m_timebase.isValid()) {
+      B2FATAL("timebase calibration not available");
+    }
 
   }
 
   void TOPChannelMaskerModule::event()
   {
-    // if changed then pass pixel relative efficiencies to the FORTRAN reconstructon code
-    if (m_pmtInstalled.hasChanged() or m_pmtQEData.hasChanged() or
-        m_channelRQE.hasChanged() or m_thresholdEff.hasChanged()) {
+
+    // have those payloads changed?
+
+    bool pmtInstalled = m_pmtInstalled.hasChanged();
+    bool pmtQEData = m_pmtQEData.hasChanged();
+    bool channelRQE = m_channelRQE.hasChanged();
+    bool thresholdEff = m_thresholdEff.hasChanged();
+
+    // if at least one then pass pixel relative efficiencies to the reconstructon code
+
+    if (pmtInstalled or pmtQEData or channelRQE or thresholdEff) {
       TOPreco::setChannelEffi();
-      // reset others to prevent passing the same effi. again in the next couple of events
-      m_pmtInstalled.hasChanged();
-      m_pmtQEData.hasChanged();
-      m_channelRQE.hasChanged();
-      m_thresholdEff.hasChanged();
     }
 
-    // are masks available?
-    if (!m_channelMask.isValid()) {
-      B2ERROR("channel mask not available, not masking any channels");
-      return;
+    // have asic masks changed?
+
+    bool asicMasksChanged = false;
+    if (m_eventAsicMask.isValid()) {
+      if (m_eventAsicMask->get() != m_savedAsicMask.get()) {
+        m_savedAsicMask.set(m_eventAsicMask->get());
+        asicMasksChanged = true;
+      }
     }
 
-    // if channel masks have changed then pass the masking to the FORTRAN
-    // reconstruction code to exclude from the pdf
-    if (m_channelMask.hasChanged()) {
-      TOPreco::setChannelMask(m_channelMask);
+    // have channel masks or calibration changed?
+
+    bool channelMaskChanged = m_channelMask.hasChanged();
+    bool channelT0Changed = m_channelT0.hasChanged();
+    bool timebaseChanged = m_timebase.hasChanged();
+
+    // if at least one then pass the new masking to the reconstruction code
+
+    if (channelMaskChanged or asicMasksChanged or
+        (m_maskUncalibratedChannelT0 and channelT0Changed) or
+        (m_maskUncalibratedTimebase and timebaseChanged)) {
+
+      TOPreco::setChannelMask(m_channelMask, m_savedAsicMask);
+      if (m_maskUncalibratedChannelT0) TOPreco::setUncalibratedChannelsOff(m_channelT0);
+      if (m_maskUncalibratedTimebase) TOPreco::setUncalibratedChannelsOff(m_timebase);
+      if (m_printMask) TOPreco::printChannelMask();
     }
 
-    // now flag actual data Cherenkov hits as coming from bad channels
+    // now flag actual data Cherenkov hits as coming from masked channels
+
     for (auto& digit : m_digits) {
-      if (!m_channelMask->isActive(digit.getModuleID(), digit.getChannel())) {
+      if (not m_channelMask->isActive(digit.getModuleID(), digit.getChannel())) {
         digit.setHitQuality(TOPDigit::c_Junk);
+      }
+      if (m_maskUncalibratedChannelT0 and not digit.isChannelT0Calibrated()) {
+        digit.setHitQuality(TOPDigit::c_Uncalibrated);
+      }
+      if (m_maskUncalibratedTimebase and not digit.isTimeBaseCalibrated()) {
+        digit.setHitQuality(TOPDigit::c_Uncalibrated);
       }
     }
 

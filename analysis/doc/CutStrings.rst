@@ -4,7 +4,7 @@ Cut strings and selections
 Cut strings in ``basf2`` analysis scripts work quite intuitively.
 If you are familiar with `ROOT` cutstrings and/or python logic, you will probably not notice much difference.
 
-Cut strings are used to manipulate candidates (i.e. `PartcleList`_ s) with `modularAnalysis.applyCuts`, and `modularAnalysis.cutAndCopyList`.
+Cut strings are used to manipulate candidates (i.e. `ParticleList`_ s) with `modularAnalysis.applyCuts`, and `modularAnalysis.cutAndCopyList`.
 Events selections are applied with `modularAnalysis.applyEventCuts`.
 
 You can use logical operators ``&&``, ``||`` or words ``and``, ``or`` in your cuts.

@@ -518,8 +518,12 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
                     stateBasicFilterParameters={"maximalHitDistance": 0.75},
                     pathFilter="arc_length"
                     )
-    # EclSeedRecoTracks don't have to be added to the list as these do not contain any hits
+    # "EclSeedRecoTracks" don't have to be added to the list as these do not contain any hits
     temporary_reco_track_list.append('CDCRecoTracksFromEcl')
+
+    # Do the following modules have to be added as these are executed already after
+    # the CDC standalone?
+    # If so: they also have to be included in the new SVD->CDC CKF (see add_svd_track_finding(..) above)
 
     # Correct time seed (only necessary for the CDC tracks)
     # path.add_module("IPTrackTimeEstimator",

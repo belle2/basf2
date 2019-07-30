@@ -330,6 +330,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get maximal sector global number with KLM ordering (section, sector).
+     */
+    static constexpr int getMaximalSectorGlobalNumberKLMOrder()
+    {
+      return m_MaximalEndcapNumber * m_MaximalSectorNumber;
+    }
+
+    /**
      * Get maximal plane global number.
      */
     static constexpr int getMaximalPlaneGlobalNumber()

@@ -65,7 +65,6 @@ namespace Belle2 {
     //-----------------------------------------------------
     G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
     {
-
       // Once-only initializations (constructor is called too early for these)
       if (m_FirstCall) {
         m_FirstCall = false;
@@ -119,6 +118,8 @@ namespace Belle2 {
           int(BKLMElementNumbers::moduleNumber(forward, sector, layer))
           | BKLM_MC_MASK;
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
+        if (time > m_HitTimeMax)
+          return false;
         const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
         const Module* m = m_GeoPar->findModule(forward, sector, layer);
         const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
@@ -218,5 +219,7 @@ namespace Belle2 {
       }
       return;
     }
+
   } // end of namespace bklm
+
 } // end of namespace Belle2

@@ -166,12 +166,11 @@ namespace Belle2 {
                         int IZECLB = 0, int IPhiECLB = 0, int IRECLF = 0, int IZECLF = 0, int IPhiECLF = 0,
                         int IZARICHF = 0, int IPhiARICHF = 0, int IPhiTOPB = 0, int IPhiTOPF = 0,
                         int IPhiECLCOILB = 0, int IZECLCOILB = 0,
-                        const std::vector<double>& thicknesses = std::vector<double>(),
-                        const std::vector<double>& density = std::vector<double>()):
+                        const std::vector<double>& thicknesses = std::vector<double>()):
       m_IRCDCB(IRCDCB), m_IPhiCDCB(IPhiCDCB), m_IRCDCF(IRCDCF), m_IPhiCDCF(IPhiCDCF), m_IRECLB(IRECLB),
       m_IZECLB(IZECLB), m_IPhiECLB(IPhiECLB), m_IRECLF(IRECLF), m_IZECLF(IZECLF), m_IPhiECLF(IPhiECLF),
       m_IZARICHF(IZARICHF), m_IPhiARICHF(IPhiARICHF), m_IPhiTOPB(IPhiTOPB), m_IPhiTOPF(IPhiTOPF),
-      m_IPhiECLCOILB(IPhiECLCOILB), m_IZECLCOILB(IZECLCOILB), m_thick(thicknesses), m_density(density) {}
+      m_IPhiECLCOILB(IPhiECLCOILB), m_IZECLCOILB(IZECLCOILB), m_thick(thicknesses) {}
 
     /** Destructor */
     ~ThicknessDensityPar() {}
@@ -218,8 +217,6 @@ namespace Belle2 {
     int getIZECLCOILB() const { return m_IZECLCOILB;}
     /** Get the list of the thicknesses */
     std::vector<double> getthickness() const { return m_thick;}
-    /** Get the list of the density */
-    std::vector<double> getdensity() const { return m_density;}
 
 
   private:
@@ -257,8 +254,6 @@ namespace Belle2 {
     int m_IZECLCOILB;
     /** Thickness list of CDC gap element cell. */
     std::vector<double> m_thick;
-    /** Densities list of ECL, ARICH and top gap element cell. */
-    std::vector<double> m_density;
 
     ClassDef(ThicknessDensityPar, 2); /**< 2. Added members for gap between ECL and COIL.
              1. Initial version */

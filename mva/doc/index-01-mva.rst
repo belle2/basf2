@@ -516,15 +516,3 @@ Meetings
 There are regular meetings at the inter experimental LHC machine learning (IML) working group, which you can join 
 
 `<https://iml.web.cern.ch/>`_
-
-Outlook
--------
-
-I envision a fully automatic training for all MVA methods which are used in the reconstruction chain, and in the standard tools of the analysis package.
-So each time new MC for a new experiment or run becomes available, or the software has a new release, all classifiers are retrained automatically, and stored in the condition database.
-If the user uses the new release he automatically uses the new weightfiles, if you processes new experiments, the correct weightfiles are automatically loaded.
-The mva package already provides the infrastructure to enable such an automatisation.
-But the scripts which trigger the re-training on new releases, new MC, ... have to be written.
-
-
-

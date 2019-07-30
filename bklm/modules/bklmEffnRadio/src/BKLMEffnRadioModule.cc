@@ -162,7 +162,7 @@ void BKLMEffnRadioModule::initialize()
       //forward/backward
 
 
-      //don't divide the 2D effs in z/phi because we look at D effs. We still want to divide in section/backwd
+      //don't divide the 2D effs in z/phi because we look at D effs. We still want to divide in section
       m_cModuleEff2D[i][iLay]->Divide(2);
 
       for (int j = 0; j < 2; j++) {

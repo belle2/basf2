@@ -6,6 +6,8 @@ from basf2 import *
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
+from reconstruction import events_of_doom_buster
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
@@ -46,6 +48,12 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
     """
+
+    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
+    # TODO: do we need to apply only for data? How to ensure unpacking has been done?
+    empty_path = create_path()
+    doom = path.add_module(EventsOfDoomBuster(nCDCHitsMax=4000, nSVDShaperDigitsMax=70000))
+    doom.if_true(empty_path, AfterConditionPath.END)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,

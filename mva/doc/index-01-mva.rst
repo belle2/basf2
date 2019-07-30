@@ -4,8 +4,8 @@ MVA package
 ===========
 
 .. WARNING::
-    Documentation about the MVA package migrated from our `confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=35833547>`_. Please go there.
-    If you have time to take part the migration, feel free to take `Jira ticket <https://agira.desy.de/browse/BII-3547>`_.
+    Documentation about the MVA package migrated from our `confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=35833547>`_.
+    If you have time to take part the migration, please see the `Jira ticket <https://agira.desy.de/browse/BII-3547>`_.
     In this case you might need our nice guide on Sphinx documentation: :ref:`doctools` .
 
 Overview

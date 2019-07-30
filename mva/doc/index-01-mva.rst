@@ -294,16 +294,6 @@ There are different sub-directories:
 - ``mva/examples/orthogonal_discriminators`` – create orthongonal discriminators with ugBoost or adversary networks
 - ``mva/examples/<backend>`` – backend specific examples e.g. for tmva and tensorflow
 
-Promotion of new technologies
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Another goal of the mva package is to promote new technologies like DeepLearning or Bayesian Hyper-parameter optimization. The examples already include these cases. I just mention here a few ongoing projects so people have a starting point where to look for previous work (probably there will be some thesis available by the time you reading this):
-
-- DeepFlavourTagger by Jochen Gemmler at KIT
-- Deep ContinuumSuppression by Dennis Weyland at KIT
-- Adversary Networks by Thomas Keck at KIT
-- Bayesian Hyper-parameter optimization for the Deep ContinuumSuppresion by Dennis Weyland at KIT
-
 Contributions
 -------------
 

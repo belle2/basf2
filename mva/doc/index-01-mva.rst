@@ -277,9 +277,7 @@ If the files ends on ``.root`` it is stored on your hard-disk.
 You can upload (download) weightfiles to (from) the database using ``basf2_mva_upload`` (``basf2_mva_download``) via the shell or ``basf2_mva.upload`` (``basf2_mva.download``) via Python.
 Usually new weightfiles are stored in your local database, to make the weightfiles available to all people you have to upload them to the global database, this functionality is not provided by the mva package, but by the framework itself (so if something fails here you have to talk to the database people).
 Use the ``b2conditionsdb`` upload command to upload your current local database to the global database.
-The command I'm using at the moment is::
-
-    b2conditionsdb upload TAGNAME DATABASEFILE
+See :ref:`b2conditionsdb` for details.
 
 Examples
 --------

@@ -49,7 +49,7 @@ namespace Belle2 {
     /** Get the spread of the measured CMS energy */
     double getMassSpread() const
     {
-      return m_massError;
+      return m_massSpread;
     }
 
   private:

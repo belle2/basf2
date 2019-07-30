@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     /**
-     * EndcapStructure geometry parameters.
+     * Endcap srtucture geometry parameters.
      */
     class EndcapStructureGeometry : public TObject {
 
@@ -44,13 +44,13 @@ namespace Belle2 {
       ~EndcapStructureGeometry();
 
       /**
-       * Get starting angle of the octagonal Endcap KLM shape.
+       * Get starting angle of the octagonal endcap structure shape.
        */
       double getPhi() const;
 
       /**
-       * Set starting angle of the octagonal Endcap KLM shape.
-       * @param[in] phi Starting angle of the octagonal Endcap KLM shape.
+       * Set starting angle of the octagonal endcap structure shape.
+       * @param[in] phi Starting angle of the octagonal endcap structure shape.
        */
       void setPhi(double phi);
 
@@ -67,7 +67,7 @@ namespace Belle2 {
 
     private:
 
-      /** The starting angle of the octagonal Endcap KLM shape. */
+      /** The starting angle of the octagonal endcap structure shape. */
       double m_Phi;
 
       /** The number of sides (=8 : octagonal). */
@@ -1260,9 +1260,9 @@ namespace Belle2 {
     EKLMGeometry& operator=(const EKLMGeometry& geometry);
 
     /**
-     * Get number of endcaps.
+     * Get number of sections.
      */
-    int getNEndcaps() const;
+    int getNSections() const;
 
     /**
      * Get number of layers.
@@ -1271,9 +1271,9 @@ namespace Belle2 {
 
     /**
      * Get number of detector layers.
-     * @param[in] endcap Endcap number (1 - backward, 2 - forward).
+     * @param[in] section Section number (1 - backward, 2 - forward).
      */
-    int getNDetectorLayers(int endcap) const;
+    int getNDetectorLayers(int section) const;
 
     /**
      * Get number of sectors.
@@ -1302,19 +1302,19 @@ namespace Belle2 {
 
     /**
      * Check if number of detector layers is correct (fatal error if not).
-     * Endcap number must be checked separately.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
+     * Section number must be checked separately.
+     * @param[in] section Section number.
+     * @param[in] layer   Layer number.
      */
-    void checkDetectorLayerNumber(int endcap, int layer) const;
+    void checkDetectorLayerNumber(int section, int layer) const;
 
     /**
      * Check if detector layer number is correct (fatal error if not).
-     * Endcap number must be checked separately.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
+     * Section number must be checked separately.
+     * @param[in] section Section number.
+     * @param[in] layer   Layer number.
      */
-    void checkDetectorLayer(int endcap, int layer) const;
+    void checkDetectorLayer(int section, int layer) const;
 
     /**
      * Check if segment support number is correct (fatal error if not).
@@ -1334,14 +1334,14 @@ namespace Belle2 {
     double getSolenoidZ() const;
 
     /**
-     * Get endcap structure geometry data.
+     * Get section structure geometry data.
      */
     const EndcapStructureGeometry* getEndcapStructureGeometry() const;
 
     /**
-     * Get position data for endcaps.
+     * Get position data for sections.
      */
-    const ElementPosition* getEndcapPosition() const;
+    const ElementPosition* getSectionPosition() const;
 
     /**
      * Get position data for layers.
@@ -1409,14 +1409,14 @@ namespace Belle2 {
 
   protected:
 
-    /** Number of endcaps. */
-    int m_NEndcaps;
+    /** Number of sections. */
+    int m_NSections;
 
-    /** Number of layers in one endcap. */
+    /** Number of layers in one section. */
     int m_NLayers;
 
     /** Number of detector layers. */
-    int* m_NDetectorLayers; //[m_NEndcaps]
+    int* m_NDetectorLayers; //[m_NSections]
 
     /** Number of sectors in one layer. */
     int m_NSectors;
@@ -1436,11 +1436,11 @@ namespace Belle2 {
     /** Solenoid center Z coordinate. */
     double m_SolenoidZ;
 
-    /** Endcap structure geometry data. */
+    /** Section structure geometry data. */
     EndcapStructureGeometry m_EndcapStructureGeometry;
 
-    /** Position data for endcaps. */
-    ElementPosition m_EndcapPosition;
+    /** Position data for sections. */
+    ElementPosition m_SectionPosition;
 
     /** Position data for layers. */
     ElementPosition m_LayerPosition;

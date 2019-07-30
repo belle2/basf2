@@ -59,13 +59,13 @@ namespace Belle2 {
 
     /**
      * Get channel number for EKLM.
-     * @param[in] endcap Endcap number.
-     * @param[in] sector Sector number.
-     * @param[in] layer  Layer number.
-     * @param[in] plane  Plane number.
-     * @param[in] strip  Strip number.
+     * @param[in] section Section number.
+     * @param[in] sector  Sector number.
+     * @param[in] layer   Layer number.
+     * @param[in] plane   Plane number.
+     * @param[in] strip   Strip number.
      */
-    uint16_t channelNumberEKLM(int endcap, int sector, int layer, int plane,
+    uint16_t channelNumberEKLM(int section, int sector, int layer, int plane,
                                int strip) const;
 
     /**
@@ -108,11 +108,11 @@ namespace Belle2 {
 
     /**
      * Get module number for EKLM.
-     * @param[in] endcap Endcap number.
-     * @param[in] sector Sector number.
-     * @param[in] layer  Layer number.
+     * @param[in] section Section number.
+     * @param[in] sector  Sector number.
+     * @param[in] layer   Layer number.
      */
-    uint16_t moduleNumberEKLM(int endcap, int sector, int layer) const;
+    uint16_t moduleNumberEKLM(int section, int sector, int layer) const;
 
     /**
      * Get sector number for BKLM.
@@ -123,10 +123,10 @@ namespace Belle2 {
 
     /**
      * Get sector number for EKLM.
-     * @param[in] endcap Endcap number.
-     * @param[in] sector Sector number.
+     * @param[in] section Section number.
+     * @param[in] sector  Sector number.
      */
-    uint16_t sectorNumberEKLM(int endcap, int sector) const;
+    uint16_t sectorNumberEKLM(int section, int sector) const;
 
   private:
 

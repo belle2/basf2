@@ -56,7 +56,7 @@ void KLMDQMModule::defineHistoEKLM()
 {
   int i;
   /* cppcheck-suppress variableScope */
-  int endcap, layer, detectorLayer, stripMin, stripMax;
+  int section, layer, detectorLayer, stripMin, stripMax;
   int maxLayerGlobal, maxSector, maxPlane, maxStrip;
   std::string str, str2;
   TDirectory* oldDirectory, *newDirectory;
@@ -74,9 +74,9 @@ void KLMDQMModule::defineHistoEKLM()
     detectorLayer = i + 1;
     str = "strip_layer_" + std::to_string(detectorLayer);
     str2 = "Strip number (layer " + std::to_string(detectorLayer) + ")";
-    m_Elements->layerNumberToElementNumbers(detectorLayer, &endcap, &layer);
-    stripMin = m_Elements->stripNumber(endcap, layer, 1, 1, 1);
-    stripMax = m_Elements->stripNumber(endcap, layer,
+    m_Elements->layerNumberToElementNumbers(detectorLayer, &section, &layer);
+    stripMin = m_Elements->stripNumber(section, layer, 1, 1, 1);
+    stripMax = m_Elements->stripNumber(section, layer,
                                        maxSector, maxPlane, maxStrip);
     m_eklmStripLayer[i] = new TH1F(str.c_str(), str2.c_str(),
                                    stripMax - stripMin + 1,
@@ -169,7 +169,7 @@ void KLMDQMModule::beginRun()
 void KLMDQMModule::event()
 {
   int i, n;
-  int endcap, layer, sector, plane, strip;
+  int section, layer, sector, plane, strip;
   int detectorLayer, sectorGlobal, stripGlobal;
   EKLMDigit* eklmDigit;
   n = m_Digits.getEntries();
@@ -182,14 +182,14 @@ void KLMDQMModule::event()
      */
     if (!eklmDigit->isGood())
       continue;
-    endcap = eklmDigit->getEndcap();
+    section = eklmDigit->getSection();
     layer = eklmDigit->getLayer();
     sector = eklmDigit->getSector();
     plane = eklmDigit->getPlane();
     strip = eklmDigit->getStrip();
-    detectorLayer = m_Elements->detectorLayerNumber(endcap, layer);
-    sectorGlobal = m_Elements->sectorNumber(endcap, layer, sector);
-    stripGlobal = m_Elements->stripNumber(endcap, layer, sector, plane, strip);
+    detectorLayer = m_Elements->detectorLayerNumber(section, layer);
+    sectorGlobal = m_Elements->sectorNumber(section, layer, sector);
+    stripGlobal = m_Elements->stripNumber(section, layer, sector, plane, strip);
     m_eklmSector->Fill(sectorGlobal);
     m_eklmStripLayer[detectorLayer - 1]->Fill(stripGlobal);
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());

@@ -44,19 +44,19 @@ const EKLMDataConcentratorLane* EKLMElectronicsMap::getLaneBySector(
 }
 
 void EKLMElectronicsMap::addSectorLane(
-  int endcap, int layer, int sector, int copper, int dataConcentrator, int lane)
+  int section, int layer, int sector, int copper, int dataConcentrator, int lane)
 {
   static const EKLMElementNumbers elementNumbers;
   int sectorGlobal;
   EKLMDataConcentratorLane laneId;
-  sectorGlobal = elementNumbers.sectorNumber(endcap, layer, sector);
+  sectorGlobal = elementNumbers.sectorNumber(section, layer, sector);
   laneId.setCopper(copper);
   laneId.setDataConcentrator(dataConcentrator);
   laneId.setLane(lane);
   if (m_MapSectorLane.find(sectorGlobal) != m_MapSectorLane.end()) {
     B2ERROR("Sector already exists in the electronics map."
             << LogVar("Global sector number", sectorGlobal)
-            << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+            << LogVar("Section", section) << LogVar("Layer", layer)
             << LogVar("Sector", sector));
     return;
   }

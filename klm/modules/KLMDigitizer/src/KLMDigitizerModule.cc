@@ -81,7 +81,7 @@ void KLMDigitizerModule::checkChannelParameters()
       B2ERROR("Non-positive photoelectron amplitude. The requested "
               "channel-specific simulation is impossible. "
               "KLMDigitizer is switched to the generic mode."
-              << LogVar("Endcap", eklmChannel.getSection())
+              << LogVar("Section", eklmChannel.getSection())
               << LogVar("Layer", eklmChannel.getLayer())
               << LogVar("Sector", eklmChannel.getSector())
               << LogVar("Plane", eklmChannel.getPlane())
@@ -194,14 +194,14 @@ void KLMDigitizerModule::digitizeEKLM()
     EKLMSimHit* simHit = it->second;
     ub = m_eklmSimHitChannelMap.upper_bound(it->first);
     float efficiency = m_StripEfficiency->getEndcapEfficiency(
-                         simHit->getEndcap(), simHit->getSector(),
+                         simHit->getSection(), simHit->getSector(),
                          simHit->getLayer(), simHit->getPlane(),
                          simHit->getStrip());
     if (!efficiencyCorrection(efficiency))
       continue;
     if (m_ChannelSpecificSimulation) {
       strip = m_eklmElementNumbers->stripNumber(
-                simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
+                simHit->getSection(), simHit->getLayer(), simHit->getSector(),
                 simHit->getPlane(), simHit->getStrip());
       channelData = m_Channels->getChannelData(strip);
       if (channelData == nullptr)
@@ -271,7 +271,7 @@ void KLMDigitizerModule::event()
   for (i = 0; i < m_eklmSimHits.getEntries(); i++) {
     EKLMSimHit* hit = m_eklmSimHits[i];
     channel = m_ElementNumbers->channelNumberEKLM(
-                hit->getEndcap(), hit->getSector(), hit->getLayer(),
+                hit->getSection(), hit->getSector(), hit->getLayer(),
                 hit->getPlane(), hit->getStrip());
     if (checkActive(channel))
       m_eklmSimHitChannelMap.insert(std::pair<int, EKLMSimHit*>(channel, hit));

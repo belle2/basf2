@@ -34,12 +34,12 @@ namespace Belle2 {
     virtual ~EKLMElementNumbers();
 
     /**
-     * Check if endcap number is correct.
-     * @param[in] endcap     Endcap number.
+     * Check if section number is correct.
+     * @param[in] section    Section number.
      * @param[in] fatalError Issue fatal error (default) or not.
-     * @return True if the endcap number is correct.
+     * @return True if the section number is correct.
      */
-    bool checkEndcap(int endcap, bool fatalError = true) const;
+    bool checkSection(int section, bool fatalError = true) const;
 
     /**
      * Check if layer number is correct.
@@ -51,13 +51,13 @@ namespace Belle2 {
 
     /**
      * Check if detector layer number is correct (fatal error if not).
-     * Endcap number must be checked separately.
-     * @param[in] endcap     Endcap number.
+     * Section number must be checked separately.
+     * @param[in] section    Section number.
      * @param[in] layer      Layer number.
      * @param[in] fatalError Issue fatal error (default) or not.
      * @return True if the detector layer number is correct.
      */
-    bool checkDetectorLayer(int endcap, int layer,
+    bool checkDetectorLayer(int section, int layer,
                             bool fatalError = true) const;
 
     /**
@@ -94,81 +94,81 @@ namespace Belle2 {
 
     /**
      * Get detector layer number.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
+     * @param[in] section Section number.
+     * @param[in] layer   Layer number.
      * @return Number of layer.
      * @details
      * Number is from 1 to 12 + 14 = 26.
      */
-    int detectorLayerNumber(int endcap, int layer) const;
+    int detectorLayerNumber(int section, int layer) const;
 
     /**
      * Get element numbers by detector layer global number.
      * @param[in]  layerGlobal Layer global number.
-     * @param[out] endcap      Endcap number.
+     * @param[out] section     Section number.
      * @param[out] layer       Layer number.
      */
     void layerNumberToElementNumbers(
-      int layerGlobal, int* endcap, int* layer) const;
+      int layerGlobal, int* section, int* layer) const;
 
     /**
      * Get sector number.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
+     * @param[in] section Section number.
+     * @param[in] layer   Layer number.
      * @param[in] sector Sector number.
      * @return Number of sector.
      * @details
      * Number is from 1 to 4*26 = 104.
      */
-    int sectorNumber(int endcap, int layer, int sector) const;
+    int sectorNumber(int section, int layer, int sector) const;
 
     /**
-     * Get sector number (KLM order of elements: endcap, sector, layer).
-     * @param[in] endcap Endcap number.
-     * @param[in] sector Sector number.
+     * Get sector number (KLM order of elements: section, sector, layer).
+     * @param[in] section Section number.
+     * @param[in] sector  Sector number.
      * @return Number of sector.
      * @details
      * Number is from 1 to 2*4 = 8.
      */
-    int sectorNumberKLMOrder(int endcap, int sector) const;
+    int sectorNumberKLMOrder(int section, int sector) const;
 
     /**
      * Get element numbers by sector global number.
      * @param[in]  sectorGlobal Sector global number.
-     * @param[out] endcap       Endcap number.
+     * @param[out] section      Section number.
      * @param[out] layer        Layer number.
      * @param[out] sector       Sector number.
      */
     void sectorNumberToElementNumbers(
-      int sectorGlobal, int* endcap, int* layer, int* sector) const;
+      int sectorGlobal, int* section, int* layer, int* sector) const;
 
     /**
      * Get plane number.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
-     * @param[in] sector Sector number.
-     * @param[in] plane  Plane number.
+     * @param[in] section Section number.
+     * @param[in] layer   Layer number.
+     * @param[in] sector  Sector number.
+     * @param[in] plane   Plane number.
      * @return Number of plane.
      * @details
      * Number is from 1 to 2*4*26 = 208.
      */
-    int planeNumber(int endcap, int layer, int sector, int plane) const;
+    int planeNumber(int section, int layer, int sector, int plane) const;
 
     /**
      * Get element numbers by plane global number.
      * @param[in]  planeGlobal Plane global number.
-     * @param[out] endcap      Endcap number.
+     * @param[out] section     Section number.
      * @param[out] layer       Layer number.
      * @param[out] sector      Sector number.
      * @param[out] plane       Plane number.
      */
     void planeNumberToElementNumbers(
-      int planeGlobal, int* endcap, int* layer, int* sector, int* segment)
+      int planeGlobal, int* section, int* layer, int* sector, int* segment)
     const;
 
     /**
      * Get segment number.
-     * @param[in] endcap  Endcap number.
+     * @param[in] section Section number.
      * @param[in] layer   Layer number.
      * @param[in] sector  Sector number.
      * @param[in] plane   Plane number.
@@ -177,47 +177,47 @@ namespace Belle2 {
      * @details
      * Number is from 1 to 5*2*4*26 = 1040.
      */
-    int segmentNumber(int endcap, int layer, int sector, int plane,
+    int segmentNumber(int section, int layer, int sector, int plane,
                       int segment) const;
 
     /**
      * Get element numbers by segment global number.
      * @param[in]  segmentGlobal Segment global number.
-     * @param[out] endcap        Endcap number.
+     * @param[out] section       Section number.
      * @param[out] layer         Layer number.
      * @param[out] sector        Sector number.
      * @param[out] plane         Plane number.
      * @param[out] segment       Segment number.
      */
     void segmentNumberToElementNumbers(
-      int segmentGlobal, int* endcap, int* layer, int* sector, int* plane,
+      int segmentGlobal, int* section, int* layer, int* sector, int* plane,
       int* segment) const;
 
     /**
      * Get strip number.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
-     * @param[in] sector Sector number.
-     * @param[in] plane  Plane number.
-     * @param[in] strip  Strip number.
+     * @param[in] section Section number.
+     * @param[in] layer   Layer number.
+     * @param[in] sector  Sector number.
+     * @param[in] plane   Plane number.
+     * @param[in] strip   Strip number.
      * @return Number of strip.
      * @details
      * Number is from 1 to 75*2*4*26 = 15600.
      */
-    int stripNumber(int endcap, int layer, int sector, int plane,
+    int stripNumber(int section, int layer, int sector, int plane,
                     int strip) const;
 
     /**
      * Get element numbers by strip global number.
      * @param[in]  stripGlobal Strip global number.
-     * @param[out] endcap      Endcap number.
+     * @param[out] section     Section number.
      * @param[out] layer       Layer number.
      * @param[out] sector      Sector number.
      * @param[out] plane       Plane number.
      * @param[out] strip       Strip number.
      */
     void stripNumberToElementNumbers(
-      int stripGlobal, int* endcap, int* layer, int* sector, int* plane,
+      int stripGlobal, int* section, int* layer, int* sector, int* plane,
       int* strip) const;
 
     /**
@@ -260,11 +260,11 @@ namespace Belle2 {
     }
 
     /**
-     * Get maximal endcap number.
+     * Get maximal section number.
      */
-    static constexpr int getMaximalEndcapNumber()
+    static constexpr int getMaximalSectionNumber()
     {
-      return m_MaximalEndcapNumber;
+      return m_MaximalSectionNumber;
     }
 
     /**
@@ -277,9 +277,9 @@ namespace Belle2 {
 
     /**
      * Get maximal detector layer number.
-     * @param[in] endcap Endcap number.
+     * @param[in] section Section number.
      */
-    int getMaximalDetectorLayerNumber(int endcap) const;
+    int getMaximalDetectorLayerNumber(int section) const;
 
     /**
      * Get maximal sector number.
@@ -379,8 +379,8 @@ namespace Belle2 {
 
   protected:
 
-    /** Maximal endcap number. */
-    static constexpr int m_MaximalEndcapNumber = 2;
+    /** Maximal section number. */
+    static constexpr int m_MaximalSectionNumber = 2;
 
     /** Maximal layer number. */
     static constexpr int m_MaximalLayerNumber = 14;

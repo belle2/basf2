@@ -202,7 +202,7 @@ void KLMChannelIndex::increment(enum IndexLevel indexLevel)
         break;
       case c_IndexLevelSection:
         m_Section++;
-        if (m_Section > EKLMElementNumbers::getMaximalEndcapNumber()) {
+        if (m_Section > EKLMElementNumbers::getMaximalSectionNumber()) {
           m_Section = 1;
           increment(c_IndexLevelSubdetector);
         }

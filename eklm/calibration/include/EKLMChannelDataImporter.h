@@ -46,14 +46,14 @@ namespace Belle2 {
 
     /**
      * Set channel data.
-     * @param[in] endcap      Endcap number.
+     * @param[in] section     Section number.
      * @param[in] layer       Layer number.
      * @param[in] sector      Sector number.
      * @param[in] plane       Plane number.
      * @param[in] strip       Strip number.
      * @param[in] channelData Channel data.
      */
-    void setChannelData(int endcap, int layer, int sector, int plane,
+    void setChannelData(int section, int layer, int sector, int plane,
                         int strip, EKLMChannelData* channelData);
 
     /**

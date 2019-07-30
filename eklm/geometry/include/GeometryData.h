@@ -91,13 +91,13 @@ namespace Belle2 {
       bool hitInEKLM(double z) const;
 
       /**
-       * Get endcap transformation.
+       * Get section transformation.
        * @param[out] t Transformation.
-       * @param[in]  n Number of endcap.
+       * @param[in]  n Number of section.
        * @details
        * Numbers start from 0.
        */
-      void getEndcapTransform(HepGeom::Transform3D* t, int n) const;
+      void getSectionTransform(HepGeom::Transform3D* t, int n) const;
 
       /**
        * Get layer transformation.
@@ -160,7 +160,7 @@ namespace Belle2 {
       ~GeometryData();
 
       /**
-       * Read endcap structure geometry data.
+       * Read section structure geometry data.
        * @param[in] gd Current GearDir.
        */
       void readEndcapStructureGeometry(const GearDir& gd);
@@ -207,10 +207,10 @@ namespace Belle2 {
       /** Number of strip in position-based array. */
       int* m_StripLenToAll;
 
-      /** Minimal z coordinate of the forward endcap. */
+      /** Minimal z coordinate of the forward section. */
       double m_MinZForward;
 
-      /** Maximal z coordinate of the backward endcap. */
+      /** Maximal z coordinate of the backward section. */
       double m_MaxZBackward;
 
     };

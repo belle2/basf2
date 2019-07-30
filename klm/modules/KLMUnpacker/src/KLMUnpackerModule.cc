@@ -97,7 +97,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   const int* rawData, EKLMDataConcentratorLane* lane,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
-  int endcap, layer, sector, strip = 0;
+  int section, layer, sector, strip = 0;
   KLM::RawData raw;
   KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
   if ((raw.triggerBits & 0x10) != 0)
@@ -140,13 +140,13 @@ void KLMUnpackerModule::unpackEKLMDigit(
     }
     if (!m_WriteWrongHits)
       return;
-    endcap = 0;
+    section = 0;
     layer = 0;
     sector = 0;
     correctHit = false;
   } else {
     m_ElementNumbers->sectorNumberToElementNumbers(
-      *sectorGlobal, &endcap, &layer, &sector);
+      *sectorGlobal, &section, &layer, &sector);
   }
   EKLMDigit* eklmDigit = m_eklmDigits.appendNew();
   eklmDigit->addRelationTo(klmDigitEventInfo);
@@ -155,7 +155,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setTime(
     m_TimeConversion->getTime(raw.ctime, raw.tdc,
                               klmDigitEventInfo->getTriggerCTime(), true));
-  eklmDigit->setEndcap(endcap);
+  eklmDigit->setSection(section);
   eklmDigit->setLayer(layer);
   eklmDigit->setSector(sector);
   eklmDigit->setPlane(plane);
@@ -163,7 +163,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setCharge(raw.charge);
   if (correctHit) {
     int stripGlobal = m_ElementNumbers->stripNumber(
-                        endcap, layer, sector, plane, strip);
+                        section, layer, sector, plane, strip);
     const EKLMChannelData* channelData =
       m_Channels->getChannelData(stripGlobal);
     if (channelData == nullptr)

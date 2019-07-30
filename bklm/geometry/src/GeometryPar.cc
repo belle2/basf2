@@ -22,6 +22,7 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dbobjects/BKLMDisplacement.h>
 #include <bklm/dataobjects/BKLMElementID.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 
 using namespace std;
 
@@ -53,8 +54,8 @@ namespace Belle2 {
     GeometryPar::GeometryPar(const GearDir& content) :
       m_DoBeamBackgroundStudy(false),
       m_BkgSensitiveDetector(NULL),
-      m_NSector(8),
-      m_NLayer(15)
+      m_NSector(BKLMElementNumbers::getMaximalSectorNumber()),
+      m_NLayer(BKLMElementNumbers::getMaximalLayerNumber())
     {
       clear();
       read(content);
@@ -64,8 +65,8 @@ namespace Belle2 {
     GeometryPar::GeometryPar(const BKLMGeometryPar& element) :
       m_DoBeamBackgroundStudy(false),
       m_BkgSensitiveDetector(NULL),
-      m_NSector(8),
-      m_NLayer(15)
+      m_NSector(BKLMElementNumbers::getMaximalSectorNumber()),
+      m_NLayer(BKLMElementNumbers::getMaximalLayerNumber())
     {
       clear();
       readFromDB(element);
@@ -241,21 +242,21 @@ namespace Belle2 {
         }
       }
       // values that depend on fb/sector/layer
-      for (int fb = BKLM_FORWARD; fb <= BKLM_BACKWARD; ++fb) {
-        bool isForward = (fb == BKLM_FORWARD);
+      for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
+        bool isForward = (section == BKLMElementNumbers::c_ForwardSection);
         for (int sector = 1; sector <= m_NSector; ++sector) {
           sprintf(name, "/Sectors/%s/Sector[@sector=\"%d\"]", (isForward ? "Forward" : "Backward"), sector);
           GearDir sectorContent(content);
           sectorContent.append(name);
-          m_SectorRotation[fb - 1][sector - 1] = sectorContent.getAngle("Phi");
+          m_SectorRotation[section][sector - 1] = sectorContent.getAngle("Phi");
           for (int layer = 1; layer <= m_NLayer; ++layer) {
             GearDir layerContent(sectorContent);
             sprintf(name, "/Layer[@layer=\"%d\"]", layer);
             layerContent.append(name);
-            m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/X");
-            m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/Y");
-            m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/Z");
-            m_IsFlipped[fb - 1][sector - 1][layer - 1] = layerContent.getBool("Flip", false);
+            m_LocalReconstructionShiftX[section][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/X");
+            m_LocalReconstructionShiftY[section][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/Y");
+            m_LocalReconstructionShiftZ[section][sector - 1][layer - 1] = layerContent.getLength("ReconstructionShift/Z");
+            m_IsFlipped[section][sector - 1][layer - 1] = layerContent.getBool("Flip", false);
           }
         }
       }
@@ -378,16 +379,16 @@ namespace Belle2 {
         }
       }
       // values that depend on fb/sector/layer
-      for (int fb = BKLM_FORWARD; fb <= BKLM_BACKWARD; ++fb) {
+      for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
         for (int sector = 1; sector <= m_NSector; ++sector) {
-          m_SectorRotation[fb - 1][sector - 1] = element.getSectorRotation(fb, sector);
+          m_SectorRotation[section][sector - 1] = element.getSectorRotation(section, sector);
           for (int layer = 1; layer <= m_NLayer; ++layer) {
-            m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftX(fb, sector, layer);
-            m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftY(fb, sector, layer);
-            m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftZ(fb, sector, layer);
-            m_IsFlipped[fb - 1][sector - 1][layer - 1] = false;
+            m_LocalReconstructionShiftX[section][sector - 1][layer - 1] = element.getLocalReconstructionShiftX(section, sector, layer);
+            m_LocalReconstructionShiftY[section][sector - 1][layer - 1] = element.getLocalReconstructionShiftY(section, sector, layer);
+            m_LocalReconstructionShiftZ[section][sector - 1][layer - 1] = element.getLocalReconstructionShiftZ(section, sector, layer);
+            m_IsFlipped[section][sector - 1][layer - 1] = false;
             if (layer <= NSCINTLAYER) {
-              m_IsFlipped[fb - 1][sector - 1][layer - 1] = element.isFlipped(fb, sector, layer);
+              m_IsFlipped[section][sector - 1][layer - 1] = element.isFlipped(section, sector, layer);
             }
           }
         }
@@ -418,26 +419,25 @@ namespace Belle2 {
       // set up ReconstructionAlignment, so that those information can pass to Modules
       readAlignmentFromDB();
 
-      for (int fb = BKLM_FORWARD; fb <= BKLM_BACKWARD; ++fb) {
-        bool isForward = (fb == BKLM_FORWARD);
+      for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
+        bool isForward = (section == BKLMElementNumbers::c_ForwardSection);
         for (int sector = 1; sector <= m_NSector; ++sector) {
           bool hasChimney = (!isForward) && (sector == CHIMNEY_SECTOR);
           int nZStrips = (hasChimney ? m_NZStripsChimney : m_NZStrips);
           int nZScints = (hasChimney ? m_NZScintsChimney : m_NZScints);
           CLHEP::HepRotation rotation;
           if (!isForward) rotation.rotateX(M_PI);
-          rotation.rotateZ(m_SectorRotation[fb - 1][sector - 1]);
+          rotation.rotateZ(m_SectorRotation[section][sector - 1]);
           for (int layer = 1; layer <= m_NLayer; ++layer) {
-            bool isFlipped = m_IsFlipped[fb - 1][sector - 1][layer - 1];
-            CLHEP::Hep3Vector localReconstructionShift(m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1],
-                                                       m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1],
-                                                       m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1]);
-            double dx = getActiveMiddleRadius(fb, sector, layer);
+            bool isFlipped = m_IsFlipped[section][sector - 1][layer - 1];
+            CLHEP::Hep3Vector localReconstructionShift(m_LocalReconstructionShiftX[section][sector - 1][layer - 1],
+                                                       m_LocalReconstructionShiftY[section][sector - 1][layer - 1],
+                                                       m_LocalReconstructionShiftZ[section][sector - 1][layer - 1]);
+            double dx = getActiveMiddleRadius(section, sector, layer);
             double dz = getModuleHalfSize(layer, hasChimney).z() - getModuleInteriorHalfSize2(layer, hasChimney).z();
             CLHEP::Hep3Vector localOrigin(dx, 0.0, dz);
-            int moduleID = (isForward ? BKLM_END_MASK : 0)
-                           | ((sector - 1) << BKLM_SECTOR_BIT)
-                           | ((layer - 1) << BKLM_LAYER_BIT);
+            int moduleID = BKLMElementNumbers::moduleNumber(
+                             section, sector, layer);
             if (m_HasRPCs[layer - 1]) {
               localOrigin.setZ(localOrigin.z() + getModuleInteriorHalfSize1(layer, hasChimney).z() - getGasHalfSize(layer, hasChimney).z());
               Module* pModule = new Module(m_PhiStripWidth[layer - 1],
@@ -449,8 +449,8 @@ namespace Belle2 {
                                            localReconstructionShift,
                                            rotation
                                           );
-              pModule->setDisplacedGeo(getModuleDisplacedGeo(isForward, sector, layer));
-              pModule->setAlignment(getModuleAlignment(isForward, sector, layer));
+              pModule->setDisplacedGeo(getModuleDisplacedGeo(section, sector, layer));
+              pModule->setAlignment(getModuleAlignment(section, sector, layer));
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
             } else {
               double dy = getScintEnvelopeOffset(layer, hasChimney).y() * getScintEnvelopeOffsetSign(layer) * (isFlipped ? -1.0 : 1.0);
@@ -464,8 +464,8 @@ namespace Belle2 {
                                            rotation,
                                            isFlipped
                                           );
-              pModule->setDisplacedGeo(getModuleDisplacedGeo(isForward, sector, layer));
-              pModule->setAlignment(getModuleAlignment(isForward, sector, layer));
+              pModule->setDisplacedGeo(getModuleDisplacedGeo(section, sector, layer));
+              pModule->setAlignment(getModuleAlignment(section, sector, layer));
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
               double base = -0.5 * (m_NPhiScints[layer - 1] + 1) * m_ScintWidth;
               for (int scint = 1; scint <= m_NPhiScints[layer - 1]; ++scint) {
@@ -609,7 +609,7 @@ namespace Belle2 {
       return m_GapInnerRadius + 0.5 * m_GapNominalHeight + m_LayerHeight * (layer - 1);
     }
 
-    double GeometryPar::getActiveMiddleRadius(int fb, int sector, int layer) const
+    double GeometryPar::getActiveMiddleRadius(int section, int sector, int layer) const
     {
       // place the active radius midway between the two readout planes
       // (same as positioning in GeoBKLMCreator.cc)
@@ -623,7 +623,7 @@ namespace Belle2 {
       }
       double r = getGapMiddleRadius(layer) + dx;
       if (!hasRPCs(layer)) {
-        if (m_IsFlipped[fb - 1][sector - 1][layer - 1]) {
+        if (m_IsFlipped[section][sector - 1][layer - 1]) {
           r -= getPolystyreneOffsetX();
         } else {
           r += getPolystyreneOffsetX();
@@ -718,9 +718,9 @@ namespace Belle2 {
       return m_HasRPCs[layer - 1];
     }
 
-    const Module* GeometryPar::findModule(int forward, int sector, int layer) const
+    const Module* GeometryPar::findModule(int section, int sector, int layer) const
     {
-      int moduleID = BKLMElementNumbers::moduleNumber(forward, sector, layer);
+      int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
       return (iM == m_Modules.end() ? NULL : iM->second);
     }
@@ -735,20 +735,16 @@ namespace Belle2 {
       return (iM == m_Modules.end() ? NULL : iM->second);
     }
 
-    const HepGeom::Transform3D GeometryPar::getModuleAlignment(bool isForward, int sector, int layer) const
+    const HepGeom::Transform3D GeometryPar::getModuleAlignment(int section, int sector, int layer) const
     {
-      int moduleID = (isForward ? BKLM_END_MASK : 0)
-                     | ((sector - 1) << BKLM_SECTOR_BIT)
-                     | ((layer - 1) << BKLM_LAYER_BIT);
+      int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
       map<int, HepGeom::Transform3D>::const_iterator iA = m_Alignments.find(moduleID);
       return (iA == m_Alignments.end() ? HepGeom::Transform3D() : iA->second);
     }
 
-    const HepGeom::Transform3D GeometryPar::getModuleDisplacedGeo(bool isForward, int sector, int layer) const
+    const HepGeom::Transform3D GeometryPar::getModuleDisplacedGeo(int section, int sector, int layer) const
     {
-      int moduleID = (isForward ? BKLM_END_MASK : 0)
-                     | ((sector - 1) << BKLM_SECTOR_BIT)
-                     | ((layer - 1) << BKLM_LAYER_BIT);
+      int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
       map<int, HepGeom::Transform3D>::const_iterator iDis = m_Displacements.find(moduleID);
       return (iDis == m_Displacements.end() ? HepGeom::Transform3D() : iDis->second);
     }
@@ -761,12 +757,11 @@ namespace Belle2 {
         return;
       }
 
-      for (int fb = BKLM_FORWARD; fb <= BKLM_BACKWARD; ++fb) {
-        bool isForward = (fb == BKLM_FORWARD);
+      for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
         for (int sector = 1; sector <= m_NSector; ++sector) {
           for (int layer = 1; layer <= m_NLayer; ++layer) {
 
-            BKLMElementID bklmid(int(isForward), sector, layer);
+            BKLMElementID bklmid(section, sector, layer);
             int id = bklmid.getID();
             HepGeom::Transform3D alignment;
             alignment = getTransformFromRigidBodyParams(
@@ -777,9 +772,8 @@ namespace Belle2 {
                           bklmAlignments->getGlobalParam(id, 5),
                           bklmAlignments->getGlobalParam(id, 6));
 
-            int moduleID = (isForward ? BKLM_END_MASK : 0)
-                           | ((sector - 1) << BKLM_SECTOR_BIT)
-                           | ((layer - 1) << BKLM_LAYER_BIT);
+            int moduleID = BKLMElementNumbers::moduleNumber(
+                             section, sector, layer);
 
             m_Alignments.insert(std::pair<int, HepGeom::Transform3D>(moduleID, alignment));
           }
@@ -802,7 +796,7 @@ namespace Belle2 {
       for (const auto& disp : displacements) {
         unsigned short bklmElementID = disp.getElementID();
         BKLMElementID bklmid(bklmElementID);
-        unsigned short forward = bklmid.getSection();
+        unsigned short section = bklmid.getSection();
         unsigned short sector = bklmid.getSectorNumber();
         unsigned short layer = bklmid.getLayerNumber();
 
@@ -814,7 +808,7 @@ namespace Belle2 {
                                             disp.getGammaRotation()
                                                                            );
 
-        int moduleID = BKLMElementNumbers::moduleNumber(forward, sector, layer);
+        int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
 
         m_Displacements.insert(std::pair<int, HepGeom::Transform3D>(moduleID, displacement));
       }

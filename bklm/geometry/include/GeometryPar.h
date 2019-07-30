@@ -114,10 +114,10 @@ namespace Belle2 {
       double getModuleMiddleRadius(int layer) const;
 
       //! Get the radial midpoint of the detector module's active volume of specified layer
-      double getActiveMiddleRadius(int fb, int sector, int layer) const;
+      double getActiveMiddleRadius(int section, int sector, int layer) const;
 
       //! Get the flip (180-degrees about z axis) of a particular BKLM module
-      bool getModuleFlip(int fb, int sector, int layer) const { return m_IsFlipped[fb - 1][sector - 1][layer - 1]; }
+      bool getModuleFlip(int section, int sector, int layer) const { return m_IsFlipped[section][sector - 1][layer - 1]; }
 
       //! Get the global rotation angle about z of the entire BKLM
       double getRotation(void) const { return m_Rotation; }
@@ -342,16 +342,16 @@ namespace Belle2 {
       bool hasRPCs(int layer) const;
 
       //! Get the pointer to the definition of a module
-      const Module* findModule(int forward, int sector, int layer) const;
+      const Module* findModule(int section, int sector, int layer) const;
 
       //! Get the pointer to the definition of a module
       const Module* findModule(int layer, bool hasChimney) const;
 
       //! Get the alignment transformation of a module
-      const HepGeom::Transform3D getModuleAlignment(bool isForward, int sector, int layer) const;
+      const HepGeom::Transform3D getModuleAlignment(int section, int sector, int layer) const;
 
       //! Get the displacement transformation of a module
-      const HepGeom::Transform3D getModuleDisplacedGeo(bool isForward, int sector, int layer) const;
+      const HepGeom::Transform3D getModuleDisplacedGeo(int section, int sector, int layer) const;
 
     private:
 

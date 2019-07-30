@@ -26,6 +26,19 @@ namespace Belle2 {
   public:
 
     /**
+     * Section symnolic constants.
+     */
+    enum Section {
+
+      /** Backward. */
+      c_BackwardSection = 0,
+
+      /** Forward. */
+      c_ForwardSection = 1,
+
+    };
+
+    /**
      * Constructor.
      */
     BKLMElementNumbers();

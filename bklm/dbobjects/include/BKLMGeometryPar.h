@@ -27,8 +27,6 @@ static const int NZSCINT = 54;
 static const int NSTATION = 7;
 static const int BKLM_INNER = 1;
 static const int BKLM_OUTER = 2;
-static const int BKLM_FORWARD = 1;
-static const int BKLM_BACKWARD = 2;
 static const int CHIMNEY_SECTOR = 3;
 
 namespace Belle2 {

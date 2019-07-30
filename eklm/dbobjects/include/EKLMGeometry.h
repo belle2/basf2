@@ -1479,7 +1479,7 @@ namespace Belle2 {
     ShieldGeometry m_ShieldGeometry;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMGeometry, 3);
+    ClassDef(Belle2::EKLMGeometry, 4);
 
   };
 

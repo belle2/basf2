@@ -30,7 +30,7 @@ namespace Belle2 {
       /** Subdetector (BKLM or EKLM). */
       c_IndexLevelSubdetector = 1,
 
-      /** Section ("forward" for BKLM, "section" for EKLM). */
+      /** Section. */
       c_IndexLevelSection = 2,
 
       /** Sector. */

@@ -31,11 +31,11 @@ const KLMElementNumbers& KLMElementNumbers::Instance()
 }
 
 uint16_t KLMElementNumbers::channelNumberBKLM(
-  int forward, int sector, int layer, int plane, int strip) const
+  int section, int sector, int layer, int plane, int strip) const
 {
   uint16_t channel;
   channel = BKLMElementNumbers::channelNumber(
-              forward, sector, layer, plane, strip);
+              section, sector, layer, plane, strip);
   return channel + m_BKLMOffset;
 }
 
@@ -87,10 +87,10 @@ int KLMElementNumbers::localChannelNumberEKLM(uint16_t channel) const
 }
 
 uint16_t KLMElementNumbers::moduleNumberBKLM(
-  int forward, int sector, int layer) const
+  int section, int sector, int layer) const
 {
   uint16_t module;
-  module = BKLMElementNumbers::moduleNumber(forward, sector, layer);
+  module = BKLMElementNumbers::moduleNumber(section, sector, layer);
   return module + m_BKLMOffset;
 }
 
@@ -106,10 +106,10 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
   return module;
 }
 
-uint16_t KLMElementNumbers::sectorNumberBKLM(int forward, int sector) const
+uint16_t KLMElementNumbers::sectorNumberBKLM(int section, int sector) const
 {
   uint16_t sect;
-  sect = BKLMElementNumbers::sectorNumber(forward, sector);
+  sect = BKLMElementNumbers::sectorNumber(section, sector);
   return sect + m_BKLMOffset;
 }
 

@@ -802,7 +802,7 @@ namespace Belle2 {
       for (const auto& disp : displacements) {
         unsigned short bklmElementID = disp.getElementID();
         BKLMElementID bklmid(bklmElementID);
-        unsigned short forward = bklmid.getForward();
+        unsigned short forward = bklmid.getSection();
         unsigned short sector = bklmid.getSectorNumber();
         unsigned short layer = bklmid.getLayerNumber();
 

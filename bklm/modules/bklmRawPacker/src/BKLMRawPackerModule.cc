@@ -89,21 +89,21 @@ void BKLMRawPackerModule::event()
     int iAx = bklmDigit->isPhiReadout();
     int iLayer = bklmDigit->getLayer();
     int iSector = bklmDigit->getSector();
-    int iForward = bklmDigit->getForward();
+    int iSection = bklmDigit->getSection();
     float iTdc = bklmDigit->getTime();
     float icharge = bklmDigit->getCharge();
     short iCTime = bklmDigit->getCTime();
     bool isRPC = bklmDigit->inRPC();
     bool isAboveThresh = bklmDigit->isAboveThreshold();
-    int moduleId = BKLMElementNumbers::channelNumber(iForward, iSector, iLayer,
+    int moduleId = BKLMElementNumbers::channelNumber(iSection, iSector, iLayer,
                                                      iAx, iChannelNr);
-    B2DEBUG(20, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " isforward: " << iForward << " layer: " << iLayer <<
+    B2DEBUG(20, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " issection: " << iSection << " layer: " << iLayer <<
             " plane: " << iAx << " icharge " << icharge << " tdc " << iTdc << " ctime " << iCTime << " isAboveThresh " << isAboveThresh <<
             " isRPC " << isRPC << " " << moduleId << bklmDigit->getModuleID());
 
     int electId = 0;
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
-      B2DEBUG(20, "BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " forward? " << iForward << " , sector " <<
+      B2DEBUG(20, "BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " section? " << iSection << " , sector " <<
               iSector);
       continue;
     } else {
@@ -117,7 +117,7 @@ void BKLMRawPackerModule::event()
     int channelId;
     intToElectCoo(electId, copperId, finesse, lane, axis, channelId);
 
-    B2DEBUG(20, "BKLMRawPacker::copperId " << copperId << " " << iForward << " " << iSector << " " << lane << " " << axis << " " <<
+    B2DEBUG(20, "BKLMRawPacker::copperId " << copperId << " " << iSection << " " << iSector << " " << lane << " " << axis << " " <<
             channelId << " " << iTdc << " " << icharge << " " << iCTime);
 
     unsigned short bword1 = 0;
@@ -253,7 +253,7 @@ void BKLMRawPackerModule::loadMapFromDB()
   for (const auto& element : elements) {
     B2DEBUG(20, "Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
             ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-            ", forward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+            ", section = " << element.getSection() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
             " plane(z/phi) = " << element.getPlane());
 
     int copperId = element.getCopperId();
@@ -262,13 +262,13 @@ void BKLMRawPackerModule::loadMapFromDB()
     int axisId = element.getAxisId();
     int channelId = element.getChannelId();
     int sector = element.getSector();
-    int forward = element.getForward();
+    int section = element.getSection();
     int layer = element.getLayer();
     int plane =  element.getPlane();
     int stripId = element.getStripId();
     int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1, laneId, axisId, channelId);
     int moduleId = 0;
-    moduleId = BKLMElementNumbers::channelNumber(forward, sector, layer,
+    moduleId = BKLMElementNumbers::channelNumber(section, sector, layer,
                                                  plane, stripId);
     m_ModuleIdToelectId[moduleId] = elecId;
     B2DEBUG(20, " electId: " << elecId << " modId: " << moduleId);

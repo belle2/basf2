@@ -162,14 +162,14 @@ void BKLMEffnRadioModule::initialize()
       //forward/backward
 
 
-      //don't divide the 2D effs in z/phi because we look at D effs. We still want to divide in fwd/backwd
+      //don't divide the 2D effs in z/phi because we look at D effs. We still want to divide in section/backwd
       m_cModuleEff2D[i][iLay]->Divide(2);
 
       for (int j = 0; j < 2; j++) {
 
-        sprintf(buffer, "EffFound_Sector%d_layer%d_fwd%d", i + 1, iLay + 1, j);
+        sprintf(buffer, "EffFound_Sector%d_layer%d_section%d", i + 1, iLay + 1, j);
         m_eff2DFound[i][iLay][j] = new TH2D(buffer, buffer, 50, -200.0, 200.0, 50, 0.0, 300.0);
-        sprintf(buffer, "EffExpected_Sector%d_layer%d_fwd%d", i + 1, iLay + 1, j);
+        sprintf(buffer, "EffExpected_Sector%d_layer%d_section%d", i + 1, iLay + 1, j);
         m_eff2DExpected[i][iLay][j] = new TH2D(buffer, buffer, 50, -200.0, 200, 50, 0.0, 300.0);
 
         m_strips[i][iLay][j] = new TBox** [2];
@@ -183,7 +183,7 @@ void BKLMEffnRadioModule::initialize()
         m_stripNonHitsEff[i][iLay][j] = new int* [2];
         m_hOccupancy1D[i][iLay][j] = new TH1D*[2];
         //theta/phi, use the size of the RPC modules as the range
-        //z for each module is about 220cm (440 fwd+bkwd), y is 167-275 cm...
+        //z for each module is about 220cm (440 section+bkwd), y is 167-275 cm...
         //but this doesn't matter, since we'll be using 2D histos anyways
         //        m_cModuleEff2D[i][iLay]->cd(j+1)->Range(0,0,300,300);
         for (int k = 0; k < 2; k++) {
@@ -198,18 +198,18 @@ void BKLMEffnRadioModule::initialize()
           m_stripHits[i][iLay][j][k] = new int[54];
           m_stripHitsEff[i][iLay][j][k] = new int[54];
           m_stripNonHitsEff[i][iLay][j][k] = new int[54];
-          char fwd[10];
+          char section[10];
           char phi[10];
           if (j == 1)
-            sprintf(fwd, "Forward");
+            sprintf(section, "Section");
           else
-            sprintf(fwd, "Backward");
+            sprintf(section, "Backward");
           if (k == 1)
             sprintf(phi, "Phi");
           else
             sprintf(phi, "Z");
 
-          sprintf(buffer, "Module%d_Layer%d_%s_%s", i + 1, iLay + 1, fwd, phi);
+          sprintf(buffer, "Module%d_Layer%d_%s_%s", i + 1, iLay + 1, section, phi);
           //48 channels
           if (iLay >= 2)
             m_hOccupancy1D[i][iLay][j][k] = new TH1D(buffer, buffer, 48, 0, 48);
@@ -298,7 +298,7 @@ void BKLMEffnRadioModule::event()
       continue;
     }
     hitsPerLayer[layer]++;
-    int fwd = hits1D[h]->getForward();
+    int section = hits1D[h]->getSection();
     int isPhi = 0;
 
     int channelMin = hits1D[h]->getStripMin() - 1;
@@ -318,8 +318,8 @@ void BKLMEffnRadioModule::event()
       isPhi = 1;
     }
     for (int c = channelMin; c <= channelMax; c++) {
-      m_stripHits[sector][layer][fwd][isPhi][c]++;
-      m_hOccupancy1D[sector][layer][fwd][isPhi]->Fill(c);
+      m_stripHits[sector][layer][section][isPhi][c]++;
+      m_hOccupancy1D[sector][layer][section][isPhi]->Fill(c);
     }
 
   }
@@ -393,18 +393,18 @@ void BKLMEffnRadioModule::terminate()
           m_cModule[i][iLay]->cd(j * 2 + k + 1);
           m_hOccupancy1D[i][iLay][j][k]->Write();
           char buffer[100];
-          char fwd[10];
+          char section[10];
           char phi[10];
           if (j == 1)
-            sprintf(fwd, "Forward");
+            sprintf(section, "Section");
           else
-            sprintf(fwd, "Backward");
+            sprintf(section, "Backward");
           if (k == 1)
             sprintf(phi, "Phi");
           else
             sprintf(phi, "Z");
 
-          sprintf(buffer, "Sector %d, layer %d, %s, %s", i + 1, iLay + 1, fwd, phi);
+          sprintf(buffer, "Sector %d, layer %d, %s, %s", i + 1, iLay + 1, section, phi);
 
           for (int l = 0; l < 54; l++) {
             //don't draw channels > 48 for RPC layers...
@@ -533,15 +533,15 @@ void BKLMEffnRadioModule::getEffs()
         }
 
         int sector1 = hits2D[h]->getSector();
-        int fwd1 = hits2D[h]->getForward();
+        int section1 = hits2D[h]->getSection();
         int sector2 = hits2D[h2]->getSector();
-        int fwd2 = hits2D[h]->getForward();
+        int section2 = hits2D[h]->getSection();
 
         //let's stay in the same module...(that is what we use for the simple tracking as well...)
-        if (sector1 != sector2  || fwd1 != fwd2)
+        if (sector1 != sector2  || section1 != section2)
           continue;
         //module that defines the coordiante system used... use first layer, other layers should then be along the x axis
-        const Belle2::bklm::Module* refMod = m_GeoPar->findModule(fwd1, sector1, 1);
+        const Belle2::bklm::Module* refMod = m_GeoPar->findModule(section1, sector1, 1);
         //require lever arm
 
         vector<SimplePoint*> points;
@@ -559,7 +559,7 @@ void BKLMEffnRadioModule::getEffs()
           }
 
           //the stuff below is only needed if we only extrapolate using the two seed points
-          //    const Belle2::bklm::Module* m1 = m_GeoPar->findModule(fwd1, sector1, layer1);
+          //    const Belle2::bklm::Module* m1 = m_GeoPar->findModule(section1, sector1, layer1);
           TVector3 gHitPos1 = hits2D[h]->getGlobalPosition();
 
           //for some bizarre reason, some parts of the BKLM software use tvector3, others the clhep classes...
@@ -589,7 +589,7 @@ void BKLMEffnRadioModule::getEffs()
           //check if we find a point in effLayer which is also in this sector and close to the track
           bool found = false;
           for (int e = 0; e < hits2D.getEntries(); e++) {
-            if ((hits2D[e]->getLayer() != effLayer) || (hits2D[e]->getSector() != sector1) || (hits2D[e]->getForward() != fwd1))
+            if ((hits2D[e]->getLayer() != effLayer) || (hits2D[e]->getSector() != sector1) || (hits2D[e]->getSection() != section1))
               continue;
             //looking at hit in this layer..., see how far away we are from the projected hit...
             TVector3 candGlPos = hits2D[e]->getGlobalPosition();
@@ -603,8 +603,8 @@ void BKLMEffnRadioModule::getEffs()
 
           }
           if (found)
-            m_eff2DFound[sector1 - 1][effLayer - 1][fwd1]->Fill(expHitExtrapol.Y(), expHitExtrapol.Z());
-          m_eff2DExpected[sector1 - 1][effLayer - 1][fwd1]->Fill(expHitExtrapol.Y(), expHitExtrapol.Z());
+            m_eff2DFound[sector1 - 1][effLayer - 1][section1]->Fill(expHitExtrapol.Y(), expHitExtrapol.Z());
+          m_eff2DExpected[sector1 - 1][effLayer - 1][section1]->Fill(expHitExtrapol.Y(), expHitExtrapol.Z());
 
 
 
@@ -660,11 +660,11 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
 
   int layer1 = bklmHits2D[firstHit]->getLayer();
   int sector1 = bklmHits2D[firstHit]->getSector();
-  int fwd1 = bklmHits2D[firstHit]->getForward();
+  int section1 = bklmHits2D[firstHit]->getSection();
 
   int layer2 = bklmHits2D[secondHit]->getLayer();
   int sector2 = bklmHits2D[secondHit]->getSector();
-  int fwd2 = bklmHits2D[secondHit]->getForward();
+  int section2 = bklmHits2D[secondHit]->getSection();
 
   for (int h = 0; h < bklmHits2D.getEntries(); ++h) {
     int layer = bklmHits2D[h]->getLayer();
@@ -675,7 +675,7 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
     if ((layer == layer1) || (layer == layer2))
       continue;
     //same sector necessary? probably not, the test is pretty simple...
-    if ((sector != sector1) || (sector != sector2) || (fwd1 != bklmHits2D[h]->getForward()) || (fwd2 != fwd1))
+    if ((sector != sector1) || (sector != sector2) || (section1 != bklmHits2D[h]->getSection()) || (section2 != section1))
       continue;
     //don't use points that are already part of other tracks... So don't allow sharing
     //tried only to disallow the same seeds but that doesn't seem to be enough...

@@ -42,13 +42,13 @@ namespace Belle2 {
 
     /**
      * Get channel number for BKLM.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    uint16_t channelNumberBKLM(int forward, int sector, int layer, int plane,
+    uint16_t channelNumberBKLM(int section, int sector, int layer, int plane,
                                int strip) const;
 
     /**
@@ -100,11 +100,11 @@ namespace Belle2 {
 
     /**
      * Get module number for BKLM.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      */
-    uint16_t moduleNumberBKLM(int forward, int sector, int layer) const;
+    uint16_t moduleNumberBKLM(int section, int sector, int layer) const;
 
     /**
      * Get module number for EKLM.
@@ -116,10 +116,10 @@ namespace Belle2 {
 
     /**
      * Get sector number for BKLM.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      */
-    uint16_t sectorNumberBKLM(int forward, int sector) const;
+    uint16_t sectorNumberBKLM(int section, int sector) const;
 
     /**
      * Get sector number for EKLM.

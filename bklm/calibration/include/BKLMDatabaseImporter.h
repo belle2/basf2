@@ -51,13 +51,13 @@ namespace Belle2 {
 
     /**
      * Set non-default lane.
-     * @param[in] forward Forward.
+     * @param[in] section Section.
      * @param[in] sector  Sector.
      * @param[in] leyar   Layer.
      * @param[in] lane    Lane.
      */
     void setElectronicMappingLane(
-      int forward, int sector, int layer, int lane);
+      int section, int sector, int layer, int lane);
 
     /**
      * Import BKLM electronics mapping in the database.

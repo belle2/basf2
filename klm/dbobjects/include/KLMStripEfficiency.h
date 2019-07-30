@@ -49,7 +49,7 @@ namespace Belle2 {
 
     /**
      * Set efficiency and relative error for a single BKLM strip using the geometrical infos
-     * @param forward 1 for BF sectors, 0 for BB sectors
+     * @param section 1 for BF sectors, 0 for BB sectors
      * @param sector sector number
      * @param layer layer number
      * @param plane plane number
@@ -57,10 +57,10 @@ namespace Belle2 {
      * @param efficiency efficiency of the strip
      * @param efficiencyError error on the efficiency of the strip
      */
-    void setBarrelEfficiency(int forward, int sector, int layer, int plane, int strip, float efficiency, float efficiencyError = 0.)
+    void setBarrelEfficiency(int section, int sector, int layer, int plane, int strip, float efficiency, float efficiencyError = 0.)
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberBKLM(forward, sector, layer, plane, strip);
+      uint16_t stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
       setEfficiency(stripId, efficiency, efficiencyError);
     }
 
@@ -95,16 +95,16 @@ namespace Belle2 {
 
     /**
      * Returns efficiency of a given BKLM strip using the geometrical infos
-     * @param forward 1 for BF sectors, 0 for BB sectors
+     * @param section 1 for BF sectors, 0 for BB sectors
      * @param sector sector number
      * @param layer layer number
      * @param plane plane number
      * @param strip strip number
      */
-    float getBarrelEfficiency(int forward, int sector, int layer, int plane, int strip) const
+    float getBarrelEfficiency(int section, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberBKLM(forward, sector, layer, plane, strip);
+      uint16_t stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
       return getEfficiency(stripId);
     }
 
@@ -137,16 +137,16 @@ namespace Belle2 {
 
     /**
      * Returns error on efficiency of a given BKLM strip using the geometrical infos
-     * @param forward 1 for BF sectors, 0 for BB sectors
+     * @param section 1 for BF sectors, 0 for BB sectors
      * @param sector sector number
      * @param layer layer number
      * @param plane plane number
      * @param strip strip number
      */
-    float getBarrelEfficiencyError(int forward, int sector, int layer, int plane, int strip) const
+    float getBarrelEfficiencyError(int section, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberBKLM(forward, sector, layer, plane, strip);
+      uint16_t stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
       return getEfficiencyError(stripId);
     }
 

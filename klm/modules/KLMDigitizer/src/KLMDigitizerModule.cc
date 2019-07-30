@@ -139,7 +139,7 @@ void KLMDigitizerModule::digitizeBKLM()
     BKLMSimHit* simHit = it->second;
     ub = m_bklmSimHitChannelMap.upper_bound(it->first);
     float efficiency = m_StripEfficiency->getBarrelEfficiency(
-                         simHit->getForward(), simHit->getSector(),
+                         simHit->getSection(), simHit->getSector(),
                          simHit->getLayer(), simHit->getPlane(),
                          simHit->getStrip());
     if (!efficiencyCorrection(efficiency))
@@ -250,7 +250,7 @@ void KLMDigitizerModule::event()
       if (hit->getStripMin() > 0) {
         for (int s = hit->getStripMin(); s <= hit->getStripMax(); ++s) {
           channel = m_ElementNumbers->channelNumberBKLM(
-                      hit->getForward(), hit->getSector(), hit->getLayer(),
+                      hit->getSection(), hit->getSector(), hit->getLayer(),
                       hit->getPlane(), s);
           if (checkActive(channel)) {
             m_bklmSimHitChannelMap.insert(
@@ -260,7 +260,7 @@ void KLMDigitizerModule::event()
       }
     } else {
       channel = m_ElementNumbers->channelNumberBKLM(
-                  hit->getForward(), hit->getSector(), hit->getLayer(),
+                  hit->getSection(), hit->getSector(), hit->getLayer(),
                   hit->getPlane(), hit->getStrip());
       if (checkActive(channel)) {
         m_bklmSimHitChannelMap.insert(

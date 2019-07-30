@@ -157,7 +157,7 @@ void KLM::ScintillatorSimulator::simulate(
   bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
   const BKLMSimHit* hit = firstHit->second;
   const bklm::Module* module =
-    geoPar->findModule(hit->getForward(), hit->getSector(), hit->getLayer());
+    geoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
   double stripLength =
     2.0 * (hit->isPhiReadout() ?
            module->getPhiScintHalfLength(hit->getStrip()) :

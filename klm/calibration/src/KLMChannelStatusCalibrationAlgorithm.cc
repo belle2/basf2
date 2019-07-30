@@ -219,7 +219,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
       if (!notEnoughData) {
         B2INFO("KLM module " << klmModule.getKLMModuleNumber() <<
                " (subdetector " << klmModule.getSubdetector() <<
-               ", forward " << klmModule.getSection() <<
+               ", section " << klmModule.getSection() <<
                ", sector " << klmModule.getSector() <<
                ", layer " << klmModule.getLayer() <<
                "): " << moduleHits << " hits, average: " << averageHits << ".");

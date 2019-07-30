@@ -318,7 +318,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_pid->GetListOfFunctions()->Add(new TNamed("Check",
                                               "The more peaked at 1, the better. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely). Both cases result in PID=nan."));
   h_pid->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.5,pvalue-error=0.01"));
+  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.25,pvalue-error=0.01"));
 
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Description",
                                                     TString::Format("Sample PDG = %i - ECL distribution of binary deltaLogL=logl(%i)-logl(%i). U/O flow is added to first (last) bin.",
@@ -328,7 +328,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Check",
                                                     "Basic metric for signal/bkg separation. The more negative, the better separation is achieved. Non-zero U-flow indicates a non-normal PDF value (of sig OR bkg) for some p,clusterTheta range, which might be due to a non-optimal definition of the x-axis range of the PDF templates. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely)."));
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01"));
+  h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.25,pvalue-error=0.01"));
 
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Description",
                                                        TString::Format("Sample PDG = %i - Track-ECLCluster match flag distribution.",
@@ -336,7 +336,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Check",
                                                        "The more peaked at 1, the better. Non-zero population in the bins w/ flag != 0|1 indicates failure of MC matching for reco tracks. In such cases, flag=nan."));
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.5,pvalue-error=0.01"));
+  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.25,pvalue-error=0.01"));
 
   h_pid->Write();
   h_deltalogl->Write();
@@ -400,6 +400,13 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
   TString pid_glob_ratio_th_name = TString::Format("pid_glob_%i_%s__VS_th", sigHypoPdgId, ratioType.c_str());
   TString pid_glob_ratio_phi_name = TString::Format("pid_glob_%i_%s__VS_phi", sigHypoPdgId, ratioType.c_str());
 
+  // MetaOptions string.
+  std::string metaopts("pvalue-warn=0.25,pvalue-error=0.01,nostats");
+  // Electron plots should be visible to the shifter by default.
+  if (sampleHypo == Const::electron || sigHypo == Const::electron) {
+    metaopts = "shifter," + metaopts;
+  }
+
   if (TEfficiency::CheckConsistency(*h_p_N, *h_p_D)) {
 
     TEfficiency* t_pid_glob_ratio_p = new TEfficiency(*h_p_N, *h_p_D);
@@ -420,7 +427,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("Check",
                                                              "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
     t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-    t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
     t_pid_glob_ratio_p->Write();
 
@@ -447,7 +454,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Check",
                                                               "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
     t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
     t_pid_glob_ratio_th->Write();
 
@@ -474,7 +481,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("Check",
                                                                "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
     t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-    t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
     t_pid_glob_ratio_phi->Write();
 
@@ -534,6 +541,13 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
   TString match_eff_th_name = TString::Format("trkclusmatch_%i_Efficiency__VS_th", sampleHypoPdgId);
   TString match_eff_phi_name = TString::Format("trkclusmatch_%i_Efficiency__VS_phi", sampleHypoPdgId);
 
+  // MetaOptions string.
+  std::string metaopts("pvalue-warn=0.25,pvalue-error=0.01,nostats");
+  // Electron plots should be visible to the shifter by default.
+  if (sampleHypo == Const::electron) {
+    metaopts = "shifter," + metaopts;
+  }
+
   if (TEfficiency::CheckConsistency(*h_pt_N, *h_pt_D)) {
 
     TEfficiency* t_match_eff_pt = new TEfficiency(*h_pt_N, *h_pt_D);
@@ -551,7 +565,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-    t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
     t_match_eff_pt->Write();
 
@@ -575,7 +589,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
     t_match_eff_th->Write();
 
@@ -598,7 +612,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check",
                                                           "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.5,pvalue-error=0.01,nostats"));
+    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
     t_match_eff_phi->Write();
 

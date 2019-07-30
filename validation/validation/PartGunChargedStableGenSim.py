@@ -36,11 +36,11 @@ basf2.set_random_seed("P1s@Merd@")
 pGun = basf2.register_module("ParticleGun")
 param_pGun = {
     "pdgCodes": chargedStableList,
-    "nTracks": 24,  # 0 : generate 1 track per pdgId per event.
+    "nTracks": 0,  # 0 : generate 1 track per pdgId per event.
     "momentumGeneration": "uniform",
     "momentumParams": [0.05, 5.0],
     "thetaGeneration": "uniform",
-    "thetaParams": [0, 180],
+    "thetaParams": [17, 150],  # Generate tracks within CDC acceptance.
     "phiGeneration": "uniform",
     "phiParams": [0, 360],
     "vertexGeneration": "uniform",

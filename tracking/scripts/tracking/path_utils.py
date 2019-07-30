@@ -584,7 +584,7 @@ def add_cdc_monopole_track_finding(path, output_reco_tracks="RecoTracksMpl"):
     path.add_module("TFCDC_AxialStraightTrackFinder")
     # path.add_module("TFCDC_MonopoleAxialTrackFinderLegendre")
 
-    path.add_module("TFCDC_MonopoleStereoHitFinder")
+    path.add_module("TFCDC_MonopoleStereoHitFinderQuadratic")
 
     path.add_module("TFCDC_TrackExporter",
                     inputTracks="CDCMonopoleTrackVector",

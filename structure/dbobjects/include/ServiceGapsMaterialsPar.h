@@ -255,7 +255,8 @@ namespace Belle2 {
     /** Thickness list of CDC gap element cell. */
     std::vector<double> m_thick;
 
-    ClassDef(ThicknessDensityPar, 2); /**< 2. Added members for gap between ECL and COIL.
+    ClassDef(ThicknessDensityPar, 3); /**< 3. Delete the density.
+       2. Added members for gap between ECL and COIL.
              1. Initial version */
 
   };
@@ -313,9 +314,9 @@ namespace Belle2 {
     const std::vector<ServiceGapsMaterialsEclPar>& getServiceGapsEclMaterials(void) const { return m_ServiceGapsEclMaterials; }
     /** Get Service Materials at ECL */
     std::vector<ServiceGapsMaterialsEclPar>& getServiceGapsEclMaterials(void)  { return m_ServiceGapsEclMaterials; }
-    /** Get Gap element cell Thickness and Density */
+    /** Get Gap element cell Thickness */
     const ThicknessDensityPar& getthick(void) const { return m_thick; }
-    /** Get Gap element cell Thickness and Density */
+    /** Get Gap element cell Thickness */
     ThicknessDensityPar& getthick(void)  { return m_thick; }
 
 
@@ -340,7 +341,7 @@ namespace Belle2 {
     ServiceGapsMomVolPar m_momvolfor;
     /** Barrel ECL and COIL gap mother volume for Service Materials. */
     ServiceGapsMomVolPar m_momvoleclcoilbarrel;
-    /** Gap element cell Thickness and density for Service Materials. */
+    /** Gap element cell Thickness for Service Materials. */
     ThicknessDensityPar m_thick;
 
     ClassDef(ServiceGapsMaterialsPar, 2); /**< 2. Added gap mother volume between ECL and COIL.

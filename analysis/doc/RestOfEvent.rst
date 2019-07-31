@@ -296,7 +296,7 @@ event:
 
 These reconstructed neutrino particles have no daughters, and they can be
 useful in combination with the visible signal side, for example in semileptonic
-:math:`B`-meson decays, where tag side has been reconstructed using :doc:`Full Event Interpretation`.
+:math:`B`-meson decays, where tag side has been reconstructed using :doc:`FullEventInterpretation`.
 
 .. warning::
   The resulting particles described here cannot be used for vertexing nor MC matching.

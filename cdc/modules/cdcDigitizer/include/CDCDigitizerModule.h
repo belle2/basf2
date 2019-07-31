@@ -195,6 +195,7 @@ namespace Belle2 {
     float m_uprEdgeOfTimeWindow[nBoards] = {0}; /*!< Upper edge of time-window */
     float m_tdcThresh          [nBoards] = {0}; /*!< Threshold for timing-signal */
     float m_adcThresh          [nBoards] = {0}; /*!< Threshold for FADC */
+    unsigned short m_widthOfTimeWindow  [nBoards] = {0}; /*!< Width of time window */
 
     bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
     bool m_spaceChargeEffect;           /**< Space charge effect */

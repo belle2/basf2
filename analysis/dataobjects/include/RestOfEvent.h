@@ -431,7 +431,7 @@ namespace Belle2 {
     std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
     std::vector<Mask> m_masks;         /**< List of the ROE masks */
     bool m_isNested;                   /**< Nested ROE indicator */
-    int m_pdgCode;
+    int m_pdgCode;                     /**< PDG code of the 'ROE particle' if we are going to create one */
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list

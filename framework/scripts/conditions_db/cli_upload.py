@@ -36,8 +36,6 @@ def command_upload(args, db=None):
                           help="""By default payload root files are normalized to get the same checksum for the same content.
                                   This can be disabled with the normalize option 'False'. Any other normalize option will
                                   set the file name in the root file metadata to the given value.""")
-        args.add_argument("--normalize", action="store_true", default=False,
-                          help="Normalize the payload root files before the upload")
         args.add_argument("-j", type=int, default=1, dest="nprocess",
                           help="Number of concurrent connections to use for database "
                           "connection (default: %(default)s)")

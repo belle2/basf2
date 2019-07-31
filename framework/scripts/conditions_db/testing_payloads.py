@@ -99,7 +99,7 @@ class TestingPayloadEntry:
 
     def iov_str(self):
         """String representation of IoV"""
-        return f"{entry.firstRun['exp']}/{entry.firstRun['run']} - {entry.finalRun['exp']}/{entry.finalRun['run']}"
+        return f"{self.firstRun['exp']}/{self.firstRun['run']} - {self.finalRun['exp']}/{self.finalRun['run']}"
 
 
 def parse_testing_payloads_file(filename, check_existing=True):

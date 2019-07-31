@@ -429,7 +429,7 @@ class ConditionsDB:
 
         return result
 
-    def upload(self, filename, global_tag, normalize=False, ignore_existing=False, nprocess=10, uploaded_entries=None):
+    def upload(self, filename, global_tag, normalize=False, ignore_existing=False, nprocess=1, uploaded_entries=None):
         """
         Upload a testing payload storage to the conditions database.
 
@@ -466,16 +466,16 @@ class ConditionsDB:
         # it again and remove duplicates but keep the last one for each
         entries = sorted(set(reversed(entries)))
 
+        if normalize:
+            name = normalize if normalize is not True else None
+            for e in entries:
+                e.normalize(name=name)
+
         # so let's have a list of all payloads (name, checksum) as some payloads
         # might have multiple iovs. Each payload gets a list of all of those
         payloads = defaultdict(list)
         for e in entries:
             payloads[(e.module, e.checksum)].append(e)
-
-        if normalize:
-            name = normalize if normalize is not True else None
-            for payload in payloads.values():
-                payload[0].normalize(name=name)
 
         existing_payloads = {}
         existing_iovs = {}

@@ -140,6 +140,8 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
   unsigned int n = m_ElectronicsChannels.size();
   for (unsigned int i = 0; i < n; ++i) {
     uint16_t channel = m_ElectronicsChannels[i].first;
+    BKLMElementNumbers::channelNumberToElementNumbers(
+      channel, &channelSection, &channelSector, &channelLayer, &plane, &strip);
     if ((channelSection == section) &&
         (channelSector == sector) &&
         (channelLayer == layer))

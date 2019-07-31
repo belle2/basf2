@@ -16,7 +16,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/EventT0.h>
-#include "TH1.h"
+#include "TH1F.h"
 #include "TTree.h"
 #include <string>
 
@@ -73,25 +73,25 @@ namespace Belle2 {
       std::string m_relRecoTrackTrackName;    /**< Relation between RecoTrack and Belle2:Track. */
       std::string m_treeName;                 /**< Name of tree for the output file. */
 
-      double weight;            /**<  Weight of hit.*/
-      double alpha;             /**< Entrance Azimuthal angle of hit (degree). */
-      double theta;             /**< Entrance Polar angle of hit (degree). */
+      float weight;            /**<  Weight of hit.*/
+      float alpha;             /**< Entrance Azimuthal angle of hit (degree). */
+      float theta;             /**< Entrance Polar angle of hit (degree). */
       unsigned short adc;       /**< adc value. */
-      double t;                 /**< Measurement Drift time. */
-      double t_fit;             /**< Drift time calculated from x_fit. */
-      double evtT0;             /**< event T0*/
-      double x_mea;             /**< measure drift length (signed by left right).*/
-      double x_u;               /**< X_fit for unbiased track fit.*/
-      double x_b;               /**< X_fit for biased track fit.*/
+      float t;                 /**< Measurement Drift time. */
+      float t_fit;             /**< Drift time calculated from x_fit. */
+      float evtT0;             /**< event T0*/
+      float x_mea;             /**< measure drift length (signed by left right).*/
+      float x_u;               /**< X_fit for unbiased track fit.*/
+      float x_b;               /**< X_fit for biased track fit.*/
       int lay;                  /**< Layer ID. */
       int IWire;                /**< Wire ID. */
-      double Pval;              /**< P-value of fitted track.  */
-      double ndf;               /**< degree of freedom. */
-      double d0;                /**< Track Parameter, d0. */
-      double z0;                /**< Track Parameter, z0. */
-      double phi0;              /**< Track Parameter, phi0. */
-      double tanL;              /**< Track Parameter, tanL. */
-      double omega;             /**< Track Parameter, omega. */
+      float Pval;              /**< P-value of fitted track.  */
+      float ndf;               /**< degree of freedom. */
+      float d0;                /**< Track Parameter, d0. */
+      float z0;                /**< Track Parameter, z0. */
+      float phi0;              /**< Track Parameter, phi0. */
+      float tanL;              /**< Track Parameter, tanL. */
+      float omega;             /**< Track Parameter, omega. */
       double m_minimumPt = 0;   /**< minimum pt required for track*/
 
       bool m_calExpectedDriftTime = true;      /**< Calculate expected drift time from x_fit or not. */

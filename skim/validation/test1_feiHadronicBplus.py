@@ -5,7 +5,7 @@
 <header>
     <input>../feiHadronicBplus.dst.root</input>
     <output>../feiHadronicBplus.udst.root</output>
-    <contact>sophie.hollitt@adelaide.edu.au, philip.grace@adelaide.edu.au</contact>
+    <contact>philip.grace@adelaide.edu.au</contact>
     <interval>nightly</interval>
 </header>
 """
@@ -13,7 +13,6 @@ __author__ = "P. Grace"
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
@@ -37,7 +36,7 @@ skimOutputUdst('../feiHadronicBplus', BplushadronicList, path=path)
 summaryOfLists(BplushadronicList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

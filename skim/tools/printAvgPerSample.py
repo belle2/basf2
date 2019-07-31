@@ -35,7 +35,7 @@ from skimExpertFunctions import get_test_file, get_eventN
 skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
 skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
 skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic   '
-skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
+skims += 'feiSLB0 feiSLBplus  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
 skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV'
 skims += ' CharmRare BtoXll BtoXgamma  TauLFV Charm3BodyHadronic Charm3BodyHadronic2 Charm3BodyHadronic3'
 skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1   Charm2BodyNeutrals Charm2BodyNeutralsD0'

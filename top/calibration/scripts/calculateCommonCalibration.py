@@ -175,7 +175,7 @@ class calibrateGlobalT0Offline(Module):
         func.SetParLimits(2, 0.05, 0.3)  # to avoid the sign ambiguity
         func.SetParameter(3, 0.)
         func.SetParameter(4, hmax * 0.1)
-        h_to_fit.Fit(func, 'L R S')
+        status = h_to_fit.Fit(func, 'L R S')
 
         # Tree creation, branches declaration....
         fileName = 'commonT0Histo-run' + str(self.run) + '.root'
@@ -192,6 +192,7 @@ class calibrateGlobalT0Offline(Module):
         integral = array('f', [0.])
         nEvt = array('f', [0.])
         chi2 = array('f', [0.])
+        fitStatus = array('i', [0])
 
         tree.Branch('expNum', expNum, 'expNum/I')
         tree.Branch('runNum', runNum, 'runNum/I')
@@ -202,6 +203,7 @@ class calibrateGlobalT0Offline(Module):
         tree.Branch('chi2', chi2, 'chi2/F')
         tree.Branch('integral', integral, 'integral/F')
         tree.Branch('nEvt', nEvt, 'nEvt/F')
+        tree.Branch('fitStatus', fitStatus, 'fitStatus/I')
 
         # Dumps the fit results into the tree
         expNum[0] = self.expNo
@@ -213,6 +215,7 @@ class calibrateGlobalT0Offline(Module):
         integral[0] = func.GetParameter(0) / h_to_fit.GetBinWidth(1)
         chi2[0] = func.GetChisquare() / float(func.GetNDF())
         nEvt[0] = h_to_fit.Integral()
+        fitStatus[0] = int(status)
 
         tree.Fill()
         tree.Write()

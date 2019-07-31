@@ -25,6 +25,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/Environment.h>
 
 #include <queue>
 
@@ -186,6 +187,22 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+    double isSignalAcceptMissingGamma(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissGamma);
+      status &= (~MCMatching::c_MissingResonance);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
     double isSignalAcceptMissing(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -196,6 +213,7 @@ namespace Belle2 {
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
       status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissGamma);
       status &= (~MCMatching::c_MissingResonance);
       status &= (~MCMatching::c_MissMassiveParticle);
       status &= (~MCMatching::c_MissKlong);
@@ -696,6 +714,7 @@ namespace Belle2 {
 
       // sort descending by weight
       std::sort(weights.begin(), weights.end());
+      std::reverse(weights.begin(), weights.end());
       return weights[0];
     }
 
@@ -728,6 +747,11 @@ namespace Belle2 {
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
+    double isMC(const Particle*)
+    {
+      return Environment::Instance().isMC();
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -750,6 +774,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptMissingMassive",
                       isSignalAcceptMissingMassive,
                       "same as isSignal, but also accept missing massive particle");
+    REGISTER_VARIABLE("isSignalAcceptMissingGamma",
+                      isSignalAcceptMissingGamma,
+                      "same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma");
     REGISTER_VARIABLE("isSignalAcceptMissing",
                       isSignalAcceptMissing,
                       "same as isSignal, but also accept missing particle");
@@ -858,11 +885,13 @@ namespace Belle2 {
     VARIABLE_GROUP("MC Matching for ECLClusters");
     REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight,
                       "Returns the weight of the ECLCluster -> MCParticle relation for the MCParticle matched to the particle. "
-                      "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for rhe cluster. "
+                      "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for the cluster. "
                       "Returns -1 if the cluster *was* matched to particles, but not the match of the particle provided.");
     REGISTER_VARIABLE("clusterBestMCMatchWeight", particleClusterBestMCMatchWeight,
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
+    REGISTER_VARIABLE("isMC", isMC,
+                      "Returns 1 if run on MC and 0 for data.");
   }
 }

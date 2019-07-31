@@ -21,7 +21,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
+        inputMdst('default', find_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
@@ -31,7 +31,7 @@ class TestTreeFits(unittest.TestCase):
         reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
         matchMCTruth('B0:rec', path=main)
 
-        conf = 0.1
+        conf = 0
         main.add_module('TreeFitter',
                         particleList='B0:rec',
                         confidenceLevel=conf,
@@ -67,9 +67,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertFalse(falsePositives == 0, "No background survived the fit. This is weird.")
+        self.assertTrue(falsePositives < 2129, "Background rejection too small.")
 
-        self.assertTrue(truePositives > (allSig / 2.), "More than 50% of signal did not survived the fit.")
+        self.assertTrue(truePositives > 32, "Signal rejection too high")
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")

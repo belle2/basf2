@@ -10,50 +10,17 @@
 
 #include <iostream>
 #include <framework/utilities/IOIntercept.h>
-#include <framework/logging/LogSystem.h>
-#include <framework/logging/LogConnectionBase.h>
+#include <framework/utilities/testhelpers/Fixtures.h>
 #include <gtest/gtest.h>
 
-using namespace std;
 using namespace Belle2;
 
 namespace {
-  /** intercept log messages and store them in a given vector */
-  class LogInterceptor final: public LogConnectionBase {
-    /** reference to where they should be stored */
-    std::vector<LogMessage>& m_messages;
-  public:
-    /** remember where to put the messages */
-    explicit LogInterceptor(std::vector<LogMessage>& messages): m_messages(messages) {}
-    /** always connected */
-    bool isConnected() override { return true; }
-    /** and always sucessful in storing into buffer */
-    bool sendMessage(LogMessage const& message) override {m_messages.push_back(message); return true; }
-  };
-
   /** params for testing */
   using logconvert_params_t = std::tuple<LogConfig::ELogLevel, std::string, std::string, bool, bool>;
 
   /** Fixture class to intercept log messages which is needed for some tests */
-  class IOInterceptTest: public ::testing::Test {
-  protected:
-    /** list of log messages */
-    std::vector<LogMessage> m_messages;
-
-    /** Add a log message interceptor */
-    void SetUp() override
-    {
-      m_messages.clear();
-      LogSystem::Instance().resetLogConnections();
-      LogSystem::Instance().addLogConnection(new LogInterceptor(m_messages));
-    }
-
-    /** And try to reset logging system to default */
-    void TearDown() override
-    {
-      LogSystem::Instance().resetLogging();
-    }
-  };
+  using IOInterceptTest = TestHelpers::LogMessageTest;
 
   /** Typedef to allow the death test sharing the fixture */
   using IOInterceptDeathTest = IOInterceptTest;
@@ -75,12 +42,10 @@ namespace {
     (useStdout ? std::cout : std::cerr) << raw_message;
     capture.finish();
     // check that the amount of log messages is correct
-    ASSERT_EQ(m_messages.size(), generateMessage ? 1 : 0);
+    expectMessage(level, generateMessage ? 1 : 0, true);
     if (!generateMessage) return;
     // and also check the message level and content
-    LogMessage& msg = m_messages.front();
-    ASSERT_EQ(msg.getLogLevel(), level);
-    ASSERT_EQ(msg.getMessage(), "Output from capture_name:\ncapture_name: " + formatted_message);
+    expectMessageContent(level, "Output from capture_name:\ncapture_name: " + formatted_message);
   }
 
   /** all the parameter combinations we want to test for conversion
@@ -124,10 +89,10 @@ namespace {
       logmessages.start();
       std::cout << "this is my message";
     }
-    ASSERT_EQ(m_messages.size(), 1);
-    LogMessage& msg = m_messages.front();
-    ASSERT_EQ(msg.getLogLevel(), LogConfig::c_Info);
-    ASSERT_EQ(msg.getMessage(), "Output from capture_name:\n-this is my message");
+    // check that the amount of log messages is correct
+    expectMessage(LogConfig::c_Info, 1, true);
+    // and also check the message level and content
+    expectMessageContent(LogConfig::c_Info, "Output from capture_name:\n-this is my message");
   }
 
   /** check intercept guard */
@@ -146,12 +111,10 @@ namespace {
     }
     std::cerr << "this will not be captured" << std::endl;
     ASSERT_EQ(m_messages.size(), 2);
-    LogMessage& msg = m_messages.front();
-    ASSERT_EQ(msg.getLogLevel(), LogConfig::c_Info);
-    ASSERT_EQ(msg.getMessage(), "Output from capture_name:\n-this is my message");
-    LogMessage& err = m_messages.back();
-    ASSERT_EQ(err.getLogLevel(), LogConfig::c_Error);
-    ASSERT_EQ(err.getMessage(), "Output from capture_name:\n-this is my error");
+    // and also check the message level and content
+    expectMessageContent(LogConfig::c_Error, "Output from capture_name:\n-this is my error");
+    m_messages.pop_back();
+    expectMessageContent(LogConfig::c_Info, "Output from capture_name:\n-this is my message");
   }
 
   /** check that the indentation is applied for all lines */
@@ -161,9 +124,8 @@ namespace {
     capture.start();
     std::cout << "this is\na multi line message";
     capture.finish();
-    ASSERT_EQ(m_messages.size(), 1);
-    LogMessage& msg = m_messages.front();
-    ASSERT_EQ(msg.getMessage(), "Output from indent:\nindent: this is\nindent: a multi line message");
+    expectMessage(LogConfig::c_Info, 1, true);
+    expectMessageContent(LogConfig::c_Info, "Output from indent:\nindent: this is\nindent: a multi line message");
   }
 
   /** and that it can be set correctly */
@@ -174,9 +136,8 @@ namespace {
     std::cout << "this is\na multi line message";
     capture.setIndent("--->");
     capture.finish();
-    ASSERT_EQ(m_messages.size(), 1);
-    LogMessage& msg = m_messages.front();
-    ASSERT_EQ(msg.getMessage(), "Output from indent:\n--->this is\n--->a multi line message");
+    expectMessage(LogConfig::c_Info, 1, true);
+    expectMessageContent(LogConfig::c_Info, "Output from indent:\n--->this is\n--->a multi line message");
   }
 
   /** empty indentation should work too */
@@ -187,9 +148,8 @@ namespace {
     capture.setIndent("");
     std::cout << "this is\na multi line message";
     capture.finish();
-    ASSERT_EQ(m_messages.size(), 1);
-    LogMessage& msg = m_messages.front();
-    ASSERT_EQ(msg.getMessage(), "Output from indent:\nthis is\na multi line message");
+    expectMessage(LogConfig::c_Info, 1, true);
+    expectMessageContent(LogConfig::c_Info, "Output from indent:\nthis is\na multi line message");
   }
 
   /** test that capturing stdout works */
@@ -240,7 +200,7 @@ namespace {
     std::string out;
     int written{0};
     for (int i = 0; i < 100000; ++i) {
-      std::cout << (char)(i % 255) << flush;
+      std::cout << (char)(i % 255) << std::flush;
       if (std::cout.good()) written = i + 1;
       out.push_back(i % 255);
     }

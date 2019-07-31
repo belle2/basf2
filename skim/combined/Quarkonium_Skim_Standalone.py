@@ -12,8 +12,19 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdCharged import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-00'
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+import argparse
+gb2_setuprel = 'release-03-02-00'
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 # create a new path
 skimpath = Path()

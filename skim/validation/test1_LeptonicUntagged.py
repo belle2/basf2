@@ -5,7 +5,7 @@
 <header>
     <input>../LeptonicUntagged.dst.root</input>
     <output>../LeptonicUntagged.udst.root</output>
-    <contact>hannah.wakeling@mail.mcgill.ca, philip.grace@adelaide.edu.au</contact>
+    <contact>philip.grace@adelaide.edu.au</contact>
     <interval>nightly</interval>
 </header>
 """
@@ -20,34 +20,34 @@ from skim.standardlists.charm import *
 from skimExpertFunctions import *
 
 
-leppath = Path()
+path = Path()
 
 fileList = ['../LeptonicUntagged.dst.root']
 
-inputMdstList('default', fileList, path=leppath)
+inputMdstList('default', fileList, path=path)
 
 # Load particle lists
-loadStdSkimPi0(path=leppath)
-loadStdSkimPhoton(path=leppath)
-stdPi('loose', path=leppath)
-stdK('loose', path=leppath)
-stdPi('all', path=leppath)
-stdE('all', path=leppath)
-stdMu('all', path=leppath)
-stdPi0s('loose', path=leppath)  # for stdCharm.py
-stdPhotons('loose', path=leppath)
+loadStdSkimPi0(path=path)
+loadStdSkimPhoton(path=path)
+stdPi('loose', path=path)
+stdK('loose', path=path)
+stdPi('all', path=path)
+stdE('all', path=path)
+stdMu('all', path=path)
+stdPi0s('loose', path=path)  # for stdCharm.py
+stdPhotons('loose', path=path)
 
 # Leptonic skim
 from skim.leptonic import LeptonicList
 
-lepList = LeptonicList(path=leppath)
-skimOutputUdst('../LeptonicUntagged', lepList, path=leppath)
+lepList = LeptonicList(path=path)
+skimOutputUdst('../LeptonicUntagged', lepList, path=path)
 
-summaryOfLists(lepList, path=leppath)
+summaryOfLists(lepList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
-process(leppath)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

@@ -58,6 +58,7 @@ SVDPackerModule::SVDPackerModule() : Module(),
   addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
            "number to be added to the FADC trigger number to match the main trigger number", 0);
   addParam("simulate3sampleData", m_simulate3sampleData, "Simulate 3-sample RAW Data", bool(false));
+  addParam("binPrintout", m_binPrintout, "Print binary data created by the Packer", bool(false));
   // initialize event #
   n_basf2evt = 0;
 
@@ -171,11 +172,9 @@ void SVDPackerModule::event()
   }// end of the loop that fills fadc_apv_matrix !!!!
 
 
-  bool sim3sample;
-
   for (unsigned int iFADC = 0; iFADC < nFADCboards; iFADC++) {
 
-    sim3sample = false;
+    bool sim3sample = false;
 
     //get original FADC number
     unsigned short FADCorg = FADCnumberMapRev[iFADC];
@@ -335,7 +334,7 @@ void SVDPackerModule::event()
   } // end FADC loop
 
 
-  //binPrintout(data_words.size());
+  if (m_binPrintout) binPrintout(data_words.size());
 
   delete [] fadc_apv_matrix;
 
@@ -367,7 +366,7 @@ void SVDPackerModule::binPrintout(unsigned int nwords)
 
     uint32_t ulFlag = 1 << (sizeof(data_words[j]) * 8 - 1);
     for (; ulFlag > 0; ulFlag >>= 1)
-      printf("%d", data_words[j] & ulFlag ? 1 : 0);
+      printf("%d", (data_words[j] & ulFlag) ? 1 : 0);
 
     cout << endl;
   }

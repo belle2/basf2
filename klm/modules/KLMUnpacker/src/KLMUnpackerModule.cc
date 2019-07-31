@@ -100,6 +100,8 @@ void KLMUnpackerModule::unpackEKLMDigit(
   int endcap, layer, sector, strip = 0;
   KLM::RawData raw;
   KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
+  if ((raw.triggerBits & 0x10) != 0)
+    return;
   /**
    * The possible values of the strip number in the raw data are
    * from 0 to 127, while the actual range of strip numbers is from
@@ -223,8 +225,10 @@ void KLMUnpackerModule::unpackBKLMDigit(
 
   // moduleId counts are zero based
   int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+  if ((layer < 2) && ((raw.triggerBits & 0x10) != 0))
+    return;
   // int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
-  // int isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
+  // int forward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
   // int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
   int channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
 
@@ -345,7 +349,7 @@ void KLMUnpackerModule::loadMapFromDB()
     B2DEBUG(29, "KLMUnpackerModule:: version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " <<
             element.getCopperId() <<
             ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-            ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+            ", forward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
             " plane(z/phi) = " << element.getPlane());
 
     int copperId = element.getCopperId();
@@ -354,14 +358,14 @@ void KLMUnpackerModule::loadMapFromDB()
     int axisId = element.getAxisId();
     int channelId = element.getChannelId();
     int sector = element.getSector();
-    int isForward = element.getIsForward();
+    int forward = element.getForward();
     int layer = element.getLayer();
     int plane =  element.getPlane();
     int stripId = element.getStripId();
     int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1 , laneId, axisId, channelId);
     int moduleId = 0;
 
-    moduleId = BKLMElementNumbers::channelNumber(isForward, sector, layer,
+    moduleId = BKLMElementNumbers::channelNumber(forward, sector, layer,
                                                  plane, stripId);
     m_electIdToModuleId[elecId] = moduleId;
 

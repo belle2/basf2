@@ -82,7 +82,7 @@ void MCMatcherKLMClustersModule::event()
         n4 = bklmDigits.size();
         for (i4 = 0; i4 < n4; i4++) {
           RelationVector<BKLMSimHit> bklmSimHits =
-            bklmDigits[i4]->getRelationsFrom<BKLMSimHit>();
+            bklmDigits[i4]->getRelationsTo<BKLMSimHit>();
           n5 = bklmSimHits.size();
           for (i5 = 0; i5 < n5; i5++) {
             RelationVector<MCParticle> bklmMCParticles =

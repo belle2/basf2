@@ -13,7 +13,6 @@
 #include <Eigen/Core>
 #include <vector>
 #include <framework/logging/Logger.h>
-
 namespace TreeFitter {
 
   class ParticleBase;
@@ -24,7 +23,7 @@ namespace TreeFitter {
   public:
 
     /** Constructor */
-    explicit FitParams(int dim);
+    explicit FitParams(const int dim);
 
     /** Destructor */
     ~FitParams() {};

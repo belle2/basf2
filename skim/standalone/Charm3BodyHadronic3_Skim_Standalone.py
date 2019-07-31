@@ -14,13 +14,24 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
+import argparse
 skimCode = encodeSkimName('Charm3BodyHadronic3')
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 c3bh3path = Path()
 

@@ -56,9 +56,6 @@ namespace Belle2 {
       /** Simulation hits. */
       StoreArray<EKLMSimHit> m_SimHits;
 
-      /** Active channels. */
-      bool* m_ChannelActive;
-
       /**
        * All hits with time large  than m_ThresholdHitTime
        * will be dropped.

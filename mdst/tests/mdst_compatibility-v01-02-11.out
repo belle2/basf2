@@ -4,6 +4,7 @@
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
 Untested method EventMetaData::setEndOfData
+Untested method EventMetaData::setEndOfRun
 Untested method EventMetaData::setErrorFlag
 Untested method EventMetaData::setEvent
 Untested method EventMetaData::setExperiment
@@ -143,6 +144,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541275560155998554
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): 0
@@ -9738,6 +9740,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541275609131813384
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -19015,6 +19018,7 @@ EventMetaData:
   getRun(): 0
   getSubrun(): 0
   getTime(): 1541275614516574857
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0

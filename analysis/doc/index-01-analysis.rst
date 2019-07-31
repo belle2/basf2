@@ -54,18 +54,20 @@ There are also some more specialised python wrapper functions for vertex-fitting
 .. toctree:: Vertex
 .. toctree:: PhotonWrappers
 
+
 Variables
 =========
 
-While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate variables associated with a given candidate or event.
-In ``basf2`` analysis, variables are handled by the VariableManager:
+While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
 
-.. _variablemanager:
-   .. autodata:: variables.variables
+In ``basf2`` analysis, variables are handled by the `VariableManager`.
+There are many variables available for use in analysis.
+Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`mbc`, and :b2:var:`deltaE`.
 
-Here is a list of variables known to ``basf2`` that can be used in cut strings or written out to file.
+You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
 
 .. toctree:: Variables
+
 
 Output for offline analysis
 ===========================

@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #pragma once
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -84,19 +85,22 @@ namespace Belle2 {
      *  <h2>Python interface</h2>
      *  This class is exported to Python, and can be used to use variables in Python basf2 modules:
         \code
-        from variables import *
-        # for convenience, a Manager instance is already created (called 'variables')
+        from variables import variables
 
         from ROOT import TLorentzVector
         someParticle = Belle2.Particle(TLorentzVector(1.0, 0, 0, 0), 321)
         print(variables.evaluate('E', someParticle))
         \endcode
      *
-     *
-     *  \note You should probably also update this page if you add a useful function
-     *        https://confluence.desy.de/display/BI/Physics+ParticleSelectorFunctions
      */
     class Manager {
+      /**
+       * NOTE: the python interface is documented manually in analysis/doc/Variables.rst
+       * (because we use ROOT to expose this in python rather than boost::python).
+       *
+       * Please also keep that up-to-date with any modufications
+       *
+       */
 
     public:
       /** functions stored take a const Particle* and return double. */

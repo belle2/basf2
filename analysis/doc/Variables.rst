@@ -1,4 +1,85 @@
-.. _variables:
+
+VariableManager
+===============
+
+The VariableManager handles all variables in ``basf2`` analysis.
+It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
+C++ class with a python interface.
+
+The C++ documentation is `here <https://b2-master.belle2.org/software/development/classBelle2_1_1Variable_1_1Manager.html>`_.
+
+.. tip::
+
+        For (unfortunate) historical reasons, the python accessor to the VariableManager
+        singleton is called ``variables`` and is in the python ``variables`` module.
+        This leads to python ``import`` commands which read strangely.
+        For example:
+
+        .. code-block:: python
+
+            from variables import variables
+                
+        To avoid confusion, example/tutorial scripts often use a namespace alias ``vm``.
+        You might want to use this in your scripts.
+
+        .. code-block:: python
+
+            from variables import variables as vm # shorthand for VariableManager
+
+
+.. py:class:: VariableManager
+
+   Singleton class to hold all variables and aliases in the current scope.
+
+   .. warning:: 
+        The VariableManager operates outside of the `basf2.Path`. 
+        The aliases set at the point of calling `basf2.process` are used.
+
+   .. py:method:: addAlias(alias, expression)
+
+      Create a new alias, the type annotations in the signature are optional
+
+      :param str alias: New alias to create
+      :param str expression: The expression the alias should evaluate to
+
+      :return: True if the alias was successfully added
+
+   .. py:method:: getAliasNames()
+
+      Get a list of all alias names (in reverse order added)
+
+      .. tip:: 
+
+          This returns a ``ROOT.vector<string> object``.
+          It can be unpacked using a list comprehension in python.
+
+          >>> my_aliases = [name for name in vm.getAliasNames()]
+
+      :returns: ``ROOT.vector`` list of alias names
+
+   .. py:method:: addCollection(collection, variables)
+
+      Create a new alias, the type annotations in the signature are optional
+
+      :param str collection: The new collection to create.
+      :param list(str) variables: A list of variables to include in the variable collection.
+
+      :returns: True if the collection was successfully added
+
+   .. py:method:: getCollection(collection)
+  
+      Get a list of all variables in the ``collection``.
+
+      :param str collection: The name of the existing variable collection
+
+      :returns: ``ROOT.vector`` list of variable names
+
+   .. py:method:: printAliases()
+ 
+      Prints all aliases currently registered.
+      Useful to call just before calling `basf2.process` on an analysis path when debugging.
+
+.. _variablesByGroup:
 
 Variables by group
 ==================

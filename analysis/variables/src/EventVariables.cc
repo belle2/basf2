@@ -37,7 +37,6 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 #include <framework/logging/Logger.h>
 

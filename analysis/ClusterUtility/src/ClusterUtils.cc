@@ -179,16 +179,16 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLClust
 // -----------------------------------------------------------------------------
 const TVector3 ClusterUtils::GetIPPosition()
 {
-  if (!m_beamSpot) {
+  if (!m_beamSpotDB) {
     B2WARNING("Beamspot not available, using (0, 0, 0) as IP position instead.");
     return TVector3(0.0, 0.0, 0.0);
-  } else return m_beamSpot->getIPPosition();
+  } else return m_beamSpotDB->getIPPosition();
 }
 
 // -----------------------------------------------------------------------------
 const TMatrixDSym ClusterUtils::GetIPPositionCovarianceMatrix()
 {
-  if (!m_beamSpot) {
+  if (!m_beamSpotDB) {
     B2WARNING("Beam parameters not available, using ((1, 0, 0), (0, 1, 0), (0, 0, 1)) as IP covariance matrix instead.");
 
     TMatrixDSym covmat(3);
@@ -196,5 +196,5 @@ const TMatrixDSym ClusterUtils::GetIPPositionCovarianceMatrix()
       covmat(i, i) = 1.0; // 1.0*1.0 cm^2
     }
     return covmat;
-  } else return m_beamSpot->getCovVertex();
+  } else return m_beamSpotDB->getCovVertex();
 }

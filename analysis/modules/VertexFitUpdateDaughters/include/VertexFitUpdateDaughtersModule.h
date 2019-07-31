@@ -69,7 +69,7 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
-    DBObjPtr<BeamSpot> m_beamSpot;/**< Beam spot database object */
+    DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
 
     /**
      * Main steering routine

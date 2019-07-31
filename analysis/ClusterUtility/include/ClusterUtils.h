@@ -91,7 +91,7 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr<BeamSpot> m_beamSpot; /**< BeamSpot. */
+    DBObjPtr<BeamSpot> m_beamSpotDB; /**< Beam spot database object */
   };
 
 } // Belle2 namespace

@@ -41,7 +41,7 @@ void CKFToCDCFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   m_resultStorer.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->getParameter<std::string>("statePreFilter").setDefaultValue("all");
-  moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough"); //rough_and_recording
+  moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough");
   moduleParamList->getParameter<std::string>("stateExtrapolationFilter").setDefaultValue("extrapolate_and_update");
   moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance");
 }

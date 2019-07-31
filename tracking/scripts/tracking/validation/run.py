@@ -49,6 +49,9 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     #: Switch to use the extended harvesting validation instead
     extended = False
 
+    #: Only works in extended mode
+    saveFullTrees = False
+
     def preparePathValidation(self, path):
         """The default way to add the validation module to the path.
 
@@ -57,11 +60,15 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         """
 
         if self.extended:
+            expert_level = None
+            if self.saveFullTrees:
+                expert_level = 200
+
             trackingValidationModule = CombinedTrackingValidationModule(
                 name=self.name,
                 contact=self.contact,
                 output_file_name=self.output_file_name,
-                expert_level=200
+                expert_level=expert_level
                 )
         else:
             # Validation module generating plots

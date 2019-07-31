@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Simon Kurz, Nils Braun                                   *
@@ -24,7 +24,6 @@ TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStat
   const CDCCKFState& lastState = path->back();
 
   const double& arcLength = state.getArcLength() - lastState.getArcLength();
-
   // TODO: magic number
   if (!lastState.isSeed() and (arcLength >= 0 or arcLength < -20)) {
     return NAN;
@@ -34,7 +33,7 @@ TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStat
   }
 
 
-  double hitDistance = state.getHitDistance();
+  const double& hitDistance = state.getHitDistance();
   if (!lastState.isSeed() and std::abs(hitDistance) > m_maximalHitDistance) {
     return NAN;
   }

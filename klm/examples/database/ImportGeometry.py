@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Create EKLM geometry payloads.
+# Create KLM geometry payloads.
+# Note that GeoConfiguration created by this script should not be used except
+# for testing, because it contains the KLM only.
 
 import os
 import random
@@ -16,7 +18,7 @@ gearbox = register_module('Gearbox')
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('components', ['EKLM'])
+geometry.param('components', ['EKLM', 'BKLM'])
 geometry.param('useDB', False)
 geometry.param('createPayloads', True)
 geometry.param('payloadIov', [0, 0, -1, -1])

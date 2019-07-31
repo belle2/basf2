@@ -18,7 +18,7 @@
 #include <framework/database/DBObjPtr.h>
 
 // DataObjects
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 // rave
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
@@ -69,7 +69,7 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
-    DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
+    DBObjPtr<BeamSpot> m_beamSpot;/**< Beam spot database object */
 
     /**
      * Main steering routine

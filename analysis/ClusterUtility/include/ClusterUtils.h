@@ -10,8 +10,8 @@
 
 #pragma once
 
-// BEAMPARAMETERS AND DATABASE
-#include <framework/dbobjects/BeamParameters.h>
+// BEAMSPOT AND DATABASE
+#include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/DBObjPtr.h>
 
 // MDST
@@ -91,7 +91,7 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
+    DBObjPtr<BeamSpot> m_beamSpot; /**< BeamSpot. */
   };
 
 } // Belle2 namespace

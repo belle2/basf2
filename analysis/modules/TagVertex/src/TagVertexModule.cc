@@ -207,10 +207,10 @@ namespace Belle2 {
     m_shiftZ = 4.184436e+02 * bg *  0.0001;   // shift of 120 um (Belle2) in the boost direction
 
     if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
-      m_BeamSpotCenter = m_beamParams->getVertex() +
+      m_BeamSpotCenter = m_beamSpot->getIPPosition() +
                          TVector3(m_shiftZ * TMath::Sin(boostAngle), 0., m_shiftZ * TMath::Cos(boostAngle)); // boost in the XZ plane
     } else {
-      m_BeamSpotCenter = m_beamParams->getVertex(); // Standard algorithm needs no shift
+      m_BeamSpotCenter = m_beamSpot->getIPPosition(); // Standard algorithm needs no shift
     }
 
     double cut = 8.717575e-02 * bg;
@@ -282,7 +282,7 @@ namespace Belle2 {
     if (Breco->getPValue() < 0.) return false;
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov = m_beamSpot->getCovVertex();
 
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
@@ -415,7 +415,7 @@ namespace Belle2 {
     TVector3 boostDir = boost.Unit();
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov = m_beamSpot->getCovVertex();
     beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();

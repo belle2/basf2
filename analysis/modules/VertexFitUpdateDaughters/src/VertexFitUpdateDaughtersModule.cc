@@ -14,7 +14,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -92,10 +92,10 @@ void VertexFitUpdateDaughtersModule::event()
 
   analysis::RaveSetup::initialize(1, m_Bfield);
 
-  m_BeamSpotCenter = m_beamParams->getVertex();
+  m_BeamSpotCenter = m_beamSpot->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
   TMatrixDSym beamSpotCov(3);
-  if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamParams->getCovVertex();
+  if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpot->getCovVertex();
   if (m_withConstraint == "iptube") VertexFitUpdateDaughtersModule::findConstraintBoost(2.);
 
   if (m_withConstraint != "ipprofile" && m_withConstraint != "iptube"  && m_withConstraint != "mother" && m_withConstraint != "")
@@ -266,7 +266,7 @@ void VertexFitUpdateDaughtersModule::findConstraintBoost(double cut)
   TVector3 boostDir = boost.Unit();
 
   TMatrixDSym beamSpotCov(3);
-  beamSpotCov = m_beamParams->getCovVertex();
+  beamSpotCov = m_beamSpot->getCovVertex();
   beamSpotCov(2, 2) = cut * cut;
   double thetab = boostDir.Theta();
   double phib = boostDir.Phi();

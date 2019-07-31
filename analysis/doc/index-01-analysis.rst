@@ -35,6 +35,11 @@ The syntax used during this procedure is the :doc:`DecayString` and is described
 
 .. toctree:: DecayString
 
+It is often desirable to apply selections to `ParticleList`_ s, and events.
+This is done with cut strings.
+
+.. toctree:: CutStrings
+
 
 Modular analysis convenience functions
 ======================================

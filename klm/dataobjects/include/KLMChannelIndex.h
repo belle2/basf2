@@ -73,7 +73,8 @@ namespace Belle2 {
     ~KLMChannelIndex();
 
     /**
-     * Set index level.
+     * Set index level. If the index level is increased, then the index is set
+     * to the first element of the higher-order level.
      */
     void setIndexLevel(enum IndexLevel indexLevel);
 

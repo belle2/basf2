@@ -76,27 +76,55 @@ namespace Belle2 {
 
     /**
      * Determine whether a given channel is in BKLM.
+     * This function also works for modules amd sectors.
      * @param[in] channel KLM channel number.
      */
     bool isBKLMChannel(uint16_t channel) const;
 
     /**
      * Determine whether a given channel is in EKLM.
+     * This function also works for modules amd sectors.
      * @param[in] channel KLM channel number.
      */
     bool isEKLMChannel(uint16_t channel) const;
 
     /**
      * Get local BKLM channel number.
+     * This function also works for modules amd sectors.
      * @param[in] channel KLM channel number.
      */
     int localChannelNumberBKLM(uint16_t channel) const;
 
     /**
      * Get local EKLM channel number.
+     * This function also works for modules amd sectors.
      * @param[in] channel KLM channel number.
      */
     int localChannelNumberEKLM(uint16_t channel) const;
+
+    /**
+     * Get element numbers by channel number.
+     * @param[in]  channel     KLM channel number.
+     * @param[out] subdetector Subdetector.
+     * @param[out] section     Section.
+     * @param[out] sector      Sector.
+     * @param[out] layer       Layer.
+     * @param[out] plane       Plane.
+     * @param[out] strip       Strip.
+     */
+    void channelNumberToElementNumbers(
+      uint16_t channel, int* subdetector, int* section, int* sector,
+      int* layer, int* plane, int* strip) const;
+
+    /**
+     * Get module number.
+     * @param[in] subdetector Subdetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector (1-based).
+     * @param[in] layer       Layer (1-based).
+     */
+    uint16_t moduleNumber(int subdetector, int section, int sector,
+                          int layer) const;
 
     /**
      * Get module number for BKLM.
@@ -113,6 +141,18 @@ namespace Belle2 {
      * @param[in] layer   Layer number.
      */
     uint16_t moduleNumberEKLM(int section, int sector, int layer) const;
+
+    /**
+     * Get element numbers by module number.
+     * @param[in]  module      KLM module number.
+     * @param[out] subdetector Subdetector.
+     * @param[out] section     Section.
+     * @param[out] sector      Sector.
+     * @param[out] layer       Layer.
+     */
+    void moduleNumberToElementNumbers(
+      uint16_t module, int* subdetector, int* section, int* sector,
+      int* layer) const;
 
     /**
      * Get sector number for BKLM.

@@ -79,6 +79,25 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
       Prints all aliases currently registered.
       Useful to call just before calling `basf2.process` on an analysis path when debugging.
 
+
+Aliases
+~~~~~~~
+
+Variable names are deliberately verbose and explicit (to avoid ambiguity).
+However, it is often not desirable to deal with long unwieldy variable names particularly in the context of `VariableManagerOutput`.
+Aliases to variable names may be set with:
+
+.. code-block:: python
+
+        from variables import variables as vm
+        vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
+
+.. warning::
+
+        The `VariableManager` instance is configured independently of the `basf2.Path`.
+        The configuration just before calling `basf2.process` is what wins.
+
+
 .. _variablesByGroup:
 
 Variables by group
@@ -391,40 +410,6 @@ They have a **[Calibration]** pretag.
    :group: ECL trigger calibration
 .. b2-variables::
    :group: KLM Calibration | PID
-
-
-Aliases
-=======
-
-Variable names are deliberately verbose and explicit (to avoid ambiguity).
-However, it is often not desirable to deal with long unwieldy variable names particularly in the context of `VariableManagerOutput`.
-Aliases to variable names may be set with:
-
-.. code-block:: python
-
-        from variables import variables 
-        variables.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
-
-
-.. note::
-
-        Beware of confusion: the python module ``variables`` contains an object also called ``variables`` which is the ``Belle2.Variable.Manager.Instance()``.
-        This is a historic design choice.
-
-        Often, in examples and snippets we write: ``from varibles import variables as vm``.
-
-
-Note that this does not need the `basf2.Path` as an argument.
-
-.. warning::
-
-        The `VariableManager` instance is a singleton that is configured independently of the `basf2.Path`.
-        The configuration just before calling `basf2.process` is what wins.
-
-
-.. autofunction:: variables.variables.addAlias()
-.. autofunction:: variables.variables.printAliases()
-
 
 
 Collections and Lists

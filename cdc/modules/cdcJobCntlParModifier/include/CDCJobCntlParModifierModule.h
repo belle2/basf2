@@ -43,7 +43,8 @@ namespace Belle2 {
     CDC::CDCGeoControlPar& m_gcp;  /*!< Reference to CDCGeo... */
 
     //For Simulation
-    bool m_wireSag;                               /*!< Switch for sense wire sag */
+    bool m_timeWalk;                        /*!< Switch for time walk in translator */
+    bool m_wireSag;                         /*!< Switch for sense wire sag */
     bool m_modLeftRightFlag;                /*!< Switch for modified left/right flag */
     bool m_debug4Sim;                          /*!< Switch for debug printing. */
     double m_thresholdEnergyDeposit;  /*!< Energy thresh. for G4 step (GeV) */

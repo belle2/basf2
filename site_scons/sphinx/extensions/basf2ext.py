@@ -213,8 +213,9 @@ class VariableListDirective(Directive):
 
             # for overloaded variables, we might have to flag noindex in the
             # variable description so also check for that
+            index = self.noindex
             if ":noindex:" in var.description:
-                self.noindex = ["    :noindex:"]
+                index = ["    :noindex:"]
                 var.description = var.description.replace(":noindex:", "")
 
             docstring = var.description.splitlines()
@@ -223,7 +224,7 @@ class VariableListDirective(Directive):
             # of doxygen docstring conversion we have
             env.app.emit('autodoc-process-docstring', "b2:variable", var.name, var, None, docstring)
 
-            description = [f".. b2:variable:: {var.name}"] + self.noindex + [""]
+            description = [f".. b2:variable:: {var.name}"] + index + [""]
             description += ["    " + e for e in docstring]
             if "group" not in self.options:
                 description += ["", f"    :Group: {var.group}"]

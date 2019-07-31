@@ -12,7 +12,8 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
 
         For (unfortunate) historical reasons, the python accessor to the VariableManager
         singleton is called ``variables`` and is in the python ``variables`` module.
-        This leads to python ``import`` commands which read strangely.
+        This leads to strange-looking python ``import`` commands.
+
         For example:
 
         .. code-block:: python
@@ -31,13 +32,29 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
 
    Singleton class to hold all variables and aliases in the current scope.
 
-   .. warning:: 
-        The VariableManager operates outside of the `basf2.Path`. 
-        The aliases set at the point of calling `basf2.process` are used.
-
    .. py:method:: addAlias(alias, expression)
 
-      Create a new alias, the type annotations in the signature are optional
+      Create a new alias.
+
+      Variable names are deliberately verbose and explicit (to avoid ambiguity).
+      However, it is often not desirable to deal with long unwieldy variable names particularly in the context of `VariableManagerOutput`.
+
+      Example:
+
+          Aliases to a verbose variable may be set with:
+
+          >>> from variables import variables as vm
+          >>> vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
+
+      .. seealso:: 
+
+          `variables.utils.create_aliases` and `variables.utils.create_aliases_for_selected` 
+          might be helpful if you find yourself setting many aliases in your analysis script.
+
+      .. warning:: 
+
+          The VariableManager instance is configured independently of the `basf2.Path`. 
+          In case of adding the same alias twice, the configuration just before calling `basf2.process` is what wins.
 
       :param str alias: New alias to create
       :param str expression: The expression the alias should evaluate to
@@ -50,19 +67,24 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
 
       .. tip:: 
 
-          This returns a ``ROOT.vector<string> object``.
-          It can be unpacked using a list comprehension in python.
+          This returns a ``ROOT.vector`` which you will probably 
+          need to converted into a python ``list(str)``.
 
-          >>> my_aliases = [name for name in vm.getAliasNames()]
+          >>> my_aliases = list(vm.getAliasNames())
 
       :returns: ``ROOT.vector`` list of alias names
 
    .. py:method:: addCollection(collection, variables)
 
-      Create a new alias, the type annotations in the signature are optional
+      Create a new variable collection.
+
+      .. tip:: 
+
+         This method takes a ``ROOT.vector<string>`` as input.
+         It's probably easier to use `variables.utils.add_collection` which wraps this function for you.
 
       :param str collection: The new collection to create.
-      :param list(str) variables: A list of variables to include in the variable collection.
+      :param ROOT.vector(str) variables: A ``ROOT.vector<string>`` of variables to add as the variable collection.
 
       :returns: True if the collection was successfully added
 
@@ -77,25 +99,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
    .. py:method:: printAliases()
  
       Prints all aliases currently registered.
-      Useful to call just before calling `basf2.process` on an analysis path when debugging.
-
-
-Aliases
-~~~~~~~
-
-Variable names are deliberately verbose and explicit (to avoid ambiguity).
-However, it is often not desirable to deal with long unwieldy variable names particularly in the context of `VariableManagerOutput`.
-Aliases to variable names may be set with:
-
-.. code-block:: python
-
-        from variables import variables as vm
-        vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
-
-.. warning::
-
-        The `VariableManager` instance is configured independently of the `basf2.Path`.
-        The configuration just before calling `basf2.process` is what wins.
+      Useful to call just before calling `basf2.process` on an analysis `basf2.Path` when debugging.
 
 
 .. _variablesByGroup:
@@ -427,25 +431,23 @@ One can use the list in the steering file as follows:
   my_list = ['p','E']
 
   # Passing it as an argument to variablesToNtuple
-  modularAnalysis.variablesToNtuple(variables=my_list,
-                                     ...)
+  modularAnalysis.variablesToNtuple(variables=my_list, ...)
 
-It is also possible to create user-defined variable collections. Name of the variable collection can
-be treated as a variable name, and hence one would have the following syntax in the steering file:
+It is also possible to create user-defined variable collections.
+The name of the variable collection can be treated as a variable name.
 
-.. code:: python
+.. autofunction:: variables.utils.add_collection
 
-  # Defining the collection
-  variables.utils.add_collection(['p','E'],"my_collection")
 
-  # Passing it as an argument to variablesToNtuple
-  modularAnalysis.variablesToNtuple(variables=['my_collection'],
-                                     ...)
+Predefined collections
+~~~~~~~~~~~~~~~~~~~~~~
 
-There are several predefined lists of variables and for each predefined list it exists a collection with the same name:
+We provide several predefined lists of variables.
+For each predefined list, there is a collection with the same name:
 
 .. automodule:: variables.collections
    :members:
+
 
 Operations with variable lists
 ==============================
@@ -459,6 +461,7 @@ lists of kinematic variables in CMS using ``useCMSFrame(variable)`` meta-variabl
   from variables.utils import create_aliases
   # Replacement to Kinematics tool
   kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
+
   # Kinematic variables in CMS
   cms_kinematics = create_aliases(kinematics, "useCMSFrame({variable})", "CMS")
 

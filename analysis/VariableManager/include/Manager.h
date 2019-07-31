@@ -98,8 +98,7 @@ namespace Belle2 {
        * NOTE: the python interface is documented manually in analysis/doc/Variables.rst
        * (because we use ROOT to expose this in python rather than boost::python).
        *
-       * Please also keep that up-to-date with any modufications.
-       *
+       * Please also keep that up-to-date with any modifications.
        */
 
     public:

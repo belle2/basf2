@@ -1,0 +1,68 @@
+version: '3.4'
+
+# Basic hlt definition
+x-hlt-node: &hlt_node
+  build:
+    context: ../base_image
+  image: hbasf2_local_test:18.04
+  expose: [8000]
+  cap_add:
+    - SYS_PTRACE
+  volumes:
+    - ./:/work
+    - ${BELLE2_LOCAL_DIR}:/mnt/basf2/software:ro
+    - ${BELLE2_EXTERNALS_TOPDIR}:/mnt/basf2/externals:ro
+    - ${BELLE2_TOOLS}:/mnt/basf2/tools:ro
+    - ${BELLE2_DAQ_SLC}:/mnt/daq_slc/:ro
+
+services:
+  hltin:
+    <<: *hlt_node
+    hostname: hltin
+    container_name: hltin
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.2
+  hltout:
+    <<: *hlt_node
+    hostname: hltout
+    container_name: hltout
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.3
+  hltwk01:
+    <<: *hlt_node
+    hostname: hltwk01
+    container_name: hltwk01
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.4
+  hltwk02:
+    <<: *hlt_node
+    hostname: hltwk02
+    container_name: hltwk02
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.5
+  storage:
+    <<: *hlt_node
+    hostname: storage
+    container_name: storage
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.6
+  hltctl:
+    <<: *hlt_node
+    hostname: hltctl
+    container_name: hltctl
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.7
+
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16

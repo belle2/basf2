@@ -126,10 +126,10 @@ namespace Belle2 {
     void setRotation(double x)  { m_Rotation = x; }
 
     //! Get the rotation angle for a sector
-    double getSectorRotation(int fb, int sector) const { return m_SectorRotation[fb - 1][sector - 1]; }
+    double getSectorRotation(int section, int sector) const { return m_SectorRotation[section][sector - 1]; }
 
     //! Set the rotation angle for a sector
-    void setSectorRotation(int fb, int sector, double x) { m_SectorRotation[fb - 1][sector - 1] = x; }
+    void setSectorRotation(int section, int sector, double x) { m_SectorRotation[section][sector - 1] = x; }
 
     //! Get the global shift along a of the entire BKLM
     double getOffsetZ(void) const { return m_OffsetZ; }
@@ -571,32 +571,32 @@ namespace Belle2 {
     double getMPPCHeight(void) const { return m_MPPCHeight; }
 
     //! Get reconstruction dx in local system. displacement, not alignment
-    double getLocalReconstructionShiftX(int fb, int sector, int layer) const { return m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1]; }
+    double getLocalReconstructionShiftX(int section, int sector, int layer) const { return m_LocalReconstructionShiftX[section][sector - 1][layer - 1]; }
 
     //! Set reconstruction dx in local system. displacement, not alignment
-    void setLocalReconstructionShiftX(int fb, int sector, int layer, double x) { m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1] = x; }
+    void setLocalReconstructionShiftX(int section, int sector, int layer, double x) { m_LocalReconstructionShiftX[section][sector - 1][layer - 1] = x; }
 
     //! Get reconstruction dy in local system. displacement, not alignment
-    double getLocalReconstructionShiftY(int fb, int sector, int layer) const { return m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1]; }
+    double getLocalReconstructionShiftY(int section, int sector, int layer) const { return m_LocalReconstructionShiftY[section][sector - 1][layer - 1]; }
 
     //! Set reconstruction dy in local system. displacement, not alignment
-    void setLocalReconstructionShiftY(int fb, int sector, int layer, double x) { m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1] = x; }
+    void setLocalReconstructionShiftY(int section, int sector, int layer, double x) { m_LocalReconstructionShiftY[section][sector - 1][layer - 1] = x; }
 
     //! Get reconstruction dz in local system. displacement, not alignment
-    double getLocalReconstructionShiftZ(int fb, int sector, int layer) const { return m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1]; }
+    double getLocalReconstructionShiftZ(int section, int sector, int layer) const { return m_LocalReconstructionShiftZ[section][sector - 1][layer - 1]; }
 
     //! Set reconstruction dz in local system. displacement, not alignment
-    void setLocalReconstructionShiftZ(int fb, int sector, int layer, double x) { m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1] = x; }
+    void setLocalReconstructionShiftZ(int section, int sector, int layer, double x) { m_LocalReconstructionShiftZ[section][sector - 1][layer - 1] = x; }
 
     //! Get the z-phi planes flip (i.e., rotation by 180 degrees about z axis)
     //! True: z plane is inner, close to IP. False: phi-plane is inner, close to IP
     //! *for scintillator layers only*
-    bool isFlipped(int fb, int sector, int layer) const { return m_IsFlipped[fb - 1][sector - 1][layer - 1]; }
+    bool isFlipped(int section, int sector, int layer) const { return m_IsFlipped[section][sector - 1][layer - 1]; }
 
     //! Set the z-phi planes flip (i.e., rotation by 180 degrees about z axis)
     //! True: z plane is inner, close to IP. False: phi-plane is inner, close to IP
     //! *for scintillator layers only*
-    void isFlipped(int fb, int sector, int layer, bool flag) { m_IsFlipped[fb - 1][sector - 1][layer - 1] = flag; }
+    void isFlipped(int section, int sector, int layer, bool flag) { m_IsFlipped[section][sector - 1][layer - 1] = flag; }
 
     //! Get comment
     std::string getBKLMGeometryParComment() const { return m_comment; }

@@ -483,18 +483,28 @@ def cutAndCopyLists(
     path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from all input ParticleLists to
-    the single output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from all lists in ``inputListNames`` to
+    ``outputListName`` if they pass ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        Require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (list(str)): list of input ParticleList names
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
@@ -512,18 +522,28 @@ def cutAndCopyList(
     path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from the input ParticleList to
-    the output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from ``inputListName`` to ``outputListName`` if they pass
+    ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", "pi+:loose", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
@@ -756,6 +776,45 @@ def fillConvertedPhotonsList(
     path.add_module(pload)
 
 
+def fillParticleListFromROE(
+    decayString,
+    cut,
+    maskName='',
+    sourceParticleListName='',
+    useMissing=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    Creates Particle object for each ROE of the desired type found in the
+    StoreArray<RestOfEvent>, loads them to the StoreArray<Particle>
+    and fills the ParticleList. If useMissing is True, then the missing
+    momentum is used instead of ROE.
+
+    The type of the particles to be loaded is specified via the decayString module parameter.
+
+    @param decayString             specifies type of Particles and determines the name of the ParticleList.
+                                   Source ROEs can be taken as a daughter list, for example:
+                                   'B0:tagFromROE -> B0:signal'
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param maskName                Name of the ROE mask to use
+    @param sourceParticleListName  Use related ROEs to this particle list as a source
+    @param useMissing              Use missing momentum instead of ROE momentum
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('writeOut', writeOut)
+    pload.param('roeMaskName', maskName)
+    pload.param('useMissing', useMissing)
+    pload.param('sourceParticleListName', sourceParticleListName)
+    pload.param('useROEs', True)
+    path.add_module(pload)
+
+
 def fillParticleListFromMC(
     decayString,
     cut,
@@ -819,12 +878,21 @@ def fillParticleListsFromMC(
 
 def applyCuts(list_name, cut, path):
     """
-    Removes StoreArray<Particle> indices of Particles from given ParticleList
-    that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes particle candidates from ``list_name`` that do not pass ``cut``
+    (given selection criteria).
 
-    @param list_name input ParticleList name
-    @param cut  Particles that do not pass these selection criteria are removed from the ParticleList
-    @param path      modules are added to this path
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> applyCuts("pi+:mypions", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        list_name (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        path (basf2.Path): modules are added to this path
     """
 
     pselect = register_module('ParticleSelector')
@@ -836,10 +904,19 @@ def applyCuts(list_name, cut, path):
 
 def applyEventCuts(cut, path):
     """
-    Removes events that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes events that do not pass the ``cut`` (given selection criteria).
 
-    @param cut  Events that do not pass these selection criteria are skipped
-    @param path      modules are added to this path
+    Example:
+        continuum events (in mc only) with more than 5 tracks
+
+        >>> applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        cut (str): Events that do not pass these selection criteria are skipped
+        path (basf2.Path): modules are added to this path
     """
 
     eselect = register_module('VariableToReturnValue')
@@ -1945,7 +2022,7 @@ def printROEInfo(
     @param full_print   print out mask values for each Track/ECLCLuster in mask
     @param path         modules are added to this path
     """
-    if not isinstance(path, basf2.Path):
+    if not isinstance(path, Path):
         B2FATAL("Error from printROEInfo, please add this to the for_each path")
 
     printMask = register_module('RestOfEventPrinter')

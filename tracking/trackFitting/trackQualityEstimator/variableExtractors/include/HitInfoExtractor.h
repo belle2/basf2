@@ -47,25 +47,12 @@ namespace Belle2 {
 
       int n_no_trackPoint = 0;  // number of recoHitInformations without related track points
       int n_no_KalmanFitterInfo = 0;  // number of track points without related KalmanFitterInfo
-      std::optional<float> weight_firstCDCHit;
-      std::optional<float> weight_lastSVDHit;
-      std::optional<float> smoothedChi2_firstCDCHit;
-      std::optional<float> smoothedChi2_lastSVDHit;
       for (const RecoHitInformation* recoHitInformation : recoHitInformations) {
         const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
         if (trackPoint) {
           const genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();
           if (kalmanFitterInfo) {
             kalmanFitterInfos.push_back(kalmanFitterInfo);
-            if ((not weight_firstCDCHit)
-                and (recoHitInformation->getTrackingDetector() == recoHitInformation->c_CDC)) {
-              weight_firstCDCHit = kalmanFitterInfo->getWeights().front();
-              smoothedChi2_firstCDCHit = this->getSmoothedChi2(kalmanFitterInfo);
-            }
-            if (recoHitInformation->getTrackingDetector() == recoHitInformation->c_SVD) {
-              weight_lastSVDHit = kalmanFitterInfo->getWeights().front();
-              smoothedChi2_lastSVDHit = this->getSmoothedChi2(kalmanFitterInfo);
-            }
           } else {
             n_no_KalmanFitterInfo++;
           }
@@ -75,8 +62,49 @@ namespace Belle2 {
       }
       m_variables.at("N_Hits_without_TrackPoint") = n_no_trackPoint;
       m_variables.at("N_TrackPoints_without_KalmanFitterInfo") = n_no_KalmanFitterInfo;
-      m_variables.at("weight_lastSVDHit") = weight_lastSVDHit.value_or(m_valueIfVarNotAvailable);
+
+      // define lambda to which checks if hitinfo has kalman info and is from a specific detector
+      // use that via std::find_if to find first/last fitted hits from that detector
+      const auto hitHasKalmanInfoAndIsFromDetector =
+        [&recoTrack, this](const auto & recoHitInformation,
+      RecoHitInformation::RecoHitDetector trackingDetector) {
+        return (this->getKalmanFitterInfo(recoTrack, recoHitInformation)
+                and (recoHitInformation->getTrackingDetector() == trackingDetector));
+      };
+      const auto hitHasKalmanInfoAndIsFromCDC = std::bind(hitHasKalmanInfoAndIsFromDetector,
+                                                          std::placeholders::_1,
+                                                          RecoHitInformation::c_CDC);
+      const auto hitHasKalmanInfoAndIsFromSVD = std::bind(hitHasKalmanInfoAndIsFromDetector,
+                                                          std::placeholders::_1,
+                                                          RecoHitInformation::c_SVD);
+
+      // find first CDC hit with Kalman info and extract weight and Chi2
+      const auto firstHitWithCDCKalmanInfoIter = std::find_if(recoHitInformations.begin(),
+                                                              recoHitInformations.end(),
+                                                              hitHasKalmanInfoAndIsFromCDC);
+      std::optional<float> weight_firstCDCHit;
+      std::optional<float> smoothedChi2_firstCDCHit;
+      if (firstHitWithCDCKalmanInfoIter != recoHitInformations.end()) {
+        const genfit::KalmanFitterInfo* kalmanFitterInfo = this->getKalmanFitterInfo(recoTrack, *firstHitWithCDCKalmanInfoIter);
+        weight_firstCDCHit = kalmanFitterInfo->getWeights().front();
+        smoothedChi2_firstCDCHit = this->getSmoothedChi2(kalmanFitterInfo);
+      }
       m_variables.at("weight_firstCDCHit") = weight_firstCDCHit.value_or(m_valueIfVarNotAvailable);
+      m_variables.at("smoothedChi2_firstCDCHit") = smoothedChi2_firstCDCHit.value_or(m_valueIfVarNotAvailable);
+
+      // find last SVD hit with Kalman info and extract weight and Chi2
+      const auto lastHitWithSVDKalmanInfoIter = std::find_if(recoHitInformations.rbegin(),
+                                                             recoHitInformations.rend(),
+                                                             hitHasKalmanInfoAndIsFromSVD);
+      std::optional<float> weight_lastSVDHit;
+      std::optional<float> smoothedChi2_lastSVDHit;
+      if (lastHitWithSVDKalmanInfoIter != recoHitInformations.rend()) {
+        const genfit::KalmanFitterInfo* kalmanFitterInfo = this->getKalmanFitterInfo(recoTrack, *lastHitWithSVDKalmanInfoIter);
+        weight_lastSVDHit = kalmanFitterInfo->getWeights().front();
+        smoothedChi2_lastSVDHit = this->getSmoothedChi2(kalmanFitterInfo);
+      }
+      m_variables.at("weight_lastSVDHit") = weight_lastSVDHit.value_or(m_valueIfVarNotAvailable);
+      m_variables.at("smoothedChi2_lastSVDHit") = smoothedChi2_lastSVDHit.value_or(m_valueIfVarNotAvailable);
 
       std::vector<float> fitWeights;
       std::vector<float> chi2Values;
@@ -144,7 +172,19 @@ namespace Belle2 {
     }
 
   private:
-    /// Helper function to safely get Chi2 from a KalmanFitterInfo object if available, and if not return nullopt
+    /// Helper function to get Kalman fitter info from RecoHitInformation if available
+    genfit::KalmanFitterInfo* getKalmanFitterInfo(const RecoTrack& recoTrack,
+                                                  const RecoHitInformation* recoHitInformation)
+    {
+      const genfit::TrackPoint* trackPointPtr = recoTrack.getCreatedTrackPoint(recoHitInformation);
+      if (trackPointPtr) {
+        return trackPointPtr->getKalmanFitterInfo();
+      } else {
+        return nullptr;
+      }
+    }
+    /// Helper function to safely get Chi2 from a KalmanFitterInfo object if available, and if not
+    /// return nullopt
     std::optional<float> getSmoothedChi2(const genfit::KalmanFitterInfo* kalmanFitterInfo)
     {
       try {

@@ -138,7 +138,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
     pos_cut = 'charge > 0 and isInRestOfEvent == 1 and p < infinity'
     neg_cut = 'charge < 0 and isInRestOfEvent == 1 and p < infinity'
 
-    if additional_roe_filter is not None:
+    if additional_roe_filter:
         pos_cut = pos_cut + ' and ' + additional_roe_filter
         neg_cut = neg_cut + ' and ' + additional_roe_filter
 

@@ -68,7 +68,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
       .. tip:: 
 
           This returns a ``ROOT.vector`` which you will probably 
-          need to converted into a python ``list(str)``.
+          need to convert into a python ``list(str)``.
 
           >>> my_aliases = list(vm.getAliasNames())
 
@@ -478,8 +478,8 @@ to help to easily create aliases.
 .. autofunction:: variables.utils.create_daughter_aliases
 .. autofunction:: variables.utils.create_mctruth_aliases
 
-Miscelaneous helpers for using variables
-========================================
+Miscellaneous helpers for using variables
+=========================================
 
 .. autofunction:: variables.getAllTrgNames
 .. autofunction:: variables.std_vector

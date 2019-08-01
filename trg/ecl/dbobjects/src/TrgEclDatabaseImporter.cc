@@ -84,7 +84,7 @@ namespace Belle2 {
     std::vector<int>  ChannelId;
     std::vector<int>  TEreconstruction;
     std::vector<int>  Threshold;
-    std::vector<int>  Conversionfactor;
+    std::vector<double>  Conversionfactor;
     std::vector<int>  Toffset;
     std::vector<int>  Wavemean;
     std::vector<int>  Wavesigma;
@@ -219,23 +219,30 @@ namespace Belle2 {
     DBImportArray<TRGECLETMPara> etmpara;
 
     int FPGAversion;
-    int ADCto100MeV;
+    double ADCto100MeV;
     int ELow;
     int EHigh;
     int ELum;
     int FWD2DBhabha[14];
     int BWD2DBhabha[14];
-    int Bhabha3DThreshold[2];
+    int Bhabha3DSelectionThreshold[2];
+    int Bhabha3DVetoThreshold[2];
+    int Bhabha3DSelectionAngle[4];
+    int Bhabha3DVetoAngle[4];
+    int mumuThreshold;
+    int mumuAngle[4];
     int LowMultiThreshold[4];
+    int Prescalefactor[3];
     int TriggerLatency;
     int ETMDelay;
-
+    int n300MeVCluster;
+    int ECLBurstThreshold;
 
     stream >> FPGAversion
            >> ADCto100MeV
-           >> ELow
-           >> EHigh
            >> ELum
+           >> EHigh
+           >> ELow
            >> FWD2DBhabha[0]    >> BWD2DBhabha[0]
            >> FWD2DBhabha[1]    >> BWD2DBhabha[1]
            >> FWD2DBhabha[2]    >> BWD2DBhabha[2]
@@ -250,19 +257,38 @@ namespace Belle2 {
            >> FWD2DBhabha[11]   >> BWD2DBhabha[11]
            >> FWD2DBhabha[12]   >> BWD2DBhabha[12]
            >> FWD2DBhabha[13]   >> BWD2DBhabha[13]
-           >> Bhabha3DThreshold[0]
-           >> Bhabha3DThreshold[1]
+           >> Bhabha3DSelectionThreshold[0]
+           >> Bhabha3DSelectionThreshold[1]
+           >> Bhabha3DVetoThreshold[0]
+           >> Bhabha3DVetoThreshold[1]
+           >> Bhabha3DSelectionAngle[0]
+           >> Bhabha3DSelectionAngle[1]
+           >> Bhabha3DSelectionAngle[0]
+           >> Bhabha3DSelectionAngle[1]
+           >> Bhabha3DVetoAngle[0]
+           >> Bhabha3DVetoAngle[1]
+           >> Bhabha3DVetoAngle[0]
+           >> Bhabha3DVetoAngle[1]
+           >> mumuThreshold
+           >> mumuAngle[0]
+           >> mumuAngle[1]
            >> LowMultiThreshold[0]
            >> LowMultiThreshold[1]
            >> LowMultiThreshold[2]
            >> LowMultiThreshold[3]
+           >> Prescalefactor[0]
+           >> Prescalefactor[1]
+           >> Prescalefactor[2]
            >> TriggerLatency
-           >> ETMDelay;
+           >> ETMDelay
+           >> n300MeVCluster
+           >> ECLBurstThreshold;
 
 
 
-    etmpara.appendNew(FPGAversion, ADCto100MeV, ELow, EHigh, ELum, FWD2DBhabha, BWD2DBhabha, Bhabha3DThreshold, LowMultiThreshold,
-                      TriggerLatency, ETMDelay);
+    etmpara.appendNew(FPGAversion, ADCto100MeV, ELow, EHigh, ELum, FWD2DBhabha, BWD2DBhabha, Bhabha3DSelectionThreshold,
+                      Bhabha3DVetoThreshold, Bhabha3DSelectionAngle, Bhabha3DVetoAngle, mumuThreshold, mumuAngle, LowMultiThreshold,
+                      Prescalefactor, TriggerLatency, ETMDelay, n300MeVCluster, ECLBurstThreshold);
 
     stream.close();
     //Import to DB

@@ -563,7 +563,10 @@ class ConditionsDB:
           data (dict): a dictionary with the information provided by the user:
             task: category of global tag, either master, online, prompt, data, mc, or analysis
             tag: the global tage name
-            request: type of request, either Update, New, or Modification. The latter two imply task == master
+            request: type of request, either Update, New, or Modification. The latter two imply task == master because
+              if new payload classes are introduced or payload classes are modified then they will first be included in
+              the master global tag. Here a synchronization of code and payload changes has to be managed.
+              If new or modified payload classes should be included in other global tags they must already be in a release.
             pull-request: number of the pull request containing new or modified payload classes, only for request == New or Modified
             backward-compatibility: description of what happens if the old payload is encountered by the updated code,
               only for request == Modified

@@ -351,7 +351,6 @@ def add_svd_track_finding(
                         outputRelationRecoTrackStoreArrayName=comb_tracks,
                         writeOutDirection="backward",
                         stateBasicFilterParameters={"maximalHitDistance": 0.15},
-                        stateExtrapolationFilterParameters={"direction": "forward"},
                         pathFilter="arc_length",
                         maximalLayerJump=4)
 

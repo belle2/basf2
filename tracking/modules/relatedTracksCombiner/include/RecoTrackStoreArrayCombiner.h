@@ -19,11 +19,11 @@
  */
 namespace Belle2 {
   /// Module to combine RecoTracks.
-  class TracksCombinerModule : public Module {
+  class RecoTrackStoreArrayCombinerModule : public Module {
 
   public:
     /// Constructor of the module. Setting up parameters and description.
-    TracksCombinerModule();
+    RecoTrackStoreArrayCombinerModule();
 
     /// Declare required StoreArray
     void initialize() override;

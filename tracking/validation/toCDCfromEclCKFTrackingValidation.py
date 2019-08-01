@@ -62,15 +62,10 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         outputRelationRecoTrackStoreArrayName="EclSeedRecoTracks",
                         writeOutDirection="forward",
                         stateBasicFilterParameters={"maximalHitDistance": 7.5, "maximalHitDistanceEclSeed": 75.0},
-                        # stateBasicFilterParameters={"maximalHitDistance": 7.5, "maximalHitDistanceEclSeed": 75.0,
-                        #                             "returnWeight": 1.},
-                        # stateBasicFilterParameters={"returnWeight": 1.},
                         stateExtrapolationFilterParameters={"direction": "backward"},
                         pathFilter="arc_length_fromEcl",
                         inputECLshowersStoreArrayName="ECLShowers",
                         trackFindingDirection="backward",
-                        # filter="size_and_recording_fromEcl",
-                        # filterParameters={"returnWeight": 1.}
                         )
 
         path.add_module("ToCDCCKF",
@@ -82,11 +77,8 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         outputRelationRecoTrackStoreArrayName="CKFCDCRecoTracksFromEcl",
                         writeOutDirection="backward",
                         stateBasicFilterParameters={"maximalHitDistance": 0.75},
-                        # stateBasicFilterParameters={"maximalHitDistance": 0.75, "returnWeight": 1.},
                         stateExtrapolationFilterParameters={"direction": "forward"},
                         pathFilter="arc_length",
-                        # filter="size_and_recording",
-                        # filterParameters={"returnWeight": 1.}
                         )
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")

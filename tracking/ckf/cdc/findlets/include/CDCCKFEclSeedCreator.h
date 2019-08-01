@@ -55,7 +55,12 @@ namespace Belle2 {
     double m_param_minimalEnRequirement = 0.3;
     /// Don't do Ecl seeding in central region to save computing time
     bool m_param_restrictToForwardSeeds = true;
-
+    /// Correction if the shower is assumed to start in a certain depth
+    double m_param_showerDepth = 12.;
+    /// Up to which (neg) tanLambda value should the seeding be performed
+    double m_param_tanLambdaForwardNeg = -0.8;
+    /// Up to which (pos) tanLambda value should the seeding be performed
+    double m_param_tanLambdaForwardPos = 1.8;
 
     // Store Arrays
     /// Input ECL Showers Store Array

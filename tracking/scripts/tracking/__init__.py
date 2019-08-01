@@ -199,6 +199,9 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     # collections that will be pruned
     temporary_reco_track_list = []
 
+    # the name of the most recent track collection
+    latest_reco_tracks = None
+
     if not is_pxd_used(components):
         if use_ecl_to_cdc_ckf and is_cdc_used(components):
             combined_ecl_reco_tracks = reco_tracks
@@ -228,7 +231,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 
         # TODO: add another merging step? (SVD track found by vxdtf2, and CDC track found by ECL CKF)?
 
-        path.add_module("TracksCombiner",
+        path.add_module("RecoTrackStoreArrayCombiner",
                         Temp1RecoTracksStoreArrayName=latest_reco_tracks,
                         Temp2RecoTracksStoreArrayName=ecl_reco_tracks,
                         recoTracksStoreArrayName=combined_ecl_reco_tracks)

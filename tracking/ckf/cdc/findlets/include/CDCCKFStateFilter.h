@@ -71,7 +71,7 @@ namespace Belle2 {
         weight = m_preFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2DEBUG(100, "Failes PreFilter");
+          B2DEBUG(100, "Fails PreFilter");
           continue;
         }
 
@@ -81,7 +81,7 @@ namespace Belle2 {
         weight = m_basicFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2DEBUG(100, "Failes BasicFilter");
+          B2DEBUG(100, "Fails BasicFilter");
           continue;
         }
 
@@ -89,7 +89,7 @@ namespace Belle2 {
         weight = m_extrapolationFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2DEBUG(100, "Failes ExtrapolationFilter");
+          B2DEBUG(100, "Fails ExtrapolationFilter");
           continue;
         }
 
@@ -100,7 +100,7 @@ namespace Belle2 {
         weight = m_finalSelection({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2DEBUG(100, "Failes FinalFilter");
+          B2DEBUG(100, "Fails FinalFilter");
           continue;
         }
       }

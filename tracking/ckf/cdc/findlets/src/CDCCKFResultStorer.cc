@@ -77,17 +77,17 @@ void CDCCKFResultStorer::initialize()
 void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
 {
   for (const CDCCKFResult& result : results) {
-    if (result.size() == 1) {
+    if (result.size() < 2) {
       continue;
     }
 
-    genfit::MeasuredStateOnPlane const* trackState = 0;
+    genfit::MeasuredStateOnPlane const* trackState = nullptr;
     if (m_param_trackFindingDirection == TrackFindingCDC::EForwardBackward::c_Forward) {
       trackState = &result.at(1).getTrackState();
     } else if (m_param_trackFindingDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
       trackState = &result.back().getTrackState();
     } else {
-      B2ERROR("CDCCKFResultStorer: No valid direction specified. Please use forward/backward.");
+      B2FATAL("CDCCKFResultStorer: No valid direction specified. Please use forward/backward.");
     }
 
     // only accept paths that reached the center of the CDC (for ECL seeding)

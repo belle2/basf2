@@ -71,7 +71,7 @@ namespace Belle2 {
       } else if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward) {
         doForward = false;
       } else {
-        B2WARNING("CDCCKFStateCreator: No valid direction specified. Please use forward/backward.");
+        B2FATAL("CDCCKFStateCreator: No valid direction specified. Please use forward/backward.");
       }
     }
 

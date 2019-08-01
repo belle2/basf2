@@ -18,6 +18,8 @@
 
 #include <framework/core/ModuleParamList.h>
 
+#include <framework/gearbox/Const.h>
+
 using namespace Belle2;
 
 CDCCKFEclSeedCreator::CDCCKFEclSeedCreator() : Super()
@@ -44,6 +46,21 @@ void CDCCKFEclSeedCreator::exposeParameters(ModuleParamList* moduleParamList, co
                                 m_param_restrictToForwardSeeds,
                                 "Don't do Ecl seeding in central region to save computing time",
                                 m_param_restrictToForwardSeeds);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "tanLambdaForwardNeg"),
+                                m_param_tanLambdaForwardNeg,
+                                "Up to which (neg) tanLambda value should the seeding be performed",
+                                m_param_tanLambdaForwardNeg);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "tanLambdaForwardPos"),
+                                m_param_tanLambdaForwardPos,
+                                "Up to which (pos) tanLambda value should the seeding be performed",
+                                m_param_tanLambdaForwardPos);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "showerDepth"),
+                                m_param_showerDepth,
+                                "Don't do Ecl seeding in central region to save computing time",
+                                m_param_showerDepth);
 }
 
 void CDCCKFEclSeedCreator::initialize()
@@ -86,20 +103,20 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 
     // restrict to forward seeds
     if (m_param_restrictToForwardSeeds) {
-      if (tanLambda > -0.8 && tanLambda < 1.8) {
+      if (tanLambda > m_param_tanLambdaForwardNeg && tanLambda < m_param_tanLambdaForwardPos) {
         continue;
       }
     }
 
-    // Shower assumed to be in 12cm depth
-    pos = pos - 12. / pos.Mag() * pos;
+    // Correction if shower is assumed to start in a certain depth
+    pos = pos - m_param_showerDepth / pos.Mag() * pos;
 
     TVector3 mom = Eclus / pos.Mag() * pos;
 
     // Calculate helix trajectory for negative and positive charge seeds
     // Find center of circular trajectory
-    double rad = std::abs(mom.Pt() / (29.9792458 * 1e-4 * 1. *
-                                      1.5)); // factor 1. for charge // speed of light in [cm per ns] // const magnetic field
+    // factor 1. for charge // speed of light in [cm per ns] // const magnetic field
+    double rad = std::abs(mom.Pt() / (Const::speedOfLight * 1e-4 * 1. * 1.5));
 
     // Particle would not be able to reach ECL (underestimation of shower energy)
     if (2. * rad < pos.Perp()) {
@@ -178,10 +195,10 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     RecoTrack* eclSeedPos = m_eclSeedRecoTracks.appendNew(pos, mompos, +1);
     eclSeedPos->addRelationTo(&shower);
 
-    // define MeasuredStateOnPlane
-    genfit::AbsTrackRep* repNeg = RecoTrackGenfitAccess::createOrReturnRKTrackRep(*eclSeedNeg, -211);
+    // define MeasuredStateOnPlane (use pion hypothesis)
+    genfit::AbsTrackRep* repNeg = RecoTrackGenfitAccess::createOrReturnRKTrackRep(*eclSeedNeg, -Const::pion.getPDGCode());
     genfit::MeasuredStateOnPlane msopNeg(repNeg);
-    genfit::AbsTrackRep* repPos = RecoTrackGenfitAccess::createOrReturnRKTrackRep(*eclSeedPos, 211);
+    genfit::AbsTrackRep* repPos = RecoTrackGenfitAccess::createOrReturnRKTrackRep(*eclSeedPos, Const::pion.getPDGCode());
     genfit::MeasuredStateOnPlane msopPos(repPos);
 
     // set position, momentum, cov, sharedPlanePtr

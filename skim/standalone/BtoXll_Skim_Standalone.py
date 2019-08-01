@@ -28,8 +28,7 @@ args = parser.parse_args()
 if args.data:
     use_central_database("data_reprocessing_prompt_bucket6")
 
-# basic setup
-gb2_setuprel = 'release-03-02-02'
+gb2_setuprel = 'release-03-02-03'
 skimCode = encodeSkimName('BtoXll')
 
 path = Path()

@@ -127,16 +127,16 @@ namespace Belle2 {
         foundHitsGraph->Draw("P");
 
         const double centerX = (AInBoxAlgorithm::BoxAlgorithm::centerX(node));
+        const double deltaX = (AInBoxAlgorithm::BoxAlgorithm::deltaX(node));
         const double centerY = (AInBoxAlgorithm::BoxAlgorithm::centerY(node));
-        const double deltaY = (AInBoxAlgorithm::BoxAlgorithm::deltaY(node));
         const double centerZ = (AInBoxAlgorithm::BoxAlgorithm::centerZ(node));
 
         TF1* candidateL = new TF1("candL", AInBoxAlgorithm::BoxAlgorithm::debugLine(), 0, 120);
         TF1* candidateH = new TF1("candH", AInBoxAlgorithm::BoxAlgorithm::debugLine(), 0, 120);
         TF1* candidateMean = new TF1("candMean", AInBoxAlgorithm::BoxAlgorithm::debugLine(), 0, 120);
 
-        candidateL->SetParameters(centerX, centerY - deltaY, centerZ - 100.0 * deltaY);
-        candidateH->SetParameters(centerX, centerY + deltaY, centerZ + 100.0 * deltaY);
+        candidateL->SetParameters(centerX - deltaX, centerY, centerZ - 100.0 * deltaX);
+        candidateH->SetParameters(centerX + deltaX, centerY, centerZ + 100.0 * deltaX);
         candidateMean->SetParameters(centerX, centerY, centerZ);
 
         candidateL->SetLineColor(9);

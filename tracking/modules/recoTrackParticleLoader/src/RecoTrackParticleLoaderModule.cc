@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/particleCreator/ParticleCreatorModule.h>
+#include <tracking/modules/recoTrackParticleLoader/RecoTrackParticleLoaderModule.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -24,9 +24,9 @@
 
 using namespace Belle2;
 
-REG_MODULE(ParticleCreator)
+REG_MODULE(RecoTrackParticleLoader)
 
-ParticleCreatorModule::ParticleCreatorModule() :
+RecoTrackParticleLoaderModule::RecoTrackParticleLoaderModule() :
   Module()
 {
   setDescription(
@@ -41,7 +41,7 @@ ParticleCreatorModule::ParticleCreatorModule() :
            "PDG code of the hypothesis of the output Particles", m_pdgCode);
 }
 
-void ParticleCreatorModule::initialize()
+void RecoTrackParticleLoaderModule::initialize()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
   recoTracks.isRequired();
@@ -57,7 +57,7 @@ void ParticleCreatorModule::initialize()
   pList.registerInDataStore();
 }
 
-void ParticleCreatorModule::event()
+void RecoTrackParticleLoaderModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
   StoreArray<Particle> particles;

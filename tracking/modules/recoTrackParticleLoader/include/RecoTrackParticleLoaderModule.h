@@ -24,11 +24,11 @@ namespace Belle2 {
    * made more general.
    */
 
-  class ParticleCreatorModule : public Module {
+  class RecoTrackParticleLoaderModule : public Module {
 
   public:
     // Constructor
-    ParticleCreatorModule();
+    RecoTrackParticleLoaderModule();
 
     // Require and register the datastore arrays
     void initialize() override;

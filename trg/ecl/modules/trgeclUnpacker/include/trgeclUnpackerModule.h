@@ -89,7 +89,6 @@ namespace Belle2 {
     StoreArray<TRGECLUnpackerSumStore>  m_TRGECLSumArray;
     StoreArray<TRGECLUnpackerEvtStore>  m_TRGECLEvtArray;
     StoreArray<TRGECLCluster>  m_TRGECLClusterArray;
-
   };
 
 } // end namespace Belle2

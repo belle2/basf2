@@ -314,7 +314,7 @@ namespace Belle2 {
     int m_NeuroDelay = 0;
 
     /** cnttrg */
-    int m_Cnttrg = 0;
+    // int m_Cnttrg = 0; // not used, commented out at 2019/07/31 by ytlai
     int m_mergerCnttrg = 0;
     int m_2DFinderCnttrg = 0;
     int m_NeuroCnttrg = 0;

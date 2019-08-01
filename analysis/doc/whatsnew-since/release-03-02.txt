@@ -28,3 +28,21 @@ Modular Analysis
   data. It triggers the ROE to be constructed from all tracks and from Belle's
   specific gamma:mdst list.
 * Added signal region function `modularAnalysis.signalRegion`. By default, this function enables a new variable ``isSignalRegion`` and excludes the defined area when processing is done on data.
+
+Vertex Fitting
+++++++++++++++
+
+* The parameter confidenceLevel of the module ParticleVertexFitter now always
+  rejects the particle candidates with a p-value lower than the specified one.
+  Specifically, setting confidenceLevel to 0 does not reject candidates with
+  p-value equal to 0 anymore. Thus, the meaning of this parameter is now
+  the same as for the module TreeFitter.
+Modules
++++++++
+
+* ParticleLoader can load :doc:`RestOfEvent` as a particle 
+  using a new function `modularAnalysis.fillParticleListFromROE`.
+  This ROE particle can be combined with any other particle or written down 
+  using usual variables. 
+  Another option is to load missing momentum as a particle by supplementing 
+  ``useMissing = True`` argument to the function, mentioned above.

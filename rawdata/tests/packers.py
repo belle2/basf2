@@ -19,7 +19,7 @@ def create_digits():
     sim.add_module("EvtGenInput")
     add_simulation(sim)
     sim.add_module("RootOutput", outputFileName="digits.root", branchNames=[
-        "PXDDigits", "SVDShaperDigits", "SVDEventInfoSim", "CDCDigits", "TOPRawDigits", "ARICHDigits",
+        "PXDDigits", "SVDShaperDigits", "SVDEventInfo", "CDCDigits", "TOPRawDigits", "ARICHDigits",
         "BKLMDigits", "EKLMDigits", "ECLDigits", "ECLDsp",
     ])
     process(sim)
@@ -55,6 +55,10 @@ main.add_module('Geometry', components=['ARICH', 'TOP', 'SVD'])
 
 # conversion from digits to raw data
 add_packers(main)
+for module in main.modules():
+    if module.name() in["SVDPacker"]:
+        module.param('SVDEventInfo', 'SVDEventInfo')
+
 
 # output
 # add_raw_output(main)

@@ -97,9 +97,12 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     branch_names.remove("RawTRGs")
     branch_names.remove("RawFTSWs")
 
+    for module in path.modules():
+        if module.name() in["SVDDataFormatCheck", "__ROISVDCoGTimeEstimator"]:
+            module.param('SVDEventInfo', 'SVDEventInfoSim')
+
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 
-    basf2.print_path(path)
     basf2.process(path)
 
 

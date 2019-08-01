@@ -55,9 +55,6 @@ main.add_module('Geometry', components=['ARICH', 'TOP', 'SVD'])
 
 # conversion from digits to raw data
 add_packers(main)
-for module in main.modules():
-    if module.name() in["SVDPacker"]:
-        module.param('svdEventInfo', 'SVDEventInfo')
 
 # output
 # add_raw_output(main)

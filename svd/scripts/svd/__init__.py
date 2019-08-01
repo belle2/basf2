@@ -98,7 +98,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
         shaperDigitsName = ""
-        svdEventInfoName = "SVDEventInfoSim"
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         fitterName = 'SVDCoGTimeEstimator'
@@ -107,7 +106,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         clusterName = ""
         recoDigitsName = ""
         shaperDigitsName = ""
-        svdEventInfoName = "SVDEventInfo"
         missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
 
 # add strip masking if needed
@@ -128,13 +126,11 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     if dataFormatName not in [e.name() for e in path.modules()]:
         dataFormat = register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)
-        dataFormat.param('SVDEventInfo', svdEventInfoName)
 
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
         fitter.param('RecoDigits', recoDigitsName)
-        fitter.param('SVDEventInfo', svdEventInfoName)
         path.add_module(fitter)
 
     if clusterizerName not in [e.name() for e in path.modules()]:
@@ -191,18 +187,11 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             path.add_module(clusterizer)
 
 
-def add_svd_simulation(path, isROIsimulation=False):
-
-    if(isROIsimulation):
-        svdEventInfoName = "SVDEventInfoSim"
-    else:
-        svdEventInfoName = "SVDEventInfo"
+def add_svd_simulation(path):
 
     svdevtinfoset = register_module("SVDEventInfoSetter")
-    svdevtinfoset.param('SVDEventInfo', svdEventInfoName)
     path.add_module(svdevtinfoset)
     digitizer = register_module('SVDDigitizer')
-    digitizer.param('SVDEventInfo', svdEventInfoName)
     path.add_module(digitizer)
 
 

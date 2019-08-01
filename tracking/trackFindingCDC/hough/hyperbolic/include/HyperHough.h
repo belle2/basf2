@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/hough/trees/OtherSimpleBoxDivisionHoughTree.h>
+#include <tracking/trackFindingCDC/hough/trees/SimpleBoxDivisionHoughTree3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -16,14 +16,14 @@ namespace Belle2 {
     /**
      * Hough Tree for finding StereoHits with using CDCRecoHit3D as the item type.
      * This implementation uses the HitInHyperBox decision algorithm with 2 divisions for each step.
-     * This class is only an alias. The real algorithm can be found in OtherSimpleBoxDivisionHoughTree.
+     * This class is only an alias. The real algorithm can be found in SimpleBoxDivisionHoughTree3D.
      */
     template <class AHitPointerType,
               class AHitDecisionAlgorithm,
               size_t pDivisions = 2,
               size_t qDivisions = 2,
               size_t muDivisions = 2>
-    class HyperHough : public OtherSimpleBoxDivisionHoughTree<AHitPointerType,
+    class HyperHough : public SimpleBoxDivisionHoughTree3D<AHitPointerType,
       AHitDecisionAlgorithm,
       pDivisions,
       qDivisions,
@@ -31,7 +31,7 @@ namespace Belle2 {
 
     private:
       /// Super type
-      using Super = OtherSimpleBoxDivisionHoughTree<AHitPointerType,
+      using Super = SimpleBoxDivisionHoughTree3D<AHitPointerType,
             AHitDecisionAlgorithm,
             pDivisions,
             qDivisions,

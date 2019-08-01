@@ -22,7 +22,7 @@ namespace Belle2 {
     /// Convenience class for the typical usage-case: A box divisioned hough tree with maximum and minimum values in both directions.
     /// This time in 3D
     template<class AHitPtr, class AInBoxAlgorithm, size_t divisionX, size_t divisionY, size_t divisionZ>
-    class OtherSimpleBoxDivisionHoughTree : public
+    class SimpleBoxDivisionHoughTree3D : public
       BoxDivisionHoughTree<AHitPtr, typename AInBoxAlgorithm::HoughBox, divisionX, divisionY, divisionZ> {
 
     private:
@@ -38,12 +38,12 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      OtherSimpleBoxDivisionHoughTree(float maximumX,
-                                      float maximumY,
-                                      float maximumZ,
-                                      Width<0> overlapX = 0,
-                                      Width<1> overlapY = 0,
-                                      Width<2> overlapZ = 0)
+      SimpleBoxDivisionHoughTree3D(float maximumX,
+                                   float maximumY,
+                                   float maximumZ,
+                                   Width<0> overlapX = 0,
+                                   Width<1> overlapY = 0,
+                                   Width<2> overlapZ = 0)
         : Super(0)
         , m_maximumX(maximumX)
         , m_maximumY(maximumY)

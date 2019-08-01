@@ -31,7 +31,7 @@ RecoTrackParticleLoaderModule::RecoTrackParticleLoaderModule() :
 {
   setDescription(
     "Takes fitted RecoTracks and creates Particles from them directly, skipping the step of creating Tracks and TrackFitResults.");
-//   setPropertyFlags(c_ParallelProcessingCertified); //FIXME is it?
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("recoTrackColName", m_recoTrackColName,
            "Name of the collection holding the input RecoTrack", m_recoTrackColName);

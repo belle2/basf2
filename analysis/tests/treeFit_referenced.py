@@ -22,7 +22,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputfile = require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
+        inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
         inputMdst('default', inputfile, path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)

@@ -83,7 +83,7 @@ void StorageDeserializerModule::initialize()
   m_streamer = new DataStoreStreamer();
   m_package = new DataStorePackage(m_streamer, m_eb2);
 
-  StoreArray<RawPXD>::registerPersistent();
+  rawpxdarray.registerInDataStore();
   if (m_info.isAvailable()) {
     m_info.reportReady();
   }

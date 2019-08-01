@@ -46,6 +46,6 @@ namespace Belle2 {
      * A check if this variable string is a counter type variable to be handled
      * by the VariablesTo* output modules directly.
      */
-    bool isCounterVariable(std::string variableName);
+    bool isCounterVariable(const std::string& variableName);
   }
 }

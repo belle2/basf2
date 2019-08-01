@@ -40,14 +40,10 @@ PXDDQMCorrModule::PXDDQMCorrModule() : HistoModule()
   //Set module properties
   setDescription("PXD DQM Correlation module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxd"));
 }
 
-
-PXDDQMCorrModule::~PXDDQMCorrModule()
-{
-}
 
 //------------------------------------------------------------------
 // Function to define histograms
@@ -104,14 +100,10 @@ void PXDDQMCorrModule::event()
 
   for (const PXDCluster& cluster1 : m_storeClusters) {
     int iPlane1 = cluster1.getSensorID().getLayerNumber();
-    if ((iPlane1 < c_firstPXDPlane) || (iPlane1 > c_lastPXDPlane)) continue;
-    int index1 = planeToIndex(iPlane1);
-    if (index1 == 0) {
+    if (iPlane1 == 0) {
       for (const PXDCluster& cluster2 : m_storeClusters) {
         int iPlane2 = cluster2.getSensorID().getLayerNumber();
-        if ((iPlane2 < c_firstPXDPlane) || (iPlane2 > c_lastPXDPlane)) continue;
-        int index2 = planeToIndex(iPlane2);
-        if (index2 == 1) {
+        if (iPlane2 == 1) {
           m_CorrelationU->Fill(cluster1.getU(), cluster2.getU());
           m_CorrelationV->Fill(cluster1.getV(), cluster2.getV());
           m_DeltaU->Fill(cluster2.getU() - cluster1.getU());
@@ -122,12 +114,3 @@ void PXDDQMCorrModule::event()
   }
 }
 
-
-void PXDDQMCorrModule::endRun()
-{
-}
-
-
-void PXDDQMCorrModule::terminate()
-{
-}

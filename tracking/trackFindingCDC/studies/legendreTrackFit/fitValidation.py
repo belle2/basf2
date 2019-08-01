@@ -15,30 +15,38 @@ from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 
 class FitValidationModule(HarvestingModule):
+    """Validate the track fit"""
 
     def __init__(
             self,
             mc_track_cands_store_array_name,
             legendre_track_cand_store_array_name,
             output_file_name):
+        """Constructor"""
         super(
             FitValidationModule,
             self).__init__(
             foreach=legendre_track_cand_store_array_name,
             output_file_name=output_file_name)
 
+        #: cached name of the MCTrackCands StoreArray
         self.mc_track_cands_store_array_name = mc_track_cands_store_array_name
+        #: cached name of the LegendreTrackCands StoreArray
         self.legendre_track_cand_store_array_name = legendre_track_cand_store_array_name
 
-        # Fitters
+        #: Use the Riemann fitter for circles
         self.circle_fitter = Belle2.TrackFindingCDC.CDCRiemannFitter.getFitter()
+        #: Use the standard track fitter for speed
         self.fast_fitter = Belle2.TrackFindingCDC.TrackFitter()
 
     def prepare(self):
+        """ Initialize the harvester"""
+        #: cached name of the CDCHits StoreArray
         self.cdcHits = Belle2.PyStoreArray("CDCHits")
         return HarvestingModule.prepare(self)
 
     def peel(self, legendre_track_cand):
+        """Aggregate the track and MC information for track-fit validation"""
 
         cdc_hit_store_array = self.cdcHits
 
@@ -77,6 +85,8 @@ class FitValidationModule(HarvestingModule):
 
         return return_dict
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="tree")
 
 
@@ -85,8 +95,9 @@ from tracking import modules
 
 
 class FitValidation(StandardEventGenerationRun):
-
+    """Read generated events or generate new events, simulate, fit the tracks and validate"""
     def create_path(self):
+        """Create and populate the basf2 path"""
 
         main_path = super(FitValidation, self).create_path()
 

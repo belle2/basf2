@@ -97,12 +97,12 @@ void RestOfEventBuilderModule::createNestedROE()
   for (unsigned i = 0; i < nParticles; i++) {
     const Particle* particle = plist->getParticle(i);
     // check if a Particle object is already related to a RestOfEvent object
-    RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
+    auto* check_roe = particle->getRelated<RestOfEvent>();
     if (check_roe != nullptr) {
       return;
     }
     // create nested RestOfEvent object:
-    RestOfEvent* nestedROE = nestedROEArray.appendNew(true);
+    RestOfEvent* nestedROE = nestedROEArray.appendNew(particle->getPDGCode(), true);
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(nestedROE);
     // create relation: host ROE <-> nested ROE
@@ -137,12 +137,12 @@ void RestOfEventBuilderModule::createROE()
     const Particle* particle = plist->getParticle(i);
 
     // check if a Particle object is already related to a RestOfEvent object
-    RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
+    auto* check_roe = particle->getRelated<RestOfEvent>();
     if (check_roe != nullptr)
       return;
 
     // create RestOfEvent object
-    RestOfEvent* roe = roeArray.appendNew();
+    RestOfEvent* roe = roeArray.appendNew(particle->getPDGCode());
 
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(roe);
@@ -173,22 +173,23 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
     for (int i = 0; i < m_part; i++) {
       Particle* storedParticle = plist->getParticle(i);
 
-      bool toAdd = true;
-      for (auto* daughter : fsdaughters) {
-        if (RestOfEvent::compareParticles(storedParticle, daughter)) {
-          B2DEBUG(10, "Ignoring Particle with PDG " << storedParticle->getPDGCode() << " index " << storedParticle->getMdstArrayIndex() <<
-                  " to "
-                  <<
-                  daughter->getMdstArrayIndex());
-          B2DEBUG(10, "Is copy " << storedParticle->isCopyOf(daughter));
-          toAdd = false;
-          nExcludedParticles++;
-          break;
+      std::vector<const Particle*> storedParticleDaughters = storedParticle->getFinalStateDaughters();
+      for (auto* storedParticleDaughter : storedParticleDaughters) {
+        bool toAdd = true;
+        for (auto* daughter : fsdaughters) {
+          if (RestOfEvent::compareParticles(storedParticleDaughter, daughter)) {
+            B2DEBUG(10, "Ignoring Particle with PDG " << daughter->getPDGCode() << " index " <<
+                    storedParticleDaughter->getArrayIndex() << " to " << daughter->getArrayIndex());
+            B2DEBUG(10, "Is copy " << storedParticleDaughter->isCopyOf(daughter));
+            toAdd = false;
+            nExcludedParticles++;
+            break;
+          }
         }
-      }
-      if (toAdd) {
-        //roe->addParticle(storedParticle);
-        particlesToAdd.push_back(storedParticle);
+        if (toAdd) {
+          //roe->addParticle(storedParticle);
+          particlesToAdd.push_back(storedParticleDaughter);
+        }
       }
     }
   }
@@ -245,22 +246,22 @@ void RestOfEventBuilderModule::printParticle(const Particle* particle)
   B2INFO("[RestOfEventBuilderModule] tracks  : ");
 
   std::string printout;
-  for (unsigned i = 0; i < trackFSPs.size(); i++)
-    printout += std::to_string(trackFSPs[i]) + " ";
+  for (int trackFSP : trackFSPs)
+    printout += std::to_string(trackFSP) + " ";
   B2INFO(printout);
 
   printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] eclFSPs : ");
-  for (unsigned i = 0; i < eclFSPs.size(); i++)
-    printout += std::to_string(eclFSPs[i]) + " ";
+  for (int eclFSP : eclFSPs)
+    printout += std::to_string(eclFSP) + " ";
   B2INFO(printout);
 
   printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] klmFSPs : ");
-  for (unsigned i = 0; i < klmFSPs.size(); i++)
-    printout += std::to_string(klmFSPs[i]) + " ";
+  for (int klmFSP : klmFSPs)
+    printout += std::to_string(klmFSP) + " ";
   B2INFO(printout);
 
 }

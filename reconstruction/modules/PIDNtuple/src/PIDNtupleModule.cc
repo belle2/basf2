@@ -104,7 +104,7 @@ void PIDNtupleModule::initialize()
   m_tree->Branch("klm",   &m_pid.klm,   "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
 
   m_norm = 1;
-  double p0 = m_p1 * log(1.0 + 4.0 * m_p2 / m_p1); // distribution peak
+  double p0 = m_p1 * log1p(4.0 * m_p2 / m_p1); // distribution peak
   m_norm = 1.0 / momDistribution(p0);
   m_value = momDistribution(m_pMax);
 }

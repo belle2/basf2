@@ -40,7 +40,6 @@ process(main)
 
 # and run the importer
 dbImporter = BKLMDatabaseImporter()
-# dbImporter.importBklmElectronicMapping()
 # dbImporter.importBklmGeometryPar()
 # dbImporter.importBklmSimulationPar()
 # dbImporter.importBklmBadChannels()

@@ -34,7 +34,7 @@ GearboxModule::GearboxModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
-  m_backends.push_back("file:");
+  m_backends.emplace_back("file:");
 
   //Parameter definition
   addParam("backends",  m_backends, "The backends to use when looking for xml "

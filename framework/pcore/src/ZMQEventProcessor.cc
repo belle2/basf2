@@ -17,7 +17,6 @@
 
 #include <framework/pcore/ZMQEventProcessor.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/GlobalProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
@@ -28,15 +27,13 @@
 #include <framework/core/Environment.h>
 #include <framework/logging/LogSystem.h>
 
-#include <thread>
-
 #include <TROOT.h>
 
 #include <chrono>
 #include <thread>
 #include <sys/stat.h>
 
-#include <signal.h>
+#include <csignal>
 #include <fstream>
 
 using namespace std;
@@ -122,7 +119,7 @@ ZMQEventProcessor::~ZMQEventProcessor()
   g_eventProcessorForSignalHandling = nullptr;
 }
 
-void ZMQEventProcessor::process(PathPtr path, long maxEvent)
+void ZMQEventProcessor::process(const PathPtr& path, long maxEvent)
 {
   // Concerning signal handling:
   // * During the initialization, we just raise the signal without doing any cleanup etc.
@@ -279,7 +276,7 @@ void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList
 
   // TODO: make sure to only send statistics!
   const auto& evtMessage = streamer.stream();
-  auto message = ZMQMessageFactory::createMessage(c_MessageTypes::c_statisticMessage, evtMessage);
+  auto message = ZMQMessageFactory::createMessage(EMessageTypes::c_statisticMessage, evtMessage);
   zmqClient.publish(std::move(message));
 
   B2DEBUG(10, "Finished an output process");

@@ -38,12 +38,12 @@ namespace Belle2 {
       m_flag = b.m_flag;
       return *this;
     }
-
+    /** set trigger GDL readout status 0:fine 1:problematic -1:not known**/
     void setflag(int i)
     {
       m_flag = i;
     }
-
+    /** get trigger GDL readout status 0:fine 1:problematic -1:not known**/
     int getflag() const
     {
       return m_flag;

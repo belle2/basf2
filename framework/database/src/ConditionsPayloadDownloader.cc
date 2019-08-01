@@ -16,6 +16,7 @@
 #include <framework/utilities/EnvironmentVariables.h>
 #include <TRandom.h>
 #include <iomanip>
+#include <memory>
 #include <set>
 #include <chrono>
 #include <thread>
@@ -159,6 +160,42 @@ namespace Belle2 {
   /* We only want to initialize curl once */
   bool ConditionsPayloadDownloader::s_globalInit{false};
 
+  /* And we need a global list of checked payloads for this processing */
+  std::set<std::string> ConditionsPayloadDownloader::s_verifiedGlobalTags;
+
+  void ConditionsPayloadDownloader::verifyUsableGlobaltag(const std::string& escapedGlobalTag)
+  {
+    if (s_verifiedGlobalTags.find(escapedGlobalTag) != s_verifiedGlobalTags.end()) return;
+
+    B2DEBUG(30, "Checking if global tag " << std::quoted(escapedGlobalTag) << " is usable ...");
+
+    SessionGuard session(*this);
+
+    const std::string url = urljoin(m_restUrl, "v2/globalTag/" + escapedGlobalTag);
+    std::stringstream gtinfo;
+    if (!download(url, gtinfo)) {
+      B2FATAL("Cannot download information on global tag " << std::quoted(escapedGlobalTag)
+              << ". Usually this means it doesn't exist and you misspelled the name");
+    }
+
+    boost::property_tree::ptree pt;
+    gtinfo.clear();
+    gtinfo.seekg(0, std::ios::beg);
+    try {
+      // and load it into a boost property_tree
+      boost::property_tree::read_json(gtinfo, pt);
+      auto status = pt.get<std::string>("globalTagStatus.name");
+      if (status == "INVALID") {
+        B2FATAL("The global tag " << std::quoted(escapedGlobalTag)
+                << " you're trying to use is marked as invalid");
+      }
+    } catch (boost::property_tree::ptree_error& e) {
+      // Any problems parsing the reply? bail
+      B2FATAL("Cannot parse database global tag information: " << e.what());
+    }
+    s_verifiedGlobalTags.emplace(escapedGlobalTag);
+  }
+
   /* add directory but make sure it's absolute */
   void ConditionsPayloadDownloader::addLocalDirectory(const std::string& directory, EConditionsDirectoryStructure structure)
   {
@@ -175,7 +212,7 @@ namespace Belle2 {
       s_globalInit = true;
     }
     // create the curl session
-    m_session.reset(new ConditionsCurlSession);
+    m_session = std::make_unique<ConditionsCurlSession>();
     m_session->curl = curl_easy_init();
     if (!m_session->curl) {
       B2FATAL("Cannot intialize libcurl");
@@ -246,7 +283,7 @@ namespace Belle2 {
 
   bool ConditionsPayloadDownloader::update(const std::string& globalTag, int experiment, int run)
   {
-    //make sure we have an active curl session needed for escaping the tag name ...
+    // make sure we have an active curl session needed for escaping the tag name ...
     SessionGuard session(*this);
 
     B2DEBUG(31, "ConditionsDB: Updating payload information from global tag "
@@ -293,6 +330,11 @@ namespace Belle2 {
       // found a working server, let's stick to this one
       m_restUrl = restUrl;
     }
+
+    // Ok we now we can download a list of payloads ... but this global tag
+    // might be invalid or might not exist at all. So do check that now.
+    verifyUsableGlobaltag(escapedTagStr);
+
     // and if that was successful we parse the returned json by resetting the stringstream to its beginning
     payloads.clear();
     payloads.seekg(0, std::ios::beg);
@@ -307,15 +349,15 @@ namespace Belle2 {
         PayloadInfo payloadInfo;
         auto payload = iov.second.get_child("payload");
         auto payloadIov = iov.second.get_child("payloadIov");
-        std::string name = payload.get<std::string>("basf2Module.name");
+        auto name = payload.get<std::string>("basf2Module.name");
         payloadInfo.digest = payload.get<std::string>("checksum");
         payloadInfo.payloadUrl = payload.get<std::string>("payloadUrl");
         payloadInfo.revision = payload.get<int>("revision", 0);
         payloadInfo.baseUrl = payload.get<std::string>("baseUrl");
-        int firstExp = payloadIov.get<int>("expStart");
-        int firstRun = payloadIov.get<int>("runStart");
-        int finalExp = payloadIov.get<int>("expEnd");
-        int finalRun = payloadIov.get<int>("runEnd");
+        auto firstExp = payloadIov.get<int>("expStart");
+        auto firstRun = payloadIov.get<int>("runStart");
+        auto finalExp = payloadIov.get<int>("expEnd");
+        auto finalRun = payloadIov.get<int>("runEnd");
         payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
 
         // make sure we have all fields filled

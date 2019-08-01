@@ -97,12 +97,14 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
         shaperDigitsName = ""
+        missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
         clusterName = ""
         recoDigitsName = ""
         shaperDigitsName = ""
+        missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
 
 # add strip masking if needed
     if(applyMasking):
@@ -119,13 +121,11 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
             masking.param('ShaperDigitsUnmasked', shaperDigitsName)
             path.add_module(masking)
 
+    path.add_module('SVDDataFormatCheck', ShaperDigits=shaperDigitsName)
+
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
-        fitter.param('Correction_StripCalPeakTime', True)
-        fitter.param('Correction_TBTimeWindow', True)
-        fitter.param('Correction_ShiftMeanToZero', True)
-        fitter.param('Correction_ShiftMeanToZeroTBDep', False)
         fitter.param('RecoDigits', recoDigitsName)
         path.add_module(fitter)
 
@@ -136,6 +136,11 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         clusterizer.param('Clusters', clusterName)
         clusterizer.param('useDB', True)
         path.add_module(clusterizer)
+
+    if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
+        missingAPVCreator = register_module('SVDMissingAPVsClusterCreator')
+        missingAPVCreator.set_name(missingAPVsClusterCreatorName)
+        path.add_module(missingAPVCreator)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -180,6 +185,8 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
 
 def add_svd_simulation(path):
 
+    svdevtinfoset = register_module("SVDEventInfoSetter")
+    path.add_module(svdevtinfoset)
     digitizer = register_module('SVDDigitizer')
     path.add_module(digitizer)
 
@@ -212,7 +219,6 @@ def add_svd_SPcreation(path, isROIsimulation=False):
     if svdSPCreatorName not in [e.name() for e in path.modules()]:
         spCreatorSVD = register_module('SVDSpacePointCreator')
         spCreatorSVD.set_name(svdSPCreatorName)
-        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)

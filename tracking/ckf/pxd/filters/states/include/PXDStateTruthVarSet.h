@@ -60,8 +60,10 @@ namespace Belle2 {
     virtual bool extract(const BasePXDStateFilter::Object* result) override;
 
   private:
+    /// Pointer to the object containing event number etc
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
+    /// MC information used in the PXD CKF
     MCUtil m_mcUtil;
   };
 }

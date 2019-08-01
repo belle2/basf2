@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMDIGIT_H
-#define BKLMDIGIT_H
+#pragma once
 
 //#include <framework/datastore/RelationsObject.h>
 #include <framework/dataobjects/DigitBase.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 namespace Belle2 {
@@ -74,8 +74,8 @@ namespace Belle2 {
     bool isAboveThreshold() const { return ((m_ModuleID & BKLM_ABOVETHRESHOLD_MASK) != 0); }
 
     //! Get detector end
-    //! @return detector end (TRUE=forward or FALSE=backward) of this strip
-    bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
+    //! @return detector end (1=forward or 0=backward) of this strip
+    int getForward() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
 
     //! Get sector number
     //! @return sector number of this strip (1..8)
@@ -85,13 +85,17 @@ namespace Belle2 {
     //! @return layer number of this strip (1..15)
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
+    //! Get plane number.
+    //! @return Plane number (0=z, 1=phi).
+    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
+
     //! Get readout coordinate
     //! @return readout coordinate (TRUE=phi, FALSE=z) of this strip
     bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
     //! Get strip number
     //! @return strip number (1..64)
-    int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStrip() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get detector-module ID
     //! @return unique detector-module ID (internally calculated)
@@ -128,7 +132,7 @@ namespace Belle2 {
     int getCTime() const { return m_CTime; }
 
     //! Get the status of scint pulse-shape fit
-    //! @return status of scint pulse-shape fit (enum EKLM::FPGAFitStatus returned as int!)
+    //! @return status of scint pulse-shape fit (enum EKLM::ScintillatorFirmwareFitStatus returned as int!)
     int getFitStatus() { return m_FitStatus; }
 
     //! Determine whether two BKLMDigits refer to the same strip
@@ -158,7 +162,7 @@ namespace Belle2 {
     //! Set the charge value
     void setCharge(int charge) { m_Charge = charge; }
 
-    //! Set the status of the pulse-shape fit (enum EKLM::FPGAFitStatus --> int!)
+    //! Set the status of the pulse-shape fit (enum EKLM::ScintillatorFirmwareFitStatus --> int!)
     //! @param status completion status of the pulse-shape analysis
     void setFitStatus(int status) { m_FitStatus = status; }
 
@@ -202,5 +206,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif //BKLMDIGIT_H

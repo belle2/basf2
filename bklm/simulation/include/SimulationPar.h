@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIMULATIONPAR_H
-#define SIMULATIONPAR_H
+#pragma once
 
 namespace Belle2 {
 
@@ -80,5 +79,3 @@ namespace Belle2 {
   } // end of namespace bklm
 
 } // end of namespace Belle2
-
-#endif // SIMULATIONPAR_H

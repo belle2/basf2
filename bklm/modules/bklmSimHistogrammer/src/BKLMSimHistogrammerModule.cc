@@ -20,10 +20,8 @@
 
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <bklm/dataobjects/BKLMDigit.h>
-#include <eklm/simulation/FPGAFitter.h>
 #include <simulation/dataobjects/SimHitBase.h>
 
-#include <TRandom.h>
 #include "TMath.h"
 
 using namespace std;
@@ -226,7 +224,7 @@ void BKLMSimHistogrammerModule::event()
       break;
 
     }
-    int channel = hits1D[i]->isForward() * 840 +  hits1D[i]->getSector() * 105 + hits1D[i]->isPhiReadout() * 1680 +
+    int channel = hits1D[i]->getForward() * 840 +  hits1D[i]->getSector() * 105 + hits1D[i]->isPhiReadout() * 1680 +
                   hits1D[i]->getStripAve();
     m_hSimHitPerChannelLayer->Fill(channel, hits1D[i]->getLayer(), m_weight);
     m_bgSource->Fill(scaledTag, m_weight);

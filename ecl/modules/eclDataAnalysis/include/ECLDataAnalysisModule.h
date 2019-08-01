@@ -292,6 +292,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterTimingError;  /**< ECLCluster time error */
     std::vector<double>* m_eclClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLCluster*/
     std::vector<double>* m_eclClusterHighestE; /**< Highest energy deposit (per crystal) in ECLCluster */
+    std::vector<int>* m_eclClusterCellId; /**< CellId with highest energy deposit in ECLCluster */
     std::vector<int>* m_eclClusterNofCrystals;  /**< Number of crystals in ECLCluster */
     std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal healt flag */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
@@ -305,7 +306,8 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterLAT; /**< Reconstructed LAT */
     std::vector<double>* m_eclClusterDeltaTime99; /**< DeltaTime99 */
     std::vector<int>* m_eclClusterDetectorRegion; /**< Cluster Detector Region */
-    std::vector<int>* m_eclClusterHypothesisId; /**< Cluster Detector Region */
+    std::vector<int>* m_eclClusterHasNPhotonHypothesis; /**< Cluster has n-photon hypothesis */
+    std::vector<int>* m_eclClusterHasNeutralHadronHypothesis; /**< Cluster has neutral hadron hypothesis */
 
     int m_eclPureDigitMultip; /**< Number of ECLDigits per event, PureCsI option */
     std::vector<int>* m_eclPureDigitIdx; /**< ECLDigit index, PureCsI option */
@@ -399,6 +401,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterTimingError;  /**< Cluster time error, PureCsI option */
     std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in Cluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterCellId; /**< CellId with highest energy deposit in Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterLat; /**< Cluster shape parameter LAT, PureCsI option */
     std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in Cluster, PureCsI option */
     std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag, PureCsI option */
@@ -412,7 +415,8 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterE1oE9;  /**< Reconstructed E1oE9, PureCsI option */
     std::vector<double>* m_eclPureClusterDeltaTime99;  /**< Reconstructed DeltaT99, PureCsI option */
     std::vector<int>* m_eclPureClusterDetectorRegion; /**< Clusters detector region, PureCsI option */
-    std::vector<int>* m_eclPureClusterHypothesisId; /**< Cluster ID Hyp, PureCsI option */
+    std::vector<int>* m_eclPureClusterHasNPhotonHypothesis; /**< Cluster has n-photon hypothesis, PureCsI option */
+    std::vector<int>* m_eclPureClusterHasNeutralHadronHypothesis; /**< Cluster has neutral hadron hypothesis, PureCsI option */
 
     int m_eclShowerMultip; /**< Number of ECLShowers per event */
     std::vector<int>* m_eclShowerIdx; /**< Shower Index */

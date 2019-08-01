@@ -42,10 +42,12 @@ void EKLMRawPackerModule::beginRun()
 void EKLMRawPackerModule::event()
 {
   const EKLMDataConcentratorLane* lane;
+  /* cppcheck-suppress variableScope */
   int i, j, k, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
   vector<uint32_t> dataWords[4][4]; // Indices: copper - 1, data concentrator.
   int* detectorBuf[4], nWords[4];
   uint32_t buf[2];
+  /* cppcheck-suppress variableScope */
   uint16_t bword1, bword2, bword3, bword4;
   RawCOPPERPackerInfo packerInfo;
   EKLMDigit* eklmDigit;
@@ -53,8 +55,6 @@ void EKLMRawPackerModule::event()
     B2FATAL("No EKLM electronics map.");
   for (i = 0; i < m_Digits.getEntries(); i++) {
     eklmDigit = m_Digits[i];
-    if (!(eklmDigit->isGood()))
-      continue;
     buf[0] = 0;
     buf[1] = 0;
     bword1 = 0;

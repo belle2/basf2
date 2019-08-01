@@ -14,9 +14,9 @@ class EffModule(Module):
     #: The number of events passing L1 trigger
     Ntrg_event = 0
     #: The number of events passing each L1 trigger line
-    Nsubtrg_event = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    prescale_phase2 = [1, 1, 20, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1]
-    prescale_phase3 = [1, 1, 20, 2, 1, 1, 1, 1, 2, 1, 1, 20, 20, 1, 5, 1, 3, 5]
+    Nsubtrg_event = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    prescale_phase2 = [1, 1, 20, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    prescale_phase3 = [1, 1, 20, 2, 1, 1, 1, 1, 2, 1, 1, 20, 20, 1, 5, 1, 3, 5, 1, 1, 1, 1, 1]
 #   trglog = ['n_2d_finder>=3', 'n_2d_finder==2&&BhabhaVeto==0',
     trglog_phase2 = ['3 or more 3D tracks',
                      '2 3D tracks, ≥1 within 25 cm, not a trkBhabha',
@@ -35,7 +35,12 @@ class EffModule(Module):
                      'exactly 1 E*>1 GeV and 1 E>300 MeV, in 2,3 or 16',
                      'clusters back-to-back in phi, both >250 MeV, no 2 GeV',
                      'clusters back-to-back in phi, 1 <250 MeV, no 2 GeV',
-                     'clusters back-to-back in 3D, no 2 GeV'
+                     'clusters back-to-back in 3D, no 2 GeV',
+                     'eed: two matched & cluster b2b',
+                     'fed: one track & one matched & cluster b2b',
+                     'fp: one track & track-cluster b2b',
+                     'eeb: two matched & track b2b',
+                     'fep: one track & one matched & track-cluster b2b'
                      ]
 
     trglog_phase3 = ['3 or more 3D tracks',
@@ -55,7 +60,12 @@ class EffModule(Module):
                      'exactly 1 E*>1 GeV and 1 E>300 MeV, in 2,3 or 16',
                      'clusters back-to-back in phi, both >250 MeV, no 2 GeV',
                      'clusters back-to-back in phi, 1 <250 MeV, no 2 GeV, TrkZ25 is 3D track',
-                     'clusters back-to-back in 3D, no 2 GeV'
+                     'clusters back-to-back in 3D, no 2 GeV',
+                     'eed: two matched & cluster b2b',
+                     'fed: one track & one matched & cluster b2b',
+                     'fp: one track & track-cluster b2b',
+                     'eeb: two matched & track b2b',
+                     'fep: one track & one matched & track-cluster b2b'
                      ]
     # ---add new trigger line by users---
     # ---add a component with initial value 0 in Nsubtrg_event

@@ -33,7 +33,7 @@
 // NAMESPACES
 using namespace Belle2;
 
-CDCDedxDatabaseImporter::CDCDedxDatabaseImporter(std::string inputFileName, std::string name)
+CDCDedxDatabaseImporter::CDCDedxDatabaseImporter(std::string inputFileName, const std::string& name)
 {
   m_inputFileNames.push_back(inputFileName);
   m_name = name;

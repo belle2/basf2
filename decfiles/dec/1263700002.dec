@@ -1,0 +1,55 @@
+# EventType: 1263700002
+# Descriptor: [B+ -> D** l nu ]cc
+# NickName: B+_D**lnu
+# Documentation: B0->D** l nu process, tag B decays exclusively as B->(D->Kpi(pi))pi
+# Tested: No
+# PhysicsWG: SL
+# Responsible: Sourav Dey
+# Email: souravdey@tauex.tau.ac.il
+# Cuts: None
+# Date: 20190124
+#
+#
+
+Alias  D0tag D0
+Alias  anti-D0tag anti-D0
+ChargeConj D0tag  anti-D0tag
+
+Alias B-tag B-
+Alias B+tag B+
+ChargeConj B-tag B+tag
+
+Decay Upsilon(4S)
+0.5 B+sig B-tag VSS;
+0.5 B-sig B+tag VSS;
+Enddecay
+
+
+Decay B+sig
+
+0.00757       anti-D_10    e+   nu_e        LLSW 0.71 -1.6 -0.5 2.9;
+0.00389       anti-D_0*0   e+   nu_e        LLSW 0.68 -0.2 0.3;
+0.00431       anti-D'_10   e+   nu_e        LLSW 0.68 -0.2 0.3;
+0.00373       anti-D_2*0   e+   nu_e        LLSW 0.71 -1.6 -0.5 2.9;
+
+0.00757       anti-D_10    mu+  nu_mu        LLSW 0.71 -1.6 -0.5 2.9;
+0.00389       anti-D_0*0   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
+0.00431       anti-D'_10   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
+0.00373       anti-D_2*0   mu+  nu_mu        LLSW 0.71 -1.6 -0.5 2.9;
+
+Enddecay
+CDecay B-sig
+
+
+Decay B-tag
+1.00 D0tag  pi-   PHOTOS                 PHSP;
+Enddecay
+CDecay B+tag
+
+Decay D0tag
+1.00 K- pi+   PHOTOS   PHSP;
+Enddecay
+CDecay anti-D0tag 
+
+#
+End

@@ -33,6 +33,9 @@ DqmMemFile::DqmMemFile(string name, string mode, int size)
   // Open TMemFile if write mode selected
   if (m_mode == 1) {
     m_memfile = new TMemFile(name.c_str(), m_buf, size * sizeof(int), "RECREATE");
+    m_shm->lock();
+    m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+    m_shm->unlock();
     printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
   } else
     printf("DqmMemFile : TMemFile is opend in READ mode.\n");
@@ -117,11 +120,9 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
     if (obj->IsA()->InheritsFrom("TH1")) {
       TH1* h1 = (TH1*) obj;
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
-      if (h1->GetEntries() > 0) {    // Do not send empty histograms
-        msg->add(h1, h1->GetName());
-        nobjs++;
-        numobjs++;
-      }
+      msg->add(h1, h1->GetName());
+      nobjs++;
+      numobjs++;
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
       //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
       TDirectory* tdir = (TDirectory*) obj;

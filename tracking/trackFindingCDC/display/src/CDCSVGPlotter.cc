@@ -37,8 +37,6 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -400,6 +398,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       return false;
     };
 
+    // cppcheck-suppress ignoredReturnValue
     std::adjacent_find(simHitsForMcParticle.begin(),
                        simHitsForMcParticle.end(),
                        drawConnectSimHits);

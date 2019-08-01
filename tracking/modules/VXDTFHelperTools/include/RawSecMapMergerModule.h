@@ -77,7 +77,7 @@ namespace Belle2 {
 
 
     /** bundle all relevant files to a TChain */
-    std::unique_ptr<TChain> createTreeChain(const SectorMapConfig& configuration, std::string nHitString);
+    std::unique_ptr<TChain> createTreeChain(const SectorMapConfig& configuration, const std::string& nHitString);
 
 
     /** for given chain and names of branches:

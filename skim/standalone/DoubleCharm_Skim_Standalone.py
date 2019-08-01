@@ -14,22 +14,30 @@ from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
 
 
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-02-00'
 import os
 import sys
 import glob
+import argparse
 skimCode = encodeSkimName('DoubleCharm')
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC12")
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 path = Path()
-inputMdstList('MC9', fileList, path=path)
+inputMdstList('default', fileList, path=path)
 stdPi('all', path=path)
 stdPi('loose', path=path)
 stdK('loose', path=path)

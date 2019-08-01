@@ -15,7 +15,66 @@ import os
 
 def get_default_decayfile():
     """Return the default DECAY.dec for Belle2"""
-    return Belle2.FileSystem.findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC")
+    return Belle2.FileSystem.findFile("decfiles/dec/DECAY_BELLE2.DEC")
+
+
+def add_generator_preselection(
+        path,
+        emptypath,
+        nChargedMin=0,
+        nChargedMax=999,
+        MinChargedP=-1.0,
+        MinChargedPt=-1.0,
+        MinChargedTheta=0.0,
+        MaxChargedTheta=180.0,
+        nPhotonMin=0,
+        nPhotonMax=999,
+        MinPhotonEnergy=-1,
+        MinPhotonTheta=0.0,
+        MaxPhotonTheta=180.0,
+        applyInCMS=False):
+    """
+        Adds generator preselection.
+        Should be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules
+        It uses all particles from the event generator (i.e. primary, non-virtual, non-initial particles).
+        It checks if the required conditions are fullfilled.
+        If not, the events are given to the emptypath.
+        The main usecase is a reduction of simulation time.
+        Note that you have to multiply the generated cross section by the retention fraction of the preselection.
+
+        Parameters:
+            path (basf2.Path): path where the generator should be added
+            emptypath (basf2.Path): path where the skipped events are given to
+            nChargedMin (int): minimum number of charged particles
+            nChargedMax (int): maximum number of charged particles
+            MinChargedP (float): minimum charged momentum [GeV]
+            MinChargedPt (float): minimum charged transverse momentum (pt) [GeV]
+            MinChargedTheta (float): minimum polar angle of charged particle [deg]
+            MaxChargedTheta (float): maximum polar angle of charged particle [deg]
+            nPhotonMin (int): minimum number of photons
+            nPhotonMax (int): maximum number of photons
+            MinPhotonEnergy (float): minimum photon energy [GeV]
+            MinPhotonTheta (float): minimum polar angle of photon [deg]
+            MaxPhotonTheta (float): maximum polar angle of photon [deg]
+            applyInCMS (bool): if true apply the P,Pt,theta, and energy cuts in the center of mass frame
+    """
+
+    generatorpreselection = path.add_module('GeneratorPreselection',
+                                            nChargedMin=nChargedMin,
+                                            nChargedMax=nChargedMax,
+                                            MinChargedP=MinChargedP,
+                                            MinChargedPt=MinChargedPt,
+                                            MinChargedTheta=MinChargedTheta,
+                                            MaxChargedTheta=MaxChargedTheta,
+                                            nPhotonMin=nPhotonMin,
+                                            nPhotonMax=nPhotonMax,
+                                            MinPhotonEnergy=MinPhotonEnergy,
+                                            MinPhotonTheta=MinPhotonTheta,
+                                            MaxPhotonTheta=MaxPhotonTheta
+                                            )
+
+    # empty path for unwanted events
+    generatorpreselection.if_value('<11', emptypath)
 
 
 def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, subweights=[], maxsubweight=1, maxfinalweight=3.0):
@@ -63,16 +122,14 @@ def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, sub
     )
 
     if preselection:
-        generatorpreselection = path.add_module(
-            'GeneratorPreselection',
+        generator_emptypath = create_path()
+        add_generator_preselection(
+            path=path,
+            emptypath=generator_emptypath,
             nChargedMin=1,
             MinChargedPt=0.1,
             MinChargedTheta=17.0,
-            MaxChargedTheta=150.0
-        )
-
-        generator_emptypath = create_path()
-        generatorpreselection.if_value('!=11', generator_emptypath)
+            MaxChargedTheta=150.0)
 
 
 def add_kkmc_generator(path, finalstate=''):
@@ -266,7 +323,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
     # fragmentation failure as is this currently not supported by do_while
     add_continuum_generator(loop_path, finalstate, userdecfile, useevtgenparticledata, skip_on_failure=False)
     # check for the particles we want
-    loop_path.add_module("InclusiveParticleChecker", particles=particles)
+    loop_path.add_module("InclusiveParticleChecker", particles=particles, includeConjugates=include_conjugates)
     # Done, add this to the path and iterate it until we found our particle
     path.do_while(loop_path, max_iterations=max_iterations)
 

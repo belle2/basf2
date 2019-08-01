@@ -13,46 +13,47 @@ import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
-
+import datetime
 import os
 
+now = datetime.datetime.now()
 
-class defaultCoGTimeCalibrationImporter(basf2.Module):
+
+class defaultCoGTimeCalibrationImporter_pol1TBdep(basf2.Module):
 
     def beginRun(self):
 
         iov = Belle2.IntervalOfValidity.always()
-        #      iov = IntervalOfValidity(0,0,-1,-1)
-
-        payload = Belle2.SVDCoGTimeCalibrations.t_payload()
 
         timeCal = SVDCoGCalibrationFunction()
         timeCal.set_bias(0., 0., 0., 0.)
         timeCal.set_scale(1., 1., 1., 1.)
+        timeCal.set_current(0)
 
-        geoCache = Belle2.VXD.GeoCache.getInstance()
-
-        for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
-            layerNumber = layer.getLayerNumber()
-            for ladder in geoCache.getLadders(layer):
-                ladderNumber = ladder.getLadderNumber()
-                for sensor in geoCache.getSensors(ladder):
-                    sensorNumber = sensor.getSensorNumber()
-                    for side in (0, 1):
-                        print(
-                            "setting CoG calibration for " +
-                            str(layerNumber) +
-                            "." +
-                            str(ladderNumber) +
-                            "." +
-                            str(sensorNumber) +
-                            " to alfa = 1, beta = 0")
-                        payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, timeCal)
+        payload = Belle2.SVDCoGTimeCalibrations.t_payload(
+            timeCal, "CoGTimeCalibrations_default_" + str(now.isoformat()) + "_INFO:_1stOrderPol__alpha=1_beta=0")
 
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 
 
-use_local_database("localDB_noCoGcalibration/database.txt", "localDB_noCoGcalibration")
+class defaultCoGTimeCalibrationImporter_pol3TBindep(basf2.Module):
+
+    def beginRun(self):
+
+        iov = Belle2.IntervalOfValidity.always()
+
+        timeCal = SVDCoGCalibrationFunction()
+        timeCal.set_pol3parameters(0., 1., 0., 0.)
+        timeCal.set_current(1)
+
+        payload = Belle2.SVDCoGTimeCalibrations.t_payload(
+            timeCal, "CoGTimeCalibrations_default_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_a=0_b=1_c=0_d=0")
+
+        Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
+
+
+use_central_database("svd_onlySVDinGeoConfiguration")
+use_local_database("localDB_defaultCoGcalibration/database.txt", "localDB_defaultCoGcalibration")
 
 main = create_path()
 
@@ -62,10 +63,11 @@ eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module("Gearbox")
-main.add_module("Geometry", components=['SVD'], useDB=True)
+main.add_module("Geometry")
 
-main.add_module(defaultCoGTimeCalibrationImporter())
-
+# main.add_module(defaultCoGTimeCalibrationImporter_pol1TBdep())
+main.add_module(defaultCoGTimeCalibrationImporter_pol3TBindep())
+#
 # Show progress of processing
 progress = register_module('Progress')
 main.add_module(progress)

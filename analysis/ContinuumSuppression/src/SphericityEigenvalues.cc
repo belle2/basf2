@@ -10,8 +10,8 @@
 
 
 #include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
+#include <framework/logging/Logger.h>
 #include <Eigen/Core>
-#include <Eigen/Eigenvalues>
 #include <Eigen/Eigenvalues>
 
 #include <string>
@@ -38,7 +38,13 @@ void SphericityEigenvalues::calculateEigenvalues()
   // normalization
   double norm = 0;
 
-  for (auto p : m_momenta) {
+
+  if (m_momenta.size() < 2) {
+    B2WARNING("The particle list has less than 2 elements. The sphericity matrix will not be calculated");
+    return;
+  }
+
+  for (const auto& p : m_momenta) {
     elements[0] += p.X() * p.X(); // diag
     elements[1] += p.X() * p.Y();
     elements[2] += p.X() * p.Z();

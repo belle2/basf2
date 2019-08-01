@@ -131,8 +131,8 @@ from skim.charm import DstToD0PiD0ToHpHmKs
 add_skim('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpath)
 
 # charm Skim: D -> gamma gamma/ e e/ mu mu
-from skim.charm import CharmRareList
-add_skim('CharmRare', CharmRareList(path=skimpath), path=skimpath)
+from skim.charm import CharmRare
+add_skim('CharmRare', CharmRare(path=skimpath), path=skimpath)
 
 
 # Systematics skim
@@ -204,10 +204,7 @@ add_skim('LeptonicUntagged', LeptonicList(path=skimpath), path=skimpath)
 from skim.semileptonic import PRList
 add_skim('PRsemileptonicUntagged', PRList(path=skimpath), path=skimpath)
 
-
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
-use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+basf2.use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 # Weightfiles for FEIv4_2018_MC9_release_02_00_01 in this database
 
 import fei
@@ -224,11 +221,10 @@ from skim.fei import*
 add_skim('feiHadronicBplus', BplusHadronic(path=skimpath), path=skimpath)
 
 from skim.fei import*
-add_skim('feiSLBplusWithOneLep', BplusSLWithOneLep(path=skimpath), path=skimpath)
-
+add_skim('feiSLBplus', BplusSL(path=skimpath), path=skimpath)
 
 from skim.fei import*
-add_skim('feiSLB0WithOneLep', B0SLWithOneLep(path=skimpath), path=skimpath)
+add_skim('feiSLB0', B0SL(path=skimpath), path=skimpath)
 
 
 from skim.dark import SinglePhotonDarkList

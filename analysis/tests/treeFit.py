@@ -6,6 +6,7 @@ import tempfile
 from basf2 import *
 from modularAnalysis import *
 from vertex import vertexTree
+import b2test_utils
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple
@@ -21,7 +22,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
+        inputMdst('default', b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
@@ -55,13 +56,9 @@ class TestTreeFits(unittest.TestCase):
         print("True fit survivors: {0} out of {1} true candidates".format(truePositives, allSig))
         print("False fit survivors: {0} out of {1} false candidates".format(falsePositives, allBkg))
 
-        self.assertFalse(truePositives == 0, "No signal survived the fit.")
+        self.assertTrue(truePositives > 32, f"Signal rejection too high. True positives: {truePositives}")
 
-        self.assertFalse(falsePositives == 0, "No background survived the fit. This is weird.")
-
-        self.assertTrue(truePositives > (allSig / 2.), "More than 50% of signal did not survived the fit.")
-
-        self.assertFalse(allBkg == falsePositives, "All background candidates survived the fit.")
+        self.assertTrue(falsePositives < 2129, f"Background rejection got worse. False positives: {falsePositives}")
 
         print("Test passed, cleaning up.")
 

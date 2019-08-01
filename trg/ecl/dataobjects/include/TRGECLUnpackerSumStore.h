@@ -54,8 +54,17 @@ namespace Belle2 {
     //! Lowmilti bit of this hit.
     int s_low_multi;
 
-    //! 3D Bhabha bit of this hit.
-    int s_b2bhabha;
+    //! 3D Bhabha for veto bit of this hit.
+    int s_b2bhabhav;
+
+    //! 3D Bhabha for selection bit of this hit.
+    int s_b2bhabhas;
+
+    //! mumu bit of this hit.
+    int s_mumu;
+
+    //! prescale bit of this hit.
+    int s_prescale;
 
     //! 2D Bhabha bit of this hit.
     int s_b1bhabha;
@@ -75,6 +84,9 @@ namespace Belle2 {
     //! Total Energy Type of this hit.
     int s_etot_type;
 
+    //! The case of Total Energy > 20GeV  of this hit.
+    int s_etot_20gev;
+
     //! Timing of this hit.
     int s_time;
 
@@ -89,6 +101,9 @@ namespace Belle2 {
 
     //! The mothod to set the sumamry revoclk
     void setSumRevo(int sum_revo) {s_sum_revo = sum_revo;}
+
+    //! The mothod to set Timing
+    void setTime(int time) {s_time = time;}
 
     //! The method to set Cluster Theta
     void setCLTheta(int cl_theta[6])
@@ -134,8 +149,17 @@ namespace Belle2 {
     //! The mothod to set Lowmilti bit
     void setLowMulti(int low_multi) {s_low_multi = low_multi;}
 
-    //! The mothod to set 3D Bhabha bit
-    void set3DBhabha(int b2bhabha) {s_b2bhabha = b2bhabha;}
+    //! The mothod to set 3D Bhabha veto bit
+    void set3DBhabhaV(int b2bhabhav) {s_b2bhabhav = b2bhabhav;}
+
+    //! The mothod to set 3D Bhabha selection bit
+    void set3DBhabhaS(int b2bhabhas) {s_b2bhabhas = b2bhabhas;}
+
+    //! The mothod to set mumu bit
+    void setMumu(int mumu) {s_mumu = mumu;}
+
+    //! The mothod to set prescale bit
+    void setPrescale(int prescale) {s_prescale = prescale;}
 
     //! The mothod to set 2D Bhabha bit
     void set2DBhabha(int b1bhabha) {s_b1bhabha = b1bhabha;}
@@ -155,8 +179,8 @@ namespace Belle2 {
     //! The mothod to set Total Energy Type
     void setEtotType(int etot_type) {s_etot_type = etot_type;}
 
-    //! The mothod to set Timing
-    void setTime(int time) {s_time = time;}
+    //! The mothod to set Total Energy more than 20 gev
+    void setEtot20GeV(int etot_20gev) {s_etot_20gev = etot_20gev;}
 
     //! The mothod to set Timing Type
     void setTimeType(int time_type) {s_time_type = time_type;}
@@ -194,8 +218,17 @@ namespace Belle2 {
     //! The mothod to get Lowmilti bit
     int getLowMulti() const {return s_low_multi;}
 
-    //! The mothod to get 3D Bhabha bit
-    int get3DBhabha() const {return s_b2bhabha;}
+    //! The mothod to get 3D Bhabha veto bit
+    int get3DBhabhaV() const {return s_b2bhabhav;}
+
+    //! The mothod to get 3D Bhabha selection bit
+    int get3DBhabhaS() const {return s_b2bhabhas;}
+
+    //! The mothod to get mumu bit
+    int getMumu() const {return s_mumu;}
+
+    //! The mothod to get prescale bit
+    int getPrescale() const {return s_prescale;}
 
     //! The mothod to get 2D Bhabha bit
     int get2DBhabha() const {return s_b1bhabha;}
@@ -215,6 +248,9 @@ namespace Belle2 {
     //! The mothod to get Total Energy Type
     int getEtotType() const {return s_etot_type;}
 
+    //! The mothod to get Total Energy more than 20GeV
+    int getEtot20GeV() const {return s_etot_20gev;}
+
     //! The mothod to get Timing
     int getTime() const {return s_time;}
 
@@ -224,23 +260,27 @@ namespace Belle2 {
     TRGECLUnpackerSumStore()
     {
       s_eventId   = 0;
-      memset(s_cl_theta,  0, sizeof(s_cl_theta));
-      memset(s_cl_phi,    0, sizeof(s_cl_phi));
-      memset(s_cl_time,   0, sizeof(s_cl_time));
-      memset(s_cl_energy, 0, sizeof(s_cl_energy));
-      s_ncl       = 0;
-      s_icn       = 0;
-      s_icn_over  = 0;
-      s_low_multi = 0;
-      s_b2bhabha  = 0;
-      s_b1bhabha  = 0;
-      s_b1_type   = 0;
-      s_physics   = 0;
-      s_bg_veto   = 0;
-      s_etot      = 0;
-      s_etot_type = 0;
-      s_time      = 0;
-      s_time_type = 0;
+      memset(s_cl_theta,   0, sizeof(s_cl_theta));
+      memset(s_cl_phi,     0, sizeof(s_cl_phi));
+      memset(s_cl_time,    0, sizeof(s_cl_time));
+      memset(s_cl_energy,  0, sizeof(s_cl_energy));
+      s_ncl        = 0;
+      s_icn        = 0;
+      s_icn_over   = 0;
+      s_low_multi  = 0;
+      s_b2bhabhav  = 0;
+      s_b2bhabhas  = 0;
+      s_mumu       = 0;
+      s_prescale   = 0;
+      s_b1bhabha   = 0;
+      s_b1_type    = 0;
+      s_physics    = 0;
+      s_bg_veto    = 0;
+      s_etot       = 0;
+      s_etot_type  = 0;
+      s_etot_20gev = 0;
+      s_time       = 0;
+      s_time_type  = 0;
     }
 
     //! Useful Constructor
@@ -254,40 +294,48 @@ namespace Belle2 {
       int icn,
       int icn_over,
       int low_multi,
-      int b2bhabha,
+      int b2bhabhav,
+      int b2bhabhas,
+      int mumu,
+      int prescale,
       int b1bhabha,
       int b1_type,
       int physics,
       int bg_veto,
       int etot,
       int etot_type,
+      int etot_20gev,
       int time,
       int time_type
     )
     {
       s_eventId   = eventId;
       for (int i = 0; i < 6; i++) {
-        s_cl_theta[i]  = cl_theta[i];
-        s_cl_phi[i]    = cl_phi[i];
-        s_cl_time[i]   = cl_time[i];
-        s_cl_energy[i] = cl_energy[i];
+        s_cl_theta[i]   = cl_theta[i];
+        s_cl_phi[i]     = cl_phi[i];
+        s_cl_time[i]    = cl_time[i];
+        s_cl_energy[i]  = cl_energy[i];
       }
-      s_ncl       = ncl;
-      s_icn       = icn;
-      s_icn_over  = icn_over;
-      s_low_multi = low_multi;
-      s_b2bhabha  = b2bhabha;
-      s_b1bhabha  = b1bhabha;
-      s_b1_type   = b1_type;
-      s_physics   = physics;
-      s_bg_veto   = bg_veto;
-      s_etot      = etot;
-      s_etot_type = etot_type;
-      s_time      = time;
-      s_time_type = time_type;
+      s_ncl        = ncl;
+      s_icn        = icn;
+      s_icn_over   = icn_over;
+      s_low_multi  = low_multi;
+      s_b2bhabhav  = b2bhabhav;
+      s_b2bhabhas  = b2bhabhas;
+      s_mumu       = mumu;
+      s_prescale   = prescale;
+      s_b1bhabha   = b1bhabha;
+      s_b1_type    = b1_type;
+      s_physics    = physics;
+      s_bg_veto    = bg_veto;
+      s_etot       = etot;
+      s_etot_type  = etot_type;
+      s_etot_20gev = etot_20gev;
+      s_time       = time;
+      s_time_type  = time_type;
     }
     /** the class title */
-    ClassDef(TRGECLUnpackerSumStore, 1);
+    ClassDef(TRGECLUnpackerSumStore, 4);
   };
 
 } // end namespace Belle2

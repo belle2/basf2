@@ -14,43 +14,48 @@ from stdPhotons import *
 from skim.standardlists.lightmesons import *
 from stdPi0s import *
 from stdV0s import *
-from skimExpertFunctions import *
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-00'
+gb2_setuprel = 'release-03-02-00'
 
 skimCode = encodeSkimName('TauLFV')
 
-import sys
-import os
-import glob
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
-inputMdstList('MC9', fileList)
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
-stdPi('loose')
-stdK('loose')
-stdPr('loose')
-stdE('loose')
-stdMu('loose')
-stdPhotons('loose')
-stdPi0s('loose')
-loadStdSkimPi0()
-stdKshorts()
-loadStdLightMesons()
+taulfvskim = Path()
+
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=taulfvskim)
+
+stdPi('loose', path=taulfvskim)
+stdK('loose', path=taulfvskim)
+stdPr('loose', path=taulfvskim)
+stdE('loose', path=taulfvskim)
+stdMu('loose', path=taulfvskim)
+stdPhotons('loose', path=taulfvskim)
+stdPi0s('loose', path=taulfvskim)
+loadStdSkimPi0(path=taulfvskim)
+stdKshorts(path=taulfvskim)
+loadStdLightMesons(path=taulfvskim)
 
 # Tau Skim
 from skim.taupair import *
-tauList = TauLFVList(1)
+tauList = TauLFVList(1, path=taulfvskim)
 
-skimOutputUdst(skimCode, tauList)
-summaryOfLists(tauList)
+skimOutputUdst(skimCode, tauList, path=taulfvskim)
+summaryOfLists(tauList, path=taulfvskim)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=taulfvskim)
+process(taulfvskim)
 
 # print out the summary
 print(statistics)

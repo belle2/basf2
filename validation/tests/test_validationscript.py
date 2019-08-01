@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import metaoptions
-import ROOT
-import random
-import math
 import tempfile
 import validationscript
 

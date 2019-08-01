@@ -27,10 +27,12 @@ namespace Belle2 {
    */
   class SVDClusterCalibrations {
   public:
-    static std::string name;
-    static std::string time_name;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDClusterCuts> > t_payload;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDHitTimeSelectionFunction> > t_time_payload;
+    static std::string name; /**< name of SVDClusterCuts  payload*/
+    static std::string time_name; /**< name of SVDHitTimeSelectionFunction payload */
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDClusterCuts> >
+    t_payload;  /**< typedef for the of SVDClusterCuts  payload of all SVD sensors*/
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDHitTimeSelectionFunction> >
+    t_time_payload; /**< typedef for the of SVDHitTimeSelectionFunction  payload of all SVD sensors*/
 
     /** Constructor, no input argument is required */
     SVDClusterCalibrations()
@@ -38,8 +40,12 @@ namespace Belle2 {
       , m_time_aDBObjPtr(time_name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDClusterCalibrations: from now one we are using " <<
+        B2INFO("SVDClusterCuts: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
+
+      m_time_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDHitTimeSelectionFunction: from now on we are using " <<
+        this->m_time_aDBObjPtr -> get_uniqueID()); });
     }
 
     /** Return the corrected cluster position error
@@ -225,8 +231,8 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr< t_payload > m_aDBObjPtr;
-    DBObjPtr< t_time_payload > m_time_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDClusterCuts  payload */
+    DBObjPtr< t_time_payload > m_time_aDBObjPtr; /**< SVDHitTimeSelectionFunction paylaod */
   };
 }
 

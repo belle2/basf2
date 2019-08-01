@@ -11,13 +11,13 @@
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics, \
+    set_nprocesses
 from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
-import validationtools
 
 set_random_seed(12345)
 
@@ -45,16 +45,26 @@ add_reconstruction(main)
 main.add_module('Profile')
 
 # output
-main.add_module('RootOutput', additionalBranchNames=['SpacePoints', 'SVDSpacePoints'], outputFileName='../EvtGenSimRec.root')
+main.add_module(
+    'RootOutput',
+    additionalBranchNames=['SpacePoints', 'SVDSpacePoints'],
+    outputFileName='../EvtGenSimRec.root'
+)
 
 process(main)
 
 # Print call statistics
 print(statistics)
 
-statistics_plots('EvtGenSimRec_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation and reconstruction job with generic EvtGen events',
-                 prefix='EvtGenSimRec')
-event_timing_plot('../EvtGenSimRec.root', 'EvtGenSimRec_statistics.root', contact='tkuhr',
-                  jobDesc='a standard simulation and reconstruction job with generic EvtGen events',
-                  prefix='EvtGenSimRec')
+statistics_plots(
+    'EvtGenSimRec_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation and reconstruction job with generic EvtGen events',
+    prefix='EvtGenSimRec'
+)
+event_timing_plot(
+    '../EvtGenSimRec.root', 'EvtGenSimRec_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation and reconstruction job with generic EvtGen events',
+    prefix='EvtGenSimRec'
+)

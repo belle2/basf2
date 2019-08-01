@@ -139,7 +139,7 @@ int ERecoDistributor::UnConfigure(NSMmsg*, NSMcontext*)
   printf("m_nrecv = %d\n", m_nrecv);
   for (int i = 0; i < m_nrecv; i++) {
     if (m_pid_recv[i] != 0) {
-      printf("ERecoDistributor : killing receiver pid=%d\n", m_pid_sender[i]);
+      printf("ERecoDistributor : killing receiver pid=%d\n", m_pid_recv[i]);
       kill(m_pid_recv[i], SIGKILL);
       waitpid(m_pid_recv[i], &status, 0);
     }
@@ -196,7 +196,7 @@ void ERecoDistributor::server()
   m_flow->fillProcessStatus(GetNodeInfo());
 
   while (true) {
-    int sender_id = 0;
+    int sender_id = 0; // the only useage is commented below? do we need it?
     pid_t pid = m_proc->CheckProcess();
     if (pid > 0) {
       printf("ERecoDistributor : process dead. pid = %d\n", pid);
@@ -206,7 +206,6 @@ void ERecoDistributor::server()
           m_pid_recv[i] = 0;
         }
       }
-    } else {
       for (int i = 0; i < m_nnodes; i++) {
         if (pid == m_pid_sender[i]) {
           m_log->Fatal("ERecoDistributor : sender process (%d) dead. pid=%d\n", i, m_pid_sender[i]);

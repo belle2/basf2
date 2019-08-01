@@ -3,8 +3,8 @@
 //---------------------------------------------------------------
 // Filename : TRGCDCT3DUnpackerModule.cc
 // Section  :
-// Owner    :
-// Email    :
+// Owner    : JB Kim, physjg
+// Email    : physjg@hep1.phys.ntu.edu.tw
 //---------------------------------------------------------------
 // Description : TRGCDCT3DUnpacker Module
 //---------------------------------------------------------------
@@ -24,7 +24,7 @@ REG_MODULE(TRGCDCT3DUnpacker);
 
 string TRGCDCT3DUnpackerModule::version() const
 {
-  return string("1.00");
+  return string("1.10");
 }
 
 TRGCDCT3DUnpackerModule::TRGCDCT3DUnpackerModule()
@@ -33,6 +33,10 @@ TRGCDCT3DUnpackerModule::TRGCDCT3DUnpackerModule()
 
   string desc = "TRGCDCT3DUnpackerModule(" + version() + ")";
   setDescription(desc);
+  setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("T3DMOD", m_T3DMOD,
+           "T3D module number",
+           0);
   B2INFO("TRGCDCT3DUnpacker: Constructor done.");
 }
 
@@ -46,8 +50,35 @@ void TRGCDCT3DUnpackerModule::terminate()
 
 void TRGCDCT3DUnpackerModule::initialize()
 {
-  m_store.registerInDataStore();
+  char c_name[100];
+  sprintf(c_name, "TRGCDCT3DUnpackerStore%d", m_T3DMOD);
+  m_store.registerInDataStore(c_name);
   //StoreArray<TRGCDCT3DUnpackerStore>::registerPersistent();
+
+  //set copper address
+  if (m_T3DMOD == 0) {
+    m_copper_address = 0x11000003;
+    m_copper_ab = 0;
+    m_nword = 3075;
+  } else if (m_T3DMOD == 1) {
+    m_copper_address = 0x11000003;
+    m_copper_ab = 1;
+    m_nword = 3075;
+  } else if (m_T3DMOD == 2) {
+    m_copper_address = 0x11000004;
+    m_copper_ab = 0;
+    m_nword = 3075;
+  } else if (m_T3DMOD == 3) {
+    m_copper_address = 0x11000004;
+    m_copper_ab = 1;
+    m_nword = 3075;
+  } else {
+    B2ERROR("trgcdct3dunpacker:cooper address is not set");
+    m_copper_address = 0;
+    m_copper_ab = 0;
+    m_nword = 3075;
+  }
+
 }
 
 void TRGCDCT3DUnpackerModule::beginRun()
@@ -63,9 +94,9 @@ void TRGCDCT3DUnpackerModule::event()
   StoreArray<RawTRG> raw_trgarray;
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      if (raw_trgarray[i]->GetNodeID(j) == 0x11000003) {
-        if (raw_trgarray[i]->GetDetectorNwords(j, 1) > 0) {
-          fillTreeTRGCDCT3DUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, 1), raw_trgarray[j]->GetEveNo(j));
+      if (raw_trgarray[i]->GetNodeID(j) == m_copper_address) {
+        if (raw_trgarray[i]->GetDetectorNwords(j, m_copper_ab) == m_nword) {
+          fillTreeTRGCDCT3DUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[i]->GetEveNo(j));
         }
       }
     }
@@ -75,7 +106,13 @@ void TRGCDCT3DUnpackerModule::event()
 void TRGCDCT3DUnpackerModule::fillTreeTRGCDCT3DUnpacker(int* buf, int evt)
 {
 
-  const unsigned nword_header = 2;
+  const unsigned nword_header = 3;  // updated from 2 to 3
+
+  long dataHeader = buf[nword_header] & 0xffff0000;
+  if (dataHeader != 0xdddd0000) {
+    // wrong data block header
+    return ;
+  }
 
   //StoreArray<TRGCDCT3DUnpackerStore> storeAry;
   for (int clk = 0; clk < nClks; clk++) { // 0..47

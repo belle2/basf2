@@ -133,8 +133,8 @@ void AbstractNSMCallback::readVar(const NSMMessage& msg, NSMVar& var)
   const char* value = (msg.getData() + pars[2] + 1 + pars[3] + 1);
   var = NSMVar(name, (NSMVar::Type)pars[0], pars[1], value);
   var.setNode(node);
-  var.setId(pars[3]);
-  var.setRevision(pars[4]);
+  var.setId(pars[4]);
+  var.setDate(pars[5]);
 }
 
 bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,

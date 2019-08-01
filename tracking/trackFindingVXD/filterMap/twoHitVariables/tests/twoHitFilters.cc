@@ -519,6 +519,8 @@ namespace VXDTFtwoHitFilterTest {
     EXPECT_FALSE(filter.accept(x1, x2));
     EXPECT_EQ(1 , myCounter.used);
 
+    // creates a false positive as the reference of bypassControl is used in the filter which is not recognized by cppcheck
+    // cppcheck-suppress unreadVariable
     bypassControl = true;
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_EQ(2 , myCounter.used);

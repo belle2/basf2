@@ -75,7 +75,7 @@ namespace Belle2 {
      *  @param UClusterTime       Time in ns of the cluster on the U side
      *  @param VClusterTime       Time in ns of the cluster on the V side
      */
-    SpacePoint(B2Vector3<double> pos, B2Vector3<double> posError, std::pair<double, double> normalizedLocal,
+    SpacePoint(const B2Vector3<double>& pos, const B2Vector3<double>& posError, std::pair<double, double> normalizedLocal,
                std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID,
                double UClusterTime = 0. , double VClusterTime = 0.) :
       m_position(pos), m_positionError(posError),

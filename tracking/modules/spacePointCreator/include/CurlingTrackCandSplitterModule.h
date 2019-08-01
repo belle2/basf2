@@ -21,8 +21,6 @@
 #include <TFile.h>
 #include <TTree.h>
 
-#include <array>
-
 namespace Belle2 {
   /**
    * Module for checking SpacePointTrackCandidates for curling behaviour and splitting them into Track Candidate Stubs (each of them being a SpacePointTrackCand again) which do not show curling behaviour.
@@ -192,7 +190,7 @@ namespace Belle2 {
 
     /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
     bool getDirectionOfFlight(std::pair<const B2Vector3<double>, const B2Vector3<double> > const& hitPosAndMom,
-                              const B2Vector3<double> origin);
+                              const B2Vector3<double>& origin);
 
     /**
      * Exception for case when no TrueHit can be found for a Cluster

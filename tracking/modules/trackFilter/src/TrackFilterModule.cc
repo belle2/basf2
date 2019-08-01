@@ -113,7 +113,7 @@ void TrackFilterModule::event()
 
 void TrackFilterModule::terminate()
 {
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     m_selectedNtpl->Write();
@@ -141,6 +141,9 @@ bool TrackFilterModule::isSelected(const Track* track)
     isExcluded = true;
 
   if (tfr->getPValue() < m_min_Pval)
+    isExcluded = true;
+
+  if (tfr->getMomentum().Perp() < m_min_pT)
     isExcluded = true;
 
   HitPatternVXD hitPatternVXD = tfr->getHitPatternVXD();

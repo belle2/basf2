@@ -24,6 +24,7 @@ tags. All the available commands are listed below.
 
 import os
 import re
+import sys
 import argparse
 import textwrap
 import json
@@ -34,7 +35,7 @@ import pprint
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
     LogPythonInterface
 from basf2.utils import pretty_print_table
-from pager import Pager
+from terminal_utils import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
 from . import ConditionsDB, enable_debugging, encode_name
@@ -445,9 +446,9 @@ def command_diff(args, db):
             """Add a list of payloads to the table, filling the first column with opcode"""
             for p in payloads:
                 if args.human_readable:
-                    table.append([opcode, p.name, p.rev, p.readable_iov()])
+                    table.append([opcode, p.name, p.revision, p.readable_iov()])
                 else:
-                    table.append([opcode, p.name, p.rev] + list(p.iov))
+                    table.append([opcode, p.name, p.revision] + list(p.iov))
 
         for tag, i1, i2, j1, j2 in diff.get_opcodes():
             if tag == "equal":
@@ -578,7 +579,7 @@ def command_iov(args, db):
             payloads.sort()
             if args.human_readable:
                 table = [["Name", "Rev", "IoV", "IovId", "PayloadId"]]
-                table += [[p.name, p.rev, p.readable_iov(), p.payload_id, p.iov_id] for p in payloads]
+                table += [[p.name, p.revision, p.readable_iov(), p.iov_id, p.payload_id] for p in payloads]
                 columns = ["+", -8, -32, 6, 9]
                 # strip repeated names, revision, payloadid, to make it more readable
                 last_name = None
@@ -594,7 +595,7 @@ def command_iov(args, db):
 
             else:
                 table = [["Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run", "IovId", "PayloadId"]]
-                table += [[p.name, p.rev] + list(p.iov) + [p.iov_id, p.payload_id] for p in payloads]
+                table += [[p.name, p.revision] + list(p.iov) + [p.iov_id, p.payload_id] for p in payloads]
                 columns = ["+", -8, 6, 6, 6, 6, 6, 9]
 
             pretty_print_table(table, columns)
@@ -771,17 +772,20 @@ def get_argument_parser():
     """
     Build a parser with all arguments of all commands
     """
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--debugging", action="store_true",
-                        help="Enable debugging of http traffic")
-    parser.add_argument("--help-full", action=FullHelpAction,
-                        help="show help message for all commands and exit")
-    parser.add_argument("--base-url", default=None,
-                        help="URI for the base of the REST API, if not given a list of default locations is tried")
-    parser.add_argument("--http-auth", choices=["none", "basic", "digest"], default="basic",
-                        help=argparse.SUPPRESS)
-    parser.add_argument("--http-user", default="commonDBUser", help=argparse.SUPPRESS)
-    parser.add_argument("--http-password", default="Eil9ohphoo2quot", help=argparse.SUPPRESS)
+    # extra ArgumentParser with the global options just for reusability
+    options = argparse.ArgumentParser(add_help=False)
+    options.add_argument("--debugging", action="store_true",
+                         help="Enable debugging of http traffic")
+    options.add_argument("--help-full", action=FullHelpAction,
+                         help="show help message for all commands and exit")
+    options.add_argument("--base-url", default=None,
+                         help="URI for the base of the REST API, if not given a list of default locations is tried")
+    options.add_argument("--http-auth", choices=["none", "basic", "digest"], default="basic",
+                         help=argparse.SUPPRESS)
+    options.add_argument("--http-user", default="commonDBUser", help=argparse.SUPPRESS)
+    options.add_argument("--http-password", default="Eil9ohphoo2quot", help=argparse.SUPPRESS)
+
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter, parents=[options])
     parser.set_defaults(func=lambda x, y: parser.print_help())
     parsers = parser.add_subparsers(
         title="Top level commands",
@@ -810,18 +814,14 @@ def get_argument_parser():
                     title="sub commands",
                     description="To get additional help, run '%(prog)s COMMAND --help'"
                 )
-                # now we added a subparser let's also have a recursive
-                # --help-full argument
-                parent_parser.add_argument("--help-full", action=FullHelpAction,
-                                           help="show help message for all commands and exit")
                 subparsers[tuple(parts[:-1])][1] = parent
         # so we have our subparsers instance, now create argument parser for the
         # function. We use the first part of the function docstring as help text
         # and everything after the first empty line as description of the
         # command
         helptxt, description = textwrap.dedent(func.__doc__).split("\n\n", 1)
-        command_parser = parent.add_parser(parts[-1], help=helptxt, description=description,
-                                           formatter_class=argparse.RawDescriptionHelpFormatter)
+        command_parser = parent.add_parser(parts[-1], help=helptxt, add_help=True, description=description,
+                                           parents=[options], formatter_class=argparse.RawDescriptionHelpFormatter)
         # now call the function with the parser as first argument and no
         # database instance. This let's them define their own arguments
         func(command_parser, None)
@@ -831,6 +831,38 @@ def get_argument_parser():
         subparsers[tuple(parts)] = [command_parser, None]
 
     return parser
+
+
+def create_symlinks(base):
+    """Create symlinks from base to all subcommands.
+
+    e.g. if the base is ``b2conditionsdb`` then this command will create symlinks
+    like ``b2conditionsdb-tag-show`` in the same directory
+
+    When adding a new command to b2conditionsdb this function needs to be executed
+    in the framework tools directory
+
+    python3 -c 'from conditions_db import cli_main; cli_main.create_symlinks("b2conditionsdb")'
+    """
+    from conditions_db import cli_main
+    import os
+    excluded = [
+        ['tag']  # the tag command without subcommand is not very useful
+    ]
+    for name in sorted(globals().keys()):
+        if not name.startswith("command_"):
+            continue
+        parts = name.split("_")[1:]
+        if parts in excluded:
+            continue
+        dest = base + "-".join([""] + parts)
+
+        try:
+            os.remove(dest)
+        except FileNotFoundError:
+            pass
+        print(f"create symlink {dest}")
+        os.symlink(base, dest)
 
 
 def main():
@@ -854,7 +886,13 @@ def main():
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
 
+    # Ok, some people prefer `-` in the executable name for tab completion so lets
+    # support that by just splitting the executable name
+    sys.argv[0:1] = sys.argv[0].split('-')
+
+    # parse argument definition for all sub commands
     parser = get_argument_parser()
+
     # done, all functions parsed. Create the database instance and call the
     # correct subfunction according to the selected argument
     args = parser.parse_args()

@@ -43,31 +43,6 @@ GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
   }
 }
 
-GlobalLabel::GlobalLabel(VxdID vxdid, GlobalLabel::gidTYPE paramId): gid(0),
-  eid(0), pid(0), tid(0), tif(0)
-{
-  construct(vxdid.getID() + vxdOffset, paramId);
-}
-
-GlobalLabel::GlobalLabel(WireID cdcid, GlobalLabel::gidTYPE paramId): gid(0),
-  eid(0), pid(0), tid(0), tif(0)
-{
-  construct(cdcid.getEWire() + cdcOffset, paramId);
-}
-
-GlobalLabel::GlobalLabel(BKLMElementID bklmid, GlobalLabel::gidTYPE paramId):
-  gid(0), eid(0), pid(0), tid(0), tif(0)
-{
-  construct(bklmid.getID() + bklmOffset, paramId);
-}
-
-GlobalLabel::GlobalLabel(EKLMElementID eklmElement,
-                         GlobalLabel::gidTYPE paramId):
-  gid(0), eid(0), pid(0), tid(0), tif(0)
-{
-  construct(eklmElement.getGlobalNumber() + eklmOffset, paramId);
-}
-
 void GlobalLabel::registerTimeDependent(GlobalLabel::gidTYPE start,
                                         GlobalLabel::gidTYPE end)
 {
@@ -102,34 +77,6 @@ GlobalLabel::gidTYPE GlobalLabel::setParameterId(GlobalLabel::gidTYPE paramId)
   }
   construct(getUniqueId(), getElementId(), paramId);
   return label();
-}
-
-VxdID GlobalLabel::getVxdID() const
-{
-  if (eid >= cdcOffset)
-    return VxdID();
-  return VxdID(eid - vxdOffset);
-}
-
-WireID GlobalLabel::getWireID() const
-{
-  if (eid < cdcOffset)
-    return WireID();
-  return WireID(eid - cdcOffset);
-}
-
-BKLMElementID GlobalLabel::getBklmID() const
-{
-  if (eid < bklmOffset)
-    return BKLMElementID();
-  return BKLMElementID(eid - bklmOffset);
-}
-
-EKLMElementID GlobalLabel::getEklmID() const
-{
-  if (!isEKLM())
-    B2FATAL("Attempt to call GlobalLabel::getEklmID() for non-EKLM label.");
-  return EKLMElementID(eid - eklmOffset);
 }
 
 void GlobalLabel::construct(GlobalLabel::gidTYPE elementId,

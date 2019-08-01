@@ -37,9 +37,9 @@ int main(int argc, char** argv)
     printf("mrb2rb : allocating %s with size=%d (KBytes)\n", argv[i + 1], RBUFSIZE * 4 / 1000);
     rbufin.push_back(new RingBuffer(argv[i + 1], RBUFSIZE));
   }
-  //  RingBuffer* rbufout = new RingBuffer(argv[argc - 1]);
-  printf("mrb2rb : allocating %s with size=%d (KBytes)\n", argv[argc - 1], RBUFSIZE * 4 / 1000);
-  RingBuffer* rbufout = new RingBuffer(argv[argc - 1], RBUFSIZE);
+  RingBuffer* rbufout = new RingBuffer(argv[argc - 1]);
+  //  printf ( "mrb2rb : allocating %s with size=%d (KBytes)\n", argv[argc-1], RBUFSIZE*4/1000 );
+  //  RingBuffer* rbufout = new RingBuffer(argv[argc - 1], RBUFSIZE);
   char* evbuf = new char[MAXEVTSIZE];
 
   int inptr = 0;

@@ -18,17 +18,18 @@
     <chipNegativeCrosstalk desc="Factor to suppress p.e. detection efficiency due to reverse polarized crosstalk between chip channels">0.2</chipNegativeCrosstalk>
     <apdMaterial desc="Material of HAPD reflective bottom">ARICH_Silicon</apdMaterial> 
     <fillMaterial desc="Material that fills HAPD volume">ARICH_Vacuum</fillMaterial> 
-    <apdReflectivity desc="Reflectivity of APD surface">0.15</apdReflectivity>
+    <apdReflectivity desc="Reflectivity of APD surface">0.05</apdReflectivity>
     <Surface name="APDSurface">
       <Properties>
 	<Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">0.90</value> 
-          <value energy="2.0">0.90</value> 
-          <value energy="3.0">0.90</value> 
-          <value energy="4.0">0.90</value> 
-          <value energy="5.0">0.90</value> 
-          <value energy="6.0">0.90</value> 
-          <value energy="7.0">0.90</value>                 
+          <value energy="1.0">0.30</value> 
+          <value energy="2.0">0.30</value> 
+          <value energy="3.0">0.30</value> 
+          <value energy="4.0">0.30</value> 
+          <value energy="5.0">0.30</value> 
+          <value energy="6.0">0.30</value> 
+          <value energy="7.0">0.30</value>                 
+          <value energy="8.0">0.30</value>                 
 	</Property>
       </Properties>
       <Type>dielectric_metal</Type>

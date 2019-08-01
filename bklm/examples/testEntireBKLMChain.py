@@ -58,7 +58,7 @@ sim.add_simulation(path=main,
 
 # Pack and unpack data
 main.add_module('BKLMRawPacker')
-main.add_module('BKLMUnpacker')
+main.add_module('KLMUnpacker')
 
 # Add the digit analyzer module (optional)
 main.add_module('BKLMDigitAnalyzer',
@@ -71,7 +71,8 @@ main.add_module(reco)
 
 # Add the self-tracking
 main.add_module('BKLMTracking',
-                StudyEffiMode=0)
+                StudyEffiMode=True,
+                outputName='bklmEfficiency_test.root')
 
 # Save the dataobjects in a .root output
 main.add_module('RootOutput',

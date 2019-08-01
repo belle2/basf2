@@ -17,7 +17,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class GridEventTimeExtractor<Chi2BasedEventTimeExtractor>;
+template class Belle2::GridEventTimeExtractor<Chi2BasedEventTimeExtractor>;
 
 FullGridChi2TrackTimeExtractor::FullGridChi2TrackTimeExtractor()
 {
@@ -32,7 +32,6 @@ void FullGridChi2TrackTimeExtractor::exposeParameters(ModuleParamList* modulePar
   m_finalExtractor.exposeParameters(moduleParamList, prefixed("Refiner", prefix));
 
   moduleParamList->getParameter<unsigned int>("GridIterations").setDefaultValue(1);
-  moduleParamList->getParameter<unsigned int>("RefinerIterations").setDefaultValue(1);
   moduleParamList->getParameter<bool>("RefinerUseLastEventT0").setDefaultValue(true);
 }
 

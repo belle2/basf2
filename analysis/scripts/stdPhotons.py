@@ -13,7 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def stdPhotons(listtype='loose', path=analysis_main):
+def stdPhotons(listtype='loose', path=None):
     """
     Function to prepare one of several standardized types of photon lists:
 
@@ -35,7 +35,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
 
     # all photons (reconstructed using the N1 clustering)
     if listtype == 'all':
-        fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path)
+        fillParticleList('gamma:all', 'clusterHasNPhotons', True, path)
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
     elif listtype == 'cdc':
@@ -119,7 +119,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
 
 
 # Used in skimming code
-def loadStdSkimPhoton(path=analysis_main):
+def loadStdSkimPhoton(path):
     """
     Function to prepare the skim photon lists.
 
@@ -141,7 +141,7 @@ def loadStdSkimPhoton(path=analysis_main):
 # Only used for Belle via b2bii
 
 
-def loadStdGoodBellePhoton(path=analysis_main):
+def loadStdGoodBellePhoton(path):
     """
     Load the Belle goodBelle list. Creates a ParticleList named
     'gamma:goodBelle' with '0.5 < :b2:var:`goodBelleGamma` < 1.5'

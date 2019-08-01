@@ -22,7 +22,7 @@
 #include <TH2.h>
 #include <TH3.h>
 #include <TFile.h>
-
+#include <TGraph.h>
 
 namespace Belle2 {
   namespace microtpc {
@@ -87,9 +87,9 @@ namespace Belle2 {
       /** rate */
       TH1F* h_tpc_rate[20];
       /** Neutron kin energy dis */
-      TH1F* h_mctpc_kinetic[20];
-      /** Neutron kin energy dis */
-      TH1F* h_mctpc_kinetic_zoom[20];
+      TH2F* h_mctpc_kinetic[20];
+      /* Neutron kin energy dis */
+      TH2F* h_mctpc_kinetic_zoom[20];
       /** theta v phi dis */
       TH2F* h_mctpc_tvp[20];
       /** theta v phi dis */
@@ -201,7 +201,14 @@ namespace Belle2 {
       TH2F* h_Wevtrl2[8][12];
       /** Phi v. theta per TPC for He w/ edge cuts weighted */
       TH2F* h_twtvp_He_pure[8];
-
+      /** recoil energy */
+      TH3F* h_mctpc_recoil[3];
+      /** weighted recoil energy */
+      TH3F* h_mctpc_recoilW[3];
+      /** vector of interaction probability vs E graphs for all recoils*/
+      std::vector<TGraph*> m_intProb;
+      /** vector of maximal energy fraction transfered to recoil*/
+      std::vector<double> m_maxEnFrac;
       /** Phi v. theta, weighted per TPC */
       TH2F* h_wtvp[8];
       /** Phi v. theta, weighted per TPC for He */

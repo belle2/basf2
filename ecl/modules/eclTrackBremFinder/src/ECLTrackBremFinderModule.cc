@@ -141,8 +141,7 @@ void ECLTrackBremFinderModule::event()
       track.getRelationsWith<ECLCluster>
       (m_param_eclClustersStoreArrayName);       //check the cluster hypothesis ID here (take c_nPhotons hypothesis)!!
     for (auto& relatedCluster : relatedClustersToTrack) {
-      auto particleHypothesisID = relatedCluster.getHypothesisId();
-      if (particleHypothesisID == ECLCluster::c_nPhotons) {
+      if (relatedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         primaryClusterOfTrack = &relatedCluster;
       }
     }
@@ -208,8 +207,7 @@ void ECLTrackBremFinderModule::event()
     // iterate over full cluster list to find possible compatible clusters
     for (ECLCluster& cluster : m_eclClusters) {
       //check if the cluster belongs to a photon or electron
-      int particleHypothesisID = cluster.getHypothesisId();
-      if (particleHypothesisID != ECLCluster::c_nPhotons) {
+      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         B2DEBUG(20, "Cluster has wrong hypothesis!");
         continue;
       }
@@ -231,7 +229,7 @@ void ECLTrackBremFinderModule::event()
 
       // check if the cluster energy is higher than the track momentum itself
       // also check that cluster has more than 2% of the track momentum
-      double relativeEnergy = cluster.getEnergy() / trackMomentum;
+      double relativeEnergy = cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / trackMomentum;
       if (relativeEnergy > 1 || relativeEnergy < m_relativeClusterEnergy) {
         B2DEBUG(20, "Relative energy of cluster higher than 1 or below threshold!");
         continue;
@@ -301,7 +299,7 @@ void ECLTrackBremFinderModule::event()
 
         if (fitted_pos.Perp() <= 16 && clusterDistance <= m_clusterDistanceCut) {
           m_bremHits.appendNew(recoTrack, bremCluster,
-                               fitted_pos, bremCluster->getEnergy(),
+                               fitted_pos, bremCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons),
                                clusterDistance, effAcceptanceFactor);
 
           // add a relation between the bremsstrahlung cluster and the track to transfer the information to the analysis

@@ -43,23 +43,33 @@ namespace Belle2 {
       }
       return *this;
     }
-
+    /** set name of i-th output trigger bit**/
     void setoutbitname(int i, const char* c)
     {
       strcpy(m_outbitname[i], c);
     }
+    /** set the number of output trigger bits**/
     void setnoutbit(int i)
     {
       m_noutbit = i;
     }
-
+    /** get name of i-th output trigger bit**/
     const char* getoutbitname(int i) const
     {
       return m_outbitname[i];
     }
+    /** get the number of output trigger bits**/
     int getnoutbit() const
     {
       return m_noutbit;
+    }
+    /** get name of i-th input trigger bit**/
+    int getoutbitnum(const char* c) const
+    {
+      for (int i = 0; i < 320; i++) {
+        if (strcmp(c, m_outbitname[i]) == 0)return i;
+      }
+      return -1;
     }
 
   private:

@@ -25,16 +25,16 @@ def _stdChargedEffCuts(particletype, listtype):
     effindex = _effnames.index(listtype)
 
     # efficiency cuts = [.95,.90,.85] efficiency; values outside (0,1) mean the cut does not exist and an error will be thrown
-    effcuts = [[0.002, 0.075, 0.275],
-               [0.002, 0.043, 0.218],
-               [0.000, 0.061, 1.000],
-               [0.047, 1.000, 1.000],
-               [0.008, 1.000, 1.000]]
+    effcuts = [[0.001, 0.019, 0.098],
+               [5e-6,  0.027, 0.167],
+               [0.000, 0.043, 0.251],
+               [0.093, 0.301, 0.709],
+               [0.187, 0.418, 0.909]]
     #
     return effcuts[particleindex][effindex]
 
 
-def stdCharged(particletype, listtype, path=analysis_main):
+def stdCharged(particletype, listtype, path):
     """
     Function to prepare one of several standardized types of charged particle lists:
       - 'all' with no cuts on track
@@ -53,8 +53,8 @@ def stdCharged(particletype, listtype, path=analysis_main):
     """
 
     # basic quality cut strings
-    trackQuality = 'thetaInCDCAcceptance and chiProb > 0.001'
-    ipCut = 'd0 < 0.5 and abs(z0) < 2'
+    trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
+    ipCut = 'dr < 0.5 and abs(dz) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 
     if particletype not in _chargednames:
@@ -103,7 +103,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
 ###
 
 
-def stdPi(listtype=_defaultlist, path=analysis_main):
+def stdPi(listtype=_defaultlist, path=None):
     """
     Function to prepare standard pion lists, refer to stdCharged for details
 
@@ -113,7 +113,7 @@ def stdPi(listtype=_defaultlist, path=analysis_main):
     stdCharged('pi', listtype, path)
 
 
-def stdK(listtype=_defaultlist, path=analysis_main):
+def stdK(listtype=_defaultlist, path=None):
     """
     Function to prepare standard kaon lists, refer to stdCharged for details
 
@@ -123,7 +123,7 @@ def stdK(listtype=_defaultlist, path=analysis_main):
     stdCharged('K', listtype, path)
 
 
-def stdPr(listtype=_defaultlist, path=analysis_main):
+def stdPr(listtype=_defaultlist, path=None):
     """
     Function to prepare standard proton lists, refer to stdCharged for details
 
@@ -133,7 +133,7 @@ def stdPr(listtype=_defaultlist, path=analysis_main):
     stdCharged('p', listtype, path)
 
 
-def stdE(listtype=_defaultlist, path=analysis_main):
+def stdE(listtype=_defaultlist, path=None):
     """
     Function to prepare standard electron lists, refer to stdCharged for details
 
@@ -143,7 +143,7 @@ def stdE(listtype=_defaultlist, path=analysis_main):
     stdCharged('e', listtype, path)
 
 
-def stdMu(listtype=_defaultlist, path=analysis_main):
+def stdMu(listtype=_defaultlist, path=None):
     """
     Function to prepare standard muon lists, refer to stdCharged for details
 

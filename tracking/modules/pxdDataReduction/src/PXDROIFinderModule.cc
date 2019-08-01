@@ -12,16 +12,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <genfit/MaterialEffects.h>
-#include <geometry/GeometryManager.h>
-#include <TGeoManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
-#include <genfit/FieldManager.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <time.h>
-#include <list>
-#include <genfit/Track.h> //giulia
 
 using namespace std;
 using namespace Belle2;
@@ -35,7 +25,7 @@ REG_MODULE(PXDROIFinder)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDROIFinderModule::PXDROIFinderModule() : Module()
+PXDROIFinderModule::PXDROIFinderModule() : Module() , m_ROIinfo()
 {
   //Set module properties
   setDescription("This module performs the reduction of the PXD data output");
@@ -131,11 +121,11 @@ void PXDROIFinderModule::event()
 
   //  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
-  m_thePXDInterceptor->fillInterceptList(&PXDInterceptList, trackList, &recoTrackToPXDIntercepts);
+  if (m_thePXDInterceptor) m_thePXDInterceptor->fillInterceptList(&PXDInterceptList, trackList, &recoTrackToPXDIntercepts);
 
   //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
 
-  m_thePixelTranslator->fillRoiIDList(&PXDInterceptList, &ROIList);
+  if (m_thePixelTranslator) m_thePixelTranslator->fillRoiIDList(&PXDInterceptList, &ROIList);
 
   // clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time3);
 
@@ -144,7 +134,7 @@ void PXDROIFinderModule::event()
 
 void PXDROIFinderModule::endRun()
 {
-  delete m_thePixelTranslator;
-  delete m_thePXDInterceptor;
+  if (m_thePixelTranslator) delete m_thePixelTranslator;
+  if (m_thePXDInterceptor) delete m_thePXDInterceptor;
 }
 

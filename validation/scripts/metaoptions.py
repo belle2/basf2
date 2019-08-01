@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
+from typing import Optional, Iterable, List
+
 
 class MetaOptionParser:
     """
@@ -12,13 +15,15 @@ class MetaOptionParser:
     ["expert", "pvalue-warn=0.9", "pvalue-error=0.4"]
     """
 
-    def __init__(self, meta_option_list):
+    def __init__(self, meta_option_list: Optional[Iterable] = None):
         """
         @param meta_option_list: list of meta options read from ROOT object
         """
-
+        if meta_option_list is None:
+            meta_option_list = []
+        meta_option_list = list(meta_option_list)
         #: store the meta option list for usage in the functions below
-        self.mo = meta_option_list
+        self.mo = meta_option_list  # type: List[str]
 
     def has_option(self, option_name):
         """
@@ -44,20 +49,37 @@ class MetaOptionParser:
         """
         return self.float_value("pvalue-error")
 
-    def float_value(self, key):
+    def float_value(self, key, default=None):
         """
         Extract the float value from a meta option list
         @param key: the key to identify the value from the list
-        @return: The float value or None if this key did not exist
+        @param default: default value
+        @return: The float value or the default value if this key did not exist
                  or the float value could not be parsed.
         """
         v = self.parse_key_value(key)
         if v is None:
-            return None
+            return default
         try:
             return float(v)
         except ValueError:
-            return None
+            return default
+
+    def int_value(self, key, default=None):
+        """
+        Extract the int value from a meta option list
+        @param key: the key to identify the value from the list
+        @param default: default value
+        @return: The int value or None if this key did not exist
+                 or the float value could not be parsed.
+        """
+        v = self.parse_key_value(key)
+        if v is None:
+            return default
+        try:
+            return int(v)
+        except ValueError:
+            return default
 
     def parse_key_value(self, key):
         """

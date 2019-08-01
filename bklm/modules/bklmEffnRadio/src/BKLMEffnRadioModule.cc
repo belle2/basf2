@@ -27,11 +27,7 @@
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
-#include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Matrix/Matrix.h"
-
-#include <bklm/geometry/GeometryPar.h>
-#include <bklm/geometry/Module.h>
 
 #include "TMath.h"
 #include "TCanvas.h"
@@ -111,8 +107,10 @@ void BKLMEffnRadioModule::initialize()
   m_hOccupancy1D = new TH1D**** [8];
 
 
-  if (!m_strips || !m_stripsEff)
-  { B2DEBUG(1, "no strip"); return;}
+  if (!m_strips || !m_stripsEff) {
+    B2DEBUG(20, "BKLMEffnRadioModule:: no strip!");
+    return;
+  }
   float stripPix = 1000 / 48;
   float stripPixScinti = 1000 / 54;
 
@@ -121,8 +119,10 @@ void BKLMEffnRadioModule::initialize()
   for (int i = 0; i < 8; i++) {
     m_strips[i] = new TBox**** [15];
     m_stripsEff[i] = new TBox**** [15];
-    if (!m_strips[i] || !m_stripsEff[i])
-    {B2DEBUG(1, "no strips! i = " << i); continue;}
+    if (!m_strips[i] || !m_stripsEff[i]) {
+      B2DEBUG(20, "BKLMEffnRadioModule:: no strip! i = " << i);
+      continue;
+    }
     m_stripHits[i] = new int** *[15];
     m_stripHitsEff[i] = new int** *[15];
     m_stripNonHitsEff[i] = new int** *[15];
@@ -148,8 +148,10 @@ void BKLMEffnRadioModule::initialize()
       m_eff2DFound[i][iLay] = new TH2D*[2];
       m_eff2DExpected[i][iLay] = new TH2D*[2];
 
-      if (!m_strips[i][iLay] || !m_stripsEff[i][iLay])
-      {B2DEBUG(1, "no strips! iLay = " << iLay); continue;}
+      if (!m_strips[i][iLay] || !m_stripsEff[i][iLay]) {
+        B2DEBUG(20, "BKLMEffnRadioModule:: no strips! iLay = " << iLay);
+        continue;
+      }
       m_stripHits[i][iLay] = new int** [2];
       m_stripHitsEff[i][iLay] = new int** [2];
       m_stripNonHitsEff[i][iLay] = new int** [2];
@@ -172,8 +174,10 @@ void BKLMEffnRadioModule::initialize()
 
         m_strips[i][iLay][j] = new TBox** [2];
         m_stripsEff[i][iLay][j] = new TBox** [2];
-        if (!m_strips[i][iLay][j] || !m_stripsEff[i][iLay][j])
-        {B2DEBUG(1, "no strips! j = " << j); continue;}
+        if (!m_strips[i][iLay][j] || !m_stripsEff[i][iLay][j]) {
+          B2DEBUG(20, "BKLMEffnRadioModule:: no strip! j = " << j);
+          continue;
+        }
         m_stripHits[i][iLay][j] = new int* [2];
         m_stripHitsEff[i][iLay][j] = new int* [2];
         m_stripNonHitsEff[i][iLay][j] = new int* [2];
@@ -187,8 +191,10 @@ void BKLMEffnRadioModule::initialize()
           (m_cModuleEff[i][iLay]->cd(j * 2 + k + 1))->Range(0, 0, 1000, 1000);
           m_strips[i][iLay][j][k] = new TBox*[54];
           m_stripsEff[i][iLay][j][k] = new TBox*[54];
-          if (!m_strips[i][iLay][j][k] || !m_stripsEff[i][iLay][j][k])
-          {B2DEBUG(1, "no strips! k = " << k); continue;}
+          if (!m_strips[i][iLay][j][k] || !m_stripsEff[i][iLay][j][k]) {
+            B2DEBUG(20, "BKLMEffnRadioModule:: no strip! k = " << k);
+            continue;
+          }
           m_stripHits[i][iLay][j][k] = new int[54];
           m_stripHitsEff[i][iLay][j][k] = new int[54];
           m_stripNonHitsEff[i][iLay][j][k] = new int[54];
@@ -275,9 +281,7 @@ void BKLMEffnRadioModule::event()
 {
   m_eventCounter++;
   if (!(m_eventCounter % 1000))
-    B2DEBUG(1, "looking at event nr " << m_eventCounter);
-
-  //   cout <<" we have " << hits1D.getEntries() << " 1D hits " << endl;
+    B2DEBUG(20, "BKLMEffnRadioModule:: looking at event " << m_eventCounter);
 
   m_hHitsPerEvent1D->Fill(hits1D.getEntries());
   int hitsPerLayer[16];
@@ -285,17 +289,16 @@ void BKLMEffnRadioModule::event()
   for (int h = 0;  h < hits1D.getEntries(); h++) {
     int sector = hits1D[h]->getSector() - 1;
     if ((sector < 0) || (sector >= 8)) {
-      B2DEBUG(1, "wrong sector number. sector = " << sector);
+      B2DEBUG(20, "BKLMEffnRadioModule:: wrong sector number: sector = " << sector);
       continue;
     }
     int layer = hits1D[h]->getLayer() - 1;
-    //      cout <<"layer is : "<< layer <<endl;
     if ((layer < 0) || (layer >= 15)) {
-      B2DEBUG(1, "wrong layer number. layer = " << layer);
+      B2DEBUG(20, "BKLMEffnRadioModule:: wrong layer number: layer = " << layer);
       continue;
     }
     hitsPerLayer[layer]++;
-    int fwd = 0;
+    int fwd = hits1D[h]->getForward();
     int isPhi = 0;
 
     int channelMin = hits1D[h]->getStripMin() - 1;
@@ -307,18 +310,14 @@ void BKLMEffnRadioModule::event()
 
     //scintillator layers have 54 channels, not 48 like the rpcs
     if (channelMin < 0 || channelMax < 0 || channelMin > channelMax || channelMax >= 54 || channelMin >= 54) {
-      B2DEBUG(1, "wrong channel, min = " << channelMin << " max = " << channelMax << " layer = " << layer);
+      B2DEBUG(20, "BKLMEffnRadioModule:: wrong channel, min = " << channelMin << " max = " << channelMax << " layer = " << layer);
       continue;
     }
 
-    if (hits1D[h]->isForward()) {
-      fwd = 1;
-    }
     if (hits1D[h]->isPhiReadout()) {
       isPhi = 1;
     }
     for (int c = channelMin; c <= channelMax; c++) {
-      //      cout <<"sector: " << sector <<" layer: "<< layer<<" fwd: " << fwd <<" isPhi: " << isPhi <<" channel: " << c <<endl;
       m_stripHits[sector][layer][fwd][isPhi][c]++;
       m_hOccupancy1D[sector][layer][fwd][isPhi]->Fill(c);
     }
@@ -363,7 +362,8 @@ void BKLMEffnRadioModule::terminate()
     float lInd = i / (float)48;
     float colorIndex = lInd * 48 + 51;
     int roundInd = fabs(lInd * maxStripHits + 0.5);
-    B2DEBUG(1, "lInd is " << lInd << " color index is: " << colorIndex << " max strip: " << maxStripHits << " round ind: " << roundInd);
+    B2DEBUG(20, "BKLMEffnRadioModule:: lInd is " << lInd << " color index is: " << colorIndex << " max strip: " << maxStripHits <<
+            " round ind: " << roundInd);
     char buffer[200];
     sprintf(buffer, "%d", roundInd);
 
@@ -372,7 +372,6 @@ void BKLMEffnRadioModule::terminate()
   }
   cLegend.Write();
 
-  //    cout <<"max Strip Hits: " << maxStripHits<<endl;
   for (int i = 0; i < 8; i++) {
     for (int iLay = 0; iLay < 15; iLay++) {
       for (int j = 0; j < 2; j++) {
@@ -484,11 +483,7 @@ void BKLMEffnRadioModule::terminate()
 
 void BKLMEffnRadioModule::getEffs()
 {
-  //  cout <<"get Effs " <<endl;
-
-
   m_GeoPar = GeometryPar::instance();
-  //  cout <<"we have " <<hits2D.getEntries() <<" 2d hits " <<endl;
   m_hHitsPerEvent2D->Fill(hits2D.getEntries());
 
   //we should
@@ -538,13 +533,9 @@ void BKLMEffnRadioModule::getEffs()
         }
 
         int sector1 = hits2D[h]->getSector();
-        int fwd1 = 0;
-        if (hits2D[h]->isForward())
-          fwd1 = 1;
+        int fwd1 = hits2D[h]->getForward();
         int sector2 = hits2D[h2]->getSector();
-        int fwd2 = 0;
-        if (hits2D[h]->isForward())
-          fwd2 = 1;
+        int fwd2 = hits2D[h]->getForward();
 
         //let's stay in the same module...(that is what we use for the simple tracking as well...)
         if (sector1 != sector2  || fwd1 != fwd2)
@@ -564,7 +555,6 @@ void BKLMEffnRadioModule::getEffs()
         //just did this to collect tracks
         try {
           if (effLayer >= 16) {
-            //      cout <<endl<<"looking for all tracks"<<endl;
             throw string("all layers");
           }
 
@@ -599,7 +589,7 @@ void BKLMEffnRadioModule::getEffs()
           //check if we find a point in effLayer which is also in this sector and close to the track
           bool found = false;
           for (int e = 0; e < hits2D.getEntries(); e++) {
-            if ((hits2D[e]->getLayer() != effLayer) || (hits2D[e]->getSector() != sector1) || (hits2D[e]->isForward() != fwd1))
+            if ((hits2D[e]->getLayer() != effLayer) || (hits2D[e]->getSector() != sector1) || (hits2D[e]->getForward() != fwd1))
               continue;
             //looking at hit in this layer..., see how far away we are from the projected hit...
             TVector3 candGlPos = hits2D[e]->getGlobalPosition();
@@ -607,15 +597,7 @@ void BKLMEffnRadioModule::getEffs()
             const Hep3Vector candLocPos_cl = refMod->globalToLocal(candGlPos_cl);
             TVector3 candLocPos(candLocPos_cl.x(), candLocPos_cl.y(), candLocPos_cl.z());
 
-            // UNUSED Double_t distance=(candLocPos-expHit).Mag();
             Double_t distanceExtrapol = (candLocPos - expHitExtrapol).Mag();
-
-            //            cout <<" expHit: "; expHit.Print();cout <<"distance to hit: "; candLocPos.Print();
-            //            cout <<"extrapolatedHit: "; expHitExtrapol.Print();
-            //      cout <<" is " << distance << " or (extrapolated) " << distanceExtrapol<<endl;
-            //            cout <<"subtract " << effX-r1 <<"?  effX: " << effX <<",r1: " << r1 <<" (this radius minus layer1 should bring you back)" <<endl;
-            //      cout <<"angle is: " << (lHitPos2-lHitPos1).Angle(lHitPos1-candLocPos);
-            //        cout <<" or " <<  (lHitPos2-lHitPos1).Angle(lHitPos2-candLocPos);
             if (distanceExtrapol < m_maxEffDistance)
               found = true;
 
@@ -648,16 +630,7 @@ void BKLMEffnRadioModule::getEffs()
           m_hTrackTheta->Fill(theta);
           m_hTrackPhi->Fill(phi);
         }
-        if (effLayer == 16) {
-          // UNUSED for(auto pi : m_pointIndices)
-          {
-            //          cout <<"using index : " <<pi<<endl;
-          }
-        }
         for (unsigned int i = 0; i < points.size(); i++) {
-          if (effLayer == 16) {
-            //      cout<<"x: "<< points[i]->x <<" y: " << points[i]->y << " z: "<< points[i]->z<<endl;
-          }
           delete points[i];
         }
         points.clear();
@@ -682,23 +655,16 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
 
   set<int> locIndices;
   if (points.size() > 0) {
-    B2DEBUG(1, "point vector not empty...");
+    B2DEBUG(20, "BKLMEffnRadioModule:: point vector not empty...");
   }
 
   int layer1 = bklmHits2D[firstHit]->getLayer();
   int sector1 = bklmHits2D[firstHit]->getSector();
-  int fwd1 = 0;
-
-  if (bklmHits2D[firstHit]->isForward())
-    fwd1 = 1;
+  int fwd1 = bklmHits2D[firstHit]->getForward();
 
   int layer2 = bklmHits2D[secondHit]->getLayer();
   int sector2 = bklmHits2D[secondHit]->getSector();
-  int fwd2 = 0;
-
-  if (bklmHits2D[secondHit]->isForward())
-    fwd2 = 1;
-
+  int fwd2 = bklmHits2D[secondHit]->getForward();
 
   for (int h = 0; h < bklmHits2D.getEntries(); ++h) {
     int layer = bklmHits2D[h]->getLayer();
@@ -709,7 +675,7 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
     if ((layer == layer1) || (layer == layer2))
       continue;
     //same sector necessary? probably not, the test is pretty simple...
-    if ((sector != sector1) || (sector != sector2) || (fwd1 != bklmHits2D[h]->isForward()) || (fwd2 != fwd1))
+    if ((sector != sector1) || (sector != sector2) || (fwd1 != bklmHits2D[h]->getForward()) || (fwd2 != fwd1))
       continue;
     //don't use points that are already part of other tracks... So don't allow sharing
     //tried only to disallow the same seeds but that doesn't seem to be enough...
@@ -730,11 +696,6 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
       angle += 2 * TMath::Pi();
     }
     if (fabs(angle) < TMath::Pi() * 0.1) {
-      //    cout <<"found point on track, angle: " << angle <<endl;
-      //    cout <<"gl1: ("<<gl1.x()<<","<<gl1.y()<<","<< gl1.z()<<")"<<endl;
-      //    cout <<"gl2: ("<<gl2.x()<<","<<gl2.y()<<","<<gl2.z()<<")"<<endl;
-      //    cout <<"gl: ("<<gl.x()<<","<<gl.y()<<","<< gl.z()<<")"<<endl;
-      //    cout <<"------"<<endl;
       //we found a point on the track, so let's add it to the points of the track...
       //but first translate it into the reference coordinate system
 
@@ -804,14 +765,12 @@ void BKLMEffnRadioModule::trackFit(vector<SimplePoint*>& points, TrackParams& pa
     Double_t x = iter->z;
     Double_t y = iter->y;
     Double_t z = iter->x;
-    //    cout <<"x: " << x << " y: " << y << " z: " << z <<endl;
     A += z * z;
     B += z;
     Cx += x * z;
     Cy += y * z;
     Ex += x;
     Ey += y;
-
   }
   D = points.size();
 

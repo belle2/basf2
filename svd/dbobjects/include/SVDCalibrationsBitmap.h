@@ -21,20 +21,26 @@ namespace Belle2 {
   class SVDCalibrationsBitmap {
 
   public:
-    typedef bool calibrationType;
-    typedef unsigned long bundleType;
-    typedef std::vector< bundleType > payloadContainerType;
+    typedef bool calibrationType; /**< typedef of the calibration value (1/0)*/
+    typedef unsigned long bundleType; /**< typedef for the bundle type*/
+    typedef std::vector< bundleType > payloadContainerType; /**< typedef of the vector of bundle type*/
 
-    static const int nBitsInBundle = CHAR_BIT * sizeof(bundleType);
+    static const int nBitsInBundle = CHAR_BIT * sizeof(bundleType); /**< nuber of bits in the bundle*/
 
+    /** default constructor*/
     SVDCalibrationsBitmap() {};
+
+    /** default destructor*/
     ~SVDCalibrationsBitmap() {};
+
+    /** get the calibration value of that strip*/
     static inline calibrationType get(const payloadContainerType& svdBitmap, unsigned int strip)
     {
       std::bitset<nBitsInBundle> bundle = svdBitmap.at(strip / (nBitsInBundle));
       return bundle[strip % nBitsInBundle];
     }
 
+    /** set the calibration value of the strip*/
     static inline void set(payloadContainerType& svdBitmap, unsigned int strip,
                            calibrationType value)
     {
@@ -43,6 +49,7 @@ namespace Belle2 {
       svdBitmap.at(strip / (nBitsInBundle)) =  bundle.to_ulong();
     }
 
+    /** initialize the calibration bitmap*/
     static void init(payloadContainerType& svdBitmap, unsigned int layer,
                      unsigned int /*ladder*/ , unsigned int /*sensor*/,
                      unsigned int side, bool defaultB)

@@ -1,7 +1,7 @@
 from pybasf2 import B2WARNING
 
 from basf2 import register_module, create_path
-from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf
+from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 
@@ -18,12 +18,9 @@ def add_geometry_modules(path, components=None):
     """
     # check for detector geometry, necessary for track extrapolation in genfit
     if 'Geometry' not in path:
-        geometry = register_module('Geometry', useDB=True)
+        path.add_module('Geometry', useDB=True)
         if components is not None:
-            B2WARNING("Custom detector components specified, disabling Geometry from Database")
-            geometry.param('useDB', False)
-            geometry.param('components', components)
-        path.add_module(geometry)
+            B2WARNING("Custom detector components specified: Will still build full geometry")
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
@@ -80,7 +77,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
 
 
 def add_cr_track_fit_and_track_creator(path, components=None,
-                                       data_taking_period='gcr2017', top_in_counter=False,
+                                       data_taking_period='early_phase3', top_in_counter=False,
                                        prune_tracks=False, event_timing_extraction=True,
                                        reco_tracks="RecoTracks", tracks=""):
     """
@@ -100,7 +97,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
            (assuming PMT is put at -z of the counter).
     """
 
-    if data_taking_period != "phase2":
+    if data_taking_period not in ["phase2", "phase3", "early_phase3"]:
         import cdc.cr as cosmics_setup
 
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)
@@ -245,8 +242,19 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
                     VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)
 
 
-def add_svd_track_finding(path, components, input_reco_tracks, output_reco_tracks, svd_ckf_mode="VXDTF2_after",
-                          use_mc_truth=False, add_both_directions=True, temporary_reco_tracks="SVDRecoTracks", **kwargs):
+def add_svd_track_finding(
+        path,
+        components,
+        input_reco_tracks,
+        output_reco_tracks,
+        svd_ckf_mode="VXDTF2_after",
+        use_mc_truth=False,
+        add_both_directions=True,
+        temporary_reco_tracks="SVDRecoTracks",
+        temporary_reco_tracks_two="SVDplusRecoTracks",
+        use_svd_to_cdc_ckf=True,
+        prune_temporary_tracks=True,
+        **kwargs):
     """Add SVD track finding to the path"""
 
     if not is_svd_used(components):
@@ -312,16 +320,53 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
                         CDCRecoTrackColName=input_reco_tracks,
                         VXDRecoTrackColName=temporary_reco_tracks)
 
+    elif svd_ckf_mode == "cosmics":
+        add_cosmics_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                            use_mc_truth=use_mc_truth, direction="backward", **kwargs)
+        if add_both_directions:
+            add_cosmics_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
+                                use_mc_truth=use_mc_truth, direction="forward", **kwargs)
+
     else:
         raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
+
+    if use_svd_to_cdc_ckf:
+        comb_tracks = temporary_reco_tracks_two
+    else:
+        comb_tracks = output_reco_tracks
 
         # Write out the combinations of tracks
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=temporary_reco_tracks,
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
-                    recoTracksStoreArrayName=output_reco_tracks)
+                    recoTracksStoreArrayName=comb_tracks)
+
+    if use_svd_to_cdc_ckf:
+        path.add_module("ToCDCCKF",
+                        inputWireHits="CDCWireHitVector",
+                        inputRecoTrackStoreArrayName=comb_tracks,
+                        relatedRecoTrackStoreArrayName="CKFCDCRecoTracks",
+                        relationCheckForDirection="backward",
+                        ignoreTracksWithCDChits=True,
+                        outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
+                        outputRelationRecoTrackStoreArrayName=comb_tracks,
+                        writeOutDirection="backward",
+                        stateBasicFilterParameters={"maximalHitDistance": 0.15},
+                        pathFilter="arc_length",
+                        maximalLayerJump=4)
+
+        path.add_module("CDCCKFTracksCombiner",
+                        CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
+                        VXDRecoTracksStoreArrayName=comb_tracks,
+                        recoTracksStoreArrayName=output_reco_tracks)
+
+        if prune_temporary_tracks:
+            for temp_reco_track in [comb_tracks, "CKFCDCRecoTracks"]:
+                path.add_module('PruneRecoTracks', storeArrayName=temp_reco_track)
 
 
-def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False):
+def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
+                          use_second_hits=False, use_cdc_quality_estimator=False,
+                          cdc_quality_estimator_weightfile=None):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -332,17 +377,21 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
+    :param use_cdc_quality_estimator: Add the TFCDC_TrackQualityEstimator to set the CDC quality
+           indicator for the ``output_reco_tracks``
+    :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
     """
-    # Init the geometry for cdc tracking and the hits
+    # Init the geometry for cdc tracking and the hits and cut low ADC hits
     path.add_module("TFCDC_WireHitPreparer",
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
-                    flightTimeEstimation="outwards")
+                    flightTimeEstimation="outwards",
+                    noiseChargeDeposit=6.0e-7)
 
-    # Constructs clusters and reduce background hits
+    # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",
-                    ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2})
+                    ClusterFilter="all",
+                    ClusterFilterParameters={})
 
     # Find segments within the clusters
     path.add_module("TFCDC_SegmentFinderFacetAutomaton")
@@ -391,6 +440,18 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
         path.add_module("TFCDC_TrackCreatorSingleSegments",
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
+
+    if use_cdc_quality_estimator:
+        # Add mva method to set a quality indicator for the CDC tracks
+        cdc_qe_module = path.add_module(
+            "TFCDC_TrackQualityEstimator",
+            inputTracks=output_tracks,
+            filter='mva',
+            deleteTracks=False,
+        )
+        if cdc_quality_estimator_weightfile is not None:
+            # Set a custom weight file identifier/path instead of default
+            cdc_qe_module.param("filterParameters", {"identifier": cdc_quality_estimator_weightfile})
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",

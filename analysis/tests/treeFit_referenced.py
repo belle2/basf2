@@ -4,6 +4,7 @@ import unittest
 import os
 import tempfile
 from basf2 import *
+import b2test_utils
 from modularAnalysis import *
 from vertex import vertexTree
 from ROOT import Belle2
@@ -21,7 +22,8 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
+        inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
+        inputMdst('default', inputfile, path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
@@ -31,9 +33,10 @@ class TestTreeFits(unittest.TestCase):
         reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
         matchMCTruth('B0:rec', path=main)
 
+        conf = 0
         main.add_module('TreeFitter',
                         particleList='B0:rec',
-                        confidenceLevel=-1,
+                        confidenceLevel=conf,
                         massConstraintList=[],
                         massConstraintListParticlename=[],
                         expertUseReferencing=True,
@@ -59,16 +62,17 @@ class TestTreeFits(unittest.TestCase):
         truePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal > 0)")
         falsePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal == 0)")
 
+        mustBeZero = ntuple.GetEntries("(chiProb < {})".format(conf))
+
         print("True fit survivors: {0} out of {1} true candidates".format(truePositives, allSig))
         print("False fit survivors: {0} out of {1} false candidates".format(falsePositives, allBkg))
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertFalse(falsePositives == 0, "No background survived the fit. This is weird.")
+        self.assertTrue(falsePositives < 2129, "Background rejection too small.")
 
-        self.assertTrue(truePositives > (allSig / 2.), "More than 50% of signal did not survived the fit.")
-
-        self.assertFalse(allBkg == falsePositives, "All background candidates survived the fit.")
+        self.assertTrue(truePositives > 32, "Signal rejection too high")
+        self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")
 

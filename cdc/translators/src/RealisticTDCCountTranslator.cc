@@ -19,7 +19,8 @@ using namespace Belle2;
 using namespace CDC;
 
 RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay) :
-  m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
+  m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()),
+  m_scp(CDCSimControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
   m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
   StoreObjPtr<FileMetaData> filPtr("", DataStore::c_Persistent);
@@ -90,12 +91,12 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   driftTime -= timeOfFlightEstimator;
 
   //Forth: Time-walk correction
-  //Correct for data only now. Eventually correct also for MC (don't forget to switch on this effect in digitizer in that case).
-  if (m_realData) {
+  if (m_realData) { //for data, always correct
     driftTime -= m_cdcp.getTimeWalk(wireID, adcCount);
     //    B2INFO("RealisticTDCCountTranslator:: time-walk corr. done.");
-    //  } else {
-    //    B2INFO("RealisticTDCCountTranslator:: no time-walk corr. for MC now.");
+  } else if (m_scp.getTimeWalk()) { //for MC, ccorrect if the flag is on
+    driftTime -= m_cdcp.getTimeWalk(wireID, adcCount);
+    //    B2INFO("RealisticTDCCountTranslator:: time-walk corr. done for MC.");
   }
 
   return driftTime;

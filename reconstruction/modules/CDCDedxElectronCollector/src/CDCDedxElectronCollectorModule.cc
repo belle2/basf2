@@ -127,8 +127,8 @@ void CDCDedxElectronCollectorModule::collect()
 
     ////NEW
     const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
-    if (eclCluster) {
-      double TrkEoverP = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+    if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+      double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
       if (abs(TrkEoverP - 1) >= fSetEoverP)continue;
       //printf("TrkEoverP = %0.03f\n", TrkEoverP);
     }
@@ -149,9 +149,9 @@ void CDCDedxElectronCollectorModule::collect()
 
         double TrkEoverPOther = -2.0;
         const ECLCluster* eclClusterOther = Othertrack->getRelated<ECLCluster>();
-        if (!eclClusterOther)continue;
+        if (!eclClusterOther or !eclClusterOther->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))continue;
 
-        TrkEoverPOther = (eclClusterOther->getEnergy()) / (mOtherTrack->getMomentum().Mag());
+        TrkEoverPOther = (eclClusterOther->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (mOtherTrack->getMomentum().Mag());
 
         //cutting on EoverP of other track
         if (abs(TrkEoverPOther - 1.0) >= fSetEoverP) {

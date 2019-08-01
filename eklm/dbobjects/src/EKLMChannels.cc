@@ -9,6 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/logging/Logger.h>
@@ -41,4 +42,3 @@ const EKLMChannelData* EKLMChannels::getChannelData(uint16_t strip) const
     return nullptr;
   return &(it->second);
 }
-

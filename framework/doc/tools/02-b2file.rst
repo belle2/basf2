@@ -19,11 +19,21 @@ look for the file in a local xml file catalog using an logical file name (LFN)::
                    Implies ``--all`` and ``--steering``.
 -s, --steering     print steering file contents
 
+
+.. _b2file-metadata-add:
+
 ``b2file-metadata-add``: Add/Edit LFN in given file
 ---------------------------------------------------
 
 This tools allows to modify the LFN and the data descriptions stored in a given
-basf2 output file. It will also update the xml file catalog.
+basf2 output file. It will also update the xml file catalog if the file was
+registered in it before.
+
+.. versionchanged:: after release-03-00-00
+
+   Previously the file was always registered in the file catalog so even new
+   file catalog was always created if none was existing. Now it only updates
+   the file catalog when the file is already registered.
 
 The keys and values for the data descriptions can take any value and are not
 used by the offline software in any way. They can be used for bookkeeping or
@@ -55,6 +65,8 @@ skimDecayMode
                    data description to set of the form key=value. If the
                    argument does not contain an equal sign it's interpeted as a
                    key to delete from the dataDescriptions.
+
+.. _b2file-catalog-add:
 
 ``b2file-catalog-add``: Add a file to a local XML file catalog
 --------------------------------------------------------------
@@ -127,14 +139,16 @@ restrictions apply:
 
 ::
 
-    usage: b2file-merge [-h] [-f] [-q] [--no-catalog] OUTPUTFILENAME
+    usage: b2file-merge [-h] [-f] [-q] [--no-catalog] [--add-to-catalog] OUTPUTFILENAME
                         INPUTFILENAME [INPUTFILENAME ...]
 
 .. rubric:: Optional Arguments
 
--f, --force   overwrite the output file if already present
--q, --quiet   if given only warnings and errors are printed
---no-catalog  don't register output file in file catalog
+-f, --force        overwrite the output file if already present
+-q, --quiet        if given only warnings and errors are printed
+--no-catalog       don't register output file in file catalog. This is now the
+                   default and just kept for backwards compatibility.g
+--add-to-catalog   add the output file to the file catalog
 
 .. rubric:: Examples
 
@@ -152,6 +166,11 @@ restrictions apply:
    the tool now checks for consistency of the real/MC flag for all input files
    and refues to merge mixed sets of real and MC data.
 
+.. versionchanged:: after release-03-00-00
+   files will by default no longer be registered in a file catalog. To get the
+   old behavior please supply the ``--add-to-catalog`` command line option or
+   run ``b2file-catalaog-add`` on the output file.
+
 
 ``b2file-mix``: Create a run of mixed data from a set of input files
 ---------------------------------------------------------------------------------
@@ -164,6 +183,18 @@ restrictions apply:
     :nogroupsections:
 
 
+``b2file-remove-branches``: Create a copy of a basf2 output file removing a list of given branches in the process
+-----------------------------------------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2file-remove-branches
+    :func: create_argumentparser
+    :prog: b2file-remove-branches
+    :nodefaultconst:
+    :nogroupsections:
+
+.. versionadded:: release-04-00-00
+
 ``b2file-size``: Show detailed size information about the content of a file
 ---------------------------------------------------------------------------
 
@@ -173,3 +204,27 @@ restrictions apply:
     :prog: b2file-size
     :nodefault:
     :nogroupsections:
+
+``b2file-normalize``: Reset non-reproducible root file metadata and optionally the file name in the metadata
+------------------------------------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2file-normalize
+    :func: get_argument_parser
+    :prog: b2file-normalize
+    :nodefaultconst:
+    :nogroupsections:
+
+.. versionadded:: release-04-00-00
+
+``b2file-md5sum``: Calculate a md5 checksum of a root file content excluding the root metadata
+----------------------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2file-md5sum
+    :func: get_argument_parser
+    :prog: b2file-md5sum
+    :nodefaultconst:
+    :nogroupsections:
+
+.. versionadded:: release-04-00-00

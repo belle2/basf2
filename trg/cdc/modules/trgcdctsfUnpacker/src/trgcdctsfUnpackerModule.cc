@@ -54,17 +54,26 @@ void TRGCDCTSFUnpackerModule::terminate()
 
 void TRGCDCTSFUnpackerModule::initialize()
 {
+  char c_name[100];
+  sprintf(c_name, "TRGCDCTSFUnpackerStore%d", m_TSFMOD);
+  storeAry.registerInDataStore(c_name);
 
-  storeAry.registerInDataStore();
-
+  StoreObjPtr<EventMetaData> bevt;
+  _exp = bevt->getExperiment();
+  _run = bevt->getRun();
 
   //set copper address
   if (m_TSFMOD == 0) {
     m_copper_address = 0x11000007;
     m_copper_ab = 0;
   } else if (m_TSFMOD == 1) {
-    m_copper_address = 0x11000007;
-    m_copper_ab = 1;
+    if (_exp > 7 || (_exp == 7 && _run > 4023)) {
+      m_copper_address = 0x11000009;
+      m_copper_ab = 0;
+    } else {
+      m_copper_address = 0x11000007;
+      m_copper_ab = 1;
+    }
   } else if (m_TSFMOD == 2) {
     m_copper_address = 0x11000008;
     m_copper_ab = 0;
@@ -72,16 +81,28 @@ void TRGCDCTSFUnpackerModule::initialize()
     m_copper_address = 0x11000008;
     m_copper_ab = 1;
   } else if (m_TSFMOD == 4) {
+    if (_exp > 7 || (_exp == 7 && _run > 4023)) {
+      m_copper_address = 0x11000007;
+      m_copper_ab = 1;
+    } else {
+      m_copper_address = 0x11000009;
+      m_copper_ab = 0;
+    }
+  } else if (m_TSFMOD == 5) {
     m_copper_address = 0x11000009;
+    m_copper_ab = 1;
+  } else if (m_TSFMOD == 6) {
+    m_copper_address = 0x1100000a;
     m_copper_ab = 0;
   } else {
     B2ERROR("trgcdctsfunpacker:cooper address is not set");
     m_copper_address = 0;
+    m_copper_ab = 0;
   }
 
 
   //set bitmap
-  if (m_TSFMOD == 0 || m_TSFMOD == 4) {
+  if (m_TSFMOD == 0 || m_TSFMOD == 4 || m_TSFMOD == 6) {
     m_nBits = nBits_2k;
     m_nword = nword_2k;
     for (int i = 0; i < nLeafs; i++) {
@@ -89,7 +110,7 @@ void TRGCDCTSFUnpackerModule::initialize()
         m_BitMap[i][j] = BitMap_2k[i][j];
       }
     }
-  } else if (m_TSFMOD == 1 || m_TSFMOD == 2 || m_TSFMOD == 3) {
+  } else if (m_TSFMOD == 1 || m_TSFMOD == 2 || m_TSFMOD == 3 || m_TSFMOD == 5) {
     m_nBits = nBits_4k;
     m_nword = nword_4k;
     for (int i = 0; i < nLeafs; i++) {

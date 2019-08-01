@@ -23,7 +23,7 @@ REG_MODULE(VariableToReturnValue)
 
 
 VariableToReturnValueModule::VariableToReturnValueModule() :
-  Module(), m_function(0)
+  Module(), m_function(nullptr)
 {
   //Set module properties
   setDescription("Calculate event-based variable specified by the user and sets return value of the module accordingly.");

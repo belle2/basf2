@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# @cond
+# @cond SUPPRESS_DOXYGEN
 
 # Thomas Keck 2016
 
@@ -89,11 +89,11 @@ MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'dQ': ('dQ', 100, -1.0, 1.0),
                              'abs(dM)': ('abs(dM)', 100, 0.0, 1.0),
                              'abs(dQ)': ('abs(dQ)', 100, 0.0, 1.0),
-                             'piid': ('piid', 100, 0.0, 1.0),
-                             'Kid': ('Kid', 100, 0.0, 1.0),
-                             'prid': ('prid', 100, 0.0, 1.0),
-                             'eid': ('eid', 100, 0.0, 1.0),
-                             'muid': ('muid', 100, 0.0, 1.0),
+                             'pionID': ('pionID', 100, 0.0, 1.0),
+                             'kaonID': ('kaonID', 100, 0.0, 1.0),
+                             'protonID': ('protonID', 100, 0.0, 1.0),
+                             'electronID': ('electronID', 100, 0.0, 1.0),
+                             'muonID': ('muonID', 100, 0.0, 1.0),
                              'isSignal': ('isSignal', 2, -0.5, 1.5),
                              'isSignalAcceptMissingNeutrino': ('isSignalAcceptMissingNeutrino', 2, -0.5, 1.5),
                              'isPrimarySignal': ('isPrimarySignal', 2, -0.5, 1.5),
@@ -237,3 +237,5 @@ class Particle(object):
                                           preCutConfig=preCutConfig,
                                           decayModeID=decayModeID))
         return self
+
+# @endcond

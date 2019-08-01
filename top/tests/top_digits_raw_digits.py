@@ -76,7 +76,7 @@ class DigitTest(Module):
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 particlegun = register_module('ParticleGun')
@@ -85,9 +85,12 @@ particlegun.param('nTracks', 10)
 main.add_module(particlegun)
 
 add_simulation(main, components=['TOP'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["TOP"])
+set_module_parameters(main, type="TOPDigitizer", lookBackWindows=220)
 
 converter = register_module('TOPRawDigitConverter')
 converter.param('outputDigitsName', 'TOPDigitsUnpacked')
+converter.param('lookBackWindows', 220)
 converter.param('minPulseWidth', 0.0)
 converter.param('maxPulseWidth', 1000.0)
 main.add_module(converter)

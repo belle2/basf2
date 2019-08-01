@@ -25,7 +25,7 @@ Here are some examples:
      # WILL NOT WORK!!!
      applyEventCuts("(nTracks > 10) and (nParticlesInList(gamma:all) > 4)", path=mypath)
 
-The above example can be made even more readable with the use of variable aliases (described later).
+The above example can be made even more readable with the use of variable aliases (`VariableManager.addAlias`).
 
 .. code-block:: python
 

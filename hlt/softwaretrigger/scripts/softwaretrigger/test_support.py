@@ -99,10 +99,6 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
 
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 
-    # Set the correct SVDEventInfo name in the given modules, when SVDPacker is used and not followed by SVDUnpacker
-    for m in path.modules():
-        if m.name() == "SVDDataFormatCheck" or m.name() == "__ROISVDCoGTimeEstimator":
-            m.param('SVDEventInfo', 'SVDEventInfoSim')
     basf2.process(path)
 
 

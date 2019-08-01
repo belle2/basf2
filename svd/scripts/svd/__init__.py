@@ -191,9 +191,9 @@ def add_svd_unpacker(path):
 
 
 def add_svd_packer(path):
-    if 'SVDEventInfoSetter' not in [e.name() for e in path.modules()]:
-        path.add_module('SVDEventInfoSetter')
+
     changeSVDEventInfoNameForPacker(path)
+
     packer = register_module('SVDPacker')
     path.add_module(packer)
 
@@ -220,6 +220,6 @@ def add_svd_SPcreation(path, isROIsimulation=False):
 
 def changeSVDEventInfoNameForPacker(path):
 
-    for m in path.modules():
-        if m.name() == "SVDEventInfoSetter" or m.name() == "SVDDigitizer":
-            m.param('SVDEventInfo', 'SVDEventInfoSim')
+    for module in path.modules():
+        if module.name() in["SVDEventInfoSetter", "SVDDigitizer"]:
+            module.param('SVDEventInfo', 'SVDEventInfoSim')

@@ -335,7 +335,7 @@ namespace Belle2 {
       s_time_type  = time_type;
     }
     /** the class title */
-    ClassDef(TRGECLUnpackerSumStore, 3);
+    ClassDef(TRGECLUnpackerSumStore, 4);
   };
 
 } // end namespace Belle2

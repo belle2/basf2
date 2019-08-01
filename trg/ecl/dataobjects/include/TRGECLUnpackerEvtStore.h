@@ -449,7 +449,7 @@ namespace Belle2 {
       e_evt_time_win = timewin;
     }
     /** the class title */
-    ClassDef(TRGECLUnpackerEvtStore, 3);
+    ClassDef(TRGECLUnpackerEvtStore, 4);
   };
 
 } // end namespace Belle2

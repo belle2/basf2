@@ -45,7 +45,7 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("This module is used to reconstruct B momentum for two body decays in a K_L0 and something else. The K_L0 momentum is reconstructed by taking reconstructed direction (ECL or KLM) and kinematic constraints.");
+    setDescription("This module is used to employ the e+e- initial energy constraint to determine the momentum of Klongs for two body B decays containing a K_L0 and something else. The module creates a list of K_L0 candidates whose K_L0 momentum is reconstructed by taking reconstructed direction (ECL or KLM), the intial energy of the e+e- collision and kinematic constraints.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters

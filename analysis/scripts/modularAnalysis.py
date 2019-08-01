@@ -1019,7 +1019,7 @@ def reconstructMissingKlongDecayExpert(
     recoList="_reco",
 ):
     """
-    Creates mother particle accounting for missing momentum.
+    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)

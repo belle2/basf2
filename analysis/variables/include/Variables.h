@@ -373,14 +373,5 @@ namespace Belle2 {
      */
     double b2bClusterPhi(const Particle* particle);
 
-    /**
-     * return Kshort using Belle goodKS algorithm
-     */
-    double goodBelleKshort(const Particle* KS);
-
-    /**
-     * return goodLambda using Belle goodLambda selection rules
-     */
-    double goodBelleLambda(const Particle* Lambda);
   }
 } // Belle2 namespace

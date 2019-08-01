@@ -82,8 +82,32 @@
 [INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]    -> MDST source: RestOfEvents
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
+[INFO] Number of ParticleLists studied 1 
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+   Upsilon(4S)( 0)	|	0.2800	1.0000	1.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+   Upsilon(4S)( 0)	|	  0.6600	  2.3571	  0.0000	  0.0000	  0.0000	  0.0000	  0.6600	  2.3571
+
+[INFO] 
+=======================================================
+Total Retention: 0.2800
+Total Number of Particles created in the DataStore: 6864
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
@@ -120,7 +144,7 @@ Lambda0:frommc( 6)	|	  0.1400	  1.1667	  0.1200	  1.0000	  0.0200	  0.1667	  0.0
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 6831
+Total Number of Particles created in the DataStore: 6864
 =======================================================
 
 [INFO] ParticleStats Summary: 
@@ -155,7 +179,7 @@ Total Number of Particles created in the DataStore: 6831
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 6831
+Total Number of Particles created in the DataStore: 6864
 =======================================================
 
 [WARNING] There were 1 tracks skipped because of zero charge for mu+  { module: ParticleLoader }
@@ -255,8 +279,13 @@ Total Number of Particles created in the DataStore: 6831
 [INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]    -> MDST source: RestOfEvents
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
 [INFO] Number of ParticleLists studied 11 
+[INFO] Number of ParticleLists studied 1 
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles
@@ -1456,6 +1485,25 @@ Total Number of Particles created in the DataStore: 6831
  extra info=( ) 
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0| Unique 
+   Upsilon(4S)( 0)	|	0.0000	1.0000	0.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+   Upsilon(4S)( 0)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+
+[INFO] 
+=======================================================
+Total Retention: 0.0000
+Total Number of Particles created in the DataStore: 107
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================

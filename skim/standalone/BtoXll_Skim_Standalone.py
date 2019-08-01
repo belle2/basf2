@@ -31,6 +31,16 @@ if args.data:
 gb2_setuprel = 'release-03-02-03'
 skimCode = encodeSkimName('BtoXll')
 
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
 path = Path()
 fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=path)

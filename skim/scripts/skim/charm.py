@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Skim list building functions for charm analyses. """
-"""
-note: The Hp, Hm and Jm in the function name represent
-arbitrary charged particles with positive or negative
-charge.
-"""
+""" Skim list building functions for charm analyses.. """
+
 
 __authors__ = [
     ""
@@ -14,14 +10,18 @@ __authors__ = [
 
 from basf2 import *
 from modularAnalysis import *
-from vertex import *
 
 
 def D0ToHpJm(path):
+    mySel = 'abs(d0) < 1 and abs(z0) < 3'
+    mySel += ' and 0.296706 < theta < 2.61799'
+    fillParticleList('pi+:mygood', mySel, path=path)
+    fillParticleList('K+:mygood', mySel, path=path)
+
     charmcuts = '1.80 < M < 1.93 and useCMSFrame(p)>2.2'
-    D0_Channels = ['pi+:loose K-:loose',
-                   'pi+:loose pi-:loose',
-                   'K+:loose K-:loose',
+    D0_Channels = ['pi+:mygood K-:mygood',
+                   'pi+:mygood pi-:mygood',
+                   'K+:mygood K-:mygood',
                    ]
 
     D0List = []
@@ -42,10 +42,10 @@ def DstToD0PiD0ToHpJm(path):
 
     DstList = []
     for chID, channel in enumerate(D0List):
-        reconstructDecay('D*+:HpJm' + str(chID) + ' -> D0:HpJm' + str(chID) + ' pi+:all', Dstcuts, chID, path=path)
+        reconstructDecay('D*+:HpJm' + str(chID) + ' -> D0:HpJm' + str(chID) + ' pi+:mygood', Dstcuts, chID, path=path)
         # vertexRave('D*+:HpJm' + str(chID), 0.000, path=path)
         DstList.append('D*+:HpJm' + str(chID))
-        DstList += D0List
+        # DstList += D0List
 
     return DstList
 
@@ -80,6 +80,7 @@ def DstToD0PiD0ToHpHmPi0(path):
     for chID, channel in enumerate(D0_Channels):
         reconstructDecay('D0:HpHmPi0' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
         # vertexTree('D0:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
+        # reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> pi+:all D0:HpHmPi0' + str(chID), Dstcuts, chID, path=path)
         reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> D0:HpHmPi0' + str(chID) + ' pi+:all', Dstcuts, chID, path=path)
         # vertexKFit('D*+:HpHmPi0' + str(chID), 0.001, path=path) REMOVED 27 Jun 2019 by Emma Oxford
         DstList.append('D*+:HpHmPi0' + str(chID))
@@ -195,61 +196,3 @@ def CharmRare(path):
         DstList.append('D*+:' + str(chID))
 
     return DstList
-
-
-def CharmSemileptonicList(path):
-    Dcuts = '1.82 < M < 1.92'
-    DstarSLcuts = '1.9 < M < 2.1'
-    antiD0SLcuts = 'massDifference(0)<0.15'
-
-    D_Channels = ['K-:95eff pi+:95eff',
-                  'K-:95eff pi+:95eff pi0:skim',
-                  'K-:95eff pi+:95eff pi+:95eff pi-:95eff',
-                  'K-:95eff pi+:95eff pi+:95eff pi-:95eff pi0:skim',
-                  ]
-
-    DList = []
-    for chID, channel in enumerate(D_Channels):
-        reconstructDecay('D0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
-        DList.append('D0:std' + str(chID))
-    copyLists('D0:all', DList, path=path)
-
-    DstarSLRecoilChannels = ['D0:all pi+:95eff',
-                             ]
-
-    antiD0List = []
-    for chID, channel in enumerate(DstarSLRecoilChannels):
-        reconstructRecoil(decayString='D*-:SL' + str(chID) + ' -> ' + channel,
-                          cut=DstarSLcuts, dmID=chID, path=path)
-        reconstructRecoilDaughter(decayString='anti-D0:SL' + str(chID) + ' -> D*-:SL' + str(chID) +
-                                  ' pi-:95eff', cut=antiD0SLcuts, dmID=chID, path=path)
-        antiD0List.append('anti-D0:SL' + str(chID))
-
-    nueRecoilChannels = []
-    for channel in antiD0List:
-        # nueRecoilChannels.append(channel + ' K+:95eff e-:std')
-        # nueRecoilChannels.append(channel + ' pi+:95eff e-:std')
-        nueRecoilChannels.append(channel + ' K+:95eff e-:95eff')
-        nueRecoilChannels.append(channel + ' pi+:95eff e-:95eff')
-
-    numuRecoilChannels = []
-    for channel in antiD0List:
-        # numuRecoilChannels.append(channel + ' K+:95eff mu-:std')
-        # numuRecoilChannels.append(channel + ' pi+:95eff mu-:std')
-        numuRecoilChannels.append(channel + ' K+:95eff mu-:95eff')
-        numuRecoilChannels.append(channel + ' pi+:95eff mu-:95eff')
-
-    nueList = []
-    for chID, channel in enumerate(nueRecoilChannels):
-        reconstructRecoilDaughter(decayString='anti-nu_e:SL' + str(chID) + ' -> ' + channel,
-                                  cut='', dmID=chID, path=path)
-        nueList.append('anti-nu_e:SL' + str(chID))
-
-    numuList = []
-    for chID, channel in enumerate(numuRecoilChannels):
-        reconstructRecoilDaughter(decayString='anti-nu_mu:SL' + str(chID) + ' -> ' + channel,
-                                  cut='', dmID=chID, path=path)
-        numuList.append('anti-nu_mu:SL' + str(chID))
-
-    allLists = nueList + numuList
-    return allLists

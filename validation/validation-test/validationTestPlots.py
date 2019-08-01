@@ -69,10 +69,32 @@ add_properties(
 
 gaus_h.Write()
 
+# Warnings
+# ======================================
+
+warnings_h = ROOT.TH1F(
+    "warnings_histogram",
+    "Histogram with missing check and description",
+    100, -3, 3
+)
+warnings_h.FillRandom("gaus", 500)
+
+add_properties(
+    warnings_h,
+    {
+        'Description': "",
+        'Check': "",
+        'Contact': "Kilian Lieret, Kilian.Lieret@campus.lmu.de",
+        'MetaOptions': "logx, nostats"
+    }
+)
+
+warnings_h.Write()
+
 # Exp histograms
 # ======================================
 
-exp_h = ROOT.TH1F("exp_histogram", " Exp Histogram", 100, 0, 10)
+exp_h = ROOT.TH1F("exp_histogram", " Expert Histogram", 100, 0, 10)
 
 exp_fn = ROOT.TF1("exp_fn", "exp(-x)", 0, 10)
 exp_h.FillRandom("exp_fn", 500)
@@ -81,8 +103,9 @@ add_properties(
     exp_h,
     {
         'Description': "Expert Validation Plot",
-        'Check': "Exp Histogram Check",
-        'Contact': "Exp Histogram Contact",
+        'Check': "Expert Histogram Check. Should only appear if expert button"
+                 "was checked.",
+        'Contact': "Expert Histogram Contact",
         'MetaOptions': "logy, nostats, C, expert"
     }
 )
@@ -162,13 +185,14 @@ for i in range(500):
 
 teff = ROOT.TEfficiency(gaus_passed, gaus_total)
 teff.SetName("TEfficiency")
+teff.SetTitle("Tefficiency")
 
 add_properties(
     teff,
     {
         'Description': "Efficiency plot of something",
         'Check': "Check For Something",
-        'Contact': "Contact Someone"
+        'Contact': "Contact Someone",
     }
 )
 
@@ -188,6 +212,7 @@ for i in range(50):
     graph_err.SetPoint(i, i + 1.0, passed)
 
 graph_err.SetName("TGraphErrors")
+graph_err.SetTitle("TGraphErrors")
 add_properties(
     graph_err,
     {
@@ -203,7 +228,7 @@ graph_err.Write()
 # ======================================
 
 # generate some user-defined HTML
-html_content = ROOT.TNamed("This is bold HTML tag", "<p><b>THIS IS USER'S HTML</b></p>")
+html_content = ROOT.TNamed("This is a bold HTML tag", "<p><b>THIS IS USER'S HTML</b></p>")
 
 html_content.Write()
 

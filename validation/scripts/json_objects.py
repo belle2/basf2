@@ -332,7 +332,8 @@ class ComparisonPlot(Plot):
             plot_path=None,
             comparison_text=None,
             height=None,
-            width=None):
+            width=None,
+            warnings=None):
         """
         Create a new ComparisonPlot object and fill all members
         """
@@ -363,6 +364,11 @@ class ComparisonPlot(Plot):
 
         #: path were the png and pdf files are located
         self.plot_path = plot_path
+
+        #: Warnings ("no contact" person etc.)
+        if warnings is None:
+            warnings = []
+        self.warnings = warnings
 
 
 class ComparisonNTuple(NTuple):

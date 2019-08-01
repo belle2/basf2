@@ -18,7 +18,6 @@ import os.path
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 from stdCharged import stdPi, stdK, stdE, stdMu

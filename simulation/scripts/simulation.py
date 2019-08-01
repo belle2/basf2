@@ -199,15 +199,10 @@ def add_simulation(
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
-    # BKLM digitization
-    if components is None or 'BKLM' in components:
-        bklm_digitizer = register_module('BKLMDigitizer')
-        path.add_module(bklm_digitizer)
-
-    # EKLM digitization
-    if components is None or 'EKLM' in components:
-        eklm_digitizer = register_module('EKLMDigitizer')
-        path.add_module(eklm_digitizer)
+    # KLM digitization
+    if components is None or 'BKLM' in components or 'EKLM' in components:
+        klm_digitizer = register_module('KLMDigitizer')
+        path.add_module(klm_digitizer)
 
     # background overlay executor - after all digitizers
     if bkgfiles is not None and bkgOverlay:

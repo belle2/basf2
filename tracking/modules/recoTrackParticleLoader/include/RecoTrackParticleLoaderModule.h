@@ -27,23 +27,23 @@ namespace Belle2 {
   class RecoTrackParticleLoaderModule : public Module {
 
   public:
-    // Constructor
+    /// Constructor
     RecoTrackParticleLoaderModule();
 
-    // Require and register the datastore arrays
+    /// Require and register the datastore arrays
     void initialize() override;
 
-    // Build Particle array
+    /// Build Particle array
     void event() override;
 
   private:
-    // Name of the collection holding the input RecoTracks
+    /// Name of the collection holding the input RecoTracks
     std::string m_recoTrackColName = "RecoTracks";
 
-    // Name of the particleList holding the output Particles
+    /// Name of the particleList holding the output Particles
     std::string m_particleListName = "ParticlesFromRecoTracks";
 
-    // PDG code of the hypothesis of the output Particles
+    /// PDG code of the hypothesis of the output Particles
     int m_pdgCode = 211;
   };
 }

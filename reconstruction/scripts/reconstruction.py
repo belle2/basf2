@@ -47,6 +47,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
+    :param nCDCHitsMax: the max number of CDC hits for an event to be reconstructed.
+    :param nSVDShaperDigitsMax: the max number of SVD shaper digits for an event to be reconstructed.
     """
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.

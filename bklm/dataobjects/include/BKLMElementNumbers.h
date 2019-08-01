@@ -12,6 +12,7 @@
 
 /* C++ headers. */
 #include <cstdint>
+#include <string>
 
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMStatus.h>
@@ -124,6 +125,13 @@ namespace Belle2 {
      */
     static bool checkChannelNumber(
       int section, int sector, int layer, int plane, int strip);
+
+    /**
+     * Get HSLB name.
+     * @param[in] copper Copper.
+     * @param[in[ slot   Slot.
+     */
+    static std::string getHSLBName(int copper, int slot);
 
     /**
      * Get maximal section number (0-based).

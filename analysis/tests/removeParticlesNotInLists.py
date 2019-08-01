@@ -57,8 +57,3 @@ with b2test_utils.clean_working_directory():
     B2RESULT("reduced size (kB):  " + str(statreduced / 1024))
     if statfull <= statreduced:
         B2FATAL("Reduced file is not smaller than original")
-
-# os.remove('removeparticlesnotinlists_D0ntuple.root')
-# os.remove('removeparticlesnotinlists_pi0ntuple.root')
-# os.remove('removeparticlesnotinlists_full.root')
-# os.remove('removeparticlesnotinlists_reduced.root')

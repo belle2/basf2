@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 
+#include <framework/gearbox/Unit.h>
+
 #include <cmath>
 
 namespace Belle2 {
@@ -64,8 +66,8 @@ namespace Belle2 {
         const double perpS = recoHit.getArcLength2D();
         const double recoZ = recoHit.getRecoZ();
 
-        const bool sameSign = SameSignChecker::sameSign(catZ(lowerQ, centerP, perpS) + centerZ0 - 100.0 * deltaQ - recoZ,
-                                                        catZ(upperQ, centerP, perpS) + centerZ0 + 100.0 * deltaQ - recoZ); //100 is a reference - size of CDC in cm
+        const bool sameSign = SameSignChecker::sameSign(catZ(lowerQ, centerP, perpS) + centerZ0 - 100.0 * Unit::cm * deltaQ - recoZ,
+                                                        catZ(upperQ, centerP, perpS) + centerZ0 + 100.0 * Unit::cm * deltaQ - recoZ); //100 is a reference - size of CDC in cm
         if (not sameSign) {
           return 1.0;
         } else {
@@ -99,7 +101,7 @@ namespace Belle2 {
       static double catZ(const double q, const double p, const double R)
       {
         //100 here is a reference  - size of CDC in cm
-        return 100.0 * q * (std::sqrt(1 - p * p) * std::cosh(R / 100.0 + std::asinh(p / std::sqrt(1 - p * p))) - 1);
+        return 100.0 * Unit::cm * q * (std::sqrt(1 - p * p) * std::cosh(R / (100.0 * Unit::cm) + std::asinh(p / std::sqrt(1 - p * p))) - 1);
       }
 
     public:

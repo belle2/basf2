@@ -26,7 +26,10 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
+
 #include "trg/ecl/TrgEclDataBase.h"
+#include "trg/ecl/TrgEclMapping.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
@@ -85,7 +88,7 @@ namespace Belle2 {
     StoreArray<TRGECLUnpackerStore>     m_TRGECLTCArray;
     StoreArray<TRGECLUnpackerSumStore>  m_TRGECLSumArray;
     StoreArray<TRGECLUnpackerEvtStore>  m_TRGECLEvtArray;
-
+    StoreArray<TRGECLCluster>  m_TRGECLClusterArray;
   };
 
 } // end namespace Belle2

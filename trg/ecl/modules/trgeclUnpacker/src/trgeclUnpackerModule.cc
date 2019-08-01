@@ -13,7 +13,8 @@
 // 2.00 : 2018/02/17 : 8 window data (ETM Ver. 100)
 // 3.00 : 2018/07/31 : ETM version dependence included
 // 3.01 : 2019/02/25 : Trigger bit modify
-// 3.02 : 2019/06/24 : 20GeV overflow bit
+// 3.01 : 2019/05/10 : Update Trigger summary contaning Cluster information
+// 3.03 : 2019/06/24 : 20GeV overflow bit
 //---------------------------------------------------------------
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
@@ -51,6 +52,7 @@ void TRGECLUnpackerModule::initialize()
   m_TRGECLSumArray.registerInDataStore();
   m_TRGECLTCArray.registerInDataStore();
   m_TRGECLEvtArray.registerInDataStore();
+  m_TRGECLClusterArray.registerInDataStore();
 }
 
 void TRGECLUnpackerModule::beginRun() {}
@@ -276,6 +278,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int m_sumNum       = 0;
 
   TrgEclDataBase database;
+  TrgEclMapping mapping;
 
   vector<int> cl_1d;
   vector<vector<int>> cl_2d;
@@ -559,6 +562,10 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int etot_i     = 0;
   int etot_c     = 0;
   int etot_f     = 0;
+  int cl_tcid = 0;
+  int cl_thetaid = 0;
+  int cl_phiid = 0;
+  int m_clNum    = 0;
 
 
   int evt_v_size = evt_2d_vector.size();
@@ -674,6 +681,29 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
       evt_time_win = 1;
     }
 
+    for (int icluster = 0; icluster < 6; icluster++) {
+      if (evt_cl_energy[icluster] == 0 || evt_cl_theta[icluster] == 0 || evt_cl_phi[icluster] == 0) {continue;}
+      cl_tcid = mapping.getTCIdFromPosition(evt_cl_theta[icluster], evt_cl_phi[icluster]);
+      if (cl_tcid == 0) {continue;}
+      cl_thetaid = mapping.getTCThetaIdFromTCId(cl_tcid);
+      cl_phiid = mapping.getTCPhiIdFromTCId(cl_tcid);
+
+      m_TRGECLClusterArray.appendNew();
+      m_clNum    =  m_TRGECLClusterArray.getEntries() - 1;
+      m_TRGECLClusterArray[m_clNum] ->setEventId(n_basf2evt);
+      m_TRGECLClusterArray[m_clNum] ->setClusterId(icluster);
+      m_TRGECLClusterArray[m_clNum] ->setEventRevo(evt_revo);
+
+      m_TRGECLClusterArray[m_clNum] ->setMaxTCId(cl_tcid);  // center of Cluster
+      m_TRGECLClusterArray[m_clNum] ->setMaxThetaId(cl_thetaid);
+      m_TRGECLClusterArray[m_clNum] ->setMaxPhiId(cl_phiid);
+      m_TRGECLClusterArray[m_clNum] ->setClusterId(icluster);
+      m_TRGECLClusterArray[m_clNum] ->setEnergyDep((double)evt_cl_energy[icluster] * 5.25); // MeV
+      m_TRGECLClusterArray[m_clNum] ->setTimeAve((double)evt_cl_time[icluster]);
+      m_TRGECLClusterArray[m_clNum]->setPositionX(mapping.getTCPosition(cl_tcid).X());
+      m_TRGECLClusterArray[m_clNum]->setPositionY(mapping.getTCPosition(cl_tcid).Y());
+      m_TRGECLClusterArray[m_clNum]->setPositionZ(mapping.getTCPosition(cl_tcid).Z());
+    }
     m_TRGECLEvtArray.appendNew();
     m_evtNum = m_TRGECLEvtArray.getEntries() - 1;
     m_TRGECLEvtArray[m_evtNum]->setEventId(n_basf2evt);

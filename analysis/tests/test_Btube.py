@@ -58,7 +58,7 @@ my_path = b2.create_path()
 # load input ROOT file
 
 ma.inputMdst('default',
-             Belle2.FileSystem.findFile('analysis/tests/mdst.root'),
+             b2test_utils.require_file('analysis/tests/mdst.root'),
              path=my_path)
 
 stdc.stdPi(listtype='all', path=my_path)
@@ -133,5 +133,6 @@ ma.variablesToNtuple('Upsilon(4S):sig', U4S_vars,
                      filename=output_file, treename='u4stree', path=my_path)
 ma.variablesToNtuple('B+:tag', common_vars,
                      filename=output_file, treename='tagtree', path=my_path)
+
 with b2test_utils.clean_working_directory():
     b2test_utils.safe_process(my_path)

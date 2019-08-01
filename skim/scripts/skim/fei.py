@@ -427,8 +427,8 @@ def B0SL(path):
 
     * B0 -> D- e+ nu
     * B0 -> D- mu+ nu
-    * B0 -> D+* e+ nu
-    * B0 -> D+* mu+ nu
+    * B0 -> D-* e+ nu
+    * B0 -> D-* mu+ nu
     * B0 -> anti-D0 pi- e+ nu
     * B0 -> anti-D0 pi- mu+ nu
     * B0 -> anti-D0* pi- e+ nu
@@ -491,8 +491,8 @@ def BplusSL(path):
     * B+ -> anti-D0* mu+ nu
     * B+ -> D- pi+ e+ nu
     * B+ -> D- pi+ mu+ nu
-    * B+ -> D+* pi+ e+ nu
-    * B+ -> D+* pi+ mu+ nu
+    * B+ -> D-* pi+ e+ nu
+    * B+ -> D-* pi+ mu+ nu
 
     This function applies cuts to the FEI-reconstructed tag side B, and
     the pre-cuts and FEI must be applied separately.

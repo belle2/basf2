@@ -7,11 +7,11 @@ there is a clone of this file which requires the presence of mdst12.root (a
 larger file) that is present on the buildbot server but not bamboo
 """
 
-from ROOT import Belle2
+import b2test_utils
 from basf2 import set_random_seed, create_path, process, LogLevel
 
 set_random_seed("1337")
-testinput = [Belle2.FileSystem.findFile('analysis/tests/mdst.root')]
+testinput = [b2test_utils.require_file('analysis/tests/mdst.root')]
 fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']
 
 ###############################################################################

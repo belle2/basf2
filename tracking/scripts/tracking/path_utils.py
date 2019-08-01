@@ -350,9 +350,9 @@ def add_svd_track_finding(
                         outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
                         outputRelationRecoTrackStoreArrayName=comb_tracks,
                         writeOutDirection="backward",
-                        stateBasicFilterParameters={"maximalHitDistance": 0.75},
+                        stateBasicFilterParameters={"maximalHitDistance": 0.15},
                         pathFilter="arc_length",
-                        maximalLayerJump=2)
+                        maximalLayerJump=4)
 
         path.add_module("CDCCKFTracksCombiner",
                         CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",

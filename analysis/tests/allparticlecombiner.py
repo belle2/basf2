@@ -38,7 +38,7 @@ class TestAllParticleCombiner(unittest.TestCase):
 
         ma.combineAllParticles(['pi+:fromPV'], 'vpho:PVFit', path=main)
 
-        vertexKFit('vpho:PVFit', conf_level=-1, constraint='iptube', path=main, silence_warning=True)
+        vertexKFit('vpho:PVFit', conf_level=-1, constraint='iptube', path=main)
 
         variables.addAlias('PVX', 'x')
         variables.addAlias('PVY', 'y')

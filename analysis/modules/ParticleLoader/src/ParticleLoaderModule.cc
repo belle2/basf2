@@ -35,6 +35,7 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 #include <utility>
 
@@ -67,6 +68,18 @@ namespace Belle2 {
 
     addParam("useMCParticles", m_useMCParticles,
              "Use MCParticles instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+
+    addParam("useROEs", m_useROEs,
+             "Use ROE instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+
+    addParam("roeMaskName", m_roeMaskName,
+             "ROE mask name to load", std::string(""));
+
+    addParam("sourceParticleListName", m_sourceParticleListName,
+             "Particle list name from which we need to get ROEs", std::string(""));
+
+    addParam("useMissing", m_useMissing,
+             "If true, the Particle List will be filled with missing momentum from the ROE and signal particle.", false);
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
@@ -129,7 +142,7 @@ namespace Belle2 {
         int pdgCode  = mother->getPDGCode();
         string listName = mother->getFullName();
 
-        if (not isValidPDGCode(pdgCode) and m_useMCParticles == false)
+        if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 
         // if we're not loading MCParticles and we are loading K0S, Lambdas, or photons --> ee then this decaystring is a V0
@@ -141,9 +154,17 @@ namespace Belle2 {
 
         int nProducts = m_decaydescriptor.getNDaughters();
         if (mdstSourceIsV0 == false) {
-          if (nProducts > 0)
-            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
-                    << ". DecayString should not contain any daughters, only the mother particle.");
+          if (nProducts > 0) {
+            if (!m_useROEs) {
+              B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                      << ". DecayString should not contain any daughters, only the mother particle.");
+            } else {
+              B2INFO("ParticleLoaderModule: Replacing the source particle list name by " <<
+                     m_decaydescriptor.getDaughter(0)->getMother()->getFullName()
+                     << " all other daughters will be ignored.");
+              m_sourceParticleListName = m_decaydescriptor.getDaughter(0)->getMother()->getFullName();
+            }
+          }
         } else {
           if (nProducts != 2)
             B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
@@ -177,7 +198,10 @@ namespace Belle2 {
 
         // add PList to corresponding collection of Lists
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
-        if (m_useMCParticles) {
+        if (m_useROEs) {
+          B2INFO("   -> MDST source: RestOfEvents");
+          m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+        } else if (m_useMCParticles) {
           B2INFO("   -> MDST source: MCParticles");
           m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
         } else {
@@ -230,8 +254,9 @@ namespace Belle2 {
       particleExtraInfoMap.create();
     }
 
-
-    if (m_useMCParticles)
+    if (m_useROEs)
+      roeToParticles();
+    else if (m_useMCParticles)
       mcParticlesToParticles();
     else {
       tracksToParticles();
@@ -252,6 +277,83 @@ namespace Belle2 {
                   << get<c_PListName>(track2Plist));
       }
   }
+
+  void ParticleLoaderModule::roeToParticles()
+  {
+    if (m_ROE2Plists.empty()) // nothing to do
+      return;
+    // Multiple particle lists are not supported
+    auto roe2Plist = m_ROE2Plists[0];
+    string listName = get<c_PListName>(roe2Plist);
+    string antiListName = get<c_AntiPListName>(roe2Plist);
+    int pdgCode = get<c_PListPDGCode>(roe2Plist);
+    bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(roe2Plist);
+
+    StoreObjPtr<ParticleList> plist(listName);
+    plist.create();
+    plist->initialize(pdgCode, listName);
+
+    if (!isSelfConjugatedParticle) {
+      StoreObjPtr<ParticleList> antiPlist(antiListName);
+      antiPlist.create();
+      antiPlist->initialize(-1 * pdgCode, antiListName);
+      antiPlist->bindAntiParticleList(*(plist));
+    }
+    if (m_sourceParticleListName != "") {
+      // Take related ROEs from a particle list
+      StoreObjPtr<ParticleList> pList(m_sourceParticleListName);
+      if (!pList.isValid())
+        B2FATAL("ParticleList " << m_sourceParticleListName << " could not be found or is not valid!");
+      for (unsigned int i = 0; i < pList->getListSize(); i++) {
+        RestOfEvent* roe = pList->getParticle(i)->getRelatedTo<RestOfEvent>();
+        if (!roe) {
+          B2ERROR("ParticleList " << m_sourceParticleListName << " has no associated ROEs!");
+        } else {
+          addROEToParticleList(roe, pdgCode);
+        }
+      }
+
+    } else {
+      // Take all ROE if no particle list provided
+      StoreArray<RestOfEvent> roes;
+      for (int i = 0; i < roes.getEntries(); i++) {
+        addROEToParticleList(roes[i]);
+      }
+    }
+  }
+
+  void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int pdgCode, bool isSelfConjugatedParticle)
+  {
+
+    Particle* newPart = nullptr;
+    if (!m_useMissing) {
+      // Convert ROE to particle
+      newPart = roe->convertToParticle(m_roeMaskName, pdgCode, isSelfConjugatedParticle);
+    } else {
+      // Create a particle from missing momentum
+      StoreArray<Particle> particles;
+      auto* signalSideParticle = roe->getRelatedFrom<Particle>();
+      PCmsLabTransform T;
+      TLorentzVector boost4Vector = T.getBoostVector();
+
+      TLorentzVector signal4Vector = signalSideParticle->get4Vector();
+      TLorentzVector roe4Vector = roe->get4Vector(m_roeMaskName);
+      TLorentzVector missing4Vector;
+      missing4Vector.SetVect(boost4Vector.Vect() - (signal4Vector.Vect() + roe4Vector.Vect()));
+      missing4Vector.SetE(missing4Vector.Vect().Mag());
+      newPart = particles.appendNew(missing4Vector, pdgCode);
+
+    }
+    for (auto roe2Plist : m_ROE2Plists) {
+      string listName = get<c_PListName>(roe2Plist);
+      auto& cut = get<c_CutPointer>(roe2Plist);
+      StoreObjPtr<ParticleList> plist(listName);
+      if (cut->check(newPart))
+        plist->addParticle(newPart);
+    }
+
+  }
+
 
   void ParticleLoaderModule::v0sToParticles()
   {

@@ -14,6 +14,7 @@
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
+#include <cdc/simulation/CDCSimControlPar.h>
 
 #include <framework/dataobjects/EventT0.h>
 
@@ -118,6 +119,11 @@ namespace Belle2 {
        * Cached reference to CDC GeoControlPar object.
        */
       const CDCGeoControlPar& m_gcp;
+
+      /**
+       * Cached reference to CDC SimControlPar object.
+       */
+      const CDCSimControlPar& m_scp;
 
       /**
        * Cached reference to CDC GeometryPar object.

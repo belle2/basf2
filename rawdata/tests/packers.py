@@ -19,7 +19,7 @@ def create_digits():
     sim.add_module("EvtGenInput")
     add_simulation(sim)
     sim.add_module("RootOutput", outputFileName="digits.root", branchNames=[
-        "PXDDigits", "SVDShaperDigits", "SVDEventInfo", "CDCDigits", "TOPRawDigits", "ARICHDigits",
+        "PXDDigits", "SVDShaperDigits", "SVDEventInfoSim", "CDCDigits", "TOPRawDigits", "ARICHDigits",
         "BKLMDigits", "EKLMDigits", "ECLDigits", "ECLDsp",
     ])
     process(sim)

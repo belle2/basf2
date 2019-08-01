@@ -6,7 +6,7 @@
   <input>PartGunChargedStableGenSim.root</input>
   <output>EvtGenSimRec_dedx.root</output>
   <description>Generates dE/dx debug data (DedxTracks) for testing</description>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jkumar@andrew.cmu.edu</contact>
 </header>
 """
 

@@ -7,7 +7,7 @@
   <output>CombinedPIDPerformance.root</output>
   <description>This steering script fully reconstructs particle gun events for a set of charged stable particles,
   making plots for PID performance validation</description>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jbennett@phy.olemiss.edu</contact>
   <interval>release</interval>
 </header>
 """

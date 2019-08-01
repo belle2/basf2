@@ -4,6 +4,7 @@ import unittest
 import os
 import tempfile
 import basf2
+import b2test_utils
 import modularAnalysis as ma
 from variables import variables
 from vertex import vertexKFit
@@ -23,10 +24,11 @@ class TestAllParticleCombiner(unittest.TestCase):
         main = basf2.create_path()
 
         basf2.set_random_seed("1234")
+        inputfile = b2test_utils.require_file(
+            'analysis/tests/mdst.root', py_case=self)
         main.add_module(
             'RootInput',
-            inputFileNames=[
-                Belle2.FileSystem.findFile('analysis/tests/mdst.root')],
+            inputFileNames=[inputfile],
             logLevel=basf2.LogLevel.ERROR)
 
         ma.fillParticleList('pi+:fromPV', 'dr < 2 and abs(dz) < 5', path=main)

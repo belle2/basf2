@@ -69,6 +69,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
                      output_variable='networkOutput', target='qrCombined', overwrite=False,
                      transform_to_probability=False, signal_fraction=-1.0, classifier_args=None,
                      train_valid_fraction=.92, mva_steering_file='analysis/scripts/dft/tensorflow_dnn_interface.py',
+                     additional_roe_filter=None,
                      path=None):
     """
     DeepFlavorTagger classifier function.
@@ -86,6 +87,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
     :param classifier_args:dictionary, costumized arguments for the mlp
     :param train_valid_fraction: float, train-valid fraction. if transform to probability is
     enabled, train valid fraction will be splitted to a test set (.5)
+    :param additional_roe_filter: string, additional cutstring applied for the particle lists in the RoE
     :param path: basf2 path obj
     :return: None
     """
@@ -133,10 +135,15 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
     dft_particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
 
-    cutAndCopyList(dft_particle_lists[0], roe_particle_list, 'charge > 0 and isInRestOfEvent == 1 and p < infinity',
-                   writeOut=True, path=roe_path)
-    cutAndCopyList(dft_particle_lists[1], roe_particle_list, 'charge < 0 and isInRestOfEvent == 1 and p < infinity',
-                   writeOut=True, path=roe_path)
+    pos_cut = 'charge > 0 and isInRestOfEvent == 1 and p < infinity'
+    neg_cut = 'charge < 0 and isInRestOfEvent == 1 and p < infinity'
+
+    if additional_roe_filter is not None:
+        pos_cut = pos_cut + ' and ' + additional_roe_filter
+        neg_cut = neg_cut + ' and ' + additional_roe_filter
+
+    cutAndCopyList(particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
+    cutAndCopyList(particle_lists[1], roe_particle_list, neg_cut, writeOut=True, path=roe_path)
 
     # sort pattern for tagging specific variables
     rank_variable = 'p'

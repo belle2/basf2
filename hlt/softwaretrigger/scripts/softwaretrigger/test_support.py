@@ -99,6 +99,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
 
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 
+    basf2.print_path(path)
     basf2.process(path)
 
 

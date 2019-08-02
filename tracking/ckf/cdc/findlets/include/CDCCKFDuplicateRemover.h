@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/ckf/cdc/entities/CDCCKFResult.h>
 
+#include <ecl/dataobjects/ECLShower.h>
+
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
@@ -72,17 +74,13 @@ namespace Belle2 {
       // If both charge assumptions lead to a good track, only pick one of the to avoid duplicate tracks
       auto iter = goodResults.begin();
       while (iter < goodResults.end()) {
-        double rClus = iter->front().getSeed()->getPositionSeed().Perp();
-        double zClus = iter->front().getSeed()->getPositionSeed().Z();
-
         auto iter2 = iter + 1;
         bool increaseIter = true;
         while (iter2 < goodResults.end()) {
           // find tracks from same seed
-          if (std::abs(iter2->front().getSeed()->getPositionSeed().Perp() - rClus) < 0.000001
-              && std::abs(iter2->front().getSeed()->getPositionSeed().Z() - zClus) < 0.000001) {
+          if (iter2->front().getSeed()->getRelated<ECLShower>() == iter2->front().getSeed()->getRelated<ECLShower>()) {
             // let filter decide which one to keep
-            bool selectFirst = m_filter_duplicateTrack({&*iter, &*iter2});
+            bool selectFirst = m_filter_duplicateTrack({&*iter, &*iter2}) > 0;
             if (selectFirst) {
               iter2 = goodResults.erase(iter2);
             } else {
@@ -125,13 +123,13 @@ namespace Belle2 {
           if (std::abs(TVector2::Phi_mpi_pi(iter2->front().getSeed()->getPositionSeed().Phi() - phiClus)) < 2.
               && std::abs(iter2->front().getSeed()->getPositionSeed().Theta() - thetaClus) < 0.1) {
             // let filter decide which one to keep
-            bool isDuplicate = m_filter_duplicateSeed({&*iter, &*iter2});
+            bool isDuplicate = m_filter_duplicateSeed({&*iter, &*iter2}) > 0;
             if (! isDuplicate) {
               B2DEBUG(100, "Keeping both tracks");
               ++iter2;
             } else {
               B2DEBUG(100, "Duplicate hits found");
-              bool selectFirst = m_filter_duplicateTrack({&*iter, &*iter2});
+              bool selectFirst = m_filter_duplicateTrack({&*iter, &*iter2}) > 0;
               if (selectFirst) {
                 iter2 = goodResults.erase(iter2);
               } else {

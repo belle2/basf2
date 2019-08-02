@@ -176,7 +176,8 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     }
 
     if (clockwise1 == clockwise2) {
-      B2WARNING("Something went wrong during helix extrapolation.");
+      B2WARNING("Something went wrong during helix extrapolation. Skipping track.");
+      continue;
     }
 
     TVector3 mompos;

@@ -51,6 +51,8 @@ namespace Belle2 {
     {
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalLayerJump"),
                                     m_maximalLayerJump, "Maximal jump over N layers", m_maximalLayerJump);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalLayerJumpBackwardSeed"),
+                                    m_maximalLayerJump_backwardSeed, "Maximal jump over N layers", m_maximalLayerJump_backwardSeed);
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalDeltaPhi"),
                                     m_maximalDeltaPhi, "Maximal distance in phi between wires for Z=0 plane", m_maximalDeltaPhi);
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitFindingDirection"),
@@ -87,7 +89,9 @@ namespace Belle2 {
         const size_t nHits = wireHits.size();
         m_wireHitCache.reserve(nHits);
         for (auto  hitPtr : wireHits) {
-          // to speed things up, don't consider background/taken hits at all (and not just in the loop below)
+          // to speed things up, don't consider background/taken hits at all (and not just in the loop below).
+          // I can't just remove them from the list, otherwise the relation to the wireHits is broken
+          // so set the layer index to a high number.
           if (hitPtr->getAutomatonCell().hasBackgroundFlag() || hitPtr->getAutomatonCell().hasTakenFlag()) {
             m_wireHitCache.push_back(CDCCKFWireHitCache{99999, 0.});
           } else {
@@ -157,7 +161,7 @@ namespace Belle2 {
 
         const auto iCLayer =  m_wireHitCache[idx].icLayer; // wireHit->getWire().getICLayer();
         if (m_param_writeOutDirection == TrackFindingCDC::EForwardBackward::c_Backward && lastState.isSeed()) {
-          if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump_eclSeed) {
+          if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump_backwardSeed) {
             continue;
           }
         } else if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {
@@ -184,8 +188,8 @@ namespace Belle2 {
   private:
     /// Maximum allowed step over layers
     int m_maximalLayerJump = 2;
-    /// Maximum allowed step over layers
-    int m_maximalLayerJump_eclSeed = 3;
+    /// Maximum allowed step over layers (if outside->in CKF) for first step after seed (e.g. ECLShower)
+    int m_maximalLayerJump_backwardSeed = 3;
     /// Maximal distance in phi between the path last hit/seed and the candidate hit
     double m_maximalDeltaPhi =  TMath::Pi() / 8;
     /// Parameter for the direction in which the tracks are built

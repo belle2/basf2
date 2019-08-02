@@ -237,26 +237,6 @@ namespace Belle2 {
     double particleDeltaE(const Particle* part);
 
     /**
-     * return prob(chi^2,ndf) of fit
-     */
-    double particlePvalue(const Particle* part);
-
-    /**
-     * return number of daughter particles
-     */
-    double particleNDaughters(const Particle* part);
-
-    /**
-     * return flavor type
-     */
-    double particleFlavorType(const Particle* part);
-
-    /**
-     * return charge
-     */
-    double particleCharge(const Particle* part);
-
-    /**
      * return component x of 3-momentum recoiling against given Particle
      */
     double recoilPx(const Particle* particle);

@@ -47,20 +47,24 @@ TH2F* create2DHisto(const char* name, const char* title,
 }
 
 // ======================================================================
-void addDetails(TH1F* h, const char* descr, const char* check, const char* contact_str)
-{
-      h->GetListOfFunctions()->Add(new TNamed("Description", descr));
-      h->GetListOfFunctions()->Add(new TNamed("Check", check));
-      h->GetListOfFunctions()->Add(new TNamed("Contact", contact_str));
-
-}
-
-void add2Details(TH2F* h, const char* descr, const char* check, const char* contact_str)
+void addDetails(TH1F* h, const char* descr, const char* check, const char* contact_str, bool isShifter=true)
 {
   h->GetListOfFunctions()->Add(new TNamed("Description", descr));
   h->GetListOfFunctions()->Add(new TNamed("Check", check));
   h->GetListOfFunctions()->Add(new TNamed("Contact", contact_str));
+  if (isShifter)
+    h->GetListOfFunctions()->Add(new TNamed("MetaOption", "shifter"));
+  
+}
 
+void add2Details(TH2F* h, const char* descr, const char* check, const char* contact_str, bool isShifter=true)
+{
+  h->GetListOfFunctions()->Add(new TNamed("Description", descr));
+  h->GetListOfFunctions()->Add(new TNamed("Check", check));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", contact_str));
+  if (isShifter)
+    h->GetListOfFunctions()->Add(new TNamed("MetaOption", "shifter"));
+  
 }
 
 // ======================================================================

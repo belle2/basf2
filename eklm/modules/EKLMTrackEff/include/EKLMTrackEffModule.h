@@ -10,6 +10,18 @@
 
 #pragma once
 
+
+/* C++ headers. */
+#include<map>
+
+/* ROOT headers. */
+#include "TH1.h"
+#include "TH2F.h"
+#include "TFile.h"
+#include "TGraph.h"
+#include "TGraphErrors.h"
+
+/* Belle2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
@@ -24,18 +36,6 @@
 #include <eklm/geometry/TransformData.h>
 #include <eklm/geometry/TransformDataGlobalAligned.h>
 
-
-// ROOT includes
-#include "TH1.h"
-#include "TH2F.h"
-#include "TFile.h"
-#include "TGraph.h"
-#include "TGraphErrors.h"
-
-// std lib includes
-
-#include<map>
-
 namespace Belle2 {
 
   /**
@@ -48,159 +48,256 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * Constructor.
+     */
     EKLMTrackEffModule();
 
+    /**
+     * Destructor.
+     */
     virtual ~EKLMTrackEffModule();
 
+    /**
+     * Initializer.
+     */
     void initialize() override;
 
+
+    /**
+     * This method is called for each event.
+     */
     void event() override;
 
+    /**
+     * This method is called in the end of event processing.
+     */
     void terminate() override;
 
-    // Was ExtHit entered in EKLM sensetive volume? If it isn`t returns tuple of -1.
-    // If it is returns copyid, idEndcap, idLayer, idSector, idPlane, idStrip
-    std::tuple<int, int, int, int, int, int> check_exthit(const ExtHit& ext_hit);
+    /**
+     * Was ExtHit entered in EKLM sensetive volume? If it isn`t returns tuple of -1.
+     * If it is returns copyid, idEndcap, idLayer, idSector, idPlane, idStrip
+     */
+    std::tuple<int, int, int, int, int, int> checkExtHit(const ExtHit& ext_hit) const;
 
-    // Find min distance from ext_hit to Hit2d in event
-    double get_min_dist(const ExtHit& ext_hit);
+    /**
+     * Find min distance from ext_hit to Hit2d in event
+     */
+    double getMinDist(const ExtHit& ext_hit) const;
 
-
-    /*                     SIMPLE MUID
-    Calculating number of Hit2ds in forward and backward parts
-    If it is many hits in one of the endcaps can be sure that this muon track
-    And the second track with high probability is in opposite endcap (because we choosed events with 2trks)
-    If it is so, calculate efficiency in opposite endcap
-    */
-    std::pair<bool, bool> MuID(int number_of_required_hits);
-
-    // Calculate hist errors
-    double error_calc(int64_t num_of_hits, int64_t num_of_exthits);
-
-    // Matching of digits with ext hits
-    bool digits_matching(const ExtHit& ext_hit, double allowed_distance);
-
-    // MAtching of Hit2ds wih exthits
-    bool hit2ds_matching(const ExtHit& ext_hit, double allowed_distance);
-
-    // Min dist (in number of strips) to ext hit from 1d hit
-    double get_min_1d_dist(const ExtHit& ext_hit);
-
-    //FInd sum energy of tracks
-    double get_sum_track_energy(const StoreArray<Track>& selected_tracks);
-
-    // Find angle between 2 tracks
-    double angle_between_tracks(const StoreArray<Track>& selected_tracks);
-
-    // Fiiling hist of correlation between tracks in event
-    // Works only in case of 2 tracks!
-    void ext_hits_corr(StoreArray<Track>& selected_tracks);
-    void hit2ds_corr();
-    void theta_corr(StoreArray<Track>& selected_tracks);
+    /**
+     * Find dist (in number of strips) to ext hit from 1d hit
+     */
+    double getMinDist1d(const ExtHit& ext_hit) const;
 
 
-    // Function to determine sector efficiency from maps
-    std::pair<std::map<int, std::vector<double> >, std::map<int, std::vector<double> > > calculate_sector_eff(
-      std::map<int, std::map<int, int64_t> > sector_matching, std::map<int, std::map<int, int64_t> > sector_all);
+    /**                     SIMPLE MUID
+     * Calculating number of Hit2ds in forward and backward parts
+     * If there are many hits in one of the endcaps can be sure that this is muon track
+     * And the second track with high probability is in opposite endcap (because we choosed events with 2trks)
+     * If it is so, calculate efficiency in opposite endcap
+     */
+    std::pair<bool, bool> trackCheck(int number_of_required_hits) const;
 
-    // Calculate distance to IP and make cut on this distance
-    bool d0_z0_cut(const StoreArray<Track>& selected_tracks, double dist);
+    /**
+     * Calculate hist errors
+     */
+    double errorCalculation(int64_t num_of_hits, int64_t num_of_exthits) const;
 
-    // Making theta cut
-    bool theta_acceptance(const StoreArray<Track>& selected_tracks);
+    /**
+     *  Matching of digits with ext hits
+     */
+    bool digitsMatching(const ExtHit& ext_hit, double allowed_distance) const;
+
+    /**
+     * Matching of Hit2ds wih exthits
+     */
+    bool hit2dsMatching(const ExtHit& ext_hit, double allowed_distance) const;
+
+    /**
+     * Find sum energy of tracks in event
+     */
+    double getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const;
+
+    /**
+     * Find theta angle between 2 tracks
+     */
+    double angleThetaBetweenTracks(const StoreArray<Track>& selected_tracks) const;
+
+    /**
+     * Fiiling hist of correlation between extHits of tracks in event
+     * Works only in case of 2 tracks!
+     */
+    void extHitsCorr(const StoreArray<Track>& selected_tracks);
+
+    /**
+     * Fiiling hist of correlation between Hit2ds in event
+     * Works only in case of 2 tracks!
+     */
+    void hit2dsCorr();
+
+    /**
+     * Fiiling hist of correlation between theta angle of tracks in event
+     * Works only in case of 2 tracks!
+     */
+    void thetaCorr(const StoreArray<Track>& selected_tracks);
+
+
+    /**
+     * Function to determine sector efficiency from maps
+     */
+    std::pair<std::map<int, std::vector<double> >, std::map<int, std::vector<double> > >
+    calculate_sector_eff(std::map<int, std::map<int, int64_t> > sector_matching,
+                         std::map<int, std::map<int, int64_t> > sector_all);
+
+    /**
+     * Calculate distance to IP and make cut on this distance
+     */
+    bool d0z0Cut(const StoreArray<Track>& selected_tracks, double dist) const;
+
+    /**
+     * Making theta cut
+     */
+    bool thetaAcceptance(const StoreArray<Track>& selected_tracks) const;
 
   private:
 
-    // Arrays for storing data objects
-    StoreArray<EKLMDigit> digits;
-    StoreArray<EKLMHit2d> hit2ds;
+    /** Digits. */
+    StoreArray<EKLMDigit> m_digits;
+
+    /** Hit2ds. */
+    StoreArray<EKLMHit2d> m_hit2ds;
+
+    /** Tracks. */
     StoreArray<Track> m_tracks;
+
+    /** RecoTracks. */
     StoreArray<RecoTrack> m_recoTracks;
+
+    /** TrackFitResult. */
     StoreArray<TrackFitResult> m_trackFitResults;
+
+    /** ExtHits. */
     StoreArray<ExtHit> m_extHits;
-    StoreArray<EKLMAlignmentHit> hitAlign;
-    StoreArray<KLMDigitEventInfo> m_DigitEventInfos;
 
-    // Geometry
-    const EKLM::ElementNumbersSingleton* m_eklmElementNumbers;
+    /** AlignmentHits. */
+    StoreArray<EKLMAlignmentHit> m_hitAlign;
+
+    /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
-    const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
 
-    // Hist for z distribution of Hit2ds
-    TH1F* Hit2d_z_distrib;
-    TH1F* Hit2d_matched_distrib;
-    std::map<int, TH1F*> Hit2d_sector_hists;
+    /** Hist for z distribution of Hit2ds */
+    TH1F* m_Hit2dZDistrib;
 
-    // Hists for z distribution of ExtHits by sectors
-    TH1F* Ext_hits_z_distrib;
-    TH1F* Ext_hits_layer_distrib;
-    std::map<int, TH1F*> sector_hists;
+    /** Hist for layers distribution of matched Hit2ds */
+    TH1F* m_Hit2dMatchedDistrib;
 
-    // Hist for number of exthits per event
-    TH1F* n_exthits;
-    TH1F* n_Hit2ds;
+    /** Map of hists for layers distribution of matched Hit2ds by sectors*/
+    std::map<int, TH1F*> m_Hit2dSectorHists;
 
-    // Hists for z distribution of ExtHits with track and cuts
-    TH1F* Ext_hits_z_distrib_tracks;
-    TH1F* Ext_hits_layer_distrib_tracks;
-    std::map<int, TH1F*> sector_hists_track;
+    /** Hist for z distribution of ExtHits */
+    TH1F* m_ExtHitsZDistribution;
 
-    // Hist for tracks momentum
-    TH1F* h_TrackMomentum;
+    /** Hist for layer distribution of ExtHits */
+    TH1F* m_ExtHitsLayerDistribution;
 
-    // Hist for z/theta distribution of extHits
-    TH2F* ext_hit_z_theta;
+    /** Hists for z distribution of ExtHits by layer */
+    std::map<int, TH1F*> m_ExtHitsSectorHists;
 
-    // Hits of minimal Hit2ds distance
-    TH1F* min_hit_dist;
+    /** Hist for number of exthits per event */
+    TH1F* m_extHitsNum;
 
-    // 1d hits min dist to exthit
-    TH1F* hit1d_min_dist;
+    /** Hist for number of Hit2ds per event */
+    TH1F* m_Hit2dsNum;
 
-    // Corelation hist
-    TH2F* hits_corr;
-    TH2F* hit2ds_corr_hist;
-    TH2F* theta_corr_hist;
+    /** Hist for z distribution of ExtHits with track and cuts */
+    TH1F* m_ExtHitsZDistribTracks;
 
-    // Energy sum of tracks hist
-    TH1F* muons_energy;
+    /** Hist for layer distribution of ExtHits with track and cuts */
+    TH1F* m_ExtHitsLayerDistribTracks;
 
-    // D0 and Z0 distributions
-    TH1F* d0_distr;
-    TH1F* z0_distr;
+    /** Hists for layer distribution of ExtHits with track and cuts by sector */
+    std::map<int, TH1F*> m_ExtHitsSectorHistsTrack;
 
-    // Tracks theta
-    TH1F* muons_theta;
-    TH1F* muons_theta_without_cut;
-    TH1F* muons_angle;
+    /** Hist for z/theta distribution of extHits */
+    TH2F* m_ExtHitZTheta;
 
-    int m_eventCounter = 0;
+    /** Hits of minimal distance between Hit2d and extHit*/
+    TH1F* m_MinHitDist;
+
+    /** Hits of minimal distance between digit and extHit */
+    TH1F* m_DigitMinDist;
+
+    /** Correlation between ExtHits of 2 tracks in event */
+    TH2F* m_ExtHitsCorrelation;
+
+    /** Correlation between Hit2ds of 2 tracks in event */
+    TH2F* m_Hit2dsCorrelation;
+
+    /** Correlation between Hit2ds of 2 tracks in event */
+    TH2F* m_ThetaCorrelationHist;
+
+    /** Energy sum of tracks in event */
+    TH1F* m_MuonsEnergy;
+
+    /** D0 distribution*/
+    TH1F* m_D0Distribution;
+
+    /** Z0 distribution*/
+    TH1F* m_Z0Distribution;
+
+    /** Muons tracks theta */
+    TH1F* m_MuonsTheta;
+
+    /** Muons tracks theta without cut */
+    TH1F* m_MuonsThetaWithoutCut;
+
+    /** Theta angle between muons tracks */
+    TH1F* m_MuonsAngle;
+
+    /** File with the result */
     TFile* m_file;
+
+    /** Run in debug mode or not */
     bool m_debug;
-    double m_d0_z0;
-    bool m_energy_cut;
+
+    /** D0 and Z0 distance parameters */
+    double m_D0Z0;
+
+    /** Use energy cut or not (some issues, so I don`t use this now)*/
+    bool m_EnergyCut;
+
+    /** Output file name */
     std::string m_filename;
-    double m_minMass = 0.1;
 
-    //Files for hists
-    std::ofstream main_eff, layer_distrib, layer_track, hit2d_distrib, min_dist;
+    /** Max distance to 2D hit from extHit to be still matched */
+    double m_AllowedDistance2D;
 
+    /** Max distance in strips number to 1D hit from extHit to be still matched */
+    double m_AllowedDistance1D;
 
-    // Maps to store layers info about matching of exthit and Hit2D; matching of exthit and Digit in one layer
-    // If layer wit extHit have Hit2d - match
-
+    /** Map to store info about matching of exthit and Hit2D in layer */
     std::map<int, int64_t> matching_by_layer;
+
+    /** Map to store info about all of exthit in layer */
     std::map<int, int64_t> all_exthits_in_layer;
 
+    /** Map to store info about matching of exthit and Digit in plane */
     std::map<int, int64_t> matching_digits_by_plane;
+
+    /** Map to store info about all of exthit in plane */
     std::map<int, int64_t> all_exthits_in_plane;
 
-    // Matchng for every sector and layer
-
+    /** Map to store info about matching of exthit and Hit2D in layer for each sector */
     std::map<int, std::map<int, int64_t> > sector_matching_by_layer;
+
+    /** Map to store info about all of exthit in layer for each sector */
     std::map<int, std::map<int, int64_t> > sector_all_exthits_in_layer;
 
+    /** Map to store info about matching of exthit and Hit2D in plane for each sector */
     std::map<int, std::map<int, int64_t> > sector_digit_matching_by_plane;
+
+    /** Map to store info about all of exthit in plane for each sector */
     std::map<int, std::map<int, int64_t> > all_digits_in_plane;
 
   };

@@ -36,14 +36,17 @@ using namespace Belle2;
 
 REG_MODULE(EKLMTrackEff)
 
-EKLMTrackEffModule::EKLMTrackEffModule() : Module() , m_eventCounter(0)
+EKLMTrackEffModule::EKLMTrackEffModule() : Module()
 {
   setDescription("Get track matching efficiency for EKLM");
   addParam("filename", m_filename, "Output root filename", std::string("EKLMTrackMatch.root"));
   addParam("debug", m_debug, "Debug/analysis mode", bool(false));
-  addParam("z0_d0", m_d0_z0, "D0_z0 distance", double(5));
-  // addParam("energy_cut", m_energy_cut, " 2 < E < 10 full energy", bool(false));
-  // addParam("minDiMuonMass", m_minMass, "Minimal dimuon invariant mass", 0.1);
+  addParam("z0_d0", m_D0Z0, "D0_z0 distance", double(5));
+  addParam("AllowedDistance2D", m_AllowedDistance2D, "Max distance to 2D hit from extHit to be still matched (default 15cm)",
+           double(15));
+  addParam("AllowedDistance1D", m_AllowedDistance1D,
+           "Max distance in strips number to 1D hit from extHit to be still matched (default 8 strips)", double(8));
+  // addParam("energy_cut", m_EnergyCut, " 2 < E < 10 full energy", bool(false));
 }
 
 EKLMTrackEffModule::~EKLMTrackEffModule()
@@ -57,16 +60,14 @@ EKLMTrackEffModule::~EKLMTrackEffModule()
 
 void EKLMTrackEffModule::initialize()
 {
-  digits.isRequired();
-  hit2ds.isRequired();
+  m_digits.isRequired();
+  m_hit2ds.isRequired();
   m_recoTracks.isRequired();
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
   m_extHits.isRequired();
-  hitAlign.isRequired();
-  m_tracks.registerRelationTo(hit2ds);
-  m_recoTracks.registerRelationTo(hit2ds);
-  digits.registerRelationTo(m_DigitEventInfos);
+  m_hitAlign.isRequired();
+  m_recoTracks.registerRelationTo(m_hit2ds);
   m_GeoDat = &(EKLM::GeometryData::Instance());
   // hit2ds.registerRelation(<Tracks>);
 
@@ -78,70 +79,60 @@ void EKLMTrackEffModule::initialize()
 
   //* For Debug / analysis *//
 
-  if (m_debug) {
-    //Files for hists
-    layer_distrib.open("layer_distrib.txt");
-    layer_track.open("layer_track.txt");
-    hit2d_distrib.open("hit2d_distrib.txt");
-    min_dist.open("min_dist.txt");
-  }
+  m_ExtHitsZDistribution = new TH1F("z_distrib_without_tracks", "", 600, -300, 420);
+  m_extHitsNum = new TH1F("Number_of_exthits", "", 59, 1, 60);
+  m_Hit2dsNum = new TH1F("Number_of_Hit2ds", "", 59, 1, 60);
 
-  Ext_hits_z_distrib = new TH1F("z_distrib_without_tracks", "", 600, -300, 420);
-  n_exthits = new TH1F("Number_of_exthits", "", 59, 1, 60);
-  n_Hit2ds = new TH1F("Number_of_Hit2ds", "", 59, 1, 60);
-
-  ext_hit_z_theta = new TH2F("z/theta distribution of extHits", "", 26, -12, 14, 90, 0, 180);
-  ext_hit_z_theta->GetXaxis()->SetTitle("Layer");
-  ext_hit_z_theta->GetYaxis()->SetTitle("Theta");
+  m_ExtHitZTheta = new TH2F("z/theta distribution of extHits", "", 26, -12, 14, 90, 0, 180);
+  m_ExtHitZTheta->GetXaxis()->SetTitle("Layer");
+  m_ExtHitZTheta->GetYaxis()->SetTitle("Theta");
 
   for (int i = 1; i < 5; ++i) {
     std::string name = "Sector " + std::to_string(i);
-    sector_hists[i] = new TH1F(name.data(), " ", 40, -20, 20);
+    m_ExtHitsSectorHists[i] = new TH1F(name.data(), " ", 40, -20, 20);
   }
 
-  Ext_hits_z_distrib_tracks = new TH1F("z_distrib_with_tracks", "", 600, -300, 420);
+  m_ExtHitsZDistribTracks = new TH1F("z_distrib_with_tracks", "", 600, -300, 420);
 
   for (int i = 1; i < 5; ++i) {
     std::string name = "With track by Sector " + std::to_string(i);
-    sector_hists_track[i] = new TH1F(name.data(), " ", 40, -20, 20);
+    m_ExtHitsSectorHistsTrack[i] = new TH1F(name.data(), " ", 40, -20, 20);
   }
 
 
-  Hit2d_z_distrib = new TH1F("Hit2d_z_distib", "", 600, -300, 420);
+  m_Hit2dZDistrib = new TH1F("Hit2d_z_distib", "", 600, -300, 420);
 
   for (int i = 1; i < 5; ++i) {
     std::string name = "Hit2D with Sector " + std::to_string(i);
-    Hit2d_sector_hists[i] = new TH1F(name.data(), " ", 40, -20, 20);
+    m_Hit2dSectorHists[i] = new TH1F(name.data(), " ", 40, -20, 20);
   }
 
-  h_TrackMomentum = new TH1F("momentum", "", 200, 0, 10);
+  m_MinHitDist = new TH1F("min_dist", "", 50, 0, 50);
+  m_DigitMinDist = new TH1F("min dist for 1d", "", 20, 0, 20);
 
-  min_hit_dist = new TH1F("min_dist", "", 50, 0, 50);
-  hit1d_min_dist = new TH1F("min dist for 1d", "", 20, 0, 20);
+  m_ExtHitsLayerDistribution = new TH1F("ext_hit_layer_distrib", "", 26, -12, 14);
 
-  Ext_hits_layer_distrib = new TH1F("ext_hit_layer_distrib", "", 26, -12, 14);
+  m_Hit2dMatchedDistrib = new TH1F("Hit2ds_matched_distrib", "", 26, -12, 14);
 
-  Hit2d_matched_distrib = new TH1F("Hit2ds_matched_distrib", "", 26, -12, 14);
+  m_ExtHitsLayerDistribTracks = new TH1F("Ext_hits_layer_distrib_track", "", 26, -12, 14);
 
-  Ext_hits_layer_distrib_tracks = new TH1F("Ext_hits_layer_distrib_track", "", 26, -12, 14);
+  m_ExtHitsCorrelation = new TH2F("Corr_between_hits_in_tracks", "", 34, 1, 35, 34, 1, 35);
 
-  hits_corr = new TH2F("Corr_between_hits_in_tracks", "", 34, 1, 35, 34, 1, 35);
+  m_Hit2dsCorrelation = new TH2F("Corr_between_hit2ds_int_back_and_fwd", "", 14, 1, 15, 14, 1, 15);
+  m_Hit2dsCorrelation->GetYaxis()->SetTitle("Bwd");
+  m_Hit2dsCorrelation->GetXaxis()->SetTitle("Fwd");
 
-  hit2ds_corr_hist = new TH2F("Corr_between_hit2ds_int_back_and_fwd", "", 14, 1, 15, 14, 1, 15);
-  hit2ds_corr_hist->GetYaxis()->SetTitle("Bwd");
-  hit2ds_corr_hist->GetXaxis()->SetTitle("Fwd");
+  m_ThetaCorrelationHist = new TH2F("Theta_corr", "", 45, 0, 180, 45, 0, 180);
+  m_MuonsEnergy = new TH1F("Muons energy", "", 100, 1, 12);
+  m_MuonsTheta = new TH1F("Muons theta", "", 45, 0, 180);
+  m_MuonsThetaWithoutCut = new TH1F("Muons theta witout cut", "", 45, 0, 180);
+  m_MuonsAngle = new TH1F("Angle between muons", "", 30, 0, CLHEP::pi);
 
-  theta_corr_hist = new TH2F("Theta_corr", "", 45, 0, 180, 45, 0, 180);
-  muons_energy = new TH1F("Muons energy", "", 100, 1, 12);
-  muons_theta = new TH1F("Muons theta", "", 45, 0, 180);
-  muons_theta_without_cut = new TH1F("Muons theta witout cut", "", 45, 0, 180);
-  muons_angle = new TH1F("Angle between muons", "", 30, 0, CLHEP::pi);
-
-  d0_distr = new TH1F("D0", "", 120, 0, 6);
-  z0_distr = new TH1F("Z0", "", 120, 0, 6);
+  m_D0Distribution = new TH1F("D0", "", 120, 0, 6);
+  m_Z0Distribution = new TH1F("Z0", "", 120, 0, 6);
 }
 
-std::tuple<int, int, int, int, int, int> EKLMTrackEffModule::check_exthit(const ExtHit& ext_hit)
+std::tuple<int, int, int, int, int, int> EKLMTrackEffModule::checkExtHit(const ExtHit& ext_hit) const
 {
   // If ExtHit NOT in EKLM continue
   if (ext_hit.getDetectorID() != Const::EDetector::EKLM) return std::make_tuple(-1, -1, -1, -1, -1, -1);
@@ -157,14 +148,14 @@ std::tuple<int, int, int, int, int, int> EKLMTrackEffModule::check_exthit(const 
   return std::make_tuple(copyid, idEndcap, idLayer, idSector, idPlane, idStrip);
 }
 
-double EKLMTrackEffModule::get_min_dist(const ExtHit& ext_hit)
+double EKLMTrackEffModule::getMinDist(const ExtHit& ext_hit) const
 {
   double distance_value = 0;
   int copyid = ext_hit.getCopyID();
   int idEndcap = -1, idLayer = -1, idSector = -1, idPlane = -1, idStrip = -1;
   m_GeoDat->stripNumberToElementNumbers(copyid, &idEndcap, &idLayer, &idSector, &idPlane, &idStrip);
 
-  for (auto hit_2_d : hit2ds) {
+  for (auto hit_2_d : m_hit2ds) {
     // Asking dor a match sector, layer etc.
     if (hit_2_d.getLayer() == idLayer && hit_2_d.getEndcap() == idEndcap && hit_2_d.getSector() == idSector) {
       TVector3 hit2d_pos = hit_2_d.getPosition();
@@ -180,14 +171,14 @@ double EKLMTrackEffModule::get_min_dist(const ExtHit& ext_hit)
   return distance_value;
 }
 
-double EKLMTrackEffModule::get_min_1d_dist(const ExtHit& ext_hit)
+double EKLMTrackEffModule::getMinDist1d(const ExtHit& ext_hit) const
 {
   double distance_value = -1;
   int copyid = ext_hit.getCopyID();
   int idEndcap = -1, idLayer = -1, idSector = -1, idPlane = -1, idStrip = -1;
   m_GeoDat->stripNumberToElementNumbers(copyid, &idEndcap, &idLayer, &idSector, &idPlane, &idStrip);
 
-  for (auto hit_1d : digits) {
+  for (auto hit_1d : m_digits) {
     // Asking dor a match sector, layer etc.
     if (hit_1d.getLayer() == idLayer && hit_1d.getEndcap() == idEndcap
         && hit_1d.getSector() == idSector && hit_1d.getPlane() == idPlane) {
@@ -204,7 +195,7 @@ double EKLMTrackEffModule::get_min_1d_dist(const ExtHit& ext_hit)
   return distance_value;
 }
 
-std::pair<bool, bool> EKLMTrackEffModule::MuID(int number_of_required_hits)
+std::pair<bool, bool> EKLMTrackEffModule::trackCheck(int number_of_required_hits) const
 {
   // Map to calc number of hits
   // Forward - 2, backward - 1
@@ -212,7 +203,7 @@ std::pair<bool, bool> EKLMTrackEffModule::MuID(int number_of_required_hits)
   bool mark_backward = false;
 
   std::map<int, int> endcap_hits = { {1, 0}, {2, 0} };
-  for (auto hit_ : hit2ds) {
+  for (auto hit_ : m_hit2ds) {
     endcap_hits[hit_.getEndcap()]++;
   }
 
@@ -222,7 +213,7 @@ std::pair<bool, bool> EKLMTrackEffModule::MuID(int number_of_required_hits)
   return std::make_pair(mark_forward, mark_backward);
 }
 
-double EKLMTrackEffModule::error_calc(int64_t num_of_hits, int64_t num_of_exthits)
+double EKLMTrackEffModule::errorCalculation(int64_t num_of_hits, int64_t num_of_exthits) const
 {
   double hit2d_err = std::sqrt(static_cast<long double>(num_of_hits)) / num_of_hits;
   double exthits_err = std::sqrt(static_cast<long double>(num_of_exthits)) / num_of_exthits;
@@ -230,14 +221,14 @@ double EKLMTrackEffModule::error_calc(int64_t num_of_hits, int64_t num_of_exthit
   return error;
 }
 
-bool EKLMTrackEffModule::digits_matching(const ExtHit& ext_hit, double allowed_distance)
+bool EKLMTrackEffModule::digitsMatching(const ExtHit& ext_hit, double allowed_distance) const
 {
   int copyid = ext_hit.getCopyID();
   int idEndcap = -1, idLayer = -1, idSector = -1, idPlane = -1, idStrip = -1;
   m_GeoDat->stripNumberToElementNumbers(copyid, &idEndcap, &idLayer, &idSector, &idPlane, &idStrip);
   TVector3 ext_hit_pos = ext_hit.getPosition();
 
-  for (auto hit_1d : digits) {
+  for (auto hit_1d : m_digits) {
     TVector3 hit1d_pos = hit_1d.getPosition();
     TVector3 distance = hit1d_pos - ext_hit_pos;
 
@@ -250,14 +241,14 @@ bool EKLMTrackEffModule::digits_matching(const ExtHit& ext_hit, double allowed_d
   return false;
 }
 
-bool EKLMTrackEffModule::hit2ds_matching(const ExtHit& ext_hit, double allowed_distance)
+bool EKLMTrackEffModule::hit2dsMatching(const ExtHit& ext_hit, double allowed_distance) const
 {
   int copyid = ext_hit.getCopyID();
   int idEndcap = -1, idLayer = -1, idSector = -1, idPlane = -1, idStrip = -1;
   m_GeoDat->stripNumberToElementNumbers(copyid, &idEndcap, &idLayer, &idSector, &idPlane, &idStrip);
   TVector3 ext_hit_pos = ext_hit.getPosition();
 
-  for (auto hit_2d : hit2ds) {
+  for (auto hit_2d : m_hit2ds) {
     TVector3 hit1d_pos = hit_2d.getPosition();
     TVector3 distance = hit1d_pos - ext_hit_pos;
 
@@ -268,7 +259,34 @@ bool EKLMTrackEffModule::hit2ds_matching(const ExtHit& ext_hit, double allowed_d
   return false;
 }
 
-void EKLMTrackEffModule::ext_hits_corr(StoreArray<Track>& selected_tracks)
+double EKLMTrackEffModule::getSumTrackEnergy(const StoreArray<Track>& selected_tracks) const
+{
+  double eneregy = 0;
+  for (auto trk : selected_tracks) {
+    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
+    eneregy += fitResult->getEnergy();
+  }
+  return eneregy;
+}
+
+double EKLMTrackEffModule::angleThetaBetweenTracks(const StoreArray<Track>& selected_tracks) const
+{
+  TVector3 first_trk;
+  TVector3 second_trk;
+  bool trk_cnt = false;
+
+  for (auto trk : selected_tracks) {
+    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
+    if (trk_cnt) first_trk = fitResult->getMomentum();
+    else second_trk = fitResult->getMomentum();
+    trk_cnt = true;
+  }
+
+  TVector3 result = first_trk - second_trk;
+  return result.Theta();
+}
+
+void EKLMTrackEffModule::extHitsCorr(const StoreArray<Track>& selected_tracks)
 {
   int first_trk = 0;
   int second_trk = 0;
@@ -286,21 +304,21 @@ void EKLMTrackEffModule::ext_hits_corr(StoreArray<Track>& selected_tracks)
     trk_cnt = true;
   }
 
-  hits_corr->Fill(first_trk, second_trk);
+  m_ExtHitsCorrelation->Fill(first_trk, second_trk);
 }
 
-void EKLMTrackEffModule::hit2ds_corr()
+void EKLMTrackEffModule::hit2dsCorr()
 {
   int bwd_hits = 0;
   int fwd_hits = 0;
-  for (auto hit : hit2ds) {
+  for (auto hit : m_hit2ds) {
     if (hit.getEndcap() == 1) bwd_hits++;
     if (hit.getEndcap() == 2) fwd_hits++;
   }
-  hit2ds_corr_hist->Fill(fwd_hits, bwd_hits);
+  m_Hit2dsCorrelation->Fill(fwd_hits, bwd_hits);
 }
 
-void EKLMTrackEffModule::theta_corr(StoreArray<Track>& selected_tracks)
+void EKLMTrackEffModule::thetaCorr(const StoreArray<Track>& selected_tracks)
 {
   double first_trk = 0;
   double second_trk = 0;
@@ -312,35 +330,9 @@ void EKLMTrackEffModule::theta_corr(StoreArray<Track>& selected_tracks)
     if (trk_cnt) second_trk = fitResult->getMomentum().Theta() * 180.0 / CLHEP::pi;
     trk_cnt = true;
   }
-  theta_corr_hist->Fill(first_trk, second_trk);
+  m_ThetaCorrelationHist->Fill(first_trk, second_trk);
 }
 
-double EKLMTrackEffModule::get_sum_track_energy(const StoreArray<Track>& selected_tracks)
-{
-  double eneregy = 0;
-  for (auto trk : selected_tracks) {
-    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
-    eneregy += fitResult->getEnergy();
-  }
-  return eneregy;
-}
-
-double EKLMTrackEffModule::angle_between_tracks(const StoreArray<Track>& selected_tracks)
-{
-  TVector3 first_trk;
-  TVector3 second_trk;
-  bool trk_cnt = false;
-
-  for (auto trk : selected_tracks) {
-    const TrackFitResult* fitResult = trk.getTrackFitResultWithClosestMass(Const::muon);
-    if (trk_cnt) first_trk = fitResult->getMomentum();
-    else second_trk = fitResult->getMomentum();
-    trk_cnt = true;
-  }
-
-  TVector3 result = first_trk - second_trk;
-  return result.Theta();
-}
 
 std::pair<std::map<int, std::vector<double> >, std::map<int, std::vector<double> > >
 EKLMTrackEffModule::calculate_sector_eff(std::map<int, std::map<int, int64_t> > sector_matching,
@@ -356,7 +348,7 @@ EKLMTrackEffModule::calculate_sector_eff(std::map<int, std::map<int, int64_t> > 
       int64_t num_of_exthits = sector_all[sector][layer];
       double partial_eff = static_cast<long double>(num_of_hits) / num_of_exthits;
       layer_eff_temp.push_back(partial_eff);
-      layer_eff_temp_err.push_back(error_calc(num_of_hits, num_of_exthits));
+      layer_eff_temp_err.push_back(errorCalculation(num_of_hits, num_of_exthits));
     }
     sector_layers_eff[sector] = layer_eff_temp;
     sector_layers_eff_err[sector] = layer_eff_temp_err;
@@ -365,7 +357,7 @@ EKLMTrackEffModule::calculate_sector_eff(std::map<int, std::map<int, int64_t> > 
   return std::make_pair(sector_layers_eff, sector_layers_eff_err);
 }
 
-bool EKLMTrackEffModule::d0_z0_cut(const StoreArray<Track>& selected_tracks, double dist)
+bool EKLMTrackEffModule::d0z0Cut(const StoreArray<Track>& selected_tracks, double dist) const
 {
   bool cosmic = false;
 
@@ -379,7 +371,7 @@ bool EKLMTrackEffModule::d0_z0_cut(const StoreArray<Track>& selected_tracks, dou
   return cosmic;
 }
 
-bool EKLMTrackEffModule::theta_acceptance(const StoreArray<Track>& selected_tracks)
+bool EKLMTrackEffModule::thetaAcceptance(const StoreArray<Track>& selected_tracks) const
 {
   bool disacceptance = false;
 
@@ -401,7 +393,7 @@ void EKLMTrackEffModule::event()
   **********************************/
 
   // Variables to mark possibility of using track for efficiency study
-  auto [mark_forward, mark_backward] = MuID(5);
+  auto [mark_forward, mark_backward] = trackCheck(5);
 
   for (const Track& track : m_tracks) {
 
@@ -411,36 +403,31 @@ void EKLMTrackEffModule::event()
     if (recoTrack && m_tracks.getEntries() == 2) {
       const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::muon);
       if (fitResult->getMomentum().Mag() > 11. || fitResult->getMomentum().Mag() < 1.) continue;
-      // if (m_energy_cut) {
-      //   if (get_sum_track_energy(m_tracks) > 10) continue;
+      // if (m_EnergyCut) {
+      //   if (getSumTrackEnergy(m_tracks) > 10) continue;
       // }
 
-      if (d0_z0_cut(m_tracks, m_d0_z0)) continue;
-      // if (theta_acceptance(m_tracks)) continue;
+      if (d0z0Cut(m_tracks, m_D0Z0)) continue;
+      // if (thetaAcceptance(m_tracks)) continue;
 
       for (const auto& ext_hit : track.getRelationsTo<ExtHit>()) {
 
-        auto [copyid, idEndcap, idLayer, idSector, idPlane, idStrip] = check_exthit(ext_hit);
+        auto [copyid, idEndcap, idLayer, idSector, idPlane, idStrip] = checkExtHit(ext_hit);
         if (copyid == -1) continue;
 
         TVector3 ext_hit_pos = ext_hit.getPosition();
 
-        // Max distance to 2D hit
-        double allowed_distance2D = 15;
-        // Max distance to 1D hit (in strips)
-        double allowed_distance1D = 8;
-
         if (idEndcap == 2 && mark_forward) {
-          if (hit2ds_matching(ext_hit, allowed_distance2D)) {
+          if (hit2dsMatching(ext_hit, m_AllowedDistance2D)) {
             matching_by_layer[idLayer]++;
             sector_matching_by_layer[idSector][idLayer]++;
-            Hit2d_matched_distrib->Fill(idLayer);
+            m_Hit2dMatchedDistrib->Fill(idLayer);
           }
 
           all_exthits_in_layer[idLayer]++;
           sector_all_exthits_in_layer[idSector][idLayer]++;
 
-          if (digits_matching(ext_hit, allowed_distance1D)) {
+          if (digitsMatching(ext_hit, m_AllowedDistance1D)) {
             matching_digits_by_plane[ 2 * idLayer + idPlane - 2]++;
             sector_digit_matching_by_plane[idSector][ 2 * idLayer + idPlane - 2]++;
           }
@@ -449,16 +436,16 @@ void EKLMTrackEffModule::event()
           all_digits_in_plane[idSector][ 2 * idLayer + idPlane - 2]++;
 
         } else if (idEndcap == 1 && mark_backward) {
-          if (hit2ds_matching(ext_hit, allowed_distance2D)) {
+          if (hit2dsMatching(ext_hit, m_AllowedDistance2D)) {
             matching_by_layer[-idLayer]++;
             sector_matching_by_layer[idSector][-idLayer]++;
-            Hit2d_matched_distrib->Fill(-idLayer);
+            m_Hit2dMatchedDistrib->Fill(-idLayer);
           }
 
           all_exthits_in_layer[-idLayer]++;
           sector_all_exthits_in_layer[idSector][-idLayer]++;
 
-          if (digits_matching(ext_hit, allowed_distance1D)) {
+          if (digitsMatching(ext_hit, m_AllowedDistance1D)) {
             matching_digits_by_plane[-2 * idLayer - idPlane + 2]++;
             sector_digit_matching_by_plane[idSector][ - 2 * idLayer - idPlane + 2]++;
           }
@@ -488,33 +475,33 @@ void EKLMTrackEffModule::event()
       if (recoTrack && m_tracks.getEntries() == 2) {
         const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::muon);
         if (fitResult->getMomentum().Mag() > 11. || fitResult->getMomentum().Mag() < 1.) continue;
-        muons_theta_without_cut->Fill(fitResult->getMomentum().Theta() * 180.0 / CLHEP::pi);
-        // if (m_energy_cut) {
-        // if (get_sum_track_energy(m_tracks) > 10) continue;
+        m_MuonsThetaWithoutCut->Fill(fitResult->getMomentum().Theta() * 180.0 / CLHEP::pi);
+        // if (m_EnergyCut) {
+        // if (getSumTrackEnergy(m_tracks) > 10) continue;
         // }
         double d0 = fitResult->getD0();
         double z0 = fitResult->getZ0();
-        d0_distr->Fill(d0);
-        z0_distr->Fill(z0);
-        if (d0_z0_cut(m_tracks, m_d0_z0)) continue;
-        // if (theta_acceptance(m_tracks)) continue;
-        muons_theta->Fill(fitResult->getMomentum().Theta() * 180.0 / CLHEP::pi);
+        m_D0Distribution->Fill(d0);
+        m_Z0Distribution->Fill(z0);
+        if (d0z0Cut(m_tracks, m_D0Z0)) continue;
+        // if (thetaAcceptance(m_tracks)) continue;
+        m_MuonsTheta->Fill(fitResult->getMomentum().Theta() * 180.0 / CLHEP::pi);
 
         // Only in debug mode
         // Searching for correlations
         // Use this functions only when second track is OK
         if (trk_cnt == 2) {
-          ext_hits_corr(m_tracks);
-          hit2ds_corr();
-          theta_corr(m_tracks);
+          extHitsCorr(m_tracks);
+          hit2dsCorr();
+          thetaCorr(m_tracks);
           //Get tracks energy distib
-          muons_energy->Fill(get_sum_track_energy(m_tracks));
-          muons_angle->Fill(angle_between_tracks(m_tracks));
+          m_MuonsEnergy->Fill(getSumTrackEnergy(m_tracks));
+          m_MuonsAngle->Fill(angleThetaBetweenTracks(m_tracks));
         }
 
         for (const auto& ext_hit : track.getRelationsTo<ExtHit>()) {
 
-          auto [copyid, idEndcap, idLayer, idSector, idPlane, idStrip] = check_exthit(ext_hit);
+          auto [copyid, idEndcap, idLayer, idSector, idPlane, idStrip] = checkExtHit(ext_hit);
           if (copyid == -1) continue;
 
           TVector3 ext_hit_pos = ext_hit.getPosition();
@@ -528,24 +515,21 @@ void EKLMTrackEffModule::event()
 
           // If Forward (2) else Backward(1)
           if (idEndcap == 2 && mark_forward) {
-            sector_hists_track[idSector]->Fill(idLayer);
-            Ext_hits_layer_distrib_tracks->Fill(idLayer);
-            layer_track << idLayer << '\n';
-            Ext_hits_z_distrib_tracks->Fill(ext_hit.getPosition().z());
+            m_ExtHitsSectorHistsTrack[idSector]->Fill(idLayer);
+            m_ExtHitsLayerDistribTracks->Fill(idLayer);
+            m_ExtHitsZDistribTracks->Fill(ext_hit.getPosition().z());
             // To get all exthits in event
-            ext_hit_z_theta->Fill(idLayer, theta);
+            m_ExtHitZTheta->Fill(idLayer, theta);
           } else if (idEndcap == 1 && mark_backward) {
-            sector_hists_track[idSector]->Fill(-idLayer);
-            Ext_hits_layer_distrib_tracks->Fill(-idLayer);
-            layer_track << -idLayer << '\n';
-            Ext_hits_z_distrib_tracks->Fill(ext_hit.getPosition().z());
-            ext_hit_z_theta->Fill(-idLayer, theta);
+            m_ExtHitsSectorHistsTrack[idSector]->Fill(-idLayer);
+            m_ExtHitsLayerDistribTracks->Fill(-idLayer);
+            m_ExtHitsZDistribTracks->Fill(ext_hit.getPosition().z());
+            m_ExtHitZTheta->Fill(-idLayer, theta);
           }
 
           // To get distance distribution
-          min_hit_dist->Fill(get_min_dist(ext_hit));
-          hit1d_min_dist->Fill(get_min_1d_dist(ext_hit));
-          min_dist << get_min_dist(ext_hit) << '\n';
+          m_MinHitDist->Fill(getMinDist(ext_hit));
+          m_DigitMinDist->Fill(getMinDist1d(ext_hit));
 
           //* End of ExtHits loop *//
         }
@@ -562,43 +546,39 @@ void EKLMTrackEffModule::event()
     // Loop by all extHits
     for (auto ext_hit : m_extHits) {
 
-      auto [copyid, idEndcap, idLayer, idSector, idPlane, idStrip] = check_exthit(ext_hit);
+      auto [copyid, idEndcap, idLayer, idSector, idPlane, idStrip] = checkExtHit(ext_hit);
       if (copyid == -1) continue;
 
       // If Forward (2) else Backward(1)
       if (idEndcap == 2) {
-        Ext_hits_layer_distrib->Fill(idLayer);
-        layer_distrib << idLayer << '\n';
-        sector_hists[idSector]->Fill(idLayer);
+        m_ExtHitsLayerDistribution->Fill(idLayer);
+        m_ExtHitsSectorHists[idSector]->Fill(idLayer);
       } else {
-        Ext_hits_layer_distrib->Fill(-idLayer);
-        layer_distrib << -idLayer << '\n';
-        sector_hists[idSector]->Fill(-idLayer);
+        m_ExtHitsLayerDistribution->Fill(-idLayer);
+        m_ExtHitsSectorHists[idSector]->Fill(-idLayer);
       }
 
       ++counter;
-      Ext_hits_z_distrib->Fill(ext_hit.getPosition().z());
+      m_ExtHitsZDistribution->Fill(ext_hit.getPosition().z());
 
     }
 
-    n_exthits->Fill(counter);
-    n_Hit2ds->Fill(hit2ds.getEntries());
+    m_extHitsNum->Fill(counter);
+    m_Hit2dsNum->Fill(m_hit2ds.getEntries());
 
 
     /********************************
       Hit2D z distrib
     **********************************/
 
-    for (auto hit_2d : hit2ds) {
-      Hit2d_z_distrib->Fill(hit_2d.getPosition().z());
+    for (auto hit_2d : m_hit2ds) {
+      m_Hit2dZDistrib->Fill(hit_2d.getPosition().z());
 
       // If Forward (2) else Backward(1)
       if (hit_2d.getEndcap() == 2) {
-        hit2d_distrib << hit_2d.getLayer() << '\n';
-        Hit2d_sector_hists[hit_2d.getSector()]->Fill(hit_2d.getLayer());
+        m_Hit2dSectorHists[hit_2d.getSector()]->Fill(hit_2d.getLayer());
       } else {
-        Hit2d_sector_hists[hit_2d.getSector()]->Fill(-hit_2d.getLayer());
-        hit2d_distrib << -hit_2d.getLayer() << '\n';
+        m_Hit2dSectorHists[hit_2d.getSector()]->Fill(-hit_2d.getLayer());
       }
     }
 
@@ -620,7 +600,7 @@ void EKLMTrackEffModule::terminate()
     int64_t num_of_exthits = all_exthits_in_layer[layer];
 
     // Calculating errors
-    error.push_back(error_calc(num_of_hits, num_of_exthits));
+    error.push_back(errorCalculation(num_of_hits, num_of_exthits));
     double partial_eff = static_cast<long double>(num_of_hits) / num_of_exthits;
     layer_eff.push_back(partial_eff);
     layer_num.push_back(layer);
@@ -660,7 +640,7 @@ void EKLMTrackEffModule::terminate()
     int64_t num_of_exthits = all_exthits_in_plane[plane];
 
     // Calculating errors
-    error.push_back(error_calc(num_of_hits, num_of_exthits));
+    error.push_back(errorCalculation(num_of_hits, num_of_exthits));
     double partial_eff = static_cast<long double>(num_of_hits) / num_of_exthits;
     layer_eff.push_back(partial_eff);
     layer_num.push_back(plane);
@@ -747,42 +727,41 @@ void EKLMTrackEffModule::terminate()
 
   if (m_debug) {
     // Writing all additional hists
-    Ext_hits_z_distrib->Write();
-    Ext_hits_layer_distrib->Write();
-    n_exthits->Write();
-    n_Hit2ds->Write();
+    m_ExtHitsZDistribution->Write();
+    m_ExtHitsLayerDistribution->Write();
+    m_extHitsNum->Write();
+    m_Hit2dsNum->Write();
 
-    for (auto hist : sector_hists) {
+    for (auto hist : m_ExtHitsSectorHists) {
       hist.second->Write();
     }
 
-    Ext_hits_z_distrib_tracks->Write();
-    Ext_hits_layer_distrib_tracks->Write();
+    m_ExtHitsZDistribTracks->Write();
+    m_ExtHitsLayerDistribTracks->Write();
 
-    for (auto hist : sector_hists_track) {
+    for (auto hist : m_ExtHitsSectorHistsTrack) {
       hist.second->Write();
     }
 
-    Hit2d_z_distrib->Write();
-    Hit2d_matched_distrib->Write();
+    m_Hit2dZDistrib->Write();
+    m_Hit2dMatchedDistrib->Write();
 
-    for (auto hist : Hit2d_sector_hists) {
+    for (auto hist : m_Hit2dSectorHists) {
       hist.second->Write();
     }
 
-    min_hit_dist->Write();
-    hit1d_min_dist->Write();
-    ext_hit_z_theta->Write();
-    h_TrackMomentum->Write();
-    hits_corr->Write();
-    hit2ds_corr_hist->Write();
-    theta_corr_hist->Write();
-    muons_energy->Write();
-    muons_theta->Write();
-    muons_theta_without_cut->Write();
-    muons_angle->Write();
-    d0_distr->Write();
-    z0_distr->Write();
+    m_MinHitDist->Write();
+    m_DigitMinDist->Write();
+    m_ExtHitZTheta->Write();
+    m_ExtHitsCorrelation->Write();
+    m_Hit2dsCorrelation->Write();
+    m_ThetaCorrelationHist->Write();
+    m_MuonsEnergy->Write();
+    m_MuonsTheta->Write();
+    m_MuonsThetaWithoutCut->Write();
+    m_MuonsAngle->Write();
+    m_D0Distribution->Write();
+    m_Z0Distribution->Write();
   }
 
   m_file->Close();

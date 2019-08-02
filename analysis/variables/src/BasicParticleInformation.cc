@@ -45,6 +45,26 @@ namespace Belle2 {
       return (properties & Particle::PropertyFlags::c_IsUnspecified) ? 1.0 : 0.0;
     }
 
+    double particlePvalue(const Particle* part)
+    {
+      return part->getPValue();
+    }
+
+    double particleNDaughters(const Particle* part)
+    {
+      return part->getNDaughters();
+    }
+
+    double particleFlavorType(const Particle* part)
+    {
+      return part->getFlavorType();
+    }
+
+    double particleCharge(const Particle* part)
+    {
+      return part->getCharge();
+    }
+
     VARIABLE_GROUP("Basic particle information");
     REGISTER_VARIABLE("isFromECL", particleIsFromECL, "Returns 1.0 if this particle was created from an ECLCluster, 0 otherwise.");
     REGISTER_VARIABLE("isFromKLM", particleIsFromKLM, "Returns 1.0 if this particle was created from a KLMCluster, 0 otherwise.");
@@ -55,5 +75,11 @@ namespace Belle2 {
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
     REGISTER_VARIABLE("isUnspecified", particleIsUnspecified,
                       "returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not");
+    REGISTER_VARIABLE("chiProb", particlePvalue, "chi ^ 2 probability of the fit");
+    REGISTER_VARIABLE("nDaughters", particleNDaughters,
+                      "number of daughter particles");
+    REGISTER_VARIABLE("flavor", particleFlavorType,
+                      "flavor type of decay(0 = unflavored, 1 = flavored)");
+    REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
   }
 }

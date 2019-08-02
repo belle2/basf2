@@ -14,7 +14,7 @@ from modularAnalysis import *
 from stdPhotons import *
 
 
-def stdPi0s(listtype='veryLoose', path=analysis_main):
+def stdPi0s(listtype='veryLoose', path=None):
     """
     Function to prepare one of several standardized types of pi0 lists:
 
@@ -112,7 +112,7 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
 # pi0 list for skims (and ONLY for skims)
 
 
-def loadStdSkimPi0(path=analysis_main):
+def loadStdSkimPi0(path):
     """
     Function to prepare the skim pi0 lists.
 

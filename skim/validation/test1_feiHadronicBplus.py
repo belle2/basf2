@@ -13,7 +13,6 @@ __author__ = "P. Grace"
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
@@ -37,7 +36,7 @@ skimOutputUdst('../feiHadronicBplus', BplushadronicList, path=path)
 summaryOfLists(BplushadronicList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
+setSkimLogging(path)
 process(path)
 
 # print out the summary

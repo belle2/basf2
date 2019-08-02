@@ -10,17 +10,30 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import stdE, stdMu
+from stdCharged import stdE, stdMu, stdPi
 from stdPi0s import *
 from stdPhotons import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
 
-gb2_setuprel = 'release-03-02-00'
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
+
+gb2_setuprel = 'release-03-02-02'
 set_log_level(LogLevel.INFO)
 import os
 import sys
 import glob
-skimCode = encodeSkimName('CharmRare')
+
+# skimCode = encodeSkimName('CharmRare')
+skimCode = "CharmRare"
 
 crpath = Path()
 
@@ -32,9 +45,10 @@ loadStdSkimPi0(path=crpath)
 loadStdSkimPhoton(path=crpath)
 stdMu('loose', path=crpath)
 stdE('loose', path=crpath)
+stdPi('loose', path=crpath)
 
-from skim.charm import CharmRareList
-CharmRareList = CharmRareList(crpath)
+from skim.charm import CharmRare
+CharmRareList = CharmRare(crpath)
 skimOutputUdst(skimCode, CharmRareList, path=crpath)
 summaryOfLists(CharmRareList, path=crpath)
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOBKLMCREATOR_H
-#define GEOBKLMCREATOR_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 #include <bklm/geometry/GeometryPar.h>
@@ -236,5 +235,3 @@ namespace Belle2 {
   } // end of namespace bklm
 
 }  // end of namespace Belle2
-
-#endif // GEOBKLMCREATOR_H

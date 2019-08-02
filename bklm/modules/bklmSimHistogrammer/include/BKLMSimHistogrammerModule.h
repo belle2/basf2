@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMSIMHistogrammerMODULE_H
-#define BKLMSIMHistogrammerMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -141,5 +140,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // BKLMDIGITIZERMODULE_H

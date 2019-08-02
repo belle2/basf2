@@ -5,8 +5,7 @@
 // Author : Anselm Vossen, based on Satoru Yamada's DummyDataPacker
 //-
 
-#ifndef BKLMRAWPACKER_H
-#define BKLMRAWPACKER_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -62,12 +61,6 @@ namespace Belle2 {
     //    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
 
     //    StoreArray<RawFTSW> raw_ftswarray;
-
-    //! use default elect id, if not found in mapping file
-    bool m_useDefaultElectId = true;
-
-    //! use electronic map from DataBase or not
-    bool m_loadMapFromDB = false;
 
     //! offset of the scintillator ADC
     int m_scintADCOffset = 3400;
@@ -133,14 +126,6 @@ namespace Belle2 {
     //! TO be used to map electronics address to module id
     int electCooToInt(int copper, int finesse, int lane, int axis, int channel);
 
-    //! get the default electronic Id
-    int getDefaultElectId(int isForward, int sector, int layer, int axis, int stripId);
-
-    //! remap the channel ID for scitilators and RPCs
-    int getChannel(int isForward, int sector, int layer,  int plane,  int channel);
-
   };
 
 } // end namespace Belle2
-
-#endif // MODULEHELLO_H

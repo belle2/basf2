@@ -242,8 +242,19 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
                     VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)
 
 
-def add_svd_track_finding(path, components, input_reco_tracks, output_reco_tracks, svd_ckf_mode="VXDTF2_after",
-                          use_mc_truth=False, add_both_directions=True, temporary_reco_tracks="SVDRecoTracks", **kwargs):
+def add_svd_track_finding(
+        path,
+        components,
+        input_reco_tracks,
+        output_reco_tracks,
+        svd_ckf_mode="VXDTF2_after",
+        use_mc_truth=False,
+        add_both_directions=True,
+        temporary_reco_tracks="SVDRecoTracks",
+        temporary_reco_tracks_two="SVDplusRecoTracks",
+        use_svd_to_cdc_ckf=True,
+        prune_temporary_tracks=True,
+        **kwargs):
     """Add SVD track finding to the path"""
 
     if not is_svd_used(components):
@@ -319,10 +330,38 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
     else:
         raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
 
+    if use_svd_to_cdc_ckf:
+        comb_tracks = temporary_reco_tracks_two
+    else:
+        comb_tracks = output_reco_tracks
+
         # Write out the combinations of tracks
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=temporary_reco_tracks,
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
-                    recoTracksStoreArrayName=output_reco_tracks)
+                    recoTracksStoreArrayName=comb_tracks)
+
+    if use_svd_to_cdc_ckf:
+        path.add_module("ToCDCCKF",
+                        inputWireHits="CDCWireHitVector",
+                        inputRecoTrackStoreArrayName=comb_tracks,
+                        relatedRecoTrackStoreArrayName="CKFCDCRecoTracks",
+                        relationCheckForDirection="backward",
+                        ignoreTracksWithCDChits=True,
+                        outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
+                        outputRelationRecoTrackStoreArrayName=comb_tracks,
+                        writeOutDirection="backward",
+                        stateBasicFilterParameters={"maximalHitDistance": 0.15},
+                        pathFilter="arc_length",
+                        maximalLayerJump=4)
+
+        path.add_module("CDCCKFTracksCombiner",
+                        CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
+                        VXDRecoTracksStoreArrayName=comb_tracks,
+                        recoTracksStoreArrayName=output_reco_tracks)
+
+        if prune_temporary_tracks:
+            for temp_reco_track in [comb_tracks, "CKFCDCRecoTracks"]:
+                path.add_module('PruneRecoTracks', storeArrayName=temp_reco_track)
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,

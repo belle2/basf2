@@ -40,8 +40,7 @@ output = basf2.register_module('RootOutput')
 output.param('outputFileName', 'ParticleGunMuonsKLM.root')
 
 # Digitizers
-bklm_digitizer = basf2.register_module('BKLMDigitizer')
-eklm_digitizer = basf2.register_module('EKLMDigitizer')
+klm_digitizer = basf2.register_module('KLMDigitizer')
 
 # Packers
 bklm_packer = basf2.register_module('BKLMRawPacker')
@@ -66,8 +65,7 @@ main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(g4sim)
 
-main.add_module(bklm_digitizer)
-main.add_module(eklm_digitizer)
+main.add_module(klm_digitizer)
 main.add_module(bklm_packer)
 main.add_module(eklm_packer)
 main.add_module(klm_unpacker)

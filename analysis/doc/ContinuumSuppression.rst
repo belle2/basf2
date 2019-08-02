@@ -52,7 +52,7 @@ Here is a simple example that you can use as a starting point:
         Prior to Feb. 2017 B2GM, these selections for ROE: ``'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2'`` were hard coded in the module. Since then the explicit usage of a cleanMask is mandatory.
 
 Another new feature is the addition of an event-level R2 variable
-(`R2EventLevel`). It has been added as a `Continuum Suppression` variable, even
+(`R2EventLevel`). It has been added as a Continuum Suppression variable, even
 though it is event-level. This returns the event-level R2, where no cuts have
 been applied. Being event-level, it does not reconstruct a B or build a ROE, so
 no masks can be applied. This may be useful for skimming purposes, as R2 is a
@@ -91,24 +91,6 @@ from the Belle software):
   variables = ['KSFWVariables(hso00)','KSFWVariables(hso00,FS1)']
 
 Again, as shown in this example, you can store both cases in your ntuple.
-
-
-If you are using :doc:`NtupleMaker` (aka ``NtupleTools``), the way to store the
-entire set of :b2:var:`CleoConeCS` constructed from only ROE particles is by adding
-``CcROE`` as an argument.  Similarly, to store the KSFW moments calculated from
-the B final state particles, you need to add ``KsfwFS1``. To store all sets of
-CleoCones and KSFW variables, you can do the following:
-
-::
-
-  tools = ['ContinuumSuppression[KsfwFS1CcROE]', '^B0']
-  tools += ['ContinuumSuppression', '^B0']
-
-For the time-being, this also stores two identical sets of :b2:var:`thrustBm`, :b2:var:`thrustOm`,
-:b2:var:`cosTBTO`, :b2:var:`cosTBz`, and :b2:var:`R2` variables.
-This is due to the fact that the ``FS1`` and ``CcROE`` cases to not affect the
-calculation of these variables, so they are simply written out twice. This will
-be fixed in the near future. 
 
 Deep Continuum Suppression
 --------------------------

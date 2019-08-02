@@ -374,11 +374,6 @@ namespace Belle2 {
     double b2bClusterPhi(const Particle* particle);
 
     /**
-     * return Kshort using Belle goodKS algorithm
-     */
-    double goodBelleKshort(const Particle* KS);
-
-    /**
      * returns the longitudinal momentum asymmetry
      * alpha = (p_{L}^{+} - p_{L}^{-}) / (p_{L}^{+} - p_{L}^{-})
      * for the Armenteros plot.
@@ -400,6 +395,5 @@ namespace Belle2 {
      * respect to the V0 mother
      */
     double ArmenterosDaughter2Qt(const Particle* part);
-
   }
 } // Belle2 namespace

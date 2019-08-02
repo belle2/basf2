@@ -75,7 +75,18 @@ namespace Belle2 {
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
     REGISTER_VARIABLE("isUnspecified", particleIsUnspecified,
                       "returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not");
-    REGISTER_VARIABLE("chiProb", particlePvalue, "chi ^ 2 probability of the fit");
+    REGISTER_VARIABLE("chiProb", particlePvalue, R"DOC(
+A context-dependent :math:`\chi^2` probability for 'the fit' related to this particle.
+
+* If this particle is track-based, then this is the pvalue of the track fit (identical to :b2:var:`pValue`).
+* If this particle is cluster-based then this variable is currently unused.
+* If this particle is composite and a vertex fit has been performed, then this is the :math:`\chi^2` probability of the vertex fit result.
+
+.. tip:: 
+    If multiple vertex fits are performed then the last one sets the ``chiProb`` overwriting all previous.
+
+.. seealso:: :b2:var:`pValue` for tracks
+    )DOC");
     REGISTER_VARIABLE("nDaughters", particleNDaughters,
                       "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType,

@@ -29,8 +29,8 @@ class DQMModes(Enum):
     """Split between DQM modules that need to run on all events and on the filtered ones"""
     # DQM modules which should run on dismissed and non_dismissed events
     all_events = "all_events"
-    # DQM modules which should run before every reconstruction
-    before_reco = "before_reco"
+    # DQM modules which should run before the HLT filter
+    before_filter = "before_filter"
     # DQM modules which should only run on the filtered ones
     filtered = "filtered"
     # If not in HLT, just all all DQM modules

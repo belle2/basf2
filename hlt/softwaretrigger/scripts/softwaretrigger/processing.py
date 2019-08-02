@@ -6,12 +6,11 @@ import basf2
 import ROOT
 
 from softwaretrigger import constants
-from softwaretrigger.path_utils import add_geometry_if_not_present, add_expressreco_dqm, add_hlt_dqm
 from pxd import add_roi_payload_assembler, add_roi_finder
 
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
-from softwaretrigger.softwaretrigger_reconstruction import add_softwaretrigger_reconstruction, \
-    add_cosmic_softwaretrigger_reconstruction
+from softwaretrigger import path_utils
+import reconstruction
 
 from rawdata import add_unpackers
 
@@ -107,7 +106,6 @@ def add_hlt_processing(path,
                        prune_output=True,
                        unpacker_components=None,
                        reco_components=None,
-                       do_reconstruction=True,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -123,49 +121,65 @@ def add_hlt_processing(path,
     if prune_input:
         path.add_module("PruneDataStore", matchEntries=constants.HLT_INPUT_OBJECTS)
 
-    add_geometry_if_not_present(path)
+    # Add the geometry (if not already present)
+    path_utils.add_geometry_if_not_present(path)
+
+    # Unpack the event content
     add_unpackers(path, components=unpacker_components)
 
-    # Add the part of the dqm modules, which should run before every reconstruction
-    add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_reco)
+    # Do the reconstruction needed for the HLT decision
+    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
 
-    if do_reconstruction:
-        if run_type == constants.RunTypes.beam:
-            accept_path = add_softwaretrigger_reconstruction(path, components=reco_components,
-                                                             softwaretrigger_mode=softwaretrigger_mode,
-                                                             store_array_debug_prescale=1,
-                                                             **kwargs)
-        elif run_type == constants.RunTypes.cosmic:
-            if softwaretrigger_mode != constants.SoftwareTriggerModes.monitor:
-                basf2.B2FATAL("There is no trigger menu for the run type cosmic!")
+    # Add the part of the dqm modules, which should run after every reconstruction
+    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
 
-            accept_path = add_cosmic_softwaretrigger_reconstruction(path, components=reco_components,
-                                                                    **kwargs)
-        else:
-            basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+    # Now split up the path according to the HLT decision
+    hlt_filter_module = path_utils.add_filter_module(path)
 
-        # Only create the ROIs for accepted events
-        add_roi_finder(accept_path)
+    # Build up two paths: one for all accepted events...
+    accept_path = basf2.Path()
 
-        # Add the HLT DQM modules only in case the event is accepted
-        add_hlt_dqm(accept_path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
+    # ... and one for all dismissed events
+    discard_path = basf2.Path()
+
+    # Only turn on the filtering (by branching the path) if filtering is turned on
+    if softwaretrigger_mode == constants.SoftwareTriggerModes.filter:
+        # There are two possibilities for the output of this module
+        # (1) the event is dismissed -> only store the metadata
+        hlt_filter_module.if_value("==0", discard_path, basf2.AfterConditionPath.CONTINUE)
+        # (2) the event is accepted -> go on with the hlt reconstruction
+        hlt_filter_module.if_value("==1", accept_path, basf2.AfterConditionPath.CONTINUE)
+    elif softwaretrigger_mode == constants.SoftwareTriggerModes.monitor:
+        # Otherwise just always go with the accept path
+        path.add_path(accept_path)
     else:
-        # Add the HLT DQM modules always
-        add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
+        basf2.B2FATAL(f"The software trigger mode {softwaretrigger_mode} is not supported.")
+
+    # For all dismissed events we remove the data store content
+    path_utils.add_store_only_metadata_path(discard_path)
+
+    # For accepted events we continue the reconstruction
+    path_utils.add_post_filter_reconstruction(accept_path, run_type=run_type, components=reco_components)
+
+    # Only create the ROIs for accepted events
+    add_roi_finder(accept_path)
+
+    # Add the HLT DQM modules only in case the event is accepted
+    path_utils.add_hlt_dqm(accept_path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
 
     # Make sure to create ROI payloads for sending them to ONSEN
     # Do this for all events
     # Normally, the payload assembler dismisses the event if the software trigger says "no"
-    # However, if (a) there is is software trigger (because there is no reconstruction) or
-    # (b) we are running in monitoring mode, we ignore the decision
-    pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor) or not do_reconstruction
+    # However, if we are running in monitoring mode, we ignore the decision
+    pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor)
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
 
     # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
-    add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events)
+    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events)
 
     if prune_output:
-        path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS)
+        # And in the end remove everything which should not be stored
+        path_utils.add_store_only_rawdata_path(path)
 
 
 def add_expressreco_processing(path,
@@ -198,7 +212,7 @@ def add_expressreco_processing(path,
     if prune_input:
         path.add_module("PruneDataStore", matchEntries=constants.EXPRESSRECO_INPUT_OBJECTS)
 
-    add_geometry_if_not_present(path)
+    path_utils.add_geometry_if_not_present(path)
     add_unpackers(path, components=unpacker_components)
 
     if do_reconstruction:
@@ -211,7 +225,7 @@ def add_expressreco_processing(path,
         else:
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
-    add_expressreco_dqm(path, run_type, components=reco_components)
+    path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
 
     if prune_output:
         path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS +

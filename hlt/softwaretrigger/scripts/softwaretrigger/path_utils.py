@@ -2,7 +2,7 @@ import basf2
 from softwaretrigger import constants
 import modularAnalysis
 
-from rawdata import add_unpackers
+import reconstruction
 from tracking import add_cdc_monopole_track_finding
 
 
@@ -26,15 +26,10 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
         path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
 
 
-def add_hlt_dqm(path, run_type, components=constants.DEFAULT_HLT_COMPONENTS,
-                dqm_mode=constants.DQMModes.dont_care, standalone=False):
+def add_hlt_dqm(path, run_type, components, dqm_mode):
     """
     Add all the DQM modules for HLT to the path
     """
-    if standalone:
-        add_geometry_if_not_present(path)
-        add_unpackers(path, components=components)
-
     add_online_dqm(
         path,
         run_type=run_type,
@@ -43,19 +38,18 @@ def add_hlt_dqm(path, run_type, components=constants.DEFAULT_HLT_COMPONENTS,
         dqm_mode=dqm_mode.name)
 
 
-def add_expressreco_dqm(path, run_type, components=constants.DEFAULT_EXPRESSRECO_COMPONENTS, standalone=False):
+def add_expressreco_dqm(path, run_type, components):
     """
     Add all the DQM modules for ExpressReco to the path
     """
-    if standalone:
-        add_geometry_if_not_present(path)
-        add_unpackers(path, components=components)
-
     add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components,
                    dqm_mode=constants.DQMModes.dont_care.name)
 
 
 def add_geometry_if_not_present(path):
+    """
+    Add the geometry and gearbox module if it was not already added to the path
+    """
     if 'Gearbox' not in path:
         path.add_module('Gearbox')
 
@@ -63,22 +57,18 @@ def add_geometry_if_not_present(path):
         path.add_module('Geometry', useDB=True)
 
 
-def get_store_only_metadata_path():
+def add_store_only_metadata_path(path):
     """
     Helper function to create a path which deletes (prunes) everything from the data store except
     things that are really needed, e.g. the event meta data and the results of the software trigger module.
 
     After this path was processed, you can not use the data store content any more to do reconstruction (because
     it is more or less empty), but can only output it to a (S)ROOT file.
-    :return: The created path.
     """
-    store_metadata_path = basf2.create_path()
-    store_metadata_path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS).set_name("KeepMetaData")
-
-    return store_metadata_path
+    path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS).set_name("KeepMetaData")
 
 
-def get_store_only_rawdata_path(additonal_store_arrays_to_keep=None):
+def add_store_only_rawdata_path(path, additonal_store_arrays_to_keep=None):
     """
     Helper function to create a path which deletes (prunes) everything from the data store except
     raw objects from the detector and things that are really needed, e.g. the event meta data and the results of the
@@ -86,17 +76,13 @@ def get_store_only_rawdata_path(additonal_store_arrays_to_keep=None):
 
     After this path was processed, you can not use the data store content any more to do reconstruction (because
     it is more or less empty), but can only output it to a (S)ROOT file.
-    :return: The created path.
     """
     entries_to_keep = constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS
 
     if additonal_store_arrays_to_keep:
         entries_to_keep += additonal_store_arrays_to_keep
 
-    store_rawdata_path = basf2.create_path()
-    store_rawdata_path.add_module("PruneDataStore", matchEntries=entries_to_keep).set_name("KeepRawData")
-
-    return store_rawdata_path
+    path.add_module("PruneDataStore", matchEntries=entries_to_keep).set_name("KeepRawData")
 
 
 def add_filter_software_trigger(path, store_array_debug_prescale=0):
@@ -138,3 +124,48 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
+
+
+def add_filter_reconstruction(path, run_type, components, **kwargs):
+    """
+    Add everything needed to calculation a filter decision and if possible,
+    also do the HLT filtering. This is only possible for beam runs (in the moment).
+
+    Up to now, we add the full reconstruction, but this will change in the future.
+
+    Please note that this function adds the HLT decision, but does not branch
+    according to it.
+    """
+    if run_type == constants.RunTypes.beam:
+        reconstruction.add_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
+                                          add_trigger_calculation=False, components=components, **kwargs)
+
+        add_filter_software_trigger(path, store_array_debug_prescale=1)
+    elif run_type == constants.RunTypes.cosmic:
+        reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
+                                                  components=components, **kwargs)
+    else:
+        basf2.B2FATAL(f"Run Type {run_type} not supported.")
+
+
+def add_filter_module(path):
+    """
+    Add and return a skim module, which has a return value dependent
+    on the final HLT decision.
+    """
+    return path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
+
+
+def add_post_filter_reconstruction(path, run_type, components):
+    """
+    Add all modules which should run after the HLT decision is taken
+    and only on the accepted events.
+    Up to now, this only includes the skim part, but this will
+    change in the future.
+    """
+    if run_type == constants.RunTypes.beam:
+        add_skim_software_trigger(path, store_array_debug_prescale=1)
+    elif run_type == constants.RunTypes.cosmic:
+        pass
+    else:
+        basf2.B2FATAL(f"Run Type {run_type} not supported.")

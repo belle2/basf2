@@ -9,7 +9,7 @@ import basf2
 
 from rawdata import add_raw_seqoutput, add_unpackers
 from softwaretrigger import constants
-from softwaretrigger.softwaretrigger_reconstruction import add_softwaretrigger_reconstruction
+from softwaretrigger.processing import add_hlt_processing
 
 # You could use your own components here or just use the default for the HLT (everything except PXD)
 # e.g. without SVD
@@ -21,12 +21,11 @@ main_path = basf2.create_path()
 
 main_path.add_module("SeqRootInput", inputFileName="hlt_rawdata_simulation.sroot")
 
-# adding the HistoManager is important because the add_softwaretrigger_reconstruction call
+# adding the HistoManager is important because the add_hlt_processing call
 # adds DQM modules which will crash, if the HistoManager is not registered
 main_path.add_module("HistoManager")
 
-add_unpackers(main_path, components=components)
-add_softwaretrigger_reconstruction(main_path, store_array_debug_prescale=1, components=components)
+add_hlt_processing(main_path, store_array_debug_prescale=1, components=components)
 
 add_raw_seqoutput(main_path, additionalObjects=["SoftwareTriggerResults", "SoftwareTriggerVariables", "ROIs"])
 

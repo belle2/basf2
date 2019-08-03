@@ -1732,7 +1732,6 @@ arguments. Operator precedence is taken into account. For example ::
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
     REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
-                      "Similar to varFor, the functionality is a special case of :b2:var:`matchedMC`.\n"
                       "Returns the value of the variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.\n"
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
                       "E.g. varForMCGen(PDG) returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");

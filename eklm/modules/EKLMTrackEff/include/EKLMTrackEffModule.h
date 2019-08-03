@@ -31,6 +31,7 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/dataobjects/EKLMAlignmentHit.h>
+#include <eklm/dataobjects/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
@@ -100,11 +101,6 @@ namespace Belle2 {
     std::pair<bool, bool> trackCheck(int number_of_required_hits) const;
 
     /**
-     * Calculate hist errors
-     */
-    double errorCalculation(int64_t num_of_hits, int64_t num_of_exthits) const;
-
-    /**
      *  Matching of digits with ext hits
      */
     bool digitsMatching(const ExtHit& ext_hit, double allowed_distance) const;
@@ -142,14 +138,6 @@ namespace Belle2 {
      */
     void thetaCorr(const StoreArray<Track>& selected_tracks);
 
-
-    /**
-     * Function to determine sector efficiency from maps
-     */
-    std::pair<std::map<int, std::vector<double> >, std::map<int, std::vector<double> > >
-    calculate_sector_eff(std::map<int, std::map<int, int64_t> > sector_matching,
-                         std::map<int, std::map<int, int64_t> > sector_all);
-
     /**
      * Calculate distance to IP and make cut on this distance
      */
@@ -185,6 +173,9 @@ namespace Belle2 {
 
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
+
+    /** EKLMElementNumbers. */
+    const EKLMElementNumbers* m_EKLMElemNum;
 
     /** Hist for z distribution of Hit2ds */
     TH1F* m_Hit2dZDistrib;
@@ -276,29 +267,32 @@ namespace Belle2 {
     /** Max distance in strips number to 1D hit from extHit to be still matched */
     double m_AllowedDistance1D;
 
-    /** Map to store info about matching of exthit and Hit2D in layer */
-    std::map<int, int64_t> matching_by_layer;
+    /** Hist for containing matched digits for each plane (data for calibration) */
+    TH1F* m_MatchedDigitsInPlane;
 
-    /** Map to store info about all of exthit in layer */
-    std::map<int, int64_t> all_exthits_in_layer;
+    /** Hist for containing all extHits for each plane (data for calibration) */
+    TH1F* m_AllExtHitsInPlane;
 
-    /** Map to store info about matching of exthit and Digit in plane */
-    std::map<int, int64_t> matching_digits_by_plane;
+    /** Hist of planes eff (data for calibration) */
+    TH1F* m_planesEff;
 
-    /** Map to store info about all of exthit in plane */
-    std::map<int, int64_t> all_exthits_in_plane;
+    /** Hists to store info about matching of exthit and Hit2D in layer for each sector */
+    std::map<int, TH1F*> m_MatchingByLayer;
 
-    /** Map to store info about matching of exthit and Hit2D in layer for each sector */
-    std::map<int, std::map<int, int64_t> > sector_matching_by_layer;
+    /** Hists to store info about all of exthit in layer for each sector */
+    std::map<int, TH1F*> m_AllExtHitsInLayer;
 
-    /** Map to store info about all of exthit in layer for each sector */
-    std::map<int, std::map<int, int64_t> > sector_all_exthits_in_layer;
+    /** Hist of layers eff (data for visualisation) by sectors*/
+    std::map<int, TH1F*> m_LayersEff;
 
-    /** Map to store info about matching of exthit and Hit2D in plane for each sector */
-    std::map<int, std::map<int, int64_t> > sector_digit_matching_by_plane;
+    /** Hists to store info about matching of exthit and Digits in plane for each sector */
+    std::map<int, TH1F*> m_MatchingByPlaneVis;
 
-    /** Map to store info about all of exthit in plane for each sector */
-    std::map<int, std::map<int, int64_t> > all_digits_in_plane;
+    /** Hists to store info about all of exthit in plane for each sector */
+    std::map<int, TH1F*> m_AllExtHitsInPlaneVis;
+
+    /** Hist of planes eff (data for visualisation) by sector */
+    std::map<int, TH1F*> m_PlanesEffVis;
 
   };
 

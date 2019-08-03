@@ -76,6 +76,52 @@ void EKLMTrackEffModule::initialize()
   m_file = new TFile(m_filename.c_str(), "recreate");
   m_file->cd();
 
+  m_MatchedDigitsInPlane = new TH1F("Matched Digits in planeNumber", "", 208, 1, 208);
+  m_AllExtHitsInPlane = new TH1F("All ExtHits in planeNumber", "", 208, 1, 208);
+  m_planesEff = new TH1F("Planes efficiency", "", 208, 1, 208);
+
+  for (int i = 1; i < 5; ++i) {
+    std::string name = "Matched 2D hits in layer sector " + std::to_string(i);
+    m_MatchingByLayer[i] = new TH1F(name.data(), " ", 27, -12, 15);
+    m_MatchingByLayer[i]->GetYaxis()->SetTitle("Num of matched 2Dhits");
+    m_MatchingByLayer[i]->GetXaxis()->SetTitle("Layer");
+  }
+
+  for (int i = 1; i < 5; ++i) {
+    std::string name = "All ExtHits in layer sector " + std::to_string(i);
+    m_AllExtHitsInLayer[i] = new TH1F(name.data(), " ", 27, -12, 15);
+    m_AllExtHitsInLayer[i]->GetYaxis()->SetTitle("Num of all exthits");
+    m_AllExtHitsInLayer[i]->GetXaxis()->SetTitle("Layer");
+  }
+
+  for (int i = 1; i < 5; ++i) {
+    std::string name = "Layer efficiency sector " + std::to_string(i);
+    m_LayersEff[i] = new TH1F(name.data(), " ", 27, -12, 15);
+    m_LayersEff[i]->GetYaxis()->SetTitle("Layer efficiency");
+    m_LayersEff[i]->GetXaxis()->SetTitle("Layer");
+  }
+
+  for (int i = 1; i < 5; ++i) {
+    std::string name = "Matched Digits in layer sector " + std::to_string(i);
+    m_MatchingByPlaneVis[i] = new TH1F(name.data(), " ", 53, -24, 29);
+    m_MatchingByPlaneVis[i]->GetYaxis()->SetTitle("Num of matched Digits");
+    m_MatchingByPlaneVis[i]->GetXaxis()->SetTitle("2 * Layer + plane - 2");
+  }
+
+  for (int i = 1; i < 5; ++i) {
+    std::string name = "All ExtHits in plane sector " + std::to_string(i);
+    m_AllExtHitsInPlaneVis[i] = new TH1F(name.data(), " ", 53, -24, 29);
+    m_AllExtHitsInPlaneVis[i]->GetYaxis()->SetTitle("Num of all exthits");
+    m_AllExtHitsInPlaneVis[i]->GetXaxis()->SetTitle("2 * Layer + plane - 2");
+  }
+
+  for (int i = 1; i < 5; ++i) {
+    std::string name = "Plane efficiency sector " + std::to_string(i);
+    m_PlanesEffVis[i] = new TH1F(name.data(), " ", 53, -24, 29);
+    m_PlanesEffVis[i]->GetYaxis()->SetTitle("Num of all exthits");
+    m_PlanesEffVis[i]->GetXaxis()->SetTitle("2 * Layer + plane - 2");
+  }
+
 
   //* For Debug / analysis *//
 
@@ -213,14 +259,6 @@ std::pair<bool, bool> EKLMTrackEffModule::trackCheck(int number_of_required_hits
   return std::make_pair(mark_forward, mark_backward);
 }
 
-double EKLMTrackEffModule::errorCalculation(int64_t num_of_hits, int64_t num_of_exthits) const
-{
-  double hit2d_err = std::sqrt(static_cast<long double>(num_of_hits)) / num_of_hits;
-  double exthits_err = std::sqrt(static_cast<long double>(num_of_exthits)) / num_of_exthits;
-  double error = (std::sqrt(hit2d_err * hit2d_err + exthits_err * exthits_err));
-  return error;
-}
-
 bool EKLMTrackEffModule::digitsMatching(const ExtHit& ext_hit, double allowed_distance) const
 {
   int copyid = ext_hit.getCopyID();
@@ -333,30 +371,6 @@ void EKLMTrackEffModule::thetaCorr(const StoreArray<Track>& selected_tracks)
   m_ThetaCorrelationHist->Fill(first_trk, second_trk);
 }
 
-
-std::pair<std::map<int, std::vector<double> >, std::map<int, std::vector<double> > >
-EKLMTrackEffModule::calculate_sector_eff(std::map<int, std::map<int, int64_t> > sector_matching,
-                                         std::map<int, std::map<int, int64_t> > sector_all)
-{
-
-  std::map<int, std::vector<double> > sector_layers_eff;
-  std::map<int, std::vector<double> > sector_layers_eff_err;
-  for (auto [sector, sectors_eff] : sector_matching) {
-    std::vector<double> layer_eff_temp;
-    std::vector<double> layer_eff_temp_err;
-    for (auto [layer, num_of_hits] : sectors_eff) {
-      int64_t num_of_exthits = sector_all[sector][layer];
-      double partial_eff = static_cast<long double>(num_of_hits) / num_of_exthits;
-      layer_eff_temp.push_back(partial_eff);
-      layer_eff_temp_err.push_back(errorCalculation(num_of_hits, num_of_exthits));
-    }
-    sector_layers_eff[sector] = layer_eff_temp;
-    sector_layers_eff_err[sector] = layer_eff_temp_err;
-  }
-
-  return std::make_pair(sector_layers_eff, sector_layers_eff_err);
-}
-
 bool EKLMTrackEffModule::d0z0Cut(const StoreArray<Track>& selected_tracks, double dist) const
 {
   bool cosmic = false;
@@ -417,42 +431,39 @@ void EKLMTrackEffModule::event()
 
         TVector3 ext_hit_pos = ext_hit.getPosition();
 
+        int planeNum = m_EKLMElemNum->planeNumber(idEndcap, idLayer, idSector, idPlane);
+
         if (idEndcap == 2 && mark_forward) {
           if (hit2dsMatching(ext_hit, m_AllowedDistance2D)) {
-            matching_by_layer[idLayer]++;
-            sector_matching_by_layer[idSector][idLayer]++;
+            m_MatchingByLayer[idSector]->Fill(idLayer);
             m_Hit2dMatchedDistrib->Fill(idLayer);
           }
 
-          all_exthits_in_layer[idLayer]++;
-          sector_all_exthits_in_layer[idSector][idLayer]++;
+          m_AllExtHitsInLayer[idSector]->Fill(idLayer);
 
           if (digitsMatching(ext_hit, m_AllowedDistance1D)) {
-            matching_digits_by_plane[ 2 * idLayer + idPlane - 2]++;
-            sector_digit_matching_by_plane[idSector][ 2 * idLayer + idPlane - 2]++;
+            m_MatchedDigitsInPlane->Fill(planeNum);
+            m_MatchingByPlaneVis[idSector]->Fill(2 * idLayer + idPlane - 2);
           }
 
-          all_exthits_in_plane[2 * idLayer + idPlane - 2]++;
-          all_digits_in_plane[idSector][ 2 * idLayer + idPlane - 2]++;
+          m_AllExtHitsInPlane->Fill(planeNum);
+          m_AllExtHitsInPlaneVis[idSector]->Fill(2 * idLayer + idPlane - 2);
 
         } else if (idEndcap == 1 && mark_backward) {
           if (hit2dsMatching(ext_hit, m_AllowedDistance2D)) {
-            matching_by_layer[-idLayer]++;
-            sector_matching_by_layer[idSector][-idLayer]++;
+            m_MatchingByLayer[idSector]->Fill(-idLayer);
             m_Hit2dMatchedDistrib->Fill(-idLayer);
           }
 
-          all_exthits_in_layer[-idLayer]++;
-          sector_all_exthits_in_layer[idSector][-idLayer]++;
+          m_AllExtHitsInLayer[idSector]->Fill(-idLayer);
 
           if (digitsMatching(ext_hit, m_AllowedDistance1D)) {
-            matching_digits_by_plane[-2 * idLayer - idPlane + 2]++;
-            sector_digit_matching_by_plane[idSector][ - 2 * idLayer - idPlane + 2]++;
+            m_MatchedDigitsInPlane->Fill(planeNum);
+            m_MatchingByPlaneVis[idSector]->Fill(-2 * idLayer - idPlane + 2);
           }
 
-          all_exthits_in_plane[-2 * idLayer - idPlane + 2]++;
-          all_digits_in_plane[idSector][ - 2 * idLayer - idPlane + 2]++;
-
+          m_AllExtHitsInPlane->Fill(planeNum);
+          m_AllExtHitsInPlaneVis[idSector]->Fill(-2 * idLayer - idPlane + 2);
         }
       }
     }
@@ -590,140 +601,62 @@ void EKLMTrackEffModule::event()
 void EKLMTrackEffModule::terminate()
 {
 
-  // Layer eff
-  std::vector<double> layer_eff;
-  std::vector<double> layer_num;
-  std::vector<double> error;
-  std::vector<double> error_x;
-  error_x.resize(26);
-  for (auto [layer, num_of_hits] : matching_by_layer) {
-    int64_t num_of_exthits = all_exthits_in_layer[layer];
+  m_MatchedDigitsInPlane->Sumw2();
+  m_AllExtHitsInPlane->Sumw2();
+  m_MatchedDigitsInPlane->Write();
+  m_AllExtHitsInPlane->Write();
 
-    // Calculating errors
-    error.push_back(errorCalculation(num_of_hits, num_of_exthits));
-    double partial_eff = static_cast<long double>(num_of_hits) / num_of_exthits;
-    layer_eff.push_back(partial_eff);
-    layer_num.push_back(layer);
+  m_planesEff->Divide(m_MatchedDigitsInPlane, m_AllExtHitsInPlane, 1, 1, "B");
+  m_planesEff->Write();
+
+  for (int i = 1; i < 5; i++) {
+    m_MatchingByLayer[i]->Sumw2();
+    // m_MatchingByLayer[i]->Write();
+    m_AllExtHitsInLayer[i]->Sumw2();
+    // m_AllExtHitsInLayer[i]->Write();
+    m_LayersEff[i]->Divide(m_MatchingByLayer[i], m_AllExtHitsInLayer[i], 1, 1, "B");
+    m_LayersEff[i]->Write();
+
+    m_MatchingByPlaneVis[i]->Sumw2();
+    // m_MatchingByPlaneVis[i]->Write();
+    m_AllExtHitsInPlaneVis[i]->Sumw2();
+    // m_AllExtHitsInPlaneVis[i]->Write();
+    m_PlanesEffVis[i]->Divide(m_MatchingByPlaneVis[i], m_AllExtHitsInPlaneVis[i], 1, 1, "B");
+    m_PlanesEffVis[i]->Write();
   }
-
-  // Calculating layer eff by sectors
-  auto [sector_layers_eff, sector_layers_eff_err] = calculate_sector_eff(sector_matching_by_layer, sector_all_exthits_in_layer);
-
-  TGraphErrors* Ext_2Dhits_layer_efficiency = new TGraphErrors(static_cast<Int_t>(layer_num.size()), layer_num.data(),
-      layer_eff.data(), error_x.data(), error.data());
-  Ext_2Dhits_layer_efficiency->SetName("layer_eff");
-  Ext_2Dhits_layer_efficiency->Draw("AP*");
-  Ext_2Dhits_layer_efficiency->GetYaxis()->SetRangeUser(0, 1.2);
-  Ext_2Dhits_layer_efficiency->GetYaxis()->SetTitle("efficiency");
-  Ext_2Dhits_layer_efficiency->GetXaxis()->SetTitle("Layer");
-  Ext_2Dhits_layer_efficiency->Write();
-
-  std::map<int, TGraphErrors*> tgraph_map;
-  for (auto [sec, eff_vec] : sector_layers_eff) {
-    tgraph_map[sec] = new TGraphErrors(static_cast<Int_t>(layer_num.size()), layer_num.data(), eff_vec.data(), nullptr,
-                                       sector_layers_eff_err[sec].data());
-    std::string graph_name = "layer_eff_sector_" + std::to_string(sec);
-    tgraph_map[sec]->SetName(graph_name.data());
-    tgraph_map[sec]->Draw("AP*");
-    tgraph_map[sec]->GetYaxis()->SetRangeUser(0, 1.2);
-    tgraph_map[sec]->GetYaxis()->SetTitle("efficiency");
-    tgraph_map[sec]->GetXaxis()->SetTitle("Layer");
-    tgraph_map[sec]->Write();
-  }
-
-  error = {};
-  layer_eff = {};
-  layer_num = {};
-  error_x.resize(52);
-
-  for (auto [plane, num_of_hits] : matching_digits_by_plane) {
-    int64_t num_of_exthits = all_exthits_in_plane[plane];
-
-    // Calculating errors
-    error.push_back(errorCalculation(num_of_hits, num_of_exthits));
-    double partial_eff = static_cast<long double>(num_of_hits) / num_of_exthits;
-    layer_eff.push_back(partial_eff);
-    layer_num.push_back(plane);
-  }
-
-  TGraphErrors* plane_eff = new TGraphErrors(static_cast<Int_t>(layer_num.size()), layer_num.data(),
-                                             layer_eff.data(), error_x.data(), error.data());
-  plane_eff->SetName("plane_eff");
-  plane_eff->Draw("AP*");
-  plane_eff->GetYaxis()->SetRangeUser(0, 1.2);
-  plane_eff->GetYaxis()->SetTitle("efficiency");
-  plane_eff->GetXaxis()->SetTitle("2 * Layer + plane - 2");
-  plane_eff->Write();
-
-  // Plane eff by sectors
-
-  auto [sector_plane_eff, sector_plane_eff_err] = calculate_sector_eff(sector_digit_matching_by_plane, all_digits_in_plane);
-
-  std::map<int, TGraphErrors*> tgraph_map_plane;
-  for (auto [sec, eff_vec] : sector_plane_eff) {
-    tgraph_map_plane[sec] = new TGraphErrors(static_cast<Int_t>(layer_num.size()), layer_num.data(), eff_vec.data(), nullptr,
-                                             sector_plane_eff_err[sec].data());
-    std::string graph_name = "layer_eff_sector_" + std::to_string(sec) + " from 1d";
-    tgraph_map_plane[sec]->SetName(graph_name.data());
-    tgraph_map_plane[sec]->Draw("AP*");
-    tgraph_map_plane[sec]->GetYaxis()->SetRangeUser(0, 1.2);
-    tgraph_map_plane[sec]->GetYaxis()->SetTitle("efficiency");
-    tgraph_map_plane[sec]->GetXaxis()->SetTitle("2 * Layer + plane - 2");
-    tgraph_map_plane[sec]->Write();
-  }
-
-
-  // Making 2d eff from 1d:
-  error_x.resize(26);
-  std::vector<double> error_y;
-  layer_num = {};
-  for (int i = -12; i < 14; i++) {
-    if (i > -1) layer_num.push_back(i + 1);
-    else layer_num.push_back(i);
-  }
-
-  std::vector<double> eff_2d_from1d;
-  for (size_t i = 0; i < layer_eff.size(); i += 2) {
-    eff_2d_from1d.push_back(layer_eff.at(i) * layer_eff.at(i + 1));
-    error_y.push_back(std::sqrt(error.at(i) * error.at(i) + error.at(i + 1) * error.at(i + 1)));
-  }
-
-  TGraphErrors* from_1d_to_2d = new TGraphErrors(static_cast<Int_t>(layer_num.size()), layer_num.data(),
-                                                 eff_2d_from1d.data(), error_x.data(), error_y.data());
-  from_1d_to_2d->SetName("2d_from_1d_eff");
-  from_1d_to_2d->Draw("AP*");
-  from_1d_to_2d->GetYaxis()->SetRangeUser(0, 1.2);
-  from_1d_to_2d->GetYaxis()->SetTitle("efficiency");
-  from_1d_to_2d->GetXaxis()->SetTitle("Layer");
-  from_1d_to_2d->Write();
 
   // Making 2d eff from 1d by sectors
 
-  error_x.resize(26);
-  std::map<int, std::vector<double> > sector_eff_err_2d_from_1d;
-  std::map<int, std::vector<double> > sector_eff_2d_from_1d;
+  std::map<int, std::vector<double> > sectorEffErr2dFrom1d;
+  std::map<int, std::vector<double> > sectorEff2dFrom1d;
+  std::vector<double> layerNum;
 
-  for (auto [sec, plane_eff_vec] : sector_plane_eff) {
-    for (size_t i = 0; i < plane_eff_vec.size(); i += 2) {
-      sector_eff_2d_from_1d[sec].push_back(plane_eff_vec.at(i) * plane_eff_vec.at(i + 1));
-      sector_eff_err_2d_from_1d[sec].push_back(std::sqrt(sector_plane_eff_err[sec].at(i) * sector_plane_eff_err[sec].at(i)
-                                                         + sector_plane_eff_err[sec].at(i + 1) * sector_plane_eff_err[sec].at(i + 1)));
+  for (int i = -12; i < 14; i ++) {
+    if (i < 0) layerNum.push_back(i);
+    else layerNum.push_back(i + 1);
+  }
+
+  for (auto [sec, planeEffHist] : m_PlanesEffVis) {
+    for (size_t i = 1; i < 54; i += 2) {
+      if (planeEffHist->GetXaxis()->GetBinCenter(i) == 0.5) i++;   // To skip 0 empty bin
+      sectorEff2dFrom1d[sec].push_back(planeEffHist->GetBinContent(i) * planeEffHist->GetBinContent(i + 1));
+      sectorEffErr2dFrom1d[sec].push_back(std::sqrt(planeEffHist->GetBinError(i) * planeEffHist->GetBinError(i)
+                                                    + planeEffHist->GetBinError(i + 1) * planeEffHist->GetBinError(i + 1)));
     }
   }
 
-  for (auto [sec, eff_vec] : sector_eff_2d_from_1d) {
-    tgraph_map_plane[sec] = new TGraphErrors(static_cast<Int_t>(layer_num.size()), layer_num.data(), eff_vec.data(), nullptr,
-                                             sector_eff_err_2d_from_1d[sec].data());
-    std::string graph_name = "plane_eff_sector_" + std::to_string(sec) + " from_1d";
-    tgraph_map_plane[sec]->SetName(graph_name.data());
-    tgraph_map_plane[sec]->Draw("AP*");
-    tgraph_map_plane[sec]->GetYaxis()->SetRangeUser(0, 1.2);
-    tgraph_map_plane[sec]->GetYaxis()->SetTitle("efficiency");
-    tgraph_map_plane[sec]->GetXaxis()->SetTitle("Layer");
-    tgraph_map_plane[sec]->Write();
+  std::map<int, TGraphErrors*> tGraphMapLayer;
+  for (auto [sec, effVec] : sectorEff2dFrom1d) {
+    tGraphMapLayer[sec] = new TGraphErrors(26, layerNum.data(), effVec.data(), nullptr,
+                                           sectorEffErr2dFrom1d[sec].data());
+    std::string graphName = "Layer efficiency sector " + std::to_string(sec) + " from 1d";
+    tGraphMapLayer[sec]->SetName(graphName.data());
+    tGraphMapLayer[sec]->Draw("AP*");
+    tGraphMapLayer[sec]->GetYaxis()->SetRangeUser(0, 1.2);
+    tGraphMapLayer[sec]->GetYaxis()->SetTitle("efficiency");
+    tGraphMapLayer[sec]->GetXaxis()->SetTitle("Layer");
+    tGraphMapLayer[sec]->Write();
   }
-
-
 
   if (m_debug) {
     // Writing all additional hists

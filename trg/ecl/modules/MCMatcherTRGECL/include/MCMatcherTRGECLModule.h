@@ -80,11 +80,11 @@ namespace Belle2 {
 
 
     /** CPU time     */
-    double m_timeCPU;
+    double m_timeCPU = 0.;
     /** Run number   */
-    int    m_nRun;
+    int    m_nRun = 0;
     /** Event number */
-    int    m_nEvent;
+    int    m_nEvent = 0;
     /** object of TC Mapping*/
     TrgEclMapping* _TCMap;
     /** TCId  */

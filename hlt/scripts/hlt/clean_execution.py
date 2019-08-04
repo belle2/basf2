@@ -49,7 +49,7 @@ class CleanBasf2Execution:
         self._handled_processes = []
         # The commands related to the processes
         self._handled_commands = []
-
+        # Maximum time the process is allowed to stay alive after SIGTERM has been sent
         self.timeout = timeout
 
     def start(self, command):

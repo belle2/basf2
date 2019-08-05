@@ -356,14 +356,14 @@ Most of the mentioned techniques below have an example in the mva package under 
 General Machine Learning 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- Christopher M. Bishop. Pattern Recognition and Machine Learning
-- Trevor Hastie, Robert Tibshirani, and Jerome Friedman. The Elements of Statistical Learning.
-- J. Han, M. Kamber, J. Pei. Data Mining: Concepts and Techniques 
+- Christopher M. Bishop. `Pattern Recognition and Machine Learning <http://dx.doi.org/10.1117/1.2819119>`_
+- Trevor Hastie, Robert Tibshirani, and Jerome Friedman. `The Elements of Statistical Learning. <http://dx.doi.org/10.1007/978-0-387-84858-7>`_
+- J. Han, M. Kamber, J. Pei. `Data Mining: Concepts and Techniques <https://doi.org/10.1145/565117.565130>`_
 
 Focused on HEP
 ^^^^^^^^^^^^^^
 
-- O. Behnke, K. Kröninger, G. Scott, T. Schörner-Sadenius. Data Analysis in High Energy Physics: A Practical Guide to Statistical Methods
+- O. Behnke, K. Kröninger, G. Scott, T. Schörner-Sadenius. `Data Analysis in High Energy Physics: A Practical Guide to Statistical Methods <http://doi.org/10.1002/9783527653416>`_
 
 Boosted Decision Trees
 ^^^^^^^^^^^^^^^^^^^^^^

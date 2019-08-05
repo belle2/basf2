@@ -431,7 +431,7 @@ void EKLMTrackEffModule::event()
 
         TVector3 ext_hit_pos = ext_hit.getPosition();
 
-        int planeNum = m_EKLMElemNum->planeNumber(idEndcap, idLayer, idSector, idPlane);
+        int planeNum = m_ElementNumbers->planeNumber(idEndcap, idLayer, idSector, idPlane);
 
         if (idEndcap == 2 && mark_forward) {
           if (hit2dsMatching(ext_hit, m_AllowedDistance2D)) {

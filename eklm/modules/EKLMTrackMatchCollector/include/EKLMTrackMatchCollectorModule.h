@@ -36,45 +36,45 @@
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
 #include <eklm/geometry/TransformDataGlobalAligned.h>
+#include <calibration/CalibrationCollectorModule.h>
+
 
 namespace Belle2 {
 
   /**
-   * Module EKLMTrackEffModule.
+   * Module EKLMTrackMatchCollectorModule.
    * @details
-   * Module for monitoring track matching efficiency.
+   * Module for collecting data for track matching efficiency.
    */
 
-  class EKLMTrackEffModule : public Module {
+  class EKLMTrackMatchCollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMTrackEffModule();
+    EKLMTrackMatchCollectorModule();
 
     /**
      * Destructor.
      */
-    virtual ~EKLMTrackEffModule();
+    virtual ~EKLMTrackMatchCollectorModule();
 
     /**
      * Initializer.
      */
-    void initialize() override;
-
+    void prepare() override;
 
     /**
      * This method is called for each event.
      */
-    void event() override;
+    void collect() override;
 
     /**
-     * This method is called in the end of event processing.
+     * This method is called at the end of run.
      */
-    void terminate() override;
-
+    void closeRun() override;
     /**
      * Was ExtHit entered in EKLM sensetive volume? If it isn`t returns tuple of -1.
      * If it is returns copyid, idEndcap, idLayer, idSector, idPlane, idStrip

@@ -1059,7 +1059,7 @@ namespace Belle2 {
     }
 
     PCmsLabTransform T;
-    double rotationangle = T.getBeamParams().getHER().Vect().Angle(-1.0 * T.getBeamParams().getLER().Vect()) / 2.;
+    double rotationangle = T.getBeamCrossingAngle() / 2.;
 
     TLorentzVector iptube_mom(0., 0., 1e10, 1e10);
     iptube_mom.RotateX(0.);

@@ -57,6 +57,14 @@ namespace Belle2 {
     }
 
     /**
+     * Returns beam crossing angle
+     */
+    double getBeamCrossingAngle() const
+    {
+      return getBeamParams().getHER().Vect().Angle(-1.0 * getBeamParams().getLER().Vect());
+    }
+
+    /**
      * Returns CMS energy of e+e- (aka. invariant mass in any system)
      */
     double getCMSEnergy() const

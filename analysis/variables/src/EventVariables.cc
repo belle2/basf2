@@ -170,7 +170,7 @@ namespace Belle2 {
     double getCrossingAngle(const Particle*)
     {
       PCmsLabTransform T;
-      return T.getBeamParams().getHER().Vect().Angle(-1.0 * T.getBeamParams().getLER().Vect());
+      return T.getBeamCrossingAngle();
     }
 
     double getCMSEnergy(const Particle*)

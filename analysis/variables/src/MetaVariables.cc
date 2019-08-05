@@ -106,7 +106,7 @@ namespace Belle2 {
             return -999.;
           }
           PCmsLabTransform T;
-          TLorentzVector pRecoil = T.getBeamParams().getHER() + T.getBeamParams().getLER() - roe->get4Vector();
+          TLorentzVector pRecoil = T.getBoostVector() - roe->get4Vector();
           Particle tmp(pRecoil, 0);
           UseReferenceFrame<RestFrame> frame(&tmp);
           double result = var->function(particle);

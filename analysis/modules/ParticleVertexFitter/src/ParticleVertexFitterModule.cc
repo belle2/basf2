@@ -619,7 +619,8 @@ namespace Belle2 {
     }
 
     // apply four momentum constraint
-    kf.setFourMomentum(m_beamParams->getHER() + m_beamParams->getLER());
+    PCmsLabTransform T;
+    kf.setFourMomentum(T.getBoostVector());
 
     int err = kf.doFit();
 

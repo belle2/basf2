@@ -19,7 +19,7 @@ def mc_gen_topo(n=200):
 
     Note that the function has a parameter that specifies the number of MCGenPDG_i/MCGenMothIndex_i variables.
     To completely examine the topology information of the events in an MC sample,
-    the parameter should be great than or equal to the maximum of nMCGen in the sample.
+    the parameter should be greater than or equal to the maximum of nMCGen in the sample.
     Normally, the maximum of nMCGen in the MC samples at Belle II is less than 200.
     Hence, if you have no idea about the maximum of nMCGen in your own MC sample,
     it is usually a safe choice to use the default parameter value 200.

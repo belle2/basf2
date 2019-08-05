@@ -45,11 +45,11 @@ class CleanBasf2Execution:
         """
         Create a new execution with the given parameters (list of arguments)
         """
-        # The processes handled by this class
+        #: The processes handled by this class
         self._handled_processes = []
-        # The commands related to the processes
+        #: The commands related to the processes
         self._handled_commands = []
-        # Maximum time the process is allowed to stay alive after SIGTERM has been sent
+        #: Maximum time the process is allowed to stay alive after SIGTERM has been sent
         self.timeout = timeout
 
     def start(self, command):

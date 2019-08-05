@@ -362,6 +362,8 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
   if (byMuid) {
     if (!m_muidParameters.isValid())
       B2FATAL("Muid parameters are not available.");
+    if (!m_klmStripEfficiency.isValid())
+      B2FATAL("KLM strip efficiency data are not available.");
     if (m_MuonPlusPar != NULL) {
       if (m_ExpNo == expNo) { return; }
       delete m_MuonPlusPar;
@@ -794,16 +796,26 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   }
 
   if (klmClusterInfo != NULL) {
+    // here we set a relation only to the closest KLMCluster
+    // and we don't set any relation if the distance is too large
     StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
+    double minDistance = m_MaxKLMTrackClusterDistance;
+    unsigned int closestCluster = 0;
     for (unsigned int c = 0; c < klmClusterInfo->size(); ++c) {
-      if (klmHit[c].getDistance() > 1.0E9) continue;
+      if (klmHit[c].getDistance() > 1.0E9) {
+        continue;
+      }
       TrackClusterSeparation* h = trackClusterSeparations.appendNew(klmHit[c]);
       (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
-      extState.track->addRelationTo(h); // relation track to TrackSep
-      if (klmHit[c].getDistance() < m_MaxKLMTrackClusterDistance) {
-        // relation track->KLMCluster, the MDST obj KLMCluster assumes these exist for at least muons
-        extState.track->addRelationTo((*klmClusterInfo)[c].first);
+      extState.track->addRelationTo(h); // relation Track to TrackSep
+      if (klmHit[c].getDistance() < minDistance) {
+        closestCluster = c;
+        minDistance = klmHit[c].getDistance();
       }
+    }
+    if (minDistance < m_MaxKLMTrackClusterDistance) {
+      // set the relation Track to KLMCluster, using the distance as weight
+      extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / minDistance);
     }
   }
 
@@ -1386,10 +1398,8 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
             //efficiency storage
-            if (m_klmStripEfficiency.isValid()) {
-              muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
-                                              intersection.sector + 1, intersection.layer + 1, 1, 1));
-            }
+            muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
+                                            intersection.sector + 1, intersection.layer + 1, 1, 1));
           } else {
             muid->setExtBKLMEfficiencyValue(intersection.layer, 0);
           }

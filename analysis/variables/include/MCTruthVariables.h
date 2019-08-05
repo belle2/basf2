@@ -277,5 +277,14 @@ namespace Belle2 {
      * correspont to the track's mcmatch (== the particle)
      */
     double particleClusterBestMCPDGCode(const Particle*);
+
+
+    /**
+     * returns True if the environment is MC and False for data
+     */
+    double isMC(const Particle*);
+
+
   }
 }
+

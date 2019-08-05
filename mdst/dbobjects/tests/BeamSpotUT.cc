@@ -14,9 +14,9 @@ namespace Belle2 {
   TEST_F(BeamSpotTest, Basic)
   {
     BeamSpot bs;
-    EXPECT_EQ(bs.getVertex().X() , 0.);
-    EXPECT_EQ(bs.getVertex().Y() , 0.);
-    EXPECT_EQ(bs.getVertex().Z() , 0.);
+    EXPECT_EQ(bs.getIPPosition().X() , 0.);
+    EXPECT_EQ(bs.getIPPosition().Y() , 0.);
+    EXPECT_EQ(bs.getIPPosition().Z() , 0.);
 
     std::function<float (int, int)> sizeElement = [ & sizeElement](int i, int j) {
       return j >= i ? (i + 1) + 10 * (j + 1) : sizeElement(j, i) ;
@@ -36,28 +36,29 @@ namespace Belle2 {
     TVector3 position;
     position.SetXYZ(1., 2., 3.);
 
-    bs.setSize(size);
-    bs.setVertex(position, positionError);
+    bs.setSizeCovMatrix(size);
+    bs.setIP(position, positionError);
 
-    TVector3 testPosition = bs.getVertex();
+    TVector3 testPosition = bs.getIPPosition();
     EXPECT_EQ(testPosition.X() , 1.);
     EXPECT_EQ(testPosition.Y() , 2.);
     EXPECT_EQ(testPosition.Z() , 3.);
 
-    TMatrixDSym testError = bs.getPositionError();
+    TMatrixDSym testError = bs.getIPPositionCovMatrix();
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++)
         EXPECT_EQ(testError(i, j) , errorElement(i, j));
 
-    TMatrixDSym testSize = bs.getSize();
+    TMatrixDSym testSize = bs.getSizeCovMatrix();
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++)
         EXPECT_EQ(testSize(i, j) , sizeElement(i, j));
 
-    TMatrixDSym testSize2 = bs.getCovVertex();
+
+    TMatrixDSym testCovVertex = bs.getCovVertex();
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++)
-        EXPECT_EQ(testSize2(i, j) , sizeElement(i, j));
+        EXPECT_EQ(testCovVertex(i, j) , (sizeElement(i, j) + errorElement(i, j)));
 
     EXPECT_EQ(bs.getGlobalUniqueID() , 1);
     BeamSpot bs2(bs);
@@ -71,9 +72,9 @@ namespace Belle2 {
     bs4 = bs3;
     size(2, 2) = 0.;
 
-    bs3.setSize(size);
+    bs3.setSizeCovMatrix(size);
     size(2, 2) = std::numeric_limits<double>::min();
-    bs4.setSize(size);
+    bs4.setSizeCovMatrix(size);
 
     EXPECT_EQ(bs4 == bs3, false);
   }

@@ -82,18 +82,18 @@ void BeamSpotMonitorModule::event()
     return;
 
   //retrieve vertex position
-  m_x = m_BeamSpot.getVertex().X();
-  m_y = m_BeamSpot.getVertex().Y();
-  m_z = m_BeamSpot.getVertex().Z();
+  m_x = m_BeamSpot.getIPPosition().X();
+  m_y = m_BeamSpot.getIPPosition().Y();
+  m_z = m_BeamSpot.getIPPosition().Z();
 
   //retrieve vertex position error
-  TMatrixDSym posErr = m_BeamSpot.getPositionError();
+  TMatrixDSym posErr = m_BeamSpot.getIPPositionCovMatrix();
   m_xErr = sqrt(posErr[0][0]);
   m_yErr = sqrt(posErr[1][1]);
   m_zErr = sqrt(posErr[2][2]);
 
   //retrieve beam spot size
-  TMatrixDSym size = m_BeamSpot.getSize();
+  TMatrixDSym size = m_BeamSpot.getSizeCovMatrix();
   m_xSize = sqrt(size[0][0]);
   m_ySize = sqrt(size[1][1]);
   m_zSize = sqrt(size[2][2]);

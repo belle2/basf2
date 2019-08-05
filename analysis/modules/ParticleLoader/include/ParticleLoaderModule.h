@@ -16,6 +16,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 
+#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
 
@@ -127,6 +128,16 @@ namespace Belle2 {
     void v0sToParticles();
 
     /**
+     * Loads ROE object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
+     */
+    void roeToParticles();
+
+    /**
+     * Helper method to load ROE object as Particle
+     */
+    void addROEToParticleList(RestOfEvent* roe, int pdgCode = 0, bool isSelfConjugatedParticle = true);
+
+    /**
      * returns true if the PDG code determined from the decayString is valid
      */
     bool isValidPDGCode(const int pdgCode);
@@ -138,6 +149,8 @@ namespace Belle2 {
 
     bool m_useMCParticles;  /**< Load MCParticle as Particle instead of the corresponding MDST dataobject */
 
+    bool m_useROEs;  /**< Switch to load ROE as Particle */
+
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
 
     std::vector<std::tuple<std::string, std::string>>
@@ -147,12 +160,15 @@ namespace Belle2 {
     std::vector<PList> m_MCParticles2Plists; /**< Collection of PLists that will collect Particles created from MCParticles */
     std::vector<PList> m_Tracks2Plists; /**< Collection of PLists that will collect Particles created from Tracks */
     std::vector<PList> m_V02Plists; /**< Collection of PLists that will collect Particles created from V0 */
+    std::vector<PList> m_ROE2Plists; /**< Collection of PLists that will collect Particles created from V0 */
     std::vector<PList> m_ECLClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters */
     std::vector<PList> m_KLMClusters2Plists; /**< Collection of PLists that will collect Particles created from KLMClusters */
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
-
+    std::string m_roeMaskName; /**< ROE mask name to load */
+    std::string m_sourceParticleListName; /**< Particle list name from which we need to get related ROEs */
+    bool m_useMissing; /**< Use missing momentum to build a particle */
     int m_trackHypothesis; /**< pdg code for track hypothesis that should be used to create the particle */
 
     bool m_enforceFitHypothesis =

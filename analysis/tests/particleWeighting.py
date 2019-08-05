@@ -4,6 +4,7 @@
 import sys
 import os
 from basf2 import *
+import b2test_utils
 from modularAnalysis import *
 from stdCharged import *
 import random
@@ -174,7 +175,8 @@ B2RESULT("Weights are created and loaded to DB")
 main = create_path()
 ntupleName = 'particleWeighting.root'
 treeName = 'pitree'
-inputMdst("default", Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
+inputfile = b2test_utils.require_file('analysis/tests/mdst.root')
+inputMdst("default", inputfile, path=main)
 
 # use standard final state particle lists
 # creates "pi+:all" ParticleList (and c.c.)
@@ -203,13 +205,11 @@ main.add_module(reweighter)
 variablesToNtuple('pi+:gen', varsPi, filename=ntupleName, treename=treeName,
                   path=main)
 
-# Process the events
-process(main)
+with b2test_utils.clean_working_directory():
 
-# print out the summary
-print(statistics)
+    # Process the events
+    b2test_utils.safe_process(main)
 
-check(ntupleName, treeName)
+    check(ntupleName, treeName)
 
 B2RESULT("Weight were applied corectly")
-os.remove(ntupleName)

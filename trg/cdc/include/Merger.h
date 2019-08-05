@@ -74,7 +74,7 @@ namespace Belle2 {
     void simulate(void);
 
     /// Output signal bundle. not the best way to do this though.
-    TRGSignalBundle* mosb;
+    TRGSignalBundle* mosb = nullptr;
 
   public:// VHDL utilities
 

@@ -48,7 +48,7 @@ namespace Belle2 {
 
     void SimulationPar::read()
     {
-      GearDir content(Gearbox::getInstance().getDetectorComponent("BKLM"), "SimulationParameters");
+      GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"), "BKLM/SimulationParameters");
       if (!content) return;
 
       m_HitTimeMax = content.getWithUnit("/HitTimeMax");

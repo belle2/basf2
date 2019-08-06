@@ -362,6 +362,8 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
   if (byMuid) {
     if (!m_muidParameters.isValid())
       B2FATAL("Muid parameters are not available.");
+    if (!m_klmStripEfficiency.isValid())
+      B2FATAL("KLM strip efficiency data are not available.");
     if (m_MuonPlusPar != NULL) {
       if (m_ExpNo == expNo) { return; }
       delete m_MuonPlusPar;
@@ -1396,10 +1398,8 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
             //efficiency storage
-            if (m_klmStripEfficiency.isValid()) {
-              muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
-                                              intersection.sector + 1, intersection.layer + 1, 1, 1));
-            }
+            muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
+                                            intersection.sector + 1, intersection.layer + 1, 1, 1));
           } else {
             muid->setExtBKLMEfficiencyValue(intersection.layer, 0);
           }

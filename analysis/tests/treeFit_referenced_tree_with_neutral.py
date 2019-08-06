@@ -4,6 +4,7 @@ import unittest
 import os
 import tempfile
 from basf2 import *
+import b2test_utils
 from modularAnalysis import *
 from vertex import vertexTree
 from ROOT import Belle2
@@ -21,7 +22,9 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', find_file('analysis/1000_B_DstD0Kpipi0_skimmed.root', 'validation'), path=main)
+        inputfile = b2test_utils.require_file(
+            'analysis/1000_B_DstD0Kpipi0_skimmed.root', 'validation', py_case=self)
+        inputMdst('default', inputfile, path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
         fillParticleList('K+:a', 'kaonID > 0.5', path=main)

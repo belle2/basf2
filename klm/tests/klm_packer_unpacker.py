@@ -14,7 +14,8 @@ set_log_level(LogLevel.INFO)
 class PackerUnpackerTest(Module):
 
     """
-    module which checks if two collections of EKLMDigits are equal
+    module which checks if two collections of EKLMDigits and BKLMDigits are
+    equal
     """
 
     def sort_bklm_digits(self, unsortedPyStoreArray):
@@ -58,7 +59,7 @@ class PackerUnpackerTest(Module):
 
     def event(self):
         """
-        load original EKLMDigits and the packed/unpacked ones, sort and compare them
+        load original digits and the packed/unpacked ones, sort and compare them
         """
 
         # direct from simulation
@@ -134,9 +135,8 @@ particlegun.param('nTracks', 10)
 particlegun.param('momentumParams', [0.5, 4.0])
 main.add_module(particlegun)
 
-add_simulation(main, components=['BKLM', 'EKLM'])
-set_module_parameters(main, type='Geometry', useDB=False,
-                      components=['BKLM', 'EKLM'])
+add_simulation(main, components=['KLM'])
+set_module_parameters(main, type='Geometry', useDB=False, components=['KLM'])
 
 bklm_packer = register_module('BKLMRawPacker')
 eklm_packer = register_module('EKLMRawPacker')

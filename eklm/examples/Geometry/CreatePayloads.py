@@ -16,7 +16,7 @@ gearbox = register_module('Gearbox')
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('components', ['EKLM'])
+geometry.param('components', ['KLM'])
 geometry.param('useDB', False)
 geometry.param('createPayloads', True)
 geometry.param('payloadIov', [0, 0, -1, -1])

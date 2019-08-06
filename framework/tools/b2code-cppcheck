@@ -37,8 +37,41 @@ EOT
     exit 1;
 fi
 
+# crashes or endless loops in cppcheck 1.88
+EXCLUDES="-i ${SOFTWARE_DIR}/tracking/ckf/pxd/findlets/src/CKFToPXDFindlet.cc
+          -i ${SOFTWARE_DIR}/tracking/ckf/svd/findlets/src/CKFToSVDFindlet.cc
+          -i ${SOFTWARE_DIR}/tracking/ckf/svd/findlets/src/CKFToSVDSeedFindlet.cc
+          -i ${SOFTWARE_DIR}/tracking/ckf/svd/findlets/src/RecoTrackRelator.cc
+          -i ${SOFTWARE_DIR}/tracking/ckf/svd/findlets/src/RelationApplier.cc
+          -i ${SOFTWARE_DIR}/tracking/ckf/svd/utilities/src/SVDMCUtil.cc
+          -i ${SOFTWARE_DIR}/tracking/modules/cdcToVXDExtrapolator/src/CKFModules.cc
+          -i ${SOFTWARE_DIR}/tracking/modules/cosmicsTrackMerger/src/CosmicsTrackMergerFindlet.cc
+          -i ${SOFTWARE_DIR}/tracking/modules/cosmicsTrackMerger/src/CosmicsTrackMergerModule.cc
+          -i ${SOFTWARE_DIR}/tracking/modules/cosmicsTrackMerger/src/PhiRecoTrackRelationFilter.cc
+          -i ${SOFTWARE_DIR}/tracking/modules/trackFinderCDC/src/AxialTrackFinderModules.cc
+          -i ${SOFTWARE_DIR}/tracking/modules/trackFinderCDC/src/StereoHitFinderModule.cc
+          -i ${SOFTWARE_DIR}/tracking/modules/trackFinderCDC/src/TrackFinderModule.cc
+          -i ${SOFTWARE_DIR}/tracking/modules/vxdCDCTrackMerger/src/MCVXDCDCTrackMergerModule.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/collectors/matchers/src/StereoHitTrackQuadTreeMatcher.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/filters/segmentTrack/src/SegmentTrackFilterFactory.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/AxialTrackFinderHough.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/MonopoleStereoHitFinder.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/StereoHitFinder.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/complete/src/TrackFinder.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/minimal/src/AxialTrackCreatorHitHough.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/minimal/src/AxialTrackCreatorSegmentHough.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0Curv.test.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0CurvTanL.test.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0Impact.test.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0ImpactCurv.test.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0TanL.test.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/StereoHitContained.test.cc
+          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/tests/LinearDivision.test.cc
+"
+
 cppcheck -q --enable=all --template=gcc --suppress=unusedFunction --inline-suppr --force --relative-paths=${SOFTWARE_DIR} \
          -D_PACKAGE_=PACKAGE -ULOG_NO_B2DEBUG -ULOG_NO_B2METHOD -ULOG_NO_B2INFO -ULOG_NO_B2WARNING -ULOG_NO_B2ASSERT -ULOG_NO_B2RESULT \
+         -D__GNUC__=8 -UR__DICTIONARY_FILENAME -U__CINT__ -U__ROOTCLING__ -U__APPLE__ -U__ECC -U__ICC \
          -I ${SOFTWARE_DIR}/include/ -I ${SOFTWARE_DIR}/framework/data/cppcheck-includes/ \
          -i ${SOFTWARE_DIR}/build/ -i ${SOFTWARE_DIR}/include/ -i ${SOFTWARE_DIR}/framework/utilities/sha3hash \
-         "$@"  2>&1
+         "$@" ${EXCLUDES} 2>&1

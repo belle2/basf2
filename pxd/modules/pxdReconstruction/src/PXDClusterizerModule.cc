@@ -40,7 +40,7 @@ REG_MODULE(PXDClusterizer);
 
 PXDClusterizerModule::PXDClusterizerModule() :
   Module(), m_elNoise(0.7), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
-    8.0), m_sizeHeadTail(3), m_clusterCacheSize(0)
+    8.0), m_sizeHeadTail(3), m_clusterCacheSize(0), m_cutAdjacentSignal(0)
 {
   //Set module properties
   setDescription("Cluster PXDHits");

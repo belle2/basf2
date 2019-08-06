@@ -32,14 +32,14 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    PXDDAQDHCStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_dhcID(0), m_rawCount(0), m_redCount(0) {}
+    PXDDAQDHCStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_dhcID(0), m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
 
     /** constructor setting the error mask, dhcid, raw and reduced data counters
      * @param dhcid DHC id
      * @param mask error mask
      */
     PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask) : m_errorMask(mask),
-      m_critErrorMask(0), m_usable(true), m_dhcID(dhcid), m_rawCount(0), m_redCount(0) {}
+      m_critErrorMask(0), m_usable(true), m_dhcID(dhcid), m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
 
     /** Return Usability of data
      * @return conclusion if data is useable

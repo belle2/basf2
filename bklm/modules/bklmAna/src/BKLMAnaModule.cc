@@ -271,8 +271,7 @@ void BKLMAnaModule::endRun()
 
 void BKLMAnaModule::terminate()
 {
-  float num = 0;
-  float denom = 0;
+  float num, denom;
 
   for (int iL = 0; iL < 15; iL ++) {
     for (int i = 0; i < m_totalThephi[iL]->GetNbinsX(); i++) {

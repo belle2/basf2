@@ -263,15 +263,17 @@ namespace Belle2 {
            >> Bhabha3DVetoThreshold[1]
            >> Bhabha3DSelectionAngle[0]
            >> Bhabha3DSelectionAngle[1]
-           >> Bhabha3DSelectionAngle[0]
-           >> Bhabha3DSelectionAngle[1]
+           >> Bhabha3DSelectionAngle[2]
+           >> Bhabha3DSelectionAngle[3]
            >> Bhabha3DVetoAngle[0]
            >> Bhabha3DVetoAngle[1]
-           >> Bhabha3DVetoAngle[0]
-           >> Bhabha3DVetoAngle[1]
+           >> Bhabha3DVetoAngle[2]
+           >> Bhabha3DVetoAngle[3]
            >> mumuThreshold
            >> mumuAngle[0]
            >> mumuAngle[1]
+           >> mumuAngle[2]
+           >> mumuAngle[3]
            >> LowMultiThreshold[0]
            >> LowMultiThreshold[1]
            >> LowMultiThreshold[2]
@@ -283,7 +285,6 @@ namespace Belle2 {
            >> ETMDelay
            >> n300MeVCluster
            >> ECLBurstThreshold;
-
 
 
     etmpara.appendNew(FPGAversion, ADCto100MeV, ELow, EHigh, ELum, FWD2DBhabha, BWD2DBhabha, Bhabha3DSelectionThreshold,

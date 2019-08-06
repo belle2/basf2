@@ -73,6 +73,7 @@ namespace Belle2 {
     addParam("EventSelect", _SelectEvent, "TRGECL Select one trigger window for logic study", _SelectEvent);
     addParam("ConditionDB", _ConditionDB, "Flag to use Condition Database(Defult 0)", _ConditionDB);
 
+
     _2DBhabhaThresholdFWD.clear();
     _2DBhabhaThresholdBWD.clear();
     _3DBhabhaSelectionThreshold.clear();
@@ -83,6 +84,19 @@ namespace Belle2 {
 
     _TotalEnergy.clear();
     _LowMultiThreshold.clear();
+
+    _TotalEnergy = {5, 10, 30}; // /100 MeV
+    _2DBhabhaThresholdFWD = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
+    _2DBhabhaThresholdBWD  = {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // /100 MeV
+    _3DBhabhaVetoThreshold = {30, 45}; //  /100 MeV
+    _3DBhabhaSelectionThreshold = {20, 40}; //  /100 MeV
+    _3DBhabhaVetoAngle = {160, 200, 165, 190}; //  /100 MeV
+    _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
+    _mumuThreshold = 20; //100 MeV
+    _mumuAngle = {160, 200, 165, 190}; //  degree
+    _LowMultiThreshold = {10, 20, 25, 30}; // degree
+    _n300MeVCluster = 1;
+    _ECLBurstThreshold = 20;
 
 
     if (TRGDebug::level()) {
@@ -149,22 +163,7 @@ namespace Belle2 {
         _mumuAngle =  {(double)para.getmumuAngle(0), (double)para.getmumuAngle(1), (double)para.getmumuAngle(2)};
         _LowMultiThreshold = {(double)para.getLowMultiThreshold(0) , (double)para.getLowMultiThreshold(1), (double)para.getLowMultiThreshold(2), (double)para.getLowMultiThreshold(3)}; //  /100 MeV
       }
-    } else {
-
-      _TotalEnergy = {5, 10, 30}; // /100 MeV
-      _2DBhabhaThresholdFWD = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
-      _2DBhabhaThresholdBWD  = {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // /100 MeV
-      _3DBhabhaVetoThreshold = {30, 45}; //  /100 MeV
-      _3DBhabhaSelectionThreshold = {20, 40}; //  /100 MeV
-      _3DBhabhaVetoAngle = {160, 200, 165, 190}; //  /100 MeV
-      _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
-      _mumuThreshold = 20; //100 MeV
-      _mumuAngle = {160, 200, 165, 190}; //  degree
-      _LowMultiThreshold = {10, 20, 25, 30}; // degree
-      _n300MeVCluster = 1;
-      _ECLBurstThreshold = 20;
     }
-
 
     if (TRGDebug::level()) {
       std::cout << "TRGECLModule ... beginRun called " << std::endl;
@@ -202,10 +201,10 @@ namespace Belle2 {
     _ecl -> set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
     _ecl -> setmumuThreshold(_mumuThreshold);
     _ecl -> setmumuAngle(_mumuAngle);
-
     _ecl -> setTotalEnergyThreshold(_TotalEnergy);
     _ecl -> setLowMultiplicityThreshold(_LowMultiThreshold);
-
+    _ecl -> setn300MeVClusterThreshold(_n300MeVCluster);
+    _ecl -> setECLBurstThreshold(_ECLBurstThreshold);
 
     if (_SelectEvent == 0) {
       _ecl->simulate01(m_nEvent);

@@ -473,13 +473,13 @@ bool BKLMTrackingModule::sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2)
 
 bool BKLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, BKLMHit2d* hit)
 {
-  if (hit->getSection() == (section != 0) && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
+  if (hit->getSection() == section && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
   else return false;
 }
 
 bool BKLMTrackingModule::isSectorUnderStudy(int section, int iSector, BKLMHit2d* hit)
 {
-  if (hit->getSection() == (section != 0) && hit->getSector() == iSector + 1) return true;
+  if (hit->getSection() == section && hit->getSector() == iSector + 1) return true;
   else return false;
 }
 

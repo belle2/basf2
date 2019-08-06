@@ -261,7 +261,7 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   eclCluster->addRelationTo(eclShower);
 
   // set relation to ECLCalDigits and set failed timing flags
-  auto maxEcrysID = eclShower->getCentralCellId() ;
+  auto cellIDOfMaxEnergyCrystal = eclShower->getCentralCellId() ;
   auto showerDigitRelations = eclShower->getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
   for (unsigned int iRel = 0; iRel < showerDigitRelations.size(); ++iRel) {
     const auto calDigit = showerDigitRelations.object(iRel);
@@ -271,7 +271,7 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
 
 
     // Set the failed timing flag for the crystal that defines the cluster time
-    if (calDigit->getCellId() == maxEcrysID) {
+    if (calDigit->getCellId() == cellIDOfMaxEnergyCrystal) {
       if (calDigit->isFailedFit()) {
         eclCluster->addStatus(ECLCluster::EStatusBit::c_fitTimeFailed);
         eclCluster->setTime(eclShower->getTime());

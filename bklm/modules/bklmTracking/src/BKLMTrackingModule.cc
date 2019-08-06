@@ -473,13 +473,13 @@ bool BKLMTrackingModule::sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2)
 
 bool BKLMTrackingModule::isLayerUnderStudy(int forward, int iSector, int iLayer, BKLMHit2d* hit)
 {
-  if (hit->getForward() == forward && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
+  if (hit->getForward() == (forward != 0) && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
   else return false;
 }
 
 bool BKLMTrackingModule::isSectorUnderStudy(int forward, int iSector, BKLMHit2d* hit)
 {
-  if (hit->getForward() == forward && hit->getSector() == iSector + 1) return true;
+  if (hit->getForward() == (forward != 0) && hit->getSector() == iSector + 1) return true;
   else return false;
 }
 
@@ -494,6 +494,7 @@ double BKLMTrackingModule::distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
   sigma = DBL_MAX;
 
   TVectorD m_SectorPar = track->getLocalTrackParam();
+  TMatrixDSym m_SectorErr = track->getTrackParamErr();
 
   m_GeoPar = GeometryPar::instance();
   const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getForward(), hit->getSector(), 1);

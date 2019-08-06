@@ -53,10 +53,21 @@ namespace Belle2 {
        */
       virtual G4bool IsApplicable(const G4ParticleDefinition& p) override;
 
+      /** WARNING new
+       * calculate some min energy?
+       */
+      virtual G4double MinPrimaryEnergy(const G4ParticleDefinition* p,
+                                        const G4Material*, G4double cut) final;
+
       /**
        * Print out of the class parameters
        */
       virtual void PrintInfo() override;
+
+      /** WARNING new
+       * Print description in html
+       */
+      virtual void ProcessDescription(std::ostream&) const override;
 
     protected:
 

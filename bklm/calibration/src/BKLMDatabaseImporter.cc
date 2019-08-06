@@ -50,7 +50,7 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
 {
   int copperId = 0;
   int slotId = 0;
-  int laneId = 0;
+  int laneId;
   int axisId = 0;
   KLMChannelIndex bklmPlanes(KLMChannelIndex::c_IndexLevelPlane);
   for (KLMChannelIndex bklmPlane = bklmPlanes.beginBKLM();

@@ -240,6 +240,8 @@ namespace Belle2 {
           auto uid = label.getUniqueId();
 
           std::set<int> payloadIndices;
+          // this is probably dangerous if we do not impose additional invariant
+          //TODO: better to always loop over whole event header?
           for (int i = timeid; i < std::min(eov + 1, int(std::get<EventHeader>(timeTable).size())); ++i) {
             payloadIndices.insert(getContinuousIndexByTimeID(timeTable, uid, i));
           }
@@ -268,7 +270,7 @@ namespace Belle2 {
 
               // First obj in event dependency
               //TODO: how the lifetime of EventDependency is handled?
-              // both works now -> have to check data storage in DB in real life scenario
+              // both work now -> have to check data storage in DB in real life scenario
               auto payloads = new EventDependency(obj);
               //auto payloads = EventDependency(obj);
               // Add others

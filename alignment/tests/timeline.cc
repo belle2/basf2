@@ -189,7 +189,7 @@ namespace {
     {
       GlobalLabel::clearTimeDependentParamaters();
 
-      //boost::filesystem::remove_all("testPayloads");
+      boost::filesystem::remove_all("testPayloads");
       Database::reset();
       DataStore::Instance().reset();
     }
@@ -410,7 +410,7 @@ namespace {
     timeline.loadFromDB();
 
     GlobalLabel::setCurrentTimeInterval(3);
-    auto beamZ = GlobalLabel::construct<BeamParameters>(0, 2).label();
+    auto beamZ = GlobalLabel::construct<BeamParameters>(0, 3).label();
 
     timeline.updateGlobalParam(GlobalLabel(beamZ), 42.);
 
@@ -418,6 +418,34 @@ namespace {
     EXPECT_EQ(objects.size(), 8);
 
     for (auto iov_obj : objects)
-      Database::Instance().storeData(iov_obj.second->ClassName(), iov_obj.second, iov_obj.first);
+      Database::Instance().storeData(DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.second, iov_obj.first);
+
+    TFile file("testPayloads/dbstore_EventDependency_rev_1.root");
+    auto evdep = (EventDependency*) file.Get("EventDependency");
+
+    auto beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532, 2, 7)));
+    EXPECT_EQ(beam->getVertex()[2], 42.);
+
+    beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532 - 1, 2, 7)));
+    EXPECT_EQ(beam->getVertex()[2], 0.);
+
+    file.Close();
   }
 }  // namespace
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -34,6 +34,8 @@
 #include <framework/dataobjects/EventT0.h>
 #include <framework/dbobjects/BeamParameters.h>
 
+#include <mdst/dbobjects/BeamSpot.h>
+
 // cluster utils
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
@@ -177,7 +179,7 @@ namespace Belle2 {
     double getCMSEnergy(const Particle*)
     {
       PCmsLabTransform T;
-      return T.getBeamParams().getMass();
+      return T.getCMSEnergy();
     }
 
     double getBeamPx(const Particle*)
@@ -206,20 +208,20 @@ namespace Belle2 {
 
     double getIPX(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().X();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).X();
     }
 
     double getIPY(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().Y();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).Y();
     }
 
     double getIPZ(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().Z();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).Z();
     }
 
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element)

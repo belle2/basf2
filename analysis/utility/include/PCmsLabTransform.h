@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Francesco Tenchini                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,29 +33,19 @@ namespace Belle2 {
     PCmsLabTransform();
 
     /**
-     * Returns Lorentz transformation from CMS to Lab
-     * @return const reference to Lorentz rotation matrix
-     */
-    const TLorentzRotation& rotateCmsToLab() const
-    {
-      return getBeamParams().getCMSToLab();
-    }
-
-    /**
-     * Returns Lorentz transformation from Lab to CMS
-     * @return const reference to Lorentz rotation matrix
-     */
-    const TLorentzRotation& rotateLabToCms() const
-    {
-      return getBeamParams().getLabToCMS();
-    }
-
-    /**
      * Returns boost vector (beta=p/E)
      */
     TVector3 getBoostVector() const
     {
-      return getBeamFourMomentum().BoostVector();
+      return m_boostVectorDB->getBoost();
+    }
+
+    /**
+     * Returns CMS energy of e+e- (aka. invariant mass in any system)
+     */
+    double getCMSEnergy() const
+    {
+      return m_invariantMassDB->getMass();
     }
 
     /**
@@ -63,7 +53,10 @@ namespace Belle2 {
      */
     TLorentzVector getBeamFourMomentum() const
     {
-      return getBeamParams().getHER() + getBeamParams().getLER();
+      TVector3 beta = getBoostVector();
+      double gamma = 1 / TMath::Sqrt(1 - beta.Mag2());
+      TLorentzVector beamFourVec(beta, 1.);
+      return beamFourVec * gamma * getCMSEnergy();
     }
 
     /**
@@ -75,11 +68,22 @@ namespace Belle2 {
     }
 
     /**
-     * Returns CMS energy of e+e- (aka. invariant mass in any system)
+     * Returns Lorentz transformation from Lab to CMS
+     * @return const reference to Lorentz rotation matrix
      */
-    double getCMSEnergy() const
+    const TLorentzRotation rotateLabToCms() const
     {
-      return getCollisionInvariantMass().getMass();
+      TLorentzRotation rotation(-1.*getBoostVector());
+      return rotation;
+    }
+
+    /**
+     * Returns Lorentz transformation from CMS to Lab
+     * @return const reference to Lorentz rotation matrix
+     */
+    const TLorentzRotation rotateCmsToLab() const
+    {
+      return rotateLabToCms().Inverse();
     }
 
     /**
@@ -98,12 +102,6 @@ namespace Belle2 {
 
     /** Get currently valid nominal beam parameters from database. */
     const BeamParameters& getBeamParams() const;
-
-    /** Get currently valid beam invariant mass from database. */
-    const CollisionInvariantMass& getCollisionInvariantMass() const;
-
-    /** Get currently valid beam boost vector from database. */
-    const CollisionBoostVector& getCollisionBoostVector() const;
 
   private:
     const DBObjPtr<BeamParameters> m_beamParamsDB; /**< db object for beam parameters. */

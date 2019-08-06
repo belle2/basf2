@@ -1397,7 +1397,6 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           }
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-            //efficiency storage
             muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
                                             intersection.sector + 1, intersection.layer + 1, 1, 1));
           } else {
@@ -1418,7 +1417,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       fromG4eToPhasespace(g4eState, intersection.covariance);
       if (findMatchingEndcapHit(intersection, extState.track)) {
         extState.extLayerPattern |= (0x00008000 << intersection.layer);
-        //        extState.extEKLMEfficiencyVector[intersection.layer] == 1; TODO
+        //efficiency implementation
+        muid->setExtEKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0),
+                                        intersection.sector + 1, intersection.layer + 1, 1, 1));
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
         }
@@ -1454,9 +1455,10 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-          //          extState.extEKLMEfficiencyVector[intersection.layer] == 1; TODO
+          muid->setExtEKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0),
+                                          intersection.sector + 1, intersection.layer + 1, 1, 1));
         } else {
-          //          extState.extEKLMEfficiencyVector[intersection.layer] == 0; TODO
+          muid->setExtEKLMEfficiencyValue(intersection.layer, 0);
         }
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;

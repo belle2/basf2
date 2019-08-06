@@ -32,6 +32,7 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/dataobjects/EventT0.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 // cluster utils
 #include <analysis/ClusterUtility/ClusterUtils.h>
@@ -157,14 +158,14 @@ namespace Belle2 {
     // Beam Energies
     double getHEREnergy(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getHER().E();
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getHER()).E();
     }
 
     double getLEREnergy(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getLER().E();
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getLER()).E();
     }
 
     double getCrossingAngle(const Particle*)
@@ -497,8 +498,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
     REGISTER_VARIABLE("productionIdentifier", productionIdentifier, "[Eventbased] production identifier");
 
-    REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] HER energy");
-    REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] LER energy");
+    REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] Nominal HER energy");
+    REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] Nominal LER energy");
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
     REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Crossing angle");
     REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Beam energy (lab)");

@@ -153,7 +153,7 @@ Basic particle information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. b2-variables::
-   :group: Basic Particle Information
+   :group: Basic particle information
 
 PID for expert
 """"""""""""""

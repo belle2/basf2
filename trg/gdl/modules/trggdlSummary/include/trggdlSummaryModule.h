@@ -47,12 +47,12 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     //condition database for prescales
     DBObjPtr<TRGGDLDBPrescales> m_prescales;
-    int LeafBitMap[320];
-    char LeafNames[320][100];
-    int _e_timtype;
-    int ee_psn[10];
-    int ee_ftd[10];
-    int ee_itd[10];
+    int LeafBitMap[320] = {0};
+    char LeafNames[320][100] = {{""}};
+    int _e_timtype = 0;
+    int ee_psn[10] = {0};
+    int ee_ftd[10] = {0};
+    int ee_itd[10] = {0};
 
   };
 

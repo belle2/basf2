@@ -300,7 +300,7 @@ namespace Belle2 {
     StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;
 
     /** debug level specified in the steering file */
-    int m_debugLevel;
+    int m_debugLevel = 0;
 
     /** Belle2Link delay of the merger reader */
     int m_mergerDelay = 0;

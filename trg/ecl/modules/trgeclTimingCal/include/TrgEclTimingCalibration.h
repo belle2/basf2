@@ -84,8 +84,8 @@ namespace Belle2 {
     int cut_ntc;  // The number of TC cut
     int TC_ref;   // Reference TC whose time offset set to be 0
 
-    int nevt_selected; // The number of selected events
-    int nevt_read;     // The number of read events
+    int nevt_selected = 0; // The number of selected events
+    int nevt_read = 0;     // The number of read events
     double TCEnergyCalibrationConstant; // ADC to GeV energy conversion factor
     double cut_chisq; // TC chisq cut (iteration mode)
 

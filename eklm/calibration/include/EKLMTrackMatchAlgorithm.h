@@ -12,6 +12,7 @@
 
 #include <TH1.h>
 #include <calibration/CalibrationAlgorithm.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
 
 namespace Belle2 {
 
@@ -39,10 +40,17 @@ namespace Belle2 {
 
   private:
 
+    /** EKLMElementNumbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
+
     /** Hist of planes eff (data for calibration) */
     TH1F* m_planesEff;
 
+    /** Output root file */
     TFile* m_file;
+
+    /** Efficiency data object */
+    KLMStripEfficiency* m_StripEfficiency;
 
   };
 

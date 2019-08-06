@@ -1,20 +1,17 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019  Belle II Collaboration                              *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Vitaliy Popov, Dmytro Minchenko                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 
-
 #include <TH1.h>
 #include <eklm/calibration/EKLMTrackMatchAlgorithm.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;
 
@@ -46,5 +43,25 @@ CalibrationAlgorithm::EResult EKLMTrackMatchAlgorithm::calibrate()
   m_planesEff->Divide(MatchedDigitsInPlane.get(), AllExtHitsInPlane.get(), 1, 1, "B");
   m_planesEff->Write();
 
+  KLMChannelIndex klmChannels;
+  for (KLMChannelIndex klmChannel = klmChannels.beginEKLM(); klmChannel != klmChannels.endEKLM(); ++klmChannel) {
+
+    int idEndcap = klmChannel.getSection(); // Endcap
+    int idSector = klmChannel.getSector(); // Sector
+    int idLayer = klmChannel.getLayer(); // Layer
+    int idPlane = klmChannel.getPlane(); // Plane
+    int idStrip = klmChannel.getStrip(); // Strip
+    int planeNum = m_ElementNumbers->planeNumber(idEndcap, idLayer, idSector, idPlane);
+
+    // Bin number is equal to plane planeNumber
+    float efficiency = m_planesEff->GetBinContent(planeNum);
+    float efficiencyError = m_planesEff->GetBinError(planeNum);
+
+    // Fill the efficiency for this strip.
+    m_StripEfficiency->setEndcapEfficiency(idEndcap, idSector, idLayer, idPlane, idStrip, efficiency, efficiencyError);
+  }
+
+  // Where can I get IoV?
+  saveCalibration(m_StripEfficiency, "KLMStripEfficiency");
   return CalibrationAlgorithm::c_OK;
 }

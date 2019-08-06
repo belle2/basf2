@@ -182,7 +182,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         use_ecl_to_cdc_ckf = False
 
     if use_ecl_to_cdc_ckf and not is_ecl_used(components):
-        B2WARNING("ECL CKF cannot be used without ECL. Turning it off.")
+        B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
     # output tracks

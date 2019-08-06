@@ -49,7 +49,6 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
         "UseReassignedHits": True,
-        'UseOnlyBeforeTOP': True,
         'UseNLoops': 1
     }
 

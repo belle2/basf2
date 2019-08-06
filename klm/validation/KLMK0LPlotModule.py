@@ -40,6 +40,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Check', 'No efficiency decrease or multiple candidates \
                      increase'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: X resolution histogram.
         self.hist_xres = ROOT.TH1F('k0l_xres',
                                    'KLM K0L decay vertex X resolution',
@@ -50,6 +51,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'X resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Y resolution histogram.
         self.hist_yres = ROOT.TH1F('k0l_yres',
                                    'KLM K0L decay vertex Y resolution',
@@ -60,6 +62,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Y resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Z resolution histogram.
         self.hist_zres = ROOT.TH1F('k0l_zres',
                                    'KLM K0L decay vertex Z resolution',
@@ -70,6 +73,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Z resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Time resolution histogram.
         self.hist_tres = ROOT.TH1F('k0l_tres',
                                    'KLM K0L decay time resolution',
@@ -80,6 +84,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Time resolution'))
         l.Add(TNamed('Check', 'No bias.'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Momentum resolution histogram.
         self.hist_pres = ROOT.TH1F('k0l_pres',
                                    'KLM K0L momentum resolution',
@@ -90,6 +95,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Momentum resolution'))
         l.Add(TNamed('Check', 'No bias.'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Momentum theta resolution histogram.
         self.hist_ptres = ROOT.TH1F('k0l_ptres',
                                     'KLM K0L momentum theta resolution',
@@ -100,6 +106,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Momentum theta resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 0.06'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Momentum phi resolution histogram.
         self.hist_ppres = ROOT.TH1F('k0l_ppres',
                                     'KLM K0L momentum phi resolution',
@@ -110,6 +117,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Momentum phi resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 0.07'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Covariance matrix histogram.
         self.hist_covmat = ROOT.TH1F('k0l_covmat',
                                      'KLM K0L coordinates covariance matrix',
@@ -125,6 +133,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Momentum phi resolution'))
         l.Add(TNamed('Check', 'No lagre nondiagonal elements.'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Correlation matrix histogram.
         self.hist_corrmat = ROOT.TH1F('k0l_corrmat',
                                       'KLM K0L correlation matrix',
@@ -144,6 +153,7 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Momentum phi resolution'))
         l.Add(TNamed('Check', 'No lagre nondiagonal elements.'))
         l.Add(TNamed('Contact', contact))
+        l.Add(TNamed('MetaOptions', 'shifter'))
         #: Average vertex.
         self.vertex_k_av = ROOT.TVector3(0, 0, 0)
         #: Vertex list.

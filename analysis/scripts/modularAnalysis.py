@@ -1,4 +1,3 @@
-# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -2296,25 +2295,51 @@ def buildEventShape(inputListNames=[],
                     checkForDuplicates=False,
                     path=None):
     """
-    Calculates the event shape quantities (thrust, sphericity, Fox-Wolfram moments...) using the
-    particles in the lists provided by the user.
-    The results of the calculation are then store in the EventShapeContainer dataobject, and are accessible
-    byt the variabels of the EventShape group.
+    Calculates the event-level shape quantities (thrust, sphericity, Fox-Wolfram moments...)
+    using the particles in the lists provided by the user. If no particle list is provided,
+    the function will internally create a list of good tracks and a list of good photons
+    with (optionally) minimal quality cuts. The user can provide as many particle lists
+    as needed, using also combined particles, but the function will always assume that
+    the lists are independent.
+    If the lists provided by the user contain several times the same track (either with
+    different mass hypothesis, or once as an independent particle and once as daughter of a
+    combined particle) the results won't be reliable.
+    A basic check for duplicates is available setting the checkForDuplicate flags,
+    but is usually quite time consuming.
 
-    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
-                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
-    @param default_cleanup  if True,  applyes some very standard cuts on pt and costTheta when defines the interanl lists.
-    @param path             modules are added to this path
-    @param allMoments  Enables the calculation of FW and harmonic moments from 5 to 8
-    @param cleoCones  Enables the calculation of the CLEO cones.
-    @param collisionAxis  Enables the calculation of the  quantities related to the collision axis.
-    @param foxWolfram    Enables the calculation of the Fox-Wolfram moments.
-    @param jets   Enables the calculation of jet-related quantities.
-    @param harmonicMoments   Enables the calculation of the Harmonic moments.
-    @param sphericity  Enables the calculation of the sphericity-related quantities.
-    @param thrust  Enables the calculation of thust-related quantities.
-    @param checkForDuplicates Perform a check for duplicate particles before adding them.
 
+    The results of the calculation are then stored into the EventShapeContainer dataobject,
+    and are accessible using the variables of the EventShape group.
+
+    The user can switch the calculation of certain quantities on or off to save computing
+    time. By default the calculation of the high-order moments (5-8) is turned off.
+    Switching off an option will make the corresponding variables not available.
+
+
+    @param inputListNames     List of ParticleLists used to calculate the global
+                              event kinematics. If the list is empty the default
+                              particleLists pi+:evtshape and gamma:evtshape are filled.
+    @param default_cleanup    If True, applies standard cuts on pt and costTheta when
+                              defining the internal lists. This option is ignored if the
+                              particleLists are provided by the user.
+    @param path               Path to append the eventShape modules to.
+    @param thrust             Enables the calculation of thrust-related quantities (CLEO
+                              cones, Harmonic moments, jets).
+    @param collisionAxis      Enables the calculation of the  quantities related to the
+                              collision axis .
+    @param foxWolfram         Enables the calculation of the Fox-Wolfram moments.
+    @param harmonicMoments    Enables the calculation of the Harmonic moments with respect
+                              to both the thrust axis and, if collisionAxis = True, the collision axis.
+    @param allMoments         If True, calculates also the  FW and harmonic moments from order
+                              5 to 8 instead of the low-order ones only.
+    @param cleoCones          Enables the calculation of the CLEO cones with respect to both the thrust
+                              axis and, if collisionAxis = True, the collision axis.
+    @param jets               Enables the calculation of the hemisphere momenta and masses.
+                              Requires thrust = True.
+    @param sphericity         Enables the calculation of the sphericity-related quantities.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them. This option
+                              is quite time consuming, instead of using it consider sanitizing
+                              the lists you are passing to the function.
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
@@ -2323,7 +2348,7 @@ def buildEventShape(inputListNames=[],
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
-            B2INFO("Using the default lists for the EventShape module.")
+            B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
@@ -2334,7 +2359,7 @@ def buildEventShape(inputListNames=[],
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
-            B2WARNING("Creating the default lists with no cleanup. This can be potentially dangerous")
+            B2WARNING("Creating the default lists with no cleanup.")
     else:
         particleLists = inputListNames
 

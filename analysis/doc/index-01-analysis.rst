@@ -99,6 +99,8 @@ Advanced Topics
 
 .. toctree:: FullEventInterpretation
 
+.. toctree:: EventShape
+
 .. toctree:: ContinuumSuppression
 
 .. toctree:: TreeFitter

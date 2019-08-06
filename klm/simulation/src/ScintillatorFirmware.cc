@@ -51,14 +51,11 @@ enum KLM::ScintillatorFirmwareFitStatus KLM::ScintillatorFirmware::fit(
     else if (amp[i] < min)
       min = amp[i];
   }
-  /* No signal. */
-  if (ithr < 0)
+  /* No signal or cannot determine background level. */
+  if (ithr < 0 || ithr <= nPointsSigBg)
     return c_ScintillatorFirmwareNoSignal;
   /* Region for background (pedestal) level. */
-  ibg = std::max(ithr - nPointsSigBg, 0);
-  /* Cannot determine background level, no data before signal. */
-  if (ibg == 0)
-    return c_ScintillatorFirmwareNoSignal;
+  ibg = ithr - nPointsSigBg;
   /* Determine background (pedestal) level. */
   for (i = 0; i < ibg; i++)
     bgSum = bgSum + amp[i];

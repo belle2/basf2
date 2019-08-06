@@ -64,9 +64,9 @@ namespace Belle2 {
     int m_minLayers;
 
     //! Total number of processed events
-    int m_nEvents;
+    int m_nEvents = 0;
     //! Total number of found tracks
-    int m_nTracks;
+    int m_nTracks = 0;
 
     /**name of StoreArray Tracks*/
     std::string m_klmtrackCollectionName;

@@ -38,17 +38,17 @@ namespace Belle2 {
 
   protected:
     //dz of T3D in each module
-    TH1D* h_dz;
-    TH1D* h_phi;
-    TH1D* h_tanlambda;
-    TH1D* h_pt;
-    TH1D* h_phi_2D;
-    TH1D* h_pt_2D;
+    TH1D* h_dz = nullptr;
+    TH1D* h_phi = nullptr;
+    TH1D* h_tanlambda = nullptr;
+    TH1D* h_pt = nullptr;
+    TH1D* h_phi_2D = nullptr;
+    TH1D* h_pt_2D = nullptr;
 
 
     //TDirectories
-    TDirectory* oldDir;
-    TDirectory* dirDQM;
+    TDirectory* oldDir = nullptr;
+    TDirectory* dirDQM = nullptr;
 
     //flag to save ps file
     bool m_generatePostscript;
@@ -57,13 +57,13 @@ namespace Belle2 {
     std::string m_postScriptName;
 
     //experiment number
-    unsigned _exp;
+    unsigned _exp = 0;
 
     //run number
-    unsigned _run;
+    unsigned _run = 0;
 
     //T3D module number
-    int m_T3DMOD;
+    int m_T3DMOD = 0;
 
     //3D data store
     StoreArray<CDCTriggerTrack> entAry;

@@ -322,6 +322,13 @@ function getDefaultRevisions(mode="rbn") {
     // Don't use [referenceRevision, otherList[0]] or similar, because this
     // gives problems if otherList is of length 0!
 
+    // First, we cache the case of running locally: There all of the above
+    // revision lists are empty and our only guess is to return allRevisions, which
+    // in particular will include 'reference' and 'current' etc.
+    if (!nightlyRevisions.length && !buildRevisions.length && !releaseRevisions.length){
+        return allRevisions;
+    }
+
     if (mode === "all"){
         return allRevisions;
     }

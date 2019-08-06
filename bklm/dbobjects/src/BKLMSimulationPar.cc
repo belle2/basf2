@@ -35,12 +35,10 @@ void BKLMSimulationPar::read(const GearDir& content)
     return;
 
   char name[40];
-  int div = 0;
-  int j = 0;
   double weight[c_MAX_NHIT];
 
-  for (div = 0; div <= c_NDIV; ++div) {
-    for (j = 0; j < c_MAX_NHIT; ++j) {
+  for (int div = 0; div <= c_NDIV; ++div) {
+    for (int j = 0; j < c_MAX_NHIT; ++j) {
       m_PhiMultiplicityCDF[div][j] = 1.0;
       m_ZMultiplicityCDF[div][j] = 1.0;
     }
@@ -52,20 +50,20 @@ void BKLMSimulationPar::read(const GearDir& content)
   phiContent.append("/RPCStripMultiplicity/Phi");
   m_NPhiDiv = phiContent.getNumberNodes("/Division");
   int nDiv = min(phiContent.getNumberNodes("/Division"), c_NDIV + 1);
-  for (div = 0; div < nDiv; ++div) {
+  for (int div = 0; div < nDiv; ++div) {
     sprintf(name, "/Division[@id=\"%d\"]", div);
     GearDir divContent(phiContent);
     divContent.append(name);
     m_NPhiMultiplicity[div] = divContent.getNumberNodes("/Weight");
     int nWeight = min(divContent.getNumberNodes("/Weight"), c_MAX_NHIT - 1);
     weight[0] = 0.0;
-    for (j = 1; j <= nWeight; ++j) {
+    for (int j = 1; j <= nWeight; ++j) {
       sprintf(name, "/Weight[@multiplicity=\"%d\"]", j);
       m_PhiWeight[div][j] =  divContent.getDouble(name);
       weight[j] = divContent.getDouble(name) + weight[j - 1];
       weight[0] = weight[j];
     }
-    for (j = 1; j < c_MAX_NHIT; ++j) {
+    for (int j = 1; j < c_MAX_NHIT; ++j) {
       m_PhiMultiplicityCDF[div][j] = (j <= nWeight ? weight[j] / weight[0] : 1.0);
     }
   }
@@ -74,20 +72,20 @@ void BKLMSimulationPar::read(const GearDir& content)
   zContent.append("/RPCStripMultiplicity/Z");
   nDiv = min(zContent.getNumberNodes("/Division"), c_NDIV + 1);
   m_NZDiv = zContent.getNumberNodes("/Division");
-  for (div = 0; div < nDiv; ++div) {
+  for (int div = 0; div < nDiv; ++div) {
     sprintf(name, "/Division[@id=\"%d\"]", div);
     GearDir divContent(zContent);
     divContent.append(name);
     int nWeight = min(divContent.getNumberNodes("/Weight"), c_MAX_NHIT - 1);
     m_NZMultiplicity[div] = divContent.getNumberNodes("/Weight");
     weight[0] = 0.0;
-    for (j = 1; j <= nWeight; ++j) {
+    for (int j = 1; j <= nWeight; ++j) {
       sprintf(name, "/Weight[@multiplicity=\"%d\"]", j);
       m_ZWeight[div][j] = divContent.getDouble(name);
       weight[j] = divContent.getDouble(name) + weight[j - 1];
       weight[0] = weight[j];
     }
-    for (j = 1; j < c_MAX_NHIT; ++j) {
+    for (int j = 1; j < c_MAX_NHIT; ++j) {
       m_ZMultiplicityCDF[div][j] = (j <= nWeight ? weight[j] / weight[0] : 1.0);
     }
   }

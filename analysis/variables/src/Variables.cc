@@ -539,13 +539,15 @@ namespace Belle2 {
 
     double ImpactXY(const Particle* particle)
     {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+
       double px = particle->getPx();
       double py = particle->getPy();
 
       if (py == py && px == px) {
 
-        double x = particle->getX() - 0;
-        double y = particle->getY() - 0;
+        double x = particle->getX() - (beamSpotDB->getIPPosition()).X();
+        double y = particle->getY() - (beamSpotDB->getIPPosition()).Y();
 
         double pt = sqrt(px * px + py * py);
 

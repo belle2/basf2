@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from geometry import check_components
 from ROOT import Belle2
 from pxd import add_pxd_packer, add_pxd_unpacker
 from svd import add_svd_packer, add_svd_unpacker
@@ -12,6 +13,9 @@ def add_packers(path, components=None):
     """
     This function adds the raw data packer modules to a path.
     """
+
+    # Check components.
+    check_components(components)
 
     # Add Gearbox or geometry to path if not already there
     if "Gearbox" not in path:
@@ -61,6 +65,9 @@ def add_unpackers(path, components=None):
     """
     This function adds the raw data unpacker modules to a path.
     """
+
+    # Check components.
+    check_components(components)
 
     # Add Gearbox or geometry to path if not already there
     if "Gearbox" not in path:

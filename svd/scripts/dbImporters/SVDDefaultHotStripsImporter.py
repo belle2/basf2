@@ -59,7 +59,7 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox", fileName="/geometry/Beast2_phase2.xml")
+main.add_module("Gearbox")  # , fileName="/geometry/Beast2_phase2.xml")
 main.add_module("Geometry", components=['SVD'])  # , useDB = True)
 
 main.add_module(defaultHotStripsImporter())

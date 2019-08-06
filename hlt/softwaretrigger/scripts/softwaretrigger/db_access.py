@@ -134,6 +134,8 @@ def set_event_number(evt_number, run_number, exp_number):
 def get_all_cuts():
     for base_identifier in ["filter", "skim"]:
         menu = download_trigger_menu_from_db(base_name=base_identifier, do_set_event_number=False)
+        if not menu:
+            continue
         cuts = menu.getCutIdentifiers()
         for cut_identifier in cuts:
             cut = download_cut_from_db(base_name=base_identifier, cut_name=cut_identifier, do_set_event_number=False)

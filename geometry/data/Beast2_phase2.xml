@@ -60,8 +60,7 @@
   <xi:include href="../top/TOP.xml"/>
   <xi:include href="../arich/ARICH.xml"/>
   <xi:include href="../ecl/ECL.xml"/>
-  <xi:include href="../bklm/BKLM.xml"/>
-  <xi:include href="../eklm/EKLM.xml"/>
+  <xi:include href="../klm/KLM.xml"/>
 
   <xi:include href="../beast/microtpc/MICROTPC-phase2.xml"/>
   <xi:include href="../beast/pindiode/PINDIODE-phase2.xml"/>

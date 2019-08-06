@@ -1941,7 +1941,7 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
 {
   (void)content;
   (void)type;
-  m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox));
+  m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox, &content));
   try {
     m_TransformData =
       new EKLM::TransformData(false, EKLM::TransformData::c_Displacement);
@@ -1975,7 +1975,7 @@ void EKLM::GeoEKLMCreator::createPayloads(const GearDir& content,
                                           const IntervalOfValidity& iov)
 {
   (void)content;
-  m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox));
+  m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox, &content));
   try {
     m_TransformData =
       new EKLM::TransformData(false, EKLM::TransformData::c_Displacement);

@@ -82,7 +82,7 @@ selector.if_false(emptypath)
 
 # Unpack detector data
 add_unpackers(main,
-              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM'])
 
 # Convert ECLDsps to ECLWaveforms
 compress = basf2.register_module('ECLCompressBGOverlay')

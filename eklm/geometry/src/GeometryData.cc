@@ -28,9 +28,9 @@ using namespace Belle2;
 static const char c_MemErr[] = "Memory allocation error.";
 
 const EKLM::GeometryData&
-EKLM::GeometryData::Instance(enum DataSource dataSource)
+EKLM::GeometryData::Instance(enum DataSource dataSource, const GearDir* gearDir)
 {
-  static EKLM::GeometryData gd(dataSource);
+  static EKLM::GeometryData gd(dataSource, gearDir);
   return gd;
 }
 
@@ -253,11 +253,12 @@ void EKLM::GeometryData::fillStripIndexArrays()
   }
 }
 
-void EKLM::GeometryData::readXMLDataStrips()
+void EKLM::GeometryData::readXMLDataStrips(const GearDir& gd)
 {
   int i;
   std::string name;
-  GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Strip");
+  GearDir Strips(gd);
+  Strips.append("/Strip");
   m_StripGeometry.setWidth(Strips.getLength("Width") * CLHEP::cm);
   m_StripGeometry.setThickness(Strips.getLength("Thickness") * CLHEP::cm);
   m_StripGeometry.setGrooveDepth(Strips.getLength("GrooveDepth") * CLHEP::cm);
@@ -471,12 +472,13 @@ void EKLM::GeometryData::readEndcapStructureGeometry(const GearDir& gd)
   m_EndcapStructureGeometry.setNSides(d.getInt("NSides"));
 }
 
-void EKLM::GeometryData::initializeFromGearbox()
+void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
 {
   int i, j, k;
   std::string name;
   ShieldDetailGeometry shieldDetailGeometry;
-  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
+  GearDir gd(*gearDir);
+  gd.append("/EKLM");
   /* Numbers of elements. */
   m_NEndcaps = gd.getInt("NEndcaps");
   checkEndcap(m_NEndcaps);
@@ -564,7 +566,7 @@ void EKLM::GeometryData::initializeFromGearbox()
         segmentSupport2.getLength("DeltaLLeft") * CLHEP::cm);
     }
   }
-  readXMLDataStrips();
+  readXMLDataStrips(gd);
   GearDir shield(gd);
   shield.append("/Shield");
   m_ShieldGeometry.setThickness(shield.getLength("Thickness") * CLHEP::cm);
@@ -596,12 +598,13 @@ void EKLM::GeometryData::initializeFromDatabase()
   m_Geometry = new EKLMGeometry(*this);
 }
 
-EKLM::GeometryData::GeometryData(enum DataSource dataSource)
+EKLM::GeometryData::GeometryData(enum DataSource dataSource,
+                                 const GearDir* gearDir)
 {
   m_Geometry = nullptr;
   switch (dataSource) {
     case c_Gearbox:
-      initializeFromGearbox();
+      initializeFromGearbox(gearDir);
       break;
     case c_Database:
       initializeFromDatabase();

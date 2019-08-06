@@ -50,9 +50,11 @@ namespace Belle2 {
       /**
        * Instantiation.
        * @param[in] dataSource Data source.
+       * @param[in] gearDir    XML data directory.
        */
-      static const GeometryData& Instance(enum DataSource dataSource =
-                                            c_Database);
+      static const GeometryData& Instance(
+        enum DataSource dataSource = c_Database,
+        const GearDir* gearDir = nullptr);
 
       /**
        * Save geometry data to database.
@@ -151,8 +153,9 @@ namespace Belle2 {
       /**
        * Constructor.
        * @param[in] dataSource Data source.
+       * @param[in] gearDir    XML data directory.
        */
-      explicit GeometryData(enum DataSource dataSource);
+      explicit GeometryData(enum DataSource dataSource, const GearDir* gearDir);
 
       /**
        * Destructor.
@@ -167,8 +170,9 @@ namespace Belle2 {
 
       /**
        * Initialize from Gearbox (XML).
+       * @param[in] gearDir XML data directory.
        */
-      void initializeFromGearbox();
+      void initializeFromGearbox(const GearDir* gearDir);
 
       /**
        * Initialize from database.
@@ -188,7 +192,7 @@ namespace Belle2 {
       /**
        * Read strip parameters from XML database.
        */
-      void readXMLDataStrips();
+      void readXMLDataStrips(const GearDir& gd);
 
       /**
        * Calculate shield geometry data.

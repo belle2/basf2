@@ -103,8 +103,9 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
 
   if (wireHits.size() < m_minimal_hit_number) {
     return;
-  }
+  };
 
+  B2ASSERT("Number of hits per asic can not exceed 8", wireHits.size() <= 8);
   // compute median time:
   vector<short> times;
   for (auto& hit : wireHits) {
@@ -130,6 +131,7 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
   }
 
   if ((nbg < times.size())     // at least 1 hit with different TDC ("signal")
+      && (nbg > 1) // more than one candidate hits
       && (nbg > times.size() - m_nsignal_max) // a few background hits
       && (adcOnMedian < adcOffMedian) // triggered by large ADC "signal"
      ) {

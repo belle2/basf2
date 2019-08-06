@@ -60,13 +60,13 @@ namespace Belle2 {
       std::map<int, std::pair<int, int> > m_map;
 
       /// min. number of hits in ASIC for background check
-      size_t m_minimal_hit_number{5};
+      size_t m_minimal_hit_number{4};
 
       /// distance from median TDC, to be considered as bg.
-      double m_deviation_from_median{3.5};
+      double m_deviation_from_median{10.};
 
       /// max. number of signal-like hits in ASIC for background check
-      size_t m_nsignal_max{2};
+      size_t m_nsignal_max{4};
     };
   }
 }

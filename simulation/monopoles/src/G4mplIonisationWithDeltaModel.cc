@@ -111,6 +111,13 @@ G4mplIonisationWithDeltaModel::Initialise(const G4ParticleDefinition* p,
 }
 
 G4double
+G4mplIonisationWithDeltaModel::MinEnergyCut(const G4ParticleDefinition*,
+                                            const G4MaterialCutsCouple* couple)
+{
+  return couple->GetMaterial()->GetIonisation()->GetMeanExcitationEnergy();
+}
+
+G4double
 G4mplIonisationWithDeltaModel::ComputeDEDXPerVolume(const G4Material* material,
                                                     const G4ParticleDefinition* p,
                                                     G4double kineticEnergy,

@@ -151,8 +151,8 @@ namespace Belle2 {
                                   G4double tmax,
                                   G4double length) override;
 
-      /** WARNING new
-       *
+      /**
+       * Threshold for zero value
        */
       virtual G4double MinEnergyCut(const G4ParticleDefinition*,
                                     const G4MaterialCutsCouple* couple) override;

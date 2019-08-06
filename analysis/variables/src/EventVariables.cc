@@ -238,8 +238,8 @@ namespace Belle2 {
         return 0;
       }
 
-      PCmsLabTransform T;
-      return T.getBeamParams().getCovVertex()(elementI, elementJ);
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return beamSpotDB->getCovVertex()(elementI, elementJ);
     }
 
     // Event kinematics -> missing momentum in lab and CMS, missing energy and mass2, visible energy

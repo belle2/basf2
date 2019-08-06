@@ -26,8 +26,4 @@ TLorentzVector PCmsLabTransform::cmsToLab(const TLorentzVector& vector)
 
 PCmsLabTransform::PCmsLabTransform() = default;
 
-const BeamParameters& PCmsLabTransform::getBeamParams() const
-{
-  return *m_beamParamsDB;
-}
 

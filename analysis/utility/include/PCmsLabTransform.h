@@ -64,7 +64,7 @@ namespace Belle2 {
      */
     double getBeamCrossingAngle() const
     {
-      return getBeamParams().getHER().Vect().Angle(-1.0 * getBeamParams().getLER().Vect());
+      return (m_beamParamsDB->getHER()).Vect().Angle(-1.0 * (m_beamParamsDB->getLER()).Vect());
     }
 
     /**
@@ -99,9 +99,6 @@ namespace Belle2 {
      * @return Lorentz vector in Laboratory System
      */
     static TLorentzVector cmsToLab(const TLorentzVector& vec);
-
-    /** Get currently valid nominal beam parameters from database. */
-    const BeamParameters& getBeamParams() const;
 
   private:
     const DBObjPtr<BeamParameters> m_beamParamsDB; /**< db object for beam parameters. */

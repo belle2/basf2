@@ -3,6 +3,7 @@
 #include <alignment/GlobalLabel.h>
 #include <alignment/GlobalParam.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <../framework/database/include/EventDependency.h>
 #include <memory>
 
 namespace Belle2 {
@@ -72,7 +73,9 @@ namespace Belle2 {
 
           if (std::get<TableData>(timeTable).find(uid) == std::get<TableData>(timeTable).end()) {
             auto firstEvent = std::get<EventHeader>(timeTable).at(0);
-            auto iov = IntervalOfValidity(firstEvent.getExperiment(), firstEvent.getRun(), -1, -1);
+            auto lastEvent = std::get<EventHeader>(timeTable).at(std::get<EventHeader>(timeTable).size() - 1);
+
+            auto iov = IntervalOfValidity(firstEvent.getExperiment(), firstEvent.getRun(), lastEvent.getExperiment(), lastEvent.getRun());
             auto objCopy = std::shared_ptr<GlobalParamSetAccess>(obj->clone());
             payloadsTable[uid].push_back({ iov, {{firstEvent, objCopy}} });
 
@@ -96,23 +99,16 @@ namespace Belle2 {
             auto lastEvent = event;
             bool startedAddingIntras = false;
             for (; iCol < int(std::get<EventHeader>(timeTable).size());) {
-              B2INFO("A iCol " << iCol << " uid " << uid);
               auto nextEvent = gotoBeforeNextChangeInRun(timeTable, uid, iCol);
               if (nextEvent != lastEvent) {
-                B2INFO("B1 iCol " << iCol << " uid " << uid);
-
                 auto objIntraRunCopy = std::shared_ptr<GlobalParamSetAccess>(obj->clone());
                 intraRunEntries.push_back({nextEvent, objIntraRunCopy});
                 lastEvent = nextEvent;
                 startedAddingIntras = true;
               } else {
-                B2INFO("B2 iCol " << iCol << " uid " << uid);
                 break;
               }
-              B2INFO("A' iCol " << iCol << " uid " << uid);
-
             }
-            B2INFO("C iCol " << iCol << " uid " << uid);
 
             // Move to next IoV block (for intra-run deps in just processed block, next block is always the next run)
             auto endEvent = gotoNextChangeRunWise(timeTable, uid, iCol);
@@ -241,14 +237,54 @@ namespace Belle2 {
         {
           auto timeid = label.getTimeId();
           auto eov = label.getEndOfValidity();
+          auto uid = label.getUniqueId();
 
-          getPayloadByTimeID(label.getUniqueId(), timeid).second->updateGlobalParam(correction, label.getElementId(), label.getParameterId());
+          std::set<int> payloadIndices;
+          for (int i = timeid; i < std::min(eov + 1, int(std::get<EventHeader>(timeTable).size())); ++i) {
+            payloadIndices.insert(getContinuousIndexByTimeID(timeTable, uid, i));
+          }
+
+          for (auto payloadIndex : payloadIndices) {
+            getPayloadByContinuousIndex(payloadsTable, label.getUniqueId(), payloadIndex).second->updateGlobalParam(correction,
+                label.getElementId(), label.getParameterId());
+          }
+
         }
 
-        std::pair<EventMetaData, std::shared_ptr<GlobalParamSetAccess>> getPayloadByTimeID(int uid, int timeid)
+        std::vector<std::pair<IntervalOfValidity, TObject*>> releaseObjects()
         {
-          return getPayloadByContinuousIndex(payloadsTable, uid, getContinuousIndexByTimeID(timeTable, uid, timeid));
-        };
+          std::vector<std::pair<IntervalOfValidity, TObject*>> result;
+
+          for (auto& row : payloadsTable) {
+            for (auto& iovBlock : row.second) {
+              auto iov = iovBlock.first;
+              auto obj = iovBlock.second.at(0).second->releaseObject();
+
+              // non-intra-run
+              if (iovBlock.second.size() == 1) {
+                result.push_back({iov, obj});
+                continue;
+              }
+
+              // First obj in event dependency
+              //TODO: how the lifetime of EventDependency is handled?
+              // both works now -> have to check data storage in DB in real life scenario
+              auto payloads = new EventDependency(obj);
+              //auto payloads = EventDependency(obj);
+              // Add others
+              for (long unsigned int iObj = 1; iObj < iovBlock.second.size(); ++iObj) {
+                auto nextEvent = iovBlock.second.at(iObj).first.getEvent();
+                auto nextObj = iovBlock.second.at(iObj).second->releaseObject();
+
+                payloads->add(nextEvent, nextObj);
+                //payloads.add(nextEvent, nextObj);
+              }
+              result.push_back({iov, payloads});
+              //result.push_back({iov, &payloads});
+            }
+          }
+          return result;
+        }
 
       };
     } // namespace timeline

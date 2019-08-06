@@ -9,6 +9,9 @@
 #include <string>
 
 #include <framework/database/Database.h>
+#include <../framework/database/include/LocalDatabase.h>
+#include <../framework/database/include/DatabaseChain.h>
+#include <../framework/database/include/ConditionsDatabase.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -23,6 +26,7 @@
 #include <TMath.h>
 
 
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -159,6 +163,10 @@ namespace {
     /// init
     virtual void SetUp()
     {
+      DatabaseChain::createInstance();
+      ConditionsDatabase::createDefaultInstance("data_reprocessing_proc9");
+      LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+
       GlobalLabel::clearTimeDependentParamaters();
       auto beamspotX = GlobalLabel::construct<BeamParameters>(0, 1);
       auto beamspotZ = GlobalLabel::construct<BeamParameters>(0, 3);
@@ -181,6 +189,9 @@ namespace {
     {
       GlobalLabel::clearTimeDependentParamaters();
 
+      //boost::filesystem::remove_all("testPayloads");
+      Database::reset();
+      DataStore::Instance().reset();
     }
 
   };
@@ -391,5 +402,22 @@ namespace {
   TEST_F(TimeLineTest, GlobalParamTimeLine)
   {
 
+    GlobalParamVector vector({"BeamParameters", "VXDAlignment", "CDCAlignment"});
+    GlobalCalibrationManager::initGlobalVector(vector);
+    GlobalLabel label;
+    GlobalParamTimeLine timeline(eventHeader, label, vector);
+
+    timeline.loadFromDB();
+
+    GlobalLabel::setCurrentTimeInterval(3);
+    auto beamZ = GlobalLabel::construct<BeamParameters>(0, 2).label();
+
+    timeline.updateGlobalParam(GlobalLabel(beamZ), 42.);
+
+    auto objects = timeline.releaseObjects();
+    EXPECT_EQ(objects.size(), 8);
+
+    for (auto iov_obj : objects)
+      Database::Instance().storeData(iov_obj.second->ClassName(), iov_obj.second, iov_obj.first);
   }
 }  // namespace

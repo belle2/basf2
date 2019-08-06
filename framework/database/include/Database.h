@@ -64,8 +64,8 @@ namespace Belle2 {
        * @param aObject Pointer to the object
        * @param aIov Iov of the object
        */
-      DBImportQuery(const std::string& aName, TObject* aObject = nullptr,
-                    const IntervalOfValidity& aIov = IntervalOfValidity()): name(aName), object(aObject), iov(aIov) {};
+      explicit DBImportQuery(const std::string& aName, TObject* aObject = nullptr,
+                             const IntervalOfValidity& aIov = IntervalOfValidity()): name(aName), object(aObject), iov(aIov) {};
       std::string        name;   /**< identifier of the object */
       TObject*           object; /**< Pointer to the object */
       IntervalOfValidity iov;    /**< Interval of validity of the object */

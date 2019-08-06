@@ -58,10 +58,22 @@ namespace Belle2 {
     void importTimeConversion(const KLMTimeConversion* timeConversion);
 
     /**
-     * Import strip efficiencies.
-     * @param[in] fileName Name of the ROOT file containing the efficiencies.
+     * Load strip efficiencies.
+     *
+     * @param[out] stripEfficiency
+     * Strip efficiency.
+     *
+     * @param[in] fileName
+     * Name of the ROOT file containing the efficiencies.
      */
-    void importStripEfficiency(std::string fileName);
+    void loadStripEfficiency(KLMStripEfficiency* stripEfficiency,
+                             std::string fileName);
+
+    /**
+     * Import strip efficiencies.
+     * @param[in] stripEfficiency Strip efficiency.
+     */
+    void importStripEfficiency(const KLMStripEfficiency* stripEfficiency);
 
   private:
 

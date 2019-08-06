@@ -87,7 +87,7 @@ namespace Belle2 {
 
         return std::cos(motherMomentum.Angle(n));
 
-      }  else return 0;
+      }  else return std::numeric_limits<float>::quiet_NaN();
 
     }
 
@@ -112,7 +112,7 @@ namespace Belle2 {
 
         return std::cos(motherMomentum.Angle(pGamma.Vect()));
 
-      }  else return 0;
+      }  else return std::numeric_limits<float>::quiet_NaN();
 
     }
 
@@ -135,7 +135,6 @@ namespace Belle2 {
         if (!part)
         {
           B2FATAL("Couldn't find the " << idau << "th daughter");
-          return -999.0;
         }
 
         TLorentzVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));

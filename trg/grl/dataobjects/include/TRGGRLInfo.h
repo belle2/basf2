@@ -40,6 +40,7 @@ namespace Belle2 {
       m_n_high_2000_cluster414(-1),
       m_n_high_2000_cluster231516(-1),
       m_n_high_2000_cluster117(-1),
+      m_n_high_2000_endcap_cluster(-1),
       m_nbbc(-1),
       m_nbbtc(-1),
       m_n_klm_track(-1),

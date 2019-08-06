@@ -210,10 +210,10 @@ class ValidationMetadataSetter(basf2.Module):
         """And update the metadata at the end"""
         for name, *metadata in self._variables:
             name = Belle2.makeROOTCompatible(name)
-            validation_metadata_update(self._tfile.get(), name, *metadata)
+            validation_metadata_update(self._tfile, name, *metadata)
         if self._description:
-            file_description_set(self._tfile.get(), self._description)
-        self._tfile.reset()
+            file_description_set(self._tfile, self._description)
+        del self._tfile
 
 
 def create_validation_histograms(

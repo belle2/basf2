@@ -16,9 +16,10 @@ from contextlib import contextmanager
 import multiprocessing
 import basf2
 import subprocess
+import unittest
 
 
-def skip_test(reason):
+def skip_test(reason, py_case=None):
     """Skip a test script with a given reason. This function will end the script
     and not return.
 
@@ -29,8 +30,33 @@ def skip_test(reason):
     Useful if the test depends on some external condition like a web service and
     missing this dependency should not fail the test run.
     """
-    print("TEST SKIPPED: %s" % reason, file=sys.stderr, flush=True)
+    if py_case:
+        py_case.skipTest(reason)
+    else:
+        print("TEST SKIPPED: %s" % reason, file=sys.stderr, flush=True)
     sys.exit(1)
+
+
+def require_file(filename, data_type="", py_case=None):
+    """Check for the existence of a test input file before attempting to open it.
+    Skips the test if not found.
+
+    Wraps `basf2.find_file` for use in test scripts run as
+    :ref`b2test-scripts <b2test-scripts>`
+
+    Parameters:
+        filename (str): relative filename to look for, either in a central place or in the current working directory
+        data_type (str): case insensitive data type to fine.  Either empty string or one of `""examples"`` or ``"validation"``.
+        py_case (unittest.TestCase): if this is to be skipped within python's native unittest then pass the TestCase instance
+
+    Returns:
+        Full path to the test input file
+    """
+    try:
+        fullpath = basf2.find_file(filename, data_type, silent=False)
+    except FileNotFoundError as fnf:
+        skip_test('Cannot find: %s' % fnf.filename, py_case)
+    return fullpath
 
 
 @contextmanager

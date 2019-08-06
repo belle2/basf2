@@ -182,25 +182,25 @@ namespace Belle2 {
     double getBeamPx(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBoostVector()).Px();
+      return (T.getBeamFourMomentum()).Px();
     }
 
     double getBeamPy(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBoostVector()).Py();
+      return (T.getBeamFourMomentum()).Py();
     }
 
     double getBeamPz(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBoostVector()).Pz();
+      return (T.getBeamFourMomentum()).Pz();
     }
 
     double getBeamE(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBoostVector()).E();
+      return (T.getBeamFourMomentum()).E();
     }
 
     double getIPX(const Particle*)

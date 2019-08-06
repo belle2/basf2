@@ -199,7 +199,7 @@ namespace Belle2 {
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
     PCmsLabTransform T;
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
     float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
@@ -411,7 +411,7 @@ namespace Belle2 {
 
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
 
     TMatrixDSym beamSpotCov(3);
@@ -1001,7 +1001,7 @@ namespace Belle2 {
 
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
 
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
 

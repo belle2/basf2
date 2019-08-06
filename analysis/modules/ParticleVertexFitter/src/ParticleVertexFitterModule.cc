@@ -620,7 +620,7 @@ namespace Belle2 {
 
     // apply four momentum constraint
     PCmsLabTransform T;
-    kf.setFourMomentum(T.getBoostVector());
+    kf.setFourMomentum(T.getBeamFourMomentum());
 
     int err = kf.doFit();
 
@@ -1078,7 +1078,7 @@ namespace Belle2 {
   {
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boost = T.getBoostVector();
     TVector3 boostDir = boost.Unit();
 
     TMatrixDSym beamSpotCov = m_beamSpotDB->getCovVertex();

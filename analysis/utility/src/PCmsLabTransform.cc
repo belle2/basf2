@@ -28,5 +28,15 @@ PCmsLabTransform::PCmsLabTransform() = default;
 
 const BeamParameters& PCmsLabTransform::getBeamParams() const
 {
-  return *m_beamParams;
+  return *m_beamParamsDB;
+}
+
+const CollisionInvariantMass& PCmsLabTransform::getCollisionInvariantMass() const
+{
+  return *m_invariantMassDB;
+}
+
+const CollisionBoostVector& PCmsLabTransform::getCollisionBoostVector() const
+{
+  return *m_boostVectorDB;
 }

@@ -262,7 +262,7 @@ void VertexFitUpdateDaughtersModule::findConstraintBoost(double cut)
 
   PCmsLabTransform T;
 
-  TVector3 boost = T.getBoostVector().BoostVector();
+  TVector3 boost = T.getBoostVector();
   TVector3 boostDir = boost.Unit();
 
   TMatrixDSym beamSpotCov(3);

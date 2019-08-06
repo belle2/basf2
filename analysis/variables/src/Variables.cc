@@ -852,7 +852,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Px();
     }
@@ -862,7 +862,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Py();
     }
@@ -872,7 +872,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Pz();
     }
@@ -883,7 +883,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).P();
     }
@@ -893,7 +893,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Vect().Theta();
     }
@@ -903,7 +903,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).Vect().Phi();
     }
@@ -913,7 +913,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).E();
     }
@@ -923,7 +923,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).M();
     }
@@ -933,7 +933,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBoostVector();
+      TLorentzVector pIN = T.getBeamFourMomentum();
 
       return (pIN - particle->get4Vector()).M2();
     }

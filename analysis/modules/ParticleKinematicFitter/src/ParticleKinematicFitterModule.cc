@@ -517,7 +517,7 @@ namespace Belle2 {
 
       if (m_orcaConstraint == "HardBeam") {
         PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
+        const TLorentzVector boost = T.getBeamFourMomentum();
 
         m_hardConstraintPx = MomentumConstraint(0, 1, 0, 0, boost.Px());
         m_hardConstraintPy = MomentumConstraint(0, 0, 1, 0, boost.Py());
@@ -536,7 +536,7 @@ namespace Belle2 {
 
       } else if (m_orcaConstraint == "RecoilMass") {
         PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
+        const TLorentzVector boost = T.getBeamFourMomentum();
 
         m_hardConstraintRecoilMass = RecoilMassConstraint(m_recoilMass, boost.Px(), boost.Py(), boost.Pz(), boost.E());
 
@@ -545,7 +545,7 @@ namespace Belle2 {
 
       } else if (m_orcaConstraint == "Mass") {
         PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
+        const TLorentzVector boost = T.getBeamFourMomentum();
 
         m_hardConstraintMass = MassConstraint(m_invMass);
 

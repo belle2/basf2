@@ -11,6 +11,8 @@
 #pragma once
 
 #include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/CollisionBoostVector.h>
+#include <mdst/dbobjects/CollisionInvariantMass.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <TLorentzRotation.h>
@@ -49,9 +51,17 @@ namespace Belle2 {
     }
 
     /**
-     * Returns boost vector
+     * Returns boost vector (beta=p/E)
      */
-    TLorentzVector getBoostVector() const
+    TVector3 getBoostVector() const
+    {
+      return getBeamFourMomentum().BoostVector();
+    }
+
+    /**
+     * Returns LAB four-momentum of e+e-
+     */
+    TLorentzVector getBeamFourMomentum() const
     {
       return getBeamParams().getHER() + getBeamParams().getLER();
     }
@@ -69,7 +79,7 @@ namespace Belle2 {
      */
     double getCMSEnergy() const
     {
-      return getBeamParams().getMass();
+      return getCollisionInvariantMass().getMass();
     }
 
     /**
@@ -86,11 +96,19 @@ namespace Belle2 {
      */
     static TLorentzVector cmsToLab(const TLorentzVector& vec);
 
-    /** Get currently valid beam parameters from database. */
+    /** Get currently valid nominal beam parameters from database. */
     const BeamParameters& getBeamParams() const;
 
+    /** Get currently valid beam invariant mass from database. */
+    const CollisionInvariantMass& getCollisionInvariantMass() const;
+
+    /** Get currently valid beam boost vector from database. */
+    const CollisionBoostVector& getCollisionBoostVector() const;
+
   private:
-    const DBObjPtr<BeamParameters> m_beamParams; /**< actually performs calculations. */
+    const DBObjPtr<BeamParameters> m_beamParamsDB; /**< db object for beam parameters. */
+    const DBObjPtr<CollisionInvariantMass> m_invariantMassDB; /**< db object for invariant mass. */
+    const DBObjPtr<CollisionBoostVector> m_boostVectorDB; /**< db object for boost vector. */
   };
 
 } // Belle2 namespace

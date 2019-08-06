@@ -286,7 +286,7 @@ namespace Belle2 {
 
       if (vert) {
         PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
+        TVector3 boost = T.getBoostVector();
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaT() * bg * c;
@@ -302,7 +302,7 @@ namespace Belle2 {
 
       if (vert) {
         PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
+        TVector3 boost = T.getBoostVector();
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaTErr() * bg * c;
@@ -316,7 +316,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       TVector3 pos = part->getVertex();
@@ -329,7 +329,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
@@ -343,7 +343,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
@@ -358,7 +358,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
       TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
 
@@ -375,7 +375,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
@@ -411,7 +411,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
       TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
 

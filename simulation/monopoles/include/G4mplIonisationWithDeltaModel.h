@@ -111,13 +111,13 @@ namespace Belle2 {
        * @param vdp Pointer to the storage of sampled delta electrons
        * @param materialCutsCouple This argument of base function is ignored
        * @param dp Secnodary particle pointer
-       * @param minKinEnergy Minimal energy of secondary electrons
+       * @param tmin Minimal energy of secondary electrons
        * @param maxEnergy Maximum energy of secondary electrons
        */
       virtual void SampleSecondaries(std::vector<G4DynamicParticle*>* vdp,
                                      const G4MaterialCutsCouple* materialCutsCouple,
                                      const G4DynamicParticle* dp,
-                                     G4double minKinEnergy,
+                                     G4double tmin,
                                      G4double maxEnergy) override;
 
 
@@ -150,6 +150,12 @@ namespace Belle2 {
                                   const G4DynamicParticle*,
                                   G4double tmax,
                                   G4double length) override;
+
+      /** WARNING new
+       *
+       */
+      virtual G4double MinEnergyCut(const G4ParticleDefinition*,
+                                    const G4MaterialCutsCouple* couple) override;
 
       void SetParticle(const G4ParticleDefinition* p); /**< Read definition of the monopole*/
 

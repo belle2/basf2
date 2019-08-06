@@ -76,7 +76,7 @@ namespace Belle2 {
     void exportBklmGeometryPar();
 
     //! Import BKLM simulation parameters into the database
-    void importBklmSimulationPar();
+    void importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop);
 
     //! Export BKLM simulation parameters from the database
     void exportBklmSimulationPar();

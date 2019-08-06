@@ -90,10 +90,3 @@ void G4mplIonisation::InitialiseEnergyLossProcess(const G4ParticleDefinition* p,
 
 void G4mplIonisation::PrintInfo()
 {}
-
-void G4mplIonisation::ProcessDescription(std::ostream& out) const
-{
-  out << "No description available." << G4endl;
-  G4VEnergyLossProcess::ProcessDescription(out);
-}
-

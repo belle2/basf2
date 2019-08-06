@@ -64,11 +64,6 @@ namespace Belle2 {
        */
       virtual void PrintInfo() override;
 
-      /**
-       * Print description in html
-       */
-      virtual void ProcessDescription(std::ostream&) const override;
-
     protected:
 
       /**G4VEnergyLossProcess::InitialiseEnergyLossProcess() implementation.

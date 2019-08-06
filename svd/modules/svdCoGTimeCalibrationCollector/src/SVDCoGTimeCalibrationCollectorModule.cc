@@ -40,13 +40,13 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
 void SVDCoGTimeCalibrationCollectorModule::prepare()
 {
   TH2F hEventT0vsCoG("eventT0vsCoG__L@layerL@ladderS@sensor@view",
-                     "EventT0 vs rawCoG in @layer.@ladder.@sensor @view/@side",
+                     "EventT0Sync vs rawCoG in @layer.@ladder.@sensor @view/@side",
                      300, -150, 150, 300, -150, 150);
-  hEventT0vsCoG.GetYaxis()->SetTitle("eventT0 (ns)");
+  hEventT0vsCoG.GetYaxis()->SetTitle("EventT0Sync (ns)");
   hEventT0vsCoG.GetXaxis()->SetTitle("raw_cog (ns)");
   m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);
 
-  m_hEventT0 = new TH1F("hEventT0", "EventT0", 200, -100, 100);
+  m_hEventT0 = new TH1F("hEventT0", "EventT0Sync", 200, -100, 100);
 
   m_histogramTree = new TTree("tree", "tree");
   m_svdCls.isRequired(m_svdClusters);

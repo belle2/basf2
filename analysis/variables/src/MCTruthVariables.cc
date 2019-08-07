@@ -47,28 +47,40 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
-    double isCustomSignal(const Particle* part)
+    double isSignalWithoutProperty(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle, false);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissingResonance);
+      //status &= (~MCMatching::c_DecayInFlight);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
+    double isExtendedSignal(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
         return 0.0;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-
-      //remove the bits corresponding to PropertyFlags which are set by decaystring grammar.
-      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) {
-        status &= (~MCMatching::c_MissFSR);
-        status &= (~MCMatching::c_MissPHOTOS);
-      }
-      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreIntermediate) status &= (~MCMatching::c_MissingResonance);
-      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreMassive) status &= (~MCMatching::c_MissMassiveParticle);
-      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreNeutrino) status &= (~MCMatching::c_MissNeutrino);
-      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreGamma) status &= (~MCMatching::c_MissGamma);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
+      status &= (~MCMatching::c_MissingResonance);
+      status &= (~MCMatching::c_MisID);
+      status &= (~MCMatching::c_AddedWrongParticle);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
-    double isExtendedSignal(const Particle* part)
+    double isSignalAcceptWrongFSPs(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
@@ -774,11 +786,16 @@ namespace Belle2 {
 
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
-    REGISTER_VARIABLE("isCustomSignal", isCustomSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
                       "It behaves according to DecayStringGrammar.");
+    REGISTER_VARIABLE("isSignalWithoutProperty", isSignalWithoutProperty,
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
+                      "It does not consider the missing particle flags of PropertyFlags of the particle.");
     REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
+                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+                      "Misidentification of charged FSP is allowed. \n"
+                      "It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs");
+    REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Misidentification of charged FSP is allowed.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
@@ -817,7 +834,7 @@ namespace Belle2 {
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
     REGISTER_VARIABLE("mcErrorsWithoutProperty", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags) \n"
-                      "Particle::Property which is set by decayString grammar is not considered.");
+                      "The ignore particle flags of Particle::PropertyFlags which is set by decayString grammar are not considered.");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
                       "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,

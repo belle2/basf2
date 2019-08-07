@@ -44,20 +44,28 @@ namespace Belle2 {
 
     /**
      * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
+     * It behaves according to DecayStringGrammar.
      */
     double isSignal(const Particle* part);
 
     /**
      * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
-     * It behaves according to DecayStringGrammar.
+     * It does not consider the ignore particle flags of PropertyFlags of the particle.
      */
-    double isCustomSignal(const Particle* part);
+    double isSignalWithoutProperty(const Particle* part);
+
+    /**
+     * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
+     * Misidentification of charged FSP is allowed.
+     * It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs.
+     */
+    double isExtendedSignal(const Particle* part);
 
     /**
      * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
      * Misidentification of charged FSP is allowed.
      */
-    double isExtendedSignal(const Particle* part);
+    double isSignalAcceptWrongFSPs(const Particle* part);
 
     /**
      * return 1 if Particle is correctly reconstructed (SIGNAL including missing neutrino), 0 otherwise

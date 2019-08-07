@@ -19,7 +19,7 @@ Convenience
 ~~~~~~~~~~~
 
 .. b2-variables::
-        :variables: isSignal,isCustomSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :variables: isSignal,isSignalWithoutProperty,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
 -----------
@@ -34,7 +34,7 @@ MCMatching for composite particles searches, by default, for the first common mo
 .. warning:: Note that "first common mother" can give some unexpected results in certain corner-cases
 
 Your own custom matching can be controlled by the DecayString grammar as described in :doc:`Grammar for custom MCMatching` and :doc:`Arrows`.
-Which is then available in :b2:var:`isCustomSignal`.
+Which is then available in :b2:var:`isSignal`.
 
 .. TODO: amalgamate this information better and link to the tracking/neutrals sphinx doc when it exists.
 

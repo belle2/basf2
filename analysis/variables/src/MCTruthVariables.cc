@@ -771,7 +771,7 @@ namespace Belle2 {
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("isCustomSignal", isCustomSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
-                      "It bevaives according to DecayStringGrammar.");
+                      "It behaves according to DecayStringGrammar.");
     REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Misidentification of charged FSP is allowed.");

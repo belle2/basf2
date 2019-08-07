@@ -206,7 +206,6 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   // Now, all daughters of the particles should be matched to at least one DecayDescriptor daughter
-  // if (!m_isInclusive && int(matches_global.size()) != nDaughters_p) return 0;
   if (int(matches_global.size()) != nDaughters_p) return 0;
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem

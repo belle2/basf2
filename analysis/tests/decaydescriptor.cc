@@ -204,7 +204,7 @@ namespace {
     EXPECT_EQ(dd1.getMother()->isUnspecified(), true);
     EXPECT_EQ(dd1.getMother()->isSelected(), false);
 
-    // Both selectors, @ and ^, can be used in same time
+    // Both selectors, @ and ^, can be used at the same time
     DecayDescriptor dd2;
     initok = dd2.init("^@Xsd:candidates -> K+:loose pi-:loose");
     EXPECT_EQ(initok, true);
@@ -233,7 +233,7 @@ namespace {
     EXPECT_EQ(dd4.getDaughter(0)->getMother()->isUnspecified(), true);
     EXPECT_EQ(dd4.getDaughter(0)->getMother()->isSelected(), false);
 
-    // Both selectors, @ and ^, can be used in same time
+    // Both selectors, @ and ^, can be used at the same time
     DecayDescriptor dd5;
     initok = dd5.init("B0:Xsdee -> ^@Xsd e+:loose e-:loose");
     EXPECT_EQ(initok, true);

@@ -49,7 +49,7 @@ namespace Belle2 {
 
     /**
      * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
-     * It behaives according to DecayStringGrammer.
+     * It behaves according to DecayStringGrammar.
      */
     double isCustomSignal(const Particle* part);
 

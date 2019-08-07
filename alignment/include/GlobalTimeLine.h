@@ -1,9 +1,19 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Tadeas Bilka                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <alignment/GlobalLabel.h>
 #include <alignment/GlobalParam.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <../framework/database/include/EventDependency.h>
+#include <framework/database/EventDependency.h>
 #include <memory>
 
 namespace Belle2 {
@@ -26,7 +36,7 @@ namespace Belle2 {
 
         auto lastIntervalStartEvent = std::get<EventHeader>(timeTable).at(row.size() - 1);
 
-        if (timeid >= row.size()) {
+        if (timeid >= int(row.size())) {
           return lastIntervalStartEvent;
         }
 
@@ -88,7 +98,6 @@ namespace Belle2 {
             auto exprun = std::get<RunHeader>(timeTable).at(iCol);
             auto exp = exprun.first;
             auto run = exprun.second;
-            auto cell = std::get<TableData>(timeTable).at(uid).at(iCol);
 
             // Prepare intra run objects
             // 1st is always there (even for non-intra-run)
@@ -97,14 +106,12 @@ namespace Belle2 {
             intraRunEntries.push_back({event, objCopy});
             // At each change in run, add new entry
             auto lastEvent = event;
-            bool startedAddingIntras = false;
             for (; iCol < int(std::get<EventHeader>(timeTable).size());) {
               auto nextEvent = gotoBeforeNextChangeInRun(timeTable, uid, iCol);
               if (nextEvent != lastEvent) {
                 auto objIntraRunCopy = std::shared_ptr<GlobalParamSetAccess>(obj->clone());
                 intraRunEntries.push_back({nextEvent, objIntraRunCopy});
                 lastEvent = nextEvent;
-                startedAddingIntras = true;
               } else {
                 break;
               }
@@ -159,7 +166,6 @@ namespace Belle2 {
       void finalizeTimeTable(TimeTable& table)
       {
         for (auto& row : std::get<TableData>(table)) {
-          auto uid = row.first;
           auto& cells = row.second;
 
           int currIndex = 0;
@@ -290,5 +296,5 @@ namespace Belle2 {
 
       };
     } // namespace timeline
-  } //namespace alignment
-}  // namespace Belle2
+  } // namespace alignment
+} // namespace Belle2

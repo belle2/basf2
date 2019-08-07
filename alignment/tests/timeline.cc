@@ -1,31 +1,30 @@
-#include <alignment/GlobalTimeLine.h>
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Tadeas Bilka                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <gtest/gtest.h>
 
-#include <alignment/PedeResult.h>
+#include <alignment/GlobalTimeLine.h>
+#include <alignment/Manager.h>
 
 #include <vxd/dataobjects/VxdID.h>
-#include <cdc/dataobjects/WireID.h>
-#include <gtest/gtest.h>
-#include <iostream>
-#include <string>
 
 #include <framework/database/Database.h>
-#include <../framework/database/include/LocalDatabase.h>
-#include <../framework/database/include/DatabaseChain.h>
-#include <../framework/database/include/ConditionsDatabase.h>
+#include <framework/database/LocalDatabase.h>
+#include <framework/database/DatabaseChain.h>
+#include <framework/database/ConditionsDatabase.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <TFile.h>
-#include <TTree.h>
-#include <TH1F.h>
-
-#include <TClonesArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/Hierarchy.h>
-#include <alignment/Manager.h>
 #include <TMath.h>
 
-
+#include <iostream>
+#include <string>
 #include <boost/filesystem.hpp>
 
 using namespace std;
@@ -471,20 +470,3 @@ namespace {
     // --------------------------------------------------------------------
   }
 }  // namespace
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

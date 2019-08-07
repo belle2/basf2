@@ -51,10 +51,11 @@ def get_argument_parser():
                         choices=['master', 'new', 'modify', 'online', 'prompt', 'data', 'mc', 'analysis'],
                         help="""Type of global tag that should be updated.
                                 Use new/modify if the request contains new/modified payload classes.""")
-    parser.add_argument('--normalize', default=True,
-                        help="""By default payload root files are normalized to get the same checksum for the same content.
-                                This can be disabled with the normalize option 'False'. Any other normalize option will
-                                in addition set the file name in the root file metadata to the given value.""")
+    normalize_group = parser.add_mutually_exclusive_group()
+    normalize_group.add_argument('--no-normalize', dest="normalize", default=True, action="store_false",
+                                 help="Don't normalize")
+    normalize_group.add_argument('--normalize-name', type=str,
+                                 help="Set the file name in the root file metadata to the given value.")
     parser.add_argument('--release', type=str,
                         help='Required release version')
     parser.add_argument('--reason', type=str,
@@ -95,7 +96,7 @@ if __name__ == "__main__":
             sys.exit(0)
 
     # normalize files?
-    normalize = False if args.normalize == 'False' else args.normalize
+    normalize = args.normalize_name if hasattr(args, 'normalize_name') else args.normalize
     if normalize is True and not args.confirm:
         normalize = input('\nShould the payload root files be normalized (y/n) [y]? ').lower() in ['y', '']
         if normalize:

@@ -30,7 +30,7 @@ future studies.
 Algorithm
 ---------
 
-Working horse of the algorithm is a multilayer perceptron with 8 hidden layers. It is trained with
+The core of the algorithm is a multilayer perceptron with 8 hidden layers. It is trained with
 stochastic gradient descent.
 
 .. figure:: figs/network_scheme.png

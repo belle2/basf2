@@ -663,6 +663,24 @@ namespace Belle2 {
       return MCMatching::countMissingParticle(p, mcp, PDGcodes);
     }
 
+    double getHEREnergy(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getHER()).E();
+    }
+
+    double getLEREnergy(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getLER()).E();
+    }
+
+    double getCrossingAngle(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getHER()).Vect().Angle(-1.0 * (beamParamsDB->getLER()).Vect());
+    }
+
     double particleClusterMatchWeight(const Particle* particle)
     {
       /* Get the weight of the *cluster* mc match for the mcparticle matched to
@@ -751,25 +769,6 @@ namespace Belle2 {
     double isMC(const Particle*)
     {
       return Environment::Instance().isMC();
-    }
-
-    // Beam Kinematics
-    double getHEREnergy(const Particle*)
-    {
-      static DBObjPtr<BeamParameters> beamParamsDB;
-      return (beamParamsDB->getHER()).E();
-    }
-
-    double getLEREnergy(const Particle*)
-    {
-      static DBObjPtr<BeamParameters> beamParamsDB;
-      return (beamParamsDB->getLER()).E();
-    }
-
-    double getCrossingAngle(const Particle*)
-    {
-      static DBObjPtr<BeamParameters> beamParamsDB;
-      return (beamParamsDB->getHER()).Vect().Angle(-1.0 * (beamParamsDB->getLER()).Vect());
     }
 
     VARIABLE_GROUP("MC matching and MC truth");
@@ -872,7 +871,21 @@ namespace Belle2 {
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
                       "Returns the number of missing daughters having assigned PDG codes."
                       "-1 if the no MCParticle is associated to the particle.")
+    REGISTER_VARIABLE("Eher", getHEREnergy, R"DOC(
+[Eventbased] The nominal HER energy used by the generator.
 
+.. warning:: This variable does not make sense for data.
+)DOC");
+    REGISTER_VARIABLE("Eler", getLEREnergy, R"DOC(
+[Eventbased] The nominal LER energy used by the generator.
+
+.. warning:: This variable does not make sense for data.
+)DOC");
+    REGISTER_VARIABLE("XAngle", getCrossingAngle, R"DOC(
+[Eventbased] The nominal beam crossing angle from generator level beam kinematics.
+
+.. warning:: This variable does not make sense for data.
+)DOC");
 
     VARIABLE_GROUP("Generated tau decay information");
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
@@ -913,10 +926,6 @@ namespace Belle2 {
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("isMC", isMC,
                       "Returns 1 if run on MC and 0 for data.");
-    VARIABLE_GROUP("Nominal beam kinematics")
-    REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] Nominal HER energy");
-    REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] Nominal LER energy");
-    REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Nominal beam crossing angle");
 
   }
 }

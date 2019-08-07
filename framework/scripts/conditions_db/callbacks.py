@@ -21,11 +21,7 @@ def _get_recommended_tags(base_tags, user_tags, metadata):
 
 def _join_tags(*tags):
     """Return concatenated list of GTs"""
-    result = []
-    for entry in tags:
-        if entry is not None:
-            result += entry
-    return result
+    return sum((entry for entry in tags if entry is not None), [])
 
 
 def recommended_tags(base_tags, user_tags, metadata):

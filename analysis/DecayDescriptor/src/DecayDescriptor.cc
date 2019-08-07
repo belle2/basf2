@@ -74,16 +74,19 @@ bool DecayDescriptor::init(const DecayString& s)
     }
 
     // Identify arrow type
-    if (d->m_strArrow == "->") {
+    if (d->m_strArrow == "->" or d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
       m_isIgnoreRadiatedPhotons = true;
       m_isIgnoreIntermediate = true;
-    } else if (d->m_strArrow == "=>") {
+      if (d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
+        B2WARNING("Use of " << d->m_strArrow << " will be deprecated in release-05, please consider to use ->.");
+      }
+    } else if (d->m_strArrow == "=norad=>") {
       m_isIgnoreRadiatedPhotons = false;
       m_isIgnoreIntermediate = true;
-    } else if (d->m_strArrow == "-->") {
+    } else if (d->m_strArrow == "=direct=>") {
       m_isIgnoreRadiatedPhotons = true;
       m_isIgnoreIntermediate = false;
-    } else if (d->m_strArrow == "==>") {
+    } else if (d->m_strArrow == "=exact=>") {
       m_isIgnoreRadiatedPhotons = false;
       m_isIgnoreIntermediate = false;
     } else {
@@ -105,18 +108,11 @@ bool DecayDescriptor::init(const DecayString& s)
     }
 
     // Initialise list of keywords
-    // Keyword has higher priority than arrow for m_isIgnoreRadiatedPhotons
     // For neutrino
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
       m_isIgnoreNeutrino = true;
     } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!nu")) != d->m_keywords.end()) {
       m_isIgnoreNeutrino = false;
-    }
-    // For radiated photon
-    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?rad")) != d->m_keywords.end()) {
-      m_isIgnoreRadiatedPhotons = true;
-    } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!rad")) != d->m_keywords.end()) {
-      m_isIgnoreRadiatedPhotons = false;
     }
     // For gamma
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?gamma")) != d->m_keywords.end()) {

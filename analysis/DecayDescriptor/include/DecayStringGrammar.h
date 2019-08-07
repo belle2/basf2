@@ -46,10 +46,11 @@ namespace Belle2 {
     label %= lit(":") >> lexeme[+(char_ - reserved)];
 
     // Arrow types
-    arrow %= string("->") | string("-->") | string("=>") | string("==>");
+    arrow %= string("->") | string("-->") | string("=>") | string("==>") | string("=direct=>") | string("=norad=>") |
+             string("=exact=>");
 
     // Keyword for custom MC Matching
-    keyword = string("...") | string("?nu") | string("!nu") | string("?rad") | string("!rad") | string("?gamma") | string("!gamma");
+    keyword = string("...") | string("?nu") | string("!nu") | string("?gamma") | string("!gamma");
     keywordlist = *keyword;
 
     // Basic decay: mother -> daughterlist

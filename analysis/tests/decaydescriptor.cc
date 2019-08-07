@@ -112,23 +112,23 @@ namespace {
 
   TEST(DecayDescriptorTest, ArrowsDecaysGrammar)
   {
-    // --> means ignore intermediate resonances
+    // =direct=> means ignore intermediate resonances
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:candidates --> K+:loose pi-:loose gamma:clean");
+    bool initok = dd1.init("B0:candidates =direct=> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd1.isIgnoreIntermediate(), false);
 
-    // => means ignore photons
+    // =norad=> means ignore photons
     DecayDescriptor dd2;
-    initok = dd2.init("B0:candidates => K+:loose pi-:loose gamma:clean");
+    initok = dd2.init("B0:candidates =norad=> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd2.isIgnoreRadiatedPhotons(), false);
     EXPECT_EQ(dd2.isIgnoreIntermediate(), true);
 
-    // ==> means ignore intermediate resonances *and* photons
+    // =exact=> means ignore intermediate resonances *and* photons
     DecayDescriptor dd3;
-    initok = dd3.init("B0:candidates ==> K+:loose pi-:loose gamma:clean");
+    initok = dd3.init("B0:candidates =exact=> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd3.isIgnoreRadiatedPhotons(), false);
     EXPECT_EQ(dd3.isIgnoreIntermediate(), false);
@@ -167,56 +167,35 @@ namespace {
     EXPECT_EQ(dd3.isIgnoreNeutrino(), false);
     EXPECT_EQ(dd3.isIgnoreGamma(), false);
 
-    // ?rad means ignore radiated photon
+    // ?gamma means ignore missing gamma
     DecayDescriptor dd4;
-    initok = dd4.init("B0:candidates -> K+:loose pi-:loose ?rad");
+    initok = dd4.init("B0:candidates -> K+:loose pi-:loose ?gamma");
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd4.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd4.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd4.isIgnoreMassive(), false);
     EXPECT_EQ(dd4.isIgnoreNeutrino(), false);
-    EXPECT_EQ(dd4.isIgnoreGamma(), false);
+    EXPECT_EQ(dd4.isIgnoreGamma(), true);
 
-    // !rad means take into account radiated photon
+    // !gamma means take into account missing gamma
     DecayDescriptor dd5;
-    initok = dd5.init("B0:candidates -> K+:loose pi-:loose !rad");
+    initok = dd5.init("B0:candidates -> K+:loose pi-:loose !gamma");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd5.isIgnoreRadiatedPhotons(), false);
+    EXPECT_EQ(dd5.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd5.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd5.isIgnoreMassive(), false);
     EXPECT_EQ(dd5.isIgnoreNeutrino(), false);
     EXPECT_EQ(dd5.isIgnoreGamma(), false);
 
-    // ?gamma means ignore missing gamma
+    // ... ?nu ?gamma means accept missing massive
     DecayDescriptor dd6;
-    initok = dd6.init("B0:candidates -> K+:loose pi-:loose ?gamma");
+    initok = dd6.init("B0:candidates -> e-:loose ... ?nu ?gamma");
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd6.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd6.isIgnoreIntermediate(), true);
-    EXPECT_EQ(dd6.isIgnoreMassive(), false);
-    EXPECT_EQ(dd6.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd6.isIgnoreMassive(), true);
+    EXPECT_EQ(dd6.isIgnoreNeutrino(), true);
     EXPECT_EQ(dd6.isIgnoreGamma(), true);
-
-    // !gamma means take into account missing gamma
-    DecayDescriptor dd7;
-    initok = dd7.init("B0:candidates -> K+:loose pi-:loose !gamma");
-    EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd7.isIgnoreRadiatedPhotons(), true);
-    EXPECT_EQ(dd7.isIgnoreIntermediate(), true);
-    EXPECT_EQ(dd7.isIgnoreMassive(), false);
-    EXPECT_EQ(dd7.isIgnoreNeutrino(), false);
-    EXPECT_EQ(dd7.isIgnoreGamma(), false);
-
-
-    // ... ?nu ?gamma means accept missing massive
-    DecayDescriptor dd8;
-    initok = dd8.init("B0:candidates -> e-:loose ... ?nu ?gamma");
-    EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd8.isIgnoreRadiatedPhotons(), true);
-    EXPECT_EQ(dd8.isIgnoreIntermediate(), true);
-    EXPECT_EQ(dd8.isIgnoreMassive(), true);
-    EXPECT_EQ(dd8.isIgnoreNeutrino(), true);
-    EXPECT_EQ(dd8.isIgnoreGamma(), true);
 
   }
 

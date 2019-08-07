@@ -61,8 +61,8 @@ One can use the keywords for decay string to configure how :code:`'isCustomSigna
 * :code:`'...'` Missing massive final state particles are ignored
 * :code:`'?nu'` Missing neutrinos are ignored
 * :code:`'!nu'` Missing neutrinos are taken into account (default)
-* :code:`'?rad'` Missing radiated photons are ignored (default)
-* :code:`'!rad'` Missing radiated photons are taken into account
+* :code:`'?gamma'` Missing gammas are ignored 
+* :code:`'!gamma'` Missing gammas are taken into account (default)
 
 
 Arrows
@@ -70,7 +70,9 @@ Arrows
 For truth matching purposes different types of arrows are defined:
 
 * :code:`'->'` intermediate resonances and radiated photons are ignored
-* :code:`'-->'` radiated photons are ignored
-* :code:`'=>'` intermediate resonances are ignored
-* :code:`'==>'` exact match of the decay including intermediate resonances
+* :code:`'-->'`, :code:`'=>'` and :code:`'==>'` work same as :code:`'->'`. These three will be deprecated in release-05, please consider to use :code:`'->'`.
+
+* :code:`'=direct=>'` intermediate resonances are considered but radiated photons are ignored
+* :code:`'=norad=>'` radiated photons are considered but intermediate resonances are ignored
+* :code:`'=exact=>'` exact match of the decay including intermediate resonances and radiated photons
 

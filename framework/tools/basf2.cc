@@ -39,6 +39,7 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/core/MetadataService.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -172,6 +173,8 @@ int main(int argc, char* argv[])
      "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
     ("zmq",
      "Use ZMQ for multiprocessing instead of a RingBuffer. This has many implications and should only be used by experts.")
+    ("job-information", prog::value<string>(),
+     "Create json file with metadata of output files and basf2 execution status.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -377,6 +380,12 @@ int main(int argc, char* argv[])
       RandomNumbers::initialize(varMap["random-seed"].as<string>());
     }
 
+    if (varMap.count("job-information")) {
+      string jobInfoFile = varMap["job-information"].as<string>();
+      MetadataService::Instance().setJsonFileName(jobInfoFile);
+      B2INFO("Job information file: " << jobInfoFile);
+    }
+
 
   } catch (exception& e) {
     cerr << "error: " << e.what() << endl;
@@ -435,6 +444,9 @@ int main(int argc, char* argv[])
     if (Environment::Instance().getDryRun()) {
       Environment::Instance().printJobInformation();
     }
+
+    //Report completion in json metadata
+    MetadataService::Instance().finishBasf2();
   } catch (error_already_set&) {
     //Apparently an exception occured which wasn't handled. So print the traceback
     PyErr_Print();

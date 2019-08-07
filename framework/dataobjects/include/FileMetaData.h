@@ -16,6 +16,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <nlohmann/json.hpp>
 
 namespace Belle2 {
 
@@ -234,6 +235,10 @@ namespace Belle2 {
      *  @return True if metadata could be written
      */
     bool write(std::ostream& output, const std::string& physicalFileName) const;
+
+    /** Get a json representation.
+     */
+    nlohmann::json getJson() const;
 
   private:
 

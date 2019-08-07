@@ -187,3 +187,28 @@ bool FileMetaData::write(std::ostream& output, const std::string& physicalFileNa
 
   return true;
 }
+
+nlohmann::json FileMetaData::getJson() const
+{
+  return {
+    {"LFN", m_lfn},
+    {"nEvents", m_nEvents},
+    {"experimentLow", m_experimentLow},
+    {"runLow", m_runLow},
+    {"eventLow", m_eventLow},
+    {"experimentHigh", m_experimentHigh},
+    {"runHigh", m_runHigh},
+    {"eventHigh", m_eventHigh},
+    {"parents", m_parentLfns},
+    {"date", m_date},
+    {"site", m_site},
+    {"user", m_user},
+    {"randomSeed", m_randomSeed},
+    {"release", m_release},
+    {"isMC", m_isMC},
+    {"mcEvents", m_mcEvents},
+    {"globalTag", m_databaseGlobalTag},
+    {"dataDescription", m_dataDescription},
+    {"steering", m_steering}
+  };
+}

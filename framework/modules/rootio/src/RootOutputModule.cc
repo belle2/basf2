@@ -12,6 +12,7 @@
 
 #include <framework/io/RootIOUtilities.h>
 #include <framework/core/FileCatalog.h>
+#include <framework/core/MetadataService.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
 // needed for complex module parameter
@@ -408,13 +409,14 @@ void RootOutputModule::fillFileMetaData()
   if (m_updateFileCatalog) {
     FileCatalog::Instance().registerFile(m_file->GetName(), *m_fileMetaData);
   }
-
+  m_outputFileMetaData = *m_fileMetaData;
 }
 
 
 void RootOutputModule::terminate()
 {
   closeFile();
+  MetadataService::Instance().addRootOutputFile(m_outputFileName, &m_outputFileMetaData);
 }
 
 void RootOutputModule::closeFile()

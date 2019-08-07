@@ -13,7 +13,7 @@ Event shapes are discussed in several papers. Two comprehensive introductions ca
 
 `The Pythia 6 manual <http://home.thep.lu.se/~torbjorn/pythia6/pythia6200.pdf>`_ 
 
-`G. Fox, S. Wolfram, Events shapes in e+e- annihilation <https://www.stephenwolfram.com/publications/academic/event-shapes-annihilation.pdf>`_
+`G. Fox, S. Wolfram, Event shapes in e+e- annihilation <https://www.stephenwolfram.com/publications/academic/event-shapes-annihilation.pdf>`_
 
 For an introduction on both the theory of the event shapes variables and their use for continuum suppression and even characterization, you can also check the `slides of the starter kit workshop <https://indico.belle2.org/event/5/sessions/10/attachments/85/122/Continuum_suppression_lecture_V2.pdf>`_ .
 

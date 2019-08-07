@@ -85,13 +85,13 @@ namespace Belle2 {
     if (!m_metadataProvider) initialize();
     // So first go over the requested payloads once, reset the info and check for any
     // testing payloads we might want to use
-    const size_t testingPayloads = std::count_if(query.begin(), query.end(), [this, &event](auto & p) {
+    const size_t testingPayloads = std::count_if(query.begin(), query.end(), [this, &event](auto & payload) {
       // make sure the queries are "reset" to invalid revision and no filename before we start looking
-      p.filename = "";
-      p.revision = 0;
+      payload.filename = "";
+      payload.revision = 0;
       // and now look in all testing payload providers if any.
       for (auto& tmp : m_testingPayloads) {
-        if (tmp.get(event, p)) return true;
+        if (tmp.get(event, payload)) return true;
       }
       return false;
     });
@@ -107,23 +107,23 @@ namespace Belle2 {
       return getData(event, query);
     }
     // and if we could find the metadata lets also locate the payloads ...
-    const size_t payloadsLocated = std::count_if(query.begin(), query.end(), [this](auto & p) {
+    const size_t payloadsLocated = std::count_if(query.begin(), query.end(), [this](auto & payload) {
       // make sure we don't overwrite local payloads or otherwise already valid filenames;
-      if (!p.filename.empty()) return true;
+      if (!payload.filename.empty()) return true;
       // but don't check for payloads we could not find. But this is only a
       // problem if they are required so report success for not required
       // payloads
-      if (p.revision == 0) return not p.required;
+      if (payload.revision == 0) return not payload.required;
       // and locate the payload.
-      if (not m_payloadProvider->find(p)) {
+      if (not m_payloadProvider->find(payload)) {
         // if that fails lets let the user know: Even for optional payloads, if
         // we know the metadata but cannot find the file something is fishy and
         // should be reported.
-        auto loglevel = p.required ? LogConfig::c_Error : LogConfig::c_Warning;
+        auto loglevel = payload.required ? LogConfig::c_Error : LogConfig::c_Warning;
         B2LOG(loglevel, 0, "Conditions data: Could not find file for payload"
-              << LogVar("name", p.name) << LogVar("revision", p.revision)
-              << LogVar("checksum", p.checksum) << LogVar("globaltag", p.globaltag));
-        return not p.required;
+              << LogVar("name", payload.name) << LogVar("revision", payload.revision)
+              << LogVar("checksum", payload.checksum) << LogVar("globaltag", payload.globaltag));
+        return not payload.required;
       }
       return true;
     });
@@ -133,8 +133,8 @@ namespace Belle2 {
 
   bool Database::storeData(std::list<DBImportQuery>& query)
   {
-    return std::all_of(query.begin(), query.end(), [this](const auto & q) {
-      return storeData(q.name, q.object, q.iov);
+    return std::all_of(query.begin(), query.end(), [this](const auto & import) {
+      return storeData(import.name, import.object, import.iov);
     });
   }
 

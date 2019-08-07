@@ -111,7 +111,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
-	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_1.root
+	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
 	validity = 3,0,3,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -145,7 +145,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
-	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_1.root
+	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
 	validity = 3,0,3,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -179,7 +179,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [WARNING] Conditions Database: checksum mismatch after download. Trying once more in a temporary file
 	name = BeamParameters
 	revision = 1
-	filename = ${cwd}/db-cache/00/dbstore_BeamParameters_rev_1.root
+	filename = ${cwd}/db-cache/00/BeamParameters_r1.root
 [ERROR] Conditions Database: failure downloading url
 	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_1.root
 	error = checksum mismatch
@@ -211,7 +211,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [WARNING] Conditions Database: checksum mismatch after download. Trying once more in a temporary file
 	name = BeamParameters
 	revision = 1
-	filename = ${cwd}/db-cache/00/dbstore_BeamParameters_rev_1.root
+	filename = ${cwd}/db-cache/00/BeamParameters_r1.root
 [ERROR] Conditions Database: failure downloading url
 	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_1.root
 	error = checksum mismatch
@@ -304,7 +304,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 3
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
-	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_3.root
+	filename = ${cwd}/db-cache/24/BeamParameters_r3.root
 	validity = 6,0,6,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -338,7 +338,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 3
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
-	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_3.root
+	filename = ${cwd}/db-cache/24/BeamParameters_r3.root
 	validity = 6,0,6,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -529,7 +529,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
-	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_1.root
+	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
 	validity = 3,0,3,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -562,7 +562,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
-	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_1.root
+	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
 	validity = 3,0,3,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 

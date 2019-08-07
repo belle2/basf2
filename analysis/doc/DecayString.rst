@@ -54,8 +54,8 @@ Here is an example of use:
 
 	reconstructDecay('B0:Xsdee -> Xsd:comb e+:loose e-:loose', '', path=mypath)
 
-Keywords for custom MCMatching
-------------------------------
+Grammar for custom MCMatching
+-----------------------------
 One can use the keywords for decay string to configure how :code:`'isCustomSignal'` is behaving. If these keywords are used, the missing particles are ignored or taken into account. For example, if :code:`'...'` is used, missing final state particles are ignored, hence :code:`'isCustomSignal'` works as :code:`'isSignalAcceptMissingMassive'`.
 
 * :code:`'...'` Missing massive final state particles are ignored

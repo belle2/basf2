@@ -28,7 +28,13 @@ More detais
 
 Both variables will have non-trivial values only if the MCMatching module, which relates composite Particle(s) and MCParticle(s), is executed. mcPDG is set to the PDG code of the first common mother MCParticle of the daughters of this Particle.
 
-More details about MCMatching for tracks is [here](https://confluence.desy.de/display/BI/Software+TrackMatchingStatus), and for photons is [here]( https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf).
+More details about MCMatching for tracks is `here <https://confluence.desy.de/display/BI/Software+TrackMatchingStatus>`, and for photons is `here <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`.
+MCMatching for composite particles searches, by default, for the first common mother of all daughter particles of the candidate.
+
+.. warning:: Note that "first common mother" can give some unexpected results in certain corner-cases
+
+Your own custom matching can be controlled by the DecayString grammar as described in :doc:`Grammar for custom MCMatching`.
+Which is then available in :b2:var:`isCustomSignal`.
 
 .. TODO: amalgamate this information better and link to the tracking/neutrals sphinx doc when it exists.
 

@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun, Oliver Frost                                 *
+ * Contributors: Nils Braun, Oliver Frost, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  Small helper for checking the same sign of for or two floats.
+     *  Small helper for checking the same sign of two, four or eight floats.
      */
     class SameSignChecker {
 
@@ -34,6 +34,17 @@ namespace Belle2 {
       {
         return ((n1 > 0 and n2 > 0 and n3 > 0 and n4 > 0) or
                 (n1 < 0 and n2 < 0 and n3 < 0 and n4 < 0));
+      }
+
+      /// Check if eight values have the same sign.
+      static bool sameSign(double n1, double n2, double n3, double n4,
+                           double n5, double n6, double n7, double n8)
+      {
+        return ((n1 > 0 and n2 > 0 and n3 > 0 and n4 > 0 and
+                 n5 > 0 and n6 > 0 and n7 > 0 and n8 > 0)
+                or
+                (n1 < 0 and n2 < 0 and n3 < 0 and n4 < 0 and
+                 n5 < 0 and n6 < 0 and n7 < 0 and n8 < 0));
       }
 
       /// Check if two values are in the rectangle spanned by the other four values

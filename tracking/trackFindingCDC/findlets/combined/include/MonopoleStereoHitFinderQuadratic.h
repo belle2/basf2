@@ -23,7 +23,7 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 #include <tracking/trackFindingCDC/utilities/HitComperator.h>
 
-#include <tracking/trackFindingCDC/hough/hyperbolic/HitHyperHough.h>
+#include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackInspector.h>
 
 #include <vector>
@@ -36,10 +36,12 @@ namespace Belle2 {
     /**
      * Complex findlet for finding stereo hits from monopoles to a list of cdc tracks.
      *
-     * NOTE in development
+     * WARNING This findlet is kept here just in case hyperbolic one misbehaves and eats up too much RAM
+     * If it doesn't, this one should be removed around release-05 or earlier
+     *
      * I guess uses collector framework and a quadtree search for quadratic tracks from IP
      */
-    class MonopoleStereoHitFinder : public Findlet<CDCWireHit&, CDCTrack&> {
+    class MonopoleStereoHitFinderQuadratic : public Findlet<CDCWireHit&, CDCTrack&> {
 
     private:
       /// Type of the base class
@@ -47,7 +49,7 @@ namespace Belle2 {
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
-      MonopoleStereoHitFinder();
+      MonopoleStereoHitFinderQuadratic();
 
       /// Short description of the findlet
       std::string getDescription() final;
@@ -66,14 +68,14 @@ namespace Belle2 {
       /// Create RL wire hits out of the wire hits
       RLTaggedWireHitCreator m_rlWireHitCreator;
       /// Find matching hits to a track
-      StereoHitTrackQuadTreeMatcher<HitHyperHough> m_matcher;
+      StereoHitTrackQuadTreeMatcher<HitQuadraticLegendre> m_matcher;
       /// Filter for the Stereo Hits added to the track
       FilterSelector<CDCTrack, CDCRLWireHit, ChooseableFilter<StereoHitFilterFactory>> m_filterSelector;
       /// Select only those where the relation is unique (or the best one in those groups)
       SingleMatchSelector<CDCTrack, CDCRLWireHit, HitComperator> m_singleMatchSelector;
       /// Add the hits to the tracks
       StereoHitTrackAdder m_adder;
-      /// Print found tracks
+      // Print found tracks
       TrackInspector m_inspector;
       /// Fit the tracks after creation TODO the fitter obviously should be different
 //       TrackSZFitter m_szFitter;

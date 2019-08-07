@@ -97,6 +97,7 @@ namespace Belle2 {
     /// Type for discrete phi0 values
     using DiscretePhi0 = DiscreteValue<Vector2D, Phi0Tag>;
 
+    // NOTE The following is for quadratic and hyperbolic tracks
     /// Phantom type tag for the discrete p representation
     class PTag;
 
@@ -114,6 +115,5 @@ namespace Belle2 {
 
     /// Type to have continuous q values
     using ContinuousQ = ContinuousValue<double, QTag>;
-
   }
 }

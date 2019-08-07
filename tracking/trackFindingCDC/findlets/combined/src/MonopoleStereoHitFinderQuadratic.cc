@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/combined/MonopoleStereoHitFinder.h>
+#include <tracking/trackFindingCDC/findlets/combined/MonopoleStereoHitFinderQuadratic.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -19,7 +19,7 @@ using namespace TrackFindingCDC;
 
 template class TrackFindingCDC::ChooseableFilter<StereoHitFilterFactory>;
 
-MonopoleStereoHitFinder::MonopoleStereoHitFinder() : Super()
+MonopoleStereoHitFinderQuadratic::MonopoleStereoHitFinderQuadratic() : Super()
 {
   addProcessingSignalListener(&m_rlWireHitCreator);
   addProcessingSignalListener(&m_matcher);
@@ -30,12 +30,14 @@ MonopoleStereoHitFinder::MonopoleStereoHitFinder() : Super()
 //   addProcessingSignalListener(&m_szFitter);
 }
 
-std::string MonopoleStereoHitFinder::getDescription()
+std::string MonopoleStereoHitFinderQuadratic::getDescription()
 {
-  return "Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a 3D hough tree looking for hyperbolic cosines.";
+  return "Tries to add monopole CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.\n"
+         "WARNING This findlet is kept here just in case hyperbolic one misbehaves and eats up too much RAM\n"
+         "If it doesn't, this one should be removed around release-05 or earlier";
 }
 
-void MonopoleStereoHitFinder::beginEvent()
+void MonopoleStereoHitFinderQuadratic::beginEvent()
 {
   Super::beginEvent();
 
@@ -43,7 +45,7 @@ void MonopoleStereoHitFinder::beginEvent()
   m_relations.clear();
 }
 
-void MonopoleStereoHitFinder::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void MonopoleStereoHitFinderQuadratic::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
@@ -56,7 +58,7 @@ void MonopoleStereoHitFinder::exposeParameters(ModuleParamList* moduleParamList,
 //   m_szFitter.exposeParameters(moduleParamList, prefix);
 }
 
-void MonopoleStereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCTrack>& tracks)
+void MonopoleStereoHitFinderQuadratic::apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCTrack>& tracks)
 {
   m_rlTaggedWireHits.reserve(2 * inputWireHits.size());
   m_relations.reserve(2 * inputWireHits.size() * tracks.size());

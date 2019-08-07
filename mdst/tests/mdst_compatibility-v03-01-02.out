@@ -1,7 +1,7 @@
 [INFO] Steering file: mdst/tests/mdst_compatibility-v03-01-02.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
-[INFO] Added file ${cwd}/mdst/tests/mdst-v03-01-02.root
+[INFO] Added file ${BELLE2_LOCAL_DIR}/mdst/tests/mdst-v03-01-02.root
 [INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData

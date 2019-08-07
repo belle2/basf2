@@ -91,8 +91,9 @@ def show_only_errors():
         yield
 
 
-def configure_logging_for_tests(replacements=None):
-    """Change the log system to behave a bit more appropriately for testing scenarios:
+def configure_logging_for_tests(user_replacements=None):
+    """
+    Change the log system to behave a bit more appropriately for testing scenarios:
 
     1. Simplify log message to be just ``[LEVEL] message``
     2. Disable error summary, just additional noise
@@ -109,7 +110,7 @@ def configure_logging_for_tests(replacements=None):
             - :envvar:`BELLE2_BACKGROUND_DIR`
 
     Parameters:
-        replacements (dict(str, str)): Additional strings and their replacements to replace in the output
+        user_replacements (dict(str, str)): Additional strings and their replacements to replace in the output
 
     Warning:
         This function should be called **after** switching directory to replace the correct directory name
@@ -123,15 +124,19 @@ def configure_logging_for_tests(replacements=None):
     for level in basf2.LogLevel.values.values():
         basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 
-    if replacements is None:
-        replacements = {}
-
+    # now create dictionary of string replacements. Since each key can only be
+    # present once oder is kind of important so the less portable ones like
+    # current directory should go first and might be overridden if for example
+    # the BELLE2_LOCAL_DIR is identical to the current working directory
+    replacements = {}
+    replacements[os.getcwd()] = "${cwd}"
+    replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
     for env_name in re.findall(":envvar:`(.*?)`", configure_logging_for_tests.__doc__):
         if env_name in os.environ:
             replacements[os.environ[env_name]] = f"${{{env_name}}}"
-    replacements[os.getcwd()] = "${cwd}"
-    replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
+    if user_replacements is not None:
+        replacements.update(user_replacements)
     sys.stdout = logfilter.LogReplacementFilter(sys.__stdout__, replacements)
 
 

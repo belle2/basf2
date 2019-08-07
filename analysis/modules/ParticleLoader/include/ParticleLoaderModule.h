@@ -175,6 +175,7 @@ namespace Belle2 {
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
 
     std::vector<int> m_chargeZeroTrackCounts; /**< internally used to count number of tracks with charge zero */
+    int m_sameChargeDaughtersV0Counts;
   };
 
 } // Belle2 namespace

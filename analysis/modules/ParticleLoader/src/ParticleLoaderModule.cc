@@ -244,6 +244,7 @@ namespace Belle2 {
 
 
     m_chargeZeroTrackCounts = std::vector<int>(m_Tracks2Plists.size(), 0);
+    m_sameChargeDaughtersV0Counts = 0;
   }
 
   void ParticleLoaderModule::event()
@@ -276,6 +277,10 @@ namespace Belle2 {
                   << " tracks skipped because of zero charge for "
                   << get<c_PListName>(track2Plist));
       }
+    // report V0 errors integrated
+    if (m_sameChargeDaughtersV0Counts > 0)
+      B2WARNING("There were " << m_sameChargeDaughtersV0Counts
+                << " v0s skipped because of same charge daughters");
   }
 
   void ParticleLoaderModule::roeToParticles()
@@ -394,6 +399,15 @@ namespace Belle2 {
       const V0* v0 = V0s[i];
       Const::ParticleType v0Type = v0->getV0Hypothesis();
 
+      // before the loop over ParticleLists
+      // check if the charge of the 2 V0's daughters is opposite
+      if (v0->getTrackFitResults().first->getChargeSign() == v0->getTrackFitResults().second->getChargeSign()) {
+        B2DEBUG(19, "V0 with same charge daughters skipped!");
+        m_sameChargeDaughtersV0Counts++;
+        continue;
+      }
+
+      // inner loop over the ParticleLists
       for (auto v02Plist : m_V02Plists) {
         int listPDGCode = get<c_PListPDGCode>(v02Plist);
 

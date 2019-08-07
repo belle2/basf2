@@ -17,7 +17,7 @@
 #include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
 #include <genfit/GblTrajectory.h>
-
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {

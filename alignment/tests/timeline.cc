@@ -203,7 +203,7 @@ namespace {
 
   };
 
-
+  /// Test creation of initial TimeTable
   TEST_F(TimeLineTest, InitialTimeTable)
   {
     GlobalLabel label;
@@ -224,6 +224,7 @@ namespace {
 
   }
 
+  /// Test finalization of the timetable and its adressing
   TEST_F(TimeLineTest, TimeTable)
   {
     finalizeTimeTable(initTimeTable);
@@ -258,6 +259,7 @@ namespace {
 
   }
 
+  /// Test creation of the payloads table from finalized timetable
   TEST_F(TimeLineTest, TimeTable2PayloadsTable)
   {
     GlobalParamVector vector({"BeamParameters", "VXDAlignment", "CDCAlignment"});
@@ -268,53 +270,53 @@ namespace {
 
     // vxd
     timeid = 0;
-    ev = gotoBeforeNextChangeInRun(timeTable, 10, timeid);
+    ev = gotoNextChangeInRun(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 0);
     EXPECT_EQ(ev, EventMetaData(0, 0, 7));
 
     timeid = 1;
-    ev = gotoBeforeNextChangeInRun(timeTable, 10, timeid);
+    ev = gotoNextChangeInRun(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 1);
     EXPECT_EQ(ev, EventMetaData(0, 1, 7));
 
     timeid = 4;
-    ev = gotoBeforeNextChangeInRun(timeTable, 10, timeid);
+    ev = gotoNextChangeInRun(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 4);
     EXPECT_EQ(ev, EventMetaData(0, 3, 7));
 
     timeid = 5;
-    ev = gotoBeforeNextChangeInRun(timeTable, 10, timeid);
+    ev = gotoNextChangeInRun(timeTable, 10, timeid);
     EXPECT_EQ(timeid, 5);
     EXPECT_EQ(ev, EventMetaData(0, 4, 7));
 
     // beam
     timeid = 0;
-    ev = gotoBeforeNextChangeInRun(timeTable, 1, timeid);
+    ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 0);
     EXPECT_EQ(ev, EventMetaData(0, 0, 7));
 
     timeid = 1;
-    ev = gotoBeforeNextChangeInRun(timeTable, 1, timeid);
+    ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 1);
     EXPECT_EQ(ev, EventMetaData(0, 1, 7));
 
     timeid = 2;
-    ev = gotoBeforeNextChangeInRun(timeTable, 1, timeid);
+    ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 3);
     EXPECT_EQ(ev, EventMetaData(530532, 2, 7));
 
     timeid = 3;
-    ev = gotoBeforeNextChangeInRun(timeTable, 1, timeid);
+    ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 3);
     EXPECT_EQ(ev, EventMetaData(530532, 2, 7));
 
     timeid = 4;
-    ev = gotoBeforeNextChangeInRun(timeTable, 1, timeid);
+    ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 4);
     EXPECT_EQ(ev, EventMetaData(0, 3, 7));
 
     timeid = 5;
-    ev = gotoBeforeNextChangeInRun(timeTable, 1, timeid);
+    ev = gotoNextChangeInRun(timeTable, 1, timeid);
     EXPECT_EQ(timeid, 5);
     EXPECT_EQ(ev, EventMetaData(0, 4, 7));
 
@@ -406,6 +408,7 @@ namespace {
 
   }
 
+  /// Test the full workflow using GlobalParamTimeLin
   TEST_F(TimeLineTest, GlobalParamTimeLine)
   {
 

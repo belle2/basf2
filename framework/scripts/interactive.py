@@ -23,6 +23,7 @@ from IPython.terminal.prompts import Prompts, Token
 
 class Basf2IPythonPrompt(Prompts):
     """Provide slightly customized prompts when running basf2 interactively"""
+
     def in_prompt_tokens(self, cli=None):
         """Input prompt"""
         return [(Token.Prompt, "basf2 in ["),

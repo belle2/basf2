@@ -76,11 +76,9 @@ void KLMDatabaseImporter::importTimeConversion(
   timeConversionImport.import(iov);
 }
 
-void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
+void KLMDatabaseImporter::loadStripEfficiency(
+  KLMStripEfficiency* stripEfficiency, std::string fileName)
 {
-  DBImportObjPtr<KLMStripEfficiency> stripEfficiency;
-  stripEfficiency.construct();
-
   TFile* file = TFile::Open(fileName.c_str(), "r");
   if (!file) {
     B2ERROR("KLMDatabaseImporter: calibration file " << fileName << " *** failed to open");
@@ -117,11 +115,15 @@ void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
     }
     file->Close();
   }
+}
 
+void KLMDatabaseImporter::importStripEfficiency(
+  const KLMStripEfficiency* stripEfficiency)
+{
+  DBImportObjPtr<KLMStripEfficiency> stripEfficiencyImport;
+  stripEfficiencyImport.construct(*stripEfficiency);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
-  stripEfficiency.import(iov);
-
-  B2INFO("KLMDatabaseImporter: strip efficiencies imported and calibration file " << fileName << " closed");
+  stripEfficiencyImport.import(iov);
 }
 

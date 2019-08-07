@@ -5,11 +5,11 @@ import os
 from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
-
+import b2test_utils
 
 main = create_path()
 
-inputMdst("default", Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
+inputMdst("default", b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
 
 kaons = ('K-', 'kaonID > 0.05')
 pions = ('pi+', 'pionID > 0.05')
@@ -48,18 +48,12 @@ output = register_module('RootOutput')
 output.param('outputFileName', 'removeparticlesnotinlists_reduced.root')
 main.add_module(output)
 
-process(main)
+with b2test_utils.clean_working_directory():
+    b2test_utils.safe_process(main)
 
-print(statistics)
-
-statfull = os.stat('removeparticlesnotinlists_full.root').st_size
-statreduced = os.stat('removeparticlesnotinlists_reduced.root').st_size
-B2RESULT("original size (kB): " + str(statfull / 1024))
-B2RESULT("reduced size (kB):  " + str(statreduced / 1024))
-if statfull <= statreduced:
-    B2FATAL("Reduced file is not smaller than original")
-
-os.remove('removeparticlesnotinlists_D0ntuple.root')
-os.remove('removeparticlesnotinlists_pi0ntuple.root')
-os.remove('removeparticlesnotinlists_full.root')
-os.remove('removeparticlesnotinlists_reduced.root')
+    statfull = os.stat('removeparticlesnotinlists_full.root').st_size
+    statreduced = os.stat('removeparticlesnotinlists_reduced.root').st_size
+    B2RESULT("original size (kB): " + str(statfull / 1024))
+    B2RESULT("reduced size (kB):  " + str(statreduced / 1024))
+    if statfull <= statreduced:
+        B2FATAL("Reduced file is not smaller than original")

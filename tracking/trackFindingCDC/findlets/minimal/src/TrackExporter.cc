@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Dmitrii Neverov                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -56,6 +56,10 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_discardCovarianceMatrix,
                                 "Discard covariance matrix in favour of a hand written one.",
                                 m_param_discardCovarianceMatrix);
+  moduleParamList->addParameter(prefixed(prefix, "monopoleMomSeed"),
+                                m_param_monopoleMomSeed,
+                                "If non-zero, estimate seeds as for monopoles and set the momentum magnitude as this value.",
+                                m_param_monopoleMomSeed);
 }
 
 void TrackExporter::initialize()
@@ -83,7 +87,11 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
   if (m_param_exportTracks) {
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     for (const CDCTrack& track : tracks) {
-      RecoTrack* newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
+      RecoTrack* newRecoTrack;
+      if (m_param_monopoleMomSeed != 0.0)
+        newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks, m_param_monopoleMomSeed);
+      else
+        newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
       if (newRecoTrack) {
         newRecoTrack->setQualityIndicator(track.getQualityIndicator());
       }

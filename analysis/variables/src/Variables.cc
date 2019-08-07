@@ -561,7 +561,61 @@ namespace Belle2 {
       } else return 0;
     }
 
+    double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      int nDaughters = part -> getNDaughters();
+      if (nDaughters != 2)
+        B2FATAL("You are trying to use an Armenteros variable. The mother particle is required th have exactly two daughters");
 
+      const auto& daughters = part -> getDaughters();
+      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      TVector3 daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      TVector3 daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+
+      int daughter1Charge = daughters[0] -> getCharge();
+      int daughter2Charge = daughters[1] -> getCharge();
+      double daughter1Ql = daughter1Momentum.Dot(motherMomentum) / motherMomentum.Mag();
+      double daughter2Ql = daughter2Momentum.Dot(motherMomentum) / motherMomentum.Mag();
+
+      double Arm_alpha;
+      if (daughter2Charge > daughter1Charge)
+        Arm_alpha = (daughter2Ql - daughter1Ql) / (daughter2Ql + daughter1Ql);
+      else
+        Arm_alpha = (daughter1Ql - daughter2Ql) / (daughter1Ql + daughter2Ql);
+
+      return Arm_alpha;
+    }
+
+    double ArmenterosDaughter1Qt(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      int nDaughters = part -> getNDaughters();
+      if (nDaughters != 2)
+        B2FATAL("You are trying to use an Armenteros variable. The mother particle is required th have exactly two daughters.");
+
+      const auto& daughters = part -> getDaughters();
+      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      TVector3 daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      double qt = daughter1Momentum.Perp(motherMomentum);
+
+      return qt;
+    }
+
+    double ArmenterosDaughter2Qt(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      int nDaughters = part -> getNDaughters();
+      if (nDaughters != 2)
+        B2FATAL("You are trying to use an Armenteros variable. The mother particle is required th have exactly two daughters.");
+
+      const auto& daughters = part -> getDaughters();
+      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      TVector3 daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      double qt = daughter2Momentum.Perp(motherMomentum);
+
+      return qt;
+    }
 
 
 // mass ------------------------------------------------------------
@@ -770,25 +824,6 @@ namespace Belle2 {
 
 // other ------------------------------------------------------------
 
-    double particlePvalue(const Particle* part)
-    {
-      return part->getPValue();
-    }
-
-    double particleNDaughters(const Particle* part)
-    {
-      return part->getNDaughters();
-    }
-
-    double particleFlavorType(const Particle* part)
-    {
-      return part->getFlavorType();
-    }
-
-    double particleCharge(const Particle* part)
-    {
-      return part->getCharge();
-    }
 
     void printParticleInternal(const Particle* p, int depth)
     {
@@ -1222,16 +1257,19 @@ namespace Belle2 {
                       "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
     REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
                       "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
+                      "Longitudinal momentum asymmetry of V0's daughters.\n"
+                      "The mother (V0) is required to have exactly two daughters");
+    REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt,
+                      "Transverse momentum of the first daughter with respect to the V0 mother.\n"
+                      "The mother is required to have exactly two daughters");
+    REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt,
+                      "Transverse momentum of the second daughter with respect to the V0 mother.\n"
+                      "The mother is required to have exactly two daughters");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
-    REGISTER_VARIABLE("chiProb", particlePvalue, "chi ^ 2 probability of the fit");
-    REGISTER_VARIABLE("nDaughters", particleNDaughters,
-                      "number of daughter particles");
-    REGISTER_VARIABLE("flavor", particleFlavorType,
-                      "flavor type of decay(0 = unflavored, 1 = flavored)");
-    REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
     REGISTER_VARIABLE("trackMatchType", trackMatchType,
                       "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
                       "called connected - region(CR) track match");

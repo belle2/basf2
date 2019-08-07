@@ -37,13 +37,15 @@ namespace Belle2 {
     /** Direct daughters of the decaying particle. */
     std::vector<DecayDescriptor> m_daughters;
     /** Ignore radiated photons? */
-    bool m_isIgnorePhotons;
+    bool m_isIgnoreRadiatedPhotons;
     /** Ignore intermediate particles or resonances? */
     bool m_isIgnoreIntermediate;
     /** Ignore missing massive final state particles? */
     bool m_isIgnoreMassive;
     /** Ignore missing neutrino? */
     bool m_isIgnoreNeutrino;
+    /** Ignore missing gamma? */
+    bool m_isIgnoreGamma;
     /** Is this the NULL object? */
     bool m_isNULL;
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
@@ -137,10 +139,10 @@ namespace Belle2 {
     {
       return (i < getNDaughters()) ? &(m_daughters[i]) : NULL;
     }
-    /** Check if additional photons shall be ignored. */
-    bool isIgnorePhotons() const
+    /** Check if additional radiated photons shall be ignored. */
+    bool isIgnoreRadiatedPhotons() const
     {
-      return m_isIgnorePhotons;
+      return m_isIgnoreRadiatedPhotons;
     }
     /** Check if intermediate resonances/particles shall be ignored. */
     bool isIgnoreIntermediate() const
@@ -156,6 +158,11 @@ namespace Belle2 {
     bool isIgnoreNeutrino() const
     {
       return m_isIgnoreNeutrino;
+    }
+    /** Check if missing gammas shall be ignored. */
+    bool isIgnoreGamma() const
+    {
+      return m_isIgnoreGamma;
     }
 
     /** Is the decay or the particle self conjugated */

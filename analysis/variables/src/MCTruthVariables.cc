@@ -55,14 +55,14 @@ namespace Belle2 {
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
-      if (part->getProperty() & Particle::PropertyFlags::c_isIgnorePhotons) {
+      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) {
         status &= (~MCMatching::c_MissFSR);
         status &= (~MCMatching::c_MissPHOTOS);
-        status &= (~MCMatching::c_MissGamma);
       }
       if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreIntermediate) status &= (~MCMatching::c_MissingResonance);
       if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreMassive) status &= (~MCMatching::c_MissMassiveParticle);
       if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreNeutrino) status &= (~MCMatching::c_MissNeutrino);
+      if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreGamma) status &= (~MCMatching::c_MissGamma);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }

@@ -29,10 +29,11 @@ DecayDescriptor::DecayDescriptor() :
   m_mother(),
   m_iDaughter_p(-1),
   m_daughters(),
-  m_isIgnorePhotons(false),
+  m_isIgnoreRadiatedPhotons(false),
   m_isIgnoreIntermediate(false),
   m_isIgnoreMassive(false),
   m_isIgnoreNeutrino(false),
+  m_isIgnoreGamma(false),
   m_isNULL(false)
 {
 }
@@ -74,16 +75,16 @@ bool DecayDescriptor::init(const DecayString& s)
 
     // Identify arrow type
     if (d->m_strArrow == "->") {
-      m_isIgnorePhotons = true;
+      m_isIgnoreRadiatedPhotons = true;
       m_isIgnoreIntermediate = true;
     } else if (d->m_strArrow == "=>") {
-      m_isIgnorePhotons = false;
+      m_isIgnoreRadiatedPhotons = false;
       m_isIgnoreIntermediate = true;
     } else if (d->m_strArrow == "-->") {
-      m_isIgnorePhotons = true;
+      m_isIgnoreRadiatedPhotons = true;
       m_isIgnoreIntermediate = false;
     } else if (d->m_strArrow == "==>") {
-      m_isIgnorePhotons = false;
+      m_isIgnoreRadiatedPhotons = false;
       m_isIgnoreIntermediate = false;
     } else {
       B2WARNING("Unknown arrow: " << d->m_strArrow);
@@ -104,17 +105,26 @@ bool DecayDescriptor::init(const DecayString& s)
     }
 
     // Initialise list of keywords
-    // Keyword has higher priority than arrow for m_isIgnorePhotons
+    // Keyword has higher priority than arrow for m_isIgnoreRadiatedPhotons
+    // For neutrino
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
       m_isIgnoreNeutrino = true;
     } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!nu")) != d->m_keywords.end()) {
       m_isIgnoreNeutrino = false;
     }
+    // For radiated photon
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?rad")) != d->m_keywords.end()) {
-      m_isIgnorePhotons = true;
+      m_isIgnoreRadiatedPhotons = true;
     } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!rad")) != d->m_keywords.end()) {
-      m_isIgnorePhotons = false;
+      m_isIgnoreRadiatedPhotons = false;
     }
+    // For gamma
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?gamma")) != d->m_keywords.end()) {
+      m_isIgnoreGamma = true;
+    } else if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "!gamma")) != d->m_keywords.end()) {
+      m_isIgnoreGamma = false;
+    }
+    // For massive FSP
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
       m_isIgnoreMassive = true;
     }
@@ -189,7 +199,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
       int iPDGCode_daughter_p = 0;
       if (const auto* part_test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = part_test->getPDGCode();
       else if (const auto* mc_test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = mc_test->getPDG();
-      if (iDaughter_d == 0 && m_isIgnorePhotons && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
+      if (iDaughter_d == 0 && m_isIgnoreRadiatedPhotons && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
       int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);
       if (iMatchResult < 0) isAmbiguities = true;
       if (abs(iMatchResult) == 2 && iCC == 1) continue;

@@ -43,7 +43,7 @@ namespace {
     EXPECT_EQ(initok, true);
 
     // standard arrow, not an inclusive decay
-    EXPECT_EQ(dd.isIgnorePhotons(), true);
+    EXPECT_EQ(dd.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd.isIgnoreIntermediate(), true);
 
     ASSERT_NE(dd.getMother(), nullptr);
@@ -116,21 +116,21 @@ namespace {
     DecayDescriptor dd1;
     bool initok = dd1.init("B0:candidates --> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd1.isIgnorePhotons(), true);
+    EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd1.isIgnoreIntermediate(), false);
 
     // => means ignore photons
     DecayDescriptor dd2;
     initok = dd2.init("B0:candidates => K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd2.isIgnorePhotons(), false);
+    EXPECT_EQ(dd2.isIgnoreRadiatedPhotons(), false);
     EXPECT_EQ(dd2.isIgnoreIntermediate(), true);
 
     // ==> means ignore intermediate resonances *and* photons
     DecayDescriptor dd3;
     initok = dd3.init("B0:candidates ==> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd3.isIgnorePhotons(), false);
+    EXPECT_EQ(dd3.isIgnoreRadiatedPhotons(), false);
     EXPECT_EQ(dd3.isIgnoreIntermediate(), false);
 
   }
@@ -141,55 +141,82 @@ namespace {
     DecayDescriptor dd1;
     bool initok = dd1.init("B0:candidates -> K+:loose gamma:clean ...");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd1.isIgnorePhotons(), true);
+    EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd1.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd1.isIgnoreMassive(), true);
     EXPECT_EQ(dd1.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd1.isIgnoreGamma(), false);
 
     // ?nu means accept missing neutrino
     DecayDescriptor dd2;
     initok = dd2.init("B0:candidates -> K+:loose pi-:loose ?nu");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd2.isIgnorePhotons(), true);
+    EXPECT_EQ(dd2.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd2.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd2.isIgnoreMassive(), false);
     EXPECT_EQ(dd2.isIgnoreNeutrino(), true);
+    EXPECT_EQ(dd2.isIgnoreGamma(), false);
 
     // !nu means take into account missing neutrino (Default)
     DecayDescriptor dd3;
     initok = dd3.init("B0:candidates -> K+:loose pi-:loose !nu");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd3.isIgnorePhotons(), true);
+    EXPECT_EQ(dd3.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd3.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd3.isIgnoreMassive(), false);
     EXPECT_EQ(dd3.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd3.isIgnoreGamma(), false);
 
-    // ?rad means ignore radiative
+    // ?rad means ignore radiated photon
     DecayDescriptor dd4;
     initok = dd4.init("B0:candidates -> K+:loose pi-:loose ?rad");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd4.isIgnorePhotons(), true);
+    EXPECT_EQ(dd4.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd4.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd4.isIgnoreMassive(), false);
     EXPECT_EQ(dd4.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd4.isIgnoreGamma(), false);
 
-    // !rad means take into account radiative
+    // !rad means take into account radiated photon
     DecayDescriptor dd5;
     initok = dd5.init("B0:candidates -> K+:loose pi-:loose !rad");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd5.isIgnorePhotons(), false);
+    EXPECT_EQ(dd5.isIgnoreRadiatedPhotons(), false);
     EXPECT_EQ(dd5.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd5.isIgnoreMassive(), false);
     EXPECT_EQ(dd5.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd5.isIgnoreGamma(), false);
 
-    // ... and ?nu means accept missing massive
+    // ?gamma means ignore missing gamma
     DecayDescriptor dd6;
-    initok = dd6.init("B0:candidates -> e-:loose ... ?nu");
+    initok = dd6.init("B0:candidates -> K+:loose pi-:loose ?gamma");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd6.isIgnorePhotons(), true);
+    EXPECT_EQ(dd6.isIgnoreRadiatedPhotons(), false);
     EXPECT_EQ(dd6.isIgnoreIntermediate(), true);
-    EXPECT_EQ(dd6.isIgnoreMassive(), true);
-    EXPECT_EQ(dd6.isIgnoreNeutrino(), true);
+    EXPECT_EQ(dd6.isIgnoreMassive(), false);
+    EXPECT_EQ(dd6.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd6.isIgnoreGamma(), true);
+
+    // !gamma means take into account missing gamma
+    DecayDescriptor dd7;
+    initok = dd7.init("B0:candidates -> K+:loose pi-:loose !gamma");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd7.isIgnoreRadiatedPhotons(), false);
+    EXPECT_EQ(dd7.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd7.isIgnoreMassive(), false);
+    EXPECT_EQ(dd7.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd7.isIgnoreGamma(), false);
+
+
+    // ... ?nu ?gamma means accept missing massive
+    DecayDescriptor dd8;
+    initok = dd8.init("B0:candidates -> e-:loose ... ?nu ?gamma");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd8.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd8.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd8.isIgnoreMassive(), true);
+    EXPECT_EQ(dd8.isIgnoreNeutrino(), true);
+    EXPECT_EQ(dd8.isIgnoreGamma(), true);
 
   }
 

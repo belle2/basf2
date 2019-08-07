@@ -49,7 +49,7 @@ namespace Belle2 {
     arrow %= string("->") | string("-->") | string("=>") | string("==>");
 
     // Keyword for custom MC Matching
-    keyword = string("...") | string("?nu") | string("!nu") | string("?rad") | string("!rad");
+    keyword = string("...") | string("?nu") | string("!nu") | string("?rad") | string("!rad") | string("?gamma") | string("!gamma");
     keywordlist = *keyword;
 
     // Basic decay: mother -> daughterlist

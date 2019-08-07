@@ -113,10 +113,11 @@ namespace Belle2 {
     bool valid = decaydescriptor.init(decayString);
     if (!valid)
       B2ERROR("Invalid input DecayString: " << decayString);
-    m_isIgnorePhotons = decaydescriptor.isIgnorePhotons();
+    m_isIgnoreRadiatedPhotons = decaydescriptor.isIgnoreRadiatedPhotons();
     m_isIgnoreIntermediate = decaydescriptor.isIgnoreIntermediate();
-    m_isIgnoreMassive  = decaydescriptor.isIgnoreMassive();
+    m_isIgnoreMassive = decaydescriptor.isIgnoreMassive();
     m_isIgnoreNeutrino = decaydescriptor.isIgnoreNeutrino();
+    m_isIgnoreGamma = decaydescriptor.isIgnoreGamma();
 
 
     // Mother particle
@@ -385,10 +386,11 @@ namespace Belle2 {
     const TLorentzVector vec(px, py, pz, E);
 
     int property = Particle::PropertyFlags::c_Ordinary;
-    if (m_isIgnorePhotons) property += Particle::PropertyFlags::c_isIgnorePhotons;
+    if (m_isIgnoreRadiatedPhotons) property += Particle::PropertyFlags::c_isIgnoreRadiatedPhotons;
     if (m_isIgnoreIntermediate) property += Particle::PropertyFlags::c_isIgnoreIntermediate;
     if (m_isIgnoreMassive) property += Particle::PropertyFlags::c_isIgnoreMassive;
     if (m_isIgnoreNeutrino) property += Particle::PropertyFlags::c_isIgnoreNeutrino;
+    if (m_isIgnoreGamma) property += Particle::PropertyFlags::c_isIgnoreGamma;
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,

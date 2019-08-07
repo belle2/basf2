@@ -38,6 +38,8 @@ Untested method PIDLikelihood::setLogLikelihood
 Untested method ECLCluster::addHypothesis
 Untested method ECLCluster::addStatus
 Untested method ECLCluster::getHypothesisId
+Untested method ECLCluster::hasFailedFitTime
+Untested method ECLCluster::hasFailedTimeResolution
 Untested method ECLCluster::hasStatus
 Untested method ECLCluster::removeHypothesis
 Untested method ECLCluster::removeStatus

@@ -25,7 +25,8 @@ void AsicBackgroundDetector::initialize()
 {
   Super::initialize();
   // database:
-  m_channelMapFromDB = new DBArray<CDCChannelMap>;
+  m_channelMapFromDB = std::make_unique<DBArray<CDCChannelMap>> ();
+
   if ((*m_channelMapFromDB).isValid()) {
     B2DEBUG(100, "CDC Channel map is  valid");
   } else {
@@ -46,14 +47,6 @@ void AsicBackgroundDetector::beginRun()
     const int iCh = cm.getBoardChannel();
     const WireID wireId(isl, il, iw);
     m_map[wireId.getEWire()] = std::pair<int, int>(iBoard, iCh);
-  }
-}
-
-void AsicBackgroundDetector::terminate()
-{
-  Super::terminate();
-  if (m_channelMapFromDB) {
-    delete m_channelMapFromDB;
   }
 }
 

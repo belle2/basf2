@@ -33,9 +33,6 @@ namespace Belle2 {
       /// Access database here:
       void initialize() final;
 
-      /// Terminate
-      void terminate() final;
-
       /// Reload channel map if needed
       void beginRun() final;
 
@@ -55,7 +52,8 @@ namespace Belle2 {
       /**
        * Channel map retrieved from DB.
        */
-      DBArray<CDCChannelMap>* m_channelMapFromDB;
+      std::unique_ptr<DBArray<CDCChannelMap> > m_channelMapFromDB;
+
       /// map from ewire to board/channel ID
       std::map<int, std::pair<int, int> > m_map;
 

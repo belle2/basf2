@@ -28,7 +28,7 @@
 #include "G4Step.hh"
 #include "G4VProcess.hh"
 
-#define DEPTH_FORWARD 2
+#define DEPTH_SECTION 2
 #define DEPTH_SECTOR 3
 #define DEPTH_LAYER 5
 #define DEPTH_PLANE 9
@@ -113,15 +113,15 @@ namespace Belle2 {
         int plane = hist->GetCopyNumber(depth - DEPTH_PLANE);
         int layer = hist->GetCopyNumber(depth - DEPTH_LAYER);
         int sector = hist->GetCopyNumber(depth - DEPTH_SECTOR);
-        int forward = (hist->GetCopyNumber(depth - DEPTH_FORWARD) == BKLM_FORWARD) ? 1 : 0;
+        int section = (hist->GetCopyNumber(depth - DEPTH_SECTION) == BKLM_FORWARD) ? 1 : 0;
         int moduleID =
-          int(BKLMElementNumbers::moduleNumber(forward, sector, layer))
+          int(BKLMElementNumbers::moduleNumber(section, sector, layer))
           | BKLM_MC_MASK;
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
         if (time > m_HitTimeMax)
           return false;
         const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
-        const Module* m = m_GeoPar->findModule(forward, sector, layer);
+        const Module* m = m_GeoPar->findModule(section, sector, layer);
         const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
         const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
         if (postStep->GetProcessDefinedStep() != 0) {

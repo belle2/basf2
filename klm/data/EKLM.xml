@@ -7,10 +7,10 @@
 	<!-- Geometry. -->
 	<Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
 	<!-- Numbers of elements. -->
-	<NEndcaps desc="Number of endcaps">2</NEndcaps>
-	<NLayers desc="Number of layers in one endcap">14</NLayers>
-	<NDetectorLayersForward desc="Number of detector layers in the forward endcap">14</NDetectorLayersForward>
-	<NDetectorLayersBackward desc="Number of detector layers in the backward endcap">12</NDetectorLayersBackward>
+	<NSections desc="Number of sections">2</NSections>
+	<NLayers desc="Number of layers in one section">14</NLayers>
+	<NDetectorLayersForward desc="Number of detector layers in the forward section">14</NDetectorLayersForward>
+	<NDetectorLayersBackward desc="Number of detector layers in the backward section">12</NDetectorLayersBackward>
 	<NSectors desc="Number of sectors in one layer">4</NSectors>
 	<NPlanes desc="Number of planes in one sector">2</NPlanes>
 	<NSegments desc="Number of segments in one plane">5</NSegments>
@@ -26,14 +26,14 @@
 		<Phi unit="deg">-22.5</Phi>
 		<NSides desc="number of sides of Barrel KLM Vessel">8</NSides>
 	</EndcapStructure>
-	<Endcap>
+	<Section>
 		<InnerR desc="Inner radius" unit="mm">1280.0</InnerR>
 		<OuterR desc="Outer radius" unit="mm">3535.0</OuterR>
 		<Length desc="Length" unit="mm">1321.0</Length>
 		<X desc="X position" unit="mm">0</X>
 		<Y desc="Y position" unit="mm">0</Y>
 		<Z desc="Z position" unit="mm">2960.5</Z>
-	</Endcap>
+	</Section>
 	<Layer>
 		<InnerR desc="Inner radius" unit="mm">1305.0</InnerR>
 		<OuterR desc="Outer radius" unit="mm">3320.0</OuterR>

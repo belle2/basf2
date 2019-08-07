@@ -97,7 +97,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   const int* rawData, EKLMDataConcentratorLane* lane,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
-  int endcap, layer, sector, strip = 0;
+  int section, layer, sector, strip = 0;
   KLM::RawData raw;
   KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
   if ((raw.triggerBits & 0x10) != 0)
@@ -140,13 +140,13 @@ void KLMUnpackerModule::unpackEKLMDigit(
     }
     if (!m_WriteWrongHits)
       return;
-    endcap = 0;
+    section = 0;
     layer = 0;
     sector = 0;
     correctHit = false;
   } else {
     m_ElementNumbers->sectorNumberToElementNumbers(
-      *sectorGlobal, &endcap, &layer, &sector);
+      *sectorGlobal, &section, &layer, &sector);
   }
   EKLMDigit* eklmDigit = m_eklmDigits.appendNew();
   eklmDigit->addRelationTo(klmDigitEventInfo);
@@ -155,7 +155,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setTime(
     m_TimeConversion->getTime(raw.ctime, raw.tdc,
                               klmDigitEventInfo->getTriggerCTime(), true));
-  eklmDigit->setEndcap(endcap);
+  eklmDigit->setSection(section);
   eklmDigit->setLayer(layer);
   eklmDigit->setSector(sector);
   eklmDigit->setPlane(plane);
@@ -163,7 +163,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
   eklmDigit->setCharge(raw.charge);
   if (correctHit) {
     int stripGlobal = m_ElementNumbers->stripNumber(
-                        endcap, layer, sector, plane, strip);
+                        section, layer, sector, plane, strip);
     const EKLMChannelData* channelData =
       m_Channels->getChannelData(stripGlobal);
     if (channelData == nullptr)
@@ -228,7 +228,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
   if ((layer < 2) && ((raw.triggerBits & 0x10) != 0))
     return;
   // int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
-  // int forward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
+  // int section = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
   // int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
   int channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
 
@@ -349,7 +349,7 @@ void KLMUnpackerModule::loadMapFromDB()
     B2DEBUG(29, "KLMUnpackerModule:: version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " <<
             element.getCopperId() <<
             ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-            ", forward = " << element.getForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+            ", section = " << element.getSection() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
             " plane(z/phi) = " << element.getPlane());
 
     int copperId = element.getCopperId();
@@ -358,14 +358,14 @@ void KLMUnpackerModule::loadMapFromDB()
     int axisId = element.getAxisId();
     int channelId = element.getChannelId();
     int sector = element.getSector();
-    int forward = element.getForward();
+    int section = element.getSection();
     int layer = element.getLayer();
     int plane =  element.getPlane();
     int stripId = element.getStripId();
     int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1 , laneId, axisId, channelId);
     int moduleId = 0;
 
-    moduleId = BKLMElementNumbers::channelNumber(forward, sector, layer,
+    moduleId = BKLMElementNumbers::channelNumber(section, sector, layer,
                                                  plane, stripId);
     m_electIdToModuleId[elecId] = moduleId;
 

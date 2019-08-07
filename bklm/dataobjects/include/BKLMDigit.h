@@ -73,9 +73,9 @@ namespace Belle2 {
     //! @return whether the scint hit is usable (true) or not (false) in pulse-shape fit
     bool isAboveThreshold() const { return ((m_ModuleID & BKLM_ABOVETHRESHOLD_MASK) != 0); }
 
-    //! Get detector end
-    //! @return detector end (1=forward or 0=backward) of this strip
-    int getForward() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
+    //! Get section number
+    //! @return section number (1=forward or 0=backward) of this strip
+    int getSection() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
 
     //! Get sector number
     //! @return sector number of this strip (1..8)

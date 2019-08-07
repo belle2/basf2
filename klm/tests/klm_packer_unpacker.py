@@ -31,7 +31,7 @@ class PackerUnpackerTest(Module):
         return sorted(
             py_list,
             key=lambda x: (
-                x.getForward(),
+                x.getSection(),
                 x.getSector(),
                 x.getLayer(),
                 x.getStrip())
@@ -50,7 +50,7 @@ class PackerUnpackerTest(Module):
         return sorted(
             py_list,
             key=lambda x: (
-                x.getEndcap(),
+                x.getSection(),
                 x.getLayer(),
                 x.getSector(),
                 x.getPlane(),
@@ -89,7 +89,7 @@ class PackerUnpackerTest(Module):
 
             # check the content of the digit
             # the following content is not consistent due to incomplete mapping file,  data/geometry/BKLMElectronicsMapping.xml
-            assert digit.getForward() == digit_unpacked.getForward()
+            assert digit.getSection() == digit_unpacked.getSection()
             assert digit.getSector() == digit_unpacked.getSector()
             assert digit.getLayer() == digit_unpacked.getLayer()
             assert digit.getStrip() == digit_unpacked.getStrip()
@@ -110,7 +110,7 @@ class PackerUnpackerTest(Module):
 
             # check the content of the digit
             # From EKLMHitBase
-            assert digit.getEndcap() == digit_unpacked.getEndcap()
+            assert digit.getSection() == digit_unpacked.getSection()
             assert digit.getLayer() == digit_unpacked.getLayer()
             assert digit.getSector() == digit_unpacked.getSector()
             # assert digit.getEDep() == digit_unpacked.getEDep()

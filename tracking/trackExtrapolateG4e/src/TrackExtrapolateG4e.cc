@@ -291,7 +291,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
   const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
   m_BarrelHalfLength = bklmGeometry->getHalfLength() * CLHEP::cm; // in G4 units (mm)
-  m_EndcapHalfLength = 0.5 * eklmGeometry.getEndcapPosition()->getLength(); // in G4 units (mm)
+  m_EndcapHalfLength = 0.5 * eklmGeometry.getSectionPosition()->getLength(); // in G4 units (mm)
   m_OffsetZ = bklmGeometry->getOffsetZ() * CLHEP::cm; // in G4 units (mm)
   double minZ = m_OffsetZ - (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   double maxZ = m_OffsetZ + (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
@@ -305,8 +305,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_OffsetZ /= CLHEP::cm;                            // now in G4e units (cm)
   m_BarrelMinR = bklmGeometry->getGap1InnerRadius(); // in G4e units (cm)
   m_BarrelMaxR /= CLHEP::cm;                         // now in G4e units (cm)
-  m_EndcapMinR = eklmGeometry.getEndcapPosition()->getInnerR() / CLHEP::cm; // in G4e units (cm)
-  m_EndcapMaxR = eklmGeometry.getEndcapPosition()->getOuterR() / CLHEP::cm; // in G4e units (cm)
+  m_EndcapMinR = eklmGeometry.getSectionPosition()->getInnerR() / CLHEP::cm; // in G4e units (cm)
+  m_EndcapMaxR = eklmGeometry.getSectionPosition()->getOuterR() / CLHEP::cm; // in G4e units (cm)
   m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;                // in G4e units (cm)
 
   // Measurement uncertainties and acceptance windows
@@ -335,9 +335,9 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
     }
   }
   double dz(eklmGeometry.getLayerShiftZ() / CLHEP::cm); // in G4e units (cm)
-  double z0((eklmGeometry.getEndcapPosition()->getZ()
+  double z0((eklmGeometry.getSectionPosition()->getZ()
              + eklmGeometry.getLayerShiftZ()
-             - 0.5 * eklmGeometry.getEndcapPosition()->getLength()
+             - 0.5 * eklmGeometry.getSectionPosition()->getLength()
              - 0.5 * eklmGeometry.getLayerPosition()->getLength()) / CLHEP::cm); // in G4e units (cm)
 
   int nEndcapLayers = eklmGeometry.getNLayers();
@@ -1623,7 +1623,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
 
   if (bestHit >= 0) {
     BKLMHit2d* hit = bklmHits[bestHit];
-    intersection.isForward = (hit->getForward() == 1);
+    intersection.isForward = (hit->getSection() == 1);
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
     double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};
@@ -1667,7 +1667,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   for (int h = 0; h < eklmHits.getEntries(); ++h) {
     EKLMHit2d* hit = eklmHits[h];
     if (hit->getLayer() != matchingLayer) continue;
-    if (hit->getEndcap() != matchingEndcap) continue;
+    if (hit->getSection() != matchingEndcap) continue;
     // DIVOT no such function for EKLM!
     // if (hit->isOutOfTime()) continue;
     if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
@@ -1686,7 +1686,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   if (bestHit >= 0) {
     EKLMHit2d* hit = eklmHits[bestHit];
     intersection.hit = bestHit;
-    intersection.isForward = (hit->getEndcap() == 2);
+    intersection.isForward = (hit->getSection() == 2);
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};

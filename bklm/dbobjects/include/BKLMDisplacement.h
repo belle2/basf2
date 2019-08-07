@@ -42,9 +42,6 @@ namespace Belle2 {
     //! Destructor
     ~BKLMDisplacement() {}
 
-    //!get the F/B info of current module, 0: backward, 1: forward
-    // int getIsForward();
-
     //! get the identifier id
     float getElementID() const {return m_elementID;}
 

@@ -37,13 +37,13 @@ namespace Belle2 {
 
     /**
      * Get channel number.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    static uint16_t channelNumber(int forward, int sector, int layer, int plane,
+    static uint16_t channelNumber(int section, int sector, int layer, int plane,
                                   int strip);
 
     /**
@@ -61,11 +61,11 @@ namespace Belle2 {
 
     /**
      * Get module number.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      */
-    static uint16_t moduleNumber(int forward, int sector, int layer);
+    static uint16_t moduleNumber(int section, int sector, int layer);
 
     /**
      * Get element numbers by module number.
@@ -79,45 +79,45 @@ namespace Belle2 {
 
     /**
      * Get sector number.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      */
-    static uint16_t sectorNumber(int forward, int sector);
+    static uint16_t sectorNumber(int section, int sector);
 
     /**
      * Get layer global number.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      */
-    static int layerGlobalNumber(int forward, int sector, int layer);
+    static int layerGlobalNumber(int section, int sector, int layer);
 
     /**
      * Get number of strips.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
      */
-    static int getNStrips(int forward, int sector, int layer, int plane);
+    static int getNStrips(int section, int sector, int layer, int plane);
 
     /**
      * Check channel number.
-     * @param[in] forward Forward (1) or backward (0) BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
     static bool checkChannelNumber(
-      int forward, int sector, int layer, int plane, int strip);
+      int section, int sector, int layer, int plane, int strip);
 
     /**
-     * Get maximal forward number (0-based).
+     * Get maximal section number (0-based).
      */
-    static constexpr int getMaximalForwardNumber()
+    static constexpr int getMaximalSectionNumber()
     {
-      return m_MaximalForwardNumber;
+      return m_MaximalSectionNumber;
     }
 
     /**
@@ -149,7 +149,7 @@ namespace Belle2 {
      */
     static constexpr int getMaximalSectorGlobalNumber()
     {
-      return (m_MaximalForwardNumber + 1) * m_MaximalSectorNumber;
+      return (m_MaximalSectionNumber + 1) * m_MaximalSectorNumber;
     }
 
     /**
@@ -157,17 +157,17 @@ namespace Belle2 {
      */
     static constexpr int getMaximalLayerGlobalNumber()
     {
-      return (m_MaximalForwardNumber + 1) * m_MaximalSectorNumber * m_MaximalLayerNumber;
+      return (m_MaximalSectionNumber + 1) * m_MaximalSectorNumber * m_MaximalLayerNumber;
     }
 
     /**
      * Get element numbers by layer global number (0-based).
      * @param[in]  layerGlobal  Layer global number.
-     * @param[out] forward      Forward (1) or backward (0) BKLM.
+     * @param[out] section      Forward (1) or backward (0) BKLM.
      * @param[out] sector       Sector (1-based).
      * @param[out] layer        Layer (1-based).
      */
-    static void layerGlobalNumberToElementNumbers(int layerGlobal, int* forward, int* sector, int* layer);
+    static void layerGlobalNumberToElementNumbers(int layerGlobal, int* section, int* sector, int* layer);
 
     /**
      * Get plane number (0 = z, 1 = phi) by module identifier.
@@ -187,8 +187,8 @@ namespace Belle2 {
 
   protected:
 
-    /** Maximal forward number (0-based). */
-    static constexpr int m_MaximalForwardNumber = 1;
+    /** Maximal section number (0-based). */
+    static constexpr int m_MaximalSectionNumber = 1;
 
     /** Maximal sector number (1-based). */
     static constexpr int m_MaximalSectorNumber = 8;

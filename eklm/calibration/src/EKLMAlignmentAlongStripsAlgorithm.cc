@@ -37,12 +37,12 @@ EKLMAlignmentAlongStripsAlgorithm::~EKLMAlignmentAlongStripsAlgorithm()
 CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
 {
   /* cppcheck-suppress variableScope */
-  int i, n, nEndcaps, nSectors, nLayers, nDetectorLayers, nPlanes, nSegments;
+  int i, n, nSections, nSectors, nLayers, nDetectorLayers, nPlanes, nSegments;
   /* cppcheck-suppress variableScope */
   int segment, segmentGlobal;
   std::vector<std::pair<int, double> > segmentSignificance;
   std::vector<std::pair<int, double> >::iterator it;
-  int iEndcap, iLayer, iSector, iPlane, iSegment;
+  int iSection, iLayer, iSector, iPlane, iSegment;
   int**** *nHits, *** *averageHits;
   double nHitsSegment, nHitsAverage, nSigma;
   bool found;
@@ -50,31 +50,31 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   struct Event* event = nullptr;
   std::shared_ptr<TTree> t_in = getObjectPtr<TTree>("calibration_data");
   t_in->SetBranchAddress("event", &event);
-  nEndcaps = geoDat->getNEndcaps();
+  nSections = geoDat->getNSections();
   nSectors = geoDat->getNSectors();
   nLayers = geoDat->getNLayers();
   nPlanes = geoDat->getNPlanes();
   nSegments = geoDat->getNSegments();
-  nHits = new int**** [nEndcaps];
-  averageHits = new int** *[nEndcaps];
-  for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
-    nHits[iEndcap] = new int** *[nLayers];
-    averageHits[iEndcap] = new int** [nLayers];
+  nHits = new int**** [nSections];
+  averageHits = new int** *[nSections];
+  for (iSection = 0; iSection < nSections; iSection++) {
+    nHits[iSection] = new int** *[nLayers];
+    averageHits[iSection] = new int** [nLayers];
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
-      nHits[iEndcap][iLayer] = new int** [nSectors];
-      averageHits[iEndcap][iLayer] = new int* [nPlanes];
+      nHits[iSection][iLayer] = new int** [nSectors];
+      averageHits[iSection][iLayer] = new int* [nPlanes];
       for (iPlane = 0; iPlane < nPlanes; iPlane++) {
-        averageHits[iEndcap][iLayer][iPlane] = new int[nSegments];
+        averageHits[iSection][iLayer][iPlane] = new int[nSegments];
         for (iSegment = 0; iSegment < nSegments; iSegment++) {
-          averageHits[iEndcap][iLayer][iPlane][iSegment] = 0;
+          averageHits[iSection][iLayer][iPlane][iSegment] = 0;
         }
       }
       for (iSector = 0; iSector < nSectors; iSector++) {
-        nHits[iEndcap][iLayer][iSector] = new int* [nPlanes];
+        nHits[iSection][iLayer][iSector] = new int* [nPlanes];
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
-          nHits[iEndcap][iLayer][iSector][iPlane] = new int[nSegments];
+          nHits[iSection][iLayer][iSector][iPlane] = new int[nSegments];
           for (iSegment = 0; iSegment < nSegments; iSegment++) {
-            nHits[iEndcap][iLayer][iSector][iPlane][iSegment] = 0;
+            nHits[iSection][iLayer][iSector][iPlane][iSegment] = 0;
           }
         }
       }
@@ -84,31 +84,31 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   for (i = 0; i < n; i++) {
     t_in->GetEntry(i);
     segment = (event->strip - 1) / geoDat->getNStripsSegment();
-    nHits[event->endcap - 1][event->layer - 1][event->sector - 1]
+    nHits[event->section - 1][event->layer - 1][event->sector - 1]
     [event->plane - 1][segment]++;
-    averageHits[event->endcap - 1][event->layer - 1]
+    averageHits[event->section - 1][event->layer - 1]
     [getAveragedPlane(event->sector, event->plane)][segment]++;
   }
-  for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
+  for (iSection = 0; iSection < nSections; iSection++) {
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
       for (iPlane = 0; iPlane < nPlanes; iPlane++) {
         for (iSegment = 0; iSegment < nSegments; iSegment++) {
-          averageHits[iEndcap][iLayer][iPlane][iSegment] /= nSectors;
+          averageHits[iSection][iLayer][iPlane][iSegment] /= nSectors;
         }
       }
     }
   }
-  for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
-    nDetectorLayers = geoDat->getNDetectorLayers(iEndcap + 1);
+  for (iSection = 0; iSection < nSections; iSection++) {
+    nDetectorLayers = geoDat->getNDetectorLayers(iSection + 1);
     for (iLayer = 0; iLayer < nDetectorLayers; iLayer++) {
       for (iSector = 0; iSector < nSectors; iSector++) {
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
           for (iSegment = 0; iSegment < nSegments; iSegment++) {
-            segmentGlobal = geoDat->segmentNumber(iEndcap + 1, iLayer + 1,
+            segmentGlobal = geoDat->segmentNumber(iSection + 1, iLayer + 1,
                                                   iSector + 1, iPlane + 1,
                                                   iSegment + 1);
-            nHitsSegment = nHits[iEndcap][iLayer][iSector][iPlane][iSegment];
-            nHitsAverage = averageHits[iEndcap][iLayer]
+            nHitsSegment = nHits[iSection][iLayer][iSector][iPlane][iSegment];
+            nHitsAverage = averageHits[iSection][iLayer]
                            [getAveragedPlane(iSector + 1, iPlane + 1)]
                            [iSegment];
             nSigma = (nHitsSegment - nHitsAverage) /
@@ -129,31 +129,31 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
        ++it) {
     if (it->second < 3.0)
       break;
-    geoDat->segmentNumberToElementNumbers(it->first, &iEndcap, &iLayer,
+    geoDat->segmentNumberToElementNumbers(it->first, &iSection, &iLayer,
                                           &iSector, &iPlane, &iSegment);
-    printf("Segment %d (endcap %d, layer %d, sector %d, plane %d, segment %d):"
-           " %.1f sigma\n", it->first, iEndcap, iLayer, iSector, iPlane,
+    printf("Segment %d (section %d, layer %d, sector %d, plane %d, segment %d):"
+           " %.1f sigma\n", it->first, iSection, iLayer, iSector, iPlane,
            iSegment, it->second);
     found = true;
   }
   if (!found)
     printf("none found.\n");
-  for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
+  for (iSection = 0; iSection < nSections; iSection++) {
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
       for (iPlane = 0; iPlane < nPlanes; iPlane++) {
-        delete[] averageHits[iEndcap][iLayer][iPlane];
+        delete[] averageHits[iSection][iLayer][iPlane];
       }
       for (iSector = 0; iSector < nSectors; iSector++) {
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
-          delete[] nHits[iEndcap][iLayer][iSector][iPlane];
+          delete[] nHits[iSection][iLayer][iSector][iPlane];
         }
-        delete[] nHits[iEndcap][iLayer][iSector];
+        delete[] nHits[iSection][iLayer][iSector];
       }
-      delete[] nHits[iEndcap][iLayer];
-      delete[] averageHits[iEndcap][iLayer];
+      delete[] nHits[iSection][iLayer];
+      delete[] averageHits[iSection][iLayer];
     }
-    delete[] nHits[iEndcap];
-    delete[] averageHits[iEndcap];
+    delete[] nHits[iSection];
+    delete[] averageHits[iSection];
   }
   delete[] nHits;
   delete[] averageHits;

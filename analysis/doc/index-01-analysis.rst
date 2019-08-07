@@ -97,6 +97,8 @@ Advanced Topics
 
 .. toctree:: FlavorTagger
 
+.. toctree:: DeepFlavorTagger
+
 .. toctree:: FullEventInterpretation
 
 .. toctree:: ContinuumSuppression

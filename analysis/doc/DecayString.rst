@@ -56,7 +56,8 @@ Here is an example of use:
 
 Grammar for custom MCMatching
 -----------------------------
-One can use the keywords for decay string to configure how :code:`'isCustomSignal'` is behaving. If these keywords are used, the missing particles are ignored or taken into account. For example, if :code:`'...'` is used, missing final state particles are ignored, hence :code:`'isCustomSignal'` works as :code:`'isSignalAcceptMissingMassive'`.
+One can use the keywords for decay string to configure how :code:`'isCustomSignal'` is behaving. If these keywords are used, the missing particles are ignored or taken into account. For example, if :code:`'...'` is used, missing final state particles are ignored, hence :code:`'isCustomSignal'` works as :code:`'isSignalAcceptMissingMassive'`. 
+Keywords must be placed at the end of the decay string. It is not allowed to put keywords in front of particles.
 
 * :code:`'...'` Missing massive final state particles are ignored
 * :code:`'?nu'` Missing neutrinos are ignored
@@ -69,14 +70,13 @@ Here is an exapmle of use:
 .. code-block:: python
  
         from modularAnalysis import reconstructDecay
-
-	# isCustomSignal of K_S0:missNu accepts missing neutrino
+	# Keywords must be placed behind all particles
 	reconstructDecay('K_S0:missNu     -> pi+:loose e-:loose ?nu',      '', path=mypath)
-	# isCustomSignal of Xsu:missMassive accepts missing massive FSP and gamma (such as pi0 -> gamma gamma)
+	# isCustomSignal of K_S0:missNu accepts missing neutrino
 	reconstructDecay('Xsu:missMassive -> K+:loose pi0:all ... ?gamma', '', path=mypath)
-	# isCustomSignal of B+:inclusive accepts missing massive FSP, neutrino, and gamma. 
+	# isCustomSignal of Xsu:missMassive accepts missing massive FSP and gamma (such as pi0 -> gamma gamma)
 	reconstructDecay('B+:inclusive    -> mu-:loose ... ?nu ?gamma',    '', path=mypath)
-
+	# isCustomSignal of B+:inclusive accepts missing massive FSP, neutrino, and gamma. 
 
 Arrows
 ------
@@ -84,7 +84,6 @@ For truth matching purposes different types of arrows are defined:
 
 * :code:`'->'` intermediate resonances and radiated photons are ignored
 * :code:`'-->'`, :code:`'=>'` and :code:`'==>'` work same as :code:`'->'`. These three will be deprecated in release-05, please consider to use :code:`'->'`.
-
 * :code:`'=direct=>'` intermediate resonances are considered but radiated photons are ignored
 * :code:`'=norad=>'` radiated photons are considered but intermediate resonances are ignored
 * :code:`'=exact=>'` exact match of the decay including intermediate resonances and radiated photons

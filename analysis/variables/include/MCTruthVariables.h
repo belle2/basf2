@@ -136,6 +136,11 @@ namespace Belle2 {
     double particleMCErrors(const Particle* particle);
 
     /**
+     * return combination of MCMatching::MCErrorFlags flags without considering PropertyFlags of particle which are set by decaystring grammar.
+     */
+    double particleMCErrorsWithoutProperty(const Particle* particle);
+
+    /**
      * return the weight of the Particle -> MCParticle relation (only for the first Relation = largest weight)
      */
     double particleMCMatchWeight(const Particle* particle);

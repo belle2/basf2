@@ -54,7 +54,8 @@ namespace Belle2 {
         return 0.0;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
+
+      //remove the bits corresponding to PropertyFlags which are set by decaystring grammar.
       if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) {
         status &= (~MCMatching::c_MissFSR);
         status &= (~MCMatching::c_MissPHOTOS);
@@ -253,6 +254,11 @@ namespace Belle2 {
     double particleMCErrors(const Particle* part)
     {
       return MCMatching::getMCErrors(part);
+    }
+
+    double particleMCErrorsWithoutProperty(const Particle* part)
+    {
+      return MCMatching::getMCErrors(part, nullptr, false);
     }
 
     double particleNumberOfMCMatch(const Particle* particle)
@@ -809,6 +815,9 @@ namespace Belle2 {
                       "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
+    REGISTER_VARIABLE("mcErrorsWithoutProperty", particleMCErrors,
+                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags) \n"
+                      "Particle::Property which is set by decayString grammar is not considered.");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
                       "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,

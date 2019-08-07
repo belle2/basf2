@@ -156,6 +156,9 @@ namespace Belle2 {
     /** Enable global derivatives for wire sagging **/
     bool m_enableWireSagging;
 
+    /** List of event meta data entries at which payloads can change for timedep calibration */
+    std::vector<std::tuple<int, int, int>> m_eventNumbers{};
+
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
   };

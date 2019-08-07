@@ -58,6 +58,8 @@
 
 #include <genfit/KalmanFitterInfo.h>
 
+#include <framework/core/ModuleParamList.templateDetails.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
@@ -152,6 +154,10 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("enableWireSagging", m_enableWireSagging, "Enable global derivatives for wire sagging",
            bool(false));
 
+  // Time dependence
+  addParam("events", m_eventNumbers,
+           "List of (event, run, exp) with event numbers at which payloads can change for timedep calibration.",
+           m_eventNumbers);
 }
 
 void MillepedeCollectorModule::prepare()
@@ -228,8 +234,13 @@ void MillepedeCollectorModule::prepare()
   Belle2::alignment::VXDGlobalParamInterface::s_enablePXD = m_enablePXDHierarchy;
   Belle2::alignment::VXDGlobalParamInterface::s_enableSVD = m_enableSVDHierarchy;
 
+  std::vector<EventMetaData> events;
+  for (auto& ev_run_exp : m_eventNumbers) {
+    events.push_back(EventMetaData(std::get<0>(ev_run_exp), std::get<1>(ev_run_exp), std::get<2>(ev_run_exp)));
+  }
+
   // This will also build the hierarchy for the first time:
-  Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
+  Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components, events);
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = m_fitTrackT0;

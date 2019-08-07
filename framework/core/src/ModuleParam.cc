@@ -37,3 +37,6 @@ template class Belle2::ModuleParam<boost::optional<double>>;
 template class Belle2::ModuleParam<boost::optional<std::string>>;
 
 template class Belle2::ModuleParam<std::shared_ptr<Belle2::Path>>;
+
+template class Belle2::ModuleParam<std::vector<std::tuple<int, int, int>>>;
+

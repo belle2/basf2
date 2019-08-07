@@ -50,14 +50,19 @@ namespace Belle2 {
     void setCTimeShift(int shift);
 
     /**
-     * Get time.
+     * Get time for scintillator.
      * @param[in] ctime        CTIME.
-     * @param[in] tdc          TDC.
      * @param[in] triggerCTime Trigger CTIME.
-     * @param[in] scintillator Scintillator (true) or RPC (false).
      */
-    double getTime(int ctime, int tdc, int triggerCTime,
-                   bool scintillator) const;
+    double getTime(int ctime, int triggerCTime) const;
+
+    /**
+     * Get coarse and fine times for RPC.
+     * @param[in] ctime        REVO9 time.
+     * @param[in] tdc          TDC.
+     * @param[in] triggerTime  REVO9 Trigger time.
+     */
+    std::pair<int, double> getTimes(int ctime, int tdc, int triggerTime) const;
 
     /**
      * Get time for simulation.

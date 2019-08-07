@@ -13,6 +13,7 @@ import sys
 import os
 import tempfile
 from contextlib import contextmanager
+from collections import OrderedDict
 import multiprocessing
 import basf2
 import subprocess
@@ -128,8 +129,7 @@ def configure_logging_for_tests(user_replacements=None):
     # present once oder is kind of important so the less portable ones like
     # current directory should go first and might be overridden if for example
     # the BELLE2_LOCAL_DIR is identical to the current working directory
-    replacements = {}
-    replacements[os.getcwd()] = "${cwd}"
+    replacements = OrderedDict()
     replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
     for env_name in re.findall(":envvar:`(.*?)`", configure_logging_for_tests.__doc__):
@@ -137,6 +137,8 @@ def configure_logging_for_tests(user_replacements=None):
             replacements[os.environ[env_name]] = f"${{{env_name}}}"
     if user_replacements is not None:
         replacements.update(user_replacements)
+    # add cwd only if it doesn't overwrite anything ...
+    replacements.setdefault(os.getcwd(), "${cwd}")
     sys.stdout = logfilter.LogReplacementFilter(sys.__stdout__, replacements)
 
 

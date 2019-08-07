@@ -20,6 +20,7 @@ class LogReplacementFilter:
         self._out = out
         #: what to replace
         self._replacements = replacements
+        # build a regular expression from dictionary keys
         self._regex = re.compile("|".join(re.escape(e) for e in replacements))
 
     def write(self, data):

@@ -16,7 +16,6 @@
 #include <analysis/utility/MCMatching.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-
 #include <mdst/dataobjects/ECLCluster.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -26,6 +25,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <queue>
 
@@ -752,6 +753,25 @@ namespace Belle2 {
       return Environment::Instance().isMC();
     }
 
+    // Beam Kinematics
+    double getHEREnergy(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getHER()).E();
+    }
+
+    double getLEREnergy(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getLER()).E();
+    }
+
+    double getCrossingAngle(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getHER()).Vect().Angle(-1.0 * (beamParamsDB->getLER()).Vect());
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -893,5 +913,10 @@ namespace Belle2 {
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("isMC", isMC,
                       "Returns 1 if run on MC and 0 for data.");
+    VARIABLE_GROUP("Nominal beam kinematics")
+    REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] Nominal HER energy");
+    REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] Nominal LER energy");
+    REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Nominal beam crossing angle");
+
   }
 }

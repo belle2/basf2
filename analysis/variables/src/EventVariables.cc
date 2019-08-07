@@ -32,8 +32,9 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/dataobjects/EventT0.h>
-#include <framework/dbobjects/BeamParameters.h>
 
+// database
+#include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
 // cluster utils
@@ -158,24 +159,6 @@ namespace Belle2 {
     }
 
     // Beam Energies
-    double getHEREnergy(const Particle*)
-    {
-      static DBObjPtr<BeamParameters> beamParamsDB;
-      return (beamParamsDB->getHER()).E();
-    }
-
-    double getLEREnergy(const Particle*)
-    {
-      static DBObjPtr<BeamParameters> beamParamsDB;
-      return (beamParamsDB->getLER()).E();
-    }
-
-    double getCrossingAngle(const Particle*)
-    {
-      static DBObjPtr<BeamParameters> beamParamsDB;
-      return (beamParamsDB->getHER()).Vect().Angle(-1.0 * (beamParamsDB->getLER()).Vect());
-    }
-
     double getCMSEnergy(const Particle*)
     {
       PCmsLabTransform T;
@@ -500,10 +483,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
     REGISTER_VARIABLE("productionIdentifier", productionIdentifier, "[Eventbased] production identifier");
 
-    REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] Nominal HER energy");
-    REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] Nominal LER energy");
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
-    REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Nominal beam crossing angle");
     REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Beam energy (lab)");
     REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Beam momentum Px (lab)");
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Beam momentum Py (lab)");

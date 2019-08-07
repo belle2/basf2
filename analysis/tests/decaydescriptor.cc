@@ -191,7 +191,7 @@ namespace {
     DecayDescriptor dd6;
     initok = dd6.init("B0:candidates -> K+:loose pi-:loose ?gamma");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd6.isIgnoreRadiatedPhotons(), false);
+    EXPECT_EQ(dd6.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd6.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd6.isIgnoreMassive(), false);
     EXPECT_EQ(dd6.isIgnoreNeutrino(), false);
@@ -201,7 +201,7 @@ namespace {
     DecayDescriptor dd7;
     initok = dd7.init("B0:candidates -> K+:loose pi-:loose !gamma");
     EXPECT_EQ(initok, true);
-    EXPECT_EQ(dd7.isIgnoreRadiatedPhotons(), false);
+    EXPECT_EQ(dd7.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd7.isIgnoreIntermediate(), true);
     EXPECT_EQ(dd7.isIgnoreMassive(), false);
     EXPECT_EQ(dd7.isIgnoreNeutrino(), false);

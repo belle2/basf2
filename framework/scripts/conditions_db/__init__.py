@@ -15,17 +15,24 @@ from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
 import json
-from checksum import file_checksum
 import urllib
-from conditions_db.testing_payloads import parse_testing_payloads_file
 from versioning import upload_global_tag, jira_global_tag_v2
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
+import hashlib
 
 
 def encode_name(name):
     """Escape name to be used in an url"""
     return urllib.parse.quote(name, safe="")
+
+
+def file_checksum(filename):
+    """Calculate md5 hash of file"""
+    md5hash = hashlib.md5()
+    with open(filename, "rb") as data:
+        md5hash.update(data.read())
+    return md5hash.hexdigest()
 
 
 class ConditionsDB:
@@ -442,6 +449,7 @@ class ConditionsDB:
         """
 
         # first create a list of payloads
+        from conditions_db.testing_payloads import parse_testing_payloads_file
         entries = parse_testing_payloads_file(filename)
         if entries is None:
             B2ERROR(f"Problems with testing payload storage file {filename}, exiting")

@@ -11,7 +11,7 @@ all tags already exist.
 
 import os
 from basf2 import B2ERROR, LogLevel, logging
-from checksum import file_checksum
+from . import file_checksum
 from B2Tools.b2root import normalize_file
 
 

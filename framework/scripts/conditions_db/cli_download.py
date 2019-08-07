@@ -15,9 +15,8 @@ import shutil
 import fnmatch
 import re
 from urllib.parse import urljoin
-from . import ConditionsDB, encode_name
+from . import ConditionsDB, encode_name, file_checksum
 from .cli_utils import ItemFilter
-from checksum import file_checksum
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from concurrent.futures import ThreadPoolExecutor
 

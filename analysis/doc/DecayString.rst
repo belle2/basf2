@@ -64,6 +64,19 @@ One can use the keywords for decay string to configure how :code:`'isCustomSigna
 * :code:`'?gamma'` Missing gammas are ignored 
 * :code:`'!gamma'` Missing gammas are taken into account (default)
 
+Here is an exapmle of use:
+
+.. code-block:: python
+ 
+        from modularAnalysis import reconstructDecay
+
+	# isCustomSignal of K_S0:missNu accepts missing neutrino
+	reconstructDecay('K_S0:missNu     -> pi+:loose e-:loose ?nu',      '', path=mypath)
+	# isCustomSignal of Xsu:missMassive accepts missing massive FSP and gamma (such as pi0 -> gamma gamma)
+	reconstructDecay('Xsu:missMassive -> K+:loose pi0:all ... ?gamma', '', path=mypath)
+	# isCustomSignal of B+:inclusive accepts missing massive FSP, neutrino, and gamma. 
+	reconstructDecay('B+:inclusive    -> mu-:loose ... ?nu ?gamma',    '', path=mypath)
+
 
 Arrows
 ------
@@ -75,4 +88,32 @@ For truth matching purposes different types of arrows are defined:
 * :code:`'=direct=>'` intermediate resonances are considered but radiated photons are ignored
 * :code:`'=norad=>'` radiated photons are considered but intermediate resonances are ignored
 * :code:`'=exact=>'` exact match of the decay including intermediate resonances and radiated photons
+
+Here is an exapmle of use:
+
+.. code-block:: python
+ 
+        from modularAnalysis import reconstructDecay
+	reconstructDecay('B+:default ->        K+:loose e+:loose e-:loose', '', path=mypath)
+	reconstructDecay('B+:direct  =direct=> K+:loose e+:loose e-:loose', '', path=mypath)
+	reconstructDecay('B+:norad   =norad=>  K+:loose e+:loose e-:loose', '', path=mypath)
+	reconstructDecay('B+:exact   =exact=>  K+:loose e+:loose e-:loose', '', path=mypath)
+
+	# If one reconstructs B+ -> K+ e+ e- with above codes, one gets following results
+	# isCustomSignal(B+:default) == 1
+	# isCustomSignal(B+:direct)  == 1
+	# isCustomSignal(B+:norad)   == 1
+	# isCustomSignal(B+:exact)   == 1
+
+	# If one reconstructs B+ -> K+ e+ e- and FSR photon with above codes, one gets following results
+	# isCustomSignal(B+:default) == 1
+	# isCustomSignal(B+:direct)  == 1
+	# isCustomSignal(B+:norad)   == 0 Because the radiated photon is missed.
+	# isCustomSignal(B+:exact)   == 0 Because the radiated photon is missed.
+
+	# If one reconstructs B+ -> K+ Jpsi( -> e+ e- and FSR photon) with above codes, one gets following results
+	# isCustomSignal(B+:default) == 1
+	# isCustomSignal(B+:direct)  == 0 Because the intermediate resonance (Jpsi) is missed.
+	# isCustomSignal(B+:norad)   == 0 Because the radiated photon is missed.
+	# isCustomSignal(B+:exact)   == 0 Because the intermediate resonance (Jpsi) and the radiated photon are missed.
 

@@ -33,7 +33,7 @@ MCMatching for composite particles searches, by default, for the first common mo
 
 .. warning:: Note that "first common mother" can give some unexpected results in certain corner-cases
 
-Your own custom matching can be controlled by the DecayString grammar as described in :doc:`Grammar for custom MCMatching`.
+Your own custom matching can be controlled by the DecayString grammar as described in :doc:`Grammar for custom MCMatching` and :doc:`Arrows`.
 Which is then available in :b2:var:`isCustomSignal`.
 
 .. TODO: amalgamate this information better and link to the tracking/neutrals sphinx doc when it exists.

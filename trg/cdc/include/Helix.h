@@ -142,15 +142,24 @@ namespace Belle2 {
     /// sets and returns z componet of the magnetic field.
     double bFieldZ(double);
 
+    /// set limits for helix parameters
     static void set_limits(const CLHEP::HepVector& a_min,
                            const CLHEP::HepVector& a_max);
+
+    /// set to throw exception or not
     static bool set_exception(bool);
+
+    /// set to print debug info or not
     static bool set_print(bool);
 
   private:
+    /// limits for helix parameters
     static CLHEP::HepVector ms_amin, ms_amax;
+    /// range in checked or not
     static bool ms_check_range;
+    /// print debug info or not
     static bool ms_print_debug;
+    /// throw exception or not
     static bool ms_throw_exception;
 
 
@@ -159,16 +168,25 @@ namespace Belle2 {
     TRGCDCHelix& operator = (const TRGCDCHelix&);
 
   public:// Mathmatical functions
+    /// Mathmatical functions
     CLHEP::HepMatrix delApDelA(const CLHEP::HepVector& ap) const;
+    /// Mathmatical functions
     CLHEP::HepMatrix delXDelA(double phi) const;
+    /// Mathmatical functions
     CLHEP::HepMatrix delMDelA(double phi) const;
+    /// Mathmatical functions
     CLHEP::HepMatrix del4MDelA(double phi, double mass) const;
+    /// Mathmatical functions
     CLHEP::HepMatrix del4MXDelA(double phi, double mass) const;
 
   private:
+    /// update Caches
     void updateCache(void);
+    /// check validity
     void checkValid(void);
+    /// print debug info
     void debugPrint(void) const;
+    /// function not defined
     void debugTRGCDCHelix(void) const;
 
   public:
@@ -176,22 +194,36 @@ namespace Belle2 {
     static const double ConstantAlpha;
 
   private:
+    /// matrix validity
     bool m_matrixValid;
+    /// helix validity
     bool m_helixValid;
+    /// magnetic field
     double m_bField;
+    /// alpha parameter
     double m_alpha;
+    /// pivot
     HepGeom::Point3D<double>  m_pivot;
+    /// a HepVector parameter
     CLHEP::HepVector m_a;
+    /// Ea HepSymMatrix parameter
     CLHEP::HepSymMatrix m_Ea;
 
   private: // caches
+    /// caches
     HepGeom::Point3D<double>  m_center;
+    /// caches
     double m_cp;
+    /// caches
     double m_sp;
+    /// caches
     double m_pt;
+    /// caches
     double m_r;
+    /// caches
     double m_ac[5];
 
+    /// string of invalid helix
     static const std::string invalidhelix;
 
   };

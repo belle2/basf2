@@ -30,7 +30,8 @@ namespace Belle2 {
                                                  float yMax,
                                                  unsigned nLayers)
     : TRGCDCHoughPlane(name, trans, nX, xMin, xMax, nY, yMin, yMax),
-      _nLayers(nLayers)
+      _nLayers(nLayers),
+      _reverse{} // 2019/07/31 by ytlai
   {
 
     for (unsigned i = 0; i < N_LAYERS; i++)

@@ -132,10 +132,9 @@ desc = {
     'IPhiECLBack': u'segmentation in Phi of backward',
     'IRECLFor': u'segmentation in R of forward',
     'IZECLFor': u'segmentation in Z of forward',
-    'IPhiECLFor': u'segmentation in Phi of forward',
-    'density': u'Density'}
+    'IPhiECLFor': u'segmentation in Phi of forward'}
 
-# The segmentation in R, Z and Phi. And thickness, density.
+# The segmentation in R, Z and Phi. And thickness.
 value = {
     'IRCDCBack': 16,
     'IPhiCDCBack': 144,
@@ -153,8 +152,7 @@ value = {
     'IPhiECLBack': 144,
     'IRECLFor': 3,
     'IZECLFor': 5,
-    'IPhiECLFor': 144,
-    'density': density_list}
+    'IPhiECLFor': 144}
 
 elements = [
     'IRCDCBack',
@@ -173,10 +171,9 @@ elements = [
     'IPhiECLBack',
     'IRECLFor',
     'IZECLFor',
-    'IPhiECLFor',
-    'density']
+    'IPhiECLFor']
 
-unit = {'thicknesses': 'mm', 'density': 'g/cm3'}
+unit = {'thicknesses': 'mm'}
 
 for element in elements:
     sNode = doc.createElement(element)

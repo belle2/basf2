@@ -27,7 +27,7 @@ namespace Belle2 {
     TRGECLQAMModule();
     //! Destrunctor
     virtual ~TRGECLQAMModule();
-    int basf2evt;
+    int basf2evt = 0;
   public:
     //! version
     std::string version() const;

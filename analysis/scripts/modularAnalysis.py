@@ -483,18 +483,28 @@ def cutAndCopyLists(
     path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from all input ParticleLists to
-    the single output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from all lists in ``inputListNames`` to
+    ``outputListName`` if they pass ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        Require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (list(str)): list of input ParticleList names
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
@@ -512,18 +522,28 @@ def cutAndCopyList(
     path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from the input ParticleList to
-    the output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from ``inputListName`` to ``outputListName`` if they pass
+    ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", "pi+:loose", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
@@ -858,12 +878,21 @@ def fillParticleListsFromMC(
 
 def applyCuts(list_name, cut, path):
     """
-    Removes StoreArray<Particle> indices of Particles from given ParticleList
-    that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes particle candidates from ``list_name`` that do not pass ``cut``
+    (given selection criteria).
 
-    @param list_name input ParticleList name
-    @param cut  Particles that do not pass these selection criteria are removed from the ParticleList
-    @param path      modules are added to this path
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> applyCuts("pi+:mypions", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        list_name (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        path (basf2.Path): modules are added to this path
     """
 
     pselect = register_module('ParticleSelector')
@@ -875,10 +904,19 @@ def applyCuts(list_name, cut, path):
 
 def applyEventCuts(cut, path):
     """
-    Removes events that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes events that do not pass the ``cut`` (given selection criteria).
 
-    @param cut  Events that do not pass these selection criteria are skipped
-    @param path      modules are added to this path
+    Example:
+        continuum events (in mc only) with more than 5 tracks
+
+        >>> applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        cut (str): Events that do not pass these selection criteria are skipped
+        path (basf2.Path): modules are added to this path
     """
 
     eselect = register_module('VariableToReturnValue')
@@ -981,12 +1019,12 @@ def reconstructMissingKlongDecayExpert(
     recoList="_reco",
 ):
     """
-    Creates mother particle accounting for missing momentum.
+    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         created (mother) Particles are added to the mother ParticleList if they
-                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param cut         Particles are added to the K_L0 ParticleList if they
+                       pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path

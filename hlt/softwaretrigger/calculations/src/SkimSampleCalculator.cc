@@ -29,7 +29,6 @@ using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
-  m_monopoleRecoTracks("RecoTracksMpl"),
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim")
 {
 
@@ -37,7 +36,6 @@ SkimSampleCalculator::SkimSampleCalculator() :
 
 void SkimSampleCalculator::requireStoreArrays()
 {
-  m_monopoleRecoTracks.isRequired();
   m_pionParticles.isRequired();
   m_gammaParticles.isRequired();
 };
@@ -369,9 +367,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     }
   }
   calculationResult["BhabhaECL"] = BhabhaECL;
-
-  // Monopole searches
-  calculationResult["nMplTracks"] = m_monopoleRecoTracks.getEntries();
 
   // Radiative Bhabha skim (radee) for CDC dE/dx calib studies
   double radee = 0.;

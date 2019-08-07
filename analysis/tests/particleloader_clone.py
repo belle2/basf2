@@ -11,10 +11,7 @@ import sys
 import basf2
 import b2test_utils
 
-try:
-    inputFile = basf2.find_file('mdst12.root', 'validation')
-except FileNotFoundError as fnf:
-    b2test_utils.skip_test("Cannot find: %s" % fnf.filename)
+inputFile = b2test_utils.require_file('mdst12.root', 'validation')
 
 basf2.set_random_seed("1337")
 fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']

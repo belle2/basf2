@@ -17,5 +17,4 @@
     <IRECLFor desc="segmentation in R of forward">3</IRECLFor>
     <IZECLFor desc="segmentation in Z of forward">5</IZECLFor>
     <IPhiECLFor desc="segmentation in Phi of forward">144</IPhiECLFor>
-    <density desc="Density" unit="g/cm3">1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10  1.29e-10</density>
 </TicknessDensity>

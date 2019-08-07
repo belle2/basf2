@@ -4,9 +4,9 @@ from skimExpertFunctions import get_test_file
 all_skims = [
     'ALP3Gamma', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon',
     'BtoDh_Kspipipi0', 'BtoDh_Kspi0', 'BtoDh_hh', 'BtoDh_Kshh',
-    'BtoPi0Pi0', 'BtoXll', 'BtoXgamma', 'Charm2BodyHadronic', 'Charm2BodyHadronicD0',
-    'Charm2BodyNeutrals', 'Charm2BodyNeutralsD0', 'Charm3BodyHadronic', 'Charm3BodyHadronic2',
-    'Charm3BodyHadronic1', 'Charm3BodyHadronic3', 'CharmRare', 'CharmSemileptonic',
+    'BtoPi0Pi0', 'BtoXll', 'BtoXgamma', 'DstToD0Pi_D0ToHpJm', 'XToD0_D0ToHpJm',
+    'DstToD0Pi_D0ToNeutrals', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpJmPi0', 'DstToD0Pi_D0ToHpJmPi02',
+    'DstToD0Pi_D0ToHpHmPi0', 'DstToD0Pi_D0ToHpJmEta', 'DstToD0Pi_D0ToRare', 'DstToD0Pi_D0ToSemileptonic',
     'CharmlessHad2Body', 'CharmlessHad3Body', 'ISRpipicc',
     'LFVZpInvisible', 'LFVZpVisible', 'LeptonicUntagged', 'PRsemileptonicUntagged',
     'SLUntagged', 'SinglePhotonDark', 'SystematicsEELL', 'SystematicsRadMuMu', 'SystematicsRadEE',

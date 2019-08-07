@@ -11,6 +11,9 @@ __authors__ = [
 from basf2 import *
 from modularAnalysis import *
 
+haveRunD0ToHpJm = 0
+haveRunD0ToNeutrals = 0
+
 
 def D0ToHpJm(path):
     mySel = 'abs(d0) < 1 and abs(z0) < 3'
@@ -30,13 +33,19 @@ def D0ToHpJm(path):
         # vertexKFit('D0:HpJm' + str(chID), 0.000, path=path)
         D0List.append('D0:HpJm' + str(chID))
 
+    global haveRunD0ToHpJm
+    haveRunD0ToHpJm = 1
     Lists = D0List
     return Lists
 
 
 def DstToD0PiD0ToHpJm(path):
 
-    D0List = D0ToHpJm(path)
+    D0List = []
+    if haveRunD0ToHpJm == 1:
+        D0List = ['D0:HpJm0', 'D0:HpJm1', 'D0:HpJm2']
+    else:
+        D0List = D0ToHpJm(path)
 
     Dstcuts = '0 < Q < 0.018'
 
@@ -139,13 +148,19 @@ def D0ToNeutrals(path):
         vertexRave('D0:2Nbdy' + str(chID), 0.001, path=path)
         D0List.append('D0:2Nbdy' + str(chID))
 
+    global haveRunD0ToNeutrals
+    haveRunD0ToNeutrals = 1
     Lists = D0List
     return Lists
 
 
 def DstToD0Neutrals(path):
 
-    D0List = D0ToNeutrals(path)
+    D0List = []
+    if haveRunD0ToNeutrals == 1:
+        D0List = ['D0:2Nbdy0', 'D0:2Nbdy1', 'D0:2Nbdy2']
+    else:
+        D0List = D0ToNeutrals(path)
 
     Dstcuts = '0 < Q < 0.02'
 
@@ -196,3 +211,61 @@ def CharmRare(path):
         DstList.append('D*+:' + str(chID))
 
     return DstList
+
+
+def CharmSemileptonic(path):
+    Dcuts = '1.82 < M < 1.92'
+    DstarSLcuts = '1.9 < M < 2.1'
+    antiD0SLcuts = 'massDifference(0)<0.15'
+
+    D_Channels = ['K-:95eff pi+:95eff',
+                  'K-:95eff pi+:95eff pi0:skim',
+                  'K-:95eff pi+:95eff pi+:95eff pi-:95eff',
+                  'K-:95eff pi+:95eff pi+:95eff pi-:95eff pi0:skim',
+                  ]
+
+    DList = []
+    for chID, channel in enumerate(D_Channels):
+        reconstructDecay('D0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
+        DList.append('D0:std' + str(chID))
+    copyLists('D0:all', DList, path=path)
+
+    DstarSLRecoilChannels = ['D0:all pi+:95eff',
+                             ]
+
+    antiD0List = []
+    for chID, channel in enumerate(DstarSLRecoilChannels):
+        reconstructRecoil(decayString='D*-:SL' + str(chID) + ' -> ' + channel,
+                          cut=DstarSLcuts, dmID=chID, path=path)
+        reconstructRecoilDaughter(decayString='anti-D0:SL' + str(chID) + ' -> D*-:SL' + str(chID) +
+                                  ' pi-:95eff', cut=antiD0SLcuts, dmID=chID, path=path)
+        antiD0List.append('anti-D0:SL' + str(chID))
+
+    nueRecoilChannels = []
+    for channel in antiD0List:
+        # nueRecoilChannels.append(channel + ' K+:95eff e-:std')
+        # nueRecoilChannels.append(channel + ' pi+:95eff e-:std')
+        nueRecoilChannels.append(channel + ' K+:95eff e-:95eff')
+        nueRecoilChannels.append(channel + ' pi+:95eff e-:95eff')
+
+    numuRecoilChannels = []
+    for channel in antiD0List:
+        # numuRecoilChannels.append(channel + ' K+:95eff mu-:std')
+        # numuRecoilChannels.append(channel + ' pi+:95eff mu-:std')
+        numuRecoilChannels.append(channel + ' K+:95eff mu-:95eff')
+        numuRecoilChannels.append(channel + ' pi+:95eff mu-:95eff')
+
+    nueList = []
+    for chID, channel in enumerate(nueRecoilChannels):
+        reconstructRecoilDaughter(decayString='anti-nu_e:SL' + str(chID) + ' -> ' + channel,
+                                  cut='', dmID=chID, path=path)
+        nueList.append('anti-nu_e:SL' + str(chID))
+
+    numuList = []
+    for chID, channel in enumerate(numuRecoilChannels):
+        reconstructRecoilDaughter(decayString='anti-nu_mu:SL' + str(chID) + ' -> ' + channel,
+                                  cut='', dmID=chID, path=path)
+        numuList.append('anti-nu_mu:SL' + str(chID))
+
+    allLists = nueList + numuList
+    return allLists

@@ -15,13 +15,10 @@ from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
 gb2_setuprel = 'release-03-02-00'
 
-import os
-import sys
-import glob
-import argparse
-skimCode = encodeSkimName('Charm2BodyNeutrals')
+skimCode = encodeSkimName('DstToD0Pi_D0ToKsOmega')
 
 # Read optional --data argument
 parser = argparse.ArgumentParser()
@@ -33,31 +30,30 @@ args = parser.parse_args()
 if args.data:
     use_central_database("data_reprocessing_prompt_bucket6")
 
-c2bnpath = Path()
+c2bn2path = Path()
 
 fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=c2bnpath)
+inputMdstList('default', fileList, path=c2bn2path)
 
+stdPi('loose', path=c2bn2path)
+stdK('loose', path=c2bn2path)
+stdE('loose', path=c2bn2path)
+stdMu('loose', path=c2bn2path)
+stdPi('all', path=c2bn2path)
+stdK('all', path=c2bn2path)
+stdE('all', path=c2bn2path)
+stdMu('all', path=c2bn2path)
+stdKshorts(path=c2bn2path)
+mergedKshorts(path=c2bn2path)
+loadStdSkimPi0(path=c2bn2path)
 
-stdPi('loose', path=c2bnpath)
-stdK('loose', path=c2bnpath)
-stdE('loose', path=c2bnpath)
-stdMu('loose', path=c2bnpath)
-stdPi('all', path=c2bnpath)
-stdK('all', path=c2bnpath)
-stdE('all', path=c2bnpath)
-stdMu('all', path=c2bnpath)
-stdKshorts(path=c2bnpath)
-mergedKshorts(path=c2bnpath)
-loadStdSkimPi0(path=c2bnpath)
+from skim.charm import DstToD0PiD0ToKsOmega
+DstList = DstToD0PiD0ToKsOmega(c2bn2path)
+skimOutputUdst(skimCode, DstList, path=c2bn2path)
 
-from skim.charm import DstToD0Neutrals
-DstList = DstToD0Neutrals(c2bnpath)
-skimOutputUdst(skimCode, DstList, path=c2bnpath)
+summaryOfLists(DstList, path=c2bn2path)
 
-summaryOfLists(DstList, path=c2bnpath)
-
-setSkimLogging(path=c2bnpath)
-process(path=c2bnpath)
+setSkimLogging(path=c2bn2path)
+process(c2bn2path)
 
 print(statistics)

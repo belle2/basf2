@@ -243,6 +243,16 @@ namespace Belle2 {
       return trackFit->getPValue();
     }
 
+    double trackFitHypothesisPDG(const Particle* part)
+    {
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
+
+      return trackFit->getParticleType().getPDGCode();
+    }
+
     double trackNECLClusters(const Particle* part)
     {
       const Track* track = part->getTrack();
@@ -437,6 +447,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA");
     REGISTER_VARIABLE("tanlambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probalility of the track fit");
+    REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, "PDG code of the track hypothesis actually used for the fit");
     REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,
                       "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.");
     REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta,

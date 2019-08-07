@@ -63,7 +63,7 @@ namespace Belle2::Conditions {
      * is assumed. Downloaded payloads will be placed in the cachedir using the
      * hashed directory structure.
      */
-    PayloadProvider(const std::vector<std::string>& locations, const std::string& cachedir = "", int timeout = 60);
+    explicit PayloadProvider(const std::vector<std::string>& locations, const std::string& cachedir = "", int timeout = 60);
 
     /** Try to find a payload, return true on success, false if it cannot be
      * found.

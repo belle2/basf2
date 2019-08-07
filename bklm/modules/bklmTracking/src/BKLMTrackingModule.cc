@@ -494,7 +494,6 @@ double BKLMTrackingModule::distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
   sigma = DBL_MAX;
 
   TVectorD m_SectorPar = track->getLocalTrackParam();
-  TMatrixDSym m_SectorErr = track->getTrackParamErr();
 
   m_GeoPar = GeometryPar::instance();
   const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);

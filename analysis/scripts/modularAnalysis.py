@@ -1,3 +1,4 @@
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -2298,14 +2299,7 @@ def buildEventShape(inputListNames=[],
     Calculates the event-level shape quantities (thrust, sphericity, Fox-Wolfram moments...)
     using the particles in the lists provided by the user. If no particle list is provided,
     the function will internally create a list of good tracks and a list of good photons
-    with (optionally) minimal quality cuts. The user can provide as many particle lists
-    as needed, using also combined particles, but the function will always assume that
-    the lists are independent.
-    If the lists provided by the user contain several times the same track (either with
-    different mass hypothesis, or once as an independent particle and once as daughter of a
-    combined particle) the results won't be reliable.
-    A basic check for duplicates is available setting the checkForDuplicate flags,
-    but is usually quite time consuming.
+    with (optionally) minimal quality cuts.
 
 
     The results of the calculation are then stored into the EventShapeContainer dataobject,
@@ -2315,11 +2309,21 @@ def buildEventShape(inputListNames=[],
     time. By default the calculation of the high-order moments (5-8) is turned off.
     Switching off an option will make the corresponding variables not available.
 
+    Warning:
+       The user can provide as many particle lists
+       as needed, using also combined particles, but the function will always assume that
+       the lists are independent.
+       If the lists provided by the user contain several times the same track (either with
+       different mass hypothesis, or once as an independent particle and once as daughter of a
+       combined particle) the results won't be reliable.
+       A basic check for duplicates is available setting the checkForDuplicate flags,
+       but is usually quite time consuming.
 
-    @param inputListNames     List of ParticleLists used to calculate the global
-                              event kinematics. If the list is empty the default
+
+    @param inputListNames     List of ParticleLists used to calculate the
+                              event shape variables. If the list is empty the default
                               particleLists pi+:evtshape and gamma:evtshape are filled.
-    @param default_cleanup    If True, applies standard cuts on pt and costTheta when
+    @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.
     @param path               Path to append the eventShape modules to.

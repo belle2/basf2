@@ -12,6 +12,9 @@ Variables
 
 * chi2 and ndf from KFit vertices stored as extraInfo
 
+* Added :b2:var:`sourceObjectIsInList` which checks that there are no particles from the same underlying track or cluster in a given particle list. 
+  Similar to :b2:var:`isInList` but a tighter reqirement.
+
 Modules
 +++++++
 

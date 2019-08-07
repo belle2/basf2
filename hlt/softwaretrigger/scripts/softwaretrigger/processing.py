@@ -11,7 +11,7 @@ from pxd import add_roi_payload_assembler, add_roi_finder
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
 from softwaretrigger import path_utils
 import reconstruction
-
+from geometry import check_components
 from rawdata import add_unpackers
 
 
@@ -115,6 +115,9 @@ def add_hlt_processing(path,
     if reco_components is None:
         reco_components = constants.DEFAULT_HLT_COMPONENTS
 
+    check_components(unpacker_components)
+    check_components(reco_components)
+
     # ensure that only DataStore content is present that we expect in
     # in the HLT configuration. If ROIpayloads or tracks are present in the
     # input file, this can be a problem and lead to crashes
@@ -198,6 +201,9 @@ def add_expressreco_processing(path,
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
     if reco_components is None:
         reco_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
+
+    check_components(unpacker_components)
+    check_components(reco_components)
 
     # If turned on, only events selected by the HLT will go to ereco.
     # this is needed as by default also un-selected events will get passed to ereco,

@@ -1,9 +1,8 @@
 import basf2
 from softwaretrigger import constants
 import modularAnalysis
-
+from geometry import check_components
 import reconstruction
-from tracking import add_cdc_monopole_track_finding
 
 
 def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
@@ -97,7 +96,6 @@ def add_filter_software_trigger(path, store_array_debug_prescale=0):
      cut calculations in the data store.
     :return: the software trigger module
     """
-
     hlt_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="filter",
                                      preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
@@ -119,9 +117,6 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:skim", 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
 
-    # monopoles
-    add_cdc_monopole_track_finding(path)
-
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
@@ -136,6 +131,8 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
     Please note that this function adds the HLT decision, but does not branch
     according to it.
     """
+    check_components(components)
+
     if run_type == constants.RunTypes.beam:
         reconstruction.add_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
                                           add_trigger_calculation=False, components=components, **kwargs)
@@ -163,6 +160,8 @@ def add_post_filter_reconstruction(path, run_type, components):
     Up to now, this only includes the skim part, but this will
     change in the future.
     """
+    check_components(components)
+
     if run_type == constants.RunTypes.beam:
         add_skim_software_trigger(path, store_array_debug_prescale=1)
     elif run_type == constants.RunTypes.cosmic:

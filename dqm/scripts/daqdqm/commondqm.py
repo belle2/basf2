@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from geometry import check_components
 from analysisDQM import add_analysis_dqm
 
 
@@ -26,6 +27,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             events should be added
     """
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
+    # Check components.
+    check_components(components)
 
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)

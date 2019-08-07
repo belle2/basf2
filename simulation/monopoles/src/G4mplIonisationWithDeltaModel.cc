@@ -206,7 +206,9 @@ G4mplIonisationWithDeltaModel::ComputeCrossSectionPerElectron(
   G4double maxEnergy = std::min(tmax, maxKinEnergy);
   G4double cutEnergy = std::max(LowEnergyLimit(), cut);
   G4double cross = (cutEnergy < maxEnergy)
-                   ? (0.5 / cutEnergy - 0.5 / maxEnergy) * pi_hbarc2_over_mc2 * nmpl * nmpl : 0.0;
+                   ? (1.0 / cutEnergy - 1.0 / maxEnergy) * twopi_mc2_rcl2 * chargeSquare : 0.0; //cross section used in ATLAS
+//   G4double cross = (cutEnergy < maxEnergy)
+//                    ? (0.5 / cutEnergy - 0.5 / maxEnergy) * pi_hbarc2_over_mc2 * chargeSquare : 0.0; //one coming with GEANT4; causes 4 orders higher values
   return cross;
 }
 

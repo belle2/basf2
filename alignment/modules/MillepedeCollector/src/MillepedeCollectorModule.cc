@@ -58,8 +58,6 @@
 
 #include <genfit/KalmanFitterInfo.h>
 
-#include <framework/core/ModuleParamList.templateDetails.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace alignment;

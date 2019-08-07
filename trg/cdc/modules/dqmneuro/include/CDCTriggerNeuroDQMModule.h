@@ -24,14 +24,14 @@
 namespace Belle2 {
 
   /** CDC Trigger DQM Module */
-  class CDCTriggerDQMModule : public HistoModule {  // <- derived from HistoModule class
+  class CDCTriggerNeuroDQMModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
     /** Constructor */
-    CDCTriggerDQMModule();
+    CDCTriggerNeuroDQMModule();
     /** Destructor */
-    virtual ~CDCTriggerDQMModule();
+    virtual ~CDCTriggerNeuroDQMModule();
 
     /** Module functions */
     virtual void initialize();
@@ -79,7 +79,8 @@ namespace Belle2 {
 
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
-
+    /** Switch to supress output for dqm online module */
+    bool m_limitedoutput;
     // names for unpacked objects
     /** Name for TS hits from unpacker */
     std::string m_unpackedSegmentHitsName;

@@ -59,7 +59,7 @@ def add_neuro_simulation_swts(path):
                     filename=Belle2.FileSystem.findFile("data/trg/cdc/Background2.0_20161207.root"),
                     writeMLPinput=True,
                     fixedPoint=True,
-                    alwaysTrackT0=True,
+                    et_option='fastestpriority'
                     )
 
 
@@ -74,7 +74,7 @@ def add_neuro_simulation(path):
                     # 'FixedAbsPt350MeV_20170112_Bkg.root'
                     writeMLPinput=True,
                     fixedPoint=True,
-                    alwaysTrackT0=True,
+                    et_option='fastestpriority'
                     )
 
 
@@ -139,7 +139,7 @@ if showRecoTracks:
 
 main.add_module('HistoManager',
                 histoFileName=outputfile)
-main.add_module('CDCTriggerDQM',
+main.add_module('CDCTriggerNeuroDQM',
                 simNeuroTracksName='TSimNeuroTracks',
                 simNeuroTracksSWTSSW2DName=simNeuroTracksSWTSSW2DName,
                 showRecoTracks=showRecoTracks,

@@ -11,18 +11,18 @@ set_random_seed(1)
 bkgdir = "/remote/pcbelle11/sebastian/OfficialBKG/15thCampaign/phase3/set0/"
 thrange = [10, 170]
 particlegun_params = {
-    'pdgCodes': [-13, 13],              # muons
-    'nTracks': 1,                       # single tracks
-    'momentumGeneration': 'inversePt',  # uniform in the track curvature
-    'momentumParams': [0.3, 10.],       # 0.3: minimum pt for standard track finder
-    'thetaGeneration': 'uniformCos',    # uniform in solid angle
-    'thetaParams': thrange,           # hit SL 6 from z in [-50, 50]
-    'phiGeneration': 'uniform',         # uniform in solid angle
-    'phiParams': [0, 360],              # full phi
-    'vertexGeneration': 'uniform',      # uniform vertex distribution
-    'xVertexParams': [0, 0.0],          # vertex on z-axis
-    'yVertexParams': [0, 0.0],          # vertex on z-axis
-    'zVertexParams': [0.0, 0.0]}     # target range for training
+        'pdgCodes': [-13, 13],              # muons
+        'nTracks': 1,                       # single tracks
+        'momentumGeneration': 'inversePt',  # uniform in the track curvature
+        'momentumParams': [0.3, 10.],       # 0.3: minimum pt for standard track finder
+        'thetaGeneration': 'uniformCos',    # uniform in solid angle
+        'thetaParams': thrange,           # hit SL 6 from z in [-50, 50]
+        'phiGeneration': 'uniform',         # uniform in solid angle
+        'phiParams': [0, 360],              # full phi
+        'vertexGeneration': 'uniform',      # uniform vertex distribution
+        'xVertexParams': [0, 0.0],          # vertex on z-axis
+        'yVertexParams': [0, 0.0],          # vertex on z-axis
+        'zVertexParams': [0.0, 0.0]}     # target range for training
 
 main = create_path()
 main.add_module('EventInfoSetter', evtNumList=5000)  # , expList=[7], runList=[3525])
@@ -53,7 +53,7 @@ main.add_module('CDCTriggerETF',
 main.add_module('CDCTriggerNeuro',
                 filename=Belle2.FileSystem.findFile("trg/cdc/data/Background2.0_20161207.root"),
                 # et_option='fastestpriority',
-                alwaysTrackT0=True,
+                et_option='fastestpriority',
                 hitCollectionName='CDCTriggerSegmentHits',
                 outputCollectionName='CDCTriggerNeuroTracks',
                 inputCollectionName='CDCTrigger2DFinderTracks',

@@ -130,6 +130,33 @@ def add_unpackers(path, components=None):
         for mod_t3d in nmod_t3d:
             path.add_module('TRGCDCT3DUnpacker', T3DMOD=mod_t3d)
 
+        # unpacker for neurotrigger
+        neurounpacker = register_module('CDCTriggerUnpacker')
+        neurounpacker.param('headerSize', 3)
+        # unpack the data from the 2D tracker and save its Bitstream
+        neurounpacker.param('unpackTracker2D', True)
+        # make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
+        neurounpacker.param('decode2DFinderTrack', True)
+        # make CDCTriggerSegmentHit objects from the 2D input
+        neurounpacker.param('decode2DFinderInput', True)
+        neurounpacker.param('2DNodeId', [
+            [0x11000001, 0],
+            [0x11000001, 1],
+            [0x11000002, 0],
+            [0x11000002, 1],
+        ])
+        neurounpacker.param('NeuroNodeId', [
+            [0x11000005, 0],
+            [0x11000005, 1],
+            [0x11000006, 0],
+            [0x11000006, 1],
+        ])
+        neurounpacker.param('unpackNeuro', True)
+        neurounpacker.param('decodeNeuro', True)
+        neurounpacker.param('delayNNOutput', [9, 9, 9, 9])
+        neurounpacker.param('delayNNSelect', [4, 4, 4, 4])
+        path.add_module(neurounpacker)
+
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     """

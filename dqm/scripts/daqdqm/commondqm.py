@@ -139,7 +139,17 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
-
+        # CDCTriggerNeuro
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
+                        hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
+        path.add_module('SetupGenfitExtrapolation')
+        path.add_module('CDCTriggerDQM',
+                        limitedoutput=True,
+                        showRecoTracks=True,
+                        skipWithoutHWTS=True,
+                        maxRecoZDist=1.0,
+                        maxRecoD0Dist=0.5,
+                        )
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')

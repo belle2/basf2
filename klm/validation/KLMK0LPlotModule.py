@@ -131,7 +131,7 @@ class KLMK0LPlotModule(Module):
         self.hist_covmat.SetYTitle('Covariance, cm^{2}')
         l = self.hist_covmat.GetListOfFunctions()
         l.Add(TNamed('Description', 'Momentum phi resolution'))
-        l.Add(TNamed('Check', 'No lagre nondiagonal elements.'))
+        l.Add(TNamed('Check', 'No large off-diagonal elements.'))
         l.Add(TNamed('Contact', contact))
         l.Add(TNamed('MetaOptions', 'shifter'))
         #: Correlation matrix histogram.
@@ -151,7 +151,7 @@ class KLMK0LPlotModule(Module):
         self.hist_corrmat.SetYTitle('Correlation coefficient')
         l = self.hist_corrmat.GetListOfFunctions()
         l.Add(TNamed('Description', 'Momentum phi resolution'))
-        l.Add(TNamed('Check', 'No lagre nondiagonal elements.'))
+        l.Add(TNamed('Check', 'No large off-diagonal elements.'))
         l.Add(TNamed('Contact', contact))
         l.Add(TNamed('MetaOptions', 'shifter'))
         #: Average vertex.

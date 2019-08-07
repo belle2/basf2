@@ -271,7 +271,7 @@ class ConditionsDB:
 
         return result
 
-    def check_payloads(self, payloads):
+    def check_payloads(self, payloads, information="payloadId"):
         """
         Check for the existence of payloads in the database.
 
@@ -279,10 +279,12 @@ class ConditionsDB:
             payloads (list((str,str))): A list of payloads to check for. Each
                payload needs to be a tuple of the name of the payload and the
                md5 checksum of the payload file.
+            information (str): The information to be extracted from the
+               payload dictionary
 
         Returns:
             A dictionary with the payload identifiers (name, checksum) as keys
-            and the payload ids as values for all payloads which are already
+            and the requested information as values for all payloads which are already
             present in the database.
         """
 
@@ -297,7 +299,7 @@ class ConditionsDB:
         for payload in req.json():
             module = payload["basf2Module"]["name"]
             checksum = payload["checksum"]
-            result[(module, checksum)] = payload["payloadId"]
+            result[(module, checksum)] = payload[information]
 
         return result
 
@@ -313,19 +315,12 @@ class ConditionsDB:
             True if successful.
         """
 
-        search_query = [{"name": e.module, "checksum": e.checksum} for e in entries]
-        try:
-            req = self.request("POST", "/checkPayloads", json=search_query)
-        except ConditionsDB.RequestError as e:
+        result = check_payloads([(entry.module, entry.checksum) for entry in entries], "revision")
+        if not result:
             return False
 
-        result = {}
-        for payload in req.json():
-            module = payload["basf2Module"]["name"]
-            checksum = payload["checksum"]
-            result[(module, checksum)] = payload["revision"]
         for entry in entries:
-            entry.revision = result[(entry.module, entry.checksum)]
+            entry.revision = result.get((entry.module, entry.checksum), 0)
 
         return True
 

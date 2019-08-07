@@ -27,7 +27,7 @@ void AsicBackgroundDetector::initialize()
   // database:
   m_channelMapFromDB = new DBArray<CDCChannelMap>;
   if ((*m_channelMapFromDB).isValid()) {
-    B2INFO("CDC Channel map is  valid");
+    B2DEBUG(100, "CDC Channel map is  valid");
   } else {
     B2FATAL("CDC Channel map is not valid");
   }
@@ -68,7 +68,7 @@ void AsicBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
   map< pair<int, int>, vector<CDCWireHit*>> groupedByAsic;
   for (CDCWireHit& wireHit : wireHits) {
     auto eWire = wireHit.getWireID().getEWire();
-    B2ASSERT("Channel map found for the channel", m_map.count(eWire) > 0);
+    B2ASSERT("Channel map NOT found for the channel", m_map.count(eWire) > 0);
     auto board = m_map[eWire].first;
     auto channel = m_map[eWire].second;
     auto asicID = pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels

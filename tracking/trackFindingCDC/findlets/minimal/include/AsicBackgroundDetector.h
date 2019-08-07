@@ -28,12 +28,12 @@ namespace Belle2 {
 
     public:
       /// Default constructor
-      AsicBackgroundDetector() {}
+      AsicBackgroundDetector() = default;
 
       /// Access database here:
       void initialize() final;
 
-      /// Terimante
+      /// Terminate
       void terminate() final;
 
       /// Reload channel map if needed
@@ -48,10 +48,10 @@ namespace Belle2 {
       /// Main algorithm marking hit as background
       virtual void apply(std::vector<CDCWireHit>& wireHits) final;
 
-      /// Algorithm marking hit as background for each CDC ASIC
-      virtual void applyAsicFilter(std::vector<CDCWireHit*>& wireHits) final;
-
     private:
+
+      /// Algorithm marking hit as background for each CDC ASIC
+      void applyAsicFilter(std::vector<CDCWireHit*>& wireHits);
       /**
        * Channel map retrieved from DB.
        */

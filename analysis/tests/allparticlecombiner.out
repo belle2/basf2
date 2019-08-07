@@ -1,5 +1,9 @@
 [INFO] Steering file: analysis/tests/allparticlecombiner.py
+[INFO] The random number seed is set to "1234"
 [INFO] Starting event processing, random seed is set to '1234'
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:fromPV (pi-:fromPV)
 [INFO]    -> MDST source: Tracks
@@ -29,10 +33,5 @@ Total Number of Particles created in the DataStore: 620
 =======================================================
 
 [INFO] Writing NTuple ntuple
-[WARNING] There were 1 tracks skipped because of zero charge for pi+:fromPV  { module: ParticleLoader_pi+:fromPV }
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
 [WARNING] There were 1 tracks skipped because of zero charge for pi+:fromPV
-[INFO] ================================================================================
-
 Test passed, cleaning up.

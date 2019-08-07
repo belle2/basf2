@@ -162,7 +162,7 @@ namespace Belle2::Conditions {
       B2WARNING("Input files metadata all have empty globaltag setting, globaltag replay not possible");
       return;
     }
-    // set the list of globaltags from the
+    // set the list of globaltags from the string containing the globaltags
     boost::split(*m_inputGlobaltags, *inputGlobaltags, boost::is_any_of(","));
   }
 

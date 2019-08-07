@@ -17,9 +17,9 @@ You probably want to either set the output fileName or the treeName to something
    from modularAnalysis import variablesToNtuple
    variablesToNtuple('pi+:all', ['p'], filename='pions.root')
    variablesToNtuple('gamma:all', ['p'], filename='photons.root') # two files
-  { module: VariablesToNtuple_e+ }
+
 [INFO] Starting event processing, random seed is set to '1337'
-[ERROR] The required object 'e+' (durability: event) does not exist. Maybe you forgot the module that registers it?  { module: VariablesToNtuple_e+ }
+[ERROR] The required object 'e+' (durability: event) does not exist. Maybe you forgot the module that registers it?
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:

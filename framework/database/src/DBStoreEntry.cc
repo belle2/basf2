@@ -103,6 +103,7 @@ namespace Belle2 {
             << LogVar("name", m_name)
             << LogVar("revision", m_revision)
             << LogVar("checksum", m_checksum)
+            << LogVar("filename", m_filename)
             << LogVar("validity", m_iov));
     notifyAccessors();
   }

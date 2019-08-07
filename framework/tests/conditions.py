@@ -22,7 +22,7 @@ import os
 import basf2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
-from b2test_utils import clean_working_directory, safe_process, skip_test
+from b2test_utils import clean_working_directory, safe_process, skip_test, configure_logging_for_tests
 import multiprocessing
 import shutil
 
@@ -71,9 +71,9 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         # let's provide one correct payload
         "3": example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1"),
         # same payload but checksum mismatch
-        "4": example_payload.format(checksum="[wrong checksum]", revision="1"),
+        "4": example_payload.format(checksum="00[wrong checksum]", revision="1"),
         # non existing payload file
-        "5": example_payload.format(checksum="missing", revision="2"),
+        "5": example_payload.format(checksum="00[missing]", revision="2"),
         # duplicate payload, or in this case triple
         "6": example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="2")[:-1] + "," +
              example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1")[1:-1] + "," +
@@ -206,6 +206,10 @@ def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localte
     basf2.reset_database()
     # now run the path in a child process inside of a clean working directory
     with clean_working_directory():
+        # make logging more reproducible by replacing some strings
+        configure_logging_for_tests()
+        basf2.logging.log_level = basf2.LogLevel.DEBUG
+        basf2.logging.debug_level = 30
         basf2.conditions.reset()
         basf2.conditions.expert_settings(download_cache_location="db-cache")
         basf2.conditions.override_globaltags([globaltag])
@@ -221,14 +225,6 @@ basf2.conditions.expert_settings(backoff_factor=1, connection_timeout=5, stalled
 
 # set the random seed to something fixed
 basf2.set_random_seed("something important")
-# simplify logging output to just the type and the message
-for level in basf2.LogLevel.values.values():
-    basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
-# disable error summary, we don't need it for these short tests and it basically
-# doubles the output
-basf2.logging.enable_summary(False)
-basf2.logging.log_level = basf2.LogLevel.DEBUG
-basf2.logging.debug_level = 30
 # and create a pipe so we can send the port we listen on from child to parent
 conn = multiprocessing.Pipe(False)
 # now start the mock conditions database as daemon so it gets killed at the end

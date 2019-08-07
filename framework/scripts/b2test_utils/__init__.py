@@ -17,6 +17,8 @@ import multiprocessing
 import basf2
 import subprocess
 import unittest
+import re
+from . import logfilter
 
 
 def skip_test(reason, py_case=None):
@@ -89,15 +91,48 @@ def show_only_errors():
         yield
 
 
-def configure_logging_for_tests():
+def configure_logging_for_tests(replacements=None):
     """Change the log system to behave a bit more appropriately for testing scenarios:
 
-    * don't show C++ function names as they are not always the same across compilers
-    * disable error summary, just additional noise
+    1. Simplify log message to be just ``[LEVEL] message``
+    2. Disable error summary, just additional noise
+    3. Intercept all log messages and replace
+        * the current working directory in log messaged with ``${cwd}``
+        * the current default globaltags with ``${default_globaltag}``
+        * the contents of the following environment varibles with their name:
+            - :envvar:`BELLE2_TOOLS`
+            - :envvar:`BELLE2_RELEASE_DIR`
+            - :envvar:`BELLE2_LOCAL_DIR`
+            - :envvar:`BELLE2_EXTERNALS_DIR`
+            - :envvar:`BELLE2_VALIDATION_DATA_DIR`
+            - :envvar:`BELLE2_EXAMPLES_DATA_DIR`
+            - :envvar:`BELLE2_BACKGROUND_DIR`
+
+    Parameters:
+        replacements (dict(str, str)): Additional strings and their replacements to replace in the output
+
+    Warning:
+        This function should be called **after** switching directory to replace the correct directory name
     """
+    basf2.logging.reset()
     basf2.logging.enable_summary(False)
+    basf2.logging.enable_python_logging = True
+    basf2.logging.add_console()
+    # clang prints namespaces differently so no function names. Also let's skip the line number,
+    # we don't want failing tests just because we added a new line of code. In fact, let's just see the message
     for level in basf2.LogLevel.values.values():
-        basf2.logging.set_info(level, basf2.logging.get_info(level) & ~basf2.LogInfo.FUNCTION)
+        basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+
+    if replacements is None:
+        replacements = {}
+
+    # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
+    for env_name in re.findall(":envvar:`(.*?)`", configure_logging_for_tests.__doc__):
+        if env_name in os.environ:
+            replacements[os.environ[env_name]] = f"${{{env_name}}}"
+    replacements[os.getcwd()] = "${cwd}"
+    replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
+    sys.stdout = logfilter.LogReplacementFilter(sys.__stdout__, replacements)
 
 
 @contextmanager

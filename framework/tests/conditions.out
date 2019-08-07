@@ -111,6 +111,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_1.root
 	validity = 3,0,3,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -144,6 +145,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_1.root
 	validity = 3,0,3,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -177,6 +179,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [WARNING] Conditions Database: checksum mismatch after download. Trying once more in a temporary file
 	name = BeamParameters
 	revision = 1
+	filename = ${cwd}/db-cache/00/dbstore_BeamParameters_rev_1.root
 [ERROR] Conditions Database: failure downloading url
 	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_1.root
 	error = checksum mismatch
@@ -184,12 +187,13 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [ERROR] Conditions data: Could not find file for payload
 	name = BeamParameters
 	revision = 1
-	checksum = [wrong checksum]
+	checksum = 00[wrong checksum]
 	globaltag = localtest
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
 	revision = 1
-	checksum = [wrong checksum]
+	checksum = 00[wrong checksum]
+	filename = 
 	validity = 4,0,4,0
 [FATAL] 2 ERROR(S) occurred! The processing of events will not be started.
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -207,6 +211,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [WARNING] Conditions Database: checksum mismatch after download. Trying once more in a temporary file
 	name = BeamParameters
 	revision = 1
+	filename = ${cwd}/db-cache/00/dbstore_BeamParameters_rev_1.root
 [ERROR] Conditions Database: failure downloading url
 	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_1.root
 	error = checksum mismatch
@@ -214,12 +219,13 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [ERROR] Conditions data: Could not find file for payload
 	name = BeamParameters
 	revision = 1
-	checksum = [wrong checksum]
+	checksum = 00[wrong checksum]
 	globaltag = localtest
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
 	revision = 1
-	checksum = [wrong checksum]
+	checksum = 00[wrong checksum]
+	filename = 
 	validity = 4,0,4,0
 [FATAL] 2 ERROR(S) occurred! The processing of events will not be started.
 [INFO] >>> check exp 5: [{
@@ -243,12 +249,13 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [ERROR] Conditions data: Could not find file for payload
 	name = BeamParameters
 	revision = 2
-	checksum = missing
+	checksum = 00[missing]
 	globaltag = localtest
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
 	revision = 2
-	checksum = missing
+	checksum = 00[missing]
+	filename = 
 	validity = 5,0,5,0
 [FATAL] 3 ERROR(S) occurred! The processing of events will not be started.
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -273,12 +280,13 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [ERROR] Conditions data: Could not find file for payload
 	name = BeamParameters
 	revision = 2
-	checksum = missing
+	checksum = 00[missing]
 	globaltag = localtest
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
 	revision = 2
-	checksum = missing
+	checksum = 00[missing]
+	filename = 
 	validity = 5,0,5,0
 [FATAL] 3 ERROR(S) occurred! The processing of events will not be started.
 [INFO] >>> check exp 6: [{
@@ -296,6 +304,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 3
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_3.root
 	validity = 6,0,6,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -329,6 +338,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 3
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_3.root
 	validity = 6,0,6,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -519,6 +529,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_1.root
 	validity = 3,0,3,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -551,6 +562,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	name = BeamParameters
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/dbstore_BeamParameters_rev_1.root
 	validity = 3,0,3,0
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 

@@ -141,7 +141,7 @@ namespace Belle2::Conditions {
           // ok, download was fine, check checksum again
           if (not m_downloader.verifyChecksum(localStream, metadata.checksum)) {
             B2WARNING("Conditions Database: checksum mismatch after download. Trying once more in a temporary file"
-                      << LogVar("name", metadata.name) << LogVar("revision", metadata.revision));
+                      << LogVar("name", metadata.name) << LogVar("revision", metadata.revision) << LogVar("filename", local.string()));
             throw std::runtime_error("checksum mismatch");
           }
         } catch (std::exception& e) {

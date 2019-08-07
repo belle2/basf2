@@ -7,7 +7,7 @@ test parsing of local database files
 
 from basf2 import logging, LogLevel, LogInfo
 from conditions_db.cli_upload import parse_database_file
-from b2test_utils import clean_working_directory, run_in_subprocess
+from b2test_utils import clean_working_directory, run_in_subprocess, configure_logging_for_tests
 import ROOT
 
 ROOT.gInterpreter.Declare("#include <framework/database/TestingPayloadStorage.h>")
@@ -52,6 +52,7 @@ evt = ROOT.Belle2.EventMetaData(0, 0, 0)
 payload = ROOT.Belle2.Conditions.PayloadMetadata("test")
 
 with clean_working_directory():
+    configure_logging_for_tests()
     for i, entry in enumerate(entries.splitlines(True)):
         print("testing", repr(entry))
         filename = "database-%02d.txt" % i

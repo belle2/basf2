@@ -219,7 +219,7 @@ void EventProcessor::callEvent(Module* module)
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool setEventInfo)
 {
   LogSystem& logSystem = LogSystem::Instance();
-  auto dbsession = Database::Instance().startUpdate();
+  auto dbsession = Database::Instance().createScopedUpdateSession();
 
   m_processStatisticsPtr.registerInDataStore();
   //TODO I might want to overwrite it in initialize (e.g. if read from file)
@@ -434,7 +434,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 void EventProcessor::processBeginRun(bool skipDB)
 {
   m_inRun = true;
-  auto dbsession = Database::Instance().startUpdate();
+  auto dbsession = Database::Instance().createScopedUpdateSession();
 
   LogSystem& logSystem = LogSystem::Instance();
   m_processStatisticsPtr->startGlobal();

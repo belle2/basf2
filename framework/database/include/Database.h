@@ -175,7 +175,7 @@ namespace Belle2 {
      * but don't keep session alive for full processing time. This will return
      * an object which keeps the session open as long as it is alive.
      */
-    ScopeGuard startUpdate();
+    ScopeGuard createScopedUpdateSession();
 
 
   protected:

@@ -60,7 +60,7 @@ namespace Belle2 {
     Conditions::Configuration::getInstance().reset();
   }
 
-  ScopeGuard Database::startUpdate()
+  ScopeGuard Database::createScopedUpdateSession()
   {
     // make sure we reread testing text files in case they got updated
     for (auto& testing : m_testingPayloads) {

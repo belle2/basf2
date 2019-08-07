@@ -46,6 +46,10 @@ namespace Belle2 {
     /// Report failure(false) or success (true) even if some parameters could not be determined
     void ignoreUndeterminedParams(bool ignore = true) {m_ignoreUndeterminedParams = ignore;}
 
+    /// Set the events at which payloads can change for time-dep calibration (translation from
+    /// time IDs (aka continuous subruns) to EventMetaData (and later IoVs))
+    void setEvents(const std::vector<EventMetaData>& events) {m_events = events;}
+
   protected:
 
     /// Run algo on data
@@ -64,6 +68,9 @@ namespace Belle2 {
     alignment::PedeApplication m_pede{};
     /// Report failure(false) or success (true) even if some parameters could not be determined
     bool m_ignoreUndeterminedParams{false};
+    /// The events at which payloads can change for time-dep calibration (translation from
+    /// time IDs (aka continuous subruns) to EventMetaData (and later IoVs))
+    std::vector<EventMetaData> m_events{};
 
     /// Write out binary files from data in tree with GBL data to be used by Millepede and add them to steering
     void prepareMilleBinary();

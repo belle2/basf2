@@ -167,14 +167,21 @@ namespace {
       ConditionsDatabase::createDefaultInstance("data_reprocessing_proc9");
       LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
 
+      GlobalLabel::setCurrentTimeInterval(0);
       GlobalLabel::clearTimeDependentParamaters();
+
       auto beamspotX = GlobalLabel::construct<BeamParameters>(0, 1);
       auto beamspotZ = GlobalLabel::construct<BeamParameters>(0, 3);
-      auto ying = GlobalLabel::construct<VXDAlignment>(VxdID(1, 0, 0, 1).getID(), 3);
+      auto yingZ = GlobalLabel::construct<VXDAlignment>(VxdID(1, 0, 0, 1).getID(), 3);
 
-      ying.registerTimeDependent(4);
+      yingZ.registerTimeDependent(4);
 
+      // should be banned:
+      //beamspotX.registerTimeDependent(3);
+      // -> instead:
+      beamspotX.registerTimeDependent(2);
       beamspotX.registerTimeDependent(3);
+      beamspotX.registerTimeDependent(4);
 
       beamspotZ.registerTimeDependent(1);
       beamspotZ.registerTimeDependent(2);
@@ -188,6 +195,7 @@ namespace {
     virtual void TearDown()
     {
       GlobalLabel::clearTimeDependentParamaters();
+      GlobalLabel::setCurrentTimeInterval(0);
 
       boost::filesystem::remove_all("testPayloads");
       Database::reset();
@@ -409,10 +417,21 @@ namespace {
 
     timeline.loadFromDB();
 
+    GlobalLabel::setCurrentTimeInterval(4);
+    auto beamX0 = GlobalLabel::construct<BeamParameters>(0, 1).label();
+    timeline.updateGlobalParam(GlobalLabel(beamX0), 3.);
+
     GlobalLabel::setCurrentTimeInterval(3);
     auto beamZ = GlobalLabel::construct<BeamParameters>(0, 3).label();
+    auto beamX = GlobalLabel::construct<BeamParameters>(0, 1).label();
+
+    GlobalLabel::setCurrentTimeInterval(4);
+    auto yingZ = GlobalLabel::construct<VXDAlignment>(VxdID(1, 0, 0, 1).getID(), 3).label();
+
 
     timeline.updateGlobalParam(GlobalLabel(beamZ), 42.);
+    timeline.updateGlobalParam(GlobalLabel(beamX), 43.);
+    timeline.updateGlobalParam(GlobalLabel(yingZ), 44.);
 
     auto objects = timeline.releaseObjects();
     EXPECT_EQ(objects.size(), 8);
@@ -426,10 +445,30 @@ namespace {
     auto beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532, 2, 7)));
     EXPECT_EQ(beam->getVertex()[2], 42.);
 
+    beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532, 2, 7)));
+    EXPECT_EQ(beam->getVertex()[0], 43.);
+
     beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532 - 1, 2, 7)));
     EXPECT_EQ(beam->getVertex()[2], 0.);
 
+    beam = dynamic_cast<BeamParameters*>(evdep->getObject(EventMetaData(530532 - 1, 2, 7)));
+    EXPECT_EQ(beam->getVertex()[0], 0.);
+
     file.Close();
+
+    TFile file2("testPayloads/dbstore_BeamParameters_rev_3.root");
+    auto beam2 = (BeamParameters*) file2.Get("BeamParameters");
+    beam2->getVertex().Print();
+    EXPECT_EQ(beam2->getVertex()[0], 3.);
+
+    file2.Close();
+
+    TFile file3("testPayloads/dbstore_VXDAlignment_rev_2.root");
+    auto vxd = (VXDAlignment*) file3.Get("VXDAlignment");
+    EXPECT_EQ(vxd->getGlobalParam(VxdID(1, 0, 0, 1).getID(), 3), 44.);
+
+    file3.Close();
+    // --------------------------------------------------------------------
   }
 }  // namespace
 

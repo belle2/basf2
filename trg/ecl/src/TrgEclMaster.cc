@@ -760,6 +760,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   obj_bhabha -> setmumuThreshold(_mumuThreshold);
   obj_bhabha -> setmumuAngle(_mumuAngle);
 
+
   std::vector<double> vct_bhabha;
   vct_bhabha.clear();
   int bhabha2D = 0 ;

@@ -17,12 +17,12 @@ gearbox = register_module('Gearbox')
 gearbox.initialize()
 
 
-FAMParameters = FileSystem.findFile('trg/ecl/data/FAM_Parameters.dat')
+FAMParameters = FileSystem.findFile('../data/FAM_Parameters.dat')
 SignalPDF = FileSystem.findFile('trg/ecl/data/SignalPDF.dat')
 NoiseMatrix = FileSystem.findFile('trg/ecl/data/NoiseMatrix.dat')
 
 TMMParameters = FileSystem.findFile('trg/ecl/data/TMM_Parameters.dat')
-ETMParameters = FileSystem.findFile('trg/ecl/data/ETM_Parameter.dat')
+ETMParameters = FileSystem.findFile('trg/ecl/data/ETM_Parameters.dat')
 BadRunList = FileSystem.findFile('trg/ecl/data/BadRunList.dat')
 
 use_local_database("trg_ecl/database.txt", "trg_ecl")

@@ -61,7 +61,7 @@ namespace Belle2 {
       m_3DBhabhaSelectionThreshold[0] = Bhabha3DSelectionThreshold[0];
       m_3DBhabhaSelectionThreshold[1] = Bhabha3DSelectionThreshold[1];
       m_3DBhabhaVetoThreshold[0] = Bhabha3DVetoThreshold[0];
-      m_3DBhabhaVetoThreshold[0] = Bhabha3DVetoThreshold[0];
+      m_3DBhabhaVetoThreshold[1] = Bhabha3DVetoThreshold[1];
 
       m_3DBhabhaSelectionAngle[0] = Bhabha3DSelectionAngle[0];
       m_3DBhabhaSelectionAngle[1] = Bhabha3DSelectionAngle[1];

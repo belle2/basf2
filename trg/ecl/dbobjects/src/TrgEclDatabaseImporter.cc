@@ -74,7 +74,6 @@ namespace Belle2 {
     TrgEclMapping* _map = new TrgEclMapping();
 
 
-    //  cout << "Import FAM Parameters  " << endl;
     DBImportArray<TRGECLFAMPara> fampara;
     //  fampara.construct();
 

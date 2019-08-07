@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <framework/dbobjects/BeamParameters.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 #include <framework/database/DBObjPtr.h>
@@ -60,14 +59,6 @@ namespace Belle2 {
     }
 
     /**
-     * Returns beam crossing angle
-     */
-    double getBeamCrossingAngle() const
-    {
-      return (m_beamParamsDB->getHER()).Vect().Angle(-1.0 * (m_beamParamsDB->getLER()).Vect());
-    }
-
-    /**
      * Returns Lorentz transformation from Lab to CMS
      * @return const reference to Lorentz rotation matrix
      */
@@ -101,7 +92,6 @@ namespace Belle2 {
     static TLorentzVector cmsToLab(const TLorentzVector& vec);
 
   private:
-    const DBObjPtr<BeamParameters> m_beamParamsDB; /**< db object for beam parameters. */
     const DBObjPtr<CollisionInvariantMass> m_invariantMassDB; /**< db object for invariant mass. */
     const DBObjPtr<CollisionBoostVector> m_boostVectorDB; /**< db object for boost vector. */
   };

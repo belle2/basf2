@@ -19,6 +19,7 @@
 
 // DataObjects
 #include <mdst/dbobjects/BeamSpot.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 // kfitter
 #include <analysis/KFit/MassFitKFit.h>
@@ -81,6 +82,7 @@ namespace Belle2 {
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
+    DBObjPtr<BeamParameters> m_beamParams;/**< Nominal beam parameters */
 
     /**
      * Main steering routine

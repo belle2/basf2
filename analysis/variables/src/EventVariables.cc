@@ -172,8 +172,8 @@ namespace Belle2 {
 
     double getCrossingAngle(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamCrossingAngle();
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      return (beamParamsDB->getHER()).Vect().Angle(-1.0 * (beamParamsDB->getLER()).Vect());
     }
 
     double getCMSEnergy(const Particle*)
@@ -503,7 +503,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] Nominal HER energy");
     REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] Nominal LER energy");
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
-    REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Crossing angle");
+    REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Nominal beam crossing angle");
     REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Beam energy (lab)");
     REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Beam momentum Px (lab)");
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Beam momentum Py (lab)");

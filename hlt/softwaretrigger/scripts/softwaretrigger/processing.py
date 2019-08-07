@@ -136,9 +136,6 @@ def add_hlt_processing(path,
     # Add the part of the dqm modules, which should run after every reconstruction
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
 
-    # Now split up the path according to the HLT decision
-    hlt_filter_module = path_utils.add_filter_module(path)
-
     # Build up two paths: one for all accepted events...
     accept_path = basf2.Path()
 
@@ -147,6 +144,9 @@ def add_hlt_processing(path,
 
     # Only turn on the filtering (by branching the path) if filtering is turned on
     if softwaretrigger_mode == constants.SoftwareTriggerModes.filter:
+        # Now split up the path according to the HLT decision
+        hlt_filter_module = path_utils.add_filter_module(path)
+
         # There are two possibilities for the output of this module
         # (1) the event is dismissed -> only store the metadata
         hlt_filter_module.if_value("==0", discard_path, basf2.AfterConditionPath.CONTINUE)

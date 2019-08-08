@@ -16,9 +16,11 @@
 #include <framework/database/Database.h>
 // needed for complex module parameter
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/utilities/EnvironmentVariables.h>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <TClonesArray.h>
 
@@ -402,6 +404,52 @@ void RootOutputModule::fillFileMetaData()
   std::string lfn = m_file->GetName();
   if(m_regularFile) {
     lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+  }
+  // Format LFN if BELLE2_LFN_FORMATSTRING is set
+  std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
+  if (!format.empty()) {
+    std::map<std::string, std::string> substitutions;
+    // TODO: replace the following by extraction from metadata json when that becomes available
+    substitutions["experimentLow"] = m_fileMetaData->getExperimentLow();
+    substitutions["runLow"] = m_fileMetaData->getRunLow();
+    substitutions["eventLow"] = m_fileMetaData->getEventLow();
+    substitutions["experimentHigh"] = m_fileMetaData->getExperimentHigh();
+    substitutions["runHigh"] = m_fileMetaData->getRunHigh();
+    substitutions["eventHigh"] = m_fileMetaData->getEventHigh();
+    substitutions["date"] = m_fileMetaData->getDate();
+    substitutions["site"] = m_fileMetaData->getSite();
+    substitutions["user"] = m_fileMetaData->getUser();
+    substitutions["randomSeed"] = m_fileMetaData->getRandomSeed();
+    substitutions["release"] = m_fileMetaData->getRelease();
+    substitutions["type"] = m_fileMetaData->isMC() ? "mc" : "data";
+    substitutions["globalTag"] = m_fileMetaData->getDatabaseGlobalTag();
+    for (auto& [key, value]: m_fileMetaData->getDataDescription()) {
+      substitutions["dataDescription." + key] = value;
+    }
+    boost::filesystem::path fullPath(m_outputFileName);
+    substitutions["file.name"] = fullPath.filename().string();
+    substitutions["file.suffix"] = fullPath.extension().string();
+    substitutions["file.stem"] = fullPath.stem().string();
+    substitutions["file.parent"] = fullPath.parent_path().string();
+
+    lfn = format;
+    for (std::string::size_type first = lfn.find("{"); first != std::string::npos; first = lfn.find("{", first)) {
+      auto last = lfn.find("}", first);
+      auto key = lfn.substr(first+1, last-first-1);
+      std::string value = "";
+      auto equal = key.find(":=");
+      if (equal != std::string::npos) {
+        value = key.substr(equal+2);
+        key = key.substr(0, equal);
+      }
+      if (substitutions.find(key) != substitutions.end()) {
+        value = substitutions[key];
+      }
+      lfn.replace(first, last-first+1, value);
+    }
+    boost::algorithm::replace_all(lfn, " ", "_");
+    boost::algorithm::replace_all(lfn, "__", "_");
+    boost::algorithm::replace_all(lfn, "//", "/");
   }
   m_fileMetaData->setLfn(lfn);
   //register the file in the catalog

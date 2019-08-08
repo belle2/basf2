@@ -305,6 +305,7 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=[],
     dataDescription=None,
+    rawFormat=False
 ):
     """
     This function adds the cDST output modules (mDST + calibration objects) to a path,
@@ -316,6 +317,7 @@ def add_cdst_output(
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
            fields to the output FileMetaData
+    @param rawFormat saves the cdsts in the raw+tracking format.
     """
 
     calibrationBranches = [
@@ -360,6 +362,31 @@ def add_cdst_output(
         'BKLMHit2dsToBKLMHit1ds',
         'BKLMHit1dsToBKLMDigits'
     ]
+
+    if rawFormat:
+        calibrationBranches = [
+            'EventMetaData',
+            'RawPXDs',
+            'RawSVDs',
+            'RawCDCs',
+            'RawECLs',
+            'RawARICHs',
+            'RawKLMs',
+            'RawTOPs',
+            'RawTRGs',
+            'RecoTracks',
+            'Tracks',
+            'V0s',
+            'TrackFitResults',
+            'EventT0',
+            'CDCDedxTracks',
+            'SVDShaperDigitsFromTracks',
+            'EventT0',
+            'VXDDedxTracks',
+            'CDCDedxLikelihoods',
+            'VXDDedxLikelihoods',
+            'SVDEventInfo']
+
     if dataDescription is None:
         dataDescription = {}
     dataDescription.setdefault("dataLevel", "cdst")

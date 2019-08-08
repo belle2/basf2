@@ -184,43 +184,44 @@ namespace Belle2 {
 
 
     //! FPGAversion
-    int m_FPGAversion;
+    int m_FPGAversion = 0;
     //! 100 MeV/ADC conversion factor
-    double m_ADCto100MeV;
+    double m_ADCto100MeV = 0.0;
     //! Total Energy > 500 MeV
-    int m_ELow;
+    int m_ELow = 0;
     //! Total Energy > 1000 MeV
-    int m_EHigh;
+    int m_EHigh = 0;
     //! Total Energy > 3000 MeV
-    int m_ELum;
+    int m_ELum = 0;
     //! Belle 1 type(2D) Bhabha threshold in forward part (Higher)
-    int m_2DBhabhaFWD[14];
+    int m_2DBhabhaFWD[14] = {0};
     //! Belle 1 type(2D) Bhabha threshold in backward part (Lower)
-    int m_2DBhabhaBWD[14];
+    int m_2DBhabhaBWD[14] = {0};
     //! 3D Selection Bhabha Threshold
-    int m_3DBhabhaSelectionThreshold[2];
+    int m_3DBhabhaSelectionThreshold[2] = {0};
     //! 3D Veto Bhabha Threshold
-    int m_3DBhabhaVetoThreshold[2];
+    int m_3DBhabhaVetoThreshold[2] = {0};
     //! 3D Selection Bhabha Angle Selection
-    int m_3DBhabhaSelectionAngle[4];
+    int m_3DBhabhaSelectionAngle[4] = {0};
     //! 3D Veto Bhabha Angle Selection
-    int m_3DBhabhaVetoAngle[4];
+    int m_3DBhabhaVetoAngle[4] = {0};
     //! mumu bit Threshold
-    int m_mumuThreshold;
+    int m_mumuThreshold = 0;
     //! mumu bit angle selection
-    int m_mumuAngle[4];
+    int m_mumuAngle[4] = {0};
     //! Low Multiplicity bit Threshold
-    int m_LowMultiThreshold[4];
+    int m_LowMultiThreshold[4] = {0};
     //! Prescale factor
-    int m_Prescalefactor[3];
+    int m_Prescalefactor[3] = {0};
     //! Letency of Trigger Window (Interval btw L1 and ETM TRG )
-    int m_TriggerLatency;
+    int m_TriggerLatency = 0;
     //! Delay of ETM to GDL
-    int m_ETMDelay;
+    int m_ETMDelay = 0;
     //! The number of cluster exceeding 300 MeV.
-    int m_n300MeVCluster;
+    int m_n300MeVCluster = 0;
     //! ECL Burst bit Threshold
-    int m_ECLBurstThreshold;
+    int m_ECLBurstThreshold = 0;
+
     /* //! ETM module ID */
     /* int m_module_ID; */
 

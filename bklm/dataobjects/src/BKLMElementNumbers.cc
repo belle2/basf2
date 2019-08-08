@@ -11,6 +11,7 @@
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 using namespace Belle2;
 
@@ -114,4 +115,10 @@ void BKLMElementNumbers::layerGlobalNumberToElementNumbers(int layerGlobal, int*
   *section = ((layerGlobal / m_MaximalLayerNumber) / m_MaximalSectorNumber) % (m_MaximalLayerNumber + 1);
   *sector = ((layerGlobal / m_MaximalLayerNumber) % m_MaximalSectorNumber) + 1;
   *layer = (layerGlobal % m_MaximalLayerNumber) + 1;
+}
+
+std::string BKLMElementNumbers::getHSLBName(int copper, int slot)
+{
+  char hslb = 'a' + slot - 1;
+  return "700" + std::to_string(copper - BKLM_ID) + hslb;
 }

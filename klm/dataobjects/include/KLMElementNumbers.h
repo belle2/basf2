@@ -155,6 +155,12 @@ namespace Belle2 {
       int* layer) const;
 
     /**
+     * Get number of channels in module.
+     * @param[in] module KLM module number.
+     */
+    unsigned int getNChannelsModule(uint16_t module) const;
+
+    /**
      * Get sector number for BKLM.
      * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).

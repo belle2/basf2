@@ -159,6 +159,20 @@ void KLMElementNumbers::moduleNumberToElementNumbers(
   }
 }
 
+unsigned int KLMElementNumbers::getNChannelsModule(uint16_t module) const
+{
+  if (isBKLMChannel(module)) {
+    int localModule = localChannelNumberBKLM(module);
+    int section, sector, layer;
+    BKLMElementNumbers::moduleNumberToElementNumbers(
+      localModule, &section, &sector, &layer);
+    return BKLMElementNumbers::getNStrips(section, sector, layer, 0) +
+           BKLMElementNumbers::getNStrips(section, sector, layer, 1);
+  } else {
+    return EKLMElementNumbers::getNStripsSector();
+  }
+}
+
 uint16_t KLMElementNumbers::sectorNumberBKLM(int section, int sector) const
 {
   uint16_t sect;

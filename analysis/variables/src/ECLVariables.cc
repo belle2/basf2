@@ -1288,15 +1288,9 @@ should have a time that corresponds to the event trigger time :math:`t_{0}`
     | Precision: :math:`12` bit
 )DOC");
     REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
-Returns flag stating if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
+Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
 of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
 this variable tells the user if that has happened.
-
-.. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.0`
-    | Precision: :math:`12` bit
 )DOC");
     REGISTER_VARIABLE("clusterErrorTiming", eclClusterErrorTiming, R"DOC(
 Returns ECL cluster's timing uncertainty that contains :math:`99\%` of true photons (dt99).
@@ -1324,15 +1318,9 @@ We remove such clusters in most physics photon lists.
     and it is not clear that a simple rejection is the correction strategy.
 )DOC");
     REGISTER_VARIABLE("clusterHasFailedErrorTiming", eclClusterHasFailedErrorTiming, R"DOC(
-Returns flag stating if the ECL cluster's timing uncertainty calculation failed. Photon timing is given by the fitted time
+Status bit for if the ECL cluster's timing uncertainty calculation failed. Photon timing is given by the fitted time
 of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
 this variable tells the user if that has happened.
-
-.. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.0`
-    | Precision: :math:`12` bit
 )DOC");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE, R"DOC(
 Returns energy of the highest energetic crystal in the ECL cluster after reweighting.

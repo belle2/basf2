@@ -15,7 +15,8 @@ Event shapes are discussed in several papers. Two comprehensive introductions ca
 
 `G. Fox, S. Wolfram, Event shapes in e+e- annihilation <https://www.stephenwolfram.com/publications/academic/event-shapes-annihilation.pdf>`_
 
-For an introduction on both the theory of the event shapes variables and their use for continuum suppression and even characterization, you can also check the `slides of the starter kit workshop <https://indico.belle2.org/event/5/sessions/10/attachments/85/122/Continuum_suppression_lecture_V2.pdf>`_ .
+For an introduction on both the theory of the event shapes variables and their use for continuum suppression and event
+characterization, you can also check the `slides of the starter kit workshop <https://indico.belle2.org/event/5/sessions/10/attachments/85/122/Continuum_suppression_lecture_V2.pdf>`_ .
 
 
 
@@ -27,7 +28,7 @@ What is the difference between event shape and continuum suppression?
 ---------------------------------------------------------------------
 This section is inspired by `a B2question <https://questions.belle2.org/question/4764/continuum-suppression-or-event-shape/>`_ .
 The event shape variables are closely related to the continuum suppression one, but return completely different values and have also a different meaning.
-The Belle II continuum suppression (in short CS) uses the classic event shape variables, but calculating them separately on a B candidate and its rest of the event
+The Belle II continuum suppression (in short CS) uses the classic event shape variables, but calculates them separately on a B candidate and its rest of the event
 (the story is  actually much longer: please see the `ContinuumSuppression` section).
 This makes the CS variables highly optimized for the continuum suppression when a  B meson is reconstructed in an exclusive channel,
 but completely useless to any other application.
@@ -46,7 +47,8 @@ In summary, the event shape variables are suitable for:
 How to use eventShape
 ---------------------
 
-To access the event shape variables you have to append the EventShapeCalculator module to your path, which will calculate all the quantities you need and store them in the datastore making them available to the `VariableManage`. You can do this simply adding the `modularAnalysis.buildEventShape()` function to your analysis path:
+To access the event shape variables you have to append the EventShapeCalculator module to your path, which will calculate all the quantities you need and store them in the datastore
+making them available to the `VariableManage`. You can do this simply adding the `modularAnalysis.buildEventShape()` function to your analysis path:
 
 .. autofunction:: modularAnalysis.buildEventShape
 
@@ -65,7 +67,7 @@ This is a very minimal implementation of the event shape in a steering file:
 		ma.buildEventShape(path=my_path)
 
 		# Now the event shape variables are accessible
-		# to the VarableManager
+		# to the VariableManager
 
 
 For a complete steering file, see the example `B2A704-EventShape.py <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A704-EventShape.py>`_ .
@@ -74,7 +76,8 @@ Event shape variables
 ---------------------
 
 
-Once `modularAnalysis.buildEventShape()` has been added to the analysis path, the event shape variables will be accessible via the  `VariableManager` as any other event-level variable. Here you can find some deeper theoretical explanation about their meaning, and how they are constructed.
+Once `modularAnalysis.buildEventShape()` has been added to the analysis path, the event shape variables will be accessible via the  `VariableManager` as any other event-level variable.
+Here you can find some deeper theoretical explanation about their meaning, and how they are constructed.
 
 
 .. glossary::
@@ -98,8 +101,12 @@ Once `modularAnalysis.buildEventShape()` has been added to the analysis path, th
       of the event and tends to be aligned to the first eigenvector of the sphericity matrix.
       The Thrust is the normalized sum the projections of all the particles' momenta onto the thrust axis.  It is close to 1 for a jet-like event, and close to 1/3 for a spherical one
       The calculation of the thrust axis allows the event to be divided into two hemispheres; total energy, momentum, and mass can be calculated for each of them individually.
-      The `VariableManager` provides the thrust value (:b2:var:`thrust`), the three cartesian components of the thrust axis (:b2:var:`thrustAxisX`, :b2:var:`thrustAxisY`, :b2:var:`thrustAxisZ`), the polar direction of the thrust axis (:b2:var:`thrustAxisCosTheta`) and the metavariable :b2:var:`useThrustFrame` that allows to calculate any variable in a rotated reference frame where the z axis coincides with the thrust axis.
-      Finally, you can access the invariant mass (:b2:var:`forwardHemisphereMass`), the total energy (:b2:var:`forwardHemisphereEnergy`), the total momentum (:b2:var:`forwardHemisphereMomentum`) and the components of the total momentum (:b2:var:`forwardHemisphereX`, :b2:var:`forwardHemisphereY`, :b2:var:`forwardHemisphereZ`) of the particles belonging to the forward emisphere. Similar variables are also defined for the backward hemisphere.
+      The `VariableManager` provides the thrust value (:b2:var:`thrust`), the three cartesian components of the thrust axis (:b2:var:`thrustAxisX`, :b2:var:`thrustAxisY`, :b2:var:`thrustAxisZ`),
+      the polar direction of the thrust axis (:b2:var:`thrustAxisCosTheta`) and the metavariable :b2:var:`useThrustFrame` that allows to calculate any variable in a
+      rotated reference frame where the z axis coincides with the thrust axis.
+      Finally, you can access the invariant mass (:b2:var:`forwardHemisphereMass`), the total energy (:b2:var:`forwardHemisphereEnergy`), the total
+      momentum (:b2:var:`forwardHemisphereMomentum`) and the components of the total momentum (:b2:var:`forwardHemisphereX`, :b2:var:`forwardHemisphereY`,
+      :b2:var:`forwardHemisphereZ`) of the particles belonging to the forward emisphere. Similar variables are also defined for the backward hemisphere.
       
    Fox-Wolfram moments
       The Fox-Wolfram moments are among the most powerful quantities to define the shape of an event. They are based on the idea of expanding the geometrical distribution of the
@@ -109,8 +116,9 @@ Once `modularAnalysis.buildEventShape()` has been added to the analysis path, th
 
       where :math:`i,j` runs over all the particles in the event,  :math:`P_l` is the Legendre polynomial of order :math:`l`, and :math:`\alpha_{i,j}` is the angle
       between the momentum of the i-th and j-th particle.
-      Instead of the raw momenta, the event shape is always studied using the normalized moments :math:`R_i = H_i/H_0`, defined between 0 and 1.
-      The `VariableManager` provides access to any Fox-Wolfram moment up to order 8 with the metavariables :b2:var:`foxWolframH` (raw moments) and :b2:var:`foxWolframR` (normalized moments). For convenience the normalized moments from 1 to 4 are also accessible using the variables :b2:var:`foxWolframR1` to :b2:var:`foxWolframR4`.
+      Instead of the raw moments, the event shape is always studied using the normalized moments :math:`R_i = H_i/H_0`, defined between 0 and 1.
+      The `VariableManager` provides access to any Fox-Wolfram moment up to order 8 with the metavariables :b2:var:`foxWolframH` (raw moments) and :b2:var:`foxWolframR` (normalized moments).
+      For convenience the normalized moments from 1 to 4 are also accessible using the variables :b2:var:`foxWolframR1` to :b2:var:`foxWolframR4`.
 	    
    Harmonic moments
       The harmonic moments are the coefficients of the expansion of the event in spherical harmonics around an arbitrary axis. Unlike the Fox-Wolfram moments, they are not
@@ -120,13 +128,18 @@ Once `modularAnalysis.buildEventShape()` has been added to the analysis path, th
       :math:`B_l = \sum_i\frac{p_i}{\sqrt{s}}P_l(cos\alpha_i)`,
 
       where :math:`P_l` is the Legendre polynomial of order :math:`l`, and :math:`\alpha_i` is the angle between the momentum of the i-th particle and the chosen expansion axis.
-      The `VariableManager` provides access to any harmonic moment up to order 8, calculated either using the collision axis or the thrust axis,  via the metavariable :b2:var:`harmonicMoment`. For convenience the harmonic moments from 0 to 4 calculated using the thrust axis as polar axis are also accessible using the variables :b2:var:`harmonicMomentThrust0` to :b2:var:`harmonicMomentThrust4`.
+      The `VariableManager` provides access to any harmonic moment up to order 8, calculated either using the collision axis or the thrust axis,  via the metavariable :b2:var:`harmonicMoment`.
+      For convenience the harmonic moments from 0 to 4 calculated using the thrust axis as polar axis are also accessible using the variables
+      :b2:var:`harmonicMomentThrust0` to :b2:var:`harmonicMomentThrust4`.
 	    
       
    Cleo cones
-     The CLEO cones are a set of concentric cones with different opening angle having the thrust axis as symmetry axis. In our current implementation we use 9 cones, of opening angle between 10 and 90 degrees, 10 degrees apart one from the other. The measurement of the energy flux in each cone provides a set of variables that have been proven to be very powerful for continuum suppression. Jet like events will be more likely to have all the energy flow
+     The CLEO cones are a set of concentric cones with different opening angle having the thrust axis as symmetry axis. In our current implementation we use 9 cones,
+     of opening angle between 10 and 90 degrees, 10 degrees apart one from the other. The measurement of the energy flux in each cone provides a set of variables that
+     have been proven to be very powerful for continuum suppression. Jet like events will be more likely to have all the energy flow
      concentrated in the narrower cones, while spherical events will have a more evenly-distributed flow. 
-     The `VariableManager` provides access to any CLEO cone value up to order 8, calculated either using the collision axis or the thrust axis,  via the metavariable :b2:var:`cleoCone`. For convenience the CLEO cones variables calculated using using the thrust axis are also accessible using the variables :b2:var:`cleoConeThrust0` to :b2:var:`cleoConeThrust8`.
+     The `VariableManager` provides access to any CLEO cone value up to order 8, calculated either using the collision axis or the thrust axis,  via the metavariable :b2:var:`cleoCone`.
+     For convenience the CLEO cones variables calculated using using the thrust axis are also accessible using the variables :b2:var:`cleoConeThrust0` to :b2:var:`cleoConeThrust8`.
 	    
       
      

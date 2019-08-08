@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>KShortGenSimNoBkg.root</input>
   <output>V0ValidationSample.root, V0ValidationHarvested.root</output>
   <description>This module generates events for the V0 validation.</description>
@@ -99,6 +99,7 @@ class V0Harvester(HarvestingModule):
                 "FOUND": False
             }
 
+    #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Store the output of the module in a root file.
     save_tree = SaveTreeRefiner()
 

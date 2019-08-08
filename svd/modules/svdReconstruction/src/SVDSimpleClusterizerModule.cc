@@ -33,7 +33,7 @@ REG_MODULE(SVDSimpleClusterizer)
 //-----------------------------------------------------------------
 
 SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
-  m_cutSeed(5.0), m_cutAdjacent(3.0), m_sizeHeadTail(3)
+  m_cutSeed(5.0), m_cutAdjacent(3.0), m_sizeHeadTail(3), m_cutCluster(0), m_useDB(true)
 {
   //Set module properties
   setDescription("Clusterize SVDRecoDigits fitted by the Center of Gravity estimator");
@@ -56,6 +56,10 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
            "SN for digits to be considered as seed", m_cutSeed);
   addParam("HeadTailSize", m_sizeHeadTail,
            "Cluster size at which to switch to Analog head tail algorithm", m_sizeHeadTail);
+  addParam("ClusterSN", m_cutCluster,
+           "minimum value of the SNR of the cluster", m_cutCluster);
+  addParam("useDB", m_useDB,
+           "if false use clustering module parameters", m_useDB);
 
 
 }
@@ -135,9 +139,14 @@ void SVDSimpleClusterizerModule::event()
   if (relClusterTrueHit) relClusterTrueHit.clear();
 
 
+  if (m_useDB) {
+    m_cutSeed = m_ClusterCal.getMinSeedSNR(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip());
+    m_cutAdjacent = m_ClusterCal.getMinAdjSNR(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip());
+    m_cutCluster = m_ClusterCal.getMinClusterSNR(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip());
+  }
   //create a dummy cluster just to start
   SimpleClusterCandidate clusterCandidate(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip(),
-                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
+                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster);
 
   //loop over the SVDRecoDigits
   int i = 0;
@@ -147,6 +156,12 @@ void SVDSimpleClusterizerModule::event()
     VxdID thisSensorID = m_storeDigits[i]->getSensorID();
     bool thisSide = m_storeDigits[i]->isUStrip();
     int thisCellID = m_storeDigits[i]->getCellID();
+
+    if (m_useDB) {
+      m_cutSeed = m_ClusterCal.getMinSeedSNR(thisSensorID, thisSide);
+      m_cutAdjacent = m_ClusterCal.getMinAdjSNR(thisSensorID, thisSide);
+      m_cutCluster = m_ClusterCal.getMinClusterSNR(thisSensorID, thisSide);
+    }
 
     //Ignore digits with insufficient signal
     float thisNoise = m_NoiseCal.getNoiseInElectrons(thisSensorID, thisSide, thisCellID);
@@ -178,7 +193,7 @@ void SVDSimpleClusterizerModule::event()
       }
 
       //prepare for the next cluster:
-      clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
+      clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster);
 
       //start another cluster:
       if (! clusterCandidate.add(thisSensorID, thisSide, aStrip))
@@ -213,14 +228,14 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
 
   VxdID sensorID = cluster.getSensorID();
   bool isU = cluster.isUSide();
-  float position = cluster.getPosition();
-  float positionError = cluster.getPositionError();
-  float time = cluster.getTime();
-  float timeError = cluster.getTimeError(); //not implemented yet
   float seedCharge = cluster.getSeedCharge();
   float charge = cluster.getCharge();
   float size = cluster.size();
   float SNR = cluster.getSNR();
+  float position = cluster.getPosition();
+  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
+  float time = cluster.getTime();
+  float timeError = cluster.getTimeError(); //not implemented yet
 
 
   //  Store Cluster into Datastore

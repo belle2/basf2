@@ -31,6 +31,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDReductionModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDReductionModule();
   private:
 
     //! Module functions to be called from main process
@@ -51,9 +53,9 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! Histogram covering all modules
-    TH1F* m_hReduction;
+    TH1F* m_hReduction = nullptr;
     //! Final Canvas
-    TCanvas* m_cReduction;
+    TCanvas* m_cReduction = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

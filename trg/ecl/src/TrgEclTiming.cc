@@ -24,7 +24,7 @@ using namespace Belle2;
 //
 //
 //
-TrgEclTiming::TrgEclTiming() : NofTopTC(3)
+TrgEclTiming::TrgEclTiming() : NofTopTC(3), Source(0)
 {
 
   _TCMap = new TrgEclMapping();
@@ -64,32 +64,45 @@ double TrgEclTiming::GetEventTiming(int method)
 }
 double TrgEclTiming::GetEventTiming00()
 {
+  Source = 0;
   double Fastest = 9999;
+  int FastestTCId = 0;
   const int hit_size = TCTiming.size();
 
   for (int ihit = 0; ihit < hit_size; ihit++) {
     if (TCTiming[ihit] < Fastest) {
       Fastest = TCTiming[ihit];
+      FastestTCId = TCId[ihit];
     }
   }
 
+  if (FastestTCId < 81) {Source = 1;}
+  else if (FastestTCId > 80 && FastestTCId < 513) {Source = 2;}
+  else {Source = 4;}
   return Fastest ;
 
 }
 
 double TrgEclTiming::GetEventTiming01()
 {
+  Source = 0;
+
   double maxEnergy = 0;
   double maxTiming = 0;
-
+  int maxTCId = 0;
   const int hit_size = TCTiming.size();
 
   for (int ihit = 0; ihit < hit_size; ihit++) {
     if (TCEnergy[ihit] > maxEnergy) {
       maxEnergy = TCEnergy[ihit] ;
       maxTiming = TCTiming[ihit] ;
+      maxTCId = TCId[ihit];
     }
   }
+  if (maxTCId < 81) {Source = 1;}
+  else if (maxTCId > 80 && maxTCId < 513) {Source = 2;}
+  else {Source = 4;}
+
 
   return maxTiming;
 
@@ -98,16 +111,17 @@ double TrgEclTiming::GetEventTiming01()
 
 double TrgEclTiming::GetEventTiming02()
 {
+  Source = 0;
   std::vector<double> maxEnergy;
   std::vector<double> maxTiming;
 
   const int NtopTC = NofTopTC;
+  int maxTCId = 0;
 
   maxEnergy.clear();
   maxTiming.clear();
   maxEnergy.resize(NtopTC, 0);
   maxTiming.resize(NtopTC, 0);
-
 
   const int hit_size = TCTiming.size();
   double E_sum = 0;
@@ -119,6 +133,7 @@ double TrgEclTiming::GetEventTiming02()
         if (maxEnergy[iNtopTC] < TCEnergy[ihit]) {
           maxEnergy[iNtopTC] =  TCEnergy[ihit];
           maxTiming[iNtopTC] =  TCTiming[ihit];
+          maxTCId = TCId[ihit];
         }
       } else if (iNtopTC > 0) {
         if (maxEnergy[iNtopTC - 1] > TCEnergy[ihit] && maxEnergy[iNtopTC] < TCEnergy[ihit]) {
@@ -132,6 +147,11 @@ double TrgEclTiming::GetEventTiming02()
   }
 
   EventTiming /= E_sum;
+
+  if (maxTCId < 81) {Source = 1;}
+  else if (maxTCId > 80 && maxTCId < 513) {Source = 2;}
+  else {Source = 4;}
+
 
 
   return EventTiming;

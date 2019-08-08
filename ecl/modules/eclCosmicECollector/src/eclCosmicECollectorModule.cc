@@ -43,7 +43,7 @@ REG_MODULE(eclCosmicECollector)
 
 eclCosmicECollectorModule::eclCosmicECollectorModule() : CalibrationCollectorModule(), m_ECLExpCosmicESame("ECLExpCosmicESame"),
   m_ECLExpCosmicEDifferent("ECLExpCosmicEDifferent"), m_ElectronicsCalib("ECLCrystalElectronics"),
-  m_CosmicECalib("ECLCrystalEnergyCosmic") , m_ElectronicsTime("ECLCrystalElectronicsTime"), m_TimeOffset("ECLCrystalTimeOffset")
+  m_CosmicECalib("ECLCrystalEnergyCosmic")
 {
   /** Set module properties */
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using cosmic rays");
@@ -109,10 +109,6 @@ void eclCosmicECollectorModule::prepare()
                                     2000);
   registerObject<TH2F>("RawDigitAmpvsCrys", RawDigitAmpvsCrys);
 
-  auto RawDigitTimevsCrys = new TH2F("RawDigitTimevsCrys", "Shifted digit Time vs crystal ID;crystal ID;Time", 8736, 0, 8736, 200,
-                                     -2000, 2000);
-  registerObject<TH2F>("RawDigitTimevsCrys", RawDigitTimevsCrys);
-
   /**----------------------------------------------------------------------------------------*/
   /** Parameters */
   B2INFO("Input parameters to eclCosmicECollector:");
@@ -133,14 +129,11 @@ void eclCosmicECollectorModule::prepare()
   if (m_ECLExpCosmicEDifferent.hasChanged()) {ExpCosmicEDifferent = m_ECLExpCosmicEDifferent->getCalibVector();}
   if (m_ElectronicsCalib.hasChanged()) {ElectronicsCalib = m_ElectronicsCalib->getCalibVector();}
   if (m_CosmicECalib.hasChanged()) {CosmicECalib = m_CosmicECalib->getCalibVector();}
-  if (m_ElectronicsTime.hasChanged()) {ElectronicsTime = m_ElectronicsTime->getCalibVector();}
-  if (m_TimeOffset.hasChanged()) {TimeOffset = m_TimeOffset->getCalibVector();}
 
   /** Write out a few for quality control */
   for (int ic = 1; ic < 9000; ic += 1000) {
     B2INFO("DB constants for cellID=" << ic << ": ExpCosmicESame = " << ExpCosmicESame[ic - 1] << " ExpCosmicEDifferent = " <<
-           ExpCosmicEDifferent[ic - 1] << " ElectronicsCalib = " << ElectronicsCalib[ic - 1] << " CosmicECalib = " << CosmicECalib[ic - 1] <<
-           " ElectronicsTime = " << ElectronicsTime[ic - 1] << " TimeOffset = " << TimeOffset[ic - 1]);
+           ExpCosmicEDifferent[ic - 1] << " ElectronicsCalib = " << ElectronicsCalib[ic - 1] << " CosmicECalib = " << CosmicECalib[ic - 1]);
   }
 
   /** Verify that we have valid values for the starting calibrations */
@@ -338,10 +331,6 @@ void eclCosmicECollectorModule::collect()
     EperCrys[crysID] = eclDigit.getAmp() * abs(CosmicECalib[crysID]) * ElectronicsCalib[crysID];
     EnergyPerTC[TCperCrys[crysID]] += EperCrys[crysID];
     getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());
-    if (EperCrys[crysID] > 0.01) {
-      float shiftedTime = eclDigit.getTimeFit() - ElectronicsTime[crysID] - TimeOffset[crysID];
-      getObjectPtr<TH2F>("RawDigitTimevsCrys")->Fill(crysID + 0.001, shiftedTime);
-    }
   }
   for (int crysID = 0; crysID < 8736; crysID++) {HitCrys[crysID] = EperCrys[crysID] > m_minCrysE;}
 

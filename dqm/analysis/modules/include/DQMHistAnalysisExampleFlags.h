@@ -40,8 +40,10 @@ namespace Belle2 {
 
     // Data members
 
-    TH2F* m_hFlagtest;
-    TCanvas* m_cFlagtest;
+    /** The histogram for the test. */
+    TH2F* m_hFlagtest = nullptr;
+    /** The drawing canvas for the test. */
+    TCanvas* m_cFlagtest = nullptr;
 
   };
 } // end namespace Belle2

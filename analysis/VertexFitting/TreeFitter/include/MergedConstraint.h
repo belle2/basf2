@@ -26,7 +26,7 @@ namespace TreeFitter {
     /** destructor */
     virtual ~MergedConstraint() {}
     /** constructor with constraint list */
-    MergedConstraint(const constraintlist& list) :
+    explicit MergedConstraint(const constraintlist& list) :
       Constraint(Constraint::merged), m_list(list)
     {
       int d = 0;

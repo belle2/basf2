@@ -2,23 +2,19 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 import math
 
 # ----------------------------------------------------------------------------
 # Example of generating double calibration pulses with TOPDoublePulseGenerator
 # ----------------------------------------------------------------------------
 
-# local database with Kichimi-san TBC and T0 constants
-reset_database()
-pathTo = '/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855/'  # on KEKCC
-use_local_database(pathTo + "localDB/localDB.txt", pathTo + "localDB")
-
 # Create path
 main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param('evtNumList', [100])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
@@ -27,6 +23,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

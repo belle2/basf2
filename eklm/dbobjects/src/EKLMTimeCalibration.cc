@@ -41,7 +41,7 @@ EKLMTimeCalibration::getTimeCalibrationData(uint16_t strip) const
   std::map<uint16_t, EKLMTimeCalibrationData>::const_iterator it;
   it = m_data.find(strip);
   if (it == m_data.end())
-    return NULL;
+    return nullptr;
   return &(it->second);
 }
 

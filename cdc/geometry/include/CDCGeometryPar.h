@@ -23,11 +23,13 @@
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
+#include <cdc/dbobjects/CDCFudgeFactorsForSigma.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCMisalignment.h>
 #include <cdc/dbobjects/CDCGeometry.h>
+#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
 #include <vector>
 #include <string>
@@ -168,14 +170,21 @@ namespace Belle2 {
       void newReadSigma(const GearDir, int mode = 0);
 
       /**
-       * Set spatial resolution (from DB).
+       * Read fudge factors
+       * @param GearDir Gear Dir.
+       * @param mode dummy now.
        */
-      void setSigma();
+      void readFFactor(const GearDir, int mode = 0);
 
       /**
        * Set spatial resolution (from DB).
        */
       void setSResol();
+
+      /**
+       * Set fudge factors (from DB).
+       */
+      void setFFactor();
 
       /**
        * Read the propagation speed along the sense wire.
@@ -200,6 +209,11 @@ namespace Belle2 {
        * Set t0 parameters (from DB)
        */
       void setT0();
+
+      /**
+       * Calculate mean t0 in ns (over all wires)
+       */
+      void calcMeanT0();
 
       /**
        * Read bad-wires (from a file).
@@ -232,9 +246,38 @@ namespace Belle2 {
       void readTW(const GearDir, int mode = 0);
 
       /**
+       * Read spatial edep-to-adc conv. factors.
+       * @param GearDir Gear Dir.
+       * @param mode dummy now..
+       */
+      void readEDepToADC(const GearDir, int mode = 0);
+
+      /**
        * Set time-walk parameters.
        */
       void setTW();
+
+      /** Set edep-to-ADC conversion params. (from DB) */
+      void setEDepToADCConversions();
+
+      /** Return edep-to-ADC conversion factor.
+       * @param layer no. (0-55)
+       * @param cell  no. (0-)
+       * @param edep  energy-deposit in the cell(keV).
+       * @param dx    path length (cm) of the track in the cell.
+       * @param costh cos(theta) of track.
+       */
+      double getEDepToADCConvFactor(unsigned short layer, unsigned short cell, double edep, double dx, double costh);
+
+
+      /** Return edep-to-ADC conversion main factor (in count/keV)
+       * @param layer no. (0-55)
+       * @param cell  no. (0-)
+       */
+      double getEDepToADCMainFactor(unsigned short layer, unsigned short cell)
+      {
+        return m_eDepToADCParams[layer][cell][0];
+      };
 
       //! Generate an xml file used in gearbox
       /*!
@@ -397,6 +440,12 @@ namespace Belle2 {
           \return The z offset of wire layer i.
       */
       double zOffsetWireLayer(unsigned i) const;
+
+      //! Returns the mean t0 over all wires.
+      /*!
+          \return mean t0.
+      */
+      double getMeanT0() const;
 
       //! Returns the forward position of the input sense wire.
       /*!
@@ -840,9 +889,8 @@ namespace Belle2 {
 
       double getDriftTime(double dist, unsigned short layer, unsigned short lr, double alpha, double theta) const;
 
-
       /**
-       * Return the resolution of drift length (cm).
+       * Return the basic resolution of drift length (cm). N.B. A fudge factor may be multiplied at the place where this is called; be careful.
        * @param dist Drift length (cm); negative dist is treated as |dist|.
        * @param layer Layer id.
        * @param lr Left/Right.
@@ -850,13 +898,22 @@ namespace Belle2 {
        * @param theta incident angle (polar angle) (rad).
        */
       double getSigma(double dist, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
+
+      /**
+       * Return the fuge factor for space resol.
+       * @param target target sigma: =0: for sigma in data reconstruction; =1: for sigma in MC recon.; =2: for sigma in digitization in MC
+       */
+      double getFudgeFactorForSigma(unsigned short target) const
+      {
+        return m_fudgeFactorForSigma[target];
+      }
+
       /**
        * Returns old left/right.
        * @param posOnWire  Position on the wire  at the closest point.
        * @param posOnTrack Position on the track at the closest point.
        * @param momentum   Track 3-momentum.
        */
-
       unsigned short getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
 
       /**
@@ -1027,6 +1084,7 @@ namespace Belle2 {
       float m_FWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
       float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
+      float m_eDepToADCParams[MAX_N_SLAYERS][MAX_N_SCELLS][4] = {0}; /*!< edep-to-ADC conv. params. */
 
       float m_alphaPoints[maxNAlphaPoints]; /*!< alpha sampling points for xt (rad) */
       float m_thetaPoints[maxNThetaPoints]; /*!< theta sampling points for xt (rad) */
@@ -1036,8 +1094,11 @@ namespace Belle2 {
       float m_XT[MAX_N_SLAYERS][2][maxNAlphaPoints][maxNThetaPoints][nXTParams];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
       float m_Sigma[MAX_N_SLAYERS][2][maxNAlphaPoints][maxNThetaPoints][nSigmaParams];      /*!< position resulution for each layer. */
       float m_propSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
-      float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< t0 for each sense-wire (in nsec). */
+      float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS] = {0};  /*!< t0 for each sense-wire (in nsec). */
       float m_timeWalkCoef[nBoards][2];  /*!< coefficients for time walk. */
+
+      //      float m_meanT0;  /*!< mean t0 over all wires. */
+      double m_meanT0;  /*!< mean t0 over all wires; should be double. */
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
 
@@ -1051,6 +1112,7 @@ namespace Belle2 {
       double m_nominalPropSpeed;   /*!< Nominal propagation speed of the sense wire (27.25 cm/nsec). */
       double m_nominalSpaceResol;  /*!< Nominal spacial resolution (0.0130 cm). */
       double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
+      double m_fudgeFactorForSigma[3];     /*!< Fuge factor for space resol. */
 
       DBObjPtr<CDCTimeZeros>* m_t0FromDB; /*!< t0s retrieved from DB. */
       DBObjPtr<CDCBadWires>* m_badWireFromDB; /*!< bad-wires retrieved from DB. */
@@ -1058,10 +1120,12 @@ namespace Belle2 {
       DBObjPtr<CDCTimeWalks>* m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
       DBObjPtr<CDCXtRelations>* m_xtRelFromDB; /*!< xt params. retrieved from DB (new). */
       DBObjPtr<CDCSpaceResols>* m_sResolFromDB; /*!< sigma params. retrieved from DB. */
+      DBObjPtr<CDCFudgeFactorsForSigma>* m_fFactorFromDB; /*!< fudge factors retrieved from DB. */
       DBArray<CDCChannelMap>* m_chMapFromDB; /*!< channel map retrieved from DB. */
       DBArray<CDCDisplacement>* m_displacementFromDB; /*!< displacement params. retrieved from DB. */
       DBObjPtr<CDCAlignment>* m_alignmentFromDB; /*!< alignment params. retrieved from DB. */
       DBObjPtr<CDCMisalignment>* m_misalignmentFromDB; /*!< misalignment params. retrieved from DB. */
+      DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB; /*!< Pointer to edep-to-ADC conv. params. from DB. */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
@@ -1213,6 +1277,11 @@ namespace Belle2 {
     inline double CDCGeometryPar::zOffsetWireLayer(unsigned i) const
     {
       return (m_zSBackwardLayer[i] + (m_zSForwardLayer[i] - m_zSBackwardLayer[i]) / 2);
+    }
+
+    inline double CDCGeometryPar::getMeanT0() const
+    {
+      return m_meanT0;
     }
 
   } // end of namespace CDC

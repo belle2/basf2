@@ -42,24 +42,24 @@ namespace Belle2 {
       /// Initialisation before the event processing starts
       void initialize() final;
 
-      /// Execute one pass over a quad tree
+      /// Execute one pass over given clusters and wirehits and create tracks
       void apply(const std::vector<const ECLCluster*>& eclClusters,
                  const std::vector<const CDCWireHit*>& axialWireHits,
                  std::vector<CDCTrack>& tracks) final;
 
     private:
-      // Search for hits compatible with given trajectory
+      /// Search for hits compatible with given trajectory
       std::vector<const CDCWireHit*> search(const std::vector<const CDCWireHit*>& axialWireHits,
-                                            const CDCTrajectory2D& trajectory);
+                                            const CDCTrajectory2D& guidingTrajectory2D);
 
     private:
-      // ECL cluster energy threshold
+      /// ECL cluster energy threshold
       float m_param_minEnergy = 0.050; //GeV
 
-      // Track number of hits threshold
+      /// Track number of hits threshold
       unsigned int m_param_minNHits = 5;
 
-      // Maximum distance from hits to the track
+      /// Maximum distance from hits to the track
       float m_param_maxDistance = 0.5; //cm, NOTE for conventional tracking it is 0.2
     };
   }

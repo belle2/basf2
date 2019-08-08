@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from geometry import check_components
 from ROOT import Belle2
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
@@ -69,7 +70,8 @@ def add_PXDDataReduction(path, components,
                                                  'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
                                                  'RecoHitInformationsTo__ROIsvdClusters',
                                                  'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles',
-                                                 '__ROIsvdClustersToSVDDigits', '__ROIsvdClustersToSVDTrueHits',
+                                                 '__ROIsvdRecoDigitsToMCParticles',
+                                                 '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits',
                                                  '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
                                                  '__ROIsvdRecoTracksToRecoHitInformations',
                                                  '__ROIsvdRecoTracksToSPTrackCands__ROI'])
@@ -116,6 +118,9 @@ def add_simulation(
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     """
 
+    # Check compoments.
+    check_components(components)
+
     # background mixing or overlay input before process forking
     if bkgfiles is not None:
         if bkgOverlay:
@@ -144,12 +149,9 @@ def add_simulation(
 
     # detector geometry
     if 'Geometry' not in path:
-        geometry = register_module('Geometry', useDB=True)
+        path.add_module('Geometry', useDB=True)
         if components is not None:
-            B2WARNING("Custom detector components specified, disabling Geometry from Database")
-            geometry.param('useDB', False)
-            geometry.param('components', components)
-        path.add_module(geometry)
+            B2WARNING("Custom detector components specified: Will still build full geometry")
 
     # event T0 jitter simulation
     if simulateT0jitter and 'EventT0Generator' not in path:
@@ -201,15 +203,10 @@ def add_simulation(
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
-    # BKLM digitization
-    if components is None or 'BKLM' in components:
-        bklm_digitizer = register_module('BKLMDigitizer')
-        path.add_module(bklm_digitizer)
-
-    # EKLM digitization
-    if components is None or 'EKLM' in components:
-        eklm_digitizer = register_module('EKLMDigitizer')
-        path.add_module(eklm_digitizer)
+    # KLM digitization
+    if components is None or 'BKLM' in components or 'EKLM' in components:
+        klm_digitizer = register_module('KLMDigitizer')
+        path.add_module(klm_digitizer)
 
     # background overlay executor - after all digitizers
     if bkgfiles is not None and bkgOverlay:

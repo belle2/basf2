@@ -8,16 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGIT_H
-#define EKLMDIGIT_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitMCTime.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <framework/dataobjects/DigitBase.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 namespace Belle2 {
 
@@ -91,24 +90,6 @@ namespace Belle2 {
      * @param[in] tdc TDC.
      */
     void setTDC(uint16_t tdc);
-
-    /**
-     * Get trigger CTIME.
-     * @return Trigger CTIME.
-     */
-    uint16_t getTriggerCTime() const;
-
-    /**
-     * Set trigger CTIME.
-     * @param[in] ctime Trigger CTime
-     */
-    void setTriggerCTime(uint16_t ctime);
-
-    /**
-     * Get relative CTIME (event - trigger).
-     * @return Relative CTIME.
-     */
-    int getRelativeCTime() const;
 
     /**
      * Get number of photoelectrons (fit result).
@@ -202,9 +183,6 @@ namespace Belle2 {
     /** TDC (time provided by ASIC). */
     uint16_t m_TDC;
 
-    /** Trigger CTIME. */
-    uint16_t m_TriggerCTime;
-
     /** Generated number of photoelectrons (MC only). */
     int m_generatedNPE;
 
@@ -214,12 +192,9 @@ namespace Belle2 {
     /** MC time at SiPM. */
     float m_sMCTime;
 
-    /** Makes objects storable. */
-    ClassDefOverride(Belle2::EKLMDigit, 10);
+    /** Class version. */
+    ClassDefOverride(Belle2::EKLMDigit, 11);
 
   };
 
 }
-
-#endif
-

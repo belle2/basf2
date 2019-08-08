@@ -50,19 +50,19 @@ namespace Belle2 {
     virtual ~ECLLocalMaximumFinderModule();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate (close ROOT files here if you have opened any). */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Store array: MCParticle. */
     StoreArray<MCParticle> m_mcParticles;
@@ -149,43 +149,43 @@ namespace Belle2 {
     std::vector< int > m_StoreArrPosition;
 
     /** Neighbour maps. */
-    ECL::ECLNeighbours* m_neighbourMap;
+    ECL::ECLNeighbours* m_neighbourMap{nullptr};
 
     /** Geometry */
-    ECL::ECLGeometryPar* m_geom;
+    ECL::ECLGeometryPar* m_geom{nullptr};
 
     /** Output training files and trees. */
-    TFile* m_outfile; /**< outfiles that contain tree */
-    TTree* m_tree; /**< tree that contain information for MVA training */
+    TFile* m_outfile{nullptr}; /**< outfiles that contain tree */
+    TTree* m_tree{nullptr}; /**< tree that contain information for MVA training */
 
     /** Variables (possibly) used for MVA classification. Must be float for our framework mvas. */
     const static unsigned c_nMaxNeighbours = 12; /**< maximal number of neighbours (can be more than 8 only in the endcaps) */
-    float m_energyRatioNeighbour[c_nMaxNeighbours]; /**< energy ratio of neighbour 0..9 to center */
-    float m_time;  /**< time */
+    float m_energyRatioNeighbour[c_nMaxNeighbours] {}; /**< energy ratio of neighbour 0..9 to center */
+    float m_time = 0.0;  /**< time */
 
     /** Variables to monitor the MVA training.*/
-    float m_energy; /**< energy of the center cell */
-    float m_thetaId;  /**< local maximum center theta Id */
-    float m_phiId;  /**< local maximum center theta Id */
-    float m_cellId;  /**< local maximum center cell Id */
-    float m_maxNeighbourEnergy;  /**< highest energy of all neighbours */
-    float m_timeResolution;  /**< time resolution */
-    float m_timeFitFailed;  /**< failed fit */
-    float m_CRId; /**< CR ID */
-    float m_LMId; /**< LM ID */
+    float m_energy = 0.0; /**< energy of the center cell */
+    float m_thetaId = 0.0;  /**< local maximum center theta Id */
+    float m_phiId = 0.0;  /**< local maximum center theta Id */
+    float m_cellId = 0.0;  /**< local maximum center cell Id */
+    float m_maxNeighbourEnergy = 0.0;  /**< highest energy of all neighbours */
+    float m_timeResolution = 0.0;  /**< time resolution */
+    float m_timeFitFailed = 0.0;  /**< failed fit */
+    float m_CRId = 0.0; /**< CR ID */
+    float m_LMId = 0.0; /**< LM ID */
 
     /** MC truth variables */
-    float m_target; /**< target type */
-    float m_targetindex; /**< target array index */
-    float m_targetpi0index; /**< target array index */
+    float m_target = 0.0; /**< target type */
+    float m_targetindex = 0.0; /**< target array index */
+    float m_targetpi0index = 0.0; /**< target array index */
 
     /** Variables (possibly) used for cut classification. */
-    float m_nNeighbours10;  /**< Number of neighbours above 1.0 MeV. */
-    float m_maxEnergyRatio;  /**< Highest energetic neighbour energy divided by LM energy. */
+    float m_nNeighbours10 = 0.0;  /**< Number of neighbours above 1.0 MeV. */
+    float m_maxEnergyRatio = 0.0;  /**< Highest energetic neighbour energy divided by LM energy. */
 
-    double m_totalSignalEnergy; /**< total energy of this digit */
-    double m_signalEnergy[10][5]; /**< total energy per MC matching type of this digit */
-    int m_signalId[10][5]; /**< total energy per MC matching type of this digit */
+    double m_totalSignalEnergy = 0.0; /**< total energy of this digit */
+    double m_signalEnergy[10][5] {}; /**< total energy per MC matching type of this digit */
+    int m_signalId[10][5] {}; /**< total energy per MC matching type of this digit */
   };
 
   /** Class to find connected regions, pureCsI version*/

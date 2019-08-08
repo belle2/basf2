@@ -7,6 +7,8 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
 #include <genfit/RKTrackRep.h>
+#include <genfit/MplTrackRep.h>
+#include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/dataobjects/Helix.h>
 
@@ -130,7 +132,7 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
     genfit::TrackCandHit* trackCandHit = trackCand.getHit(hitIndex);
     const int detID = trackCandHit->getDetId();
     const int hitID = trackCandHit->getHitId();
-    const unsigned int sortingParameter = recreateSortingParameters ? hitIndex : static_cast<const unsigned int>
+    const unsigned int sortingParameter = recreateSortingParameters ? hitIndex : static_cast<unsigned int>
                                           (trackCandHit->getSortingParameter());
     if (detID == Const::CDC) {
       UsedCDCHit* cdcHit = cdcHits[hitID];
@@ -344,8 +346,7 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
   }
 
   // make sure we only consider fitted if the Kalman method was used
-  const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
-  if (not kfs) {
+  if (not dynamic_cast<const genfit::KalmanFitStatus*>(fs)) {
     return false;
   }
 
@@ -399,7 +400,11 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
 
   // not available? create one
   if (trackRepresentation == nullptr) {
-    trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    if (PDGcode == Monopoles::c_monopolePDGCode) {
+      trackRepresentation = new genfit::MplTrackRep(PDGcode, Monopoles::monopoleMagCharge);
+    } else {
+      trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    }
     RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
   }
   return trackRepresentation;

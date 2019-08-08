@@ -19,7 +19,7 @@ void _StoreArrayImpl::clearRelations(const StoreAccessorBase& array)
 {
   auto related_arrays = DataStore::Instance().getListOfRelatedArrays(array);
 
-  for (std::string other_name : related_arrays) {
+  for (const std::string& other_name : related_arrays) {
     RelationArray a(DataStore::relationName(other_name, array.getName()), array.getDurability());
     RelationArray b(DataStore::relationName(array.getName(), other_name), array.getDurability());
     if (a.isValid())

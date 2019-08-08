@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -70,6 +70,40 @@ namespace Belle2 {
      */
     double particleTagVpVal(const Particle* particle);
 
+    /**
+     * return the number of tracks in the tag vertex
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleTagVNTracks(const Particle* particle);
+
+    /**
+     * return the fit type of the tag vertex
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleTagVNTracks(const Particle* particle);
+
+    /**
+     * returns the number of degrees of freedom in the tag vertex fit. can be non-integer due to adaptive vertex fitting.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVNDF(const Particle*);
+
+    /**
+     * returns chi^2 value of the tag vertex fit result.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVChi2(const Particle*);
+
+    /**
+     * returns the IP component of chi^2 value of the tag vertex fit result.
+     *
+     * requires that TagVertex <-> Particle relation exists (returns -1111 if not)
+     */
+    double particleTagVChi2IP(const Particle*);
 
 
     /**
@@ -124,13 +158,25 @@ namespace Belle2 {
     double particleDeltaZ(const Particle* particle);
 
     /**
+     * returns the error of Delta Z (Brec - Btag) in cm
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaZErr(const Particle* particle);
+
+    /**
      * return Delta Boost direction (Brec - Btag) in cm
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleDeltaB(const Particle* particle);
 
-
+    /**
+     * returns the error of the difference Delta Boost direction (Brec - Btag) in cm
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaBErr(const Particle* particle);
 
     /**
      * returns the vertex component in the boost direction
@@ -205,6 +251,12 @@ namespace Belle2 {
      *
      */
     double tagVErrOrthogonalBoostDirection(const Particle*);
+
+    /**
+     * Returns internal mc flavor used in the TagV module. Only to be used for internal checks by developers.
+     *
+     */
+    double particleInternalTagVMCFlavor(const Particle*);
 
   }
 }

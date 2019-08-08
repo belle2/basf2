@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <boost/optional.hpp>
+
 #include <string>
 #include <unordered_map>
 #include <set>
@@ -104,10 +106,25 @@ namespace Belle2 {
     void update();
 
     /**
+     * Updates all objects that are outside their interval of validity.
+     * This method is for calling the DBStore manually using an EventMetaData object
+     * instead of relying on the DataStore containing one.
+     */
+    void update(const EventMetaData& event);
+
+    /**
      * Updates all intra-run dependent objects.
      * This method is called by the framework for each event.
      */
     void updateEvent();
+
+    /**
+     * Updates all intra-run dependent objects.
+     * This method is for specifying the event number to update to manually. Updates the m_manualEvent to use
+     * the event number given in the argument, before performing the intra-run update.
+     * This doesn't alter/use the DataStore EventMetaData.
+     */
+    void updateEvent(const unsigned int eventNumber);
 
     /**
      * Invalidate all payloads.
@@ -139,6 +156,15 @@ namespace Belle2 {
     /** same for copy constructor */
     DBStore(const DBStore&);
 
+    /** The main code that does an update, factored out so it can be used by both update and update(event). */
+    void performUpdate(const EventMetaData& event);
+
+    /**
+     * The main code that does an updateEvent.
+     * Factored out so it can be used by both updateEvent and updateEvent(eventNumber).
+     */
+    void performUpdateEvent(const EventMetaData& event);
+
     /** Map names to DBEntry objects. */
     std::unordered_map<std::string, DBStoreEntry> m_dbEntries;
 
@@ -146,8 +172,15 @@ namespace Belle2 {
     std::set<DBStoreEntry*> m_intraRunDependencies;
 
     /**
-     * StoreObjPtr for the EventMetaData to get the current experiment and run
+     * StoreObjPtr for the EventMetaData to get the current experiment and run from the DataStore.
      */
-    StoreObjPtr<EventMetaData> m_event;
+    StoreObjPtr<EventMetaData> m_storeEvent;
+
+    /**
+     * Optional EventMetaData variable. This is set by DBStore::Instance().update(event).
+     * Provides a similar interface to StoreObjPtr and allows us to check when not initialized/valid easily.
+     * Can be moved to a std::optional when/if we move to C++17.
+     */
+    boost::optional<EventMetaData> m_manualEvent;
   };
 } // namespace Belle2

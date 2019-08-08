@@ -1166,6 +1166,7 @@ c--   propagate photon to mirror and do reflection
          Y=Y+Y0
       ELSE                      ! prism shaped
          CALL UNFOLD_EXTVOL(MDN,LR,KMIN,KMAX)
+         YSIZ=EXT_YUP(ID)-EXT_YDN(ID)
          Y0=(EXT_YUP(ID)+EXT_YDN(ID))/2
          IF(YD.GT.Y0) THEN
             K2=KMAX

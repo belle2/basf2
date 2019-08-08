@@ -65,10 +65,10 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
     //move vertex position of selected particle and its daughters
     if (m_meanDecayLength > 0) {
-      if (p.getPDG() == pdg_displaced) {
+      if (p.getPDG() == m_pdgDisplaced) {
         TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
         TLorentzVector p4 = p.get4Vector();
-        fr.SetRange(Rmin, Rmax);
+        fr.SetRange(m_Rmin, m_Rmax);
         fr.SetParameter(0, m_meanDecayLength * p4.Gamma());
         r = fr.GetRandom();
         x = r * p4.Px() / p4.P();
@@ -81,7 +81,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       }
 
       if (mother > 0) {
-        if (graph[mother - 1].getPDG() == pdg_displaced) {
+        if (graph[mother - 1].getPDG() == m_pdgDisplaced) {
           p.setProductionVertex(TVector3(x, y, z));
           p.setProductionTime(t);
           p.setValidVertex(true);
@@ -96,13 +96,13 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       p4.SetPz(-1.0 * p4.Pz());
     p4 = m_labboost * p4;
     p.set4Vector(p4);
-    if (p.getPDG() == pdg_displaced) {
+    if (p.getPDG() == m_pdgDisplaced) {
       v4.SetXYZT(p.getDecayVertex().X(), p.getDecayVertex().Y(), p.getDecayVertex().Z(), Const::speedOfLight * p.getDecayTime());
       v4 = m_labboost * v4;
       p.setDecayVertex(v4.X(), v4.Y(), v4.Z());
       p.setDecayTime(v4.T() / Const::speedOfLight);
     } else if (mother > 0) {
-      if (graph[mother - 1].getPDG() == pdg_displaced) {
+      if (graph[mother - 1].getPDG() == m_pdgDisplaced) {
         v4.SetXYZT(p.getProductionVertex().X(), p.getProductionVertex().Y(), p.getProductionVertex().Z(),
                    Const::speedOfLight * p.getProductionTime());
         v4 = m_labboost * v4;

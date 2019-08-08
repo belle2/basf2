@@ -37,8 +37,6 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -106,9 +104,8 @@ const AttributeMap c_defaultSVGAttributes({
   {"transform", "translate(0, 1120) scale(1,-1)"}
 });
 
-CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade)
-  : m_animate(animate)
-  , m_eventdataPlotter(std::make_unique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
+CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade) :
+  m_eventdataPlotter(std::make_unique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
 {
   int top = -112;
   int left = -112;
@@ -401,6 +398,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       return false;
     };
 
+    // cppcheck-suppress ignoredReturnValue
     std::adjacent_find(simHitsForMcParticle.begin(),
                        simHitsForMcParticle.end(),
                        drawConnectSimHits);

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDISPLACEMENTGENERATORMODULE_H
-#define EKLMDISPLACEMENTGENERATORMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <framework/core/Module.h>
@@ -159,6 +158,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

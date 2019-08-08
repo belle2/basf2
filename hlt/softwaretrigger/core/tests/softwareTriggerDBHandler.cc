@@ -24,12 +24,12 @@ namespace Belle2 {
     /// Class to test the down- and upload of trigger cuts to the DB.
     class SoftwareTriggerDBHandlerTest : public ::testing::Test {
       /// Do everything in a temporary dir.
-      TestHelpers::TempDirCreator* tmp_dir;
+      TestHelpers::TempDirCreator* m_tmpDir = nullptr;
 
       /// Setup the local DB and the datastore with the event meta data.
       void SetUp()
       {
-        tmp_dir = new TestHelpers::TempDirCreator;
+        m_tmpDir = new TestHelpers::TempDirCreator;
 
         StoreObjPtr<EventMetaData> evtPtr;
         DataStore::Instance().setInitializeActive(true);
@@ -37,7 +37,7 @@ namespace Belle2 {
         DataStore::Instance().setInitializeActive(false);
         evtPtr.construct(1, 0, 0);
 
-        LocalDatabase::createInstance(tmp_dir->getTempDir() + "/testPayloads/TestDatabase.txt");
+        LocalDatabase::createInstance(m_tmpDir->getTempDir() + "/testPayloads/TestDatabase.txt");
       }
 
       /// Destroy the DB and the DataStore.
@@ -47,7 +47,7 @@ namespace Belle2 {
         DBStore::Instance().reset();
         DataStore::Instance().reset();
 
-        delete tmp_dir;
+        delete m_tmpDir;
       }
     };
 

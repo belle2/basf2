@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Lueck, Ulf Stolzenberg, Benjamin Schwenker, Uwe Gebauer        *
+ * Contributors: Thomas Lueck, Ulf Stolzenberg, Benjamin Schwenker, Uwe Gebauer, Bjoern Spruck *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,11 +23,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 
-//root stuff
-#include "TTree.h"
-#include "TString.h"
-#include "TH1D.h"
-#include "TH2D.h"
+#include "TH1F.h"
+#include "TH2F.h"
 #include "TVector3.h"
 
 
@@ -46,30 +43,27 @@ namespace Belle2 {
      */
     PXDDQMEfficiencyModule();
 
-    /**
-     * destructor
-     */
-    virtual ~PXDDQMEfficiencyModule();
+  private:
 
     /**
      * main function which fills trees and histograms
      */
-    virtual void event();
+    void event() override final;
+
+    /**
+     * begin run function which resets histograms
+     */
+    void beginRun() override final;
 
     /**
      * initializes the need store arrays, trees and histograms
      */
-    virtual void initialize();
+    void initialize() override final;
 
     /**
      * actually defines the trees and histograms
      */
-    virtual void defineHisto();
-
-    /**
-     * Do the initialization here
-     */
-    virtual void beginRun();
+    void defineHisto() override final;
 
 
 
@@ -99,6 +93,8 @@ namespace Belle2 {
 
     bool m_cutBorders;
 
+    bool m_verboseHistos; //! add some verbose istograms for cuts
+
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
 
@@ -116,14 +112,29 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_tracks;
     StoreArray<ROIid> m_ROIs;
 
-    double m_distcut; //distance cut in cm!
-    double m_pcut; //pValue-Cut for tracks
-    double m_momCut; //Cut on fitted track momentum
-    unsigned int m_minSVDHits; //Required hits in SVD strips for tracks
-    int m_maskedDistance; //Distance inside which no dead pixel or module border is allowed
+    double m_distcut; // distance cut in cm!
+    double m_uFactor; // factor for track-error on distcut comparison
+    double m_vFactor; // factor for track-error on distcut comparison
+    double m_pcut; // pValue-Cut for tracks
+    double m_momCut; // Cut on fitted track momentum
+    double m_pTCut; // Cut on fitted track pT
+    unsigned int m_minSVDHits; // Required hits in SVD strips for tracks
+    double m_z0minCut;/**> cut z0 minimum in cm (large negativ value eg -9999 disables)*/
+    double m_z0maxCut;/**> cut z0 maximum in cm (large positiv value eg 9999 disables)*/
+    double m_d0Cut;/**> cut abs(d0) in cm (and negativ value eg -9999 disables)*/
+    int m_maskedDistance; // Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency
-    std::map<VxdID, TH2D*> m_h_track_hits;
-    std::map<VxdID, TH2D*> m_h_matched_cluster;
+    std::map<VxdID, TH2F*> m_h_track_hits;
+    std::map<VxdID, TH2F*> m_h_matched_cluster;
+    std::map<VxdID, TH1F*> m_h_p;
+    std::map<VxdID, TH1F*> m_h_pt;
+    std::map<VxdID, TH1F*> m_h_su;
+    std::map<VxdID, TH1F*> m_h_sv;
+    std::map<VxdID, TH1F*> m_h_p2;
+    std::map<VxdID, TH1F*> m_h_pt2;
+    std::map<VxdID, TH1F*> m_h_su2;
+    std::map<VxdID, TH1F*> m_h_sv2;
+
   };
 }

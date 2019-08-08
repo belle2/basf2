@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: David Dossett                                                   *
+ * Contributors: David Dossett                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

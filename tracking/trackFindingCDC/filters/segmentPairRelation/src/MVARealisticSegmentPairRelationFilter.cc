@@ -17,6 +17,6 @@ using namespace TrackFindingCDC;
 template class TrackFindingCDC::MVA<BaseSegmentPairRelationFilter>;
 
 MVARealisticSegmentPairRelationFilter::MVARealisticSegmentPairRelationFilter()
-  : Super(std::make_unique<VarSet>(), "tracking/data/trackfindingcdc_RealisticSegmentPairRelationFilter.xml", 0.22)
+  : Super(std::make_unique<VarSet>(), "trackfindingcdc_RealisticSegmentPairRelationFilter", 0.22)
 {
 }

@@ -16,6 +16,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TProfile.h"
+#include "TProfile2D.h"
 
 // dataobject classes
 #include <framework/datastore/StoreArray.h>
@@ -85,6 +86,7 @@ namespace Belle2 {
     double m_momentumCut; /**< momentum cut */
     double m_pValueCut;   /**< pValue cut */
     bool m_usePionID; /**< use pion ID in track selection */
+    int m_cutNphot;   /**< Number of photon cut */
 
     // histograms
     TH1F* m_recoTime = 0;           /**< time distribution */
@@ -114,6 +116,8 @@ namespace Belle2 {
     std::vector<TH1F*> m_badChannelHits; /**< Histograms for bad channel hits*/
     std::vector<TH1F*> m_goodHitsPerEvent; /**< Histograms for good hits per event*/
     std::vector<TH1F*> m_badHitsPerEvent; /**< Histograms for bad hits per event*/
+    std::vector<TProfile2D*> m_goodHitsXYTrack; /**< Histograms (2D) for good hits in x-y per module with track*/
+    std::vector<TProfile2D*> m_goodHitsXYTrackBkg; /**< Histograms (2D) for good hits in x-y per module with bkg track*/
 
     // other
     int m_numModules = 0; /**< number of TOP modules */

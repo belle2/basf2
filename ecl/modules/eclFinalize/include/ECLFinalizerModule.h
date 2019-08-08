@@ -35,29 +35,32 @@ namespace Belle2 {
     ~ECLFinalizerModule();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
     double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
+    double m_clusterLossyFraction; /**< Maximum allowed fractional difference between nPhotons and neutralHadron number of crystals */
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigits */
     StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */
     StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
     StoreObjPtr<EventT0> m_eventT0; /**< Event T0 */
+
+    int makeCluster(int, double); /**< Make a cluster from a given shower array index */
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/

@@ -215,7 +215,7 @@ namespace Belle2 {
   }
 
 
-  void TOPGainEfficiencyCalculatorModule::LoadHistograms(std::string histotype)
+  void TOPGainEfficiencyCalculatorModule::LoadHistograms(const std::string& histotype)
   {
 
     TFile* f = new TFile(m_inputFile.c_str());
@@ -463,7 +463,7 @@ namespace Belle2 {
   }
 
 
-  void TOPGainEfficiencyCalculatorModule::DrawResult(std::string histotype, EHistogramType LoadHisto)
+  void TOPGainEfficiencyCalculatorModule::DrawResult(const std::string& histotype, EHistogramType LoadHisto)
   {
     std::ostringstream pdfFilename;
     pdfFilename << m_outputPDFFile << "_" << histotype;

@@ -109,7 +109,17 @@ def importRandomPixelMaskPhase2(HotPixelFraction=0.001, expLow=0, runLow=0, expH
     pixelMask = Belle2.PXDMaskedPixelPar()
 
     # Create a list of sensors
-    sensorIDList = [Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"), Belle2.VxdID("2.1.1"), Belle2.VxdID("2.1.2")]
+    sensorIDList = [
+        Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"),
+        Belle2.VxdID("1.2.1"), Belle2.VxdID("1.2.2"),
+        Belle2.VxdID("1.3.1"), Belle2.VxdID("1.3.2"),
+        Belle2.VxdID("1.4.1"), Belle2.VxdID("1.4.2"),
+        Belle2.VxdID("1.5.1"), Belle2.VxdID("1.5.2"),
+        Belle2.VxdID("1.6.1"), Belle2.VxdID("1.6.2"),
+        Belle2.VxdID("1.7.1"), Belle2.VxdID("1.7.2"),
+        Belle2.VxdID("1.8.1"), Belle2.VxdID("1.8.2"),
+        Belle2.VxdID("2.4.1"), Belle2.VxdID("2.4.2"),
+        Belle2.VxdID("2.5.1"), Belle2.VxdID("2.5.2")]
 
     # Mean number of hot pixels per sensor
     AverageHotPixels = HotPixelFraction * 250 * 768

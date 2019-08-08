@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMRECONSTRUCTORMODULE_H
-#define EKLMRECONSTRUCTORMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMAlignmentHit.h>
@@ -124,6 +123,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

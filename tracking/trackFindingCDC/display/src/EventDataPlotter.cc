@@ -12,8 +12,6 @@
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 #include <tracking/trackFindingCDC/display/BoundingBox.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
@@ -770,7 +768,7 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
         }
         const genfit::MeasuredStateOnPlane& state = fittedResult->getFittedState();
         state.getPosMomCov(pos, mom, cov);
-      } catch (genfit::Exception) {
+      } catch (const genfit::Exception&) {
         B2WARNING("Skipping state with strange pos, mom or cov");
         continue;
       }

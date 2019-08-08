@@ -8,15 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMSIMHistogrammerMODULE_H
-#define BKLMSIMHistogrammerMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/dataobjects/BKLMHit1d.h>
-#include <eklm/simulation/FPGAFitter.h>
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH1I.h"
@@ -142,5 +140,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // BKLMDIGITIZERMODULE_H

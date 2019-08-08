@@ -21,7 +21,7 @@ Hough3DFinder::Hough3DFinder(void) :
   m_cotStart(0), m_cotEnd(0), m_z0Start(0), m_z0End(0),
   m_nCotSteps(0), m_nZ0Steps(0), m_cotStepSize(0), m_z0StepSize(0),
   m_houghMeshLayerDiff(0), m_houghMeshLayer(0), m_houghMesh(0), m_houghMeshDiff(0),
-  m_hitMap(0), m_geoCandidatesIndex(0), m_geoCandidatesPhi(0),
+  m_hitMap(0), m_driftMap(0), m_geoCandidatesIndex(0), m_geoCandidatesPhi(0),
   m_geoCandidatesDiffStWires(0), m_stAxPhi(), m_bestCot(0), m_bestZ0(0),
   m_houghMax(0), m_minDiffHough(0), m_foundZ(), m_foundPhiSt(), m_bestTSIndex(),
   m_bestTS(), m_inputFileName("GeoFinder.input"), m_findRhoMax(0), m_findRhoMin(0),

@@ -12,4 +12,4 @@
 
 using namespace Belle2;
 
-AnalysisConfiguration* AnalysisConfiguration::s_instance = 0;
+AnalysisConfiguration* AnalysisConfiguration::s_instance = nullptr;

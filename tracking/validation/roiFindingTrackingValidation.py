@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>giulia.casarosa@desy.de</contact>
+  <contact>software-tracking@belle2.org</contact>
   <output>ROIFindingValidation.root</output>
   <description>
   This module validates the ROI Finding module.
@@ -13,7 +13,7 @@
 #   <input>EvtGenSimNoBkg.root</input>
 
 NAME = 'ROIFinding'  # not used?
-CONTACT = 'giulia.casarosa@desy.de'
+CONTACT = 'software-tracking@belle2.org'
 # INPUT_FILE = '../EvtGenSimNoBkg.root' #can't use it because PXDDataReduction in simulated
 # INPUT_FILE = 'simRootOutput.root'  # for debugging purposes
 OUTPUT_FILE = 'ROIFindingTrackingValidation.root'
@@ -50,31 +50,47 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
         output_file_name=None,
         nROIs=0
     ):
+        """Constructor"""
 
         super().__init__()
+        #: name of this validation output
         self.validation_name = NAME
+        #: contact person
         self.contact = CONTACT
+        #: #: name of the output ROOT file
         self.output_file_name = OUTPUT_FILE
 
+        #: count the number of ROIs
         self.nROIs = 0
+        #: count the number of PXDDigits
         self.nPXDDigits = 0
+        #: count the number of PXDDigits inside the ROIs
         self.nPXDDigitsIN = 0
 
         # default binning used for resolution plots over pt
         #        self.resolution_pt_binning = [0.05, 0.1, 0.25, 0.4, 0.6, 1., 1.5, 2., 3., 4.]
 
     def initialize(self):
+        """Receive signal at the start of event processing"""
 
+        #: list of the number of ROIs in PXD layer 1
         self.nROIs_L1 = collections.deque()
+        #: list of the number of ROIs in PXD layer 2
         self.nROIs_L2 = collections.deque()
 
+        #: list of the ratios of filter to all PXD hits
         self.drf = collections.deque()
 
+        #: list of the u-coordinate sigma in PXD layer 1
         self.statU_L1 = collections.deque()
+        #: list of the v-coordinate sigma in PXD layer 1
         self.statV_L1 = collections.deque()
+        #: list of the u-coordinate sigma in PXD layer 2
         self.statU_L2 = collections.deque()
+        #: list of the v-coordinate sigma in PXD layer 2
         self.statV_L2 = collections.deque()
 
+        #: list of the hit angular information in PXD layer 1
         self.theta_phi_L1 = collections.deque()
 
     def event(self):
@@ -114,6 +130,7 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
                 self.statV_L2.append(inter.getSigmaV())
 
     def terminate(self):
+        """Receive signal at the end of event processing"""
 
         name = self.validation_name
         contact = self.contact

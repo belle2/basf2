@@ -16,6 +16,7 @@
 #include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TTree.h>
@@ -61,10 +62,16 @@ namespace Belle2 {
     std::string m_treeName;
 
     /** ROOT file for output. */
-    std::shared_ptr<TFile> m_file;
+    std::shared_ptr<TFile> m_file{nullptr};
     /** The ROOT TNtuple for output. */
     StoreObjPtr<RootMergeable<TTree>> m_tree;
-    /** Branch addresses */
+    // Counter branch addresses (event number, candidate number etc)
+    int m_event{ -1};                /**< event number */
+    int m_run{ -1};                  /**< run number */
+    int m_experiment{ -1};           /**< experiment number */
+    int m_candidate{ -1};            /**< candidate counter */
+    unsigned int m_ncandidates{0};   /**< total n candidates */
+    /** Variable branch addresses */
     std::vector<double> m_branchAddresses;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
@@ -76,8 +83,9 @@ namespace Belle2 {
     /** Inverse sampling rates */
     std::map<int, unsigned int> m_sampling_rates;
 
-    const Variable::Manager::Var* m_sampling_variable; /**< Variable Pointer to target variable */
+    const Variable::Manager::Var* m_sampling_variable{nullptr}; /**< Variable Pointer to target variable */
     std::map<int, unsigned long int> m_sampling_counts; /**< Current number of samples with this value */
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< the event information */
 
   };
 } // end namespace Belle2

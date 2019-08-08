@@ -58,6 +58,7 @@ namespace Belle2 {
         m_tot = tot;
         m_adc = adc;
         m_tdc = tdc;
+        m_tdc2 = 0;
         m_f2ndHit = false;
       }
 

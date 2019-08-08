@@ -122,7 +122,7 @@ namespace Belle2 {
        */
       void setCanvasHeight(float height);
 
-      /*
+      /**
        *  Indicates the start of a group of drawn elements.
        */
       void startGroup(const AttributeMap& attributeMap = AttributeMap());

@@ -21,11 +21,11 @@ using namespace Belle2;
 
 EKLM::TransformData::TransformData(bool global, Displacement displacementType)
 {
+  /* cppcheck-suppress variableScope */
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, sector, segment;
   int nEndcaps, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
   std::string payload;
-  const EKLMAlignmentData* sectorAlignment, *segmentAlignment;
   AlignmentChecker alignmentChecker(true);
   m_GeoDat = &(GeometryData::Instance());
   nEndcaps = m_GeoDat->getNEndcaps();
@@ -118,8 +118,9 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
         for (iSector = 1; iSector <= nSectors; iSector++) {
           sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
-          sectorAlignment = alignment->getSectorAlignment(sector);
-          if (sectorAlignment == NULL)
+          const EKLMAlignmentData* sectorAlignment =
+            alignment->getSectorAlignment(sector);
+          if (sectorAlignment == nullptr)
             B2FATAL("Incomplete EKLM displacement (alignment) data.");
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
             /* First plane is rotated. */
@@ -141,8 +142,9 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
             for (iSegment = 1; iSegment <= nSegments; iSegment++) {
               segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
                                                 iPlane, iSegment);
-              segmentAlignment = alignment->getSegmentAlignment(segment);
-              if (segmentAlignment == NULL)
+              const EKLMAlignmentData* segmentAlignment =
+                alignment->getSegmentAlignment(segment);
+              if (segmentAlignment == nullptr)
                 B2FATAL("Incomplete EKLM displacement (alignment) data.");
               m_Segment[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
               [iSegment - 1] =
@@ -177,6 +179,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
 EKLM::TransformData::~TransformData()
 {
   int iEndcap, iLayer, iSector, iPlane;
+  /* cppcheck-suppress variableScope */
   int nEndcaps, nLayers, nDetectorLayers, nSectors, nPlanes;
   nEndcaps = m_GeoDat->getNEndcaps();
   nLayers = m_GeoDat->getNLayers();
@@ -227,6 +230,7 @@ EKLM::TransformData::~TransformData()
 void EKLM::TransformData::transformsToGlobal()
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip;
+  /* cppcheck-suppress variableScope */
   int nEndcaps, nLayers, nDetectorLayers, nSectors, nPlanes, nSegments, nStrips;
   nEndcaps = m_GeoDat->getNEndcaps();
   nLayers = m_GeoDat->getNLayers();
@@ -427,9 +431,12 @@ int EKLM::TransformData::getSectorByPosition(
 int EKLM::TransformData::getStripsByIntersection(
   const HepGeom::Point3D<double>& intersection, int* strip1, int* strip2) const
 {
+  /* cppcheck-suppress variableScope */
   int endcap, layer, sector, plane, segment, strip, stripSegment, stripGlobal;
+  /* cppcheck-suppress variableScope */
   int nLayers, nPlanes, nSegments, nStripsSegment, minDistanceSegment;
   double solenoidCenter, firstLayerCenter, layerShift;
+  /* cppcheck-suppress variableScope */
   double x, y, z, l, minY, maxY;
   double minDistance = 0, minDistanceNew, stripWidth;
   HepGeom::Point3D<double> intersectionClhep, intersectionLocal;

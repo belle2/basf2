@@ -38,7 +38,7 @@ namespace Belle2 {
        * @param step the G4Step with the current step information
        * @return true if a Hit has been created, false if the hit was ignored
        */
-      bool step(G4Step* step, G4TouchableHistory*);
+      bool step(G4Step* step, G4TouchableHistory*) override;
       int m_trackID;                    /** track id */
     };
   } //microtpc namespace

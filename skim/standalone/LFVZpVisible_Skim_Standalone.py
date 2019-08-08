@@ -11,33 +11,46 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging
-
-
+from stdCharged import stdPi, stdK, stdE, stdMu
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-02-00'
 skimCode = encodeSkimName('LFVZpVisible')
 import sys
 import os
 import glob
+import argparse
 
-fileList = [
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
-    ]
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
-inputMdstList('MC9', fileList)
+lfvzppath = Path()
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=lfvzppath)
 
-loadStdCharged()
+stdPi('loose', path=lfvzppath)
+stdK('loose', path=lfvzppath)
+stdE('loose', path=lfvzppath)
+stdMu('loose', path=lfvzppath)
+stdPi('all', path=lfvzppath)
+stdK('all', path=lfvzppath)
+stdE('all', path=lfvzppath)
+stdMu('all', path=lfvzppath)
+
 
 from skim.dark import LFVZpVisibleList
-SysList = LFVZpVisibleList()
-skimOutputUdst(skimCode, SysList)
-summaryOfLists(SysList)
+SysList = LFVZpVisibleList(path=lfvzppath)
+skimOutputUdst(skimCode, SysList, path=lfvzppath)
+summaryOfLists(SysList, path=lfvzppath)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=lfvzppath)
+process(lfvzppath)
 
 print(statistics)

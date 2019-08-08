@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDATACONCENTRATORLANE_H
-#define EKLMDATACONCENTRATORLANE_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -82,12 +81,9 @@ namespace Belle2 {
     /** Lane number. */
     int m_Lane;
 
-    /** Needed to make objects storable, */
+    /** Class version, */
     ClassDef(EKLMDataConcentratorLane, 1);
 
   };
 
 }
-
-#endif
-

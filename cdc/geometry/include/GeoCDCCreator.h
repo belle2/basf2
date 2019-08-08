@@ -181,10 +181,10 @@ namespace Belle2 {
       G4VPhysicalVolume* physical_cdc;
 
       //! Sensitive detector
-      CDCSensitiveDetector* m_sensitive;
+      CDCSensitiveDetector* m_sensitive = nullptr;
 
       //! Sensitive detector for background studies
-      BkgSensitiveDetector* m_bkgsensitive;
+      BkgSensitiveDetector* m_bkgsensitive = nullptr;
 
       //! Vector of pointers to G4VisAttributes
       std::vector<G4VisAttributes*> m_VisAttributes;

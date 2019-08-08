@@ -48,7 +48,7 @@ namespace Belle2 {
 
     /// dumps debug information.
     virtual void dump(const std::string& message = std::string(""),
-                      const std::string& prefix = std::string("")) const;
+                      const std::string& prefix = std::string("")) const override;
 
     /// returns a pointer to a track segment.
     const TRGCDCSegment& segment(void) const;

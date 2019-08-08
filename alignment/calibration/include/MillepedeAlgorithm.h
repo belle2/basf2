@@ -14,7 +14,6 @@
 #include <alignment/PedeResult.h>
 #include <alignment/PedeApplication.h>
 #include <alignment/dataobjects/PedeSteering.h>
-#include <boost/python/list.hpp>
 
 namespace Belle2 {
   /**
@@ -50,7 +49,7 @@ namespace Belle2 {
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
     /// Components (BeamParameters...) to calibrate or empty for all available in data
@@ -65,24 +64,6 @@ namespace Belle2 {
     alignment::PedeApplication m_pede{};
     /// Report failure(false) or success (true) even if some parameters could not be determined
     bool m_ignoreUndeterminedParams{false};
-
-    /// Convert IOV to string (to be able to use it as a key in map)
-    std::string to_string(const IntervalOfValidity& iov)
-    {
-      std::stringstream stream;
-      stream << iov;
-      return stream.str();
-    }
-
-    /// Convert string to IOV (to convert map key back to IOV)
-    IntervalOfValidity to_IOV(const std::string& iov)
-    {
-      std::stringstream stream;
-      stream << iov;
-      IntervalOfValidity IOV;
-      stream >> IOV;
-      return IOV;
-    }
 
     /// Write out binary files from data in tree with GBL data to be used by Millepede and add them to steering
     void prepareMilleBinary();

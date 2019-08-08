@@ -89,7 +89,7 @@ StereoHitFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "recording") {
     return std::make_unique<RecordingStereoHitFilter>("StereoHitFilter.root");
   } else if (filterName == "mva") {
-    return std::make_unique<MVAStereoHitFilter>("tracking/data/trackfindingcdc_StereoHitFilter.xml");
+    return std::make_unique<MVAStereoHitFilter>("trackfindingcdc_StereoHitFilter");
   } else {
     return Super::create(filterName);
   }

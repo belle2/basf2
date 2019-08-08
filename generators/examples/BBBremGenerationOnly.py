@@ -8,17 +8,17 @@
 # Example steering file
 ########################################################
 
-from basf2 import *
+import basf2
 
 # Set the global log level
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-main = create_path()
+main = basf2.create_path()
 
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=10000)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=10000)
 
 # Register the BBBremInput module
-bbbrem = register_module('BBBremInput')
+bbbrem = basf2.register_module('BBBremInput')
 
 # Set the fraction of the minimum photon energy.
 # bbbrem.param('MinPhotonEnergyFraction', 0.000001)
@@ -39,10 +39,10 @@ bbbrem.param('DensityCorrectionParameter', 1.68e-17)
 # bbbrem.set_log_level(LogLevel.INFO)
 
 # Register the Progress module and the Python histogram module
-progress = register_module('Progress')
+progress = basf2.register_module('Progress')
 
 # output
-output = register_module('RootOutput')
+output = basf2.register_module('RootOutput')
 output.param('outputFileName', './bbbremgen.root')
 
 # Create the main path and add the modules
@@ -50,12 +50,12 @@ output.param('outputFileName', './bbbremgen.root')
 main.add_module(progress)
 main.add_module(bbbrem)
 
-main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.DEBUG, onlyPrimaries=False)
 
 main.add_module(output)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

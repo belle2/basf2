@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisPXDCharge.h
-// Description : DAQM Analysis for PXD Common Modes
+// Description : DQM Analysis for PXD Cluster Charges
 //
 // Author : Bjoern Spruck, University Mainz
 // Date : 2018
@@ -17,6 +17,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <vector>
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -31,6 +32,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDChargeModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDChargeModule();
   private:
 
     //! Module functions to be called from main process
@@ -56,17 +59,17 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! only one fit function for all Landaus
-    TF1* m_fLandau;
+    TF1* m_fLandau = nullptr;
     //! Fit the Mean for all modules
-    TF1* m_fMean;
+    TF1* m_fMean = nullptr;
     //! Histogram covering all modules
-    TH1F* m_hCharge;
+    TH1F* m_hCharge = nullptr;
     //! Final Canvas
-    TCanvas* m_cCharge;
+    TCanvas* m_cCharge = nullptr;
 
 #ifdef _BELLE2_EPICS
-    //! Place for two EPICS PVs, Mean and maximum deviation
-    chid  mychid[2];
+    //! Place for EPICS PVs, Mean and maximum deviation
+    std::vector <chid> mychid;
 #endif
   };
 } // end namespace Belle2

@@ -49,7 +49,7 @@ namespace Belle2 {
      * @param startPath The processing starts with the first module of this path.
      * @param maxEvent Optional: The maximum number of events that will be processed. If the number is smaller or equal 0, all events will be processed.
      */
-    void process(PathPtr startPath, long maxEvent = 0);
+    void process(const PathPtr& startPath, long maxEvent = 0);
 
     /** Set the name of the module we want to profile
      * @param name Name of the module as returned by getName()
@@ -75,7 +75,7 @@ namespace Belle2 {
     class StoppedBySignalException : public std::runtime_error {
     public:
       /** Constructor. */
-      StoppedBySignalException(int signal);
+      explicit StoppedBySignalException(int signal);
       int signal; /**< see 'man 7 signal'. */
     };
 
@@ -100,7 +100,7 @@ namespace Belle2 {
      * @param maxEvent The maximum number of events that will be processed. If the number is smaller or equal 0, all events are processed.
      * @param isInputProcess true when this is either the only or the input process
      */
-    void processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent = 0, bool isInputProcess = true);
+    void processCore(const PathPtr& startPath, const ModulePtrList& modulePathList, long maxEvent = 0, bool isInputProcess = true);
 
     /** Calls event() functions on all modules for the current event. Used by processCore.
      *
@@ -144,6 +144,11 @@ namespace Belle2 {
      * the endRun() loop will also be called.
      */
     void processEndRun();
+
+    /**
+     * Calculate the maximum event number out of the argument from command line and the environment.
+     */
+    long getMaximumEventNumber(long maxEvent) const;
 
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
     ModulePtrList m_moduleList; /**< List of all modules in order initialized. */

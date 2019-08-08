@@ -36,11 +36,11 @@ namespace Belle2 {
     SVDClusterQualityEstimatorModule();
 
     /** Init the module.*/
-    virtual void initialize();
+    virtual void initialize() override;
     /** Event. */
-    virtual void event();
+    virtual void event() override;
     /** Final output.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:
@@ -52,13 +52,13 @@ namespace Belle2 {
     /** The storeArray for svdClusters */
     StoreArray<SVDCluster> m_svdClusters;
 
-    std::string m_inputPDF; /** File path of root file containing pdf histograms */
+    std::string m_inputPDF; /**< File path of root file containing pdf histograms */
 
-    TFile* m_calibrationFile; /**Pointer to root TFile containing PDF histograms */
+    TFile* m_calibrationFile; /**< Pointer to root TFile containing PDF histograms */
 
-    bool m_useQualityEstimator; /** Standard is true. Can be turned off in case accessing pdf root file is causing errors */
+    bool m_useQualityEstimator; /**< Standard is true. Can be turned off in case accessing pdf root file is causing errors */
 
-    bool m_useLegacyNaming; /** Choice between PDF naming conventions */
+    bool m_useLegacyNaming; /**< Choice between PDF naming conventions */
   };
 } //end namespace Belle2
 

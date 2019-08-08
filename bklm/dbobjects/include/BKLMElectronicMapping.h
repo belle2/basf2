@@ -8,17 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMELECTRONICMAPPING_DB_H
-#define BKLMELECTRONICMAPPING_DB_H
+#pragma once
 
 #include <TObject.h>
 #include <string>
 #include <cmath>
 //#include <framework/logging/Logger.h>
 #include <vector>
-
-#include <TROOT.h>
-#include <TClass.h>
 
 namespace Belle2 {
 
@@ -40,12 +36,12 @@ namespace Belle2 {
      * Constructor
      */
 
-    BKLMElectronicMapping(int version, int copperId, int slotId, int laneId, int axisId, int channelId, int isForward, int sector,
+    BKLMElectronicMapping(int version, int copperId, int slotId, int laneId, int axisId, int channelId, int forward, int sector,
                           int layer,
                           int plane, int stripId)
     {
       m_version = version; m_copperId = copperId; m_slotId = slotId; m_laneId = laneId; m_axisId = axisId; m_channelId = channelId;
-      m_isForward = isForward; m_sector = sector; m_layer = layer; m_plane = plane; m_strip = stripId;
+      m_isForward = forward; m_sector = sector; m_layer = layer; m_plane = plane; m_strip = stripId;
     };
 
     /**
@@ -73,13 +69,22 @@ namespace Belle2 {
      */
     int getLaneId() const {return m_laneId; }
 
+    /**
+     * Set lane.
+     * @param[in] lane Lane.
+     */
+    void setLane(int lane)
+    {
+      m_laneId = lane;
+    }
+
     /** Return electronics channelId in the map
      */
     int getChannelId() const {return m_channelId; }
 
     /** Return forward/backward info. in the map
      */
-    int getIsForward() const {return m_isForward; }
+    int getForward() const {return m_isForward; }
 
     /** Return sector #No in the map
      */
@@ -88,6 +93,15 @@ namespace Belle2 {
     /** Return layer #No in the map
      */
     int getLayer() const {return m_layer; }
+
+    /**
+     * Set layer.
+     * @param[in] layer layer.
+     */
+    void setLayer(int layer)
+    {
+      m_layer = layer;
+    }
 
     /** Return which plane (z/phi) in the map
      */
@@ -120,5 +134,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

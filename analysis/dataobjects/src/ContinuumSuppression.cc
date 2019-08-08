@@ -16,12 +16,12 @@
 
 using namespace Belle2;
 
-void ContinuumSuppression::addThrustB(TVector3 thrustB)
+void ContinuumSuppression::addThrustB(const TVector3& thrustB)
 {
   m_thrustB = thrustB;
 }
 
-void ContinuumSuppression::addThrustO(TVector3 thrustO)
+void ContinuumSuppression::addThrustO(const TVector3& thrustO)
 {
   m_thrustO = thrustO;
 }
@@ -51,22 +51,22 @@ void ContinuumSuppression::addR2(float R2)
   m_R2 = R2;
 }
 
-void ContinuumSuppression::addKsfwFS0(std::vector<float> KsfwFS0)
+void ContinuumSuppression::addKsfwFS0(const std::vector<float>& KsfwFS0)
 {
   m_ksfwFS0 = KsfwFS0;
 }
 
-void ContinuumSuppression::addKsfwFS1(std::vector<float> KsfwFS1)
+void ContinuumSuppression::addKsfwFS1(const std::vector<float>& KsfwFS1)
 {
   m_ksfwFS1 = KsfwFS1;
 }
 
-void ContinuumSuppression::addCleoConesALL(std::vector<float> CleoConesALL)
+void ContinuumSuppression::addCleoConesALL(const std::vector<float>& CleoConesALL)
 {
   m_cleoConesALL = CleoConesALL;
 }
 
-void ContinuumSuppression::addCleoConesROE(std::vector<float> CleoConesROE)
+void ContinuumSuppression::addCleoConesROE(const std::vector<float>& CleoConesROE)
 {
   m_cleoConesROE = CleoConesROE;
 }

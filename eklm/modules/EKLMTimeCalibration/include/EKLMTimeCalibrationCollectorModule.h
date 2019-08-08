@@ -8,15 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATIONCOLLECTORMODULE_H
-#define EKLMTIMECALIBRATIONCOLLECTORMODULE_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
-
-/* External headers. */
-#include <TFile.h>
-#include <TTree.h>
 
 /* Belle2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
@@ -92,6 +87,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

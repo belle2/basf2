@@ -20,11 +20,13 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <top/dataobjects/TOPTimeZero.h>
+#include <framework/dataobjects/MCInitialParticles.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/database/DBObjPtr.h>
+#include <top/dbobjects/TOPCalCommonT0.h>
 
 namespace Belle2 {
-
-  class CDCDedxLikelihood;
-  class VXDDedxLikelihood;
 
   /**
    * Bunch finder: searches for the bunch crossing where the interaction happened
@@ -46,6 +48,11 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
+     * Called when entering a new run.
+     */
+    virtual void beginRun() override;
+
+    /**
      * Event processor.
      */
     virtual void event() override;
@@ -61,12 +68,10 @@ namespace Belle2 {
     /**
      * Return mass of the most probable charged stable particle according to dEdx
      * and predefined prior probabilities
-     * @param cdcdedx dE/dx likelihoods from CDC
-     * @param vxddedx dE/dx likelihoods from VXD
+     * @param track reconstructed track
      * @return mass
      */
-    double getMostProbableMass(const CDCDedxLikelihood* cdcdedx,
-                               const VXDDedxLikelihood* vxddedx);
+    double getMostProbableMass(const Track& track);
 
     // steering parameters
     int m_numBins;      /**< number of bins to which search region is divided */
@@ -76,29 +81,41 @@ namespace Belle2 {
     double m_minSBRatio;  /**< minimal signal-to-background ratio */
     double m_minDERatio;  /**< minimal ratio of detected over expected photons */
     double m_maxDERatio;  /**< maximal ratio of detected over expected photons */
+    double m_minPt; /**< minimal p_T of track */
+    double m_maxPt; /**< maximal p_T of track */
+    double m_maxD0; /**< maximal absolute value of helix perigee distance */
+    double m_maxZ0; /**< maximal absolute value of helix perigee z coordnate */
+    int m_minNHitsCDC; /**< minimal number of hits in CDC */
     bool m_useMCTruth;    /**< use MC truth for mass instead of dEdx most probable */
     bool m_saveHistograms; /**< flag to save histograms */
     double m_tau; /**< first order filter time constant [events] */
     bool m_fineSearch; /**< use fine search */
     bool m_correctDigits; /**< subtract bunch time in TOPDigits */
-    bool m_addOffset; /**< add running average offset to bunch time */
-    double m_bias; /**< bias to be subtracted */
+    bool m_subtractRunningOffset; /**< subtract running offset when running in HLT mode */
     int m_bunchesPerSSTclk; /**< number of bunches per SST clock */
+    bool m_usePIDLikelihoods; /**< if true, use PIDLikelihoods (only on cdst files) */
 
     // internal variables shared between events
-    double m_bunchTimeSep; /**< time between two filled bunches */
+    double m_bunchTimeSep = 0; /**< time between two bunches */
     std::map<int, double> m_priors; /**< map of PDG codes to prior probabilities */
-    double m_offset = 0; /**< running average offset to the reconstructed bunch */
-    double m_error = 0; /**< error on running average offset */
-    unsigned m_eventCount = 0; /**< event counter */
+    double m_runningOffset = 0; /**< running average of bunch offset */
+    double m_runningError = 0; /**< error on running average */
+    bool m_HLTmode = false; /**< use running average to correct digits */
     unsigned m_processed = 0; /**< processed events */
     unsigned m_success = 0; /**< events with reconstructed bunch */
+    int m_nodEdxCount = 0; /**< counter of tracks with no dEdx, reset at each event */
 
     // collections
     StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */
     StoreArray<TOPRawDigit> m_topRawDigits; /**< collection of TOP raw digits */
     StoreArray<Track> m_tracks; /**< collection of tracks */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
+    StoreObjPtr<MCInitialParticles> m_initialParticles; /**< simulated beam particles */
+    StoreArray<TOPTimeZero> m_timeZeros; /**< collection of T0 of individual tracks */
+    StoreObjPtr<EventT0> m_eventT0; /**< event T0 */
+
+    // database
+    DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
 
   };
 

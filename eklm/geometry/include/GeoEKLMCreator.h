@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_GEOEKLMCREATOR_H
-#define EKLM_GEOEKLMCREATOR_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -416,7 +415,7 @@ namespace Belle2 {
        * @param[in] name    First part of solid names.
        */
       G4VSolid* unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
-                            int nSolids, std::string name);
+                            int nSolids, const std::string& name);
 
       /**
        * Create plastic sheet logical volume.
@@ -500,8 +499,8 @@ namespace Belle2 {
        * @param[in] layer  Layer logical volume.
        * @return Layer logical volume.
        *
-       * If layer == NULL, then new layer logical volume is created
-       * (for detector layers). If layer != NULL, then the existing
+       * If layer == nullptr, then new layer logical volume is created
+       * (for detector layers). If layer != nullptr, then the existing
        * logical volume is used (for shield layers).
        */
       G4LogicalVolume* createLayer(G4LogicalVolume* endcap,
@@ -513,8 +512,8 @@ namespace Belle2 {
        * @param[in] sector Sector logical volume.
        * @return Sector logical volume.
        *
-       * If sector == NULL, then new sector logical volume is created
-       * (for detector layers). If sector != NULL, then the existing
+       * If sector == nullptr, then new sector logical volume is created
+       * (for detector layers). If sector != nullptr, then the existing
        * logical volume is used (for shield layers).
        */
       G4LogicalVolume* createSector(G4LogicalVolume* layer,
@@ -673,6 +672,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

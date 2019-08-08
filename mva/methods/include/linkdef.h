@@ -1,5 +1,7 @@
 #ifdef __CINT__
 
+// Remember to include your headers in methods/include/MVA.h, otherwise cling will not find them.
+
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
@@ -8,6 +10,7 @@
 
 #pragma link C++ class Belle2::MVA::FastBDTOptions-;
 #pragma link C++ class Belle2::MVA::PDFOptions-;
+#pragma link C++ class Belle2::MVA::RegressionFastBDTOptions-;
 #pragma link C++ class Belle2::MVA::CombinationOptions-;
 #pragma link C++ class Belle2::MVA::FANNOptions-;
 #pragma link C++ class Belle2::MVA::TMVAOptions-;

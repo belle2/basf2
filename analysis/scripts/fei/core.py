@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# @cond
+# @cond SUPPRESS_DOXYGEN
 
 # Thomas Keck 2017
 
@@ -502,8 +502,12 @@ class PostReconstruction(object):
                                      variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                      filename=config.removeJPsiSlash(filename), path=path)
 
-                variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                             'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                if 'B' in particle.identifier:
+                    variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                                 'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                else:
+                    variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 filename = 'Monitor_Final_{}.root'.format(particle.identifier)
                 variablesToNtuple(particle.identifier, variables, treename='variables',
                                   filename=config.removeJPsiSlash(filename), path=path)
@@ -895,3 +899,5 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
 
     # Finally we return the path, the stage and the used lists to the user.
     return FeiState(path, stage + 1, plists=used_lists)
+
+# @endcond

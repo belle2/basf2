@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Thomas Kuhr, Thomas Hauth                 *
+ * Contributors: Martin Ritter, Thomas Kuhr                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,7 +15,9 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
-#include <framework/logging/LogConnectionFileDescriptor.h>
+#include <framework/logging/LogConnectionJSON.h>
+#include <framework/logging/LogConnectionUDP.h>
+#include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogVariableStream.h>
 
 #include <framework/core/Environment.h>
@@ -23,6 +25,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
@@ -30,7 +33,7 @@ using namespace boost::python;
 
 void LogPythonInterface::setLogLevel(LogConfig::ELogLevel level)
 {
-  LogConfig::ELogLevel overrideLevel = (LogConfig::ELogLevel)Environment::Instance().getLogLevelOverride();
+  auto overrideLevel = (LogConfig::ELogLevel)Environment::Instance().getLogLevelOverride();
   if (overrideLevel != LogConfig::c_Default)
     level = overrideLevel;
 
@@ -82,6 +85,16 @@ LogConfig& LogPythonInterface::getPackageLogConfig(const std::string& package)
   return LogSystem::Instance().getPackageLogConfig(package);
 }
 
+void LogPythonInterface::addLogJSON(bool complete)
+{
+  LogSystem::Instance().addLogConnection(new LogConnectionJSON(complete));
+}
+
+void LogPythonInterface::addLogUDP(const std::string& hostname, unsigned short port)
+{
+  LogSystem::Instance().addLogConnection(new LogConnectionUDP(hostname, port));
+}
+
 void LogPythonInterface::addLogFile(const std::string& filename, bool append)
 {
   LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionTxtFile(filename, append)));
@@ -89,12 +102,12 @@ void LogPythonInterface::addLogFile(const std::string& filename, bool append)
 
 void LogPythonInterface::addLogConsole()
 {
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 }
 
 void LogPythonInterface::addLogConsole(bool color)
 {
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO, color)));
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO, color)));
 }
 
 void LogPythonInterface::reset()
@@ -112,13 +125,23 @@ void LogPythonInterface::enableErrorSummary(bool on)
   LogSystem::Instance().enableErrorSummary(on);
 }
 
+void LogPythonInterface::setPythonLoggingEnabled(bool enabled) const
+{
+  LogConnectionConsole::setPythonLoggingEnabled(enabled);
+}
+
+bool LogPythonInterface::getPythonLoggingEnabled() const
+{
+  return LogConnectionConsole::getPythonLoggingEnabled();
+}
+
 /** Return dict containing message counters */
 dict LogPythonInterface::getLogStatistics()
 {
   dict returnDict;
   LogSystem& logSys = LogSystem::Instance();
   for (int iLevel = 0; iLevel < LogConfig::c_Default; ++iLevel) {
-    LogConfig::ELogLevel logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
+    auto logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
     returnDict[logLevel] = logSys.getMessageCounter(logLevel);
   }
   return returnDict;
@@ -139,7 +162,7 @@ namespace {
 
   bool terminalSupportsColors()
   {
-    return LogConnectionFileDescriptor::terminalSupportsColors(STDOUT_FILENO);
+    return LogConnectionConsole::terminalSupportsColors(STDOUT_FILENO);
   }
 }
 
@@ -160,6 +183,20 @@ void LogPythonInterface::exposePythonAPI()
   by default. In contrast to all other log levels DEBUG messages have an
   additional numeric indication of their priority called the ``debug_level`` to
   allow for different levels of verbosity.
+
+  The agreed values for ``debug_level`` are
+
+  * **0-9** for user code. These numbers are reserved for user analysis code and
+    may not be used by any part of basf2.
+  * **10-19** for analysis package code. The use case is that a user wants to debug
+    problems in analysis jobs with the help of experts.
+
+  * **20-29** for simulation/reconstruction code.
+  * **30-39** for core framework code.
+
+  .. note:: The default maximum debug level which will be shown when
+            running ``basf2 --debug`` without any argument for ``--debug`` is **10**
+
 
 .. attribute:: INFO
 
@@ -273,8 +310,8 @@ These fields can be used as a bitmask to configure the appearance of log message
   void (LogPythonInterface::*addLogConsole)(bool) = &LogPythonInterface::addLogConsole;
 
   //Interface the Interface class :)
-  class_<LogPythonInterface, boost::noncopyable>("LogPythonInterface",
-                                                 R"(Logging configuration (for messages generated from C++ or Python), available as a global `basf2.logging` object in Python. See also `basf2.set_log_level()` and `basf2.set_debug_level()`.
+  class_<LogPythonInterface, std::shared_ptr<LogPythonInterface>, boost::noncopyable>("LogPythonInterface", R"(
+Logging configuration (for messages generated from C++ or Python), available as a global `basf2.logging` object in Python. See also `basf2.set_log_level()` and `basf2.set_debug_level()`.
 
 This class exposes a object called `logging` to the python interface. With
 this object it is possible to set all properties of the logging system
@@ -330,6 +367,31 @@ Parameters:
   .def("add_console", addLogConsole,
        addLogConsole_overloads(args("enable_color"), "Write log output to console. (In addition to existing outputs). "
                                "If ``enable_color`` is not specified color will be enabled if supported"))
+  .def("add_json", &LogPythonInterface::addLogJSON, (bp::arg("complete_info") = false), R"DOCSTRING(
+Write log output to console, but format log messages as json objects for
+simplified parsing by other tools.  Each log message will be printed as a one
+line JSON object.
+
+.. versionadded:: release-03-00-00
+
+Parameters:
+   complete_info (bool): If this is set to True the complete log information is printed regardless of the `LogInfo` setting.
+
+See Also:
+   `add_console()`, `set_info()`
+)DOCSTRING")
+  .def("add_udp", &LogPythonInterface::addLogUDP, (bp::arg("hostname"), bp::arg("port")), R"DOCSTRING(
+    Send the log output as a JSON object to the given hostname and port via UDP.
+
+.. versionadded:: release-04-00-00
+
+Parameters:
+   hostname (str): The hostname to send the message to. If it can not be resolved, an exception will be thrown.
+   port (int): The port on the host to send the message via UDP.
+
+See Also:
+   `add_json()`
+)DOCSTRING")
   .def("terminal_supports_colors", &terminalSupportsColors, "Returns true if the terminal supports colored output")
   .staticmethod("terminal_supports_colors")
   .def("reset", &LogPythonInterface::reset, "Remove all configured logging outputs. "
@@ -340,7 +402,20 @@ Parameters:
   .def("enable_summary", &LogPythonInterface::enableErrorSummary, args("on"),
        "Enable or disable the error summary printed at the end of processing. "
        "Expects one argument whether or not the summary should be shown")
+  .add_property("enable_python_logging",  &LogPythonInterface::getPythonLoggingEnabled,
+                &LogPythonInterface::setPythonLoggingEnabled, R"DOCSTRING(
+Enable or disable logging via python. If this is set to true than log messages
+will be sent via `sys.stdout`. This is probably slightly slower but is useful
+when running in jupyter notebooks or when trying to redirect stdout in python
+to a buffer. This setting affects all log connections to the
+console.
+
+.. versionadded:: release-03-00-00)DOCSTRING")
   ;
+
+  //Expose Logging object
+  std::shared_ptr<LogPythonInterface> initguard{new LogPythonInterface()};
+  scope().attr("logging") = initguard;
 
   //Add all the logging functions. To handle arbitrary keyword arguments we add
   //them as raw functions. However it seems setting the docstring needs to be
@@ -348,40 +423,44 @@ Parameters:
   //set docstring ...
 
   const std::string common_doc = R"DOCSTRING(
-All additional positional arguments are concatenated to the message and all
-keyword arguments are added to the function as log variables.)DOCSTRING";
+All additional positional arguments are converted to strings and concatenated
+to the log message. All keyword arguments are added to the function as
+:ref:`logging_logvariables`.)DOCSTRING";
 
   auto logDebug = raw_function(&LogPythonInterface::logDebug);
   def("B2DEBUG", logDebug);
   setattr(logDebug, "__doc__", "B2DEBUG(debugLevel, message, *args, **kwargs)\n\n"
           "Print a `DEBUG <basf2.LogLevel.DEBUG>` message. "
-          "The first argument is the debug Level" + common_doc);
+          "The first argument is the `debug_level <basf2.LogLevel.DEBUG>`. " +
+          common_doc);
 
   auto logInfo = raw_function(&LogPythonInterface::logInfo);
   def("B2INFO", logInfo);
   setattr(logInfo, "__doc__", "B2INFO(message, *args, **kwargs)\n\n"
-          "Print a `INFO <basf2.LogLevel.INFO>` message" + common_doc);
+          "Print a `INFO <basf2.LogLevel.INFO>` message. " + common_doc);
 
   auto logResult = raw_function(&LogPythonInterface::logResult);
   def("B2RESULT", logResult);
   setattr(logResult, "__doc__", "B2RESULT(message, *args, **kwargs)\n\n"
-          "Print a `RESULT <basf2.LogLevel.RESULT>` message" + common_doc);
+          "Print a `RESULT <basf2.LogLevel.RESULT>` message. " + common_doc
+          + "\n\n.. deprecated:: release-01-00-00\n    use `B2INFO()` instead");
 
   auto logWarning = raw_function(&LogPythonInterface::logWarning);
   def("B2WARNING", logWarning);
   setattr(logWarning, "__doc__", "B2WARNING(message, *args, **kwargs)\n\n"
-          "Print a `WARNING <basf2.LogLevel.WARNING>` message" + common_doc);
+          "Print a `WARNING <basf2.LogLevel.WARNING>` message. " + common_doc);
 
   auto logError = raw_function(&LogPythonInterface::logError);
   def("B2ERROR", logError);
   setattr(logError, "__doc__", "B2ERROR(message, *args, **kwargs)\n\n"
-          "Print a `ERROR <basf2.LogLevel.ERROR>` message" + common_doc);
+          "Print a `ERROR <basf2.LogLevel.ERROR>` message. " + common_doc);
 
   auto logFatal = raw_function(&LogPythonInterface::logFatal);
   def("B2FATAL", logFatal);
   setattr(logFatal, "__doc__", "B2FATAL(message, *args, **kwargs)\n\n"
-          "Print a `FATAL <basf2.LogLevel.FATAL>` message. "
-          "This also exits the programm with an error" + common_doc);
+          "Print a `FATAL <basf2.LogLevel.FATAL>` message. " + common_doc +
+          "\n\n.. note:: This also exits the programm with an error and is "
+          "guaranteed to not return.");
 }
 
 namespace {
@@ -395,7 +474,7 @@ namespace {
    * objects to a std::map<string,string> by using the `str()` operator in
    * python.
    */
-  auto pythonDictToMap(dict d)
+  auto pythonDictToMap(const dict& d)
   {
     std::map<std::string, std::string> result;
     if (d.is_none()) return result;
@@ -414,7 +493,7 @@ namespace {
    * log stream variables. In case of debug messages the first argument is
    * treated as the debug level.
    */
-  boost::python::object dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, boost::python::dict kwargs)
+  void dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, const boost::python::dict& kwargs)
   {
     int debugLevel = 0;
     const int firstArg = logLevel == LogConfig::c_Debug ? 1 : 0;
@@ -454,55 +533,50 @@ namespace {
       Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(logLevel, std::move(lvs), "steering",
                                                 function, file, line, debugLevel));
     }
-    // return None
-    return boost::python::object();
   }
 }
 
-boost::python::object LogPythonInterface::logDebug(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logDebug(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2DEBUG
-  return dispatchMessage(LogConfig::c_Debug, args, kwargs);
-#elif
-  return boost::python::object();
+  dispatchMessage(LogConfig::c_Debug, std::move(args), kwargs);
 #endif
+  return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logInfo(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logInfo(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2INFO
-  return dispatchMessage(LogConfig::c_Info, args, kwargs);
-#elif
-  return boost::python::object();
+  dispatchMessage(LogConfig::c_Info, std::move(args), kwargs);
 #endif
+  return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logResult(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logResult(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2RESULT
-  return dispatchMessage(LogConfig::c_Result, args, kwargs);
-#elif
-  return boost::python::object();
+  dispatchMessage(LogConfig::c_Result, std::move(args), kwargs);
 #endif
+  return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logWarning(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logWarning(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2WARNING
-  return dispatchMessage(LogConfig::c_Warning, args, kwargs);
-#elif
-  return boost::python::object();
+  dispatchMessage(LogConfig::c_Warning, std::move(args), kwargs);
 #endif
+  return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logError(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logError(boost::python::tuple args, const boost::python::dict& kwargs)
 {
-  return dispatchMessage(LogConfig::c_Error, args, kwargs);
+  dispatchMessage(LogConfig::c_Error, std::move(args), kwargs);
+  return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logFatal(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logFatal(boost::python::tuple args, const boost::python::dict& kwargs)
 {
-  dispatchMessage(LogConfig::c_Fatal, args, kwargs);
+  dispatchMessage(LogConfig::c_Fatal, std::move(args), kwargs);
   std::exit(1);
   return boost::python::object();
 }

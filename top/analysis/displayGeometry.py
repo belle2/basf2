@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 from ROOT import Belle2
 
 # ---------------------------------------------------------------------------
@@ -19,7 +20,7 @@ main = create_path()
 
 # set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # gearbox
@@ -32,6 +33,7 @@ main.add_module(gearbox)
 
 # geometry (TOP only)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

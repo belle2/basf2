@@ -4,7 +4,7 @@
 #######################################################
 # run 'pydoc3 vertex' for general documentation of vertexxing stuff
 #
-# I recommend to use the TreeFitter for everything as it is the fastest tool
+# It is recommended to use the TreeFitter for everything as it is the fastest tool
 #
 # If you want to fit precise vertices with nTracks>2 attached and you are
 # interested in the vertex postion, TagV COULD BE the better tool as it
@@ -19,58 +19,61 @@
 #
 # is reconstructed.
 #
-#
 # Note: This example is build upon
 # B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.py
 #
-# Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
-#
-# Contributors: J.F.Krohn
+# Contributors: J.F.Krohn (2018)
+#               I. Komarov (September 2018)
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
-from modularAnalysis import massKFit
+import basf2 as b2
+import modularAnalysis as ma
+import variables.collections as vc
+import variables.utils as vu
+import vertex as vx
 from stdPi0s import stdPi0s
 
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst-B0D0pi0.root']
-out_put_name = 'mdst-B0D0pi0-TreeFitted.root'
+# create path
+my_path = b2.create_path()
 
-inputMdstList('default', filelistSIG)
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+             path=my_path)
+
 
 # use standard final state particle lists
 #
 # creates "pi0:looseFit" ParticleList
-stdPi0s('looseFit')
+# https://confluence.desy.de/display/BI/Physics+StandardParticles
+stdPi0s(listtype='looseFit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-reconstructDecay('D0:pi0pi0 -> pi0:looseFit pi0:looseFit', '1.7 < M < 2.0')
-
+ma.reconstructDecay(decayString='D0:pi0pi0 -> pi0:looseFit pi0:looseFit',
+                    cut='1.7 < M < 2.0',
+                    path=my_path)
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0')
+ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:looseFit',
+                    cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
+                    path=my_path)
 
-vertexTree(list_name='B0:all',
-           conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
-           ipConstraint=True,
-           # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
-           updateAllDaughters=True,  # update momenta off ALL particles
-           massConstraint=[111]  # mass constrain ALL pi0
-           )
+vx.vertexTree(list_name='B0:all',
+              conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
+              ipConstraint=True,
+              # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
+              updateAllDaughters=True,  # update momenta off ALL particles
+              massConstraint=['pi0'],  # mass constrain ALL pi0
+              path=my_path
+              )
 
 # perform MC matching (MC truth association)
-matchMCTruth('B0:all')
+ma.matchMCTruth(list_name='B0:all',
+                path=my_path)
 
 # whatever you are interested in
 #
@@ -84,14 +87,15 @@ variables = [
 ]
 
 # safe the output
-analysis_main.add_module('VariablesToNtuple',
-                         treeName='B0',
-                         particleList='B0:all',
-                         variables=variables,
-                         fileName=out_put_name)
+output_name = "B2A400-TreeFit.root"
+my_path.add_module('VariablesToNtuple',
+                   treeName='B0',
+                   particleList='B0:all',
+                   variables=variables,
+                   fileName=output_name)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

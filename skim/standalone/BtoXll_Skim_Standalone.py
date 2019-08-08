@@ -10,48 +10,54 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
-from stdLightMesons import *
+from skim.standardlists.lightmesons import *
 from stdPhotons import *
-set_log_level(LogLevel.INFO)
-from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
-import sys
-import os
-import glob
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
+gb2_setuprel = 'release-03-02-00'
 skimCode = encodeSkimName('BtoXll')
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
 
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
-inputMdstList('MC9', fileList)
-loadStdSkimPi0()
-loadStdSkimPhoton()
-stdPi0s('loose')
-stdPhotons('loose')
-loadStdCharged()
-stdK('95eff')
-stdPi('95eff')
-stdE('95eff')
-stdMu('95eff')
-stdMu('90eff')
-stdKshorts()
-loadStdLightMesons()
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
+path = Path()
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=path)
+loadStdSkimPi0(path=path)
+loadStdSkimPhoton(path=path)
+stdPi0s('loose', path=path)
+stdPhotons('loose', path=path)
+stdK('95eff', path=path)
+stdPi('95eff', path=path)
+stdE('95eff', path=path)
+stdMu('95eff', path=path)
+stdK('loose', path=path)
+stdPi('loose', path=path)
+stdKshorts(path=path)
+loadStdLightMesons(path=path)
+
+cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1', path=path)
+reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580', path=path)
 # EWP Skim
-from BtoXll_List import *
-XllList = B2XllList()
-skimOutputUdst(skimCode, XllList)
-summaryOfLists(XllList)
+from skim.ewp import B2XllList
+XllList = B2XllList(path=path)
+skimOutputUdst(skimCode, XllList, path=path)
+summaryOfLists(XllList, path=path)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=path)
+process(path=path)
 
 # print out the summary
 print(statistics)

@@ -55,20 +55,19 @@ namespace Belle2 {
       /**
        *Initializes the Module.
        */
-      virtual void initialize() override;
-      virtual void beginRun() override;
-      virtual void event() override;
-      virtual void endRun() override;
+      virtual void initialize() override; /**<initialize*/
+      virtual void beginRun() override; /**<begin run*/
+      virtual void event() override; /**<event*/
+      virtual void endRun() override; /**<end run*/
 
-      std::string m_rawSVDListName;
-      std::string m_svdDigitListName;
+      std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
+      std::string m_svdDigitListName; /**<SVDDigit StoreArray name*/
 
-      bool m_generateOldDigits;
-      std::string m_svdShaperDigitListName;
-      std::string m_svdDAQDiagnosticsListName;
+      bool m_generateOldDigits;  /**< whether to produce old SVDDigit format*/
+      std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
+      std::string m_svdDAQDiagnosticsListName; /**<SVDDAQDiagnostic StoreArray name*/
 
-      int m_wrongFTBcrc;
-
+      int m_wrongFTBcrc; /**<FTB CRC no-Match counter*/
 
 
     private:
@@ -100,8 +99,8 @@ namespace Belle2 {
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
         unsigned int trgType   : 4;
-        unsigned int trgTiming : 3;
-        unsigned int onebit    : 1;
+        unsigned int trgTiming : 2;
+        unsigned int xTalk     : 2;
         unsigned int FADCnum   : 8;
         unsigned int evtType   : 1; // Event type(0): 0…TTD event, 1…standalone event
         unsigned int DAQMode   : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
@@ -112,9 +111,6 @@ namespace Belle2 {
       struct APVHeader {
         unsigned int CMC1      : 8; //LSB
         unsigned int CMC2      : 4;
-//         unsigned int fifoErr   : 1;
-//         unsigned int frameErr  : 1;
-//         unsigned int detectErr : 1;
         unsigned int apvErr    : 4;
         unsigned int pipelineAddr : 8;
         unsigned int APVnum : 6;
@@ -140,10 +136,8 @@ namespace Belle2 {
 
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
-        unsigned int emuPipeAddr: 8;
-//         unsigned int fifoErrOR   : 1;
-//         unsigned int frameErrOR  : 1;
-//         unsigned int detectErrOR : 1;
+        unsigned int dataSizeCut: 1;
+        unsigned int nullDigits: 7;
         unsigned int apvErrOR  : 4;
         unsigned int check : 4; //MSB
       };
@@ -156,14 +150,14 @@ namespace Belle2 {
 
 
       union {  // The 4 byte words of the stream can be interpreted as:
-        uint32_t m_data32;
-        FTBHeader m_FTBHeader;
-        MainHeader m_MainHeader;
-        APVHeader m_APVHeader;
-        data_A  m_data_A;
-        data_B  m_data_B;
-        FADCTrailer m_FADCTrailer;
-        FTBTrailer m_FTBTrailer;
+        uint32_t m_data32; /**< Input 32-bit data word */
+        FTBHeader m_FTBHeader; /**< Implementation of FTB Header */
+        MainHeader m_MainHeader;  /**< Implementation of FADC Header */
+        APVHeader m_APVHeader;  /**< Implementation of APV Header */
+        data_A  m_data_A; /**< Implementation of 1st data word */
+        data_B  m_data_B; /**< Implementation of 2nd data word */
+        FADCTrailer m_FADCTrailer;  /**< Implementation of FADC Trailer */
+        FTBTrailer m_FTBTrailer; /**< Implementation of FTB Trailer */
       };
 
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
@@ -198,6 +192,27 @@ namespace Belle2 {
        *  APV/FADC combination in the mapping -> wrong payload is identified
        */
       bool m_badMappingFatal = false;
+
+      /** Optionally we can get printout of Raw Data words */
+      bool m_printRaw;
+
+      /** The parameter that indicates what fraction of B2ERRORs messages
+       * should be suppressed to not overload HLT while data taking
+       */
+      int m_errorRate;
+
+      /** this 4-bits value should be 1111 if no headers/trailers are missing */
+      unsigned short seenHeadersAndTrailers: 4;
+
+      /** counters for specific ERRORS produced by the Unpacker */
+      int nTriggerMatchErrors;
+      int nEventMatchErrors;
+      int nUpsetAPVsErrors;
+      int nErrorFieldErrors;
+      int nMissingAPVsErrors;
+      int nFADCMatchErrors;
+      int nAPVErrors;
+      int nFTBFlagsErrors;
 
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;

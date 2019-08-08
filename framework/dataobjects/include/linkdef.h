@@ -15,7 +15,6 @@
 
 #pragma link C++ class Belle2::Helix+;
 #pragma link C++ class Belle2::UncertainHelix+;
-#pragma link C++ class Belle2::EventT0::IntOrDouble+;
 #pragma link C++ class Belle2::EventT0+;
 #pragma link C++ class Belle2::EventT0::EventT0Component+;
 #pragma link C++ class Belle2::BinnedEventT0+;
@@ -31,12 +30,12 @@
   code="{m_nEvents = onfile.m_events;}"
 
 #pragma link C++ class Belle2::DisplayData+;
-#pragma link C++ class vector<TVector3>+;
-#pragma link C++ class map<string, vector<TVector3> >+;
-#pragma link C++ class pair<string, TVector3>+;
-#pragma link C++ class vector<pair<string, TVector3> >+;
-#pragma link C++ class vector<TH1*>+;
+#pragma link C++ class std::vector<TVector3>+;
+#pragma link C++ class std::map<string, vector<TVector3>>+;
+#pragma link C++ class std::pair<string, TVector3>+;
+#pragma link C++ class std::vector<std::pair<std::string, TVector3>>+;
+#pragma link C++ class std::vector<TH1*>+;
 #pragma link C++ class Belle2::DisplayData::Arrow+;
-#pragma link C++ class vector<Arrow>+;
+#pragma link C++ class std::vector<Belle2::DisplayData::Arrow>+;
 
 #endif

@@ -42,11 +42,15 @@ namespace Belle2 {
               const std::string& prefix = std::string("")) const;
 
   public:// Modifiers
-    virtual int fit(TRGCDCTrackBase&) const;
+    // Fitter
+    virtual int fit(TRGCDCTrackBase&) const override;
 
   private:
+    /// charge
     mutable double _charge;
+    /// radius
     mutable double _radius;
+    /// center
     mutable HepGeom::Point3D<double> _center;
   };
 

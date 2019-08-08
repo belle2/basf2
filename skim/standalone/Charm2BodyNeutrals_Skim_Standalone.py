@@ -11,39 +11,53 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
 import os
 import sys
 import glob
+import argparse
 skimCode = encodeSkimName('Charm2BodyNeutrals')
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
+c2bnpath = Path()
+
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=c2bnpath)
 
 
-inputMdstList('MC9', fileList)
+stdPi('loose', path=c2bnpath)
+stdK('loose', path=c2bnpath)
+stdE('loose', path=c2bnpath)
+stdMu('loose', path=c2bnpath)
+stdPi('all', path=c2bnpath)
+stdK('all', path=c2bnpath)
+stdE('all', path=c2bnpath)
+stdMu('all', path=c2bnpath)
+stdKshorts(path=c2bnpath)
+mergedKshorts(path=c2bnpath)
+loadStdSkimPi0(path=c2bnpath)
 
+from skim.charm import DstToD0Neutrals
+DstList = DstToD0Neutrals(c2bnpath)
+skimOutputUdst(skimCode, DstList, path=c2bnpath)
 
-loadStdCharged()
-loadStdKS()
-loadStdSkimPi0()
+summaryOfLists(DstList, path=c2bnpath)
 
-from Charm2BodyNeutrals_List import *
-
-
-DstList = DstToD0Neutrals()
-skimOutputUdst(skimCode, DstList)
-
-summaryOfLists(DstList)
-
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=c2bnpath)
+process(path=c2bnpath)
 
 print(statistics)

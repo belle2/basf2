@@ -22,10 +22,10 @@ TrgBit::versionFTDL(void) const
 TrgBit::TrgBit(void)
   : _exp(0),
     _run(0),
-    _isFiredFilled(false),
-    nconf_input(0),
+    nconf_psnm(0),
     nconf_ftdl(0),
-    nconf_psnm(0)
+    nconf_input(0),
+    _isFiredFilled(false)
 {
 
   StoreObjPtr<EventMetaData> bevt;

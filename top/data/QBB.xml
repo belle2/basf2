@@ -51,7 +51,7 @@
     <height descr="up to the side rails (changed from 43.4 mm)" unit="mm">36.4</height>
     <angle unit="deg">11.25</angle>
     <bottomThickness descr="TBC" unit="mm">3.0</bottomThickness>
-    <sideThickness descr="TBC" unit="mm">1.5</sideThickness>
+    <sideThickness descr="TBC" unit="mm">0.9</sideThickness>
     <backThickness descr="TBC" unit="mm">8.0</backThickness>
     <frontThickness descr="TBC" unit="mm">3.0</frontThickness>
     <extensionThickness descr="TBC" unit="mm">5.0</extensionThickness>

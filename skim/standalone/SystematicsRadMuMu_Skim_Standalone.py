@@ -6,37 +6,46 @@
 #
 # Systematics Skims for radiative muon pairs
 # Torben Ferber (torben.ferber@desy.de), 2018
+# Sam Cunliffe (sam.cunliffe@desy.de)
 #
 #######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging
-
+from basf2 import process, statistics, Path, set_log_level, LogLevel
+from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
+from stdCharged import stdMu
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-02-00'
 
-import sys
-import os
-import glob
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002314/e0000/4S/r00000/mumu_ecldigits/sub00/' +
-    'mdst_000001_prod00002314_task00000001.root']
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
+# create a path to build skim lists
+skimpath = Path()
 
-inputMdstList('MC9', fileList)
+# input test data
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=skimpath)
+stdMu('all', path=skimpath)
 
-loadStdCharged()
-
+# setup the skim get the skim code
 from skim.systematics import SystematicsRadMuMuList
-SysList = SystematicsRadMuMuList()
+SysList = SystematicsRadMuMuList(skimpath)
 skimCode = encodeSkimName('SystematicsRadMuMu')
-skimOutputUdst(skimCode, SysList)
-summaryOfLists(SysList)
+skimOutputUdst(skimCode, SysList, path=skimpath)
+summaryOfLists(SysList, path=skimpath)
 
-setSkimLogging()
-process(analysis_main)
+# silence noisy modules
+setSkimLogging(path=skimpath)
 
+# process the path (run the skim)
+process(skimpath)
 print(statistics)

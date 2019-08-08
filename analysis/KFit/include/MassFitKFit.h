@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef MASSFITKFIT_H
-#define MASSFITKFIT_H
-
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -124,6 +121,11 @@ namespace Belle2 {
        */
       enum KFitError::ECode doFit(void);
 
+      /**
+       * Update mother particle.
+       * @param[in] mother Mother particle.
+       */
+      enum KFitError::ECode updateMother(Particle* mother);
 
     private:
       enum KFitError::ECode prepareInputMatrix(void) override;
@@ -165,6 +167,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* MASSFITKFIT_H */
-

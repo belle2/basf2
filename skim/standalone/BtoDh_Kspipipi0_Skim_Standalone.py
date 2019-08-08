@@ -10,42 +10,49 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from skimExpertFunctions import *
+from skim.standardlists.charm import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-02-00'
 
-import os
-import sys
-import glob
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
+path = Path()
+
 skimCode = encodeSkimName('BtoDh_Kspipipi0')
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC12")
+
+inputMdstList('default', fileList, path=path)
 
 
-inputMdstList('MC9', fileList)
-
-
-loadStdCharged()
-loadStdKS()
-loadStdSkimPi0()
+stdPi('all', path=path)
+stdK('all', path=path)
+stdKshorts(path=path)
+loadStdSkimPi0(path=path)
 
 # B- to D(->Kspipipi0)h- Skim
-from BtoDh_Kspipipi0_List import *
-loadDkspipipi0()
-BtoDhList = BsigToDhToKspipipi0List()
-skimOutputUdst(skimCode, BtoDhList)
-summaryOfLists(BtoDhList)
+from skim.btocharm import loadDkspipipi0, BsigToDhToKspipipi0List
+loadDkspipipi0(path=path)
+BtoDhList = BsigToDhToKspipipi0List(path=path)
+skimOutputUdst(skimCode, BtoDhList, path=path)
+summaryOfLists(BtoDhList, path=path)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path)
+process(path)
 
 # print out the summary
 print(statistics)

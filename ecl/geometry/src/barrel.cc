@@ -115,6 +115,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
   }
 
   // phi septum wall
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_septum_walls) {
     double zh = (0.5 - 0.001) / 2;
     G4ThreeVector psw[] = {G4ThreeVector(-1000.8, 0, -zh), G4ThreeVector(1982.6, 0, -zh), G4ThreeVector(2288, 198.2, -zh),
@@ -129,6 +130,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
                       0)*G4RotateZ3D(1.25 / 180 * M_PI)*G4RotateY3D(-M_PI / 2), pswlogical, "phiwallphysical", sectorlogical, false, 0, overlap);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_forward_support_ring) {
     zr_t vc4[] = {{0, 1449.2}, {0, 1582}, {90, 1582}, {90, 1582 - 75.7}};
     std::vector<zr_t> contour4(vc4, vc4 + 4);
@@ -138,6 +140,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     new G4PVPlacement(NULL, G4ThreeVector(0, 0, 2290), part4logical, "part4physical", top, false, 0, overlap);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_backward_support_ring) {
     zr_t vc6[] = {{0, 1543}, { -105, 1543}, { -105, 1543 + 84}, {0, 1543 + 84}};
     std::vector<zr_t> contour6(vc6, vc6 + 4);
@@ -147,6 +150,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     new G4PVPlacement(NULL, G4ThreeVector(0, 0, -1225), part6logical, "part6physical", top, false, 0, overlap);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_forward_support_wall) {
     zr_t vc2[] = {{0, 1180.1}, {0, 1249.5}, {54.3, 1249.5}, {445.8, 1503.6}, {445.8 + 4 * sind(32.982), 1503.6 - 4 * cosd(32.982)}, {54.3 + 4 * sind(32.982 / 2), 1249.5 - 4}, {4, 1249.5 - 4}, {4, 1180.1}};
     std::vector<zr_t> contour2(vc2, vc2 + 8);
@@ -156,6 +160,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     new G4PVPlacement(NULL, G4ThreeVector(0, 0, 1930), part2logical, "part2physical", top, false, 0, overlap);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_backward_support_wall) {
     zr_t vc3[] = {{0, 1180.1}, { -4, 1180.1}, { -4, 1249.5 - 4}, { -61.9 - 4 * sind(52.897 / 2), 1249.5 - 4}, { -285, 1539.1 - 4 * sind(52.897 / 2)}, { -285, 1618.8}, { -285 + 4, 1618.8}, { -285 + 4, 1539.1}, { -61.9, 1249.5}, {0, 1249.5}};
     std::vector<zr_t> contour3(vc3, vc3 + 10);
@@ -165,6 +170,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     new G4PVPlacement(NULL, G4ThreeVector(0, 0, -940), part3logical, "part3physical", top, false, 0, overlap);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_inner_support_wall) {
     G4VSolid* part1solid = new G4Tubs("part1solid", 1250.1, 1250.1 + 1.5, (988.5 + 1972.5) / 2, phi0, dphi);
     G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, Materials::get("A5083"), "part1logical", 0, 0, 0);
@@ -241,6 +247,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
 
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_forward_support_legs) {
     G4ThreeVector vc11a[] = {G4ThreeVector(0, 0, -63. / 2), G4ThreeVector(35, 24.5, -63. / 2), G4ThreeVector(35, 158 - 35, -63. / 2), G4ThreeVector(0, 158 - 35, -63. / 2),
                              G4ThreeVector(0, 0, 63. / 2), G4ThreeVector(35, 24.5, 63. / 2), G4ThreeVector(35, 158 - 35, 63. / 2), G4ThreeVector(0, 158 - 35, 63. / 2)
@@ -272,6 +279,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     new G4PVReplica("supportfwdrep", sfsl, sfl, kPhi, nseg, 2 * M_PI / 72, (2.796 - 2.5)*M_PI / 180);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_backward_support_legs) {
     G4VSolid* part12asolid = new G4Box("part12asolid", 90. / 2, (118. - 35.) / 2, 35. / 2);
     G4VSolid* part12bsolid = new G4Box("part12bsolid", 90. / 2, 35. / 2, 120. / 2);
@@ -301,6 +309,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     new G4PVReplica("supportbkwrep", sbsl, sbl, kPhi, nseg, 2 * M_PI / 72, (2.796 - 2.5)*M_PI / 180);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_septum_walls) {
     struct zwall_t { double zlow, zup;};
     zwall_t zs[] = {{ -682.1, -883.9}, { -445.9, -571.7}, { -220.8, -274.2}, {0, 0}, {220.8, 274.2}, {445.9, 571.7}, {682.1, 883.9}, {936.6, 1220.5}, {1217.1, 1591.2}, {1532., 2007.4}};
@@ -365,6 +374,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     }
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_pipe) {
     double zh = (1219. + 2288.) / 2, dz = (-1219. + 2288.) / 2;
     G4VSolid* tubec = new G4Tubs("tubec", 0, 12. / 2, zh, 0, 2 * M_PI);
@@ -380,6 +390,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
   //  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_barrel.dat");
   vector<cplacement_t> bp = load_placements(m_sap, ECLParts::barrel);
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_preamplifier) {
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       G4Transform3D twc = get_transform(*it);
@@ -391,6 +402,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     }
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_crystal_holder) {
     G4VSolid* holder0 = new G4Box("holder0", 19. / 2, 38. / 2, 6. / 2);
     G4VSolid* holder1 = new G4Box("holder1", 7. / 2, 26. / 2, 7. / 2);
@@ -406,6 +418,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     }
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_crystals) {
     //    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_barrel.dat");
     vector<shape_t*> cryst = load_shapes(m_sap, ECLParts::barrel);
@@ -427,6 +440,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     }
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_crystal_support) {
     G4LogicalVolume* tl[8];
     for (int i = 0; i < 8; i++) {

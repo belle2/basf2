@@ -112,6 +112,9 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         # add the validation module to the path
         self.preparePathValidation(path)
 
+        if self.root_output_file:
+            path.add_module("RootOutput", outputFileName=self.root_output_file)
+
         return path
 
 

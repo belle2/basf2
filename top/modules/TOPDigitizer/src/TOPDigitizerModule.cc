@@ -89,18 +89,14 @@ namespace Belle2 {
              "if true, simulate time transition spread. "
              "Should be always switched ON, except for some dedicated timing studies.",
              true);
-    addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 508);
+    addParam("lookBackWindows", m_lookBackWindows, "number of look back windows", 220);
+    addParam("readoutWindows", m_readoutWindows, "number of readout windows", 8);
+    addParam("offsetWindows", m_offsetWindows,
+             "number of offset windows. This is the number of windows before "
+             "the one determined by look-back (firstWindow)", 2);
 
   }
 
-
-  TOPDigitizerModule::~TOPDigitizerModule()
-  {
-    if (m_timebases) delete m_timebases;
-    if (m_pulseHeights) delete m_pulseHeights;
-    if (m_thresholds) delete m_thresholds;
-    if (m_noises) delete m_noises;
-  }
 
   void TOPDigitizerModule::initialize()
   {
@@ -119,6 +115,27 @@ namespace Belle2 {
     m_rawDigits.registerRelationTo(m_waveforms, DataStore::c_Event,
                                    DataStore::c_DontWriteOut);
 
+    // set write-window depths of production debug format (write-window is 128 samples)
+    for (int i = 0; i < 3; i++) {
+      m_writeDepths.push_back(214);
+      m_writeDepths.push_back(212);
+      m_writeDepths.push_back(214);
+    }
+
+    // check some steering parameters
+    for (auto writeDepth : m_writeDepths) {
+      if (m_lookBackWindows >= writeDepth * 2) {
+        B2ERROR("Number of look-back windows must be smaller that write depth");
+      }
+    }
+    if (m_readoutWindows >= m_lookBackWindows) {
+      B2ERROR("Number of readout windows must be smaller that look-back");
+    }
+
+    // pass parameters to TimeDigitizer
+    TimeDigitizer::setReadoutWindows(m_readoutWindows);
+    TimeDigitizer::setOffsetWindows(m_offsetWindows);
+
     // geometry and nominal data
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
@@ -131,56 +148,77 @@ namespace Belle2 {
     TOPDigit::setPileupTime(geo->getNominalTDC().getPileupTime());
 
     // default sample times (equidistant)
-    double syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
-    m_sampleTimes.setTimeAxis(syncTimeBase); // equidistant time base
+    m_syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
+    m_sampleTimes.setTimeAxis(m_syncTimeBase); // equidistant time base
+
+    // time range for digitization
+    m_timeMin = geo->getSignalShape().getTMin() - m_offsetWindows * m_syncTimeBase / 2;
+    m_timeMax = geo->getSignalShape().getTMax() +
+                (m_readoutWindows - m_offsetWindows) * m_syncTimeBase / 2;
 
     // default pulse height generator
     m_pulseHeightGenerator = PulseHeightGenerator(m_ADCx0, m_ADCp1, m_ADCp2, m_ADCmax);
 
-    // constants from database
-    if (m_useDatabase) {
-      m_timebases = new DBObjPtr<TOPCalTimebase>;
-      m_pulseHeights = new DBObjPtr<TOPCalChannelPulseHeight>;
-      m_thresholds = new DBObjPtr<TOPCalChannelThreshold>;
-      m_noises = new DBObjPtr<TOPCalChannelNoise>;
-    } else if (m_useSampleTimeCalibration) {
-      m_timebases = new DBObjPtr<TOPCalTimebase>;
-    }
-
-    // time range for digitization
-    m_timeMin = geo->getNominalTDC().getTimeMin() + geo->getSignalShape().getTMin();
-    m_timeMax = geo->getNominalTDC().getTimeMax() + geo->getSignalShape().getTMax();
-
   }
+
 
   void TOPDigitizerModule::beginRun()
   {
     StoreObjPtr<EventMetaData> evtMetaData;
 
+    // check availability of mappers
+    const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
+    if (not channelMapper.isValid()) {
+      B2FATAL("No valid channel mapper found for run "
+              << evtMetaData->getRun()
+              << " of experiment " << evtMetaData->getExperiment());
+    }
+    const auto& frontEndMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
+    if (not frontEndMapper.isValid()) {
+      B2FATAL("No valid front-end mapper found for run "
+              << evtMetaData->getRun()
+              << " of experiment " << evtMetaData->getExperiment());
+    }
+
     // check availability of constants in database
     if (m_useDatabase) {
-      if (!(*m_timebases).isValid()) {
+      if (not m_timebases.isValid()) {
         B2FATAL("Sample time calibration constants requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
-      if (!(*m_pulseHeights).isValid()) {
+      if (not m_channelT0.isValid()) {
+        B2FATAL("Channel T0 calibration constants requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
+      if (not m_moduleT0.isValid()) {
+        B2FATAL("Module T0 calibration constants requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
+      if (not m_commonT0.isValid()) {
+        B2FATAL("Common T0 calibration constants requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
+      if (not m_pulseHeights.isValid()) {
         B2FATAL("Pulse height calibration constants requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
-      if (!(*m_thresholds).isValid()) {
+      if (not m_thresholds.isValid()) {
         B2FATAL("Channel thresholds requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
-      if (!(*m_noises).isValid()) {
+      if (not m_noises.isValid()) {
         B2FATAL("Channel noise levels requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     } else if (m_useSampleTimeCalibration) {
-      if (!(*m_timebases).isValid()) {
+      if (not m_timebases.isValid()) {
         B2FATAL("Sample time calibration constants requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
@@ -192,15 +230,36 @@ namespace Belle2 {
   void TOPDigitizerModule::event()
   {
 
-    // generate first window number
-    unsigned window = gRandom->Integer(m_storageDepth);
+    // generate revo9 count
+    unsigned revo9cnt = gRandom->Integer(11520);
+    int SSTcnt = revo9cnt / 6;
+    double SSTfrac = (revo9cnt % 6) / 6.0;
+    double trgTimeOffset = SSTfrac * m_syncTimeBase;  // in [ns], to be subtracted
+
+    // find first window number
+    int refWindow = SSTcnt * 2;  // same as lastWriteAddr
+    int lastDepth = m_writeDepths.back();
+    unsigned phase = 0;
+    for (auto depth : m_writeDepths) {
+      SSTcnt -= depth;
+      if (SSTcnt < 0) break;
+      phase++;
+      refWindow = SSTcnt * 2;
+      lastDepth = depth;
+    }
+    unsigned storageDepth = lastDepth * 2;
+    TimeDigitizer::setStorageDepth(storageDepth);
+    int window = refWindow - m_lookBackWindows;
+    if (window < 0) window += storageDepth;
+    TimeDigitizer::setFirstWindow(window);
+
+    // geometry and nominal data
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     // simulate start time jitter
     double startTimeJitter = gRandom->Gaus(0, m_timeZeroJitter);
 
-    // get nominal TTS and electronic efficiency
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    const auto& tts = geo->getNominalTTS();
+    // get electronic efficiency
     double electronicEfficiency = geo->getNominalTDC().getEfficiency();
 
     // define pixels with time digitizers
@@ -210,8 +269,8 @@ namespace Belle2 {
     // add simulated hits to time digitizers
 
     for (const auto& simHit : m_simHits) {
-      // simulate electronic efficiency
       if (!m_useWaveforms) {
+        // simulate electronic efficiency
         if (gRandom->Rndm() > electronicEfficiency) continue;
       }
       // do spatial digitization
@@ -225,19 +284,45 @@ namespace Belle2 {
 
       // add start time jitter and generated TTS to photon time
       double time = simHit.getTime() + startTimeJitter;
-      if (m_simulateTTS) time += tts.generateTTS();
+      if (m_simulateTTS) {
+        const auto& tts = TOPGeometryPar::Instance()->getTTS(moduleID, pmtID);
+        time += tts.generateTTS();
+      }
+
+      double timeOffset = trgTimeOffset;
+      double calErrorSq = 0; // calibration uncertainties
+      if (m_useDatabase) {
+        const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
+        auto channel = channelMapper.getChannel(pixelID);
+        if (m_channelT0->isCalibrated(moduleID, channel)) {
+          timeOffset += m_channelT0->getT0(moduleID, channel);
+          double err = m_channelT0->getT0Error(moduleID, channel);
+          calErrorSq += err * err;
+        }
+        if (m_moduleT0->isCalibrated(moduleID)) {
+          timeOffset += m_moduleT0->getT0(moduleID);
+          double err = m_moduleT0->getT0Error(moduleID);
+          calErrorSq += err * err;
+
+        }
+        if (m_commonT0->isCalibrated()) {
+          timeOffset += m_commonT0->getT0();
+          double err = m_commonT0->getT0Error();
+          calErrorSq += err * err;
+        }
+      }
 
       // time range cut (to speed up digitization)
-      if (time < m_timeMin) continue;
-      if (time > m_timeMax) continue;
+      if (time + timeOffset < m_timeMin) continue;
+      if (time + timeOffset > m_timeMax) continue;
 
       // generate pulse height
       double pulseHeight = generatePulseHeight(moduleID, pixelID);
       auto hitType = TimeDigitizer::c_Hit;
 
       // add time and pulse height to digitizer of a given pixel
-      TimeDigitizer digitizer(moduleID, pixelID, window, m_storageDepth,
-                              m_rmsNoise, m_sampleTimes);
+      TimeDigitizer digitizer(moduleID, pixelID, timeOffset, calErrorSq, m_rmsNoise,
+                              m_sampleTimes);
       if (!digitizer.isValid()) continue;
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
@@ -252,8 +337,9 @@ namespace Belle2 {
       auto pulseHeight = simCalPulses.getAmplitude();
       auto time = simCalPulses.getTime();
       auto hitType = TimeDigitizer::c_CalPulse;
-      TimeDigitizer digitizer(moduleID, pixelID, window, m_storageDepth,
-                              m_rmsNoise, m_sampleTimes);
+      double timeOffset = trgTimeOffset;
+      TimeDigitizer digitizer(moduleID, pixelID, timeOffset, 0.0, m_rmsNoise,
+                              m_sampleTimes);
       if (!digitizer.isValid()) continue;
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
@@ -264,18 +350,17 @@ namespace Belle2 {
 
     if (m_darkNoise > 0) {
       int numModules = geo->getNumModules();
-      double timeMin = geo->getNominalTDC().getTimeMin();
-      double timeMax = geo->getNominalTDC().getTimeMax();
       for (int moduleID = 1; moduleID <= numModules; moduleID++) {
         int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
         int numHits = gRandom->Poisson(m_darkNoise);
         for (int i = 0; i < numHits; i++) {
           int pixelID = int(gRandom->Rndm() * numPixels) + 1;
-          double time = (timeMax - timeMin) * gRandom->Rndm() + timeMin;
+          double time = (m_timeMax - m_timeMin) * gRandom->Rndm() + m_timeMin;
           double pulseHeight = generatePulseHeight(moduleID, pixelID);
           auto hitType = TimeDigitizer::c_Hit;
-          TimeDigitizer digitizer(moduleID, pixelID, window, m_storageDepth,
-                                  m_rmsNoise, m_sampleTimes);
+          double timeOffset = 0;
+          TimeDigitizer digitizer(moduleID, pixelID, timeOffset, 0.0, m_rmsNoise,
+                                  m_sampleTimes);
           if (!digitizer.isValid()) continue;
           unsigned id = digitizer.getUniqueID();
           Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
@@ -291,8 +376,9 @@ namespace Belle2 {
       for (int moduleID = 1; moduleID <= numModules; moduleID++) {
         int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
         for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
-          TimeDigitizer digitizer(moduleID, pixelID, window, m_storageDepth,
-                                  m_rmsNoise, m_sampleTimes);
+          double timeOffset = 0; // unused since no real signal generated here
+          TimeDigitizer digitizer(moduleID, pixelID, timeOffset, 0.0, m_rmsNoise,
+                                  m_sampleTimes);
           if (!digitizer.isValid()) continue;
           unsigned id = digitizer.getUniqueID();
           pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer));
@@ -302,23 +388,23 @@ namespace Belle2 {
 
     // replace equidistant time base with calibrated one if available
 
-    if (m_timebases) {
+    if (m_useDatabase or m_useSampleTimeCalibration) {
       for (auto& pixel : pixels) {
         auto& digitizer = pixel.second;
-        const auto* sampleTimes = (*m_timebases)->getSampleTimes(digitizer.getScrodID(),
-                                                                 digitizer.getChannel());
-        if (!sampleTimes) continue;
+        const auto* sampleTimes = m_timebases->getSampleTimes(digitizer.getScrodID(),
+                                                              digitizer.getChannel());
+        if (not sampleTimes) continue;
         if (sampleTimes->isCalibrated()) digitizer.setSampleTimes(sampleTimes);
       }
     }
 
     // replace default noise level with channel dependent one if available
 
-    if (m_noises) {
+    if (m_useDatabase) {
       for (auto& pixel : pixels) {
         auto& digitizer = pixel.second;
-        auto rmsNoise = (*m_noises)->getNoise(digitizer.getModuleID(),
-                                              digitizer.getChannel());
+        auto rmsNoise = m_noises->getNoise(digitizer.getModuleID(),
+                                           digitizer.getChannel());
         if (rmsNoise > 0) {
           digitizer.setNoise(rmsNoise);
         }
@@ -330,9 +416,8 @@ namespace Belle2 {
     for (auto& pixel : pixels) {
       const auto& digitizer = pixel.second;
       int threshold = m_threshold;
-      if (m_thresholds) { // use channel dependent ones
-        threshold = (*m_thresholds)->getThr(digitizer.getModuleID(),
-                                            digitizer.getChannel());
+      if (m_useDatabase) { // use channel dependent ones
+        threshold = m_thresholds->getThr(digitizer.getModuleID(), digitizer.getChannel());
         if (threshold <= 0) threshold = m_threshold; // not available, use the default
       }
       if (m_useWaveforms) {
@@ -344,30 +429,47 @@ namespace Belle2 {
       }
     }
 
+    // set additional info
+
+    for (auto& rawDigit : m_rawDigits) {
+      rawDigit.setRevo9Counter(revo9cnt);
+      rawDigit.setPhase(phase);
+      rawDigit.setLastWriteAddr(refWindow);
+      rawDigit.setLookBackWindows(m_lookBackWindows);
+      rawDigit.setOfflineFlag();
+    }
+
+    for (auto& waveform : m_waveforms) {
+      waveform.setRevo9Counter(revo9cnt);
+      waveform.setOffsetWindows(m_offsetWindows);
+    }
+
+    // set calibration flags
+
+    if (m_useDatabase) {
+      for (auto& digit : m_digits) {
+        if (m_channelT0->isCalibrated(digit.getModuleID(), digit.getChannel())) {
+          digit.addStatus(TOPDigit::c_ChannelT0Calibrated);
+        }
+        if (m_moduleT0->isCalibrated(digit.getModuleID())) {
+          digit.addStatus(TOPDigit::c_ModuleT0Calibrated);
+        }
+        if (m_commonT0->isCalibrated()) {
+          digit.addStatus(TOPDigit::c_CommonT0Calibrated);
+        }
+      }
+    }
+
   }
 
-
-  void TOPDigitizerModule::endRun()
-  {
-
-  }
-
-  void TOPDigitizerModule::terminate()
-  {
-
-  }
 
   double TOPDigitizerModule::generatePulseHeight(int moduleID, int pixelID) const
   {
-    if (m_pulseHeights) {
+    if (m_useDatabase) {
       const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
-      if (!channelMapper.isValid()) {
-        B2ERROR("TOPDigitizer: no valid channel mapper found");
-        return 0;
-      }
       auto channel = channelMapper.getChannel(pixelID);
-      if ((*m_pulseHeights)->isCalibrated(moduleID, channel)) {
-        const auto& par = (*m_pulseHeights)->getParameters(moduleID, channel);
+      if (m_pulseHeights->isCalibrated(moduleID, channel)) {
+        const auto& par = m_pulseHeights->getParameters(moduleID, channel);
         PulseHeightGenerator generator(par.x0, par.p1, par.p2, m_ADCmax);
         return generator.generate();
       }

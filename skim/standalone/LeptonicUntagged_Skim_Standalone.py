@@ -10,50 +10,63 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
-from stdV0s import *
-from stdCharm import *
-from skimExpertFunctions import *
+from stdV0s import stdKshorts
+from skim.standardlists.charm import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+
 set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-gb2_setuprel = 'release-02-00-01'
+import argparse
+gb2_setuprel = 'release-03-02-00'
 skimCode = encodeSkimName('LeptonicUntagged')
 
+fileList = get_test_file("mixedBGx1", "MC12")
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
-inputMdstList('MC9', fileList)
+leppath = Path()
 
-loadStdSkimPi0()
-loadStdSkimPhoton()
-loadStdCharged()
-stdPi0s('loose')  # for stdCharm.py
-stdPhotons('loose')
-loadStdKS()
+inputMdstList('default', fileList, path=leppath)
 
-loadStdD0()
-loadStdDplus()
-loadStdDstar0()
-loadStdDstarPlus()
+loadStdSkimPi0(path=leppath)
+loadStdSkimPhoton(path=leppath)
+stdPi('loose', path=leppath)
+stdK('loose', path=leppath)
+stdPi('all', path=leppath)
+stdE('all', path=leppath)
+stdMu('all', path=leppath)
+stdPi0s('loose', path=leppath)  # for stdCharm.py
+stdPhotons('loose', path=leppath)
+stdKshorts(path=leppath)
+
+loadStdD0(path=leppath)
+loadStdDplus(path=leppath)
+loadStdDstar0(path=leppath)
+loadStdDstarPlus(path=leppath)
 
 # SL Skim
 from skim.leptonic import LeptonicList
 
-lepList = LeptonicList()
-skimOutputUdst(skimCode, lepList)
+lepList = LeptonicList(path=leppath)
+skimOutputUdst(skimCode, lepList, path=leppath)
 
-summaryOfLists(lepList)
+summaryOfLists(lepList, path=leppath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=leppath)
+process(leppath)
 
 # print out the summary
 print(statistics)

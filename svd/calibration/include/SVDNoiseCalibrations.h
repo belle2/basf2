@@ -32,14 +32,15 @@ namespace Belle2 {
    */
   class SVDNoiseCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload;
+    static std::string name; /**< name of the SVDNoiseCalibrations payload */
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > >
+    t_payload;  /**< typedef of the SVDNoiseCalibrations payload of all SVD strips*/
 
     /** Constructor, no input argument is required */
     SVDNoiseCalibrations(): m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDNoiseCalibrations: from now one we are using " <<
+        B2INFO("SVDNoiseCalibrations: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
     }
 
@@ -95,7 +96,7 @@ namespace Belle2 {
     */
 
   private:
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr;  /**< the SVDNoiseCalibrations pyaload */
 
 
   };

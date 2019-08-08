@@ -20,6 +20,7 @@ namespace Belle2 {
   class ECLTRGInformation;
   class ECLTriggerCell;
   class TRGECLUnpackerStore;
+  class TRGECLUnpackerEvtStore;
   class TrgEclMapping;
 
   /**
@@ -35,13 +36,13 @@ namespace Belle2 {
     ECLTRGInformationModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** event */
-    virtual void event();
+    virtual void event() override;
 
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -59,11 +60,12 @@ namespace Belle2 {
     std::vector< int > m_TCStoreArrPosition;
 
     /** TC mapping class */
-    TrgEclMapping* m_trgmap;
+    TrgEclMapping* m_trgmap{nullptr};
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits  */
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters  */
     StoreArray<TRGECLUnpackerStore> m_trgUnpackerStore; /**< Required input array of TRGECLUnpackerStore  */
+    StoreArray<TRGECLUnpackerEvtStore> m_trgUnpackerEvtStore; /**< Required input array of TRGECLUnpackerEvtStore  */
 
     StoreArray<ECLTriggerCell> m_eclTCs; /**< Output array of ECLTCs  */
     StoreObjPtr<ECLTRGInformation> m_eclTRGInformation; /**< Analysis level information per event holding TRG information*/

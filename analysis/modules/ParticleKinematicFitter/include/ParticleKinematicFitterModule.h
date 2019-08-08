@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEKINEMATICFITTERMODULE_H
-#define PARTICLEKINEMATICFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -239,7 +238,8 @@ namespace Belle2 {
        * @param particleChildren list of all particle childen
        * @param mother mother particle
        */
-      bool storeOrcaKinFitParticles(std::string prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren, Particle* mother);
+      bool storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren,
+                                    Particle* mother);
 
 
       /**
@@ -300,4 +300,3 @@ namespace Belle2 {
   }// end OrcaKinFit namespace
 } // Belle2 namespace
 
-#endif

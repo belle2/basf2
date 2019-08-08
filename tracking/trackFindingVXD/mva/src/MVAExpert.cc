@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-MVAExpert::MVAExpert(std::string identifier,
+MVAExpert::MVAExpert(const std::string& identifier,
                      std::vector<Named<float*>>& namedVariables)
   : m_namedVariables(namedVariables)
   , m_identifier(identifier)
@@ -41,11 +41,10 @@ void MVAExpert::beginRun()
 {
   std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
   if (weightfile) {
-    // TODO: add other methods besides FastBDT?
     // FastBDT_version refers to the weightfile version, only FastBDT_VERSION_MAJOR >= 5 can handle FastBDT_version==2
-    // Currently using FastBDT_VERSION_MAJOR = 3 (in externals/v01-05-01/include/root/FastBDT.h )
     if (weightfile->getElement<std::string>("method") == "FastBDT" and
-        weightfile->getElement<int>("FastBDT_version") == 1) {
+        (weightfile->getElement<int>("FastBDT_version") == 1 or
+         weightfile->getElement<int>("FastBDT_version") == 2)) {
 
       int nExpectedVars = weightfile->getElement<int>("number_feature_variables");
       int nActualVars = m_namedVariables.size();

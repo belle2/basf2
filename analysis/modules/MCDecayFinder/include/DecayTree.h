@@ -7,8 +7,7 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-#ifndef DECAYTREE_H
-#define DECAYTREE_H
+#pragma once
 #include <vector>
 
 namespace Belle2 {
@@ -92,4 +91,3 @@ namespace Belle2 {
     m_daughters.push_back(t);
   }
 } // namespace Belle2
-#endif // DECAYTREE_H

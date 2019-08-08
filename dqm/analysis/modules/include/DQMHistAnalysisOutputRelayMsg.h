@@ -36,8 +36,11 @@ namespace Belle2 {
 
     // Data members
   private:
-    TSocket* m_sock;
+    /** The socket to the canvas server. */
+    TSocket* m_sock = nullptr;
+    /** The port of the canvas server. */
     int m_port;
+    /** The hostname of the canvas server. */
     std::string m_hostname;
 
   };

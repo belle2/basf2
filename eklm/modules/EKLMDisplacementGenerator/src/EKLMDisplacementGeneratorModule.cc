@@ -55,7 +55,7 @@ EKLMDisplacementGeneratorModule::EKLMDisplacementGeneratorModule() : Module()
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_GeoDat = NULL;
+  m_GeoDat = nullptr;
 }
 
 EKLMDisplacementGeneratorModule::~EKLMDisplacementGeneratorModule()
@@ -224,6 +224,7 @@ sector:
 
 void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
 {
+  /* cppcheck-suppress variableScope */
   int i, n, iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment, param;
   float value;
   IntervalOfValidity iov(0, 0, -1, -1);
@@ -430,10 +431,14 @@ void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
         param = 1;
         value = alignmentData->getDx();
         t_sector->Fill();
+        /* cppcheck-suppress redundantAssignment */
         param = 2;
+        /* cppcheck-suppress redundantAssignment */
         value = alignmentData->getDy();
         t_sector->Fill();
+        /* cppcheck-suppress redundantAssignment */
         param = 3;
+        /* cppcheck-suppress redundantAssignment */
         value = alignmentData->getDalpha();
         t_sector->Fill();
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
@@ -445,7 +450,9 @@ void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
             param = 1;
             value = alignmentData->getDy();
             t_segment->Fill();
+            /* cppcheck-suppress redundantAssignment */
             param = 2;
+            /* cppcheck-suppress redundantAssignment */
             value = alignmentData->getDalpha();
             t_segment->Fill();
           }

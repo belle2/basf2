@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * Wrap am module of given type.
      */
-    AsyncWrapper(const std::string& moduleType);
+    explicit AsyncWrapper(const std::string& moduleType);
 
     ~AsyncWrapper();
 
@@ -62,9 +62,6 @@ namespace Belle2 {
   private:
     /** The wrapped module. */
     ModulePtr m_wrappedModule;
-
-    /** process manager. */
-    ProcHandler* m_procHandler;
 
     /** shared memory buffer */
     RingBuffer* m_ringBuffer;

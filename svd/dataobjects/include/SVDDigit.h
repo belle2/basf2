@@ -146,7 +146,7 @@ namespace Belle2 {
     * Enables BG overlay module to identify uniquely the physical channel of this Digit.
     * @return unique channel ID, composed of VxdID (1 - 16), strip side (17), strip number (18-28) and sample number 29-32).
     */
-    unsigned int getUniqueChannelID() const
+    unsigned int getUniqueChannelID() const override
     { return m_index + (m_cellID << 4) + ((m_isU ? 1 : 0) << 15) + (m_sensorID << 16); }
     /**
     * Implementation of the base class function.
@@ -154,7 +154,7 @@ namespace Belle2 {
     * @param bg BG digit
     * @return append status
     */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override
     {
       m_charge += dynamic_cast<const SVDDigit*>(bg)->getCharge();
       return DigitBase::c_DontAppend;
@@ -174,7 +174,7 @@ namespace Belle2 {
     short m_prev_id;     /**< SVDDigit index in StoreArray of previous sample. */
     short m_next_id;     /**< SVDDigit index in StoreArray of next sample. */
 
-    ClassDef(SVDDigit, 5)
+    ClassDefOverride(SVDDigit, 5)
 
   }; // class SVDDigit
 

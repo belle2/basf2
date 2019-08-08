@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLELIST_H
-#define PARTICLELIST_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <framework/utilities/ArrayIterator.h>
@@ -174,7 +173,7 @@ namespace Belle2 {
      * @param pdg PDG code of particles to be hold in this list
      * @param name of the particle list
      */
-    void initialize(int pdg, std::string name, std::string particleStoreName = "Particles");
+    void initialize(int pdg, const std::string& name, const std::string& particleStoreName = "Particles");
 
     /**
      * Binds particle and anti-particle ParticleLists. After the lists are bound any action performed on ParticleList
@@ -191,7 +190,7 @@ namespace Belle2 {
      * @param name name of the Particle store array
      * @param forAntiParticle if true the name is set also for the anti-particle list
      */
-    void setParticleCollectionName(std::string name, bool forAntiParticle = true);
+    void setParticleCollectionName(const std::string& name, bool forAntiParticle = true);
 
     /**
      * Adds a new particle to the list (safe method)
@@ -354,5 +353,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

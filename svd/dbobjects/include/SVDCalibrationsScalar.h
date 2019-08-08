@@ -20,31 +20,36 @@ namespace Belle2 {
   class SVDCalibrationsScalar {
 
   public:
-    typedef T calibrationType;
-    typedef calibrationType payloadContainerType;
+    typedef T calibrationType; /**< typedef of the calibration type class*/
+    typedef calibrationType payloadContainerType; /**< typedef of the payload container, one per side */
 
     /*
      * this class is used to deal with a value for side
      */
-
     SVDCalibrationsScalar() {};
+
+    /** default destructor*/
     ~SVDCalibrationsScalar() {};
+
+    /** get the calibration of the side*/
     static inline calibrationType get(const payloadContainerType& svdScalar, unsigned int /*strip*/)
     {
       return svdScalar;
     }
 
-    static inline void set(payloadContainerType svdScalar, unsigned int /*strip*/,
+    /** set the calibration of the side*/
+    static inline void set(payloadContainerType& svdScalar, unsigned int /*strip*/,
                            calibrationType value)
     {
       svdScalar = value;
     }
 
-    static void init(payloadContainerType& /*svdScalar*/, unsigned int /*layer*/,
+    /**initialize the calibration scalar*/
+    static void init(payloadContainerType& svdScalar, unsigned int /*layer*/,
                      unsigned int /*ladder*/ , unsigned int /*sensor*/,
-                     unsigned int /*side*/, const T& /*defaultT*/)
+                     unsigned int /*side*/, const T& defaultT)
     {
-
+      svdScalar = defaultT;
     }
   };
 }

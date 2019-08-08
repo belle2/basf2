@@ -33,7 +33,7 @@ using namespace Belle2;
 REG_MODULE(ECLMatchingPerformanceExpert)
 
 ECLMatchingPerformanceExpertModule::ECLMatchingPerformanceExpertModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL)
+  Module(), m_trackProperties()
 {
   setDescription("Module to test the matching efficiency between tracks and ECLClusters. Additionally, information about the tracks are written into a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -113,10 +113,10 @@ void ECLMatchingPerformanceExpertModule::event()
       m_trackProperties.nCDChits = recoTrack->getNumberOfCDCHits();
 
       for (auto& eclCluster : track.getRelationsTo<ECLCluster>()) {
-        if (eclCluster.getHypothesisId() != 5) continue;
+        if (!eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
         if (!(eclCluster.isTrack())) continue;
         m_matchedToECLCluster = 1;
-        m_hypothesisOfMatchedECLCluster = eclCluster.getHypothesisId();
+        m_hypothesisOfMatchedECLCluster = eclCluster.getHypotheses();
         break;
       }
 
@@ -293,7 +293,7 @@ void ECLMatchingPerformanceExpertModule::setupTree()
   addVariableToTree("nCDChits", m_trackProperties.nCDChits);
 
   addVariableToTree("ECLMatch", m_matchedToECLCluster);
-  addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
+  addVariableToTree("Hypothesis", m_hypothesisOfMatchedECLCluster);
 
   addVariableToTree("MinDistance", m_distance);
 

@@ -46,20 +46,20 @@ namespace Belle2 {
   public:
 
     /// returns type.
-    virtual unsigned objectType(void) const;
+    virtual unsigned objectType(void) const override;
 
     /// returns the circle center.
     const TRGPoint2D& center(void) const;
 
     /// returns Pt.
-    double pt(void) const;
+    double pt(void) const override;
 
     /// returns radius.
     double radius(void) const;
 
     /// dumps debug information.
     virtual void dump(const std::string& message = std::string(""),
-                      const std::string& prefix = std::string("")) const;
+                      const std::string& prefix = std::string("")) const override;
 
     /// sets circle properties.
     void property(double charge,
@@ -70,7 +70,7 @@ namespace Belle2 {
   public: // Utility functions
 
     /// calculate closest approach. Error was happened if return value is not zero.
-    int approach2D(TRGCDCLink&) const;
+    int approach2D(TRGCDCLink&) const override;
 
   private:
 

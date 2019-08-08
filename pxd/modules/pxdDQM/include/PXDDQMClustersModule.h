@@ -64,48 +64,50 @@ namespace Belle2 {
 
 
     /** Hitmaps of Digits */
-    TH1I* m_hitMapCounts;
+    TH1I* m_hitMapCounts = {};
     /** Hitmaps of Clusters*/
-    TH1I* m_hitMapClCounts;
+    TH1I* m_hitMapClCounts = {};
     /** Hitmaps of digits on chips */
-    TH1I* m_hitMapCountsChip;
+    TH1I* m_hitMapCountsChip = {};
     /** Hitmaps of clusters on chips */
-    TH1I* m_hitMapClCountsChip;
+    TH1I* m_hitMapClCountsChip = {};
     /** Fired pixels per event */
-    TH1F** m_fired;
+    TH1F** m_fired = {};
     /** Clusters per event */
-    TH1F** m_clusters;
+    TH1F** m_clusters = {};
     /** Start row distribution */
-    TH1F** m_startRow;
+    TH1F** m_startRow = {};
     /** Cluster seed charge by distance from the start row */
-    TH1F** m_chargStartRow;
+    TH1F** m_chargStartRow = {};
     /** counter for Cluster seed charge by distance from the start row */
-    TH1F** m_startRowCount;
+    TH1F** m_startRowCount = {};
     /** Charge of clusters */
-    TH1F** m_clusterCharge;
+    TH1F** m_clusterCharge = {};
+    /** Deposited energy of clusters */
+    TH1F** m_clusterEnergy = {};
     /** Charge of pixels */
-    TH1F** m_pixelSignal;
+    TH1F** m_pixelSignal = {};
     /** u cluster size */
-    TH1F** m_clusterSizeU;
+    TH1F** m_clusterSizeU = {};
     /** v cluster size */
-    TH1F** m_clusterSizeV;
+    TH1F** m_clusterSizeV = {};
     /** Cluster size */
-    TH1F** m_clusterSizeUV;
+    TH1F** m_clusterSizeUV = {};
 
     /** Hitmaps pixels for u */
-    TH1F** m_hitMapU;
+    TH1F** m_hitMapU = {};
     /** Hitmaps pixels for v */
-    TH1F** m_hitMapV;
+    TH1F** m_hitMapV = {};
     /** Hitmaps pixels */
-    TH2F** m_hitMap;
+    TH2F** m_hitMap = {};
     /** Hitmaps clusters for u */
-    TH1F** m_hitMapUCl;
+    TH1F** m_hitMapUCl = {};
     /** Hitmaps clusters for v */
-    TH1F** m_hitMapVCl;
+    TH1F** m_hitMapVCl = {};
     /** Hitmaps clusters */
-    TH2F** m_hitMapCl;
+    TH2F** m_hitMapCl = {};
     /** Seed */
-    TH1F** m_seed;
+    TH1F** m_seed = {};
 
   };
 

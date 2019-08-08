@@ -41,13 +41,13 @@ DATCONSVDSimpleClusterizerModule::DATCONSVDSimpleClusterizerModule() : Module()
 
   // 2. Clustering
   addParam("NoiseLevelADU", m_NoiseLevelInADU,
-           "Simple assumption of the noise level of the sensors in ADU's", (unsigned short)(3));
+           "Simple assumption of the noise level of the sensors in ADU's", (unsigned short)(5));
   addParam("NoiseCutADU", m_NoiseCutInADU,
-           "Simple assumption of the noise level of the sensors in ADU's", (unsigned short)(3));
+           "Simple assumption of the noise level of the sensors in ADU's", (unsigned short)(5));
   addParam("useSimpleClustering", m_useSimpleClustering,
            "Use the simple clustering that is currently done on FPGA for phase 2", bool(true));
   addParam("maxClusterSize", m_maxClusterSize,
-           "Maximum cluster size in count of strips.", (unsigned short)(5));
+           "Maximum cluster size in count of strips.", (unsigned short)(6));
 
 }
 

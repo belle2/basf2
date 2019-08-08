@@ -35,10 +35,10 @@ namespace Belle2 {
     virtual ~ClusterMatcherModule();
 
     /** init */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** process event */
-    virtual void event();
+    virtual void event() override;
 
     /** cone angle for matching (whole cone) */
     float m_coneInRad = 0.26;

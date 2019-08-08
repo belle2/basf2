@@ -515,19 +515,19 @@ namespace Belle2 {
     void setMCharm(double m) {m_mCharm = m;}
 
     /** Sets the Wilson coeffcient CV1.   */
-    void setCV1(EvtComplex v) {m_CV1 = v;}
+    void setCV1(const EvtComplex& v) {m_CV1 = v;}
 
     /** Sets the Wilson coeffcient CV2.   */
-    void setCV2(EvtComplex v) {m_CV2 = v;}
+    void setCV2(const EvtComplex& v) {m_CV2 = v;}
 
     /** Sets the Wilson coeffcient CS1.   */
-    void setCS1(EvtComplex v) {m_CS1 = v;}
+    void setCS1(const EvtComplex& v) {m_CS1 = v;}
 
     /** Sets the Wilson coeffcient CS2.   */
-    void setCS2(EvtComplex v) {m_CS2 = v;}
+    void setCS2(const EvtComplex& v) {m_CS2 = v;}
 
     /** Sets the Wilson coeffcient CT.   */
-    void setCT(EvtComplex v) {m_CT = v;}
+    void setCT(const EvtComplex& v) {m_CT = v;}
 
   private:
     // Parameters

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSIMHIT_H
-#define EKLMSIMHIT_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -136,11 +135,9 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** The class title. */
+    /** Class version. */
     ClassDefOverride(Belle2::EKLMSimHit, 2);
 
   };
 
-} // end namespace Belle2
-
-#endif
+}

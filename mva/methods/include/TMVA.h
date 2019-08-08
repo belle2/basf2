@@ -17,7 +17,6 @@
 #include <mva/interface/Expert.h>
 
 #include <framework/utilities/MakeROOTCompatible.h>
-#include <framework/utilities/WorkingDirectoryManager.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/Utils.h>
 #include <framework/logging/Logger.h>
@@ -241,6 +240,8 @@ namespace Belle2 {
       std::unique_ptr<TMVA::Reader> m_expert; /**< TMVA::Reader pointer */
       mutable std::vector<float>
       m_input_cache; /**< Input Cache for TMVA::Reader: Otherwise we would have to set the branch addresses in each apply call */
+      mutable std::vector<float>
+      m_spectators_cache; /**< Spectators Cache for TMVA::Reader: Otherwise we would have to set the branch addresses in each apply call */
     };
 
     /**

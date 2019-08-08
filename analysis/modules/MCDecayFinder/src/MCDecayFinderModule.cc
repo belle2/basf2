@@ -26,7 +26,7 @@ using namespace Belle2;
 // Register module in the framework
 REG_MODULE(MCDecayFinder)
 
-MCDecayFinderModule::MCDecayFinderModule() : Module()
+MCDecayFinderModule::MCDecayFinderModule() : Module(), m_isSelfConjugatedParticle(false)
 {
   //Set module properties
   setDescription("Find decays in MCParticle list matching a given DecayString and create Particles from them.");
@@ -108,7 +108,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // D = Information from DecayDescriptor
 
   // Create empty DecayTree as return value
-  DecayTree<MCParticle>* decay = new DecayTree<MCParticle>();
+  auto* decay = new DecayTree<MCParticle>();
 
   // Load PDG codes and compare,
   int iPDGD = d->getMother()->getPDGCode();
@@ -136,6 +136,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // Create index for MCParticle daughter list
   // The index of matched daughters will be then removed later from this list.
   vector<int> daughtersPIndex;
+  daughtersPIndex.reserve(nDaughtersP);
   for (int i = 0; i < nDaughtersP; i++) daughtersPIndex.push_back(i);
 
   // 1) if radiated photons are to be ignored, the MCParticle must
@@ -154,7 +155,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   for (int iDD = 0; iDD < nDaughtersD; iDD++) {
     // check if there is an unmatched particle daughter matching this decay descriptor daughter
     bool isMatchDaughter = false;
-    for (vector<int>::iterator itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {
+    for (auto itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {
       DecayTree<MCParticle>* daughter = match(daughtersP[*itDP], d->getDaughter(iDD), isCC);
       if (!daughter->getObj()) continue;
       // Matching daughter found, remove it from list of unmatched particle daughters
@@ -195,10 +196,10 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   bool isInclusive = d->isInclusive();
   if (!isInclusive) {
     B2DEBUG(10, "Decay is not inclusive, check for left over MCParticles!\n");
-    for (vector<int>::iterator itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {
+    for (int& itDP : daughtersPIndex) {
       // Check if additional photons are to be ignored
-      if (isIgnorePhotons && daughtersP[*itDP]->getPDG() == 22) continue;
-      B2DEBUG(10, "There was an additional particle left which is not a photon. Found " << daughtersP[*itDP]->getPDG());
+      if (isIgnorePhotons && daughtersP[itDP]->getPDG() == 22) continue;
+      B2DEBUG(10, "There was an additional particle left which is not a photon. Found " << daughtersP[itDP]->getPDG());
       return decay;
     }
   } else {

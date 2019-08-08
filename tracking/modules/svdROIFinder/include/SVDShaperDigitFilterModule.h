@@ -36,11 +36,11 @@ namespace Belle2 {
     ~SVDShaperDigitFilterModule();
 
     /**  register new SVDSShaperDigits store arrays (inside/ouside ROIs)*/
-    void initialize();
+    void initialize() override;
 
 
     /**  Filtering of digits inside/outside ROIs*/
-    void event();
+    void event() override;
 
 
   private:

@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>CosmicsSimNoBkg.root</input>
   <description>Validates the axial hough finder working on segments in cosmics events.</description>
 </header>
@@ -25,13 +25,18 @@ from tracking.validation.run import TrackingValidationRun
 
 
 class CosmicsAxialHough(TrackingValidationRun):
+    """Validate the CDC axial Hough track finder with cosmic rays"""
+    #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'Cosmics'
+    #: no background overlay
     root_input_file = '../CosmicsSimNoBkg.root'
+    #: use full detector for validation
     components = None
 
     def finder_module(self, path):
+        """Add the CDC track-finding module to the basf2 path"""
         path.add_module('TFCDC_WireHitPreparer')
         path.add_module("TFCDC_ClusterPreparer")
         path.add_module('TFCDC_SegmentFinderFacetAutomaton',
@@ -46,6 +51,7 @@ class CosmicsAxialHough(TrackingValidationRun):
             cdc_display_module.draw_recotrack_seed_trajectories = True
             path.add_module(cdc_display_module)
 
+    #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
@@ -55,7 +61,9 @@ class CosmicsAxialHough(TrackingValidationRun):
         "UseReassignedHits": True,
     }
 
+    #: Include pulls in the validation output
     pulls = True
+    #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
 
 

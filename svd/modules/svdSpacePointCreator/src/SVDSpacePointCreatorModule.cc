@@ -8,7 +8,6 @@
  **************************************************************************/
 
 #include <svd/modules/svdSpacePointCreator/SVDSpacePointCreatorModule.h>
-
 #include <svd/modules/svdSpacePointCreator/SpacePointHelperFunctions.h>
 
 #include <framework/logging/Logger.h>
@@ -103,7 +102,7 @@ void SVDSpacePointCreatorModule::event()
     provideSVDClusterSingles(m_svdClusters,
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_minClusterTime, m_useQualityEstimator, m_calibrationFile,
+    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_ClusterCal, m_useQualityEstimator, m_calibrationFile,
                                   m_useLegacyNaming);
   }
 

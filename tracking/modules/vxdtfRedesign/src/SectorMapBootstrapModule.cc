@@ -224,7 +224,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config2.mField = 1.5;
   config2.rarenessThreshold = 0.001;
   config2.quantiles = {0.005, 1. - 0.005};
-  bootstrapSectorMap(config2);
+  // only for testing so dont bootstrap this by default
+  // bootstrapSectorMap(config2);
 
   SectorMapConfig config3;
 //   config3.pTCuts = {0.290, 3.5};
@@ -243,7 +244,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config3.mField = 1.5;
   config3.rarenessThreshold = 0.001;
   config3.quantiles = {0.005, 1. - 0.005};
-  bootstrapSectorMap(config3);
+  // only for testing so dont bootstrap this by default
+  // bootstrapSectorMap(config3);
 
 
   SectorMapConfig config4;
@@ -268,7 +270,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
     config4.vSectorDivider.push_back(stress);
   }
 
-  bootstrapSectorMap(config4);
+  // only for testing so dont bootstrap this by default
+  // bootstrapSectorMap(config4);
 
 
   SectorMapConfig configTB;
@@ -290,7 +293,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   configTB.rarenessThreshold = 0.; //0.001;
   configTB.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
   // TODO: still missing: minimal sample-size, quantiles for smaller samplesizes, threshshold small <-> big sampleSize.
-  bootstrapSectorMap(configTB);
+  // only for testing so dont bootstrap this by default
+  // bootstrapSectorMap(configTB);
 
 
 
@@ -322,7 +326,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 
   vector< vector< FullSecID > > sectors;
 
-//   sectors.resize(uSup.size() + 1);
   sectors.resize(config.uSectorDivider.size());
   unsigned nSectorsInU = config.uSectorDivider.size(),
            nSectorsInV = config.vSectorDivider.size();
@@ -361,7 +364,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   if (std::find(config.allowedLayers.begin(), config.allowedLayers.end(), 0) != config.allowedLayers.end()) {
     std::vector<double> uCuts4vIP = {}, vCuts4vIP = {};
     sectors.clear();
-    sectors = {{0}};
+    sectors = {{ FullSecID(0) }};
     segmentFilters->addSectorsOnSensor(uCuts4vIP, vCuts4vIP, sectors);
   }
 

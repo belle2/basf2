@@ -35,9 +35,9 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDClusterCheckModule();
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
     private:
       /** Name of the first PXDCluster StoreArray */
       std::string m_clustersOld;

@@ -66,6 +66,15 @@ namespace Belle2 {
     void printFEElectronics();
 
     /**
+     * Import edep-to-adc params. to the data base.
+     */
+    void importEDepToADC(std::string fileName);
+    /**
+     * Get edep-to-adc params. from the database and print.
+     */
+    void printEDepToADC();
+
+    /**
      * Import t0 table to the data base.
      */
     void importTimeZero(std::string fileName);
@@ -142,6 +151,16 @@ namespace Belle2 {
     void printSigma();
 
     /**
+     * Import fudge factor table to the database.
+     */
+    void importFFactor(std::string fileName);
+    /**
+     * Get the fudge factor table from the database and
+     * print it.
+     */
+    void printFFactor();
+
+    /**
      * Import displacement of wire position to the database.
      */
     void importDisplacement(std::string fileName);
@@ -171,6 +190,20 @@ namespace Belle2 {
      * print it.
      */
     void printWirPosMisalign();
+
+    /**
+     * Import CDCWireHits cut values to the database.
+     * The cut values are read from a json file.
+     * An example of legal json file can be found at
+     * cdc/data/CDCWireHitRequirements_example.json
+     * In the json file, upper values of -1 stand for unbounded.
+     */
+    void importCDCWireHitRequirements(const std::string& jsonFileName) const;
+    /**
+     * Get CDCWireHits cut values from the database and
+     * print them.
+     */
+    void printCDCWireHitRequirements() const;
 
   private:
 

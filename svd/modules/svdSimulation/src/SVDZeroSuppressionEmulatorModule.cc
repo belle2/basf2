@@ -28,7 +28,7 @@ SVDZeroSuppressionEmulatorModule::SVDZeroSuppressionEmulatorModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("FADCmode", m_FADCmode,
-           "FADC mode: if true the approximation to integer is done", bool(false));
+           "FADC mode: if true the approximation to integer is done", bool(true));
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string(""));
   addParam("ShaperDigitsIN", m_SVDShaperDigitsIN,

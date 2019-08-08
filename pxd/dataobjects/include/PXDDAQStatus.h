@@ -124,6 +124,11 @@ namespace Belle2 {
       return m_pxdPacket.back();
     }
 
+    /** Return map of module usability
+     * @return map of VxdID with usable flags
+     */
+    std::map <VxdID , bool> getUsable() const;
+
 
     /** iterator-based iteration for packets */
     std::vector<PXDDAQPacketStatus>::iterator begin() { return m_pxdPacket.begin(); };

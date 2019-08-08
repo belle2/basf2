@@ -16,10 +16,13 @@
 #include <TObject.h>
 #include <framework/logging/Logger.h>
 
-/** DB object to store photon, hadron and diode shape parameters used in simulations.  All crystals use same parameters in simulation. */
 
 namespace Belle2 {
 
+  /**
+   * DB object to store photon, hadron and diode shape parameters used in simulations.
+   * All crystals use same parameters in simulation.
+   */
   class ECLDigitWaveformParametersForMC: public TObject {
   public:
 

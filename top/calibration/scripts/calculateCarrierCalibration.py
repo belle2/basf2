@@ -109,9 +109,9 @@ class calculateCarrierCalibration(Module):
             if digit.hasStatus(Belle2.TOPDigit.c_EventT0Subtracted):
                 digit.subtractT0(-recBunch.getTime())
                 digit.removeStatus(Belle2.TOPDigit.c_EventT0Subtracted)
-            if digit.hasStatus(Belle2.TOPDigit.c_OffsetSubtracted):
+            if digit.hasStatus(Belle2.TOPDigit.c_BunchOffsetSubtracted):
                 digit.subtractT0(-recBunch.getAverageOffset())
-                digit.removeStatus(Belle2.TOPDigit.c_OffsetSubtracted)
+                digit.removeStatus(Belle2.TOPDigit.c_BunchOffsetSubtracted)
             if digit.getHitQuality() == 1:
                 slot = digit.getModuleID()
                 chan = digit.getChannel()

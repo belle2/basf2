@@ -224,6 +224,18 @@ namespace Belle2 {
     bool registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
                           EStoreFlags storeFlags, const std::string& namedRelation);
 
+    /** Check for the existence of a relation in the DataStore map.
+     *
+     *  @param fromArray  Origin of the relation
+     *  @param toArray    Target of the relation
+     *  @param durability Decide with which durability map you want to perform the requested action.
+     *  @param namedRelation Additional name for the relation, or "" for the default naming.
+     *  @return           True if there is a registered relation.
+     *  @sa DependencyMap
+     */
+    bool hasRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                     const std::string& namedRelation);
+
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *
      *  @note can only be used in initialize() function
@@ -512,6 +524,8 @@ namespace Belle2 {
     explicit DataStore();
     /** no copy constructor */
     DataStore(const DataStore&) = delete;
+    /** no assignment operator */
+    DataStore& operator=(const DataStore&) = delete;
     /** Destructor. */
     ~DataStore();
 

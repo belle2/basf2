@@ -38,8 +38,7 @@ REG_MODULE(VariablesToNtuple)
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
-  Module(),
-  m_tree("", DataStore::c_Persistent)
+  Module(), m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved separate rows.");
@@ -60,12 +59,11 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("sampling", m_sampling,
            "Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate.",
            default_sampling);
-
-  m_file = nullptr;
 }
 
 void VariablesToNtupleModule::initialize()
 {
+  m_eventMetaData.isRequired();
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
@@ -83,7 +81,7 @@ void VariablesToNtupleModule::initialize()
     return;
   }
 
-  m_file->cd();
+  TDirectory::TContext directoryGuard(m_file.get());
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
@@ -105,6 +103,20 @@ void VariablesToNtupleModule::initialize()
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");
   m_tree->get().SetCacheSize(100000);
+
+  // declare counter branches - pass through variable list, remove counters added by user
+  m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
+  m_tree->get().Branch("__run__", &m_run, "__run__/I");
+  m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  if (not m_particleList.empty()) {
+    m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
+    m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
+  }
+  for (const auto& variable : m_variables)
+    if (Variable::isCounterVariable(variable)) {
+      B2WARNING("The counter '" << variable
+                << "' is handled automatically by VariablesToNtuple, you don't need to add it.");
+    }
 
   // declare branches and get the variable strings
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
@@ -162,6 +174,10 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
 
 void VariablesToNtupleModule::event()
 {
+  m_event = m_eventMetaData->getEvent();
+  m_run = m_eventMetaData->getRun();
+  m_experiment = m_eventMetaData->getExperiment();
+
   if (m_particleList.empty()) {
     m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);
     if (m_branchAddresses[0] > 0) {
@@ -173,8 +189,9 @@ void VariablesToNtupleModule::event()
 
   } else {
     StoreObjPtr<ParticleList> particlelist(m_particleList);
-    unsigned int nPart = particlelist->getListSize();
-    for (unsigned int iPart = 0; iPart < nPart; iPart++) {
+    m_ncandidates = particlelist->getListSize();
+    for (unsigned int iPart = 0; iPart < m_ncandidates; iPart++) {
+      m_candidate = iPart;
       const Particle* particle = particlelist->getParticle(iPart);
       m_branchAddresses[0] = getInverseSamplingRateWeight(particle);
       if (m_branchAddresses[0] > 0) {
@@ -191,14 +208,13 @@ void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing NTuple " << m_treeName);
-    m_file->cd();
+    TDirectory::TContext directoryGuard(m_file.get());
     m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
+    m_file.reset();
     if (writeError) {
-      m_file.reset();
       B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
-    m_file.reset();
   }
 }

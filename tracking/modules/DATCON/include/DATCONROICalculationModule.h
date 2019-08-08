@@ -43,9 +43,9 @@ namespace Belle2 {
     virtual ~DATCONROICalculationModule() = default;
 
     /** Initialize the module and check module parameters */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Run tracking */
-    virtual void event();
+    virtual void event() override;
 
   protected:
 

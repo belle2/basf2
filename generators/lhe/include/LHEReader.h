@@ -88,9 +88,10 @@ namespace Belle2 {
     int m_nInitial;        /**< The number of particles in each event with a set Initial flag. */
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
-    double m_meanDecayLength;        /**< Mean lifetime*c of displaced particle. */
-    double Rmin, Rmax;           /**< Minimum and maximum of vertex distance to IP.*/
-    int pdg_displaced;           /**< PDG code of the displaced particle being studied*/
+    double m_meanDecayLength = 0.;        /**< Mean lifetime*c of displaced particle. */
+    double m_Rmin = 0.; /**< Minimum  of vertex distance to IP.*/
+    double m_Rmax = 0.; /**< Maximum of vertex distance to IP.*/
+    int m_pdgDisplaced = 0; /**< PDG code of the displaced particle being studied*/
 
   protected:
     /** Just a typedef for simple use of the boost::tokenizer to split the lines */

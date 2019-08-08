@@ -49,7 +49,7 @@ namespace Belle2 {
        * @param topVolume Top volume in which the geometry has to be placed
        * @param type Type of geometry to be build
        */
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
       /**
        * Function to create the geometry from the Database
@@ -57,14 +57,14 @@ namespace Belle2 {
        * @param topVolume Top volume in which the geometry has to be placed
        * @param type Type of geometry to be build
        */
-      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
       /** Function to create the geometry database.
        * This function should be implemented to convert Gearbox parameters to one ore more database payloads
        * @param content GearDir pointing to the parameters which should be used for construction
        * @param iov interval of validity to use when generating payloads
        */
-      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov);
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override;
 
     private:
 
@@ -74,7 +74,7 @@ namespace Belle2 {
       void backward(G4LogicalVolume&);
       /** Place elements inside the forward endcap */
       void forward(G4LogicalVolume&);
-
+      /** Wrapped crystal */
       G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
 
       /** Define visual attributes */
@@ -92,9 +92,11 @@ namespace Belle2 {
 
       /** Sensitive detector */
       Simulation::SensitiveDetectorBase* m_sensitive;
+      /** Sensitive diode */
       Simulation::SensitiveDetectorBase* m_sensediode;
       /** Vector of background-Sensitive detectors */
       std::map<std::string, G4VisAttributes*> m_atts;
+      /** overlap */
       int m_overlap;
     };
 

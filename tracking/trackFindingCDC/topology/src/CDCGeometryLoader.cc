@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Thomas Hauth                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,13 +20,10 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void CDCGeometryLoader::loadLocalDatabase()
+void CDCGeometryLoader::loadDatabase()
 {
   // Setup the DataStore and
   // create the default event number to be used for the DB parameter
@@ -35,45 +32,26 @@ void CDCGeometryLoader::loadLocalDatabase()
   DataStore::Instance().setInitializeActive(true);
   evtPtr.registerInDataStore();
   DataStore::Instance().setInitializeActive(false);
-  evtPtr.construct(0, 0, 1);
-
-  // Setup the Database
-  Database::reset();
+  // use experiment 0 for MC-only events
+  evtPtr.construct(1, 0, 0);
 
   // Load the default database including the remote db
-  // Database::Instance();
-
-  // Load only the local database
-  std::string dbFilePath = FileSystem::findFile("data/framework/database.txt");
-  LocalDatabase::createInstance(dbFilePath, "", true, LogConfig::c_Error);
+  Database::Instance();
+  // load database content for IoV in EventMetaData
   DBStore::Instance().update();
 
-  // DBObjPtr<BeamParameters> dbBeamParameters;
-  // B2ASSERT("Beamparameters in the database", dbBeamParameters);
-  // B2INFO("Successfully found beamparameters with energy "
-  //   << dbBeamParameters->getEnergy());
+  DBObjPtr<CDCGeometry> cdcGeometry;
+  if (!cdcGeometry) {
+    B2FATAL("No CDC configuration can be loaded!");
+  } else {
+    B2INFO("CDC Geometry loaded from DB");
+  }
 
-  // CDCGeometry not uploaded yet - maybe useful later
-  // DBObjPtr<CDCGeometry> dbGeometry;
-  // if (not dbGeometry) {
-  //   B2FATAL("No configuration for CDC found.");
-  // }
-  // CDCGeometry& cdcGeometry = *dbGeometry;
-
-  // Setup the gearbox
-  TestHelpers::TestWithGearbox::SetUpTestCase();
-  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
-
-  // Unpack the cdc geometry, which currently uses both the db and the gearbox
-  CDCGeometry cdcGeometry;
-  cdcGeometry.read(cdcGearDir);
-  CDC::CDCGeometryPar::Instance(&cdcGeometry);
+  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
 }
 
 void CDCGeometryLoader::closeDatabase()
 {
-  // Close the gearbox and reset the global objects
-  TestHelpers::TestWithGearbox::TearDownTestCase();
   Database::reset();
   DataStore::Instance().reset();
 }

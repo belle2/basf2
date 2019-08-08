@@ -107,6 +107,8 @@ namespace Belle2 {
 
     /** disabled. */
     EVEVisualization(const EVEVisualization&) = delete;
+    /** disabled assignment */
+    EVEVisualization& operator=(const EVEVisualization&) = delete;
     /** Destructor. */
     ~EVEVisualization();
 
@@ -120,6 +122,12 @@ namespace Belle2 {
     /** Add a RecoTrack, to evaluate track finding. */
     void addTrackCandidate(const std::string& collectionName,
                            const RecoTrack& recoTrack);
+
+    /** Add a RecoTrack, but use stored genfit track representation
+     * to make visualisation objects.
+     * FIXME this is mostly just a workaround for monopoles.*/
+    void addTrackCandidateImproved(const std::string& collectionName,
+                                   const RecoTrack& recoTrack);
 
     /** Add a CDCTriggerTrack. */
     void addCDCTriggerTrack(const std::string& collectionName,
@@ -321,7 +329,7 @@ namespace Belle2 {
     bool m_assignToPrimaries;
 
     /** If true, secondary MCParticles (and hits created by them) will not be shown. */
-    bool m_hideSecondaries;
+    bool m_hideSecondaries{false};
 
     /** map MCParticles to MCTrack (so hits can be added to the correct track). */
     std::map<const MCParticle*, MCTrack> m_mcparticleTracks;

@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef MASSVERTEXFITKFIT_H
-#define MASSVERTEXFITKFIT_H
-
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -46,6 +43,11 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setInitialVertex(const HepPoint3D& v);
+      /** Set an initial vertex point for the mass-vertex constraint fit.
+       * @param v initial vertex point
+       * @return error code (zero if success)
+       */
+      enum KFitError::ECode       setInitialVertex(const TVector3& v);
       /** Set an invariant mass for the mass-vertex constraint fit.
        * @param m invariant mass
        * @return error code (zero if success)
@@ -96,6 +98,11 @@ namespace Belle2 {
        */
       enum KFitError::ECode doFit(void);
 
+      /**
+       * Update mother particle.
+       * @param[in] mother Mother particle.
+       */
+      enum KFitError::ECode updateMother(Particle* mother);
 
     private:
       enum KFitError::ECode prepareInputMatrix(void) override;
@@ -126,6 +133,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* MASSVERTEXFITKFIT_H */
-

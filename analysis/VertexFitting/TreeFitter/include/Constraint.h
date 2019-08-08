@@ -116,7 +116,7 @@ namespace TreeFitter {
   protected:
 
     /**  constructor */
-    Constraint(Constraint::Type type) :
+    explicit Constraint(Constraint::Type type) :
       m_node(0),
       m_chi2(1e10),
       m_depth(0),

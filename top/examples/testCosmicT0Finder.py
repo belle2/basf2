@@ -156,6 +156,9 @@ class Ntuple(Module):
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.WARNING)
 
+# Define a global tag (note: the one given bellow will become out-dated!)
+use_central_database('data_reprocessing_proc8')
+
 # Create path
 main = create_path()
 
@@ -163,14 +166,8 @@ main = create_path()
 roinput = register_module('RootInput')
 main.add_module(roinput)
 
-# geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry
-geometry = register_module('Geometry')
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # shift digits in time
 main.add_module(ShiftDigits())

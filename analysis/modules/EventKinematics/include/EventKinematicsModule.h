@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTKINEMATICSMODULE_H
-#define EVENTKINEMATICSMODULE_H
+#pragma once
 
 #include <cstdlib>
 #include <ctime>
@@ -86,4 +85,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* EVENTSHAPEMODULE_H */

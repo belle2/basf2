@@ -34,9 +34,16 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
-  addParam("HistoDir", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:ReductionFlag"));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
+}
+
+DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
 }
 
 void DQMHistAnalysisPXDReductionModule::initialize()
@@ -58,7 +65,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cReduction = new TCanvas("c_Reduction");
+  m_cReduction = new TCanvas((m_histogramDirectoryName + "/c_Reduction").data());
   m_hReduction = new TH1F("Reduction", "Reduction; Module; Reduction", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hReduction->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hReduction->SetStats(false);
@@ -85,8 +92,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
@@ -123,20 +130,20 @@ void DQMHistAnalysisPXDReductionModule::event()
   }
   m_cReduction->cd();
 
-  double data = 0; // what do we want to return?
-
   // not enough Entries
   if (!enough) {
-    m_cReduction->Pad()->SetFillColor(6);// Magenta
+    m_cReduction->Pad()->SetFillColor(kGray);// Magenta or Gray
   } else {
 //   B2INFO("data "<<data);
-    /// FIXME: absolute numbers or relative numbers and what is the laccpetable limit?
+    /// FIXME: absolute numbers or relative numbers and what is the accpetable limit?
 //   if (data > 100.) {
-//     m_cReduction->Pad()->SetFillColor(2);// Red
+//     m_cReduction->Pad()->SetFillColor(kRed);// Red
 //   } else if (data > 50.) {
-//     m_cReduction->Pad()->SetFillColor(5);// Yellow
+//     m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
 //   } else {
-    m_cReduction->Pad()->SetFillColor(0);// White
+//     m_cReduction->Pad()->SetFillColor(kGreen);// Green
+//   } else {
+    m_cReduction->Pad()->SetFillColor(kWhite);// White
   }
 
   if (m_hReduction) {
@@ -149,6 +156,8 @@ void DQMHistAnalysisPXDReductionModule::event()
   m_cReduction->Modified();
   m_cReduction->Update();
 #ifdef _BELLE2_EPICS
+  double data = 0; // what do we want to return?
+
   SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif

@@ -48,7 +48,7 @@ namespace Belle2 {
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
     /** Number of vCells of Belle II PXD sensors*/

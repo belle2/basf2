@@ -38,13 +38,13 @@ namespace Belle2 {
      * Check if parameters are consistent
      * @return returns true if true
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Detector plane parameters") const;
+    void print(const std::string& title = "Detector plane parameters") const override;
 
     /**
      * Set detector plane positioning within ARICH local volume
@@ -272,7 +272,7 @@ namespace Belle2 {
     unsigned m_nRings = 0;        /**< number of HAPD module rings */
     unsigned m_nSlots = 0;        /**< number of HAPD module slots */
 
-    ClassDef(ARICHGeoDetectorPlane, 1); /**< ClassDef */
+    ClassDefOverride(ARICHGeoDetectorPlane, 1); /**< ClassDef */
 
   };
 

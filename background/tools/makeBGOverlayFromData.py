@@ -1,48 +1,48 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2
+import sys
 from rawdata import add_unpackers
 from ROOT import Belle2
 
-# -----------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 # Make data sample for BG overlay from experimental raw data
 #
-# Usage: basf2 makeBGOverlayFromData.py -i <inputFileName> -o <outputFileName>
-#   <inputFileName> must be raw data in a root format
+# Usage: basf2 makeBGOverlayFromData.py -i <inputFileName> -o <outputFileName> globalTag
 #
-# Note: use proper global tag!
-# -----------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 
-# define global tag
-globalTag = 'data_reprocessing_prod4'
+# Argument parsing
+argvs = sys.argv
+if len(argvs) < 2:
+    print("usage: basf2", argvs[0], "globalTag -i <inputFileName> -o <outputFileName>")
+    sys.exit()
+
+globalTag = argvs[1]
+trigTypes = [5, 7]  # trigger types for event selection (see TRGSummary.h)
 
 
-class SelectTRGTypeRandom(Module):
-    ''' select random triggered events from TRGSummary '''
-    # unreliable because of bugs in TRGUnpacker - do not use it before bugs are fixed
+class SelectTRGTypes(basf2.Module):
+    ''' select events according to given trigger types '''
 
     def event(self):
         ''' event processing '''
 
-        evtmetadata = Belle2.PyStoreObj('EventMetaData')
-
+        self.return_value(0)
         trg_summary = Belle2.PyStoreObj('TRGSummary')
         if not trg_summary.isValid():
-            B2ERROR('No TRGSummary available - event ignored')
-            self.return_value(0)
+            basf2.B2ERROR('No TRGSummary available - event ignored')
             return
 
-        # print('Event', evtmetadata.getEvent(), 'type', trg_summary.getTimType())
-
-        if trg_summary.getTimType() == Belle2.TRGSummary.TTYP_RAND:
-            self.return_value(1)
-        else:
-            self.return_value(0)
+        for trgType in trigTypes:
+            if trg_summary.getTimType() == trgType:
+                self.return_value(1)
+                return
 
 
-class AdjustTOPDigitsTime(Module):
-    ''' adjust time of TOPDigits '''
+class AdjustTOPDigitsTime(basf2.Module):
+    ''' adjust time of TOPDigits: a temporary solution! '''
 
     def event(self):
         ''' event processing '''
@@ -52,30 +52,40 @@ class AdjustTOPDigitsTime(Module):
             digit.subtractT0(330.0)  # set t = 0 to the average bunch crossing time
 
 
-use_central_database(globalTag)
+# Define global tag
+basf2.use_central_database(globalTag)
 
-# Create path
-main = create_path()
-emptypath = create_path()
+# Create paths
+main = basf2.create_path()
+emptypath = basf2.create_path()
 
 # Input: raw data
-roinput = register_module('RootInput')
-main.add_module(roinput)
+main.add_module('RootInput')
 
-# Unpackers
-add_unpackers(main)
+# Gearbox
+main.add_module('Gearbox')
+
+# Geometry
+main.add_module('Geometry')
+
+# Unpack TRGSummary
+main.add_module('TRGGDLUnpacker')
+main.add_module('TRGGDLSummary')
 
 # Show progress of processing
-progress = register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
-# Select random trigger events -> not usable before bug fixes in TRGUnpacker
-# selector = SelectTRGTypeRandom()
-# main.add_module(selector)
-# selector.if_false(emptypath)
+# Select random trigger events
+selector = SelectTRGTypes()
+main.add_module(selector)
+selector.if_false(emptypath)
 
-# convert ECLDsps to ECLWaveforms (used also to select random trigger events)
-compress = register_module('ECLCompressBGOverlay')
+# Unpack detector data
+add_unpackers(main,
+              components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+
+# Convert ECLDsps to ECLWaveforms
+compress = basf2.register_module('ECLCompressBGOverlay')
 main.add_module(compress, CompressionAlgorithm=3)
 compress.if_false(emptypath)
 
@@ -83,13 +93,13 @@ compress.if_false(emptypath)
 main.add_module(AdjustTOPDigitsTime())
 
 # Output: digitized hits only
-output = register_module('RootOutput')
+output = basf2.register_module('RootOutput')
 output.param('branchNames', ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
                              'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits'])
 main.add_module(output)
 
 # Process events
-process(main)
+basf2.process(main)
 
 # Print call statistics
-print(statistics)
+print(basf2.statistics)

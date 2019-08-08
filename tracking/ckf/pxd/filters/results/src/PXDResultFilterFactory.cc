@@ -79,7 +79,7 @@ PXDResultFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "recording") {
     return std::make_unique<RecordingPXDResultFilter>();
   } else if (filterName == "mva") {
-    return std::make_unique<MVAPXDResultFilter>("tracking/data/ckf_CDCToPXDResult.xml");
+    return std::make_unique<MVAPXDResultFilter>("ckf_CDCToPXDResult");
   } else if (filterName == "truth") {
     return std::make_unique<ChooseableTruthPXDResultFilter>("truth");
   } else if (filterName == "truth_teacher") {

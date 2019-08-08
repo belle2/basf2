@@ -16,7 +16,7 @@ import os
 import glob
 from ROOT import Belle2
 from basf2 import create_path, process, LogLevel, set_log_level, set_random_seed, use_central_database
-from datastoreprinter import DataStorePrinter, PrintObjectsModule
+from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 
 from rawdata import add_unpackers
 

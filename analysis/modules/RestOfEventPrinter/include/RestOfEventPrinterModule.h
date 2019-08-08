@@ -8,15 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RESTOFEVENTPRINTERMODULE_H
-#define RESTOFEVENTPRINTERMODULE_H
-
+#pragma once
 #include <framework/core/Module.h>
 #include <string>
 #include <map>
 
 #include <analysis/dataobjects/RestOfEvent.h>
 
+#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
 
@@ -50,18 +49,12 @@ namespace Belle2 {
     bool m_fullPrint; /**< True: Print whole masks content. */
 
     /**
-     * Prints out values of the specific ROE Track mask
+     * Prints out values of the specific ROE  mask
      */
-    void printTrackMask(std::map<unsigned int, bool> trackMask) const;
-
-    /**
-     * Prints out values of the specific ROE ECLCluster mask
-     */
-    void printECLClusterMask(std::map<unsigned int, bool> eclClusterMask) const;
+    void printMaskParticles(const std::vector<const Particle*>& maskParticles) const;
 
 
   };
 
 } // Belle2 namespace
 
-#endif

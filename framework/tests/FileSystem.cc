@@ -1,5 +1,5 @@
 #include <framework/utilities/FileSystem.h>
-#include <framework/utilities/WorkingDirectoryManager.h>
+#include <framework/utilities/ScopeGuard.h>
 #include <boost/filesystem.hpp>
 
 #include <gtest/gtest.h>
@@ -37,7 +37,7 @@ namespace {
 
       {
         //check relative filenames
-        WorkingDirectoryManager pwd("/tmp"); //don't influence other tests by changing pwd
+        auto pwd = ScopeGuard::guardWorkingDirectory("/tmp"); //don't influence other tests by changing pwd
         std::string relname = fs::relative(filename, "/tmp").string();
         ASSERT_TRUE(FileSystem::fileExists(relname));
         chdir("/");

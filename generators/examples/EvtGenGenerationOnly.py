@@ -8,10 +8,11 @@
 # Contributor(s): Torben Ferber (torben.ferber@desy.de)
 #
 ########################################################
-import os
 
-from basf2 import *
-from generators import *
+import os
+import sys
+import basf2
+from generators import add_evtgen_generator
 
 # interpret the first input argument as decay file to facilitate testing of dec-files
 dec_file = None
@@ -23,7 +24,7 @@ if len(sys.argv) > 1:
 
 
 # main path
-main = create_path()
+main = basf2.create_path()
 
 # event info setter
 main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
@@ -34,10 +35,10 @@ add_evtgen_generator(path=main, finalstate=final_state, signaldecfile=dec_file)
 # run
 main.add_module("Progress")
 main.add_module("RootOutput", outputFileName="evtgen_upsilon4s.root")
-main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

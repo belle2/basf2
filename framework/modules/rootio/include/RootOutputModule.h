@@ -13,6 +13,9 @@
 #include <framework/core/Module.h>
 #include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/FileMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -20,7 +23,7 @@
 #include <string>
 #include <vector>
 
-
+#include <boost/optional.hpp>
 
 namespace Belle2 {
   /** Write objects from DataStore into a ROOT file.
@@ -78,6 +81,12 @@ namespace Belle2 {
 
   private:
 
+    /** Finalize the output file */
+    void closeFile();
+
+    /** Open the next output file */
+    void openFile();
+
     /** Fill TTree.
      *
      * Write the objects from the DataStore to the output TTree.
@@ -117,8 +126,11 @@ namespace Belle2 {
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
+    /** TFile compression algorithm.  */
+    int m_compressionAlgorithm{0};
+
     /** TFile compression level.  */
-    int m_compressionLevel;
+    int m_compressionLevel{1};
 
     /** Branch split level.
      *
@@ -142,8 +154,14 @@ namespace Belle2 {
      */
     bool m_ignoreCommandLineOverride;
 
+    /** Maximum output file size in MB. If not set we don't split. Otherwise we split
+     * if the event tree in output file has reached the given size in MB */
+    boost::optional<uint64_t> m_outputSplitSize{boost::none};
 
     //then those for purely internal use:
+
+    /** Keep track of the file index: if we split files than we add '.f{fileIndex:05d}' in front of the ROOT extension */
+    int m_fileIndex{0};
 
     /** TFile for output. */
     TFile* m_file;
@@ -189,5 +207,13 @@ namespace Belle2 {
 
     /** Whether to keep parents same as that of input file */
     bool m_keepParents{false};
+
+    /** Whether this is a regular, local file where we can actually create directories */
+    bool m_regularFile{true};
+
+    /** Pointer to the event meta data */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+    /** Pointer to the file meta data */
+    StoreObjPtr<FileMetaData> m_fileMetaData{"", DataStore::c_Persistent};
   };
 } // end namespace Belle2

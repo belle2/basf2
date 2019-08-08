@@ -49,18 +49,18 @@ namespace Belle2 {
       virtual ~QcsmonitorDigitizerModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:

@@ -86,7 +86,7 @@ def get_det_hit_ids(reco_track, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Bel
 
 def calc_ndf_from_det_hit_ids(det_hit_ids,
                               ndf_by_det_id={Belle2.Const.PXD: 2,
-                                             Belle2.Const.SVD: 2,
+                                             Belle2.Const.SVD: 1,
                                              Belle2.Const.CDC: 1}):
     """For a set of detector and hit ids calculate the total number of degrees of freedom
 
@@ -108,7 +108,7 @@ def calc_ndf_from_det_hit_ids(det_hit_ids,
 def calc_hit_efficiency(det_hit_ids,
                         mc_det_hit_ids,
                         ndf_by_det_id={Belle2.Const.PXD: 2,
-                                       Belle2.Const.SVD: 2,
+                                       Belle2.Const.SVD: 1,
                                        Belle2.Const.CDC: 1}):
     """Calculates the fraction of detector and hits ids in a reference (MC) set that are also
     present in a reconstructed (PR) set.

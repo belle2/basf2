@@ -26,12 +26,16 @@ namespace Belle2 {
 
     /**
      * hit quality enumerators
+     *
+     * Note: the only allowed place for switching to c_Uncalibrated is TOPChannelMasker
+     * because this information must be also passed to reconstruction
      */
     enum EHitQuality {
       c_Junk = 0,
       c_Good = 1,
       c_CrossTalk = 3,
-      c_CalPulse = 4
+      c_CalPulse = 4,
+      c_Uncalibrated = 5
     };
 
     /**
@@ -43,8 +47,9 @@ namespace Belle2 {
       c_ModuleT0Calibrated =  4,
       c_CommonT0Calibrated =  8,
       c_FullyCalibrated = c_TimeBaseCalibrated | c_ChannelT0Calibrated | c_ModuleT0Calibrated | c_CommonT0Calibrated,
-      c_OffsetSubtracted = 16,
+      c_OffsetSubtracted = 16,       // offset used in MC
       c_EventT0Subtracted = 32,
+      c_BunchOffsetSubtracted = 64,  // reconstructed average bunch offset
     };
 
     /**
@@ -85,6 +90,18 @@ namespace Belle2 {
      * @param time pile-up time in [ns]
      */
     static void setPileupTime(double time) {s_pileupTime = time;}
+
+    /**
+     * Sets module ID
+     * @param moduleID  module ID (1-based)
+     */
+    void setModuleID(int moduleID) {m_moduleID = moduleID;}
+
+    /**
+     * Sets pixel ID
+     * @param pixelID   pixel ID (1-based)
+     */
+    void setPixelID(int pixelID) {m_pixelID = pixelID;}
 
     /**
      * Sets hardware channel number (0-based)
@@ -181,6 +198,12 @@ namespace Belle2 {
      * @return hit quality
      */
     EHitQuality getHitQuality() const {return m_quality; }
+
+    /**
+     * Returns calibration status bits
+     * @return status bits
+     */
+    unsigned short getStatus() const {return m_status;}
 
     /**
      * Returns calibration status

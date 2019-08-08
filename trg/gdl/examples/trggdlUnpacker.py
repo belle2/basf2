@@ -20,8 +20,10 @@ if argc != 2:
 if argc == 2:
     f_in_root = argvs[1]
 
-set_log_level(LogLevel.ERROR)
-# set_log_level(LogLevel.INFO)
+# set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.INFO)
+
+use_central_database("TRGGDL_201811")
 
 # input
 if f_in_root[-6:] == ".sroot":

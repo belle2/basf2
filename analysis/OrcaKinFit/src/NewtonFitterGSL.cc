@@ -43,17 +43,16 @@ static int nitcalc = 0;
 static int nitsvd = 0;
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
 // constructor
     NewtonFitterGSL::NewtonFitterGSL()
       : npar(0), ncon(0), nsoft(0), nunm(0), ierr(0), nit(0), fitprob(0), chi2(0),
         idim(0),
-        x(0), xold(0), xbest(0), dx(0), dxscal(0), grad(0), y(0), yscal(0),
-        perr(0), v1(0), v2(0), Meval(0),
-        M(0), Mscal(0), M1(0), M2(0), M3(0), M4(0), M5(0), Mevec(0),
-        CC(0), CC1(0), CCinv(0), permM(0), ws(0),
+        x(nullptr), xold(nullptr), xbest(nullptr), dx(nullptr), dxscal(nullptr), grad(nullptr), y(nullptr), yscal(nullptr),
+        perr(nullptr), v1(nullptr), v2(nullptr), Meval(nullptr),
+        M(nullptr), Mscal(nullptr), M1(nullptr), M2(nullptr), M3(nullptr), M4(nullptr), M5(nullptr), Mevec(nullptr),
+        CC(nullptr), CC1(nullptr), CCinv(nullptr), permM(nullptr), ws(nullptr),
         wsdim(0), chi2best(0),
         chi2new(0),
         chi2old(0),
@@ -93,31 +92,31 @@ namespace Belle2 {
       if (permM) gsl_permutation_free(permM);
       if (ws) gsl_eigen_symmv_free(ws);
 
-      x = 0;
-      xold = 0;
-      xbest = 0;
-      dx = 0;
-      dxscal = 0;
-      grad = 0;
-      y = 0;
-      yscal = 0;
-      perr = 0;
-      v1 = 0;
-      v2 = 0;
-      Meval = 0;
-      M = 0;
-      Mscal = 0;
-      M1 = 0;
-      M2 = 0;
-      M3 = 0;
-      M4 = 0;
-      M5 = 0;
-      Mevec = 0;
-      CC = 0;
-      CC1 = 0;
-      CCinv = 0;
-      permM = 0;
-      ws = 0; wsdim = 0;
+      x = nullptr;
+      xold = nullptr;
+      xbest = nullptr;
+      dx = nullptr;
+      dxscal = nullptr;
+      grad = nullptr;
+      y = nullptr;
+      yscal = nullptr;
+      perr = nullptr;
+      v1 = nullptr;
+      v2 = nullptr;
+      Meval = nullptr;
+      M = nullptr;
+      Mscal = nullptr;
+      M1 = nullptr;
+      M2 = nullptr;
+      M3 = nullptr;
+      M4 = nullptr;
+      M5 = nullptr;
+      Mevec = nullptr;
+      CC = nullptr;
+      CC1 = nullptr;
+      CCinv = nullptr;
+      permM = nullptr;
+      ws = nullptr; wsdim = 0;
     }
 
 
@@ -160,15 +159,14 @@ namespace Belle2 {
       if (tracer) tracer->initialize(*this);
 #endif
 
-      bool converged = 0;
+      bool converged = false;
       ierr = 0;
 
       chi2new = calcChi2();
       nit = 0;
       if (debug > 1) {
         B2INFO("Fit objects:\n");
-        for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-          BaseFitObject* fo = *i;
+        for (auto fo : fitobjects) {
           assert(fo);
           B2INFO(fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2());
           for (int ilocal = 0; ilocal < fo->getNPar(); ++ilocal) {
@@ -186,7 +184,7 @@ namespace Belle2 {
           }
         }
         B2INFO("constraints:\n");
-        for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
+        for (auto i = constraints.begin(); i != constraints.end(); ++i) {
           BaseHardConstraint* c = *i;
           assert(c);
           B2INFO(i - constraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError());
@@ -194,7 +192,7 @@ namespace Belle2 {
           B2INFO("  global number: " << kglobal);
         }
         B2INFO("soft constraints:\n");
-        for (SoftConstraintIterator i = softconstraints.begin(); i != softconstraints.end(); ++i) {
+        for (auto i = softconstraints.begin(); i != softconstraints.end(); ++i) {
           BaseSoftConstraint* c = *i;
           assert(c);
           B2INFO(i - softconstraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError()
@@ -209,8 +207,7 @@ namespace Belle2 {
         if (nit == 0 || nit < nitdebug) B2DEBUG(11, "===================\nStarting iteration " << nit);
         if (nit == 0 || nit < nitdebug) {
           std::string printout = "\n Fit objects:\n";
-          for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-            BaseFitObject* fo = *i;
+          for (auto fo : fitobjects) {
             assert(fo);
             printout += fo->getName();
             printout += ", chi2=" ;
@@ -218,8 +215,7 @@ namespace Belle2 {
             printout += "\n";
           }
           printout += "constraints:\n";
-          for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
-            BaseHardConstraint* c = *i;
+          for (auto c : constraints) {
             assert(c);
             printout += c->getName() ;
             printout += ": ";
@@ -229,8 +225,7 @@ namespace Belle2 {
             printout += "\n";
           }
           printout += "soft constraints:\n";
-          for (SoftConstraintIterator i = softconstraints.begin(); i != softconstraints.end(); ++i) {
-            BaseSoftConstraint* c = *i;
+          for (auto c : softconstraints) {
             assert(c);
             printout += c->getName() ;
             printout += ": ";
@@ -340,13 +335,13 @@ namespace Belle2 {
         calcCovMatrix();
 
         // update errors in fitobjects
-        for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-          for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-            int iglobal = fitobjects[ifitobj]->getGlobalParNum(ilocal);
-            for (int jlocal = ilocal; jlocal < fitobjects[ifitobj]->getNPar(); ++jlocal) {
-              int jglobal = fitobjects[ifitobj]->getGlobalParNum(jlocal);
+        for (auto& fitobject : fitobjects) {
+          for (int ilocal = 0; ilocal < fitobject->getNPar(); ++ilocal) {
+            int iglobal = fitobject->getGlobalParNum(ilocal);
+            for (int jlocal = ilocal; jlocal < fitobject->getNPar(); ++jlocal) {
+              int jglobal = fitobject->getGlobalParNum(jlocal);
               if (iglobal >= 0 && jglobal >= 0)
-                fitobjects[ifitobj]->setCov(ilocal, jlocal, gsl_matrix_get(CCinv, iglobal, jglobal));
+                fitobject->setCov(ilocal, jlocal, gsl_matrix_get(CCinv, iglobal, jglobal));
             }//CCinv
           }
         }
@@ -355,8 +350,7 @@ namespace Belle2 {
 
       std::string printout = "\n ========= END =========\n";
       printout += "Fit objects:\n";
-      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-        BaseFitObject* fo = *i;
+      for (auto fo : fitobjects) {
         assert(fo);
         printout += fo->getName() ;
         printout += ": ";
@@ -365,8 +359,7 @@ namespace Belle2 {
         printout += "\n";
       }
       printout += "constraints:\n";
-      for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
-        BaseHardConstraint* c = *i;
+      for (auto c : constraints) {
         assert(c);
         printout += c->getName();
         printout += ": ";
@@ -402,15 +395,15 @@ namespace Belle2 {
       npar = 0;
       nunm = 0;
 
-      for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-        for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-          if (!fitobjects[ifitobj]->isParamFixed(ilocal)) {
+      for (auto& fitobject : fitobjects) {
+        for (int ilocal = 0; ilocal < fitobject->getNPar(); ++ilocal) {
+          if (!fitobject->isParamFixed(ilocal)) {
             B2DEBUG(13, "NewtonFitterGSL::initialize: parameter " << ilocal
-                    << " of fitobject " << fitobjects[ifitobj]->getName()
+                    << " of fitobject " << fitobject->getName()
                     << " gets global number " << npar);
-            fitobjects[ifitobj]->setGlobalParNum(ilocal, npar);
+            fitobject->setGlobalParNum(ilocal, npar);
             ++npar;
-            if (!fitobjects[ifitobj]->isParamMeasured(ilocal)) ++nunm;
+            if (!fitobject->isParamMeasured(ilocal)) ++nunm;
           }
         }
       }
@@ -465,9 +458,9 @@ namespace Belle2 {
 
       if (ws && wsdim != idim) {
         gsl_eigen_symmv_free(ws);
-        ws = 0;
+        ws = nullptr;
       }
-      if (ws == 0) ws = gsl_eigen_symmv_alloc(idim);
+      if (ws == nullptr) ws = gsl_eigen_symmv_alloc(idim);
       wsdim = idim;
 
       return true;
@@ -477,13 +470,11 @@ namespace Belle2 {
     double NewtonFitterGSL::calcChi2()
     {
       chi2 = 0;
-      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-        BaseFitObject* fo = *i;
+      for (auto fo : fitobjects) {
         assert(fo);
         chi2 += fo->getChi2();
       }
-      for (SoftConstraintIterator i = softconstraints.begin(); i != softconstraints.end(); ++i) {
-        BaseSoftConstraint* bsc = *i;
+      for (auto bsc : softconstraints) {
         assert(bsc);
         chi2 += bsc->getChi2();
       }
@@ -654,7 +645,7 @@ namespace Belle2 {
         if (p->size != size) {
           gsl_permutation_free(p);
           if (size > 0) p = gsl_permutation_alloc(size);
-          else p = 0;
+          else p = nullptr;
         }
       } else if (size > 0) p = gsl_permutation_alloc(size);
     }
@@ -666,7 +657,7 @@ namespace Belle2 {
         if (v->size != size) {
           gsl_vector_free(v);
           if (size > 0) v = gsl_vector_alloc(size);
-          else v = 0;
+          else v = nullptr;
         }
       } else if (size > 0) v = gsl_vector_alloc(size);
     }
@@ -677,7 +668,7 @@ namespace Belle2 {
         if (m->size1 != size1 || m->size2 != size2) {
           gsl_matrix_free(m);
           if (size1 * size2 > 0) m = gsl_matrix_alloc(size1, size2);
-          else m = 0;
+          else m = nullptr;
         }
       } else if (size1 * size2 > 0) m = gsl_matrix_alloc(size1, size2);
     }
@@ -707,7 +698,7 @@ namespace Belle2 {
       assert(xnew);
       assert(xnew->size == idim);
       bool significant = false;
-      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
+      for (auto i = fitobjects.begin(); i != fitobjects.end(); ++i) {
         BaseFitObject* fo = *i;
         assert(fo);
         bool s = fo->updateParams(xnew->block->data, xnew->size);
@@ -725,8 +716,7 @@ namespace Belle2 {
     {
       assert(xold);
       assert(xold->size == idim);
-      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-        BaseFitObject* fo = *i;
+      for (auto fo : fitobjects) {
         assert(fo);
         for (int ilocal = 0; ilocal < fo->getNPar(); ++ilocal) {
           if (!fo->isParamFixed(ilocal)) {
@@ -736,8 +726,7 @@ namespace Belle2 {
           }
         }
       }
-      for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
-        BaseHardConstraint* c = *i;
+      for (auto c : constraints) {
         assert(c);
         int iglobal = c->getGlobalNum();
         assert(iglobal >= 0 && iglobal < (int)idim);
@@ -750,8 +739,7 @@ namespace Belle2 {
       assert(perr);
       assert(perr->size == idim);
       gsl_vector_set_all(perr, 1);
-      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-        BaseFitObject* fo = *i;
+      for (auto fo : fitobjects) {
         assert(fo);
         for (int ilocal = 0; ilocal < fo->getNPar(); ++ilocal) {
           if (!fo->isParamFixed(ilocal)) {
@@ -762,8 +750,7 @@ namespace Belle2 {
           }
         }
       }
-      for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
-        BaseHardConstraint* c = *i;
+      for (auto c : constraints) {
         assert(c);
         int iglobal = c->getGlobalNum();
         assert(iglobal >= 0 && iglobal < (int)idim);
@@ -780,8 +767,7 @@ namespace Belle2 {
       gsl_matrix_set_zero(M);
 
       // First, all terms d^2 chi^2/dx1 dx2
-      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-        BaseFitObject* fo = *i;
+      for (auto fo : fitobjects) {
         assert(fo);
         fo->addToGlobalChi2DerMatrix(M->block->data, M->tda);
       }
@@ -793,8 +779,7 @@ namespace Belle2 {
       // Second, all terms d^2 chi^2/dlambda dx,
       // i.e. the first derivatives of the contraints,
       // plus the second derivatives times the lambda values
-      for (unsigned int k = 0; k < constraints.size(); ++k) {
-        BaseHardConstraint* c = constraints[k];
+      for (auto c : constraints) {
         assert(c);
         int kglobal = c->getGlobalNum();
         assert(kglobal >= 0 && kglobal < (int)idim);
@@ -817,8 +802,7 @@ namespace Belle2 {
 
       // Finally, treat the soft constraints
 
-      for (SoftConstraintIterator i = softconstraints.begin(); i != softconstraints.end(); ++i) {
-        BaseSoftConstraint* bsc = *i;
+      for (auto bsc : softconstraints) {
         assert(bsc);
         bsc->add2ndDerivativesToMatrix(M->block->data, M->tda);
       }
@@ -844,16 +828,14 @@ namespace Belle2 {
       assert(y->size == idim);
       gsl_vector_set_zero(y);
       // First, for the parameters
-      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-        BaseFitObject* fo = *i;
+      for (auto fo : fitobjects) {
         assert(fo);
         fo->addToGlobalChi2DerVector(y->block->data, y->size);
       }
 
       // Now add lambda*derivatives of constraints,
       // And finally, the derivatives w.r.t. to the constraints, i.e. the constraints themselves
-      for (unsigned int k = 0; k < constraints.size(); ++k) {
-        BaseHardConstraint* c = constraints[k];
+      for (auto c : constraints) {
         assert(c);
         int kglobal = c->getGlobalNum();
         assert(kglobal >= 0 && kglobal < (int)idim);
@@ -863,8 +845,7 @@ namespace Belle2 {
 
       // Finally, treat the soft constraints
 
-      for (SoftConstraintIterator i = softconstraints.begin(); i != softconstraints.end(); ++i) {
-        BaseSoftConstraint* bsc = *i;
+      for (auto bsc : softconstraints) {
         assert(bsc);
         bsc->addToGlobalChi2DerVector(y->block->data, y->size);
       }
@@ -1038,8 +1019,7 @@ namespace Belle2 {
       gsl_matrix_set_zero(M1);
       gsl_matrix_set_zero(M2);
       // First, all terms d^2 chi^2/dx1 dx2
-      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-        BaseFitObject* fo = *i;
+      for (auto fo : fitobjects) {
         assert(fo);
         fo->addToGlobalChi2DerMatrix(M1->block->data, M1->tda);
         fo->addToGlobCov(M2->block->data, M2->tda);
@@ -1120,7 +1100,7 @@ namespace Belle2 {
       // Finally, copy covariance matrix
       if (cov && covDim != npar) {
         delete[] cov;
-        cov = 0;
+        cov = nullptr;
       }
       covDim = npar;
       if (!cov) cov = new double[covDim * covDim];
@@ -1139,8 +1119,7 @@ namespace Belle2 {
       switch (imerit) {
         case 1: // l1 penalty function, Nocedal&Wright Eq. (15.24)
           result = chi2;
-          for (unsigned int k = 0; k < constraints.size(); ++k) {
-            BaseHardConstraint* c = constraints[k];
+          for (auto c : constraints) {
             assert(c);
             int kglobal = c->getGlobalNum();
             assert(kglobal >= 0 && kglobal < (int)idim);
@@ -1165,5 +1144,4 @@ namespace Belle2 {
 
   }// end OrcaKinFit namespace
 } // end Belle2 namespace
-
 

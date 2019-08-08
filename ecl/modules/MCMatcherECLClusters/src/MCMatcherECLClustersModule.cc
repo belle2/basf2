@@ -173,6 +173,8 @@ void MCMatcherECLClustersModule::event()
   // the relation between ECLShower->MCParticle.  StoreArray<ECLCluster> eclClusters;
   for (const auto& eclShower : m_eclShowers) {
     const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>(eclClusterArrayName());
+    if (!eclCluster) continue;
+
     const RelationVector<MCParticle> mcParticles = eclShower.getRelationsTo<MCParticle>();
     for (unsigned int i = 0; i < mcParticles.size(); ++i) {
       const auto mcParticle = mcParticles.object(i);

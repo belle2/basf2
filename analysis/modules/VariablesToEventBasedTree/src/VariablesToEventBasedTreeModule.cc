@@ -29,8 +29,7 @@ REG_MODULE(VariablesToEventBasedTree)
 
 
 VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
-  Module(),
-  m_tree("", DataStore::c_Persistent)
+  Module(), m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TTree. The Tree is event-based, meaning that the variables of each candidate for each event are saved in an array of a branch of the Tree.");
@@ -62,6 +61,7 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
 
 void VariablesToEventBasedTreeModule::initialize()
 {
+  m_eventMetaData.isRequired();
   StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // Initializing the output root file
@@ -88,11 +88,21 @@ void VariablesToEventBasedTreeModule::initialize()
   m_values.resize(m_variables.size());
   m_event_values.resize(m_event_variables.size());
 
+  m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  m_tree->get().Branch("__run__", &m_run, "__run__/I");
+  m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
   m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   m_tree->get().Branch("__weight__", &m_weight, "__weight__/F");
 
   for (unsigned int i = 0; i < m_event_variables.size(); ++i) {
     auto varStr = m_event_variables[i];
+
+    if (Variable::isCounterVariable(varStr)) {
+      B2WARNING("The counter '" << varStr
+                << "' is handled automatically by VariablesToEventBasedTree, you don't need to add it.");
+      continue;
+    }
+
     m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_values[i], (makeROOTCompatible(varStr) + "/D").c_str());
 
     //also collection function pointers
@@ -158,6 +168,10 @@ float VariablesToEventBasedTreeModule::getInverseSamplingRateWeight()
 
 void VariablesToEventBasedTreeModule::event()
 {
+  // get counter numbers
+  m_event = m_eventMetaData->getEvent();
+  m_run = m_eventMetaData->getRun();
+  m_experiment = m_eventMetaData->getExperiment();
 
   StoreObjPtr<ParticleList> particlelist(m_particleList);
   m_ncandidates = particlelist->getListSize();

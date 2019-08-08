@@ -43,10 +43,10 @@ namespace Belle2 {
       SVDNNShapeReconstructorModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
 
     protected:
 
@@ -117,10 +117,10 @@ namespace Belle2 {
       /** Lookup table for SVDShaperDigit->SVDTrueHit relation */
       RelationLookup m_trueRelation;
 
-      // Write SVDRecoDigits? (no in normal operation)
+      /** Write SVDRecoDigits? (no in normal operation)*/
       bool m_writeRecoDigits = false;
 
-      // Zero-suppression cut
+      /** Zero-suppression cut*/
       float m_cutAdjacent = 3.0;
 
     };//end class declaration

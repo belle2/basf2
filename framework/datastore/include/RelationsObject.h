@@ -405,9 +405,9 @@ namespace Belle2 {
     {
       return getRelationsWith<TObject>(name);
     }
-    TObject* getRelatedTo(const std::string& name) const { return getRelatedTo<TObject>(name); }
-    TObject* getRelatedFrom(const std::string& name) const { return getRelatedFrom<TObject>(name); }
-    TObject* getRelated(const std::string& name) const { return getRelated<TObject>(name); }
+    TObject* getRelatedTo(const std::string& name, const std::string& namedRelation = "") const { return getRelatedTo<TObject>(name, namedRelation); }
+    TObject* getRelatedFrom(const std::string& name, const std::string& namedRelation = "") const { return getRelatedFrom<TObject>(name, namedRelation); }
+    TObject* getRelated(const std::string& name, const std::string& namedRelation = "") const { return getRelated<TObject>(name, namedRelation); }
     /** @} */
 #endif
   protected:

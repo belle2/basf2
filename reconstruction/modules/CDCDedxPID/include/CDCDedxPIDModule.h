@@ -80,14 +80,14 @@ namespace Belle2 {
     virtual ~CDCDedxPIDModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -182,7 +182,7 @@ namespace Belle2 {
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
 
-    int m_nLayerWires[9]; /**< number of wires per layer: needed for wire gain calibration */
+    int m_nLayerWires[9] = {}; /**< number of wires per layer: needed for wire gain calibration */
 
     // parameters to determine the predicted means and resolutions and hadron correction
     DBObjPtr<CDCDedxMeanPars> m_DBMeanPars; /**< dE/dx mean parameters */

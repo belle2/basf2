@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMCHANNELS_H
-#define EKLMCHANNELS_H
+#pragma once
 
 /* C++ headers. */
 #include <cstdint>
@@ -58,12 +57,9 @@ namespace Belle2 {
     /** Channel data. */
     std::map<uint16_t, EKLMChannelData> m_Channels;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMChannels, 1);
 
   };
 
 }
-
-#endif
-

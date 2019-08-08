@@ -5,9 +5,9 @@
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Racha Cheaib
-# Email: rcheaib@olemiss.edu
+# Email: rachac@mail.ubc.ca
 # Cuts: None
-# Date: 20180821
+# Date: 20181108
 #
 #
 
@@ -55,7 +55,7 @@ Decay myK_S0
 Enddecay
 
 Decay myD-
-1.00 K- pi+ pi-    PHSP;
+1.00 K+ pi- pi-    PHSP;
 Enddecay
 CDecay myD+
 

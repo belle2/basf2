@@ -73,13 +73,13 @@ namespace Belle2 {
      * Consistency check of geometry parameters
      * @return true if consistent
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Parameters of ARICH support structure and neutron shield") const;
+    void print(const std::string& title = "Parameters of ARICH support structure and neutron shield") const override;
 
     /**
      * Set parameters of support wedge volumes
@@ -286,7 +286,7 @@ namespace Belle2 {
     std::vector<wedge> m_wedges;         /**< vector of wedge volumes to be placed */
     std::vector<box> m_boxes;            /**< vector of box volumes to be places */
 
-    ClassDef(ARICHGeoSupport, 1); /**< ClassDef */
+    ClassDefOverride(ARICHGeoSupport, 1); /**< ClassDef */
 
   };
 

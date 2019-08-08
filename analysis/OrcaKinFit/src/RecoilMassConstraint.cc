@@ -42,8 +42,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+      for (auto fitobject : fitobjects) {
+        auto* pfo = dynamic_cast < ParticleFitObject* >(fitobject);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();
@@ -79,8 +79,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+      for (auto fitobject : fitobjects) {
+        auto* pfo = dynamic_cast < ParticleFitObject* >(fitobject);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();
@@ -102,13 +102,13 @@ namespace Belle2 {
       double recoilmass_inv = 0.;
       if (recoil > 1e-9)  recoilmass_inv = 1. / recoil;
 
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        for (int ilocal = 0; ilocal < fitobjects[i]->getNPar(); ilocal++) {
-          if (!fitobjects[i]->isParamFixed(ilocal)) {
-            int iglobal = fitobjects[i]->getGlobalParNum(ilocal);
+      for (auto fitobject : fitobjects) {
+        for (int ilocal = 0; ilocal < fitobject->getNPar(); ilocal++) {
+          if (!fitobject->isParamFixed(ilocal)) {
+            int iglobal = fitobject->getGlobalParNum(ilocal);
             assert(iglobal >= 0 && iglobal < idim);
 
-            ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+            auto* pfo = dynamic_cast < ParticleFitObject* >(fitobject);
             assert(pfo);
             der[iglobal] = - recoilE  * pfo->getDE(ilocal)
                            + recoilpx * pfo->getDPx(ilocal)
@@ -128,8 +128,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+      for (auto& fitobject : fitobjects) {
+        auto* pfo = dynamic_cast < ParticleFitObject* >(fitobject);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();
@@ -165,8 +165,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int k = 0; k < fitobjects.size(); k++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[k]);
+      for (auto fitobject : fitobjects) {
+        auto* pfo = dynamic_cast < ParticleFitObject* >(fitobject);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();
@@ -216,8 +216,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int k = 0; k < fitobjects.size(); k++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[k]);
+      for (auto fitobject : fitobjects) {
+        auto* pfo = dynamic_cast < ParticleFitObject* >(fitobject);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();

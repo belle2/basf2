@@ -66,13 +66,13 @@ namespace Belle2 {
     int approach(TRGCDCLink&, bool sagCorrection = false) const;
 
     /// returns momentum vector.
-    virtual const CLHEP::Hep3Vector& p(void) const;
+    virtual const CLHEP::Hep3Vector& p(void) const override;
 
     /// returns Pt.
-    virtual double pt(void) const;
+    virtual double pt(void) const override;
 
     /// returns position vector.
-    virtual const CLHEP::Hep3Vector& x(void) const;
+    virtual const CLHEP::Hep3Vector& x(void) const override;
 
     /// Set 2D fit chi2
     void set2DFitChi2(double);

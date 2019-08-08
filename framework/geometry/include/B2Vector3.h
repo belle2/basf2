@@ -67,6 +67,7 @@ namespace Belle2 {
     /** Constructor expecting a pointer to a B2Vector3 */
     explicit B2Vector3(const B2Vector3<DataType>* b2Vec3): m_coordinates {b2Vec3->X(), b2Vec3->Y(), b2Vec3->Z()} {};
     /** Constructor expecting a B2Vector3 of different type*/
+    // cppcheck-suppress noExplicitConstructor
     template <typename OtherType> B2Vector3(const B2Vector3<OtherType>& b2Vec3):
       m_coordinates {static_cast<DataType>(b2Vec3.X()), static_cast<DataType>(b2Vec3.Y()), static_cast<DataType>(b2Vec3.Z())} {};
     /** Constructor expecting a pointer to a B2Vector3 of different type */

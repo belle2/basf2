@@ -111,6 +111,7 @@ namespace Belle2 {
 
     digits.clear();
     int trgtype = 16;
+    double vth_thscan = 0.0;
 
     if (m_debug) {
       std::cout << std::endl << "------------------------" << std::endl;
@@ -153,8 +154,8 @@ namespace Belle2 {
             if (m_debug) febHead.print();
 
             if (/*febHead.type != head.type ||*/ febHead.version != head.version || febHead.mergerID != head.mergerID
-                                                 || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in FEB header " << (unsigned)febHead.FEBSlot <<
-                                                       " not consistent with data in merger header " << (unsigned)head.mergerID);
+                                                 || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in header " << LogVar("FEB ID", (unsigned)febHead.FEBSlot) <<
+                                                       " not consistent with data in header " << LogVar("merger ID", (unsigned)head.mergerID));
 
             // feb header shift
             ibyte += ARICHFEB_HEADER_SIZE;
@@ -164,11 +165,11 @@ namespace Belle2 {
 
             unsigned mergID = m_mergerMap->getMergerIDfromSN((unsigned)head.mergerID);
 
-            if (mergID == 99) { B2ERROR("ARICHUnpackerModule: unknown merger number: " << mergID << " (SN: " << (unsigned)head.mergerID << "). Merger date will be skipped"); break;}
+            if (mergID == 99) { B2ERROR("ARICHUnpackerModule: unknown merger number " << LogVar("merger ID", mergID) << LogVar("Serial Number", (unsigned)head.mergerID) << "Merger data will be skipped"); break;}
 
             unsigned moduleID = m_mergerMap->getModuleID(mergID, (unsigned)febHead.FEBSlot);
 
-            if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger to FEB mapping:: " << mergID << " (SN: " << (unsigned)head.mergerID << ") FEB slot: " << (unsigned)febHead.FEBSlot << ". Merger data will be skipped"); break;}
+            if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger to FEB mapping" << LogVar("merger ID", mergID) << LogVar("Serial Number", (unsigned)head.mergerID) << LogVar("FEB slot", (unsigned)febHead.FEBSlot) << "Merger data will be skipped"); break;}
 
             // read data
             if (m_debug) std::cout << "Hit channels: " << std::endl;
@@ -196,13 +197,14 @@ namespace Belle2 {
                 asicCh--;
                 ibyte++;
               }
-            } else B2ERROR("ARICHUnpackerModule: Unknown data type " << febHead.type);
+            } else B2ERROR("ARICHUnpackerModule: Unknown data type" << LogVar("type", febHead.type));
 
           }
 
           if (ceil(ibyte / 4.) != (unsigned)bufferSize)
-            B2WARNING("ARICHUnpackerModule: data buffer size mismatch (from copper vs data header: " <<  bufferSize << " vs. " <<  ceil(
-                        ibyte / 4.));
+            B2WARNING("ARICHUnpackerModule: data buffer size mismatch " <<  LogVar("size from copper", bufferSize) << LogVar("size from merger",
+                      ceil(
+                        ibyte / 4.)));
         }
       } // end of rawData loop
 
@@ -232,7 +234,12 @@ namespace Belle2 {
             ver = calbyte(buf);
             boardid = calbyte(buf);
             febno = calbyte(buf);
-            unsigned int length = calword(buf);
+
+            // first line: vth value
+            unsigned int vth_int = cal2byte(buf);
+            if (vth_int > 0) { vth_thscan = (vth_int * 0.0024) - 1.27; }
+            // second line: length
+            unsigned int length = cal2byte(buf);
             int evtno = calword(buf);
             unsigned int ibyte = 0;
             std::stringstream ss;
@@ -260,10 +267,8 @@ namespace Belle2 {
                   ss << "ch# " << ch << "(" << val << ") ";
                   hasHit = true;
                   if (febno < 0 || febno > 6) {
-                    B2ERROR("FEB is bad : " << febno << " hslb-" << finesse << ":"
-                            << " type=" << type_feb << ", ver=" << ver << " "
-                            << ", boardid=" << boardid << ", febno=" << febno
-                            << ", length=" << length << ", evtno=" << evtno);
+                    B2ERROR("FEB is bad : " << LogVar("FEB no.", febno) << LogVar("hslb", finesse) << LogVar("type", type_feb) << LogVar("ver",
+                            ver) << LogVar("boardid", boardid) << LogVar("febno", febno) << LogVar("length", length) << LogVar("evtno", evtno));
                   }
                   feb.push_back(ch, val);
                 }
@@ -271,7 +276,9 @@ namespace Belle2 {
                 if (ch < 0) break;
               }
             } else if (type_feb == 0x01) { // Suppressed mode
-              if (length > 144 * 2 + 10) B2FATAL("error " << length);
+              // The below line is commented since it sometimes causes problem during processing threshold scan data.
+              // No harm to comment this line since it is only utilized for threshold scan data.
+              //if (length > 144 * 2 + 10) B2FATAL("error " << LogVar("length", length));
               //B2INFO("suppreed mode");
               while (ibyte < length) {
                 int ch = calbyte(buf);
@@ -282,10 +289,8 @@ namespace Belle2 {
                   ss << "ch# " << ch << "(" << val << ") ";
                   hasHit = true;
                   if (febno < 0 || febno > 6) {
-                    B2ERROR("FEB is bad : " << febno << " hslb-" << finesse << ":"
-                            << " type=" << type_feb << ", ver=" << ver << " "
-                            << ", boardid=" << boardid << ", febno=" << febno
-                            << ", length=" << length << ", evtno=" << evtno);
+                    B2ERROR("FEB is bad : " << LogVar("FEB no.", febno) << LogVar("hslb", finesse) << LogVar("type", type_feb) << LogVar("ver",
+                            ver) << LogVar("boardid", boardid) << LogVar("febno", febno) << LogVar("length", length) << LogVar("evtno", evtno));
                     return;
                   }
                   feb.push_back(ch, val);
@@ -303,6 +308,7 @@ namespace Belle2 {
     } // end of raw unpacker
 
     arichinfo->settrgtype(trgtype);
+    if (vth_thscan > -1.27) { arichinfo->setvth_thscan(vth_thscan); }
     arichinfo->setntrack(0);
     arichinfo->setnexthit(0);
     arichinfo->setnhit(0);
@@ -328,15 +334,23 @@ namespace Belle2 {
     head.FEBSlot = line1[0];
 
     // data length
-    char len[4];
+    unsigned char len[4];
     for (int i = 0; i < 4; i++) {
       shift = (3 - ibyte % 4) * 8;
       len[3 - i] = buffer[ibyte / 4] >> shift;
       ibyte++;
     }
 
+    unsigned seu = len[2];
+    // This line (16 bits) is actaully not used for data length.
+    len[2] = 0;
+    len[3] = 0;
     uint32_t* tmp = (uint32_t*)len;
     head.length = *tmp;
+
+    for (int i = 0; i < 6; i ++) {
+      head.SEU_FEB[i] = (seu & (1 << i)) != 0;
+    }
 
     // trigger number
     char trg[4];

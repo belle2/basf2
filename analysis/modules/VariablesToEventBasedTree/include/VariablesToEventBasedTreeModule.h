@@ -1,10 +1,11 @@
 #pragma once
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2013 - Belle II Collaboration                             *
+* Copyright(C) 2013-2018 - Belle II Collaboration                        *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Thomas Keck                                              *
+*               Sam Cunliffe                                             *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -12,6 +13,7 @@
 #include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TNtuple.h>
@@ -60,17 +62,18 @@ namespace Belle2 {
     std::string m_treeName;
 
     /** ROOT file for output. */
-    TFile* m_file;
+    TFile* m_file{nullptr};
     /** The ROOT TNtuple for output. */
     StoreObjPtr<RootMergeable<TTree>> m_tree;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
     /** List of function pointers corresponding to given event variables. */
     std::vector<Variable::Manager::FunctionPtr> m_event_functions;
-    /** number of candidates in this event */
-    unsigned int m_ncandidates;
-    /** weight of this event */
-    float m_weight;
+    int m_event{ -1};                /**< event number */
+    int m_run{ -1};                  /**< run number */
+    int m_experiment{ -1};           /**< experiment number */
+    unsigned int m_ncandidates{ 0};  /**< number of candidates in this event */
+    float m_weight{0.0};             /**< weight of this event */
     /** Values corresponding to given variables. */
     std::vector<std::vector<double>> m_values;
     /** Values corresponding to given event variables. */
@@ -83,8 +86,11 @@ namespace Belle2 {
     /** Inverse sampling rates */
     std::map<int, unsigned int> m_sampling_rates;
 
-    const Variable::Manager::Var* m_sampling_variable; /**< Variable Pointer to target variable */
+    const Variable::Manager::Var* m_sampling_variable{nullptr}; /**< Variable Pointer to target variable */
     std::map<int, unsigned long int> m_sampling_counts; /**< Current number of samples with this value */
+
+    /** event metadata (get event number etc) */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
   };
 } // end namespace Belle2

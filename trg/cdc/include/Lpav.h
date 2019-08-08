@@ -24,27 +24,39 @@
 
 namespace Belle2 {
 
+  /// TRGCDCLpav class
   class TRGCDCLpav : public TRGCDCLpar {
     // friend classes and functions
 
   public:
     // constants, enums and typedefs
 
-    // Constructors and destructor
+    /// Constructor
     TRGCDCLpav();
+    /// Destructor
     virtual ~TRGCDCLpav();
 
-    // member functions
+    /// member functions for calculation
     void calculate_average(void);
+    /// member functions for calculation
     void calculate_average3(void);
+    /// member functions for calculation
     void calculate_average(double x, double y, double w = 1);
+    /// member functions for calculation
     void calculate_average3(double x, double y, double w = 1);
+    /// member functions for calculation
     double calculate_lpar(void);
+    /// member functions for calculation
     double calculate_lpar3(void);
+    /// member functions for fit
     double fit();
+    /// member functions for fit
     double fit(double x, double y, double w = 1);
+    /// member functions for clear
     inline void clear();
+    /// member functions to add point
     void add_point(double x, double y, double w = 1);
+    /// member functions to add point
     void add_point_frac(double x, double y, double w, double f);
 
     // const member functions
@@ -60,15 +72,21 @@ namespace Belle2 {
 
     // static member functions
 
-    // assignment operator(s)
+    /// assignment operator(s)
     inline const TRGCDCLpav& operator=(const TRGCDCLpav&);
+    /// assignment operator(s)
     const TRGCDCLpav& operator=(const TRGCDCLpar&);
+    /// assignment operator(s)
     const TRGCDCLpav& operator+=(const TRGCDCLpav&);
 
+    /// ostream operator
     friend std::ostream& operator<<(std::ostream& o, const TRGCDCLpav& s);
+    /// + operator
     friend TRGCDCLpav operator+(const TRGCDCLpav&, const TRGCDCLpav&);
-    class Singular {}; // exception class, no covarience matrix.
-    class Singular_c {}; // exception class, no covarience matrix_c
+    /// exception class, no covarience matrix.
+    class Singular {};
+    /// exception class, no covarience matrix_c
+    class Singular_c {};
 
   protected:
     // protected member functions
@@ -76,15 +94,16 @@ namespace Belle2 {
     // protected const member functions
 
   private:
-    // Constructors and destructor
+    /// Constructors and destructor
     inline TRGCDCLpav(const TRGCDCLpav&);
 
-    // comparison operators
+    /// comparison operators
     bool operator==(const TRGCDCLpav&) const;
+    /// comparison operators
     bool operator!=(const TRGCDCLpav&) const;
 
     // private member functions
-    void add(double x, double y, double w = 1, double a = 0, double b = 0);
+//    void add(double x, double y, double w = 1, double a = 0, double b = 0);
     void sub(double x, double y, double w = 1, double a = 0, double b = 0);
     void calculate_average_n(double xxav, double yyav, double xyav,
                              double xrrav, double yrrav, double rrrrav);
@@ -95,7 +114,7 @@ namespace Belle2 {
 
     // private const member functions
 
-    // data members
+    /// data members
     double m_wsum;
     double m_xsum;
     double m_ysum;
@@ -127,7 +146,7 @@ namespace Belle2 {
 
   };
 
-// inline function definitions
+/// inline function definitions
   inline const TRGCDCLpav& TRGCDCLpav::operator=(const TRGCDCLpav& lp)
   {
     TRGCDCLpar::operator=(lp);

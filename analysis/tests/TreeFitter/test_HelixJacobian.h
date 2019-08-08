@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
@@ -6,8 +8,8 @@
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Unit.h>
-namespace Belle2 {
 
+namespace {
 
   /** Test fixture. */
   class TreeFitterHelixJacobianTest : public ::testing::Test {
@@ -53,9 +55,8 @@ namespace Belle2 {
 
     std::vector<double> h = {d0, phi0, omega, z0, tanLambda};
     std::vector<double> h_framework = {helix.getD0(), helix.getPhi0(), helix.getOmega(), helix.getZ0(), helix.getTanLambda()};
-    double res = 0;
     for (int row = 0; row < 5; ++row) {
-      res = h[row] - h_framework[row];
+      double res = h[row] - h_framework[row];
       EXPECT_TRUE(res < eps) << "row " << row  << " num - ana " << res << " framework " << h_framework[row] << " mine " << h[row];
     }
   }

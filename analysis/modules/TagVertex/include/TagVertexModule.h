@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TAGVERTEXMODULE_H
-#define TAGVERTEXMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -79,6 +78,7 @@ namespace Belle2 {
     std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
     std::string m_useFitAlgorithm;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
     int m_reqPXDHits;                /**< N of PXD hits for a track to be used */
+    std::string m_roeMaskName;      /**< ROE particles from this mask will be used for vertex fitting */
 
     double m_Bfield;              /**< magnetic field from data base */
     std::vector<const Track*> m_tagTracks;  /**< tracks of the rest of the event */
@@ -103,6 +103,9 @@ namespace Belle2 {
     double m_tagVol;              /**< tagV component in the direction orthogonal to the boost */
     double m_truthTagVol;         /**< MC tagV component in the direction orthogonal to the boost */
     double m_tagVolErr;           /**< Error of the tagV component in the direction orthogonal to the boost */
+    double m_tagVNDF;             /**< Number of degrees of freedom in the tag vertex fit */
+    double m_tagVChi2;            /**< chi^2 value of the tag vertex fit result */
+    double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);
@@ -152,4 +155,3 @@ namespace Belle2 {
     void deltaT(Particle* Breco);
   };
 }
-#endif /* TAGVERTEXMODULE_H */

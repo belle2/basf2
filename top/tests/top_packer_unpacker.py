@@ -143,12 +143,14 @@ class RawDigitsTest(Module):
             assert digit.getValueFall1() == digitUnpacked.getValueFall1()
             assert digit.getIntegral() == digitUnpacked.getIntegral()
             assert digit.getErrorFlags() == digitUnpacked.getErrorFlags()
+            assert digit.getRevo9Counter() == digitUnpacked.getRevo9Counter()
+            assert digit.getPhase() == digitUnpacked.getPhase()
 
 
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 particlegun = register_module('ParticleGun')
@@ -157,6 +159,8 @@ particlegun.param('nTracks', 10)
 main.add_module(particlegun)
 
 add_simulation(main, components=['TOP'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["TOP"])
+set_module_parameters(main, type="TOPDigitizer", lookBackWindows=220)
 
 Packer = register_module('TOPPacker')
 main.add_module(Packer)
@@ -169,6 +173,7 @@ main.add_module(unPacker)
 converter = register_module('TOPRawDigitConverter')
 converter.param('inputRawDigitsName', 'TOPRawDigitsUnpacked')
 converter.param('outputDigitsName', 'TOPDigitsUnpacked')
+converter.param('lookBackWindows', 220)
 converter.param('minPulseWidth', 0.0)
 converter.param('maxPulseWidth', 1000.0)
 main.add_module(converter)

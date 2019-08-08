@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr, Thomas Hauth                  *
+ * Contributors: Andreas Moll, Thomas Kuhr, Thomas Hauth, Martin Ritter   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -39,7 +39,7 @@ namespace Belle2 {
      * @param line The line number in the source code where the message was sent from.
      */
     LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
-               const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
+               std::string  function, std::string  file, unsigned int line, int debugLevel = 0);
 
     /**
      * The LogMessage constructor taking a LogVariableStream which can contains name/value pairs
@@ -52,7 +52,7 @@ namespace Belle2 {
      * @param line The line number in the source code where the message was sent from.
      */
     LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
-               const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
+               std::string  function, std::string  file, unsigned int line, int debugLevel = 0);
 
     /**
      * Provide move constructor
@@ -117,7 +117,14 @@ namespace Belle2 {
      */
     std::ostream& print(std::ostream& out) const;
 
+    /** Return a json string for the log message.
+     * The returned string will be a json object containing the full log message on one line
+     * @param complete if true include all fields independent of the logInfo settings
+     */
+    std::string toJSON(bool complete) const;
 
+    /** Return a reference to the log variables associated with this message */
+    const std::vector<LogVar>& getLogVariables() const { return m_message.getVariables(); }
   private:
 
     LogConfig::ELogLevel m_logLevel; /**< The log level of the message. */

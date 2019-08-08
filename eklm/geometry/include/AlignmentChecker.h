@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_ALIGNMENTCHECKER_H
-#define EKLM_ALIGNMENTCHECKER_H
+#pragma once
 
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
@@ -48,6 +47,11 @@ namespace Belle2 {
        * Copy constructor (disabled).
        */
       AlignmentChecker(const AlignmentChecker&) = delete;
+
+      /**
+       * Operator = (disabled).
+       */
+      AlignmentChecker& operator=(const AlignmentChecker&) = delete;
 
       /**
        * Destructor.
@@ -122,6 +126,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

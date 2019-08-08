@@ -138,7 +138,7 @@ namespace Belle2 {
      * Optino to reduce 3D to 2D map (in coordinates, _NOT_ Br, Bphi, Bz components)
      * @param mapEnable List of dimensions to enable: "rphiz", "rphi", "phiz" or "rz"
      */
-    void enableCoordinate(std::string mapEnable = "rphiz") { m_mapEnable = mapEnable; }
+    void enableCoordinate(const std::string& mapEnable = "rphiz") { m_mapEnable = mapEnable; }
   protected:
 
   private:

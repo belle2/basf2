@@ -120,6 +120,22 @@ namespace Belle2 {
        */
       double getRelativePixelEfficiency(int moduleID, int pixelID) const;
 
+      /**
+       * Returns PMT type at a given position
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @return PMT type
+       */
+      unsigned getPMTType(int moduleID, int pmtID) const;
+
+      /**
+       * Returns TTS of a PMT at given position
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @return TTS
+       */
+      const TOPNominalTTS& getTTS(int moduleID, int pmtID) const;
+
       static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
 
     private:
@@ -140,6 +156,30 @@ namespace Belle2 {
        * @param content XML data directory
        */
       TOPGeometry* createConfiguration(const GearDir& content);
+
+      /**
+       * Create a parameter object from gearbox for bar segment
+       * @param content XML data directory
+       * @param serialNumber bar segment serial number
+       */
+      TOPGeoBarSegment createBarSegment(const GearDir& content,
+                                        const std::string& serialNumber);
+
+      /**
+       * Create a parameter object from gearbox for mirror segment
+       * @param content XML data directory
+       * @param serialNumber mirror segment serial number
+       */
+      TOPGeoMirrorSegment createMirrorSegment(const GearDir& content,
+                                              const std::string& serialNumber);
+
+      /**
+       * Create a parameter object from gearbox for prism
+       * @param content XML data directory
+       * @param serialNumber prism serial number
+       */
+      TOPGeoPrism createPrism(const GearDir& content,
+                              const std::string& serialNumber);
 
       /**
        * Adds number to string
@@ -163,6 +203,11 @@ namespace Belle2 {
        * Maps PMT QE data to positions within the detector
        */
       void mapPmtQEToPositions() const;
+
+      /**
+       * Maps PMT type to positions within the detector
+       */
+      void mapPmtTypeToPositions() const;
 
       /**
        * Prepares a map of relative pixel efficiencies
@@ -228,6 +273,7 @@ namespace Belle2 {
       mutable TOPNominalQE m_envelopeQE;  /**< envelope quantum efficiency */
       mutable std::map<int, const TOPPmtQE*> m_pmts; /**< QE data mapped to positions */
       mutable std::map<int, double> m_relEfficiencies; /**< pixel relative QE */
+      mutable std::map<int, unsigned> m_pmtTypes; /**< PMT types mapped to positions */
 
       // Other
 

@@ -45,30 +45,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -98,8 +98,9 @@ namespace Belle2 {
 
   protected:
     unsigned int calbyte(const int* buf); /**< calculate number of bytes in raw Unpacker */
+    unsigned int cal2byte(const int* buf); /**< calculate number of lines (2 bytes) in raw Unpacker */
     unsigned int calword(const int* buf); /**< calculate number of words in raw Unpacker */
-    unsigned int m_ibyte; /**< bye index of raw unpacker */
+    unsigned int m_ibyte = 0; /**< bye index of raw unpacker */
   };
 
   /**
@@ -111,6 +112,14 @@ namespace Belle2 {
     unsigned int val = 0xff & (buf[m_ibyte / 4] >> shift);
     m_ibyte++;
     return val;
+  }
+
+  /**
+   * calculate number of lines (2 bytes) in raw Unpacker
+   */
+  inline unsigned int ARICHUnpackerModule::cal2byte(const int* buf)
+  {
+    return (calbyte(buf) << 8) | calbyte(buf);
   }
 
   /**

@@ -50,7 +50,7 @@ namespace Belle2 {
 
     double scale(double);
     double scale(void) const;
-    void resetPosition(void);
+    void resetPosition(void) override;
     bool axial(void) const;
     bool axial(bool);
     bool stereo(void) const;
@@ -60,7 +60,7 @@ namespace Belle2 {
     bool oldCDC(void) const;
     bool oldCDC(bool);
 
-    void clear(void);
+    void clear(void) override;
 
     /// appends wire hits to display.
     void append(const std::vector<const TRGCDCWire*>&,
@@ -90,11 +90,11 @@ namespace Belle2 {
     void oneShot(const std::vector<const TRGCDCSegment*>&,
                  Gdk::Color color = Gdk::Color("#6600FF009900"));
 
-    virtual bool on_expose_event(GdkEventExpose*);
-    virtual bool on_button_press_event(GdkEventButton*);
+    virtual bool on_expose_event(GdkEventExpose*) override;
+    virtual bool on_button_press_event(GdkEventButton*) override;
 
   private:
-    virtual void on_realize();
+    virtual void on_realize() override;
     void drawCDC(void);
     void draw(void);
     void drawWires(void);

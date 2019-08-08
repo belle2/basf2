@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef RaveKinematicVertexFitter_H
-#define RaveKinematicVertexFitter_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
@@ -174,10 +172,10 @@ namespace Belle2 {
     private:
 
       /** Convert the error matrix from P-M to P-E. It Requires an input error matrit in the form X,P,M */
-      TMatrixDSym ErrorMatrixMassToEnergy(TLorentzVector p4, TMatrixDSym MassErr);
+      TMatrixDSym ErrorMatrixMassToEnergy(const TLorentzVector& p4, const TMatrixDSym& MassErr);
 
       /** Convert the error matrix from P-E to P-M. It Requires an input error matrit in the form X,P,E */
-      TMatrixDSym ErrorMatrixEnergyToMass(TLorentzVector p4, TMatrixDSym EnergyErr);
+      TMatrixDSym ErrorMatrixEnergyToMass(const TLorentzVector& p4, const TMatrixDSym& EnergyErr);
 
       /** Start capturing the output of rave and divert it to log messages.
        * Capturing will finish as soon as the returned object goes out of scope
@@ -188,4 +186,3 @@ namespace Belle2 {
 
 }
 
-#endif

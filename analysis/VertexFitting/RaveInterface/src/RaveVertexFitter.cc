@@ -30,7 +30,7 @@ using namespace analysis;
 RaveVertexFitter::RaveVertexFitter(): m_useBeamSpot(false)
 {
   //B2WARNING( "RaveVertexFitter::RaveVertexFitter()" );
-  if (RaveSetup::getRawInstance() == NULL) {
+  if (RaveSetup::getRawInstance() == nullptr) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveVertexFitter are used");
   }
   //B2WARNING "m_useBeamSpot " << m_useBeamSpot );
@@ -41,7 +41,7 @@ RaveVertexFitter::RaveVertexFitter(): m_useBeamSpot(false)
 void RaveVertexFitter::initBeamSpotMember()
 {
   m_useBeamSpot = false;
-  if (RaveSetup::getRawInstance() == NULL) {
+  if (RaveSetup::getRawInstance() == nullptr) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveVertexFitter are used");
   }
   m_useBeamSpot = RaveSetup::getRawInstance()->m_useBeamSpot;
@@ -49,10 +49,7 @@ void RaveVertexFitter::initBeamSpotMember()
 
 
 
-RaveVertexFitter::~RaveVertexFitter()
-{
-
-}
+RaveVertexFitter::~RaveVertexFitter() = default;
 
 
 void RaveVertexFitter::addTrack(const TrackFitResult* const aTrackPtr)
@@ -106,8 +103,8 @@ void RaveVertexFitter::addTrack(const Particle* aParticlePtr)
                              cov(0, 0), cov(0, 1), cov(0, 2),
                              cov(1, 1), cov(1, 2), cov(2, 2));
 
-  m_raveTracks.push_back(rave::Track(id, ravestate, ravecov, rave::Charge(aParticlePtr->getCharge() + 0.1), 1,
-                                     1)); // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
+  // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
+  m_raveTracks.emplace_back(id, ravestate, ravecov, rave::Charge(aParticlePtr->getCharge() + 0.1), 1, 1);
 
   m_belleDaughters.push_back(const_cast<Particle*>(aParticlePtr));
 }
@@ -265,13 +262,12 @@ void RaveVertexFitter::updateDaughters()
   }
 
   std::vector < rave::Track > rTracks = m_raveVertices[0].tracks(); //< the original tracks
-  std::vector < rave::Track > rfTracks = m_raveVertices[0].refittedTracks(); //< the refitted tracks
 
   for (unsigned int i = 0; i < rTracks.size(); i++) {
     rave::Track rtrk =  m_raveVertices[0].refittedTrack(rTracks[i]);
     const rave::Point3D fittedV = rtrk.position();
     const rave::Vector3D fittedP = rtrk.momentum();
-    const rave::Covariance6D fittedCov = rtrk.error();
+    const rave::Covariance6D& fittedCov = rtrk.error();
 
     TVector3 x3(fittedV.x(), fittedV.y(), fittedV.z());
     TLorentzVector p4;

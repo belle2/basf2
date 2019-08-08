@@ -2,6 +2,20 @@ import json
 import enum
 import functools
 
+# todo: shouldn't I call super().__init__() or similar to make sure that I
+# execute code from mother classes?? This seems to only have been done for
+# some of the subclasses here... /klieret
+
+"""
+Define datatypes for later serialization by json
+"""
+
+# todo: write a short overview over the many classes and their relationships here /klieret
+
+# ==============================================================================
+# Data classes
+# ==============================================================================
+
 
 class JsonBase:
 
@@ -94,7 +108,7 @@ class PlotFile(JsonBase):
     root files up to now
     """
 
-    def __init__(self, package, title, rootfile, plots):
+    def __init__(self, package, title, rootfile, plots, description=""):
         """
         Create a new PlotFile object and fill all members
         """
@@ -107,6 +121,8 @@ class PlotFile(JsonBase):
         self.rootfile = rootfile
         #: list of plots which are contained inside this plot file
         self.plots = plots
+        #: Description of plot file
+        self.description = description
 
 
 class Plot(JsonBase):
@@ -115,7 +131,8 @@ class Plot(JsonBase):
     Wrapper for one specfic plot.
     """
 
-    def __init__(self, is_expert=False, description=None, check=None, contact=None, width=None, height=None):
+    def __init__(self, is_expert=False, description=None, check=None,
+                 contact=None, width=None, height=None):
         """
         Create a new Plot object and fill all members
         """
@@ -137,7 +154,8 @@ class Plot(JsonBase):
 class NTuple(JsonBase):
 
     """
-    Wrapper for NTuple lists. This is not a graphical plot, but a list of values
+    Wrapper for NTuple lists. This is not a graphical plot, but a list of
+    values
     """
 
     def __init__(self, is_expert=False, description=None, check=None):
@@ -156,8 +174,9 @@ class NTuple(JsonBase):
 class HtmlContent(JsonBase):
 
     """
-    Wrapper for user HTML Content. This is not a graphical plot but HTML code which
-    will be directly output on the validation website.
+    Wrapper for user HTML Content. This is not a graphical plot but HTML
+    code which will be directly output on the validation website.
+
     """
 
     def __init__(self, is_expert=False, description=None, check=None):
@@ -176,14 +195,19 @@ class HtmlContent(JsonBase):
 class Package(JsonBase):
 
     """
-    One high-level package of the validation suites which contains a set of scripts
-    and output plot files
+    One high-level package of the validation suites which contains a set of
+    scripts and output plot files
     """
 
-    def __init__(self, name, plotfiles=[], scriptfiles=[], fail_count=0):
+    def __init__(self, name, plotfiles=None, scriptfiles=None, fail_count=0):
         """
         Create a new NTuple object and fill all members
         """
+
+        if not plotfiles:
+            plotfiles = []
+        if not scriptfiles:
+            scriptfiles = []
 
         #: name of the package
         self.name = name
@@ -231,7 +255,7 @@ class ComparisonResult(JsonBase):
         Create a new ComparisonResult object and fill all members
         """
 
-        #: a string containing a describtion of the comparison's outcome
+        #: a string containing a description of the comparison's outcome
         self.state = state
         #: the chi2 value computed during the comparison
         self.chi2 = chi2
@@ -245,20 +269,30 @@ class ComparisonPlotFile(PlotFile):
     """
 
     def __init__(
-            self,
-            package,
-            title,
-            rootfile,
-            compared_revisions=None,
-            plots=[],
-            has_reference=False,
-            ntuples=[],
-            html_content=[]):
+        self,
+        package,
+        title,
+        rootfile,
+        compared_revisions=None,
+        plots=None,
+        has_reference=False,
+        ntuples=None,
+        html_content=None,
+        description=None
+    ):
         """
         Create a new ComparisonPlotFile object and fill all members
         """
 
-        super().__init__(package, title, rootfile, plots)
+        if not plots:
+            plots = []
+        if not ntuples:
+            ntuples = []
+        if not html_content:
+            html_content = []
+
+        super().__init__(package, title, rootfile, plots,
+                         description=description)
         #: label of the revision which were used in this comparison
         self.compared_revision = compared_revisions
         #: the ntuples which were compared
@@ -270,15 +304,19 @@ class ComparisonPlotFile(PlotFile):
         self.has_reference = has_reference
 
         #: the number of failed comparisons in this file
-        self.comparison_error = len([plt for plt in self.plots if plt.comparison_result == "error"])
+        self.comparison_error = len([
+            plt for plt in self.plots if plt.comparison_result == "error"
+        ])
         #: the number of comparisons which resulted a warning
-        self.comparison_warning = len([plt for plt in self.plots if plt.comparison_result == "warning"])
+        self.comparison_warning = len([
+            plt for plt in self.plots if plt.comparison_result == "warning"
+        ])
 
 
 class ComparisonPlot(Plot):
 
     """
-    One indidividual plot including its comparison outcome.
+    One individual plot including its comparison outcome.
     """
 
     def __init__(
@@ -292,37 +330,45 @@ class ComparisonPlot(Plot):
             check=None,
             is_expert=None,
             plot_path=None,
-            comparison_pvalue=None,
-            comparison_pvalue_warn=None,
-            comparison_pvalue_error=None,
             comparison_text=None,
             height=None,
-            width=None):
+            width=None,
+            warnings=None):
         """
         Create a new ComparisonPlot object and fill all members
         """
 
         # todo: move more into the base class
-        super().__init__(is_expert=is_expert, description=description, check=check, contact=contact,
-                         height=height, width=width)
+        super().__init__(
+            is_expert=is_expert,
+            description=description,
+            check=check,
+            contact=contact,
+            height=height,
+            width=width
+        )
         #: tile used to display this plot
         self.title = title
+
         #: text string for the comparison outcome
         self.comparison_result = comparison_result
+
         #: verbose text describing the outcome of the comparison
         self.comparison_text = comparison_text
-        #: the p-value computed during the comparison
-        self.comparison_pvalue = comparison_pvalue
-        #: the p-value at below which a warning is indicated on the website
-        self.comparison_pvalue_warn = comparison_pvalue_warn
-        #: the p-value at below which an error is indicated on the website
-        self.comparison_pvalue_error = comparison_pvalue_error
+
         #: the filename of the png file plotted with the comparison graphs
         self.png_filename = png_filename
+
         #: the filename of the pdf file plotted with the comparison graphs
         self.pdf_filename = pdf_filename
+
         #: path were the png and pdf files are located
         self.plot_path = plot_path
+
+        #: Warnings ("no contact" person etc.)
+        if warnings is None:
+            warnings = []
+        self.warnings = warnings
 
 
 class ComparisonNTuple(NTuple):
@@ -344,12 +390,17 @@ class ComparisonNTuple(NTuple):
         """
 
         # todo: move more into the base class
-        super().__init__(is_expert=is_expert, description=description, check=check)
+        super().__init__(
+            is_expert=is_expert,
+            description=description,
+            check=check
+        )
         #: Text used as title for the ntuple item
         self.title = title
         #: name of contact person
         self.contact = contact
-        #: path to the json file which contains the individual numbers of the ntuple
+        #: path to the json file which contains the individual numbers of
+        #: the ntuple
         self.json_file_path = json_file_path
 
 
@@ -377,28 +428,41 @@ class ComparisonHtmlContent(HtmlContent):
         self.title = title
         #: name of contact person
         self.contact = contact
-        #: path to the json file which contains the individual numbers of the ntuple
+        #: path to the json file which contains the individual numbers of
+        #: the ntuple
         self.html_content = html_content
 
 
 class ComparisonPackage(Package):
 
     """
-    Informtion about a Package which was used in a comparison operation
+    Information about a Package which was used in a comparison operation
     """
 
-    def __init__(self, name, plotfiles=[], scriptfiles=[], ntuplefiles=[]):
+    def __init__(self, name, plotfiles=None, scriptfiles=None,
+                 ntuplefiles=None):
         """
         Create a new ComparisonPackage object and fill all members
         """
+
+        if not plotfiles:
+            plotfiles = []
+        if not scriptfiles:
+            scriptfiles = []
+        if not ntuplefiles:
+            ntuplefiles = []
 
         super().__init__(name, plotfiles=plotfiles, scriptfiles=scriptfiles)
 
         # compute from the plotfiles ... and flatten list
         #: the number of failed comparisons in this package
-        self.comparison_error = sum([pf.comparison_error for pf in plotfiles])
+        self.comparison_error = sum([
+            pf.comparison_error for pf in plotfiles
+        ])
         #: the number of comparisons which resulted a warning
-        self.comparison_warning = sum([pf.comparison_warning for pf in plotfiles])
+        self.comparison_warning = sum([
+            pf.comparison_warning for pf in plotfiles
+        ])
 
 
 class ComparisonRevision(Revision):
@@ -427,10 +491,15 @@ class Comparison(JsonBase):
     between revisions
     """
 
-    def __init__(self, revisions=[], packages=[]):
+    def __init__(self, revisions=None, packages=None):
         """
         Create a new ComparisonRevision object and fill all members
         """
+
+        if not revisions:
+            revisions = []
+        if not packages:
+            packages = []
 
         #: the list of revisions used in this comparison
         self.revisions = revisions
@@ -438,8 +507,15 @@ class Comparison(JsonBase):
         self.packages = packages
         sorted_revs = sorted(revisions, key=lambda x: x.label)
         #: the unique label of this comparison
-        self.label = functools.reduce(lambda x, y: x + "_" + y.label, sorted_revs, "")[1:]
+        self.label = functools.reduce(
+            lambda x, y: x + "_" + y.label,
+            sorted_revs, ""
+        )[1:]
 
+
+# ==============================================================================
+# Functions
+# ==============================================================================
 
 def dump(file_name, obj):
     """
@@ -484,7 +560,7 @@ def dump_rec(top_object):
 
             # store compiled list with corresponding key
             this_dict[k] = obj_list
-        # one of our objets, which might be nested and
+        # one of our objects, which might be nested and
         # needs special treatment ?
         elif isinstance(v, JsonBase):
             this_dict[k] = dump_rec(v)

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef  BKLMTRACKING_H
-#define  BKLMTRACKING_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -143,6 +142,20 @@ namespace Belle2 {
     double distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
                          double& error,
                          double& sigma);
+
+    //! run number
+    std::vector<int> m_runNumber;
+
+    //! total number of processed events in the run
+    int m_runTotalEvents;
+
+    //! total number of processed events
+    std::vector<int> m_totalEvents;
+
+    //! total number of processed events in the run with at lease one BKLMTrack
+    int m_runTotalEventsWithTracks;
+
+    //! total number of processed events with at least one BKLMTrack
+    std::vector<int> m_totalEventsWithTracks;
   };
 } // end namespace Belle2
-#endif

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMCHANNELDATA_H
-#define EKLMCHANNELDATA_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -32,16 +31,6 @@ namespace Belle2 {
      * Destructor.
      */
     ~EKLMChannelData();
-
-    /**
-     * Get if channel is active or not.
-     */
-    bool getActive() const;
-
-    /**
-     * Set if channel is active or not.
-     */
-    void setActive(bool active);
 
     /**
      * Get pedestal.
@@ -139,12 +128,9 @@ namespace Belle2 {
     /** Lookback window width (unit is 32 TDC counts). */
     int m_LookbackWindowWidth;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMChannelData, 4);
 
   };
 
 }
-
-#endif
-

@@ -12,41 +12,50 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdPi0s import *
-from stdCharged import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+from stdCharged import stdPi, stdK, stdE, stdMu
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 
 import os
 import sys
 import glob
+import argparse
 skimCode = encodeSkimName("CharmSemileptonic")
-fileList = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
-     'mdst_0005*_prod00000198_task000005*.root'
-     ]
 
-inputMdstList('MC9', fileList)
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
+cslpath = Path()
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=cslpath)
 
 
-stdPi('95eff')
-stdK('95eff')
-loadStdSkimPi0()
-reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, analysis_main)
-vertexKFit('K_S0:all', 0.0)
-applyCuts('K_S0:all', '0.477614 < M < 0.517614')
+stdPi('95eff', path=cslpath)
+stdK('95eff', path=cslpath)
+stdE('95eff', path=cslpath)
+stdMu('95eff', path=cslpath)
+loadStdSkimPi0(path=cslpath)
 
-fillParticleList('e+:std', 'electronID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
+reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, path=cslpath)
+vertexKFit('K_S0:all', 0.0, path=cslpath)
+applyCuts('K_S0:all', '0.477614 < M < 0.517614', path=cslpath)
 
-fillParticleList('mu+:std', 'muonID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
 
 # CSL Skim
-from CharmSemileptonic_List import *
-CSLList = CharmSemileptonicList()
-skimOutputUdst(skimCode, CSLList)
-summaryOfLists(CSLList)
+from skim.charm import CharmSemileptonicList
+CSLList = CharmSemileptonicList(cslpath)
+skimOutputUdst(skimCode, CSLList, path=cslpath)
+summaryOfLists(CSLList, path=cslpath)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=cslpath)
+process(cslpath)
 
 # print out the summary
 print(statistics)

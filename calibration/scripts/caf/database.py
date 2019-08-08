@@ -8,21 +8,37 @@ from basf2 import B2DEBUG
 
 
 class SQLiteDB():
+    """
+    Parameters:
+      database_path (pathlib.Path): The path to the database file we want to create/connect to.
 
-    def __init__(self, database_path, schema=None):
+    Keyword Arguments:
+      schema (dict): Database table schema for the DB of the form:
+                     {"tablename": ["columnname1 text primary key",
+                                    "columnname2 int"]
+                     }
+      read_only (bool): Should the connection be treated as a read-only connection (no update/insert calls)
+      timeout (float): What timeout value should the connection have. How long to wait for other changes to commit.
+    """
+
+    def __init__(self, database_path, schema=None, read_only=False, timeout=5.0):
         self.database_path = database_path
         self.schema = schema
         self.conn = None
+        self.read_only = read_only
         try:
-            if not self.database_path.exists():
+            if not self.database_path.exists() and not self.read_only:
                 if not self.schema:
                     raise ValueError("The requested database did not exist, "
                                      "but you didn't provide a schema to create the tables.")
                 else:
-                    self.open(self.database_path)
+                    self.open(self.database_path, timeout)
                     self.create_schema()
+            elif not self.database_path.exists() and read_only:
+                raise ValueError("The requested database did not exist, "
+                                 "but you specified that this was a read_only connection.")
             else:
-                self.open(self.database_path)
+                self.open(self.database_path, timeout)
         except AttributeError as err:
             if not isinstance(self.database_path, pathlib.Path):
                 raise TypeError("You did not use a pathlib.Path object as the database_path.")
@@ -37,13 +53,17 @@ class SQLiteDB():
 
     def close(self):
         if self.conn:
-            B2DEBUG(29, "Committing changes and closing Connection for database {}".format(self.database_path))
-            self.conn.commit()
+            if not self.read_only:
+                B2DEBUG(29, "Committing changes and closing Connection for database {}".format(self.database_path))
+                self.conn.commit()
             self.conn.close()
 
-    def open(self, database_path):
+    def open(self, database_path, timeout):
         B2DEBUG(29, "Opening Connection for database {}".format(self.database_path))
-        self.conn = sqlite3.connect(str(database_path))
+        connection_uri = 'file:'+str(database_path)
+        if self.read_only:
+            connection_uri += '?mode=ro'
+        self.conn = sqlite3.connect(connection_uri, uri=True, timeout=timeout)
 
     def commit(self):
         self.conn.commit()
@@ -62,13 +82,22 @@ class SQLiteDB():
 
 
 class CAFDB(SQLiteDB):
+    """
+    Parameters:
+      database_path (pathlib.Path): The path to the database file we want to create/connect to.
+
+    Keyword Arguments:
+      read_only (bool): Should the connection be treated as a read-only connection (no update/insert calls)
+      timeout (float): What timeout value should the connection have. How long to wait for other changes to commit.
+    """
+
     default_schema = {"calibrations": ["name text primary key",
                                        "state text",
                                        "checkpoint text",
                                        "iteration int"]}
 
-    def __init__(self, database_path):
-        super().__init__(database_path, self.default_schema)
+    def __init__(self, database_path, read_only=False, timeout=30.0):
+        super().__init__(database_path, self.default_schema, read_only, timeout)
 
     def insert_calibration(self, calibration_name, state="init", checkpoint="init", iteration=0):
         self.query("INSERT INTO calibrations VALUES (?,?,?,?)", (calibration_name, state, checkpoint, iteration))
@@ -80,8 +109,17 @@ class CAFDB(SQLiteDB):
         return self.query("SELECT {} FROM calibrations WHERE name=?".format(column_name), (calibration_name,)).fetchone()[0]
 
     def output_calibration_table(self):
-        table_string = pandas.read_sql_query("SELECT * FROM calibrations", self.conn).to_string()
-        line_len = len(table_string.split("\n")[0])
+        data = {"name": [], "state": [], "checkpoint": [], "iteration": []}
+        for row in self.query("SELECT * FROM calibrations"):
+            data["name"].append(row[0])
+            data["state"].append(row[1])
+            data["checkpoint"].append(row[2])
+            data["iteration"].append(row[3])
+
+        table = pandas.DataFrame(data)
+        table_string = table.to_string()
+
+        line_len = len(table_string.split("\n")[1])
         title = " Calibrations Table ".center(line_len, " ")
         border = line_len * "="
         header = "\n".join((border, title, border))

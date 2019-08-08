@@ -10,28 +10,18 @@
 #ifndef ECLCHANNELMAPPER_H
 #define ECLCHANNELMAPPER_H
 #include <framework/logging/Logger.h>
+#include <ecl/dbobjects/ECLChannelMap.h>
 namespace Belle2 {
   namespace ECL {
-    enum {
-      ECL_BARREL_SHAPERS_IN_CRATE = 12,
-      ECL_FWD_SHAPERS_IN_CRATE    = 10,
-      ECL_BKW_SHAPERS_IN_CRATE    = 8,
-      ECL_TOTAL_SHAPERS      = 576,
-      ECL_FINESSES_IN_COPPER = 2,
-      ECL_CHANNELS_IN_SHAPER = 16,
-      ECL_CRATES             = 52,
-      ECL_BARREL_CRATES      = 36,
-      ECL_FWD_CRATES         = 8,
-      ECL_BKW_CRATES         = 8,
-      ECL_COPPERS            = 26,
-      ECL_BARREL_COPPERS     = 18,
-      ECL_ENCAP_COPPERS      = 8,
-      ECL_TOTAL_CHANNELS     = 8736,
-      ECL_BARREL_CHANNELS    = 6624,
-      ECL_FWD_CHANNELS       = 1152,
-      ECL_BKW_CHANNELS       = 960
-    };
-
+    /**
+     * This class provides access to ECL channel map that is either
+     *  a) Loaded from the database (see ecl/dbobject/include/ECLChannelMap.h).
+     *  b) (** NOT SUPPORTED **) Loaded from the text file (standard location
+     *     is FileSystem::findFile("ecl/data/ecl_channels_map.txt"))
+     *
+     * Please note that (a) is recommended and (b) should be used only for
+     * very specific rare cases (such as prepation of new ECLChannelMap payloads)
+     */
     class ECLChannelMapper {
 
       /// initialization flag
@@ -47,12 +37,16 @@ namespace Belle2 {
       int convertArrayInv[ECL_TOTAL_CHANNELS][3]; // 0 -- icrate, 1 -- iboard, 2 -- ichannel
 
     public:
+      /// Default constructor
       ECLChannelMapper();
-      ~ECLChannelMapper() {};
+      /// Default destructor
+      ~ECLChannelMapper() {}
       /// Initialize channel mapper using data stored in the ASCII file
       bool initFromFile(const char* eclMapFile);
-      /// Initialize from DataBase TODO
+      /// Initialize channel mapper from the conditions database
       bool initFromDB();
+      /// Convert internal data to ECLChannelMap database object
+      ECLChannelMap getDBObject();
 
       /// get crate number by given COPPER node number and FINESSE number
       int getCrateID(int iCOPPERNode, int iFINESSE); // iFINNES = 0 (FINESSE A) or 1 (FINESSE B)
@@ -80,13 +74,7 @@ namespace Belle2 {
         if (ECL_BARREL_CRATES + ECL_FWD_CRATES < iCrate && iCrate <= ECL_CRATES) return ECL_BKW_SHAPERS_IN_CRATE;
         return 0;
       }
-
-
-
-
     };
-
-
   }
 }
 #endif

@@ -41,23 +41,23 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(nullptr)
   setDescription("BKLM reconstruction module of 1D and 2D hits");
   setPropertyFlags(c_ParallelProcessingCertified);
   // MC 1 GeV/c muons: 1-sigma width is 0.43 ns
-  addParam("Orthogonal-strip coincidence window (ns)", m_DtMax,
-           "Orthogonal strip hits whose time difference exceeds this value are independent",
+  addParam("DtMax", m_DtMax,
+           "Orthogonal-strip coincidence window. ns.",
            double(50.0));
   // MC 1 GeV/c muons: mean prompt time is 0.43 ns
-  addParam("Nominal prompt time (ns)", m_PromptTime,
-           "Nominal time of prompt hits",
+  addParam("PromptTime", m_PromptTime,
+           "Nominal time of prompt hits, ns.",
            double(0.0));
   // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
-  addParam("Prompt window (ns)", m_PromptWindow,
-           "Half-width of prompt window relative to PromptTime",
+  addParam("PromptWindow", m_PromptWindow,
+           "Half-width of prompt window relative to PromptTime, ns.",
            //double(50.0));
            double(2000.0));
-  addParam("Alignment correction flag", m_ifAlign,
-           "flag for alignment correction, do the correction (true) or not (false), default is false",
-           bool(false));
-  addParam("load time window from db", m_loadTimingFromDB,
-           "locad timing window from database (true) or not (false), default is true",
+  addParam("IfAlign", m_ifAlign,
+           "Perform alignment correction (true) or not (false).",
+           bool(true));
+  addParam("LoadTimingFromDB", m_loadTimingFromDB,
+           "Load timing window from database (true) or not (false).",
            bool(true));
 }
 
@@ -76,25 +76,21 @@ void BKLMReconstructorModule::initialize()
   hit2ds.registerRelationTo(hit1ds);
 
   m_GeoPar = Belle2::bklm::GeometryPar::instance();
-
 }
 
 void BKLMReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2DEBUG(1, "BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
 
   if (m_loadTimingFromDB) {
     m_DtMax = m_timing->getCoincidenceWindow();
     m_PromptTime = m_timing->getPromptTime();
     m_PromptWindow = m_timing->getPromptWindow();
   }
-
 }
 
 void BKLMReconstructorModule::event()
 {
-
   // Construct StoreArray<BKLMHit1D> from StoreArray<BKLMDigit>
 
   // sort by module+strip number
@@ -132,7 +128,7 @@ void BKLMReconstructorModule::event()
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
     int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;
-    const bklm::Module* m = m_GeoPar->findModule(hit1ds[i]->isForward(), hit1ds[i]->getSector(), hit1ds[i]->getLayer());
+    const bklm::Module* m = m_GeoPar->findModule(hit1ds[i]->getForward(), hit1ds[i]->getSector(), hit1ds[i]->getLayer());
     bool isPhiReadout = hit1ds[i]->isPhiReadout();
     for (int j = i + 1; j < hit1ds.getEntries(); ++j) {
       if (moduleID != (hit1ds[j]->getModuleID() & BKLM_MODULEID_MASK)) continue;
@@ -144,14 +140,13 @@ void BKLMReconstructorModule::event()
       double phiTime = hit1ds[phiIndex]->getTime() - propagationTimes.y();
       double zTime = hit1ds[zIndex]->getTime() - propagationTimes.z();
       if (std::fabs(phiTime - zTime) > m_DtMax) continue;
-      //! the second param in localToGlobal is whether do the alignment correction (true) or not (false)
+      // the second param in localToGlobal is whether do the alignment correction (true) or not (false)
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_ifAlign);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
       BKLMHit2d* hit2d = hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time); // also creates relations hit2d to each hit1d
       if (fabs(time - m_PromptTime) > m_PromptWindow) hit2d->isOutOfTime();
     }
   }
-
 }
 
 void BKLMReconstructorModule::endRun()

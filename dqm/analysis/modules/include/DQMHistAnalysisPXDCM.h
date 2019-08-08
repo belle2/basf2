@@ -17,6 +17,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <vector>
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -32,6 +33,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDCMModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDCMModule();
   private:
 
     //! Module functions to be called from main process
@@ -52,15 +55,19 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! histogram covering all modules
-    TH2F* m_hCommonMode;
+    TH2F* m_hCommonMode = nullptr;
     //! Final Canvas
-    TCanvas* m_cCommonMode;
-    //! Lines in the Canvas to guide the eye
-    TLine* m_line1, *m_line2, *m_line3;
+    TCanvas* m_cCommonMode = nullptr;
+    //! Line in the Canvas to guide the eye
+    TLine* m_line1 = nullptr;
+    //! Line in the Canvas to guide the eye
+    TLine* m_line2 = nullptr;
+    //! Line in the Canvas to guide the eye
+    TLine* m_line3 = nullptr;
 
 #ifdef _BELLE2_EPICS
-    //! one epics PV
-    chid  mychid;
+    //! epics PVs
+    std::vector <chid> mychid;
 #endif
   };
 } // end namespace Belle2

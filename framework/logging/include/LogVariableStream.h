@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth                                             *
+ * Contributors: Thomas Hauth, Martin Ritter                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -30,7 +30,7 @@ public:
    *          convert to a string.
    */
   template<class TVarType>
-  LogVar(std::string name, TVarType v) :
+  LogVar(const std::string& name, const TVarType& v) :
     m_name(name),
     m_value(boost::lexical_cast<std::string>(v))
   {
@@ -58,16 +58,6 @@ public:
   bool operator==(const LogVar& lv) const
   {
     return (lv.m_name == this->m_name) && (lv.m_value == this->m_value);
-  }
-
-  /**
-   * Custom assignment operator
-   */
-  LogVar& operator=(const LogVar& lvs)
-  {
-    this->m_name = lvs.m_name;
-    this->m_value = lvs.m_value;
-    return *this;
   }
 
 private:
@@ -120,7 +110,7 @@ public:
   /** Constructor which sets an initial text for this stream
    * @param text Initial text
    * */
-  LogVariableStream(std::string const& text, std::map<std::string, std::string> variables = {})
+  explicit LogVariableStream(std::string const& text, std::map<std::string, std::string> variables = {})
   {
     m_stringStream << text;
     for (auto const& kv : variables) {
@@ -203,13 +193,25 @@ public:
       return m_stringStream.str();
     }
 
-    std::stringstream s;
+    std::stringstream tmpBuffer;
     // put the string first
-    s <<  m_stringStream.str();
+    tmpBuffer <<  m_stringStream.str();
     for (auto const& v : m_variables) {
-      s << std::endl << "\t" << v.getName() << " = " << v.getValue();
+      tmpBuffer << std::endl << "\t" << v.getName() << " = " << v.getValue();
     }
-    return s.str();
+    return tmpBuffer.str();
+  }
+
+  /** Return the constant message part without the variables */
+  std::string getMessage() const
+  {
+    return m_stringStream.str();
+  }
+
+  /** Return the list of all defined variables */
+  const std::vector<LogVar>& getVariables() const
+  {
+    return m_variables;
   }
 
 private:

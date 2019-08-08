@@ -108,6 +108,7 @@ namespace Belle2 {
 
   };
 
+/// Template to define a selection-variable class
 #define SELECTION_VARIABLE( variableName, nArgs, argumentType, implementation ) \
   class variableName:             \
     public SelectionVariable< argumentType , nArgs, double >     \

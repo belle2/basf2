@@ -38,13 +38,13 @@ namespace Belle2 {
     /**
      * Consistency check of geometry parameters
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Mirror configuration parameters") const;
+    void print(const std::string& title = "Mirror configuration parameters") const override;
 
     /**
      * Set parameters of mirror plate
@@ -235,7 +235,7 @@ namespace Belle2 {
 
     GeoOpticalSurface m_surface;           /**< optical surface of mirror plates */
 
-    ClassDef(ARICHGeoMirrors, 1); /**< ClassDef */
+    ClassDefOverride(ARICHGeoMirrors, 1); /**< ClassDef */
 
   };
 

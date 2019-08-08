@@ -27,6 +27,9 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#ifdef ALIGNMENT_USING_BHABHA
+#include <mdst/dataobjects/ECLCluster.h>
+#endif
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -69,6 +72,7 @@ namespace Belle2 {
   void ARICHNtupleModule::initialize()
   {
 
+    if (m_file) delete m_file;
     m_file = new TFile(m_outputFile.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
       B2FATAL("Couldn't open file '" << m_outputFile << "' for writing!");
@@ -79,10 +83,18 @@ namespace Belle2 {
 
     m_tree->Branch("evt", &m_arich.evt, "evt/I");
     m_tree->Branch("run", &m_arich.run, "run/I");
+    m_tree->Branch("exp", &m_arich.exp, "exp/I");
 
+    m_tree->Branch("charge", &m_arich.charge, "charge/S");
     m_tree->Branch("pValue", &m_arich.pValue, "pValue/F");
     m_tree->Branch("d0", &m_arich.z0, "pValue/F");
     m_tree->Branch("z0", &m_arich.d0, "pValue/F");
+
+#ifdef ALIGNMENT_USING_BHABHA
+    m_tree->Branch("eop", &m_arich.eop, "eop/F");
+    m_tree->Branch("e9e21", &m_arich.e9e21, "e9e21/F");
+    m_tree->Branch("etot", &m_arich.etot, "etot/F");
+#endif
 
     m_tree->Branch("PDG", &m_arich.PDG, "PDG/I");
     m_tree->Branch("motherPDG", &m_arich.motherPDG, "motherPDG/I");
@@ -136,13 +148,44 @@ namespace Belle2 {
 
     if (!m_arichTracks.isValid()) return;
 
+#ifdef ALIGNMENT_USING_BHABHA
+    double E_tot = 0.;
+    StoreArray<ECLCluster> eclClusters;
+    for (const auto& trk : m_tracks) {
+      const ECLCluster* eclTrack = trk.getRelated<ECLCluster>();
+      if (eclTrack) {
+        if (eclTrack->getEnergy() > 0.1) E_tot += eclTrack->getEnergy();
+      }
+    }
+    for (const auto& cluster : eclClusters) {
+      if (!cluster.isNeutral()) continue;
+      if (cluster.getHypothesisId() != 5 && cluster.getHypothesisId() != 1)
+        continue;
+      if (cluster.getEnergy() > 0.1) E_tot += cluster.getEnergy();
+    }
+#endif
+
     for (const auto& arichTrack : m_arichTracks) {
 
-      const ARICHLikelihood* lkh = arichTrack.getRelated<ARICHLikelihood>();
+      const ExtHit* extHit = arichTrack.getRelated<ExtHit>();
+
+      const Track* mdstTrack = NULL;
+      if (extHit) mdstTrack = extHit->getRelated<Track>();
+
+      const ARICHAeroHit* aeroHit = arichTrack.getRelated<ARICHAeroHit>();
+
+      const ARICHLikelihood* lkh = NULL;
+      if (mdstTrack) lkh = mdstTrack->getRelated<ARICHLikelihood>();
+      else lkh = arichTrack.getRelated<ARICHLikelihood>();
+
       if (!lkh) continue;
       if (lkh->getFlag() != 1) continue;
 
       m_arich.clear();
+
+      m_arich.evt = evtMetaData->getEvent();
+      m_arich.run = evtMetaData->getRun();
+      m_arich.exp = evtMetaData->getExperiment();
 
       // set hapd window hit if available
       if (arichTrack.hitsWindow()) {
@@ -167,6 +210,9 @@ namespace Belle2 {
 
       m_arich.detPhot = lkh->getDetPhot();
 
+#ifdef ALIGNMENT_USING_BHABHA
+      m_arich.etot = E_tot;
+#endif
       m_arich.status = 1;
 
       m_arich.trgtype = 0;
@@ -177,14 +223,22 @@ namespace Belle2 {
 
       const MCParticle* particle = 0;
 
-      const Track* mdstTrack = lkh->getRelated<Track>();
       if (mdstTrack) {
         const TrackFitResult* fitResult = mdstTrack->getTrackFitResultWithClosestMass(Const::pion);
         if (fitResult) {
           m_arich.pValue = fitResult->getPValue();
           TVector3 trkPos = fitResult->getPosition();
+          m_arich.charge = fitResult->getChargeSign();
           m_arich.z0 = trkPos.Z();
           m_arich.d0 = (trkPos.XYvector()).Mod();
+#ifdef ALIGNMENT_USING_BHABHA
+          TVector3 trkMom = fitResult->getMomentum();
+          const ECLCluster* eclTrack = mdstTrack->getRelated<ECLCluster>();
+          if (eclTrack) {
+            m_arich.eop = eclTrack->getEnergy() / trkMom.Mag();
+            m_arich.e9e21 = eclTrack->getE9oE21();
+          }
+#endif
         }
         m_arich.status += 10;
         int fromARICHMCP = 0;
@@ -218,7 +272,7 @@ namespace Belle2 {
 
       // get reconstructed photons associated with track
       const std::vector<ARICHPhoton>& photons = arichTrack.getPhotons();
-      m_arich.nRec = photons.size() < 200 ? photons.size() : 200 ;
+      m_arich.nRec = photons.size();
       int nphot = 0;
       for (auto it = photons.begin(); it != photons.end(); ++it) {
         ARICHPhoton iph = *it;
@@ -231,7 +285,6 @@ namespace Belle2 {
         }
         m_arich.photons.push_back(iph);
         nphot++;
-        if (nphot == 200) break;
       }
 
       TVector3 recPos = arichTrack.getPosition();
@@ -244,7 +297,6 @@ namespace Belle2 {
       m_arich.recHit.theta = recMom.Theta();
       m_arich.recHit.phi = recMom.Phi();
 
-      const ARICHAeroHit* aeroHit = lkh->getRelated<ARICHAeroHit>();
       if (aeroHit) {
         TVector3 truePos = aeroHit->getPosition();
         m_arich.mcHit.x = truePos.X();
@@ -283,7 +335,6 @@ namespace Belle2 {
           }
         }
       }
-
       m_tree->Fill();
     }
   }

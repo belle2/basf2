@@ -317,7 +317,7 @@ namespace VXDTFObserversTest {
 
 
     /** for easy printing of results collected so far */
-    void PrintResults(string identifier = "unknown")
+    void PrintResults(const string& identifier = "unknown")
     {
       for (auto& entry : m_container) {
         B2WARNING(" for " << identifier << "-combination: " <<

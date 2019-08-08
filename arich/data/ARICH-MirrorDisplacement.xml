@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<MirrorDisplacement>
+  <Disable desc="don't use the displacement if 1">1</Disable>
+  <Plate id="1">
+    <r desc="displacement in r" unit="mm">0.0</r>
+    <phi desc="displacement in phi" unit="deg">0.0</phi>
+    <z desc="displacement in z" unit="mm">0.0</z>
+    <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+    <beta desc="y angle displacement" unit="deg">0.0</beta>
+    <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+  </Plate>
+ <Plate id="2">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="3">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="4">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="5">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="6">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="7">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="8">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="9">
+    <r desc="displacement in r" unit="mm">0.0</r>
+    <phi desc="displacement in phi" unit="deg">0.0</phi>
+    <z desc="displacement in z" unit="mm">0.0</z>
+    <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+    <beta desc="y angle displacement" unit="deg">0.0</beta>
+    <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="10">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="11">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="12">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="13">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="14">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="15">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="16">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="17">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+ <Plate id="18">
+   <r desc="displacement in r" unit="mm">0.0</r>
+   <phi desc="displacement in phi" unit="deg">0.0</phi>
+   <z desc="displacement in z" unit="mm">0.0</z>
+   <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+   <beta desc="y angle displacement" unit="deg">0.0</beta>
+   <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+ </Plate>
+</MirrorDisplacement>

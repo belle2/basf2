@@ -37,7 +37,7 @@ namespace Belle2 {
      *  which is an invalid index.
      *  @param qualityIndicator   Initialises m_qualityIndicator with 0, a value associated typically with fake tracks.
      */
-    Track(float qualityIndicator = 0.) : m_qualityIndicator(qualityIndicator)
+    explicit Track(float qualityIndicator = 0.) : m_qualityIndicator(qualityIndicator)
     {
       std::fill(m_trackFitIndices, m_trackFitIndices + Const::chargedStableSet.size(), -1);
     }

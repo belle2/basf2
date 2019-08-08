@@ -32,13 +32,13 @@ namespace Belle2 {
     virtual ~CDCTriggerTSFModule() {}
 
     /** Initialize the module and register DataStore arrays. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Run the TSF for an event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Clean up pointers. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** remove hit information from last event */
     void clear();

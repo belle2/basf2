@@ -310,27 +310,6 @@ void DQMHistAnalysisPXDERModule::terminate()
 {
 }
 
-int DQMHistAnalysisPXDERModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > c_lastPXDLayer) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          return tempcounter;
-        }
-        tempcounter++;
-      }
-    }
-  }
-  return tempcounter;
-}
-
-
 void DQMHistAnalysisPXDERModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -351,8 +330,8 @@ void DQMHistAnalysisPXDERModule::getIDsFromIndex(const int Index, int& Layer, in
   }
 }
 
-int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double ratio, std::string name_hist,
-                                        std::string name_refhist, TH1I* flaghist)
+int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double ratio, const std::string& name_hist,
+                                        const std::string& name_refhist, TH1I* flaghist)
 {
   int iret = 0;
   float WarningLevel = 6.0;

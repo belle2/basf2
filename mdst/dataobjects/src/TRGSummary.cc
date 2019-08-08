@@ -1,5 +1,10 @@
 #include <mdst/dataobjects/TRGSummary.h>
 
+#include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+
 #include <TROOT.h>
 #include <TColor.h>
 
@@ -18,6 +23,75 @@ TRGSummary::TRGSummary(unsigned int inputBits[10],
     m_psnmBits[i] = psnmBits[i];
   }
   m_timType = timType;
+}
+
+bool TRGSummary::test() const
+{
+  for (unsigned int word = 0; word < c_ntrgWords; word++) {
+    if (m_psnmBits[word] != 0) return true;
+  }
+  return false;
+}
+
+bool TRGSummary::testInput(unsigned int bit) const
+{
+  if (bit > c_trgWordSize * c_ntrgWords) {
+    B2ERROR("Requested input trigger bit number is out of range" << LogVar("bit", bit));
+    return false;
+  }
+  int iWord = bit / c_trgWordSize;
+  int iBit = bit % c_trgWordSize;
+  return (m_inputBits[iWord] & (1 << iBit)) != 0;
+}
+
+bool TRGSummary::testFtdl(unsigned int bit) const
+{
+  if (bit > c_trgWordSize * c_ntrgWords) {
+    B2ERROR("Requested ftdl trigger bit number is out of range" << LogVar("bit", bit));
+    return false;
+  }
+  int iWord = bit / c_trgWordSize;
+  int iBit = bit % c_trgWordSize;
+  return (m_ftdlBits[iWord] & (1 << iBit)) != 0;
+}
+
+bool TRGSummary::testPsnm(unsigned int bit) const
+{
+  if (bit > c_trgWordSize * c_ntrgWords) {
+    B2ERROR("Requested psnm trigger bit number is out of range" << LogVar("bit", bit));
+    return false;
+  }
+  int iWord = bit / c_trgWordSize;
+  int iBit = bit % c_trgWordSize;
+  return (m_psnmBits[iWord] & (1 << iBit)) != 0;
+}
+
+unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
+{
+  static DBObjPtr<TRGGDLDBInputBits> inputBits;
+
+  for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
+    if (std::string(inputBits->getinbitname((int)bit)) == name) {
+      return bit;
+    }
+  }
+
+  B2ERROR("The requested input trigger name does not exist" << LogVar("name", name));
+  return c_trgWordSize * c_ntrgWords;
+}
+
+unsigned int TRGSummary::getOutputBitNumber(const std::string& name) const
+{
+  static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
+
+  for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
+    if (std::string(ftdlBits->getoutbitname((int)bit)) == name) {
+      return bit;
+    }
+  }
+
+  B2ERROR("The requested output trigger name does not exist" << LogVar("name", name));
+  return c_trgWordSize * c_ntrgWords;
 }
 
 std::string TRGSummary::getInfoHTML() const

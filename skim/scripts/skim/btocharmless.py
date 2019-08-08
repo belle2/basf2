@@ -13,7 +13,21 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def CharmlessHad2BodyB0List():
+def BtoPi0Pi0List(path):
+    Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
+
+    B0_Channels = ['pi0:skim pi0:skim']
+
+    B0List = []
+    for chID, channel in enumerate(B0_Channels):
+        reconstructDecay('B0:Pi0Pi0' + ' -> ' + channel, Bcuts, chID, path=path)
+        B0List.append('B0:Pi0Pi0')
+
+    Lists = B0List
+    return Lists
+
+
+def CharmlessHad2BodyB0List(path):
     """
     Skim list definitions for all neutral B to charmless 2 body modes.
 
@@ -28,65 +42,66 @@ def CharmlessHad2BodyB0List():
     **Working Group**: BtoCharmless (WG9)
 
     **Decay Modes**:
-    1. B0 -> pi+ pi-
-    2. B0 -> pi0 pi0
-    3. B0 -> K+ pi-
-    4. B0 -> K+ K-
-    5. B0 -> eta pi0
-    6. B0 -> eta eta
-    7. B0 -> K_S0 pi0
-    8. B0 -> rho0 pi0
-    9. B0 -> rho- pi+
-    10. B0 -> K+ rho-
-    11. B0 -> eta rho0
-    12. B0 -> omega eta
-    13. B0 -> phi pi0
-    14. B0 -> phi eta
-    15. B0 -> omega pi0
-    16. B0 -> eta K*0
-    17. B0 -> K*+ pi-
-    18. B0 -> K*0 pi0
-    19. B0 -> K*+ K-
-    20. B0 -> rho0 rho0
-    21. B0 -> rho+ rho-
-    22. B0 -> omega rho0
-    23. B0 -> omega omega
-    24. B0 -> phi rho0
-    25. B0 -> phi omega
-    26. B0 -> phi phi
-    27. B0 -> omega K*0
-    28. B0 -> K*0 rho0
-    29. B0 -> K*+ rho-
-    30. B0 -> K*0 phi
-    31. B0 -> K*0 anti-K*0
-    32. B0 -> K*0 K*0
-    33. B0 -> K*+ K*-
-    34. B0 -> eta f_0
-    35. B0 -> omega f_0
-    36. B0 -> phi f_0
-    37. B0 -> rho0 f_0
-    38. B0 -> K*0 f_0
-    39. B0 -> f_0 f_0
+    * B0 -> pi+ pi-
+    * B0 -> pi0 pi0
+    * B0 -> K+ pi-
+    * B0 -> K+ K-
+    * B0 -> eta pi0
+    * B0 -> eta eta
+    * B0 -> K_S0 pi0
+    * B0 -> rho0 pi0
+    * B0 -> rho- pi+
+    * B0 -> K+ rho-
+    * B0 -> eta rho0
+    * B0 -> omega eta
+    * B0 -> phi pi0
+    * B0 -> phi eta
+    * B0 -> omega pi0
+    * B0 -> eta K*0
+    * B0 -> K*+ pi-
+    * B0 -> K*0 pi0
+    * B0 -> K*+ K-
+    * B0 -> rho0 rho0
+    * B0 -> rho+ rho-
+    * B0 -> omega rho0
+    * B0 -> omega omega
+    * B0 -> phi rho0
+    * B0 -> phi omega
+    * B0 -> phi phi
+    * B0 -> omega K*0
+    * B0 -> K*0 rho0
+    * B0 -> K*+ rho-
+    * B0 -> K*0 phi
+    * B0 -> K*0 anti-K*0
+    * B0 -> K*0 K*0
+    * B0 -> K*+ K*-
+    * B0 -> eta f_0
+    * B0 -> omega f_0
+    * B0 -> phi f_0
+    * B0 -> rho0 f_0
+    * B0 -> K*0 f_0
+    * B0 -> f_0 f_0
 
-    **Particle Lists**: Standard loose lists for all light mesons.
-    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
-    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+    **Particle Lists**:
+    * Standard loose lists for all light mesons.
+    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
-    1. R2EventLevel < 0.5 (event level)
-    2. nTracks >= 2 (event level)
-    3. 5.24 < Mbc < 5.29
-    4. abs(deltaE) < 0.5
+    * R2 < 0.5
+    * nTracks >= 2 (event level)
+    * 5.24 < Mbc < 5.29
+    * abs(deltaE) < 0.5
 
     Note:
       Does not include decay modes involving eta prime at the current time.
     """
     __author__ = "Kim Smith"
 
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2')
+    applyEventCuts('nTracks >= 2', path=path)
 
-    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25')
-    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51')
+    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
+    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
 
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
@@ -137,41 +152,47 @@ def CharmlessHad2BodyB0List():
 
     B0PPList = []
     for chID, channel in enumerate(B0_PPChannels):
-        reconstructDecay('B0:HAD_b2PP' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2PP' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0PPList.append('B0:HAD_b2PP' + str(chID))
 
     B0PVList = []
     for chID, channel in enumerate(B0_PVChannels):
-        reconstructDecay('B0:HAD_b2PV' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2PV' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0PVList.append('B0:HAD_b2PV' + str(chID))
 
     B0VVList = []
     for chID, channel in enumerate(B0_VVChannels):
-        reconstructDecay('B0:HAD_b2VV' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2VV' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0VVList.append('B0:HAD_b2VV' + str(chID))
 
     B0PSList = []
     for chID, channel in enumerate(B0_PSChannels):
-        reconstructDecay('B0:HAD_b2PS' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2PS' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0PSList.append('B0:HAD_b2PS' + str(chID))
 
     B0VSList = []
     for chID, channel in enumerate(B0_VSChannels):
-        reconstructDecay('B0:HAD_b2VS' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2VS' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0VSList.append('B0:HAD_b2VS' + str(chID))
 
     B0SSList = []
     for chID, channel in enumerate(B0_SSChannels):
-        reconstructDecay('B0:HAD_b2SS' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2SS' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0SSList.append('B0:HAD_b2SS' + str(chID))
 
-    copyLists('B0:2BodyB0', B0PPList + B0PVList + B0VVList + B0PSList + B0VSList + B0SSList)
+    copyLists('B0:2BodyB0', B0PPList + B0PVList + B0VVList + B0PSList + B0VSList + B0SSList, path=path)
 
-    List = ['B0:2BodyB0']
+    buildRestOfEvent('B0:2BodyB0', path=path)
+    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+    appendROEMasks('B0:2BodyB0', [cleanMask], path=path)
+    buildContinuumSuppression('B0:2BodyB0', 'cleanMask', path=path)
+    cutAndCopyList('B0:2BodySkim', 'B0:2BodyB0', 'R2 < 0.5', path=path)
+
+    List = ['B0:2BodySkim']
     return List
 
 
-def CharmlessHad2BodyBmList():
+def CharmlessHad2BodyBmList(path):
     """
     Skim list definitions for all charged B to charmless 2 body modes.
 
@@ -186,53 +207,54 @@ def CharmlessHad2BodyBmList():
     **Working Group**: BtoCharmless (WG9)
 
     **Decay Modes**:
-    1. B- -> pi- pi0
-    2. B- -> K- pi0
-    3. B- -> eta pi-
-    4. B- -> eta K-
-    5. B- -> rho0 pi-
-    6. B- -> rho- pi0
-    7. B- -> K- rho0
-    8. B- -> omega pi-
-    9. B- -> eta rho-
-    10. B- -> phi pi-
-    11. B- -> eta K*-
-    12. B- -> omega K-
-    13. B- -> K*0 pi-
-    14. B- -> K*- pi0
-    15. B- -> K- phi
-    16. B- -> rho- rhro0
-    17. B- -> omega rho-
-    18. B- -> phi rho-
-    19. B- -> omega K*-
-    20. B- -> K*- rho0
-    21. B- -> K*0 rho-
-    22. B- -> K*- K*0
-    23. B- -> K*- phi
-    24. B- -> pi- f_0
-    25. B- -> f_0 K-
-    26. B- -> rho- f_0
-    27. B- -> K*- f_0
+    * B- -> pi- pi0
+    * B- -> K- pi0
+    * B- -> eta pi-
+    * B- -> eta K-
+    * B- -> rho0 pi-
+    * B- -> rho- pi0
+    * B- -> K- rho0
+    * B- -> omega pi-
+    * B- -> eta rho-
+    * B- -> phi pi-
+    * B- -> eta K*-
+    * B- -> omega K-
+    * B- -> K*0 pi-
+    * B- -> K*- pi0
+    * B- -> K- phi
+    * B- -> rho- rhro0
+    * B- -> omega rho-
+    * B- -> phi rho-
+    * B- -> omega K*-
+    * B- -> K*- rho0
+    * B- -> K*0 rho-
+    * B- -> K*- K*0
+    * B- -> K*- phi
+    * B- -> pi- f_0
+    * B- -> f_0 K-
+    * B- -> rho- f_0
+    * B- -> K*- f_0
 
-    **Particle Lists**: Standard loose lists for all light mesons.
-    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
-    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+    **Particle Lists**:
+    * Standard loose lists for all light mesons.
+    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
-    1. R2EventLevel < 0.5 (event level)
-    2. nTracks >= 2 (event level)
-    3. 5.24 < Mbc < 5.29
-    4. abs(deltaE) < 0.5
+    * R2 < 0.5
+    * nTracks >= 2 (event level)
+    * 5.24 < Mbc < 5.29
+    * abs(deltaE) < 0.5
 
     Note:
       Does not include decay modes involving eta prime at the current time.
     """
     __author__ = "Kim Smith"
 
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2')
+    applyEventCuts('nTracks >= 2', path=path)
 
-    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25')
-    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51')
+    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
+    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
 
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
@@ -270,36 +292,42 @@ def CharmlessHad2BodyBmList():
 
     BmPPList = []
     for chID, channel in enumerate(Bm_PPChannels):
-        reconstructDecay('B-:HAD_b2PP' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:HAD_b2PP' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmPPList.append('B-:HAD_b2PP' + str(chID))
 
     BmPVList = []
     for chID, channel in enumerate(Bm_PVChannels):
-        reconstructDecay('B-:HAD_b2PV' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:HAD_b2PV' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmPVList.append('B-:HAD_b2PV' + str(chID))
 
     BmVVList = []
     for chID, channel in enumerate(Bm_VVChannels):
-        reconstructDecay('B-:HAD_b2VV' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:HAD_b2VV' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmVVList.append('B-:HAD_b2VV' + str(chID))
 
     BmPSList = []
     for chID, channel in enumerate(Bm_PSChannels):
-        reconstructDecay('B-:HAD_b2PS' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:HAD_b2PS' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmPSList.append('B-:HAD_b2PS' + str(chID))
 
     BmVSList = []
     for chID, channel in enumerate(Bm_VSChannels):
-        reconstructDecay('B-:HAD_b2VS' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:HAD_b2VS' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmVSList.append('B-:HAD_b2VS' + str(chID))
 
-    copyLists('B-:2BodyBm', BmPPList + BmPVList + BmVVList + BmPSList + BmVSList)
+    copyLists('B-:2BodyBm', BmPPList + BmPVList + BmVVList + BmPSList + BmVSList, path=path)
 
-    List = ['B-:2BodyBm']
+    buildRestOfEvent('B-:2BodyBm', path=path)
+    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+    appendROEMasks('B-:2BodyBm', [cleanMask], path=path)
+    buildContinuumSuppression('B-:2BodyBm', 'cleanMask', path=path)
+    cutAndCopyList('B-:2BodySkim', 'B-:2BodyBm', 'R2 < 0.5', path=path)
+
+    List = ['B-:2BodySkim']
     return List
 
 
-def CharmlessHad3BodyB0List():
+def CharmlessHad3BodyB0List(path):
     """
     Skim list definitions for all neutral B to charmless 3 body modes.
 
@@ -314,43 +342,44 @@ def CharmlessHad3BodyB0List():
     **Working Group**: BtoCharmless (WG9)
 
     **Decay Modes**:
-    1. B0 -> pi+ pi- pi0
-    2. B0 -> K+ pi- pi0
-    3. B0 -> K+ K- pi0
-    4. B0 -> K_S0 K_S0 pi0
-    5. B0 -> K_S0 K_S0 eta
-    6. B0 -> K_S0 K_S0 K_S0
-    7. B0 -> rho0 pi+ pi-
-    8. B0 -> rho0 K+ pi-
-    9. B0 -> phi pi+ pi-
-    10. B0 -> K*0 pi+ pi-
-    11. B0 -> K*0 K+ K-
-    12. B0 -> K*0 K- pi+
-    13. B0 -> K*0 K+ pi-
-    14. B0 -> f_0 pi+ pi-
-    15. B0 -> f_0 K+ pi-
+    * B0 -> pi+ pi- pi0
+    * B0 -> K+ pi- pi0
+    * B0 -> K+ K- pi0
+    * B0 -> K_S0 K_S0 pi0
+    * B0 -> K_S0 K_S0 eta
+    * B0 -> K_S0 K_S0 K_S0
+    * B0 -> rho0 pi+ pi-
+    * B0 -> rho0 K+ pi-
+    * B0 -> phi pi+ pi-
+    * B0 -> K*0 pi+ pi-
+    * B0 -> K*0 K+ K-
+    * B0 -> K*0 K- pi+
+    * B0 -> K*0 K+ pi-
+    * B0 -> f_0 pi+ pi-
+    * B0 -> f_0 K+ pi-
 
-    **Particle Lists**: Standard loose lists for all light mesons.
-    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
-    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+    **Particle Lists**:
+    * Standard loose lists for all light mesons.
+    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
-    1. R2EventLevel < 0.5 (event level)
-    2. nTracks >= 2 (event level)
-    3. 5.24 < Mbc < 5.29
-    4. abs(deltaE) < 0.5
-    5. abs(cosTBTO) < 0.9
-    6. abs(cosTBz) < 0.85
+    * R2 < 0.5
+    * nTracks >= 2 (event level)
+    * 5.24 < Mbc < 5.29
+    * abs(deltaE) < 0.5
+    * abs(cosTBTO) < 0.9
+    * abs(cosTBz) < 0.85
 
     Note:
       Does not include decay modes involving eta prime at the current time.
     """
     __author__ = "Kim Smith"
 
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2')
+    applyEventCuts('nTracks >= 2', path=path)
 
-    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25')
-    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51')
+    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25', path=path)
+    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
 
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
@@ -374,32 +403,32 @@ def CharmlessHad3BodyB0List():
 
     B0PPPList = []
     for chID, channel in enumerate(B0_PPPChannels):
-        reconstructDecay('B0:HAD_b2PPP' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2PPP' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0PPPList.append('B0:HAD_b2PPP' + str(chID))
 
     B0PPVList = []
     for chID, channel in enumerate(B0_PPVChannels):
-        reconstructDecay('B0:HAD_b2PPV' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2PPV' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0PPVList.append('B0:HAD_b2PPV' + str(chID))
 
     B0PPSList = []
     for chID, channel in enumerate(B0_PPSChannels):
-        reconstructDecay('B0:HAD_b2PPS' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:HAD_b2PPS' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0PPSList.append('B0:HAD_b2PPS' + str(chID))
 
-    copyLists('B0:3BodyB0', B0PPPList + B0PPVList + B0PPSList)
+    copyLists('B0:3BodyB0', B0PPPList + B0PPVList + B0PPSList, path=path)
 
-    buildRestOfEvent('B0:3BodyB0')
+    buildRestOfEvent('B0:3BodyB0', path=path)
     cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-    appendROEMasks('B0:3BodyB0', [cleanMask])
-    buildContinuumSuppression('B0:3BodyB0', 'cleanMask')
-    cutAndCopyList('B0:3BodySkim', 'B0:3BodyB0', 'abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85')
+    appendROEMasks('B0:3BodyB0', [cleanMask], path=path)
+    buildContinuumSuppression('B0:3BodyB0', 'cleanMask', path=path)
+    cutAndCopyList('B0:3BodySkim', 'B0:3BodyB0', 'R2 < 0.5 and abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
 
     List = ['B0:3BodySkim']
     return List
 
 
-def CharmlessHad3BodyBmList():
+def CharmlessHad3BodyBmList(path):
     """
     Skim list definitions for all charged B to charmless 3 body modes.
 
@@ -414,44 +443,45 @@ def CharmlessHad3BodyBmList():
     **Working Group**: BtoCharmless (WG9)
 
     **Decay Modes**:
-    1. B- -> K- pi+ pi-
-    2. B- -> K- pi0 pi0
-    3. B- -> K+ pi- pi-
-    4. B- -> K- K+ pi-
-    5. B- -> K- K+ K-
-    6. B- -> pi- pi- pi+
-    7. B- -> pi- pi0 pi0
-    8. B- -> K- K_S0 K_S0
-    9. B- -> pi- K_S0 K_S0
-    10. B- -> K_S0 pi- pi0
-    11. B- -> K*- pi- pi+
-    12. B- -> K*- pi- K+
-    13. B- -> K*- K- K+
-    14. B- -> phi K_S0 pi-
-    15. B- -> K- phi phi
-    16. B- -> omega phi K-
+    * B- -> K- pi+ pi-
+    * B- -> K- pi0 pi0
+    * B- -> K+ pi- pi-
+    * B- -> K- K+ pi-
+    * B- -> K- K+ K-
+    * B- -> pi- pi- pi+
+    * B- -> pi- pi0 pi0
+    * B- -> K- K_S0 K_S0
+    * B- -> pi- K_S0 K_S0
+    * B- -> K_S0 pi- pi0
+    * B- -> K*- pi- pi+
+    * B- -> K*- pi- K+
+    * B- -> K*- K- K+
+    * B- -> phi K_S0 pi-
+    * B- -> K- phi phi
+    * B- -> omega phi K-
 
-    **Particle Lists**: Standard loose lists for all light mesons.
-    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
-    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+    **Particle Lists**:
+    * Standard loose lists for all light mesons.
+    * Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    * Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
 
     **Additional Cuts**:
-    1. R2EventLevel < 0.5 (event level)
-    2. nTracks >= 2 (event level)
-    3. 5.24 < Mbc < 5.29
-    4. abs(deltaE) < 0.5
-    5. abs(cosTBTO) < 0.9
-    6. abs(cosTBz) < 0.85
+    * R2 < 0.5
+    * nTracks >= 2 (event level)
+    * 5.24 < Mbc < 5.29
+    * abs(deltaE) < 0.5
+    * abs(cosTBTO) < 0.9
+    * abs(cosTBz) < 0.85
 
     Note:
       Does not include decay modes involving eta prime at the current time.
     """
     __author__ = "Kim Smith"
 
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2')
+    applyEventCuts('nTracks >= 2', path=path)
 
-    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.15 and E > 0.25')
-    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51')
+    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.15 and E > 0.25', path=path)
+    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51', path=path)
 
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
@@ -476,26 +506,26 @@ def CharmlessHad3BodyBmList():
 
     BmPPPList = []
     for chID, channel in enumerate(Bm_PPPChannels):
-        reconstructDecay('B-:HAD_b2PPP' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:HAD_b2PPP' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmPPPList.append('B-:HAD_b2PPP' + str(chID))
 
     BmPPVList = []
     for chID, channel in enumerate(Bm_PPVChannels):
-        reconstructDecay('B-:HAD_b2PPV' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:HAD_b2PPV' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmPPVList.append('B-:HAD_b2PPV' + str(chID))
 
     BmPVVList = []
     for chID, channel in enumerate(Bm_PVVChannels):
-        reconstructDecay('B-:HAD_b2PVV' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:HAD_b2PVV' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmPVVList.append('B-:HAD_b2PVV' + str(chID))
 
-    copyLists('B-:3BodyBm', BmPPPList + BmPPVList + BmPVVList)
+    copyLists('B-:3BodyBm', BmPPPList + BmPPVList + BmPVVList, path=path)
 
-    buildRestOfEvent('B-:3BodyBm')
+    buildRestOfEvent('B-:3BodyBm', path=path)
     cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-    appendROEMasks('B-:3BodyBm', [cleanMask])
-    buildContinuumSuppression('B-:3BodyBm', 'cleanMask')
-    cutAndCopyList('B-:3BodySkim', 'B-:3BodyBm', 'abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85')
+    appendROEMasks('B-:3BodyBm', [cleanMask], path=path)
+    buildContinuumSuppression('B-:3BodyBm', 'cleanMask', path=path)
+    cutAndCopyList('B-:3BodySkim', 'B-:3BodyBm', 'R2 < 0.5 and abs(cosTBTO) < 0.9 and abs(cosTBz) < 0.85', path=path)
 
     List = ['B-:3BodySkim']
     return List

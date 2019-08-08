@@ -9,36 +9,45 @@ Physics channel: ee → A'γ; A' → invisible; Skim LFN code:   18020100
 __author__ = "Sam Cunliffe"
 
 
-from basf2 import process, statistics
-from modularAnalysis import analysis_main, inputMdstList, skimOutputUdst, summaryOfLists
-from stdCharged import loadStdCharged
+from basf2 import process, statistics, Path
+from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
+from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
-from skimExpertFunctions import setSkimLogging, encodeSkimName
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import argparse
+gb2_setuprel = 'release-03-02-00'
 
-gb2_setuprel = 'release-02-00-01'
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+# create a path
+darkskimpath = Path()
 
-inputMdstList('MC10', fileList)
-
-stdPhotons('all')
-loadStdCharged()
+# test input file
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=darkskimpath)
+stdPhotons('all', path=darkskimpath)
+stdE('all', path=darkskimpath)
+stdMu('all', path=darkskimpath)
 
 # dark photon skim
 from skim.dark import SinglePhotonDarkList
-darklist = SinglePhotonDarkList()
+darklist = SinglePhotonDarkList(path=darkskimpath)
 skimCode = encodeSkimName('SinglePhotonDark')
 print("Single photon dark skim:", skimCode)
-skimOutputUdst(skimCode, darklist)
-summaryOfLists(darklist)
+skimOutputUdst(skimCode, darklist, path=darkskimpath)
+summaryOfLists(darklist, path=darkskimpath)
 
 # suppress noisy modules, and then process
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=darkskimpath)
+process(darkskimpath)
 
 # print out the summary
 print(statistics)

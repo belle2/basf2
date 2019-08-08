@@ -52,7 +52,8 @@ namespace Belle2 {
     double m_confidenceLevel;
 
     /** convergence precision for the newton method
-     * When the detla chiSquared between 2 iterations is smaller than this stop the fit and call it converged
+     * When the delta chiSquared between 2 iterations divided by the chiSquared of the previous iteration
+    * is smaller than this stop the fit and call it converged
      * optimized - don't touch
      * */
     double m_precision;
@@ -60,6 +61,15 @@ namespace Belle2 {
     /** vector carrying the PDG codes of the particles to be mass constraint */
     std::vector<int> m_massConstraintList;
 
+    /** list of pdg codes of particles to use a geo cosntraint for */
+    std::vector<int> m_geoConstraintListPDG;
+
+    /** list of pdg codes of particles where we use thesame vertex for production and decay
+     * which is the vertex of the mother */
+    std::vector<int> m_fixedToMotherVertexListPDG;
+
+    /** vector carrying the names of the particles to be mass constraint */
+    std::vector<std::string> m_massConstraintListParticlename;
     /** type of the mass constraint false: use normal one. true: use parameters of daughters experimental!
      *  WARNING not even guaranteed that it works
      * */
@@ -103,5 +113,15 @@ namespace Belle2 {
      * */
     std::vector<std::string> m_removeConstraintList;
 
+    /** should the vertex be joined with the mother and should it be geometrically cosntrained?
+     *  'I dont know hat I am doing'
+     * */
+    bool m_automatic_vertex_constraining;
+
+    /** dimension to use for beam/origin cosntraint  */
+    int m_originDimension;
+
+    /** inflate beamspot covariance of z by this number */
+    int m_inflationFactorCovZ;
   };
 }

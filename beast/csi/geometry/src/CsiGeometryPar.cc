@@ -11,7 +11,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <cmath>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>

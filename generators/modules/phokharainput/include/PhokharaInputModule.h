@@ -73,7 +73,7 @@ namespace Belle2 {
     int m_narres;  /**< narr_res: no narrow resonances (0), J/psi (1) and psi(2S) (2) only for m_finalState = 0,1,6,7 */
     int m_protonff;  /**< ProtonFormFactor old(0), ProtonFormFactor new(1) */
 
-    double m_cmsEnergy; /**< CMS energy. */
+    double m_cmsEnergy = -1.0; /**< CMS energy. */
     std::vector<double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
     std::vector<double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
     double m_MinInvMassHadronsGamma; /**< m_MinInvMassHadronsGamma [GeV^2]. */
@@ -86,6 +86,7 @@ namespace Belle2 {
     double m_epsilon; /**< Soft/hard photon separator*/
     std::string m_ParameterFile; /**< file that holds all resonance parameters*/
 //     std::string m_InputFile; /**< file that holds all input parameters - NOT USED IN BELLE II IMPLEMENTATION!!!*/
+    bool m_BeamEnergySpread; /**< Simulate beam-energy spread. */
 
     /** Variables */
     Phokhara m_generator;   /**< The Phokhara generator. */

@@ -9,12 +9,13 @@
 # upload it to the database
 #
 # Contributors: I. Komarov (April 2018)
+#               I. Komarov (September 2018)
 #
 ######################################################
 
 import sys
-from basf2 import *
-from modularAnalysis import analysis_main
+import basf2 as b2
+import modularAnalysis as ma
 import random
 
 # Add some bin constructors
@@ -104,7 +105,7 @@ outOfRangeWeightInfo["StatErr"] = -1
 outOfRangeWeightInfo["SystErr"] = -1
 
 # Now, let's configure table creator
-addtable = register_module('ParticleWeightingLookUpCreator')
+addtable = b2.register_module('ParticleWeightingLookUpCreator')
 addtable.param('tableIDSpec', tableIDSpec)
 addtable.param('outOfRangeWeight', outOfRangeWeightInfo)
 addtable.param('experimentHigh', 1000)
@@ -113,7 +114,7 @@ addtable.param('runHigh', 1000)
 addtable.param('runLow', 0)
 addtable.param('tableName', "ParticleReweighting:TestMomentum")
 
-addtable2 = register_module('ParticleWeightingLookUpCreator')
+addtable2 = b2.register_module('ParticleWeightingLookUpCreator')
 addtable2.param('tableIDNotSpec', tableIDNotSpec)
 addtable2.param('outOfRangeWeight', outOfRangeWeightInfo)
 addtable2.param('experimentHigh', 1000)
@@ -122,13 +123,14 @@ addtable2.param('runHigh', 1000)
 addtable2.param('runLow', 0)
 addtable2.param('tableName', "ParticleReweighting:TestMomentum2")
 
-analysis_main.add_module(addtable)
-analysis_main.add_module(addtable2)
-
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('expList', [0])
-analysis_main.add_module(eventinfosetter)
 
-process(analysis_main)
+my_path = b2.create_path()
+my_path.add_module(addtable)
+my_path.add_module(addtable2)
+my_path.add_module(eventinfosetter)
+
+b2.process(my_path)

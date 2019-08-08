@@ -31,10 +31,10 @@ namespace Belle2 {
     UpdateParticleTrackCandModule();
 
     /** init */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** update candidates */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

@@ -29,10 +29,10 @@ namespace Belle2 {
     ECLTriggerClusterMatcherModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Event */
-    virtual void event();
+    virtual void event() override;
 
   private:
 

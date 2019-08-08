@@ -46,9 +46,9 @@ namespace Belle2 {
       PXDClusterizerModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
 
     private:
       /** Create lookup maps for Relations

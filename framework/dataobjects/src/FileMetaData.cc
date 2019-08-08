@@ -27,7 +27,7 @@ using namespace boost::python;
 FileMetaData::FileMetaData() :
   m_lfn(""), m_nEvents(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
   m_experimentHigh(0), m_runHigh(0), m_eventHigh(0), m_date(""), m_site(""), m_user(""), m_release(""),
-  m_steering(""), m_mcEvents(0)
+  m_steering(""), m_isMC(true), m_mcEvents(0)
 {
 }
 
@@ -66,6 +66,7 @@ void FileMetaData::exposePythonAPI()
   .def("get_random_seed", &FileMetaData::getRandomSeed, return_value_policy<copy_const_reference>())
   .def("get_release", &FileMetaData::getRelease, return_value_policy<copy_const_reference>())
   .def("get_steering", &FileMetaData::getSteering, return_value_policy<copy_const_reference>())
+  .def("is_mc", &FileMetaData::isMC)
   .def("get_mc_events", &FileMetaData::getMcEvents)
   .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag, return_value_policy<copy_const_reference>())
   .def("get_data_description", &FileMetaData::getDataDescription, return_value_policy<copy_const_reference>())
@@ -102,6 +103,7 @@ void FileMetaData::Print(Option_t* option) const
     printer.put("user", m_user);
     printer.put("randomSeed", m_randomSeed);
     printer.put("release", m_release);
+    printer.put("isMC", m_isMC);
     printer.put("mcEvents", m_mcEvents);
     printer.put("globalTag", m_databaseGlobalTag);
     printer.put("dataDescription", m_dataDescription);
@@ -128,9 +130,9 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
     boost::algorithm::trim(line);
     if (line.compare("</File>") == 0) return true;
 
-    int pos = line.find(">") + 1;
+    int pos = line.find('>') + 1;
     std::string tag = line.substr(0, pos);
-    std::string value = line.substr(pos, line.rfind("<") - pos);
+    std::string value = line.substr(pos, line.rfind('<') - pos);
     if (tag.compare("<LFN>") == 0) {
       m_lfn = HTML::unescape(value);
     } else if (tag.compare("<PFN>") == 0) {
@@ -148,11 +150,11 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
     } else if (tag.compare("<EventHigh>") == 0) {
       m_eventHigh = stoi(value);
     } else if (tag.compare("<Parents>") == 0) {
-      pos = value.find(",");
+      pos = value.find(',');
       while (pos > 0) {
         m_parentLfns.push_back(HTML::unescape(value.substr(0, pos)));
         value.erase(0, pos + 1);
-        pos = value.find(",");
+        pos = value.find(',');
       }
       m_parentLfns.push_back(HTML::unescape(value));
     }

@@ -23,9 +23,6 @@
 #include <stdio.h>
 #include <TCut.h>
 
-// Header file for the classes stored in the TTree if any.
-#include <vector>
-
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
 /** eclChargedPidSelector
@@ -146,7 +143,7 @@ public :
   void SetOutputDir(const char* outpath); /**< Set output directory */
 
   /** Constructor */
-  eclChargedPidSelector(TTree* tree = 0) :
+  explicit eclChargedPidSelector(TTree* tree = 0) :
     fChain(0),
     eclShowerEnergy(0),
     eclShowerTheta(0),

@@ -12,30 +12,46 @@ from basf2 import *
 from modularAnalysis import *
 from stdPi0s import *
 from stdPhotons import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+from stdCharged import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 import sys
-import os
-import glob
-skimCode = encodeSkimName('BottomoniumUpsilon')
-fileList = \
-    [
-        '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-        'mdst_000001_prod00002288_task00000001.root'
-    ]
+import argparse
 
-inputMdstList('MC9', fileList)
-stdPhotons('loose')
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
+# create a new path
+BottomoniumUpsilonskimpath = Path()
+
+skimCode = encodeSkimName('BottomoniumUpsilon')
+
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=BottomoniumUpsilonskimpath)
+
+# use standard final state particle lists
+stdPi('loose', path=BottomoniumUpsilonskimpath)
+stdE('loose', path=BottomoniumUpsilonskimpath)
+stdMu('loose', path=BottomoniumUpsilonskimpath)
+
+stdPhotons('loose', path=BottomoniumUpsilonskimpath)
 
 # Bottomonium Skim
-from BottomoniumUpsilon_List import *
-YList = UpsilonList()
-skimOutputUdst(skimCode, YList)
-summaryOfLists(YList)
+from skim.quarkonium import *
+YList = UpsilonList(path=BottomoniumUpsilonskimpath)
+skimOutputUdst(skimCode, YList, path=BottomoniumUpsilonskimpath)
+summaryOfLists(YList, path=BottomoniumUpsilonskimpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=BottomoniumUpsilonskimpath)
+process(BottomoniumUpsilonskimpath)
 
 # print out the summary
 print(statistics)

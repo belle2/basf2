@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMRECONSTRUCTIONPARAMETERS_H
-#define EKLMRECONSTRUCTIONPARAMETERS_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -48,12 +47,9 @@ namespace Belle2 {
     /** Time resolution. */
     float m_TimeResolution;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMReconstructionParameters, 1);
 
   };
 
 }
-
-#endif
-

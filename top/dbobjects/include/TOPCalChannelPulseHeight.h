@@ -59,18 +59,24 @@ namespace Belle2 {
         return;
       }
       if (x0 <= 0) {
-        B2ERROR("Invalid parameter value x0 (" << x0 << ") for slot " << moduleID
-                << " channel " << channel << ", constant not set (" << ClassName() << ")");
+        B2ERROR("Invalid parameter value x0, constant not set (" << ClassName() << ")."
+                << LogVar("x0", x0)
+                << LogVar("slot", moduleID)
+                << LogVar("channel", channel));
         return;
       }
       if (p1 < 0) {
-        B2ERROR("Invalid parameter value p1 (" << p1 << ") for slot " << moduleID
-                << " channel " << channel << ", constant not set (" << ClassName() << ")");
+        B2ERROR("Invalid parameter value p1, constant not set (" << ClassName() << ")."
+                << LogVar("p1", p1)
+                << LogVar("slot", moduleID)
+                << LogVar("channel", channel));
         return;
       }
       if (p2 <= 0) {
-        B2ERROR("Invalid parameter value p2 (" << p2 << ") for slot " << moduleID
-                << " channel " << channel << ", constant not set (" << ClassName() << ")");
+        B2ERROR("Invalid parameter value p2, constant not set (" << ClassName() << ")."
+                << LogVar("p2", p2)
+                << LogVar("slot", moduleID)
+                << LogVar("channel", channel));
         return;
       }
       m_par[module][channel].x0 = x0;
@@ -108,14 +114,15 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Invalid slot number " << moduleID
-                  << ", returning parameters of slot 0 channel 0 (" << ClassName() << ")");
+        B2WARNING("Invalid slot number, "
+                  "returning parameters of slot 1 channel 0 (" << ClassName() << ")"
+                  << LogVar("slot", moduleID));
         return m_par[0][0];
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Invalid channel " << channel
-                  << ", returning parameters of slot " << moduleID << " channel 0 ("
-                  << ClassName() << ")");
+        B2WARNING("Invalid channel, "
+                  "returning parameters of channel 0 (" << ClassName() << ")"
+                  << LogVar("channel", channel));
         return m_par[module][0];
       }
       return m_par[module][channel];

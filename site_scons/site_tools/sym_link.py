@@ -4,6 +4,7 @@
 import os
 import errno
 from SCons.Script import GetOption
+from SCons.Builder import Builder
 
 # define relpath for python < 2.6
 if not hasattr(os.path, 'relpath'):
@@ -44,9 +45,14 @@ def create_symlink(target, source, env):
     return 0
 
 
+copy_file = Builder(action='cp -pf $SOURCE $TARGET')
+copy_file.action.cmdstr = '${COPYCOMSTR}'
+
+
 def generate(env):
     if not GetOption('no-symlink'):
         env['INSTALL'] = create_symlink
+    env['BUILDERS']['Copy'] = copy_file
 
 
 def exists(env):

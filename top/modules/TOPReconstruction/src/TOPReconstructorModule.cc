@@ -125,6 +125,11 @@ namespace Belle2 {
   void TOPReconstructorModule::event()
   {
 
+    // clear output objects
+
+    m_likelihoods.clear();
+    m_topPulls.clear();
+
     // check bunch reconstruction status and do the reconstruction:
     // - if object exists and bunch is found (collision data w/ bunch finder in the path)
     // - if object doesn't exist (cosmic data and other cases w/o bunch finder in the path)

@@ -46,10 +46,19 @@ namespace Belle2 {
      */
     void initialize() override;
 
+    /**
+     *Initializations at the begin of the run.
+     */
     void beginRun() override;
 
+    /**
+     *Event loop.
+     */
     void event() override;
 
+    /**
+     *Executed at the end of the run.
+     */
     void endRun() override;
 
     /**
@@ -78,12 +87,6 @@ namespace Belle2 {
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
 
     int m_rootEvent;   /**<  event number*/
-
-    //svd sensor number
-    Int_t m_nSensorsL3; /**<  number of sensors on L3*/
-    Int_t m_nSensorsL4; /**<  number of sensors on L4*/
-    Int_t m_nSensorsL5; /**<  number of sensors on L4*/
-    Int_t m_nSensorsL6; /**<  number of sensors on L4*/
 
     //graphs & histos - results
     Double_t pt[6]  = {0.05, 0.15, 0.25, 0.4, 0.75, 1.5}; /**< bin edges (in pt = transverse momentum)*/

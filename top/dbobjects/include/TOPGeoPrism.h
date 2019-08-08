@@ -118,19 +118,21 @@ namespace Belle2 {
     }
 
     /**
-     * Returns wavelength filter thickness (filter on -z side)
+     * Returns wavelength filter thickness (filter on -z side).
+     * For backward compatibility, since now the filter is part of TOPGeoPMTArray
      * @return thickness
      */
     double getFilterThickness() const {return m_glueThickness / s_unit;}
 
     /**
      * Returns wavelength filter material name (filter on -z side)
+     * For backward compatibility, since now the filter is part of TOPGeoPMTArray
      * @return material name
      */
     const std::string& getFilterMaterial() const {return m_glueMaterial;}
 
     /**
-     * Returns glue thickness (no glue on -z side, instead there is a wavelength filter)
+     * Returns glue thickness (no glue on -z side)
      * @return thickness
      */
     double getGlueThickness() const override {return 0;}
@@ -190,6 +192,16 @@ namespace Belle2 {
 
 
   private:
+
+    /**
+     * Disable setting the glue, since there is none
+     */
+    void setGlue(double, const std::string&) override {}
+
+    /**
+     * Disable setting the glue delamination, since there is no glue
+     */
+    void setGlueDelamination(double, double, const std::string&) override {}
 
     float m_exitThickness = 0; /**< thickness at PMT side */
     float m_flatLength = 0; /**< length of the flat part at the bottom */

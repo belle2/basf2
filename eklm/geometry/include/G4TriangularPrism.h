@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef G4TRIANGULARPRISM_H
-#define G4TRIANGULARPRISM_H
+#pragma once
 
 /* External headers. */
 #include <G4IntersectionSolid.hh>
@@ -42,6 +41,11 @@ namespace Belle2 {
      * Copy constructor (disabled).
      */
     G4TriangularPrism(const G4TriangularPrism&) = delete;
+
+    /**
+     * Operator =  (disabled).
+     */
+    G4TriangularPrism& operator=(const G4TriangularPrism&) = delete;
 
     /**
      * Destructor.
@@ -81,6 +85,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

@@ -26,14 +26,12 @@ namespace TreeFitter {
 
     /** Constructor */
     Origin(Belle2::Particle* particle,
-           const bool forceFitAll,
-           const std::vector<double> customOriginVertex,
-           const std::vector<double> customOriginCovariance,
-           const bool isBeamSpot
+           const ConstraintConfiguration& config,
+           const bool forceFitAll
           );
 
     /** Constructor */
-    Origin(Belle2::Particle* daughter);
+    explicit Origin(Belle2::Particle* daughter);
 
     /** destructor */
     virtual ~Origin() {};
@@ -105,5 +103,7 @@ namespace TreeFitter {
     /** the parameters are initialize elsewhere this is just a pointer to that */
     Belle2::DBObjPtr<Belle2::BeamParameters> m_beamParams;
 
+    /** inflated the covariance matrix in z by this number */
+    const int m_inflationFactorCovZ;
   };
 }

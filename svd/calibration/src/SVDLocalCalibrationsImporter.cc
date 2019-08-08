@@ -34,9 +34,12 @@
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+
+#include <svd/calibration/SVDDetectorConfiguration.h>
+//#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -49,8 +52,6 @@
 #include <TFile.h>
 #include <TVectorF.h>
 /*
-#include <fstream>
-
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -59,6 +60,20 @@
 using namespace std;
 using namespace Belle2;
 using boost::property_tree::ptree;
+
+void SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fileName)
+{
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
+  const std::string filename = FileSystem::findFile(fileName); //phase 3 xmlMapping
+  B2INFO("Importing the svd online -> offline map " << fileName << "\n");
+  //  const std::string filename = FileSystem::findFile("testbeam/vxd/data/2017_svd_mapping.xml");
+  const std::string payloadname = "SVDChannelMapping.xml";
+  if (Database::Instance().addPayload(payloadname, filename, iov))
+    B2INFO("Success!");
+  else
+    B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
+}
 
 
 void SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
@@ -82,11 +97,18 @@ void SVDLocalCalibrationsImporter::importSVDPedestalCalibrationsFromXML(const st
       -1.0, errorTollerant);
 }
 
+void SVDLocalCalibrationsImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
+      xmlFileName, "hot_strips",
+      false, errorTollerant);
+}
+
 void SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDFADCMaskedStrips::t_payload  >(SVDFADCMaskedStrips::name,
-      xmlFileName, "FADCMasked_strips",
-      -1.0, errorTollerant);
+      xmlFileName, "masks",
+      false, errorTollerant);
 }
 
 

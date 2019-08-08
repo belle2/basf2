@@ -80,7 +80,7 @@ namespace Belle2 {
      *     By default the same directory as the one containing the database text file is used.
      * @param readOnly   If this flag is set the database is opened in read only mode without locking.
      */
-    explicit LocalDatabase(const std::string& fileName, const std::string& payloadDir = "", bool readOnly = false);
+    explicit LocalDatabase(std::string  fileName, std::string  payloadDir = "", bool readOnly = false);
 
     /** Hidden copy constructor, as it is a singleton. */
     LocalDatabase(const LocalDatabase&);

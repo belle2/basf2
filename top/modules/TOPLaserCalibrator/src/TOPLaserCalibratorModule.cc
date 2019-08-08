@@ -32,7 +32,6 @@
 
 // database classes
 #include <framework/database/DBStore.h>
-#include <top/dbobjects/TOPASICChannel.h>
 
 #include <Math/PdfFuncMathCore.h>
 #include <TFile.h>
@@ -150,7 +149,7 @@ namespace Belle2 {
 
     //read laser propagation time from MC (TOPChannelT0MC)
     auto mcFile = new TFile(m_mcInput.c_str());
-    auto tree = (TTree*)mcFile->Get("t0MC");
+    auto tree = static_cast<TTree*>(mcFile->Get("t0MC"));
     int channel_mc;
     double maxpos;
 

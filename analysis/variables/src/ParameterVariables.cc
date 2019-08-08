@@ -386,7 +386,7 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
-    double pointingAngle(const Particle* particle, const std::vector<double> daughters)
+    double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
         return -999;
@@ -401,7 +401,7 @@ namespace Belle2 {
       TVector3 productionVertex = particle->getVertex();
       TVector3 decayVertex = particle->getDaughter(daughter)->getVertex();
 
-      TVector3 vertexDiffVector = productionVertex - decayVertex;
+      TVector3 vertexDiffVector = decayVertex - productionVertex;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       TVector3 daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
@@ -409,7 +409,7 @@ namespace Belle2 {
       return cos(daughterMomentumVector.Angle(vertexDiffVector));
     }
 
-    double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double> daughters)
+    double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
         return -999;

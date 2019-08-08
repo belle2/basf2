@@ -21,6 +21,7 @@ namespace Belle2 {
   // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
   typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
   using Belle2::PXD::PXDError::PXDErrorFlags;
+  using Belle2::PXD::PXDError::EPXDErrMask;
 
   /**
    * The PXD DAQ DHE Status class
@@ -53,6 +54,10 @@ namespace Belle2 {
      */
     bool isUsable() const { return m_usable; }
 
+    /** Mark Data in DHE as Unusable
+     */
+    void markUnusable() { m_usable = false; m_errorMask |= EPXDErrMask::c_UNUSABLE_DATA;}
+
     /** Set Error bit mask
      * @param m Bit Mask to set
      */
@@ -78,7 +83,7 @@ namespace Belle2 {
      * the PXD data from this DHE is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0ull && (m_errorMask & EPXDErrMask::c_UNUSABLE_DATA) == 0ull;}
 
     /** Set VxdID and DHE ID of sensor */
     void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
@@ -106,6 +111,10 @@ namespace Belle2 {
     /** get Readout Frame number */
     unsigned short getFrameNr(void) const { return  m_frameNr;};
 
+
+    void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};
+    uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
+
     /** Add DHP information
      * @param daqdhp DHP Status Object
      */
@@ -125,6 +134,11 @@ namespace Belle2 {
     std::vector<PXDDAQDHPStatus>::iterator begin()  { return m_pxdDHP.begin(); };
     /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator end()  { return m_pxdDHP.end(); };
+
+    /** const iterator-based iteration for DHPs */
+    std::vector<PXDDAQDHPStatus>::const_iterator cbegin() const { return m_pxdDHP.cbegin(); };
+    /** const iterator-based iteration for DHPs */
+    std::vector<PXDDAQDHPStatus>::const_iterator cend() const { return m_pxdDHP.cend(); };
     /** Returns PXDDAQDHPStatus for the last DHP */
     PXDDAQDHPStatus& dhp_back()  { return m_pxdDHP.back(); };
     /** Returns number of DHPs */
@@ -155,6 +169,7 @@ namespace Belle2 {
     unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
+    uint32_t m_errorinfo; /* erroinfo from the DHE END */
 
     /** Vector of DHP informations belonging to this event */
     std::vector< PXDDAQDHPStatus> m_pxdDHP;
@@ -162,7 +177,7 @@ namespace Belle2 {
     /** Vector of Common Mode informations belonging to this event */
     std::vector < PXDDAQDHPComMode> m_commode;
 
-    ClassDef(PXDDAQDHEStatus, 4);
+    ClassDef(PXDDAQDHEStatus, 6);
 
   }; // class PXDDAQDHEStatus
 

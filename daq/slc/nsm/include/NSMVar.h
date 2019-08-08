@@ -22,7 +22,10 @@ namespace Belle2 {
     static const NSMVar NOVALUE;
 
   public:
-    NSMVar() : m_value(NULL), m_name(), m_type(NONE), m_len(0) {}
+    NSMVar() : m_value(NULL), m_name(), m_type(NONE), m_len(0)
+    {
+      setDate(Date());
+    }
     NSMVar(const std::string& name, Type type, int len, const void* value)
       : m_value(NULL)
     {
@@ -62,27 +65,27 @@ namespace Belle2 {
   public:
     const NSMVar& operator=(const NSMVar& var)
     {
-      copy(var.m_name, var.m_type, var.m_len, var.m_value, var.m_id, var.m_rev);
+      copy(var.m_name, var.m_type, var.m_len, var.m_value, var.m_id, var.m_date);
       m_node = var.m_node;
       m_date = var.m_date;
       return *this;
     }
     const NSMVar& operator=(int val)
     {
-      copy(m_name, INT, 0, &val, m_id, m_rev);
+      copy(m_name, INT, 0, &val, m_id);
       return *this;
     }
     const NSMVar& operator=(float val)
     {
-      copy(m_name, FLOAT, 0, &val, m_id, m_rev);
+      copy(m_name, FLOAT, 0, &val, m_id);
       return *this;
     }
     const NSMVar& operator=(const std::string& val)
     {
       if (val.size() > 0) {
-        copy(m_name, TEXT, val.size() + 1, val.c_str(), m_id, m_rev);
+        copy(m_name, TEXT, val.size() + 1, val.c_str(), m_id);
       } else {
-        copy(m_name, TEXT, 1, "", m_id, m_rev);
+        copy(m_name, TEXT, 1, "", m_id);
       }
       return *this;
     }
@@ -111,9 +114,7 @@ namespace Belle2 {
     int getInt(int i) const;
     float getFloat(int i) const;
     int getId() const { return m_id; }
-    int getRevision() const { return m_rev; }
     void setId(int id) { m_id = id; }
-    void setRevision(int rev) { m_rev = rev; }
     void setDate(int date) { m_date = date; }
     void setDate(const Date& date) { m_date = date.get(); }
     int getDate() const { return m_date; }
@@ -124,7 +125,7 @@ namespace Belle2 {
 
   public:
     void copy(const std::string& name, Type type, int len,
-              const void* value, int id = 0, int rev = 0);
+              const void* value, int id = 0, int date = 0);
 
   private:
     void* m_value;
@@ -133,7 +134,6 @@ namespace Belle2 {
     Type m_type;
     int m_len;
     int m_id;
-    int m_rev;
     int m_date;
 
   };

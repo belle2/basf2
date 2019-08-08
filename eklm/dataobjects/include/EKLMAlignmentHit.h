@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMALIGNMENTHIT_H
-#define EKLMALIGNMENTHIT_H
+#pragma once
 
 /* Belle2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -58,12 +57,9 @@ namespace Belle2 {
      */
     int m_DigitIdentifier;
 
-    /** Needed to make object storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMAlignmentHit, 1);
 
   };
 
 }
-
-#endif
-

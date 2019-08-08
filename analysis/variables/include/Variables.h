@@ -211,6 +211,10 @@ namespace Belle2 {
      */
     double particleInvariantMassBeforeFitSignificance(const Particle* part);
 
+    /**
+     * return mass squared (determined from particle's 4-momentum vector)
+     */
+    double particleMassSquared(const Particle* part);
 
     /**
      * return released energy in decay
@@ -233,187 +237,6 @@ namespace Belle2 {
     double particleDeltaE(const Particle* part);
 
     /**
-     * return StoreArray index (0-based) of the MDST object from which the Particle was created
-     */
-    double particleMdstArrayIndex(const Particle* part);
-
-    /**
-     * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
-     */
-    double particleMdstSource(const Particle* part);
-
-    /**
-     * return prob(chi^2,ndf) of fit
-     */
-    double particlePvalue(const Particle* part);
-
-    /**
-     * return number of daughter particles
-     */
-    double particleNDaughters(const Particle* part);
-
-    /**
-     * return flavor type
-     */
-    double particleFlavorType(const Particle* part);
-
-    /**
-     * return charge
-     */
-    double particleCharge(const Particle* part);
-
-    /**
-    <<<<<<< Updated upstream
-    =======
-     * return 1 if Particle is related to initial MCParticle, 0 if Particle is related to non-initial MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCInitialParticle(const Particle* particle);
-
-    /**
-     * return 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non-virtual MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCVirtualParticle(const Particle* particle);
-
-    /**
-     * return 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non-FSR MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCFSRParticle(const Particle* particle);
-
-    /**
-     * return 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non-Photos MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCPhotosParticle(const Particle* particle);
-
-    /**
-     * return 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non-ISR MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCISRParticle(const Particle* particle);
-
-    /**
-     * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
-     */
-    double isSignal(const Particle* part);
-
-    /**
-     * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
-     * Misidentification of charged FSP is allowed.
-     */
-    double isExtendedSignal(const Particle* part);
-
-    /**
-     * return 1 if Particle is correctly reconstructed (SIGNAL including misssing neutrino), 0 otherwise
-     */
-    double isSignalAcceptMissingNeutrino(const Particle* part);
-
-    /**
-     * check the PDG code of a particles MC mother
-     */
-    double genMotherPDG(const Particle* particle);
-
-    /**
-     * check the array index of a particle's MC mother
-     */
-    double genMotherIndex(const Particle* particle);
-
-    /**
-     * generated momentum of a particles MC mother
-     */
-    double genMotherP(const Particle* particle);
-
-    /**
-     * check the array index of a particle's related MCParticle
-     */
-    double genParticleIndex(const Particle* particle);
-
-    /**
-     * return PDG code of matched MCParticle
-     */
-    double particleMCMatchPDGCode(const Particle* particle);
-
-    /**
-     * return combination of MCMatching::MCErrorFlags flags.
-     */
-    double particleMCErrors(const Particle* particle);
-
-    /**
-     * return the weight of the Particle -> MCParticle relation (only for the first Relation = largest weight)
-     */
-    double particleMCMatchWeight(const Particle* particle);
-
-    /**
-     * return the number of relations of this Particle to MCParticle
-     */
-    double particleNumberOfMCMatch(const Particle* particle);
-
-    /**
-     * return 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCPrimaryParticle(const Particle* particle);
-
-    /**
-     * return the true momentum transfer to lepton pair in a B (semi-) leptonic B meson decay
-     */
-    double particleMCMomentumTransfer2(const Particle* part);
-
-    /**
-     * return decay time of matched MCParticle (-999.0 if the particle is not matched)
-     * note this is the delta time between decay of the particle and collision
-     */
-    double particleMCMatchDecayTime(const Particle* particle);
-
-    /**
-     * return life time of matched mc particle in CMS frame.
-     */
-    double particleMCMatchLifeTime(const Particle* particle);
-
-    /**
-     * return px of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchPX(const Particle* particle);
-
-    /**
-     * return py of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchPY(const Particle* particle);
-
-    /**
-     * return pz of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchPZ(const Particle* particle);
-
-    /**
-     * return decay x-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDX(const Particle* particle);
-
-    /**
-     * return decay y-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDY(const Particle* particle);
-
-    /**
-     * return decay z-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDZ(const Particle* particle);
-
-    /**
-     * return Energy of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchE(const Particle* particle);
-
-    /**
-     * return total momentum of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchP(const Particle* particle);
-
-    /**
-     * return recoiling mass against the particles appended as particle's daughters.
-     * MC truth values are used in the calculations.
-     */
-    double particleMCRecoilMass(const Particle* particle);
-
-    /**
-    >>>>>>> Stashed changes
      * return component x of 3-momentum recoiling against given Particle
      */
     double recoilPx(const Particle* particle);
@@ -521,10 +344,36 @@ namespace Belle2 {
     double b2bPhi(const Particle* particle);
 
     /**
-     * return Kshort using Belle goodKS algorithm
+     * returns the theta angle (lab) that is back-to-back (cms) to the cluster
      */
-    double goodBelleKshort(const Particle* KS);
+    double b2bClusterTheta(const Particle* particle);
 
+    /**
+     * returns the phi angle (lab) that is back-to-back (cms) to the cluster
+     */
+    double b2bClusterPhi(const Particle* particle);
 
+    /**
+     * returns the longitudinal momentum asymmetry
+     * alpha = (p_{L}^{+} - p_{L}^{-}) / (p_{L}^{+} - p_{L}^{-})
+     * for the Armenteros plot.
+     * The particle (mother) is required to have exactly two daughters.
+     * In case the two daughters have same charge it will return
+     * alpha = (p_{L}^{d1} - p_{L}^{d2}) / (p_{L}^{d1} - p_{L}^{d2})
+     * where d1 is the first daughter, d2 the second daughter.
+     */
+    double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part);
+
+    /**
+     * returns the transverse momentum of the first daughter with
+     * respect to the V0 mother
+     */
+    double ArmenterosDaughter1Qt(const Particle* part);
+
+    /**
+     * returns the transverse momentum of the second daughter with
+     * respect to the V0 mother
+     */
+    double ArmenterosDaughter2Qt(const Particle* part);
   }
 } // Belle2 namespace

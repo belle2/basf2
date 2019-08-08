@@ -152,7 +152,7 @@ particlegun.param('thetaParams', [17, 150])
 # The default is a uniform theta distribution between 0 and 360 degree
 
 particlegun.param('phiGeneration', 'uniform')
-particlegun.param('phiParams', [17, 150])
+particlegun.param('phiParams', [0, 360])
 
 # or we could create a normal distributed phi angle around 90 degrees with a
 # width of 5 degrees
@@ -215,17 +215,10 @@ eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 output.param('outputFileName', 'ParticleGunOutput.root')
 
 # ============================================================================
-# Do the simulation
-
 main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
-main.add_module(gearbox)
-main.add_module(geometry)
 main.add_module(particlegun)
-
-add_simulation(main)
-add_reconstruction(main)
 
 main.add_module(output)
 

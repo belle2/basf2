@@ -14,5 +14,6 @@ def add_ecl_trigger(path):
 
     trgecl = register_module("TRGECL")
     # Output Clustering method(0: Use only ICN, 1: ICN + Max TC)
-    trgecl.param('Clustering', 0)
+    trgecl.param('Clustering', 1)
+    trgecl.param('ClusterLimit', 6)  # The limit # of cluster
     path.add_module(trgecl)

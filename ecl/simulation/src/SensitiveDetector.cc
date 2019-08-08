@@ -12,7 +12,6 @@
 #include <framework/gearbox/Unit.h>
 #include <simulation/background/BkgNeutronWeight.h>
 
-#include "G4EmCalculator.hh"// Used to get dE/dx for pulse shape construction
 #include <framework/utilities/FileSystem.h>
 
 using namespace std;
@@ -24,7 +23,8 @@ SensitiveDetector::SensitiveDetector(G4String name, G4double UNUSED(thresholdEne
                                      G4double UNUSED(thresholdKineticEnergy)):
   Simulation::SensitiveDetectorBase(name, Const::ECL),
   m_eclSimHitRel(m_mcParticles, m_eclSimHits),
-  m_eclHitRel(m_mcParticles, m_eclHits)//,
+  m_eclHitRel(m_mcParticles, m_eclHits),
+  m_ECLHadronComponentEmissionFunction()
   // m_thresholdEnergyDeposit(thresholdEnergyDeposit),
   // m_thresholdKineticEnergy(thresholdKineticEnergy)
 {
@@ -42,14 +42,7 @@ SensitiveDetector::SensitiveDetector(G4String name, G4double UNUSED(thresholdEne
   m_mcParticles.registerRelationTo(m_eclSimHits);
   m_mcParticles.registerRelationTo(m_eclHits);
 
-  const std::string& hadronEmissionFile = FileSystem::findFile("/data/ecl/HadronScintEmissionFunction.root");
-  TFile* inFile = new TFile(hadronEmissionFile.c_str(), "READ");
-  if (!inFile or inFile->IsZombie()) {
-    B2FATAL("Could not open file " << "HadronScintEmissionFunction.root");
-  }
-  m_HadronEmissionFunction = (TGraph*)inFile->Get("HadronEmissionFunction");
-  inFile->Close();
-  delete inFile;
+  m_HadronEmissionFunction = m_ECLHadronComponentEmissionFunction->getHadronComponentEmissionFunction();
 }
 
 SensitiveDetector::~SensitiveDetector()
@@ -88,21 +81,20 @@ double GetCsITlScintillationEfficiency(double x)
 bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
   //
-  G4EmCalculator emCal;
   double preKineticEnergy = aStep->GetPreStepPoint()->GetKineticEnergy();
   double postKineticEnergy = aStep->GetPostStepPoint()->GetKineticEnergy();
   double avgKineticEnergy = 0.5 * (preKineticEnergy + postKineticEnergy);
   const G4ParticleDefinition* StepParticleDefinition = aStep->GetTrack()->GetParticleDefinition();
   G4Material* StepMaterial = aStep->GetTrack()->GetMaterial();
   const double CsIDensity = 4.51; //gcm^-3
-  double ELE_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "eIoni"  ,
-                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
-  double MU_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "muIoni"  ,
-                                     StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
-  double HAD_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "hIoni"  ,
-                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
-  double ION_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "ionIoni",
-                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
+  double ELE_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "eIoni"  ,
+                                        StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
+  double MU_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "muIoni"  ,
+                                       StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
+  double HAD_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "hIoni"  ,
+                                        StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
+  double ION_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "ionIoni",
+                                        StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
   G4double DEDX_val = ELE_DEDX + MU_DEDX + HAD_DEDX + ION_DEDX; //Ionization dE/dx for any particle type
 
   G4double edep = aStep->GetTotalEnergyDeposit();

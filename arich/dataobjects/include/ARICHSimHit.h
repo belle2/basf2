@@ -66,7 +66,7 @@ namespace Belle2 {
     TVector2 getLocalPosition() const { TVector2 vec(m_x, m_y); return vec; }
 
     //! Get global time of hit
-    float getGlobalTime() const { return m_globalTime; }
+    float getGlobalTime() const override { return m_globalTime; }
 
     //! Get detected photon energy
     double getEnergy() const { return m_energy; }
@@ -74,7 +74,7 @@ namespace Belle2 {
     /** Shift the SimHit in time (needed for beam background mixing)
      *  @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) { m_globalTime += delta;}
+    void shiftInTime(float delta) override { m_globalTime += delta;}
 
 
   private:
@@ -84,7 +84,7 @@ namespace Belle2 {
     float m_globalTime;      /**< Global time of hit */
     float m_energy;          /**< Energy of detected photon */
 
-    ClassDef(ARICHSimHit, 1); /**< the class title */
+    ClassDefOverride(ARICHSimHit, 1); /**< the class title */
 
   };
 

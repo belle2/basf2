@@ -32,7 +32,7 @@ EvtGenDecayModule::EvtGenDecayModule() : Module()
                  "the module 'EvtGenInput'.");
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)",
            FileSystem::findFile(
-             "generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true));
+             "decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file",
            std::string(""));
   addParam("MCParticleColName", m_MCParticleColName,
@@ -49,7 +49,7 @@ void EvtGenDecayModule::initialize()
   StoreArray<MCParticle> mcParticles(m_MCParticleColName);
   mcParticles.isRequired();
   const std::string defaultDecFile =
-    FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true);
+    FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
   if (m_DecFile.empty()) {
     B2ERROR("No global decay file defined, please make sure "
             "the parameter 'DecFile' is set correctly.");
@@ -69,8 +69,6 @@ void EvtGenDecayModule::beginRun()
 void EvtGenDecayModule::event()
 {
   int i, n;
-  bool decay;
-  MCParticleGraph::GraphParticle* graphParticle;
   if (m_BeamParameters.hasChanged()) {
     if (!m_Initialized) {
       initializeGenerator();
@@ -83,8 +81,9 @@ void EvtGenDecayModule::event()
   m_Graph.loadList(m_MCParticleColName);
   n = m_Graph.size();
   for (i = 0; i < n; i++) {
-    graphParticle = &m_Graph[i];
-    decay = true;
+    bool decay = true;
+    MCParticleGraph::GraphParticle* graphParticle = &m_Graph[i];
+
     if (graphParticle->isInitial())
       decay = false;
     else if (graphParticle->getNDaughters() > 0)

@@ -13,7 +13,7 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <Eigen/Core>
 
 #include <analysis/dataobjects/Particle.h>
@@ -21,6 +21,7 @@
 namespace TreeFitter {
 
   class FitParams;
+  class ConstraintConfiguration;
 
   /** base class for all particles */
   class ParticleBase {
@@ -41,7 +42,11 @@ namespace TreeFitter {
                         };
 
     /** default constructor  */
+    ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) ;
+
+    /** constructor used for final states */
     ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) ;
+
 
     /** constructor only used by inter action point (ip constraint)  */
     ParticleBase(const std::string& name);
@@ -58,14 +63,14 @@ namespace TreeFitter {
     /** create the according treeFitter particle obj for a basf2 particle type  */
     static ParticleBase* createParticle(Belle2::Particle* particle,
                                         const ParticleBase* mother,
-                                        bool forceFitAll = false);
+                                        const ConstraintConfiguration& config,
+                                        bool forceFitAll = false
+                                       );
 
     /** create a custom origin particle or a beamspot*/
     static ParticleBase* createOrigin(Belle2::Particle* daughter,
-                                      bool forceFitAll,
-                                      const std::vector<double> customOriginVertex,
-                                      const std::vector<double> customOriginCovariance,
-                                      const bool isBeamSpot
+                                      const ConstraintConfiguration& config,
+                                      bool forceFitAll
                                      );
 
     /** init particle that does not need a mother vertex  */
@@ -161,7 +166,7 @@ namespace TreeFitter {
     int charge() const { return m_charge ; }
 
     /** add daughter  */
-    virtual ParticleBase* addDaughter(Belle2::Particle*, bool forceFitAll = false);
+    virtual ParticleBase* addDaughter(Belle2::Particle*, const ConstraintConfiguration& config, bool forceFitAll = false);
 
     /** remove daughter */
     virtual void removeDaughter(const ParticleBase* pb);
@@ -215,6 +220,12 @@ namespace TreeFitter {
 
     /** daughter container  */
     std::vector<ParticleBase*> m_daughters;
+
+    /** decay length less than 1 micron  */
+    bool m_isStronglyDecayingResonance;
+
+    /** has all the constraint config */
+    const ConstraintConfiguration* m_config;
 
   private:
     /** index */

@@ -43,11 +43,11 @@ namespace Belle2 {
        *@brief structure holding values from template fit
        */
       struct FitResult {
-        double amplitude; /**< fitted amplitude */
-        double amplitudeError; /**< fitted amplitude error*/
-        double backgroundOffset;/**< fitted background offset */
-        double backgroundOffsetError; /**< fitted background offset error*/
-        double risingEdge;/**< fitted rising edge*/
+        double amplitude = 0; /**< fitted amplitude */
+        double amplitudeError = 0; /**< fitted amplitude error*/
+        double backgroundOffset = 0;/**< fitted background offset */
+        double backgroundOffsetError = 0; /**< fitted background offset error*/
+        double risingEdge = 0;/**< fitted rising edge*/
 
         /**
          *@brief set the fit result variables to zero
@@ -66,12 +66,12 @@ namespace Belle2 {
       *@brief Variables used during template fit minimization
       */
       struct MinimizationSums {
-        double S1; /**< sum of sample weights */
-        double Sx; /**< sum of template*weight */
-        double Sxx;/**< sum of template*template*weight */
-        double Sy; /**< sum of signal sample * weight */
-        double Sxy;/**< sum of signal sample *template*weight */
-        double Syy;/**< sum of signal sample * signal sample * weight */
+        double S1 = 0; /**< sum of sample weights */
+        double Sx = 0; /**< sum of template*weight */
+        double Sxx = 0;/**< sum of template*template*weight */
+        double Sy = 0; /**< sum of signal sample * weight */
+        double Sxy = 0;/**< sum of signal sample *template*weight */
+        double Syy = 0;/**< sum of signal sample * signal sample * weight */
 
         /**
          *@brief set sums used during template fit to initial values
@@ -223,7 +223,7 @@ namespace Belle2 {
 
       //fit results
       FitResult m_result;/**< fit result from template fit*/
-      double m_chisq;/**< chi square value from template fit */
+      double m_chisq = 0;/**< chi square value from template fit */
       std::vector<double> m_chisq_vec;/**< all computed chi square values from template fit */
 
     };

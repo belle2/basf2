@@ -68,15 +68,15 @@ namespace Belle2 {
       virtual ~PXDBackgroundModule();
 
       /* Initialize module */
-      virtual void initialize();
+      virtual void initialize() override;
       /* Start-of-run initializations */
-      virtual void beginRun();
+      virtual void beginRun() override;
       /* Event processing */
-      virtual void event();
+      virtual void event() override;
       /* End-of-run tasks */
-      virtual void endRun();
+      virtual void endRun() override;
       /* Final summary and cleanup */
-      virtual void terminate();
+      virtual void terminate() override;
 
     private:
 

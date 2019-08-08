@@ -161,7 +161,7 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
     MCParticleGraph::GraphParticle* p = &graph[i];
     int moID = 0;
     char buf[200];
-    sprintf(buf, "IntB: %3d %4d %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
+    sprintf(buf, "IntB: %3d %4u %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
             p->getIndex() ,  p->getStatus() ,  p->getPDG() ,  moID ,
             p->getFirstDaughter() ,  p->getLastDaughter() ,
             p->get4Vector().Px() ,  p->get4Vector().Py() ,
@@ -188,10 +188,9 @@ int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
   vector <MCParticleGraph::GraphParticle*> MCPList;
 
   //Fill top particle in the tree & starting the queue:
-  int nParticles = 0;
   for (int i = 1; i <= hepevt_.nhep; ++i) {
     int position = graph.size();
-    graph.addParticle(); nParticles++;
+    graph.addParticle();
     MCParticleGraph::GraphParticle* p = &graph[position];
     updateGraphParticle(i, p, vertex);
     MCPList.push_back(p);

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTSHAPECONTAINER_H
-#define EVENTSHAPECONTAINER_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
@@ -399,5 +398,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-
-#endif

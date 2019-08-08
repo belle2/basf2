@@ -22,7 +22,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-
+#include <simulation/monopoles/G4Monopole.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
@@ -179,8 +179,6 @@ namespace Belle2 {
       //      std::cout <<"setignore=true for track= "<< t.GetTrackID() << std::endl;
     }
 
-    const G4double charge = t.GetDefinition()->GetPDGCharge();
-
     //    const G4double tof = t.GetGlobalTime(); //tof at post step point
     //    if (isnan(tof)) {
     //      B2ERROR("SensitiveDetector: global time is nan");
@@ -188,6 +186,7 @@ namespace Belle2 {
     //    }
 
     const G4int pid = t.GetDefinition()->GetPDGEncoding();
+    const G4double charge = t.GetDefinition()->GetPDGCharge();
     const G4int trackID = t.GetTrackID();
     //    std::cout << "pid,stepl,trackID,trackl,weight= " << pid <<" "<< stepLength <<" "<< trackID <<" "<< t.GetTrackLength() <<" "<< hitWeight << std::endl;
 
@@ -211,9 +210,9 @@ namespace Belle2 {
     const unsigned layerId = v.GetCopyNo();
     B2DEBUG(150, "LayerID in continuous counting method: " << layerId);
 
-    // If neutral particles, ignore them.
+    // If neutral particles, ignore them, unless monopoles.
 
-    if (charge == 0.) return false;
+    if ((charge == 0.) && (abs(pid) != 99666)) return false;
 
     // Calculate cell ID
     TVector3 tposIn(posIn.x() / CLHEP::cm, posIn.y() / CLHEP::cm, posIn.z() / CLHEP::cm);
@@ -282,7 +281,9 @@ namespace Belle2 {
       const HepPoint3D fwd(tfw3v.x(), tfw3v.y(), tfw3v.z());
       const HepPoint3D bck(tbw3v.x(), tbw3v.y(), tbw3v.z());
 
-      if (m_magneticField) {
+      if (m_magneticField && (abs(pid) != 99666)) {
+        // For monopoles a line segment approximation in the step volume is done,
+        // which is more reasonable, but should be done with a proper catenary FIXME
         // Cal. distance assuming helix track (still approximation)
         m_nonUniformField = 1;
         if (Bfield[0] == 0. && Bfield[1] == 0. &&
@@ -638,7 +639,6 @@ namespace Belle2 {
 
     m_hitNumber = cdcArray.getEntries();
 
-    // cppcheck-suppress memleak
     CDCSimHit* simHit =  cdcArray.appendNew();
 
     simHit->setWireID(layerId, wireId);
@@ -678,7 +678,6 @@ namespace Belle2 {
     //    if (hitWeight < 0) m_nNegHits++;
     //    std::cout <<"trackID,HitNumber,weight,driftL,edep= "<< trackID <<" "<< m_hitNumber <<" "<< hitWeight <<" "<< distance <<" "<< edep << std::endl;
     //    return (m_hitNumber);
-    // cppcheck-suppress memleak
   }
 
 

@@ -30,6 +30,25 @@ namespace Belle2 {
     {}
 
     /**
+     * Clear reconstruction data members
+     */
+    void clearReconstructed()
+    {
+      m_recBunchNo = 0;
+      m_recTime = 0;
+      m_currentOffset = 0;
+      m_averageOffset = 0;
+      m_currentOffsetError = 0;
+      m_averageOffsetError = 0;
+      m_numTracks = 0;
+      m_usedTracks = 0;
+      m_nodEdx = 0;
+      m_fineSearch = false;
+      m_histograms.clear();
+      m_recValid = false;
+    }
+
+    /**
      * Set reconstructed relative bunch number and time
      * @param bunchNo relative bunch number
      * @param time relative bunch time
@@ -95,19 +114,31 @@ namespace Belle2 {
     }
 
     /**
-     * Return reconstructed bunch number (= bunch used for the event start time)
-     * @return bunch number relative to the interaction
+     * Returns reconstructed bunch number relative to L1 trigger signal at TOP
+     * note: depends on the "look back" setting
+     * @return bunch number relative to L1 trigger signal at TOP minus "look back"
      */
     int getBunchNo() const {return m_recBunchNo;}
 
     /**
-     * Return reconstructed bunch time (time to be added to correct time of digits)
-     * @return time relative to interaction time
+     * Returns reconstructed absolute bunch number within the ring
+     * @param offset offset [RF clock ticks] (to be calibrated)
+     * @return bunch number w.r.t revolution marker
+     */
+    int getAbsoluteBunchNo(int offset) const
+    {
+      return (m_recBunchNo + m_revo9Counter * 4 - offset) % 5120;
+    }
+
+    /**
+     * Returns reconstructed bunch time relative to L1 trigger signal at TOP
+     * (time to be subtracted to correct time of digits)
+     * @return time relative to L1 trigger signal at TOP minus "look back"
      */
     double getTime() const {return m_recTime;}
 
     /**
-     * Returns current offset
+     * Returns current offset to reconstructed bunch
      * @return offset
      */
     double getCurrentOffset() const {return m_currentOffset;}
@@ -119,7 +150,7 @@ namespace Belle2 {
     double getCurrentOffsetError() const {return m_currentOffsetError;}
 
     /**
-     * Returns average offset
+     * Returns average offset to reconstructed bunch
      * @return offset
      */
     double getAverageOffset() const {return m_averageOffset;}
@@ -131,19 +162,19 @@ namespace Belle2 {
     double getAverageOffsetError() const {return m_averageOffsetError;}
 
     /**
-     * Return number of tracks in acceptance of TOP
+     * Returns number of tracks in acceptance of TOP
      * @return number of tracks
      */
     int getNumTracks() const {return m_numTracks;}
 
     /**
-     * Return number of tracks used for bunch number reconstruction
+     * Returns number of tracks used for bunch reconstruction
      * @return number of tracks
      */
     int getUsedTracks() const {return m_usedTracks;}
 
     /**
-     * Return number of used tracks without dEdx information
+     * Returns number of used tracks without dEdx information
      * @return number of tracks
      */
     int getNodEdxTracks() const {return m_nodEdx;}
@@ -161,19 +192,19 @@ namespace Belle2 {
     bool isReconstructed() const {return m_recValid;}
 
     /**
-     * Check if fine search is done or not
+     * Check if fine search is done
      * @return true on fine search
      */
     bool isFineSearch() const {return m_fineSearch;}
 
     /**
-     * Return simulated bunch number (= bunch used for the event start time)
+     * Returns simulated bunch number (= bunch used for the event start time)
      * @return bunch number relative to the interaction
      */
     int getMCBunchNo() const {return m_simBunchNo;}
 
     /**
-     * Return simulated bunch time (= time used as event start time)
+     * Returns simulated bunch time (= time used as event start time)
      * @return time relative to interaction time
      */
     double getMCTime() const {return m_simTime;}

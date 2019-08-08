@@ -1,0 +1,25 @@
+# EventType: 1110440000
+# Descriptor: [B0 -> pi+ pi- mu+ mu-] cc
+# NickName: Bd_pipimumu
+# Documentation: Rare b->dll process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20181116
+#
+#
+Decay Upsilon(4S)
+1.000 B0sig  anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+#
+#
+Decay B0sig
+1.000   pi+ pi-	 mu+	 mu-   PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+#
+End
+#
+

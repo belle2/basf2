@@ -89,9 +89,9 @@ void LHEInputModule::initialize()
 
   //pass displaced vertex to LHEReader
   m_lhe.m_meanDecayLength = m_meanDecayLength;
-  m_lhe.Rmin = m_Rmin;
-  m_lhe.Rmax = m_Rmax;
-  m_lhe.pdg_displaced = m_pdg_displaced;
+  m_lhe.m_Rmin = m_Rmin;
+  m_lhe.m_Rmax = m_Rmax;
+  m_lhe.m_pdgDisplaced = m_pdg_displaced;
   //print out warning information if default R range is change
   if (m_Rmin != 0 || m_Rmax != 1000000) {
     TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
@@ -144,7 +144,7 @@ void LHEInputModule::event()
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
     mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-  } catch (LHEReader::LHEEmptyEventError) {
+  } catch (LHEReader::LHEEmptyEventError&) {
     B2DEBUG(100, "Reached end of LHE file.");
     m_lhe.closeCurrentInputFile();
     m_iFile++;

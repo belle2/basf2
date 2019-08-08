@@ -54,7 +54,7 @@ namespace Belle2 {
        * @param step Current Geant4 step in the sensitive medium.
        * @result true if a hit was stored, o.w. false.
        */
-      bool step(G4Step* aStep, G4TouchableHistory*);
+      bool step(G4Step* aStep, G4TouchableHistory*) override;
 
     private:
 

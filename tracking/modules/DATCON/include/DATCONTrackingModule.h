@@ -71,11 +71,11 @@ namespace Belle2 {
     virtual ~DATCONTrackingModule() = default;
 
     /** Initialize the module and check module parameters */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Run tracking */
-    virtual void event();
+    virtual void event() override;
     /** Terminate the module */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Add module parameter, put in separate function to have the Constructor clean and readable */
     void addParameter();
@@ -112,8 +112,8 @@ namespace Belle2 {
       * https://en.wikipedia.org/wiki/Connected_component_(graph_theory) (06. May 2018)
       */
     void DepthFirstSearch(bool u_side, int** ArrayOfActiveHoughSpaceSectors, int angleSectors, int vertSectors,
-                          int* initialPositionX, int* initialPositionY, int actualPositionX, int actualPositionY,
-                          int* clusterCount, int* clusterSize, TVector2* CenterOfGravity, std::vector<unsigned int>& mergedList);
+                          int actualPositionX, int actualPositionY,
+                          std::vector<unsigned int>& mergedList);
 
     /** Layer filter, checking for hits from different SVD layers */
     bool layerFilter(bool* layer);
@@ -265,6 +265,14 @@ namespace Belle2 {
     int m_MaximumThetaHSClusterSizeX;
     /** Maximum cluster size in vertical direction in the Theta HS */
     int m_MaximumThetaHSClusterSizeY;
+    /** Size of the current cluster */
+    int m_clusterSize;
+    /** Number of clusters in current event */
+    int m_clusterCount;
+    /** Initial position of cluster in HS sector coordinates */
+    TVector2 m_clusterInitialPosition;
+    /** Center of Gravity of current cluster */
+    TVector2 m_clusterCenterOfGravity;
 
     // 5. Merge TrackCandidates or Tracks?
     /** Use TrackMerger to merge found tracks (candidates) to avoid / reduce fakes */

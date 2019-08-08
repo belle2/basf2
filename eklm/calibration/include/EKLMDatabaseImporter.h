@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDATABASEIMPORTER_H
-#define EKLMDATABASEIMPORTER_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
@@ -92,33 +91,10 @@ namespace Belle2 {
     void importDisplacement();
 
     /**
-     * Load default electronics map. This function actually only initializes
-     * the database object pointer, but does not load anything. All data should
-     * be loaded by calling addSectorLane().
-     */
-    void loadDefaultElectronicsMap();
-
-    /**
-     * Add sector-lane pair.
-     * @param[in] endcap           Endcap number.
-     * @param[in] layer            Layer number.
-     * @param[in] sector           Sector number.
-     * @param[in] copper           Copper identifier.
-     * @param[in] dataConcentrator Data concentrator number.
-     * @param[in] lane             Lane number.
-     */
-    void addSectorLane(int endcap, int layer, int sector,
-                       int copper, int dataConcentrator, int lane);
-
-    /**
      * Import electronics map.
+     * @param[in] electronicsMap EKLM electronics map.
      */
-    void importElectronicsMap();
-
-    /**
-     * Import time conversion parameters.
-     */
-    void importTimeConversion();
+    void importElectronicsMap(const EKLMElectronicsMap* electronicsMap);
 
   private:
 
@@ -143,6 +119,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

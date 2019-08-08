@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTKINEMATICS_H
-#define EVENTKINEMATICS_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -44,14 +43,14 @@ namespace Belle2 {
      *
      * @param TVector3 missing momentum
      */
-    void addMissingMomentum(TVector3 missingMomentum);
+    void addMissingMomentum(const TVector3& missingMomentum);
 
     /**
      * Add the missing momentum vector in CMS.
      *
      * @param TVector3 missing momentum
      */
-    void addMissingMomentumCMS(TVector3 missingMomentumCMS);
+    void addMissingMomentumCMS(const TVector3& missingMomentumCMS);
 
     /**
      * Add missing energy in CMS.
@@ -166,4 +165,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

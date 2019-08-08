@@ -105,6 +105,16 @@ namespace Belle2 {
     /// Gets version of class.
     std::string version(void) const;
 
+    /// Get stereo geometry
+    static void getStereoGeometry(std::map<std::string, std::vector<double> >& stGeometry);
+
+    /// Get stereo Xt
+    static void getStereoXt(std::vector<double> const& stPriorityLayer, std::vector<std::vector<double> >& stXts, bool isSimple = 0);
+
+    /// Get constants for firmwareFit
+    static void getConstants(std::map<std::string, double>& mConstD, std::map<std::string, std::vector<double> >& mConstV,
+                             bool isXtSimple = 0);
+
   private:
     /// Name.
     const std::string m_name;

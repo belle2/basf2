@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <bklm/geometry/GeometryPar.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 #include <simulation/background/BkgSensitiveDetector.h>
@@ -96,16 +97,18 @@ namespace Belle2 {
       m_Phi = content.getLength("Phi");
       m_NSector = content.getNumberNodes("Sectors/Forward/Sector");
       if (m_NSector > NSECTOR) { // array-bounds check
-        B2FATAL("BKLM GeometryPar::read(): # of sectors (" <<
-                m_NSector << ") exceeds array size NSECTOR (" << NSECTOR << ")");
+        B2FATAL("BKLM GeometryPar::read(): sector array size exceeded:"
+                << LogVar("# of sectors", m_NSector)
+                << LogVar("array size", NSECTOR));
       }
       m_SolenoidOuterRadius = content.getLength("SolenoidOuterRadius");
       m_OuterRadius = content.getLength("OuterRadius");
       m_HalfLength = content.getLength("HalfLength");
       m_NLayer = content.getNumberNodes("Layers/Layer");
       if (m_NLayer > NLAYER) { // array-bounds check
-        B2FATAL("BKLM GeometryPar::read(): # of layers (" <<
-                m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")");
+        B2FATAL("BKLM GeometryPar::read(): layer array size exceeded:"
+                << LogVar("# of layers", m_NLayer)
+                << LogVar("array size", NLAYER));
       }
 
       m_IronNominalHeight = content.getLength("Layers/IronNominalHeight");
@@ -122,12 +125,14 @@ namespace Belle2 {
       m_NZScints = content.getInt("Layers/NZScintillators");
       m_NZScintsChimney = content.getInt("Layers/NZScintillatorsChimney");
       if (m_NZScints > NZSCINT) { // array-bounds check
-        B2FATAL("BKLM GeometryPar::read(): # of z scintillators (" <<
-                m_NZScints << ") exceeds array size NZSCINT (" << NZSCINT << ")");
+        B2FATAL("BKLM GeometryPar::read(): z-scint array size exceeded:"
+                << LogVar("# of z scintillators", m_NZScints)
+                << LogVar("array size", NZSCINT));
       }
       if (m_NZScintsChimney > NZSCINT) { // array-bounds check
-        B2FATAL("BKLM GeometryPar::read(): # of z scintillators in chimney sector (" <<
-                m_NZScintsChimney << ") exceeds array size NZSCINT (" << NZSCINT << ")");
+        B2FATAL("BKLM GeometryPar::read(): chimney sector z-scint array size exceeded:"
+                << LogVar("# of z scintillators", m_NZScintsChimney)
+                << LogVar("array size", NZSCINT));
       }
 
       m_ModuleLength = content.getLength("Module/Length");
@@ -181,8 +186,9 @@ namespace Belle2 {
 
       m_NReadoutStation = content.getNumberNodes("Readout/Stations/Station");
       if (m_NReadoutStation > NSTATION) { // array-bounds check
-        B2FATAL("BKLM GeometryPar::read(): # of readout stations (" <<
-                m_NReadoutStation << ") exceeds array size NSTATION (" << NSTATION << ")");
+        B2FATAL("BKLM GeometryPar::read(): readout stations array size exceeded:"
+                << LogVar("# of readout stations", m_NReadoutStation)
+                << LogVar("array size", NSTATION));
       }
       for (int station = 1; station <= m_NReadoutStation; ++station) {
         sprintf(name, "/Readout/Stations/Station[@station=\"%d\"]", station);
@@ -222,8 +228,10 @@ namespace Belle2 {
         m_ScintEnvelopeOffsetSign[layer - 1] = layerContent.getInt("ScintEnvelopeOffsetSign");
         m_NPhiScints[layer - 1] = layerContent.getInt("PhiScintillators/NScints", 0);
         if (m_NPhiScints[layer - 1] > NPHISCINT) { // array-bounds check
-          B2FATAL("BKLM GeometryPar::read(): # of phi scintillators (" <<
-                  m_NPhiScints[layer - 1] << ") exceeds array size NPHISCINT (" << NPHISCINT << ")");
+          B2FATAL("BKLM GeometryPar::read(): phi-scint array size exceeded:"
+                  << LogVar("in zero-based layer", layer - 1)
+                  << LogVar("# phi scintillators", m_NPhiScints[layer - 1])
+                  << LogVar("array size", NPHISCINT));
         }
         for (int scint = 1; scint <= m_NZScints; ++scint) {
           sprintf(name, "/ZScintillators/Scint[@scint=\"%d\"]", scint);
@@ -395,7 +403,7 @@ namespace Belle2 {
         B2INFO("BKLM::GeometryPar: DoBeamBackgroundStudy is enabled");
         m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
       } else {
-        B2DEBUG(1, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
+        B2DEBUG(20, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
       }
       m_Gap1ActualHeight = m_Gap1NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
       m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);
@@ -710,11 +718,9 @@ namespace Belle2 {
       return m_HasRPCs[layer - 1];
     }
 
-    const Module* GeometryPar::findModule(bool isForward, int sector, int layer) const
+    const Module* GeometryPar::findModule(int forward, int sector, int layer) const
     {
-      int moduleID = (isForward ? BKLM_END_MASK : 0)
-                     | ((sector - 1) << BKLM_SECTOR_BIT)
-                     | ((layer - 1) << BKLM_LAYER_BIT);
+      int moduleID = BKLMElementNumbers::moduleNumber(forward, sector, layer);
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
       return (iM == m_Modules.end() ? NULL : iM->second);
     }
@@ -760,17 +766,16 @@ namespace Belle2 {
         for (int sector = 1; sector <= m_NSector; ++sector) {
           for (int layer = 1; layer <= m_NLayer; ++layer) {
 
-            // BKLM_FORWARD =1, BKLM_BACKWARD=2.
-            BKLMElementID bklmid(fb - 1, sector - 1, layer - 1);
-
+            BKLMElementID bklmid(int(isForward), sector, layer);
+            int id = bklmid.getID();
             HepGeom::Transform3D alignment;
-            alignment = getTransformFromRigidBodyParams(bklmAlignments->get(bklmid, 1),
-                                                        bklmAlignments->get(bklmid, 2),
-                                                        bklmAlignments->get(bklmid, 3),
-                                                        bklmAlignments->get(bklmid, 4),
-                                                        bklmAlignments->get(bklmid, 5),
-                                                        bklmAlignments->get(bklmid, 6)
-                                                       );
+            alignment = getTransformFromRigidBodyParams(
+                          bklmAlignments->getGlobalParam(id, 1),
+                          bklmAlignments->getGlobalParam(id, 2),
+                          bklmAlignments->getGlobalParam(id, 3),
+                          bklmAlignments->getGlobalParam(id, 4),
+                          bklmAlignments->getGlobalParam(id, 5),
+                          bklmAlignments->getGlobalParam(id, 6));
 
             int moduleID = (isForward ? BKLM_END_MASK : 0)
                            | ((sector - 1) << BKLM_SECTOR_BIT)
@@ -797,7 +802,7 @@ namespace Belle2 {
       for (const auto& disp : displacements) {
         unsigned short bklmElementID = disp.getElementID();
         BKLMElementID bklmid(bklmElementID);
-        unsigned short isForward = bklmid.getIsForward();
+        unsigned short forward = bklmid.getForward();
         unsigned short sector = bklmid.getSectorNumber();
         unsigned short layer = bklmid.getLayerNumber();
 
@@ -809,9 +814,7 @@ namespace Belle2 {
                                             disp.getGammaRotation()
                                                                            );
 
-        int moduleID = (isForward ? BKLM_END_MASK : 0)
-                       | ((sector - 1) << BKLM_SECTOR_BIT)
-                       | ((layer - 1) << BKLM_LAYER_BIT);
+        int moduleID = BKLMElementNumbers::moduleNumber(forward, sector, layer);
 
         m_Displacements.insert(std::pair<int, HepGeom::Transform3D>(moduleID, displacement));
       }
@@ -823,9 +826,9 @@ namespace Belle2 {
         double dGamma)
     {
 
-      CLHEP::HepRotation dx = CLHEP::HepRotationX(dGamma);
-      CLHEP::HepRotation dy = CLHEP::HepRotationY(dAlpha);
-      CLHEP::HepRotation dz = CLHEP::HepRotationZ(dBeta);
+      CLHEP::HepRotation dy = CLHEP::HepRotationY(-dAlpha);
+      CLHEP::HepRotation dz = CLHEP::HepRotationZ(-dBeta);
+      CLHEP::HepRotation dx = CLHEP::HepRotationX(-dGamma);
       CLHEP::Hep3Vector shift(dW, dU, dV);
 
       //we do dx-->dz-->dy ( local w-->v-->u), because angles are definded as intrinsic rotations u-->v'-->w''

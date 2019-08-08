@@ -29,7 +29,7 @@ public:
    *  As Genfit uses kGauss, but we use T in basf2, we need to apply a factor 10 in the calculation.
    *  @param position   Position at which the magnetic field should be evaluated.
    */
-  TVector3 get(const TVector3& position) const
+  TVector3 get(const TVector3& position) const override
   {
     static double conversion{1. / Belle2::Unit::kGauss};
     return Belle2::BFieldManager::getField(position) * conversion;

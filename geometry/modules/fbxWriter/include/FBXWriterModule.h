@@ -98,62 +98,62 @@ namespace Belle2 {
     HepPolyhedron* getBooleanSolidPolyhedron(G4VSolid*);
 
     //! Once-only flag to write FBX only on the first event
-    bool m_First;
+    bool m_First{true};
 
     //! User-specified flag to select whether to write and re-use logical- and physical-volume
     //! prototypes once (true) or to write duplicates of each such volume (false).
-    bool m_UsePrototypes;
+    bool m_UsePrototypes{false};
 
     //! User-specified output filename
-    std::string m_Filename;
+    std::string m_Filename{"belle2.fbx"};
 
     //! Output file
     std::ofstream m_File;
 
     //! Modified (legal-character and unique) physical-volume name
-    std::vector<std::string>* m_PVName;
+    std::vector<std::string>* m_PVName{nullptr};
 
     //! Modified (legal-character and unique) logical-volume name
-    std::vector<std::string>* m_LVName;
+    std::vector<std::string>* m_LVName{nullptr};
 
     //! Modified (legal-character and unique) solid name
-    std::vector<std::string>* m_SolidName;
+    std::vector<std::string>* m_SolidName{nullptr};
 
     //! Unique identifiers for physical volumes (Model nodes with transformation information)
-    std::vector<unsigned long long>* m_PVID;
+    std::vector<unsigned long long>* m_PVID{nullptr};
 
     //! Unique identifiers for logical volumes (Model nodes with links to Geometry and Material)
-    std::vector<unsigned long long>* m_LVID;
+    std::vector<unsigned long long>* m_LVID{nullptr};
 
     //! Unique identifiers for logical volumes' color information (Material nodes)
-    std::vector<unsigned long long>* m_MatID;
+    std::vector<unsigned long long>* m_MatID{nullptr};
 
     //! Unique identifiers for solids (Geometry nodes)
-    std::vector<unsigned long long>* m_SolidID;
+    std::vector<unsigned long long>* m_SolidID{nullptr};
 
     //! Flag to indicate that the logical volume is visible
-    std::vector<bool>* m_Visible;
+    std::vector<bool>* m_Visible{nullptr};
 
     //! Count of number of instances of each physical volume
-    std::vector<unsigned int>* m_PVCount;
+    std::vector<unsigned int>* m_PVCount{nullptr};
 
     //! Count of number of instances of each logical volume
-    std::vector<unsigned int>* m_LVCount;
+    std::vector<unsigned int>* m_LVCount{nullptr};
 
     //! Count of number of instances of each solid (typically 1)
-    std::vector<unsigned int>* m_SolidCount;
+    std::vector<unsigned int>* m_SolidCount{nullptr};
 
     //! Count of number of replicas of each replicated physical volume
-    std::vector<unsigned int>* m_PVReplicas;
+    std::vector<unsigned int>* m_PVReplicas{nullptr};
 
     //! Count of number of replicas of each logical volume associated with a replicated physical volume
-    std::vector<unsigned int>* m_LVReplicas;
+    std::vector<unsigned int>* m_LVReplicas{nullptr};
 
     //! Count of number of replicas of each solid (extras for replicas with modified solids)
-    std::vector<unsigned int>* m_SolidReplicas;
+    std::vector<unsigned int>* m_SolidReplicas{nullptr};
 
     //! Flag to indicate that a logical volume is referenced at most once (eligible for bypass)
-    std::vector<bool>* m_LVUnique;
+    std::vector<bool>* m_LVUnique{nullptr};
 
   };
 

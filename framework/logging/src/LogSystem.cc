@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                *
+ * Contributors: Andreas Moll, Thomas Kuhr, Martin Ritter                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,12 +12,12 @@
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionFilter.h>
-#include <framework/logging/LogConnectionFileDescriptor.h>
+#include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TROOT.h>
-#include <signal.h>
+#include <csignal>
 
 #include <cstdio>
 #include <iostream>
@@ -43,8 +43,8 @@ void LogSystem::addLogConnection(LogConnectionBase* logConnection)
 
 void LogSystem::resetLogConnections()
 {
-  for (unsigned int i = 0; i < m_logConnections.size(); i++) {
-    delete m_logConnections[i];
+  for (auto connection : m_logConnections) {
+    delete connection;
   }
   m_logConnections.clear();
 }
@@ -63,7 +63,7 @@ bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const
 bool LogSystem::sendMessage(LogMessage&& message)
 {
   LogConfig::ELogLevel logLevel = message.getLogLevel();
-  map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
+  auto packageLogConfig = m_packageLogConfigs.find(message.getPackage());
   if ((packageLogConfig != m_packageLogConfigs.end()) && packageLogConfig->second.getLogInfo(logLevel)) {
     message.setLogInfo(packageLogConfig->second.getLogInfo(logLevel));
   } else if (m_moduleLogConfig && m_moduleLogConfig->getLogInfo(logLevel)) {
@@ -75,8 +75,8 @@ bool LogSystem::sendMessage(LogMessage&& message)
   message.setModule(m_moduleName);
 
   bool messageSent = false;
-  for (unsigned int i = 0; i < m_logConnections.size(); i++) {
-    if (m_logConnections[i]->sendMessage(message)) {
+  for (auto con : m_logConnections) {
+    if (con->sendMessage(message)) {
       messageSent = true;
     }
   }
@@ -90,6 +90,10 @@ bool LogSystem::sendMessage(LogMessage&& message)
 
   if (logLevel >= m_logConfig.getAbortLevel()) {
     printErrorSummary();
+    // make sure loc connections are finalized to not loose output
+    for (auto connection : m_logConnections) {
+      connection->finalizeOnAbort();
+    }
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
 
     //in good tradition, ROOT signal handlers are unsafe.
@@ -108,8 +112,8 @@ bool LogSystem::sendMessage(LogMessage&& message)
 
 void LogSystem::resetMessageCounter()
 {
-  for (int i = 0; i < LogConfig::c_Default; ++i) {
-    m_messageCounter[i] = 0;
+  for (int& i : m_messageCounter) {
+    i = 0;
   }
   m_errorLog.clear();
 }
@@ -149,7 +153,7 @@ const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
 
 LogSystem::LogSystem() :
   m_logConfig(LogConfig::c_Info),
-  m_moduleLogConfig(0),
+  m_moduleLogConfig(nullptr),
   m_printErrorSummary(false)
 {
   resetLogging();
@@ -175,7 +179,7 @@ void LogSystem::resetLogging()
 
   resetMessageCounter();
   resetLogConnections();
-  addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
+  addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 
   m_errorLog.clear();
   m_errorLog.reserve(100);

@@ -88,12 +88,13 @@ namespace Belle2 {
   private:
 
     TH2F* m_TimeHeightHistogramForFit[c_NPixelPerModule *
-                                      c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
+                                      c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
     TH2F* m_TimeHeightHistogramForHitRate[c_NPixelPerModule *
-                                          c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
+                                          c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
     TH2F* m_TimeIntegralHistogramForFit[c_NPixelPerModule *
-                                        c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
-    TH1F* m_nCalPulseHistogram; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
+                                        c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
+    TH1F* m_nCalPulseHistogram =
+      0; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
          the x-axis means global asic ID, defined as (slotNum-1)*64+(pixelID-1) */
 
     std::vector<int>

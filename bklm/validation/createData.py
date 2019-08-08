@@ -3,9 +3,8 @@
 
 #################################################################
 #                                                               #
-#    script to simulate 1000 charged-muon single-track events   #
-#    using the ParticleGun for BKLM validation. (No             #
-#    background hits overlaid.)                                 #
+#    Script to simulate 1000 charged-muon single-track events   #
+#    using the ParticleGun for BKLM validation.                 #
 #                                                               #
 #    written by Leo Piilonen, VT                                #
 #    piilonen@vt.edu                                            #
@@ -21,78 +20,55 @@
 """
 
 import glob
-from basf2 import *
-from simulation import add_simulation
-from reconstruction import add_reconstruction
+import os
 
-set_random_seed(981543)
+import basf2 as b2
+import simulation as sim
+import reconstruction as rec
+
+b2.set_random_seed(981543)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 output_filename = '../muon-BKLMValidation.root'
+b2.B2INFO('The output file name is ' + output_filename)
 
-print(output_filename)
+main_path = b2.create_path()
 
-path = create_path()
+main_path.add_module('EventInfoSetter',
+                     evtNumList=1000)
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
-path.add_module(eventinfosetter)
+main_path.add_module('Progress')
+main_path.add_module('ProgressBar')
 
-progress = register_module('Progress')
-path.add_module(progress)
-
-pgun = register_module('ParticleGun')
-param_pgun = {
-    'pdgCodes': [-13, 13],
-    'nTracks': 1,
-    'varyNTracks': 0,
-    'momentumGeneration': 'uniform',
-    'momentumParams': [0.5, 5.0],
-    'thetaGeneration': 'uniformCos',
-    'thetaParams': [35., 130.],
-    'phiGeneration': 'uniform',
-    'phiParams': [0.0, 360.0],
-    'vertexGeneration': 'fixed',
-    'xVertexParams': [0.0],
-    'yVertexParams': [0.0],
-    'zVertexParams': [0.0],
-}
-pgun.param(param_pgun)
-path.add_module(pgun)
-
-# Need to define this to replace default (non-physical) magnetic field with 2D map
-components = [
-    'MagneticField2d',
-    'COIL',
-    'STR',
-    'BeamPipe',
-    'Cryostat',
-    'HeavyMetalShield',
-    'VXDService',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ARICH',
-    'ECL',
-    'BKLM',
-    'EKLM',
-]
+main_path.add_module('ParticleGun',
+                     pdgCodes=[-13, 13],
+                     nTracks=1,
+                     varyNTracks=0,
+                     momentumGeneration='uniform',
+                     momentumParams=[0.5, 5.0],
+                     thetaGeneration='uniformCos',
+                     thetaParams=[35., 130.],
+                     phiGeneration='uniform',
+                     phiParams=[0., 360.],
+                     vertexGeneration='fixed',
+                     xVertexParams=[0.0],
+                     yVertexParams=[0.0],
+                     zVertexParams=[0.0])
 
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    background_files = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
-    print('Background files:')
-    print(background_files)
-    add_simulation(path, components, background_files)
+    bkg_filename = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+    b2.B2INFO('The background files are: ' + str(bkg_filename))
+    sim.add_simulation(path=main_path,
+                       bkgfiles=bkg_filename)
 else:
-    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
-    add_simulation(path, components)
+    b2.B2WARNING('The variable BELLE2_BACKGROUND_DIR is not set: beam background is not used in the simulation')
+    sim.add_simulation(path=main_path)
 
-add_reconstruction(path, components)
+rec.add_reconstruction(path=main_path)
 
-output = register_module('RootOutput')
-output.param('outputFileName', output_filename)
-output.param('branchNames', ['MCParticles', 'ExtHits', 'Muids', 'BKLMHit2ds', 'EKLMHit2ds'])
-path.add_module(output)
+main_path.add_module('RootOutput',
+                     outputFileName=output_filename,
+                     branchNames=['MCParticles', 'ExtHits', 'Muids', 'BKLMHit2ds', 'EKLMHit2ds'])
 
-process(path)
-print(statistics)
+b2.process(main_path)
+print(b2.statistics)

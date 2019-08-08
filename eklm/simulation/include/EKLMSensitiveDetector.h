@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSENSETIVEDETECTOR_H
-#define EKLMSENSETIVEDETECTOR_H
+#pragma once
 
 /* Belle2 headers. */
 #include <simulation/kernel/SensitiveDetectorBase.h>
@@ -57,9 +56,6 @@ namespace Belle2 {
       /** Simulation hits. */
       StoreArray<EKLMSimHit> m_SimHits;
 
-      /** Active channels. */
-      bool* m_ChannelActive;
-
       /**
        * All hits with time large  than m_ThresholdHitTime
        * will be dropped.
@@ -71,6 +67,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

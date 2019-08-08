@@ -34,10 +34,10 @@ namespace Belle2 {
     eclCosmicECollectorModule();
 
     /** prepare. Define histograms to be filled and stored; ecl geometry calculations */
-    void prepare();
+    void prepare() override;
 
     /** collect. Select events and fill histograms */
-    void collect();
+    void collect() override;
 
   private:
 
@@ -81,13 +81,5 @@ namespace Belle2 {
     /** Existing single crystal calibration from DB; will be updated by CAF */
     DBObjPtr<ECLCrystalCalib> m_CosmicECalib; /**< database object */
     std::vector<float> CosmicECalib; /**< vector obtained from DB object */
-
-    //** Time offset from electronics calibration from database */
-    DBObjPtr<ECLCrystalCalib> m_ElectronicsTime; /**< database object */
-    std::vector<float> ElectronicsTime; /**< vector obtained from DB object */
-
-    //** Time offset from cosmic calibration from database */
-    DBObjPtr<ECLCrystalCalib> m_TimeOffset; /**< database object */
-    std::vector<float> TimeOffset; /**< vector obtained from DB object */
   };
 }

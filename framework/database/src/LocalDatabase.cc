@@ -21,6 +21,7 @@
 #include <boost/range/adaptor/reversed.hpp>
 #include <fstream>
 #include <iomanip>
+#include <utility>
 #include <sys/file.h>
 
 using namespace std;
@@ -30,13 +31,15 @@ namespace fs = boost::filesystem;
 void LocalDatabase::createInstance(const std::string& fileName, const std::string& payloadDir, bool readOnly,
                                    LogConfig::ELogLevel logLevel, bool invertLogging)
 {
-  LocalDatabase* database = new LocalDatabase(fileName, payloadDir, readOnly);
+  auto* database = new LocalDatabase(fileName, payloadDir, readOnly);
   database->setLogLevel(logLevel, invertLogging);
   Database::setInstance(database);
 }
 
-LocalDatabase::LocalDatabase(const std::string& fileName, const std::string& payloadDir, bool readOnly):
-  m_fileName(fileName), m_absFileName(fs::absolute(m_fileName).string()), m_payloadDir(payloadDir), m_readOnly(readOnly)
+// cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
+LocalDatabase::LocalDatabase(std::string  fileName, std::string  payloadDir, bool readOnly):
+  m_fileName(std::move(fileName)), m_absFileName(fs::absolute(m_fileName).string()), m_payloadDir(std::move(payloadDir)),
+  m_readOnly(readOnly)
 {
   if (m_payloadDir.empty()) {
     m_payloadDir = fs::path(m_absFileName).parent_path().string();
@@ -63,7 +66,7 @@ bool LocalDatabase::readDatabase()
   // read and parse the database content
   std::ifstream file(m_absFileName.c_str());
   if (!file.is_open()) {
-    B2ERROR("Opening of database file " << m_fileName << " failed.");
+    B2ERROR("Opening of database file " << m_fileName << " failed: " << strerror(errno));
     return false;
   }
   int lineno{0};
@@ -98,7 +101,7 @@ bool LocalDatabase::readDatabase()
         throw std::runtime_error("revision must be an integer");
       }
       // parse name
-      size_t pos = name.find("/");
+      size_t pos = name.find('/');
       if (pos == std::string::npos) {
         throw std::runtime_error("payload name must be of the form dbstore/<payloadname>");
       }
@@ -122,6 +125,7 @@ bool LocalDatabase::tryDefault(DBQuery& query)
   if (FileSystem::fileExists(defaultName)) {
     query.filename = defaultName;
     query.iov = IntervalOfValidity(0, -1, -1, -1);
+    query.checksum = FileSystem::calculateMD5(query.filename);
     if (m_invertLogging)
       B2LOG(m_logLevel, 35, "Obtained " << query.name << " from " << defaultName << ". IoV="
             << query.iov);
@@ -147,6 +151,10 @@ bool LocalDatabase::getData(const EventMetaData& event, DBQuery& query)
     if (entry.second.contains(event)) {
       query.revision = entry.first;
       query.filename = payloadFileName(m_payloadDir, query.name, query.revision);
+      if (!FileSystem::fileExists(query.filename)) {
+        B2ERROR("Could not find payload file." << LogVar("filename", query.filename) << LogVar("database", m_fileName));
+        return false;
+      }
       query.iov = entry.second;
       // We don't store the md5 in the file yet ... we probably should
       query.checksum = FileSystem::calculateMD5(query.filename);

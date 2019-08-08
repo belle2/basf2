@@ -1,18 +1,19 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2012-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Marko Staric                                *
+ * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLE_H
-#define PARTICLE_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
@@ -25,7 +26,6 @@ class TClonesArray;
 namespace Belle2 {
 
   // forward declarations
-  class ECLCluster;
   class KLMCluster;
   class Track;
   class TrackFitResult;
@@ -98,6 +98,14 @@ namespace Belle2 {
     enum {c_Px, c_Py, c_Pz, c_E, c_X, c_Y, c_Z};
 
     /**
+     * Flags that describe the particle property
+     */
+    enum PropertyFlags {
+      c_Ordinary = 0, /** Ordinary particles */
+      c_IsUnspecified = 1, /**< Is the particle unspecified by marking @ ? */
+    };
+
+    /**
      * Default constructor.
      * All private members are set to 0. Particle type is set to c_Undefined.
      */
@@ -142,6 +150,23 @@ namespace Belle2 {
              TClonesArray* arrayPointer = nullptr);
 
     /**
+     * Constructor for composite particles.
+     * All other private members are set to their default values (0).
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
+     * @param flavorType decay flavor type
+     * @param daughterIndices indices of daughters in StoreArray<Particle>
+     * @param particle property
+     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
+     */
+    Particle(const TLorentzVector& momentum,
+             const int pdgCode,
+             EFlavorType flavorType,
+             const std::vector<int>& daughterIndices,
+             int properties,
+             TClonesArray* arrayPointer = nullptr);
+
+    /**
      * Constructor from a reconstructed track (mdst object Track);
      * @param track pointer to Track object
      * @param chargedStable Type of charged particle
@@ -167,11 +192,13 @@ namespace Belle2 {
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
      * @param eclCluster pointer to ECLCluster object
+     * @param type the kind of ParticleType we want (photon by default)
      */
-    explicit Particle(const ECLCluster* eclCluster);
+    explicit Particle(const ECLCluster* eclCluster,
+                      const Const::ParticleType& type = Const::photon);
 
     /**
-     * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
+     * Constructor of a KLong from a reconstructed KLM cluster.
      * @param klmCluster pointer to KLMCluster object
      */
     explicit Particle(const KLMCluster* klmCluster);
@@ -230,6 +257,14 @@ namespace Belle2 {
     }
 
     /**
+     * sets m_properties
+     */
+    void setProperty(const int properties)
+    {
+      m_properties = properties;
+    }
+
+    /**
      * Sets Lorentz vector, position, 7x7 error matrix and p-value
      * @param p4 Lorentz vector
      * @param vertex point (position or vertex)
@@ -257,16 +292,18 @@ namespace Belle2 {
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      */
-    void appendDaughter(const Particle* daughter);
+    void appendDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
      * Appends index of daughter to daughters index array
      * @param particleIndex index of daughter in StoreArray<Particle>
      */
-    void appendDaughter(int particleIndex)
+    void appendDaughter(int particleIndex, const bool updateType = true)
     {
-      m_particleType = c_Composite;
-
+      if (updateType) {
+        // is it a composite particle or fsr corrected?
+        m_particleType = c_Composite;
+      }
       m_daughterIndices.push_back(particleIndex);
     }
 
@@ -318,6 +355,17 @@ namespace Belle2 {
     unsigned getMdstArrayIndex(void) const
     {
       return m_mdstIndex;
+    }
+
+    /**
+     * Returns particle property as a bit pattern
+     * The values are defined in the PropertyFlags enum and described in detail there.
+     *
+     * @return Combination of Properties describing the particle property
+     */
+    int getProperty() const
+    {
+      return m_properties;
     }
 
     /**
@@ -519,7 +567,7 @@ namespace Belle2 {
      * @return true if the function returned true for any of the particles it
      *    was applied to
      */
-    bool forEachDaughter(std::function<bool(const Particle*)> function,
+    bool forEachDaughter(const std::function<bool(const Particle*)>& function,
                          bool recursive = true, bool includeSelf = true) const;
 
     /**
@@ -589,15 +637,23 @@ namespace Belle2 {
     const PIDLikelihood* getPIDLikelihood() const;
 
     /**
-     * Returns the pointer to the ECLCluster object that was used to create this Particle (ParticleType == c_ECLCluster).
-     * NULL pointer is returned, if the Particle was not made from ECLCluster.
+     * Returns the pointer to the ECLCluster object that was used to create this Particle (if ParticleType == c_ECLCluster).
+     * Returns the pointer to the most energetic ECLCluster matched to the track (if ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle has no relation to an ECLCluster (either the particle is a different type or there was no track match).
      * @return const pointer to the ECLCluster
      */
     const ECLCluster* getECLCluster() const;
 
     /**
+     * Returns the energy of the ECLCluster for the particle.
+     * The return value depends on the ECLCluster hypothesis.
+     * @return energy of the ECLCluster
+     */
+    double getECLClusterEnergy() const;
+
+    /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
-     * Returns the pointer to the largest KLMCluster object associated to this Particle if ParticleType == c_Track.
+     * Returns the pointer to the KLMCluster object associated to this Particle if ParticleType == c_Track.
      * NULL pointer is returned, if the Particle has no relation to the KLMCluster.
      * @return const pointer to the KLMCluster
      */
@@ -605,7 +661,9 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the MCParticle object that was used to create this Particle (ParticleType == c_MCParticle).
-     * NULL pointer is returned, if the Particle was not made from MCParticle.
+     * Returns the best MC match for this particle (if ParticleType == c_Track or c_ECLCluster or c_KLMCluster)
+     * NULL pointer is returned, if the Particle was not made from MCParticle or not matched.
+     *
      * @return const pointer to the MCParticle
      */
     const MCParticle* getMCParticle() const;
@@ -650,6 +708,11 @@ namespace Belle2 {
       return m_extraInfo.size();
     }
 
+    /**
+     * Sets the user defined extraInfo. Adds it if necessary, overwrites existing ones if they share the same name.
+     * */
+    void writeExtraInfo(const std::string& name, const float value);
+
     /** Sets the user-defined data of given name to the given value.
      *
      * throws std::runtime_error if variable isn't set.
@@ -693,6 +756,27 @@ namespace Belle2 {
       return std::abs(m_pdgCodeUsedForFit) == std::abs(m_pdgCode);
     }
 
+    /**
+    * Returns the ECLCluster EHypothesisBit for this Particle.
+    */
+    ECLCluster::EHypothesisBit getECLClusterEHypothesisBit() const
+    {
+      const int pdg = abs(getPDGCode());
+      if ((pdg == Const::photon.getPDGCode())
+          or (pdg == Const::electron.getPDGCode())
+          or (pdg == Const::muon.getPDGCode())
+          or (pdg == Const::pion.getPDGCode())
+          or (pdg == Const::kaon.getPDGCode())
+          or (pdg == Const::proton.getPDGCode())
+          or (pdg == Const::deuteron.getPDGCode())) {
+        return ECLCluster::EHypothesisBit::c_nPhotons;
+      } else if (pdg == Const::Klong.getPDGCode()) {
+        return ECLCluster::EHypothesisBit::c_neutralHadron;
+      } else {
+        return ECLCluster::EHypothesisBit::c_none;
+      }
+    }
+
   private:
 
     // persistent data members
@@ -711,6 +795,7 @@ namespace Belle2 {
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
+    int m_properties; /**< particle property */
 
     /**
      * Identifier that can be used to identify whether the particle is unqiue
@@ -778,19 +863,17 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-
     /**
      * set mdst array index
      */
     void setMdstArrayIndex(const int arrayIndex);
 
-    ClassDef(Particle, 9); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 10); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
+    // v10: added m_properties
 
     friend class ParticleSubset;
   };
 
 } // end namespace Belle2
-
-#endif

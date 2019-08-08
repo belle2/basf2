@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMALIGNMENT_H
-#define EKLMALIGNMENT_H
+#pragma once
 
 /* C++ headers. */
 #include <cstdint>
@@ -99,12 +98,9 @@ namespace Belle2 {
     /** Segment alignment. */
     std::map<uint16_t, EKLMAlignmentData> m_SegmentAlignment;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMAlignment, 2);
 
   };
 
 }
-
-#endif
-

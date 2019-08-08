@@ -55,19 +55,11 @@ SelectDaughtersModule::SelectDaughtersModule() : Module()
 
 }
 
-SelectDaughtersModule::~SelectDaughtersModule()
-{
-}
-
 void SelectDaughtersModule::initialize()
 {
   if (m_decayString != "") {
     m_decaydescriptor.init(m_decayString);
   }
-}
-
-void SelectDaughtersModule::beginRun()
-{
 }
 
 void SelectDaughtersModule::event()
@@ -89,24 +81,13 @@ void SelectDaughtersModule::event()
 
     std::vector<Particle*> daughters = particle->getDaughters();
     std::vector<const Particle*> selParticles = m_decaydescriptor.getSelectionParticles(particle);
-    std::vector<std::string> selParticlesName = m_decaydescriptor.getSelectionNames();
 
-    for (unsigned idau = 0; idau < daughters.size(); idau++) {
+    for (auto& daughter : daughters) {
       bool isSel = false;
-      for (unsigned isel = 0; isel < selParticles.size(); isel++) {
-        if (daughters[idau] == selParticles[isel]) isSel = true;
+      for (auto& selParticle : selParticles) {
+        if (daughter == selParticle) isSel = true;
       }
-      if (!isSel) particle->removeDaughter(daughters[idau]);
+      if (!isSel) particle->removeDaughter(daughter);
     }
   }
 }
-
-void SelectDaughtersModule::endRun()
-{
-}
-
-void SelectDaughtersModule::terminate()
-{
-}
-
-

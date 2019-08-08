@@ -70,6 +70,7 @@ namespace Belle2 {
              "track p-value cut used to histogram pulls etc.", 0.001);
     addParam("usePionID", m_usePionID,
              "use pion ID from TOP to histogram pulls etc.", true);
+    addParam("cutNphot", m_cutNphot, "Cut on total number of photons", 3);
   }
 
 
@@ -168,6 +169,7 @@ namespace Belle2 {
       string name, title;
       TH1F* h1 = 0;
       TH2F* h2 = 0;
+      TProfile2D* h3 = 0;
 
       name = str(format("window_vs_asic_%1%") % (module));
       title = str(format("Distribution of hits: raw timing for slot #%1%") % (module));
@@ -281,6 +283,26 @@ namespace Belle2 {
       h1->GetXaxis()->SetTitle("hits / event");
       h1->SetMinimum(0);
       m_badHitsPerEvent.push_back(h1);
+
+      name = str(format("good_hits_xy_track_%1%") % (module));
+      title = str(format("Hits per track, each channel, slot #%1%") % (module));
+      h3 = new TProfile2D(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5, 0, 1000);
+      h3->SetOption("LIVE");
+      h3->SetStats(kFALSE);
+      h3->GetXaxis()->SetTitle("pixel column");
+      h3->GetYaxis()->SetTitle("pixel row");
+      h3->SetMinimum(0);
+      m_goodHitsXYTrack.push_back(h3);
+
+      name = str(format("good_hits_xy_track_bkg_%1%") % (module));
+      title = str(format("Hits per bkg track, each channel, slot #%1%") % (module));
+      h3 = new TProfile2D(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5, 0, 1000);
+      h3->SetOption("LIVE");
+      h3->SetStats(kFALSE);
+      h3->GetXaxis()->SetTitle("pixel column");
+      h3->GetYaxis()->SetTitle("pixel row");
+      h3->SetMinimum(0);
+      m_goodHitsXYTrackBkg.push_back(h3);
     }
 
     // cd back to root directory
@@ -329,6 +351,8 @@ namespace Belle2 {
       m_badChannelHits[i]->Reset();
       m_goodHitsPerEvent[i]->Reset();
       m_badHitsPerEvent[i]->Reset();
+      m_goodHitsXYTrack[i]->Reset();
+      m_goodHitsXYTrackBkg[i]->Reset();
     }
   }
 
@@ -346,6 +370,10 @@ namespace Belle2 {
 
     std::vector<int> n_good(16, 0);
     std::vector<int> n_bad(16, 0);
+    std::vector<int> n_good_first(16, 0);
+    std::vector<int> n_good_second(16, 0);
+    std::vector<int> n_good_pixel_hits(16 * 512, 0);
+
     for (const auto& digit : m_digits) {
       int i = digit.getModuleID() - 1;
       if (i < 0 || i >= m_numModules) {
@@ -369,6 +397,9 @@ namespace Belle2 {
           m_time->Fill(digit.getTime());
         }
         m_goodChannelHits[i]->Fill(digit.getChannel());
+        if (digit.getTime() > 0 && digit.getTime() < 20) n_good_first[i]++;
+        if (digit.getTime() > 20 && digit.getTime() < 50) n_good_second[i]++;
+        n_good_pixel_hits[(digit.getModuleID() - 1) * 512 + (digit.getPixelID() - 1)]++;
         n_good[i]++;
       } else { // other hits = background hits
         m_badHits->Fill(i + 1);
@@ -384,6 +415,15 @@ namespace Belle2 {
       m_hitsPerEvent->Fill(i + 1, n_good[i]);
       m_goodHitsPerEvent[i]->Fill(n_good[i]);
       m_badHitsPerEvent[i]->Fill(n_bad[i]);
+
+      bool slot_has_track = (n_good_first[i] + n_good_second[i]) > m_cutNphot;
+      for (int j = 0; j < 512; j++) {
+        int col = j % 64 + 1, row = j / 64 + 1;
+        if (slot_has_track)
+          m_goodHitsXYTrack[i]->Fill(col, row, n_good_pixel_hits[i * 512 + j]);
+        else
+          m_goodHitsXYTrackBkg[i]->Fill(col, row, n_good_pixel_hits[i * 512 + j]);
+      }
     }
 
     for (const auto& track : m_tracks) {

@@ -10,44 +10,54 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from skimExpertFunctions import *
+from skim.standardlists.charm import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
 
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-02-00'
 import os
 import sys
 import glob
+import argparse
 skimCode = encodeSkimName('DoubleCharm')
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = get_test_file("mixedBGx1", "MC12")
 
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
 
-inputMdstList('MC9', fileList)
-loadStdCharged()
-loadStdKS()
-loadStdSkimPi0()
-loadStdSkimPhoton()
-stdPi0s('loose')
-stdPhotons('loose')
-loadStdD0()
-loadStdDplus()
-loadStdDstar0()
-loadStdDstarPlus()
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
+
+path = Path()
+inputMdstList('default', fileList, path=path)
+stdPi('all', path=path)
+stdPi('loose', path=path)
+stdK('loose', path=path)
+stdKshorts(path=path)
+loadStdSkimPi0(path=path)
+loadStdSkimPhoton(path=path)
+stdPi0s('loose', path=path)
+stdPhotons('loose', path=path)
+loadStdD0(path=path)
+loadStdDplus(path=path)
+loadStdDstar0(path=path)
+loadStdDstarPlus(path=path)
 
 # Double Charm Skim
-from DoubleCharm_List import *
-DCList = DoubleCharmList()
-skimOutputUdst(skimCode, DCList)
-summaryOfLists(DCList)
-setSkimLogging()
-process(analysis_main)
+from skim.btocharm import *
+DCList = DoubleCharmList(path=path)
+skimOutputUdst(skimCode, DCList, path=path)
+summaryOfLists(DCList, path=path)
+setSkimLogging(path=path)
+process(path=path)
 
 # print out the summary
 print(statistics)

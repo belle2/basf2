@@ -20,7 +20,7 @@ namespace Belle2 {
     return envValue != nullptr;
   }
 
-  std::string EnvironmentVariables::get(const std::string& name, const std::string fallback)
+  std::string EnvironmentVariables::get(const std::string& name, const std::string& fallback)
   {
     char* envValue = std::getenv(name.c_str());
     if (envValue != nullptr) {
@@ -36,6 +36,18 @@ namespace Belle2 {
   {
     if (!isSet(name)) return fallback;
     std::string value = get(name);
+    std::vector<std::string> items;
+    //Treat empty string as empty list
+    if (value.empty()) return items;
+    boost::split(items, value, boost::is_any_of(separators));
+    return items;
+  }
+
+  std::vector<std::string> EnvironmentVariables::getOrCreateList(const std::string& name, const std::string& fallback,
+      const std::string& separators)
+  {
+    //almost the same as above but we don't need to check if its set, we just parse the value or fallback into a list
+    std::string value = get(name, fallback);
     std::vector<std::string> items;
     //Treat empty string as empty list
     if (value.empty()) return items;

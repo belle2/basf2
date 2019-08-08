@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/ckf/svd/findlets/CKFToSVDFindlet.h>
 #include <tracking/ckf/pxd/findlets/CKFToPXDFindlet.h>
+#include <tracking/ckf/cdc/findlets/CKFToCDCFindlet.h>
 #include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
@@ -33,6 +34,11 @@ namespace Belle2 {
     }
   };
 
+  /**
+   * Seed-finding combinatorical Kalman Filter that combines every RecoTrack with every
+   * SVD track, then filters the combinations.
+   * All implementation is done in the corresponding findlet.
+   */
   class CDCToSVDSeedCKFModule : public TrackFindingCDC::FindletModule<CKFToSVDSeedFindlet> {
 
   public:
@@ -44,6 +50,11 @@ namespace Belle2 {
     }
   };
 
+  /**
+   * Combinatorical Kalman Filter that extrapolates every RecoTrack into the PXD
+   * and collects space points.
+   * All implementation is done in the corresponding findlet.
+   */
   class ToPXDCKFModule : public TrackFindingCDC::FindletModule<CKFToPXDFindlet> {
 
   public:
@@ -52,6 +63,22 @@ namespace Belle2 {
     {
       setDescription("Combinatorical Kalman Filter used for extracting SVD/CDC tracks into "
                      "PXD and create merged tracks.");
+    }
+  };
+
+  /**
+   * Combinatorical Kalman Filter that extrapolates every RecoTrack into the CDC
+   * and collects wire hits.
+   * All implementation is done in the corresponding findlet.
+   */
+  class ToCDCCKFModule : public TrackFindingCDC::FindletModule<CKFToCDCFindlet> {
+
+  public:
+    /// Set description
+    ToCDCCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFindlet>( {"CDCWireHitVector"})
+    {
+      setDescription("Combinatorical Kalman Filter used for extracting SVD tracks into "
+                     "CDC and create merged tracks.");
     }
   };
 

@@ -11,6 +11,6 @@
 #pragma link C++ class Belle2::ParticleWeightingLookUpTable+;
 #pragma link C++ class Belle2::PIDPriorsTable+;
 #pragma link C++ class Belle2::PIDPriors+;
-
+#pragma link C++ class Belle2::ChargedPidMVAWeights+;
 
 #endif

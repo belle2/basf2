@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -56,6 +56,32 @@ namespace Belle2 {
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns a function which returns the the variable for the closest
+     * particle in the provided particle list
+     */
+    Manager::FunctionPtr closestInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the angle to the closest particle
+     * in the provided particle list. See also closestInList.
+     */
+    Manager::FunctionPtr angleToClosestInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the the variable for the most
+     * back-to-back (closest to 180 degrees) particle in the provided particle list
+     */
+    Manager::FunctionPtr mostB2BInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the angle to the most back-to-back
+     * (closest to 180 degrees) particle in the provided particle list.
+     * See also mostB2BInList.
+     */
+    Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
+
+
+    /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
      */
@@ -87,10 +113,50 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments);
 
     /**
-     * * Returns function which returns the difference of the angular variable phi between the two given daughters
-     * * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     * */
+     * Returns function which returns the difference of the given variable between the first daughters of the two given daughters
+     * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     * Third argument the name of the variable.
+     */
+    Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable phi between the two given daughters
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable phi between the first daughters of the two given daughters
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters
+     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable clusterPhi between the first daughters of the two given daughters
+     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable phi between the two given daughters in the CMS frame
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters in the CMS frame
+     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the normalized difference of the given variable between the two given daughters
@@ -124,6 +190,16 @@ namespace Belle2 {
     Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the angle between clusters associated to the two daughters.
+     * If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters.
+     * If three indices given: returns the angle between the momentum of the third particle's cluster and a vector
+     * which is the sum of the first two daughter's cluster momenta.
+     * Returns nan if any of the daughters specified don't have an associated cluster.
+     * The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.
+     */
+    Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the invariant Mass m_ij=sqrt((pi + pj)^2) of the two given daughters
      * The two possible arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      */
@@ -154,6 +230,12 @@ namespace Belle2 {
     Manager::FunctionPtr isInfinity(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the combined p-value of the given p-values
+     * All arguments should be p-values in the range 0 to 1.
+     */
+    Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the absolute value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */
@@ -181,6 +263,11 @@ namespace Belle2 {
      */
     Manager::FunctionPtr cos(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns the log10 value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr log10(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the variable of the nth daughter of the given particle.
@@ -208,6 +295,23 @@ namespace Belle2 {
      * mother, -999 will be returned.
      */
     Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the variable for the ith generator particle.
+     * The arguments of the function must be
+     *     argument 1: Index of the particle in the MCParticle Array
+     *     argument 2: Valid basf2 function name of the function that shall be evaluated.
+     * If the provided index goes beyond the length of the mcParticles array, -999 will be returned.
+     */
+    Manager::FunctionPtr genParticle(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the variable for the generator level Upsilon(4S).
+     * The argument of the function must be a valid basf2 function name of the function
+     * that shall be evaluated.
+     * If no generator level Upsilon(4S) exists for this event, -999 will be returned.
+     */
+    Manager::FunctionPtr genUpsilon4S(const std::vector<std::string>& arguments);
 
     /**
      * Returns a specific variable according to its rank in a particle list.
@@ -262,5 +366,20 @@ namespace Belle2 {
     * Returns function which returns maximum transverse momentum Pt in the given particle Lists.
     */
     Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns if at least one track is related to the cluster of the particle and this track satisfies the given condition.
+    */
+    Manager::FunctionPtr eclClusterTrackMatchedWithCondition(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the arithmetic mean of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr averageValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the median value of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments);
   }
 }

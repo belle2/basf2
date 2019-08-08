@@ -19,6 +19,7 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/Variables.h>
+#include <analysis/variables/MCTruthVariables.h>
 
 #include <iostream>
 #include <vector>
@@ -48,29 +49,30 @@ REG_MODULE(CurlTagger)
 CurlTaggerModule::CurlTaggerModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC("This module is designed to tag curl tracks"
-    )DOC");
+  setDescription(
+    R"DOC("Curl Tagger is a tool designed to identify and tag extra tracks caused by low pt particles curling around the detector. For further documentation please see 'tagCurlTracks' in modularAnalysis.")DOC");
 
   // Parameter definitions
-  addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("belle", m_BelleFlag, "flag to distinuguish belle (true) from belle II (false) data", false);
+  addParam("particleLists", m_ParticleLists, "input particle lists to check for curls or use for training");
+  addParam("belle", m_BelleFlag, "flag to distinuguish Belle (true) from Belle II (false) data", false);
   addParam("ptCut", m_PtCut, "preselection pt Cut", 0.6);
   addParam("selectorType", m_SelectorType,
-           "gives the name of the selector to use, available : 'cut', 'mva'", std::string("cut"));
-  addParam("mcTruth", m_McStatsFlag, "outputs extra stats based on MC truth", false);
+           "the name of the selector to use when deciding if two reconstructed particles are the same true particle, available : 'cut', 'mva'",
+           std::string("cut"));
+  addParam("mcTruth", m_McStatsFlag,
+           "additionaly bundles the particles using their genParticleIndex and tags them with extraInfo(isTruthCurl) and extraInfo(truthBundleSize).",
+           false);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
 
-  addParam("responseCut", m_ResponseCut, "min allowed selector response for a match", 0.303);
+  addParam("responseCut", m_ResponseCut, "minimum allowed selector response for a match.", 0.324);
 }
 
-CurlTaggerModule::~CurlTaggerModule()
-{
-}
+CurlTaggerModule::~CurlTaggerModule() = default;
 
 bool CurlTaggerModule::passesPreSelection(Particle* p)
 {
   if (Variable::particlePt(p) > m_PtCut) {return false;}
-  if (Variable::trackNCDCHits(p) == 0 && Variable::trackNVXDHits(p) == 0) {return false;} //should never happen anyway but might as well check
+  if (!(Variable::trackNCDCHits(p) > 0 || Variable::trackNVXDHits(p) > 0)) {return false;} //should never happen anyway but might as well check
   if (p -> getCharge() == 0) {return false;}
   return true;
 }
@@ -163,10 +165,10 @@ void CurlTaggerModule::event()
 
         if (m_McStatsFlag) {
           bool addedParticleToTruthBundle = false;
-          for (unsigned int tb = 0; tb < truthBundles.size(); tb++) {
-            Particle* bPart = truthBundles[tb].getParticle(0);
+          for (auto& truthBundle : truthBundles) {
+            Particle* bPart = truthBundle.getParticle(0);
             if (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(bPart)) {
-              truthBundles[tb].addParticle(iPart);
+              truthBundle.addParticle(iPart);
               addedParticleToTruthBundle = true;
               break;
             } // same genParticleIndex
@@ -215,6 +217,3 @@ void CurlTaggerModule::terminate()
 {
   m_Selector->finalize();
 }
-
-
-

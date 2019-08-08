@@ -57,4 +57,9 @@
 #pragma link C++ class Belle2::ARICHHvCablesMapping+;
 #pragma link C++ class Belle2::ARICHHvCrateCableMapping+;
 #pragma link C++ class Belle2::ARICHAeroTilesInfo+;
+#pragma link C++ class Belle2::ARICHGlobalAlignment+;
+#pragma link C++ class Belle2::ARICHPositionElement+;
+#pragma link C++ class Belle2::ARICHGeoGlobalDisplacement+;
+#pragma link C++ class Belle2::ARICHGeoMirrorDisplacement+;
+#pragma link C++ class Belle2::ARICHMirrorAlignment+;
 #endif

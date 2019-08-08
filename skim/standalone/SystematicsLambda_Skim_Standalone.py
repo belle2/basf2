@@ -10,58 +10,29 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
 from stdPhotons import *
-from skimExpertFunctions import *
-
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
-
-import sys
-import os
-import glob
-
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+gb2_setuprel = 'release-03-02-00'
 
 
-inputMdstList('MC9', fileList)
-loadStdCharged()
+skimpath = Path()
 
-from SystematicsLambda_List import *
-SysList = SystematicsLambdaList()
+fileList = get_test_file("mixedBGx1", "MC12")
+inputMdstList('default', fileList, path=skimpath)
+
+from skim.systematics import *
+SysList = SystematicsLambdaList(path=skimpath)
 
 skimCode = encodeSkimName('SystematicsLambda')
 
 argc = len(sys.argv)
 argvs = sys.argv
 
-if 'Validation' in sys.argv and len(sys.argv) > 2:
-    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList)
-else:
-    skimOutputUdst(skimCode, SysList)
+skimOutputUdst(skimCode, SysList, path=skimpath)
+summaryOfLists(SysList, path=skimpath)
 
-summaryOfLists(SysList)
-
-if 'Validation' in sys.argv:
-    if argc > 2:
-        ntupleFile('Validation_%s_%s.root' % (skimCode, (argvs[argvs.index('Validation') + 1])))
-    else:
-        ntupleFile('Validation_%s.root' % (skimCode))
-
-    toolsdstar = ['EventMetaData', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['InvMass', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['Kinematics', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['Track', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['Vertex', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['MCTruth', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['CMSKinematics', '^Lambda0 -> p+ pi-']
-    ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar)
-
-
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=skimpath)
+process(skimpath)
 
 print(statistics)

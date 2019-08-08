@@ -46,7 +46,7 @@ namespace {
    * on each object in the list and use the string representation. So it should
    * work with basically any python object.
    */
-  std::vector<std::string> extractStringList(py::object obj)
+  std::vector<std::string> extractStringList(const py::object& obj)
   {
     std::vector<std::string> result;
     Belle2::PyObjConvUtils::iteratePythonObject(obj, [&result](const boost::python::object & item) {

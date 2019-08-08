@@ -154,7 +154,7 @@ namespace Belle2::Conditions {
   }
 
   bool TestingPayloadStorage::store(const std::string& name, const IntervalOfValidity& iov,
-                                    std::function<bool(const std::string&)> writer)
+                                    const std::function<bool(const std::string&)>& writer)
   {
     if (iov.empty()) {
       B2ERROR("IoV is empty, refusing to store object in testing payload storage"

@@ -2203,7 +2203,7 @@ arguments. Operator precedence is taken into account. For example ::
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
-Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle is in the list provided, 0.0 if not. 
+Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 
 
 .. note::
   This only makes sense for particles that are not composite. Returns -1 for composite particles.

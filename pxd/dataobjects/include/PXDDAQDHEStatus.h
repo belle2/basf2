@@ -18,7 +18,7 @@
 
 namespace Belle2 {
 
-  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
+  /** tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit) */
   typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
   using Belle2::PXD::PXDError::PXDErrorFlags;
   using Belle2::PXD::PXDError::EPXDErrMask;
@@ -111,8 +111,9 @@ namespace Belle2 {
     /** get Readout Frame number */
     unsigned short getFrameNr(void) const { return  m_frameNr;};
 
-
+    /** set erroinfo from the DHE END **/
     void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};
+    /** get erroinfo from the DHE END **/
     uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
 
     /** Add DHP information
@@ -169,7 +170,7 @@ namespace Belle2 {
     unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
-    uint32_t m_errorinfo; /* erroinfo from the DHE END */
+    uint32_t m_errorinfo; /**< erroinfo from the DHE END **/
 
     /** Vector of DHP informations belonging to this event */
     std::vector< PXDDAQDHPStatus> m_pxdDHP;
@@ -177,6 +178,7 @@ namespace Belle2 {
     /** Vector of Common Mode informations belonging to this event */
     std::vector < PXDDAQDHPComMode> m_commode;
 
+    /** necessary for ROOT */
     ClassDef(PXDDAQDHEStatus, 6);
 
   }; // class PXDDAQDHEStatus

@@ -33,10 +33,10 @@ uint16_t BKLMElementNumbers::channelNumber(
 }
 
 void BKLMElementNumbers::channelNumberToElementNumbers(
-  uint16_t channel, int* forward, int* sector, int* layer, int* plane,
+  uint16_t channel, int* section, int* sector, int* layer, int* plane,
   int* strip)
 {
-  *forward = ((channel & BKLM_END_MASK) >> BKLM_END_BIT);
+  *section = ((channel & BKLM_END_MASK) >> BKLM_END_BIT);
   *sector = ((channel & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
   *layer = ((channel & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
   *plane = ((channel & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT);
@@ -51,9 +51,9 @@ uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer)
 }
 
 void BKLMElementNumbers::moduleNumberToElementNumbers(
-  uint16_t module, int* forward, int* sector, int* layer)
+  uint16_t module, int* section, int* sector, int* layer)
 {
-  *forward = ((module & BKLM_END_MASK) >> BKLM_END_BIT);
+  *section = ((module & BKLM_END_MASK) >> BKLM_END_BIT);
   *sector = ((module & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
   *layer = ((module & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
 }

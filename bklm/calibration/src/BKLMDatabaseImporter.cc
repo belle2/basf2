@@ -27,8 +27,9 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <string>
 #include <vector>
@@ -49,7 +50,7 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
 {
   int copperId = 0;
   int slotId = 0;
-  int laneId = 0;
+  int laneId;
   int axisId = 0;
   KLMChannelIndex bklmPlanes(KLMChannelIndex::c_IndexLevelPlane);
   for (KLMChannelIndex bklmPlane = bklmPlanes.beginBKLM();
@@ -122,7 +123,12 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
         }
       }
 
-      m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, section, sector, layer, plane, iStrip);
+      uint16_t detectorChannel = BKLMElementNumbers::channelNumber(
+                                   section, sector, layer, plane, iStrip);
+      m_ElectronicsChannels.push_back(
+        std::pair<uint16_t, BKLMElectronicsChannel>(
+          detectorChannel,
+          BKLMElectronicsChannel(copperId, slotId, laneId, axisId, channelId)));
     }
   }
 }
@@ -130,41 +136,36 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
 void BKLMDatabaseImporter::setElectronicMappingLane(
   int section, int sector, int layer, int lane)
 {
-  int n = m_bklmMapping.getEntries();
-  for (int i = 0; i < n; i++) {
-    BKLMElectronicMapping* mapping = m_bklmMapping[i];
-    if ((mapping->getSection() == section) &&
-        (mapping->getSector() == sector) &&
-        (mapping->getLayer() == layer))
-      mapping->setLane(lane);
+  int channelSection, channelSector, channelLayer, plane, strip;
+  unsigned int n = m_ElectronicsChannels.size();
+  for (unsigned int i = 0; i < n; ++i) {
+    uint16_t channel = m_ElectronicsChannels[i].first;
+    BKLMElementNumbers::channelNumberToElementNumbers(
+      channel, &channelSection, &channelSector, &channelLayer, &plane, &strip);
+    if ((channelSection == section) &&
+        (channelSector == sector) &&
+        (channelLayer == layer))
+      m_ElectronicsChannels[i].second.setLane(lane);
   }
 }
 
 void BKLMDatabaseImporter::importBklmElectronicMapping()
 {
-  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  m_bklmMapping.import(iov);
-  return;
-}
-
-void BKLMDatabaseImporter::exportBklmElectronicMapping()
-{
-
-  DBArray<BKLMElectronicMapping> elements;
-  elements.getEntries();
-
-  // Print mapping info
-  B2INFO("DBArray<BKLMElectronicMapping> entries " << elements.getEntries());
-
-  for (const auto& element : elements) {
-    if (element.getStripId() == 1) {
-      B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
-             ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-             ", channelId = " << element.getChannelId() <<
-             ", section = " << element.getSection() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
-             " plane(z/phi) = " << element.getPlane() << " stripId = " << element.getStripId());
-    }
+  IntervalOfValidity iov(0, 0, -1, -1);
+  DBImportObjPtr<BKLMElectronicsMap> m_ElectronicsMap;
+  m_ElectronicsMap.construct();
+  unsigned int n = m_ElectronicsChannels.size();
+  for (unsigned int i = 0; i < n; ++i) {
+    m_ElectronicsMap->addChannel(
+      m_ElectronicsChannels[i].first,
+      m_ElectronicsChannels[i].second.getCopper(),
+      m_ElectronicsChannels[i].second.getSlot(),
+      m_ElectronicsChannels[i].second.getLane(),
+      m_ElectronicsChannels[i].second.getAxis(),
+      m_ElectronicsChannels[i].second.getChannel());
   }
+  m_ElectronicsMap.import(iov);
+  return;
 }
 
 void BKLMDatabaseImporter::importBklmGeometryPar()

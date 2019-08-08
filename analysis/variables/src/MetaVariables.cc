@@ -410,19 +410,19 @@ namespace Belle2 {
 
       auto func = [listName](const Particle * particle) -> double {
 
-        // this only makes sense for particles that are *not* composite and come
-        // from some mdst object (tracks, clusters..)
-        Particle::EParticleType particletype = particle->getParticleType();
-        if (particletype == Particle::EParticleType::c_Composite
-        or particletype == Particle::EParticleType::c_Undefined)
-          return -1.0;
-
         // check the list exists
         StoreObjPtr<ParticleList> list(listName);
         if (!(list.isValid()))
         {
           B2FATAL("Invalid Listname " << listName << " given to sourceObjectIsInList");
         }
+
+        // this only makes sense for particles that are *not* composite and come
+        // from some mdst object (tracks, clusters..)
+        Particle::EParticleType particletype = particle->getParticleType();
+        if (particletype == Particle::EParticleType::c_Composite
+        or particletype == Particle::EParticleType::c_Undefined)
+          return -1.0;
 
         // it *is* possible to have a particle list from different sources (like
         // hadrons from the ECL and KLM) so we have to check each particle in

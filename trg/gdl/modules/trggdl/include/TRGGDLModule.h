@@ -59,8 +59,9 @@ namespace Belle2 {
     std::string version(void) const;
 
   private: // Parameters
+
     StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo; /**< required input for TRGGRLInfo */
-    StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
+//  StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
 
     /// Debug level.
     int _debugLevel;
@@ -79,7 +80,11 @@ namespace Belle2 {
     /// Switch for the firmware simulation. 0:do nothing, 1:do everything
     int _firmwareSimulationMode;
 
+    /// Switch for algorithm source. False when using local .alg file.
+    bool _alg_from_db;
+
     std::string _Phase;
+
   private:
 
     /// A pointer to a TRGGDL;

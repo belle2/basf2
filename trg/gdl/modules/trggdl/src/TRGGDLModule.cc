@@ -71,6 +71,11 @@ namespace Belle2 {
              "TRGGDL firmware simulation mode",
              _firmwareSimulationMode);
 
+    addParam("algFromDB",
+             _alg_from_db,
+             "Set false when alg is taken from local file.",
+             true);
+
     B2DEBUG(100, "TRGGDLModule ... created");
   }
 
@@ -87,11 +92,14 @@ namespace Belle2 {
   TRGGDLModule::initialize()
   {
 
+//  m_TRGSummary.isRequired();
     TRGDebug::level(_debugLevel);
 
     B2DEBUG(100, "TRGGDLModule::initialize ... options");
-    m_TRGGRLInfo.isRequired("TRGGRLObjects");
-    m_TRGSummary.registerInDataStore();
+    if (_simulationMode != 3) {
+      m_TRGGRLInfo.isRequired("TRGGRLObjects");
+    }
+//  m_TRGSummary.registerInDataStore();
   }
 
   void
@@ -107,13 +115,15 @@ namespace Belle2 {
                                _simulationMode,
                                _fastSimulationMode,
                                _firmwareSimulationMode,
-                               _Phase);
+                               _Phase,
+                               _alg_from_db);
     } else if (cfn != _gdl->configFile()) {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
                                _fastSimulationMode,
                                _firmwareSimulationMode,
-                               _Phase);
+                               _Phase,
+                               _alg_from_db);
     }
 
     B2DEBUG(100, "TRGGDLModule ... beginRun called  configFile = " << cfn);
@@ -122,16 +132,24 @@ namespace Belle2 {
   void
   TRGGDLModule::event()
   {
+    StoreObjPtr<EventMetaData> bevt;
+    unsigned _exp = bevt->getExperiment();
+    unsigned _run = bevt->getRun();
+    unsigned _evt = bevt->getEvent();
+    std::cout << "evt(" << _evt << ") " << std::endl;
+
     TRGDebug::enterStage("TRGGDLModule event");
     //...GDL simulation...
     _gdl->update(true);
     _gdl->simulate();
 
+    StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
     int result_summary = 0;
-    StoreObjPtr<TRGSummary> gdlResult;
-    if (gdlResult)
-      result_summary = gdlResult->getTRGSummary(0);
-
+    if (m_TRGSummary) {
+      result_summary = m_TRGSummary->getTRGSummary(0);
+    } else {
+      B2WARNING("TRGGDLModule.cc: TRGSummary not found. Check it!!!!");
+    }
     setReturnValue(result_summary);
 
     TRGDebug::leaveStage("TRGGDLModule event");

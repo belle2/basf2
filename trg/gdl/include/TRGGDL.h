@@ -23,6 +23,15 @@
 #include "trg/trg/SignalVector.h"
 #include "trg/trg/SignalBundle.h"
 
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <trg/grl/dataobjects/TRGGRLInfo.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+#include <mdst/dbobjects/TRGGDLDBPrescales.h>
+#include <mdst/dataobjects/TRGSummary.h>
+
 namespace HepGeom {
   template <class T> class Point3D;
 }
@@ -49,7 +58,8 @@ namespace Belle2 {
                              unsigned simulationMode = 0,
                              unsigned fastSimulationMode = 0,
                              unsigned firmwareSimulationMode = 0,
-                             const std::string& Phase = "Phase");
+                             const std::string& Phase = "Phase",
+                             bool alg_from_db = true);
 
     /// returns TRGGDL object. TRGGDL should be created with specific
     /// configuration before calling this function.
@@ -62,7 +72,8 @@ namespace Belle2 {
            unsigned simulationMode,
            unsigned fastSimulationMode,
            unsigned firmwareSimulationMode,
-           const std::string& Phase);
+           const std::string& Phase,
+           bool alg_from_db = true);
 
     /// Destructor
     virtual ~TRGGDL();
@@ -139,7 +150,10 @@ namespace Belle2 {
     static TRGState timingDecision(const TRGState& input,
                                    TRGState& registers,
                                    bool& logicStillActive);
-    int doprescale(int f);
+    bool doprescale(int f);
+
+    bool isFiredFTDL(std::vector<bool> input, std::string alg);
+
   private:
 
     /// updates TRGGDL information for MC.
@@ -151,6 +165,9 @@ namespace Belle2 {
     /// Firmware simulation
     void firmwareSimulation(void);
 
+    /// Data simulation
+    void dataSimulation(void);
+
     /// Read input data definition.
     void getInput(std::ifstream& ifs);
 
@@ -159,6 +176,15 @@ namespace Belle2 {
 
     /// Read algorithm data definition.
     void getAlgorithm(std::ifstream& ifs);
+
+    /// Returns fired/not for input bits.
+    bool isFiredInput(int n) {return _inpBits[n];}
+
+    /// Returns fired/not for ftdl bits.
+    bool isFiredFtdl(int n) {return _ftdBits[n];}
+
+    /// Returns fired/not for psnm bits.
+    bool isFiredPsnm(int n) {return _psnBits[n];}
 
   private:
 
@@ -212,6 +238,18 @@ namespace Belle2 {
 
     /// Timing output signal bundle.
     TRGSignalBundle* _tosb;
+
+    /**Data base of GDL input bits**/
+    DBObjPtr<TRGGDLDBInputBits> m_InputBitsDB;
+    DBObjPtr<TRGGDLDBFTDLBits>  m_FTDLBitsDB;
+    DBObjPtr<TRGGDLDBPrescales> m_PrescalesDB;
+
+    ///
+    std::vector<bool> _inpBits;
+    std::vector<bool> _ftdBits;
+    std::vector<bool> _psnBits;
+
+    bool _alg_from_db;
 
     friend class TRGGDLModule;
   };

@@ -145,6 +145,27 @@ namespace Belle2 {
     /** get the prescale factor which the bit is corresponding*/
     unsigned int getPreScale(int i, int bit) const {return m_prescaleBits[i][bit];}
 
+    /** get fired/not for input Bits */
+    bool isFiredInput(int i) const
+    {
+      if (m_inputBits[i / 32] & (1 << (i % 32))) return true;
+      return false;
+    }
+
+    /** get fired/not for input Ftdl */
+    bool isFiredFtdl(int i) const
+    {
+      if (m_ftdlBits[i / 32] & (1 << (i % 32))) return true;
+      return false;
+    }
+
+    /** get fired/not for input Ftdl */
+    bool isFiredPsnm(int i) const
+    {
+      if (m_psnmBits[i / 32] & (1 << (i % 32))) return true;
+      return false;
+    }
+
     /**set the timType */
     void setTimType(ETimingType timType) {m_timType = timType;}
 

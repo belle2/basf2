@@ -67,6 +67,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         pathFilter="arc_length_fromEcl",
                         inputECLshowersStoreArrayName="ECLShowers",
                         trackFindingDirection="backward",
+                        seedComponent="ECL"
                         )
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")

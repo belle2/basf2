@@ -506,7 +506,8 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
                     pathFilter="arc_length_fromEcl",
                     inputECLshowersStoreArrayName="ECLShowers",
                     trackFindingDirection="backward",
-                    setTakenFlag=False
+                    setTakenFlag=False,
+                    seedComponent="ECL"
                     )
 
     path.add_module("ToCDCCKF",
@@ -519,7 +520,8 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
                     writeOutDirection="backward",
                     stateBasicFilterParameters={"maximalHitDistance": 0.75},
                     stateExtrapolationFilterParameters={"direction": "forward"},
-                    pathFilter="arc_length"
+                    pathFilter="arc_length",
+                    seedComponent="ECL"
                     )
     # "EclSeedRecoTracks" don't have to be added to the list as these do not contain any hits
     temporary_reco_track_list.append('CDCRecoTracksFromEcl')

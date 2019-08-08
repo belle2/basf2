@@ -38,7 +38,7 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
     @staticmethod
     def finder_module(path):
         components = ["SVD", "CDC", "ECL"]
-        reconstruction.add_ecl_modules(path)
+        reconstruction.add_pretracking_reconstruction(path, components=components)
 
         tracking.add_tracking_reconstruction(path, components=components,
                                              use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=True)

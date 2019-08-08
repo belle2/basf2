@@ -66,6 +66,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         pathFilter="arc_length_fromEcl",
                         inputECLshowersStoreArrayName="ECLShowers",
                         trackFindingDirection="backward",
+                        seedComponent="ECL"
                         )
 
         path.add_module("ToCDCCKF",
@@ -79,6 +80,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         stateBasicFilterParameters={"maximalHitDistance": 0.75},
                         stateExtrapolationFilterParameters={"direction": "forward"},
                         pathFilter="arc_length",
+                        seedComponent="ECL"
                         )
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")

@@ -48,6 +48,11 @@ void CDCCKFResultStorer::exposeParameters(ModuleParamList* moduleParamList, cons
                                 "Export all tracks, even if they did not reach the center of the CDC",
                                 m_param_exportAllTracks);
 
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "seedComponent"),
+                                m_seedComponentString,
+                                "Where does the seed track come from (typically SVD, ECL)",
+                                m_seedComponentString);
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "setTakenFlag"),
                                 m_param_setTakenFlag,
                                 "Set flag that hit is taken",
@@ -72,6 +77,14 @@ void CDCCKFResultStorer::initialize()
   m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
 
   m_param_trackFindingDirection = fromString(m_param_trackFindingDirectionAsString);
+
+  if (m_seedComponentString == "SVD") {
+    m_trackFinderType = RecoHitInformation::c_SVDtoCDCCKF;
+  } else if (m_seedComponentString == "ECL") {
+    m_trackFinderType = RecoHitInformation::c_ECLtoCDCCKF;
+  } else {
+    B2FATAL("CDCCKFResultStorer: No valid seed component specified. Please use SVD/ECL.");
+  }
 }
 
 void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
@@ -115,7 +128,7 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
                 RecoHitInformation::RightLeftInformation::c_right :
                 RecoHitInformation::RightLeftInformation::c_left;
 
-      newRecoTrack->addCDCHit(wireHit->getHit(), sortingParameter, rl);
+      newRecoTrack->addCDCHit(wireHit->getHit(), sortingParameter, rl, m_trackFinderType);
       sortingParameter++;
 
       if (m_param_setTakenFlag) {

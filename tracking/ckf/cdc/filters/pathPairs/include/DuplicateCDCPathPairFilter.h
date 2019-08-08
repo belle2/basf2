@@ -14,29 +14,22 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <boost/range/adaptor/reversed.hpp>
+#include <utility>
 
 namespace Belle2 {
-  /// For the two paths with the same number of hits prefers one with smallest sum dist^2
+  /// Simple filter to distinguish between photon conversion and Bremsstrahlung
   class DuplicateCDCPathPairFilter : public BaseCDCPathPairFilter {
   public:
-    /// Input: pair of paths, returns 1 if duplicate hits found
+    /// Input: pair of paths, returns 1 if too many duplicate hits found
     TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;
-
-      // Right now, use simple (yet efficient) algorithm to distinguish between
-      // photon conversion and Bremsstrahlung
-      // Check if 90% of the hits shared by both tracks
-      // Might not be optimal for short tracks? (forward region)
 
       const CDCCKFPath* shortPath = &lhs;
       const CDCCKFPath* longPath = &rhs;
       if (longPath->size() < shortPath->size())
       {
-        const CDCCKFPath* temp = shortPath;
-        shortPath = longPath;
-        longPath = temp;
+        std::swap(shortPath, longPath);
       }
 
       int match = 0;
@@ -52,8 +45,21 @@ namespace Belle2 {
         }
       }
 
-      return double(match) / double(total) > 0.9;
+      return double(match) / double(total) > m_minFractionSharedHits;
     }
+
+    /// Expose the parameters
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+    {
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minFractionSharedHits"),
+                                    m_minFractionSharedHits,
+                                    "Fraction of shared hits to distinguish photon conversion/Bremsstahlung",
+                                    m_minFractionSharedHits);
+    }
+
+  private:
+    /// minimal fraction of shared hits
+    double m_minFractionSharedHits = 0.9;
   };
 }
 

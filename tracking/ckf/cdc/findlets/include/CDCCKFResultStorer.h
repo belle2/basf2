@@ -57,6 +57,10 @@ namespace Belle2 {
     TrackFindingCDC::EForwardBackward m_param_trackFindingDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
     /// Set flag that hit is taken
     bool m_param_setTakenFlag = true;
+    /// What was used to seed the CKF (typically c_SVDtoCDCCKF, c_ECLtoCDCCKF)
+    RecoHitInformation::OriginTrackFinder m_trackFinderType = RecoHitInformation::c_SVDtoCDCCKF;
+    /// Where does the seed track for the CKF come from (typically SVD, ECL)
+    std::string m_seedComponentString = "SVD";
 
     // Store Arrays
     /// Output Reco Tracks Store Array

@@ -18,7 +18,6 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <mdst/dbobjects/BeamSpot.h>
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>

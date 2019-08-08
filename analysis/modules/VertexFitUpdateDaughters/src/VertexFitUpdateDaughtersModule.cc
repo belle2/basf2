@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dbobjects/BeamSpot.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>

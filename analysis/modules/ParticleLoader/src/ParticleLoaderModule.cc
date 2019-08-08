@@ -244,7 +244,7 @@ namespace Belle2 {
 
 
     m_chargeZeroTrackCounts = std::vector<int>(m_Tracks2Plists.size(), 0);
-    m_sameChargeDaughtersV0Counts = 0;
+    m_sameChargeDaughtersV0Counts = std::vector<int>(m_V02Plists.size(), 0);
   }
 
   void ParticleLoaderModule::event()
@@ -278,9 +278,13 @@ namespace Belle2 {
                   << get<c_PListName>(track2Plist));
       }
     // report V0 errors integrated
-    if (m_sameChargeDaughtersV0Counts > 0)
-      B2WARNING("There were " << m_sameChargeDaughtersV0Counts
-                << " v0s skipped because of same charge daughters");
+    for (size_t i = 0; i < m_V02Plists.size(); i++)
+      if (m_sameChargeDaughtersV0Counts[i] > 0) {
+        auto v02Plist = m_V02Plists[i];
+        B2WARNING("There were " << m_sameChargeDaughtersV0Counts[i]
+                  << " v0s skipped because of same charge daughters for "
+                  << get<c_PListName>(v02Plist));
+      }
   }
 
   void ParticleLoaderModule::roeToParticles()
@@ -399,20 +403,20 @@ namespace Belle2 {
       const V0* v0 = V0s[i];
       Const::ParticleType v0Type = v0->getV0Hypothesis();
 
-      // before the loop over ParticleLists
-      // check if the charge of the 2 V0's daughters is opposite
-      if (v0->getTrackFitResults().first->getChargeSign() == v0->getTrackFitResults().second->getChargeSign()) {
-        B2DEBUG(19, "V0 with same charge daughters skipped!");
-        m_sameChargeDaughtersV0Counts++;
-        continue;
-      }
-
       // inner loop over the ParticleLists
-      for (auto v02Plist : m_V02Plists) {
+      for (size_t ilist = 0; ilist < m_V02Plists.size(); ilist++) {
+        auto v02Plist = m_V02Plists[ilist];
         int listPDGCode = get<c_PListPDGCode>(v02Plist);
 
         if (abs(listPDGCode) != abs(v0Type.getPDGCode()))
           continue;
+
+        // check if the charge of the 2 V0's daughters is opposite
+        if (v0->getTrackFitResults().first->getChargeSign() == v0->getTrackFitResults().second->getChargeSign()) {
+          B2DEBUG(19, "V0 with same charge daughters skipped!");
+          m_sameChargeDaughtersV0Counts[ilist]++;
+          continue;
+        }
 
         Const::ChargedStable pTypeP(Const::pion);
         Const::ChargedStable pTypeM(Const::pion);

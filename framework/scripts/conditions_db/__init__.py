@@ -322,7 +322,7 @@ class ConditionsDB:
             True if successful.
         """
 
-        result = check_payloads([(entry.module, entry.checksum) for entry in entries], "revision")
+        result = self.check_payloads([(entry.module, entry.checksum) for entry in entries], "revision")
         if not result:
             return False
 

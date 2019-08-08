@@ -56,16 +56,23 @@ Here is an example of use:
 
 Grammar for custom MCMatching
 -----------------------------
-One can use the keywords for decay string to configure how :code:`'isSignal'` is behaving. If these keywords are used, the missing particles are ignored or taken into account. For example, if :code:`'...'` is used, missing final state particles are ignored, hence :code:`'isSignal'` works as :code:`'isSignalAcceptMissingMassive'`. 
-Keywords must be placed at the end of the decay string. It is not allowed to put keywords in front of particles.
+One can use the grammar for decay string to configure how :code:`isSignal` is behaving. The grammar is composed of :doc:`Keywords` and :doc:`Arrows`. By default, :code:`'isSignal'` requires that all final state particle daughters are correctly reconstructed except radiated photon and intermediate state. One can make :code:`isSignal` accept missing some particles or do not accept missing radiated photon or intermediate resonances.
+
+Keywords
+^^^^^^^^
+If one put following keywords at the end of decay string, :code:`'isSignal'` will accept missing massive particle/neutrino/gamma(not radiated), respectively.  
 
 * :code:`'...'` Missing massive final state particles are ignored
 * :code:`'?nu'` Missing neutrinos are ignored
-* :code:`'!nu'` Missing neutrinos are taken into account (default)
 * :code:`'?gamma'` Missing gammas are ignored 
-* :code:`'!gamma'` Missing gammas are taken into account (default)
 
-Here is an exapmle of use:
+These are useful to analyze inclusive processes with fully-inclusive method. One can also use the following keywords to make one's decay string explicit. 
+
+* :code:`'!nu'` Missing neutrinos are considered (default)
+* :code:`'!gamma'` Missing gammas are considered (default)
+
+
+Keywords must be placed at the end of the decay string. It is not allowed to put keywords in front of particles. Here is an exapmle of use:
 
 .. code-block:: python
  
@@ -79,8 +86,8 @@ Here is an exapmle of use:
 	# isSignal of B+:inclusive accepts missing massive FSP, neutrino, and gamma. 
 
 Arrows
-------
-For truth matching purposes different types of arrows are defined:
+^^^^^^
+In addition to the common arrow :code:`'->'`, one can use different types of arrows. If the following verbose arrow is used, :code:`isSignal` will consider missing radiated photons and/or missing intermediate resonances. 
 
 * :code:`'->'` intermediate resonances and radiated photons are ignored
 * :code:`'-->'`, :code:`'=>'` and :code:`'==>'` work same as :code:`'->'`. These three will be deprecated in release-05, please consider to use :code:`'->'`.

@@ -74,8 +74,8 @@ laser_collector.param('refSlot', 4)  # Do not change this unless this slot is ba
 
 algorithm = TOP.TOPLocalCalFitter()
 algorithm.isMC = False
-algorithm.m_TTSData = "/home/belle/tamponi/LaserMCData/TTSParametrizations.root"
-algorithm.m_laserCorrections = "/home/belle/tamponi/LaserMCData/laserMCFit.root"
+algorithm.m_TTSData = "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root"
+algorithm.m_laserCorrections = "/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root"
 
 
 cal = Calibration(name='TOPLocalCalFitter', collector=laser_collector, algorithms=algorithm, input_files=inputFileNames)

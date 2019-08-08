@@ -30,24 +30,30 @@ namespace Belle2 {
       /**..Destructor */
       virtual ~TOPLocalCalFitter() {}
 
-      /** Parameters. They are public so you can set them in the steering file */
       int minEntries = 50; /**<  Minimum number of entries to perform the fit*/
       std::string m_output = "laserFitResult.root"; /**< Name of the output file */
-      std::string m_laserCorrections = "LaserMCParameters.root"; /**< Name of the output file */
-      std::string m_TTSData = "TTSParametrization.root"; /**< Name of the output file */
+      std::string m_laserCorrections =
+        "/group/belle2/group/detector/TOP/calibration/MCreferences/LaserMCParameters.root"; /**< Name of the output file */
+      std::string m_TTSData =
+        "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrization.root"; /**< Name of the output file */
       bool isMonitoringFit =
         false; /**< Set to True if you are analyzing runs with low statistics and you want to fix the fit parameters from a high-stat run*/
 
     protected:
 
+      /** prepares the output tree */
       void setupOutputTreeAndFile();
 
+      /** loads the TTS parameters and the MC truth info */
       void loadMCInfoTrees();
 
+      /** determines if the constant obtained by the fit are good or not */
       void determineFitStatus();
 
+      /** Fits the laser light on one channel*/
       void fitChannel(short, short, TH1*);
 
+      /** Fits the two pulsers */
       void fitPulser(TH1*, TH1*);
 
       /**..Run algorithm on events */
@@ -61,7 +67,7 @@ namespace Belle2 {
       TTree* fitTree = nullptr; /**< Output of the fitter. The tree containg the fit results. */
 
 
-      // Variables associated to the input tree branches
+      // Variables for the TTS parametrization tree
       float mean2 = 0;  /**< Position of the second gaussian of the TTS parametrization with respect to the first one*/
       float sigma1 = 0; /**< Width of the first gaussian on the TTS parametrization */
       float sigma2 = 0; /**< Width of the second gaussian on the TTS parametrization */
@@ -70,7 +76,7 @@ namespace Belle2 {
       short pixelRow = 0; /**< Pixel row */
       short pixelCol = 0; /**< Pixel column */
 
-
+      // Variables for the MC truth infos
       short channelLaser = 0; /**< Channel number (0-512) */
       float peakTimeLaser = 0; /**< Time of the main laser peak in the MC simulation (aka MC correction)  */
       float deltaTLaser = 0; /**< Distance between the main and the secondary laser peak */
@@ -81,7 +87,7 @@ namespace Belle2 {
       float backgroundSigmaLaser = 0; /**< Width of the guassian used to describe the long tail of the timing distribution */
 
 
-      //fit results
+      // Variables for the output tree
       short channel = 0;
       short slot = 0;
       short row = 0;

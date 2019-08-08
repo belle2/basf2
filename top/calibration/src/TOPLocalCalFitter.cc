@@ -97,9 +97,44 @@ TOPLocalCalFitter::TOPLocalCalFitter(): CalibrationAlgorithm("TOPLaserCalibrator
 }
 
 
+
+void  TOPLocalCalFitter::loadMCInfoTrees()
+{
+  std::cout << "Entering loadMCInfoTree" << std::endl;
+  std::cout  << "Getting the  TTS parameters from " << m_TTSData << std::endl;
+  TFile inputTTS(m_TTSData.c_str());
+  inputTTS.cd();
+  inputTTS.GetObject("tree", treeTTS);
+  treeTTS->SetBranchAddress("mean2", &mean2);
+  treeTTS->SetBranchAddress("sigma1", &sigma1);
+  treeTTS->SetBranchAddress("sigma2", &sigma2);
+  treeTTS->SetBranchAddress("fraction1", &f1);
+  treeTTS->SetBranchAddress("fraction2", &f2);
+  treeTTS->SetBranchAddress("pixelRow", &pixelRow);
+  treeTTS->SetBranchAddress("pixelCol", &pixelCol);
+
+  std::cout << "Getting the laser fit parameters from " << m_laserCorrections << std::endl;
+  TFile inputLaser(m_laserCorrections.c_str());
+  inputLaser.cd();
+  inputLaser.GetObject("fitTree", treeLaser);
+  treeLaser->SetBranchAddress("peakTime", &peakTimeLaser);
+  treeLaser->SetBranchAddress("deltaT", &deltaTLaser);
+  treeLaser->SetBranchAddress("fraction", &fractionLaser);
+
+  std::cout << "Exiting loadMCInfoTree" << std::endl;
+
+  treeLaser->Show(1);
+  treeTTS->Show(1);
+
+  return;
+}
+
+
 void  TOPLocalCalFitter::setupOutputTreeAndFile()
 {
+  std::cout << "Entering setupOutputTreeAndFile: Setting up output tree" << std::endl;
   histFile = new TFile(m_output.c_str(), "recreate");
+  histFile->cd();
   fitTree = new TTree("fitTree", "fitTree");
   fitTree->Branch<short>("channel", &channel);
   fitTree->Branch<short>("slot", &slot);
@@ -131,7 +166,7 @@ void  TOPLocalCalFitter::setupOutputTreeAndFile()
 
   fitTree->Branch<float>("chi2", &chi2);
   fitTree->Branch<float>("rms", &rms);
-  std::cout << "tree done" << std::endl;
+  std::cout << "Exiting setupOutputTreeAndFile: tree done" << std::endl;
   return;
 }
 
@@ -140,12 +175,19 @@ void  TOPLocalCalFitter::setupOutputTreeAndFile()
 
 void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
 {
+  std::cout << "Entering fitChannel" << std::endl;
   treeLaser->GetEntry(iChannel);
   treeTTS->GetEntry(iChannel + 512 * iSlot);
+  treeLaser->Show(iChannel);
+  treeTTS->Show(iChannel + 512 * iSlot);
+
+  std::cout << "MC info loaded" << std::endl;
 
   double maxpos = h_profile->GetBinCenter(h_profile->GetMaximumBin());
   h_profile->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 2.);
   double integral = h_profile->Integral();
+  std::cout << "histo OK" << std::endl;
+
 
   TF1 laser = TF1("laser", laserPDF, maxpos - 1, maxpos + 2., 16);
 
@@ -260,12 +302,15 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
 
   channelT0 = peakTime - peakTimeMC;
   channelT0Err = peakTimeErr;
+  std::cout << "Exiting fitChannel" << std::endl;
   return;
 }
 
 
 void  TOPLocalCalFitter::fitPulser(TH1* h_profileFirstPulser, TH1* h_profileSecondPulser)
 {
+  std::cout << "Entering fitPulser" << std::endl;
+
   float maxpos = h_profileFirstPulser->GetBinCenter(h_profileFirstPulser->GetMaximumBin());
   h_profileFirstPulser->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 1.);
   if (h_profileFirstPulser->Integral() > 1000) {
@@ -297,34 +342,11 @@ void  TOPLocalCalFitter::fitPulser(TH1* h_profileFirstPulser, TH1* h_profileSeco
     secondPulserTime = -999;
     secondPulserSigma = -999;
   }
+  std::cout << "Exiting fitPulser" << std::endl;
+
   return;
 }
 
-void  TOPLocalCalFitter::loadMCInfoTrees()
-{
-  B2INFO("Getting the  TTS parameters from " << m_TTSData);
-  TFile inputTTS(m_TTSData.c_str());
-  inputTTS.cd();
-  inputTTS.GetObject("tree", treeTTS);
-  treeTTS->SetBranchAddress("mean2", &mean2);
-  treeTTS->SetBranchAddress("sigma1", &sigma1);
-  treeTTS->SetBranchAddress("sigma2", &sigma2);
-  treeTTS->SetBranchAddress("fraction1", &f1);
-  treeTTS->SetBranchAddress("fraction2", &f2);
-  treeTTS->SetBranchAddress("pixelRow", &pixelRow);
-  treeTTS->SetBranchAddress("pixelCol", &pixelCol);
-
-  B2INFO("Getting the laser fit parameters from " << m_laserCorrections);
-  TFile inputLaser(m_laserCorrections.c_str());
-  inputLaser.cd();
-  inputLaser.GetObject("fitTree", treeLaser);
-  treeLaser->SetBranchAddress("peakTime", &peakTimeLaser);
-  treeLaser->SetBranchAddress("deltaT", &deltaTLaser);
-  treeLaser->SetBranchAddress("fraction", &fractionLaser);
-
-  histFile->cd();
-  return;
-}
 
 
 void  TOPLocalCalFitter::determineFitStatus()
@@ -343,9 +365,17 @@ void  TOPLocalCalFitter::determineFitStatus()
 
 CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
 {
+
+  std::cout << "Calibrating " << std::endl;
+
   gROOT->SetBatch();
 
   loadMCInfoTrees();
+
+  setupOutputTreeAndFile();
+
+
+  std::cout << "Loading hittree" << std::endl;
 
   // Loads the tree with the hits
   auto hitTree = getObjectPtr<TTree>("hitTree");
@@ -353,10 +383,10 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
   std::cout << "Filling the time VS channel histogram" << std::endl;
   hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "dVdt > 80 && amplitude > 80");
 
-  setupOutputTreeAndFile();
+  histFile->cd();
 
   for (short iSlot = 0; iSlot < 16; iSlot++) {
-    B2INFO("Fitting slot " << iSlot + 1);
+    std::cout << "Fitting slot " << iSlot + 1 << std::endl;
     for (short iChannel = 0; iChannel < 512; iChannel++) {
       TH1D* h_profile = h_hitTime->ProjectionY(("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
                                                iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);

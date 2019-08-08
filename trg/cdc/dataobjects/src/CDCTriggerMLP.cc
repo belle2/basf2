@@ -16,8 +16,8 @@ CDCTriggerMLP::CDCTriggerMLP():
               -1., 1.,
               -1., 11.,
               -1., 1.},
-  T0fromHits(false),
-  et_option("etf_or_fastestpriority")
+  et_option("etf_or_fastestpriority"),
+  T0fromHits(false)
 {
   weights.assign(nWeightsCal(), 0.);
 }
@@ -47,8 +47,8 @@ CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nodes,
               -1., 1.,
               -1., 11.,
               -1., 1.},
-  T0fromHits(calcT0),
-  et_option(etoption)
+  et_option(etoption),
+  T0fromHits(calcT0)
 {
   weights.assign(nWeightsCal(), 0.);
 }

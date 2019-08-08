@@ -33,8 +33,10 @@ import collections
 from skimExpertFunctions import get_test_file, get_eventN
 
 skims = 'Dark Semileptonic feiHadronic BtoCharm BtoCharmless Quarkonium  CombinedSystematics MiscCombined'
-bkgs = 'mixedBGx1  chargedBGx1 ccbarBGx1 ssbarBGx1 uubarBGx0  ddbarBGx1  taupairBGx1'
-bkgs += ' mixedBGx0 chargedBGx0 ccbarBGx0 ssbarBGx0 uubarBGx0 ddbarBGx0 taupairBGx0'
+
+bkgs = 'MC12_mixedBGx1  MC12_chargedBGx1 MC12_ccbarBGx1 MC12_ssbarBGx1 MC12_uubarBGx0  MC12_ddbarBGx1  MC12_taupairBGx1'
+bkgs += ' MC12_mixedBGx0 MC12_chargedBGx0 MC12_ccbarBGx0 MC12_ssbarBGx0 MC12_uubarBGx0 MC12_ddbarBGx0 MC12_taupairBGx0'
+
 
 nFullEvents = 200000
 nSkims = 0
@@ -97,7 +99,6 @@ for bkg in bkgs.split():
         pos = bkg.find('_')
         skimCampaign = bkg[0:pos]
         sampleType = bkg[pos + 1:]
-        skimCampaign = 'MC9'
         fileList = get_test_file(sampleType, skimCampaign)
         nFullEvents = get_eventN(fileList)
         nSkimmedEvents = 0  # get_eventN(outputFileName + '.udst.root')

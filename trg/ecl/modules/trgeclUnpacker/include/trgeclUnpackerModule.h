@@ -26,6 +26,10 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
+
+#include "trg/ecl/TrgEclDataBase.h"
+#include "trg/ecl/TrgEclMapping.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
@@ -69,27 +73,22 @@ namespace Belle2 {
     /** Unpacker main function.*/
     virtual void checkBuffer(int*, int);
 
-    /** Unpacker main function. ETM verion 114 */
-    virtual void checkBuffer_114(int*, int);
-
-    /** Unpacker main function. ETM verion 115 */
-    virtual void checkBuffer_115(int*, int);
-
   protected :
     /** Event number */
     int n_basf2evt;
-    int etm_version;
+    int etm_version = 0;
 
-    unsigned int nodeid;
-    int nwords;
-    int iFiness;
+    unsigned int nodeid = 0;
+    int nwords = 0;
+    int iFiness = 0;
+    int trgtype = 0;
 
   private :
 
     StoreArray<TRGECLUnpackerStore>     m_TRGECLTCArray;
     StoreArray<TRGECLUnpackerSumStore>  m_TRGECLSumArray;
     StoreArray<TRGECLUnpackerEvtStore>  m_TRGECLEvtArray;
-
+    StoreArray<TRGECLCluster>  m_TRGECLClusterArray;
   };
 
 } // end namespace Belle2

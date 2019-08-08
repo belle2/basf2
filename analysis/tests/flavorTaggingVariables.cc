@@ -51,7 +51,7 @@ namespace {
   class FlavorTaggingVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<ECLCluster> testsECLClusters;
@@ -84,7 +84,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -297,9 +297,9 @@ namespace {
 
     double refsBtagToWBosonPMissCMS = 0.542734;
 
-    for (unsigned i = 0; i < roeChargedParticles.size(); i++) {
+    for (auto& roeChargedParticle : roeChargedParticles) {
 
-      double output = var -> function(roeChargedParticles[i]);
+      double output = var -> function(roeChargedParticle);
 
       EXPECT_NEAR(output, refsBtagToWBosonPMissCMS, 0.000005);
 
@@ -382,9 +382,9 @@ namespace {
     * analysis/utility/include/MCMatching.h */
     vector<int> notAcceptedMCErrorFlags{4, 8, 16, 32, 64, 128, 256, 512};
 
-    for (unsigned i = 0; i < notAcceptedMCErrorFlags.size(); i++) {
+    for (int notAcceptedMCErrorFlag : notAcceptedMCErrorFlags) {
 
-      savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, notAcceptedMCErrorFlags[i]);
+      savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, notAcceptedMCErrorFlag);
       double output = var -> function(savedB0);
       ASSERT_EQ(output, 0);
 

@@ -50,11 +50,6 @@ namespace Belle2 {
     double nKLMClusters(const Particle*);
 
     /**
-     * return total energy in KLM clusters in event
-     */
-    double KLMEnergy(const Particle*);
-
-    /**
      * return number MCParticles in event
      */
     double nMCParticles(const Particle*);

@@ -144,6 +144,53 @@ namespace {
     EXPECT_EQ(dd4.isIgnorePhotons(), false);
     EXPECT_EQ(dd4.isIgnoreIntermediate(), false);
     EXPECT_EQ(dd4.isInclusive(), true);
+
+  }
+
+  TEST(DecayDescriptorTest, UnspecifiedParticleGrammar)
+  {
+    // @ means unspecified particle, for example @Xsd -> K+ pi-
+    DecayDescriptor dd1;
+    bool initok = dd1.init("@Xsd:candidates -> K+:loose pi-:loose");
+    EXPECT_EQ(initok, true);
+
+    ASSERT_NE(dd1.getMother(), nullptr);
+    EXPECT_EQ(dd1.getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd1.getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd1.getMother()->isSelected(), false);
+
+    // Both selectors, @ and ^, cannot be used in same time
+    DecayDescriptor dd2;
+    initok = dd2.init("^@Xsd:candidates -> K+:loose pi-:loose");
+    EXPECT_EQ(initok, false);
+
+    DecayDescriptor dd3;
+    initok = dd3.init("@^Xsd:candidates -> K+:loose pi-:loose");
+    EXPECT_EQ(initok, false);
+
+
+    // @ can be attached to a daughter
+    DecayDescriptor dd4;
+    initok = dd4.init("B0:Xsdee -> @Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, true);
+
+    ASSERT_NE(dd4.getMother(), nullptr);
+    EXPECT_EQ(dd4.getMother()->isUnspecified(), false);
+    EXPECT_EQ(dd4.getMother()->isSelected(), false);
+
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->getName(), "Xsd");
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->isUnspecified(), true);
+    EXPECT_EQ(dd4.getDaughter(0)->getMother()->isSelected(), false);
+
+    // Both selectors, @ and ^, cannot be used in same time
+    DecayDescriptor dd5;
+    initok = dd5.init("B0:Xsdee -> ^@Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, false);
+
+    DecayDescriptor dd6;
+    initok = dd6.init("B0:Xsdee -> @^Xsd e+:loose e-:loose");
+    EXPECT_EQ(initok, false);
+
   }
 
   TEST(DecayDescriptorTest, SelectionParticles)
@@ -306,12 +353,12 @@ namespace {
     std::vector<std::pair<int, std::string>> K_path;
     std::vector<std::pair<int, std::string>> pi0_path;
 
-    K_path.push_back(std::make_pair(0, std::string("B")));
-    K_path.push_back(std::make_pair(0, std::string("D")));
-    K_path.push_back(std::make_pair(0, std::string("K")));
+    K_path.emplace_back(0, std::string("B"));
+    K_path.emplace_back(0, std::string("D"));
+    K_path.emplace_back(0, std::string("K"));
 
-    pi0_path.push_back(std::make_pair(0, std::string("B")));
-    pi0_path.push_back(std::make_pair(1, std::string("pi0")));
+    pi0_path.emplace_back(0, std::string("B"));
+    pi0_path.emplace_back(1, std::string("pi0"));
 
     EXPECT_NE(expected_hierarchies, selected_hierarchies);
     expected_hierarchies.push_back(K_path);

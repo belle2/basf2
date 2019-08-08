@@ -41,9 +41,9 @@ namespace Belle2 {
   template <typename SignalBus>
   class Bitstream : public TObject {
     friend class CDCTriggerUnpackerModule;
-    friend class Merger;
-    friend class Tracker2D;
-    friend class Neuro;
+    friend struct Merger;
+    friend struct Tracker2D;
+    friend struct Neuro;
   public:
     /** default constructor */
     Bitstream() {};
@@ -57,13 +57,14 @@ namespace Belle2 {
     /** destructor, empty because we don't allocate memory explicitly. */
     ~Bitstream() { };
 
-    // accessors
+    //! accessors
     const SignalBus& signal()
     {
       return m_signal;
     }
 
   protected:
+    //! SignalBus of the Bitstream
     SignalBus m_signal;
 
     //! Needed to make the ROOT object storable

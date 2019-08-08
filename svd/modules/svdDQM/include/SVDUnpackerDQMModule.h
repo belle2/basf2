@@ -52,6 +52,8 @@ namespace Belle2 {
     void beginRun() override final;
     /** Module function event */
     void event() override final;
+    /** Module function endRun */
+    void endRun() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -75,25 +77,36 @@ namespace Belle2 {
     /** mapping implementation */
     std::unique_ptr<SVDOnlineToOfflineMap> m_map;
     static std::string m_xmlFileName; /**< xml filename*/
-    DBObjPtr<PayloadFile> m_mapping; /**<  channel map payload*/
+    DBObjPtr<PayloadFile> m_mapping; /**< channel map payload*/
 
     StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigits Store Arrra*/
     StoreArray<SVDDAQDiagnostic> m_svdDAQDiagnostics; /**<SVDDAQDiagnostic StoreArray*/
     StoreObjPtr<EventMetaData> m_eventMetaData; /**<EvtMetaData StoreObjectPointer*/
 
-    bool changeFADCaxis; /**<change FADC (y) axis*/
-    bool shutUpNoData; /**<shut up if no data comes*/
+    bool changeFADCaxis = false; /**<change FADC (y) axis*/
+    bool shutUpNoData = true; /**<shut up if no data comes*/
 
-    uint16_t ftbError; /**<FTB error container*/
-    uint16_t ftbFlags; /**<FTB flags container*/
-    uint16_t apvError; /**< APV error container*/
-    bool apvMatch; /**< apv match error*/
-    bool fadcMatch; /**<fadcc match error*/
-    bool upsetAPV; /**<upset APV error*/
-    bool badMapping; /**<bad mapping error*/
-    bool badHeader; /**<bad header error*/
-    bool badTrailer; /**<bad trailer error*/
-    unsigned short fadcNo; /**<fadc number*/
+    int expNumber = 0; /**< experiment number*/
+    int runNumber = 0; /**< run number*/
+
+    bool badEvent = false; /**<indicates if the particular event has any SVD error*/
+    unsigned int nEvents = 0;  /**<event counter */
+    unsigned int nBadEvents = 0;  /**<counter of events with any kind of error*/
+    float errorFraction = 0; /**<fraction of events with any kind of error*/
+
+    uint16_t ftbError = 0; /**<FTB error container*/
+    uint16_t ftbFlags = 0; /**<FTB flags container*/
+    uint16_t apvError = 0; /**< APV error container*/
+    bool apvMatch = true; /**< apv match error*/
+    bool fadcMatch = true; /**<fadcc match error*/
+    bool upsetAPV = false; /**<upset APV error*/
+    bool badMapping = false; /**<bad mapping error*/
+    bool badHeader = false; /**<bad header error*/
+    bool badTrailer = false; /**<bad trailer error*/
+    bool missedHeader = false; /** missed Header error*/
+    bool missedTrailer = false; /** missed Trailer error*/
+
+    unsigned short fadcNo = 0; /**<fadc number*/
     //unsigned short apvNo;
 
     std::unordered_set<unsigned char>* FADCs; /**< FADC boards number*/
@@ -101,7 +114,8 @@ namespace Belle2 {
     std::vector<unsigned short> vec_fadc; /**<vector of FADC boards*/
 
     //histogram
-    TH2S* DQMUnpackerHisto; /**< TH2S histogram with Unpacking errors*/
+    TH2S* DQMUnpackerHisto = NULL; /**< TH2S histogram with Unpacking errors*/
+    TH1S* DQMEventFractionHisto = NULL; /**< TH1S histogram showing the fraction of events affected by errors*/
 
   };
 

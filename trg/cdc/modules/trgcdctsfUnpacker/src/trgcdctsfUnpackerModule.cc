@@ -58,14 +58,22 @@ void TRGCDCTSFUnpackerModule::initialize()
   sprintf(c_name, "TRGCDCTSFUnpackerStore%d", m_TSFMOD);
   storeAry.registerInDataStore(c_name);
 
+  StoreObjPtr<EventMetaData> bevt;
+  _exp = bevt->getExperiment();
+  _run = bevt->getRun();
 
   //set copper address
   if (m_TSFMOD == 0) {
     m_copper_address = 0x11000007;
     m_copper_ab = 0;
   } else if (m_TSFMOD == 1) {
-    m_copper_address = 0x11000007;
-    m_copper_ab = 1;
+    if (_exp > 7 || (_exp == 7 && _run > 4023)) {
+      m_copper_address = 0x11000009;
+      m_copper_ab = 0;
+    } else {
+      m_copper_address = 0x11000007;
+      m_copper_ab = 1;
+    }
   } else if (m_TSFMOD == 2) {
     m_copper_address = 0x11000008;
     m_copper_ab = 0;
@@ -73,8 +81,13 @@ void TRGCDCTSFUnpackerModule::initialize()
     m_copper_address = 0x11000008;
     m_copper_ab = 1;
   } else if (m_TSFMOD == 4) {
-    m_copper_address = 0x11000009;
-    m_copper_ab = 0;
+    if (_exp > 7 || (_exp == 7 && _run > 4023)) {
+      m_copper_address = 0x11000007;
+      m_copper_ab = 1;
+    } else {
+      m_copper_address = 0x11000009;
+      m_copper_ab = 0;
+    }
   } else if (m_TSFMOD == 5) {
     m_copper_address = 0x11000009;
     m_copper_ab = 1;

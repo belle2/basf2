@@ -98,6 +98,7 @@ namespace Belle2 {
         }
       }
 
+      /// association of CDCWireHits with a generic collection item
       std::multimap<const CDCWireHit*, const ACollectionItem*> m_hitLookup;
     };
   }

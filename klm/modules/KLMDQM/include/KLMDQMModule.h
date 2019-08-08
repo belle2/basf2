@@ -3,7 +3,7 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Vipin Gaur                              *
+ * Contributors: Kirill Chilikin, Vipin Gaur, Leo Piilonen                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,15 +12,18 @@
 
 /* External headers. */
 #include <TH1F.h>
-#include <TH2F.h>
 
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/dataobjects/BKLMHit1d.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
 
 namespace Belle2 {
 
@@ -93,10 +96,22 @@ namespace Belle2 {
     std::string m_HistogramDirectoryNameBKLM;
 
     /** name of BKLMDigit store array. */
-    std::string m_outputDigitsName;
+    std::string m_inputDigitsName;
 
-    /** Name of BKLMHit store array. */
-    std::string m_outputHitsName;
+    /** Name of BKLMHit2d store array. */
+    std::string m_inputHitsName2d;
+
+    /** Name of BKLMHit1d store array. */
+    std::string m_inputHitsName1d;
+
+    /** KLM channel array index. */
+    const KLMChannelArrayIndex* m_ChannelArrayIndex;
+
+    /** KLM sector array index. */
+    const KLMSectorArrayIndex* m_SectorArrayIndex;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
@@ -113,50 +128,31 @@ namespace Belle2 {
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
 
+    /** Number of hits per channel. */
+    TH1F** m_ChannelHits[
+      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
+      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
+
+    /** Number of channel hit histograms per sector for BKLM. */
+    const int m_ChannelHitHistogramsBKLM = 2;
+
+    /** Number of channel hit histograms per sector for EKLM. */
+    const int m_ChannelHitHistogramsEKLM = 3;
+
     /** Sector number. */
     TH1F* m_eklmSector;
-
-    /** Strip number within a layer. */
-    TH1F** m_eklmStripLayer;
-
-    /** Number of hits per layer. */
-    TH1F* m_bklmLayerHits;
-
-    /** Reconstructed pulse height. */
-    TH1F* m_bklmEDep;
-
-    /** Reconstructed number MPPC pixels. */
-    TH1F* m_bklmNPixel;
-
-    /** z-measuring strip numbers of the 2D hit. */
-    TH1F* m_bklmZStrips;
-
-    /** Phi strip number of muon hit. */
-    TH1F* m_bklmPhiStrip;
-
-    /** Sector number of muon hit. */
-    TH1F* m_bklmSector;
-
-    /** Layer number of muon hit. */
-    TH1F* m_bklmLayer;
-
-    /** Distance from z axis in transverse plane of muon hit. */
-    TH1F* m_bklmHit2dsR;
 
     /** Axial position of muon hit. */
     TH1F* m_bklmHit2dsZ;
 
-    /** Position projected into transverse plane of muon hit. */
-    TH2F* m_bklmHit2dsYvsx;
+    /** Sector and layer number occupancy for phi-readout hits */
+    TH1F* m_bklmSectorLayerPhi;
 
-    /** Position projected into x-z plane of muon hit. */
-    TH2F* m_bklmHit2dsXvsz;
+    /** Sector and layer number occupancy for Z-readout hits */
+    TH1F* m_bklmSectorLayerZ;
 
-    /** Position projected into y-z plane of muon hit. */
-    TH2F* m_bklmHit2dsYvsz;
-
-    /** Layer VS Sector histogram for the BKLM forward and backward regions. */
-    TH2F* m_bklmLayerVsSector[2];
+    /** Number of BKLM Digits. */
+    TH1F* m_bklmDigitsN;
 
   };
 

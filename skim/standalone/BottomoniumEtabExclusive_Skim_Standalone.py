@@ -10,17 +10,28 @@
 from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+gb2_setuprel = 'release-03-02-00'
 import sys
 import os
 import glob
+import argparse
+
+# Read optional --data argument
+parser = argparse.ArgumentParser()
+parser.add_argument('--data',
+                    help='Provide this flag if running on data.',
+                    action='store_true', default=False)
+args = parser.parse_args()
+
+if args.data:
+    use_central_database("data_reprocessing_prompt_bucket6")
 
 # create a new path
 BottomoniumEtabskimpath = Path()
 
 skimCode = encodeSkimName('BottomoniumEtabExclusive')
-fileList = get_test_file("mixedBGx1", "MC11")
+fileList = get_test_file("mixedBGx1", "MC12")
 inputMdstList('default', fileList, path=BottomoniumEtabskimpath)
 
 

@@ -83,7 +83,9 @@ CDCTriggerNeuroModule::initialize()
   if (m_fixedPoint) {
     m_NeuroTrigger.setPrecision(m_precision);
   }
-
+  if (m_et_option == "") {
+    m_et_option = m_NeuroTrigger.get_et_option();
+  }
   m_tracksNN.registerInDataStore(m_outputCollectionName);
   m_tracks2D.isRequired(m_inputCollectionName);
   m_segmentHits.isRequired(m_hitCollectionName);

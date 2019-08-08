@@ -22,6 +22,7 @@ class TFile;
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /// Record the MVA variables
     class Recorder::Impl {
 
     public:

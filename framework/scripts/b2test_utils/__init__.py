@@ -16,9 +16,10 @@ from contextlib import contextmanager
 import multiprocessing
 import basf2
 import subprocess
+import unittest
 
 
-def skip_test(reason):
+def skip_test(reason, py_case=None):
     """Skip a test script with a given reason. This function will end the script
     and not return.
 
@@ -29,8 +30,33 @@ def skip_test(reason):
     Useful if the test depends on some external condition like a web service and
     missing this dependency should not fail the test run.
     """
-    print("TEST SKIPPED: %s" % reason, file=sys.stderr, flush=True)
+    if py_case:
+        py_case.skipTest(reason)
+    else:
+        print("TEST SKIPPED: %s" % reason, file=sys.stderr, flush=True)
     sys.exit(1)
+
+
+def require_file(filename, data_type="", py_case=None):
+    """Check for the existence of a test input file before attempting to open it.
+    Skips the test if not found.
+
+    Wraps `basf2.find_file` for use in test scripts run as
+    :ref`b2test-scripts <b2test-scripts>`
+
+    Parameters:
+        filename (str): relative filename to look for, either in a central place or in the current working directory
+        data_type (str): case insensitive data type to fine.  Either empty string or one of `""examples"`` or ``"validation"``.
+        py_case (unittest.TestCase): if this is to be skipped within python's native unittest then pass the TestCase instance
+
+    Returns:
+        Full path to the test input file
+    """
+    try:
+        fullpath = basf2.find_file(filename, data_type, silent=False)
+    except FileNotFoundError as fnf:
+        skip_test('Cannot find: %s' % fnf.filename, py_case)
+    return fullpath
 
 
 @contextmanager
@@ -191,3 +217,55 @@ Please run:
 and fix any issues you have introduced. Here is what {toolname} found:\n""")
         print("\n".join(clean_log))
         sys.exit(1)
+
+
+def get_streamer_checksums(objects):
+    """
+    Extract the version and streamer checksum of the C++ objects in the given list
+    by writing them all to a TMemFile and getting back the streamer info list
+    automatically created by ROOT afterwards.
+    Please note, that this list also includes the streamer infos of all
+    base objects of the objects you gave.
+
+    Returns a dictionary object name -> (version, checksum).
+    """
+    import ROOT
+
+    # Write out the objects to a mem file
+    f = ROOT.TMemFile("test_mem_file", "RECREATE")
+    f.cd()
+
+    for o in objects:
+        o.Write()
+    f.Write()
+
+    # Go through all streamer infos and extract checksum and version
+    streamer_checksums = dict()
+    for streamer_info in f.GetStreamerInfoList():
+        if not isinstance(streamer_info, ROOT.TStreamerInfo):
+            continue
+        streamer_checksums[streamer_info.GetName()] = (streamer_info.GetClassVersion(), streamer_info.GetCheckSum())
+
+    f.Close()
+    return streamer_checksums
+
+
+def get_object_with_name(object_name, root=None):
+    """
+    (Possibly) recursively get the object with the given name from the Belle2 namespace.
+
+    If the object name includes a ".", the first part will be turned into an object (probably a module)
+    and the function is continued with this object as the root and the rest of the name.
+
+    If not, the object is extracted via a getattr call.
+    """
+    if root is None:
+        from ROOT import Belle2
+        root = Belle2
+
+    if "." in object_name:
+        namespace, object_name = object_name.split(".", 1)
+
+        return get_object_with_name(object_name, get_object_with_name(namespace, root=root))
+
+    return getattr(root, object_name)

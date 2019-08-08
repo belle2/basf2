@@ -258,6 +258,7 @@ namespace Belle2 {
       bool isFakedData(void) const;
       void print(void) const;
       inline unsigned int get_dhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
+      inline unsigned int getErrorInfo(void) const {return errorinfo;};
     };
 
     /** DHE End frame data struct.
@@ -277,6 +278,7 @@ namespace Belle2 {
       inline unsigned int getFixedSize(void) const  {    return 16;  };
       void print(void) const;
       inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
+      inline unsigned int getErrorInfo(void) const {return errorinfo;};
     };
 
 

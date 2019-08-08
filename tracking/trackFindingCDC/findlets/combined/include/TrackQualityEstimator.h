@@ -46,7 +46,7 @@ namespace Belle2 {
       void apply(std::vector<CDCTrack>& tracks) final;
 
     private:
-      // Findlet to fill CDCTracks into lookup table (singleton) with clone information
+      /// Findlet to fill CDCTracks into lookup table (singleton) with clone information
       CDCMCCloneLookUpFiller m_mcCloneLookUpFiller;
 
       /// Store output of needsTruthInformation from filter in member variable

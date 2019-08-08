@@ -114,7 +114,15 @@ int main(int argc, char* argv[])
 
     if (not raw) {
       // We want to have it in words, not bytes
-      size = ((size - 1) / sizeof(int) + 1);
+      int sizeInWords = ((size - 1) / sizeof(int) + 1);
+
+      // However we have to make sure to pad the buffer correctly, as sizeInWords could be a larger buffer
+      unsigned int sizeRoundedUp = sizeInWords * sizeof(int);
+      auto charBuffer = reinterpret_cast<char*>(buffer);
+      for (int pos = size; pos < sizeRoundedUp; pos++) {
+        charBuffer[pos] = 0;
+      }
+      size = sizeInWords;
 
       // Terminate messages make us terminate
       EvtMessage message(reinterpret_cast<char*>(buffer));

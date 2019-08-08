@@ -140,6 +140,13 @@ int EKLMElementNumbers::sectorNumber(int endcap, int layer, int sector) const
          sector;
 }
 
+int EKLMElementNumbers::sectorNumberKLMOrder(int endcap, int sector) const
+{
+  checkEndcap(endcap);
+  checkSector(sector);
+  return m_MaximalSectorNumber * (endcap - 1) + sector;
+}
+
 void EKLMElementNumbers::sectorNumberToElementNumbers(
   int sectorGlobal, int* endcap, int* layer, int* sector) const
 {
@@ -253,23 +260,8 @@ void EKLMElementNumbers::getAsicChannel(
   *asic = asicMod5 + m_MaximalSegmentNumber * (plane - 1);
 }
 
-int EKLMElementNumbers::getMaximalEndcapNumber() const
-{
-  return m_MaximalEndcapNumber;
-}
-
-int EKLMElementNumbers::getMaximalLayerNumber() const
-{
-  return m_MaximalLayerNumber;
-}
-
 int EKLMElementNumbers::getMaximalDetectorLayerNumber(int endcap) const
 {
   checkEndcap(endcap);
   return m_MaximalDetectorLayerNumber[endcap - 1];
-}
-
-int EKLMElementNumbers::getMaximalSegmentNumber() const
-{
-  return m_MaximalSegmentNumber;
 }

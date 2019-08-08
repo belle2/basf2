@@ -7,6 +7,8 @@ Test backwards compatibility for an mdst file produced with release-00-09-03.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-00-09-03:
+- EventMetaData:
+  + isEndOfRun
 - The default magnetic field is changed affecting all momentum measurements.
 - Track:
   * getTrackFitResult behavior changed for non-pion tracks
@@ -24,6 +26,7 @@ CHANGES since release-00-09-03:
   * getTimTypeBits is replaced by getTimType
 - SoftwareTriggerResult:
   * getTotalResult removed
+  * non-prescaled results added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel

@@ -364,8 +364,8 @@ void DataStore::replaceData(const StoreAccessorBase& from, const StoreAccessorBa
   } else if (fromEntry->objClass == RelationContainer::Class()) {
     if (!toEntry->ptr)
       toEntry->ptr = toEntry->object;
-    RelationContainer* fromRel = static_cast<RelationContainer*>(fromEntry->ptr);
-    RelationContainer* toRel = static_cast<RelationContainer*>(toEntry->ptr);
+    auto* fromRel = static_cast<RelationContainer*>(fromEntry->ptr);
+    auto* toRel = static_cast<RelationContainer*>(toEntry->ptr);
 
     toRel->elements().Delete();
 
@@ -389,7 +389,7 @@ void DataStore::updateRelationsObjectCache(StoreEntry& entry)
   const TClonesArray* array = static_cast<TClonesArray*>(entry.ptr);
   const int nEntries = array->GetEntriesFast();
   for (int i = 0; i < nEntries; i++) {
-    RelationsObject* relobj = static_cast<RelationsObject*>(array->At(i));
+    auto* relobj = static_cast<RelationsObject*>(array->At(i));
     relobj->m_cacheArrayIndex = i;
     relobj->m_cacheDataStoreEntry = &entry;
   }
@@ -400,7 +400,7 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   if (!entry or index < 0) {
     //usually entry/index should be passed for RelationsObject,
     //but there are exceptions -> let's check again
-    const RelationsObject* relObj = dynamic_cast<const RelationsObject*>(object);
+    const auto* relObj = dynamic_cast<const RelationsObject*>(object);
     if (relObj) {
       entry = relObj->m_cacheDataStoreEntry;
       index = relObj->m_cacheArrayIndex;
@@ -519,7 +519,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   // auto create relations if needed (both if null pointer, or uninitialised object read from TTree)
   if (!entry->ptr)
     entry->recreate();
-  RelationContainer* relContainer = static_cast<RelationContainer*>(entry->ptr);
+  auto* relContainer = static_cast<RelationContainer*>(entry->ptr);
   if (relContainer->isDefaultConstructed()) {
     relContainer->setFromName(fromEntry->name);
     relContainer->setFromDurability(c_Event);
@@ -575,13 +575,13 @@ RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TOb
     //get relations with object
     if (searchSide == c_ToSide) {
       for (const auto& rel : relIndex.getElementsFrom(object)) {
-        TObject* const toObject = const_cast<TObject*>(rel.to);
+        auto* const toObject = const_cast<TObject*>(rel.to);
         if (toObject)
           result.emplace_back(toObject, rel.weight);
       }
     } else {
       for (const auto& rel : relIndex.getElementsTo(object)) {
-        TObject* const fromObject = const_cast<TObject*>(rel.from);
+        auto* const fromObject = const_cast<TObject*>(rel.from);
         if (fromObject)
           result.emplace_back(fromObject, rel.weight);
       }
@@ -812,7 +812,7 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
   } else if (!entrylist_event.empty()) {
     //copy only given entries (in c_Event)
     targetidx = m_idToIndexMap.at(id);
-    for (auto entryname : entrylist_event) {
+    for (const auto& entryname : entrylist_event) {
       if (m_entries[m_currentIdx][c_Event].count(entryname) == 0)
         continue;
       if (m_entries[targetidx][c_Event].count(entryname) != 0) {

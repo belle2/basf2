@@ -11,8 +11,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
+#include <daq/slc/system/LockGuard.h>
 
 using namespace Belle2;
+
+Mutex DBObjectLoader::m_mutex;
 
 DBObject DBObjectLoader::load(const std::string& filename)
 {
@@ -83,12 +86,20 @@ DBObject DBObjectLoader::load(DBInterface& db,
   StringList list = DBObjectLoader::getDBlist(db, tablename, configname);
   if (list.size() == 0) return obj;
   StringList s = StringUtil::split(list[0], ',');
+  DBRecordList record_v;
   std::stringstream ss;
   ss << "select * from " << s[1] << " where pid =" << s[2] << " order by id";
-  db.execute(ss.str());
-  DBRecordList record_v(db.loadRecords());
+  try {
+    LockGuard lockGuard(m_mutex);
+    db.execute(ss.str());
+    record_v = db.loadRecords();
+  } catch (const DBHandlerException& e) {
+    throw;
+  }
+  int timestamp = 0;
   if (list.size() > 0) {
     configname = s[0];
+    timestamp = atoi(s[4].c_str());
   }
   ss.str("");
   ss << " config : " << configname << std::endl;
@@ -106,7 +117,9 @@ DBObject DBObjectLoader::load(DBInterface& db,
     }
   }
   ConfigFile conf(ss);
-  return DBObjectLoader::load(conf);
+  obj = DBObjectLoader::load(conf);
+  obj.setDate(timestamp);
+  return obj;
 }
 
 bool DBObjectLoader::add(DBObject& obj, StringList& str,
@@ -300,14 +313,22 @@ bool DBObjectLoader::createDB(DBInterface& db,
     LogFile::warning(e.what());
   }
   try {
-    db.execute("select max(id) as id from %s;", tablename_id.c_str());
+    db.execute("begin;");
+    bool failed = true;
     int id = 1;
-    DBRecordList record(db.loadRecords());
-    if (record.size() > 0) {
-      id = record[0].getInt("id") + 1;
+    try {
+      db.execute("insert into %s (name, content) values ('%s','%s') returning id;",
+                 tablename_id.c_str(), obj.getName().c_str(), tablename_date.c_str());
+      failed = false;
+      DBRecordList record(db.loadRecords());
+      if (record.size() > 0) {
+        id = record[0].getInt("id");
+      }
+    } catch (const DBHandlerException& e) {
+      LogFile::error(e.what());
     }
-    db.execute("insert into %s (name, id, content) values ('%s', %d, '%s');",
-               tablename_id.c_str(), obj.getName().c_str(), id, tablename_date.c_str());
+    db.execute("commit;");
+    if (failed) return false;
     std::string s = obj.printSQL(tablename_date, id);
     db.execute(s);
   } catch (const DBHandlerException& e) {
@@ -324,27 +345,28 @@ StringList DBObjectLoader::getDBlist(DBInterface& db,
   StringList str;
   try {
     if (!db.isConnected()) db.connect();
+    std::stringstream ss;
     if (grep.size() > 0) {
       const char* prefix = grep.c_str();
-      std::stringstream ss;
-      ss << "select id,name,content,to_char(record_time,'DD/MM HH24:MI:SS') as tdate from " << tablename << "_id where "
+      ss << "select id,name,content,to_char(record_time,'DD/MM HH24:MI:SS') as tdate, extract(epoch from record_time) as utime from " <<
+         tablename << "_id where "
          << "(name like '" << prefix << "_%' or "
          << "name like '" << prefix << "') order by id desc";
       if (max > 0) ss << " limit " << max;
       ss << ";";
-      db.execute(ss.str());
     } else {
-      std::stringstream ss;
-      ss << "select id,name,content,to_char(record_time,'DD/MM HH24:MI:SS') as tdate from " << tablename << "_id order by id desc";
+      ss << "select id,name,content,to_char(record_time,'DD/MM HH24:MI:SS') as tdate, extract(epoch from record_time) as utime from " <<
+         tablename << "_id order by id desc";
       if (max > 0) ss << " limit " << max;
       ss << ";";
-      db.execute(ss.str());
     }
+    LockGuard lockGuard(m_mutex);
+    db.execute(ss.str());
     DBRecordList record_v(db.loadRecords());
     for (size_t i = 0; i < record_v.size(); i++) {
       DBRecord& record(record_v[i]);
       str.push_back(record.get("name") + "," + record.get("content") + "," +
-                    record.get("id") + "," + record.get("tdate"));
+                    record.get("id") + "," + record.get("tdate") + "," + record.get("utime"));
     }
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());

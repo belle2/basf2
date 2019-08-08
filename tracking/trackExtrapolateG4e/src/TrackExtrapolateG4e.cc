@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
+#include <tracking/dbobjects/MuidParameters.h>
 #include <tracking/trackExtrapolateG4e/MuidPar.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -125,8 +126,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
   m_ExpNo(0), // modified later
-  m_bklmBadChannelsValid(false), // initialized later
-  m_eklmChannelsValid(false), // initialized later
+  m_klmChannelStatusValid(false), // initialized later
   m_eklmTransformData(NULL), // initialized later
   m_MuonPlusPar(NULL), // modified later
   m_MuonMinusPar(NULL), // modified later
@@ -155,6 +155,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
     m_BarrelSectorPerp[s] = G4ThreeVector(0.0, 0.0, 0.0);
     m_BarrelSectorPhi[s] = G4ThreeVector(0.0, 0.0, 0.0);
   }
+  m_klmElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 TrackExtrapolateG4e::~TrackExtrapolateG4e()
@@ -357,8 +358,12 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
 {
   StoreObjPtr<EventMetaData> evtMetaData;
   int expNo = evtMetaData->getExperiment();
-  B2DEBUG(1, (byMuid ? "muid" : "ext") << ": Experiment " << expNo << "  run " << evtMetaData->getRun());
+  B2DEBUG(20, (byMuid ? "muid" : "ext") << ": Experiment " << expNo << "  run " << evtMetaData->getRun());
   if (byMuid) {
+    if (!m_muidParameters.isValid())
+      B2FATAL("Muid parameters are not available.");
+    if (!m_klmStripEfficiency.isValid())
+      B2FATAL("KLM strip efficiency data are not available.");
     if (m_MuonPlusPar != NULL) {
       if (m_ExpNo == expNo) { return; }
       delete m_MuonPlusPar;
@@ -388,16 +393,11 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
     m_ElectronPar = new MuidPar(expNo, "Electron");
     m_PositronPar = new MuidPar(expNo, "Positron");
 
-    // Check availability of dead-channel lists for muid
-    m_bklmBadChannelsValid = m_bklmBadChannels.isValid();
-    if (!m_bklmBadChannelsValid) {
-      B2WARNING("BKLM bad-channel list requested but not available for experiment "
-                << expNo << " run " << evtMetaData->getRun());
-    }
+    // Check availability of KLM channel status for muid
     m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
-    m_eklmChannelsValid = m_eklmChannels.isValid();
-    if (!m_eklmChannelsValid) {
-      B2WARNING("EKLM channel database requested but not available for experiment "
+    m_klmChannelStatusValid = m_klmChannelStatus.isValid();
+    if (!m_klmChannelStatusValid) {
+      B2WARNING("KLM channel database requested but not available for experiment "
                 << expNo << " run " << evtMetaData->getRun());
     }
 
@@ -546,6 +546,7 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
 
   G4ThreeVector positionG4e = position * CLHEP::cm; // convert from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // convert from genfit2 units (GeV/c) to geant4 units (MeV/c)
+  // cppcheck-suppress knownConditionTrueFalse
   if (isCosmic) momentumG4e = -momentumG4e;
   G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
@@ -686,7 +687,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
           }
         }
       }
-      if (createMuidHit(extState, g4eState, bklmHitUsed)) {
+      if (createMuidHit(extState, g4eState, muid, bklmHitUsed)) {
         // Force geant4e to update its G4Track from the Kalman-updated state
         m_ExtMgr->GetPropagator()->SetStepN(0);
       }
@@ -795,16 +796,26 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   }
 
   if (klmClusterInfo != NULL) {
+    // here we set a relation only to the closest KLMCluster
+    // and we don't set any relation if the distance is too large
     StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
+    double minDistance = m_MaxKLMTrackClusterDistance;
+    unsigned int closestCluster = 0;
     for (unsigned int c = 0; c < klmClusterInfo->size(); ++c) {
-      if (klmHit[c].getDistance() > 1.0E9) continue;
+      if (klmHit[c].getDistance() > 1.0E9) {
+        continue;
+      }
       TrackClusterSeparation* h = trackClusterSeparations.appendNew(klmHit[c]);
       (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
-      extState.track->addRelationTo(h); // relation track to TrackSep
-      if (klmHit[c].getDistance() < m_MaxKLMTrackClusterDistance) {
-        // relation track->KLMCluster, the MDST obj KLMCluster assumes these exist for at least muons
-        extState.track->addRelationTo((*klmClusterInfo)[c].first);
+      extState.track->addRelationTo(h); // relation Track to TrackSep
+      if (klmHit[c].getDistance() < minDistance) {
+        closestCluster = c;
+        minDistance = klmHit[c].getDistance();
       }
+    }
+    if (minDistance < m_MaxKLMTrackClusterDistance) {
+      // set the relation Track to KLMCluster, using the distance as weight
+      extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / minDistance);
     }
   }
 
@@ -1311,7 +1322,7 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
 // Write another volume-entry point on track.
 // The track state will be modified here by the Kalman fitter.
 
-bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState& g4eState,
+bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState& g4eState, Muid* muid,
                                         std::vector<std::map<const Track*, double> >* bklmHitUsed)
 {
 
@@ -1333,6 +1344,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       if (findMatchingBarrelHit(intersection, extState.track)) {
         (*bklmHitUsed)[intersection.hit].insert(std::pair<const Track*, double>(extState.track, intersection.chi2));
         extState.extLayerPattern |= (0x00000001 << intersection.layer);
+        //efficiency implementation
+        muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
+                                        intersection.sector + 1, intersection.layer + 1, 1, 1));
         if (extState.lastBarrelExtLayer < intersection.layer) {
           extState.lastBarrelExtLayer = intersection.layer;
         }
@@ -1351,22 +1365,43 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         vector<G4VPhysicalVolume*>::iterator j = find(m_BKLMVolumes->begin(), m_BKLMVolumes->end(), g4eState.GetG4Track()->GetVolume());
         if (j != m_BKLMVolumes->end()) {
           int layer = intersection.layer + 1; // from 0-based to 1-based enumeration
-          bool isDead = false; // by default, the nearest orthogonal strips are not dead
-          if (m_bklmBadChannelsValid) {
+          bool isDead = true; // by default, the nearest orthogonal strips are dead
+          if (m_klmChannelStatusValid) {
             bool isForward = intersection.isForward;
             int fb = (isForward ? 1 : 0);
             int sector = intersection.sector + 1; // from 0-based to 1-based enumeration
             const bklm::Module* m = bklm::GeometryPar::instance()->findModule(isForward, sector, layer); // uses 1-based enumeration
             if (m) {
               const CLHEP::Hep3Vector localPosition = m->globalToLocal(intersection.position); // uses and returns position in cm
-              int zStrip = static_cast<int>(std::round(m->getZStrip(localPosition))); // uses position in cm
-              int phiStrip = static_cast<int>(std::round(m->getPhiStrip(localPosition))); // ditto
-              isDead = m_bklmBadChannels->isDeadChannel(fb, sector, layer, 0, zStrip) || // uses 1-based enumeration
-                       m_bklmBadChannels->isDeadChannel(fb, sector, layer, 1, phiStrip); // ditto
+              int zStrip = m->getZStripNumber(localPosition);
+              int phiStrip = m->getPhiStripNumber(localPosition);
+              if (zStrip >= 0 && phiStrip >= 0) {
+                uint16_t channel1, channel2;
+                channel1 = m_klmElementNumbers->channelNumberBKLM(
+                             fb, sector, layer, 0, zStrip);
+                channel2 = m_klmElementNumbers->channelNumberBKLM(
+                             fb, sector, layer, 1, phiStrip);
+                enum KLMChannelStatus::ChannelStatus status1, status2;
+                status1 = m_klmChannelStatus->getChannelStatus(channel1);
+                status2 = m_klmChannelStatus->getChannelStatus(channel2);
+                if (status1 == KLMChannelStatus::c_Unknown ||
+                    status2 == KLMChannelStatus::c_Unknown)
+                  B2ERROR("No KLM channel status data."
+                          << LogVar("Forward", fb) << LogVar("Sector", sector)
+                          << LogVar("Layer", layer) << LogVar("Z strip", zStrip)
+                          << LogVar("Phi strip", phiStrip));
+                isDead = (status1 == KLMChannelStatus::c_Dead ||
+                          status2 == KLMChannelStatus::c_Dead);
+              }
             }
           }
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+            //efficiency storage
+            muid->setExtBKLMEfficiencyValue(intersection.layer, m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0),
+                                            intersection.sector + 1, intersection.layer + 1, 1, 1));
+          } else {
+            muid->setExtBKLMEfficiencyValue(intersection.layer, 0);
           }
           if (extState.lastBarrelExtLayer < intersection.layer) {
             extState.lastBarrelExtLayer = intersection.layer;
@@ -1383,6 +1418,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       fromG4eToPhasespace(g4eState, intersection.covariance);
       if (findMatchingEndcapHit(intersection, extState.track)) {
         extState.extLayerPattern |= (0x00008000 << intersection.layer);
+        //        extState.extEKLMEfficiencyVector[intersection.layer] == 1; TODO
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
         }
@@ -1398,19 +1434,29 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
       } else {
         bool isDead = true;
-        int result, strip1, strip2;
-        result = m_eklmTransformData->getStripsByIntersection(
-                   intersection.position, &strip1, &strip2);
-        if (result == 0) {
-          const EKLMChannelData* channel1, *channel2;
-          channel1 = m_eklmChannels->getChannelData(strip1);
-          channel2 = m_eklmChannels->getChannelData(strip2);
-          if (channel1 == NULL || channel2 == NULL)
-            B2ERROR("Incomplete EKLM channel data.");
-          isDead = (!channel1->getActive()) || (!channel2->getActive());
+        if (m_klmChannelStatusValid) {
+          int result, strip1, strip2;
+          result = m_eklmTransformData->getStripsByIntersection(
+                     intersection.position, &strip1, &strip2);
+          if (result == 0) {
+            uint16_t channel1, channel2;
+            channel1 = m_klmElementNumbers->channelNumberEKLM(strip1);
+            channel2 = m_klmElementNumbers->channelNumberEKLM(strip2);
+            enum KLMChannelStatus::ChannelStatus status1, status2;
+            status1 = m_klmChannelStatus->getChannelStatus(channel1);
+            status2 = m_klmChannelStatus->getChannelStatus(channel2);
+            if (status1 == KLMChannelStatus::c_Unknown ||
+                status2 == KLMChannelStatus::c_Unknown)
+              B2ERROR("Incomplete KLM channel status data.");
+            isDead = (status1 == KLMChannelStatus::c_Dead ||
+                      status2 == KLMChannelStatus::c_Dead);
+          }
         }
         if (!isDead) {
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+          //          extState.extEKLMEfficiencyVector[intersection.layer] == 1; TODO
+        } else {
+          //          extState.extEKLMEfficiencyVector[intersection.layer] == 0; TODO
         }
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
@@ -1577,7 +1623,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
 
   if (bestHit >= 0) {
     BKLMHit2d* hit = bklmHits[bestHit];
-    intersection.isForward = hit->isForward();
+    intersection.isForward = (hit->getForward() == 1);
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
     double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};

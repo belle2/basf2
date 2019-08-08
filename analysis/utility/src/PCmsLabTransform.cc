@@ -26,8 +26,7 @@ TLorentzVector PCmsLabTransform::cmsToLab(const TLorentzVector& vector)
   return T.rotateCmsToLab() * vector;
 }
 
-PCmsLabTransform::PCmsLabTransform()
-{ }
+PCmsLabTransform::PCmsLabTransform() = default;
 
 const BeamParameters& PCmsLabTransform::getBeamParams() const
 {

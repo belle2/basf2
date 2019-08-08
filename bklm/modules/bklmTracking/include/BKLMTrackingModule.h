@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef  BKLMTRACKING_H
-#define  BKLMTRACKING_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -160,4 +159,3 @@ namespace Belle2 {
     std::vector<int> m_totalEventsWithTracks;
   };
 } // end namespace Belle2
-#endif

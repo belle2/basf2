@@ -14,8 +14,7 @@
 using namespace Belle2;
 
 // -----------------------------------------------------------------------------
-ClusterUtils::ClusterUtils()
-{ }
+ClusterUtils::ClusterUtils() = default;
 
 // -----------------------------------------------------------------------------
 const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, double mass)

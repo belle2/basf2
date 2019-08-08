@@ -12,13 +12,12 @@ import sys
 import inspect
 from vertex import *
 from kinfit import *
-from analysisPath import analysis_main
 from variables import variables
 import basf2_mva
 import pdg
 
 
-def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
+def setAnalysisConfigParams(configParametersAndValues, path):
     """
     Sets analysis configuration parameters.
 
@@ -55,7 +54,7 @@ def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entrySequence=None, *, parentLevel=0):
+def inputMdst(environmentType, filename, path, skipNEvents=0, entrySequence=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
@@ -77,7 +76,7 @@ def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entr
     inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
 
 
-def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, entrySequences=None, *, parentLevel=0):
+def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
 
@@ -165,7 +164,7 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
         path.add_module(fixECL)
 
 
-def outputMdst(filename, path=analysis_main):
+def outputMdst(filename, path):
     """
     Saves mDST (mini-Data Summary Tables) to the output root file.
     """
@@ -174,7 +173,7 @@ def outputMdst(filename, path=analysis_main):
     mdst.add_mdst_output(path, mc=True, filename=filename)
 
 
-def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main, dataDescription=None):
+def outputUdst(filename, particleLists=[], includeArrays=[], path=None, dataDescription=None):
     """
     Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
@@ -209,7 +208,8 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main,
                                 dataDescription=dataDescription)
 
 
-def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,
+def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[],
+                   includeArrays=[], path=None, *,
                    outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
@@ -307,7 +307,7 @@ def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
     path.add_module(r1)
 
 
-def setupEventInfo(noEvents, path=analysis_main):
+def setupEventInfo(noEvents, path):
     """
     Prepare to generate events. This function sets up the EventInfoSetter.
     You should call this before adding a generator from generators.
@@ -325,7 +325,7 @@ def setupEventInfo(noEvents, path=analysis_main):
     path.add_module(evtnumbers)
 
 
-def loadGearbox(path=analysis_main):
+def loadGearbox(path):
     """
     Loads Gearbox module to the path.
 
@@ -339,7 +339,7 @@ def loadGearbox(path=analysis_main):
     path.add_module(paramloader)
 
 
-def printPrimaryMCParticles(path=analysis_main):
+def printPrimaryMCParticles(path):
     """
     Prints all primary MCParticles.
     """
@@ -348,7 +348,7 @@ def printPrimaryMCParticles(path=analysis_main):
     path.add_module(mcparticleprinter)
 
 
-def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=analysis_main):
+def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
     """
@@ -363,7 +363,7 @@ def copyList(
     outputListName,
     inputListName,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Copy all Particle indices from input ParticleList to the output ParticleList.
@@ -386,7 +386,7 @@ def correctFSR(
     angleThreshold=5.0,
     energyThreshold=1.0,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Takes the particles from the given lepton list copies them to the output list and adds the
@@ -420,7 +420,7 @@ def copyLists(
     outputListName,
     inputListNames,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Copy all Particle indices from all input ParticleLists to the single output ParticleList.
@@ -445,7 +445,7 @@ def copyParticles(
     outputListName,
     inputListName,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Create copies of Particles given in the input ParticleList and add them to the output ParticleList.
@@ -480,21 +480,31 @@ def cutAndCopyLists(
     inputListNames,
     cut,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from all input ParticleLists to
-    the single output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from all lists in ``inputListNames`` to
+    ``outputListName`` if they pass ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        Require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (list(str)): list of input ParticleList names
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
@@ -509,21 +519,31 @@ def cutAndCopyList(
     inputListName,
     cut,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
-    Copy Particle indices that pass selection criteria from the input ParticleList to
-    the output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Copy candidates from ``inputListName`` to ``outputListName`` if they pass
+    ``cut`` (given selection criteria).
 
-    @param ouputListName copied ParticleList
-    @param inputListName vector of original ParticleLists to be copied
-    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        Note the Particles themselves are not copied.
+        The original and copied ParticleLists will point to the same Particles.
+
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> cutAndCopyLists("pi+:energeticPions", "pi+:loose", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        outputListName (str): the new ParticleList name
+        inputListName (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        writeOut (bool): whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
     """
-
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
@@ -550,7 +570,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
-                      path=analysis_main,
+                      path=None,
                       enforceFitHypothesis=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
@@ -631,7 +651,7 @@ def fillParticleList(
     decayString,
     cut,
     writeOut=False,
-    path=analysis_main,
+    path=None,
     enforceFitHypothesis=False
 ):
     """
@@ -698,7 +718,7 @@ def fillParticleListWithTrackHypothesis(
     hypothesis,
     writeOut=False,
     enforceFitHypothesis=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     As fillParticleList, but if used for a charged FSP, loads the particle with the requested hypothesis if available
@@ -728,7 +748,7 @@ def fillConvertedPhotonsList(
     decayString,
     cut,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Creates photon Particle object for each e+e- combination in the V0 StoreArray.
@@ -756,12 +776,51 @@ def fillConvertedPhotonsList(
     path.add_module(pload)
 
 
+def fillParticleListFromROE(
+    decayString,
+    cut,
+    maskName='',
+    sourceParticleListName='',
+    useMissing=False,
+    writeOut=False,
+    path=None,
+):
+    """
+    Creates Particle object for each ROE of the desired type found in the
+    StoreArray<RestOfEvent>, loads them to the StoreArray<Particle>
+    and fills the ParticleList. If useMissing is True, then the missing
+    momentum is used instead of ROE.
+
+    The type of the particles to be loaded is specified via the decayString module parameter.
+
+    @param decayString             specifies type of Particles and determines the name of the ParticleList.
+                                   Source ROEs can be taken as a daughter list, for example:
+                                   'B0:tagFromROE -> B0:signal'
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param maskName                Name of the ROE mask to use
+    @param sourceParticleListName  Use related ROEs to this particle list as a source
+    @param useMissing              Use missing momentum instead of ROE momentum
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('writeOut', writeOut)
+    pload.param('roeMaskName', maskName)
+    pload.param('useMissing', useMissing)
+    pload.param('sourceParticleListName', sourceParticleListName)
+    pload.param('useROEs', True)
+    path.add_module(pload)
+
+
 def fillParticleListFromMC(
     decayString,
     cut,
     addDaughters=False,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
@@ -789,7 +848,7 @@ def fillParticleListsFromMC(
     decayStringsWithCuts,
     addDaughters=False,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
@@ -817,14 +876,23 @@ def fillParticleListsFromMC(
     path.add_module(pload)
 
 
-def applyCuts(list_name, cut, path=analysis_main):
+def applyCuts(list_name, cut, path):
     """
-    Removes StoreArray<Particle> indices of Particles from given ParticleList
-    that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes particle candidates from ``list_name`` that do not pass ``cut``
+    (given selection criteria).
 
-    @param list_name input ParticleList name
-    @param cut  Particles that do not pass these selection criteria are removed from the ParticleList
-    @param path      modules are added to this path
+    Example:
+        require energetic pions safely inside the cdc
+
+        >>> applyCuts("pi+:mypions", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        list_name (str): input ParticleList name
+        cut (str): Candidates that do not pass these selection criteria are removed from the ParticleList
+        path (basf2.Path): modules are added to this path
     """
 
     pselect = register_module('ParticleSelector')
@@ -834,12 +902,21 @@ def applyCuts(list_name, cut, path=analysis_main):
     path.add_module(pselect)
 
 
-def applyEventCuts(cut, path=analysis_main):
+def applyEventCuts(cut, path):
     """
-    Removes events that do not pass the given selection criteria (given in ParticleSelector style).
+    Removes events that do not pass the ``cut`` (given selection criteria).
 
-    @param cut  Events that do not pass these selection criteria are skipped
-    @param path      modules are added to this path
+    Example:
+        continuum events (in mc only) with more than 5 tracks
+
+        >>> applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
+
+    Warning:
+        You must use square braces ``[`` and ``]`` for conditional statements.
+
+    Parameters:
+        cut (str): Events that do not pass these selection criteria are skipped
+        path (basf2.Path): modules are added to this path
     """
 
     eselect = register_module('VariableToReturnValue')
@@ -854,16 +931,21 @@ def reconstructDecay(
     cut,
     dmID=0,
     writeOut=False,
-    path=analysis_main,
+    path=None,
     candidate_limit=None,
     ignoreIfTooManyCandidates=True,
 ):
-    """
+    r"""
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
-    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+    reconstructed as well (meaning that the charge conjugated mother list is created as well). One cay use an
+    at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
+    is marked as unspecified, it will not checked for its identity when doing :ref:`MCMatching`. Any particle which
+    decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
+    would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
+    need to be stated correctly so this can be used for "sum of exclusive" decays
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -897,21 +979,52 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def combineAllParticles(
+    inputParticleLists,
+    outputList,
+    cut='',
+    writeOut=False,
+    path=None
+):
+    """
+    Creates a new Particle as the combination of all Particles from all
+    provided inputParticleLists. However, each particle is used only once
+    (even if duplicates are provided) and the combination has to pass the
+    specified selection criteria to be saved in the newly created (mother)
+    ParticleList.
+
+    @param inputParticleLists List of input particle lists which are combined to the new Particle
+    @param outputList         Name of the particle combination created with this module
+    @param cut                created (mother) Particle is added to the mother ParticleList if it passes
+                              these given cuts (in VariableManager style) and is rejected otherwise
+    @param writeOut           whether RootOutput module should save the created ParticleList
+    @param path               module is added to this path
+    """
+
+    pmake = register_module('AllParticleCombiner')
+    pmake.set_name('AllParticleCombiner_' + outputList)
+    pmake.param('inputListNames', inputParticleLists)
+    pmake.param('outputListName', outputList)
+    pmake.param('cut', cut)
+    pmake.param('writeOut', writeOut)
+    path.add_module(pmake)
+
+
 def reconstructMissingKlongDecayExpert(
     decayString,
     cut,
     dmID=0,
     writeOut=False,
-    path=analysis_main,
+    path=None,
     recoList="_reco",
 ):
     """
-    Creates mother particle accounting for missing momentum.
+    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         created (mother) Particles are added to the mother ParticleList if they
-                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param cut         Particles are added to the K_L0 ParticleList if they
+                       pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
@@ -925,7 +1038,7 @@ def reconstructMissingKlongDecayExpert(
     pcalc.param('decayMode', dmID)
     pcalc.param('writeOut', writeOut)
     pcalc.param('recoList', recoList)
-    analysis_main.add_module(pcalc)
+    path.add_module(pcalc)
 
     rmake = register_module('KlongDecayReconstructorExpert')
     rmake.set_name('KlongDecayReconstructorExpert_' + decayString)
@@ -934,14 +1047,14 @@ def reconstructMissingKlongDecayExpert(
     rmake.param('decayMode', dmID)
     rmake.param('writeOut', writeOut)
     rmake.param('recoList', recoList)
-    analysis_main.add_module(rmake)
+    path.add_module(rmake)
 
 
 def replaceMass(
     replacerName,
     particleLists=[],
     pdgCode=22,
-    path=analysis_main,
+    path=None,
 ):
     """
     replaces the mass of the particles inside the given particleLists
@@ -965,7 +1078,7 @@ def reconstructRecoil(
     cut,
     dmID=0,
     writeOut=False,
-    path=analysis_main,
+    path=None,
     candidate_limit=None,
 ):
     """
@@ -1010,7 +1123,7 @@ def reconstructRecoilDaughter(
     cut,
     dmID=0,
     writeOut=False,
-    path=analysis_main,
+    path=None,
     candidate_limit=None,
 ):
     """
@@ -1057,14 +1170,26 @@ def rankByHighest(
     outputVariable='',
     allowMultiRank=False,
     cut='',
-    path=analysis_main,
+    path=None,
 ):
     """
     Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
-    in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
+    in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
+    The list is also sorted from best to worst candidate
     (each charge, e.g. B+/B-, separately).
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
+
+    .. tip::
+        Extra-info fields can be accessed by the :b2:var:`extraInfo` metavariable.
+        These variable names can become clunky, so it's probably a good idea to set an alias.
+        For example if you rank your B candidates by momentum,
+
+        .. code:: python
+
+            rankByHighest("B0:myCandidates", "p", path=mypath)
+            vm.addAlias("momentumRank", "extraInfo(p_rank)")
+
 
     @param particleList     The input ParticleList
     @param variable         Variable to order Particles by.
@@ -1093,14 +1218,26 @@ def rankByLowest(
     outputVariable='',
     allowMultiRank=False,
     cut='',
-    path=analysis_main,
+    path=None,
 ):
     """
     Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
-    in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
+    in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
+    The list is also sorted from best to worst candidate
     (each charge, e.g. B+/B-, separately).
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
+
+    .. tip::
+        Extra-info fields can be accessed by the :b2:var:`extraInfo` metavariable.
+        These variable names can become clunky, so it's probably a good idea to set an alias.
+        For example if you rank your B candidates by :b2:var:`dM`,
+
+        .. code:: python
+
+            rankByLowest("B0:myCandidates", "dM", path=mypath)
+            vm.addAlias("massDifferenceRank", "extraInfo(dM_rank)")
+
 
     @param particleList     The input ParticleList
     @param variable         Variable to order Particles by.
@@ -1123,7 +1260,7 @@ def rankByLowest(
     path.add_module(bcs)
 
 
-def printDataStore(eventNumber=-1, path=analysis_main):
+def printDataStore(eventNumber=-1, path=None):
     """
     Prints the contents of DataStore in the first event (or a specific event number or all events).
     Will list all objects and arrays (including size).
@@ -1146,7 +1283,7 @@ def printDataStore(eventNumber=-1, path=analysis_main):
     path.add_module(printDS)
 
 
-def printVariableValues(list_name, var_names, path=analysis_main):
+def printVariableValues(list_name, var_names, path):
     """
     Prints out values of specified variables of all Particles included in given ParticleList. For debugging purposes.
 
@@ -1163,7 +1300,7 @@ def printVariableValues(list_name, var_names, path=analysis_main):
     path.add_module(prlist)
 
 
-def printList(list_name, full, path=analysis_main):
+def printList(list_name, full, path):
     """
     Prints the size and executes Particle->print() (if full=True)
     method for all Particles in given ParticleList. For debugging purposes.
@@ -1180,74 +1317,12 @@ def printList(list_name, full, path=analysis_main):
     path.add_module(prlist)
 
 
-def ntupleFile(file_name, path=analysis_main):
-    """
-    Warning:
-        NtupleTools are going to be deprecated from release-03 and we aim to
-        remove them from release-04.  Please see
-        `modularAnalysis.variablesToNtuple` for the recommended alternative.
-
-    Creates new ROOT file to which the flat ntuples will be saved.
-
-    Parameters:
-        file_name (str): file name of the output root file
-        path (basf2.Path): modules are added to this path
-    """
-
-    message = (
-        "NtupleTools are going to be deprecated from release-03 and we"
-        " aim to remove them from release-04.\nPlease see "
-        "modularAnalysis.variablesToNtuple for the recommended alternative."
-    )
-    B2WARNING(message)
-
-    ntmaker = register_module('NtupleMaker')
-    ntmaker.set_name('NtupleMaker_ntupleFile_' + file_name)
-    ntmaker.param('fileName', file_name)
-    path.add_module(ntmaker)
-
-
-def ntupleTree(
-    tree_name,
-    list_name,
-    tools,
-    path=analysis_main,
-):
-    """
-    Warning:
-        NtupleTools are going to be deprecated from release-03 and we aim to
-        remove them from release-04.  Please see
-        `modularAnalysis.variablesToNtuple` for the recommended alternative.
-
-    Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
-
-    Parameters:
-        tree_name (str): the output nutple (TTree) name
-        list_name (str): input ParticleList name
-        tools (list(str)): list of Ntuple tools to be included, tool-decaystring pairs.
-    """
-
-    message = (
-        "NtupleTools are going to be deprecated from release-03 and we"
-        " aim to remove them from release-04.\nPlease see "
-        "modularAnalysis.variablesToNtuple for the recommended alternative."
-    )
-    B2WARNING(message)
-
-    ntmaker = register_module('NtupleMaker')
-    ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
-    ntmaker.param('treeName', tree_name)
-    ntmaker.param('listName', list_name)
-    ntmaker.param('tools', tools)
-    path.add_module(ntmaker)
-
-
 def variablesToNtuple(
     decayString,
     variables,
     treename='variables',
     filename='ntuple.root',
-    path=analysis_main,
+    path=None,
 ):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
@@ -1276,7 +1351,9 @@ def variablesToHistogram(
     variables,
     variables_2d=[],
     filename='ntuple.root',
-    path=analysis_main,
+    path=None, *,
+    directory=None,
+    prefixDecayString=False,
 ):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
@@ -1287,6 +1364,10 @@ def variablesToHistogram(
         variables_2d (list(tuple)): pair of variables + binning for each which must be registered in the VariableManager
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
+        directory (str): directory inside the output file where the histograms should be saved.
+            Useful if you want to have different histograms in the same file to separate them.
+        prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
+            programmatic naming of the structure in the file.
     """
 
     output = register_module('VariablesToHistogram')
@@ -1295,6 +1376,12 @@ def variablesToHistogram(
     output.param('variables', variables)
     output.param('variables_2d', variables_2d)
     output.param('fileName', filename)
+    if directory is not None or prefixDecayString:
+        if directory is None:
+            directory = ""
+        if prefixDecayString:
+            directory = decayString + "_" + directory
+        output.param("directory", directory)
     path.add_module(output)
 
 
@@ -1302,7 +1389,7 @@ def variablesToExtraInfo(
     particleList,
     variables,
     option=0,
-    path=analysis_main,
+    path=None,
 ):
     """
     For each particle in the input list the selected variables are saved in an extra-info field with the given name.
@@ -1330,7 +1417,7 @@ def variablesToDaughterExtraInfo(
     decayString,
     variables,
     option=0,
-    path=analysis_main,
+    path=None,
 ):
     """
     For each daughter particle specified via decay string the selected variables (estimated for the mother particle)
@@ -1378,7 +1465,49 @@ def variableToSignalSideExtraInfo(
     path.add_module(mod)
 
 
-def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=analysis_main):
+def signalRegion(
+        particleList,
+        cut,
+        path=None,
+        name="isSignalRegion",
+        blind_data=True,
+):
+    """
+    Define and blind a signal region.
+    Per default, the defined signal region is cut out if ran on data.
+    This function will provide a new variable 'isSignalRegion' as default, which is either 0 or 1 depending on the cut
+    provided.
+
+    Example:
+        >>> ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
+        >>> ma.signalRegion("B+:sig",
+        >>>                  "Mbc>5.27 and abs(deltaE)<0.2",
+        >>>                  blind_data=True,
+        >>>                  path=path)
+        >>> ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
+
+    Parameters:
+        particleList (str):     The input ParticleList
+        cut (str):              Cut string describing the signal region
+        path (basf2.Path)::     Modules are added to this path
+        name (str):             Name of the Signal region in the variable manager
+        blind_data (bool):      Automatically exclude signal region from data
+
+    """
+
+    mod = register_module('VariablesToExtraInfo')
+    mod.set_name(f'{name}_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', {f"passesCut({cut})": name})
+    variables.addAlias(name, f"extraInfo({name})")
+    path.add_module(mod)
+
+    # Check if we run on Data
+    if blind_data:
+        applyCuts(particleList, f"{name}==0 or isMC==1", path=path)
+
+
+def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
     """
     Removes the ExtraInfo of the given particleLists. If specified (removeEventExtraInfo = True) also the EventExtraInfo is removed.
     """
@@ -1447,7 +1576,7 @@ def findMCDecay(
     list_name,
     decay,
     writeOut=False,
-    path=analysis_main,
+    path=None,
 ):
     """
     The MCDecayFinder module is buggy at the moment. Not to be used.
@@ -1461,7 +1590,7 @@ def findMCDecay(
     path.add_module(decayfinder)
 
 
-def summaryOfLists(particleLists, path=analysis_main):
+def summaryOfLists(particleLists, path):
     """
     Prints out Particle statistics at the end of the job: number of events with at
     least one candidate, average number of candidates per event, etc.
@@ -1474,7 +1603,7 @@ def summaryOfLists(particleLists, path=analysis_main):
     path.add_module(particleStats)
 
 
-def matchMCTruth(list_name, path=analysis_main):
+def matchMCTruth(list_name, path):
     """
     Performs MC matching (sets relation Particle->MCParticle) for
     all particles (and its (grand)^N-daughter particles) in the specified
@@ -1490,7 +1619,7 @@ def matchMCTruth(list_name, path=analysis_main):
     path.add_module(mcMatch)
 
 
-def looseMCTruth(list_name, path=analysis_main):
+def looseMCTruth(list_name, path):
     """
     Performs loose MC matching for all particles in the specified
     ParticleList.
@@ -1521,7 +1650,7 @@ def looseMCTruth(list_name, path=analysis_main):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main):
+def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=False, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1531,13 +1660,17 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     @param inputParticlelists list of input particle list names, which serve
                               as a source of particles to build ROE, the FSP particles from
                               target_list_name are excluded from ROE object
+    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
     # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
-    fillParticleList('gamma:roe_default', '', path=path)
-    fillParticleList('K_L0:roe_default', '', path=path)
-    inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    if not belle_sources:
+        fillParticleList('gamma:roe_default', '', path=path)
+        fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
+        inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    else:
+        inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
@@ -1545,7 +1678,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     path.add_module(roeBuilder)
 
 
-def buildNestedRestOfEvent(target_list_name, maskName='', path=analysis_main):
+def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     """
@@ -1563,7 +1696,7 @@ def appendROEMask(
     trackSelection,
     eclClusterSelection,
     fractions=[0, 0, 1, 0, 0, 0],
-    path=analysis_main
+    path=None
 ):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
@@ -1598,7 +1731,7 @@ def appendROEMask(
     path.add_module(roeMask)
 
 
-def appendROEMasks(list_name, mask_tuples, path=analysis_main):
+def appendROEMasks(list_name, mask_tuples, path=None):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
     selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
@@ -1642,7 +1775,7 @@ def updateROEMask(
     trackSelection,
     eclClusterSelection='',
     fractions=[],
-    path=analysis_main
+    path=None
 ):
     """
     Update an existing ROE mask by applying additional selection cuts for tracks and/or clusters
@@ -1671,7 +1804,7 @@ def updateROEFractions(
     list_name,
     mask_name,
     fractions,
-    path=analysis_main
+    path
 ):
     """
     Update chargedStable fractions for an existing ROE mask.
@@ -1693,7 +1826,7 @@ def updateROEFractions(
 def updateROEMasks(
     list_name,
     mask_tuples,
-    path=analysis_main
+    path
 ):
     """
     Update existing ROE masks by applying additional selection cuts for tracks and/or clusters
@@ -1724,7 +1857,7 @@ def keepInROEMasks(
     mask_names,
     cut_string,
     fractions=[],
-    path=analysis_main
+    path=None
 ):
     """
     This function is used to apply particle list specific cuts on one or more ROE masks (track or eclCluster).
@@ -1778,7 +1911,7 @@ def discardFromROEMasks(
     mask_names,
     cut_string,
     fractions=[],
-    path=analysis_main
+    path=None
 ):
     """
     This function is used to apply particle list specific cuts on one or more ROE masks (track or eclCluster).
@@ -1831,7 +1964,7 @@ def optimizeROEWithV0(
     mask_names,
     cut_string,
     fractions=[],
-    path=analysis_main
+    path=None
 ):
     """
     This function is used to apply particle list specific cuts on one or more ROE masks for Tracks.
@@ -1889,7 +2022,7 @@ def printROEInfo(
     @param full_print   print out mask values for each Track/ECLCLuster in mask
     @param path         modules are added to this path
     """
-    if not isinstance(path, basf2.Path):
+    if not isinstance(path, Path):
         B2FATAL("Error from printROEInfo, please add this to the for_each path")
 
     printMask = register_module('RestOfEventPrinter')
@@ -1900,7 +2033,7 @@ def printROEInfo(
     path.add_module(printMask)
 
 
-def buildContinuumSuppression(list_name, roe_mask, path=analysis_main):
+def buildContinuumSuppression(list_name, roe_mask, path):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
@@ -1916,7 +2049,7 @@ def buildContinuumSuppression(list_name, roe_mask, path=analysis_main):
     path.add_module(qqBuilder)
 
 
-def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
+def removeParticlesNotInLists(lists_to_keep, path):
     """
     Removes all Particles that are not in a given list of ParticleLists (or daughters of those).
     All relations from/to Particles, daughter indices, and other ParticleLists are fixed.
@@ -1930,7 +2063,7 @@ def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
     path.add_module(mod)
 
 
-def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_name, input_lists_names, path=analysis_main):
+def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_name, input_lists_names, path):
     """
     Reconstructs Btag from particles in given ParticleLists which do not share any final state particles (mdstSource) with Bsig.
 
@@ -1948,7 +2081,7 @@ def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_nam
     path.add_module(btag)
 
 
-def selectDaughters(particle_list_name, decay_string, path=analysis_main):
+def selectDaughters(particle_list_name, decay_string, path):
     """
     Redefine the Daughters of a particle: select from decayString
 
@@ -1962,7 +2095,7 @@ def selectDaughters(particle_list_name, decay_string, path=analysis_main):
     path.add_module(seld)
 
 
-def markDuplicate(particleList, prioritiseV0, path=analysis_main):
+def markDuplicate(particleList, prioritiseV0, path):
     """
     Call DuplicateVertexMarker to find duplicate particles in a list and
     flag the ones that should be kept
@@ -1976,7 +2109,7 @@ def markDuplicate(particleList, prioritiseV0, path=analysis_main):
     path.add_module(markdup)
 
 
-def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
+def V0ListMerger(firstList, secondList, prioritiseV0, path):
     """
     Merge two particle lists, vertex them and trim duplicates
 
@@ -2006,7 +2139,7 @@ def writePi0EtaVeto(
     etavetoname='Eta_Prob',
     downloadFlag=True,
     selection='',
-    path=analysis_main,
+    path=None
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -2107,7 +2240,7 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_main):
+def buildEventKinematics(inputListNames=[], default_cleanup=True, path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
     using ParticleLists provided. If no ParticleList is provided, default ParticleLists are used
@@ -2161,7 +2294,7 @@ def buildEventShape(inputListNames=[],
                     sphericity=True,
                     thrust=True,
                     checkForDuplicates=False,
-                    path=analysis_main):
+                    path=None):
     """
     Calculates the event shape quantities (thrust, sphericity, Fox-Wolfram moments...) using the
     particles in the lists provided by the user.
@@ -2221,17 +2354,18 @@ def buildEventShape(inputListNames=[],
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(path=analysis_main):
+def labelTauPairMC(printDecayInfo=False, path=None):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
+    @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
     """
     tauDecayMarker = register_module('TauDecayMarker')
     tauDecayMarker.set_name('TauDecayMarker_')
 
-    path.add_module(tauDecayMarker)
+    path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
 
 
 def tagCurlTracks(particleLists,
@@ -2241,7 +2375,7 @@ def tagCurlTracks(particleLists,
                   selectorType='cUt',
                   ptCut=0.6,
                   train=False,
-                  path=analysis_main):
+                  path=None):
     """
     Warning:
         The cut selector is not calibrated with Belle II data and should not be used without extensive study.
@@ -2290,7 +2424,7 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
-def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path=analysis_main):
+def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
     """
     Apply an MVA (BDT) to perform particle identification for charged stable particles using `ChargedPidMVA` module.
 
@@ -2321,12 +2455,12 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path=analy
 
         The MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
 
-    The MVA algorithm used is a gradient boosted decision tree (`TMVA 4.2.1`, `ROOT 6.14/06`).
+    The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.2.1**, **ROOT 6.14/06**).
 
     Parameters:
         sigHypoPDGCode (int): the pdgId of the signal mass hypothesis.
         bkgHypoPDGCode (int): the pdgId of the background mass hypothesis.
-        particleLists list(str): list of names of ParticleList objects for charged stable particles.
+        particleLists (list): list of names of ParticleList objects for charged stable particles.
                                  The charge-conjugate ParticleLists will be also stored automatically.
         path (basf2.Path): the module is added to this path.
 
@@ -2356,6 +2490,4 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path=analy
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module
-    pretty_print_module(__name__, "modularAnalysis", {
-        repr(analysis_main): "analysis_main",
-    })
+    pretty_print_module(__name__, "modularAnalysis")

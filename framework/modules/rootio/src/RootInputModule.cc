@@ -443,10 +443,9 @@ void RootInputModule::readTree()
     }
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
-    if (!m_recovery or fileMetaData)
-      B2INFO("Loading new input file"
-             << LogVar("filename", m_tree->GetFile()->GetName())
-             << LogVar("metadata LFN", fileMetaData->getLfn()));
+    B2INFO("Loading new input file"
+           << LogVar("filename", m_tree->GetFile()->GetName())
+           << LogVar("metadata LFN", fileMetaData->getLfn()));
   }
 
   for (auto entry : m_storeEntries) {
@@ -475,9 +474,7 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
   //Go over the branchlist and connect the branches with DataStore entries
   const TObjArray* branches = tree->GetListOfBranches();
   if (!branches) {
-    const auto loglevel = m_recovery ? LogConfig::c_Warning : LogConfig::c_Fatal;
-    B2LOG(loglevel, 0, "Tree '" << tree->GetName() << "' doesn't contain any branches!");
-    return false; //stop in case this wasn't fatal
+    B2FATAL("Tree '" << tree->GetName() << "' doesn't contain any branches!");
   }
   set<string> branchList;
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
@@ -721,9 +718,7 @@ void RootInputModule::readPersistentEntry(long fileEntry)
   int bytesRead = m_persistent->GetEntry(fileEntry);
   if (bytesRead <= 0) {
     const char* name = m_tree->GetCurrentFile() ? m_tree->GetCurrentFile()->GetName() : "<unknown>";
-    const auto loglevel = m_recovery ? LogConfig::c_Warning : LogConfig::c_Fatal;
-    B2LOG(loglevel, 0, "Could not read 'persistent' TTree #" << fileEntry << " in file " << name);
-    return;
+    B2FATAL("Could not read 'persistent' TTree #" << fileEntry << " in file " << name);
   }
 
   for (auto entry : m_persistentStoreEntries) {

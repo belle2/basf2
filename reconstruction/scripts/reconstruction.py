@@ -625,3 +625,42 @@ def add_dedx_modules(path, components=None):
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
+
+
+def prepare_cdst_analysis(path, components=None):
+    """
+    Adds to a (analysis) path all the modules needed to
+    analyse a cdsts file in the raw+tracking format.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    # unpackers
+    add_unpackers(path, components=components)
+
+    # this is currently just calls add_ecl_modules
+    add_pretracking_reconstruction(path, components=components)
+
+    # needed to retrieve the PXD and SVD clusters out of the raws
+    if components is None or 'SVD' in components:
+        add_svd_reconstruction(path)
+    if components is None or 'PXD' in components:
+        add_pxd_reconstruction(path)
+
+    # check, this one may not be needed...
+    path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
+    # from here on mostly a replica of add_posttracking_reconstruction without dE/dx, prunetracks and eventT0 modules
+    add_ext_module(path, components)
+    add_top_modules(path, components)
+    add_arich_modules(path, components)
+    add_ecl_finalizer_module(path, components)
+    add_ecl_mc_matcher_module(path, components)
+    add_klm_modules(path, components)
+    add_klm_mc_matcher_module(path, components)
+    add_muid_module(path, components=components)
+    add_ecl_track_cluster_modules(path, components)
+    add_ecl_cluster_properties_modules(path, components)
+    add_ecl_eip_module(path, components)
+    add_pid_module(path, components)
+    add_ecl_track_brem_finder(path, components)

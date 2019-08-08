@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include <simulation/dataobjects/SimHitBase.h>
-#include <framework/datastore/RelationsObject.h>
+#include <bklm/dataobjects/BKLMElementNumbers.h>
 #include <bklm/dataobjects/BKLMStatus.h>
+#include <framework/datastore/RelationsObject.h>
+#include <simulation/dataobjects/SimHitBase.h>
 
 //#define BKLM_INNER 1
 //#define BKLM_OUTER 2
@@ -49,8 +50,8 @@ namespace Belle2 {
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
     //! Get detector end
-    //! @return detector end (TRUE=forward or FALSE=backward) of this hit
-    bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
+    //! @return detector end (1=forward or 0=backward) of this hit
+    int getForward() const { return ((m_ModuleID & BKLM_END_MASK) >> BKLM_END_BIT); }
 
     //! Get sector number
     //! @return sector number of this hit
@@ -60,8 +61,9 @@ namespace Belle2 {
     //! @return layer number of this hit
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
-    //! returns plane (0=inner or 1=outer) of this hit
-    //int getPlane() const { return (((m_ModuleID & BKLM_PLANE_MASK) != 0) ? BKLM_INNER : BKLM_OUTER); }
+    //! Get plane number.
+    //! @return Plane number (0=z, 1=phi).
+    bool getPlane() const { return BKLMElementNumbers::getPlaneByModule(m_ModuleID);}
 
     //! Get readout coordinate
     //! @return readout coordinate (TRUE=phi, FALSE=z) of this hit
@@ -69,11 +71,11 @@ namespace Belle2 {
 
     //! Get strip number of this hit
     //! @return readout strip number of this hit (assuming one strip per hit)
-    int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStrip() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get lowest readout strip number of a contiguous set
     //! @return lowest readout strip number of this hit (assuming a contiguous set of RPC strips)
-    int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+    int getStripMin() const { return BKLMElementNumbers::getStripByModule(m_ModuleID); }
 
     //! Get highest readout strip number of a contiguous set
     //! @return highest readout strip number of this hit (assuming a contiguous set of RPC strips)

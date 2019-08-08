@@ -13,13 +13,14 @@ Core
 
 .. b2-variables::
         :variables: mcPDG,mcErrors
+        :noindex:
 
 ~~~~~~~~~~~
 Convenience
 ~~~~~~~~~~~
 
 .. b2-variables::
-        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
 -----------
@@ -142,15 +143,7 @@ Skipping of intermediate states in decay chain not supported yet, e.g. $B \to \p
 MC decay string
 ---------------
 
-See more at `confluence page <https://confluence.desy.de/display/BI/Physics+MCDecayString#PhysicsMCDecayString-Status>`_
-
 Analysis module to search for a generator-level decay string for given particle.
-
-~~~~~~
-Status
-~~~~~~
-
-Prior to release-01-00-00 the MCDecayString could only be used with NtupleTools via a hashed version, and a separate output file containing the hashes and the full decay strings, by matching the hashes between the two files.  See the section below for how to include this information in pre release-01-00-00 NtupleFiles.
 
 ~~~~~~~~~~~~~~~~~~
 Using decay hashes
@@ -159,105 +152,6 @@ Using decay hashes
 The use of decay hashes is demonstrated in :code:`B2A502-WriteOutDecayHash.py` and :code:`B2A503-ReadDecayHash.py`.
 
 B2A502-WriteOutDecayHash.py creates one ROOT file, via `variablesToNtuple` containing the requested variables including the two decay hashes, and a second root file containing the two decay hashes, and the full decay string.  The decay strings can be related to the candidates that they are associated with by matching up the decay hashes.  An example of this using python is shown in B2A503-ReadDecayHash.py.
-
-~~~~~~~~~~~~~~~~~~~~~~~~
-Including the NtupleTool
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-To use the MCDecayString as an NtupleTool, it is necessary to include the module ParticleMCDecayStringModule, for example:
-
-.. code-block:: python
-
-  main.add_module('ParticleMCDecayString', listName='D*+')
-
-The NtupleTool can then be added, as follows:
-
-.. code-block:: python
-
-  toolsDST += ['MCDecayString', '^D*+']
-
-
-This can be seen in the tutorial: :code:`analysis/examples/tutorials/B2A504-MCDecayStringNtupleTool.py`
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Understanding the decay string
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The following is an example of a decay string:
-
-.. code-block:: python
-
-  '-413 (--> -421 (--> 321 -211) -211) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) ^-413 (--> -421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> ^-421 (--> 321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> ^321 -211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 ^-211) -211)) |  10022 (--> 413 (--> 421 (--> -321 211) 211) 111 (--> 22 22) 111 (--> 22 22) -413 (--> -421 (--> 321 -211) ^-211))'
-
-The string consists of several parts, separated by pipes :code:`|`.
-
-In each of the strings particles are identified via their PDG number; see for example: http://pdg.lbl.gov/2017/reviews/rpp2016-rev-monte-carlo-numbering.pdf
-
-The first part is the desired decay that is being searched for.
-
-This is followed by a number of strings equal to the number of particles in the desired decay (five in the example above: the D* (-413), the D (-421), the kaon (321), the first pion (-211), and the second pion (-211)).  For each of these particles the full string of the actual MC decay is given if the particle has a match, or "(No match)" if the particle does not have a match.  For example, the first particle is a D*(-413), and the associated string shows it matching with a D*(-413) indicated by a caret, ^, placed before the matched particle in the string.  In the string above all particles are corrected matched.
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Using the decay string with ROOT
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The decay string is stored as a :code:`std: :string` in the Ntuple tools; these are handled well by all recent versions of ROOT (including the version included in externals of basf2), but there may be some issues reading this if you are using a really old version of ROOT.
-
-The string will even plot directly onto a TCanvas if you click on the :code:`c_str()` function of the string, though this is unlikely to be very useful unless you have only a few events and a customised axis layout on the canvas.
-
-The strings can be drawn to the terminal, subject to any cuts you with to apply to, for example, help out with identifying the source of events that pass a particular set of cuts via:
-
-.. code-block:: bash
-
-  root [3] dsttree->Scan("DST_mcDecayString", "iCand==0 && evt_no == 42", "colsize=300")
-
-  # or
-
-  root [4] Bplus->Scan("B_mcDecayString", "B_mbc > 5.26 && abs(B_deltae) < 0.05", "colsize=300")
-
-It is necessary to specify the colsize variable in order to see the full string (if omitted only the first 8 characters are displayed), and the value should be set appropriately to see the full string for your decay.
-
-~~~~~~~~~~~~~~
-Concise format
-~~~~~~~~~~~~~~
-
-The decay string format is rather long, and it is possible to use a shorter format, by passing the option :code:`conciseString` to the module as follows:
-
-.. code-block:: python
-
-  path.add_module('ParticleMCDecayString', listName='D*+', conciseString = True)
-
-The concise string has the following format:
-
-.. code-block:: python
-
-  '521 (--> 310 211 111 (--> 22 22)) | 300553 (--> a521 (--> b310 c211 d111 (--> e22 f22)) -521 (--> 421 (--> 223 (--> -211 211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211))'
-
-In this example each of the six particles in the decay that is searched for are given an identifier (by default the minuscule Roman alphabet / Romaji, i.e. "a", "b", "c", etc, incrementing alphabetically).  There is only one string giving the actual MC decay, and it contains the identifiers with the particle to which they are matched.
-
-Multiple identifiers could match up to a single particle, commonly this might be an Y(4S) or a virtual photon:
-
-.. code-block:: python
-
-  '521 (--> 310 211 111 (--> 22 22)) |  ab300553 (--> 521 (--> 310 c211 111 (--> 22 22)) -521 (--> 413 (--> 421 (--> 310 310 211 -211) 211) 313 (--> 311 (--> 310) 111 (--> 22 22)) -321 -213 (--> -211 d111 (--> f22 e22))))'
-
-It there were unmatched particles it would look something like this:
-
-.. code-block:: python
-
-  '521 (--> 310 211 111 (--> 22 22)) | 300553 (--> 521 (--> b310 211 111 (--> 22 f22)) -521 (--> 421 (--> 223 (--> -211 c211 111 (--> 22 22)) 130) -213 (--> -211 111 (--> 22 22)) -311 (--> 310) 321 -211)) | No match: ade'
-
-
-If it is not possible to convert the string to the concise format then the standard string format is returned instead. 
-
-This will happen for instance if your decay has more than particles than identifiers (26 by default).  It is possible to alter the list of identifiers or add more by setting the option "identifiers", which has a default of :code:`std::string("abcdefghijklmnopqrstuvwxyz")`.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Pre release-01-00-00 inclusion in NtupleTools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To run ParticleMCDecayString and include information in the NtupleFile created from NtupleTools it is possible to do the following:
 
 .. code-block:: python
 
@@ -269,20 +163,12 @@ Then the decayHash and decayHashExtended can be included in NtupleTools by inclu
 
 .. code-block:: python
 
-  tools += ['CustomFloats[extraInfo(DecayHash)', my_decay]
-  tools += ['CustomFloats[extraInfo(DecayHashExtended)', my_decay]
-
-or (recommended) via an alias:
-
-.. code-block:: python
-
   from variables import variables
   variables.addAlias('decayHash', 'extraInfo(DecayHash)')
   variables.addAlias('decayHashExtended', 'extraInfo(DecayHashExtended)')
   ...
-  tools += ['CustomFloats[decayHash:decayHashExtended]', my_decay]
-
-The analyst can then compare the hashes in the nTupleFile with the hashes in the root file produced by the ParticleMCDecayString module to retrieve the decay strings.
+  variables += ['decayHash', 'decayHashExtended']
+  variablesToNtuple('mydecay', variables, path=mypath)
 
 ------------------
 Tau decay MC modes

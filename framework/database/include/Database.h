@@ -71,7 +71,7 @@ namespace Belle2 {
       /**
        * Constructor
        */
-      DBQuery(const std::string& aName, bool required = true): name(aName), missingOK(required) {};
+      explicit DBQuery(const std::string& aName, bool required = true): name(aName), missingOK(required) {};
       std::string name;         /**< identifier of the object */
       unsigned int revision{0}; /**< revision of the payload */
       std::string filename{};   /**< filename containing the payload */
@@ -91,8 +91,8 @@ namespace Belle2 {
        * @param aObject Pointer to the object
        * @param aIov Iov of the object
        */
-      DBImportQuery(const std::string& aName, TObject* aObject = 0,
-                    const IntervalOfValidity& aIov = IntervalOfValidity()): name(aName), object(aObject), iov(aIov) {};
+      explicit DBImportQuery(const std::string& aName, TObject* aObject = 0,
+                             const IntervalOfValidity& aIov = IntervalOfValidity()): name(aName), object(aObject), iov(aIov) {};
       std::string        name;   /**< identifier of the object */
       TObject*           object; /**< Pointer to the object */
       IntervalOfValidity iov;    /**< Interval of validity of the object */

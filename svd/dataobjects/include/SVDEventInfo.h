@@ -78,7 +78,7 @@ namespace Belle2 {
      *  Gets the type of SVDTrigger for the event
      */
     SVDTriggerType getTriggerType() const
-    { return m_triggerType; }
+    { return SVDTriggerType(m_triggerType); }
 
     /** X-talk info getter
      *  Gets the X-talk info for the event

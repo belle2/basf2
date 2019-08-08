@@ -298,7 +298,7 @@ namespace Belle2 {
     StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;
 
     /** debug level specified in the steering file */
-    int m_debugLevel;
+    int m_debugLevel = 0;
 
     /** Belle2Link delay of the merger reader */
     int m_mergerDelay = 0;
@@ -312,7 +312,7 @@ namespace Belle2 {
     int m_NeuroDelay = 0;
 
     /** cnttrg */
-    int m_Cnttrg = 0;
+    // int m_Cnttrg = 0; // not used, commented out at 2019/07/31 by ytlai
     int m_mergerCnttrg = 0;
     int m_2DFinderCnttrg = 0;
     int m_NeuroCnttrg = 0;

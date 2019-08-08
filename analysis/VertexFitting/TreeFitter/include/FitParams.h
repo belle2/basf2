@@ -23,7 +23,7 @@ namespace TreeFitter {
   public:
 
     /** Constructor */
-    explicit FitParams(int dim);
+    explicit FitParams(const int dim);
 
     /** Destructor */
     ~FitParams() {};

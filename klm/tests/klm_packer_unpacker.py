@@ -30,7 +30,7 @@ class PackerUnpackerTest(Module):
         return sorted(
             py_list,
             key=lambda x: (
-                x.isForward(),
+                x.getForward(),
                 x.getSector(),
                 x.getLayer(),
                 x.getStrip())
@@ -88,13 +88,12 @@ class PackerUnpackerTest(Module):
 
             # check the content of the digit
             # the following content is not consistent due to incomplete mapping file,  data/geometry/BKLMElectronicsMapping.xml
-            assert digit.isForward() == digit_unpacked.isForward()
+            assert digit.getForward() == digit_unpacked.getForward()
             assert digit.getSector() == digit_unpacked.getSector()
             assert digit.getLayer() == digit_unpacked.getLayer()
             assert digit.getStrip() == digit_unpacked.getStrip()
             assert digit.isPhiReadout() == digit_unpacked.isPhiReadout()
             assert digit.inRPC() == digit_unpacked.inRPC()
-            assert digit.isForward() == digit_unpacked.isForward()
             assert digit.getCTime() == digit_unpacked.getCTime()
             assert digit.getCharge() == digit_unpacked.getCharge()
             assert digit.isAboveThreshold() == digit_unpacked.isAboveThreshold()

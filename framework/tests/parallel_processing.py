@@ -11,6 +11,7 @@ from ROOT import TFile, TTree, Belle2
 
 class CheckEventNumbers(Module):
     """Class to check that we see all events we expect exactly once and nothing else"""
+
     def __init__(self, evtNumList):
         """Remember number of events to process"""
         super().__init__()

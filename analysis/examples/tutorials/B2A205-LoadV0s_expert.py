@@ -29,6 +29,7 @@ import modularAnalysis as ma
 import variables.collections as vc
 import variables.utils as vu
 import stdV0s as stdv
+import vertex as vtx
 
 # create path
 my_path = b2.create_path()
@@ -47,9 +48,9 @@ ma.printDataStore(path=my_path)
 # A vertex fit should also be performed
 # In this example a cut on the candidates mass is applied
 ma.fillParticleList(decayString='K_S0:V0 -> pi+ pi-', cut='0.3 < M < 0.7', path=my_path)
-ma.vertexKFit(list_name='K_S0:V0', conf_level=0.0, path=my_path)
+vtx.vertexTree(list_name='K_S0:V0', conf_level=0.0, path=my_path)
 ma.fillParticleList(decayString='Lambda0:V0 -> p+ pi-', cut='0.9 < M < 1.3', path=my_path)
-ma.vertexKFit(list_name='Lambda0:V0', conf_level=0.0, path=my_path)
+vtx.vertexTree(list_name='Lambda0:V0', conf_level=0.0, path=my_path)
 
 # alternatively, we can create a list of particles combined
 # using the analysis ParticleCombiner module
@@ -62,9 +63,9 @@ ma.fillParticleList(decayString='pi-:all', cut='', path=my_path)
 ma.fillParticleList(decayString='p+:all', cut='', path=my_path)
 
 ma.reconstructDecay(decayString='K_S0:RD -> pi+:all pi-:all', cut='0.3 < M < 0.7', path=my_path)
-ma.vertexKFit(list_name='K_S0:RD', conf_level=0.0, path=my_path)
+vtx.vertexTree(list_name='K_S0:RD', conf_level=0.0, path=my_path)
 ma.reconstructDecay(decayString='Lambda0:RD -> p+:all pi-:all', cut='0.9 < M < 1.3', path=my_path)
-ma.vertexKFit(list_name='Lambda0:RD', conf_level=0.0, path=my_path)
+vtx.vertexTree(list_name='Lambda0:RD', conf_level=0.0, path=my_path)
 
 # print contents of the DataStore after loading Particles
 ma.printDataStore(path=my_path)

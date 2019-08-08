@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2
+from b2test_utils import configure_logging_for_tests
 from ROOT import Belle2
 
-set_random_seed("something important")
+configure_logging_for_tests()
+basf2.set_random_seed("something important")
 
 
-class NoopModule(Module):
+class NoopModule(basf2.Module):
     """Doesn't do anything."""
 
 
-class TestModule(Module):
+class TestModule(basf2.Module):
     """Test to read relations in the input files."""
 
     #: event counter
@@ -25,9 +27,9 @@ class TestModule(Module):
         filemetadata = Belle2.PyStoreObj('FileMetaData', 1)
         nevents = filemetadata.obj().getNEvents()
         if self.iEvent < 12 and not nevents == 12:
-            B2FATAL("FileMetaData from file 1 not loaded!")
+            basf2.B2FATAL("FileMetaData from file 1 not loaded!")
         elif self.iEvent >= 12 and not nevents == 15:
-            B2FATAL("FileMetaData from file 2 not loaded!")
+            basf2.B2FATAL("FileMetaData from file 2 not loaded!")
 
         simhits = Belle2.PyStoreArray('PXDSimHits')
         for hit in simhits:
@@ -39,21 +41,21 @@ class TestModule(Module):
 
 
 inputfiles = [
-    Belle2.FileSystem.findFile('framework/tests/chaintest_1.root'),
-    Belle2.FileSystem.findFile('framework/tests/chaintest_2.root')
+    basf2.find_file('framework/tests/chaintest_1.root'),
+    basf2.find_file('framework/tests/chaintest_2.root')
 ]
 
-main = create_path()
+main = basf2.Path()
 
 # not used for anything, just checking wether the master module
 # can be found if it's not the first module in the path.
 main.add_module(NoopModule())
 
-main.add_module('RootInput', logLevel=LogLevel.WARNING, inputFileNames=inputfiles)
+main.add_module('RootInput', logLevel=basf2.LogLevel.WARNING, inputFileNames=inputfiles)
 main.add_module('EventInfoPrinter')
 main.add_module('PrintCollections', printForEvent=0)
 
 main.add_module(TestModule())
 
 # Process events
-process(main)
+basf2.process(main)

@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <alignment/GlobalTimeLine.h>
 
+
+#include <framework/core/PyObjConvUtils.h>
+
 namespace Belle2 {
   namespace alignment {
     namespace timeline {
@@ -269,6 +272,81 @@ namespace Belle2 {
           }
         }
         return result;
+      }
+
+      std::vector< EventMetaData > pySetupTimedepGLobalLabels(PyObject* config)
+      {
+        boost::python::handle<> handle(boost::python::borrowed(config));
+        boost::python::list configList(handle);
+        auto newConfig = PyObjConvUtils::convertPythonObject(configList,
+                                                             std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >());
+        return setupTimedepGlobalLabels(newConfig);
+
+      }
+
+
+      std::vector<EventMetaData> setupTimedepGlobalLabels(
+        std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >& config)
+      {
+        std::vector< std::tuple< std::set< int >, std::set< std::tuple< int, int, int > > > > myConfig = {};
+        std::set<std::tuple<int, int, int>> events;
+        for (auto& params_events : config) {
+          auto myRow = std::make_tuple(std::set<int>(), std::set<std::tuple< int, int, int>>());
+
+          for (auto& param : std::get<0>(params_events))
+            std::get<0>(myRow).insert(param);
+          for (auto& event : std::get<1>(params_events))
+            std::get<1>(myRow).insert(event);
+
+          for (auto& event : std::get<1>(params_events)) {
+            int eventNum = std::get<0>(event);
+            int runNum = std::get<1>(event);
+            int expNum = std::get<2>(event);
+
+            auto emd = std::make_tuple(eventNum, runNum, expNum);
+            events.insert(emd);
+
+
+            if (eventNum != 0) {
+              // Automatically add start of this run and start of next run as points where params can change
+              //NOTE: this is the main invariant we need to keep - if something can change inside run, it is expected
+              // it did change since last run and will change for next run, too... (i.e. if there is an event depencency,
+              // the IoV of the payload has to span only single run)
+              auto firstEventThisRun = std::make_tuple(0, runNum, expNum);
+              auto firstEventNextRun = std::make_tuple(0, runNum + 1, expNum);
+
+              events.insert(firstEventThisRun);
+              events.insert(firstEventNextRun);
+
+              std::get<1>(myRow).insert(firstEventThisRun);
+              std::get<1>(myRow).insert(firstEventNextRun);
+            }
+          }
+          myConfig.push_back(myRow);
+        }
+
+        std::vector<EventMetaData> eventsVect;
+        std::map<std::tuple<int, int, int>, int> eventIndices;
+
+
+        for (auto& event : events) {
+          eventsVect.push_back(EventMetaData(std::get<0>(event), std::get<1>(event), std::get<2>(event)));
+          eventIndices[event] = eventsVect.size() - 1;
+        }
+
+        GlobalLabel::clearTimeDependentParamaters();
+
+        for (auto& params_events : myConfig) {
+          for (auto& param : std::get<0>(params_events)) {
+            for (auto& event : std::get<1>(params_events)) {
+              GlobalLabel label(param);
+              auto eventIndex = eventIndices[event];
+              label.registerTimeDependent(eventIndex);
+            }
+          }
+        }
+
+        return eventsVect;
       }
     }
   }

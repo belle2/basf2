@@ -57,6 +57,7 @@
 #include <alignment/GblMultipleScatteringController.h>
 
 #include <genfit/KalmanFitterInfo.h>
+#include "../../../include/GlobalTimeLine.h"
 
 using namespace std;
 using namespace Belle2;
@@ -156,6 +157,10 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("events", m_eventNumbers,
            "List of (event, run, exp) with event numbers at which payloads can change for timedep calibration.",
            m_eventNumbers);
+  // Time dependence config
+  addParam("timedepConfig", m_timedepConfig,
+           "list{ {list{param1, param2, ...}, list{(ev1, run1, exp1), ...}}, ... }.",
+           m_timedepConfig);
 }
 
 void MillepedeCollectorModule::prepare()
@@ -238,7 +243,17 @@ void MillepedeCollectorModule::prepare()
   }
 
   // This will also build the hierarchy for the first time:
-  Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components, events);
+  if (!m_timedepConfig.empty() && m_eventNumbers.empty()) {
+    auto autoEvents = Belle2::alignment::timeline::setupTimedepGlobalLabels(m_timedepConfig);
+    Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components, autoEvents);
+  } else if (m_timedepConfig.empty() && !m_eventNumbers.empty()) {
+    Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components, events);
+  } else if (m_timedepConfig.empty() && m_eventNumbers.empty()) {
+    Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
+  } else {
+    B2ERROR("Cannot set both, event list and timedep config.");
+  }
+
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   AlignableCDCRecoHit::s_enableTrackT0LocalDerivative = m_fitTrackT0;

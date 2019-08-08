@@ -15,6 +15,8 @@
 #include <alignment/PedeApplication.h>
 #include <alignment/dataobjects/PedeSteering.h>
 
+#include <alignment/GlobalTimeLine.h>
+
 namespace Belle2 {
   /**
    * Class implementing Millepede calibration algorithm
@@ -49,6 +51,49 @@ namespace Belle2 {
     /// Set the events at which payloads can change for time-dep calibration (translation from
     /// time IDs (aka continuous subruns) to EventMetaData (and later IoVs))
     void setEvents(const std::vector<EventMetaData>& events) {m_events = events;}
+
+    /// Setup the complete time dependence of parameters at once (ensures consistency) (Python version)
+    ///
+    /// (Calls GlobalLabel static functions internally to fill its timedep. map)
+    ///
+    /// @param config python list of tuples of size 2, first element is list of parameter numbers
+    /// retrieved by GlobalLabel.construct(payload id (uid), element id, param id) (with empty timedep map)
+    /// second is list of event metadata as tuple of size 3 (event, run, exp)
+    /// For example:
+    ///
+    /// >>> config = [([1, 2], [(0, 0, 0), (111, 0, 0)]), ([3], (0, 3, 0))]
+    /// >>> setupTimedepGlobalLabels(config)
+    ///
+    /// will define parameters 1 and 2 to timedep with values changing at event 0 and 111 of run 0 exp 0
+    /// and (added automatically) at event 0 of run 1. Parameter 3 can change its value from run 2 to 3.
+    ///
+    /// Overrides the event slicing defined by setEvents()
+    ///
+    void setTimedepConfig(PyObject* config) {setEvents(alignment::timeline::setupTimedepGlobalLabels(config));}
+
+    /// Setup the complete time dependence of parameters at once (ensures consistency) (C++ version)
+    ///
+    /// (Calls GlobalLabel static functions internally to fill its timedep. map)
+    ///
+    /// @param config vector of tuples of size 2, first element is vector of parameter numbers
+    /// retrieved by GlobalLabel.construct(payload id (uid), element id, param id) (with empty timedep map)
+    /// second is vector of event metadata as tuple of size 3 (event, run, exp)
+    /// For example:
+    ///
+    ///     setupTimedepGlobalLabels
+    ///     (
+    ///         {{{1, 2}, {{0, 0, 0}, {111, 0, 0}}}, {{3}, {0, 3, 0}}}
+    ///     );
+    ///
+    /// will define parameters 1 and 2 to be timedep with values changing at event 0 and 111 of run 0 exp 0
+    /// and (added automatically) at event 0 of run 1. Parameter 3 can change its value from run 2 to 3.
+    ///
+    /// Overrides the event slicing defined by setEvents()
+    ///
+    void setTimedepConfig(std::vector< std::tuple< std::vector<int>, std::vector< std::tuple<int, int, int> > > >& config)
+    {
+      setEvents(alignment::timeline::setupTimedepGlobalLabels(config));
+    }
 
   protected:
 

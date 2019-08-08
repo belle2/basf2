@@ -16,6 +16,9 @@
 #include <framework/database/EventDependency.h>
 #include <memory>
 
+#include <boost/python.hpp>
+#include <boost/python/list.hpp>
+
 namespace Belle2 {
   namespace alignment {
     namespace timeline {
@@ -94,6 +97,45 @@ namespace Belle2 {
       /// @param timeid of column
       int getContinuousIndexByTimeID(const TimeTable& timeTable, int uid, int timeid);
 
+      /// Setup the complete time dependence of parameters at once (ensures consistency) (Python version)
+      ///
+      /// (Calls GlobalLabel static functions internally to fill its timedep. map)
+      ///
+      /// @param config python list of tuples of size 2, first element is list of parameter numbers
+      /// retrieved by GlobalLabel.construct(payload id (uid), element id, param id) (with empty timedep map)
+      /// second is list of event metadata as tuple of size 3 (event, run, exp)
+      /// For example:
+      ///
+      /// >>> config = [([1, 2], [(0, 0, 0), (111, 0, 0)]), ([3], (0, 3, 0))]
+      /// >>> setupTimedepGlobalLabels(config)
+      ///
+      /// will define parameters 1 and 2 to timedep with values changing at event 0 and 111 of run 0 exp 0
+      /// and (added automatically) at event 0 of run 1. Parameter 3 can change its value from run 2 to 3.
+      ///
+      /// @return vector of EventMetaData with the finest granularity inferred from the parameter configuration
+      ///
+      std::vector<EventMetaData> setupTimedepGlobalLabels(PyObject* config);
+
+      /// Setup the complete time dependence of parameters at once (ensures consistency) (C++ version)
+      ///
+      /// (Calls GlobalLabel static functions internally to fill its timedep. map)
+      ///
+      /// @param config vector of tuples of size 2, first element is vector of parameter numbers
+      /// retrieved by GlobalLabel.construct(payload id (uid), element id, param id) (with empty timedep map)
+      /// second is vector of event metadata as tuple of size 3 (event, run, exp)
+      /// For example:
+      ///
+      /// >>> config = [([1, 2], [(0, 0, 0), (111, 0, 0)]), ([3], (0, 3, 0))]
+      /// >>> setupTimedepGlobalLabels(config)
+      ///
+      /// will define parameters 1 and 2 to be timedep with values changing at event 0 and 111 of run 0 exp 0
+      /// and (added automatically) at event 0 of run 1. Parameter 3 can change its value from run 2 to 3.
+      ///
+      /// @return vector of EventMetaData with the finest granularity inferred from the parameter configuration
+      ///
+      std::vector<EventMetaData> setupTimedepGlobalLabels(
+        std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >& config);
+
       /// Convenient class to automatically create payloads from allowed time
       /// depedence of parameter, load their value from database, update te constants one by one
       /// usually from Millepde result) and output the final payloads (including EventDependencies)
@@ -136,6 +178,7 @@ namespace Belle2 {
         std::vector<std::pair<IntervalOfValidity, TObject*>> releaseObjects();
 
       };
+
     } // namespace timeline
   } // namespace alignment
 } // namespace Belle2

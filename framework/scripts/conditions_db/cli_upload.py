@@ -18,7 +18,7 @@ def command_upload(args, db=None):
     Upload a local database to the conditions database.
 
     This command allows uploading a local database which was created by basf2 to
-    the central database. It assumes that the global tag already exists so
+    the central database. It assumes that the globaltag already exists so
     please create it before if necessary using 'tag create'.
 
     The command requires the tagname to upload the payloads to and a
@@ -29,7 +29,7 @@ def command_upload(args, db=None):
 
     if db is None:
         args.add_argument("tag", metavar="TAGNAME",
-                          help="Global tag to use for iov creation")
+                          help="globaltag to use for iov creation")
         args.add_argument("payloadsfile", metavar="PAYLOADSFILE",
                           help="Testing payload storage file containing list of iovs")
         args.add_argument('--normalize', default=True,

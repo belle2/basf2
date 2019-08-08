@@ -171,12 +171,16 @@ public:
   /// Holds the minimum value for fitted integer axial phi location between superlayers.
   double m_findPhiZIntMin;
   /// Integer space
-  /// The rho max and min value for integer geo finder.
-  double m_rhoMax, m_rhoMin;
+  /// The rho max value for integer geo finder.
+  double m_rhoMax;
+  /// The rho min value for integer geo finder.
+  double m_rhoMin;
   /// The number of bits of rho for integer geo finder.
   int m_rhoBit;
-  /// The phi0 max and min value for integer geo finder.
-  double m_phi0Max, m_phi0Min;
+  /// The phi0 max value for integer geo finder.
+  double m_phi0Max;
+  /// The phi0 min value for integer geo finder.
+  double m_phi0Min;
   /// The number of bits of phi0 for integer geo finder.
   int m_phi0Bit;
   /// A factor that changes phi space to wire space.

@@ -36,14 +36,11 @@ void KLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
    * Here there is a memory leak in case of realloc() failure, but it does not
    * matter because a fatal error is issued in this case.
    */
-  /* cppcheck-suppress memleakOnRealloc */
   m_Photoelectrons =
     (struct Photoelectron*)realloc(m_Photoelectrons,
                                    size * sizeof(struct Photoelectron));
-  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex = (int*)realloc(m_PhotoelectronIndex,
                                        size * sizeof(int));
-  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
                                         size * sizeof(int));
   if (size != 0) {

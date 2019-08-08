@@ -6,7 +6,7 @@ test parsing of local database files
 """
 
 from basf2 import logging, LogLevel, LogInfo
-from conditions_db.cli_upload import parse_database_file
+from conditions_db.testing_payloads import parse_testing_payloads_file
 from b2test_utils import clean_working_directory, run_in_subprocess, configure_logging_for_tests
 import ROOT
 
@@ -60,7 +60,7 @@ with clean_working_directory():
             f.write(entry)
 
         # parse in python
-        entries = parse_database_file(filename, check_existing=False)
+        entries = parse_testing_payloads_file(filename, check_existing=False)
         if entries:
             print(entries)
         # and parse in C++

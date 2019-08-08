@@ -274,7 +274,7 @@ namespace Belle2 {
         return result;
       }
 
-      std::vector< EventMetaData > pySetupTimedepGLobalLabels(PyObject* config)
+      std::vector< EventMetaData > setupTimedepGlobalLabels(PyObject* config)
       {
         boost::python::handle<> handle(boost::python::borrowed(config));
         boost::python::list configList(handle);

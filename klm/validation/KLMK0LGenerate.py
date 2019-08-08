@@ -46,6 +46,10 @@ eklmReconstructor = register_module('EKLMReconstructor')
 klmK0LReconstructor = register_module('KLMK0LReconstructor')
 mc_matcher = register_module('MCMatcherKLMClusters')
 
+# Add progress bars
+progress = register_module('Progress')
+progressBar = register_module('ProgressBar')
+
 # Output
 output = register_module('RootOutput')
 output.param('outputFileName', '../KLMK0LOutput.root')
@@ -63,7 +67,10 @@ main.add_module(eklmReconstructor)
 main.add_module(klmK0LReconstructor)
 main.add_module(mc_matcher)
 
+main.add_module(progress)
+main.add_module(progressBar)
+
 main.add_module(output)
 
-# Process 100 events
+# Process the path
 process(main)

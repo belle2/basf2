@@ -222,9 +222,6 @@ namespace Belle2 {
     //! ECL Burst bit Threshold
     int m_ECLBurstThreshold = 0;
 
-    /* //! ETM module ID */
-    /* int m_module_ID; */
-
     //! the class title
     ClassDef(TRGECLETMPara, 2); /*< the class title */
   };
